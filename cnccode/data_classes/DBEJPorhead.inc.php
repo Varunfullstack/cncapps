@@ -20,8 +20,8 @@ class DBEJPorhead extends DBEPorhead
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -88,22 +88,31 @@ class DBEJPorhead extends DBEPorhead
     /**
      * Get rows by operative and date
      * @access public
+     * @param $supplierID
+     * @param $ordheadID
+     * @param $orderType
+     * @param $supplierRef
+     * @param $lineText
+     * @param string $partNo
+     * @param string $fromDate
+     * @param string $toDate
+     * @param string $context
      * @return bool Success
      */
     function getRowsBySearchCriteria(
-        $supplierID,
-        $ordheadID,
-        $orderType,
-        $supplierRef,
-        $lineText,
-        $partNo = '',
-        $fromDate = '',
-        $toDate = '',
+        $supplierID = null,
+        $ordheadID = null,
+        $orderType = null,
+        $supplierRef = null,
+        $lineText = null,
+        $partNo = null,
+        $fromDate = null,
+        $toDate = null,
         $context = 'PO'                    // PI = Purchase Invoice 'PO' = Purchase Order GI = Goods In
     )
     {
         $this->setMethodName("getRowsBySearchCriteria");
-        if ($lineText != '' OR $partNo != '') {
+        if ($lineText || $partNo) {
             $statement =
                 "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
                 " FROM " . $this->getTableName() .
@@ -139,25 +148,25 @@ class DBEJPorhead extends DBEPorhead
                 " LEFT JOIN customer ON ordhead.odh_custno= customer.cus_custno";
         }
         $statement = $statement . " WHERE 1=1";
-        if ($supplierID != '') {
+        if ($supplierID) {
             $statement = $statement .
                 " AND " . $this->getDBColumnName(self::supplierID) . "=" . $supplierID;
         }
-        if ($ordheadID != '') {
+        if ($ordheadID) {
             $statement = $statement .
                 " AND " . $this->getDBColumnName(self::ordheadID) . "=" . $ordheadID;
         }
-        if ($fromDate != '') {
+        if ($fromDate) {
             $statement = $statement .
                 " AND " . $this->getDBColumnName(self::date) . ">= '" . $fromDate . "'";
         }
-        if ($toDate != '') {
+        if ($toDate) {
             $statement = $statement .
                 " AND " . $this->getDBColumnName(self::date) . "<= '" . $toDate . "'";
         }
 
 
-        if ($orderType != '') {
+        if ($orderType) {
             if ($orderType == 'B') {
                 $statement = $statement .
                     " AND " . $this->getDBColumnName(self::type) . " IN('I','P')";
@@ -188,7 +197,7 @@ class DBEJPorhead extends DBEPorhead
             $statement .= " AND " . $this->getDBColumnName(self::directDeliveryFlag) . "<> 'Y'";
         }
 
-        if ($lineText != '') {
+        if ($lineText) {
             $statement .=
                 " AND MATCH (item.itm_desc, item.notes, item.itm_unit_of_sale)
 					AGAINST ('" . mysqli_real_escape_string(
@@ -197,14 +206,14 @@ class DBEJPorhead extends DBEPorhead
                 ) . "' IN BOOLEAN MODE)";
         }
 
-        if ($partNo != '') {
+        if ($partNo) {
             $statement .=
                 " AND item.itm_unit_of_sale LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $partNo
                 ) . "%'";
         }
-        if ($supplierRef != '') {
+        if ($supplierRef) {
             $statement .=
                 " AND " . $this->getDBColumnName(self::supplierRef) . " LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
@@ -220,10 +229,9 @@ class DBEJPorhead extends DBEPorhead
         return $ret;
     }
 
-    function getRow()
+    function getRow($porheadID = null)
     {
         $this->setMethodName("getRow");
-        $ret = FALSE;
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
@@ -247,7 +255,6 @@ class DBEJPorhead extends DBEPorhead
     function getPurchaseInvoiceRow()
     {
         $this->setMethodName("getPurchaseInvoiceRow");
-        $ret = FALSE;
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
@@ -279,5 +286,3 @@ class DBEJPorhead extends DBEPorhead
         return (parent::getRow());
     }
 }
-
-?>

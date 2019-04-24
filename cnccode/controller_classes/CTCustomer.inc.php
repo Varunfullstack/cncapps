@@ -1319,7 +1319,7 @@ class CTCustomer extends CTCNC
         );
 
         $dsCustomer = new DataSet($this);
-        if ($this->buCustomer->getDailyCallList($dsCustomer)) {
+        if ($this->buCustomer->getDailyCallList($this,$dsCustomer)) {
 
             $buUser = new BUUser($this);
 
@@ -1896,6 +1896,7 @@ ORDER BY cus_name ASC  ";
         $this->setMethodName('search');
 // Parameter validation
         if (!$this->buCustomer->getCustomersByNameMatch(
+            $this->dsCustomer,
             $this->getContactString(),
             $this->getPhoneString(),
             $this->getCustomerString(),
@@ -1903,8 +1904,7 @@ ORDER BY cus_name ASC  ";
             $this->convertDateYMD($this->getNewCustomerFromDate()),
             $this->convertDateYMD($this->getNewCustomerToDate()),
             $this->convertDateYMD($this->getDroppedCustomerFromDate()),
-            $this->convertDateYMD($this->getDroppedCustomerToDate()),
-            $this->dsCustomer
+            $this->convertDateYMD($this->getDroppedCustomerToDate())
         )
         ) {
             $this->setCustomerStringMessage(CTCUSTOMER_MSG_NONE_FND);
@@ -3363,6 +3363,7 @@ ORDER BY cus_name ASC  ";
     {
         $this->setMethodName('displayCustomerSelectPopup');
         $this->buCustomer->getCustomersByNameMatch(
+            $this->dsCustomer,
             null,
             null,
             $this->getCustomerString(),
@@ -3370,8 +3371,7 @@ ORDER BY cus_name ASC  ";
             null,
             null,
             null,
-            null,
-            $this->dsCustomer
+            null
         );
         if ($this->dsCustomer->rowCount() == 1) {
             $this->setTemplateFiles(

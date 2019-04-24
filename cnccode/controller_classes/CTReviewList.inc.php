@@ -13,6 +13,9 @@ require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 class CTReviewList extends CTCNC
 {
 
+    /** @var BUCustomer */
+    public $buCustomer;
+
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
@@ -28,17 +31,17 @@ class CTReviewList extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-
         $this->displayReviewList();
-
     }
 
     /**
      * Displays list of customers to review
      *
+     * @throws Exception
      */
     function displayReviewList()
     {
@@ -56,8 +59,8 @@ class CTReviewList extends CTCNC
         } else {
             $sortColumn = false;
         }
-
-        if ($this->buCustomer->getDailyCallList($dsCustomer, $sortColumn)) {
+        $dsCustomer = new DataSet($this);
+        if ($this->buCustomer->getDailyCallList($this, $dsCustomer, $sortColumn)) {
 
             $buUser = new BUUser($this);
 
@@ -73,8 +76,9 @@ class CTReviewList extends CTCNC
                     );
 
                 if ($dsCustomer->getValue(DBECustomer::reviewUserID)) {
+                    $dsUser = new DataSet($this);
                     $buUser->getUserByID($dsCustomer->getValue(DBECustomer::reviewUserID), $dsUser);
-                    $user = $dsUser->getValue('name');
+                    $user = $dsUser->getValue(DBEUser::name);
                 } else {
                     $user = false;
                 }
@@ -88,7 +92,9 @@ class CTReviewList extends CTCNC
 
                     array(
                         'customerName' => $dsCustomer->getValue(DBECustomer::name),
-                        'reviewDate'   => (new DateTime($dsCustomer->getValue(DBECustomer::reviewDate)))->format('d/m/Y'),
+                        'reviewDate'   => (new DateTime($dsCustomer->getValue(DBECustomer::reviewDate)))->format(
+                            'd/m/Y'
+                        ),
                         'reviewTime'   => $dsCustomer->getValue(DBECustomer::reviewTime),
                         'reviewAction' => substr($dsCustomer->getValue(DBECustomer::reviewAction), 0, 50),
                         'reviewUser'   => $user,
@@ -97,18 +103,10 @@ class CTReviewList extends CTCNC
                     )
 
                 );
-
                 $this->template->parse('reviews', 'reviewBlock', true);
-
             }
-
             $this->template->parse('CONTENTS', 'CustomerReviewList', true);
-
         }
-
         $this->parsePage();
-
     }
-
-}// end of class
-?>
+}

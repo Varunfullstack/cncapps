@@ -38,6 +38,7 @@ class CTManagementReports extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -70,6 +71,9 @@ class CTManagementReports extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function spendByManufacturer()
     {
         $this->setMethodName('spendByManufacturer');
@@ -90,26 +94,9 @@ class CTManagementReports extends CTCNC
 
         $this->template->set_block('ManagementReportsSpendManufacturer', 'resultsBlock', 'results');
 
-        $minValue = 99999;
-        $maxValue = 0;
         $grandTotal = 0;
 
         while ($row = $results->fetch_object()) {
-            /*
-                        $manufacturers[] = $row->manufacturer;
-                        $value[1][] = $row->month1;
-                        $value[2][] = $row->month2;
-                        $value[3][] = $row->month3;
-                        $value[4][] = $row->month4;
-                        $value[5][] = $row->month5;
-                        $value[6][] = $row->month6;
-                        $value[7][] = $row->month7;
-                        $value[8][] = $row->month8;
-                        $value[9][] = $row->month9;
-                        $value[10][] = $row->month10;
-                        $value[11][] = $row->month11;
-                        $value[12][] = $row->month12;
-            */
             $total =
                 $row->month1 +
                 $row->month2 +
@@ -148,17 +135,15 @@ class CTManagementReports extends CTCNC
             $this->template->parse('results', 'resultsBlock', true);
         }
 
-        $urlGenerateReport =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'spendByManufacturer'
-                )
-            );
+        $urlGenerateReport = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'spendByManufacturer'
+            )
+        );
 
         $this->template->set_var(
             array(
-                'urlTheChart'       => $urlTheChart,
                 'urlGenerateReport' => $urlGenerateReport,
                 'manufacturerName'  => $_REQUEST['manufacturerName'],
                 'grandTotal'        => Controller::formatNumber($grandTotal, 0)
@@ -169,8 +154,11 @@ class CTManagementReports extends CTCNC
 
         $this->parsePage();
 
-    } // end function sepndByManufacturer
+    }
 
+    /**
+     * @throws Exception
+     */
     function spendBySupplier()
     {
         $this->setMethodName('spendBySupplier');
@@ -183,28 +171,23 @@ class CTManagementReports extends CTCNC
         $this->template->set_block('ManagementReportsSpendSupplier', 'yearBlock', 'years');
         $this->parseYearSelector($_REQUEST['year']);
 
-        $supplierPopupURL =
-            Controller::buildLink(
-                CTCNC_PAGE_SUPPLIER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_SUPPLIER_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
+        $supplierPopupURL = Controller::buildLink(
+            CTCNC_PAGE_SUPPLIER,
+            array(
+                'action'  => CTCNC_ACT_DISP_SUPPLIER_POPUP,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
 
         $results = $this->buManagementReports->getSpendBySupplier($_REQUEST['supplierID'], $_REQUEST['year']);
-
+        $supplierName = null;
         if ($_REQUEST['supplierID']) {
             $dbeSupplier = new DBESupplier($this);
             $dbeSupplier->getRow($_REQUEST['supplierID']);
-            $supplierName = $dbeSupplier->getValue('name');
+            $supplierName = $dbeSupplier->getValue(DBESupplier::name);
         }
 
         $this->template->set_block('ManagementReportsSpendSupplier', 'resultsBlock', 'results');
-
-        $minValue = 99999;
-        $maxValue = 0;
-
         while ($row = $results->fetch_object()) {
 
             $suppliers[] = $row->supplier;
@@ -250,19 +233,19 @@ class CTManagementReports extends CTCNC
                         $row->month10 +
                         $row->month11 +
                         $row->month12,
-                        0)
+                        0
+                    )
                 )
             );
 
             $this->template->parse('results', 'resultsBlock', true);
         }
-        $urlGenerateReport =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'SpendBySupplier'
-                )
-            );
+        $urlGenerateReport = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'SpendBySupplier'
+            )
+        );
         $this->template->set_var(
             array(
                 'urlGenerateReport' => $urlGenerateReport,
@@ -278,6 +261,9 @@ class CTManagementReports extends CTCNC
 
     } // end function spendBySupplier
 
+    /**
+     * @throws Exception
+     */
     function spendByCategory()
     {
         $this->setMethodName('spendByCategory');
@@ -297,12 +283,9 @@ class CTManagementReports extends CTCNC
 
         $this->template->set_block('ManagementReportsSpendCategory', 'resultsBlock', 'results');
 
-        $minValue = 99999;
-        $maxValue = 0;
-
         while ($row = $results->fetch_object()) {
 
-            $categorys[] = $row->category;
+            $categories[] = $row->category;
             $value[1][] = $row->month1;
             $value[2][] = $row->month2;
             $value[3][] = $row->month3;
@@ -345,26 +328,24 @@ class CTManagementReports extends CTCNC
                         $row->month10 +
                         $row->month11 +
                         $row->month12,
-                        0)
+                        0
+                    )
                 )
             );
 
             $this->template->parse('results', 'resultsBlock', true);
         }
 
-        $urlGenerateReport =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'SpendByCategory'
-                )
-            );
+        $urlGenerateReport = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'SpendByCategory'
+            )
+        );
 
         $this->template->set_var(
             array(
                 'urlGenerateReport' => $urlGenerateReport,
-                'urlCategoryPopup'  => $categoryPopupURL,
-                'categoryName'      => $categoryName,
                 'categoryID'        => $_REQUEST['categoryID']
             )
         );
@@ -373,7 +354,7 @@ class CTManagementReports extends CTCNC
 
         $this->parsePage();
 
-    } // end function sepndBycategory
+    }
 
     /**
      * @param $year
@@ -429,6 +410,9 @@ class CTManagementReports extends CTCNC
         return $data;
     }
 
+    /**
+     * @throws Exception
+     */
     function SalesByCustomer()
     {
         $this->setMethodName('SalesByCustomer');
@@ -449,23 +433,21 @@ class CTManagementReports extends CTCNC
         $this->parseNoOfPcs($this->template, $_REQUEST['noOfPcs']);
 
 
-        $customerPopupURL =
-            Controller::buildLink(
-                CTCNC_PAGE_CUSTOMER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
+        $customerPopupURL = Controller::buildLink(
+            CTCNC_PAGE_CUSTOMER,
+            array(
+                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
 
-        $fetchDataUrl =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => self::GetSalesByCustomerDataAction
-                )
-            );
-
+        $fetchDataUrl = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => self::GetSalesByCustomerDataAction
+            )
+        );
+        $customerName = null;
         if ($_REQUEST['customerID']) {
             $dbeCustomer = new DBECustomer($this);
             $dbeCustomer->getRow($_REQUEST['customerID']);
@@ -492,6 +474,7 @@ class CTManagementReports extends CTCNC
     /**
      * Get and parse year drop-down selector
      * @access private
+     * @param $selectedYear
      */
     function parseYearSelector($selectedYear)
     {
@@ -499,7 +482,7 @@ class CTManagementReports extends CTCNC
 
         for ($year = $thisYear; $year >= $thisYear - 3; $year--) {
 
-            $yearSelected = ($selectedYear == $year) ? CT_SELECTED : '';
+            $yearSelected = ($selectedYear == $year) ? CT_SELECTED : null;
 
             $this->template->set_var(
                 array(
@@ -527,11 +510,10 @@ class CTManagementReports extends CTCNC
         ];
 
         foreach ($options as $option) {
-            $isSelected = $selectedNoOfPcs ? ($selectedNoOfPcs == $option ? CT_SELECTED : '') : ($option === "Search All" ? CT_SELECTED : '');
+            $isSelected = $selectedNoOfPcs ? ($selectedNoOfPcs == $option ? CT_SELECTED : null) : ($option === "Search All" ? CT_SELECTED : null);
+            $value = $option;
             if ($option === 'Search All') {
-                $value = '';
-            } else {
-                $value = $option;
+                $value = null;
             }
 
             $this->template->set_var(
@@ -557,7 +539,7 @@ class CTManagementReports extends CTCNC
 
         $this->template->set_var(
             array(
-                'selectedSector'    => $selectedSectorID ? CT_SELECTED : '',
+                'selectedSector'    => $selectedSectorID ? CT_SELECTED : null,
                 'sectorID'          => null,
                 'sectorDescription' => "Search All"
             )
@@ -569,7 +551,7 @@ class CTManagementReports extends CTCNC
 
             $sectorID = $dsResults->getValue(DBESector::sectorID);
             $sectorDescription = $dsResults->getValue(DBESector::description);
-            $selectedSector = ($selectedSectorID == $sectorID) ? CT_SELECTED : '';
+            $selectedSector = ($selectedSectorID == $sectorID) ? CT_SELECTED : null;
 
             $this->template->set_var(
                 array(
@@ -582,6 +564,4 @@ class CTManagementReports extends CTCNC
             $this->template->parse('sectors', 'sectorBlock', true);
         }
     }
-
-}// end of class
-?>
+}

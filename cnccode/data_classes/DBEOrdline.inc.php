@@ -27,8 +27,8 @@ class DBEOrdline extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -136,13 +136,13 @@ class DBEOrdline extends DBEntity
 
     function deleteRowsByOrderID()
     {
-        if ($this->getValue('ordheadID') == '') {
+        if ($this->getValue(self::ordheadID) == '') {
             $this->raiseError('ordheadID not set');
         }
         $this->setQueryString(
             'DELETE FROM ' . $this->getTableName() . ' WHERE ' . $this->getDBColumnName(
-                'ordheadID'
-            ) . ' = ' . $this->getValue('ordheadID')
+                self::ordheadID
+            ) . ' = ' . $this->getValue(self::ordheadID)
         );
         return (parent::runQuery());
     }
@@ -150,8 +150,8 @@ class DBEOrdline extends DBEntity
     function getPKWhere()
     {
         return (
-            $this->getDBColumnName('ordheadID') . ' = ' . $this->getValue('ordheadID') .
-            " AND " . $this->getDBColumnName('sequenceNo') . ' = ' . $this->getValue('sequenceNo')
+            $this->getDBColumnName(self::ordheadID) . ' = ' . $this->getValue(self::ordheadID) .
+            " AND " . $this->getDBColumnName(self::sequenceNo) . ' = ' . $this->getValue(self::sequenceNo)
         );
     }
 
@@ -163,22 +163,20 @@ class DBEOrdline extends DBEntity
     function shuffleRowsDown()
     {
         $this->setMethodName("shuffleRowsDown");
-        if ($this->getValue('ordheadID') == '') {
+        if (!$this->getValue(self::ordheadID)) {
             $this->raiseError('ordheadID not set');
         }
-        if ($this->getValue('sequenceNo') == '') {
+        if (!$this->getValue(self::sequenceNo)) {
             $this->setValue(
-                'sequenceNo',
-                0
+                self::sequenceNo,
+                null
             );
         }
-        $sequenceNo = $this->getDBColumnName('sequenceNo');
-        $ordheadID = $this->getDBColumnName('ordheadID');
         $this->setQueryString(
             'UPDATE ' . $this->getTableName() .
-            ' SET ' . $this->getDBColumnName('sequenceNo') . '=' . $this->getDBColumnName('sequenceNo') . '+1' .
-            ' WHERE ' . $this->getDBColumnName('ordheadID') . ' = ' . $this->getFormattedValue('ordheadID') .
-            ' AND ' . $this->getDBColumnName('sequenceNo') . ' >= ' . $this->getFormattedValue('sequenceNo')
+            ' SET ' . $this->getDBColumnName(self::sequenceNo) . '=' . $this->getDBColumnName(self::sequenceNo) . '+1' .
+            ' WHERE ' . $this->getDBColumnName(self::ordheadID) . ' = ' . $this->getFormattedValue(self::ordheadID) .
+            ' AND ' . $this->getDBColumnName(self::sequenceNo) . ' >= ' . $this->getFormattedValue(self::sequenceNo)
         );
         $ret = $this->runQuery();
         $this->resetQueryString();
@@ -193,20 +191,20 @@ class DBEOrdline extends DBEntity
     function shuffleRowsUp()
     {
         $this->setMethodName("shuffleRowsUp");
-        if ($this->getValue('ordheadID') == '') {
+        if ($this->getValue(self::ordheadID) == '') {
             $this->raiseError('ordheadID not set');
         }
-        if ($this->getValue('sequenceNo') == '') {
+        if ($this->getValue(self::sequenceNo) == '') {
             $this->setValue(
-                'sequenceNo',
+                self::sequenceNo,
                 0
             );
         }
         $this->setQueryString(
             'UPDATE ' . $this->getTableName() .
-            ' SET ' . $this->getDBColumnName('sequenceNo') . '=' . $this->getDBColumnName('sequenceNo') . '-1' .
-            ' WHERE ' . $this->getDBColumnName('ordheadID') . ' = ' . $this->getValue('ordheadID') .
-            ' AND ' . $this->getDBColumnName('sequenceNo') . ' >= ' . $this->getValue('sequenceNo')
+            ' SET ' . $this->getDBColumnName(self::sequenceNo) . '=' . $this->getDBColumnName(self::sequenceNo) . '-1' .
+            ' WHERE ' . $this->getDBColumnName(self::ordheadID) . ' = ' . $this->getValue(self::ordheadID) .
+            ' AND ' . $this->getDBColumnName(self::sequenceNo) . ' >= ' . $this->getValue(self::sequenceNo)
         );
         $ret = $this->runQuery();
         $this->resetQueryString();
@@ -217,49 +215,50 @@ class DBEOrdline extends DBEntity
      * Move given row down in the sequence
      * Swaps sequence numbers of 2 rows
      * @access public
+     * @param string $direction
      * @return bool
      */
     function moveRow($direction = 'UP')
     {
         $this->setMethodName("moveRow");
-        if ($this->getValue('ordheadID') == '') {
+        if ($this->getValue(self::ordheadID) == '') {
             $this->raiseError('ordheadID not set');
         }
-        if ($this->getValue('sequenceNo') == '') {
+        if ($this->getValue(self::sequenceNo) == '') {
             $this->setValue(
-                'sequenceNo',
+                self::sequenceNo,
                 0
             );
         }
         // current row into temporary buffer row: sequenceNo = -99
         $this->setQueryString(
             'UPDATE ' . $this->getTableName() .
-            ' SET ' . $this->getDBColumnName('sequenceNo') . ' = -99' .
-            ' WHERE ' . $this->getDBColumnName('ordheadID') . ' = ' . $this->getValue('ordheadID') .
-            ' AND ' . $this->getDBColumnName('sequenceNo') . ' = ' . $this->getValue('sequenceNo')
+            ' SET ' . $this->getDBColumnName(self::sequenceNo) . ' = -99' .
+            ' WHERE ' . $this->getDBColumnName(self::ordheadID) . ' = ' . $this->getValue(self::ordheadID) .
+            ' AND ' . $this->getDBColumnName(self::sequenceNo) . ' = ' . $this->getValue(self::sequenceNo)
         );
-        $ret = $this->runQuery();
+        $this->runQuery();
         $this->resetQueryString();
         // Move row next to this one
         if ($direction == 'UP') {
-            $sequenceNo = $this->getValue('sequenceNo') - 1;
+            $sequenceNo = $this->getValue(self::sequenceNo) - 1;
         } else {            // down
-            $sequenceNo = $this->getValue('sequenceNo') + 1;
+            $sequenceNo = $this->getValue(self::sequenceNo) + 1;
         }
         $this->setQueryString(
             'UPDATE ' . $this->getTableName() .
-            ' SET ' . $this->getDBColumnName('sequenceNo') . ' = ' . $this->getValue('sequenceNo') .
-            ' WHERE ' . $this->getDBColumnName('ordheadID') . ' = ' . $this->getValue('ordheadID') .
-            ' AND ' . $this->getDBColumnName('sequenceNo') . ' = ' . $sequenceNo
+            ' SET ' . $this->getDBColumnName(self::sequenceNo) . ' = ' . $this->getValue(self::sequenceNo) .
+            ' WHERE ' . $this->getDBColumnName(self::ordheadID) . ' = ' . $this->getValue(self::ordheadID) .
+            ' AND ' . $this->getDBColumnName(self::sequenceNo) . ' = ' . $sequenceNo
         );
-        $ret = $this->runQuery();
+        $this->runQuery();
         $this->resetQueryString();
         // Move current row from temp
         $this->setQueryString(
             'UPDATE ' . $this->getTableName() .
-            ' SET ' . $this->getDBColumnName('sequenceNo') . ' = ' . $sequenceNo .
-            ' WHERE ' . $this->getDBColumnName('ordheadID') . ' = ' . $this->getValue('ordheadID') .
-            ' AND ' . $this->getDBColumnName('sequenceNo') . ' = -99'
+            ' SET ' . $this->getDBColumnName(self::sequenceNo) . ' = ' . $sequenceNo .
+            ' WHERE ' . $this->getDBColumnName(self::ordheadID) . ' = ' . $this->getValue(self::ordheadID) .
+            ' AND ' . $this->getDBColumnName(self::sequenceNo) . ' = -99'
         );
         $ret = $this->runQuery();
         $this->resetQueryString();
@@ -274,14 +273,14 @@ class DBEOrdline extends DBEntity
     function getRowsForPO()
     {
         $this->setMethodName("getRowsForPO");
-        if ($this->getValue('ordheadID') == '') {
+        if ($this->getValue(self::ordheadID) == '') {
             $this->raiseError('ordheadID not set');
         }
         $this->setQueryString(
             "SELECT DISTINCT  odl_suppno, odl_stockcat, " .
             "odl_itemno, odl_d_unit, SUM(odl_qty_ord) " .
             "FROM ordline " .
-            "WHERE odl_ordno = " . $this->getValue('ordheadID') .
+            "WHERE odl_ordno = " . $this->getValue(self::ordheadID) .
             " AND odl_type = 'I' " .
             "GROUP BY odl_suppno, odl_stockcat, " .
             "odl_itemno, odl_d_unit " .
@@ -304,11 +303,9 @@ class DBEOrdline extends DBEntity
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE odl_ordno = " . $ordheadID .
-            " AND " . $this->getDBColumnName('sequenceNo') . " = " . $sequenceNo
+            " AND " . $this->getDBColumnName(self::sequenceNo) . " = " . $sequenceNo
         );
 
         return (parent::getRow());
     }
 }
-
-?>

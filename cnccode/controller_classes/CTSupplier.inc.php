@@ -87,6 +87,7 @@ class CTSupplier extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -136,12 +137,14 @@ class CTSupplier extends CTCNC
     /**
      * Display the popup selector form
      * @access private
+     * @throws Exception
      */
     function displaySupplierSelectPopup()
     {
         $this->setMethodName('displaySupplierSelectPopup');
 
         // A single slash means create new supplier
+        $urlCreate = null;
         if ($_REQUEST['supplierName']{0} == '/') {
             $urlCreate = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
@@ -165,8 +168,8 @@ class CTSupplier extends CTCNC
             );
             $this->template->set_var(
                 array(
-                    'submitName' => addslashes($this->dsSupplier->getValue("name")),
-                    'supplierID' => $this->dsSupplier->getValue("supplierID")
+                    'submitName' => addslashes($this->dsSupplier->getValue(DBEJSupplier::name)),
+                    'supplierID' => $this->dsSupplier->getValue(DBEJSupplier::supplierID)
                 )
             );
         } else {
@@ -202,9 +205,13 @@ class CTSupplier extends CTCNC
                 while ($this->dsSupplier->fetchNext()) {
                     $this->template->set_var(
                         array(
-                            'supplierName' => Controller::htmlDisplayText(($this->dsSupplier->getValue("name"))),
-                            'submitName'   => Controller::htmlDisplayText($this->dsSupplier->getValue("name")),
-                            'supplierID'   => $this->dsSupplier->getValue("supplierID")
+                            'supplierName' => Controller::htmlDisplayText(
+                                ($this->dsSupplier->getValue(DBEJSupplier::name))
+                            ),
+                            'submitName'   => Controller::htmlDisplayText(
+                                $this->dsSupplier->getValue(DBEJSupplier::name)
+                            ),
+                            'supplierID'   => $this->dsSupplier->getValue(DBEJSupplier::supplierID)
                         )
                     );
                     $this->template->parse(
@@ -232,6 +239,7 @@ class CTSupplier extends CTCNC
     /**
      * Display the search form
      * @access private
+     * @throws Exception
      */
     function displaySearchForm()
     {
@@ -281,13 +289,13 @@ class CTSupplier extends CTCNC
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'     => CTCNC_ACT_SUPPLIER_EDIT,
-                            'supplierID' => $this->dsSupplier->getValue("supplierID")
+                            'supplierID' => $this->dsSupplier->getValue(DBEJSupplier::supplierID)
                         )
                     );
 
                 $this->template->set_var(
                     array(
-                        'supplierName' => $this->dsSupplier->getValue("name"),
+                        'supplierName' => $this->dsSupplier->getValue(DBEJSupplier::name),
                         'supplierURL'  => $supplierURL
                     )
                 );
@@ -309,12 +317,13 @@ class CTSupplier extends CTCNC
     /**
      * Search for suppliers using supplierName
      * @access private
+     * @throws Exception
      */
     function search()
     {
         $this->setMethodName('search');
 // Parameter validation
-        if ($_REQUEST['supplierString'] == '' && $_REQUEST['address'] == '') {
+        if (!$_REQUEST['supplierString'] && !$_REQUEST['address']) {
             $GLOBALS['supplierStringMessage'] = 'You must specify some parameters';
             $this->displaySearchForm();
             exit;
@@ -332,7 +341,7 @@ class CTSupplier extends CTCNC
 
         if ($this->dsSupplier->rowCount() == 1) {
             $this->dsSupplier->fetchNext();
-            $_REQUEST['supplierID'] = $this->dsSupplier->getValue("supplierID");
+            $_REQUEST['supplierID'] = $this->dsSupplier->getValue(DBEJSupplier::supplierID);
             $_REQUEST['action'] = CTCNC_ACT_SUPPLIER_EDIT;
             $this->supplierForm();
         } else {
@@ -346,6 +355,7 @@ class CTSupplier extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function supplierForm()
     {
@@ -372,7 +382,7 @@ class CTSupplier extends CTCNC
                     CTCNC_PAGE_CONTACT,
                     array(
                         'action'     => CTCNC_ACT_CONTACT_POPUP,
-                        'supplierID' => $this->dsSupplier->getValue('supplierID'),
+                        'supplierID' => $this->dsSupplier->getValue(DBEJSupplier::supplierID),
                         'htmlFmt'    => CT_HTML_FMT_POPUP
                     )
                 );
@@ -387,8 +397,10 @@ class CTSupplier extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'contactName'     => Controller::htmlDisplayText($this->dsSupplier->getValue('contactName')),
-                    'contactID'       => $this->dsSupplier->getValue('contactID'),
+                    'contactName'     => Controller::htmlDisplayText(
+                        $this->dsSupplier->getValue(DBEJSupplier::contactName)
+                    ),
+                    'contactID'       => $this->dsSupplier->getValue(DBEJSupplier::contactID),
                     'urlContactEdit'  => $urlContactEdit,
                     'urlContactPopup' => $urlContactPopup
                 )
@@ -461,6 +473,7 @@ class CTSupplier extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function supplierFormPrepareAdd()
     {
@@ -485,6 +498,7 @@ class CTSupplier extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function supplierFormPrepareEdit()
     {
@@ -514,6 +528,7 @@ class CTSupplier extends CTCNC
 
     function parsePayMethodSelector($payMethodID)
     {
+        $dsPayMethod = new DataSet($this);
         $this->buSupplier->getAllPayMethods($dsPayMethod);
         $this->template->set_block(
             'SupplierEdit',
@@ -527,7 +542,7 @@ class CTSupplier extends CTCNC
                     'payMethodID'          => $dsPayMethod->getValue(DBEPayMethod::payMethodID),
                     'payMethodSelected'    => ($payMethodID == $dsPayMethod->getValue(
                             DBEPayMethod::payMethodID
-                        )) ? CT_SELECTED : ''
+                        )) ? CT_SELECTED : null
                 )
             );
             $this->template->parse(
@@ -541,6 +556,7 @@ class CTSupplier extends CTCNC
     /**
      * Update supplier record
      * @access private
+     * @throws Exception
      */
     function supplierUpdate()
     {
@@ -556,20 +572,24 @@ class CTSupplier extends CTCNC
             } else {
                 $_REQUEST['action'] = CTCNC_ACT_SUPPLIER_EDIT;
             }
-            $_REQUEST['supplierID'] = $this->dsSupplier->getValue('supplierID');
+            $_REQUEST['supplierID'] = $this->dsSupplier->getValue(DBEJSupplier::supplierID);
             $this->supplierForm();
             exit;
         }
         $this->buSupplier->updateSupplier($this->dsSupplier);
         // force entry of a contact if none exists
 
-        if ($this->dsSupplier->getValue('contactID') == 0) {
+        if ($this->dsSupplier->getValue(DBEJSupplier::contactID) == 0) {
             $this->setFormErrorMessage('Please create a contact or select an existing contact');
             $_REQUEST['action'] = CTCNC_ACT_SUPPLIER_EDIT;
             $this->supplierForm();
             exit;
         } else {
-//             if there is a parent (popup) this forces update of supplierID back through Javascript to parent HTML window
+
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array()
+            );
             if (isset($_SESSION['supplierParentDescField'])) {
                 $urlNext = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -579,15 +599,8 @@ class CTSupplier extends CTCNC
                         'htmlFmt'      => CT_HTML_FMT_POPUP
                     )
                 );
-            } else {
-
-                $urlNext = Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array()
-                );
             }
             header('Location: ' . $urlNext);
         }
     }
-}// end of class
-?>
+}

@@ -16,9 +16,7 @@ if ($_REQUEST['period']) {
 $buQuestionnaireReport->setPeriod($period);
 $buQuestionnaireReport->setQuestionnaireID(1); // CNC support
 
-$prizewinner = $buQuestionnaireReport->setPrizewinner();
-
-$report = '<P><A HREF="' . $_SERVER['HTTP_HOST'] . '/Prizewinner.php">' . $prizewinner . '</A></P>';
+$report = null;
 
 $report .= $buQuestionnaireReport->getReport();
 
@@ -69,5 +67,3 @@ $buMail->putInQueue(
     $hdrs,
     $body
 );
-
-?>

@@ -37,19 +37,17 @@ class DBEJQuotation extends DBEQuotation
     function getRowsByOrdheadID()
     {
         $this->setMethodName("getRowsByOrdheadID");
-        if ($this->getValue('ordheadID') == '') {
+        if ($this->getValue(self::ordheadID) == '') {
             $this->raiseError('ordheadID not set');
         }
         $this->setQueryString(
             'SELECT ' . $this->getDBColumnNamesAsString() .
             ' FROM ' . $this->getTableName() . ' LEFT JOIN consultant ON ' . $this->getTableName(
-            ) . '.' . $this->getDBColumnName('userID') . '=consultant.cns_consno' .
+            ) . '.' . $this->getDBColumnName(self::userID) . '=consultant.cns_consno' .
             ' WHERE ' . $this->getTableName() . '.' . $this->getDBColumnName(
-                'ordheadID'
-            ) . '=' . $this->getFormattedValue('ordheadID')
+                self::ordheadID
+            ) . '=' . $this->getFormattedValue(self::ordheadID)
         );
         return (parent::getRows());
     }
 }
-
-?>

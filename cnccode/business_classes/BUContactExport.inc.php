@@ -8,11 +8,12 @@ require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUMail.inc.php');
+require_once($cfg['path_ct'] . '/CTContactExport.inc.php');
 
 class BUContactExport extends Business
 {
-
-    var $dbeContact = "";
+    /** @var */
+    public $dbeContact;
 
     /**
      * Constructor
@@ -24,6 +25,13 @@ class BUContactExport extends Business
         parent::__construct($owner);
     }
 
+    /**
+     * @param DSForm $dsSearchForm
+     * @param $quotationItemIDs
+     * @param $contractItemIDs
+     * @param $sectorIDs
+     * @return bool|mysqli_result
+     */
     function search(
         $dsSearchForm,
         $quotationItemIDs,
@@ -32,12 +40,13 @@ class BUContactExport extends Business
     )
     {
         $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
 
         $query =
             "SELECT DISTINCT";
 
-        if ($dsSearchForm->getValue('exportEmailOnlyFlag')) {
+        if ($dsSearchForm->getValue(CTContactExport::searchFormExportEmailOnlyFlag)) {
             $query .= " con_email AS EmailAddress";
         } else {
             $query .=
@@ -61,43 +70,53 @@ class BUContactExport extends Business
         CONCAT(con_first_name,' ',con_last_name) AS DisplayName,
         cus_prospect AS Prospect";
 
-            if ($dsSearchForm->getValue('noOfPCs')) {
-                $query .= ", CONCAT( '\'', '" . $dsSearchForm->getValue('noOfPCs') . "') AS `PCs`";
+            if ($dsSearchForm->getValue(CTContactExport::searchFormNoOfPCs)) {
+                $query .= ", CONCAT( '\'', '" . $dsSearchForm->getValue(
+                        CTContactExport::searchFormNoOfPCs
+                    ) . "') AS `PCs`";
             }
-            if ($dsSearchForm->getValue('noOfServers')) {
-                $query .= ", '" . $dsSearchForm->getValue('noOfServers') . "' AS `Servers >=`";
+            if ($dsSearchForm->getValue(CTContactExport::searchFormNoOfServers)) {
+                $query .= ", '" . $dsSearchForm->getValue(CTContactExport::searchFormNoOfServers) . "' AS `Servers >=`";
             }
-            if ($dsSearchForm->getValue('sendMailshotFlag')) {
+            if ($dsSearchForm->getValue(CTContactExport::searchFormSendMailshotFlag)) {
                 $query .= ", 'Y' AS `Mailshot`";
             }
-            if ($dsSearchForm->getValue('mailshot2Flag')) {
-                $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot2FlagDesc') . "`";
+            if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot2Flag)) {
+                $query .= ", 'Y' AS `" . $dsHeader->getValue(DBEHeader::mailshot2FlagDesc) . "`";
             }
-            if ($dsSearchForm->getValue('mailshot3Flag')) {
-                $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot3FlagDesc') . "`";
+            if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot3Flag)) {
+                $query .= ", 'Y' AS `" . $dsHeader->getValue(DBEHeader::mailshot3FlagDesc) . "`";
             }
-            if ($dsSearchForm->getValue('mailshot4Flag')) {
-                $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot4FlagDesc') . "`";
+            if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot4Flag)) {
+                $query .= ", 'Y' AS `" . $dsHeader->getValue(DBEHeader::mailshot4FlagDesc) . "`";
             }
-            if ($dsSearchForm->getValue('mailshot8Flag')) {
-                $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot8FlagDesc') . "`";
+            if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot8Flag)) {
+                $query .= ", 'Y' AS `" . $dsHeader->getValue(DBEHeader::mailshot8FlagDesc) . "`";
             }
-            if ($dsSearchForm->getValue('mailshot9Flag')) {
-                $query .= ", 'Y' AS `" . $dsHeader->getValue('mailshot9FlagDesc') . "`";
+            if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot9Flag)) {
+                $query .= ", 'Y' AS `" . $dsHeader->getValue(DBEHeader::mailshot9FlagDesc) . "`";
             }
-            if ($dsSearchForm->getValue('newCustomerFromDate')) {
-                $query .= ", '" . $dsSearchForm->getValue('newCustomerFromDate') . "' AS `New Customer From`";
+            if ($dsSearchForm->getValue(CTContactExport::searchFormNewCustomerFromDate)) {
+                $query .= ", '" . $dsSearchForm->getValue(
+                        CTContactExport::searchFormNewCustomerFromDate
+                    ) . "' AS `New Customer From`";
             }
-            if ($dsSearchForm->getValue('newCustomerToDate')) {
-                $query .= ", '" . $dsSearchForm->getValue('newCustomerToDate') . "' AS `New Customer To`";
+            if ($dsSearchForm->getValue(CTContactExport::searchFormNewCustomerToDate)) {
+                $query .= ", '" . $dsSearchForm->getValue(
+                        CTContactExport::searchFormNewCustomerToDate
+                    ) . "' AS `New Customer To`";
             }
-            if ($dsSearchForm->getValue('droppedCustomerFromDate')) {
-                $query .= ", '" . $dsSearchForm->getValue('droppedCustomerFromDate') . "' AS `Lost Customer From`";
+            if ($dsSearchForm->getValue(CTContactExport::searchFormDroppedCustomerFromDate)) {
+                $query .= ", '" . $dsSearchForm->getValue(
+                        CTContactExport::searchFormDroppedCustomerFromDate
+                    ) . "' AS `Lost Customer From`";
             }
-            if ($dsSearchForm->getValue('droppedCustomerToDate')) {
-                $query .= ", '" . $dsSearchForm->getValue('droppedCustomerToDate') . "' AS `Lost Customer To`";
+            if ($dsSearchForm->getValue(CTContactExport::searchFormDroppedCustomerToDate)) {
+                $query .= ", '" . $dsSearchForm->getValue(
+                        CTContactExport::searchFormDroppedCustomerToDate
+                    ) . "' AS `Lost Customer To`";
             }
-            if ($dsSearchForm->getValue('broadbandRenewalFlag')) {
+            if ($dsSearchForm->getValue(CTContactExport::searchFormBroadbandRenewalFlag)) {
                 $query .= ", 'Y' AS `Broadband Renewal`";
 
             }
@@ -110,15 +129,17 @@ class BUContactExport extends Business
                 $query .= ", 'Y' as review";
             }
 
-            if ($dsSearchForm->getValue('broadbandIsp')) {
-                $query .= ", '" . $dsSearchForm->getValue('broadbandIsp') . "' AS `BroadbandIsp`";
+            if ($dsSearchForm->getValue(CTContactExport::searchFormBroadbandIsp)) {
+                $query .= ", '" . $dsSearchForm->getValue(
+                        CTContactExport::searchFormBroadbandIsp
+                    ) . "' AS `BroadbandIsp`";
 
             }
-            if ($dsSearchForm->getValue('contractRenewalFlag')) {
+            if ($dsSearchForm->getValue(CTContactExport::searchFormContractRenewalFlag)) {
                 $query .= ", 'Y' AS `Contract Renewal`";
 
             }
-            if ($dsSearchForm->getValue('quotationRenewalFlag')) {
+            if ($dsSearchForm->getValue(CTContactExport::searchFormQuotationRenewalFlag)) {
                 $query .= ", 'Y' AS `Quotation Renewal`";
 
             }
@@ -134,11 +155,11 @@ class BUContactExport extends Business
       JOIN customer ON
         con_custno = cus_custno";
 
-        if ($dsSearchForm->getValue('contractRenewalFlag')) {
+        if ($dsSearchForm->getValue(CTContactExport::searchFormContractRenewalFlag)) {
             $query .=
                 " JOIN custitem cc ON cc.cui_custno = cus_custno";
         }
-        if ($dsSearchForm->getValue('quotationRenewalFlag')) {
+        if ($dsSearchForm->getValue(CTContactExport::searchFormQuotationRenewalFlag)) {
             $query .=
                 " JOIN custitem qc ON qc.cui_custno = cus_custno";
         }
@@ -189,7 +210,7 @@ class BUContactExport extends Business
             $query .= " and " . DBEContact::reviewUser . " = 'Y'";
         }
 
-        if ($dsSearchForm->getValue('broadbandRenewalFlag')) {
+        if ($dsSearchForm->getValue(CTContactExport::searchFormBroadbandRenewalFlag)) {
             $query .= " AND declinedFlag = 'N'";
         }
 
@@ -236,19 +257,21 @@ class BUContactExport extends Business
         }
 
         if (
-            $dsSearchForm->getValue('broadbandRenewalFlag') &&
-            $dsSearchForm->getValue('broadbandIsp')
+            $dsSearchForm->getValue(CTContactExport::searchFormBroadbandRenewalFlag) &&
+            $dsSearchForm->getValue(CTContactExport::searchFormBroadbandIsp)
         ) {
-            $query .= " AND lower(ispID) = lower('" . $dsSearchForm->getValue('broadbandIsp') . "')";
+            $query .= " AND lower(ispID) = lower('" . $dsSearchForm->getValue(
+                    CTContactExport::searchFormBroadbandIsp
+                ) . "')";
         }
-        if ($dsSearchForm->getValue('contractRenewalFlag')) {
+        if ($dsSearchForm->getValue(CTContactExport::searchFormContractRenewalFlag)) {
             $query .= " AND declinedFlag = 'N'";
         }
-        if ($dsSearchForm->getValue('quotationRenewalFlag')) {
+        if ($dsSearchForm->getValue(CTContactExport::searchFormQuotationRenewalFlag)) {
             $query .= " AND declinedFlag = 'N'";
         }
 
-        if ($dsSearchForm->getValue('contractRenewalFlag') && $contractItemIDs) {
+        if ($dsSearchForm->getValue(CTContactExport::searchFormContractRenewalFlag) && $contractItemIDs) {
             $query .=
                 " AND cui_itemno IN(
                         " . implode(
@@ -258,7 +281,7 @@ class BUContactExport extends Business
                     )";
         }
 
-        if ($dsSearchForm->getValue('quotationRenewalFlag') && $quotationItemIDs) {
+        if ($dsSearchForm->getValue(CTContactExport::searchFormQuotationRenewalFlag) && $quotationItemIDs) {
             $query .=
                 " AND cui_itemno IN(
                         " . implode(
@@ -268,23 +291,31 @@ class BUContactExport extends Business
                     )";
         }
 
-        if ($dsSearchForm->getValue('newCustomerFromDate')) {
+        if ($dsSearchForm->getValue(CTContactExport::searchFormNewCustomerFromDate)) {
             $query .=
-                " AND cus_became_customer_date >= '" . $dsSearchForm->getValue('newCustomerFromDate') . "'";
+                " AND cus_became_customer_date >= '" . $dsSearchForm->getValue(
+                    CTContactExport::searchFormNewCustomerFromDate
+                ) . "'";
         }
-        if ($dsSearchForm->getValue('newCustomerToDate')) {
+        if ($dsSearchForm->getValue(CTContactExport::searchFormNewCustomerToDate)) {
             $query .=
-                " AND cus_became_customer_date <= '" . $dsSearchForm->getValue('newCustomerToDate') . "'";
+                " AND cus_became_customer_date <= '" . $dsSearchForm->getValue(
+                    CTContactExport::searchFormNewCustomerToDate
+                ) . "'";
         }
-        if ($dsSearchForm->getValue('droppedCustomerFromDate')) {
+        if ($dsSearchForm->getValue(CTContactExport::searchFormDroppedCustomerFromDate)) {
             $query .=
-                " AND cus_dropped_customer_date >= '" . $dsSearchForm->getValue('droppedCustomerFromDate') . "'";
+                " AND cus_dropped_customer_date >= '" . $dsSearchForm->getValue(
+                    CTContactExport::searchFormDroppedCustomerFromDate
+                ) . "'";
         }
-        if ($dsSearchForm->getValue('droppedCustomerToDate')) {
+        if ($dsSearchForm->getValue(CTContactExport::searchFormDroppedCustomerToDate)) {
             $query .=
-                " AND cus_dropped_customer_date <= '" . $dsSearchForm->getValue('droppedCustomerToDate') . "'";
+                " AND cus_dropped_customer_date <= '" . $dsSearchForm->getValue(
+                    CTContactExport::searchFormDroppedCustomerToDate
+                ) . "'";
         }
-        if ($dsSearchForm->getValue('exportEmailOnlyFlag')) {
+        if ($dsSearchForm->getValue(CTContactExport::searchFormExportEmailOnlyFlag)) {
             $query .= " AND con_email <> ''";
         }
 
@@ -312,11 +343,9 @@ class BUContactExport extends Business
                        $results
     )
     {
-        $senderEmail = $dsForm->getValue('fromEmailAddress');
-        $senderName = 'CNC';
-
-        $body = $dsForm->getValue('emailBody');
-        $subject = $dsForm->getValue('emailSubject');
+        $senderEmail = $dsForm->getValue(CTContactExport::searchFormFromEmailAddress);
+        $body = $dsForm->getValue(CTContactExport::searchFormEmailBody);
+        $subject = $dsForm->getValue(CTContactExport::searchFormEmailSubject);
         /*
         Loop through contacts sending email to each
         */
@@ -363,8 +392,6 @@ class BUContactExport extends Business
                 break;
             }
 
-        } // end while
-
+        }
     }
-}// End of class
-?>
+}

@@ -37,18 +37,22 @@ define(
 );
 define(
     'CTGOODSIN_ACT_RECEIVE',
-    'recieve'
+    'receive'
 );
 
 // Page text
 class CTGoodsIn extends CTCNC
 {
-    var $dsDateRange = '';
-    var $buPurchaseOrder = '';
-    var $buGoodsIn = '';
-    var $dsPorhead = '';
-//	var $dsPorline='';
-    var $orderTypeArray = array(
+
+    public $dsDateRange;
+    /** @var BUPurchaseOrder */
+    public $buPurchaseOrder;
+    /** @var BUGoodsIn */
+    public $buGoodsIn;
+    /** @var DSForm */
+    public $dsPorhead;
+
+    public $orderTypeArray = array(
         "I" => "Initial",
         "P" => "Part Received",
         "B" => "Both Initial & Part Received",
@@ -140,19 +144,17 @@ class CTGoodsIn extends CTCNC
         foreach ($_REQUEST as $key => $value) {
             $_REQUEST[$key] = trim($value);
         }
-        if (($_REQUEST['porheadID'] != '') AND (!is_numeric($_REQUEST['porheadID']))) {
+        if (($_REQUEST['porheadID']) AND (!is_numeric($_REQUEST['porheadID']))) {
             $this->setFormErrorMessage('Order no must be numeric');;
         }
-        if ($this->getFormError() == 0) {
+        if (!$this->getFormError()) {
             $this->buGoodsIn->search(
+                $this->dsPorhead,
                 $_REQUEST['supplierID'],
                 $_REQUEST['porheadID'],
-                '',
-                '',
-                'B',
-                // initial and part receieved only
-                '',
-                $this->dsPorhead
+                null,
+                null,
+                'B'
             );
         }
         if ($this->dsPorhead->rowCount() == 1) {
@@ -206,11 +208,11 @@ class CTGoodsIn extends CTCNC
                 'orderBlock',
                 'orders'
             );
-            $supplierNameCol = $this->dsPorhead->columnExists('supplierName');
-            $typeCol = $this->dsPorhead->columnExists('type');
-            $customerNameCol = $this->dsPorhead->columnExists('customerName');
-            $porheadIDCol = $this->dsPorhead->columnExists('porheadID');
-            $supplierRefCol = $this->dsPorhead->columnExists('supplierRef');
+            $supplierNameCol = $this->dsPorhead->columnExists(DBEJPorhead::supplierName);
+            $typeCol = $this->dsPorhead->columnExists(DBEJPorhead::type);
+            $customerNameCol = $this->dsPorhead->columnExists(DBEJPorhead::customerName);
+            $porheadIDCol = $this->dsPorhead->columnExists(DBEJPorhead::porheadID);
+            $supplierRefCol = $this->dsPorhead->columnExists(DBEJPorhead::supplierRef);
 
             while ($this->dsPorhead->fetchNext()) {
                 $goodsInURL =
@@ -240,8 +242,9 @@ class CTGoodsIn extends CTCNC
                 );
             }
         }
+        $supplierName = null;
 // search parameter section
-        if ($_REQUEST['supplierID'] != '') {
+        if ($_REQUEST['supplierID']) {
             $buSupplier = new BUSupplier($this);
             $dsSupplier = new DataSet($this);
             $buSupplier->getSupplierByID(
@@ -249,8 +252,6 @@ class CTGoodsIn extends CTCNC
                 $dsSupplier
             );
             $supplierName = $dsSupplier->getValue(DBESupplier::name);
-        } else {
-            $supplierName = '';
         }
         $this->template->set_var(
             array(
@@ -279,7 +280,7 @@ class CTGoodsIn extends CTCNC
         $this->setMethodName('displayGoodsIn');
         $dsPorhead = &$this->dsPorhead;
         $dsPorline = &$this->dsPorline;
-        if ($_REQUEST['porheadID'] == '') {
+        if (!$_REQUEST['porheadID']) {
             $this->displayFatalError(CTGOODSIN_MSG_PORHEADID_NOT_PASSED);
             return;
         }
@@ -415,14 +416,14 @@ class CTGoodsIn extends CTCNC
                         'allowReceive'    => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetAllowReceive),
                         'renew'           => $this->dsGoodsIn->getValue(
                             BUGoodsIn::receiveDataSetRenew
-                        ) ? CT_CHECKED : '',
+                        ) ? CT_CHECKED : null,
                         'customerItemID'  => $this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetCustomerItemID),
                     )
                 );
                 if ($this->dsGoodsIn->getValue(BUGoodsIn::receiveDataSetRequireSerialNo)) {
                     $this->template->set_var(
                         'DISABLED',
-                        ''
+                        null
                     );
                     // There is a warranty drop-down for each line
                     $dsWarranty->initialise();
@@ -434,7 +435,7 @@ class CTGoodsIn extends CTCNC
                                 'warrantyID'          => $dsWarranty->getValue(DBEWarranty::warrantyID),
                                 'warrantySelected'    => ($thisWarrantyID == $dsWarranty->getValue(
                                         DBEWarranty::warrantyID
-                                    )) ? CT_SELECTED : ''
+                                    )) ? CT_SELECTED : null
                             )
                         );
                         $this->template->parse(
@@ -459,7 +460,7 @@ class CTGoodsIn extends CTCNC
                 } else {
                     $this->template->set_var(
                         'lineDisabled',
-                        ''
+                        null
                     );
                 }
 
@@ -470,10 +471,10 @@ class CTGoodsIn extends CTCNC
                 );
                 $this->template->set_var(
                     'warranties',
-                    ''
-                ); // clear for next line
-            } // while ($dsPorline->fetchNext())
-        }// if ($dsPorline->rowCount() > 0)
+                    null
+                );
+            }
+        }
         $this->template->parse(
             'CONTENTS',
             'GoodsInDisplay',
@@ -495,12 +496,12 @@ class CTGoodsIn extends CTCNC
             $this->displayFatalError(CTGOODSIN_MSG_PORHEADID_NOT_PASSED);
         }
         if (!$dsGoodsIn->populateFromArray($_REQUEST['receive'])) {
-            $this->setFormErrorMessage('Quantitites entered must be numeric');
+            $this->setFormErrorMessage('Quantities entered must be numeric');
             $this->displayGoodsIn();
             exit;
         }
         if (!$this->buGoodsIn->validateQtys($dsGoodsIn)) {
-            $this->setFormErrorMessage('Quantitites to receive must not exceed outstanding quantities');
+            $this->setFormErrorMessage('Quantities to receive must not exceed outstanding quantities');
             $this->displayGoodsIn();
             exit;
         }

@@ -525,8 +525,8 @@ class CTRenewalReport extends CTCNC
 
         $items = $buRenewal->getRenewalsAndExternalItemsByCustomer(
             $customerID,
-            $displayAccountsInfo,
-            $this
+            $this,
+            $displayAccountsInfo
         );
 
         usort(

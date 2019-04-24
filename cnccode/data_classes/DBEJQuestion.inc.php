@@ -36,7 +36,7 @@ class DBEJQuestion extends DBEQuestion
         $this->setQueryString(
             'SELECT ' . $this->getDBColumnNamesAsString() .
             ' FROM ' . $this->getTableName() . ' LEFT JOIN answertype ON ' . $this->getTableName(
-            ) . '.' . $this->getDBColumnName('answerTypeID') . '=answertype.ant_answertypeno' .
+            ) . '.' . $this->getDBColumnName(self::answerTypeID) . '=answertype.ant_answertypeno' .
             ' WHERE que_questionnaireno = ' . $questionnaireID .
             ' ORDER BY que_weight'
         );

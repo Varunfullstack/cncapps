@@ -16,6 +16,10 @@ require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 class BUCustomerProfitabilityMonthsReport extends Business
 {
 
+    const searchFormCustomerID = "customerID";
+    const searchFormStartYearMonth = "startYearMonth";
+    const searchFormEndYearMonth = "endYearMonth";
+
     function __construct(&$owner)
     {
         parent::__construct($owner);
@@ -24,9 +28,9 @@ class BUCustomerProfitabilityMonthsReport extends Business
     public function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);
-        $dsData->addColumn('customerID', DA_STRING, DA_NOT_NULL);
-        $dsData->addColumn('startYearMonth', DA_STRING, DA_NOT_NULL);
-        $dsData->addColumn('endYearMonth', DA_STRING, DA_NOT_NULL);
+        $dsData->addColumn(self::searchFormCustomerID, DA_STRING, DA_NOT_NULL);
+        $dsData->addColumn(self::searchFormStartYearMonth, DA_STRING, DA_NOT_NULL);
+        $dsData->addColumn(self::searchFormEndYearMonth, DA_STRING, DA_NOT_NULL);
     }
 
     function getPeriodsBetween($startYearMonth, $endYearMonth)
@@ -38,7 +42,7 @@ class BUCustomerProfitabilityMonthsReport extends Business
         while ($d1 <= $d2) {
 
             $periods[] = $d1->format('m/Y');
-            $d1->add(new \DateInterval('P1M'));
+            $d1->add(new DateInterval('P1M'));
 
         }
 
@@ -49,7 +53,10 @@ class BUCustomerProfitabilityMonthsReport extends Business
     /**
      * Create a PDF file of customer profit figures and save to documentation
      * folder
-     *
+     * @param $customerID
+     * @param $startYearMonth
+     * @param $endYearMonth
+     * @return array
      */
     public function getReportData($customerID, $startYearMonth, $endYearMonth)
     {
@@ -59,18 +66,19 @@ class BUCustomerProfitabilityMonthsReport extends Business
 
         $buCustomerAnalysisReport = new BUCustomerAnalysisReport($this);
 
+        $dsSearchForm = new DSForm($this);
         $buCustomerAnalysisReport->initialiseSearchForm($dsSearchForm);
 
         $periods = $this->getPeriodsBetween($startYearMonth, $endYearMonth);
 
-        $dsSearchForm->setValue('customerID', $customerID);
+        $dsSearchForm->setValue(self::searchFormCustomerID, $customerID);
 
         $profit = array();
 
         foreach ($periods as $period) {
 
-            $dsSearchForm->setValue('startYearMonth', $period);
-            $dsSearchForm->setValue('endYearMonth', $period);
+            $dsSearchForm->setValue(self::searchFormStartYearMonth, $period);
+            $dsSearchForm->setValue(self::searchFormEndYearMonth, $period);
 
             $results = $buCustomerAnalysisReport->getResults($dsSearchForm);
 
@@ -89,5 +97,3 @@ class BUCustomerProfitabilityMonthsReport extends Business
         return $profit;
     }
 }
-
-?>

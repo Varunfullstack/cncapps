@@ -30,7 +30,7 @@ class DBEManufacturer extends DBCNCEntity
     function getRowsByNameMatch()
     {
         $this->setMethodName("getRowsByNameMatch");
-        if ($this->getValue('name') == '') {
+        if ($this->getValue(self::name) == '') {
             $this->raiseError('name not set');
         }
 
@@ -39,11 +39,11 @@ class DBEManufacturer extends DBCNCEntity
             " FROM " . $this->getTableName() .
             " WHERE 1=1";
         $queryString .=
-            " AND man_name LIKE '%" . $this->getValue('name') . "%'";
+            " AND man_name LIKE '%" . $this->getValue(self::name) . "%'";
 
 
         $queryString .=
-            " ORDER BY " . $this->getDBColumnName('name') .
+            " ORDER BY " . $this->getDBColumnName(self::name) .
             " LIMIT 0,200";
 
         $this->setQueryString($queryString);

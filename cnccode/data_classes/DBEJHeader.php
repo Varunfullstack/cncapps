@@ -8,18 +8,21 @@
 
 class DBEJHeader extends DBEHeader
 {
+
+    const gscItemDescription = "gscItemDescription";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("gscItemDescription", DA_STRING, DA_NOT_NULL, "itm_desc");
+        $this->addColumn(self::gscItemDescription, DA_STRING, DA_NOT_NULL, "itm_desc");
         $this->setAddColumnsOff();
     }
 

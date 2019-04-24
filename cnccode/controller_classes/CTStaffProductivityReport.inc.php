@@ -13,9 +13,9 @@ require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTStaffProductivityReport extends CTCNC
 {
-    public $dsPrintRange = '';
-    public $dsSearchForm = '';
-    public $dsResults = '';
+    public $dsPrintRange;
+    public $dsSearchForm;
+    public $dsResults;
     public $BUStaffProductivityReport;
 
     function __construct($requestMethod,
@@ -44,6 +44,7 @@ class CTStaffProductivityReport extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -55,6 +56,9 @@ class CTStaffProductivityReport extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function search()
     {
 
@@ -65,14 +69,12 @@ class CTStaffProductivityReport extends CTCNC
         if ($_SERVER ['REQUEST_METHOD'] == 'POST') {
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
                 $this->setFormErrorOn();
-
             } else {
-
-                if ($dsSearchForm->getValue('startDate') == '') {
+                if (!$dsSearchForm->getValue(BUStaffProductivityReport::searchFormStartDate)) {
 
                     $dsSearchForm->setUpdateModeUpdate();
                     $dsSearchForm->setValue(
-                        'startDate',
+                        BUStaffProductivityReport::searchFormStartDate,
                         date(
                             'Y-m-d',
                             strtotime("-1 year")
@@ -81,10 +83,10 @@ class CTStaffProductivityReport extends CTCNC
                     $dsSearchForm->post();
                 }
 
-                if (!$dsSearchForm->getValue('endDate')) {
+                if (!$dsSearchForm->getValue(BUStaffProductivityReport::searchFormEndDate)) {
                     $dsSearchForm->setUpdateModeUpdate();
                     $dsSearchForm->setValue(
-                        'endDate',
+                        BUStaffProductivityReport::searchFormEndDate,
                         date('Y-m-d')
                     );
                     $dsSearchForm->post();
@@ -125,11 +127,15 @@ class CTStaffProductivityReport extends CTCNC
 
         $this->template->set_var(
             array(
-                'formError'        => $this->formError,
-                'startDate'        => Controller::dateYMDtoDMY($dsSearchForm->getValue('startDate')),
-                'startDateMessage' => $dsSearchForm->getMessage('startDate'),
-                'endDate'          => Controller::dateYMDtoDMY($dsSearchForm->getValue('endDate')),
-                'endDateMessage'   => $dsSearchForm->getMessage('endDate')
+                'formError' => $this->formError,
+                'startDate' => Controller::dateYMDtoDMY(
+                    $dsSearchForm->getValue(BUStaffProductivityReport::searchFormStartDate)
+                ),
+                'startDateMessage' => $dsSearchForm->getMessage(BUStaffProductivityReport::searchFormStartDate),
+                'endDate' => Controller::dateYMDtoDMY(
+                    $dsSearchForm->getValue(BUStaffProductivityReport::searchFormEndDate)
+                ),
+                'endDateMessage' => $dsSearchForm->getMessage(BUStaffProductivityReport::searchFormEndDate)
             )
         );
 
@@ -142,5 +148,4 @@ class CTStaffProductivityReport extends CTCNC
 
     } // end function displaySearchForm
 
-} // end of class
-?>
+}

@@ -34,7 +34,7 @@ class DBEJExternalItem extends DBEExternalItem
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " JOIN itemtype ON itemtype.ity_itemtypeno = externalitem.itemTypeID
-			WHERE " . $this->getDBColumnName('customerID') . "='" . mysqli_real_escape_string(
+			WHERE " . $this->getDBColumnName(self::customerID) . "='" . mysqli_real_escape_string(
                 $this->db->link_id(),
                 $customerID
             ) . "'";

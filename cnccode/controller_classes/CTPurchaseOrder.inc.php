@@ -701,11 +701,7 @@ class CTPurchaseOrder extends CTCNC
             null
         ); // default
         $dbeOrdhead = new DBEJOrdhead($this);
-        $dbeOrdhead->setValue(
-            DBEJOrdhead::ordheadID,
-            $dsPorhead->getValue(DBEJPorhead::ordheadID)
-        );
-        if ($dbeOrdhead->getRow()) {
+        if ($dbeOrdhead->getRow($dsPorhead->getValue(DBEJPorhead::ordheadID))) {
             $urlSalesOrder =
                 Controller::buildLink(
                     CTCNC_PAGE_SALESORDER,

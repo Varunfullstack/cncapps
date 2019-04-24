@@ -25,12 +25,18 @@ define('CTPURCHASEINV_ACT_DISPLAY', 'display');
 
 class CTPurchaseInv extends CTCNC
 {
-    var $buPurchaseInv = '';
-    var $dsPurchaseInv = '';
-    var $buPurchaseOrder = '';
-    var $dsPorhead = '';
-    var $dsPorline = '';
-    var $orderTypeArray = array(
+    /** @var BUPurchaseInv */
+    public $buPurchaseInv;
+    /** @var DSForm */
+    public $dsPurchaseInv;
+    /** @var BUPurchaseOrder */
+    public $buPurchaseOrder;
+    /** @var DSForm */
+    public $dsPorhead;
+    /** @var DSForm */
+    public $dsPorline;
+    /** @var array */
+    public $orderTypeArray = array(
         "I" => "Initial",
         "P" => "Part Received",
         "B" => "Both Initial & Part Received",
@@ -58,6 +64,7 @@ class CTPurchaseInv extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -85,13 +92,15 @@ class CTPurchaseInv extends CTCNC
      * Run search based upon passed parameters
      * Display search form with results
      * @access private
+     * @throws Exception
      */
     function search()
     {
         $this->setMethodName('search');
-        if (($_REQUEST['porheadID'] != '') AND (!is_numeric($_REQUEST['porheadID']))) {
+        if (($_REQUEST['porheadID']) && (!is_numeric($_REQUEST['porheadID']))) {
             $this->setFormErrorMessage('Order no must be numeric');;
         }
+        $found = false;
         if ($this->getFormError() == 0) {
 
             $found = $this->buPurchaseInv->search(
@@ -105,13 +114,13 @@ class CTPurchaseInv extends CTCNC
         // one row and not already authorised
         if ($found & $this->dsPorhead->rowCount() == 1) {
             $this->dsPorhead->fetchNext();
-            $urlNext =
-                Controller::buildLink($_SERVER['PHP_SELF'],
-                                 array(
-                                     'action' => CTPURCHASEINV_ACT_DISPLAY,
-                                     'porheadID' => $this->dsPorhead->getValue('porheadID')
-                                 )
-                );
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'    => CTPURCHASEINV_ACT_DISPLAY,
+                    'porheadID' => $this->dsPorhead->getValue(DBEJPorhead::porheadID)
+                )
+            );
             header('Location: ' . $urlNext);
             exit;
         } else {
@@ -123,6 +132,7 @@ class CTPurchaseInv extends CTCNC
     /**
      * Display the results of order search
      * @access private
+     * @throws Exception
      */
     function displaySearchForm()
     {
@@ -135,61 +145,58 @@ class CTPurchaseInv extends CTCNC
             Controller::buildLink(
                 CTCNC_PAGE_SUPPLIER,
                 array(
-                    'action' => CTCNC_ACT_DISP_SUPPLIER_POPUP,
+                    'action'  => CTCNC_ACT_DISP_SUPPLIER_POPUP,
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
         $this->dsPorhead->initialise();
         if ($this->dsPorhead->rowCount() > 0) {
             $this->template->set_block('PurchaseInvSearch', 'orderBlock', 'orders');
-            $supplierNameCol = $this->dsPorhead->columnExists('supplierName');
-            $typeCol = $this->dsPorhead->columnExists('type');
-            $customerNameCol = $this->dsPorhead->columnExists('customerName');
-            $porheadIDCol = $this->dsPorhead->columnExists('porheadID');
-            $porheadDateCol = $this->dsPorhead->columnExists('date');
-            $supplierRefCol = $this->dsPorhead->columnExists('supplierRef');
-            $printedCol = $this->dsPorhead->columnExists('printed');
-            $ordheadIDCol = $this->dsPorhead->columnExists('ordheadID');
+            $supplierNameCol = $this->dsPorhead->columnExists(DBEJPorhead::supplierName);
+            $typeCol = $this->dsPorhead->columnExists(DBEJPorhead::type);
+            $customerNameCol = $this->dsPorhead->columnExists(DBEJPorhead::customerName);
+            $porheadIDCol = $this->dsPorhead->columnExists(DBEJPorhead::porheadID);
+            $porheadDateCol = $this->dsPorhead->columnExists(DBEJPorhead::date);
+            $supplierRefCol = $this->dsPorhead->columnExists(DBEJPorhead::supplierRef);
             while ($this->dsPorhead->fetchNext()) {
-                $purchaseInvURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => CTPURCHASEINV_ACT_DISPLAY,
-                            'porheadID' => $this->dsPorhead->getValue($porheadIDCol)
-                        )
-                    );
+                $purchaseInvURL = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'    => CTPURCHASEINV_ACT_DISPLAY,
+                        'porheadID' => $this->dsPorhead->getValue($porheadIDCol)
+                    )
+                );
                 $customerName = $this->dsPorhead->getValue($customerNameCol);
                 $supplierName = $this->dsPorhead->getValue($supplierNameCol);
                 $this->template->set_var(
                     array(
-                        'listCustomerName' => $customerName,
-                        'listSupplierName' => $supplierName,
+                        'listCustomerName'   => $customerName,
+                        'listSupplierName'   => $supplierName,
                         'listPurchaseInvURL' => $purchaseInvURL,
-                        'listPorheadID' => $this->dsPorhead->getValue($porheadIDCol),
-                        'listDate' => Controller::dateYMDtoDMY($this->dsPorhead->getValue($porheadDateCol)),
-                        'listOrderType' => $this->orderTypeArray[$this->dsPorhead->getValue($typeCol)],
-                        'listSupplierRef' => $this->dsPorhead->getValue($supplierRefCol)//,
+                        'listPorheadID'      => $this->dsPorhead->getValue($porheadIDCol),
+                        'listDate'           => Controller::dateYMDtoDMY($this->dsPorhead->getValue($porheadDateCol)),
+                        'listOrderType'      => $this->orderTypeArray[$this->dsPorhead->getValue($typeCol)],
+                        'listSupplierRef'    => $this->dsPorhead->getValue($supplierRefCol)//,
                     )
                 );
                 $this->template->parse('orders', 'orderBlock', true);
             }
         }
 // search parameter section
-        if ($_REQUEST['supplierID'] != '') {
+        $supplierName = null;
+        if (($_REQUEST['supplierID'])) {
             $buSupplier = new BUSupplier($this);
+            $dsSupplier = new DataSet($this);
             $buSupplier->getSupplierByID($_REQUEST['supplierID'], $dsSupplier);
-            $supplierName = $dsSupplier->getValue('name');
-        } else {
-            $supplierName = '';
+            $supplierName = $dsSupplier->getValue(DBESupplier::name);
         }
         $this->template->set_var(
             array(
-                'supplierName' => $supplierName,
-                'porheadID' => $_REQUEST['porheadID'],
-                'supplierID' => $_REQUEST['supplierID'],
-                'lineText' => $_REQUEST['lineText'],
-                'submitURL' => $submitURL,
+                'supplierName'     => $supplierName,
+                'porheadID'        => $_REQUEST['porheadID'],
+                'supplierID'       => $_REQUEST['supplierID'],
+                'lineText'         => $_REQUEST['lineText'],
+                'submitURL'        => $submitURL,
                 'urlSupplierPopup' => $urlSupplierPopup
             )
         );
@@ -200,26 +207,28 @@ class CTPurchaseInv extends CTCNC
     /**
      * Display the results of order search
      * @access private
+     * @throws Exception
      */
     function display()
     {
         $this->setMethodName('display');
         $dsPorhead = &$this->dsPorhead;
         $dsPorline = &$this->dsPorline;
-        if ($_REQUEST['porheadID'] == '') {
+        if (!$_REQUEST['porheadID']) {
             $this->displayFatalError(CTPURCHASEINV_MSG_PORHEADID_NOT_PASSED);
             return;
         }
         $this->buPurchaseOrder->getHeaderByID($_REQUEST['porheadID'], $dsPorhead);
         $dsPorhead->fetchNext();
-        $this->buPurchaseOrder->getLinesByID($dsPorhead->getValue('porheadID'), $dsPorline);
+        $this->buPurchaseOrder->getLinesByID($dsPorhead->getValue(DBEJPorhead::porheadID), $dsPorline);
 
         // Do we require customer items to be created?
         $buSalesOrder = new BUSalesOrder($this);
-        $buSalesOrder->getOrderByOrdheadID($dsPorhead->getValue('ordheadID'), $dsOrdhead, $dsOrdline);
-        $addCustomerItems = ($dsOrdhead->getValue('addItem') == 'Y');
+        $dsOrdhead = new DataSet($this);
+        $buSalesOrder->getOrderByOrdheadID($dsPorhead->getValue(DBEJPorhead::ordheadID), $dsOrdhead, $dsOrdline);
+        $addCustomerItems = ($dsOrdhead->getValue(DBEJOrdhead::addItem) == 'Y');
 
-        if ($this->dsPorhead->getValue('directDeliveryFlag') == 'Y') {
+        if ($this->dsPorhead->getValue(DBEJPorhead::directDeliveryFlag) == 'Y') {
 
             if ($errorMessage = $this->buPurchaseInv->renewalsNotCompleted($dsOrdline)) {
 
@@ -237,25 +246,23 @@ class CTPurchaseInv extends CTCNC
         );
         $_REQUEST['purchaseInvoiceDate'] = date('Y-m-d');
 
-        $porheadID = $dsPorhead->getValue('porheadID');
-        $orderType = $dsPorhead->getValue('type');
+        $porheadID = $dsPorhead->getValue(DBEJPorhead::porheadID);
         $this->setPageTitle("Purchase Invoice Authorisation");
         $this->setTemplateFiles(array('PurchaseInvDisplay' => 'PurchaseInvDisplay.inc'));
 
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTPURCHASEINV_ACT_UPDATE,
-                    'porheadID' => $porheadID
-                )
-            );
+        $urlUpdate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'    => CTPURCHASEINV_ACT_UPDATE,
+                'porheadID' => $porheadID
+            )
+        );
 
         $urlPurchaseOrder =
             Controller::buildLink(
                 CTCNC_PAGE_PURCHASEORDER,
                 array(
-                    'action' => CTCNC_ACT_DISPLAY_PO,
+                    'action'    => CTCNC_ACT_DISPLAY_PO,
                     'porheadID' => $porheadID
                 )
             );
@@ -264,25 +271,26 @@ class CTPurchaseInv extends CTCNC
             Controller::buildLink(
                 CTCNC_PAGE_SALESORDER,
                 array(
-                    'action' => CTCNC_ACT_DISP_SALESORDER,
-                    'ordheadID' => $dsPorhead->getValue('ordheadID'),
-                    'htmlFmt' => CT_HTML_FMT_POPUP
+                    'action'    => CTCNC_ACT_DISP_SALESORDER,
+                    'ordheadID' => $dsPorhead->getValue(DBEJPorhead::ordheadID),
+                    'htmlFmt'   => CT_HTML_FMT_POPUP
                 )
             );
 
         $this->template->set_var(
             array(
-                'porheadID' => $porheadID,
-                'supplierName' => Controller::htmlDisplayText($dsPorhead->getValue('supplierName')),
-                'vatRate' => $dsPorhead->getValue('vatRate'),
+                'porheadID'           => $porheadID,
+                'supplierName'        => Controller::htmlDisplayText($dsPorhead->getValue(DBEJPorhead::supplierName)),
+                'vatRate'             => $dsPorhead->getValue(DBEJPorhead::vatRate),
                 'purchaseInvoiceDate' => Controller::dateYMDtoDMY(($_REQUEST['purchaseInvoiceDate'])),
-                'purchaseInvoiceNo' => Controller::htmlDisplayText($_REQUEST['purchaseInvoiceNo']),
-                'urlUpdate' => $urlUpdate,
-                'urlPurchaseOrder' => $urlPurchaseOrder,
-                'urlSalesOrder' => $urlSalesOrder
+                'purchaseInvoiceNo'   => Controller::htmlDisplayText($_REQUEST['purchaseInvoiceNo']),
+                'urlUpdate'           => $urlUpdate,
+                'urlPurchaseOrder'    => $urlPurchaseOrder,
+                'urlSalesOrder'       => $urlSalesOrder
             )
         );
 
+        $dsWarranty = new DataSet($this);
         if ($addCustomerItems) {
             $buGoodsIn = new BUGoodsIn($this);
             $buGoodsIn->getAllWarranties($dsWarranty);
@@ -295,30 +303,60 @@ class CTPurchaseInv extends CTCNC
             while ($this->dsPurchaseInv->fetchNext()) {
                 $this->template->set_var(
                     array(
-                        'description' => Controller::htmlDisplayText($this->dsPurchaseInv->getValue("description")),
-                        'sequenceNo' => $this->dsPurchaseInv->getValue('sequenceNo'),
-                        'orderSequenceNo' => $this->dsPurchaseInv->getValue('orderSequenceNo')
+                        'description'     => Controller::htmlDisplayText(
+                            $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceDescription)
+                        ),
+                        'sequenceNo'      => $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceSequenceNo),
+                        'orderSequenceNo' => $this->dsPurchaseInv->getValue(
+                            BUPurchaseInv::purchaseInvoiceOrderSequenceNo
+                        )
                     )
                 );
                 $bodyTagExtras = 'onLoad="calculateTotals(); document.forms[0].elements[1].focus();"';
                 $this->template->set_var('bodyTagExtras', $bodyTagExtras);
                 $this->template->set_var(
                     array(
-                        'qtyOrdered' => number_format($this->dsPurchaseInv->getValue("qtyOrdered"), 1, '.', ''),
-                        'qtyOS' => number_format($this->dsPurchaseInv->getValue("qtyOS"), 1, '.', ''),
-                        'curPOUnitCost' => number_format($this->dsPurchaseInv->getValue("curPOUnitCost"), 2, '.', ''),
-                        'curInvUnitCost' => number_format($this->dsPurchaseInv->getValue("curInvUnitCost"), 2, '.', ''),
-                        'curInvTotalCost' => number_format($this->dsPurchaseInv->getValue("curInvTotalCost"),
-                                                           2,
-                                                           '.',
-                                                           ''),
-                        'itemID' => $this->dsPurchaseInv->getValue("itemID"),
-                        'qtyToInvoice' => $this->dsPurchaseInv->getValue("qtyToInvoice"),
-                        'partNo' => Controller::htmlDisplayText($this->dsPurchaseInv->getValue("partNo")),
-                        'requireSerialNo' => $this->dsPurchaseInv->getValue("requireSerialNo"),
-                        'serialNo' => $this->dsPurchaseInv->getValue("serialNo"),
-                        'renew' => $this->dsPurchaseInv->getValue("renew"),
-                        'warrantyID' => $this->dsPurchaseInv->getValue("warrantyID")
+                        'qtyOrdered'      => number_format(
+                            $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceQtyOrdered),
+                            1,
+                            '.',
+                            ''
+                        ),
+                        'qtyOS'           => number_format(
+                            $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceQtyOS),
+                            1,
+                            '.',
+                            ''
+                        ),
+                        'curPOUnitCost'   => number_format(
+                            $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceCurPOUnitCost),
+                            2,
+                            '.',
+                            ''
+                        ),
+                        'curInvUnitCost'  => number_format(
+                            $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceCurInvUnitCost),
+                            2,
+                            '.',
+                            ''
+                        ),
+                        'curInvTotalCost' => number_format(
+                            $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceCurInvTotalCost),
+                            2,
+                            '.',
+                            ''
+                        ),
+                        'itemID'          => $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceItemID),
+                        'qtyToInvoice'    => $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceQtyToInvoice),
+                        'partNo'          => Controller::htmlDisplayText(
+                            $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoicePartNo)
+                        ),
+                        'requireSerialNo' => $this->dsPurchaseInv->getValue(
+                            BUPurchaseInv::purchaseInvoiceRequireSerialNo
+                        ),
+                        'serialNo'        => $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceSerialNo),
+                        'renew'           => $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceRenew),
+                        'warrantyID'      => $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceWarrantyID)
                     )
                 );
 
@@ -328,22 +366,24 @@ class CTPurchaseInv extends CTCNC
                 if ($this->getFormError()) {
                     $this->template->set_var('SUBMIT_DISABLED', 'DISABLED');
                 } else {
-                    $this->template->set_var('SUBMIT_DISABLED', '');
+                    $this->template->set_var('SUBMIT_DISABLED', null);
                 }
 
-                if ($this->dsPurchaseInv->getValue('requireSerialNo')) {
+                if ($this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceRequireSerialNo)) {
 
-                    $this->template->set_var('DISABLED', '');
+                    $this->template->set_var('DISABLED', null);
 
                     // There is a warranty drop-down for each line
                     $dsWarranty->initialise();
-                    $thisWarrantyID = $this->dsPurchaseInv->getValue('warrantyID');
+                    $thisWarrantyID = $this->dsPurchaseInv->getValue(BUPurchaseInv::purchaseInvoiceWarrantyID);
                     while ($dsWarranty->fetchNext()) {
                         $this->template->set_var(
                             array(
-                                'warrantyDescription' => $dsWarranty->getValue('description'),
-                                'warrantyID' => $dsWarranty->getValue('warrantyID'),
-                                'warrantySelected' => ($thisWarrantyID == $dsWarranty->getValue('warrantyID')) ? CT_SELECTED : ''
+                                'warrantyDescription' => $dsWarranty->getValue(DBEWarranty::description),
+                                'warrantyID'          => $dsWarranty->getValue(DBEWarranty::warrantyID),
+                                'warrantySelected'    => ($thisWarrantyID == $dsWarranty->getValue(
+                                        DBEWarranty::warrantyID
+                                    )) ? CT_SELECTED : null
                             )
                         );
                         $this->template->parse('warranties', 'warrantyBlock', true);
@@ -353,7 +393,7 @@ class CTPurchaseInv extends CTCNC
                 }
 
                 $this->template->parse('orderLines', 'orderLineBlock', true);
-                $this->template->set_var('warranties', ''); // clear for next line
+                $this->template->set_var('warranties', null); // clear for next line
             } // while ($dsPorline->fetchNext())
         }// if ($dsPorline->rowCount() > 0)
         $this->template->parse('CONTENTS', 'PurchaseInvDisplay', true);
@@ -362,6 +402,7 @@ class CTPurchaseInv extends CTCNC
 
     /**
      * perform updates
+     * @throws Exception
      */
     function doUpdate()
     {
@@ -378,7 +419,7 @@ class CTPurchaseInv extends CTCNC
         }
 
         if (!$this->buPurchaseInv->validateQtys($dsPurchaseInv)) {
-            $this->setFormErrorMessage('Quantitites to invoice must not exceed outstanding quantities');
+            $this->setFormErrorMessage('Quantities to invoice must not exceed outstanding quantities');
             $this->display();
             exit;
         }
@@ -401,7 +442,7 @@ class CTPurchaseInv extends CTCNC
             exit;
         }
 
-        if ($_REQUEST['purchaseInvoiceNo'] == '') {
+        if (!$_REQUEST['purchaseInvoiceNo']) {
             $this->setFormErrorMessage('Please enter a purchase invoice number');
             $this->display();
             exit;
@@ -411,7 +452,7 @@ class CTPurchaseInv extends CTCNC
             $this->display();
             exit;
         }
-        if ($_REQUEST['purchaseInvoiceDate'] == '') {
+        if (!$_REQUEST['purchaseInvoiceDate']) {
             $this->setFormErrorMessage('Please enter a purchase invoice date');
             $this->display();
             exit;
@@ -431,26 +472,28 @@ class CTPurchaseInv extends CTCNC
             $dsPurchaseInv,
             $this->userID
         );
+        $dsPorhead = new DataSet($this);
         $this->buPurchaseOrder->getHeaderByID($_REQUEST['porheadID'], $dsPorhead);
-        if ($dsPorhead->getValue('type') == 'A') {
+        if ($dsPorhead->getValue(DBEJPorhead::type) == 'A') {
             $urlNext =
-                Controller::buildLink($_SERVER['PHP_SELF'],
-                                 array(
-                                     'action' => CTCNC_ACT_DISPLAY_SEARCH_FORM
-                                 )
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => CTCNC_ACT_DISPLAY_SEARCH_FORM
+                    )
                 );
         } else {
             $urlNext =
-                Controller::buildLink($_SERVER['PHP_SELF'],
-                                 array(
-                                     'action' => CTCNC_ACT_DISPLAY_GOODS_IN,
-                                     'porheadID' => $_REQUEST['porheadID']
-                                 )
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'    => CTCNC_ACT_DISPLAY_GOODS_IN,
+                        'porheadID' => $_REQUEST['porheadID']
+                    )
                 );
         }
         header('Location: ' . $urlNext);
         exit;
     }
 
-}// end of class
-?>
+}

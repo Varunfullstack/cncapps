@@ -194,6 +194,9 @@ class BURenContract extends Business
 
     }
 
+    /**
+     * @throws Exception
+     */
     function createRenewalsSalesOrders()
     {
         $buSalesOrder = new BUSalesOrder ($this);

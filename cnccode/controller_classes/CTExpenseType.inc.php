@@ -18,8 +18,10 @@ define('CTEXPENSETYPE_ACT_UPDATE', 'updateExpenseType');
 
 class CTExpenseType extends CTCNC
 {
-    var $dsExpenseType = '';
-    var $buExpenseType = '';
+    /** @var DSForm */
+    public $dsExpenseType;
+    /** @var BUExpenseType */
+    public $buExpenseType;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
@@ -38,6 +40,7 @@ class CTExpenseType extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -63,6 +66,7 @@ class CTExpenseType extends CTCNC
     /**
      * Display list of types
      * @access private
+     * @throws Exception
      */
     function displayList()
     {
@@ -71,16 +75,16 @@ class CTExpenseType extends CTCNC
         $this->setTemplateFiles(
             array('ExpenseTypeList' => 'ExpenseTypeList.inc')
         );
+        $dsExpenseType = new DataSet($this);
 
         $this->buExpenseType->getAllTypes($dsExpenseType);
 
-        $urlCreate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTEXPENSETYPE_ACT_CREATE
-                )
-            );
+        $urlCreate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTEXPENSETYPE_ACT_CREATE
+            )
+        );
 
         $this->template->set_var(
             array('urlCreate' => $urlCreate)
@@ -89,39 +93,28 @@ class CTExpenseType extends CTCNC
         if ($dsExpenseType->rowCount() > 0) {
             $this->template->set_block('ExpenseTypeList', 'typeBlock', 'types');
             while ($dsExpenseType->fetchNext()) {
-                $expenseTypeID = $dsExpenseType->getValue('expenseTypeID');
+                $expenseTypeID = $dsExpenseType->getValue(DBEExpenseType::expenseTypeID);
                 $urlEdit =
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => CTEXPENSETYPE_ACT_EDIT,
+                            'action'        => CTEXPENSETYPE_ACT_EDIT,
                             'expenseTypeID' => $expenseTypeID
                         )
                     );
                 $txtEdit = '[edit]';
-                /*
-                                $urlDelete =
-                                    Controller::buildLink(
-                                        $_SERVER['PHP_SELF'],
-                                        array(
-                                            'action'				=>	CTEXPENSETYPE_ACT_DELETE,
-                                            'expenseTypeID'	=>	$expenseTypeID
-                                        )
-                                    );
-                                $txtDelete = '[delete]';
-                    */
                 $this->template->set_var(
                     array(
                         'expenseTypeID' => $expenseTypeID,
-                        'description' => Controller::htmlDisplayText($dsExpenseType->getValue('description')),
-                        'urlEdit' => $urlEdit,
-//						'urlDelete' => $urlDelete,
-                        'txtEdit' => $txtEdit
-//						'txtDelete' => $txtDelete
+                        'description'   => Controller::htmlDisplayText(
+                            $dsExpenseType->getValue(DBEExpenseType::description)
+                        ),
+                        'urlEdit'       => $urlEdit,
+                        'txtEdit'       => $txtEdit
                     )
                 );
                 $this->template->parse('types', 'typeBlock', true);
-            }//while $dsExpenseType->fetchNext()
+            }
         }
         $this->template->parse('CONTENTS', 'ExpenseTypeList', true);
         $this->parsePage();
@@ -130,6 +123,7 @@ class CTExpenseType extends CTCNC
     /**
      * Edit/Add Expense Type
      * @access private
+     * @throws Exception
      */
     function edit()
     {
@@ -142,33 +136,33 @@ class CTExpenseType extends CTCNC
                 $expenseTypeID = $_REQUEST['expenseTypeID'];
             } else {                                                                    // creating new
                 $dsExpenseType->initialise();
-                $dsExpenseType->setValue('expenseTypeID', '0');
-                $expenseTypeID = '0';
+                $dsExpenseType->setValue(DBEExpenseType::expenseTypeID, null);
+                $expenseTypeID = null;
             }
         } else {                                                                        // form validation error
             $dsExpenseType->initialise();
             $dsExpenseType->fetchNext();
-            $expenseTypeID = $dsExpenseType->getValue('expenseTypeID');
+            $expenseTypeID = $dsExpenseType->getValue(DBEExpenseType::expenseTypeID);
         }
-        if ($_REQUEST['action'] == CTEXPENSETYPE_ACT_EDIT && $this->buExpenseType->canDeleteExpenseType($_REQUEST['expenseTypeID'])) {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTEXPENSETYPE_ACT_DELETE,
-                        'expenseTypeID' => $expenseTypeID
-                    )
-                );
+        $urlDelete = null;
+        $txtDelete = null;
+        if ($_REQUEST['action'] == CTEXPENSETYPE_ACT_EDIT && $this->buExpenseType->canDeleteExpenseType(
+                $_REQUEST['expenseTypeID']
+            )) {
+            $urlDelete = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'        => CTEXPENSETYPE_ACT_DELETE,
+                    'expenseTypeID' => $expenseTypeID
+                )
+            );
             $txtDelete = 'Delete';
-        } else {
-            $urlDelete = '';
-            $txtDelete = '';
         }
         $urlUpdate =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => CTEXPENSETYPE_ACT_UPDATE,
+                    'action'        => CTEXPENSETYPE_ACT_UPDATE,
                     'expenseTypeID' => $expenseTypeID
                 )
             );
@@ -185,15 +179,19 @@ class CTExpenseType extends CTCNC
         );
         $this->template->set_var(
             array(
-                'expenseTypeID' => $dsExpenseType->getValue('expenseTypeID'),
-                'description' => Controller::htmlInputText($dsExpenseType->getValue('description')),
-                'descriptionMessage' => Controller::htmlDisplayText($dsExpenseType->getMessage('description')),
-                'mileageFlagChecked' => Controller::htmlChecked($dsExpenseType->getValue('mileageFlag')),
-                'vatFlagChecked' => Controller::htmlChecked($dsExpenseType->getValue('vatFlag')),
-                'urlUpdate' => $urlUpdate,
-                'urlDelete' => $urlDelete,
-                'txtDelete' => $txtDelete,
-                'urlDisplayList' => $urlDisplayList
+                'expenseTypeID'      => $dsExpenseType->getValue(DBEExpenseType::expenseTypeID),
+                'description'        => Controller::htmlInputText(
+                    $dsExpenseType->getValue(DBEExpenseType::description)
+                ),
+                'descriptionMessage' => Controller::htmlDisplayText(
+                    $dsExpenseType->getMessage(DBEExpenseType::description)
+                ),
+                'mileageFlagChecked' => Controller::htmlChecked($dsExpenseType->getValue(DBEExpenseType::mileageFlag)),
+                'vatFlagChecked'     => Controller::htmlChecked($dsExpenseType->getValue(DBEExpenseType::vatFlag)),
+                'urlUpdate'          => $urlUpdate,
+                'urlDelete'          => $urlDelete,
+                'txtDelete'          => $txtDelete,
+                'urlDisplayList'     => $urlDisplayList
             )
         );
         $this->template->parse('CONTENTS', 'ExpenseTypeEdit', true);
@@ -203,15 +201,15 @@ class CTExpenseType extends CTCNC
     /**
      * Update call expense type details
      * @access private
+     * @throws Exception
      */
     function update()
     {
         $this->setMethodName('update');
-        $dsExpenseType = &$this->dsExpenseType;
         print_r($_REQUEST['expenseType']);
         $this->formError = (!$this->dsExpenseType->populateFromArray($_REQUEST['expenseType']));
         if ($this->formError) {
-            if ($this->dsExpenseType->getValue('expenseTypeID') == '0') {                    // attempt to insert
+            if (!$this->dsExpenseType->getValue(DBEExpenseType::expenseTypeID)) {
                 $_REQUEST['action'] = CTEXPENSETYPE_ACT_EDIT;
             } else {
                 $_REQUEST['action'] = CTEXPENSETYPE_ACT_CREATE;
@@ -223,11 +221,12 @@ class CTExpenseType extends CTCNC
         $this->buExpenseType->updateExpenseType($this->dsExpenseType);
 
         $urlNext =
-            Controller::buildLink($_SERVER['PHP_SELF'],
-                             array(
-                                 'expenseTypeID' => $this->dsExpenseType->getValue('expenseTypeID'),
-                                 'action' => CTCNC_ACT_VIEW
-                             )
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'expenseTypeID' => $this->dsExpenseType->getValue(DBEExpenseType::expenseTypeID),
+                    'action'        => CTCNC_ACT_VIEW
+                )
             );
         header('Location: ' . $urlNext);
     }
@@ -237,6 +236,7 @@ class CTExpenseType extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function delete()
     {
@@ -245,16 +245,14 @@ class CTExpenseType extends CTCNC
             $this->displayFatalError('Cannot delete this expense type');
             exit;
         } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTEXPENSETYPE_ACT_DISPLAY_LIST
-                    )
-                );
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTEXPENSETYPE_ACT_DISPLAY_LIST
+                )
+            );
             header('Location: ' . $urlNext);
             exit;
         }
     }
-}// end of class
-?>
+}

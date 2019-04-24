@@ -61,29 +61,19 @@ class CTHome extends CTCNC
     {
         switch ($_REQUEST['action']) {
             case 'lastWeekHelpDesk':
-                $days = $_REQUEST['days'];
-                if (!$days) {
-                    $days = 30;
-                }
                 $team = 1;
-
                 if (isset($_REQUEST['team'])) {
                     $team = $_REQUEST['team'];
                 }
-
-
                 echo json_encode(
                     $this->showLastWeekHelpDeskData(
-                        $team,
-                        $days
+                        $team
                     ),
                     JSON_NUMERIC_CHECK
                 );
                 break;
 
             case self::GetDetailedChartsDataAction:
-
-
                 echo json_encode(
                     $this->getDetailedChartsData(
                         $_REQUEST['engineerID'],
@@ -337,7 +327,7 @@ class CTHome extends CTCNC
 
         $this->buCustomer = new BUCustomer($this);
         $dsCustomer = new DataSet($this);
-        if ($this->buCustomer->getDailyCallList($dsCustomer)) {
+        if ($this->buCustomer->getDailyCallList($this, $dsCustomer)) {
 
 
             while ($dsCustomer->fetchNext()) {
@@ -1068,12 +1058,10 @@ class CTHome extends CTCNC
 
     /**
      * @param $team
-     * @param $days
      * @return array
      * @throws Exception
      */
-    private function showLastWeekHelpDeskData($team,
-                                              $days
+    private function showLastWeekHelpDeskData($team
     )
     {
         $isStandardUser = false;
@@ -1110,7 +1098,6 @@ class CTHome extends CTCNC
 
         $results = $this->buUser->teamMembersPerformanceData(
             $team,
-            $days,
             $this->buUser->isSdManager($this->userID)
         );
 

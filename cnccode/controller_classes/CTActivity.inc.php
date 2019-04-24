@@ -18,12 +18,10 @@ require_once($cfg['path_dbe'] . '/DBEJCallActivity.php');
 require_once($cfg['path_dbe'] . '/DBECallDocument.inc.php');
 require_once($cfg['path_dbe'] . '/DBECallActType.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJCallActType.php');
-require_once($cfg['path_dbe'] . '/DBEEscalation.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
 require_once($cfg['path_bu'] . '/BUSite.inc.php');
 require_once($cfg['path_bu'] . '/BUContact.inc.php');
-require_once($cfg['path_bu'] . '/BUSecurityApp.inc.php');
 require_once($cfg['path_bu'] . '/BURootCause.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -129,19 +127,19 @@ class CTActivity extends CTCNC
 
     const GREEN = '#BDF8BA';
     const CONTENT = '#F4f4f2';
-    var $statusArrayCustomer =
+    public $statusArrayCustomer =
         array(
             "A" => "Active",
             "E" => "Ended",
             ""  => "All"
         );
-    var $serverGuardArray =
+    public $serverGuardArray =
         array(
             ""  => "Please select",
             "Y" => "ServerGuard Related",
             "N" => "Not ServerGuard Related"
         );
-    var $arrContractType =
+    public $arrContractType =
         array(
             "TM"  => "T & M",
             "GSC" => "Pre-pay",
@@ -153,22 +151,13 @@ class CTActivity extends CTCNC
      * @var DSForm
      */
     private $dsSearchForm;
-    /**
-     *
-     * @var DataSet
-     */
+    /** @var DataSet|DBEJCallActivity */
     private $dsSearchResults;
-    /**
-     *
-     * @var DataSet
-     */
+    /** @var DataSet */
     private $sessionKey;
     private $contactID;
     private $userWarned = false;
-    /**
-     *
-     * @var BUActivity
-     */
+    /** @var BUActivity */
     private $buActivity;
     private $statusArray =
         array(
@@ -210,15 +199,15 @@ class CTActivity extends CTCNC
         $this->dsCallActivity = new DSForm($this);
         $this->dsCallActivity->copyColumnsFrom($this->buActivity->dbeJCallActivity);
         $this->dsCallActivity->setNull(
-            'siteNo',
+            DBECallActivity::siteNo,
             DA_ALLOW_NULL
         );
         $this->dsCallActivity->setNull(
-            'contactID',
+            DBECallActivity::contactID,
             DA_ALLOW_NULL
         );
         $this->dsCallActivity->setNull(
-            'callActTypeID',
+            DBECallActivity::callActTypeID,
             DA_ALLOW_NULL
         );
 
@@ -863,15 +852,15 @@ class CTActivity extends CTCNC
                 'txtExpand',
                 'show/hide latest activity'
             );
-            $customerNameCol = $dsSearchResults->columnExists('customerName');
-            $callActivityIDCol = $dsSearchResults->columnExists('callActivityID');
-            $statusCol = $dsSearchResults->columnExists('status');
-            $reasonCol = $dsSearchResults->columnExists('reason');
-            $dateCol = $dsSearchResults->columnExists('date');
-            $startCol = $dsSearchResults->columnExists('startTime');
-            $endCol = $dsSearchResults->columnExists('endTime');
-            $contractDescriptionCol = $dsSearchResults->columnExists('contractDescription');
-            $problemIDCol = $dsSearchResults->columnExists('problemID');
+            $customerNameCol = $dsSearchResults->columnExists(DBEJCallActivity::customerName);
+            $callActivityIDCol = $dsSearchResults->columnExists(DBEJCallActivity::callActivityID);
+            $statusCol = $dsSearchResults->columnExists(DBEJCallActivity::status);
+            $reasonCol = $dsSearchResults->columnExists(DBEJCallActivity::reason);
+            $dateCol = $dsSearchResults->columnExists(DBEJCallActivity::date);
+            $startCol = $dsSearchResults->columnExists(DBEJCallActivity::startTime);
+            $endCol = $dsSearchResults->columnExists(DBEJCallActivity::endTime);
+            $contractDescriptionCol = $dsSearchResults->columnExists(DBEJCallActivity::contractDescription);
+            $problemIDCol = $dsSearchResults->columnExists(DBEJCallActivity::problemID);
 
             /*
         if we are displaying checked T&M activities then show Generate Sales Order and Skip Sales Order buttons
@@ -3666,6 +3655,9 @@ class CTActivity extends CTCNC
         exit;
     }
 
+    /**
+     * @throws Exception
+     */
     function editLinkedSalesOrder()
     {
         $this->setMethodName('editLinkedSalesOrder');
@@ -3733,6 +3725,9 @@ class CTActivity extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @throws Exception
+     */
     function problemHistoryPopup()
     {
         $this->setTemplateFiles(
@@ -3917,6 +3912,9 @@ class CTActivity extends CTCNC
         exit;
     }    // end allocateAddition
 
+    /**
+     * @throws Exception
+     */
     function customerProblemPopup()
     {
         $this->setTemplateFiles(
@@ -3945,7 +3943,6 @@ class CTActivity extends CTCNC
         );
 
         $this->parsePage();
-
         exit;
     }
 

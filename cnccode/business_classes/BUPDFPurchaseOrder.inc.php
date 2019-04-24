@@ -86,21 +86,30 @@ define(
 
 class BUPDFPurchaseOrder extends BaseObject
 {
-    var $_buPDF = '';                    // BUPDF object
-    var $_buPurchaseOrder = '';
-    var $_buSupplier = '';
-    var $_buContact = '';
-    var $_dbePayMethod = '';
-    var $_buSalesOrder = '';
-    var $_dsPorhead = '';
-    var $_dsOrdhead = '';
-    var $_dsPorline = '';
-    var $_dsSupplierContact = '';
-    var $_dsCustomerContact = '';
-    var $_dsUser = '';
-    var $_dsSupplier = '';
-    var $_porheadID = '';
-    var $_titleLine = '';
+    /** @var BUPDF */
+    public $_buPDF;
+    /** @var BUPurchaseOrder */
+    public $_buPurchaseOrder;
+    public $_buSupplier;
+    public $_buContact;
+    public $_dbePayMethod;
+    public $_buSalesOrder;
+    /** @var DataSet|DBEJPorhead */
+    public $_dsPorhead;
+    /** @var DataSet|DBEJOrdhead */
+    public $_dsOrdhead;
+    /** @var DataSet|DBEJPorline */
+    public $_dsPorline;
+    /** @var DataSet|DBEContact */
+    public $_dsSupplierContact;
+    /** @var DataSet|DBEContact */
+    public $_dsCustomerContact;
+    /** @var DataSet|DBEUser */
+    public $_dsUser;
+    /** @var DataSet|DBESupplier */
+    public $_dsSupplier;
+    public $_porheadID;
+    public $_titleLine;
 
     /**
      * Constructor
@@ -171,7 +180,7 @@ class BUPDFPurchaseOrder extends BaseObject
                 $this->_dsOrdhead
             );
             $this->_buContact->getContactByID(
-                $this->_dsOrdhead->getValue('delContactID'),
+                $this->_dsOrdhead->getValue(DBEJOrdhead::delContactID),
                 $this->_dsCustomerContact
             );
         }
@@ -217,26 +226,26 @@ class BUPDFPurchaseOrder extends BaseObject
             }
             $this->_buPDF->printStringRJAt(
                 BUPDFPOR_QTY_COL,
-                $dsPorline->getValue('qtyOrdered')
+                $dsPorline->getValue(DBEJPorline::qtyOrdered)
             );
             $this->_buPDF->printStringAt(
                 BUPDFPOR_DETAILS_COL,
-                $dsPorline->getValue('itemDescription')
+                $dsPorline->getValue(DBEJPorline::itemDescription)
             );
             $this->_buPDF->printStringAt(
                 BUPDFPOR_PART_COL - 5,
-                $dsPorline->getValue('partNo')
+                $dsPorline->getValue(DBEJPorline::partNo)
             );
             $this->_buPDF->printStringRJAt(
                 BUPDFPOR_UNIT_PRICE_COL,
                 POUND_CHAR . number_format(
-                    $dsPorline->getValue('curUnitCost'),
+                    $dsPorline->getValue(DBEJPorline::curUnitCost),
                     2,
                     '.',
                     ','
                 )
             );
-            $total = ($dsPorline->getValue('curUnitCost') * $dsPorline->getValue('qtyOrdered'));
+            $total = ($dsPorline->getValue(DBEJPorline::curUnitCost) * $dsPorline->getValue(DBEJPorline::qtyOrdered));
             $this->_buPDF->printStringRJAt(
                 BUPDFPOR_COST_COL,
                 POUND_CHAR . number_format(
@@ -249,12 +258,9 @@ class BUPDFPurchaseOrder extends BaseObject
             $grandTotal += $total;
             $this->_buPDF->CR();
         }
-//		$this->_buPDF->moveYTo((BUPDFPOR_NUMBER_OF_LINES - 6.5) * $this->_buPDF->getFontSize());
-//		$this->_buPDF->printStringAt(BUPDFPOR_DETAILS_COL, '***** Thank you for your order *****');
         $this->_buPDF->setBoldOn();
         $this->_buPDF->setFont();
         $savedYPos = $this->_buPDF->getYPos();
-//		$this->_buPDF->moveYTo($this->_titleLine + (BUPDFPOR_NUMBER_OF_LINES * $this->_buPDF->getFontSize()/2));
         $this->_buPDF->box(
             BUPDFPOR_UNIT_PRICE_BOX_LEFT_EDGE,
             $this->_buPDF->getYPos(),
@@ -296,11 +302,11 @@ class BUPDFPurchaseOrder extends BaseObject
         $this->_buPDF->printStringRJAt(
             BUPDFPOR_UNIT_PRICE_COL,
             'VAT @ ' . number_format(
-                $this->_dsPorhead->getValue('vatRate'),
+                $this->_dsPorhead->getValue(DBEJPorhead::vatRate),
                 1
             ) . '%'
         );
-        $vatValue = $grandTotal * ($this->_dsPorhead->getValue('vatRate') / 100);
+        $vatValue = $grandTotal * ($this->_dsPorhead->getValue(DBEJPorhead::vatRate) / 100);
 
         // for some reason number_format insists on truncating the VAT value so I round it first!
         $vatValue = $this->myFormattedRoundedNumber($vatValue);
@@ -342,7 +348,6 @@ class BUPDFPurchaseOrder extends BaseObject
         );
         $this->_buPDF->setFontSize(10);
         $this->_buPDF->setFont();
-//		$this->_buPDF->moveYTo($this->_titleLine + (BUPDFPOR_NUMBER_OF_LINES * $this->_buPDF->getFontSize()/2) - 2);
         /*
         Draw boxes around columns
         */
@@ -352,7 +357,6 @@ class BUPDFPurchaseOrder extends BaseObject
             $this->_titleLine,
             BUPDFPOR_QTY_BOX_WIDTH,
             $savedYPos - $this->_titleLine
-//			(BUPDFPOR_NUMBER_OF_LINES)*($this->_buPDF->getFontSize()/2)
         );
         // Around details
         $this->_buPDF->box(
@@ -360,7 +364,6 @@ class BUPDFPurchaseOrder extends BaseObject
             $this->_titleLine,
             BUPDFPOR_DETAILS_BOX_WIDTH,
             $savedYPos - $this->_titleLine
-//			(BUPDFPOR_NUMBER_OF_LINES)*($this->_buPDF->getFontSize()/2)
         );
         // Box around the Part no
         $this->_buPDF->box(
@@ -368,7 +371,6 @@ class BUPDFPurchaseOrder extends BaseObject
             $this->_titleLine,
             BUPDFPOR_PART_BOX_WIDTH,
             $savedYPos - $this->_titleLine
-//			(BUPDFPOR_NUMBER_OF_LINES)*($this->_buPDF->getFontSize()/2)
         );
         // Box around the Cost
         $this->_buPDF->box(
@@ -376,7 +378,6 @@ class BUPDFPurchaseOrder extends BaseObject
             $this->_titleLine,
             BUPDFPOR_UNIT_PRICE_BOX_WIDTH,
             $savedYPos - $this->_titleLine
-        //(BUPDFPOR_NUMBER_OF_LINES)*($this->_buPDF->getFontSize()/2)
         );
         /*
         End of drawing boxes around columns
@@ -386,8 +387,8 @@ class BUPDFPurchaseOrder extends BaseObject
         $this->_buPDF->setFont();
         $this->_buPDF->CR();
         if (
-            ($this->_dsPorhead->getValue('directDeliveryFlag') == 'N') or
-            ($this->_dsPorhead->getValue('ordheadID') == 0)
+            ($this->_dsPorhead->getValue(DBEJPorhead::directDeliveryFlag) == 'N') or
+            ($this->_dsPorhead->getValue(DBEJPorhead::ordheadID) == 0)
         ) {
             $this->_buPDF->printString('Please deliver to CNC at the address shown below.');
             $this->_buPDF->CR();
@@ -400,51 +401,51 @@ class BUPDFPurchaseOrder extends BaseObject
             $this->_buPDF->CR();
             $this->_buPDF->printStringAt(
                 15,
-                $this->_dsCustomerContact->getValue('title') . ' ' .
-                $this->_dsCustomerContact->getValue('firstName') . ' ' .
-                $this->_dsCustomerContact->getValue('lastName') . ' '
+                $this->_dsCustomerContact->getValue(DBEContact::title) . ' ' .
+                $this->_dsCustomerContact->getValue(DBEContact::firstName) . ' ' .
+                $this->_dsCustomerContact->getValue(DBEContact::lastName) . ' '
             );
             $savedYPos = $this->_buPDF->getYPos();
             $this->_buPDF->CR();
             $this->_buPDF->printStringAt(
                 15,
-                $this->_dsOrdhead->getValue('customerName')
+                $this->_dsOrdhead->getValue(DBEJOrdhead::customerName)
             );
             $this->_buPDF->CR();
             $this->_buPDF->printStringAt(
                 15,
-                $this->_dsOrdhead->getValue('delAdd1')
+                $this->_dsOrdhead->getValue(DBEJOrdhead::delAdd1)
             );
             $this->_buPDF->CR();
-            if ($this->_dsOrdhead->getValue('delAdd2') != '') {
+            if ($this->_dsOrdhead->getValue(DBEJOrdhead::delAdd2)) {
                 $this->_buPDF->printStringAt(
                     15,
-                    $this->_dsOrdhead->getValue('delAdd2')
+                    $this->_dsOrdhead->getValue(DBEJOrdhead::delAdd2)
                 );
                 $this->_buPDF->CR();
             }
-            if ($this->_dsOrdhead->getValue('delAdd3') != '') {
+            if ($this->_dsOrdhead->getValue(DBEJOrdhead::delAdd3)) {
                 $this->_buPDF->printStringAt(
                     15,
-                    $this->_dsOrdhead->getValue('delAdd3')
-                );
-                $this->_buPDF->CR();
-            }
-            $this->_buPDF->printStringAt(
-                15,
-                $this->_dsOrdhead->getValue('delTown')
-            );
-            $this->_buPDF->CR();
-            if ($this->_dsOrdhead->getValue('delCounty') != '') {
-                $this->_buPDF->printStringAt(
-                    15,
-                    $this->_dsOrdhead->getValue('delCounty')
+                    $this->_dsOrdhead->getValue(DBEJOrdhead::delAdd3)
                 );
                 $this->_buPDF->CR();
             }
             $this->_buPDF->printStringAt(
                 15,
-                $this->_dsOrdhead->getValue('delPostcode')
+                $this->_dsOrdhead->getValue(DBEJOrdhead::delTown)
+            );
+            $this->_buPDF->CR();
+            if ($this->_dsOrdhead->getValue(DBEJOrdhead::delCounty)) {
+                $this->_buPDF->printStringAt(
+                    15,
+                    $this->_dsOrdhead->getValue(DBEJOrdhead::delCounty)
+                );
+                $this->_buPDF->CR();
+            }
+            $this->_buPDF->printStringAt(
+                15,
+                $this->_dsOrdhead->getValue(DBEJOrdhead::delPostcode)
             );
             $this->_buPDF->CR();
             // Box around the address
@@ -453,7 +454,6 @@ class BUPDFPurchaseOrder extends BaseObject
                 $savedYPos,
                 BUPDFPOR_ADDRESS_BOX_WIDTH,
                 $this->_buPDF->getYPos() - $savedYPos
-            //(BUPDFPOR_NUMBER_OF_LINES)*($this->_buPDF->getFontSize()/2)
             );
         }
         $this->_buPDF->CR();
@@ -468,6 +468,7 @@ class BUPDFPurchaseOrder extends BaseObject
         );
         $this->_buPDF->CR();
         if ($this->_dbePayMethod->getValue(DBEPayMethod::cardFlag) == 'Y') {
+            $dsCardholder = new DBEUser($this);
             $this->_buSalesOrder->getUserByID(
                 $this->_dbePayMethod->getValue(DBEPayMethod::userID),
                 $dsCardholder
@@ -507,7 +508,7 @@ class BUPDFPurchaseOrder extends BaseObject
             $this->_buPDF->setFont();
             $this->_buPDF->printStringAt(
                 40,
-                $dsCardholder->getValue('name')
+                $dsCardholder->getValue(DBEUser::name)
             );
             $this->_buPDF->CR();
         }
@@ -561,37 +562,36 @@ class BUPDFPurchaseOrder extends BaseObject
         $this->_buPDF->CR();
         $this->_buPDF->CR();
         $firstAddLine = $this->_buPDF->getYPos();    // remember this line no
-        $this->_buPDF->printString($this->_dsSupplier->getValue('name'));
+        $this->_buPDF->printString($this->_dsSupplier->getValue(DBESupplier::name));
         $this->_buPDF->CR();
         $this->_buPDF->setFontSize(8);
         $this->_buPDF->setFont();
-        $this->_buPDF->printString($this->_dsSupplier->getValue('add1'));
-        if ($this->_dsSupplier->getValue('add2') != '') {
+        $this->_buPDF->printString($this->_dsSupplier->getValue(DBESupplier::add1));
+        if ($this->_dsSupplier->getValue(DBESupplier::add2)) {
             $this->_buPDF->CR();
-            $this->_buPDF->printString($this->_dsSupplier->getValue('add2'));
+            $this->_buPDF->printString($this->_dsSupplier->getValue(DBESupplier::add2));
         }
         $this->_buPDF->CR();
-        $this->_buPDF->printString($this->_dsSupplier->getValue('town'));
-        if ($this->_dsSupplier->getValue('county') != '') {
+        $this->_buPDF->printString($this->_dsSupplier->getValue(DBESupplier::town));
+        if ($this->_dsSupplier->getValue(DBESupplier::county)) {
             $this->_buPDF->CR();
-            $this->_buPDF->printString($this->_dsSupplier->getValue('county'));
+            $this->_buPDF->printString($this->_dsSupplier->getValue(DBESupplier::county));
         }
         $this->_buPDF->CR();
-        $this->_buPDF->printString($this->_dsSupplier->getValue('postcode'));
+        $this->_buPDF->printString($this->_dsSupplier->getValue(DBESupplier::postcode));
         $this->_buPDF->CR();
         $this->_buPDF->CR();
         $this->_buPDF->setFontSize(10);
         $this->_buPDF->setFont();
         $contactString =
             'F.A.O. ' .
-            $this->_dsSupplierContact->getValue('title') . ' ' .
-            $this->_dsSupplierContact->getValue('firstName') . ' ' .
-            $this->_dsSupplierContact->getValue('lastName') . ' ';
-        if ($this->_dsSupplierContact->getValue('fax') != '') {
-            $contactString .= '(Fax: ' . $this->_dsSupplierContact->getValue('fax') . ')';
+            $this->_dsSupplierContact->getValue(DBEContact::title) . ' ' .
+            $this->_dsSupplierContact->getValue(DBEContact::firstName) . ' ' .
+            $this->_dsSupplierContact->getValue(DBEContact::lastName) . ' ';
+        if ($this->_dsSupplierContact->getValue(DBEContact::fax)) {
+            $contactString .= '(Fax: ' . $this->_dsSupplierContact->getValue(DBEContact::fax) . ')';
         }
         $this->_buPDF->printString($contactString);
-        $faoLine = $this->_buPDF->getYPos();
         $this->_buPDF->moveYTo($firstAddLine);    //move back up the page
         $this->_buPDF->CR();
         $this->_buPDF->box(
@@ -614,7 +614,7 @@ class BUPDFPurchaseOrder extends BaseObject
         $this->_buPDF->setFont();
         $this->_buPDF->printStringAt(
             BUPDFPOR_COST_BOX_LEFT_EDGE,
-            'P0' . $this->_dsPorhead->getValue('porheadID')
+            'P0' . $this->_dsPorhead->getValue(DBEJPorhead::porheadID)
         );
         $this->_buPDF->CR();
         $this->_buPDF->box(
@@ -665,7 +665,7 @@ class BUPDFPurchaseOrder extends BaseObject
         $this->_buPDF->printStringAt(
             BUPDFPOR_COST_BOX_LEFT_EDGE,
             substr(
-                $this->_dsUser->getValue('name'),
+                $this->_dsUser->getValue(DBEUser::name),
                 0,
                 17
             )
@@ -695,7 +695,7 @@ class BUPDFPurchaseOrder extends BaseObject
         $this->_buPDF->printStringAt(
             BUPDFPOR_COST_BOX_LEFT_EDGE,
             substr(
-                $this->_dsSupplier->getValue('cncAccountNo'),
+                $this->_dsSupplier->getValue(DBESupplier::cncAccountNo),
                 0,
                 17
             )
@@ -725,7 +725,7 @@ class BUPDFPurchaseOrder extends BaseObject
         $this->_buPDF->printStringAt(
             BUPDFPOR_COST_BOX_LEFT_EDGE,
             substr(
-                $this->_dsOrdhead->getValue('custPORef'),
+                $this->_dsOrdhead->getValue(DBEJOrdhead::custPORef),
                 0,
                 15
             )
@@ -793,7 +793,6 @@ class BUPDFPurchaseOrder extends BaseObject
         $this->_buPDF->setBoldOff();
         $this->_buPDF->setFont();
         $this->_buPDF->CR();
-        $grandTotal = 0;
     }
 
     function myFormattedRoundedNumber($number,
@@ -805,5 +804,4 @@ class BUPDFPurchaseOrder extends BaseObject
             (($number >= 0) ? ($number + $fuzz) : ($number - $fuzz))
         );
     }
-}// End of class
-?>
+}

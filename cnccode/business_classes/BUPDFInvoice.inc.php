@@ -16,7 +16,6 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 require_once($cfg['path_bu'] . '/BUPDF.inc.php');
-require_once($cfg['path_bu'] . '/BUNotepad.inc.php');
 require_once($cfg['path_dbe'] . '/DBEPaymentTerms.inc.php');
 define(
     'BUPDFINV_NUMBER_OF_LINES',
@@ -80,7 +79,6 @@ class BUPDFInvoice extends BaseObject
     public $_buPDF;
     /** @var BUInvoice */
     public $_buInvoice;
-    public $_buNotepad;
     /** @var DataSet|DBEInvhead */
     public $_dsInvhead;
     public $_customerID;
@@ -111,7 +109,6 @@ class BUPDFInvoice extends BaseObject
         } else {
             $this->raiseError('_buInvoice object not passed');
         }
-        $this->_buNotepad = new BUNotepad($this);
     }
 
     function reprintInvoicesByRange($customerID,
@@ -287,27 +284,6 @@ class BUPDFInvoice extends BaseObject
                     )
                 );
                 $grandTotal += $total;
-                $dsNotepad = new DataSet($this);
-                $this->_buNotepad->getNotes(
-                    BUPDFINV_NOTEPAD_ITEM,
-                    $dsInvline->getValue(DBEInvline::itemID),
-                    $dsNotepad
-                );
-                if ($dsNotepad->fetchNext()) {
-                    $this->_buPDF->setFontSize(8);
-                    $this->_buPDF->setFont();
-                    do {
-                        if (trim($dsNotepad->getValue(DBENotepad::noteText)) != '') {
-                            $this->_buPDF->CR();
-                            $this->_buPDF->printStringAt(
-                                BUPDFINV_DETAILS_COL,
-                                $dsNotepad->getValue(DBENotepad::noteText)
-                            );
-                        }
-                    } while ($dsNotepad->fetchNext());
-                    $this->_buPDF->setFontSize(10);
-                    $this->_buPDF->setFont();
-                }
             } else {
                 $this->_buPDF->printStringAt(
                     BUPDFINV_DETAILS_COL,

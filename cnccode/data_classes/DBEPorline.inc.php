@@ -20,8 +20,8 @@ class DBEPorline extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -88,12 +88,12 @@ class DBEPorline extends DBEntity
     function deleteRowsByOrdheadID()
     {
         $this->setMethodName('deleteRowsByOrdheadID');
-        if ($this->getValue('porheadID') == '') {
+        if ($this->getValue(self::porheadID) == '') {
             $this->raiseError('porheadID not set');
         }
         $this->setQueryString(
             "DELETE FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('porheadID') . ' = ' . $this->getValue('porheadID')
+            " WHERE " . $this->getDBColumnName(self::porheadID) . ' = ' . $this->getValue(self::porheadID)
         );
         $ret = ($this->runQuery());
         $this->resetQueryString();
@@ -103,8 +103,8 @@ class DBEPorline extends DBEntity
     function getPKWhere()
     {
         return (
-            $this->getDBColumnName('porheadID') . ' = ' . $this->getValue('porheadID') .
-            " AND " . $this->getDBColumnName('sequenceNo') . ' = ' . $this->getValue('sequenceNo')
+            $this->getDBColumnName(self::porheadID) . ' = ' . $this->getValue(self::porheadID) .
+            " AND " . $this->getDBColumnName(self::sequenceNo) . ' = ' . $this->getValue(self::sequenceNo)
         );
     }
 
@@ -116,19 +116,18 @@ class DBEPorline extends DBEntity
     function shuffleRowsDown()
     {
         $this->setMethodName("shuffleRowsDown");
-        if ($this->getValue('porheadID') == '') {
+        if ($this->getValue(self::porheadID) == '') {
             $this->raiseError('porheadID not set');
         }
-        if ($this->getValue('sequenceNo') == '') {
+        if ($this->getValue(self::sequenceNo) == '') {
             $this->raiseError('sequenceNo not set');
         }
-        $sequenceNo = $this->getDBColumnName('sequenceNo');
-        $porheadID = $this->getDBColumnName('porheadID');
+
         $this->setQueryString(
             'UPDATE ' . $this->getTableName() .
-            ' SET ' . $this->getDBColumnName('sequenceNo') . '=' . $this->getDBColumnName('sequenceNo') . '+1' .
-            ' WHERE ' . $this->getDBColumnName('porheadID') . ' = ' . $this->getFormattedValue('porheadID') .
-            ' AND ' . $this->getDBColumnName('sequenceNo') . ' >= ' . $this->getFormattedValue('sequenceNo')
+            ' SET ' . $this->getDBColumnName(self::sequenceNo) . '=' . $this->getDBColumnName(self::sequenceNo) . '+1' .
+            ' WHERE ' . $this->getDBColumnName(self::porheadID) . ' = ' . $this->getFormattedValue(self::porheadID) .
+            ' AND ' . $this->getDBColumnName(self::sequenceNo) . ' >= ' . $this->getFormattedValue(self::sequenceNo)
         );
         $ret = $this->runQuery();
         $this->resetQueryString();
@@ -143,17 +142,17 @@ class DBEPorline extends DBEntity
     function shuffleRowsUp()
     {
         $this->setMethodName("shuffleRowsUp");
-        if ($this->getValue('porheadID') == '') {
+        if ($this->getValue(self::porheadID) == '') {
             $this->raiseError('porheadID not set');
         }
-        if ($this->getValue('sequenceNo') == '') {
+        if ($this->getValue(self::sequenceNo) == '') {
             $this->raiseError('sequenceNo not set');
         }
         $this->setQueryString(
             'UPDATE ' . $this->getTableName() .
-            ' SET ' . $this->getDBColumnName('sequenceNo') . '=' . $this->getDBColumnName('sequenceNo') . '-1' .
-            ' WHERE ' . $this->getDBColumnName('porheadID') . ' = ' . $this->getValue('porheadID') .
-            ' AND ' . $this->getDBColumnName('sequenceNo') . ' >= ' . $this->getValue('sequenceNo')
+            ' SET ' . $this->getDBColumnName(self::sequenceNo) . '=' . $this->getDBColumnName(self::sequenceNo) . '-1' .
+            ' WHERE ' . $this->getDBColumnName(self::porheadID) . ' = ' . $this->getValue(self::porheadID) .
+            ' AND ' . $this->getDBColumnName(self::sequenceNo) . ' >= ' . $this->getValue(self::sequenceNo)
         );
         $ret = $this->runQuery();
         $this->resetQueryString();
@@ -164,46 +163,47 @@ class DBEPorline extends DBEntity
      * Move given row down in the sequence
      * Swaps sequence numbers of 2 rows
      * @access public
+     * @param string $direction
      * @return bool
      */
     function moveRow($direction = 'UP')
     {
         $this->setMethodName("moveRow");
-        if ($this->getValue('porheadID') == '') {
+        if ($this->getValue(self::porheadID) == '') {
             $this->raiseError('porheadID not set');
         }
-        if ($this->getValue('sequenceNo') == '') {
+        if ($this->getValue(self::sequenceNo) == '') {
             $this->raiseError('sequenceNo not set');
         }
         // current row into temporary buffer row: sequenceNo = -99
         $this->setQueryString(
             'UPDATE ' . $this->getTableName() .
-            ' SET ' . $this->getDBColumnName('sequenceNo') . ' = -99' .
-            ' WHERE ' . $this->getDBColumnName('porheadID') . ' = ' . $this->getValue('porheadID') .
-            ' AND ' . $this->getDBColumnName('sequenceNo') . ' = ' . $this->getValue('sequenceNo')
+            ' SET ' . $this->getDBColumnName(self::sequenceNo) . ' = -99' .
+            ' WHERE ' . $this->getDBColumnName(self::porheadID) . ' = ' . $this->getValue(self::porheadID) .
+            ' AND ' . $this->getDBColumnName(self::sequenceNo) . ' = ' . $this->getValue(self::sequenceNo)
         );
-        $ret = $this->runQuery();
+        $this->runQuery();
         $this->resetQueryString();
         // Move row next to this one
         if ($direction == 'UP') {
-            $sequenceNo = $this->getValue('sequenceNo') - 1;
+            $sequenceNo = $this->getValue(self::sequenceNo) - 1;
         } else {            // down
-            $sequenceNo = $this->getValue('sequenceNo') + 1;
+            $sequenceNo = $this->getValue(self::sequenceNo) + 1;
         }
         $this->setQueryString(
             'UPDATE ' . $this->getTableName() .
-            ' SET ' . $this->getDBColumnName('sequenceNo') . ' = ' . $this->getValue('sequenceNo') .
-            ' WHERE ' . $this->getDBColumnName('porheadID') . ' = ' . $this->getValue('porheadID') .
-            ' AND ' . $this->getDBColumnName('sequenceNo') . ' = ' . $sequenceNo
+            ' SET ' . $this->getDBColumnName(self::sequenceNo) . ' = ' . $this->getValue(self::sequenceNo) .
+            ' WHERE ' . $this->getDBColumnName(self::porheadID) . ' = ' . $this->getValue(self::porheadID) .
+            ' AND ' . $this->getDBColumnName(self::sequenceNo) . ' = ' . $sequenceNo
         );
-        $ret = $this->runQuery();
+        $this->runQuery();
         $this->resetQueryString();
         // Move current row from temp
         $this->setQueryString(
             'UPDATE ' . $this->getTableName() .
-            ' SET ' . $this->getDBColumnName('sequenceNo') . ' = ' . $sequenceNo .
-            ' WHERE ' . $this->getDBColumnName('porheadID') . ' = ' . $this->getValue('porheadID') .
-            ' AND ' . $this->getDBColumnName('sequenceNo') . ' = -99'
+            ' SET ' . $this->getDBColumnName(self::sequenceNo) . ' = ' . $sequenceNo .
+            ' WHERE ' . $this->getDBColumnName(self::porheadID) . ' = ' . $this->getValue(self::porheadID) .
+            ' AND ' . $this->getDBColumnName(self::sequenceNo) . ' = -99'
         );
         $ret = $this->runQuery();
         $this->resetQueryString();
@@ -211,18 +211,18 @@ class DBEPorline extends DBEntity
     }
 
     /**
-     * Return count of rows that still have items to be recieved
+     * Return count of rows that still have items to be received
      */
     function countOutstandingRows()
     {
-        if ($this->getValue('porheadID') == '') {
+        if ($this->getValue(self::porheadID) == '') {
             $this->raiseError('porheadID not set');
         }
         $this->setQueryString(
             "SELECT COUNT(*)" .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('porheadID') . "=" . $this->getFormattedValue('porheadID') .
-            " AND " . $this->getDBColumnName('qtyReceived') . " < " . $this->getDBColumnName('qtyOrdered')
+            " WHERE " . $this->getDBColumnName(self::porheadID) . "=" . $this->getFormattedValue(self::porheadID) .
+            " AND " . $this->getDBColumnName(self::qtyReceived) . " < " . $this->getDBColumnName(self::qtyOrdered)
         );
         if ($this->runQuery()) {
             if ($this->nextRecord()) {
@@ -230,7 +230,6 @@ class DBEPorline extends DBEntity
                 return ($this->getDBColumnValue(0));
             }
         }
+        return 0;
     }
 }
-
-?>

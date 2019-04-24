@@ -73,9 +73,6 @@ class CTQuestionnaire extends CTCNC
             case 'edit':
                 $this->edit();
                 break;
-            case 'delete':
-                $this->delete();
-                break;
             case 'update':
                 $this->update();
                 break;
@@ -151,20 +148,6 @@ class CTQuestionnaire extends CTCNC
                     );
                 $txtEdit = '[edit]';
 
-                $urlDelete = null;
-                $txtDelete = null;
-                if ($this->buQuestionnaire->canDelete($questionnaireID)) {
-                    $urlDelete =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'          => 'delete',
-                                'questionnaireID' => $questionnaireID
-                            )
-                        );
-                    $txtDelete = '[delete]';
-                }
-
                 $this->template->set_var(
                     array(
                         'questionnaireID'        => $questionnaireID,
@@ -173,9 +156,7 @@ class CTQuestionnaire extends CTCNC
                         ),
                         'urlEdit'                => $urlEdit,
                         'urlDisplayQuestionList' => $urlDisplayQuestionList,
-                        'urlDelete'              => $urlDelete,
                         'txtEdit'                => $txtEdit,
-                        'txtDelete'              => $txtDelete,
                         'urlView'                => $urlView
                     )
                 );
@@ -225,19 +206,6 @@ class CTQuestionnaire extends CTCNC
             $dsQuestionnaire->initialise();
             $dsQuestionnaire->fetchNext();
             $questionnaireID = $dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID);
-        }
-        $urlDelete = null;
-        $txtDelete = null;
-        if ($_REQUEST['action'] == 'edit' && $this->buQuestionnaire->canDelete($_REQUEST['questionnaireID'])) {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'          => 'delete',
-                        'questionnaireID' => $questionnaireID
-                    )
-                );
-            $txtDelete = 'Delete';
         }
         $urlUpdate =
             Controller::buildLink(
@@ -296,8 +264,6 @@ class CTQuestionnaire extends CTCNC
                     $dsQuestionnaire->getMessage(DBEQuestionnaire::nameRequired)
                 ),
                 'urlUpdate'           => $urlUpdate,
-                'urlDelete'           => $urlDelete,
-                'txtDelete'           => $txtDelete,
                 'urlDisplayList'      => $urlDisplayList,
                 'logo'                => $dsQuestionnaire->getValue(DBEQuestionnaire::logo)
             )
@@ -342,32 +308,6 @@ class CTQuestionnaire extends CTCNC
                 )
             );
         header('Location: ' . $urlNext);
-    }
-
-    /**
-     * Delete Questionnaire
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function delete()
-    {
-        $this->setMethodName('delete');
-        if (!$this->buQuestionnaire->deleteQuestionnaire($_REQUEST['questionnaireID'])) {
-            $this->displayFatalError('Cannot delete this row');
-            exit;
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'displayList'
-                    )
-                );
-            header('Location: ' . $urlNext);
-            exit;
-        }
     }
 
     /**

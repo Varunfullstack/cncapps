@@ -348,13 +348,11 @@ class CTRenContract extends CTCNC
             )
         );
 
+        $disabled = 'DISABLED';
+        $readonly = 'READONLY';
         if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
-            $readonly = ''; // not
-            $disabled = ''; // not
-        } else {
-            //$disabled = CTCNC_HTML_DISABLED;
-            $disabled = 'DISABLED';
-            $readonly = 'READONLY';
+            $readonly = null;
+            $disabled = null;
         }
 
         $urlPrintContract =
@@ -382,7 +380,7 @@ class CTRenContract extends CTCNC
               size="10"
               maxlength="10">
                     <span class="formErrorMessage">' . Controller::htmlDisplayText(
-                    $dsRenContract->getMessage('curUnitSale')
+                    $dsRenContract->getMessage(DBEJRenContract::curUnitSale)
                 ) . '</span> </td>
         </tr>
         <tr>
@@ -394,7 +392,7 @@ class CTRenContract extends CTCNC
               size="10"
               maxlength="10" />
                     <span class="formErrorMessage">' . Controller::htmlDisplayText(
-                    $dsRenContract->getMessage('curUnitCost')
+                    $dsRenContract->getMessage(DBEJRenContract::curUnitCost)
                 ) . '</span> </td>
         </tr>';
 
@@ -492,7 +490,7 @@ class CTRenContract extends CTCNC
                     $dsRenContract->getValue(DBEJRenContract::invoicePeriodMonths)
                 ),
                 'invoicePeriodMonthsMessage'         => Controller::htmlDisplayText(
-                    $dsRenContract->getMessage('invoicePeriodMonths')
+                    $dsRenContract->getMessage(DBEJRenContract::invoicePeriodMonths)
 
                 ),
                 'totalInvoiceMonths'                 => Controller::htmlInputText(
@@ -505,62 +503,62 @@ class CTRenContract extends CTCNC
                     $dsRenContract->getValue(DBEJRenContract::notes)
                 ),
                 'notesMessage'                       => Controller::htmlDisplayText(
-                    $dsRenContract->getMessage('notes')
+                    $dsRenContract->getMessage(DBEJRenContract::notes)
                 ),
                 'hostingCompany'                     => Controller::htmlInputText(
                     $dsRenContract->getValue(DBEJRenContract::hostingCompany)
                 ),
                 'hostingCompanyMessage'              => Controller::htmlDisplayText(
-                    $dsRenContract->getMessage('hostingCompany')
+                    $dsRenContract->getMessage(DBEJRenContract::hostingCompany)
                 ),
                 'password'                           => Controller::htmlInputText(
                     $dsRenContract->getValue(DBEJRenContract::password)
                 ),
                 'passwordMessage'                    => Controller::htmlDisplayText(
-                    $dsRenContract->getMessage('password')
+                    $dsRenContract->getMessage(DBEJRenContract::password)
                 ),
                 'osPlatform'                         => Controller::htmlInputText(
                     $dsRenContract->getValue(DBEJRenContract::osPlatform)
                 ),
                 'osPlatformMessage'                  => Controller::htmlDisplayText(
-                    $dsRenContract->getMessage('osPlatform')
+                    $dsRenContract->getMessage(DBEJRenContract::osPlatform)
                 ),
                 'domainNames'                        => Controller::htmlInputText(
                     $dsRenContract->getValue(DBEJRenContract::domainNames)
                 ),
                 'domainNamesMessage'                 => Controller::htmlDisplayText(
-                    $dsRenContract->getMessage('domainNames')
+                    $dsRenContract->getMessage(DBEJRenContract::domainNames)
                 ),
                 'controlPanelUrl'                    => Controller::htmlInputText(
                     $dsRenContract->getValue(DBEJRenContract::controlPanelUrl)
                 ),
                 'controlPanelUrlMessage'             => Controller::htmlDisplayText(
-                    $dsRenContract->getMessage('controlPanelUrl')
+                    $dsRenContract->getMessage(DBEJRenContract::controlPanelUrl)
 
                 ),
                 'ftpAddress'                         => Controller::htmlInputText(
                     $dsRenContract->getValue(DBEJRenContract::ftpAddress)
                 ),
                 'ftpAddressMessage'                  => Controller::htmlDisplayText(
-                    $dsRenContract->getMessage('ftpAddress')
+                    $dsRenContract->getMessage(DBEJRenContract::ftpAddress)
                 ),
                 'ftpUsername'                        => Controller::htmlInputText(
                     $dsRenContract->getValue(DBEJRenContract::ftpUsername)
                 ),
                 'ftpUsernameMessage'                 => Controller::htmlDisplayText(
-                    $dsRenContract->getMessage('ftpUsername')
+                    $dsRenContract->getMessage(DBEJRenContract::ftpUsername)
                 ),
                 'wwwAddress'                         => Controller::htmlInputText(
                     $dsRenContract->getValue(DBEJRenContract::wwwAddress)
                 ),
                 'wwwAddressMessage'                  => Controller::htmlDisplayText(
-                    $dsRenContract->getMessage('wwwAddress')
+                    $dsRenContract->getMessage(DBEJRenContract::wwwAddress)
                 ),
                 'websiteDeveloper'                   => Controller::htmlInputText(
                     $dsRenContract->getValue(DBEJRenContract::websiteDeveloper)
                 ),
                 'websiteDeveloperMessage'            => Controller::htmlDisplayText(
-                    $dsRenContract->getMessage('websiteDeveloper')
+                    $dsRenContract->getMessage(DBEJRenContract::websiteDeveloper)
                 ),
                 'officialOrderNumber'                => Controller::htmlInputText(
                     $dsRenContract->getValue(DBECustomerItem::officialOrderNumber)
@@ -581,7 +579,7 @@ class CTRenContract extends CTCNC
                     $dsRenContract->getValue(DBEJRenContract::despatchDate)
                 ),
                 'despatchDateMessage'                => Controller::htmlDisplayText(
-                    $dsRenContract->getMessage('despatchDate')
+                    $dsRenContract->getMessage(DBEJRenContract::despatchDate)
                 ),
                 'expiryDate'                         => Controller::dateYMDtoDMY(
                     $dsRenContract->getValue(DBEJRenContract::expiryDate)
@@ -594,7 +592,7 @@ class CTRenContract extends CTCNC
                     $dsRenContract->getValue(DBECustomerItem::initialContractLength)
                 )->format('d/m/Y'),
                 'expiryDateMessage'                  => Controller::htmlDisplayText(
-                    $dsRenContract->getMessage('expiryDate')
+                    $dsRenContract->getMessage(DBEJRenContract::expiryDate)
                 ),
                 'autoGenerateContractInvoiceChecked' => Controller::htmlChecked(
                     $dsRenContract->getValue(DBEJRenContract::autoGenerateContractInvoice)
@@ -618,7 +616,9 @@ class CTRenContract extends CTCNC
                     'curGSCBalance'        => Controller::htmlDisplayText(
                         $dsRenContract->getValue(DBEJRenContract::curGSCBalance)
                     ),
-                    'curGSCBalanceMessage' => Controller::htmlDisplayText($dsRenContract->getMessage('curGSCBalance'))
+                    'curGSCBalanceMessage' => Controller::htmlDisplayText(
+                        $dsRenContract->getMessage(DBEJRenContract::curGSCBalance)
+                    )
                 )
             );
         }
@@ -626,7 +626,7 @@ class CTRenContract extends CTCNC
         $this->template->set_block(
             'RenContractEdit',
             'renewalStatusBlock',
-            'renewalStatuss'
+            'renewalStatus'
         );
         $this->parseRenewalSelector($dsRenContract->getValue(DBEJRenContract::renewalStatus));
 
@@ -732,9 +732,7 @@ class CTRenContract extends CTCNC
         $this->setMethodName('update');
         $this->formError = (!$this->dsRenContract->populateFromArray($_REQUEST['renContract']));
         if ($this->formError) {
-            if ($this->dsRenContract->getValue(
-                    DBEJRenContract::customerItemID
-                ) == '') {                    // attempt to insert
+            if ($this->dsRenContract->getValue(DBEJRenContract::customerItemID)) {
                 $_REQUEST['action'] = 'edit';
             } else {
                 $_REQUEST['action'] = 'create';
@@ -792,7 +790,7 @@ class CTRenContract extends CTCNC
     function parseRenewalSelector($renewalStatus)
     {
         foreach ($this->renewalStatusArray as $key => $value) {
-            $renewalStatusSelected = ($renewalStatus == $key) ? CT_SELECTED : '';
+            $renewalStatusSelected = ($renewalStatus == $key) ? CT_SELECTED : null;
             $this->template->set_var(
                 array(
                     'renewalStatusSelected'    => $renewalStatusSelected,
@@ -801,7 +799,7 @@ class CTRenContract extends CTCNC
                 )
             );
             $this->template->parse(
-                'renewalStatuss',
+                'renewalStatus',
                 'renewalStatusBlock',
                 true
             );
@@ -811,7 +809,7 @@ class CTRenContract extends CTCNC
     private function parseInitialContractLength($initialContractLength)
     {
         foreach (self::InitialContractLengthValues as $value) {
-            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : '';
+            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : null;
             $this->template->set_var(
                 array(
                     'initialContractLengthSelected'    => $initialContractLengthSelected,

@@ -58,6 +58,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -106,7 +107,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
                 try {
                     $this->uploadDocuments();
                     $response['status'] = "ok";
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     http_response_code(400);
                     $response['status'] = "error";
                     $response['error'] = $exception->getMessage();
@@ -167,6 +168,166 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
+    private function uploadDocuments()
+    {
+        $counter = 0;
+
+        $buActivity = new BUActivity($this);
+
+
+        if (!isset($_FILES['files']) || !count($_FILES['files']['name'])) {
+            throw new Exception('At least one file must be provided');
+        }
+
+        if (!isset($_REQUEST['customerID'])) {
+            throw new Exception('Customer ID is missing');
+        }
+
+        if (!isset($_REQUEST['reviewMeetingDate'])) {
+            throw new Exception('Review Meeting Date is missing');
+        }
+
+        $dbeDocuments = new DBECustomerReviewMeetingDocument($this);
+
+        foreach ($_FILES['files']['name'] as $fileName) {
+            $dbeDocuments->setUpdateModeInsert();
+
+            $dbeDocuments->setValue(
+                DBECustomerReviewMeetingDocument::customerID,
+                $_REQUEST['customerID']
+            );
+            $dbeDocuments->setValue(
+                DBECustomerReviewMeetingDocument::meetingDate,
+                common_convertDateDMYToYMD($_REQUEST['reviewMeetingDate'])
+            );
+            $dbeDocuments->setValue(
+                DBECustomerReviewMeetingDocument::file,
+                file_get_contents($_FILES['files']['tmp_name'][$counter])
+            );
+            $dbeDocuments->setValue(
+                DBECustomerReviewMeetingDocument::uploadedBy,
+                $buActivity->loggedInUserID
+            );
+            $dbeDocuments->setValue(
+                DBECustomerReviewMeetingDocument::uploadedAt,
+                (new DateTime())->format('Y-m-d H:i:s')
+            );
+            $dbeDocuments->setValue(
+                DBECustomerReviewMeetingDocument::fileName,
+                $fileName
+            );
+            $dbeDocuments->setValue(
+                DBECustomerReviewMeetingDocument::fileMIMEType,
+                $_FILES['files']['type'][$counter]
+            );
+            $dbeDocuments->post();
+            $counter++;
+
+        }
+    }
+
+    /**
+     * @return bool
+     * @throws Exception
+     */
+    private function deleteDocument()
+    {
+        if (!isset($_REQUEST['documentID'])) {
+            throw new Exception("Document id is missing");
+        }
+        $documentID = $_REQUEST['documentID'];
+
+        $dbeDocuments = new DBECustomerReviewMeetingDocument($this);
+
+        $dbeDocuments->deleteRow($documentID);
+
+        return true;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function sendDocuments()
+    {
+        if (!isset($_REQUEST['meetingDate'])) {
+            throw new Exception('Meeting date is missing');
+        }
+        if (!isset($_REQUEST['standardTextID'])) {
+            throw new Exception('Standard text ID is missing');
+        }
+        if (!isset($_REQUEST['customerID'])) {
+            throw new Exception('Customer ID is missing');
+        }
+
+        $meetingDate = $_REQUEST['meetingDate'];
+        $standardTextID = $_REQUEST['standardTextID'];
+        $customerID = $_REQUEST['customerID'];
+
+        $buStandardText = new BUStandardText($this);
+        $dsResults = new DataSet($this);
+        $buStandardText->getStandardTextByID(
+            $standardTextID,
+            $dsResults
+        );
+
+        $dbeContact = new DBEContact($this);
+        $dbeContact->getReviewContactsByCustomerID($customerID);
+
+        $buMail = new BUMail($this);
+
+        $message = $dsResults->getValue(DBEStandardText::stt_text);
+        $fromEmail = 'support@cnc-ltd.co.uk';
+        while ($dbeContact->fetchNext()) {
+
+            $body = str_replace(
+                "[%contactFirstName%]",
+                $dbeContact->getValue(DBEContact::firstName),
+                $message
+            );
+            $body = str_replace(
+                "[%reviewMeetingDate%]",
+                $meetingDate,
+                $body
+            );
+
+            $toEmail = $dbeContact->getValue(DBEContact::email);
+
+            $hdrs = array(
+                'From'         => $this->dbeUser->getValue(DBEUser::username) . '@cnc-ltd.co.uk',
+                'To'           => $toEmail,
+                'Subject'      => "CNC Review Meeting Documents",
+                'Date'         => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+            $buMail->mime->setHTMLBody($body);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
+            );
+
+            $body = $buMail->mime->get($mime_params);
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->putInQueue(
+                $fromEmail,
+                $toEmail,
+                $hdrs,
+                $body
+            );
+
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
     private function displaySearchForm()
     {
         $this->setPageTitle('Customer Review Meeting Documents');
@@ -282,152 +443,5 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
         );
         $this->parsePage();
 
-    }
-
-    private function uploadDocuments()
-    {
-        $counter = 0;
-
-        $buActivity = new BUActivity($this);
-
-
-        if (!isset($_FILES['files']) || !count($_FILES['files']['name'])) {
-            throw new Exception('At least one file must be provided');
-        }
-
-        if (!isset($_REQUEST['customerID'])) {
-            throw new Exception('Customer ID is missing');
-        }
-
-        if (!isset($_REQUEST['reviewMeetingDate'])) {
-            throw new Exception('Review Meeting Date is missing');
-        }
-
-        $dbeDocuments = new DBECustomerReviewMeetingDocument($this);
-
-        foreach ($_FILES['files']['name'] as $fileName) {
-            $dbeDocuments->setUpdateModeInsert();
-
-            $dbeDocuments->setValue(
-                DBECustomerReviewMeetingDocument::customerID,
-                $_REQUEST['customerID']
-            );
-            $dbeDocuments->setValue(
-                DBECustomerReviewMeetingDocument::meetingDate,
-                common_convertDateDMYToYMD($_REQUEST['reviewMeetingDate'])
-            );
-            $dbeDocuments->setValue(
-                DBECustomerReviewMeetingDocument::file,
-                file_get_contents($_FILES['files']['tmp_name'][$counter])
-            );
-            $dbeDocuments->setValue(
-                DBECustomerReviewMeetingDocument::uploadedBy,
-                $buActivity->loggedInUserID
-            );
-            $dbeDocuments->setValue(
-                DBECustomerReviewMeetingDocument::uploadedAt,
-                (new DateTime())->format('Y-m-d H:i:s')
-            );
-            $dbeDocuments->setValue(
-                DBECustomerReviewMeetingDocument::fileName,
-                $fileName
-            );
-            $dbeDocuments->setValue(
-                DBECustomerReviewMeetingDocument::fileMIMEType,
-                $_FILES['files']['type'][$counter]
-            );
-            $result = $dbeDocuments->post();
-            $counter++;
-
-        }
-    }
-
-    private function deleteDocument()
-    {
-        if (!isset($_REQUEST['documentID'])) {
-            throw new Exception("Document id is missing");
-        }
-        $documentID = $_REQUEST['documentID'];
-
-        $dbeDocuments = new DBECustomerReviewMeetingDocument($this);
-
-        $dbeDocuments->deleteRow($documentID);
-
-        return true;
-    }
-
-    private function sendDocuments()
-    {
-        if (!isset($_REQUEST['meetingDate'])) {
-            throw new Exception('Meeting date is missing');
-        }
-        if (!isset($_REQUEST['standardTextID'])) {
-            throw new Exception('Standard text ID is missing');
-        }
-        if (!isset($_REQUEST['customerID'])) {
-            throw new Exception('Customer ID is missing');
-        }
-
-        $meetingDate = $_REQUEST['meetingDate'];
-        $standardTextID = $_REQUEST['standardTextID'];
-        $customerID = $_REQUEST['customerID'];
-
-        $buStandardText = new BUStandardText($this);
-        $dsResults = new DataSet($this);
-        $buStandardText->getStandardTextByID(
-            $standardTextID,
-            $dsResults
-        );
-
-        $dbeContact = new DBEContact($this);
-        $dbeContact->getReviewContactsByCustomerID($customerID);
-
-        $buMail = new BUMail($this);
-
-        $message = $dsResults->getValue("stt_text");
-        $fromEmail = 'support@cnc-ltd.co.uk';
-        while ($dbeContact->fetchNext()) {
-
-            $body = str_replace(
-                "[%contactFirstName%]",
-                $dbeContact->getValue(DBEContact::firstName),
-                $message
-            );
-            $body = str_replace(
-                "[%reviewMeetingDate%]",
-                $meetingDate,
-                $body
-            );
-
-            $toEmail = $dbeContact->getValue(DBEContact::email);
-
-            $hdrs = array(
-                'From'         => $this->dbeUser->getValue(DBEUser::username) . '@cnc-ltd.co.uk',
-                'To'           => $toEmail,
-                'Subject'      => "CNC Review Meeting Documents",
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-            $buMail->mime->setHTMLBody($body);
-
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-
-            $body = $buMail->mime->get($mime_params);
-
-            $hdrs = $buMail->mime->headers($hdrs);
-
-            $buMail->putInQueue(
-                $fromEmail,
-                $toEmail,
-                $hdrs,
-                $body
-            );
-
-        }
     }
 }

@@ -31,8 +31,8 @@ class DBEItem extends DBCNCEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -158,35 +158,31 @@ class DBEItem extends DBCNCEntity
      * Get rows by description match
      * Excludes discontinued rows
      * @access public
+     * @param bool $renewalTypeID
      * @return bool Success
      */
     function getRowsByDescriptionMatch($renewalTypeID = false)
     {
         $this->setMethodName("getRowsByDescriptionMatch");
-        $ret = FALSE;
-        if ($this->getValue('description') == '') {
+
+        if (!$this->getValue(self::description)) {
             $this->raiseError('description not set');
         }
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE 1=1";
-        /*
-                foreach($matchStringArray AS $matchString){
-                    $queryString .= " AND " . $this->getDBColumnName('description')." LIKE '%" . mysql_escape_string($matchString) . "%'";
-                }
-        */
         $queryString .=
             " AND MATCH (item.itm_desc, item.notes, item.itm_unit_of_sale)
-				AGAINST ('" . $this->getValue('description') . "' IN BOOLEAN MODE)";
+				AGAINST ('" . $this->getValue(self::description) . "' IN BOOLEAN MODE)";
 
         if ($renewalTypeID) {
             $queryString .= " AND renewalTypeID = $renewalTypeID";
         }
 
         $queryString .=
-            " AND " . $this->getDBColumnName('discontinuedFlag') . " <> 'Y'" .
-            " ORDER BY " . $this->getDBColumnName('description') .
+            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
+            " ORDER BY " . $this->getDBColumnName(self::description) .
             " LIMIT 0,200";
         $this->setQueryString($queryString);
 
@@ -198,66 +194,66 @@ class DBEItem extends DBCNCEntity
      * Get rows by part number match
      * Excludes discontinued rows
      * @access public
+     * @param bool $renewalTypeID
      * @return bool Success
      */
     function getRowsByPartNoMatch($renewalTypeID = false)
     {
         $this->setMethodName("getRowsByPartNoMatch");
-        $ret = FALSE;
-        if ($this->getValue('partNo') == '') {
+        if (!$this->getValue(self::partNo)) {
             $this->raiseError('partNo not set');
         }
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('partNo') . " LIKE " . $this->getFormattedLikeValue('partNo') .
-            " AND " . $this->getDBColumnName('discontinuedFlag') . " <> 'Y'";
+            " WHERE " . $this->getDBColumnName(self::partNo) . " LIKE " . $this->getFormattedLikeValue(self::partNo) .
+            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'";
         if ($renewalTypeID) {
             $queryString .= " AND renewalTypeID = $renewalTypeID";
         }
 
         $queryString .=
-            " ORDER BY " . $this->getDBColumnName('partNo') .
+            " ORDER BY " . $this->getDBColumnName(self::partNo) .
             " LIMIT 0,200";
 
         $this->setQueryString($queryString);
 
-        $ret = (parent::getRows());
-        return $ret;
+        return (parent::getRows());
     }
 
     /**
      * Update sales stock qty by given amount
      * @access public
+     * @param $value
      * @return bool Success
      */
     function updateSalesStockQty($value)
     {
         $this->setMethodName("updateSalesStockQty");
-        $ret = FALSE;
+
         $this->setQueryString(
             "UPDATE " . $this->getTableName() .
-            " SET " . $this->getDBColumnName('salesStockQty') . "=" . $value .
+            " SET " . $this->getDBColumnName(self::salesStockQty) . "=" . $value .
             " WHERE " . $this->getPKWhere()
         );
-        $ret = (parent::updateRow());
+        return (parent::updateRow());
     }
 
     /**
      * Update maint stock qty by given amount
      * @access public
+     * @param $value
      * @return bool Success
      */
     function updateMaintStockQty($value)
     {
         $this->setMethodName("updateMaintStockQty");
-        $ret = FALSE;
         $this->setQueryString(
             "UPDATE " . $this->getTableName() .
-            " SET " . $this->getDBColumnName('maintStockQty') . "=" . $value .
+            " SET " . $this->getDBColumnName(self::maintStockQty) . "=" . $value .
             " WHERE " . $this->getPKWhere()
         );
-        $ret = (parent::updateRow());
+        return (parent::updateRow());
     }
 
     function setRowsDiscontinued($discontinueItemIDArray)
@@ -270,8 +266,8 @@ class DBEItem extends DBCNCEntity
 
         $this->setQueryString(
             "UPDATE " . $this->getTableName() .
-            " SET " . $this->getDBColumnName('discontinuedFlag') . " = 'Y'" .
-            " WHERE " . $this->getDBColumnName('itemID') . " IN ( " . implode(
+            " SET " . $this->getDBColumnName(self::discontinuedFlag) . " = 'Y'" .
+            " WHERE " . $this->getDBColumnName(self::itemID) . " IN ( " . implode(
                 ',',
                 $discontinueItemIDArray
             ) . ")"
@@ -293,9 +289,9 @@ class DBEItem extends DBCNCEntity
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('renewalTypeID') . " = '" . $renewalTypeID . "'" .
-            " AND " . $this->getDBColumnName('discontinuedFlag') . " <> 'Y'" .
-            " ORDER BY " . $this->getDBColumnName('description');
+            " WHERE " . $this->getDBColumnName(self::renewalTypeID) . " = '" . $renewalTypeID . "'" .
+            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
+            " ORDER BY " . $this->getDBColumnName(self::description);
 
         $this->setQueryString($queryString);
 
@@ -304,5 +300,3 @@ class DBEItem extends DBCNCEntity
     }
 
 }
-
-?>

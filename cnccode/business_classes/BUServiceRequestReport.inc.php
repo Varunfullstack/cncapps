@@ -19,12 +19,16 @@ class BUServiceRequestReport extends Business
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
     }
 
+    /**
+     * @param $dsData
+     */
     function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);
@@ -34,6 +38,10 @@ class BUServiceRequestReport extends Business
         $dsData->setValue(self::searchFormCustomerID, null);
     }
 
+    /**
+     * @param DSForm $dsSearchForm
+     * @return bool|mysqli_result
+     */
     function search(&$dsSearchForm)
     {
         $buHeader = new BUHeader($this);
@@ -98,19 +106,17 @@ class BUServiceRequestReport extends Business
             ON itm_itemno = cui_itemno
           WHERE 1=1";
 
-//        WHERE pro_status IN ('C', 'F')";
-
-        if ($dsSearchForm->getValue('fromDate')) {
-            $query .= " AND pro_date_raised >= '" . $dsSearchForm->getValue('fromDate') . "'";
+        if ($dsSearchForm->getValue(self::searchFormFromDate)) {
+            $query .= " AND pro_date_raised >= '" . $dsSearchForm->getValue(self::searchFormFromDate) . "'";
         }
 
-        if ($dsSearchForm->getValue('toDate')) {
-            $query .= " AND pro_date_raised <= '" . $dsSearchForm->getValue('toDate') . "'";
+        if ($dsSearchForm->getValue(self::searchFormToDate)) {
+            $query .= " AND pro_date_raised <= '" . $dsSearchForm->getValue(self::searchFormToDate) . "'";
         }
 
-        if ($dsSearchForm->getValue('customerID')) {
+        if ($dsSearchForm->getValue(self::searchFormCustomerID)) {
             $query .=
-                " AND pro_custno = " . $dsSearchForm->getValue('customerID');
+                " AND pro_custno = " . $dsSearchForm->getValue(self::searchFormCustomerID);
         }
 
         $query .= " ORDER BY pro_date_raised";
@@ -119,7 +125,4 @@ class BUServiceRequestReport extends Business
 
         return $result;
     }
-
-
-}// End of class
-?>
+}

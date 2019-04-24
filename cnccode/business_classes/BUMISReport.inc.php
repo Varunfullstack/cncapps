@@ -11,6 +11,8 @@ require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
 class BUMISReport extends Business
 {
+    const searchFormCustomerID = "customerID";
+    const searchFormMonths = "months";
 
     function __construct(&$owner)
     {
@@ -20,15 +22,17 @@ class BUMISReport extends Business
     function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);
-        $dsData->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
-        $dsData->setValue('customerID', '');
-        $dsData->addColumn('months', DA_INTEGER, DA_ALLOW_NULL);
-        $dsData->setValue('months', 12);
+        $dsData->addColumn(self::searchFormCustomerID, DA_STRING, DA_ALLOW_NULL);
+        $dsData->setValue(self::searchFormCustomerID, null);
+        $dsData->addColumn(self::searchFormMonths, DA_INTEGER, DA_ALLOW_NULL);
+        $dsData->setValue(self::searchFormMonths, 12);
     }
 
     /**
      * Average monthly contract billing
-     **/
+     * @param $customerID
+     * @return bool|mysqli_result
+     */
     function getAverageMonthlyContractValues($customerID)
     {
         $sql =
@@ -60,7 +64,11 @@ class BUMISReport extends Business
 
     /**
      * Actual year-to-date contract billing by contract
-     **/
+     * @param $customerID
+     * @param $itemID
+     * @param $yearMonth
+     * @return mixed
+     */
     function getActualBillingByContractAndMonth($customerID, $itemID, $yearMonth)
     {
         $sql =
@@ -336,7 +344,7 @@ class BUMISReport extends Business
         return $this->db->query($sql)->fetch_row();
     }
 
-    function getCncDomianValue($customerID)
+    function getCncDomainValue($customerID)
     {
         $sql =
             "
@@ -466,14 +474,19 @@ class BUMISReport extends Business
         return $this->db->query($sql)->fetch_row();
     }
 
+    /**
+     * @param DSForm $searchForm
+     * @return string
+     */
     function getContractCsv(&$searchForm)
     {
         $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
 
-        $customerID = $searchForm->getValue('customerID');
+        $customerID = $searchForm->getValue(self::searchFormCustomerID);
 
-        $months = $searchForm->getValue('months');
+        $months = $searchForm->getValue(self::searchFormMonths);
         $dateYMD = date('Y') . '-' . date('m') . '-01';
         $baseDate = strtotime($dateYMD);
 
@@ -481,12 +494,12 @@ class BUMISReport extends Business
             $months = 12;
         }
 
-        $hourlyRate = $dsHeader->getValue('hourlyLabourCost');
+        $hourlyRate = $dsHeader->getValue(DBEHeader::hourlyLabourCost);
 
         $returnFile = '';
 
         $averageMonthlyContractValues = $this->getAverageMonthlyContractValues($customerID);
-
+        $averageMonthlyContractArray = [];
         /*
         Build an array
         */
@@ -517,7 +530,7 @@ class BUMISReport extends Business
         Other Sales Profit
         */
         $total = 0;
-
+        $otherSalesProfit = null;
         for ($monthIncrement = 1; $monthIncrement <= $months; $monthIncrement++) {
 
             $yearMonth = date('Ym', strtotime('-' . $monthIncrement . ' month', $baseDate));
@@ -538,7 +551,7 @@ class BUMISReport extends Business
         $returnFile .= "\n";
 
         $total = 0;
-
+        $prePayProfit = null;
         for ($monthIncrement = 1; $monthIncrement <= $months; $monthIncrement++) {
 
             $yearMonth = date('Ym', strtotime('-' . $monthIncrement . ' month', $baseDate));
@@ -559,7 +572,7 @@ class BUMISReport extends Business
         $returnFile .= "\n";
 
         $total = 0;
-
+        $profit = null;
         for ($monthIncrement = 1; $monthIncrement <= $months; $monthIncrement++) {
 
             $yearMonth = date('Ym', strtotime('-' . $monthIncrement . ' month', $baseDate));
@@ -580,8 +593,6 @@ class BUMISReport extends Business
 
         $returnFile .= 'Broadband' . ',' . number_format($broadBandValueResult[0], 2, '.', '');
 
-        $monthIncrement = 1;
-
         for ($monthIncrement = 1; $monthIncrement <= $months; $monthIncrement++) {
 
             $yearMonth = date('Ym', strtotime('-' . $monthIncrement . ' month', $baseDate));
@@ -598,8 +609,6 @@ class BUMISReport extends Business
 
         $returnFile .= 'Hosting' . ',' . number_format($hostingValueResult[0], 2, '.', '');
 
-        $monthIncrement = 1;
-
         for ($monthIncrement = 1; $monthIncrement <= $months; $monthIncrement++) {
 
             $yearMonth = date('Ym', strtotime('-' . $monthIncrement . ' month', $baseDate));
@@ -615,7 +624,7 @@ class BUMISReport extends Business
         */
         $returnFile .= "\n";
 
-        $domainValueResult = $this->getCncDomianValue($customerID);
+        $domainValueResult = $this->getCncDomainValue($customerID);
 
         $returnFile .= 'Domains' . ',' . number_format($domainValueResult[0], 2, '.', '');
 
@@ -801,5 +810,4 @@ class BUMISReport extends Business
         return $returnFile;
 
     }
-}//End of class
-?>
+}

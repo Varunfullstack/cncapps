@@ -9,21 +9,21 @@ require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 class DBEJContract extends DBECustomerItem
 {
 
-const itemDescription = "itemDescription";
-const itemTypeID = "itemTypeID";
-const renewalTypeID = "renewalTypeID";
-const renewalType = "renewalType";
-const postcode = "postcode";
-const invoiceFromDate = "invoiceFromDate";
-const invoiceToDate = "invoiceToDate";
-const invoiceFromDateYMD = "invoiceFromDateYMD";
-const invoiceToDateYMD = "invoiceToDateYMD";
+    const itemDescription = "itemDescription";
+    const itemTypeID = "itemTypeID";
+    const renewalTypeID = "renewalTypeID";
+    const renewalType = "renewalType";
+    const postcode = "postcode";
+    const invoiceFromDate = "invoiceFromDate";
+    const invoiceToDate = "invoiceToDate";
+    const invoiceFromDateYMD = "invoiceFromDateYMD";
+    const invoiceToDateYMD = "invoiceToDateYMD";
 
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -36,28 +36,36 @@ const invoiceToDateYMD = "invoiceToDateYMD";
         $this->addColumn(self::renewalType, DA_STRING, DA_ALLOW_NULL, "renewalType.description");
         $this->addColumn(self::postcode, DA_STRING, DA_ALLOW_NULL, "add_postcode");
         $this->addColumn(self::adslPhone, DA_STRING, DA_ALLOW_NULL);
-        $this->addColumn(self::invoiceFromDate,
-                         DA_DATE,
-                         DA_NOT_NULL,
-                         "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%d/%m/%Y')");
-        $this->addColumn(self::invoiceToDate,
-                         DA_DATE,
-                         DA_NOT_NULL,
-                         "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%d/%m/%Y')");
+        $this->addColumn(
+            self::invoiceFromDate,
+            DA_DATE,
+            DA_NOT_NULL,
+            "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%d/%m/%Y')"
+        );
+        $this->addColumn(
+            self::invoiceToDate,
+            DA_DATE,
+            DA_NOT_NULL,
+            "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%d/%m/%Y')"
+        );
 
-        $this->addColumn(self::invoiceFromDateYMD,
-                         DA_DATE,
-                         DA_NOT_NULL,
-                         "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%Y-%m-%d') as invoiceFromDateYMD");
+        $this->addColumn(
+            self::invoiceFromDateYMD,
+            DA_DATE,
+            DA_NOT_NULL,
+            "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%Y-%m-%d') as invoiceFromDateYMD"
+        );
 
-        $this->addColumn(self::invoiceToDateYMD,
-                         DA_DATE,
-                         DA_NOT_NULL,
-                         "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%Y-%m-%d') as invoiceToDateYMD");
+        $this->addColumn(
+            self::invoiceToDateYMD,
+            DA_DATE,
+            DA_NOT_NULL,
+            "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%Y-%m-%d') as invoiceToDateYMD"
+        );
         $this->setAddColumnsOff();
     }
 
-    function getRowsByCustomerID($customerID, $includeExpired = FALSE)
+    function getRowsByCustomerID($customerID)
     {
         $this->setMethodName('getRowsByCustomerID');
         if ($customerID == '') {
@@ -69,16 +77,10 @@ const invoiceToDateYMD = "invoiceToDateYMD";
             " JOIN item ON cui_itemno = itm_itemno" .
             " JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID" .
             " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno " .
-            " WHERE " . $this->getDBColumnName('customerID') . "=" . $customerID .
+            " WHERE " . $this->getDBColumnName(self::customerID) . "=" . $customerID .
             "  AND renewalType.allowSrLogging = 'Y'
          AND declinedFlag <> 'Y'
        ORDER BY renewalType.description, itm_desc";
-        /*
-            if (!$includeExpired){
-                $queryString .=
-                    " AND " . $this->getDBColumnName('expiryDate') . ">=  CURRENT_DATE()";
-            }
-        */
 
         $this->setQueryString($queryString);
         return (parent::getRows());
@@ -98,7 +100,7 @@ const invoiceToDateYMD = "invoiceToDateYMD";
             " JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID" .
             " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno " .
             " WHERE cic_cuino=" . $customerItemID .
-            " AND " . $this->getDBColumnName('itemID') . "<>" . CONFIG_DEF_SERVERGUARD_ANNUAL_CHARGE_ITEMID .
+            " AND " . $this->getDBColumnName(self::itemID) . "<>" . CONFIG_DEF_SERVERGUARD_ANNUAL_CHARGE_ITEMID .
             "   AND renewalType.allowSrLogging = 'Y'
        ORDER BY renewalType.description, itm_desc";
 
@@ -115,7 +117,7 @@ const invoiceToDateYMD = "invoiceToDateYMD";
             " JOIN item ON cui_itemno = itm_itemno" .
             " JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID" .
             " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno " .
-            " WHERE " . $this->getDBColumnName('customerItemID') . "=" . $contractID;
+            " WHERE " . $this->getDBColumnName(self::customerItemID) . "=" . $contractID;
 
         $this->setQueryString($queryString);
         return (parent::getRow());
@@ -130,6 +132,7 @@ const invoiceToDateYMD = "invoiceToDateYMD";
     function getPrePayContracts($customerID)
     {
         $buHeader = new BUHeader ($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
         $dsHeader->fetchNext();
 
@@ -142,7 +145,7 @@ const invoiceToDateYMD = "invoiceToDateYMD";
             JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
 	  	WHERE
 	  		cui_custno = " . $customerID .
-            " AND cui_itemno = " . $dsHeader->getValue('gscItemID') .
+            " AND cui_itemno = " . $dsHeader->getValue(DBEHeader::gscItemID) .
             " AND cui_expiry_date >= now()" . // and is not expired
             " AND renewalStatus  <> 'D' and declinedFlag <> 'Y'";
 
@@ -207,5 +210,3 @@ const invoiceToDateYMD = "invoiceToDateYMD";
         return (parent::getRows());
     }
 }
-
-?>

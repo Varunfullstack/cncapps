@@ -15,7 +15,8 @@ define(
 
 class BUItem extends Business
 {
-    var $dbeItem = "";
+    /** @var DBEItem */
+    public $dbeItem;
 
     /**
      * Constructor
@@ -227,12 +228,9 @@ class BUItem extends Business
         ));
     }
 
-    function discontinue(
-        $discontinueItemIDArray
-    )
+    function discontinue($discontinueItemIDArray)
     {
         $this->dbeItem->setRowsDiscontinued($discontinueItemIDArray);
     }
 
-}// End of class
-?>
+}

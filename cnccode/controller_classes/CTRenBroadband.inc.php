@@ -309,7 +309,7 @@ class CTRenBroadband extends CTCNC
         $readonly = CTCNC_HTML_READONLY;
 
         if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
-            $disabled = ''; // not
+            $disabled = null;
             $pricePerMonth =
                 '<tr>
             <td class="promptText">Sale Price/Month </td>
@@ -321,7 +321,7 @@ class CTRenBroadband extends CTCNC
               size="10"
               maxlength="10">
                     <span class="formErrorMessage">' . Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('salePricePerMonth')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::salePricePerMonth)
                 ) . '</span> </td>
         </tr>
         <tr>
@@ -335,7 +335,7 @@ class CTRenBroadband extends CTCNC
               size="10"
               maxlength="10" />
                     <span class="formErrorMessage">' . Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('costPricePerMonth')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::costPricePerMonth)
                 ) . '</span> </td>
         </tr>';
 
@@ -444,13 +444,13 @@ class CTRenBroadband extends CTCNC
                     $dsRenBroadband->getValue(DBEJRenBroadband::months)
                 ),
                 'monthsMessage'                        => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('months')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::months)
                 ),
                 'invoicePeriodMonths'                  => Controller::htmlInputText(
                     $dsRenBroadband->getValue(DBEJRenBroadband::invoicePeriodMonths)
                 ),
                 'invoicePeriodMonthsMessage'           => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('invoicePeriodMonths')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::invoicePeriodMonths)
                 ),
                 'totalInvoiceMonths'                   => Controller::htmlInputText(
                     $dsRenBroadband->getValue(DBEJRenBroadband::totalInvoiceMonths)
@@ -459,49 +459,49 @@ class CTRenBroadband extends CTCNC
                     $dsRenBroadband->getValue(DBEJRenBroadband::adslPhone)
                 ),
                 'adslPhoneMessage'                     => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('adslPhone')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::adslPhone)
                 ),
                 'macCode'                              => Controller::htmlInputText(
                     $dsRenBroadband->getValue(DBEJRenBroadband::macCode)
                 ),
                 'macCodeMessage'                       => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('macCode')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::macCode)
                 ),
                 'reference'                            => Controller::htmlInputText(
                     $dsRenBroadband->getValue(DBEJRenBroadband::reference)
                 ),
                 'referenceMessage'                     => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('reference')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::reference)
                 ),
                 'defaultGateway'                       => Controller::htmlInputText(
                     $dsRenBroadband->getValue(DBEJRenBroadband::defaultGateway)
                 ),
                 'defaultGatewayMessage'                => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('defaultGateway')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::defaultGateway)
                 ),
                 'networkAddress'                       => Controller::htmlInputText(
                     $dsRenBroadband->getValue(DBEJRenBroadband::networkAddress)
                 ),
                 'networkAddressMessage'                => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('networkAddress')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::networkAddress)
                 ),
                 'subnetMask'                           => Controller::htmlInputText(
                     $dsRenBroadband->getValue(DBEJRenBroadband::subnetMask)
                 ),
                 'subnetMaskMessage'                    => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('subnetMask')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::subnetMask)
                 ),
                 'routerIPAddress'                      => Controller::htmlInputText(
                     $dsRenBroadband->getValue(DBEJRenBroadband::routerIPAddress)
                 ),
                 'routerIPAddressMessage'               => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('routerIPAddress')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::routerIPAddress)
                 ),
                 'userName'                             => Controller::htmlInputText(
                     $dsRenBroadband->getValue(DBEJRenBroadband::userName)
                 ),
                 'userNameMessage'                      => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('userName')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::userName)
                 ),
                 'password'                             => Controller::htmlInputText(
                     $dsRenBroadband->getValue(DBEJRenBroadband::password)
@@ -564,61 +564,61 @@ class CTRenBroadband extends CTCNC
                     $dsRenBroadband->getValue(DBEJRenBroadband::docsUpdatedAndChecksCompleted)
                 ),
                 'passwordMessage'                      => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('password')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::password)
                 ),
                 'etaDateMessage'                       => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('etaDate')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::etaDate)
                 ),
                 'installationDateMessage'              => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('installationDate')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::installationDate)
                 ),
                 'ispIDMessage'                         => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('ispID')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::ispID)
                 ),
                 'dnsCompanyMessage'                    => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('dnsCompany')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::dnsCompany)
                 ),
                 'ipCurrentNoMessage'                   => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('ipCurrentNo')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::ipCurrentNo)
                 ),
                 'mxMessage'                            => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('mx')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::mx)
                 ),
                 'secureServerMessage'                  => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('secureServer')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::secureServer)
                 ),
                 'vpnsMessage'                          => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('vpns')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::vpns)
                 ),
                 'owaMessage'                           => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('owa')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::owa)
                 ),
                 'omaMessage'                           => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('oma')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::oma)
                 ),
                 'remotePortalMessage'                  => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('remotePortal')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::remotePortal)
                 ),
                 'smartHostMessage'                     => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('smartHost')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::smartHost)
                 ),
                 'preparationRecordsMessage'            => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('preparationRecords')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::preparationRecords)
                 ),
                 'assignedToMessage'                    => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('assignedTo')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::assignedTo)
                 ),
                 'initialSpeedTestMessage'              => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('initialSpeedTest')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::initialSpeedTest)
                 ),
                 'preMigrationNotesMessage'             => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('preMigrationNotes')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::preMigrationNotes)
                 ),
                 'postMigrationNotesMessage'            => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('postMigrationNotes')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::postMigrationNotes)
                 ),
                 'docsUpdatedAndChecksCompletedMessage' => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('docsUpdatedAndChecksCompleted')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::docsUpdatedAndChecksCompleted)
                 ),
                 'declinedFlagChecked'                  => Controller::htmlChecked(
                     $dsRenBroadband->getValue(DBEJRenBroadband::declinedFlag)
@@ -627,7 +627,7 @@ class CTRenBroadband extends CTCNC
                     $dsRenBroadband->getValue(DBEJRenBroadband::bandwidthAllowance)
                 ),
                 'bandwidthAllowanceMessage'            => Controller::htmlDisplayText(
-                    $dsRenBroadband->getMessage('bandwidthAllowance')
+                    $dsRenBroadband->getMessage(DBEJRenBroadband::bandwidthAllowance)
                 ),
                 'autoGenerateContractInvoiceChecked'   => Controller::htmlChecked(
                     $dsRenBroadband->getValue(DBECustomerItem::autoGenerateContractInvoice)
@@ -702,9 +702,7 @@ class CTRenBroadband extends CTCNC
         $this->setMethodName('update');
         $this->formError = (!$this->dsRenBroadband->populateFromArray($_REQUEST['renBroadband']));
         if ($this->formError) {
-            if ($this->dsRenBroadband->getValue(
-                    DBEJRenBroadband::customerItemID
-                ) == '') {                    // attempt to insert
+            if ($this->dsRenBroadband->getValue(DBEJRenBroadband::customerItemID)) {
                 $_REQUEST['action'] = 'edit';
             } else {
                 $_REQUEST['action'] = 'create';
@@ -808,7 +806,7 @@ class CTRenBroadband extends CTCNC
     private function parseInitialContractLength($initialContractLength)
     {
         foreach (self::InitialContractLengthValues as $value) {
-            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : '';
+            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : null;
             $this->template->set_var(
                 array(
                     'initialContractLengthSelected'    => $initialContractLengthSelected,

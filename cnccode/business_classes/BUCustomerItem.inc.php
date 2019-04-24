@@ -30,7 +30,7 @@ class BUCustomerItem extends Business
     const searchFormRenewalStatus = 'renewalStatus';
 
     /** @var DBEJCustomerItem */
-    var $dbeJCustomerItem = '';
+    public $dbeJCustomerItem;
 
     /**
      * Constructor
@@ -103,39 +103,39 @@ class BUCustomerItem extends Business
         );
         $dsData->setValue(
             self::searchFormStartDate,
-            ''
+            null
         );
         $dsData->setValue(
             self::searchFormEndDate,
-            ''
+            null
         );
         $dsData->setValue(
             self::searchFormCustomerID,
-            ''
+            null
         );
         $dsData->setValue(
             self::searchFormCustomerName,
-            ''
+            null
         );
         $dsData->setValue(
             self::searchFormItemText,
-            ''
+            null
         );
         $dsData->setValue(
             self::searchFormContractText,
-            ''
+            null
         );
         $dsData->setValue(
             self::searchFormSerialNo,
-            ''
+            null
         );
         $dsData->setValue(
             self::searchFormOrdheadID,
-            ''
+            null
         );
         $dsData->setValue(
             self::searchFormRenewalStatus,
-            ''
+            null
         );
     }
 
@@ -154,14 +154,14 @@ class BUCustomerItem extends Business
         $dsSearchForm->fetchNext();
         $itemText = trim($dsSearchForm->getValue(self::searchFormItemText));
         $contractText = trim($dsSearchForm->getValue(self::searchFormContractText));
-        if ($dsSearchForm->getValue(self::searchFormCustomerItemID) != '') {
+        if ($dsSearchForm->getValue(self::searchFormCustomerItemID)) {
             $this->getCustomerItemByID(
                 $dsSearchForm->getValue(self::searchFormCustomerItemID),
                 $dsResults
             );
         } else {
             if ($itemText{0} == '?') {  // get all customer items if ? passed in
-                $itemText = '';
+                $itemText = null;
             }
             $this->dbeJCustomerItem->getRowsBySearchCriteria(
                 $dsSearchForm->getValue(self::searchFormCustomerID),
@@ -296,7 +296,7 @@ class BUCustomerItem extends Business
         $this->setMethodName('update');
         $dsCustomerItem->fetchNext();
         $customerItemID = $dsCustomerItem->getValue(DBECustomerItem::customerItemID);
-        if ($customerItemID == '') {
+        if (!$customerItemID) {
             $this->raiseError('customerItemID not passed');
         }
 
@@ -310,7 +310,7 @@ class BUCustomerItem extends Business
         If being suspended now, set suspended date and user
         */
         if (
-            $dsCustomerItem->getValue(DBECustomerItem::secondsiteValidationSuspendUntilDate) != '' &&
+            $dsCustomerItem->getValue(DBECustomerItem::secondsiteValidationSuspendUntilDate) &&
             $dbeCustomerItem->getValue(
                 DBECustomerItem::secondsiteValidationSuspendUntilDate
             ) != $dsCustomerItem->getValue(
@@ -398,7 +398,7 @@ class BUCustomerItem extends Business
     }
 
     /**
-     * Test whether given customer item has dependendent entities
+     * Test whether given customer item has dependent entities
      *
      * @parameter integer $customerItemID
      * @return bool : TRUE = has dependencies
@@ -436,8 +436,8 @@ class BUCustomerItem extends Business
     )
     {
         $this->setMethodName('uploadDocumentFile');
-        if ($customerItemID == '') $this->raiseError('customerItemID not passed');
-        if ($description == '') $this->raiseError('description not passed');
+        if (!$customerItemID) $this->raiseError('customerItemID not passed');
+        if (!$description) $this->raiseError('description not passed');
         $dbeDocument = new DBECustomerItemDocument($this);
         $dbeDocument->setPKValue(null);
         $dbeDocument->setValue(
@@ -539,7 +539,7 @@ class BUCustomerItem extends Business
 
     function getMinResponseTime($customerID)
     {
-        $minResponseHours = $this->getMinumumContractResponseHours($customerID);
+        $minResponseHours = $this->getMinimumContractResponseHours($customerID);
 
         if ($minResponseHours > 0) {
             $minResponseTime = 'Response required within ' . $minResponseHours . ' hours<BR/><BR/>';
@@ -551,11 +551,11 @@ class BUCustomerItem extends Business
 
     }
 
-    function getMinumumContractResponseHours($customerID)
+    function getMinimumContractResponseHours($customerID)
     {
         global $db; //PHPLib DB object
 
-        $this->setMethodName('getMinumumContractResponseHours');
+        $this->setMethodName('getMinimumContractResponseHours');
 
         $queryString =
             "

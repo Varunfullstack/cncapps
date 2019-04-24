@@ -10,8 +10,8 @@ define('BO_CLASSNAME_BASEOBJECT', 'BaseObject');
 
 class BaseObject
 {
-    var $methodName = "";
-    var $owner;                    // The owner object of this object
+    public $methodName;
+    public $owner;                    // The owner object of this object
 
     function __construct(&$owner)
     {
@@ -58,22 +58,33 @@ class BaseObject
      * Recursively raises errors on owner objects until the owner is a controller then displays a formatted error message
      *
      * @access public
-     * @param  string $message Error message
+     * @param string $message Error message
      * @return  void
      */
     function raiseError($message)
     {
-        if (is_subclass_of($this, BO_CLASSNAME_CONTROLLER)) {                                // This object is a controller so display formatted error document
+        if (is_subclass_of(
+            $this,
+            BO_CLASSNAME_CONTROLLER
+        )) {                                // This object is a controller so display formatted error document
             $this->displayFatalError($message);
         } else {
             $errorString = $message . ' in ' . $this->getClassName() . "." . $this->getMethodName();
-            if (($this->owner == '') || (!is_subclass_of($this->owner, BO_CLASSNAME_BASEOBJECT))) {    // Not owned one of our system's objects
+            if (($this->owner == '') || (!is_subclass_of(
+                    $this->owner,
+                    BO_CLASSNAME_BASEOBJECT
+                ))) {    // Not owned one of our system's objects
                 die($errorString);                                                                                                                                // So simply die with a message
             } else {
-                if (is_subclass_of($this->owner, BO_CLASSNAME_CONTROLLER)) {                // Owner is a controller so display formatted error document
+                if (is_subclass_of(
+                    $this->owner,
+                    BO_CLASSNAME_CONTROLLER
+                )) {                // Owner is a controller so display formatted error document
                     $this->owner->displayFatalError($errorString);
                 } else {
-                    $this->owner->raiseError($errorString . ' << ');                                    // Promote error handling to owner class handler
+                    $this->owner->raiseError(
+                        $errorString . ' << '
+                    );                                    // Promote error handling to owner class handler
                 }
             }
         }

@@ -16,10 +16,12 @@ define('CTCUSTOMERTYPE_ACT_EDIT', 'editCustomerType');
 define('CTCUSTOMERTYPE_ACT_DELETE', 'deleteCustomerType');
 define('CTCUSTOMERTYPE_ACT_UPDATE', 'updateCustomerType');
 
-class CTCUSTOMERTYPE extends CTCNC
+class CTCustomerType extends CTCNC
 {
-    var $dsCustomerType = '';
-    var $buCustomerType = '';
+    /** @var DSForm */
+    public $dsCustomerType;
+    /** @var BUCustomerType */
+    public $buCustomerType;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
@@ -38,6 +40,7 @@ class CTCUSTOMERTYPE extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -63,24 +66,24 @@ class CTCUSTOMERTYPE extends CTCNC
     /**
      * Display list of types
      * @access private
+     * @throws Exception
      */
     function displayList()
     {
         $this->setMethodName('displayList');
-        $this->setPageTitle('Referal Types');
+        $this->setPageTitle('Referral Types');
         $this->setTemplateFiles(
             array('CustomerTypeList' => 'CustomerTypeList.inc')
         );
-
+        $dsCustomerType = new DataSet($this);
         $this->buCustomerType->getAll($dsCustomerType);
 
-        $urlCreate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTCUSTOMERTYPE_ACT_CREATE
-                )
-            );
+        $urlCreate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTCUSTOMERTYPE_ACT_CREATE
+            )
+        );
 
         $this->template->set_var(
             array('urlCreate' => $urlCreate)
@@ -96,41 +99,42 @@ class CTCUSTOMERTYPE extends CTCNC
 
             while ($dsCustomerType->fetchNext()) {
 
-                $customerTypeID = $dsCustomerType->getValue('customerTypeID');
+                $customerTypeID = $dsCustomerType->getValue(DBECustomerType::customerTypeID);
 
                 $urlEdit =
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => CTCUSTOMERTYPE_ACT_EDIT,
+                            'action'         => CTCUSTOMERTYPE_ACT_EDIT,
                             'customerTypeID' => $customerTypeID
                         )
                     );
                 $txtEdit = '[edit]';
 
+                $urlDelete = null;
+                $txtDelete = null;
                 if ($this->buCustomerType->canDelete($customerTypeID)) {
                     $urlDelete =
                         Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
-                                'action' => CTCUSTOMERTYPE_ACT_DELETE,
+                                'action'         => CTCUSTOMERTYPE_ACT_DELETE,
                                 'customerTypeID' => $customerTypeID
                             )
                         );
                     $txtDelete = '[delete]';
-                } else {
-                    $urlDelete = '';
-                    $txtDelete = '';
                 }
 
                 $this->template->set_var(
                     array(
                         'customerTypeID' => $customerTypeID,
-                        'description' => Controller::htmlDisplayText($dsCustomerType->getValue('description')),
-                        'urlEdit' => $urlEdit,
-                        'urlDelete' => $urlDelete,
-                        'txtEdit' => $txtEdit,
-                        'txtDelete' => $txtDelete
+                        'description'    => Controller::htmlDisplayText(
+                            $dsCustomerType->getValue(DBECustomerType::description)
+                        ),
+                        'urlEdit'        => $urlEdit,
+                        'urlDelete'      => $urlDelete,
+                        'txtEdit'        => $txtEdit,
+                        'txtDelete'      => $txtDelete
                     )
                 );
 
@@ -145,6 +149,7 @@ class CTCUSTOMERTYPE extends CTCNC
     /**
      * Edit/Add Further Action
      * @access private
+     * @throws Exception
      */
     function edit()
     {
@@ -157,33 +162,33 @@ class CTCUSTOMERTYPE extends CTCNC
                 $customerTypeID = $_REQUEST['customerTypeID'];
             } else {                                                                    // creating new
                 $dsCustomerType->initialise();
-                $dsCustomerType->setValue('customerTypeID', '0');
+                $dsCustomerType->setValue(DBECustomerType::customerTypeID, '0');
                 $customerTypeID = '0';
             }
         } else {                                                                        // form validation error
             $dsCustomerType->initialise();
             $dsCustomerType->fetchNext();
-            $customerTypeID = $dsCustomerType->getValue('customerTypeID');
+            $customerTypeID = $dsCustomerType->getValue(DBECustomerType::customerTypeID);
         }
-        if ($_REQUEST['action'] == CTCUSTOMERTYPE_ACT_EDIT && $this->buCustomerType->canDelete($_REQUEST['customerTypeID'])) {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCUSTOMERTYPE_ACT_DELETE,
-                        'customerTypeID' => $customerTypeID
-                    )
-                );
+        $urlDelete = null;
+        $txtDelete = null;
+        if ($_REQUEST['action'] == CTCUSTOMERTYPE_ACT_EDIT && $this->buCustomerType->canDelete(
+                $_REQUEST['customerTypeID']
+            )) {
+            $urlDelete = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'         => CTCUSTOMERTYPE_ACT_DELETE,
+                    'customerTypeID' => $customerTypeID
+                )
+            );
             $txtDelete = 'Delete';
-        } else {
-            $urlDelete = '';
-            $txtDelete = '';
         }
         $urlUpdate =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => CTCUSTOMERTYPE_ACT_UPDATE,
+                    'action'         => CTCUSTOMERTYPE_ACT_UPDATE,
                     'customerTypeID' => $customerTypeID
                 )
             );
@@ -194,19 +199,23 @@ class CTCUSTOMERTYPE extends CTCNC
                     'action' => CTCUSTOMERTYPE_ACT_DISPLAY_LIST
                 )
             );
-        $this->setPageTitle('Edit Referal Type');
+        $this->setPageTitle('Edit Referral Type');
         $this->setTemplateFiles(
             array('CustomerTypeEdit' => 'CustomerTypeEdit.inc')
         );
         $this->template->set_var(
             array(
-                'customerTypeID' => $customerTypeID,
-                'description' => Controller::htmlInputText($dsCustomerType->getValue('description')),
-                'descriptionMessage' => Controller::htmlDisplayText($dsCustomerType->getMessage('description')),
-                'urlUpdate' => $urlUpdate,
-                'urlDelete' => $urlDelete,
-                'txtDelete' => $txtDelete,
-                'urlDisplayList' => $urlDisplayList
+                'customerTypeID'     => $customerTypeID,
+                'description'        => Controller::htmlInputText(
+                    $dsCustomerType->getValue(DBECustomerType::description)
+                ),
+                'descriptionMessage' => Controller::htmlDisplayText(
+                    $dsCustomerType->getMessage(DBECustomerType::description)
+                ),
+                'urlUpdate'          => $urlUpdate,
+                'urlDelete'          => $urlDelete,
+                'txtDelete'          => $txtDelete,
+                'urlDisplayList'     => $urlDisplayList
             )
         );
         $this->template->parse('CONTENTS', 'CustomerTypeEdit', true);
@@ -216,14 +225,14 @@ class CTCUSTOMERTYPE extends CTCNC
     /**
      * Update call Further Action details
      * @access private
+     * @throws Exception
      */
     function update()
     {
         $this->setMethodName('update');
-        $dsCustomerType = &$this->dsCustomerType;
         $this->formError = (!$this->dsCustomerType->populateFromArray($_REQUEST['customerType']));
         if ($this->formError) {
-            if ($this->dsCustomerType->getValue('customerTypeID') == '') {                    // attempt to insert
+            if (!$this->dsCustomerType->getValue(DBECustomerType::customerTypeID)) {
                 $_REQUEST['action'] = CTCUSTOMERTYPE_ACT_EDIT;
             } else {
                 $_REQUEST['action'] = CTCUSTOMERTYPE_ACT_CREATE;
@@ -234,13 +243,13 @@ class CTCUSTOMERTYPE extends CTCNC
 
         $this->buCustomerType->updateCustomerType($this->dsCustomerType);
 
-        $urlNext =
-            Controller::buildLink($_SERVER['PHP_SELF'],
-                             array(
-                                 'customerTypeID' => $this->dsCustomerType->getValue('customerTypeID'),
-                                 'action' => CTCNC_ACT_VIEW
-                             )
-            );
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'customerTypeID' => $this->dsCustomerType->getValue(DBECustomerType::customerTypeID),
+                'action'         => CTCNC_ACT_VIEW
+            )
+        );
         header('Location: ' . $urlNext);
     }
 
@@ -249,6 +258,7 @@ class CTCUSTOMERTYPE extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function delete()
     {
@@ -256,17 +266,14 @@ class CTCUSTOMERTYPE extends CTCNC
         if (!$this->buCustomerType->deleteCustomerType($_REQUEST['customerTypeID'])) {
             $this->displayFatalError('Cannot delete this row');
             exit;
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCUSTOMERTYPE_ACT_DISPLAY_LIST
-                    )
-                );
-            header('Location: ' . $urlNext);
-            exit;
         }
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTCUSTOMERTYPE_ACT_DISPLAY_LIST
+            )
+        );
+        header('Location: ' . $urlNext);
+        exit;
     }
-}// end of class
-?>
+}

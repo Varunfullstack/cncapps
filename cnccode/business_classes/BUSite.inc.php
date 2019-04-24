@@ -13,12 +13,15 @@ define('BUSITE_MATCH_STR_NT_PASD', 'No match string passed');
 
 class BUSite extends Business
 {
-    var $dbeSite = "";
-    var $dbeJSite = "";
+    /** @var DBESite */
+    public $dbeSite;
+    /** @var DBEJSite */
+    public $dbeJSite;
 
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -29,16 +32,16 @@ class BUSite extends Business
 
     /**
      * Get Site rows whose names match the search string or, if the string is numeric, try to select by customerID
-     * @parameter Integer $customerID numeric customerID
-     * @parameter String $matchString String to match against or numeric siteNo
-     * @parameter DataSet &$dsResults results
+     * @param Integer $customerID numeric customerID
+     * @param String $matchString String to match against or numeric siteNo
+     * @param DataSet &$dsResults results
      * @return bool : One or more rows
      * @access public
      */
     function getSitesByDescMatch($customerID, $matchString, &$dsResults)
     {
         $this->setMethodName('getSitesByDescMatch');
-        if ($matchString == '') {
+        if (!$matchString) {
             $this->raiseError(BUSITE_MATCH_STR_NT_PASD);
         }
         $ret = FALSE;
@@ -60,20 +63,18 @@ class BUSite extends Business
 
     /**
      * Get site row by customerID/SiteNo
-     * @parameter integer $customerID
-     * @parameter integer $siteNo
-     * @parameter DataSet &$dsResults results
+     * @param integer $customerID
+     * @param integer $siteNo
+     * @param DataSet &$dsResults results
      * @return bool : Success
      * @access public
      */
     function getSiteByID($customerID, $siteNo, &$dsResults)
     {
-        if ($customerID == '') {
+        if (!$customerID) {
             $this->raiseError('customerID not passed');
         }
-//		if ((integer) $siteNo==''){
-//			$this->raiseError('siteNo not passed');
-//		}
+
         $this->setMethodName('getSiteByID');
         $this->dbeJSite->setValue(DBESite::customerID, $customerID);
         $this->dbeJSite->setValue(DBESite::siteNo, $siteNo);
@@ -83,14 +84,15 @@ class BUSite extends Business
 
     /**
      * Create a new dataset containing defaults for new site row
-     * @parameter DataSet &$dsResults results
+     * @param $customerID
+     * @param DataSet $dsResults
      * @return bool : Success
      * @access public
      */
     function initialiseNewSite($customerID, &$dsResults)
     {
         $this->setMethodName('initialiseNewSite');
-        if ($customerID == '') {
+        if (!$customerID) {
             $this->raiseError('customerID not passed');
         }
         $dsResults->copyColumnsFrom($this->dbeJSite);
@@ -106,7 +108,7 @@ class BUSite extends Business
      * Update/Insert site to DB
      *    Only handles one row in dataset.
      *
-     * @parameter DataSet &$dsResults results
+     * @param DataSet $dsSite
      * @return bool : Success
      * @access public
      */
@@ -143,19 +145,21 @@ class BUSite extends Business
             //create default contact details
             $buContact = new BUContact($this);
             $dsContact = new DataSet($this);
-            $buContact->initialiseNewContact('',
-                                             $dsSite->getValue(DBESite::customerID),
-                                             $dsSite->getValue(DBESite::siteNo),
-                                             $dsContact);
+            $buContact->initialiseNewContact(
+                null,
+                $dsSite->getValue(DBESite::customerID),
+                $dsSite->getValue(DBESite::siteNo),
+                $dsContact
+            );
             $dsContact->setUpdateModeUpdate();
-            $dsContact->setValue('firstName', 'Please');
-            $dsContact->setValue('lastName', 'Enter');
-            $dsContact->setValue('phone', 'Please enter');
+            $dsContact->setValue(DBEContact::firstName, 'Please');
+            $dsContact->setValue(DBEContact::lastName, 'Enter');
+            $dsContact->setValue(DBEContact::phone, 'Please enter');
             $dsContact->post();
             $buContact->updateContact($dsContact);
             $this->dbeSite->setUpdateModeUpdate();
-            $this->dbeSite->setValue(DBESite::invoiceContactID, $dsContact->getValue('contactID'));
-            $this->dbeSite->setValue(DBESite::deliverContactID, $dsContact->getValue('contactID'));
+            $this->dbeSite->setValue(DBESite::invoiceContactID, $dsContact->getValue(DBEContact::contactID));
+            $this->dbeSite->setValue(DBESite::deliverContactID, $dsContact->getValue(DBEContact::contactID));
             $this->dbeSite->post();
         }
         return TRUE;
@@ -164,17 +168,17 @@ class BUSite extends Business
     /**
      * Calculate a unique Sage Reference for new customer site
      * Based upon uppercase first two non-space characters of name plus integer starting at 1 (e.g. KA002)
-     * @parameter DataSet &$source dataset
-     * @parameter dbeEntity &$dbeSite site database entity
+     * @param integer $customerID
      * @return bool : Success
      * @access public
      */
     function getSageRef($customerID)
     {
         $buCustomer = new BUCustomer($this);
+        $dsCustomer = new DataSet($this);
         $buCustomer->getCustomerByID($customerID, $dsCustomer);
         $customerName = $dsCustomer->getValue(DBECustomer::name);
-        $shortCode = "";
+        $shortCode = null;
         for ($ixChar = 0; $ixChar <= strlen($customerName); $ixChar++) {
             if (substr($customerName, $ixChar, 1) != " ") {
                 $shortCode = $shortCode . strtoupper(substr($customerName, $ixChar, 1));
@@ -185,7 +189,8 @@ class BUSite extends Business
         }
         $number = 1;
         $numberUnique = FALSE;
-        $dbeSite = new DBESite($this);                // Just for sageRef check
+        $dbeSite = new DBESite($this);
+        $sageRef = null;
         while (!$numberUnique) {
             $sageRef = $shortCode . str_pad($number, 3, "0", STR_PAD_LEFT);
             $numberUnique = $dbeSite->uniqueSageRef($sageRef);
@@ -193,5 +198,4 @@ class BUSite extends Business
         }
         return $sageRef;
     }
-}// End of class
-?>
+}

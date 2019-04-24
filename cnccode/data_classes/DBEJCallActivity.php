@@ -71,8 +71,8 @@ class DBEJCallActivity extends DBECallActivity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -402,9 +402,9 @@ class DBEJCallActivity extends DBECallActivity
             " rootcause ON rootcause.rtc_rootcauseno = problem.pro_rootcauseno";
     }
 
-    function getRow($callActivityID = '')
+    function getRow($callActivityID = null)
     {
-        if ($callActivityID != '') {
+        if ($callActivityID) {
             $this->setPKValue($callActivityID);
         }
         $this->setQueryString(
@@ -432,6 +432,7 @@ class DBEJCallActivity extends DBECallActivity
 
     function getRowsInIdArray($IDArray)
     {
+        $IDs = "";
         foreach ($IDArray as $val):
             $IDs .= "," . $val;
         endforeach;
@@ -546,7 +547,7 @@ class DBEJCallActivity extends DBECallActivity
             "SELECT COUNT(*) FROM " . $this->getTableName() .
             " JOIN problem ON pro_problemno = caa_problemno" .
             " WHERE pro_custno =" . $customerID .
-            " AND " . $this->getDBColumnName('siteNo') . "=" . $siteNo
+            " AND " . $this->getDBColumnName(self::siteNo) . "=" . $siteNo
         );
         if ($this->runQuery()) {
             if ($this->nextRecord()) {
@@ -554,6 +555,7 @@ class DBEJCallActivity extends DBECallActivity
                 return ($this->getDBColumnValue(0));
             }
         }
+        return 0;
     }
 
     function getPendingChangeRequestRows()

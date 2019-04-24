@@ -73,18 +73,18 @@ class DBEPayMethod extends DBEntity
     function getRowsByDescriptionMatch()
     {
         $this->setMethodName("getRowsByDescriptionMatch");
-        $ret = FALSE;
-        if ($this->getValue('description') == '') {
+        if (!$this->getValue(self::description)) {
             $this->raiseError('description not set');
         }
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('description') . " LIKE " . $this->getFormattedLikeValue('description') .
-            " ORDER BY " . $this->getDBColumnName('description')
+            " WHERE " . $this->getDBColumnName(self::description) . " LIKE " . $this->getFormattedLikeValue(
+                self::description
+            ) .
+            " ORDER BY " . $this->getDBColumnName(self::description)
         );
-        $ret = (parent::getRows());
-        return $ret;
+        return parent::getRows();
     }
 }
 

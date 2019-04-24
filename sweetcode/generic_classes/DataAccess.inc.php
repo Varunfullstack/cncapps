@@ -281,7 +281,7 @@ class DataAccess extends BaseObject
      *<BR/>
      * @parameter DataAccess &$data reference to DataAccess object from which to copy
      * @access public
-     * @param DataSet $data
+     * @param DataSet|DBEntity $data
      * @return boolean Returns TRUE if any rows have been posted to the target
      */
     function replicate(&$data)
@@ -1657,5 +1657,3 @@ not a boolean, the given value is null, column given is not the PK, and there is
     }
 
 }
-
-?>

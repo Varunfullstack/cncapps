@@ -39,6 +39,11 @@ define(
     'update'
 );
 
+define('CTPROJECT_MSG_DOCUMENT_NOT_LOADED', 'DOCUMENT NOT LOADED');
+define('CTPROJECT_MAX_DOCUMENT_FILE_SIZE', 'MAX DOCUMENT FILE SIZE');
+define('CTPROJECT_MSG_DOCUMENT_TOO_BIG', 'DOCUMENT TOO BIG');
+
+
 class CTProject extends CTCNC
 {
     const inHoursQuantity = "inHoursQuantity";

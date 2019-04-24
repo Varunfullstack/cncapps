@@ -6,6 +6,7 @@
  */
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBESupplier.inc.php");
+require_once($cfg["path_dbe"] . "/DBEJSupplier.php");
 require_once($cfg["path_dbe"] . "/DBEPayMethod.inc.php");
 define('BUSUPPLIER_MATCH_STR_NT_PASD', 'No match string passed');
 

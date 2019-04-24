@@ -15,7 +15,9 @@ define('CTSTOCKLEVEL_ACT_UPDATE', 'update');
 
 class CTStockLevel extends CTCNC
 {
-    var $dsItem = '';
+    /** @var DataSet|DBEItem */
+    public $dsItem;
+    /** @var BUItem */
     public $BUItem;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
@@ -33,6 +35,7 @@ class CTStockLevel extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -51,6 +54,27 @@ class CTStockLevel extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
+    function update()
+    {
+        $salesStockQty = $_POST['salesStockQty'];
+        $maintStockQty = $_POST['maintStockQty'];
+
+        $dbeItem = new DBEItem($this);
+        foreach ($salesStockQty AS $key => $value) {
+            $dbeItem->getRow($key);
+            $dbeItem->setValue(DBEItem::salesStockQty, $value);
+            $dbeItem->setValue(DBEItem::maintStockQty, $maintStockQty[$key]);
+            $dbeItem->updateRow();
+        }
+        $this->search();
+    }
+
+    /**
+     * @throws Exception
+     */
     function search()
     {
         $this->setTemplateFiles('StockLevel', 'StockLevel.inc');
@@ -84,7 +108,7 @@ class CTStockLevel extends CTCNC
             array(
                 'urlSearch' => $urlSearch,
                 'urlUpdate' => $urlUpdate,
-                'itemText' => $_SESSION['itemText']
+                'itemText'  => $_SESSION['itemText']
             )
         );
 
@@ -96,46 +120,17 @@ class CTStockLevel extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'itemDescription' => Controller::htmlDisplayText($this->dsItem->getValue('description')),
-                        'salesStockQty' => Controller::htmlInputText($this->dsItem->getValue('salesStockQty')),
-                        'maintStockQty' => Controller::htmlInputText($this->dsItem->getValue('maintStockQty')),
-                        'itemID' => $this->dsItem->getValue('itemID')
+                        'itemDescription' => Controller::htmlDisplayText($this->dsItem->getValue(DBEItem::description)),
+                        'salesStockQty'   => Controller::htmlInputText($this->dsItem->getValue(DBEItem::salesStockQty)),
+                        'maintStockQty'   => Controller::htmlInputText($this->dsItem->getValue(DBEItem::maintStockQty)),
+                        'itemID'          => $this->dsItem->getValue(DBEItem::itemID)
                     )
                 );
 
                 $this->template->parse('items', 'itemBlock', true);
-
-            } //end while
-
+            }
         }
-
         $this->template->parse('CONTENTS', 'StockLevel', true);
         $this->parsePage();
-
-    }
-
-    function update()
-    {
-
-        $salesStockQty = $_POST['salesStockQty'];
-        $maintStockQty = $_POST['maintStockQty'];
-
-        $dbeItem = new DBEItem($this);
-
-        foreach ($salesStockQty AS $key => $value) {
-
-            $dbeItem->getRow($key);
-
-            $dbeItem->setValue('salesStockQty', $value);
-            $dbeItem->setValue('maintStockQty', $maintStockQty[$key]);
-
-            $dbeItem->updateRow();
-
-        }
-
-        $this->search();
-
     }
 }
-
-?>

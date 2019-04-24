@@ -28,6 +28,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -57,6 +58,9 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function display()
     {
 
@@ -70,7 +74,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $_SESSION['IM'] = $showImplementation;
         $_SESSION['p5'] = $isP5;
 
-        $this->setPageTitle('SD Manager Dashboard' . ($isP5 ? ' Priority 5' : ''));
+        $this->setPageTitle('SD Manager Dashboard' . ($isP5 ? ' Priority 5' : null));
 
         $this->setTemplateFiles(
             array('SDManagerDashboard' => 'SDManagerDashboard')
@@ -209,6 +213,13 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
     }
 
 
+    /**
+     * @param DataSet $problems
+     * @param $name
+     * @param null $title
+     * @return mixed|void|null
+     * @throws Exception
+     */
     private function renderQueue(DataSet $problems,
                                  $name,
                                  $title = null
@@ -247,50 +258,51 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         );
 
         if (!$problems->rowCount()) {
-            return '';
+            return null;
         }
 
         while ($problems->fetchNext()) {
 
             $rowCount++;
-            $urlViewActivity =
-                Controller::buildLink(
-                    'Activity.php',
-                    array(
-                        'action'    => 'displayLastActivity',
-                        'problemID' => $problems->getValue('problemID')
-                    )
-                );
+            $urlViewActivity = Controller::buildLink(
+                'Activity.php',
+                array(
+                    'action'    => 'displayLastActivity',
+                    'problemID' => $problems->getValue(DBEJProblem::problemID)
+                )
+            );
 
             $buActivity = new BUActivity($this);
 
-            $activityCount = $buActivity->getActivityCount($problems->getValue('problemID'));
+            $activityCount = $buActivity->getActivityCount($problems->getValue(DBEJProblem::problemID));
 
             $bgColour = $this->getResponseColour(
-                $problems->getValue('status'),
-                $problems->getValue('priority'),
-                $problems->getValue('slaResponseHours'),
-                $problems->getValue('workingHours'),
-                $problems->getValue('respondedHours')
+                $problems->getValue(DBEJProblem::status),
+                $problems->getValue(DBEJProblem::priority),
+                $problems->getValue(DBEJProblem::slaResponseHours),
+                $problems->getValue(DBEJProblem::workingHours),
+                $problems->getValue(DBEJProblem::respondedHours)
             );
             /*
             Updated by another user?
             */
             if (
-                $problems->getValue('userID') &&
-                $problems->getValue('userID') != $problems->getValue('lastUserID')
+                $problems->getValue(DBEJProblem::userID) &&
+                $problems->getValue(DBEJProblem::userID) != $problems->getValue(DBEJProblem::lastUserID)
             ) {
                 $updatedBgColor = self::PURPLE;
             } else {
                 $updatedBgColor = self::CONTENT;
             }
 
-            if ($problems->getValue('respondedHours') == 0 && $problems->getValue('status') == 'I') {
+            if ($problems->getValue(DBEJProblem::respondedHours) == 0 && $problems->getValue(
+                    DBEJProblem::status
+                ) == 'I') {
                 /*
                 Initial SRs that have not yet been responded to
                 */
                 $hoursRemainingBgColor = self::AMBER;
-            } elseif ($problems->getValue('awaitingCustomerResponseFlag') == 'Y') {
+            } elseif ($problems->getValue(DBEJProblem::awaitingCustomerResponseFlag) == 'Y') {
                 $hoursRemainingBgColor = self::GREEN;
             } else {
                 $hoursRemainingBgColor = self::BLUE;
@@ -302,25 +314,23 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                     'SalesOrder.php',
                     array(
                         'action'     => 'search',
-                        'customerID' => $problems->getValue('customerID')
+                        'customerID' => $problems->getValue(DBEJProblem::customerID)
                     )
                 );
 
+            $alarmDateTimeDisplay = null;
             if ($problems->getValue(DBEProblem::alarmDate)) {
 
                 $alarmDateTimeDisplay = Controller::dateYMDtoDMY(
-                        $problems->getValue('alarmDate')
-                    ) . ' ' . $problems->getValue('alarmTime');
+                        $problems->getValue(DBEJProblem::alarmDate)
+                    ) . ' ' . $problems->getValue(DBEJProblem::alarmTime);
 
                 /*
                 Has an alarm date that is in the past, set updated BG Colour (indicates moved back into work queue from future queue)
                 */
-                if ($problems->getValue('alarmDate') <= date(CONFIG_MYSQL_DATE)) {
+                if ($problems->getValue(DBEJProblem::alarmDate) <= date(CONFIG_MYSQL_DATE)) {
                     $updatedBgColor = self::PURPLE;
                 }
-
-            } else {
-                $alarmDateTimeDisplay = '';
 
             }
             /*
@@ -328,21 +338,21 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             Activity edit
             */
             if (
-                $problems->getValue('lastCallActTypeID') == 0
+                $problems->getValue(DBEJProblem::lastCallActTypeID) == 0
             ) {
                 $workBgColor = self::GREEN; // green = in progress
             } else {
                 $workBgColor = self::CONTENT;
             }
 
-            if ($problems->getValue('priority') == 1) {
+            if ($problems->getValue(DBEJProblem::priority) == 1) {
                 $priorityBgColor = self::ORANGE;
             } else {
                 $priorityBgColor = self::CONTENT;
             }
 
 
-            $problemID = $problems->getValue('problemID');
+            $problemID = $problems->getValue(DBEJProblem::problemID);
             $dbeProblem = new DBEProblem($this);
             $dbeProblem->setValue(
                 DBEProblem::problemID,
@@ -350,7 +360,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             );
             $dbeProblem->getRow();
 
-            $totalActivityDurationHours = $problems->getValue('totalActivityDurationHours');
+            $totalActivityDurationHours = $problems->getValue(DBEJProblem::totalActivityDurationHours);
             $template->set_var(
                 array(
                     'hoursRemaining'             => number_format(
@@ -362,32 +372,38 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                     'hoursRemainingBgColor'      => $hoursRemainingBgColor,
                     'totalActivityDurationHours' => $totalActivityDurationHours,
                     'urlCustomer'                => $urlCustomer,
-                    'time'                       => $problems->getValue('lastStartTime'),
-                    'date'                       => Controller::dateYMDtoDMY($problems->getValue('lastDate')),
-                    'problemID'                  => $problems->getValue('problemID'),
+                    'time'                       => $problems->getValue(DBEJProblem::lastStartTime),
+                    'date'                       => Controller::dateYMDtoDMY(
+                        $problems->getValue(DBEJProblem::lastDate)
+                    ),
+                    'problemID'                  => $problems->getValue(DBEJProblem::problemID),
                     'reason'                     => self::truncate(
-                        $problems->getValue('reason'),
+                        $problems->getValue(DBEJProblem::reason),
                         150
                     ),
-                    'urlProblemHistoryPopup'     => $this->getProblemHistoryLink($problems->getValue('problemID')),
-                    'engineerDropDown'           => $this->getAllocatedUserDropdown(
-                        $problems->getValue('problemID'),
-                        $problems->getValue('userID')
+                    'urlProblemHistoryPopup'     => $this->getProblemHistoryLink(
+                        $problems->getValue(DBEJProblem::problemID)
                     ),
-                    'engineerName'               => $problems->getValue('engineerName'),
-                    'customerName'               => $problems->getValue('customerName'),
+                    'engineerDropDown'           => $this->getAllocatedUserDropdown(
+                        $problems->getValue(DBEJProblem::problemID),
+                        $problems->getValue(DBEJProblem::userID)
+                    ),
+                    'engineerName'               => $problems->getValue(DBEJProblem::engineerName),
+                    'customerName'               => $problems->getValue(DBEJProblem::customerName),
                     'customerNameDisplayClass'
                                                  => $this->getCustomerNameDisplayClass(
-                        $problems->getValue('specialAttentionFlag'),
-                        $problems->getValue('specialAttentionEndDate'),
+                        $problems->getValue(DBEJProblem::specialAttentionFlag),
+                        $problems->getValue(DBEJProblem::specialAttentionEndDate),
                         $problems->getValue(DBEJProblem::specialAttentionContactFlag)
                     ),
                     'urlViewActivity'            => $urlViewActivity,
                     'slaResponseHours'           => number_format(
-                        $problems->getValue('slaResponseHours'),
+                        $problems->getValue(DBEJProblem::slaResponseHours),
                         1
                     ),
-                    'priority'                   => Controller::htmlDisplayText($problems->getValue('priority')),
+                    'priority'                   => Controller::htmlDisplayText(
+                        $problems->getValue(DBEJProblem::priority)
+                    ),
                     'alarmDateTime'              => $alarmDateTimeDisplay,
                     'bgColour'                   => $bgColour,
                     'workBgColor'                => $workBgColor,
@@ -433,6 +449,12 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         );
     }
 
+    /**
+     * @param bool $showHelpDesk
+     * @param bool $showEscalation
+     * @param bool $showImplementation
+     * @throws Exception
+     */
     private function renderOpenSRByCustomer($showHelpDesk = true,
                                             $showEscalation = true,
                                             $showImplementation = true
@@ -458,7 +480,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
               FROM
                 problem 
               WHERE problem.`pro_custno` = customer.`cus_custno` 
-                AND problem.`pro_status` IN ("I", "P")';
+                AND problem.`pro_status` IN ("I", "P") ';
 
         if (!$showHelpDesk) {
             $query .= ' and pro_queue_no <> 1 ';
@@ -483,14 +505,13 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
 
             $rowCount++;
 
-            $urlCustomer =
-                Controller::buildLink(
-                    'SalesOrder.php',
-                    array(
-                        'action'     => 'search',
-                        'customerID' => $row['cus_custno']
-                    )
-                );
+            $urlCustomer = Controller::buildLink(
+                'SalesOrder.php',
+                array(
+                    'action'     => 'search',
+                    'customerID' => $row['cus_custno']
+                )
+            );
 
             $this->template->set_var(
 
@@ -509,5 +530,4 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             );
         }
     }
-}// end of class
-?>
+}

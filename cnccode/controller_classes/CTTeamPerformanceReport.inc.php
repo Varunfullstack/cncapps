@@ -44,23 +44,26 @@ class CTTeamPerformanceReport extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
         $this->search();
     }
 
+    /**
+     * @throws Exception
+     */
     function search()
     {
 
         $this->setMethodName('search');
 
         $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
 
         $dsSearchForm = new DSForm ($this);
-
-        $dsResults = new DataSet ($this);
 
         $this->buTeamPerformance->initialiseSearchForm($dsSearchForm);
 
@@ -74,23 +77,25 @@ class CTTeamPerformanceReport extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'esTeamTargetSlaPercentage'  => $dsHeader->getValue('esTeamTargetSlaPercentage'),
-                        'esTeamTargetFixHours'       => $dsHeader->getValue('esTeamTargetFixHours'),
-                        'esTeamTargetFixQtyPerMonth' => $dsHeader->getValue('esTeamTargetFixQtyPerMonth'),
+                        'esTeamTargetSlaPercentage'  => $dsHeader->getValue(DBEJHeader::esTeamTargetSlaPercentage),
+                        'esTeamTargetFixHours'       => $dsHeader->getValue(DBEJHeader::esTeamTargetFixHours),
+                        'esTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEJHeader::esTeamTargetFixQtyPerMonth),
 
-                        'hdTeamTargetSlaPercentage'  => $dsHeader->getValue('hdTeamTargetSlaPercentage'),
-                        'hdTeamTargetFixHours'       => $dsHeader->getValue('hdTeamTargetFixHours'),
-                        'hdTeamTargetFixQtyPerMonth' => $dsHeader->getValue('hdTeamTargetFixQtyPerMonth'),
+                        'hdTeamTargetSlaPercentage'  => $dsHeader->getValue(DBEJHeader::hdTeamTargetSlaPercentage),
+                        'hdTeamTargetFixHours'       => $dsHeader->getValue(DBEJHeader::hdTeamTargetFixHours),
+                        'hdTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEJHeader::hdTeamTargetFixQtyPerMonth),
 
-                        'imTeamTargetSlaPercentage'  => $dsHeader->getValue('imTeamTargetSlaPercentage'),
-                        'imTeamTargetFixHours'       => $dsHeader->getValue('imTeamTargetFixHours'),
-                        'imTeamTargetFixQtyPerMonth' => $dsHeader->getValue('imTeamTargetFixQtyPerMonth')
+                        'imTeamTargetSlaPercentage'  => $dsHeader->getValue(DBEJHeader::imTeamTargetSlaPercentage),
+                        'imTeamTargetFixHours'       => $dsHeader->getValue(DBEJHeader::imTeamTargetFixHours),
+                        'imTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEJHeader::imTeamTargetFixQtyPerMonth)
 
                     )
                 );
 
                 /* Extract data and build report */
-                $results = $this->buTeamPerformance->getRecordsByYear($dsSearchForm->getValue('year'));
+                $results = $this->buTeamPerformance->getRecordsByYear(
+                    $dsSearchForm->getValue(BUTeamPerformance::searchFormYear)
+                );
 
                 foreach ($results as $result) {
 
@@ -206,7 +211,7 @@ class CTTeamPerformanceReport extends CTCNC
         $this->template->set_var(
             array(
                 'formError' => $this->formError,
-                'year'      => $dsSearchForm->getValue('year'),
+                'year'      => $dsSearchForm->getValue(BUTeamPerformance::searchFormYear),
                 'urlSubmit' => $urlSubmit,
             )
         );
@@ -218,6 +223,4 @@ class CTTeamPerformanceReport extends CTCNC
         );
         $this->parsePage();
     }
-
-} // end of class
-?>
+}

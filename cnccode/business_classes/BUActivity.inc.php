@@ -12,10 +12,7 @@ use CNCLTD\AutomatedRequest;
 
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_gc"] . "/Controller.inc.php");
-require_once($cfg ["path_dbe"] . "/DBECustomerCallActivity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJContract.inc.php");
-require_once($cfg ["path_dbe"] . "/DBECustomerCallActivityMonth.inc.php");
-require_once($cfg ["path_dbe"] . "/DBECurrentActivity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActivity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg ["path_dbe"] . "/DBEProblem.inc.php");
@@ -27,11 +24,11 @@ require_once($cfg ["path_dbe"] . "/DBECallDocument.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActType.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJCallActType.php");
 require_once($cfg ["path_dbe"] . "/DBEProject.inc.php");
-require_once($cfg ["path_dbe"] . "/DBEEscalation.inc.php");
 require_once($cfg ["path_bu"] . "/BUCustomer.inc.php");
 require_once($cfg ["path_bu"] . "/BUSite.inc.php");
 require_once($cfg ["path_bu"] . "/BUHeader.inc.php");
 require_once($cfg ["path_bu"] . "/BUSalesOrder.inc.php");
+require_once($cfg ["path_bu"] . "/BURenContract.inc.php");
 require_once($cfg ["path_bu"] . "/BUContact.inc.php");
 require_once($cfg ["path_bu"] . "/BUProblemSLA.inc.php");
 require_once($cfg ["path_func"] . "/activity.inc.php");
@@ -642,11 +639,11 @@ class BUActivity extends Business
             $dsSite->getValue(DBESite::town)
         );
         $dsCallActivity->post();
-    } // end sendCritcalEmail
+    }
 
     /**
      *
-     * Set the activity tyoe to customer contact
+     * Set the activity type to customer contact
      *
      * @param mixed $callActivityID
      */
@@ -1123,7 +1120,7 @@ class BUActivity extends Business
         if ($dbeJProblem->getValue(DBEJProblem::rootCauseID)) {
             $dbeRootCause = new DBERootCause($this);
             $dbeRootCause->getRow($dbeJProblem->getValue(DBEJProblem::rootCauseID));
-            $rootCause = $dbeRootCause->getValue('description');
+            $rootCause = $dbeRootCause->getValue(DBERootCause::description);
         } else {
             $rootCause = 'Unknown';
         }
@@ -2796,13 +2793,11 @@ class BUActivity extends Business
             $callActivityID,
             $dsCallActivity
         );
-
         $requestingUserID = $dsCallActivity->getValue(DBEJCallActivity::userID);
 
         $this->dbeUser->getRow($userID);
 
         $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
-        $status = $dsCallActivity->getValue(DBEJCallActivity::status);
         $subject = null;
         switch ($response) {
 
@@ -4109,14 +4104,12 @@ class BUActivity extends Business
                 $max_hours,
                 $dbeCallActType->getValue(DBECallActType::oohMultiplier),
                 $dbeCallActType->getValue(DBECallActType::itemID),
-                $dbeJCallActivity->getValue(DBEJCallActivity::underContractFlag),
                 $this->dsHeader,
                 $normalHours,
                 $beforeHours,
                 $afterHours,
                 $outOfHoursRate,
-                $normalRate,
-                'N'
+                $normalRate
             );
 
             if ($normalHours > 0) {
@@ -4279,648 +4272,6 @@ class BUActivity extends Business
             'Y'
         );
         $dsData->post();
-    }
-
-    /**
-     * @param DataSet $dsData
-     * @param bool $update
-     * @return bool|DataSet
-     */
-    function exportPrePayActivities(&$dsData,
-                                    $update = false
-    )
-    {
-
-        $this->setMethodName('exportPrePayActivities');
-
-        $dsResults = new DataSet($this);
-        $dsResults->addColumn(
-            self::exportPrePayActivitiesFormCustomerName,
-            DA_DATE,
-            DA_ALLOW_NULL
-        );
-        $dsResults->addColumn(
-            self::exportPrePayActivitiesFormPreviousBalance,
-            DA_FLOAT,
-            DA_ALLOW_NULL
-        );
-        $dsResults->addColumn(
-            self::exportPrePayActivitiesFormCurrentBalance,
-            DA_FLOAT,
-            DA_ALLOW_NULL
-        );
-        $dsResults->addColumn(
-            self::exportPrePayActivitiesFormExpiryDate,
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $dsResults->addColumn(
-            self::exportPrePayActivitiesFormTopUp,
-            DA_FLOAT,
-            DA_ALLOW_NULL
-        );
-        $dsResults->addColumn(
-            self::exportPrePayActivitiesFormContacts,
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $dsResults->addColumn(
-            self::exportPrePayActivitiesFormContractType,
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $dsResults->addColumn(
-            self::exportPrePayActivitiesFormWebFileLink,
-            DA_STRING,
-            DA_ALLOW_NULL
-        ); // link to statement
-
-
-        $dbeVat = new DBEVat($this);
-        $dbeVat->getRow();
-        $vatCode = $this->dsHeader->getValue(DBEHeader::stdVATCode);
-        $this->standardVatRate = $dbeVat->getValue((integer)$vatCode[1]); // use second part of code as column no
-
-        $db = new dbSweetcode(); // database connection for query
-
-
-        /* get a list of valid support customer items */
-        $queryString = "  SELECT cui_cuino
-        FROM custitem
-        JOIN customer ON customer.cus_custno = custitem.cui_custno
-        WHERE cui_itemno = " . $this->dsHeader->getValue(
-                DBEHeader::gscItemID
-            ) . " AND cui_expiry_date >= '" . $dsData->getValue(
-                self::exportDataSetEndDate
-            ) . "'" . " AND cui_desp_date <= '" . $dsData->getValue(
-                self::exportDataSetEndDate
-            ) . "'" . // and the contract has started
-            " AND cui_expiry_date >= now()" . // and is not expired
-            " AND  cus_custno <> " . CONFIG_SALES_STOCK_CUSTOMERID . " AND  renewalStatus  <> 'D'";
-
-        $db->query($queryString);
-        while ($db->next_record()) {
-            $validContracts [$db->Record ['cui_cuino']] = 0; // initialise to no activity
-        }
-
-        $dbeCallActivity = new DBECallActivity($this); // for update of status
-
-
-        $queryString = "SELECT
-        caa_callactivityno,
-        caa_date,
-        DATE_FORMAT(callactivity.caa_date, '%d/%m/%Y') AS activityDate,
-        caa_starttime,
-        caa_endtime,
-        reason,
-        cns_name,
-        cat_desc,
-        callacttype.curValueFlag,
-        callacttype.travelFlag,
-        address.add_max_travel_hours,
-        cat_min_hours,
-        cat_ooh_multiplier,
-        caa_callacttypeno,
-        cat_itemno,
-        cus_name,
-        add_postcode,
-        con_first_name,
-        con_last_name,
-        caa_under_contract,
-        callactivity.curValue,
-        cui_desp_date,
-        cui_expiry_date,
-        cui_cuino,
-        curGSCBalance,
-        cus_custno AS custno,
-        itm_sstk_price,
-        ity_desc,
-        customer.gscTopUpAmount
-      FROM
-        callactivity
-        JOIN problem ON pro_problemno = caa_problemno
-        JOIN consultant ON caa_consno = cns_consno
-        JOIN callacttype ON cat_callacttypeno=caa_callacttypeno
-        JOIN custitem ON pro_contract_cuino = cui_cuino
-        JOIN customer ON pro_custno = cus_custno
-        JOIN address ON add_custno = pro_custno AND add_siteno = caa_siteno
-        JOIN contact ON con_contno = caa_contno
-        JOIN item ON cui_itemno = itm_itemno
-        JOIN itemtype ON ity_itemtypeno = itm_itemtypeno
-      WHERE
-        itm_itemno = " . $this->dsHeader->getValue(DBEHeader::gscItemID) . " AND caa_endtime IS NOT NULL
-        AND caa_status = 'C'
-        AND caa_date <= '" . $dsData->getValue('endDate') . "'" . // include activities before statement date
-            " AND cui_desp_date <= '" . $dsData->getValue('endDate') . "'" . // and the contract has started
-            " AND cui_expiry_date >= now()" . // and is not expired
-            " AND  cus_custno <> " . CONFIG_SALES_STOCK_CUSTOMERID . " AND  renewalStatus  <> 'D'" . // not declined
-            " AND  caa_callacttypeno  <> " . CONFIG_ENGINEER_TRAVEL_ACTIVITY_TYPE_ID . " AND  caa_callacttypeno  <> " . CONFIG_PROACTIVE_SUPPORT_ACTIVITY_TYPE_ID .  // not declined
-            " AND pro_status = 'C'";     // only completed problems
-        $queryString .= " ORDER BY pro_custno, caa_date, caa_starttime";
-
-        $db->query($queryString);
-        $ret = FALSE; // indicates there were no statements to export
-
-
-        $buContact = new BUContact($this);
-        $buCustomer = new BUCustomer($this);
-
-        // ensure all customers have at least one statement contact
-        $last_custno = '9999';
-
-        while ($db->next_record()) {
-
-            if ($db->Record ['custno'] != $last_custno) {
-                if ($last_custno != '9999') {
-                    /** @var DataSet $dsStatementContact */
-                    $buContact->getGSCContactByCustomerID(
-                        $db->Record ['custno'],
-                        $dsStatementContact
-                    );
-                    if (!is_object($dsStatementContact)) {
-                        $this->raiseError(
-                            'Customer ' . $db->Record ['cns_name'] . ' needs at least one Pre-pay statement contact.'
-                        );
-                        exit();
-                    }
-                }
-            }
-            $last_custno = $db->Record ['custno'];
-        }
-
-        // create CSV summary file
-        $filepath = SAGE_EXPORT_DIR . '/PP-SUMMARY-' . Controller::dateYMDtoDMY(
-                $dsData->getValue('endDate'),
-                '-'
-            );
-        $this->csvSummaryFileHandle = fopen(
-            $filepath . '.csv',
-            'wb'
-        );
-
-        $db->query($queryString);
-
-        $last_custno = '9999';
-        $htmlFileHandle = null;
-        $csvFileHandle = null;
-        while ($db->next_record()) {
-
-            $validContracts [$db->Record ['cui_cuino']] = 1; // flag contract as having activity
-
-            $ret = TRUE; // there was at least one statement to export
-
-
-            // new customer so create new csv and html files
-            if ($db->Record ['custno'] != $last_custno) {
-
-                if ($last_custno != '9999') {
-                    $topUpValue = $this->doTopUp(
-                        $lastRecord,
-                        $update
-                    );
-                    $newBalance = $lastRecord ['curGSCBalance'] + $this->totalCost;
-                    $this->template->set_var(
-                        array(
-                            'totalCost'        => common_numberFormat($this->totalCost),
-                            'previousBalance'  => common_numberFormat($lastRecord ['curGSCBalance']),
-                            'remainingBalance' => common_numberFormat($newBalance)
-                        )
-                    );
-
-                    $this->template->parse(
-                        'output',
-                        'page',
-                        true
-                    );
-                    fwrite(
-                        $htmlFileHandle,
-                        $this->template->get_var('output')
-                    );
-                    fclose($htmlFileHandle); // close previous html file
-
-
-                    $this->postRowToSummaryFile(
-                        $lastRecord,
-                        $dsResults,
-                        $dsStatementContact,
-                        $newBalance,
-                        $topUpValue,
-                        $dsData->getValue('endDate')
-                    );
-
-                    $dsStatementContact->initialise();
-
-                    if ($update) {
-                        $this->sendGSCStatement(
-                            $filepath . '.html',
-                            $dsStatementContact,
-                            $newBalance,
-                            $dsData->getValue('endDate'),
-                            $topUpValue
-                        );
-                    }
-                    fclose($csvFileHandle); // close previous csv file
-                } // end if( $last_custno != '9999' )
-
-
-                $this->totalCost = 0; // reset cost
-
-
-                $filepath = SAGE_EXPORT_DIR . '/PP_' . substr(
-                        $db->Record ['cus_name'],
-                        0,
-                        10
-                    ) . $dsData->getValue('endDate');
-
-                $csvFileHandle = fopen(
-                    $filepath . '.csv',
-                    'wb'
-                );
-                if (!$csvFileHandle) {
-                    $this->raiseError("Unable to open csv file " . $filepath);
-                }
-
-                $htmlFileHandle = fopen(
-                    $filepath . '.html',
-                    'wb'
-                );
-                if (!$htmlFileHandle) {
-                    $this->raiseError("Unable to open html file " . $filepath);
-                }
-
-                // set up new html file template
-                $this->template = new Template(
-                    $GLOBALS ["cfg"] ["path_templates"],
-                    "remove"
-                );
-                $this->template->set_file(
-                    'page',
-                    'GSCReport.inc.html'
-                );
-                // get GSC contact record
-                $buContact->getGSCContactByCustomerID(
-                    $db->Record ['custno'],
-                    $dsStatementContact
-                );
-                /** @var DataSet $dsSite */
-                $buCustomer->getSiteByCustomerIDSiteNo(
-                    $dsStatementContact->getValue(DBEContact::customerID),
-                    $dsStatementContact->getValue(DBEContact::siteNo),
-                    $dsSite
-                );
-
-                // Set header fields
-                $this->template->set_var(
-                    array(
-                        'companyName'   => $db->Record ['cus_name'],
-                        'customerRef'   => $db->Record ['cui_cuino'],
-                        'startDate'     => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']),
-                        'endDate'       => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']),
-                        'statementDate' => Controller::dateYMDtoDMY($dsData->getValue('endDate')),
-                        'add1'          => $dsSite->getValue(DBESite::add1),
-                        'add2'          => $dsSite->getValue(DBESite::add2),
-                        'add3'          => $dsSite->getValue(DBESite::add3),
-                        'town'          => $dsSite->getValue(DBESite::town),
-                        'county'        => $dsSite->getValue(DBESite::county),
-                        'postcode'      => $dsSite->getValue(DBESite::postcode),
-                        'cnc_name'      => $this->dsHeader->getValue(DBEHeader::name),
-                        'cnc_add1'      => $this->dsHeader->getValue(DBEHeader::add1),
-                        'cnc_add2'      => $this->dsHeader->getValue(DBEHeader::add2),
-                        'cnc_add3'      => $this->dsHeader->getValue(DBEHeader::add3),
-                        'cnc_town'      => $this->dsHeader->getValue(DBEHeader::town),
-                        'cnc_county'    => $this->dsHeader->getValue(DBEHeader::county),
-                        'cnc_postcode'  => $this->dsHeader->getValue(DBEHeader::postcode),
-                        'cnc_phone'     => $this->dsHeader->getValue(DBEHeader::phone)
-                    )
-                );
-
-                $this->template->set_block(
-                    'page',
-                    'lineBlock',
-                    'lines'
-                );
-
-                $last_custno = $db->Record ['custno'];
-                $ret = TRUE; // indicates there were statements to export
-
-
-            } // end if( $db->Record['custno'] != $last_custno )
-
-
-            $posted = FALSE;
-
-            if ($db->Record ['curValueFlag'] == 'Y') { // This is a monetary value activity such as top-up or adjustment
-                $this->postRowToPrePayExportFile(
-                    $csvFileHandle,
-                    'M',
-                    // Type = Monetary
-                    $db->Record,
-                    1,
-                    // set hours = 1 for calculation
-                    $db->Record ['curValue']
-                );
-                $posted = TRUE;
-            } else {
-
-                /* mantis 359: Apply maximum travel hours to travel type activities */
-                if ($db->Record ['travelFlag'] == 'Y') {
-                    $max_hours = $db->Record ['MaxTravelHours'];
-                } else {
-                    $max_hours = 0;
-                }
-
-
-                getRatesAndHours(
-                    $db->Record ['caa_date'],
-                    $db->Record ['caa_starttime'],
-                    $db->Record ['caa_endtime'],
-                    $db->Record ['cat_min_hours'],
-                    $max_hours,
-                    $db->Record ['cat_ooh_multiplier'],
-                    $db->Record ['cat_itemno'],
-                    'Y',
-                    $this->dsHeader,
-                    $normalHours,
-                    $beforeHours,
-                    $afterHours,
-                    $outOfHoursRate,
-                    $normalRate,
-                    'N'
-                );
-
-                if ($beforeHours > 0) {
-                    $this->postRowToPrePayExportFile(
-                        $csvFileHandle,
-                        'O',
-                        // out of hours
-                        $db->Record,
-                        $beforeHours,
-                        $outOfHoursRate
-                    );
-                    $posted = TRUE;
-                }
-                if ($normalHours > 0) {
-                    $this->postRowToPrePayExportFile(
-                        $csvFileHandle,
-                        'I',
-                        // in hours
-                        $db->Record,
-                        $normalHours,
-                        $normalRate
-                    );
-                    $posted = TRUE;
-                }
-                if ($afterHours > 0) {
-                    $this->postRowToPrePayExportFile(
-                        $csvFileHandle,
-                        'O',
-                        // out of hours
-                        $db->Record,
-                        $afterHours,
-                        $outOfHoursRate
-                    );
-                    $posted = TRUE;
-                }
-            }
-
-            if ($posted == FALSE) { // No hours to post but need a line
-                $this->postRowToPrePayExportFile( // e.g. for top-up activity or value activity
-                    $csvFileHandle,
-                    'I',
-                    $db->Record,
-                    0,
-                    0
-                );
-            }
-
-            if ($update) {
-                // update status on call activity to Authorised and statement date to today
-
-
-                $dbeCallActivity->getRow($db->Record ['caa_callactivityno']);
-                $dbeCallActivity->setValue(
-                    DBEJCallActivity::status,
-                    'A'
-                );
-                $dbeCallActivity->setValue(
-                    DBEJCallActivity::statementYearMonth,
-                    date('Y-m')
-                );
-                $dbeCallActivity->updateRow();
-            }
-            $lastRecord = $db->Record;
-        }
-
-        if ($ret == TRUE) {
-            fclose($csvFileHandle);
-
-            $topUpValue = $this->doTopUp(
-                $lastRecord,
-                $update
-            );
-            $newBalance = $lastRecord ['curGSCBalance'] + $this->totalCost;
-            $this->template->set_var(
-                array(
-                    'totalCost'        => common_numberFormat($this->totalCost),
-                    'previousBalance'  => common_numberFormat($lastRecord ['curGSCBalance']),
-                    'remainingBalance' => common_numberFormat($newBalance)
-                )
-            );
-            $this->template->parse(
-                'output',
-                'page',
-                true
-            );
-            fwrite(
-                $htmlFileHandle,
-                $this->template->get_var('output')
-            );
-            fclose($htmlFileHandle);
-
-            $this->postRowToSummaryFile(
-                $lastRecord,
-                $dsResults,
-                $dsStatementContact,
-                $newBalance,
-                $topUpValue,
-                $dsData->getValue('endDate')
-            );
-
-            if ($update) {
-                $dsStatementContact->initialise();
-                $this->sendGSCStatement(
-                    $filepath . '.html',
-                    $dsStatementContact,
-                    $newBalance,
-                    $dsData->getValue('endDate'),
-                    $topUpValue
-                );
-            }
-        }
-
-        /*
-  Now produce statements for contracts that had no activity
-*/
-        $this->totalCost = 0; // there is no balance of activity cost
-        reset($validContracts);
-        foreach ($validContracts as $key => $value) {
-            if ($value == 0) {
-
-                $ret = true;
-
-                $queryString = "SELECT
-            cus_name,
-            cui_desp_date,
-            cui_expiry_date,
-            cui_cuino,
-            curGSCBalance,
-            cui_custno AS custno,
-            gscTopUpAmount,
-            ity_desc
-          FROM
-            custitem
-            JOIN customer ON cui_custno = cus_custno
-            JOIN item ON cui_itemno = itm_itemno
-            JOIN itemtype ON ity_itemtypeno = itm_itemtypeno
-          WHERE
-            cui_cuino = " . $key . " AND  cus_custno <> 2511" . " AND  renewalStatus  <> 'D'";
-
-                $db->query($queryString);
-                $db->next_record();
-                // get GSC contact record
-                $buContact->getGSCContactByCustomerID(
-                    $db->Record ['custno'],
-                    $dsStatementContact
-                );
-                $buCustomer->getSiteByCustomerIDSiteNo(
-                    $dsStatementContact->getValue(DBEContact::customerID),
-                    $dsStatementContact->getValue(DBEContact::siteNo),
-                    $dsSite
-                );
-
-                // set up new html file template
-                $filepath = SAGE_EXPORT_DIR . '/PP_' . substr(
-                        $db->Record ['cus_name'],
-                        0,
-                        10
-                    ) . $dsData->getValue('endDate');
-                $htmlFileHandle = fopen(
-                    $filepath . '.html',
-                    'wb'
-                );
-                if (!$htmlFileHandle) {
-                    $this->raiseError("Unable to open html file " . $filepath);
-                }
-                $this->template = new Template(
-                    $GLOBALS ["cfg"] ["path_templates"],
-                    "remove"
-                );
-                $this->template->set_file(
-                    'page',
-                    'GSCReport.inc.html'
-                );
-
-                // Set header fields
-                $this->template->set_var(
-                    array(
-                        'companyName'   => $db->Record ['cus_name'],
-                        'customerRef'   => $key,
-                        'startDate'     => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']),
-                        'endDate'       => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']),
-                        'statementDate' => Controller::dateYMDtoDMY($dsData->getValue('endDate')),
-                        'add1'          => $dsSite->getValue(DBESite::add1),
-                        'add2'          => $dsSite->getValue(DBESite::add2),
-                        'add3'          => $dsSite->getValue(DBESite::add3),
-                        'town'          => $dsSite->getValue(DBESite::town),
-                        'county'        => $dsSite->getValue(DBESite::county),
-                        'postcode'      => $dsSite->getValue(DBESite::postcode),
-                        'cnc_name'      => $this->dsHeader->getValue(DBEHeader::name),
-                        'cnc_add1'      => $this->dsHeader->getValue(DBEHeader::add1),
-                        'cnc_add2'      => $this->dsHeader->getValue(DBEHeader::add2),
-                        'cnc_add3'      => $this->dsHeader->getValue(DBEHeader::add3),
-                        'cnc_town'      => $this->dsHeader->getValue(DBEHeader::town),
-                        'cnc_county'    => $this->dsHeader->getValue(DBEHeader::county),
-                        'cnc_postcode'  => $this->dsHeader->getValue(DBEHeader::postcode),
-                        'cnc_phone'     => $this->dsHeader->getValue(DBEHeader::phone)
-                    )
-                );
-                $this->template->set_block(
-                    'page',
-                    'lineBlock',
-                    'lines'
-                );
-
-                $this->template->set_var(
-                    array(
-                        'activityDate'     => null,
-                        'activityPostcode' => null,
-                        'activityRef'      => null,
-                        'activityContact'  => null,
-                        'activityType'     => null,
-                        'activityHours'    => null,
-                        'activityCost'     => null,
-                        'activityDetails'  => 'No activity for this period'
-                    )
-                );
-
-                $this->template->parse(
-                    'lines',
-                    'lineBlock',
-                    true
-                );
-                $this->totalCost += $value;
-                $this->template->set_var(
-                    array(
-                        'totalCost'        => 0,
-                        'previousBalance'  => common_numberFormat($db->Record ['curGSCBalance']),
-                        'remainingBalance' => common_numberFormat($db->Record ['curGSCBalance'])
-                    )
-                );
-                $this->template->parse(
-                    'output',
-                    'page',
-                    true
-                );
-                fwrite(
-                    $htmlFileHandle,
-                    $this->template->get_var('output')
-                );
-                fclose($htmlFileHandle);
-
-                $dsStatementContact->initialise();
-                $topUpValue = $this->doTopUp(
-                    $db->Record,
-                    $update
-                );
-
-                $this->postRowToSummaryFile(
-                    $db->Record,
-                    $dsResults,
-                    $dsStatementContact,
-                    $db->Record ['curGSCBalance'],
-                    $topUpValue,
-                    $dsData->getValue('endDate')
-                );
-
-                if ($update) {
-                    $this->sendGSCStatement(
-                        $filepath . '.html',
-                        $dsStatementContact,
-                        $db->Record ['curGSCBalance'],
-                        $dsData->getValue('endDate'),
-                        $topUpValue
-                    );
-                }
-            }
-        }
-
-        fclose($this->csvSummaryFileHandle);
-
-        if ($ret) {
-            return $dsResults;
-        } else {
-            return false;
-        }
     }
 
     function doTopUp(&$Record,
@@ -5109,7 +4460,7 @@ class BUActivity extends Business
                                   $endDate
     )
     {
-        $contacts = '';
+        $contacts = null;
         while ($dsStatementContact->fetchNext()) {
             $contacts .= $dsStatementContact->getValue(DBEContact::firstName) . ' ' . $dsStatementContact->getValue(
                     DBEContact::lastName
@@ -5194,7 +4545,7 @@ class BUActivity extends Business
             $message = '<body><p class=MsoNormal style="font: normal 2px Arial, sans-serif ;color: navy" ><span style=\'font-size:10.0pt;color:black\'>';
             $message .= 'Dear ' . $dsContact->getValue(DBEContact::firstName) . ',';
             $message .= '<!--suppress CheckTagEmptyBody --><o:p></o:p></span></p>';
-            $message .= '<p class=MsoNormal><font size=2 color=navy face=Arial><span style=\'font-size:10.0pt;color:black\'>';
+            $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
             // Temporary:
             $message .= 'Please find attached your latest Pre-Pay Contract statement, on which there
 is currently a balance of ';
@@ -5222,7 +4573,7 @@ is currently a balance of ';
             $toEmail = $dsContact->getValue(DBEContact::firstName) . ' ' .
                 $dsContact->getValue(DBEContact::lastName) . '<' . $dsContact->getValue(DBEContact::email) . '>';
 
-            $senderName = '';
+            $senderName = null;
 
             // create mime
             $html = '<html lang="en">' . $message . '</html>';
@@ -5269,10 +4620,9 @@ is currently a balance of ';
     )
     {
 
+        $timeFrameDesc = null;
         if ($timeFrameFlag == 'O') {
             $timeFrameDesc = ' - Out of hours';
-        } else {
-            $timeFrameDesc = '';
         }
         if (!$Record['reason']) {
             $details = trim($Record ['cat_desc']);
@@ -5315,21 +4665,19 @@ is currently a balance of ';
             "\r\n"
         );
 
+        $postcode = $Record ['add_postcode'];
+        $activityRef = $Record ['caa_callactivityno'];
+        $hours = common_numberFormat($hours);
         if ($timeFrameFlag == 'M') { // Monetary value like topUp
-            $contacts = '';
-            $postcode = '';
-            $activityRef = '';
-            $hours = '';
-        } else {
-            $postcode = $Record ['add_postcode'];
-            $activityRef = $Record ['caa_callactivityno'];
-            $hours = common_numberFormat($hours);
+            $contacts = null;
+            $postcode = null;
+            $activityRef = null;
+            $hours = null;
         }
 
         // don't display zero values
-        if ($value == 0) {
-            $displayValue = '';
-        } else {
+        $displayValue = null;
+        if ($value != 0) {
             $displayValue = common_numberFormat($value);
         }
 
@@ -5874,27 +5222,25 @@ is currently a balance of ';
         $this->setMethodName('sendUncheckedActivityEmail');
 
         $this->dbeCallActivitySearch->getRowsBySearchCriteria(
-            '',
-            '',
-            '',
+            null,
+            null,
+            null,
             'UC',
-            '',
-            '',
+            null,
+            null,
             date('Y-m-d'),
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
             null,
             null,
             'N'
         );
 
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-//        $senderName = 'CNC Support Department';
-
         $toEmail = false;
 
         ob_start();
@@ -6176,18 +5522,6 @@ is currently a balance of ';
         $dsData->setValue(
             self::customerActivityFormCustomerName,
             null
-        );
-    }
-
-    function getCurrentActivities(&$dsActivityEngineer)
-    {
-        $dbeCurrentActivity = new DBECurrentActivity($this);
-
-        $dbeCurrentActivity->getRows();
-
-        return $this->getData(
-            $dbeCurrentActivity,
-            $dsActivityEngineer
         );
     }
 
@@ -6503,7 +5837,7 @@ is currently a balance of ';
     }
 
     /**
-     * Allocate an tecnician to a request, sending an email to the engineer if this request
+     * Allocate an technician to a request, sending an email to the engineer if this request
      * was previously with another technician
      *
      * @param mixed $problemID
@@ -6524,7 +5858,7 @@ is currently a balance of ';
         /*
     Send an email to the new person new user is not "unallocated" user
     */
-        if ($userID > 0) { // not deallocating
+        if ($userID > 0) { // not de-allocating
             $this->sendServiceReallocatedEmail(
                 $problemID,
                 $userID,
@@ -6658,7 +5992,7 @@ is currently a balance of ';
      *
      * @param mixed $status
      * @param mixed $dsResults
-     * @param boolean $future Return future scheduled requests ONLY?
+     * @param bool $includeAutomaticallyFixed
      */
     function getProblemsByStatus($status,
                                  &$dsResults,
@@ -6850,12 +6184,12 @@ is currently a balance of ';
         $internalNotes = '<P>' . str_replace(
                 "\r\n",
                 "",
-                $dsInput->getValue('serviceRequestText')
+                $dsInput->getValue(BURenContract::serviceRequestText)
             ) . '</P>';
 
-        if ($dsInput->getValue('etaDate')) {
+        if ($dsInput->getValue(BURenContract::etaDate)) {
             $internalNotes .=
-                '<P>ETA: ' . Controller::dateYMDtoDMY($dsInput->getValue('etaDate')) . '</P><BR/>';
+                '<P>ETA: ' . Controller::dateYMDtoDMY($dsInput->getValue(BURenContract::etaDate)) . '</P><BR/>';
 
         } else {
             $internalNotes .=
@@ -6884,9 +6218,7 @@ is currently a balance of ';
             $directDelivery = false;
             while ($dbePorhead->fetchNext()) {
                 if ($dbePorhead->getValue(DBEPorhead::directDeliveryFlag) == 'Y') {
-
                     $directDelivery = true;
-
                 }
             }
 
@@ -6899,7 +6231,7 @@ is currently a balance of ';
 
         $slaResponseHours =
             $this->getSlaResponseHours(
-                $dsInput->getValue('serviceRequestPriority'),
+                $dsInput->getValue(BURenContract::serviceRequestPriority),
                 $dsOrdhead->getValue(DBEOrdhead::customerID),
                 $dsOrdhead->getValue(DBEOrdhead::delContactID)
             );
@@ -6935,7 +6267,7 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEJProblem::priority,
-            $dsInput->getValue('serviceRequestPriority')
+            $dsInput->getValue(BURenContract::serviceRequestPriority)
         );
         $dbeProblem->setValue(
             DBEJProblem::hideFromCustomerFlag,
@@ -6947,7 +6279,7 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEJProblem::contractCustomerItemID,
-            $dsInput->getValue('serviceRequestCustomerItemID')
+            $dsInput->getValue(BURenContract::serviceRequestCustomerItemID)
         );
         $dbeProblem->setValue(
             DBEJProblem::internalNotes,
@@ -6959,7 +6291,7 @@ is currently a balance of ';
         );
 
         $dbeProblem->insertRow();
-
+        $reason = null;
 
         /* Use type of first SO line as first line of reason */
         while ($dsOrdline->fetchNext()) {
@@ -7283,7 +6615,8 @@ is currently a balance of ';
 
     /**
      * Gets one customer raised request
-     *
+     * @param $customerproblemno
+     * @return array
      */
     function getCustomerRaisedRequest($customerproblemno)
     {
@@ -7335,7 +6668,7 @@ is currently a balance of ';
 
     /**
      * Delete one customer raised request
-     *
+     * @param $customerproblemno
      */
     function deleteCustomerRaisedRequest($customerproblemno)
     {
@@ -8088,6 +7421,10 @@ is currently a balance of ';
         return $ret;
     }
 
+    /**
+     * @param $problemID
+     * @param AutomatedRequest $record
+     */
     function processAttachment($problemID,
                                AutomatedRequest $record
     )
@@ -8124,15 +7461,11 @@ is currently a balance of ';
                 );
 
                 fclose($handle);
-                //unlink( $filePath );
-                $ret = true;
             } else {
                 $errorString = 'Failed to import attachment file ' . $filePath . '<BR/>';
                 echo $errorString;
-                $ret = false;
             }
         }
-        return $ret;
     }
 
     function getRequestByCustPostcodeMonitorNameAgentName(
@@ -8233,7 +7566,7 @@ is currently a balance of ';
                 $endTime = $this->getEndtime(CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID);
 
                 /*
-        Prepopulate reason
+        Pre-populate reason
         */
                 $reason = "<!--suppress HtmlDeprecatedAttribute -->
 <table border='1' style='border: solid black 1px'><thead><tr><td></td><td>Details</td></tr></thead><tbody><tr><td>System:</td><td></td></tr><tr><td>Summary of problem:</td><td></td></tr><tr><td>Change Requested:</td><td></td></tr><tr><td>Method to test change if successful:</td><td></td></tr><tr><td>Reversion plan if unsuccessful:</td><td></td></tr></tbody></table>";
@@ -8601,7 +7934,7 @@ is currently a balance of ';
     }
 
     /**
-     * sets problem out of pause mode by unsetting flag on activity
+     * sets problem out of pause mode by un-setting flag on activity
      *
      * @param mixed $callactivityID
      * @param mixed $date
@@ -8784,7 +8117,7 @@ is currently a balance of ';
       FROM
           callactivity
       WHERE
-          (caa_endtime is null or caa_endtime = '')
+          caa_endtime is null
             AND
             caa_problemno = " . $problemID;
 
@@ -8804,7 +8137,7 @@ is currently a balance of ';
     public function closeActivitiesWithEndTime($problemID)
     {
         global $db;
-        $sql = "update callactivity  set caa_status  = 'C'  WHERE caa_problemno = $problemID and (caa_endtime is not null or caa_endtime <> '' )";
+        $sql = "update callactivity  set caa_status  = 'C'  WHERE caa_problemno = $problemID and caa_endtime is not null )";
         $db->query($sql);
         return true;
     }
@@ -8903,7 +8236,7 @@ is currently a balance of ';
     }
 
     /**
-     * Sends email to the tecnician that escalated request to let them know request is fixed
+     * Sends email to the technician that escalated request to let them know request is fixed
      *
      * @param mixed $problemID
      */
@@ -9852,6 +9185,7 @@ is currently a balance of ';
      * @param mixed $customerID
      * @param mixed $contractCustomerItemID
      * @param mixed $matchText
+     * @return bool
      */
     private function getExisting2ndSiteActivityID($customerID,
                                                   $contractCustomerItemID,
@@ -9939,6 +9273,9 @@ is currently a balance of ';
   Send email to SD Managers requesting more time to be allocated to SR
   */
 
+    /**
+     * @return array
+     */
     public function getOpenSrsByUser()
     {
         global $db;
@@ -9959,13 +9296,12 @@ is currently a balance of ';
 
             " GROUP BY
           pro_consno";
-
+        $ret = [];
         $db->query($sql);
         while ($db->next_record()) {
             $ret[] = $db->Record;
         }
         return $ret;
-
     }
 
     /**
@@ -10224,6 +9560,7 @@ is currently a balance of ';
      *
      * @param mixed $userID
      * @param DateTime|null $date
+     * @throws Exception
      */
     function createUserTimeLogRecord($userID,
                                      DateTime $date = null
@@ -10429,7 +9766,7 @@ is currently a balance of ';
 
       WHERE
         callacttype.`travelFlag` = 'N'
-        AND (caa_endtime is not null and caa_endtime <> '')";
+        AND caa_endtime is not null";
 
         if ($days) {
             $sql .=
@@ -10626,22 +9963,6 @@ is currently a balance of ';
 
         $body = $template->get_var('output');
 
-//        $body = preg_replace(
-//            '/[\x00-\x1F\x7F-\xFF]/',
-//            '',
-//            $body
-//        );
-//        $body = preg_replace(
-//            '/[\x00-\x1F\x7F]/',
-//            '',
-//            $body
-//        );
-//        $body = preg_replace(
-//            '/[\x00-\x1F\x7F]/u',
-//            '',
-//            $body
-//        );
-
         $buMail->mime->setHTMLBody($body);
         $mime_params = array(
             'text_encoding' => '7bit',
@@ -10755,18 +10076,23 @@ is currently a balance of ';
 
     }
 
+    /**
+     * @param $problemID
+     * @param bool $ignoreOperation
+     * @return int
+     */
     public function getActivityCount($problemID,
                                      $ignoreOperation = true
     )
     {
-        $dbejCallActivity = new DBEJCallActivity($this);
-        $dbejCallActivity->getRowsByProblemID(
+        $DBEJCallActivity = new DBEJCallActivity($this);
+        $DBEJCallActivity->getRowsByProblemID(
             $problemID,
             true,
             !$ignoreOperation
         );
         $count = 0;
-        while ($thing = $dbejCallActivity->fetchNext()) {
+        while ($thing = $DBEJCallActivity->fetchNext()) {
             $count++;
         }
         return $count;
@@ -11003,10 +10329,10 @@ is currently a balance of ';
 
         $dbeCallActivity->insertRow();
 
-        $dbejCallactivity = new DBEJCallActivity($this);
-        $dbejCallactivity->getRow($dbeCallActivity->getPKValue());
+        $DBEJCallActivity = new DBEJCallActivity($this);
+        $DBEJCallActivity->getRow($dbeCallActivity->getPKValue());
 
-        return $dbejCallactivity;
+        return $DBEJCallActivity;
     }
 
     public function getProblemsByContact($contactID)

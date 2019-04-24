@@ -16,10 +16,12 @@ define('CTROOTCAUSE_ACT_EDIT', 'editRootCause');
 define('CTROOTCAUSE_ACT_DELETE', 'deleteRootCause');
 define('CTROOTCAUSE_ACT_UPDATE', 'updateRootCause');
 
-class CTROOTCAUSE extends CTCNC
+class CTRootCause extends CTCNC
 {
-    var $dsRootCause = '';
-    var $buRootCause = '';
+    /** @var DSForm */
+    public $dsRootCause;
+    /** @var BURootCause */
+    public $buRootCause;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
@@ -38,6 +40,7 @@ class CTROOTCAUSE extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -63,6 +66,7 @@ class CTROOTCAUSE extends CTCNC
     /**
      * Display list of types
      * @access private
+     * @throws Exception
      */
     function displayList()
     {
@@ -71,16 +75,15 @@ class CTROOTCAUSE extends CTCNC
         $this->setTemplateFiles(
             array('RootCauseList' => 'RootCauseList.inc')
         );
-
+        $dsRootCause = new DataSet($this);
         $this->buRootCause->getAll($dsRootCause);
 
-        $urlCreate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTROOTCAUSE_ACT_CREATE
-                )
-            );
+        $urlCreate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTROOTCAUSE_ACT_CREATE
+            )
+        );
 
         $this->template->set_var(
             array('urlCreate' => $urlCreate)
@@ -96,41 +99,39 @@ class CTROOTCAUSE extends CTCNC
 
             while ($dsRootCause->fetchNext()) {
 
-                $rootCauseID = $dsRootCause->getValue('rootCauseID');
+                $rootCauseID = $dsRootCause->getValue(DBERootCause::rootCauseID);
 
                 $urlEdit =
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => CTROOTCAUSE_ACT_EDIT,
+                            'action'      => CTROOTCAUSE_ACT_EDIT,
                             'rootCauseID' => $rootCauseID
                         )
                     );
                 $txtEdit = '[edit]';
 
+                $urlDelete = null;
+                $txtDelete = null;
                 if ($this->buRootCause->canDelete($rootCauseID)) {
                     $urlDelete =
                         Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
-                                'action' => CTROOTCAUSE_ACT_DELETE,
+                                'action'      => CTROOTCAUSE_ACT_DELETE,
                                 'rootCauseID' => $rootCauseID
                             )
                         );
                     $txtDelete = '[delete]';
-                } else {
-                    $urlDelete = '';
-                    $txtDelete = '';
                 }
-
                 $this->template->set_var(
                     array(
                         'rootCauseID' => $rootCauseID,
-                        'description' => Controller::htmlDisplayText($dsRootCause->getValue('description')),
-                        'urlEdit' => $urlEdit,
-                        'urlDelete' => $urlDelete,
-                        'txtEdit' => $txtEdit,
-                        'txtDelete' => $txtDelete
+                        'description' => Controller::htmlDisplayText($dsRootCause->getValue(DBERootCause::description)),
+                        'urlEdit'     => $urlEdit,
+                        'urlDelete'   => $urlDelete,
+                        'txtEdit'     => $txtEdit,
+                        'txtDelete'   => $txtDelete
                     )
                 );
 
@@ -145,6 +146,7 @@ class CTROOTCAUSE extends CTCNC
     /**
      * Edit/Add Further Action
      * @access private
+     * @throws Exception
      */
     function edit()
     {
@@ -157,33 +159,31 @@ class CTROOTCAUSE extends CTCNC
                 $rootCauseID = $_REQUEST['rootCauseID'];
             } else {                                                                    // creating new
                 $dsRootCause->initialise();
-                $dsRootCause->setValue('rootCauseID', '0');
+                $dsRootCause->setValue(DBERootCause::rootCauseID, '0');
                 $rootCauseID = '0';
             }
         } else {                                                                        // form validation error
             $dsRootCause->initialise();
             $dsRootCause->fetchNext();
-            $rootCauseID = $dsRootCause->getValue('rootCauseID');
+            $rootCauseID = $dsRootCause->getValue(DBERootCause::rootCauseID);
         }
+        $urlDelete = null;
+        $txtDelete = null;
         if ($_REQUEST['action'] == CTROOTCAUSE_ACT_EDIT && $this->buRootCause->canDelete($_REQUEST['rootCauseID'])) {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTROOTCAUSE_ACT_DELETE,
-                        'rootCauseID' => $rootCauseID
-                    )
-                );
+            $urlDelete = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'      => CTROOTCAUSE_ACT_DELETE,
+                    'rootCauseID' => $rootCauseID
+                )
+            );
             $txtDelete = 'Delete';
-        } else {
-            $urlDelete = '';
-            $txtDelete = '';
         }
         $urlUpdate =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => CTROOTCAUSE_ACT_UPDATE,
+                    'action'      => CTROOTCAUSE_ACT_UPDATE,
                     'rootCauseID' => $rootCauseID
                 )
             );
@@ -200,15 +200,23 @@ class CTROOTCAUSE extends CTCNC
         );
         $this->template->set_var(
             array(
-                'rootCauseID' => $rootCauseID,
-                'description' => Controller::htmlInputText($dsRootCause->getValue('description')),
-                'descriptionMessage' => Controller::htmlDisplayText($dsRootCause->getMessage('description')),
-                'longDescription' => Controller::htmlInputText($dsRootCause->getValue('longDescription')),
-                'longDescriptionMessage' => Controller::htmlDisplayText($dsRootCause->getMessage('longDescription')),
-                'urlUpdate' => $urlUpdate,
-                'urlDelete' => $urlDelete,
-                'txtDelete' => $txtDelete,
-                'urlDisplayList' => $urlDisplayList
+                'rootCauseID'            => $rootCauseID,
+                'description'            => Controller::htmlInputText(
+                    $dsRootCause->getValue(DBERootCause::description)
+                ),
+                'descriptionMessage'     => Controller::htmlDisplayText(
+                    $dsRootCause->getMessage(DBERootCause::description)
+                ),
+                'longDescription'        => Controller::htmlInputText(
+                    $dsRootCause->getValue(DBERootCause::longDescription)
+                ),
+                'longDescriptionMessage' => Controller::htmlDisplayText(
+                    $dsRootCause->getMessage(DBERootCause::longDescription)
+                ),
+                'urlUpdate'              => $urlUpdate,
+                'urlDelete'              => $urlDelete,
+                'txtDelete'              => $txtDelete,
+                'urlDisplayList'         => $urlDisplayList
             )
         );
         $this->template->parse('CONTENTS', 'RootCauseEdit', true);
@@ -218,14 +226,14 @@ class CTROOTCAUSE extends CTCNC
     /**
      * Update call Further Action details
      * @access private
+     * @throws Exception
      */
     function update()
     {
         $this->setMethodName('update');
-        $dsRootCause = &$this->dsRootCause;
         $this->formError = (!$this->dsRootCause->populateFromArray($_REQUEST['rootCause']));
         if ($this->formError) {
-            if ($this->dsRootCause->getValue('rootCauseID') == '') {                    // attempt to insert
+            if ($this->dsRootCause->getValue(DBERootCause::rootCauseID)) {
                 $_REQUEST['action'] = CTROOTCAUSE_ACT_EDIT;
             } else {
                 $_REQUEST['action'] = CTROOTCAUSE_ACT_CREATE;
@@ -237,11 +245,12 @@ class CTROOTCAUSE extends CTCNC
         $this->buRootCause->updateRootCause($this->dsRootCause);
 
         $urlNext =
-            Controller::buildLink($_SERVER['PHP_SELF'],
-                             array(
-                                 'rootCauseID' => $this->dsRootCause->getValue('rootCauseID'),
-                                 'action' => CTCNC_ACT_VIEW
-                             )
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'rootCauseID' => $this->dsRootCause->getValue(DBERootCause::rootCauseID),
+                    'action'      => CTCNC_ACT_VIEW
+                )
             );
         header('Location: ' . $urlNext);
     }
@@ -251,6 +260,7 @@ class CTROOTCAUSE extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function delete()
     {
@@ -270,5 +280,4 @@ class CTROOTCAUSE extends CTCNC
             exit;
         }
     }
-}// end of class
-?>
+}

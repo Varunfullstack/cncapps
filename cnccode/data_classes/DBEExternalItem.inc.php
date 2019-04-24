@@ -46,7 +46,7 @@ class DBEExternalItem extends DBEntity
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('customerID') . "='" . mysqli_real_escape_string(
+            " WHERE " . $this->getDBColumnName(self::customerID) . "='" . mysqli_real_escape_string(
                 $this->db->link_id(),
                 $customerID
             );

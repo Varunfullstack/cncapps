@@ -15,6 +15,7 @@ require_once($cfg['path_dbe'] . '/DBECustomerItemDocument.inc.php');
 require_once($cfg['path_bu'] . '/BUPDFSupportContract.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
+require_once($cfg['path_dbe'] . '/DBEWarranty.inc.php');
 // Messages
 define(
     'CTCUSTOMERITEM_MSG_CUSTOMER_ITEM_NOT_FND',
@@ -226,7 +227,7 @@ class CTCustomerItem extends CTCNC
                 3000                            // row count limit
             );
         }
-        if ($_REQUEST['CSV'] != '') {
+        if ($_REQUEST['CSV']) {
             $this->generateCSV();
         } else {
             $this->displaySearchForm();
@@ -269,7 +270,7 @@ class CTCustomerItem extends CTCNC
             $this->buCustomerItem->initialiseSearchForm($dsSearchForm);
         }
         $customerString = null;
-        if ($dsSearchForm->getValue(DBECustomerItem::customerID) != '') {
+        if ($dsSearchForm->getValue(DBECustomerItem::customerID)) {
             $buCustomer = new BUCustomer($this);
             $dsCustomer = new DataSet($this);
             $buCustomer->getCustomerByID(
@@ -286,7 +287,9 @@ class CTCustomerItem extends CTCNC
                     $dsSearchForm->getValue(DBECustomerItem::customerItemID)
                 ),
                 'ordheadID'        => Controller::htmlDisplayText($dsSearchForm->getValue(DBECustomerItem::ordheadID)),
-                'ordheadIDMessage' => Controller::htmlDisplayText($dsSearchForm->getMessage('ordheadID')),
+                'ordheadIDMessage' => Controller::htmlDisplayText(
+                    $dsSearchForm->getMessage(BUCustomerItem::searchFormOrdheadID)
+                ),
                 'serialNo'         => Controller::htmlDisplayText($dsSearchForm->getValue(DBECustomerItem::serialNo)),
                 'itemText'         => Controller::htmlDisplayText(
                     $dsSearchForm->getValue(BUCustomerItem::searchFormItemText)
@@ -301,7 +304,7 @@ class CTCustomerItem extends CTCNC
         $this->template->set_block(
             'CustomerItemSearch',
             'renewalStatusBlock',
-            'renewalStatuss'
+            'renewalStatus'
         );
         $this->parseRenewalSelector($dsSearchForm->getValue(BUCustomerItem::searchFormRenewalStatus));
         // Lines section
@@ -313,12 +316,12 @@ class CTCustomerItem extends CTCNC
                 'items'
             );
 
-            $siteCol = $this->dsCustomerItem->columnExists('siteDescription');
-            $customerNameCol = $this->dsCustomerItem->columnExists('customerName');
-            $serialNoCol = $this->dsCustomerItem->columnExists('serialNo');
-            $itemDescriptionCol = $this->dsCustomerItem->columnExists('itemDescription');
-            $customerItemIDCol = $this->dsCustomerItem->columnExists('customerItemID');
-            $serverNameCol = $this->dsCustomerItem->columnExists('serverName');
+            $siteCol = $this->dsCustomerItem->columnExists(DBEJCustomerItem::siteDescription);
+            $customerNameCol = $this->dsCustomerItem->columnExists(DBEJCustomerItem::customerName);
+            $serialNoCol = $this->dsCustomerItem->columnExists(DBECustomerItem::serialNo);
+            $itemDescriptionCol = $this->dsCustomerItem->columnExists(DBEJCustomerItem::itemDescription);
+            $customerItemIDCol = $this->dsCustomerItem->columnExists(DBECustomerItem::customerItemID);
+            $serverNameCol = $this->dsCustomerItem->columnExists(DBECustomerItem::serverName);
 
 
             if (
@@ -338,15 +341,12 @@ class CTCustomerItem extends CTCNC
 
                 $urlItem = $this->getContractUrl($this->dsCustomerItem);
 
+                $checkBox = null;
                 if (
                 $dsSearchForm->getValue(BUCustomerItem::searchFormCustomerID)
                 ) {
-                    $checkBox =
-                        '<input type="checkbox" id="salesOrder" name="customerItemIDs[' . $customerItemID . ']" value="' . $customerItemID . '" />';
-                } else {
-                    $checkBox = '';
+                    $checkBox = '<input type="checkbox" id="salesOrder" name="customerItemIDs[' . $customerItemID . ']" value="' . $customerItemID . '" />';
                 }
-
                 $contracts = $this->buCustomerItem->getContractDescriptionsByCustomerItemId($customerItemID);
 
                 $this->template->set_var(
@@ -440,7 +440,7 @@ class CTCustomerItem extends CTCNC
             "\r\n",
             " ",
             $value
-        );      // remove carrage returns
+        );      // remove carriage returns
         $value = str_replace(
             "\"",
             "",
@@ -531,7 +531,7 @@ class CTCustomerItem extends CTCNC
     function parseRenewalSelector($renewalStatus)
     {
         foreach ($this->renewalStatusArray as $key => $value) {
-            $renewalStatusSelected = ($renewalStatus == $key) ? CT_SELECTED : '';
+            $renewalStatusSelected = ($renewalStatus == $key) ? CT_SELECTED : null;
             $this->template->set_var(
                 array(
                     'renewalStatusSelected'    => $renewalStatusSelected,
@@ -540,7 +540,7 @@ class CTCustomerItem extends CTCNC
                 )
             );
             $this->template->parse(
-                'renewalStatuss',
+                'renewalStatus',
                 'renewalStatusBlock',
                 true
             );
@@ -557,7 +557,7 @@ class CTCustomerItem extends CTCNC
     {
         foreach ($this->secondsiteImageDelayDays as $key => $value) {
 
-            $delayDaysSelected = ($delayDays == $key) ? CT_SELECTED : '';
+            $delayDaysSelected = ($delayDays == $key) ? CT_SELECTED : null;
             $this->template->set_var(
                 array(
                     'delayDaysSelected'    => $delayDaysSelected,
@@ -575,6 +575,7 @@ class CTCustomerItem extends CTCNC
 
     /**
      * Display the popup selector form
+     * @throws Exception
      */
     function displayItemSelectPopup()
     {
@@ -860,7 +861,7 @@ class CTCustomerItem extends CTCNC
                 )
             );
 
-        $secondSiteLocationPathValidationText = '';
+        $secondSiteLocationPathValidationText = null;
         if ($dsCustomerItem->getValue(DBEJCustomerItem::secondsiteLocationPath)) {
             /*
             validate 2nd site location path
@@ -870,7 +871,7 @@ class CTCustomerItem extends CTCNC
             }
         }
 
-        $secondSiteReplicationPathValidationText = '';
+        $secondSiteReplicationPathValidationText = null;
         if ($dsCustomerItem->getValue(DBECustomerItem::secondSiteReplicationPath)) {
             if (!file_exists($dsCustomerItem->getValue(DBECustomerItem::secondSiteReplicationPath))) {
                 $secondSiteReplicationPathValidationText = 'Location is not available';
@@ -878,10 +879,10 @@ class CTCustomerItem extends CTCNC
         }
 
         /* Default to enable 2ndSite fields */
-        $secondsiteReadonly = '';
-        $secondsiteDisabled = '';
-        $secondsiteReplicationReadonly = "";
-        $secondsiteReplicationDisabled = "";
+        $secondsiteReadonly = null;
+        $secondsiteDisabled = null;
+        $secondsiteReplicationReadonly = null;
+        $secondsiteReplicationDisabled = null;
 
         $secondsiteLocalExcludeFlagShow = 0;
         $secondSiteReplicationExcludeFlagShow = 0;
@@ -912,6 +913,7 @@ class CTCustomerItem extends CTCNC
 
         $buUser = new BUUser($this);
 
+        $suspendedByText = null;
         if (
             $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteValidationSuspendUntilDate) &&
             $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteSuspendedByUserID)
@@ -925,10 +927,9 @@ class CTCustomerItem extends CTCNC
             $suspendedByText =
                 $dsUser->getValue(DBEUser::name) . ' on ' .
                 Controller::dateYMDtoDMY($dsCustomerItem->getValue(DBEJCustomerItem::secondsiteSuspendedDate));
-        } else {
-            $suspendedByText = '';
         }
 
+        $imageDelayByText = null;
         if (
             $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteImageDelayDays) > '0' &&
             $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteImageDelayUserID)
@@ -941,10 +942,7 @@ class CTCustomerItem extends CTCNC
             $imageDelayByText =
                 $dsUser->getValue(DBEUser::name) . ' on ' .
                 Controller::dateYMDtoDMY($dsCustomerItem->getValue(DBEJCustomerItem::secondsiteImageDelayDate));
-        } else {
-            $imageDelayByText = '';
         }
-
         $this->template->set_var(
             array(
                 'urlSubmit'                                   => $urlSubmit,
@@ -984,43 +982,43 @@ class CTCustomerItem extends CTCNC
                     $dsCustomerItem->getValue(DBEJCustomerItem::ordheadID)
                 ),
                 'ordheadIDMessage'                            => Controller::htmlDisplayText(
-                    $dsCustomerItem->getMessage('ordheadID')
+                    $dsCustomerItem->getMessage(DBECustomerItem::ordheadID)
                 ),
                 'porheadID'                                   => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::porheadID)
                 ),
                 'porheadIDMessage'                            => Controller::htmlDisplayText(
-                    $dsCustomerItem->getMessage('porheadID')
+                    $dsCustomerItem->getMessage(DBECustomerItem::porheadID)
                 ),
                 'curUnitSale'                                 => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::curUnitSale)
                 ),
                 'curUnitSaleMessage'                          => Controller::htmlDisplayText(
-                    $dsCustomerItem->getMessage('curUnitSale')
+                    $dsCustomerItem->getMessage(DBECustomerItem::curUnitSale)
                 ),
                 'curUnitCost'                                 => $dsCustomerItem->getValue(
                     DBEJCustomerItem::curUnitCost
                 ),
                 'curUnitCostMessage'                          => Controller::htmlDisplayText(
-                    $dsCustomerItem->getMessage('curUnitCost')
+                    $dsCustomerItem->getMessage(DBECustomerItem::curUnitCost)
                 ),
                 'sOrderDate'                                  => Controller::dateYMDtoDMY(
                     $dsCustomerItem->getValue(DBEJCustomerItem::sOrderDate)
                 ),
                 'sOrderDateMessage'                           => Controller::htmlDisplayText(
-                    $dsCustomerItem->getMessage('sOrderDate')
+                    $dsCustomerItem->getMessage(DBECustomerItem::sOrderDate)
                 ),
                 'expiryDate'                                  => Controller::dateYMDtoDMY(
                     $dsCustomerItem->getValue(DBEJCustomerItem::expiryDate)
                 ),
                 'expiryDateMessage'                           => Controller::htmlDisplayText(
-                    $dsCustomerItem->getMessage('expiryDate')
+                    $dsCustomerItem->getMessage(DBECustomerItem::expiryDate)
                 ),
                 'curGSCBalance'                               => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::curGSCBalance)
                 ),
                 'curGSCBalanceMessage'                        => Controller::htmlDisplayText(
-                    $dsCustomerItem->getMessage('curGSCBalance')
+                    $dsCustomerItem->getMessage(DBECustomerItem::curGSCBalance)
                 ),
                 'customerItemNotes'                           => Controller::htmlTextArea(
                     $dsCustomerItem->getValue(DBEJCustomerItem::customerItemNotes)
@@ -1035,13 +1033,13 @@ class CTCustomerItem extends CTCNC
                     $dsCustomerItem->getValue(DBEJCustomerItem::despatchDate)
                 ),
                 'despatchDateMessage'                         => Controller::htmlDisplayText(
-                    $dsCustomerItem->getMessage('despatchDate')
+                    $dsCustomerItem->getMessage(DBECustomerItem::despatchDate)
                 ),
                 'secondsiteLocationPath'                      => $dsCustomerItem->getValue(
                     DBEJCustomerItem::secondsiteLocationPath
                 ),
                 'secondsiteLocationPathMessage'               => Controller::htmlDisplayText(
-                    $dsCustomerItem->getMessage('secondsiteLocationPath')
+                    $dsCustomerItem->getMessage(DBECustomerItem::secondsiteLocationPath)
                 ),
                 'secondSiteReplicationPath'                   => $dsCustomerItem->getValue(
                     DBECustomerItem::secondSiteReplicationPath
@@ -1053,7 +1051,7 @@ class CTCustomerItem extends CTCNC
                     $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteValidationSuspendUntilDate)
                 ),
                 'secondsiteValidationSuspendUntilDateMessage' => Controller::htmlDisplayText(
-                    $dsCustomerItem->getMessage('secondsiteValidationSuspendUntilDate')
+                    $dsCustomerItem->getMessage(DBECustomerItem::secondsiteValidationSuspendUntilDate)
                 ),
 
                 'suspendedByText' => $suspendedByText,
@@ -1064,7 +1062,7 @@ class CTCustomerItem extends CTCNC
                     $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteImageDelayDays)
                 ),
                 'secondsiteImageDelayDaysMessage'         => Controller::htmlDisplayText(
-                    $dsCustomerItem->getMessage('secondsiteImageDelayDays')
+                    $dsCustomerItem->getMessage(DBECustomerItem::secondsiteImageDelayDays)
                 ),
                 'secondSiteLocationPathValidationText'    => $secondSiteLocationPathValidationText,
                 'secondSiteReplicationPathValidationText' => $secondSiteReplicationPathValidationText,
@@ -1102,7 +1100,7 @@ class CTCustomerItem extends CTCNC
         $this->template->set_block(
             'CustomerItemDisplay',
             'renewalStatusBlock',
-            'renewalStatuss'
+            'renewalStatus'
         );
         $this->parseRenewalSelector($dsCustomerItem->getValue(DBEJCustomerItem::renewalStatus));
 
@@ -1161,6 +1159,8 @@ class CTCustomerItem extends CTCNC
                             'secondsiteImageID' => $dsSecondsiteImage->getValue(DBESecondsiteImage::secondsiteImageID)
                         )
                     );
+                $imageTime = null;
+                $imageAgeDays = null;
 
                 if ($dsSecondsiteImage->getValue(DBESecondsiteImage::status) && $dsSecondsiteImage->getValue(
                         DBESecondsiteImage::imageTime
@@ -1175,11 +1175,9 @@ class CTCustomerItem extends CTCNC
                         (time() - strtotime($dsSecondsiteImage->getValue(DBESecondsiteImage::imageTime))) / 86400,
                         0
                     );
-                } else {
-                    $imageTime = '';
-                    $imageAgeDays = '';
                 }
 
+                $replicationImageAgeDays = null;
                 if ($dsSecondsiteImage->getValue(DBESecondsiteImage::replicationStatus) && $dsSecondsiteImage->getValue(
                         DBESecondsiteImage::replicationImageTime
                     ) > 0) {
@@ -1189,10 +1187,7 @@ class CTCustomerItem extends CTCNC
                             )) / 86400,
                         0
                     );
-                } else {
-                    $replicationImageAgeDays = '';
                 }
-
                 $this->template->set_var(
                     array(
                         'secondsiteImageID'         => $dsSecondsiteImage->getValue(
@@ -1405,10 +1400,18 @@ class CTCustomerItem extends CTCNC
                 'itemDescription'     => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::itemDescription)
                 ),
-                'descriptionMessage'  => Controller::htmlDisplayText($dsCustomerItem->getMessage('itemID')),
-                'customerNameMessage' => Controller::htmlDisplayText($dsCustomerItem->getMessage('customerID')),
-                'siteDescMessage'     => Controller::htmlDisplayText($dsCustomerItem->getMessage('siteNo')),
-                'serialNoMessage'     => Controller::htmlDisplayText($dsCustomerItem->getMessage('serialNo')),
+                'descriptionMessage'  => Controller::htmlDisplayText(
+                    $dsCustomerItem->getMessage(DBECustomerItem::itemID)
+                ),
+                'customerNameMessage' => Controller::htmlDisplayText(
+                    $dsCustomerItem->getMessage(DBECustomerItem::customerID)
+                ),
+                'siteDescMessage'     => Controller::htmlDisplayText(
+                    $dsCustomerItem->getMessage(DBECustomerItem::siteNo)
+                ),
+                'serialNoMessage'     => Controller::htmlDisplayText(
+                    $dsCustomerItem->getMessage(DBECustomerItem::serialNo)
+                ),
             )
         );
         $this->template->parse(
@@ -1442,7 +1445,7 @@ class CTCustomerItem extends CTCNC
     function parseWarrantySelector($warrantyID)
     {
         // Manufacturer selector
-        require_once($GLOBALS['cfg']['path_dbe'] . '/DBEWarranty.inc.php');
+
         $dbeWarranty = new DBEWarranty($this);
         $dbeWarranty->getRows();
         $this->template->set_block(
@@ -1457,7 +1460,7 @@ class CTCustomerItem extends CTCNC
                     'warrantyID'          => $dbeWarranty->getValue(DBEWarranty::warrantyID),
                     'warrantySelected'    => ($warrantyID == $dbeWarranty->getValue(
                             DBEWarranty::warrantyID
-                        )) ? CT_SELECTED : ''
+                        )) ? CT_SELECTED : null
                 )
             );
             $this->template->parse(
@@ -1600,7 +1603,7 @@ class CTCustomerItem extends CTCNC
         $this->setMethodName('viewDocument');
         $dbeCustomerItemDocument = new DBECustomerItemDocument($this);
         if (!$dbeCustomerItemDocument->getRow($_REQUEST['customerItemDocumentID'])) {
-            $this->displayFatalError('Acrivity file not found.');
+            $this->displayFatalError('Activity file not found.');
         }
         if ($dbeCustomerItemDocument->getValue(DBEJCustomerItemDocument::fileMIMEType) != 'application/pdf') {
             return $this->getFile();
@@ -1643,10 +1646,10 @@ class CTCustomerItem extends CTCNC
     function uploadDocument()
     {
         // validate
-        if ($_REQUEST['uploadDescription'] == '') {
+        if (!$_REQUEST['uploadDescription']) {
             $this->setFormErrorMessage('Please enter a description');
         }
-        if ($_FILES['userfile']['name'] == '') {
+        if (!$_FILES['userfile']['name']) {
             $this->setFormErrorMessage('Please enter a file path');
         }
         if (!is_uploaded_file($_FILES['userfile']['tmp_name'])) {                    // Possible hack?

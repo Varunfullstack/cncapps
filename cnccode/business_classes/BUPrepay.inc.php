@@ -7,9 +7,6 @@
  */
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_gc"] . "/Controller.inc.php");
-require_once($cfg ["path_dbe"] . "/DBECustomerCallActivity.inc.php");
-require_once($cfg ["path_dbe"] . "/DBECustomerCallActivityMonth.inc.php");
-require_once($cfg ["path_dbe"] . "/DBECurrentActivity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActivity.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg ["path_dbe"] . "/DBEProblem.inc.php");
@@ -33,20 +30,45 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 class BUPrepay extends Business
 {
-    /**
-     *
-     * @var DBEProblem
-     */
-    private $dbeProblem = '';
-    private $dbeUser = '';
-    private $buCustomer = '';
-    private $dsHeader = '';
-    private $dsData = '';
+
+    const exportDataSetEndDate = "endDate";
+    const exportDataSetPreviewRun = "previewRun";
+
+    const exportPrePayCustomerName = "customerName";
+    const exportPrePayPreviousBalance = "previousBalance";
+    const exportPrePayCurrentBalance = "currentBalance";
+    const exportPrePayExpiryDate = "expiryDate";
+    const exportPrePayTopUp = "topUp";
+    const exportPrePayContacts = "contacts";
+    const exportPrePayContractType = "contractType";
+    const exportPrePayWebFileLink = "webFileLink";
+
+
+    /** @var DBEUser */
+    private $dbeUser;
+    /** @var BUCustomer */
+    private $buCustomer;
+    /** @var DataSet|DBEHeader */
+    private $dsHeader;
+    /** @var DSForm */
+    private $dsData;
     private $updateFlag = false;
+    /**
+     * @var DBEJCallActivity
+     */
+    public $dbeJCallActivity;
+    /**
+     * @var bool|float|int|string
+     */
+    private $standardVatRate;
+    private $totalCost;
+    /** @var Template */
+    private $template;
 
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -54,8 +76,8 @@ class BUPrepay extends Business
         $this->dbeJCallActivity = new DBEJCallActivity ($this);
         $this->dbeUser = new DBEUser ($this);
         $buHeader = new BUHeader ($this);
+        $this->dsHeader = new DataSet($this);
         $buHeader->getHeader($this->dsHeader);
-        $this->dsHeader->fetchNext();
         $this->buCustomer = new BUCustomer ($this);
     }
 
@@ -63,10 +85,10 @@ class BUPrepay extends Business
     {
         $this->setMethodName('initialiseExportDataset');
         $dsData = new DSForm ($this);
-        $dsData->addColumn('endDate', DA_DATE, DA_ALLOW_NULL);
-        $dsData->addColumn('previewRun', DA_YN_FLAG, DA_ALLOW_NULL);
+        $dsData->addColumn(self::exportDataSetEndDate, DA_DATE, DA_ALLOW_NULL);
+        $dsData->addColumn(self::exportDataSetPreviewRun, DA_YN_FLAG, DA_ALLOW_NULL);
         $dsData->setUpdateModeUpdate();
-        $dsData->setValue('previewRun', 'Y');
+        $dsData->setValue(self::exportDataSetPreviewRun, 'Y');
         $dsData->post();
 
     }
@@ -80,19 +102,19 @@ class BUPrepay extends Business
         $this->updateFlag = $updateFlag;
 
         $dsResults = new DataSet ($this);
-        $dsResults->addColumn('customerName', DA_DATE, DA_ALLOW_NULL);
-        $dsResults->addColumn('previousBalance', DA_FLOAT, DA_ALLOW_NULL);
-        $dsResults->addColumn('currentBalance', DA_FLOAT, DA_ALLOW_NULL);
-        $dsResults->addColumn('expiryDate', DA_STRING, DA_ALLOW_NULL);
-        $dsResults->addColumn('topUp', DA_FLOAT, DA_ALLOW_NULL);
-        $dsResults->addColumn('contacts', DA_STRING, DA_ALLOW_NULL);
-        $dsResults->addColumn('contractType', DA_STRING, DA_ALLOW_NULL);
-        $dsResults->addColumn('webFileLink', DA_STRING, DA_ALLOW_NULL); // link to statement
+        $dsResults->addColumn(self::exportPrePayCustomerName, DA_DATE, DA_ALLOW_NULL);
+        $dsResults->addColumn(self::exportPrePayPreviousBalance, DA_FLOAT, DA_ALLOW_NULL);
+        $dsResults->addColumn(self::exportPrePayCurrentBalance, DA_FLOAT, DA_ALLOW_NULL);
+        $dsResults->addColumn(self::exportPrePayExpiryDate, DA_STRING, DA_ALLOW_NULL);
+        $dsResults->addColumn(self::exportPrePayTopUp, DA_FLOAT, DA_ALLOW_NULL);
+        $dsResults->addColumn(self::exportPrePayContacts, DA_STRING, DA_ALLOW_NULL);
+        $dsResults->addColumn(self::exportPrePayContractType, DA_STRING, DA_ALLOW_NULL);
+        $dsResults->addColumn(self::exportPrePayWebFileLink, DA_STRING, DA_ALLOW_NULL); // link to statement
 
 
         $dbeVat = new DBEVat($this);
         $dbeVat->getRow();
-        $vatCode = $this->dsHeader->getValue('stdVATCode');
+        $vatCode = $this->dsHeader->getValue(DBEHeader::stdVATCode);
         $this->standardVatRate = $dbeVat->getValue((integer)$vatCode[1]); // use second part of code as column no
 
         $db = new dbSweetcode (); // database connection for query
@@ -106,9 +128,11 @@ class BUPrepay extends Business
       custitem
 			JOIN customer ON customer.cus_custno = custitem.cui_custno
 		WHERE
-      cui_itemno = " . $this->dsHeader->getValue('gscItemID') .
-            " AND cui_expiry_date >= '" . $this->dsData->getValue('endDate') . "'" .
-            " AND cui_desp_date <= '" . $this->dsData->getValue('endDate') . "'" . // and the contract has started
+      cui_itemno = " . $this->dsHeader->getValue(DBEHeader::gscItemID) .
+            " AND cui_expiry_date >= '" . $this->dsData->getValue(self::exportDataSetEndDate) . "'" .
+            " AND cui_desp_date <= '" . $this->dsData->getValue(
+                self::exportDataSetEndDate
+            ) . "'" . // and the contract has started
             " AND cui_expiry_date >= now()" . // and is not expired
             " AND	cus_custno <> " . CONFIG_SALES_STOCK_CUSTOMERID .
             " AND	renewalStatus  <> 'D'";
@@ -152,9 +176,15 @@ class BUPrepay extends Business
         JOIN itemtype
           ON ity_itemtypeno = itm_itemtypeno
           
-      WHERE itm_itemno = " . $this->dsHeader->getValue('gscItemID') .              // Activity logged against PrePay contract
-            " AND DATE(pro_fixed_date) <= '" . $this->dsData->getValue('endDate') . "'" .   // Request was raised before run date
-            " AND cui_desp_date <= '" . $this->dsData->getValue('endDate') . "'" .     // Contract had started before run date
+      WHERE itm_itemno = " . $this->dsHeader->getValue(
+                DBEHeader::gscItemID
+            ) .              // Activity logged against PrePay contract
+            " AND DATE(pro_fixed_date) <= '" . $this->dsData->getValue(
+                self::exportDataSetEndDate
+            ) . "'" .   // Request was raised before run date
+            " AND cui_desp_date <= '" . $this->dsData->getValue(
+                self::exportDataSetEndDate
+            ) . "'" .     // Contract had started before run date
             " AND cui_expiry_date >= NOW() " .                                      // Contract not expired
             " AND pro_custno <> " . CONFIG_SALES_STOCK_CUSTOMERID .                 // Not CNC sales stock customer
             " AND renewalStatus <> 'D' " .                                          // Contract renewal not declined
@@ -165,7 +195,7 @@ class BUPrepay extends Business
             " AND pro_status = 'C'" .                                                // Service Request completed
             " AND caa_status = 'C'" .                                                // Activity completed
             " AND
-          ( caa_starttime <> caa_endtime OR curValue <> 0 )" .                   // time was logged or this is a value (e.g. topup)
+          ( caa_starttime <> caa_endtime OR curValue <> 0 )" .                   // time was logged or this is a value (e.g. topUp)
             " GROUP BY pro_problemno
       ORDER BY pro_custno, pro_problemno, pro_date_raised";
 
@@ -177,14 +207,17 @@ class BUPrepay extends Business
 
         // ensure all customers have at least one statement contact
         $last_custno = '9999';
-
+        $htmlFileHandle = null;
         while ($db->next_record()) {
 
             if ($db->Record ['custno'] != $last_custno) {
                 if ($last_custno != '9999') {
+                    $dsStatementContact = new DataSet($this);
                     $buContact->getGSCContactByCustomerID($db->Record ['custno'], $dsStatementContact);
                     if (!is_object($dsStatementContact)) {
-                        $this->raiseError('Customer ' . $db->Record ['cus_name'] . ' needs at least one Pre-pay statement contact.');
+                        $this->raiseError(
+                            'Customer ' . $db->Record ['cus_name'] . ' needs at least one Pre-pay statement contact.'
+                        );
                         exit ();
                     }
                 }
@@ -195,6 +228,7 @@ class BUPrepay extends Business
         $db->query($queryString);
 
         $last_custno = '9999';
+        $filepath = null;
 
         while ($db->next_record()) {
 
@@ -207,12 +241,12 @@ class BUPrepay extends Business
 
                 if ($last_custno != '9999') {
 
-                    $topupValue = $this->doTopUp($lastRecord);
+                    $topUpValue = $this->doTopUp($lastRecord);
                     $newBalance = $lastRecord ['curGSCBalance'] + $this->totalCost;
                     $this->template->set_var(
                         array(
-                            'totalCost' => common_numberFormat($this->totalCost),
-                            'previousBalance' => common_numberFormat($lastRecord ['curGSCBalance']),
+                            'totalCost'        => common_numberFormat($this->totalCost),
+                            'previousBalance'  => common_numberFormat($lastRecord ['curGSCBalance']),
                             'remainingBalance' => common_numberFormat($newBalance)
                         )
                     );
@@ -227,8 +261,8 @@ class BUPrepay extends Business
                         $dsResults,
                         $dsStatementContact,
                         $newBalance,
-                        $topupValue,
-                        $this->dsData->getValue('endDate')
+                        $topUpValue,
+                        $this->dsData->getValue(self::exportDataSetEndDate)
                     );
 
                     $dsStatementContact->initialise();
@@ -241,8 +275,8 @@ class BUPrepay extends Business
                             $last_custno,
                             $dsStatementContact,
                             $newBalance,
-                            $this->dsData->getValue('endDate'),
-                            $topupValue
+                            $this->dsData->getValue(self::exportDataSetEndDate),
+                            $topUpValue
                         );
 
                     }
@@ -253,9 +287,11 @@ class BUPrepay extends Business
                 $this->totalCost = 0; // reset cost
 
 
-                $filepath = SAGE_EXPORT_DIR . '/PP_' . substr($db->Record ['cus_name'],
-                                                              0,
-                                                              20) . $this->dsData->getValue('endDate');
+                $filepath = SAGE_EXPORT_DIR . '/PP_' . substr(
+                        $db->Record ['cus_name'],
+                        0,
+                        20
+                    ) . $this->dsData->getValue(self::exportDataSetEndDate);
 
                 $htmlFileHandle = fopen($filepath . '.html', 'wb');
                 if (!$htmlFileHandle) {
@@ -267,30 +303,35 @@ class BUPrepay extends Business
                 $this->template->set_file('page', 'PrepayReport.inc.html');
                 // get GSC contact record
                 $buContact->getGSCContactByCustomerID($db->Record ['custno'], $dsStatementContact);
-                $this->buCustomer->getSiteByCustomerIDSiteNo($dsStatementContact->getValue('customerID'),
-                                                             $dsStatementContact->getValue('siteNo'),
-                                                             $dsSite);
+                $dsSite = new DataSet($this);
+                $this->buCustomer->getSiteByCustomerIDSiteNo(
+                    $dsStatementContact->getValue(DBEContact::customerID),
+                    $dsStatementContact->getValue(DBEContact::siteNo),
+                    $dsSite
+                );
 
                 // Set header fields
                 $this->template->set_var(
                     array(
-                        'companyName' => $db->Record ['cus_name'],
-                        'customerRef' => $db->Record ['cui_cuino'],
-                        'statementDate' => Controller::dateYMDtoDMY($this->dsData->getValue('endDate')),
-                        'add1' => $dsSite->getValue(DBESite::add1),
-                        'add2' => $dsSite->getValue(DBESite::add2),
-                        'add3' => $dsSite->getValue(DBESite::add3),
-                        'town' => $dsSite->getValue(DBESite::town),
-                        'county' => $dsSite->getValue(DBESite::county),
-                        'postcode' => $dsSite->getValue(DBESite::postcode),
-                        'cnc_name' => $this->dsHeader->getValue('name'),
-                        'cnc_add1' => $this->dsHeader->getValue('add1'),
-                        'cnc_add2' => $this->dsHeader->getValue('add2'),
-                        'cnc_add3' => $this->dsHeader->getValue('add3'),
-                        'cnc_town' => $this->dsHeader->getValue('town'),
-                        'cnc_county' => $this->dsHeader->getValue('county'),
-                        'cnc_postcode' => $this->dsHeader->getValue('postcode'),
-                        'cnc_phone' => $this->dsHeader->getValue('phone')
+                        'companyName'   => $db->Record ['cus_name'],
+                        'customerRef'   => $db->Record ['cui_cuino'],
+                        'statementDate' => Controller::dateYMDtoDMY(
+                            $this->dsData->getValue(self::exportDataSetEndDate)
+                        ),
+                        'add1'          => $dsSite->getValue(DBESite::add1),
+                        'add2'          => $dsSite->getValue(DBESite::add2),
+                        'add3'          => $dsSite->getValue(DBESite::add3),
+                        'town'          => $dsSite->getValue(DBESite::town),
+                        'county'        => $dsSite->getValue(DBESite::county),
+                        'postcode'      => $dsSite->getValue(DBESite::postcode),
+                        'cnc_name'      => $this->dsHeader->getValue(DBEHeader::name),
+                        'cnc_add1'      => $this->dsHeader->getValue(DBEHeader::add1),
+                        'cnc_add2'      => $this->dsHeader->getValue(DBEHeader::add2),
+                        'cnc_add3'      => $this->dsHeader->getValue(DBEHeader::add3),
+                        'cnc_town'      => $this->dsHeader->getValue(DBEHeader::town),
+                        'cnc_county'    => $this->dsHeader->getValue(DBEHeader::county),
+                        'cnc_postcode'  => $this->dsHeader->getValue(DBEHeader::postcode),
+                        'cnc_phone'     => $this->dsHeader->getValue(DBEHeader::phone)
                     )
                 );
 
@@ -298,17 +339,7 @@ class BUPrepay extends Business
 
                 $last_custno = $db->Record ['custno'];
                 $ret = TRUE; // indicates there were statements to export
-
-
-            } // end if ( $db->Record['custno'] != $last_custno )
-
-
-            $posted = FALSE;
-
-            /*
-            Loop around the activities in this request, totaling the values
-            */
-
+            }
             $lastRecord = $db->Record;
 
             $this->getActivitiesByServiceRequest($db->Record);
@@ -317,12 +348,12 @@ class BUPrepay extends Business
         //close file
 
         if ($ret == TRUE) {
-            $topupValue = $this->doTopUp($lastRecord);
+            $topUpValue = $this->doTopUp($lastRecord);
             $newBalance = $lastRecord ['curGSCBalance'] + $this->totalCost;
             $this->template->set_var(
                 array(
-                    'totalCost' => common_numberFormat($this->totalCost),
-                    'previousBalance' => common_numberFormat($lastRecord ['curGSCBalance']),
+                    'totalCost'        => common_numberFormat($this->totalCost),
+                    'previousBalance'  => common_numberFormat($lastRecord ['curGSCBalance']),
                     'remainingBalance' => common_numberFormat($newBalance)
                 )
             );
@@ -331,21 +362,25 @@ class BUPrepay extends Business
             fwrite($htmlFileHandle, $this->template->get_var('output'));
             fclose($htmlFileHandle);
 
-            $this->postRowToSummaryFile($lastRecord,
-                                        $dsResults,
-                                        $dsStatementContact,
-                                        $newBalance,
-                                        $topupValue,
-                                        $this->dsData->getValue('endDate'));
+            $this->postRowToSummaryFile(
+                $lastRecord,
+                $dsResults,
+                $dsStatementContact,
+                $newBalance,
+                $topUpValue,
+                $this->dsData->getValue(self::exportDataSetEndDate)
+            );
 
             if ($this->updateFlag) {
                 $dsStatementContact->initialise();
-                $this->sendStatement($filepath . '.html',
-                                     $last_custno,
-                                     $dsStatementContact,
-                                     $newBalance,
-                                     $this->dsData->getValue('endDate'),
-                                     $topupValue);
+                $this->sendStatement(
+                    $filepath . '.html',
+                    $last_custno,
+                    $dsStatementContact,
+                    $newBalance,
+                    $this->dsData->getValue(self::exportDataSetEndDate),
+                    $topUpValue
+                );
             }
         }
 
@@ -376,21 +411,22 @@ class BUPrepay extends Business
 						JOIN itemtype ON ity_itemtypeno = itm_itemtypeno
 					WHERE
 						cui_cuino = " . $key . " AND	cus_custno <> 2511" . " AND	renewalStatus  <> 'D'";
-// The following code is used when there has been a crash to exclude already processed custs		
-//		$queryString .= " AND cus_custno NOT IN( 1000, 823, 820, 520 , 203, 117)";
-
                 $db->query($queryString);
                 $db->next_record();
                 // get GSC contact record
                 $buContact->getGSCContactByCustomerID($db->Record ['custno'], $dsStatementContact);
-                $this->buCustomer->getSiteByCustomerIDSiteNo($dsStatementContact->getValue('customerID'),
-                                                             $dsStatementContact->getValue('siteNo'),
-                                                             $dsSite);
+                $this->buCustomer->getSiteByCustomerIDSiteNo(
+                    $dsStatementContact->getValue(DBEContact::customerID),
+                    $dsStatementContact->getValue(DBEContact::siteNo),
+                    $dsSite
+                );
 
                 // set up new html file template
-                $filepath = SAGE_EXPORT_DIR . '/PP_' . substr($db->Record ['cus_name'],
-                                                              0,
-                                                              20) . $this->dsData->getValue('endDate');
+                $filepath = SAGE_EXPORT_DIR . '/PP_' . substr(
+                        $db->Record ['cus_name'],
+                        0,
+                        20
+                    ) . $this->dsData->getValue(self::exportDataSetEndDate);
                 $htmlFileHandle = fopen($filepath . '.html', 'wb');
                 if (!$htmlFileHandle) {
                     $this->raiseError("Unable to open html file " . $filepath);
@@ -399,36 +435,69 @@ class BUPrepay extends Business
                 $this->template->set_file('page', 'PrepayReport.inc.html');
 
                 // Set header fields
-                $this->template->set_var(array('companyName' => $db->Record ['cus_name'], 'customerRef' => $key, 'startDate' => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']), 'endDate' => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']), 'statementDate' => Controller::dateYMDtoDMY($this->dsData->getValue('endDate')), 'add1' => $dsSite->getValue(DBESite::add1), 'add2' => $dsSite->getValue(DBESite::add2), 'add3' => $dsSite->getValue(DBESite::add3), 'town' => $dsSite->getValue(DBESite::town), 'county' => $dsSite->getValue(DBESite::county), 'postcode' => $dsSite->getValue(DBESite::postcode), 'cnc_name' => $this->dsHeader->getValue('name'), 'cnc_add1' => $this->dsHeader->getValue('add1'), 'cnc_add2' => $this->dsHeader->getValue('add2'), 'cnc_add3' => $this->dsHeader->getValue('add3'), 'cnc_town' => $this->dsHeader->getValue('town'), 'cnc_county' => $this->dsHeader->getValue('county'), 'cnc_postcode' => $this->dsHeader->getValue('postcode'), 'cnc_phone' => $this->dsHeader->getValue('phone')));
+                $this->template->set_var(
+                    array(
+                        'companyName'   => $db->Record ['cus_name'],
+                        'customerRef'   => $key,
+                        'startDate'     => Controller::dateYMDtoDMY($db->Record ['cui_desp_date']),
+                        'endDate'       => Controller::dateYMDtoDMY($db->Record ['cui_expiry_date']),
+                        'statementDate' => Controller::dateYMDtoDMY(
+                            $this->dsData->getValue(self::exportDataSetEndDate)
+                        ),
+                        'add1'          => $dsSite->getValue(DBESite::add1),
+                        'add2'          => $dsSite->getValue(DBESite::add2),
+                        'add3'          => $dsSite->getValue(DBESite::add3),
+                        'town'          => $dsSite->getValue(DBESite::town),
+                        'county'        => $dsSite->getValue(DBESite::county),
+                        'postcode'      => $dsSite->getValue(DBESite::postcode),
+                        'cnc_name'      => $this->dsHeader->getValue(DBEHeader::name),
+                        'cnc_add1'      => $this->dsHeader->getValue(DBEHeader::add1),
+                        'cnc_add2'      => $this->dsHeader->getValue(DBEHeader::add2),
+                        'cnc_add3'      => $this->dsHeader->getValue(DBEHeader::add3),
+                        'cnc_town'      => $this->dsHeader->getValue(DBEHeader::town),
+                        'cnc_county'    => $this->dsHeader->getValue(DBEHeader::county),
+                        'cnc_postcode'  => $this->dsHeader->getValue(DBEHeader::postcode),
+                        'cnc_phone'     => $this->dsHeader->getValue(DBEHeader::phone)
+                    )
+                );
 
                 $this->template->set_block('page', 'lineBlock', 'lines');
 
                 $this->template->set_var(
                     array(
-                        'requestDate' => '',
-                        'requestRef' => '',
-                        'requestHours' => '',
-                        'requestValue' => '',
+                        'requestDate'            => '',
+                        'requestRef'             => '',
+                        'requestHours'           => '',
+                        'requestValue'           => '',
                         'requestCustomerContact' => '',
-                        'requestDetails' => 'No service requests logged in this period')
+                        'requestDetails'         => 'No service requests logged in this period'
+                    )
                 );
 
                 $this->template->parse('lines', 'lineBlock', true);
                 $this->totalCost += $value;
-                $this->template->set_var(array('totalCost' => 0, 'previousBalance' => common_numberFormat($db->Record ['curGSCBalance']), 'remainingBalance' => common_numberFormat($db->Record ['curGSCBalance'])));
+                $this->template->set_var(
+                    array(
+                        'totalCost'        => 0,
+                        'previousBalance'  => common_numberFormat($db->Record ['curGSCBalance']),
+                        'remainingBalance' => common_numberFormat($db->Record ['curGSCBalance'])
+                    )
+                );
                 $this->template->parse('output', 'page', true);
                 fwrite($htmlFileHandle, $this->template->get_var('output'));
                 fclose($htmlFileHandle);
 
                 $dsStatementContact->initialise();
-                $topupValue = $this->doTopUp($db->Record);
+                $topUpValue = $this->doTopUp($db->Record);
 
-                $this->postRowToSummaryFile($db->Record,
-                                            $dsResults,
-                                            $dsStatementContact,
-                                            $db->Record ['curGSCBalance'],
-                                            $topupValue,
-                                            $this->dsData->getValue('endDate'));
+                $this->postRowToSummaryFile(
+                    $db->Record,
+                    $dsResults,
+                    $dsStatementContact,
+                    $db->Record ['curGSCBalance'],
+                    $topUpValue,
+                    $this->dsData->getValue(self::exportDataSetEndDate)
+                );
 
                 if ($this->updateFlag) {
                     $this->sendStatement(
@@ -436,8 +505,8 @@ class BUPrepay extends Business
                         $db->Record['cus_custno'],
                         $dsStatementContact,
                         $db->Record ['curGSCBalance'],
-                        $this->dsData->getValue('endDate'),
-                        $topupValue
+                        $this->dsData->getValue(self::exportDataSetEndDate),
+                        $topUpValue
                     );
                 }
             }
@@ -463,7 +532,7 @@ class BUPrepay extends Business
         if ($this->updateFlag) {
             $dbeCustomerItem = new DBECustomerItem ($this);
             $dbeCustomerItem->getRow($Record ['cui_cuino']);
-            $dbeCustomerItem->setValue('curGSCBalance', $newBalance);
+            $dbeCustomerItem->setValue(DBECustomerItem::curGSCBalance, $newBalance);
             $dbeCustomerItem->updateRow();
         }
 
@@ -473,16 +542,16 @@ class BUPrepay extends Business
 
         if ($newBalance < 0) {
             // value of the top-up activity is the GSC item price plus amount required to clear balance
-            $topupValue = (0 - $newBalance) + $Record ['gscTopUpAmount'];
+            $topUpValue = (0 - $newBalance) + $Record ['gscTopUpAmount'];
         } else {
-            $topupValue = $Record ['gscTopUpAmount']; // just the top-up amount
+            $topUpValue = $Record ['gscTopUpAmount']; // just the top-up amount
         }
         // 	Create sales order
         if ($this->updateFlag) {
-            $salesOrderNo = $this->createTopupSalesOrder($Record, $topupValue);
+            $this->createTopUpSalesOrder($Record, $topUpValue);
         }
 
-        return $topupValue;
+        return $topUpValue;
     }
 
     function getActivitiesByServiceRequest($serviceRequestRecord)
@@ -522,7 +591,7 @@ class BUPrepay extends Business
           JOIN contact ON caa_contno = con_contno
         WHERE
           caa_problemno = " . $serviceRequestRecord['pro_problemno'] .
-            " AND itm_itemno = " . $this->dsHeader->getValue('gscItemID') . " AND caa_endtime IS NOT NULL
+            " AND itm_itemno = " . $this->dsHeader->getValue(DBEHeader::gscItemID) . " AND caa_endtime IS NOT NULL
           AND caa_status = 'C'
           AND caa_callacttypeno NOT IN( " .                                     // Activity type not engineer travel or proactive
             CONFIG_ENGINEER_TRAVEL_ACTIVITY_TYPE_ID . "," .
@@ -531,11 +600,12 @@ class BUPrepay extends Business
         ORDER BY caa_date, caa_starttime";
 
         $db->query($queryString);
-
-        $totalValue = 0;
-
         $firstActivity = true;
-
+        $requestValue = 0;
+        $requestHours = 0;
+        $dbeCallActivity = null;
+        $reason = null;
+        $customerContact = null;
         while ($db->next_record()) {
 
             if ($db->Record ['curValueFlag'] == 'Y') { // This is a monetary value activity such as top-up or adjustment
@@ -547,7 +617,7 @@ class BUPrepay extends Business
                 If this is travel then apply maximum hours to customer site
                 */
                 if ($db->Record ['travelFlag'] == 'Y') {
-
+                    $dsSite = new DataSet($this);
                     $this->buCustomer->getSiteByCustomerIDSiteNo(
                         $serviceRequestRecord['custno'],
                         $db->Record['caa_siteno'],
@@ -572,14 +642,12 @@ class BUPrepay extends Business
                     $max_hours,
                     $db->Record ['cat_ooh_multiplier'],
                     $db->Record ['cat_itemno'],
-                    'Y', // under contract
                     $this->dsHeader,
                     $normalHours,
                     $beforeHours,
                     $afterHours,
                     $overtimeRate,
-                    $normalRate,
-                    'N'
+                    $normalRate
                 );
 
                 /*
@@ -608,8 +676,8 @@ class BUPrepay extends Business
                 }
                 // update status on call activity to Authorised and statement date to today
                 $dbeCallActivity->getRow($db->Record ['caa_callactivityno']);
-                $dbeCallActivity->setValue('status', 'A');
-                $dbeCallActivity->setValue('statementYearMonth', date('Y-m'));
+                $dbeCallActivity->setValue(DBECallActivity::status, 'A');
+                $dbeCallActivity->setValue(DBECallActivity::statementYearMonth, date('Y-m'));
                 $dbeCallActivity->updateRow();
             }
 
@@ -627,23 +695,33 @@ class BUPrepay extends Business
     }    // end function
 
 
-    function postRowToSummaryFile(&$Record, &$dsResults, &$dsStatementContact, $newBalance, $topupAmount, $endDate)
+    /**
+     * @param $Record
+     * @param DataSet $dsResults
+     * @param DataSet|DBEContact $dsStatementContact
+     * @param $newBalance
+     * @param $topUpAmount
+     * @param $endDate
+     */
+    function postRowToSummaryFile(&$Record, &$dsResults, &$dsStatementContact, $newBalance, $topUpAmount, $endDate)
     {
         $contacts = '';
-        while ($dsStatementContact->fetchNext) {
-            $contacts .= $dsStatementContact->getValue('firstName') . ' ' . $dsStatementContact->getValue('lastName');
+        while ($dsStatementContact->fetchNext()) {
+            $contacts .= $dsStatementContact->getValue(DBEContact::firstName) . ' ' . $dsStatementContact->getValue(
+                    DBEContact::lastName
+                );
         }
         $webFileLink = 'export/PP_' . substr($Record ['cus_name'], 0, 20) . $endDate . '.html';
 
         $dsResults->setUpdateModeInsert();
-        $dsResults->setValue('customerName', $Record ['cus_name']);
-        $dsResults->setValue('previousBalance', $Record ['curGSCBalance']);
-        $dsResults->setValue('currentBalance', common_numberFormat($newBalance));
-        $dsResults->setValue('expiryDate', Controller::dateYMDtoDMY($Record ['cui_expiry_date']));
-        $dsResults->setValue('topUp', common_numberFormat($topupAmount));
-        $dsResults->setValue('contacts', $contacts);
-        $dsResults->setValue('contractType', $Record ['ity_desc']);
-        $dsResults->setValue('webFileLink', $webFileLink);
+        $dsResults->setValue(self::exportPrePayCustomerName, $Record ['cus_name']);
+        $dsResults->setValue(self::exportPrePayPreviousBalance, $Record ['curGSCBalance']);
+        $dsResults->setValue(self::exportPrePayCurrentBalance, common_numberFormat($newBalance));
+        $dsResults->setValue(self::exportPrePayExpiryDate, Controller::dateYMDtoDMY($Record ['cui_expiry_date']));
+        $dsResults->setValue(self::exportPrePayTopUp, common_numberFormat($topUpAmount));
+        $dsResults->setValue(self::exportPrePayContacts, $contacts);
+        $dsResults->setValue(self::exportPrePayContractType, $Record ['ity_desc']);
+        $dsResults->setValue(self::exportPrePayWebFileLink, $webFileLink);
         $dsResults->post();
     }
 
@@ -659,12 +737,12 @@ class BUPrepay extends Business
 
         $this->template->set_var(
             array(
-                'requestDate' => $serviceRequestRecord ['requestDate'],
-                'requestDetails' => $reason,
-                'requestRef' => $serviceRequestRecord['pro_problemno'],
-                'requestHours' => common_numberFormat($requestHours),
+                'requestDate'            => $serviceRequestRecord ['requestDate'],
+                'requestDetails'         => $reason,
+                'requestRef'             => $serviceRequestRecord['pro_problemno'],
+                'requestHours'           => common_numberFormat($requestHours),
                 'requestCustomerContact' => $customerContact,
-                'requestValue' => common_numberFormat($requestValue)
+                'requestValue'           => common_numberFormat($requestValue)
             )
         );
 
@@ -676,58 +754,69 @@ class BUPrepay extends Business
     /*
         Create sales order for top-up
     */
-    function createTopupSalesOrder(&$Record, $topupValue)
+    function createTopUpSalesOrder(&$Record, $topUpValue)
     {
-        $this->setMethodName('createTopupSalesOrder');
+        $this->setMethodName('createTopUpSalesOrder');
 
         $this->buCustomer->getCustomerByID($Record ['custno'], $dsCustomer);
 
         // create sales order header with correct field values
         $buSalesOrder = new BUSalesOrder ($this);
+        $dsOrdhead = new DataSet($this);
         $buSalesOrder->initialiseOrder($dsOrdhead, $dbeOrdline, $dsCustomer);
         $dsOrdhead->setUpdateModeUpdate();
-        $dsOrdhead->setvalue('custPORef', 'Top Up');
-        $dsOrdhead->setvalue('addItem', 'N');
-        $dsOrdhead->setvalue('partInvoice', 'N');
-        $dsOrdhead->setvalue('payMethod', CONFIG_PAYMENT_TERMS_30_DAYS);
+        $dsOrdhead->setvalue(DBEJOrdhead::custPORef, 'Top Up');
+        $dsOrdhead->setvalue(DBEJOrdhead::addItem, 'N');
+        $dsOrdhead->setvalue(DBEJOrdhead::partInvoice, 'N');
+        $dsOrdhead->setvalue(DBEJOrdhead::paymentTermsID, CONFIG_PAYMENT_TERMS_30_DAYS);
         $dsOrdhead->post();
-        $buSalesOrder->updateHeader($dsOrdhead->getValue('ordheadID'),
-                                    $dsOrdhead->getValue('custPORef'),
-                                    $dsOrdhead->getValue('payMethod'),
-                                    $dsOrdhead->getValue('partInvoice'),
-                                    $dsOrdhead->getValue('addItem'));
+        $buSalesOrder->updateHeader(
+            $dsOrdhead->getValue(DBEJOrdhead::ordheadID),
+            $dsOrdhead->getValue(DBEJOrdhead::custPORef),
+            $dsOrdhead->getValue(DBEJOrdhead::paymentTermsID),
+            $dsOrdhead->getValue(DBEJOrdhead::partInvoice),
+            $dsOrdhead->getValue(DBEJOrdhead::addItem)
+        );
 
-        $ordheadID = $dsOrdhead->getValue('ordheadID');
+        $ordheadID = $dsOrdhead->getValue(DBEJOrdhead::ordheadID);
         $sequenceNo = 1;
 
-        // get topup item details
+        // get topUp item details
         $dbeItem = new DBEItem ($this);
         $dbeItem->getRow(CONFIG_DEF_PREPAY_TOPUP_ITEMID);
 
         // create order line
         $dbeOrdline = new DBEOrdline ($this);
-        $dbeOrdline->setValue('ordheadID', $ordheadID);
-        $dbeOrdline->setValue('sequenceNo', $sequenceNo);
-        $dbeOrdline->setValue('customerID', $Record ['custno']);
-        $dbeOrdline->setValue('qtyDespatched', 0);
-        $dbeOrdline->setValue('qtyLastDespatched', 0);
-        $dbeOrdline->setValue('supplierID', CONFIG_SALES_STOCK_SUPPLIERID);
-        $dbeOrdline->setValue('lineType', 'I');
-        $dbeOrdline->setValue('sequenceNo', $sequenceNo);
-        $dbeOrdline->setValue('stockcat', 'R');
-        $dbeOrdline->setValue('itemID', CONFIG_DEF_PREPAY_TOPUP_ITEMID);
-        $dbeOrdline->setValue('qtyOrdered', 1);
-        $dbeOrdline->setValue('curUnitCost', 0);
-        $dbeOrdline->setValue('curTotalCost', 0);
-        $dbeOrdline->setValue('curUnitSale', $topupValue);
-        $dbeOrdline->setValue('curTotalSale', $topupValue);
-        $dbeOrdline->setValue('description', $dbeItem->getValue('description'));
+        $dbeOrdline->setValue(DBEJOrdline::ordheadID, $ordheadID);
+        $dbeOrdline->setValue(DBEJOrdline::sequenceNo, $sequenceNo);
+        $dbeOrdline->setValue(DBEJOrdline::customerID, $Record ['custno']);
+        $dbeOrdline->setValue(DBEJOrdline::qtyDespatched, 0);
+        $dbeOrdline->setValue(DBEJOrdline::qtyLastDespatched, 0);
+        $dbeOrdline->setValue(DBEJOrdline::supplierID, CONFIG_SALES_STOCK_SUPPLIERID);
+        $dbeOrdline->setValue(DBEJOrdline::lineType, 'I');
+        $dbeOrdline->setValue(DBEJOrdline::sequenceNo, $sequenceNo);
+        $dbeOrdline->setValue(DBEJOrdline::stockcat, 'R');
+        $dbeOrdline->setValue(DBEJOrdline::itemID, CONFIG_DEF_PREPAY_TOPUP_ITEMID);
+        $dbeOrdline->setValue(DBEJOrdline::qtyOrdered, 1);
+        $dbeOrdline->setValue(DBEJOrdline::curUnitCost, 0);
+        $dbeOrdline->setValue(DBEJOrdline::curTotalCost, 0);
+        $dbeOrdline->setValue(DBEJOrdline::curUnitSale, $topUpValue);
+        $dbeOrdline->setValue(DBEJOrdline::curTotalSale, $topUpValue);
+        $dbeOrdline->setValue(DBEJOrdline::description, $dbeItem->getValue(DBEItem::description));
         $dbeOrdline->insertRow();
-        return $dsOrdhead->getValue('ordheadID');
+        return $dsOrdhead->getValue(DBEJOrdhead::ordheadID);
     }
 
 
-    function sendStatement($statementFilepath, $custno, &$dsContact, $balance, $date, $topupValue)
+    /**
+     * @param $statementFilepath
+     * @param $custno
+     * @param DataSet|DBEContact $dsContact
+     * @param $balance
+     * @param $date
+     * @param $topUpValue
+     */
+    function sendStatement($statementFilepath, $custno, &$dsContact, $balance, $date, $topUpValue)
     {
 
         $buMail = new BUMail($this);
@@ -736,34 +825,34 @@ class BUPrepay extends Business
 
         $id_user = $GLOBALS ['auth']->is_authenticated();
         $this->dbeUser->getRow($id_user);
-
-        $statementFilename = basename($statementFilepath);
         $senderEmail = CONFIG_SALES_EMAIL;
         $senderName = 'CNC Sales';
 
         while ($dsContact->fetchNext()) {
             // Send email with attachment
-            $message = '<body><p class=MsoNormal><font size=2 color=navy face=Arial><span style=\'font-size:10.0pt;color:black\'>';
-            $message .= 'Dear ' . $dsContact->getValue('firstName') . ',';
-            $message .= '<o:p></o:p></span></font></p>';
-            $message .= '<p class=MsoNormal><font size=2 color=navy face=Arial><span style=\'font-size:10.0pt;color:black\'>';
+            $message = '<body><p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
+            $message .= 'Dear ' . $dsContact->getValue(DBEContact::firstName) . ',';
+            $message .= '</span></p>';
+            $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
             // Temporary:
             $message .= 'Please find attached your latest Pre-Pay Contract statement, on which there
 is currently a balance of ';
             $message .= '&pound;' . common_numberFormat($balance) . ' + VAT.';
             $message .= '</p>';
 
-            $message .= '<p class=MsoNormal><font size=2 color=navy face=Arial><span style=\'font-size:10.0pt;color:black\'>';
+            $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
             $message .= 'If you have any queries relating to any of the items detailed on this statement, then please notify us within 7 days so that we can make any adjustments if applicable.';
             $message .= '</p>';
 
             if ($balance <= 100) {
-                $message .= '<p class=MsoNormal><font size=2 color=navy face=Arial><span style=\'font-size:10.0pt;color:black\'>';
-                $message .= 'If no response to the contrary is received within 7 days of this statement, then we will automatically raise an invoice for &pound;' . common_numberFormat($topupValue * (1 + ($this->standardVatRate / 100))) . ' Inc VAT.';
+                $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
+                $message .= 'If no response to the contrary is received within 7 days of this statement, then we will automatically raise an invoice for &pound;' . common_numberFormat(
+                        $topUpValue * (1 + ($this->standardVatRate / 100))
+                    ) . ' Inc VAT.';
                 $message .= '</p>';
             }
 
-            $message .= '<p class=MsoNormal><font size=2 color=navy face=Arial><span style=\'font-size:10.0pt;color:black\'>';
+            $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
             $message .= 'Are you aware that you can receive up to &pound;500 for the referral of any company made to CNC that results in the purchase of a support contract?  Please call us for further information.';
             $message .= '</p>';
 
@@ -771,26 +860,26 @@ is currently a balance of ';
 
             $subject = 'Pre-Pay Contract Statement: ' . Controller::dateYMDtoDMY($date);
 
-            $toEmail = $dsContact->getValue('firstName') . ' ' . $dsContact->getValue('lastName') . '<' . $dsContact->getValue('email') . '>';
+            $toEmail = $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(
+                    DBEContact::lastName
+                ) . '<' . $dsContact->getValue(DBEContact::email) . '>';
 
             // create mime
-            $html = '<html>' . $message . '</html>';
-
-            $file = '$statementFilename';
+            $html = '<html lang="en">' . $message . '</html>';
 
             $hdrs = array(
-                'From' => $senderName . " <" . $senderEmail . ">",
-                'To' => $toEmail,
-                'Subject' => $subject,
+                'From'         => $senderName . " <" . $senderEmail . ">",
+                'To'           => $toEmail,
+                'Subject'      => $subject,
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
 
             $buMail->mime->setHTMLBody($html);
             $mime_params = array(
                 'text_encoding' => '7bit',
-                'text_charset' => 'UTF-8',
-                'html_charset' => 'UTF-8',
-                'head_charset' => 'UTF-8'
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
             );
             $body = $buMail->mime->get($mime_params);
             $hdrs = $buMail->mime->headers($hdrs);
@@ -804,7 +893,7 @@ is currently a balance of ';
 
         } // end while
         /*
-        Upate DB
+        Update DB
         */
         $this->save($statementFilepath, $custno, $balance);
     }
@@ -835,5 +924,4 @@ is currently a balance of ';
 
     }
 
-} // End of class
-?>
+}

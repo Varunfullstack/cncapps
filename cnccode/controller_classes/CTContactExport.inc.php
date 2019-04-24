@@ -99,6 +99,7 @@ class CTContactExport extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -635,11 +636,12 @@ class CTContactExport extends CTCNC
 
     } // end function displaySearchForm
 
+    /**
+     * @param $resultSet mysqli_result
+     */
     function generateCSV($resultSet)
     {
-
         $fileName = 'contacts.csv';
-
         Header('Content-type: text/plain');
         Header('Content-Disposition: attachment; filename=' . $fileName);
 
@@ -881,5 +883,4 @@ WHERE customer.`cus_referred` <> 'Y'
 
         return base64_encode($fileData);
     }
-}// end of class
-?>
+}

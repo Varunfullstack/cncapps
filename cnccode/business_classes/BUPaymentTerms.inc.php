@@ -11,7 +11,8 @@ require_once($cfg["path_dbe"] . "/DBEOrdhead.inc.php");
 
 class BUPaymentTerms extends Business
 {
-    var $dbePaymentTerms = "";
+    /** @var DBEPaymentTerms */
+    public $dbePaymentTerms;
 
     /**
      * Constructor
@@ -57,19 +58,18 @@ class BUPaymentTerms extends Business
     /**
      *    canDeletePaymentTerms
      * Only allowed if type has no activities
+     * @param $ID
+     * @return bool
      */
     function canDeletePaymentTerms($ID)
     {
         $dbeInvhead = new DBEInvhead($this);
         $dbeOrdhead = new DBEOrdhead($this);
         // validate no activities of this type
-        $dbeInvhead->setValue('paymentTermsID', $ID);
-        $dbeOrdhead->setValue('paymentTermsID', $ID);
-        if ($dbeInvhead->countRowsByColumn('paymentTermsID') < 1 && $dbeOrdhead->countRowsByColumn('paymentTermsID') < 1) {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
+        $dbeInvhead->setValue(DBEInvhead::paymentTermsID, $ID);
+        $dbeOrdhead->setValue(DBEOrdhead::paymentTermsID, $ID);
+        return $dbeInvhead->countRowsByColumn(DBEInvhead::paymentTermsID) < 1 && $dbeOrdhead->countRowsByColumn(
+                DBEOrdhead::paymentTermsID
+            ) < 1;
     }
-}// End of class
-?>
+}

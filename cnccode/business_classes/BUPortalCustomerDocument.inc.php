@@ -4,9 +4,9 @@ require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
 
 class BUPortalCustomerDocument extends Business
 {
-    var $dbePortalCustomerDocument = "";
-    var $dbePortalCustomerDocumentWithoutFile = "";
-    var $dbeCallActivity = "";
+    public $dbePortalCustomerDocument;
+    public $dbePortalCustomerDocumentWithoutFile;
+    public $dbeCallActivity;
 
     function __construct(&$owner)
     {
@@ -25,11 +25,20 @@ class BUPortalCustomerDocument extends Business
         $this->updateDataAccessObject($dsData, $this->dbePortalCustomerDocumentWithoutFile);
 
         /* file to add? */
-        if ($userfile['name'] != '') {
+        if ($userfile['name']) {
             $this->dbePortalCustomerDocument->getRow($this->dbePortalCustomerDocumentWithoutFile->getPKValue());
-            $this->dbePortalCustomerDocument->setValue('file', fread(fopen($userfile ['tmp_name'], 'rb'), $userfile ['size']));
-            $this->dbePortalCustomerDocument->setValue('filename', ( string )$userfile ['name']);
-            $this->dbePortalCustomerDocument->setValue('fileMimeType', ( string )$userfile ['type']);
+            $this->dbePortalCustomerDocument->setValue(
+                DBEPortalCustomerDocument::file,
+                fread(fopen($userfile ['tmp_name'], 'rb'), $userfile ['size'])
+            );
+            $this->dbePortalCustomerDocument->setValue(
+                DBEPortalCustomerDocument::filename,
+                ( string )$userfile ['name']
+            );
+            $this->dbePortalCustomerDocument->setValue(
+                DBEPortalCustomerDocument::fileMimeType,
+                ( string )$userfile ['type']
+            );
             $this->dbePortalCustomerDocument->updateRow();
         }
 
@@ -50,25 +59,14 @@ class BUPortalCustomerDocument extends Business
      */
     function getDocumentsByCustomerID($customerID, &$dsResults)
     {
-        $this->dbePortalCustomerDocument->setValue('customerID', $customerID);
-        $this->dbePortalCustomerDocument->getRowsByColumn('customerID', 'description');
+        $this->dbePortalCustomerDocument->setValue(DBEPortalCustomerDocument::customerID, $customerID);
+        $this->dbePortalCustomerDocument->getRowsByColumn(DBEPortalCustomerDocument::customerID, 'description');
         return ($this->getData($this->dbePortalCustomerDocument, $dsResults));
     }
 
     function deleteDocument($ID)
     {
         $this->setMethodName('deleteDocument');
-        if ($this->canDelete($ID)) {
-            return $this->dbePortalCustomerDocument->deleteRow($ID);
-        } else {
-            return FALSE;
-        }
+        return $this->dbePortalCustomerDocument->deleteRow($ID);
     }
-
-    function canDelete($ID)
-    {
-        return TRUE;
-    }
-
-}// End of class
-?>
+}

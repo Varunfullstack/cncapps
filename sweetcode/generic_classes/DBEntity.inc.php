@@ -546,16 +546,16 @@ class DBEntity extends DataAccess
      * @access public
      * @return bool Success
      */
-    function getRow($pkValue = '')
+    function getRow($pkValue = null)
     {
         $this->setMethodName("getRow");
         $ret = FALSE;
         if ($this->getQueryString() == "") {                    // allow use of own query string
             if ($this->getPK() != DA_PK_NOT_SET) {        // if we have a PK then validate value
-                if ($pkValue != '') {
+                if ($pkValue) {
                     $this->setPKValue($pkValue);
                 } else {
-                    if ($this->getPKValue() == "" & $this->getPKValue() != 0) {
+                    if ($this->getPKValue() == "" && $this->getPKValue() != 0) {
                         $this->raiseError("PK value not set");
                         return $ret;
                     }

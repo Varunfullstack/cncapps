@@ -55,7 +55,6 @@ class CTContractAnalysisReport extends CTCNC
     {
 
         switch ($_REQUEST['action']) {
-
             case 'email':
                 $this->email();
                 break;

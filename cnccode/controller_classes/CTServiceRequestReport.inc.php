@@ -46,6 +46,7 @@ class CTServiceRequestReport extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {

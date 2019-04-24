@@ -66,8 +66,8 @@ class DBEOrdhead extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -474,6 +474,7 @@ class DBEOrdhead extends DBEntity
                 return ($this->getDBColumnValue(0));
             }
         }
+        return false;
     }
 
     function countRowsByContactID($contactID)
@@ -489,8 +490,7 @@ class DBEOrdhead extends DBEntity
                 return ($this->getDBColumnValue(0));
             }
         }
+        return false;
     }
 
 }
-
-?>

@@ -7,34 +7,42 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEOrdlinePO extends DBEntity
 {
+
+    const supplierID = "supplierID";
+    const stockcat = "stockcat";
+    const itemID = "itemID";
+    const curUnitCost = "curUnitCost";
+    const qtyOrdered = "qtyOrdered";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setTableName("Ordline");
-        $this->addColumn("supplierID", DA_ID, DA_ALLOW_NULL, "odl_suppno");
-        $this->addColumn("stockcat", DA_STRING, DA_ALLOW_NULL, "odl_stockcat");
-        $this->addColumn("itemID", DA_ID, DA_ALLOW_NULL, "odl_itemno");
-        $this->addColumn("curUnitCost", DA_FLOAT, DA_ALLOW_NULL, "odl_d_unit");
-        $this->addColumn("qtyOrdered", DA_FLOAT, DA_ALLOW_NULL, "odl_qty_ord");
+        $this->addColumn(self::supplierID, DA_ID, DA_ALLOW_NULL, "odl_suppno");
+        $this->addColumn(self::stockcat, DA_STRING, DA_ALLOW_NULL, "odl_stockcat");
+        $this->addColumn(self::itemID, DA_ID, DA_ALLOW_NULL, "odl_itemno");
+        $this->addColumn(self::curUnitCost, DA_FLOAT, DA_ALLOW_NULL, "odl_d_unit");
+        $this->addColumn(self::qtyOrdered, DA_FLOAT, DA_ALLOW_NULL, "odl_qty_ord");
         $this->setAddColumnsOff();
     }
 
     /**
      * get all rows ready for generation of purchase orders
      * @access public
+     * @param null $ordheadID
      * @return bool
      */
-    function getRows($ordheadID)
+    function getRows($ordheadID = null)
     {
         $this->setMethodName("getRows");
-        if ($ordheadID == '') {
+        if (!$ordheadID) {
             $this->raiseError('ordheadID not set');
         }
         $this->setQueryString(
@@ -50,5 +58,3 @@ class DBEOrdlinePO extends DBEntity
         return (parent::getRows());
     }
 }
-
-?>

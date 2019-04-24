@@ -24,8 +24,10 @@ define('CTSITE_TXT_UPDATE_SITE', 'Update Site');
 
 class CTSite extends CTCNC
 {
+    /** @var BUSite */
     private $buSite;
-    var $dsSite = '';
+    /** @var DSForm */
+    public $dsSite;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
@@ -44,6 +46,7 @@ class CTSite extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -82,11 +85,12 @@ class CTSite extends CTCNC
     /**
      * Display the popup selector form
      * @access private
+     * @throws Exception
      */
     function displaySiteSelectPopup()
     {
         $this->setMethodName('displaySiteSelectPopup');
-        if ($_REQUEST['customerID'] == '') {
+        if (!$_REQUEST['customerID']) {
             $this->raiseError('customerID not passed');
         }
         $urlCreate = Controller::buildLink(
@@ -127,7 +131,7 @@ class CTSite extends CTCNC
                 $this->template->set_var(
                     array(
                         'siteDesc'        => Controller::htmlDisplayText(($siteDesc)),
-                        'submitName'      => addslashes($siteDesc), //so dblquotes don't mess javascript up
+                        'submitName'      => addslashes($siteDesc), //so double quotes don't mess javascript up
                         'siteNo'          => $this->dsSite->getValue(DBESite::siteNo),
                         // this is so the popup knows which field on the parent to update
                         'parentIDField'   => $_SESSION['siteParentIDField'],
@@ -146,14 +150,15 @@ class CTSite extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function siteForm()
     {
         $this->setMethodName('siteForm');
         // initialisation stuff
+        $edit = false;
         if ($_REQUEST['action'] == CTCNC_ACT_SITE_ADD) {
             $urlSubmit = $this->siteFormPrepareAdd();
-            $add = TRUE;
         } else {
             $urlSubmit = $this->siteFormPrepareEdit();
             $edit = TRUE;
@@ -193,23 +198,23 @@ class CTSite extends CTCNC
                 'siteNo'            => $this->dsSite->getValue(DBESite::siteNo),
                 'customerID'        => $this->dsSite->getValue(DBESite::customerID),
                 'add1'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::add1)),
-                'add1Message'       => Controller::htmlDisplayText($this->dsSite->getMessage('add1')),
+                'add1Message'       => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::add1)),
                 'add2'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::add2)),
-                'add2Message'       => Controller::htmlDisplayText($this->dsSite->getMessage('add2')),
+                'add2Message'       => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::add2)),
                 'add3'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::add3)),
-                'add3Message'       => Controller::htmlDisplayText($this->dsSite->getMessage('add3')),
+                'add3Message'       => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::add3)),
                 'town'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::town)),
-                'townMessage'       => Controller::htmlDisplayText($this->dsSite->getMessage('town')),
+                'townMessage'       => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::town)),
                 'county'            => Controller::htmlInputText($this->dsSite->getValue(DBESite::county)),
-                'countyMessage'     => Controller::htmlDisplayText($this->dsSite->getMessage('county')),
+                'countyMessage'     => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::county)),
                 'postcode'          => Controller::htmlInputText($this->dsSite->getValue(DBESite::postcode)),
-                'postcodeMessage'   => Controller::htmlDisplayText($this->dsSite->getMessage('postcode')),
+                'postcodeMessage'   => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::postcode)),
                 'phone'             => Controller::htmlInputText($this->dsSite->getValue(DBESite::phone)),
-                'phoneMessage'      => Controller::htmlDisplayText($this->dsSite->getMessage('phone')),
+                'phoneMessage'      => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::phone)),
                 'debtorCode'        => Controller::htmlInputText($this->dsSite->getValue(DBESite::debtorCode)),
-                'debtorCodeMessage' => Controller::htmlDisplayText($this->dsSite->getMessage('debtorCode')),
+                'debtorCodeMessage' => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::debtorCode)),
                 'sageRef'           => Controller::htmlInputText($this->dsSite->getValue(DBESite::sageRef)),
-                'sageRefMessage'    => Controller::htmlDisplayText($this->dsSite->getMessage('sageRef')),
+                'sageRefMessage'    => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::sageRef)),
                 'invContactID'      => $this->dsSite->getValue(DBEJSite::invoiceContactID),
                 'invContactName'    => $this->dsSite->getValue(DBEJSite::invContactName),
                 'delContactName'    => $this->dsSite->getValue(DBEJSite::delContactName),
@@ -232,6 +237,7 @@ class CTSite extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function siteFormPrepareAdd()
     {
@@ -259,6 +265,7 @@ class CTSite extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function siteFormPrepareEdit()
     {
@@ -286,6 +293,7 @@ class CTSite extends CTCNC
     /**
      * Update site record
      * @access private
+     * @throws Exception
      */
     function siteUpdate()
     {
@@ -316,19 +324,5 @@ class CTSite extends CTCNC
             $_REQUEST['siteDesc'] = $this->dsSite->getValue(DBESite::siteNo);
             $this->displaySiteSelectPopup();
         }
-        /*
-                    $urlNext = Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => CTCNC_ACT_SITE_POPUP,
-                            'customerID' => $this->dsSite->getValue(DBESite::CustomerID),
-                            'siteDesc' => $this->dsSite->getValue(DBESite::SiteNo)
-                        )
-                    );
-                    header('Location: ' . $urlNext);
-                }
-        */
-    }// end of class
+    }
 }
-
-?>

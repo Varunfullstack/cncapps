@@ -53,8 +53,8 @@ class DBECallActivitySearch extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -314,20 +314,20 @@ class DBECallActivitySearch extends DBEntity
     }
 
     function getRowsBySearchCriteria(
-        $callActivityID,
-        $problemID,
-        $customerID,
-        $userID,
-        $status,
-        $rootCauseID,
-        $priority,
-        $activityText,
-        $serviceRequestSpentTime,
-        $individualActivitySpentTime,
-        $fromDate,
-        $toDate,
-        $contractCustomerItemID,
-        $callActTypeID,
+        $callActivityID = null,
+        $problemID = null,
+        $customerID = null,
+        $userID = null,
+        $status = null,
+        $rootCauseID = null,
+        $priority = null,
+        $activityText = null,
+        $serviceRequestSpentTime = null,
+        $individualActivitySpentTime = null,
+        $fromDate = null,
+        $toDate = null,
+        $contractCustomerItemID = null,
+        $callActTypeID = null,
         $linkedSalesOrderID = null,
         $managementReviewOnly = 'N',
         $breachedSlaOption = '',

@@ -32,7 +32,6 @@ class DBECallActivity extends DBEntity
     const parentCallActivityID = "parentCallActivityID";
     const awaitingCustomerResponseFlag = "awaitingCustomerResponseFlag";
     const loggingErrorFlag = "loggingErrorFlag";
-    const escalationID = "escalationID";
     const escalationAcceptedFlag = "escalationAcceptedFlag";
     const hideFromCustomerFlag = "hideFromCustomerFlag";
     const secondsiteErrorServer = "secondsiteErrorServer";
@@ -196,11 +195,6 @@ class DBECallActivity extends DBEntity
             "caa_logging_error_flag"
         );
         $this->addColumn(
-            self::escalationID,
-            DA_ID,
-            DA_ALLOW_NULL
-        );
-        $this->addColumn(
             self::escalationAcceptedFlag,
             DA_YN,
             DA_ALLOW_NULL
@@ -281,6 +275,7 @@ class DBECallActivity extends DBEntity
                 return ($this->getDBColumnValue(0));
             }
         }
+        return 0;
     }
 
     function countTravelRowsForTodayByCustomerSiteNoEngineer(
@@ -305,6 +300,7 @@ class DBECallActivity extends DBEntity
                 return ($this->getDBColumnValue(0));
             }
         }
+        return 0;
     }
 
     function countEngineerRowsByProblem($problemID)
@@ -321,6 +317,7 @@ class DBECallActivity extends DBEntity
                 return ($this->getDBColumnValue(0));
             }
         }
+        return 0;
     }
 
     function countSendEmailActivities($problemID)
@@ -338,6 +335,7 @@ class DBECallActivity extends DBEntity
                 return ($this->getDBColumnValue(0));
             }
         }
+        return 0;
     }
 
     function setAllActivitiesToAuthorisedByProblemID($problemID)
@@ -353,6 +351,3 @@ class DBECallActivity extends DBEntity
         $this->runQuery();
     }
 }
-
-
-?>

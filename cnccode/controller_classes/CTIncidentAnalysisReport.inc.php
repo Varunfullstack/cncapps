@@ -12,9 +12,14 @@ require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTIncidentAnalysisReport extends CTCNC
 {
-    var $dsPrintRange = '';
-    var $dsSearchForm = '';
-    var $dsResults = '';
+    /** @var DSForm */
+    public $dsSearchForm;
+    /** @var DataSet */
+    public $dsResults;
+    /**@var bool|mysqli_result */
+    public $results;
+    /**@var BUIncidentAnalysisReport */
+    public $buIncidentAnalysisReport;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
@@ -33,6 +38,7 @@ class CTIncidentAnalysisReport extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -47,6 +53,9 @@ class CTIncidentAnalysisReport extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function search()
     {
 
@@ -57,20 +66,23 @@ class CTIncidentAnalysisReport extends CTCNC
 
             if (!$this->dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
                 $this->setFormErrorOn();
-                $this->displaySearchForm(); //redisplay with errors
+                $this->displaySearchForm();
                 exit ();
             }
 
         }
 
-        if ($this->dsSearchForm->getValue('fromDate') == '') {
+        if (!$this->dsSearchForm->getValue(BUIncidentAnalysisReport::searchFormFromDate)) {
             $this->dsSearchForm->setUpdateModeUpdate();
-            $this->dsSearchForm->setValue('fromDate', date('Y-m-d', strtotime("-1 year")));
+            $this->dsSearchForm->setValue(
+                BUIncidentAnalysisReport::searchFormFromDate,
+                date('Y-m-d', strtotime("-1 year"))
+            );
             $this->dsSearchForm->post();
         }
-        if (!$this->dsSearchForm->getValue('toDate')) {
+        if (!$this->dsSearchForm->getValue(BUIncidentAnalysisReport::searchFormToDate)) {
             $this->dsSearchForm->setUpdateModeUpdate();
-            $this->dsSearchForm->setValue('toDate', date('Y-m-d'));
+            $this->dsSearchForm->setValue(BUIncidentAnalysisReport::searchFormToDate, date('Y-m-d'));
             $this->dsSearchForm->post();
         }
 
@@ -83,6 +95,7 @@ class CTIncidentAnalysisReport extends CTCNC
     /**
      * Display search form
      * @access private
+     * @throws Exception
      */
     function displaySearchForm()
     {
@@ -105,12 +118,16 @@ class CTIncidentAnalysisReport extends CTCNC
         */
         $this->template->set_var(
             array(
-                'formError' => $this->formError,
-                'fromDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
-                'fromDateMessage' => $dsSearchForm->getMessage('fromDate'),
-                'toDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
-                'toDateMessage' => $dsSearchForm->getMessage('toDate'),
-                'urlSubmit' => $urlSubmit,
+                'formError'       => $this->formError,
+                'fromDate'        => Controller::dateYMDtoDMY(
+                    $dsSearchForm->getValue(BUIncidentAnalysisReport::searchFormFromDate)
+                ),
+                'fromDateMessage' => $dsSearchForm->getMessage(BUIncidentAnalysisReport::searchFormFromDate),
+                'toDate'          => Controller::dateYMDtoDMY(
+                    $dsSearchForm->getValue(BUIncidentAnalysisReport::searchFormToDate)
+                ),
+                'toDateMessage'   => $dsSearchForm->getMessage(BUIncidentAnalysisReport::searchFormToDate),
+                'urlSubmit'       => $urlSubmit,
             )
         );
         /*
@@ -128,13 +145,14 @@ class CTIncidentAnalysisReport extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'year' => $row->year,
-                        'month' => $row->month,
+                        'year'                 => $row->year,
+                        'month'                => $row->month,
                         'incidentsTotalCount'
-                        => $row->incidentsTotalCount,
-                        'activityTotalHours' => $row->activityTotalHours,
-                        'fixAverageHours' => number_format($row->fixAverageHours, 2),
-                        'responseAverageHours' => number_format($row->responseAverageHours, 2))
+                                               => $row->incidentsTotalCount,
+                        'activityTotalHours'   => $row->activityTotalHours,
+                        'fixAverageHours'      => number_format($row->fixAverageHours, 2),
+                        'responseAverageHours' => number_format($row->responseAverageHours, 2)
+                    )
                 );
 
                 $this->template->parse('results', 'resultBlock', true);
@@ -143,8 +161,5 @@ class CTIncidentAnalysisReport extends CTCNC
         $this->template->parse('CONTENTS', 'IncidentAnalysisReport', true);
 
         $this->parsePage();
-
-    } // end function displaySearchForm
-
-} // end of class
-?>
+    }
+}

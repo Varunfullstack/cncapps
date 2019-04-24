@@ -13,6 +13,10 @@ require_once($cfg["path_bu"] . '/BUItem.inc.php');
 class BUCustomerAnalysisReport extends Business
 {
 
+    const searchFormCustomerID = "customerID";
+    const searchFormStartYearMonth = "customerID";
+    const searchFormEndYearMonth = "startYearMonth";
+
     function __construct(&$owner)
     {
         parent::__construct($owner);
@@ -21,12 +25,12 @@ class BUCustomerAnalysisReport extends Business
     function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);
-        $dsData->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
-        $dsData->setValue('customerID', '');
-        $dsData->addColumn('startYearMonth', DA_STRING, DA_ALLOW_NULL);
-        $dsData->setValue('startYearMonth', '');
-        $dsData->addColumn('endYearMonth', DA_STRING, DA_ALLOW_NULL);
-        $dsData->setValue('endYearMonth', '');
+        $dsData->addColumn(self::searchFormCustomerID, DA_STRING, DA_ALLOW_NULL);
+        $dsData->setValue(self::searchFormCustomerID, null);
+        $dsData->addColumn(self::searchFormStartYearMonth, DA_STRING, DA_ALLOW_NULL);
+        $dsData->setValue(self::searchFormStartYearMonth, null);
+        $dsData->addColumn(self::searchFormEndYearMonth, DA_STRING, DA_ALLOW_NULL);
+        $dsData->setValue(self::searchFormEndYearMonth, null);
     }
 
     /**
@@ -143,7 +147,7 @@ class BUCustomerAnalysisReport extends Business
         }
         $row = $this->db->query($sql)->fetch_array();
 
-        /* Per month values in different fields despending upon renewal type */
+        /* Per month values in different fields depending upon renewal type */
         if ($row['salePricePerMonth'] > 0) {
             $perMonthSale = $row['salePricePerMonth'];
             $perMonthCost = $row['costPricePerMonth'];
@@ -188,28 +192,32 @@ class BUCustomerAnalysisReport extends Business
         return $this->db->query($sql)->fetch_array();
     }
 
-
+    /**
+     * @param DSForm $searchForm
+     * @return mixed
+     */
     function getResults(&$searchForm)
     {
         $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
 
-        $customerID = $searchForm->getValue('customerID');
+        $customerID = $searchForm->getValue(self::searchFormCustomerID);
 
         $startDate = DateTime::createFromFormat(
             "m/Y",
-            $searchForm->getValue('startYearMonth')
+            $searchForm->getValue(self::searchFormStartYearMonth)
         )->modify('first day of this month ');
         $endDate = DateTime::createFromFormat(
             "m/Y",
-            $searchForm->getValue('endYearMonth')
+            $searchForm->getValue(self::searchFormEndYearMonth)
         )->modify('last day of this month');
 
         $diff = $startDate->diff($endDate);
 
-        $numberOfMonths = round($diff->days/30);
+        $numberOfMonths = round($diff->days / 30);
 
-        $hourlyRate = $dsHeader->getValue('hourlyLabourCost');
+        $hourlyRate = $dsHeader->getValue(DBEHeader::hourlyLabourCost);
 
         $test = new BUItem($this);
         /**
@@ -218,7 +226,7 @@ class BUCustomerAnalysisReport extends Business
         $data = null;
         $test->getItemByID(2237, $data);
 
-        $hourlyLabourCharge = $data->getValue('curUnitSale');
+        $hourlyLabourCharge = $data->getValue(DBEItem::curUnitSale);
 
         $contractItems = $this->getContractItems($customerID);
         $contractItemsArray = array();
@@ -255,20 +263,19 @@ class BUCustomerAnalysisReport extends Business
 
             $profit = $sales - $cost - $labourCost;
 
+            $profitPercent = null;
             if ($sales > 0) {
                 $profitPercent = number_format(100 - (($cost + $labourCost) / $sales) * 100, 2);
-            } else {
-                $profitPercent = '';
             }
 
             $results[$item['Contract']] =
                 array(
-                    'sales' => $sales,
-                    'cost' => $cost,
-                    'profit' => $profit,
+                    'sales'         => $sales,
+                    'cost'          => $cost,
+                    'profit'        => $profit,
                     'profitPercent' => $profitPercent,
-                    'labourCost' => $labourCost,
-                    'labourHours' => $labourHoursRow[0]
+                    'labourCost'    => $labourCost,
+                    'labourHours'   => $labourHoursRow[0]
                 );
         }
 
@@ -289,20 +296,19 @@ class BUCustomerAnalysisReport extends Business
 
         $profit = $sales - $cost - $labourCost;
 
+        $profitPercent = null;
         if ($sales > 0) {
             $profitPercent = number_format(100 - (($cost + $labourCost) / $sales) * 100, 2);
-        } else {
-            $profitPercent = '';
         }
 
         $results['Other Sales'] =
             array(
-                'sales' => $sales,
-                'cost' => $cost,
-                'profit' => $profit,
+                'sales'         => $sales,
+                'cost'          => $cost,
+                'profit'        => $profit,
                 'profitPercent' => $profitPercent,
-                'labourCost' => $labourCost,
-                'labourHours' => $otherSalesHoursRow['hours']
+                'labourCost'    => $labourCost,
+                'labourHours'   => $otherSalesHoursRow['hours']
             );
 
         return $results;
@@ -310,6 +316,12 @@ class BUCustomerAnalysisReport extends Business
     }
 
 
+    /**
+     * @param $startYearMonth
+     * @param $endYearMonth
+     * @return int
+     * @throws Exception
+     */
     function getMonthsBetweenYearMonths($startYearMonth, $endYearMonth)
     {
         $d1 = new DateTime($startYearMonth . "-01");
@@ -317,14 +329,13 @@ class BUCustomerAnalysisReport extends Business
 
         $months = 0;
 
-        $d1->add(new \DateInterval('P1M'));
+        $d1->add(new DateInterval('P1M'));
 
         while ($d1 <= $d2) {
             $months++;
-            $d1->add(new \DateInterval('P1M'));
+            $d1->add(new DateInterval('P1M'));
         }
 
         return $months + 1;
     }
-}//End of class
-?>
+}

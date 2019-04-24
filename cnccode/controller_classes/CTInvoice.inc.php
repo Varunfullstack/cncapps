@@ -953,11 +953,7 @@ class CTInvoice extends CTCNC
         // link to Sales Order
         if ($dsInvhead->getValue(DBEInvhead::ordheadID) != 0) {
             $dbeOrdhead = new DBEJOrdhead($this);
-            $dbeOrdhead->setValue(
-                DBEOrdhead::ordheadID,
-                $dsInvhead->getValue(DBEInvhead::ordheadID)
-            );
-            if ($dbeOrdhead->getRow()) {
+            if ($dbeOrdhead->getRow($dsInvhead->getValue(DBEInvhead::ordheadID))) {
                 $urlSalesOrder =
                     Controller::buildLink(
                         CTCNC_PAGE_SALESORDER,
@@ -1449,44 +1445,44 @@ class CTInvoice extends CTCNC
         // set item line required fields
         if ($_REQUEST['invline'][1]['lineType'] == "I") {
             $this->dsInvline->setNull(
-                'itemID',
+                DBEInvline::itemID,
                 DA_NOT_NULL
             );
             $this->dsInvline->setNull(
-                'qty',
+                DBEInvline::qty,
                 DA_NOT_NULL
             );
             $this->dsInvline->setNull(
-                'curUnitCost',
+                DBEInvline::curUnitCost,
                 DA_NOT_NULL
             );
             $this->dsInvline->setNull(
-                'curUnitSale',
+                DBEInvline::curUnitSale,
                 DA_NOT_NULL
             );
             $this->dsInvline->setNull(
-                'description',
+                DBEInvline::description,
                 DA_NOT_NULL
             );
         } else {                                                                                                        // Comment line
             $this->dsInvline->setNull(
-                'itemID',
+                DBEInvline::itemID,
                 DA_ALLOW_NULL
             );
             $this->dsInvline->setNull(
-                'qty',
+                DBEInvline::qty,
                 DA_ALLOW_NULL
             );
             $this->dsInvline->setNull(
-                'curUnitCost',
+                DBEInvline::curUnitCost,
                 DA_ALLOW_NULL
             );
             $this->dsInvline->setNull(
-                'curUnitSale',
+                DBEInvline::curUnitSale,
                 DA_ALLOW_NULL
             );
             $this->dsInvline->setNull(
-                'description',
+                DBEInvline::description,
                 DA_NOT_NULL
             );
         }

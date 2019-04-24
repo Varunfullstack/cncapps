@@ -745,25 +745,6 @@ class DBECustomerItem extends DBCNCEntity
         return (parent::getRows());
     }
 
-    /* Update for new many-to-many
-    function setRowsToContractID( $contractID, $customerItemIDArray )
-    {
-
-       $this->setMethodName('setRowsToContractID');
-
-       if ( !$customerItemIDArray ){
-         $this->raiseError('$customerItemIDArray  not set');
-       }
-
-       $this->setQueryString(
-         "UPDATE " . $this->getTableName().
-         " SET ". $this->getDBColumnName('contractID') . " = " . $contractID .
-         " WHERE ". $this->getDBColumnName('customerItemID') . " IN ( ". implode( ',', $customerItemIDArray ) . ")"
-       );
-
-      return $this->runQuery();
-    }
-    */
     function addYearToStartDate($customerItemID)
     {
         $statement =
@@ -813,7 +794,7 @@ class DBECustomerItem extends DBCNCEntity
     }
 
     function updateContract($customerItemID,
-                            $contractIDs = false
+                            $contractIDs = []
     )
     {
 
@@ -859,7 +840,7 @@ class DBECustomerItem extends DBCNCEntity
       WHERE
         cic_cuino = $customerItemID";
 
-        $result = $this->db->query($statement);
+        $this->db->query($statement);
 
         $existingContractIDs = array();
 
@@ -913,5 +894,3 @@ class DBECustomerItem extends DBCNCEntity
     }
 
 }
-
-?>

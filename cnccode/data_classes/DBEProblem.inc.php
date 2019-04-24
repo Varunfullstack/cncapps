@@ -391,14 +391,12 @@ class DBEProblem extends DBEntity
 
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('customerID') . ' = ' . $customerID .
-            " AND " . $this->getDBColumnName('completeDate') . " BETWEEN '" .
+            " WHERE " . $this->getDBColumnName(self::customerID) . ' = ' . $customerID .
+            " AND " . $this->getDBColumnName(self::completeDate) . " BETWEEN '" .
             $startDate->format('Y-m-d') . "' AND '" . $endDate->format('Y-m-d') . "' AND " .
-            $this->getDBColumnName('managementReviewReason') . "<> ''"
+            $this->getDBColumnName(self::managementReviewReason) . "<> ''"
         );
 
         return parent::getRows();
     }
 }
-
-?>

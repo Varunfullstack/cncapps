@@ -341,4 +341,37 @@
         <dropTable tableName="arecord"/>
         <rollback/>
     </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-48">
+        <dropTable tableName="servicedeskreport"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-49">
+        <dropTable tableName="notepad"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-50">
+        <dropTable tableName="prizewinner"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-51">
+        <dropTable tableName="securityapp"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-52">
+        <dropTable tableName="escalation"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-53">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callactivity" columnName="escalationID"/>
+        </preConditions>
+        <dropColumn tableName="callactivity" columnName="escalationID"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-54">
+        <dropTable tableName="ordline_sco"/>
+        <rollback/>
+    </changeSet>
+
+
 </databaseChangeLog>

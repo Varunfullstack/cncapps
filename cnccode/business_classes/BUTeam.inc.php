@@ -10,7 +10,8 @@ require_once($cfg["path_dbe"] . "/DBEUser.inc.php");
 
 class BUTeam extends Business
 {
-    var $dbeTeam = "";
+    /** @var DBETeam */
+    public $dbeTeam;
 
     /**
      * Constructor
@@ -23,6 +24,10 @@ class BUTeam extends Business
         $this->dbeTeam = new DBETeam($this);
     }
 
+    /**
+     * @param $dsData
+     * @return bool
+     */
     function updateTeam(&$dsData)
     {
         $this->setMethodName('updateTeam');
@@ -30,6 +35,11 @@ class BUTeam extends Business
         return TRUE;
     }
 
+    /**
+     * @param $ID
+     * @param $dsResults
+     * @return bool
+     */
     function getTeamByID($ID, &$dsResults)
     {
         $this->dbeTeam->setPKValue($ID);
@@ -98,16 +108,13 @@ class BUTeam extends Business
 
     /**
      *    canDelete
+     * @param $ID
+     * @return bool
      */
     function canDelete($ID)
     {
         $dbeUser = new DBEUser($this);
-        $dbeUser->setValue('teamID', $ID);
-        if ($dbeUser->countRowsByColumn('teamID') < 1) {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
+        $dbeUser->setValue(DBEJUser::teamID, $ID);
+        return $dbeUser->countRowsByColumn(DBEJUser::teamID) < 1;
     }
-}// End of class
-?>
+}

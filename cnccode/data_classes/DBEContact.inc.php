@@ -62,8 +62,8 @@ class DBEContact extends DBCNCEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -519,6 +519,7 @@ class DBEContact extends DBCNCEntity
      * Get rows by name match
      * Excludes discontinued rows
      * @access public
+     * @param $match
      * @return bool Success
      */
     function getSupplierContactRowsByNameMatch($match)
@@ -554,6 +555,8 @@ class DBEContact extends DBCNCEntity
      * Get customer/site rows by name match
      * Excludes discontinued rows
      * @access public
+     * @param $customerId
+     * @param $match
      * @return bool Success
      */
     function getCustomerRowsByNameMatch($customerId,
@@ -688,22 +691,6 @@ class DBEContact extends DBCNCEntity
             $sql .= " AND con_custno = " . $customerID;
         }
         $this->setQueryString($sql);
-
-        return (parent::getRows());
-    }
-
-    function getTechnicalMailshotRows()
-    {
-        $this->setQueryString(
-            "SELECT
-        contact.*
-      FROM contact
-          JOIN customer ON cus_custno = con_custno
-      WHERE cus_mailshot = 'Y'
-        AND " . $this->getDBColumnName(CONFIG_HEADER_TECHNICAL_MAILSHOT_CONTACT_FLAG) . " = 'Y'
-        AND " . $this->getDBColumnName(CONFIG_HEADER_SUPPORT_CONTACT_FLAG) . " = 'Y'
-        AND cus_prospect = 'N'"
-        );
 
         return (parent::getRows());
     }
@@ -940,5 +927,3 @@ class DBEContact extends DBCNCEntity
 
     }
 }
-
-?>

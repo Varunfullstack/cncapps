@@ -63,9 +63,9 @@ class CTContact extends CTCNC
      * @var     DSForm
      * @access  private
      */
-    var $dsContact = '';
+    public $dsContact;
 
-    /** @var BUContact  */
+    /** @var BUContact */
     private $buContact;
 
     function __construct($requestMethod,
@@ -97,6 +97,7 @@ class CTContact extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -136,18 +137,14 @@ class CTContact extends CTCNC
     /**
      * Display the popup selector form
      * @access private
+     * @throws Exception
      */
     function displayContactSelectPopup()
     {
         $this->setMethodName('displayContactSelectPopup');
-        if (($_REQUEST['supplierID'] == '') AND ($_REQUEST['customerID'] == '')) {
+        if (!$_REQUEST['supplierID'] && $_REQUEST['customerID']) {
             $this->raiseError('supplierID or customerID not passed');
         }
-        /*				for contact lookup from calls
-                if (($_REQUEST['customerID']!='') AND ($_REQUEST['siteNo']=='')){
-                    $this->raiseError('siteNo not passed');
-                }
-        */
         $urlCreate = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
@@ -162,7 +159,7 @@ class CTContact extends CTCNC
             header('Location: ' . $urlCreate);
             exit;
         }
-        if ($_REQUEST['supplierID'] != '') {
+        if ($_REQUEST['supplierID']) {
             $this->buContact->getSupplierContactsByNameMatch(
                 $_REQUEST['supplierID'],
                 $_REQUEST['contactName'],
@@ -212,12 +209,14 @@ class CTContact extends CTCNC
                 'contacts'
             );
             while ($this->dsContact->fetchNext()) {
-                $name = $this->dsContact->getValue("firstName") . ' ' . $this->dsContact->getValue("lastName");
+                $name = $this->dsContact->getValue(DBEContact::firstName) . ' ' . $this->dsContact->getValue(
+                        DBEContact::lastName
+                    );
                 $this->template->set_var(
                     array(
                         'contactName' => Controller::htmlDisplayText(($name)),
-                        'submitName'  => addslashes($name), //so dblquotes don't mess javascript up
-                        'contactID'   => $this->dsContact->getValue("contactID")
+                        'submitName'  => addslashes($name), //so double quotes don't mess javascript up
+                        'contactID'   => $this->dsContact->getValue(DBEContact::contactID)
                     )
                 );
                 $this->template->parse(
@@ -251,6 +250,7 @@ class CTContact extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function contactForm()
     {
@@ -263,6 +263,7 @@ class CTContact extends CTCNC
         }
         // template
         $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
         $this->setTemplateFiles(
             'ContactEdit',
@@ -272,7 +273,7 @@ class CTContact extends CTCNC
         $this->template->set_block(
             'CustomerEdit',
             'selectSupportLevel',
-            ''
+            null
         );
 
         $this->template->set_block(
@@ -300,31 +301,31 @@ class CTContact extends CTCNC
                     $this->dsContact->getValue(DBEContact::firstName)
                 ),
                 'firstNameMessage'                     => Controller::htmlDisplayText(
-                    $this->dsContact->getMessage('firstName')
+                    $this->dsContact->getMessage(DBEContact::firstName)
                 ),
                 'lastName'                             => Controller::htmlInputText(
                     $this->dsContact->getValue(DBEContact::lastName)
                 ),
                 'lastNameMessage'                      => Controller::htmlDisplayText(
-                    $this->dsContact->getMessage('lastName')
+                    $this->dsContact->getMessage(DBEContact::lastName)
                 ),
                 'position'                             => Controller::htmlInputText(
                     $this->dsContact->getValue(DBEContact::position)
                 ),
                 'positionMessage'                      => Controller::htmlDisplayText(
-                    $this->dsContact->getMessage('position')
+                    $this->dsContact->getMessage(DBEContact::position)
                 ),
                 'title'                                => Controller::htmlInputText(
                     $this->dsContact->getValue(DBEContact::title)
                 ),
                 'titleMessage'                         => Controller::htmlDisplayText(
-                    $this->dsContact->getMessage('title')
+                    $this->dsContact->getMessage(DBEContact::title)
                 ),
                 'email'                                => Controller::htmlInputText(
                     $this->dsContact->getValue(DBEContact::email)
                 ),
                 'emailMessage'                         => Controller::htmlDisplayText(
-                    $this->dsContact->getMessage('email')
+                    $this->dsContact->getMessage(DBEContact::email)
                 ),
                 'portalPasswordButtonClass'            => $this->dsContact->getValue(
                     DBEContact::portalPassword
@@ -333,25 +334,25 @@ class CTContact extends CTCNC
                     $this->dsContact->getValue(DBEContact::failedLoginCount)
                 ),
                 'failedLoginCountMessage'              => Controller::htmlDisplayText(
-                    $this->dsContact->getMessage('failedLoginCount')
+                    $this->dsContact->getMessage(DBEContact::failedLoginCount)
                 ),
                 'notes'                                => Controller::htmlInputText(
                     $this->dsContact->getValue(DBEContact::notes)
                 ),
                 'notesMessage'                         => Controller::htmlDisplayText(
-                    $this->dsContact->getMessage('notes')
+                    $this->dsContact->getMessage(DBEContact::notes)
                 ),
                 'phone'                                => Controller::htmlDisplayText(
                     $this->dsContact->getValue(DBEContact::phone)
                 ),
                 'phoneMessage'                         => Controller::htmlDisplayText(
-                    $this->dsContact->getMessage('phone')
+                    $this->dsContact->getMessage(DBEContact::phone)
                 ),
                 'mobilePhone'                          => Controller::htmlDisplayText(
                     $this->dsContact->getValue(DBEContact::mobilePhone)
                 ),
                 'mobilePhoneMessage'                   => Controller::htmlDisplayText(
-                    $this->dsContact->getMessage('mobilePhone')
+                    $this->dsContact->getMessage(DBEContact::mobilePhone)
                 ),
                 'accountsFlagChecked'                  => Controller::htmlChecked(
                     $this->dsContact->getValue(DBEContact::accountsFlag)
@@ -406,7 +407,7 @@ class CTContact extends CTCNC
                 ),
                 'topUpValidation'                      => $buCustomer->hasPrepayContract(
                     DBEContact::customerID
-                ) ? 'data-validation="atLeastOne"' : '',
+                ) ? 'data-validation="atLeastOne"' : null,
                 'mailshot2FlagDesc'                    => Controller::htmlDisplayText(
                     $dsHeader->getValue(DBEHeader::mailshot2FlagDesc)
                 ),
@@ -445,7 +446,7 @@ class CTContact extends CTCNC
                 ),
                 'pendingLeaverFlagChecked'             => ($this->dsContact->getValue(
                         DBEContact::pendingLeaverFlag
-                    ) == 'Y') ? CT_CHECKED : '',
+                    ) == 'Y') ? CT_CHECKED : null,
                 'pendingLeaverDate'                    => Controller::dateYMDtoDMY(
                     $this->dsContact->getValue(DBEContact::pendingLeaverDate)
                 ),
@@ -466,16 +467,17 @@ class CTContact extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function contactFormPrepareAdd()
     {
         // If form error then preserve values in $this->dsContact else initialise new
         $this->setPageTitle(CTCONTACT_TXT_NEW_CONTACT);
         if (!$this->getFormError()) {
-            if (($_REQUEST['supplierID'] == '') AND ($_REQUEST['customerID'] == '')) {
+            if (!$_REQUEST['supplierID'] && !$_REQUEST['customerID']) {
                 $this->raiseError('supplierID or customerID not passed');
             }
-            if (($_REQUEST['customerID'] != '') AND ($_REQUEST['siteNo'] == '')) {
+            if ($_REQUEST['customerID'] && $_REQUEST['siteNo'] == "") {
                 $this->raiseError('siteNo not passed');
             }
             $this->buContact->initialiseNewContact(
@@ -485,14 +487,12 @@ class CTContact extends CTCNC
                 $this->dsContact
             );
         }
-        return (
-        Controller::buildLink(
+        return Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'  => CTCONTACT_ACT_CONTACT_INSERT,
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
-        )
         );
     }
 
@@ -501,6 +501,7 @@ class CTContact extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function contactFormPrepareEdit()
     {
@@ -517,47 +518,20 @@ class CTContact extends CTCNC
                 $this->displayFatalError(CTCONTACT_MSG_CONTACT_NOT_FND);
             }
         }
-        return (
-        Controller::buildLink(
+        return Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'  => CTCONTACT_ACT_CONTACT_UPDATE,
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
-        )
-        );
-    }
 
-    function parsePayMethodSelector($payMethodID)
-    {
-        $dsPayMethod = new DataSet($this);
-        $this->buContact->getAllPayMethods($dsPayMethod);
-        $this->template->set_block(
-            'ContactEdit',
-            'payMethodBlock',
-            'payMethods'
         );
-        while ($dsPayMethod->fetchNext()) {
-            $this->template->set_var(
-                array(
-                    'payMethodDescription' => $dsPayMethod->getValue(DBEPayMethod::description),
-                    'payMethodID'          => $dsPayMethod->getValue(DBEPayMethod::payMethodID),
-                    'payMethodSelected'    => ($payMethodID == $dsPayMethod->getValue(
-                            DBEPayMethod::payMethodID
-                        )) ? CT_SELECTED : ''
-                )
-            );
-            $this->template->parse(
-                'payMethods',
-                'payMethodBlock',
-                true
-            );
-        }
     }
 
     /**
      * Update contact record
      * @access private
+     * @throws Exception
      */
     function contactUpdate()
     {
@@ -574,7 +548,7 @@ class CTContact extends CTCNC
             } else {
                 $_REQUEST['action'] = CTCNC_ACT_CONTACT_EDIT;
             }
-            $_REQUEST['contactID'] = $this->dsContact->getValue('contactID');
+            $_REQUEST['contactID'] = $this->dsContact->getValue(DBEContact::contactID);
             $this->contactForm();
             exit;
         }
@@ -588,14 +562,13 @@ class CTContact extends CTCNC
             $_SERVER['PHP_SELF'],
             array(
                 'action'      => CTCNC_ACT_DISP_CONTACT_POPUP,
-                'supplierID'  => $this->dsContact->getValue('supplierID'),
-                'customerID'  => $this->dsContact->getValue('customerID'),
-                'siteNo'      => $this->dsContact->getValue('siteNo'),
+                'supplierID'  => $this->dsContact->getValue(DBEContact::supplierID),
+                'customerID'  => $this->dsContact->getValue(DBEContact::customerID),
+                'siteNo'      => $this->dsContact->getValue(DBEContact::siteNo),
                 'contactName' => $this->dsContact->getPKValue(),
                 'htmlFmt'     => CT_HTML_FMT_POPUP
             )
         );
         header('Location: ' . $urlNext);
     }
-}// end of class
-?>
+}

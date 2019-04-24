@@ -11,6 +11,10 @@ require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
 class BUContractAnalysisReport extends Business
 {
+    const searchFormContracts = "contracts";
+    const searchFormStartYearMonth = "startYearMonth";
+    const searchFormEndYearMonth = "endYearMonth";
+
 
     function __construct(&$owner)
     {
@@ -20,27 +24,27 @@ class BUContractAnalysisReport extends Business
     function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);
-        $dsData->addColumn('contracts', DA_STRING, DA_ALLOW_NULL);
-        $dsData->setValue('contracts', '');
-        $dsData->addColumn('startYearMonth', DA_STRING, DA_ALLOW_NULL);
-        $dsData->setValue('startYearMonth', '');
-        $dsData->addColumn('endYearMonth', DA_STRING, DA_ALLOW_NULL);
-        $dsData->setValue('endYearMonth', '');
+        $dsData->addColumn(self::searchFormContracts, DA_STRING, DA_ALLOW_NULL);
+        $dsData->setValue(self::searchFormContracts, null);
+        $dsData->addColumn(self::searchFormStartYearMonth, DA_STRING, DA_ALLOW_NULL);
+        $dsData->setValue(self::searchFormStartYearMonth, null);
+        $dsData->addColumn(self::searchFormEndYearMonth, DA_STRING, DA_ALLOW_NULL);
+        $dsData->setValue(self::searchFormEndYearMonth, null);
     }
 
     /**
      * Get a comma-separated list of itemIDs that match contract search string
-     **/
+     * @param $contracts
+     * @return bool
+     */
     function getContractItemIDs($contracts)
     {
         $sql =
             "
         SELECT
           GROUP_CONCAT( itm_itemno ) AS `IDs`
-          
         FROM
           item
-          
         WHERE
           item.renewalTypeID <> 0
           AND MATCH (itm_desc) AGAINST ( '$contracts' IN BOOLEAN MODE )";
@@ -54,7 +58,9 @@ class BUContractAnalysisReport extends Business
 
     /**
      * Get list of customers with given contracts
-     **/
+     * @param $contractItemIDs
+     * @return bool|mysqli_result
+     */
     function getCustomers($contractItemIDs)
     {
         $sql =
@@ -62,23 +68,18 @@ class BUContractAnalysisReport extends Business
         SELECT
           DISTINCT cus_custno AS `customerID`,
           cus_name AS `Customer`
-          
         FROM
           customer
           JOIN custitem ON cui_custno = cus_custno
-          
         WHERE
           declinedFlag = 'N'
           AND renewalStatus ='R'";
 
         if ($contractItemIDs) {
-            $sql .=
-                " AND cui_itemno IN ( $contractItemIDs )";
+            $sql .= " AND cui_itemno IN ( $contractItemIDs )";
         }
 
-        $sql .=
-            " ORDER BY
-          cus_name";
+        $sql .= " ORDER BY cus_name";
 
         return $this->db->query($sql);
     }
@@ -86,7 +87,8 @@ class BUContractAnalysisReport extends Business
     function getLabourHours($customerID,
                             DateTimeInterface $startDate,
                             DateTimeInterface $endDate,
-                            $contractItemIDs = false)
+                            $contractItemIDs = false
+    )
     {
         $sql =
             "SELECT
@@ -164,20 +166,29 @@ class BUContractAnalysisReport extends Business
 
     }
 
+    /**
+     * @param DSForm $searchForm
+     * @return array|bool
+     */
     function getResults($searchForm)
     {
         $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
 
-        $contracts = $searchForm->getValue('contracts');
-        $startDate = (DateTime::createFromFormat("m/Y",
-                                                 $searchForm->getValue('startYearMonth')))->modify('first day of this month ');
-        $endDate = (DateTime::createFromFormat("m/Y",
-                                               $searchForm->getValue('endYearMonth')))->modify('last day of this month');
+        $contracts = $searchForm->getValue(self::searchFormContracts);
+        $startDate = (DateTime::createFromFormat(
+            "m/Y",
+            $searchForm->getValue(self::searchFormStartYearMonth)
+        ))->modify('first day of this month ');
+        $endDate = (DateTime::createFromFormat(
+            "m/Y",
+            $searchForm->getValue(self::searchFormEndYearMonth)
+        ))->modify('last day of this month');
 
         $numberOfMonths = $startDate->diff($endDate)->m + ($startDate->diff($endDate)->y * 12);
 
-        $hourlyRate = $dsHeader->getValue('hourlyLabourCost');
+        $hourlyRate = $dsHeader->getValue(DBEHeader::hourlyLabourCost);
 
         $nothingFoundForSpecifiedContractString = false;
 
@@ -203,7 +214,7 @@ class BUContractAnalysisReport extends Business
         while ($row = $customers->fetch_array()) {
             $customersArray[] = $row;
         }
-
+        $results = [];
 
         foreach ($customersArray as $customer) {
             /*
@@ -222,39 +233,29 @@ class BUContractAnalysisReport extends Business
                     $customer['customerID'],
                     $contractItemIDs
                 );
-
             $cost = round($contractValues['perMonthCost'] * $numberOfMonths, 2);
-
             $sales = round($contractValues['perMonthSale'] * $numberOfMonths, 2);
-
             $labourCost = round($labourHoursRow[0] * $hourlyRate, 2);
-
             $prepayValues = $this->getPrepayValues($startDate, $endDate, $customer['customerID'], $contractItemIDs);
-
             $sales = round($sales + $prepayValues['sales'], 2);
-//            $labourCost = round($labourCost + $prepayValues['labourCost'], 2);
-
             $profit = $sales - $cost - $labourCost;
 
             //get prepay data
-
-
+            $profitPercent = null;
             if ($sales > 0) {
                 $profitPercent = number_format(100 - (($cost + $labourCost) / $sales) * 100, 2);
-            } else {
-                $profitPercent = '';
             }
 
 
             $results[$customer['Customer']] =
                 array(
-                    'customerID' => $customer['customerID'],
-                    'sales' => $sales,
-                    'cost' => $cost,
-                    'profit' => $profit,
-                    'labourCost' => $labourCost,
+                    'customerID'    => $customer['customerID'],
+                    'sales'         => $sales,
+                    'cost'          => $cost,
+                    'profit'        => $profit,
+                    'labourCost'    => $labourCost,
                     'profitPercent' => $profitPercent,
-                    'labourHours' => $labourHoursRow[0]
+                    'labourHours'   => $labourHoursRow[0]
                 );
         }
 
@@ -265,7 +266,8 @@ class BUContractAnalysisReport extends Business
     function getPrepayValues(DateTimeInterface $startDate,
                              DateTimeInterface $endDate,
                              $customerId,
-                             $contractItemIDs = null)
+                             $contractItemIDs = null
+    )
     {
         $query = "SELECT
                   hourlyLabourCharge * hours AS sales,
@@ -280,7 +282,6 @@ class BUContractAnalysisReport extends Business
                       FROM
                         item
                       WHERE itm_itemno = 2237)                        AS hourlyLabourCharge,
-                     itm_desc                                         AS contract,
                      cui_itemno,
                      (SELECT SUM(
                                  pro_total_activity_duration_hours
@@ -319,9 +320,8 @@ class BUContractAnalysisReport extends Business
         }
 
         return array(
-            "sales" => $sales,
+            "sales"      => $sales,
             "labourCost" => $labourCost
         );
     }
-}//End of class
-?>
+}

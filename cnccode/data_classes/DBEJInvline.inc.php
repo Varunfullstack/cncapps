@@ -33,9 +33,11 @@ class DBEJInvline extends DBEInvline
     /**
      * Return rows from DB by column value
      * @access public
+     * @param $column
+     * @param null $columnSort
      * @return bool Success
      */
-    function getRowsByColumn($column)
+    function getRowsByColumn($column, $columnSort = null)
     {
         $this->setMethodName("getRowsByColumn");
         if ($column == '') {
@@ -50,30 +52,28 @@ class DBEJInvline extends DBEInvline
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " LEFT JOIN item ON " . $this->getDBColumnName('itemID') . "=itm_itemno" .
+            " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "=itm_itemno" .
             " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn) .
-            " ORDER BY " . $this->getDBColumnName('sequenceNo')
+            " ORDER BY " . $this->getDBColumnName(self::sequenceNo)
         );
         return ($this->getRows());
     }
 
     function getRowByInvheadIDSequenceNo()
     {
-        if ($this->getValue('invheadID') == '') {
+        if ($this->getValue(self::invheadID) == '') {
             $this->raiseError('invheadID not set');
         }
-        if ($this->getValue('sequenceNo') == '') {
+        if ($this->getValue(self::sequenceNo) == '') {
             $this->raiseError('sequenceNo not set');
         }
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " LEFT JOIN item ON " . $this->getDBColumnName('itemID') . "=itm_itemno" .
-            " WHERE " . $this->getDBColumnName('invheadID') . "=" . $this->getFormattedValue('invheadID') .
-            " AND " . $this->getDBColumnName('sequenceNo') . "=" . $this->getFormattedValue('sequenceNo')
+            " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "=itm_itemno" .
+            " WHERE " . $this->getDBColumnName(self::invheadID) . "=" . $this->getFormattedValue(self::invheadID) .
+            " AND " . $this->getDBColumnName(self::sequenceNo) . "=" . $this->getFormattedValue(self::sequenceNo)
         );
         return (parent::getRow());
     }
 }
-
-?>

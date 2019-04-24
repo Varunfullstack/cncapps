@@ -14,6 +14,10 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 class CTServiceDeskReportCustomer extends CTCNC
 {
+    const searchFormCustomerID = "customerID";
+    const searchFormFromDate = "fromDate";
+    const searchFormToDate = "toDate";
+
     public $dsPrintRange;
     public $dsSearchForm;
     public $buServiceDeskReport;
@@ -30,53 +34,53 @@ class CTServiceDeskReportCustomer extends CTCNC
         }
         $this->buServiceDeskReport = new BUServiceDeskReport($this);
         $this->dsSearchForm = new DSForm ($this);
-        $this->dsSearchForm->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
-        $this->dsSearchForm->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
-        $this->dsSearchForm->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
-        $this->dsSearchForm->setValue('customerID', '');
+        $this->dsSearchForm->addColumn(self::searchFormCustomerID, DA_STRING, DA_ALLOW_NULL);
+        $this->dsSearchForm->addColumn(self::searchFormFromDate, DA_DATE, DA_ALLOW_NULL);
+        $this->dsSearchForm->addColumn(self::searchFormToDate, DA_DATE, DA_ALLOW_NULL);
+        $this->dsSearchForm->setValue(self::searchFormCustomerID, '');
     }
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
         $this->search();
     }
 
+    /**
+     * @throws Exception
+     */
     function search()
     {
-
+        $report = null;
         $this->setMethodName('search');
-
         if (isset ($_REQUEST ['searchForm']) == 'POST') {
-
             if (!$this->dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
-
                 $this->setFormErrorOn();
-
             } else {
-                $this->buServiceDeskReport->startDate = $this->dsSearchForm->getValue('fromDate');
-                $this->buServiceDeskReport->endDate = $this->dsSearchForm->getValue('toDate');
-                $this->buServiceDeskReport->customerID = $this->dsSearchForm->getValue('customerID');
+                $this->buServiceDeskReport->startDate = $this->dsSearchForm->getValue(self::searchFormFromDate);
+                $this->buServiceDeskReport->endDate = $this->dsSearchForm->getValue(self::searchFormToDate);
+                $this->buServiceDeskReport->customerID = $this->dsSearchForm->getValue(self::searchFormCustomerID);
 
                 $report = $this->buServiceDeskReport->getCustomerReport();
 
                 $buMail = new BUMail($this);
 
                 $senderEmail = CONFIG_SUPPORT_EMAIL;
-                $senderName = 'CNC Support Department';
 
                 $dbeUser = new DBEUser($this);
                 $loggedInUserID = $GLOBALS ['auth']->is_authenticated();
                 $dbeUser->getRow($loggedInUserID);
-                $toEmail = $dbeUser->getValue('username') . '@' . CONFIG_PUBLIC_DOMAIN;
+                $toEmail = $dbeUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
 
                 $hdrs = array(
-                    'From' => $senderEmail,
-                    'To' => $toEmail,
-                    'Subject' => 'Service Desk Report ' . $this->buServiceDeskReport->getPeriod() . ' - ' . $this->buServiceDeskReport->getCustomerName(),
-                    'Date' => date("r"),
+                    'From'         => $senderEmail,
+                    'To'           => $toEmail,
+                    'Subject'      => 'Service Desk Report ' . $this->buServiceDeskReport->getPeriod(
+                        ) . ' - ' . $this->buServiceDeskReport->getCustomerName(),
+                    'Date'         => date("r"),
                     'Content-Type' => 'text/html; charset=UTF-8'
                 );
 
@@ -84,9 +88,9 @@ class CTServiceDeskReportCustomer extends CTCNC
 
                 $mime_params = array(
                     'text_encoding' => '7bit',
-                    'text_charset' => 'UTF-8',
-                    'html_charset' => 'UTF-8',
-                    'head_charset' => 'UTF-8'
+                    'text_charset'  => 'UTF-8',
+                    'html_charset'  => 'UTF-8',
+                    'head_charset'  => 'UTF-8'
                 );
                 $body = $buMail->mime->get($mime_params);
 
@@ -104,14 +108,14 @@ class CTServiceDeskReportCustomer extends CTCNC
 
         }
 
-        if ($this->dsSearchForm->getValue('fromDate') == '') {
+        if ($this->dsSearchForm->getValue(self::searchFormFromDate) == '') {
             $this->dsSearchForm->setUpdateModeUpdate();
-            $this->dsSearchForm->setValue('fromDate', date('Y-m-d', strtotime("-1 month")));
+            $this->dsSearchForm->setValue(self::searchFormFromDate, date('Y-m-d', strtotime("-1 month")));
             $this->dsSearchForm->post();
         }
-        if (!$this->dsSearchForm->getValue('toDate')) {
+        if (!$this->dsSearchForm->getValue(self::searchFormToDate)) {
             $this->dsSearchForm->setUpdateModeUpdate();
-            $this->dsSearchForm->setValue('toDate', date('Y-m-d'));
+            $this->dsSearchForm->setValue(self::searchFormToDate, date('Y-m-d'));
             $this->dsSearchForm->post();
         }
 
@@ -127,35 +131,35 @@ class CTServiceDeskReportCustomer extends CTCNC
         $urlSubmit = Controller::buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 
         $this->setPageTitle('Customer Service Desk Report');
-
-        if ($this->dsSearchForm->getValue('customerID') != 0) {
+        $customerString = null;
+        if ($this->dsSearchForm->getValue(self::searchFormCustomerID) != 0) {
+            $dsCustomer = new DataSet($this);
             $buCustomer = new BUCustomer ($this);
-            $buCustomer->getCustomerByID($this->dsSearchForm->getValue('customerID'), $dsCustomer);
+            $buCustomer->getCustomerByID($this->dsSearchForm->getValue(self::searchFormCustomerID), $dsCustomer);
             $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
-        $urlCustomerPopup = Controller::buildLink(CTCNC_PAGE_CUSTOMER,
-                                             array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP));
+        $urlCustomerPopup = Controller::buildLink(
+            CTCNC_PAGE_CUSTOMER,
+            array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP)
+        );
 
         $this->template->set_var(
             array(
-                'formError' => $this->formError,
-                'customerID' => $this->dsSearchForm->getValue('customerID'),
-                'customerString' => $customerString,
-                'fromDate' => Controller::dateYMDtoDMY($this->dsSearchForm->getValue('fromDate')),
-                'fromDateMessage' => $this->dsSearchForm->getMessage('fromDate'),
-                'toDate' => Controller::dateYMDtoDMY($this->dsSearchForm->getValue('toDate')),
-                'toDateMessage' => $this->dsSearchForm->getMessage('toDate'),
+                'formError'        => $this->formError,
+                'customerID'       => $this->dsSearchForm->getValue(self::searchFormCustomerID),
+                'customerString'   => $customerString,
+                'fromDate'         => Controller::dateYMDtoDMY($this->dsSearchForm->getValue(self::searchFormFromDate)),
+                'fromDateMessage'  => $this->dsSearchForm->getMessage(self::searchFormFromDate),
+                'toDate'           => Controller::dateYMDtoDMY($this->dsSearchForm->getValue(self::searchFormToDate)),
+                'toDateMessage'    => $this->dsSearchForm->getMessage(self::searchFormToDate),
                 'urlCustomerPopup' => $urlCustomerPopup,
-                'urlSubmit' => $urlSubmit,
-                'report' => $report
+                'urlSubmit'        => $urlSubmit,
+                'report'           => $report
             )
         );
 
         $this->template->parse('CONTENTS', 'ServiceDeskReportCustomerPage', true);
 
         $this->parsePage();
-
-    } // end function displaySearchForm
-
-} // end of class
-?>
+    }
+}
