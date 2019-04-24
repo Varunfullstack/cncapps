@@ -280,16 +280,13 @@ class BUProblemSLA extends Business
 
                 $hoursUntilComplete =
                     $this->getWorkingHoursBetweenUnixDates(
-
                         date('U'),
                         // from now
                         strtotime(
                             $this->dbeProblem->getValue(DBEProblem::completeDate) . ' ' . $dbeCallActivity->getValue(
                                 DBEJCallActivity::endTime
                             )
-                        ),
-                        // time on completion date
-                        false                                                           // no pauses
+                        )
                     );
                 /*
                 Autocomplete NON-T&M SRs that have activity duration of less than one hour and have reached their complete date
@@ -774,7 +771,7 @@ class BUProblemSLA extends Business
 
     function getWorkingHoursBetweenUnixDates($utStart,
                                              $utEnd,
-                                             $pauseArray
+                                             $pauseArray = []
     )
     {
         /*
@@ -788,15 +785,6 @@ class BUProblemSLA extends Business
             $pauseEnd = current($pauseArray);                     // the value is the end
             $pauseStart = key($pauseArray);                       // the key is the start
         }
-
-        /*
-        if ( ( $utEnd - $utCounter ) <= self::fiveMinutes ){
-
-          return 0;
-
-        }
-        */
-        //$utEnd = $utEnd - self::fiveMinutes; test
 
         while ($utCounter < $utEnd) {
 

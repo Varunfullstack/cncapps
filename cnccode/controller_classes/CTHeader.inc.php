@@ -569,7 +569,7 @@ class CTHeader extends CTCNC
             'portalDocuments'
         );
 
-        if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) {
+        if ($this->getAction() != 'add') {
 
             $buPortalDocument = new BUPortalDocument($this);
             $dsPortalDocument = new DataSet($this);

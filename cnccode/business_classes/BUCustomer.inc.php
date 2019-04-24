@@ -1475,12 +1475,10 @@ class BUCustomer extends Business
 
     function createCustomerFolder($customerID)
     {
-
         $dir = $this->getCustomerFolderPath($customerID);
-
         /* check to see if the folder exists */
         if (!is_dir($dir)) {
-            mkdir($dir);
+            mkdir($dir, 0777, true);
         }
         /*
         Then sub/folders
@@ -1500,11 +1498,7 @@ class BUCustomer extends Business
             );
 
         foreach ($subfolders as $folder) {
-            mkdir(
-                $dir . '/' . $folder,
-                0777,
-                true
-            );
+            $this->createFolderIfNotExist($dir . '/' . $folder);
         }
         /*
         Then these under Current Documentation
@@ -1518,23 +1512,25 @@ class BUCustomer extends Business
             );
 
         foreach ($subfolders as $folder) {
-            mkdir(
-                $dir . '/Current Documentation/' . $folder,
-                0777,
-                true
-            );
+            $this->createFolderIfNotExist($dir . '/Current Documentation/' . $folder);
         }
 
-        mkdir(
-            $dir . '/Current Documentation/Documents and Forms/Starters & Leavers',
-            0777,
-            true
-        );
-        mkdir(
-            $dir . '/Review Meetings/Analysis & Reports',
-            0777,
-            true
-        );
+        $this->createFolderIfNotExist($dir . '/Current Documentation/Documents and Forms/Starters & Leavers');
+
+        $this->createFolderIfNotExist($dir . '/Review Meetings/Analysis & Reports');
+    }
+
+    /**
+     * @param $folderName
+     * @return bool|void
+     */
+    private function createFolderIfNotExist($folderName)
+    {
+        if (file_exists($folderName)) {
+            return;
+        }
+
+        return mkdir($folderName, 0777, true);
     }
 
     function customerFolderExists($customerID)
