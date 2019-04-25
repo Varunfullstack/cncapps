@@ -21,10 +21,11 @@ class CTPassword extends CTCNC
 
     public static $passwordLevels = [
         ["level" => 0, "description" => "No Access"],
-        ["level" => 1, "description" => "Standard Access"],
-        ["level" => 2, "description" => "Elevated Access"],
-        ["level" => 3, "description" => "Team Lead Access"],
-        ["level" => 4, "description" => "Management Access"]
+        ["level" => 1, "description" => "Helpdesk Access"],
+        ["level" => 2, "description" => "Engineer Access"],
+        ["level" => 3, "description" => "Senior Engineer Access"],
+        ["level" => 4, "description" => "Team Lead Access"],
+        ["level" => 5, "description" => "Management Access"]
     ];
 
     function __construct($requestMethod,
