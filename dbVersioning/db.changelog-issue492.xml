@@ -1154,11 +1154,9 @@
     </changeSet>
     <changeSet author="pavwebdev" id="1554199133-133">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
-                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'service request review_csv'
-            </sqlCheck>
+            <tableExists tableName="service request review_csv"/>
         </preConditions>
-        <sql>         alter table service request review_csv engine = InnoDB;     </sql>
+        <dropTable tableName="service request review_csv"/>
         <rollback/>
     </changeSet>
     <changeSet author="pavwebdev" id="1554199133-134">
