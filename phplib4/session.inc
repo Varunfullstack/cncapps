@@ -57,6 +57,7 @@ class Session
 
     function register($things)
     {
+
         $things = explode(
             ",",
             $things
