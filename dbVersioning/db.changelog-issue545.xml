@@ -1,16 +1,33 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
     <changeSet author="pavwebdev" id="1556182482-0">
         <tagDatabase tag="issue545"/>
     </changeSet>
     <changeSet author="pavwebdev" id="1556182482-1">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
-
+                SELECT COUNT(LEVEL) FROM PASSWORD WHERE LEVEL = 5
             </sqlCheck>
         </preConditions>
+        <sql>
+            update password
+            set level = case
+                            when 4 then 5
+                            when 3 then 4
+                            else level
+                end
+        </sql>
+        <rollback>
+            <sql>
+                update password
+                set level = case
+                                when 5 then 4
+                                when 4 then 3
+                                else level
+                    end
+            </sql>
+        </rollback>
     </changeSet>
 </databaseChangeLog>
