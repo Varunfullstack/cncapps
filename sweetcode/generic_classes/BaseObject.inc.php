@@ -15,13 +15,11 @@ class BaseObject
 
     function __construct(&$owner)
     {
-        error_reporting(E_ERROR | E_WARNING | E_PARSE);
         $this->owner = &$owner;
     }
 
     function BaseObjectNoOwner()
     {
-        error_reporting(E_ERROR | E_WARNING | E_PARSE);
         $this->owner = '';
     }
 //	function setClassname($class_name){
