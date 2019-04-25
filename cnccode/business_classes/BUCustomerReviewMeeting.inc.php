@@ -536,15 +536,7 @@ class BUCustomerReviewMeeting extends Business
         $items = $buRenewal->getRenewalsAndExternalItemsByCustomer(
             $customerID,
             new Controller(
-                null,
-                $nothing,
-                $nothing,
-                $nothing,
-                $nothing,
-                null,
-                null,
-                null,
-                null
+                null, $nothing, $nothing, $nothing, $nothing
             ),
             true
         );

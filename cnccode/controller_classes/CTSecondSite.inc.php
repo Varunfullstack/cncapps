@@ -46,7 +46,7 @@ class CTSecondSite extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'edit':
             case 'add':
                 $this->edit();
@@ -86,12 +86,12 @@ class CTSecondSite extends CTCNC
         $dsSecondsiteImage = &$this->dsSecondsiteImage; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == 'edit') {
+            if ($this->getAction() == 'edit') {
                 $this->buSecondsite->getSecondsiteImageByID(
-                    $_REQUEST['secondsiteImageID'],
+                    $this->getParam('secondsiteImageID'),
                     $dsSecondsiteImage
                 );
-                $secondsiteImageID = $_REQUEST['secondsiteImageID'];
+                $secondsiteImageID = $this->getParam('secondsiteImageID');
             } else {                                                                    // creating new
                 $dsSecondsiteImage->initialise();
                 $dsSecondsiteImage->setValue(
@@ -100,7 +100,7 @@ class CTSecondSite extends CTCNC
                 );
                 $dsSecondsiteImage->setValue(
                     DBESecondSiteImage::customerItemID,
-                    $_REQUEST['customerItemID']
+                    $this->getParam('customerItemID')
                 );
                 $secondsiteImageID = '0';
             }
@@ -169,13 +169,13 @@ class CTSecondSite extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsSecondsiteImage->populateFromArray($_REQUEST['secondsiteImage']));
+        $this->formError = (!$this->dsSecondsiteImage->populateFromArray($this->getParam('secondsiteImage')));
 
         if ($this->formError) {
             if ($this->dsSecondsiteImage->getValue(DBESecondSiteImage::secondsiteImageID)) {
-                $_REQUEST['action'] = CTPROJECT_ACT_EDIT;
+                $this->setAction(CTPROJECT_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTPROJECT_ACT_ACT;
+                $this->setAction(CTPROJECT_ACT_ACT);
             }
             $this->edit();
             exit;
@@ -202,11 +202,11 @@ class CTSecondSite extends CTCNC
         $this->setMethodName('delete');
         $dsSecondsiteImage = new DataSet($this);
         $this->buSecondsite->getSecondsiteImageByID(
-            $_REQUEST['secondsiteImageID'],
+            $this->getParam('secondsiteImageID'),
             $dsSecondsiteImage
         );
 
-        $this->buSecondsite->deleteSecondsiteImage($_REQUEST['secondsiteImageID']);
+        $this->buSecondsite->deleteSecondsiteImage($this->getParam('secondsiteImageID'));
 
         $urlNext =
             Controller::buildLink(
@@ -226,7 +226,7 @@ class CTSecondSite extends CTCNC
      */
     function listAll()
     {
-        $selectedYear = @$_REQUEST['searchYear'];
+        $selectedYear = @$this->getParam('searchYear');
 
         if (!$selectedYear) {
             $selectedYear = date('Y');
@@ -559,7 +559,7 @@ class CTSecondSite extends CTCNC
      */
     function run()
     {
-        $this->buSecondsite->validateBackups($_REQUEST['customerItemID']);
+        $this->buSecondsite->validateBackups($this->getParam('customerItemID'));
 
         $urlNext =
             Controller::buildLink(
@@ -638,7 +638,7 @@ class CTSecondSite extends CTCNC
 
                 if ($results = $this->buSecondsite->getResults($dsSearchForm)) {
 
-                    if ($_REQUEST['Search'] == 'Generate CSV') {
+                    if ($this->getParam('Search') == 'Generate CSV') {
 
                         $template = new Template (
                             $cfg["path_templates"],
@@ -691,7 +691,7 @@ class CTSecondSite extends CTCNC
                             'rows'
                         );
 
-                        if (isset($_REQUEST['orderBy'])) {
+                        if ($this->getParam('orderBy')) {
                             foreach ($results as $key => $row) {
                                 $customerName[$key] = $row['customerName'];
                                 $serverName[$key] = $row['serverName'];
@@ -699,15 +699,15 @@ class CTSecondSite extends CTCNC
                                 $errors[$key] = $row['errors'];
                             }
 
-                            if ($_SESSION['secondsiteSortDirection'] == SORT_DESC) {
-                                $_SESSION['secondsiteSortDirection'] = SORT_ASC;
+                            if ($this->getSessionParam('secondsiteSortDirection') == SORT_DESC) {
+                                $this->setSessionParam('secondsiteSortDirection', SORT_ASC);
                             } else {
-                                $_SESSION['secondsiteSortDirection'] = SORT_DESC;
+                                $this->setSessionParam('secondsiteSortDirection', SORT_DESC);
 
                             }
 
                             array_multisort(
-                                $$_REQUEST['orderBy'],
+                                $$this->getParam('orderBy'),
                                 $_SESSION['secondsiteSortDirection'],
                                 $results
                             );

@@ -96,20 +96,20 @@ class CTCurrentActivityReport extends CTCNC
             }
         }
 
-        if (!isset($_SESSION['priorityFilter'])) {
+        if (!$this->getSessionParam('priorityFilter')) {
+            $priorityFilter = $this->getSessionParam('priorityFilter');
 
-            foreach ($this->buActivity->priorityArray as $key => $value) {
-
-                $_SESSION['priorityFilter'][] = $key;
-
+            if (!$priorityFilter) {
+                $priorityFilter = [];
             }
-
+            foreach ($this->buActivity->priorityArray as $key => $value) {
+                $priorityFilter[] = $key;
+            }
+            $this->setSessionParam('priorityFilter', $priorityFilter);
         }
 
         $buUser = new BUUser($this);
         $this->loggedInUserIsSdManager = $buUser->isSdManager($this->userID);
-
-
     }
 
     /**
@@ -120,29 +120,29 @@ class CTCurrentActivityReport extends CTCNC
     {
 
 
-        if (!isset($_SESSION['displayToBeLoggedSectionFlag'])) {
-            $_SESSION['displayToBeLoggedSectionFlag'] = 1;
+        if (!$this->getSessionParam('displayToBeLoggedSectionFlag')) {
+            $this->setSessionParam('displayToBeLoggedSectionFlag', 1);
         }
-        if (!isset($_SESSION['displayQueue1Flag'])) {
-            $_SESSION['displayQueue1Flag'] = 1;
+        if (!$this->getSessionParam('displayQueue1Flag')) {
+            $this->setSessionParam('displayQueue1Flag', 1);
         }
-        if (!isset($_SESSION['displayQueue2Flag'])) {
-            $_SESSION['displayQueue2Flag'] = 1;
+        if (!$this->getSessionParam('displayQueue2Flag')) {
+            $this->setSessionParam('displayQueue2Flag', 1);
         }
-        if (!isset($_SESSION['displayQueue3Flag'])) {
-            $_SESSION['displayQueue3Flag'] = 1;
+        if (!$this->getSessionParam('displayQueue3Flag')) {
+            $this->setSessionParam('displayQueue3Flag', 1);
         }
-        if (!isset($_SESSION['displayQueue4Flag'])) {
-            $_SESSION['displayQueue4Flag'] = 1;
+        if (!$this->getSessionParam('displayQueue4Flag')) {
+            $this->setSessionParam('displayQueue4Flag', 1);
         }
-        if (!isset($_SESSION['displayQueue5Flag'])) {
-            $_SESSION['displayQueue5Flag'] = 1;
+        if (!$this->getSessionParam('displayQueue5Flag')) {
+            $this->setSessionParam('displayQueue5Flag', 1);
         }
-        if (!isset($_SESSION['displayQueue7Flag'])) {
-            $_SESSION['displayQueue7Flag'] = 1;
+        if (!$this->getSessionParam('displayQueue7Flag')) {
+            $this->setSessionParam('displayQueue7Flag', 1);
         }
 
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             case 'allocateUser':
                 $this->allocateUser();
@@ -214,73 +214,73 @@ class CTCurrentActivityReport extends CTCNC
 
     function toggleDisplayToBeLoggedFlag()
     {
-        if ($_SESSION['displayToBeLoggedFlag']) {
-            $_SESSION['displayToBeLoggedFlag'] = false;
+        if ($this->getSessionParam('displayToBeLoggedFlag')) {
+            $this->setSessionParam('displayToBeLoggedFlag', false);
         } else {
-            $_SESSION['displayToBeLoggedFlag'] = true;
+            $this->setSessionParam('displayToBeLoggedFlag', true);
         }
     }
 
     function toggleDisplayQueue1Flag()
     {
-        if ($_SESSION['displayQueue1Flag']) {
-            $_SESSION['displayQueue1Flag'] = false;
+        if ($this->getSessionParam('displayQueue1Flag')) {
+            $this->setSessionParam('displayQueue1Flag', false);
         } else {
-            $_SESSION['displayQueue1Flag'] = true;
+            $this->setSessionParam('displayQueue1Flag', true);
         }
     }
 
     function toggleDisplayQueue2Flag()
     {
-        if ($_SESSION['displayQueue2Flag']) {
-            $_SESSION['displayQueue2Flag'] = false;
+        if ($this->getSessionParam('displayQueue2Flag')) {
+            $this->setSessionParam('displayQueue2Flag', false);
         } else {
-            $_SESSION['displayQueue2Flag'] = true;
+            $this->setSessionParam('displayQueue2Flag', true);
         }
     }
 
     function toggleDisplayQueue3Flag()
     {
-        if ($_SESSION['displayQueue3Flag']) {
-            $_SESSION['displayQueue3Flag'] = false;
+        if ($this->getSessionParam('displayQueue3Flag')) {
+            $this->setSessionParam('displayQueue3Flag', false);
         } else {
-            $_SESSION['displayQueue3Flag'] = true;
+            $this->setSessionParam('displayQueue3Flag', true);
         }
     }
 
     function toggleDisplayQueue4Flag()
     {
-        if ($_SESSION['displayQueue4Flag']) {
-            $_SESSION['displayQueue4Flag'] = false;
+        if ($this->getSessionParam('displayQueue4Flag')) {
+            $this->setSessionParam('displayQueue4Flag', false);
         } else {
-            $_SESSION['displayQueue4Flag'] = true;
+            $this->setSessionParam('displayQueue4Flag', true);
         }
     }
 
     function toggleDisplayQueue5Flag()
     {
-        if ($_SESSION['displayQueue5Flag']) {
-            $_SESSION['displayQueue5Flag'] = false;
+        if ($this->getSessionParam('displayQueue5Flag')) {
+            $this->setSessionParam('displayQueue5Flag', false);
         } else {
-            $_SESSION['displayQueue5Flag'] = true;
+            $this->setSessionParam('displayQueue5Flag', true);
         }
     }
 
     function toggleDisplayQueue6Flag()
     {
-        if ($_SESSION['displayQueue6Flag']) {
-            $_SESSION['displayQueue6Flag'] = false;
+        if ($this->getSessionParam('displayQueue6Flag')) {
+            $this->setSessionParam('displayQueue6Flag', false);
         } else {
-            $_SESSION['displayQueue6Flag'] = true;
+            $this->setSessionParam('displayQueue6Flag', true);
         }
     }
 
     function toggleDisplayQueue7Flag()
     {
-        if ($_SESSION['displayQueue7Flag']) {
-            $_SESSION['displayQueue7Flag'] = false;
+        if ($this->getSessionParam('displayQueue7Flag')) {
+            $this->setSessionParam('displayQueue7Flag', false);
         } else {
-            $_SESSION['displayQueue7Flag'] = true;
+            $this->setSessionParam('displayQueue7Flag', true);
         }
     }
 
@@ -291,7 +291,7 @@ class CTCurrentActivityReport extends CTCNC
     {
         unset($_SESSION['selectedUserID']);
 
-        $_SESSION['selectedUserID'] = $GLOBALS['auth']->is_authenticated();
+        $this->setSessionParam('selectedUserID', $GLOBALS['auth']->is_authenticated());
 
         $urlNext =
             Controller::buildLink(
@@ -317,8 +317,8 @@ class CTCurrentActivityReport extends CTCNC
         $dbeUser->getRow();
 
         $this->buActivity->allocateUserToRequest(
-            $_REQUEST['problemID'],
-            $_REQUEST['userID'],
+            $this->getParam('problemID'),
+            $this->getParam('userID'),
             $dbeUser
         );
 
@@ -360,16 +360,16 @@ class CTCurrentActivityReport extends CTCNC
     function setFilter()
     {
 
-        if (isset($_REQUEST['selectedUserID'])) {
-            $_SESSION['selectedUserID'] = $_REQUEST['selectedUserID'];
+        if ($this->getParam('selectedUserID')) {
+            $this->setSessionParam('selectedUserID', $this->getParam('selectedUserID'));
         }
 
-        if (isset($_REQUEST['priorityFilter'])) {
-            $_SESSION['priorityFilter'] = $_REQUEST['priorityFilter'];
+        if ($this->getParam('priorityFilter')) {
+            $this->setSessionParam('priorityFilter', $this->getParam('priorityFilter'));
         }
 
-        if (isset($_REQUEST['selectedCustomerID'])) {
-            $_SESSION['selectedCustomerID'] = $_REQUEST['selectedCustomerID'];
+        if ($this->getParam('selectedCustomerID')) {
+            $this->setSessionParam('selectedCustomerID', $this->getParam('selectedCustomerID'));
         }
 
         $urlNext =
@@ -578,35 +578,35 @@ class CTCurrentActivityReport extends CTCNC
 
         $this->template->set_var(
             'displayToBeLoggedFlag',
-            ($_SESSION['displayToBeLoggedFlag'] == 0) ? '0' : '1'
+            ($this->getSessionParam('displayToBeLoggedFlag') == 0) ? '0' : '1'
         );
         $this->template->set_var(
             'displayQueue1Flag',
-            ($_SESSION['displayQueue1Flag'] == 0) ? '0' : '1'
+            ($this->getSessionParam('displayQueue1Flag') == 0) ? '0' : '1'
         );
         $this->template->set_var(
             'displayQueue2Flag',
-            ($_SESSION['displayQueue2Flag'] == 0) ? '0' : '1'
+            ($this->getSessionParam('displayQueue2Flag') == 0) ? '0' : '1'
         );
         $this->template->set_var(
             'displayQueue3Flag',
-            ($_SESSION['displayQueue3Flag'] == 0) ? '0' : '1'
+            ($this->getSessionParam('displayQueue3Flag') == 0) ? '0' : '1'
         );
         $this->template->set_var(
             'displayQueue4Flag',
-            ($_SESSION['displayQueue4Flag'] == 0) ? '0' : '1'
+            ($this->getSessionParam('displayQueue4Flag') == 0) ? '0' : '1'
         );
         $this->template->set_var(
             'displayQueue5Flag',
-            ($_SESSION['displayQueue5Flag'] == 0) ? '0' : '1'
+            ($this->getSessionParam('displayQueue5Flag') == 0) ? '0' : '1'
         );
         $this->template->set_var(
             'displayQueue6Flag',
-            ($_SESSION['displayQueue6Flag'] == 0) ? '0' : '1'
+            ($this->getSessionParam('displayQueue6Flag') == 0) ? '0' : '1'
         );
         $this->template->set_var(
             'displayQueue7Flag',
-            ($_SESSION['displayQueue7Flag'] == 0) ? '0' : '1'
+            ($this->getSessionParam('displayQueue7Flag') == 0) ? '0' : '1'
         );
 
 
@@ -619,7 +619,7 @@ class CTCurrentActivityReport extends CTCNC
         $this->renderQueue(4);  //Implementations
         $this->renderQueue(5);  // Managers
 
-        if ($_SESSION['selectedCustomerID']) {
+        if ($this->getSessionParam('selectedCustomerID')) {
             $this->renderQueue(6);  //Fixed
         } else {
             $this->template->set_block(
@@ -768,7 +768,7 @@ class CTCurrentActivityReport extends CTCNC
             asort($this->customerFilterList);
             foreach ($this->customerFilterList as $customerID => $customerName) {
                 $customerIDSelected = null;
-                if ($_SESSION['selectedCustomerID'] == $customerID) {
+                if ($this->getSessionParam('selectedCustomerID') == $customerID) {
                     $customerIDSelected = 'SELECTED';
                 }
                 $this->template->set_var(
@@ -881,7 +881,9 @@ class CTCurrentActivityReport extends CTCNC
 
         while ($serviceRequests->fetchNext()) {
             $linkAllocateAdditionalTime = null;
-            $this->customerFilterList[$serviceRequests->getValue(DBEJProblem::customerID)] = $serviceRequests->getValue(DBEJProblem::customerName);
+            $this->customerFilterList[$serviceRequests->getValue(DBEJProblem::customerID)] = $serviceRequests->getValue(
+                DBEJProblem::customerName
+            );
 
             if (
             !in_array(
@@ -900,7 +902,9 @@ class CTCurrentActivityReport extends CTCNC
             }
 
             if (
-                ($_SESSION['selectedUserID'] && $_SESSION['selectedUserID'] != $serviceRequests->getValue(DBEJProblem::userID)) AND
+                ($_SESSION['selectedUserID'] && $_SESSION['selectedUserID'] != $serviceRequests->getValue(
+                        DBEJProblem::userID
+                    )) AND
 
                 $serviceRequests->getValue(DBEJProblem::userID) != '0'        // always show Unallocated
             ) {
@@ -951,7 +955,9 @@ class CTCurrentActivityReport extends CTCNC
                 $updatedBgColor = self::CONTENT;
             }
 
-            if ($serviceRequests->getValue(DBEJProblem::respondedHours) == 0 && $serviceRequests->getValue(DBEJProblem::status) == 'I') {
+            if ($serviceRequests->getValue(DBEJProblem::respondedHours) == 0 && $serviceRequests->getValue(
+                    DBEJProblem::status
+                ) == 'I') {
                 /*
                 Initial SRs that have not yet been responded to
                 */
@@ -997,7 +1003,7 @@ class CTCurrentActivityReport extends CTCNC
 
                 $workBgColor = self::CONTENT;
 
-                if ($_SESSION['selectedCustomerID']) {
+                if ($this->getSessionParam('selectedCustomerID')) {
                     $urlWork =
                         Controller::buildLink(
                             'Activity.php',
@@ -1060,7 +1066,9 @@ class CTCurrentActivityReport extends CTCNC
 
 
             $hoursRemaining = number_format(
-                $serviceRequests->getValue(DBEJProblem::workingHours) - $serviceRequests->getValue(DBEJProblem::slaResponseHours),
+                $serviceRequests->getValue(DBEJProblem::workingHours) - $serviceRequests->getValue(
+                    DBEJProblem::slaResponseHours
+                ),
                 1
             );
             $totalActivityDurationHours = $serviceRequests->getValue(DBEJProblem::totalActivityDurationHours);
@@ -1083,13 +1091,17 @@ class CTCurrentActivityReport extends CTCNC
                     'imColor'                    => $this->pickColor($imRemaining),
                     'urlCustomer'                => $urlCustomer,
                     'time'                       => $serviceRequests->getValue(DBEJProblem::lastStartTime),
-                    'date'                       => Controller::dateYMDtoDMY($serviceRequests->getValue(DBEJProblem::lastDate)),
+                    'date'                       => Controller::dateYMDtoDMY(
+                        $serviceRequests->getValue(DBEJProblem::lastDate)
+                    ),
                     'problemID'                  => $serviceRequests->getValue(DBEJProblem::problemID),
                     'reason'                     => CTCurrentActivityReport::truncate(
                         $serviceRequests->getValue(DBEJProblem::reason),
                         150
                     ),
-                    'urlProblemHistoryPopup'     => $this->getProblemHistoryLink($serviceRequests->getValue(DBEJProblem::problemID)),
+                    'urlProblemHistoryPopup'     => $this->getProblemHistoryLink(
+                        $serviceRequests->getValue(DBEJProblem::problemID)
+                    ),
                     'engineerDropDown'           => $this->getAllocatedUserDropdown(
                         $serviceRequests->getValue(DBEJProblem::problemID),
                         $serviceRequests->getValue(DBEJProblem::userID)
@@ -1107,7 +1119,9 @@ class CTCurrentActivityReport extends CTCNC
                         $serviceRequests->getValue(DBEJProblem::slaResponseHours),
                         1
                     ),
-                    'priority'                   => Controller::htmlDisplayText($serviceRequests->getValue(DBEJProblem::priority)),
+                    'priority'                   => Controller::htmlDisplayText(
+                        $serviceRequests->getValue(DBEJProblem::priority)
+                    ),
                     'alarmDateTime'              => $alarmDateTimeDisplay,
                     'bgColour'                   => $bgColour,
                     'workBgColor'                => $workBgColor
@@ -1327,7 +1341,7 @@ class CTCurrentActivityReport extends CTCNC
      */
     function deleteCustomerRequest()
     {
-        $customerproblemno = $_REQUEST['cpr_customerproblemno'];
+        $customerproblemno = $this->getParam('cpr_customerproblemno');
 
         $this->buActivity->deleteCustomerRaisedRequest($customerproblemno);
         $urlNext = Controller::buildLink(
@@ -1344,8 +1358,8 @@ class CTCurrentActivityReport extends CTCNC
      */
     function changeQueue()
     {
-        $problemID = $_REQUEST['problemID'];
-        $newQueue = $_REQUEST['queue'];
+        $problemID = $this->getParam('problemID');
+        $newQueue = $this->getParam('queue');
 
         $this->buActivity->escalateProblemByProblemID(
             $problemID,
@@ -1367,7 +1381,7 @@ class CTCurrentActivityReport extends CTCNC
     function escalate()
     {
 
-        $problemID = $_REQUEST['problemID'];
+        $problemID = $this->getParam('problemID');
 
         $this->buActivity->escalateProblemByProblemID($problemID);
 
@@ -1384,7 +1398,7 @@ class CTCurrentActivityReport extends CTCNC
      */
     function deescalate()
     {
-        $problemID = $_REQUEST['problemID'];
+        $problemID = $this->getParam('problemID');
         $this->buActivity->deEscalateProblemByProblemID($problemID);
 
         $urlNext = Controller::buildLink(

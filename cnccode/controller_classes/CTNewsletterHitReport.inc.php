@@ -13,6 +13,7 @@ class CTNewsletterHitReport extends CTCNC
 {
 
     public $buNewsletterHitReport;
+    public $dsSearchResults;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
@@ -33,7 +34,7 @@ class CTNewsletterHitReport extends CTCNC
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'search':
             default:
                 $this->searchForm();
@@ -44,6 +45,8 @@ class CTNewsletterHitReport extends CTCNC
     /**
      * Display search form
      * @access private
+     * @throws Exception
+     * @throws Exception
      */
     function searchForm()
     {
@@ -69,14 +72,6 @@ class CTNewsletterHitReport extends CTCNC
         }
 
         $this->setMethodName('searchForm');
-
-        $urlSubmit = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTCNC_ACT_SEARCH
-            )
-        );
-
         $this->setPageTitle('newsletter hit report');
         $this->setTemplateFiles('NewsletterHitReport', 'NewsletterHitReport.inc');
 
@@ -101,4 +96,3 @@ class CTNewsletterHitReport extends CTCNC
     }
 
 }// end of class
-?>

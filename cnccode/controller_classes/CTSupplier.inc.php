@@ -92,7 +92,7 @@ class CTSupplier extends CTCNC
     function defaultAction()
     {
         $this->setParentFormFields();
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTCNC_ACT_SUPPLIER_ADD:
             case CTCNC_ACT_SUPPLIER_EDIT:
                 $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
@@ -122,13 +122,13 @@ class CTSupplier extends CTCNC
      */
     function setParentFormFields()
     {
-        if (isset($_REQUEST['parentIDField'])) {
-            $_SESSION['supplierParentIDField'] = $_REQUEST['parentIDField'];
+        if ($this->getParam('parentIDField')) {
+            $this->setSessionParam('supplierParentIDField', $this->getParam('parentIDField'));
         } else {
             unset($_SESSION['supplierParentIDField']);
         }
-        if (isset($_REQUEST['parentDescField'])) {
-            $_SESSION['supplierParentDescField'] = $_REQUEST['parentDescField'];
+        if ($this->getParam('parentDescField')) {
+            $this->setSessionParam('supplierParentDescField', $this->getParam('parentDescField'));
         } else {
             unset($_SESSION['supplierParentDescField']);
         }
@@ -145,7 +145,7 @@ class CTSupplier extends CTCNC
 
         // A single slash means create new supplier
         $urlCreate = null;
-        if ($_REQUEST['supplierName']{0} == '/') {
+        if ($this->getParam('supplierName'){0} == '/') {
             $urlCreate = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
@@ -158,7 +158,7 @@ class CTSupplier extends CTCNC
         }
 
         $this->buSupplier->getSuppliersByNameMatch(
-            $_REQUEST['supplierName'],
+            $this->getParam('supplierName'),
             $this->dsSupplier
         );
         if ($this->dsSupplier->rowCount() == 1) {
@@ -176,7 +176,7 @@ class CTSupplier extends CTCNC
             if ($this->dsSupplier->rowCount() == 0) {
                 $this->template->set_var(
                     'supplierName',
-                    $_REQUEST['supplierName']
+                    $this->getParam('supplierName')
                 );
                 $this->setTemplateFiles(
                     'SupplierSelect',
@@ -269,8 +269,8 @@ class CTSupplier extends CTCNC
         );
         $this->template->set_var(
             array(
-                'supplierString'        => $_REQUEST['supplierString'],
-                'address'               => $_REQUEST['address'],
+                'supplierString'        => $this->getParam('supplierString'),
+                'address'               => $this->getParam('address'),
                 'supplierStringMessage' => $GLOBALS['supplierStringMessage'],
                 'submitURL'             => $submitURL,
                 'createURL'             => $createURL,
@@ -323,15 +323,15 @@ class CTSupplier extends CTCNC
     {
         $this->setMethodName('search');
 // Parameter validation
-        if (!$_REQUEST['supplierString'] && !$_REQUEST['address']) {
+        if (!$this->getParam('supplierString') && !$this->getParam('address')) {
             $GLOBALS['supplierStringMessage'] = 'You must specify some parameters';
             $this->displaySearchForm();
             exit;
         } else {
             if (!$this->buSupplier->getSuppliersByNameMatch(
-                $_REQUEST['supplierString'],
+                $this->getParam('supplierString'),
                 $this->dsSupplier,
-                $_REQUEST['address']                        // on the end to ensure existing code works OK
+                $this->getParam('address')                        // on the end to ensure existing code works OK
             )
             ) {
                 $GLOBALS['supplierStringMessage'] = CTSUPPLIER_MSG_NONE_FND;
@@ -341,8 +341,8 @@ class CTSupplier extends CTCNC
 
         if ($this->dsSupplier->rowCount() == 1) {
             $this->dsSupplier->fetchNext();
-            $_REQUEST['supplierID'] = $this->dsSupplier->getValue(DBEJSupplier::supplierID);
-            $_REQUEST['action'] = CTCNC_ACT_SUPPLIER_EDIT;
+            $this->setParam('supplierID', $this->dsSupplier->getValue(DBEJSupplier::supplierID));
+            $this->setAction(CTCNC_ACT_SUPPLIER_EDIT);
             $this->supplierForm();
         } else {
             $this->displaySearchForm();
@@ -361,7 +361,7 @@ class CTSupplier extends CTCNC
     {
         $this->setMethodName('supplierForm');
         // initialisation stuff
-        if ($_REQUEST['action'] == CTCNC_ACT_SUPPLIER_ADD) {
+        if ($this->getAction() == CTCNC_ACT_SUPPLIER_ADD) {
             $urlSubmit = $this->supplierFormPrepareAdd();
         } else {
             $urlSubmit = $this->supplierFormPrepareEdit();
@@ -376,7 +376,7 @@ class CTSupplier extends CTCNC
             )
         );
         // If editing a supplier then the contact field will exist
-        if ($_REQUEST['action'] == CTCNC_ACT_SUPPLIER_EDIT) {
+        if ($this->getAction() == CTCNC_ACT_SUPPLIER_EDIT) {
             $urlContactPopup =
                 Controller::buildLink(
                     CTCNC_PAGE_CONTACT,
@@ -453,7 +453,7 @@ class CTSupplier extends CTCNC
             'SupplierEditJS',
             true
         );
-        if ($_REQUEST['action'] == CTCNC_ACT_SUPPLIER_EDIT) {
+        if ($this->getAction() == CTCNC_ACT_SUPPLIER_EDIT) {
             $this->template->parse(
                 'supplierEditContact',
                 'SupplierEditContact',
@@ -505,11 +505,11 @@ class CTSupplier extends CTCNC
         $this->setPageTitle(CTSUPPLIER_TXT_UPDATE_SUPPLIER);
         // if updating and not a form error then validate passed id and get row from DB
         if (!$this->getFormError()) {
-            if (empty($_REQUEST['supplierID'])) {
+            if (empty($this->getParam('supplierID'))) {
                 $this->displayFatalError(CTSUPPLIER_MSG_SUPPLIERID_NOT_PASSED);
             }
             if (!$this->buSupplier->getSupplierByID(
-                $_REQUEST['supplierID'],
+                $this->getParam('supplierID'),
                 $this->dsSupplier
             )) {
                 $this->displayFatalError(CTSUPPLIER_MSG_SUPPLIER_NOT_FND);
@@ -561,18 +561,18 @@ class CTSupplier extends CTCNC
     function supplierUpdate()
     {
         $this->setMethodName('supplierUpdate');
-        if (!isset($_REQUEST['supplier'])) {
+        if (!$this->getParam('supplier')) {
             $this->displayFatalError(CTSUPPLIER_MSG_SUPPLIER_ARRAY_NOT_PASSED);
             return;
         }
-        if (!$this->dsSupplier->populateFromArray($_REQUEST['supplier'])) {
+        if (!$this->dsSupplier->populateFromArray($this->getParam('supplier'))) {
             $this->setFormErrorOn();
-            if ($_REQUEST['action'] == CTSUPPLIER_ACT_SUPPLIER_INSERT) {
-                $_REQUEST['action'] = CTCNC_ACT_SUPPLIER_ADD;
+            if ($this->getAction() == CTSUPPLIER_ACT_SUPPLIER_INSERT) {
+                $this->setAction(CTCNC_ACT_SUPPLIER_ADD);
             } else {
-                $_REQUEST['action'] = CTCNC_ACT_SUPPLIER_EDIT;
+                $this->setAction(CTCNC_ACT_SUPPLIER_EDIT);
             }
-            $_REQUEST['supplierID'] = $this->dsSupplier->getValue(DBEJSupplier::supplierID);
+            $this->setParam('supplierID', $this->dsSupplier->getValue(DBEJSupplier::supplierID));
             $this->supplierForm();
             exit;
         }
@@ -581,7 +581,7 @@ class CTSupplier extends CTCNC
 
         if ($this->dsSupplier->getValue(DBEJSupplier::contactID) == 0) {
             $this->setFormErrorMessage('Please create a contact or select an existing contact');
-            $_REQUEST['action'] = CTCNC_ACT_SUPPLIER_EDIT;
+            $this->setAction(CTCNC_ACT_SUPPLIER_EDIT);
             $this->supplierForm();
             exit;
         } else {
@@ -590,7 +590,7 @@ class CTSupplier extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array()
             );
-            if (isset($_SESSION['supplierParentDescField'])) {
+            if ($this->getSessionParam('supplierParentDescField')) {
                 $urlNext = Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(

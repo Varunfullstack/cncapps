@@ -221,6 +221,10 @@ class CTCNC extends Controller
                          $cfg
     )
     {
+        if ($this->getParam('action')) {
+            $this->setAction($this->getAction());
+        }
+
         if (!$this->isRunningFromCommandLine() && isset($GLOBALS ['auth'])) {
             $this->userID = $GLOBALS ['auth']->is_authenticated();
         } else {
@@ -241,11 +245,7 @@ class CTCNC extends Controller
             $postVars,
             $getVars,
             $cookieVars,
-            $cfg,
-            "",
-            "",
-            "",
-            ""
+            $cfg
         );
     }
 
@@ -371,7 +371,7 @@ class CTCNC extends Controller
         $screenCustomerTemplate = 'ScreenCustomer.inc';
 
 
-        if (isset($_REQUEST['oldMenu'])) {
+        if ($this->getParam('oldMenu')) {
             $screenSalesTemplate = 'ScreenSalesOld.inc';
             $screenAccountsTemplate = 'ScreenAccountsOld.inc';
             $screenTechnicalTemplate = 'ScreenTechnicalOld.inc';
@@ -504,15 +504,16 @@ class CTCNC extends Controller
         parent::parsePage();
     }
 
+
     function initialProcesses()
     {
-        if ($_REQUEST ['htmlFmt']) {
+        if ($this->getParam('htmlFmt')) {
             $this->setHTMLFmt($_REQUEST ['htmlFmt']);
         }
 
         self::getDbeUser();
 
-        switch ($_REQUEST ['action']) {
+        switch ($this->getAction()) {
             case CTCNC_ACT_LOGOUT :
                 $this->logout();
                 break;

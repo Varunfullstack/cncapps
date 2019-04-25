@@ -16,9 +16,6 @@ require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 
 class CTDirectDebitInvoicing extends CTCNC
 {
-
-    private $dsPrintRange;
-
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -44,10 +41,11 @@ class CTDirectDebitInvoicing extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             case 'preview':
                 $this->preview();
@@ -61,6 +59,9 @@ class CTDirectDebitInvoicing extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function displayStuff()
     {
         $this->setMethodName('display thing');
@@ -92,6 +93,9 @@ class CTDirectDebitInvoicing extends CTCNC
     }
 
 
+    /**
+     * @throws Exception
+     */
     private function sendInvoices()
     {
         $buInvoice = new BUInvoice($this);

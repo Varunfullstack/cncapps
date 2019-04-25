@@ -62,11 +62,11 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case self::FETCH_CUSTOMER_DOCUMENTS:
 
                 $dbeDocuments = new DBECustomerReviewMeetingDocument($this);
-                $dbeDocuments->getRowsByCustomerID($_REQUEST['customerID']);
+                $dbeDocuments->getRowsByCustomerID($this->getParam('customerID'));
 
                 $data = [];
 
@@ -141,13 +141,13 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
                 break;
             case self::DOWNLOAD_DOCUMENT:
 
-                if (!isset($_REQUEST['documentID'])) {
+                if (!$this->getParam('documentID')) {
                     echo 'Document ID missing';
                     http_response_code(400);
                     exit;
                 }
                 $dbeDocuments = new DBECustomerReviewMeetingDocument($this);
-                $dbeDocuments->getRow($_REQUEST['documentID']);
+                $dbeDocuments->getRow($this->getParam('documentID'));
 
                 header('Content-Description: File Transfer');
                 header('Content-Type: ' . $dbeDocuments->getValue(DBECustomerReviewMeetingDocument::fileMIMEType));
@@ -182,11 +182,11 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             throw new Exception('At least one file must be provided');
         }
 
-        if (!isset($_REQUEST['customerID'])) {
+        if (!$this->getParam('customerID')) {
             throw new Exception('Customer ID is missing');
         }
 
-        if (!isset($_REQUEST['reviewMeetingDate'])) {
+        if (!$this->getParam('reviewMeetingDate')) {
             throw new Exception('Review Meeting Date is missing');
         }
 
@@ -197,11 +197,11 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
 
             $dbeDocuments->setValue(
                 DBECustomerReviewMeetingDocument::customerID,
-                $_REQUEST['customerID']
+                $this->getParam('customerID')
             );
             $dbeDocuments->setValue(
                 DBECustomerReviewMeetingDocument::meetingDate,
-                common_convertDateDMYToYMD($_REQUEST['reviewMeetingDate'])
+                common_convertDateDMYToYMD($this->getParam('reviewMeetingDate'))
             );
             $dbeDocuments->setValue(
                 DBECustomerReviewMeetingDocument::file,
@@ -235,10 +235,10 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
      */
     private function deleteDocument()
     {
-        if (!isset($_REQUEST['documentID'])) {
+        if (!$this->getParam('documentID')) {
             throw new Exception("Document id is missing");
         }
-        $documentID = $_REQUEST['documentID'];
+        $documentID = $this->getParam('documentID');
 
         $dbeDocuments = new DBECustomerReviewMeetingDocument($this);
 
@@ -252,19 +252,19 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
      */
     private function sendDocuments()
     {
-        if (!isset($_REQUEST['meetingDate'])) {
+        if (!$this->getParam('meetingDate')) {
             throw new Exception('Meeting date is missing');
         }
-        if (!isset($_REQUEST['standardTextID'])) {
+        if (!$this->getParam('standardTextID')) {
             throw new Exception('Standard text ID is missing');
         }
-        if (!isset($_REQUEST['customerID'])) {
+        if (!$this->getParam('customerID')) {
             throw new Exception('Customer ID is missing');
         }
 
-        $meetingDate = $_REQUEST['meetingDate'];
-        $standardTextID = $_REQUEST['standardTextID'];
-        $customerID = $_REQUEST['customerID'];
+        $meetingDate = $this->getParam('meetingDate');
+        $standardTextID = $this->getParam('standardTextID');
+        $customerID = $this->getParam('customerID');
 
         $buStandardText = new BUStandardText($this);
         $dsResults = new DataSet($this);

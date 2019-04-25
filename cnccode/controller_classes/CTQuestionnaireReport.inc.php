@@ -60,7 +60,7 @@ class CTQuestionnaireReport extends CTCNC
         $report = null;
         if (isset ($_REQUEST ['searchForm']) == 'POST') {
 
-            if ($_REQUEST['CSV']) {
+            if ($this->getParam('CSV')) {
                 $csv = true;
             }
 

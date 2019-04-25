@@ -40,7 +40,7 @@ class CTStockLevel extends CTCNC
     function defaultAction()
     {
         $this->setMethodName('defaultAction');
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             case CTSTOCKLEVEL_ACT_UPDATE:
                 $this->update();
@@ -84,11 +84,11 @@ class CTStockLevel extends CTCNC
         // save search text in a session var
         if ($_POST['itemText']) {
 
-            $_SESSION['itemText'] = $_POST['itemText'];
+            $this->setSessionParam('itemText', $_POST['itemText']);
 
         }
 
-        if ($_SESSION['itemText']) {
+        if($this->getSessionParam('itemText')) {
 
             $this->BUItem->getItemsByNameMatch($_SESSION['itemText'], $this->dsItem);
 

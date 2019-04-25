@@ -53,7 +53,7 @@ class CTServiceRequestsByCustomerReport extends CTCNC
     function defaultAction()
     {
 
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             case 'email':
                 $this->email();
@@ -226,7 +226,7 @@ class CTServiceRequestsByCustomerReport extends CTCNC
     {
         $this->setMethodName('email');
         $dsSearchForm = $this->initialiseSearchForm();
-        $days = $_REQUEST['days'];
+        $days = $this->getParam('days');
         $dsSearchForm->setValue(
             self::searchFormDays,
             $days

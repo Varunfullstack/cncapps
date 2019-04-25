@@ -70,7 +70,7 @@ class CTExternalItem extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CREXTERNALITEM_ACT_EDIT:
             case CREXTERNALITEM_ACT_ACT:
                 $this->edit();
@@ -98,12 +98,12 @@ class CTExternalItem extends CTCNC
         $dsExternalItem = &$this->dsExternalItem; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CREXTERNALITEM_ACT_EDIT) {
+            if ($this->getAction() == CREXTERNALITEM_ACT_EDIT) {
                 $this->buExternalItem->getExternalItemByID(
-                    $_REQUEST['externalItemID'],
+                    $this->getParam('externalItemID'),
                     $dsExternalItem
                 );
-                $externalItemID = $_REQUEST['externalItemID'];
+                $externalItemID = $this->getParam('externalItemID');
             } else {                                                                    // creating new
                 $dsExternalItem->initialise();
                 $dsExternalItem->setValue(
@@ -112,7 +112,7 @@ class CTExternalItem extends CTCNC
                 );
                 $dsExternalItem->setValue(
                     DBEExternalItem::customerID,
-                    $_REQUEST['customerID']
+                    $this->getParam('customerID')
                 );
                 $externalItemID = '0';
             }
@@ -124,8 +124,8 @@ class CTExternalItem extends CTCNC
         $urlDelete = null;
         $txtDelete = null;
 
-        if ($_REQUEST['action'] == CREXTERNALITEM_ACT_EDIT && $this->buExternalItem->canDelete(
-                $_REQUEST['externalItemID']
+        if ($this->getAction() == CREXTERNALITEM_ACT_EDIT && $this->buExternalItem->canDelete(
+                $this->getParam('externalItemID')
             )) {
             $urlDelete =
                 Controller::buildLink(
@@ -206,13 +206,13 @@ class CTExternalItem extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsExternalItem->populateFromArray($_REQUEST['externalItem']));
+        $this->formError = (!$this->dsExternalItem->populateFromArray($this->getParam('externalItem')));
         if ($this->formError) {
-            $_REQUEST['action'] = CREXTERNALITEM_ACT_ACT;
+            $this->setAction(CREXTERNALITEM_ACT_ACT);
             if (!$this->dsExternalItem->getValue(
                 DBEExternalItem::externalItemID
             )) {                    // attempt to insert
-                $_REQUEST['action'] = CREXTERNALITEM_ACT_EDIT;
+                $this->setAction(CREXTERNALITEM_ACT_EDIT);
             }
             $this->edit();
             exit;
@@ -243,11 +243,11 @@ class CTExternalItem extends CTCNC
         $this->setMethodName('delete');
         $dsExternalItem = new DataSet($this);
         $this->buExternalItem->getExternalItemByID(
-            $_REQUEST['externalItemID'],
+            $this->getParam('externalItemID'),
             $dsExternalItem
         );
 
-        if (!$this->buExternalItem->deleteExternalItem($_REQUEST['externalItemID'])) {
+        if (!$this->buExternalItem->deleteExternalItem($this->getParam('externalItemID'))) {
             $this->displayFatalError('Cannot delete this external item');
             exit;
         } else {
@@ -302,7 +302,7 @@ class CTExternalItem extends CTCNC
     {
         $dsExternalItem = new DataSet($this);
         $this->buExternalItem->getExternalItemByID(
-            $_REQUEST['externalItemID'],
+            $this->getParam('externalItemID'),
             $dsExternalItem
         );
         $this->setPageTitle(

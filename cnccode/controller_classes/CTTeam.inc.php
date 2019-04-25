@@ -44,7 +44,7 @@ class CTTeam extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTTEAM_ACT_EDIT:
 
             case CTTEAM_ACT_CREATE:
@@ -159,9 +159,9 @@ class CTTeam extends CTCNC
         $dsTeam = &$this->dsTeam; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CTTEAM_ACT_EDIT) {
-                $this->buTeam->getTeamByID($_REQUEST['teamID'], $dsTeam);
-                $teamID = $_REQUEST['teamID'];
+            if ($this->getAction() == CTTEAM_ACT_EDIT) {
+                $this->buTeam->getTeamByID($this->getParam('teamID'), $dsTeam);
+                $teamID = $this->getParam('teamID');
             } else {                                                                    // creating new
                 $dsTeam->initialise();
                 $dsTeam->setValue(DBETeam::teamID, '0');
@@ -174,7 +174,7 @@ class CTTeam extends CTCNC
         }
         $urlDelete = null;
         $txtDelete = null;
-        if ($_REQUEST['action'] == CTTEAM_ACT_EDIT && $this->buTeam->canDelete($_REQUEST['teamID'])) {
+        if ($this->getAction() == CTTEAM_ACT_EDIT && $this->buTeam->canDelete($this->getParam('teamID'))) {
             $urlDelete =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -248,12 +248,12 @@ class CTTeam extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsTeam->populateFromArray($_REQUEST['team']));
+        $this->formError = (!$this->dsTeam->populateFromArray($this->getParam('team')));
         if ($this->formError) {
             if (!$this->dsTeam->getValue(DBETeam::teamID)) {
-                $_REQUEST['action'] = CTTEAM_ACT_EDIT;
+                $this->setAction(CTTEAM_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTTEAM_ACT_CREATE;
+                $this->setAction(CTTEAM_ACT_CREATE);
             }
             $this->edit();
             exit;
@@ -277,7 +277,7 @@ class CTTeam extends CTCNC
     function delete()
     {
         $this->setMethodName('delete');
-        if (!$this->buTeam->deleteTeam($_REQUEST['teamID'])) {
+        if (!$this->buTeam->deleteTeam($this->getParam('teamID'))) {
             $this->displayFatalError('Cannot delete this Team');
             exit;
         } else {

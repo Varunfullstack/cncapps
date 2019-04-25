@@ -1207,8 +1207,8 @@ class CTCustomer extends CTCNC
                 try {
                     $response['decryptedData'] = Encryption::decrypt(
                         CUSTOMERS_ENCRYPTION_PRIVATE_KEY,
-                        @$_REQUEST['passphrase'],
-                        @$_REQUEST['encryptedData']
+                        @$this->getParam('passphrase'),
+                        @$this->getParam('encryptedData')
                     );
                 } catch (Exception $exception) {
                     $response['status'] = "error";
@@ -1229,11 +1229,11 @@ class CTCustomer extends CTCNC
      */
     function setParentFormFields()
     {
-        if (isset($_REQUEST['parentIDField'])) {
-            $_SESSION['parentIDField'] = $_REQUEST['parentIDField'];
+        if ($this->getParam('parentIDField')) {
+            $this->setSessionParam('parentIDField', $this->getParam('parentIDField'));
         }
-        if (isset($_REQUEST['parentDescField'])) {
-            $_SESSION['parentDescField'] = $_REQUEST['parentDescField'];
+        if ($this->getParam('parentDescField')) {
+            $this->setSessionParam('parentDescField', $this->getParam('parentDescField'));
         }
     }
 
@@ -1319,7 +1319,7 @@ class CTCustomer extends CTCNC
         );
 
         $dsCustomer = new DataSet($this);
-        if ($this->buCustomer->getDailyCallList($this,$dsCustomer)) {
+        if ($this->buCustomer->getDailyCallList($this, $dsCustomer)) {
 
             $buUser = new BUUser($this);
 
@@ -1980,10 +1980,10 @@ ORDER BY cus_name ASC  ";
 
 // Parameters
         $this->setPageTitle("Customer");
-        if ($_REQUEST['save_page']) {
-            $_SESSION['save_page'] = $_REQUEST['save_page'];
+        if ($this->getParam('save_page')) {
+            $this->setSessionParam('save_page', $this->getParam('save_page'));
         } else {
-            $_SESSION['save_page'] = false;
+            $this->setSessionParam('save_page', false);
         }
         $submitURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
@@ -1993,8 +1993,8 @@ ORDER BY cus_name ASC  ";
         );
 
 
-        if ($_SESSION['save_page']) {
-            $cancelURL = $_SESSION['save_page'];
+        if ($this->getSessionParam('save_page')) {
+            $cancelURL = $this->getSessionParam('save_page');
         } else {
             $cancelURL = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
@@ -2259,7 +2259,7 @@ ORDER BY cus_name ASC  ";
                 'slaP3'                          => $this->dsCustomer->getValue(DBECustomer::slaP3),
                 'slaP4'                          => $this->dsCustomer->getValue(DBECustomer::slaP4),
                 'slaP5'                          => $this->dsCustomer->getValue(DBECustomer::slaP5),
-                'isShowingInactive'              => $_REQUEST['showInactiveContacts'] ? 'true' : 'false',
+                'isShowingInactive'              => $this->getParam('showInactiveContacts') ? 'true' : 'false',
                 'primaryMainMandatory'           => count($mainContacts) ? 'required' : null,
                 'sortCode'                       => $this->dsCustomer->getValue(DBECustomer::sortCode),
                 'accountName'                    => $this->dsCustomer->getValue(DBECustomer::accountName),
@@ -2595,13 +2595,13 @@ ORDER BY cus_name ASC  ";
             $this->buCustomer->getSitesByCustomerID(
                 $this->dsCustomer->getValue(DBECustomer::customerID),
                 $this->dsSite,
-                $_REQUEST['showInactiveSites']
+                $this->getParam('showInactiveSites')
             );
 
             $this->buCustomer->getContactsByCustomerID(
                 $this->dsCustomer->getValue(DBECustomer::customerID),
                 $this->dsContact,
-                $_REQUEST['showInactiveContacts']
+                $this->getParam('showInactiveContacts')
             );
 
             if ($this->getAction() == CTCUSTOMER_ACT_ADDCONTACT) {
@@ -3333,7 +3333,7 @@ ORDER BY cus_name ASC  ";
                 }
             }
             $this->setAction(CTCUSTOMER_ACT_DISP_SUCCESS);
-            if ($_SESSION['save_page']) {
+            if ($this->getSessionParam('save_page')) {
                 header('Location: ' . $_SESSION['save_page']);
                 exit;
             } else {
@@ -3645,8 +3645,8 @@ ORDER BY cus_name ASC  ";
      */
     protected function saveContactPassword()
     {
-        $contactID = $_REQUEST['contactID'];
-        $password = $_REQUEST['password'];
+        $contactID = $this->getParam('contactID');
+        $password = $this->getParam('password');
 
         if (!$contactID || !$password) {
             throw new Exception("Contact ID and Password required");
@@ -3678,7 +3678,7 @@ ORDER BY cus_name ASC  ";
      */
     protected function clearContact()
     {
-        $contactID = $_REQUEST['contactID'];
+        $contactID = $this->getParam('contactID');
         if (!$contactID) {
             throw new Exception("Contact ID required");
         }
@@ -3808,11 +3808,11 @@ ORDER BY cus_name ASC  ";
      */
     private function getCustomerReviewContacts()
     {
-        if (!isset($_REQUEST['customerID'])) {
+        if (!$this->getParam('customerID')) {
             throw new Exception('Customer ID is missing');
         }
 
-        $customerID = $_REQUEST['customerID'];
+        $customerID = $this->getParam('customerID');
         $dbeContact = new DBEContact($this);
         $dbeContact->getReviewContactsByCustomerID($customerID);
 

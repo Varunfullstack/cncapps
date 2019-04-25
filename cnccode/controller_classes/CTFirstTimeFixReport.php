@@ -33,33 +33,36 @@ class CTFirstTimeFixReport extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function defaultAction()
     {
 
 
-        switch (@$_REQUEST['action']) {
+        switch (@$this->getAction()) {
 
             case 'fetchData':
 
                 $startDate = null;
-                if (@$_REQUEST['startDate']) {
+                if (@$this->getParam('startDate')) {
                     $startDate = DateTime::createFromFormat(
                         'd/m/Y',
-                        $_REQUEST['startDate']
+                        $this->getParam('startDate')
                     );
                 }
 
                 $endDate = null;
-                if (@$_REQUEST['endDate']) {
+                if (@$this->getParam('endDate')) {
                     $endDate = DateTime::createFromFormat(
                         'd/m/Y',
-                        $_REQUEST['endDate']
+                        $this->getParam('endDate')
                     );
                 }
                 echo json_encode(
                     $this->getFirstTimeFixData(
-                        @$_REQUEST['customerID'],
-                        @$_REQUEST['engineerID'],
+                        @$this->getParam('customerID'),
+                        @$this->getParam('engineerID'),
                         $startDate,
                         $endDate
                     )
@@ -71,6 +74,9 @@ class CTFirstTimeFixReport extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     private function search()
     {
 

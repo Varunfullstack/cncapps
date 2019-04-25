@@ -69,7 +69,7 @@ class CTPurchaseInv extends CTCNC
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:
                 $this->search();
                 break;
@@ -97,17 +97,17 @@ class CTPurchaseInv extends CTCNC
     function search()
     {
         $this->setMethodName('search');
-        if (($_REQUEST['porheadID']) && (!is_numeric($_REQUEST['porheadID']))) {
+        if (($this->getParam('porheadID')) && (!is_numeric($this->getParam('porheadID')))) {
             $this->setFormErrorMessage('Order no must be numeric');;
         }
         $found = false;
         if ($this->getFormError() == 0) {
 
             $found = $this->buPurchaseInv->search(
-                $_REQUEST['supplierID'],
-                $_REQUEST['porheadID'],
-                $_REQUEST['supplierRef'],
-                $_REQUEST['lineText'],
+                $this->getParam('supplierID'),
+                $this->getParam('porheadID'),
+                $this->getParam('supplierRef'),
+                $this->getParam('lineText'),
                 $this->dsPorhead
             );
         }
@@ -184,18 +184,18 @@ class CTPurchaseInv extends CTCNC
         }
 // search parameter section
         $supplierName = null;
-        if (($_REQUEST['supplierID'])) {
+        if (($this->getParam('supplierID'))) {
             $buSupplier = new BUSupplier($this);
             $dsSupplier = new DataSet($this);
-            $buSupplier->getSupplierByID($_REQUEST['supplierID'], $dsSupplier);
+            $buSupplier->getSupplierByID($this->getParam('supplierID'), $dsSupplier);
             $supplierName = $dsSupplier->getValue(DBESupplier::name);
         }
         $this->template->set_var(
             array(
                 'supplierName'     => $supplierName,
-                'porheadID'        => $_REQUEST['porheadID'],
-                'supplierID'       => $_REQUEST['supplierID'],
-                'lineText'         => $_REQUEST['lineText'],
+                'porheadID'        => $this->getParam('porheadID'),
+                'supplierID'       => $this->getParam('supplierID'),
+                'lineText'         => $this->getParam('lineText'),
                 'submitURL'        => $submitURL,
                 'urlSupplierPopup' => $urlSupplierPopup
             )
@@ -214,11 +214,11 @@ class CTPurchaseInv extends CTCNC
         $this->setMethodName('display');
         $dsPorhead = &$this->dsPorhead;
         $dsPorline = &$this->dsPorline;
-        if (!$_REQUEST['porheadID']) {
+        if (!$this->getParam('porheadID')) {
             $this->displayFatalError(CTPURCHASEINV_MSG_PORHEADID_NOT_PASSED);
             return;
         }
-        $this->buPurchaseOrder->getHeaderByID($_REQUEST['porheadID'], $dsPorhead);
+        $this->buPurchaseOrder->getHeaderByID($this->getParam('porheadID'), $dsPorhead);
         $dsPorhead->fetchNext();
         $this->buPurchaseOrder->getLinesByID($dsPorhead->getValue(DBEJPorhead::porheadID), $dsPorline);
 
@@ -244,7 +244,7 @@ class CTPurchaseInv extends CTCNC
             $this->dsPurchaseInv,
             $addCustomerItems
         );
-        $_REQUEST['purchaseInvoiceDate'] = date('Y-m-d');
+        $this->setParam('purchaseInvoiceDate', date('Y-m-d'));
 
         $porheadID = $dsPorhead->getValue(DBEJPorhead::porheadID);
         $this->setPageTitle("Purchase Invoice Authorisation");
@@ -282,8 +282,8 @@ class CTPurchaseInv extends CTCNC
                 'porheadID'           => $porheadID,
                 'supplierName'        => Controller::htmlDisplayText($dsPorhead->getValue(DBEJPorhead::supplierName)),
                 'vatRate'             => $dsPorhead->getValue(DBEJPorhead::vatRate),
-                'purchaseInvoiceDate' => Controller::dateYMDtoDMY(($_REQUEST['purchaseInvoiceDate'])),
-                'purchaseInvoiceNo'   => Controller::htmlDisplayText($_REQUEST['purchaseInvoiceNo']),
+                'purchaseInvoiceDate' => Controller::dateYMDtoDMY(($this->getParam('purchaseInvoiceDate'))),
+                'purchaseInvoiceNo'   => Controller::htmlDisplayText($this->getParam('purchaseInvoiceNo')),
                 'urlUpdate'           => $urlUpdate,
                 'urlPurchaseOrder'    => $urlPurchaseOrder,
                 'urlSalesOrder'       => $urlSalesOrder
@@ -409,10 +409,10 @@ class CTPurchaseInv extends CTCNC
         $this->setMethodName('doUpdate');
         $dsPurchaseInv = &$this->dsPurchaseInv;
         $this->buPurchaseInv->initialiseDataset($dsPurchaseInv);
-        if (!isset($_REQUEST['porheadID'])) {
+        if (!$this->getParam('porheadID')) {
             $this->displayFatalError(CTGOODSIN_MSG_PORHEADID_NOT_PASSED);
         }
-        if (!$dsPurchaseInv->populateFromArray($_REQUEST['purchaseInv'])) {
+        if (!$dsPurchaseInv->populateFromArray($this->getParam('purchaseInv'))) {
             $this->setFormErrorMessage('Values entered must be numeric');
             $this->display();
             exit;
@@ -442,22 +442,22 @@ class CTPurchaseInv extends CTCNC
             exit;
         }
 
-        if (!$_REQUEST['purchaseInvoiceNo']) {
+        if (!$this->getParam('purchaseInvoiceNo')) {
             $this->setFormErrorMessage('Please enter a purchase invoice number');
             $this->display();
             exit;
         }
-        if (!$this->buPurchaseInv->invoiceNoIsUnique($_REQUEST['purchaseInvoiceNo'], $_REQUEST['porheadID'])) {
+        if (!$this->buPurchaseInv->invoiceNoIsUnique($this->getParam('purchaseInvoiceNo'), $this->getParam('porheadID'))) {
             $this->setFormErrorMessage('This purchase invoice no has already been used');
             $this->display();
             exit;
         }
-        if (!$_REQUEST['purchaseInvoiceDate']) {
+        if (!$this->getParam('purchaseInvoiceDate')) {
             $this->setFormErrorMessage('Please enter a purchase invoice date');
             $this->display();
             exit;
         }
-        $dateArray = explode('/', $_REQUEST['purchaseInvoiceDate']);
+        $dateArray = explode('/', $this->getParam('purchaseInvoiceDate'));
         if (!checkdate($dateArray[1], $dateArray[0], $dateArray[2])) {
             $this->setFormErrorMessage('Please enter a valid purchase invoice date');
             $this->display();
@@ -466,14 +466,14 @@ class CTPurchaseInv extends CTCNC
             $invoiceDateYMD = $dateArray[2] . '-' . $dateArray[1] . '-' . $dateArray[0];
         }
         $this->buPurchaseInv->update(
-            $_REQUEST['porheadID'],
-            $_REQUEST['purchaseInvoiceNo'],
+            $this->getParam('porheadID'),
+            $this->getParam('purchaseInvoiceNo'),
             $invoiceDateYMD,
             $dsPurchaseInv,
             $this->userID
         );
         $dsPorhead = new DataSet($this);
-        $this->buPurchaseOrder->getHeaderByID($_REQUEST['porheadID'], $dsPorhead);
+        $this->buPurchaseOrder->getHeaderByID($this->getParam('porheadID'), $dsPorhead);
         if ($dsPorhead->getValue(DBEJPorhead::type) == 'A') {
             $urlNext =
                 Controller::buildLink(
@@ -488,7 +488,7 @@ class CTPurchaseInv extends CTCNC
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'    => CTCNC_ACT_DISPLAY_GOODS_IN,
-                        'porheadID' => $_REQUEST['porheadID']
+                        'porheadID' => $this->getParam('porheadID')
                     )
                 );
         }

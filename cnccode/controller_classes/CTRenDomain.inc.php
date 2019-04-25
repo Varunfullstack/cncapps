@@ -94,7 +94,7 @@ class CTRenDomain extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'edit':
             case 'create':
                 $this->edit();
@@ -133,7 +133,7 @@ class CTRenDomain extends CTCNC
         $dsRenDomain = new DataSet($this);
         $this->buRenDomain->getAll(
             $dsRenDomain,
-            $_REQUEST['orderBy']
+            $this->getParam('orderBy')
         );
 
         if ($dsRenDomain->rowCount() > 0) {
@@ -210,8 +210,8 @@ class CTRenDomain extends CTCNC
         $buSalesOrder = new BUSalesOrder($this);
         $dsOrdline = new DataSet($this);
         $buSalesOrder->getOrdlineByIDSeqNo(
-            $_REQUEST['ordheadID'],
-            $_REQUEST['sequenceNo'],
+            $this->getParam('ordheadID'),
+            $this->getParam('sequenceNo'),
             $dsOrdline
         );
 
@@ -222,7 +222,7 @@ class CTRenDomain extends CTCNC
             // create a new record first
             $dsOrdhead = new DataSet($this);
             $buSalesOrder->getOrderByOrdheadID(
-                $_REQUEST['ordheadID'],
+                $this->getParam('ordheadID'),
                 $dsOrdhead,
                 $dsDontNeedOrdline
             );
@@ -282,12 +282,12 @@ class CTRenDomain extends CTCNC
 
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == 'edit') {
+            if ($this->getAction() == 'edit') {
                 $this->buRenDomain->getRenDomainByID(
-                    $_REQUEST['ID'],
+                    $this->getParam('ID'),
                     $dsRenDomain
                 );
-                $customerItemID = $_REQUEST['ID'];
+                $customerItemID = $this->getParam('ID');
             } else {                                                                    // creating new
                 $dsRenDomain->initialise();
                 $dsRenDomain->setValue(
@@ -307,7 +307,7 @@ class CTRenDomain extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'update',
-                    'ordheadID'      => $_REQUEST['ordheadID'],
+                    'ordheadID'      => $this->getParam('ordheadID'),
                     'customerItemID' => $customerItemID
                 )
             );
@@ -493,14 +493,14 @@ class CTRenDomain extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsRenDomain->populateFromArray($_REQUEST['renDomain']));
+        $this->formError = (!$this->dsRenDomain->populateFromArray($this->getParam('renDomain')));
         if ($this->formError) {
             if ($this->dsRenDomain->getValue(
                 DBEJCustomerItem::customerItemID
             )) {                    // attempt to insert
-                $_REQUEST['action'] = 'edit';
+                $this->setAction('edit');
             } else {
-                $_REQUEST['action'] = 'create';
+                $this->setAction('create');
             }
             $this->edit();
             exit;
@@ -508,14 +508,14 @@ class CTRenDomain extends CTCNC
 
         $this->buRenDomain->updateRenDomain($this->dsRenDomain);
 
-        if ($_REQUEST['ordheadID'] == 1) {        // see whether more renewals need to be edited for this
+        if ($this->getParam('ordheadID') == 1) {        // see whether more renewals need to be edited for this
             // despatch
             $urlNext =
                 Controller::buildLink(
                     'Despatch',
                     array(
                         'action' => 'inputRenewals',
-                        'ID'     => $_REQUEST['ordheadID']
+                        'ID'     => $this->getParam('ordheadID')
                     )
                 );
 

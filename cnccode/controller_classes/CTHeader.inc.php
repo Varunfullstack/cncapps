@@ -60,7 +60,7 @@ class CTHeader extends CTCNC
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTHEADER_ACT_UPDATE:
                 $this->update();
                 break;
@@ -537,10 +537,10 @@ class CTHeader extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsHeader->populateFromArray($_REQUEST['header']));
+        $this->formError = (!$this->dsHeader->populateFromArray($this->getParam('header')));
 
         if ($this->formError) {
-            $_REQUEST['action'] = CTHEADER_ACT_EDIT;
+            $this->setAction(CTHEADER_ACT_EDIT);
             $this->edit();
             exit;
         }

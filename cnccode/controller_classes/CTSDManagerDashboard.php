@@ -32,21 +32,21 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'allocateUser':
                 $options = [];
 
 
-                if ($_SESSION['HD']) {
+                if($this->getSessionParam('HD')) {
                     $options['HD'] = true;
                 }
-                if ($_SESSION['ES']) {
+                if($this->getSessionParam('ES')) {
                     $options['ES'] = true;
                 }
-                if ($_SESSION['IM']) {
+                if($this->getSessionParam('IM')) {
                     $options['IM'] = true;
                 }
-                if ($_SESSION['p5']) {
+                if($this->getSessionParam('p5')) {
                     $options['p5'] = true;
                 }
 
@@ -64,15 +64,15 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
     function display()
     {
 
-        $isP5 = isset($_REQUEST['showP5']);
+        $isP5 = $this->getParam('showP5');
 
-        $showHelpDesk = isset($_REQUEST['HD']);
-        $showEscalation = isset($_REQUEST['ES']);
-        $showImplementation = isset($_REQUEST['IM']);
-        $_SESSION['HD'] = $showHelpDesk;
-        $_SESSION['ES'] = $showEscalation;
-        $_SESSION['IM'] = $showImplementation;
-        $_SESSION['p5'] = $isP5;
+        $showHelpDesk = $this->getParam('HD');
+        $showEscalation = $this->getParam('ES');
+        $showImplementation = $this->getParam('IM');
+        $this->setSessionParam('HD', $showHelpDesk);
+        $this->setSessionParam('ES', $showEscalation);
+        $this->setSessionParam('IM', $showImplementation);
+        $this->setSessionParam('p5', $isP5);
 
         $this->setPageTitle('SD Manager Dashboard' . ($isP5 ? ' Priority 5' : null));
 

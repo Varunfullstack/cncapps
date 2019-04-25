@@ -32,10 +32,11 @@ class CTCustomerNote extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             case 'getCustomerNote':
                 $this->getCustomerNote();
@@ -66,19 +67,19 @@ class CTCustomerNote extends CTCNC
     function getCustomerNote()
     {
 
-        if (!$_REQUEST['identifier']) {
+        if (!$this->getParam('identifier')) {
             $this->raiseError('No identifier Passed');
         }
-        if (!$_REQUEST['customerID']) {
+        if (!$this->getParam('customerID')) {
             $this->raiseError('No customerID Passed');
         }
 
         $buCustomerNote = new BUCustomerNote($this);
 
         if ($record = $buCustomerNote->getNote(
-            $_REQUEST['customerID'],
-            $_REQUEST['created'],
-            $_REQUEST['identifier']
+            $this->getParam('customerID'),
+            $this->getParam('created'),
+            $this->getParam('identifier')
         )) {
 
             $noteHistory = $this->getTextStringOfHistory($record->cno_custno);
@@ -90,14 +91,14 @@ class CTCustomerNote extends CTCNC
     function deleteCustomerNote()
     {
 
-        if (!$_REQUEST['customerNoteID']) {
+        if (!$this->getParam('customerNoteID')) {
             $this->raiseError('No customerNoteID Passed');
         }
 
         $buCustomerNote = new BUCustomerNote($this);
 
         if ($record = $buCustomerNote->deleteNote(
-            $_REQUEST['customerNoteID']
+            $this->getParam('customerNoteID')
         )) {
 
             $noteHistory = $this->getTextStringOfHistory($record->cno_custno);
@@ -111,17 +112,17 @@ class CTCustomerNote extends CTCNC
     function updateNote()
     {
 
-        if (!$_REQUEST['customerID']) {
+        if (!$this->getParam('customerID')) {
             $this->raiseError('No customerID Passed');
         }
 
         $buCustomerNote = new BUCustomerNote($this);
 
         if ($record = $buCustomerNote->updateNote(
-            $_REQUEST['customerID'],
-            $_REQUEST['customerNoteID'],
-            $_REQUEST['details'],
-            $_REQUEST['ordheadID']
+            $this->getParam('customerID'),
+            $this->getParam('customerNoteID'),
+            $this->getParam('details'),
+            $this->getParam('ordheadID')
         )) {
 
             $noteHistory = $this->getTextStringOfHistory($record->cno_custno);
@@ -134,6 +135,8 @@ class CTCustomerNote extends CTCNC
     /**
      * Form to create a new customer note
      *
+     * @throws Exception
+     * @throws Exception
      */
     function customerNotePopup()
     {
@@ -145,23 +148,22 @@ class CTCustomerNote extends CTCNC
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-            if (!$_REQUEST['customerID']) {
+            if (!$this->getParam('customerID')) {
                 $this->raiseError('No customerID Passed');
             }
 
-            if (!$_REQUEST['details']) {
+            if (!$this->getParam('details')) {
                 $this->raiseError('No details Passed');
             }
 
             $buCustomerNote = new BUCustomerNote($this);
 
-            $record =
-                $buCustomerNote->updateNote(
-                    $_REQUEST['customerID'],
-                    $_REQUEST['customerNoteID'],
-                    $_REQUEST['details'],
-                    $_REQUEST['ordheadID']
-                );
+            $buCustomerNote->updateNote(
+                $this->getParam('customerID'),
+                $this->getParam('customerNoteID'),
+                $this->getParam('details'),
+                $this->getParam('ordheadID')
+            );
 
             echo '<script language="javascript">window.close()</script>;';
 
@@ -176,10 +178,10 @@ class CTCustomerNote extends CTCNC
                         $_REQUEST ['ordheadID']
                     );
                 if ($record) {
-                    $_REQUEST['customerID'] = $record->cno_custno;
-                    $_REQUEST['customerNoteID'] = $record->cno_customernoteno;
-                    $_REQUEST['ordheadID'] = $record->cno_ordno;
-                    $_REQUEST['details'] = $record->cno_details;
+                    $this->setParam('customerID', $record->cno_custno);
+                    $this->setParam('customerNoteID', $record->cno_customernoteno);
+                    $this->setParam('ordheadID', $record->cno_ordno);
+                    $this->setParam('details', $record->cno_details);
                 }
             }
         }
@@ -195,11 +197,11 @@ class CTCustomerNote extends CTCNC
 
         $this->template->set_var(
             array(
-                'customerID' => $_REQUEST['customerID'],
-                'ordheadID' => $_REQUEST['ordheadID'],
-                'customerNoteID' => $_REQUEST['customerNoteID'],
-                'details' => $_REQUEST['details'],
-                'urlSubmit' => $urlSubmit
+                'customerID'     => $this->getParam('customerID'),
+                'ordheadID'      => $this->getParam('ordheadID'),
+                'customerNoteID' => $this->getParam('customerNoteID'),
+                'details'        => $this->getParam('details'),
+                'urlSubmit'      => $urlSubmit
             )
         );
         $this->template->parse('CONTENTS', 'CustomerNotePopup', true);
@@ -239,14 +241,12 @@ class CTCustomerNote extends CTCNC
 
     function customerNoteHistoryPopup()
     {
-        $returnOutput = false;
 
-        if (!$_REQUEST['customerID']) {
+        if (!$this->getParam('customerID')) {
             $this->raiseError('No customerID Passed');
-        } else {
-            $customerID = $_REQUEST['customerID'];
+            return;
         }
-
+        $customerID = $this->getParam('customerID');
         $this->setTemplateFiles('CustomerNoteHistoryPopup', 'CustomerNoteHistoryPopup.inc');
 
         $buCustomerNote = new BUCustomerNote($this);
@@ -260,8 +260,8 @@ class CTCustomerNote extends CTCNC
                 $this->template->set_var(
                     array(
                         'details' => Controller::formatForHTML($row->cno_details),
-                        'date' => Controller::dateYMDtoDMY($row->cno_modified),
-                        'name' => $row->cns_name
+                        'date'    => Controller::dateYMDtoDMY($row->cno_modified),
+                        'name'    => $row->cns_name
                     )
                 );
 
@@ -294,7 +294,9 @@ class CTCustomerNote extends CTCNC
                 }
                 if (substr($row->cno_modified, 0, 10) != '2010-09-28') {
                     $returnString .=
-                        Controller::dateYMDtoDMY($row->cno_modified) . ' - ' . $row->cns_name . " ####################################################################\\n\\n";
+                        Controller::dateYMDtoDMY(
+                            $row->cno_modified
+                        ) . ' - ' . $row->cns_name . " ####################################################################\\n\\n";
                 }
 
                 $returnString .= $row->cno_details;
@@ -307,4 +309,3 @@ class CTCustomerNote extends CTCNC
     }
 
 }// end of class
-?>

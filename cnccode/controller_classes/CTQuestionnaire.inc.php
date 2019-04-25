@@ -55,7 +55,7 @@ class CTQuestionnaire extends CTCNC
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'createQuestion':
             case 'editQuestion':
                 $this->editQuestion();
@@ -188,12 +188,12 @@ class CTQuestionnaire extends CTCNC
         $dsQuestionnaire = &$this->dsQuestionnaire; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == 'edit') {
+            if ($this->getAction() == 'edit') {
                 $this->buQuestionnaire->getQuestionnaireByID(
-                    $_REQUEST['questionnaireID'],
+                    $this->getParam('questionnaireID'),
                     $dsQuestionnaire
                 );
-                $questionnaireID = $_REQUEST['questionnaireID'];
+                $questionnaireID = $this->getParam('questionnaireID');
             } else {                                                                    // creating new
                 $dsQuestionnaire->initialise();
                 $dsQuestionnaire->setValue(
@@ -284,14 +284,14 @@ class CTQuestionnaire extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsQuestionnaire->populateFromArray($_REQUEST['questionnaire']));
+        $this->formError = (!$this->dsQuestionnaire->populateFromArray($this->getParam('questionnaire')));
         if ($this->formError) {
             if ($this->dsQuestionnaire->getValue(
                 DBEQuestionnaire::questionnaireID
             )) {                    // attempt to insert
-                $_REQUEST['action'] = 'edit';
+                $this->setAction('edit');
             } else {
-                $_REQUEST['action'] = 'create';
+                $this->setAction('create');
             }
             $this->edit();
             exit;
@@ -323,7 +323,7 @@ class CTQuestionnaire extends CTCNC
         );
         $dsQuestion = new DataSet($this);
         $this->buQuestionnaire->getAllQuestions(
-            $_REQUEST['questionnaireID'],
+            $this->getParam('questionnaireID'),
             $dsQuestion
         );
         $dsQuestionnaire = new DataSet($this);
@@ -339,7 +339,7 @@ class CTQuestionnaire extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'          => 'createQuestion',
-                    'questionnaireID' => $_REQUEST['questionnaireID']
+                    'questionnaireID' => $this->getParam('questionnaireID')
 
                 )
             );
@@ -436,12 +436,12 @@ class CTQuestionnaire extends CTCNC
         $dsQuestion = &$this->dsQuestion; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == 'editQuestion') {
+            if ($this->getAction() == 'editQuestion') {
                 $this->buQuestionnaire->getQuestionByID(
-                    $_REQUEST['questionID'],
+                    $this->getParam('questionID'),
                     $dsQuestion
                 );
-                $questionID = $_REQUEST['questionID'];
+                $questionID = $this->getParam('questionID');
             } else {                                  // creating new
                 $dsQuestion->initialise();
                 $dsQuestion->setValue(
@@ -450,7 +450,7 @@ class CTQuestionnaire extends CTCNC
                 );
                 $dsQuestion->setValue(
                     DBEQuestion::questionnaireID,
-                    $_REQUEST['questionnaireID']
+                    $this->getParam('questionnaireID')
                 );
                 $questionID = '0';
             }
@@ -462,7 +462,7 @@ class CTQuestionnaire extends CTCNC
         $urlDelete = null;
         $txtDelete = null;
         if (
-            $_REQUEST['action'] == 'editQuestion' && $this->buQuestionnaire->canDelete($_REQUEST['questionID'])
+            $this->getAction() == 'editQuestion' && $this->buQuestionnaire->canDelete($this->getParam('questionID'))
         ) {
             $urlDelete =
                 Controller::buildLink(
@@ -580,12 +580,12 @@ class CTQuestionnaire extends CTCNC
     function updateQuestion()
     {
         $this->setMethodName('updateQuestion');
-        $this->formError = (!$this->dsQuestion->populateFromArray($_REQUEST['question']));
+        $this->formError = (!$this->dsQuestion->populateFromArray($this->getParam('question')));
         if ($this->formError) {
             if ($this->dsQuestion->getValue(DBEQuestion::questionID)) {          // attempt to insert
-                $_REQUEST['action'] = 'editQuestion';
+                $this->setAction('editQuestion');
             } else {
-                $_REQUEST['action'] = 'createQuestion';
+                $this->setAction('createQuestion');
             }
             $this->edit();
             exit;
@@ -614,7 +614,7 @@ class CTQuestionnaire extends CTCNC
     function deleteQuestion()
     {
         $this->setMethodName('deleteQuestion');
-        if (!$this->buQuestionnaire->deleteQuestion($_REQUEST['questionID'])) {
+        if (!$this->buQuestionnaire->deleteQuestion($this->getParam('questionID'))) {
             $this->displayFatalError('Cannot delete this row');
             exit;
         } else {

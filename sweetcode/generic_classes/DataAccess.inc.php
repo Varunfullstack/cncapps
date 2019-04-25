@@ -755,32 +755,20 @@ class DataAccess extends BaseObject
      */
     function columnExists($ixColumn)
     {
-        if ($this->_colCount == 0) return DA_OUT_OF_RANGE;
-        $ixColumnNo = $this->colNameInverse[$ixColumn];
-
-        if ($ixColumnNo === FALSE or is_null($ixColumnNo)) {
-
-            if (gettype($ixColumn) != DA_STRING) {
-
-                if ($ixColumn < $this->_colCount) {
-
-                    return $ixColumn;
-
-                } else {
-
-                    return DA_OUT_OF_RANGE;
-
-                }
-            } else {
-
-                return DA_OUT_OF_RANGE;
-
-            }
-        } else {
-
-            return $ixColumnNo;
-
+        if ($ixColumn === FALSE || is_null($ixColumn)) {
+            return DA_OUT_OF_RANGE;
         }
+
+        if (!$this->_colCount) return DA_OUT_OF_RANGE;
+
+        if (is_numeric($ixColumn)) {
+            if ($ixColumn > (count($this->colNameInverse) - 1)) {
+                return DA_OUT_OF_RANGE;
+            }
+            return $ixColumn;
+        }
+        if (!isset($this->colNameInverse[$ixColumn])) return DA_OUT_OF_RANGE;
+        return $this->colNameInverse[$ixColumn];
     }
 
     /**
@@ -1236,9 +1224,12 @@ class DataAccess extends BaseObject
         $type = $this->getTypeByColumnNumberNoCheck($ixColumnNumber);
         if ($type == DA_ID) {
             return (int)$this->row[$ixColumnNumber];
-        } else {
-            return $this->row[$ixColumnNumber];
         }
+        if (!count($this->row) || ($ixColumnNumber > (count($this->row) - 1)) || !isset($this->row[$ixColumnNumber])) {
+            return null;
+        }
+        return $this->row[$ixColumnNumber];
+
     }
     /**
      * Set row values assuming the arguments are in column index order

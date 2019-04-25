@@ -660,10 +660,10 @@ class CTCustomerCRM extends CTCustomer
         );
 
 // Parameters
-        if ($_REQUEST['save_page']) {
-            $_SESSION['save_page'] = $_REQUEST['save_page'];
+        if ($this->getParam('save_page')) {
+            $this->setSessionParam('save_page', $this->getParam('save_page'));
         } else {
-            $_SESSION['save_page'] = false;
+            $this->setSessionParam('save_page', false);
         }
         $submitURL =
             Controller::buildLink(
@@ -673,8 +673,8 @@ class CTCustomerCRM extends CTCustomer
                 )
             );
 
-        if ($_SESSION['save_page']) {
-            $cancelURL = $_SESSION['save_page'];
+        if ($this->getSessionParam('save_page')) {
+            $cancelURL = $this->getSessionParam('save_page');
         } else {
             $cancelURL = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
@@ -1756,7 +1756,7 @@ class CTCustomerCRM extends CTCustomer
             }
 
             $this->setAction(CTCUSTOMER_ACT_DISP_SUCCESS);
-            if ($_SESSION['save_page']) {
+            if ($this->getSessionParam('save_page')) {
                 header('Location: ' . $_SESSION['save_page']);
                 exit;
             } else {

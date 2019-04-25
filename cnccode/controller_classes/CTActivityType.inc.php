@@ -46,7 +46,7 @@ class CTActivityType extends CTCNC
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTACTIVITYTYPE_ACT_EDIT:
             case CTACTIVITYTYPE_ACT_CREATE:
                 $this->edit();
@@ -158,9 +158,9 @@ class CTActivityType extends CTCNC
         $dsCallActType = &$this->dsCallActType; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CTACTIVITYTYPE_ACT_EDIT) {
-                $this->buActivityType->getActivityTypeByID($_REQUEST['callActTypeID'], $dsCallActType);
-                $callActTypeID = $_REQUEST['callActTypeID'];
+            if ($this->getAction() == CTACTIVITYTYPE_ACT_EDIT) {
+                $this->buActivityType->getActivityTypeByID($this->getParam('callActTypeID'), $dsCallActType);
+                $callActTypeID = $this->getParam('callActTypeID');
             } else {                                                                    // creating new
                 $dsCallActType->initialise();
                 $dsCallActType->setValue(DBECallActType::callActTypeID, '0');
@@ -173,8 +173,8 @@ class CTActivityType extends CTCNC
         }
         $urlDelete = null;
         $txtDelete = null;
-        if ($_REQUEST['action'] == CTACTIVITYTYPE_ACT_EDIT && $this->buActivityType->canDeleteActivityType(
-                $_REQUEST['callActTypeID']
+        if ($this->getAction() == CTACTIVITYTYPE_ACT_EDIT && $this->buActivityType->canDeleteActivityType(
+                $this->getParam('callActTypeID')
             )) {
             $urlDelete = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
@@ -323,12 +323,12 @@ class CTActivityType extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsCallActType->populateFromArray($_REQUEST['callActType']));
+        $this->formError = (!$this->dsCallActType->populateFromArray($this->getParam('callActType')));
         if ($this->formError) {
             if (!$this->dsCallActType->getValue(DBECallActType::callActTypeID)) {
-                $_REQUEST['action'] = CTACTIVITYTYPE_ACT_EDIT;
+                $this->setAction(CTACTIVITYTYPE_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTACTIVITYTYPE_ACT_CREATE;
+                $this->setAction(CTACTIVITYTYPE_ACT_CREATE);
             }
             $this->edit();
             exit;
@@ -356,7 +356,7 @@ class CTActivityType extends CTCNC
     function delete()
     {
         $this->setMethodName('delete');
-        if (!$this->buActivityType->deleteActivityType($_REQUEST['callActTypeID'])) {
+        if (!$this->buActivityType->deleteActivityType($this->getParam('callActTypeID'))) {
             $this->displayFatalError('Cannot delete this activity type');
             exit;
         } else {

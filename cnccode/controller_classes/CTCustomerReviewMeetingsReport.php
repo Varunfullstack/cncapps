@@ -50,7 +50,7 @@ class CTCustomerReviewMeetingsReport extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             default:
                 $this->display();
@@ -58,6 +58,9 @@ class CTCustomerReviewMeetingsReport extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function display()
     {
 
@@ -186,15 +189,4 @@ class CTCustomerReviewMeetingsReport extends CTCNC
 
         $this->parsePage();
     }
-
-    private function getDateOrNA($date)
-    {
-        if (!$date) {
-            return 'N/A';
-        }
-        return $date->format(
-            'd/m/Y'
-        );
-    }
 }// end of class
-?>

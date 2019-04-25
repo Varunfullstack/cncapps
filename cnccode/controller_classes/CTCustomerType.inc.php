@@ -45,7 +45,7 @@ class CTCustomerType extends CTCNC
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTCUSTOMERTYPE_ACT_EDIT:
             case CTCUSTOMERTYPE_ACT_CREATE:
                 $this->edit();
@@ -157,9 +157,9 @@ class CTCustomerType extends CTCNC
         $dsCustomerType = &$this->dsCustomerType; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CTCUSTOMERTYPE_ACT_EDIT) {
-                $this->buCustomerType->getCustomerTypeByID($_REQUEST['customerTypeID'], $dsCustomerType);
-                $customerTypeID = $_REQUEST['customerTypeID'];
+            if ($this->getAction() == CTCUSTOMERTYPE_ACT_EDIT) {
+                $this->buCustomerType->getCustomerTypeByID($this->getParam('customerTypeID'), $dsCustomerType);
+                $customerTypeID = $this->getParam('customerTypeID');
             } else {                                                                    // creating new
                 $dsCustomerType->initialise();
                 $dsCustomerType->setValue(DBECustomerType::customerTypeID, '0');
@@ -172,8 +172,8 @@ class CTCustomerType extends CTCNC
         }
         $urlDelete = null;
         $txtDelete = null;
-        if ($_REQUEST['action'] == CTCUSTOMERTYPE_ACT_EDIT && $this->buCustomerType->canDelete(
-                $_REQUEST['customerTypeID']
+        if ($this->getAction() == CTCUSTOMERTYPE_ACT_EDIT && $this->buCustomerType->canDelete(
+                $this->getParam('customerTypeID')
             )) {
             $urlDelete = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
@@ -230,12 +230,12 @@ class CTCustomerType extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsCustomerType->populateFromArray($_REQUEST['customerType']));
+        $this->formError = (!$this->dsCustomerType->populateFromArray($this->getParam('customerType')));
         if ($this->formError) {
             if (!$this->dsCustomerType->getValue(DBECustomerType::customerTypeID)) {
-                $_REQUEST['action'] = CTCUSTOMERTYPE_ACT_EDIT;
+                $this->setAction(CTCUSTOMERTYPE_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTCUSTOMERTYPE_ACT_CREATE;
+                $this->setAction(CTCUSTOMERTYPE_ACT_CREATE);
             }
             $this->edit();
             exit;
@@ -263,7 +263,7 @@ class CTCustomerType extends CTCNC
     function delete()
     {
         $this->setMethodName('delete');
-        if (!$this->buCustomerType->deleteCustomerType($_REQUEST['customerTypeID'])) {
+        if (!$this->buCustomerType->deleteCustomerType($this->getParam('customerTypeID'))) {
             $this->displayFatalError('Cannot delete this row');
             exit;
         }

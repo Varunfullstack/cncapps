@@ -1,7 +1,5 @@
 <?php
 
-use Syonix\ChangelogViewer\Factory\ViewerFactory;
-
 /**
  * Controller base class
  * Provides generic functionality to process HTML requests.
@@ -18,19 +16,6 @@ use Syonix\ChangelogViewer\Factory\ViewerFactory;
  * @author Karim Ahmed.
  * @access virtual
  */
-function stripslashes_deep($value)
-{
-    $value = is_array($value) ?
-        array_map(
-            'stripslashes_deep',
-            $value
-        ) :
-        stripslashes($value);
-
-    return $value;
-}
-
-// Session level constants
 
 define(
     "CT_LEVEL_NONE",
@@ -144,7 +129,7 @@ class Controller extends BaseObject
      * @var Template $template
      */
     public $template;                    // PHPLib template object
-    var $cfg = "";                            // Configuration variables
+    var $cfg;                            // Configuration variables
     var $db = "";                                // PHPLib DB object
     var $pageTitle = "";
     var $formError = FALSE;
@@ -158,23 +143,31 @@ class Controller extends BaseObject
         &$postVars,
         &$getVars,
         &$cookieVars,
-        &$cfg,
-        $sessClassName,
-        $authClassName,
-        $permClassName,
-        $userClassName
+        &$cfg
     )
     {
         $this->BaseObjectNoOwner();
-//		$this->BaseObject();
         $this->pageOpen();
         $this->postVars =& $postVars;
         $this->getVars =& $getVars;
         $this->cookieVars =& $cookieVars;
         $this->cfg =& $cfg;
-        $this->createTemplate();
         $this->requestMethod = $requestMethod;
+        $this->createTemplate();
         $this->setFormErrorOff();
+
+    }
+
+    public function getParam($paramName)
+    {
+        if (!$paramName) {
+            return null;
+        }
+
+        if (!isset($_REQUEST[$paramName])) {
+            return null;
+        }
+        return $_REQUEST[$paramName];
     }
 
     public static function dateToISO($getValue)
@@ -325,6 +318,24 @@ class Controller extends BaseObject
     function getAction()
     {
         return $this->action;
+    }
+
+    function getSessionParam($paramName)
+    {
+        if (!$paramName) {
+            return null;
+        }
+
+        if (!isset($_SESSION[$paramName])) {
+            return null;
+        }
+
+        return $_SESSION[$paramName];
+    }
+
+    function setSessionParam($paramName, $value)
+    {
+        $_SESSION[$paramName] = $value;
     }
 
     /**
@@ -494,6 +505,9 @@ class Controller extends BaseObject
     function handleRequest()
     {
         $this->setMethodName("handleRequest");
+        if (isset($_REQUEST['action'])) {
+            $this->setAction($_REQUEST['action']);
+        }
         switch ($this->getAction()) {
             case CT_ACTION_INSERT:
                 $this->insert();
@@ -575,7 +589,7 @@ class Controller extends BaseObject
     {
         $this->template->set_var(
             "STYLESHEET",
-            $this->cfg["stylesheet"]
+            isset($this->cfg["stylesheet"]) ? $this->cfg["stylesheet"] : null
         );
         $this->template->set_var(
             "pageTitle",
@@ -1089,6 +1103,11 @@ class Controller extends BaseObject
                 return $dateYMD; // it isn't a valid date format so just return it as-is for display
             }
         }
+    }
+
+    protected function setParam(string $string, $value)
+    {
+        $_REQUEST[$string] = $value;
     }
 }// End of class
 ?>

@@ -42,7 +42,7 @@ class CTManagementReports extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'SalesByCustomer':
                 $this->SalesByCustomer();
                 break;
@@ -56,10 +56,10 @@ class CTManagementReports extends CTCNC
                 break;
             case self::GetSalesByCustomerDataAction:
                 $data = $this->salesByCustomerData(
-                    $_REQUEST['year'],
-                    $_REQUEST['customerID'],
-                    $_REQUEST['sector'],
-                    $_REQUEST['noOfPcs']
+                    $this->getParam('year'),
+                    $this->getParam('customerID'),
+                    $this->getParam('sector'),
+                    $this->getParam('noOfPcs')
                 );
 
                 echo json_encode($data);
@@ -84,12 +84,12 @@ class CTManagementReports extends CTCNC
 
         // year selector
         $this->template->set_block('ManagementReportsSpendManufacturer', 'yearBlock', 'years');
-        $this->parseYearSelector($_REQUEST['year']);
+        $this->parseYearSelector($this->getParam('year'));
 
         $results =
             $this->buManagementReports->getSpendByManufacturer(
-                $_REQUEST['manufacturerName'],
-                $_REQUEST['year']
+                $this->getParam('manufacturerName'),
+                $this->getParam('year')
             );
 
         $this->template->set_block('ManagementReportsSpendManufacturer', 'resultsBlock', 'results');
@@ -145,7 +145,7 @@ class CTManagementReports extends CTCNC
         $this->template->set_var(
             array(
                 'urlGenerateReport' => $urlGenerateReport,
-                'manufacturerName'  => $_REQUEST['manufacturerName'],
+                'manufacturerName'  => $this->getParam('manufacturerName'),
                 'grandTotal'        => Controller::formatNumber($grandTotal, 0)
             )
         );
@@ -169,7 +169,7 @@ class CTManagementReports extends CTCNC
 
         // year selector
         $this->template->set_block('ManagementReportsSpendSupplier', 'yearBlock', 'years');
-        $this->parseYearSelector($_REQUEST['year']);
+        $this->parseYearSelector($this->getParam('year'));
 
         $supplierPopupURL = Controller::buildLink(
             CTCNC_PAGE_SUPPLIER,
@@ -179,11 +179,11 @@ class CTManagementReports extends CTCNC
             )
         );
 
-        $results = $this->buManagementReports->getSpendBySupplier($_REQUEST['supplierID'], $_REQUEST['year']);
+        $results = $this->buManagementReports->getSpendBySupplier($this->getParam('supplierID'), $this->getParam('year'));
         $supplierName = null;
-        if ($_REQUEST['supplierID']) {
+        if ($this->getParam('supplierID')) {
             $dbeSupplier = new DBESupplier($this);
-            $dbeSupplier->getRow($_REQUEST['supplierID']);
+            $dbeSupplier->getRow($this->getParam('supplierID'));
             $supplierName = $dbeSupplier->getValue(DBESupplier::name);
         }
 
@@ -251,7 +251,7 @@ class CTManagementReports extends CTCNC
                 'urlGenerateReport' => $urlGenerateReport,
                 'urlSupplierPopup'  => $supplierPopupURL,
                 'supplierName'      => $supplierName,
-                'supplierID'        => $_REQUEST['supplierID']
+                'supplierID'        => $this->getParam('supplierID')
             )
         );
 
@@ -274,11 +274,11 @@ class CTManagementReports extends CTCNC
 
         // year selector
         $this->template->set_block('ManagementReportsSpendCategory', 'yearBlock', 'years');
-        $this->parseYearSelector($_REQUEST['year']);
+        $this->parseYearSelector($this->getParam('year'));
 
         $results =
             $this->buManagementReports->getSpendByCategory(
-                $_REQUEST['year']
+                $this->getParam('year')
             );
 
         $this->template->set_block('ManagementReportsSpendCategory', 'resultsBlock', 'results');
@@ -346,7 +346,7 @@ class CTManagementReports extends CTCNC
         $this->template->set_var(
             array(
                 'urlGenerateReport' => $urlGenerateReport,
-                'categoryID'        => $_REQUEST['categoryID']
+                'categoryID'        => $this->getParam('categoryID')
             )
         );
 
@@ -423,14 +423,14 @@ class CTManagementReports extends CTCNC
 
         // year selector
         $this->template->set_block('ManagementReportsSalesCustomer', 'yearBlock', 'years');
-        $this->parseYearSelector($_REQUEST['year']);
+        $this->parseYearSelector($this->getParam('year'));
         // sector selector
         $this->template->set_block('ManagementReportsSalesCustomer', 'sectorBlock', 'sectors');
-        $this->parseSectorSelector($_REQUEST['sectorID']);
+        $this->parseSectorSelector($this->getParam('sectorID'));
 
         // noOfPcs selector
 
-        $this->parseNoOfPcs($this->template, $_REQUEST['noOfPcs']);
+        $this->parseNoOfPcs($this->template, $this->getParam('noOfPcs'));
 
 
         $customerPopupURL = Controller::buildLink(
@@ -448,9 +448,9 @@ class CTManagementReports extends CTCNC
             )
         );
         $customerName = null;
-        if ($_REQUEST['customerID']) {
+        if ($this->getParam('customerID')) {
             $dbeCustomer = new DBECustomer($this);
-            $dbeCustomer->getRow($_REQUEST['customerID']);
+            $dbeCustomer->getRow($this->getParam('customerID'));
             $customerName = $dbeCustomer->getValue(DBECustomer::name);
         }
 
@@ -458,9 +458,9 @@ class CTManagementReports extends CTCNC
             array(
                 'customerPopupURL' => $customerPopupURL,
                 'customerName'     => $customerName,
-                'customerID'       => $_REQUEST['customerID'],
-                'sectorID'         => $_REQUEST['sectorID'],
-                'noOfPcs'          => $_REQUEST['noOfPcs'],
+                'customerID'       => $this->getParam('customerID'),
+                'sectorID'         => $this->getParam('sectorID'),
+                'noOfPcs'          => $this->getParam('noOfPcs'),
                 'fetchDataUrl'     => $fetchDataUrl
             )
         );

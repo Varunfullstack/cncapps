@@ -53,7 +53,7 @@ class CTCustomerReviewMeeting extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             case 'generatePdf':
                 echo json_encode($this->generatePdf());
@@ -378,25 +378,25 @@ class CTCustomerReviewMeeting extends CTCNC
             }
 
         } else {
-            if ($_REQUEST['customerID']) {
+            if ($this->getParam('customerID')) {
                 $dsSearchForm->setValue(
                     BUCustomerReviewMeeting::searchFormCustomerID,
-                    $_REQUEST['customerID']
+                    $this->getParam('customerID')
                 );
                 $dsSearchForm->setValue(
                     BUCustomerReviewMeeting::searchFormStartYearMonth,
-                    $_REQUEST['startYearMonth']
+                    $this->getParam('startYearMonth')
                 );
                 $dsSearchForm->setValue(
                     BUCustomerReviewMeeting::searchFormEndYearMonth,
-                    $_REQUEST['endYearMonth']
+                    $this->getParam('endYearMonth')
                 );
                 $dsSearchForm->setValue(
                     BUCustomerReviewMeeting::searchFormMeetingDate,
-                    $_REQUEST['meetingDateYmd']
+                    $this->getParam('meetingDateYmd')
                 );
-                $nonEditableText = $_REQUEST['nonEditableText'];
-                $editableText = $_REQUEST['editableText'];
+                $nonEditableText = $this->getParam('nonEditableText');
+                $editableText = $this->getParam('editableText');
 
             }
         }
@@ -563,7 +563,7 @@ class CTCustomerReviewMeeting extends CTCNC
     function generatePdf()
     {
 
-        $text = $_REQUEST['html'];
+        $text = $this->getParam('html');
 
         $agendaTemplate = new Template (
             $GLOBALS ["cfg"] ["path_templates"],
@@ -593,9 +593,9 @@ class CTCustomerReviewMeeting extends CTCNC
         $html = $agendaTemplate->get_var('output');
         try {
             $this->buCustomerReviewMeeting->generateAgendaPdf(
-                $_REQUEST['customerID'],
+                $this->getParam('customerID'),
                 $html,
-                $_REQUEST['meetingDateYmd']
+                $this->getParam('meetingDateYmd')
             );
         } catch (Exception $exception) {
             http_response_code(500);
@@ -604,23 +604,23 @@ class CTCustomerReviewMeeting extends CTCNC
 
         $startDate = (DateTime::createFromFormat(
             "m/Y",
-            $_REQUEST['startYearMonth']
+            $this->getParam('startYearMonth')
         ))->modify('first day of this month ');
         $endDate = (DateTime::createFromFormat(
             "m/Y",
-            $_REQUEST['endYearMonth']
+            $this->getParam('endYearMonth')
         ))->modify('last day of this month');
 
         $this->buCustomerReviewMeeting->generateSalesPdf(
-            $_REQUEST['customerID'],
+            $this->getParam('customerID'),
             $startDate,
             $endDate,
-            $_REQUEST['meetingDateYmd']
+            $this->getParam('meetingDateYmd')
         );
 
         $this->buCustomerReviewMeeting->generateMeetingNotes(
-            $_REQUEST['customerID'],
-            $_REQUEST['meetingDateYmd']
+            $this->getParam('customerID'),
+            $this->getParam('meetingDateYmd')
         );
 
         return ["status" => "ok"];

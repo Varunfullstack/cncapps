@@ -45,12 +45,12 @@ class CTSecondSiteReplication extends CTSecondSite
         $dsSecondsiteImage = &$this->dsSecondsiteImage; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == 'edit') {
+            if ($this->getAction() == 'edit') {
                 $this->buSecondsite->getSecondsiteImageByID(
-                    $_REQUEST['secondsiteImageID'],
+                    $this->getParam('secondsiteImageID'),
                     $dsSecondsiteImage
                 );
-                $secondsiteImageID = $_REQUEST['secondsiteImageID'];
+                $secondsiteImageID = $this->getParam('secondsiteImageID');
             } else {                                                                    // creating new
                 $dsSecondsiteImage->initialise();
                 $dsSecondsiteImage->setValue(
@@ -59,7 +59,7 @@ class CTSecondSiteReplication extends CTSecondSite
                 );
                 $dsSecondsiteImage->setValue(
                     DBESecondSiteImage::customerItemID,
-                    $_REQUEST['customerItemID']
+                    $this->getParam('customerItemID')
                 );
                 $secondsiteImageID = '0';
             }
@@ -380,7 +380,7 @@ class CTSecondSiteReplication extends CTSecondSite
      */
     function run()
     {
-        $this->buSecondsite->validateBackups($_REQUEST['customerItemID']);
+        $this->buSecondsite->validateBackups($this->getParam('customerItemID'));
 
         $urlNext =
             Controller::buildLink(

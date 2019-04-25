@@ -60,15 +60,7 @@ class BUDailyReport extends Business
             );
 
             $controller = new Controller(
-                '',
-                $nothing,
-                $nothing,
-                $nothing,
-                $nothing,
-                null,
-                null,
-                null,
-                null
+                '', $nothing, $nothing, $nothing, $nothing
             );
 
             do {
@@ -229,15 +221,7 @@ class BUDailyReport extends Business
             );
 
             $controller = new Controller(
-                '',
-                $nothing,
-                $nothing,
-                $nothing,
-                $nothing,
-                null,
-                null,
-                null,
-                null
+                '', $nothing, $nothing, $nothing, $nothing
             );
 
             do {
@@ -425,15 +409,7 @@ class BUDailyReport extends Business
             );
 
             $controller = new Controller(
-                '',
-                $nothing,
-                $nothing,
-                $nothing,
-                $nothing,
-                null,
-                null,
-                null,
-                null
+                '', $nothing, $nothing, $nothing, $nothing
             );
             do {
 
@@ -524,15 +500,7 @@ class BUDailyReport extends Business
             );
 
             $controller = new Controller(
-                '',
-                $nothing,
-                $nothing,
-                $nothing,
-                $nothing,
-                null,
-                null,
-                null,
-                null
+                '', $nothing, $nothing, $nothing, $nothing
             );
 
             do {
@@ -859,15 +827,7 @@ class BUDailyReport extends Business
             );
 
             $controller = new Controller(
-                '',
-                $nothing,
-                $nothing,
-                $nothing,
-                $nothing,
-                null,
-                null,
-                null,
-                null
+                '', $nothing, $nothing, $nothing, $nothing
             );
 
             $title = "P5 SRs with no SO";
@@ -1031,15 +991,7 @@ class BUDailyReport extends Business
             $title = "P5 SRs with SO and not T&M";
 
             $controller = new Controller(
-                '',
-                $nothing,
-                $nothing,
-                $nothing,
-                $nothing,
-                null,
-                null,
-                null,
-                null
+                '', $nothing, $nothing, $nothing, $nothing
             );
 
             do {
@@ -1148,7 +1100,7 @@ WHERE pro_priority = 5
         return $this->db->query($sql);
     }
 
-    public function contactOpenSRReport($onScreen)
+    public function contactOpenSRReport($onScreen = false)
     {
         $this->setMethodName('contactOpenSRReport');
 

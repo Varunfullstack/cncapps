@@ -57,10 +57,10 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'generatePDF':
                 $filename = $this->getPDFQuestionnaire(
-                    $_REQUEST['questionnaireAnswerID'],
+                    $this->getParam('questionnaireAnswerID'),
                     'grass-fridge-mouse-boat'
                 );
                 header('Pragma: public');
@@ -73,26 +73,26 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 readfile($filename);
                 break;
             case 'employeeAnswer':
-                $this->showEmployeeAnswer($_REQUEST['questionnaireID']);
+                $this->showEmployeeAnswer($this->getParam('questionnaireID'));
                 break;
             case 'managerAnswer':
                 $this->showManagerAnswer(
-                    $_REQUEST['questionnaireID'],
-                    $_REQUEST['staffID']
+                    $this->getParam('questionnaireID'),
+                    $this->getParam('staffID')
                 );
                 break;
             case 'managerQuestionnaireList':
                 $this->showManagerQuestionnaireList();
                 break;
             case 'sendQuestionnaire':
-                $this->sendQuestionnaire($_REQUEST['questionnaireID']);
+                $this->sendQuestionnaire($this->getParam('questionnaireID'));
                 break;
             case 'getQuestionnaireManagerData':
                 $response = ["status" => "ok"];
                 try {
                     $response['data'] = $this->getQuestionnaireManagerData(
-                        @$_REQUEST['type'],
-                        @$_REQUEST['questionnaireID']
+                        @$this->getParam('type'),
+                        @$this->getParam('questionnaireID')
                     );
                 } catch (Exception $exception) {
                     $response['status'] = "error";
@@ -135,8 +135,8 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 try {
                     $response['decryptedData'] = Encryption::decrypt(
                         USER_ENCRYPTION_PRIVATE_KEY,
-                        @$_REQUEST['passphrase'],
-                        @$_REQUEST['encryptedData']
+                        @$this->getParam('passphrase'),
+                        @$this->getParam('encryptedData')
                     );
                 } catch (Exception $exception) {
                     $response['status'] = "error";
@@ -297,12 +297,12 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $dsQuestionnaire = &$this->dsQuestionnaire; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == 'edit') {
+            if ($this->getAction() == 'edit') {
                 $this->buQuestionnaire->getQuestionnaireByID(
-                    $_REQUEST['questionnaireID'],
+                    $this->getParam('questionnaireID'),
                     $dsQuestionnaire
                 );
-                $questionnaireID = $_REQUEST['questionnaireID'];
+                $questionnaireID = $this->getParam('questionnaireID');
             } else {                                                                    // creating new
                 $dsQuestionnaire->initialise();
                 $dsQuestionnaire->setValue(
@@ -318,8 +318,8 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         }
         $urlDelete = null;
         $txtDelete = null;
-        if ($_REQUEST['action'] == 'edit' && $this->buQuestionnaire->canDeleteQuestionnaire(
-                $_REQUEST['questionnaireID']
+        if ($this->getAction() == 'edit' && $this->buQuestionnaire->canDeleteQuestionnaire(
+                $this->getParam('questionnaireID')
             )) {
             $urlDelete =
                 Controller::buildLink(
@@ -391,14 +391,14 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsQuestionnaire->populateFromArray($_REQUEST['questionnaire']));
+        $this->formError = (!$this->dsQuestionnaire->populateFromArray($this->getParam('questionnaire')));
         if ($this->formError) {
             if ($this->dsQuestionnaire->getValue(
                 DBEStaffAppraisalQuestionnaire::id
             )) {                    // attempt to insert
-                $_REQUEST['action'] = 'edit';
+                $this->setAction('edit');
             } else {
-                $_REQUEST['action'] = 'create';
+                $this->setAction('create');
             }
             $this->edit();
             exit;
@@ -427,7 +427,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     function delete()
     {
         $this->setMethodName('delete');
-        if (!$this->buQuestionnaire->deleteQuestionnaire($_REQUEST['questionnaireID'])) {
+        if (!$this->buQuestionnaire->deleteQuestionnaire($this->getParam('questionnaireID'))) {
             $this->displayFatalError('Cannot delete this row');
             exit;
         } else {
@@ -456,7 +456,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         );
         $dsQuestion = new DataSet($this);
         $this->buQuestionnaire->getAllQuestions(
-            $_REQUEST['questionnaireID'],
+            $this->getParam('questionnaireID'),
             $dsQuestion
         );
         $dsQuestionnaire = new DataSet($this);
@@ -472,7 +472,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'          => 'createQuestion',
-                    'questionnaireID' => $_REQUEST['questionnaireID']
+                    'questionnaireID' => $this->getParam('questionnaireID')
 
                 )
             );
@@ -569,12 +569,12 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $dsQuestion = &$this->dsQuestion; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == 'editQuestion') {
+            if ($this->getAction() == 'editQuestion') {
                 $this->buQuestionnaire->getQuestionByID(
-                    $_REQUEST['questionID'],
+                    $this->getParam('questionID'),
                     $dsQuestion
                 );
-                $questionID = $_REQUEST['questionID'];
+                $questionID = $this->getParam('questionID');
             } else {                                  // creating new
                 $dsQuestion->initialise();
                 $dsQuestion->setValue(
@@ -583,7 +583,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 );
                 $dsQuestion->setValue(
                     DBEStaffAppraisalQuestion::questionnaireID,
-                    $_REQUEST['questionnaireID']
+                    $this->getParam('questionnaireID')
                 );
                 $questionID = '0';
             }
@@ -595,8 +595,8 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $urlDelete = null;
         $txtDelete = null;
         if (
-            $_REQUEST['action'] == 'editQuestion' &&
-            $this->buQuestionnaire->canDeleteQuestionnaire($_REQUEST['questionID'])
+            $this->getAction() == 'editQuestion' &&
+            $this->buQuestionnaire->canDeleteQuestionnaire($this->getParam('questionID'))
         ) {
             $urlDelete =
                 Controller::buildLink(
@@ -737,12 +737,12 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     function updateQuestion()
     {
         $this->setMethodName('updateQuestion');
-        $this->formError = (!$this->dsQuestion->populateFromArray($_REQUEST['question']));
+        $this->formError = (!$this->dsQuestion->populateFromArray($this->getParam('question')));
         if ($this->formError) {
             if ($this->dsQuestion->getValue(DBEStaffAppraisalQuestion::id) == null) {          // attempt to insert
-                $_REQUEST['action'] = 'editQuestion';
+                $this->setAction('editQuestion');
             } else {
-                $_REQUEST['action'] = 'createQuestion';
+                $this->setAction('createQuestion');
             }
             $this->edit();
             exit;
@@ -771,7 +771,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     function deleteQuestion()
     {
         $this->setMethodName('deleteQuestion');
-        if (!$this->buQuestionnaire->deleteQuestion($_REQUEST['questionID'])) {
+        if (!$this->buQuestionnaire->deleteQuestion($this->getParam('questionID'))) {
             $this->displayFatalError('Cannot delete this row');
             exit;
         } else {
@@ -1438,7 +1438,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     {
         // first we need to pull the questionnaireAnswerID
 
-        $questionnaireAnswerID = @$_REQUEST['questionnaireAnswerID'];
+        $questionnaireAnswerID = @$this->getParam('questionnaireAnswerID');
 
         if (!$questionnaireAnswerID) {
             throw new Exception('Questionnaire Answer ID is missing!');
@@ -1453,10 +1453,10 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
         $isStaffMember = $dbeQuestionnaireAnswer->getValue(
                 DBEStaffAppraisalQuestionnaireAnswer::staffMemberID
-            ) == $currentUserID && isset($_REQUEST['completeFor']) && $_REQUEST['completeFor'] == 'staffMember';
+            ) == $currentUserID && $this->getParam('completeFor') && $this->getParam('completeFor') == 'staffMember';
         $isManager = $dbeQuestionnaireAnswer->getValue(
                 DBEStaffAppraisalQuestionnaireAnswer::managerID
-            ) == $currentUserID && isset($_REQUEST['completeFor']) && $_REQUEST['completeFor'] == 'manager';
+            ) == $currentUserID && $this->getParam('completeFor') && $this->getParam('completeFor') == 'manager';
 
         if (!($isStaffMember || $isManager)) {
             throw new Exception(
@@ -1467,27 +1467,27 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         if ($isManager) {
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::sickDaysThisYear,
-                $_REQUEST['sickDaysThisYear']
+                $this->getParam('sickDaysThisYear')
             );
 
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::proposedSalary,
-                $_REQUEST['proposedSalary']
+                $this->getParam('proposedSalary')
             );
 
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::proposedBonus,
-                $_REQUEST['proposedBonus']
+                $this->getParam('proposedBonus')
             );
 
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::teamLeaderComments,
-                $_REQUEST['teamLeaderComments']
+                $this->getParam('teamLeaderComments')
             );
 
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::managerComments,
-                $_REQUEST['managerComments']
+                $this->getParam('managerComments')
             );
         }
 
@@ -1499,7 +1499,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::questionnaireID)
         );
 
-        $questionAnswers = $_REQUEST['question'];
+        $questionAnswers = $this->getParam('question');
 
         while ($dbeQuestions->fetchNext()) {
 
@@ -1563,7 +1563,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
         $dbeObjective = new DBEStaffAppraisalObjectives($this);
         $dbeObjective->getRowsByAnswerID($questionnaireAnswerID);
-        $objectives = $_REQUEST['objective'];
+        $objectives = $this->getParam('objective');
 
         while ($dbeObjective->fetchNext()) {
             $objectiveID = $dbeObjective->getValue(DBEStaffAppraisalObjectives::id);
@@ -1601,7 +1601,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
     {
         // first we need to pull the questionnaireAnswerID
 
-        $questionnaireAnswerID = @$_REQUEST['questionnaireAnswerID'];
+        $questionnaireAnswerID = @$this->getParam('questionnaireAnswerID');
 
         if (!$questionnaireAnswerID) {
             throw new Exception('Questionnaire Answer ID is missing!');
@@ -1616,10 +1616,10 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
         $isStaffMember = $dbeQuestionnaireAnswer->getValue(
                 DBEStaffAppraisalQuestionnaireAnswer::staffMemberID
-            ) == $currentUserID && isset($_REQUEST['completeFor']) && $_REQUEST['completeFor'] == 'staffMember';
+            ) == $currentUserID && $this->getParam('completeFor') && $this->getParam('completeFor') == 'staffMember';
         $isManager = $dbeQuestionnaireAnswer->getValue(
                 DBEStaffAppraisalQuestionnaireAnswer::managerID
-            ) == $currentUserID && isset($_REQUEST['completeFor']) && $_REQUEST['completeFor'] == 'manager';
+            ) == $currentUserID && $this->getParam('completeFor') && $this->getParam('completeFor') == 'manager';
 
         $this->saveQuestionnaire();
         if ($isStaffMember) {
@@ -1634,7 +1634,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
         if ($isManager) {
 
-            $passPhrase = $_REQUEST['passPhrase'];
+            $passPhrase = $this->getParam('passPhrase');
 
             if (!$passPhrase) {
                 throw new Exception('Passphrase is needed for decrypting data');

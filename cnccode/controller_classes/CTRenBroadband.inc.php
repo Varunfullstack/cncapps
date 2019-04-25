@@ -58,7 +58,7 @@ class CTRenBroadband extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'edit':
             case 'create':
                 $this->edit();
@@ -101,7 +101,7 @@ class CTRenBroadband extends CTCNC
         $dsRenBroadband = new DataSet($this);
         $this->buRenBroadband->getAll(
             $dsRenBroadband,
-            $_REQUEST['orderBy']
+            $this->getParam('orderBy')
         );
 
         if ($dsRenBroadband->rowCount() > 0) {
@@ -183,8 +183,8 @@ class CTRenBroadband extends CTCNC
         $buSalesOrder = new BUSalesOrder($this);
         $dsOrdline = new DataSet($this);
         $buSalesOrder->getOrdlineByIDSeqNo(
-            $_REQUEST['ordheadID'],
-            $_REQUEST['sequenceNo'],
+            $this->getParam('ordheadID'),
+            $this->getParam('sequenceNo'),
             $dsOrdline
         );
 
@@ -197,7 +197,7 @@ class CTRenBroadband extends CTCNC
             // create a new record first
             $dsOrdhead = new DataSet($this);
             $buSalesOrder->getOrderByOrdheadID(
-                $_REQUEST['ordheadID'],
+                $this->getParam('ordheadID'),
                 $dsOrdhead,
                 $dsDontNeedOrdline
             );
@@ -257,12 +257,12 @@ class CTRenBroadband extends CTCNC
 
         $customerItemID = null;
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == 'edit') {
+            if ($this->getAction() == 'edit') {
                 $this->buRenBroadband->getRenBroadbandByID(
-                    $_REQUEST['ID'],
+                    $this->getParam('ID'),
                     $dsRenBroadband
                 );
-                $customerItemID = $_REQUEST['ID'];
+                $customerItemID = $this->getParam('ID');
             } else {                                                                    // creating new
                 $dsRenBroadband->initialise();
                 $dsRenBroadband->setValue(
@@ -281,7 +281,7 @@ class CTRenBroadband extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'update',
-                    'ordheadID'      => $_REQUEST['ordheadID'],
+                    'ordheadID'      => $this->getParam('ordheadID'),
                     'customerItemID' => $customerItemID
                 )
             );
@@ -700,12 +700,12 @@ class CTRenBroadband extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsRenBroadband->populateFromArray($_REQUEST['renBroadband']));
+        $this->formError = (!$this->dsRenBroadband->populateFromArray($this->getParam('renBroadband')));
         if ($this->formError) {
             if ($this->dsRenBroadband->getValue(DBEJRenBroadband::customerItemID)) {
-                $_REQUEST['action'] = 'edit';
+                $this->setAction('edit');
             } else {
-                $_REQUEST['action'] = 'create';
+                $this->setAction('create');
             }
             $this->edit();
             exit;
@@ -713,14 +713,14 @@ class CTRenBroadband extends CTCNC
 
         $this->buRenBroadband->updateRenBroadband($this->dsRenBroadband);
 
-        if ($_REQUEST['ordheadID'] == 1) {        // see whether more renewals need to be edited for this
+        if ($this->getParam('ordheadID') == 1) {        // see whether more renewals need to be edited for this
             // despatch
             $urlNext =
                 Controller::buildLink(
                     'Despatch',
                     array(
                         'action' => 'inputRenewals',
-                        'ID'     => $_REQUEST['ordheadID']
+                        'ID'     => $this->getParam('ordheadID')
                     )
                 );
 
@@ -749,7 +749,7 @@ class CTRenBroadband extends CTCNC
     function delete()
     {
         $this->setMethodName('delete');
-        if (!$this->buRenBroadband->deleteRenBroadband($_REQUEST['customerItemID'])) {
+        if (!$this->buRenBroadband->deleteRenBroadband($this->getParam('customerItemID'))) {
             $this->displayFatalError('Cannot delete this broadband contract');
             exit;
         } else {
@@ -786,8 +786,8 @@ class CTRenBroadband extends CTCNC
     {
         $this->setMethodName('emailTo');
         $this->buRenBroadband->sendEmailTo(
-            $_REQUEST['customerItemID'],
-            $_REQUEST['emailAddress']
+            $this->getParam('customerItemID'),
+            $this->getParam('emailAddress')
         );
 
         $urlNext =
@@ -795,7 +795,7 @@ class CTRenBroadband extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action' => 'edit',
-                    'ID'     => $_REQUEST['customerItemID']
+                    'ID'     => $this->getParam('customerItemID')
                 )
             );
 

@@ -39,7 +39,7 @@ class CTCustomerProfitabilityMonthsReport extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             default:
                 $this->search();
@@ -96,7 +96,7 @@ class CTCustomerProfitabilityMonthsReport extends CTCNC
                             $dsSearchForm->getValue(BUCustomerProfitabilityMonthsReport::searchFormStartYearMonth),
                             $dsSearchForm->getValue(BUCustomerProfitabilityMonthsReport::searchFormEndYearMonth)
                         );
-                    if ($_REQUEST['Search'] == 'CSV') {
+                    if ($this->getParam('Search') == 'CSV') {
                         $this->generateCSV($reportData);
                     }
                     $this->template->set_block('CustomerProfitabilityMonthsReport', 'periodBlock', 'periods');

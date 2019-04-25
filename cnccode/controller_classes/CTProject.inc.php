@@ -125,7 +125,7 @@ class CTProject extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTPROJECT_ACT_EDIT:
             case CTPROJECT_ACT_ACT:
                 $this->edit();
@@ -162,13 +162,13 @@ class CTProject extends CTCNC
                 break;
             case self::DOWNLOAD_PROJECT_PLAN:
 
-                if (!isset($_REQUEST['projectID'])) {
+                if (!$this->getParam('projectID')) {
                     echo 'Project ID missing';
                     http_response_code(400);
                     exit;
                 }
                 $dbeDocuments = new DBEProject($this);
-                $dbeDocuments->getRow($_REQUEST['projectID']);
+                $dbeDocuments->getRow($this->getParam('projectID'));
 
                 header('Content-Description: File Transfer');
                 header('Content-Type: ' . $dbeDocuments->getValue(DBEProject::planMIMEType));
@@ -220,12 +220,12 @@ class CTProject extends CTCNC
         $dsProject = &$this->dsProject; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CTPROJECT_ACT_EDIT) {
+            if ($this->getAction() == CTPROJECT_ACT_EDIT) {
                 $this->buProject->getProjectByID(
-                    $_REQUEST['projectID'],
+                    $this->getParam('projectID'),
                     $dsProject
                 );
-                $projectID = $_REQUEST['projectID'];
+                $projectID = $this->getParam('projectID');
             } else {                                                                    // creating new
                 $dsProject->initialise();
                 $dsProject->setValue(
@@ -234,7 +234,7 @@ class CTProject extends CTCNC
                 );
                 $dsProject->setValue(
                     DBEProject::customerID,
-                    $_REQUEST['customerID']
+                    $this->getParam('customerID')
                 );
                 $projectID = '0';
             }
@@ -243,7 +243,7 @@ class CTProject extends CTCNC
             $dsProject->fetchNext();
             $projectID = $dsProject->getValue(DBEProject::projectID);
         }
-        if ($_REQUEST['action'] == CTPROJECT_ACT_EDIT && $this->buProject->canDelete($_REQUEST['projectID'])) {
+        if ($this->getAction() == CTPROJECT_ACT_EDIT && $this->buProject->canDelete($this->getParam('projectID'))) {
             $urlDelete =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -506,18 +506,18 @@ class CTProject extends CTCNC
         $buHeader->getHeader($dbeHeader);
 
         $dbeProject = new DBEProject($this);
-        $projectID = $_REQUEST['projectID'];
+        $projectID = $this->getParam('projectID');
 
         $dbeProject->getRow($projectID);
 
         $this->dsProject->replicate($dbeProject);
 
-        $this->formError = (!$this->dsProject->populateFromArray($_REQUEST['project']));
+        $this->formError = (!$this->dsProject->populateFromArray($this->getParam('project')));
         if ($this->formError) {
             if ($this->dsProject->getValue(DBEProject::projectID) == '') {                    // attempt to insert
-                $_REQUEST['action'] = CTPROJECT_ACT_EDIT;
+                $this->setAction(CTPROJECT_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTPROJECT_ACT_ACT;
+                $this->setAction(CTPROJECT_ACT_ACT);
             }
             $this->edit();
             exit;
@@ -568,7 +568,7 @@ class CTProject extends CTCNC
 
         $this->buProject->updateProject($this->dsProject);
 
-        if (!empty($_REQUEST['newComment'])) {
+        if (!empty($this->getParam('newComment'))) {
 
             global $db;
 
@@ -585,7 +585,7 @@ class CTProject extends CTCNC
                 ],
                 [
                     'type'  => 's',
-                    'value' => $_REQUEST['newComment']
+                    'value' => $this->getParam('newComment')
                 ]
             ];
 
@@ -618,11 +618,11 @@ class CTProject extends CTCNC
         $this->setMethodName('delete');
         $dsProject = new DataSet($this);
         $this->buProject->getProjectByID(
-            $_REQUEST['projectID'],
+            $this->getParam('projectID'),
             $dsProject
         );
 
-        if (!$this->buProject->deleteProject($_REQUEST['projectID'])) {
+        if (!$this->buProject->deleteProject($this->getParam('projectID'))) {
             $this->displayFatalError('Cannot delete this project');
             exit;
         } else {
@@ -646,7 +646,7 @@ class CTProject extends CTCNC
     {
         $dsProject = new DataSet($this);
         $this->buProject->getProjectByID(
-            $_REQUEST['projectID'],
+            $this->getParam('projectID'),
             $dsProject
         );
         $this->setPageTitle('Project: ' . Controller::htmlDisplayText($dsProject->getValue(DBEProject::description)));
@@ -723,7 +723,7 @@ class CTProject extends CTCNC
         }
         $result = $db->preparedQuery(
             $query,
-            [['type' => 'i', 'value' => $_REQUEST['projectID']]]
+            [['type' => 'i', 'value' => $this->getParam('projectID')]]
         );
 
 
@@ -795,7 +795,7 @@ class CTProject extends CTCNC
                 $errorMessage = "Sales Order ID Required";
             }
         } else {
-            $projectID = $_REQUEST['projectID'];
+            $projectID = $this->getParam('projectID');
             $linkedOrderID = '';
         }
 
@@ -833,13 +833,13 @@ class CTProject extends CTCNC
             throw new Exception('At least one file must be provided');
         }
 
-        if (!isset($_REQUEST['projectID'])) {
+        if (!$this->getParam('projectID')) {
             throw new Exception('Project ID is missing');
         }
 
 
         $dbeProject = new DBEProject($this);
-        $dbeProject->getRow($_REQUEST['projectID']);
+        $dbeProject->getRow($this->getParam('projectID'));
         foreach ($_FILES['files']['name'] as $fileName) {
 
             $dbeProject->setUpdateModeUpdate();
@@ -869,14 +869,14 @@ class CTProject extends CTCNC
      */
     private function calculateBudget()
     {
-        $projectID = @$_REQUEST['projectID'];
+        $projectID = @$this->getParam('projectID');
 
         if (!$projectID) {
             echo 'There is no project ID';
             exit;
         }
         $dbeProject = new DBEProject($this);
-        $dbeProject->getRow($_REQUEST['projectID']);
+        $dbeProject->getRow($this->getParam('projectID'));
 
         if (!$dbeProject->getValue(DBEProject::ordHeadID)) {
             echo 'The project does not have a linked Sales Order';
@@ -1068,13 +1068,13 @@ GROUP BY caa_callacttypeno,
      */
     private function fetchBudgetData()
     {
-        if (!isset($_REQUEST['projectID'])) {
+        if (!$this->getParam('projectID')) {
             throw new Exception('Project ID is missing');
         }
 
 
         $dbeProject = new DBEProject($this);
-        $dbeProject->getRow($_REQUEST['projectID']);
+        $dbeProject->getRow($this->getParam('projectID'));
         $buHeader = new BUHeader($this);
         $dbeHeader = new DataSet($this);
         $buHeader->getHeader($dbeHeader);

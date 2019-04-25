@@ -93,9 +93,14 @@ class BUUser extends Business
     /**
      *    canDeleteUser
      * Only allowed if type has no activities
+     * @param $id
+     * @return bool
      */
-    function canDeleteUser()
+    function canDeleteUser($id)
     {
+        if ($id) {
+            return false;
+        }
         return FALSE;
     }
 

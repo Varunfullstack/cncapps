@@ -110,7 +110,7 @@ class CTDespatch extends CTCNC
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_TECHNICAL);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTCNC_ACT_DISPLAY_DESPATCH:
                 $this->displayDespatch();
                 break;
@@ -144,12 +144,12 @@ class CTDespatch extends CTCNC
         $buSalesOrder = new BUSalesOrder($this);
         $dsOrdhead = &$this->dsOrdhead;
         $dsOrdline = &$this->dsOrdline;
-        if ($_REQUEST['ordheadID'] == '') {
+        if ($this->getParam('ordheadID') == '') {
             $this->displayFatalError(CTDESPATCH_MSG_ORDHEADID_NOT_PASSED);
             return;
         }
         $buSalesOrder->getOrdheadByID(
-            $_REQUEST['ordheadID'],
+            $this->getParam('ordheadID'),
             $dsOrdhead
         );
         $dsOrdhead->fetchNext();
@@ -375,14 +375,14 @@ class CTDespatch extends CTCNC
         foreach ($_REQUEST as $key => $value) {
             $_REQUEST[$key] = trim($value);
         }
-        if (($_REQUEST['ordheadID'] != '') AND (!is_numeric($_REQUEST['ordheadID']))) {
+        if (($this->getParam('ordheadID') != '') AND (!is_numeric($this->getParam('ordheadID')))) {
             $this->setFormErrorMessage('Order no must be numeric');;
         }
         if ($this->getFormError() == 0) {
             $buDespatch = new BUDespatch($this);
             $buDespatch->search(
-                $_REQUEST['customerID'],
-                $_REQUEST['ordheadID'],
+                $this->getParam('customerID'),
+                $this->getParam('ordheadID'),
                 $this->dsOrdhead
             );
         }
@@ -475,11 +475,11 @@ class CTDespatch extends CTCNC
         }
 
         $customerString = null;
-        if (isset($_REQUEST['customerID']) && $_REQUEST['customerID']) {
+        if ($this->getParam('customerID') && $this->getParam('customerID')) {
             $buCustomer = new BUCustomer($this);
             $dsCustomer = new DataSet($this);
             $buCustomer->getCustomerByID(
-                $_REQUEST['customerID'],
+                $this->getParam('customerID'),
                 $dsCustomer
             );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
@@ -487,8 +487,8 @@ class CTDespatch extends CTCNC
         $this->template->set_var(
             array(
                 'customerString'   => $customerString,
-                'ordheadID'        => $_REQUEST['ordheadID'],
-                'customerID'       => $_REQUEST['customerID'],
+                'ordheadID'        => $this->getParam('ordheadID'),
+                'customerID'       => $this->getParam('customerID'),
                 'submitURL'        => $submitURL,
                 'clearURL'         => $clearURL,
                 'urlCustomerPopup' => $urlCustomerPopup
@@ -512,26 +512,26 @@ class CTDespatch extends CTCNC
         $buDespatch = new BUDespatch($this);
         $buSalesOrder = new BUSalesOrder($this);
         $dsDespatch = &$this->dsDespatch;
-        if ($_REQUEST['deliveryMethodID'] == '') {
+        if ($this->getParam('deliveryMethodID') == '') {
             $this->setFormErrorMessage('Please select a delivery method');
         }
 
 
-        $this->setDeliveryMethodID($_REQUEST['deliveryMethodID']);
+        $this->setDeliveryMethodID($this->getParam('deliveryMethodID'));
         $buDespatch->initialiseDespatchDataset($dsDespatch);
 
-        if (!$dsDespatch->populateFromArray($_REQUEST['despatch'])) {
+        if (!$dsDespatch->populateFromArray($this->getParam('despatch'))) {
             $this->setFormErrorMessage('Quantities entered must be numeric');
         }
 //		$hasRenewalsLines = false;
-        $forciblyCreateNote = isset($_REQUEST['forciblyCreateNote']);
+        $forciblyCreateNote = $this->getParam('forciblyCreateNote');
 
         $dsDespatch->initialise();
         $buRenewal = null;
         while ($dsDespatch->fetchNext()) {
             $dsOrdline = new DataSet($this);
             $buSalesOrder->getOrdlineByIDSeqNo(
-                $_REQUEST['ordheadID'],
+                $this->getParam('ordheadID'),
                 $dsDespatch->getValue(BUDespatch::despatchSequenceNo),
                 $dsOrdline
             );
@@ -584,7 +584,7 @@ class CTDespatch extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'    => CTCNC_ACT_DISPLAY_DESPATCH,
-                    'ordheadID' => $_REQUEST['ordheadID']
+                    'ordheadID' => $this->getParam('ordheadID')
                 )
             );
         header('Location: ' . $urlNext);
@@ -598,14 +598,14 @@ class CTDespatch extends CTCNC
     function displayNoteDoc()
     {
         $this->setMethodName('displayNoteDoc');
-        if ($_REQUEST['deliveryNoteID'] == '') {
+        if ($this->getParam('deliveryNoteID') == '') {
             $this->displayFatalError(CTDESPATCH_MSG_DELIVERYNOTEID_NOT_PASSED);
             return;
         }
         $buDespatch = new BUDespatch($this);
         $dsDeliveryNote = new DataSet($this);
         $buDespatch->getDeliveryNoteByID(
-            $_REQUEST['deliveryNoteID'],
+            $this->getParam('deliveryNoteID'),
             $dsDeliveryNote
         );
         $dsDeliveryNote->fetchNext();

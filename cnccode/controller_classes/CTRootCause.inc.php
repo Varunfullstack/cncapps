@@ -45,7 +45,7 @@ class CTRootCause extends CTCNC
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTROOTCAUSE_ACT_EDIT:
             case CTROOTCAUSE_ACT_CREATE:
                 $this->edit();
@@ -154,9 +154,9 @@ class CTRootCause extends CTCNC
         $dsRootCause = &$this->dsRootCause; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CTROOTCAUSE_ACT_EDIT) {
-                $this->buRootCause->getRootCauseByID($_REQUEST['rootCauseID'], $dsRootCause);
-                $rootCauseID = $_REQUEST['rootCauseID'];
+            if ($this->getAction() == CTROOTCAUSE_ACT_EDIT) {
+                $this->buRootCause->getRootCauseByID($this->getParam('rootCauseID'), $dsRootCause);
+                $rootCauseID = $this->getParam('rootCauseID');
             } else {                                                                    // creating new
                 $dsRootCause->initialise();
                 $dsRootCause->setValue(DBERootCause::rootCauseID, '0');
@@ -169,7 +169,7 @@ class CTRootCause extends CTCNC
         }
         $urlDelete = null;
         $txtDelete = null;
-        if ($_REQUEST['action'] == CTROOTCAUSE_ACT_EDIT && $this->buRootCause->canDelete($_REQUEST['rootCauseID'])) {
+        if ($this->getAction() == CTROOTCAUSE_ACT_EDIT && $this->buRootCause->canDelete($this->getParam('rootCauseID'))) {
             $urlDelete = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
@@ -231,12 +231,12 @@ class CTRootCause extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsRootCause->populateFromArray($_REQUEST['rootCause']));
+        $this->formError = (!$this->dsRootCause->populateFromArray($this->getParam('rootCause')));
         if ($this->formError) {
             if ($this->dsRootCause->getValue(DBERootCause::rootCauseID)) {
-                $_REQUEST['action'] = CTROOTCAUSE_ACT_EDIT;
+                $this->setAction(CTROOTCAUSE_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTROOTCAUSE_ACT_CREATE;
+                $this->setAction(CTROOTCAUSE_ACT_CREATE);
             }
             $this->edit();
             exit;
@@ -265,7 +265,7 @@ class CTRootCause extends CTCNC
     function delete()
     {
         $this->setMethodName('delete');
-        if (!$this->buRootCause->deleteRootCause($_REQUEST['rootCauseID'])) {
+        if (!$this->buRootCause->deleteRootCause($this->getParam('rootCauseID'))) {
             $this->displayFatalError('Cannot delete this row');
             exit;
         } else {

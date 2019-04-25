@@ -43,7 +43,7 @@ class CTPortalCustomerDocument extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTPORTALCUSTOMERDOCUMENT_ACT_EDIT:
             case CTPORTALCUSTOMERDOCUMENT_ACT_ADD:
                 $this->edit();
@@ -73,16 +73,16 @@ class CTPortalCustomerDocument extends CTCNC
         $dsPortalCustomerDocument = &$this->dsPortalCustomerDocument; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CTPORTALCUSTOMERDOCUMENT_ACT_EDIT) {
+            if ($this->getAction() == CTPORTALCUSTOMERDOCUMENT_ACT_EDIT) {
                 $this->buPortalCustomerDocument->getDocumentByID(
-                    $_REQUEST['portalCustomerDocumentID'],
+                    $this->getParam('portalCustomerDocumentID'),
                     $dsPortalCustomerDocument
                 );
-                $portalCustomerDocumentID = $_REQUEST['portalCustomerDocumentID'];
+                $portalCustomerDocumentID = $this->getParam('portalCustomerDocumentID');
             } else {                                                                    // creating new
                 $dsPortalCustomerDocument->initialise();
                 $dsPortalCustomerDocument->setValue(DBEPortalCustomerDocument::portalCustomerDocumentID, '0');
-                $dsPortalCustomerDocument->setValue(DBEPortalCustomerDocument::customerID, $_REQUEST['customerID']);
+                $dsPortalCustomerDocument->setValue(DBEPortalCustomerDocument::customerID, $this->getParam('customerID'));
                 $portalCustomerDocumentID = '0';
             }
         } else {                                                                        // form validation error
@@ -92,7 +92,7 @@ class CTPortalCustomerDocument extends CTCNC
                 DBEPortalCustomerDocument::portalCustomerDocumentID
             );
         }
-        if ($_REQUEST['action'] == CTPORTALCUSTOMERDOCUMENT_ACT_EDIT) {
+        if ($this->getAction() == CTPORTALCUSTOMERDOCUMENT_ACT_EDIT) {
             $urlDelete =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -175,7 +175,7 @@ class CTPortalCustomerDocument extends CTCNC
         $this->setMethodName('viewFile');
         $dsPortalCustomerDocument = new DataSet($this);
         $this->buPortalCustomerDocument->getDocumentByID(
-            $_REQUEST['portalCustomerDocumentID'],
+            $this->getParam('portalCustomerDocumentID'),
             $dsPortalCustomerDocument
         );
 
@@ -221,7 +221,7 @@ class CTPortalCustomerDocument extends CTCNC
     {
         $this->setMethodName('update');
 
-        $this->formError = (!$this->dsPortalCustomerDocument->populateFromArray($_REQUEST['portalCustomerDocument']));
+        $this->formError = (!$this->dsPortalCustomerDocument->populateFromArray($this->getParam('portalCustomerDocument')));
         /*
         Need a file when creating new
         */
@@ -247,9 +247,9 @@ class CTPortalCustomerDocument extends CTCNC
             if ($this->dsPortalCustomerDocument->getValue(
                     DBEPortalCustomerDocument::portalCustomerDocumentID
                 ) == '') {                    // attempt to insert
-                $_REQUEST['action'] = CTPORTALCUSTOMERDOCUMENT_ACT_EDIT;
+                $this->setAction(CTPORTALCUSTOMERDOCUMENT_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTPORTALCUSTOMERDOCUMENT_ACT_ADD;
+                $this->setAction(CTPORTALCUSTOMERDOCUMENT_ACT_ADD);
             }
             $this->edit();
             exit;
@@ -280,11 +280,11 @@ class CTPortalCustomerDocument extends CTCNC
         $this->setMethodName('delete');
         $dsPortalCustomerDocument = new DataSet($this);
         $this->buPortalCustomerDocument->getDocumentByID(
-            $_REQUEST['portalCustomerDocumentID'],
+            $this->getParam('portalCustomerDocumentID'),
             $dsPortalCustomerDocument
         );
 
-        if (!$this->buPortalCustomerDocument->deleteDocument($_REQUEST['portalCustomerDocumentID'])) {
+        if (!$this->buPortalCustomerDocument->deleteDocument($this->getParam('portalCustomerDocumentID'))) {
             $this->displayFatalError('Cannot delete this document');
             exit;
         } else {

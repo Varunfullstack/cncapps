@@ -41,12 +41,12 @@ class CTAnswerTypeConfig extends CTCNC
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'saveConfig':
                 $this->saveConfig();
                 break;
             case 'configure':
-                $this->showConfig($_REQUEST['answerTypeID']);
+                $this->showConfig($this->getParam('answerTypeID'));
                 break;
             default:
                 $this->displayList();
@@ -183,7 +183,7 @@ class CTAnswerTypeConfig extends CTCNC
      */
     private function saveConfig()
     {
-        $answerTypeID = $_REQUEST['answerTypeID'];
+        $answerTypeID = $this->getParam('answerTypeID');
 
         $answerType = new DBEAnswerType($this);
 
@@ -191,7 +191,7 @@ class CTAnswerTypeConfig extends CTCNC
 
         switch ($answerTypeID) {
             case 5:
-                $config = $_REQUEST['config'];
+                $config = $this->getParam('config');
 
                 $answerType->setValue(
                     DBEAnswerType::answerOptions,

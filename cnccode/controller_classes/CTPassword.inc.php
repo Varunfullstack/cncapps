@@ -57,7 +57,7 @@ class CTPassword extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'edit':
                 $this->edit();
                 break;
@@ -67,14 +67,12 @@ class CTPassword extends CTCNC
             case 'generate':
                 $this->generate();
                 break;
-            case 'loadFromCsv':
-                $this->loadFromCsv();
-                break;
-
             case 'list':
-                if ($_REQUEST['customerID']) {
-                    $customerID = $_REQUEST['customerID'];
+
+                if (!$this->getParam('customerID')) {
+                    throw new Exception('Customer ID is not provided');
                 }
+                $customerID = $this->getParam('customerID');
                 $this->displayList($customerID);
                 break;
 
@@ -117,9 +115,10 @@ class CTPassword extends CTCNC
 
 
         $this->setPageTitle('Passwords');
-
+        $customerString = null;
         if ($dsSearchForm->getValue(DBEPassword::customerID)) {
             $buCustomer = new BUCustomer ($this);
+            $dsCustomer = new DataSet($this);
             $buCustomer->getCustomerByID(
                 $dsSearchForm->getValue(DBEPassword::customerID),
                 $dsCustomer
@@ -160,11 +159,13 @@ class CTPassword extends CTCNC
     /**
      * Display list of types
      * @access private
+     * @param $customerID
+     * @throws Exception
      */
     function displayList($customerID)
     {
         $dbeCustomer = new DBECustomer($this);
-        $showArchived = isset($_REQUEST['archived']);
+        $showArchived = $this->getParam('archived');
 
         if (empty($customerID)) {
             $this->raiseError('Please search for a customer by typing and then pressing tab');
@@ -186,6 +187,9 @@ class CTPassword extends CTCNC
             $this->dbeUser->getValue(DBEUser::passwordLevel),
             $showArchived
         );
+
+        $urlSubmit = null;
+        $urlAdd = null;
 
         if (!$showArchived) {
 
@@ -334,6 +338,14 @@ class CTPassword extends CTCNC
      * renewalCustomerItemID (blank if renewal not created yet
      *
      *
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     function edit()
     {
@@ -346,8 +358,8 @@ class CTPassword extends CTCNC
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
-            $_REQUEST['password'][1]['encrypted'] = 1;
-            $passwordID = $_REQUEST['password'][1]['passwordID'];
+            $this->getParam('password')[1]['encrypted'] = 1;
+            $passwordID = $this->getParam('password')[1]['passwordID'];
             if ($passwordID) {
 
                 $dbePassword->getRow($passwordID);
@@ -356,7 +368,7 @@ class CTPassword extends CTCNC
 
                 $previousPasswordDecrypted = $this->buPassword->decrypt($previousPassword);
 
-                $newPassword = $_REQUEST['password'][1]['password'];
+                $newPassword = $this->getParam('password')[1]['password'];
 
                 if ($previousPassword && $previousPasswordDecrypted != $newPassword) {
                     $this->buPassword->archive(
@@ -364,31 +376,31 @@ class CTPassword extends CTCNC
                         $this->dbeUser
                     );
 
-                    $_REQUEST['password'][1]['passwordID'] = "0";
+                    $this->getParam('password')[1]['passwordID'] = "0";
                 }
             }
 
-            $_REQUEST['password'][1][DBEPassword::username] = $this->buPassword->encrypt(
-                $_REQUEST['password'][1][DBEPassword::username]
+            $this->getParam('password')[1][DBEPassword::username] = $this->buPassword->encrypt(
+                $this->getParam('password')[1][DBEPassword::username]
             );
 
 
-            $_REQUEST['password'][1][DBEPassword::password] = $this->buPassword->encrypt(
-                $_REQUEST['password'][1][DBEPassword::password]
+            $this->getParam('password')[1][DBEPassword::password] = $this->buPassword->encrypt(
+                $this->getParam('password')[1][DBEPassword::password]
             );
 
 
-            $_REQUEST['password'][1][DBEPassword::notes] = $this->buPassword->encrypt(
-                $_REQUEST['password'][1][DBEPassword::notes]
+            $this->getParam('password')[1][DBEPassword::notes] = $this->buPassword->encrypt(
+                $this->getParam('password')[1][DBEPassword::notes]
             );
 
 
-            $_REQUEST['password'][1][DBEPassword::URL] = $this->buPassword->encrypt(
-                $_REQUEST['password'][1][DBEPassword::URL]
+            $this->getParam('password')[1][DBEPassword::URL] = $this->buPassword->encrypt(
+                $this->getParam('password')[1][DBEPassword::URL]
             );
 
 
-            $formError = (!$dsPassword->populateFromArray($_REQUEST['password']));
+            $formError = (!$dsPassword->populateFromArray($this->getParam('password')));
 
             if (!$formError) {
                 $this->buPassword->updatePassword($dsPassword);
@@ -407,10 +419,10 @@ class CTPassword extends CTCNC
             }
         } else {
             $passwordID = null;
-            if ($_REQUEST['passwordID']) {                      // editing
-                $passwordID = $_REQUEST['passwordID'];
+            if ($this->getParam('passwordID')) {                      // editing
+                $passwordID = $this->getParam('passwordID');
                 $this->buPassword->getPasswordByID(
-                    $_REQUEST['passwordID'],
+                    $this->getParam('passwordID'),
                     $dsPassword
                 );
                 $customerID = $dsPassword->getValue(DBEPassword::customerID);
@@ -421,9 +433,9 @@ class CTPassword extends CTCNC
                 );
                 $dsPassword->setValue(
                     DBEPassword::customerID,
-                    $_REQUEST['customerID']
+                    $this->getParam('customerID')
                 );
-                $customerID = $_REQUEST['customerID'];
+                $customerID = $this->getParam('customerID');
             }
         }
 
@@ -531,15 +543,15 @@ class CTPassword extends CTCNC
         $this->setMethodName('archive');
 
         if (!$this->buPassword->getPasswordByID(
-            $_REQUEST['passwordID'],
+            $this->getParam('passwordID'),
             $dsPassword
         )) {
-            $this->raiseError('PasswordID ' . $_REQUEST['passwordID'] . ' not found');
+            $this->raiseError('PasswordID ' . $this->getParam('passwordID') . ' not found');
             exit;
         }
 
         $this->buPassword->archive(
-            $_REQUEST['passwordID'],
+            $this->getParam('passwordID'),
             $this->dbeUser
         );
         $urlNext =
@@ -558,6 +570,7 @@ class CTPassword extends CTCNC
     /**
      * generate a password
      *
+     * @throws Exception
      */
     function generate()
     {
@@ -635,4 +648,3 @@ class CTPassword extends CTCNC
         );
     }
 }// end of class
-?>

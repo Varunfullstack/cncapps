@@ -71,7 +71,7 @@ class CTSector extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTSECTOR_ACT_EDIT:
             case CTSECTOR_ACT_CREATE:
                 $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
@@ -199,12 +199,12 @@ class CTSector extends CTCNC
         $dsSector = &$this->dsSector; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CTSECTOR_ACT_EDIT) {
+            if ($this->getAction() == CTSECTOR_ACT_EDIT) {
                 $this->buSector->getSectorByID(
-                    $_REQUEST['sectorID'],
+                    $this->getParam('sectorID'),
                     $dsSector
                 );
-                $sectorID = $_REQUEST['sectorID'];
+                $sectorID = $this->getParam('sectorID');
             } else {                                                                    // creating new
                 $dsSector->initialise();
                 $dsSector->setValue(
@@ -220,7 +220,7 @@ class CTSector extends CTCNC
         }
         $urlDelete = null;
         $txtDelete = null;
-        if ($_REQUEST['action'] == CTSECTOR_ACT_EDIT && $this->buSector->canDelete($_REQUEST['sectorID'])) {
+        if ($this->getAction() == CTSECTOR_ACT_EDIT && $this->buSector->canDelete($this->getParam('sectorID'))) {
             $urlDelete =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -277,12 +277,12 @@ class CTSector extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsSector->populateFromArray($_REQUEST['sector']));
+        $this->formError = (!$this->dsSector->populateFromArray($this->getParam('sector')));
         if ($this->formError) {
             if (!$this->dsSector->getValue(DBESector::sectorID)) {
-                $_REQUEST['action'] = CTSECTOR_ACT_EDIT;
+                $this->setAction(CTSECTOR_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTSECTOR_ACT_CREATE;
+                $this->setAction(CTSECTOR_ACT_CREATE);
             }
             $this->edit();
             exit;
@@ -311,7 +311,7 @@ class CTSector extends CTCNC
     function delete()
     {
         $this->setMethodName('delete');
-        if (!$this->buSector->deleteSector($_REQUEST['sectorID'])) {
+        if (!$this->buSector->deleteSector($this->getParam('sectorID'))) {
             $this->displayFatalError('Cannot delete this Further Action');
             exit;
         } else {

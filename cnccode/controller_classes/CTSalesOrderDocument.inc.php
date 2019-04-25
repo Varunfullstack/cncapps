@@ -43,7 +43,7 @@ class CTSalesOrderDocument extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTSALESORDERDOCUMENT_ACT_EDIT:
             case CTSALESORDERDOCUMENT_ACT_ADD:
                 $this->edit();
@@ -71,13 +71,13 @@ class CTSalesOrderDocument extends CTCNC
         $dsSalesOrderDocument = &$this->dsSalesOrderDocument; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CTSALESORDERDOCUMENT_ACT_EDIT) {
-                $this->buSalesOrderDocument->getDocumentByID($_REQUEST['salesOrderDocumentID'], $dsSalesOrderDocument);
-                $salesOrderDocumentID = $_REQUEST['salesOrderDocumentID'];
+            if ($this->getAction() == CTSALESORDERDOCUMENT_ACT_EDIT) {
+                $this->buSalesOrderDocument->getDocumentByID($this->getParam('salesOrderDocumentID'), $dsSalesOrderDocument);
+                $salesOrderDocumentID = $this->getParam('salesOrderDocumentID');
             } else {                                                                    // creating new
                 $dsSalesOrderDocument->initialise();
                 $dsSalesOrderDocument->setValue(DBESalesOrderDocument::salesOrderDocumentID, '0');
-                $dsSalesOrderDocument->setValue(DBESalesOrderDocument::ordheadID, $_REQUEST['ordheadID']);
+                $dsSalesOrderDocument->setValue(DBESalesOrderDocument::ordheadID, $this->getParam('ordheadID'));
                 $salesOrderDocumentID = '0';
             }
         } else {                                                                        // form validation error
@@ -87,7 +87,7 @@ class CTSalesOrderDocument extends CTCNC
         }
         $urlDelete = null;
         $txtDelete = null;
-        if ($_REQUEST['action'] == CTSALESORDERDOCUMENT_ACT_EDIT) {
+        if ($this->getAction() == CTSALESORDERDOCUMENT_ACT_EDIT) {
             $urlDelete = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
@@ -147,7 +147,7 @@ class CTSalesOrderDocument extends CTCNC
         $this->setMethodName('viewFile');
         $dsSalesOrderDocument = new DataSet($this);
         $this->buSalesOrderDocument->getDocumentByID(
-            $_REQUEST['salesOrderDocumentID'],
+            $this->getParam('salesOrderDocumentID'),
             $dsSalesOrderDocument
         );
 
@@ -168,7 +168,7 @@ class CTSalesOrderDocument extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsSalesOrderDocument->populateFromArray($_REQUEST['salesOrderDocument']));
+        $this->formError = (!$this->dsSalesOrderDocument->populateFromArray($this->getParam('salesOrderDocument')));
         /*
         Need a file when creating new
         */
@@ -187,9 +187,9 @@ class CTSalesOrderDocument extends CTCNC
 
         if ($this->formError) {
             if (!$this->dsSalesOrderDocument->getValue(DBESalesOrderDocument::salesOrderDocumentID)) {
-                $_REQUEST['action'] = CTSALESORDERDOCUMENT_ACT_EDIT;
+                $this->setAction(CTSALESORDERDOCUMENT_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTSALESORDERDOCUMENT_ACT_ADD;
+                $this->setAction(CTSALESORDERDOCUMENT_ACT_ADD);
             }
             $this->edit();
             exit;
@@ -220,9 +220,9 @@ class CTSalesOrderDocument extends CTCNC
     {
         $this->setMethodName('delete');
         $dsSalesOrderDocument = new DataSet($this);
-        $this->buSalesOrderDocument->getDocumentByID($_REQUEST['salesOrderDocumentID'], $dsSalesOrderDocument);
+        $this->buSalesOrderDocument->getDocumentByID($this->getParam('salesOrderDocumentID'), $dsSalesOrderDocument);
 
-        if (!$this->buSalesOrderDocument->deleteDocument($_REQUEST['salesOrderDocumentID'])) {
+        if (!$this->buSalesOrderDocument->deleteDocument($this->getParam('salesOrderDocumentID'))) {
             $this->displayFatalError('Cannot delete this document');
             exit;
         } else {

@@ -91,7 +91,7 @@ class CTItem extends CTCNC
     function defaultAction()
     {
         $this->setParentFormFields();
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTCNC_ACT_ITEM_ADD:
             case CTCNC_ACT_ITEM_EDIT:
                 $this->checkPermissions(PHPLIB_PERM_SALES);
@@ -119,14 +119,14 @@ class CTItem extends CTCNC
      */
     function setParentFormFields()
     {
-        if (isset($_REQUEST['parentIDField'])) {
-            $_SESSION['itemParentIDField'] = $_REQUEST['parentIDField'];
+        if ($this->getParam('parentIDField')) {
+            $this->setSessionParam('itemParentIDField', $this->getParam('parentIDField'));
         }
-        if (isset($_REQUEST['parentDescField'])) {
-            $_SESSION['itemParentDescField'] = $_REQUEST['parentDescField'];
+        if ($this->getParam('parentDescField')) {
+            $this->setSessionParam('itemParentDescField', $this->getParam('parentDescField'));
         }
-        if (isset($_REQUEST['parentSlaResponseHoursField'])) {
-            $_SESSION['itemParentSlaResponseHoursField'] = $_REQUEST['parentSlaResponseHoursField'];
+        if ($this->getParam('parentSlaResponseHoursField')) {
+            $this->setSessionParam('itemParentSlaResponseHoursField', $this->getParam('parentSlaResponseHoursField'));
         }
     }
 
@@ -139,8 +139,8 @@ class CTItem extends CTCNC
     {
         common_decodeQueryArray($_REQUEST);
 
-        if ($_REQUEST['renewalTypeID']) {
-            $renewalTypeID = $_REQUEST['renewalTypeID'];
+        if ($this->getParam('renewalTypeID')) {
+            $renewalTypeID = $this->getParam('renewalTypeID');
         } else {
             $renewalTypeID = false;
         }
@@ -157,13 +157,13 @@ class CTItem extends CTCNC
         );
 
         // A single slash means create new item
-        if ($_REQUEST['itemDescription']{0} == '/') {
+        if ($this->getParam('itemDescription'){0} == '/') {
             header('Location: ' . $urlCreate);
             exit;
         }
         $dsItem = new DataSet($this);
         $this->buItem->getItemsByNameMatch(
-            $_REQUEST['itemDescription'],
+            $this->getParam('itemDescription'),
             $dsItem,
             $renewalTypeID
         );
@@ -209,7 +209,7 @@ class CTItem extends CTCNC
             if ($dsItem->rowCount() == 0) {
                 $this->template->set_var(
                     array(
-                        'itemDescription' => $_REQUEST['itemDescription'],
+                        'itemDescription' => $this->getParam('itemDescription'),
                     )
                 );
                 $this->setTemplateFiles(
@@ -307,9 +307,9 @@ class CTItem extends CTCNC
     {
         $this->setMethodName('itemForm');
         // initialisation stuff
-        if ($_REQUEST['action'] == CTCNC_ACT_ITEM_ADD) {
-            if ($_REQUEST['renewalTypeID']) {
-                $renewalTypeID = $_REQUEST['renewalTypeID'];
+        if ($this->getAction() == CTCNC_ACT_ITEM_ADD) {
+            if ($this->getParam('renewalTypeID')) {
+                $renewalTypeID = $this->getParam('renewalTypeID');
             } else {
                 $renewalTypeID = false;
             }
@@ -434,11 +434,11 @@ class CTItem extends CTCNC
         $this->setPageTitle(CTITEM_TXT_UPDATE_ITEM);
         // if updating and not a form error then validate passed id and get row from DB
         if (!$this->getFormError()) {
-            if (empty($_REQUEST['itemID'])) {
+            if (empty($this->getParam('itemID'))) {
                 $this->displayFatalError(CTITEM_MSG_ITEMID_NOT_PASSED);
             }
             if (!$this->buItem->getItemByID(
-                $_REQUEST['itemID'],
+                $this->getParam('itemID'),
                 $this->dsItem
             )) {
                 $this->displayFatalError(CTITEM_MSG_ITEM_NOT_FND);
@@ -580,20 +580,20 @@ class CTItem extends CTCNC
     function itemUpdate()
     {
         $this->setMethodName('itemUpdate');
-        if (!isset($_REQUEST['item'])) {
+        if (!$this->getParam('item')) {
             $this->displayFatalError(CTITEM_MSG_ITEM_ARRAY_NOT_PASSED);
             return;
         }
 
         //$this->buItem->initialiseNewItem($this->dsItem);
-        if (!$this->dsItem->populateFromArray($_REQUEST['item'])) {
+        if (!$this->dsItem->populateFromArray($this->getParam('item'))) {
             $this->setFormErrorOn();
-            if ($_REQUEST['action'] == CTITEM_ACT_ITEM_INSERT) {
-                $_REQUEST['action'] = CTCNC_ACT_ITEM_ADD;
+            if ($this->getAction() == CTITEM_ACT_ITEM_INSERT) {
+                $this->setAction(CTCNC_ACT_ITEM_ADD);
             } else {
-                $_REQUEST['action'] = CTCNC_ACT_ITEM_EDIT;
+                $this->setAction(CTCNC_ACT_ITEM_EDIT);
             }
-            $_REQUEST['itemID'] = $this->dsItem->getValue(DBEItem::itemID);
+            $this->setParam('itemID', $this->dsItem->getValue(DBEItem::itemID));
             $this->itemForm();
             exit;
         }
@@ -615,13 +615,13 @@ class CTItem extends CTCNC
     function discontinue()
     {
         $this->setMethodName('discontinue');
-        if (isset($_REQUEST['discontinueItemIDs'])) {
+        if ($this->getParam('discontinueItemIDs')) {
 
             $this->buItem->discontinue(
-                $_REQUEST['discontinueItemIDs']
+                $this->getParam('discontinueItemIDs')
             );
 
         }
-        header('Location: ' . $_REQUEST['returnTo']);
+        header('Location: ' . $this->getParam('returnTo'));
     }
 }

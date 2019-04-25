@@ -43,7 +43,7 @@ class CTQuotationConversionReport extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             default:
                 $this->displaySearchForm();
                 break;
@@ -63,7 +63,7 @@ class CTQuotationConversionReport extends CTCNC
 
         if ($_POST) {
 
-            if (!$this->dsSearchForm->populateFromArray($_REQUEST['search'])) {
+            if (!$this->dsSearchForm->populateFromArray($this->getParam('search'))) {
                 $this->setFormErrorOn();
             } else {
 

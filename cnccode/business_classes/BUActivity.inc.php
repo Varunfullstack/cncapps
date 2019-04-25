@@ -10489,7 +10489,4 @@ is currently a balance of ';
 
         return true;
     }
-
-
-} // End of class
-?>
+}

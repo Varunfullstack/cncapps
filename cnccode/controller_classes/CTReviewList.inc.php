@@ -54,8 +54,8 @@ class CTReviewList extends CTCNC
 
         $this->buCustomer = new BUCustomer($this);
 
-        if (isset($_REQUEST['sortColumn'])) {
-            $sortColumn = $_REQUEST['sortColumn'];
+        if ($this->getParam('sortColumn')) {
+            $sortColumn = $this->getParam('sortColumn');
         } else {
             $sortColumn = false;
         }

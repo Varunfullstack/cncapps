@@ -102,7 +102,7 @@ class CTContact extends CTCNC
     function defaultAction()
     {
         $this->setParentFormFields();
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTCNC_ACT_CONTACT_ADD:
             case CTCNC_ACT_CONTACT_EDIT:
                 $this->checkPermissions(array(PHPLIB_PERM_MAINTENANCE, PHPLIB_PERM_SALES));
@@ -126,11 +126,11 @@ class CTContact extends CTCNC
      */
     function setParentFormFields()
     {
-        if (isset($_REQUEST['parentIDField'])) {
-            $_SESSION['contactParentIDField'] = $_REQUEST['parentIDField'];
+        if ($this->getParam('parentIDField')) {
+            $this->setSessionParam('contactParentIDField', $this->getParam('parentIDField'));
         }
-        if (isset($_REQUEST['parentDescField'])) {
-            $_SESSION['contactParentDescField'] = $_REQUEST['parentDescField'];
+        if ($this->getParam('parentDescField')) {
+            $this->setSessionParam('contactParentDescField', $this->getParam('parentDescField'));
         }
     }
 
@@ -142,35 +142,35 @@ class CTContact extends CTCNC
     function displayContactSelectPopup()
     {
         $this->setMethodName('displayContactSelectPopup');
-        if (!$_REQUEST['supplierID'] && $_REQUEST['customerID']) {
+        if (!$this->getParam('supplierID') && $this->getParam('customerID')) {
             $this->raiseError('supplierID or customerID not passed');
         }
         $urlCreate = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'     => CTCNC_ACT_CONTACT_ADD,
-                'supplierID' => $_REQUEST['supplierID'],
-                'customerID' => $_REQUEST['customerID'],
-                'siteNo'     => $_REQUEST['siteNo'],
+                'supplierID' => $this->getParam('supplierID'),
+                'customerID' => $this->getParam('customerID'),
+                'siteNo'     => $this->getParam('siteNo'),
                 'htmlFmt'    => CT_HTML_FMT_POPUP
             )
         );
-        if ($_REQUEST['contactName']{0} == '/') {
+        if ($this->getParam('contactName'){0} == '/') {
             header('Location: ' . $urlCreate);
             exit;
         }
-        if ($_REQUEST['supplierID']) {
+        if ($this->getParam('supplierID')) {
             $this->buContact->getSupplierContactsByNameMatch(
-                $_REQUEST['supplierID'],
-                $_REQUEST['contactName'],
+                $this->getParam('supplierID'),
+                $this->getParam('contactName'),
                 $this->dsContact
             );
         } else {
             $this->buContact->getCustomerContactsByNameMatch(
-                $_REQUEST['customerID'],
-                $_REQUEST['contactName'],
+                $this->getParam('customerID'),
+                $this->getParam('contactName'),
                 $this->dsContact,
-                $_REQUEST['siteNo']
+                $this->getParam('siteNo')
             );
         }
         if ($this->dsContact->rowCount() == 1) {
@@ -182,7 +182,7 @@ class CTContact extends CTCNC
         if ($this->dsContact->rowCount() == 0) {
             $this->template->set_var(
                 'contactName',
-                $_REQUEST['contactName']
+                $this->getParam('contactName')
             );
             $this->setTemplateFiles(
                 'ContactSelect',
@@ -256,7 +256,7 @@ class CTContact extends CTCNC
     {
         $this->setMethodName('contactForm');
         // initialisation stuff
-        if ($_REQUEST['action'] == CTCNC_ACT_CONTACT_ADD) {
+        if ($this->getAction() == CTCNC_ACT_CONTACT_ADD) {
             $urlSubmit = $this->contactFormPrepareAdd();
         } else {
             $urlSubmit = $this->contactFormPrepareEdit();
@@ -474,16 +474,16 @@ class CTContact extends CTCNC
         // If form error then preserve values in $this->dsContact else initialise new
         $this->setPageTitle(CTCONTACT_TXT_NEW_CONTACT);
         if (!$this->getFormError()) {
-            if (!$_REQUEST['supplierID'] && !$_REQUEST['customerID']) {
+            if (!$this->getParam('supplierID') && !$this->getParam('customerID')) {
                 $this->raiseError('supplierID or customerID not passed');
             }
-            if ($_REQUEST['customerID'] && $_REQUEST['siteNo'] == "") {
+            if ($this->getParam('customerID') && $this->getParam('siteNo') == "") {
                 $this->raiseError('siteNo not passed');
             }
             $this->buContact->initialiseNewContact(
-                $_REQUEST['supplierID'],
-                $_REQUEST['customerID'],
-                $_REQUEST['siteNo'],
+                $this->getParam('supplierID'),
+                $this->getParam('customerID'),
+                $this->getParam('siteNo'),
                 $this->dsContact
             );
         }
@@ -508,11 +508,11 @@ class CTContact extends CTCNC
         $this->setPageTitle(CTCONTACT_TXT_UPDATE_CONTACT);
         // if updating and not a form error then validate passed id and get row from DB
         if (!$this->getFormError()) {
-            if (empty($_REQUEST['contactID'])) {
+            if (empty($this->getParam('contactID'))) {
                 $this->displayFatalError(CTCONTACT_MSG_CONTACTID_NOT_PASSED);
             }
             if (!$this->buContact->getContactByID(
-                $_REQUEST['contactID'],
+                $this->getParam('contactID'),
                 $this->dsContact
             )) {
                 $this->displayFatalError(CTCONTACT_MSG_CONTACT_NOT_FND);
@@ -536,19 +536,19 @@ class CTContact extends CTCNC
     function contactUpdate()
     {
         $this->setMethodName('contactUpdate');
-        if (!isset($_REQUEST['contact'])) {
+        if (!$this->getParam('contact')) {
             $this->displayFatalError(CTCONTACT_MSG_CONTACT_ARRAY_NOT_PASSED);
             return;
         }
         $this->buContact->initialiseUpdateContact($this->dsContact);
-        if (!$this->dsContact->populateFromArray($_REQUEST['contact'])) {
+        if (!$this->dsContact->populateFromArray($this->getParam('contact'))) {
             $this->setFormErrorOn();
-            if ($_REQUEST['action'] == CTCONTACT_ACT_CONTACT_INSERT) {
-                $_REQUEST['action'] = CTCNC_ACT_CONTACT_ADD;
+            if ($this->getAction() == CTCONTACT_ACT_CONTACT_INSERT) {
+                $this->setAction(CTCNC_ACT_CONTACT_ADD);
             } else {
-                $_REQUEST['action'] = CTCNC_ACT_CONTACT_EDIT;
+                $this->setAction(CTCNC_ACT_CONTACT_EDIT);
             }
-            $_REQUEST['contactID'] = $this->dsContact->getValue(DBEContact::contactID);
+            $this->setParam('contactID', $this->dsContact->getValue(DBEContact::contactID));
             $this->contactForm();
             exit;
         }

@@ -193,7 +193,7 @@ class CTInvoice extends CTCNC
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_SALES);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:
                 $this->search();
                 break;
@@ -424,15 +424,15 @@ class CTInvoice extends CTCNC
     {
         $this->setMethodName('invoiceSearch');
         $this->buInvoice->initialiseSearchForm($this->dsSearchForm);
-        if ($_REQUEST['ordheadID']) {                    // just search by ordheadID
+        if ($this->getParam('ordheadID')) {                    // just search by ordheadID
             $this->dsSearchForm->setUpdateModeInsert();
             $this->dsSearchForm->setValue(
                 BUInvoice::searchFormOrdheadID,
-                $_REQUEST['ordheadID']
+                $this->getParam('ordheadID')
             );
             $this->dsSearchForm->post();
         } else {
-            if (!$this->dsSearchForm->populateFromArray($_REQUEST['invoice'])) {
+            if (!$this->dsSearchForm->populateFromArray($this->getParam('invoice'))) {
                 $this->setFormErrorOn();
                 $this->displaySearchForm(); //redisplay with errors
                 exit;
@@ -546,7 +546,7 @@ class CTInvoice extends CTCNC
 
         $this->buInvoice->initialiseDataset($this->dsPrintRange);
 
-        if (!$this->dsPrintRange->populateFromArray($_REQUEST['invoice'])) {
+        if (!$this->dsPrintRange->populateFromArray($this->getParam('invoice'))) {
             $this->setFormErrorOn();
             $this->printUnprinted(); //redisplay with errors
         }
@@ -565,7 +565,7 @@ class CTInvoice extends CTCNC
 
         }
 
-        if (isset($_REQUEST['Trial'])) {
+        if ($this->getParam('Trial')) {
 
             $this->trialPrintUnprintedGenerate();
             exit;
@@ -649,13 +649,13 @@ class CTInvoice extends CTCNC
      */
     function createInvoice()
     {
-        if (!$_REQUEST['customerID']) {
+        if (!$this->getParam('customerID')) {
             $this->displayFatalError('customerID not passed');
         }
-        if ($_REQUEST['action'] == CTINVOICE_ACT_CREATE_NEW_INVOICE) {
-            $invheadID = $this->buInvoice->createNewInvoice($_REQUEST['customerID']);
+        if ($this->getAction() == CTINVOICE_ACT_CREATE_NEW_INVOICE) {
+            $invheadID = $this->buInvoice->createNewInvoice($this->getParam('customerID'));
         } else {
-            $invheadID = $this->buInvoice->createNewCreditNote($_REQUEST['customerID']);
+            $invheadID = $this->buInvoice->createNewCreditNote($this->getParam('customerID'));
         }
         $this->redirectToDisplay($invheadID);
         exit;
@@ -669,7 +669,7 @@ class CTInvoice extends CTCNC
     {
         $dsInvhead = new DataSet($this);
         $this->buInvoice->getInvoiceByID(
-            $_REQUEST['invheadID'],
+            $this->getParam('invheadID'),
             $dsInvhead,
             $dsInvline
         );
@@ -678,7 +678,7 @@ class CTInvoice extends CTCNC
         header('Expires: 0');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename=' . $_REQUEST['invheadID'] . '.pdf;');
+        header('Content-Disposition: attachment; filename=' . $this->getParam('invheadID') . '.pdf;');
         header('Content-Transfer-Encoding: binary');
         echo $dsInvhead->getValue(DBEInvhead::pdfFile);
         exit();
@@ -691,13 +691,13 @@ class CTInvoice extends CTCNC
     function regeneratePdf()
     {
 
-        $pdfFile = $this->buInvoice->regeneratePdfInvoice($_REQUEST['invheadID']);
+        $pdfFile = $this->buInvoice->regeneratePdfInvoice($this->getParam('invheadID'));
 
         header('Pragma: public');
         header('Expires: 0');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename=' . $_REQUEST['invheadID'] . '.pdf;');
+        header('Content-Disposition: attachment; filename=' . $this->getParam('invheadID') . '.pdf;');
         header('Content-Transfer-Encoding: binary');
         echo $pdfFile;
         exit();
@@ -791,7 +791,7 @@ class CTInvoice extends CTCNC
     {
         $this->setMethodName('invoiceReprintGenerate');
         $this->buInvoice->initialiseDataset($this->dsPrintRange);
-        if (!$this->dsPrintRange->populateFromArray($_REQUEST['invoice'])) {
+        if (!$this->dsPrintRange->populateFromArray($this->getParam('invoice'))) {
             $this->setFormErrorOn();
             $this->invoiceReprint(); //redisplay with errors
             exit;
@@ -854,12 +854,12 @@ class CTInvoice extends CTCNC
         $txtRegeneratePdf = null;
 
         if (!$this->formError) {
-            if (!$_REQUEST['invheadID']) {
+            if (!$this->getParam('invheadID')) {
                 $this->displayFatalError(CTINVOICE_MSG_INVHEADID_NOT_PASSED);
                 return;
             }
             $this->buInvoice->getInvoiceByID(
-                $_REQUEST['invheadID'],
+                $this->getParam('invheadID'),
                 $dsInvhead,
                 $dsInvline
             );
@@ -1272,26 +1272,26 @@ class CTInvoice extends CTCNC
     {
         $this->setMethodName('editLine');
         $this->setPageTitle('Invoice - Edit Line');
-        if (!$_REQUEST['invheadID']) {
+        if (!$this->getParam('invheadID')) {
             $this->displayFatalError(CTINVOICE_MSG_INVHEADID_NOT_PASSED);
             return;
         }
         if (!$this->buInvoice->getInvoiceHeaderByID(
-            $_REQUEST['invheadID'],
+            $this->getParam('invheadID'),
             $this->dsInvhead
         )) {
             $this->displayFatalError(CTINVOICE_MSG_INVOICE_NOT_FND);
             return;
         }
-        if (!$_REQUEST['sequenceNo']) {
+        if (!$this->getParam('sequenceNo')) {
             $this->displayFatalError(CTINVOICE_MSG_SEQNO_NOT_PASSED);
             return;
         }
         if (!$this->formError) {
-            if ($_REQUEST['action'] == CTINVOICE_ACT_EDIT_LINE) {
+            if ($this->getAction() == CTINVOICE_ACT_EDIT_LINE) {
                 if (!$this->buInvoice->getInvlineByIDSeqNo(
-                    $_REQUEST['invheadID'],
-                    $_REQUEST['sequenceNo'],
+                    $this->getParam('invheadID'),
+                    $this->getParam('sequenceNo'),
                     $this->dsInvline
                 )) {
                     $this->displayFatalError(CTINVOICE_MSG_LINE_NOT_FND);
@@ -1299,8 +1299,8 @@ class CTInvoice extends CTCNC
                 }
             } else {
                 $this->buInvoice->initialiseNewInvline(
-                    $_REQUEST['invheadID'],
-                    $_REQUEST['sequenceNo'],
+                    $this->getParam('invheadID'),
+                    $this->getParam('sequenceNo'),
                     $this->dsInvline
                 );
             }
@@ -1345,7 +1345,7 @@ class CTInvoice extends CTCNC
                 'curUnitSaleMessage' => $this->dsInvline->getMessage(DBEInvline::curUnitSale)
             )
         );
-        if ($_REQUEST['action'] == CTINVOICE_ACT_EDIT_LINE) {
+        if ($this->getAction() == CTINVOICE_ACT_EDIT_LINE) {
             $urlSubmit =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -1443,7 +1443,7 @@ class CTInvoice extends CTCNC
     {
         $this->setMethodName('updateLine');
         // set item line required fields
-        if ($_REQUEST['invline'][1]['lineType'] == "I") {
+        if ($this->getParam('invline')[1]['lineType'] == "I") {
             $this->dsInvline->setNull(
                 DBEInvline::itemID,
                 DA_NOT_NULL
@@ -1486,20 +1486,20 @@ class CTInvoice extends CTCNC
                 DA_NOT_NULL
             );
         }
-        $this->formError = !$this->dsInvline->populateFromArray($_REQUEST['invline']);
+        $this->formError = !$this->dsInvline->populateFromArray($this->getParam('invline'));
         // Validate Item line
         if ($this->formError) {                    // Form error so redisplay edit form
-            if ($_REQUEST['action'] == CTINVOICE_ACT_INSERT_LINE) {
-                $_REQUEST['action'] = CTINVOICE_ACT_ADD_LINE;
+            if ($this->getAction() == CTINVOICE_ACT_INSERT_LINE) {
+                $this->setAction(CTINVOICE_ACT_ADD_LINE);
             } else {
-                $_REQUEST['action'] = CTINVOICE_ACT_EDIT_LINE;
+                $this->setAction(CTINVOICE_ACT_EDIT_LINE);
             }
-            $_REQUEST['invheadID'] = $this->dsInvline->getValue(DBEInvline::invheadID);
-            $_REQUEST['sequenceNo'] = $this->dsInvline->getValue(DBEInvline::sequenceNo);
+            $this->setParam('invheadID', $this->dsInvline->getValue(DBEInvline::invheadID));
+            $this->setParam('sequenceNo', $this->dsInvline->getValue(DBEInvline::sequenceNo));
             $this->editLine();
             exit;
         }
-        if ($_REQUEST['action'] == CTINVOICE_ACT_INSERT_LINE) {
+        if ($this->getAction() == CTINVOICE_ACT_INSERT_LINE) {
             $this->buInvoice->insertNewLine($this->dsInvline);
         } else {
             $this->buInvoice->updateLine(
@@ -1521,10 +1521,10 @@ class CTInvoice extends CTCNC
     {
         $this->setMethodName('moveLineUp');
         $this->buInvoice->moveLineUp(
-            $_REQUEST['invheadID'],
-            $_REQUEST['sequenceNo']
+            $this->getParam('invheadID'),
+            $this->getParam('sequenceNo')
         );
-        $this->redirectToDisplay($_REQUEST['invheadID']);
+        $this->redirectToDisplay($this->getParam('invheadID'));
     }
 
     /**
@@ -1538,10 +1538,10 @@ class CTInvoice extends CTCNC
     {
         $this->setMethodName('moveLineDown');
         $this->buInvoice->moveLineDown(
-            $_REQUEST['invheadID'],
-            $_REQUEST['sequenceNo']
+            $this->getParam('invheadID'),
+            $this->getParam('sequenceNo')
         );
-        $this->redirectToDisplay($_REQUEST['invheadID']);
+        $this->redirectToDisplay($this->getParam('invheadID'));
     }
 
     /**
@@ -1555,10 +1555,10 @@ class CTInvoice extends CTCNC
     {
         $this->setMethodName('deleteLine');
         $this->buInvoice->deleteLine(
-            $_REQUEST['invheadID'],
-            $_REQUEST['sequenceNo']
+            $this->getParam('invheadID'),
+            $this->getParam('sequenceNo')
         );
-        $this->redirectToDisplay($_REQUEST['invheadID']);
+        $this->redirectToDisplay($this->getParam('invheadID'));
     }
 
     /**
@@ -1573,10 +1573,10 @@ class CTInvoice extends CTCNC
         $this->setMethodName('deleteInvoice');
         $dsInvhead = new DataSet($this);
         $this->buInvoice->getInvoiceHeaderByID(
-            $_REQUEST['invheadID'],
+            $this->getParam('invheadID'),
             $dsInvhead
         );
-        $this->buInvoice->deleteInvoice($_REQUEST['invheadID']);
+        $this->buInvoice->deleteInvoice($this->getParam('invheadID'));
         if ($dsInvhead->getValue(DBEInvhead::ordheadID)) {
             if ($this->buInvoice->countInvoicesByOrdheadID($dsInvhead->getValue(DBEInvhead::ordheadID)) > 0) {
                 $urlNext =                        // there is still one or more invoices so display it/them
@@ -1619,11 +1619,11 @@ class CTInvoice extends CTCNC
     {
         $this->setMethodName('updateHeader');
         $this->buInvoice->updateHeader(
-            $_REQUEST['invheadID'],
-            $_REQUEST['custPORef'],
-            $_REQUEST['paymentTermsID']
+            $this->getParam('invheadID'),
+            $this->getParam('custPORef'),
+            $this->getParam('paymentTermsID')
         );
-        $this->redirectToDisplay($_REQUEST['invheadID']);
+        $this->redirectToDisplay($this->getParam('invheadID'));
     }
 
     /**
@@ -1635,10 +1635,10 @@ class CTInvoice extends CTCNC
     {
         $this->setMethodName('updateAddress');
         $this->buInvoice->updateAddress(
-            $_REQUEST['invheadID'],
-            $_REQUEST['siteNo']
+            $this->getParam('invheadID'),
+            $this->getParam('siteNo')
         );
-        $this->redirectToDisplay($_REQUEST['invheadID']);
+        $this->redirectToDisplay($this->getParam('invheadID'));
     }
 
     /**
@@ -1650,10 +1650,10 @@ class CTInvoice extends CTCNC
     {
         $this->setMethodName('updateContact');
         $this->buInvoice->updateContact(
-            $_REQUEST['invheadID'],
-            $_REQUEST['contactID']
+            $this->getParam('invheadID'),
+            $this->getParam('contactID')
         );
-        $this->redirectToDisplay($_REQUEST['invheadID']);
+        $this->redirectToDisplay($this->getParam('invheadID'));
     }
 
     /**

@@ -129,12 +129,12 @@ class CTCustomerItem extends CTCNC
     {
         $this->checkPermissions(PHPLIB_PERM_TECHNICAL);
         $this->setParentFormFields();
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:
 
-                if ($_REQUEST['Search'] == 'Add Contract') {
+                if ($this->getParam('Search') == 'Add Contract') {
                     $this->applyContractUpdates('add');
-                } elseif ($_REQUEST['Search'] == 'Remove Contract') {
+                } elseif ($this->getParam('Search') == 'Remove Contract') {
                     $this->applyContractUpdates('remove');
                 }
 
@@ -186,14 +186,14 @@ class CTCustomerItem extends CTCNC
      */
     function setParentFormFields()
     {
-        if (isset($_REQUEST['parentIDField'])) {
-            $_SESSION['parentIDField'] = $_REQUEST['parentIDField'];
+        if ($this->getParam('parentIDField')) {
+            $this->setSessionParam('parentIDField', $this->getParam('parentIDField'));
         }
-        if (isset($_REQUEST['parentWarrantyIDField'])) {
-            $_SESSION['parentWarrantyIDField'] = $_REQUEST['parentWarrantyIDField'];
+        if ($this->getParam('parentWarrantyIDField')) {
+            $this->setSessionParam('parentWarrantyIDField', $this->getParam('parentWarrantyIDField'));
         }
-        if (isset($_REQUEST['parentDescField'])) {
-            $_SESSION['parentDescField'] = $_REQUEST['parentDescField'];
+        if ($this->getParam('parentDescField')) {
+            $this->setSessionParam('parentDescField', $this->getParam('parentDescField'));
         }
     }
 
@@ -207,13 +207,13 @@ class CTCustomerItem extends CTCNC
     {
         $this->setMethodName('search');
         $this->buCustomerItem->initialiseSearchForm($this->dsSearchForm);
-        if (!$this->dsSearchForm->populateFromArray($_REQUEST['customerItem'])) {
+        if (!$this->dsSearchForm->populateFromArray($this->getParam('customerItem'))) {
             $this->setFormErrorOn();
             $this->displaySearchForm(); //redisplay with errors
             exit;
         }
 
-        if ($_REQUEST['CSV']) {
+        if ($this->getParam('CSV')) {
 
             $this->buCustomerItem->search(
                 $this->dsSearchForm,
@@ -227,7 +227,7 @@ class CTCustomerItem extends CTCNC
                 3000                            // row count limit
             );
         }
-        if ($_REQUEST['CSV']) {
+        if ($this->getParam('CSV')) {
             $this->generateCSV();
         } else {
             $this->displaySearchForm();
@@ -585,11 +585,11 @@ class CTCustomerItem extends CTCNC
         $this->buCustomerItem->initialiseSearchForm($dsSearch);
         $dsSearch->setValue(
             BUCustomerItem::searchFormItemText,
-            $_REQUEST['itemDescription']
+            $this->getParam('itemDescription')
         );
         $dsSearch->setValue(
             BUCustomerItem::searchFormCustomerID,
-            $_REQUEST['customerID']
+            $this->getParam('customerID')
         );
         $dsCustomerItem = new DataSet($this);
         $this->buCustomerItem->search(
@@ -603,7 +603,7 @@ class CTCustomerItem extends CTCNC
             );
             $dsSearch->setValue(
                 BUCustomerItem::searchFormSerialNo,
-                $_REQUEST['itemDescription']
+                $this->getParam('itemDescription')
             );
         }
         $this->buCustomerItem->search(
@@ -639,7 +639,7 @@ class CTCustomerItem extends CTCNC
             if ($dsCustomerItem->rowCount() == 0) {
                 $this->template->set_var(
                     array(
-                        'itemDescription' => $_REQUEST['itemDescription'],
+                        'itemDescription' => $this->getParam('itemDescription'),
                     )
                 );
                 $this->setTemplateFiles(
@@ -712,7 +712,7 @@ class CTCustomerItem extends CTCNC
     {
         $buCustomerItem = &$this->buCustomerItem;
         $buCustomerItem->getCustomerItemByID(
-            $_REQUEST['customerItemID'],
+            $this->getParam('customerItemID'),
             $dsCustomerItem
         );
         $url = $this->getContractUrl($dsCustomerItem);
@@ -735,34 +735,34 @@ class CTCustomerItem extends CTCNC
         $dsCustomerItem = &$this->dsCustomerItem; // local refs
         $buCustomerItem = &$this->buCustomerItem;
         $customerItemID = null;
-        if ($_REQUEST['action'] != CTCUSTOMERITEM_ACT_ADD) {
+        if ($this->getAction() != CTCUSTOMERITEM_ACT_ADD) {
             if (!$this->getFormError()) {
                 $buCustomerItem->getCustomerItemByID(
-                    $_REQUEST['customerItemID'],
+                    $this->getParam('customerItemID'),
                     $dsCustomerItem
                 );
                 /*
             Get list of contracts this item is attached to
             */
-                $this->contractIDs = $buCustomerItem->getContractIDsByCustomerItemID($_REQUEST['customerItemID']);
+                $this->contractIDs = $buCustomerItem->getContractIDsByCustomerItemID($this->getParam('customerItemID'));
             } else {
                 $dsCustomerItem->initialise(); // form error so already have a dataset
             }
             $dsCustomerItem->fetchNext();
             $customerItemID = $dsCustomerItem->getValue(DBEJCustomerItem::customerItemID);
         } else {
-            if (!$_REQUEST['customerID']) {
+            if (!$this->getParam('customerID')) {
                 $this->raiseError('CustomerID not passed');
             } else {
                 $buCustomerItem->initialiseNewCustomerItem($dsCustomerItem);
                 $dsCustomerItem->setValue(
                     DBEJCustomerItem::customerID,
-                    $_REQUEST['customerID']
+                    $this->getParam('customerID')
                 );
             }
         }
 
-        if ($_REQUEST['action'] == CTCUSTOMERITEM_ACT_ADD) {
+        if ($this->getAction() == CTCUSTOMERITEM_ACT_ADD) {
             $urlSubmit =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -826,7 +826,7 @@ class CTCustomerItem extends CTCNC
 
 
         // Display delete link if no dependencies
-        if ($_REQUEST['action'] != CTCUSTOMERITEM_ACT_ADD) {
+        if ($this->getAction() != CTCUSTOMERITEM_ACT_ADD) {
             if ($buCustomerItem->canDelete()) {
                 $urlDelete =
                     Controller::buildLink(
@@ -1108,7 +1108,7 @@ class CTCustomerItem extends CTCNC
         /*
         2nd Site Images
         */
-        if ($_REQUEST['action'] != CTCUSTOMERITEM_ACT_ADD) {
+        if ($this->getAction() != CTCUSTOMERITEM_ACT_ADD) {
 
             $this->template->set_block(
                 'CustomerItemDisplay',
@@ -1220,7 +1220,7 @@ class CTCustomerItem extends CTCNC
         /*
          Documents section
         */
-        if ($_REQUEST['action'] != CTCUSTOMERITEM_ACT_ADD) {
+        if ($this->getAction() != CTCUSTOMERITEM_ACT_ADD) {
             $this->template->set_block(
                 'CustomerItemDisplay',
                 'documentBlock',
@@ -1239,7 +1239,7 @@ class CTCustomerItem extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'uploadDescription' => $_REQUEST['uploadDescription'],
+                    'uploadDescription' => $this->getParam('uploadDescription'),
                     'userfile'          => $_FILES['userfile']['name'],
                     'txtUploadFile'     => $txtUploadFile,
                     'urlUploadFile'     => $urlUploadFile
@@ -1292,7 +1292,7 @@ class CTCustomerItem extends CTCNC
                     true
                 );
             }
-        }// if ($_REQUEST['action'] != CTACTIVITY_ACT_CREATE_CALL)
+        }// if ($this->getAction() != CTACTIVITY_ACT_CREATE_CALL)
         /*
         End documents section
         */
@@ -1535,18 +1535,18 @@ class CTCustomerItem extends CTCNC
         /*
         contractID array is the contracts
         */
-        $this->contractIDs = $_REQUEST['contractID']; /* ?? */
+        $this->contractIDs = $this->getParam('contractID'); /* ?? */
 
-        if (!$this->dsCustomerItem->populateFromArray($_REQUEST['customerItem'])) {
+        if (!$this->dsCustomerItem->populateFromArray($this->getParam('customerItem'))) {
             $this->setFormErrorOn();
-            if ($_REQUEST['action'] == CTCUSTOMERITEM_ACT_INSERT) {
+            if ($this->getAction() == CTCUSTOMERITEM_ACT_INSERT) {
                 $this->add();
             } else {
-                $_REQUEST['action'] = CTCUSTOMERITEM_ACT_EDIT;
+                $this->setAction(CTCUSTOMERITEM_ACT_EDIT);
             }
 
 
-            $_REQUEST['customerItemID'] = $this->dsCustomerItem->getValue(DBECustomerItem::customerItemID);
+            $this->setParam('customerItemID', $this->dsCustomerItem->getValue(DBECustomerItem::customerItemID));
 
             $this->display();
             exit;
@@ -1576,7 +1576,7 @@ class CTCustomerItem extends CTCNC
     {
         $this->setMethodName('delete');
         if ($this->buCustomerItem->canDelete()) {
-            $this->buCustomerItem->deleteCustomerItem($_REQUEST['customerItemID']);
+            $this->buCustomerItem->deleteCustomerItem($this->getParam('customerItemID'));
             $urlNext = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 []
@@ -1602,7 +1602,7 @@ class CTCustomerItem extends CTCNC
         // Validation and setting of variables
         $this->setMethodName('viewDocument');
         $dbeCustomerItemDocument = new DBECustomerItemDocument($this);
-        if (!$dbeCustomerItemDocument->getRow($_REQUEST['customerItemDocumentID'])) {
+        if (!$dbeCustomerItemDocument->getRow($this->getParam('customerItemDocumentID'))) {
             $this->displayFatalError('Activity file not found.');
         }
         if ($dbeCustomerItemDocument->getValue(DBEJCustomerItemDocument::fileMIMEType) != 'application/pdf') {
@@ -1622,7 +1622,7 @@ class CTCustomerItem extends CTCNC
         // Validation and setting of variables
         $this->setMethodName('getFile');
         $dbeCustomerItemDocument = new DBECustomerItemDocument($this);
-        if (!$dbeCustomerItemDocument->getRow($_REQUEST['customerItemDocumentID'])) {
+        if (!$dbeCustomerItemDocument->getRow($this->getParam('customerItemDocumentID'))) {
             $this->displayFatalError('File not found.');
         }
         header('Pragma: ');
@@ -1646,7 +1646,7 @@ class CTCustomerItem extends CTCNC
     function uploadDocument()
     {
         // validate
-        if (!$_REQUEST['uploadDescription']) {
+        if (!$this->getParam('uploadDescription')) {
             $this->setFormErrorMessage('Please enter a description');
         }
         if (!$_FILES['userfile']['name']) {
@@ -1657,18 +1657,18 @@ class CTCustomerItem extends CTCNC
         }
         if ($this->formError) {
             $this->buCustomerItem->getCustomerItemByID(
-                $_REQUEST['customerItemID'],
+                $this->getParam('customerItemID'),
                 $this->dsCustomerItem
             );
             $this->display();
             exit;
         }
         $this->buCustomerItem->uploadDocumentFile(
-            $_REQUEST['customerItemID'],
-            $_REQUEST['uploadDescription'],
+            $this->getParam('customerItemID'),
+            $this->getParam('uploadDescription'),
             $_FILES['userfile']
         );
-        $this->redirectToDisplay($_REQUEST['customerItemID']);
+        $this->redirectToDisplay($this->getParam('customerItemID'));
     }
 
     /**
@@ -1686,7 +1686,7 @@ class CTCustomerItem extends CTCNC
         // Validation and setting of variables
         $this->setMethodName('deleteDocument');
         $dbeCustomerItemDocument = new DBECustomerItemDocument($this);
-        if (!$dbeCustomerItemDocument->getRow($_REQUEST['customerItemDocumentID'])) {
+        if (!$dbeCustomerItemDocument->getRow($this->getParam('customerItemDocumentID'))) {
             $this->displayFatalError('Document not found.');
         }
         $customerItemID = $dbeCustomerItemDocument->getValue(DBEJCustomerItemDocument::customerItemID);
@@ -1708,11 +1708,11 @@ class CTCustomerItem extends CTCNC
         $buCustomerItem = new BUCustomerItem($this);
         $dsContract = new DataSet($this);
         $buCustomerItem->getCustomerItemByID(
-            $_REQUEST['customerItemID'],
+            $this->getParam('customerItemID'),
             $dsContract
         );
         $buCustomerItem->getCustomerItemsByContractID(
-            $_REQUEST['customerItemID'],
+            $this->getParam('customerItemID'),
             $dsCustomerItem
         );
         $buSite = new BUSite($this);
@@ -1761,17 +1761,17 @@ class CTCustomerItem extends CTCNC
     {
         $this->setMethodName('applyContractUpdates');
 
-        if (isset($_REQUEST['customerItemIDs'])) {
+        if ($this->getParam('customerItemIDs')) {
 
             if ($action == 'add') {
                 $this->buCustomerItem->addContractToCustomerItems(
-                    $_REQUEST['contractID'],
-                    $_REQUEST['customerItemIDs']
+                    $this->getParam('contractID'),
+                    $this->getParam('customerItemIDs')
                 );
             } else {
                 $this->buCustomerItem->removeContractFromCustomerItems(
-                    $_REQUEST['contractID'],
-                    $_REQUEST['customerItemIDs']
+                    $this->getParam('contractID'),
+                    $this->getParam('customerItemIDs')
                 );
 
             }

@@ -86,7 +86,7 @@ class CTRenewalReport extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             case 'produceReport':
                 $this->page = $this->produceReport(
@@ -107,8 +107,8 @@ class CTRenewalReport extends CTCNC
                 echo json_encode(
                     [
                         'PDFPath' => $this->generatePDFContract(
-                            $_REQUEST['customerID'],
-                            $_REQUEST['contractsIDs']
+                            $this->getParam('customerID'),
+                            $this->getParam('contractsIDs')
                         )
                     ]
                 );
@@ -118,10 +118,10 @@ class CTRenewalReport extends CTCNC
                 echo json_encode(
                     [
                         'status' => $this->sendPDFContract(
-                            $_REQUEST['PDFPath'],
-                            $_REQUEST['contactID'],
-                            $_REQUEST['signableTemplateID'],
-                            $_REQUEST['customerID']
+                            $this->getParam('PDFPath'),
+                            $this->getParam('contactID'),
+                            $this->getParam('signableTemplateID'),
+                            $this->getParam('customerID')
                         )
                     ]
                 );
@@ -507,7 +507,7 @@ class CTRenewalReport extends CTCNC
             $calledFromSearch = true;
         } else {
             $calledFromSearch = false;
-            $customerID = $_REQUEST['customerID'];
+            $customerID = $this->getParam('customerID');
             $this->setPageTitle("Renewal Report");
         }
 

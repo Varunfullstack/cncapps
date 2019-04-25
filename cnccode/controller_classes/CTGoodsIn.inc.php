@@ -112,7 +112,7 @@ class CTGoodsIn extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:
                 $this->search();
                 break;
@@ -144,14 +144,14 @@ class CTGoodsIn extends CTCNC
         foreach ($_REQUEST as $key => $value) {
             $_REQUEST[$key] = trim($value);
         }
-        if (($_REQUEST['porheadID']) AND (!is_numeric($_REQUEST['porheadID']))) {
+        if (($this->getParam('porheadID')) AND (!is_numeric($this->getParam('porheadID')))) {
             $this->setFormErrorMessage('Order no must be numeric');;
         }
         if (!$this->getFormError()) {
             $this->buGoodsIn->search(
                 $this->dsPorhead,
-                $_REQUEST['supplierID'],
-                $_REQUEST['porheadID'],
+                $this->getParam('supplierID'),
+                $this->getParam('porheadID'),
                 null,
                 null,
                 'B'
@@ -244,11 +244,11 @@ class CTGoodsIn extends CTCNC
         }
         $supplierName = null;
 // search parameter section
-        if ($_REQUEST['supplierID']) {
+        if ($this->getParam('supplierID')) {
             $buSupplier = new BUSupplier($this);
             $dsSupplier = new DataSet($this);
             $buSupplier->getSupplierByID(
-                $_REQUEST['supplierID'],
+                $this->getParam('supplierID'),
                 $dsSupplier
             );
             $supplierName = $dsSupplier->getValue(DBESupplier::name);
@@ -256,8 +256,8 @@ class CTGoodsIn extends CTCNC
         $this->template->set_var(
             array(
                 'supplierName'     => $supplierName,
-                'porheadID'        => $_REQUEST['porheadID'],
-                'supplierID'       => $_REQUEST['supplierID'],
+                'porheadID'        => $this->getParam('porheadID'),
+                'supplierID'       => $this->getParam('supplierID'),
                 'submitURL'        => $submitURL,
                 'urlSupplierPopup' => $urlSupplierPopup
             )
@@ -280,12 +280,12 @@ class CTGoodsIn extends CTCNC
         $this->setMethodName('displayGoodsIn');
         $dsPorhead = &$this->dsPorhead;
         $dsPorline = &$this->dsPorline;
-        if (!$_REQUEST['porheadID']) {
+        if (!$this->getParam('porheadID')) {
             $this->displayFatalError(CTGOODSIN_MSG_PORHEADID_NOT_PASSED);
             return;
         }
         $this->buPurchaseOrder->getHeaderByID(
-            $_REQUEST['porheadID'],
+            $this->getParam('porheadID'),
             $dsPorhead
         );
         $dsPorhead->fetchNext();
@@ -492,10 +492,10 @@ class CTGoodsIn extends CTCNC
     {
         $dsGoodsIn = &$this->dsGoodsIn;
         $this->buGoodsIn->initialiseReceiveDataset($dsGoodsIn);
-        if (!isset($_REQUEST['porheadID'])) {
+        if (!$this->getParam('porheadID')) {
             $this->displayFatalError(CTGOODSIN_MSG_PORHEADID_NOT_PASSED);
         }
-        if (!$dsGoodsIn->populateFromArray($_REQUEST['receive'])) {
+        if (!$dsGoodsIn->populateFromArray($this->getParam('receive'))) {
             $this->setFormErrorMessage('Quantities entered must be numeric');
             $this->displayGoodsIn();
             exit;
@@ -517,11 +517,11 @@ class CTGoodsIn extends CTCNC
         }
 
         $this->buGoodsIn->receive(
-            $_REQUEST['porheadID'],
+            $this->getParam('porheadID'),
             $dsGoodsIn
         );
         $this->buPurchaseOrder->getHeaderByID(
-            $_REQUEST['porheadID'],
+            $this->getParam('porheadID'),
             $dsPorhead
         );
         $urlNext =
@@ -529,7 +529,7 @@ class CTGoodsIn extends CTCNC
                 CTCNC_PAGE_PURCHASEORDER,
                 array(
                     'action'    => CTCNC_ACT_DISPLAY_PO,
-                    'porheadID' => $_REQUEST['porheadID']
+                    'porheadID' => $this->getParam('porheadID')
                 )
             );
         header('Location: ' . $urlNext);

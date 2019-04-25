@@ -45,7 +45,7 @@ class CTPaymentTerms extends CTCNC
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTPAYMENTTERMS_ACT_EDIT:
             case CTPAYMENTTERMS_ACT_CREATE:
                 $this->edit();
@@ -130,9 +130,9 @@ class CTPaymentTerms extends CTCNC
         $dsPaymentTerms = &$this->dsPaymentTerms; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CTPAYMENTTERMS_ACT_EDIT) {
-                $this->buPaymentTerms->getPaymentTermsByID($_REQUEST['paymentTermsID'], $dsPaymentTerms);
-                $paymentTermsID = $_REQUEST['paymentTermsID'];
+            if ($this->getAction() == CTPAYMENTTERMS_ACT_EDIT) {
+                $this->buPaymentTerms->getPaymentTermsByID($this->getParam('paymentTermsID'), $dsPaymentTerms);
+                $paymentTermsID = $this->getParam('paymentTermsID');
             } else {                                                                    // creating new
                 $dsPaymentTerms->initialise();
                 $dsPaymentTerms->setValue(DBEPaymentTerms::paymentTermsID, null);
@@ -145,8 +145,8 @@ class CTPaymentTerms extends CTCNC
         }
         $urlDelete = null;
         $txtDelete = null;
-        if ($_REQUEST['action'] == CTPAYMENTTERMS_ACT_EDIT && $this->buPaymentTerms->canDeletePaymentTerms(
-                $_REQUEST['paymentTermsID']
+        if ($this->getAction() == CTPAYMENTTERMS_ACT_EDIT && $this->buPaymentTerms->canDeletePaymentTerms(
+                $this->getParam('paymentTermsID')
             )) {
             $urlDelete = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
@@ -214,14 +214,14 @@ class CTPaymentTerms extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsPaymentTerms->populateFromArray($_REQUEST['paymentTerms']));
+        $this->formError = (!$this->dsPaymentTerms->populateFromArray($this->getParam('paymentTerms')));
         if ($this->formError) {
             if ($this->dsPaymentTerms->getValue(
                     DBEPaymentTerms::paymentTermsID
                 ) == null) {                    // attempt to insert
-                $_REQUEST['action'] = CTPAYMENTTERMS_ACT_EDIT;
+                $this->setAction(CTPAYMENTTERMS_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTPAYMENTTERMS_ACT_CREATE;
+                $this->setAction(CTPAYMENTTERMS_ACT_CREATE);
             }
             $this->edit();
             exit;
@@ -250,7 +250,7 @@ class CTPaymentTerms extends CTCNC
     function delete()
     {
         $this->setMethodName('delete');
-        if (!$this->buPaymentTerms->deletePaymentTerms($_REQUEST['paymentTermsID'])) {
+        if (!$this->buPaymentTerms->deletePaymentTerms($this->getParam('paymentTermsID'))) {
             $this->displayFatalError('Cannot delete this payment term');
             exit;
         } else {

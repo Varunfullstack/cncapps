@@ -424,7 +424,7 @@ class DataSet extends DataAccess
     *		Expects dates passed in to be DD/MM/YYYY (as entered on HTML form) BUT always
     *		converts to YYYY-MM-DD (internal Sweetcode standard) EVEN IF the date was bad
     */
-    function populateFromArray(&$entityArray)
+    function populateFromArray($entityArray)
     {
         $this->setMethodName('populateFromArray');
         $ret = TRUE;

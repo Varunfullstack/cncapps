@@ -183,7 +183,7 @@ class CTUser extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTUSER_ACT_EDIT:
             case CTUSER_ACT_CREATE:
                 $this->edit();
@@ -205,12 +205,12 @@ class CTUser extends CTCNC
                 try {
                     $response['decryptedData'] = Encryption::decrypt(
                         USER_ENCRYPTION_PRIVATE_KEY,
-                        @$_REQUEST['passphrase'],
-                        @$_REQUEST['encryptedData']
+                        @$this->getParam('passphrase'),
+                        @$this->getParam('encryptedData')
                     );
 
-                    if (isset($_REQUEST['extraData']) && $response['decryptedData']) {
-                        switch ($_REQUEST['extraData']) {
+                    if ($this->getParam('extraData') && $response['decryptedData']) {
+                        switch ($this->getParam('extraData')) {
                             case 'age':
                                 $response['extraData'] = (new DateTime())->diff(
                                         DateTime::createFromFormat(
@@ -366,12 +366,12 @@ class CTUser extends CTCNC
         $dsUser = &$this->dsUser; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CTUSER_ACT_EDIT) {
+            if ($this->getAction() == CTUSER_ACT_EDIT) {
                 $this->buUser->getUserByID(
-                    $_REQUEST['userID'],
+                    $this->getParam('userID'),
                     $dsUser
                 );
-                $userID = $_REQUEST['userID'];
+                $userID = $this->getParam('userID');
             } else {                                                                    // creating new
                 $dsUser->initialise();
                 $dsUser->setValue(
@@ -387,7 +387,7 @@ class CTUser extends CTCNC
         }
         $urlDelete = null;
         $txtDelete = null;
-        if ($_REQUEST['action'] == CTUSER_ACT_EDIT && $this->buUser->canDeleteUser($_REQUEST['userID'])) {
+        if ($this->getAction() == CTUSER_ACT_EDIT && $this->buUser->canDeleteUser($this->getParam('userID'))) {
             $urlDelete =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -791,176 +791,176 @@ class CTUser extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        if (isset($_REQUEST['user'][1]["dateOfBirth"])) {
-            if ($_REQUEST['user'][1]["dateOfBirth"]) {
-                $_REQUEST['user'][1]["encryptedDateOfBirth"] =
+        if ($this->getParam('user')[1]["dateOfBirth"]) {
+            if ($this->getParam('user')[1]["dateOfBirth"]) {
+                $this->getParam('user')[1]["encryptedDateOfBirth"] =
                     Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["dateOfBirth"]
+                        $this->getParam('user')[1]["dateOfBirth"]
                     );
 
             } else {
-                $_REQUEST['user'][1]["encryptedDateOfBirth"] = null;
+                $this->getParam('user')[1]["encryptedDateOfBirth"] = null;
             }
         }
 
-        if (isset($_REQUEST['user'][1]["pensionAdditionalPayments"])) {
+        if ($this->getParam('user')[1]["pensionAdditionalPayments"]) {
 
-            if ($_REQUEST['user'][1]["pensionAdditionalPayments"]) {
-                $_REQUEST['user'][1]["encryptedPensionAdditionalPayments"] =
+            if ($this->getParam('user')[1]["pensionAdditionalPayments"]) {
+                $this->getParam('user')[1]["encryptedPensionAdditionalPayments"] =
                     Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["pensionAdditionalPayments"]
+                        $this->getParam('user')[1]["pensionAdditionalPayments"]
                     );
 
             } else {
-                $_REQUEST['user'][1]["encryptedPensionAdditionalPayments"] = null;
+                $this->getParam('user')[1]["encryptedPensionAdditionalPayments"] = null;
             }
         }
 
-        if (isset($_REQUEST['user'][1]["salary"])) {
+        if ($this->getParam('user')[1]["salary"]) {
 
-            if ($_REQUEST['user'][1]["salary"]) {
-                $_REQUEST['user'][1]["encryptedSalary"] =
+            if ($this->getParam('user')[1]["salary"]) {
+                $this->getParam('user')[1]["encryptedSalary"] =
                     Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["salary"]
+                        $this->getParam('user')[1]["salary"]
                     );
 
             } else {
-                $_REQUEST['user'][1]["encryptedSalary"] = null;
+                $this->getParam('user')[1]["encryptedSalary"] = null;
             }
         }
 
-        if (isset($_REQUEST['user'][1]["salarySacrifice"])) {
+        if ($this->getParam('user')[1]["salarySacrifice"]) {
 
-            if ($_REQUEST['user'][1]["salarySacrifice"]) {
-                $_REQUEST['user'][1]["encryptedSalarySacrifice"] =
+            if ($this->getParam('user')[1]["salarySacrifice"]) {
+                $this->getParam('user')[1]["encryptedSalarySacrifice"] =
                     Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["salarySacrifice"]
+                        $this->getParam('user')[1]["salarySacrifice"]
                     );
 
             } else {
-                $_REQUEST['user'][1]["encryptedSalarySacrifice"] = null;
-            }
-        }
-
-
-        if (isset($_REQUEST['user'][1]["nationalInsuranceNumber"])) {
-
-            if ($_REQUEST['user'][1]["nationalInsuranceNumber"]) {
-                $_REQUEST['user'][1]["encryptedNationalInsuranceNumber"] =
-                    Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["nationalInsuranceNumber"]
-                    );
-
-            } else {
-                $_REQUEST['user'][1]["encryptedNationalInsuranceNumber"] = null;
-            }
-        }
-
-        if (isset($_REQUEST['user'][1]["address1"])) {
-
-            if ($_REQUEST['user'][1]["address1"]) {
-                $_REQUEST['user'][1]["encryptedAddress1"] =
-                    Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["address1"]
-                    );
-
-            } else {
-                $_REQUEST['user'][1]["encryptedAddress1"] = null;
-            }
-        }
-
-        if (isset($_REQUEST['user'][1]["address2"])) {
-
-            if ($_REQUEST['user'][1]["address2"]) {
-                $_REQUEST['user'][1]["encryptedAddress2"] =
-                    Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["address2"]
-                    );
-
-            } else {
-                $_REQUEST['user'][1]["encryptedAddress2"] = null;
+                $this->getParam('user')[1]["encryptedSalarySacrifice"] = null;
             }
         }
 
 
-        if (isset($_REQUEST['user'][1]["address3"])) {
+        if ($this->getParam('user')[1]["nationalInsuranceNumber"]) {
 
-            if ($_REQUEST['user'][1]["address3"]) {
-                $_REQUEST['user'][1]["encryptedAddress3"] =
+            if ($this->getParam('user')[1]["nationalInsuranceNumber"]) {
+                $this->getParam('user')[1]["encryptedNationalInsuranceNumber"] =
                     Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["address3"]
+                        $this->getParam('user')[1]["nationalInsuranceNumber"]
                     );
 
             } else {
-                $_REQUEST['user'][1]["encryptedAddress3"] = null;
+                $this->getParam('user')[1]["encryptedNationalInsuranceNumber"] = null;
             }
         }
 
-        if (isset($_REQUEST['user'][1]["town"])) {
-            if ($_REQUEST['user'][1]["town"]) {
-                $_REQUEST['user'][1]["encryptedTown"] =
+        if ($this->getParam('user')[1]["address1"]) {
+
+            if ($this->getParam('user')[1]["address1"]) {
+                $this->getParam('user')[1]["encryptedAddress1"] =
                     Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["town"]
+                        $this->getParam('user')[1]["address1"]
                     );
 
             } else {
-                $_REQUEST['user'][1]["encryptedTown"] = null;
+                $this->getParam('user')[1]["encryptedAddress1"] = null;
             }
         }
 
-        if (isset($_REQUEST['user'][1]["county"])) {
+        if ($this->getParam('user')[1]["address2"]) {
 
-            if ($_REQUEST['user'][1]["county"]) {
-                $_REQUEST['user'][1]["encryptedCounty"] =
+            if ($this->getParam('user')[1]["address2"]) {
+                $this->getParam('user')[1]["encryptedAddress2"] =
                     Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["county"]
+                        $this->getParam('user')[1]["address2"]
                     );
 
             } else {
-                $_REQUEST['user'][1]["encryptedCounty"] = null;
+                $this->getParam('user')[1]["encryptedAddress2"] = null;
             }
         }
 
-        if (isset($_REQUEST['user'][1]["postcode"])) {
 
-            if ($_REQUEST['user'][1]["postcode"]) {
-                $_REQUEST['user'][1]["encryptedPostcode"] =
+        if ($this->getParam('user')[1]["address3"]) {
+
+            if ($this->getParam('user')[1]["address3"]) {
+                $this->getParam('user')[1]["encryptedAddress3"] =
                     Encryption::encrypt(
                         USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["postcode"]
+                        $this->getParam('user')[1]["address3"]
                     );
 
             } else {
-                $_REQUEST['user'][1]["encryptedPostcode"] = null;
+                $this->getParam('user')[1]["encryptedAddress3"] = null;
             }
         }
-        $this->formError = (!$this->dsUser->populateFromArray($_REQUEST['user']));
-        if (isset($_REQUEST['perms'])) {
+
+        if ($this->getParam('user')[1]["town"]) {
+            if ($this->getParam('user')[1]["town"]) {
+                $this->getParam('user')[1]["encryptedTown"] =
+                    Encryption::encrypt(
+                        USER_ENCRYPTION_PUBLIC_KEY,
+                        $this->getParam('user')[1]["town"]
+                    );
+
+            } else {
+                $this->getParam('user')[1]["encryptedTown"] = null;
+            }
+        }
+
+        if ($this->getParam('user')[1]["county"]) {
+
+            if ($this->getParam('user')[1]["county"]) {
+                $this->getParam('user')[1]["encryptedCounty"] =
+                    Encryption::encrypt(
+                        USER_ENCRYPTION_PUBLIC_KEY,
+                        $this->getParam('user')[1]["county"]
+                    );
+
+            } else {
+                $this->getParam('user')[1]["encryptedCounty"] = null;
+            }
+        }
+
+        if ($this->getParam('user')[1]["postcode"]) {
+
+            if ($this->getParam('user')[1]["postcode"]) {
+                $this->getParam('user')[1]["encryptedPostcode"] =
+                    Encryption::encrypt(
+                        USER_ENCRYPTION_PUBLIC_KEY,
+                        $this->getParam('user')[1]["postcode"]
+                    );
+
+            } else {
+                $this->getParam('user')[1]["encryptedPostcode"] = null;
+            }
+        }
+        $this->formError = (!$this->dsUser->populateFromArray($this->getParam('user')));
+        if ($this->getParam('perms')) {
             $this->dsUser->setUpdateModeUpdate();
             $this->dsUser->setValue(
                 DBEJUser::perms,
                 implode(
                     ',',
-                    $_REQUEST['perms']
+                    $this->getParam('perms')
                 )
             );
             $this->dsUser->post();
         }
         if ($this->formError) {
             if ($this->dsUser->getValue(DBEJUser::userID) == '0') {                    // attempt to insert
-                $_REQUEST['action'] = CTUSER_ACT_EDIT;
+                $this->setAction(CTUSER_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTUSER_ACT_CREATE;
+                $this->setAction(CTUSER_ACT_CREATE);
             }
             $this->edit();
             exit;
@@ -993,7 +993,7 @@ class CTUser extends CTCNC
     function delete()
     {
         $this->setMethodName('delete');
-        if (!$this->buUser->deleteUser($_REQUEST['userID'])) {
+        if (!$this->buUser->deleteUser($this->getParam('userID'))) {
             $this->displayFatalError('Cannot delete this user');
             exit;
         }
@@ -1020,7 +1020,7 @@ class CTUser extends CTCNC
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-            if (!$this->formError = (!$this->dsAbsence->populateFromArray($_REQUEST['absence']))) {
+            if (!$this->formError = (!$this->dsAbsence->populateFromArray($this->getParam('absence')))) {
 
 
                 $this->buUser->setUserAbsent(
@@ -1045,7 +1045,7 @@ class CTUser extends CTCNC
             */
             $this->dsAbsence->setValue(
                 self::absenceFormUserID,
-                $_REQUEST['userID']
+                $this->getParam('userID')
             );
             $this->dsAbsence->setValue(
                 self::absenceFormStartDate,

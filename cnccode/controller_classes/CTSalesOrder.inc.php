@@ -1005,7 +1005,8 @@ class CTSalesOrder extends CTCNC
             true
         );
 
-        $_SESSION['urlReferer'] =                    // so called functions know where to come back to
+        $this->setSessionParam(
+            'urlReferer',
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
@@ -1018,7 +1019,8 @@ class CTSalesOrder extends CTCNC
                     'toDate'          => $this->getToDate(),
                     'lineText'        => $this->getLineText()
                 )
-            );
+            )
+        );
 
         if ($this->dsOrdhead->rowCount() > 0) {
 
@@ -1126,7 +1128,7 @@ class CTSalesOrder extends CTCNC
     {
         $this->setMethodName('search');
         $this->setCustomerID(
-            $_REQUEST['customerID']
+            $this->getParam('customerID')
         ); // Have to do this because I couldn't use Javascript to set form[customerID]
         if (
             (!is_numeric($this->getOrdheadID())) &
@@ -2487,7 +2489,7 @@ class CTSalesOrder extends CTCNC
             return;
         }
         $this->checkUpdatedByAnotherUser(
-            $_REQUEST['updatedTime'],
+            $this->getParam('updatedTime'),
             $dsOrdhead->getValue(DBEOrdhead::updatedTime)
         );
         if (($dsOrdhead->getValue(DBEOrdhead::type) != 'Q') & ($dsOrdhead->getValue(DBEOrdhead::type) != 'I')) {
@@ -2704,7 +2706,7 @@ class CTSalesOrder extends CTCNC
     {
         $this->setMethodName('updateOrderLine');
         // pasting lines from another Sales Order
-        if ($_REQUEST['ordline'][1]['lineType'] == 'S') {
+        if ($this->getParam('ordline')[1]['lineType'] == 'S') {
             $this->pasteLinesFromSO();
             exit;
         }
@@ -2741,7 +2743,7 @@ class CTSalesOrder extends CTCNC
             DA_STRING,
             DA_ALLOW_NULL
         );
-        if ($_REQUEST['ordline'][1]['lineType'] == "I") {                    // Item line
+        if ($this->getParam('ordline')[1]['lineType'] == "I") {                    // Item line
             $this->dsOrdline->setNull(
                 DBEOrdline::itemID,
                 DA_NOT_NULL
@@ -2800,7 +2802,7 @@ class CTSalesOrder extends CTCNC
                 DA_NOT_NULL
             );
         }
-        $this->formError = !$this->dsOrdline->populateFromArray($_REQUEST['ordline']);
+        $this->formError = !$this->dsOrdline->populateFromArray($this->getParam('ordline'));
 
         $this->setOrdheadID($this->dsOrdline->getValue(DBEOrdhead::ordheadID));
         $dsOrdhead = new DataSet($this);
@@ -2812,22 +2814,22 @@ class CTSalesOrder extends CTCNC
             return;
         }
         $this->checkUpdatedByAnotherUser(
-            $_REQUEST['updatedTime'],
+            $this->getParam('updatedTime'),
             $dsOrdhead->getValue(DBEOrdhead::updatedTime)
         );
 
         // Validate Item line
         if ($this->formError) {                    // Form error so redisplay edit form
-            if ($_REQUEST['action'] == CTSALESORDER_ACT_INSERT_ORDLINE) {
-                $_REQUEST['action'] = CTSALESORDER_ACT_ADD_ORDLINE;
+            if ($this->getAction() == CTSALESORDER_ACT_INSERT_ORDLINE) {
+                $this->setAction(CTSALESORDER_ACT_ADD_ORDLINE);
             } else {
-                $_REQUEST['action'] = CTSALESORDER_ACT_UPDATE_ORDLINE;
+                $this->setAction(CTSALESORDER_ACT_UPDATE_ORDLINE);
             }
             $this->setSequenceNo($this->dsOrdline->getValue(DBEOrdline::sequenceNo));
             $this->editOrderLine();
             exit;
         }
-        if ($_REQUEST['action'] == CTSALESORDER_ACT_INSERT_ORDLINE) {
+        if ($this->getAction() == CTSALESORDER_ACT_INSERT_ORDLINE) {
             $this->buSalesOrder->insertNewOrderLine($this->dsOrdline);
         } else {
             $this->buSalesOrder->updateOrderLine($this->dsOrdline);
@@ -2837,7 +2839,7 @@ class CTSalesOrder extends CTCNC
 
     /**
      * Paste lines from another Sales Order onto the end of this one
-     * $_REQUEST['ordline'][1]['description'] holds ordheadID of order to paste from
+     * $this->getParam('ordline')[1]['description'] holds ordheadID of order to paste from
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
@@ -2846,14 +2848,14 @@ class CTSalesOrder extends CTCNC
     function pasteLinesFromSO()
     {
         $this->setMethodName('pasteLinesFromSO');
-        $this->setOrdheadID($_REQUEST['ordline'][1]['ordheadID']);
-        if (!is_numeric($_REQUEST['ordline'][1]['description'])) {
+        $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
+        if (!is_numeric($this->getParam('ordline')[1]['description'])) {
             $this->setFormErrorMessage('Sales order number must be numeric');
             $this->displayOrder();
             return;
         }
         if (!$this->buSalesOrder->getOrdheadByID(
-            $_REQUEST['ordline'][1]['description'],
+            $this->getParam('ordline')[1]['description'],
             $dsOrdhead
         )) {
             $this->setFormErrorMessage('The sales order you are trying to paste from does not exist');
@@ -2861,7 +2863,7 @@ class CTSalesOrder extends CTCNC
             return;
         }
         $this->buSalesOrder->pasteLinesFromOrder(
-            $_REQUEST['ordline'][1]['description'],
+            $this->getParam('ordline')[1]['description'],
             $this->getOrdheadID()
         );
         $this->displayOrder();
@@ -2944,7 +2946,7 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
         }
         $this->checkUpdatedByAnotherUser(
-            $_REQUEST['updatedTime'],
+            $this->getParam('updatedTime'),
             $dsOrdhead->getValue(DBEOrdhead::updatedTime)
         );
         if (!$this->getSequenceNo()) {
@@ -2979,7 +2981,7 @@ class CTSalesOrder extends CTCNC
             return;
         }
         $this->checkUpdatedByAnotherUser(
-            $_REQUEST['updatedTime'],
+            $this->getParam('updatedTime'),
             $dsOrdhead->getValue(DBEOrdhead::updatedTime)
         );
         if ($this->getAction() == CTSALESORDER_ACT_UPDATE_INV_ADDRESS) {
@@ -3024,7 +3026,7 @@ class CTSalesOrder extends CTCNC
             return;
         }
         $this->checkUpdatedByAnotherUser(
-            $_REQUEST['updatedTime'],
+            $this->getParam('updatedTime'),
             $dsOrdhead->getValue(DBEOrdhead::updatedTime)
         );
         if (($dsOrdhead->getValue(DBEOrdhead::type) != 'Q') & ($dsOrdhead->getValue(DBEOrdhead::type) != 'I')) {
@@ -3900,12 +3902,12 @@ class CTSalesOrder extends CTCNC
     {
         $this->setMethodName('deleteOrder');
         $this->buSalesOrder->deleteOrder($this->getOrdheadID());
-        if (isset($_REQUEST['urlCallback'])) {
-            $url = $_REQUEST['urlCallback'];
+        if ($this->getParam('urlCallback')) {
+            $url = $this->getParam('urlCallback');
         } else {
-            if ($_SESSION['urlReferer']) {
-                $url = $_SESSION['urlReferer'];
-                $_SESSION['urlReferer'] = null;
+            if ($this->getSessionParam('urlReferer')) {
+                $url = $this->getSessionParam('urlReferer');
+                $this->setSessionParam('urlReferer', null);
             } else {
                 $url =
                     Controller::buildLink(
@@ -4211,7 +4213,7 @@ class CTSalesOrder extends CTCNC
             return;
         }
         $this->checkUpdatedByAnotherUser(
-            $_REQUEST['updatedTime'],
+            $this->getParam('updatedTime'),
             $dsOrdhead->getValue(DBEOrdhead::updatedTime)
         );
 
@@ -4221,10 +4223,10 @@ class CTSalesOrder extends CTCNC
         }
         $this->buSalesOrder->updateHeader(
             $this->getOrdheadID(),
-            $_REQUEST['form']['custPORef'],
-            $_REQUEST['form']['paymentTermsID'],
-            $_REQUEST['form']['partInvoice'] == 'Y' ? 'Y' : 'N',
-            $_REQUEST['form']['addItem'] == 'Y' ? 'Y' : 'N'
+            $this->getParam('form')['custPORef'],
+            $this->getParam('form')['paymentTermsID'],
+            $this->getParam('form')['partInvoice'] == 'Y' ? 'Y' : 'N',
+            $this->getParam('form')['addItem'] == 'Y' ? 'Y' : 'N'
         );
         header('Location: ' . $this->getDisplayOrderURL());
         exit;
@@ -4241,11 +4243,11 @@ class CTSalesOrder extends CTCNC
     function updateLines()
     {
         $this->setMethodName('updateLines');
-        if (!$_REQUEST['ordheadID']) {
+        if (!$this->getParam('ordheadID')) {
             $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
             return;
         } else {
-            $this->setOrdheadID($_REQUEST['ordheadID']);
+            $this->setOrdheadID($this->getParam('ordheadID'));
         }
         $dsOrdhead = new DataSet($this);
         if (!$this->buSalesOrder->getOrdheadByID(
@@ -4256,7 +4258,7 @@ class CTSalesOrder extends CTCNC
             return;
         }
         $this->checkUpdatedByAnotherUser(
-            $_REQUEST['updatedTime'],
+            $this->getParam('updatedTime'),
             $dsOrdhead->getValue(DBEOrdhead::updatedTime)
         );
         if (($dsOrdhead->getValue(DBEOrdhead::type) != 'Q') & ($dsOrdhead->getValue(DBEOrdhead::type) != 'I')) {
@@ -4266,7 +4268,7 @@ class CTSalesOrder extends CTCNC
         $dbeJOrdline = new DBEJOrdline($this);
         $this->dsOrdline = new DataSet($this);
         $this->dsOrdline->copyColumnsFrom($dbeJOrdline);
-        if (!$this->dsOrdline->populateFromArray($_REQUEST['ordline'])) {
+        if (!$this->dsOrdline->populateFromArray($this->getParam('ordline'))) {
             $this->lineValidationError = 'One or more order line values are invalid';
             $this->displayOrder();
         } else {
@@ -4609,14 +4611,14 @@ now that the notes are in a text field we need to split the lines up for the PDF
         $this->setMethodName('updateItemPrice');
 
         $dbeItem = new DBEItem($this);
-        $dbeItem->getRow($_REQUEST['itemID']);
+        $dbeItem->getRow($this->getParam('itemID'));
         $dbeItem->setValue(
             DBEItem::curUnitSale,
-            $_REQUEST['curUnitSale']
+            $this->getParam('curUnitSale')
         );
         $dbeItem->setValue(
             DBEItem::curUnitCost,
-            $_REQUEST['curUnitCost']
+            $this->getParam('curUnitCost')
         );
         $dbeItem->updateRow();
 
@@ -4636,7 +4638,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
             $this->displayOrder();
             return FALSE;
         } else {
-            $_SESSION['selectedOrderLine'] = $this->postVars['selectedOrderLine'];
+            $this->setSessionParam('selectedOrderLine', $this->postVars['selectedOrderLine']);
             $redirectUrl =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -4713,7 +4715,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-            $formError = !$dsInput->populateFromArray($_REQUEST['inputForm']);
+            $formError = !$dsInput->populateFromArray($this->getParam('inputForm'));
 
             if ($dsInput->getValue(DBEOrdhead::serviceRequestCustomerItemID) == 99) {
                 $formError = true;

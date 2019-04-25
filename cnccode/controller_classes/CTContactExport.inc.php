@@ -103,7 +103,7 @@ class CTContactExport extends CTCNC
      */
     function defaultAction()
     {
-        switch (@$_REQUEST['action']) {
+        switch (@$this->getAction()) {
             case '3cxExport':
                 echo json_encode(
                     [
@@ -281,26 +281,26 @@ class CTContactExport extends CTCNC
         $quotationItemIDs = array();
         $contractItemIDs = array();
 
-        if ($_REQUEST['Export'] || $_REQUEST['SendEmail']) {
+        if ($this->getParam('Export') || $this->getParam('SendEmail')) {
 
-            if (isset($_REQUEST['searchForm'][1]['supportLevel'])) {
-                $_REQUEST['searchForm'][1]['supportLevel'] = json_encode($_REQUEST['searchForm'][1]['supportLevel']);
+            if ($this->getParam('searchForm')[1]['supportLevel']) {
+                $this->getParam('searchForm')[1]['supportLevel'] = json_encode($this->getParam('searchForm')[1]['supportLevel']);
             }
-            $dsSearchForm->populateFromArray($_REQUEST['searchForm']);
+            $dsSearchForm->populateFromArray($this->getParam('searchForm'));
 
-            if ($_REQUEST['quotationItemIDs']) {
-                $quotationItemIDs = $_REQUEST['quotationItemIDs'];
-            }
-
-            if ($_REQUEST['contractItemIDs']) {
-                $contractItemIDs = $_REQUEST['contractItemIDs'];
+            if ($this->getParam('quotationItemIDs')) {
+                $quotationItemIDs = $this->getParam('quotationItemIDs');
             }
 
-            if ($_REQUEST['sectorIDs']) {
-                $sectorIDs = $_REQUEST['sectorIDs'];
+            if ($this->getParam('contractItemIDs')) {
+                $contractItemIDs = $this->getParam('contractItemIDs');
             }
 
-            if ($_REQUEST['SendEmail']) {
+            if ($this->getParam('sectorIDs')) {
+                $sectorIDs = $this->getParam('sectorIDs');
+            }
+
+            if ($this->getParam('SendEmail')) {
                 $dsSearchForm->setValue(
                     self::searchFormExportEmailOnlyFlag,
                     false
@@ -315,7 +315,7 @@ class CTContactExport extends CTCNC
                     $sectorIDs
                 );
 
-            if ($_REQUEST['Export']) {
+            if ($this->getParam('Export')) {
 
                 $this->generateCSV($results);
                 exit;

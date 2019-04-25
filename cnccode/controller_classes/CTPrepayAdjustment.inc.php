@@ -61,7 +61,7 @@ class CTPrepayAdjustment extends CTCNC
         */
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-            $formError = (!$this->dsCallActivity->populateFromArray($_REQUEST['callActivity']));
+            $formError = (!$this->dsCallActivity->populateFromArray($this->getParam('callActivity')));
 
             if ($this->dsCallActivity->getValue(DBEJCallActivity::customerID) == 0) {
                 $this->dsCallActivity->setMessage(DBEJCallActivity::customerID, 'Please select a customer');

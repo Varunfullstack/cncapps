@@ -45,7 +45,7 @@ class CTExpenseType extends CTCNC
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTEXPENSETYPE_ACT_EDIT:
             case CTEXPENSETYPE_ACT_CREATE:
                 $this->edit();
@@ -131,9 +131,9 @@ class CTExpenseType extends CTCNC
         $dsExpenseType = &$this->dsExpenseType; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CTEXPENSETYPE_ACT_EDIT) {
-                $this->buExpenseType->getExpenseTypeByID($_REQUEST['expenseTypeID'], $dsExpenseType);
-                $expenseTypeID = $_REQUEST['expenseTypeID'];
+            if ($this->getAction() == CTEXPENSETYPE_ACT_EDIT) {
+                $this->buExpenseType->getExpenseTypeByID($this->getParam('expenseTypeID'), $dsExpenseType);
+                $expenseTypeID = $this->getParam('expenseTypeID');
             } else {                                                                    // creating new
                 $dsExpenseType->initialise();
                 $dsExpenseType->setValue(DBEExpenseType::expenseTypeID, null);
@@ -146,8 +146,8 @@ class CTExpenseType extends CTCNC
         }
         $urlDelete = null;
         $txtDelete = null;
-        if ($_REQUEST['action'] == CTEXPENSETYPE_ACT_EDIT && $this->buExpenseType->canDeleteExpenseType(
-                $_REQUEST['expenseTypeID']
+        if ($this->getAction() == CTEXPENSETYPE_ACT_EDIT && $this->buExpenseType->canDeleteExpenseType(
+                $this->getParam('expenseTypeID')
             )) {
             $urlDelete = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
@@ -206,13 +206,13 @@ class CTExpenseType extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        print_r($_REQUEST['expenseType']);
-        $this->formError = (!$this->dsExpenseType->populateFromArray($_REQUEST['expenseType']));
+        print_r($this->getParam('expenseType'));
+        $this->formError = (!$this->dsExpenseType->populateFromArray($this->getParam('expenseType')));
         if ($this->formError) {
             if (!$this->dsExpenseType->getValue(DBEExpenseType::expenseTypeID)) {
-                $_REQUEST['action'] = CTEXPENSETYPE_ACT_EDIT;
+                $this->setAction(CTEXPENSETYPE_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTEXPENSETYPE_ACT_CREATE;
+                $this->setAction(CTEXPENSETYPE_ACT_CREATE);
             }
             $this->edit();
             exit;
@@ -241,7 +241,7 @@ class CTExpenseType extends CTCNC
     function delete()
     {
         $this->setMethodName('delete');
-        if (!$this->buExpenseType->deleteExpenseType($_REQUEST['expenseTypeID'])) {
+        if (!$this->buExpenseType->deleteExpenseType($this->getParam('expenseTypeID'))) {
             $this->displayFatalError('Cannot delete this expense type');
             exit;
         } else {

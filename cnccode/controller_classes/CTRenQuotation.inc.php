@@ -95,7 +95,7 @@ class CTRenQuotation extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'edit':
             case 'create':
                 $this->edit();
@@ -127,7 +127,7 @@ class CTRenQuotation extends CTCNC
             array('RenQuotationList' => 'RenQuotationList.inc')
         );
 
-        if (!isset($_REQUEST['orderBy'])) {
+        if (!$this->getParam('orderBy')) {
             header(
                 'Location: ' . Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -142,7 +142,7 @@ class CTRenQuotation extends CTCNC
         $dsRenQuotation = new DataSet($this);
         $this->buRenQuotation->getAll(
             $dsRenQuotation,
-            $_REQUEST['orderBy']
+            $this->getParam('orderBy')
         );
 
         if ($dsRenQuotation->rowCount()) {
@@ -260,8 +260,8 @@ class CTRenQuotation extends CTCNC
         $buSalesOrder = new BUSalesOrder($this);
         $dsOrdline = new DataSet($this);
         $buSalesOrder->getOrdlineByIDSeqNo(
-            $_REQUEST['ordheadID'],
-            $_REQUEST['sequenceNo'],
+            $this->getParam('ordheadID'),
+            $this->getParam('sequenceNo'),
             $dsOrdline
         );
 
@@ -271,7 +271,7 @@ class CTRenQuotation extends CTCNC
             // create a new record first
             $dsOrdhead = new DataSet($this);
             $buSalesOrder->getOrderByOrdheadID(
-                $_REQUEST['ordheadID'],
+                $this->getParam('ordheadID'),
                 $dsOrdhead,
                 $dsDontNeedOrdline
             );
@@ -331,12 +331,12 @@ class CTRenQuotation extends CTCNC
         $dsRenQuotation = &$this->dsRenQuotation; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == 'edit') {
+            if ($this->getAction() == 'edit') {
                 $this->buRenQuotation->getRenQuotationByID(
-                    $_REQUEST['ID'],
+                    $this->getParam('ID'),
                     $dsRenQuotation
                 );
-                $customerItemID = $_REQUEST['ID'];
+                $customerItemID = $this->getParam('ID');
             } else {                                                                    // creating new
                 $dsRenQuotation->initialise();
                 $dsRenQuotation->setValue(
@@ -356,7 +356,7 @@ class CTRenQuotation extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'update',
-                    'ordheadID'      => $_REQUEST['ordheadID'],
+                    'ordheadID'      => $this->getParam('ordheadID'),
                     'customerItemID' => $customerItemID
                 )
             );
@@ -526,16 +526,16 @@ class CTRenQuotation extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsRenQuotation->populateFromArray($_REQUEST['renQuotation']));
+        $this->formError = (!$this->dsRenQuotation->populateFromArray($this->getParam('renQuotation')));
 
         if ($this->formError) {
 
             if ($this->dsRenQuotation->getValue(
                 DBEJRenQuotation::customerItemID
             )) {                    // attempt to insert
-                $_REQUEST['action'] = 'edit';
+                $this->setAction('edit');
             } else {
-                $_REQUEST['action'] = 'create';
+                $this->setAction('create');
             }
             $this->edit();
             exit;
@@ -543,14 +543,14 @@ class CTRenQuotation extends CTCNC
 
         $this->buRenQuotation->updateRenQuotation($this->dsRenQuotation);
 
-        if ($_REQUEST['ordheadID'] == 1) {        // see whether more renewals need to be edited for this
+        if ($this->getParam('ordheadID') == 1) {        // see whether more renewals need to be edited for this
             // despatch
             $urlNext =
                 Controller::buildLink(
                     'Despatch',
                     array(
                         'action' => 'inputRenewals',
-                        'ID'     => $_REQUEST['ordheadID']
+                        'ID'     => $this->getParam('ordheadID')
                     )
                 );
 

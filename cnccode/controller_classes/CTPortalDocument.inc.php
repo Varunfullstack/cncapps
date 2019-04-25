@@ -45,7 +45,7 @@ class CTPortalDocument extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTPORTALDOCUMENT_ACT_EDIT:
             case CTPORTALDOCUMENT_ACT_ADD:
                 $this->edit();
@@ -75,9 +75,9 @@ class CTPortalDocument extends CTCNC
         $dsPortalDocument = &$this->dsPortalDocument; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CTPORTALDOCUMENT_ACT_EDIT) {
-                $this->buPortalDocument->getDocumentByID($_REQUEST['portalDocumentID'], $dsPortalDocument);
-                $portalDocumentID = $_REQUEST['portalDocumentID'];
+            if ($this->getAction() == CTPORTALDOCUMENT_ACT_EDIT) {
+                $this->buPortalDocument->getDocumentByID($this->getParam('portalDocumentID'), $dsPortalDocument);
+                $portalDocumentID = $this->getParam('portalDocumentID');
             } else {                                                                    // creating new
                 $dsPortalDocument->initialise();
                 $dsPortalDocument->setValue(DBEPortalDocument::portalDocumentID, null);
@@ -90,7 +90,7 @@ class CTPortalDocument extends CTCNC
         }
         $urlDelete = null;
         $txtDelete = null;
-        if ($_REQUEST['action'] == CTPORTALDOCUMENT_ACT_EDIT) {
+        if ($this->getAction() == CTPORTALDOCUMENT_ACT_EDIT) {
             $urlDelete =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -158,7 +158,7 @@ class CTPortalDocument extends CTCNC
         $this->setMethodName('viewFile');
         $dsPortalDocument = new DataSet($this);
         $this->buPortalDocument->getDocumentByID(
-            $_REQUEST['portalDocumentID'],
+            $this->getParam('portalDocumentID'),
             $dsPortalDocument
         );
 
@@ -179,7 +179,7 @@ class CTPortalDocument extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsPortalDocument->populateFromArray($_REQUEST['portalDocument']));
+        $this->formError = (!$this->dsPortalDocument->populateFromArray($this->getParam('portalDocument')));
         /*
         Need a file when creating new
         */
@@ -196,9 +196,9 @@ class CTPortalDocument extends CTCNC
 
         if ($this->formError) {
             if (!$this->dsPortalDocument->getValue(DBEPortalDocument::portalDocumentID)) {
-                $_REQUEST['action'] = CTPORTALDOCUMENT_ACT_EDIT;
+                $this->setAction(CTPORTALDOCUMENT_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTPORTALDOCUMENT_ACT_ADD;
+                $this->setAction(CTPORTALDOCUMENT_ACT_ADD);
             }
             $this->edit();
             exit;
@@ -225,9 +225,9 @@ class CTPortalDocument extends CTCNC
     {
         $this->setMethodName('delete');
 
-        $this->buPortalDocument->getDocumentByID($_REQUEST['portalDocumentID'], $dsPortalDocument);
+        $this->buPortalDocument->getDocumentByID($this->getParam('portalDocumentID'), $dsPortalDocument);
 
-        if (!$this->buPortalDocument->deleteDocument($_REQUEST['portalDocumentID'])) {
+        if (!$this->buPortalDocument->deleteDocument($this->getParam('portalDocumentID'))) {
             $this->displayFatalError('Cannot delete this document');
             exit;
         } else {

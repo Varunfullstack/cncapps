@@ -39,7 +39,7 @@ class CTPrepay extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             case 'exportGenerate':
                 $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
@@ -63,14 +63,14 @@ class CTPrepay extends CTCNC
         $this->setMethodName('exportGenerate');
         $this->buPrepay->initialiseExportDataset($this->dsPrepayExport);
         $dsResults = null;
-        if (!$this->dsPrepayExport->populateFromArray($_REQUEST['export'])) {
+        if (!$this->dsPrepayExport->populateFromArray($this->getParam('export'))) {
             $this->setFormErrorOn();
         } else {
             // do export
             $dsResults =
                 $this->buPrepay->exportPrepayActivities(
                     $this->dsPrepayExport,
-                    $_REQUEST['update']
+                    $this->getParam('update')
                 );
         }
         $this->exportForm($dsResults);

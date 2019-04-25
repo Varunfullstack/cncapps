@@ -65,7 +65,7 @@ class CTSTANDARDTEXT extends CTCNC
     function defaultAction()
     {
 
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTSTANDARDTEXT_ACT_EDIT:
             case CTSTANDARDTEXT_ACT_CREATE:
                 $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
@@ -205,12 +205,12 @@ class CTSTANDARDTEXT extends CTCNC
         $dsStandardText = &$this->dsStandardText; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CTSTANDARDTEXT_ACT_EDIT) {
+            if ($this->getAction() == CTSTANDARDTEXT_ACT_EDIT) {
                 $this->buStandardText->getStandardTextByID(
-                    $_REQUEST['stt_standardtextno'],
+                    $this->getParam('stt_standardtextno'),
                     $dsStandardText
                 );
-                $stt_standardtextno = $_REQUEST['stt_standardtextno'];
+                $stt_standardtextno = $this->getParam('stt_standardtextno');
             } else {                                                                    // creating new
                 $dsStandardText->initialise();
                 $dsStandardText->setValue(
@@ -227,7 +227,7 @@ class CTSTANDARDTEXT extends CTCNC
         $urlDelete = null;
         $txtDelete = null;
 
-        if ($_REQUEST['action'] == CTSTANDARDTEXT_ACT_EDIT) {
+        if ($this->getAction() == CTSTANDARDTEXT_ACT_EDIT) {
             $urlDelete =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -337,15 +337,15 @@ class CTSTANDARDTEXT extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsStandardText->populateFromArray($_REQUEST['standardText']));
+        $this->formError = (!$this->dsStandardText->populateFromArray($this->getParam('standardText')));
 
         if ($this->formError) {
             if (!$this->dsStandardText->getValue(
                 DBEStandardText::stt_standardtextno
             )) {                    // attempt to insert
-                $_REQUEST['action'] = CTSTANDARDTEXT_ACT_EDIT;
+                $this->setAction(CTSTANDARDTEXT_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTSTANDARDTEXT_ACT_CREATE;
+                $this->setAction(CTSTANDARDTEXT_ACT_CREATE);
             }
             $this->edit();
             exit;
@@ -374,7 +374,7 @@ class CTSTANDARDTEXT extends CTCNC
     function delete()
     {
         $this->setMethodName('delete');
-        if (!$this->buStandardText->deleteStandardText($_REQUEST['stt_standardtextno'])) {
+        if (!$this->buStandardText->deleteStandardText($this->getParam('stt_standardtextno'))) {
             $this->displayFatalError('Cannot delete this row');
             exit;
         } else {

@@ -54,7 +54,7 @@ class CTContractAnalysisReport extends CTCNC
     function defaultAction()
     {
 
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'email':
                 $this->email();
                 break;
@@ -91,7 +91,7 @@ class CTContractAnalysisReport extends CTCNC
 
                 $results = $this->buContractAnalysisReport->getResults($dsSearchForm);
 
-                if ($results && $_REQUEST['Search'] == 'Generate CSV') {
+                if ($results && $this->getParam('Search') == 'Generate CSV') {
 
                     $template = new Template (
                         $cfg["path_templates"],
@@ -217,9 +217,9 @@ class CTContractAnalysisReport extends CTCNC
             $profit[$key] = $row['profit'];
         }
 
-        if (isset($_REQUEST['orderBy'])) {
+        if ($this->getParam('orderBy')) {
             array_multisort(
-                $$_REQUEST['orderBy'],
+                $$this->getParam('orderBy'),
                 SORT_ASC,
                 $results
             );

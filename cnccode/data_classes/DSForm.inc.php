@@ -45,20 +45,21 @@ class DSForm extends DataSet
         }
     }
 
-    /*
-    * @desc Get a form error message for a column
-    * @access public
-    * @return string $message
-    * @param variant $ixPassedColumn Column for which to set message
-    */
+    /**
+     * @param $ixPassedColumn
+     * @return mixed|void|null
+     */
     function getMessage($ixPassedColumn)
     {
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
+            if (!count($this->message) || $ixColumn > count($this->message) - 1) {
+                return null;
+            }
             return ($this->message[$ixColumn]);
-        } else {
-            $this->raiseError("getMessage(): Column " . $ixPassedColumn . " out of range");
         }
+        $this->raiseError("getMessage(): Column " . $ixPassedColumn . " out of range");
+        return null;
     }
 }
 

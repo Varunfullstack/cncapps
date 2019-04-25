@@ -62,7 +62,7 @@ class CTCustomerAnalysisReport extends CTCNC
 
                 $results = $this->buCustomerAnalysisReport->getResults($dsSearchForm);
 
-                if ($_REQUEST['Search'] == 'Generate CSV') {
+                if ($this->getParam('Search') == 'Generate CSV') {
 
                     $template = new Template ($cfg["path_templates"], "remove");
 
@@ -100,7 +100,7 @@ class CTCustomerAnalysisReport extends CTCNC
                     $grandTotalLabour = 0;
                     $grandTotalLabourHours = 0;
 
-                    if (isset($_REQUEST['orderBy'])) {
+                    if ($this->getParam('orderBy')) {
                         $columns = [
                             "sales"         => [],
                             "cost"          => [],
@@ -117,7 +117,7 @@ class CTCustomerAnalysisReport extends CTCNC
                             $columns['profitPercent'][$key] = $row['profitPercent'];
                             $columns['profit'][$key] = $row['profit'];
                         }
-                        array_multisort($columns[$_REQUEST['orderBy']], SORT_ASC, $results);
+                        array_multisort($columns[$this->getParam('orderBy')], SORT_ASC, $results);
                     }
 
                     $this->template->set_block('CustomerAnalysisReport', 'contractsBlock', 'contracts');

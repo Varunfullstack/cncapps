@@ -93,7 +93,7 @@ class CTExpense extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTCNC_ACT_VIEW:
                 $this->displayExpenses();
                 break;
@@ -134,10 +134,10 @@ class CTExpense extends CTCNC
     function createExpense()
     {
         $this->setMethodName('createExpense');
-        if (!$_REQUEST['callActivityID']) {
+        if (!$this->getParam('callActivityID')) {
             throw new Exception('Call activity ID not provided');
         }
-        $expenseID = $this->buExpense->createExpenseFromCallActivityID($_REQUEST['callActivityID']);
+        $expenseID = $this->buExpense->createExpenseFromCallActivityID($this->getParam('callActivityID'));
 
         $urlNext =
             Controller::buildLink(
@@ -158,7 +158,7 @@ class CTExpense extends CTCNC
     function displayExpenses()
     {
         $this->setMethodName('displayExpenses');
-        if (!$_REQUEST['callActivityID']) {
+        if (!$this->getParam('callActivityID')) {
             $this->displayFatalError('no callActivityID passed');
             exit;
         }
@@ -171,7 +171,7 @@ class CTExpense extends CTCNC
         $buActivity = new BUActivity($this);
         $dsCallActivity = new DataSet($this);
         $buActivity->getActivityByID(
-            $_REQUEST['callActivityID'],
+            $this->getParam('callActivityID'),
             $dsCallActivity
         );
 
@@ -180,7 +180,7 @@ class CTExpense extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => CTEXPENSE_ACT_CREATE_EXPENSE,
-                    'callActivityID' => $_REQUEST['callActivityID']
+                    'callActivityID' => $this->getParam('callActivityID')
                 )
             );
 
@@ -218,7 +218,7 @@ class CTExpense extends CTCNC
         );
         $dsExpense = new DataSet($this);
         $this->buExpense->getExpensesByCallActivityID(
-            $_REQUEST['callActivityID'],
+            $this->getParam('callActivityID'),
             $dsExpense
         );
         if ($dsExpense->rowCount() > 0) {
@@ -252,7 +252,7 @@ class CTExpense extends CTCNC
                 $this->template->set_var(
                     array(
                         'expenseID'      => $expenseID,
-                        'callActivityID' => $_REQUEST['callActivityID'],
+                        'callActivityID' => $this->getParam('callActivityID'),
                         'expenseType'    => Controller::htmlDisplayText($dsExpense->getValue(DBEJExpense::expenseType)),
                         'mileage'        => Controller::htmlDisplayText($dsExpense->getValue(DBEJExpense::mileage)),
                         'value'          => Controller::formatNumber($dsExpense->getValue(DBEJExpense::value)),
@@ -296,10 +296,10 @@ class CTExpense extends CTCNC
         $dsExpense = &$this->dsExpense; // ref to class var
         if (!$this->getFormError()) {
             $this->buExpense->getExpenseByID(
-                $_REQUEST['expenseID'],
+                $this->getParam('expenseID'),
                 $dsExpense
             );
-            $expenseID = $_REQUEST['expenseID'];
+            $expenseID = $this->getParam('expenseID');
         } else {
             $expenseID = $dsExpense->getValue(DBEJExpense::expenseID);
         }
@@ -333,7 +333,7 @@ class CTExpense extends CTCNC
         );
         $this->template->set_var(
             array(
-                'expenseID'           => $_REQUEST['expenseID'],
+                'expenseID'           => $this->getParam('expenseID'),
                 'callActivityID'      => $dsExpense->getValue(DBEJExpense::callActivityID),
                 'date'                => Controller::dateYMDtoDMY($dsCallActivity->getValue(DBEJCallActivity::date)),
                 'activityType'        => Controller::htmlDisplayText(
@@ -400,7 +400,7 @@ class CTExpense extends CTCNC
     function updateExpense()
     {
         $this->setMethodName('updateExpense');
-        $this->formError = (!$this->dsExpense->populateFromArray($_REQUEST['expense']));
+        $this->formError = (!$this->dsExpense->populateFromArray($this->getParam('expense')));
 
 
         if ($this->formError) {
@@ -432,14 +432,14 @@ class CTExpense extends CTCNC
     {
         $this->setMethodName('deleteExpense');
         $this->buExpense->getExpenseByID(
-            $_REQUEST['expenseID'],
+            $this->getParam('expenseID'),
             $dsExpense
         );
-        if (!$this->buExpense->canDeleteExpense($_REQUEST['expenseID'])) {
+        if (!$this->buExpense->canDeleteExpense($this->getParam('expenseID'))) {
             $this->displayFatalError('Cannot delete expense - already exported');
             exit;
         } else {
-            $callActivityID = $this->buExpense->deleteExpense($_REQUEST['expenseID']);
+            $callActivityID = $this->buExpense->deleteExpense($this->getParam('expenseID'));
         }
         $urlNext =
             Controller::buildLink(
@@ -499,21 +499,21 @@ class CTExpense extends CTCNC
     {
         $this->setMethodName('exportExpenseGenerate');
         $this->buExpense->initialiseExportDataset($this->dsExpenseExport);
-        if (!$this->dsExpenseExport->populateFromArray($_REQUEST['expenseExport'])) {
+        if (!$this->dsExpenseExport->populateFromArray($this->getParam('expenseExport'))) {
             $this->setFormErrorOn();
             $this->exportExpenseForm(); //redisplay with errors
         } else {
             // do export
             $overtimeExported = $this->buExpense->exportEngineerOvertime(
                 $this->dsExpenseExport,
-                $_REQUEST['exportType']
+                $this->getParam('exportType')
             );
             $expensesExported = $this->buExpense->exportEngineerExpenses(
                 $this->dsExpenseExport,
-                $_REQUEST['exportType']
+                $this->getParam('exportType')
             );
 
-            if ($_REQUEST['exportType'] == 'Export') {
+            if ($this->getParam('exportType') == 'Export') {
 
                 if ($overtimeExported OR $expensesExported) {
                     $this->setFormErrorMessage('Export files created and emails sent');

@@ -115,7 +115,7 @@ class CTRenContract extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'edit':
             case 'create':
                 $this->edit();
@@ -154,7 +154,7 @@ class CTRenContract extends CTCNC
         $dsRenContract = new DataSet($this);
         $this->buRenContract->getAll(
             $dsRenContract,
-            $_REQUEST['orderBy']
+            $this->getParam('orderBy')
         );
 
         if ($dsRenContract->rowCount() > 0) {
@@ -231,8 +231,8 @@ class CTRenContract extends CTCNC
         $buSalesOrder = new BUSalesOrder($this);
         $dsOrdline = new DataSet($this);
         $buSalesOrder->getOrdlineByIDSeqNo(
-            $_REQUEST['ordheadID'],
-            $_REQUEST['sequenceNo'],
+            $this->getParam('ordheadID'),
+            $this->getParam('sequenceNo'),
             $dsOrdline
         );
 
@@ -243,7 +243,7 @@ class CTRenContract extends CTCNC
             // create a new record first
             $dsOrdhead = new DataSet($this);
             $buSalesOrder->getOrderByOrdheadID(
-                $_REQUEST['ordheadID'],
+                $this->getParam('ordheadID'),
                 $dsOrdhead,
                 $dsDontNeedOrdline
             );
@@ -303,12 +303,12 @@ class CTRenContract extends CTCNC
 
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == 'edit') {
+            if ($this->getAction() == 'edit') {
                 $this->buRenContract->getRenContractByID(
-                    $_REQUEST['ID'],
+                    $this->getParam('ID'),
                     $dsRenContract
                 );
-                $customerItemID = $_REQUEST['ID'];
+                $customerItemID = $this->getParam('ID');
             } else {                                                                    // creating new
                 $dsRenContract->initialise();
                 $dsRenContract->setValue(
@@ -328,7 +328,7 @@ class CTRenContract extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'update',
-                    'ordheadID'      => $_REQUEST['ordheadID'],
+                    'ordheadID'      => $this->getParam('ordheadID'),
                     'customerItemID' => $customerItemID
                 )
             );
@@ -730,12 +730,12 @@ class CTRenContract extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        $this->formError = (!$this->dsRenContract->populateFromArray($_REQUEST['renContract']));
+        $this->formError = (!$this->dsRenContract->populateFromArray($this->getParam('renContract')));
         if ($this->formError) {
             if ($this->dsRenContract->getValue(DBEJRenContract::customerItemID)) {
-                $_REQUEST['action'] = 'edit';
+                $this->setAction('edit');
             } else {
-                $_REQUEST['action'] = 'create';
+                $this->setAction('create');
             }
             $this->edit();
             exit;
@@ -743,14 +743,14 @@ class CTRenContract extends CTCNC
 
         $this->buRenContract->updateRenContract($this->dsRenContract);
 
-        if ($_REQUEST['ordheadID'] == 1) {        // see whether more renewals need to be edited for this
+        if ($this->getParam('ordheadID') == 1) {        // see whether more renewals need to be edited for this
             // despatch
             $urlNext =
                 Controller::buildLink(
                     'Despatch',
                     array(
                         'action' => 'inputRenewals',
-                        'ID'     => $_REQUEST['ordheadID']
+                        'ID'     => $this->getParam('ordheadID')
                     )
                 );
 
@@ -772,6 +772,7 @@ class CTRenContract extends CTCNC
     /**
      * This function creates quotes for the contract renewals that are due
      *
+     * @throws Exception
      */
     function createRenewalsSalesOrders()
     {

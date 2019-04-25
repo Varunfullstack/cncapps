@@ -59,11 +59,11 @@ class CTHome extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'lastWeekHelpDesk':
                 $team = 1;
-                if (isset($_REQUEST['team'])) {
-                    $team = $_REQUEST['team'];
+                if ($this->getParam('team')) {
+                    $team = $this->getParam('team');
                 }
                 echo json_encode(
                     $this->showLastWeekHelpDeskData(
@@ -76,18 +76,18 @@ class CTHome extends CTCNC
             case self::GetDetailedChartsDataAction:
                 echo json_encode(
                     $this->getDetailedChartsData(
-                        $_REQUEST['engineerID'],
-                        $_REQUEST['startDate'],
-                        $_REQUEST['endDate']
+                        $this->getParam('engineerID'),
+                        $this->getParam('startDate'),
+                        $this->getParam('endDate')
                     ),
                     JSON_NUMERIC_CHECK
                 );
                 break;
             case self::DetailedChartsAction:
                 $this->showDetailCharts(
-                    $_REQUEST['engineerID'],
-                    $_REQUEST['startDate'],
-                    $_REQUEST['endDate']
+                    $this->getParam('engineerID'),
+                    $this->getParam('startDate'),
+                    $this->getParam('endDate')
                 );
                 break;
 

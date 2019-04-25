@@ -90,7 +90,7 @@ class CTBookSalesVisit extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             case self::ACTION_BOOK_SALES_VISIT:
                 $this->bookSalesVisit();
@@ -110,8 +110,8 @@ class CTBookSalesVisit extends CTCNC
         $urlCustomerPopup = null;
         $dsSearchForm = &$this->dsSearchForm; // ref to global
         $bookedActivity = null;
-        if (isset($_REQUEST['booked'])) {
-            $bookedActivity = $_REQUEST['booked'];
+        if ($this->getParam('booked')) {
+            $bookedActivity = $this->getParam('booked');
         }
 
         if (!$this->hasPermissions(PHPLIB_PERM_CUSTOMER)) {
@@ -282,11 +282,11 @@ class CTBookSalesVisit extends CTCNC
     private function bookSalesVisit()
     {
 
-        if ($_REQUEST['form'][0]['attendees']) {
-            $_REQUEST['form'][0]['attendees'] = json_encode($_REQUEST['form'][0]['attendees']);
+        if ($this->getParam('form')[0]['attendees']) {
+            $this->getParam('form')[0]['attendees'] = json_encode($this->getParam('form')[0]['attendees']);
         }
 
-        if (!$this->dsSearchForm->populateFromArray($_REQUEST['form'])) {
+        if (!$this->dsSearchForm->populateFromArray($this->getParam('form'))) {
             $this->formError = true;
             return $this->showForm();
         }
@@ -552,7 +552,7 @@ class CTBookSalesVisit extends CTCNC
         }
 
         $this->dsSearchForm->clear();
-        $_REQUEST['booked'] = $firstActivityCreated;
+        $this->setParam('booked', $firstActivityCreated);
         return $this->showForm();
     }
 }

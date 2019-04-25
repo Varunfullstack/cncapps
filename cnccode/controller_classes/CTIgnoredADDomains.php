@@ -14,6 +14,7 @@ require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 class CTIgnoredADDomains extends CTCNC
 {
     var $buActivity;
+    public $dsIgnoredADDomains;
 
     function __construct($requestMethod,
                          $postVars,
@@ -40,19 +41,21 @@ class CTIgnoredADDomains extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'delete':
-                if (!isset($_REQUEST['id'])) {
+                if (!$this->getParam('id')) {
                     http_response_code(400);
                     throw new Exception('ID is missing');
                 }
 
                 $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
 
-                $DBEIgnoredADDomain->getRow($_REQUEST['id']);
+                $DBEIgnoredADDomain->getRow($this->getParam('id'));
 
                 if (!$DBEIgnoredADDomain->rowCount) {
                     http_response_code(404);
@@ -64,13 +67,13 @@ class CTIgnoredADDomains extends CTCNC
                 break;
             case 'update':
 
-                if (!isset($_REQUEST['id'])) {
+                if (!$this->getParam('id')) {
                     throw new Exception('ID is missing');
                 }
 
                 $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
 
-                $DBEIgnoredADDomain->getRow($_REQUEST['id']);
+                $DBEIgnoredADDomain->getRow($this->getParam('id'));
 
                 if (!$DBEIgnoredADDomain->rowCount) {
                     http_response_code(404);
@@ -79,11 +82,11 @@ class CTIgnoredADDomains extends CTCNC
 
                 $DBEIgnoredADDomain->setValue(
                     DBEIgnoredADDomain::domain,
-                    $_REQUEST['domain']
+                    $this->getParam('domain')
                 );
                 $DBEIgnoredADDomain->setValue(
                     DBEIgnoredADDomain::customerID,
-                    $_REQUEST['customerID']
+                    $this->getParam('customerID')
                 );
 
                 $DBEIgnoredADDomain->updateRow();
@@ -94,11 +97,11 @@ class CTIgnoredADDomains extends CTCNC
 
                 $DBEIgnoredADDomain->setValue(
                     DBEIgnoredADDomain::domain,
-                    $_REQUEST['domain']
+                    $this->getParam('domain')
                 );
                 $DBEIgnoredADDomain->setValue(
                     DBEIgnoredADDomain::customerID,
-                    $_REQUEST['customerID']
+                    $this->getParam('customerID')
                 );
 
                 $DBEIgnoredADDomain->insertRow();
@@ -155,6 +158,11 @@ class CTIgnoredADDomains extends CTCNC
     /**
      * Export expenses that have not previously been exported
      * @access private
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     function displayForm()
     {
@@ -209,25 +217,6 @@ class CTIgnoredADDomains extends CTCNC
         $this->parsePage();
     }
 
-    function resolveCalls()
-    {
-        $this->setMethodName('exportExpenseGenerate');
-        $this->buActivity->initialiseResolveForm($this->dsIgnoredADDomains);
-        if (!$this->dsIgnoredADDomains->populateFromArray($_REQUEST['IgnoredADDomains'])) {
-            $this->setFormErrorOn();
-            $this->displayForm(); //redisplay with errors
-        } else {
-            // do the resolving
-            $filePath = $this->buActivity->resolveCalls($this->dsIgnoredADDomains);
-            if ($filePath) {
-                $this->setFormErrorMessage('Calls resolved and logged to ' . $filePath);
-            } else {
-                $this->setFormErrorMessage('No calls to resolve');
-            }
-            $this->displayForm();
-        }
-    }
-
     function parsePage()
     {
         $urlLogo = '';
@@ -240,4 +229,3 @@ class CTIgnoredADDomains extends CTCNC
         parent::parsePage();
     }
 }// end of class
-?>
