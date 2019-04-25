@@ -996,6 +996,23 @@
     }
 
     function checkMailShotOptions() {
+        const emails = {};
+
+        const inputs = $(".contacts input[type='email']");
+        for (let i = 0; i < inputs.length; i++) {
+            if (inputs[i].value) {
+                const email = inputs[i].value;
+
+                if (emails[email]) {
+                    alert('Please review form errors, fix them before submitting');
+                    return false;
+                }
+
+                emails[email] = true;
+            }
+
+        }
+
         var x = document.getElementsByClassName('stmCheckBox');
 
         console.log(x);
