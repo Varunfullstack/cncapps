@@ -6,13 +6,12 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 $thing = null;
 $buServiceDeskReport = new BUServiceDeskReport($thing);
 
-if ($_REQUEST['period']) {
+$period = date(
+    'Y-m',
+    strtotime('last month')
+);
+if (isset($_REQUEST['period'])) {
     $period = $_REQUEST['period'];
-} else {
-    $period = date(
-        'Y-m',
-        strtotime('last month')
-    );
 }
 $buServiceDeskReport->setPeriod($period);
 
