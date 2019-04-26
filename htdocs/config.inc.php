@@ -25,14 +25,7 @@ so we don't waste time!
 */
 /*
 if (get_magic_quotes_gpc()) {
-   function stripslashes_deep($value)
-   {
-       $value = is_array($value) ?
-                   array_map('stripslashes_deep', $value) :
-                   stripslashes($value);
 
-       return $value;
-   }
    $_POST 		=	array_map('stripslashes_deep', $_POST);
    $_GET 			= array_map('stripslashes_deep', $_GET);
    $_REQUEST	= array_map('stripslashes_deep', $_REQUEST);
@@ -42,6 +35,15 @@ if (get_magic_quotes_gpc()) {
 /*
 End Strip all slashes from request variables (includes cookies)
 */
+
+function stripslashes_deep($value)
+{
+    $value = is_array($value) ?
+        array_map('stripslashes_deep', $value) :
+        stripslashes($value);
+
+    return $value;
+}
 set_time_limit(30 * 60);
 // if magic_quotes_gpc is set then strip all backslashes from GPC arrays first
 // absolute path to root application directory

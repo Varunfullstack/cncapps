@@ -96,6 +96,7 @@ class BUServiceDeskReport extends Business
         $parameters
     )
     {
+        $whereString = null;
         if (isset($parameters['contractKey']) && $parameters['contractKey']) {
             if ($parameters['contractKey'] != 'TM') {
                 $whereString =
@@ -613,9 +614,9 @@ class BUServiceDeskReport extends Business
             $template->set_var(
                 array(
                     'teamMemberName'     => $key,
-                    'teamMemberResolved' => $value['resolved'],
-                    'teamMemberRejected' => $value['rejected'],
-                    'teamMemberHours'    => $value['hours']
+                    'teamMemberResolved' => isset($value['resolved']) ? $value['resolved'] : null,
+                    'teamMemberRejected' => isset($value['rejected']) ? $value['rejected'] : null,
+                    'teamMemberHours'    => isset($value['hours']) ? $value['hours'] : null
                 )
             );
 
