@@ -659,7 +659,7 @@ class BURenQuotation extends Business
                 $dbeRenQuotationUpdate->getRow();
                 $dbeRenQuotationUpdate->setValue(
                     DBECustomerItem::dateGenerated,
-                    date(CONFIG_MYSQL_DATE)
+                    date(DATE_MYSQL_DATE)
                 );
                 $dbeRenQuotationUpdate->updateRow();
 

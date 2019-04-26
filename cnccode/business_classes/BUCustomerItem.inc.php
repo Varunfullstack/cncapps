@@ -323,7 +323,7 @@ class BUCustomerItem extends Business
             );
             $dsCustomerItem->setValue(
                 DBECustomerItem::secondsiteSuspendedDate,
-                date(CONFIG_MYSQL_DATE)
+                date(DATE_MYSQL_DATE)
             );
         } else {
             $dsCustomerItem->setValue(
@@ -352,7 +352,7 @@ class BUCustomerItem extends Business
             );
             $dsCustomerItem->setValue(
                 DBECustomerItem::secondsiteImageDelayDate,
-                date(CONFIG_MYSQL_DATE)
+                date(DATE_MYSQL_DATE)
             );
         } else {
             $dsCustomerItem->setValue(
@@ -508,7 +508,7 @@ class BUCustomerItem extends Business
 
             if (
                 $dbeJCustomerItem->getValue(DBEJCustomerItem::servercareFlag) == 'Y' AND
-                $dbeJCustomerItem->getValue(DBEJCustomerItem::expiryDate) >= date(CONFIG_MYSQL_DATE)
+                $dbeJCustomerItem->getValue(DBEJCustomerItem::expiryDate) >= date(DATE_MYSQL_DATE)
             ) {
                 $hasContract = true;
             }
@@ -529,7 +529,7 @@ class BUCustomerItem extends Business
 
             if (
                 $dbeJCustomerItem->getValue(DBEJCustomerItem::servercareFlag) == 'Y' AND
-                $dbeJCustomerItem->getValue(DBEJCustomerItem::expiryDate) >= date(CONFIG_MYSQL_DATE)
+                $dbeJCustomerItem->getValue(DBEJCustomerItem::expiryDate) >= date(DATE_MYSQL_DATE)
             ) {
                 return $dbeJCustomerItem->getValue(DBEJCustomerItem::customerItemID);
             }

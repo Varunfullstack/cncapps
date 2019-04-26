@@ -82,15 +82,12 @@ class CTStockLevel extends CTCNC
         $this->setPageTitle('Stock Levels');
 
         // save search text in a session var
-        if ($_POST['itemText']) {
-
-            $this->setSessionParam('itemText', $_POST['itemText']);
-
+        if ($this->getParam('itemText')) {
+            $this->setSessionParam('itemText', $this->getParam('itemText'));
         }
 
-        if($this->getSessionParam('itemText')) {
-
-            $this->BUItem->getItemsByNameMatch($_SESSION['itemText'], $this->dsItem);
+        if ($this->getSessionParam('itemText')) {
+            $this->BUItem->getItemsByNameMatch($this->getSessionParam('itemText'), $this->dsItem);
 
         }
 
@@ -108,7 +105,7 @@ class CTStockLevel extends CTCNC
             array(
                 'urlSearch' => $urlSearch,
                 'urlUpdate' => $urlUpdate,
-                'itemText'  => $_SESSION['itemText']
+                'itemText'  => $this->getSessionParam('itemText')
             )
         );
 

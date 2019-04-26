@@ -38,14 +38,7 @@ class CTLeadStatusReport extends CTCNC
      */
     function defaultAction()
     {
-
-        switch ($this->getAction()) {
-
-            default:
-                $this->displayReport();
-                break;
-        }
-
+        $this->displayReport();
     }
 
     /**
@@ -106,7 +99,7 @@ class CTLeadStatusReport extends CTCNC
         /*
         Hot leads
         */
-        $hotLeads = $this->buLeadStatus->getLeadsByStatus(1, $_SESSION['orderHotAlpha']);
+        $hotLeads = $this->buLeadStatus->getLeadsByStatus(1, $this->getSessionParam('orderHotAlpha'));
 
         $this->template->set_block('LeadStatusReport', 'hotBlock', 'hots');
 
@@ -137,7 +130,7 @@ class CTLeadStatusReport extends CTCNC
         /*
         Warm leads
         */
-        $warmLeads = $this->buLeadStatus->getLeadsByStatus(2, $_SESSION['orderWarmAlpha']);
+        $warmLeads = $this->buLeadStatus->getLeadsByStatus(2, $this->getSessionParam('orderWarmAlpha'));
 
         $this->template->set_block('LeadStatusReport', 'warmBlock', 'warms');
 
@@ -168,7 +161,7 @@ class CTLeadStatusReport extends CTCNC
         /*
         Cold leads
         */
-        $coldLeads = $this->buLeadStatus->getLeadsByStatus(3, $_SESSION['orderColdAlpha']);
+        $coldLeads = $this->buLeadStatus->getLeadsByStatus(3, $this->getSessionParam('orderColdAlpha'));
 
         $this->template->set_block('LeadStatusReport', 'coldBlock', 'colds');
 
@@ -201,7 +194,7 @@ class CTLeadStatusReport extends CTCNC
         /*
         Dead leads
         */
-        $deadLeads = $this->buLeadStatus->getLeadsByStatus(4, $_SESSION['orderDeadAlpha']);
+        $deadLeads = $this->buLeadStatus->getLeadsByStatus(4, $this->getSessionParam('orderDeadAlpha'));
 
         $this->template->set_block('LeadStatusReport', 'deadBlock', 'deads');
 

@@ -45,24 +45,4 @@ class BUHeader extends Business
         $this->updateDataAccessObject($dsData, $this->dbeHeader);
         return TRUE;
     }
-
-    function updateHelpDesk($data)
-    {
-
-        $this->setMethodName('updateHelpDesk');
-        $this->dbeHeader->getRow(1);
-        $this->dbeHeader->setValue(DBEJHeader::helpDeskProblems, $data['helpDeskProblems']);
-        $this->dbeHeader->updateRow();
-        return TRUE;
-    }
-
-    function clearActivityProblemField()
-    {
-
-        $this->setMethodName('clearActivityProblemField');
-        $this->dbeHeader->getRow(1);
-        $this->dbeHeader->setValue(DBEJHeader::helpDeskProblems, null);
-        $this->dbeHeader->updateRow();
-        return TRUE;
-    }
 }

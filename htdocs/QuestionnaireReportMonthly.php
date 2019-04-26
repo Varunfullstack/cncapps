@@ -5,14 +5,10 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 $thing = null;
 $buQuestionnaireReport = new BUQuestionnaireReport($thing);
 
-if ($_REQUEST['period']) {
-    $period = $_REQUEST['period'];
-} else {
-    $period = date(
-        'Y-m',
-        strtotime('last month')
-    );
-}
+$period = isset($_REQUEST['period']) ? $_REQUEST['period'] : date(
+    'Y-m',
+    strtotime('last month')
+);
 $buQuestionnaireReport->setPeriod($period);
 $buQuestionnaireReport->setQuestionnaireID(1); // CNC support
 

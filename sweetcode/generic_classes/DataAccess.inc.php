@@ -762,11 +762,12 @@ class DataAccess extends BaseObject
         if (!$this->_colCount) return DA_OUT_OF_RANGE;
 
         if (is_numeric($ixColumn)) {
-            if ($ixColumn > (count($this->colNameInverse) - 1)) {
+            if (!key_exists($ixColumn, $this->colName)) {
                 return DA_OUT_OF_RANGE;
             }
             return $ixColumn;
         }
+
         if (!isset($this->colNameInverse[$ixColumn])) return DA_OUT_OF_RANGE;
         return $this->colNameInverse[$ixColumn];
     }
@@ -1221,12 +1222,12 @@ class DataAccess extends BaseObject
      */
     function getValueNoCheckByColumnNumber($ixColumnNumber)
     {
+        if (!count($this->row) || ($ixColumnNumber > (count($this->row) - 1)) || !isset($this->row[$ixColumnNumber])) {
+            return null;
+        }
         $type = $this->getTypeByColumnNumberNoCheck($ixColumnNumber);
         if ($type == DA_ID) {
             return (int)$this->row[$ixColumnNumber];
-        }
-        if (!count($this->row) || ($ixColumnNumber > (count($this->row) - 1)) || !isset($this->row[$ixColumnNumber])) {
-            return null;
         }
         return $this->row[$ixColumnNumber];
 
@@ -1452,7 +1453,7 @@ not a boolean, the given value is null, column given is not the PK, and there is
      * @param $data
      * @return boolean Success
      */
-    function copyColumnsFrom(&$data)
+    function copyColumnsFrom($data)
     {
         $this->setMethodName("copyColumnsFrom");
         if (!is_subclass_of(
@@ -1477,7 +1478,7 @@ not a boolean, the given value is null, column given is not the PK, and there is
      * @param DataAccess $data
      * @param integer $ixCol Column on source dataset to be added to this one
      */
-    function copyColumn(&$data,
+    function copyColumn($data,
                         $ixCol
     )
     {

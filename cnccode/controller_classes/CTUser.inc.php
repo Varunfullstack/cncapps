@@ -1049,7 +1049,7 @@ class CTUser extends CTCNC
             );
             $this->dsAbsence->setValue(
                 self::absenceFormStartDate,
-                date(CONFIG_MYSQL_DATE)
+                date(DATE_MYSQL_DATE)
             );
             $this->dsAbsence->setValue(
                 self::absenceFormDays,

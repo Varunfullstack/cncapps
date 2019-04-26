@@ -6,6 +6,13 @@
  * @authors Karim Ahmed - Sweet Code Limited
  *
  */
+
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use PhpOffice\PhpWord\Settings;
+use PhpOffice\PhpWord\TemplateProcessor;
+use setasign\FpdiProtection\FpdiProtection;
+
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_bu"] . "/BUCustomer.inc.php");
@@ -146,10 +153,9 @@ class BUCustomerReviewMeeting extends Business
                 'page',
                 'CustomerReviewMeeting.inc.ics'
             );
-
-            $mainSupportContacts = $dbeContact->getMainSupportRowsByCustomerID($customer['customerID']);
+            $dbeContact->getMainSupportRowsByCustomerID($customer['customerID']);
             if ($dbeContact->fetchNext()) {
-
+                $dsSite = new DataSet($this);
                 $buSite->getSiteByID(
                     $customer['customerID'],
                     $dbeContact->getValue(DBEContact::siteNo),
@@ -174,7 +180,9 @@ class BUCustomerReviewMeeting extends Business
                         'county'       => $dsSite->getValue(DBESite::county),
                         'postcode'     => $dsSite->getValue(DBESite::postcode),
                         'contactPhone' => $phone,
-                        'contactName'  => $dbeContact->getValue(DBEContact::firstName) . ' ' . $dbeContact->getValue(DBEContact::lastName)
+                        'contactName'  => $dbeContact->getValue(DBEContact::firstName) . ' ' . $dbeContact->getValue(
+                                DBEContact::lastName
+                            )
                     )
                 );
 
@@ -182,7 +190,6 @@ class BUCustomerReviewMeeting extends Business
 
             $template->set_var(
                 array(
-                    'dateYYYYMMDD' => $nextMeetingDateYmd,
                     'nowYYYYMMDD'  => date('Ymd'),
                     'nowHHMMSS'    => date('His'),
                     'customerName' => $customer['customerName']
@@ -293,6 +300,13 @@ class BUCustomerReviewMeeting extends Business
         );
     }
 
+    /**
+     * @param $customerID
+     * @param $htmlBody
+     * @param $meetingDate
+     * @return bool
+     * @throws Exception
+     */
     public function generateAgendaPdf($customerID,
                                       $htmlBody,
                                       $meetingDate
@@ -348,7 +362,7 @@ class BUCustomerReviewMeeting extends Business
             $htmlPage
         );
 
-        $meetingDate = new \DateTime($meetingDate);
+        $meetingDate = new DateTime($meetingDate);
 
         $meetingDateDmy = $meetingDate->format('d-m-Y');
         $path = $reviewMeetingFolderPath . '/Agenda ' . $meetingDateDmy;
@@ -365,9 +379,9 @@ class BUCustomerReviewMeeting extends Business
             $descriptors,
             $pipes
         );
-
+        $_error = null;
         if (is_resource($process)) {
-            $_stdOut = stream_get_contents($pipes[1]);
+            stream_get_contents($pipes[1]);
             $_stdErr = stream_get_contents($pipes[2]);
             fclose($pipes[1]);
             fclose($pipes[2]);
@@ -378,7 +392,6 @@ class BUCustomerReviewMeeting extends Business
             }
         }
         if ($_error) {
-//            unlink($tempFilePath);
             throw new Exception(json_encode($_error));
         } else {
             unlink($tempFilePath);
@@ -390,9 +403,11 @@ class BUCustomerReviewMeeting extends Business
      * Create a PDF file of customer profit figures and save to documentation
      * folder
      * @param $customerID
-     * @param $startDate
-     * @param $endDate
+     * @param DateTimeInterface $startDate
+     * @param DateTimeInterface $endDate
      * @param $meetingDate
+     * @return false|mixed|string|string[]|null
+     * @throws Exception
      */
     public function generateSalesPdf($customerID,
                                      DateTimeInterface $startDate,
@@ -401,7 +416,7 @@ class BUCustomerReviewMeeting extends Business
     )
     {
         $buCustomer = new BUCustomer($this);
-
+        $dsCustomer = new DataSet($this);
         $buCustomer->getCustomerByID(
             $customerID,
             $dsCustomer
@@ -422,7 +437,7 @@ class BUCustomerReviewMeeting extends Business
             'page',
             'CustomerReviewMeetingSalesDocument.inc.html'
         );
-
+        $dsSearchForm = new DSForm($this);
         $this->initialiseSearchForm($dsSearchForm);
 
         $dsSearchForm->setValue(
@@ -658,12 +673,12 @@ class BUCustomerReviewMeeting extends Business
 
         require_once BASE_DRIVE . '/vendor/autoload.php';
 
-        $options = new \Dompdf\Options();
+        $options = new Options();
         $options->set(
             'isRemoteEnabled',
             true
         );
-        $dompdf = new \Dompdf\Dompdf($options);
+        $dompdf = new Dompdf($options);
 
         $dompdf->setPaper(
             'A4',
@@ -713,7 +728,7 @@ class BUCustomerReviewMeeting extends Business
 
         $pdfString = $dompdf->output();
 
-        $meetingDate = new \DateTime($meetingDate);
+        $meetingDate = new DateTime($meetingDate);
 
         $meetingDateDmy = $meetingDate->format('d-m-Y');
 
@@ -739,6 +754,19 @@ class BUCustomerReviewMeeting extends Business
         return $htmlPage;
     }
 
+    /**
+     * @param $origFile
+     * @param $destFile
+     * @param null $owner_password
+     * @param null $user_password
+     * @param array $permissions
+     * @return mixed
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\Filter\FilterException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \setasign\Fpdi\PdfReader\PdfReaderException
+     */
     function pdfEncrypt($origFile,
                         $destFile,
                         $owner_password = null,
@@ -746,13 +774,13 @@ class BUCustomerReviewMeeting extends Business
                         $permissions = ['print']
     )
     {
-        $pdf = new \setasign\FpdiProtection\FpdiProtection();
+        $pdf = new FpdiProtection();
         $pagecount = $pdf->setSourceFile($origFile);
         // copy all pages from the old unprotected pdf in the new one
         for ($loop = 1; $loop <= $pagecount; $loop++) {
             $tplidx = $pdf->importPage($loop);
             $pdf->addPage();
-            $dim = $pdf->useTemplate($tplidx);
+            $pdf->useTemplate($tplidx);
         }
         // Allow for array('print', 'modify', 'copy', 'annot-forms');
         $pdf->SetProtection(
@@ -767,20 +795,27 @@ class BUCustomerReviewMeeting extends Business
         return $destFile;
     }
 
+    /**
+     * @param $customerID
+     * @param $meetingDate
+     * @throws \PhpOffice\PhpWord\Exception\CopyFileException
+     * @throws \PhpOffice\PhpWord\Exception\CreateTemporaryFileException
+     * @throws Exception
+     */
     public function generateMeetingNotes($customerID,
                                          $meetingDate
     )
     {
         $buCustomer = new BUCustomer($this);
-
+        $dsCustomer = new DataSet($this);
         $buCustomer->getCustomerByID(
             $customerID,
             $dsCustomer
         );
 
 
-        \PhpOffice\PhpWord\Settings::setOutputEscapingEnabled(true);
-        $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor(
+        Settings::setOutputEscapingEnabled(true);
+        $templateProcessor = new TemplateProcessor(
             PDF_RESOURCE_DIR . '/Client Meeting Notes Template.docx'
         );
 
@@ -814,7 +849,7 @@ class BUCustomerReviewMeeting extends Business
             self::templateClientName,
             $clientName
         );
-        $meetingDate = new \DateTime($meetingDate);
+        $meetingDate = new DateTime($meetingDate);
         $templateProcessor->setValue(
             self::templateReviewMeetingDate,
             $meetingDate->format('d/m/Y')
@@ -826,7 +861,7 @@ class BUCustomerReviewMeeting extends Business
         $docFile = $uniqueId . ".docx";
         $pdfFile = $uniqueId . '.pdf';
         $templateProcessor->saveAs($docFile);
-        $output = shell_exec(
+        shell_exec(
             '"c:\Program Files\LibreOffice\program\soffice.exe" --headless --convert-to pdf ' . $docFile
         );
 

@@ -333,6 +333,11 @@ class Controller extends BaseObject
         return $_SESSION[$paramName];
     }
 
+    function unsetSessionParam($paramName)
+    {
+        unset($_SESSION[$paramName]);
+    }
+
     function setSessionParam($paramName, $value)
     {
         $_SESSION[$paramName] = $value;
@@ -821,7 +826,7 @@ class Controller extends BaseObject
                 "methodName"   => $this->getMethodName(),
                 "trace"        => $this->generateCallTrace(),
                 "url"          => $_SERVER['PHP_SELF'],
-                "arguments"    => $_SERVER['argv']
+                "arguments"    => isset($_SERVER['argv']) ? $_SERVER['argv'] : null
             )
         );
         $this->template->parse(

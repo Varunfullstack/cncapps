@@ -1289,6 +1289,20 @@
             engine = InnoDB;     </sql>
         <rollback/>
     </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-147">
+        <dropNotNullConstraint columnName="createdUserID" tableName="portal_customer_document"
+                               columnDataType="int(11)"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-148">
+        <modifyDataType tableName="portal_customer_document" columnName="fileMimeType" newDataType="varchar(255)"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-149">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_helpdesk_problems"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_helpdesk_problems"/>
+        <rollback/>
+    </changeSet>
 
 
 </databaseChangeLog>

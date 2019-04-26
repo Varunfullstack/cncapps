@@ -68,18 +68,13 @@ class CTPrepayAdjustment extends CTCNC
                 $formError = true;
             } else {
                 $dbeCustomerItem = new DBECustomerItem($this);
-
                 if (!$dbeCustomerItem->getGSCRow($this->dsCallActivity->getValue(DBEJCallActivity::customerID))) {
-
                     $this->dsCallActivity->setMessage(DBEJCallActivity::customerID, 'Not a Prepay Customer');
                     $formError = true;
-
                 }
-
             }
 
             if (!$formError) {
-
                 $this->buActivity->createPrepayAdjustment(
                     $this->dsCallActivity->getValue(DBEJCallActivity::customerID),
                     $this->dsCallActivity->getValue(DBEJCallActivity::curValue),
@@ -92,9 +87,7 @@ class CTPrepayAdjustment extends CTCNC
                 );
                 header('Location: ' . $urlNext);
                 exit;
-
             }
-
         }
 
         $urlSubmit = Controller::buildLink(
@@ -119,7 +112,7 @@ class CTPrepayAdjustment extends CTCNC
                 'formError'         => $this->formError,
                 'customerID'        => $this->dsCallActivity->getValue(DBEJCallActivity::customerID),
                 'customerIDMessage' => $this->dsCallActivity->getMessage(DBEJCallActivity::customerID),
-                'customerName'      => $_POST['customerName'],
+                'customerName'      => $this->getParam('customerName'),
                 'urlCustomerPopup'  => $urlCustomerPopup,
                 'callActivityID'    => $this->dsCallActivity->getValue(DBEJCallActivity::callActivityID),
                 'date'              => Controller::dateYMDtoDMY(

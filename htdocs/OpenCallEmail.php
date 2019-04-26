@@ -7,12 +7,9 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+ini_set('max_execution_time', 50000);
 
 $thing = null;
-ini_set(
-    'zend.ze1_compatibility_mode',
-    0
-);
 require_once("config.inc.php");
 require_once("../cnccode/business_classes/BUMail.inc.php");
 
@@ -95,7 +92,7 @@ foreach ($engineers as $row) {
         ob_start();
     }
     ?>
-    <HTML>
+    <HTML lang="en">
     <P>
         Your following activities are open (no end time entered):
     </P>
@@ -219,7 +216,7 @@ foreach ($managers as $managerId => $manager) {
         ob_start();
     }
     ?>
-    <HTML>
+    <HTML lang="en">
     <style>
         table, th, td {
             border: 1px solid black;

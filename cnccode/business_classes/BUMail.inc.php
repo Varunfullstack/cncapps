@@ -9,10 +9,10 @@ require_once($cfg["path_gc"] . "/Business.inc.php");
 /*
  * PEAR Mail classes
  */
-require_once(__DIR__."/../../php/PEAR/Mail.php");
-require_once(__DIR__."/../../php/PEAR/Mail/smtp.php");
-require_once(__DIR__."/../../php/PEAR/Mail/mime.php");
-require_once(__DIR__."/../../php/PEAR/Mail/Queue.php");
+require_once(__DIR__ . "/../../php/PEAR/Mail.php");
+require_once(__DIR__ . "/../../php/PEAR/Mail/smtp.php");
+require_once(__DIR__ . "/../../php/PEAR/Mail/mime.php");
+require_once(__DIR__ . "/../../php/PEAR/Mail/Queue.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
 class BUMail extends Business
@@ -120,15 +120,13 @@ class BUMail extends Business
 
         }
 
-        if (!$userID && isset($GLOBALS ['auth'])) {
+        $userID = 0;
+        if (isset($GLOBALS ['auth'])) {
             $userID = ( string )$GLOBALS ['auth']->is_authenticated();
-        } else {
-            $userID = 0;
         }
-
         return
             array(
-                'userID' => $userID,
+                'userID'  => $userID,
                 'toEmail' => $toEmail,
                 'headers' => $headers
             );

@@ -289,7 +289,7 @@ class CTCurrentActivityReport extends CTCNC
      */
     function showMineOnly()
     {
-        unset($_SESSION['selectedUserID']);
+        $this->unsetSessionParam('selectedUserID');
 
         $this->setSessionParam('selectedUserID', $GLOBALS['auth']->is_authenticated());
 
@@ -339,9 +339,9 @@ class CTCurrentActivityReport extends CTCNC
     function resetFilter()
     {
 
-        unset($_SESSION['selectedUserID']);
-        unset($_SESSION['selectedCustomerID']);
-        unset($_SESSION['priorityFilter']);
+        $this->unsetSessionParam('selectedUserID');
+        $this->unsetSessionParam('selectedCustomerID');
+        $this->unsetSessionParam('priorityFilter');
 
         $urlNext =
             Controller::buildLink(
@@ -707,7 +707,7 @@ class CTCurrentActivityReport extends CTCNC
         foreach ($this->filterUser as $value) {
 
             $userSelected = null;
-            if ($value['userID'] == $_SESSION['selectedUserID']) {
+            if ($value['userID'] == $this->getSessionParam('selectedUserID')) {
                 $userSelected = 'SELECTED';
             }
 
@@ -737,7 +737,7 @@ class CTCurrentActivityReport extends CTCNC
         foreach ($this->buActivity->priorityArray as $key => $value) {
 
             $checked = null;
-            if (in_array($key, $_SESSION['priorityFilter'])
+            if (in_array($key, $this->getSessionParam('priorityFilter'))
             ) {
                 $checked = 'checked';
             }
@@ -888,21 +888,25 @@ class CTCurrentActivityReport extends CTCNC
             if (
             !in_array(
                 $serviceRequests->getValue(DBEJProblem::priority),
-                $_SESSION['priorityFilter']
+                $this->getSessionParam('priorityFilter')
             )
             ) {
                 continue;
             }
 
 
-            if ($_SESSION['selectedCustomerID'] && $_SESSION['selectedCustomerID'] != $serviceRequests->getValue(
+            if ($this->getSessionParam('selectedCustomerID') && $this->getSessionParam(
+                    'selectedCustomerID'
+                ) != $serviceRequests->getValue(
                     DBEJProblem::customerID
                 )) {
                 continue;
             }
 
             if (
-                ($_SESSION['selectedUserID'] && $_SESSION['selectedUserID'] != $serviceRequests->getValue(
+                ($this->getSessionParam('selectedUserID') && $this->getSessionParam(
+                        'selectedUserID'
+                    ) != $serviceRequests->getValue(
                         DBEJProblem::userID
                     )) AND
 
@@ -985,7 +989,7 @@ class CTCurrentActivityReport extends CTCNC
                 /*
                 Has an alarm date that is in the past, set updated BG Colour (indicates moved back into work queue from future queue)
                 */
-                if ($serviceRequests->getValue(DBEJProblem::alarmDate) <= date(CONFIG_MYSQL_DATE)) {
+                if ($serviceRequests->getValue(DBEJProblem::alarmDate) <= date(DATE_MYSQL_DATE)) {
                     $updatedBgColor = self::PURPLE;
                 }
 

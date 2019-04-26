@@ -105,13 +105,9 @@ class BUImportRequests extends Business
      * @return bool|mixed
      * @throws Exception
      */
-    protected function processMessage($record
-    )
+    protected function processMessage($record)
     {
-        return $this->buActivity->processAutomaticRequest(
-            $record,
-            $errorString
-        );
+        return $this->buActivity->processAutomaticRequest($record);
     }
 
     function sendFailureEmail($sender,

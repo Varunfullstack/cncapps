@@ -48,7 +48,7 @@ class CTMISReport extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST ['action']) {
+        switch ($this->getAction()) {
 
             case CTCNC_ACT_SEARCH :
                 $this->search();

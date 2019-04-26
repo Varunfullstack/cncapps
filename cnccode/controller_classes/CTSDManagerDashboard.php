@@ -328,7 +328,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 /*
                 Has an alarm date that is in the past, set updated BG Colour (indicates moved back into work queue from future queue)
                 */
-                if ($problems->getValue(DBEJProblem::alarmDate) <= date(CONFIG_MYSQL_DATE)) {
+                if ($problems->getValue(DBEJProblem::alarmDate) <= date(DATE_MYSQL_DATE)) {
                     $updatedBgColor = self::PURPLE;
                 }
 

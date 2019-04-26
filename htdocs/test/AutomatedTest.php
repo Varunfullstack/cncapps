@@ -54,7 +54,7 @@ foreach ($files as $file) {
                                 return false;
                             }
                             return response.text().then(text => {
-                                return text.indexOf('Fatal error') < 0 && text.indexOf('Warning') < 0
+                                return text.indexOf('Fatal error') < 0 && text.indexOf('Warning') < 0 && text.indexOf('Notice') < 0
                             })
                         }
                     ).then(success => {

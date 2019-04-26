@@ -36,7 +36,7 @@ class BUSalesOrderDocument extends Business
             );
             $this->dbeSalesOrderDocument->setValue(DBESalesOrderDocument::filename, ( string )$userfile ['name']);
             $this->dbeSalesOrderDocument->setValue(DBESalesOrderDocument::fileMimeType, ( string )$userfile ['type']);
-            $this->dbeSalesOrderDocument->setValue(DBESalesOrderDocument::createdDate, date(CONFIG_MYSQL_DATETIME));
+            $this->dbeSalesOrderDocument->setValue(DBESalesOrderDocument::createdDate, date(DATE_MYSQL_DATETIME));
             $this->dbeSalesOrderDocument->setValue(DBESalesOrderDocument::createdUserID, $this->owner->userID);
             $this->dbeSalesOrderDocument->updateRow();
         }

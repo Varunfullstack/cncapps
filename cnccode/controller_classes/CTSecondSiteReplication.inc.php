@@ -312,7 +312,7 @@ class CTSecondSiteReplication extends CTSecondSite
                 array(
                     'customerName'   => $record['cus_name'],
                     'serverName'     => $record['serverName'],
-                    'serverPath'     => $record['secondSiteReplicationLocationPath'],
+                    'serverPath'     => $record['secondSiteReplicationPath'],
                     'imagePath'      => $record['replicationImagePath'],
                     'imageName'      => $record['imageName'],
                     'suspendedUntil' => $suspendedUntil,

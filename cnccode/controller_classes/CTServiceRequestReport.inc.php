@@ -50,7 +50,7 @@ class CTServiceRequestReport extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST ['action']) {
+        switch ($this->getAction()) {
 
             default :
                 $this->search();

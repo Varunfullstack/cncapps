@@ -50,7 +50,6 @@ class DBEHeader extends DBEntity
     const mailshot9FlagDesc = "mailshot9FlagDesc";
     const mailshot10FlagDesc = "mailshot10FlagDesc";
     const mailshot11FlagDesc = "mailshot11FlagDesc";
-    const helpDeskProblems = "helpDeskProblems";
     const hourlyLabourCost = "hourlyLabourCost";
     const highActivityAlertCount = "highActivityAlertCount";
     const priority1Desc = "priority1Desc";
@@ -297,12 +296,6 @@ class DBEHeader extends DBEntity
             DA_STRING,
             DA_NOT_NULL,
             "hed_mailflg11_desc"
-        );
-        $this->addColumn(
-            self::helpDeskProblems,
-            DA_MEMO,
-            DA_NOT_NULL,
-            "hed_helpdesk_problems"
         );
         $this->addColumn(
             self::hourlyLabourCost,

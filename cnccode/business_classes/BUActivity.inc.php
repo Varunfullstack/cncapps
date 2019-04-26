@@ -146,7 +146,9 @@ class BUActivity extends Business
             "2" => "Escalations",
             "3" => "Implementations",
             "4" => "Sales",
-            "5" => "Managers"
+            "5" => "Managers",
+            "6" => "Fixed",
+            "7" => "Future"
         );
     public $allocatedMinutesArray =
         array(
@@ -196,7 +198,7 @@ class BUActivity extends Business
                 5 => $this->dsHeader->getValue(DBEHeader::priority5Desc)
             );
 
-        if ($GLOBALS ['auth']) {
+        if (isset($GLOBALS ['auth'])) {
             $this->loggedInUserID = $GLOBALS ['auth']->is_authenticated();
         } else {
             $this->loggedInUserID = USER_SYSTEM;
@@ -441,7 +443,7 @@ class BUActivity extends Business
         $this->sendPartsUsedEmail(
             $callActivityID,
             $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(DBEUser::lastName),
-            date(CONFIG_MYSQL_DATE),
+            date(DATE_MYSQL_DATE),
             $message
         );
 
@@ -613,7 +615,7 @@ class BUActivity extends Business
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::date,
-            date(CONFIG_MYSQL_DATE)
+            date(DATE_MYSQL_DATE)
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::startTime,
@@ -921,7 +923,7 @@ class BUActivity extends Business
         $dbeCallActivity->setPKValue(null);
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
-            date(CONFIG_MYSQL_DATE)
+            date(DATE_MYSQL_DATE)
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::startTime,
@@ -3731,7 +3733,7 @@ class BUActivity extends Business
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
-            date(CONFIG_MYSQL_DATE)
+            date(DATE_MYSQL_DATE)
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::startTime,
@@ -4810,7 +4812,7 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEJProblem::dateRaised,
-            date(CONFIG_MYSQL_DATETIME)
+            date(DATE_MYSQL_DATETIME)
         ); // default
         $dbeProblem->setValue(
             DBEJProblem::contractCustomerItemID,
@@ -4837,7 +4839,7 @@ is currently a balance of ';
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
-            date(CONFIG_MYSQL_DATE)
+            date(DATE_MYSQL_DATE)
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::startTime,
@@ -5407,7 +5409,7 @@ is currently a balance of ';
         );
         $dbeCallDocument->setValue(
             DBEJCallDocument::createDate,
-            date(CONFIG_MYSQL_DATETIME)
+            date(DATE_MYSQL_DATETIME)
         );
         $dbeCallDocument->setValue(
             DBEJCallDocument::fileMIMEType,
@@ -6178,7 +6180,7 @@ is currently a balance of ';
         );
 
 
-        $dateRaised = date(CONFIG_MYSQL_DATE . ' ' . CONFIG_MYSQL_TIME);
+        $dateRaised = date(DATE_MYSQL_DATE . ' ' . DATE_MYSQL_TIME);
         $timeRaised = date(CONFIG_MYSQL_TIME_HOURS_MINUTES);
 
         $internalNotes = '<P>' . str_replace(
@@ -6735,7 +6737,7 @@ is currently a balance of ';
             echo "<div>We couldn't find a customer ID, should log in to be logged</div>";
             $prependMessage = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
                 ) . ' on ' . date(
-                    CONFIG_MYSQL_DATETIME
+                    DATE_MYSQL_DATETIME
                 ) . "</div>";
             return $this->addCustomerRaisedRequest(
                 $automatedRequest,
@@ -6778,7 +6780,7 @@ is currently a balance of ';
                     echo "<div>The contact was not found or the contact doesn't belong to the same customer ID</div>";
                     $prependMessage = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
                         ) . ' on ' . date(
-                            CONFIG_MYSQL_DATETIME
+                            DATE_MYSQL_DATETIME
                         ) . "</div>";
                     return $this->addCustomerRaisedRequest(
                         $automatedRequest,
@@ -6794,7 +6796,7 @@ is currently a balance of ';
                 echo "<div>We have tried to pull a the contact from the sender email, but we couldn't find it</div>";
                 $details = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
                     ) . ' on ' . date(
-                        CONFIG_MYSQL_DATETIME
+                        DATE_MYSQL_DATETIME
                     ) . " who was not the original service request initiator</div>" . $details;
 
                 $dbeLastActivity = $this->getLastActivityInProblem($automatedRequest->getServiceRequestID());
@@ -6822,7 +6824,7 @@ is currently a balance of ';
             if ($dbeContact->getValue(DBEContact::customerID) != $automatedRequest->getCustomerID()) {
                 $details = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
                     ) . ' on ' . date(
-                        CONFIG_MYSQL_DATETIME
+                        DATE_MYSQL_DATETIME
                     ) . " who was not the original service request initiator</div>" . $details;
 
                 $dbeLastActivity = $this->getLastActivityInProblem($automatedRequest->getServiceRequestID());
@@ -6852,7 +6854,7 @@ is currently a balance of ';
             if ($dbeProblem->getValue(DBEProblem::contactID) != $dbeContact->getValue(DBEContact::contactID)) {
                 $details = '<div style="color: red">Update from email received from ' . $automatedRequest->getSenderEmailAddress(
                     ) . ' on ' . date(
-                        CONFIG_MYSQL_DATETIME
+                        DATE_MYSQL_DATETIME
                     ) . " who was not the original service request initiator</div>" . $details;
             }
 
@@ -6899,7 +6901,7 @@ is currently a balance of ';
         if (!$automatedRequest->getMonitorStatus()) {
             /* Create new request */
             $details = $automatedRequest->getSubjectLine() . "\n\n" . $details . "\n\n";
-            $details .= 'Raised from ServerGuard on ' . date(CONFIG_MYSQL_DATETIME);
+            $details .= 'Raised from ServerGuard on ' . date(DATE_MYSQL_DATETIME);
 
             $this->raiseNewRequestFromImport(
                 $automatedRequest,
@@ -7000,7 +7002,7 @@ is currently a balance of ';
             } else {
                 /* Create new request */
                 $details = $automatedRequest->getSubjectLine() . "\n\n" . $details . "\n\n";
-                $details .= 'Raised from ServerGuard on ' . date(CONFIG_MYSQL_DATETIME);
+                $details .= 'Raised from ServerGuard on ' . date(DATE_MYSQL_DATETIME);
 
                 $this->raiseNewRequestFromImport(
                     $automatedRequest,
@@ -7095,7 +7097,7 @@ is currently a balance of ';
             if (!$serverGuard) {
                 $prependMessage = '<div style="color: red">Utility alert sent from email ' . $record->getSenderEmailAddress(
                     ) . ' on ' . date(
-                        CONFIG_MYSQL_DATETIME
+                        DATE_MYSQL_DATETIME
                     ) . "</div>";
 
                 if ($this->isWhitelistedUtilityEmail($record->getSenderEmailAddress())) {
@@ -7131,7 +7133,7 @@ is currently a balance of ';
                 echo "<div>The sender contact does not belong to the same customer ID -> to be logged</div>";
                 $prependMessage = '<div style="color: red">Update from email received from ' . $record->getSenderEmailAddress(
                     ) . ' on ' . date(
-                        CONFIG_MYSQL_DATETIME
+                        DATE_MYSQL_DATETIME
                     ) . "</div>";
 
                 return $this->addCustomerRaisedRequest(
@@ -7221,7 +7223,7 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEProblem::dateRaised,
-            date(CONFIG_MYSQL_DATETIME)
+            date(DATE_MYSQL_DATETIME)
         ); // default
         $dbeProblem->setValue(
             DBEProblem::contactID,
@@ -7301,7 +7303,7 @@ is currently a balance of ';
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
-            date(CONFIG_MYSQL_DATE)
+            date(DATE_MYSQL_DATE)
         );
         $startTime = date('H:i');
         $dbeCallActivity->setValue(
@@ -7756,7 +7758,7 @@ is currently a balance of ';
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
-            date(CONFIG_MYSQL_DATE)
+            date(DATE_MYSQL_DATE)
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::startTime,
@@ -8023,7 +8025,7 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEJProblem::fixedDate,
-            date(CONFIG_MYSQL_DATETIME)
+            date(DATE_MYSQL_DATETIME)
         );
         $dbeProblem->setValue(
             DBEJProblem::userID,
@@ -8175,7 +8177,7 @@ is currently a balance of ';
         $dbeCallActivity->setPKValue(null);
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
-            date(CONFIG_MYSQL_DATE)
+            date(DATE_MYSQL_DATE)
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::startTime,
@@ -8364,7 +8366,7 @@ is currently a balance of ';
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
-            date(CONFIG_MYSQL_DATE)
+            date(DATE_MYSQL_DATE)
         );
         $time = date('H:i');
         $dbeCallActivity->setValue(
@@ -8742,7 +8744,7 @@ is currently a balance of ';
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
-            date(CONFIG_MYSQL_DATE)
+            date(DATE_MYSQL_DATE)
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::startTime,
@@ -9072,7 +9074,7 @@ is currently a balance of ';
             );
             $dbeProblem->setValue(
                 DBEProblem::dateRaised,
-                date(CONFIG_MYSQL_DATETIME)
+                date(DATE_MYSQL_DATETIME)
             );
             $dbeProblem->setValue(
                 DBEProblem::contactID,
@@ -9124,7 +9126,7 @@ is currently a balance of ';
             );
             $dbeCallActivity->setValue(
                 DBEJCallActivity::date,
-                date(CONFIG_MYSQL_DATE)
+                date(DATE_MYSQL_DATE)
             );
             $dbeCallActivity->setValue(
                 DBEJCallActivity::startTime,
@@ -10292,7 +10294,7 @@ is currently a balance of ';
         $dbeCallActivity->setPKValue(null);
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
-            date(CONFIG_MYSQL_DATE)
+            date(DATE_MYSQL_DATE)
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::startTime,

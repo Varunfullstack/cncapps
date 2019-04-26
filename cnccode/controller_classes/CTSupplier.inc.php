@@ -271,7 +271,7 @@ class CTSupplier extends CTCNC
             array(
                 'supplierString'        => $this->getParam('supplierString'),
                 'address'               => $this->getParam('address'),
-                'supplierStringMessage' => $GLOBALS['supplierStringMessage'],
+                'supplierStringMessage' => isset($GLOBALS['supplierStringMessage']) ? $GLOBALS['supplierStringMessage'] : null,
                 'submitURL'             => $submitURL,
                 'createURL'             => $createURL,
                 'urlSupplierPopup'      => $supplierPopup

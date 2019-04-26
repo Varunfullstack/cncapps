@@ -392,7 +392,7 @@ class CTBookSalesVisit extends CTCNC
         );
         $dbeProblem->setValue(
             DBEProblem::dateRaised,
-            date(CONFIG_MYSQL_DATETIME)
+            date(DATE_MYSQL_DATETIME)
         );
 
         $dbeProblem->setValue(
@@ -446,7 +446,7 @@ class CTBookSalesVisit extends CTCNC
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
-            date(CONFIG_MYSQL_DATE)
+            date(DATE_MYSQL_DATE)
         );
         $startTime = date('H:i');
         $dbeCallActivity->setValue(

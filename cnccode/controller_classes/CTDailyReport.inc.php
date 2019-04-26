@@ -50,7 +50,7 @@ class CTDailyReport extends CTCNC
      */
     function defaultAction()
     {
-        switch ($_REQUEST ['action']) {
+        switch ($this->getAction()) {
 
             case 'fixedIncidents' :
                 $this->buDailyReport->fixedIncidents($this->daysAgo);

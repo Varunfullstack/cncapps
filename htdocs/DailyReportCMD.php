@@ -11,10 +11,12 @@ require_once($cfg ['path_bu'] . '/BUDailyReport.inc.php');
 $nothing = null;
 $buDailyReport = new BUDailyReport($nothing);
 
-$daysAgo = $_REQUEST['daysAgo'];
+$daysAgo = isset($_REQUEST['daysAgo']) ? $_REQUEST['daysAgo'] : null;
 $onScreen = isset($_GET['onScreen']);
 
-switch ($_REQUEST ['action']) {
+$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
+
+switch ($action) {
 
     case 'fixedIncidents' :
         $buDailyReport->fixedIncidents($daysAgo);

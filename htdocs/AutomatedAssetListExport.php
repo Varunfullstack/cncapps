@@ -202,6 +202,12 @@ ORDER BY clients.name,
             );
             $dbeCustomerDocument = new DBEPortalCustomerDocument($thing);
             $dbeCustomerDocument->getCurrentAssetList($customerID);
+
+            $dbeCustomerDocument->setValue(
+                DBEPortalCustomerDocument::file,
+                file_get_contents($fileName)
+            );
+
             if (!$dbeCustomerDocument->rowCount) {
                 $dbeCustomerDocument->setValue(
                     DBEPortalCustomerDocument::customerID,
@@ -232,15 +238,15 @@ ORDER BY clients.name,
                     'Y'
                 );
 
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::createdDate,
+                    (new DateTime())->format(DATE_MYSQL_DATETIME)
+                );
+
                 $dbeCustomerDocument->insertRow();
-
+            } else {
+                $dbeCustomerDocument->updateRow();
             }
-
-            $dbeCustomerDocument->setValue(
-                DBEPortalCustomerDocument::file,
-                file_get_contents($fileName)
-            );
-            $dbeCustomerDocument->updateRow();
 
             echo '<div>Data was found at labtech, creating file ' . $fileName . '</div>';
         } catch (\Exception $exception) {

@@ -167,7 +167,7 @@ class BUProblemSLA extends Business
             if ($this->hoursCalculated) {
                 $this->dbeProblem->setValue(
                     DBEProblem::workingHoursCalculatedToTime,
-                    date(CONFIG_MYSQL_DATETIME)
+                    date(DATE_MYSQL_DATETIME)
                 );
             }
 
@@ -200,7 +200,7 @@ class BUProblemSLA extends Business
 
                 $this->dbeProblem->setValue(
                     DBEProblem::workingHoursCalculatedToTime,
-                    date(CONFIG_MYSQL_DATETIME)
+                    date(DATE_MYSQL_DATETIME)
                 );
 
             }
@@ -236,7 +236,7 @@ class BUProblemSLA extends Business
 
                 $this->dbeProblem->setValue(
                     DBEProblem::workingHoursCalculatedToTime,
-                    date(CONFIG_MYSQL_DATETIME)
+                    date(DATE_MYSQL_DATETIME)
                 );
 
             }

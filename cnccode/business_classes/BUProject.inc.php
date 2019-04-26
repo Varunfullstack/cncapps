@@ -46,7 +46,7 @@ class BUProject extends Business
         $buProject->getProjectsByCustomerID(
             $customerID,
             $dsProject,
-            date(CONFIG_MYSQL_DATE)
+            date(DATE_MYSQL_DATE)
         );
         $link = '';
 

@@ -245,14 +245,6 @@ switch ($server_type) {
             CONFIG_CATCHALL_EMAIL
         );
 
-
-        $GLOBALS['request_mail_options'] =
-            array(
-                'host'     => 'cncmx01',
-                'port'     => 143,
-                'user'     => 'devasr',
-                'password' => 'Unread01$'
-            );
         break;
 
     case MAIN_CONFIG_SERVER_TYPE_LIVE:
@@ -328,14 +320,6 @@ switch ($server_type) {
             'display_errors',
             'off'
         );
-
-        $GLOBALS['request_mail_options'] =
-            array(
-                'host'     => 'cncmx01',
-                'port'     => 143,
-                'user'     => 'asr',
-                'password' => 'Unread01$'
-            );
 
         $GLOBALS['mail_options'] =
             array(
@@ -421,14 +405,6 @@ switch ($server_type) {
             'CONFIG_PREPAY_EMAIL',
             CONFIG_CATCHALL_EMAIL
         );
-
-        $GLOBALS['request_mail_options'] =
-            array(
-                'host'     => 'cncmx01',
-                'port'     => 143,
-                'user'     => 'devasr',
-                'password' => 'Unread01$'
-            );
         break;
 
     case MAIN_CONFIG_SERVER_TYPE_WEBSITE:
@@ -507,14 +483,7 @@ switch ($server_type) {
             'CONFIG_PREPAY_EMAIL',
             CONFIG_CATCHALL_EMAIL
         );
-
-        $GLOBALS['request_mail_options'] =
-            array(
-                'host'     => 'cncmx01',
-                'port'     => 143,
-                'user'     => 'devasr',
-                'password' => 'Unread01$'
-            );
+        
         break;
 
 } // end switch
@@ -1017,11 +986,11 @@ define(
 );
 
 define(
-    'CONFIG_MYSQL_DATE',
+    'DATE_MYSQL_DATE',
     'Y-m-d'
 );
 define(
-    'CONFIG_MYSQL_TIME',
+    'DATE_MYSQL_TIME',
     'H:i:s'
 );
 
@@ -1031,8 +1000,8 @@ define(
 );
 
 define(
-    'CONFIG_MYSQL_DATETIME',
-    CONFIG_MYSQL_DATE . ' ' . CONFIG_MYSQL_TIME
+    'DATE_MYSQL_DATETIME',
+    DATE_MYSQL_DATE . ' ' . DATE_MYSQL_TIME
 );
 
 $cfg["postToSco"] = FALSE;

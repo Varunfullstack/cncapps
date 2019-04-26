@@ -12,8 +12,8 @@ require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 
 class CTStarterLeaverManagement extends CTCNC
 {
-    var $dsStandardText = '';
-    var $buStandardText = '';
+    /** @var DSForm */
+    public $dsStandardText;
 
     function __construct($requestMethod,
                          $postVars,
@@ -58,7 +58,9 @@ class CTStarterLeaverManagement extends CTCNC
 
                 $location = 'Location: StarterLeaverManagement.php';
                 if ($this->getParam('type')) {
-                    $location .= "?action=displayCustomerQuestions&customerID=" . $this->getParam('question')['customerID'] . "&type=" . $this->getParam('type');
+                    $location .= "?action=displayCustomerQuestions&customerID=" . $this->getParam(
+                            'question'
+                        )['customerID'] . "&type=" . $this->getParam('type');
                 }
                 header($location);
                 break;
@@ -176,6 +178,9 @@ class CTStarterLeaverManagement extends CTCNC
     }
 
 
+    /**
+     * @throws Exception
+     */
     private function addQuestion()
     {
         if (!$this->getParam('question')) {
@@ -241,6 +246,9 @@ class CTStarterLeaverManagement extends CTCNC
         $dbeStarterLeaverQuestion->insertRow();
     }
 
+    /**
+     * @throws Exception
+     */
     private function updateQuestion()
     {
         if (!$this->getParam('question')) {
@@ -297,6 +305,9 @@ class CTStarterLeaverManagement extends CTCNC
 
     }
 
+    /**
+     * @throws Exception
+     */
     private function displayCustomerQuestions()
     {
         $this->setMethodName('displayCustomerQuestions');
@@ -452,6 +463,9 @@ class CTStarterLeaverManagement extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @throws Exception
+     */
     private function deleteQuestion()
     {
         if (!$this->getParam('questionID') || !($questionID = $this->getParam('questionID'))) {

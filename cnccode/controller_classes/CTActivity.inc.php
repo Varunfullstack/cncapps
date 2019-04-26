@@ -3230,10 +3230,10 @@ class CTActivity extends CTCNC
                 $isAddToQueue = true;
             }
 
-            $this->updateSession('date', date(CONFIG_MYSQL_DATE));
+            $this->updateSession('date', date(DATE_MYSQL_DATE));
             $this->updateSession('startTime', date('H:i'));
 
-            $this->updateSession('dateRaised', date(CONFIG_MYSQL_DATE));
+            $this->updateSession('dateRaised', date(DATE_MYSQL_DATE));
             $this->updateSession('timeRaised', date('H:i'));
 
             if (!$_SESSION[$this->sessionKey]['priority'] = $this->getParam('priority')) {

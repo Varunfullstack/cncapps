@@ -590,7 +590,7 @@ class DBEntity extends DataAccess
     function getRows($sortColumn = '')
     {
         $this->setMethodName("getRows");
-        if ($this->getQueryString() == "") {
+        if (!$this->getQueryString()) {
             $queryString =
                 "SELECT " . $this->getDBColumnNamesAsString() .
                 " FROM " . $this->getTableName();
@@ -841,6 +841,9 @@ class DBEntity extends DataAccess
      */
     function getFormattedValue($ixColumn)
     {
+        if (!is_numeric($ixColumn)) {
+            $ixColumn = $this->colNameInverse[$ixColumn];
+        }
         return $this->prepareForSQL($ixColumn);
     }
 
@@ -855,6 +858,9 @@ class DBEntity extends DataAccess
         $this->setMethodName('getValue');
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
+            if (!key_exists($ixColumn, $this->db->Record)) {
+                return null;
+            }
             return $this->db->Record[$ixColumn];
         } else {
             $this->raiseError("column " . $ixPassedColumn . " out of range");

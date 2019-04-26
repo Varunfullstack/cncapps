@@ -93,7 +93,9 @@ class CTCustomerReviewMeetingsReport extends CTCNC
                 DBESite::siteNo,
                 0
             );
+
             $dbeSite->getRowByCustomerIDSiteNo();
+
 
             $lastReviewMeetingDate = DateTime::createFromFormat(
                 'Y-m-d',

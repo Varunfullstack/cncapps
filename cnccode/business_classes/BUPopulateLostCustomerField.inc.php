@@ -50,7 +50,7 @@ class BUPopulateLostCustomerField extends Business
 
             if (
                 $row->lastOrderDate < date(
-                    CONFIG_MYSQL_DATETIME,
+                    DATE_MYSQL_DATETIME,
                     strtotime('- 9 months')
                 ) &&
                 $row1->orderCount >= 4
