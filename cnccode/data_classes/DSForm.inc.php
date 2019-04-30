@@ -53,7 +53,7 @@ class DSForm extends DataSet
     {
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
-            if (!count($this->message) || $ixColumn > count($this->message) - 1) {
+            if (!count($this->message) || !key_exists($ixColumn, $this->message)) {
                 return null;
             }
             return ($this->message[$ixColumn]);

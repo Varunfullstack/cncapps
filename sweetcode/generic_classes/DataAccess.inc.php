@@ -281,7 +281,7 @@ class DataAccess extends BaseObject
      *<BR/>
      * @parameter DataAccess &$data reference to DataAccess object from which to copy
      * @access public
-     * @param DataSet|DBEntity $data
+     * @param DataAccess $data
      * @return boolean Returns TRUE if any rows have been posted to the target
      */
     function replicate(&$data)
@@ -327,8 +327,7 @@ class DataAccess extends BaseObject
         $crossRef = array();
         for ($ixCol = 0; $ixCol < $data->_colCount; $ixCol++) {
             $ixThisColumn = $this->columnExists($data->getName($ixCol));
-            if ($ixThisColumn != -1) { // column exists
-
+            if ($ixThisColumn != DA_OUT_OF_RANGE) { // column exists
                 // add to cross-ref table for columns
                 $crossRef[$ixCol] = $ixThisColumn;
                 $thisName = $this->getName($ixThisColumn);
@@ -350,8 +349,8 @@ class DataAccess extends BaseObject
         if (!$data->firstRowFetched) {        // in case get_row has been called
             $data->fetchNext();
         }
-
         while (!$data->eof) {
+
             /*
             Update row on this object if allowed and the primary key column in $data has a value
             otherwise insert a new row.
@@ -1222,6 +1221,11 @@ class DataAccess extends BaseObject
      */
     function getValueNoCheckByColumnNumber($ixColumnNumber)
     {
+        if ($this->debug) {
+            echo '<div> getValueNoCheckByColumnNumber: ';
+            var_dump($ixColumnNumber);
+            echo '</div>';
+        }
         if (!count($this->row) || !key_exists($ixColumnNumber, $this->row) || !isset($this->row[$ixColumnNumber])) {
             return null;
         }
@@ -1612,6 +1616,35 @@ not a boolean, the given value is null, column given is not the PK, and there is
         return DA_OUT_OF_RANGE;
     }
 
+    private function tryCreateDateTime($string)
+    {
+        if (!$string) {
+            return null;
+        }
+        if ($string == '0000-00-00 00:00:00') {
+            return null;
+        }
+
+        $date = DateTime::createFromFormat(
+            'd/m/Y H:i:s',
+            $string
+        );
+
+        if ($date) {
+            return $date->format(DATE_MYSQL_DATETIME);
+        }
+
+        $date = DateTime::createFromFormat(
+            'Y-m-d H:i:s',
+            $string
+        );
+
+        if (!$date) {
+            return null;
+        }
+        return $date->format(DATE_MYSQL_DATETIME);
+    }
+
     /**
      * @param $colIdx
      * @param $value
@@ -1643,22 +1676,7 @@ not a boolean, the given value is null, column given is not the PK, and there is
                 }
                 return $value;
             case DA_DATETIME:
-                if ($value == '0000-00-00 00:00:00') {
-                    return null;
-                }
-
-                $date = DateTime::createFromFormat(
-                    'd/m/Y H:i:s',
-                    $value
-                );
-
-                if (!$date) {
-                    return null;
-                }
-
-                $value = $date->format(DATE_MYSQL_DATETIME);
-
-                return $value;
+                return $this->tryCreateDateTime($value);
             case DA_DATE:
                 if ($value == '0000-00-00' || !$value) {
                     return null;
@@ -1691,6 +1709,10 @@ not a boolean, the given value is null, column given is not the PK, and there is
             return $validationFunction($value);
         }
 
+        if ($value === '') {
+            $value = null;
+        }
+
         if ($value === null) {
             return true;
         }
@@ -1701,6 +1723,7 @@ not a boolean, the given value is null, column given is not the PK, and there is
             case DA_YN:
                 return in_array($value, ['Y', 'N']) ? true : DATASET_MSG_INVALID;
             case DA_DATE:
+
                 $date = DateTime::createFromFormat(
                     'd/m/Y',
                     $value

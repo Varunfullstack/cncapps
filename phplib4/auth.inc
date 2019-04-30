@@ -245,6 +245,9 @@ class Auth
         $this->unauth($nobody == "" ? $this->nobody : $nobody);
     }
 
+    /**
+     * @return bool|mixed
+     */
     function is_authenticated()
     {
         if (

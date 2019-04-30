@@ -296,7 +296,7 @@ class CTCustomer extends CTCNC
         }
         foreach ($contactArray as $key => $value) {
 
-            if ($value['contactID']) {
+            if (@$value['contactID']) {
 
                 $dbeContact = new DBEContact($this);
                 $dbeContact->getRow($value['contactID']);
@@ -310,24 +310,24 @@ class CTCustomer extends CTCNC
             $this->dsContact->setUpdateModeInsert();
             $this->dsContact->setValue(
                 DBEContact::contactID,
-                $value['contactID']
+                @$value['contactID']
             );
             $this->dsContact->setValue(
                 DBEContact::customerID,
-                $value['customerID']
+                @$value['customerID']
             );
             $this->dsContact->setValue(
                 DBEContact::supplierID,
-                $value['supplierID']
+                @$value['supplierID']
             );
             $this->dsContact->setValue(
                 DBEContact::siteNo,
-                $value['siteNo']
+                @$value['siteNo']
             );
 
             $this->dsContact->setValue(
                 DBEContact::title,
-                $value['title']
+                @$value['title']
             );
             $this->dsContact->setValue(
                 self::contactFormTitleClass,
@@ -342,7 +342,7 @@ class CTCustomer extends CTCNC
             }
             $this->dsContact->setValue(
                 DBEContact::lastName,
-                $value['lastName']
+                @$value['lastName']
             );
             $this->dsContact->setValue(
                 self::contactFormLastNameClass,
@@ -357,7 +357,7 @@ class CTCustomer extends CTCNC
             }
             $this->dsContact->setValue(
                 DBEContact::firstName,
-                $value['firstName']
+                @$value['firstName']
             );
 
             $this->dsContact->setValue(
@@ -372,7 +372,7 @@ class CTCustomer extends CTCNC
                 );
             }
             $validEmail = true;
-            $email = !$value['email'] ? null : $value['email'];
+            $email = !@$value['email'] ? null : $value['email'];
 
 
             $this->dsContact->setValue(
@@ -383,8 +383,8 @@ class CTCustomer extends CTCNC
 
                 if ($this->buCustomer->duplicatedEmail(
                     $email,
-                    $value['contactID'],
-                    $value['customerID']
+                    @$value['contactID'],
+                    @$value['customerID']
                 )) {
                     $this->setFormErrorOn();
                     $this->dsContact->setValue(
@@ -404,148 +404,148 @@ class CTCustomer extends CTCNC
 
             $this->dsContact->setValue(
                 DBEContact::phone,
-                $value['phone']
+                @$value['phone']
             );
             $this->dsContact->setValue(
                 DBEContact::notes,
-                $value['notes']
+                @$value['notes']
             );
             $this->dsContact->setValue(
                 DBEContact::mobilePhone,
-                $value['mobilePhone']
+                @$value['mobilePhone']
             );
             $this->dsContact->setValue(
                 DBEContact::position,
-                $value['position']
+                @$value['position']
             );
             $this->dsContact->setValue(
                 DBEContact::fax,
-                $value['fax']
+                @$value['fax']
             );
 
             $this->dsContact->setValue(
                 DBEContact::accountsFlag,
-                $this->getYN($value['accountsFlag'])
+                $this->getYN(@$value['accountsFlag'])
             );
 
             $this->dsContact->setValue(
                 DBEContact::supportLevel,
-                $value['supportLevel']
+                @$value['supportLevel']
             );
 
             $this->dsContact->setValue(
                 DBEContact::reviewUser,
-                $this->getYN($value['reviewUser'])
+                $this->getYN(@$value['reviewUser'])
             );
 
 
             $this->dsContact->setValue(
                 DBEContact::specialAttentionContactFlag,
-                $this->getYN($value['specialAttentionContactFlag'])
+                $this->getYN(@$value['specialAttentionContactFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::discontinuedFlag,
-                $this->getYN($value['discontinuedFlag'])
+                $this->getYN(@$value['discontinuedFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::mailshot2Flag,
-                $this->getYN($value['mailshot2Flag'])
+                $this->getYN(@$value['mailshot2Flag'])
             );
             $this->dsContact->setValue(
                 DBEContact::mailshot3Flag,
-                $this->getYN($value['mailshot3Flag'])
+                $this->getYN(@$value['mailshot3Flag'])
             );
             $this->dsContact->setValue(
                 DBEContact::mailshot4Flag,
-                $this->getYN($value['mailshot4Flag'])
+                $this->getYN(@$value['mailshot4Flag'])
             );
             $this->dsContact->setValue(
                 DBEContact::mailshot8Flag,
-                $this->getYN($value['mailshot8Flag'])
+                $this->getYN(@$value['mailshot8Flag'])
             );
             $this->dsContact->setValue(
                 DBEContact::mailshot9Flag,
-                $this->getYN($value['mailshot9Flag'])
+                $this->getYN(@$value['mailshot9Flag'])
             );
             $this->dsContact->setValue(
                 DBEContact::mailshot11Flag,
-                $this->getYN($value['mailshot11Flag'])
+                $this->getYN(@$value['mailshot11Flag'])
             );
             $this->dsContact->setValue(
                 DBEContact::initialLoggingEmailFlag,
-                $this->getYN($value['initialLoggingEmailFlag'])
+                $this->getYN(@$value['initialLoggingEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::workStartedEmailFlag,
-                $this->getYN($value['workStartedEmailFlag'])
+                $this->getYN(@$value['workStartedEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::workUpdatesEmailFlag,
-                $this->getYN($value['workUpdatesEmailFlag'])
+                $this->getYN(@$value['workUpdatesEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::fixedEmailFlag,
-                $this->getYN($value['fixedEmailFlag'])
+                $this->getYN(@$value['fixedEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::pendingClosureEmailFlag,
-                $this->getYN($value['pendingClosureEmailFlag'])
+                $this->getYN(@$value['pendingClosureEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::closureEmailFlag,
-                $this->getYN($value['closureEmailFlag'])
+                $this->getYN(@$value['closureEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::othersInitialLoggingEmailFlag,
-                $this->getYN($value['othersInitialLoggingEmailFlag'])
+                $this->getYN(@$value['othersInitialLoggingEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::othersWorkStartedEmailFlag,
-                $this->getYN($value['othersWorkStartedEmailFlag'])
+                $this->getYN(@$value['othersWorkStartedEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::othersWorkUpdatesEmailFlag,
-                $this->getYN($value['othersWorkUpdatesEmailFlag'])
+                $this->getYN(@$value['othersWorkUpdatesEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::othersFixedEmailFlag,
-                $this->getYN($value['othersFixedEmailFlag'])
+                $this->getYN(@$value['othersFixedEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::othersPendingClosureEmailFlag,
-                $this->getYN($value['othersPendingClosureEmailFlag'])
+                $this->getYN(@$value['othersPendingClosureEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::othersClosureEmailFlag,
-                $this->getYN($value['othersClosureEmailFlag'])
+                $this->getYN(@$value['othersClosureEmailFlag'])
             );
             $this->dsContact->setValue(
                 DBEContact::reviewUser,
-                $this->getYN($value['reviewUser'])
+                $this->getYN(@$value['reviewUser'])
             );
             $this->dsContact->setValue(
                 DBEContact::hrUser,
-                $this->getYN($value['hrUser'])
+                $this->getYN(@$value['hrUser'])
             );
 
             $this->dsContact->setValue(
                 DBEContact::sendMailshotFlag,
-                $this->getYN($value['sendMailshotFlag'])
+                $this->getYN(@$value['sendMailshotFlag'])
             );
 
             $this->dsContact->setValue(
                 DBEContact::failedLoginCount,
-                $value['failedLoginCount']
+                @$value['failedLoginCount']
             );
 
             $this->dsContact->setValue(
                 DBEContact::pendingLeaverFlag,
-                $this->getYN($value[DBEContact::pendingLeaverFlag])
+                $this->getYN(@$value[DBEContact::pendingLeaverFlag])
             );
 
             $this->dsContact->setValue(
                 DBEContact::pendingLeaverDate,
-                common_convertDateDMYToYMD($value[DBEContact::pendingLeaverDate])
+                common_convertDateDMYToYMD(@$value[DBEContact::pendingLeaverDate])
             );
 
             // Determine whether a new contact is to be added
@@ -584,15 +584,15 @@ class CTCustomer extends CTCNC
             );
             $this->dsSite->setValue(
                 DBESite::customerID,
-                $value['customerID']
+                @$value['customerID']
             );
             $this->dsSite->setValue(
                 DBESite::siteNo,
-                $value['siteNo']
+                @$value['siteNo']
             );
             $this->dsSite->setValue(
                 DBESite::add1,
-                $value['add1']
+                @$value['add1']
             );
             if (!$this->dsSite->getValue(DBESite::add1)) {
                 $this->setFormErrorOn();
@@ -603,15 +603,15 @@ class CTCustomer extends CTCNC
             }
             $this->dsSite->setValue(
                 DBESite::add2,
-                $value['add2']
+                @$value['add2']
             );
             $this->dsSite->setValue(
                 DBESite::add3,
-                $value['add3']
+                @$value['add3']
             );
             $this->dsSite->setValue(
                 DBESite::town,
-                strtoupper($value['town'])
+                strtoupper(@$value['town'])
             );
             if (!$this->dsSite->getValue(DBESite::town)) {
                 $this->setFormErrorOn();
@@ -622,11 +622,11 @@ class CTCustomer extends CTCNC
             }
             $this->dsSite->setValue(
                 DBESite::county,
-                $value['county']
+                @$value['county']
             );
             $this->dsSite->setValue(
                 DBESite::postcode,
-                strtoupper($value['postcode'])
+                strtoupper(@$value['postcode'])
             );
             if (!$this->dsSite->getValue(DBESite::postcode)) {
                 $this->setFormErrorOn();
@@ -637,35 +637,35 @@ class CTCustomer extends CTCNC
             }
             $this->dsSite->setValue(
                 DBESite::phone,
-                $value['phone']
+                @$value['phone']
             );
             $this->dsSite->setValue(
                 DBESite::maxTravelHours,
-                $value['maxTravelHours']
+                @$value['maxTravelHours']
             );
             $this->dsSite->setValue(
                 DBESite::invoiceContactID,
-                $value['invoiceContactID']
+                @$value['invoiceContactID']
             );
             $this->dsSite->setValue(
                 DBESite::deliverContactID,
-                $value['deliverContactID']
+                @$value['deliverContactID']
             );
             $this->dsSite->setValue(
                 DBESite::sageRef,
-                $value['sageRef']
+                @$value['sageRef']
             );
             $this->dsSite->setValue(
                 DBESite::debtorCode,
-                $value['debtorCode']
+                @$value['debtorCode']
             );
             $this->dsSite->setValue(
                 DBESite::nonUKFlag,
-                $this->getYN($value['nonUKFlag'])
+                $this->getYN(@$value['nonUKFlag'])
             );
             $this->dsSite->setValue(
                 DBESite::activeFlag,
-                $this->getYN($value['activeFlag'])
+                $this->getYN(@$value['activeFlag'])
             );
             $this->dsSite->post();
         }
@@ -730,13 +730,14 @@ class CTCustomer extends CTCNC
                 self::customerFormDeliverSiteMessage,
                 CTCUSTOMER_CLS_TABLE_EDIT_HEADER
             );
+
             $this->dsCustomer->setValue(
                 DBECustomer::customerID,
-                $value['customerID']
+                @$value['customerID']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::name,
-                $value['name']
+                @$value['name']
             );
             if (!$this->dsCustomer->getValue(DBECustomer::name)) {
                 $this->setFormErrorOn();
@@ -747,31 +748,31 @@ class CTCustomer extends CTCNC
             }
             $this->dsCustomer->setValue(
                 DBECustomer::regNo,
-                $value['regNo']
+                @$value['regNo']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::invoiceSiteNo,
-                $value['invoiceSiteNo']
+                @$value['invoiceSiteNo']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::deliverSiteNo,
-                $value['deliverSiteNo']
+                @$value['deliverSiteNo']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::mailshotFlag,
-                $this->getYN($value['mailshotFlag'])
+                $this->getYN(@$value['mailshotFlag'])
             );
             $this->dsCustomer->setValue(
                 DBECustomer::referredFlag,
-                $this->getYN($value['referredFlag'])
+                $this->getYN(@$value['referredFlag'])
             );
             $this->dsCustomer->setValue(
                 DBECustomer::specialAttentionFlag,
-                $this->getYN($value['specialAttentionFlag'])
+                $this->getYN(@$value['specialAttentionFlag'])
             );
             $this->dsCustomer->setValue(
                 DBECustomer::specialAttentionEndDate,
-                $this->convertDateYMD($value['specialAttentionEndDate'])
+                $this->convertDateYMD(@$value['specialAttentionEndDate'])
             );
 
             if (
@@ -787,23 +788,23 @@ class CTCustomer extends CTCNC
 
             $this->dsCustomer->setValue(
                 DBECustomer::primaryMainContactID,
-                $value[DBECustomer::primaryMainContactID]
+                @$value[DBECustomer::primaryMainContactID]
             );
 
             $this->dsCustomer->setValue(
                 DBECustomer::customerTypeID,
-                $value['customerTypeID']
+                @$value['customerTypeID']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::support24HourFlag,
-                $this->getYN($value['support24HourFlag'])
+                $this->getYN(@$value['support24HourFlag'])
             );
 
             $this->dsCustomer->setValue(
                 self::customerFormSectorMessage,
                 null
             );
-            if (!$value['sectorID']) {
+            if (!@$value['sectorID']) {
                 $this->setFormErrorOn();
                 $this->dsCustomer->setValue(
                     self::customerFormSectorMessage,
@@ -812,120 +813,120 @@ class CTCustomer extends CTCNC
             }
             $this->dsCustomer->setValue(
                 DBECustomer::sectorID,
-                $value['sectorID']
+                @$value['sectorID']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::leadStatusID,
-                $value['leadStatusID']
+                @$value['leadStatusID']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::prospectFlag,
-                $this->getYN($value['prospectFlag'])
+                $this->getYN(@$value['prospectFlag'])
             );
             $this->dsCustomer->setValue(
                 DBECustomer::createDate,
-                $value['createDate']
+                @$value['createDate']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::gscTopUpAmount,
-                $value['gscTopUpAmount']
+                @$value['gscTopUpAmount']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::becameCustomerDate,
-                $this->convertDateYMD($value['becameCustomerDate'])
+                $this->convertDateYMD(@$value['becameCustomerDate'])
             );
             $this->dsCustomer->setValue(
                 DBECustomer::droppedCustomerDate,
-                $this->convertDateYMD($value['droppedCustomerDate'])
+                $this->convertDateYMD(@$value['droppedCustomerDate'])
             );
             $this->dsCustomer->setValue(
                 DBECustomer::lastReviewMeetingDate,
-                $this->convertDateYMD($value['lastReviewMeetingDate'])
+                $this->convertDateYMD(@$value['lastReviewMeetingDate'])
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reviewMeetingFrequencyMonths,
-                $value['reviewMeetingFrequencyMonths']
+                @$value['reviewMeetingFrequencyMonths']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reviewDate,
-                $this->convertDateYMD($value['reviewDate'])
+                $this->convertDateYMD(@$value['reviewDate'])
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reviewMeetingEmailSentFlag,
-                $this->getYN($value['reviewMeetingEmailSentFlag'])
+                $this->getYN(@$value['reviewMeetingEmailSentFlag'])
             );
 
             $this->dsCustomer->setValue(
                 DBECustomer::reviewAction,
-                $value['reviewAction']
+                @$value['reviewAction']
 
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reviewUserID,
-                $value['reviewUserID']
+                @$value['reviewUserID']
             );
 
             $this->dsCustomer->setValue(
                 DBECustomer::accountManagerUserID,
-                $value['accountManagerUserID']
+                @$value['accountManagerUserID']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reviewTime,
-                $value['reviewTime']
+                @$value['reviewTime']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::noOfServers,
-                $value['noOfServers']
+                @$value['noOfServers']
             );
 
             $this->dsCustomer->setValue(
                 DBECustomer::activeDirectoryName,
-                $value['activeDirectoryName']
+                @$value['activeDirectoryName']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::noOfPCs,
-                $value['noOfPCs']
+                @$value['noOfPCs']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::noOfSites,
-                $value['noOfSites']
+                @$value['noOfSites']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::comments,
-                $value['comments']
+                @$value['comments']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::techNotes,
-                $value['techNotes']
+                @$value['techNotes']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::slaP1,
-                $value['slaP1']
+                @$value['slaP1']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::slaP2,
-                $value['slaP2']
+                @$value['slaP2']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::slaP3,
-                $value['slaP3']
+                @$value['slaP3']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::slaP4,
-                $value['slaP4']
+                @$value['slaP4']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::slaP5,
-                $value['slaP5']
+                @$value['slaP5']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::pcxFlag,
-                $this->getYN($value['pcxFlag'])
+                $this->getYN(@$value['pcxFlag'])
             );
 
             $this->dsCustomer->setValue(
                 DBECustomer::sortCode,
-                $value['sortCode']
+                @$value['sortCode']
             );
 
             if (isset($value['newSortCode'])) {
@@ -945,12 +946,12 @@ class CTCustomer extends CTCNC
 
             $this->dsCustomer->setValue(
                 DBECustomer::accountName,
-                $value['accountName']
+                @$value['accountName']
             );
 
             $this->dsCustomer->setValue(
                 DBECustomer::accountNumber,
-                $value['accountNumber']
+                @$value['accountNumber']
             );
 
             if (isset($value['newAccountNumber'])) {
@@ -968,7 +969,6 @@ class CTCustomer extends CTCNC
                     $accountNumber
                 );
             }
-
             $this->dsCustomer->post();
         }
     }

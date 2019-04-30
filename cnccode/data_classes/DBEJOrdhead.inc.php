@@ -170,10 +170,13 @@ class DBEJOrdhead extends DBEOrdhead
     {
         $this->setMethodName("getRow");
 
-        $this->setValue(
-            DBEOrdhead::ordheadID,
-            $ordheadID
-        );
+        if (!$this->getValue(DBEOrdhead::ordheadID)) {
+            $this->setValue(
+                DBEOrdhead::ordheadID,
+                $ordheadID
+            );
+        }
+
 
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .

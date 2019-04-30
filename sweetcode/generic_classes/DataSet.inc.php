@@ -427,6 +427,9 @@ class DataSet extends DataAccess
         foreach ($entityArray as $key => $row) {
             $this->setUpdateModeInsert();
             foreach ($row as $fieldName => $value) {
+                if ($this->debug) {
+                    var_dump($fieldName, $value);
+                }
                 $columnIdx = $this->columnExists($fieldName);
                 if ($columnIdx == DA_OUT_OF_RANGE) {
                     $this->setMessage(
@@ -440,15 +443,13 @@ class DataSet extends DataAccess
                     $columnIdx,
                     $value
                 );
-
-
                 $validation = $this->checkValid($fieldName, $value);
-
                 if ($validation !== true) {
                     $this->setMessage(
                         $fieldName,
                         $validation
                     );
+                    $ret = false;
                     continue;
                 }
 
@@ -472,7 +473,6 @@ class DataSet extends DataAccess
                         $message
     )
     {
-
         $this->addColumn(
             $columnName . 'Message',
             DA_STRING,

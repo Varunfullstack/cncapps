@@ -14,12 +14,13 @@ class DBECustomerNote extends DBEntity
     const details = "details";
     const createdUserID = "createdUserID";
     const orderID = "orderID";
+    const modifiedAt = 'modifiedAt';
 
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -33,6 +34,7 @@ class DBECustomerNote extends DBEntity
         $this->addColumn(self::details, DA_MEMO, DA_ALLOW_NULL, "cno_details");
         $this->addColumn(self::createdUserID, DA_ID, DA_NOT_NULL, "cno_created_consno");
         $this->addColumn(self::orderID, DA_ID, DA_ALLOW_NULL, "cno_ordno");
+        $this->addColumn(self::modifiedAt, DA_DATETIME, DA_ALLOW_NULL, "cno_modified");
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

@@ -35,7 +35,10 @@ if (get_magic_quotes_gpc()) {
 /*
 End Strip all slashes from request variables (includes cookies)
 */
-
+/**
+ * @param $value
+ * @return array|string
+ */
 function stripslashes_deep($value)
 {
     $value = is_array($value) ?

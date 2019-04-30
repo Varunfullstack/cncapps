@@ -892,11 +892,9 @@ class Controller extends BaseObject
         )) {
             //$this->displayFatalError("Method ".$methodName."() does not exist");
         } else {
-            $command =
-                "if(isset(\$this->postVars[\"form\"][\"" . $variableName . "\"]))" .
-                "\$this->" . $methodName .
-                "(stripslashes_deep(\$this->postVars[\"form\"][\"" . $variableName . "\"]));";
-            eval($command);
+            if (isset($this->postVars['form'][$variableName])) {
+                call_user_func([$this, $methodName], stripslashes_deep($this->postVars['form'][$variableName]));
+            }
         }
     }
 

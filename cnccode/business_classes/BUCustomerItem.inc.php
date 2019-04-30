@@ -296,9 +296,6 @@ class BUCustomerItem extends Business
         $this->setMethodName('update');
         $dsCustomerItem->fetchNext();
         $customerItemID = $dsCustomerItem->getValue(DBECustomerItem::customerItemID);
-        if (!$customerItemID) {
-            $this->raiseError('customerItemID not passed');
-        }
 
         $dbeCustomerItem = new DBECustomerItem($this);
         if ($dsCustomerItem->getValue(DBECustomerItem::customerItemID)) {

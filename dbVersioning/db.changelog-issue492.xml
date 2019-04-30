@@ -1306,7 +1306,7 @@
     <changeSet author="pavwebdev" id="1554199133-150">
         <preConditions onFail="MARK_RAN">
             <not>
-                <indexExists tableName="item" columnNames="notes"/>
+                <indexExists tableName="item" indexName="idx_fulltext_item_itm_desc_notes_unit_of_sale"/>
             </not>
         </preConditions>
         <sql>
@@ -1315,6 +1315,20 @@
         </sql>
         <rollback>
             <dropIndex tableName="item" indexName="idx_fulltext_item_itm_desc_notes_unit_of_sale"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-151">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="item" indexName="idx_fulltext_item_notes_unit_of_sale"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE FULLTEXT INDEX idx_fulltext_item_notes_unit_of_sale
+                ON item (notes, itm_unit_of_sale);
+        </sql>
+        <rollback>
+            <dropIndex tableName="item" indexName="idx_fulltext_item_notes_unit_of_sale"/>
         </rollback>
     </changeSet>
 </databaseChangeLog>

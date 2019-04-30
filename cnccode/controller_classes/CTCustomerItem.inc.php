@@ -943,6 +943,7 @@ class CTCustomerItem extends CTCNC
                 $dsUser->getValue(DBEUser::name) . ' on ' .
                 Controller::dateYMDtoDMY($dsCustomerItem->getValue(DBEJCustomerItem::secondsiteImageDelayDate));
         }
+
         $this->template->set_var(
             array(
                 'urlSubmit'                                   => $urlSubmit,
@@ -1533,10 +1534,9 @@ class CTCustomerItem extends CTCNC
         contractID array is the contracts
         */
         $this->contractIDs = $this->getParam('contractID'); /* ?? */
-        $this->dsCustomerItem->debug = false;
+
         if (!$this->dsCustomerItem->populateFromArray($this->getParam('customerItem'))) {
             $this->setFormErrorOn();
-
             if ($this->getAction() == CTCUSTOMERITEM_ACT_INSERT) {
                 $this->add();
             } else {
@@ -1548,6 +1548,7 @@ class CTCustomerItem extends CTCNC
             $this->display();
             exit;
         }
+
         $this->buCustomerItem->update(
             $this->dsCustomerItem,
             $this->contractIDs

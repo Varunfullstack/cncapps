@@ -891,11 +891,7 @@ class DBEntity extends DataAccess
     {
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
-
-            if ($this->colType[$ixColumn] == DA_BOOLEAN) {
-                $value = $value ? 1 : 0;
-            }
-
+            $value = $this->prepareValue($ixColumn, $value);
             $this->db->Record[$ixColumn] = $value;
             return TRUE;
         } else {

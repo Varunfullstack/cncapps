@@ -109,39 +109,38 @@ class BUSalesOrder extends Business
     )
     {
         $this->setMethodName('getOrderWithCustomerName');
-        $ret = FALSE;
         if (!$ordheadID) {
             $this->raiseError('order ID not passed');
-        } else {
-            $dbeJOrdline = new DBEJOrdline($this);
-            $dbeJOrdhead = new DBEJOrdhead($this);
-            $ret = ($this->getDatasetByPK(
-                $ordheadID,
-                $dbeJOrdhead,
-                $dsOrdhead
-            ));
-            if (!$ret) {
-                $this->raiseError('order not found');
-            }
-            $dbeJOrdline->setValue(
-                DBEJOrdline::ordheadID,
-                $ordheadID
-            );
-            $dbeJOrdline->getRowsByColumn(
-                DBEJOrdline::ordheadID
-            );
-            $this->getData(
-                $dbeJOrdline,
-                $dsJOrdline
-            );
-            $dsJOrdline->sortAscending(DBEJOrdline::sequenceNo);
-            $buCustomer = new BUCustomer($this);
-            $buCustomer->getContactByID(
-                $dsOrdhead->getValue(DBEOrdhead::delContactID),
-                $dsDeliveryContact
-            );
+            return false;
         }
-        return $ret;
+        $dbeJOrdline = new DBEJOrdline($this);
+        $dbeJOrdhead = new DBEJOrdhead($this);
+        $ret = ($this->getDatasetByPK(
+            $ordheadID,
+            $dbeJOrdhead,
+            $dsOrdhead
+        ));
+        if (!$ret) {
+            $this->raiseError('order not found');
+        }
+        $dbeJOrdline->setValue(
+            DBEJOrdline::ordheadID,
+            $ordheadID
+        );
+        $dbeJOrdline->getRowsByColumn(
+            DBEJOrdline::ordheadID
+        );
+        $this->getData(
+            $dbeJOrdline,
+            $dsJOrdline
+        );
+        $dsJOrdline->sortAscending(DBEJOrdline::sequenceNo);
+        $buCustomer = new BUCustomer($this);
+        $buCustomer->getContactByID(
+            $dsOrdhead->getValue(DBEOrdhead::delContactID),
+            $dsDeliveryContact
+        );
+        return true;
     }
 
     function getOrderByOrdheadID($ordheadID,

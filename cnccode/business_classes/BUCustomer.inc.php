@@ -445,21 +445,11 @@ class BUCustomer extends Business
             $this->raiseError('Customer Name is empty!');
             exit;
         }
-        $dsData->setValue(
-            DBECustomer::modifyDate,
-            date('Y-m-d H:i:s')
-        );
-        $dsData->setValue(
-            DBECustomer::modifyUserID,
-            $GLOBALS ['auth']->is_authenticated()
-        );
-
         $this->dbeCustomer->setCallbackMethod(
             DA_BEFORE_POST,
             $this,
             'beforeUpdateCustomer'
         );
-
         return ($this->updateDataAccessObject(
             $dsData,
             $this->dbeCustomer
@@ -474,6 +464,16 @@ class BUCustomer extends Business
         $customerID = $newRow->getPkValue();
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerID);
+
+        $newRow->setValue(
+            DBECustomer::modifyDate,
+            date('d/m/Y H:i:s')
+        );
+        $newRow->setValue(
+            DBECustomer::modifyUserID,
+            $GLOBALS ['auth']->is_authenticated()
+        );
+
         if ($dbeCustomer->getValue(DBECustomer::lastReviewMeetingDate) != $newRow->getValue(
                 DBECustomer::lastReviewMeetingDate
             )) {
