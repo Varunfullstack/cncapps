@@ -38,6 +38,11 @@ define(
     'The given value does not conform with the format'
 );
 
+define(
+    'DATASET_MSG_INVALID_SUPPORT_LEVEL',
+    'The given value does not match the possible values: null, "main", "supervisor", "support", "delegate"'
+);
+
 class DataSet extends DataAccess
 {
 
@@ -339,23 +344,6 @@ class DataSet extends DataAccess
         return $ret;
     }
 
-    function setValue($ixPassedColumn,
-                      $value
-    )
-    {
-        return (parent::setValue(
-            $ixPassedColumn,
-            (string)$value
-        ));
-    }
-
-    function getValue($ixPassedColumn)
-    {
-        return ((string)parent::getValue($ixPassedColumn));
-//		return(stripslashes(parent::getValue($ixPassedColumn)));
-//		return(parent::getValue($ixPassedColumn));
-    }
-
     /**
      * Search the given column for the first value matching parameter passed
      * Overriden to optomise for dataset array
@@ -426,149 +414,51 @@ class DataSet extends DataAccess
     */
     function populateFromArray($entityArray)
     {
+        if ($this->debug) {
+            echo '<br>';
+            var_dump($entityArray);
+            echo '<br>';
+        }
         $this->setMethodName('populateFromArray');
         $ret = TRUE;
         if (!is_array($entityArray)) {
             $this->raiseError('entityArray not an array');
         }
-        foreach ($entityArray as $key => $row) {                            // loop though rows
+        foreach ($entityArray as $key => $row) {
             $this->setUpdateModeInsert();
-            foreach ($row as $fieldName => $value) {                        // loop through column values
-                if (
-                    ($this->getNull($fieldName) == DA_NOT_NULL) & ($value == '')
-                ) {
-                    $ret = FALSE;
+            foreach ($row as $fieldName => $value) {
+                $columnIdx = $this->columnExists($fieldName);
+                if ($columnIdx == DA_OUT_OF_RANGE) {
                     $this->setMessage(
                         $fieldName,
-                        DATASET_MSG_REQUIRED
+                        'This column does not exist'
                     );
-                } else {
-                    $columnType = $this->getType($fieldName);
-                    // Because blank is returned from HTML form if not checked
-                    if ($columnType == DA_YN) {
-                        $this->setValue(
-                            $fieldName,
-                            ($value == 'Y' ? 'Y' : 'N')
-                        );
-                    }
-                    if (($this->getNull($fieldName) == DA_ALLOW_NULL) && !$value) {
-                        $this->setValue(
-                            $fieldName,
-                            ''
-                        );
-                    } else {                // this is a not null column with a value so validate the data type
-                        // Column type validation
-
-                        $validationFunction = $this->getValidationFunction($fieldName);
-                        if ($validationFunction) {
-                            if (!$validationFunction($value)) {
-                                $this->setMessage(
-                                    $fieldName,
-                                    DATASET_MSG_INVALID
-                                );
-                                $ret = FALSE;
-                            } else {
-                                $this->setValue(
-                                    $fieldName,
-                                    $value
-                                );
-                            }
-                        } else {
-                            switch ($columnType) {
-                                case DA_DATE:
-                                    if ($value) {
-                                        $date = DateTime::createFromFormat(
-                                            'd/m/Y',
-                                            $value
-                                        );
-                                        if (!$date) {
-                                            $this->setValue(
-                                                $fieldName,
-                                                $value
-                                            );
-                                            $this->setMessage(
-                                                $fieldName,
-                                                DATASET_MSG_BAD_DATE_FORMAT
-                                            );
-                                            $ret = FALSE;
-                                        } else {
-                                            $this->setValue(
-                                                $fieldName,
-                                                $date->format('Y-m-d')
-                                            );
-                                        }
-                                    } else {
-                                        $value = null;    // signifies no date
-                                    }
-                                    break;
-                                case DA_TIME:
-                                    if ($value) {
-                                        if (!$this->isTime($value)) {
-                                            $this->setMessage(
-                                                $fieldName,
-                                                DATASET_MSG_BAD_TIME
-                                            );
-                                            $ret = FALSE;
-                                        }
-                                        $this->setValue(
-                                            $fieldName,
-                                            $value
-                                        );
-                                    }
-                                    break;
-                                case DA_INTEGER:
-                                case DA_ID:
-                                case DA_FLOAT:
-                                    $value = trim($value);                // remove trailing spaces
-                                    if (!is_numeric($value)) {
-                                        $this->setMessage(
-                                            $fieldName,
-                                            DATASET_MSG_NOT_NUMERIC
-                                        );
-                                        $ret = FALSE;
-                                    }
-                                    $this->setValue(
-                                        $fieldName,
-                                        $value
-                                    );
-                                    break;
-                                default:
-                                    $this->setValue(
-                                        $fieldName,
-                                        $value
-                                    );
-                                    break;
-                                case DA_SUPPORT_LEVEL:
-                                    $value = trim($value);
-
-                                    if (!empty($value)) {
-                                        $validOptions = ['main', 'supervisor', 'support', 'delegate'];
-                                        if (!in_array(
-                                            $value,
-                                            $validOptions
-                                        )) {
-                                            $this->setMessage(
-                                                $fieldName,
-                                                SUPPORT_LEVEL_MSG_INCORRECT_VALUE
-                                            );
-                                            $ret = FALSE;
-                                        }
-                                    } else {
-                                        $value = null;
-                                    }
-
-                                    $this->setValue(
-                                        $fieldName,
-                                        $value
-                                    );
-                                    break;
-                            }
-                        }
-                    }
+                    continue;
                 }
+
+                $this->setValueNoCheckByColumnNumber(
+                    $columnIdx,
+                    $value
+                );
+
+
+                $validation = $this->checkValid($fieldName, $value);
+
+                if ($validation !== true) {
+                    $this->setMessage(
+                        $fieldName,
+                        $validation
+                    );
+                    continue;
+                }
+
+                $this->setValue(
+                    $fieldName,
+                    $value
+                );
             }
-            $this->post();
         }
+        $this->post();
         return $ret;
     }
 
@@ -601,71 +491,6 @@ class DataSet extends DataAccess
                 $ixCol,
                 DA_ALLOW_NULL
             );
-        }
-    }
-
-    function isTime($time)
-    {
-        if ($time == '') {
-            $ret = TRUE;
-        } else {
-            $ret =
-                (
-                    is_numeric(
-                        substr(
-                            $time,
-                            0,
-                            2
-                        )
-                    ) &&
-                    (substr(
-                            $time,
-                            0,
-                            2
-                        ) < 24) &&
-                    is_numeric(
-                        substr(
-                            $time,
-                            3,
-                            2
-                        )
-                    ) &&
-                    (substr(
-                            $time,
-                            3,
-                            2
-                        ) < 60) &&
-                    (substr(
-                            $time,
-                            2,
-                            1
-                        ) == ':') &&
-                    (strlen($time) == 5)
-                );
-        }
-        return $ret;
-    }
-
-    function convertDateYMD($dateDMY)
-    {
-        if ($dateDMY != '') {
-            $dateArray = explode(
-                '/',
-                $dateDMY
-            );
-            return ($dateArray[2] . '-' . str_pad(
-                    $dateArray[1],
-                    2,
-                    '0',
-                    STR_PAD_LEFT
-                ) . '-' . str_pad(
-                    $dateArray[0],
-                    2,
-                    '0',
-                    STR_PAD_LEFT
-                ));
-        } else {
-            return '';
         }
     }
 

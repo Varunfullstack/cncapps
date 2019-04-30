@@ -389,7 +389,7 @@ class DataAccess extends BaseObject
             if ($this->postRow) {
                 for ($ixCol = 0; $ixCol < $data->_colCount; $ixCol++) {
                     $this->setValueNoCheckByColumnNumber(
-                        $crossRef[$ixCol],
+                        isset($crossRef[$ixCol]) ? $crossRef[$ixCol] : null,
                         $data->getValueNoCheckByColumnNumber($ixCol)
                     );
                 }
@@ -1222,7 +1222,7 @@ class DataAccess extends BaseObject
      */
     function getValueNoCheckByColumnNumber($ixColumnNumber)
     {
-        if (!count($this->row) || ($ixColumnNumber > (count($this->row) - 1)) || !isset($this->row[$ixColumnNumber])) {
+        if (!count($this->row) || !key_exists($ixColumnNumber, $this->row) || !isset($this->row[$ixColumnNumber])) {
             return null;
         }
         $type = $this->getTypeByColumnNumberNoCheck($ixColumnNumber);
@@ -1260,6 +1260,11 @@ class DataAccess extends BaseObject
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($this->debug) {
             echo '<div> Testing for column existence: ' . $ixPassedColumn . ' - value: ' . $value . '</div>';
+            try {
+                throw new Exception();
+            } catch (Exception $exception) {
+                var_dump($exception->getTraceAsString());
+            }
         }
         if ($ixColumn != DA_OUT_OF_RANGE) {
             $value = $this->prepareValue(
@@ -1293,39 +1298,41 @@ not a boolean, the given value is null, column given is not the PK, and there is
                     "Could not set column value because " . $ixPassedColumn . " does not accept NULL values."
                 );
                 return FALSE;
-            } else {
-                if ($value == null) {
-                    if ($this->debug) {
-                        echo '<div>The value given is NULL and there is a default value set: ' . $this->getDefaultValue(
-                                $ixColumn
-                            ) . '</div>';
-                    }
-                    $this->row[$ixColumn] = $this->getDefaultValue($ixColumn);
-
-                    return true;
-                }
+            }
 
 
+            if ($value === null && $this->getDefaultValue($ixColumn) !== null) {
                 if ($this->debug) {
-                    echo '<div>The value given is ' . $value . ' and there is a default value set: ' . $this->getDefaultValue(
+                    echo '<div>The value given is NULL and there is a default value set: ' . $this->getDefaultValue(
                             $ixColumn
                         ) . '</div>';
                 }
-                $this->row[$ixColumn] = $value;
-                return TRUE;
+                $this->row[$ixColumn] = $this->getDefaultValue($ixColumn);
+
+                return true;
             }
-        } else {
+
+
             if ($this->debug) {
-                echo '<div> The column does not exist</div>';
+                echo '<div>The value given is ' . $value . '</div>';
             }
-            if ($this->failOutOfRange) {
-                $this->raiseError("Could not set column value because " . $ixPassedColumn . " out of range");
-                return FALSE;
-            } else {
-                return TRUE;
-            }
+            $this->row[$ixColumn] = $value;
+            return TRUE;
+
+        }
+
+
+        if ($this->debug) {
+            echo '<div> The column does not exist</div>';
+        }
+        if ($this->failOutOfRange) {
+            $this->raiseError("Could not set column value because " . $ixPassedColumn . " out of range");
+            return FALSE;
+        } else {
+            return TRUE;
         }
     }
+
 
     /**
      * Set column value by index without any error checking
@@ -1537,8 +1544,9 @@ not a boolean, the given value is null, column given is not the PK, and there is
         return $value;
     }
 
-    private function setDefaultValue($ixColumn,
-                                     $defaultValue
+    private
+    function setDefaultValue($ixColumn,
+                             $defaultValue
     )
     {
         if ($this->debug) {
@@ -1562,8 +1570,9 @@ not a boolean, the given value is null, column given is not the PK, and there is
         return $ret;
     }
 
-    protected function setValidationFunction($ixColumn,
-                                             $validationFunction
+    protected
+    function setValidationFunction($ixColumn,
+                                   $validationFunction
     )
     {
         $ret = FALSE;
@@ -1581,7 +1590,9 @@ not a boolean, the given value is null, column given is not the PK, and there is
      * @param $ixPassedColumn
      * @return null|Callable
      */
-    protected function getValidationFunction($ixPassedColumn)
+    protected
+    function getValidationFunction($ixPassedColumn
+    )
     {
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn == DA_OUT_OF_RANGE) {
@@ -1595,13 +1606,10 @@ not a boolean, the given value is null, column given is not the PK, and there is
     {
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
-            $ret = $this->colDefaultValue[$ixColumn];
-        } else {
-            $this->raiseError("GetDefaultValue(): Column " . $ixPassedColumn . " out of range");
-            $ret = DA_OUT_OF_RANGE;
+            return $this->colDefaultValue[$ixColumn];
         }
-        return $ret;
-
+        $this->raiseError("GetDefaultValue(): Column " . $ixPassedColumn . " out of range");
+        return DA_OUT_OF_RANGE;
     }
 
     /**
@@ -1627,7 +1635,6 @@ not a boolean, the given value is null, column given is not the PK, and there is
             case DA_INTEGER:
             case DA_FLOAT:
             case DA_ID:
-
                 if ($value === '') {
                     if ($this->debug) {
                         echo '<div>The value is empty string, return null</div>';
@@ -1639,13 +1646,80 @@ not a boolean, the given value is null, column given is not the PK, and there is
                 if ($value == '0000-00-00 00:00:00') {
                     return null;
                 }
-            case DA_DATE:
-                if ($value == '0000-00-00') {
+
+                $date = DateTime::createFromFormat(
+                    'd/m/Y H:i:s',
+                    $value
+                );
+
+                if (!$date) {
                     return null;
                 }
+
+                $value = $date->format(DATE_MYSQL_DATETIME);
+
+                return $value;
+            case DA_DATE:
+                if ($value == '0000-00-00' || !$value) {
+                    return null;
+                }
+                $date = DateTime::createFromFormat(
+                    'd/m/Y',
+                    $value
+                );
+
+                if (!$date) {
+                    return null;
+                }
+                $value = $date->format(DATE_MYSQL_DATE);
+                return $value;
+            case DA_YN:
+                return $value == 'Y' ? 'Y' : 'N';
             default:
                 return $value;
         }
+    }
+
+    function checkValid($columnNameOrIndex, $value)
+    {
+        if ($this->getNull($columnNameOrIndex) == DA_NOT_NULL && $value === null) {
+            return DATASET_MSG_REQUIRED;
+        }
+
+        $validationFunction = $this->getValidationFunction($columnNameOrIndex);
+        if ($validationFunction) {
+            return $validationFunction($value);
+        }
+
+        if ($value === null) {
+            return true;
+        }
+
+        $columnType = $this->getType($columnNameOrIndex);
+        switch ($columnType) {
+            case DA_YN_FLAG:
+            case DA_YN:
+                return in_array($value, ['Y', 'N']) ? true : DATASET_MSG_INVALID;
+            case DA_DATE:
+                $date = DateTime::createFromFormat(
+                    'd/m/Y',
+                    $value
+                );
+                return !!$date ? true : DATASET_MSG_INVALID_DATE;
+            case DA_TIME:
+                return $this->isTime($value) ? true : DATASET_MSG_BAD_TIME;
+            case DA_INTEGER:
+            case DA_ID:
+            case DA_FLOAT:
+                return is_numeric($value) ? true : DATASET_MSG_INVALID;
+            case DA_SUPPORT_LEVEL:
+                $validOptions = ['main', 'supervisor', 'support', 'delegate'];
+                return in_array(
+                    $value,
+                    $validOptions
+                ) ? true : DATASET_MSG_INVALID_SUPPORT_LEVEL;
+        }
+        return true;
     }
 
 }

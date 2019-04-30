@@ -636,7 +636,7 @@ class DBECustomerItem extends DBCNCEntity
         );
         $this->addColumn(
             self::initialContractLength,
-            DA_YN,
+            DA_INTEGER,
             DA_NOT_NULL,
             'custitem.initialContractLength'
         );

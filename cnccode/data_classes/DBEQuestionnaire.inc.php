@@ -65,8 +65,8 @@ class DBEQuestionnaire extends DBEntity
         );
         $this->addColumn(
             self::nameRequired,
-            DA_STRING,
             DA_YN,
+            DA_NOT_NULL,
             "qur_name_required"
         );
         $this->addColumn(

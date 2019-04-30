@@ -87,6 +87,42 @@ class BaseObject
             }
         }
     }
+
+    function isTime($time)
+    {
+        return (
+            is_numeric(
+                substr(
+                    $time,
+                    0,
+                    2
+                )
+            ) &&
+            (substr(
+                    $time,
+                    0,
+                    2
+                ) < 24) &&
+            is_numeric(
+                substr(
+                    $time,
+                    3,
+                    2
+                )
+            ) &&
+            (substr(
+                    $time,
+                    3,
+                    2
+                ) < 60) &&
+            (substr(
+                    $time,
+                    2,
+                    1
+                ) == ':') &&
+            (strlen($time) == 5)
+        );
+    }
 }
 
 ?>

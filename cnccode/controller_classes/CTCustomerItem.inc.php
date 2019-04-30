@@ -1240,17 +1240,14 @@ class CTCustomerItem extends CTCNC
             $this->template->set_var(
                 array(
                     'uploadDescription' => $this->getParam('uploadDescription'),
-                    'userfile'          => $_FILES['userfile']['name'],
+                    'userfile'          => isset($_FILES['userfile']) ? $_FILES['userfile']['name'] : null,
                     'txtUploadFile'     => $txtUploadFile,
                     'urlUploadFile'     => $urlUploadFile
                 )
             );
 
             $dbeJCustomerItemDocument = new DBEJCustomerItemDocument($this);
-            $dbeJCustomerItemDocument->setValue(
-                DBEJCustomerItem::customerItemID,
-                $customerItemID
-            );
+            $dbeJCustomerItemDocument->setValue(DBEJCustomerItem::customerItemID, $customerItemID);
             $dbeJCustomerItemDocument->getRowsByColumn(DBEJCustomerItem::customerItemID);
             while ($dbeJCustomerItemDocument->fetchNext()) {
                 $urlViewFile =
@@ -1536,26 +1533,26 @@ class CTCustomerItem extends CTCNC
         contractID array is the contracts
         */
         $this->contractIDs = $this->getParam('contractID'); /* ?? */
-
+        $this->dsCustomerItem->debug = false;
         if (!$this->dsCustomerItem->populateFromArray($this->getParam('customerItem'))) {
             $this->setFormErrorOn();
+
             if ($this->getAction() == CTCUSTOMERITEM_ACT_INSERT) {
                 $this->add();
             } else {
                 $this->setAction(CTCUSTOMERITEM_ACT_EDIT);
             }
 
-
             $this->setParam('customerItemID', $this->dsCustomerItem->getValue(DBECustomerItem::customerItemID));
 
             $this->display();
             exit;
         }
-
         $this->buCustomerItem->update(
             $this->dsCustomerItem,
             $this->contractIDs
         );
+
 
         $this->dsCustomerItem->initialise();
         // this forces update of itemID back through Javascript to parent HTML window

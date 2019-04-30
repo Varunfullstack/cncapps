@@ -301,11 +301,10 @@ class BUCustomerItem extends Business
         }
 
         $dbeCustomerItem = new DBECustomerItem($this);
-        if ($dsCustomerItem->getValue(DBECustomerItem::customerItemID) != 0) {
+        if ($dsCustomerItem->getValue(DBECustomerItem::customerItemID)) {
             $dbeCustomerItem->getRow($customerItemID);
         }
         $dsCustomerItem->setUpdateModeUpdate();
-
         /*
         If being suspended now, set suspended date and user
         */

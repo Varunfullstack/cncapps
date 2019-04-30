@@ -286,27 +286,23 @@ class CTQuestionnaire extends CTCNC
         $this->setMethodName('update');
         $this->formError = (!$this->dsQuestionnaire->populateFromArray($this->getParam('questionnaire')));
         if ($this->formError) {
-            if ($this->dsQuestionnaire->getValue(
-                DBEQuestionnaire::questionnaireID
-            )) {                    // attempt to insert
+            $this->setAction('create');
+            if ($this->dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID)) {
                 $this->setAction('edit');
-            } else {
-                $this->setAction('create');
             }
             $this->edit();
             exit;
         }
-
         $this->buQuestionnaire->updateQuestionnaire($this->dsQuestionnaire);
 
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'questionnaireID' => $this->dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID),
-                    'action'          => 'view'
-                )
-            );
+
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'questionnaireID' => $this->dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID),
+                'action'          => 'view'
+            )
+        );
         header('Location: ' . $urlNext);
     }
 
