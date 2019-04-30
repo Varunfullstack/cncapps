@@ -2513,7 +2513,7 @@ class CTActivity extends CTCNC
         $this->template->set_var(
             array(
                 'uploadDescription' => $this->getParam('uploadDescription'),
-                'userfile'          => $_FILES['userfile']['name'],
+                'userfile'          => isset($_FILES['userfile']) ? $_FILES['userfile']['name'] : null,
                 'txtUploadFile'     => $txtUploadFile,
                 'urlUploadFile'     => $urlUploadFile
             )

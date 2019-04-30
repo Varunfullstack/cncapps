@@ -1303,6 +1303,18 @@
         <dropColumn tableName="headert" columnName="hed_helpdesk_problems"/>
         <rollback/>
     </changeSet>
-
-
+    <changeSet author="pavwebdev" id="1554199133-150">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="item" columnNames="notes"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE FULLTEXT INDEX idx_fulltext_item_itm_desc_notes_unit_of_sale
+                ON item (itm_desc, notes, itm_unit_of_sale);
+        </sql>
+        <rollback>
+            <dropIndex tableName="item" indexName="idx_fulltext_item_itm_desc_notes_unit_of_sale"/>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>
