@@ -2,6 +2,7 @@
 require_once("config.inc.php");
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 
+require_once($_SERVER['DOCUMENT_ROOT'] . '/.config.php');
 require_once(CONFIG_PATH_CNC_CLASSES . 'contract_report.php');
 
 page_open(
