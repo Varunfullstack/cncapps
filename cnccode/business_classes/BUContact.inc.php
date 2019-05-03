@@ -269,6 +269,7 @@ class BUContact extends Business
         $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
         $dsResults->copyColumnsFrom($this->dbeContact);
+        $dsResults->setNull(DBEContact::contactID, DA_ALLOW_NULL);
         $dsResults->setUpdateModeInsert();
         $dsResults->setValue(
             DBEContact::contactID,

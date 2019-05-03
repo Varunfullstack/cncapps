@@ -14,8 +14,8 @@ class BUCustomerAnalysisReport extends Business
 {
 
     const searchFormCustomerID = "customerID";
-    const searchFormStartYearMonth = "customerID";
-    const searchFormEndYearMonth = "startYearMonth";
+    const searchFormStartYearMonth = "startYearMonth";
+    const searchFormEndYearMonth = "endYearMonth";
 
     function __construct(&$owner)
     {
@@ -26,10 +26,10 @@ class BUCustomerAnalysisReport extends Business
     {
         $dsData = new DSForm($this);
         $dsData->addColumn(self::searchFormCustomerID, DA_STRING, DA_ALLOW_NULL);
-        $dsData->setValue(self::searchFormCustomerID, null);
         $dsData->addColumn(self::searchFormStartYearMonth, DA_STRING, DA_ALLOW_NULL);
-        $dsData->setValue(self::searchFormStartYearMonth, null);
         $dsData->addColumn(self::searchFormEndYearMonth, DA_STRING, DA_ALLOW_NULL);
+        $dsData->setValue(self::searchFormCustomerID, null);
+        $dsData->setValue(self::searchFormStartYearMonth, null);
         $dsData->setValue(self::searchFormEndYearMonth, null);
     }
 

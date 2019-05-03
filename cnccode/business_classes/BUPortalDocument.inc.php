@@ -18,9 +18,30 @@ class BUPortalDocument extends Business
         $this->dbePortalDocumentWithoutFile = new DBEPortalDocumentWithoutFile($this);
     }
 
+    function beforePost(DataAccess $newRow)
+    {
+        if (!$newRow->getValue(DBEPortalDocumentWithoutFile::createdUserID)) {
+            $newRow->setValue(DBEPortalDocumentWithoutFile::createdUserID, $this->owner->userID);
+        }
+
+        if (!$newRow->getValue(DBEPortalDocumentWithoutFile::createdDate)) {
+            $newRow->setValue(
+                DBEPortalDocumentWithoutFile::createdDate,
+                (new DateTime())->format(DATE_MYSQL_DATETIME)
+            );
+        }
+    }
+
     function updateDocument(&$dsData, $userfile)
     {
         $this->setMethodName('updateDocument');
+
+        $this->dbePortalDocumentWithoutFile->setCallbackMethod(
+            DA_BEFORE_POST,
+            $this,
+            'beforePost'
+        );
+
         /**
          * Upload new document from local disk
          * @access private
@@ -55,7 +76,7 @@ class BUPortalDocument extends Business
 
     function getDocuments(&$dsResults)
     {
-        $this->dbePortalDocument->getRows('description');
+        $this->dbePortalDocument->getRows(DBEPortalDocument::description);
         return ($this->getData($this->dbePortalDocument, $dsResults));
     }
 

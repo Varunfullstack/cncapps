@@ -35,6 +35,7 @@ class CTSalesOrderDocument extends CTCNC
         $this->buSalesOrderDocument = new BUSalesOrderDocument($this);
         $this->dsSalesOrderDocument = new DSForm($this);
         $this->dsSalesOrderDocument->copyColumnsFrom($this->buSalesOrderDocument->dbeSalesOrderDocument);
+        $this->dsSalesOrderDocument->setPK($this->buSalesOrderDocument->dbeSalesOrderDocument->getPK());
     }
 
     /**
@@ -72,13 +73,15 @@ class CTSalesOrderDocument extends CTCNC
 
         if (!$this->getFormError()) {
             if ($this->getAction() == CTSALESORDERDOCUMENT_ACT_EDIT) {
-                $this->buSalesOrderDocument->getDocumentByID($this->getParam('salesOrderDocumentID'), $dsSalesOrderDocument);
+                $this->buSalesOrderDocument->getDocumentByID(
+                    $this->getParam('salesOrderDocumentID'),
+                    $dsSalesOrderDocument
+                );
                 $salesOrderDocumentID = $this->getParam('salesOrderDocumentID');
             } else {                                                                    // creating new
                 $dsSalesOrderDocument->initialise();
-                $dsSalesOrderDocument->setValue(DBESalesOrderDocument::salesOrderDocumentID, '0');
                 $dsSalesOrderDocument->setValue(DBESalesOrderDocument::ordheadID, $this->getParam('ordheadID'));
-                $salesOrderDocumentID = '0';
+                $salesOrderDocumentID = null;
             }
         } else {                                                                        // form validation error
             $dsSalesOrderDocument->initialise();
@@ -131,6 +134,14 @@ class CTSalesOrderDocument extends CTCNC
                 'descriptionMessage'   => Controller::htmlDisplayText(
                     $dsSalesOrderDocument->getMessage(DBESalesOrderDocument::description)
                 ),
+                'createdDate'          => $dsSalesOrderDocument->getValue(
+                    DBESalesOrderDocument::createdDate
+                ) ? $dsSalesOrderDocument->getValue(DBESalesOrderDocument::createdDate) : (new DateTime())->format(
+                    DATE_MYSQL_DATETIME
+                ),
+                'createdUserID'        => $dsSalesOrderDocument->getValue(
+                    DBESalesOrderDocument::createdUserID
+                ) ? $dsSalesOrderDocument->getValue(DBESalesOrderDocument::createdUserID) : $this->userID,
                 'urlUpdate'            => $urlUpdate,
                 'urlDelete'            => $urlDelete,
                 'urlDisplayOrder'      => $urlDisplayOrder,
@@ -169,6 +180,7 @@ class CTSalesOrderDocument extends CTCNC
     {
         $this->setMethodName('update');
         $this->formError = (!$this->dsSalesOrderDocument->populateFromArray($this->getParam('salesOrderDocument')));
+
         /*
         Need a file when creating new
         */
@@ -178,7 +190,6 @@ class CTSalesOrderDocument extends CTCNC
             $this->setFormErrorMessage('Please enter a file path');
         } else {
             /* uploading a file */
-
             if ($_FILES['userfile']['name'] && !is_uploaded_file($_FILES['userfile']['tmp_name'])) {
                 $this->setFormErrorMessage('Document not loaded - is it bigger than 6 MBytes?');
             }
@@ -194,7 +205,6 @@ class CTSalesOrderDocument extends CTCNC
             $this->edit();
             exit;
         }
-
         $this->buSalesOrderDocument->updateDocument($this->dsSalesOrderDocument, $_FILES['userfile']);
 
         $urlNext =

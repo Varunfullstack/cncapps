@@ -142,7 +142,7 @@ class CTContact extends CTCNC
     function displayContactSelectPopup()
     {
         $this->setMethodName('displayContactSelectPopup');
-        if (!$this->getParam('supplierID') && $this->getParam('customerID')) {
+        if (!$this->getParam('supplierID') && !$this->getParam('customerID')) {
             $this->raiseError('supplierID or customerID not passed');
         }
         $urlCreate = Controller::buildLink(

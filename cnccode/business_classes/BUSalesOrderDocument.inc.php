@@ -21,10 +21,7 @@ class BUSalesOrderDocument extends Business
     function updateDocument(&$dsData, $userfile)
     {
         $this->setMethodName('updateDocument');
-        /**
-         * Upload new document from local disk
-         * @access private
-         */
+
         $this->updateDataAccessObject($dsData, $this->dbeSalesOrderDocumentWithoutFile);
 
         /* file to add? */
@@ -36,8 +33,6 @@ class BUSalesOrderDocument extends Business
             );
             $this->dbeSalesOrderDocument->setValue(DBESalesOrderDocument::filename, ( string )$userfile ['name']);
             $this->dbeSalesOrderDocument->setValue(DBESalesOrderDocument::fileMimeType, ( string )$userfile ['type']);
-            $this->dbeSalesOrderDocument->setValue(DBESalesOrderDocument::createdDate, date(DATE_MYSQL_DATETIME));
-            $this->dbeSalesOrderDocument->setValue(DBESalesOrderDocument::createdUserID, $this->owner->userID);
             $this->dbeSalesOrderDocument->updateRow();
         }
 

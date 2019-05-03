@@ -428,6 +428,8 @@ class CTBookSalesVisit extends CTCNC
 
         $dbeCallActivity = new DBECallActivity($this);
 
+        $dbeCallActivity->setValue(DBEJCallActivity::curValue, '0.00');
+
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActivityID,
             0
@@ -482,8 +484,10 @@ class CTBookSalesVisit extends CTCNC
         $dbeCallActivity->insertRow();
 
         $attendeesJSON = $dsSearchForm->getValue(self::searchFormAttendees);
-
-        $attendees = json_decode($attendeesJSON);
+        $attendees = $attendeesJSON;
+        if (!is_array($attendeesJSON)) {
+            $attendees = json_decode($attendeesJSON);
+        }
 
         $firstActivityCreated = null;
 

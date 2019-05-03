@@ -36,6 +36,7 @@ class CTTeam extends CTCNC
         $this->buTeam = new BUTeam($this);
         $this->dsTeam = new DSForm($this);
         $this->dsTeam->copyColumnsFrom($this->buTeam->dbeTeam);
+        $this->dsTeam->setNull(DBETeam::teamID, DA_ALLOW_NULL);
     }
 
     /**

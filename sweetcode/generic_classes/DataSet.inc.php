@@ -112,6 +112,9 @@ class DataSet extends DataAccess
                 $ret = TRUE;
                 break;
             case DA_MODE_UPDATE:
+                if ($this->debug) {
+                    var_dump($this->ixCurrentRow);
+                }
                 $this->rows[$this->ixCurrentRow] = $this->row;
                 $ret = TRUE;
                 break;
@@ -131,6 +134,16 @@ class DataSet extends DataAccess
     function fetchNext()
     {
         parent::fetchNext();
+
+        if ($this->debug) {
+            try {
+                throw new Exception();
+            } catch (Exception $exception) {
+                var_dump($exception->getTraceAsString());
+            }
+            var_dump($this->ixCurrentRow, $this->rowCount());
+            var_dump(array_keys($this->rows));
+        }
         if (($this->ixCurrentRow + 1) >= $this->rowCount()) {
             $this->eof = TRUE;
             return FALSE;
@@ -428,7 +441,7 @@ class DataSet extends DataAccess
             $this->setUpdateModeInsert();
             foreach ($row as $fieldName => $value) {
                 if ($this->debug) {
-                    var_dump($fieldName, $value);
+                    echo '<div>FieldName: ' . $fieldName . ', Value: ' . $value . '</div>';
                 }
                 $columnIdx = $this->columnExists($fieldName);
                 if ($columnIdx == DA_OUT_OF_RANGE) {

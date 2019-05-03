@@ -40,10 +40,8 @@ class BUCustomerProfitabilityMonthsReport extends Business
         $d2 = DateTime::createFromFormat('m/Y', $endYearMonth)->modify('last day of this month');
 
         while ($d1 <= $d2) {
-
             $periods[] = $d1->format('m/Y');
             $d1->add(new DateInterval('P1M'));
-
         }
 
         return $periods;
@@ -68,7 +66,6 @@ class BUCustomerProfitabilityMonthsReport extends Business
 
         $dsSearchForm = new DSForm($this);
         $buCustomerAnalysisReport->initialiseSearchForm($dsSearchForm);
-
         $periods = $this->getPeriodsBetween($startYearMonth, $endYearMonth);
 
         $dsSearchForm->setValue(self::searchFormCustomerID, $customerID);
@@ -76,12 +73,9 @@ class BUCustomerProfitabilityMonthsReport extends Business
         $profit = array();
 
         foreach ($periods as $period) {
-
             $dsSearchForm->setValue(self::searchFormStartYearMonth, $period);
             $dsSearchForm->setValue(self::searchFormEndYearMonth, $period);
-
             $results = $buCustomerAnalysisReport->getResults($dsSearchForm);
-
             $profitPeriodTotal = 0;
 
             foreach ($results as $contractName => $row) {
@@ -92,7 +86,6 @@ class BUCustomerProfitabilityMonthsReport extends Business
                 }
             }
             $profit[$period] = $profitPeriodTotal;
-
         }
         return $profit;
     }

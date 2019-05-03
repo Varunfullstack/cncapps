@@ -533,6 +533,5 @@ class CTGoodsIn extends CTCNC
                 )
             );
         header('Location: ' . $urlNext);
-        exit;
     }
 }

@@ -227,13 +227,13 @@ class BUExpense extends Business
         $dbeVat = new DBEVat($this);
         $dbeVat->getRow();
         $vatRate = $dbeVat->getValue((integer)$stdVatCode[1]);
-
+        $date = DateTime::createFromFormat(DATE_MYSQL_DATE, $dsData->getValue(self::exportDataSetEndDate));
         /*
         start writing to summary file
         */
         $summaryFileName =
             SAGE_EXPORT_DIR .
-            '/EXPENSE-SUMMARY-' . $dsData->getValue(self::exportDataSetEndDate) . '.csv';
+            '/EXPENSE-SUMMARY-' . $date->format(DATE_MYSQL_DATE) . '.csv';
 
         $summaryFileHandle = fopen(
             $summaryFileName,

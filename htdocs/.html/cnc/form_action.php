@@ -1,1 +1,0 @@
-<?php print SC_HTTP::serverVar('PHP_SELF') ?>" method="post" enctype="application/x-www-form-urlencoded" name="<?php print SC_String::display($business->name, SC_STRING_FMT_UPPERCASE_FIRST_LETTER)?>

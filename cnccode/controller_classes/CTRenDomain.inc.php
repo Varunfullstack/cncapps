@@ -60,7 +60,7 @@ class CTRenDomain extends CTCNC
         $this->buRenDomain = new BURenDomain($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenDomain = new DSForm($this);
-        $this->dsRenDomain->copyColumnsFrom($this->buRenDomain->dbeRenDomain);
+        $this->dsRenDomain->copyColumnsFrom(new DBEJRenDomain($this));
         $this->dsRenDomain->addColumn(
             self::renDomainFormCustomerName,
             DA_STRING,
@@ -423,7 +423,7 @@ class CTRenDomain extends CTCNC
                     $dsRenDomain->getValue(DBEJCustomerItem::customerID)
                 ),
                 'siteName'                           => Controller::htmlDisplayText(
-                    $dsRenDomain->getValue(DBEJCustomerItem::siteDescription)
+                    $dsRenDomain->getValue(DBEJRenDomain::siteName)
                 ),
                 'siteNo'                             => $dsRenDomain->getValue(DBEJCustomerItem::siteNo),
                 'itemDescription'                    => Controller::htmlDisplayText(

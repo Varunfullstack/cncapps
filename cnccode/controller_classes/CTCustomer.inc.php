@@ -776,8 +776,8 @@ class CTCustomer extends CTCNC
             );
 
             if (
-                $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &
-                $this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)
+                $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
+                !$this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)
             ) {
                 $this->dsCustomer->setValue(
                     self::customerFormSpecialAttentionEndDateMessage,
@@ -823,10 +823,16 @@ class CTCustomer extends CTCNC
                 DBECustomer::prospectFlag,
                 $this->getYN(@$value['prospectFlag'])
             );
+
+            var_dump(@$value['createDate']);
+            $this->dsCustomer->debug = true;
             $this->dsCustomer->setValue(
                 DBECustomer::createDate,
                 @$value['createDate']
             );
+            $this->dsCustomer->debug = false;
+
+
             $this->dsCustomer->setValue(
                 DBECustomer::gscTopUpAmount,
                 @$value['gscTopUpAmount']
@@ -2154,7 +2160,6 @@ ORDER BY cus_name ASC  ";
         $buItem = new BUCustomerItem($this);
 
         $forceDirectDebit = $buItem->clientHasDirectDebit($this->dsCustomer->getValue(DBECustomer::customerID));
-
 
         $this->template->set_var(
             array(
@@ -3617,9 +3622,6 @@ ORDER BY cus_name ASC  ";
                         ),
                         'mainContactOnlyFlag' => $dsPortalCustomerDocument->getValue(
                             DBEPortalCustomerDocument::mainContactOnlyFlag
-                        ),
-                        'createDate'          => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::createdDate
                         ),
                         'urlViewFile'         => $urlViewFile,
                         'urlEditDocument'     => $urlEditDocument,

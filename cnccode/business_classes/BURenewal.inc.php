@@ -455,6 +455,7 @@ class BURenewal extends Business
             $row['notes'] = $dbeJRenDomain->getValue(DBEJRenDomain::notes);
             $row['expiryDate'] = $dbeJRenDomain->getValue(DBEJRenDomain::invoiceFromDate);
             $row['renewalTypeID'] = 4;
+            $row['coveredItems'] = [];
             $row['calculatedExpiryDate'] = getExpiryDate(
                 DateTime::createFromFormat(
                     'Y-m-d',
@@ -497,6 +498,7 @@ class BURenewal extends Business
             $row['notes'] = $dbeJRenBroadband->getValue(DBEJRenBroadband::adslPhone);
             $row['expiryDate'] = $dbeJRenBroadband->getValue(DBEJRenBroadband::invoiceFromDate);
             $row['renewalTypeID'] = 1;
+            $row['coveredItems'] = [];
             $row['calculatedExpiryDate'] = getExpiryDate(
                 DateTime::createFromFormat(
                     'Y-m-d',
@@ -537,7 +539,7 @@ class BURenewal extends Business
             $row['notes'] = $dbeJRenHosting->getValue(DBEJRenHosting::notes);
             $row['expiryDate'] = $dbeJRenHosting->getValue(DBEJRenHosting::invoiceFromDate);
             $row['renewalTypeID'] = 5;
-
+            $row['coveredItems'] = [];
             $row['calculatedExpiryDate'] = getExpiryDate(
                 DateTime::createFromFormat(
                     'Y-m-d',
@@ -583,7 +585,7 @@ class BURenewal extends Business
             $row['notes'] = $dbeJRenQuotation->getValue(DBEJRenQuotation::notes);
             $row['expiryDate'] = $dbeJRenQuotation->getValue(DBEJRenQuotation::nextPeriodStartDate);
             $row['renewalTypeID'] = 3;
-
+            $row['coveredItems'] = [];
             $row['calculatedExpiryDate'] = (
             DateTime::createFromFormat(
                 'Y-m-d',
@@ -625,7 +627,7 @@ class BURenewal extends Business
             $row['itemTypeDescription'] = $dsExternalItem->getValue(DBEJExternalItem::itemTypeDescription);
             $row['notes'] = $dsExternalItem->getValue(DBEJExternalItem::notes);
             $row['renewalTypeID'] = 0;
-
+            $row['coveredItems'] = [];
             $returnArray[] = $row;
         }
         return $returnArray;

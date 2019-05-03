@@ -377,11 +377,11 @@ class CTInvoice extends CTCNC
                 'invoiceBlock',
                 'invoices'
             );
-            $typeCol = $dsSearchResults->columnExists(BUInvoice::searchFormInvoiceType);
-            $customerNameCol = $dsSearchResults->columnExists(BUInvoice::searchFormCustomerName);
-            $custPORefCol = $dsSearchResults->columnExists(self::custPORef);
-            $invheadIDCol = $dsSearchResults->columnExists(BUInvoice::searchFormInvheadID);
-            $ordheadIDCol = $dsSearchResults->columnExists(BUInvoice::searchFormOrdheadID);
+            $typeCol = $dsSearchResults->columnExists(DBEInvhead::type);
+            $customerNameCol = $dsSearchResults->columnExists(DBEJInvhead::customerName);
+            $custPORefCol = $dsSearchResults->columnExists(DBEInvhead::custPORef);
+            $invheadIDCol = $dsSearchResults->columnExists(DBEJInvhead::invheadID);
+            $ordheadIDCol = $dsSearchResults->columnExists(DBEJInvhead::ordheadID);
             while ($dsSearchResults->fetchNext()) {
                 $invoiceURL =
                     Controller::buildLink(
@@ -424,19 +424,19 @@ class CTInvoice extends CTCNC
     {
         $this->setMethodName('invoiceSearch');
         $this->buInvoice->initialiseSearchForm($this->dsSearchForm);
-        if ($this->getParam('ordheadID')) {                    // just search by ordheadID
+        if (!$this->getParam('ordheadID')) {
+            if ($this->getParam('invoice') && !$this->dsSearchForm->populateFromArray($this->getParam('invoice'))) {
+                $this->setFormErrorOn();
+                $this->displaySearchForm(); //redisplay with errors
+                exit;
+            }
+        } else {                    // just search by ordheadID
             $this->dsSearchForm->setUpdateModeInsert();
             $this->dsSearchForm->setValue(
                 BUInvoice::searchFormOrdheadID,
                 $this->getParam('ordheadID')
             );
             $this->dsSearchForm->post();
-        } else {
-            if (!$this->dsSearchForm->populateFromArray($this->getParam('invoice'))) {
-                $this->setFormErrorOn();
-                $this->displaySearchForm(); //redisplay with errors
-                exit;
-            }
         }
         $this->buInvoice->search(
             $this->dsSearchForm,

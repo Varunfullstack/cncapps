@@ -174,9 +174,9 @@ class BUStaffProductivityReport extends Business
         cns_consno = $userID";
 
         $result = $this->db->query($query);
-        $row = $result->fetch_object();
-        $helpdeskFlag = $row->helpdeskFlag;
-        $hourlyPayRate = $row->hourlyPayRate;
+        $helpDeskRow = $result->fetch_object();
+        $helpdeskFlag = $helpDeskRow->helpdeskFlag;
+        $hourlyPayRate = $helpDeskRow->hourlyPayRate;
 
         /* Get user's normal working hours */
         if ($helpdeskFlag == 'Y') {
@@ -238,7 +238,7 @@ class BUStaffProductivityReport extends Business
             if ($row->weekday == 0 OR $row->weekday == 6) {
                 $overtime = $endTime - $startTime;
             } else {
-                if ($row->weekdayOvertimeFlag == 'Y') {
+                if ($helpDeskRow->weekdayOvertimeFlag == 'Y') {
                     /*
                     If this is a helpdesk staff then evening overtime is only allowed on activities that start after office end time
                     */

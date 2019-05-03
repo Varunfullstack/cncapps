@@ -1331,4 +1331,105 @@
             <dropIndex tableName="item" indexName="idx_fulltext_item_notes_unit_of_sale"/>
         </rollback>
     </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-152">
+        <dropNotNullConstraint columnName="filename" tableName="salesorder_document" columnDataType="char(100)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-153">
+        <dropNotNullConstraint columnName="file" tableName="salesorder_document" columnDataType="longblob"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-154">
+        <dropNotNullConstraint columnName="fileMimeType" tableName="salesorder_document" columnDataType="char(50)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-155">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="salesorder_document" indexName="PRIMARY"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey columnNames="salesOrderDocumentID" constraintName="PRIMARY" tableName="salesorder_document"/>
+        <rollback>
+            <dropPrimaryKey tableName="salesorder_document" constraintName="PRIMARY"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-156">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="NO">
+                SELECT `information_schema`.COLUMNS.`IS_NULLABLE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='callactivity'
+                AND column_name='caa_callacttypeno'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint tableName="callactivity" columnName="caa_callacttypeno" columnDataType="int(11)"/>
+        <sql>
+            update callactivity
+            set caa_callacttypeno = null
+            where caa_callacttypeno = 0
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-157">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="NO">
+                SELECT `information_schema`.COLUMNS.`IS_NULLABLE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='portal_document'
+                AND column_name='filename'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint columnName="filename" tableName="portal_document" columnDataType="char(100)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-158">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="NO">
+                SELECT `information_schema`.COLUMNS.`IS_NULLABLE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='portal_document'
+                AND column_name='file'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint columnName="file" tableName="portal_document" columnDataType="longblob"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-159">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="NO">
+                SELECT `information_schema`.COLUMNS.`IS_NULLABLE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='portal_document'
+                AND column_name='fileMimeType'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint columnName="fileMimeType" tableName="portal_document" columnDataType="char(50)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-160">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                select count(*) > 0 from customer where cus_create_date is null or cus_create_date = '0000-00-00'
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            UPDATE
+                customer
+            SET cus_create_date =
+                    CASE
+                        WHEN cus_became_customer_date IS NOT NULL
+                            THEN cus_became_customer_date
+                        ELSE '1996-01-01'
+                        END
+            WHERE cus_create_date IS NULL
+               OR cus_create_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+
 </databaseChangeLog>

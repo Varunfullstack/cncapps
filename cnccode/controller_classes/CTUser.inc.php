@@ -93,7 +93,8 @@ class CTUser extends CTCNC
         }
         $this->buUser = new BUUser($this);
         $this->dsUser = new DSForm($this);
-        $this->dsUser->copyColumnsFrom($this->buUser->dbeUser);
+        $this->dsUser->copyColumnsFrom($this->buUser->dbeUser, false);
+        $this->dsUser->setNull(DBEUser::userID, DA_ALLOW_NULL);
 
         $this->dsUser->setAddColumnsOn();
         $this->dsUser->addColumn(
@@ -783,6 +784,42 @@ class CTUser extends CTCNC
         $this->parsePage();
     }// end function edit()
 
+
+    private function updateEncryptedData(array $userData, DataAccess $dsUser)
+    {
+        $dsUser->setUpdateModeUpdate();
+
+
+        $keys = [
+            'dateOfBirth',
+            'pensionAdditionalPayments',
+            'salary',
+            'salarySacrifice',
+            'nationalInsuranceNumber',
+            'address1',
+            'address2',
+            'address3',
+            'town',
+            'county',
+            'postcode',
+        ];
+
+
+        foreach ($keys as $key) {
+            $encryptedKeyName = 'encrypted' . ucfirst($key);
+            $encryptedValue = $this->dsUser->getValue($encryptedKeyName);
+            if (isset($userData[$key]) && $userData[$key]) {
+                $encryptedValue = Encryption::encrypt(
+                    USER_ENCRYPTION_PUBLIC_KEY,
+                    $userData[$key]
+                );
+
+            }
+            $this->dsUser->setValue($encryptedKeyName, $encryptedValue);
+        }
+        $dsUser->post();
+    }
+
     /**
      * Update call user details
      * @access private
@@ -791,160 +828,10 @@ class CTUser extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        if ($this->getParam('user')[1]["dateOfBirth"]) {
-            if ($this->getParam('user')[1]["dateOfBirth"]) {
-                $this->getParam('user')[1]["encryptedDateOfBirth"] =
-                    Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->getParam('user')[1]["dateOfBirth"]
-                    );
-
-            } else {
-                $this->getParam('user')[1]["encryptedDateOfBirth"] = null;
-            }
-        }
-
-        if ($this->getParam('user')[1]["pensionAdditionalPayments"]) {
-
-            if ($this->getParam('user')[1]["pensionAdditionalPayments"]) {
-                $this->getParam('user')[1]["encryptedPensionAdditionalPayments"] =
-                    Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->getParam('user')[1]["pensionAdditionalPayments"]
-                    );
-
-            } else {
-                $this->getParam('user')[1]["encryptedPensionAdditionalPayments"] = null;
-            }
-        }
-
-        if ($this->getParam('user')[1]["salary"]) {
-
-            if ($this->getParam('user')[1]["salary"]) {
-                $this->getParam('user')[1]["encryptedSalary"] =
-                    Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->getParam('user')[1]["salary"]
-                    );
-
-            } else {
-                $this->getParam('user')[1]["encryptedSalary"] = null;
-            }
-        }
-
-        if ($this->getParam('user')[1]["salarySacrifice"]) {
-
-            if ($this->getParam('user')[1]["salarySacrifice"]) {
-                $this->getParam('user')[1]["encryptedSalarySacrifice"] =
-                    Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->getParam('user')[1]["salarySacrifice"]
-                    );
-
-            } else {
-                $this->getParam('user')[1]["encryptedSalarySacrifice"] = null;
-            }
-        }
-
-
-        if ($this->getParam('user')[1]["nationalInsuranceNumber"]) {
-
-            if ($this->getParam('user')[1]["nationalInsuranceNumber"]) {
-                $this->getParam('user')[1]["encryptedNationalInsuranceNumber"] =
-                    Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->getParam('user')[1]["nationalInsuranceNumber"]
-                    );
-
-            } else {
-                $this->getParam('user')[1]["encryptedNationalInsuranceNumber"] = null;
-            }
-        }
-
-        if ($this->getParam('user')[1]["address1"]) {
-
-            if ($this->getParam('user')[1]["address1"]) {
-                $this->getParam('user')[1]["encryptedAddress1"] =
-                    Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->getParam('user')[1]["address1"]
-                    );
-
-            } else {
-                $this->getParam('user')[1]["encryptedAddress1"] = null;
-            }
-        }
-
-        if ($this->getParam('user')[1]["address2"]) {
-
-            if ($this->getParam('user')[1]["address2"]) {
-                $this->getParam('user')[1]["encryptedAddress2"] =
-                    Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->getParam('user')[1]["address2"]
-                    );
-
-            } else {
-                $this->getParam('user')[1]["encryptedAddress2"] = null;
-            }
-        }
-
-
-        if ($this->getParam('user')[1]["address3"]) {
-
-            if ($this->getParam('user')[1]["address3"]) {
-                $this->getParam('user')[1]["encryptedAddress3"] =
-                    Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->getParam('user')[1]["address3"]
-                    );
-
-            } else {
-                $this->getParam('user')[1]["encryptedAddress3"] = null;
-            }
-        }
-
-        if ($this->getParam('user')[1]["town"]) {
-            if ($this->getParam('user')[1]["town"]) {
-                $this->getParam('user')[1]["encryptedTown"] =
-                    Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->getParam('user')[1]["town"]
-                    );
-
-            } else {
-                $this->getParam('user')[1]["encryptedTown"] = null;
-            }
-        }
-
-        if ($this->getParam('user')[1]["county"]) {
-
-            if ($this->getParam('user')[1]["county"]) {
-                $this->getParam('user')[1]["encryptedCounty"] =
-                    Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->getParam('user')[1]["county"]
-                    );
-
-            } else {
-                $this->getParam('user')[1]["encryptedCounty"] = null;
-            }
-        }
-
-        if ($this->getParam('user')[1]["postcode"]) {
-
-            if ($this->getParam('user')[1]["postcode"]) {
-                $this->getParam('user')[1]["encryptedPostcode"] =
-                    Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $this->getParam('user')[1]["postcode"]
-                    );
-
-            } else {
-                $this->getParam('user')[1]["encryptedPostcode"] = null;
-            }
-        }
         $this->formError = (!$this->dsUser->populateFromArray($this->getParam('user')));
+        $userData = $this->getParam('user')[1];
+        $this->updateEncryptedData($userData, $this->dsUser);
+
         if ($this->getParam('perms')) {
             $this->dsUser->setUpdateModeUpdate();
             $this->dsUser->setValue(
@@ -957,29 +844,24 @@ class CTUser extends CTCNC
             $this->dsUser->post();
         }
         if ($this->formError) {
-            if ($this->dsUser->getValue(DBEJUser::userID) == '0') {                    // attempt to insert
-                $this->setAction(CTUSER_ACT_EDIT);
-            } else {
+            if (!$this->dsUser->getValue(DBEJUser::userID)) {
                 $this->setAction(CTUSER_ACT_CREATE);
+            } else {
+                $this->setAction(CTUSER_ACT_EDIT);
             }
             $this->edit();
             exit;
         }
 
-
-        $this->dsUser->setUpdateModeUpdate();
-        $this->dsUser->post();
-
         $this->buUser->updateUser($this->dsUser);
 
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'userID' => $this->dsUser->getValue(DBEJUser::userID),
-                    'action' => CTCNC_ACT_VIEW
-                )
-            );
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'userID' => $this->dsUser->getValue(DBEJUser::userID),
+                'action' => CTCNC_ACT_VIEW
+            )
+        );
         header('Location: ' . $urlNext);
     }
 

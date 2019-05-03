@@ -67,11 +67,10 @@ class CTPrepay extends CTCNC
             $this->setFormErrorOn();
         } else {
             // do export
-            $dsResults =
-                $this->buPrepay->exportPrepayActivities(
-                    $this->dsPrepayExport,
-                    $this->getParam('update')
-                );
+            $dsResults = $this->buPrepay->exportPrepayActivities(
+                $this->dsPrepayExport,
+                $this->getParam('update')
+            );
         }
         $this->exportForm($dsResults);
     }

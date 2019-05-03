@@ -337,6 +337,7 @@ class DataAccess extends BaseObject
                 }
             }
         }
+
         if ($this->afterColumnsCreatedMethod != "") {
             $this->callback(
                 DA_AFTER_COLUMNS_CREATED,
@@ -350,7 +351,6 @@ class DataAccess extends BaseObject
             $data->fetchNext();
         }
         while (!$data->eof) {
-
             /*
             Update row on this object if allowed and the primary key column in $data has a value
             otherwise insert a new row.
@@ -366,6 +366,9 @@ class DataAccess extends BaseObject
             objects unless you really intend to update their rows!
             You will just end up with an empty dataset.
             */
+            if ($this->debug) {
+                var_dump($this->allowUpdate);
+            }
             if ($this->allowUpdate) {
                 if ($data->getPKValue() != $this->getNewRowValue()) {
                     $this->setPKValue($data->getPKValue());
@@ -403,8 +406,8 @@ class DataAccess extends BaseObject
                 (!is_subclass_of(
                     $data,
                     DA_CLASSNAME_DBENTITY
-                )) &
-                ($this->getUpdateMode() == DA_MODE_INSERT) &
+                )) &&
+                ($this->getUpdateMode() == DA_MODE_INSERT) &&
                 ($data->getPKName() != "") &&
                 ($data->getPKValue() == $this->getNewRowValue())
             ) {
@@ -413,7 +416,6 @@ class DataAccess extends BaseObject
                 $data->post();
             }
             if ($this->afterPostMethod != "") {
-//				$ret=($this->callback(DA_AFTER_POST, $data));
                 $this->callback(
                     DA_AFTER_POST,
                     $data
@@ -755,19 +757,47 @@ class DataAccess extends BaseObject
     function columnExists($ixColumn)
     {
         if ($ixColumn === FALSE || is_null($ixColumn)) {
+            if ($this->debug) {
+                echo '<div>ColumnExists: given column name or index is null </div>';
+            }
             return DA_OUT_OF_RANGE;
         }
 
-        if (!$this->_colCount) return DA_OUT_OF_RANGE;
+        if (!$this->_colCount) {
+            if ($this->debug) {
+                echo '<div>ColumnExists: there are no columns defined </div>';
+            }
+            return DA_OUT_OF_RANGE;
+        }
 
         if (is_numeric($ixColumn)) {
+            if ($this->debug) {
+                echo '<div>ColumnExists: column given is numeric: ' . $ixColumn . ' </div>';
+            }
+
             if (!key_exists($ixColumn, $this->colName)) {
+                if ($this->debug) {
+                    echo '<div>ColumnExists: The column does not exist: ' . $ixColumn . ' </div>';
+                }
                 return DA_OUT_OF_RANGE;
+            }
+            if ($this->debug) {
+                echo '<div>ColumnExists: The given ' . $ixColumn . ' does exist</div>';
             }
             return $ixColumn;
         }
 
-        if (!isset($this->colNameInverse[$ixColumn])) return DA_OUT_OF_RANGE;
+        if (!isset($this->colNameInverse[$ixColumn])) {
+            if ($this->debug) {
+                echo '<div>ColumnExists: The column does not exist ' . $ixColumn . ' </div>';
+            }
+            return DA_OUT_OF_RANGE;
+        }
+
+        if ($this->debug) {
+            echo '<div>ColumnExists: The given ' . $ixColumn . ' does exist</div>';
+        }
+
         return $this->colNameInverse[$ixColumn];
     }
 
@@ -1678,19 +1708,7 @@ not a boolean, the given value is null, column given is not the PK, and there is
             case DA_DATETIME:
                 return $this->tryCreateDateTime($value);
             case DA_DATE:
-                if ($value == '0000-00-00' || !$value) {
-                    return null;
-                }
-                $date = DateTime::createFromFormat(
-                    'd/m/Y',
-                    $value
-                );
-
-                if (!$date) {
-                    return null;
-                }
-                $value = $date->format(DATE_MYSQL_DATE);
-                return $value;
+                return $this->tryCreateDate($value);
             case DA_YN:
                 return $value == 'Y' ? 'Y' : 'N';
             default:
@@ -1700,7 +1718,15 @@ not a boolean, the given value is null, column given is not the PK, and there is
 
     function checkValid($columnNameOrIndex, $value)
     {
-        if ($this->getNull($columnNameOrIndex) == DA_NOT_NULL && $value === null) {
+        if ($this->debug) {
+            echo '<div>Check Valid: ';
+            var_dump($columnNameOrIndex, $value);
+            echo '</div>';
+        }
+
+        $colIdx = $this->columnExists($columnNameOrIndex);
+
+        if ($this->getPK() != $colIdx && $this->getNull($columnNameOrIndex) == DA_NOT_NULL && $value === null) {
             return DATASET_MSG_REQUIRED;
         }
 
@@ -1722,13 +1748,10 @@ not a boolean, the given value is null, column given is not the PK, and there is
             case DA_YN_FLAG:
             case DA_YN:
                 return in_array($value, ['Y', 'N']) ? true : DATASET_MSG_INVALID;
+            case DA_DATETIME:
+                return !!$this->tryCreateDateTime($value) ? true : DATASET_MSG_INVALID_DATE;
             case DA_DATE:
-
-                $date = DateTime::createFromFormat(
-                    'd/m/Y',
-                    $value
-                );
-                return !!$date ? true : DATASET_MSG_INVALID_DATE;
+                return !!$this->tryCreateDate($value) ? true : DATASET_MSG_INVALID_DATE;
             case DA_TIME:
                 return $this->isTime($value) ? true : DATASET_MSG_BAD_TIME;
             case DA_INTEGER:
@@ -1743,6 +1766,42 @@ not a boolean, the given value is null, column given is not the PK, and there is
                 ) ? true : DATASET_MSG_INVALID_SUPPORT_LEVEL;
         }
         return true;
+    }
+
+    private function tryCreateDate($string)
+    {
+        if (!$string) {
+            return null;
+        }
+        if ($string == '0000-00-00') {
+            return null;
+        }
+
+        $date = DateTime::createFromFormat(
+            'd/m/Y',
+            $string
+        );
+
+        if ($date) {
+            return $date->format(DATE_MYSQL_DATE);
+        }
+
+        $date = DateTime::createFromFormat(
+            'Y-m-d',
+            $string
+        );
+
+        if ($date) {
+            return $date->format(DATE_MYSQL_DATE);
+        }
+
+        $date = DateTime::createFromFormat('Y-m-d H:i:s', $string);
+
+        if (!$date) {
+            return null;
+        }
+
+        return $date->format(DATE_MYSQL_DATE);
     }
 
 }

@@ -16,21 +16,21 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class BUGoodsIn extends Business
 {
-    const receiveDataSetRequireSerialNo = 'setRequireSerialNo';
-    const receiveDataSetSerialNo = 'setSerialNo';
-    const receiveDataSetDescription = 'setDescription';
-    const receiveDataSetSequenceNo = 'setSequenceNo';
-    const receiveDataSetOrderSequenceNo = 'setOrderSequenceNo';
-    const receiveDataSetQtyOrdered = 'setQtyOrdered';
-    const receiveDataSetQtyReceived = 'setQtyReceived';
-    const receiveDataSetQtyToReceive = 'setQtyToReceive';
-    const receiveDataSetWarrantyID = 'setWarrantyID';
-    const receiveDataSetQtyOS = 'setQtyOS';
-    const receiveDataSetItemID = 'setItemID';
-    const receiveDataSetCustomerItemID = 'setCustomerItemID';
-    const receiveDataSetPartNo = 'setPartNo';
-    const receiveDataSetAllowReceive = 'setAllowReceive';
-    const receiveDataSetRenew = 'setRenew';
+    const receiveDataSetRequireSerialNo = 'requireSerialNo';
+    const receiveDataSetSerialNo = 'serialNo';
+    const receiveDataSetDescription = 'description';
+    const receiveDataSetSequenceNo = 'sequenceNo';
+    const receiveDataSetOrderSequenceNo = 'orderSequenceNo';
+    const receiveDataSetQtyOrdered = 'qtyOrdered';
+    const receiveDataSetQtyReceived = 'qtyReceived';
+    const receiveDataSetQtyToReceive = 'qtyToReceive';
+    const receiveDataSetWarrantyID = 'warrantyID';
+    const receiveDataSetQtyOS = 'qtyOS';
+    const receiveDataSetItemID = 'itemID';
+    const receiveDataSetCustomerItemID = 'customerItemID';
+    const receiveDataSetPartNo = 'partNo';
+    const receiveDataSetAllowReceive = 'allowReceive';
+    const receiveDataSetRenew = 'renew';
 
 
     /** @var BUSalesOrder */

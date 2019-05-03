@@ -56,18 +56,15 @@ class CTPrepayAdjustment extends CTCNC
         $this->setMethodName('edit');
 
         $this->setTemplateFiles('PrepayAdjustment', 'PrepayAdjustment.inc');
-        /*
-        submitted so validate/update
-        */
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
             $formError = (!$this->dsCallActivity->populateFromArray($this->getParam('callActivity')));
-
-            if ($this->dsCallActivity->getValue(DBEJCallActivity::customerID) == 0) {
+            if (!$this->dsCallActivity->getValue(DBEJCallActivity::customerID)) {
                 $this->dsCallActivity->setMessage(DBEJCallActivity::customerID, 'Please select a customer');
                 $formError = true;
             } else {
                 $dbeCustomerItem = new DBECustomerItem($this);
+                $dbeCustomerItem->setShowSQLOn();
                 if (!$dbeCustomerItem->getGSCRow($this->dsCallActivity->getValue(DBEJCallActivity::customerID))) {
                     $this->dsCallActivity->setMessage(DBEJCallActivity::customerID, 'Not a Prepay Customer');
                     $formError = true;
@@ -92,9 +89,7 @@ class CTPrepayAdjustment extends CTCNC
 
         $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
-            array(
-                'action' => 'update'
-            )
+            []
         );
 
         $urlCustomerPopup = Controller::buildLink(

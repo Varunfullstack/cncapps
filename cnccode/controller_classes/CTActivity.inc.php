@@ -3237,10 +3237,11 @@ class CTActivity extends CTCNC
             $this->updateSession('timeRaised', date('H:i'));
 
             if (!$_SESSION[$this->sessionKey]['priority'] = $this->getParam('priority')) {
-
                 $error['priority'] = 'Required';
             }
-            if ($_FILES['userfile']['name'] & !$this->getParam('uploadDescription')) {
+            if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name'] && !$this->getParam(
+                    'uploadDescription'
+                )) {
                 $error['file'] = 'Description Required';
             }
 
@@ -3317,36 +3318,39 @@ class CTActivity extends CTCNC
 
         $this->updateSession('callActTypeID', CONFIG_INITIAL_ACTIVITY_TYPE_ID);
 
+        $session = $this->getSessionParam($this->sessionKey);
+
         /* initialise */
-        if (!$_SESSION[$this->sessionKey]['dateRaised']) {
+        if (!isset($session['dateRaised'])) {
             $this->updateSession('dateRaised', date('d/m/Y'));
         }
-        if (!$_SESSION[$this->sessionKey]['timeRaised']) {
+        if (!isset($session['timeRaised'])) {
             $this->updateSession('timeRaised', date('H:i'));
         }
 
-        if (!$_SESSION[$this->sessionKey]['hideFromCustomerFlag']) {
+        if (!isset($session['hideFromCustomerFlag'])) {
             $this->updateSession('hideFromCustomerFlag', 'N');
         }
 
-        $this->priorityDropdown($_SESSION[$this->sessionKey]['priority']);
+
+        $this->priorityDropdown(@$session['priority']);
 
         $this->siteDropdown(
-            $_SESSION[$this->sessionKey]['customerID'],
-            $_SESSION[$this->sessionKey]['siteNo'],
+            @$_SESSION[$this->sessionKey]['customerID'],
+            @$_SESSION[$this->sessionKey]['siteNo'],
             'ActivityCreate6',
             'siteBlock'
         );
 
         $this->onlyMainAndSupervisorsDropdown(
             'ActivityCreate6',
-            $_SESSION[$this->sessionKey]['customerID'],
-            $_SESSION[$this->sessionKey]['contactID']
+            @$_SESSION[$this->sessionKey]['customerID'],
+            @$_SESSION[$this->sessionKey]['contactID']
         );
 
         $this->contactDropdown(
-            $_SESSION[$this->sessionKey]['customerID'],
-            $_SESSION[$this->sessionKey]['contactID'],
+            @$_SESSION[$this->sessionKey]['customerID'],
+            @$_SESSION[$this->sessionKey]['contactID'],
             'ActivityCreate6'
         );
 
@@ -3372,37 +3376,37 @@ class CTActivity extends CTCNC
 
         $this->template->set_var(
             array(
-                'callActivityID'              => $_SESSION[$this->sessionKey]['callActivityID'],
-                'customerID'                  => $_SESSION[$this->sessionKey]['customerID'],
-                'siteNoMessage'               => $error['siteNo'],
-                'reason'                      => $_SESSION[$this->sessionKey]['reason'],
-                'reasonMessage'               => $error['reason'],
-                'internalNotes'               => $_SESSION[$this->sessionKey]['internalNotes'],
-                'customerName'                => $_SESSION[$this->sessionKey]['customerName'],
+                'callActivityID'              => @$_SESSION[$this->sessionKey]['callActivityID'],
+                'customerID'                  => @$_SESSION[$this->sessionKey]['customerID'],
+                'siteNoMessage'               => @$error['siteNo'],
+                'reason'                      => @$_SESSION[$this->sessionKey]['reason'],
+                'reasonMessage'               => @$error['reason'],
+                'internalNotes'               => @$_SESSION[$this->sessionKey]['internalNotes'],
+                'customerName'                => @$_SESSION[$this->sessionKey]['customerName'],
                 'customerNameDisplayClass'
-                                              => $_SESSION[$this->sessionKey]['customerNameDisplayClass'],
-                'renewalsLink'                => $this->getRenewalsLink($_SESSION[$this->sessionKey]['customerID']),
+                                              => @$_SESSION[$this->sessionKey]['customerNameDisplayClass'],
+                'renewalsLink'                => $this->getRenewalsLink(@$_SESSION[$this->sessionKey]['customerID']),
                 'projectLink'                 => BUProject::getCurrentProjectLink(
-                    $_SESSION[$this->sessionKey]['customerID']
+                    @$_SESSION[$this->sessionKey]['customerID']
                 ),
                 'contractListPopupLink'       => $this->getContractListPopupLink(
-                    $_SESSION[$this->sessionKey]['customerID']
+                    @$_SESSION[$this->sessionKey]['customerID']
                 ),
-                'dateRaised'                  => Controller::dateYMDtoDMY($_SESSION[$this->sessionKey]['dateRaised']),
-                'timeRaised'                  => $_SESSION[$this->sessionKey]['timeRaised'],
-                'dateMessage'                 => $error['date'],
-                'startTimeMessage'            => $error['startTime'],
-                'priorityMessage'             => $error['priority'],
-                'fileMessage'                 => $error['file'],
-                'contactNotes'                => $_SESSION[$this->sessionKey]['contactNotes'],
-                'techNotes'                   => $_SESSION[$this->sessionKey]['techNotes'],
-                'urlCustomer'                 => $this->getCustomerUrl($_SESSION[$this->sessionKey]['customerID']),
+                'dateRaised'                  => Controller::dateYMDtoDMY(@$_SESSION[$this->sessionKey]['dateRaised']),
+                'timeRaised'                  => @$_SESSION[$this->sessionKey]['timeRaised'],
+                'dateMessage'                 => @$error['date'],
+                'startTimeMessage'            => @$error['startTime'],
+                'priorityMessage'             => @$error['priority'],
+                'fileMessage'                 => @$error['file'],
+                'contactNotes'                => @$_SESSION[$this->sessionKey]['contactNotes'],
+                'techNotes'                   => @$_SESSION[$this->sessionKey]['techNotes'],
+                'urlCustomer'                 => $this->getCustomerUrl(@$_SESSION[$this->sessionKey]['customerID']),
                 'hideFromCustomerFlagChecked' => Controller::htmlChecked(
-                    $_SESSION[$this->sessionKey]['hideFromCustomerFlag']
+                    @$_SESSION[$this->sessionKey]['hideFromCustomerFlag']
                 ),
-                'passwordLink'                => $this->getPasswordLink($_SESSION[$this->sessionKey]['customerID']),
+                'passwordLink'                => $this->getPasswordLink(@$_SESSION[$this->sessionKey]['customerID']),
                 'thirdPartyContactLink'       => $this->getThirdPartyContactLink(
-                    $_SESSION[$this->sessionKey]['customerID']
+                    @ $_SESSION[$this->sessionKey]['customerID']
                 ),
                 'generatePasswordLink'        => $this->getGeneratePasswordLink(),
                 'DISABLED'                    => $disabled,

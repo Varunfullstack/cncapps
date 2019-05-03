@@ -214,7 +214,7 @@ class BUPrepay extends Business
                 if ($last_custno != '9999') {
                     $dsStatementContact = new DataSet($this);
                     $buContact->getGSCContactByCustomerID($db->Record ['custno'], $dsStatementContact);
-                    if (!is_object($dsStatementContact)) {
+                    if (!$dsStatementContact->rowCount()) {
                         $this->raiseError(
                             'Customer ' . $db->Record ['cus_name'] . ' needs at least one Pre-pay statement contact.'
                         );
@@ -229,6 +229,8 @@ class BUPrepay extends Business
 
         $last_custno = '9999';
         $filepath = null;
+
+        $date = DateTime::createFromFormat(DATE_MYSQL_DATETIME, $this->dsData->getValue(self::exportDataSetEndDate));
 
         while ($db->next_record()) {
 
@@ -262,7 +264,7 @@ class BUPrepay extends Business
                         $dsStatementContact,
                         $newBalance,
                         $topUpValue,
-                        $this->dsData->getValue(self::exportDataSetEndDate)
+                        $date->format(DATE_MYSQL_DATE)
                     );
 
                     $dsStatementContact->initialise();
@@ -291,10 +293,12 @@ class BUPrepay extends Business
                         $db->Record ['cus_name'],
                         0,
                         20
-                    ) . $this->dsData->getValue(self::exportDataSetEndDate);
+                    ) . $date->format('Y-m-d');
 
                 $htmlFileHandle = fopen($filepath . '.html', 'wb');
                 if (!$htmlFileHandle) {
+                    var_dump('first instance ...');
+                    print_r(error_get_last());
                     $this->raiseError("Unable to open html file " . $filepath);
                 }
 
@@ -304,6 +308,13 @@ class BUPrepay extends Business
                 // get GSC contact record
                 $buContact->getGSCContactByCustomerID($db->Record ['custno'], $dsStatementContact);
                 $dsSite = new DataSet($this);
+                $buContact->getGSCContactByCustomerID($db->Record ['custno'], $dsStatementContact);
+                if (!$dsStatementContact->rowCount()) {
+                    $this->raiseError(
+                        'Customer ' . $db->Record ['cus_name'] . ' needs at least one Pre-pay statement contact.'
+                    );
+                    exit ();
+                }
                 $this->buCustomer->getSiteByCustomerIDSiteNo(
                     $dsStatementContact->getValue(DBEContact::customerID),
                     $dsStatementContact->getValue(DBEContact::siteNo),
@@ -368,7 +379,7 @@ class BUPrepay extends Business
                 $dsStatementContact,
                 $newBalance,
                 $topUpValue,
-                $this->dsData->getValue(self::exportDataSetEndDate)
+                $date->format(DATE_MYSQL_DATE)
             );
 
             if ($this->updateFlag) {
@@ -415,6 +426,14 @@ class BUPrepay extends Business
                 $db->next_record();
                 // get GSC contact record
                 $buContact->getGSCContactByCustomerID($db->Record ['custno'], $dsStatementContact);
+
+                if (!$dsStatementContact->rowCount()) {
+                    $this->raiseError(
+                        'Customer ' . $db->Record ['cus_name'] . ' needs at least one Pre-pay statement contact.'
+                    );
+                    exit ();
+                }
+
                 $this->buCustomer->getSiteByCustomerIDSiteNo(
                     $dsStatementContact->getValue(DBEContact::customerID),
                     $dsStatementContact->getValue(DBEContact::siteNo),
@@ -426,9 +445,11 @@ class BUPrepay extends Business
                         $db->Record ['cus_name'],
                         0,
                         20
-                    ) . $this->dsData->getValue(self::exportDataSetEndDate);
+                    ) . $date->format('Y-m-d');
                 $htmlFileHandle = fopen($filepath . '.html', 'wb');
                 if (!$htmlFileHandle) {
+                    var_dump('second instance ...');
+                    print_r(error_get_last());
                     $this->raiseError("Unable to open html file " . $filepath);
                 }
                 $this->template = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
@@ -496,7 +517,7 @@ class BUPrepay extends Business
                     $dsStatementContact,
                     $db->Record ['curGSCBalance'],
                     $topUpValue,
-                    $this->dsData->getValue(self::exportDataSetEndDate)
+                    $date->format(DATE_MYSQL_DATE)
                 );
 
                 if ($this->updateFlag) {

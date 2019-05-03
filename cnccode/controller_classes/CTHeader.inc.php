@@ -85,7 +85,9 @@ class CTHeader extends CTCNC
             $this->buHeader->getHeader($dsHeader);
         } else {                                                                        // form validation error
             $dsHeader->initialise();
+            $dsHeader->debug = true;
             $dsHeader->fetchNext();
+            $dsHeader->debug = false;
         }
         $urlUpdate =
             Controller::buildLink(
@@ -570,7 +572,6 @@ class CTHeader extends CTCNC
         );
 
         if ($this->getAction() != 'add') {
-
             $buPortalDocument = new BUPortalDocument($this);
             $dsPortalDocument = new DataSet($this);
             $buPortalDocument->getDocuments($dsPortalDocument);

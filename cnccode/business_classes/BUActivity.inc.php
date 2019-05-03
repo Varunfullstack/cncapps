@@ -4865,6 +4865,10 @@ is currently a balance of ';
             DBEJCallActivity::problemID,
             $dbeProblem->getPKValue()
         );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::curValue,
+            0.00
+        );
 
         $dbeCallActivity->insertRow();
 
@@ -4883,6 +4887,7 @@ is currently a balance of ';
         $dbeCallActivity = new DBECallActivity($this);
         $dsCallActivity = new DataSet($this);
         $dsCallActivity->copyColumnsFrom($dbeCallActivity);
+        $dsCallActivity->setNull(DBECallActivity::callActivityID, DA_ALLOW_NULL);
 
         $dateTimeRaised = $_SESSION [$sessionKey] ['dateRaised'] . ' ' . $_SESSION [$sessionKey] ['timeRaised'] . ':00';
 
@@ -5447,6 +5452,7 @@ is currently a balance of ';
                 DBEJCallActivity::callActTypeID,
                 CONFIG_CONTRACT_ADJUSTMENT_ACTIVITY_TYPE_ID
             );
+
             $dbeCallActivity->setValue(
                 DBEJCallActivity::date,
                 $date
@@ -8348,7 +8354,6 @@ is currently a balance of ';
 
         $dbeContact = new DBEContact($this);
         $siteNo = $dbeContact->getValue(DBEContact::siteNo);
-
 
         $dbeCallActivity = new DBECallActivity($this);
 
