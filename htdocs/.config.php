@@ -52,7 +52,7 @@ define('CONFIG_PATH_CACHE', $_SERVER['DOCUMENT_ROOT'] . $add_path . '/.page_cach
 Pages
 */
 define('CONFIG_PAGE_LOGIN', 'login.php');
-
+require_once(CONFIG_PATH_SC_CLASSES . 'string.php');
 /*
 Use the right database params for our server
 */
