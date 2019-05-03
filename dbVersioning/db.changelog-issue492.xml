@@ -1431,5 +1431,21 @@
         </sql>
         <rollback/>
     </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-161">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="NO">
+                SELECT `information_schema`.COLUMNS.`IS_NULLABLE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='mail_queue'
+                AND column_name='time_started_sending'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint columnName="time_started_sending" tableName="mail_queue" columnDataType="datetime"/>
+        <rollback/>
+        <sql>
+            update mail_queue set time_started_sending = null where time_started_sending = '0000-00-00 00:00:00'
+        </sql>
+    </changeSet>
 
 </databaseChangeLog>

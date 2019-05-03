@@ -115,7 +115,7 @@ class Mail_Queue_Container
     /**
      * Get next mail from queue. When exclude first time preload all queue
      *
-     * @return mixed  MailBody object on success else Mail_Queue_Error
+     * @return Mail_Queue_Body|Mail_Queue_Error|object|bool on success else Mail_Queue_Error
      * @access    public
      */
     function get()

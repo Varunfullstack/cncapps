@@ -77,13 +77,13 @@ class DB_mysqli extends DB_common
      * @var array
      */
     var $features = array(
-        'limit'         => 'alter',
-        'new_link'      => false,
-        'numrows'       => true,
-        'pconnect'      => false,
-        'prepare'       => false,
-        'ssl'           => true,
-        'transactions'  => true,
+        'limit'        => 'alter',
+        'new_link'     => false,
+        'numrows'      => true,
+        'pconnect'     => false,
+        'prepare'      => false,
+        'ssl'          => true,
+        'transactions' => true,
     );
 
     /**
@@ -167,19 +167,19 @@ class DB_mysqli extends DB_common
      * @since  Property available since Release 1.6.5
      */
     var $mysqli_flags = array(
-        MYSQLI_NOT_NULL_FLAG        => 'not_null',
-        MYSQLI_PRI_KEY_FLAG         => 'primary_key',
-        MYSQLI_UNIQUE_KEY_FLAG      => 'unique_key',
-        MYSQLI_MULTIPLE_KEY_FLAG    => 'multiple_key',
-        MYSQLI_BLOB_FLAG            => 'blob',
-        MYSQLI_UNSIGNED_FLAG        => 'unsigned',
-        MYSQLI_ZEROFILL_FLAG        => 'zerofill',
-        MYSQLI_AUTO_INCREMENT_FLAG  => 'auto_increment',
-        MYSQLI_TIMESTAMP_FLAG       => 'timestamp',
-        MYSQLI_SET_FLAG             => 'set',
+        MYSQLI_NOT_NULL_FLAG       => 'not_null',
+        MYSQLI_PRI_KEY_FLAG        => 'primary_key',
+        MYSQLI_UNIQUE_KEY_FLAG     => 'unique_key',
+        MYSQLI_MULTIPLE_KEY_FLAG   => 'multiple_key',
+        MYSQLI_BLOB_FLAG           => 'blob',
+        MYSQLI_UNSIGNED_FLAG       => 'unsigned',
+        MYSQLI_ZEROFILL_FLAG       => 'zerofill',
+        MYSQLI_AUTO_INCREMENT_FLAG => 'auto_increment',
+        MYSQLI_TIMESTAMP_FLAG      => 'timestamp',
+        MYSQLI_SET_FLAG            => 'set',
         // MYSQLI_NUM_FLAG             => 'numeric',  // unnecessary
         // MYSQLI_PART_KEY_FLAG        => 'multiple_key',  // duplicatvie
-        MYSQLI_GROUP_FLAG           => 'group_by'
+        MYSQLI_GROUP_FLAG          => 'group_by'
     );
 
     /**
@@ -253,7 +253,7 @@ class DB_mysqli extends DB_common
      * Example of how to connect using SSL:
      * <code>
      * require_once 'DB.php';
-     * 
+     *
      * $dsn = array(
      *     'phptype'  => 'mysqli',
      *     'username' => 'someuser',
@@ -266,19 +266,19 @@ class DB_mysqli extends DB_common
      *     'capath'   => '/path/to/ca/dir',
      *     'cipher'   => 'AES',
      * );
-     * 
+     *
      * $options = array(
      *     'ssl' => true,
      * );
-     * 
+     *
      * $db = DB::connect($dsn, $options);
      * if (PEAR::isError($db)) {
      *     die($db->getMessage());
      * }
      * </code>
      *
-     * @param array $dsn         the data source name
-     * @param bool  $persistent  should the connection be persistent?
+     * @param array $dsn the data source name
+     * @param bool $persistent should the connection be persistent?
      *
      * @return int  DB_OK on success. A DB_Error object on failure.
      */
@@ -297,25 +297,25 @@ class DB_mysqli extends DB_common
         @ini_set('track_errors', 1);
         $php_errormsg = '';
 
-        if (((int) $this->getOption('ssl')) === 1) {
+        if (((int)$this->getOption('ssl')) === 1) {
             $init = mysqli_init();
             mysqli_ssl_set(
                 $init,
-                empty($dsn['key'])    ? null : $dsn['key'],
-                empty($dsn['cert'])   ? null : $dsn['cert'],
-                empty($dsn['ca'])     ? null : $dsn['ca'],
+                empty($dsn['key']) ? null : $dsn['key'],
+                empty($dsn['cert']) ? null : $dsn['cert'],
+                empty($dsn['ca']) ? null : $dsn['ca'],
                 empty($dsn['capath']) ? null : $dsn['capath'],
                 empty($dsn['cipher']) ? null : $dsn['cipher']
             );
             if ($this->connection = @mysqli_real_connect(
-                    $init,
-                    $dsn['hostspec'],
-                    $dsn['username'],
-                    $dsn['password'],
-                    $dsn['database'],
-                    $dsn['port'],
-                    $dsn['socket']))
-            {
+                $init,
+                $dsn['hostspec'],
+                $dsn['username'],
+                $dsn['password'],
+                $dsn['database'],
+                $dsn['port'],
+                $dsn['socket']
+            )) {
                 $this->connection = $init;
             }
         } else {
@@ -333,13 +333,21 @@ class DB_mysqli extends DB_common
 
         if (!$this->connection) {
             if (($err = @mysqli_connect_error()) != '') {
-                return $this->raiseError(DB_ERROR_CONNECT_FAILED,
-                                         null, null, null,
-                                         $err);
+                return $this->raiseError(
+                    DB_ERROR_CONNECT_FAILED,
+                    null,
+                    null,
+                    null,
+                    $err
+                );
             } else {
-                return $this->raiseError(DB_ERROR_CONNECT_FAILED,
-                                         null, null, null,
-                                         $php_errormsg);
+                return $this->raiseError(
+                    DB_ERROR_CONNECT_FAILED,
+                    null,
+                    null,
+                    null,
+                    $php_errormsg
+                );
             }
         }
 
@@ -379,14 +387,17 @@ class DB_mysqli extends DB_common
      */
     function simpleQuery($query)
     {
+
         $ismanip = $this->_checkManip($query);
         $this->last_query = $query;
         $query = $this->modifyQuery($query);
+
         if ($this->_db) {
             if (!@mysqli_select_db($this->connection, $this->_db)) {
                 return $this->mysqliRaiseError(DB_ERROR_NODBSELECTED);
             }
         }
+
         if (!$this->autocommit && $ismanip) {
             if ($this->transaction_opcount == 0) {
                 $result = @mysqli_query($this->connection, 'SET AUTOCOMMIT=0');
@@ -437,10 +448,10 @@ class DB_mysqli extends DB_common
      * DB_result::fetchInto() instead.  It can't be declared "protected"
      * because DB_result is a separate object.
      *
-     * @param resource $result    the query result resource
-     * @param array    $arr       the referenced array to put the data in
-     * @param int      $fetchmode how the resulting array should be indexed
-     * @param int      $rownum    the row number to fetch (0 = first row)
+     * @param resource $result the query result resource
+     * @param array $arr the referenced array to put the data in
+     * @param int $fetchmode how the resulting array should be indexed
+     * @param int $rownum the row number to fetch (0 = first row)
      *
      * @return mixed  DB_OK on success, NULL when the end of a result set is
      *                 reached or on failure
@@ -489,7 +500,7 @@ class DB_mysqli extends DB_common
      * DB_result::free() instead.  It can't be declared "protected"
      * because DB_result is a separate object.
      *
-     * @param resource $result  PHP's query result resource
+     * @param resource $result PHP's query result resource
      *
      * @return bool  TRUE on success, FALSE if $result is invalid
      *
@@ -510,7 +521,7 @@ class DB_mysqli extends DB_common
      * DB_result::numCols() instead.  It can't be declared "protected"
      * because DB_result is a separate object.
      *
-     * @param resource $result  PHP's query result resource
+     * @param resource $result PHP's query result resource
      *
      * @return int  the number of columns.  A DB_Error object on failure.
      *
@@ -535,7 +546,7 @@ class DB_mysqli extends DB_common
      * DB_result::numRows() instead.  It can't be declared "protected"
      * because DB_result is a separate object.
      *
-     * @param resource $result  PHP's query result resource
+     * @param resource $result PHP's query result resource
      *
      * @return int  the number of rows.  A DB_Error object on failure.
      *
@@ -556,7 +567,7 @@ class DB_mysqli extends DB_common
     /**
      * Enables or disables automatic commits
      *
-     * @param bool $onoff  true turns it on, false turns it off
+     * @param bool $onoff true turns it on, false turns it off
      *
      * @return int  DB_OK on success.  A DB_Error object if the driver
      *               doesn't support auto-committing transactions.
@@ -638,7 +649,7 @@ class DB_mysqli extends DB_common
         } else {
             return 0;
         }
-     }
+    }
 
     // }}}
     // {{{ nextId()
@@ -646,8 +657,8 @@ class DB_mysqli extends DB_common
     /**
      * Returns the next free id in a sequence
      *
-     * @param string  $seq_name  name of the sequence
-     * @param boolean $ondemand  when true, the seqence is automatically
+     * @param string $seq_name name of the sequence
+     * @param boolean $ondemand when true, the seqence is automatically
      *                            created if it does not exist
      *
      * @return int  the next id number in the sequence.
@@ -662,8 +673,10 @@ class DB_mysqli extends DB_common
         do {
             $repeat = 0;
             $this->pushErrorHandling(PEAR_ERROR_RETURN);
-            $result = $this->query('UPDATE ' . $seqname
-                                   . ' SET id = LAST_INSERT_ID(id + 1)');
+            $result = $this->query(
+                'UPDATE ' . $seqname
+                . ' SET id = LAST_INSERT_ID(id + 1)'
+            );
             $this->popErrorHandling();
             if ($result === DB_OK) {
                 // COMMON CASE
@@ -676,8 +689,10 @@ class DB_mysqli extends DB_common
                 // Sequence table must be empty for some reason,
                 // so fill it and return 1
                 // Obtain a user-level lock
-                $result = $this->getOne('SELECT GET_LOCK('
-                                        . "'${seqname}_lock', 10)");
+                $result = $this->getOne(
+                    'SELECT GET_LOCK('
+                    . "'${seqname}_lock', 10)"
+                );
                 if (DB::isError($result)) {
                     return $this->raiseError($result);
                 }
@@ -686,15 +701,19 @@ class DB_mysqli extends DB_common
                 }
 
                 // add the default value
-                $result = $this->query('REPLACE INTO ' . $seqname
-                                       . ' (id) VALUES (0)');
+                $result = $this->query(
+                    'REPLACE INTO ' . $seqname
+                    . ' (id) VALUES (0)'
+                );
                 if (DB::isError($result)) {
                     return $this->raiseError($result);
                 }
 
                 // Release the lock
-                $result = $this->getOne('SELECT RELEASE_LOCK('
-                                        . "'${seqname}_lock')");
+                $result = $this->getOne(
+                    'SELECT RELEASE_LOCK('
+                    . "'${seqname}_lock')"
+                );
                 if (DB::isError($result)) {
                     return $this->raiseError($result);
                 }
@@ -702,8 +721,7 @@ class DB_mysqli extends DB_common
                 return 1;
 
             } elseif ($ondemand && DB::isError($result) &&
-                $result->getCode() == DB_ERROR_NOSUCHTABLE)
-            {
+                $result->getCode() == DB_ERROR_NOSUCHTABLE) {
                 // ONDEMAND TABLE CREATION
                 $result = $this->createSequence($seq_name);
 
@@ -717,8 +735,7 @@ class DB_mysqli extends DB_common
                 }
 
             } elseif (DB::isError($result) &&
-                      $result->getCode() == DB_ERROR_ALREADY_EXISTS)
-            {
+                $result->getCode() == DB_ERROR_ALREADY_EXISTS) {
                 // BACKWARDS COMPAT
                 // see _BCsequence() comment
                 $result = $this->_BCsequence($seqname);
@@ -735,7 +752,7 @@ class DB_mysqli extends DB_common
     /**
      * Creates a new sequence
      *
-     * @param string $seq_name  name of the new sequence
+     * @param string $seq_name name of the new sequence
      *
      * @return int  DB_OK on success.  A DB_Error object on failure.
      *
@@ -745,9 +762,11 @@ class DB_mysqli extends DB_common
     function createSequence($seq_name)
     {
         $seqname = $this->getSequenceName($seq_name);
-        $res = $this->query('CREATE TABLE ' . $seqname
-                            . ' (id INTEGER UNSIGNED AUTO_INCREMENT NOT NULL,'
-                            . ' PRIMARY KEY(id))');
+        $res = $this->query(
+            'CREATE TABLE ' . $seqname
+            . ' (id INTEGER UNSIGNED AUTO_INCREMENT NOT NULL,'
+            . ' PRIMARY KEY(id))'
+        );
         if (DB::isError($res)) {
             return $res;
         }
@@ -761,7 +780,7 @@ class DB_mysqli extends DB_common
     /**
      * Deletes a sequence
      *
-     * @param string $seq_name  name of the sequence to be deleted
+     * @param string $seq_name name of the sequence to be deleted
      *
      * @return int  DB_OK on success.  A DB_Error object on failure.
      *
@@ -780,7 +799,7 @@ class DB_mysqli extends DB_common
      * Backwards compatibility with old sequence emulation implementation
      * (clean up the dupes)
      *
-     * @param string $seqname  the sequence name to clean up
+     * @param string $seqname the sequence name to clean up
      *
      * @return bool  true on success.  A DB_Error object on failure.
      *
@@ -809,8 +828,10 @@ class DB_mysqli extends DB_common
         // This should kill all rows except the highest
         // We should probably do something if $highest_id isn't
         // numeric, but I'm at a loss as how to handle that...
-        $result = $this->query('DELETE FROM ' . $seqname
-                               . " WHERE id <> $highest_id");
+        $result = $this->query(
+            'DELETE FROM ' . $seqname
+            . " WHERE id <> $highest_id"
+        );
         if (DB::isError($result)) {
             return $result;
         }
@@ -835,7 +856,7 @@ class DB_mysqli extends DB_common
      * WARNING:  Older versions of MySQL can't handle the backtick
      * character (<kbd>`</kbd>) in table or column names.
      *
-     * @param string $str  identifier name to be quoted
+     * @param string $str identifier name to be quoted
      *
      * @return string  quoted identifier string
      *
@@ -853,7 +874,7 @@ class DB_mysqli extends DB_common
     /**
      * Escapes a string according to the current DBMS's standards
      *
-     * @param string $str  the string to be escaped
+     * @param string $str the string to be escaped
      *
      * @return string  the escaped string
      *
@@ -871,10 +892,10 @@ class DB_mysqli extends DB_common
     /**
      * Adds LIMIT clauses to a query string according to current DBMS standards
      *
-     * @param string $query   the query to modify
-     * @param int    $from    the row to start to fetching (0 = the first row)
-     * @param int    $count   the numbers of rows to fetch
-     * @param mixed  $params  array, string or numeric data to be used in
+     * @param string $query the query to modify
+     * @param int $from the row to start to fetching (0 = the first row)
+     * @param int $count the numbers of rows to fetch
+     * @param mixed $params array, string or numeric data to be used in
      *                         execution of the statement.  Quantity of items
      *                         passed must match quantity of placeholders in
      *                         query:  meaning 1 placeholder for non-array
@@ -899,7 +920,7 @@ class DB_mysqli extends DB_common
     /**
      * Produces a DB_Error object regarding the current problem
      *
-     * @param int $errno  if the error is being manually raised pass a
+     * @param int $errno if the error is being manually raised pass a
      *                     DB_ERROR* constant here.  If this isn't passed
      *                     the error information gathered from the DBMS.
      *
@@ -923,9 +944,14 @@ class DB_mysqli extends DB_common
             }
             $errno = $this->errorCode(mysqli_errno($this->connection));
         }
-        return $this->raiseError($errno, null, null, null,
-                                 @mysqli_errno($this->connection) . ' ** ' .
-                                 @mysqli_error($this->connection));
+        return $this->raiseError(
+            $errno,
+            null,
+            null,
+            null,
+            @mysqli_errno($this->connection) . ' ** ' .
+            @mysqli_error($this->connection)
+        );
     }
 
     // }}}
@@ -947,12 +973,12 @@ class DB_mysqli extends DB_common
     /**
      * Returns information about a table or a result set
      *
-     * @param object|string  $result  DB_result object from a query or a
+     * @param object|string $result DB_result object from a query or a
      *                                 string containing the name of a table.
      *                                 While this also accepts a query result
      *                                 resource identifier, this behavior is
      *                                 deprecated.
-     * @param int            $mode    a valid tableInfo mode
+     * @param int $mode a valid tableInfo mode
      *
      * @return array  an associative array with the information requested.
      *                 A DB_Error object on failure.
@@ -973,8 +999,10 @@ class DB_mysqli extends DB_common
              * Probably received a table name.
              * Create a result resource identifier.
              */
-            $id = @mysqli_query($this->connection,
-                                "SELECT * FROM $result LIMIT 0");
+            $id = @mysqli_query(
+                $this->connection,
+                "SELECT * FROM $result LIMIT 0"
+            );
             $got_string = true;
         } elseif (isset($result->result)) {
             /*
@@ -1004,7 +1032,7 @@ class DB_mysqli extends DB_common
         }
 
         $count = @mysqli_num_fields($id);
-        $res   = array();
+        $res = array();
 
         if ($mode) {
             $res['num_fields'] = $count;
@@ -1028,8 +1056,8 @@ class DB_mysqli extends DB_common
                 'table' => $case_func($tmp->table),
                 'name'  => $case_func($tmp->name),
                 'type'  => isset($this->mysqli_types[$tmp->type])
-                                    ? $this->mysqli_types[$tmp->type]
-                                    : 'unknown',
+                    ? $this->mysqli_types[$tmp->type]
+                    : 'unknown',
                 // http://bugs.php.net/?id=36579
                 'len'   => $tmp->length,
                 'flags' => $flags,
@@ -1056,7 +1084,7 @@ class DB_mysqli extends DB_common
     /**
      * Obtains the query string needed for listing a given type of objects
      *
-     * @param string $type  the kind of objects you want to retrieve
+     * @param string $type the kind of objects you want to retrieve
      *
      * @return string  the SQL query string or null if the driver doesn't
      *                  support the object type requested

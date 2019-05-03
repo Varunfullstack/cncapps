@@ -20,7 +20,7 @@ class BUMail extends Business
 
     const SECONDS_DELAY_UNTIL_SEND = 1;
     const DELETE_AFTER_SEND = 1;
-    const MAIL_QUEUE_SEND_LIMIT = 30;
+    const MAIL_QUEUE_SEND_LIMIT = 20 ;
     const MAIL_QUEUE_TRY_LIMIT = 5;
 
     private $crlf = "\n";
@@ -135,19 +135,18 @@ class BUMail extends Business
 
     public function sendQueue()
     {
-        /*
-        reset sending field if started sending time older than 15 minutes
-        */
-        $sql =
-            "UPDATE
-          mail_queue
-        SET
-          time_started_sending = '0000-00-00 00:00:00'
-        WHERE
-          time_started_sending < DATE_SUB( NOW(), INTERVAL 15 MINUTE )";
+//        /*
+//        reset sending field if started sending time older than 15 minutes
+//        */
+//        $sql =
+//            "UPDATE
+//          mail_queue
+//        SET
+//          time_started_sending = null
+//        WHERE
+//          time_started_sending < DATE_SUB( NOW(), INTERVAL 15 MINUTE )";
 
-        $this->db->query($sql);
-
+//        $this->db->query($sql);
         return $this->mailQueue->sendMailsInQueue(
             self::MAIL_QUEUE_SEND_LIMIT,
             0,
@@ -161,7 +160,6 @@ class BUMail extends Business
     public function mailqueueCallBackBeforeSend($args)
     {
         $mailId = $args['id'];
-
         $sql =
             "SELECT
         time_started_sending
@@ -169,14 +167,11 @@ class BUMail extends Business
         mail_queue
       WHERE
         id = $mailId";
-
+        $this->db->commit();
         $result = $this->db->query($sql);
-
         $row = $result->fetch_object();
-
         $ret = false;
-
-        if ($row->time_started_sending == '0000-00-00 00:00:00') {
+        if (!$row->time_started_sending) {
             $ret = true;
             /*
             Set is_sending flag
@@ -190,6 +185,7 @@ class BUMail extends Business
           id = $mailId";
 
             $this->db->query($sql);
+            $this->db->commit();
         }
         return $ret;
     }
@@ -209,11 +205,12 @@ class BUMail extends Business
             "UPDATE
         mail_queue
       SET
-        time_started_sending = '0000-00-00 00:00:00'
+        time_started_sending = null
       WHERE
         id = $mailId";
 
         $this->db->query($sql);
+        $this->db->commit();
     }
 }
 
