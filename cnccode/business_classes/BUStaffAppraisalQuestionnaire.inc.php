@@ -177,7 +177,6 @@ FROM
   StaffAppraisalQuestionnaireAnswer a 
 WHERE a.managerID = $managerID
 GROUP BY a.`questionnaireID`) stats ON stats.questionnaireID = id";
-
         $db->query(
             $query
         );

@@ -57,7 +57,9 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
         );
 
         $this->setAddColumnsOff();
-        $this->setPK(0);
+        $this->setPK(self::id);
+
+        var_debug($this->getPK());
     }
 
     /**
@@ -104,6 +106,29 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
 
         $this->dbeNextPK->resetQueryString();
         return $id;
+    }
+
+    function insertRow()
+    {
+        $this->setMethodName("insertRow");
+        // Only set the default query if not already set in
+        // descendent class.
+
+        $this->setYNFlags();
+        if ($this->getQueryString() == "") {
+            $this->setQueryString(
+                "INSERT INTO " . $this->getTableName() .
+                "(" .
+                $this->getDBColumnNamesAsString() .
+                ")VALUES(" .
+                $this->getColumnValuesAsString() .
+                ")"
+            );
+        }
+
+        $ret = $this->runQuery();
+        $this->resetQueryString();
+        return $ret;
     }
 
     /**

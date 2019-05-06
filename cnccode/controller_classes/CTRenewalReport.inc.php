@@ -336,6 +336,8 @@ class CTRenewalReport extends CTCNC
             0
         );
 
+
+
         if ($response && $response->http == 202) {
             $buMail = new BUMail($this);
 

@@ -892,19 +892,16 @@ class DBEntity extends DataAccess
     )
     {
         $ixColumn = $this->columnExists($ixPassedColumn);
-        if ($ixColumn != DA_OUT_OF_RANGE) {
-            $value = $this->prepareValue($ixColumn, $value);
-            $this->db->Record[$ixColumn] = $value;
-            return TRUE;
-        } else {
-            if ($this->failOutOfRange) {
-                $this->raiseError("Could not set column value because " . $ixPassedColumn . " out of range");
-                return FALSE;
-            } else {
-                return TRUE;
-            }
+        if ($ixColumn == DA_OUT_OF_RANGE) {
+            $this->raiseError("Could not set column value because " . $ixPassedColumn . " out of range");
+            return false;
         }
-        //return (parent::setValue($ixPassedColumn, mysql_real_escape_string($value)));
+        $value = $this->prepareValue($ixColumn, $value);
+        if ($this->debug) {
+            var_debug($value);
+        }
+        $this->db->Record[$ixColumn] = $value;
+        return TRUE;
     }
 
     /**

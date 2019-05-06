@@ -4909,7 +4909,7 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEProblem::customerID,
-            $_SESSION [$sessionKey] ['customerID']
+            @$_SESSION [$sessionKey] ['customerID']
         );
         $dbeProblem->setValue(
             DBEProblem::dateRaised,
@@ -4917,16 +4917,16 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEProblem::userID,
-            $_SESSION [$sessionKey] ['userID']
+            @$_SESSION [$sessionKey] ['userID']
         );
         $dbeProblem->setValue(
             DBEProblem::rootCauseID,
-            $_SESSION [$sessionKey] ['rootCauseID']
+            @$_SESSION [$sessionKey] ['rootCauseID']
         );
 
         $dbeProblem->setValue(
             DBEProblem::authorisedBy,
-            $_SESSION[$sessionKey]['authorisedBy']
+            @$_SESSION[$sessionKey]['authorisedBy']
         );
 
         $dbeProblem->setValue(
@@ -4949,33 +4949,33 @@ is currently a balance of ';
         ); // initial queue number
         $dbeProblem->setValue(
             DBEProblem::priority,
-            $_SESSION [$sessionKey] ['priority']
+            @$_SESSION [$sessionKey] ['priority']
         );
         $dbeProblem->setValue(
             DBEProblem::hideFromCustomerFlag,
-            $_SESSION [$sessionKey] ['hideFromCustomerFlag']
+            @$_SESSION [$sessionKey] ['hideFromCustomerFlag']
         );
         $dbeProblem->setValue(
             DBEProblem::internalNotes,
-            $_SESSION [$sessionKey] ['internalNotes']
+            @$_SESSION [$sessionKey] ['internalNotes']
         );
         $dbeProblem->setValue(
             DBEProblem::contactID,
-            $_SESSION [$sessionKey] ['contactID']
+            @$_SESSION [$sessionKey] ['contactID']
         );
         $dbeProblem->setValue(
             DBEProblem::contractCustomerItemID,
-            $_SESSION [$sessionKey] ['contractCustomerItemID']
+            @$_SESSION [$sessionKey] ['contractCustomerItemID']
         );
         $dbeProblem->setValue(
             DBEProblem::projectID,
-            $_SESSION [$sessionKey] ['projectID']
+            @$_SESSION [$sessionKey] ['projectID']
         );
         $dbeProblem->insertRow();
 
         $endTime = $this->getEndtime(
-            $_SESSION [$sessionKey] ['callActTypeID'],
-            $_SESSION [$sessionKey] ['timeRaised']
+            @$_SESSION [$sessionKey] ['callActTypeID'],
+            @$_SESSION [$sessionKey] ['timeRaised']
         );
 
         $dsCallActivity->setUpdateModeInsert();
@@ -4985,15 +4985,15 @@ is currently a balance of ';
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::siteNo,
-            $_SESSION [$sessionKey] ['siteNo']
+            @$_SESSION [$sessionKey] ['siteNo']
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::contactID,
-            $_SESSION [$sessionKey] ['contactID']
+            @$_SESSION [$sessionKey] ['contactID']
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::callActTypeID,
-            $_SESSION [$sessionKey] ['callActTypeID']
+            @$_SESSION [$sessionKey] ['callActTypeID']
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::problemID,
@@ -5001,11 +5001,11 @@ is currently a balance of ';
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::date,
-            $_SESSION [$sessionKey] ['dateRaised']
+            @$_SESSION [$sessionKey] ['dateRaised']
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::startTime,
-            $_SESSION [$sessionKey] ['timeRaised']
+            @$_SESSION [$sessionKey] ['timeRaised']
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::endTime,
@@ -5021,16 +5021,16 @@ is currently a balance of ';
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::reason,
-            $_SESSION [$sessionKey] ['reason']
+            @$_SESSION [$sessionKey] ['reason']
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::serverGuard,
-            $_SESSION [$sessionKey] ['serverGuard']
+            @$_SESSION [$sessionKey] ['serverGuard']
         );
 
         $dsCallActivity->setValue(
             DBEJCallActivity::curValue,
-            $_SESSION [$sessionKey] ['curValue']
+            @$_SESSION [$sessionKey] ['curValue']
         );
         $dsCallActivity->setValue(
             DBEJCallActivity::statementYearMonth,
@@ -5050,7 +5050,7 @@ is currently a balance of ';
         ); // user that created activity
         $dsCallActivity->post();
         $dbeContact = null;
-        if ($_SESSION[$sessionKey]['contactID']) {
+        if (@$_SESSION[$sessionKey]['contactID']) {
             $dbeContact = new DBEContact($this);
             $dbeContact->getRow($_SESSION[$sessionKey]['contactID']);
         }
@@ -5076,7 +5076,7 @@ is currently a balance of ';
         $buCustomer = new BUCustomer($this);
         $dsCustomer = new DataSet($this);
         $buCustomer->getCustomerByID(
-            $_SESSION[$sessionKey]['customerID'],
+            @$_SESSION[$sessionKey]['customerID'],
             $dsCustomer
         );
 

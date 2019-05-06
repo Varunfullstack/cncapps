@@ -467,18 +467,25 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
         $this->setPageTitle($dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::description));
 
-        $urlCreate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'          => 'createQuestion',
-                    'questionnaireID' => $this->getParam('questionnaireID')
+        $urlCreate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'          => 'createQuestion',
+                'questionnaireID' => $this->getParam('questionnaireID')
 
-                )
-            );
+            )
+        );
+
+        $urlReturnToQuestionnaireList = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            []
+        );
 
         $this->template->set_var(
-            array('urlCreate' => $urlCreate)
+            [
+                'urlCreate'                    => $urlCreate,
+                'urlReturnToQuestionnaireList' => $urlReturnToQuestionnaireList
+            ]
         );
 
         if ($dsQuestion->rowCount() > 0) {
@@ -1693,7 +1700,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         $this->setTemplateFiles(
             array('StaffAppraisalManagerQuestionnaireList' => 'StaffAppraisalManagerQuestionnaireList.inc')
         );
-
         $stats = $this->buQuestionnaire->getStats($this->userID);
 
 
@@ -1794,7 +1800,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $dbeObjective = new DBEStaffAppraisalObjectives($this);
 
             for ($i = 1; $i < 5; $i++) {
-
                 $dbeObjective->setValue(
                     DBEStaffAppraisalObjectives::id,
                     $i
@@ -1877,6 +1882,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             (new DateTime())->format(COMMON_MYSQL_DATETIME)
         );
         $dbeQuestionnaire->updateRow();
+        exit;
         return $this->showManagerQuestionnaireList();
     }
 

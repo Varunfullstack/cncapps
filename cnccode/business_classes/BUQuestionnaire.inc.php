@@ -129,9 +129,8 @@ class BUQuestionnaire extends Business
         $this->setMethodName('deleteQuestion');
         if ($this->canDeleteQuestion($ID)) {
             return $this->dbeQuestion->deleteRow($ID);
-        } else {
-            return FALSE;
         }
+        return FALSE;
     }
 
     /**

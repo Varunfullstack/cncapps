@@ -373,7 +373,7 @@ class CTQuestionnaire extends CTCNC
                         Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
-                                'action'     => 'delete',
+                                'action'     => 'deleteQuestion',
                                 'questionID' => $questionID
                             )
                         );
@@ -610,19 +610,32 @@ class CTQuestionnaire extends CTCNC
     function deleteQuestion()
     {
         $this->setMethodName('deleteQuestion');
-        if (!$this->buQuestionnaire->deleteQuestion($this->getParam('questionID'))) {
-            $this->displayFatalError('Cannot delete this row');
-            exit;
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'displayQuestionList'
-                    )
-                );
-            header('Location: ' . $urlNext);
+        // we have to know from what questionnaire we have to delete the question so we can redirect the user back to
+        // the correct list of questions
+
+        $questionID = $this->getParam('questionID');
+
+        if (!$questionID) {
+            return $this->displayFatalError('Question ID not given');
+        }
+        $dsQuestion = new DataSet($this);
+        $this->buQuestionnaire->getQuestionByID($questionID, $dsQuestion);
+
+        $questionnaireID = $dsQuestion->getValue(DBEQuestion::questionnaireID);
+
+        if (!$this->buQuestionnaire->deleteQuestion($questionID)) {
+            $this->displayFatalError('Cannot delete this question, it has already been answered at least once');
             exit;
         }
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'          => 'displayQuestionList',
+                    'questionnaireID' => $questionnaireID
+                )
+            );
+        header('Location: ' . $urlNext);
+        exit;
     }
 }
