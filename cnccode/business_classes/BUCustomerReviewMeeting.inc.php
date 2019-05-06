@@ -239,10 +239,8 @@ class BUCustomerReviewMeeting extends Business
             $buMail->putInQueue(
                 $senderEmail,
                 $customer['accountManagerUsername'] . '@' . CONFIG_PUBLIC_DOMAIN,
-                // account manager
                 $hdrs,
-                $body,
-                false      // to SD Managers
+                $body      // to SD Managers
             );
 
             /* @todo set flag */

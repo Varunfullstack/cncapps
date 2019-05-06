@@ -65,8 +65,7 @@ if ($count > 0) {
     $sent = $buMail->send(
         $send_to_email,
         $hdrs,
-        $body,
-        true
+        $body
     );
 
     if ($sent) {

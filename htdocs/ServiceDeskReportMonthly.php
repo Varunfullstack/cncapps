@@ -47,8 +47,7 @@ $buMail->putInQueue(
     $senderEmail,
     'monthlysdreport@' . CONFIG_PUBLIC_DOMAIN,
     $hdrs,
-    $body,
-    true
+    $body
 );
 
 ?>

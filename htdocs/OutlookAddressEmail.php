@@ -188,8 +188,7 @@ $result = $buMail->putInQueue(
     CONFIG_SALES_EMAIL,
     CONFIG_SALES_EMAIL,
     $hdrs,
-    $body,
-    false
+    $body
 );
 header('Location:/index.php');
 ?>

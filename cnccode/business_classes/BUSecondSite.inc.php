@@ -627,8 +627,7 @@ class BUSecondsite extends Business
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            true
+            $body
         );
 
     }

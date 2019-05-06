@@ -778,8 +778,7 @@ class BUDailyReport extends Business
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            true      // to SD Managers
+            $body      // to SD Managers
         );
 
         echo "SENT";

@@ -1114,8 +1114,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 $senderEmail,
                 $toEmail,
                 $hdrs,
-                $body,
-                true
+                $body
             );
 
         }

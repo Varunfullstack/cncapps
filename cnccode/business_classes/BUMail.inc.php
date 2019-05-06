@@ -20,12 +20,10 @@ class BUMail extends Business
 
     const SECONDS_DELAY_UNTIL_SEND = 1;
     const DELETE_AFTER_SEND = 1;
-    const MAIL_QUEUE_SEND_LIMIT = 20 ;
+    const MAIL_QUEUE_SEND_LIMIT = 20;
     const MAIL_QUEUE_TRY_LIMIT = 5;
 
-    private $crlf = "\n";
     private $mailQueue;
-    private $mailQueueSendLimit;
     public $mime;
     private $buUser;
 
@@ -51,14 +49,12 @@ class BUMail extends Business
      * @param mixed $toEmail
      * @param mixed $headers
      * @param mixed $body
-     * @param mixed $sendToSdManagerRecipients
      * @return mixed
      */
     public function send(
         $toEmail,
         $headers,
-        $body,
-        $sendToSdManagerRecipients = false      // obsolete
+        $body
     )
     {
         $parameters = $this->prepareMessage(
@@ -75,7 +71,6 @@ class BUMail extends Business
             $parameters['headers'],
             $body
         );
-
         return $sent;
     }
 
@@ -83,12 +78,9 @@ class BUMail extends Business
         $fromEmail,
         $toEmail,
         $headers,
-        $body,
-        $sendToSdManagerRecipients = false
+        $body
     )
     {
-        $userID = false; // initialise
-
         $parameters = $this->prepareMessage(
             $toEmail,
             $headers
@@ -117,7 +109,6 @@ class BUMail extends Business
         if ($GLOBALS ['server_type'] != MAIN_CONFIG_SERVER_TYPE_LIVE) {
             $headers['Subject'] = $headers['Subject'] . ' | Emails to: ' . $toEmail;
             $toEmail = CONFIG_TEST_EMAIL;
-
         }
 
         $userID = 0;

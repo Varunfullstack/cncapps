@@ -540,8 +540,7 @@ class BUProblemSLA extends Business
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            true
+            $body
         );
     }
 
@@ -638,8 +637,7 @@ class BUProblemSLA extends Business
                 $senderEmail,
                 $toEmail,
                 $hdrs,
-                $body,
-                true
+                $body
             );
 
         } // end if ( $dbeJCallActivity = $this->buActivity->getFirstActivityInProblem( $problemID ) ){

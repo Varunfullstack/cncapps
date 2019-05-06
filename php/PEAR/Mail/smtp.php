@@ -77,7 +77,7 @@ class Mail_smtp extends Mail
     /**
      * SMTP connection object.
      *
-     * @var object
+     * @var Net_SMTP
      * @access private
      */
     var $_smtp = null;

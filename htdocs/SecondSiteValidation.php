@@ -208,8 +208,7 @@ $buMail->putInQueue(
     $senderEmail,
     $toEmail,
     $hdrs,
-    $body,
-    true
+    $body
 );
 
 echo $html; // and output to page

@@ -46,6 +46,7 @@ function stripslashes_deep($value)
         stripslashes($value);
     return $value;
 }
+
 set_time_limit(30 * 60);
 // if magic_quotes_gpc is set then strip all backslashes from GPC arrays first
 // absolute path to root application directory
@@ -487,7 +488,7 @@ switch ($server_type) {
             'CONFIG_PREPAY_EMAIL',
             CONFIG_CATCHALL_EMAIL
         );
-        
+
         break;
 
 } // end switch

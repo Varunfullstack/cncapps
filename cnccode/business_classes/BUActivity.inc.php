@@ -744,8 +744,7 @@ class BUActivity extends Business
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            true
+            $body
         );
     }
 
@@ -1517,8 +1516,7 @@ class BUActivity extends Business
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            true
+            $body
         );
     }
 
@@ -2025,8 +2023,7 @@ class BUActivity extends Business
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            true
+            $body
         );
     }
 
@@ -2267,8 +2264,7 @@ class BUActivity extends Business
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            true
+            $body
         );
     }
 
@@ -2368,8 +2364,7 @@ class BUActivity extends Business
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            true
+            $body
         );
     } // end sendChangeRequestEmail
 
@@ -3566,8 +3561,7 @@ class BUActivity extends Business
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            $sendToSDManagers
+            $body
         );
     }
 
@@ -5217,8 +5211,7 @@ is currently a balance of ';
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            true
+            $body
         );
     }
 
@@ -5335,8 +5328,7 @@ is currently a balance of ';
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            true
+            $body
         );
 
     }
@@ -7928,8 +7920,7 @@ is currently a balance of ';
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            true
+            $body
         );
     }
 
@@ -8334,8 +8325,7 @@ is currently a balance of ';
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            false
+            $body
         );
     }
 
@@ -9713,8 +9703,7 @@ is currently a balance of ';
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            true
+            $body
         );
 
         $this->logOperationalActivity(
@@ -9998,8 +9987,7 @@ is currently a balance of ';
                 $senderEmail,
                 $toEmail,
                 $hdrs,
-                $body,
-                true
+                $body
             );
         }
 

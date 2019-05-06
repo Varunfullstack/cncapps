@@ -110,8 +110,7 @@ foreach ($result->fetch_all(MYSQLI_ASSOC) as $row) {
         CONFIG_SUPPORT_EMAIL,
         $row['con_email'],
         $hdrs,
-        $body,
-        true
+        $body
     );
 
 }

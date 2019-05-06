@@ -288,8 +288,7 @@ class CTServiceRequestsByCustomerReport extends CTCNC
                 $senderEmail,
                 $toEmail,
                 $hdrs,
-                $body,
-                true
+                $body
             );
 
             echo 'email queued to be sent';

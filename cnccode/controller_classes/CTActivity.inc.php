@@ -3503,7 +3503,6 @@ class CTActivity extends CTCNC
     {
         $dbeContact = new DBEContact($this);
         $dbeSite = new DBESite($this);
-
         $dbeContact->getRowsByCustomerID(
             $customerID,
             false,
@@ -4063,9 +4062,9 @@ class CTActivity extends CTCNC
         );
         $dsCustomer->fetchNext();
         $customerDetails = null;
-        if ($dsCallActivity->getValue(DBEJCallActivity::contactID) != 0 & $dsCallActivity->getValue(
+        if ($dsCallActivity->getValue(DBEJCallActivity::contactID) && $dsCallActivity->getValue(
                 DBEJCallActivity::siteNo
-            ) != null) {
+            ) !== null) {
 
             $dsSite = new DataSet($this);
             $buCustomer->getSiteByCustomerIDSiteNo(
@@ -4350,7 +4349,8 @@ class CTActivity extends CTCNC
             'ActivityEdit'
         );
 
-        if ($dsCallActivity->getValue(DBEJCallActivity::siteNo)) {
+
+        if ($dsCallActivity->getValue(DBEJCallActivity::siteNo) !== null) {
             $this->contactDropdown(
                 $dsCallActivity->getValue(DBEJCallActivity::customerID),
                 $dsCallActivity->getValue(DBEJCallActivity::contactID),
@@ -4683,7 +4683,7 @@ class CTActivity extends CTCNC
             );
         } else {
             $dbeCallActType->getRow($dsCallActivity->getValue(DBEJCallActivity::callActTypeID));
-            if (!$dsCallActivity->getValue(DBEJCallActivity::siteNo)) {
+            if ($dsCallActivity->getValue(DBEJCallActivity::siteNo) === null) {
                 $this->formError = true;
                 $this->dsCallActivity->setMessage(
                     DBEJCallActivity::siteNo,

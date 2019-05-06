@@ -85,8 +85,7 @@ if ($error) {
         BACKUP_ALERT_EMAIL_FROM_USER,
         $send_to_email,
         $hdrs,
-        $body,
-        true
+        $body
     );
 
 } else {

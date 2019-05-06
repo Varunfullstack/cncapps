@@ -161,6 +161,5 @@ $sent = $buMail->putInQueue(
     CONFIG_SUPPORT_EMAIL,
     $toEmail,
     $hdrs,
-    $body,
-    true
+    $body
 );
