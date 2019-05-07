@@ -56,6 +56,7 @@ class CTSTANDARDTEXT extends CTCNC
         $this->buStandardText = new BUStandardText($this);
         $this->dsStandardText = new DSForm($this);
         $this->dsStandardText->copyColumnsFrom($this->buStandardText->dbeStandardText);
+
     }
 
     /**

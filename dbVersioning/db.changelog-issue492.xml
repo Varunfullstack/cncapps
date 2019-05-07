@@ -1447,5 +1447,19 @@
             update mail_queue set time_started_sending = null where time_started_sending = '0000-00-00 00:00:00'
         </sql>
     </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-162">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="problem" indexName="idx_pro_rootcauseno"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE INDEX idx_pro_rootcauseno
+                ON problem (pro_rootcauseno);
+        </sql>
+        <rollback>
+            <dropIndex tableName="problem" indexName="idx_pro_rootcauseno"/>
+        </rollback>
+    </changeSet>
 
 </databaseChangeLog>

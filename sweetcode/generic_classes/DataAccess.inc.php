@@ -1524,11 +1524,11 @@ not a boolean, the given value is null, column given is not the PK, and there is
     )
     {
         $ixThisColumn = $this->columnExists($data->getName($ixCol));
-        if (($ixThisColumn == -1) & ($this->allowAddColumns)) {
+        if (($ixThisColumn == -1) && ($this->allowAddColumns)) {
             $this->addColumnNoCheck(
                 $data->getName($ixCol),
                 $data->getType($ixCol),
-                $data->getNull($ixCol),
+                $data->getPk() == $ixCol ? DA_ALLOW_NULL : $data->getNull($ixCol),
                 $data->getDefaultValue($ixCol),
                 $data->getValidationFunction($ixCol)
             );
