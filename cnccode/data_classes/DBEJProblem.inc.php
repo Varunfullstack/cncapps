@@ -329,13 +329,15 @@ class DBEJProblem extends DBEProblem
 
           AND pro_queue_no = $queueNo
         
-          AND CONCAT( pro_alarm_date , ' ' , pro_alarm_time ) <= NOW()";
+          AND ( " . $this->getDBColumnName(self::alarmDate) . " is null or CONCAT( " . $this->getDBColumnName(
+                self::alarmDate
+            ) . " , ' ' , " . $this->getDBColumnName(self::alarmTime) . " ) <= NOW() )";
 
         if ($unassignedOnly) {
-            $sql .= " AND pro_consno = 0";
+            $sql .= " AND pro_consno is null";
 
         } else {
-            $sql .= " AND pro_consno <> 0";
+            $sql .= " AND pro_consno is not null";
         }
 
 
@@ -810,7 +812,8 @@ class DBEJProblem extends DBEProblem
 
     }
 
-    public function getOpenRowsByContactID($contactID) {
+    public function getOpenRowsByContactID($contactID)
+    {
         $sql =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .

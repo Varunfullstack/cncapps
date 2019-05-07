@@ -1444,7 +1444,9 @@
         <dropNotNullConstraint columnName="time_started_sending" tableName="mail_queue" columnDataType="datetime"/>
         <rollback/>
         <sql>
-            update mail_queue set time_started_sending = null where time_started_sending = '0000-00-00 00:00:00'
+            update mail_queue
+            set time_started_sending = null
+            where time_started_sending = '0000-00-00 00:00:00'
         </sql>
     </changeSet>
     <changeSet author="pavwebdev" id="1554199133-162">
@@ -1460,6 +1462,13 @@
         <rollback>
             <dropIndex tableName="problem" indexName="idx_pro_rootcauseno"/>
         </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-163">
+        <sql>
+            update problem
+            set pro_consno = null
+            where pro_consno = 0
+        </sql>
     </changeSet>
 
 </databaseChangeLog>

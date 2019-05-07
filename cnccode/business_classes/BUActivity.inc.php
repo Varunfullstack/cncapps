@@ -6045,7 +6045,6 @@ is currently a balance of ';
             $queueNo,
             true
         ); // unassigned first
-
         $this->getData(
             $dbeJProblem,
             $dsResults
@@ -6054,7 +6053,6 @@ is currently a balance of ';
         $dsResults->sortAscending(
             'dashboardSortColumn'
         );
-
         $dbeJProblem->getRowsByQueueNo($queueNo);       // then assigned
 
         $dsAssignedResults = new DataSet($this);
