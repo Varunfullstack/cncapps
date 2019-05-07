@@ -3,6 +3,22 @@ BODY {
     font-family: Arial, Tahoma, Helvetica, sans-serif;
 }
 
+body.environment-design {
+    background-color: #fdffe5;
+}
+
+body.environment-test {
+    background-color: #f1f9d1;
+}
+
+body.environment-website {
+    background-color: #f0f9ff;
+}
+
+body.environment-development {
+    background-color: #FAE8EF;
+}
+
 .oddRows > tbody > tr:nth-child(odd) {
     background-color: rgb(250, 250, 250) !important;
 }

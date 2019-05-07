@@ -76,6 +76,11 @@ define(
     'website'
 );
 
+define(
+    'MAIN_CONFIG_SERVER_TYPE_DESIGN',
+    'design'
+);
+
 
 define(
     'CUSTOMERS_ENCRYPTION_PRIVATE_KEY',
@@ -142,7 +147,6 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
 
         case 'cncapps':
             $server_type = MAIN_CONFIG_SERVER_TYPE_LIVE;
-
             break;
         case 'cncdev7:85':
             $server_type = MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
@@ -153,6 +157,9 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
             break;
         case 'cncweb:88':
             $server_type = MAIN_CONFIG_SERVER_TYPE_WEBSITE;
+            break;
+        case 'cncdesign:89':
+            $server_type = MAIN_CONFIG_SERVER_TYPE_DESIGN;
 
     }
 
@@ -165,6 +172,7 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
     $GLOBALS['isRunningFromCommandLine'] = true;
     $_SERVER['HTTP_HOST'] = 'cncapps';
 }
+
 
 
 define(
@@ -467,6 +475,92 @@ switch ($server_type) {
             'CONFIG_CATCHALL_EMAIL',
             'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', xavi@pavilionweb.co.uk'
         );
+        error_reporting(E_ALL & ~E_WARNING);
+        ini_set(
+            'display_errors',
+            'on'
+        );
+
+        $GLOBALS['mail_options'] =
+            array(
+                'driver' => 'smtp',
+                'host'   => 'cncltd-co-uk0i.mail.protection.outlook.com',
+                'port'   => 25,
+                'auth'   => false
+            );
+
+        define(
+            'CONFIG_TEST_EMAIL',
+            CONFIG_CATCHALL_EMAIL
+        );
+        define(
+            'CONFIG_SALES_EMAIL',
+            'sales@' . CONFIG_PUBLIC_DOMAIN
+        );
+        define(
+            'CONFIG_SALES_MANAGER_EMAIL',
+            CONFIG_CATCHALL_EMAIL
+        );
+        define(
+            'CONFIG_SUPPORT_EMAIL',
+            'support@cnc-ltd.co.uk'
+        );
+        define(
+            'CONFIG_CUSTOMER_SERVICE_EMAIL',
+            ' customerservice@' . CONFIG_PUBLIC_DOMAIN
+        );
+        define(
+            'CONFIG_SUPPORT_MANAGER_EMAIL',
+            CONFIG_CATCHALL_EMAIL
+        );
+        define(
+            'CONFIG_SUPPORT_ADMINISTRATOR_EMAIL',
+            CONFIG_CATCHALL_EMAIL
+        );
+        define(
+            'CONFIG_HELP_DESK_EMAIL',
+            'helpdeskE-Mails@' . CONFIG_PUBLIC_DOMAIN
+        );
+        define(
+            'CONFIG_PREPAY_EMAIL',
+            CONFIG_CATCHALL_EMAIL
+        );
+
+        $GLOBALS['request_mail_options'] =
+            array(
+                'host'     => 'cncmx01',
+                'port'     => 143,
+                'user'     => 'devasr',
+                'password' => 'Unread01$'
+            );
+        break;
+
+    case MAIN_CONFIG_SERVER_TYPE_DESIGN:
+        define(
+            "DB_NAME",
+            "cnctest"
+        );
+        define(
+            "BASE_DRIVE",
+            dirname(__DIR__)
+        );
+        define(
+            "SCR_DIR",
+            "\\\\cncltd\\cnc\\Company\\scr\\dev"
+        );
+        define(
+            "CUSTOMER_DIR_FROM_BROWSER",
+            "//cncltd/cnc/customer/dev"
+        );
+        define(
+            "CUSTOMER_DIR",
+            "\\\\cncltd\\cnc\\Customer\\dev"
+        );
+        define(
+            'CONFIG_CATCHALL_EMAIL',
+            'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN
+        );
+//            error_reporting(E_ALL & ~E_STRICT)
         error_reporting(E_ALL & ~E_WARNING);
         ini_set(
             'display_errors',

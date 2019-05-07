@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 531 - Create configuration settings for the new Design Environment 
+
 ## [v2.4.2] - 2019-04-12
 ### Fixed
 - Fix issue with duplicated emails in contacts.
