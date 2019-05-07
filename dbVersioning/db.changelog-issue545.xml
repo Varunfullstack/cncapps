@@ -30,4 +30,29 @@
             </sql>
         </rollback>
     </changeSet>
+    <changeSet author="pavwebdev" id="1556182482-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(passwordLevel) FROM consultant WHERE passwordLevel = 5
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            update consultant
+            set passwordLevel = case
+                            when 4 then 5
+                            when 3 then 4
+                            else passwordLevel
+                end
+        </sql>
+        <rollback>
+            <sql>
+                update consultant
+                set passwordLevel = case
+                                when 5 then 4
+                                when 4 then 3
+                                else passwordLevel
+                    end
+            </sql>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>
