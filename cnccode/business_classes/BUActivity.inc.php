@@ -6091,29 +6091,6 @@ is currently a balance of ';
 
     }
 
-    function toggleDoNextFlag($problemID)
-    {
-        if (!$this->dbeProblem) {
-            $this->dbeProblem = new DBEProblem($this);
-        }
-
-        $this->dbeProblem->getRow($problemID);
-
-        if ($this->dbeProblem->getValue(DBEJProblem::doNextFlag) == 'Y') {
-            $this->dbeProblem->setValue(
-                DBEJProblem::doNextFlag,
-                'N'
-            );
-        } else {
-            $this->dbeProblem->setValue(
-                DBEJProblem::doNextFlag,
-                'Y'
-            );
-        }
-        $this->dbeProblem->updateRow();
-
-    }
-
     function toggleCriticalFlag($problemID)
     {
         if (!$this->dbeProblem) {

@@ -150,6 +150,7 @@
             UPDATE problem
             SET pro_alarm_date = NULL
             WHERE pro_alarm_date = '0000-00-00'
+               or pro_alarm_date = ''
         </sql>
         <rollback/>
     </changeSet>
@@ -1468,6 +1469,154 @@
             update problem
             set pro_consno = null
             where pro_consno = 0
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-164">
+        <sql>
+            update problem
+            set pro_priority = null
+            where pro_priority = 0
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-165">
+        <sql>
+            update problem
+            set pro_date_raised = null
+            where pro_date_raised = '0000-00-00 00:00:00'
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-166">
+        <sql>
+            update problem
+            set pro_fixed_consno = null
+            where pro_fixed_consno = 0
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-167">
+        <sql>
+            update problem
+            set pro_fixed_date = null
+            where pro_fixed_date = '0000-00-00 00:00:00'
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-168">
+        <sql>
+            UPDATE
+                problem
+            SET problem.`pro_date_raised` =
+                    (SELECT MIN(callactivity.`caa_date`)
+                     FROM callactivity
+                     WHERE callactivity.`caa_problemno` = problem.`pro_problemno`)
+            WHERE pro_date_raised IS NULL
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-169">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_email_option"/>
+        </preConditions>
+        <dropColumn tableName="problem" columnName="pro_email_option"/>
+        <rollback>
+            <addColumn tableName="problem">
+                <column name="pro_email_option" afterColumn="pro_complete_date" type="enum('A','N','S')">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-170">
+        <sql>
+            update problem
+            set pro_complete_date = null
+            where pro_complete_date = '0000-00-00'
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-171">
+        <sql>
+            update problem
+            set pro_hide_from_customer_flag = 'N'
+            where pro_hide_from_customer_flag = ''
+               or pro_hide_from_customer_flag is null
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-172">
+        <sql>
+            update problem
+            set pro_alarm_time = null
+            where pro_alarm_time = ''
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-173">
+        <sql>
+            update problem
+            set pro_contract_cuino = null
+            where pro_contract_cuino = 0
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-174">
+        <sql>
+            update problem
+            set pro_escalated_consno = null
+            where pro_escalated_consno = 0
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-175">
+        <sql>
+            update problem
+            set pro_contno = null
+            where pro_contno = 0
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-176">
+        <sql>
+            update problem
+            set activityCategoryID = null
+            where activityCategoryID = 0
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-177">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_technician_weighting"/>
+        </preConditions>
+        <dropColumn tableName="problem" columnName="pro_technician_weighting"/>
+        <rollback>
+            <addColumn tableName="problem">
+                <column name="pro_technician_weighting" afterColumn="activityCategoryID" type="enum(1,2,3,4,5)">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-178">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_rejected_consno"/>
+        </preConditions>
+        <dropColumn tableName="problem" columnName="pro_rejected_consno"/>
+        <rollback>
+            <addColumn tableName="problem">
+                <column name="pro_rejected_consno" afterColumn="activityCategoryID" type="int(11)">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-179">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_do_next_flag"/>
+        </preConditions>
+        <dropColumn tableName="problem" columnName="pro_do_next_flag"/>
+        <rollback>
+            <addColumn tableName="problem">
+                <column name="pro_do_next_flag" afterColumn="activityCategoryID" type="char(1)">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-180">
+        <sql>
+            update problem
+            set pro_rootcauseno = null
+            where pro_rootcauseno = 0
         </sql>
     </changeSet>
 

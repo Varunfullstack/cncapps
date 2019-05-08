@@ -738,6 +738,7 @@ class CTActivity extends CTCNC
                 'urlSubmit'                   => $urlSubmit
             )
         );
+
         // activity status selector
         $this->template->set_block(
             'ActivitySearch',
@@ -749,13 +750,12 @@ class CTActivity extends CTCNC
         } else {
             $statusArray = &$this->statusArray;
         }
-
         foreach ($statusArray as $key => $value) {
             $statusSelected = ($dsSearchForm->getValue(BUActivity::searchFormStatus) == $key) ? CT_SELECTED : null;
             $this->template->set_var(
                 array(
                     'statusSelected'    => $statusSelected,
-                    'status'            => $key,
+                    'statusValue'            => $key,
                     'statusDescription' => $value
                 )
             );
@@ -1824,7 +1824,7 @@ class CTActivity extends CTCNC
         $buCustomerItem = new BUCustomerItem($this);
         $minResponseTime = $buCustomerItem->getMinResponseTime($dsCallActivity->getValue(DBEJCallActivity::customerID));
 
-        $problemStatus = $this->buActivity->problemStatusArray[$dbeJProblem->getValue(DBEJProblem::status)];
+        $problemStatus = @$this->buActivity->problemStatusArray[$dbeJProblem->getValue(DBEJProblem::status)];
 
         $dbeLastActivity = $this->buActivity->getLastActivityInProblem(
             $dsCallActivity->getValue(DBEJCallActivity::problemID)
@@ -1991,7 +1991,7 @@ class CTActivity extends CTCNC
                 'hiddenText'                         => $hiddenText,
                 'currentUserBgColor'                 => $currentUserBgColor,
                 'currentUser'                        => $currentUser,
-                'problemPriority'                    => $this->buActivity->priorityArray[$dbeJProblem->getValue(
+                'problemPriority'                    => @$this->buActivity->priorityArray[$dbeJProblem->getValue(
                     DBEJProblem::priority
                 )],
                 'problemStatus'                      => $problemStatus,
