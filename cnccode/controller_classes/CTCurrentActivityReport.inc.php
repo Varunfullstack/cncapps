@@ -359,19 +359,9 @@ class CTCurrentActivityReport extends CTCNC
      */
     function setFilter()
     {
-
-        if ($this->getParam('selectedUserID')) {
-            $this->setSessionParam('selectedUserID', $this->getParam('selectedUserID'));
-        }
-
-        if ($this->getParam('priorityFilter')) {
-            $this->setSessionParam('priorityFilter', $this->getParam('priorityFilter'));
-        }
-
-        if ($this->getParam('selectedCustomerID')) {
-            $this->setSessionParam('selectedCustomerID', $this->getParam('selectedCustomerID'));
-        }
-
+        $this->setSessionParam('selectedUserID', $this->getParam('selectedUserID'));
+        $this->setSessionParam('priorityFilter', $this->getParam('priorityFilter'));
+        $this->setSessionParam('selectedCustomerID', $this->getParam('selectedCustomerID'));
         $urlNext =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
