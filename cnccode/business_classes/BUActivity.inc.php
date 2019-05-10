@@ -2680,7 +2680,7 @@ class BUActivity extends Business
             case 'D':
                 $this->logOperationalActivity(
                     $dsCallActivity->getValue(DBECallActivity::problemID),
-                    '<p>Time request denied: ' . $comments . '</p>'
+                    '<p style="color: red;">Time request denied: ' . $comments . '</p>'
                 );
                 $this->sendTimeRequestDeniedEmail(
                     $dsCallActivity,
