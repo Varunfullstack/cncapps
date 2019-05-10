@@ -150,7 +150,6 @@
             UPDATE problem
             SET pro_alarm_date = NULL
             WHERE pro_alarm_date = '0000-00-00'
-               or pro_alarm_date = ''
         </sql>
         <rollback/>
     </changeSet>
@@ -1618,6 +1617,170 @@
             set pro_rootcauseno = null
             where pro_rootcauseno = 0
         </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-181">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="project" indexName="idx_customerID"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE INDEX idx_customerID
+                ON project (customerID);
+        </sql>
+        <rollback>
+            <dropIndex tableName="project" indexName="idx_customerID"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-182">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="problem" indexName="idx_pro_projectno"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE INDEX idx_pro_projectno
+                ON problem (pro_projectno);
+        </sql>
+        <rollback>
+            <dropIndex tableName="problem" indexName="idx_pro_projectno"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-183">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="staffAppraisalObjectives" primaryKeyName="PRIMARY"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="staffAppraisalObjectives" columnNames="id, questionnaireAnswerID"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-184">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="contactAuditLog" indexName="idx_con_custno_con_first_name_con_last_name"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE INDEX idx_con_custno_con_first_name_con_last_name
+                ON contactAuditLog (con_custno, con_first_name, con_last_name);
+        </sql>
+        <rollback>
+            <dropIndex tableName="contactAuditLog" indexName="idx_con_custno_con_first_name_con_last_name"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-185">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="custype" primaryKeyName="PRIMARY"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="custype" columnNames="cty_ctypeno"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-186">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="ignoredaddomain"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="ignoredaddomain" columnNames="ignoredADDomainID"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-187">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="passwordService"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="passwordService" columnNames="passwordServiceID"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-188">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="problem_monitoring"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="problem_monitoring" columnNames="problemId, cons_no"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-189">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="staffAppraisalQuestion"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="staffAppraisalQuestion" columnNames="id"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-190">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="staffAppraisalQuestion" indexName="idx_questionnaireID"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="staffAppraisalQuestion" indexName="idx_questionnaireID">
+            <column name="questionnaireId"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-191">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="staffAppraisalQuestionAnswer"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="staffAppraisalQuestionAnswer" columnNames="answerID"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-192">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="staffAppraisalQuestionAnswer" indexName="idx_questionID"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="staffAppraisalQuestionAnswer" indexName="idx_questionID">
+            <column name="questionID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-193">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="staffAppraisalQuestionnaire"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="staffAppraisalQuestionnaire" columnNames="id"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-194">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="staffAppraisalQuestionnaireAnswer"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="staffAppraisalQuestionnaireAnswer" columnNames="id"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-195">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="staffAppraisalQuestionnaireAnswer"
+                             indexName="idx_questionnaireID_staffMemberID"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="staffAppraisalQuestionnaireAnswer" indexName="idx_questionnaireID_staffMemberID">
+            <column name="questionnaireID"/>
+            <column name="staffMemberID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-196">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="utilityEmail"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="utilityEmail" columnNames="utilityEmailID"
+                       constraintName="PRIMARY"/>
     </changeSet>
 
 </databaseChangeLog>

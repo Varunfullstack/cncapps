@@ -280,26 +280,46 @@ class BUSecondsiteReplication extends BUSecondsite
     }
 
 
-
     function setImageStatus($secondSiteImageID,
                             $status,
                             $imagePath = null,
                             $imageTime = null
     )
     {
+
         $queryString =
             "UPDATE
         secondsite_image 
       SET
-        replicationStatus = '$status',
-        replicationImagePath = '" . addslashes($imagePath) . "',
-        replicationImageTime = '$imageTime'
+        replicationStatus = ?,
+        replicationImagePath = ?,
+        replicationImageTime = ?
       WHERE
-        secondSiteImageID = $secondSiteImageID";
-
+        secondSiteImageID = ?";
+        /** @var dbSweetcode $db */
         $db = $GLOBALS['db'];
 
-        $db->query($queryString);
+        $db->preparedQuery(
+            $queryString,
+            [
+                [
+                    'type'  => "s",
+                    'value' => $status
+                ],
+                [
+                    'type'  => "s",
+                    'value' => $imagePath
+                ],
+                [
+                    'type'  => "s",
+                    'value' => $imageTime
+                ],
+                [
+                    'type'  => "i",
+                    'value' => $secondSiteImageID
+                ],
+            ]
+        );
     }
 
     function setImageStatusByServer($customerItemID,

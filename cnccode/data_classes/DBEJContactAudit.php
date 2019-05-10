@@ -89,6 +89,15 @@ class DBEJContactAudit extends DBEContactAudit
                 ) . " = $customerId";
         }
 
+        if ($firstName) {
+            $queryString .= " and " . $this->getDBColumnName(self::firstName) .
+                " = '" . $firstName . "'";
+        }
+
+        if ($lastName) {
+            $queryString .= " and " . $this->getDBColumnName(self::lastName) .
+                " = '" . $lastName . "'";
+        }
 
         if ($startDate) {
             $queryString .= " and date(" . $this->getTableName() . "." . $this->getDBColumnName(
@@ -100,17 +109,6 @@ class DBEJContactAudit extends DBEContactAudit
             $queryString .= " and date(" . $this->getTableName() . "." . $this->getDBColumnName(
                     self::createdAt
                 ) . ") <= '" . $endDate->format('Y-m-d') . "'";
-        }
-
-
-        if ($firstName) {
-            $queryString .= " and " . $this->getDBColumnName(self::firstName) .
-                " = '" . $firstName . "'";
-        }
-
-        if ($lastName) {
-            $queryString .= " and " . $this->getDBColumnName(self::lastName) .
-                " = '" . $lastName . "'";
         }
 
         if ($limit) {

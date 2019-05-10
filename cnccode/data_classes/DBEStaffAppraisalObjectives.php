@@ -41,12 +41,12 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
         );
         $this->addColumn(
             self::requirement,
-            DA_ID,
+            DA_STRING,
             DA_ALLOW_NULL
         );
         $this->addColumn(
             self::measure,
-            DA_ID,
+            DA_STRING,
             DA_ALLOW_NULL
         );
 
@@ -58,8 +58,6 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
 
         $this->setAddColumnsOff();
         $this->setPK(self::id);
-
-        var_debug($this->getPK());
     }
 
     /**
@@ -141,7 +139,7 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
         $colString = "";
         for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
             // exclude primary key columns
-            if (($this->getName($ixCol) != self::questionnaireAnswerID) & ($this->getName($ixCol) != self::id)) {
+            if (($this->getName($ixCol) != self::questionnaireAnswerID) && ($this->getName($ixCol) != self::id)) {
                 if ($colString != "") $colString = $colString . ",";
                 $colString = $colString . $this->getDBColumnName($ixCol) . "=" .
                     $this->prepareForSQL($this->getValue($ixCol));

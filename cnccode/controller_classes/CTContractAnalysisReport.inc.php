@@ -252,7 +252,7 @@ class CTContractAnalysisReport extends CTCNC
                 Controller::buildLink(
                     'ContractAnalysisReport.php',
                     array(
-                        'searchForm[1][contracts]'      => $_REQUEST ['searchForm'][1]['contracts'],
+                        'searchForm[1][contracts]'      => @$_REQUEST ['searchForm'][1]['contracts'],
                         'searchForm[1][startYearMonth]' => $dsSearchForm->getValue(self::searchFormStartYearMonth),
                         'searchForm[1][endYearMonth]'   => $dsSearchForm->getValue(self::searchFormEndYearMonth),
                     )
