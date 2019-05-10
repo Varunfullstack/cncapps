@@ -1669,15 +1669,6 @@
             <dropIndex tableName="contactAuditLog" indexName="idx_con_custno_con_first_name_con_last_name"/>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="1554199133-185">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <primaryKeyExists tableName="custype" primaryKeyName="PRIMARY"/>
-            </not>
-        </preConditions>
-        <addPrimaryKey tableName="custype" columnNames="cty_ctypeno"
-                       constraintName="PRIMARY"/>
-    </changeSet>
     <changeSet author="pavwebdev" id="1554199133-186">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -1782,5 +1773,220 @@
         <addPrimaryKey tableName="utilityEmail" columnNames="utilityEmailID"
                        constraintName="PRIMARY"/>
     </changeSet>
-
+    <changeSet author="pavwebdev" id="1554199133-197">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="auto_request_contracts"/>
+        </preConditions>
+        <dropTable tableName="auto_request_contracts"/>
+        <rollback>
+            <createTable tableName="auto_request_contracts">
+                <column name="contractCustomerItemID" type="INT UNSIGNED"/>
+                <column name="customerID" type="INT"/>
+                <column name="customerName" type="VARCHAR(35)"/>
+                <column name="renewalType" type="CHAR(50)"/>
+                <column name="postcode" type="CHAR(15)"/>
+                <column name="description" type="VARCHAR(45)"/>
+                <column name="adslPhone" type="VARCHAR(255)"/>
+                <column name="routerIpAddress" type="TEXT"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-198">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="auto_request_rootcause"/>
+        </preConditions>
+        <dropTable tableName="auto_request_rootcause"/>
+        <rollback>
+            <createTable tableName="auto_request_rootcause">
+                <column name="rootCauseID" type="INT UNSIGNED"/>
+                <column name="description" type="CHAR(50)"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-199">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="auto_request_rootcause"/>
+        </preConditions>
+        <dropTable tableName="auto_request_rootcause"/>
+        <rollback>
+            <createTable tableName="auto_request_rootcause">
+                <column name="rootCauseID" type="INT UNSIGNED"/>
+                <column name="description" type="CHAR(50)"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-200">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="callactivity_archive"/>
+        </preConditions>
+        <dropTable tableName="callactivity_archive"/>
+        <rollback>
+            <createTable tableName="callactivity_archive">
+                <column defaultValueNumeric="0" name="caa_callactivityno" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="caa_siteno" type="INT"/>
+                <column defaultValueNumeric="0" name="caa_contno" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="caa_item" type="SMALLINT"/>
+                <column defaultValueNumeric="0" name="caa_callacttypeno" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="activityCategoryID" type="INT UNSIGNED"/>
+                <column defaultValueNumeric="0" name="projectID" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="caa_problemno" type="INT UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="0000-00-00" name="caa_date" type="date">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="" name="caa_starttime" type="VARCHAR(5)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="caa_endtime" type="VARCHAR(5)"/>
+                <column name="caa_status" type="CHAR(1)"/>
+                <column name="caa_expexport_flag" type="CHAR(1)"/>
+                <column name="reason" type="TEXT"/>
+                <column name="internalNotes" type="MEDIUMTEXT"/>
+                <column defaultValueNumeric="0.00" name="curValue" type="DECIMAL(6, 2)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="statementYearMonth" type="VARCHAR(7)"/>
+                <column defaultValueNumeric="0" name="caa_custno" type="INT UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="caa_cuino" type="INT UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="caa_contract_cuino" type="INT UNSIGNED"/>
+                <column defaultValue="" name="caa_under_contract" type="CHAR(1)">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="" name="caa_authorised" type="CHAR(1)">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="caa_consno" type="INT UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="" name="caa_ot_exp_flag" type="CHAR(1)">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="caa_completed_consno" type="INT UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="0000-00-00 00:00:00" name="caa_completed_date" type="datetime">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="N" name="caa_serverguard" type="CHAR(1)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="caa_parent_callactivityno" type="INT"/>
+                <column defaultValue="N" name="caa_awaiting_customer_response_flag"
+                        remarks="If so then exclude this from time duration calculations" type="CHAR(1)"/>
+                <column name="caa_class" remarks="[W]orking, [I]nformational, [O]ther" type="CHAR(1)"/>
+                <column defaultValueComputed="CURRENT_TIMESTAMP" name="created" type="TIMESTAMP(19)">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="N" name="caa_logging_error_flag"
+                        remarks="Was there an error when logging this activity" type="CHAR(1)"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-202">
+        <sql>update custype
+             set cty_ctypeno = 25
+             where cty_desc = "Legacy" </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-203">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="custype" primaryKeyName="PRIMARY"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="custype" columnNames="cty_ctypeno"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-204">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="domain_import"/>
+        </preConditions>
+        <dropTable tableName="domain_import"/>
+        <rollback>
+            <createTable tableName="domain_import">
+                <column name="domain" type="CHAR(100)"/>
+                <column name="expiryDate" type="date"/>
+                <column name="customerID" type="INT"/>
+                <column name="invoicePeriodMonths" type="INT"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-205">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="future_action"/>
+        </preConditions>
+        <dropTable tableName="future_action"/>
+        <rollback>
+            <createTable tableName="future_action">
+                <column defaultValueNumeric="0" name="futureActionID" type="INT UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="furtherActionID" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="0000-00-00" name="date" type="date">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="" name="callActivityID" type="VARCHAR(11)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="engineerName" type="CHAR(50)"/>
+                <column name="dateCreated" type="date"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-206">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="mailshot_table"/>
+        </preConditions>
+        <dropTable tableName="mailshot_table"/>
+        <rollback>
+            <createTable tableName="mailshot_table">
+                <column name="keyfield" type="CHAR(50)"/>
+                <column name="hits" type="INT"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-207">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="main_contacts"/>
+        </preConditions>
+        <dropTable tableName="main_contacts"/>
+        <rollback>
+            <createTable tableName="main_contacts">
+                <column name="ContactFirstName" type="CHAR(25)"/>
+                <column name="ContactLastName" type="CHAR(35)"/>
+                <column name="ContactEmail" type="CHAR(60)"/>
+                <column name="CustomerName" type="VARCHAR(35)"/>
+                <column name="CustomerID" type="INT"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-208">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="temp_table"/>
+        </preConditions>
+        <dropTable tableName="temp_table"/>
+        <rollback>
+            <createTable tableName="temp_table">
+                <column name="id" type="INT UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="value" type="CHAR(200)"/>
+            </createTable>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>

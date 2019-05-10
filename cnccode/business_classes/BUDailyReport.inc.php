@@ -852,10 +852,6 @@ class BUDailyReport extends Business
                             50
                         ),
                         'durationHours'    => $row[4],
-                        'timeSpentHours'   => $row[5],
-                        'lastUpdatedDate'  => $row[6],
-                        'priority'         => $row[7],
-                        'teamName'         => $row[8],
                         'urlRequest'       => $urlRequest,
                         'title'            => $title
                     )
@@ -876,10 +872,6 @@ class BUDailyReport extends Business
                             )
                         ),
                         'durationHours'    => $row[4],
-                        'timeSpentHours'   => $row[5],
-                        'lastUpdatedDate'  => $row[6],
-                        'priority'         => $row[7],
-                        'teamName'         => $row[8],
                     )
                 );
 
