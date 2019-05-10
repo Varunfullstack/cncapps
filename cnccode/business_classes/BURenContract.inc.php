@@ -943,61 +943,6 @@ HEREDOC;
         $dbeCallActivity->updateRow();
     }
 
-    function emailSalesOrderNotification($customerName,
-                                         $ordheadID
-    ) // GL
-    {
-        $toEmail = false;
-        $senderEmail = CONFIG_SALES_EMAIL;
-
-        $buMail = new BUMail($this);
-
-        $hdrs =
-            array(
-                'From'         => $senderEmail,
-                'Subject'      => 'ServiceDesk renewal sales order created for ' . $customerName,
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
-
-        ob_start(); ?>
-        <HTML>
-        <BODY>
-        <TABLE border="1">
-            <tr>
-                <td><A HREF="/SalesOrder.php?ordheadID=<?php echo $ordheadID ?>">Open Order</A></td>
-            </tr>
-        </TABLE>
-        </BODY>
-        </HTML>
-        <?php
-
-        $message = ob_get_contents();
-        ob_end_clean();
-
-        $buMail->mime->setHTMLBody($message);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body,
-            true
-        );
-
-    } // end send email to technical manager
-
     function isCompleted($customerItemID)
     {
         $this->dbeRenContract->getRow($customerItemID);

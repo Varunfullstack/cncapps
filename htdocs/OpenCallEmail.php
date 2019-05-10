@@ -169,7 +169,9 @@ foreach ($engineers as $row) {
 
         $body = $buMail->mime->get($mime_params);
 
+        $sendTo = $row['cns_logname'] . '@' . $domain;
         $hdrs = array(
+            'To'           => $sendTo,
             'From'         => CONFIG_SALES_MANAGER_EMAIL,
             'Subject'      => $emailSubject,
             'Content-Type' => 'text/html; charset=UTF-8'
@@ -177,7 +179,6 @@ foreach ($engineers as $row) {
 
         $hdrs = $buMail->mime->headers($hdrs);
 
-        $sendTo = $row['cns_logname'] . '@' . $domain;
 
         $sent = $buMail->send(
             $sendTo,

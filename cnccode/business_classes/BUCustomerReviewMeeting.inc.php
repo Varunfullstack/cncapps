@@ -14,8 +14,6 @@ require_once($cfg["path_bu"] . "/BUCustomerAnalysisReport.inc.php");
 require_once($cfg["path_dbe"] . "/DBEContact.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
-use Dompdf\Dompdf;
-
 class BUCustomerReviewMeeting extends Business
 {
 
@@ -196,8 +194,11 @@ class BUCustomerReviewMeeting extends Business
 
             $subject = 'Review meeting with ' . $customer['customerName'] . ' due by ' . $customer['nextMeetingDate'];
 
+            $toEmail = $customer['accountManagerUsername'] . '@' . CONFIG_PUBLIC_DOMAIN;
+
             $hdrs = array(
                 'From'         => $senderEmail,
+                'To'           => $toEmail,
                 'Subject'      => $subject,
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
@@ -225,7 +226,7 @@ class BUCustomerReviewMeeting extends Business
 
             $buMail->putInQueue(
                 $senderEmail,
-                $customer['accountManagerUsername'] . '@' . CONFIG_PUBLIC_DOMAIN,
+                $toEmail,
                 // account manager
                 $hdrs,
                 $body,

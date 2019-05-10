@@ -23,7 +23,6 @@ $dateToTest = @$_REQUEST['testDate'];
 $error = false;
 
 
-
 if (!$dateToTest) {
     $dateToTest = Date('Y-m-d', strtotime("+3 days"));
 }
@@ -92,15 +91,16 @@ foreach ($result->fetch_all(MYSQLI_ASSOC) as $row) {
 
     $mime_params = array(
         'text_encoding' => '7bit',
-        'text_charset' => 'UTF-8',
-        'html_charset' => 'UTF-8',
-        'head_charset' => 'UTF-8'
+        'text_charset'  => 'UTF-8',
+        'html_charset'  => 'UTF-8',
+        'head_charset'  => 'UTF-8'
     );
     $body = $buMail->mime->get($mime_params);
-
+    $toEmail = $row['con_email'];
     $hdrs = array(
-        'From' => CONFIG_SUPPORT_EMAIL,
-        'Subject' => $subject,
+        'To'           => $toEmail,
+        'From'         => CONFIG_SUPPORT_EMAIL,
+        'Subject'      => $subject,
         'Content-Type' => 'text/html; charset=UTF-8'
     );
 
@@ -108,7 +108,7 @@ foreach ($result->fetch_all(MYSQLI_ASSOC) as $row) {
 
     $sent = $buMail->putInQueue(
         CONFIG_SUPPORT_EMAIL,
-        $row['con_email'],
+        $toEmail,
         $hdrs,
         $body,
         true
