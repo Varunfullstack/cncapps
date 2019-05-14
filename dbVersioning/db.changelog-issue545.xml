@@ -15,7 +15,6 @@
             update password
             set level = case
                             when level = 4 then 5
-                            when level = 3 then 4
                             else level
                 end
         </sql>
@@ -24,7 +23,6 @@
                 update password
                 set level = case
                                 when level = 5 then 4
-                                when level = 4 then 3
                                 else level
                     end
             </sql>
