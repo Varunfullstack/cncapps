@@ -37,6 +37,8 @@ function common_isAnInternalStockSupplier($supplierID)
     }
 }
 
+
+
 function common_convertDateDMYToYMD($dateDMY)
 {
     if ($dateDMY != '') {

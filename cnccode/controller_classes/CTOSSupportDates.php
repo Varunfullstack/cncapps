@@ -50,7 +50,6 @@ class CTOSSupportDates extends CTCNC
                     http_response_code(404);
                     exit;
                 }
-                $DBEOSSupportDates->setLogSQLOn();
                 $DBEOSSupportDates->deleteRow();
                 echo json_encode(["status" => "ok"]);
                 break;
@@ -69,37 +68,22 @@ class CTOSSupportDates extends CTCNC
                     exit;
                 }
 
-                $DBEOSSupportDates->setValue(
-                    DBEOSSupportDates::domain,
-                    $_REQUEST['domain']
-                );
-                $DBEOSSupportDates->setValue(
-                    DBEOSSupportDates::customerID,
-                    $_REQUEST['customerID']
-                );
-
-                $DBEOSSupportDates->updateRow();
-                echo json_encode(["status" => "ok"]);
-                break;
-            case 'create':
-                $DBEOSSupportDates = new DBEOSSupportDates($this);
-
                 $availabilityDateString = $_REQUEST['availabilityDate'];
-                $availabilityDate = null;
                 if ($availabilityDateString) {
                     $availabilityDate = DateTime::createFromFormat('d/m/Y', $availabilityDateString);
                     if (!$availabilityDate) {
                         throw new Exception('Date format is wrong');
                     }
+                    $availabilityDateString = $availabilityDate->format('Y-m-d');
                 }
 
                 $endOfLifeDateString = $_REQUEST['endOfLifeDate'];
-                $endOfLifeDate = null;
                 if ($endOfLifeDateString) {
                     $endOfLifeDate = DateTime::createFromFormat('d/m/Y', $endOfLifeDateString);
                     if (!$endOfLifeDate) {
                         throw new Exception('Date format is wrong');
                     }
+                    $endOfLifeDateString = $endOfLifeDate->format('Y-m-d');
                 }
 
 
@@ -107,8 +91,39 @@ class CTOSSupportDates extends CTCNC
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::version, $_REQUEST['version']);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::build, $_REQUEST['build']);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::subBuild, $_REQUEST['subBuild']);
-                $DBEOSSupportDates->setValue(DBEOSSupportDates::availabilityDate, $availabilityDate);
-                $DBEOSSupportDates->setValue(DBEOSSupportDates::endOfLifeDate, $endOfLifeDate);
+                $DBEOSSupportDates->setValue(DBEOSSupportDates::availabilityDate, $availabilityDateString);
+                $DBEOSSupportDates->setValue(DBEOSSupportDates::endOfLifeDate, $endOfLifeDateString);
+                $DBEOSSupportDates->updateRow();
+                echo json_encode(["status" => "ok"]);
+                break;
+            case 'create':
+                $DBEOSSupportDates = new DBEOSSupportDates($this);
+
+                $availabilityDateString = $_REQUEST['availabilityDate'];
+                if ($availabilityDateString) {
+                    $availabilityDate = DateTime::createFromFormat('d/m/Y', $availabilityDateString);
+                    if (!$availabilityDate) {
+                        throw new Exception('Date format is wrong');
+                    }
+                    $availabilityDateString = $availabilityDate->format('Y-m-d');
+                }
+
+                $endOfLifeDateString = $_REQUEST['endOfLifeDate'];
+                if ($endOfLifeDateString) {
+                    $endOfLifeDate = DateTime::createFromFormat('d/m/Y', $endOfLifeDateString);
+                    if (!$endOfLifeDate) {
+                        throw new Exception('Date format is wrong');
+                    }
+                    $endOfLifeDateString = $endOfLifeDate->format('Y-m-d');;
+                }
+
+
+                $DBEOSSupportDates->setValue(DBEOSSupportDates::name, $_REQUEST['name']);
+                $DBEOSSupportDates->setValue(DBEOSSupportDates::version, $_REQUEST['version']);
+                $DBEOSSupportDates->setValue(DBEOSSupportDates::build, $_REQUEST['build']);
+                $DBEOSSupportDates->setValue(DBEOSSupportDates::subBuild, $_REQUEST['subBuild']);
+                $DBEOSSupportDates->setValue(DBEOSSupportDates::availabilityDate, $availabilityDateString);
+                $DBEOSSupportDates->setValue(DBEOSSupportDates::endOfLifeDate, $endOfLifeDateString);
                 $DBEOSSupportDates->insertRow();
 
                 echo json_encode(
@@ -129,20 +144,46 @@ class CTOSSupportDates extends CTCNC
                 $DBEOSSupportDates = new DBEOSSupportDates($this);
 
                 $DBEOSSupportDates->getRows();
+
+
                 $data = [];
                 while ($DBEOSSupportDates->fetchNext()) {
+                    $availabilityDateString = $DBEOSSupportDates->getValue(DBEOSSupportDates::availabilityDate);
+                    if ($availabilityDateString) {
+                        $availabilityDate = DateTime::createFromFormat('Y-m-d', $availabilityDateString);
+                        if (!$availabilityDate) {
+                            throw new Exception('Date format is wrong');
+                        }
+                        $availabilityDateString = $availabilityDate->format('d/m/Y');
+                    }
+
+                    $endOfLifeDateString = $DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate);
+                    if ($endOfLifeDateString) {
+                        $endOfLifeDate = DateTime::createFromFormat('Y-m-d', $endOfLifeDateString);
+                        if (!$endOfLifeDate) {
+                            throw new Exception('Date format is wrong');
+                        }
+
+                        $endOfLifeDateString = $endOfLifeDate->format('d/m/Y');
+                    }
+
                     $data[] = [
                         "id"               => $DBEOSSupportDates->getValue(DBEOSSupportDates::id),
-                        "name"             => $DBEOSSupportDates->getValue($DBEOSSupportDates::name),
-                        "version"          => $DBEOSSupportDates->getValue($DBEOSSupportDates::version),
-                        "build"            => $DBEOSSupportDates->getValue($DBEOSSupportDates::build),
-                        "subBuild"         => $DBEOSSupportDates->getValue($DBEOSSupportDates::subBuild),
-                        "availabilityDate" => $DBEOSSupportDates->getValue($DBEOSSupportDates::availabilityDate),
-                        "endOfLifeDate"    => $DBEOSSupportDates->getValue($DBEOSSupportDates::endOfLifeDate),
+                        "name"             => $DBEOSSupportDates->getValue(DBEOSSupportDates::name),
+                        "version"          => $DBEOSSupportDates->getValue(DBEOSSupportDates::version),
+                        "build"            => $DBEOSSupportDates->getValue(DBEOSSupportDates::build),
+                        "subBuild"         => $DBEOSSupportDates->getValue(DBEOSSupportDates::subBuild),
+                        "availabilityDate" => $availabilityDateString,
+                        "endOfLifeDate"    => $endOfLifeDateString,
                     ];
                 }
                 echo json_encode(
-                    ["data" => $data],
+                    [
+                        "draw"            => 1,
+                        "recordsTotal"    => 57,
+                        "recordsFiltered" => 57,
+                        "data"            => $data
+                    ],
                     JSON_NUMERIC_CHECK
                 );
                 break;
