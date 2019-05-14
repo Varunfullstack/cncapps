@@ -199,7 +199,6 @@
                     text: 'Edit',
                     action: (e, dt, node, config) => {
                         const rows = dataTable.rows({selected: true}).data();
-                        console.log(rows);
                         showEdit(rows[0]);
                     },
                     name: 'edit'
@@ -209,9 +208,9 @@
                     text: 'Delete',
                     action: (e, dt, node, config) => {
                         const row = dataTable.rows({selected: true});
+                        if(confirm('Are you sure?')){
 
-                        console.log(row);
-                        dialogElem.dialog('open');
+                        }
                     },
                     name: 'delete'
 
@@ -255,57 +254,57 @@
             }
             dataTable.buttons("edit:name").enable(false);
         });
-        // drawList();
-        list.on('click', '.editButton', function (thing) {
-            $elm = $(this);
-
-            const data = $elm.closest('.OSSupportDatesItem').data();
-            editingItem = OSSupportDatesItems.find(e => e.id === data.id);
-
-            if (!editingItem) {
-                throw Error('Failed to find element to edit');
-            }
-
-            domainInput.val(editingItem.domain);
-            const isCustomerSpecific = !!editingItem.customerID;
-
-            customerSection.find('[name="customerID"]').val(editingItem.customerID);
-            customerSection.find('[name="form[customerString]"]').val(editingItem.customerString);
-            $('[name="isCustomerSpecific"]').each(function () {
-                const $radio = $(this);
-                $radio.prop('checked', +$radio.val() == isCustomerSpecific);
-            });
-            cancelButton.show();
-            saveButton.show();
-            addButton.hide();
-            detail.data('editItemID', data.id);
-        });
-
-        list.on('click', '.deleteButton', function (thing) {
-
-            if (!confirm('are you sure you want to delete this entry?')) {
-                return;
-            }
-
-            $elm = $(this);
-
-            const data = $elm.closest('.OSSupportDatesItem').data();
-            const foundIndex = OSSupportDatesItems.findIndex(e => e.id === data.id);
-
-            if (foundIndex < 0) {
-                throw Error('Failed to find element to delete');
-            }
-            const urlDeleteItem = "{URLDeleteItem}&id=";
-            const url = urlDeleteItem + data.id;
-
-            $.ajax({
-                url: url,
-                method: 'GET',
-            }).then(function (result) {
-                OSSupportDatesItems.splice(foundIndex, 1);
-                drawList();
-            })
-        });
+        // // drawList();
+        // list.on('click', '.editButton', function (thing) {
+        //     $elm = $(this);
+        //
+        //     const data = $elm.closest('.OSSupportDatesItem').data();
+        //     editingItem = OSSupportDatesItems.find(e => e.id === data.id);
+        //
+        //     if (!editingItem) {
+        //         throw Error('Failed to find element to edit');
+        //     }
+        //
+        //     domainInput.val(editingItem.domain);
+        //     const isCustomerSpecific = !!editingItem.customerID;
+        //
+        //     customerSection.find('[name="customerID"]').val(editingItem.customerID);
+        //     customerSection.find('[name="form[customerString]"]').val(editingItem.customerString);
+        //     $('[name="isCustomerSpecific"]').each(function () {
+        //         const $radio = $(this);
+        //         $radio.prop('checked', +$radio.val() == isCustomerSpecific);
+        //     });
+        //     cancelButton.show();
+        //     saveButton.show();
+        //     addButton.hide();
+        //     detail.data('editItemID', data.id);
+        // });
+        //
+        // list.on('click', '.deleteButton', function (thing) {
+        //
+        //     if (!confirm('are you sure you want to delete this entry?')) {
+        //         return;
+        //     }
+        //
+        //     $elm = $(this);
+        //
+        //     const data = $elm.closest('.OSSupportDatesItem').data();
+        //     const foundIndex = OSSupportDatesItems.findIndex(e => e.id === data.id);
+        //
+        //     if (foundIndex < 0) {
+        //         throw Error('Failed to find element to delete');
+        //     }
+        //     const urlDeleteItem = "{URLDeleteItem}&id=";
+        //     const url = urlDeleteItem + data.id;
+        //
+        //     $.ajax({
+        //         url: url,
+        //         method: 'GET',
+        //     }).then(function (result) {
+        //         OSSupportDatesItems.splice(foundIndex, 1);
+        //         drawList();
+        //     })
+        // });
 
 
         cancelButton.click(function () {
