@@ -1,3 +1,7 @@
+function getFormDataAsJSON(form) {
+
+}
+
 /*
  Common Javascript functions
 

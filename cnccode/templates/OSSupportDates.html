@@ -1,27 +1,20 @@
 <style>
-    .list {
-        float: left;
-        border-right: solid 2px blue;
-        padding-right: 5px;
-    }
-
     .detail {
-        float: left;
-        padding-left: 5px;
+        padding-left: 10px;
     }
 
-    .ignoredADDomainItem {
+    .OSSupportDatesItem {
         display: flex;
         flex-direction: row;
         width: 300px;
         padding: 2px;
     }
 
-    .ignoredADDomainItem .buttons {
+    .OSSupportDatesItem .buttons {
         flex-basis: 100px;
     }
 
-    .ignoredADDomainItem .email {
+    .OSSupportDatesItem .email {
         flex-basis: 200px;
     }
 
@@ -45,10 +38,13 @@
 <script id="email-items-template"
         type="text/template"
 >
-    {% #ignoredADDomainItems %}
-    <div class="ignoredADDomainItem"
+    {% #OSSupportDatesItems %}
+    <div class="OSSupportDatesItem"
          data-id="{% id %}"
     >
+        <div>
+            OS Name
+        </div>
         <div class="email">
             <span>{% domain %}</span>
             {% #customerID %}
@@ -63,11 +59,83 @@
             <button class="deleteButton">Delete</button>
         </div>
     </div>
-    {% /ignoredADDomainItems %}
-    {% ^ignoredADDomainItems %}
-    There are no ignored domains yet
-    {% /ignoredADDomainItems %}
+    {% /OSSupportDatesItems %}
+    {% ^OSSupportDatesItems %}
+    There are no OS Support Dates yet
+    {% /OSSupportDatesItems %}
 </script>
+<div id="dialog"
+     title="Dialog Title"
+>
+    <form class="detail"
+          onsubmit="return false;"
+    >
+        <input hidden
+               name="id"
+        >
+        <div>
+            <span>OS Name:</span>
+            <br>
+            <input type="text"
+                   name="name"
+                   required
+            >
+        </div>
+        <div>
+            <span>OS Version:</span>
+            <br>
+            <input type="number"
+                   name="version"
+                   required
+            >
+        </div>
+        <div>
+            <span>OS Build:</span>
+            <br>
+            <input type="number"
+                   name="build"
+                   required
+            >.<input type="number"
+                     name="subBuild"
+        >
+        </div>
+        <div>
+            <span>Availability Date:</span>
+            <br>
+            <input type="text"
+                   name="availabilityDate"
+                   required
+                   class="jqueryCalendar"
+            >
+        </div>
+        <div>
+            <span>EOL Date:</span>
+            <br>
+            <input type="text"
+                   name="endOfLifeDate"
+                   class="jqueryCalendar"
+            >
+        </div>
+        <div>
+            <button class="addButton"
+                    type="button"
+                    hidden
+            >Add
+            </button>
+            <button class="saveButton"
+                    type="button"
+                    hidden
+            >Save
+            </button>
+            <button class="cancelButton"
+                    hidden
+                    type="button"
+            >Cancel
+            </button>
+        </div>
+
+    </form>
+</div>
 <script type="application/javascript">
     let customerSection = null;
     let domainInput = null;
@@ -77,76 +145,122 @@
     let list = null;
     let detail = null;
 
-    let ignoredADDomainItems = [];
+    let OSSupportDatesItems = [];
 
-    function changeWildCard(value) {
-        if (value) {
-            customerSection.show();
-            customerSection.find('[name="customerID"]').val('');
-            customerSection.find('[name="form[customerString]"]').val('');
-        } else {
-            customerSection.hide();
-            customerSection.find('[name="customerID"]').val('');
-            customerSection.find('[name="form[customerString]"]').val('');
-        }
+    function addRow(dataTable, data) {
+        const addedRow = dataTable.row.add(data).draw();
+        addedRow.show().draw(false);
+        const addedRowNode = addedRow.node();
+        $(addedRowNode).addClass('highlight');
     }
 
-    $.ajax({
-        url: '{URLGetData}',
-        method: 'GET',
-        dataType: 'JSON'
-    }).then(function (result) {
-        ignoredADDomainItems = result;
-        drawList();
-    })
-
-    Mustache.tags = ['{%', '%}'];
-
-    Mustache.Formatters = {
-        decimal: function (number) {
-            if (typeof number !== 'number') {
-                return number;
-            }
-
-            return number.toFixed(2);
-        },
-        lightGrayClass: function (number) {
-
-            if (isNaN(parseFloat(number)) || !isFinite(number)) {
-                return null;
-            }
-
-            if (number != 0) {
-                return null;
-            }
-
-            return "grey"
-        }
-
-    };
     let editingItem = null;
 
-    function drawList() {
-        const source = document.getElementById("email-items-template").innerHTML;
-        const context = {ignoredADDomainItems: ignoredADDomainItems};
-        const html = Mustache.to_html(source, context);
-        list.html(html);
+    let dataTable = null;
+    let dialogElem = null;
+    let form = null;
+
+    function showEdit(data) {
+
+        form.elements['id'].value = data.id;
+        form.elements['name'].value = data.name;
+        form.elements['version'].value = data.version;
+        form.elements['build'].value = data.build;
+        form.elements['availabilityDate'].value = data.availabilityDate;
+        form.elements['endOfLifeDate'].value = data.endOfLifeDate;
+        saveButton.show();
+        addButton.hide();
+        dialogElem.dialog('open');
+
     }
 
+
     $(function () {
+        dialogElem = $("#dialog");
+        form = $('.detail')[0];
+
+        dialogElem.dialog({autoOpen: false, position: {my: 'center', at: "top"}});
+
         customerSection = $('.customerSection');
         domainInput = $('[name="domain"]');
         addButton = $('.addButton');
         saveButton = $('.saveButton');
         cancelButton = $('.cancelButton');
         list = $('.list');
-        detail = $('.detail');
-        drawList();
+
+        dataTable = list.DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'csv',
+                    bom: true
+                },
+                {
+                    text: 'Edit',
+                    action: (e, dt, node, config) => {
+                        const rows = dataTable.rows({selected: true}).data();
+                        console.log(rows);
+                        showEdit(rows[0]);
+                    },
+                    name: 'edit'
+
+                },
+                {
+                    text: 'Delete',
+                    action: (e, dt, node, config) => {
+                        const row = dataTable.rows({selected: true});
+
+                        console.log(row);
+                        dialogElem.dialog('open');
+                    },
+                    name: 'delete'
+
+                }
+            ],
+            serverSide: true,
+            ajax: {
+                url: "{URLGetData}",
+                type: "GET"
+            },
+            rowId: 'id',
+            select: {style: 'single'},
+            columns: [
+                {data: "name"},
+                {data: "version"},
+                {data: "build"},
+                {data: "subBuild"},
+                {data: "availabilityDate"},
+                {data: "endOfLifeDate"}
+            ],
+            columnDefs: [
+                {type: "date-eu", targets: [4, 5]}
+            ],
+            paging: false,
+            order: [
+                [0, 'asc'],
+            ]
+        });
+
+        dataTable.buttons("edit:name").enable(false);
+        dataTable.on('select', function (e, dt, type, indexes) {
+            if (type !== 'row') {
+                return;
+            }
+            dataTable.buttons("edit:name").enable(true);
+        });
+
+        dataTable.on('deselect', function (e, dt, type, indexes) {
+            if (type !== 'row') {
+                return;
+            }
+            dataTable.buttons("edit:name").enable(false);
+        });
+        // drawList();
         list.on('click', '.editButton', function (thing) {
             $elm = $(this);
 
-            const data = $elm.closest('.ignoredADDomainItem').data();
-            editingItem = ignoredADDomainItems.find(e => e.id === data.id);
+            const data = $elm.closest('.OSSupportDatesItem').data();
+            editingItem = OSSupportDatesItems.find(e => e.id === data.id);
 
             if (!editingItem) {
                 throw Error('Failed to find element to edit');
@@ -154,7 +268,7 @@
 
             domainInput.val(editingItem.domain);
             const isCustomerSpecific = !!editingItem.customerID;
-            changeWildCard(isCustomerSpecific);
+
             customerSection.find('[name="customerID"]').val(editingItem.customerID);
             customerSection.find('[name="form[customerString]"]').val(editingItem.customerString);
             $('[name="isCustomerSpecific"]').each(function () {
@@ -175,8 +289,8 @@
 
             $elm = $(this);
 
-            const data = $elm.closest('.ignoredADDomainItem').data();
-            const foundIndex = ignoredADDomainItems.findIndex(e => e.id === data.id);
+            const data = $elm.closest('.OSSupportDatesItem').data();
+            const foundIndex = OSSupportDatesItems.findIndex(e => e.id === data.id);
 
             if (foundIndex < 0) {
                 throw Error('Failed to find element to delete');
@@ -188,7 +302,7 @@
                 url: url,
                 method: 'GET',
             }).then(function (result) {
-                ignoredADDomainItems.splice(foundIndex, 1);
+                OSSupportDatesItems.splice(foundIndex, 1);
                 drawList();
             })
         });
@@ -201,13 +315,6 @@
         saveButton.click(function () {
             if (!detail[0].checkValidity()) {
                 detail.submit();
-                return;
-            }
-
-            const customerString = customerSection.find('[name="form[customerString]"]').val();
-            const customerID = +customerSection.find('[name="customerID"]').val();
-            if ($('[name="isCustomerSpecific"][value="1"]')[0].checked && !customerID) {
-                alert('Please select a customer');
                 return;
             }
 
@@ -236,22 +343,16 @@
         });
 
         addButton.click(function () {
+            debugger;
             if (!detail[0].checkValidity()) {
                 detail.submit();
                 return;
             }
-            const customerString = customerSection.find('[name="form[customerString]"]').val();
-            const customerID = +customerSection.find('[name="customerID"]').val();
-            if ($('[name="isCustomerSpecific"][value="1"]')[0].checked && !customerID) {
-                alert('Please select a customer');
-                return;
-            }
 
-            const data = {
-                domain: domainInput.val(),
-                customerID: customerSection.find('[name="customerID"]').val(),
-                customerString: customerString
-            };
+            const data = Array.from(detail[0].elements).reduce((acc, element) => {
+                if (element.name) acc[element.name] = element.value;
+                return acc
+            }, {});
 
             $.ajax({
                 url: '{URLAddItem}',
@@ -260,20 +361,17 @@
                 dataType: 'json',
                 data: data
             }).then(function (newItem) {
-                ignoredADDomainItems.push(newItem);
+                OSSupportDatesItems.push(newItem);
                 drawList();
                 cancelEdit();
             })
 
         });
 
-        changeWildCard(false);
-
-
     });
 
     function cancelEdit() {
-        changeWildCard(false);
+
         $('[name="isCustomerSpecific"]').each(function () {
             const $radio = $(this);
             $radio.prop('checked', !+$radio.val());
@@ -293,69 +391,20 @@
     }
 
 </script>
-<div class="list">
-</div>
-<form class="detail"
-      onsubmit="return false;"
->
-    <div>
-        <span>OS Name:</span>
-        <br>
-        <input type="text"
-               name="name"
-               required
-        >
-    </div>
-    <div>
-        <span>OS Version:</span>
-        <br>
-        <input type="number"
-               name="version"
-               required
-        >
-    </div>
-    <div>
-        <span>OS Build:</span>
-        <br>
-        <input type="number"
-               name="build"
-               required
-        >.<input type="number"
-                 name="subBuild"
-    >
-    </div>
-    <div>
-        <span>Availability Date:</span>
-        <br>
-        <input type="text"
-               name="availabilityDate"
-               required
-               class="jqueryCalendar"
-        >
-    </div>
-    <div>
-        <span>EOL Date:</span>
-        <br>
-        <input type="text"
-               name="endOfLifeDate"
-               class="jqueryCalendar"
-        >
-    </div>
-    <div>
-        <button class="addButton"
-                type="button"
-        >Add
-        </button>
-        <button class="saveButton"
-                type="button"
-                hidden
-        >Save
-        </button>
-        <button class="cancelButton"
-                hidden
-                type="button"
-        >Cancel
-        </button>
-    </div>
+<div style="display: flex">
+    <table class="list">
+        <thead>
+        <tr>
+            <th>OS Name</th>
+            <th>OS Version</th>
+            <th>OS Build</th>
+            <th>OS SubBuild</th>
+            <th>Availability Date</th>
+            <th>EOL Date</th>
+        </tr>
+        </thead>
+        <tbody>
 
-</form>
+        </tbody>
+    </table>
+</div>

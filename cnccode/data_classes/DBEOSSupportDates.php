@@ -23,5 +23,6 @@ class DBEOSSupportDates extends DBEntity
         $this->addColumn(self::availabilityDate, DA_DATE, DA_NOT_NULL);
         $this->addColumn(self::endOfLifeDate, DA_DATE, DA_ALLOW_NULL);
         $this->setAddColumnsOff();
+        $this->setPK(self::id);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
+require_once($cfg['path_dbe'] . '/DBEOSSupportDates.php');
 
 class CTOSSupportDates extends CTCNC
 {
@@ -83,12 +84,31 @@ class CTOSSupportDates extends CTCNC
             case 'create':
                 $DBEOSSupportDates = new DBEOSSupportDates($this);
 
+                $availabilityDateString = $_REQUEST['availabilityDate'];
+                $availabilityDate = null;
+                if ($availabilityDateString) {
+                    $availabilityDate = DateTime::createFromFormat('d/m/Y', $availabilityDateString);
+                    if (!$availabilityDate) {
+                        throw new Exception('Date format is wrong');
+                    }
+                }
+
+                $endOfLifeDateString = $_REQUEST['endOfLifeDate'];
+                $endOfLifeDate = null;
+                if ($endOfLifeDateString) {
+                    $endOfLifeDate = DateTime::createFromFormat('d/m/Y', $endOfLifeDateString);
+                    if (!$endOfLifeDate) {
+                        throw new Exception('Date format is wrong');
+                    }
+                }
+
+
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::name, $_REQUEST['name']);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::version, $_REQUEST['version']);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::build, $_REQUEST['build']);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::subBuild, $_REQUEST['subBuild']);
-                $DBEOSSupportDates->setValue(DBEOSSupportDates::availabilityDate, $_REQUEST['availabilityDate']);
-                $DBEOSSupportDates->setValue(DBEOSSupportDates::endOfLifeDate, $_REQUEST['endOfLifeDate']);
+                $DBEOSSupportDates->setValue(DBEOSSupportDates::availabilityDate, $availabilityDate);
+                $DBEOSSupportDates->setValue(DBEOSSupportDates::endOfLifeDate, $endOfLifeDate);
                 $DBEOSSupportDates->insertRow();
 
                 echo json_encode(
@@ -122,7 +142,7 @@ class CTOSSupportDates extends CTCNC
                     ];
                 }
                 echo json_encode(
-                    $data,
+                    ["data" => $data],
                     JSON_NUMERIC_CHECK
                 );
                 break;
