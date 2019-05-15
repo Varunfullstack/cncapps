@@ -13,7 +13,8 @@
         "ext-zip": "*",
         "phpoffice/phpspreadsheet": "^1.5",
         "ext-fileinfo": "*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "ext-ldap": "*"
     },
     "autoload": {
         "psr-4": {
