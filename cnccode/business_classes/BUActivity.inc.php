@@ -9185,15 +9185,21 @@ is currently a balance of ';
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($problemID);
 
+        $dbeProblem->setValue(DBEProblem::awaitingCustomerResponseFlag, 'N');
+        $dbeProblem->setValue(DBEProblem::alarmDate, null);
+        $dbeProblem->setValue(DBEProblem::alarmTime, null);
+        $dbeProblem->updateRow();
+
         $firstActivity = $this->getFirstActivityInProblem($problemID);
 
         $contactID = $firstActivity->getValue(DBECallActivity::contactID);
 
         $dbeContact = new DBEContact($this);
         $siteNo = $dbeContact->getValue(DBEContact::siteNo);
-
-
+        
         $dbeCallActivity = new DBECallActivity($this);
+
+        $dbeCallActivity->setValue(DBEJCallActivity::awaitingCustomerResponseFlag, 'N');
 
         $dbeCallActivity->setValue(
             DBEJCallActivity::siteNo,
@@ -9233,6 +9239,7 @@ is currently a balance of ';
             DBEJCallActivity::userID,
             USER_SYSTEM
         );
+
         $dbeCallActivity->setValue(
             DBEJCallActivity::problemID,
             $dbeProblem->getValue(DBEProblem::problemID)

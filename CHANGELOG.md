@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 531 - Create configuration settings for the new Design Environment 
 - Issue 524 - Automated Request table field change
+- Issue 533 - PO Status Report v7
 
 ## [v2.4.2] - 2019-04-12
 ### Fixed
