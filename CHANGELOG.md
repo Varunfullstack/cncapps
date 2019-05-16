@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 545 - Password level modification
 ### Fixed
 - Issue 551 - Contact Audit Log missing support level
+- Issue 552 - Contact Position field extension
 ### Removed
 - Issue 530 - Remove reference to faxing on generating a sales order
 
