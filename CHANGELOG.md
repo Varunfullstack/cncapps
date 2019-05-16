@@ -7,6 +7,8 @@ This project changes will be shown here.
 - Issue 524 - Automated Request table field change
 - Issue 533 - PO Status Report v7
 - Issue 545 - Password level modification
+### Fixed
+- Issue 551 - Contact Audit Log missing support level
 
 ## [v2.4.2] - 2019-04-12
 ### Fixed
