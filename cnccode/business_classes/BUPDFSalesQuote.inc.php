@@ -262,7 +262,7 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printString(
-            'If you would like to proceed with this quotation then please forward your written (fax or e-mail) order to us at your earliest convenience.'
+            'If you would like to proceed with this quotation then please forward your written order to us at your earliest convenience.'
         );
         $buPDF->CR();
         $buPDF->CR();
