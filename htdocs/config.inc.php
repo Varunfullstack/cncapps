@@ -1115,6 +1115,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 require_once(BASE_DRIVE . "/phplib4/prepend.php"); // need to do this on live site
 
 require_once($cfg["path_phplib_classes"] . DIRECTORY_SEPARATOR . "local4.inc.php");
+/** @var dbSweetcode $db */
 $db = new dbSweetcode;
 
 //$db->query("SET sql_mode = ''");    // strict mode off

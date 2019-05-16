@@ -88,7 +88,7 @@ class DBEPassword extends DBEntity
 
         $this->addColumn(
             self::serviceID,
-            DA_INTEGER,
+            DA_ID,
             DA_ALLOW_NULL
         );
 

@@ -1989,4 +1989,21 @@
             </createTable>
         </rollback>
     </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-209">
+        <sql>
+            update password
+            set archivedAt = if(archivedAt = '0000-00-00 00:00:00', null, archivedAt),
+                archivedBy = if(archivedBy = '', null, archivedBy),
+                serviceID  = if(serviceID = 0, null, serviceID)
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-210">
+        <sql>
+            update custitem
+            set initialContractLength = 12
+            where initialContractLength is null
+        </sql>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>

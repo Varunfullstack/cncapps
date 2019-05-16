@@ -875,11 +875,7 @@ class CTCurrentActivityReport extends CTCNC
                 DBEJProblem::customerName
             );
 
-            if (
-            !in_array(
-                $serviceRequests->getValue(DBEJProblem::priority),
-                $this->getSessionParam('priorityFilter')
-            )
+            if (!in_array($serviceRequests->getValue(DBEJProblem::priority), $this->getSessionParam('priorityFilter'))
             ) {
                 continue;
             }

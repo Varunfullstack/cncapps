@@ -54,6 +54,7 @@ class CTPassword extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -244,6 +245,7 @@ class CTPassword extends CTCNC
                 )
             );
 
+
             $urlEdit = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
@@ -251,12 +253,11 @@ class CTPassword extends CTCNC
                     'passwordID' => $dsPassword->getValue(DBEPassword::passwordID)
                 )
             );
+            $weirdFields = "<td class=\"contentLeftAlign\"><A href=\"$urlEdit\">edit</a></td>
+        <td class=\"contentLeftAlign\"><A href=\"$urlArchive\" onClick=\"if(!confirm('Are you sure you want to archive this password?')) return(false)\">archive</a></td>";
             if ($showArchived) {
                 $weirdFields = "<td class=\"contentLeftAlign\">" . $dsPassword->getValue(DBEPassword::archivedBy) . "</td>
         <td class=\"contentLeftAlign\">" . $dsPassword->getValue(DBEPassword::archivedAt) . "</td>";
-            } else {
-                $weirdFields = "<td class=\"contentLeftAlign\"><A href=\"$urlEdit\">edit</a></td>
-        <td class=\"contentLeftAlign\"><A href=\"$urlArchive\" onClick=\"if(!confirm('Are you sure you want to archive this password?')) return(false)\">archive</a></td>";
             }
 
             $notes = $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::notes));
@@ -283,6 +284,7 @@ class CTPassword extends CTCNC
                 'level'               => $dsPassword->getValue(DBEPassword::level),
             ];
         }
+
 
         usort(
             $passwords,
@@ -356,51 +358,28 @@ class CTPassword extends CTCNC
         $dsPassword->copyColumnsFrom($dbePassword);
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $passwordForm = $this->getParam('password')[1];
 
-
-            $this->getParam('password')[1]['encrypted'] = 1;
-            $passwordID = $this->getParam('password')[1]['passwordID'];
+            $passwordForm['encrypted'] = 1;
+            $passwordID = $passwordForm['passwordID'];
             if ($passwordID) {
-
                 $dbePassword->getRow($passwordID);
-
                 $previousPassword = $dbePassword->getValue(DBEPassword::password);
-
                 $previousPasswordDecrypted = $this->buPassword->decrypt($previousPassword);
-
-                $newPassword = $this->getParam('password')[1]['password'];
-
+                $newPassword = $passwordForm['password'];
                 if ($previousPassword && $previousPasswordDecrypted != $newPassword) {
                     $this->buPassword->archive(
                         $passwordID,
                         $this->dbeUser
                     );
-
-                    $this->getParam('password')[1]['passwordID'] = "0";
+                    $passwordForm['passwordID'] = null;
                 }
             }
-
-            $this->getParam('password')[1][DBEPassword::username] = $this->buPassword->encrypt(
-                $this->getParam('password')[1][DBEPassword::username]
-            );
-
-
-            $this->getParam('password')[1][DBEPassword::password] = $this->buPassword->encrypt(
-                $this->getParam('password')[1][DBEPassword::password]
-            );
-
-
-            $this->getParam('password')[1][DBEPassword::notes] = $this->buPassword->encrypt(
-                $this->getParam('password')[1][DBEPassword::notes]
-            );
-
-
-            $this->getParam('password')[1][DBEPassword::URL] = $this->buPassword->encrypt(
-                $this->getParam('password')[1][DBEPassword::URL]
-            );
-
-
-            $formError = (!$dsPassword->populateFromArray($this->getParam('password')));
+            $passwordForm[DBEPassword::username] = $this->buPassword->encrypt($passwordForm[DBEPassword::username]);
+            $passwordForm[DBEPassword::password] = $this->buPassword->encrypt($passwordForm[DBEPassword::password]);
+            $passwordForm[DBEPassword::notes] = $this->buPassword->encrypt($passwordForm[DBEPassword::notes]);
+            $passwordForm[DBEPassword::URL] = $this->buPassword->encrypt($passwordForm[DBEPassword::URL]);
+            $formError = (!$dsPassword->populateFromArray([$passwordForm]));
 
             if (!$formError) {
                 $this->buPassword->updatePassword($dsPassword);
@@ -429,7 +408,7 @@ class CTPassword extends CTCNC
             } else {                                               // create new record
                 $dsPassword->setValue(
                     DBEPassword::passwordID,
-                    0
+                    null
                 );
                 $dsPassword->setValue(
                     DBEPassword::customerID,
@@ -589,6 +568,11 @@ class CTPassword extends CTCNC
 
     }
 
+    /**
+     * @param $a
+     * @param $b
+     * @return int|lt
+     */
     function weirdStringComparison($a,
                                    $b
     )

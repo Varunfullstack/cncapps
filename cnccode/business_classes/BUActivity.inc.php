@@ -1232,7 +1232,6 @@ class BUActivity extends Business
             case self::WorkUpdatesActivityLogged:
                 $templateName = 'ActivityLoggedCustomerEmail';
                 if ($dbeCallActType->getValue(DBEJCallActType::customerEmailFlag) != 'Y') {
-                    var_dump('customer email flag is not YES');
                     return;
                 }
                 $fields['extra'] = 'The service request requires further action by CNC as detailed above. 
@@ -6000,12 +5999,10 @@ is currently a balance of ';
     )
     {
         $dbeJProblem = new DBEJProblem($this);
-
         $dbeJProblem->getRowsByStatus(
             $status,
             $includeAutomaticallyFixed
         );
-
         $this->getData(
             $dbeJProblem,
             $dsResults
@@ -8110,9 +8107,25 @@ is currently a balance of ';
 
     public function closeActivitiesWithEndTime($problemID)
     {
+        /** @var $db dbSweetcode */
         global $db;
-        $sql = "update callactivity  set caa_status  = 'C'  WHERE caa_problemno = $problemID and caa_endtime is not null )";
-        $db->query($sql);
+        $starttime = microtime(true);
+        /* do stuff here */
+
+
+        $sql = "update callactivity  set caa_status  = 'C'  WHERE caa_problemno = $problemID and caa_endtime is not null";
+        $result = $db->preparedQuery(
+            $sql,
+            [
+                [
+                    'type'  => 'i',
+                    'value' => $problemID
+                ],
+            ]
+        );
+        $endtime = microtime(true);
+        $timediff = $endtime - $starttime;
+        var_dump($timediff);
         return true;
     }
 

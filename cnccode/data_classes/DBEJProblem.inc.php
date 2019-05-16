@@ -253,7 +253,7 @@ class DBEJProblem extends DBEProblem
                 " AND pro_status = '" . $status . "'";
         }
         /* Exclude future dated */
-        $sql .= " AND CONCAT( pro_alarm_date, ' ', pro_alarm_time ) <= NOW()";
+        $sql .= " AND (pro_alarm_date is null or CONCAT( pro_alarm_date, ' ', pro_alarm_time ) <= NOW())";
 
         if ($status == 'F' && !$includeAutomaticallyFixed) {
             $sql .= " AND last.caa_consno <> " . USER_SYSTEM;

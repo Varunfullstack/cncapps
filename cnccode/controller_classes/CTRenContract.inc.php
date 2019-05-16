@@ -457,6 +457,7 @@ class CTRenContract extends CTCNC
                 DBECustomer::accountName
             ) && $dsCustomer->getValue(DBECustomer::accountNumber);
 
+
         $this->template->set_var(
             array(
                 'customerItemID'                     => $dsRenContract->getValue(DBEJRenContract::customerItemID),

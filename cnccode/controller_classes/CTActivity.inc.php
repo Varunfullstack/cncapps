@@ -755,7 +755,7 @@ class CTActivity extends CTCNC
             $this->template->set_var(
                 array(
                     'statusSelected'    => $statusSelected,
-                    'statusValue'            => $key,
+                    'statusValue'       => $key,
                     'statusDescription' => $value
                 )
             );
@@ -4965,9 +4965,10 @@ class CTActivity extends CTCNC
 
 
             if ($this->getParam('Fixed')) {
-
                 //try to close all the activities
+
                 $this->buActivity->closeActivitiesWithEndTime($dsCallActivity->getValue(DBEJCallActivity::problemID));
+
                 if ($this->buActivity->countOpenActivitiesInRequest(
                         $dsCallActivity->getValue(DBEJCallActivity::problemID),
                         $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
@@ -4980,6 +4981,7 @@ class CTActivity extends CTCNC
                 }
             }
         }
+
         if ($this->formError) {
             if ($this->getAction() == CTACTIVITY_ACT_INSERT_ACTIVITY) {
                 $this->setParam('callActivityID', $callActivityID);
@@ -5070,33 +5072,17 @@ class CTActivity extends CTCNC
         }
 
         if ($nextStatus == 'Fixed') {
-
             //try to close all the activities
-            $this->buActivity->closeActivitiesWithEndTime($dsCallActivity->getValue(DBEJCallActivity::problemID));
-            if ($this->buActivity->countOpenActivitiesInRequest(
-                    $dsCallActivity->getValue(DBEJCallActivity::problemID)
-                ) > 0) {
-                $this->dsCallActivity->setMessage(
-                    DBEJCallActivity::problemStatus,
-                    'Can not fix, there are open activities on this request'
+            $urlNext =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'callActivityID' => $callActivityID,
+                        'action'         => 'gatherFixedInformation'
+                    )
                 );
-                $this->setParam('callActivityID', $callActivityID);
-                $this->setAction(CTACTIVITY_ACT_EDIT_ACTIVITY);
-                $this->editActivity();
-                exit;
-            } else {
-                $urlNext =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'callActivityID' => $callActivityID,
-                            'action'         => 'gatherFixedInformation'
-                        )
-                    );
-
-                header('Location: ' . $urlNext);
-                exit;
-            }
+            header('Location: ' . $urlNext);
+            exit;
         }
 
         $this->redirectToDisplay($callActivityID);
@@ -5738,7 +5724,7 @@ class CTActivity extends CTCNC
             $this->setParam('contractCustomerItemID', 99); // prompts for Please select
         }
         $errorFile = null;
-        if ($_FILES['userfile']['name'] && !$this->getParam('uploadDescription')) {
+        if (@$_FILES['userfile']['name'] && !$this->getParam('uploadDescription')) {
             $errorFile = 'Description Required';
         }
 
@@ -5809,9 +5795,9 @@ class CTActivity extends CTCNC
                 'customerID'                    => $dsCallActivity->getValue(DBEJCallActivity::customerID),
                 'customerName'                  => $dsCallActivity->getValue(DBEJCallActivity::customerName),
                 'resolutionSummary'             => $this->getParam('resolutionSummary'),
-                'resolutionSummaryMessage'      => $error['resolutionSummary'],
-                'rootCauseIDMessage'            => $error['rootCauseID'],
-                'contractCustomerItemIDMessage' => $error['contractCustomerItemID'],
+                'resolutionSummaryMessage'      => @$error['resolutionSummary'],
+                'rootCauseIDMessage'            => @$error['rootCauseID'],
+                'contractCustomerItemIDMessage' => @$error['contractCustomerItemID'],
                 'submitURL'                     => $submitURL,
                 'historyLink'                   => $this->getProblemHistoryLink(
                     $dsCallActivity->getValue(DBEJCallActivity::problemID)
@@ -6569,9 +6555,8 @@ class CTActivity extends CTCNC
         while ($dsContract->fetchNext()) {
             $itemTypeID = $dsContract->getValue(DBEJContract::itemTypeID);
 
-            if (!$itemTypes[$itemTypeID]) {
+            if (!isset($itemTypes[$itemTypeID])) {
                 $dbeItemType = new DBEItemType($this);
-
                 $dbeItemType->getRow($itemTypeID);
                 $itemTypes[$itemTypeID] = [
                     DBEItemType::description => $dbeItemType->getValue(DBEItemType::description)
