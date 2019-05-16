@@ -54,7 +54,6 @@ while ($DBEOSSupportDates->fetchNext()) {
 }
 
 
-
 $BUHeader = new BUHeader($thing);
 $dbeHeader = new DataSet($thing);
 $BUHeader->getHeader($dbeHeader);
@@ -315,7 +314,6 @@ ORDER BY clients.name,
     } else {
         echo '<div>No Data was found</div>';
     }
-    exit;
 };
 
 
