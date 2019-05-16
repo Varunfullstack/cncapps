@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 531 - Create configuration settings for the new Design Environment 
 - Issue 524 - Automated Request table field change
 - Issue 533 - PO Status Report v7
+- Issue 545 - Password level modification
 
 ## [v2.4.2] - 2019-04-12
 ### Fixed
