@@ -8,8 +8,11 @@
 
 require_once("config.inc.php");
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
+require_once($cfg["path_dbe"] . "/DBEOSSupportDates.php");
+require_once($cfg["path_dbe"] . "/DBEHeader.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
+require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require './../vendor/autoload.php';
 global $db;
 
@@ -31,8 +34,41 @@ $labtechDB = new PDO(
     LABTECH_DB_PASSWORD,
     $options
 );
+$DBEOSSupportDates = new DBEOSSupportDates($this);
+
+$DBEOSSupportDates->getRows();
+while ($DBEOSSupportDates->fetchNext()) {
+    if (!$DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate)) {
+        continue;
+    }
+    if ($fakeTable) {
+        $fakeTable .= " union all ";
+    }
+    $date = DateTime::createFromFormat('Y-m-d', $DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate));
+
+    $fakeTable .= " select '" . $DBEOSSupportDates->getValue(
+            DBEOSSupportDates::name
+        ) . "' as osName,  '" . $DBEOSSupportDates->getValue(
+            DBEOSSupportDates::version
+        ) . "' as version, '" . $date->format('d/m/Y') . "' as endOfSupportDate";
+}
+
+var_dump($fakeTable);
+
+$BUHeader = new BUHeader($thing);
+$dbeHeader = new DataSet($thing);
+$BUHeader->getHeader($dbeHeader);
+$thresholdDays = $dbeHeader->getValue(DBEHeader::OSSupportDatesThresholdDays);
+
+if (!$thresholdDays) {
+    throw new Exception('OS Support Dates Threshold days is empty');
+}
 
 $buCustomer = new BUCustomer($thing);
+$thresholdDate = new DateTime();
+$thresholdDate->add(new DateInterval('P' . $thresholdDays . 'D'));
+var_dump($thresholdDays);
+$today = new DateTime();
 while ($dbeCustomer->fetchNext()) {
 
     $query = /** @lang MySQL */
@@ -61,6 +97,7 @@ while ($dbeCustomer->fetchNext()) {
     - 1
   ) AS \"Operating System\",
   computers.version AS \"Version\",
+       (select endOfSupportDate from ($fakeTable) f where computers.os = f.osName and computers.version like concat('%', f.version, '%') limit 1) as `OS End of Support Date`,
   computers.domain AS 'Domain',
   SUBSTRING_INDEX(
     software.name,
@@ -180,6 +217,34 @@ ORDER BY clients.name,
             'A2'
         );
 
+        for ($i = 0; $i < count($data); $i++) {
+            if (!$data[$i]['OS End of Support Date']) {
+                continue;
+            }
+            $date = DateTime::createFromFormat('d/m/Y', $data[$i]['OS End of Support Date']);
+
+            if (!$date) {
+                continue;
+            }
+            $currentRow = 2 + $i;
+            $color = null;
+            if ($date <= $today) {
+                $color = "FF0000";
+            }
+
+            if ($date <= $thresholdDate) {
+                $color = "FFFF33";
+            }
+            var_dump($color, $date->format('Y-m-d'), $thresholdDate->format('Y-m-d'), $today->format('Y-m-d'));
+            if ($color) {
+                $sheet->getStyle("$currentRow:$currentRow")
+                    ->getFill()
+                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                    ->getStartColor()
+                    ->setRGB($color);
+            }
+        }
+
         $sheet->setAutoFilter(
             $sheet->calculateWorksheetDimension()
         );
@@ -250,7 +315,7 @@ ORDER BY clients.name,
     } else {
         echo '<div>No Data was found</div>';
     }
-
+    exit;
 };
 
 

@@ -29,12 +29,17 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="pavwebdev" id="1557741125-1">
+    <changeSet author="pavwebdev" id="1557741125-2">
         <preConditions>
             <not>
-                <columnExists tableName="headert" columnName=""
+                <columnExists tableName="headert" columnName="OSSupportDatesThresholdDays"/>
             </not>
         </preConditions>
+        <addColumn tableName="headert">
+            <column name="OSSupportDatesThresholdDays" type="int(4)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
     </changeSet>
 
 </databaseChangeLog>
