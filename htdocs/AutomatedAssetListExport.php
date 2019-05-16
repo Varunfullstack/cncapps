@@ -53,7 +53,7 @@ while ($DBEOSSupportDates->fetchNext()) {
         ) . "' as version, '" . $date->format('d/m/Y') . "' as endOfSupportDate";
 }
 
-var_dump($fakeTable);
+
 
 $BUHeader = new BUHeader($thing);
 $dbeHeader = new DataSet($thing);
@@ -67,7 +67,7 @@ if (!$thresholdDays) {
 $buCustomer = new BUCustomer($thing);
 $thresholdDate = new DateTime();
 $thresholdDate->add(new DateInterval('P' . $thresholdDays . 'D'));
-var_dump($thresholdDays);
+
 $today = new DateTime();
 while ($dbeCustomer->fetchNext()) {
 
@@ -235,7 +235,7 @@ ORDER BY clients.name,
             if ($date <= $thresholdDate) {
                 $color = "FFFF33";
             }
-            var_dump($color, $date->format('Y-m-d'), $thresholdDate->format('Y-m-d'), $today->format('Y-m-d'));
+
             if ($color) {
                 $sheet->getStyle("$currentRow:$currentRow")
                     ->getFill()
