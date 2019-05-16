@@ -2,10 +2,15 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
-    <changeSet author="pavwebdev" id="1557741125 -0">
+    <changeSet author="pavwebdev" id="1557741125-0">
         <tagDatabase tag="issue519"/>
     </changeSet>
-    <changeSet author="pavwebdev" id="1557741125 -1">
+    <changeSet author="pavwebdev" id="1557741125-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="OSSupportDates"/>
+            </not>
+        </preConditions>
         <createTable tableName="OSSupportDates">
             <column name="id" type="int(11)">
                 <constraints primaryKey="true" primaryKeyName="PRIMARY" nullable="false"/>
@@ -16,12 +21,6 @@
             <column name="version" type="text">
                 <constraints nullable="false"/>
             </column>
-            <column name="build" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-            <column name="subBuild" type="bigint">
-                <constraints nullable="true"/>
-            </column>
             <column name="availabilityDate" type="date">
                 <constraints nullable="false"/>
             </column>
@@ -30,4 +29,12 @@
             </column>
         </createTable>
     </changeSet>
+    <changeSet author="pavwebdev" id="1557741125-1">
+        <preConditions>
+            <not>
+                <columnExists tableName="headert" columnName=""
+            </not>
+        </preConditions>
+    </changeSet>
+
 </databaseChangeLog>
