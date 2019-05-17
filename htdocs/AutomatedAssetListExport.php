@@ -216,6 +216,7 @@ ORDER BY clients.name,
             'A2'
         );
 
+        $sheet->getStyle("A1:S1")->getFont()->setBold(true);
 
         $sheet->setAutoFilter(
             $sheet->calculateWorksheetDimension()
@@ -233,11 +234,11 @@ ORDER BY clients.name,
             $currentRow = 2 + $i;
             $color = null;
             if ($date <= $thresholdDate) {
-                $color = "FFFFFF33";
+                $color = "FFFFEB9C";
             }
 
             if ($date <= $today) {
-                $color = "FFFF0000";
+                $color = "FFFFC7CE";
             }
 
             if ($color) {
@@ -247,6 +248,11 @@ ORDER BY clients.name,
                     ->getStartColor()
                     ->setARGB($color);
             }
+        }
+
+        foreach (range('A', $sheet->getHighestDataColumn()) as $col) {
+            $sheet->getColumnDimension($col)
+                ->setAutoSize(true);
         }
 
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
