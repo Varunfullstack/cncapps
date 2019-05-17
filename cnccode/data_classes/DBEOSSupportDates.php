@@ -1,6 +1,6 @@
 <?php
 
-
+require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 class DBEOSSupportDates extends DBEntity
 {
     const id = "id";

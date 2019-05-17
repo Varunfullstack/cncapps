@@ -41,12 +41,17 @@ $datesData = [
     ["name" => "Microsoft Windows 8", "availabilityDate" => "25/10/2012", "endOfLifeDate" => "10/01/2023"],
     ["name" => "Microsoft Windows XP", "availabilityDate" => "24/08/2001", "endOfLifeDate" => "08/04/2014"],
     ["name" => "Microsoft® Windows Vista", "availabilityDate" => "08/11/2006", "endOfLifeDate" => "11/04/2017"],
+    ["name" => "Microsoft Windows Server 2012", "availabilityDate" => "30/10/2012", "endOfLifeDate" => "10/10/2023"],
+    ["name" => "Microsoft Windows Server 2012 R2", "availabilityDate" => "25/11/2013", "endOfLifeDate" => "10/10/2023"],
+    ["name" => "Microsoft Windows Server 2016", "availabilityDate" => "15/10/2016", "endOfLifeDate" => "12/01/2027"],
+    ["name" => "Microsoft Windows Server 2019", "availabilityDate" => "13/11/2018", "endOfLifeDate" => "09/01/2029"],
+
 ];
 
 function findDatesForOS($osName, $datesData)
 {
     foreach ($datesData as $datesDatum) {
-        if (strpos($datesDatum['name'], $osName) == -1) {
+        if (strpos($osName, $datesDatum['name']) === FALSE) {
             continue;
         }
 
@@ -56,17 +61,40 @@ function findDatesForOS($osName, $datesData)
 }
 
 foreach ($labtechData as $labtechDatum) {
-
+    echo '<div>';
+    echo 'looking at: ' . $labtechDatum['name'];
+    echo '</div>';
     $foundDate = findDatesForOS($labtechDatum['name'], $datesData);
+
     if (!$foundDate) {
+        echo '<div>';
+        echo 'No Date found for this OS';
+        echo '</div>';
+        continue;
+    }
+    echo '<div>';
+    echo 'We have found dates for this OS ';
+    echo '<pre>';
+    var_dump($foundDate);
+    echo '</pre>';
+    echo '</div>';
+
+    $availabilityDate = (DateTime::createFromFormat('d/m/Y', $foundDate['availabilityDate']))->format('Y-m-d');
+    $endOfLifeDate = (DateTime::createFromFormat('d/m/Y', $foundDate['endOfLifeDate']))->format('Y-m-d');
+    $version = null;
+    if (preg_match('/^\d+\.\d+\.\d+/', $labtechDatum['version'], $matches)) {
+        $version = $matches[0];
+    }
+
+    if (!$version) {
         continue;
     }
 
     $dbeOSSupportDates = new DBEOSSupportDates($this);
     $dbeOSSupportDates->setValue(DBEOSSupportDates::name, $labtechDatum['name']);
-    $dbeOSSupportDates->setValue(DBEOSSupportDates::version, $labtechDatum['version']);
-    $dbeOSSupportDates->setValue(DBEOSSupportDates::availabilityDate, $foundDate['availabilityDate']);
-    $dbeOSSupportDates->setValue(DBEOSSupportDates::endOfLifeDate, $foundDate['endOfLifeDate']);
+    $dbeOSSupportDates->setValue(DBEOSSupportDates::version, $version);
+    $dbeOSSupportDates->setValue(DBEOSSupportDates::availabilityDate, $availabilityDate);
+    $dbeOSSupportDates->setValue(DBEOSSupportDates::endOfLifeDate, $endOfLifeDate);
     $dbeOSSupportDates->insertRow();
 
 }
