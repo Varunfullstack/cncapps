@@ -7153,6 +7153,55 @@ is currently a balance of ';
             DBEJProblem::linkedSalesOrderID,
             $ordheadID
         );
+
+        if ($dsInput->getValue('serviceRequestPriority')) {
+            $buHeader = new BUHeader($this);
+            $dsHeader = new DataSet($this);
+            $buHeader->getHeader($dsHeader);
+            $dbeProblem->setValue(DBEProblem::imLimitMinutes, $dsHeader->getValue(DBEHeader::imTeamLimitMinutes));
+
+            $buSalesOrder->getOrderByOrdheadID(
+                $ordheadID,
+                $dsOrdHead,
+                $dsOrdLine
+            );
+
+            $BUHeader = new BUHeader($this);
+            $BUHeader->getHeader($dbeHeader);
+            $minutesInADay = $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
+
+            $normalMinutes = 0;
+            $oohMinutes = 0;
+
+            while ($dsOrdLine->fetchNext()) {
+
+                if ($dsOrdLine->getValue(DBEOrdline::lineType) == 'I') {
+                    echo "<div>sequence: " . $dsOrdLine->getValue(DBEOrdline::sequenceNo) . " </div>";
+                    echo "<div>itemID: " . $dsOrdLine->getValue(DBEOrdline::itemID) . "</div>";
+
+                    switch ($dsOrdLine->getValue(DBEOrdline::itemID)) {
+                        case self::DAILY_LABOUR_CHARGE:
+                            $normalMinutes += ((float)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * $minutesInADay;
+                            break;
+                        case self::HOURLY_LABOUR_CHARGE:
+                            $normalMinutes += ((float)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * 60;
+                            break;
+                        case self::DAILY_OOH_LABOUR_CHARGE:
+                            $oohMinutes += ((float)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * $minutesInADay;
+                            break;
+                        case self::HOURLY_OOH_LABOUR_CHARGE:
+                            $oohMinutes += ((float)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * 60;
+                            break;
+                    }
+                    echo "<div>Normal Minutes: $normalMinutes</div><div>Out Of Hours Minutes: $oohMinutes</div>";
+
+                }
+
+            }
+
+
+        }
+
         $dbeProblem->insertRow();
 
         /* Use type of first SO line as first line of reason */
