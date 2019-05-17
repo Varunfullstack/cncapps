@@ -37,6 +37,7 @@ require_once($cfg ["path_dbe"] . "/DBEUtilityEmail.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg ["path_bu"] . "/BUStandardText.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJPorhead.inc.php");
+require_once($cfg["path_ct"] . "/CTProject.inc.php");
 
 define(
     'BUACTIVITY_RESOLVED',
@@ -7052,11 +7053,9 @@ is currently a balance of ';
         if ($dsInput->getValue('etaDate')) {
             $internalNotes .=
                 '<P>ETA: ' . Controller::dateYMDtoDMY($dsInput->getValue('etaDate')) . '</P><BR/>';
-
         } else {
             $internalNotes .=
                 '<P>ETA: TBA</P><BR/>';
-
         }
 
         /*
@@ -7154,52 +7153,40 @@ is currently a balance of ';
             $ordheadID
         );
 
-        if ($dsInput->getValue('serviceRequestPriority')) {
+        if ($dsInput->getValue('serviceRequestPriority') == 5) {
             $buHeader = new BUHeader($this);
             $dsHeader = new DataSet($this);
             $buHeader->getHeader($dsHeader);
             $dbeProblem->setValue(DBEProblem::imLimitMinutes, $dsHeader->getValue(DBEHeader::imTeamLimitMinutes));
-
+            $dsOrdlineBudget = new DataSet($this);
             $buSalesOrder->getOrderByOrdheadID(
                 $ordheadID,
                 $dsOrdHead,
-                $dsOrdLine
+                $dsOrdlineBudget
             );
 
-            $BUHeader = new BUHeader($this);
-            $BUHeader->getHeader($dbeHeader);
-            $minutesInADay = $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
+            $minutesInADay = $dsHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
 
             $normalMinutes = 0;
-            $oohMinutes = 0;
+            while ($dsOrdlineBudget->fetchNext()) {
 
-            while ($dsOrdLine->fetchNext()) {
-
-                if ($dsOrdLine->getValue(DBEOrdline::lineType) == 'I') {
-                    echo "<div>sequence: " . $dsOrdLine->getValue(DBEOrdline::sequenceNo) . " </div>";
-                    echo "<div>itemID: " . $dsOrdLine->getValue(DBEOrdline::itemID) . "</div>";
-
-                    switch ($dsOrdLine->getValue(DBEOrdline::itemID)) {
-                        case self::DAILY_LABOUR_CHARGE:
-                            $normalMinutes += ((float)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * $minutesInADay;
+                if ($dsOrdlineBudget->getValue(DBEOrdline::lineType) == 'I') {
+                    switch ($dsOrdlineBudget->getValue(DBEOrdline::itemID)) {
+                        case CTProject::DAILY_LABOUR_CHARGE:
+                            $normalMinutes += ((float)$dsOrdlineBudget->getValue(
+                                    DBEOrdline::qtyOrdered
+                                )) * $minutesInADay;
                             break;
-                        case self::HOURLY_LABOUR_CHARGE:
-                            $normalMinutes += ((float)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * 60;
-                            break;
-                        case self::DAILY_OOH_LABOUR_CHARGE:
-                            $oohMinutes += ((float)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * $minutesInADay;
-                            break;
-                        case self::HOURLY_OOH_LABOUR_CHARGE:
-                            $oohMinutes += ((float)$dsOrdLine->getValue(DBEOrdline::qtyOrdered)) * 60;
+                        case CTProject::HOURLY_LABOUR_CHARGE:
+                            $normalMinutes += ((float)$dsOrdlineBudget->getValue(DBEOrdline::qtyOrdered)) * 60;
                             break;
                     }
-                    echo "<div>Normal Minutes: $normalMinutes</div><div>Out Of Hours Minutes: $oohMinutes</div>";
-
                 }
-
             }
 
-
+            if ($normalMinutes > 0) {
+                $dbeProblem->setValue(DBEProblem::imLimitMinutes, $normalMinutes);
+            }
         }
 
         $dbeProblem->insertRow();
