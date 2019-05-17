@@ -7173,11 +7173,13 @@ is currently a balance of ';
                 if ($dsOrdlineBudget->getValue(DBEOrdline::lineType) == 'I') {
                     switch ($dsOrdlineBudget->getValue(DBEOrdline::itemID)) {
                         case CTProject::DAILY_LABOUR_CHARGE:
+                        case CTProject::DAILY_OOH_LABOUR_CHARGE:
                             $normalMinutes += ((float)$dsOrdlineBudget->getValue(
                                     DBEOrdline::qtyOrdered
                                 )) * $minutesInADay;
                             break;
                         case CTProject::HOURLY_LABOUR_CHARGE:
+                        case CTProject::HOURLY_OOH_LABOUR_CHARGE:
                             $normalMinutes += ((float)$dsOrdlineBudget->getValue(DBEOrdline::qtyOrdered)) * 60;
                             break;
                     }
