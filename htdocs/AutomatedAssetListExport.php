@@ -216,6 +216,11 @@ ORDER BY clients.name,
             'A2'
         );
 
+
+        $sheet->setAutoFilter(
+            $sheet->calculateWorksheetDimension()
+        );
+
         for ($i = 0; $i < count($data); $i++) {
             if (!$data[$i]['OS End of Support Date']) {
                 continue;
@@ -228,26 +233,21 @@ ORDER BY clients.name,
             $currentRow = 2 + $i;
             $color = null;
             if ($date <= $thresholdDate) {
-                $color = "FFFF33";
+                $color = "FFFFFF33";
             }
 
             if ($date <= $today) {
-                $color = "FF0000";
+                $color = "FFFF0000";
             }
 
-
             if ($color) {
-                $sheet->getStyle("$currentRow:$currentRow")
+                $sheet->getStyle("A$currentRow:S$currentRow")
                     ->getFill()
                     ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                     ->getStartColor()
-                    ->setRGB($color);
+                    ->setARGB($color);
             }
         }
-
-        $sheet->setAutoFilter(
-            $sheet->calculateWorksheetDimension()
-        );
 
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $customerFolder = $buCustomer->getCustomerFolderPath($customerID);
