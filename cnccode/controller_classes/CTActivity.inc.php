@@ -1290,6 +1290,7 @@ class CTActivity extends CTCNC
 
     function parsePage()
     {
+        parent::parsePage();
         $urlLogo = '';
         $this->template->set_var(
             array(
