@@ -227,13 +227,14 @@ ORDER BY clients.name,
             }
             $currentRow = 2 + $i;
             $color = null;
+            if ($date <= $thresholdDate) {
+                $color = "FFFF33";
+            }
+
             if ($date <= $today) {
                 $color = "FF0000";
             }
 
-            if ($date <= $thresholdDate) {
-                $color = "FFFF33";
-            }
 
             if ($color) {
                 $sheet->getStyle("$currentRow:$currentRow")
