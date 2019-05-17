@@ -1297,7 +1297,6 @@ class CTActivity extends CTCNC
                 'txtHome' => 'Home'
             )
         );
-        parent::parsePage();
     }
 
     function countParamsSet($array)
@@ -6492,8 +6491,9 @@ class CTActivity extends CTCNC
 
         $this->setPageTitle("Time Request");
         $requestorID = $dsCallActivity->getValue(DBECallActivity::userID);
-        $this->dbeUser->getRow($requestorID);
-        $teamID = $this->dbeUser->getValue(DBEUser::teamID);
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRow($requestorID);
+        $teamID = $dbeUser->getValue(DBEUser::teamID);
         $teamName = '';
         $usedMinutes = 0;
         $assignedMinutes = 0;
