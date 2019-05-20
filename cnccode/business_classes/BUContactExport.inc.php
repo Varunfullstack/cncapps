@@ -46,7 +46,7 @@ class BUContactExport extends Business
         $query =
             "SELECT DISTINCT";
 
-        if ($dsSearchForm->getValue(CTContactExport::searchFormExportEmailOnlyFlag)) {
+        if ($dsSearchForm->getValue(CTContactExport::searchFormExportEmailOnlyFlag) == 'Y') {
             $query .= " con_email AS EmailAddress";
         } else {
             $query .=
@@ -350,7 +350,6 @@ class BUContactExport extends Business
         Loop through contacts sending email to each
         */
         while ($row = $results->fetch_array(MYSQLI_ASSOC)) {
-
             $buMail = new BUMail($this);
 
             $toEmail = $row['EmailAddress'];

@@ -7,6 +7,7 @@
  */
 require_once($cfg['path_bu'] . '/BUContactExport.inc.php');
 require_once($cfg['path_bu'] . '/BUContact.inc.php');
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUSector.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -281,12 +282,14 @@ class CTContactExport extends CTCNC
         $quotationItemIDs = array();
         $contractItemIDs = array();
 
+
         if ($this->getParam('Export') || $this->getParam('SendEmail')) {
 
-            if ($this->getParam('searchForm')[1]['supportLevel']) {
-                $this->getParam('searchForm')[1]['supportLevel'] = json_encode($this->getParam('searchForm')[1]['supportLevel']);
+            $searchForm = $this->getParam('searchForm')[1];
+            if (isset($searchForm['supportLevel'])) {
+                $searchForm['supportLevel'] = json_encode($searchForm['supportLevel']);
             }
-            $dsSearchForm->populateFromArray($this->getParam('searchForm'));
+            $dsSearchForm->populateFromArray([$searchForm]);
 
             if ($this->getParam('quotationItemIDs')) {
                 $quotationItemIDs = $this->getParam('quotationItemIDs');
@@ -303,7 +306,7 @@ class CTContactExport extends CTCNC
             if ($this->getParam('SendEmail')) {
                 $dsSearchForm->setValue(
                     self::searchFormExportEmailOnlyFlag,
-                    false
+                    'N'
                 );
             }
 
@@ -316,10 +319,8 @@ class CTContactExport extends CTCNC
                 );
 
             if ($this->getParam('Export')) {
-
                 $this->generateCSV($results);
                 exit;
-
             } else {
 
                 if (!$dsSearchForm->getValue(self::searchFormFromEmailAddress)) {
@@ -346,7 +347,6 @@ class CTContactExport extends CTCNC
                         $results
                     );
                 }
-
             }
 
         }
