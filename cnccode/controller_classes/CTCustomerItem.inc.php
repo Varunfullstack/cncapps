@@ -867,7 +867,7 @@ class CTCustomerItem extends CTCNC
         $secondSiteLocationPathValidationText = '';
         if ($dsCustomerItem->getValue('secondsiteLocationPath')) {
             /*
-            validate 2nd site location path
+            validate Offsite backup location path
             */
             if (!file_exists($dsCustomerItem->getValue('secondsiteLocationPath'))) {
                 $secondSiteLocationPathValidationText = 'Location is not available';
@@ -1098,7 +1098,7 @@ class CTCustomerItem extends CTCNC
 
 
         /*
-        2nd Site Images
+        Offsite Backup Images
         */
         if ($_REQUEST['action'] != CTCUSTOMERITEM_ACT_ADD) {
 
@@ -1110,7 +1110,7 @@ class CTCustomerItem extends CTCNC
 
             $addSecondsiteImageURL =
                 Controller::buildLink(
-                    'SecondSite.php',
+                    'OffsiteBackupStatus.php',
                     array(
                         'action'         => 'add',
                         'customerItemID' => $dsCustomerItem->getValue('customerItemID')
@@ -1119,7 +1119,7 @@ class CTCustomerItem extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'addSecondsiteImageText' => 'Add 2nd Site Image',
+                    'addSecondsiteImageText' => 'Add Offsite Backup Image',
                     'addSecondsiteImageUrl'  => $addSecondsiteImageURL
                 )
             );
@@ -1134,7 +1134,7 @@ class CTCustomerItem extends CTCNC
 
                 $deleteSecondsiteImageLink =
                     Controller::buildLink(
-                        'SecondSite.php',
+                        'OffsiteBackupStatus.php',
                         array(
                             'action'            => 'delete',
                             'secondsiteImageID' => $dsSecondsiteImage->getValue('secondsiteImageID')
@@ -1144,7 +1144,7 @@ class CTCustomerItem extends CTCNC
 
                 $editSecondsiteImageLink =
                     Controller::buildLink(
-                        'SecondSite.php',
+                        'OffsiteBackupStatus.php',
                         array(
                             'action'            => 'edit',
                             'secondsiteImageID' => $dsSecondsiteImage->getValue('secondsiteImageID')
@@ -1202,7 +1202,7 @@ class CTCustomerItem extends CTCNC
         }
 
         /*
-        end 2nd Site Images
+        end Offsite Backup Images
         */
 
         /*

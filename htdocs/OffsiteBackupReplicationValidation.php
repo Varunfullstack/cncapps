@@ -8,10 +8,10 @@
  */
 require_once("config.inc.php");
 GLOBAL $cfg;
-require_once($cfg['path_bu'] . '/BUSecondsite.inc.php');
+require_once($cfg['path_bu'] . '/BUSecondsiteReplication.inc.php');
 
 $testRun = !!@$_REQUEST['testRun'];
-$buSecondsite = new BUSecondsite($this);
+$buSecondsite = new BUSecondsiteReplication($this);
 
 set_time_limit(0); // unlimited execution time
 
@@ -27,7 +27,7 @@ $template = new Template(
 
 $template->set_file(
     'page',
-    'secondSiteCompletedEmail.inc.html'
+    'secondSiteReplicationCompletedEmail.inc.html'
 );
 
 $template->set_block(
@@ -41,7 +41,7 @@ foreach ($buSecondsite->log as $logEntry) {
     if ($logEntry['type'] == BUSecondsite::LOG_TYPE_SUCCESS) {
         continue; // don't report successes in detail
     }
-    $class = "";
+
     switch ($logEntry['type']) {
 
         case BUSecondsite::LOG_TYPE_ERROR_INCOMPLETE:
@@ -73,32 +73,6 @@ foreach ($buSecondsite->log as $logEntry) {
 
 $template->set_block(
     'page',
-    'delayedCheckServerBlock',
-    'delayedServers'
-);
-
-$servers = $buSecondsite->getDelayedCheckServers();
-foreach ($servers as $server) {
-
-    $template->set_var(
-        array(
-            'customerName' => $server['cus_name'],
-            'serverName'   => $server['serverName'],
-            'delayDays'    => $server['secondsiteImageDelayDays'],
-            'delayUser'    => $server['delayUser'],
-            'delayDate'    => $server['secondsiteImageDelayDate']
-        )
-    );
-    $template->parse(
-        'delayedServers',
-        'delayedCheckServerBlock',
-        true
-    );
-
-}
-
-$template->set_block(
-    'page',
     'suspendedCheckServerBlock',
     'suspendedServers'
 );
@@ -124,11 +98,7 @@ foreach ($servers as $server) {
 
 }
 
-$template->set_block(
-    'page',
-    'excludedLocalServerBlock',
-    'excludedLocalServers'
-);
+$template->set_block('page', 'excludedLocalServerBlock', 'excludedLocalServers');
 
 $servers = $buSecondsite->getExcludedLocalServers();
 
@@ -137,14 +107,10 @@ foreach ($servers as $server) {
     $template->set_var(
         array(
             'customerName' => $server['cus_name'],
-            'serverName'   => $server['serverName']
+            'serverName' => $server['serverName']
         )
     );
-    $template->parse(
-        'excludedLocalServers',
-        'excludedLocalServerBlock',
-        true
-    );
+    $template->parse('excludedLocalServers', 'excludedLocalServerBlock', true);
 
 }
 
@@ -170,17 +136,17 @@ $template->parse(
 );
 
 $html = $template->get_var('output');
-$subject = '2nd Site Backup Validation Completed';
+$subject = 'Offsite Backup Replication Validation Completed';
 
 if ($testRun) {
-    $subject = '2nd Site Backup Test Run Completed';
+    $subject = 'Offsite Backup Replication Test Run Completed';
 }
 
 
 $senderEmail = CONFIG_SUPPORT_EMAIL;
 $senderName = 'CNC Support Department';
 
-$toEmail = '2sprocesscompleted@' . CONFIG_PUBLIC_DOMAIN;
+$toEmail = '2srepprocesscompleted@' . CONFIG_PUBLIC_DOMAIN;
 
 $hdrs = array(
     'To'           => $toEmail,

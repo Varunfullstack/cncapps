@@ -240,7 +240,7 @@ class CTSecondSite extends CTCNC
 
         $passed = $this->buSecondsite->getImagesByStatus(BUSecondsite::STATUS_PASSED);
 
-        $this->setPageTitle('2nd Site');
+        $this->setPageTitle('Offsite Backup Status');
 
         $this->setTemplateFiles(array('SecondsiteList' => 'SecondsiteList.inc'));
 
@@ -557,7 +557,7 @@ class CTSecondSite extends CTCNC
 
         $urlNext =
             Controller::buildLink(
-                'SecondSite.php',
+                'OffsiteBackupStatus.php',
                 array()
             );
         header('Location: ' . $urlNext);
@@ -568,7 +568,7 @@ class CTSecondSite extends CTCNC
     {
         $ret =
             Controller::buildLink(
-                'SecondSite.php',
+                'OffsiteBackupStatus.php',
                 array(
                     'action'         => 'run',
                     'customerItemID' => $server_cuino
@@ -704,7 +704,7 @@ class CTSecondSite extends CTCNC
 
                             $reportUrl =
                                 Controller::buildLink(
-                                    'SecondSite.php',
+                                    'OffsiteBackupStatus.php',
                                     array(
                                         'action'                        => 'failureAnalysis',
                                         'searchForm[1][customerID]'     => $_REQUEST ['searchForm'][1]['customerID'],

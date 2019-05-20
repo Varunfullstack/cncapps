@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 545 - Password level modification
 - Issue 560 - Offsite Backup Image Validation Process
 - Issue 557 - Change Request Process GUI enhancement
+- Issue 550 - Rename 2nd Site links
 ### Fixed
 - Issue 551 - Contact Audit Log missing support level
 - Issue 552 - Contact Position field extension
