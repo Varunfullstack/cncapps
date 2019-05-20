@@ -621,11 +621,6 @@ class CTContactExport extends CTCNC
             );
         }
 
-        $this->standardTextList(
-            'ContactExport',
-            'standardTextBlock'
-        );
-
         $this->template->parse(
             'CONTENTS',
             'ContactExport',

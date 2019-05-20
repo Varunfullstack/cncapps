@@ -406,29 +406,6 @@
                     <tr>
                         <td valign="top"
                             class="promptText"
-                        >Insert template
-                        </td>
-                        <td>
-                            <select id="standardText"
-                                    name="standardText"
-                            >
-                                <!-- BEGIN standardTextBlock -->
-                                <option value="{standardTextContent}"
-                                        title=""
-                                >{standardTextDescription}
-                                </option>
-                                <!-- END standardTextBlock -->
-                            </select><input type="button"
-                                            name="insert"
-                                            value="Insert"
-                                            onclick="insertValueQuery( 'standardText', 'emailBody' )"
-                                            title="Insert"
-                        />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td valign="top"
-                            class="promptText"
                         >Email Body
                         </td>
                         <td>
@@ -437,13 +414,8 @@
                                       cols="30"
                                       rows="20"
                             >{emailBody}</textarea>
-                            <script type="text/javascript">
-                                /*
-                                 reason = CKEDITOR.replace( 'searchForm[1][emailBody]', { customConfig : '/ckeditor_config.js' } );
-                                 reason.addCss( 'body { font-size: 10pt; }' );
-                                 reason.addCss( 'P { margin-top: 10px; margin-bottom: 10px; }' );
-                                 reason = CKEDITOR.replace( 'searchForm[1][emailBody]' );
-                                 */
+                            <script>
+                                reason = CKEDITOR.replace('emailBody', {customConfig: '/ckeditor_config.js'});
                             </script>
                         </td>
                     </tr>
