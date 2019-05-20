@@ -237,10 +237,14 @@ class BUSecondsite extends Business
                             /*
                             No matching files of any date
                             */
-                            $missingImages[] = 'No file in ' . $networkPath . ' matches pattern: ' . $pattern;
+                            $missingImages[] = 'No file in ' . $networkPath . ' matches pattern: ' . htmlentities(
+                                    $pattern
+                                );
                             $missingLetters[] = $image['imageName'];
 
-                            $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': No file in ' . $networkPath . ' matches pattern: ' . $pattern;
+                            $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': No file in ' . $networkPath . ' matches pattern: ' . htmlentities(
+                                    $pattern
+                                );
 
                             $this->logMessage(
                                 $errorMessage,
@@ -251,8 +255,6 @@ class BUSecondsite extends Business
                                 $image['secondSiteImageID'],
                                 self::STATUS_IMAGE_NOT_FOUND
                             );
-
-                            echo $pattern . " NOT FOUND<br/>";
                         }
                     } else {
                         /*
