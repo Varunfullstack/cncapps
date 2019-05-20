@@ -2678,6 +2678,10 @@ class BUActivity extends Business
                 );
                 break;
             case 'D':
+                $this->logOperationalActivity(
+                    $dsCallActivity->getValue(DBECallActivity::problemID),
+                    '<p style="color: red;">Time request denied: ' . $comments . '</p>'
+                );
                 $this->sendTimeRequestDeniedEmail(
                     $dsCallActivity,
                     $requestingUser,
@@ -3036,13 +3040,10 @@ class BUActivity extends Business
 
         $template->setVar(
             array(
-                'problemID' => $problemID,
-
-                'userName' => $userName,
-
+                'problemID'       => $problemID,
+                'userName'        => $userName,
                 'urlLastActivity' => $urlLastActivity,
-
-                'requestReason' => $reason
+                'requestReason'   => $reason
             )
         );
 
@@ -3059,7 +3060,7 @@ class BUActivity extends Business
         $hdrs = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
-            'Subject'      => "Time Request Denied",
+            'Subject'      => "Time Request Denied - SR " . $problemID,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
