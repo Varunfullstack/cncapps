@@ -37,6 +37,7 @@ require_once($cfg ["path_dbe"] . "/DBEUtilityEmail.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg ["path_bu"] . "/BUStandardText.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJPorhead.inc.php");
+require_once($cfg["path_ct"] . "/CTProject.inc.php");
 
 define(
     'BUACTIVITY_RESOLVED',
@@ -7055,11 +7056,9 @@ is currently a balance of ';
         if ($dsInput->getValue('etaDate')) {
             $internalNotes .=
                 '<P>ETA: ' . Controller::dateYMDtoDMY($dsInput->getValue('etaDate')) . '</P><BR/>';
-
         } else {
             $internalNotes .=
                 '<P>ETA: TBA</P><BR/>';
-
         }
 
         /*
@@ -7156,6 +7155,45 @@ is currently a balance of ';
             DBEJProblem::linkedSalesOrderID,
             $ordheadID
         );
+
+        if ($dsInput->getValue('serviceRequestPriority') == 5) {
+            $buHeader = new BUHeader($this);
+            $dsHeader = new DataSet($this);
+            $buHeader->getHeader($dsHeader);
+            $dbeProblem->setValue(DBEProblem::imLimitMinutes, $dsHeader->getValue(DBEHeader::imTeamLimitMinutes));
+            $dsOrdlineBudget = new DataSet($this);
+            $buSalesOrder->getOrderByOrdheadID(
+                $ordheadID,
+                $dsOrdHead,
+                $dsOrdlineBudget
+            );
+
+            $minutesInADay = $dsHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
+
+            $normalMinutes = 0;
+            while ($dsOrdlineBudget->fetchNext()) {
+
+                if ($dsOrdlineBudget->getValue(DBEOrdline::lineType) == 'I') {
+                    switch ($dsOrdlineBudget->getValue(DBEOrdline::itemID)) {
+                        case CTProject::DAILY_LABOUR_CHARGE:
+                        case CTProject::DAILY_OOH_LABOUR_CHARGE:
+                            $normalMinutes += ((float)$dsOrdlineBudget->getValue(
+                                    DBEOrdline::qtyOrdered
+                                )) * $minutesInADay;
+                            break;
+                        case CTProject::HOURLY_LABOUR_CHARGE:
+                        case CTProject::HOURLY_OOH_LABOUR_CHARGE:
+                            $normalMinutes += ((float)$dsOrdlineBudget->getValue(DBEOrdline::qtyOrdered)) * 60;
+                            break;
+                    }
+                }
+            }
+
+            if ($normalMinutes > 0) {
+                $dbeProblem->setValue(DBEProblem::imLimitMinutes, $normalMinutes);
+            }
+        }
+
         $dbeProblem->insertRow();
 
         /* Use type of first SO line as first line of reason */
