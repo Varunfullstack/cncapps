@@ -627,6 +627,11 @@ define(
     'CONFIG_LDAP_DOMAINCONTROLLER',
     'cncdc1'
 );
+
+define(
+    'CONFIG_SECONDARY_LDAP_DOMAINCONTROLLER',
+    'cncdc03'
+);
 define(
     'CONFIG_LDAP_DOMAIN',
     'cncltd'

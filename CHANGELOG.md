@@ -11,6 +11,7 @@ This project changes will be shown here.
 - Issue 557 - Change Request Process GUI enhancement
 - Issue 550 - Rename 2nd Site links
 - Issue 547 - Time Request Denied Process
+- Issue 532 - Secondary LDAP server
 ### Fixed
 - Issue 551 - Contact Audit Log missing support level
 - Issue 552 - Contact Position field extension
