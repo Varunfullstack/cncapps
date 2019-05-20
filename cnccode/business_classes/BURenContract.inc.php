@@ -772,4 +772,21 @@ HEREDOC;
 
         echo "<div> Contract Renewals - END </div>";
     }
+
+    function isCompleted($customerItemID)
+    {
+        $this->dbeRenContract->getRow($customerItemID);
+
+        if
+        (
+            $this->dbeRenContract->getValue('installationDate') &&
+            $this->dbeRenContract->getValue('invoicePeriodMonths')
+        ) {
+            $ret = true;
+
+        }
+
+        return $ret;
+
+    }
 }

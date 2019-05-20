@@ -9,6 +9,7 @@
 require_once($cfg['path_bu'] . '/BUSalesOrder.inc.php');
 require_once($cfg['path_bu'] . '/BUDespatch.inc.php');
 require_once($cfg["path_bu"] . "/BURenewal.inc.php");
+require_once($cfg["path_bu"] . "/BUPDFDeliveryNote.inc.php");
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_ct'] . '/CTDeliveryNotes.inc.php');
 require_once($cfg['path_gc'] . '/DataSet.inc.php');
@@ -516,16 +517,12 @@ class CTDespatch extends CTCNC
             $this->setFormErrorMessage('Please select a delivery method');
         }
 
-
         $this->setDeliveryMethodID($this->getParam('deliveryMethodID'));
         $buDespatch->initialiseDespatchDataset($dsDespatch);
-
         if (!$dsDespatch->populateFromArray($this->getParam('despatch'))) {
             $this->setFormErrorMessage('Quantities entered must be numeric');
         }
-//		$hasRenewalsLines = false;
         $forciblyCreateNote = $this->getParam('forciblyCreateNote');
-
         $dsDespatch->initialise();
         $buRenewal = null;
         while ($dsDespatch->fetchNext()) {
@@ -578,6 +575,13 @@ class CTDespatch extends CTCNC
         if ($this->getformError()) {
             $this->displayDespatch();
             exit;
+        } else {
+            $deliveryNoteFile = $buDespatch->despatch(
+                $_REQUEST['ordheadID'],
+                $_REQUEST['deliveryMethodID'],
+                $dsDespatch,
+                @$_REQUEST['onlyCreateDespatchNote']
+            );
         }
         $urlNext =
             Controller::buildLink(

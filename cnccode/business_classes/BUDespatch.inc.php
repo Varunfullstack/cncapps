@@ -147,6 +147,192 @@ class BUDespatch extends Business
     }
 
     /**
+     * @param int $ordheadID
+     * @param int $deliveryMethodID
+     * @param DataSet|DSForm $dsDespatch
+     * @param bool $onlyCreateDespatchNote
+     * @return bool|String
+     */
+    function despatch($ordheadID, $deliveryMethodID, &$dsDespatch, $onlyCreateDespatchNote = true)
+    {
+        $this->setMethodName('despatch');
+        $this->dbeOrdline = new DBEOrdline($this);
+        $dsDespatch->initialise();
+        $buSalesOrder = new BUSalesOrder($this);
+        $dsOrdhead = new DataSet($this);
+        $buSalesOrder->getOrdheadByID($ordheadID, $dsOrdhead);
+        $partInvoice = ($dsOrdhead->getValue(DBEJOrdhead::partInvoice) == 'Y');
+        $dsOrdline = new DataSet($this);
+        $this->getLinesByID($ordheadID, $dsOrdline);
+
+// Check Whether The Order Will Be Complete Following This Despatch
+        $fullyDespatched = TRUE;
+        while ($dsDespatch->fetchNext()) {
+            $dsOrdline->fetchNext();
+            if ($dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
+                $qtyOutstanding = $dsOrdline->getValue(DBEOrdline::qtyOrdered) - $dsOrdline->getValue(
+                        DBEOrdline::qtyDespatched
+                    );
+                if ($qtyOutstanding - $dsDespatch->getValue('qtyToDespatch') != 0) {
+                    $fullyDespatched = FALSE;
+                    break;
+                }
+            }
+        }
+
+        /*
+        * Update ordline (except if $onlyCreateDespatchNote )
+        */
+        $ordlineUpdated = FALSE;
+        $dsDespatch->initialise();
+        $dsOrdline->initialise();
+        while ($dsDespatch->fetchNext()) {
+            $dsOrdline->fetchNext();
+
+            $qtyToDespatch = $dsDespatch->getValue('qtyToDespatch');
+
+            if ($qtyToDespatch <= 0) {
+                continue;
+            }
+            if (
+                $dsOrdline->getValue(DBEOrdline::lineType) == 'I' // exclude comment lines
+            ) {
+
+                if (!$onlyCreateDespatchNote) {
+
+                    $this->updateOrdline($ordheadID, $dsOrdline, $dsDespatch);
+                }
+
+                $ordlineUpdated = TRUE;
+            }
+        }
+        /*
+        * update order status and create invoices(optionally) if order updated and we are not
+        * just creating a despactch note.
+        */
+        if (!$onlyCreateDespatchNote && $ordlineUpdated) {
+
+            $dbeOrdhead = new DBEOrdhead($this);
+            $dbeOrdhead->getRow($ordheadID);
+            if ($fullyDespatched) {
+                $dbeOrdhead->setValue(DBEOrdhead::type, 'C');
+            } else {
+                $dbeOrdhead->setValue(DBEOrdhead::type, 'P');
+            }
+            $dbeOrdhead->updateRow();
+            unset($dbeOrdhead);
+
+            $invheadID = false;
+
+            // do we generate invoices for these payment terms?
+            $dbePaymentTerms = new DBEPaymentTerms($this);
+            $dbePaymentTerms->getRow($dsOrdhead->getValue(DBEJOrdhead::paymentTermsID));
+
+            if ($dbePaymentTerms->getValue(DBEPaymentTerms::generateInvoiceFlag) == 'Y') {
+                // Last despatch for this non part-invoice order so generate invoice for whole
+                if (!$partInvoice AND $fullyDespatched) {
+                    $buInvoice = new BUInvoice($this);
+                    $invheadID = $buInvoice->createInvoiceFromOrder($dsOrdhead, $dsOrdline);
+                    unset($buInvoice);
+                }
+                if ($partInvoice) {
+                    $buInvoice = new BUInvoice($this);
+                    $invheadID = $buInvoice->createInvoiceFromDespatch($dsOrdhead, $dsOrdline, $dsDespatch);
+                    unset($buInvoice);
+                }
+            } // end
+
+        } // !$onlyCreateDespatchNote && $ordlineUpdated
+
+        /*
+        * If the item despatched is a GSC contract/topup then update the GSC balance on the customer table
+        */
+        if (
+            !$onlyCreateDespatchNote &&
+            (
+                $dsOrdline->getValue(DBEOrdline::itemID) == CONFIG_DEF_PREPAY_ITEMID OR
+                $dsOrdline->getValue(DBEOrdline::itemID) == CONFIG_DEF_PREPAY_TOPUP_ITEMID)
+        ) {
+            // create an activity row
+
+            $buActivity = new BUActivity($this);
+            $buActivity->createTopUpActivity(
+                $dsOrdhead->getValue(DBEOrdhead::customerID),
+                $dsOrdline->getValue(DBEOrdline::curTotalSale),
+                $invheadID
+            );
+        }
+
+        $dbeDeliveryMethod = new DBEDeliveryMethod($this);
+        $dsDeliveryMethod = new DataSet($this);
+        $this->getDatasetByPK($deliveryMethodID, $dbeDeliveryMethod, $dsDeliveryMethod);
+
+        $deliveryNoteFile = FALSE;
+
+        if ($dsDeliveryMethod->getValue(DBEDeliveryMethod::sendNoteFlag) == 'Y') {
+
+            if ($ordlineUpdated) {
+
+                $buContact = new BUContact($this);
+
+                $buContact->getContactByID($dsOrdhead->getValue(DBEOrdhead::delContactID), $dsContact);
+
+                $deliveryNoteFile = $this->createDeliveryNote(
+                    $dsOrdhead,
+                    $dsOrdline,
+                    $dsDespatch,
+                    $dsContact,
+                    $dsDeliveryMethod,
+                    $fullyDespatched
+                );
+            }
+        }
+        unset($dbeDeliveryMethod);
+        return $deliveryNoteFile;
+    }
+
+    /**
+     * @param DataSet $dsOrdhead
+     * @param DataSet $dsOrdline
+     * @param DataSet|DSForm $dsDespatch
+     * @param DataSet $dsContact
+     * @param DataSet $dsDeliveryMethod
+     * @param bool $fullyDespatched
+     * @return String
+     */
+    function createDeliveryNote(
+        &$dsOrdhead,
+        &$dsOrdline,
+        &$dsDespatch,
+        &$dsContact,
+        &$dsDeliveryMethod,
+        $fullyDespatched
+    )
+    {
+        // create record on delivery note table
+        $dbeDeliveryNote = new DBEDeliveryNote($this);
+        $dbeDeliveryNote->setValue(DBEDeliveryNote::ordheadID, $dsOrdhead->getValue(DBEOrdhead::ordheadID));
+        $noteNo = $dbeDeliveryNote->getNextNoteNo();
+
+        $dbeDeliveryNote->setPKValue('0');
+        $dbeDeliveryNote->setValue(DBEDeliveryNote::ordheadID, $dsOrdhead->getValue(DBEOrdhead::ordheadID));
+        $dbeDeliveryNote->setValue(DBEDeliveryNote::noteNo, $noteNo);
+        $dbeDeliveryNote->setValue(DBEDeliveryNote::dateTime, date('Y-m-d H:i:s'));
+        $dbeDeliveryNote->insertRow();
+        $buPDFDeliveryNote = new BUPDFDeliveryNote(
+            $this,
+            $dsOrdhead,
+            $dsOrdline,
+            $dsDespatch,
+            $dsContact,
+            $dsDeliveryMethod,
+            $noteNo,
+            $fullyDespatched
+        );
+        return ($buPDFDeliveryNote->generateFile()); // the file path is returned
+    }
+
+    /**
      * @param $ordheadID
      * @param DataSet|DBEJOrdline $dsOrdline
      * @param DSForm $dsDespatch

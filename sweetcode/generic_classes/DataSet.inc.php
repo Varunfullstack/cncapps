@@ -471,8 +471,8 @@ class DataSet extends DataAccess
                     $value
                 );
             }
+            $this->post();
         }
-        $this->post();
         return $ret;
     }
 
