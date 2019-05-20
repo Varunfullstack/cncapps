@@ -222,7 +222,7 @@ class BUSecondsite extends Business
                         $pattern = '/' . $image['imageName'];
                     }
 
-                    $pattern .= '.*(-cd\.spi|spf)$/i';
+                    $pattern .= '.*(-cd\.spi|spf|(?<!-c[w|m|r])\.spi)$/i';
 
                     $matchedFiles = self::preg_ls(
                         $networkPath,
