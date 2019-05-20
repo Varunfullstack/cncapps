@@ -207,19 +207,18 @@ class CTContractAnalysisReport extends CTCNC
             'customers'
         );
 
+        $orderBy = $this->getParam('orderBy');
 
-        foreach ($results as $key => $row) {
-            $sales[$key] = $row['sales'];
-            $cost[$key] = $row['cost'];
-            $labourCost[$key] = $row['labourCost'];
-            $labourHours[$key] = $row['labourHours'];
-            $profitPercent[$key] = $row['profitPercent'];
-            $profit[$key] = $row['profit'];
-        }
+        $profit = array_column($results, 'profit');
+        $sales = array_column($results, 'sales');
+        $cost = array_column($results, 'cost');
+        $labourCost = array_column($results, 'labourCost');
+        $labourHours = array_column($results, 'labourHours');
+        $profitPercent = array_column($results, 'profitPercent');
 
-        if ($this->getParam('orderBy')) {
+        if ($orderBy) {
             array_multisort(
-                $$this->getParam('orderBy'),
+                $$orderBy,
                 SORT_ASC,
                 $results
             );

@@ -2006,4 +2006,16 @@
         </sql>
         <rollback/>
     </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-211">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT data_type = 'tinyint' FROM information_schema.`COLUMNS` c WHERE c.`TABLE_SCHEMA` = DATABASE() AND
+                c.`TABLE_NAME` = 'paymentterms' AND c.`COLUMN_NAME` = 'days'
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="paymentTerms" columnName="days" newDataType="smallint"/>
+        <rollback>
+            <modifyDataType tableName="paymentTerms" columnName="days" newDataType="tinyint"/>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>
