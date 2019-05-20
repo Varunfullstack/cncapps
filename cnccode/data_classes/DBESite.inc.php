@@ -193,11 +193,12 @@ class DBESite extends DBCNCEntity
     {
         $colString = "";
         for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
+
             // exclude primary key columns
-            if (($this->getName($ixCol) != self::customerID) & ($this->getName($ixCol) != self::siteNo)) {
+            if (($this->getName($ixCol) != self::customerID) && ($this->getName($ixCol) != self::siteNo)) {
                 if ($colString != "") $colString = $colString . ",";
                 $colString = $colString . $this->getDBColumnName($ixCol) . "=" .
-                    $this->prepareForSQL($this->getValue($ixCol));
+                    $this->prepareForSQL($ixCol);
             }
         }
         return $colString;

@@ -1718,15 +1718,16 @@ not a boolean, the given value is null, column given is not the PK, and there is
 
     function checkValid($columnNameOrIndex, $value)
     {
+        $colIdx = $this->columnExists($columnNameOrIndex);
+
         if ($this->debug) {
             echo '<div>Check Valid: ';
             var_dump($columnNameOrIndex, $value);
+            var_dump($this->colNull);
             echo '</div>';
         }
 
-        $colIdx = $this->columnExists($columnNameOrIndex);
-
-        if ($this->getPK() != $colIdx && $this->getNull($columnNameOrIndex) == DA_NOT_NULL && $value === null) {
+        if ($this->getPK() != $colIdx && $this->getNull($colIdx) == DA_NOT_NULL && $value === null) {
             return DATASET_MSG_REQUIRED;
         }
 

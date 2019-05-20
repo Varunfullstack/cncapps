@@ -1446,7 +1446,7 @@ class CTInvoice extends CTCNC
         if ($this->getParam('invline')[1]['lineType'] == "I") {
             $this->dsInvline->setNull(
                 DBEInvline::itemID,
-                DA_NOT_NULL
+                DA_ALLOW_NULL
             );
             $this->dsInvline->setNull(
                 DBEInvline::qty,

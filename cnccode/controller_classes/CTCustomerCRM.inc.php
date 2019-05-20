@@ -393,73 +393,73 @@ class CTCustomerCRM extends CTCustomer
         foreach ($customerArray as $value) {
 
             $this->buCustomer->getCustomerByID(
-                $value['customerID'],
+                @$value['customerID'],
                 $this->dsCustomer
             );
             $this->dsCustomer->setUpdateModeInsert();
             $this->dsCustomer->setValue(
                 DBECustomer::mailshotFlag,
-                $this->getYN($value['mailshotFlag'])
+                $this->getYN(@$value['mailshotFlag'])
             );
             $this->dsCustomer->setValue(
                 DBECustomer::customerLeadStatusID,
-                $value['customerLeadStatusID']
+                @$value['customerLeadStatusID']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::dateMeetingConfirmed,
-                $value['dateMeetingConfirmedDate']
+                @$value['dateMeetingConfirmedDate']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::meetingDateTime,
-                $value['meetingDateTime']
+                @$value['meetingDateTime']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::inviteSent,
-                $this->getTrueFalse($value[DBECustomer::inviteSent])
+                $this->getTrueFalse(@$value[DBECustomer::inviteSent])
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reportProcessed,
-                $this->getTrueFalse($value[DBECustomer::reportProcessed])
+                $this->getTrueFalse(@$value[DBECustomer::reportProcessed])
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reportSent,
-                $this->getTrueFalse($value[DBECustomer::reportSent])
+                $this->getTrueFalse(@$value[DBECustomer::reportSent])
             );
             $this->dsCustomer->setValue(
                 DBECustomer::crmComments,
-                $value[DBECustomer::crmComments]
+                @$value[DBECustomer::crmComments]
             );
             $this->dsCustomer->setValue(
                 DBECustomer::companyBackground,
-                $value[DBECustomer::companyBackground]
+                @$value[DBECustomer::companyBackground]
             );
             $this->dsCustomer->setValue(
                 DBECustomer::decisionMakerBackground,
-                $value[DBECustomer::decisionMakerBackground]
+                @$value[DBECustomer::decisionMakerBackground]
             );
 
             $this->dsCustomer->setValue(
                 DBECustomer::primaryMainContactID,
-                $value[DBECustomer::primaryMainContactID]
+                @$value[DBECustomer::primaryMainContactID]
             );
 
             $this->dsCustomer->setValue(
                 DBECustomer::opportunityDeal,
-                $value[DBECustomer::opportunityDeal]
+                @$value[DBECustomer::opportunityDeal]
             );
             $this->dsCustomer->setValue(
                 DBECustomer::rating,
-                $value[DBECustomer::rating]
+                @$value[DBECustomer::rating]
             );
             $reviewDate = DateTime::createFromFormat(
                 'd/m/Y',
-                $value[DBECustomer::reviewDate]
+                @$value[DBECustomer::reviewDate]
             );
 
             if ($reviewDate) {
                 $reviewDateValue = null;
                 if ($reviewDate) {
-                    $reviewDateValue = $reviewDate->format(DATE_ISO8601);
+                    $reviewDateValue = $reviewDate->format(DATE_MYSQL_DATE);
                 }
 
                 $this->dsCustomer->setValue(
@@ -472,15 +472,15 @@ class CTCustomerCRM extends CTCustomer
 
             $this->dsCustomer->setValue(
                 DBECustomer::reviewTime,
-                $value[DBECustomer::reviewTime]
+                @$value[DBECustomer::reviewTime]
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reviewUserID,
-                $value[DBECustomer::reviewUserID]
+                @$value[DBECustomer::reviewUserID]
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reviewAction,
-                $value[DBECustomer::reviewAction]
+                @$value[DBECustomer::reviewAction]
             );
             $this->dsCustomer->post();
         }

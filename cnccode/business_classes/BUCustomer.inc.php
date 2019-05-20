@@ -533,7 +533,7 @@ class BUCustomer extends Business
             $this,
             'setSageRef'
         );
-        $ret = $ret & ($this->updateSite($dsSite));
+        $ret = $ret && ($this->updateSite($dsSite));
         $this->dbeSite->resetCallbackMethod(DA_BEFORE_POST);
         $this->addNewContactRow(
             $dsContact,
