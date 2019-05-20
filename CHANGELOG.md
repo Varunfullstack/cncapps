@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 533 - PO Status Report v7
 - Issue 545 - Password level modification
 - Issue 560 - Offsite Backup Image Validation Process
+- Issue 557 - Change Request Process GUI enhancement
 ### Fixed
 - Issue 551 - Contact Audit Log missing support level
 - Issue 552 - Contact Position field extension
