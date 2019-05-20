@@ -229,8 +229,7 @@ class BUPrepay extends Business
 
         $last_custno = '9999';
         $filepath = null;
-
-        $date = DateTime::createFromFormat(DATE_MYSQL_DATETIME, $this->dsData->getValue(self::exportDataSetEndDate));
+        $date = DateTime::createFromFormat(DATE_MYSQL_DATE, $this->dsData->getValue(self::exportDataSetEndDate));
 
         while ($db->next_record()) {
 
