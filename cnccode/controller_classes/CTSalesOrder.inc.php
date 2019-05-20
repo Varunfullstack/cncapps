@@ -4688,7 +4688,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
         $dsInput->addColumn(
             DBEOrdhead::serviceRequestPriority,
             DA_INTEGER,
-            DA_NOT_NULL
+            DA_ALLOW_NULL
         );
         $dsInput->addColumn(
             DBEOrdhead::serviceRequestText,
