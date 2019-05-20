@@ -687,8 +687,7 @@ class CTCurrentActivityReport extends CTCNC
             $this->filterUser,
             function ($a,
                       $b
-            ) use
-            (
+            ) use (
                 $loggedInUserID
             ) {
 
@@ -1166,6 +1165,9 @@ class CTCurrentActivityReport extends CTCNC
             );
             $totalActivityDurationHours = $dsResults->getValue('totalActivityDurationHours');
 
+            $dbeCustomer = new DBECustomer($this);
+            $dbeCustomer->getRow($dsResults->getValue('customerID'));
+            $hideWork = $dbeCustomer->getValue(DBECustomer::referredFlag) == 'Y';
             $this->template->set_var(
 
                 array(
@@ -1211,8 +1213,8 @@ class CTCurrentActivityReport extends CTCNC
                     'priority'                   => Controller::htmlDisplayText($dsResults->getValue('priority')),
                     'alarmDateTime'              => $alarmDateTimeDisplay,
                     'bgColour'                   => $bgColour,
-                    'workBgColor'                => $workBgColor
-
+                    'workBgColor'                => $workBgColor,
+                    'workHidden'                 => $hideWork ? 'hidden' : null,
                 )
 
             );

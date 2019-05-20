@@ -12,6 +12,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 551 - Contact Audit Log missing support level
 - Issue 552 - Contact Position field extension
+- Issue 554 - Block 'Work' Button for referred customers
 ### Removed
 - Issue 530 - Remove reference to faxing on generating a sales order
 
