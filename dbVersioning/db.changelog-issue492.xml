@@ -2018,4 +2018,16 @@
             <modifyDataType tableName="paymentTerms" columnName="days" newDataType="tinyint"/>
         </rollback>
     </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-212">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="NO">
+                SELECT `information_schema`.COLUMNS.`IS_NULLABLE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='quotation'
+                AND column_name='emailSubject'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint columnName="emailSubject" tableName="quotation" columnDataType="char(100)"/>
+    </changeSet>
 </databaseChangeLog>

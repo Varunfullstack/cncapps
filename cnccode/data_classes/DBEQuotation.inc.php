@@ -56,7 +56,7 @@ class DBEQuotation extends DBEntity
         $this->addColumn(
             self::sentDateTime,
             DA_DATETIME,
-            DA_NOT_NULL
+            DA_ALLOW_NULL
         );
         $this->addColumn(
             self::userID,
