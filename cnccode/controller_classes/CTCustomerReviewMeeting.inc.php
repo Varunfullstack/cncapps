@@ -1187,6 +1187,7 @@ class CTCustomerReviewMeeting extends CTCNC
 
             $hdrs = array(
                 'From'         => $senderEmail,
+                'To'           => $toEmail,
                 'Subject'      => $subject,
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'

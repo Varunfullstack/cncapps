@@ -670,6 +670,7 @@ class BUActivity extends Business
 
         $hdrs = array(
             'From'         => $senderEmail,
+            'To'           => $toEmail,
             'Subject'      => CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' - Completed Early',
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
@@ -5821,6 +5822,7 @@ is currently a balance of ';
 
         $hdrs = array(
             'From'         => $senderEmail,
+            'To'           => $toEmail,
             'Subject'      => $subject,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
