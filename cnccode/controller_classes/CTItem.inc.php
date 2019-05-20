@@ -170,9 +170,9 @@ class CTItem extends CTCNC
 
         $this->template->set_var(
             array(
-                'parentIDField'               => $_SESSION['itemParentIDField'],
-                'parentSlaResponseHoursField' => $_SESSION['itemParentSlaResponseHoursField'],
-                'parentDescField'             => $_SESSION['itemParentDescField']
+                'parentIDField'               => @$_SESSION['itemParentIDField'],
+                'parentSlaResponseHoursField' => @$_SESSION['itemParentSlaResponseHoursField'],
+                'parentDescField'             => @$_SESSION['itemParentDescField']
             )
         );
         if ($dsItem->rowCount() == 1) {
