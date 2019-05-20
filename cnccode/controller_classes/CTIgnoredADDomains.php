@@ -208,36 +208,5 @@ class CTIgnoredADDomains extends CTCNC
 
         $this->parsePage();
     }
-
-    function resolveCalls()
-    {
-        $this->setMethodName('exportExpenseGenerate');
-        $this->buActivity->initialiseResolveForm($this->dsIgnoredADDomains);
-        if (!$this->dsIgnoredADDomains->populateFromArray($_REQUEST['IgnoredADDomains'])) {
-            $this->setFormErrorOn();
-            $this->displayForm(); //redisplay with errors
-        } else {
-            // do the resolving
-            $filePath = $this->buActivity->resolveCalls($this->dsIgnoredADDomains);
-            if ($filePath) {
-                $this->setFormErrorMessage('Calls resolved and logged to ' . $filePath);
-            } else {
-                $this->setFormErrorMessage('No calls to resolve');
-            }
-            $this->displayForm();
-        }
-    }
-
-    function parsePage()
-    {
-        $urlLogo = '';
-        $this->template->set_var(
-            array(
-                'urlLogo' => $urlLogo,
-                'txtHome' => 'Home'
-            )
-        );
-        parent::parsePage();
-    }
 }// end of class
 ?>

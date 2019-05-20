@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 519 - Windows 10 version EOL Build notifications
 ### Changed
 - Issue 531 - Create configuration settings for the new Design Environment 
 - Issue 524 - Automated Request table field change

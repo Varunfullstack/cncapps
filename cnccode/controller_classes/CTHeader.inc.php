@@ -330,6 +330,12 @@ class CTHeader extends CTCNC
                 DBEHeader::projectCommenceNotification . 'Message' => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::projectCommenceNotification)
                 ),
+                DBEHeader::OSSupportDatesThresholdDays => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEHeader::OSSupportDatesThresholdDays)
+                ),
+                DBEHeader::OSSupportDatesThresholdDays . 'Message' => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEHeader::OSSupportDatesThresholdDays)
+                ),
                 'urlItemPopup' => $urlItemPopup,
                 'urlUpdate'    => $urlUpdate
             )
