@@ -8848,13 +8848,14 @@ is currently a balance of ';
      * @param $rootCauseID
      * @param $resolutionSummary
      * @return bool
+     * @throws Exception
      */
     function setProblemToFixed(
         $problemID,
-        $fixedUserID,
-        $contractCustomerItemID,
-        $rootCauseID,
-        $resolutionSummary
+        $fixedUserID = null,
+        $contractCustomerItemID = null,
+        $rootCauseID = null,
+        $resolutionSummary = null
     )
     {
         /*
