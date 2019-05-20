@@ -1840,16 +1840,20 @@ class CTSalesOrder extends CTCNC
                                 // new line below current
                             )
                         );
-                    $urlMoveLineUp =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'      => CTSALESORDER_ACT_MOVE_ORDLINE_UP,
-                                'ordheadID'   => $this->getOrdheadID(),
-                                'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
-                                'sequenceNo'  => $dsOrdline->getValue(DBEOrdline::sequenceNo)
-                            )
-                        );
+
+                    if ($dsOrdline->getValue(DBEOrdline::sequenceNo) > 0) {
+                        $urlMoveLineUp =
+                            Controller::buildLink(
+                                $_SERVER['PHP_SELF'],
+                                array(
+                                    'action'      => CTSALESORDER_ACT_MOVE_ORDLINE_UP,
+                                    'ordheadID'   => $this->getOrdheadID(),
+                                    'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
+                                    'sequenceNo'  => $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                                )
+                            );
+                    }
+
                     $urlMoveLineDown =
                         Controller::buildLink(
                             $_SERVER['PHP_SELF'],
@@ -1890,6 +1894,7 @@ class CTSalesOrder extends CTCNC
                     '',
                     $removeDescription
                 );
+
                 $this->template->set_var(
                     array(
                         'salesOrderLineDesc' => $salesOrderLineDesc,
@@ -1904,6 +1909,9 @@ class CTSalesOrder extends CTCNC
                         )) ? CT_CHECKED : null,
                         'urlMoveLineUp'      => $urlMoveLineUp,
                         'urlMoveLineDown'    => $urlMoveLineDown,
+                        'moveUpHidden'       => $dsOrdline->getValue(DBEOrdline::sequenceNo) > 0 ? null : 'hidden',
+                        'moveDownHidden'     => $dsOrdline->getValue(DBEOrdline::sequenceNo) < $dsOrdline->rowCount(
+                        ) - 1 ? null : 'hidden',
                         'removeDescription'  => $removeDescription,
                         'urlEditLine'        => $urlEditLine,
                         'urlDeleteLine'      => $urlDeleteLine,
@@ -2949,7 +2957,7 @@ class CTSalesOrder extends CTCNC
             $this->getParam('updatedTime'),
             $dsOrdhead->getValue(DBEOrdhead::updatedTime)
         );
-        if (!$this->getSequenceNo()) {
+        if ($this->getSequenceNo() === null) {
             $this->displayFatalError(CTSALESORDER_MSG_SEQNO_NOT_PASSED);
         }
     }

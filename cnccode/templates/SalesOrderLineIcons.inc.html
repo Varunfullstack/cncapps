@@ -1,6 +1,37 @@
 <!-- Template: SalesOrderLineIcons.inc.html -->
-<A href="{urlAddLine}"><img align=middle border=0 hspace=2 src="images/icon_insert_row.png" alt="Add new line" title="Add new line"></A> 
-<A href="{urlDeleteLine}"><img align=middle border=0 hspace=2 src="images/icon_delete.png" alt="Delete line" title="Delete line" onClick="if(!confirm('Are you sure you want to remove {removeDescription}?')) return(false)"></A> 
-<A href="{urlMoveLineUp}"><img align=middle border=0 hspace=2 height=13 src="images/icon_up.png" alt="Move line up" title="Move line up"></A> 
-<A href="{urlMoveLineDown}"><img align=middle border=0 hspace=2 height=13 src="images/icon_down.png" alt="Move line down" title="Move line down"></A> 
+<A href="{urlAddLine}"><img align=middle
+                            border=0
+                            hspace=2
+                            src="images/icon_insert_row.png"
+                            alt="Add new line"
+                            title="Add new line"
+></A>
+<A href="{urlDeleteLine}"><img align=middle
+                               border=0
+                               hspace=2
+                               src="images/icon_delete.png"
+                               alt="Delete line"
+                               title="Delete line"
+                               onClick="if(!confirm('Are you sure you want to remove {removeDescription}?')) return(false)"
+></A>
+<A href="{urlMoveLineUp}"
+   class="{moveUpHidden}"
+><img align=middle
+      border=0
+      hspace=2
+      height=13
+      src="images/icon_up.png"
+      alt="Move line up"
+      title="Move line up"
+></A>
+<A href="{urlMoveLineDown}"
+   class="{moveDownHidden}"
+><img align=middle
+      border=0
+      hspace=2
+      height=13
+      src="images/icon_down.png"
+      alt="Move line down"
+      title="Move line down"
+></A>
 <!-- End Template: SalesOrderLineIcons.inc.html -->

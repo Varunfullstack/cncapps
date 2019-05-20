@@ -220,11 +220,14 @@ class DBEOrdline extends DBEntity
      */
     function moveRow($direction = 'UP')
     {
+        if($direction == 'UP'){
+            $this->setShowSQLOn();
+        }
         $this->setMethodName("moveRow");
-        if ($this->getValue(self::ordheadID) == '') {
+        if (!$this->getValue(self::ordheadID)) {
             $this->raiseError('ordheadID not set');
         }
-        if ($this->getValue(self::sequenceNo) == '') {
+        if ($this->getValue(self::sequenceNo) == null) {
             $this->setValue(
                 self::sequenceNo,
                 0

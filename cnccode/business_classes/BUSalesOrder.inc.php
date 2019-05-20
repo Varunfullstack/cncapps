@@ -1296,7 +1296,7 @@ class BUSalesOrder extends Business
         if (!$sequenceNo) {
             $this->raiseError('sequenceNo not passed');
         }
-        if ($sequenceNo == 1) {
+        if ($sequenceNo == 0) {
             return;
         }
         $dbeOrdline = new DBEOrdline($this);
@@ -1308,6 +1308,7 @@ class BUSalesOrder extends Business
             DBEOrdline::sequenceNo,
             $sequenceNo
         );
+        $dbeOrdline->setShowSQLOn();
         $dbeOrdline->moveRow('UP');
         $dbeOrdhead = new DBEOrdhead($this);
         $dbeOrdhead->setPKValue($ordheadID);
@@ -1321,7 +1322,7 @@ class BUSalesOrder extends Business
         if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
         }
-        if (!$sequenceNo) {
+        if ($sequenceNo == null) {
             $this->raiseError('sequenceNo not passed');
         }
         $dbeOrdline = new DBEOrdline($this);
