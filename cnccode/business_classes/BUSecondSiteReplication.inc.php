@@ -203,14 +203,9 @@ class BUSecondsiteReplication extends BUSecondsite
                                 $mostRecentFileTime = $fileModifyTime;
                                 $mostRecentFileName = $file;
                             }
-
-                            if ($fileModifyTime >= $timeToLookFrom) {
-                                $currentFileFound = true;
-                                break;      // got it
-                            }
                         }
 
-                        if (!$currentFileFound) {
+                        if (!$mostRecentFileTime >= $timeToLookFrom) {
 
                             $allServerImagesPassed = false;
 

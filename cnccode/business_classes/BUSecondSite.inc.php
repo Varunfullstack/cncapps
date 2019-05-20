@@ -265,22 +265,14 @@ class BUSecondsite extends Business
                         $mostRecentFileTime = 0;
 
                         foreach ($matchedFiles as $file) {
-
                             $fileModifyTime = filemtime($file);
 
                             if ($fileModifyTime > $mostRecentFileTime) {
                                 $mostRecentFileTime = $fileModifyTime;
                                 $mostRecentFileName = $file;
                             }
-
-                            if ($fileModifyTime >= $timeToLookFrom) {
-                                $currentFileFound = true;
-                                break;      // got it
-                            }
                         }
-
-
-                        if (!$currentFileFound) {
+                        if (!$mostRecentFileTime >= $timeToLookFrom) {
 
                             $allServerImagesPassed = false;
                             if (!$isSuspended) {
@@ -640,7 +632,7 @@ class BUSecondsite extends Business
      * Get the size of file, platform- and architecture-independant.
      * This function supports 32bit and 64bit architectures and works fith large files > 2 GB
      * The return value type depends on platform/architecture: (float) when PHP_INT_SIZE < 8 or (int) otherwise
-     * @param   resource $fp
+     * @param resource $fp
      * @return  mixed (int|float) File size on success or (bool) FALSE on error
      */
     function my_filesize($filepath)
