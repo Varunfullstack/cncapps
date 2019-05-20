@@ -263,31 +263,31 @@ class DBEHeader extends DBEntity
         );
         $this->addColumn(
             self::mailshot2FlagDesc,
-            DA_YN,
+            DA_TEXT,
             DA_NOT_NULL,
             "hed_mailflg2_desc"
         );
         $this->addColumn(
             self::mailshot3FlagDesc,
-            DA_YN,
+            DA_TEXT,
             DA_NOT_NULL,
             "hed_mailflg3_desc"
         );
         $this->addColumn(
             self::mailshot4FlagDesc,
-            DA_YN,
+            DA_STRING,
             DA_NOT_NULL,
             "hed_mailflg4_desc"
         );
         $this->addColumn(
             self::mailshot8FlagDesc,
-            DA_YN,
+            DA_STRING,
             DA_NOT_NULL,
             "hed_mailflg8_desc"
         );
         $this->addColumn(
             self::mailshot9FlagDesc,
-            DA_YN,
+            DA_STRING,
             DA_NOT_NULL,
             "hed_mailflg9_desc"
         );
