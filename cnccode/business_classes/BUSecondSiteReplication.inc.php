@@ -83,7 +83,7 @@ class BUSecondsiteReplication extends BUSecondsite
                     !$server['secondSiteReplicationPath'] OR
                     count($images) == 0
                 ) {
-                    $error = '2nd Site Replication Path Error Or No Images';
+                    $error = 'Offsite Backup Replication Path Error Or No Images';
                     if (!$isSuspended) {
                         $this->imageCount += count($images);
                         $this->serverErrorCount++;
@@ -337,7 +337,7 @@ class BUSecondsiteReplication extends BUSecondsite
 
         $body = $template->get_var('output');
 
-        $subject = '2nd Site configuration warning - ' . $server['cus_name'] . ' - ' . $server['serverName'];
+        $subject = 'Offsite Backup configuration warning - ' . $server['cus_name'] . ' - ' . $server['serverName'];
 
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $senderName = 'CNC Support Department';

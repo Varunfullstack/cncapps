@@ -867,7 +867,7 @@ class CTCustomerItem extends CTCNC
         $secondSiteLocationPathValidationText = '';
         if ($dsCustomerItem->getValue('secondsiteLocationPath')) {
             /*
-            validate 2nd site location path
+            validate Offsite backup location path
             */
             if (!file_exists($dsCustomerItem->getValue('secondsiteLocationPath'))) {
                 $secondSiteLocationPathValidationText = 'Location is not available';
@@ -1098,7 +1098,7 @@ class CTCustomerItem extends CTCNC
 
 
         /*
-        2nd Site Images
+        Offsite Backup Images
         */
         if ($_REQUEST['action'] != CTCUSTOMERITEM_ACT_ADD) {
 
@@ -1202,7 +1202,7 @@ class CTCustomerItem extends CTCNC
         }
 
         /*
-        end 2nd Site Images
+        end Offsite Backup Images
         */
 
         /*

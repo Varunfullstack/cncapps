@@ -142,7 +142,7 @@ class BUSecondsite extends Business
                     !$server['secondsiteLocationPath'] OR
                     count($images) == 0
                 ) {
-                    $error = '2nd Site Backup Path Error Or No Images';
+                    $error = 'Offsite Backup Path Error Or No Images';
                     if (!$isSuspended) {
                         $this->imageCount += count($images);
                         $this->serverErrorCount++;
@@ -594,7 +594,7 @@ class BUSecondsite extends Business
 
         $body = $template->get_var('output');
 
-        $subject = '2nd Site configuration warning - ' . $server['cus_name'] . ' - ' . $server['serverName'];
+        $subject = 'Offsite Site configuration warning - ' . $server['cus_name'] . ' - ' . $server['serverName'];
 
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $senderName = 'CNC Support Department';

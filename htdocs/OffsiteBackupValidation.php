@@ -170,10 +170,10 @@ $template->parse(
 );
 
 $html = $template->get_var('output');
-$subject = '2nd Site Backup Validation Completed';
+$subject = 'Offsite Backup Validation Completed';
 
 if ($testRun) {
-    $subject = '2nd Site Backup Test Run Completed';
+    $subject = 'Offsite Backup Test Run Completed';
 }
 
 

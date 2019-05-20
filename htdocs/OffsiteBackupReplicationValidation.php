@@ -136,10 +136,10 @@ $template->parse(
 );
 
 $html = $template->get_var('output');
-$subject = '2nd Site Replication Validation Completed';
+$subject = 'Offsite Backup Replication Validation Completed';
 
 if ($testRun) {
-    $subject = '2nd Site Replication Test Run Completed';
+    $subject = 'Offsite Backup Replication Test Run Completed';
 }
 
 
