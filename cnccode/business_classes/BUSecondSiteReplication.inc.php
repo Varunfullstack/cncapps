@@ -152,7 +152,7 @@ class BUSecondsiteReplication extends BUSecondsite
                         $pattern = '/' . $image['imageName'];
                     }
 
-                    $pattern .= '.*(-cd.spi|spf)$/i';
+                    $pattern .= '.*(-cd\.spi|spf|(?<!-c[w|m|r])\.spi)$/i';
 
                     $matchedFiles = self::preg_ls(
                         $networkPath,
@@ -203,14 +203,9 @@ class BUSecondsiteReplication extends BUSecondsite
                                 $mostRecentFileTime = $fileModifyTime;
                                 $mostRecentFileName = $file;
                             }
-
-                            if ($fileModifyTime >= $timeToLookFrom) {
-                                $currentFileFound = true;
-                                break;      // got it
-                            }
                         }
 
-                        if (!$currentFileFound) {
+                        if (!$mostRecentFileTime >= $timeToLookFrom) {
 
                             $allServerImagesPassed = false;
 

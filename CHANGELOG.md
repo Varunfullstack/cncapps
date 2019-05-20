@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 524 - Automated Request table field change
 - Issue 533 - PO Status Report v7
 - Issue 545 - Password level modification
+- Issue 560 - Offsite Backup Image Validation Process
 ### Fixed
 - Issue 551 - Contact Audit Log missing support level
 - Issue 552 - Contact Position field extension

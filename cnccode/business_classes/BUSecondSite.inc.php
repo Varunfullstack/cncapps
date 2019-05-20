@@ -222,7 +222,7 @@ class BUSecondsite extends Business
                         $pattern = '/' . $image['imageName'];
                     }
 
-                    $pattern .= '.*(-cd.spi|spf)$/i';
+                    $pattern .= '.*(-cd\.spi|spf|(?<!-c[w|m|r])\.spi)$/i';
 
                     $matchedFiles = self::preg_ls(
                         $networkPath,
@@ -237,10 +237,14 @@ class BUSecondsite extends Business
                             /*
                             No matching files of any date
                             */
-                            $missingImages[] = 'No file in ' . $networkPath . ' matches pattern: ' . $pattern;
+                            $missingImages[] = 'No file in ' . $networkPath . ' matches pattern: ' . htmlentities(
+                                    $pattern
+                                );
                             $missingLetters[] = $image['imageName'];
 
-                            $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': No file in ' . $networkPath . ' matches pattern: ' . $pattern;
+                            $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': No file in ' . $networkPath . ' matches pattern: ' . htmlentities(
+                                    $pattern
+                                );
 
                             $this->logMessage(
                                 $errorMessage,
@@ -251,8 +255,6 @@ class BUSecondsite extends Business
                                 $image['secondSiteImageID'],
                                 self::STATUS_IMAGE_NOT_FOUND
                             );
-
-                            echo $pattern . " NOT FOUND<br/>";
                         }
                     } else {
                         /*
@@ -265,22 +267,14 @@ class BUSecondsite extends Business
                         $mostRecentFileTime = 0;
 
                         foreach ($matchedFiles as $file) {
-
                             $fileModifyTime = filemtime($file);
 
                             if ($fileModifyTime > $mostRecentFileTime) {
                                 $mostRecentFileTime = $fileModifyTime;
                                 $mostRecentFileName = $file;
                             }
-
-                            if ($fileModifyTime >= $timeToLookFrom) {
-                                $currentFileFound = true;
-                                break;      // got it
-                            }
                         }
-
-
-                        if (!$currentFileFound) {
+                        if (!$mostRecentFileTime >= $timeToLookFrom) {
 
                             $allServerImagesPassed = false;
                             if (!$isSuspended) {
@@ -640,7 +634,7 @@ class BUSecondsite extends Business
      * Get the size of file, platform- and architecture-independant.
      * This function supports 32bit and 64bit architectures and works fith large files > 2 GB
      * The return value type depends on platform/architecture: (float) when PHP_INT_SIZE < 8 or (int) otherwise
-     * @param   resource $fp
+     * @param resource $fp
      * @return  mixed (int|float) File size on success or (bool) FALSE on error
      */
     function my_filesize($filepath)
