@@ -207,6 +207,7 @@ class DBESite extends DBCNCEntity
     /**
      * Return all rows from DB
      * @access public
+     * @param string $activeFlag
      * @return bool Success
      */
     function getRowsByCustomerID($activeFlag = 'Y')

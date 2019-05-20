@@ -796,11 +796,11 @@ class CTInvoice extends CTCNC
             $this->invoiceReprint(); //redisplay with errors
             exit;
         }
-        if ($this->dsPrintRange->getValue(BUInvoice::searchFormStartDate) .
+        if (!($this->dsPrintRange->getValue(BUInvoice::searchFormStartDate) .
             $this->dsPrintRange->getValue(BUInvoice::searchFormEndDate) .
             $this->dsPrintRange->getValue(BUInvoice::searchFormCustomerID) .
             $this->dsPrintRange->getValue(BUInvoice::searchFormStartInvheadID) .
-            $this->dsPrintRange->getValue(BUInvoice::searchFormEndInvheadID)
+            $this->dsPrintRange->getValue(BUInvoice::searchFormEndInvheadID))
         ) {
             $this->setFormErrorMessage('Please use parameters');
             $this->invoiceReprint(); //redisplay with errors
