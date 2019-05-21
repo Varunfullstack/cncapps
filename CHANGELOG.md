@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+- Issue 525 - Activity Search page, move the columns of "fix time", "activities" after "Fixed By"
+
 ## [v2.4.2] - 2019-04-12
 ### Fixed
 - Fix issue with duplicated emails in contacts.

@@ -902,7 +902,7 @@ class CTActivity extends CTCNC
             if ($dsSearchForm->getValue('status') == 'CHECKED_T_AND_M' ||
                 $dsSearchForm->getValue('status') == 'CHECKED_NON_T_AND_M') {
                 $weirdColumns = '<td class="listHeadText"><div style="width: 100px">SO</div></td>';
-                $headerColSpan = 10;
+                $headerColSpan = 12;
             }
 
             $this->template->set_var(
