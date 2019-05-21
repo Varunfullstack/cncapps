@@ -94,6 +94,22 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             'Shortest_SLA_Remaining'
         );
 
+
+        $buProblem->getSDDashBoardData(
+            $problems,
+            $limit,
+            'critical',
+            $isP5,
+            $showHelpDesk,
+            $showEscalation,
+            $showImplementation
+        );
+
+        $criticalSR = $this->renderQueue(
+            $problems,
+            'Critical_Service_Requests'
+        );
+
         $buProblem->getSDDashBoardData(
             $problems,
             $limit,
@@ -197,6 +213,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 "longestOpenSR"                    => $longestOpenSR,
                 "mostHoursLogged"                  => $mostHoursLogged,
                 "activitiesByXXEngineersInXXHours" => $activitiesByXXEngineersInXXHours,
+                "criticalServiceRequests"          => $criticalSR
             ]
         );
 
@@ -251,7 +268,6 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         }
 
         while ($problems->fetchNext()) {
-
             $rowCount++;
             $urlViewActivity =
                 Controller::buildLink(
