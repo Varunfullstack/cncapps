@@ -2889,6 +2889,11 @@ ORDER BY cus_name ASC  ";
 
         } // end foreach
 
+        $mainCount = 0;
+        $supervisorCount = 0;
+        $supportCount = 0;
+        $delegateCount = 0;
+        $totalCount = 0;
 
         while ($this->dsContact->fetchNext()) {
 
@@ -2915,6 +2920,27 @@ ORDER BY cus_name ASC  ";
                 $deleteContactLink = '';
                 $clientFormURL = '';
             } else {
+
+                if ($this->dsContact->getValue(DBEContact::supportLevel)) {
+
+                    switch ($this->dsContact->getValue(DBEContact::supportLevel)) {
+                        case 'main':
+                            $mainCount++;
+                            break;
+                        case 'supervisor':
+                            $supervisorCount++;
+                            break;
+                        case 'support':
+                            $supportCount++;
+                            break;
+                        case 'delegate':
+                            $delegateCount++;
+                            break;
+                    }
+                    $totalCount++;
+                }
+
+
                 $deleteContactURL =
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
@@ -3074,6 +3100,16 @@ ORDER BY cus_name ASC  ";
                     'customLetter1URL'                     => $customLetter1URL,
                     'deleteContactLink'                    => $deleteContactLink
                 )
+            );
+
+            $this->template->set_var(
+                [
+                    "mainCount"       => $mainCount,
+                    "supervisorCount" => $supervisorCount,
+                    "supportCount"    => $supportCount,
+                    "delegateCount"   => $delegateCount,
+                    "totalCount"      => $totalCount,
+                ]
             );
 
             $this->siteDropdown(
