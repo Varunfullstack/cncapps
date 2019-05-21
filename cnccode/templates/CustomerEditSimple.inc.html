@@ -76,7 +76,7 @@
         table-layout: fixed;
     }
 
-    .fixed_header tbody, thead {
+    .fixed_header tbody, .fixed_header thead {
         display: block;
     }
 
@@ -95,7 +95,7 @@
         overflow: hidden;
     }
 
-    .fixed_header td, th {
+    .fixed_header td, .fixed_header th {
         word-wrap: break-word;
     }
 
@@ -2611,9 +2611,34 @@
         <br/>
         <br/>
         <h3 style="clear: both;">Contacts</h3>
-        <div>
-            Main: {mainCount} Supervisor: {supervisorCount} Support: {supportCount} Delegate: {delegateCount} Total: {totalCount}
-        </div>
+        <table >
+            <thead style="font-size: small;">
+            <tr>
+                <th>
+                    Main
+                </th>
+                <th>
+                    Supervisor
+                </th>
+                <th>
+                    Support
+                </th>
+                <th>Delegate</th>
+                <th>Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    {mainCount}
+                </td>
+                <td>{supervisorCount}</td>
+                <td>{supportCount}</td>
+                <td>{delegateCount}</td>
+                <td>{totalCount}</td>
+            </tr>
+            </tbody>
+        </table>
         <div id="contactsTableErrors"
              style="display: none"
         >
