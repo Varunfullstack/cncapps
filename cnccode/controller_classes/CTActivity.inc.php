@@ -1381,50 +1381,57 @@ class CTActivity extends CTCNC
             )
         );
 
+
         // only allow include travel
-        $this->setSessionParam('includeTravel', 1);
         if (
-            $dsCallActivity->getValue(DBEJCallActivity::travelFlag) != 'Y' || !strstr(
+            $dsCallActivity->getValue('travelFlag') == 'Y' &&
+            strstr(
                 $_SERVER['HTTP_REFERER'],
                 'search'
             )
         ) {
-            if ($this->getParam('toggleIncludeTravel')) {
-                $this->setSessionParam('includeTravel', $this->getSessionParam('includeTravel'));
+
+            $_SESSION['includeTravel'] = 1;
+
+        } else {
+            if (isset($_REQUEST['toggleIncludeTravel'])) {
+                $_SESSION['includeTravel'] = !$_SESSION['includeTravel'];
             }
+
         }
 
-        $this->setSessionParam('includeOperationalTasks', 1);
         if (
-            $dsCallActivity->getValue(DBEJCallActivity::callActTypeID) != CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID
+            $dsCallActivity->getValue('callActTypeID') == CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID
         ) {
-            if ($this->getParam('toggleIncludeOperationalTasks')) {
-                $this->setSessionParam('includeOperationalTasks', !$this->getSessionParam('includeOperationalTasks'));
+
+            $_SESSION['includeOperationalTasks'] = 1;
+
+        } else {
+            if (isset($_REQUEST['toggleIncludeOperationalTasks'])) {
+                $_SESSION['includeOperationalTasks'] = !$_SESSION['includeOperationalTasks'];
             }
         }
-        $this->setSessionParam('includeServerGuardUpdates', 1);
+
 
         if (
-            $dsCallActivity->getValue(
-                DBEJCallActivity::callActTypeID
-            ) != CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID || !strstr(
+            $dsCallActivity->getValue('callActTypeID') == CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID &&
+            strstr(
                 $_SERVER['HTTP_REFERER'],
                 'search'
             )
         ) {
-            if ($this->getParam('toggleIncludeServerGuardUpdates')) {
-                $this->setSessionParam(
-                    'includeServerGuardUpdates',
-                    !$this->getSessionParam('includeServerGuardUpdates')
-                );
+            $_SESSION['includeServerGuardUpdates'] = 1;
+        } else {
+            if (isset($_REQUEST['toggleIncludeServerGuardUpdates'])) {
+                $_SESSION['includeServerGuardUpdates'] = !$_SESSION['includeServerGuardUpdates'];
             }
         }
 
-        if ($this->getParam('toggleContext')) {
-            if ($this->getSessionParam('context') == 'project') {
-                $this->setSessionParam('context', 'Problem');
+        if (isset($_REQUEST['toggleContext'])) {
+            if ($_SESSION['context'] == 'project') {
+                $_SESSION['context'] = 'Problem';
             } else {
-                $this->setSessionParam('context', 'project');
+                $_SESSION['context'] = 'project';
             }
         }
 
