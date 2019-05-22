@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [3.1.0]
 ### Added
 - Issue 519 - Windows 10 version EOL Build notifications
 - Issue 487 - Auto add time to SR when fixing and within XX minutes under budget
