@@ -898,18 +898,13 @@ class CTCustomerItem extends CTCNC
             if secondsiteLocalExcludeFlag is set to exclude this server from checks then disable all secondsite input fields
             */
             if ($dsCustomerItem->getValue('secondsiteLocalExcludeFlag') == 'Y') {
-
                 $secondsiteReadonly = CTCNC_HTML_READONLY;
-
                 $secondsiteDisabled = CTCNC_HTML_DISABLED;
             }
             if ($dsCustomerItem->getValue(DBECustomerItem::secondSiteReplicationExcludeFlag) == 'Y') {
-
                 $secondsiteReplicationReadonly = CTCNC_HTML_READONLY;
-
                 $secondsiteReplicationDisabled = CTCNC_HTML_DISABLED;
             }
-
         }
 
         $buUser = new BUUser($this);
@@ -1058,6 +1053,9 @@ class CTCustomerItem extends CTCNC
                 'secondsiteImageDelayDaysMessage'         => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage('secondsiteImageDelayDays')
                 ),
+                'offsiteBackupDelayDisable'               => ($this->dbeUser->getValue(
+                        DBEUser::offsiteBackupAdditionalPermissionsFlag
+                    ) == 'Y') ? 'true' : 'false',
                 'secondSiteLocationPathValidationText'    => $secondSiteLocationPathValidationText,
                 'secondSiteReplicationPathValidationText' => $secondSiteReplicationPathValidationText,
                 'secondsiteLocalExcludeFlagShow'          => $secondsiteLocalExcludeFlagShow,
@@ -1074,7 +1072,6 @@ class CTCustomerItem extends CTCNC
                 "secondsiteReplicationDisabled"           => $secondsiteReplicationDisabled,
             )
         );
-
         $this->template->set_block(
             'CustomerItemDisplay',
             'secondsiteImageDelayDaysBlock',
