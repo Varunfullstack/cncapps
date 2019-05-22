@@ -683,12 +683,17 @@ class CTHome extends CTCNC
         );
 
         $teamLevel = $this->buUser->getLevelByUserID($this->userID);
-
-        if ($teamLevel == 1) {
-            $targetLogPercentage = $this->dsHeader->getValue('hdTeamTargetLogPercentage');
-        } else {
-            $targetLogPercentage = $this->dsHeader->getValue('esTeamTargetLogPercentage');
-
+        $targetLogPercentage = 0;
+        switch ($teamLevel) {
+            case 1:
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::hdTeamTargetLogPercentage);
+                break;
+            case 2:
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::esTeamTargetLogPercentage);
+                break;
+            case 3:
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::imTeamTargetLogPercentage);
+                break;
         }
 
         /* Extract data and build report */
