@@ -490,6 +490,8 @@
 
         if (!backupPermission) {
             $('select#secondsiteImageDelayDays').attr("disabled", true);
+            $("input#secondsiteLocalExcludeFlag").attr('disabled', true);
+            $("input#secondSiteReplicationExcludeFlag").attr('disabled', true);
         }
 
 
