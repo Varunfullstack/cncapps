@@ -1384,28 +1384,23 @@ class CTActivity extends CTCNC
 
         // only allow include travel
         if (
-            $dsCallActivity->getValue('travelFlag') == 'Y' &&
+            $dsCallActivity->getValue(DBEJCallActivity::travelFlag) == 'Y' &&
             strstr(
                 $_SERVER['HTTP_REFERER'],
                 'search'
             )
         ) {
-
             $_SESSION['includeTravel'] = 1;
-
         } else {
             if (isset($_REQUEST['toggleIncludeTravel'])) {
                 $_SESSION['includeTravel'] = !$_SESSION['includeTravel'];
             }
-
         }
 
         if (
-            $dsCallActivity->getValue('callActTypeID') == CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID
+            $dsCallActivity->getValue(DBEJCallActivity::callActTypeID) == CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID
         ) {
-
             $_SESSION['includeOperationalTasks'] = 1;
-
         } else {
             if (isset($_REQUEST['toggleIncludeOperationalTasks'])) {
                 $_SESSION['includeOperationalTasks'] = !$_SESSION['includeOperationalTasks'];
@@ -1414,7 +1409,7 @@ class CTActivity extends CTCNC
 
 
         if (
-            $dsCallActivity->getValue('callActTypeID') == CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID &&
+            $dsCallActivity->getValue(DBEJCallActivity::callActTypeID) == CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID &&
             strstr(
                 $_SERVER['HTTP_REFERER'],
                 'search'
