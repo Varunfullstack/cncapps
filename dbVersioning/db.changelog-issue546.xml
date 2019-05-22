@@ -1,0 +1,35 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1558535906-0">
+        <tagDatabase tag="issue546"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1558535906-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(rootcause.`rtc_desc`) FROM rootcause WHERE rootcause.`rtc_rootcauseno` = 55
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            delete
+            from rootcause
+            where rootcause.`rtc_rootcauseno` = 55;
+        </sql>
+        <rollback>
+            <sql>
+                insert into rootcause
+                values (55, 'zNot in Use', 'Do not use this');
+            </sql>
+        </rollback>
+        <sql>
+            update problem
+            set problem.pro_rootcauseno = null
+            where problem.pro_rootcauseno = 55
+               or problem.pro_rootcauseno = 0
+               or problem.pro_rootcauseno = 9
+               or problem.pro_rootcauseno = 27
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 546 - Prevent zNot in Use root cause
+
 ## [v2.4.2] - 2019-04-12
 ### Fixed
 - Fix issue with duplicated emails in contacts.
