@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v2.4.3] - 2019-05-22
+### Fixed
+- Implementation team targets are not showing correctly for users on the home page
+
 ## [v2.4.2] - 2019-04-12
 ### Fixed
 - Fix issue with duplicated emails in contacts.
