@@ -124,11 +124,19 @@
 <div class="reportSection">
     <h2>Service Request Count</h2>
     <table class="collapse requestCount">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Raised Manually</th>
+            <th>Proactively Raised</th>
+        </tr>
+        </thead>
         <tbody>
         <!-- BEGIN userBlock -->
         <tr>
             <td>{srUserName}</td>
             <td>{srCount}</td>
+            <td>{srHiddenCount}</td>
         </tr>
         <!-- END userBlock -->
         </tbody>

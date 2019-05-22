@@ -286,8 +286,9 @@ class CTCustomerReviewMeeting extends CTCNC
 
                     $nonEditableTemplate->set_var(
                         array(
-                            'srUserName' => $row->name,
-                            'srCount'    => $row->count
+                            'srUserName'    => $row->name,
+                            'srCount'       => $row->count,
+                            'srHiddenCount' => $row->hiddenCount
                         )
                     );
 

@@ -21,6 +21,7 @@ This project changes will be shown here.
 - Issue 561 -  Asset List Export - show if disk is encrypted
 - Issue 525 - Activity Search page, move the columns of "fix time", "activities" after "Fixed By"
 - Issue 568 - Backup & Replication permissions
+- Issue 567 - Customer Review Meeting Agenda SR count
 ### Fixed
 - Issue 551 - Contact Audit Log missing support level
 - Issue 552 - Contact Position field extension
