@@ -577,10 +577,6 @@ class CTCustomerReviewMeeting extends CTCNC
 
 
         $html = $agendaTemplate->get_var('output');
-
-        $cssToInlineStyles = new \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles();
-        $html = $cssToInlineStyles->convert($html);
-
         try {
             $this->buCustomerReviewMeeting->generateAgendaPdf(
                 $_REQUEST['customerID'],

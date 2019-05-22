@@ -16,7 +16,6 @@
     .ul3 li {
         width: 33%;
         list-style-type: none;
-        float: left;
         display: inline-block;
     }
 </style>
@@ -43,8 +42,7 @@
                     '&parentDescField=customerString',
                     'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
             }
-        }
-        else {
+        } else {
             document.searchForm.customerID.value = "";
         }
     }
@@ -82,6 +80,8 @@
                         var thirdCol = 'table' + tableID;
                         tableID++;
 
+                        $(this).parent().append('<div style="clear: both"></div>');
+
                         var split1 = Math.ceil(rowCount / 3);
                         var remainder = rowCount - split1;
                         var split2 = Math.ceil(remainder / 2) + split1;
@@ -107,9 +107,11 @@
                     console.log(rowCount);
                     if (rowCount > 20) {
                         $(this).addClass('overflow').attr('id', 'table' + tableID);
+
                         var leftCol = 'table' + tableID;
                         tableID++;
                         $(this).clone().appendTo($(this).parent()).attr('id', 'table' + tableID);
+                        $(this).parent().append('<div style="clear: both"></div>');
                         var rightCol = 'table' + tableID;
                         tableID++;
 
@@ -139,7 +141,7 @@
             $('.reportSection').each(function () {
                 if ((height + $(this).outerHeight()) > 1305) {
                     //if adding the next section would cause it to spill onto a new page add in a page break and reset the height count
-                    $(this).prepend('<div class="pageBreak"></div>');
+                    $(this).addClass('newPage');
                     height = 0;
                 }
                 height += $(this).outerHeight();
@@ -206,7 +208,7 @@
 
     .collapse {
         padding: 0;
-        width:
+        width: 0;
     }
 
     .collapse li {
@@ -248,10 +250,9 @@
     }
 
     .reportSection {
-        float: left;
         width: 100%;
-        display: inline-block;
     }
+
     .reportSection.newPage {
         page-break-before: always;
     }
