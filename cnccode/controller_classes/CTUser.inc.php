@@ -624,27 +624,32 @@ class CTUser extends CTCNC
                         PHPLIB_PERM_RENEWALS
                     ) !== FALSE) ? CT_CHECKED : '',
 
-                'changeApproverFlagChecked'           => Controller::htmlChecked(
+                'changeApproverFlagChecked'                     => Controller::htmlChecked(
                     $dsUser->getValue('changeApproverFlag')
                 ),
-                'changeInitialDateAndTimeFlagChecked' => Controller::htmlChecked(
+                'changeInitialDateAndTimeFlagChecked'           => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::changeInitialDateAndTimeFlag)
                 ),
-                'excludeFromStatsFlagChecked'         => Controller::htmlChecked(
+                'excludeFromStatsFlagChecked'                   => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::excludeFromStatsFlag)
                 ),
-                'projectManagementFlagChecked'        => Controller::htmlChecked(
+                'projectManagementFlagChecked'                  => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::projectManagementFlag)
                 ),
-                'reportsChecked'                      => (strpos(
+                'offsiteBackupAdditionalPermissionsFlagChecked' => Controller::htmlChecked(
+                    $dsUser->getValue(DBEUser::offsiteBackupAdditionalPermissionsFlag)
+                ),
+                'reportsChecked'                                => (strpos(
                         $dsUser->getValue('perms'),
                         PHPLIB_PERM_REPORTS
                     ) !== FALSE) ? CT_CHECKED : '',
-                'teamMessage'                         => Controller::htmlDisplayText($dsUser->getMessage('teamID')),
-                'urlUpdate'                           => $urlUpdate,
-                'urlDelete'                           => $urlDelete,
-                'txtDelete'                           => $txtDelete,
-                'urlDisplayList'                      => $urlDisplayList,
+                'teamMessage'                                   => Controller::htmlDisplayText(
+                    $dsUser->getMessage('teamID')
+                ),
+                'urlUpdate'                                     => $urlUpdate,
+                'urlDelete'                                     => $urlDelete,
+                'txtDelete'                                     => $txtDelete,
+                'urlDisplayList'                                => $urlDisplayList,
 
             )
         );

@@ -62,6 +62,7 @@ class DBEUser extends DBEntity
     const passwordLevel = 'passwordLevel';
     const changeSRContractsFlag = 'changeSRContractsFlag';
     const starterLeaverQuestionManagementFlag = 'starterLeaverQuestionManagementFlag';
+    const offsiteBackupAdditionalPermissionsFlag = 'offsiteBackupAdditionalPermissionsFlag';
 
     /**
      * calls constructor()
@@ -351,6 +352,12 @@ class DBEUser extends DBEntity
 
         $this->addColumn(
             self::starterLeaverQuestionManagementFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::offsiteBackupAdditionalPermissionsFlag,
             DA_YN,
             DA_NOT_NULL
         );

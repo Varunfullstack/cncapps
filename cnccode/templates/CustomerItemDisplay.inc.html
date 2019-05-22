@@ -361,8 +361,7 @@
         <tr>
             <td class="promptText">Offsite Backup Image Check Delay Days</td>
             <td colspan="2">
-                <select
-                        {secondsiteDisabled}
+                <select {secondsiteDisabled}
                         {disabled}
                         id="secondsiteImageDelayDays"
                         name="customerItem[1][secondsiteImageDelayDays]"
@@ -487,6 +486,15 @@
 <script type="text/javascript">
     $(document).ready(function () {
 
+        const backupPermission = {offsiteBackupDelayDisable};
+
+        if (!backupPermission) {
+            $('select#secondsiteImageDelayDays').attr("disabled", true);
+            $("input#secondsiteLocalExcludeFlag").attr('disabled', true);
+            $("input#secondSiteReplicationExcludeFlag").attr('disabled', true);
+        }
+
+
         if ({secondsiteLocalExcludeFlagShow} == 0) {
             $("tr#secondsiteLocalExcludeFlag").hide();
         }
@@ -499,17 +507,17 @@
             if ($(this).is(':checked')) {
                 $('input#secondSiteValidationSuspendUntilDate,input#secondsiteServerDriveLetters,input#secondsiteLocationPath').attr("readonly", true);
                 $('select#secondsiteImageDelayDays').attr("disabled", true);
-            }
-            else {
+            } else {
                 $('input#secondSiteValidationSuspendUntilDate,input#secondsiteServerDriveLetters,input#secondsiteLocationPath').attr("readonly", false);
-                $('select#secondsiteImageDelayDays').attr("disabled", false);
+                if (backupPermission) {
+                    $('select#secondsiteImageDelayDays').attr("disabled", false);
+                }
             }
         });
         $("input#secondSiteReplicationExcludeFlag").click(function () {
             if ($(this).is(':checked')) {
                 $('input#secondSiteReplicationPath').attr("readonly", true);
-            }
-            else {
+            } else {
                 $('input#secondSiteReplicationPath').attr("readonly", false);
             }
         });
