@@ -17,6 +17,7 @@ This project changes will be shown here.
 - Issue 532 - Secondary LDAP server
 - Issue 529 - P5 default times when generated from Sales Order
 - Issue 564 - SD Manager Dashboard Show Critical SR
+- Issue 561 -  Asset List Export - show if disk is encrypted
 ### Fixed
 - Issue 551 - Contact Audit Log missing support level
 - Issue 552 - Contact Position field extension

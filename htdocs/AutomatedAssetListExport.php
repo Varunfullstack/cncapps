@@ -90,6 +90,7 @@ while ($dbeCustomer->fetchNext()) {
   cim_processorfamily.value AS \"CPU Type\",
   computers.totalmemory AS \"Memory\",
   SUM(drives.Size) AS \"Total Disk\",
+  if(exd.`Bitlocker Recovery Key` is not null and exd.`Bitlocker Recovery Key` <> '','Encrypted',null) as 'Drive Encryption',
   SUBSTRING_INDEX(
     computers.os,
     'Microsoft Windows ',
@@ -178,6 +179,8 @@ FROM
     ON (
       computers.VirusScanner = virusscanners.vscanid
     )
+  left join v_extradatacomputers exd
+  on (exd.computerid = computers.computerid)
     where clients.externalID = ? 
 GROUP BY computers.computerid 
 ORDER BY clients.name,
