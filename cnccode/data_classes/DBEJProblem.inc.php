@@ -702,6 +702,9 @@ class DBEJProblem extends DBEProblem
                     $sql .= ' order by hoursRemaining desc';
                     break;
                 }
+            case 'critical':
+                $sql .= " and  " . $this->getDBColumnName(self::criticalFlag) . " = 'Y' order by hoursRemaining desc ";
+                break;
         }
 
         $sql .= ' limit ' . $limit;
@@ -810,7 +813,8 @@ class DBEJProblem extends DBEProblem
 
     }
 
-    public function getOpenRowsByContactID($contactID) {
+    public function getOpenRowsByContactID($contactID)
+    {
         $sql =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .

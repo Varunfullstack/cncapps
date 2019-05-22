@@ -11150,7 +11150,6 @@ is currently a balance of ';
     )
     {
         $dbeJProblem = new DBEJProblem($this);
-
         $dbeJProblem->getDashBoardRows(
             $limit,
             $order,
