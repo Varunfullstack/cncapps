@@ -4679,7 +4679,10 @@ class CTActivity extends CTCNC
             exit;
         }
 
-        if ($dsCallActivity->getValue('callActTypeID') == 0) {                    //delete this activity
+        if (in_array(
+            $dsCallActivity->getValue(DBECallActivity::callActTypeID),
+            [0, 59]
+        )) {                    //delete this activity
 
             $this->buActivity->deleteCallActivity($_REQUEST['callActivityID']);
 

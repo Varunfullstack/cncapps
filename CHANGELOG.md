@@ -24,6 +24,7 @@ This project changes will be shown here.
 - Issue 552 - Contact Position field extension
 - Issue 554 - Block 'Work' Button for referred customers
 - Issue 526 - Special Attention Emails missing To field
+- Issue 566 - Change Request Cancel button doesn't delete activity if it's been autosaved already
 ### Removed
 - Issue 530 - Remove reference to faxing on generating a sales order
 
