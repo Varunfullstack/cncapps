@@ -102,6 +102,10 @@
     table.dataTable tfoot th {
         padding-right: 0 !important;
     }
+
+    td.red {
+        color: red;
+    }
 </style>
 <div class="reportDescription">
     This report breakdowns down the support contracts to show details about the ratio of supported users and servers.
@@ -117,6 +121,9 @@
         </th>
         <th>
             ServiceDesk Users
+        </th>
+        <th>
+            Supported Users
         </th>
         <th>
             ServiceDesk Contract
@@ -143,6 +150,7 @@
         <th></th>
         <th></th>
         <th style="text-align: right"></th>
+        <th style="text-align: right"></th>
         <th style="text-align:right">Total</th>
         <th style="text-align:right">Average</th>
         <th></th>
@@ -162,6 +170,9 @@
         </td>
         <td style="text-align:right">
             {serviceDeskUsers}
+        </td>
+        <td style="text-align:right" class="{moreThanExpectedClass}">
+            {supportedUsers}
         </td>
         <td style="text-align:right">
             £{serviceDeskContract}

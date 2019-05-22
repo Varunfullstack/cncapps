@@ -324,27 +324,16 @@ class CTCustomerReviewMeeting extends CTCNC
                 }
 
 
-                $mainContacts = $buCustomer->getMainSupportContacts($customerId);
-                $string = '';
-                for ($i = 0; $i < count($mainContacts); $i++) {
-                    if ($i > 0) {
-                        //we have to append the comma ..or the "and" if this is the last one
-                        if ($i === count($mainContacts) - 1) {
-                            $string .= ' and ';
-                        } else {
-                            $string .= ', ';
-                        }
-
-                    }
-
-                    $string .= $mainContacts[$i]['firstName'] . ' ' . $mainContacts[$i]['lastName'];
-
-                }
+                $supportedUsersData = $this->getSupportedUsersLevelsCount(
+                    $buContact,
+                    $customerId,
+                    $dsCustomer->getValue(DBECustomer::name)
+                );
 
 
                 $textTemplate->set_var(
                     'mainContacts',
-                    $string
+                    $supportedUsersData['data']
                 );
 
                 $buHeader = new BUHeader($this);
@@ -1088,7 +1077,12 @@ class CTCustomerReviewMeeting extends CTCNC
             $customerId
         );
 
-        $supportContacts = [];
+        $supportContacts = [
+            "main"       => [],
+            "supervisor" => [],
+            "support"    => [],
+            "delegate"   => []
+        ];
 
         $duplicates = [];
         $userMap = [];
@@ -1121,7 +1115,7 @@ class CTCustomerReviewMeeting extends CTCNC
             }
 
 
-            $supportContacts[] = [
+            $supportContacts[$dsSupportContact->getValue(DBEContact::supportLevel)][] = [
                 "firstName" => $firstName,
                 "lastName"  => $lastName
             ];
@@ -1214,14 +1208,186 @@ class CTCustomerReviewMeeting extends CTCNC
             );
 
         }
-        // we need to know how many contacts are there
-        $supportContactInfo = "";
-        for ($i = 0; $i < count($supportContacts); $i++) {
-            $supportContactInfo .= "<li>" . $supportContacts[$i]['firstName'] . ' ' . $supportContacts[$i]['lastName'] . "</li>";
+
+        $sectionTemplate = '<div style="clear: both;margin-bottom: 22px"></div><div style="font-weight: bold; font-size: small;text-align: left; ">{type} Contacts ({count})</div>
+    <br>
+    <ul class="ul3">
+        {contactData}
+    </ul>';
+
+        $toReturn = "";
+        foreach ($supportContacts as $type => $data) {
+
+            $contactsInfo = "";
+            foreach ($data as $contact) {
+                $contactsInfo .= "<li>" . $contact['firstName'] . ' ' . $contact['lastName'] . "</li>";
+            }
+            $currentSection = "" . $sectionTemplate;
+            $currentSection = str_replace('{type}', ucfirst($type), $currentSection);
+            $currentSection = str_replace('{count}', count($supportContacts[$type]), $currentSection);
+            $currentSection = str_replace('{contactData}', $contactsInfo, $currentSection);
+            $toReturn .= $currentSection;
         }
+
+        return [
+            "data"  => $toReturn,
+            "count" => count($supportContacts)
+        ];
+    }
+
+    private function getSupportedUsersLevelsCount(BUContact $buContact,
+                                                  $customerId,
+                                                  $customerName
+    )
+    {
+        /** @var DataSet $dsSupportContact */
+        $dsSupportContact = null;
+        $buContact->getSupportContacts(
+            $dsSupportContact,
+            $customerId
+        );
+
+        $supportContactsCounts = [
+            "main"       => 0,
+            "supervisor" => 0,
+            "support"    => 0,
+            "delegate"   => 0,
+            "total"      => 0
+        ];
+
+        $duplicates = [];
+        $userMap = [];
+
+        while ($dsSupportContact->fetchNext()) {
+
+            $firstName = $dsSupportContact->getValue('firstName');
+            $lastName = $dsSupportContact->getValue('lastName');
+            $userId = $dsSupportContact->getValue('contactID');
+            $key = strtolower($firstName . $lastName);
+            if (isset($userMap[$key])) {
+
+                if (!isset($duplicates[$userMap[$key]['id']])) {
+                    $duplicates[$userMap[$key]['id']] = $userMap[$key];
+                }
+
+                $duplicates[$userId] = [
+                    "firstName"  => $firstName,
+                    "lastName"   => $lastName,
+                    "id"         => $userId,
+                    "customerId" => $customerId
+                ];
+            } else {
+                $userMap[$key] = [
+                    "firstName"  => $firstName,
+                    "lastName"   => $lastName,
+                    "id"         => $userId,
+                    "customerId" => $customerId
+                ];
+            }
+
+
+            $supportContactsCounts[$dsSupportContact->getValue(DBEContact::supportLevel)]++;
+            $supportContactsCounts['total']++;
+        }
+
+        if (count($duplicates)) {
+            // send email to sales@cnc-ltd.co.uk with the list of duplicates
+            $buMail = new BUMail($this);
+
+            $senderEmail = CONFIG_SUPPORT_EMAIL;
+
+            $senderName = 'CNC Support Department';
+
+            $toEmail = 'sales@cnc-ltd.co.uk';
+
+            $template = new Template(
+                $GLOBALS ["cfg"]["path_templates"],
+                "remove"
+            );
+            $template->set_file(
+                'page',
+                'CustomerReviewMeetingContactDuplicates.html'
+            );
+
+            $template->set_var(
+                'customerName',
+                $customerName
+            );
+
+            $template->set_block(
+                'page',
+                'contactBlock',
+                'contacts'
+            );
+
+            foreach ($duplicates as $key => $row) {
+
+                $template->set_var(
+                    array(
+                        'contactID'        => $row['id'],
+                        'contactFirstName' => $row['firstName'],
+                        'contactLastName'  => $row['lastName'],
+
+                    )
+                );
+
+                $template->parse(
+                    'contacts',
+                    'contactBlock',
+                    true
+                );
+            }
+
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
+
+            $body = $template->get_var('output');
+
+            $subject = 'Possible duplicated customer contacts';
+
+            $hdrs = array(
+                'From'         => $senderEmail,
+                'Subject'      => $subject,
+                'Date'         => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            $buMail->mime->setHTMLBody($body);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
+            );
+            $body = $buMail->mime->get($mime_params);
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->putInQueue(
+                $senderEmail,
+                $toEmail,
+                $hdrs,
+                $body,
+                true
+            );
+
+        }
+
+        $supportContactInfo = "<table><thead><tr><th>Type</th><th>Qty</th></tr></thead><tbody>";
+        $supportContactInfo .= "<tr><td>Main</td><td>$supportContactsCounts[main]</td></tr>";
+        $supportContactInfo .= "<tr><td>Supervisor</td><td>$supportContactsCounts[supervisor]</td></tr>";
+        $supportContactInfo .= "<tr><td>Support</td><td>$supportContactsCounts[support]</td></tr>";
+        $supportContactInfo .= "<tr><td>Delegate</td><td>$supportContactsCounts[delegate]</td></tr>";
+        $supportContactInfo .= "<tr><td>Total</td><td>$supportContactsCounts[total]</td></tr>";
+        $supportContactInfo .= "</tbody></table>";
+
         return [
             "data"  => $supportContactInfo,
-            "count" => count($supportContacts)
+            "count" => $supportContactsCounts['total']
         ];
     }
 

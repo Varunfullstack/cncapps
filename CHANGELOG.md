@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Added
 - Issue 519 - Windows 10 version EOL Build notifications
 - Issue 487 - Auto add time to SR when fixing and within XX minutes under budget
+- Issue 515 - Report showing contacts with support & on the contract
 ### Changed
 - Issue 531 - Create configuration settings for the new Design Environment 
 - Issue 524 - Automated Request table field change
