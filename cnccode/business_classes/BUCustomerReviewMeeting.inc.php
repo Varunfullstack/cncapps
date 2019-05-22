@@ -298,34 +298,6 @@ class BUCustomerReviewMeeting extends Business
 
         $reviewMeetingFolderPath = $documentFolderPath . '/Review Meetings';
 
-        $template = new Template (
-            $GLOBALS ["cfg"] ["path_templates"],
-            "remove"
-        );
-
-        /*
-        Template with html head etc
-        */
-        $template->set_file(
-            'page',
-            'CustomerReviewMeetingAgendaDocument.inc.html'
-        );
-
-        $template->set_var(
-            [
-                'htmlBody' => $htmlBody,
-                //                "waterMarkURL" => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png'
-            ]
-        );
-
-        $template->parse(
-            'output',
-            'page',
-            true
-        );
-
-        $htmlPage = $template->get_var('output');
-
         @mkdir(
             $reviewMeetingFolderPath,
             '0777',
@@ -339,7 +311,7 @@ class BUCustomerReviewMeeting extends Business
 
         file_put_contents(
             $tempFilePath,
-            $htmlPage
+            $htmlBody
         );
 
         $meetingDate = new \DateTime($meetingDate);
@@ -375,7 +347,7 @@ class BUCustomerReviewMeeting extends Business
 //            unlink($tempFilePath);
             throw new Exception(json_encode($_error));
         } else {
-            unlink($tempFilePath);
+//            unlink($tempFilePath);
             return true;
         }
     }
