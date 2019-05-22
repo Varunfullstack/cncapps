@@ -18,6 +18,7 @@ This project changes will be shown here.
 - Issue 529 - P5 default times when generated from Sales Order
 - Issue 564 - SD Manager Dashboard Show Critical SR
 - Issue 561 -  Asset List Export - show if disk is encrypted
+- Issue 525 - Activity Search page, move the columns of "fix time", "activities" after "Fixed By"
 ### Fixed
 - Issue 551 - Contact Audit Log missing support level
 - Issue 552 - Contact Position field extension
