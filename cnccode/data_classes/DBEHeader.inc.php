@@ -90,6 +90,7 @@ class DBEHeader extends DBEntity
     const SDDashboardEngineersInSREngineersMaxCount = "SDDashboardEngineersInSREngineersMaxCount";
     const projectCommenceNotification = "projectCommenceNotification";
     const OSSupportDatesThresholdDays = "OSSupportDatesThresholdDays";
+    const closingSRBufferMinutes = "closingSRBufferMinutes";
 
     /**
      * calls constructor()
@@ -536,6 +537,12 @@ class DBEHeader extends DBEntity
 
         $this->addColumn(
             self::OSSupportDatesThresholdDays,
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::closingSRBufferMinutes,
             DA_INTEGER,
             DA_NOT_NULL
         );

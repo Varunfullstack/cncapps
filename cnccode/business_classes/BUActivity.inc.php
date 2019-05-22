@@ -8889,13 +8889,14 @@ is currently a balance of ';
      * @param $rootCauseID
      * @param $resolutionSummary
      * @return bool
+     * @throws Exception
      */
     function setProblemToFixed(
         $problemID,
-        $fixedUserID,
-        $contractCustomerItemID,
-        $rootCauseID,
-        $resolutionSummary
+        $fixedUserID = null,
+        $contractCustomerItemID = null,
+        $rootCauseID = null,
+        $resolutionSummary = null
     )
     {
         /*
@@ -8914,6 +8915,35 @@ is currently a balance of ';
         if (!$fixedUserID) {
             $fixedUserID = $this->loggedInUserID;
         }
+
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRow($fixedUserID);
+
+
+        $closingUserTeamID = $dbeUser->getValue(DBEUser::teamID);
+        $minutesToAdd = $this->dsHeader->getValue(DBEHeader::closingSRBufferMinutes);
+
+
+        switch ($closingUserTeamID) {
+            case 1:
+                $dbeProblem->setValue(
+                    DBEProblem::hdLimitMinutes,
+                    $dbeProblem->getValue(DBEProblem::hdLimitMinutes) + $minutesToAdd
+                );
+                break;
+            case 2:
+                $dbeProblem->setValue(
+                    DBEProblem::esLimitMinutes,
+                    $dbeProblem->getValue(DBEProblem::esLimitMinutes) + $minutesToAdd
+                );
+                break;
+            case 4:
+                $dbeProblem->setValue(
+                    DBEProblem::imLimitMinutes,
+                    $dbeProblem->getValue(DBEProblem::imLimitMinutes) + $minutesToAdd
+                );
+        }
+
 
         $dbeProblem->setValue(
             DBEJProblem::fixedUserID,

@@ -278,6 +278,21 @@
         </tr>
 
         <tr>
+            <td class="promptText">Closing SR Buffer Minutes</td>
+            <td class="field">
+                <input {DISABLED}
+                       required
+                       type="number"
+                       title="Time added to the team of the closing engineer"
+                       name="header[1][closingSRBufferMinutes]"
+                       value="{closingSRBufferMinutes}"
+                       size="5"
+                       maxlength="5"
+                > <span class="formErrorMessage">{closingSRBufferMinutesMessage}</span>
+            </td>
+        </tr>
+
+        <tr>
             <td class="promptText">Helpdesk Team SR Default Limit Minutes</td>
             <td class="field">
                 <input
@@ -880,7 +895,8 @@
                                          {DISABLED}
                                          type="checkbox"
                                          value="Y"
-                                         {mailshot9FlagDefChecked}></td>
+                                         {mailshot9FlagDefChecked}
+            ></td>
         </tr>
         <tr>
             <td class="promptText">11</td>
