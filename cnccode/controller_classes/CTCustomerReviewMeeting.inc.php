@@ -159,8 +159,10 @@ class CTCustomerReviewMeeting extends CTCNC
                 );
 
                 $nonEditableTemplate->set_var(
-                    "supportContactInfo",
-                    $supportedUsersData['data']
+                    [
+                        "supportContactInfo" => $supportedUsersData['data'],
+                        "supportUsersCount"  => $supportedUsersData['count']
+                    ]
                 );
 
                 $contractsTemplate = new Template (
@@ -1087,7 +1089,7 @@ class CTCustomerReviewMeeting extends CTCNC
 
         $duplicates = [];
         $userMap = [];
-
+        $count = 0;
         while ($dsSupportContact->fetchNext()) {
 
             $firstName = $dsSupportContact->getValue('firstName');
@@ -1120,6 +1122,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 "firstName" => $firstName,
                 "lastName"  => $lastName
             ];
+            $count++;
         }
 
         if (count($duplicates)) {
@@ -1232,7 +1235,7 @@ class CTCustomerReviewMeeting extends CTCNC
 
         return [
             "data"  => $toReturn,
-            "count" => count($supportContacts)
+            "count" => $count
         ];
     }
 

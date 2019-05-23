@@ -219,7 +219,7 @@ ORDER BY clients.name,
             'A2'
         );
 
-        $sheet->getStyle("A1:S1")->getFont()->setBold(true);
+        $sheet->getStyle("A1:T1")->getFont()->setBold(true);
 
         $sheet->setAutoFilter(
             $sheet->calculateWorksheetDimension()
@@ -245,7 +245,7 @@ ORDER BY clients.name,
             }
 
             if ($color) {
-                $sheet->getStyle("A$currentRow:S$currentRow")
+                $sheet->getStyle("A$currentRow:T$currentRow")
                     ->getFill()
                     ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                     ->getStartColor()

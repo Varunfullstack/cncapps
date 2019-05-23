@@ -67,7 +67,7 @@
 
             $('.reportSection table').each(function () {
                 if (!$(this).hasClass('overflow') && !$(this).hasClass('thirdTable')) {
-                    var rowCount = $('tr', $(this)).length;
+                    var rowCount = $('tbody tr', $(this)).length;
                     console.log(rowCount);
                     if (rowCount > 50) {
                         $(this).addClass('thirdTable').attr('id', 'table' + tableID);
@@ -79,7 +79,6 @@
                         $(this).clone().appendTo($(this).parent()).attr('id', 'table' + tableID);
                         var thirdCol = 'table' + tableID;
                         tableID++;
-
                         $(this).parent().append('<div style="clear: both"></div>');
 
                         var split1 = Math.ceil(rowCount / 3);
@@ -91,19 +90,18 @@
                         console.log('split2:' + split2);
 
                         remainder = remainder - split2;
-                        $("tr:gt(" + (split1 - 1) + ")", '#' + firstCol).remove();
+                        $("tbody tr:gt(" + (split1 - 1) + ")", '#' + firstCol).remove();
                         //First remove the final 3rd then the first third
-                        $("tr:gt(" + (split2 - 1) + ")", '#' + secondCol).remove();
-                        $("tr:lt(" + split1 + ")", '#' + secondCol).remove();
-
-                        $("tr:lt(" + (split2) + ")", '#' + thirdCol).remove();
+                        $("tbody tr:gt(" + (split2 - 1) + ")", '#' + secondCol).remove();
+                        $("tbody tr:lt(" + split1 + ")", '#' + secondCol).remove();
+                        $("tobdy tr:lt(" + (split2) + ")", '#' + thirdCol).remove();
                     }
                 }
             })
 
             $('.reportSection table').each(function () {
                 if (!$(this).hasClass('overflow') && !$(this).hasClass('thirdTable')) {
-                    var rowCount = $('tr', $(this)).length;
+                    var rowCount = $('tbody tr', $(this)).length;
                     console.log(rowCount);
                     if (rowCount > 20) {
                         $(this).addClass('overflow').attr('id', 'table' + tableID);
@@ -117,8 +115,8 @@
 
                         var split = Math.floor(rowCount / 2);
                         console.log('split: ' + split);
-                        $("tr:lt(" + (split + 1) + ")", '#' + leftCol).remove();
-                        $("tr:gt(" + split + ")", '#' + rightCol).remove();
+                        $("tbody tr:lt(" + (split + 1) + ")", '#' + leftCol).remove();
+                        $("tbody tr:gt(" + split + ")", '#' + rightCol).remove();
                     }
                 }
             })
