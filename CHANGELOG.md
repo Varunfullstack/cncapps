@@ -18,7 +18,7 @@ This project changes will be shown here.
 - Archived passwords not observing access levels
 - Saving contacts when there are duplicate email addresses transposes the email onto other contacts. See attached video.
 - Emails from quote reminders are stuck in the queue.
-### Changed
+### Changed 
 - LDAP config
 
 ## [v2.4.0] - 2019-03-27
