@@ -9,10 +9,10 @@ require_once($cfg["path_gc"] . "/Business.inc.php");
 /*
  * PEAR Mail classes
  */
-require_once("Mail.php");
-require_once("Mail/mime.php");
-require_once("Mail/smtp.php");
-require_once("Mail/Queue.php");
+require_once(__DIR__ . "/../../php/PEAR/Mail.php");
+require_once(__DIR__ . "/../../php/PEAR/Mail/smtp.php");
+require_once(__DIR__ . "/../../php/PEAR/Mail/mime.php");
+require_once(__DIR__ . "/../../php/PEAR/Mail/Queue.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
 class BUMail extends Business
@@ -20,12 +20,10 @@ class BUMail extends Business
 
     const SECONDS_DELAY_UNTIL_SEND = 1;
     const DELETE_AFTER_SEND = 1;
-    const MAIL_QUEUE_SEND_LIMIT = 30;
+    const MAIL_QUEUE_SEND_LIMIT = 20;
     const MAIL_QUEUE_TRY_LIMIT = 5;
 
-    private $crlf = "\n";
     private $mailQueue;
-    private $mailQueueSendLimit;
     public $mime;
     private $buUser;
 
@@ -37,10 +35,9 @@ class BUMail extends Business
         parent::__construct($owner);
 
         $this->mime = new Mail_Mime;
-
         $this->mailQueue = new Mail_Queue (
-            $GLOBALS ['db_options'],
-            $GLOBALS ['mail_options']
+            $GLOBALS['db_options'],
+            $GLOBALS['mail_options']
         );
 
         $this->buUser = new BUUser($this);
@@ -52,17 +49,18 @@ class BUMail extends Business
      * @param mixed $toEmail
      * @param mixed $headers
      * @param mixed $body
-     * @param mixed $sendToSdManagerRecipients
      * @return mixed
      */
     public function send(
         $toEmail,
         $headers,
-        $body,
-        $sendToSdManagerRecipients = false      // obsolete
+        $body
     )
     {
-        $parameters = $this->prepareMessage($toEmail, $headers);
+        $parameters = $this->prepareMessage(
+            $toEmail,
+            $headers
+        );
 
         $mail = new Mail_smtp(
             $GLOBALS ['mail_options']
@@ -73,7 +71,6 @@ class BUMail extends Business
             $parameters['headers'],
             $body
         );
-
         return $sent;
     }
 
@@ -81,13 +78,13 @@ class BUMail extends Business
         $fromEmail,
         $toEmail,
         $headers,
-        $body,
-        $sendToSdManagerRecipients = false
+        $body
     )
     {
-        $userID = false; // initialise
-
-        $parameters = $this->prepareMessage($toEmail, $headers);
+        $parameters = $this->prepareMessage(
+            $toEmail,
+            $headers
+        );
 
         return $this->mailQueue->put(
             $fromEmail,
@@ -101,7 +98,9 @@ class BUMail extends Business
 
     }
 
-    private function prepareMessage($toEmail, $headers)
+    private function prepareMessage($toEmail,
+                                    $headers
+    )
     {
         /*
         if we are not in live environment then send to test account but append list of
@@ -110,18 +109,15 @@ class BUMail extends Business
         if ($GLOBALS ['server_type'] != MAIN_CONFIG_SERVER_TYPE_LIVE) {
             $headers['Subject'] = $headers['Subject'] . ' | Emails to: ' . $toEmail;
             $toEmail = CONFIG_TEST_EMAIL;
-
         }
 
-        if (!$userID && isset($GLOBALS ['auth'])) {
+        $userID = 0;
+        if (isset($GLOBALS ['auth'])) {
             $userID = ( string )$GLOBALS ['auth']->is_authenticated();
-        } else {
-            $userID = 0;
         }
-
         return
             array(
-                'userID' => $userID,
+                'userID'  => $userID,
                 'toEmail' => $toEmail,
                 'headers' => $headers
             );
@@ -130,19 +126,18 @@ class BUMail extends Business
 
     public function sendQueue()
     {
-        /*
-        reset sending field if started sending time older than 15 minutes
-        */
-        $sql =
-            "UPDATE
-          mail_queue
-        SET
-          time_started_sending = '0000-00-00 00:00:00'
-        WHERE
-          time_started_sending < DATE_SUB( NOW(), INTERVAL 15 MINUTE )";
+//        /*
+//        reset sending field if started sending time older than 15 minutes
+//        */
+//        $sql =
+//            "UPDATE
+//          mail_queue
+//        SET
+//          time_started_sending = null
+//        WHERE
+//          time_started_sending < DATE_SUB( NOW(), INTERVAL 15 MINUTE )";
 
-        $this->db->query($sql);
-
+//        $this->db->query($sql);
         return $this->mailQueue->sendMailsInQueue(
             self::MAIL_QUEUE_SEND_LIMIT,
             0,
@@ -156,7 +151,6 @@ class BUMail extends Business
     public function mailqueueCallBackBeforeSend($args)
     {
         $mailId = $args['id'];
-
         $sql =
             "SELECT
         time_started_sending
@@ -164,14 +158,11 @@ class BUMail extends Business
         mail_queue
       WHERE
         id = $mailId";
-
+        $this->db->commit();
         $result = $this->db->query($sql);
-
         $row = $result->fetch_object();
-
         $ret = false;
-
-        if ($row->time_started_sending == '0000-00-00 00:00:00') {
+        if (!$row->time_started_sending) {
             $ret = true;
             /*
             Set is_sending flag
@@ -185,6 +176,7 @@ class BUMail extends Business
           id = $mailId";
 
             $this->db->query($sql);
+            $this->db->commit();
         }
         return $ret;
     }
@@ -204,11 +196,12 @@ class BUMail extends Business
             "UPDATE
         mail_queue
       SET
-        time_started_sending = '0000-00-00 00:00:00'
+        time_started_sending = null
       WHERE
         id = $mailId";
 
         $this->db->query($sql);
+        $this->db->commit();
     }
 }
 

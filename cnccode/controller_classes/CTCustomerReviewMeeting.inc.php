@@ -49,10 +49,11 @@ class CTCustomerReviewMeeting extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             case 'generatePdf':
                 echo json_encode($this->generatePdf());
@@ -64,18 +65,18 @@ class CTCustomerReviewMeeting extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function search()
     {
-        global $cfg;
-
         $this->setMethodName('search');
-
         $dsSearchForm = new DSForm ($this);
-        $dsResults = new DataSet ($this);
-
         $this->buCustomerReviewMeeting->initialiseSearchForm($dsSearchForm);
         $this->setTemplateFiles(array('CustomerReviewMeeting' => 'CustomerReviewMeeting.inc'));
-
+        $graphData = null;
+        $editableText = null;
+        $nonEditableText = null;
         if (isset($_REQUEST ['searchForm'])) {
 
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
@@ -83,16 +84,14 @@ class CTCustomerReviewMeeting extends CTCNC
             } else {
                 $startDate = (DateTime::createFromFormat(
                     "m/Y",
-                    $dsSearchForm->getValue('startYearMonth')
+                    $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormStartYearMonth)
                 ))->modify('first day of this month ');
                 $endDate = (DateTime::createFromFormat(
                     "m/Y",
-                    $dsSearchForm->getValue('endYearMonth')
+                    $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormEndYearMonth)
                 ))->modify('last day of this month');
 
-                $customerId = $dsSearchForm->getValue('customerID');
-                $buCustomerItem = new BUCustomerItem($this);
-
+                $customerId = $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID);
                 $buCustomer = new BUCustomer($this);
                 $buActivity = new BUActivity($this);
 
@@ -102,11 +101,11 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $buContact = new BUContact($this);
 
-                /** @var DBECustomer $dsCustomer */
+                /** @var DBECustomer|DataSet $dsCustomer */
                 $dsCustomer = null;
 
                 $buCustomer->getCustomerByID(
-                    $dsSearchForm->getValue('customerID'),
+                    $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID),
                     $dsCustomer
                 );
 
@@ -136,7 +135,9 @@ class CTCustomerReviewMeeting extends CTCNC
                 $nonEditableTemplate->set_var(
                     array(
                         'customerName' => $dsCustomer->getValue(DBECustomer::name),
-                        'meetingDate'  => self::dateYMDtoDMY($dsSearchForm->getValue('meetingDate')),
+                        'meetingDate'  => self::dateYMDtoDMY(
+                            $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormMeetingDate)
+                        ),
                         'slaP1'        => $dsCustomer->getValue(DBECustomer::slaP1),
                         'slaP2'        => $dsCustomer->getValue(DBECustomer::slaP2),
                         'slaP3'        => $dsCustomer->getValue(DBECustomer::slaP3),
@@ -147,7 +148,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 );
 
                 $results = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
-                    $dsSearchForm->getValue('customerID'),
+                    $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID),
                     $startDate,
                     $endDate
                 );
@@ -202,7 +203,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 );
                 $textTemplate->set_var(
                     '24HourFlag',
-                    $dsCustomer->getValue("support24HourFlag") == 'N' ? "Do you require 24x7 cover?" : null
+                    $dsCustomer->getValue(DBECustomer::support24HourFlag) == 'N' ? "Do you require 24x7 cover?" : null
                 );
                 $textTemplate->set_var(
                     'p1Incidents',
@@ -229,9 +230,9 @@ class CTCustomerReviewMeeting extends CTCNC
                     'managementReviewBlock',
                     'reviews'
                 );
-
+                $dsReviews = new DataSet($this);
                 $buActivity->getManagementReviewsInPeriod(
-                    $dsSearchForm->getValue('customerID'),
+                    $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID),
                     $startDate,
                     $endDate,
                     $dsReviews
@@ -248,17 +249,17 @@ class CTCustomerReviewMeeting extends CTCNC
                             'Activity.php',
                             array(
                                 'action'    => 'displayLastActivity',
-                                'problemID' => $dsReviews->getValue('problemID')
+                                'problemID' => $dsReviews->getValue(DBEProblem::problemID)
                             )
                         );
 
                     $textTemplate->set_var(
                         array(
                             'reviewHeading'        => 'Review Item ' . $itemNo . '. SR no ' . $dsReviews->getValue(
-                                    'problemID'
+                                    DBEProblem::problemID
                                 ),
                             'urlServiceRequest'    => $urlServiceRequest,
-                            'managementReviewText' => $dsReviews->getValue('managementReviewReason'),
+                            'managementReviewText' => $dsReviews->getValue(DBEProblem::managementReviewReason),
                         )
                     );
 
@@ -272,7 +273,9 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $buServiceDeskReport->setStartPeriod($startDate);
                 $buServiceDeskReport->setEndPeriod($endDate);
-                $buServiceDeskReport->customerID = $dsSearchForm->getValue('customerID');
+                $buServiceDeskReport->customerID = $dsSearchForm->getValue(
+                    BUCustomerReviewMeeting::searchFormCustomerID
+                );
 
                 $srCountByUser = $buServiceDeskReport->getIncidentsGroupedByUser();
 
@@ -334,11 +337,8 @@ class CTCustomerReviewMeeting extends CTCNC
                         } else {
                             $string .= ', ';
                         }
-
                     }
-
                     $string .= $mainContacts[$i]['firstName'] . ' ' . $mainContacts[$i]['lastName'];
-
                 }
 
 
@@ -348,6 +348,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 );
 
                 $buHeader = new BUHeader($this);
+                $dsHeader = new DataSet($this);
                 $buHeader->getHeader($dsHeader);
                 $textTemplate->set_var(
                     'customerReviewMeetingText',
@@ -377,25 +378,25 @@ class CTCustomerReviewMeeting extends CTCNC
             }
 
         } else {
-            if ($_REQUEST['customerID']) {
+            if ($this->getParam('customerID')) {
                 $dsSearchForm->setValue(
-                    'customerID',
-                    $_REQUEST['customerID']
+                    BUCustomerReviewMeeting::searchFormCustomerID,
+                    $this->getParam('customerID')
                 );
                 $dsSearchForm->setValue(
-                    'startYearMonth',
-                    $_REQUEST['startYearMonth']
+                    BUCustomerReviewMeeting::searchFormStartYearMonth,
+                    $this->getParam('startYearMonth')
                 );
                 $dsSearchForm->setValue(
-                    'endYearMonth',
-                    $_REQUEST['endYearMonth']
+                    BUCustomerReviewMeeting::searchFormEndYearMonth,
+                    $this->getParam('endYearMonth')
                 );
                 $dsSearchForm->setValue(
-                    'meetingDate',
-                    $_REQUEST['meetingDateYmd']
+                    BUCustomerReviewMeeting::searchFormMeetingDate,
+                    $this->getParam('meetingDateYmd')
                 );
-                $nonEditableText = $_REQUEST['nonEditableText'];
-                $editableText = $_REQUEST['editableText'];
+                $nonEditableText = $this->getParam('nonEditableText');
+                $editableText = $this->getParam('editableText');
 
             }
         }
@@ -422,32 +423,34 @@ class CTCustomerReviewMeeting extends CTCNC
             );
 
         $this->setPageTitle('Customer Review Meeting Agenda');
-
-        if ($dsSearchForm->getValue('customerID') != 0) {
+        $customerString = null;
+        if ($dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID) != 0) {
             $buCustomer = new BUCustomer ($this);
             $buCustomer->getCustomerByID(
-                $dsSearchForm->getValue('customerID'),
+                $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID),
                 $dsCustomer
             );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
-        echo "<script> var graphData = " . json_encode(
+        echo "<script> let graphData = " . json_encode(
                 $graphData,
                 JSON_NUMERIC_CHECK
             ) . "</script>";
 
         $this->template->set_var(
             array(
-                'customerID'            => $dsSearchForm->getValue('customerID'),
-                'customerIDMessage'     => $dsSearchForm->getMessage('customerID'),
+                'customerID'            => $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID),
+                'customerIDMessage'     => $dsSearchForm->getMessage(BUCustomerReviewMeeting::searchFormCustomerID),
                 'customerString'        => $customerString,
-                'startYearMonth'        => $dsSearchForm->getValue('startYearMonth'),
-                'startYearMonthMessage' => $dsSearchForm->getMessage('startYearMonth'),
-                'endYearMonth'          => $dsSearchForm->getValue('endYearMonth'),
-                'endYearMonthMessage'   => $dsSearchForm->getMessage('endYearMonth'),
-                'meetingDate'           => self::dateYMDtoDMY($dsSearchForm->getValue('meetingDate')),
-                'meetingDateYmd'        => $dsSearchForm->getValue('meetingDate'),
+                'startYearMonth'        => $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormStartYearMonth),
+                'startYearMonthMessage' => $dsSearchForm->getMessage(BUCustomerReviewMeeting::searchFormStartYearMonth),
+                'endYearMonth'          => $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormEndYearMonth),
+                'endYearMonthMessage'   => $dsSearchForm->getMessage(BUCustomerReviewMeeting::searchFormEndYearMonth),
+                'meetingDate'           => self::dateYMDtoDMY(
+                    $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormMeetingDate)
+                ),
+                'meetingDateYmd'        => $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormMeetingDate),
                 'urlCustomerPopup'      => $urlCustomerPopup,
                 'editableText'          => $editableText,
                 'nonEditableText'       => $nonEditableText,
@@ -482,7 +485,6 @@ class CTCustomerReviewMeeting extends CTCNC
             return $serverCareContractBody = "Server Care: None";
         }
         $datasetContracts->fetchNext();
-        $serverCareItemID = $datasetContracts->getValue("customerItemID");
         $serverCareContractsTemplate = new Template (
             $GLOBALS ["cfg"] ["path_templates"],
             "remove"
@@ -494,11 +496,13 @@ class CTCustomerReviewMeeting extends CTCNC
         );
         $serverCareContractsTemplate->set_var(
             "contractDescription",
-            $datasetContracts->getValue('itemDescription')
+            $datasetContracts->getValue(DBEJCustomerItem::itemDescription)
         );
         $serverCareContractsTemplate->set_var(
             "nextInvoice",
-            $datasetContracts->getValue('invoiceFromDate') . " - " . $datasetContracts->getValue('invoiceToDate')
+            $datasetContracts->getValue(DBEJCustomerItem::invoiceFromDate) . " - " . $datasetContracts->getValue(
+                DBEJCustomerItem::invoiceToDate
+            )
         );
         $serverCareContractsTemplate->set_var(
             'usersCount',
@@ -519,18 +523,16 @@ class CTCustomerReviewMeeting extends CTCNC
         );
 
         while ($dsServer->fetchNext()) {
-
-            if ($dsServer->getValue('sOrderDate') != '0000-00-00') {
-                $purchaseDate = self::dateYMDtoDMY($dsServer->getValue('sOrderDate'));
-            } else {
-                $purchaseDate = '';
+            $purchaseDate = null;
+            if ($dsServer->getValue(DBEJCustomerItem::sOrderDate)) {
+                $purchaseDate = self::dateYMDtoDMY($dsServer->getValue(DBEJCustomerItem::sOrderDate));
             }
 
             $serverCareContractsTemplate->set_var(
                 array(
-                    'itemDescription' => $dsServer->getValue('itemDescription'),
-                    'serialNo'        => $dsServer->getValue('serialNo'),
-                    'serverName'      => $dsServer->getValue('serverName'),
+                    'itemDescription' => $dsServer->getValue(DBEJCustomerItem::itemDescription),
+                    'serialNo'        => $dsServer->getValue(DBEJCustomerItem::serialNo),
+                    'serverName'      => $dsServer->getValue(DBEJCustomerItem::serverName),
                     'purchaseDate'    => $purchaseDate,
                 )
             );
@@ -555,12 +557,13 @@ class CTCustomerReviewMeeting extends CTCNC
     /**
      * Create PDF reports and save to disk
      *
+     * @throws Exception
      */
 
     function generatePdf()
     {
 
-        $text = $_REQUEST['html'];
+        $text = $this->getParam('html');
 
         $agendaTemplate = new Template (
             $GLOBALS ["cfg"] ["path_templates"],
@@ -590,40 +593,37 @@ class CTCustomerReviewMeeting extends CTCNC
         $html = $agendaTemplate->get_var('output');
         try {
             $this->buCustomerReviewMeeting->generateAgendaPdf(
-                $_REQUEST['customerID'],
+                $this->getParam('customerID'),
                 $html,
-                $_REQUEST['meetingDateYmd']
+                $this->getParam('meetingDateYmd')
             );
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             http_response_code(500);
             return ["status" => $exception->getMessage(), "description" => "Failed to generate files"];
         }
 
         $startDate = (DateTime::createFromFormat(
             "m/Y",
-            $_REQUEST['startYearMonth']
+            $this->getParam('startYearMonth')
         ))->modify('first day of this month ');
         $endDate = (DateTime::createFromFormat(
             "m/Y",
-            $_REQUEST['endYearMonth']
+            $this->getParam('endYearMonth')
         ))->modify('last day of this month');
 
         $this->buCustomerReviewMeeting->generateSalesPdf(
-            $_REQUEST['customerID'],
+            $this->getParam('customerID'),
             $startDate,
             $endDate,
-            $_REQUEST['meetingDateYmd']
+            $this->getParam('meetingDateYmd')
         );
 
         $this->buCustomerReviewMeeting->generateMeetingNotes(
-            $_REQUEST['customerID'],
-            $_REQUEST['meetingDateYmd']
+            $this->getParam('customerID'),
+            $this->getParam('meetingDateYmd')
         );
 
         return ["status" => "ok"];
-
-//        $this->search();  // redisplays text
-
     }
 
     private function getServiceDeskContractBody($customerId)
@@ -640,10 +640,12 @@ class CTCustomerReviewMeeting extends CTCNC
             return $this->getPrepayContractBody($customerId);
         }
         $datasetContracts->fetchNext();
-        $users = $datasetContracts->getValue('users');
-        $description = $datasetContracts->getValue('itemDescription');
-        $invoicePeriod = $datasetContracts->getValue('invoiceFromDate') . " - " . $datasetContracts->getValue(
-                'invoiceToDate'
+        $users = $datasetContracts->getValue(DBEJCustomerItem::users);
+        $description = $datasetContracts->getValue(DBEJCustomerItem::itemDescription);
+        $invoicePeriod = $datasetContracts->getValue(
+                DBEJCustomerItem::invoiceFromDate
+            ) . " - " . $datasetContracts->getValue(
+                DBEJCustomerItem::invoiceToDate
             );
         return "<p>User Support Contract: $description for $users users</p><p>Next Invoice: $invoicePeriod</p>";
     }
@@ -701,7 +703,6 @@ class CTCustomerReviewMeeting extends CTCNC
             );
 
             $dateRaised = $dateTime->format('d/m/Y');
-            $dateFixed = $dbeProblem->getValue(DBEJProblem::fixedDate);
             $slaResponse = $dbeProblem->getValue(DBEJProblem::slaResponseHours);
             $respondedHours = $dbeProblem->getValue(DBEJProblem::respondedHours);
 
@@ -861,6 +862,7 @@ class CTCustomerReviewMeeting extends CTCNC
 
         if ($datasetContracts->rowCount()) {
             $test = new BUCustomerItem($this);
+            $datasetServerWatch = new DataSet($this);
             $test->getServerWatchContractByCustomerID(
                 $customerId,
                 $datasetServerWatch
@@ -983,99 +985,6 @@ class CTCustomerReviewMeeting extends CTCNC
         ];
     }
 
-    private function generateGraph($data,
-                                   $dataX
-    )
-    {
-        JpGraph\JpGraph::load();
-        JpGraph\JpGraph::module('line');
-        $graph = new Graph(
-            700,
-            400
-        );
-        $graph->title->Set($data['title']);
-        $graph->title->SetFont(
-            FF_ARIAL,
-            FS_BOLD,
-            12
-        );
-        $graph->title->SetColor('white');
-        $graph->SetScale("textlin");
-        $graph->SetMargin(
-            80,
-            70,
-            60,
-            80
-        );
-        $graph->xaxis->setTickLabels($dataX);
-        $graph->xaxis->setLabelAngle(45);
-
-// Make sure that the X-axis is always at the bottom of the scale
-// (By default the X-axis is alwys positioned at Y=0 so if the scale
-// doesn't happen to include 0 the axis will not be shown)
-        $graph->xaxis->SetPos('min');
-
-// Use Times font
-        $graph->xaxis->SetFont(
-            FF_ARIAL,
-            FS_NORMAL,
-            8
-        );
-        $graph->yaxis->SetFont(
-            FF_ARIAL,
-            FS_NORMAL,
-            9
-        );
-//
-//// Set colors for axis
-        $graph->xaxis->SetColor('black');
-        $graph->yaxis->SetColor('black');
-// Show ticks outwards
-        $graph->xaxis->SetTickSide(SIDE_DOWN);
-        $graph->xaxis->SetLabelMargin(6);
-        $graph->yaxis->SetTickSide(SIDE_LEFT);
-
-// Setup a filled y-grid
-//$graph->ygrid->SetFill(true,'darkgray:1.55@0.7','darkgray:1.6@0.7');
-//        $graph->ygrid->SetStyle('dotted');
-//        $graph->xgrid->SetStyle('dashed');
-
-// Create the plot line
-        $secondY = false;
-        foreach ($data["plots"] as $key => $plot) {
-
-            $p1 = new LinePlot($plot["data"]);
-            $p1->SetLegend($plot["legend"]);
-            $p1->SetStyle('solid');
-            if ($plot["2ndAxis"]) {
-                $secondY = true;
-                $graph->AddY2($p1);
-            } else {
-                $graph->Add($p1);
-            }
-            $p1->SetWeight(2);
-        }
-
-        if ($secondY) {
-            $graph->SetY2Scale("lin");
-            $graph->y2axis->SetColor('black');
-        }
-
-        $graph->legend->SetPos(
-            0.5,
-            0.05,
-            'center'
-        );
-        $graph->img->SetAntiAliasing(true);
-        $img = $graph->Stroke('__handle');
-        ob_start();
-        imagejpeg($img);
-        $image_data = ob_get_contents();
-        ob_end_clean();
-        $dataUri = "data:image/jpeg;base64," . base64_encode($image_data);
-        return $dataUri;
-    }
-
     private function getSupportedUsersData(BUContact $buContact,
                                            $customerId,
                                            $customerName
@@ -1095,9 +1004,9 @@ class CTCustomerReviewMeeting extends CTCNC
 
         while ($dsSupportContact->fetchNext()) {
 
-            $firstName = $dsSupportContact->getValue('firstName');
-            $lastName = $dsSupportContact->getValue('lastName');
-            $userId = $dsSupportContact->getValue('contactID');
+            $firstName = $dsSupportContact->getValue(DBEContact::firstName);
+            $lastName = $dsSupportContact->getValue(DBEContact::lastName);
+            $userId = $dsSupportContact->getValue(DBEContact::contactID);
             $key = strtolower($firstName . $lastName);
             if (isset($userMap[$key])) {
 
@@ -1132,9 +1041,6 @@ class CTCustomerReviewMeeting extends CTCNC
             $buMail = new BUMail($this);
 
             $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-            $senderName = 'CNC Support Department';
-
             $toEmail = 'sales@cnc-ltd.co.uk';
 
             $template = new Template(
@@ -1208,8 +1114,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 $senderEmail,
                 $toEmail,
                 $hdrs,
-                $body,
-                true
+                $body
             );
 
         }
@@ -1224,6 +1129,10 @@ class CTCustomerReviewMeeting extends CTCNC
         ];
     }
 
+    /**
+     * @param DBECustomer|DataSet $dsCustomer
+     * @return string
+     */
     private function getReviewMeetingFrequencyBody($dsCustomer)
     {
         $value = $dsCustomer->getValue(DBECustomer::reviewMeetingFrequencyMonths);
@@ -1251,12 +1160,4 @@ class CTCustomerReviewMeeting extends CTCNC
 
         return "<h2>Review Meeting Frequency - " . $frequency . "</h2>";
     }
-
-    private function getMainContacts(BUContact $buContact)
-    {
-        $buContact->getMainContacts();
-    }
-
-} // end of class
-?>
-
+}

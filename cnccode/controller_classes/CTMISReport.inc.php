@@ -13,9 +13,19 @@ require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTMISReport extends CTCNC
 {
-    var $dsPrintRange = '';
-    var $dsSearchForm = '';
-    var $dsResults = '';
+    public $dsPrintRange;
+    /** @var DSForm */
+    public $dsSearchForm;
+    /** @var DataSet */
+    public $dsResults;
+    /**
+     * @var string
+     */
+    public $results;
+    /**
+     * @var BUMISReport
+     */
+    public $buMISReport;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
@@ -34,10 +44,11 @@ class CTMISReport extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST ['action']) {
+        switch ($this->getAction()) {
 
             case CTCNC_ACT_SEARCH :
                 $this->search();
@@ -48,6 +59,9 @@ class CTMISReport extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function search()
     {
 
@@ -73,6 +87,7 @@ class CTMISReport extends CTCNC
     /**
      * Display search form
      * @access private
+     * @throws Exception
      */
     function displaySearchForm()
     {
@@ -83,10 +98,13 @@ class CTMISReport extends CTCNC
 
         $this->setTemplateFiles(array('MISReport' => 'MISReport.inc'));
 
-        $urlCustomerPopup = Controller::buildLink(CTCNC_PAGE_CUSTOMER,
-                                             array('action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                                                   'htmlFmt' => CT_HTML_FMT_POPUP
-                                             ));
+        $urlCustomerPopup = Controller::buildLink(
+            CTCNC_PAGE_CUSTOMER,
+            array(
+                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
 
         $urlSubmit = Controller::buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 
@@ -95,10 +113,11 @@ class CTMISReport extends CTCNC
         if ($dsSearchForm->rowCount() == 0) {
             $this->buMISReport->initialiseSearchForm($dsSearchForm);
         }
-
-        if ($dsSearchForm->getValue('customerID') != 0) {
+        $customerString = null;
+        if ($dsSearchForm->getValue(BUMISReport::searchFormCustomerID)) {
             $buCustomer = new BUCustomer ($this);
-            $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
+            $dsCustomer = new DataSet($this);
+            $buCustomer->getCustomerByID($dsSearchForm->getValue(BUMISReport::searchFormCustomerID), $dsCustomer);
             $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
@@ -113,10 +132,10 @@ class CTMISReport extends CTCNC
         $this->template->set_var(
             array(
                 'formError'        => $this->formError,
-                'customerID'       => $dsSearchForm->getValue('customerID'),
+                'customerID'       => $dsSearchForm->getValue(BUMISReport::searchFormCustomerID),
                 'customerString'   => $customerString,
-                'months'           => $dsSearchForm->getValue('months'),
-                'monthsMessage'    => $dsSearchForm->getMessage('months'),
+                'months'           => $dsSearchForm->getValue(BUMISReport::searchFormMonths),
+                'monthsMessage'    => $dsSearchForm->getMessage(BUMISReport::searchFormMonths),
                 'urlCustomerPopup' => $urlCustomerPopup,
                 'urlSubmit'        => $urlSubmit,
             )
@@ -124,8 +143,5 @@ class CTMISReport extends CTCNC
 
         $this->template->parse('CONTENTS', 'MISReport', true);
         $this->parsePage();
-    } // end function displaySearchForm
-
-
-} // end of class
-?>
+    }
+}

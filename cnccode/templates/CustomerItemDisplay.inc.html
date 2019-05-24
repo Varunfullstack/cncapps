@@ -188,7 +188,6 @@
                 <input
                         type="text"
                         {readonly}
-                        name="customerItem[1][siteDesc]"
                         id="siteDesc"
                         value="{siteDesc}"
                         onKeydown="javascript:checkFunctionKey(siteDesc)"
@@ -499,8 +498,7 @@
             if ($(this).is(':checked')) {
                 $('input#secondSiteValidationSuspendUntilDate,input#secondsiteServerDriveLetters,input#secondsiteLocationPath').attr("readonly", true);
                 $('select#secondsiteImageDelayDays').attr("disabled", true);
-            }
-            else {
+            } else {
                 $('input#secondSiteValidationSuspendUntilDate,input#secondsiteServerDriveLetters,input#secondsiteLocationPath').attr("readonly", false);
                 $('select#secondsiteImageDelayDays').attr("disabled", false);
             }
@@ -508,8 +506,7 @@
         $("input#secondSiteReplicationExcludeFlag").click(function () {
             if ($(this).is(':checked')) {
                 $('input#secondSiteReplicationPath').attr("readonly", true);
-            }
-            else {
+            } else {
                 $('input#secondSiteReplicationPath').attr("readonly", false);
             }
         });

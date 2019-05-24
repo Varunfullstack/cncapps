@@ -22,7 +22,6 @@ class DBEInvhead extends DBEntity
     const contactID = "contactID";
     const contactName = "contactName";
     const salutation = "salutation";
-    const payMethod = "payMethod";
     const paymentTermsID = "paymentTermsID";
     const vatCode = "vatCode";
     const vatRate = "vatRate";
@@ -39,8 +38,8 @@ class DBEInvhead extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -130,12 +129,6 @@ class DBEInvhead extends DBEntity
             DA_STRING,
             DA_ALLOW_NULL,
             "inh_salutation"
-        );
-        $this->addColumn(
-            self::payMethod,
-            DA_STRING,
-            DA_NOT_NULL,
-            "inh_pay_method"
         );
         $this->addColumn(
             self::paymentTermsID,
@@ -234,7 +227,7 @@ class DBEInvhead extends DBEntity
                 $this->db->link_id(),
                 $date
             ) . "'" .
-            " WHERE " . $this->getDBColumnName(self::datePrinted) . "='0000-00-00'";
+            " WHERE " . $this->getDBColumnName(self::datePrinted) . " is null ";
 
         if (!$directDebit) {
             $queryString .= " and " . $this->getDBColumnName(self::directDebitFlag) . ' <> "Y" ';
@@ -265,7 +258,7 @@ class DBEInvhead extends DBEntity
                 $this->db->link_id(),
                 $type
             ) . "'" .
-            " AND " . $this->getDBColumnName(self::datePrinted) . "='0000-00-00'";
+            " AND " . $this->getDBColumnName(self::datePrinted) . " is null ";
         if (!$directDebit) {
             $queryString .= " and " . $this->getDBColumnName(self::directDebitFlag) . ' <> "Y" ';
         } else {
@@ -300,7 +293,7 @@ class DBEInvhead extends DBEntity
                 $this->db->link_id(),
                 $type
             ) . "'" .
-            " AND " . $this->getDBColumnName(self::datePrinted) . "='0000-00-00'" .
+            " AND " . $this->getDBColumnName(self::datePrinted) . " is null " .
             " AND inl_unit_price IS NOT NULL";
 
         if (!$directDebit) {

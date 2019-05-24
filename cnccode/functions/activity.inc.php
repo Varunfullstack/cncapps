@@ -13,14 +13,12 @@ Functions that relate to call activities
  * @param int $maxHours if 0 then no max
  * @param float $oohMultiplier out of hours multiplier
  * @param string|int $itemID activity type itemID
- * @param $underContractFlag
  * @param DataSet $dsHeader
  * @param $normalHours
  * @param $hoursBeforeWork
  * @param $hoursAfterWork
  * @param $overtimeRate
  * @param $normalRate
- * @param string $otFlag
  */
 function getRatesAndHours(
     $date,
@@ -30,14 +28,12 @@ function getRatesAndHours(
     $maxHours,
     $oohMultiplier,
     $itemID,
-    $underContractFlag,
     &$dsHeader,
     &$normalHours,
     &$hoursBeforeWork,
     &$hoursAfterWork,
     &$overtimeRate,
-    &$normalRate,
-    $otFlag = 'Y'
+    &$normalRate
 )
 {
     $that = null;// get activity times as decimals
@@ -169,5 +165,3 @@ function limitTime($decimalTime,
     }
     return $ret;
 }
-
-?>

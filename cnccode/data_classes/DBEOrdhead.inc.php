@@ -50,7 +50,6 @@ class DBEOrdhead extends DBEntity
     const debtorCode = "debtorCode";
     const wip = "wip";
     const consultantID = "consultantID";
-    const payMethod = "payMethod";
     const paymentTermsID = "paymentTermsID";
     const addItem = "addItem";
     const callID = "callID";
@@ -67,8 +66,8 @@ class DBEOrdhead extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -125,7 +124,7 @@ class DBEOrdhead extends DBEntity
         );
         $this->addColumn(
             self::quotationOrdheadID,
-            DA_STRING,
+            DA_INTEGER,
             DA_ALLOW_NULL,
             "odh_quotation_ordno"
         );
@@ -334,12 +333,6 @@ class DBEOrdhead extends DBEntity
             "odh_consno"
         );
         $this->addColumn(
-            self::payMethod,
-            DA_STRING,
-            DA_ALLOW_NULL,
-            "odh_pay_method"
-        );
-        $this->addColumn(
             self::paymentTermsID,
             DA_ID,
             DA_NOT_NULL
@@ -481,6 +474,7 @@ class DBEOrdhead extends DBEntity
                 return ($this->getDBColumnValue(0));
             }
         }
+        return false;
     }
 
     function countRowsByContactID($contactID)
@@ -496,8 +490,7 @@ class DBEOrdhead extends DBEntity
                 return ($this->getDBColumnValue(0));
             }
         }
+        return false;
     }
 
 }
-
-?>

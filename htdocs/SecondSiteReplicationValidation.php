@@ -9,9 +9,9 @@
 require_once("config.inc.php");
 GLOBAL $cfg;
 require_once($cfg['path_bu'] . '/BUSecondsiteReplication.inc.php');
-
+$thing = null;
 $testRun = !!@$_REQUEST['testRun'];
-$buSecondsite = new BUSecondsiteReplication($this);
+$buSecondsite = new BUSecondsiteReplication($thing);
 
 set_time_limit(0); // unlimited execution time
 
@@ -98,7 +98,11 @@ foreach ($servers as $server) {
 
 }
 
-$template->set_block('page', 'excludedLocalServerBlock', 'excludedLocalServers');
+$template->set_block(
+    'page',
+    'excludedLocalServerBlock',
+    'excludedLocalServers'
+);
 
 $servers = $buSecondsite->getExcludedLocalServers();
 
@@ -107,10 +111,14 @@ foreach ($servers as $server) {
     $template->set_var(
         array(
             'customerName' => $server['cus_name'],
-            'serverName' => $server['serverName']
+            'serverName'   => $server['serverName']
         )
     );
-    $template->parse('excludedLocalServers', 'excludedLocalServerBlock', true);
+    $template->parse(
+        'excludedLocalServers',
+        'excludedLocalServerBlock',
+        true
+    );
 
 }
 
@@ -156,7 +164,7 @@ $hdrs = array(
     'Content-Type' => 'text/html; charset=UTF-8'
 );
 
-$buMail = new BUMail($this);
+$buMail = new BUMail($thing);
 
 $buMail->mime->setHTMLBody($html);
 
@@ -174,8 +182,7 @@ $buMail->putInQueue(
     $senderEmail,
     $toEmail,
     $hdrs,
-    $body,
-    true
+    $body
 );
 
 echo $html; // and output to page

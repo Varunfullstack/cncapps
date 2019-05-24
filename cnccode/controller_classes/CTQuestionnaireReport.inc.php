@@ -14,8 +14,13 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 class CTQuestionnaireReport extends CTCNC
 {
+    const searchFormQuestionnaireID = "questionnaireID";
+    const searchFormFromDate = "fromDate";
+    const searchFormToDate = "toDate";
 
-    var $dsSearchForm = '';
+    /** @var DSForm */
+    public $dsSearchForm;
+    /** @var BUQuestionnaireReport */
     public $buQuestionnaireReport;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
@@ -31,30 +36,32 @@ class CTQuestionnaireReport extends CTCNC
         $this->buQuestionnaireReport = new BUQuestionnaireReport($this);
 
         $this->dsSearchForm = new DSForm ($this);
-        $this->dsSearchForm->addColumn('questionnaireID', DA_STRING, DA_NOT_NULL);
-        $this->dsSearchForm->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
-        $this->dsSearchForm->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
+        $this->dsSearchForm->addColumn(self::searchFormQuestionnaireID, DA_STRING, DA_NOT_NULL);
+        $this->dsSearchForm->addColumn(self::searchFormFromDate, DA_DATE, DA_ALLOW_NULL);
+        $this->dsSearchForm->addColumn(self::searchFormToDate, DA_DATE, DA_ALLOW_NULL);
     }
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
         $this->search();
     }
 
+    /**
+     * @throws Exception
+     */
     function search()
     {
-
         $this->setMethodName('search');
-
+        $csv = false;
+        $report = null;
         if (isset ($_REQUEST ['searchForm']) == 'POST') {
 
-            if ($_REQUEST['CSV']) {
+            if ($this->getParam('CSV')) {
                 $csv = true;
-            } else {
-                $csv = false;
             }
 
             if (!$this->dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
@@ -62,9 +69,11 @@ class CTQuestionnaireReport extends CTCNC
                 $this->setFormErrorOn();
 
             } else {
-                $this->buQuestionnaireReport->startDate = $this->dsSearchForm->getValue('fromDate');
-                $this->buQuestionnaireReport->endDate = $this->dsSearchForm->getValue('toDate');
-                $this->buQuestionnaireReport->questionnaireID = $this->dsSearchForm->getValue('questionnaireID');
+                $this->buQuestionnaireReport->startDate = $this->dsSearchForm->getValue(self::searchFormFromDate);
+                $this->buQuestionnaireReport->endDate = $this->dsSearchForm->getValue(self::searchFormToDate);
+                $this->buQuestionnaireReport->questionnaireID = $this->dsSearchForm->getValue(
+                    self::searchFormQuestionnaireID
+                );
 
                 $report = $this->buQuestionnaireReport->getReport($csv);
 
@@ -75,18 +84,17 @@ class CTQuestionnaireReport extends CTCNC
                     $buMail = new BUMail($this);
 
                     $senderEmail = CONFIG_SUPPORT_EMAIL;
-                    $senderName = 'CNC Support Department';
-
                     $dbeUser = new DBEUser($this);
                     $loggedInUserID = $GLOBALS ['auth']->is_authenticated();
                     $dbeUser->getRow($loggedInUserID);
-                    $toEmail = $dbeUser->getValue('username') . '@' . CONFIG_PUBLIC_DOMAIN;
+                    $toEmail = $dbeUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
 
                     $hdrs = array(
-                        'From' => $senderEmail,
-                        'To' => $toEmail,
-                        'Subject' => 'Questionnaire Report ' . $this->buQuestionnaireReport->getPeriod() . ' - ' . $this->buQuestionnaireReport->getQuestionnaireDescription(),
-                        'Date' => date("r"),
+                        'From'         => $senderEmail,
+                        'To'           => $toEmail,
+                        'Subject'      => 'Questionnaire Report ' . $this->buQuestionnaireReport->getPeriod(
+                            ) . ' - ' . $this->buQuestionnaireReport->getQuestionnaireDescription(),
+                        'Date'         => date("r"),
                         'Content-Type' => 'text/html; charset=UTF-8'
                     );
 
@@ -94,9 +102,9 @@ class CTQuestionnaireReport extends CTCNC
 
                     $mime_params = array(
                         'text_encoding' => '7bit',
-                        'text_charset' => 'UTF-8',
-                        'html_charset' => 'UTF-8',
-                        'head_charset' => 'UTF-8'
+                        'text_charset'  => 'UTF-8',
+                        'html_charset'  => 'UTF-8',
+                        'head_charset'  => 'UTF-8'
                     );
                     $body = $buMail->mime->get($mime_params);
 
@@ -114,14 +122,14 @@ class CTQuestionnaireReport extends CTCNC
 
         }
 
-        if ($this->dsSearchForm->getValue('fromDate') == '') {
+        if (!$this->dsSearchForm->getValue(self::searchFormFromDate)) {
             $this->dsSearchForm->setUpdateModeUpdate();
-            $this->dsSearchForm->setValue('fromDate', date('Y-m-d', strtotime("-1 month")));
+            $this->dsSearchForm->setValue(self::searchFormFromDate, date('Y-m-d', strtotime("-1 month")));
             $this->dsSearchForm->post();
         }
-        if (!$this->dsSearchForm->getValue('toDate')) {
+        if (!$this->dsSearchForm->getValue(self::searchFormToDate)) {
             $this->dsSearchForm->setUpdateModeUpdate();
-            $this->dsSearchForm->setValue('toDate', date('Y-m-d'));
+            $this->dsSearchForm->setValue(self::searchFormToDate, date('Y-m-d'));
             $this->dsSearchForm->post();
         }
 
@@ -141,14 +149,18 @@ class CTQuestionnaireReport extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'formError' => $this->formError,
-                    'questionnaireIDMessage' => $this->dsSearchForm->getMessage('questionnaireID'),
-                    'fromDate' => Controller::dateYMDtoDMY($this->dsSearchForm->getValue('fromDate')),
-                    'fromDateMessage' => $this->dsSearchForm->getMessage('fromDate'),
-                    'toDate' => Controller::dateYMDtoDMY($this->dsSearchForm->getValue('toDate')),
-                    'toDateMessage' => $this->dsSearchForm->getMessage('toDate'),
-                    'urlSubmit' => $urlSubmit,
-                    'report' => $report
+                    'formError'              => $this->formError,
+                    'questionnaireIDMessage' => $this->dsSearchForm->getMessage(self::searchFormQuestionnaireID),
+                    'fromDate'               => Controller::dateYMDtoDMY(
+                        $this->dsSearchForm->getValue(self::searchFormFromDate)
+                    ),
+                    'fromDateMessage'        => $this->dsSearchForm->getMessage(self::searchFormFromDate),
+                    'toDate'                 => Controller::dateYMDtoDMY(
+                        $this->dsSearchForm->getValue(self::searchFormToDate)
+                    ),
+                    'toDateMessage'          => $this->dsSearchForm->getMessage(self::searchFormToDate),
+                    'urlSubmit'              => $urlSubmit,
+                    'report'                 => $report
                 )
             );
 
@@ -157,6 +169,7 @@ class CTQuestionnaireReport extends CTCNC
             */
 
             $buQuestionnaire = new BUQuestionnaire($this);
+            $dsQuestionnaire = new DataSet($this);
             $buQuestionnaire->getAll($dsQuestionnaire);
 
             $this->template->set_block('QuestionnaireReportPage', 'questionnaireBlock', 'questionnaires');
@@ -164,9 +177,11 @@ class CTQuestionnaireReport extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'questionnaireDescription' => $dsQuestionnaire->getValue('description'),
-                        'questionnaireID' => $dsQuestionnaire->getValue('questionnaireID'),
-                        'questionnaireSelected' => ($this->dsSearchForm->getValue('questionnaireID') == $dsQuestionnaire->getValue('questionnaireID')) ? CT_SELECTED : ''
+                        'questionnaireDescription' => $dsQuestionnaire->getValue(DBEQuestionnaire::description),
+                        'questionnaireID'          => $dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID),
+                        'questionnaireSelected'    => ($this->dsSearchForm->getValue(
+                                self::searchFormQuestionnaireID
+                            ) == $dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID)) ? CT_SELECTED : null
                     )
                 );
                 $this->template->parse('questionnaires', 'questionnaireBlock', true);
@@ -180,8 +195,5 @@ class CTQuestionnaireReport extends CTCNC
             Header('Content-Disposition: attachment; filename=questionnaire.csv');
             echo $report;
         }
-
-    } // end function displaySearchForm
-
-} // end of class
-?>
+    }
+}

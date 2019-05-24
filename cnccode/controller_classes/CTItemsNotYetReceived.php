@@ -47,10 +47,11 @@ class CTItemsNotYetReceived extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             default:
                 $this->displayContractAndNumbersReport();
@@ -58,6 +59,9 @@ class CTItemsNotYetReceived extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function displayContractAndNumbersReport()
     {
 
@@ -161,6 +165,10 @@ class CTItemsNotYetReceived extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @param DateTimeInterface $date
+     * @return string
+     */
     private function getDateOrNA($date)
     {
         if (!$date) {
@@ -171,4 +179,3 @@ class CTItemsNotYetReceived extends CTCNC
         );
     }
 }// end of class
-?>

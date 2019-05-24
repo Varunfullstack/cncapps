@@ -4,9 +4,12 @@ require_once($cfg["path_dbe"] . "/DBESalesOrderDocumentWithoutFile.php");
 
 class BUSalesOrderDocument extends Business
 {
-    var $dbeSalesOrderDocument = "";
-    var $dbeSalesOrderDocumentWithoutFile = "";
-    var $dbeCallActivity = "";
+    /** @var DBESalesOrderDocument */
+    public $dbeSalesOrderDocument;
+    /** @var DBESalesOrderDocumentWithoutFile */
+    public $dbeSalesOrderDocumentWithoutFile;
+    /** @var DBECallActivity */
+    public $dbeCallActivity;
 
     function __construct(&$owner)
     {
@@ -18,21 +21,18 @@ class BUSalesOrderDocument extends Business
     function updateDocument(&$dsData, $userfile)
     {
         $this->setMethodName('updateDocument');
-        /**
-         * Upload new document from local disk
-         * @access private
-         */
+
         $this->updateDataAccessObject($dsData, $this->dbeSalesOrderDocumentWithoutFile);
 
         /* file to add? */
-        if ($userfile['name'] != '') {
+        if ($userfile['name']) {
             $this->dbeSalesOrderDocument->getRow($this->dbeSalesOrderDocumentWithoutFile->getPKValue());
-            $this->dbeSalesOrderDocument->setValue('file',
-                                                   fread(fopen($userfile ['tmp_name'], 'rb'), $userfile ['size']));
-            $this->dbeSalesOrderDocument->setValue('filename', ( string )$userfile ['name']);
-            $this->dbeSalesOrderDocument->setValue('fileMimeType', ( string )$userfile ['type']);
-            $this->dbeSalesOrderDocument->setValue('createdDate', date(CONFIG_MYSQL_DATETIME));
-            $this->dbeSalesOrderDocument->setValue('createdUserID', $this->owner->userID);
+            $this->dbeSalesOrderDocument->setValue(
+                DBESalesOrderDocument::file,
+                fread(fopen($userfile ['tmp_name'], 'rb'), $userfile ['size'])
+            );
+            $this->dbeSalesOrderDocument->setValue(DBESalesOrderDocument::filename, ( string )$userfile ['name']);
+            $this->dbeSalesOrderDocument->setValue(DBESalesOrderDocument::fileMimeType, ( string )$userfile ['type']);
             $this->dbeSalesOrderDocument->updateRow();
         }
 
@@ -48,25 +48,21 @@ class BUSalesOrderDocument extends Business
 
     function getDocumentsByOrdheadID($ordheadID, &$dsResults)
     {
-        $this->dbeSalesOrderDocument->setValue('ordheadID', $ordheadID);
-        $this->dbeSalesOrderDocument->getRowsByColumn('ordheadID', 'createdDate');
+        $this->dbeSalesOrderDocument->setValue(DBESalesOrderDocument::ordheadID, $ordheadID);
+        $this->dbeSalesOrderDocument->getRowsByColumn(DBESalesOrderDocument::ordheadID, 'createdDate');
         return ($this->getData($this->dbeSalesOrderDocument, $dsResults));
     }
 
     function deleteDocument($ID)
     {
         $this->setMethodName('deleteDocument');
-        if ($this->canDelete($ID)) {
-            return $this->dbeSalesOrderDocument->deleteRow($ID);
-        } else {
-            return FALSE;
-        }
+        return $this->dbeSalesOrderDocument->deleteRow($ID);
     }
 
     function copyDocumentsToOrder($fromOrdheadID, $toOrdheadID)
     {
         $this->setMethodName('copyDocumentsToOrder');
-
+        $dsDocument = new DataSet($this);
         $this->getDocumentsByOrdheadID($fromOrdheadID, $dsDocument);
 
         $dsNewDocument = new DataSet($this);
@@ -75,18 +71,12 @@ class BUSalesOrderDocument extends Business
         while ($dsDocument->fetchNext()) {
             $dsNewDocument->setUpdateModeInsert();
             $dsNewDocument->row = $dsDocument->row;
-            $dsNewDocument->setValue('salesOrderDocumentID', 0);
-            $dsNewDocument->setValue('ordheadID', $toOrdheadID);
+            $dsNewDocument->setValue(DBESalesOrderDocument::salesOrderDocumentID, 0);
+            $dsNewDocument->setValue(DBESalesOrderDocument::ordheadID, $toOrdheadID);
             $dsNewDocument->post();
         }
         $this->dbeSalesOrderDocument->replicate($dsNewDocument);
 
     }
 
-    function canDelete($ID)
-    {
-        return TRUE;
-    }
-
-}// End of class
-?>
+}

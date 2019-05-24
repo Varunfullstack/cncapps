@@ -1,24 +1,23 @@
 <?php
 require_once("config.inc.php");
-require_once($cfg["path_ct"]."/CTQuestionnaireReport.inc.php");
+require_once($cfg["path_ct"] . "/CTQuestionnaireReport.inc.php");
 session_start();
 page_open(
-  array(
-    'sess' => PHPLIB_CLASSNAME_SESSION,
-    'auth' => PHPLIB_CLASSNAME_AUTH,
-    'perm' => PHPLIB_CLASSNAME_PERM,
-    ''
-  )
+    array(
+        'sess' => PHPLIB_CLASSNAME_SESSION,
+        'auth' => PHPLIB_CLASSNAME_AUTH,
+        'perm' => PHPLIB_CLASSNAME_PERM,
+        ''
+    )
 );
 GLOBAL $cfg;
 header("Cache-control: private");
-$ctQuestionnaireReport= new CTQuestionnaireReport(
-  $_SERVER['REQUEST_METHOD'],
-  $_POST,
-  $_GET,
-  $_COOKIE,
-  $cfg
+$ctQuestionnaireReport = new CTQuestionnaireReport(
+    $_SERVER['REQUEST_METHOD'],
+    $_POST,
+    $_GET,
+    $_COOKIE,
+    $cfg
 );
 $ctQuestionnaireReport->execute();
 page_close();
-?>

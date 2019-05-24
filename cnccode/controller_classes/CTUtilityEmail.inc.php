@@ -13,7 +13,9 @@ require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 // Actions
 class CTUtilityEmail extends CTCNC
 {
-    var $buActivity;
+    /** @var BUActivity */
+    public $buActivity;
+    public $dsUtilityEmail;
 
     function __construct($requestMethod,
                          $postVars,
@@ -36,23 +38,26 @@ class CTUtilityEmail extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->buActivity = new BUActivity($this);
     }
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'delete':
-                if (!isset($_REQUEST['id'])) {
+                if (!$this->getParam('id')) {
                     http_response_code(400);
                     throw new Exception('ID is missing');
                 }
 
                 $dbeUtilityEmail = new DBEUtilityEmail($this);
 
-                $dbeUtilityEmail->getRow($_REQUEST['id']);
+                $dbeUtilityEmail->getRow($this->getParam('id'));
 
                 if (!$dbeUtilityEmail->rowCount) {
                     http_response_code(404);
@@ -64,13 +69,13 @@ class CTUtilityEmail extends CTCNC
                 break;
             case 'update':
 
-                if (!isset($_REQUEST['id'])) {
+                if (!$this->getParam('id')) {
                     throw new Exception('ID is missing');
                 }
 
                 $dbeUtilityEmail = new DBEUtilityEmail($this);
 
-                $dbeUtilityEmail->getRow($_REQUEST['id']);
+                $dbeUtilityEmail->getRow($this->getParam('id'));
 
                 if (!$dbeUtilityEmail->rowCount) {
                     http_response_code(404);
@@ -79,11 +84,11 @@ class CTUtilityEmail extends CTCNC
 
                 $dbeUtilityEmail->setValue(
                     DBEUtilityEmail::firstPart,
-                    $_REQUEST['firstPart']
+                    $this->getParam('firstPart')
                 );
                 $dbeUtilityEmail->setValue(
                     DBEUtilityEmail::lastPart,
-                    $_REQUEST['lastPart']
+                    $this->getParam('lastPart')
                 );
 
                 $dbeUtilityEmail->updateRow();
@@ -94,11 +99,11 @@ class CTUtilityEmail extends CTCNC
 
                 $dbeUtilityEmail->setValue(
                     DBEUtilityEmail::firstPart,
-                    $_REQUEST['firstPart']
+                    $this->getParam('firstPart')
                 );
                 $dbeUtilityEmail->setValue(
                     DBEUtilityEmail::lastPart,
-                    $_REQUEST['lastPart']
+                    $this->getParam('lastPart')
                 );
 
                 $dbeUtilityEmail->insertRow();
@@ -108,7 +113,8 @@ class CTUtilityEmail extends CTCNC
                         "id"        => $dbeUtilityEmail->getValue(DBEUtilityEmail::utilityEmailID),
                         "firstPart" => $dbeUtilityEmail->getValue(DBEUtilityEmail::firstPart),
                         "lastPart"  => $dbeUtilityEmail->getValue(DBEUtilityEmail::lastPart)
-                    ], JSON_NUMERIC_CHECK
+                    ],
+                    JSON_NUMERIC_CHECK
                 );
 
                 break;
@@ -136,6 +142,11 @@ class CTUtilityEmail extends CTCNC
     /**
      * Export expenses that have not previously been exported
      * @access private
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     function displayForm()
     {
@@ -190,25 +201,6 @@ class CTUtilityEmail extends CTCNC
         $this->parsePage();
     }
 
-    function resolveCalls()
-    {
-        $this->setMethodName('exportExpenseGenerate');
-        $this->buActivity->initialiseResolveForm($this->dsUtilityEmail);
-        if (!$this->dsUtilityEmail->populateFromArray($_REQUEST['UtilityEmail'])) {
-            $this->setFormErrorOn();
-            $this->displayForm(); //redisplay with errors
-        } else {
-            // do the resolving
-            $filePath = $this->buActivity->resolveCalls($this->dsUtilityEmail);
-            if ($filePath) {
-                $this->setFormErrorMessage('Calls resolved and logged to ' . $filePath);
-            } else {
-                $this->setFormErrorMessage('No calls to resolve');
-            }
-            $this->displayForm();
-        }
-    }
-
     function parsePage()
     {
         $urlLogo = '';
@@ -221,4 +213,3 @@ class CTUtilityEmail extends CTCNC
         parent::parsePage();
     }
 }// end of class
-?>

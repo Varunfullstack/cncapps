@@ -30,33 +30,115 @@ class DBESite extends DBCNCEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setTableName("Address");
-        $this->addColumn(self::customerID, DA_ID, DA_NOT_NULL, "add_custno");
-        $this->addColumn(self::siteNo, DA_ID, DA_ALLOW_NULL, "add_siteno");
-        $this->addColumn(self::add1, DA_STRING, DA_NOT_NULL, "add_add1");
-        $this->addColumn(self::add2, DA_STRING, DA_ALLOW_NULL, "add_add2");
-        $this->addColumn(self::add3, DA_STRING, DA_ALLOW_NULL, "add_add3");
-        $this->addColumn(self::town, DA_STRING, DA_NOT_NULL, "add_town");
-        $this->addColumn(self::county, DA_STRING, DA_ALLOW_NULL, "add_county");
-        $this->addColumn(self::postcode, DA_STRING, DA_NOT_NULL, "add_postcode");
-        $this->addColumn(self::invoiceContactID, DA_ID, DA_ALLOW_NULL, "add_inv_contno");
-        $this->addColumn(self::deliverContactID, DA_ID, DA_ALLOW_NULL, "add_del_contno");
-        $this->addColumn(self::debtorCode, DA_STRING, DA_ALLOW_NULL, "add_debtor_code");
-        $this->addColumn(self::sageRef, DA_STRING, DA_ALLOW_NULL, "add_sage_ref");
-        $this->addColumn(self::phone, DA_STRING, DA_ALLOW_NULL, "add_phone");
-        $this->addColumn(self::maxTravelHours, DA_INTEGER, DA_ALLOW_NULL, "add_max_travel_hours");
-        $this->addColumn(self::activeFlag, DA_YN, DA_ALLOW_NULL, "add_active_flag");
-        $this->addColumn(self::nonUKFlag, DA_YN, DA_ALLOW_NULL, "add_non_uk_flag");
+        $this->addColumn(
+            self::customerID,
+            DA_ID,
+            DA_NOT_NULL,
+            "add_custno"
+        );
+        $this->addColumn(
+            self::siteNo,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "add_siteno"
+        );
+        $this->addColumn(
+            self::add1,
+            DA_STRING,
+            DA_NOT_NULL,
+            "add_add1"
+        );
+        $this->addColumn(
+            self::add2,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "add_add2"
+        );
+        $this->addColumn(
+            self::add3,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "add_add3"
+        );
+        $this->addColumn(
+            self::town,
+            DA_STRING,
+            DA_NOT_NULL,
+            "add_town"
+        );
+        $this->addColumn(
+            self::county,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "add_county"
+        );
+        $this->addColumn(
+            self::postcode,
+            DA_STRING,
+            DA_NOT_NULL,
+            "add_postcode"
+        );
+        $this->addColumn(
+            self::invoiceContactID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "add_inv_contno"
+        );
+        $this->addColumn(
+            self::deliverContactID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "add_del_contno"
+        );
+        $this->addColumn(
+            self::debtorCode,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "add_debtor_code"
+        );
+        $this->addColumn(
+            self::sageRef,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "add_sage_ref"
+        );
+        $this->addColumn(
+            self::phone,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "add_phone"
+        );
+        $this->addColumn(
+            self::maxTravelHours,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "add_max_travel_hours"
+        );
+        $this->addColumn(
+            self::activeFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "add_active_flag"
+        );
+        $this->addColumn(
+            self::nonUKFlag,
+            DA_YN,
+            DA_ALLOW_NULL,
+            "add_non_uk_flag"
+        );
         $this->setPK(1);        // NOTE: This is not really the PK, just the second element
         $this->setAddColumnsOff();
-        $this->setNewRowValue(-9);        // This allows for fact that first siteNo is zero. Used in DataAccess->replicate()
+        $this->setNewRowValue(
+            -9
+        );        // This allows for fact that first siteNo is zero. Used in DataAccess->replicate()
     }
 
     /**
@@ -81,7 +163,7 @@ class DBESite extends DBCNCEntity
     /**
      * Allocates the next site number for this customer
      * @access private
-     * @param  void
+     * @param void
      * @return integer Next Siteno
      */
     function getNextPKValue()
@@ -111,11 +193,12 @@ class DBESite extends DBCNCEntity
     {
         $colString = "";
         for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
+
             // exclude primary key columns
-            if (($this->getName($ixCol) != self::customerID) & ($this->getName($ixCol) != self::siteNo)) {
+            if (($this->getName($ixCol) != self::customerID) && ($this->getName($ixCol) != self::siteNo)) {
                 if ($colString != "") $colString = $colString . ",";
-                $colString = $colString . $this->getDBColumnName($ixCol) . "='" .
-                    $this->prepareForSQL($this->getValue($ixCol)) . "'";
+                $colString = $colString . $this->getDBColumnName($ixCol) . "=" .
+                    $this->prepareForSQL($ixCol);
             }
         }
         return $colString;
@@ -124,6 +207,7 @@ class DBESite extends DBCNCEntity
     /**
      * Return all rows from DB
      * @access public
+     * @param string $activeFlag
      * @return bool Success
      */
     function getRowsByCustomerID($activeFlag = 'Y')
@@ -167,7 +251,9 @@ class DBESite extends DBCNCEntity
         return (parent::getRow());
     }
 
-    function getRowByPostcode($customerID, $postcode)
+    function getRowByPostcode($customerID,
+                              $postcode
+    )
     {
         $this->setMethodName("getRowByPostcode");
         $this->setQueryString(
@@ -245,4 +331,5 @@ class DBESite extends DBCNCEntity
         return (parent::runQuery()); // ensures it goes to SCOTrans and deleted on UNIX box
     }
 }
+
 ?>

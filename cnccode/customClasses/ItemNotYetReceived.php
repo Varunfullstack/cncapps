@@ -163,7 +163,7 @@ class ItemNotYetReceived
     }
 
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getPurchaseOrderDate()
     {
@@ -186,6 +186,11 @@ class ItemNotYetReceived
         return $this->returnDateIfValue($this->purchaseOrderRequiredBy);
     }
 
+    /**
+     * @param $value
+     * @param string $format
+     * @return \DateTime|null
+     */
     private function returnDateIfValue($value,
                                        $format = 'Y-m-d'
     )
@@ -193,11 +198,18 @@ class ItemNotYetReceived
         if (!$value) {
             return null;
         }
-        return \DateTime::createFromFormat(
+        $dateTime = \DateTime::createFromFormat(
             $format,
             $value
         );
+
+        if (!$dateTime) {
+            return null;
+        }
+
+        return $dateTime;
     }
+
 
     /**
      * @return mixed

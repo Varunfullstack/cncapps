@@ -1480,7 +1480,7 @@ function displayHTML($page = 'Welcome', $data = array())
         </tr>
 
         <tr bgcolor="#006600">
-            <td align="right" valign="top" colspan="3">
+            <td align="right" style="vertical-align:top;" colspan="3">
                 <span style="color: #ffffff">Version <?php echo GO_PEAR_VER; ?></span>&nbsp;<br/>
             </td>
         </tr>
@@ -1492,10 +1492,10 @@ function displayHTML($page = 'Welcome', $data = array())
 
 
     <table cellpadding="0" cellspacing="0" width="100%">
-        <tr valign="top">
+        <tr style="vertical-align:top;">
             <td bgcolor="#f0f0f0" width="100">
                 <table width="200" border="0" cellpadding="4" cellspacing="0">
-                    <tr valign="top">
+                    <tr style="vertical-align:top;">
                         <td style="font-size: 90%" align="left" width="200">
                             <br><br>
                             <img src="<?php echo basename(__FILE__); ?>?action=img&amp;img=smallpear" border="0">
@@ -1521,7 +1521,7 @@ function displayHTML($page = 'Welcome', $data = array())
             <td>
                 <table width="100%" cellpadding="10" cellspacing="0">
                     <tr>
-                        <td valign="top">
+                        <td style="vertical-align:top;">
 
                             <table border="0">
                                 <tr>
@@ -1587,7 +1587,7 @@ function displayHTML($page = 'Welcome', $data = array())
                                                 <br/>
                                                 <table border="0">
                                                     <TR>
-                                                        <TD valign="top"><img
+                                                        <TD style="vertical-align:top;"><img
                                                                     src="<?php echo basename(__FILE__); ?>?action=img&amp;img=note"
                                                                     border="0"></TD>
                                                         <TD>
@@ -1637,7 +1637,7 @@ function displayHTML($page = 'Welcome', $data = array())
                                                 <br/><br/>
                                                 <table border="0">
                                                     <TR>
-                                                        <TD valign="top"><img
+                                                        <TD style="vertical-align:top;"><img
                                                                     src="<?php echo basename(__FILE__); ?>?action=img&amp;img=note"
                                                                     border="0"></TD>
                                                         <TD>
@@ -1665,7 +1665,7 @@ function displayHTML($page = 'Welcome', $data = array())
                                                     ?>
                                                     <table border="0">
                                                         <TR>
-                                                            <TD valign="top"><img
+                                                            <TD style="vertical-align:top;"><img
                                                                         src="<?php echo basename(__FILE__); ?>?action=img&amp;img=note"
                                                                         border="0"></TD>
                                                             <TD>
@@ -1931,7 +1931,7 @@ function displayHTMLInstallationSummary($data = '')
     <br/>
     <table border="0">
         <TR>
-            <TD valign="top"><img src="<?php echo basename(__FILE__); ?>?action=img&amp;img=note" border="0"></TD>
+            <TD style="vertical-align:top;"><img src="<?php echo basename(__FILE__); ?>?action=img&amp;img=note" border="0"></TD>
             <TD>
 		  		  <span class="green">
 				  <b>Note:</b> To use PEAR without any problems you need to add your<br/>
@@ -1956,7 +1956,7 @@ function displayHTMLInstallationSummary($data = '')
         ?>
         <table border="0">
             <TR>
-                <TD valign="top"><img src="<?php echo basename(__FILE__); ?>?action=img&amp;img=note" border="0"></TD>
+                <TD style="vertical-align:top;"><img src="<?php echo basename(__FILE__); ?>?action=img&amp;img=note" border="0"></TD>
                 <TD>
 				  		  <span style="color: #ff0000">
 					        <b>Warning:</b> Go-PEAR was not able to determine the URL to the newly<br/>

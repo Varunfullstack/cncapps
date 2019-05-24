@@ -8,12 +8,19 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 class DBEQuestionnaire extends DBEntity
 {
     const logo = "logo";
+    const questionnaireID = "questionnaireID";
+    const description = "description";
+    const intro = "intro";
+    const thankYou = "thankYou";
+    const rating1Desc = "rating1Desc";
+    const rating5Desc = "rating5Desc";
+    const nameRequired = "nameRequired";
 
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -21,45 +28,45 @@ class DBEQuestionnaire extends DBEntity
         parent::__construct($owner);
         $this->setTableName("questionnaire");
         $this->addColumn(
-            "questionnaireID",
+            self::questionnaireID,
             DA_ID,
             DA_NOT_NULL,
             "qur_questionnaireno"
         );
         $this->addColumn(
-            "description",
+            self::description,
             DA_STRING,
             DA_NOT_NULL,
             "qur_desc"
         );
         $this->addColumn(
-            "intro",
+            self::intro,
             DA_MEMO,
             DA_NOT_NULL,
             "qur_intro"
         );
         $this->addColumn(
-            "thankYou",
+            self::thankYou,
             DA_MEMO,
             DA_NOT_NULL,
             "qur_thank_you"
         );
         $this->addColumn(
-            "rating1Desc",
+            self::rating1Desc,
             DA_STRING,
             DA_NOT_NULL,
             "qur_rating_1_desc"
         );
         $this->addColumn(
-            "rating5Desc",
+            self::rating5Desc,
             DA_STRING,
             DA_NOT_NULL,
             "qur_rating_5_desc"
         );
         $this->addColumn(
-            "nameRequired",
-            DA_STRING,
+            self::nameRequired,
             DA_YN,
+            DA_NOT_NULL,
             "qur_name_required"
         );
         $this->addColumn(
@@ -72,4 +79,3 @@ class DBEQuestionnaire extends DBEntity
     }
 }
 
-?>

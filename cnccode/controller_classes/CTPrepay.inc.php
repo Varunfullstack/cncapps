@@ -15,8 +15,9 @@ require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 
 class CTPrepay extends CTCNC
 {
-
-    private $buPrepay = '';
+    /** @var BUPrepay */
+    private $buPrepay;
+    /** @var DataSet */
     private $dsPrepayExport;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
@@ -34,10 +35,11 @@ class CTPrepay extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             case 'exportGenerate':
                 $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
@@ -54,10 +56,32 @@ class CTPrepay extends CTCNC
     }
 
     /**
+     * @throws Exception
+     */
+    function exportGenerate()
+    {
+        $this->setMethodName('exportGenerate');
+        $this->buPrepay->initialiseExportDataset($this->dsPrepayExport);
+        $dsResults = null;
+        if (!$this->dsPrepayExport->populateFromArray($this->getParam('export'))) {
+            $this->setFormErrorOn();
+        } else {
+            // do export
+            $dsResults = $this->buPrepay->exportPrepayActivities(
+                $this->dsPrepayExport,
+                $this->getParam('update')
+            );
+        }
+        $this->exportForm($dsResults);
+    }
+
+    /**
      * Export Prepay requests that have not previously been exported
      * @access private
+     * @param null|DataSet $dsResults
+     * @throws Exception
      */
-    function exportForm($dsResults = false)
+    function exportForm($dsResults = null)
     {
         $this->setMethodName('exportForm');
         $urlPreview = Controller::buildLink(
@@ -78,14 +102,19 @@ class CTPrepay extends CTCNC
         $this->setTemplateFiles('PrepayExport', 'PrepayExport.inc');
 
         if (!is_object($this->dsPrepayExport)) {
+            $this->dsPrepayExport = new DSForm($this);
             $this->buPrepay->initialiseExportDataset($this->dsPrepayExport);
         }
         $this->template->set_var(
             array(
-                'endDate' => Controller::dateYMDtoDMY($this->dsPrepayExport->getValue('endDate')),
-                'endDateMessage' => Controller::dateYMDtoDMY($this->dsPrepayExport->getMessage('endDate')),
-                'urlPreview' => $urlPreview,
-                'urlExport' => $urlExport
+                'endDate'        => Controller::dateYMDtoDMY(
+                    $this->dsPrepayExport->getValue(BUPrepay::exportDataSetEndDate)
+                ),
+                'endDateMessage' => Controller::dateYMDtoDMY(
+                    $this->dsPrepayExport->getMessage(BUPrepay::exportDataSetEndDate)
+                ),
+                'urlPreview'     => $urlPreview,
+                'urlExport'      => $urlExport
             )
         );
 
@@ -93,25 +122,16 @@ class CTPrepay extends CTCNC
             $dsResults->initialise();
             $this->template->set_block('PrepayExport', 'resultBlock', 'results');
             while ($dsResults->fetchNext()) {
-                $urlStatement =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => CTACTIVITY_ACT_EDIT_CALL,
-                            'callActivityID' => $_REQUEST['callActivityID']
-                        )
-                    );
-
                 $this->template->setVar(
                     array(
-                        'customerName' => $dsResults->getValue('customerName'),
-                        'previousBalance' => $dsResults->getValue('previousBalance'),
-                        'currentBalance' => $dsResults->getValue('currentBalance'),
-                        'topUp' => $dsResults->getValue('topUp'),
-                        'expiryDate' => $dsResults->getValue('expiryDate'),
-                        'contacts' => $dsResults->getValue('contacts'),
-                        'contractType' => $dsResults->getValue('contractType'),
-                        'webFileLink' => $dsResults->getValue('webFileLink')
+                        'customerName'    => $dsResults->getValue(BUPrepay::exportPrePayCustomerName),
+                        'previousBalance' => $dsResults->getValue(BUPrepay::exportPrePayPreviousBalance),
+                        'currentBalance'  => $dsResults->getValue(BUPrepay::exportPrePayCurrentBalance),
+                        'topUp'           => $dsResults->getValue(BUPrepay::exportPrePayTopUp),
+                        'expiryDate'      => $dsResults->getValue(BUPrepay::exportPrePayExpiryDate),
+                        'contacts'        => $dsResults->getValue(BUPrepay::exportPrePayContacts),
+                        'contractType'    => $dsResults->getValue(BUPrepay::exportPrePayContractType),
+                        'webFileLink'     => $dsResults->getValue(BUPrepay::exportPrePayWebFileLink)
                     )
                 );
                 $this->template->parse('results', 'resultBlock', true);
@@ -121,33 +141,4 @@ class CTPrepay extends CTCNC
         $this->template->parse('CONTENTS', 'PrepayExport', true);
         $this->parsePage();
     }
-
-    function exportGenerate()
-    {
-        $this->setMethodName('exportGenerate');
-        $this->buPrepay->initialiseExportDataset($this->dsPrepayExport);
-
-        if (!$this->dsPrepayExport->populateFromArray($_REQUEST['export'])) {
-            $this->setFormErrorOn();
-        } else {
-            // do export
-            $dsResults =
-                $this->buPrepay->exportPrepayActivities(
-                    $this->dsPrepayExport,
-                    $_REQUEST['update']
-                );
-//
-//            if ($_REQUEST['update']) {
-//                if ($dsResults) {
-//                    $this->setFormErrorMessage('Export files created');
-//                } else {
-//                    $this->setFormErrorMessage('No data to export for this date');
-//                }
-//            }
-//
-        }
-        $this->exportForm($dsResults);
-    }
-
-}// end of class
-?>
+}

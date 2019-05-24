@@ -21,6 +21,10 @@ class CTContactAudit extends CTCNC
      * @access  private
      */
     var $dsContact = '';
+    /**
+     * @var BUContact
+     */
+    private $buContact;
 
     function __construct($requestMethod,
                          $postVars,
@@ -50,18 +54,19 @@ class CTContactAudit extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'doSearch':
                 echo json_encode(
                     $this->searchContactAudit(
-                        $_REQUEST['customerId'],
-                        $_REQUEST['startDate'],
-                        $_REQUEST['endDate'],
-                        $_REQUEST['firstName'],
-                        $_REQUEST['lastName']
+                        $this->getParam('customerId'),
+                        $this->getParam('startDate'),
+                        $this->getParam('endDate'),
+                        $this->getParam('firstName'),
+                        $this->getParam('lastName')
                     )
                 );
                 break;
@@ -73,6 +78,9 @@ class CTContactAudit extends CTCNC
     /**
      * Display the initial form that prompts the employee for details
      * @access private
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     function displaySearchForm()
     {
@@ -85,7 +93,7 @@ class CTContactAudit extends CTCNC
         $this->setPageTitle("Contact Audit Log");
         $submitURL = Controller::buildLink(
             $_SERVER['PHP_SELF'],
-            array('action' => CTCUSTOMER_ACT_SEARCH)
+            array('action' => 'search')
         );
         $customerPopupURL =
             Controller::buildLink(
@@ -152,14 +160,8 @@ class CTContactAudit extends CTCNC
 
         $result = [];
 
-        $constants = DBEJContactAudit::getConstants();
-
         while ($test->fetchNext()) {
             $row = $test->getRowAsAssocArray();
-//            $row = [];
-//            foreach ($constants as $constant) {
-//                $row[$constant] = $test->getValue($constant);
-//            }
             $result[] = $row;
         }
 

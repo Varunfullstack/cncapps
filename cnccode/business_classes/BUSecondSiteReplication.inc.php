@@ -7,11 +7,6 @@ require_once($cfg["path_bu"] . '/BUSecondsite.inc.php');
 
 class BUSecondsiteReplication extends BUSecondsite
 {
-    function __construct(&$owner)
-    {
-        parent::__construct($owner);
-        $this->dbeSecondsiteImage = new DBESecondsiteImage($this);
-    }
 
     /**
      * Run validation process for all or just one server
@@ -44,6 +39,8 @@ class BUSecondsiteReplication extends BUSecondsite
             $excludeFromChecks = false;
 
             $isSuspended = $this->isSuspended($server);
+            $images = [];
+            $timeToLookFrom = null;
 
             if ($isSuspended) {
                 $this->suspendedServerCount++;
@@ -123,15 +120,6 @@ class BUSecondsiteReplication extends BUSecondsite
                     }
                 }
             }
-
-//            if ($error && !$customerItemID && !$isSuspended && !$testRun) {
-//                $this->sendBadConfigurationEmail(
-//                    $server,
-//                    $error,
-//                    $networkPath
-//                );
-//
-//            }
 
             if (!$error && !$excludeFromChecks) {
 
@@ -230,7 +218,6 @@ class BUSecondsiteReplication extends BUSecondsite
                                         'd/m/Y H:i:s',
                                         $mostRecentFileTime
                                     );
-                                $missingLetters[] = $driveLetter;
 
                                 $status = self::STATUS_OUT_OF_DATE;
                             } else {
@@ -287,117 +274,52 @@ class BUSecondsiteReplication extends BUSecondsite
                 if ($allServerImagesPassed) {
                     $this->resetSuspendedUntilDate($server['server_cuino']);
                 }
-
-//                if (!$isSuspended && count($missingImages) > 0 && !$customerItemID && !$testRun) {
-//
-//                    $buActivity = $this->getActivityModel()->raiseSecondSiteMissingImageRequest(
-//                        $server['custno'],
-//                        $server['serverName'],
-//                        $server['server_cuino'],
-//                        $server['cui_cuino'],
-//                        $missingLetters,
-//                        $missingImages
-//                    );
-//
-//                }
             } // if not error
 
         } // end foreach contracts
     }
 
-    function sendBadConfigurationEmail($server,
-                                       $errorMessage,
-                                       $networkPath = false
-    )
-    {
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            'secondsiteBadConfigurationEmail.inc.html'
-        );
-
-        $template->setVar(
-            array(
-                'customerName' => $server['cus_name'],
-                'cuino'        => $server['server_cuino'],
-                'serverName'   => $server['serverName'],
-                'errorMessage' => addslashes($errorMessage),
-                'networkPath'  => addslashes($networkPath)
-            )
-        );
-        $template->parse(
-            'output',
-            'page',
-            true
-        );
-
-        $body = $template->get_var('output');
-
-        $subject = '2nd Site configuration warning - ' . $server['cus_name'] . ' - ' . $server['serverName'];
-
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
-        $senderName = 'CNC Support Department';
-
-        $toEmail = '2sbadconfig@' . CONFIG_PUBLIC_DOMAIN;
-
-
-        $hdrs = array(
-            'To'           => $toEmail,
-            'From'         => $senderEmail,
-            'Subject'      => $subject,
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
-
-        $buMail = new BUMail($this);
-
-        $buMail->mime->setHTMLBody($body);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body,
-            true
-        );
-
-    }
-
 
     function setImageStatus($secondSiteImageID,
                             $status,
-                            $imagePath = '',
+                            $imagePath = null,
                             $imageTime = null
     )
     {
+
         $queryString =
             "UPDATE
         secondsite_image 
       SET
-        replicationStatus = '$status',
-        replicationImagePath = '" . addslashes($imagePath) . "',
-        replicationImageTime = '$imageTime'
+        replicationStatus = ?,
+        replicationImagePath = ?,
+        replicationImageTime = ?
       WHERE
-        secondSiteImageID = $secondSiteImageID";
-
+        secondSiteImageID = ?";
+        /** @var dbSweetcode $db */
         $db = $GLOBALS['db'];
 
-        $db->query($queryString);
+        $db->preparedQuery(
+            $queryString,
+            [
+                [
+                    'type'  => "s",
+                    'value' => $status
+                ],
+                [
+                    'type'  => "s",
+                    'value' => $imagePath
+                ],
+                [
+                    'type'  => "s",
+                    'value' => $imageTime
+                ],
+                [
+                    'type'  => "i",
+                    'value' => $secondSiteImageID
+                ],
+            ]
+        );
     }
 
     function setImageStatusByServer($customerItemID,
@@ -497,53 +419,6 @@ class BUSecondsiteReplication extends BUSecondsite
         return $servers;
     }
 
-    function updateSecondsiteImage(&$dsData)
-    {
-        $this->setMethodName('updateSecondsiteImage');
-        $this->updateDataAccessObject(
-            $dsData,
-            $this->dbeSecondsiteImage
-        );
-        return TRUE;
-    }
-
-    function getSecondsiteImageByID($ID,
-                                    &$dsResults
-    )
-    {
-        $this->dbeSecondsiteImage->setPKValue($ID);
-        $this->dbeSecondsiteImage->getRow();
-        return ($this->getData(
-            $this->dbeSecondsiteImage,
-            $dsResults
-        ));
-    }
-
-    function getSecondsiteImagesByCustomerItemID($customerItemID,
-                                                 &$dsResults
-    )
-    {
-        $this->dbeSecondsiteImage->setValue(
-            'customerItemID',
-            $customerItemID
-        );
-        $this->dbeSecondsiteImage->getRowsByColumn(
-            'customerItemID',
-            'imageName'
-        );
-        return ($this->getData(
-            $this->dbeSecondsiteImage,
-            $dsResults
-        ));
-    }
-
-
-    function deleteSecondsiteImage($ID)
-    {
-        $this->setMethodName('deleteSecondsiteImage');
-        return $this->dbeSecondsiteImage->deleteRow($ID);
-    }
-
     function getImagesByStatus($status)
     {
         $queryString =
@@ -591,127 +466,4 @@ class BUSecondsiteReplication extends BUSecondsite
         return $images;
 
     }
-
-    function initialiseSearchForm(&$dsData)
-    {
-        $dsData = new DSForm($this);
-        $dsData->addColumn(
-            'customerID',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $dsData->setValue(
-            'customerID',
-            ''
-        );
-        $dsData->addColumn(
-            'startYearMonth',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $dsData->setValue(
-            'startYearMonth',
-            ''
-        );
-        $dsData->addColumn(
-            'endYearMonth',
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $dsData->setValue(
-            'endYearMonth',
-            ''
-        );
-    }
-
-    function getResults(&$searchForm)
-    {
-        $buHeader = new BUHeader($this);
-        $buHeader->getHeader($dsHeader);
-
-        $customerID = $searchForm->getValue('customerID');
-
-        $startYearMonth = $searchForm->getValue('startYearMonth');
-        $endYearMonth = $searchForm->getValue('endYearMonth');
-
-        $sql =
-            "SELECT 
-          pro_custno,
-          cus_name as customerName,
-          custitem.cui_cust_ref as serverName,
-          CONCAT( YEAR(caa_date), '-' , LPAD( MONTH(caa_date), 2, '0' ) ) as period,
-          COUNT(*) AS `errors`
-        FROM
-          callactivity
-          JOIN problem ON pro_problemno = caa_problemno
-          JOIN customer ON cus_custno = pro_custno
-          JOIN custitem ON caa_secondsite_error_cuino = custitem.cui_cuino
-        WHERE
-          caa_date BETWEEN '$startYearMonth-01' AND '$endYearMonth-31'
-          AND caa_secondsite_error_cuino <> 0";
-
-        if ($customerID) {
-            $sql .= " AND pro_custno = $customerID";
-        }
-
-        $sql .=
-            " GROUP BY
-            pro_custno,
-            caa_secondsite_error_cuino,
-            YEAR(caa_date),
-            MONTH(caa_date)";
-
-        $results = $this->db->query($sql);
-
-        $ret = array();
-        while ($row = $results->fetch_array()) {
-            $ret[] = $row;
-        }
-
-        return $ret;
-
-    }
-
-    function getPerformanceDataForYear($year = null)
-    {
-
-        if (!$year) {
-            $year = date("Y");
-        }
-
-        $query = "SELECT SUM(passes)/ SUM(images) as successRate, MONTH FROM (
-            SELECT MONTH(created_at) AS MONTH, images, passes FROM backup_performance_log WHERE YEAR(created_at) = '$year'
-) t GROUP BY t.month";
-
-        $result = $this->db->query($query);
-
-        $data = [
-        ];
-
-        for ($i = 0; $i < 12; $i++) {
-            $data[$i + 1] = "N/A";
-        }
-
-        while ($row = $result->fetch_assoc()) {
-            $data[$row['MONTH']] = $row['successRate'] * 100;
-        }
-
-        return $data;
-    }
-
-    function getPerformanceDataAvailableYears()
-    {
-        $query = "SELECT  DISTINCT YEAR(created_at) AS YEAR  FROM    backup_performance_log";
-        $result = $this->db->query($query);
-
-        return array_map(
-            function ($item) {
-                return $item[0];
-            },
-            $result->fetch_all()
-        );
-    }
-
-
-}//End of class
-?>
+}

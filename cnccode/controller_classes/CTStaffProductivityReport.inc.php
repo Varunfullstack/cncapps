@@ -13,14 +13,25 @@ require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTStaffProductivityReport extends CTCNC
 {
-    public $dsPrintRange = '';
-    public $dsSearchForm = '';
-    public $dsResults = '';
+    public $dsPrintRange;
+    public $dsSearchForm;
+    public $dsResults;
     public $BUStaffProductivityReport;
 
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
+    function __construct($requestMethod,
+                         $postVars,
+                         $getVars,
+                         $cookieVars,
+                         $cfg
+    )
     {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        parent::__construct(
+            $requestMethod,
+            $postVars,
+            $getVars,
+            $cookieVars,
+            $cfg
+        );
         $roles = [
             "accounts",
         ];
@@ -33,10 +44,11 @@ class CTStaffProductivityReport extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST ['action']) {
+        switch ($this->getAction()) {
 
             default :
                 $this->search();
@@ -44,29 +56,39 @@ class CTStaffProductivityReport extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function search()
     {
 
         $this->setMethodName('search');
-
+        $dsSearchForm = new DSForm($this);
         $this->BUStaffProductivityReport->initialiseSearchForm($dsSearchForm);
 
-        if ($_SERVER [REQUEST_METHOD] == 'POST') {
+        if ($_SERVER ['REQUEST_METHOD'] == 'POST') {
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
                 $this->setFormErrorOn();
-
             } else {
-
-                if ($dsSearchForm->getValue('startDate') == '') {
+                if (!$dsSearchForm->getValue(BUStaffProductivityReport::searchFormStartDate)) {
 
                     $dsSearchForm->setUpdateModeUpdate();
-                    $dsSearchForm->setValue('startDate', date('Y-m-d', strtotime("-1 year")));
+                    $dsSearchForm->setValue(
+                        BUStaffProductivityReport::searchFormStartDate,
+                        date(
+                            'Y-m-d',
+                            strtotime("-1 year")
+                        )
+                    );
                     $dsSearchForm->post();
                 }
 
-                if (!$dsSearchForm->getValue('endDate')) {
+                if (!$dsSearchForm->getValue(BUStaffProductivityReport::searchFormEndDate)) {
                     $dsSearchForm->setUpdateModeUpdate();
-                    $dsSearchForm->setValue('endDate', date('Y-m-d'));
+                    $dsSearchForm->setValue(
+                        BUStaffProductivityReport::searchFormEndDate,
+                        date('Y-m-d')
+                    );
                     $dsSearchForm->post();
                 }
 
@@ -83,7 +105,10 @@ class CTStaffProductivityReport extends CTCNC
                         echo "Name,T&M Hours,T&M Costs,T&M Billed,Pre-pay Hours,Pre-pay Cost, Pre-pay Billed,Service Desk Hours,Service Desk Cost,Server Care Hours,Server Care Cost,In-house Hours,In-house Cost,Total Hours,Total Cost,Total Billed\n";
                         $firstRow = false;
                     }
-                    echo implode(',', $row) . "\n";
+                    echo implode(
+                            ',',
+                            $row
+                        ) . "\n";
 
                 }
 
@@ -95,30 +120,32 @@ class CTStaffProductivityReport extends CTCNC
 
         $this->setPageTitle('Staff Productivity Report');
 
-        $this->setTemplateFiles('StaffProductivityReport', 'StaffProductivityReport.inc');
-        $urlCustomerPopup = Controller::buildLink(
-            CTCNC_PAGE_CUSTOMER,
-            array(
-                'action' => CTCNC_ACT_DISP_CUST_POPUP,
-                'htmlFmt' => CT_HTML_FMT_POPUP
-            )
+        $this->setTemplateFiles(
+            'StaffProductivityReport',
+            'StaffProductivityReport.inc'
         );
-
 
         $this->template->set_var(
             array(
                 'formError' => $this->formError,
-                'startDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('startDate')),
-                'startDateMessage' => $dsSearchForm->getMessage('startDate'),
-                'endDate' => Controller::dateYMDtoDMY($dsSearchForm->getValue('endDate')),
-                'endDateMessage' => $dsSearchForm->getMessage('endDate')
+                'startDate' => Controller::dateYMDtoDMY(
+                    $dsSearchForm->getValue(BUStaffProductivityReport::searchFormStartDate)
+                ),
+                'startDateMessage' => $dsSearchForm->getMessage(BUStaffProductivityReport::searchFormStartDate),
+                'endDate' => Controller::dateYMDtoDMY(
+                    $dsSearchForm->getValue(BUStaffProductivityReport::searchFormEndDate)
+                ),
+                'endDateMessage' => $dsSearchForm->getMessage(BUStaffProductivityReport::searchFormEndDate)
             )
         );
 
-        $this->template->parse('CONTENTS', 'StaffProductivityReport', true);
+        $this->template->parse(
+            'CONTENTS',
+            'StaffProductivityReport',
+            true
+        );
         $this->parsePage();
 
     } // end function displaySearchForm
 
-} // end of class
-?>
+}

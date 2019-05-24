@@ -21,6 +21,7 @@ class DBEQuotation extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param $owner
      * @see constructor()
      */
     function __construct(&$owner)
@@ -55,7 +56,7 @@ class DBEQuotation extends DBEntity
         $this->addColumn(
             self::sentDateTime,
             DA_DATETIME,
-            DA_NOT_NULL
+            DA_ALLOW_NULL
         );
         $this->addColumn(
             self::userID,
@@ -78,9 +79,10 @@ class DBEQuotation extends DBEntity
 
     function getNextVersionNo()
     {
+        $ret = null;
         $this->setQueryString(
-            'SELECT MAX(' . $this->getDBColumnName('versionNo') . ') + 1 FROM ' . $this->getTableName() .
-            ' WHERE ' . $this->getDBColumnName('ordheadID') . '=' . $this->getFormattedValue('ordheadID')
+            'SELECT MAX(' . $this->getDBColumnName(self::versionNo) . ') + 1 FROM ' . $this->getTableName() .
+            ' WHERE ' . $this->getDBColumnName(self::ordheadID) . '=' . $this->getFormattedValue(self::ordheadID)
         );
         if ($this->runQuery()) {
             if ($this->nextRecord()) {
@@ -89,7 +91,7 @@ class DBEQuotation extends DBEntity
         }
         $this->resetQueryString();
         if ($ret == null) {
-            $ret = 1;
+            return 1;
         }
         return $ret;
     }
@@ -97,16 +99,14 @@ class DBEQuotation extends DBEntity
     function deleteRowsByOrderID()
     {
         $this->setMethodName('deleteRowsByOrderID');
-        if ($this->getValue('ordheadID') == '') {
+        if ($this->getValue(self::ordheadID) == '') {
             $this->raiseError('ordheadID not set');
         }
         $this->setQueryString(
             'DELETE FROM ' . $this->getTableName() . ' WHERE ' . $this->getDBColumnName(
-                'ordheadID'
-            ) . ' = ' . $this->getValue('ordheadID')
+                self::ordheadID
+            ) . ' = ' . $this->getValue(self::ordheadID)
         );
         return (parent::runQuery());
     }
 }
-
-?>

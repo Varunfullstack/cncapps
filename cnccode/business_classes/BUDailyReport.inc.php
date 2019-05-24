@@ -60,15 +60,7 @@ class BUDailyReport extends Business
             );
 
             $controller = new Controller(
-                '',
-                $nothing,
-                $nothing,
-                $nothing,
-                $nothing,
-                null,
-                null,
-                null,
-                null
+                '', $nothing, $nothing, $nothing, $nothing
             );
 
             do {
@@ -229,15 +221,7 @@ class BUDailyReport extends Business
             );
 
             $controller = new Controller(
-                '',
-                $nothing,
-                $nothing,
-                $nothing,
-                $nothing,
-                null,
-                null,
-                null,
-                null
+                '', $nothing, $nothing, $nothing, $nothing
             );
 
             do {
@@ -425,15 +409,7 @@ class BUDailyReport extends Business
             );
 
             $controller = new Controller(
-                '',
-                $nothing,
-                $nothing,
-                $nothing,
-                $nothing,
-                null,
-                null,
-                null,
-                null
+                '', $nothing, $nothing, $nothing, $nothing
             );
             do {
 
@@ -524,15 +500,7 @@ class BUDailyReport extends Business
             );
 
             $controller = new Controller(
-                '',
-                $nothing,
-                $nothing,
-                $nothing,
-                $nothing,
-                null,
-                null,
-                null,
-                null
+                '', $nothing, $nothing, $nothing, $nothing
             );
 
             do {
@@ -810,8 +778,7 @@ class BUDailyReport extends Business
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            true      // to SD Managers
+            $body      // to SD Managers
         );
 
         echo "SENT";
@@ -859,15 +826,7 @@ class BUDailyReport extends Business
             );
 
             $controller = new Controller(
-                '',
-                $nothing,
-                $nothing,
-                $nothing,
-                $nothing,
-                null,
-                null,
-                null,
-                null
+                '', $nothing, $nothing, $nothing, $nothing
             );
 
             $title = "P5 SRs with no SO";
@@ -893,10 +852,6 @@ class BUDailyReport extends Business
                             50
                         ),
                         'durationHours'    => $row[4],
-                        'timeSpentHours'   => $row[5],
-                        'lastUpdatedDate'  => $row[6],
-                        'priority'         => $row[7],
-                        'teamName'         => $row[8],
                         'urlRequest'       => $urlRequest,
                         'title'            => $title
                     )
@@ -917,10 +872,6 @@ class BUDailyReport extends Business
                             )
                         ),
                         'durationHours'    => $row[4],
-                        'timeSpentHours'   => $row[5],
-                        'lastUpdatedDate'  => $row[6],
-                        'priority'         => $row[7],
-                        'teamName'         => $row[8],
                     )
                 );
 
@@ -1031,15 +982,7 @@ class BUDailyReport extends Business
             $title = "P5 SRs with SO and not T&M";
 
             $controller = new Controller(
-                '',
-                $nothing,
-                $nothing,
-                $nothing,
-                $nothing,
-                null,
-                null,
-                null,
-                null
+                '', $nothing, $nothing, $nothing, $nothing
             );
 
             do {
@@ -1148,7 +1091,7 @@ WHERE pro_priority = 5
         return $this->db->query($sql);
     }
 
-    public function contactOpenSRReport($onScreen)
+    public function contactOpenSRReport($onScreen = false)
     {
         $this->setMethodName('contactOpenSRReport');
 

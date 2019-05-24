@@ -221,6 +221,10 @@ class CTCNC extends Controller
                          $cfg
     )
     {
+        if ($this->getParam('action')) {
+            $this->setAction($this->getAction());
+        }
+
         if (!$this->isRunningFromCommandLine() && isset($GLOBALS ['auth'])) {
             $this->userID = $GLOBALS ['auth']->is_authenticated();
         } else {
@@ -229,7 +233,7 @@ class CTCNC extends Controller
 
         $dbeUser = $this->getDbeUser();
         $dbeUser->setValue(
-            'userID',
+            DBEUser::userID,
             $this->userID
         );
         $dbeUser->getRow();
@@ -241,11 +245,7 @@ class CTCNC extends Controller
             $postVars,
             $getVars,
             $cookieVars,
-            $cfg,
-            "",
-            "",
-            "",
-            ""
+            $cfg
         );
     }
 
@@ -305,7 +305,7 @@ class CTCNC extends Controller
     /**
      * Is the request from the command line (or scheduled task)
      *
-     * @return unknown
+     * @return mixed
      */
     function isRunningFromCommandLine()
     {
@@ -316,6 +316,8 @@ class CTCNC extends Controller
     /**
      * Check a date in dd/mm/yyyy format
      * @access private
+     * @param $dateDMY
+     * @return bool
      */
     function isValidDate($dateDMY)
     {
@@ -337,6 +339,9 @@ class CTCNC extends Controller
         exit;
     }
 
+    /**
+     * @throws Exception
+     */
     function parsePage()
     {
         global $userName;
@@ -347,14 +352,14 @@ class CTCNC extends Controller
             array('action' => CTCNC_ACT_LOGOUT)
         );
         // if new session then username not set yet
-        if ($userName == '') {
+        if (!$userName) {
             $dbeUser = new DBEUser ($this);
             $dbeUser->setValue(
-                'userID',
+                DBEUser::userID,
                 $this->userID
             );
             $dbeUser->getRow();
-            $userName = $dbeUser->getValue('name');
+            $userName = $dbeUser->getValue(DBEUser::name);
         }
 
         $screenSalesTemplate = 'ScreenSales.inc';
@@ -366,7 +371,7 @@ class CTCNC extends Controller
         $screenCustomerTemplate = 'ScreenCustomer.inc';
 
 
-        if (isset($_REQUEST['oldMenu'])) {
+        if ($this->getParam('oldMenu')) {
             $screenSalesTemplate = 'ScreenSalesOld.inc';
             $screenAccountsTemplate = 'ScreenAccountsOld.inc';
             $screenTechnicalTemplate = 'ScreenTechnicalOld.inc';
@@ -376,8 +381,8 @@ class CTCNC extends Controller
             $screenCustomerTemplate = 'ScreenCustomerOld.inc';
         }
 
-        $this->template->set_var(array('userName' => $userName, 'fromDate' => '', 'urlLogout' => $urlLogout));
-        // display correct menus despending upon permission levels for this user
+        $this->template->set_var(array('userName' => $userName, 'fromDate' => null, 'urlLogout' => $urlLogout));
+        // display correct menus depending upon permission levels for this user
         if ($this->hasPermissions(PHPLIB_PERM_SALES)) {
 
             $this->setTemplateFiles(array('ScreenSales' => $screenSalesTemplate));
@@ -423,7 +428,7 @@ class CTCNC extends Controller
                 $this->template->setVar(
                     'starterLeaverMenu',
                     '<TR>
-    <TD align="left"
+    <TD style="text-align: left"
         nowrap="nowrap"
     >
         <A href="StarterLeaverManagement.php"
@@ -499,15 +504,16 @@ class CTCNC extends Controller
         parent::parsePage();
     }
 
+
     function initialProcesses()
     {
-        if ($_REQUEST ['htmlFmt'] != '') {
+        if ($this->getParam('htmlFmt')) {
             $this->setHTMLFmt($_REQUEST ['htmlFmt']);
         }
 
-        $user = self::getDbeUser();
+        self::getDbeUser();
 
-        switch ($_REQUEST ['action']) {
+        switch ($this->getAction()) {
             case CTCNC_ACT_LOGOUT :
                 $this->logout();
                 break;
@@ -536,7 +542,7 @@ class CTCNC extends Controller
 
         $permissions = explode(
             ",",
-            self::getDbeUser()->getValue('perms')
+            self::getDbeUser()->getValue(DBEUser::perms)
         );
         if (is_array($levels)) {
 
@@ -559,19 +565,19 @@ class CTCNC extends Controller
     {
         $dbeUser = $this->getDbeUser();
         $dbeUser->setValue(
-            'userID',
+            DBEUser::userID,
             $this->userID
         );
         $dbeUser->getRow();
 
         $dbeTeam = $this->getDbeTeam();
         $dbeTeam->setValue(
-            'teamID',
-            $dbeUser->getValue('teamID')
+            DBETeam::teamID,
+            $dbeUser->getValue(DBEUser::teamID)
         );
         $dbeTeam->getRow();
 
-        if ($dbeTeam->getValue('level') >= $level) {
+        if ($dbeTeam->getValue(DBETeam::level) >= $level) {
             $ret = true;
         } else {
             $ret = false;
@@ -584,12 +590,12 @@ class CTCNC extends Controller
     {
         $dbeUser = $this->getDbeUser();
         $dbeUser->setValue(
-            'userID',
+            DBEUser::userID,
             $this->userID
         );
         $dbeUser->getRow();
 
-        if ($dbeUser->getValue('changePriorityFlag') == 'Y') {
+        if ($dbeUser->getValue(DBEUser::changePriorityFlag) == 'Y') {
             $ret = true;
         } else {
             $ret = false;
@@ -600,12 +606,11 @@ class CTCNC extends Controller
 
     function getChecked($flag)
     {
-        return ($flag == 'N' ? '' : CT_CHECKED);
+        return ($flag == 'N' ? null : CT_CHECKED);
     }
 
     protected function isAppraiser()
     {
         return $this->dbeUser->getValue(DBEUser::staffAppraiserFlag) == 'Y';
     }
-} // end of class
-?>
+}

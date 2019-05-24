@@ -57,14 +57,18 @@ class BUPDFSupportContract extends BaseObject
 {
     /** @var BUPDF */
     private $_buPDF;
-    var $_dsContract = '';
-    var $_dsCustomerItem = '';
-    var $_dsCustomer = '';
-    var $_buActivity = '';
-    var $_dsSite = '';
-    var $_titleLine = 0;
-    var $_renewalTypeID = '';
-    var $_customerHasServiceDeskContract;
+    /** @var DataSet|DBEJContract */
+    public $_dsContract;
+    /** @var DataSet|DBEJCustomerItem */
+    public $_dsCustomerItem;
+    /** @var DataSet|DBECustomer */
+    public $_dsCustomer;
+    public $_buActivity;
+    /** @var DataSet|DBESite */
+    public $_dsSite;
+    public $_titleLine;
+    public $_renewalTypeID;
+    public $_customerHasServiceDeskContract;
 
     /**
      * Constructor
@@ -98,13 +102,14 @@ class BUPDFSupportContract extends BaseObject
      * Use the parameters passed in constructor to get list of invoices and generate a PDF file on
      * disk.
      * If no invoices are found then return FALSE
+     * @param bool $encrypted
      * @return String PDF disk file name or FALSE
      */
     function generateFile($encrypted = true)
     {
         $this->_dsContract->initialise();
         $this->_dsContract->fetchNext();
-        $pdfFile = DELIVERY_NOTES_DIR . '/' . $this->_dsContract->getValue('customerItemID') . '.pdf';
+        $pdfFile = DELIVERY_NOTES_DIR . '/' . $this->_dsContract->getValue(DBEJContract::customerItemID) . '.pdf';
         $this->_buPDF = new BUPDF(
             $this,
             $pdfFile,
@@ -125,7 +130,6 @@ class BUPDFSupportContract extends BaseObject
         // local refs
         $dsContract = &$this->_dsContract;
         $dsCustomerItem = &$this->_dsCustomerItem;
-        $dsSite = &$this->_dsSite;
         $this->noteHead();
         $lineCount = 0;
         $dsCustomerItem->initialise();
@@ -133,18 +137,18 @@ class BUPDFSupportContract extends BaseObject
         $this->_buPDF->setFont();
         $this->_buPDF->printStringAt(
             BUPDFSUPPORT_DETAILS_COL,
-            $dsContract->getValue('itemDescription')
+            $dsContract->getValue(DBEJCustomerItem::itemDescription)
         );
 
         // print item notes
         // we need to split the lines up for the PDF printing
-        if ($dsContract->getValue('itemNotes') != '') {
+        if ($dsContract->getValue(DBEJCustomerItem::itemNotes) != '') {
             $this->_buPDF->setFontSize(6);
             $this->_buPDF->setFont();
             $this->_buPDF->CR();
             $notesArray = explode(
                 chr(13) . chr(10),
-                $dsContract->getValue('itemNotes')
+                $dsContract->getValue(DBEJCustomerItem::itemNotes)
             );
             foreach ($notesArray as $noteLine) {
                 $this->_buPDF->CR();
@@ -157,13 +161,13 @@ class BUPDFSupportContract extends BaseObject
 
         // print customer item notes
         // we need to split the lines up for the PDF printing
-        if ($dsContract->getValue('customerItemNotes') != '') {
+        if ($dsContract->getValue(DBEJCustomerItem::customerItemNotes) != '') {
             $this->_buPDF->setFontSize(6);
             $this->_buPDF->setFont();
             $this->_buPDF->CR();
             $notesArray = explode(
                 chr(13) . chr(10),
-                $dsContract->getValue('customerItemNotes')
+                $dsContract->getValue(DBEJCustomerItem::customerItemNotes)
             );
             foreach ($notesArray as $noteLine) {
                 $this->_buPDF->CR();
@@ -181,7 +185,7 @@ class BUPDFSupportContract extends BaseObject
             $this->_buPDF->CR();
             $this->_buPDF->printStringAt(
                 BUPDFSUPPORT_DETAILS_COL,
-                'Phone Number: ' . $dsContract->getValue('adslPhone')
+                'Phone Number: ' . $dsContract->getValue(DBEJCustomerItem::adslPhone)
             );
         }
 
@@ -192,7 +196,7 @@ class BUPDFSupportContract extends BaseObject
             $this->_buPDF->CR();
             $this->_buPDF->printStringAt(
                 BUPDFSUPPORT_DETAILS_COL,
-                'Domain: ' . $dsContract->getValue('notes')
+                'Domain: ' . $dsContract->getValue(DBEJCustomerItem::notes)
             );
         }
 
@@ -227,12 +231,14 @@ class BUPDFSupportContract extends BaseObject
                     $this->_buPDF->CR();
                     $lineCount = 2;
                 }
-                if ($dsCustomerItem->getValue('serverName')) {
-                    $itemDescription = $dsCustomerItem->getValue('itemDescription') . '(' . $dsCustomerItem->getValue(
-                            'serverName'
+                if ($dsCustomerItem->getValue(DBEJCustomerItem::serverName)) {
+                    $itemDescription = $dsCustomerItem->getValue(
+                            DBEJCustomerItem::itemDescription
+                        ) . '(' . $dsCustomerItem->getValue(
+                            DBEJCustomerItem::serverName
                         ) . ')';
                 } else {
-                    $itemDescription = $dsCustomerItem->getValue('itemDescription');
+                    $itemDescription = $dsCustomerItem->getValue(DBEJCustomerItem::itemDescription);
                 }
 
                 $this->_buPDF->printStringAt(
@@ -241,25 +247,25 @@ class BUPDFSupportContract extends BaseObject
                 );
                 $this->_buPDF->printStringAt(
                     BUPDFSUPPORT_SERIAL_NO_COL - 30,
-                    $dsCustomerItem->getValue('serialNo')
+                    $dsCustomerItem->getValue(DBEJCustomerItem::serialNo)
                 );
                 $this->_buPDF->printStringRJAt(
                     BUPDFSUPPORT_PURCHASE_DATE,
-                    Controller::dateYMDtoDMY($dsCustomerItem->getValue('despatchDate'))
+                    Controller::dateYMDtoDMY($dsCustomerItem->getValue(DBEJCustomerItem::despatchDate))
                 );
                 $this->_buPDF->CR();
             } while ($dsCustomerItem->fetchNext());
         }
 
 
-        if ($dsContract->getValue('users') > 0) {
+        if ($dsContract->getValue(DBEJCustomerItem::users) > 0) {
             $this->_buPDF->CR();
             $this->_buPDF->setFontSize(10);
             $this->_buPDF->setFont();
             $this->_buPDF->CR();
             $this->_buPDF->printStringAt(
                 BUPDFSUPPORT_DETAILS_COL,
-                'Number of supported users: ' . $dsContract->getValue('users')
+                'Number of supported users: ' . $dsContract->getValue(DBEJCustomerItem::users)
             );
             $this->_buPDF->setFontSize(10);
             $this->_buPDF->setFont();
@@ -427,7 +433,7 @@ class BUPDFSupportContract extends BaseObject
         $this->_buPDF->CR();
         $this->_buPDF->CR();
         $firstAddLine = $this->_buPDF->getYPos();    // remember this line no
-        $this->_buPDF->printString($dsContract->getValue('customerName'));
+        $this->_buPDF->printString($dsContract->getValue(DBEJCustomerItem::customerName));
         $this->_buPDF->CR();
         $this->_buPDF->setFontSize(8);
         $this->_buPDF->setFont();
@@ -525,7 +531,7 @@ class BUPDFSupportContract extends BaseObject
         $this->_buPDF->setFont();
         $this->_buPDF->printStringAt(
             BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE,
-            Controller::dateYMDtoDMY($dsContract->getValue('installationDate'))
+            Controller::dateYMDtoDMY($dsContract->getValue(DBEJCustomerItem::installationDate))
         );
         $this->_buPDF->CR();
         $this->_buPDF->box(
@@ -543,7 +549,7 @@ class BUPDFSupportContract extends BaseObject
         $this->_buPDF->setBoldOn();
         $this->_buPDF->setFont();
 
-        if ($dsContract->getValue('itemID') != CONFIG_DEF_PREPAY_ITEMID) {
+        if ($dsContract->getValue(DBEJCustomerItem::itemID) != CONFIG_DEF_PREPAY_ITEMID) {
             $this->_buPDF->printStringRJAt(
                 BUPDFSUPPORT_HEADING_DESC_COL,
                 'Billing Period'
@@ -552,7 +558,7 @@ class BUPDFSupportContract extends BaseObject
             $this->_buPDF->setFont();
             $this->_buPDF->printStringAt(
                 BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE,
-                $dsContract->getValue('invoicePeriodMonths') . ' month(s)'
+                $dsContract->getValue(DBEJCustomerItem::invoicePeriodMonths) . ' month(s)'
             );
         }
 
@@ -580,7 +586,7 @@ class BUPDFSupportContract extends BaseObject
         $this->_buPDF->setFont();
         $this->_buPDF->printStringAt(
             BUPDFSUPPORT_PURCHASE_DATE_BOX_LEFT_EDGE,
-            $dsContract->getValue('customerItemID')
+            $dsContract->getValue(DBEJCustomerItem::customerItemID)
         );
         $this->_buPDF->CR();
 
@@ -592,9 +598,9 @@ class BUPDFSupportContract extends BaseObject
             $this->_buPDF->getFontSize() / 2
         );
 
-        $itemID = $dsContract->getValue('itemID');
-        $this->_renewalTypeID = $dsContract->getValue('renewalTypeID');
-
+        $itemID = $dsContract->getValue(DBEJCustomerItem::itemID);
+        $this->_renewalTypeID = $dsContract->getValue(DBEJCustomerItem::renewalTypeID);
+        $annualPrice = null;
         if ($itemID != CONFIG_DEF_PREPAY_ITEMID) {
             /*
             Calculate annual price depending upon type
@@ -604,7 +610,7 @@ class BUPDFSupportContract extends BaseObject
 
                 case(CONFIG_BROADBAND_RENEWAL_TYPE_ID):
                     $annualPrice = number_format(
-                        $dsContract->getValue('salePricePerMonth') * 12,
+                        $dsContract->getValue(DBEJCustomerItem::salePricePerMonth) * 12,
                         2
                     );
                     break;
@@ -613,15 +619,15 @@ class BUPDFSupportContract extends BaseObject
                 case(CONFIG_DOMAIN_RENEWAL_TYPE_ID):
                     $dbeItem = new DBEItem($this);
                     $dbeItem->getRow($itemID);
-                    $annualPrice = $dbeItem->getValue('curUnitSale');
+                    $annualPrice = $dbeItem->getValue(DBEItem::curUnitSale);
                     break;
 
                 case(CONFIG_CONTRACT_RENEWAL_TYPE_ID):
-                    $annualPrice = $dsContract->getValue('curUnitSale');
+                    $annualPrice = $dsContract->getValue(DBEJCustomerItem::curUnitSale);
                     break;
 
                 case(CONFIG_HOSTING_RENEWAL_TYPE_ID):
-                    $annualPrice = $dsContract->getValue('curUnitSale');
+                    $annualPrice = $dsContract->getValue(DBEJCustomerItem::curUnitSale);
                     break;
             }
 
@@ -694,7 +700,5 @@ class BUPDFSupportContract extends BaseObject
         $this->_buPDF->setBoldOff();
         $this->_buPDF->setFont();
         $this->_buPDF->CR();
-        $grandTotal = 0;
     }
-}// End of class
-?>
+}

@@ -23,6 +23,7 @@ String
 define('SC_DB_STRING', 'SC_DB_STRING');
 define('SC_DB_STRING_1', 'SC_DB_STRING_1');
 define('SC_DB_STRING_5', 'SC_DB_STRING_5');
+define('SC_DB_STRING_10', 'SC_DB_STRING_10');
 define('SC_DB_STRING_20', 'SC_DB_STRING_20');
 define('SC_DB_STRING_30', 'SC_DB_STRING_30');
 define('SC_DB_STRING_50', 'SC_DB_STRING_50');
@@ -139,6 +140,16 @@ class SC_DB extends SC_Object
                 => false,
                 'min' => false,
                 'max' => 5,
+                'is_numeric' => false,
+                'msg' => false
+            ),
+        SC_DB_STRING_10 =>
+            array(
+                'validate_function' => 'SC_String:isString',
+                'format_function'
+                                    => false,
+                'min' => false,
+                'max' => 10,
                 'is_numeric' => false,
                 'msg' => false
             ),
@@ -807,29 +818,6 @@ class SC_DB extends SC_Object
             $ret = true;
         }
         return $ret;
-    }
-
-    /*
-    * Log table update to table_update table
-    */
-    function logUpdate($type, $row_before = false)
-    {
-        require_once(CONFIG_PATH_SC_CLASSES . 'table_update.php');
-        $table_update = new SC_TableUpdate();
-        $table_update->setPKValue(null);
-        $table_update->setValue('table_update.table', $this->getTableName());
-        $table_update->setValue('table_update.pk_id', $this->getPKValue());
-        $table_update->setValue('table_update.type', $type);
-        if ($row_before) {
-            $table_update->setValue('table_update.row_before', serialize($row_before));
-        }
-        $table_update->setValue('table_update.row_after', serialize($this->row));
-        if (!$table_update->update()) {
-            $this->raiseError('Failed to update table_update table. Errors array: ' . print_r($table_update->errors, true));
-        } else {
-            require_once(CONFIG_PATH_SC_CLASSES . 'page_cache.php');
-            SC_PageCache::reset();                                    // so pages must update
-        }
     }
 
     /**
@@ -1642,43 +1630,6 @@ class SC_DB extends SC_Object
         return $ret;        // success status
     }
 
-    function delete($pk_id = false)
-    {
-        $ret = false;
-
-        if ($pk_id) {
-
-            $this->getRow($pk_id);                // so we can log before contents
-
-            $this->checkConnection();
-
-            $this->statement =
-                $this->connection->prepare(
-                    'DELETE' . CR .
-                    'FROM' . CR .
-                    TAB . $this->getTableName() . CR .
-                    'WHERE' . CR .
-                    TAB . $this->getPKName() . ' = ~1' . CR .
-                    TAB . $this->getSQLWhereConstraint()
-                );
-
-            if (
-            $this->statement->execute($pk_id)
-            ) {
-                $ret = true;
-                $this->row = array();
-                $this->initialiseRow();
-                $this->setPKValue($pk_id);
-                $this->logUpdate('D');
-            }
-
-        } else {
-            $this->raiseError('SC_DB::delete: pk_id not passed in');
-        }
-        $this->statement = false; // clear down
-
-        return $ret;        // success status
-    }
 
     /**
      * get all rows

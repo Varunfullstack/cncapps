@@ -11,20 +11,26 @@ require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 class BUTeamPerformance extends Business
 {
 
+    const searchFormYear = 'year';
+
     private $connection;
 
     function __construct(&$owner)
     {
         parent::__construct($owner);
 
-        $this->connection = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8', DB_USER, DB_PASSWORD);
+        $this->connection = new PDO(
+            'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8',
+            DB_USER,
+            DB_PASSWORD
+        );
     }
 
     function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);
-        $dsData->addColumn('year', DA_STRING, DA_ALLOW_NULL);
-        $dsData->setValue('year', '');
+        $dsData->addColumn(self::searchFormYear, DA_STRING, DA_ALLOW_NULL);
+        $dsData->setValue(self::searchFormYear, null);
     }
 
     /*
@@ -35,7 +41,7 @@ class BUTeamPerformance extends Business
         /* get current header fields */
 
         $buHeader = new BUHeader($this);
-
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
         /* row for each level */
 
@@ -87,31 +93,109 @@ class BUTeamPerformance extends Business
 
         $record =
             array(
-                'year' => $year,
-                'month' => $month,
-                'hdTeamTargetSlaPercentage' => $dsHeader->getValue('hdTeamTargetSlaPercentage'),
-                'hdTeamTargetFixHours' => $dsHeader->getValue('hdTeamTargetFixHours'),
-                'hdTeamTargetFixQtyPerMonth' => $dsHeader->getValue('hdTeamTargetFixQtyPerMonth'),
-                'hdTeamActualSlaPercentage' => $hdTeamActualSlaPercentage,
-                'hdTeamActualFixHours' => $hdTeamFixAverageHours,
+                'year'                       => $year,
+                'month'                      => $month,
+                'hdTeamTargetSlaPercentage'  => $dsHeader->getValue(DBEHeader::hdTeamTargetSlaPercentage),
+                'hdTeamTargetFixHours'       => $dsHeader->getValue(DBEHeader::hdTeamTargetFixHours),
+                'hdTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEHeader::hdTeamTargetFixQtyPerMonth),
+                'hdTeamActualSlaPercentage'  => $hdTeamActualSlaPercentage,
+                'hdTeamActualFixHours'       => $hdTeamFixAverageHours,
                 'hdTeamActualFixQtyPerMonth' => $this->getFixCount($year, $month, 1),
 
-                'esTeamTargetSlaPercentage' => $dsHeader->getValue('esTeamTargetSlaPercentage'),
-                'esTeamTargetFixHours' => $dsHeader->getValue('esTeamTargetFixHours'),
-                'esTeamTargetFixQtyPerMonth' => $dsHeader->getValue('esTeamTargetFixQtyPerMonth'),
-                'esTeamActualSlaPercentage' => $esTeamActualSlaPercentage,
-                'esTeamActualFixHours' => $esTeamFixAverageHours,
+                'esTeamTargetSlaPercentage'  => $dsHeader->getValue(DBEHeader::esTeamTargetSlaPercentage),
+                'esTeamTargetFixHours'       => $dsHeader->getValue(DBEHeader::esTeamTargetFixHours),
+                'esTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEHeader::esTeamTargetFixQtyPerMonth),
+                'esTeamActualSlaPercentage'  => $esTeamActualSlaPercentage,
+                'esTeamActualFixHours'       => $esTeamFixAverageHours,
                 'esTeamActualFixQtyPerMonth' => $this->getFixCount($year, $month, 2),
 
-                'imTeamTargetSlaPercentage' => $dsHeader->getValue('imTeamTargetSlaPercentage'),
-                'imTeamTargetFixHours' => $dsHeader->getValue('imTeamTargetFixHours'),
-                'imTeamTargetFixQtyPerMonth' => $dsHeader->getValue('imTeamTargetFixQtyPerMonth'),
-                'imTeamActualSlaPercentage' => $imTeamActualSlaPercentage,
-                'imTeamActualFixHours' => $imTeamFixAverageHours,
+                'imTeamTargetSlaPercentage'  => $dsHeader->getValue(DBEHeader::imTeamTargetSlaPercentage),
+                'imTeamTargetFixHours'       => $dsHeader->getValue(DBEHeader::imTeamTargetFixHours),
+                'imTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEHeader::imTeamTargetFixQtyPerMonth),
+                'imTeamActualSlaPercentage'  => $imTeamActualSlaPercentage,
+                'imTeamActualFixHours'       => $imTeamFixAverageHours,
                 'imTeamActualFixQtyPerMonth' => $this->getFixCount($year, $month, 3)
             );
 
         $this->updatePerformanceRecord($record);
+    }
+
+    function getCount($year, $month, $teamLevel, $resolvedWithinSla = false)
+    {
+        $sql =
+            "SELECT
+        COUNT(*)
+      FROM
+        problem
+        JOIN consultant ON pro_started_consno = cns_consno
+        JOIN team ON team.`teamID` = consultant.`teamID`        
+      WHERE
+        pro_status = 'C'
+        AND pro_custno <> " . CONFIG_INTERNAL_CUSTOMERID .
+            " AND team.`level` = ?
+        AND pro_priority < 5
+        AND MONTH(pro_complete_date) = ? AND YEAR( pro_complete_date) = ?";
+
+        if ($resolvedWithinSla) {
+            $sql .= " AND pro_sla_response_hours >= pro_responded_hours";
+        }
+
+        $statement = $this->connection->prepare($sql);
+
+        $statement->execute(array($teamLevel, $month, $year));
+
+        return $statement->fetchColumn();
+    }
+
+    function getFixAverageHours($year, $month, $teamLevel)
+    {
+        $sql =
+            "SELECT
+      AVG( pro_working_hours )
+    FROM
+      problem
+      JOIN consultant ON pro_fixed_consno = cns_consno
+      JOIN team ON team.`teamID` = consultant.`teamID`
+    WHERE
+      pro_status = 'C'
+      AND pro_custno <> " . CONFIG_INTERNAL_CUSTOMERID .
+            " AND team.`level` = ?
+      AND pro_priority < 5
+      AND MONTH(pro_complete_date) = ? AND YEAR( pro_complete_date) = ?";
+
+        $statement = $this->connection->prepare($sql);
+
+        $statement->execute(array($teamLevel, $month, $year));
+
+        $ret = $statement->fetchColumn();
+
+        if (is_null($ret)) {
+            $ret = 0;
+        }
+        return $ret;
+    }
+
+    function getFixCount($year, $month, $teamLevel)
+    {
+        $sql =
+            "SELECT
+        COUNT(*)
+      FROM
+        problem
+        JOIN consultant ON pro_fixed_consno = cns_consno
+        JOIN team ON team.`teamID` = consultant.`teamID`        
+      WHERE
+        pro_status = 'C'
+        AND pro_custno <> " . CONFIG_INTERNAL_CUSTOMERID .
+            " AND team.`level` = ?
+        AND pro_priority < 5
+        AND MONTH(pro_complete_date) = ? AND YEAR( pro_complete_date) = ?";
+
+        $statement = $this->connection->prepare($sql);
+
+        $statement->execute(array($teamLevel, $month, $year));
+
+        return $statement->fetchColumn();
     }
 
     function updatePerformanceRecord($record)
@@ -154,6 +238,21 @@ class BUTeamPerformance extends Business
         }
     }
 
+    private function getSqlSetColumnString($array)
+    {
+        $string = null;
+        $line = null;
+        foreach ($array as $key => $value) {
+            if ($string) {
+                $line = ',';
+            }
+            $line .= '`' . $key . '` = :' . $key;
+
+            $string .= $line;
+        }
+        return $string;
+    }
+
     function getPerformanceRecord($month, $year)
     {
         $month = ( integer )$month; //strip leading zero
@@ -174,84 +273,6 @@ class BUTeamPerformance extends Business
 
     }
 
-    function getCount($year, $month, $teamLevel, $resolvedWithinSla = false)
-    {
-        $sql =
-            "SELECT
-        COUNT(*)
-      FROM
-        problem
-        JOIN consultant ON pro_started_consno = cns_consno
-        JOIN team ON team.`teamID` = consultant.`teamID`        
-      WHERE
-        pro_status = 'C'
-        AND pro_custno <> " . CONFIG_INTERNAL_CUSTOMERID .
-            " AND team.`level` = ?
-        AND pro_priority < 5
-        AND MONTH(pro_complete_date) = ? AND YEAR( pro_complete_date) = ?";
-
-        if ($resolvedWithinSla) {
-            $sql .= " AND pro_sla_response_hours >= pro_responded_hours";
-        }
-
-        $statement = $this->connection->prepare($sql);
-
-        $statement->execute(array($teamLevel, $month, $year));
-
-        return $statement->fetchColumn();
-    }
-
-    function getFixCount($year, $month, $teamLevel)
-    {
-        $sql =
-            "SELECT
-        COUNT(*)
-      FROM
-        problem
-        JOIN consultant ON pro_fixed_consno = cns_consno
-        JOIN team ON team.`teamID` = consultant.`teamID`        
-      WHERE
-        pro_status = 'C'
-        AND pro_custno <> " . CONFIG_INTERNAL_CUSTOMERID .
-            " AND team.`level` = ?
-        AND pro_priority < 5
-        AND MONTH(pro_complete_date) = ? AND YEAR( pro_complete_date) = ?";
-
-        $statement = $this->connection->prepare($sql);
-
-        $statement->execute(array($teamLevel, $month, $year));
-
-        return $statement->fetchColumn();
-    }
-
-    function getFixAverageHours($year, $month, $teamLevel)
-    {
-        $sql =
-            "SELECT
-      AVG( pro_working_hours )
-    FROM
-      problem
-      JOIN consultant ON pro_fixed_consno = cns_consno
-      JOIN team ON team.`teamID` = consultant.`teamID`
-    WHERE
-      pro_status = 'C'
-      AND pro_custno <> " . CONFIG_INTERNAL_CUSTOMERID .
-            " AND team.`level` = ?
-      AND pro_priority < 5
-      AND MONTH(pro_complete_date) = ? AND YEAR( pro_complete_date) = ?";
-
-        $statement = $this->connection->prepare($sql);
-
-        $statement->execute(array($teamLevel, $month, $year));
-
-        $ret = $statement->fetchColumn();
-
-        if (is_null($ret)) {
-            $ret = 0;
-        }
-        return $ret;
-    }
-
     private function convertArrayToPlaceholders($array)
     {
         $ret = array();
@@ -260,21 +281,6 @@ class BUTeamPerformance extends Business
             $ret[':' . $key] = $value;
         }
         return $ret;
-    }
-
-    private function getSqlSetColumnString($array)
-    {
-        $string = '';
-
-        foreach ($array as $key => $value) {
-            if ($string) {
-                $line = ',';
-            }
-            $line .= '`' . $key . '` = :' . $key;
-
-            $string .= $line;
-        }
-        return $string;
     }
 
     function getRecordsByYear($year)
@@ -364,9 +370,17 @@ class BUTeamPerformance extends Business
 
         $statement->execute();
 
-        $activity_connection = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8', DB_USER, DB_PASSWORD);
+        $activity_connection = new PDO(
+            'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8',
+            DB_USER,
+            DB_PASSWORD
+        );
 
-        $update_connection = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8', DB_USER, DB_PASSWORD);
+        $update_connection = new PDO(
+            'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8',
+            DB_USER,
+            DB_PASSWORD
+        );
 
         $sql =
             "UPDATE
@@ -400,20 +414,16 @@ class BUTeamPerformance extends Business
 
             $get_act_statement = $activity_connection->prepare($sql);
 
-            $get_act_statement->execute(array($result['pro_problemno'], CONFIG_INITIAL_ACTIVITY_TYPE_ID, CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID));
+            $get_act_statement->execute(
+                array($result['pro_problemno'], CONFIG_INITIAL_ACTIVITY_TYPE_ID, CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID)
+            );
 
             if ($cons_result = $get_act_statement->fetch()) {
 
                 $updateStatement->execute(array($cons_result['caa_consno'], $result['pro_problemno']));
 
                 echo 'SR: ' . $result['pro_problemno'] . ' to ' . $cons_result['caa_consno'] . '<br/>';
-
             }
-
-
         }
-
     }
-
-}//End of class
-?>
+}

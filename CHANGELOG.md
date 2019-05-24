@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.0.0] - 2019-05-24
+### Changed
+- Issue 492 - Upgrade PHP & mySQL to the later versions
+
 ## [v2.4.3] - 2019-05-22
 ### Fixed
 - Implementation team targets are not showing correctly for users on the home page

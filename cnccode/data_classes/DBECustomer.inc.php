@@ -69,8 +69,8 @@ class DBECustomer extends DBCNCEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -160,7 +160,7 @@ class DBECustomer extends DBCNCEntity
         );
         $this->addColumn(
             self::noOfPCs,
-            DA_INTEGER,
+            DA_STRING,
             DA_ALLOW_NULL
         );
         $this->addColumn(
@@ -278,14 +278,14 @@ class DBECustomer extends DBCNCEntity
         );
         $this->addColumn(
             self::sendContractEmail,
-            DA_INTEGER,
-            DA_NOT_NULL,
+            DA_STRING,
+            DA_ALLOW_NULL,
             "cus_send_contract_email"
         );
         $this->addColumn(
             self::sendTandcEmail,
-            DA_INTEGER,
-            DA_NOT_NULL,
+            DA_STRING,
+            DA_ALLOW_NULL,
             "cus_send_tandc_email"
         );
         $this->addColumn(
@@ -395,7 +395,7 @@ class DBECustomer extends DBCNCEntity
 
         $this->addColumn(
             self::sortCode,
-            DA_INTEGER,
+            DA_STRING,
             DA_ALLOW_NULL
         );
 
@@ -582,7 +582,7 @@ class DBECustomer extends DBCNCEntity
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " where cus_mailshot = 'Y'
-				AND ( reviewDate IS NULL OR reviewDate = '0000-00-00' )
+				AND reviewDate IS NULL
 				AND ( select count(*) from invhead where inh_custno = cus_custno and inh_date_printed > DATE_SUB(CURDATE() ,INTERVAL 6 MONTH ) ) = 0";
 
         $queryString .= ' LIMIT 0,1';
@@ -618,7 +618,7 @@ class DBECustomer extends DBCNCEntity
 			)
 			OR
 			(
-				( reviewDate IS NOT NULL and reviewDate <> "0000-00-00" )
+				reviewDate IS NOT NULL
 				and reviewDate <= CURDATE()
 			))';
 
@@ -709,8 +709,7 @@ class DBECustomer extends DBCNCEntity
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             "	WHERE			
-				( reviewDate IS NOT NULL and reviewDate <> '0000-00-00' )
-				and reviewDate <= CURDATE()";
+				reviewDate IS NOT NULL and reviewDate <= CURDATE()";
 
         if ($userID) {
             $queryString .= "
@@ -764,8 +763,7 @@ class DBECustomer extends DBCNCEntity
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::lastReviewMeetingDate) . " <> '0000-00-00' and
-             " . $this->getDBColumnName(self::lastReviewMeetingDate) . ' is not null and ' .
+            " WHERE " . $this->getDBColumnName(self::lastReviewMeetingDate) . ' is not null and ' .
             $this->getDBColumnName(self::referredFlag) . ' = "N" ';
 
         $this->setQueryString($queryString);

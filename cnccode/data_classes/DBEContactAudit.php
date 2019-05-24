@@ -7,6 +7,7 @@
  */
 
 require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
+require_once($cfg["path_dbe"] . "/DBEContact.inc.php");
 
 class DBEContactAudit extends DBEContact
 {
@@ -18,8 +19,8 @@ class DBEContactAudit extends DBEContact
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)

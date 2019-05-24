@@ -24,6 +24,7 @@ class BURenQuotation extends Business
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -66,49 +67,35 @@ class BURenQuotation extends Business
         ));
     }
 
-    function deleteRenQuotation($ID)
-    {
-        $this->setMethodName('deleteRenQuotation');
-        if ($this->canDeleteRenQuotation($ID)) {
-            return $this->dbeRenQuotation->deleteRow($ID);
-        } else {
-            return FALSE;
-        }
-    }
-
     function createNewRenewal(
         $customerID,
-        $siteNo = 0,
         $itemID,
         &$customerItemID,
         $salePrice,
         $costPrice,
-        $qty
+        $qty,
+        $siteNo = 0
     )
     {
         // create a customer item
         $dbeCustomerItem = new DBECustomerItem ($this);
-
         $dsCustomerItem = new DataSet ($this);
-
         $dsCustomerItem->copyColumnsFrom($dbeCustomerItem);
-
         $dsCustomerItem->setUpdateModeInsert();
-
         $dsCustomerItem->setValue(
-            'customerItemID',
-            0
+            DBECustomerItem::customerItemID,
+            null
         );
         $dsCustomerItem->setValue(
-            'customerID',
+            DBECustomerItem::customerID,
             $customerID
         );
         $dsCustomerItem->setValue(
-            'itemID',
+            DBECustomerItem::itemID,
             $itemID
         );
         $dsCustomerItem->setValue(
-            'siteNo',
+            DBECustomerItem::siteNo,
             $siteNo
         );
 
@@ -122,32 +109,28 @@ class BURenQuotation extends Business
         $this->dbeRenQuotation->getRow($customerItemID);
 
         $this->dbeRenQuotation->setValue(
-            'customerItemID',
+            DBEJRenQuotation::customerItemID,
             $customerItemID
         );
         $this->dbeRenQuotation->setValue(
-            'renQuotationTypeID',
-            $renQuotationTypeID
-        );
-        $this->dbeRenQuotation->setValue(
-            'startDate',
+            DBEJRenQuotation::startDate,
             date('Y-m-d')
         );
         $this->dbeRenQuotation->setValue(
-            'qty',
+            DBEJRenQuotation::qty,
             $qty
         );
         $this->dbeRenQuotation->setValue(
-            'salePrice',
+            DBEJRenQuotation::salePrice,
             $salePrice
         );
         $this->dbeRenQuotation->setValue(
-            'costPrice',
+            DBEJRenQuotation::costPrice,
             $costPrice
         );
         $this->dbeRenQuotation->setValue(
-            'grantNumber',
-            ''
+            DBEJRenQuotation::grantNumber,
+            null
         );
 
         $this->dbeRenQuotation->updateRow();
@@ -172,17 +155,18 @@ class BURenQuotation extends Business
             );
 
         ob_start(); ?>
-        <HTML>
+        <HTML lang="en">
         <BODY>
+        <!--suppress HtmlDeprecatedAttribute -->
         <TABLE border="1">
             <tr>
-                <td bgcolor="#999999">Customer</td>
-                <td bgcolor="#999999">Service</td>
+                <td style="background-color: #999999">Customer</td>
+                <td style="background-color: #999999">Service</td>
             </tr>
             <?php while ($this->dbeJRenQuotation->fetchNext()) { ?>
                 <tr>
-                    <td><?php echo $this->dbeJRenQuotation->getValue('customerName') ?></td>
-                    <td><?php echo $this->dbeJRenQuotation->getValue('itemDescription') ?></td>
+                    <td><?php echo $this->dbeJRenQuotation->getValue(DBEJRenQuotation::customerName) ?></td>
+                    <td><?php echo $this->dbeJRenQuotation->getValue(DBEJRenQuotation::itemDescription) ?></td>
                 </tr>
             <?php } ?>
         </TABLE>
@@ -231,17 +215,18 @@ class BURenQuotation extends Business
             );
 
         ob_start(); ?>
-        <HTML>
+        <HTML lang="en">
         <BODY>
+        <!--suppress HtmlDeprecatedAttribute -->
         <TABLE border="1">
             <tr>
-                <td bgcolor="#999999">Customer</td>
-                <td bgcolor="#999999">Service</td>
+                <td style="background-color: #999999">Customer</td>
+                <td style="background-color: #999999">Service</td>
             </tr>
             <?php while ($this->dbeJRenQuotation->fetchNext()) { ?>
                 <tr>
-                    <td><?php echo $this->dbeJRenQuotation->getValue('customerName') ?></td>
-                    <td><?php echo $this->dbeJRenQuotation->getValue('itemDescription') ?></td>
+                    <td><?php echo $this->dbeJRenQuotation->getValue(DBEJRenQuotation::customerName) ?></td>
+                    <td><?php echo $this->dbeJRenQuotation->getValue(DBEJRenQuotation::itemDescription) ?></td>
                 </tr>
             <?php } ?>
         </TABLE>
@@ -281,14 +266,9 @@ class BURenQuotation extends Business
         $dbeRenQuotationUpdate = new DBECustomerItem($this);
 
         $this->dbeJRenQuotation->getRenewalsDueRows();
-
-
         $dbeJCustomerItem = new DBEJCustomerItem ($this);
-
         $dbeOrdline = new DBEOrdline ($this);
-
         $dbeOrdhead = new DBEOrdhead($this);
-
         $dbeCustomer = new DBECustomer ($this);
 
         $previousCustomerID = 99999;
@@ -296,6 +276,8 @@ class BURenQuotation extends Business
 
         $custItemsSharingSalesOrder = [];
         $previousOrdHeadID = null;
+        $line = 0;
+        $dsOrdhead = new DataSet($this);
         while ($this->dbeJRenQuotation->fetchNext()) {
             ?>
             quotation
@@ -303,21 +285,21 @@ class BURenQuotation extends Business
                 contract number: <?= $dbeJCustomerItem->getValue(DBECustomerItem::customerItemID) ?>
             </div>
             <?php
-            if ($dbeJCustomerItem->getRow($this->dbeJRenQuotation->getValue('customerItemID'))) {
+            if ($dbeJCustomerItem->getRow($this->dbeJRenQuotation->getValue(DBEJRenQuotation::customerItemID))) {
                 /*
                  * Group many renewals for same customer under one quote
                  */
                 if ($previousCustomerID != $dbeJCustomerItem->getValue(
-                        'customerID'
+                        DBEJCustomerItem::customerID
                     ) || $previousRenQuotationType != $dbeJCustomerItem->getValue(
                         DBEJCustomerItem::renQuotationTypeID
                     )) {
 
                     if ($previousCustomerID != $dbeJCustomerItem->getValue(
-                            'customerID'
+                            DBEJCustomerItem::customerID
                         )) {
                         echo "<div>The customer has changed - previous was $previousCustomerID, new is " . $dbeJCustomerItem->getValue(
-                                'customerID'
+                                DBEJCustomerItem::customerID
                             ) . "</div>";
                     } else {
                         echo "<div>The renQuotationType has changed - previous was $previousRenQuotationType, new is " . $dbeJCustomerItem->getValue(
@@ -329,12 +311,12 @@ class BURenQuotation extends Business
                     /*
                      *  create order header
                      */
-                    $dbeCustomer->getRow($dbeJCustomerItem->getValue('customerID'));
+                    $dbeCustomer->getRow($dbeJCustomerItem->getValue(DBEJCustomerItem::customerID));
                     $this->getData(
                         $dbeCustomer,
                         $dsCustomer
                     );
-
+                    $dsOrdline = new DataSet($this);
                     $buSalesOrder->initialiseQuote(
                         $dsOrdhead,
                         $dsOrdline,
@@ -344,7 +326,7 @@ class BURenQuotation extends Business
                     $line = -1;    // initialise sales order line seq
 
                     $quotationIntroduction = 'Please find detailed below a quote for your ' . $this->dbeJRenQuotation->getValue(
-                            'type'
+                            DBEJRenQuotation::type
                         ) . ' renewal.';
 
                     $dbeOrdhead->getRow($dsOrdhead->getValue(DBEOrdhead::ordheadID));
@@ -352,7 +334,7 @@ class BURenQuotation extends Business
                     echo '<div>The new order id is: ' . $dsOrdhead->getValue(DBEOrdhead::ordheadID) . "</div>";
 
                     $dbeOrdhead->setValue(
-                        'quotationIntroduction',
+                        DBEOrdhead::quotationIntroduction,
                         $quotationIntroduction
                     );
 
@@ -360,7 +342,7 @@ class BURenQuotation extends Business
                         DBEOrdhead::quotationSubject,
                         ucwords(
                             $this->dbeJRenQuotation->getValue(
-                                'type'
+                                DBEJRenQuotation::type
                             ) . ' renewal.'
                         )
                     );
@@ -397,66 +379,66 @@ class BURenQuotation extends Business
 
 
                 // renewal type comment line
-                if ($this->dbeJRenQuotation->getValue('comment')) {
-                    $comment = $this->dbeJRenQuotation->getValue('comment');
+                if ($this->dbeJRenQuotation->getValue(DBEJRenQuotation::comment)) {
+                    $comment = $this->dbeJRenQuotation->getValue(DBEJRenQuotation::comment);
                 } else {
-                    $comment = $this->dbeJRenQuotation->getValue('type') . ' Renewal';
+                    $comment = $this->dbeJRenQuotation->getValue(DBEJRenQuotation::type) . ' Renewal';
                 }
 
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'renewalCustomerItemID',
-                    ''
+                    DBEOrdline::renewalCustomerItemID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'ordheadID',
-                    $dsOrdhead->getValue('ordheadID')
+                    DBEOrdline::ordheadID,
+                    $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                 );
                 $dbeOrdline->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBEOrdline::customerID,
+                    $dsOrdhead->getValue(DBEOrdhead::customerID)
                 );
                 $dbeOrdline->setValue(
-                    'itemID',
+                    DBEOrdline::itemID,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'description',
+                    DBEOrdline::description,
                     $comment
                 );
                 $dbeOrdline->setValue(
-                    'supplierID',
-                    ''
+                    DBEOrdline::supplierID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'sequenceNo',
+                    DBEOrdline::sequenceNo,
                     $line
                 );
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'qtyOrdered',
+                    DBEOrdline::qtyOrdered,
                     0
                 ); // default 1
                 $dbeOrdline->setValue(
-                    'qtyDespatched',
+                    DBEOrdline::qtyDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'qtyLastDespatched',
+                    DBEOrdline::qtyLastDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitSale',
+                    DBEOrdline::curUnitSale,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitCost',
+                    DBEOrdline::curUnitCost,
                     0
                 );
 
@@ -468,69 +450,70 @@ class BURenQuotation extends Business
                  * Get stock category from item table
                  */
                 $buItem = new BUItem($this);
+                $dsItem = new DataSet($this);
                 $buItem->getItemByID(
-                    $dbeJCustomerItem->getValue('itemID'),
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID),
                     $dsItem
                 );
                 $dbeOrdline->setValue(
-                    'stockcat',
-                    $dsItem->getValue('stockcat')
+                    DBEOrdline::stockcat,
+                    $dsItem->getValue(DBEItem::stockcat)
                 );
 
                 $dbeOrdline->setValue(
-                    'renewalCustomerItemID',
-                    $this->dbeJRenQuotation->getValue('customerItemID')
+                    DBEOrdline::renewalCustomerItemID,
+                    $this->dbeJRenQuotation->getValue(DBEJRenQuotation::customerItemID)
                 );
                 $dbeOrdline->setValue(
-                    'ordheadID',
-                    $dsOrdhead->getValue('ordheadID')
+                    DBEOrdline::ordheadID,
+                    $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                 );
                 $dbeOrdline->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBEOrdline::customerID,
+                    $dsOrdhead->getValue(DBEOrdhead::customerID)
                 );
                 $dbeOrdline->setValue(
-                    'itemID',
-                    $dbeJCustomerItem->getValue('itemID')
+                    DBEOrdline::itemID,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID)
                 );
                 $dbeOrdline->setValue(
-                    'description',
-                    $dbeJCustomerItem->getValue('itemDescription')
+                    DBEOrdline::description,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemDescription)
                 );
                 $dbeOrdline->setValue(
-                    'supplierID',
+                    DBEOrdline::supplierID,
                     CONFIG_SALES_STOCK_SUPPLIERID
                 );
                 $dbeOrdline->setValue(
-                    'sequenceNo',
+                    DBEOrdline::sequenceNo,
                     $line
                 );
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'I'
                 );
                 $dbeOrdline->setValue(
-                    'qtyOrdered',
-                    $this->dbeJRenQuotation->getValue('qty')
+                    DBEOrdline::qtyOrdered,
+                    $this->dbeJRenQuotation->getValue(DBEJRenQuotation::qty)
                 );
                 $dbeOrdline->setValue(
-                    'qtyDespatched',
+                    DBEOrdline::qtyDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitSale',
-                    $this->dbeJRenQuotation->getValue('salePrice')
+                    DBEOrdline::curUnitSale,
+                    $this->dbeJRenQuotation->getValue(DBEJRenQuotation::salePrice)
                 );
                 $dbeOrdline->setValue(
-                    'curUnitCost',
-                    $this->dbeJRenQuotation->getValue('costPrice')
+                    DBEOrdline::curUnitCost,
+                    $this->dbeJRenQuotation->getValue(DBEJRenQuotation::costPrice)
                 );
 
                 $dbeOrdline->insertRow();
                 /**
                  * add installation charge
                  */
-                if ($this->dbeJRenQuotation->getValue('addInstallationCharge') == 'Y') {
+                if ($this->dbeJRenQuotation->getValue(DBEJRenQuotation::addInstallationCharge) == 'Y') {
                     $line++;
 
                     /*
@@ -542,61 +525,61 @@ class BURenQuotation extends Business
                         $dsItem
                     );
                     $dbeOrdline->setValue(
-                        'stockcat',
-                        $dsItem->getValue('stockcat')
+                        DBEOrdline::stockcat,
+                        $dsItem->getValue(DBEItem::stockcat)
                     );
 
                     $dbeOrdline->setValue(
-                        'renewalCustomerItemID',
+                        DBEOrdline::renewalCustomerItemID,
                         0
                     );
                     $dbeOrdline->setValue(
-                        'ordheadID',
-                        $dsOrdhead->getValue('ordheadID')
+                        DBEOrdline::ordheadID,
+                        $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                     );
                     $dbeOrdline->setValue(
-                        'customerID',
-                        $dsOrdhead->getValue('customerID')
+                        DBEOrdline::customerID,
+                        $dsOrdhead->getValue(DBEOrdhead::customerID)
                     );
                     $dbeOrdline->setValue(
-                        'itemID',
+                        DBEOrdline::itemID,
                         CONFIG_INSTALLATION_ITEMID
                     );
                     $dbeOrdline->setValue(
-                        'description',
+                        DBEOrdline::description,
                         'Installation/Configuration'
                     );
                     $dbeOrdline->setValue(
-                        'supplierID',
+                        DBEOrdline::supplierID,
                         CONFIG_SALES_STOCK_SUPPLIERID
                     );
                     $dbeOrdline->setValue(
-                        'sequenceNo',
+                        DBEOrdline::sequenceNo,
                         $line
                     );
                     $dbeOrdline->setValue(
-                        'lineType',
+                        DBEOrdline::lineType,
                         'I'
                     );
                     $dbeOrdline->setValue(
-                        'qtyOrdered',
+                        DBEOrdline::qtyOrdered,
                         1
                     );
                     $dbeOrdline->setValue(
-                        'qtyDespatched',
+                        DBEOrdline::qtyDespatched,
                         0
                     );
                     $dbeOrdline->setValue(
-                        'qtyLastDespatched',
+                        DBEOrdline::qtyLastDespatched,
                         0
                     );
                     $dbeOrdline->setValue(
-                        'curUnitCost',
-                        $dsItem->getValue('curUnitCost')
+                        DBEOrdline::curUnitCost,
+                        $dsItem->getValue(DBEItem::curUnitCost)
                     );
                     $dbeOrdline->setValue(
-                        'curUnitCost',
-                        $dsItem->getValue('curUnitSale')
+                        DBEOrdline::curUnitCost,
+                        $dsItem->getValue(DBEItem::curUnitSale)
                     );
 
                     $dbeOrdline->insertRow();
@@ -606,62 +589,62 @@ class BURenQuotation extends Business
                 // period comment line
                 $line++;
                 $description =
-                    $this->dbeJRenQuotation->getValue('grantNumber') . ' ' .
-                    ' Expires: ' . $this->dbeJRenQuotation->getValue('nextPeriodStartDate');
+                    $this->dbeJRenQuotation->getValue(DBEJRenQuotation::grantNumber) . ' ' .
+                    ' Expires: ' . $this->dbeJRenQuotation->getValue(DBEJRenQuotation::nextPeriodStartDate);
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'renewalCustomerItemID',
-                    ''
+                    DBEOrdline::renewalCustomerItemID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'ordheadID',
-                    $dsOrdhead->getValue('ordheadID')
+                    DBEOrdline::ordheadID,
+                    $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                 );
                 $dbeOrdline->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBEOrdline::customerID,
+                    $dsOrdhead->getValue(DBEOrdhead::customerID)
                 );
                 $dbeOrdline->setValue(
-                    'itemID',
+                    DBEOrdline::itemID,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'description',
+                    DBEOrdline::description,
                     $description
                 );
                 $dbeOrdline->setValue(
-                    'supplierID',
-                    ''
+                    DBEOrdline::supplierID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'sequenceNo',
+                    DBEOrdline::sequenceNo,
                     $line
                 );
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'qtyOrdered',
+                    DBEOrdline::qtyOrdered,
                     0
                 ); // default 1
                 $dbeOrdline->setValue(
-                    'qtyDespatched',
+                    DBEOrdline::qtyDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'qtyLastDespatched',
+                    DBEOrdline::qtyLastDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitSale',
+                    DBEOrdline::curUnitSale,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitCost',
+                    DBEOrdline::curUnitCost,
                     0
                 );
 
@@ -670,13 +653,13 @@ class BURenQuotation extends Business
                  * set generated date
                  */
                 $dbeRenQuotationUpdate->setValue(
-                    'customerItemID',
+                    DBECustomerItem::customerItemID,
                     $this->dbeJRenQuotation->getPKValue()
                 );
                 $dbeRenQuotationUpdate->getRow();
                 $dbeRenQuotationUpdate->setValue(
-                    'dateGenerated',
-                    date(CONFIG_MYSQL_DATE)
+                    DBECustomerItem::dateGenerated,
+                    date(DATE_MYSQL_DATE)
                 );
                 $dbeRenQuotationUpdate->updateRow();
 
@@ -709,10 +692,10 @@ class BURenQuotation extends Business
     )
     {
         $this->dbeRenQuotation->setValue(
-            'customerItemID',
+            DBEJRenQuotation::customerItemID,
             $customerItemID
         );
-        $this->dbeRenQuotation->getRowsByColumn('customerItemID');
+        $this->dbeRenQuotation->getRowsByColumn(DBEJRenQuotation::customerItemID);
 
         $dbRenQuotationUpdate = new DBECustomerItem($this);
 
@@ -740,11 +723,10 @@ class BURenQuotation extends Business
 
         if
         (
-            $this->dbeRenQuotation->getValue('startDate') != '0000-00-00' AND
-            $this->dbeRenQuotation->getValue('startDate') != '' AND
-            $this->dbeRenQuotation->getValue('qty') > 0 AND
-            $this->dbeRenQuotation->getValue('salePrice') > 0 AND
-            $this->dbeRenQuotation->getValue('costPrice') > 0
+            $this->dbeRenQuotation->getValue(DBEJRenQuotation::startDate) AND
+            $this->dbeRenQuotation->getValue(DBEJRenQuotation::qty) > 0 AND
+            $this->dbeRenQuotation->getValue(DBEJRenQuotation::salePrice) > 0 AND
+            $this->dbeRenQuotation->getValue(DBEJRenQuotation::costPrice) > 0
         ) {
             return true;
         } else {

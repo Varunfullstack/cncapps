@@ -20,8 +20,8 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -41,12 +41,12 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
         );
         $this->addColumn(
             self::requirement,
-            DA_ID,
+            DA_STRING,
             DA_ALLOW_NULL
         );
         $this->addColumn(
             self::measure,
-            DA_ID,
+            DA_STRING,
             DA_ALLOW_NULL
         );
 
@@ -57,7 +57,7 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
         );
 
         $this->setAddColumnsOff();
-        $this->setPK(0);
+        $this->setPK(self::id);
     }
 
     /**
@@ -84,7 +84,7 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
     /**
      * Allocates the next site number for this customer
      * @access private
-     * @param  void
+     * @param void
      * @return integer Next Siteno
      */
     function getNextPKValue()
@@ -106,6 +106,29 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
         return $id;
     }
 
+    function insertRow()
+    {
+        $this->setMethodName("insertRow");
+        // Only set the default query if not already set in
+        // descendent class.
+
+        $this->setYNFlags();
+        if ($this->getQueryString() == "") {
+            $this->setQueryString(
+                "INSERT INTO " . $this->getTableName() .
+                "(" .
+                $this->getDBColumnNamesAsString() .
+                ")VALUES(" .
+                $this->getColumnValuesAsString() .
+                ")"
+            );
+        }
+
+        $ret = $this->runQuery();
+        $this->resetQueryString();
+        return $ret;
+    }
+
     /**
      * Build and return string that can be used by update() function
      * @access private
@@ -116,10 +139,10 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
         $colString = "";
         for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
             // exclude primary key columns
-            if (($this->getName($ixCol) != self::questionnaireAnswerID) & ($this->getName($ixCol) != self::id)) {
+            if (($this->getName($ixCol) != self::questionnaireAnswerID) && ($this->getName($ixCol) != self::id)) {
                 if ($colString != "") $colString = $colString . ",";
-                $colString = $colString . $this->getDBColumnName($ixCol) . "='" .
-                    $this->prepareForSQL($this->getValue($ixCol)) . "'";
+                $colString = $colString . $this->getDBColumnName($ixCol) . "=" .
+                    $this->prepareForSQL($this->getValue($ixCol));
             }
         }
         return $colString;

@@ -84,11 +84,9 @@ class BUDirectDebitContracts extends Business
 
         $hdrs = $buMail->mime->headers($hdrs);
 
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body
+        $buMail->send(
+            'xavi@pavilionweb.co.uk', $hdrs, $body
+
         );
     }
 
@@ -122,12 +120,12 @@ class BUDirectDebitContracts extends Business
             )) {
                 ?>
                  <div>
-                    customer:<?= $dbeJCustomerItem->getValue('customerID')?>
+                    customer:<?= $dbeJCustomerItem->getValue(DBEJCustomerItem::customerID)?>
                 </div>
                 <?php
 
                 if (
-                    $previousCustomerID != $dbeJCustomerItem->getValue('customerID')
+                    $previousCustomerID != $dbeJCustomerItem->getValue(DBEJCustomerItem::customerID)
                 ) {
 
                      ?>
@@ -147,10 +145,10 @@ class BUDirectDebitContracts extends Business
                         /*
                          * Finalise previous sales order and create an invoice
                          */
-                        $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
+                        $buSalesOrder->setStatusCompleted($dsOrdhead->getValue(DBEOrdhead::ordheadID));
 
                         $buSalesOrder->getOrderByOrdheadID(
-                            $dsOrdhead->getValue('ordheadID'),
+                            $dsOrdhead->getValue(DBEOrdhead::ordheadID),
                             $dsOrdhead,
                             $dsOrdline
                         );
@@ -168,7 +166,7 @@ class BUDirectDebitContracts extends Business
                     /*
                      *  create new sales order header
                      */
-                    $dbeCustomer->getRow($dbeJCustomerItem->getValue('customerID'));
+                    $dbeCustomer->getRow($dbeJCustomerItem->getValue(DBEJCustomerItem::customerID));
                     $this->getData(
                         $dbeCustomer,
                         $dsCustomer
@@ -215,60 +213,60 @@ class BUDirectDebitContracts extends Business
 
 
                 $dbeOrdline->setValue(
-                    'renewalCustomerItemID',
-                    ''
+                    DBEOrdline::renewalCustomerItemID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'ordheadID',
-                    $dsOrdhead->getValue('ordheadID')
+                    DBEOrdline::ordheadID,
+                    $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                 );
                 $dbeOrdline->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBEOrdline::customerID,
+                    $dsOrdhead->getValue(DBEOrdhead::customerID)
                 );
                 $dbeOrdline->setValue(
-                    'itemID',
-                    0
+                    DBEOrdline::itemID,
+                    null
                 );
 
                 $dbeOrdline->setValue(
-                    'supplierID',
-                    ''
+                    DBEOrdline::supplierID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'sequenceNo',
+                    DBEOrdline::sequenceNo,
                     $line
                 );
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'qtyOrdered',
+                    DBEOrdline::qtyOrdered,
                     0
                 ); // default 1
                 $dbeOrdline->setValue(
-                    'qtyDespatched',
+                    DBEOrdline::qtyDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'qtyLastDespatched',
+                    DBEOrdline::qtyLastDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitSale',
+                    DBEOrdline::curUnitSale,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitCost',
+                    DBEOrdline::curUnitCost,
                     0
                 );
 
                 switch ($dbeJCustomerItem->getValue(DBEDirectDebitContracts::renewalTypeID)) {
                     case CONFIG_HOSTING_RENEWAL_TYPE_ID:
                         $dbeOrdline->setValue(
-                            'description',
-                            $dbeJCustomerItem->getValue('notes')
+                            DBEOrdline::description,
+                            $dbeJCustomerItem->getValue(DBEJCustomerItem::notes)
                         );
 
                         $dbeOrdline->insertRow();
@@ -282,7 +280,7 @@ class BUDirectDebitContracts extends Business
                                     DBEDirectDebitContracts::adslPhone
                                 ) . '. ';
                             $dbeOrdline->setValue(
-                                'description',
+                                DBEOrdline::description,
                                 $description
                             );
                             $dbeOrdline->insertRow();
@@ -293,7 +291,7 @@ class BUDirectDebitContracts extends Business
                     default:
 
                         $dbeOrdline->setValue(
-                            'description',
+                            DBEOrdline::description,
                             $description
                         );
                 }
@@ -307,48 +305,48 @@ class BUDirectDebitContracts extends Business
                  */
                 $buItem = new BUItem($this);
                 $buItem->getItemByID(
-                    $dbeJCustomerItem->getValue('itemID'),
+                    $dbeJCustomerItem->getValue(DBECustomerItem::itemID),
                     $dsItem
                 );
                 $dbeOrdline->setValue(
-                    'stockcat',
-                    $dsItem->getValue('stockcat')
+                    DBEOrdline::stockcat,
+                    $dsItem->getValue(DBEItem::stockcat)
                 );
 
                 $dbeOrdline->setValue(
-                    'renewalCustomerItemID',
+                    DBEOrdline::renewalCustomerItemID,
                     $dbeJCustomerItem->getValue(DBEJCustomerItem::customerItemID)
                 );
                 $dbeOrdline->setValue(
-                    'ordheadID',
-                    $dsOrdhead->getValue('ordheadID')
+                    DBEOrdline::ordheadID,
+                    $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                 );
                 $dbeOrdline->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBEOrdline::customerID,
+                    $dsOrdhead->getValue(DBEOrdhead::customerID)
                 );
                 $dbeOrdline->setValue(
-                    'itemID',
-                    $dbeJCustomerItem->getValue('itemID')
+                    DBEOrdline::itemID,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID)
                 );
                 $dbeOrdline->setValue(
-                    'description',
-                    $dbeJCustomerItem->getValue('itemDescription')
+                    DBEOrdline::description,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemDescription)
                 );
                 $dbeOrdline->setValue(
-                    'supplierID',
+                    DBEOrdline::supplierID,
                     CONFIG_SALES_STOCK_SUPPLIERID
                 );
                 $dbeOrdline->setValue(
-                    'sequenceNo',
+                    DBEOrdline::sequenceNo,
                     $line
                 );
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'I'
                 );
                 $dbeOrdline->setValue(
-                    'qtyOrdered',
+                    DBEOrdline::qtyOrdered,
                     1
                 ); // default 1
 
@@ -356,20 +354,20 @@ class BUDirectDebitContracts extends Business
                     case CONFIG_CONTRACT_RENEWAL_TYPE_ID:
                     case CONFIG_HOSTING_RENEWAL_TYPE_ID:
                         $dbeOrdline->setValue(
-                            'qtyDespatched',
+                            DBEOrdline::qtyDespatched,
                             0
                         );
                         $dbeOrdline->setValue(
-                            'qtyLastDespatched',
+                            DBEOrdline::qtyLastDespatched,
                             0
                         );
                         $dbeOrdline->setValue(
-                            'curUnitSale',
+                            DBEOrdline::curUnitSale,
                             ($dbeJCustomerItem->getValue(DBEDirectDebitContracts::curUnitSale) / 12) *
                             $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::invoicePeriodMonths)
                         );
                         $dbeOrdline->setValue(
-                            'curUnitCost',
+                            DBEOrdline::curUnitCost,
                             ($dbeJCustomerItem->getValue(DBEDirectDebitContracts::curUnitCost) / 12) *
                             $this->dbeDirectDebitContracts->getValue(
                                 DBEDirectDebitContracts::invoicePeriodMonths
@@ -378,20 +376,20 @@ class BUDirectDebitContracts extends Business
                         break;
                     case CONFIG_BROADBAND_RENEWAL_TYPE_ID:
                         $dbeOrdline->setValue(
-                            'qtyDespatched',
+                            DBEOrdline::qtyDespatched,
                             0
                         );
                         $dbeOrdline->setValue(
-                            'qtyLastDespatched',
+                            DBEOrdline::qtyLastDespatched,
                             1
                         );
                         $dbeOrdline->setValue(
-                            'curUnitSale',
+                            DBEOrdline::curUnitSale,
                             $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::salePricePerMonth) *
                             $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::invoicePeriodMonths)
                         );
                         $dbeOrdline->setValue(
-                            'curUnitCost',
+                            DBEOrdline::curUnitCost,
                             $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::costPricePerMonth) *
                             $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::invoicePeriodMonths)
                         );
@@ -408,59 +406,59 @@ class BUDirectDebitContracts extends Business
                     ' to ' .
                     $this->dbeDirectDebitContracts->getValue(DBEDirectDebitContracts::invoiceToDate);
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'renewalCustomerItemID',
+                    DBEOrdline::renewalCustomerItemID,
                     ''
                 );
                 $dbeOrdline->setValue(
-                    'ordheadID',
-                    $dsOrdhead->getValue('ordheadID')
+                    DBEOrdline::ordheadID,
+                    $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                 );
                 $dbeOrdline->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBEOrdline::customerID,
+                    $dsOrdhead->getValue(DBEOrdhead::customerID)
                 );
                 $dbeOrdline->setValue(
-                    'itemID',
+                    DBEOrdline::itemID,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'description',
+                    DBEOrdline::description,
                     $description
                 );
                 $dbeOrdline->setValue(
-                    'supplierID',
+                    DBEOrdline::supplierID,
                     ''
                 );
                 $dbeOrdline->setValue(
-                    'sequenceNo',
+                    DBEOrdline::sequenceNo,
                     $line
                 );
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'qtyOrdered',
+                    DBEOrdline::qtyOrdered,
                     0
                 ); // default 1
                 $dbeOrdline->setValue(
-                    'qtyDespatched',
+                    DBEOrdline::qtyDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'qtyLastDespatched',
+                    DBEOrdline::qtyLastDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitSale',
+                    DBEOrdline::curUnitSale,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitCost',
+                    DBEOrdline::curUnitCost,
                     0
                 );
 
@@ -479,68 +477,68 @@ class BUDirectDebitContracts extends Business
                     while ($dsLinkedItems->fetchNext()) {
                         $line++;
 
-                        $description = $dsLinkedItems->getValue('itemDescription');
-                        if ($dsLinkedItems->getValue('serverName')) {
-                            $description .= ' (' . $dsLinkedItems->getValue('serverName') . ')';
+                        $description = $dsLinkedItems->getValue(DBEJCustomerItem::itemDescription);
+                        if ($dsLinkedItems->getValue(DBEJCustomerItem::serverName)) {
+                            $description .= ' (' . $dsLinkedItems->getValue(DBEJCustomerItem::serverName) . ')';
                         }
-                        if ($dsLinkedItems->getValue('serialNo')) {
-                            $description .= ' ' . $dsLinkedItems->getValue('serialNo');
+                        if ($dsLinkedItems->getValue(DBEJCustomerItem::serialNo)) {
+                            $description .= ' ' . $dsLinkedItems->getValue(DBEJCustomerItem::serialNo);
                         }
 
                         $dbeOrdline->setValue(
-                            'description',
+                            DBEOrdline::description,
                             $description
                         );
                         $dbeOrdline->setValue(
-                            'lineType',
+                            DBEOrdline::lineType,
                             'C'
                         );
                         $dbeOrdline->setValue(
-                            'renewalCustomerItemID',
+                            DBEOrdline::renewalCustomerItemID,
                             ''
                         );
                         $dbeOrdline->setValue(
-                            'ordheadID',
-                            $dsOrdhead->getValue('ordheadID')
+                            DBEOrdline::ordheadID,
+                            $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                         );
                         $dbeOrdline->setValue(
-                            'customerID',
-                            $dsOrdhead->getValue('customerID')
+                            DBEOrdline::customerID,
+                            $dsOrdhead->getValue(DBEOrdhead::customerID)
                         );
                         $dbeOrdline->setValue(
-                            'itemID',
+                            DBEOrdline::itemID,
                             0
                         );
                         $dbeOrdline->setValue(
-                            'supplierID',
+                            DBEOrdline::supplierID,
                             ''
                         );
                         $dbeOrdline->setValue(
-                            'sequenceNo',
+                            DBEOrdline::sequenceNo,
                             $line
                         );
                         $dbeOrdline->setValue(
-                            'lineType',
+                            DBEOrdline::lineType,
                             'C'
                         );
                         $dbeOrdline->setValue(
-                            'qtyOrdered',
+                            DBEOrdline::qtyOrdered,
                             0
                         ); // default 1
                         $dbeOrdline->setValue(
-                            'qtyDespatched',
+                            DBEOrdline::qtyDespatched,
                             0
                         );
                         $dbeOrdline->setValue(
-                            'qtyLastDespatched',
+                            DBEOrdline::qtyLastDespatched,
                             0
                         );
                         $dbeOrdline->setValue(
-                            'curUnitSale',
+                            DBEOrdline::curUnitSale,
                             0
                         );
                         $dbeOrdline->setValue(
-                            'curUnitCost',
+                            DBEOrdline::curUnitCost,
                             0
                         );
 
@@ -568,7 +566,7 @@ class BUDirectDebitContracts extends Business
 
                 $dbeCustomerItem->updateRow();
 
-                $previousCustomerID = $dbeJCustomerItem->getValue('customerID');
+                $previousCustomerID = $dbeJCustomerItem->getValue(DBEJCustomerItem::customerID);
             }
         }
         /*
@@ -580,10 +578,10 @@ class BUDirectDebitContracts extends Business
                         We have finished going through all the items and we have an order from which we have to generate an invoice
                         </div>
                     <?php
-            $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
+            $buSalesOrder->setStatusCompleted($dsOrdhead->getValue(DBEOrdhead::ordheadID));
 
             $buSalesOrder->getOrderByOrdheadID(
-                $dsOrdhead->getValue('ordheadID'),
+                $dsOrdhead->getValue(DBEOrdhead::ordheadID),
                 $dsOrdhead,
                 $dsOrdline
             );

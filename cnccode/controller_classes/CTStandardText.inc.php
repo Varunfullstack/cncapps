@@ -34,7 +34,8 @@ define(
 
 class CTSTANDARDTEXT extends CTCNC
 {
-    var $dsStandardText = '';
+    /** @var DSForm */
+    public $dsStandardText;
     /** @var BUStandardText */
     public $buStandardText;
 
@@ -55,15 +56,17 @@ class CTSTANDARDTEXT extends CTCNC
         $this->buStandardText = new BUStandardText($this);
         $this->dsStandardText = new DSForm($this);
         $this->dsStandardText->copyColumnsFrom($this->buStandardText->dbeStandardText);
+
     }
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
 
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTSTANDARDTEXT_ACT_EDIT:
             case CTSTANDARDTEXT_ACT_CREATE:
                 $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
@@ -81,7 +84,7 @@ class CTSTANDARDTEXT extends CTCNC
                 try {
 
                     $data = $this->getStandardTextOptions();
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $data = [
                         "error" => $exception->getMessage()
                     ];
@@ -104,6 +107,7 @@ class CTSTANDARDTEXT extends CTCNC
     /**
      * Display list of types
      * @access private
+     * @throws Exception
      */
     function displayList()
     {
@@ -112,7 +116,7 @@ class CTSTANDARDTEXT extends CTCNC
         $this->setTemplateFiles(
             array('StandardTextList' => 'StandardTextList.inc')
         );
-
+        $dsStandardText = new DataSet($this);
         $this->buStandardText->getAllTypes($dsStandardText);
 
         $urlCreate =
@@ -137,9 +141,9 @@ class CTSTANDARDTEXT extends CTCNC
             );
             while ($dsStandardText->fetchNext()) {
 
-                $dbeStandardTextType->getRow($dsStandardText->getValue('stt_standardtexttypeno'));
+                $dbeStandardTextType->getRow($dsStandardText->getValue(DBEStandardText::stt_standardtexttypeno));
 
-                $stt_standardtextno = $dsStandardText->getValue('stt_standardtextno');
+                $stt_standardtextno = $dsStandardText->getValue(DBEStandardText::stt_standardtextno);
 
                 $urlEdit =
                     Controller::buildLink(
@@ -164,9 +168,11 @@ class CTSTANDARDTEXT extends CTCNC
                 $this->template->set_var(
                     array(
                         'stt_standardtextno' => $stt_standardtextno,
-                        'stt_desc'           => Controller::htmlDisplayText($dsStandardText->getValue('stt_desc')),
+                        'stt_desc'           => Controller::htmlDisplayText(
+                            $dsStandardText->getValue(DBEStandardText::stt_desc)
+                        ),
                         'type'               => Controller::htmlDisplayText(
-                            $dbeStandardTextType->getValue('description')
+                            $dbeStandardTextType->getValue(DBEStandardTextType::description)
                         ),
                         'urlEdit'            => $urlEdit,
                         'urlDelete'          => $urlDelete,
@@ -192,6 +198,7 @@ class CTSTANDARDTEXT extends CTCNC
     /**
      * Edit/Add Further Action
      * @access private
+     * @throws Exception
      */
     function edit()
     {
@@ -199,26 +206,29 @@ class CTSTANDARDTEXT extends CTCNC
         $dsStandardText = &$this->dsStandardText; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CTSTANDARDTEXT_ACT_EDIT) {
+            if ($this->getAction() == CTSTANDARDTEXT_ACT_EDIT) {
                 $this->buStandardText->getStandardTextByID(
-                    $_REQUEST['stt_standardtextno'],
+                    $this->getParam('stt_standardtextno'),
                     $dsStandardText
                 );
-                $stt_standardtextno = $_REQUEST['stt_standardtextno'];
+                $stt_standardtextno = $this->getParam('stt_standardtextno');
             } else {                                                                    // creating new
                 $dsStandardText->initialise();
                 $dsStandardText->setValue(
-                    'stt_standardtextno',
-                    '0'
+                    DBEStandardText::stt_standardtextno,
+                    null
                 );
-                $stt_standardtextno = '0';
+                $stt_standardtextno = null;
             }
         } else {                                                                        // form validation error
             $dsStandardText->initialise();
             $dsStandardText->fetchNext();
-            $stt_standardtextno = $dsStandardText->getValue('stt_standardtextno');
+            $stt_standardtextno = $dsStandardText->getValue(DBEStandardText::stt_standardtextno);
         }
-        if ($_REQUEST['action'] == CTSTANDARDTEXT_ACT_EDIT) {
+        $urlDelete = null;
+        $txtDelete = null;
+
+        if ($this->getAction() == CTSTANDARDTEXT_ACT_EDIT) {
             $urlDelete =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -228,9 +238,6 @@ class CTSTANDARDTEXT extends CTCNC
                     )
                 );
             $txtDelete = 'Delete';
-        } else {
-            $urlDelete = '';
-            $txtDelete = '';
         }
         $urlUpdate =
             Controller::buildLink(
@@ -252,28 +259,23 @@ class CTSTANDARDTEXT extends CTCNC
             array('StandardTextEdit' => 'StandardTextEdit.inc')
         );
 
-
         /* type selector */
         // activity status selector
         $this->template->set_block(
             'StandardTextEdit',
             'typeBlock',
             'types'
-        ); // ss avoids naming confict!
-        if ($this->hasPermissions(PHPLIB_PERM_CUSTOMER)) {
-            $statusArray = &$this->statusArrayCustomer;
-        } else {
-            $statusArray = &$this->statusArray;
-        }
+        ); // ss avoids naming conflict!
 
         $dbeStandardTextType = new DBEStandardTextType($this);
 
         $dbeStandardTextType->getRows('description');
 
+        $salesRequestTypeID = null;
         while ($dbeStandardTextType->fetchNext()) {
-            $selected = ($dsStandardText->getValue('stt_standardtexttypeno') == $dbeStandardTextType->getPKValue(
-                )) ? CT_SELECTED : '';
-
+            $selected = ($dsStandardText->getValue(
+                    DBEStandardText::stt_standardtexttypeno
+                ) == $dbeStandardTextType->getPKValue()) ? CT_SELECTED : null;
             if ($dbeStandardTextType->getValue(DBEStandardTextType::description) == 'Sales Request') {
                 $salesRequestTypeID = $dbeStandardTextType->getValue(DBEStandardTextType::standardTextTypeID);
             }
@@ -295,13 +297,17 @@ class CTSTANDARDTEXT extends CTCNC
         $this->template->set_var(
             array(
                 'stt_standardtextno'              => $stt_standardtextno,
-                'stt_desc'                        => Controller::htmlInputText($dsStandardText->getValue('stt_desc')),
-                'stt_descMessage'                 => Controller::htmlDisplayText(
-                    $dsStandardText->getMessage('stt_desc')
+                'stt_desc'                        => Controller::htmlInputText(
+                    $dsStandardText->getValue(DBEStandardText::stt_desc)
                 ),
-                'stt_text'                        => Controller::htmlInputText($dsStandardText->getValue('stt_text')),
+                'stt_descMessage'                 => Controller::htmlDisplayText(
+                    $dsStandardText->getMessage(DBEStandardText::stt_desc)
+                ),
+                'stt_text'                        => Controller::htmlInputText(
+                    $dsStandardText->getValue(DBEStandardText::stt_text)
+                ),
                 'stt_textMessage'                 => Controller::htmlDisplayText(
-                    $dsStandardText->getMessage('stt_text')
+                    $dsStandardText->getMessage(DBEStandardText::stt_text)
                 ),
                 'urlUpdate'                       => $urlUpdate,
                 'urlDelete'                       => $urlDelete,
@@ -327,19 +333,20 @@ class CTSTANDARDTEXT extends CTCNC
     /**
      * Update call Further Action details
      * @access private
+     * @throws Exception
      */
     function update()
     {
         $this->setMethodName('update');
-        $dsStandardText = &$this->dsStandardText;
-
-        $this->formError = (!$this->dsStandardText->populateFromArray($_REQUEST['standardText']));
+        $this->formError = (!$this->dsStandardText->populateFromArray($this->getParam('standardText')));
 
         if ($this->formError) {
-            if ($this->dsStandardText->getValue('stt_standardtextno') == '') {                    // attempt to insert
-                $_REQUEST['action'] = CTSTANDARDTEXT_ACT_EDIT;
+            if (!$this->dsStandardText->getValue(
+                DBEStandardText::stt_standardtextno
+            )) {                    // attempt to insert
+                $this->setAction(CTSTANDARDTEXT_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTSTANDARDTEXT_ACT_CREATE;
+                $this->setAction(CTSTANDARDTEXT_ACT_CREATE);
             }
             $this->edit();
             exit;
@@ -351,7 +358,7 @@ class CTSTANDARDTEXT extends CTCNC
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'stt_standardtextno' => $this->dsStandardText->getValue('stt_standardtextno'),
+                    'stt_standardtextno' => $this->dsStandardText->getValue(DBEStandardText::stt_standardtextno),
                     'action'             => CTCNC_ACT_VIEW
                 )
             );
@@ -363,11 +370,12 @@ class CTSTANDARDTEXT extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function delete()
     {
         $this->setMethodName('delete');
-        if (!$this->buStandardText->deleteStandardText($_REQUEST['stt_standardtextno'])) {
+        if (!$this->buStandardText->deleteStandardText($this->getParam('stt_standardtextno'))) {
             $this->displayFatalError('Cannot delete this row');
             exit;
         } else {
@@ -410,5 +418,4 @@ class CTSTANDARDTEXT extends CTCNC
 
         return $options;
     }
-}// end of class
-?>
+}

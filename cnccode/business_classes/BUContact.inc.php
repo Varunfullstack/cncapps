@@ -14,13 +14,19 @@ define(
 
 class BUContact extends Business
 {
+    const EmailClass = 'EmailCLass';
 
     /** @var DBEContact */
     public $dbeContact;
+    /**
+     * @var DBEContact
+     */
+    private $dsContact;
 
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -32,6 +38,9 @@ class BUContact extends Business
      * Get Contact rows whose names match the search string or, if the string is numeric, try to select by customerID
      * @parameter String $nameSearchString String to match against or numeric contactID
      * @parameter DataSet &$dsResults results
+     * @param $supplierID
+     * @param $matchString
+     * @param DataSet $dsResults
      * @return bool : One or more rows
      * @access public
      */
@@ -41,10 +50,10 @@ class BUContact extends Business
     )
     {
         $this->setMethodName('getSupplierContactsByNameMatch');
-        if ($matchString == '') {
+        if (!$matchString) {
             $this->raiseError(BUCONTACT_MATCH_STR_NT_PASD);
         }
-        if ($supplierID == '') {
+        if (!$supplierID) {
             $this->raiseError('supplierID not passed');
         }
         $matchString = trim($matchString);
@@ -57,7 +66,7 @@ class BUContact extends Business
         }
         if (!$ret) {
             $this->dbeContact->setValue(
-                'supplierID',
+                DBEContact::supplierID,
                 $supplierID
             );
             if ($matchString{0} == '?') {  // get all contacts for supplier
@@ -70,8 +79,8 @@ class BUContact extends Business
                 $dsResults
             ));
             $dsResults->columnSort(
-                'lastName',
-                'firstName'
+                DBEContact::lastName,
+                DBEContact::firstName
             );
         }
         return $ret;
@@ -79,7 +88,7 @@ class BUContact extends Business
 
     /**
      * Get Support Contact rows at all customers
-     * @param $dsResults
+     * @param DataSet $dsResults
      * @param bool $customerID
      * @return bool : One or more rows
      * @access public
@@ -95,13 +104,17 @@ class BUContact extends Business
             $dsResults
         ));
         $dsResults->columnSort(
-            'lastName',
-            'firstName'
-
+            DBEContact::lastName,
+            DBEContact::firstName
         );
         return $ret;
     }
 
+    /**
+     * @param DataSet $dsResults
+     * @param $customerID
+     * @return bool
+     */
     function getAuthorisingContacts(&$dsResults,
                                     $customerID
     )
@@ -113,8 +126,8 @@ class BUContact extends Business
             $dsResults
         ));
         $dsResults->columnSort(
-            'lastName',
-            'firstName'
+            DBEContact::lastName,
+            DBEContact::firstName
 
         );
         return $ret;
@@ -126,27 +139,26 @@ class BUContact extends Business
      * @parameter siteNo
      * @parameter String $nameSearchString String to match against or numeric contactID
      * @parameter DataSet &$dsResults results
+     * @param $customerID
+     * @param $matchString
+     * @param DataSet $dsResults
+     * @param string $siteNo
      * @return bool : One or more rows
      * @access public
      */
     function getCustomerContactsByNameMatch($customerID,
-                                            $siteNo = '',
                                             $matchString,
-                                            &$dsResults
+                                            &$dsResults,
+                                            $siteNo = null
     )
     {
         $this->setMethodName('getCustomerContactsByNameMatch');
-        if ($matchString == '') {
+        if (!$matchString) {
             $this->raiseError(BUCONTACT_MATCH_STR_NT_PASD);
         }
-        if ($customerID == '') {
+        if (!$customerID) {
             $this->raiseError('customerID not passed');
         }
-        /* for call contacts
-                if ($siteNo==''){
-                    $this->raiseError('siteNo not passed');
-                }
-        */
         $matchString = trim($matchString);
         $ret = FALSE;
         if (is_numeric($matchString)) {
@@ -155,7 +167,7 @@ class BUContact extends Business
                 $dsResults
             ));
             if ($ret) {
-                if ($dsResults->getValue('customerID') != $customerID) {
+                if ($dsResults->getValue(DBEContact::customerID) != $customerID) {
                     $ret = false;
                 }
             }
@@ -163,13 +175,13 @@ class BUContact extends Business
         if (!$ret) {
 
             if ($matchString{0} == '?') {  // get all contacts for customer/site
-                if ($siteNo != '') {
+                if ($siteNo == '') {
+                    $this->dbeContact->getRowsByCustomerID($customerID);
+                } else {
                     $this->dbeContact->getRowsByCustomerIDSiteNo(
                         $customerID,
                         $siteNo
                     );
-                } else {
-                    $this->dbeContact->getRowsByCustomerID($customerID);
                 }
             } else {                                                // try to match
                 $this->dbeContact->getCustomerRowsByNameMatch(
@@ -182,8 +194,8 @@ class BUContact extends Business
                 $dsResults
             ));
             $dsResults->columnSort(
-                'lastName',
-                'firstName'
+                DBEContact::lastName,
+                DBEContact::firstName
             );
         }
         return $ret;
@@ -200,16 +212,18 @@ class BUContact extends Business
     {
         $this->setMethodName('getContactByCustomerID');
         $this->dbeContact->getGSCRowsByCustomerID($customerID);
-        $ret = ($this->getData(
+        $this->getData(
             $this->dbeContact,
             $dsResults
-        ));
+        );
     }
 
     /**
      * Get general support contact statement row by customerID
      * @parameter integer $contactID
      * @parameter DataSet &$dsResults results
+     * @param $ID
+     * @param DataSet $dsResults
      * @return bool : Success
      * @access public
      */
@@ -230,6 +244,10 @@ class BUContact extends Business
      * @parameter integer $supplierID for whom to create contact (optional)
      * @parameter integer $customerID for whom to create contact
      * @parameter DataSet &$dsResults results
+     * @param $supplierID
+     * @param $customerID
+     * @param $siteNo
+     * @param $dsResults DataSet
      * @return bool : Success
      * @access public
      */
@@ -241,63 +259,65 @@ class BUContact extends Business
     {
         $this->setMethodName('initialiseNewContact');
         // create/populate new dataset
-        if (($supplierID == '') AND ($customerID == '')) {
+        if (!$supplierID && !$customerID) {
             $this->raiseError('a supplierID or customerID must be passed');
         }
-        if (($customerID != '') AND ($siteNo == '')) {
+        if ($customerID && $siteNo == '') {
             $this->raiseError('default siteNo must be passed');
         }
         $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
         $dsResults->copyColumnsFrom($this->dbeContact);
+        $dsResults->setNull(DBEContact::contactID, DA_ALLOW_NULL);
         $dsResults->setUpdateModeInsert();
         $dsResults->setValue(
-            'contactID',
-            0
+            DBEContact::contactID,
+            null
         );
         $dsResults->setValue(
-            'siteNo',
+            DBEContact::siteNo,
             $siteNo
         );
         $dsResults->setValue(
-            'supplierID',
+            DBEContact::supplierID,
             $supplierID
         );
         $dsResults->setValue(
-            'customerID',
+            DBEContact::customerID,
             $customerID
         );
         $dsResults->setValue(
-            'discontinuedFlag',
+            DBEContact::discontinuedFlag,
             'N'
         );
         $dsResults->setValue(
-            'notes',
-            ''
+            DBEContact::notes,
+            null
         );
         $dsResults->setValue(
-            'mailshot2Flag',
-            $dsHeader->getValue('mailshot2FlagDef')
+            DBEContact::mailshot2Flag,
+            $dsHeader->getValue(DBEHeader::mailshot2FlagDef)
         );
         $dsResults->setValue(
-            'mailshot3Flag',
-            $dsHeader->getValue('mailshot3FlagDef')
+            DBEContact::mailshot3Flag,
+            $dsHeader->getValue(DBEHeader::mailshot3FlagDef)
         );
         $dsResults->setValue(
-            'mailshot4Flag',
-            $dsHeader->getValue('mailshot4FlagDef')
+            DBEContact::mailshot4Flag,
+            $dsHeader->getValue(DBEHeader::mailshot4FlagDef)
         );
         $dsResults->setValue(
-            'mailshot8Flag',
-            $dsHeader->getValue('mailshot8FlagDef')
+            DBEContact::mailshot8Flag,
+            $dsHeader->getValue(DBEHeader::mailshot8FlagDef)
         );
         $dsResults->setValue(
-            'mailshot9Flag',
-            $dsHeader->getValue('mailshot9FlagDef')
+            DBEContact::mailshot9Flag,
+            $dsHeader->getValue(DBEHeader::mailshot9FlagDef)
         );
         $dsResults->setValue(
-            'mailshot11Flag',
-            $dsHeader->getValue('mailshot11FlagDef')
+            DBEContact::mailshot11Flag,
+            $dsHeader->getValue(DBEHeader::mailshot11FlagDef)
         );
         $dsResults->post();
         return TRUE;
@@ -309,6 +329,7 @@ class BUContact extends Business
      * checkbox fields.
      * @parameter integer $supplierID for whom to create contact
      * @parameter DataSet &$dsResults results
+     * @param $dsResults DataSet
      * @return bool : Success
      * @access public
      */
@@ -318,27 +339,27 @@ class BUContact extends Business
         // create/populate new dataset
         $dsResults->copyColumnsFrom($this->dbeContact);
         $dsResults->setValue(
-            'discontinuedFlag',
+            DBEContact::discontinuedFlag,
             'N'
         );
         $dsResults->setValue(
-            'mailshot2Flag',
+            DBEContact::mailshot2Flag,
             'N'
         );
         $dsResults->setValue(
-            'mailshot3Flag',
+            DBEContact::mailshot3Flag,
             'N'
         );
         $dsResults->setValue(
-            'mailshot4Flag',
+            DBEContact::mailshot4Flag,
             'N'
         );
         $dsResults->setValue(
-            'mailshot8Flag',
+            DBEContact::mailshot8Flag,
             'N'
         );
         $dsResults->setValue(
-            'mailshot9Flag',
+            DBEContact::mailshot9Flag,
             'N'
         );
         return TRUE;
@@ -349,6 +370,7 @@ class BUContact extends Business
      *    Only handles one row in dataset.
      *
      * @parameter DataSet &$dsResults results
+     * @param $dsContact
      * @return bool : Success
      * @access public
      */
@@ -374,7 +396,7 @@ class BUContact extends Business
          * + Statement at least one, at most one, per customer, ignore if referred
          * + Main at least one per customer, ignore if referred
          * + Review at least one per customer, ignore if referred
-         * + topUp at lesat one per customer if prepay contract, ignore if referred
+         * + topUp at least one per customer if prepay contract, ignore if referred
          * + Reports at least one per customer, ignore if referred
          */
 
@@ -405,12 +427,10 @@ class BUContact extends Business
                 $dsContact->getValue(DBEContact::email),
                 $dsContact->getValue(DBEContact::contactID) ? $dsContact->getValue(DBEContact::contactID) : null
             )) {
-                $this->setFormErrorOn();
                 $this->dsContact->setValue(
-                    'EmailClass',
+                    self::EmailClass,
                     CTCUSTOMER_CLS_FORM_ERROR
                 );
-                $validEmail = false;
             }
 
 
@@ -428,6 +448,15 @@ class BUContact extends Business
         );
     }
 
+    /**
+     * @param $supportLevelValue
+     * @param Template $template
+     * @param string $selected
+     * @param string $value
+     * @param string $description
+     * @param string $parent
+     * @param string $block
+     */
     public static function supportLevelDropDown($supportLevelValue,
                                                 $template,
                                                 $selected = 'supportLevelSelected',
@@ -446,7 +475,7 @@ class BUContact extends Business
             ["value" => DBEContact::supportLevelDelegate, "description" => "Delegate"],
         ];
         foreach ($supportLevels as $supportLevel) {
-            $supportLevelSelected = ($supportLevelValue == $supportLevel['value']) ? CT_SELECTED : '';
+            $supportLevelSelected = ($supportLevelValue == $supportLevel['value']) ? CT_SELECTED : null;
             $template->set_var(
                 [
                     $selected    => $supportLevelSelected,
@@ -471,7 +500,9 @@ class BUContact extends Business
         );
     }
 
-    public function getReviewContacts($customerID,DataSet  $dsResults)
+    public function getReviewContacts($customerID,
+                                      DataSet $dsResults
+    )
     {
         $this->dbeContact->getReviewContacts($customerID);
         return $this->getData(
@@ -479,5 +510,4 @@ class BUContact extends Business
             $dsResults
         );
     }
-}// End of class
-?>
+}

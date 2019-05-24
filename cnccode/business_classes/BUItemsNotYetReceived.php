@@ -25,7 +25,7 @@ class BUItemsNotYetReceived extends Business
     'CNC',
     'Direct'
   ) AS direct,
-  if(poh_ord_date = '0000-00-00', null, poh_ord_date) as purchaseOrderDate,
+  poh_ord_date as purchaseOrderDate,
   poh_required_by > (now() - INTERVAL 1 week ) as oneWeekFromNow,
   (SELECT 
     MIN(ca.caa_date) 
@@ -40,7 +40,7 @@ class BUItemsNotYetReceived extends Business
     poh_supp_ref as supplierRef,
     IF(poh_contno <> 0 OR poh_contno IS NOT NULL, poh_contno, NULL) AS orderedBy,
     poh_type as purchaseOrderType,
-    poh_ord_date is not null and poh_ord_date <> '0000-00-00' as hasBeenOrdered,
+    poh_ord_date is not null as hasBeenOrdered,
     pol_qty_ord <> pol_qty_rec as hasNotBeenReceivedYet,
     pol_qty_ord AS orderedQuantity,
     ordhead.odh_ordno as salesOrderID,
@@ -62,7 +62,7 @@ FROM
     left join (select problem.pro_linked_ordno, min(problem.pro_problemno) as pro_problemno from problem group by problem.pro_linked_ordno) minServiceRequest on minServiceRequest.pro_linked_ordno = porhead.poh_ordno
   left join project 
     on project.ordHeadID = ordhead.odh_ordno
-WHERE poh_required_by is not null and poh_required_by <> '0000-00-00'
+WHERE poh_required_by is not null
 AND item.itm_desc NOT LIKE '%labour%'
 AND item.itm_desc NOT LIKE '%Office 365%'
   AND item.itm_desc NOT LIKE '%carriage%'

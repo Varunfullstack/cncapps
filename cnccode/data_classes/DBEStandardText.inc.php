@@ -20,8 +20,8 @@ class DBEStandardText extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -29,25 +29,25 @@ class DBEStandardText extends DBEntity
         parent::__construct($owner);
         $this->setTableName("standardtext");
         $this->addColumn(
-            "stt_standardtextno",
+            self::stt_standardtextno,
             DA_ID,
             DA_NOT_NULL,
             'stt_standardtextno'
         );
         $this->addColumn(
-            "stt_desc",
+            self::stt_desc,
             DA_STRING,
             DA_NOT_NULL,
             'stt_desc'
         );
         $this->addColumn(
-            "stt_text",
+            self::stt_text,
             DA_TEXT,
             DA_NOT_NULL,
             'stt_text'
         );
         $this->addColumn(
-            "stt_standardtexttypeno",
+            self::stt_standardtexttypeno,
             DA_INTEGER,
             DA_NOT_NULL,
             'stt_standardtexttypeno'

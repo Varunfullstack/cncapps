@@ -16,8 +16,21 @@ require_once($cfg["path_bu"] . "/BUCustomer.inc.php");
 
 class BUCustomerItem extends Business
 {
+
+    const searchFormStartDate = 'startDate';
+    const searchFormEndDate = 'endDate';
+    const searchFormCustomerID = 'customerID';
+    const searchFormCustomerItemID = 'customerItemID';
+    const searchFormCustomerName = 'customerName';
+    const searchFormItemText = 'itemText';
+    const searchFormContractText = 'contractText';
+    const searchFormSerialNo = 'serialNo';
+    const searchFormOrdheadID = 'ordheadID';
+    const searchFormContractFlag = 'contractFlag';
+    const searchFormRenewalStatus = 'renewalStatus';
+
     /** @var DBEJCustomerItem */
-    var $dbeJCustomerItem = '';
+    public $dbeJCustomerItem;
 
     /**
      * Constructor
@@ -34,99 +47,103 @@ class BUCustomerItem extends Business
     {
         $dsData = new DSForm($this);
         $dsData->addColumn(
-            'startDate',
+            self::searchFormStartDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'endDate',
+            self::searchFormEndDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'customerID',
+            self::searchFormCustomerID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'customerItemID',
+            self::searchFormCustomerItemID,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'customerName',
+            self::searchFormCustomerName,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'itemText',
+            self::searchFormItemText,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'contractText',
+            self::searchFormContractText,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'serialNo',
+            self::searchFormSerialNo,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'ordheadID',
+            self::searchFormOrdheadID,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
-//		$dsData->addColumn('contractID', DA_INTEGER, DA_ALLOW_NULL);
         $dsData->addColumn(
-            'contractFlag',
+            self::searchFormContractFlag,
             DA_YN,
             DA_ALLOW_NULL
         );
         $dsData->addColumn(
-            'renewalStatus',
+            self::searchFormRenewalStatus,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->setValue(
-            'startDate',
-            ''
+            self::searchFormStartDate,
+            null
         );
         $dsData->setValue(
-            'endDate',
-            ''
+            self::searchFormEndDate,
+            null
         );
         $dsData->setValue(
-            'customerID',
-            ''
+            self::searchFormCustomerID,
+            null
         );
         $dsData->setValue(
-            'customerName',
-            ''
+            self::searchFormCustomerName,
+            null
         );
         $dsData->setValue(
-            'itemText',
-            ''
+            self::searchFormItemText,
+            null
         );
         $dsData->setValue(
-            'contractText',
-            ''
+            self::searchFormContractText,
+            null
         );
         $dsData->setValue(
-            'serialNo',
-            ''
+            self::searchFormSerialNo,
+            null
         );
         $dsData->setValue(
-            'ordheadID',
-            ''
+            self::searchFormOrdheadID,
+            null
         );
         $dsData->setValue(
-            'renewalStatus',
-            ''
+            self::searchFormRenewalStatus,
+            null
         );
     }
 
+    /**
+     * @param DataSet $dsSearchForm
+     * @param DataSet $dsResults
+     * @param int $row_limit
+     */
     function search(&$dsSearchForm,
                     &$dsResults,
                     $row_limit = 1000
@@ -135,32 +152,31 @@ class BUCustomerItem extends Business
         $this->setMethodName('search');
         $dsSearchForm->initialise();
         $dsSearchForm->fetchNext();
-        $itemText = trim($dsSearchForm->getValue('itemText'));
-        $contractText = trim($dsSearchForm->getValue('contractText'));
-        if ($dsSearchForm->getValue('customerItemID') != '') {
+        $itemText = trim($dsSearchForm->getValue(self::searchFormItemText));
+        $contractText = trim($dsSearchForm->getValue(self::searchFormContractText));
+        if ($dsSearchForm->getValue(self::searchFormCustomerItemID)) {
             $this->getCustomerItemByID(
-                $dsSearchForm->getValue('customerItemID'),
+                $dsSearchForm->getValue(self::searchFormCustomerItemID),
                 $dsResults
             );
         } else {
             if ($itemText{0} == '?') {  // get all customer items if ? passed in
-                $itemText = '';
+                $itemText = null;
             }
             $this->dbeJCustomerItem->getRowsBySearchCriteria(
-                $dsSearchForm->getValue('customerID'),
-                $dsSearchForm->getValue('ordheadID'),
-                $dsSearchForm->getValue('startDate'),
-                $dsSearchForm->getValue('endDate'),
+                $dsSearchForm->getValue(self::searchFormCustomerID),
+                $dsSearchForm->getValue(self::searchFormOrdheadID),
+                $dsSearchForm->getValue(self::searchFormStartDate),
+                $dsSearchForm->getValue(self::searchFormEndDate),
                 $itemText,
                 $contractText,
-                $dsSearchForm->getValue('serialNo'),
-                $dsSearchForm->getValue('renewalStatus'),
+                $dsSearchForm->getValue(self::searchFormSerialNo),
+                $dsSearchForm->getValue(self::searchFormRenewalStatus),
                 $row_limit
             );
             $this->dbeJCustomerItem->initialise();
             $dsResults = $this->dbeJCustomerItem;
         }
-        return $ret;
     }
 
     function getCustomerItemByID($ID,
@@ -175,11 +191,19 @@ class BUCustomerItem extends Business
         );
     }
 
+    /**
+     * @param $clientID
+     * @return bool
+     */
     function clientHasDirectDebit($clientID)
     {
         return $this->dbeJCustomerItem->getCountCustomerDirectDebitItems($clientID) > 0;
     }
 
+    /**
+     * @param $customerID
+     * @param $dsResults
+     */
     function getContractsByCustomerID($customerID,
                                       &$dsResults
     )
@@ -234,7 +258,7 @@ class BUCustomerItem extends Business
         $contractIDs = false;
 
         while ($dbeJContract->fetchNext()) {
-            $contractIDs[] = $dbeJContract->getValue('customerItemID');
+            $contractIDs[] = $dbeJContract->getValue(DBEJContract::customerItemID);
         }
         return $contractIDs;
     }
@@ -242,6 +266,7 @@ class BUCustomerItem extends Business
     /**
      * Create a new dataset containing defaults for new item row
      * @parameter DataSet &$dsResults results
+     * @param DataSet $dsResults
      * @return bool : Success
      * @access public
      */
@@ -259,6 +284,8 @@ class BUCustomerItem extends Business
      *    Only handles one row in dataset.
      *
      * @parameter DataSet &$dsResults results
+     * @param DataSet|DBECustomerItem $dsCustomerItem
+     * @param bool $contractIDs
      * @return bool : Success
      * @access public
      */
@@ -268,42 +295,40 @@ class BUCustomerItem extends Business
     {
         $this->setMethodName('update');
         $dsCustomerItem->fetchNext();
-        $customerItemID = $dsCustomerItem->getValue('customerItemID');
-        if ($customerItemID == '') {
-            $this->raiseError('customerItemID not passed');
-        }
+        $customerItemID = $dsCustomerItem->getValue(DBECustomerItem::customerItemID);
 
         $dbeCustomerItem = new DBECustomerItem($this);
-        if ($dsCustomerItem->getValue('customerItemID') != 0) {
+        if ($dsCustomerItem->getValue(DBECustomerItem::customerItemID)) {
             $dbeCustomerItem->getRow($customerItemID);
         }
         $dsCustomerItem->setUpdateModeUpdate();
-
         /*
         If being suspended now, set suspended date and user
         */
         if (
-            $dsCustomerItem->getValue('secondsiteValidationSuspendUntilDate') != '' &&
-            $dbeCustomerItem->getValue('secondsiteValidationSuspendUntilDate') != $dsCustomerItem->getValue(
-                'secondsiteValidationSuspendUntilDate'
+            $dsCustomerItem->getValue(DBECustomerItem::secondsiteValidationSuspendUntilDate) &&
+            $dbeCustomerItem->getValue(
+                DBECustomerItem::secondsiteValidationSuspendUntilDate
+            ) != $dsCustomerItem->getValue(
+                DBECustomerItem::secondsiteValidationSuspendUntilDate
             )
         ) {
             $dsCustomerItem->setValue(
-                'secondsiteSuspendedByUserID',
+                DBECustomerItem::secondsiteSuspendedByUserID,
                 $GLOBALS ['auth']->is_authenticated()
             );
             $dsCustomerItem->setValue(
-                'secondsiteSuspendedDate',
-                date(CONFIG_MYSQL_DATE)
+                DBECustomerItem::secondsiteSuspendedDate,
+                date(DATE_MYSQL_DATE)
             );
         } else {
             $dsCustomerItem->setValue(
-                'secondsiteSuspendedByUserID',
-                $dbeCustomerItem->getValue('secondsiteSuspendedByUserID')
+                DBECustomerItem::secondsiteSuspendedByUserID,
+                $dbeCustomerItem->getValue(DBECustomerItem::secondsiteSuspendedByUserID)
             );
             $dsCustomerItem->setValue(
-                'secondsiteSuspendedDate',
-                $dbeCustomerItem->getValue('secondsiteSuspendedDate')
+                DBECustomerItem::secondsiteSuspendedDate,
+                $dbeCustomerItem->getValue(DBECustomerItem::secondsiteSuspendedDate)
             );
 
         }
@@ -312,45 +337,46 @@ class BUCustomerItem extends Business
         If being delayed now, set date and user
         */
         if (
-            $dsCustomerItem->getValue('secondsiteImageDelayDays') != '0' &&
-            $dbeCustomerItem->getValue('secondsiteImageDelayDays') != $dsCustomerItem->getValue(
-                'secondsiteImageDelayDays'
+            $dsCustomerItem->getValue(DBECustomerItem::secondsiteImageDelayDays) != '0' &&
+            $dbeCustomerItem->getValue(DBECustomerItem::secondsiteImageDelayDays) != $dsCustomerItem->getValue(
+                DBECustomerItem::secondsiteImageDelayDays
             )
         ) {
             $dsCustomerItem->setValue(
-                'secondsiteImageDelayUserID',
+                DBECustomerItem::secondsiteImageDelayUserID,
                 $GLOBALS ['auth']->is_authenticated()
             );
             $dsCustomerItem->setValue(
-                'secondsiteImageDelayDate',
-                date(CONFIG_MYSQL_DATE)
+                DBECustomerItem::secondsiteImageDelayDate,
+                date(DATE_MYSQL_DATE)
             );
         } else {
             $dsCustomerItem->setValue(
-                'secondsiteImageDelayUserID',
-                $dbeCustomerItem->getValue('secondsiteImageDelayUserID')
+                DBECustomerItem::secondsiteImageDelayUserID,
+                $dbeCustomerItem->getValue(DBECustomerItem::secondsiteImageDelayUserID)
             );
             $dsCustomerItem->setValue(
-                'secondsiteImageDelayDate',
-                $dbeCustomerItem->getValue('secondsiteImageDelayDate')
+                DBECustomerItem::secondsiteImageDelayDate,
+                $dbeCustomerItem->getValue(DBECustomerItem::secondsiteImageDelayDate)
             );
 
         }
         $dsCustomerItem->post();
 
         // if customerID changed then get default siteno and contact
-        if ($dbeCustomerItem->getValue('customerID') != $dsCustomerItem->getValue(
-                'customerID'
+        if ($dbeCustomerItem->getValue(DBECustomerItem::customerID) != $dsCustomerItem->getValue(
+                DBECustomerItem::customerID
             ) && $customerItemID != 0) {
             $buCustomer = new BUCustomer($this);
+            $dsSite = new DataSet($this);
             $buCustomer->getDeliverSiteByCustomerID(
-                $dsCustomerItem->getValue('customerID'),
+                $dsCustomerItem->getValue(DBECustomerItem::customerID),
                 $dsSite,
                 $dsContact
             );
             $dsCustomerItem->setUpdateModeUpdate();
             $dsCustomerItem->setValue(
-                'siteNo',
+                DBECustomerItem::siteNo,
                 $dsSite->getValue(DBESite::siteNo)
             );
             $dsCustomerItem->post();
@@ -368,23 +394,16 @@ class BUCustomerItem extends Business
     }
 
     /**
-     * Test whether given customer item has dependendent entities
+     * Test whether given customer item has dependent entities
      *
      * @parameter integer $customerItemID
      * @return bool : TRUE = has dependencies
      * @access public
      */
-    function canDelete($customerItemID)
+    function canDelete()
     {
         $this->setMethodName('canDelete');
-        $return = TRUE;
-        /*
-            are there any service calls?
-        */
-        $dbeProblem = new DBEProblem($this);
-        // calls for this item as a contract item (e.g. General Support Contract)
-
-        return $return;
+        return true;
     }
 
     function deleteCustomerItem($customerItemID)
@@ -401,9 +420,9 @@ class BUCustomerItem extends Business
     /**
      * Upload document file
      * NOTE: Only expects one document
-     * @param Integer $callID call to upload file for
-     * @param String $filename
-     * @param Array $userfile parameters from browser POST
+     * @param $customerItemID
+     * @param $description
+     * @param $userfile
      * @return bool : success
      * @access public
      */
@@ -413,16 +432,16 @@ class BUCustomerItem extends Business
     )
     {
         $this->setMethodName('uploadDocumentFile');
-        if ($customerItemID == '') $this->raiseError('customerItemID not passed');
-        if ($description == '') $this->raiseError('description not passed');
+        if (!$customerItemID) $this->raiseError('customerItemID not passed');
+        if (!$description) $this->raiseError('description not passed');
         $dbeDocument = new DBECustomerItemDocument($this);
-        $dbeDocument->setPKValue('');
+        $dbeDocument->setPKValue(null);
         $dbeDocument->setValue(
-            'customerItemID',
+            DBECustomerItemDocument::customerItemID,
             $customerItemID
         );
         $dbeDocument->setValue(
-            'file',
+            DBECustomerItemDocument::file,
             fread(
                 fopen(
                     $userfile['tmp_name'],
@@ -432,27 +451,27 @@ class BUCustomerItem extends Business
             )
         );
         $dbeDocument->setValue(
-            'description',
+            DBECustomerItemDocument::description,
             (string)$description
         );
         $dbeDocument->setValue(
-            'filename',
+            DBECustomerItemDocument::filename,
             (string)$userfile['name']
         );
         $dbeDocument->setValue(
-            'fileLength',
+            DBECustomerItemDocument::fileLength,
             (int)$userfile['size']
         );
         $dbeDocument->setValue(
-            'createUserID',
+            DBECustomerItemDocument::createUserID,
             (string)$GLOBALS['auth']->is_authenticated()
         );
         $dbeDocument->setValue(
-            'createDate',
+            DBECustomerItemDocument::createDate,
             date('Y-m-d H:i:s')
         );
         $dbeDocument->setValue(
-            'fileMIMEType',
+            DBECustomerItemDocument::fileMIMEType,
             (string)$userfile['type']
         );
         return ($dbeDocument->insertRow());
@@ -462,10 +481,6 @@ class BUCustomerItem extends Business
                                           &$dsResults
     )
     {
-        /*
-        @todo: update for new many-to-many
-        */
-
         $this->setMethodName('getCustomerItemsByContractID');
         $dbeJCustomerItem = new DBEJCustomerItem($this);
         $dbeJCustomerItem->getItemsByContractID($contractCustomerItemID);
@@ -480,16 +495,16 @@ class BUCustomerItem extends Business
         $this->setMethodName('customerHasValidServerCareContract');
         $dbeJCustomerItem = new DBEJCustomerItem($this);
         $dbeJCustomerItem->setValue(
-            'customerID',
+            DBEJCustomerItem::customerID,
             $customerID
         );
-        $dbeJCustomerItem->getRowsByColumn('customerID');
+        $dbeJCustomerItem->getRowsByColumn(DBEJCustomerItem::customerID);
         $hasContract = false;
         while ($dbeJCustomerItem->fetchNext()) {
 
             if (
-                $dbeJCustomerItem->getValue('servercareFlag') == 'Y' AND
-                $dbeJCustomerItem->getValue('expiryDate') >= date(CONFIG_MYSQL_DATE)
+                $dbeJCustomerItem->getValue(DBEJCustomerItem::servercareFlag) == 'Y' AND
+                $dbeJCustomerItem->getValue(DBEJCustomerItem::expiryDate) >= date(DATE_MYSQL_DATE)
             ) {
                 $hasContract = true;
             }
@@ -502,15 +517,15 @@ class BUCustomerItem extends Business
         $this->setMethodName('customerHasValidServerCareContract');
         $dbeJCustomerItem = new DBEJCustomerItem($this);
         $dbeJCustomerItem->setValue(
-            'customerID',
+            DBEJCustomerItem::customerID,
             $customerID
         );
-        $dbeJCustomerItem->getRowsByColumn('customerID');
+        $dbeJCustomerItem->getRowsByColumn(DBEJCustomerItem::customerID);
         while ($dbeJCustomerItem->fetchNext()) {
 
             if (
-                $dbeJCustomerItem->getValue('servercareFlag') == 'Y' AND
-                $dbeJCustomerItem->getValue('expiryDate') >= date(CONFIG_MYSQL_DATE)
+                $dbeJCustomerItem->getValue(DBEJCustomerItem::servercareFlag) == 'Y' AND
+                $dbeJCustomerItem->getValue(DBEJCustomerItem::expiryDate) >= date(DATE_MYSQL_DATE)
             ) {
                 return $dbeJCustomerItem->getValue(DBEJCustomerItem::customerItemID);
             }
@@ -520,7 +535,7 @@ class BUCustomerItem extends Business
 
     function getMinResponseTime($customerID)
     {
-        $minResponseHours = $this->getMinumumContractResponseHours($customerID);
+        $minResponseHours = $this->getMinimumContractResponseHours($customerID);
 
         if ($minResponseHours > 0) {
             $minResponseTime = 'Response required within ' . $minResponseHours . ' hours<BR/><BR/>';
@@ -532,11 +547,11 @@ class BUCustomerItem extends Business
 
     }
 
-    function getMinumumContractResponseHours($customerID)
+    function getMinimumContractResponseHours($customerID)
     {
         global $db; //PHPLib DB object
 
-        $this->setMethodName('getMinumumContractResponseHours');
+        $this->setMethodName('getMinimumContractResponseHours');
 
         $queryString =
             "
@@ -566,6 +581,8 @@ class BUCustomerItem extends Business
      * Get server customer items by customerID
      *
      * @param integer $customerID
+     * @param $dsResults
+     * @return bool
      */
     function getServersByCustomerID($customerID,
                                     &$dsResults
@@ -579,7 +596,7 @@ class BUCustomerItem extends Business
 
         $dbeJCustomerItem = new DBEJCustomerItem($this);
         $dbeJCustomerItem->setValue(
-            'customerID',
+            DBEJCustomerItem::customerID,
             $customerID
         );
 
@@ -616,8 +633,13 @@ class BUCustomerItem extends Business
         );
     }
 
+    /**
+     * @param $customerID
+     * @return bool
+     */
     function customerHasServiceDeskContract($customerID)
     {
+        $dsContract = new DataSet($this);
         $this->getContractsByCustomerID(
             $customerID,
             $dsContract
@@ -625,7 +647,7 @@ class BUCustomerItem extends Business
 
         while ($dsContract->fetchNext()) {
 
-            if ($dsContract->getValue('itemTypeID') == CONFIG_SERVICEDESK_ITEMTYPEID) {
+            if ($dsContract->getValue(DBEJContract::itemTypeID) == CONFIG_SERVICEDESK_ITEMTYPEID) {
                 return true;
             }
 
@@ -635,15 +657,14 @@ class BUCustomerItem extends Business
 
     function serverIsUnderLocalSecondsiteContract($customerItemID)
     {
-        global $db; //PHPLib DB object
         $dbeJContract = new DBEJContract($this);
         $dbeJContract->getRowsByCustomerItemID($customerItemID);
 
         while ($dbeJContract->fetchNext()) {
-            if ($dbeJContract->getValue('itemTypeID') == CONFIG_2NDSITE_LOCAL_ITEMTYPEID) {
+            if ($dbeJContract->getValue(DBEJContract::itemTypeID) == CONFIG_2NDSITE_LOCAL_ITEMTYPEID) {
                 return true;
             }
-        }// end while
+        }
 
         return false;
     }
@@ -673,5 +694,4 @@ class BUCustomerItem extends Business
             $dsResults
         );
     }
-}// End of class
-?>
+}

@@ -45,7 +45,7 @@ class DBESalesOrderDocumentWithoutFile extends DBEntity
         );
         $this->addColumn(
             self::createdDate,
-            DA_DATE,
+            DA_DATETIME,
             DA_NOT_NULL
         );
         $this->addColumn(

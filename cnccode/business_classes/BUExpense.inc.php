@@ -6,6 +6,7 @@
  */
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEExpense.inc.php");
+require_once($cfg["path_dbe"] . "/DBEJExpense.inc.php");
 require_once($cfg["path_dbe"] . "/DBEVat.inc.php");
 require_once($cfg["path_dbe"] . "/DBECallActivity.inc.php");
 require_once($cfg["path_dbe"] . "/DBEExpenseType.inc.php");
@@ -14,11 +15,13 @@ require_once($cfg["path_func"] . "/activity.inc.php");
 
 class BUExpense extends Business
 {
+    const exportDataSetEndDate = 'endDate';
     public $dbeJExpense;
 
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -26,17 +29,27 @@ class BUExpense extends Business
         $this->dbeJExpense = new DBEJExpense($this);
     }
 
-    function getExpenseByID($expenseID, &$dsResults)
+    function getExpenseByID($expenseID,
+                            &$dsResults
+    )
     {
         $this->dbeJExpense->setPKValue($expenseID);
         $this->dbeJExpense->getRow();
-        return ($this->getData($this->dbeJExpense, $dsResults));
+        return ($this->getData(
+            $this->dbeJExpense,
+            $dsResults
+        ));
     }
 
-    function getExpensesByCallActivityID($callActivityID, &$dsResults)
+    function getExpensesByCallActivityID($callActivityID,
+                                         &$dsResults
+    )
     {
         $this->dbeJExpense->getRowsByCallActivityID($callActivityID);
-        return ($this->getData($this->dbeJExpense, $dsResults));
+        return ($this->getData(
+            $this->dbeJExpense,
+            $dsResults
+        ));
     }
 
     function createExpenseFromCallActivityID($callActivityID)
@@ -48,13 +61,34 @@ class BUExpense extends Business
         $dbeExpenseType->getRow(2);                                        // default to mileage
 
         $dbeExpense = new DBEExpense($this);
-        $dbeExpense->setValue('expenseID', 0);
-        $dbeExpense->setValue('callActivityID', $callActivityID);
-        $dbeExpense->setValue('expenseTypeID', 2);
-        $dbeExpense->setValue('mileage', 0);
-        $dbeExpense->setValue('exportedFlag', 'N');
-        $dbeExpense->setValue('value', 0);
-        $dbeExpense->setValue('vatFlag', $dbeExpenseType->getValue('vatFlag'));            // default for this expense type
+        $dbeExpense->setValue(
+            DBEExpense::expenseID,
+            0
+        );
+        $dbeExpense->setValue(
+            DBEExpense::callActivityID,
+            $callActivityID
+        );
+        $dbeExpense->setValue(
+            DBEExpense::expenseTypeID,
+            2
+        );
+        $dbeExpense->setValue(
+            DBEExpense::mileage,
+            0
+        );
+        $dbeExpense->setValue(
+            DBEExpense::exportedFlag,
+            'N'
+        );
+        $dbeExpense->setValue(
+            DBEExpense::value,
+            0
+        );
+        $dbeExpense->setValue(
+            DBEExpense::vatFlag,
+            $dbeExpenseType->getValue(DBEExpenseType::vatFlag)
+        );            // default for this expense type
         $dbeExpense->insertRow();
 
         $expenseID = $dbeExpense->getPKValue();
@@ -65,6 +99,8 @@ class BUExpense extends Business
     /**
      *    canDeleteExpense
      * Only allowed if not exported
+     * @param $expenseID
+     * @return bool
      */
     function canDeleteExpense($expenseID)
     {
@@ -73,7 +109,7 @@ class BUExpense extends Business
         $dbeExpense = new DBEExpense($this);
         $dbeExpense->getRow($expenseID);
 
-        if ($dbeExpense->getValue('exportedFlag') == 'Y') {
+        if ($dbeExpense->getValue(DBEExpense::exportedFlag) == 'Y') {
             return false;
         } else {
             return true;
@@ -85,7 +121,8 @@ class BUExpense extends Business
      * deleteExpense
      *
      * Deletes an expense row and returns the calllactivityNo
-     *
+     * @param $expenseID
+     * @return bool|float|int|string
      */
     function deleteExpense($expenseID)
     {
@@ -93,7 +130,7 @@ class BUExpense extends Business
         // get the call activity no to return
         $dbeJExpense = new DBEJExpense($this);
         $dbeJExpense->getRow($expenseID);
-        $callActivityID = $dbeJExpense->getValue('callActivityID');
+        $callActivityID = $dbeJExpense->getValue(DBEJExpense::callActivityID);
         // Delete the expense row
         $dbeExpense = new DBEExpense($this);
         $dbeExpense->setPKValue($expenseID);
@@ -101,54 +138,80 @@ class BUExpense extends Business
         return ($callActivityID);
     }
 
+    /**
+     * @param DataSet $dsExpense
+     * @return bool
+     */
     function updateExpense(&$dsExpense)
     {
         $this->setMethodName('updateExpense');
         $dbeExpenseType = new DBEExpenseType($this);
-        $dbeExpenseType->getRow($dsExpense->getValue('expenseTypeID'));
+        $dbeExpenseType->getRow($dsExpense->getValue(DBEJExpense::expenseTypeID));
         // if mileage then calculate mileage value from employee milage rate * mileage and set value to that
-        if ($dbeExpenseType->getValue('mileageFlag') == 'Y') {
+        if ($dbeExpenseType->getValue(DBEExpenseType::mileageFlag) == 'Y') {
             $dbeUser = new DBEUser($this);
-            $dbeUser->getRow($dsExpense->getValue('userID'));
+            $dbeUser->getRow($dsExpense->getValue(DBEJExpense::userID));
             $dsExpense->setUpdateModeUpdate();
-            $dsExpense->setValue('value', $dbeUser->getValue('petrolRate') * $dsExpense->getValue('mileage'));
+            $dsExpense->setValue(
+                DBEJExpense::value,
+                $dbeUser->getValue(DBEUser::petrolRate) * $dsExpense->getValue(DBEJExpense::mileage)
+            );
             $dsExpense->post();
         } else {
             $dsExpense->setUpdateModeUpdate();
-            $dsExpense->setValue('mileage', '');
+            $dsExpense->setValue(
+                DBEJExpense::mileage,
+                null
+            );
             $dsExpense->post();
         }
-        if ($dsExpense->getValue('vatFlag') != 'Y') {
+        if ($dsExpense->getValue(DBEJExpense::vatFlag) != 'Y') {
             $dsExpense->setUpdateModeUpdate();
-            $dsExpense->setValue('vatFlag', 'N');
+            $dsExpense->setValue(
+                DBEJExpense::vatFlag,
+                'N'
+            );
             $dsExpense->post();
         }
         $dbeExpense = new DBEExpense($this);
-        $this->updateDataAccessObject($dsExpense, $dbeExpense);
+        $this->updateDataAccessObject(
+            $dsExpense,
+            $dbeExpense
+        );
         return TRUE;
     }
 
     /**
      * initialise values for input of date range
-     * @return DataSet &$dsData results
+     * @param DataSet $dsData
+     * @return void $dsData results
      * @access public
      */
     function initialiseExportDataset(&$dsData)
     {
         $this->setMethodName('initialiseExportDataset');
         $dsData = new DSForm($this);
-        $dsData->addColumn('endDate', DA_DATE, DA_ALLOW_NULL);
+        $dsData->addColumn(
+            self::exportDataSetEndDate,
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
     }
 
     /**
      * Export engineer expenses to file
+     * @param DataSet $dsData
+     * @param string $runType
+     * @return bool
      */
-    function exportEngineerExpenses(&$dsData, $runType)
+    function exportEngineerExpenses(&$dsData,
+                                    $runType
+    )
     {
         GLOBAL $db;
 
         $this->setMethodName('exportEngineerExpenses');
-
+        $dbUpdate = null;
         if ($runType == 'Export') {
             $dbUpdate = new dbSweetcode;                        // database connection for update query
         }
@@ -156,22 +219,26 @@ class BUExpense extends Business
 
         // get VAT rate
         $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
         $dsHeader->fetchNext();
-        $stdVatCode = $dsHeader->getValue('stdVATCode');
+        $stdVatCode = $dsHeader->getValue(DBEHeader::stdVATCode);
 
         $dbeVat = new DBEVat($this);
         $dbeVat->getRow();
         $vatRate = $dbeVat->getValue((integer)$stdVatCode[1]);
-
+        $date = DateTime::createFromFormat(DATE_MYSQL_DATE, $dsData->getValue(self::exportDataSetEndDate));
         /*
         start writing to summary file
         */
         $summaryFileName =
             SAGE_EXPORT_DIR .
-            '/EXPENSE-SUMMARY-' . $dsData->getValue('endDate') . '.csv';
+            '/EXPENSE-SUMMARY-' . $date->format(DATE_MYSQL_DATE) . '.csv';
 
-        $summaryFileHandle = fopen($summaryFileName, 'wb');
+        $summaryFileHandle = fopen(
+            $summaryFileName,
+            'wb'
+        );
 
         $queryString = "
         SELECT
@@ -195,14 +262,27 @@ class BUExpense extends Business
         INNER JOIN expensetype ON expense.exp_expensetypeno = expensetype.ext_expensetypeno
         WHERE
         expense.exp_exported_flag <> 'Y'
-        AND callactivity.caa_date <= '" . $dsData->getValue('endDate') . "'" .
+        AND callactivity.caa_date <= '" . $dsData->getValue(self::exportDataSetEndDate) . "'" .
             " AND callactivity.caa_status IN ('C','A')
         ORDER BY cns_name, caa_date, caa_starttime";
 
         $db->query($queryString);
 
-        $month_year = substr($dsData->getValue('endDate'), 5, 2) . '/' . substr($dsData->getValue('endDate'), 0, 4);
-
+        $month_year = substr(
+                $dsData->getValue(self::exportDataSetEndDate),
+                5,
+                2
+            ) . '/' . substr(
+                $dsData->getValue(self::exportDataSetEndDate),
+                0,
+                4
+            );
+        $fileHandle = null;
+        $email_to = null;
+        $email_body = null;
+        $grandNetValue = null;
+        $grandVatValue = null;
+        $grandValue = null;
         if ($db->next_record()) {
             $lastEngineer = 'FIRST';
             do {
@@ -212,7 +292,9 @@ class BUExpense extends Business
                     // if this is a new engineer:
                     if ($db->Record['cns_name'] != $lastEngineer) {
                         if ($fileHandle) {
-                            fclose($fileHandle);                                                                // close the last engineer file if open
+                            fclose(
+                                $fileHandle
+                            );                                                                // close the last engineer file if open
 
                             $this->sendExpensesEmail(
                                 $email_to,
@@ -222,7 +304,7 @@ class BUExpense extends Business
                                 $grandValue
                             );
 
-                            $email_body = '';
+                            $email_body = null;
 
                         }
                         /*
@@ -230,9 +312,16 @@ class BUExpense extends Business
                         */
                         $fileName =
                             SAGE_EXPORT_DIR .
-                            '/EXP-' . str_replace(' ', '', $db->Record['cns_name']) .
-                            $dsData->getValue('endDate') . '.csv';
-                        $fileHandle = fopen($fileName, 'wb');
+                            '/EXP-' . str_replace(
+                                ' ',
+                                '',
+                                $db->Record['cns_name']
+                            ) .
+                            $dsData->getValue(self::exportDataSetEndDate) . '.csv';
+                        $fileHandle = fopen(
+                            $fileName,
+                            'wb'
+                        );
                         if (!$fileHandle) {
                             $this->raiseError("Unable to open file " . $fileName);
                         }
@@ -250,7 +339,7 @@ class BUExpense extends Business
                         $grandValue = 0;
 
                         $email_body =
-                            '<HTML style="font:Arial, Helvetica, sans-serif">
+                            '<HTML lang="en" style="font-family:Arial Helvetica sans-serif">
                         <P><strong>Expenses for ' . $month_year . ' </strong></P>
                         <TABLE>
                         <TR>
@@ -263,19 +352,19 @@ class BUExpense extends Business
                         <TD>
                         <strong>Activity</strong>
                         </TD>
-                        <TD align="right">
+                        <TD style="text-align: right">
                         <strong>Miles</strong>
                         </TD>
                         <TD>
                         <strong>Type</strong>
                         </TD>
-                        <TD align="right">
+                        <TD style="text-align: right">
                         <strong>Net</strong>
                         </TD>
-                        <TD align="right">
+                        <TD style="text-align: right">
                         <strong>VAT</strong>
                         </TD>
-                        <TD align="right">
+                        <TD style="text-align: right">
                         <strong>Total</strong>
                         </TD>
                         </TR>
@@ -332,11 +421,11 @@ class BUExpense extends Business
                 <TD>' . $db->Record['activityDate'] . '</TD>
                 <TD>' . $db->Record['cus_name'] . '</TD>
                 <TD>' . $db->Record['caa_callactivityno'] . '</TD>
-                <TD align="right">' . $db->Record['exp_mileage'] . '</TD>
+                <TD style="text-align: right">' . $db->Record['exp_mileage'] . '</TD>
                 <TD>' . $db->Record['ext_desc'] . '</TD>
-                <TD align="right">' . Controller::formatNumber($netValue) . '</TD>
-                <TD align="right">' . Controller::formatNumber($vatValue) . '</TD>
-                <TD align="right">' . Controller::formatNumber($totalValue) . '</TD>
+                <TD style="text-align: right">' . Controller::formatNumber($netValue) . '</TD>
+                <TD style="text-align: right">' . Controller::formatNumber($vatValue) . '</TD>
+                <TD style="text-align: right">' . Controller::formatNumber($totalValue) . '</TD>
                 </TR>';
 
                 if ($runType == 'Export') {
@@ -366,7 +455,10 @@ class BUExpense extends Business
 
             }
 
-            $this->sendSummaryEmail($summaryFileName, 'Expenses summary file attached');
+            $this->sendSummaryEmail(
+                $summaryFileName,
+                'Expenses summary file attached'
+            );
 
             //			$db->query($queryString);
 
@@ -387,7 +479,10 @@ class BUExpense extends Business
     {
         require_once("Mail.php");
 
-        $mail = Mail::factory('smtp', $GLOBALS['mail_options']);
+        $mail = Mail::factory(
+            'smtp',
+            $GLOBALS['mail_options']
+        );
 
         if ($GLOBALS['server_type'] != MAIN_CONFIG_SERVER_TYPE_LIVE) {
             $email_to = CONFIG_SALES_MANAGER_EMAIL;
@@ -404,13 +499,13 @@ class BUExpense extends Business
         <TD>
         <strong>Totals</strong>
         </TD>
-        <TD align="right">
+        <TD style="text-align: right">
         <strong>' . Controller::formatNumber($grandNetValue) . '</strong>
         </TD>
-        <TD align="right">
+        <TD style="text-align: right">
         <strong>' . Controller::formatNumber($grandVatValue) . '</strong>
         </TD>
-        <TD align="right">
+        <TD style="text-align: right">
         <strong>' . Controller::formatNumber($grandValue) . '</strong>
         </TD>
         </TR>
@@ -418,9 +513,9 @@ class BUExpense extends Business
         </HTML>';
 
         $hdrs = array(
-            'From' => 'grahaml@cnc-ltd.co.uk',
-            'To' => $email_to,
-            'Subject' => 'Your Expenses',
+            'From'         => 'grahaml@cnc-ltd.co.uk',
+            'To'           => $email_to,
+            'Subject'      => 'Your Expenses',
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -430,15 +525,18 @@ class BUExpense extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
 
         $body = $mime->get($mime_params);
         $hdrs = $mime->headers($hdrs);
-
-        $result = $mail->send($email_to, $hdrs, $body);
+        $mail->send(
+            $email_to,
+            $hdrs,
+            $body
+        );
     }
 
     /*
@@ -449,17 +547,25 @@ class BUExpense extends Business
     *
     * if $runType = CTEXPENSE_ACT_EXPORT_TRIAL then we only send the summary email and don't update exported flags 
     */
-    function exportEngineerOvertime(&$dsData, $runType)
+    /**
+     * @param DataSet $dsData
+     * @param $runType
+     * @return bool
+     */
+    function exportEngineerOvertime(&$dsData,
+                                    $runType
+    )
     {
 
         GLOBAL $db;
         $this->setMethodName('exportEngineerOvertime');
-
+        $dbUpdate = null;
         if ($runType == 'Export') {
             $dbUpdate = new dbSweetcode;                        // database connection for update query
         }
 
         $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
         $dsHeader->fetchNext();
         /*
@@ -467,9 +573,12 @@ class BUExpense extends Business
         */
         $summaryFileName =
             SAGE_EXPORT_DIR .
-            '/OVERTIME-SUMMARY-' . $dsData->getValue('endDate') . '.csv';
+            '/OVERTIME-SUMMARY-' . $dsData->getValue(self::exportDataSetEndDate) . '.csv';
 
-        $summaryFileHandle = fopen($summaryFileName, 'wb');
+        $summaryFileHandle = fopen(
+            $summaryFileName,
+            'wb'
+        );
         /*
         get all activity rows that have not been exported and are at the weekend or before/after
         hours.
@@ -492,7 +601,7 @@ class BUExpense extends Business
     JOIN callacttype ON caa_callacttypeno = cat_callacttypeno
     JOIN customer ON pro_custno = cus_custno
     JOIN consultant ON caa_consno = cns_consno
-    WHERE caa_date <= '" . $dsData->getValue('endDate') . "'" .
+    WHERE caa_date <= '" . $dsData->getValue(self::exportDataSetEndDate) . "'" .
             " AND caa_date >= '2008-01-15'" .
             " AND (caa_status = 'C' OR caa_status = 'A' )
     AND caa_ot_exp_flag = 'N'
@@ -502,8 +611,14 @@ class BUExpense extends Business
             ( weekdayOvertimeFlag = 'N' AND DATE_FORMAT(caa_date, '%w') IN (0,6) )
     )
     AND (
-    (caa_endtime > '" . $dsHeader->getValue('projectEndTime') . "' OR TIME(caa_starttime) < '" . $dsHeader->getValue('projectStartTime') . "' OR DATE_FORMAT(caa_date, '%w')IN(0,6))
-    OR (caa_endtime > '" . $dsHeader->getValue('helpdeskEndTime') . "' OR TIME(caa_starttime) < '" . $dsHeader->getValue('helpdeskStartTime') . "' OR DATE_FORMAT(caa_date, '%w') IN(0,6) )
+    (caa_endtime > '" . $dsHeader->getValue(
+                DBEHeader::projectEndTime
+            ) . "' OR TIME(caa_starttime) < '" . $dsHeader->getValue(
+                DBEHeader::projectStartTime
+            ) . "' OR DATE_FORMAT(caa_date, '%w')IN(0,6))
+    OR (caa_endtime > '" . $dsHeader->getValue(
+                DBEHeader::helpdeskEndTime
+            ) . "' OR TIME(caa_starttime) < '" . $dsHeader->getValue(DBEHeader::helpdeskStartTime) . "' OR DATE_FORMAT(caa_date, '%w') IN(0,6) )
     )
     AND( caa_endtime <> caa_starttime )
     AND callacttype.engineerOvertimeFlag = 'Y'
@@ -513,20 +628,29 @@ class BUExpense extends Business
         use the system overtime to get staff overtime limits. This is used to
         make the overtime start time earlier than the office start time
         */
-        $projectStartTime = common_convertHHMMToDecimal($dsHeader->getValue('projectStartTime'));
-        $projectEndTime = common_convertHHMMToDecimal($dsHeader->getValue('projectEndTime'));
-        $helpdeskStartTime = common_convertHHMMToDecimal($dsHeader->getValue('helpdeskStartTime'));
-        $helpdeskEndTime = common_convertHHMMToDecimal($dsHeader->getValue('helpdeskEndTime'));
+        $projectStartTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::projectStartTime));
+        $projectEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::projectEndTime));
+        $helpdeskStartTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::helpdeskStartTime));
+        $helpdeskEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::helpdeskEndTime));
 
 
         $db->query($queryString);
 
-        $month_year = substr($dsData->getValue('endDate'), 5, 2) . '/' . substr($dsData->getValue('endDate'), 0, 4);
-
+        $month_year = substr(
+                $dsData->getValue(self::exportDataSetEndDate),
+                5,
+                2
+            ) . '/' . substr(
+                $dsData->getValue(self::exportDataSetEndDate),
+                0,
+                4
+            );
+        $fileHandle = null;
+        $email_to = null;
+        $email_body = null;
+        $grandOvertime = null;
         if ($db->next_record()) {
-
             $lastEngineer = 'FIRST';
-
             do {
 
                 if ($runType == 'Export') {
@@ -535,22 +659,31 @@ class BUExpense extends Business
                     if ($db->Record['cns_name'] != $lastEngineer) {
 
                         if ($fileHandle) {
-                            fclose($fileHandle);                                                                // close the last file if open
+                            fclose(
+                                $fileHandle
+                            );                                                                // close the last file if open
                             $this->sendOvertimeEmail(
                                 $email_to,
                                 $email_body,
                                 $grandOvertime
                             );
 
-                            $email_body = '';
+                            $email_body = null;
 
                         }
                         // start writing to new overtime file
                         $fileName =
                             SAGE_EXPORT_DIR .
-                            '/OT-' . str_replace(' ', '', $db->Record['cns_name']) .
-                            $dsData->getValue('endDate') . '.csv';
-                        $fileHandle = fopen($fileName, 'wb');
+                            '/OT-' . str_replace(
+                                ' ',
+                                '',
+                                $db->Record['cns_name']
+                            ) .
+                            $dsData->getValue(self::exportDataSetEndDate) . '.csv';
+                        $fileHandle = fopen(
+                            $fileName,
+                            'wb'
+                        );
                         if (!$fileHandle) {
                             $this->raiseError("Unable to open file " . $fileName);
                         }
@@ -583,7 +716,7 @@ class BUExpense extends Business
                 <TD>
                 <strong>Activity</strong>
                 </TD>
-                <TD align="right">
+                <TD style="text-align: right">
                 <strong>Hours</strong>
                 </TD>
                 </TR>
@@ -654,11 +787,19 @@ class BUExpense extends Business
                 if ($overtime) {
 
                     $file_line =
-                        "\"" . date('d/m/Y', $db->Record['date_ts']) . "\"," .
+                        "\"" . date(
+                            'd/m/Y',
+                            $db->Record['date_ts']
+                        ) . "\"," .
                         "\"" . $db->Record['caa_starttime'] . "\"," .
                         "\"" . $db->Record['caa_endtime'] . "\"," .
                         "\"" . addslashes($db->Record['cus_name']) . "/" . $db->Record['caa_callactivityno'] . "\"," .
-                        "\"" . Controller::formatNumber($overtime, 2, '', false) . "\"" .
+                        "\"" . Controller::formatNumber(
+                            $overtime,
+                            2,
+                            '',
+                            false
+                        ) . "\"" .
                         "\r\n";
 
                     if ($runType == 'Export') {
@@ -680,23 +821,24 @@ class BUExpense extends Business
 
                     $email_body .=
                         '<TR>
-                <TD>' . date('d/m/Y', $db->Record['date_ts']) . '</TD>
+                <TD>' . date(
+                            'd/m/Y',
+                            $db->Record['date_ts']
+                        ) . '</TD>
                 <TD>' . $db->Record['caa_starttime'] . '</TD>
                 <TD>' . $db->Record['caa_endtime'] . '</TD>
                 <TD>' . $db->Record['cus_name'] . '</TD>
                 <TD>' . $db->Record['caa_callactivityno'] . '</TD>
-                <TD align="right">' . Controller::formatNumber($overtime) . '</TD>
+                <TD style="text-align: right">' . Controller::formatNumber($overtime) . '</TD>
                 </TR>';
 
-                    if ($runType == 'Export') {
-
+                    if ($dbUpdate != null) {
                         // update exported flag
                         $queryString =
                             "UPDATE callactivity SET caa_ot_exp_flag = 'Y'
                     WHERE caa_callactivityno = " . $db->Record['caa_callactivityno'];
 
                         $dbUpdate->query($queryString);
-
                     }
 
                 }
@@ -718,7 +860,10 @@ class BUExpense extends Business
 
             fclose($summaryFileHandle);
 
-            $this->sendSummaryEmail($summaryFileName, 'Overtime summary file attached');
+            $this->sendSummaryEmail(
+                $summaryFileName,
+                'Overtime summary file attached'
+            );
 
             return TRUE;
         } // end if ( $db->next_record() )
@@ -736,7 +881,10 @@ class BUExpense extends Business
     {
         require_once("Mail.php");
 
-        $mail = Mail::factory('smtp', $GLOBALS['mail_options']);
+        $mail = Mail::factory(
+            'smtp',
+            $GLOBALS['mail_options']
+        );
 
         if ($GLOBALS['server_type'] != MAIN_CONFIG_SERVER_TYPE_LIVE) {
             $email_to = CONFIG_SALES_MANAGER_EMAIL;
@@ -753,7 +901,7 @@ class BUExpense extends Business
         <TD>
         <strong>Total</strong>
         </TD>
-        <TD align="right">
+        <TD style="text-align: right">
         <strong>' . Controller::formatNumber($grandOvertime) . '</strong>
         </TD>
         </TR>
@@ -761,9 +909,9 @@ class BUExpense extends Business
         </HTML>';
 
         $hdrs = array(
-            'From' => 'grahaml@cnc-ltd.co.uk',
-            'To' => $email_to,
-            'Subject' => 'Your Overtime',
+            'From'         => 'grahaml@cnc-ltd.co.uk',
+            'To'           => $email_to,
+            'Subject'      => 'Your Overtime',
             'Content-Type' => 'text/html; charset=UTF-8'
         );
 
@@ -774,14 +922,18 @@ class BUExpense extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
         $body = $mime->get($mime_params);
         $hdrs = $mime->headers($hdrs);
 
-        $result = $mail->send($email_to, $hdrs, $body);
+        $mail->send(
+            $email_to,
+            $hdrs,
+            $body
+        );
     }
 
     function sendSummaryEmail(
@@ -791,11 +943,14 @@ class BUExpense extends Business
     {
         require_once("Mail.php");
 
-        $mail = Mail::factory('smtp', $GLOBALS['mail_options']);
+        $mail = Mail::factory(
+            'smtp',
+            $GLOBALS['mail_options']
+        );
 
         $hdrs = array(
-            'From' => 'grahaml@cnc-ltd.co.uk',
-            'To' => CONFIG_SALES_MANAGER_EMAIL,
+            'From'    => 'grahaml@cnc-ltd.co.uk',
+            'To'      => CONFIG_SALES_MANAGER_EMAIL,
             'Subject' => $email_body
         );
 
@@ -809,20 +964,24 @@ class BUExpense extends Business
 
         $mime_params = array(
             'text_encoding' => '7bit',
-            'text_charset' => 'UTF-8',
-            'html_charset' => 'UTF-8',
-            'head_charset' => 'UTF-8'
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
         );
         $body = $mime->get($mime_params);
 
         $hdrs = $mime->headers($hdrs);
 
-        $result = $mail->send(CONFIG_SALES_MANAGER_EMAIL, $hdrs, $body);
+        $mail->send(
+            CONFIG_SALES_MANAGER_EMAIL,
+            $hdrs,
+            $body
+        );
     }
 
-    public function getTotalExpensesForSalesOrder($salesOrderID) {
+    public function getTotalExpensesForSalesOrder($salesOrderID)
+    {
         return $this->dbeJExpense->getTotalExpensesForSalesOrder($salesOrderID);
     }
 
-}// End of class
-?>
+}

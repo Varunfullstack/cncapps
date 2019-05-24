@@ -4,9 +4,12 @@ require_once($cfg["path_dbe"] . "/DBEPortalDocumentWithoutFile.php");
 
 class BUPortalDocument extends Business
 {
-    var $dbePortalDocument = "";
-    var $dbePortalDocumentWithoutFile = "";
-    var $dbeCallActivity = "";
+    /** @var DBEPortalDocument */
+    public $dbePortalDocument;
+    /** @var DBEPortalDocumentWithoutFile */
+    public $dbePortalDocumentWithoutFile;
+
+    public $dbeCallActivity;
 
     function __construct(&$owner)
     {
@@ -15,25 +18,49 @@ class BUPortalDocument extends Business
         $this->dbePortalDocumentWithoutFile = new DBEPortalDocumentWithoutFile($this);
     }
 
+    function beforePost(DataAccess $newRow)
+    {
+        if (!$newRow->getValue(DBEPortalDocumentWithoutFile::createdUserID)) {
+            $newRow->setValue(DBEPortalDocumentWithoutFile::createdUserID, $this->owner->userID);
+        }
+
+        if (!$newRow->getValue(DBEPortalDocumentWithoutFile::createdDate)) {
+            $newRow->setValue(
+                DBEPortalDocumentWithoutFile::createdDate,
+                (new DateTime())->format(DATE_MYSQL_DATETIME)
+            );
+        }
+    }
+
     function updateDocument(&$dsData, $userfile)
     {
         $this->setMethodName('updateDocument');
+
+        $this->dbePortalDocumentWithoutFile->setCallbackMethod(
+            DA_BEFORE_POST,
+            $this,
+            'beforePost'
+        );
+
         /**
          * Upload new document from local disk
          * @access private
          */
         $this->updateDataAccessObject($dsData, $this->dbePortalDocumentWithoutFile);
 
-        if ($this->dbePortalDocumentWithoutFile->getValue('requiresAcceptanceFlag')) {
+        if ($this->dbePortalDocumentWithoutFile->getValue(DBEPortalDocumentWithoutFile::requiresAcceptanceFlag)) {
             $this->dbePortalDocumentWithoutFile->unsetAllOtherRequiresAcceptanceFlag();
         }
 
         /* file to add? */
         if ($userfile['name'] != '') {
             $this->dbePortalDocument->getRow($this->dbePortalDocumentWithoutFile->getPKValue());
-            $this->dbePortalDocument->setValue('file', fread(fopen($userfile ['tmp_name'], 'rb'), $userfile ['size']));
-            $this->dbePortalDocument->setValue('filename', ( string )$userfile ['name']);
-            $this->dbePortalDocument->setValue('fileMimeType', ( string )$userfile ['type']);
+            $this->dbePortalDocument->setValue(
+                DBEPortalDocument::file,
+                fread(fopen($userfile ['tmp_name'], 'rb'), $userfile ['size'])
+            );
+            $this->dbePortalDocument->setValue(DBEPortalDocument::filename, ( string )$userfile ['name']);
+            $this->dbePortalDocument->setValue(DBEPortalDocument::fileMimeType, ( string )$userfile ['type']);
             $this->dbePortalDocument->updateRow();
         }
 
@@ -49,24 +76,13 @@ class BUPortalDocument extends Business
 
     function getDocuments(&$dsResults)
     {
-        $this->dbePortalDocument->getRows('description');
+        $this->dbePortalDocument->getRows(DBEPortalDocument::description);
         return ($this->getData($this->dbePortalDocument, $dsResults));
     }
 
     function deleteDocument($ID)
     {
         $this->setMethodName('deleteDocument');
-        if ($this->canDelete($ID)) {
-            return $this->dbePortalDocument->deleteRow($ID);
-        } else {
-            return FALSE;
-        }
+        return $this->dbePortalDocument->deleteRow($ID);
     }
-
-    function canDelete($ID)
-    {
-        return TRUE;
-    }
-
-}// End of class
-?>
+}

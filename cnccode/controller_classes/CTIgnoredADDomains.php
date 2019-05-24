@@ -14,6 +14,7 @@ require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 class CTIgnoredADDomains extends CTCNC
 {
     var $buActivity;
+    public $dsIgnoredADDomains;
 
     function __construct($requestMethod,
                          $postVars,
@@ -32,73 +33,78 @@ class CTIgnoredADDomains extends CTCNC
         $roles = [
             "maintenance",
         ];
+
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
     }
 
+
+    function delete()
+    {
+        if (!$this->getParam('id')) {
+            http_response_code(400);
+            throw new Exception('ID is missing');
+        }
+
+        $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
+
+        $DBEIgnoredADDomain->getRow($this->getParam('id'));
+        if (!$DBEIgnoredADDomain->rowCount) {
+            http_response_code(404);
+            exit;
+        }
+        $DBEIgnoredADDomain->deleteRow();
+        echo json_encode(["status" => "ok"]);
+    }
+
+    function update()
+    {
+        if (!$this->getParam('id')) {
+            throw new Exception('ID is missing');
+        }
+
+        $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
+
+        $DBEIgnoredADDomain->getRow($this->getParam('id'));
+
+        if (!$DBEIgnoredADDomain->rowCount) {
+            http_response_code(404);
+            exit;
+        }
+
+        $DBEIgnoredADDomain->setValue(
+            DBEIgnoredADDomain::domain,
+            $this->getParam('domain')
+        );
+        $DBEIgnoredADDomain->setValue(
+            DBEIgnoredADDomain::customerID,
+            $this->getParam('customerID')
+        );
+
+        $DBEIgnoredADDomain->updateRow();
+        echo json_encode(["status" => "ok"]);
+    }
+
     /**
      * Route to function based upon action passed
+     * @throws Exception
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
-            case 'delete':
-                if (!isset($_REQUEST['id'])) {
-                    http_response_code(400);
-                    throw new Exception('ID is missing');
-                }
-
-                $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
-
-                $DBEIgnoredADDomain->getRow($_REQUEST['id']);
-
-                if (!$DBEIgnoredADDomain->rowCount) {
-                    http_response_code(404);
-                    exit;
-                }
-                $DBEIgnoredADDomain->setLogSQLOn();
-                $DBEIgnoredADDomain->deleteRow();
-                echo json_encode(["status" => "ok"]);
-                break;
-            case 'update':
-
-                if (!isset($_REQUEST['id'])) {
-                    throw new Exception('ID is missing');
-                }
-
-                $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
-
-                $DBEIgnoredADDomain->getRow($_REQUEST['id']);
-
-                if (!$DBEIgnoredADDomain->rowCount) {
-                    http_response_code(404);
-                    exit;
-                }
-
-                $DBEIgnoredADDomain->setValue(
-                    DBEIgnoredADDomain::domain,
-                    $_REQUEST['domain']
-                );
-                $DBEIgnoredADDomain->setValue(
-                    DBEIgnoredADDomain::customerID,
-                    $_REQUEST['customerID']
-                );
-
-                $DBEIgnoredADDomain->updateRow();
-                echo json_encode(["status" => "ok"]);
-                break;
+        switch ($this->getAction()) {
             case 'create':
                 $DBEIgnoredADDomain = new DBEIgnoredADDomain($this);
 
                 $DBEIgnoredADDomain->setValue(
                     DBEIgnoredADDomain::domain,
-                    $_REQUEST['domain']
+                    $this->getParam('domain')
                 );
                 $DBEIgnoredADDomain->setValue(
                     DBEIgnoredADDomain::customerID,
-                    $_REQUEST['customerID']
+                    $this->getParam('customerID')
                 );
 
                 $DBEIgnoredADDomain->insertRow();
@@ -155,6 +161,11 @@ class CTIgnoredADDomains extends CTCNC
     /**
      * Export expenses that have not previously been exported
      * @access private
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     function displayForm()
     {
@@ -209,25 +220,6 @@ class CTIgnoredADDomains extends CTCNC
         $this->parsePage();
     }
 
-    function resolveCalls()
-    {
-        $this->setMethodName('exportExpenseGenerate');
-        $this->buActivity->initialiseResolveForm($this->dsIgnoredADDomains);
-        if (!$this->dsIgnoredADDomains->populateFromArray($_REQUEST['IgnoredADDomains'])) {
-            $this->setFormErrorOn();
-            $this->displayForm(); //redisplay with errors
-        } else {
-            // do the resolving
-            $filePath = $this->buActivity->resolveCalls($this->dsIgnoredADDomains);
-            if ($filePath) {
-                $this->setFormErrorMessage('Calls resolved and logged to ' . $filePath);
-            } else {
-                $this->setFormErrorMessage('No calls to resolve');
-            }
-            $this->displayForm();
-        }
-    }
-
     function parsePage()
     {
         $urlLogo = '';
@@ -240,4 +232,3 @@ class CTIgnoredADDomains extends CTCNC
         parent::parsePage();
     }
 }// end of class
-?>

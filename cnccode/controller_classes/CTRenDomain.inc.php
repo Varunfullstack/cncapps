@@ -10,7 +10,6 @@ require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BURenDomain.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-require_once($cfg['path_dbe'] . '/DBEArecord.inc.php');
 
 class CTRenDomain extends CTCNC
 {
@@ -21,9 +20,20 @@ class CTRenDomain extends CTCNC
         48,
         60
     ];
-    var $dsRenDomain = '';
-    var $buRenDomain = '';
-    var $buCustomerItem = '';
+    /** @var DSForm */
+    public $dsRenDomain;
+    /** @var BURenDomain */
+    public $buRenDomain;
+    /** @var BUCustomerItem */
+    public $buCustomerItem;
+
+
+    const renDomainFormCustomerName = "customerName";
+    const renDomainFormSiteName = "siteName";
+    const renDomainFormInvoiceFromDate = "invoiceFromDate";
+    const renDomainFormInvoiceToDate = "invoiceToDate";
+    const renDomainFormItemDescription = "itemDescription";
+
 
     function __construct($requestMethod,
                          $postVars,
@@ -50,29 +60,29 @@ class CTRenDomain extends CTCNC
         $this->buRenDomain = new BURenDomain($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenDomain = new DSForm($this);
-        $this->dsRenDomain->copyColumnsFrom($this->buRenDomain->dbeRenDomain);
+        $this->dsRenDomain->copyColumnsFrom(new DBEJRenDomain($this));
         $this->dsRenDomain->addColumn(
-            'customerName',
+            self::renDomainFormCustomerName,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $this->dsRenDomain->addColumn(
-            'siteName',
+            self::renDomainFormSiteName,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $this->dsRenDomain->addColumn(
-            'invoiceFromDate',
+            self::renDomainFormInvoiceFromDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $this->dsRenDomain->addColumn(
-            'invoiceToDate',
+            self::renDomainFormInvoiceToDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $this->dsRenDomain->addColumn(
-            'itemDescription',
+            self::renDomainFormItemDescription,
             DA_STRING,
             DA_ALLOW_NULL
         );
@@ -80,10 +90,11 @@ class CTRenDomain extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'edit':
             case 'create':
                 $this->edit();
@@ -100,13 +111,6 @@ class CTRenDomain extends CTCNC
             case 'createRenewalsSalesOrders':
                 $this->createRenewalsSalesOrders();
                 break;
-            case 'editArecord':
-            case 'createArecord':
-                $this->editArecord();
-                break;
-            case 'deleteArecord':
-                $this->deleteArecord();
-                break;
             case 'list':
             default:
                 $this->displayList();
@@ -117,6 +121,7 @@ class CTRenDomain extends CTCNC
     /**
      * Display list of types
      * @access private
+     * @throws Exception
      */
     function displayList()
     {
@@ -125,10 +130,10 @@ class CTRenDomain extends CTCNC
         $this->setTemplateFiles(
             array('RenDomainList' => 'RenDomainList.inc')
         );
-
+        $dsRenDomain = new DataSet($this);
         $this->buRenDomain->getAll(
             $dsRenDomain,
-            $_REQUEST['orderBy']
+            $this->getParam('orderBy')
         );
 
         if ($dsRenDomain->rowCount() > 0) {
@@ -139,7 +144,7 @@ class CTRenDomain extends CTCNC
             );
             while ($dsRenDomain->fetchNext()) {
 
-                $customerItemID = $dsRenDomain->getValue('customerItemID');
+                $customerItemID = $dsRenDomain->getValue(DBEJCustomerItem::customerItemID);
 
                 $urlEdit =
                     Controller::buildLink(
@@ -151,16 +156,6 @@ class CTRenDomain extends CTCNC
                     );
                 $txtEdit = '[edit]';
 
-                $urlDelete =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'         => 'delete',
-                            'customerItemID' => $customerItemID
-                        )
-                    );
-                $txtDelete = '[delete]';
-
                 $urlList =
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
@@ -171,11 +166,15 @@ class CTRenDomain extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'customerName'    => $dsRenDomain->getValue('customerName'),
-                        'itemDescription' => $dsRenDomain->getValue('itemDescription'),
-                        'domain'          => $dsRenDomain->getValue('notes'),
-                        'invoiceFromDate' => Controller::dateYMDtoDMY($dsRenDomain->getValue('invoiceFromDate')),
-                        'invoiceToDate'   => Controller::dateYMDtoDMY($dsRenDomain->getValue('invoiceToDate')),
+                        'customerName'    => $dsRenDomain->getValue(DBEJCustomerItem::customerName),
+                        'itemDescription' => $dsRenDomain->getValue(DBEJCustomerItem::itemDescription),
+                        'domain'          => $dsRenDomain->getValue(DBEJCustomerItem::notes),
+                        'invoiceFromDate' => Controller::dateYMDtoDMY(
+                            $dsRenDomain->getValue(DBEJCustomerItem::invoiceFromDate)
+                        ),
+                        'invoiceToDate'   => Controller::dateYMDtoDMY(
+                            $dsRenDomain->getValue(DBEJCustomerItem::invoiceToDate)
+                        ),
                         'urlEdit'         => $urlEdit,
                         'urlList'         => $urlList,
                         'txtEdit'         => $txtEdit
@@ -204,36 +203,35 @@ class CTRenDomain extends CTCNC
      * renewalCustomerItemID (blank if renewal not created yet
      *
      *
+     * @throws Exception
      */
     function editFromSalesOrder()
     {
         $buSalesOrder = new BUSalesOrder($this);
-
+        $dsOrdline = new DataSet($this);
         $buSalesOrder->getOrdlineByIDSeqNo(
-            $_REQUEST['ordheadID'],
-            $_REQUEST['sequenceNo'],
+            $this->getParam('ordheadID'),
+            $this->getParam('sequenceNo'),
             $dsOrdline
         );
 
-        $renewalCustomerItemID = $dsOrdline->getValue('renewalCustomerItemID');
+        $renewalCustomerItemID = $dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
 
         // has the order line get a renewal already?
         if (!$renewalCustomerItemID) {
-
-
             // create a new record first
-
+            $dsOrdhead = new DataSet($this);
             $buSalesOrder->getOrderByOrdheadID(
-                $_REQUEST['ordheadID'],
+                $this->getParam('ordheadID'),
                 $dsOrdhead,
                 $dsDontNeedOrdline
             );
 
-            $ID = $this->buRenDomain->createNewRenewal(
-                $dsOrdhead->getValue('customerID'),
-                $dsOrdhead->getValue('delSiteNo'),
-                $dsOrdline->getValue('itemID'),
-                $renewalCustomerItemID                // returned by function
+            $this->buRenDomain->createNewRenewal(
+                $dsOrdhead->getValue(DBEJOrdhead::customerID),
+                $dsOrdline->getValue(DBEJOrdline::itemID),
+                $renewalCustomerItemID,
+                $dsOrdhead->getValue(DBEJOrdhead::delSiteNo)                // returned by function
             );
 
 
@@ -241,17 +239,17 @@ class CTRenDomain extends CTCNC
             $dbeOrdline = new DBEOrdline($this);
 
             $dbeOrdline->setValue(
-                'ordheadID',
-                $dsOrdline->getValue('ordheadID')
+                DBEJOrdline::ordheadID,
+                $dsOrdline->getValue(DBEJOrdline::ordheadID)
             );
             $dbeOrdline->setValue(
-                'sequenceNo',
-                $dsOrdline->getValue('sequenceNo')
+                DBEJOrdline::sequenceNo,
+                $dsOrdline->getValue(DBEJOrdline::sequenceNo)
             );
 
             $dbeOrdline->getRow();
             $dbeOrdline->setValue(
-                'renewalCustomerItemID',
+                DBEJOrdline::renewalCustomerItemID,
                 $renewalCustomerItemID
             );
 
@@ -275,6 +273,7 @@ class CTRenDomain extends CTCNC
     /**
      * Edit/Add Activity
      * @access private
+     * @throws Exception
      */
     function edit()
     {
@@ -283,24 +282,24 @@ class CTRenDomain extends CTCNC
 
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == 'edit') {
+            if ($this->getAction() == 'edit') {
                 $this->buRenDomain->getRenDomainByID(
-                    $_REQUEST['ID'],
+                    $this->getParam('ID'),
                     $dsRenDomain
                 );
-                $customerItemID = $_REQUEST['ID'];
+                $customerItemID = $this->getParam('ID');
             } else {                                                                    // creating new
                 $dsRenDomain->initialise();
                 $dsRenDomain->setValue(
-                    'customerItemID',
-                    '0'
+                    DBEJCustomerItem::customerItemID,
+                    null
                 );
-                $customerItemID = '0';
+                $customerItemID = null;
             }
         } else {                                                                        // form validation error
             $dsRenDomain->initialise();
             $dsRenDomain->fetchNext();
-            $customerItemID = $dsRenDomain->getValue('customerItemID');
+            $customerItemID = $dsRenDomain->getValue(DBEJCustomerItem::customerItemID);
         }
 
         $urlUpdate =
@@ -308,7 +307,7 @@ class CTRenDomain extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => 'update',
-                    'ordheadID'      => $_REQUEST['ordheadID'],
+                    'ordheadID'      => $this->getParam('ordheadID'),
                     'customerItemID' => $customerItemID
                 )
             );
@@ -323,10 +322,13 @@ class CTRenDomain extends CTCNC
         $this->setTemplateFiles(
             array('RenDomainEdit' => 'RenDomainEdit.inc')
         );
-
+        $readonly = CTCNC_HTML_READONLY;
+        $disabled = CTCNC_HTML_DISABLED;
+        $declined = null;
+        $pricePerMonth = null;
         if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
-            $readonly = ''; // not
-            $disabled = ''; // not
+            $readonly = null;
+            $disabled = null;
             $declined =
                 '<tr>
             <td class="promptText">Declined</td>
@@ -336,7 +338,7 @@ class CTRenDomain extends CTCNC
               {readonly}
               type="checkbox"
               value="Y"
-              ' . Controller::htmlChecked($dsRenDomain->getValue('declinedFlag')) . '
+              ' . Controller::htmlChecked($dsRenDomain->getValue(DBEJCustomerItem::declinedFlag)) . '
             /></td>
         </tr>';
 
@@ -345,31 +347,27 @@ class CTRenDomain extends CTCNC
             <td class="promptText">Sale Price/Annum </td>
             <td class="fieldText"><input
               name="renBroadband[1][salePrice]"
-              type="text" value="' . $dsRenDomain->getValue('salePrice') . '"
+              type="text" value="' . $dsRenDomain->getValue(DBEJCustomerItem::salePrice) . '"
               size="10"
               maxlength="10">
                     <span class="formErrorMessage">' . Controller::htmlDisplayText(
-                    $dsRenDomain->getMessage('salePrice')
+                    $dsRenDomain->getMessage(DBEJCustomerItem::salePrice)
                 ) . '</span> </td>
         </tr>
         <tr>
             <td class="promptText">Cost Price/Annum</td>
             <td class="fieldText"><input
               name="renBroadband[1][costPrice]"
-              type="text" value="' . $dsRenDomain->getValue('costPrice') . '"
+              type="text" value="' . $dsRenDomain->getValue(DBEJCustomerItem::costPrice) . '"
               {readonly}
               size="10"
               maxlength="10" />
                     <span class="formErrorMessage">' . Controller::htmlDisplayText(
-                    $dsRenDomain->getMessage('costPrice')
+                    $dsRenDomain->getMessage(DBEJCustomerItem::costPrice)
                 ) . '</span> </td>
         </tr>';
 
 
-        } else {
-            $readonly = CTCNC_HTML_READONLY;
-            $disabled = CTCNC_HTML_DISABLED;
-            $pricePerMonth = '';
         }
 
         $urlItemPopup =
@@ -415,54 +413,60 @@ class CTRenDomain extends CTCNC
         $this->template->set_var(
             array(
                 'pricePerMonth'                      => $pricePerMonth,
-                'costPrice'                          => $dsRenDomain->getValue('costPrice'),
-                'salePrice'                          => $dsRenDomain->getValue('salePrice'),
-                'customerItemID'                     => $dsRenDomain->getValue('customerItemID'),
+                'costPrice'                          => $dsRenDomain->getValue(DBEJCustomerItem::costPrice),
+                'salePrice'                          => $dsRenDomain->getValue(DBEJCustomerItem::salePrice),
+                'customerItemID'                     => $dsRenDomain->getValue(DBEJCustomerItem::customerItemID),
                 'customerName'                       => Controller::htmlDisplayText(
-                    $dsRenDomain->getValue('customerName')
+                    $dsRenDomain->getValue(DBEJCustomerItem::customerName)
                 ),
                 'customerID'                         => Controller::htmlDisplayText(
-                    $dsRenDomain->getValue('customerID')
+                    $dsRenDomain->getValue(DBEJCustomerItem::customerID)
                 ),
-                'siteName'                           => Controller::htmlDisplayText($dsRenDomain->getValue('siteName')),
-                'siteNo'                             => $dsRenDomain->getValue('siteNo'),
+                'siteName'                           => Controller::htmlDisplayText(
+                    $dsRenDomain->getValue(DBEJRenDomain::siteName)
+                ),
+                'siteNo'                             => $dsRenDomain->getValue(DBEJCustomerItem::siteNo),
                 'itemDescription'                    => Controller::htmlDisplayText(
-                    $dsRenDomain->getValue('itemDescription')
+                    $dsRenDomain->getValue(DBEJCustomerItem::itemDescription)
                 ),
-                'itemID'                             => Controller::htmlDisplayText($dsRenDomain->getValue('itemID')),
-                'invoiceFromDate'                    => $dsRenDomain->getValue('invoiceFromDate'),
+                'itemID'                             => Controller::htmlDisplayText(
+                    $dsRenDomain->getValue(DBEJCustomerItem::itemID)
+                ),
+                'invoiceFromDate'                    => $dsRenDomain->getValue(DBEJCustomerItem::invoiceFromDate),
                 'installationDate'                   => Controller::dateYMDtoDMY(
-                    $dsRenDomain->getValue('installationDate')
+                    $dsRenDomain->getValue(DBEJCustomerItem::installationDate)
                 ),
-                'invoiceToDate'                      => $dsRenDomain->getValue('invoiceToDate'),
+                'invoiceToDate'                      => $dsRenDomain->getValue(DBEJCustomerItem::invoiceToDate),
                 'invoicePeriodMonths'                => Controller::htmlInputText(
-                    $dsRenDomain->getValue('invoicePeriodMonths')
+                    $dsRenDomain->getValue(DBEJCustomerItem::invoicePeriodMonths)
                 ),
                 'invoicePeriodMonthsMessage'         => Controller::htmlDisplayText(
-                    $dsRenDomain->getMessage('invoicePeriodMonths')
+                    $dsRenDomain->getMessage(DBEJCustomerItem::invoicePeriodMonths)
                 ),
                 'totalInvoiceMonths'                 => Controller::htmlInputText(
-                    $dsRenDomain->getValue('totalInvoiceMonths')
+                    $dsRenDomain->getValue(DBEJCustomerItem::totalInvoiceMonths)
                 ),
                 'autoGenerateContractInvoiceChecked' => Controller::htmlChecked(
-                    $dsRenDomain->getValue('autoGenerateContractInvoice')
+                    $dsRenDomain->getValue(DBEJCustomerItem::autoGenerateContractInvoice)
                 ),
-                'notes'                              => Controller::htmlInputText($dsRenDomain->getValue('notes')),
-                'notesMessage'                       => Controller::htmlDisplayText($dsRenDomain->getMessage('notes')),
+                'notes'                              => Controller::htmlInputText(
+                    $dsRenDomain->getValue(DBEJCustomerItem::notes)
+                ),
+                'notesMessage'                       => Controller::htmlDisplayText(
+                    $dsRenDomain->getMessage(DBEJCustomerItem::notes)
+                ),
                 'urlUpdate'                          => $urlUpdate,
-                'urlDelete'                          => $urlDelete,
                 'urlItemEdit'                        => $urlItemEdit,
                 'urlItemPopup'                       => $urlItemPopup,
-                'txtDelete'                          => $txtDelete,
                 'urlDisplayList'                     => $urlDisplayList,
                 'declined'                           => $declined,
-                'declinedFlag'                       => $dsRenDomain->getValue('declinedFlag'),
+                'declinedFlag'                       => $dsRenDomain->getValue(DBEJCustomerItem::declinedFlag),
                 'disabled'                           => $disabled,
                 'readonly'                           => $readonly,
                 'internalNotes'                      => Controller::htmlTextArea(
-                    $dsRenDomain->getValue('internalNotes')
+                    $dsRenDomain->getValue(DBEJCustomerItem::internalNotes)
                 ),
-                'calculatedExpiryDate'       => getExpiryDate(
+                'calculatedExpiryDate'               => getExpiryDate(
                     DateTime::createFromFormat(
                         'Y-m-d',
                         $dsRenDomain->getValue(DBECustomerItem::installationDate)
@@ -472,71 +476,6 @@ class CTRenDomain extends CTCNC
 
             )
         );
-
-        $dbeArecord = new DBEArecord($this);
-        $dbeArecord->setValue(
-            'customerItemID',
-            $dsRenDomain->getValue('customerItemID')
-        );
-
-        $dbeArecord->getRowsByColumn(
-            'customerItemID',
-            'name'
-        );
-
-        $this->template->set_block(
-            'RenDomainEdit',
-            'arecordBlock',
-            'arecords'
-        );
-
-        $urlAddArecord =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'         => 'createArecord',
-                    'customerItemID' => $dsRenDomain->getValue('customerItemID')
-                )
-            );
-        $this->template->set_var(array('urlAddArecord' => $urlAddArecord));
-
-        while ($dbeArecord->fetchNext()) {
-
-            $urlEditArecord =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'    => 'editArecord',
-                        'arecordID' => $dbeArecord->getPKValue()
-                    )
-                );
-
-            $urlDeleteArecord =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'    => 'deleteArecord',
-                        'arecordID' => $dbeArecord->getPKValue()
-                    )
-                );
-            $this->template->set_var(
-                array(
-                    'arecordID'            => $dbeArecord->getValue('arecordID'),
-                    'arecordName'          => $dbeArecord->getValue('name'),
-                    'arecordDestinationIp' => $dbeArecord->getValue('destinationIp'),
-                    'arecordFunction'      => $dbeArecord->getValue('function'),
-                    'arecordType'          => $dbeArecord->getValue('type'),
-                    'urlDeleteArecord'     => $urlDeleteArecord,
-                    'urlEditArecord'       => $urlEditArecord
-                )
-            );
-            $this->template->parse(
-                'arecords',
-                'arecordBlock',
-                true
-            );
-        } // while
-
 
         $this->template->parse(
             'CONTENTS',
@@ -549,17 +488,19 @@ class CTRenDomain extends CTCNC
     /**
      * Update call activity type details
      * @access private
+     * @throws Exception
      */
     function update()
     {
         $this->setMethodName('update');
-        $dsRenDomain = &$this->dsRenDomain;
-        $this->formError = (!$this->dsRenDomain->populateFromArray($_REQUEST['renDomain']));
+        $this->formError = (!$this->dsRenDomain->populateFromArray($this->getParam('renDomain')));
         if ($this->formError) {
-            if ($this->dsRenDomain->getValue('customerItemID') == '') {                    // attempt to insert
-                $_REQUEST['action'] = 'edit';
+            if ($this->dsRenDomain->getValue(
+                DBEJCustomerItem::customerItemID
+            )) {                    // attempt to insert
+                $this->setAction('edit');
             } else {
-                $_REQUEST['action'] = 'create';
+                $this->setAction('create');
             }
             $this->edit();
             exit;
@@ -567,14 +508,14 @@ class CTRenDomain extends CTCNC
 
         $this->buRenDomain->updateRenDomain($this->dsRenDomain);
 
-        if ($_REQUEST['ordheadID'] == 1) {        // see whether more renewals need to be edited for this
+        if ($this->getParam('ordheadID') == 1) {        // see whether more renewals need to be edited for this
             // despatch
             $urlNext =
                 Controller::buildLink(
                     'Despatch',
                     array(
                         'action' => 'inputRenewals',
-                        'ID'     => $_REQUEST['ordheadID']
+                        'ID'     => $this->getParam('ordheadID')
                     )
                 );
 
@@ -584,7 +525,7 @@ class CTRenDomain extends CTCNC
                     $_SERVER['PHP_SELF'],
                     array(
                         'action' => 'edit',
-                        'ID'     => $this->dsRenDomain->getValue('customerItemID')
+                        'ID'     => $this->dsRenDomain->getValue(DBEJCustomerItem::customerItemID)
                     )
                 );
 
@@ -602,117 +543,10 @@ class CTRenDomain extends CTCNC
         $this->buRenDomain->createRenewalsSalesOrders();
     }
 
-    function editArecord()
-    {
-        $this->setMethodName('editArecord');
-
-        $dsArecord = new DSForm($this);
-        $dbeArecord = new DBEArecord($this);
-        $dsArecord->copyColumnsFrom($dbeArecord);
-
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $this->setMethodName('updateRenDomain');
-            $formError = (!$dsArecord->populateFromArray($_REQUEST['arecord']));
-            if (!$formError) {
-                $this->buRenDomain->updateArecord($dsArecord);
-
-                $urlNext =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'edit',
-                            'ID'     => $dsArecord->getValue('customerItemID')
-                        )
-                    );
-
-                header('Location: ' . $urlNext);
-                exit;
-            }
-        } else {
-            if ($_REQUEST['arecordID']) {                      // editing
-                $this->buRenDomain->getArecordById(
-                    $_REQUEST['arecordID'],
-                    $dsArecord
-                );
-            } else {                                               // create new record
-                $dsArecord->setValue(
-                    'arecordID',
-                    0
-                );
-                $dsArecord->setValue(
-                    'customerItemID',
-                    $_REQUEST['customerItemID']
-                );
-            }
-        }
-
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'         => 'editArecord',
-                    'ordheadID'      => $arecordID,
-                    'customerItemID' => $customerItemID
-                )
-            );
-        $this->setPageTitle('Edit A-Record');
-
-        $this->setTemplateFiles(array('ArecordEdit' => 'ArecordEdit.inc'));
-
-        $this->template->set_var(
-            array(
-                'customerItemID'       => $dsArecord->getValue('customerItemID'),
-                'arecordID'            => $dsArecord->getValue('arecordID'),
-                'type'                 => $dsArecord->getValue('type'),
-                'typeMessage'          => $dsArecord->getMessage('type'),
-                'name'                 => $dsArecord->getValue('name'),
-                'nameMessage'          => $dsArecord->getMessage('name'),
-                'function'             => $dsArecord->getValue('function'),
-                'functionMessage'      => $dsArecord->getMessage('function'),
-                'destinationIp'        => $dsArecord->getValue('destinationIp'),
-                'destinationIpMessage' => $dsArecord->getMessage('destinationIp'),
-                'urlUpdate'            => $urlUpdate
-            )
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'ArecordEdit',
-            true
-        );
-        $this->parsePage();
-    }
-
-    function deleteArecord()
-    {
-        $this->setMethodName('deleteArecord');
-
-        if (!$this->buRenDomain->getArecordById(
-            $_REQUEST['arecordID'],
-            $dsArecord
-        )) {
-            $this->raiseError('arecordID ' . $_REQUEST['arecordID'] . ' not found');
-            exit;
-        }
-
-        $this->buRenDomain->deleteArecord($_REQUEST['arecordID']);
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'edit',
-                    'ID'     => $dsArecord->getValue('customerItemID')
-                )
-            );
-
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
     private function parseInitialContractLength($initialContractLength)
     {
         foreach (self::InitialContractLengthValues as $value) {
-            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : '';
+            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : null;
             $this->template->set_var(
                 array(
                     'initialContractLengthSelected'    => $initialContractLengthSelected,
@@ -727,5 +561,4 @@ class CTRenDomain extends CTCNC
             );
         }
     }
-}// end of class
-?>
+}

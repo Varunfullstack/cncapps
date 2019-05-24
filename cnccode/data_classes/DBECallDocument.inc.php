@@ -42,7 +42,7 @@ class DBECallDocument extends DBEntity
         $this->addColumn(
             self::callActivityID,
             DA_ID,
-            DA_NOT_NULL
+            DA_ALLOW_NULL
         );
         $this->addColumn(
             self::description,

@@ -11,7 +11,12 @@ require_once($cfg["path_dbe"] . "/DBECallActivity.inc.php");
 
 class BUActivityType extends Business
 {
-    var $dbeCallActType = "";
+    /** @var DBECallActType|DataSet */
+    public $dbeCallActType;
+    /**
+     * @var DBEJCallActType
+     */
+    public $dbeJCallActType;
 
     /**
      * Constructor
@@ -25,6 +30,10 @@ class BUActivityType extends Business
         $this->dbeJCallActType = new DBEJCallActType($this);                // join to item table
     }
 
+    /**
+     * @param $dsData
+     * @return bool
+     */
     function updateActivityType(&$dsData)
     {
         $this->setMethodName('updateActivityType');
@@ -32,6 +41,11 @@ class BUActivityType extends Business
         return TRUE;
     }
 
+    /**
+     * @param $ID
+     * @param $dsResults
+     * @return bool
+     */
     function getActivityTypeByID($ID, &$dsResults)
     {
         $this->dbeJCallActType->setPKValue($ID);
@@ -39,18 +53,20 @@ class BUActivityType extends Business
         return ($this->getData($this->dbeJCallActType, $dsResults));
     }
 
+    /**
+     * @param $dsResults
+     * @return bool
+     */
     function getAllTypes(&$dsResults)
     {
         $this->dbeCallActType->getRows();
         return ($this->getData($this->dbeCallActType, $dsResults));
     }
 
-    function getAllActiveTypes(&$dsResults)
-    {
-        $this->dbeCallActType->getActiveRows();
-        return ($this->getData($this->dbeCallActType, $dsResults));
-    }
-
+    /**
+     * @param $ID
+     * @return bool
+     */
     function deleteActivityType($ID)
     {
         $this->setMethodName('deleteActivityType');
@@ -64,17 +80,14 @@ class BUActivityType extends Business
     /**
      *    canDeleteActivityType
      * Only allowed if type has no activities
+     * @param $ID
+     * @return bool
      */
     function canDeleteActivityType($ID)
     {
         $dbeCallActivity = new DBECallActivity($this);
         // validate no activities of this type
-        $dbeCallActivity->setValue('callActTypeID', $ID);
-        if ($dbeCallActivity->countRowsByColumn('callActTypeID') < 1) {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
+        $dbeCallActivity->setValue(DBECallactivity::callActTypeID, $ID);
+        return $dbeCallActivity->countRowsByColumn(DBECallactivity::callActTypeID) < 1;
     }
-}// End of class
-?>
+}

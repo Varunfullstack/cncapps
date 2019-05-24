@@ -92,16 +92,18 @@ class BURenBroadband extends Business
     /**
      *    canDeleteRenBroadband
      * Only allowed if type has no activities
+     * @param $ID
+     * @return bool
      */
     function canDeleteRenBroadband($ID)
     {
-        $dbeRenBroadband = new DBERenBroadband ($this);
+        $dbeRenBroadband = new DBEJRenBroadband ($this);
         // validate no activities of this type
         $dbeRenBroadband->setValue(
-            'customerItemID',
+            DBEJRenBroadband::customerItemID,
             $ID
         );
-        if ($dbeRenBroadband->countRowsByColumn('customerItemID') < 1) {
+        if ($dbeRenBroadband->countRowsByColumn(DBEJRenBroadband::customerItemID) < 1) {
             return TRUE;
         } else {
             return FALSE;
@@ -110,9 +112,9 @@ class BURenBroadband extends Business
 
     function createNewRenewal(
         $customerID,
-        $siteNo = 0,
         $itemID,
-        &$customerItemID
+        &$customerItemID,
+        $siteNo = null
     )
     {
         // create a customer item
@@ -125,19 +127,19 @@ class BURenBroadband extends Business
         $dsCustomerItem->setUpdateModeInsert();
 
         $dsCustomerItem->setValue(
-            'customerItemID',
-            0
+            DBEJCustomerItem::customerItemID,
+            null
         );
         $dsCustomerItem->setValue(
-            'customerID',
+            DBEJCustomerItem::customerID,
             $customerID
         );
         $dsCustomerItem->setValue(
-            'itemID',
+            DBEJCustomerItem::itemID,
             $itemID
         );
         $dsCustomerItem->setValue(
-            'siteNo',
+            DBEJCustomerItem::siteNo,
             $siteNo
         );
 
@@ -170,11 +172,13 @@ class BURenBroadband extends Business
             );
 
         ob_start(); ?>
-        <HTML>
+        <HTML lang="en">
         <BODY>
-        <TABLE border="1"
-               bgcolor="#FFFFFF"
+        <!--suppress HtmlDeprecatedAttribute -->
+        <TABLE bgcolor="#FFFFFF"
+               border="1"
         >
+            <!--suppress HtmlDeprecatedAttribute -->
             <tr bordercolor="#333333"
                 bgcolor="#CCCCCC"
             >
@@ -183,8 +187,8 @@ class BURenBroadband extends Business
             </tr>
             <?php while ($this->dbeJRenBroadband->fetchNext()) { ?>
                 <tr>
-                    <td><?php echo $this->dbeJRenBroadband->getValue('customerName') ?></td>
-                    <td><?php echo $this->dbeJRenBroadband->getValue('itemDescription') ?></td>
+                    <td><?php echo $this->dbeJRenBroadband->getValue(DBEJRenBroadband::customerName) ?></td>
+                    <td><?php echo $this->dbeJRenBroadband->getValue(DBEJRenBroadband::itemDescription) ?></td>
                 </tr>
             <?php } ?>
         </TABLE>
@@ -230,9 +234,12 @@ class BURenBroadband extends Business
         $dbeCustomer = new DBECustomer ($this);
 
         $previousCustomerID = 99999;
+        /** @var DataSet $dsOrdhead */
         $dsOrdhead = null;
         $generateInvoice = false;
         $generatedOrder = false;
+        $line = 0;
+        $description = null;
         while ($this->dbeJRenBroadband->fetchNext()) {
 
             ?>
@@ -243,13 +250,13 @@ class BURenBroadband extends Business
             </div>
             <?php
             $generatedOrder = false;
-            if ($dbeJCustomerItem->getRow($this->dbeJRenBroadband->getValue('customerItemID'))) {
+            if ($dbeJCustomerItem->getRow($this->dbeJRenBroadband->getValue(DBEJRenBroadband::customerItemID))) {
 
                 /*
                  * Group many renewals for same customer under one sales order
                  */
                 if (
-                    $previousCustomerID != $dbeJCustomerItem->getValue('customerID') ||
+                    $previousCustomerID != $dbeJCustomerItem->getValue(DBEJCustomerItem::customerID) ||
                     (
                         !$generateInvoice &&
                         $this->dbeJRenBroadband->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y'
@@ -262,10 +269,10 @@ class BURenBroadband extends Business
                         /*
                          * Finalise previous sales order and create an invoice
                          */
-                        $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
+                        $buSalesOrder->setStatusCompleted($dsOrdhead->getValue(DBEOrdhead::ordheadID));
 
                         $buSalesOrder->getOrderByOrdheadID(
-                            $dsOrdhead->getValue('ordheadID'),
+                            $dsOrdhead->getValue(DBEOrdhead::ordheadID),
                             $dsOrdhead,
                             $dsOrdline
                         );
@@ -291,7 +298,7 @@ class BURenBroadband extends Business
                     /*
                      *  create new sales order header
                      */
-                    $dbeCustomer->getRow($dbeJCustomerItem->getValue('customerID'));
+                    $dbeCustomer->getRow($dbeJCustomerItem->getValue(DBEJCustomerItem::customerID));
                     $this->getData(
                         $dbeCustomer,
                         $dsCustomer
@@ -323,55 +330,55 @@ class BURenBroadband extends Business
                 $line++;
 
                 $dbeOrdline->setValue(
-                    'renewalCustomerItemID',
-                    ''
+                    DBEOrdline::renewalCustomerItemID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'ordheadID',
-                    $dsOrdhead->getValue('ordheadID')
+                    DBEOrdline::ordheadID,
+                    $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                 );
                 $dbeOrdline->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBEOrdline::customerID,
+                    $dsOrdhead->getValue(DBEOrdhead::customerID)
                 );
                 $dbeOrdline->setValue(
-                    'itemID',
+                    DBEOrdline::itemID,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'description',
+                    DBEOrdline::description,
                     $description
                 );
                 $dbeOrdline->setValue(
-                    'supplierID',
-                    ''
+                    DBEOrdline::supplierID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'sequenceNo',
+                    DBEOrdline::sequenceNo,
                     $line
                 );
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'qtyOrdered',
+                    DBEOrdline::qtyOrdered,
                     0
                 ); // default 1
                 $dbeOrdline->setValue(
-                    'qtyDespatched',
+                    DBEOrdline::qtyDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'qtyLastDespatched',
+                    DBEOrdline::qtyLastDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitSale',
+                    DBEOrdline::curUnitSale,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitCost',
+                    DBEOrdline::curUnitCost,
                     0
                 );
 
@@ -379,10 +386,10 @@ class BURenBroadband extends Business
                 /*
                  *  Phone number comment line
                  */
-                if ($this->dbeJRenBroadband->getValue('adslPhone')) {
-                    $description = $this->dbeJRenBroadband->getValue('adslPhone') . '. ';
+                if ($this->dbeJRenBroadband->getValue(DBEJRenBroadband::adslPhone)) {
+                    $description = $this->dbeJRenBroadband->getValue(DBEJRenBroadband::adslPhone) . '. ';
                     $dbeOrdline->setValue(
-                        'description',
+                        DBEOrdline::description,
                         $description
                     );
                     $dbeOrdline->insertRow();
@@ -396,69 +403,74 @@ class BURenBroadband extends Business
                  * Get stock category from item table
                  */
                 $buItem = new BUItem($this);
+                $dsItem = new DataSet($this);
                 $buItem->getItemByID(
-                    $dbeJCustomerItem->getValue('itemID'),
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID),
                     $dsItem
                 );
                 $dbeOrdline->setValue(
-                    'stockcat',
-                    $dsItem->getValue('stockcat')
+                    DBEOrdline::stockcat,
+                    $dsItem->getValue(DBEItem::stockcat)
                 );
 
                 $dbeOrdline->setValue(
-                    'renewalCustomerItemID',
-                    $this->dbeJRenBroadband->getValue('customerItemID')
+                    DBEOrdline::renewalCustomerItemID,
+                    $this->dbeJRenBroadband->getValue(DBEJRenBroadband::customerItemID)
                 );
                 $dbeOrdline->setValue(
-                    'ordheadID',
-                    $dsOrdhead->getValue('ordheadID')
+                    DBEOrdline::ordheadID,
+                    $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                 );
                 $dbeOrdline->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBEOrdline::customerID,
+                    $dsOrdhead->getValue(DBEOrdhead::customerID)
                 );
                 $dbeOrdline->setValue(
-                    'itemID',
-                    $dbeJCustomerItem->getValue('itemID')
+                    DBEOrdline::itemID,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID)
                 );
                 $dbeOrdline->setValue(
-                    'description',
-                    $dbeJCustomerItem->getValue('itemDescription')
+                    DBEOrdline::description,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemDescription)
                 );
                 $dbeOrdline->setValue(
-                    'supplierID',
+                    DBEOrdline::supplierID,
                     CONFIG_SALES_STOCK_SUPPLIERID
                 );
                 $dbeOrdline->setValue(
-                    'sequenceNo',
+                    DBEOrdline::sequenceNo,
                     $line
                 );
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'I'
                 );
                 $dbeOrdline->setValue(
-                    'qtyOrdered',
+                    DBEOrdline::qtyOrdered,
                     1
                 ); // default 1
                 $dbeOrdline->setValue(
-                    'qtyDespatched',
+                    DBEOrdline::qtyDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'qtyLastDespatched',
+                    DBEOrdline::qtyLastDespatched,
                     1
                 );
                 $dbeOrdline->setValue(
-                    'curUnitSale',
-                    $this->dbeJRenBroadband->getValue('salePricePerMonth') * $this->dbeJRenBroadband->getValue(
-                        'invoicePeriodMonths'
+                    DBEOrdline::curUnitSale,
+                    $this->dbeJRenBroadband->getValue(
+                        DBEJRenBroadband::salePricePerMonth
+                    ) * $this->dbeJRenBroadband->getValue(
+                        DBEJRenBroadband::invoicePeriodMonths
                     )
                 );
                 $dbeOrdline->setValue(
-                    'curUnitCost',
-                    $this->dbeJRenBroadband->getValue('costPricePerMonth') * $this->dbeJRenBroadband->getValue(
-                        'invoicePeriodMonths'
+                    DBEOrdline::curUnitCost,
+                    $this->dbeJRenBroadband->getValue(
+                        DBEJRenBroadband::costPricePerMonth
+                    ) * $this->dbeJRenBroadband->getValue(
+                        DBEJRenBroadband::invoicePeriodMonths
                     )
                 );
 
@@ -467,62 +479,62 @@ class BURenBroadband extends Business
                 // period comment line
                 $line++;
                 $description = $this->dbeJRenBroadband->getValue(
-                        'invoiceFromDate'
-                    ) . ' to ' . $this->dbeJRenBroadband->getValue('invoiceToDate');
+                        DBEJRenBroadband::invoiceFromDate
+                    ) . ' to ' . $this->dbeJRenBroadband->getValue(DBEJRenBroadband::invoiceToDate);
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'renewalCustomerItemID',
-                    ''
+                    DBEOrdline::renewalCustomerItemID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'ordheadID',
-                    $dsOrdhead->getValue('ordheadID')
+                    DBEOrdline::ordheadID,
+                    $dsOrdhead->getValue(DBEJOrdhead::ordheadID)
                 );
                 $dbeOrdline->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBEOrdline::customerID,
+                    $dsOrdhead->getValue(DBEJOrdhead::customerID)
                 );
                 $dbeOrdline->setValue(
-                    'itemID',
+                    DBEOrdline::itemID,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'description',
+                    DBEOrdline::description,
                     $description
                 );
                 $dbeOrdline->setValue(
-                    'supplierID',
-                    ''
+                    DBEOrdline::supplierID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'sequenceNo',
+                    DBEOrdline::sequenceNo,
                     $line
                 );
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'qtyOrdered',
+                    DBEOrdline::qtyOrdered,
                     0
                 ); // default 1
                 $dbeOrdline->setValue(
-                    'qtyDespatched',
+                    DBEOrdline::qtyDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'qtyLastDespatched',
+                    DBEOrdline::qtyLastDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitSale',
+                    DBEOrdline::curUnitSale,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitCost',
+                    DBEOrdline::curUnitCost,
                     0
                 );
 
@@ -531,16 +543,16 @@ class BURenBroadband extends Business
                 /*
                  * Update total months invoiced on renewal record
                  */
-                $this->dbeRenBroadband->getRow($this->dbeJRenBroadband->getValue('customerItemID'));
+                $this->dbeRenBroadband->getRow($this->dbeJRenBroadband->getValue(DBEJRenBroadband::customerItemID));
                 $this->dbeRenBroadband->setValue(
-                    'totalInvoiceMonths',
-                    $this->dbeJRenBroadband->getValue('totalInvoiceMonths') +
-                    $this->dbeJRenBroadband->getValue('invoicePeriodMonths')
+                    DBEJRenBroadband::totalInvoiceMonths,
+                    $this->dbeJRenBroadband->getValue(DBEJRenBroadband::totalInvoiceMonths) +
+                    $this->dbeJRenBroadband->getValue(DBEJRenBroadband::invoicePeriodMonths)
                 );
 
                 $this->dbeRenBroadband->updateRow();
 
-                $previousCustomerID = $dbeJCustomerItem->getValue('customerID');
+                $previousCustomerID = $dbeJCustomerItem->getValue(DBEJCustomerItem::customerID);
             }
         }
         /*
@@ -557,10 +569,10 @@ class BURenBroadband extends Business
                 ) == "Y" ? 'true' : 'false' ?>
             </div>
             <?php
-            $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
+            $buSalesOrder->setStatusCompleted($dsOrdhead->getValue(DBEJOrdhead::ordheadID));
 
             $buSalesOrder->getOrderByOrdheadID(
-                $dsOrdhead->getValue('ordheadID'),
+                $dsOrdhead->getValue(DBEJOrdhead::ordheadID),
                 $dsOrdhead,
                 $dsOrdline
             );
@@ -580,8 +592,8 @@ class BURenBroadband extends Business
 
         if
         (
-            $this->dbeRenBroadband->getValue('installationDate') &&
-            $this->dbeRenBroadband->getValue('invoicePeriodMonths')
+            $this->dbeRenBroadband->getValue(DBEJRenBroadband::installationDate) &&
+            $this->dbeRenBroadband->getValue(DBEJRenBroadband::invoicePeriodMonths)
         ) {
             $ret = true;
 
@@ -597,7 +609,7 @@ class BURenBroadband extends Business
     {
         $dbeJRenBroadband = new DBEJRenBroadband($this);
         $dbeJRenBroadband->setValue(
-            'customerItemID',
+            DBEJRenBroadband::customerItemID,
             $ID
         );
         $dbeJRenBroadband->getRow();
@@ -618,64 +630,64 @@ class BURenBroadband extends Business
 
         ob_start(); ?>
 
-        <HTML>
+        <HTML lang="en">
         <BODY>
         <TABLE>
             <tr>
                 <td>Customer</td>
-                <td><?php echo $dbeJRenBroadband->getValue('customerName') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::customerName) ?></td>
             </tr>
             <tr>
                 <td>Service</td>
-                <td><?php echo $dbeJRenBroadband->getValue('itemDescription') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::itemDescription) ?></td>
             </tr>
             <tr>
                 <td>ispID</td>
-                <td><?php echo $dbeJRenBroadband->getValue('ispID') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::ispID) ?></td>
             </tr>
 
             <tr>
                 <td>ADSL Phone</td>
-                <td><?php echo $dbeJRenBroadband->getValue('adslPhone') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::adslPhone) ?></td>
             </tr>
             <tr>
                 <td>MAC Code</td>
-                <td><?php echo $dbeJRenBroadband->getValue('macCode') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::macCode) ?></td>
             </tr>
             <tr>
                 <td>Reference</td>
-                <td><?php echo $dbeJRenBroadband->getValue('reference') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::reference) ?></td>
             </tr>
             <tr>
                 <td>Default Gateway</td>
-                <td><?php echo $dbeJRenBroadband->getValue('defaultGateway') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::defaultGateway) ?></td>
             </tr>
             <tr>
                 <td>Network Address</td>
-                <td><?php echo $dbeJRenBroadband->getValue('networkAddress') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::networkAddress) ?></td>
             </tr>
             <tr>
                 <td>Subnet Mask</td>
-                <td><?php echo $dbeJRenBroadband->getValue('subnetMask') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::subnetMask) ?></td>
             </tr>
             <tr>
-                <td valign="top">Router IP Address</td>
+                <td style="vertical-align:top;">Router IP Address</td>
                 <td><?php echo Controller::htmlDisplayText(
-                        $dbeJRenBroadband->getValue('routerIPAddress'),
+                        $dbeJRenBroadband->getValue(DBEJRenBroadband::routerIPAddress),
                         1
                     ) ?></td>
             </tr>
             <tr>
                 <td>User Name</td>
-                <td><?php echo $dbeJRenBroadband->getValue('userName') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::userName) ?></td>
             </tr>
             <tr>
                 <td>Password</td>
-                <td><?php echo $dbeJRenBroadband->getValue('password') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::password) ?></td>
             </tr>
             <tr>
                 <td>eta Date</td>
-                <td><?php echo $dbeJRenBroadband->getValue('etaDate') ?></td>
+                <td><?php echo $dbeJRenBroadband->getValue(DBEJRenBroadband::etaDate) ?></td>
             </tr>
         </TABLE>
         </BODY>

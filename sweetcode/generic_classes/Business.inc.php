@@ -8,8 +8,8 @@ require_once($cfg["path_gc"] . "/BaseObject.inc.php");
 require_once($cfg["path_gc"] . "/DataSet.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
-define("BUSINESS_FK_ERR", "_fk_error");    // ext for fk ref integrity error columns in datasets
-define("BUSINESS_NT_PSD", "not passed");    // ext for fk ref integrity error columns in datasets
+define("BUSINESS_FK_ERR", "_fk_error");    // ext for fk ref integrity error columns in data sets
+define("BUSINESS_NT_PSD", "not passed");    // ext for fk ref integrity error columns in data sets
 
 class Business extends BaseObject
 {
@@ -32,7 +32,7 @@ class Business extends BaseObject
      * @return bool
      * @access private
      */
-    function updateDataAccessObject(DataSet &$dsSource, DataAccess  &$dbDestination)
+    function updateDataAccessObject(DataSet &$dsSource, DataAccess &$dbDestination)
     {
         $this->setMethodName("updateDataaccessObject");
         if (!is_object($dsSource)) {
@@ -48,8 +48,10 @@ class Business extends BaseObject
             $this->raiseError("dbDestination is not initialised");
         }
         if (!is_subclass_of($dbDestination, DA_CLASSNAME_DBENTITY)) {
-            $this->raiseError("dbDestination must be subclass of " .
-                DA_CLASSNAME_DBENTITY);
+            $this->raiseError(
+                "dbDestination must be subclass of " .
+                DA_CLASSNAME_DBENTITY
+            );
         }
         if ($dsSource->columnExists($dbDestination->getPKName()) == DA_PK_NOT_SET) {
             $this->raiseError("No Primary key column in dsSource");
@@ -59,8 +61,9 @@ class Business extends BaseObject
 
     /**
      * Get all rows from a data access object into a dataset
-     * @param $dbSource
-     * @param $dsDestination
+     * @param DataAccess $dbSource
+     * @param DataAccess $dsDestination
+     * @param bool $withPK
      * @return bool
      * @access private
      */
@@ -73,8 +76,10 @@ class Business extends BaseObject
                 ($dsDestination->getClassname() != DA_CLASSNAME_DATASET) &
                 (!is_subclass_of($dsDestination, DA_CLASSNAME_DATASET))
             ) {
-                $this->raiseError("dsDestination must be subclass or class of " .
-                    DA_CLASSNAME_DATASET);
+                $this->raiseError(
+                    "dsDestination must be subclass or class of " .
+                    DA_CLASSNAME_DATASET
+                );
             }
         }
         if (gettype($dbSource) != "object")
@@ -87,9 +92,10 @@ class Business extends BaseObject
     /**
      * Check referential integrity of a column on the dataset we are about to post to a data access
      * If it fails then an error message is posted to the dataset and affected row is not posted
-     * @param object Dataset Source Dataset
-     * @param object DBObject Target DataAccess(the one we are updating)
-     * @param object DBObject Parent Dataaccess (the one with a PK of $columnName)
+     * @param $columnName
+     * @param DataAccess $dsSource
+     * @param DataAccess $dbTarget
+     * @param DBEntity $dbParent
      * @return bool
      * @access private
      */
@@ -139,9 +145,9 @@ class Business extends BaseObject
     /**
      * Check referential integrity of a column on the dataset we are about to post to a data access
      * If it fails then an error message is posted to the dataset and affected row is not posted
-     * @param object Dataset Source Dataset
-     * @param object DBObject Target DataAccess(the one we are updating)
-     * @param object DBObject Parent Dataaccess (the one with a PK of $columnName)
+     * @param $pK
+     * @param Dataset|DBEntity $dbSource
+     * @param DataSet $dsResult Target DataAccess(the one we are updating)
      * @return bool
      * @access private
      */
@@ -160,5 +166,4 @@ class Business extends BaseObject
         }
         return $ret;
     }
-}// End of class
-?>
+}

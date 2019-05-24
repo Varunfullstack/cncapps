@@ -18,6 +18,11 @@ require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 
 class BURenContract extends Business
 {
+    const etaDate = 'etaDate';
+    const serviceRequestCustomerItemID = 'serviceRequestCustomerItemID';
+    const serviceRequestPriority = 'serviceRequestPriority';
+    const serviceRequestText = 'serviceRequestText';
+
     var $dbeRenContract = "";
     var $dbeJRenContract = "";
     var $buCustomerItem = "";
@@ -69,21 +74,11 @@ class BURenContract extends Business
         ));
     }
 
-    function deleteRenContract($ID)
-    {
-        $this->setMethodName('deleteRenContract');
-        if ($this->canDeleteRenContract($ID)) {
-            return $this->dbeRenContract->deleteRow($ID);
-        } else {
-            return FALSE;
-        }
-    }
-
     function createNewRenewal(
         $customerID,
-        $siteNo = 0,
         $itemID,
-        &$customerItemID
+        &$customerItemID,
+        $siteNo = 0
     )
     {
         // create a customer item
@@ -99,29 +94,29 @@ class BURenContract extends Business
         $dsCustomerItem->setUpdateModeInsert();
 
         $dsCustomerItem->setValue(
-            'customerItemID',
+            DBEJCustomerItem::customerItemID,
             0
         );
         $dsCustomerItem->setValue(
-            'customerID',
+            DBEJCustomerItem::customerID,
             $customerID
         );
         $dsCustomerItem->setValue(
-            'itemID',
+            DBEJCustomerItem::itemID,
             $itemID
         );
         $dsCustomerItem->setValue(
-            'siteNo',
+            DBEJCustomerItem::siteNo,
             $siteNo
         );
 
         $dsCustomerItem->setValue(
-            'curUnitCost',
-            $dbeItem->getValue('curUnitCost')
+            DBEJCustomerItem::curUnitCost,
+            $dbeItem->getValue(DBEItem::curUnitCost)
         );
         $dsCustomerItem->setValue(
-            'curUnitSale',
-            $dbeItem->getValue('curUnitSale')
+            DBEJCustomerItem::curUnitSale,
+            $dbeItem->getValue(DBEItem::curUnitSale)
         );
 
         $dsCustomerItem->post();
@@ -155,17 +150,20 @@ class BURenContract extends Business
             );
 
         ob_start(); ?>
-        <HTML>
+        <HTML lang="en">
         <BODY>
+        <!--suppress HtmlDeprecatedAttribute -->
         <TABLE border="1">
             <tr>
+                <!--suppress HtmlDeprecatedAttribute -->
                 <td bgcolor="#999999">Customer</td>
+                <!--suppress HtmlDeprecatedAttribute -->
                 <td bgcolor="#999999">Service</td>
             </tr>
             <?php while ($this->dbeJRenContract->fetchNext()) { ?>
                 <tr>
-                    <td><?php echo $this->dbeJRenContract->getValue('customerName') ?></td>
-                    <td><?php echo $this->dbeJRenContract->getValue('itemDescription') ?></td>
+                    <td><?php echo $this->dbeJRenContract->getValue(DBEJRenContract::customerName) ?></td>
+                    <td><?php echo $this->dbeJRenContract->getValue(DBEJRenContract::itemDescription) ?></td>
                 </tr>
             <?php } ?>
         </TABLE>
@@ -196,6 +194,9 @@ class BURenContract extends Business
 
     }
 
+    /**
+     * @throws Exception
+     */
     function createRenewalsSalesOrders()
     {
         $buSalesOrder = new BUSalesOrder ($this);
@@ -213,7 +214,7 @@ class BURenContract extends Business
         $dbeCustomer = new DBECustomer ($this);
 
         $dbeOrdline = new DBEOrdline ($this);
-
+        /** @var DataSet $dsOrdhead */
         $dsOrdhead = null;
         $dsOrdline = new DataSet($this);
 
@@ -221,6 +222,7 @@ class BURenContract extends Business
 
         $generateInvoice = false;
         $generatedOrder = false;
+        $line = null;
         echo "<div> Contract Renewals - START </div>";
         while ($dsRenContract->fetchNext()) {
             $generatedOrder = false;
@@ -235,7 +237,7 @@ class BURenContract extends Business
          * unless it is an SSL cert in which case it has it's own order
                  */
                 if (strpos(
-                        $dbeJCustomerItem->getValue('itemDescription'),
+                        $dbeJCustomerItem->getValue(DBEJCustomerItem::itemDescription),
                         'SSL'
                     ) !== false) {
                     $isSslCertificate = true;
@@ -244,7 +246,7 @@ class BURenContract extends Business
                 }
 
                 if (
-                    $previousCustomerID != $dbeJCustomerItem->getValue('customerID') ||
+                    $previousCustomerID != $dbeJCustomerItem->getValue(DBEJCustomerItem::customerID) ||
                     $isSslCertificate ||
                     (
                         !$generateInvoice &&
@@ -256,10 +258,10 @@ class BURenContract extends Business
                     */
                     if ($generateInvoice && $dsOrdhead) {
 
-                        $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
+                        $buSalesOrder->setStatusCompleted($dsOrdhead->getValue(DBEOrdhead::ordheadID));
 
                         $buSalesOrder->getOrderByOrdheadID(
-                            $dsOrdhead->getValue('ordheadID'),
+                            $dsOrdhead->getValue(DBEOrdhead::ordheadID),
                             $dsOrdhead,
                             $dsOrdline
                         );
@@ -270,13 +272,15 @@ class BURenContract extends Business
                         );
 
                         ?>
-                        <div>Creating invoice for previous Sales Order: <?= $dsOrdhead->getValue('ordheadID') ?></div>
+                        <div>Creating invoice for previous Sales Order: <?= $dsOrdhead->getValue(
+                                DBEOrdhead::ordheadID
+                            ) ?></div>
                         <?php
                     }
                     /*
                      *  create order header
                      */
-                    $dbeCustomer->getRow($dbeJCustomerItem->getValue('customerID'));
+                    $dbeCustomer->getRow($dbeJCustomerItem->getValue(DBEJCustomerItem::customerID));
                     $this->getData(
                         $dbeCustomer,
                         $dsCustomer
@@ -291,7 +295,7 @@ class BURenContract extends Business
                     $line = -1;    // initialise sales order line seq
 
                     ?>
-                    <div>Creating new Sales Order: <?= $dsOrdhead->getValue('ordheadID') ?></div>
+                    <div>Creating new Sales Order: <?= $dsOrdhead->getValue(DBEOrdhead::ordheadID) ?></div>
                     <?php
                 }
                 $generateInvoice = $dsRenContract->getValue(DBECustomerItem::autoGenerateContractInvoice) === 'Y';
@@ -322,64 +326,64 @@ class BURenContract extends Business
                 /**
                  * add notes as a comment line (if they exist)
                  */
-                if ($dsRenContract->getValue('notes')) {
+                if ($dsRenContract->getValue(DBEJRenContract::notes)) {
 
                     $line++;
 
                     $dbeOrdline->setValue(
-                        'description',
-                        $dsRenContract->getValue('notes')
+                        DBEOrdline::description,
+                        $dsRenContract->getValue(DBEJRenContract::notes)
                     );
                     $dbeOrdline->setValue(
-                        'lineType',
+                        DBEOrdline::lineType,
                         'C'
                     );
                     $dbeOrdline->setValue(
-                        'renewalCustomerItemID',
-                        ''
+                        DBEOrdline::renewalCustomerItemID,
+                        null
                     );
                     $dbeOrdline->setValue(
-                        'ordheadID',
-                        $dsOrdhead->getValue('ordheadID')
+                        DBEOrdline::ordheadID,
+                        $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                     );
                     $dbeOrdline->setValue(
-                        'customerID',
-                        $dsOrdhead->getValue('customerID')
+                        DBEOrdline::customerID,
+                        $dsOrdhead->getValue(DBEOrdhead::customerID)
                     );
                     $dbeOrdline->setValue(
-                        'itemID',
+                        DBEOrdline::itemID,
                         0
                     );
                     $dbeOrdline->setValue(
-                        'supplierID',
-                        ''
+                        DBEOrdline::supplierID,
+                        null
                     );
                     $dbeOrdline->setValue(
-                        'sequenceNo',
+                        DBEOrdline::sequenceNo,
                         $line
                     );
                     $dbeOrdline->setValue(
-                        'lineType',
+                        DBEOrdline::lineType,
                         'C'
                     );
                     $dbeOrdline->setValue(
-                        'qtyOrdered',
+                        DBEOrdline::qtyOrdered,
                         0
                     );
                     $dbeOrdline->setValue(
-                        'qtyDespatched',
+                        DBEOrdline::qtyDespatched,
                         0
                     );
                     $dbeOrdline->setValue(
-                        'qtyLastDespatched',
+                        DBEOrdline::qtyLastDespatched,
                         0
                     );
                     $dbeOrdline->setValue(
-                        'curUnitSale',
+                        DBEOrdline::curUnitSale,
                         0
                     );
                     $dbeOrdline->setValue(
-                        'curUnitCost',
+                        DBEOrdline::curUnitCost,
                         0
                     );
 
@@ -392,66 +396,67 @@ class BURenContract extends Business
                  * Get stock category from item table
                  */
                 $buItem = new BUItem($this);
+                $dsItem = new DataSet($this);
                 $buItem->getItemByID(
-                    $dbeJCustomerItem->getValue('itemID'),
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID),
                     $dsItem
                 );
                 $dbeOrdline->setValue(
-                    'stockcat',
-                    $dsItem->getValue('stockcat')
+                    DBEOrdline::stockcat,
+                    $dsItem->getValue(DBEItem::stockcat)
                 );
 
                 $dbeOrdline->setValue(
-                    'renewalCustomerItemID',
-                    $dsRenContract->getValue('customerItemID')
+                    DBEOrdline::renewalCustomerItemID,
+                    $dsRenContract->getValue(DBEJRenContract::customerItemID)
                 );
                 $dbeOrdline->setValue(
-                    'ordheadID',
-                    $dsOrdhead->getValue('ordheadID')
+                    DBEOrdline::ordheadID,
+                    $dsOrdhead->getValue(DBEJOrdhead::ordheadID)
                 );
                 $dbeOrdline->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBEOrdline::customerID,
+                    $dsOrdhead->getValue(DBEJOrdhead::customerID)
                 );
                 $dbeOrdline->setValue(
-                    'itemID',
-                    $dbeJCustomerItem->getValue('itemID')
+                    DBEOrdline::itemID,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID)
                 );
                 $dbeOrdline->setValue(
-                    'description',
-                    $dbeJCustomerItem->getValue('itemDescription')
+                    DBEOrdline::description,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemDescription)
                 );
                 $dbeOrdline->setValue(
-                    'supplierID',
+                    DBEOrdline::supplierID,
                     CONFIG_SALES_STOCK_SUPPLIERID
                 );
                 $dbeOrdline->setValue(
-                    'sequenceNo',
+                    DBEOrdline::sequenceNo,
                     $line
                 );
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'I'
                 );
                 $dbeOrdline->setValue(
-                    'qtyOrdered',
+                    DBEOrdline::qtyOrdered,
                     1
                 ); // default 1
                 $dbeOrdline->setValue(
-                    'qtyDespatched',
+                    DBEOrdline::qtyDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'qtyLastDespatched',
+                    DBEOrdline::qtyLastDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitSale',
+                    DBEOrdline::curUnitSale,
                     ($dbeJCustomerItem->getValue(DBECustomerItem::curUnitSale) / 12) *
                     $dsRenContract->getValue(DBECustomerItem::invoicePeriodMonths)
                 );
                 $dbeOrdline->setValue(
-                    'curUnitCost',
+                    DBEOrdline::curUnitCost,
                     ($dbeJCustomerItem->getValue(DBECustomerItem::curUnitCost) / 12) *
                     $dsRenContract->getValue(DBECustomerItem::invoicePeriodMonths)
                 );
@@ -460,63 +465,65 @@ class BURenContract extends Business
 
                 // period comment line
                 $line++;
-                $description = $dsRenContract->getValue('invoiceFromDate') . ' to ' . $dsRenContract->getValue(
-                        'invoiceToDate'
+                $description = $dsRenContract->getValue(
+                        DBEJRenContract::invoiceFromDate
+                    ) . ' to ' . $dsRenContract->getValue(
+                        DBEJRenContract::invoiceToDate
                     );
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'renewalCustomerItemID',
-                    ''
+                    DBEOrdline::renewalCustomerItemID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'ordheadID',
-                    $dsOrdhead->getValue('ordheadID')
+                    DBEOrdline::ordheadID,
+                    $dsOrdhead->getValue(DBEJOrdhead::ordheadID)
                 );
                 $dbeOrdline->setValue(
-                    'customerID',
-                    $dsOrdhead->getValue('customerID')
+                    DBEOrdline::customerID,
+                    $dsOrdhead->getValue(DBEJOrdhead::customerID)
                 );
                 $dbeOrdline->setValue(
-                    'itemID',
+                    DBEOrdline::itemID,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'description',
+                    DBEOrdline::description,
                     $description
                 );
                 $dbeOrdline->setValue(
-                    'supplierID',
-                    ''
+                    DBEOrdline::supplierID,
+                    null
                 );
                 $dbeOrdline->setValue(
-                    'sequenceNo',
+                    DBEOrdline::sequenceNo,
                     $line
                 );
                 $dbeOrdline->setValue(
-                    'lineType',
+                    DBEOrdline::lineType,
                     'C'
                 );
                 $dbeOrdline->setValue(
-                    'qtyOrdered',
+                    DBEOrdline::qtyOrdered,
                     0
                 ); // default 1
                 $dbeOrdline->setValue(
-                    'qtyDespatched',
+                    DBEOrdline::qtyDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'qtyLastDespatched',
+                    DBEOrdline::qtyLastDespatched,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitSale',
+                    DBEOrdline::curUnitSale,
                     0
                 );
                 $dbeOrdline->setValue(
-                    'curUnitCost',
+                    DBEOrdline::curUnitCost,
                     0
                 );
 
@@ -527,51 +534,51 @@ class BURenContract extends Business
                     $line++;
                     $description = 'Installation Charge';
                     $dbeOrdline->setValue(
-                        'lineType',
+                        DBEOrdline::lineType,
                         'I'
                     );
                     $dbeOrdline->setValue(
-                        'ordheadID',
-                        $dsOrdhead->getValue('ordheadID')
+                        DBEOrdline::ordheadID,
+                        $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                     );
                     $dbeOrdline->setValue(
-                        'customerID',
-                        $dsOrdhead->getValue('customerID')
+                        DBEOrdline::customerID,
+                        $dsOrdhead->getValue(DBEOrdhead::customerID)
                     );
                     $dbeOrdline->setValue(
-                        'itemID',
+                        DBEOrdline::itemID,
                         CONFIG_CONSULTANCY_DAY_LABOUR_ITEMID
                     );
                     $dbeOrdline->setValue(
-                        'description',
+                        DBEOrdline::description,
                         $description
                     );
                     $dbeOrdline->setValue(
-                        'supplierID',
+                        DBEOrdline::supplierID,
                         CONFIG_SALES_STOCK_SUPPLIERID
                     );
                     $dbeOrdline->setValue(
-                        'sequenceNo',
+                        DBEOrdline::sequenceNo,
                         $line
                     );
                     $dbeOrdline->setValue(
-                        'qtyOrdered',
+                        DBEOrdline::qtyOrdered,
                         1
                     ); // default 1
                     $dbeOrdline->setValue(
-                        'qtyDespatched',
+                        DBEOrdline::qtyDespatched,
                         0
                     );
                     $dbeOrdline->setValue(
-                        'qtyLastDespatched',
+                        DBEOrdline::qtyLastDespatched,
                         0
                     );
                     $dbeOrdline->setValue(
-                        'curUnitSale',
+                        DBEOrdline::curUnitSale,
                         35.00
                     );
                     $dbeOrdline->setValue(
-                        'curUnitCost',
+                        DBEOrdline::curUnitCost,
                         0
                     );
                     $dbeOrdline->insertRow();
@@ -579,35 +586,35 @@ class BURenContract extends Business
 
                     $dsInput = new DSForm($this);
                     $dsInput->addColumn(
-                        'etaDate',
+                        self::etaDate,
                         DA_DATE,
                         DA_ALLOW_NULL
                     );
                     $dsInput->addColumn(
-                        'serviceRequestCustomerItemID',
+                        self::serviceRequestCustomerItemID,
                         DA_INTEGER,
                         DA_ALLOW_NULL
                     );
                     $dsInput->addColumn(
-                        'serviceRequestPriority',
+                        self::serviceRequestPriority,
                         DA_INTEGER,
                         DA_ALLOW_NULL
                     );
                     $dsInput->addColumn(
-                        'serviceRequestText',
+                        self::serviceRequestText,
                         DA_STRING,
                         DA_ALLOW_NULL
                     );
 
                     $dsInput->setValue(
-                        'etaDate',
+                        self::etaDate,
                         date('Y-m-d')
                     );
 
-                    $internalNotes = $dsRenContract->getValue('internalNotes');
+                    $internalNotes = $dsRenContract->getValue(DBEJRenContract::internalNotes);
                     $internalNotes = nl2br($internalNotes);
 
-                    $renContractId = $dsRenContract->getValue('customerItemID');
+                    $renContractId = $dsRenContract->getValue(DBEJRenContract::customerItemID);
 
                     $serviceRequestText = <<<HEREDOC
                         <p>$internalNotes</p>
@@ -618,98 +625,98 @@ class BURenContract extends Business
 HEREDOC;
 
                     $dsInput->setValue(
-                        'serviceRequestText',
+                        self::serviceRequestText,
                         $serviceRequestText
                     );
                     $dsInput->setValue(
-                        'serviceRequestCustomerItemID',
-                        ''
+                        self::serviceRequestCustomerItemID,
+                        null
                     );
                     $dsInput->setValue(
-                        'serviceRequestPriority',
+                        self::serviceRequestPriority,
                         5
                     );
 
                     $buActivity->createSalesServiceRequest(
-                        $dsOrdhead->getValue('ordheadID'),
+                        $dsOrdhead->getValue(DBEOrdhead::ordheadID),
                         $dsInput
                     );
 
 
                 }
-
+                $dsLinkedItems = new DataSet($this);
                 /**
                  * add customer items linked to this contract as a comment lines
                  */
                 $this->buCustomerItem->getCustomerItemsByContractID(
-                    $dsRenContract->getValue('customerItemID'),
+                    $dsRenContract->getValue(DBEJRenContract::customerItemID),
                     $dsLinkedItems
                 );
                 while ($dsLinkedItems->fetchNext()) {
                     $line++;
 
-                    $description = $dsLinkedItems->getValue('itemDescription');
-                    if ($dsLinkedItems->getValue('serverName')) {
-                        $description .= ' (' . $dsLinkedItems->getValue('serverName') . ')';
+                    $description = $dsLinkedItems->getValue(DBEJCustomerItem::itemDescription);
+                    if ($dsLinkedItems->getValue(DBEJCustomerItem::serverName)) {
+                        $description .= ' (' . $dsLinkedItems->getValue(DBEJCustomerItem::serverName) . ')';
                     }
-                    if ($dsLinkedItems->getValue('serialNo')) {
-                        $description .= ' ' . $dsLinkedItems->getValue('serialNo');
+                    if ($dsLinkedItems->getValue(DBEJCustomerItem::serialNo)) {
+                        $description .= ' ' . $dsLinkedItems->getValue(DBEJCustomerItem::serialNo);
                     }
 
                     $dbeOrdline->setValue(
-                        'description',
+                        DBEOrdline::description,
                         $description
                     );
                     $dbeOrdline->setValue(
-                        'lineType',
+                        DBEOrdline::lineType,
                         'C'
                     );
                     $dbeOrdline->setValue(
-                        'renewalCustomerItemID',
-                        ''
+                        DBEOrdline::renewalCustomerItemID,
+                        null
                     );
                     $dbeOrdline->setValue(
-                        'ordheadID',
-                        $dsOrdhead->getValue('ordheadID')
+                        DBEOrdline::ordheadID,
+                        $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                     );
                     $dbeOrdline->setValue(
-                        'customerID',
-                        $dsOrdhead->getValue('customerID')
+                        DBEOrdline::customerID,
+                        $dsOrdhead->getValue(DBEOrdhead::customerID)
                     );
                     $dbeOrdline->setValue(
-                        'itemID',
+                        DBEOrdline::itemID,
                         0
                     );
                     $dbeOrdline->setValue(
-                        'supplierID',
-                        ''
+                        DBEOrdline::supplierID,
+                        null
                     );
                     $dbeOrdline->setValue(
-                        'sequenceNo',
+                        DBEOrdline::sequenceNo,
                         $line
                     );
                     $dbeOrdline->setValue(
-                        'lineType',
+                        DBEOrdline::lineType,
                         'C'
                     );
                     $dbeOrdline->setValue(
-                        'qtyOrdered',
+                        DBEOrdline::qtyOrdered,
                         0
                     ); // default 1
                     $dbeOrdline->setValue(
-                        'qtyDespatched',
+                        DBEOrdline::qtyDespatched,
                         0
                     );
                     $dbeOrdline->setValue(
-                        'qtyLastDespatched',
+                        DBEOrdline::qtyLastDespatched,
                         0
                     );
                     $dbeOrdline->setValue(
-                        'curUnitSale',
+                        DBEOrdline::curUnitSale,
                         0
                     );
                     $dbeOrdline->setValue(
-                        'curUnitCost',
+                        DBEOrdline::curUnitCost,
                         0
                     );
 
@@ -721,12 +728,12 @@ HEREDOC;
                  * Update total months invoiced on renewal record
                  */
 
-                $this->dbeRenContract->getRow($dsRenContract->getValue('customerItemID'));
+                $this->dbeRenContract->getRow($dsRenContract->getValue(DBEJRenContract::customerItemID));
 
                 $this->dbeRenContract->setValue(
-                    'totalInvoiceMonths',
-                    $dsRenContract->getValue('totalInvoiceMonths') +
-                    $dsRenContract->getValue('invoicePeriodMonths')
+                    DBEJRenContract::totalInvoiceMonths,
+                    $dsRenContract->getValue(DBEJRenContract::totalInvoiceMonths) +
+                    $dsRenContract->getValue(DBEJRenContract::invoicePeriodMonths)
                 );
 
                 $this->dbeRenContract->setValue(
@@ -736,7 +743,7 @@ HEREDOC;
 
                 $this->dbeRenContract->updateRow();
 
-                $previousCustomerID = $dbeJCustomerItem->getValue('customerID');
+                $previousCustomerID = $dbeJCustomerItem->getValue(DBEJCustomerItem::customerID);
             }
 
         }
@@ -745,10 +752,10 @@ HEREDOC;
         */
         if ($generateInvoice && $generatedOrder) {
 
-            $buSalesOrder->setStatusCompleted($dsOrdhead->getValue('ordheadID'));
+            $buSalesOrder->setStatusCompleted($dsOrdhead->getValue(DBEOrdhead::ordheadID));
 
             $buSalesOrder->getOrderByOrdheadID(
-                $dsOrdhead->getValue('ordheadID'),
+                $dsOrdhead->getValue(DBEOrdhead::ordheadID),
                 $dsOrdhead,
                 $dsOrdline
             );
@@ -759,244 +766,12 @@ HEREDOC;
             );
 
             ?>
-            <div>Creating invoice for previous Sales Order: <?= $dsOrdhead->getValue('ordheadID') ?></div>
+            <div>Creating invoice for previous Sales Order: <?= $dsOrdhead->getValue(DBEOrdhead::ordheadID) ?></div>
             <?php
         }
 
         echo "<div> Contract Renewals - END </div>";
     }
-
-
-    function generateServerCareActivities($dsContract)
-    {
-        $dbeWarranty = new DBEWarranty($this);
-
-        /*
-         * Create a problem thread
-         */
-
-        $dbeProblem = new DBEProblem ($this);
-        $dbeProblem->setValue(
-            'customerID',
-            $dsContract->getValue('customerID')
-        );
-        $dbeProblem->insertRow();
-        $problemID = $dbeProblem->getPKValue();
-        /*
-        *	Create a support renewal checklist activity
-        */
-
-        $template = new Template (
-            $GLOBALS ["cfg"] ["path_templates"],
-            "remove"
-        );
-        $template->set_file(
-            array(
-                'page' => 'SupportRenewalChecklist.inc.html'
-            )
-        );
-
-        $template->set_var(
-            array(
-                'contractName' => $dsContract->getValue('itemDescription'),
-                'expiryDate'   => $dsContract->getValue('expiryDate')
-            )
-        );
-
-        $sql =
-            "
-	    SELECT
-        server.cui_serial AS serialNo,
-	      item.itm_desc AS serverType,
-	      server.cui_cust_ref AS serverName,
-	      DATE_ADD( server.cui_desp_date, INTERVAL cnt_years YEARS ) AS warrantyExpiryDate
-	    FROM
-	      cncp1.custitem AS SERVER
-	      INNER JOIN cncp1.item 
-	        ON (item.itm_itemno = server.cui_itemno)
-	      JOIN contract AS warranty 
-	        ON warranty.cnt_contno = itm_contno
-	    WHERE
-	      item.itm_itemtypeno =16
-	      AND server.cui_cust_ref <> ''
-	      AND server.cui_contract_cuino = " . $dsContract->getValue(
-                'customerItemID'
-            ); // server name indicates this is a server
-
-        $results = $this->db->query($sql);
-//		$this->buCustomerItem->getServersByCustomerID( $dsContract->getValue( 'customerID'), $dsServer );
-
-        $template->set_block(
-            'SupportRenewalChecklist',
-            'serverBlock',
-            'servers'
-        );
-
-        while ($row = $results->fetch_object()) {
-
-            echo $row->serverName . "<BR/>";
-
-            $template->set_var(
-                array(
-                    'serverSerialNo'    => $row->serialNo,
-                    'serverName'        => $row->serverName,
-                    'serverDescription' => $row->serverType
-                )
-
-            );
-
-            $template->parse(
-                'servers',
-                'serverBlock',
-                true
-            );
-
-        }
-        /*
-         * Now the warranties
-         */
-        $template->set_block(
-            'SupportRenewalChecklist',
-            'warrantyBlock',
-            'warranties'
-        );
-
-        $results = $this->db->query($sql);
-
-        while ($row = $results->fetch_object()) {
-
-            $expiryDate = date(
-                'd/m/Y',
-                strtotime(
-                    '+' . $dbeWarranty->getValue('years') . ' years',
-                    strtotime($dsServer->getValue('despatchDate'))
-                )
-            );
-
-            $template->set_var(
-                array(
-                    'warrantySerialNo'   => $row->serialNo,
-                    'warrantyServerName' => $row->serverName,
-                    'warrantyExpiryDate' => $expiryDate
-                )
-
-            );
-
-            $template->parse(
-                'warranties',
-                'warrantyBlock',
-                true
-            );
-
-
-        }
-
-        $template->parse(
-            'output',
-            'page',
-            false
-        );
-
-        $reason = $template->get_var('output');
-
-        $buActivity = new BUActivity($this);
-        $callActivityID = $buActivity->createActivityFromCustomerID(
-            $dsContract->getValue('customerID'),
-            CONFIG_HEALTHCHECK_ACTIVITY_USER_ID
-        );
-
-        $dbeCustomerItem = new DBECustomerItem ($this);
-        $dbeCallActivity = new DBECallActivity ($this);
-        $dbeCallActivity->getRow($callActivityID);
-        $dbeCallActivity->setValue(
-            'callActTypeID',
-            CONFIG_SERVER_HEALTH_CHECK_CHECKLIST_ACTIVITY_TYPE_ID
-        );
-        $dbeCallActivity->setValue(
-            'contractCustomerItemID',
-            $dbeCustomerItem->getValue('customerItemID')
-        );
-        $dbeCallActivity->setValue(
-            'problemID',
-            $dbeProblem->getPKValue()
-        );
-        $dbeCallActivity->setValue(
-            'startTime',
-            '09:00'
-        );
-        $dbeCallActivity->setValue(
-            'endTime',
-            ''
-        );
-        $dbeCallActivity->setValue(
-            'status',
-            'O'
-        );
-        $dbeCallActivity->setValue(
-            'reason',
-            $reason
-        );
-        $dbeCallActivity->setValue(
-            'curValue',
-            0
-        );
-        $dbeCallActivity->updateRow();
-    }
-
-    function emailSalesOrderNotification($customerName,
-                                         $ordheadID
-    ) // GL
-    {
-        $toEmail = false;
-        $senderEmail = CONFIG_SALES_EMAIL;
-
-        $buMail = new BUMail($this);
-
-        $hdrs =
-            array(
-                'From'         => $senderEmail,
-                'Subject'      => 'ServiceDesk renewal sales order created for ' . $customerName,
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
-
-        ob_start(); ?>
-        <HTML>
-        <BODY>
-        <TABLE border="1">
-            <tr>
-                <td><A HREF="/SalesOrder.php?ordheadID=<?php echo $ordheadID ?>">Open Order</A></td>
-            </tr>
-        </TABLE>
-        </BODY>
-        </HTML>
-        <?php
-
-        $message = ob_get_contents();
-        ob_end_clean();
-
-        $buMail->mime->setHTMLBody($message);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body,
-            true
-        );
-
-    } // end send email to technical manager
 
     function isCompleted($customerItemID)
     {
@@ -1014,5 +789,4 @@ HEREDOC;
         return $ret;
 
     }
-} // End of class
-?>
+}

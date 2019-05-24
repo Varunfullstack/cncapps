@@ -63,11 +63,12 @@ class CTPasswordServices extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTPasswordService_ACT_EDIT:
             case CTPasswordService_ACT_CREATE:
                 $this->edit();
@@ -78,7 +79,7 @@ class CTPasswordServices extends CTCNC
             case CTPasswordService_ACT_UPDATE:
                 $this->update();
                 break;
-
+            /** @noinspection PhpMissingBreakStatementInspection */
             case CT_PASSWORD_SERVICE_ACT_CHANGE_ORDER:
                 $this->changeOrder();
             case CTPASSWORDSERVICE_ACT_DISPLAY_LIST:
@@ -91,11 +92,11 @@ class CTPasswordServices extends CTCNC
 
     function changeOrder()
     {
-        if (!isset($_REQUEST['sortOrder'])) {
+        if (!$this->getParam('sortOrder')) {
             return;
         }
 
-        foreach ($_REQUEST['sortOrder'] as $passwordServiceID => $value) {
+        foreach ($this->getParam('sortOrder') as $passwordServiceID => $value) {
 
             $dbePasswordService = new DBEPasswordService($this);
 
@@ -120,6 +121,7 @@ class CTPasswordServices extends CTCNC
     /**
      * Display list of types
      * @access private
+     * @throws Exception
      */
     function displayList()
     {
@@ -209,10 +211,10 @@ class CTPasswordServices extends CTCNC
                     'urlDelete'         => $urlDelete,
                     'txtEdit'           => $txtEdit,
                     'txtDelete'         => $txtDelete,
-                    'sortOrderUp'       => $up ? '' : 'disabled',
-                    'sortOrderDown'     => $down ? '' : 'disabled',
-                    'sortOrderTop'      => $top ? '' : 'disabled',
-                    'sortOrderBottom'   => $bottom ? '' : 'disabled',
+                    'sortOrderUp'       => $up ? null : 'disabled',
+                    'sortOrderDown'     => $down ? null : 'disabled',
+                    'sortOrderTop'      => $top ? null : 'disabled',
+                    'sortOrderBottom'   => $bottom ? null : 'disabled',
                 )
             );
             $this->template->parse(
@@ -232,6 +234,7 @@ class CTPasswordServices extends CTCNC
     /**
      * Edit/Add Further Action
      * @access private
+     * @throws Exception
      */
     function edit()
     {
@@ -240,17 +243,17 @@ class CTPasswordServices extends CTCNC
 
         if (!$this->getFormError()) {
 
-            if ($_REQUEST['action'] == CTPasswordService_ACT_EDIT) {
+            if ($this->getAction() == CTPasswordService_ACT_EDIT) {
                 $this->buPasswordService->getPasswordServiceByID(
-                    $_REQUEST['passwordServiceID'],
+                    $this->getParam('passwordServiceID'),
                     $dsPasswordService
                 );
-                $passwordServiceID = $_REQUEST['passwordServiceID'];
+                $passwordServiceID = $this->getParam('passwordServiceID');
             } else {                                                                    // creating new
                 $dsPasswordService->initialise();
                 $dsPasswordService->setValue(
-                    'passwordServiceID',
-                    '0'
+                    DBEPasswordService::passwordServiceID,
+                    0
                 );
                 $dbePasswordService = new DBEPasswordService($this);
                 $dsPasswordService->setValue(
@@ -264,7 +267,10 @@ class CTPasswordServices extends CTCNC
             $dsPasswordService->fetchNext();
             $passwordServiceID = $dsPasswordService->getValue(DBEPasswordService::passwordServiceID);
         }
-        if ($_REQUEST['action'] == CTPasswordService_ACT_EDIT) {
+        $urlDelete = null;
+        $txtDelete = null;
+        if ($this->getAction() != CTPasswordService_ACT_EDIT) {
+        } else {
             $urlDelete =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -274,9 +280,6 @@ class CTPasswordServices extends CTCNC
                     )
                 );
             $txtDelete = 'Delete';
-        } else {
-            $urlDelete = '';
-            $txtDelete = '';
         }
         $urlUpdate =
             Controller::buildLink(
@@ -318,7 +321,7 @@ class CTPasswordServices extends CTCNC
                 ),
                 'onePerCustomerChecked' => $dsPasswordService->getValue(
                     DBEPasswordService::onePerCustomer
-                ) ? 'checked' : '',
+                ) ? 'checked' : null,
                 'onePerCustomerMessage' => Controller::htmlDisplayText(
                     $dsPasswordService->getMessage(DBEPasswordService::onePerCustomer)
                 ),
@@ -341,21 +344,20 @@ class CTPasswordServices extends CTCNC
     /**
      * Update call Further Action details
      * @access private
+     * @throws Exception
      */
     function update()
     {
         $this->setMethodName('update');
-        $dsPasswordService = &$this->dsPasswordService;
-
-        $this->formError = (!$this->dsPasswordService->populateFromArray($_REQUEST['passwordService']));
+        $this->formError = (!$this->dsPasswordService->populateFromArray($this->getParam('passwordService')));
 
         if ($this->formError) {
-            if ($this->dsPasswordService->getValue(
-                    'passwordServiceID'
-                ) == '') {                    // attempt to insert
-                $_REQUEST['action'] = CTPasswordService_ACT_EDIT;
+            if (!$this->dsPasswordService->getValue(
+                DBEPasswordService::passwordServiceID
+            )) {                    // attempt to insert
+                $this->setAction(CTPasswordService_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTPasswordService_ACT_CREATE;
+                $this->setAction(CTPasswordService_ACT_CREATE);
             }
             $this->edit();
             exit;
@@ -367,7 +369,7 @@ class CTPasswordServices extends CTCNC
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'passwordServiceID' => $this->dsPasswordService->getValue('passwordServiceID'),
+                    'passwordServiceID' => $this->dsPasswordService->getValue(DBEPasswordService::passwordServiceID),
                     'action'            => CTCNC_ACT_VIEW
                 )
             );
@@ -384,7 +386,7 @@ class CTPasswordServices extends CTCNC
     {
         $this->setMethodName('delete');
         try {
-            $this->buPasswordService->deletePasswordService($_REQUEST['passwordServiceID']);
+            $this->buPasswordService->deletePasswordService($this->getParam('passwordServiceID'));
             $urlNext =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -399,5 +401,4 @@ class CTPasswordServices extends CTCNC
             exit;
         }
     }
-}// end of class
-?>
+}

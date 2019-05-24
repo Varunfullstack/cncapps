@@ -10,6 +10,7 @@ require_once("config.inc.php");
 
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 
+global $server_type;
 define(
     'EMAIL_SUBJECT',
     'Email Queue Problem'
@@ -36,11 +37,11 @@ $sql = "
 $db->query($sql);
 $db->next_record();
 $count = $db->Record[0];
-
+$thing = null;
 if ($count > 0) {
 
     $body = "$count emails have been in the mail queue for longer than 30 minutes.\n";
-    $buMail = new BUMail($this);
+    $buMail = new BUMail($thing);
 
     $buMail->mime->setHTMLBody($body);
 
@@ -64,8 +65,7 @@ if ($count > 0) {
     $sent = $buMail->send(
         $send_to_email,
         $hdrs,
-        $body,
-        true
+        $body
     );
 
     if ($sent) {

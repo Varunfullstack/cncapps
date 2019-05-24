@@ -10,11 +10,13 @@ require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 
 class BURootCause extends Business
 {
-    var $dbeRootCause = "";
+    /** @var DBERootCause */
+    public $dbeRootCause;
 
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -55,18 +57,15 @@ class BURootCause extends Business
 
     /**
      *    canDeleteRootCause
-     * Only allowed if this further actionhas no future action rows at the moment
+     * Only allowed if this further action has no future action rows at the moment
+     * @param $ID
+     * @return bool
      */
     function canDelete($ID)
     {
         $dbeProblem = new DBEProblem($this);
         // validate no activities of this type
-        $dbeProblem->setValue('rootCauseID', $ID);
-        if ($dbeProblem->countRowsByColumn('rootCauseID') < 1) {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
+        $dbeProblem->setValue(DBEProblem::rootCauseID, $ID);
+        return $dbeProblem->countRowsByColumn(DBEProblem::rootCauseID) < 1;
     }
-}// End of class
-?>
+}

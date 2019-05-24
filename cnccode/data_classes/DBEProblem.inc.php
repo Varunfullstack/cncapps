@@ -33,7 +33,6 @@ class DBEProblem extends DBEntity
     const reopenedFlag = "reopenedFlag";
     const contractCustomerItemID = "contractCustomerItemID";
     const contactID = "contactID";
-    const technicianWeighting = "technicianWeighting";
     const rejectedUserID = "rejectedUserID";
     const doNextFlag = "doNextFlag";
     const rootCauseID = "rootCauseID";
@@ -105,7 +104,7 @@ class DBEProblem extends DBEntity
         );
         $this->addColumn(
             self::dateRaised,
-            DA_INTEGER,
+            DA_DATE,
             DA_ALLOW_NULL,
             "pro_date_raised"
         );
@@ -125,13 +124,15 @@ class DBEProblem extends DBEntity
             self::respondedHours,
             DA_FLOAT,
             DA_ALLOW_NULL,
-            "pro_responded_hours"
+            "pro_responded_hours",
+            0.00
         );
         $this->addColumn(
             self::workingHours,
             DA_FLOAT,
             DA_ALLOW_NULL,
-            "pro_working_hours"
+            "pro_working_hours",
+            0.00
         );
         $this->addColumn(
             self::sentSlaAlertFlag,
@@ -149,7 +150,8 @@ class DBEProblem extends DBEntity
             self::completionAlertCount,
             DA_INTEGER,
             DA_ALLOW_NULL,
-            "pro_completion_alert_count"
+            "pro_completion_alert_count",
+            0
         );
         $this->addColumn(
             self::completeDate,
@@ -161,7 +163,8 @@ class DBEProblem extends DBEntity
             self::hideFromCustomerFlag,
             DA_STRING,
             DA_ALLOW_NULL,
-            "pro_hide_from_customer_flag"
+            "pro_hide_from_customer_flag",
+            'N'
         );
         $this->addColumn(
             self::alarmDate,
@@ -179,25 +182,29 @@ class DBEProblem extends DBEntity
             self::totalActivityDurationHours,
             DA_FLOAT,
             DA_ALLOW_NULL,
-            "pro_total_activity_duration_hours"
+            "pro_total_activity_duration_hours",
+            0.00
         );
         $this->addColumn(
             self::totalTravelActivityDurationHours,
             DA_FLOAT,
             DA_ALLOW_NULL,
-            "pro_total_travel_activity_duration_hours"
+            "pro_total_travel_activity_duration_hours",
+            0.00
         );
         $this->addColumn(
             self::chargeableActivityDurationHours,
             DA_FLOAT,
             DA_ALLOW_NULL,
-            "pro_chargeable_activity_duration_hours"
+            "pro_chargeable_activity_duration_hours",
+            0.00
         );
         $this->addColumn(
             self::slaResponseHours,
             DA_FLOAT,
             DA_ALLOW_NULL,
-            "pro_sla_response_hours"
+            "pro_sla_response_hours",
+            0.00
         );
         $this->addColumn(
             self::escalatedFlag,
@@ -207,7 +214,7 @@ class DBEProblem extends DBEntity
         );
         $this->addColumn(
             self::escalatedUserID,
-            DA_INTEGER,
+            DA_ID,
             DA_ALLOW_NULL,
             "pro_escalated_consno"
         );
@@ -236,24 +243,6 @@ class DBEProblem extends DBEntity
             "pro_contno"
         );
         $this->addColumn(
-            self::technicianWeighting,
-            DA_INTEGER,
-            DA_ALLOW_NULL,
-            "pro_technician_weighting"
-        );
-        $this->addColumn(
-            self::rejectedUserID,
-            DA_INTEGER,
-            DA_ALLOW_NULL,
-            "pro_rejected_consno"
-        );
-        $this->addColumn(
-            self::doNextFlag,
-            DA_YN,
-            DA_ALLOW_NULL,
-            "pro_do_next_flag"
-        );
-        $this->addColumn(
             self::rootCauseID,
             DA_INTEGER,
             DA_ALLOW_NULL,
@@ -273,7 +262,7 @@ class DBEProblem extends DBEntity
         );
         $this->addColumn(
             self::workingHoursCalculatedToTime,
-            DA_YN,
+            DA_DATETIME,
             DA_ALLOW_NULL,
             "pro_working_hours_calculated_to_time"
         );
@@ -391,14 +380,12 @@ class DBEProblem extends DBEntity
 
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName('customerID') . ' = ' . $customerID .
-            " AND " . $this->getDBColumnName('completeDate') . " BETWEEN '" .
+            " WHERE " . $this->getDBColumnName(self::customerID) . ' = ' . $customerID .
+            " AND " . $this->getDBColumnName(self::completeDate) . " BETWEEN '" .
             $startDate->format('Y-m-d') . "' AND '" . $endDate->format('Y-m-d') . "' AND " .
-            $this->getDBColumnName('managementReviewReason') . "<> ''"
+            $this->getDBColumnName(self::managementReviewReason) . "<> ''"
         );
 
         return parent::getRows();
     }
 }
-
-?>

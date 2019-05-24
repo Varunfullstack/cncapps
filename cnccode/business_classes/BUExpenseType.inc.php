@@ -16,6 +16,7 @@ class BUExpenseType extends Business
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -57,17 +58,14 @@ class BUExpenseType extends Business
     /**
      *    canDeleteExpenseType
      * Only allowed if type has no activities
+     * @param $ID
+     * @return bool
      */
     function canDeleteExpenseType($ID)
     {
         $dbeExpense = new DBEExpense($this);
         // validate no activities of this type
-        $dbeExpense->setValue('expenseTypeID', $ID);
-        if ($dbeExpense->countRowsByColumn('expenseTypeID') < 1) {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
+        $dbeExpense->setValue(DBEExpense::expenseTypeID, $ID);
+        return $dbeExpense->countRowsByColumn(DBEExpense::expenseTypeID) < 1;
     }
-}// End of class
-?>
+}

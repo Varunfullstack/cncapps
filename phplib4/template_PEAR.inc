@@ -27,9 +27,9 @@ class Template extends Template_PHPLIB
      * Constructor
      *
      * @access public
-     * @param  string template root directory
-     * @param  string how to handle unknown variables
-     * @param  array fallback paths
+     * @param string template root directory
+     * @param string how to handle unknown variables
+     * @param array fallback paths
      */
     function __construct($root = ".", $unknowns = "remove")
     {
@@ -40,7 +40,7 @@ class Template extends Template_PHPLIB
      * Sets the template directory
      *
      * @access public
-     * @param  string new template directory
+     * @param string new template directory
      * @return bool
      */
     function set_root($root)
@@ -59,7 +59,7 @@ class Template extends Template_PHPLIB
      * - "keep" will keep undefined variables as-is
      *
      * @access public
-     * @param  string unknowns
+     * @param string unknowns
      */
     function set_unknowns($unknowns = "remove")
     {
@@ -77,8 +77,8 @@ class Template extends Template_PHPLIB
      * one template.
      *
      * @access public
-     * @param  mixed handle for a filename or array with handle/name value pairs
-     * @param  string name of template file
+     * @param mixed handle for a filename or array with handle/name value pairs
+     * @param string name of template file
      * @return bool
      */
     function set_file($varname, $filename = "")
@@ -106,9 +106,9 @@ class Template extends Template_PHPLIB
      * variable {$name} instead.
      *
      * @access public
-     * @param  string parent handle
-     * @param  string block name handle
-     * @param  string variable substitution name
+     * @param string parent handle
+     * @param string block name handle
+     * @param string variable substitution name
      * @return bool
      */
     function set_block($parent, $handle, $name = "")
@@ -132,7 +132,12 @@ class Template extends Template_PHPLIB
         I have replaced it with code that does the same as the orginal code
                 if (isset($m[1][0])) $this->setVar($handle, $m[1][0]);
         */
-        $this->setVar($handle, $m[1][0]);
+        $value = null;
+        if (isset($m[1]) && isset($m[1][0])) {
+            $value = $m[1][0];
+        }
+
+        $this->setVar($handle, $value);
         $this->setVar($parent, $str);
         return true;
     }
@@ -141,9 +146,9 @@ class Template extends Template_PHPLIB
      * Set corresponding substitutions for placeholders
      *
      * @access public
-     * @param  string name of a variable that is to be defined or an array of variables with value substitution as key/value pairs
-     * @param  string value of that variable
-     * @param  boolean if true, the value is appended to the variable's existing value
+     * @param string name of a variable that is to be defined or an array of variables with value substitution as key/value pairs
+     * @param string value of that variable
+     * @param boolean if true, the value is appended to the variable's existing value
      */
     function set_var($varname, $value = "", $append = false)
     {
@@ -258,7 +263,7 @@ class Template extends Template_PHPLIB
      * Return one or more specific variable(s) with their values.
      *
      * @access public
-     * @param  mixed array with variable names or one variable name as a string
+     * @param mixed array with variable names or one variable name as a string
      * @return mixed array of variable names with their values or value of one specific variable
      */
     function get_var($varname)
@@ -270,7 +275,7 @@ class Template extends Template_PHPLIB
      * Get undefined values of a handle
      *
      * @access public
-     * @param  string handle name
+     * @param string handle name
      * @return mixed  false if an error occured or the undefined values
      */
     function get_undefined($varname)
@@ -284,7 +289,7 @@ class Template extends Template_PHPLIB
      * Complete filename, i.e. testing it for slashes
      *
      * @access private
-     * @param  string filename to be completed
+     * @param string filename to be completed
      * @return string completed filename
      */
     function filename($filename)
@@ -296,7 +301,7 @@ class Template extends Template_PHPLIB
      * Protect a replacement variable
      *
      * @access private
-     * @param  string name of replacement variable
+     * @param string name of replacement variable
      * @return string replaced variable
      */
     function varname($varname)
@@ -308,7 +313,7 @@ class Template extends Template_PHPLIB
      * load file defined by handle if it is not loaded yet
      *
      * @access private
-     * @param  string handle
+     * @param string handle
      * @return bool   FALSE if error, true if all is ok
      */
     function loadfile($varname)

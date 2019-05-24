@@ -40,7 +40,7 @@ class CTSageExport extends CTCNC
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTSAGE_EXPORT_ACT_GENERATE:
                 $this->generate();
                 break;
@@ -56,6 +56,8 @@ class CTSageExport extends CTCNC
     /**
      * Display search form
      * @access private
+     * @throws Exception
+     * @throws Exception
      */
     function select()
     {
@@ -70,10 +72,10 @@ class CTSageExport extends CTCNC
         $this->setTemplateFiles('SageExport', 'SageExport.inc');
         $this->template->set_var(
             array(
-                'month' => Controller::htmlInputText($_REQUEST['month']),
-                'year' => Controller::htmlInputText($_REQUEST['year']),
-                'includeSalesChecked' => Controller::htmlChecked($_REQUEST['includeSales']),
-                'includePurchasesChecked' => Controller::htmlChecked($_REQUEST['includePurchases']),
+                'month' => Controller::htmlInputText($this->getParam('month')),
+                'year' => Controller::htmlInputText($this->getParam('year')),
+                'includeSalesChecked' => Controller::htmlChecked($this->getParam('includeSales')),
+                'includePurchasesChecked' => Controller::htmlChecked($this->getParam('includePurchases')),
                 'urlSubmit' => $urlSubmit
             )
         );
@@ -85,45 +87,44 @@ class CTSageExport extends CTCNC
     function generate()
     {
         $this->setMethodName('generate');
-        if ($_REQUEST['month'] == '') {
+        if ($this->getParam('month') == '') {
             $this->setFormErrorMessage('Month required');
             $this->select();
             exit();
         }
-        if ($_REQUEST['year'] == '') {
+        if ($this->getParam('year') == '') {
             $this->setFormErrorMessage('Year required');
             $this->select();
             exit();
         }
-        if (!is_numeric($_REQUEST['year'])) {
+        if (!is_numeric($this->getParam('year'))) {
             $this->setFormErrorMessage('Year must be numeric');
             $this->select();
             exit();
         }
-        if (!common_inRange($_REQUEST['year'], date('Y') - 1, date('Y'))) {
+        if (!common_inRange($this->getParam('year'), date('Y') - 1, date('Y'))) {
             $this->setFormErrorMessage('Year out of range');
             $this->select();
             exit();
         }
-        if (!common_inRange($_REQUEST['month'], 1, 12)) {
+        if (!common_inRange($this->getParam('month'), 1, 12)) {
             $this->setFormErrorMessage('Month out of range');
             $this->select();
             exit();
         }
-        if (!isset($_REQUEST['includeSales']) AND !isset($_REQUEST['includePurchases'])) {
+        if (!$this->getParam('includeSales') AND !$this->getParam('includePurchases')) {
             $this->setFormErrorMessage('Choose at least one report to produce');
             $this->select();
             exit();
         }
         $this->buSageExport->generateSageData(
-            $_REQUEST['year'],
-            $_REQUEST['month'],
-            isset($_REQUEST['includeSales']),
-            isset($_REQUEST['includePurchases'])
+            $this->getParam('year'),
+            $this->getParam('month'),
+            $this->getParam('includeSales'),
+            $this->getParam('includePurchases')
         );
         $this->setFormErrorMessage('The transaction files have been created in the export directory ready for import to Sage');
         $this->select();
         exit();
     }
 }// end of class
-?>

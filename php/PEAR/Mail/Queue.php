@@ -188,7 +188,7 @@ class Mail_Queue extends PEAR
     /**
      * Mail_Queue_Container
      *
-     * @var object
+     * @var Mail_Queue_Container_db
      */
     var $container;
 
@@ -462,6 +462,7 @@ class Mail_Queue extends PEAR
      * @param mixed $callback Optional, a callback (string or array) to save the
      *                           SMTP ID and the SMTP greeting.
      *
+     * @param null $callbackBeforeSend
      * @return mixed  True on success else MAILQUEUE_ERROR object.
      */
     function sendMailsInQueue($limit = MAILQUEUE_ALL,
@@ -531,14 +532,14 @@ class Mail_Queue extends PEAR
                 $this->container->skip();       // already being sent
                 continue;
             }
-
             $this->container->countSend($mail);
+
             $result = $this->sendMail(
                 $mail,
                 true
             );
+
             if (PEAR::isError($result)) {
-                var_dump($result);
                 //remove the problematic mail from the buffer, but don't delete
                 //it from the db: it might be a temporary issue.
                 $this->container->skip();
@@ -695,8 +696,7 @@ class Mail_Queue extends PEAR
     /**
      * Get next mail from queue. The emails are preloaded
      * in a buffer for better performances.
-     *
-     * @return    object Mail_Queue_Container or error object
+     * @return Mail_Queue_Body|Mail_Queue_Error|object|bool
      * @throw     MAILQUEUE_ERROR
      * @access    public
      */

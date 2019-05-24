@@ -16,26 +16,37 @@ define('BUPDFDEL_QTY_DELIVERED_COL', 194);
 define('BUPDFDEL_DETAILS_BOX_WIDTH', 116.5);
 define('BUPDFDEL_QTY_ORDERED_BOX_WIDTH', 35);    // used for cost box too
 define('BUPDFDEL_DETAILS_BOX_LEFT_EDGE', 11);
-define('BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE',        // relative to other boxes
-       BUPDFDEL_DETAILS_BOX_LEFT_EDGE +
-       BUPDFDEL_DETAILS_BOX_WIDTH
+define(
+    'BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE',        // relative to other boxes
+    BUPDFDEL_DETAILS_BOX_LEFT_EDGE +
+    BUPDFDEL_DETAILS_BOX_WIDTH
 );
-define('BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE',
-       BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE +
-       BUPDFDEL_QTY_ORDERED_BOX_WIDTH
+define(
+    'BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE',
+    BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE +
+    BUPDFDEL_QTY_ORDERED_BOX_WIDTH
 );
 
 class BUPDFDeliveryNote extends BaseObject
 {
-    var $_buPDF = '';                    // BUPDF object
-    var $_dsOrdhead = '';
-    var $_dsOrdline = '';
-    var $_dsDespatch = '';
-    var $_dsContact = '';
-    var $_dsDeliveryMethod = '';
-    var $_noteNo = '';
-    var $_fullyDespatched = '';
-    var $_titleLine = 0;
+    /** @var BUPDF */
+    public $_buPDF;
+    /** @var DataSet */
+    public $_dsOrdhead;
+    /** @var DataSet */
+    public $_dsOrdline;
+    /** @var DataSet */
+    public $_dsDespatch;
+    /** @var DataSet */
+    public $_dsContact;
+    /** @var DataSet */
+    public $_dsDeliveryMethod;
+    /** @var int */
+    public $_noteNo;
+    /** @var bool */
+    public $_fullyDespatched;
+    /** @var int */
+    public $_titleLine = 0;
 
     /**
      * BUPDFDeliveryNote constructor.
@@ -55,7 +66,8 @@ class BUPDFDeliveryNote extends BaseObject
                          &$dsContact,
                          &$dsDeliveryMethod,
                          $noteNo,
-                         $fullyDespatched)
+                         $fullyDespatched
+    )
     {
         BaseObject::__construct($owner);
         $this->_dsOrdhead = $dsOrdhead;
@@ -95,11 +107,8 @@ class BUPDFDeliveryNote extends BaseObject
     function produceNote()
     {
         // local refs
-        $dsOrdhead = &$this->_dsOrdhead;
         $dsOrdline = &$this->_dsOrdline;
         $dsDespatch = &$this->_dsDespatch;
-        $dsContact = &$this->_dsContact;
-        $dsDeliveryMethod = &$this->_dsDeliveryMethod;
         $this->noteHead();
         $this->_buPDF->CR();
         $lineCount = 0;
@@ -127,10 +136,14 @@ class BUPDFDeliveryNote extends BaseObject
                 } else {
                     $this->_buPDF->printStringAt(BUPDFDEL_DETAILS_COL, $dsOrdline->getValue('description'));
                 }
-                $this->_buPDF->printStringRJAt(BUPDFDEL_QTY_ORDERED_COL,
-                                               number_format($dsOrdline->getValue('qtyOrdered'), 2, '.', ','));
-                $this->_buPDF->printStringRJAt(BUPDFDEL_QTY_DELIVERED_COL,
-                                               number_format($dsDespatch->getValue('qtyToDespatch'), 2, '.', ','));
+                $this->_buPDF->printStringRJAt(
+                    BUPDFDEL_QTY_ORDERED_COL,
+                    number_format($dsOrdline->getValue('qtyOrdered'), 2, '.', ',')
+                );
+                $this->_buPDF->printStringRJAt(
+                    BUPDFDEL_QTY_DELIVERED_COL,
+                    number_format($dsDespatch->getValue('qtyToDespatch'), 2, '.', ',')
+                );
             } else {
                 $this->_buPDF->printStringAt(BUPDFDEL_DETAILS_COL, $dsOrdline->getValue('description')); // comment line
             }
@@ -147,34 +160,46 @@ class BUPDFDeliveryNote extends BaseObject
         $this->_buPDF->setBoldOn();
         $this->_buPDF->setFont();
         $this->_buPDF->moveYTo($this->_titleLine + (BUPDFDEL_NUMBER_OF_LINES * $this->_buPDF->getFontSize() / 2));
-        $this->_buPDF->box(BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
-        $this->_buPDF->box(BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
         $this->_buPDF->printStringRJAt(BUPDFDEL_QTY_ORDERED_COL, 'Signed');
         $this->_buPDF->CR();
-        $this->_buPDF->box(BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
-        $this->_buPDF->box(BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
         $this->_buPDF->printStringRJAt(BUPDFDEL_QTY_ORDERED_COL, 'Print');
         $this->_buPDF->CR();
-        $this->_buPDF->box(BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
-        $this->_buPDF->box(BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
         $this->_buPDF->printStringRJAt(BUPDFDEL_QTY_ORDERED_COL, 'Date');
         $this->_buPDF->setBoldOn();
         $this->_buPDF->setFont();
@@ -183,7 +208,9 @@ class BUPDFDeliveryNote extends BaseObject
         $this->_buPDF->CR();
         $this->_buPDF->setFontSize(8);
         $this->_buPDF->setFont();
-        $this->_buPDF->printString('GOODS REMAIN THE PROPERTY OF COMPUTER & NETWORK CONSULTANTS LTD UNTIL PAID FOR IN FULL');
+        $this->_buPDF->printString(
+            'GOODS REMAIN THE PROPERTY OF COMPUTER & NETWORK CONSULTANTS LTD UNTIL PAID FOR IN FULL'
+        );
         $this->_buPDF->endPage();
     }
 
@@ -252,31 +279,41 @@ class BUPDFDeliveryNote extends BaseObject
             $dsContact->getValue('firstName') . ' ' .
             $dsContact->getValue('lastName')
         );
-        $faoLine = $this->_buPDF->getYPos();
+        $this->_buPDF->getYPos();
         $this->_buPDF->moveYTo($firstAddLine);    //move back up the page
         $this->_buPDF->CR();
-        $this->_buPDF->box(BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
-        $this->_buPDF->box(BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
         $this->_buPDF->printStringRJAt(BUPDFDEL_QTY_ORDERED_COL, 'Note No');
         $this->_buPDF->setBoldOff();
         $this->_buPDF->setFont();
-        $this->_buPDF->printStringAt(BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
-                                     $dsOrdhead->getValue('ordheadID') . '/' . $this->_noteNo);
+        $this->_buPDF->printStringAt(
+            BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
+            $dsOrdhead->getValue('ordheadID') . '/' . $this->_noteNo
+        );
         $this->_buPDF->CR();
-        $this->_buPDF->box(BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
-        $this->_buPDF->box(BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
         $this->_buPDF->setBoldOn();
         $this->_buPDF->setFont();
         $this->_buPDF->printStringRJAt(BUPDFDEL_QTY_ORDERED_COL, 'Date');
@@ -284,14 +321,18 @@ class BUPDFDeliveryNote extends BaseObject
         $this->_buPDF->setFont();
         $this->_buPDF->printStringAt(BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE, date('d/m/Y'));
         $this->_buPDF->CR();
-        $this->_buPDF->box(BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
-        $this->_buPDF->box(BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
         $this->_buPDF->setBoldOn();
         $this->_buPDF->setFont();
         $this->_buPDF->printStringRJAt(BUPDFDEL_QTY_ORDERED_COL, 'Delivery');
@@ -299,56 +340,76 @@ class BUPDFDeliveryNote extends BaseObject
         $this->_buPDF->setFont();
         $this->_buPDF->printStringAt(BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE, $dsDeliveryMethod->getValue('description'));
         $this->_buPDF->CR();
-        $this->_buPDF->box(BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
-        $this->_buPDF->box(BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
         $this->_buPDF->setBoldOn();
         $this->_buPDF->setFont();
         $this->_buPDF->printStringRJAt(BUPDFDEL_QTY_ORDERED_COL, 'CNC Order No');
         $this->_buPDF->setBoldOff();
         $this->_buPDF->setFont();
-        $this->_buPDF->printStringAt(BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
-                                     $dsOrdhead->getValue('customerID') . '/' . $dsOrdhead->getValue('ordheadID'));
+        $this->_buPDF->printStringAt(
+            BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
+            $dsOrdhead->getValue('customerID') . '/' . $dsOrdhead->getValue('ordheadID')
+        );
         $this->_buPDF->CR();
-        $this->_buPDF->box(BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
-        $this->_buPDF->box(BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
         $this->_buPDF->CR();
-        $this->_buPDF->box(BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
-        $this->_buPDF->box(BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
         $this->_buPDF->setBoldOn();
         $this->_buPDF->setFont();
         $this->_buPDF->printStringRJAt(BUPDFDEL_QTY_ORDERED_COL, 'Customer Order');
         $this->_buPDF->setBoldOff();
         $this->_buPDF->setFont();
-        $this->_buPDF->printStringAt(BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
-                                     substr($dsOrdhead->getValue('custPORef'), 0, 17));
+        $this->_buPDF->printStringAt(
+            BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
+            substr($dsOrdhead->getValue('custPORef'), 0, 17)
+        );
         $this->_buPDF->CR();
         // empty box
-        $this->_buPDF->box(BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
-        $this->_buPDF->box(BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
-                           $this->_buPDF->getYPos(),
-                           BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
-                           $this->_buPDF->getFontSize() / 2);
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_ORDERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
+        $this->_buPDF->box(
+            BUPDFDEL_QTY_DELIVERED_BOX_LEFT_EDGE,
+            $this->_buPDF->getYPos(),
+            BUPDFDEL_QTY_ORDERED_BOX_WIDTH,
+            $this->_buPDF->getFontSize() / 2
+        );
         $this->_buPDF->CR();
         $this->_titleLine = $this->_buPDF->getYPos();
         $this->_buPDF->setBoldOn();
@@ -387,7 +448,6 @@ class BUPDFDeliveryNote extends BaseObject
         $this->_buPDF->setBoldOff();
         $this->_buPDF->setFont();
         $this->_buPDF->CR();
-        $grandTotal = 0;
     }
 }// End of class
 ?>

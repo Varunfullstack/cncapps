@@ -1,6 +1,10 @@
 <!-- Template: InvoiceDisplay.inc.html -->
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
-<script language='JavaScript' src="CommonJS.js"></script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+></script>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
 <script language='JavaScript'>
     function validatesiteDesc() {
         if (Trim(document.getElementById("siteDesc").value) != "") {
@@ -19,7 +23,7 @@
         if (event.keyCode == 120) {			// F9 - edit
             switch (field.id) {
                 case "itemDescription":
-                    if (+document.getElementById("itemID").value != 0 ) {
+                    if (+document.getElementById("itemID").value != 0) {
                         window.open(
                             '{urlItemEdit}&itemID=' +
                             escape(document.getElementById("itemID").value) +
@@ -67,8 +71,15 @@
         }
     }
 </SCRIPT>
-<form name="customerItem" method="post" action="{urlSubmit}">
-    <TABLE width="600px" border="0" cellpadding="1" cellspacing="1">
+<form name="customerItem"
+      method="post"
+      action="{urlSubmit}"
+>
+    <TABLE width="600px"
+           border="0"
+           cellpadding="1"
+           cellspacing="1"
+    >
         <tr>
             <td class="promptText">Item</td>
             <td class="field">
@@ -76,7 +87,8 @@
                         type="hidden"
                         name="customerItem[1][itemID]"
                         id="itemID"
-                        value="{itemID}"/>
+                        value="{itemID}"
+                />
                 <input
                         type="text"
                         name="customerItem[1][itemDescription]"
@@ -94,7 +106,8 @@
                     type="hidden"
                     name="customerItem[1][customerID]"
                     id="customerID"
-                    value="{customerID}"/>
+                    value="{customerID}"
+            />
                 <input
                         type="text"
                         name="customerItem[1][customerName]"
@@ -116,7 +129,6 @@
                 />
                 <input
                         type="text"
-                        name="customerItem[1][siteDesc]"
                         id="siteDesc"
                         value="{siteDesc}"
                         onKeydown="javascript:checkFunctionKey(siteDesc)"
@@ -136,13 +148,19 @@
                 <span class="formErrorMessage">{serialNoMessage}</span></TD>
         </TR>
         <tr>
-            <td valign="top" class="promptText">&nbsp;</td>
+            <td valign="top"
+                class="promptText"
+            >&nbsp;
+            </td>
             <td colspan="2">&nbsp;</td>
         </tr>
         <tr>
             <td>&nbsp;</td>
             <td colspan="2">
-                <input type="submit" name="Update" value="Save"></td>
+                <input type="submit"
+                       name="Update"
+                       value="Save"
+                ></td>
         </tr>
     </table>
 </form>

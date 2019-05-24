@@ -7,19 +7,22 @@ require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBEManufacturer extends DBCNCEntity
 {
+    const manufacturerID = "manufacturerID";
+    const name = "name";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setTableName("manufact");
-        $this->addColumn("manufacturerID", DA_ID, DA_NOT_NULL, "man_manno");
-        $this->addColumn("name", DA_STRING, DA_NOT_NULL, "man_name");
+        $this->addColumn(self::manufacturerID, DA_ID, DA_NOT_NULL, "man_manno");
+        $this->addColumn(self::name, DA_STRING, DA_NOT_NULL, "man_name");
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -27,8 +30,7 @@ class DBEManufacturer extends DBCNCEntity
     function getRowsByNameMatch()
     {
         $this->setMethodName("getRowsByNameMatch");
-        $ret = FALSE;
-        if ($this->getValue('name') == '') {
+        if ($this->getValue(self::name) == '') {
             $this->raiseError('name not set');
         }
 
@@ -37,11 +39,11 @@ class DBEManufacturer extends DBCNCEntity
             " FROM " . $this->getTableName() .
             " WHERE 1=1";
         $queryString .=
-            " AND man_name LIKE '%" . $this->getValue('name') . "%'";
+            " AND man_name LIKE '%" . $this->getValue(self::name) . "%'";
 
 
         $queryString .=
-            " ORDER BY " . $this->getDBColumnName('name') .
+            " ORDER BY " . $this->getDBColumnName(self::name) .
             " LIMIT 0,200";
 
         $this->setQueryString($queryString);
@@ -50,5 +52,3 @@ class DBEManufacturer extends DBCNCEntity
         return $ret;
     }
 }
-
-?>

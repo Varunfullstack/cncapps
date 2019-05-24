@@ -12,8 +12,8 @@ require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 
 class CTStarterLeaverManagement extends CTCNC
 {
-    var $dsStandardText = '';
-    var $buStandardText = '';
+    /** @var DSForm */
+    public $dsStandardText;
 
     function __construct($requestMethod,
                          $postVars,
@@ -35,6 +35,8 @@ class CTStarterLeaverManagement extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -44,19 +46,21 @@ class CTStarterLeaverManagement extends CTCNC
         }
 
 
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'addQuestion':
                 try {
                     $this->addQuestion();
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $this->formErrorMessage = $exception->getMessage();
                     $this->formError = true;
                     $this->displayList();
                 }
 
                 $location = 'Location: StarterLeaverManagement.php';
-                if (isset($_REQUEST['type'])) {
-                    $location .= "?action=displayCustomerQuestions&customerID=" . $_REQUEST['question']['customerID'] . "&type=" . $_REQUEST['type'];
+                if ($this->getParam('type')) {
+                    $location .= "?action=displayCustomerQuestions&customerID=" . $this->getParam(
+                            'question'
+                        )['customerID'] . "&type=" . $this->getParam('type');
                 }
                 header($location);
                 break;
@@ -68,15 +72,15 @@ class CTStarterLeaverManagement extends CTCNC
 
                 try {
                     $this->deleteQuestion();
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $this->formErrorMessage = $exception->getMessage();
                     $this->formError = true;
                 }
-                $customerID = $_REQUEST['customerID'];
+                $customerID = $this->getParam('customerID');
 
                 $type = null;
-                if (isset($_REQUEST['type'])) {
-                    $type = $_REQUEST['type'];
+                if ($this->getParam('type')) {
+                    $type = $this->getParam('type');
                 }
 
                 header(
@@ -85,10 +89,10 @@ class CTStarterLeaverManagement extends CTCNC
                 break;
             case 'updateQuestion':
                 $this->updateQuestion();
-                $customerID = $_REQUEST['customerID'];
+                $customerID = $this->getParam('customerID');
                 $type = null;
-                if (isset($_REQUEST['type'])) {
-                    $type = $_REQUEST['type'];
+                if ($this->getParam('type')) {
+                    $type = $this->getParam('type');
                 }
 
                 header(
@@ -106,6 +110,7 @@ class CTStarterLeaverManagement extends CTCNC
     /**
      * Display list of types
      * @access private
+     * @throws Exception
      */
     function displayList()
     {
@@ -173,21 +178,24 @@ class CTStarterLeaverManagement extends CTCNC
     }
 
 
+    /**
+     * @throws Exception
+     */
     private function addQuestion()
     {
-        if (!isset($_REQUEST['question'])) {
+        if (!$this->getParam('question')) {
             throw new Exception('Question array is not set');
         }
 
-        if (!isset($_REQUEST['question']['customerID']) || !$_REQUEST['question']['customerID']) {
+        if (!isset($this->getParam('question')['customerID']) || !$this->getParam('question')['customerID']) {
             throw new Exception('Customer is not set');
         }
 
-        if (isset($_REQUEST['type'])) {
-            $_REQUEST['question']['formType'] = $_REQUEST['type'];
+        if ($this->getParam('type')) {
+            $this->getParam('question')['formType'] = $this->getParam('type');
         }
 
-        $questionData = $_REQUEST['question'];
+        $questionData = $this->getParam('question');
 
 
         $dbeStarterLeaverQuestion = new DBEStarterLeaverQuestion($this);
@@ -238,17 +246,20 @@ class CTStarterLeaverManagement extends CTCNC
         $dbeStarterLeaverQuestion->insertRow();
     }
 
+    /**
+     * @throws Exception
+     */
     private function updateQuestion()
     {
-        if (!isset($_REQUEST['question'])) {
+        if (!$this->getParam('question')) {
             throw new Exception('Question array is not set');
         }
 
-        if (!isset($_REQUEST['questionID']) || !$_REQUEST['questionID']) {
+        if (!$this->getParam('questionID') || !$this->getParam('questionID')) {
             throw new Exception('Question ID is missing');
         }
-        $questionID = $_REQUEST['questionID'];
-        $questionData = $_REQUEST['question'];
+        $questionID = $this->getParam('questionID');
+        $questionData = $this->getParam('question');
 
 
         $dbeStarterLeaverQuestion = new DBEStarterLeaverQuestion($this);
@@ -294,22 +305,25 @@ class CTStarterLeaverManagement extends CTCNC
 
     }
 
+    /**
+     * @throws Exception
+     */
     private function displayCustomerQuestions()
     {
         $this->setMethodName('displayCustomerQuestions');
 
-        if (!isset($_REQUEST['customerID']) || !$_REQUEST['customerID']) {
+        if (!$this->getParam('customerID') || !$this->getParam('customerID')) {
             throw new Exception('Customer ID is missing');
         }
-        $customerID = $_REQUEST['customerID'];
+        $customerID = $this->getParam('customerID');
 
 
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerID);
 
         $type = null;
-        if (isset($_REQUEST['type'])) {
-            $type = $_REQUEST['type'];
+        if ($this->getParam('type')) {
+            $type = $this->getParam('type');
         }
         $this->setPageTitle(
             'Questions List: ' . $dbeCustomer->getValue(DBECustomer::name) . ($type ? " (" . ucwords(
@@ -449,9 +463,12 @@ class CTStarterLeaverManagement extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @throws Exception
+     */
     private function deleteQuestion()
     {
-        if (!isset($_REQUEST['questionID']) || !($questionID = $_REQUEST['questionID'])) {
+        if (!$this->getParam('questionID') || !($questionID = $this->getParam('questionID'))) {
             throw new Exception('Question ID is missing');
         }
 

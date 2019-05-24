@@ -54,13 +54,15 @@ $end_time = date('Y-m-d H:i:s');
 $error = curl_error($ch);
 
 /* initialise result array */
-$result = array('header' => '',
+$result = array(
+    'header'     => '',
     'start_time' => '',
-    'end_time' => '',
-    'body' => '',
+    'end_time'   => '',
+    'body'       => '',
     'curl_error' => '',
-    'http_code' => '',
-    'last_url' => '');
+    'http_code'  => '',
+    'last_url'   => ''
+);
 
 if ($error != "") {
     $result['curl_error'] = $error;
@@ -76,12 +78,6 @@ if ($error != "") {
 
 curl_close($ch);                                                                // free handle
 
-
-/*
-$handle = fopen( 'E:\\htdocs\\service_desk_monitor_log.htm', 'a');
-fwrite( $handle, '<PRE>' . print_r( $result, true ) . '</PRE>');
-fclose( $handle );
-*/
 if ($result['curl_error']) {
     die('CURL Error: ' . $result['curl_error']);
 }
@@ -89,24 +85,25 @@ if ($result['http_code'] != 200) {
     die('HTTP Error: ' . $result['http_code']);
 }
 
-//we are going to use this to add to the monitoring db
-$dsn = 'mysql:host=localhost;dbname=cncappsdev';
-$DB_USER = "webuser";
-$DB_PASSWORD = "CnC1988";
-$options = [
-    PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
-];
-$db = new PDO($dsn, $DB_USER, $DB_PASSWORD, $options);
 
-$statement = $db->prepare('INSERT INTO taskLog(description, startedAt, finishedAt, maxCpuUsage, maxMemoryUsage) VALUES( :description, :startedAt, :finishedAt, :maxCpuUsage, :maxMemoryUsage ) ');
+////we are going to use this to add to the monitoring db
+//$dsn = 'mysql:host=localhost;dbname=cncappsdev';
+//$DB_USER = "webuser";
+//$DB_PASSWORD = "CnC1988";
+//$options = [
+//    PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
+//];
+//$db = new mysqli($dsn, $DB_USER, $DB_PASSWORD, $options);
 
-$statement->bindValue(':description', $argv[1]);
-$statement->bindValue(':startedAt', $start_time);
-$statement->bindValue(':finishedAt', $end_time);
-$statement->bindValue(':maxCpuUsage', getCpuUsage());
-$statement->bindValue(':maxMemoryUsage', memory_get_peak_usage(true));
-
-$statement->execute();
+//$statement = $db->prepare('INSERT INTO taskLog(description, startedAt, finishedAt, maxCpuUsage, maxMemoryUsage) VALUES( :description, :startedAt, :finishedAt, :maxCpuUsage, :maxMemoryUsage ) ');
+//
+//$statement->bindValue(':description', $argv[1]);
+//$statement->bindValue(':startedAt', $start_time);
+//$statement->bindValue(':finishedAt', $end_time);
+//$statement->bindValue(':maxCpuUsage', getCpuUsage());
+//$statement->bindValue(':maxMemoryUsage', memory_get_peak_usage(true));
+//
+//$statement->execute();
 
 
 ?>

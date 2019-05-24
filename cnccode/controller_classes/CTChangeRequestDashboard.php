@@ -38,7 +38,7 @@ class CTChangeRequestDashboard extends CTCNC
     function defaultAction()
     {
 
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             default:
                 $this->displayReport();
@@ -46,6 +46,9 @@ class CTChangeRequestDashboard extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function displayReport()
     {
 

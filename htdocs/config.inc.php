@@ -1,15 +1,80 @@
 <?php
-date_default_timezone_set('Europe/London');
-require_once(__DIR__ . '/../../openWebAnalytics/owa_php.php');
 
-$owa = new owa_php();
-// Set the site id you want to track
-$owa->setSiteId('b39a0f923d7f45bec2ccb7fa0435f82c');
-// Uncomment the next line to set your page title
-//$owa->setPageTitle('somepagetitle');
-// Set other page properties
-//$owa->setProperty('foo', 'bar');
-//$owa->trackPageView();
+function var_debug($variable,$strlen=100,$width=25,$depth=10,$i=0,&$objects = array())
+{
+    $search = array("\0", "\a", "\b", "\f", "\n", "\r", "\t", "\v");
+    $replace = array('\0', '\a', '\b', '\f', '\n', '\r', '\t', '\v');
+
+    $string = '';
+
+    switch(gettype($variable)) {
+        case 'boolean':      $string.= $variable?'true':'false'; break;
+        case 'integer':      $string.= $variable;                break;
+        case 'double':       $string.= $variable;                break;
+        case 'resource':     $string.= '[resource]';             break;
+        case 'NULL':         $string.= "null";                   break;
+        case 'unknown type': $string.= '???';                    break;
+        case 'string':
+            $len = strlen($variable);
+            $variable = str_replace($search,$replace,substr($variable,0,$strlen),$count);
+            $variable = substr($variable,0,$strlen);
+            if ($len<$strlen) $string.= '"'.$variable.'"';
+            else $string.= 'string('.$len.'): "'.$variable.'"...';
+            break;
+        case 'array':
+            $len = count($variable);
+            if ($i==$depth) $string.= 'array('.$len.') {...}';
+            elseif(!$len) $string.= 'array(0) {}';
+            else {
+                $keys = array_keys($variable);
+                $spaces = str_repeat(' ',$i*2);
+                $string.= "array($len)\n".$spaces.'{';
+                $count=0;
+                foreach($keys as $key) {
+                    if ($count==$width) {
+                        $string.= "\n".$spaces."  ...";
+                        break;
+                    }
+                    $string.= "\n".$spaces."  [$key] => ";
+                    $string.= var_debug($variable[$key],$strlen,$width,$depth,$i+1,$objects);
+                    $count++;
+                }
+                $string.="\n".$spaces.'}';
+            }
+            break;
+        case 'object':
+            $id = array_search($variable,$objects,true);
+            if ($id!==false)
+                $string.=get_class($variable).'#'.($id+1).' {...}';
+            else if($i==$depth)
+                $string.=get_class($variable).' {...}';
+            else {
+                $id = array_push($objects,$variable);
+                $array = (array)$variable;
+                $spaces = str_repeat(' ',$i*2);
+                $string.= get_class($variable)."#$id\n".$spaces.'{';
+                $properties = array_keys($array);
+                foreach($properties as $property) {
+                    $name = str_replace("\0",':',trim($property));
+                    $string.= "\n".$spaces."  [$name] => ";
+                    $string.= var_debug($array[$property],$strlen,$width,$depth,$i+1,$objects);
+                }
+                $string.= "\n".$spaces.'}';
+            }
+            break;
+    }
+
+    if ($i>0) return $string;
+
+    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+    do $caller = array_shift($backtrace); while ($caller && !isset($caller['file']));
+    if ($caller) $string = $caller['file'].':'.$caller['line']."\n".$string;
+
+    echo nl2br(str_replace(' ','&nbsp;',htmlentities($string)));
+}
+
+date_default_timezone_set('Europe/London');
+
 ini_set(
     'memory_limit',
     '8192M'
@@ -34,14 +99,7 @@ so we don't waste time!
 */
 /*
 if (get_magic_quotes_gpc()) {
-   function stripslashes_deep($value)
-   {
-       $value = is_array($value) ?
-                   array_map('stripslashes_deep', $value) :
-                   stripslashes($value);
 
-       return $value;
-   }
    $_POST 		=	array_map('stripslashes_deep', $_POST);
    $_GET 			= array_map('stripslashes_deep', $_GET);
    $_REQUEST	= array_map('stripslashes_deep', $_REQUEST);
@@ -51,6 +109,18 @@ if (get_magic_quotes_gpc()) {
 /*
 End Strip all slashes from request variables (includes cookies)
 */
+/**
+ * @param $value
+ * @return array|string
+ */
+function stripslashes_deep($value)
+{
+    $value = is_array($value) ?
+        array_map('stripslashes_deep', $value) :
+        stripslashes($value);
+    return $value;
+}
+
 set_time_limit(30 * 60);
 // if magic_quotes_gpc is set then strip all backslashes from GPC arrays first
 // absolute path to root application directory
@@ -203,8 +273,7 @@ switch ($server_type) {
             'CONFIG_CATCHALL_EMAIL',
             'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', xavi@pavilionweb.co.uk'
         );
-//            error_reporting(E_ALL);
-        error_reporting(E_ALL & ~E_WARNING);
+        error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
         ini_set(
             'display_errors',
             'on'
@@ -255,14 +324,6 @@ switch ($server_type) {
             CONFIG_CATCHALL_EMAIL
         );
 
-
-        $GLOBALS['request_mail_options'] =
-            array(
-                'host'     => 'cncmx01',
-                'port'     => 143,
-                'user'     => 'devasr',
-                'password' => 'Unread01$'
-            );
         break;
 
     case MAIN_CONFIG_SERVER_TYPE_LIVE:
@@ -333,19 +394,11 @@ switch ($server_type) {
             'CONFIG_PREPAY_EMAIL',
             'PrePayOverFixedAmount@cnc-ltd.co.uk'
         );
-        error_reporting(E_ALL & ~E_WARNING & ~E_STRICT);
+        error_reporting(E_ALL & ~E_WARNING & ~E_STRICT & ~E_DEPRECATED);
         ini_set(
             'display_errors',
             'off'
         );
-
-        $GLOBALS['request_mail_options'] =
-            array(
-                'host'     => 'cncmx01',
-                'port'     => 143,
-                'user'     => 'asr',
-                'password' => 'Unread01$'
-            );
 
         $GLOBALS['mail_options'] =
             array(
@@ -381,7 +434,7 @@ switch ($server_type) {
             'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN
         );
 //            error_reporting(E_ALL & ~E_STRICT)
-        error_reporting(E_ALL & ~E_WARNING);
+        error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
         ini_set(
             'display_errors',
             'on'
@@ -431,14 +484,6 @@ switch ($server_type) {
             'CONFIG_PREPAY_EMAIL',
             CONFIG_CATCHALL_EMAIL
         );
-
-        $GLOBALS['request_mail_options'] =
-            array(
-                'host'     => 'cncmx01',
-                'port'     => 143,
-                'user'     => 'devasr',
-                'password' => 'Unread01$'
-            );
         break;
 
     case MAIN_CONFIG_SERVER_TYPE_WEBSITE:
@@ -467,7 +512,7 @@ switch ($server_type) {
             'CONFIG_CATCHALL_EMAIL',
             'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', xavi@pavilionweb.co.uk'
         );
-        error_reporting(E_ALL & ~E_WARNING);
+        error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
         ini_set(
             'display_errors',
             'on'
@@ -518,13 +563,6 @@ switch ($server_type) {
             CONFIG_CATCHALL_EMAIL
         );
 
-        $GLOBALS['request_mail_options'] =
-            array(
-                'host'     => 'cncmx01',
-                'port'     => 143,
-                'user'     => 'devasr',
-                'password' => 'Unread01$'
-            );
         break;
 
 } // end switch
@@ -1027,16 +1065,22 @@ define(
 );
 
 define(
-    'CONFIG_MYSQL_DATE',
+    'DATE_MYSQL_DATE',
     'Y-m-d'
 );
 define(
-    'CONFIG_MYSQL_TIME',
+    'DATE_MYSQL_TIME',
     'H:i:s'
 );
+
 define(
-    'CONFIG_MYSQL_DATETIME',
-    CONFIG_MYSQL_DATE . ' ' . CONFIG_MYSQL_TIME
+    'CONFIG_MYSQL_TIME_HOURS_MINUTES',
+    'H:i'
+);
+
+define(
+    'DATE_MYSQL_DATETIME',
+    DATE_MYSQL_DATE . ' ' . DATE_MYSQL_TIME
 );
 
 $cfg["postToSco"] = FALSE;
@@ -1071,6 +1115,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 require_once(BASE_DRIVE . "/phplib4/prepend.php"); // need to do this on live site
 
 require_once($cfg["path_phplib_classes"] . DIRECTORY_SEPARATOR . "local4.inc.php");
+/** @var dbSweetcode $db */
 $db = new dbSweetcode;
 
 //$db->query("SET sql_mode = ''");    // strict mode off

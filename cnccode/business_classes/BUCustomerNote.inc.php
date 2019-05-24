@@ -6,6 +6,8 @@
  */
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
+require_once($cfg["path_dbe"] . "/DBECustomerNote.inc.php");
+
 
 class BUCustomerNote extends Business
 {
@@ -14,6 +16,7 @@ class BUCustomerNote extends Business
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -29,36 +32,26 @@ class BUCustomerNote extends Business
     {
         $this->setMethodName('updateNote');
 
+        $dbeCustomerNote = new DBECustomerNote($this);
+
+
         if ($customerNoteID) {
-            $sql = "UPDATE customernote";
+            $dbeCustomerNote->getRow($customerNoteID);
         } else {
-            $sql = "INSERT INTO customernote";
+            $dbeCustomerNote->setValue(DBECustomerNote::customerID, $customerID);
+            $dbeCustomerNote->setValue(DBECustomerNote::createdUserID, $GLOBALS['auth']->is_authenticated());
+            $dbeCustomerNote->setValue(DBECustomerNote::created, (new DateTime())->format('d/m/Y H:i:s'));
         }
-
-        $sql .= "
-      SET
-        cno_custno = $customerID,
-        cno_details = '" . $this->db->real_escape_string($details) . "',
-        cno_ordno = '" . $this->db->real_escape_string($ordheadID) . "',
-        cno_modified_consno = " . $GLOBALS['auth']->is_authenticated() .
-            ", cno_modified = NOW()";
-
-        if (!$customerNoteID) {
-            $sql .= ",cno_created_consno = " . $GLOBALS['auth']->is_authenticated() .
-                ", cno_created = NOW()";
-        }
+        $dbeCustomerNote->setValue(DBECustomerNote::orderID, $ordheadID);
+        $dbeCustomerNote->setValue(DBECustomerNote::details, $details);
+        $dbeCustomerNote->setValue(DBECustomerNote::modifiedUserID, $GLOBALS['auth']->is_authenticated());
+        $dbeCustomerNote->setValue(DBECustomerNote::modifiedAt, (new DateTime())->format('d/m/Y H:i:s'));
 
         if ($customerNoteID) {
-            $sql .= " WHERE cno_customernoteno = $customerNoteID";
-        }
-
-        if ($this->db->real_query($sql) === false) {
-            echo($this->db->error);
-        }
-
-        if ($customerNoteID) {
+            $dbeCustomerNote->updateRow();
             return $this->getNote($customerID, false, 'this', $customerNoteID);
         } else {
+            $dbeCustomerNote->insertRow();
             return $this->getNote($customerID, false, 'last');
 
         }

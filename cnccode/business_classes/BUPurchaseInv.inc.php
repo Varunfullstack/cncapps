@@ -21,23 +21,55 @@ require_once($cfg ["path_dbe"] . "/DBEWarranty.inc.php");
 require_once($cfg ["path_bu"] . "/BUPurchaseOrder.inc.php");
 require_once($cfg ["path_bu"] . "/BURenewal.inc.php");
 require_once($cfg ["path_func"] . "/Common.inc.php");
+require_once($cfg ['path_dbe'] . '/DBEPurchaseInv.inc.php');
 
 class BUPurchaseInv extends Business
 {
-    var $dbePorhead = '';
-    var $dbePorline = '';
-    var $dbePurchaseInv = '';
-    var $dbeItem = '';
-    var $dbeStockcat = '';
-    var $purchaseInvoiceNo = '';
-    var $purchaseInvoiceDate = '';
-    var $buPurchaseOrder = '';
-    var $dbeCustomerItem = '';
-    var $userID = '';
+    const purchaseInvoiceDescription = "description";
+    const purchaseInvoiceSequenceNo = "sequenceNo";
+    const purchaseInvoiceOrderSequenceNo = "orderSequenceNo";
+    const purchaseInvoiceQtyOrdered = "qtyOrdered";
+    const purchaseInvoiceQtyOS = "qtyOS";
+    const purchaseInvoiceCurPOUnitCost = "curPOUnitCost";
+    const purchaseInvoiceQtyToInvoice = "qtyToInvoice";
+    const purchaseInvoiceCurInvUnitCost = "curInvUnitCost";
+    const purchaseInvoiceCurInvTotalCost = "curInvTotalCost";
+    const purchaseInvoiceCurVAT = "curVAT";
+    const purchaseInvoiceItemID = "itemID";
+    const purchaseInvoicePartNo = "partNo";
+    const purchaseInvoiceSerialNo = "serialNo";
+    const purchaseInvoiceRenew = "renew";
+    const purchaseInvoiceRequireSerialNo = "requireSerialNo";
+    const purchaseInvoiceCustomerItemID = "customerItemID";
+    const purchaseInvoiceWarrantyID = "warrantyID";
+    /** @var DBEPorhead */
+    public $dbePorhead;
+    /** @var DBEPorline */
+    public $dbePorline;
+    /** @var DBEPurchaseInv */
+    public $dbePurchaseInv;
+    /** @var DBEItem */
+    public $dbeItem;
+    /** @var DBEStockcat */
+    public $dbeStockcat;
+    public $purchaseInvoiceNo;
+    public $purchaseInvoiceDate;
+    public $buPurchaseOrder;
+    public $dbeCustomerItem;
+    public $userID;
+    /**
+     * @var DBEJPorline
+     */
+    private $dbeJPorline;
+    /**
+     * @var DBEJPorhead
+     */
+    private $dbeJPorhead;
 
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -51,25 +83,31 @@ class BUPurchaseInv extends Business
     /**
      * search for all rows other than authorised or supplier is an internal stock location
      * (Sales or Maint stock)
+     * @param $supplierID
+     * @param $porheadID
+     * @param $supplierRef
+     * @param $lineText
+     * @param DataSet $dsResults
+     * @return bool
      */
     function search($supplierID, $porheadID, $supplierRef, $lineText, &$dsResults)
     {
         $this->setMethodName('search');
         $dbeJPorhead = new DBEJPorhead ($this);
-        if ($porheadID != '') { // get one row
-            $dbeJPorhead->setValue('porheadID', $porheadID);
-            $dbeJPorhead->getPurchaseInvoiceRow($porheadID);
+        if ($porheadID) { // get one row
+            $dbeJPorhead->setValue(DBEJPorhead::porheadID, $porheadID);
+            $dbeJPorhead->getPurchaseInvoiceRow();
             $ret = ($this->getData($dbeJPorhead, $dsResults));
         } else {                                                                        // use search criteria passed
             $ret = $dbeJPorhead->getRowsBySearchCriteria(
                 trim($supplierID),
-                trim($ordheadID),
-                '',
+                null,
+                null,
                 trim($supplierRef),
                 trim($lineText),
-                '', //fromdate
-                '', //todate
-                '',
+                null,
+                null,
+                null,
                 'PI'
             );
             $dbeJPorhead->initialise();
@@ -78,6 +116,12 @@ class BUPurchaseInv extends Business
         return $ret;
     }
 
+    /**
+     * @param DataSet $dsPorhead
+     * @param DataSet $dsPorline
+     * @param DSForm $dsPurchaseInv
+     * @param $addCustomerItems
+     */
     function getInitialValues(&$dsPorhead, &$dsPorline, &$dsPurchaseInv, $addCustomerItems)
     {
         $this->initialiseDataset($dsPurchaseInv);
@@ -87,11 +131,13 @@ class BUPurchaseInv extends Business
 
         $dsPorline->initialise();
         while ($dsPorline->fetchNext()) {
-            $itemID = $dsPorline->getValue('itemID');
-            if ($dsPorhead->getValue('directDeliveryFlag') == 'Y') {
-                $qtyOS = $dsPorline->getValue('qtyOrdered') - $dsPorline->getValue('qtyReceived');
+            $itemID = $dsPorline->getValue(DBEJPorline::itemID);
+            if ($dsPorhead->getValue(DBEJPorhead::directDeliveryFlag) == 'Y') {
+                $qtyOS = $dsPorline->getValue(DBEJPorline::qtyOrdered) - $dsPorline->getValue(DBEJPorline::qtyReceived);
             } else {
-                $qtyOS = $dsPorline->getValue('qtyReceived') - $dsPorline->getValue('qtyInvoiced');
+                $qtyOS = $dsPorline->getValue(DBEJPorline::qtyReceived) - $dsPorline->getValue(
+                        DBEJPorline::qtyInvoiced
+                    );
             }
             // skip if nothing outstanding for this order line
             if ($qtyOS <= 0) {
@@ -102,53 +148,80 @@ class BUPurchaseInv extends Business
             if this item requires a serial number and
             this purchase order requires customer items adding
             and delivery method is direct (no goods inwards)
-            then put each item on a separate line and prompt for s/n and warrany
+            then put each item on a separate line and prompt for s/n and warranty
             */
             if (
-                ($dbeItem->getValue('serialNoFlag') == 'Y') &
-                ($dsPorhead->getValue('directDeliveryFlag') == 'Y') &
+                ($dbeItem->getValue(DBEItem::serialNoFlag) == 'Y') &
+                ($dsPorhead->getValue(DBEJPorhead::directDeliveryFlag) == 'Y') &
                 $addCustomerItems
             ) {                    // we split each item out onto a separate line
                 for ($i = 1; $i <= $qtyOS; $i++) {
                     $sequenceNo++;
                     $dsPurchaseInv->setUpdateModeInsert();
-                    $dsPurchaseInv->setValue('description', $dsPorline->getValue('itemDescription'));
-                    $dsPurchaseInv->setValue('orderSequenceNo', $dsPorline->getValue('sequenceNo')); // the PO sequence no
-                    $dsPurchaseInv->setValue('sequenceNo', $sequenceNo); // the line sequence no
-                    $dsPurchaseInv->setValue('qtyOrdered', 1);
-                    $dsPurchaseInv->setValue('qtyOS', 1); // not invoiced
-                    $dsPurchaseInv->setValue('curPOUnitCost', $dsPorline->getValue('curUnitCost')); // PO unit cost
-                    $dsPurchaseInv->setValue('qtyToInvoice', 0);
-                    $dsPurchaseInv->setValue('curInvUnitCost', $dsPorline->getValue('curUnitCost')); // Invoice cost
-                    $dsPurchaseInv->setValue('curInvTotalCost', 0); // Invoice cost
-                    $dsPurchaseInv->setValue('curVAT', 0); // VAT
-                    $dsPurchaseInv->setValue('itemID', $itemID);
-                    $dsPurchaseInv->setValue('partNo', $dsPorline->getValue('partNo'));
-                    $dsPurchaseInv->setValue('serialNo', '');
-                    $dsPurchaseInv->setValue('requireSerialNo', TRUE); // Prompt for SN and warranty
-                    $dsPurchaseInv->setValue('renew', FALSE);
-                    $dsPurchaseInv->setValue('warrantyID', $dbeItem->getValue('warrantyID'));;
+                    $dsPurchaseInv->setValue(
+                        self::purchaseInvoiceDescription,
+                        $dsPorline->getValue(DBEJPorline::itemDescription)
+                    );
+                    $dsPurchaseInv->setValue(
+                        self::purchaseInvoiceOrderSequenceNo,
+                        $dsPorline->getValue(DBEJPorline::sequenceNo)
+                    ); // the PO sequence no
+                    $dsPurchaseInv->setValue(self::purchaseInvoiceSequenceNo, $sequenceNo); // the line sequence no
+                    $dsPurchaseInv->setValue(self::purchaseInvoiceQtyOrdered, 1);
+                    $dsPurchaseInv->setValue(self::purchaseInvoiceQtyOS, 1); // not invoiced
+                    $dsPurchaseInv->setValue(
+                        self::purchaseInvoiceCurPOUnitCost,
+                        $dsPorline->getValue(DBEJPorline::curUnitCost)
+                    ); // PO unit cost
+                    $dsPurchaseInv->setValue(self::purchaseInvoiceQtyToInvoice, 0);
+                    $dsPurchaseInv->setValue(
+                        self::purchaseInvoiceCurInvUnitCost,
+                        $dsPorline->getValue(DBEJPorline::curUnitCost)
+                    ); // Invoice cost
+                    $dsPurchaseInv->setValue(self::purchaseInvoiceCurInvTotalCost, 0); // Invoice cost
+                    $dsPurchaseInv->setValue(self::purchaseInvoiceCurVAT, 0); // VAT
+                    $dsPurchaseInv->setValue(self::purchaseInvoiceItemID, $itemID);
+                    $dsPurchaseInv->setValue(self::purchaseInvoicePartNo, $dsPorline->getValue(DBEJPorline::partNo));
+                    $dsPurchaseInv->setValue(self::purchaseInvoiceSerialNo, '');
+                    $dsPurchaseInv->setValue(self::purchaseInvoiceRequireSerialNo, TRUE); // Prompt for SN and warranty
+                    $dsPurchaseInv->setValue(self::purchaseInvoiceRenew, FALSE);
+                    $dsPurchaseInv->setValue(self::purchaseInvoiceWarrantyID, $dbeItem->getValue(DBEItem::warrantyID));;
                     $dsPurchaseInv->post();
                 }
-            } else { // no serial no and waranty so lump all together on one line
+            } else { // no serial no and warranty so lump all together on one line
                 $sequenceNo++;
                 $dsPurchaseInv->setUpdateModeInsert();
-                $dsPurchaseInv->setValue('description', $dsPorline->getValue('itemDescription'));
-                $dsPurchaseInv->setValue('orderSequenceNo', $dsPorline->getValue('sequenceNo')); // the PO sequence no
-                $dsPurchaseInv->setValue('sequenceNo', $sequenceNo); // the line sequence no
-                $dsPurchaseInv->setValue('qtyOrdered', $dsPorline->getValue('qtyOrdered'));
-                $dsPurchaseInv->setValue('qtyOS', $qtyOS); // not invoiced
-                $dsPurchaseInv->setValue('curPOUnitCost', $dsPorline->getValue('curUnitCost')); // PO unit cost
-                $dsPurchaseInv->setValue('qtyToInvoice', 0);
-                $dsPurchaseInv->setValue('curInvUnitCost', $dsPorline->getValue('curUnitCost')); // Invoice cost
-                $dsPurchaseInv->setValue('curInvTotalCost', 0); // Invoice cost
-                $dsPurchaseInv->setValue('curVAT', 0); // VAT
-                $dsPurchaseInv->setValue('itemID', $itemID);
-                $dsPurchaseInv->setValue('partNo', $dsPorline->getValue('partNo'));
-                $dsPurchaseInv->setValue('serialNo', '');
-                $dsPurchaseInv->setValue('requireSerialNo', FALSE); // No SN or warranty
-                $dsPurchaseInv->setValue('renew', FALSE);
-                $dsPurchaseInv->setValue('warrantyID', '');
+                $dsPurchaseInv->setValue(
+                    self::purchaseInvoiceDescription,
+                    $dsPorline->getValue(DBEJPorline::itemDescription)
+                );
+                $dsPurchaseInv->setValue(
+                    self::purchaseInvoiceOrderSequenceNo,
+                    $dsPorline->getValue(DBEJPorline::sequenceNo)
+                ); // the PO sequence no
+                $dsPurchaseInv->setValue(self::purchaseInvoiceSequenceNo, $sequenceNo); // the line sequence no
+                $dsPurchaseInv->setValue(
+                    self::purchaseInvoiceQtyOrdered,
+                    $dsPorline->getValue(DBEJPorline::qtyOrdered)
+                );
+                $dsPurchaseInv->setValue(self::purchaseInvoiceQtyOS, $qtyOS); // not invoiced
+                $dsPurchaseInv->setValue(
+                    self::purchaseInvoiceCurPOUnitCost,
+                    $dsPorline->getValue(DBEJPorline::curUnitCost)
+                ); // PO unit cost
+                $dsPurchaseInv->setValue(self::purchaseInvoiceQtyToInvoice, 0);
+                $dsPurchaseInv->setValue(
+                    self::purchaseInvoiceCurInvUnitCost,
+                    $dsPorline->getValue(DBEJPorline::curUnitCost)
+                ); // Invoice cost
+                $dsPurchaseInv->setValue(self::purchaseInvoiceCurInvTotalCost, 0); // Invoice cost
+                $dsPurchaseInv->setValue(self::purchaseInvoiceCurVAT, 0); // VAT
+                $dsPurchaseInv->setValue(self::purchaseInvoiceItemID, $itemID);
+                $dsPurchaseInv->setValue(self::purchaseInvoicePartNo, $dsPorline->getValue(DBEJPorline::partNo));
+                $dsPurchaseInv->setValue(self::purchaseInvoiceSerialNo, '');
+                $dsPurchaseInv->setValue(self::purchaseInvoiceRequireSerialNo, FALSE); // No SN or warranty
+                $dsPurchaseInv->setValue(self::purchaseInvoiceRenew, FALSE);
+                $dsPurchaseInv->setValue(self::purchaseInvoiceWarrantyID, '');
                 $dsPurchaseInv->post();
             }
         }
@@ -158,33 +231,43 @@ class BUPurchaseInv extends Business
     {
         $this->setMethodName('initialiseDataset');
         $dsPurchaseInv = new DataSet ($this);
-        $dsPurchaseInv->addColumn('description', DA_STRING, DA_ALLOW_NULL);
-        $dsPurchaseInv->addColumn('sequenceNo', DA_INTEGER, DA_ALLOW_NULL); // the line seqence no
-        $dsPurchaseInv->addColumn('orderSequenceNo', DA_INTEGER, DA_ALLOW_NULL); // the PO sequence no
-        $dsPurchaseInv->addColumn('qtyOrdered', DA_INTEGER, DA_ALLOW_NULL);
-        $dsPurchaseInv->addColumn('qtyOS', DA_INTEGER, DA_ALLOW_NULL); // not invoiced
-        $dsPurchaseInv->addColumn('curPOUnitCost', DA_FLOAT, DA_ALLOW_NULL); // PO unit cost
-        $dsPurchaseInv->addColumn('curPOUnitCost', DA_FLOAT, DA_ALLOW_NULL); // PO unit cost
-        $dsPurchaseInv->addColumn('qtyToInvoice', DA_INTEGER, DA_ALLOW_NULL);
-        $dsPurchaseInv->addColumn('curInvUnitCost', DA_FLOAT, DA_ALLOW_NULL); // Invoice cost
-        $dsPurchaseInv->addColumn('curInvTotalCost', DA_FLOAT, DA_ALLOW_NULL); // Invoice cost
-        $dsPurchaseInv->addColumn('curVAT', DA_FLOAT, DA_ALLOW_NULL); // VAT amount
-        $dsPurchaseInv->addColumn('itemID', DA_ID, DA_ALLOW_NULL);
-        $dsPurchaseInv->addColumn('partNo', DA_INTEGER, DA_ALLOW_NULL);
-        $dsPurchaseInv->addColumn('serialNo', DA_STRING, DA_ALLOW_NULL);
-        $dsPurchaseInv->addColumn('renew', DA_INTEGER, DA_ALLOW_NULL);
-        $dsPurchaseInv->addColumn('requireSerialNo', DA_INTEGER, DA_ALLOW_NULL);
-        $dsPurchaseInv->addColumn('customerItemID', DA_ID, DA_ALLOW_NULL);
-        $dsPurchaseInv->addColumn('warrantyID', DA_INTEGER, DA_ALLOW_NULL);
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceDescription, DA_STRING, DA_ALLOW_NULL);
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceSequenceNo, DA_INTEGER, DA_ALLOW_NULL); // the line sequence no
+        $dsPurchaseInv->addColumn(
+            self::purchaseInvoiceOrderSequenceNo,
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        ); // the PO sequence no
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceQtyOrdered, DA_INTEGER, DA_ALLOW_NULL);
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceQtyOS, DA_INTEGER, DA_ALLOW_NULL); // not invoiced
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceCurPOUnitCost, DA_FLOAT, DA_ALLOW_NULL); // PO unit cost
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceCurPOUnitCost, DA_FLOAT, DA_ALLOW_NULL); // PO unit cost
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceQtyToInvoice, DA_INTEGER, DA_ALLOW_NULL);
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceCurInvUnitCost, DA_FLOAT, DA_ALLOW_NULL); // Invoice cost
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceCurInvTotalCost, DA_FLOAT, DA_ALLOW_NULL); // Invoice cost
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceCurVAT, DA_FLOAT, DA_ALLOW_NULL); // VAT amount
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceItemID, DA_ID, DA_ALLOW_NULL);
+        $dsPurchaseInv->addColumn(self::purchaseInvoicePartNo, DA_INTEGER, DA_ALLOW_NULL);
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceSerialNo, DA_STRING, DA_ALLOW_NULL);
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceRenew, DA_INTEGER, DA_ALLOW_NULL);
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceRequireSerialNo, DA_INTEGER, DA_ALLOW_NULL);
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceCustomerItemID, DA_ID, DA_ALLOW_NULL);
+        $dsPurchaseInv->addColumn(self::purchaseInvoiceWarrantyID, DA_INTEGER, DA_ALLOW_NULL);
     }
 
+    /**
+     * @param DataSet $dsPurchaseInv
+     * @return bool
+     */
     function validateQtys(&$dsPurchaseInv)
     {
         $this->setMethodName('validateQtys');
         $ret = TRUE;
         $dsPurchaseInv->initialise();
         while ($dsPurchaseInv->fetchNext()) {
-            if ($dsPurchaseInv->getValue('qtyOS') < $dsPurchaseInv->getValue('qtyToInvoice')) {
+            if ($dsPurchaseInv->getValue(self::purchaseInvoiceQtyOS) < $dsPurchaseInv->getValue(
+                    self::purchaseInvoiceQtyToInvoice
+                )) {
                 $ret = FALSE;
                 break;
             }
@@ -192,6 +275,10 @@ class BUPurchaseInv extends Business
         return $ret;
     }
 
+    /**
+     * @param DataSet $dsPurchaseInv
+     * @return bool
+     */
     function validatePrices(&$dsPurchaseInv)
     {
         $this->setMethodName('validatePrices');
@@ -199,15 +286,15 @@ class BUPurchaseInv extends Business
         $dsPurchaseInv->initialise();
         while ($dsPurchaseInv->fetchNext()) {
             if (
-                ($dsPurchaseInv->getValue('curInvUnitCost') > 99999) OR
-                ($dsPurchaseInv->getValue('curInvUnitCost') < 0)
+                ($dsPurchaseInv->getValue(self::purchaseInvoiceCurInvUnitCost) > 99999) OR
+                ($dsPurchaseInv->getValue(self::purchaseInvoiceCurInvUnitCost) < 0)
             ) {
                 $ret = FALSE;
                 break;
             }
             if (
-                ($dsPurchaseInv->getValue('curVAT') > 99999) OR
-                ($dsPurchaseInv->getValue('curVAT') < 0)
+                ($dsPurchaseInv->getValue(self::purchaseInvoiceCurVAT) > 99999) OR
+                ($dsPurchaseInv->getValue(self::purchaseInvoiceCurVAT) < 0)
             ) {
                 $ret = FALSE;
                 break;
@@ -216,6 +303,10 @@ class BUPurchaseInv extends Business
         return $ret;
     }
 
+    /**
+     * @param DataSet $dsPurchaseInv
+     * @return bool
+     */
     function validateSerialNos(&$dsPurchaseInv)
     {
         $this->setMethodName('validateSerialNos');
@@ -223,9 +314,9 @@ class BUPurchaseInv extends Business
         $dsPurchaseInv->initialise();
         while ($dsPurchaseInv->fetchNext()) {
             if (
-                ($dsPurchaseInv->getValue('qtyToInvoice') > 0) &
-                ($dsPurchaseInv->getValue('serialNo') == '') &
-                ($dsPurchaseInv->getValue('requireSerialNo'))
+                ($dsPurchaseInv->getValue(self::purchaseInvoiceQtyToInvoice) > 0) &
+                ($dsPurchaseInv->getValue(self::purchaseInvoiceSerialNo) == '') &
+                ($dsPurchaseInv->getValue(self::purchaseInvoiceRequireSerialNo))
             ) {
                 $ret = FALSE;
                 break;
@@ -234,6 +325,10 @@ class BUPurchaseInv extends Business
         return $ret;
     }
 
+    /**
+     * @param DataSet $dsPurchaseInv
+     * @return bool
+     */
     function validateWarranties(&$dsPurchaseInv)
     {
         $this->setMethodName('validateWarranties');
@@ -241,9 +336,9 @@ class BUPurchaseInv extends Business
         $dsPurchaseInv->initialise();
         while ($dsPurchaseInv->fetchNext()) {
             if (
-                ($dsPurchaseInv->getValue('qtyToInvoice') > 0) &
-                ($dsPurchaseInv->getValue('warrantyID') == '') &
-                ($dsPurchaseInv->getValue('requireSerialNo'))
+                ($dsPurchaseInv->getValue(self::purchaseInvoiceQtyToInvoice) > 0) &
+                ($dsPurchaseInv->getValue(self::purchaseInvoiceWarrantyID) == '') &
+                ($dsPurchaseInv->getValue(self::purchaseInvoiceRequireSerialNo))
             ) {
                 $ret = FALSE;
                 break;
@@ -254,65 +349,55 @@ class BUPurchaseInv extends Business
 
     /**
      * Validate that renewals have been created and minimum information has been entered
+     * @param DataSet|DBEOrdline $dsOrdline
+     * @return bool|string
      */
     function renewalsNotCompleted($dsOrdline)
     {
-
         $this->setMethodName('validateRenewals');
-
         $ret = false;
-
         $dbeItem = new DBEItem($this);
-
+        $buRenewal = new BURenewal($this);
         while ($dsOrdline->fetchNext()) {
-
-            $dbeItem->getRow($dsOrdline->getValue('itemID'));
-
-            if ($dbeItem->getValue('renewalTypeID') > 0) {
-
-                if (!$dsOrdline->getValue('renewalCustomerItemID')) {
-
+            $dbeItem->getRow($dsOrdline->getValue(DBEJOrdline::itemID));
+            if ($dbeItem->getValue(DBEItem::renewalTypeID) > 0) {
+                if (!$dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID)) {
                     $ret = 'You have not created all of the renewals';
-
                 } else {
-                    if (!$buRenewal) {
+                    $buRenewalObject = $buRenewal->getRenewalBusinessObject(
+                        $dbeItem->getValue(DBEItem::renewalTypeID),
+                        $page
+                    );
 
-                        $buRenewal = new BURenewal($this);
-
-                    }
-                    $buRenewalObject =
-                        $buRenewal->getRenewalBusinessObject(
-                            $dbeItem->getValue('renewalTypeID'),
-                            $page
-                        );
-
-                    if (!$buRenewalObject->isCompleted($dsOrdline->getValue('renewalCustomerItemID'))) {
-
+                    if (!$buRenewalObject->isCompleted($dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID))) {
                         $ret = 'You have not completed all of the renewal information required';
-
-
                     }
-
                 } // end else
-
             } // end if is a renewal line
-
         }
-
         return $ret;
     }
 
+    /**
+     * @param $purchaseInvoiceNo
+     * @param $porheadID
+     * @return bool
+     */
     function invoiceNoIsUnique($purchaseInvoiceNo, $porheadID)
     {
         $this->setMethodName('invoiceNoIsUnique');
         $this->buPurchaseOrder = new BUPurchaseOrder ($this);
+        $dsPorhead = new DataSet($this);
         $this->buPurchaseOrder->getHeaderByID(
             $porheadID,
             $dsPorhead
         );
-        require_once($GLOBALS ['cfg'] ['path_dbe'] . '/DBEPurchaseInv.inc.php');
+
         $dbePurchaseInv = new DBEPurchaseInv ($this);
-        return $dbePurchaseInv->countRowsBySupplierInvNo($dsPorhead->getValue('supplierID'), $purchaseInvoiceNo) == 0;
+        return $dbePurchaseInv->countRowsBySupplierInvNo(
+                $dsPorhead->getValue(DBEJPorhead::supplierID),
+                $purchaseInvoiceNo
+            ) == 0;
     }
 
     /**
@@ -324,8 +409,11 @@ class BUPurchaseInv extends Business
      * method selected (direct, hand, etc). Because we are creating customer items at goods in we
      * don't have some of the info to hand.
      *
-     * @param Integer porheadID purchase order number
-     * @param Dataset $dsGoodsIn Dataset of recieved items
+     * @param $porheadID
+     * @param $purchaseInvoiceNo
+     * @param $purchaseInvoiceDate
+     * @param DSForm $dsPurchaseInv
+     * @param $userID
      */
     function update($porheadID, $purchaseInvoiceNo, $purchaseInvoiceDate, &$dsPurchaseInv, $userID)
     {
@@ -334,13 +422,15 @@ class BUPurchaseInv extends Business
         $this->purchaseInvoiceNo = $purchaseInvoiceNo;
         $this->purchaseInvoiceDate = $purchaseInvoiceDate;
         $this->buPurchaseOrder = new BUPurchaseOrder ($this);
+        $dsPorhead = new DataSet($this);
         $this->buPurchaseOrder->getHeaderByID($porheadID, $dsPorhead);
         $this->dbeItem = new DBEItem ($this);
         $this->dbeStockcat = new DBEStockcat ($this);
         $this->dbePurchaseInv = new DBEPurchaseInv ($this);
-        $ordheadID = $dsPorhead->getValue('ordheadID');
-        if ($ordheadID != 0) {
-            $buSalesOrder = new BUSalesOrder ($this);
+        $dsOrdhead = new DataSet($this);
+        $ordheadID = $dsPorhead->getValue(DBEJPorhead::ordheadID);
+        $buSalesOrder = new BUSalesOrder ($this);
+        if ($ordheadID) {
             $buSalesOrder->getOrderByOrdheadID($ordheadID, $dsOrdhead, $dsOrdline);
         }
         $this->dbePorline = new DBEPorline ($this);
@@ -351,16 +441,20 @@ class BUPurchaseInv extends Business
         */
         $dsPurchaseInv->initialise();
         while ($dsPurchaseInv->fetchNext()) {
-            if ($dsPurchaseInv->getValue('qtyToInvoice') <= 0) {
+            if ($dsPurchaseInv->getValue(self::purchaseInvoiceQtyToInvoice) <= 0) {
                 continue;
             }
             $this->postPurchaseInvoiceLine($dsPurchaseInv, $dsPorhead, $dsOrdhead);
-            $this->updateOrderLineQtys($porheadID, $dsPurchaseInv, $dsPorhead->getValue('directDeliveryFlag'));
+            $this->updateOrderLineQtys(
+                $porheadID,
+                $dsPurchaseInv,
+                $dsPorhead->getValue(DBEJPorhead::directDeliveryFlag)
+            );
             // Unlike in the UNIX system, stock levels don't get updated BUT customer items need to be generated
             // if direct delivery and the requireSerialNo is TRUE
             if (
-                ($dsPorhead->getValue('directDeliveryFlag') == 'Y') &
-                ($dsPurchaseInv->getValue('requireSerialNo') == TRUE)
+                ($dsPorhead->getValue(DBEJPorhead::directDeliveryFlag) == 'Y') &
+                ($dsPurchaseInv->getValue(self::purchaseInvoiceRequireSerialNo) == TRUE)
             ) {
                 $this->createCustomerItem($dsPurchaseInv, $dsPorhead, $dsOrdhead);
             }
@@ -370,40 +464,58 @@ class BUPurchaseInv extends Business
         // if all purchase orders for this sales order are now authorised and sales order status is initial...
         if (
             ($this->dbePorhead->countNonAuthorisedRowsBySO($ordheadID) == 0) &
-            ($dsOrdhead->getValue('type') == 'I')
+            ($dsOrdhead->getValue(DBEJOrdhead::type) == 'I')
         ) {
             // if delivery is NOT an internal stock location
-            if (!common_isAnInternalStockLocation($dsOrdhead->getValue('customerID'))) {
+            if (!common_isAnInternalStockLocation($dsOrdhead->getValue(DBEJOrdhead::customerID))) {
                 // if all purchase orders for this sales order are direct delivery then create invoices and set sales order status to completed
                 if ($this->dbePorhead->countNonDirectRowsBySO($ordheadID) == 0) {
                     $dbePaymentTerms = new DBEPaymentTerms ($this);
-                    $dbePaymentTerms->getRow($dsOrdhead->getValue('paymentTermsID'));
-                    if ($dbePaymentTerms->getValue('automaticInvoiceFlag') == 'Y') {
+                    $dbePaymentTerms->getRow($dsOrdhead->getValue(DBEJOrdhead::paymentTermsID));
+                    if ($dbePaymentTerms->getValue(DBEPaymentTerms::automaticInvoiceFlag) == 'Y') {
                         $buInvoice = new BUInvoice ($this);
                         $buInvoice->createInvoiceFromOrder($dsOrdhead, $dsOrdline);
                         $buSalesOrder->setStatusCompleted($ordheadID);
                     }
                 }
             } else {
-                $buSalesOrder->setStatusCompleted($ordheadID); // delivery to internal stock location so no invoices were created
+                $buSalesOrder->setStatusCompleted(
+                    $ordheadID
+                ); // delivery to internal stock location so no invoices were created
             }
         }
     }
 
     /**
-     * Update the puchase order line qty invoiced and qty received, if direct delivery
+     * Update the purchase order line qty invoiced and qty received, if direct delivery
+     * @param $porheadID
+     * @param DSForm $dsPurchaseInv
+     * @param $directDeliveryFlag
      */
-    function updateOrderLineQtys($porheadID, &$dsPurchaseInv, $directDeliveryFlag)
+    public function updateOrderLineQtys($porheadID, &$dsPurchaseInv, $directDeliveryFlag)
     {
 
         // update qtys on porline
-        $this->dbePorline->setValue('porheadID', $porheadID);
-        $this->dbePorline->setValue('sequenceNo', $dsPurchaseInv->getValue('orderSequenceNo'));
+        $this->dbePorline->setValue(DBEJPorline::porheadID, $porheadID);
+        $this->dbePorline->setValue(
+            DBEJPorline::sequenceNo,
+            $dsPurchaseInv->getValue(self::purchaseInvoiceOrderSequenceNo)
+        );
         $this->dbePorline->getRow();
-        $this->dbePorline->setValue('qtyInvoiced', $this->dbePorline->getValue('qtyInvoiced') + $dsPurchaseInv->getValue('qtyToInvoice'));
+        $this->dbePorline->setValue(
+            DBEJPorline::qtyInvoiced,
+            $this->dbePorline->getValue(DBEJPorline::qtyInvoiced) + $dsPurchaseInv->getValue(
+                self::purchaseInvoiceQtyToInvoice
+            )
+        );
         // we update the received qty here for Direct Delivery because there is no goods in process to do it for us
         if ($directDeliveryFlag == 'Y') {
-            $this->dbePorline->setValue('qtyReceived', $this->dbePorline->getValue('qtyReceived') + $dsPurchaseInv->getValue('qtyToInvoice'));
+            $this->dbePorline->setValue(
+                DBEJPorline::qtyReceived,
+                $this->dbePorline->getValue(DBEJPorline::qtyReceived) + $dsPurchaseInv->getValue(
+                    self::purchaseInvoiceQtyToInvoice
+                )
+            );
         }
         $this->dbePorline->updateRow();
     }
@@ -413,68 +525,90 @@ class BUPurchaseInv extends Business
         // update status on purchase order header
         $dbePorhead = &$this->dbePorhead;
         $dbePorlineTotals = new DBEPorlineTotals ($this);
-        $dbePorlineTotals->setValue('porheadID', $porheadID);
-        $dbePorlineTotals->getRow();
-        $qtyOrd = $dbePorlineTotals->getValue('qtyOrdered');
-        $qtyRec = $dbePorlineTotals->getValue('qtyReceived');
-        $qtyInv = $dbePorlineTotals->getValue('qtyInvoiced');
+        $dbePorlineTotals->getRow($porheadID);
+        $qtyOrd = $dbePorlineTotals->getValue(DBEPorlineTotals::qtyOrdered);
+        $qtyRec = $dbePorlineTotals->getValue(DBEPorlineTotals::qtyReceived);
+        $qtyInv = $dbePorlineTotals->getValue(DBEPorlineTotals::qtyInvoiced);
 
         $dbePorhead->getRow($porheadID);
 
         if ($qtyRec == 0) {
-            $dbePorhead->setValue('type', 'I');
+            $dbePorhead->setValue(DBEJPorhead::type, 'I');
         } elseif ($qtyOrd - $qtyRec > 0) {
-            $dbePorhead->setValue('type', 'P');
+            $dbePorhead->setValue(DBEJPorhead::type, 'P');
         } elseif ($qtyRec - $qtyInv == 0) {
-            $dbePorhead->setValue('type', 'A');
+            $dbePorhead->setValue(DBEJPorhead::type, 'A');
         } elseif ($qtyOrd - $qtyRec == 0) {
-            $dbePorhead->setValue('type', 'C');
+            $dbePorhead->setValue(DBEJPorhead::type, 'C');
         }
-        if ($dbePorhead->getValue('type') != 'I') { // no need to update if already Initial
+        if ($dbePorhead->getValue(DBEJPorhead::type) != 'I') { // no need to update if already Initial
             $dbePorhead->updateRow();
         }
     }
 
+    /**
+     * @param DataSet $dsPurchaseInv
+     * @param DataSet $dsPorhead
+     * @param DataSet $dsOrdhead
+     */
     function postPurchaseInvoiceLine(&$dsPurchaseInv, &$dsPorhead, &$dsOrdhead)
     {
-        $this->dbeItem->getRow($dsPurchaseInv->getValue('itemID'));
-        $this->dbeStockcat->getRow($this->dbeItem->getValue('stockcat'));
+        $this->dbeItem->getRow($dsPurchaseInv->getValue(self::purchaseInvoiceItemID));
+        $this->dbeStockcat->getRow($this->dbeItem->getValue(DBEItem::stockcat));
         /*
         Depending upon the sales order customerID, see whether the item is
         being purchased for an internal stock location or for a customer
         */
-        switch ($dsOrdhead->getValue('customerID')) {
+        switch ($dsOrdhead->getValue(DBEJOrdhead::customerID)) {
             case CONFIG_MAINT_STOCK_CUSTOMERID :
-                $nominalCode = $this->dbeStockcat->getValue('purMaintStk');
+                $nominalCode = $this->dbeStockcat->getValue(DBEStockcat::purMaintStk);
                 break;
             case CONFIG_SALES_STOCK_CUSTOMERID :
-                $nominalCode = $this->dbeStockcat->getValue('purSalesStk');
+                $nominalCode = $this->dbeStockcat->getValue(DBEStockcat::purSalesStk);
                 break;
             case CONFIG_ASSET_STOCK_CUSTOMERID :
-                $nominalCode = $this->dbeStockcat->getValue('purAsset');
+                $nominalCode = $this->dbeStockcat->getValue(DBEStockcat::purAsset);
                 break;
             case CONFIG_OPERATING_STOCK_CUSTOMERID :
-                $nominalCode = $this->dbeStockcat->getValue('purOper');
+                $nominalCode = $this->dbeStockcat->getValue(DBEStockcat::purOper);
                 break;
             default :
-                $nominalCode = $this->dbeStockcat->getValue('purCust'); // purchased for a customer
+                $nominalCode = $this->dbeStockcat->getValue(DBEStockcat::purCust); // purchased for a customer
                 break;
         }
-        $this->dbePurchaseInv->setValue('type', 'PI');
-        $this->dbePurchaseInv->setValue('date', $this->purchaseInvoiceDate);
-        $this->dbePurchaseInv->setValue('ref', $this->purchaseInvoiceNo);
-        $this->dbePurchaseInv->setValue('accRef', $dsPorhead->getValue('supplierID'));
-        $this->dbePurchaseInv->setValue('nomRef', $nominalCode);
-        $this->dbePurchaseInv->setValue('dept', '0');
-        $this->dbePurchaseInv->setValue('details', 'P' . str_pad($dsPorhead->getValue('porheadID'), 6, '0', STR_PAD_LEFT));
-        $netAmnt = $dsPurchaseInv->getValue('qtyToInvoice') * $dsPurchaseInv->getValue('curInvUnitCost');
-        $this->dbePurchaseInv->setValue('netAmnt', $netAmnt);
-        $this->dbePurchaseInv->setValue('taxCode', $dsPorhead->getValue('vatCode'));
-        $this->dbePurchaseInv->setValue('taxAmnt', $dsPurchaseInv->getValue('curVAT'));
-        $this->dbePurchaseInv->setValue('printed', 'N');
+        $this->dbePurchaseInv->setValue(DBEPurchaseInv::type, 'PI');
+        $this->dbePurchaseInv->setValue(DBEPurchaseInv::date, $this->purchaseInvoiceDate);
+        $this->dbePurchaseInv->setValue(DBEPurchaseInv::ref, $this->purchaseInvoiceNo);
+        $this->dbePurchaseInv->setValue(DBEPurchaseInv::accRef, $dsPorhead->getValue(DBEJPorhead::supplierID));
+        $this->dbePurchaseInv->setValue(DBEPurchaseInv::nomRef, $nominalCode);
+        $this->dbePurchaseInv->setValue(DBEPurchaseInv::dept, '0');
+        $this->dbePurchaseInv->setValue(
+            DBEPurchaseInv::details,
+            'P' . str_pad(
+                $dsPorhead->getValue(DBEJPorhead::porheadID),
+                6,
+                '0',
+                STR_PAD_LEFT
+            )
+        );
+        $netAmnt = $dsPurchaseInv->getValue(self::purchaseInvoiceQtyToInvoice) * $dsPurchaseInv->getValue(
+                self::purchaseInvoiceCurInvUnitCost
+            );
+        $this->dbePurchaseInv->setValue(DBEPurchaseInv::netAmnt, $netAmnt);
+        $this->dbePurchaseInv->setValue(DBEPurchaseInv::taxCode, $dsPorhead->getValue(DBEJPorhead::vatCode));
+        $this->dbePurchaseInv->setValue(
+            DBEPurchaseInv::taxAmnt,
+            $dsPurchaseInv->getValue(self::purchaseInvoiceCurVAT)
+        );
+        $this->dbePurchaseInv->setValue(DBEPurchaseInv::printed, 'N');
         $this->dbePurchaseInv->insertRow();
     }
 
+    /**
+     * @param DataSet $dsPurchaseInv
+     * @param DataSet $dsPorhead
+     * @param DataSet $dsOrdhead
+     */
     function createCustomerItem(&$dsPurchaseInv, &$dsPorhead, &$dsOrdhead)
     {
         $this->setMethodName('createCustomerItem');
@@ -482,34 +616,34 @@ class BUPurchaseInv extends Business
             $this->dbeCustomerItem = new DBECustomerItem ($this);
         }
         $dbeCustomerItem = &$this->dbeCustomerItem; // easy to use ref!
-        $dbeCustomerItem->setValue('customerItemID', 0);
-        $dbeCustomerItem->setValue('customerID', $dsOrdhead->getValue('customerID'));
-        $dbeCustomerItem->setValue('siteNo', $dsOrdhead->getValue('delSiteNo'));
-        $dbeCustomerItem->setValue('itemID', $dsPurchaseInv->getValue('itemID'));
-        $dbeCustomerItem->setValue('userID', $this->userID);
-        $dbeCustomerItem->setValue('despatchDate', date('Y-m-d'));
-        $dbeCustomerItem->setValue('ordheadID', $dsPorhead->getValue('ordheadID'));
-        $dbeCustomerItem->setValue('porheadID', $dsPorhead->getValue('porheadID'));
-        $dbeCustomerItem->setValue('sOrderDate', $dsOrdhead->getValue('date'));
-        $dbeCustomerItem->setValue('curUnitSale', ''); // redundant I think
-        $dbeCustomerItem->setValue('curUnitCost', ''); // redundant
-        $stockcat = $this->dbeItem->getValue('stockcat');
+        $dbeCustomerItem->setValue(DBEJCustomerItem::customerItemID, 0);
+        $dbeCustomerItem->setValue(DBEJCustomerItem::customerID, $dsOrdhead->getValue(DBEJOrdhead::customerID));
+        $dbeCustomerItem->setValue(DBEJCustomerItem::siteNo, $dsOrdhead->getValue(DBEJOrdhead::delSiteNo));
+        $dbeCustomerItem->setValue(DBEJCustomerItem::itemID, $dsPurchaseInv->getValue(self::purchaseInvoiceItemID));
+        $dbeCustomerItem->setValue(DBEJCustomerItem::userID, $this->userID);
+        $dbeCustomerItem->setValue(DBEJCustomerItem::despatchDate, date('Y-m-d'));
+        $dbeCustomerItem->setValue(DBEJCustomerItem::ordheadID, $dsPorhead->getValue(DBEJPorhead::ordheadID));
+        $dbeCustomerItem->setValue(DBEJCustomerItem::porheadID, $dsPorhead->getValue(DBEJPorhead::porheadID));
+        $dbeCustomerItem->setValue(DBEJCustomerItem::sOrderDate, $dsOrdhead->getValue(DBEJOrdhead::date));
+        $dbeCustomerItem->setValue(DBEJCustomerItem::curUnitSale, ''); // redundant I think
+        $dbeCustomerItem->setValue(DBEJCustomerItem::curUnitCost, ''); // redundant
+        $stockcat = $this->dbeItem->getValue(DBEItem::stockcat);
         if (($stockcat == 'M') or ($stockcat == 'R')) {
-            $dbeCustomerItem->setValue('expiryDate', date('Y-m-d', strtotime('+ 1 year')));
-        } else if ($dsPurchaseInv->getValue('renew') == TRUE) {
+            $dbeCustomerItem->setValue(DBEJCustomerItem::expiryDate, date('Y-m-d', strtotime('+ 1 year')));
+        } else if ($dsPurchaseInv->getValue(self::purchaseInvoiceRenew) == TRUE) {
             // bug 245: Add warranty years to current date to calculate expiry date.
             $dbeWarranty = new DBEWarranty ($this);
-            $dbeWarranty->getRow($dsPurchaseInv->getValue('warrantyID'));
-            $dbeCustomerItem->setValue('expiryDate', date('Y-m-d', strtotime('+ ' . $dbeWarranty->getValue('years') . ' year')));
+            $dbeWarranty->getRow($dsPurchaseInv->getValue(self::purchaseInvoiceWarrantyID));
+            $dbeCustomerItem->setValue(
+                DBEJCustomerItem::expiryDate,
+                date('Y-m-d', strtotime('+ ' . $dbeWarranty->getValue(DBEWarranty::years) . ' year'))
+            );
         }
-        $dbeCustomerItem->setValue('warrantyID', $dsPurchaseInv->getValue('warrantyID'));
-        $dbeCustomerItem->setValue('serialNo', $dsPurchaseInv->getValue('serialNo'));
-        /*
-        @todo: update for many-to-many
-
-            $dbeCustomerItem->setValue ( 'contractID', null );
-        */
+        $dbeCustomerItem->setValue(
+            DBEJCustomerItem::warrantyID,
+            $dsPurchaseInv->getValue(self::purchaseInvoiceWarrantyID)
+        );
+        $dbeCustomerItem->setValue(DBEJCustomerItem::serialNo, $dsPurchaseInv->getValue(self::purchaseInvoiceSerialNo));
         $dbeCustomerItem->insertRow();
     }
-} // End of class
-?>
+}

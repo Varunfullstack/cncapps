@@ -11,6 +11,9 @@ require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 class BUIncidentAnalysisReport extends Business
 {
 
+    const searchFormFromDate = "fromDate";
+    const searchFormToDate = "toDate";
+
     function __construct(&$owner)
     {
         parent::__construct($owner);
@@ -19,14 +22,18 @@ class BUIncidentAnalysisReport extends Business
     function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);
-        $dsData->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
-        $dsData->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
+        $dsData->addColumn(self::searchFormFromDate, DA_DATE, DA_ALLOW_NULL);
+        $dsData->addColumn(self::searchFormToDate, DA_DATE, DA_ALLOW_NULL);
     }
 
+    /**
+     * @param DSForm $dsSearchForm
+     * @return bool|mysqli_result
+     */
     function search($dsSearchForm)
     {
-        $fromDate = $dsSearchForm->getValue('fromDate');
-        $toDate = $dsSearchForm->getValue('toDate');
+        $fromDate = $dsSearchForm->getValue(self::searchFormFromDate);
+        $toDate = $dsSearchForm->getValue(self::searchFormToDate);
 
         $sql =
             "SELECT 
@@ -45,5 +52,4 @@ class BUIncidentAnalysisReport extends Business
         return $this->db->query($sql);
     }
 
-}//End of class
-?>
+}

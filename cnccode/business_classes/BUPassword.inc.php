@@ -4,14 +4,18 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Encryption;
+
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEPassword.inc.php");
 
 
 class BUPassword extends Business
 {
+    const searchFormCustomerID = 'customerID';
+    /** @var DBEPassword */
     public $dbePassword;
-    public $dbeBasePassword;
 
     /**
      * Constructor
@@ -47,8 +51,7 @@ class BUPassword extends Business
 
     function getRowsByCustomerIDAndPasswordLevel($customerID,
                                                  $passwordLevel,
-                                                 &$dsResults,
-                                                 $orderBy = false
+                                                 &$dsResults
     )
     {
         $this->dbePassword->getRowsByCustomerIDAndPasswordLevel(
@@ -91,36 +94,28 @@ class BUPassword extends Business
     {
         $dsData = new DSForm($this);
         $dsData->addColumn(
-            'customerID',
+            self::searchFormCustomerID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->setValue(
-            'customerID',
-            ''
+            self::searchFormCustomerID,
+            null
         );
     }
 
-    public function getArchivedRowsByPasswordLevel($passwordLevel,
-                                                   $dsResults
-    )
-    {
-        $this->dbePassword->getArchivedRowsByPasswordLevel(
-            $passwordLevel
-        );
-        return ($this->getData(
-            $this->dbePassword,
-            $dsResults
-        ));
-    }
-
+    /**
+     * @param $data
+     * @return mixed|null
+     * @throws Exception
+     */
     public function decrypt($data)
     {
         if (!$data) {
             return null;
         }
 
-        return \CNCLTD\Encryption::decrypt(
+        return Encryption::decrypt(
             PASSWORD_ENCRYPTION_PRIVATE_KEY,
             PASSWORD_PASSPHRASE,
             $data
@@ -133,7 +128,7 @@ class BUPassword extends Business
             return null;
         }
 
-        return \CNCLTD\Encryption::encrypt(
+        return Encryption::encrypt(
             PASSWORD_ENCRYPTION_PUBLIC_KEY,
             $data
         );

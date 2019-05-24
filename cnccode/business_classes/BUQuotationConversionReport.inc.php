@@ -10,6 +10,11 @@ require_once($cfg ["path_gc"] . "/Business.inc.php");
 class BUQuotationConversionReport extends Business
 {
 
+    const searchFormCustomerID = "customerID";
+    const searchFormFromDate = "fromDate";
+    const searchFormToDate = "toDate";
+
+
     public function __construct(&$owner)
     {
         parent::__construct($owner);
@@ -18,33 +23,27 @@ class BUQuotationConversionReport extends Business
     function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);
-        $dsData->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
-        $dsData->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
-        $dsData->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
-        $dsData->setValue('customerID', '');
+        $dsData->addColumn(self::searchFormCustomerID, DA_STRING, DA_ALLOW_NULL);
+        $dsData->addColumn(self::searchFormFromDate, DA_DATE, DA_ALLOW_NULL);
+        $dsData->addColumn(self::searchFormToDate, DA_DATE, DA_ALLOW_NULL);
+        $dsData->setValue(self::searchFormCustomerID, null);
     }
 
     public function getConversionData($fromDate, $toDate, $customerID)
     {
         $db = $GLOBALS['db'];
 
+        $fromDateSql = ' 1=1';
         if ($fromDate) {
             $fromDateSql = " `quote`.odh_quotation_create_date >= '$fromDate'";
-        } else {
-            $fromDateSql = ' 1=1';
         }
-
+        $toDateSql = null;
         if ($toDate) {
             $toDateSql = " AND `quote`.odh_quotation_create_date <= '$toDate'";
-        } else {
-            $toDateSql = '';
         }
-
+        $customerIDSql = null;
         if ($customerID) {
             $customerIDSql = " AND odh_custno = $customerID";
-        } else {
-            $customerIDSql = "";
-
         }
         $sql =
             "SELECT 
@@ -69,10 +68,7 @@ class BUQuotationConversionReport extends Business
         GROUP BY
         YEAR(odh_quotation_create_date),
         MONTH(odh_quotation_create_date)
-
-
         UNION ALL
-        
         SELECT 
           YEAR(`quote`.odh_quotation_create_date) AS YEAR,
           MONTH(`quote`.odh_quotation_create_date) AS MONTH,
@@ -84,7 +80,6 @@ class BUQuotationConversionReport extends Business
           $fromDateSql
           $toDateSql
           $customerIDSql
-           
         GROUP BY
         YEAR(`quote`.odh_quotation_create_date),
         MONTH(`quote`.odh_quotation_create_date)
@@ -100,28 +95,4 @@ class BUQuotationConversionReport extends Business
         }
         return $ret;
     }
-
-    private function getTotalQuotes($year, $month, $customerID)
-    {
-        $db = $GLOBALS['db'];
-
-        $sql =
-            "SELECT
-        COUNT(*) as count
-      FROM
-        ordhead
-      WHERE
-        odh_type = 'Q'
-        AND YEAR( odh_date ) = $year
-        AND MONTH ( odh_date ) = $month";
-
-        if ($customerID) {
-            $sql .= " AND odh_custno = $customerID";
-        }
-
-        $db->query($sql);
-        $db->next_record();
-        return $db->Record['count'];
-    }
-} // End of class
-?>
+}

@@ -11,7 +11,7 @@ require_once("config.inc.php");
 
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 
-
+$thing = null;
 define('EMAIL_FROM_USER', 'sales@cnc-ltd.co.uk');
 define('EMAIL_SUBJECT', 'Outlook address file');
 define('FORMAT_MYSQL_UK_DATE', '%e/%c/%Y');
@@ -162,7 +162,7 @@ while ($row = mysqli_fetch_assoc($result)) // Data
 
 }
 
-$buMail = new BUMail($this);
+$buMail = new BUMail($thing);
 
 $buMail->mime->setHTMLBody($html);
 
@@ -188,8 +188,7 @@ $result = $buMail->putInQueue(
     CONFIG_SALES_EMAIL,
     CONFIG_SALES_EMAIL,
     $hdrs,
-    $body,
-    false
+    $body
 );
 header('Location:/index.php');
 ?>

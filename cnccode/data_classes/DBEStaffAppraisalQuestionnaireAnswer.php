@@ -26,8 +26,8 @@ class DBEStaffAppraisalQuestionnaireAnswer extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -62,14 +62,18 @@ class DBEStaffAppraisalQuestionnaireAnswer extends DBEntity
         );
         $this->addColumn(
             self::staffCompleted,
-            DA_INTEGER,
-            DA_NOT_NULL
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
         );
 
         $this->addColumn(
             self::managerCompleted,
-            DA_INTEGER,
-            DA_NOT_NULL
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
         );
 
         $this->addColumn(

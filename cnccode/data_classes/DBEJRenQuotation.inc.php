@@ -110,7 +110,7 @@ class DBEJRenQuotation extends DBECustomerItem
             "
       UPDATE " . $this->getTableName() .
             " SET startDate = DATE_ADD( `startDate`, INTERVAL 1 YEAR ),
-      dateGenerated = '0000-00-00'
+      dateGenerated = null
         WHERE cui_cuino = $customerItemID;";
 
         $this->setQueryString($statement);
@@ -182,7 +182,8 @@ class DBEJRenQuotation extends DBECustomerItem
         $ret = (parent::getRows());
     }
 
-    function getRowsBySalesOrderID($salesOrderID){
+    function getRowsBySalesOrderID($salesOrderID)
+    {
         $statement =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
@@ -220,7 +221,7 @@ class DBEJRenQuotation extends DBECustomerItem
 			JOIN renQuotationType ON  renQuotationType.renQuotationTypeID = custitem.renQuotationTypeID
 			WHERE
         CURDATE() >= ( DATE_ADD(`startDate`, INTERVAL 11 MONTH) )
-			  AND dateGenerated = '0000-00-00' AND dateGenerated IS NOT NULL
+			  AND dateGenerated IS NULL
 		    AND declinedFlag = 'N'
         AND renewalTypeID = 3 and directDebitFlag <> 'Y'
 		 ORDER BY cui_custno,  custitem.renQuotationTypeID";

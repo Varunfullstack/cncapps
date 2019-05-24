@@ -63,8 +63,7 @@ class BUImportRequests extends Business
             echo '<br>';
             $errorString = '';
             if ($this->processMessage(
-                $automatedRequest,
-                $errorString
+                $automatedRequest
             )) {      // error string returned
                 echo $automatedRequest->getAutomatedRequestID() . " processed successfully<BR/>";
 
@@ -101,14 +100,14 @@ class BUImportRequests extends Business
 
     }
 
-    protected function processMessage($record,
-                                      &$errorString
-    )
+    /**
+     * @param $record
+     * @return bool|mixed
+     * @throws Exception
+     */
+    protected function processMessage($record)
     {
-        return $this->buActivity->processAutomaticRequest(
-            $record,
-            $errorString
-        );
+        return $this->buActivity->processAutomaticRequest($record);
     }
 
     function sendFailureEmail($sender,

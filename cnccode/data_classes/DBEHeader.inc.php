@@ -50,7 +50,6 @@ class DBEHeader extends DBEntity
     const mailshot9FlagDesc = "mailshot9FlagDesc";
     const mailshot10FlagDesc = "mailshot10FlagDesc";
     const mailshot11FlagDesc = "mailshot11FlagDesc";
-    const helpDeskProblems = "helpDeskProblems";
     const hourlyLabourCost = "hourlyLabourCost";
     const highActivityAlertCount = "highActivityAlertCount";
     const priority1Desc = "priority1Desc";
@@ -264,31 +263,31 @@ class DBEHeader extends DBEntity
         );
         $this->addColumn(
             self::mailshot2FlagDesc,
-            DA_YN,
+            DA_TEXT,
             DA_NOT_NULL,
             "hed_mailflg2_desc"
         );
         $this->addColumn(
             self::mailshot3FlagDesc,
-            DA_YN,
+            DA_TEXT,
             DA_NOT_NULL,
             "hed_mailflg3_desc"
         );
         $this->addColumn(
             self::mailshot4FlagDesc,
-            DA_YN,
+            DA_STRING,
             DA_NOT_NULL,
             "hed_mailflg4_desc"
         );
         $this->addColumn(
             self::mailshot8FlagDesc,
-            DA_YN,
+            DA_STRING,
             DA_NOT_NULL,
             "hed_mailflg8_desc"
         );
         $this->addColumn(
             self::mailshot9FlagDesc,
-            DA_YN,
+            DA_STRING,
             DA_NOT_NULL,
             "hed_mailflg9_desc"
         );
@@ -297,12 +296,6 @@ class DBEHeader extends DBEntity
             DA_STRING,
             DA_NOT_NULL,
             "hed_mailflg11_desc"
-        );
-        $this->addColumn(
-            self::helpDeskProblems,
-            DA_MEMO,
-            DA_NOT_NULL,
-            "hed_helpdesk_problems"
         );
         $this->addColumn(
             self::hourlyLabourCost,

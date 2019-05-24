@@ -7,11 +7,25 @@ require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class DBEJCustomerItem extends DBECustomerItem
 {
+
+    const customerName = "customerName";
+    const siteDescription = "siteDescription";
+    const contractItemTypeID = "contractItemTypeID";
+    const itemDescription = "itemDescription";
+    const itemNotes = "itemNotes";
+    const renewalTypeID = "renewalTypeID";
+    const partNo = "partNo";
+    const servercareFlag = "servercareFlag";
+    const invoiceFromDate = "invoiceFromDate";
+    const invoiceToDate = "invoiceToDate";
+    const invoiceFromDateYMD = "invoiceFromDateYMD";
+    const invoiceToDateYMD = "invoiceToDateYMD";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -19,75 +33,75 @@ class DBEJCustomerItem extends DBECustomerItem
         parent::__construct($owner);
         $this->setAddColumnsOn();
         $this->addColumn(
-            "customerName",
+            self::customerName,
             DA_STRING,
             DA_ALLOW_NULL,
             "cus_name"
         );
         $this->addColumn(
-            "siteDescription",
+            self::siteDescription,
             DA_STRING,
             DA_ALLOW_NULL,
             "CONCAT_WS(', ', add_add1, add_town, add_postcode)"
         );
         $this->addColumn(
-            "contractItemTypeID",
+            self::contractItemTypeID,
             DA_ID,
             DA_ALLOW_NULL,
             "citem.itm_itemtypeno"
         );
         $this->addColumn(
-            "itemDescription",
+            self::itemDescription,
             DA_STRING,
             DA_ALLOW_NULL,
             "citem.itm_desc"
         );
         $this->addColumn(
-            "itemNotes",
+            self::itemNotes,
             DA_STRING,
             DA_ALLOW_NULL,
             "citem.notes"
         );
         $this->addColumn(
-            "renewalTypeID",
+            self::renewalTypeID,
             DA_ID,
             DA_ALLOW_NULL,
             "citem.renewalTypeID"
         );
         $this->addColumn(
-            "partNo",
+            self::partNo,
             DA_STRING,
             DA_ALLOW_NULL,
             "citem.itm_unit_of_sale"
         );
         $this->addColumn(
-            "servercareFlag",
+            self::servercareFlag,
             DA_INTEGER,
             DA_ALLOW_NULL,
             "citem.itm_servercare_flag"
         );
         $this->addColumn(
-            "invoiceFromDate",
+            self::invoiceFromDate,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%d/%m/%Y')"
         );
         $this->addColumn(
-            "invoiceToDate",
+            self::invoiceToDate,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%d/%m/%Y')"
         );
 
         $this->addColumn(
-            "invoiceFromDateYMD",
+            self::invoiceFromDateYMD,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths MONTH ), '%Y-%m-%d') as invoiceFromDateYMD"
         );
 
         $this->addColumn(
-            "invoiceToDateYMD",
+            self::invoiceToDateYMD,
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%Y-%m-%d') as invoiceToDateYMD"
@@ -99,7 +113,6 @@ class DBEJCustomerItem extends DBECustomerItem
     function getRowsBySearchCriteria(
         $customerID,
         $ordheadID,
-        // sales order no
         $startDate,
         $endDate,
         $itemText,
@@ -118,34 +131,31 @@ class DBEJCustomerItem extends DBECustomerItem
             " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno" .
             " WHERE 1=1";
         if ($customerID != '') {
-            $queryString .= " AND " . $this->getDBColumnName('customerID') . "=" . $customerID;
+            $queryString .= " AND " . $this->getDBColumnName(self::customerID) . "=" . $customerID;
         }
         if ($ordheadID != '') {
-            $queryString .= " AND " . $this->getDBColumnName('ordheadID') . "=" . $ordheadID;
-        }
-        if ($contractID != '') {
-            $queryString .= " AND " . $this->getDBColumnName('contractID') . "=" . $contractID;
+            $queryString .= " AND " . $this->getDBColumnName(self::ordheadID) . "=" . $ordheadID;
         }
         if ($startDate != '') {
-            $queryString .= " AND " . $this->getDBColumnName('expiryDate') . ">= '" . mysqli_real_escape_string(
+            $queryString .= " AND " . $this->getDBColumnName(self::expiryDate) . ">= '" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $startDate
                 ) . "'";
         }
         if ($endDate != '') {
-            $queryString .= " AND " . $this->getDBColumnName('expiryDate') . "<= '" . mysqli_real_escape_string(
+            $queryString .= " AND " . $this->getDBColumnName(self::expiryDate) . "<= '" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $endDate
                 ) . "'";
         }
         if ($serialNo != '') {
-            $queryString .= " AND " . $this->getDBColumnName('serialNo') . " LIKE '%" . mysqli_real_escape_string(
+            $queryString .= " AND " . $this->getDBColumnName(self::serialNo) . " LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $serialNo
                 ) . "%'";
         }
         if ($renewalStatus != '') {
-            $queryString .= " AND " . $this->getDBColumnName('renewalStatus') . "='" . mysqli_real_escape_string(
+            $queryString .= " AND " . $this->getDBColumnName(self::renewalStatus) . "='" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $renewalStatus
                 ) . "'";
@@ -187,7 +197,7 @@ class DBEJCustomerItem extends DBECustomerItem
         return (parent::getRows());
     }
 
-    function getRow($ID)
+    function getRow($ID = null)
     {
         $this->setMethodName('getRow');
         $queryString =
@@ -196,9 +206,7 @@ class DBEJCustomerItem extends DBECustomerItem
             " JOIN item AS citem ON cui_itemno = itm_itemno" .
             " JOIN customer ON cui_custno = cus_custno" .
             " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno" .
-//      " LEFT JOIN custitem AS contract ON custitem.cui_contract_cuino = contract.cui_cuino".
-//      " LEFT JOIN item AS contractitem ON contract.cui_itemno = contractitem.itm_itemno".
-            " WHERE " . $this->getDBColumnName('customerItemID') . "=" . $ID;
+            " WHERE " . $this->getDBColumnName(self::customerItemID) . "=" . $ID;
 
         $this->setQueryString($queryString);
         return (parent::getRow());
@@ -266,13 +274,12 @@ class DBEJCustomerItem extends DBECustomerItem
     /**
      * Get a list of server rows for given customer
      *
-     * @param integer $customerID
-     * @return void
+     * @return bool
      */
     function getServersByCustomerID()
     {
         $this->setMethodName('getServersByCustomerID');
-        if ($this->getValue('customerID') == '') {
+        if ($this->getValue(self::customerID) == '') {
             $this->raiseError('customerID not set');
         }
         $this->setQueryString(
@@ -286,11 +293,11 @@ class DBEJCustomerItem extends DBECustomerItem
           JOIN custitem con ON con.cui_cuino = cic.cic_contractcuino
           JOIN item con_item ON con.cui_itemno = con_item.itm_itemno
       
- 		   WHERE " . $this->getDBColumnName('customerID') . "=" . $this->getValue('customerID') .
+ 		   WHERE " . $this->getDBColumnName(self::customerID) . "=" . $this->getValue(self::customerID) .
             " AND citem.itm_itemtypeno = " . CONFIG_SERVER_ITEMTYPEID .
             " AND con_item.itm_itemtypeno = " . CONFIG_SERVERCARE_ITEMTYPEID .
             " AND con.renewalStatus = 'R'" .
-            " AND " . $this->getDBColumnName('serverName') . " > ''
+            " AND " . $this->getDBColumnName(self::serverName) . " > ''
       ORDER BY citem.itm_desc, custitem.installationDate"
 
         );
@@ -325,5 +332,3 @@ class DBEJCustomerItem extends DBECustomerItem
         return $db->Record['directDebitCount'];
     }
 }
-
-?>

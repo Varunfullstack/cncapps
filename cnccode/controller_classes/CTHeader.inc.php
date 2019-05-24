@@ -22,8 +22,10 @@ define(
 
 class CTHeader extends CTCNC
 {
-    var $dsHeader = '';
-    var $buHeader = '';
+    /** @var DSForm */
+    public $dsHeader;
+    /** @var BUHeader */
+    public $buHeader;
 
     function __construct($requestMethod,
                          $postVars,
@@ -53,19 +55,14 @@ class CTHeader extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTHEADER_ACT_UPDATE:
                 $this->update();
-                break;
-            case 'editHelpDesk':
-                $this->editHelpDesk();
-                break;
-            case 'updateHelpDesk':
-                $this->updateHelpDesk();
                 break;
             case CTHEADER_ACT_EDIT:
             default:
@@ -77,6 +74,7 @@ class CTHeader extends CTCNC
     /**
      * Edit/Add Header
      * @access private
+     * @throws Exception
      */
     function edit()
     {
@@ -87,7 +85,9 @@ class CTHeader extends CTCNC
             $this->buHeader->getHeader($dsHeader);
         } else {                                                                        // form validation error
             $dsHeader->initialise();
+            $dsHeader->debug = true;
             $dsHeader->fetchNext();
+            $dsHeader->debug = false;
         }
         $urlUpdate =
             Controller::buildLink(
@@ -110,212 +110,375 @@ class CTHeader extends CTCNC
             );
         $this->template->set_var(
             array(
-                'headerID'                               => Controller::htmlInputText($dsHeader->getValue('headerID')),
-                'name'                                   => Controller::htmlInputText($dsHeader->getValue('name')),
-                'nameMessage'                            => Controller::htmlDisplayText($dsHeader->getMessage('name')),
-                'add1'                                   => Controller::htmlInputText($dsHeader->getValue('add1')),
-                'add1Message'                            => Controller::htmlDisplayText($dsHeader->getMessage('add1')),
-                'add2'                                   => Controller::htmlInputText($dsHeader->getValue('add2')),
-                'add3'                                   => Controller::htmlInputText($dsHeader->getValue('add3')),
-                'town'                                   => Controller::htmlInputText($dsHeader->getValue('town')),
-                'townMessage'                            => Controller::htmlDisplayText($dsHeader->getMessage('town')),
-                'county'                                 => Controller::htmlInputText($dsHeader->getValue('county')),
-                'postcode'                               => Controller::htmlInputText($dsHeader->getValue('postcode')),
-                'postcodeMessage'                        => Controller::htmlDisplayText($dsHeader->getMessage('postcode')),
-                'phone'                                  => Controller::htmlInputText($dsHeader->getValue('phone')),
-                'phoneMessage'                           => Controller::htmlDisplayText($dsHeader->getMessage('phone')),
-                'fax'                                    => Controller::htmlInputText($dsHeader->getValue('fax')),
-                'faxMessage'                             => Controller::htmlDisplayText($dsHeader->getMessage('fax')),
-                'goodsContact'                           => Controller::htmlInputText($dsHeader->getValue('goodsContact')
-                ),'goodsContactMessage'                    => Controller::htmlDisplayText($dsHeader->getMessage('goodsContact')
-                ),'serviceDeskNotification24hBegin'        => Controller::htmlInputText($dsHeader->getValue('serviceDeskNotification24hBegin')
-                ),'serviceDeskNotification24hBeginMessage' => Controller::htmlDisplayText($dsHeader->getMessage('serviceDeskNotification24hBegin')),
-                'serviceDeskNotification24hEnd'          => Controller::htmlInputText($dsHeader->getValue('serviceDeskNotification24hEnd')
-                ),'serviceDeskNotification24hEndMessage'   => Controller::htmlDisplayText($dsHeader->getMessage('serviceDeskNotification24hEnd')
-                ),'billingStartTime'                       => Controller::htmlInputText($dsHeader->getValue('billingStartTime')),
-                'billingStartTimeMessage'                => Controller::htmlDisplayText($dsHeader->getMessage('billingStartTime')
-                ),'billingEndTime'                         => Controller::htmlInputText($dsHeader->getValue('billingEndTime')),
-                'billingEndTimeMessage'                  => Controller::htmlDisplayText($dsHeader->getMessage('billingEndTime')),
-                'projectStartTime'                       => Controller::htmlInputText($dsHeader->getValue('projectStartTime')
-                ),'projectStartTimeMessage'                => Controller::htmlDisplayText($dsHeader->getMessage('projectStartTime')
-                ),'projectEndTime'                         => Controller::htmlInputText($dsHeader->getValue('projectEndTime')),
-                'projectEndTimeMessage'                  => Controller::htmlDisplayText($dsHeader->getMessage('projectEndTime')
-                ),'helpdeskStartTime'                      => Controller::htmlInputText($dsHeader->getValue('helpdeskStartTime')),
-                'helpdeskStartTimeMessage'               => Controller::htmlDisplayText($dsHeader->getMessage('helpdeskStartTime')),
-                'helpdeskEndTime'                        => Controller::htmlInputText($dsHeader->getValue('helpdeskEndTime')
-                ),'helpdeskEndTimeMessage'                 => Controller::htmlDisplayText($dsHeader->getMessage('helpdeskEndTime')),
-                'hourlyLabourCost'                       => Controller::htmlInputText($dsHeader->getValue('hourlyLabourCost')),
-                'hourlyLabourCostMessage'                => Controller::htmlDisplayText($dsHeader->getMessage('hourlyLabourCost')
-                ),'portalPin'                              => Controller::htmlInputText($dsHeader->getValue('portalPin')),
-                'portalPinMessage'                       => Controller::htmlInputText($dsHeader->getMessage('portalPin')),
-                'portal24HourPin'                        => Controller::htmlInputText($dsHeader->getValue('portal24HourPin')),
-                'portal24HourPinMessage'                 => Controller::htmlInputText($dsHeader->getMessage('portal24HourPin')
-                ),'gscItemID'                              => Controller::htmlInputText($dsHeader->getValue('gscItemID')),
-                'gscItemDescription'                     => Controller::htmlInputText($dsHeader->getValue('gscItemDescription')),
-                'highActivityAlertCount'                 => Controller::htmlInputText($dsHeader->getValue('highActivityAlertCount')),
-                'highActivityAlertCountMessage'          => $dsHeader->getMessage('highActivityAlertCount'),
-                'mailshot2FlagDesc'                      => Controller::htmlInputText($dsHeader->getValue('mailshot2FlagDesc')
-                ),'mailshot2FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot2FlagDef')),
-                'mailshot3FlagDesc'                      => Controller::htmlInputText($dsHeader->getValue('mailshot3FlagDesc')
-                ),'mailshot3FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot3FlagDef')),
-                'mailshot4FlagDesc'                      => Controller::htmlInputText($dsHeader->getValue('mailshot4FlagDesc')),
-                'mailshot4FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot4FlagDef')),
-                'mailshot8FlagDesc'                      => Controller::htmlInputText($dsHeader->getValue('mailshot8FlagDesc')),
-                'mailshot8FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot8FlagDef')),
-                'mailshot9FlagDesc'                      => Controller::htmlInputText($dsHeader->getValue('mailshot9FlagDesc')
-                ),'mailshot9FlagDefChecked'                => $this->getChecked($dsHeader->getValue('mailshot9FlagDef')),
-                'mailshot11FlagDesc'                     => Controller::htmlInputText($dsHeader->getValue('mailshot11FlagDesc')
-                ),'mailshot11FlagDefChecked'               => $this->getChecked($dsHeader->getValue('mailshot11FlagDef')),
-                'priority1Desc'                          => Controller::htmlInputText($dsHeader->getValue('priority1Desc')
-                ),'priority1DescMessage'                   => Controller::htmlDisplayText($dsHeader->getMessage('priority1Desc')),
-                'priority2Desc'                          => Controller::htmlInputText($dsHeader->getValue('priority2Desc')),
-                'priority2DescMessage'                   => Controller::htmlDisplayText($dsHeader->getMessage('priority2Desc')
-                ),'priority3Desc'                          => Controller::htmlInputText($dsHeader->getValue('priority3Desc')),
-                'priority3DescMessage'                   => Controller::htmlDisplayText($dsHeader->getMessage('priority3Desc')),
-                'priority4Desc'                          => Controller::htmlInputText($dsHeader->getValue('priority4Desc')
-                ),'priority4DescMessage'                   => Controller::htmlDisplayText($dsHeader->getMessage('priority4Desc')),
-                'priority5Desc'                          => Controller::htmlInputText($dsHeader->getValue('priority5Desc')),
-                'priority5DescMessage'                   => Controller::htmlDisplayText($dsHeader->getMessage('priority5Desc')
-                ),'allowedClientIpPattern'                 => Controller::htmlInputText($dsHeader->getValue('allowedClientIpPattern')),
-                'allowedClientIpPatternMessage'          => Controller::htmlDisplayText($dsHeader->getMessage('allowedClientIpPattern')),
+                'headerID'                               => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::headerID)
+                ),
+                'name'                                   => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::name)
+                ),
+                'nameMessage'                            => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::name)
+                ),
+                'add1'                                   => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::add1)
+                ),
+                'add1Message'                            => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::add1)
+                ),
+                'add2'                                   => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::add2)
+                ),
+                'add3'                                   => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::add3)
+                ),
+                'town'                                   => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::town)
+                ),
+                'townMessage'                            => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::town)
+                ),
+                'county'                                 => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::county)
+                ),
+                'postcode'                               => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::postcode)
+                ),
+                'postcodeMessage'                        => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::postcode)
+                ),
+                'phone'                                  => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::phone)
+                ),
+                'phoneMessage'                           => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::phone)
+                ),
+                'fax'                                    => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::fax)
+                ),
+                'faxMessage'                             => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::fax)
+                ),
+                'goodsContact'                           => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::goodsContact)
+                ),
+                'goodsContactMessage'                    => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::goodsContact)
+                ),
+                'serviceDeskNotification24hBegin'        => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::serviceDeskNotification24hBegin)
+                ),
+                'serviceDeskNotification24hBeginMessage' => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::serviceDeskNotification24hBegin)
+                ),
+                'serviceDeskNotification24hEnd'          => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::serviceDeskNotification24hEnd)
+                ),
+                'serviceDeskNotification24hEndMessage'   => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::serviceDeskNotification24hEnd)
+                ),
+                'billingStartTime'                       => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::billingStartTime)
+                ),
+                'billingStartTimeMessage'                => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::billingStartTime)
+                ),
+                'billingEndTime'                         => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::billingEndTime)
+                ),
+                'billingEndTimeMessage'                  => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::billingEndTime)
+                ),
+                'projectStartTime'                       => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::projectStartTime)
+                ),
+                'projectStartTimeMessage'                => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::projectStartTime)
+                ),
+                'projectEndTime'                         => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::projectEndTime)
+                ),
+                'projectEndTimeMessage'                  => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::projectEndTime)
+                ),
+                'helpdeskStartTime'                      => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::helpdeskStartTime)
+                ),
+                'helpdeskStartTimeMessage'               => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::helpdeskStartTime)
+                ),
+                'helpdeskEndTime'                        => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::helpdeskEndTime)
+                ),
+                'helpdeskEndTimeMessage'                 => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::helpdeskEndTime)
+                ),
+                'hourlyLabourCost'                       => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::hourlyLabourCost)
+                ),
+                'hourlyLabourCostMessage'                => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::hourlyLabourCost)
+                ),
+                'portalPin'                              => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::portalPin)
+                ),
+                'portalPinMessage'                       => Controller::htmlInputText(
+                    $dsHeader->getMessage(DBEJHeader::portalPin)
+                ),
+                'portal24HourPin'                        => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::portal24HourPin)
+                ),
+                'portal24HourPinMessage'                 => Controller::htmlInputText(
+                    $dsHeader->getMessage(DBEJHeader::portal24HourPin)
+                ),
+                'gscItemID'                              => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::gscItemID)
+                ),
+                'gscItemDescription'                     => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::gscItemDescription)
+                ),
+                'highActivityAlertCount'                 => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::highActivityAlertCount)
+                ),
+                'highActivityAlertCountMessage'          => $dsHeader->getMessage(DBEJHeader::highActivityAlertCount),
+                'mailshot2FlagDesc'                      => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::mailshot2FlagDesc)
+                ),
+                'mailshot2FlagDefChecked'                => $this->getChecked(
+                    $dsHeader->getValue(DBEJHeader::mailshot2FlagDef)
+                ),
+                'mailshot3FlagDesc'                      => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::mailshot3FlagDesc)
+                ),
+                'mailshot3FlagDefChecked'                => $this->getChecked(
+                    $dsHeader->getValue(DBEJHeader::mailshot3FlagDef)
+                ),
+                'mailshot4FlagDesc'                      => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::mailshot4FlagDesc)
+                ),
+                'mailshot4FlagDefChecked'                => $this->getChecked(
+                    $dsHeader->getValue(DBEJHeader::mailshot4FlagDef)
+                ),
+                'mailshot8FlagDesc'                      => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::mailshot8FlagDesc)
+                ),
+                'mailshot8FlagDefChecked'                => $this->getChecked(
+                    $dsHeader->getValue(DBEJHeader::mailshot8FlagDef)
+                ),
+                'mailshot9FlagDesc'                      => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::mailshot9FlagDesc)
+                ),
+                'mailshot9FlagDefChecked'                => $this->getChecked(
+                    $dsHeader->getValue(DBEJHeader::mailshot9FlagDef)
+                ),
+                'mailshot11FlagDesc'                     => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::mailshot11FlagDesc)
+                ),
+                'mailshot11FlagDefChecked'               => $this->getChecked(
+                    $dsHeader->getValue(DBEJHeader::mailshot11FlagDef)
+                ),
+                'priority1Desc'                          => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::priority1Desc)
+                ),
+                'priority1DescMessage'                   => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::priority1Desc)
+                ),
+                'priority2Desc'                          => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::priority2Desc)
+                ),
+                'priority2DescMessage'                   => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::priority2Desc)
+                ),
+                'priority3Desc'                          => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::priority3Desc)
+                ),
+                'priority3DescMessage'                   => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::priority3Desc)
+                ),
+                'priority4Desc'                          => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::priority4Desc)
+                ),
+                'priority4DescMessage'                   => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::priority4Desc)
+                ),
+                'priority5Desc'                          => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::priority5Desc)
+                ),
+                'priority5DescMessage'                   => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::priority5Desc)
+                ),
+                'allowedClientIpPattern'                 => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::allowedClientIpPattern)
+                ),
+                'allowedClientIpPatternMessage'          => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::allowedClientIpPattern)
+                ),
 
-                'hdTeamLimitHours' => Controller::htmlInputText($dsHeader->getValue('hdTeamLimitHours')),
+                'hdTeamLimitHours' => Controller::htmlInputText($dsHeader->getValue(DBEJHeader::hdTeamLimitMinutes)),
 
-                'hdTeamLimitHoursMessage' => Controller::htmlDisplayText($dsHeader->getMessage('hdTeamLimitHours')),
+                'hdTeamLimitHoursMessage' => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::hdTeamLimitMinutes)
+                ),
 
-                'esTeamLimitHours' => Controller::htmlInputText($dsHeader->getValue('esTeamLimitHours')),
+                'esTeamLimitHours' => Controller::htmlInputText($dsHeader->getValue(DBEJHeader::esTeamLimitMinutes)),
 
-                'esTeamLimitHoursMessage' => Controller::htmlDisplayText($dsHeader->getMessage('esTeamLimitHours')),
+                'esTeamLimitHoursMessage' => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::esTeamLimitMinutes)
+                ),
 
-                'imTeamLimitHours' => Controller::htmlInputText($dsHeader->getValue('imTeamLimitHours')),
+                'imTeamLimitHours' => Controller::htmlInputText($dsHeader->getValue(DBEJHeader::imTeamLimitMinutes)),
 
-                'imTeamLimitHoursMessage' => Controller::htmlDisplayText($dsHeader->getMessage('imTeamLimitHours')),
+                'imTeamLimitHoursMessage' => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::imTeamLimitMinutes)
+                ),
 
                 'hdTeamTargetLogPercentage' => Controller::htmlInputText(
-                    $dsHeader->getValue('hdTeamTargetLogPercentage')
+                    $dsHeader->getValue(DBEJHeader::hdTeamTargetLogPercentage)
                 ),
 
                 'hdTeamTargetSlaPercentage' => Controller::htmlInputText(
-                    $dsHeader->getValue('hdTeamTargetSlaPercentage')
+                    $dsHeader->getValue(DBEJHeader::hdTeamTargetSlaPercentage)
                 ),
 
                 'hdTeamTargetSlaPercentageMessage' => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('hdTeamTargetSlaPercentage')
+                    $dsHeader->getMessage(DBEJHeader::hdTeamTargetSlaPercentage)
                 ),
 
-                'hdTeamTargetFixHours' => Controller::htmlInputText($dsHeader->getValue('hdTeamTargetFixHours')),
+                'hdTeamTargetFixHours' => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::hdTeamTargetFixHours)
+                ),
 
                 'hdTeamTargetFixHoursMessage' => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('hdTeamTargetFixHours')
+                    $dsHeader->getMessage(DBEJHeader::hdTeamTargetFixHours)
                 ),
 
                 'hdTeamTargetFixQtyPerMonth' => Controller::htmlInputText(
-                    $dsHeader->getValue('hdTeamTargetFixQtyPerMonth')
+                    $dsHeader->getValue(DBEJHeader::hdTeamTargetFixQtyPerMonth)
                 ),
 
                 'hdTeamTargetFixQtyPerMonthMessage' => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('hdTeamTargetFixQtyPerMonth')
+                    $dsHeader->getMessage(DBEJHeader::hdTeamTargetFixQtyPerMonth)
                 ),
 
                 'esTeamTargetLogPercentage' => Controller::htmlInputText(
-                    $dsHeader->getValue('esTeamTargetLogPercentage')
+                    $dsHeader->getValue(DBEJHeader::esTeamTargetLogPercentage)
                 ),
 
                 'esTeamTargetSlaPercentage' => Controller::htmlInputText(
-                    $dsHeader->getValue('esTeamTargetSlaPercentage')
+                    $dsHeader->getValue(DBEJHeader::esTeamTargetSlaPercentage)
                 ),
 
                 'esTeamTargetSlaPercentageMessage' => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('esTeamTargetSlaPercentage')
+                    $dsHeader->getMessage(DBEJHeader::esTeamTargetSlaPercentage)
                 ),
 
-                'esTeamTargetFixHours' => Controller::htmlInputText($dsHeader->getValue('esTeamTargetFixHours')),
+                'esTeamTargetFixHours' => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::esTeamTargetFixHours)
+                ),
 
                 'esTeamTargetFixHoursMessage' => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('esTeamTargetFixHours')
+                    $dsHeader->getMessage(DBEJHeader::esTeamTargetFixHours)
                 ),
 
                 'esTeamTargetFixQtyPerMonth' => Controller::htmlInputText(
-                    $dsHeader->getValue('esTeamTargetFixQtyPerMonth')
+                    $dsHeader->getValue(DBEJHeader::esTeamTargetFixQtyPerMonth)
                 ),
 
                 'esTeamTargetFixQtyPerMonthMessage' => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('esTeamTargetFixQtyPerMonth')
+                    $dsHeader->getMessage(DBEJHeader::esTeamTargetFixQtyPerMonth)
                 ),
 
                 'imTeamTargetLogPercentage' => Controller::htmlInputText(
-                    $dsHeader->getValue('imTeamTargetLogPercentage')
+                    $dsHeader->getValue(DBEJHeader::imTeamTargetLogPercentage)
                 ),
 
                 'imTeamTargetSlaPercentage' => Controller::htmlInputText(
-                    $dsHeader->getValue('imTeamTargetSlaPercentage')
+                    $dsHeader->getValue(DBEJHeader::imTeamTargetSlaPercentage)
                 ),
 
                 'imTeamTargetSlaPercentageMessage' => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('imTeamTargetSlaPercentage')
+                    $dsHeader->getMessage(DBEJHeader::imTeamTargetSlaPercentage)
                 ),
 
-                'imTeamTargetFixHours' => Controller::htmlInputText($dsHeader->getValue('imTeamTargetFixHours')),
+                'imTeamTargetFixHours' => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::imTeamTargetFixHours)
+                ),
 
-                'imTeamMinutesInADay' => Controller::htmlDisplayText($dsHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay)
+                'imTeamMinutesInADay' => Controller::htmlDisplayText(
+                    $dsHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay)
 
                 ),
 
-                'imTeamTargetFixHoursMessage' => Controller::htmlDisplayText($dsHeader->getMessage('imTeamTargetFixHours')),
+                'imTeamTargetFixHoursMessage' => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::imTeamTargetFixHours)
+                ),
 
-                'imTeamTargetFixQtyPerMonth' => Controller::htmlInputText($dsHeader->getValue('imTeamTargetFixQtyPerMonth')),
+                'imTeamTargetFixQtyPerMonth' => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::imTeamTargetFixQtyPerMonth)
+                ),
 
-                'imTeamTargetFixQtyPerMonthMessage' => Controller::htmlDisplayText($dsHeader->getMessage('imTeamTargetFixQtyPerMonth')),
+                'imTeamTargetFixQtyPerMonthMessage' => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::imTeamTargetFixQtyPerMonth)
+                ),
 
-                'srAutocompleteThresholdHours' => Controller::htmlInputText($dsHeader->getValue('srAutocompleteThresholdHours')),
+                'srAutocompleteThresholdHours' => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::srAutocompleteThresholdHours)
+                ),
 
                 'srAutocompleteThresholdHoursMessage'         => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('srAutocompleteThresholdHours')
+                    $dsHeader->getMessage(DBEJHeader::srAutocompleteThresholdHours)
                 ),
-                'srStartersLeaversAutoCompleteThresholdHours' => Controller::htmlInputText($dsHeader->getValue(DBEHeader::srStartersLeaversAutoCompleteThresholdHours)),
+                'srStartersLeaversAutoCompleteThresholdHours' => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEHeader::srStartersLeaversAutoCompleteThresholdHours)
+                ),
 
-                'srStartersLeaversAutoCompleteThresholdHoursMessage' => Controller::htmlDisplayText($dsHeader->getMessage('srStartersLeaversAutoCompleteThresholdHours')),
+                'srStartersLeaversAutoCompleteThresholdHoursMessage' => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::srStartersLeaversAutoCompleteThresholdHours)
+                ),
 
-                'srPromptContractThresholdHours' => Controller::htmlInputText($dsHeader->getValue('srPromptContractThresholdHours')),
+                'srPromptContractThresholdHours' => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::srPromptContractThresholdHours)
+                ),
 
-                'srPromptContractThresholdHoursMessage' => Controller::htmlDisplayText($dsHeader->getMessage('srPromptContractThresholdHours')),
+                'srPromptContractThresholdHoursMessage' => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::srPromptContractThresholdHours)
+                ),
 
                 'customerContactWarnHours' => Controller::htmlInputText(
-                    $dsHeader->getValue('customerContactWarnHours')
+                    $dsHeader->getValue(DBEJHeader::customerContactWarnHours)
                 ),
 
                 'customerContactWarnHoursMessage' => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('customerContactWarnHours')
+                    $dsHeader->getMessage(DBEJHeader::customerContactWarnHours)
                 ),
 
-                'remoteSupportWarnHours'                                         => Controller::htmlInputText(
-                    $dsHeader->getValue('remoteSupportWarnHours')
+                'remoteSupportWarnHours'                                             => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::remoteSupportWarnHours)
                 ),
-                'remoteSupportWarnHoursMessage'                                  => Controller::htmlDisplayText(
-                    $dsHeader->getMessage('remoteSupportWarnHours')
+                'remoteSupportWarnHoursMessage'                                      => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::remoteSupportWarnHours)
                 ),
-                'customerReviewMeetingText'                                      => Controller::htmlInputText(
+                'customerReviewMeetingText'                                          => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::customerReviewMeetingText)
                 ),
-                DBEHeader::RemoteSupportMinWarnHours                             => Controller::htmlInputText(
+                DBEHeader::RemoteSupportMinWarnHours                                 => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::RemoteSupportMinWarnHours)
                 ),
-                DBEHeader::RemoteSupportMinWarnHours . 'Message'                 => Controller::htmlDisplayText(
+                DBEHeader::RemoteSupportMinWarnHours . 'Message'                     => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::RemoteSupportMinWarnHours)
                 ),
-                DBEHeader::backupTargetSuccessRate                               => Controller::htmlInputText(
+                DBEHeader::backupTargetSuccessRate                                   => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::backupTargetSuccessRate)
                 ),
-                DBEHeader::SDDashboardEngineersInSREngineersMaxCount             => Controller::htmlInputText(
+                DBEHeader::SDDashboardEngineersInSREngineersMaxCount                 => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::SDDashboardEngineersInSREngineersMaxCount)
                 ),
-                DBEHeader::SDDashboardEngineersInSRInPastHours                   => Controller::htmlInputText(
+                "SDDashboardEngineersInSRInPastHours"                                => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::SDDashboardEngineersInSRInPastHours)
                 ),
-                DBEHeader::SDDashboardEngineersInSREngineersMaxCount . "Message" => Controller::htmlDisplayText(
+                DBEHeader::SDDashboardEngineersInSREngineersMaxCount . "Message"     => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::SDDashboardEngineersInSREngineersMaxCount)
                 ),
-                DBEHeader::SDDashboardEngineersInSRInPastHours . "Message"       => Controller::htmlDisplayText(
+                "SDDashboardEngineersInSRInPastHoursMessage"                         => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::SDDashboardEngineersInSRInPastHours)
                 ),
                 DBEHeader::secondSiteReplicationAdditionalDelayAllowance             => Controller::htmlInputText(
@@ -324,14 +487,14 @@ class CTHeader extends CTCNC
                 DBEHeader::secondSiteReplicationAdditionalDelayAllowance . 'Message' => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::secondSiteReplicationAdditionalDelayAllowance)
                 ),
-                DBEHeader::projectCommenceNotification => Controller::htmlInputText(
+                DBEHeader::projectCommenceNotification                               => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::projectCommenceNotification)
                 ),
-                DBEHeader::projectCommenceNotification . 'Message' => Controller::htmlDisplayText(
+                DBEHeader::projectCommenceNotification . 'Message'                   => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::projectCommenceNotification)
                 ),
-                'urlItemPopup' => $urlItemPopup,
-                'urlUpdate'    => $urlUpdate
+                'urlItemPopup'                                                       => $urlItemPopup,
+                'urlUpdate'                                                          => $urlUpdate
             )
         );
 
@@ -343,7 +506,7 @@ class CTHeader extends CTCNC
         );
         for ($i = 0; $i < 10; $i++) {
             $vatCode = 'T' . $i;
-            $vatCodeSelected = ($dsHeader->getValue("stdVATCode") == $vatCode) ? CT_SELECTED : '';
+            $vatCodeSelected = ($dsHeader->getValue(DBEJHeader::stdVATCode) == $vatCode) ? CT_SELECTED : null;
             $this->template->set_var(
                 array(
                     'vatCodeSelected' => $vatCodeSelected,
@@ -371,15 +534,15 @@ class CTHeader extends CTCNC
     /**
      * Update
      * @access private
+     * @throws Exception
      */
     function update()
     {
         $this->setMethodName('update');
-        $dsHeader = &$this->dsHeader;
-        $this->formError = (!$this->dsHeader->populateFromArray($_REQUEST['header']));
+        $this->formError = (!$this->dsHeader->populateFromArray($this->getParam('header')));
 
         if ($this->formError) {
-            $_REQUEST['action'] = CTHEADER_ACT_EDIT;
+            $this->setAction(CTHEADER_ACT_EDIT);
             $this->edit();
             exit;
         }
@@ -397,81 +560,9 @@ class CTHeader extends CTCNC
     }
 
     /**
-     * Edit Helpdesk
-     * @access private
+     * @param $templateName
+     * @throws Exception
      */
-    function editHelpDesk()
-    {
-        $this->setMethodName('editHelpDesk');
-        $dsHeader = &$this->dsHeader; // ref to class var
-
-        if (!$this->getFormError()) {
-            $this->buHeader->getHeader($dsHeader);
-        } else {                                                                        // form validation error
-            $dsHeader->initialise();
-            $dsHeader->fetchNext();
-        }
-
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'updateHelpDesk'
-                )
-            );
-        $this->setPageTitle('Edit HelpDesk Details');
-
-        $this->setTemplateFiles(
-            array('HeaderHelpDeskEdit' => 'HeaderHelpDeskEdit.inc')
-        );
-
-        $this->template->set_var(
-            array(
-                'headerID'                => Controller::htmlInputText($dsHeader->getValue('headerID')),
-                'helpDeskProblems'        => Controller::htmlInputText($dsHeader->getValue('helpDeskProblems')),
-                'helpDeskProblemsMessage' => Controller::htmlDisplayText($dsHeader->getMessage('helpDeskProblems')),
-                'helpDeskOSCount'         => Controller::htmlInputText($dsHeader->getValue('helpDeskOSCount')),
-                'helpDeskOSCountMessage'  => Controller::htmlDisplayText($dsHeader->getMessage('helpDeskOSCount')),
-                'urlUpdate'               => $urlUpdate
-            )
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'HeaderHelpDeskEdit',
-            true
-        );
-        $this->parsePage();
-    }// end function editHelpDesk()
-
-    /**
-     * Update
-     * @access private
-     */
-    function updateHelpDesk()
-    {
-        $this->setMethodName('updateHelpDesk');
-        $dsHeader = &$this->dsHeader;
-        $this->formError = (!$this->dsHeader->populateFromArray($_REQUEST['header']));
-
-        if ($this->formError) {
-            $_REQUEST['action'] = CTHEADER_ACT_EDIT;
-            $this->edit();
-            exit;
-        }
-
-        $this->buHeader->updateHelpDesk($this->dsHeader);
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'editHelpDesk'
-                )
-            );
-        header('Location: ' . $urlNext);
-    }
-
     function documents($templateName)
     {
         $this->template->set_block(
@@ -480,18 +571,17 @@ class CTHeader extends CTCNC
             'portalDocuments'
         );
 
-        if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) {
-
+        if ($this->getAction() != 'add') {
             $buPortalDocument = new BUPortalDocument($this);
+            $dsPortalDocument = new DataSet($this);
             $buPortalDocument->getDocuments($dsPortalDocument);
 
-            $urlAddDocument =
-                Controller::buildLink(
-                    'PortalDocument.php',
-                    array(
-                        'action' => 'add'
-                    )
-                );
+            $urlAddDocument = Controller::buildLink(
+                'PortalDocument.php',
+                array(
+                    'action' => 'add'
+                )
+            );
 
 
             $this->template->set_var(
@@ -508,7 +598,7 @@ class CTHeader extends CTCNC
                         'PortalDocument.php',
                         array(
                             'action'           => 'edit',
-                            'portalDocumentID' => $dsPortalDocument->getValue('portalDocumentID')
+                            'portalDocumentID' => $dsPortalDocument->getValue(DBEPortalDocument::portalDocumentID)
                         )
                     );
 
@@ -517,7 +607,7 @@ class CTHeader extends CTCNC
                         'PortalDocument.php',
                         array(
                             'action'           => 'viewFile',
-                            'portalDocumentID' => $dsPortalDocument->getValue('portalDocumentID')
+                            'portalDocumentID' => $dsPortalDocument->getValue(DBEPortalDocument::portalDocumentID)
                         )
                     );
 
@@ -526,17 +616,19 @@ class CTHeader extends CTCNC
                         'PortalDocument.php',
                         array(
                             'action'           => 'delete',
-                            'portalDocumentID' => $dsPortalDocument->getValue('portalDocumentID')
+                            'portalDocumentID' => $dsPortalDocument->getValue(DBEPortalDocument::portalDocumentID)
                         )
                     );
 
                 $this->template->set_var(
                     array(
-                        'description'            => $dsPortalDocument->getValue("description"),
-                        'filename'               => $dsPortalDocument->getValue("filename"),
-                        'mainContactOnlyFlag'    => $dsPortalDocument->getValue("mainContactOnlyFlag"),
-                        'requiresAcceptanceFlag' => $dsPortalDocument->getValue("requiresAcceptanceFlag"),
-                        'createDate'             => $dsPortalDocument->getValue("createdDate"),
+                        'description'            => $dsPortalDocument->getValue(DBEPortalDocument::description),
+                        'filename'               => $dsPortalDocument->getValue(DBEPortalDocument::filename),
+                        'mainContactOnlyFlag'    => $dsPortalDocument->getValue(DBEPortalDocument::mainContactOnlyFlag),
+                        'requiresAcceptanceFlag' => $dsPortalDocument->getValue(
+                            DBEPortalDocument::requiresAcceptanceFlag
+                        ),
+                        'createDate'             => $dsPortalDocument->getValue(DBEPortalDocument::createdDate),
                         'urlViewFile'            => $urlViewFile,
                         'urlEditDocument'        => $urlEditDocument,
                         'urlDeleteDocument'      => $urlDeleteDocument
@@ -547,11 +639,7 @@ class CTHeader extends CTCNC
                     'portalDocumentBlock',
                     true
                 );
-            } // end while
-
-        } // end if
-
-    } // end function documents
-
-}// end of class
-?>
+            }
+        }
+    }
+}

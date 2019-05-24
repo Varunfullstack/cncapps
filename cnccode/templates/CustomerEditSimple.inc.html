@@ -682,7 +682,6 @@
                         onchange="MM_jumpMenu('_blank',this,0)"
                 >
                     <option>Send Letter</option>
-                    <option value="{clientFormURL}">Appointment</option>
                     <!-- BEGIN templateCustomLetterBlock -->
                     <option value="{customLetterURL}">{customLetterName}</option>
                     <!-- END templateCustomLetterBlock -->
@@ -1275,7 +1274,9 @@
     }
 
     function MM_jumpMenu(targ, selObj, restore) { //v3.0
-        window.open(selObj.options[selObj.selectedIndex].value, targ);
+        if (selObj.options[selObj.selectedIndex].value) {
+            window.open(selObj.options[selObj.selectedIndex].value, targ);
+        }
         if (restore) selObj.selectedIndex = 0;
     }
 
@@ -1569,12 +1570,6 @@
     <input type="hidden"
            name="form[customer][{customerID}][createDate]"
            value="{createDate}"
-    >
-    <input type="hidden"
-           name="form[customer][{customerID}][regNo]"
-           value="{regNo}"
-           size="10"
-           maxlength="10"
     >
     <input name="customerNoteID"
            id="customerNoteID"

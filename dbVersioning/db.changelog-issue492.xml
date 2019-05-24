@@ -1,0 +1,2033 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1554199133-0">
+        <tagDatabase tag="issue492"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-1">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="ordhead" columnName="odh_pay_method"/>
+        </preConditions>
+        <dropColumn tableName="ordhead" columnName="odh_pay_method"/>
+        <rollback>
+            <addColumn tableName="ordhead">
+                <column name="odh_pay_method" afterColumn="odh_consno" type="char(30)">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-2">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="invhead" columnName="inh_pay_method"/>
+        </preConditions>
+        <dropColumn tableName="invhead" columnName="inh_pay_method"/>
+        <rollback>
+            <addColumn tableName="invhead">
+                <column name="inh_pay_method" afterColumn="inh_salutation" type="char(30)">
+                    <constraints nullable="false"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-3">
+        <dropNotNullConstraint columnName="cus_dropped_customer_date" tableName="customer" columnDataType="date"/>
+        <dropNotNullConstraint tableName="customer" columnName="cus_became_customer_date" columnDataType="date"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-4">
+        <dropNotNullConstraint tableName="problem" columnName="pro_hd_pause_count" columnDataType="int(3)"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-5">
+        <dropNotNullConstraint tableName="problem" columnName="pro_management_review_reason" columnDataType="text"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-6">
+        <dropNotNullConstraint tableName="callactivity" columnName="caa_cuino" columnDataType="int(11) unsigned"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-7">
+        <dropNotNullConstraint tableName="callactivity" columnName="caa_secondsite_error_cuino"
+                               columnDataType="int(11) unsigned"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-8">
+        <modifyDataType tableName="ordhead" columnName="odh_inv_fax" newDataType="char(25)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_inv_fax" newDataType="char(20)"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-9">
+        <modifyDataType tableName="ordhead" columnName="odh_inv_phone" newDataType="char(25)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_inv_phone" newDataType="char(20)"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-10">
+        <modifyDataType tableName="ordhead" columnName="odh_inv_salutation" newDataType="char(25)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_inv_salutation" newDataType="char(15)"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-11">
+        <modifyDataType tableName="ordhead" columnName="odh_inv_contact" newDataType="char(35)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_inv_contact" newDataType="char(25)"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="1554199133-12">
+        <modifyDataType tableName="ordhead" columnName="odh_del_fax" newDataType="char(25)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_del_fax" newDataType="char(20)"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-13">
+        <modifyDataType tableName="ordhead" columnName="odh_del_phone" newDataType="char(25)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_del_phone" newDataType="char(20)"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-14">
+        <modifyDataType tableName="ordhead" columnName="odh_del_salutation" newDataType="char(25)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_del_salutation" newDataType="char(15)"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-15">
+        <modifyDataType tableName="ordhead" columnName="odh_del_contact" newDataType="char(35)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_del_contact" newDataType="char(25)"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-16">
+        <sql>
+            UPDATE porhead
+            SET poh_ord_date = NULL
+            WHERE poh_ord_date = '0000-00-00';
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-17">
+        <sql>
+            UPDATE porhead
+            SET poh_required_by = NULL
+            WHERE poh_required_by = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-18">
+        <sql>
+            UPDATE customer
+            SET cus_became_customer_date = NULL
+            WHERE cus_became_customer_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-19">
+        <sql>
+            UPDATE customer
+            SET cus_dropped_customer_date = NULL
+            WHERE cus_dropped_customer_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-20">
+        <sql>
+            UPDATE custitem
+            SET startDate = NULL
+            WHERE startDate = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-21">
+        <sql>
+            UPDATE custitem
+            SET secondsiteValidationSuspendUntilDate = NULL
+            WHERE secondsiteValidationSuspendUntilDate = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-22">
+        <sql>
+            UPDATE problem
+            SET pro_alarm_date = NULL
+            WHERE pro_alarm_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-23">
+        <sql>
+            UPDATE custitem
+            SET cui_ord_date = NULL
+            WHERE cui_ord_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-24">
+        <sql>
+            UPDATE invhead
+            SET inh_date_printed = NULL
+            WHERE inh_date_printed = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-25">
+        <sql>
+            UPDATE porline
+            SET pol_exp_date = NULL
+            WHERE pol_exp_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-26">
+        <sql>
+            UPDATE ordhead
+            SET odh_req_date = NULL
+            WHERE odh_req_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-27">
+        <sql>
+            UPDATE ordhead
+            SET odh_prom_date = NULL
+            WHERE odh_prom_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="1554199133-28">
+        <sql>
+            UPDATE ordhead
+            SET odh_expect_date = NULL
+            WHERE odh_expect_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-29">
+        <sql>
+            UPDATE customer
+            SET reviewDate = NULL
+            WHERE reviewDate = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-30">
+        <sql>
+            UPDATE customer
+            SET cus_last_review_meeting_date = NULL
+            WHERE cus_last_review_meeting_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-31">
+        <sql>
+            UPDATE secondsite_image
+            SET imageTime = NULL
+            WHERE imageTime = '0000-00-00 00:00:00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-32">
+        <sql>
+            UPDATE secondsite_image
+            SET replicationImageTime = NULL
+            WHERE replicationImageTime = '0000-00-00 00:00:00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-33">
+        <sql>
+            UPDATE custitem
+            SET cui_expiry_date = NULL
+            WHERE cui_expiry_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-34">
+        <sql>
+            UPDATE custitem
+            SET dateGenerated = NULL
+            WHERE dateGenerated = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-35">
+        <sql>
+            UPDATE custitem
+            SET cui_desp_date = NULL
+            WHERE cui_desp_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-36">
+        <sql>
+            UPDATE custitem
+            SET cui_pord_date = NULL
+            WHERE cui_pord_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-37">
+        <sql>
+            UPDATE custitem
+            SET secondsiteSuspendedDate = NULL
+            WHERE secondsiteSuspendedDate = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-38">
+        <sql>
+            UPDATE custitem
+            SET secondsiteImageDelayDate = NULL
+            WHERE secondsiteImageDelayDate = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-39">
+        <sql>
+            UPDATE project
+            SET expiryDate = NULL
+            WHERE expiryDate = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-40">
+        <sql>
+            UPDATE project
+            SET commenceDate = NULL
+            WHERE commenceDate = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-41">
+        <sql>
+            UPDATE staffAppraisalQuestionnaire
+            SET dateSent = NULL
+            WHERE dateSent = '0000-00-00 00:00:00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-42">
+        <preConditions>
+            <tableExists tableName="broadbandservicetype"/>
+        </preConditions>
+        <dropTable tableName="broadbandservicetype"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-43">
+        <dropNotNullConstraint columnName="curGSCBalance" tableName="custitem" columnDataType="decimal(8,2)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-44">
+        <sql>delete
+             from calldocument
+             where problemID = 0
+               and callActivityID = 0</sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-45">
+        <dropNotNullConstraint columnName="problemID" tableName="calldocument" columnDataType="int(11)"/>
+        <dropNotNullConstraint tableName="calldocument" columnName="callActivityID" columnDataType="int(11)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-46">
+        <sql>
+            update calldocument
+            set problemID      = if(problemID = 0, null, problemID),
+                callActivityID = if(callActivityID = 0, null, callActivityID)
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-47">
+        <dropTable tableName="arecord"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-48">
+        <dropTable tableName="servicedeskreport"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-49">
+        <dropTable tableName="notepad"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-50">
+        <dropTable tableName="prizewinner"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-51">
+        <dropTable tableName="securityapp"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-52">
+        <dropTable tableName="escalation"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-53">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callactivity" columnName="escalationID"/>
+        </preConditions>
+        <dropColumn tableName="callactivity" columnName="escalationID"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-54">
+        <dropTable tableName="ordline_sco"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-55">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'activitycategory'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table activitycategory
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-56">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'address'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table address
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-57">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'answer'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table answer
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-58">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'answertype'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table answertype
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-59">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'audit_trail'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table audit_trail
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-60">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'auto_request_activitycategory'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table auto_request_activitycategory
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-61">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'auto_request_contracts'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table auto_request_contracts
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-62">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'auto_request_rootcause'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table auto_request_rootcause
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-63">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'automated_request'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table automated_request
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-64">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'callactengineer'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table callactengineer
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-65">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'callactivity'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table callactivity
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-66">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'callactivity_archive'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table callactivity_archive
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-67">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'callacttype'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table callacttype
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-68">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'calldocument'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table calldocument
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-69">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'consultant'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table consultant
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-70">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'contact'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table contact
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-71">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'contract'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table contract
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-72">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'custitem'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table custitem
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-73">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'custitem_contract'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table custitem_contract
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-74">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'customer'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table customer
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-75">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'customeritemdocument'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table customeritemdocument
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-76">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'customernote'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table customernote
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-77">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'customerproblem'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table customerproblem
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-78">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'custype'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table custype
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-79">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'date_xref'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table date_xref
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-80">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'db_sequence'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table db_sequence
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-81">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'delivery'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table delivery
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-82">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'deliverynote'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table deliverynote
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-83">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'deshead'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table deshead
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-84">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'desline'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table desline
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-85">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'domain_import'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table domain_import
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-86">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'expense'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table expense
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-87">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'expensetype'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table expensetype
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-88">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'externalitem'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table externalitem
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-89">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'further_action'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table further_action
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-90">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'future_action'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table future_action
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-91">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'headert'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table headert
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-92">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'invhead'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table invhead
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-93">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'invline'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table invline
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-94">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'item'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table item
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-95">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'itemtype'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table itemtype
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-96">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'leadstatus'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table leadstatus
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-97">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'mail_queue'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table mail_queue
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-98">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'mail_queue_seq'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table mail_queue_seq
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-99">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'mailshot_table'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table mailshot_table
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-100">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'main_contacts'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table main_contacts
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-101">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'manufact'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table manufact
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-102">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'ordhead'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table ordhead
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-103">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'ordhead_sco'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table ordhead_sco
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-104">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'ordline'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table ordline
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-105">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'page_view'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table page_view
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-106">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'password'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table password
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-107">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'paymentterms'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table paymentterms
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-108">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'paymeth'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table paymeth
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-109">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'pinline'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table pinline
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-110">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'porhead'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table porhead
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-111">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'porline'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table porline
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-112">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'portal_customer_document'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table portal_customer_document
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-113">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'portal_document'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table portal_document
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-114">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'portal_document_acceptance'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table portal_document_acceptance
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-115">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'prepaystatement'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table prepaystatement
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-116">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'problem'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table problem
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-117">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'project'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table project
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-118">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'question'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table question
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-119">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'question_type'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table question_type
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-120">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'questionnaire'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table questionnaire
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-121">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'quotation'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table quotation
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-122">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'renbroadband'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table renbroadband
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-123">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'rencontract'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table rencontract
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-124">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'rendomain'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table rendomain
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-125">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'renewaltype'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table renewaltype
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-126">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'renquotation'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table renquotation
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-127">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'renquotationtype'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table renquotationtype
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-128">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'rootcause'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table rootcause
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-129">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'salesorder_document'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table salesorder_document
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-130">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'salesrequest'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table salesrequest
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-131">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'secondsite_image'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table secondsite_image
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-132">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'sector'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table sector
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-133">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="service request review_csv"/>
+        </preConditions>
+        <dropTable tableName="service request review_csv"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-134">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'sessions'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table sessions
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-135">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'staffavailable'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table staffavailable
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-136">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'standardtext'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table standardtext
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-137">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'standardtexttype'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table standardtexttype
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-138">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'stockcat'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table stockcat
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-139">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'supplier'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table supplier
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-140">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'team'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table team
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-141">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'team_performance'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table team_performance
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-142">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'team_role'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table team_role
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-143">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'time_breach'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table time_breach
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-144">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'user_time_log'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table user_time_log
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-145">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'userext'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table userext
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-146">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">SELECT ENGINE = 'MyIsam' FROM information_schema.`TABLES` WHERE TABLE_SCHEMA =
+                DATABASE() AND `information_schema`.`TABLES`.TABLE_NAME = 'vat'
+            </sqlCheck>
+        </preConditions>
+        <sql>         alter table vat
+            engine = InnoDB;     </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-147">
+        <dropNotNullConstraint columnName="createdUserID" tableName="portal_customer_document"
+                               columnDataType="int(11)"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-148">
+        <modifyDataType tableName="portal_customer_document" columnName="fileMimeType" newDataType="varchar(255)"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-149">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_helpdesk_problems"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_helpdesk_problems"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-150">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="item" indexName="idx_fulltext_item_itm_desc_notes_unit_of_sale"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE FULLTEXT INDEX idx_fulltext_item_itm_desc_notes_unit_of_sale
+                ON item (itm_desc, notes, itm_unit_of_sale);
+        </sql>
+        <rollback>
+            <dropIndex tableName="item" indexName="idx_fulltext_item_itm_desc_notes_unit_of_sale"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-151">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="item" indexName="idx_fulltext_item_notes_unit_of_sale"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE FULLTEXT INDEX idx_fulltext_item_notes_unit_of_sale
+                ON item (notes, itm_unit_of_sale);
+        </sql>
+        <rollback>
+            <dropIndex tableName="item" indexName="idx_fulltext_item_notes_unit_of_sale"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-152">
+        <dropNotNullConstraint columnName="filename" tableName="salesorder_document" columnDataType="char(100)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-153">
+        <dropNotNullConstraint columnName="file" tableName="salesorder_document" columnDataType="longblob"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-154">
+        <dropNotNullConstraint columnName="fileMimeType" tableName="salesorder_document" columnDataType="char(50)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-155">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="salesorder_document" indexName="PRIMARY"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey columnNames="salesOrderDocumentID" constraintName="PRIMARY" tableName="salesorder_document"/>
+        <rollback>
+            <dropPrimaryKey tableName="salesorder_document" constraintName="PRIMARY"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-156">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="NO">
+                SELECT `information_schema`.COLUMNS.`IS_NULLABLE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='callactivity'
+                AND column_name='caa_callacttypeno'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint tableName="callactivity" columnName="caa_callacttypeno" columnDataType="int(11)"/>
+        <sql>
+            update callactivity
+            set caa_callacttypeno = null
+            where caa_callacttypeno = 0
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-157">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="NO">
+                SELECT `information_schema`.COLUMNS.`IS_NULLABLE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='portal_document'
+                AND column_name='filename'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint columnName="filename" tableName="portal_document" columnDataType="char(100)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-158">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="NO">
+                SELECT `information_schema`.COLUMNS.`IS_NULLABLE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='portal_document'
+                AND column_name='file'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint columnName="file" tableName="portal_document" columnDataType="longblob"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-159">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="NO">
+                SELECT `information_schema`.COLUMNS.`IS_NULLABLE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='portal_document'
+                AND column_name='fileMimeType'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint columnName="fileMimeType" tableName="portal_document" columnDataType="char(50)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-160">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                select count(*) > 0 from customer where cus_create_date is null or cus_create_date = '0000-00-00'
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            UPDATE
+                customer
+            SET cus_create_date =
+                    CASE
+                        WHEN cus_became_customer_date IS NOT NULL
+                            THEN cus_became_customer_date
+                        ELSE '1996-01-01'
+                        END
+            WHERE cus_create_date IS NULL
+               OR cus_create_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-161">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="NO">
+                SELECT `information_schema`.COLUMNS.`IS_NULLABLE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='mail_queue'
+                AND column_name='time_started_sending'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint columnName="time_started_sending" tableName="mail_queue" columnDataType="datetime"/>
+        <rollback/>
+        <sql>
+            update mail_queue
+            set time_started_sending = null
+            where time_started_sending = '0000-00-00 00:00:00'
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-162">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="problem" indexName="idx_pro_rootcauseno"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE INDEX idx_pro_rootcauseno
+                ON problem (pro_rootcauseno);
+        </sql>
+        <rollback>
+            <dropIndex tableName="problem" indexName="idx_pro_rootcauseno"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-163">
+        <sql>
+            update problem
+            set pro_consno = null
+            where pro_consno = 0
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-164">
+        <sql>
+            update problem
+            set pro_priority = null
+            where pro_priority = 0
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-165">
+        <sql>
+            update problem
+            set pro_date_raised = null
+            where pro_date_raised = '0000-00-00 00:00:00'
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-166">
+        <sql>
+            update problem
+            set pro_fixed_consno = null
+            where pro_fixed_consno = 0
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-167">
+        <sql>
+            update problem
+            set pro_fixed_date = null
+            where pro_fixed_date = '0000-00-00 00:00:00'
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-168">
+        <sql>
+            UPDATE
+                problem
+            SET problem.`pro_date_raised` =
+                    (SELECT MIN(callactivity.`caa_date`)
+                     FROM callactivity
+                     WHERE callactivity.`caa_problemno` = problem.`pro_problemno`)
+            WHERE pro_date_raised IS NULL
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-169">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_email_option"/>
+        </preConditions>
+        <dropColumn tableName="problem" columnName="pro_email_option"/>
+        <rollback>
+            <addColumn tableName="problem">
+                <column name="pro_email_option" afterColumn="pro_complete_date" type="enum('A','N','S')">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-170">
+        <sql>
+            update problem
+            set pro_complete_date = null
+            where pro_complete_date = '0000-00-00'
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-171">
+        <sql>
+            update problem
+            set pro_hide_from_customer_flag = 'N'
+            where pro_hide_from_customer_flag = ''
+               or pro_hide_from_customer_flag is null
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-172">
+        <sql>
+            update problem
+            set pro_alarm_time = null
+            where pro_alarm_time = ''
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-173">
+        <sql>
+            update problem
+            set pro_contract_cuino = null
+            where pro_contract_cuino = 0
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-174">
+        <sql>
+            update problem
+            set pro_escalated_consno = null
+            where pro_escalated_consno = 0
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-175">
+        <sql>
+            update problem
+            set pro_contno = null
+            where pro_contno = 0
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-176">
+        <sql>
+            update problem
+            set activityCategoryID = null
+            where activityCategoryID = 0
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-177">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_technician_weighting"/>
+        </preConditions>
+        <dropColumn tableName="problem" columnName="pro_technician_weighting"/>
+        <rollback>
+            <addColumn tableName="problem">
+                <column name="pro_technician_weighting" afterColumn="activityCategoryID" type="enum(1,2,3,4,5)">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-178">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_rejected_consno"/>
+        </preConditions>
+        <dropColumn tableName="problem" columnName="pro_rejected_consno"/>
+        <rollback>
+            <addColumn tableName="problem">
+                <column name="pro_rejected_consno" afterColumn="activityCategoryID" type="int(11)">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-179">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="problem" columnName="pro_do_next_flag"/>
+        </preConditions>
+        <dropColumn tableName="problem" columnName="pro_do_next_flag"/>
+        <rollback>
+            <addColumn tableName="problem">
+                <column name="pro_do_next_flag" afterColumn="activityCategoryID" type="char(1)">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-180">
+        <sql>
+            update problem
+            set pro_rootcauseno = null
+            where pro_rootcauseno = 0
+        </sql>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-181">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="project" indexName="idx_customerID"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE INDEX idx_customerID
+                ON project (customerID);
+        </sql>
+        <rollback>
+            <dropIndex tableName="project" indexName="idx_customerID"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-182">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="problem" indexName="idx_pro_projectno"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE INDEX idx_pro_projectno
+                ON problem (pro_projectno);
+        </sql>
+        <rollback>
+            <dropIndex tableName="problem" indexName="idx_pro_projectno"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-183">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="staffAppraisalObjectives" primaryKeyName="PRIMARY"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="staffAppraisalObjectives" columnNames="id, questionnaireAnswerID"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-184">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="contactAuditLog" indexName="idx_con_custno_con_first_name_con_last_name"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE INDEX idx_con_custno_con_first_name_con_last_name
+                ON contactAuditLog (con_custno, con_first_name, con_last_name);
+        </sql>
+        <rollback>
+            <dropIndex tableName="contactAuditLog" indexName="idx_con_custno_con_first_name_con_last_name"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-186">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="ignoredaddomain"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="ignoredaddomain" columnNames="ignoredADDomainID"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-187">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="passwordService"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="passwordService" columnNames="passwordServiceID"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-188">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="problem_monitoring"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="problem_monitoring" columnNames="problemId, cons_no"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-189">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="staffAppraisalQuestion"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="staffAppraisalQuestion" columnNames="id"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-190">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="staffAppraisalQuestion" indexName="idx_questionnaireID"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="staffAppraisalQuestion" indexName="idx_questionnaireID">
+            <column name="questionnaireId"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-191">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="staffAppraisalQuestionAnswer"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="staffAppraisalQuestionAnswer" columnNames="answerID"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-192">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="staffAppraisalQuestionAnswer" indexName="idx_questionID"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="staffAppraisalQuestionAnswer" indexName="idx_questionID">
+            <column name="questionID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-193">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="staffAppraisalQuestionnaire"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="staffAppraisalQuestionnaire" columnNames="id"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-194">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="staffAppraisalQuestionnaireAnswer"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="staffAppraisalQuestionnaireAnswer" columnNames="id"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-195">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="staffAppraisalQuestionnaireAnswer"
+                             indexName="idx_questionnaireID_staffMemberID"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="staffAppraisalQuestionnaireAnswer" indexName="idx_questionnaireID_staffMemberID">
+            <column name="questionnaireID"/>
+            <column name="staffMemberID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-196">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="utilityEmail"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="utilityEmail" columnNames="utilityEmailID"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-197">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="auto_request_contracts"/>
+        </preConditions>
+        <dropTable tableName="auto_request_contracts"/>
+        <rollback>
+            <createTable tableName="auto_request_contracts">
+                <column name="contractCustomerItemID" type="INT UNSIGNED"/>
+                <column name="customerID" type="INT"/>
+                <column name="customerName" type="VARCHAR(35)"/>
+                <column name="renewalType" type="CHAR(50)"/>
+                <column name="postcode" type="CHAR(15)"/>
+                <column name="description" type="VARCHAR(45)"/>
+                <column name="adslPhone" type="VARCHAR(255)"/>
+                <column name="routerIpAddress" type="TEXT"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-198">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="auto_request_rootcause"/>
+        </preConditions>
+        <dropTable tableName="auto_request_rootcause"/>
+        <rollback>
+            <createTable tableName="auto_request_rootcause">
+                <column name="rootCauseID" type="INT UNSIGNED"/>
+                <column name="description" type="CHAR(50)"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-199">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="auto_request_rootcause"/>
+        </preConditions>
+        <dropTable tableName="auto_request_rootcause"/>
+        <rollback>
+            <createTable tableName="auto_request_rootcause">
+                <column name="rootCauseID" type="INT UNSIGNED"/>
+                <column name="description" type="CHAR(50)"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-200">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="callactivity_archive"/>
+        </preConditions>
+        <dropTable tableName="callactivity_archive"/>
+        <rollback>
+            <createTable tableName="callactivity_archive">
+                <column defaultValueNumeric="0" name="caa_callactivityno" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="caa_siteno" type="INT"/>
+                <column defaultValueNumeric="0" name="caa_contno" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="caa_item" type="SMALLINT"/>
+                <column defaultValueNumeric="0" name="caa_callacttypeno" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="activityCategoryID" type="INT UNSIGNED"/>
+                <column defaultValueNumeric="0" name="projectID" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="caa_problemno" type="INT UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="0000-00-00" name="caa_date" type="date">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="" name="caa_starttime" type="VARCHAR(5)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="caa_endtime" type="VARCHAR(5)"/>
+                <column name="caa_status" type="CHAR(1)"/>
+                <column name="caa_expexport_flag" type="CHAR(1)"/>
+                <column name="reason" type="TEXT"/>
+                <column name="internalNotes" type="MEDIUMTEXT"/>
+                <column defaultValueNumeric="0.00" name="curValue" type="DECIMAL(6, 2)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="statementYearMonth" type="VARCHAR(7)"/>
+                <column defaultValueNumeric="0" name="caa_custno" type="INT UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="caa_cuino" type="INT UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="caa_contract_cuino" type="INT UNSIGNED"/>
+                <column defaultValue="" name="caa_under_contract" type="CHAR(1)">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="" name="caa_authorised" type="CHAR(1)">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="caa_consno" type="INT UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="" name="caa_ot_exp_flag" type="CHAR(1)">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="caa_completed_consno" type="INT UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="0000-00-00 00:00:00" name="caa_completed_date" type="datetime">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="N" name="caa_serverguard" type="CHAR(1)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="caa_parent_callactivityno" type="INT"/>
+                <column defaultValue="N" name="caa_awaiting_customer_response_flag"
+                        remarks="If so then exclude this from time duration calculations" type="CHAR(1)"/>
+                <column name="caa_class" remarks="[W]orking, [I]nformational, [O]ther" type="CHAR(1)"/>
+                <column defaultValueComputed="CURRENT_TIMESTAMP" name="created" type="TIMESTAMP(19)">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="N" name="caa_logging_error_flag"
+                        remarks="Was there an error when logging this activity" type="CHAR(1)"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-202">
+        <sql>update custype
+             set cty_ctypeno = 25
+             where cty_desc = "Legacy" </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-203">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <primaryKeyExists tableName="custype" primaryKeyName="PRIMARY"/>
+            </not>
+        </preConditions>
+        <addPrimaryKey tableName="custype" columnNames="cty_ctypeno"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-204">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="domain_import"/>
+        </preConditions>
+        <dropTable tableName="domain_import"/>
+        <rollback>
+            <createTable tableName="domain_import">
+                <column name="domain" type="CHAR(100)"/>
+                <column name="expiryDate" type="date"/>
+                <column name="customerID" type="INT"/>
+                <column name="invoicePeriodMonths" type="INT"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-205">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="future_action"/>
+        </preConditions>
+        <dropTable tableName="future_action"/>
+        <rollback>
+            <createTable tableName="future_action">
+                <column defaultValueNumeric="0" name="futureActionID" type="INT UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="furtherActionID" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="0000-00-00" name="date" type="date">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValue="" name="callActivityID" type="VARCHAR(11)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="engineerName" type="CHAR(50)"/>
+                <column name="dateCreated" type="date"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-206">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="mailshot_table"/>
+        </preConditions>
+        <dropTable tableName="mailshot_table"/>
+        <rollback>
+            <createTable tableName="mailshot_table">
+                <column name="keyfield" type="CHAR(50)"/>
+                <column name="hits" type="INT"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-207">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="main_contacts"/>
+        </preConditions>
+        <dropTable tableName="main_contacts"/>
+        <rollback>
+            <createTable tableName="main_contacts">
+                <column name="ContactFirstName" type="CHAR(25)"/>
+                <column name="ContactLastName" type="CHAR(35)"/>
+                <column name="ContactEmail" type="CHAR(60)"/>
+                <column name="CustomerName" type="VARCHAR(35)"/>
+                <column name="CustomerID" type="INT"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-208">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="temp_table"/>
+        </preConditions>
+        <dropTable tableName="temp_table"/>
+        <rollback>
+            <createTable tableName="temp_table">
+                <column name="id" type="INT UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="value" type="CHAR(200)"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-209">
+        <sql>
+            update password
+            set archivedAt = if(archivedAt = '0000-00-00 00:00:00', null, archivedAt),
+                archivedBy = if(archivedBy = '', null, archivedBy),
+                serviceID  = if(serviceID = 0, null, serviceID)
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-210">
+        <sql>
+            update custitem
+            set initialContractLength = 12
+            where initialContractLength is null
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-211">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT data_type = 'tinyint' FROM information_schema.`COLUMNS` c WHERE c.`TABLE_SCHEMA` = DATABASE() AND
+                c.`TABLE_NAME` = 'paymentterms' AND c.`COLUMN_NAME` = 'days'
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="paymentTerms" columnName="days" newDataType="smallint"/>
+        <rollback>
+            <modifyDataType tableName="paymentTerms" columnName="days" newDataType="tinyint"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1554199133-212">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="NO">
+                SELECT `information_schema`.COLUMNS.`IS_NULLABLE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='quotation'
+                AND column_name='emailSubject'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint columnName="emailSubject" tableName="quotation" columnDataType="char(100)"/>
+    </changeSet>
+</databaseChangeLog>

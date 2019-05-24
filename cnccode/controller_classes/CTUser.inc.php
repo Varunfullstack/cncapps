@@ -6,6 +6,9 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Encryption;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -40,11 +43,32 @@ define(
 
 class CTUser extends CTCNC
 {
+    const dateOfBirth = "dateOfBirth";
+    const startDate = "startDate";
+    const pensionAdditionalPayments = "pensionAdditionalPayments";
+    const salary = "salary";
+    const salarySacrifice = "salarySacrifice";
+    const nationalInsuranceNumber = "nationalInsuranceNumber";
+    const address1 = "address1";
+    const address2 = "address2";
+    const address3 = "address3";
+    const town = "town";
+    const county = "county";
+    const postcode = "postcode";
+
+    const absenceFormUserID = "userID";
+    const absenceFormStartDate = "startDate";
+    const absenceFormDays = "days";
+
+
     const DECRYPT = 'decrypt';
     const GetAge = 'getAge';
-    var $dsUser = '';
-    var $dsAbsence = '';
-    var $buUser = '';
+    /** @var DSForm */
+    public $dsUser;
+    /** @var DSForm */
+    public $dsAbsence;
+    /** @var BUUser */
+    public $buUser;
 
     function __construct($requestMethod,
                          $postVars,
@@ -69,66 +93,67 @@ class CTUser extends CTCNC
         }
         $this->buUser = new BUUser($this);
         $this->dsUser = new DSForm($this);
-        $this->dsUser->copyColumnsFrom($this->buUser->dbeUser);
+        $this->dsUser->copyColumnsFrom($this->buUser->dbeUser, false);
+        $this->dsUser->setNull(DBEUser::userID, DA_ALLOW_NULL);
 
         $this->dsUser->setAddColumnsOn();
         $this->dsUser->addColumn(
-            "dateOfBirth",
+            self::dateOfBirth,
             DA_TEXT,
             DA_ALLOW_NULL
         );
         $this->dsUser->addColumn(
-            "startDate",
+            self::startDate,
             DA_TEXT,
             DA_ALLOW_NULL
         );
         $this->dsUser->addColumn(
-            "pensionAdditionalPayments",
+            self::pensionAdditionalPayments,
             DA_TEXT,
             DA_ALLOW_NULL
         );
         $this->dsUser->addColumn(
-            "salary",
+            self::salary,
             DA_TEXT,
             DA_ALLOW_NULL
         );
         $this->dsUser->addColumn(
-            "salarySacrifice",
+            self::salarySacrifice,
             DA_TEXT,
             DA_ALLOW_NULL
         );
         $this->dsUser->addColumn(
-            "nationalInsuranceNumber",
+            self::nationalInsuranceNumber,
             DA_TEXT,
             DA_ALLOW_NULL
         );
         $this->dsUser->addColumn(
-            "address1",
+            self::address1,
             DA_TEXT,
             DA_ALLOW_NULL
         );
         $this->dsUser->addColumn(
-            "address2",
+            self::address2,
             DA_TEXT,
             DA_ALLOW_NULL
         );
         $this->dsUser->addColumn(
-            "address3",
+            self::address3,
             DA_TEXT,
             DA_ALLOW_NULL
         );
         $this->dsUser->addColumn(
-            "town",
+            self::town,
             DA_TEXT,
             DA_ALLOW_NULL
         );
         $this->dsUser->addColumn(
-            "county",
+            self::county,
             DA_TEXT,
             DA_ALLOW_NULL
         );
         $this->dsUser->addColumn(
-            "postcode",
+            self::postcode,
             DA_TEXT,
             DA_ALLOW_NULL
         );
@@ -137,17 +162,17 @@ class CTUser extends CTCNC
 
         $this->dsAbsence = new DSForm($this);
         $this->dsAbsence->addColumn(
-            'userID',
+            self::absenceFormUserID,
             DA_INTEGER,
             DA_NOT_NULL
         );
         $this->dsAbsence->addColumn(
-            'startDate',
+            self::absenceFormStartDate,
             DA_DATE,
             DA_NOT_NULL
         );
         $this->dsAbsence->addColumn(
-            'days',
+            self::absenceFormDays,
             DA_INTEGER,
             DA_NOT_NULL
         );
@@ -155,10 +180,11 @@ class CTUser extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTUSER_ACT_EDIT:
             case CTUSER_ACT_CREATE:
                 $this->edit();
@@ -178,14 +204,14 @@ class CTUser extends CTCNC
             case self::DECRYPT:
                 $response = ["status" => "ok"];
                 try {
-                    $response['decryptedData'] = \CNCLTD\Encryption::decrypt(
+                    $response['decryptedData'] = Encryption::decrypt(
                         USER_ENCRYPTION_PRIVATE_KEY,
-                        @$_REQUEST['passphrase'],
-                        @$_REQUEST['encryptedData']
+                        @$this->getParam('passphrase'),
+                        @$this->getParam('encryptedData')
                     );
 
-                    if (isset($_REQUEST['extraData']) && $response['decryptedData']) {
-                        switch ($_REQUEST['extraData']) {
+                    if ($this->getParam('extraData') && $response['decryptedData']) {
+                        switch ($this->getParam('extraData')) {
                             case 'age':
                                 $response['extraData'] = (new DateTime())->diff(
                                         DateTime::createFromFormat(
@@ -229,6 +255,7 @@ class CTUser extends CTCNC
     /**
      * Display list of users
      * @access private
+     * @throws Exception
      */
     function displayList()
     {
@@ -237,8 +264,11 @@ class CTUser extends CTCNC
         $this->setTemplateFiles(
             array('UserList' => 'UserList.inc')
         );
-
+        $dsUser = new DataSet($this);
         $this->buUser->getAllUsers($dsUser);
+
+        $txtCreate = null;
+        $urlCreate = null;
 
         if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
             $urlCreate =
@@ -249,9 +279,6 @@ class CTUser extends CTCNC
                     )
                 );
             $txtCreate = 'Create new user';
-        } else {
-            $txtCreate = '';
-            $urlCreate = '';
         }
 
         $this->template->set_var(
@@ -268,8 +295,10 @@ class CTUser extends CTCNC
                 'users'
             );
             while ($dsUser->fetchNext()) {
-                $userID = $dsUser->getValue('userID');
+                $userID = $dsUser->getValue(DBEJUser::userID);
 
+                $urlEdit = null;
+                $txtEdit = null;
                 if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
 
                     $urlEdit =
@@ -282,9 +311,6 @@ class CTUser extends CTCNC
                         );
 
                     $txtEdit = '[edit]';
-                } else {
-                    $urlEdit = '';
-                    $txtEdit = '';
                 }
 
                 $urlReportAbsent =
@@ -301,9 +327,9 @@ class CTUser extends CTCNC
                     array(
                         'userID' => $userID,
 
-                        'firstName' => Controller::htmlDisplayText($dsUser->getValue('firstName')),
+                        'firstName' => Controller::htmlDisplayText($dsUser->getValue(DBEJUser::firstName)),
 
-                        'lastName' => Controller::htmlDisplayText($dsUser->getValue('lastName')),
+                        'lastName' => Controller::htmlDisplayText($dsUser->getValue(DBEJUser::lastName)),
 
                         'urlReportAbsent'
                         => $urlReportAbsent,
@@ -333,6 +359,7 @@ class CTUser extends CTCNC
     /**
      * Edit/Add Expense Type
      * @access private
+     * @throws Exception
      */
     function edit()
     {
@@ -340,26 +367,28 @@ class CTUser extends CTCNC
         $dsUser = &$this->dsUser; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == CTUSER_ACT_EDIT) {
+            if ($this->getAction() == CTUSER_ACT_EDIT) {
                 $this->buUser->getUserByID(
-                    $_REQUEST['userID'],
+                    $this->getParam('userID'),
                     $dsUser
                 );
-                $userID = $_REQUEST['userID'];
+                $userID = $this->getParam('userID');
             } else {                                                                    // creating new
                 $dsUser->initialise();
                 $dsUser->setValue(
-                    'userID',
-                    '0'
+                    DBEJUser::userID,
+                    null
                 );
-                $userID = '0';
+                $userID = null;
             }
         } else {                                                                        // form validation error
             $dsUser->initialise();
             $dsUser->fetchNext();
-            $userID = $dsUser->getValue('userID');
+            $userID = $dsUser->getValue(DBEJUser::userID);
         }
-        if ($_REQUEST['action'] == CTUSER_ACT_EDIT && $this->buUser->canDeleteUser($_REQUEST['userID'])) {
+        $urlDelete = null;
+        $txtDelete = null;
+        if ($this->getAction() == CTUSER_ACT_EDIT && $this->buUser->canDeleteUser($this->getParam('userID'))) {
             $urlDelete =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -369,9 +398,6 @@ class CTUser extends CTCNC
                     )
                 );
             $txtDelete = 'Delete';
-        } else {
-            $urlDelete = '';
-            $txtDelete = '';
         }
         $urlUpdate =
             Controller::buildLink(
@@ -406,7 +432,9 @@ class CTUser extends CTCNC
                 array(
                     'level'            => $level['level'],
                     'levelDescription' => $level['description'],
-                    'levelSelected'    => $dsUser->getValue(DBEUser::passwordLevel) == $level['level'] ? 'selected' : ''
+                    'levelSelected'    => $dsUser->getValue(
+                        DBEUser::passwordLevel
+                    ) == $level['level'] ? 'selected' : null
                 )
             );
             $this->template->parse(
@@ -419,16 +447,18 @@ class CTUser extends CTCNC
 
         $this->template->setVar(
             array(
-                'userID'                                     => $dsUser->getValue('userID'),
-                'name'                                       => Controller::htmlInputText($dsUser->getValue('name')),
+                'userID'                                     => $dsUser->getValue(DBEJUser::userID),
+                'name'                                       => Controller::htmlInputText(
+                    $dsUser->getValue(DBEJUser::name)
+                ),
                 'nameMessage'                                => Controller::htmlDisplayText(
-                    $dsUser->getMessage('name')
+                    $dsUser->getMessage(DBEJUser::name)
                 ),
                 'salutation'                                 => Controller::htmlInputText(
-                    $dsUser->getValue('salutation')
+                    $dsUser->getValue(DBEJUser::salutation)
                 ),
                 'salutationMessage'                          => Controller::htmlDisplayText(
-                    $dsUser->getMessage('salutation')
+                    $dsUser->getMessage(DBEJUser::salutation)
                 ),
                 'address1PencilColor'                        => $this->dsUser->getValue(
                     DBEUser::encryptedAddress1
@@ -491,64 +521,74 @@ class CTUser extends CTCNC
                     DBEUser::encryptedPostcode
                 ) ? 'greenPencil' : 'redPencil',
                 "encryptedPostcode"                          => $this->dsUser->getValue(DBEUser::encryptedPostcode),
-                'add1'                                       => Controller::htmlInputText($dsUser->getValue('add1')),
+                'add1'                                       => Controller::htmlInputText(
+                    $dsUser->getValue(DBEJUser::add1)
+                ),
                 'add1Message'                                => Controller::htmlDisplayText(
-                    $dsUser->getMessage('add1')
+                    $dsUser->getMessage(DBEJUser::add1)
                 ),
-                'add2'                                       => Controller::htmlInputText($dsUser->getValue('add2')),
-                'add3'                                       => Controller::htmlInputText($dsUser->getValue('add3')),
-                'town'                                       => Controller::htmlInputText($dsUser->getValue('town')),
+                'add2'                                       => Controller::htmlInputText(
+                    $dsUser->getValue(DBEJUser::add2)
+                ),
+                'add3'                                       => Controller::htmlInputText(
+                    $dsUser->getValue(DBEJUser::add3)
+                ),
+                'town'                                       => Controller::htmlInputText(
+                    $dsUser->getValue(DBEJUser::town)
+                ),
                 'townMessage'                                => Controller::htmlDisplayText(
-                    $dsUser->getMessage('town')
+                    $dsUser->getMessage(DBEJUser::town)
                 ),
-                'county'                                     => Controller::htmlInputText($dsUser->getValue('county')),
+                'county'                                     => Controller::htmlInputText(
+                    $dsUser->getValue(DBEJUser::county)
+                ),
                 'postcode'                                   => Controller::htmlInputText(
-                    $dsUser->getValue('postcode')
+                    $dsUser->getValue(DBEJUser::postcode)
                 ),
                 'postcodeMessage'                            => Controller::htmlDisplayText(
-                    $dsUser->getMessage('postcode')
+                    $dsUser->getMessage(DBEJUser::postcode)
                 ),
                 'username'                                   => Controller::htmlInputText(
-                    $dsUser->getValue('username')
+                    $dsUser->getValue(DBEJUser::username)
                 ),
                 'usernameMessage'                            => Controller::htmlDisplayText(
-                    $dsUser->getMessage('username')
+                    $dsUser->getMessage(DBEJUser::username)
                 ),
                 'employeeNo'                                 => Controller::htmlInputText(
-                    $dsUser->getValue('employeeNo')
+                    $dsUser->getValue(DBEJUser::employeeNo)
                 ),
                 'employeeNoMessage'                          => Controller::htmlDisplayText(
-                    $dsUser->getMessage('employeeNo')
+                    $dsUser->getMessage(DBEJUser::employeeNo)
                 ),
                 'jobTitle'                                   => Controller::htmlInputText(
-                    $dsUser->getValue('jobTitle')
+                    $dsUser->getValue(DBEJUser::jobTitle)
                 ),
                 'jobTitleMessage'                            => Controller::htmlDisplayText(
-                    $dsUser->getMessage('jobTitle')
+                    $dsUser->getMessage(DBEJUser::jobTitle)
                 ),
                 'petrolRate'                                 => Controller::htmlInputText(
-                    $dsUser->getValue('petrolRate')
+                    $dsUser->getValue(DBEJUser::petrolRate)
                 ),
                 'petrolRateMessage'                          => Controller::htmlDisplayText(
-                    $dsUser->getMessage('petrolRate')
+                    $dsUser->getMessage(DBEJUser::petrolRate)
                 ),
                 'hourlyPayRate'                              => Controller::htmlInputText(
-                    $dsUser->getValue('hourlyPayRate')
+                    $dsUser->getValue(DBEJUser::hourlyPayRate)
                 ),
                 'hourlyPayRateMessage'                       => Controller::htmlDisplayText(
-                    $dsUser->getMessage('hourlyPayRate')
+                    $dsUser->getMessage(DBEJUser::hourlyPayRate)
                 ),
                 'standardDayHours'                           => Controller::htmlInputText(
-                    $dsUser->getValue('standardDayHours')
+                    $dsUser->getValue(DBEJUser::standardDayHours)
                 ),
                 'standardDayHoursMessage'                    => Controller::htmlDisplayText(
-                    $dsUser->getMessage('standardDayHours')
+                    $dsUser->getMessage(DBEJUser::standardDayHours)
                 ),
                 'signatureFilename'                          => Controller::htmlInputText(
-                    $dsUser->getValue('signatureFilename')
+                    $dsUser->getValue(DBEJUser::signatureFilename)
                 ),
                 'signatureFilenameMessage'                   => Controller::htmlDisplayText(
-                    $dsUser->getMessage('signatureFilename')
+                    $dsUser->getMessage(DBEJUser::signatureFilename)
                 ),
                 'firstName'                                  => Controller::htmlInputText(
                     $dsUser->getValue(DBEUser::firstName)
@@ -575,57 +615,59 @@ class CTUser extends CTCNC
                     $dsUser->getValue(DBEUser::staffAppraiserFlag)
                 ),
                 'receiveSdManagerEmailFlagChecked'           => Controller::htmlChecked(
-                    $dsUser->getValue('receiveSdManagerEmailFlag')
+                    $dsUser->getValue(DBEJUser::receiveSdManagerEmailFlag)
                 ),
 
-                'appearInQueueFlagChecked' => Controller::htmlChecked($dsUser->getValue('appearInQueueFlag')),
+                'appearInQueueFlagChecked' => Controller::htmlChecked($dsUser->getValue(DBEJUser::appearInQueueFlag)),
 
                 'changePriorityFlagChecked' => Controller::htmlChecked(
                     $dsUser->getValue(
-                        'changePriorityFlag'
+                        DBEJUser::changePriorityFlag
                     )
                 ),
 
-                'weekdayOvertimeFlagChecked' => Controller::htmlChecked($dsUser->getValue('weekdayOvertimeFlag')),
-                'helpdeskFlagChecked'        => Controller::htmlChecked($dsUser->getValue('helpdeskFlag')),
+                'weekdayOvertimeFlagChecked' => Controller::htmlChecked(
+                    $dsUser->getValue(DBEJUser::weekdayOvertimeFlag)
+                ),
+                'helpdeskFlagChecked'        => Controller::htmlChecked($dsUser->getValue(DBEJUser::helpdeskFlag)),
 
                 'salesChecked' => (strpos(
-                        $dsUser->getValue('perms'),
+                        $dsUser->getValue(DBEJUser::perms),
                         PHPLIB_PERM_SALES
-                    ) !== FALSE) ? CT_CHECKED : '',
+                    ) !== FALSE) ? CT_CHECKED : null,
 
                 'accountsChecked' => (strpos(
-                        $dsUser->getValue('perms'),
+                        $dsUser->getValue(DBEJUser::perms),
                         PHPLIB_PERM_ACCOUNTS
-                    ) !== FALSE) ? CT_CHECKED : '',
+                    ) !== FALSE) ? CT_CHECKED : null,
 
                 'technicalChecked' => (strpos(
-                        $dsUser->getValue('perms'),
+                        $dsUser->getValue(DBEJUser::perms),
                         PHPLIB_PERM_TECHNICAL
-                    ) !== FALSE) ? CT_CHECKED : '',
+                    ) !== FALSE) ? CT_CHECKED : null,
 
                 'supervisorChecked' => (strpos(
-                        $dsUser->getValue('perms'),
+                        $dsUser->getValue(DBEJUser::perms),
                         PHPLIB_PERM_SUPERVISOR
-                    ) !== FALSE) ? CT_CHECKED : '',
+                    ) !== FALSE) ? CT_CHECKED : null,
 
                 'maintenanceChecked' => (strpos(
-                        $dsUser->getValue('perms'),
+                        $dsUser->getValue(DBEJUser::perms),
                         PHPLIB_PERM_MAINTENANCE
-                    ) !== FALSE) ? CT_CHECKED : '',
+                    ) !== FALSE) ? CT_CHECKED : null,
 
                 'customerChecked' => (strpos(
-                        $dsUser->getValue('perms'),
+                        $dsUser->getValue(DBEJUser::perms),
                         PHPLIB_PERM_CUSTOMER
-                    ) !== FALSE) ? CT_CHECKED : '',
+                    ) !== FALSE) ? CT_CHECKED : null,
 
                 'renewalsChecked' => (strpos(
-                        $dsUser->getValue('perms'),
+                        $dsUser->getValue(DBEJUser::perms),
                         PHPLIB_PERM_RENEWALS
-                    ) !== FALSE) ? CT_CHECKED : '',
+                    ) !== FALSE) ? CT_CHECKED : null,
 
                 'changeApproverFlagChecked'           => Controller::htmlChecked(
-                    $dsUser->getValue('changeApproverFlag')
+                    $dsUser->getValue(DBEJUser::changeApproverFlag)
                 ),
                 'changeInitialDateAndTimeFlagChecked' => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::changeInitialDateAndTimeFlag)
@@ -637,10 +679,12 @@ class CTUser extends CTCNC
                     $dsUser->getValue(DBEUser::projectManagementFlag)
                 ),
                 'reportsChecked'                      => (strpos(
-                        $dsUser->getValue('perms'),
+                        $dsUser->getValue(DBEJUser::perms),
                         PHPLIB_PERM_REPORTS
-                    ) !== FALSE) ? CT_CHECKED : '',
-                'teamMessage'                         => Controller::htmlDisplayText($dsUser->getMessage('teamID')),
+                    ) !== FALSE) ? CT_CHECKED : null,
+                'teamMessage'                         => Controller::htmlDisplayText(
+                    $dsUser->getMessage(DBEJUser::teamID)
+                ),
                 'urlUpdate'                           => $urlUpdate,
                 'urlDelete'                           => $urlDelete,
                 'txtDelete'                           => $txtDelete,
@@ -657,15 +701,17 @@ class CTUser extends CTCNC
             'managers'
         );
         while ($dbeManager->fetchNext()) {
-            if ($dbeManager->getValue("userID") != $dsUser->getValue("userID")) {                // exclude this user
-                $managerSelected = ($dsUser->getValue("managerID") == $dbeManager->getValue(
-                        "userID"
-                    )) ? CT_SELECTED : '';
+            if ($dbeManager->getValue(DBEJUser::userID) != $dsUser->getValue(
+                    DBEJUser::userID
+                )) {                // exclude this user
+                $managerSelected = ($dsUser->getValue(DBEJUser::managerID) == $dbeManager->getValue(
+                        DBEJUser::userID
+                    )) ? CT_SELECTED : null;
                 $this->template->set_var(
                     array(
                         'managerSelected' => $managerSelected,
-                        'managerID'       => $dbeManager->getValue("userID"),
-                        'managerName'     => $dbeManager->getValue("name")
+                        'managerID'       => $dbeManager->getValue(DBEJUser::userID),
+                        'managerName'     => $dbeManager->getValue(DBEJUser::name)
                     )
                 );
                 $this->template->parse(
@@ -686,13 +732,15 @@ class CTUser extends CTCNC
         );
         while ($dbeTeam->fetchNext()) {
 
-            $teamSelected = ($dsUser->getValue("teamID") == $dbeTeam->getValue("teamID")) ? CT_SELECTED : '';
+            $teamSelected = ($dsUser->getValue(DBEJUser::teamID) == $dbeTeam->getValue(
+                    DBETeam::teamID
+                )) ? CT_SELECTED : null;
 
             $this->template->set_var(
                 array(
                     'teamSelected' => $teamSelected,
-                    'teamID'       => $dbeTeam->getValue("teamID"),
-                    'teamName'     => $dbeTeam->getValue("name")
+                    'teamID'       => $dbeTeam->getValue(DBETeam::teamID),
+                    'teamName'     => $dbeTeam->getValue(DBETeam::name)
                 )
             );
             $this->template->parse(
@@ -711,9 +759,9 @@ class CTUser extends CTCNC
             'customers'
         );
         while ($dbeCustomer->fetchNext()) {
-            $customerSelected = ($dsUser->getValue("customerID") == $dbeCustomer->getValue(
+            $customerSelected = ($dsUser->getValue(DBEJUser::customerID) == $dbeCustomer->getValue(
                     DBECustomer::customerID
-                )) ? CT_SELECTED : '';
+                )) ? CT_SELECTED : null;
             $this->template->set_var(
                 array(
                     'customerSelected' => $customerSelected,
@@ -736,205 +784,84 @@ class CTUser extends CTCNC
         $this->parsePage();
     }// end function edit()
 
+
+    private function updateEncryptedData(array $userData, DataAccess $dsUser)
+    {
+        $dsUser->setUpdateModeUpdate();
+
+
+        $keys = [
+            'dateOfBirth',
+            'pensionAdditionalPayments',
+            'salary',
+            'salarySacrifice',
+            'nationalInsuranceNumber',
+            'address1',
+            'address2',
+            'address3',
+            'town',
+            'county',
+            'postcode',
+        ];
+
+
+        foreach ($keys as $key) {
+            $encryptedKeyName = 'encrypted' . ucfirst($key);
+            $encryptedValue = $this->dsUser->getValue($encryptedKeyName);
+            if (isset($userData[$key]) && $userData[$key]) {
+                $encryptedValue = Encryption::encrypt(
+                    USER_ENCRYPTION_PUBLIC_KEY,
+                    $userData[$key]
+                );
+
+            }
+            $this->dsUser->setValue($encryptedKeyName, $encryptedValue);
+        }
+        $dsUser->post();
+    }
+
     /**
      * Update call user details
      * @access private
+     * @throws Exception
      */
     function update()
     {
         $this->setMethodName('update');
-        $dsUser = &$this->dsUser;
+        $this->formError = (!$this->dsUser->populateFromArray($this->getParam('user')));
+        $userData = $this->getParam('user')[1];
+        $this->updateEncryptedData($userData, $this->dsUser);
 
-
-        if (isset($_REQUEST['user'][1]["dateOfBirth"])) {
-            if ($_REQUEST['user'][1]["dateOfBirth"]) {
-                $_REQUEST['user'][1]["encryptedDateOfBirth"] =
-                    \CNCLTD\Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["dateOfBirth"]
-                    );
-
-            } else {
-                $_REQUEST['user'][1]["encryptedDateOfBirth"] = null;
-            }
-        }
-
-        if (isset($_REQUEST['user'][1]["pensionAdditionalPayments"])) {
-
-            if ($_REQUEST['user'][1]["pensionAdditionalPayments"]) {
-                $_REQUEST['user'][1]["encryptedPensionAdditionalPayments"] =
-                    \CNCLTD\Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["pensionAdditionalPayments"]
-                    );
-
-            } else {
-                $_REQUEST['user'][1]["encryptedPensionAdditionalPayments"] = null;
-            }
-        }
-
-        if (isset($_REQUEST['user'][1]["salary"])) {
-
-            if ($_REQUEST['user'][1]["salary"]) {
-                $_REQUEST['user'][1]["encryptedSalary"] =
-                    \CNCLTD\Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["salary"]
-                    );
-
-            } else {
-                $_REQUEST['user'][1]["encryptedSalary"] = null;
-            }
-        }
-
-        if (isset($_REQUEST['user'][1]["salarySacrifice"])) {
-
-            if ($_REQUEST['user'][1]["salarySacrifice"]) {
-                $_REQUEST['user'][1]["encryptedSalarySacrifice"] =
-                    \CNCLTD\Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["salarySacrifice"]
-                    );
-
-            } else {
-                $_REQUEST['user'][1]["encryptedSalarySacrifice"] = null;
-            }
-        }
-
-
-        if (isset($_REQUEST['user'][1]["nationalInsuranceNumber"])) {
-
-            if ($_REQUEST['user'][1]["nationalInsuranceNumber"]) {
-                $_REQUEST['user'][1]["encryptedNationalInsuranceNumber"] =
-                    \CNCLTD\Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["nationalInsuranceNumber"]
-                    );
-
-            } else {
-                $_REQUEST['user'][1]["encryptedNationalInsuranceNumber"] = null;
-            }
-        }
-
-        if (isset($_REQUEST['user'][1]["address1"])) {
-
-            if ($_REQUEST['user'][1]["address1"]) {
-                $_REQUEST['user'][1]["encryptedAddress1"] =
-                    \CNCLTD\Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["address1"]
-                    );
-
-            } else {
-                $_REQUEST['user'][1]["encryptedAddress1"] = null;
-            }
-        }
-
-        if (isset($_REQUEST['user'][1]["address2"])) {
-
-            if ($_REQUEST['user'][1]["address2"]) {
-                $_REQUEST['user'][1]["encryptedAddress2"] =
-                    \CNCLTD\Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["address2"]
-                    );
-
-            } else {
-                $_REQUEST['user'][1]["encryptedAddress2"] = null;
-            }
-        }
-
-
-        if (isset($_REQUEST['user'][1]["address3"])) {
-
-            if ($_REQUEST['user'][1]["address3"]) {
-                $_REQUEST['user'][1]["encryptedAddress3"] =
-                    \CNCLTD\Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["address3"]
-                    );
-
-            } else {
-                $_REQUEST['user'][1]["encryptedAddress3"] = null;
-            }
-        }
-
-        if (isset($_REQUEST['user'][1]["town"])) {
-            if ($_REQUEST['user'][1]["town"]) {
-                $_REQUEST['user'][1]["encryptedTown"] =
-                    \CNCLTD\Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["town"]
-                    );
-
-            } else {
-                $_REQUEST['user'][1]["encryptedTown"] = null;
-            }
-        }
-
-        if (isset($_REQUEST['user'][1]["county"])) {
-
-            if ($_REQUEST['user'][1]["county"]) {
-                $_REQUEST['user'][1]["encryptedCounty"] =
-                    \CNCLTD\Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["county"]
-                    );
-
-            } else {
-                $_REQUEST['user'][1]["encryptedCounty"] = null;
-            }
-        }
-
-        if (isset($_REQUEST['user'][1]["postcode"])) {
-
-            if ($_REQUEST['user'][1]["postcode"]) {
-                $_REQUEST['user'][1]["encryptedPostcode"] =
-                    \CNCLTD\Encryption::encrypt(
-                        USER_ENCRYPTION_PUBLIC_KEY,
-                        $_REQUEST['user'][1]["postcode"]
-                    );
-
-            } else {
-                $_REQUEST['user'][1]["encryptedPostcode"] = null;
-            }
-        }
-        $this->formError = (!$this->dsUser->populateFromArray($_REQUEST['user']));
-        if (isset($_REQUEST['perms'])) {
+        if ($this->getParam('perms')) {
             $this->dsUser->setUpdateModeUpdate();
             $this->dsUser->setValue(
-                'perms',
+                DBEJUser::perms,
                 implode(
                     ',',
-                    $_REQUEST['perms']
+                    $this->getParam('perms')
                 )
             );
             $this->dsUser->post();
         }
         if ($this->formError) {
-            if ($this->dsUser->getValue('userID') == '0') {                    // attempt to insert
-                $_REQUEST['action'] = CTUSER_ACT_EDIT;
+            if (!$this->dsUser->getValue(DBEJUser::userID)) {
+                $this->setAction(CTUSER_ACT_CREATE);
             } else {
-                $_REQUEST['action'] = CTUSER_ACT_CREATE;
+                $this->setAction(CTUSER_ACT_EDIT);
             }
             $this->edit();
             exit;
         }
 
-
-        $this->dsUser->setUpdateModeUpdate();
-        $this->dsUser->post();
-
         $this->buUser->updateUser($this->dsUser);
 
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'userID' => $this->dsUser->getValue('userID'),
-                    'action' => CTCNC_ACT_VIEW
-                )
-            );
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'userID' => $this->dsUser->getValue(DBEJUser::userID),
+                'action' => CTCNC_ACT_VIEW
+            )
+        );
         header('Location: ' . $urlNext);
     }
 
@@ -943,26 +870,30 @@ class CTUser extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function delete()
     {
         $this->setMethodName('delete');
-        if (!$this->buUser->deleteUser($_REQUEST['userID'])) {
+        if (!$this->buUser->deleteUser($this->getParam('userID'))) {
             $this->displayFatalError('Cannot delete this user');
             exit;
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTUSER_ACT_DISPLAY_LIST
-                    )
-                );
-            header('Location: ' . $urlNext);
-            exit;
         }
+
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTUSER_ACT_DISPLAY_LIST
+            )
+        );
+        header('Location: ' . $urlNext);
+        exit;
+
     }
 
+    /**
+     * @throws Exception
+     */
     function absenceEdit()
     {
         $this->setPageTitle('Record Absence');
@@ -971,22 +902,21 @@ class CTUser extends CTCNC
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-            if (!$this->formError = (!$this->dsAbsence->populateFromArray($_REQUEST['absence']))) {
+            if (!$this->formError = (!$this->dsAbsence->populateFromArray($this->getParam('absence')))) {
 
 
                 $this->buUser->setUserAbsent(
-                    $this->dsAbsence->getValue('userID'),
-                    $this->dsAbsence->getValue('startDate'),
-                    $this->dsAbsence->getValue('days')
+                    $this->dsAbsence->getValue(self::absenceFormUserID),
+                    $this->dsAbsence->getValue(self::absenceFormStartDate),
+                    $this->dsAbsence->getValue(self::absenceFormDays)
                 );
 
-                $urlNext =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => CTUSER_ACT_DISPLAY_LIST
-                        )
-                    );
+                $urlNext = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => CTUSER_ACT_DISPLAY_LIST
+                    )
+                );
                 header('Location: ' . $urlNext);
                 exit;
             }
@@ -996,32 +926,31 @@ class CTUser extends CTCNC
             defaults
             */
             $this->dsAbsence->setValue(
-                'userID',
-                $_REQUEST['userID']
+                self::absenceFormUserID,
+                $this->getParam('userID')
             );
             $this->dsAbsence->setValue(
-                'startDate',
-                date(CONFIG_MYSQL_DATE)
+                self::absenceFormStartDate,
+                date(DATE_MYSQL_DATE)
             );
             $this->dsAbsence->setValue(
-                'days',
+                self::absenceFormDays,
                 1
             );
         }
-
+        $dsUser = new DataSet($this);
         $this->buUser->getUserByID(
-            $this->dsAbsence->getValue('userID'),
+            $this->dsAbsence->getValue(self::absenceFormUserID),
             $dsUser
         );
 
         $this->template->setVar(
             array(
-                'userID'           => $this->dsAbsence->getValue('userID'),
-                'startDate'        => Controller::dateYMDtoDMY($this->dsAbsence->getValue('startDate')),
-                'startDateMessage' => $this->dsAbsence->getMessage('startDate'),
-                'daysMessage'      => $this->dsAbsence->getMessage('days'),
-                'userName'         => $dsUser->getValue('name'),
-                'urlUpdate'        => $urlUpdate
+                'userID'           => $this->dsAbsence->getValue(self::absenceFormUserID),
+                'startDate'        => Controller::dateYMDtoDMY($this->dsAbsence->getValue(self::absenceFormStartDate)),
+                'startDateMessage' => $this->dsAbsence->getMessage(self::absenceFormStartDate),
+                'daysMessage'      => $this->dsAbsence->getMessage(self::absenceFormDays),
+                'userName'         => $dsUser->getValue(DBEJUser::name),
             )
         );
 
@@ -1033,7 +962,7 @@ class CTUser extends CTCNC
 
         for ($days = 1; $days <= 30; $days++) {
 
-            $daySelected = ($this->dsAbsence->getValue("days") == $day) ? CT_SELECTED : '';
+            $daySelected = ($this->dsAbsence->getValue(self::absenceFormDays) == $days) ? CT_SELECTED : null;
 
             $this->template->set_var(
                 array(
@@ -1057,23 +986,4 @@ class CTUser extends CTCNC
 
         $this->parsePage();
     }
-
-    function reportAbsent()
-    {
-        $this->setMethodName('reportAbsent');
-
-        $this->buUser->setUserAbsent($_REQUEST['userID']);
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTUSER_ACT_DISPLAY_LIST
-                )
-            );
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-}// end of class
-?>
+}

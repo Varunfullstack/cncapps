@@ -10,8 +10,6 @@
 GLOBAL $cfg;
 require_once("config.inc.php");
 require_once($cfg["path_ct"] . "/CTLeadStatusReport.inc.php");
-
-require_once($cfg['path_dbe'] . '/DBEBroadbandServiceType.inc.php');
 require_once($cfg['path_bu'] . '/BURenBroadband.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
@@ -52,7 +50,7 @@ if ($dsRenBroadband->rowCount()) {
         'rows'
     );
     while ($dsRenBroadband->fetchNext()) {
-        $customerItemID = $dsRenBroadband->getValue('customerItemID');
+        $customerItemID = $dsRenBroadband->getValue(DBEJRenBroadband::customerItemID);
 
         $template->set_var(
             array(
@@ -90,8 +88,6 @@ if ($dsRenBroadband->rowCount()) {
     } else {
         $buMail = new BUMail($thing);
 
-        $buMail = new BUMail($this);
-
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $senderName = 'CNC Support Department';
 
@@ -128,6 +124,3 @@ if ($dsRenBroadband->rowCount()) {
         );
     }
 }
-
-
-?>

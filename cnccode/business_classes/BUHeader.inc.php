@@ -17,6 +17,7 @@ class BUHeader extends Business
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -27,7 +28,7 @@ class BUHeader extends Business
 
     /**
      * Get customer rows whose names match the search string or, if the string is numeric, try to select by customerID
-     * @param DataSet $dsResults
+     * @param DataSet|DBEHeader $dsResults
      * @return bool : One or more rows
      * @access public
      */
@@ -44,25 +45,4 @@ class BUHeader extends Business
         $this->updateDataAccessObject($dsData, $this->dbeHeader);
         return TRUE;
     }
-
-    function updateHelpDesk($data)
-    {
-
-        $this->setMethodName('updateHelpDesk');
-        $this->dbeHeader->getRow(1);
-        $this->dbeHeader->setValue('helpDeskProblems', $data['helpDeskProblems']);
-        $this->dbeHeader->updateRow();
-        return TRUE;
-    }
-
-    function clearActivityProblemField()
-    {
-
-        $this->setMethodName('clearActivityProblemField');
-        $this->dbeHeader->getRow(1);
-        $this->dbeHeader->setValue('helpDeskProblems', '');
-        $this->dbeHeader->updateRow();
-        return TRUE;
-    }
-}// End of class
-?>
+}

@@ -74,7 +74,7 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
 
     /**
      * Reference to the current database connection.
-     * @var object PEAR_DB
+     * @var DB_mysqli
      */
     var $db;
 
@@ -115,9 +115,11 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
     function Mail_Queue_Container_db($options)
     {
         if (!is_array($options) || !isset($options['dsn'])) {
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_NO_OPTIONS,
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_NO_OPTIONS,
                 $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
-                'No dns specified!');
+                'No dns specified!'
+            );
         }
         if (isset($options['mail_table'])) {
             $this->mail_table = $options['mail_table'];
@@ -129,12 +131,13 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
         }
         $dsn = array_key_exists('dsn', $options) ? $options['dsn'] : $options;
         $this->db =& DB::connect($dsn, true);
-//        var_dump($this->db);
 
         if (PEAR::isError($this->db)) {
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_CANNOT_CONNECT,
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_CANNOT_CONNECT,
                 $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
-                'DB::connect failed: ' . DB::errorMessage($this->db));
+                'DB::connect failed: ' . DB::errorMessage($this->db)
+            );
         } else {
             $this->db->setFetchMode(DB_FETCHMODE_ASSOC);
         }
@@ -157,10 +160,13 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
             if (PEAR::isError($this->db)) {
                 $msg .= ': ' . DB::errorMessage($this->db);
             }
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_CANNOT_CONNECT,
-                $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__, $msg);
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_CANNOT_CONNECT,
+                $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__, $msg
+            );
         }
-        $query = sprintf("SELECT * FROM %s
+        $query = sprintf(
+            "SELECT * FROM %s
                            WHERE sent_time IS NULL
                              AND try_sent < %d
                              AND time_to_send <= %s
@@ -171,18 +177,22 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
         );
         $res = $this->db->limitQuery($query, $this->offset, $this->limit);
         if (PEAR::isError($res)) {
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_QUERY_FAILED,
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_QUERY_FAILED,
                 $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
-                'DB::query failed - "' . $query . '" - ' . $res->toString());
+                'DB::query failed - "' . $query . '" - ' . $res->toString()
+            );
         }
 
         $this->_last_item = 0;
         $this->queue_data = array(); //reset buffer
         while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
             if (!is_array($row)) {
-                return new Mail_Queue_Error(MAILQUEUE_ERROR_QUERY_FAILED,
+                return new Mail_Queue_Error(
+                    MAILQUEUE_ERROR_QUERY_FAILED,
                     $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
-                    'DB::query failed - "' . $query . '" - ' . $res->toString());
+                    'DB::query failed - "' . $query . '" - ' . $res->toString()
+                );
             }
 
             $delete_after_send = (bool)$row['delete_after_send'];
@@ -228,24 +238,36 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
      *                or Mail_Queue_Error on error
      * @access public
      **/
-    function put($time_to_send, $id_user, $ip, $sender,
-                 $recipient, $headers, $body, $delete_after_send = true)
+    function put($time_to_send,
+                 $id_user,
+                 $ip,
+                 $sender,
+                 $recipient,
+                 $headers,
+                 $body,
+                 $delete_after_send = true
+    )
     {
         if (!is_object($this->db) || !is_a($this->db, 'DB_Common')) {
             $msg = 'DB::connect failed';
             if (PEAR::isError($this->db)) {
                 $msg .= ': ' . DB::errorMessage($this->db);
             }
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_CANNOT_CONNECT,
-                $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__, $msg);
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_CANNOT_CONNECT,
+                $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__, $msg
+            );
         }
         $id = $this->db->nextId($this->sequence);
         if (empty($id) || PEAR::isError($id)) {
-            return new Mail_Queue_Error(MAILQUEUE_ERROR,
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR,
                 $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
-                'Cannot create id in: ' . $this->sequence);
+                'Cannot create id in: ' . $this->sequence
+            );
         }
-        $query = sprintf("INSERT INTO %s (id, create_time, time_to_send, id_user, ip,
+        $query = sprintf(
+            "INSERT INTO %s (id, create_time, time_to_send, id_user, ip,
                         sender, recipient, headers, body, delete_after_send)
                         VALUES(%d, '%s', '%s', %d, '%s', '%s', '%s', '%s', '%s', %d)",
             $this->mail_table,
@@ -263,9 +285,11 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
 
         $res = $this->db->query($query);
         if (PEAR::isError($res)) {
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_QUERY_FAILED,
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_QUERY_FAILED,
                 $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
-                'DB::query failed - "' . $query . '" - ' . $res->toString());
+                'DB::query failed - "' . $query . '" - ' . $res->toString()
+            );
         }
         return $id;
     }
@@ -276,7 +300,7 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
     /**
      * Check how many times mail was sent.
      *
-     * @param object   Mail_Queue_Body
+     * @param Mail_Queue_Body|object $mail
      * @return mixed  Integer or Mail_Queue_Error class if error.
      * @access public
      */
@@ -286,17 +310,19 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
             return new Mail_Queue_Error(MAILQUEUE_ERROR_UNEXPECTED, __FILE__, __LINE__);
         }
         $count = $mail->_try();
-        $query = sprintf("UPDATE %s SET try_sent = %d WHERE id = %d",
+        $query = sprintf(
+            "UPDATE %s SET try_sent = %d WHERE id = %d",
             $this->mail_table,
             $count,
             $mail->getId()
         );
-
         $res = $this->db->query($query);
         if (PEAR::isError($res)) {
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_QUERY_FAILED,
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_QUERY_FAILED,
                 $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
-                'DB::query failed - "' . $query . '" - ' . $res->toString());
+                'DB::query failed - "' . $query . '" - ' . $res->toString()
+            );
         }
         return $count;
     }
@@ -314,11 +340,14 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
     function setAsSent($mail)
     {
         if (!is_object($mail) || !is_a($mail, 'mail_queue_body')) {
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_UNEXPECTED,
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_UNEXPECTED,
                 $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
-                'Expected: Mail_Queue_Body class');
+                'Expected: Mail_Queue_Body class'
+            );
         }
-        $query = sprintf("UPDATE %s SET sent_time = '%s' WHERE id = %d",
+        $query = sprintf(
+            "UPDATE %s SET sent_time = '%s' WHERE id = %d",
             $this->mail_table,
             addslashes(date('Y-m-d H:i:s')),
             $mail->getId()
@@ -326,9 +355,11 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
 
         $res = $this->db->query($query);
         if (PEAR::isError($res)) {
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_QUERY_FAILED,
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_QUERY_FAILED,
                 $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
-                'DB::query failed - "' . $query . '" - ' . $res->toString());
+                'DB::query failed - "' . $query . '" - ' . $res->toString()
+            );
         }
         return true;
     }
@@ -345,15 +376,18 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
      */
     function getMailById($id)
     {
-        $query = sprintf("SELECT * FROM %s WHERE id = %d",
+        $query = sprintf(
+            "SELECT * FROM %s WHERE id = %d",
             $this->mail_table,
             (int)$id
         );
         $row = $this->db->getRow($query, null, DB_FETCHMODE_ASSOC);
         if (PEAR::isError($row) || !is_array($row)) {
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_QUERY_FAILED,
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_QUERY_FAILED,
                 $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
-                'DB::query failed - "' . $query . '" - ' . $row->toString());
+                'DB::query failed - "' . $query . '" - ' . $row->toString()
+            );
         }
 
         $delete_after_send = (bool)$row['delete_after_send'];
@@ -388,9 +422,11 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
         $query = 'SELECT count(*) FROM ' . $this->mail_table;
         $count = $this->db->getOne($query);
         if (PEAR::isError($count)) {
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_QUERY_FAILED,
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_QUERY_FAILED,
                 $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
-                'MDB2: query failed - "' . $query . '" - ' . $row->getMessage());
+                'MDB2: query failed - "' . $query . '" - ' . $row->getMessage()
+            );
         }
         return (int)$count;
     }
@@ -413,8 +449,10 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
             if (PEAR::isError($this->db)) {
                 $msg .= ': ' . $this->db->getMessage();
             }
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_CANNOT_CONNECT,
-                $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__, $msg);
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_CANNOT_CONNECT,
+                $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__, $msg
+            );
         }
         return true;
     }
@@ -431,16 +469,19 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
      */
     function deleteMail($id)
     {
-        $query = sprintf("DELETE FROM %s WHERE id = %d",
+        $query = sprintf(
+            "DELETE FROM %s WHERE id = %d",
             $this->mail_table,
             (int)$id
         );
         $res = $this->db->query($query);
 
         if (PEAR::isError($res)) {
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_QUERY_FAILED,
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_QUERY_FAILED,
                 $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
-                'DB::query failed - "' . $query . '" - ' . $res->getMessage());
+                'DB::query failed - "' . $query . '" - ' . $res->getMessage()
+            );
         }
         return true;
     }

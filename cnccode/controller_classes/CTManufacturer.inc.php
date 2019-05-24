@@ -16,8 +16,6 @@ define('CTMANUFACTURER_MSG_MANUFACTURER_NOT_FND', 'Manufacturer not found');
 define('CTMANUFACTURER_MSG_MANUFACTURERID_NOT_PASSED', 'ManufacturerID not passed');
 define('CTMANUFACTURER_MSG_MANUFACTURER_ARRAY_NOT_PASSED', 'Manufacturer array not passed');
 // Actions
-//define('CTMANUFACTURER_ACT_MANUFACTURER_INSERT', 'insertManufacturer');
-//define('CTMANUFACTURER_ACT_MANUFACTURER_UPDATE', 'updateManufacturer');
 define('CTMANUFACTURER_ACT_DISPLAY_LIST', 'listManufacturers');
 define('CTMANUFACTURER_ACT_DELETE', 'deleteManufacturer');
 define('CTMANUFACTURER_ACT_UPDATE', 'updateManufacturer');
@@ -28,13 +26,12 @@ define('CTMANUFACTURER_TXT_UPDATE_MANUFACTURER', 'Update Manufacturer');
 
 class CTManufacturer extends CTCNC
 {
+    /** @var DSForm */
+    public $dsManufacturer;
     /**
-     * Dataset for manufacturer record storage.
-     *
-     * @var     DSForm
-     * @access  private
+     * @var BUManufacturer
      */
-    var $dsManufacturer = '';
+    public $buManufacturer;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
@@ -53,11 +50,12 @@ class CTManufacturer extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
         $this->setParentFormFields();
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'editManufacturer':
             case 'createManufacturer':
                 $this->edit();
@@ -84,17 +82,18 @@ class CTManufacturer extends CTCNC
      */
     function setParentFormFields()
     {
-        if (isset($_REQUEST['parentIDField'])) {
-            $_SESSION['manufacturerParentIDField'] = $_REQUEST['parentIDField'];
+        if ($this->getParam('parentIDField')) {
+            $this->setSessionParam('manufacturerParentIDField', $this->getParam('parentIDField'));
         }
-        if (isset($_REQUEST['parentDescField'])) {
-            $_SESSION['manufacturerParentDescField'] = $_REQUEST['parentDescField'];
+        if ($this->getParam('parentDescField')) {
+            $this->setSessionParam('manufacturerParentDescField', $this->getParam('parentDescField'));
         }
     }
 
     /**
      * Display the popup selector form
      * @access private
+     * @throws Exception
      */
     function displayManufacturerSelectPopup()
     {
@@ -105,20 +104,21 @@ class CTManufacturer extends CTCNC
         $urlCreate = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
-                'action' => 'createManufacturer',
+                'action'  => 'createManufacturer',
                 'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
 
         // A single slash means create new manufacturer
-        if ($_REQUEST['manufacturerName']{0} == '/') {
+        if ($this->getParam('manufacturerName'){0} == '/') {
             header('Location: ' . $urlCreate);
             exit;
         }
-        $this->buManufacturer->getManufacturersByNameMatch($_REQUEST['manufacturerName'], $dsManufacturer);
+        $dsManufacturer = new DataSet($this);
+        $this->buManufacturer->getManufacturersByNameMatch($this->getParam('manufacturerName'), $dsManufacturer);
         $this->template->set_var(
             array(
-                'parentIDField' => $_SESSION['manufacturerParentIDField'],
+                'parentIDField'   => $_SESSION['manufacturerParentIDField'],
                 'parentDescField' => $_SESSION['manufacturerParentDescField']
             )
         );
@@ -127,15 +127,16 @@ class CTManufacturer extends CTCNC
             // This template runs a javascript function NOT inside HTML and so must use stripslashes()
             $this->template->set_var(
                 array(
-                    'submitDescription' => addslashes($dsManufacturer->getValue("name")), // for javascript
-                    'manufacturerID' => $dsManufacturer->getValue("manufacturerID")
+                    'submitDescription' => addslashes($dsManufacturer->getValue(DBEManufacturer::name)),
+                    // for javascript
+                    'manufacturerID'    => $dsManufacturer->getValue(DBEManufacturer::manufacturerID)
                 )
             );
         } else {
             if ($dsManufacturer->rowCount() == 0) {
                 $this->template->set_var(
                     array(
-                        'manufacturerName' => $_REQUEST['manufacturerName'],
+                        'manufacturerName' => $this->getParam('manufacturerName'),
                     )
                 );
                 $this->setTemplateFiles('ManufacturerSelect', 'ManufacturerSelectNone.inc');
@@ -155,9 +156,13 @@ class CTManufacturer extends CTCNC
                 while ($dsManufacturer->fetchNext()) {
                     $this->template->set_var(
                         array(
-                            'manufacturerName' => Controller::htmlDisplayText($dsManufacturer->getValue("name")),
-                            'submitDescription' => Controller::htmlInputText(addslashes($dsManufacturer->getValue("name"))),
-                            'manufacturerID' => $dsManufacturer->getValue("manufacturerID")
+                            'manufacturerName'  => Controller::htmlDisplayText(
+                                $dsManufacturer->getValue(DBEManufacturer::name)
+                            ),
+                            'submitDescription' => Controller::htmlInputText(
+                                addslashes($dsManufacturer->getValue(DBEManufacturer::name))
+                            ),
+                            'manufacturerID'    => $dsManufacturer->getValue(DBEManufacturer::manufacturerID)
                         )
                     );
                     $this->template->parse('manufacturers', 'manufacturerBlock', true);
@@ -171,6 +176,7 @@ class CTManufacturer extends CTCNC
     /**
      * Display list of manufacturers
      * @access private
+     * @throws Exception
      */
     function displayList()
     {
@@ -181,16 +187,15 @@ class CTManufacturer extends CTCNC
         $this->setTemplateFiles(
             array('ManufacturerList' => 'ManufacturerList.inc')
         );
-
+        $dsManufacturer = new DataSet($this);
         $this->buManufacturer->getAll($dsManufacturer);
 
-        $urlCreate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'createManufacturer'
-                )
-            );
+        $urlCreate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'createManufacturer'
+            )
+        );
 
         $this->template->set_var(
             array('urlCreate' => $urlCreate)
@@ -199,39 +204,28 @@ class CTManufacturer extends CTCNC
         if ($dsManufacturer->rowCount() > 0) {
             $this->template->set_block('ManufacturerList', 'manufacturerBlock', 'manufacturers');
             while ($dsManufacturer->fetchNext()) {
-                $manufacturerID = $dsManufacturer->getValue('manufacturerID');
+                $manufacturerID = $dsManufacturer->getValue(DBEManufacturer::manufacturerID);
                 $urlEdit =
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action' => 'editManufacturer',
+                            'action'         => 'editManufacturer',
                             'manufacturerID' => $manufacturerID
                         )
                     );
                 $txtEdit = '[edit]';
-                /*
-                                $urlDelete =
-                                    Controller::buildLink(
-                                        $_SERVER['PHP_SELF'],
-                                        array(
-                                            'action'				=>	CTMANUFACTURER_ACT_DELETE,
-                                            'manufacturerID'	=>	$manufacturerID
-                                        )
-                                    );
-                                $txtDelete = '[delete]';
-                    */
                 $this->template->set_var(
                     array(
                         'manufacturerID' => $manufacturerID,
-                        'name' => Controller::htmlDisplayText($dsManufacturer->getValue('name')),
-                        'urlEdit' => $urlEdit,
-//						'urlDelete' => $urlDelete,
-                        'txtEdit' => $txtEdit
-//						'txtDelete' => $txtDelete
+                        'name'           => Controller::htmlDisplayText(
+                            $dsManufacturer->getValue(DBEManufacturer::name)
+                        ),
+                        'urlEdit'        => $urlEdit,
+                        'txtEdit'        => $txtEdit
                     )
                 );
                 $this->template->parse('manufacturers', 'manufacturerBlock', true);
-            }//while $dsManufacturer->fetchNext()
+            }
         }
         $this->template->parse('CONTENTS', 'ManufacturerList', true);
         $this->parsePage();
@@ -240,6 +234,7 @@ class CTManufacturer extends CTCNC
     /**
      * Edit/Add Manufacturer
      * @access private
+     * @throws Exception
      */
     function edit()
     {
@@ -247,60 +242,59 @@ class CTManufacturer extends CTCNC
         $dsManufacturer = &$this->dsManufacturer; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == 'editManufacturer') {
-                $this->buManufacturer->getManufacturerByID($_REQUEST['manufacturerID'], $dsManufacturer);
-                $manufacturerID = $_REQUEST['manufacturerID'];
+            if ($this->getAction() == 'editManufacturer') {
+                $this->buManufacturer->getManufacturerByID($this->getParam('manufacturerID'), $dsManufacturer);
+                $manufacturerID = $this->getParam('manufacturerID');
             } else {                                                                    // creating new
                 $dsManufacturer->initialise();
-                $dsManufacturer->setValue('manufacturerID', '0');
+                $dsManufacturer->setValue(DBEManufacturer::manufacturerID, '0');
                 $manufacturerID = '0';
             }
         } else {                                                                        // form validation error
             $dsManufacturer->initialise();
             $dsManufacturer->fetchNext();
-            $manufacturerID = $dsManufacturer->getValue('manufacturerID');
+            $manufacturerID = $dsManufacturer->getValue(DBEManufacturer::manufacturerID);
         }
-        if ($_REQUEST['action'] == 'editManufacturer' && $this->buManufacturer->canDeleteManufacturer($_REQUEST['manufacturerID'])) {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'deleteManufacturer',
-                        'manufacturerID' => $manufacturerID
-                    )
-                );
-            $txtDelete = 'Delete';
-        } else {
-            $urlDelete = '';
-            $txtDelete = '';
-        }
-        $urlUpdate =
-            Controller::buildLink(
+
+        $urlDelete = null;
+        $txtDelete = null;
+        if ($this->getAction() == 'editManufacturer' && $this->buManufacturer->canDeleteManufacturer(
+                $this->getParam('manufacturerID')
+            )) {
+            $urlDelete = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'updateManufacturer',
+                    'action'         => 'deleteManufacturer',
                     'manufacturerID' => $manufacturerID
                 )
             );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTMANUFACTURER_ACT_DISPLAY_LIST
-                )
-            );
+            $txtDelete = 'Delete';
+        }
+        $urlUpdate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'         => 'updateManufacturer',
+                'manufacturerID' => $manufacturerID
+            )
+        );
+        $urlDisplayList = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTMANUFACTURER_ACT_DISPLAY_LIST
+            )
+        );
         $this->setPageTitle('Edit Manufacturer');
         $this->setTemplateFiles(
             array('ManufacturerEdit' => 'ManufacturerEdit.inc')
         );
         $this->template->set_var(
             array(
-                'manufacturerID' => $dsManufacturer->getValue('manufacturerID'),
-                'name' => Controller::htmlInputText($dsManufacturer->getValue('name')),
-                'nameMessage' => Controller::htmlDisplayText($dsManufacturer->getMessage('name')),
-                'urlUpdate' => $urlUpdate,
-                'urlDelete' => $urlDelete,
-                'txtDelete' => $txtDelete,
+                'manufacturerID' => $dsManufacturer->getValue(DBEManufacturer::manufacturerID),
+                'name'           => Controller::htmlInputText($dsManufacturer->getValue(DBEManufacturer::name)),
+                'nameMessage'    => Controller::htmlDisplayText($dsManufacturer->getMessage(DBEManufacturer::name)),
+                'urlUpdate'      => $urlUpdate,
+                'urlDelete'      => $urlDelete,
+                'txtDelete'      => $txtDelete,
                 'urlDisplayList' => $urlDisplayList
             )
         );
@@ -311,18 +305,17 @@ class CTManufacturer extends CTCNC
     /**
      * Update call manufacturer details
      * @access private
+     * @throws Exception
      */
     function update()
     {
         $this->setMethodName('update');
-        $dsManufacturer = &$this->dsManufacturer;
-
-        $this->formError = (!$this->dsManufacturer->populateFromArray($_REQUEST['manufacturer']));
+        $this->formError = (!$this->dsManufacturer->populateFromArray($this->getParam('manufacturer')));
         if ($this->formError) {
-            if ($this->dsManufacturer->getValue('manufacturerID') == '0') {                    // attempt to insert
-                $_REQUEST['action'] = 'editManufacturer';
+            if (!$this->dsManufacturer->getValue(DBEManufacturer::manufacturerID)) {
+                $this->setAction('editManufacturer');
             } else {
-                $_REQUEST['action'] = 'createManufacturer';
+                $this->setAction('createManufacturer');
             }
             $this->edit();
             exit;
@@ -330,15 +323,15 @@ class CTManufacturer extends CTCNC
 
         $this->buManufacturer->updateManufacturer($this->dsManufacturer);
 
-        $manufacturerID = $this->dsManufacturer->getValue('manufacturerID');
+        $manufacturerID = $this->dsManufacturer->getValue(DBEManufacturer::manufacturerID);
 
-        if ($_SESSION['manufacturerParentIDField']) {
+        if($this->getSessionParam('manufacturerParentIDField')) {
             $urlNext = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'displayPopup',
+                    'action'           => 'displayPopup',
                     'manufacturerName' => $manufacturerID,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
+                    'htmlFmt'          => CT_HTML_FMT_POPUP
                 )
             );
         } else {
@@ -359,24 +352,23 @@ class CTManufacturer extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function delete()
     {
         $this->setMethodName('delete');
-        if (!$this->buManufacturer->deleteManufacturer($_REQUEST['manufacturerID'])) {
+        if (!$this->buManufacturer->deleteManufacturer($this->getParam('manufacturerID'))) {
             $this->displayFatalError('Cannot delete this manufacturer');
             exit;
         } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTMANUFACTURER_ACT_DISPLAY_LIST
-                    )
-                );
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTMANUFACTURER_ACT_DISPLAY_LIST
+                )
+            );
             header('Location: ' . $urlNext);
             exit;
         }
     }
-}// end of class
-?>
+}

@@ -26,8 +26,8 @@ class DBEProject extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -152,7 +152,7 @@ class DBEProject extends DBEntity
                     self::completedDate
                 ) . ">= '$activityDate' or " . $this->getDBColumnName(
                     self::completedDate
-                ) . " is null or " . $this->getDBColumnName(self::completedDate) . " = '0000-00-00')";
+                ) . " is null)";
         }
 
         $this->setQueryString($queryString);
@@ -165,7 +165,7 @@ class DBEProject extends DBEntity
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE expiryDate >= NOW() OR expiryDate IS NULL OR expiryDate = '0000-00-00'";
+            " WHERE expiryDate >= NOW() OR expiryDate IS NULL";
 
         $this->setQueryString($queryString);
 
@@ -199,7 +199,7 @@ FROM
   JOIN customer 
     ON cus_custno = project.customerID
   LEFT JOIN (SELECT * FROM (SELECT  * FROM projectUpdates ORDER BY createdAt DESC) reOrderedProjectUpdates GROUP BY projectID) pu ON pu.projectID = project.`projectID`
-WHERE expiryDate >= NOW() OR expiryDate IS NULL OR expiryDate = '0000-00-00'
+WHERE expiryDate >= NOW() OR expiryDate IS NULL
 ORDER BY customerName ASC";
 
         $this->db->query($queryString);

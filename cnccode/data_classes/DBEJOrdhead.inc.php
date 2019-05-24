@@ -7,26 +7,52 @@ require_once($cfg["path_dbe"] . "/DBEOrdhead.inc.php");
 
 class DBEJOrdhead extends DBEOrdhead
 {
+    const customerName = "customerName";
+    const contract = "contract";
+    const customerItemID = "customerItemID";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("customerName", DA_STRING, DA_NOT_NULL, 'cus_name');
-        $this->addColumn("contract", DA_STRING, DA_ALLOW_NULL, 'itm_desc');
-        $this->addColumn("customerItemID", DA_INTEGER, DA_ALLOW_NULL, 'cui_cuino');
+        $this->addColumn(
+            self::customerName,
+            DA_STRING,
+            DA_NOT_NULL,
+            'cus_name'
+        );
+        $this->addColumn(
+            self::contract,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            'itm_desc'
+        );
+        $this->addColumn(
+            self::customerItemID,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            'cui_cuino'
+        );
         $this->setAddColumnsOff();
     }
 
     /**
      * Get rows by operative and date
      * @access public
+     * @param $customerID
+     * @param $orderType
+     * @param $custPORef
+     * @param $lineText
+     * @param $fromDate
+     * @param $toDate
+     * @param $userID
      * @return bool Success
      */
     function getRowsBySearchCriteria(
@@ -44,15 +70,15 @@ class DBEJOrdhead extends DBEOrdhead
             $statement =
                 "SELECT DISTINCT " . $this->getDBColumnNamesAsString() .
                 " FROM " . $this->getTableName() .
-                " JOIN ordline ON " . $this->getTableName() . "." . $this->getDBColumnName('ordheadID') .
+                " JOIN ordline ON " . $this->getTableName() . "." . $this->getDBColumnName(self::ordheadID) .
                 "= ordline.odl_ordno" .
-                " JOIN customer ON " . $this->getTableName() . "." . $this->getDBColumnName('customerID') .
+                " JOIN customer ON " . $this->getTableName() . "." . $this->getDBColumnName(self::customerID) .
                 "= customer.cus_custno";
         } else {
             $statement =
                 "SELECT " . $this->getDBColumnNamesAsString() .
                 " FROM " . $this->getTableName() .
-                " JOIN customer ON " . $this->getTableName() . "." . $this->getDBColumnName('customerID') .
+                " JOIN customer ON " . $this->getTableName() . "." . $this->getDBColumnName(self::customerID) .
                 "= customer.cus_custno";
         }
         $statement .=
@@ -62,7 +88,7 @@ class DBEJOrdhead extends DBEOrdhead
         $statement = $statement . " WHERE 1=1";
         if ($customerID != '') {
             $statement = $statement .
-                " AND " . $this->getDBColumnName('customerID') . "=" . $customerID;
+                " AND " . $this->getDBColumnName(self::customerID) . "=" . $customerID;
         }
         if ($userID != '') {
             $statement = $statement .
@@ -79,38 +105,56 @@ class DBEJOrdhead extends DBEOrdhead
         switch ($orderType) {
             case 'B':
                 $statement = $statement .
-                    " AND " . $this->getDBColumnName('type') . " IN('I','P')";
+                    " AND " . $this->getDBColumnName(self::type) . " IN('I','P')";
                 break;
             case '':                                            // all types
                 break;
             default:
                 $statement = $statement .
-                    " AND " . $this->getDBColumnName('type') . "='" . mysqli_real_escape_string($this->db->link_id(), $orderType) . "'";
+                    " AND " . $this->getDBColumnName(self::type) . "='" . mysqli_real_escape_string(
+                        $this->db->link_id(),
+                        $orderType
+                    ) . "'";
                 break;
         }
         if ($lineText != '') {
             $statement = $statement .
 
                 " AND ( MATCH (ordline.odl_desc)
-					AGAINST ('" . mysqli_real_escape_string($this->db->link_id(), $lineText) . "' IN BOOLEAN MODE)";
+					AGAINST ('" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $lineText
+                ) . "' IN BOOLEAN MODE)";
 
             $statement = $statement .
                 " OR MATCH (item.notes, item.itm_unit_of_sale)
-					AGAINST ('" . mysqli_real_escape_string($this->db->link_id(), $lineText) . "' IN BOOLEAN MODE) )";
+					AGAINST ('" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $lineText
+                ) . "' IN BOOLEAN MODE) )";
         }
         if ($custPORef != '') {
             $statement = $statement .
-                " AND " . $this->getDBColumnName('custPORef') . " LIKE '%" . mysqli_real_escape_string($this->db->link_id(), $custPORef) . "%'";
+                " AND " . $this->getDBColumnName(self::custPORef) . " LIKE '%" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $custPORef
+                ) . "%'";
         }
         if ($fromDate != '') {
             $statement = $statement .
-                " AND " . $this->getDBColumnName('date') . ">='" . mysqli_real_escape_string($this->db->link_id(), $fromDate) . "'";
+                " AND " . $this->getDBColumnName(self::date) . ">='" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $fromDate
+                ) . "'";
         }
         if ($toDate != '') {
             $statement = $statement .
-                " AND " . $this->getDBColumnName('date') . "<='" . mysqli_real_escape_string($this->db->link_id(), $toDate) . "'";
+                " AND " . $this->getDBColumnName(self::date) . "<='" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $toDate
+                ) . "'";
         }
-        $statement = $statement . " ORDER BY " . $this->getDBColumnName('date') . " DESC";
+        $statement = $statement . " ORDER BY " . $this->getDBColumnName(self::date) . " DESC";
         $statement = $statement . " LIMIT 0,200";
 
         $this->setQueryString($statement);
@@ -118,14 +162,28 @@ class DBEJOrdhead extends DBEOrdhead
         return $ret;
     }
 
-    function getRow()
+    /**
+     * @param $ordheadID
+     * @return bool
+     */
+    function getRow($ordheadID = null)
     {
         $this->setMethodName("getRow");
-        $ret = FALSE;
+
+        if (!$this->getValue(DBEOrdhead::ordheadID)) {
+            $this->setValue(
+                DBEOrdhead::ordheadID,
+                $ordheadID
+            );
+        }
+
+
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " JOIN customer ON " . $this->getTableName() . "." . $this->getDBColumnName('customerID') . "= customer.cus_custno" .
+            " JOIN customer ON " . $this->getTableName() . "." . $this->getDBColumnName(
+                self::customerID
+            ) . "= customer.cus_custno" .
             " LEFT JOIN custitem ON renewalOrdheadID = odh_ordno" .
             " LEFT JOIN item ON cui_itemno = itm_itemno" .
             " WHERE " . $this->getPKWhere()
@@ -139,13 +197,13 @@ class DBEJOrdhead extends DBEOrdhead
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " JOIN customer ON " . $this->getTableName() . "." . $this->getDBColumnName('customerID') .
+            " JOIN customer ON " . $this->getTableName() . "." . $this->getDBColumnName(self::customerID) .
             "= customer.cus_custno" .
             " LEFT JOIN custitem ON renewalOrdheadID = odh_ordno" .
             " LEFT JOIN item ON cui_itemno = itm_itemno" .
-            " WHERE " . $this->getDBColumnName('ordheadID') . "=" . $ordheadID .
-            " AND " . $this->getDBColumnName('type') . " IN('I','P')" .
-            " AND " . $this->getDBColumnName('customerID') . " NOT IN(" .
+            " WHERE " . $this->getDBColumnName(self::ordheadID) . "=" . $ordheadID .
+            " AND " . $this->getDBColumnName(self::type) . " IN('I','P')" .
+            " AND " . $this->getDBColumnName(self::customerID) . " NOT IN(" .
             CONFIG_ASSET_STOCK_CUSTOMERID . "," .
             CONFIG_MAINT_STOCK_CUSTOMERID . "," .
             CONFIG_SALES_STOCK_CUSTOMERID . "," .
@@ -157,22 +215,21 @@ class DBEJOrdhead extends DBEOrdhead
     function getDespatchRows($customerID = '')
     {
         $this->setMethodName("getDespatchRows");
-        $ret = FALSE;
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " JOIN customer ON " . $this->getTableName() . "." . $this->getDBColumnName('customerID') .
+            " JOIN customer ON " . $this->getTableName() . "." . $this->getDBColumnName(self::customerID) .
             "= customer.cus_custno" .
             " LEFT JOIN custitem ON renewalOrdheadID = odh_ordno" .
             " LEFT JOIN item ON cui_itemno = itm_itemno" .
             " WHERE 1=1";
         if ($customerID != '') {
             $queryString .=
-                " AND " . $this->getDBColumnName('customerID') . "=" . $customerID;
+                " AND " . $this->getDBColumnName(self::customerID) . "=" . $customerID;
         }
         $queryString .=
-            " AND " . $this->getDBColumnName('type') . " IN('I','P')" .
-            " AND " . $this->getDBColumnName('customerID') . " NOT IN(" .
+            " AND " . $this->getDBColumnName(self::type) . " IN('I','P')" .
+            " AND " . $this->getDBColumnName(self::customerID) . " NOT IN(" .
             CONFIG_ASSET_STOCK_CUSTOMERID . "," .
             CONFIG_MAINT_STOCK_CUSTOMERID . "," .
             CONFIG_SALES_STOCK_CUSTOMERID . "," .
@@ -181,5 +238,3 @@ class DBEJOrdhead extends DBEOrdhead
         return (parent::getRows());
     }
 }
-
-?>

@@ -10,14 +10,14 @@ require_once($cfg["path_func"] . "/Common.inc.php");
 
 class BUSageExport extends Business
 {
-    var $salesHandle = "";
-    var $transHandle = "";
-    var $purchaseHandle = "";
-    var $total_gross_amount = '';
-    var $lastRecord = '';
-    var $year = '';
-    var $month = '';
-    var $invoiceNumbers = false;
+    public $salesHandle;
+    public $transHandle;
+    public $purchaseHandle;
+    public $total_gross_amount;
+    public $lastRecord;
+    public $year;
+    public $month;
+    public $invoiceNumbers = [];
 
     /**
      * Constructor
@@ -31,11 +31,11 @@ class BUSageExport extends Business
 
     /**
      * Generate Sage export files
-     * @parameter Integer $month month for sage data
-     * @parameter Integer $year year for sage data
-     * @parameter Boolean $includeSales indicates whether to produce sales report
-     * @parameter Boolean $includePurchases indicates whether to produce purchase report
      * @access public
+     * @param integer $year year for sage data
+     * @param integer $month month for sage data
+     * @param boolean $includeSales indicates whether to produce sales report
+     * @param boolean $includePurchases indicates whether to produce purchase report
      */
     function generateSageData(
         $year,
@@ -179,7 +179,6 @@ class BUSageExport extends Business
             "\"" . addslashes(substr($db->Record['cus_name'], 0, 30)) . "\"," .
             "\"" . addslashes($db->Record['add_add1']) . "\"," .
             "\"" . addslashes($db->Record['add_add2']) . "\"," .
-//			"\"" . addslashes($db->Record['add_add3']) . "\",".
             "\"" . addslashes($db->Record['add_town']) . "\"," .
             "\"" . addslashes($db->Record['add_county']) . "\"," .
             "\"" . addslashes($db->Record['add_postcode']) . "\"," .
@@ -231,7 +230,9 @@ class BUSageExport extends Business
             "\"," .
             "\"" . addslashes($db->Record['inh_invno']) . "\"," .                                // reference
             "\"\"," .                                                                                                                        // details
-            "\"" . common_numberFormat($gross_amount) . "\"," .                                                                                // gross
+            "\"" . common_numberFormat(
+                $gross_amount
+            ) . "\"," .                                                                                // gross
             "\"" . addslashes($db->Record['inh_vat_code']) . "\"," .                            // VAT code
             "\"0.00\"," .                                                                                                                        // Line VAT always zero
             "\r\n";
@@ -292,20 +293,22 @@ class BUSageExport extends Business
             }
             do {
                 $reportLine =
-                    "\"" . $dbePurchaseInv->getValue('type') . "\"," .                                // PI
-                    "\"" . $dbePurchaseInv->getValue('accRef') . "\"," .
-                    "\"" . $dbePurchaseInv->getValue('nomRef') . "\"," .
-                    "\"" . $dbePurchaseInv->getValue('dept') . "\"," .
+                    "\"" . $dbePurchaseInv->getValue(
+                        DBEPurchaseInv::type
+                    ) . "\"," .                                // PI
+                    "\"" . $dbePurchaseInv->getValue(DBEPurchaseInv::accRef) . "\"," .
+                    "\"" . $dbePurchaseInv->getValue(DBEPurchaseInv::nomRef) . "\"," .
+                    "\"" . $dbePurchaseInv->getValue(DBEPurchaseInv::dept) . "\"," .
                     "\"" .
-                    substr($dbePurchaseInv->getValue('date'), 8, 2) .
-                    substr($dbePurchaseInv->getValue('date'), 5, 2) .
-                    substr($dbePurchaseInv->getValue('date'), 0, 4) .
+                    substr($dbePurchaseInv->getValue(DBEPurchaseInv::date), 8, 2) .
+                    substr($dbePurchaseInv->getValue(DBEPurchaseInv::date), 5, 2) .
+                    substr($dbePurchaseInv->getValue(DBEPurchaseInv::date), 0, 4) .
                     "\"," .
-                    "\"" . $dbePurchaseInv->getValue('ref') . "\"," .
-                    "\"" . $dbePurchaseInv->getValue('details') . "\"," .
-                    "\"" . $dbePurchaseInv->getValue('netAmnt') . "\"," .
-                    "\"" . $dbePurchaseInv->getValue('taxCode') . "\"," .
-                    "\"" . $dbePurchaseInv->getValue('taxAmnt') . "\"" .
+                    "\"" . $dbePurchaseInv->getValue(DBEPurchaseInv::ref) . "\"," .
+                    "\"" . $dbePurchaseInv->getValue(DBEPurchaseInv::details) . "\"," .
+                    "\"" . $dbePurchaseInv->getValue(DBEPurchaseInv::netAmnt) . "\"," .
+                    "\"" . $dbePurchaseInv->getValue(DBEPurchaseInv::taxCode) . "\"," .
+                    "\"" . $dbePurchaseInv->getValue(DBEPurchaseInv::taxAmnt) . "\"" .
                     "\r\n";
                 fwrite($this->purchaseHandle, $reportLine);
                 $dbePurchaseInvUpdt->setPrintedOn($dbePurchaseInv->getPKValue());
@@ -313,5 +316,4 @@ class BUSageExport extends Business
             fclose($this->purchaseHandle);
         }
     }
-}// End of class
-?>
+}

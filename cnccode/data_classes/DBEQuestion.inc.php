@@ -7,27 +7,33 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEQuestion extends DBEntity
 {
+    const questionID = "questionID";
+    const questionnaireID = "questionnaireID";
+    const answerTypeID = "answerTypeID";
+    const description = "description";
+    const activeFlag = "activeFlag";
+    const requiredFlag = "requiredFlag";
+    const weight = "weight";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setTableName("question");
-        $this->addColumn("questionID", DA_ID, DA_NOT_NULL, "que_questionno");
-        $this->addColumn("questionnaireID", DA_ID, DA_NOT_NULL, "que_questionnaireno");
-        $this->addColumn("answerTypeID", DA_ID, DA_NOT_NULL, "que_answertypeno");
-        $this->addColumn("description", DA_STRING, DA_NOT_NULL, "que_desc");
-        $this->addColumn("activeFlag", DA_YN, DA_NOT_NULL, "que_active_flag");
-        $this->addColumn("requiredFlag", DA_YN, DA_NOT_NULL, "que_required_flag");
-        $this->addColumn("weight", DA_INTEGER, DA_NOT_NULL, "que_weight");
+        $this->addColumn(self::questionID, DA_ID, DA_NOT_NULL, "que_questionno");
+        $this->addColumn(self::questionnaireID, DA_ID, DA_NOT_NULL, "que_questionnaireno");
+        $this->addColumn(self::answerTypeID, DA_ID, DA_NOT_NULL, "que_answertypeno");
+        $this->addColumn(self::description, DA_STRING, DA_NOT_NULL, "que_desc");
+        $this->addColumn(self::activeFlag, DA_YN, DA_NOT_NULL, "que_active_flag");
+        $this->addColumn(self::requiredFlag, DA_YN, DA_NOT_NULL, "que_required_flag");
+        $this->addColumn(self::weight, DA_INTEGER, DA_NOT_NULL, "que_weight");
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
 }
-
-?>

@@ -36,24 +36,27 @@ class CTAnswerTypeConfig extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'saveConfig':
                 $this->saveConfig();
                 break;
             case 'configure':
-                $this->showConfig($_REQUEST['answerTypeID']);
+                $this->showConfig($this->getParam('answerTypeID'));
                 break;
-            case CTACTIVITYTYPE_ACT_DISPLAY_LIST:
             default:
                 $this->displayList();
                 break;
         }
     }
 
+    /**
+     * @throws Exception
+     */
     private function displayList()
     {
         $this->setPageTitle('AnswerType Config List');
@@ -103,6 +106,10 @@ class CTAnswerTypeConfig extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @param $answerTypeID
+     * @throws Exception
+     */
     private function showConfig($answerTypeID)
     {
 
@@ -171,9 +178,12 @@ class CTAnswerTypeConfig extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @throws Exception
+     */
     private function saveConfig()
     {
-        $answerTypeID = $_REQUEST['answerTypeID'];
+        $answerTypeID = $this->getParam('answerTypeID');
 
         $answerType = new DBEAnswerType($this);
 
@@ -181,7 +191,7 @@ class CTAnswerTypeConfig extends CTCNC
 
         switch ($answerTypeID) {
             case 5:
-                $config = $_REQUEST['config'];
+                $config = $this->getParam('config');
 
                 $answerType->setValue(
                     DBEAnswerType::answerOptions,

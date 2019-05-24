@@ -71,7 +71,7 @@ $query =
 
 $result = $db1->query($query);
 $subject = "UK National Holiday - CNC ServiceDesk Availability";
-
+$thing = null;
 foreach ($result->fetch_all(MYSQLI_ASSOC) as $row) {
 
 
@@ -86,7 +86,7 @@ foreach ($result->fetch_all(MYSQLI_ASSOC) as $row) {
 
     $body = $template->get_var('output');
 
-    $buMail = new BUMail($this);
+    $buMail = new BUMail($thing);
 
     $buMail->mime->setHTMLBody($body);
 
@@ -110,8 +110,7 @@ foreach ($result->fetch_all(MYSQLI_ASSOC) as $row) {
         CONFIG_SUPPORT_EMAIL,
         $row['con_email'],
         $hdrs,
-        $body,
-        true
+        $body
     );
 
 }

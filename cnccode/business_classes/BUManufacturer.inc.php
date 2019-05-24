@@ -11,11 +11,13 @@ define('BUMANUFACTURER_NAME_STR_NT_PASD', 'No name string passed');
 
 class BUManufacturer extends Business
 {
-    var $dbeManufacturer = "";
+    /** @var DBEManufacturer */
+    public $dbeManufacturer;
 
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -42,6 +44,8 @@ class BUManufacturer extends Business
      * Don't include discontinued items
      * @parameter String $nameSearchString String to match against or numeric itemID
      * @parameter DataSet &$dsResults results
+     * @param $matchString
+     * @param $dsResults
      * @return bool : One or more rows
      * @access public
      */
@@ -57,7 +61,7 @@ class BUManufacturer extends Business
             $ret = ($this->getManufacturerByID($matchString, $dsResults));
         }
         if (!$ret) {
-            $this->dbeManufacturer->setValue("name", $matchString);
+            $this->dbeManufacturer->setValue(DBEManufacturer::name, $matchString);
             $this->dbeManufacturer->getRowsByNameMatch();
             $ret = ($this->getData($this->dbeManufacturer, $dsResults));
         }
@@ -83,17 +87,18 @@ class BUManufacturer extends Business
     /**
      *    canDeleteManufacturer
      * Only allowed if type has no activities
+     * @param $ID
+     * @return bool
      */
     function canDeleteManufacturer($ID)
     {
         $dbeItem = new DBEItem($this);
         // validate no items of this manufacturer
-        $dbeItem->setValue('manufacturerID', $ID);
-        if ($dbeItem->countRowsByColumn('manufacturerID') < 1) {
+        $dbeItem->setValue(DBEItem::manufacturerID, $ID);
+        if ($dbeItem->countRowsByColumn(DBEItem::manufacturerID) < 1) {
             return TRUE;
         } else {
             return FALSE;
         }
     }
-}// End of class
-?>
+}

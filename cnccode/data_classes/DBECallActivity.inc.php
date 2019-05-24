@@ -32,7 +32,6 @@ class DBECallActivity extends DBEntity
     const parentCallActivityID = "parentCallActivityID";
     const awaitingCustomerResponseFlag = "awaitingCustomerResponseFlag";
     const loggingErrorFlag = "loggingErrorFlag";
-    const escalationID = "escalationID";
     const escalationAcceptedFlag = "escalationAcceptedFlag";
     const hideFromCustomerFlag = "hideFromCustomerFlag";
     const secondsiteErrorServer = "secondsiteErrorServer";
@@ -42,8 +41,8 @@ class DBECallActivity extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -53,7 +52,7 @@ class DBECallActivity extends DBEntity
         $this->addColumn(
             self::callActivityID,
             DA_ID,
-            DA_NOT_NULL,
+            DA_ALLOW_NULL,
             "caa_callactivityno"
         );
         $this->addColumn(
@@ -116,6 +115,7 @@ class DBECallActivity extends DBEntity
             DA_STRING,
             DA_NOT_NULL,
             "caa_status"
+
         );
         $this->addColumn(
             self::expenseExportFlag,
@@ -133,10 +133,13 @@ class DBECallActivity extends DBEntity
             DA_TEXT,
             DA_ALLOW_NULL
         );
+
         $this->addColumn(
             self::curValue,
             DA_FLOAT,
-            DA_ALLOW_NULL
+            DA_NOT_NULL,
+            null,
+            '0.00'
         );
         $this->addColumn(
             self::statementYearMonth,
@@ -190,11 +193,6 @@ class DBECallActivity extends DBEntity
             DA_YN,
             DA_ALLOW_NULL,
             "caa_logging_error_flag"
-        );
-        $this->addColumn(
-            self::escalationID,
-            DA_ID,
-            DA_ALLOW_NULL
         );
         $this->addColumn(
             self::escalationAcceptedFlag,
@@ -277,6 +275,7 @@ class DBECallActivity extends DBEntity
                 return ($this->getDBColumnValue(0));
             }
         }
+        return 0;
     }
 
     function countTravelRowsForTodayByCustomerSiteNoEngineer(
@@ -301,6 +300,7 @@ class DBECallActivity extends DBEntity
                 return ($this->getDBColumnValue(0));
             }
         }
+        return 0;
     }
 
     function countEngineerRowsByProblem($problemID)
@@ -317,6 +317,7 @@ class DBECallActivity extends DBEntity
                 return ($this->getDBColumnValue(0));
             }
         }
+        return 0;
     }
 
     function countSendEmailActivities($problemID)
@@ -334,6 +335,7 @@ class DBECallActivity extends DBEntity
                 return ($this->getDBColumnValue(0));
             }
         }
+        return 0;
     }
 
     function setAllActivitiesToAuthorisedByProblemID($problemID)
@@ -349,6 +351,3 @@ class DBECallActivity extends DBEntity
         $this->runQuery();
     }
 }
-
-
-?>

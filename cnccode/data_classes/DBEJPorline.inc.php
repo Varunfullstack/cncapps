@@ -13,8 +13,8 @@ class DBEJPorline extends DBEPorline
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -40,9 +40,11 @@ class DBEJPorline extends DBEPorline
     /**
      * Return rows from DB by column value
      * @access public
+     * @param $column
+     * @param $sortColumn
      * @return bool Success
      */
-    function getRowsByColumn($column)
+    function getRowsByColumn($column, $sortColumn = null)
     {
         $this->setMethodName("getRowsByColumn");
         if ($column == '') {
@@ -57,30 +59,28 @@ class DBEJPorline extends DBEPorline
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " LEFT JOIN item ON " . $this->getDBColumnName('itemID') . "=itm_itemno" .
+            " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "=itm_itemno" .
             " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn) .
-            " ORDER BY " . $this->getDBColumnName('sequenceNo')
+            " ORDER BY " . $this->getDBColumnName(self::sequenceNo)
         );
         return ($this->getRows());
     }
 
     function getRowByPorheadIDSequenceNo()
     {
-        if ($this->getValue('porheadID') == '') {
+        if ($this->getValue(self::porheadID) == '') {
             $this->raiseError('porheadID not set');
         }
-        if ($this->getValue('sequenceNo') == '') {
+        if ($this->getValue(self::sequenceNo) == '') {
             $this->raiseError('sequenceNo not set');
         }
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " LEFT JOIN item ON " . $this->getDBColumnName('itemID') . "=itm_itemno" .
-            " WHERE " . $this->getDBColumnName('porheadID') . "=" . $this->getFormattedValue('porheadID') .
-            " AND " . $this->getDBColumnName('sequenceNo') . "=" . $this->getFormattedValue('sequenceNo')
+            " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "=itm_itemno" .
+            " WHERE " . $this->getDBColumnName(self::porheadID) . "=" . $this->getFormattedValue(self::porheadID) .
+            " AND " . $this->getDBColumnName(self::sequenceNo) . "=" . $this->getFormattedValue(self::sequenceNo)
         );
         return (parent::getRow());
     }
 }
-
-?>

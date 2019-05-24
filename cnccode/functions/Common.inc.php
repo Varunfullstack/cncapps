@@ -415,6 +415,9 @@ function getExpiryDate(DateTime $installDate,
     if ($today == null) {
         $today = new DateTime();
     }
+    if (!$initialContractLength) {
+        $initialContractLength = 12;
+    }
 
     $firstExpiryDate = clone $installDate;
 

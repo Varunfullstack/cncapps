@@ -39,17 +39,18 @@ class CTDailyReport extends CTCNC
         }
         $this->buDailyReport = new BUDailyReport ($this);
 
-        if ($_REQUEST['daysAgo']) {
-            $this->daysAgo = $_REQUEST['daysAgo'];
+        if ($this->getParam('daysAgo')) {
+            $this->daysAgo = $this->getParam('daysAgo');
         }
     }
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST ['action']) {
+        switch ($this->getAction()) {
 
             case 'fixedIncidents' :
                 $this->buDailyReport->fixedIncidents($this->daysAgo);
@@ -113,6 +114,9 @@ class CTDailyReport extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function fixedIncidents()
     {
 
@@ -368,4 +372,3 @@ class CTDailyReport extends CTCNC
     } // end function
 
 } // end of class
-?>

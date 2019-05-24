@@ -38,6 +38,11 @@ define(
     'The given value does not conform with the format'
 );
 
+define(
+    'DATASET_MSG_INVALID_SUPPORT_LEVEL',
+    'The given value does not match the possible values: null, "main", "supervisor", "support", "delegate"'
+);
+
 class DataSet extends DataAccess
 {
 
@@ -48,16 +53,8 @@ class DataSet extends DataAccess
      * constructor
      * If arguments are passed then these are used as string columns to create
      * @access public
-     * @return void
+     * @param $owner
      */
-
-    /*
-    I am not using the usual "constructor" function because I can't see how to preserve the
-    variable-length argument list accross the call.
-
-    As this class is unlikely to be inherrited from, it probably doesn't matter
-    anyhow.
-    */
     function __construct(&$owner)
     {
         parent::__construct($owner);
@@ -115,6 +112,9 @@ class DataSet extends DataAccess
                 $ret = TRUE;
                 break;
             case DA_MODE_UPDATE:
+                if ($this->debug) {
+                    var_dump($this->ixCurrentRow);
+                }
                 $this->rows[$this->ixCurrentRow] = $this->row;
                 $ret = TRUE;
                 break;
@@ -134,6 +134,16 @@ class DataSet extends DataAccess
     function fetchNext()
     {
         parent::fetchNext();
+
+        if ($this->debug) {
+            try {
+                throw new Exception();
+            } catch (Exception $exception) {
+                var_dump($exception->getTraceAsString());
+            }
+            var_dump($this->ixCurrentRow, $this->rowCount());
+            var_dump(array_keys($this->rows));
+        }
         if (($this->ixCurrentRow + 1) >= $this->rowCount()) {
             $this->eof = TRUE;
             return FALSE;
@@ -184,18 +194,14 @@ class DataSet extends DataAccess
      * Sort the order of the rows in the dataset by given column
      * @parameter integer Column Column to sort on
      * @access public
+     * @param $ixColumn
      * @return boolean
      */
-    function sortAscending($ixColumn,
-                           $sortType = false
+    function sortAscending($ixColumn
     )
     {
         $this->setMethodName("sortAscending");
         $ret = FALSE;
-
-        if ($sortType === false) {
-            $sortType = SORT_STRING;
-        }
 
         if ($this->rowCount() > 0) {
             $ixColumnNumber = $this->columnExists($ixColumn);
@@ -244,7 +250,7 @@ class DataSet extends DataAccess
             if (is_string($arg)) {
                 $columnNo = $this->columnExists($arg);
                 if ($columnNo == DA_OUT_OF_RANGE) {
-                    $this->raiseError('columnSort(). Column ' . $ixColumn . " out of range");
+                    $this->raiseError('columnSort(). Column ' . $arg . " out of range");
                 }
                 foreach ($this->rows as $row_key => $row) {
                     $sort_array[$i][] = $row[$columnNo];
@@ -263,19 +269,19 @@ class DataSet extends DataAccess
      * Load data from a CSV file assuming column names in first row
      * @access public
      * @parameter String $fileName The local filesystem path from which data will be loaded
+     * @param $fileName
      * @return boolean
      */
     function loadFromCSVFile($fileName)
     {
         $this->setMethodName("loadFromCSVFile");
-        $ret = FALSE;
         // Open the file
         $pointer = fopen(
             $fileName,
             "r"
         );
         if (!$pointer) {
-            $this->raiseError("Unable to open file " . $filename);
+            $this->raiseError("Unable to open file " . $fileName);
         }
         $this->setAddColumnsOn();
         // Create the columns from first row data
@@ -315,12 +321,12 @@ class DataSet extends DataAccess
      * Dump data to a CSV file with column names in first row
      * @access public
      * @parameter String $fileName The local filesystem path to which data will be dumped
+     * @param $fileName
      * @return boolean
      */
     function saveToCSVFile($fileName)
     {
         $this->setMethodName("saveToCSVFile");
-        $ret = FALSE;
         // Open the file
         $pointer = fopen(
             $fileName,
@@ -339,8 +345,8 @@ class DataSet extends DataAccess
         while ($this->fetchNext()) {
             fwrite(
                 $pointer,
-                ereg_replace(
-                    "\n",
+                preg_replace(
+                    "/[\n\r]/",
                     "",
                     $this->getColumnValuesAsString()
                 ) . "\n"
@@ -349,43 +355,6 @@ class DataSet extends DataAccess
         fclose($pointer);
         $ret = TRUE;
         return $ret;
-    }
-
-    /**
-     * Copy columns from another dataaccess object
-     * @access private
-     * @parameter DataAccess $dataaccess Data access object to copy
-     * @return boolean
-     */
-    function copyColumns($dataaccess)
-    {
-        $this->setMethodName("copyColumns");
-        $this->clear();
-        for ($col = 0; $col < $dataaccess->col_count(); $col++) {
-            $this->addColumn(
-                $dataaccess->getName($col),
-                $dataaccess->getType($col),
-                $dataaccess->getNull($col)
-            );
-        }
-        return true;
-    }
-
-    function setValue($ixPassedColumn,
-                      $value
-    )
-    {
-        return (parent::setValue(
-            $ixPassedColumn,
-            (string)$value
-        ));
-    }
-
-    function getValue($ixPassedColumn)
-    {
-        return ((string)parent::getValue($ixPassedColumn));
-//		return(stripslashes(parent::getValue($ixPassedColumn)));
-//		return(parent::getValue($ixPassedColumn));
     }
 
     /**
@@ -401,6 +370,7 @@ class DataSet extends DataAccess
     )
     {
         $ret = FALSE;
+        $searchArray = [];
         if ($this->rowCount() > 0) {
             $ixColumnNumber = $this->columnExists($ixColumn);
             if ($ixColumnNumber != DA_OUT_OF_RANGE) {
@@ -455,149 +425,51 @@ class DataSet extends DataAccess
     *		Expects dates passed in to be DD/MM/YYYY (as entered on HTML form) BUT always
     *		converts to YYYY-MM-DD (internal Sweetcode standard) EVEN IF the date was bad
     */
-    function populateFromArray(&$entityArray)
+    function populateFromArray($entityArray)
     {
+        if ($this->debug) {
+            echo '<br>';
+            var_dump($entityArray);
+            echo '<br>';
+        }
         $this->setMethodName('populateFromArray');
         $ret = TRUE;
         if (!is_array($entityArray)) {
             $this->raiseError('entityArray not an array');
         }
-        while (list($key, $row) = each($entityArray)) {                            // loop though rows
+        foreach ($entityArray as $key => $row) {
             $this->setUpdateModeInsert();
-            while (list($fieldName, $value) = each($row)) {                        // loop through column values
-                if (
-                    ($this->getNull($fieldName) == DA_NOT_NULL) & ($value == '')
-                ) {
-                    $ret = FALSE;
+            foreach ($row as $fieldName => $value) {
+                if ($this->debug) {
+                    echo '<div>FieldName: ' . $fieldName . ', Value: ' . $value . '</div>';
+                }
+                $columnIdx = $this->columnExists($fieldName);
+                if ($columnIdx == DA_OUT_OF_RANGE) {
                     $this->setMessage(
                         $fieldName,
-                        DATASET_MSG_REQUIRED
+                        'This column does not exist'
                     );
-                } else {
-                    $columnType = $this->getType($fieldName);
-                    // Because blank is returned from HTML form if not checked
-                    if ($columnType == DA_YN) {
-                        $this->setValue(
-                            $fieldName,
-                            ($value == 'Y' ? 'Y' : 'N')
-                        );
-                    }
-                    if (($this->getNull($fieldName) == DA_ALLOW_NULL) & ($value == '')) {
-                        $this->setValue(
-                            $fieldName,
-                            ''
-                        );
-                    } else {                // this is a not null column with a value so validate the data type
-                        // Column type validation
-
-                        $validationFunction = $this->getValidationFunction($fieldName);
-                        if ($validationFunction) {
-                            if (!$validationFunction($value)) {
-                                $this->setMessage(
-                                    $fieldName,
-                                    DATASET_MSG_INVALID
-                                );
-                                $ret = FALSE;
-                            } else {
-                                $this->setValue(
-                                    $fieldName,
-                                    $value
-                                );
-                            }
-                        } else {
-                            switch ($columnType) {
-                                case DA_DATE:
-                                    if ($value != '') {
-
-                                        $date = DateTime::createFromFormat(
-                                            'd/m/Y',
-                                            $value
-                                        );
-                                        if (!$date) {
-                                            $this->setValue(
-                                                $fieldName,
-                                                $value
-                                            );
-                                            $this->setMessage(
-                                                $fieldName,
-                                                DATASET_MSG_BAD_DATE_FORMAT
-                                            );
-                                            $ret = FALSE;
-                                        } else {
-                                            $this->setValue(
-                                                $fieldName,
-                                                $date->format('Y-m-d')
-                                            );
-                                        }
-                                    } else {
-                                        $value = '0000-00-00';    // signifies no date
-                                    }
-                                    break;
-                                case DA_TIME:
-                                    if ($value != '') {
-                                        if (!$this->isTime($value)) {
-                                            $this->setMessage(
-                                                $fieldName,
-                                                DATASET_MSG_BAD_TIME
-                                            );
-                                            $ret = FALSE;
-                                        }
-                                        $this->setValue(
-                                            $fieldName,
-                                            $value
-                                        );
-                                    }
-                                    break;
-                                case DA_INTEGER:
-                                case DA_ID:
-                                case DA_FLOAT:
-                                    $value = trim($value);                // remove trailing spaces
-                                    if (!is_numeric($value)) {
-                                        $this->setMessage(
-                                            $fieldName,
-                                            DATASET_MSG_NOT_NUMERIC
-                                        );
-                                        $ret = FALSE;
-                                    }
-                                    $this->setValue(
-                                        $fieldName,
-                                        $value
-                                    );
-                                    break;
-                                default:
-                                    $this->setValue(
-                                        $fieldName,
-                                        $value
-                                    );
-                                    break;
-                                case DA_SUPPORT_LEVEL:
-                                    $value = trim($value);
-
-                                    if (!empty($value)) {
-                                        $validOptions = ['main', 'supervisor', 'support', 'delegate'];
-                                        if (!in_array(
-                                            $value,
-                                            $validOptions
-                                        )) {
-                                            $this->setMessage(
-                                                $fieldName,
-                                                SUPPORT_LEVEL_MSG_INCORRECT_VALUE
-                                            );
-                                            $ret = FALSE;
-                                        }
-                                    } else {
-                                        $value = null;
-                                    }
-
-                                    $this->setValue(
-                                        $fieldName,
-                                        $value
-                                    );
-                                    break;
-                            }
-                        }
-                    }
+                    continue;
                 }
+
+                $this->setValueNoCheckByColumnNumber(
+                    $columnIdx,
+                    $value
+                );
+                $validation = $this->checkValid($fieldName, $value);
+                if ($validation !== true) {
+                    $this->setMessage(
+                        $fieldName,
+                        $validation
+                    );
+                    $ret = false;
+                    continue;
+                }
+
+                $this->setValue(
+                    $fieldName,
+                    $value
+                );
             }
             $this->post();
         }
@@ -605,16 +477,15 @@ class DataSet extends DataAccess
     }
 
     /**
-     * @return void
      * @param string $columnName Column for which to set message
      * @param string $message Message
      * @desc Set a form error message
+     * @return void
      */
     function setMessage($columnName,
                         $message
     )
     {
-
         $this->addColumn(
             $columnName . 'Message',
             DA_STRING,
@@ -633,71 +504,6 @@ class DataSet extends DataAccess
                 $ixCol,
                 DA_ALLOW_NULL
             );
-        }
-    }
-
-    function isTime($time)
-    {
-        if ($time == '') {
-            $ret = TRUE;
-        } else {
-            $ret =
-                (
-                    is_numeric(
-                        substr(
-                            $time,
-                            0,
-                            2
-                        )
-                    ) &&
-                    (substr(
-                            $time,
-                            0,
-                            2
-                        ) < 24) &&
-                    is_numeric(
-                        substr(
-                            $time,
-                            3,
-                            2
-                        )
-                    ) &&
-                    (substr(
-                            $time,
-                            3,
-                            2
-                        ) < 60) &&
-                    (substr(
-                            $time,
-                            2,
-                            1
-                        ) == ':') &&
-                    (strlen($time) == 5)
-                );
-        }
-        return $ret;
-    }
-
-    function convertDateYMD($dateDMY)
-    {
-        if ($dateDMY != '') {
-            $dateArray = explode(
-                '/',
-                $dateDMY
-            );
-            return ($dateArray[2] . '-' . str_pad(
-                    $dateArray[1],
-                    2,
-                    '0',
-                    STR_PAD_LEFT
-                ) . '-' . str_pad(
-                    $dateArray[0],
-                    2,
-                    '0',
-                    STR_PAD_LEFT
-                ));
-        } else {
-            return '';
         }
     }
 
@@ -740,22 +546,4 @@ class DataSet extends DataAccess
         return $colString;
     }
 
-    /**
-     * @param $ixPassedColumn
-     * @return Callable
-     */
-    private function getValidationFunction($ixPassedColumn)
-    {
-        $ixColumn = $this->columnExists($ixPassedColumn);
-        if ($ixColumn != DA_OUT_OF_RANGE) {
-            $ret = $this->colValidation[$ixColumn];
-        } else {
-            $this->raiseError("GetValidationFunction(): Column " . $ixPassedColumn . " out of range");
-            $ret = DA_OUT_OF_RANGE;
-        }
-        return $ret;
-
-    }
 }
-
-?>

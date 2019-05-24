@@ -18,6 +18,11 @@ define('CTEXCEL_EXPORT_ACT_GENERATE', 'generate');
 
 class CTExcelExport extends CTCNC
 {
+    /**
+     * @var BUExcelExport
+     */
+    public $buExcelExport;
+
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
@@ -33,10 +38,11 @@ class CTExcelExport extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTEXCEL_EXPORT_ACT_GENERATE:
                 $this->generate();
                 break;
@@ -52,6 +58,8 @@ class CTExcelExport extends CTCNC
     /**
      * Display search form
      * @access private
+     * @throws Exception
+     * @throws Exception
      */
     function select()
     {
@@ -66,8 +74,8 @@ class CTExcelExport extends CTCNC
         $this->setTemplateFiles('ExcelExport', 'ExcelExport.inc');
         $this->template->set_var(
             array(
-                'month' => Controller::htmlInputText($_REQUEST['month']),
-                'year' => Controller::htmlInputText($_REQUEST['year']),
+                'month'     => Controller::htmlInputText($this->getParam('month')),
+                'year'      => Controller::htmlInputText($this->getParam('year')),
                 'urlSubmit' => $urlSubmit
             )
         );
@@ -76,50 +84,40 @@ class CTExcelExport extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @throws Exception
+     */
     function generate()
     {
         $this->setMethodName('generate');
-        if ($_REQUEST['month'] == '') {
+        if ($this->getParam('month') == '') {
             $this->setFormErrorMessage('Month required');
             $this->select();
             exit();
         }
-        if ($_REQUEST['year'] == '') {
+        if ($this->getParam('year') == '') {
             $this->setFormErrorMessage('Year required');
             $this->select();
             exit();
         }
-        if (!is_numeric($_REQUEST['year'])) {
+        if (!is_numeric($this->getParam('year'))) {
             $this->setFormErrorMessage('Year must be numeric');
             $this->select();
             exit();
         }
-        if (!common_inRange($_REQUEST['year'], date('Y') - 1, date('Y'))) {
+        if (!common_inRange($this->getParam('year'), date('Y') - 1, date('Y'))) {
             $this->setFormErrorMessage('Year out of range');
             $this->select();
             exit();
         }
-        if (!common_inRange($_REQUEST['month'], 1, 12)) {
+        if (!common_inRange($this->getParam('month'), 1, 12)) {
             $this->setFormErrorMessage('Month out of range');
             $this->select();
             exit();
         }
-        $fileURL = $this->buExcelExport->generateFile($_REQUEST['year'], $_REQUEST['month']);
-        //header('Location:'.$fileURL);
-        //exit;
-        //echo $fileURL;
-        /*
-                header("Pragma: public");
-                header("Expires: 0");
-                header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-                header("Content-Type: application/vnd.ms-excel");
-                header("Content-Disposition: attachment; filename=".basename($fileURL).";" );
-                header("Content-Transfer-Encoding: binary");
-                header("Content-Length: ".filesize($fileURL));
-                readfile($fileURL);
-                exit();
-        */
-        $fileName = $this->buExcelExport->generateFile($_REQUEST['year'], $_REQUEST['month']);
+        $this->buExcelExport->generateFile($this->getParam('year'), $this->getParam('month'));
+
+        $fileName = $this->buExcelExport->generateFile($this->getParam('year'), $this->getParam('month'));
         if ($fileName == FALSE) {
             $this->setFormErrorMessage('No transactions found for given period');
             $this->select();
@@ -130,4 +128,3 @@ class CTExcelExport extends CTCNC
         exit();
     }
 }// end of class
-?>

@@ -7,17 +7,19 @@ require_once($cfg["path_dbe"] . "/DBEExternalItem.inc.php");
 
 class DBEJExternalItem extends DBEExternalItem
 {
+    const itemTypeDescription = 'itemTypeDescription';
+
     /**
      * calls constructor()
      * @access public
-     * @param  void
+     * @param void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("itemTypeDescription", DA_STRING, DA_ALLOW_NULL, 'itemtype.ity_desc');
+        $this->addColumn(self::itemTypeDescription, DA_STRING, DA_ALLOW_NULL, 'itemtype.ity_desc');
         $this->setAddColumnsOff();
     }
 
@@ -32,7 +34,10 @@ class DBEJExternalItem extends DBEExternalItem
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " JOIN itemtype ON itemtype.ity_itemtypeno = externalitem.itemTypeID
-			WHERE " . $this->getDBColumnName('customerID') . "='" . mysqli_real_escape_string($this->db->link_id(), $customerID) . "'";
+			WHERE " . $this->getDBColumnName(self::customerID) . "='" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $customerID
+            ) . "'";
 
         $this->setQueryString($queryString);
 
@@ -40,5 +45,3 @@ class DBEJExternalItem extends DBEExternalItem
     }
 
 }
-
-?>

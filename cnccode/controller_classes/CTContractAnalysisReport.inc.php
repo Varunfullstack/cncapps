@@ -14,6 +14,15 @@ require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 class CTContractAnalysisReport extends CTCNC
 {
 
+    const searchFormEndYearMonth = 'endYearMonth';
+    const searchFormStartYearMonth = 'startYearMonth';
+    const searchFormContracts = 'contracts';
+
+    /**
+     * @var BUContractAnalysisReport
+     */
+    private $buContractAnalysisReport;
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -40,12 +49,12 @@ class CTContractAnalysisReport extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
 
-        switch ($_REQUEST['action']) {
-
+        switch ($this->getAction()) {
             case 'email':
                 $this->email();
                 break;
@@ -58,6 +67,9 @@ class CTContractAnalysisReport extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function search()
     {
         global $cfg;
@@ -65,7 +77,6 @@ class CTContractAnalysisReport extends CTCNC
         $this->setMethodName('search');
 
         $dsSearchForm = new DSForm ($this);
-        $dsResults = new DataSet ($this);
 
         $this->buContractAnalysisReport->initialiseSearchForm($dsSearchForm);
 
@@ -80,7 +91,7 @@ class CTContractAnalysisReport extends CTCNC
 
                 $results = $this->buContractAnalysisReport->getResults($dsSearchForm);
 
-                if ($results && $_REQUEST['Search'] == 'Generate CSV') {
+                if ($results && $this->getParam('Search') == 'Generate CSV') {
 
                     $template = new Template (
                         $cfg["path_templates"],
@@ -146,11 +157,6 @@ class CTContractAnalysisReport extends CTCNC
             }
         }
 
-        $urlCustomerPopup = Controller::buildLink(
-            CTCNC_PAGE_CUSTOMER,
-            array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP)
-        );
-
         $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_SEARCH)
@@ -161,9 +167,9 @@ class CTContractAnalysisReport extends CTCNC
         $this->template->set_var(
             array(
                 'formError'      => $this->formError,
-                'contracts'      => $dsSearchForm->getValue('contracts'),
-                'startYearMonth' => $dsSearchForm->getValue('startYearMonth'),
-                'endYearMonth'   => $dsSearchForm->getValue('endYearMonth'),
+                'contracts'      => $dsSearchForm->getValue(self::searchFormContracts),
+                'startYearMonth' => $dsSearchForm->getValue(self::searchFormStartYearMonth),
+                'endYearMonth'   => $dsSearchForm->getValue(self::searchFormEndYearMonth),
                 'urlSubmit'      => $urlSubmit
             )
         );
@@ -179,6 +185,12 @@ class CTContractAnalysisReport extends CTCNC
     /*
     Render results section
     */
+    /**
+     * @param $templateName
+     * @param $results
+     * @param DSForm $dsSearchForm
+     * @throws Exception
+     */
     public function renderReport($templateName,
                                  $results,
                                  $dsSearchForm
@@ -195,19 +207,18 @@ class CTContractAnalysisReport extends CTCNC
             'customers'
         );
 
+        $orderBy = $this->getParam('orderBy');
 
-        foreach ($results as $key => $row) {
-            $sales[$key] = $row['sales'];
-            $cost[$key] = $row['cost'];
-            $labourCost[$key] = $row['labourCost'];
-            $labourHours[$key] = $row['labourHours'];
-            $profitPercent[$key] = $row['profitPercent'];
-            $profit[$key] = $row['profit'];
-        }
+        $profit = array_column($results, 'profit');
+        $sales = array_column($results, 'sales');
+        $cost = array_column($results, 'cost');
+        $labourCost = array_column($results, 'labourCost');
+        $labourHours = array_column($results, 'labourHours');
+        $profitPercent = array_column($results, 'profitPercent');
 
-        if (isset($_REQUEST['orderBy'])) {
+        if ($orderBy) {
             array_multisort(
-                $$_REQUEST['orderBy'],
+                $$orderBy,
                 SORT_ASC,
                 $results
             );
@@ -221,10 +232,9 @@ class CTContractAnalysisReport extends CTCNC
 
         foreach ($results as $customerName => $row) {
 
+            $profitAlertClass = null;
             if ($row['profit'] <= 0) {
                 $profitAlertClass = 'profitAlert';
-            } else {
-                $profitAlertClass = '';
             }
 
             $customerAnalysisUrl =
@@ -232,8 +242,8 @@ class CTContractAnalysisReport extends CTCNC
                     'CustomerAnalysisReport.php',
                     array(
                         'searchForm[1][customerID]'     => $row['customerID'],
-                        'searchForm[1][startYearMonth]' => $dsSearchForm->getValue('startYearMonth'),
-                        'searchForm[1][endYearMonth]'   => $dsSearchForm->getValue('endYearMonth'),
+                        'searchForm[1][startYearMonth]' => $dsSearchForm->getValue(self::searchFormStartYearMonth),
+                        'searchForm[1][endYearMonth]'   => $dsSearchForm->getValue(self::searchFormEndYearMonth),
                     )
                 );
 
@@ -241,9 +251,9 @@ class CTContractAnalysisReport extends CTCNC
                 Controller::buildLink(
                     'ContractAnalysisReport.php',
                     array(
-                        'searchForm[1][contracts]'      => $_REQUEST ['searchForm'][1]['contracts'],
-                        'searchForm[1][startYearMonth]' => $dsSearchForm->getValue('startYearMonth'),
-                        'searchForm[1][endYearMonth]'   => $dsSearchForm->getValue('endYearMonth'),
+                        'searchForm[1][contracts]'      => @$_REQUEST ['searchForm'][1]['contracts'],
+                        'searchForm[1][startYearMonth]' => $dsSearchForm->getValue(self::searchFormStartYearMonth),
+                        'searchForm[1][endYearMonth]'   => $dsSearchForm->getValue(self::searchFormEndYearMonth),
                     )
                 );
             $this->template->set_var(
@@ -319,40 +329,36 @@ class CTContractAnalysisReport extends CTCNC
     /*
     Send report as an email of all customers for past 12 months
     */
+    /**
+     * @throws Exception
+     */
     function email()
     {
-
-        global $cfg;
-
         $this->setMethodName('email');
-
         $dsSearchForm = new DSForm ($this);
-        $dsResults = new DataSet ($this);
-
         $this->buContractAnalysisReport->initialiseSearchForm($dsSearchForm);
-
         set_time_limit(240);
 
         /* One year excluding current month */
-        $d = new \DateTime('now');
+        $d = new DateTime('now');
 
         $d->modify('first day of previous month');
 
         $dsSearchForm->setValue(
-            'endYearMonth',
+            self::searchFormEndYearMonth,
             $d->format('m') . '/' . $d->format('Y')
         );
 
         $d->modify('11 months ago');
 
         $dsSearchForm->setValue(
-            'startYearMonth',
+            self::searchFormStartYearMonth,
             $d->format('m') . '/' . $d->format('Y')
         );
 
         $dsSearchForm->setValue(
-            'contracts',
-            ''
+            self::searchFormContracts,
+            null
         );      // All
 
         $results = $this->buContractAnalysisReport->getResults($dsSearchForm);
@@ -362,8 +368,6 @@ class CTContractAnalysisReport extends CTCNC
             $buMail = new BUMail($this);
 
             $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-            $senderName = 'CNC Support Department';
 
             $this->template = new Template(
                 EMAIL_TEMPLATE_DIR,
@@ -423,5 +427,4 @@ class CTContractAnalysisReport extends CTCNC
 
     } // end email
 
-} // end of class
-?>
+}

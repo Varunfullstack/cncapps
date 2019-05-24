@@ -8,7 +8,6 @@
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_gc"] . "/Controller.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
-require_once($cfg["path_dbe"] . "/DBEPrizewinner.inc.php");
 require_once($cfg ["path_func"] . "/Common.inc.php");
 
 class BUQuestionnaireReport extends Business
@@ -24,6 +23,14 @@ class BUQuestionnaireReport extends Business
     public $period;
 
     private $startDateOneYearAgo;
+    /**
+     * @var bool|string
+     */
+    private $year;
+    /**
+     * @var bool|string
+     */
+    private $month;
 
     /**
      * Constructor
@@ -67,27 +74,6 @@ class BUQuestionnaireReport extends Business
     function getYear()
     {
         return $this->year;
-    }
-
-    function getRatings($queID)
-    {
-        $sql =
-            "SELECT
-          que_questionno, que_desc, ans_answer, COUNT(*) as Total
-
-          FROM
-           answer
-           JOIN question ON ans_questionno = que_questionno
-          WHERE
-           que_answertypeno = 1
-           AND que_questionnaireno = $questionnaireID
-           AND ans_date BETWEEN '$this->startDate' AND '$this->endDate'
-          GROUP BY
-           que_desc, ans_answer
-          ORDER BY
-           que_questionno, ans_answer";
-
-        return $this->db->query($sql)->fetch_object();
     }
 
     function getQuestions($answerTypeID = 1)
@@ -179,7 +165,7 @@ class BUQuestionnaireReport extends Business
     }
 
 
-    function getQuestionnaire()
+    function getQuestionnaire($questionnaireID)
     {
         $sql =
             "SELECT
@@ -190,35 +176,9 @@ class BUQuestionnaireReport extends Business
           FROM
            questionnaire
           WHERE
-           qur_questionnaireno = $this->questionnaireID";
+           qur_questionnaireno = $questionnaireID";
 
         return $this->db->query($sql)->fetch_object();
-    }
-
-    function getRespondantsUniqueContact()
-    {
-        $sql =
-            "SELECT
-          DISTINCT caa_contno as contactID,
-          CONCAT( con_first_name, ' ', con_last_name ) AS requestContact,
-          cus_name AS customer
-          FROM
-           answer
-           JOIN question ON ans_questionno = que_questionno
-           JOIN problem ON ans_problemno = pro_problemno
-           JOIN callactivity ON caa_problemno = pro_problemno
-           JOIN contact ON caa_contno = con_contno
-           JOIN customer ON cus_custno = pro_custno
-           
-          WHERE
-           ans_date BETWEEN '$this->startDate' AND '$this->endDate'
-           AND que_questionnaireno = $this->questionnaireID
-          ORDER BY
-           cus_name";
-
-        return $this->db->query($sql);
-//          ans_name AS surveyContact,
-
     }
 
     function getRespondantsUniqueSurveyContact()
@@ -246,45 +206,6 @@ class BUQuestionnaireReport extends Business
             ans_name           ";
 
         return $this->db->query($sql);
-
-    }
-
-    /**
-     * Gets one person who has responded with their name
-     * but has not won a prize in the previous 6 months
-     *
-     * @return databaseRow $databaseRow
-     */
-    function getPrizewinnerNotLastSixMonths()
-    {
-        $sql =
-            "SELECT
-          DISTINCT pro_contno AS contactID,
-          CONCAT( con_first_name, ' ', con_last_name ) AS requestName,
-          cus_name AS customer
-         FROM
-           answer
-           JOIN question ON ans_questionno = que_questionno
-           JOIN problem ON pro_problemno = ans_problemno
-           JOIN contact ON con_contno = pro_contno
-           JOIN customer ON cus_custno = pro_custno 
-          WHERE
-           ans_date BETWEEN '$this->startDate' AND '$this->endDate'
-           AND que_questionnaireno = $this->questionnaireID
-           AND (
-              SELECT
-                COUNT(*)
-              FROM prizewinner
-              WHERE prz_contno = pro_contno
-                AND prz_yearmonth > DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 6 MONTH), '%Y-%m')
-                AND prz_approved_flag = 'Y' 
-            ) = 0
-           AND ans_name <> ''
-          ORDER BY RAND() LIMIT 0,1";
-
-//          ans_name AS surveyName,
-
-        return $this->db->query($sql)->fetch_object();
 
     }
 
@@ -323,21 +244,41 @@ class BUQuestionnaireReport extends Business
                 array(
                     'ratingTotal'         => $total,
                     'questionDescription' => $value['que_desc'],
-                    'rating1Percent'      => number_format($this->getRatingPercentage($value['que_questionno'],
-                                                                                      1,
-                                                                                      $total)),
-                    'rating2Percent'      => number_format($this->getRatingPercentage($value['que_questionno'],
-                                                                                      2,
-                                                                                      $total)),
-                    'rating3Percent'      => number_format($this->getRatingPercentage($value['que_questionno'],
-                                                                                      3,
-                                                                                      $total)),
-                    'rating4Percent'      => number_format($this->getRatingPercentage($value['que_questionno'],
-                                                                                      4,
-                                                                                      $total)),
-                    'rating5Percent'      => number_format($this->getRatingPercentage($value['que_questionno'],
-                                                                                      5,
-                                                                                      $total))
+                    'rating1Percent'      => number_format(
+                        $this->getRatingPercentage(
+                            $value['que_questionno'],
+                            1,
+                            $total
+                        )
+                    ),
+                    'rating2Percent'      => number_format(
+                        $this->getRatingPercentage(
+                            $value['que_questionno'],
+                            2,
+                            $total
+                        )
+                    ),
+                    'rating3Percent'      => number_format(
+                        $this->getRatingPercentage(
+                            $value['que_questionno'],
+                            3,
+                            $total
+                        )
+                    ),
+                    'rating4Percent'      => number_format(
+                        $this->getRatingPercentage(
+                            $value['que_questionno'],
+                            4,
+                            $total
+                        )
+                    ),
+                    'rating5Percent'      => number_format(
+                        $this->getRatingPercentage(
+                            $value['que_questionno'],
+                            5,
+                            $total
+                        )
+                    )
                 )
             );
 
@@ -361,12 +302,20 @@ class BUQuestionnaireReport extends Business
                 array(
                     'ynTotal'             => $total,
                     'questionDescription' => $value['que_desc'],
-                    'yesPercent'          => number_format($this->getRatingPercentage($value['que_questionno'],
-                                                                                      'Y',
-                                                                                      $total)),
-                    'noPercent'           => number_format($this->getRatingPercentage($value['que_questionno'],
-                                                                                      'N',
-                                                                                      $total))
+                    'yesPercent'          => number_format(
+                        $this->getRatingPercentage(
+                            $value['que_questionno'],
+                            'Y',
+                            $total
+                        )
+                    ),
+                    'noPercent'           => number_format(
+                        $this->getRatingPercentage(
+                            $value['que_questionno'],
+                            'N',
+                            $total
+                        )
+                    )
                 )
             );
 
@@ -441,69 +390,8 @@ class BUQuestionnaireReport extends Business
         return $template->get_var('output');
     }
 
-    function setPrizewinner()
-    {
-
-        $prizewinnner = $this->getPrizewinnerNotLastSixMonths();
-
-        $dbePrizewinner = new DBEPrizewinner($this);
-        /*
-        Have we already chosen a a winner this month?
-
-        If so, if they have been approved then do nothing more
-        If they havent been approved then delete row and assign new winner
-        */
-        $dbePrizewinner->setValue('yearMonth', '"' . date('Y-m', strtotime('last month')) . '"');
-
-        $dbePrizewinner->getRowsByColumn('yearMonth');
-
-        $createNewWinner = true;
-
-        if ($dbePrizewinner->fetchNext()) {
-
-            $ID = $dbePrizewinner->getPKValue();
-            $dbePrizewinner->resetQueryString();
-
-            if ($dbePrizewinner->getValue('approvedFlag') == 'N') {
-
-                $dbePrizewinner->deleteRow();
-
-            } else {
-
-                $createNewWinner = false;
-
-            }
-
-        }
-
-        if ($createNewWinner) {
-
-            /*
-            Populate prizewinner table
-            */
-            $dbePrizewinner->setValue('yearMonth', date('Y-m', strtotime('last month')));
-            $dbePrizewinner->setValue('contactID', $prizewinnner->contactID);
-//        $dbePrizewinner->setValue( 'surveyName', $prizewinnner->surveyName );
-            $dbePrizewinner->setValue('approvedFlag', 'N');
-
-            $dbePrizewinner->insertRow();
-
-            $returnString = $prizewinnner->requestName . ' of ' . $prizewinnner->customer . ' Won this months draw.';
-
-        } else {
-
-            $returnString = 'There is already a prizewinner this month';
-
-        }
-        return $returnString;
-
-    }
-
     function getQuestionnaireDescription()
     {
         return '';
     }
-
-
-} // End of class
-?>
+}

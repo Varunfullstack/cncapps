@@ -7,22 +7,48 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEActivityProfitReportInvoice extends DBEntity
 {
+    const InvoiceID = "InvoiceID";
+    const Date = "Date";
+    const Cost = "Cost";
+    const Sale = "Sale";
+    const Profit = "Profit";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setTableName("callactivity");
-        $this->addColumn("InvoiceID", DA_ID, DA_ALLOW_NULL);
-        $this->addColumn("Date", DA_DATE, DA_ALLOW_NULL);
-        $this->addColumn("Cost", DA_DECIMAL, DA_NOT_NULL);
-        $this->addColumn("Sale", DA_DECIMAL, DA_NOT_NULL);
-        $this->addColumn("Profit", DA_DECIMAL, DA_ALLOW_NULL);
+        $this->addColumn(
+            self::InvoiceID,
+            DA_ID,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::Date,
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::Cost,
+            DA_FLOAT,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::Sale,
+            DA_FLOAT,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::Profit,
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

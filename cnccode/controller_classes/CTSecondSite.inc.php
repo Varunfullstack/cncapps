@@ -5,10 +5,10 @@ require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 
 class CTSecondSite extends CTCNC
 {
-
-    var $dsSecondsiteImage = '';
-
-    var $buSecondsite = '';
+    /** @var DSForm */
+    public $dsSecondsiteImage;
+    /** @var buSecondsite */
+    public $buSecondsite;
 
     function __construct($requestMethod,
                          $postVars,
@@ -35,17 +35,18 @@ class CTSecondSite extends CTCNC
                 exit;
             }
         }
-        $this->buSecondsite = new buSecondsite($this);
+        $this->buSecondsite = new BUSecondsite($this);
         $this->dsSecondsiteImage = new DSForm($this);
         $this->dsSecondsiteImage->copyColumnsFrom($this->buSecondsite->dbeSecondsiteImage);
     }
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case 'edit':
             case 'add':
                 $this->edit();
@@ -77,6 +78,7 @@ class CTSecondSite extends CTCNC
     /**
      * Edit/Add Further Action
      * @access private
+     * @throws Exception
      */
     function edit()
     {
@@ -84,28 +86,28 @@ class CTSecondSite extends CTCNC
         $dsSecondsiteImage = &$this->dsSecondsiteImage; // ref to class var
 
         if (!$this->getFormError()) {
-            if ($_REQUEST['action'] == 'edit') {
+            if ($this->getAction() == 'edit') {
                 $this->buSecondsite->getSecondsiteImageByID(
-                    $_REQUEST['secondsiteImageID'],
+                    $this->getParam('secondsiteImageID'),
                     $dsSecondsiteImage
                 );
-                $secondsiteImageID = $_REQUEST['secondsiteImageID'];
+                $secondsiteImageID = $this->getParam('secondsiteImageID');
             } else {                                                                    // creating new
                 $dsSecondsiteImage->initialise();
                 $dsSecondsiteImage->setValue(
-                    'secondsiteImageID',
+                    DBESecondSiteImage::secondsiteImageID,
                     '0'
                 );
                 $dsSecondsiteImage->setValue(
-                    'customerItemID',
-                    $_REQUEST['customerItemID']
+                    DBESecondSiteImage::customerItemID,
+                    $this->getParam('customerItemID')
                 );
                 $secondsiteImageID = '0';
             }
         } else {                                                                        // form validation error
             $dsSecondsiteImage->initialise();
             $dsSecondsiteImage->fetchNext();
-            $secondsiteImageID = $dsSecondsiteImage->getValue('secondsiteImageID');
+            $secondsiteImageID = $dsSecondsiteImage->getValue(DBESecondSiteImage::secondsiteImageID);
         }
 
         $urlUpdate =
@@ -120,7 +122,7 @@ class CTSecondSite extends CTCNC
             Controller::buildLink(
                 'CustomerItem.php',
                 array(
-                    'customerItemID' => $this->dsSecondsiteImage->getValue('customerItemID'),
+                    'customerItemID' => $this->dsSecondsiteImage->getValue(DBESecondSiteImage::customerItemID),
                     'action'         => 'displayCI'
                 )
             );
@@ -132,19 +134,21 @@ class CTSecondSite extends CTCNC
 
         $this->template->set_var(
             array(
-                'customerItemID' => $dsSecondsiteImage->getValue('customerItemID'),
+                'customerItemID' => $dsSecondsiteImage->getValue(DBESecondSiteImage::customerItemID),
 
                 'secondsiteImageID' => $secondsiteImageID,
 
-                'imageName' => Controller::htmlInputText($dsSecondsiteImage->getValue('imageName')),
+                'imageName' => Controller::htmlInputText($dsSecondsiteImage->getValue(DBESecondSiteImage::imageName)),
 
-                'imageNameMessage' => Controller::htmlDisplayText($dsSecondsiteImage->getMessage('imageName')),
+                'imageNameMessage' => Controller::htmlDisplayText(
+                    $dsSecondsiteImage->getMessage(DBESecondSiteImage::imageName)
+                ),
 
-                'status' => $dsSecondsiteImage->getValue('status'),
+                'status' => $dsSecondsiteImage->getValue(DBESecondSiteImage::status),
 
-                'imagePath' => $dsSecondsiteImage->getValue('imagePath'),
+                'imagePath' => $dsSecondsiteImage->getValue(DBESecondSiteImage::imagePath),
 
-                'imageTime' => $dsSecondsiteImage->getValue('imageTime'),
+                'imageTime' => $dsSecondsiteImage->getValue(DBESecondSiteImage::imageTime),
 
                 'urlUpdate' => $urlUpdate,
 
@@ -159,19 +163,19 @@ class CTSecondSite extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @throws Exception
+     */
     function update()
     {
         $this->setMethodName('update');
-
-        $dsSecondsiteImage = &$this->dsSecondsiteImage;
-
-        $this->formError = (!$this->dsSecondsiteImage->populateFromArray($_REQUEST['secondsiteImage']));
+        $this->formError = (!$this->dsSecondsiteImage->populateFromArray($this->getParam('secondsiteImage')));
 
         if ($this->formError) {
-            if ($this->dsSecondsiteImage->getValue('secondsiteImageID') == '') {    // attempt to insert
-                $_REQUEST['action'] = CTPROJECT_ACT_EDIT;
+            if ($this->dsSecondsiteImage->getValue(DBESecondSiteImage::secondsiteImageID)) {
+                $this->setAction(CTPROJECT_ACT_EDIT);
             } else {
-                $_REQUEST['action'] = CTPROJECT_ACT_ACT;
+                $this->setAction(CTPROJECT_ACT_ACT);
             }
             $this->edit();
             exit;
@@ -183,30 +187,33 @@ class CTSecondSite extends CTCNC
             Controller::buildLink(
                 'CustomerItem.php',
                 array(
-                    'customerItemID' => $this->dsSecondsiteImage->getValue('customerItemID'),
+                    'customerItemID' => $this->dsSecondsiteImage->getValue(DBESecondSiteImage::customerItemID),
                     'action'         => 'displayCI'
                 )
             );
         header('Location: ' . $urlNext);
     }
 
+    /**
+     * @throws Exception
+     */
     function delete()
     {
         $this->setMethodName('delete');
-
+        $dsSecondsiteImage = new DataSet($this);
         $this->buSecondsite->getSecondsiteImageByID(
-            $_REQUEST['secondsiteImageID'],
+            $this->getParam('secondsiteImageID'),
             $dsSecondsiteImage
         );
 
-        $this->buSecondsite->deleteSecondsiteImage($_REQUEST['secondsiteImageID']);
+        $this->buSecondsite->deleteSecondsiteImage($this->getParam('secondsiteImageID'));
 
         $urlNext =
             Controller::buildLink(
                 'CustomerItem.php',
                 array(
                     'action'         => 'displayCI',
-                    'customerItemID' => $dsSecondsiteImage->getValue('customerItemID')
+                    'customerItemID' => $dsSecondsiteImage->getValue(DBESecondSiteImage::customerItemID)
                 )
             );
         header('Location: ' . $urlNext);
@@ -215,10 +222,11 @@ class CTSecondSite extends CTCNC
 
     /**
      * List all second site servers with status
+     * @throws Exception
      */
     function listAll()
     {
-        $selectedYear = @$_REQUEST['searchYear'];
+        $selectedYear = @$this->getParam('searchYear');
 
         if (!$selectedYear) {
             $selectedYear = date('Y');
@@ -245,6 +253,7 @@ class CTSecondSite extends CTCNC
         $this->setTemplateFiles(array('SecondsiteList' => 'SecondsiteList.inc'));
 
         $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
 
         $target = $dsHeader->getValue(DBEHeader::backupTargetSuccessRate);
@@ -291,7 +300,7 @@ class CTSecondSite extends CTCNC
             $this->template->set_var(
                 [
                     "year"         => $year,
-                    "selectedYear" => $year == $selectedYear ? 'selected' : ''
+                    "selectedYear" => $year == $selectedYear ? 'selected' : null
                 ]
             );
             $this->template->parse(
@@ -438,7 +447,9 @@ class CTSecondSite extends CTCNC
 
         foreach ($suspended as $record) {
 
-            if ($record['imageTime'] != '0000-00-00 00:00:00') {
+            $imageTime = 'No Image';
+            $imageAgeDays = null;
+            if ($record['imageTime']) {
                 $imageTime = strftime(
                     "%d/%m/%Y %H:%M:%S",
                     strtotime($record['imageTime'])
@@ -448,19 +459,13 @@ class CTSecondSite extends CTCNC
                     (time() - strtotime($record['imageTime'])) / 86400,
                     0
                 );
-            } else {
-                $imageTime = 'No Image';
-
-                $imageAgeDays = '';
-
             }
-            if ($record['secondsiteValidationSuspendUntilDate'] != '0000-00-00') {
+            $suspendedUntil = 'No longer suspended';
+            if ($record['secondsiteValidationSuspendUntilDate']) {
                 $suspendedUntil = strftime(
                     "%d/%m/%Y",
                     strtotime($record['secondsiteValidationSuspendUntilDate'])
                 );
-            } else {
-                $suspendedUntil = 'No longer suspended';
             }
             $txtRunCheck = 'Check Now';
 
@@ -550,10 +555,11 @@ class CTSecondSite extends CTCNC
     /**
      * Run validation
      *
+     * @throws Exception
      */
     function run()
     {
-        $this->buSecondsite->validateBackups($_REQUEST['customerItemID']);
+        $this->buSecondsite->validateBackups($this->getParam('customerItemID'));
 
         $urlNext =
             Controller::buildLink(
@@ -564,37 +570,44 @@ class CTSecondSite extends CTCNC
         exit;
     }
 
+    /**
+     * @param $server_cuino
+     * @return mixed|string
+     * @throws Exception
+     */
     function getRunUrl($server_cuino)
     {
-        $ret =
-            Controller::buildLink(
-                'SecondSite.php',
-                array(
-                    'action'         => 'run',
-                    'customerItemID' => $server_cuino
-                )
-            );
-
-        return $ret;
+        return Controller::buildLink(
+            'SecondSite.php',
+            array(
+                'action'         => 'run',
+                'customerItemID' => $server_cuino
+            )
+        );
     }
 
+    /**
+     * @param $server_cuino
+     * @return mixed|string
+     * @throws Exception
+     */
     function getEditUrl($server_cuino)
     {
-        $ret =
-            Controller::buildLink(
-                'CustomerItem.php',
-                array(
-                    'action'         => 'displayCI',
-                    'customerItemID' => $server_cuino
-                )
-            );
-
-        return $ret;
+        return Controller::buildLink(
+            'CustomerItem.php',
+            array(
+                'action'         => 'displayCI',
+                'customerItemID' => $server_cuino
+            )
+        );
     }
 
     /*
-    Report of second site validation falures for given customer/date range
+    Report of second site validation failures for given customer/date range
     */
+    /**
+     * @throws Exception
+     */
     function failureAnalysis()
     {
         global $cfg;
@@ -611,7 +624,6 @@ class CTSecondSite extends CTCNC
         $this->setMethodName('failureAnalysis');
 
         $dsSearchForm = new DSForm ($this);
-        $dsResults = new DataSet ($this);
 
         $this->buSecondsite->initialiseSearchForm($dsSearchForm);
 
@@ -626,7 +638,7 @@ class CTSecondSite extends CTCNC
 
                 if ($results = $this->buSecondsite->getResults($dsSearchForm)) {
 
-                    if ($_REQUEST['Search'] == 'Generate CSV') {
+                    if ($this->getParam('Search') == 'Generate CSV') {
 
                         $template = new Template (
                             $cfg["path_templates"],
@@ -679,7 +691,7 @@ class CTSecondSite extends CTCNC
                             'rows'
                         );
 
-                        if (isset($_REQUEST['orderBy'])) {
+                        if ($this->getParam('orderBy')) {
                             foreach ($results as $key => $row) {
                                 $customerName[$key] = $row['customerName'];
                                 $serverName[$key] = $row['serverName'];
@@ -687,15 +699,15 @@ class CTSecondSite extends CTCNC
                                 $errors[$key] = $row['errors'];
                             }
 
-                            if ($_SESSION['secondsiteSortDirection'] == SORT_DESC) {
-                                $_SESSION['secondsiteSortDirection'] = SORT_ASC;
+                            if ($this->getSessionParam('secondsiteSortDirection') == SORT_DESC) {
+                                $this->setSessionParam('secondsiteSortDirection', SORT_ASC);
                             } else {
-                                $_SESSION['secondsiteSortDirection'] = SORT_DESC;
+                                $this->setSessionParam('secondsiteSortDirection', SORT_DESC);
 
                             }
 
                             array_multisort(
-                                $$_REQUEST['orderBy'],
+                                $$this->getParam('orderBy'),
                                 $_SESSION['secondsiteSortDirection'],
                                 $results
                             );
@@ -747,11 +759,12 @@ class CTSecondSite extends CTCNC
         );
 
         $this->setPageTitle('Second Site Failure Analysis Report');
-
-        if ($dsSearchForm->getValue('customerID') != 0) {
+        $customerString = null;
+        if ($dsSearchForm->getValue(BUSecondSite::searchFormCustomerID) != 0) {
             $buCustomer = new BUCustomer ($this);
+            $dsCustomer = new DataSet($this);
             $buCustomer->getCustomerByID(
-                $dsSearchForm->getValue('customerID'),
+                $dsSearchForm->getValue(BUSecondSite::searchFormCustomerID),
                 $dsCustomer
             );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
@@ -760,10 +773,10 @@ class CTSecondSite extends CTCNC
         $this->template->set_var(
             array(
                 'formError'        => $this->formError,
-                'customerID'       => $dsSearchForm->getValue('customerID'),
+                'customerID'       => $dsSearchForm->getValue(BUSecondSite::searchFormCustomerID),
                 'customerString'   => $customerString,
-                'startYearMonth'   => $dsSearchForm->getValue('startYearMonth'),
-                'endYearMonth'     => $dsSearchForm->getValue('endYearMonth'),
+                'startYearMonth'   => $dsSearchForm->getValue(BUSecondSite::searchFormStartYearMonth),
+                'endYearMonth'     => $dsSearchForm->getValue(BUSecondSite::searchFormEndYearMonth),
                 'urlCustomerPopup' => $urlCustomerPopup,
                 'urlSubmit'        => $urlSubmit,
             )
@@ -799,5 +812,4 @@ class CTSecondSite extends CTCNC
             0
         );
     }
-}// end of class
-?>
+}

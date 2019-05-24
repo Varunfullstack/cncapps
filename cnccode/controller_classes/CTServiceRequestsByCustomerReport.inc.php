@@ -14,6 +14,10 @@ require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 class CTServiceRequestsByCustomerReport extends CTCNC
 {
 
+    const searchFormFromDate = 'fromDate';
+    const searchFormToDate = 'toDate';
+    const searchFormDays = 'days';
+
     private $buActivity;
 
     function __construct($requestMethod,
@@ -43,10 +47,13 @@ class CTServiceRequestsByCustomerReport extends CTCNC
         $this->buActivity = new BUActivity($this);
     }
 
+    /**
+     * @throws Exception
+     */
     function defaultAction()
     {
 
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
 
             case 'email':
                 $this->email();
@@ -60,28 +67,23 @@ class CTServiceRequestsByCustomerReport extends CTCNC
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function search()
     {
-
-        global $cfg;
-
         $this->setMethodName('search');
-
-        $dsResults = new DataSet ($this);
-
         $dsSearchForm = $this->initialiseSearchForm();
-
         $this->setTemplateFiles(array('ServiceRequestsByCustomerReport' => 'ServiceRequestsByCustomerReport.inc'));
-
         if (isset($_REQUEST ['searchForm'])) {
 
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
                 $this->setFormErrorOn();
             } else {
                 $results = $this->buActivity->getSrPercentages(
-                    $dsSearchForm->getValue('days'),
-                    $dsSearchForm->getValue('fromDate'),
-                    $dsSearchForm->getValue('toDate')
+                    $dsSearchForm->getValue(self::searchFormDays),
+                    $dsSearchForm->getValue(self::searchFormFromDate),
+                    $dsSearchForm->getValue(self::searchFormToDate)
                 );
 
                 if ($results) {
@@ -107,12 +109,12 @@ class CTServiceRequestsByCustomerReport extends CTCNC
         $this->template->set_var(
             array(
                 'formError'       => $this->formError,
-                'days'            => $dsSearchForm->getValue('days'),
-                'daysMessage'     => $dsSearchForm->getMessage('days'),
-                'fromDate'        => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
-                'fromDateMessage' => $dsSearchForm->getMessage('fromDate'),
-                'toDate'          => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
-                'toDateMessage'   => $dsSearchForm->getMessage('toDate'),
+                'days'            => $dsSearchForm->getValue(self::searchFormDays),
+                'daysMessage'     => $dsSearchForm->getMessage(self::searchFormDays),
+                'fromDate'        => Controller::dateYMDtoDMY($dsSearchForm->getValue(self::searchFormFromDate)),
+                'fromDateMessage' => $dsSearchForm->getMessage(self::searchFormFromDate),
+                'toDate'          => Controller::dateYMDtoDMY($dsSearchForm->getValue(self::searchFormToDate)),
+                'toDateMessage'   => $dsSearchForm->getMessage(self::searchFormToDate),
                 'urlSubmit'       => $urlSubmit
             )
         );
@@ -129,22 +131,22 @@ class CTServiceRequestsByCustomerReport extends CTCNC
     {
         $dsSearchForm = new DSForm ($this);
         $dsSearchForm->addColumn(
-            'fromDate',
+            self::searchFormFromDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsSearchForm->addColumn(
-            'toDate',
+            self::searchFormToDate,
             DA_DATE,
             DA_ALLOW_NULL
         );
         $dsSearchForm->addColumn(
-            'days',
+            self::searchFormDays,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
         $dsSearchForm->setValue(
-            'days',
+            self::searchFormDays,
             7
         );
 
@@ -152,9 +154,11 @@ class CTServiceRequestsByCustomerReport extends CTCNC
 
     }
 
-    /*
-    Render results section
-    */
+    /**
+     * @param $templateName
+     * @param $results
+     * @param DSForm $dsSearchForm
+     */
     public function renderReport($templateName,
                                  $results,
                                  $dsSearchForm
@@ -199,7 +203,7 @@ class CTServiceRequestsByCustomerReport extends CTCNC
 
         $this->template->set_var(
             array(
-                'days'            => $dsSearchForm->getValue('days'),
+                'days'            => $dsSearchForm->getValue(self::searchFormDays),
                 'totalHours'      => number_format(
                     $totalHours,
                     1
@@ -220,32 +224,19 @@ class CTServiceRequestsByCustomerReport extends CTCNC
     */
     function email()
     {
-
-        global $cfg;
-
         $this->setMethodName('email');
-
-        $dsResults = new DataSet ($this);
-
         $dsSearchForm = $this->initialiseSearchForm();
-
-        $days = $_REQUEST['days'];
-
+        $days = $this->getParam('days');
         $dsSearchForm->setValue(
-            'days',
+            self::searchFormDays,
             $days
         );
 
         $results = $this->buActivity->getSrPercentages($days);
 
         if ($results) {
-
             $buMail = new BUMail($this);
-
             $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-            $senderName = 'CNC Support Department';
-
             $toEmail = 'monthlysdreport@cnc-ltd.co.uk';
 
             $this->template = new Template(
@@ -297,8 +288,7 @@ class CTServiceRequestsByCustomerReport extends CTCNC
                 $senderEmail,
                 $toEmail,
                 $hdrs,
-                $body,
-                true
+                $body
             );
 
             echo 'email queued to be sent';
@@ -306,5 +296,4 @@ class CTServiceRequestsByCustomerReport extends CTCNC
 
     } // end email
 
-} // end of class
-?>
+}

@@ -7,8 +7,8 @@
 
 require_once("config.inc.php");
 require_once($cfg["path_bu"] . "/BURenewal.inc.php");
-
-$buRenewal = new BURenewal($this);
+$thing = null;
+$buRenewal = new BURenewal($thing);
 
 $buRenewal->processRenewalEmailRequests();    // Renewal schedules to be sent
 

@@ -14,12 +14,12 @@ require_once($cfg['path_bu'] . '/BURenBroadband.inc.php');
 require_once($cfg['path_bu'] . '/BURenContract.inc.php');
 require_once($cfg['path_bu'] . '/BURenQuotation.inc.php');
 require_once($cfg['path_bu'] . '/BURenDomain.inc.php');
-
-$buRenBroadband = new BURenBroadband($this);
-$buRenContract = new BURenContract($this);
-$buRenQuotation = new BURenQuotation($this);
-$buRenDomain = new BURenDomain($this);
-$buRenHosting = new BURenHosting($this);
+$thing = null;
+$buRenBroadband = new BURenBroadband($thing);
+$buRenContract = new BURenContract($thing);
+$buRenQuotation = new BURenQuotation($thing);
+$buRenDomain = new BURenDomain($thing);
+$buRenHosting = new BURenHosting($thing);
 
 $toEmail = "CreateRenewalSalesOrders@cnc-ltd.co.uk";
 

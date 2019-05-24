@@ -127,7 +127,6 @@
                value="{customerID}"
         >
         <input type="hidden"
-               name="renBroadband[1][customerName]"
                value="{customerName}"
         >
         <input type="hidden"
@@ -160,7 +159,6 @@
             <TD class="promptText">Site</TD>
             <TD class="displayfield">
                 <input type="text"
-                       name="renBroadband[1][siteDesc]"
                        id="siteDesc"
                        value="{siteDesc}"
                        onKeydown="javascript:checkFunctionKey(siteDesc)"
@@ -173,19 +171,19 @@
         </TR>
         <tr>
             <td class="promptText">Item</td>
-            <td class="field"><input type="hidden"
-                                     name="renBroadband[1][itemID]"
-                                     id="itemID"
-                                     value="{itemID}"
-            > <input type="text"
-                     {readonly}
-                     name="renBroadband[1][itemDescription]"
-                     id="itemDescription"
-                     value="{itemDescription}"
-                     onChange="javascript:validateItemDescription()"
-                     onKeydown="javascript:checkFunctionKey(itemDescription)"
-                     size="50"
-                     maxlength="50"
+            <td class="field">
+                <input type="hidden"
+                       name="renBroadband[1][itemID]"
+                       id="itemID"
+                       value="{itemID}"
+                > <input type="text"
+                         {readonly}
+                         id="itemDescription"
+                         value="{itemDescription}"
+                         onChange="javascript:validateItemDescription()"
+                         onKeydown="javascript:checkFunctionKey(itemDescription)"
+                         size="50"
+                         maxlength="50"
             > <font class="formErrorMessage">{itemDescriptionMessage}</font></td>
         </tr>
         <tr>

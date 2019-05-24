@@ -23,8 +23,12 @@ class BUPDFSalesQuote extends Business
      * generates a PDF file and creates a database record.
      *
      * @param mixed $ordheadID
+     * @param bool $salutation
+     * @param bool $introduction
+     * @param bool $emailSubject
      * @param mixed $dsSelectedOrderLine
      * @return bool
+     * @throws Exception
      */
     function generate(
         $ordheadID,
@@ -34,7 +38,9 @@ class BUPDFSalesQuote extends Business
         $dsSelectedOrderLine = false
     )
     {
-
+        $dsOrdline = new DataSet($this);
+        $dsDeliveryContact = new DataSet($this);
+        $dsOrdhead = new DataSet($this);
         if (!$this->buSalesOrder->getOrderWithCustomerName(
             $ordheadID,
             $dsOrdhead,
@@ -42,19 +48,19 @@ class BUPDFSalesQuote extends Business
             $dsDeliveryContact
         )
         ) {
-            $this->displayFatalError('Order ' . $ordheadID . 'Not Found');
+            throw new Exception('Order not found');
         }
 
         if (!$salutation) {
-            $salutation = 'Dear ' . $dsDeliveryContact->getValue('firstName');
+            $salutation = 'Dear ' . $dsDeliveryContact->getValue(DBEContact::firstName);
         }
 
         if (!$introduction) {
-            $introduction = $dsOrdhead->getValue('quotationIntroduction');
+            $introduction = $dsOrdhead->getValue(DBEOrdhead::quotationIntroduction);
         }
 
         if (!$emailSubject) {
-            $emailSubject = $dsOrdhead->getValue('quotationSubject');
+            $emailSubject = $dsOrdhead->getValue(DBEOrdhead::quotationSubject);
         }
 
         $versionNo = $this->buSalesOrder->getNextQuoteVersion($ordheadID);
@@ -65,6 +71,7 @@ class BUPDFSalesQuote extends Business
         $buItem = new BUItem($this);
 
         $userID = $GLOBALS ['auth']->is_authenticated();
+        $dsUser = new DataSet($this);
         $this->buSalesOrder->getUserByID(
             $userID,
             $dsUser
@@ -73,7 +80,7 @@ class BUPDFSalesQuote extends Business
         $buPDF = new BUPDF(
             $this,
             $quoteFile,
-            $dsUser->getValue('name'),
+            $dsUser->getValue(DBEUser::name),
             $ordheadID . '/' . $versionNo,
             'CNC Ltd',
             'Quotation',
@@ -109,30 +116,32 @@ class BUPDFSalesQuote extends Business
         $buPDF->setFont();
         $buPDF->CR();
         $buPDF->CR();
-        $firstName = $dsDeliveryContact->getValue('firstName');
+        $firstName = $dsDeliveryContact->getValue(DBEContact::firstName);
         $buPDF->printString(
-            $dsDeliveryContact->getValue('title') . ' ' . $firstName{0} . ' ' . $dsDeliveryContact->getValue('lastName')
+            $dsDeliveryContact->getValue(DBEContact::title) . ' ' . $firstName{0} . ' ' . $dsDeliveryContact->getValue(
+                DBEContact::lastName
+            )
         );
         $buPDF->CR();
-        $buPDF->printString($dsOrdhead->getValue('customerName'));
+        $buPDF->printString($dsOrdhead->getValue(DBEJOrdhead::customerName));
         $buPDF->CR();
-        $buPDF->printString($dsOrdhead->getValue('delAdd1'));
-        if ($dsOrdhead->getValue('delAdd2') != '') {
+        $buPDF->printString($dsOrdhead->getValue(DBEJOrdhead::delAdd1));
+        if ($dsOrdhead->getValue(DBEJOrdhead::delAdd2) != '') {
             $buPDF->CR();
-            $buPDF->printString($dsOrdhead->getValue('delAdd2'));
+            $buPDF->printString($dsOrdhead->getValue(DBEJOrdhead::delAdd2));
         }
-        if ($dsOrdhead->getValue('delAdd3') != '') {
+        if ($dsOrdhead->getValue(DBEJOrdhead::delAdd3) != '') {
             $buPDF->CR();
-            $buPDF->printString($dsOrdhead->getValue('delAdd3'));
-        }
-        $buPDF->CR();
-        $buPDF->printString($dsOrdhead->getValue('delTown'));
-        if ($dsOrdhead->getValue('delCounty') != '') {
-            $buPDF->CR();
-            $buPDF->printString($dsOrdhead->getValue('delCounty'));
+            $buPDF->printString($dsOrdhead->getValue(DBEJOrdhead::delAdd3));
         }
         $buPDF->CR();
-        $buPDF->printString($dsOrdhead->getValue('delPostcode'));
+        $buPDF->printString($dsOrdhead->getValue(DBEJOrdhead::delTown));
+        if ($dsOrdhead->getValue(DBEJOrdhead::delCounty) != '') {
+            $buPDF->CR();
+            $buPDF->printString($dsOrdhead->getValue(DBEJOrdhead::delCounty));
+        }
+        $buPDF->CR();
+        $buPDF->printString($dsOrdhead->getValue(DBEJOrdhead::delPostcode));
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printString(date('l, jS F Y'));
@@ -171,37 +180,39 @@ class BUPDFSalesQuote extends Business
                 $dsSelectedOrderLine &&
                 $dsSelectedOrderLine->search(
                     'sequenceNo',
-                    $dsOrdline->getValue("sequenceNo")
+                    $dsOrdline->getValue(DBEJOrdline::sequenceNo)
                 )
             ) {
-                if ($dsOrdline->getValue('lineType') == "I") {
-                    if ($dsOrdline->getValue('itemDescription') != '') {
+                if ($dsOrdline->getValue(DBEJOrdline::lineType) == "I") {
+                    if ($dsOrdline->getValue(DBEJOrdline::itemDescription) != '') {
                         $buPDF->printStringAt(
                             40,
-                            $dsOrdline->getValue('itemDescription')
+                            $dsOrdline->getValue(DBEJOrdline::itemDescription)
                         );
                     } else {
                         $buPDF->printStringAt(
                             40,
-                            $dsOrdline->getValue('description')
+                            $dsOrdline->getValue(DBEJOrdline::description)
                         );
                     }
                     $buPDF->printStringRJAt(
                         30,
                         Controller::formatNumber(
-                            $dsOrdline->getValue('qtyOrdered'),
+                            $dsOrdline->getValue(DBEJOrdline::qtyOrdered),
                             2
                         )
                     );
                     /*
                     Do not print zero sale values
                     */
-                    if ($dsOrdline->getValue('curUnitSale') != 0) {
+                    if ($dsOrdline->getValue(DBEJOrdline::curUnitSale) != 0) {
                         $buPDF->printStringRJAt(
                             150,
-                            Controller::formatNumberCur($dsOrdline->getValue('curUnitSale'))
+                            Controller::formatNumberCur($dsOrdline->getValue(DBEJOrdline::curUnitSale))
                         );
-                        $total = ($dsOrdline->getValue('curUnitSale') * $dsOrdline->getValue('qtyOrdered'));
+                        $total = ($dsOrdline->getValue(DBEJOrdline::curUnitSale) * $dsOrdline->getValue(
+                                DBEJOrdline::qtyOrdered
+                            ));
                         $buPDF->printStringRJAt(
                             170,
                             Controller::formatNumberCur($total)
@@ -209,21 +220,22 @@ class BUPDFSalesQuote extends Business
                         $grandTotal += $total;
                     }
                     if ($dsOrdline->getValue(
-                            'itemID'
+                            DBEJOrdline::itemID
                         ) != 0) {            // some item lines in old system did not have a related item record
+                        $dsItem = new DataSet($this);
                         $buItem->getItemByID(
-                            $dsOrdline->getValue('itemID'),
+                            $dsOrdline->getValue(DBEJOrdline::itemID),
                             $dsItem
                         );
                         /*
                         now that the notes are in a text field we need to split the lines up for the PDF printing
                         */
-                        if ($dsItem->getValue('notes') != '') {
+                        if ($dsItem->getValue(DBEItem::notes) != '') {
                             $buPDF->setFontSize(8);
                             $buPDF->setFont();
                             $notesArray = explode(
                                 chr(13) . chr(10),
-                                $dsItem->getValue('notes')
+                                $dsItem->getValue(DBEItem::notes)
                             );
                             foreach ($notesArray as $noteLine) {
                                 if (trim($noteLine) != '') {          // ignore blank lines
@@ -241,7 +253,7 @@ class BUPDFSalesQuote extends Business
                 } else {
                     $buPDF->printStringAt(
                         40,
-                        $dsOrdline->getValue('description')
+                        $dsOrdline->getValue(DBEJOrdline::description)
                     ); // comment line
                 }
                 $buPDF->CR();
@@ -282,8 +294,8 @@ class BUPDFSalesQuote extends Business
         $buPDF->printString('COMPUTER & NETWORK CONSULTANTS LTD');
         $buPDF->CR();
         $buPDF->CR();
-        if ($dsUser->getValue('signatureFilename')) {
-            $filePath = IMAGES_DIR . '/' . $dsUser->getValue('signatureFilename');
+        if ($dsUser->getValue(DBEUser::signatureFilename)) {
+            $filePath = IMAGES_DIR . '/' . $dsUser->getValue(DBEUser::signatureFilename);
             if (!file_exists($filePath)) {
                 throw new Exception('Could not find the signature file for the user in: ' . $filePath);
             }
@@ -297,11 +309,11 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->CR();
-        $buPDF->printString($dsUser->getValue('firstName') . ' ' . $dsUser->getValue('lastName'));
+        $buPDF->printString($dsUser->getValue(DBEUser::firstName) . ' ' . $dsUser->getValue(DBEUser::lastName));
         $buPDF->CR();
         $buPDF->setBoldOn();
         $buPDF->setFont();
-        $buPDF->printString($dsUser->getValue('jobTitle'));
+        $buPDF->printString($dsUser->getValue(DBEUser::jobTitle));
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printString('E. & O. E.');
@@ -372,78 +384,79 @@ class BUPDFSalesQuote extends Business
             110,
             'From:'
         );
-        $firstName = $dsDeliveryContact->getValue('firstName');
+        $firstName = $dsDeliveryContact->getValue(DBEContact::firstName);
         $buPDF->printStringAt(
             130,
             $dsDeliveryContact->getValue(
-                'title'
-            ) . ' ' . $firstName{0} . ' ' . $dsDeliveryContact->getValue('lastName')
+                DBEContact::title
+            ) . ' ' . $firstName{0} . ' ' . $dsDeliveryContact->getValue(DBEContact::lastName)
         );
         $buPDF->CR();
         $buPDF->printStringAt(
             130,
-            $dsOrdhead->getValue('customerName')
+            $dsOrdhead->getValue(DBEJOrdhead::customerName)
         );
         $buPDF->CR();
         $buPDF->printStringAt(
             130,
-            $dsOrdhead->getValue('delAdd1')
+            $dsOrdhead->getValue(DBEJOrdhead::delAdd1)
         );
-        if ($dsOrdhead->getValue('delAdd2') != '') {
+        if ($dsOrdhead->getValue(DBEJOrdhead::delAdd2) != '') {
             $buPDF->CR();
             $buPDF->printStringAt(
                 130,
-                $dsOrdhead->getValue('delAdd2')
+                $dsOrdhead->getValue(DBEJOrdhead::delAdd2)
             );
         }
-        if ($dsOrdhead->getValue('delAdd3') != '') {
+        if ($dsOrdhead->getValue(DBEJOrdhead::delAdd3) != '') {
             $buPDF->CR();
             $buPDF->printStringAt(
                 130,
-                $dsOrdhead->getValue('delAdd3')
-            );
-        }
-        $buPDF->CR();
-        $buPDF->printStringAt(
-            130,
-            $dsOrdhead->getValue('delTown')
-        );
-        if ($dsOrdhead->getValue('delCounty') != '') {
-            $buPDF->CR();
-            $buPDF->printStringAt(
-                130,
-                $dsOrdhead->getValue('delCounty')
+                $dsOrdhead->getValue(DBEJOrdhead::delAdd3)
             );
         }
         $buPDF->CR();
         $buPDF->printStringAt(
             130,
-            $dsOrdhead->getValue('delPostcode')
+            $dsOrdhead->getValue(DBEJOrdhead::delTown)
+        );
+        if ($dsOrdhead->getValue(DBEJOrdhead::delCounty) != '') {
+            $buPDF->CR();
+            $buPDF->printStringAt(
+                130,
+                $dsOrdhead->getValue(DBEJOrdhead::delCounty)
+            );
+        }
+        $buPDF->CR();
+        $buPDF->printStringAt(
+            130,
+            $dsOrdhead->getValue(DBEJOrdhead::delPostcode)
         );
         $buPDF->CR();
-        $buPDF->printString($dsUser->getValue('firstName') . ' ' . $dsUser->getValue('lastName'));
+        $buPDF->printString($dsUser->getValue(DBEUser::firstName) . ' ' . $dsUser->getValue(DBEUser::lastName));
         $buPDF->CR();
         $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
-        $buPDF->printString($dsHeader->getValue('name'));
+        $buPDF->printString($dsHeader->getValue(DBEHeader::name));
         $buPDF->CR();
-        $buPDF->printString($dsHeader->getValue('add1'));
+        $buPDF->printString($dsHeader->getValue(DBEHeader::add1));
         $buPDF->CR();
-        $buPDF->printString($dsHeader->getValue('add2'));
+        $buPDF->printString($dsHeader->getValue(DBEHeader::add2));
         $buPDF->CR();
-        $buPDF->printString($dsHeader->getValue('add3'));
+        $buPDF->printString($dsHeader->getValue(DBEHeader::add3));
         $buPDF->CR();
-        $buPDF->printString($dsHeader->getValue('town'));
+        $buPDF->printString($dsHeader->getValue(DBEHeader::town));
         $buPDF->CR();
-        $buPDF->printString($dsHeader->getValue('county'));
+        $buPDF->printString($dsHeader->getValue(DBEHeader::county));
         $buPDF->CR();
-        $buPDF->printString($dsHeader->getValue('postcode'));
+        $buPDF->printString($dsHeader->getValue(DBEHeader::postcode));
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printString(date('l, jS F Y'));
         $buPDF->CR();
         $buPDF->CR();
-        $buPDF->printString('Dear ' . $dsUser->getValue('firstName') . ',');
+        $buPDF->printString('Dear ' . $dsUser->getValue(DBEUser::firstName) . ',');
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printString(
@@ -486,38 +499,37 @@ class BUPDFSalesQuote extends Business
                 $dsSelectedOrderLine &&
                 $dsSelectedOrderLine->search(
                     'sequenceNo',
-                    $dsOrdline->getValue("sequenceNo")
+                    $dsOrdline->getValue(DBEJOrdline::sequenceNo)
                 )
             ) {
-                if ($dsOrdline->getValue('lineType') == "I") {
-                    if ($dsOrdline->getValue('itemDescription') != '') {
+                if ($dsOrdline->getValue(DBEJOrdline::lineType) == "I") {
+                    if ($dsOrdline->getValue(DBEJOrdline::itemDescription) != '') {
                         $buPDF->printStringAt(
                             40,
-                            $dsOrdline->getValue('itemDescription')
+                            $dsOrdline->getValue(DBEJOrdline::itemDescription)
                         );
                     } else {
                         $buPDF->printStringAt(
                             40,
-                            $dsOrdline->getValue('description')
+                            $dsOrdline->getValue(DBEJOrdline::description)
                         );
                     }
                     $buPDF->printStringRJAt(
                         150,
-                        Controller::formatNumberCur($dsOrdline->getValue('curUnitSale'))
+                        Controller::formatNumberCur($dsOrdline->getValue(DBEJOrdline::curUnitSale))
                     );
-                    $total = ($dsOrdline->getValue('curUnitSale') * $dsOrdline->getValue('qtyOrdered'));
                     if ($dsOrdline->getValue(
-                            'itemID'
+                            DBEJOrdline::itemID
                         ) != 0) {            // some item lines in old system did not have a related item record
                         $buItem->getItemByID(
-                            $dsOrdline->getValue('itemID'),
+                            $dsOrdline->getValue(DBEJOrdline::itemID),
                             $dsItem
                         );
                     }
                 } else {
                     $buPDF->printStringAt(
                         40,
-                        $dsOrdline->getValue('description')
+                        $dsOrdline->getValue(DBEJOrdline::description)
                     ); // comment line
                 }
                 $buPDF->box(
@@ -584,35 +596,35 @@ class BUPDFSalesQuote extends Business
         $dsQuotation->copyColumnsFrom($this->buSalesOrder->dbeQuotation);
         $dsQuotation->setUpdateModeInsert();
         $dsQuotation->setValue(
-            'versionNo',
+            DBEQuotation::versionNo,
             $versionNo
         );
         $dsQuotation->setValue(
-            'ordheadID',
-            $dsOrdhead->getValue('ordheadID')
+            DBEQuotation::ordheadID,
+            $dsOrdhead->getValue(DBEJOrdhead::ordheadID)
         );
         $dsQuotation->setValue(
-            'userID',
+            DBEQuotation::userID,
             $userID
         );
         $dsQuotation->setValue(
-            'sentDateTime',
-            date('0000-00-00 00:00:00')
+            DBEQuotation::sentDateTime,
+            null
         );
         $dsQuotation->setValue(
-            'salutation',
+            DBEQuotation::salutation,
             $salutation
         );
         $dsQuotation->setValue(
-            'emailSubject',
+            DBEQuotation::emailSubject,
             $emailSubject
         );
         $dsQuotation->setValue(
-            'fileExtension',
+            DBEQuotation::fileExtension,
             'pdf'
         );
         $dsQuotation->setValue(
-            'documentType',
+            DBEQuotation::documentType,
             'quotation'
         );
         $dsQuotation->post();
@@ -627,6 +639,7 @@ class BUPDFSalesQuote extends Business
      * @param $quotationID
      * @param $emailSubject
      * @return mixed
+     * @throws Exception
      */
     function sendReminderPDFEmailQuote($quotationID,
                                        $emailSubject
@@ -637,10 +650,12 @@ class BUPDFSalesQuote extends Business
         $dbeQuotation = new DBEQuotation($this);
 
         if (!$dbeQuotation->getRow($quotationID)) {
-            $this->displayFatalError('Quotation Not Found');
+            throw new Exception('Quotation Not Found');
 
         }
         $dsOrdhead = new DataSet($this);
+        $dsDeliveryContact = new DataSet($this);
+        $dsOrdline = new DataSet($this);
         if (!$this->buSalesOrder->getOrderWithCustomerName(
             $dbeQuotation->getValue(DBEQuotation::ordheadID),
             $dsOrdhead,
@@ -648,7 +663,7 @@ class BUPDFSalesQuote extends Business
             $dsDeliveryContact
         )
         ) {
-            $this->displayFatalError('Sales Order Not Found');
+            throw new Exception('Sales Order Not Found');
         }
 
         $userID = $GLOBALS ['auth']->is_authenticated();
@@ -746,6 +761,9 @@ class BUPDFSalesQuote extends Business
     /**
      * send a PDF quote.
      * @access private
+     * @param $quotationID
+     * @return mixed
+     * @throws Exception
      */
     function sendPDFEmailQuote($quotationID)
     {
@@ -754,43 +772,48 @@ class BUPDFSalesQuote extends Business
         $dbeQuotation = new DBEQuotation($this);
 
         if (!$dbeQuotation->getRow($quotationID)) {
-            $this->displayFatalError('Quotation Not Found');
+            throw new Exception('Quotation Not Found');
 
         }
-
+        $dsOrdhead = new DataSet($this);
+        $dsOrdline = new DataSet($this);
+        $dsDeliveryContact = new DataSet($this);
         if (!$this->buSalesOrder->getOrderWithCustomerName(
-            $dbeQuotation->getValue('ordheadID'),
+            $dbeQuotation->getValue(DBEQuotation::ordheadID),
             $dsOrdhead,
             $dsOrdline,
             $dsDeliveryContact
         )
         ) {
-            $this->displayFatalError('Sales Order Not Found');
+            throw new Exception('Sales Order Not Found');
         }
 
         $userID = $GLOBALS ['auth']->is_authenticated();
-
+        $dsUser = new DataSet($this);
         $this->buSalesOrder->getUserByID(
             $userID,
             $dsUser
         );
 
-        $quoteFile = 'quotes/' . $dbeQuotation->getValue('ordheadID') . '_' . $dbeQuotation->getValue(
-                'versionNo'
+        $quoteFile = 'quotes/' . $dbeQuotation->getValue(DBEQuotation::ordheadID) . '_' . $dbeQuotation->getValue(
+                DBEQuotation::versionNo
             ) . '.pdf';
 
-        $body = $dbeQuotation->getValue('documentType') . ' ' . $dsOrdhead->getValue(
-                'ordheadID'
-            ) . '/' . $dbeQuotation->getValue('versionNo') . ' for ' . $dbeQuotation->getValue('emailSubject');
+        $body = $dbeQuotation->getValue(DBEQuotation::documentType) . ' ' . $dsOrdhead->getValue(
+                DBEJOrdhead::ordheadID
+            ) . '/' . $dbeQuotation->getValue(DBEQuotation::versionNo) . ' for ' . $dbeQuotation->getValue(
+                DBEQuotation::emailSubject
+            );
 
         $subject = ucwords($body);
 
-        $senderEmail = $dsUser->getValue('username') . '@cnc-ltd.co.uk';
-        $senderName = $dsUser->getValue('firstName') . ' ' . $dsUser->getValue('lastName');
+        $senderEmail = $dsUser->getValue(DBEUser::username) . '@cnc-ltd.co.uk';
+        $senderName = $dsUser->getValue(DBEUser::firstName) . ' ' . $dsUser->getValue(DBEUser::lastName);
 
         $message =
-            '<html>
-        <head>
+            '<html lang="en">
+        <head >
+        <title>Quote</title>
         <style type="text/css">
         <!--
         BODY, P, TD, TH {
@@ -809,11 +832,11 @@ class BUPDFSalesQuote extends Business
         <body>
       ';
         // Send email with attachment
-        $message .= '<P>' . $dbeQuotation->getValue('salutation') . '</P>';
+        $message .= '<P>' . $dbeQuotation->getValue(DBEQuotation::salutation) . '</P>';
         $message .= '<P>Please find attached a quotation for your attention.</P>';
         $message .= '<P>If you have any questions please do not hesitate to contact us.</P>';
 
-        if ($dbeQuotation->getValue('documentType') == 'order form') {
+        if ($dbeQuotation->getValue(DBEQuotation::documentType) == 'order form') {
             $message .= ' To allow us to process your order please complete, sign and return at your earliest convenience';
         }
 
@@ -823,14 +846,12 @@ class BUPDFSalesQuote extends Business
             '</body>
         </html>';
 
-        $filename = $dsOrdhead->getValue('ordheadID') . '_' . $dbeQuotation->getValue('versionNo') . '.pdf';
-
         ini_set(
             "sendmail_from",
             $senderEmail
         );    // the envelope from address
 
-        $toEmail = $dsOrdhead->getValue('delContactEmail');
+        $toEmail = $dsOrdhead->getValue(DBEJOrdhead::delContactEmail);
 
         $hdrs = array(
             'From'         => $senderName . '<' . $senderEmail . '>',
@@ -869,4 +890,3 @@ class BUPDFSalesQuote extends Business
     }
 
 } // end class  
-?>

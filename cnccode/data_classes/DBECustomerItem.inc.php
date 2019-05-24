@@ -103,8 +103,8 @@ class DBECustomerItem extends DBCNCEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -636,7 +636,7 @@ class DBECustomerItem extends DBCNCEntity
         );
         $this->addColumn(
             self::initialContractLength,
-            DA_YN,
+            DA_INTEGER,
             DA_NOT_NULL,
             'custitem.initialContractLength'
         );
@@ -745,32 +745,13 @@ class DBECustomerItem extends DBCNCEntity
         return (parent::getRows());
     }
 
-    /* Update for new many-to-many
-    function setRowsToContractID( $contractID, $customerItemIDArray )
-    {
-
-       $this->setMethodName('setRowsToContractID');
-
-       if ( !$customerItemIDArray ){
-         $this->raiseError('$customerItemIDArray  not set');
-       }
-
-       $this->setQueryString(
-         "UPDATE " . $this->getTableName().
-         " SET ". $this->getDBColumnName('contractID') . " = " . $contractID .
-         " WHERE ". $this->getDBColumnName('customerItemID') . " IN ( ". implode( ',', $customerItemIDArray ) . ")"
-       );
-
-      return $this->runQuery();
-    }
-    */
     function addYearToStartDate($customerItemID)
     {
         $statement =
             "
       UPDATE " . $this->getTableName() .
             " SET startDate = DATE_ADD( `startDate`, INTERVAL 1 YEAR ),
-      dateGenerated = '0000-00-00'
+      dateGenerated = null
         WHERE cui_cuino = $customerItemID;";
 
         $this->setQueryString($statement);
@@ -813,7 +794,7 @@ class DBECustomerItem extends DBCNCEntity
     }
 
     function updateContract($customerItemID,
-                            $contractIDs = false
+                            $contractIDs = []
     )
     {
 
@@ -859,7 +840,7 @@ class DBECustomerItem extends DBCNCEntity
       WHERE
         cic_cuino = $customerItemID";
 
-        $result = $this->db->query($statement);
+        $this->db->query($statement);
 
         $existingContractIDs = array();
 
@@ -913,5 +894,3 @@ class DBECustomerItem extends DBCNCEntity
     }
 
 }
-
-?>

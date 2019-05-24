@@ -14,9 +14,14 @@ require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
 class BUStaffProductivityReport extends Business
 {
+    const searchFormStartDate = "startDate";
+    const searchFormEndDate = "endDate";
+
+
     /**
      * Constructor
      * @access Public
+     * @param $owner
      */
     function __construct(&$owner)
     {
@@ -26,8 +31,8 @@ class BUStaffProductivityReport extends Business
     function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);
-        $dsData->addColumn('startDate', DA_DATE, DA_NOT_NULL);
-        $dsData->addColumn('endDate', DA_DATE, DA_NOT_NULL);
+        $dsData->addColumn(self::searchFormStartDate, DA_DATE, DA_NOT_NULL);
+        $dsData->addColumn(self::searchFormEndDate, DA_DATE, DA_NOT_NULL);
     }
 
     function getTandMBilled($userID, $startDate, $endDate)
@@ -93,8 +98,8 @@ class BUStaffProductivityReport extends Business
         $query .=
             " AND
         caa_date BETWEEN '$startDate' AND '$endDate'
-        AND caa_starttime <> ''
-        AND caa_endtime <> ''
+        AND caa_starttime is not null
+        AND caa_endtime is not null
       AND
         caa_consno = $userID";
 
@@ -122,8 +127,8 @@ class BUStaffProductivityReport extends Business
       WHERE
         pro_custno = 282
         AND caa_date BETWEEN '$startDate' AND '$endDate'
-        AND caa_starttime <> ''
-        AND caa_endtime <> ''
+        AND caa_starttime is not null
+        AND caa_endtime is not null
         AND caa_consno = $userID";
 
         //echo $query . '<BR/>';
@@ -139,16 +144,24 @@ class BUStaffProductivityReport extends Business
         return number_format($ret, 1, '.', '');
     } // end in-house hours
 
+    /**
+     * @param $userID
+     * @param $startDate
+     * @param $endDate
+     * @param int $contractItemID
+     * @param bool $inHouse
+     * @return string
+     */
     function getCost($userID, $startDate, $endDate, $contractItemID = 0, $inHouse = false)
     {
         $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
-        $dsHeader->fetchNext();
 
-        $projectStartTime = common_convertHHMMToDecimal($dsHeader->getValue('projectStartTime'));
-        $projectEndTime = common_convertHHMMToDecimal($dsHeader->getValue('projectEndTime'));
-        $helpdeskStartTime = common_convertHHMMToDecimal($dsHeader->getValue('helpdeskStartTime'));
-        $helpdeskEndTime = common_convertHHMMToDecimal($dsHeader->getValue('helpdeskEndTime'));
+        $projectStartTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::projectStartTime));
+        $projectEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::projectEndTime));
+        $helpdeskStartTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::helpdeskStartTime));
+        $helpdeskEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::helpdeskEndTime));
 
         $query = "
       SELECT
@@ -160,13 +173,10 @@ class BUStaffProductivityReport extends Business
       WHERE
         cns_consno = $userID";
 
-        //echo $query . '<BR/>';
-
         $result = $this->db->query($query);
-        $row = $result->fetch_object();
-        $helpdeskFlag = $row->helpdeskFlag;
-        $weekdayOvertimeFlag = $row->weekdayOvertimeFlag;
-        $hourlyPayRate = $row->hourlyPayRate;
+        $helpDeskRow = $result->fetch_object();
+        $helpdeskFlag = $helpDeskRow->helpdeskFlag;
+        $hourlyPayRate = $helpDeskRow->hourlyPayRate;
 
         /* Get user's normal working hours */
         if ($helpdeskFlag == 'Y') {
@@ -209,8 +219,8 @@ class BUStaffProductivityReport extends Business
             " AND caa_consno = $userID
         AND caa_date BETWEEN '$startDate' AND '$endDate'
         AND( caa_endtime <> caa_starttime )
-        AND caa_starttime <> ''
-        AND caa_endtime <> ''
+        AND caa_starttime is not null
+        AND caa_endtime is not null
       ORDER BY
         caa_date";
 
@@ -228,7 +238,7 @@ class BUStaffProductivityReport extends Business
             if ($row->weekday == 0 OR $row->weekday == 6) {
                 $overtime = $endTime - $startTime;
             } else {
-                if ($row->weekdayOvertimeFlag == 'Y') {
+                if ($helpDeskRow->weekdayOvertimeFlag == 'Y') {
                     /*
                     If this is a helpdesk staff then evening overtime is only allowed on activities that start after office end time
                     */
@@ -262,39 +272,9 @@ class BUStaffProductivityReport extends Business
         return number_format($totalCost, 2, '.', '');
     }
 
-    function getPrepayBilled($userID, $startDate, $endDate, $contractItemID = 0)
+    function getPrepayBilled($userID, $startDate, $endDate)
     {
-        $buHeader = new BUHeader($this);
-        $buHeader->getHeader($dsHeader);
-        $dsHeader->fetchNext();
 
-        $billingStartTime = common_convertHHMMToDecimal($dsHeader->getValue('projectStartTime'));
-        $billingEndTime = common_convertHHMMToDecimal($dsHeader->getValue('projectEndTime'));
-
-        $query = "
-      SELECT
-        cns_helpdesk_flag as helpdeskFlag,
-        cns_hourly_pay_rate as hourlyPayRate,
-        weekdayOvertimeFlag
-      FROM
-        consultant
-      WHERE
-        cns_consno = $userID";
-
-        $results = $this->db->query($query);
-        $row = $results->fetch_object();
-        $helpdeskFlag = $row->helpdeskFlag;
-        $weekdayOvertimeFlag = $row->weekdayOvertimeFlag;
-        $hourlyPayRate = $row->hourlyPayRate;
-
-        /* Get user's normal working hours */
-        if ($helpdeskFlag == 'Y') {
-            $officeStartTime = $helpdeskStartTime;
-            $officeEndTime = $helpdeskEndTime;
-        } else {
-            $officeStartTime = $projectStartTime;
-            $officeEndTime = $projectEndTime;
-        }
 
         /* loop through activities */
         $query = "
@@ -326,6 +306,9 @@ class BUStaffProductivityReport extends Business
 
         $totalCost = 0;
 
+        $buHeader = new BUHeader($this);
+        $buHeader->getHeader($dsHeader);
+
         while ($row = $results->fetch_object()) {
 
             getRatesAndHours(
@@ -336,25 +319,27 @@ class BUStaffProductivityReport extends Business
                 $row->maxHours,
                 $row->oohMultiplier,
                 $row->itemID,
-                'Y',
                 $dsHeader,
                 $normalHours,
                 $beforeHours,
                 $afterHours,
                 $overtimeRate,
-                $normalRate,
-                'N'
+                $normalRate
             );
 
             $totalCost += ($normalRate * $normalHours) + ($overtimeRate * ($beforeHours + $afterHours));
-        } // end while activity
+        }
 
         if ($totalCost == null) {
             $totalCost = 0;
         }
         return number_format($totalCost, 2, '.', '');
-    } // end getPrepayBilled
+    }
 
+    /**
+     * @param DSForm $dsSearchForm
+     * @return array
+     */
     function search(&$dsSearchForm)
     {
         $query =
@@ -378,83 +363,83 @@ class BUStaffProductivityReport extends Business
             $ret[$row->name]['tAndmHours'] =
                 $this->getHours(
                     $row->userID,
-                    $dsSearchForm->getValue('startDate'),
-                    $dsSearchForm->getValue('endDate'),
+                    $dsSearchForm->getValue(self::searchFormStartDate),
+                    $dsSearchForm->getValue(self::searchFormEndDate),
                     0
                 );
             $ret[$row->name]['tAndmCost'] =
                 $this->getCost(
                     $row->userID,
-                    $dsSearchForm->getValue('startDate'),
-                    $dsSearchForm->getValue('endDate'),
+                    $dsSearchForm->getValue(self::searchFormStartDate),
+                    $dsSearchForm->getValue(self::searchFormEndDate),
                     0
                 );
             $ret[$row->name]['tAndmBilled'] =
                 $this->getTandMBilled(
                     $row->userID,
-                    $dsSearchForm->getValue('startDate'),
-                    $dsSearchForm->getValue('endDate')
+                    $dsSearchForm->getValue(self::searchFormStartDate),
+                    $dsSearchForm->getValue(self::searchFormEndDate)
                 );
             $ret[$row->name]['prePayHours'] =
                 $this->getHours(
                     $row->userID,
-                    $dsSearchForm->getValue('startDate'),
-                    $dsSearchForm->getValue('endDate'),
+                    $dsSearchForm->getValue(self::searchFormStartDate),
+                    $dsSearchForm->getValue(self::searchFormEndDate),
                     57
 
                 );
             $ret[$row->name]['prePayCost'] =
                 $this->getCost(
                     $row->userID,
-                    $dsSearchForm->getValue('startDate'),
-                    $dsSearchForm->getValue('endDate'),
+                    $dsSearchForm->getValue(self::searchFormStartDate),
+                    $dsSearchForm->getValue(self::searchFormEndDate),
                     57
                 );
             $ret[$row->name]['prePayBilled'] =
                 $this->getPrepayBilled(
                     $row->userID,
-                    $dsSearchForm->getValue('startDate'),
-                    $dsSearchForm->getValue('endDate')
+                    $dsSearchForm->getValue(self::searchFormStartDate),
+                    $dsSearchForm->getValue(self::searchFormEndDate)
                 );
             $ret[$row->name]['serviceDeskHours'] =
                 $this->getHours(
                     $row->userID,
-                    $dsSearchForm->getValue('startDate'),
-                    $dsSearchForm->getValue('endDate'),
+                    $dsSearchForm->getValue(self::searchFormStartDate),
+                    $dsSearchForm->getValue(self::searchFormEndDate),
                     56
                 );
             $ret[$row->name]['serviceDeskCost'] =
                 $this->getCost(
                     $row->userID,
-                    $dsSearchForm->getValue('startDate'),
-                    $dsSearchForm->getValue('endDate'),
+                    $dsSearchForm->getValue(self::searchFormStartDate),
+                    $dsSearchForm->getValue(self::searchFormEndDate),
                     56
                 );
             $ret[$row->name]['serverCareHours'] =
                 $this->getHours(
                     $row->userID,
-                    $dsSearchForm->getValue('startDate'),
-                    $dsSearchForm->getValue('endDate'),
+                    $dsSearchForm->getValue(self::searchFormStartDate),
+                    $dsSearchForm->getValue(self::searchFormEndDate),
                     55
                 );
             $ret[$row->name]['serverCareCost'] =
                 $this->getCost(
                     $row->userID,
-                    $dsSearchForm->getValue('startDate'),
-                    $dsSearchForm->getValue('endDate'),
+                    $dsSearchForm->getValue(self::searchFormStartDate),
+                    $dsSearchForm->getValue(self::searchFormEndDate),
                     55
                 );
             $ret[$row->name]['inHouseHours'] =
                 $this->getInHouseHours(
                     $row->userID,
-                    $dsSearchForm->getValue('startDate'),
-                    $dsSearchForm->getValue('endDate')
+                    $dsSearchForm->getValue(self::searchFormStartDate),
+                    $dsSearchForm->getValue(self::searchFormEndDate)
                 );
             $ret[$row->name]['inHouseCost'] =
                 $this->getCost(
                     $row->userID,
-                    $dsSearchForm->getValue('startDate'),
-                    $dsSearchForm->getValue('endDate'),
+                    $dsSearchForm->getValue(self::searchFormStartDate),
+                    $dsSearchForm->getValue(self::searchFormEndDate),
                     0,
                     true
                 );
@@ -477,5 +462,4 @@ class BUStaffProductivityReport extends Business
         return $ret;
     }
 
-}// End of class
-?>
+}

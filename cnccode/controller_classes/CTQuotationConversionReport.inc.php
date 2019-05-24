@@ -17,7 +17,9 @@ require_once("Mail/mime.php");
 // Actions
 class CTQuotationConversionReport extends CTCNC
 {
-    var $dsSearchForm = '';
+    /** @var DSForm */
+    public $dsSearchForm;
+    /** @var BUQuotationConversionReport */
     public $buQuotationConversionReport;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
@@ -37,17 +39,20 @@ class CTQuotationConversionReport extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
-
+        switch ($this->getAction()) {
             default:
                 $this->displaySearchForm();
                 break;
         }
     }
 
+    /**
+     * @throws Exception
+     */
     function displaySearchForm()
     {
         $dsSearchForm = &$this->dsSearchForm; // ref to global
@@ -58,15 +63,15 @@ class CTQuotationConversionReport extends CTCNC
 
         if ($_POST) {
 
-            if (!$this->dsSearchForm->populateFromArray($_REQUEST['search'])) {
+            if (!$this->dsSearchForm->populateFromArray($this->getParam('search'))) {
                 $this->setFormErrorOn();
             } else {
 
                 $quotationConversionData =
                     $this->buQuotationConversionReport->getConversionData(
-                        $this->dsSearchForm->getValue('fromDate'),
-                        $this->dsSearchForm->getValue('toDate'),
-                        $this->dsSearchForm->getValue('customerID')
+                        $this->dsSearchForm->getValue(BUQuotationConversionReport::searchFormFromDate),
+                        $this->dsSearchForm->getValue(BUQuotationConversionReport::searchFormToDate),
+                        $this->dsSearchForm->getValue(BUQuotationConversionReport::searchFormCustomerID)
                     );
             }
 
@@ -97,34 +102,38 @@ class CTQuotationConversionReport extends CTCNC
         $this->setPageTitle('Quotation Conversion Report');
 
         $dsSearchForm->initialise();
-
-        if ($dsSearchForm->getValue('customerID') != 0) {
+        $customerString = null;
+        if ($dsSearchForm->getValue(BUQuotationConversionReport::searchFormCustomerID) != 0) {
             $buCustomer = new BUCustomer($this);
-            $buCustomer->getCustomerByID($dsSearchForm->getValue('customerID'), $dsCustomer);
+            $dsCustomer = new DataSet($this);
+            $buCustomer->getCustomerByID(
+                $dsSearchForm->getValue(BUQuotationConversionReport::searchFormCustomerID),
+                $dsCustomer
+            );
             $customerString = $dsCustomer->getValue(DBECustomer::name);
         }
 
         $this->template->set_var(
             array(
                 'formError'         => $this->formError,
-                'customerID'        => $dsSearchForm->getValue('customerID'),
-                'customerIDMessage' => $dsSearchForm->getMessage('customerID'),
+                'customerID'        => $dsSearchForm->getValue(BUQuotationConversionReport::searchFormCustomerID),
+                'customerIDMessage' => $dsSearchForm->getMessage(BUQuotationConversionReport::searchFormCustomerID),
                 'customerString'    => $customerString,
-                'fromDate'          => Controller::dateYMDtoDMY($dsSearchForm->getValue('fromDate')),
-                'fromDateMessage'   => $dsSearchForm->getMessage('fromDate'),
-                'toDate'            => Controller::dateYMDtoDMY($dsSearchForm->getValue('toDate')),
-                'toDateMessage'     => $dsSearchForm->getMessage('toDate'),
+                'fromDate'          => Controller::dateYMDtoDMY(
+                    $dsSearchForm->getValue(BUQuotationConversionReport::searchFormFromDate)
+                ),
+                'fromDateMessage'   => $dsSearchForm->getMessage(BUQuotationConversionReport::searchFormFromDate),
+                'toDate'            => Controller::dateYMDtoDMY(
+                    $dsSearchForm->getValue(BUQuotationConversionReport::searchFormToDate)
+                ),
+                'toDateMessage'     => $dsSearchForm->getMessage(BUQuotationConversionReport::searchFormToDate),
                 'urlCustomerPopup'  => $urlCustomerPopup,
                 'urlSubmit'         => $urlSubmit
             )
         );
 
-        if (count($quotationConversionData) > 0) {
-
+        if (count($quotationConversionData)) {
             $this->template->set_block('QuotationConversionReport', 'rowBlock', 'rows');
-
-            $rowCount = 0;
-            $maxHours = 0;
 
             foreach ($quotationConversionData as $row) {
 
@@ -146,14 +155,9 @@ class CTQuotationConversionReport extends CTCNC
                 );
 
                 $this->template->parse('rows', 'rowBlock', true);
-
-            } // end while
-
-        } // if row count
-
+            }
+        }
         $this->template->parse('CONTENTS', 'QuotationConversionReport', true);
         $this->parsePage();
-    } // end function displaySearchForm
-
-}// end of class
-?>
+    }
+}

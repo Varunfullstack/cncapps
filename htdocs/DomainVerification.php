@@ -136,7 +136,7 @@ $body = $template->get_var('output');
 
 echo $body;
 
-$buMail = new BUMail($this);
+$buMail = new BUMail($thing);
 
 $buMail->mime->setHTMLBody($body);
 $subject = "CWA Agents with mismatching domains";
@@ -161,6 +161,5 @@ $sent = $buMail->putInQueue(
     CONFIG_SUPPORT_EMAIL,
     $toEmail,
     $hdrs,
-    $body,
-    true
+    $body
 );

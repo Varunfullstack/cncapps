@@ -1,6 +1,6 @@
 <?php
 /**
- * DM Leter
+ * DM Letter
  */
 require_once("config.inc.php");
 require_once($cfg['path_dbe'] . '/DBEUser.inc.php');
@@ -23,7 +23,7 @@ if (!isset($_REQUEST['contactID'])) {
 if (!isset($_REQUEST['letterTemplate'])) {
     die ('letterTemplate not passed');
 }
-
+$thing = null;
 $templateName = $_REQUEST['letterTemplate'];
 
 $templatePath = LETTER_TEMPLATE_DIR . "/custom/" . $templateName;
@@ -33,33 +33,52 @@ if (!file_exists($templatePath)) {
 }
 
 /* set up template */
-$template = new Template_PHPLIB(LETTER_TEMPLATE_DIR . "/custom/", 'remove');
+$template = new Template_PHPLIB(
+    LETTER_TEMPLATE_DIR . "/custom/",
+    'remove'
+);
 
-$template->setFile('Page', $templateName);
+$template->setFile(
+    'Page',
+    $templateName
+);
 
-$buCustomer = new BUCustomer($this);
-$buCustomer->getContactByID($_REQUEST['contactID'], $dsContact);
+$buCustomer = new BUCustomer($thing);
+$buCustomer->getContactByID(
+    $_REQUEST['contactID'],
+    $dsContact
+);
 $dsContact->fetchNext();
-
-$buCustomer->getCustomerByID($dsContact->getValue('customerID'), $dsCustomer);
+$dsCustomer = new DataSet($thing);
+$buCustomer->getCustomerByID(
+    $dsContact->getValue(DBEContact::customerID),
+    $dsCustomer
+);
 $dsCustomer->fetchNext();
 
 $name = $dsContact->getValue(DBEContact::title) . ' ' . $dsContact->getValue(DBEContact::lastName);
 
-
-$buCustomer->getSiteByCustomerIDSiteNo($dsContact->getValue(DBEContact::customerID),
-                                       $dsContact->getValue(DBEContact::siteNo),
-                                       $dsSite);
+$dsSite = new DataSet($thing);
+$buCustomer->getSiteByCustomerIDSiteNo(
+    $dsContact->getValue(DBEContact::customerID),
+    $dsContact->getValue(DBEContact::siteNo),
+    $dsSite
+);
 
 if ($dsContact->getValue(DBEContact::firstName)) {
     $firstName = $dsContact->getValue(DBEContact::firstName);
-    $addressee = $dsContact->getValue(DBEContact::title) . ' ' . $firstName[0] . ' ' . $dsContact->getValue(DBEContact::lastName);
+    $addressee = $dsContact->getValue(DBEContact::title) . ' ' . $firstName[0] . ' ' . $dsContact->getValue(
+            DBEContact::lastName
+        );
 } else {
     $addressee = $dsContact->getValue(DBEContact::title) . ' ' . $dsContact->getValue(DBEContact::lastName);
 }
 
-$dbeUser = new DBEUser($this);
-$dbeUser->setValue('userID', $GLOBALS['auth']->is_authenticated());
+$dbeUser = new DBEUser($thing);
+$dbeUser->setValue(
+    DBEUser::userID,
+    $GLOBALS['auth']->is_authenticated()
+);
 $dbeUser->getRow();
 
 $address =
@@ -83,7 +102,6 @@ $template->setVar(
     array(
         'title'         => $dsContact->getValue(DBEContact::title),
         'name'          => $name,
-        'formalName'    => $formalName,
         'firstName'     => $dsContact->getValue(DBEContact::firstName),
         'lastName'      => $dsContact->getValue(DBEContact::lastName),
         'addressee'     => $addressee,
@@ -96,15 +114,19 @@ $template->setVar(
     )
 );
 
-$template->parse('output', 'Page', true);
+$template->parse(
+    'output',
+    'Page',
+    true
+);
 $file = $template->getVar('output');
 
-$oFCKeditor = new FCKeditor('letterText');
-$oFCKeditor->BasePath = '/FCKeditor/';
-$oFCKeditor->Height = '800px';
-$oFCKeditor->Value = $file;
+$FCKEditor = new FCKeditor('letterText');
+$FCKEditor->BasePath = '/FCKeditor/';
+$FCKEditor->Height = '800px';
+$FCKEditor->Value = $file;
 ?>
-    <html>
+    <html lang="en">
     <head>
         <title>Client Letter</title>
         <meta http-equiv="Content-Type"
@@ -117,15 +139,18 @@ $oFCKeditor->Value = $file;
     </head>
     <body>
     <h1><?php echo $templateName ?>
-        to <?php echo $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(DBEContact::lastName) ?></h1>
+        to <?php echo $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(
+                DBEContact::lastName
+            ) ?></h1>
     <h2><?php echo stripslashes($_REQUEST['contactName']) ?></h2>
+    <!--suppress HtmlDeprecatedAttribute -->
     <table width="800"
            border="0"
            class="singleBorder"
     >
         <tr>
             <td class="promptText">
-                <?php $oFCKeditor->Create() ?>
+                <?php $FCKEditor->Create() ?>
             </td>
         </tr>
     </table>

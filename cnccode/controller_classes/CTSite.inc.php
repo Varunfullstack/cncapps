@@ -24,8 +24,10 @@ define('CTSITE_TXT_UPDATE_SITE', 'Update Site');
 
 class CTSite extends CTCNC
 {
+    /** @var BUSite */
     private $buSite;
-    var $dsSite = '';
+    /** @var DSForm */
+    public $dsSite;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
@@ -44,11 +46,12 @@ class CTSite extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
         $this->setParentFormFields();
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTCNC_ACT_SITE_ADD:
             case CTCNC_ACT_SITE_EDIT:
                 $this->siteForm();
@@ -71,42 +74,43 @@ class CTSite extends CTCNC
      */
     function setParentFormFields()
     {
-        if (isset($_REQUEST['parentIDField'])) {
-            $_SESSION['siteParentIDField'] = $_REQUEST['parentIDField'];
+        if ($this->getParam('parentIDField')) {
+            $this->setSessionParam('siteParentIDField', $this->getParam('parentIDField'));
         }
-        if (isset($_REQUEST['parentDescField'])) {
-            $_SESSION['siteParentDescField'] = $_REQUEST['parentDescField'];
+        if ($this->getParam('parentDescField')) {
+            $this->setSessionParam('siteParentDescField', $this->getParam('parentDescField'));
         }
     }
 
     /**
      * Display the popup selector form
      * @access private
+     * @throws Exception
      */
     function displaySiteSelectPopup()
     {
         $this->setMethodName('displaySiteSelectPopup');
-        if ($_REQUEST['customerID'] == '') {
+        if (!$this->getParam('customerID')) {
             $this->raiseError('customerID not passed');
         }
         $urlCreate = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
                 'action'     => CTCNC_ACT_SITE_ADD,
-                'customerID' => $_REQUEST['customerID'],
+                'customerID' => $this->getParam('customerID'),
                 'htmlFmt'    => CT_HTML_FMT_POPUP
             )
         );
-        if ($_REQUEST['siteDesc']{0} == '/') {
+        if ($this->getParam('siteDesc'){0} == '/') {
             header('Location: ' . $urlCreate);
             exit;
         }
-        $this->buSite->getSitesByDescMatch($_REQUEST['customerID'], $_REQUEST['siteDesc'], $this->dsSite);
+        $this->buSite->getSitesByDescMatch($this->getParam('customerID'), $this->getParam('siteDesc'), $this->dsSite);
         if ($this->dsSite->rowCount() == 1) {
             $this->setTemplateFiles('SiteSelect', 'SiteSelectOne.inc');
         }
         if ($this->dsSite->rowCount() == 0) {
-            $this->template->set_var('siteDesc', $_REQUEST['siteDesc']);
+            $this->template->set_var('siteDesc', $this->getParam('siteDesc'));
             $this->setTemplateFiles('SiteSelect', 'SiteSelectNone.inc');
         }
         if ($this->dsSite->rowCount() > 1) {
@@ -127,7 +131,7 @@ class CTSite extends CTCNC
                 $this->template->set_var(
                     array(
                         'siteDesc'        => Controller::htmlDisplayText(($siteDesc)),
-                        'submitName'      => addslashes($siteDesc), //so dblquotes don't mess javascript up
+                        'submitName'      => addslashes($siteDesc), //so double quotes don't mess javascript up
                         'siteNo'          => $this->dsSite->getValue(DBESite::siteNo),
                         // this is so the popup knows which field on the parent to update
                         'parentIDField'   => $_SESSION['siteParentIDField'],
@@ -146,14 +150,15 @@ class CTSite extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function siteForm()
     {
         $this->setMethodName('siteForm');
         // initialisation stuff
-        if ($_REQUEST['action'] == CTCNC_ACT_SITE_ADD) {
+        $edit = false;
+        if ($this->getAction() == CTCNC_ACT_SITE_ADD) {
             $urlSubmit = $this->siteFormPrepareAdd();
-            $add = TRUE;
         } else {
             $urlSubmit = $this->siteFormPrepareEdit();
             $edit = TRUE;
@@ -193,23 +198,23 @@ class CTSite extends CTCNC
                 'siteNo'            => $this->dsSite->getValue(DBESite::siteNo),
                 'customerID'        => $this->dsSite->getValue(DBESite::customerID),
                 'add1'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::add1)),
-                'add1Message'       => Controller::htmlDisplayText($this->dsSite->getMessage('add1')),
+                'add1Message'       => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::add1)),
                 'add2'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::add2)),
-                'add2Message'       => Controller::htmlDisplayText($this->dsSite->getMessage('add2')),
+                'add2Message'       => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::add2)),
                 'add3'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::add3)),
-                'add3Message'       => Controller::htmlDisplayText($this->dsSite->getMessage('add3')),
+                'add3Message'       => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::add3)),
                 'town'              => Controller::htmlInputText($this->dsSite->getValue(DBESite::town)),
-                'townMessage'       => Controller::htmlDisplayText($this->dsSite->getMessage('town')),
+                'townMessage'       => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::town)),
                 'county'            => Controller::htmlInputText($this->dsSite->getValue(DBESite::county)),
-                'countyMessage'     => Controller::htmlDisplayText($this->dsSite->getMessage('county')),
+                'countyMessage'     => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::county)),
                 'postcode'          => Controller::htmlInputText($this->dsSite->getValue(DBESite::postcode)),
-                'postcodeMessage'   => Controller::htmlDisplayText($this->dsSite->getMessage('postcode')),
+                'postcodeMessage'   => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::postcode)),
                 'phone'             => Controller::htmlInputText($this->dsSite->getValue(DBESite::phone)),
-                'phoneMessage'      => Controller::htmlDisplayText($this->dsSite->getMessage('phone')),
+                'phoneMessage'      => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::phone)),
                 'debtorCode'        => Controller::htmlInputText($this->dsSite->getValue(DBESite::debtorCode)),
-                'debtorCodeMessage' => Controller::htmlDisplayText($this->dsSite->getMessage('debtorCode')),
+                'debtorCodeMessage' => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::debtorCode)),
                 'sageRef'           => Controller::htmlInputText($this->dsSite->getValue(DBESite::sageRef)),
-                'sageRefMessage'    => Controller::htmlDisplayText($this->dsSite->getMessage('sageRef')),
+                'sageRefMessage'    => Controller::htmlDisplayText($this->dsSite->getMessage(DBEJSite::sageRef)),
                 'invContactID'      => $this->dsSite->getValue(DBEJSite::invoiceContactID),
                 'invContactName'    => $this->dsSite->getValue(DBEJSite::invContactName),
                 'delContactName'    => $this->dsSite->getValue(DBEJSite::delContactName),
@@ -232,16 +237,17 @@ class CTSite extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function siteFormPrepareAdd()
     {
         // If form error then preserve values in $this->dsSite else initialise new
         $this->setPageTitle(CTSITE_TXT_NEW_SITE);
         if (!$this->getFormError()) {
-            if (!isset($_REQUEST['customerID'])) {
+            if (!$this->getParam('customerID')) {
                 $this->displayFatalError(CTSITE_MSG_CUSTOMERID_NOT_PASSED);
             }
-            $this->buSite->initialiseNewSite($_REQUEST['customerID'], $this->dsSite);
+            $this->buSite->initialiseNewSite($this->getParam('customerID'), $this->dsSite);
         }
         return (
         Controller::buildLink(
@@ -259,16 +265,17 @@ class CTSite extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function siteFormPrepareEdit()
     {
         $this->setPageTitle(CTSITE_TXT_UPDATE_SITE);
         // if updating and not a form error then validate passed id and get row from DB
         if (!$this->getFormError()) {
-            if (!isset($_REQUEST['customerID'])) {
+            if (!$this->getParam('customerID')) {
                 $this->displayFatalError(CTSITE_MSG_CUSTOMERID_NOT_PASSED);
             }
-            if (!$this->buSite->getSiteByID($_REQUEST['customerID'], $_REQUEST['siteNo'], $this->dsSite)) {
+            if (!$this->buSite->getSiteByID($this->getParam('customerID'), $this->getParam('siteNo'), $this->dsSite)) {
                 $this->displayFatalError(CTSITE_MSG_SITE_NOT_FND);
             }
         }
@@ -286,49 +293,36 @@ class CTSite extends CTCNC
     /**
      * Update site record
      * @access private
+     * @throws Exception
      */
     function siteUpdate()
     {
         $this->setMethodName('siteUpdate');
-        if (!isset($_REQUEST['site'])) {
+        if (!$this->getParam('site')) {
             $this->displayFatalError(CTSITE_MSG_SITE_ARRAY_NOT_PASSED);
             return;
         }
 //		$this->buSite->initialiseNewSite($this->dsSite);
-        if (!$this->dsSite->populateFromArray($_REQUEST['site'])) {
+        if (!$this->dsSite->populateFromArray($this->getParam('site'))) {
             $this->setFormErrorOn();
-            switch ($_REQUEST['action']) {
+            switch ($this->getAction()) {
                 case CTSITE_ACT_SITE_INSERT:
-                    $_REQUEST['action'] = CTCNC_ACT_SITE_ADD;
+                    $this->setAction(CTCNC_ACT_SITE_ADD);
                     break;
                 case CTSITE_ACT_SITE_UPDATE:
-                    $_REQUEST['action'] = CTCNC_ACT_SITE_EDIT;
+                    $this->setAction(CTCNC_ACT_SITE_EDIT);
                     break;
             }
-            $_REQUEST['customerID'] = $this->dsSite->getValue(DBESite::customerID);
-            $_REQUEST['siteNo'] = $this->dsSite->getValue(DBESite::siteNo);
+            $this->setParam('customerID', $this->dsSite->getValue(DBESite::customerID));
+            $this->setParam('siteNo', $this->dsSite->getValue(DBESite::siteNo));
             $this->siteForm();
             exit;
         } else {                // Validation OK so update
             $this->buSite->updateSite($this->dsSite);
             // this forces update of contactID back through Javascript to parent HTML window
-            $_REQUEST['customerID'] = $this->dsSite->getValue(DBESite::customerID);
-            $_REQUEST['siteDesc'] = $this->dsSite->getValue(DBESite::siteNo);
+            $this->setParam('customerID', $this->dsSite->getValue(DBESite::customerID));
+            $this->setParam('siteDesc', $this->dsSite->getValue(DBESite::siteNo));
             $this->displaySiteSelectPopup();
         }
-        /*
-                    $urlNext = Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => CTCNC_ACT_SITE_POPUP,
-                            'customerID' => $this->dsSite->getValue(DBESite::CustomerID),
-                            'siteDesc' => $this->dsSite->getValue(DBESite::SiteNo)
-                        )
-                    );
-                    header('Location: ' . $urlNext);
-                }
-        */
-    }// end of class
+    }
 }
-
-?>

@@ -33,6 +33,11 @@ class BUProject extends Business
         return TRUE;
     }
 
+    /**
+     * @param $customerID
+     * @return string
+     * @throws Exception
+     */
     public static function getCurrentProjectLink($customerID)
     {
         $thing = null;
@@ -41,7 +46,7 @@ class BUProject extends Business
         $buProject->getProjectsByCustomerID(
             $customerID,
             $dsProject,
-            date(CONFIG_MYSQL_DATE)
+            date(DATE_MYSQL_DATE)
         );
         $link = '';
 
@@ -54,11 +59,11 @@ class BUProject extends Business
                 'Project.php',
                 array(
                     'action'    => 'edit',
-                    'projectID' => $dsProject->getValue('projectID'),
+                    'projectID' => $dsProject->getValue(DBEProject::projectID),
                 )
             );
             $link .= '<td><A HREF="' . $url . ' " target="_blank" >' . $dsProject->getValue(
-                    'description'
+                    DBEProject::description
                 ) . '</A></td>';
 
         }
@@ -116,16 +121,18 @@ class BUProject extends Business
     /**
      *    canDeleteProject
      * Only allowed if this project has no callActivity rows at the moment
+     * @param $ID
+     * @return bool
      */
     function canDelete($ID)
     {
         $dbeProblem = new DBEProblem($this);
         // validate no activities of this type
         $dbeProblem->setValue(
-            'projectID',
+            DBEProblem::projectID,
             $ID
         );
-        if ($dbeProblem->countRowsByColumn('projectID') < 1) {
+        if ($dbeProblem->countRowsByColumn(DBEProblem::projectID) < 1) {
             return TRUE;
         } else {
             return FALSE;
@@ -133,29 +140,10 @@ class BUProject extends Business
     }
 
     /**
-     *    isCurrent
-     * Has it expired?
+     * @param $projectID
+     * @param $linkedOrderID
+     * @throws Exception
      */
-    function isCurrent($ID,
-                       $activityDate = false
-    )
-    {
-        $this->dbeProject->getRow($ID);
-
-        if ($activityDate) {
-            $date = $activityDate;
-        } else {
-            $date = date(CONFIG_MYSQL_DATE);
-        }
-
-        if ($this->dbeProject->getValue('expiryDate') < $date) {
-            $ret = false;
-        } else {
-            $ret = true;
-        }
-        return $ret;
-    }
-
     public function updateLinkedSalesOrder($projectID,
                                            $linkedOrderID
     )
@@ -169,7 +157,7 @@ class BUProject extends Business
 
         $dbeProject->getRow($projectID);
 
-        if ($dbeProject->getValue('customerID') != $dbeSalesOrder->getValue('customerID')) {
+        if ($dbeProject->getValue(DBEProject::customerID) != $dbeSalesOrder->getValue(DBEOrdhead::customerID)) {
             throw new Exception("Sales Order Not For This Customer");
         }
 
@@ -194,4 +182,3 @@ class BUProject extends Business
         $dbeProject->updateRow();
     }
 }// End of class
-?>

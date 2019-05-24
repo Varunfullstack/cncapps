@@ -7,26 +7,9 @@ require_once($cfg["path_bu"] . "/BUActivity.inc.php");
 class BUSecondsite extends Business
 {
 
-    var $dbeSecondsiteImage;
-    var $buActivity;
-    var $log;
-    var $serverCount = 0;
-    var $imageCount = 0;
-    public $suspendedServerCount = 0;
-    public $serverErrorCount = 0;
-    public $imageErrorCount = 0;
-    public $imagePassesCount = 0;
-    protected $suspendedCheckServers = [];
-    var $delayedCheckServers = [];
-    var $excludedLocalServers = [];
-    /** @var mysqli $db */
-    var $db;
-    /* todo:
-    var $imagePassCount;
-    var $imageFailCount;
-    var $serverConfigErrorCount;
-    */
-
+    const searchFormCustomerID = 'customerID';
+    const searchFormStartYearMonth = 'startYearMonth';
+    const searchFormEndYearMonth = 'endYearMonth';
     const STATUS_PASSED = 'PASSED';
     const STATUS_SERVER_NOT_FOUND = 'SERVER_NOT_FOUND';
     const STATUS_IMAGE_NOT_FOUND = 'IMAGE_NOT_FOUND';
@@ -40,6 +23,23 @@ class BUSecondsite extends Business
     const LOG_TYPE_SUCCESS = 3;
     const LOG_TYPE_SUSPENDED = 4;
     const START_IMAGE_TIME = '19:00';
+
+    /** @var DBESecondsiteImage */
+    public $dbeSecondsiteImage;
+    public $buActivity;
+    public $log;
+    public $serverCount = 0;
+    public $imageCount = 0;
+    public $suspendedServerCount = 0;
+    public $serverErrorCount = 0;
+    public $imageErrorCount = 0;
+    public $imagePassesCount = 0;
+    protected $suspendedCheckServers = [];
+    public $delayedCheckServers = [];
+    public $excludedLocalServers = [];
+    /** @var mysqli $db */
+    public $db;
+
 
     function __construct(&$owner)
     {
@@ -86,6 +86,7 @@ class BUSecondsite extends Business
      *
      * @param mixed $customerItemID
      * @param bool $testRun
+     * @throws Exception
      */
     function validateBackups($customerItemID = false,
                              $testRun = false
@@ -108,6 +109,8 @@ class BUSecondsite extends Business
             $excludeFromChecks = false;
 
             $isSuspended = $this->isSuspended($server);
+            $images = [];
+            $timeToLookFrom = null;
 
             if ($isSuspended) {
                 $this->suspendedServerCount++;
@@ -180,7 +183,7 @@ class BUSecondsite extends Business
                             );
 
                             if (!$customerItemID && !$testRun) {
-                                $buActivity = $this->getActivityModel()->raiseSecondSiteLocationNotFoundRequest(
+                                $this->getActivityModel()->raiseSecondSiteLocationNotFoundRequest(
                                     $server['custno'],
                                     $server['serverName'],
                                     $server['server_cuino'],
@@ -299,7 +302,6 @@ class BUSecondsite extends Business
                                         'd/m/Y H:i:s',
                                         $mostRecentFileTime
                                     );
-                                $missingLetters[] = $driveLetter;
 
                                 $status = self::STATUS_OUT_OF_DATE;
                             } else {
@@ -391,7 +393,7 @@ class BUSecondsite extends Business
 
                 if (!$isSuspended && count($missingImages) > 0 && !$customerItemID && !$testRun) {
 
-                    $buActivity = $this->getActivityModel()->raiseSecondSiteMissingImageRequest(
+                    $this->getActivityModel()->raiseSecondSiteMissingImageRequest(
                         $server['custno'],
                         $server['serverName'],
                         $server['server_cuino'],
@@ -473,7 +475,6 @@ class BUSecondsite extends Business
     {
         if (
             $server['secondsiteValidationSuspendUntilDate'] &&
-            $server['secondsiteValidationSuspendUntilDate'] != '0000-00-00' &&
             $server['secondsiteValidationSuspendUntilDate'] > date('Y-m-d')
         ) {
 
@@ -534,9 +535,9 @@ class BUSecondsite extends Business
             0,
             -1
         );
-        //also, make sure that $path is a directory and repair any screwups
+        //also, make sure that $path is a directory and repair any screw ups
         if (!is_dir($path)) $path = dirname($path);
-        //assert either truth or falsehoold of $rec, allow no scalars to mean truth
+        //assert either truthy or falsey of $rec, allow no scalars to mean truth
         //get a directory handle
 
         //initialise the output array
@@ -597,10 +598,7 @@ class BUSecondsite extends Business
         $subject = '2nd Site configuration warning - ' . $server['cus_name'] . ' - ' . $server['serverName'];
 
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-        $senderName = 'CNC Support Department';
-
         $toEmail = '2sbadconfig@' . CONFIG_PUBLIC_DOMAIN;
-
 
         $hdrs = array(
             'To'           => $toEmail,
@@ -629,64 +627,14 @@ class BUSecondsite extends Business
             $senderEmail,
             $toEmail,
             $hdrs,
-            $body,
-            true
+            $body
         );
 
-    }
-
-
-    /**
-     * Get the size of file, platform- and architecture-independant.
-     * This function supports 32bit and 64bit architectures and works fith large files > 2 GB
-     * The return value type depends on platform/architecture: (float) when PHP_INT_SIZE < 8 or (int) otherwise
-     * @param   resource $fp
-     * @return  mixed (int|float) File size on success or (bool) FALSE on error
-     */
-    function my_filesize($filepath)
-    {
-        $return = false;
-        $fp = fopen(
-            $filepath,
-            'r'
-        );
-        if (is_resource($fp)) {
-            if (PHP_INT_SIZE < 8) {
-                // 32bit
-                if (0 === fseek(
-                        $fp,
-                        0,
-                        SEEK_END
-                    )) {
-                    $return = 0.0;
-                    $step = 0x7FFFFFFF;
-                    while ($step > 0) {
-                        if (0 === fseek(
-                                $fp,
-                                -$step,
-                                SEEK_CUR
-                            )) {
-                            $return += floatval($step);
-                        } else {
-                            $step >>= 1;
-                        }
-                    }
-                }
-            } elseif (0 === fseek(
-                    $fp,
-                    0,
-                    SEEK_END
-                )) {
-                // 64bit
-                $return = ftell($fp);
-            }
-        }
-        return $return;
     }
 
     function setImageStatus($secondSiteImageID,
                             $status,
-                            $imagePath = '',
+                            $imagePath = null,
                             $imageTime = null
     )
     {
@@ -694,15 +642,32 @@ class BUSecondsite extends Business
             "UPDATE
         secondsite_image 
       SET
-        status = '$status',
-        imagePath = '" . addslashes($imagePath) . "',
-        imageTime = '$imageTime'
+        status = ?,
+        imagePath = ?,
+        imageTime = ?
       WHERE
-        secondSiteImageID = $secondSiteImageID";
-
+        secondSiteImageID = ?";
+/** @var dbSweetcode $db */
         $db = $GLOBALS['db'];
 
-        $db->query($queryString);
+        $db->preparedQuery($queryString, [
+            [
+                'type' => "s",
+                'value' => $status
+            ],
+            [
+                'type' => "s",
+                'value' => $imagePath
+            ],
+            [
+                'type' => "s",
+                'value' => $imageTime
+            ],
+            [
+                'type' => "i",
+                'value' => $secondSiteImageID
+            ],
+        ]);
     }
 
     function setImageStatusByServer($customerItemID,
@@ -732,7 +697,6 @@ class BUSecondsite extends Business
         secondSiteImageID,
         imageName,
         status
-
       FROM
         secondsite_image
 
@@ -831,11 +795,11 @@ class BUSecondsite extends Business
     )
     {
         $this->dbeSecondsiteImage->setValue(
-            'customerItemID',
+            DBESecondSiteImage::customerItemID,
             $customerItemID
         );
         $this->dbeSecondsiteImage->getRowsByColumn(
-            'customerItemID',
+            DBESecondSiteImage::customerItemID,
             'imageName'
         );
         return ($this->getData(
@@ -870,7 +834,6 @@ class BUSecondsite extends Business
         ssi.status,
         ssi.imagePath,
         ssi.imageTime
-
       FROM
         custitem ci
         JOIN customer c ON c.cus_custno = ci.cui_custno
@@ -903,43 +866,47 @@ class BUSecondsite extends Business
     {
         $dsData = new DSForm($this);
         $dsData->addColumn(
-            'customerID',
+            self::searchFormCustomerID,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->setValue(
-            'customerID',
-            ''
+            self::searchFormCustomerID,
+            null
         );
         $dsData->addColumn(
-            'startYearMonth',
+            self::searchFormStartYearMonth,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->setValue(
-            'startYearMonth',
-            ''
+            self::searchFormStartYearMonth,
+            null
         );
         $dsData->addColumn(
-            'endYearMonth',
+            self::searchFormEndYearMonth,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $dsData->setValue(
-            'endYearMonth',
-            ''
+            self::searchFormEndYearMonth,
+            null
         );
     }
 
+    /**
+     * @param DSForm $searchForm
+     * @return array
+     */
     function getResults(&$searchForm)
     {
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
 
-        $customerID = $searchForm->getValue('customerID');
+        $customerID = $searchForm->getValue(self::searchFormCustomerID);
 
-        $startYearMonth = $searchForm->getValue('startYearMonth');
-        $endYearMonth = $searchForm->getValue('endYearMonth');
+        $startYearMonth = $searchForm->getValue(self::searchFormStartYearMonth);
+        $endYearMonth = $searchForm->getValue(self::searchFormEndYearMonth);
 
         $sql =
             "SELECT 
@@ -1020,5 +987,4 @@ class BUSecondsite extends Business
     }
 
 
-}//End of class
-?>
+}

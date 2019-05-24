@@ -13,10 +13,16 @@ require_once($cfg["path_dbe"] . "/DBEAnswer.inc.php");
 
 class BUQuestionnaire extends Business
 {
-    var $dbeQuestionnaire = "";
-    var $dbeQuestion = "";
-    var $dbeAnswerType = "";
-    var $dbeAnswer = "";
+    /** @var DBEQuestionnaire */
+    public $dbeQuestionnaire;
+    /** @var DBEQuestion */
+    public $dbeQuestion;
+    /** @var DBEAnswerType */
+    public $dbeAnswerType;
+    /** @var DBEAnswer */
+    public $dbeAnswer;
+    /** @var DBEJQuestion */
+    public $dbeJQuestion;
 
     /**
      * Constructor
@@ -33,6 +39,10 @@ class BUQuestionnaire extends Business
         $this->dbeAnswer = new DBEAnswer($this);
     }
 
+    /**
+     * @param $dsData
+     * @return bool
+     */
     function updateQuestionnaire(&$dsData)
     {
         $this->setMethodName('updateQuestionnaire');
@@ -40,6 +50,11 @@ class BUQuestionnaire extends Business
         return TRUE;
     }
 
+    /**
+     * @param $ID
+     * @param $dsResults
+     * @return bool
+     */
     function getQuestionnaireByID($ID, &$dsResults)
     {
         $this->dbeQuestionnaire->setPKValue($ID);
@@ -47,49 +62,33 @@ class BUQuestionnaire extends Business
         return ($this->getData($this->dbeQuestionnaire, $dsResults));
     }
 
+    /**
+     * @param $dsResults
+     * @return bool
+     */
     function getAll(&$dsResults)
     {
         $this->dbeQuestionnaire->getRows('description');
-
         return ($this->getData($this->dbeQuestionnaire, $dsResults));
-    }
-
-    function deleteQuestionnaire($ID)
-    {
-        $this->setMethodName('deleteQuestionnaire');
-        if ($this->canDeleteQuestionnaire($ID)) {
-            return $this->dbeQuestionnaire->deleteRow($ID);
-        } else {
-            return FALSE;
-        }
     }
 
     /**
      *    canDeleteQuestionnaire
      * Only allowed if this questionnaire has no answers
+     * @param $ID
+     * @return bool
      */
     function canDelete($ID)
     {
-
         $dbeQuestion = new DBEQuestion($this);
-
-        $dbeQuestion->setValue('questionnaireID', $ID);
-
-        if ($dbeQuestion->countRowsByColumn('questionnaireID') < 1) {
-
-            $ret = false;
-
-
-        } else {
-
-            $ret = FALSE;
-
-        }
-
-        return $ret;
-
+        $dbeQuestion->setValue(DBEQuestion::questionnaireID, $ID);
+        return $dbeQuestion->countRowsByColumn(DBEQuestion::questionnaireID) < 1;
     }
 
+    /**
+     * @param $dsData
+     * @return bool
+     */
     function updateQuestion(&$dsData)
     {
         $this->setMethodName('updateQuestion');
@@ -97,6 +96,11 @@ class BUQuestionnaire extends Business
         return TRUE;
     }
 
+    /**
+     * @param $ID
+     * @param $dsResults
+     * @return bool
+     */
     function getQuestionByID($ID, &$dsResults)
     {
         $this->dbeQuestion->setPKValue($ID);
@@ -104,6 +108,11 @@ class BUQuestionnaire extends Business
         return ($this->getData($this->dbeQuestion, $dsResults));
     }
 
+    /**
+     * @param $questionnaireID
+     * @param $dsResults
+     * @return bool
+     */
     function getAllQuestions($questionnaireID, &$dsResults)
     {
         $this->dbeJQuestion->getRowsByQuestionnaireID($questionnaireID);
@@ -111,40 +120,29 @@ class BUQuestionnaire extends Business
         return ($this->getData($this->dbeJQuestion, $dsResults));
     }
 
+    /**
+     * @param $ID
+     * @return bool
+     */
     function deleteQuestion($ID)
     {
         $this->setMethodName('deleteQuestion');
         if ($this->canDeleteQuestion($ID)) {
             return $this->dbeQuestion->deleteRow($ID);
-        } else {
-            return FALSE;
         }
+        return FALSE;
     }
 
     /**
      *  canDeleteQuestion
      * Only allowed if this question has no answers
+     * @param $ID
+     * @return bool
      */
     function canDeleteQuestion($ID)
     {
-
         $dbeAnswer = new DBEAnswer($this);
-
-        $dbeAnswer->setValue('questionID', $ID);
-
-        if ($dbeAnswer->countRowsByColumn('questionID') < 1) {
-
-            $ret = false;
-
-
-        } else {
-
-            $ret = FALSE;
-
-        }
-
-        return $ret;
-
+        $dbeAnswer->setValue(DBEAnswer::questionID, $ID);
+        return $dbeAnswer->countRowsByColumn(DBEAnswer::questionID) < 1;
     }
-}// End of class
-?>
+}

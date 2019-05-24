@@ -14,12 +14,15 @@ class BUCustomerSrAnalysisReport extends Business
 {
     const ITEMTYPENO_SERVERCARE = 55;
     const ITEMTYPENO_SERVICEDESK = 56;
+    const searchFormCustomerID = 'customerID';
+    const searchFormFromDate = 'fromDate';
+    const searchFormToDate = 'toDate';
     private $includedItemTypes;
 
     function __construct(&$owner)
     {
         parent::__construct($owner);
-        /* so that we can extract "other" itemtypes */
+        /* so that we can extract "other" itemTypes */
         $this->includedItemTypes = self::ITEMTYPENO_SERVERCARE . ',' . self::ITEMTYPENO_SERVICEDESK . ',' . CONFIG_PREPAY_ITEMTYPEID;
 
     }
@@ -27,25 +30,29 @@ class BUCustomerSrAnalysisReport extends Business
     function initialiseSearchForm(&$dsData)
     {
         $dsData = new DSForm($this);
-        $dsData->addColumn('customerID', DA_STRING, DA_ALLOW_NULL);
-        $dsData->addColumn('fromDate', DA_DATE, DA_ALLOW_NULL);
-        $dsData->addColumn('toDate', DA_DATE, DA_ALLOW_NULL);
-        $dsData->setValue('customerID', '');
+        $dsData->addColumn(self::searchFormCustomerID, DA_STRING, DA_ALLOW_NULL);
+        $dsData->addColumn(self::searchFormFromDate, DA_DATE, DA_ALLOW_NULL);
+        $dsData->addColumn(self::searchFormToDate, DA_DATE, DA_ALLOW_NULL);
+        $dsData->setValue(self::searchFormCustomerID, '');
     }
 
+    /**
+     * @param DataSet $dsSearchForm
+     * @return array
+     */
     function search($dsSearchForm)
     {
 
-        $fromDate = $dsSearchForm->getValue('fromDate');
-        $toDate = $dsSearchForm->getValue('toDate');
-        $customerID = $dsSearchForm->getValue('customerID');
+        $fromDate = $dsSearchForm->getValue(self::searchFormFromDate);
+        $toDate = $dsSearchForm->getValue(self::searchFormToDate);
+        $customerID = $dsSearchForm->getValue(self::searchFormCustomerID);
 
         return $this->getResultsByDateRangeBrokenByPriority($customerID, $fromDate, $toDate);
     }
 
     function getResultsByDateRangeBrokenByPriority($customerID, $fromDate, $toDate)
     {
-        $resultset = array();
+        $resultSet = [];
 
         $months = $this->getMonths(
             $fromDate,
@@ -68,10 +75,10 @@ class BUCustomerSrAnalysisReport extends Business
 
                 $priorities = [1, 2, 3, 4];
                 $itemTypes = [
-                    "serverCare" => self::ITEMTYPENO_SERVERCARE,
+                    "serverCare"  => self::ITEMTYPENO_SERVERCARE,
                     "serviceDesk" => self::ITEMTYPENO_SERVICEDESK,
-                    "prepay" => CONFIG_PREPAY_ITEMTYPEID,
-                    "other" => null
+                    "prepay"      => CONFIG_PREPAY_ITEMTYPEID,
+                    "other"       => null
                 ];
 
                 $resultRow['types'] = [
@@ -117,10 +124,10 @@ class BUCustomerSrAnalysisReport extends Business
                     }
                 }
 
-                $resultset[] = $resultRow;
+                $resultSet[] = $resultRow;
             }
         }
-        return $resultset;
+        return $resultSet;
     }
 
     function getMonths($fromDate, $toDate)
@@ -145,17 +152,15 @@ class BUCustomerSrAnalysisReport extends Business
         $query .= " GROUP BY
         YEAR( pro_date_raised ), MONTH( pro_date_raised );";
 
-        if ($result = $this->db->query($query)) {
-
-            while ($tmp = $result->fetch_array(MYSQLI_ASSOC)) {
-                $res[] = $tmp;
-            }
-
-        } else {
-            $res = false;
+        if (!($result = $this->db->query($query))) {
+            return false;
         }
-        return $res;
+        $res = [];
+        while ($tmp = $result->fetch_array(MYSQLI_ASSOC)) {
+            $res[] = $tmp;
+        }
 
+        return $res;
     }
 
     function getCountForPriority($priority, $customerID, $year, $month, $itemtypeno = false)
@@ -250,7 +255,7 @@ class BUCustomerSrAnalysisReport extends Business
 
     function getResultsByDateRange($customerID, $fromDate, $toDate)
     {
-        $resultset = array();
+        $resultSet = array();
 
         $months = $this->getMonths(
             $fromDate,
@@ -273,180 +278,180 @@ class BUCustomerSrAnalysisReport extends Business
 
                 $resultRow['serverCareCount1And3'] =
                     $this->getCount1to3(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        self::ITEMTYPENO_SERVERCARE
+                        self::ITEMTYPENO_SERVERCARE,
+                        $customerID
                     );
                 $resultRow['serverCareHoursResponded'] =
                     $this->getRespondedHours(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        self::ITEMTYPENO_SERVERCARE
+                        self::ITEMTYPENO_SERVERCARE,
+                        $customerID
                     );
                 $resultRow['serverCareHoursFix'] =
                     $this->getFixHours(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        self::ITEMTYPENO_SERVERCARE
+                        self::ITEMTYPENO_SERVERCARE,
+                        $customerID
                     );
                 $resultRow['serverCareCount4'] =
                     $this->getCount4(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        self::ITEMTYPENO_SERVERCARE
+                        self::ITEMTYPENO_SERVERCARE,
+                        $customerID
                     );
                 $resultRow['serviceDeskCount1And3'] =
                     $this->getCount1to3(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        self::ITEMTYPENO_SERVICEDESK
+                        self::ITEMTYPENO_SERVICEDESK,
+                        $customerID
                     );
                 $resultRow['serviceDeskHoursResponded'] =
                     $this->getRespondedHours(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        self::ITEMTYPENO_SERVICEDESK
+                        self::ITEMTYPENO_SERVICEDESK,
+                        $customerID
                     );
                 $resultRow['serviceDeskHoursFix'] =
                     $this->getFixHours(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        self::ITEMTYPENO_SERVICEDESK
+                        self::ITEMTYPENO_SERVICEDESK,
+                        $customerID
                     );
                 $resultRow['serviceDeskCount4'] =
                     $this->getCount4(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        self::ITEMTYPENO_SERVICEDESK
+                        self::ITEMTYPENO_SERVICEDESK,
+                        $customerID
                     );
                 $resultRow['prepayCount1And3'] =
                     $this->getCount1to3(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        CONFIG_PREPAY_ITEMTYPEID
+                        CONFIG_PREPAY_ITEMTYPEID,
+                        $customerID
                     );
                 $resultRow['prepayHoursResponded'] =
                     $this->getRespondedHours(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        CONFIG_PREPAY_ITEMTYPEID
+                        CONFIG_PREPAY_ITEMTYPEID,
+                        $customerID
                     );
                 $resultRow['prepayHoursFix'] =
                     $this->getFixHours(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        CONFIG_PREPAY_ITEMTYPEID
+                        CONFIG_PREPAY_ITEMTYPEID,
+                        $customerID
                     );
                 $resultRow['prepayCount4'] =
                     $this->getCount4(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        CONFIG_PREPAY_ITEMTYPEID
+                        CONFIG_PREPAY_ITEMTYPEID,
+                        $customerID
                     );
                 $resultRow['prepayCount1And3'] =
                     $this->getCount1to3(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        CONFIG_PREPAY_ITEMTYPEID
+                        CONFIG_PREPAY_ITEMTYPEID,
+                        $customerID
                     );
                 $resultRow['prepayHoursResponded'] =
                     $this->getRespondedHours(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        CONFIG_PREPAY_ITEMTYPEID
+                        CONFIG_PREPAY_ITEMTYPEID,
+                        $customerID
                     );
                 $resultRow['prepayHoursFix'] =
                     $this->getFixHours(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        CONFIG_PREPAY_ITEMTYPEID
+                        CONFIG_PREPAY_ITEMTYPEID,
+                        $customerID
                     );
                 $resultRow['prepayCount4'] =
                     $this->getCount4(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        CONFIG_PREPAY_ITEMTYPEID
+                        CONFIG_PREPAY_ITEMTYPEID,
+                        $customerID
                     );
 
                 $resultRow['otherCount1And3'] =
                     $this->getCount1to3(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        false
+                        false,
+                        $customerID
                     );
                 $resultRow['otherHoursResponded'] =
                     $this->getRespondedHours(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        false
+                        false,
+                        $customerID
                     );
                 $resultRow['otherHoursFix'] =
                     $this->getFixHours(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        false
+                        false,
+                        $customerID
                     );
                 $resultRow['otherCount4'] =
                     $this->getCount4(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        false
+                        false,
+                        $customerID
                     );
                 $resultRow['otherCount1And3'] =
                     $this->getCount1to3(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        false
+                        false,
+                        $customerID
                     );
                 $resultRow['otherHoursResponded'] =
                     $this->getRespondedHours(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        false
+                        false,
+                        $customerID
                     );
                 $resultRow['otherHoursFix'] =
                     $this->getFixHours(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        false
+                        false,
+                        $customerID
                     );
                 $resultRow['otherCount4'] =
                     $this->getCount4(
-                        $customerID,
                         $row['year'],
                         $row['month'],
-                        false
+                        false,
+                        $customerID
                     );
-                $resultset[] = $resultRow;
+                $resultSet[] = $resultRow;
             }
         }
-        return $resultset;
+        return $resultSet;
     }
 
-    function getCount1to3($customerID = false, $year, $month, $itemtypeno)
+    function getCount1to3($year, $month, $itemtypeno, $customerID = false)
     {
         $query = "
       SELECT
@@ -473,7 +478,7 @@ class BUCustomerSrAnalysisReport extends Business
         return $this->db->query($query)->fetch_object()->count;
     }
 
-    function getRespondedHours($customerID = false, $year, $month, $itemtypeno)
+    function getRespondedHours($year, $month, $itemtypeno, $customerID = false)
     {
         $query = "
       SELECT
@@ -499,7 +504,7 @@ class BUCustomerSrAnalysisReport extends Business
         return $this->db->query($query)->fetch_object()->hours;
     }
 
-    function getFixHours($customerID = false, $year, $month, $itemtypeno)
+    function getFixHours($year, $month, $itemtypeno, $customerID = false)
     {
         $query = "
       SELECT
@@ -525,7 +530,7 @@ class BUCustomerSrAnalysisReport extends Business
         return $this->db->query($query)->fetch_object()->hours;
     }
 
-    function getCount4($customerID = false, $year, $month, $itemtypeno)
+    function getCount4($year, $month, $itemtypeno, $customerID = false)
     {
         $query = "
       SELECT

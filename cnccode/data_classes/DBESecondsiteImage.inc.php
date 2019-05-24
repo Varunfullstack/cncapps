@@ -7,11 +7,21 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBESecondsiteImage extends DBEntity
 {
+    const secondsiteImageID = "secondsiteImageID";
+    const customerItemID = "customerItemID";
+    const imageName = "imageName";
+    const status = "status";
+    const imagePath = "imagePath";
+    const imageTime = "imageTime";
+    const replicationImagePath = "replicationImagePath";
+    const replicationImageTime = "replicationImageTime";
+    const replicationStatus = "replicationStatus";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -19,47 +29,47 @@ class DBESecondsiteImage extends DBEntity
         parent::__construct($owner);
         $this->setTableName("secondsite_image");
         $this->addColumn(
-            "secondsiteImageID",
+            self::secondsiteImageID,
             DA_ID,
             DA_NOT_NULL
         );
         $this->addColumn(
-            "customerItemID",
+            self::customerItemID,
             DA_ID,
             DA_NOT_NULL
         );
         $this->addColumn(
-            "imageName",
+            self::imageName,
             DA_STRING,
             DA_NOT_NULL
         );
         $this->addColumn(
-            "status",
+            self::status,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "imagePath",
+            self::imagePath,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "imageTime",
+            self::imageTime,
             DA_DATETIME,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "replicationImagePath",
+            self::replicationImagePath,
             DA_STRING,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "replicationImageTime",
+            self::replicationImageTime,
             DA_DATETIME,
             DA_ALLOW_NULL
         );
         $this->addColumn(
-            "replicationStatus",
+            self::replicationStatus,
             DA_STRING,
             DA_ALLOW_NULL
         );

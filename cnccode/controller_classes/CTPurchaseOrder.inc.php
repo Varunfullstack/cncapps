@@ -12,8 +12,7 @@ require_once($cfg['path_bu'] . '/BUSupplier.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_gc'] . '/DataSet.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-//require_once($cfg['path_dbe'].'/DBELocation.inc.php');
-// Messages
+
 define(
     'CTPURCHASEORDER_MSG_PURCHASEORDER_NOT_FND',
     'Purchase Order not found'
@@ -107,11 +106,11 @@ define(
 
 class CTPurchaseOrder extends CTCNC
 {
-    var $dsDateRange = '';
-    var $buPurchaseOrder = '';
-    var $dsPorhead = '';
-    var $dsPorline = '';
-    var $orderTypeArray = array(
+    public $dsDateRange;
+    public $buPurchaseOrder;
+    public $dsPorhead;
+    public $dsPorline;
+    public $orderTypeArray = array(
         "I" => "Initial",
         "P" => "Part Received",
         "B" => "Both Initial & Part Received",
@@ -149,11 +148,12 @@ class CTPurchaseOrder extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_SALES);
-        switch ($_REQUEST['action']) {
+        switch ($this->getAction()) {
             case CTCNC_ACT_GENERATE_POS_FROM_SO:
                 $this->generateFromSO();
                 break;
@@ -204,20 +204,21 @@ class CTPurchaseOrder extends CTCNC
     /**
      * Display form to allow selection of date range for which to produce invoices
      * @access private
+     * @throws Exception
      */
     function generateFromSO()
     {
         $this->setMethodName('generateFromSO');
         $requiredByDate = null;
-        if (isset($_REQUEST['requiredByDate'])) {
+        if ($this->getParam('requiredByDate')) {
             $requiredByDate = DateTime::createFromFormat(
                 'd/m/Y',
-                $_REQUEST['requiredByDate']
+                $this->getParam('requiredByDate')
             );
         }
 
         $this->buPurchaseOrder->createPOsFromSO(
-            $_REQUEST['ordheadID'],
+            $this->getParam('ordheadID'),
             $this->userID,
             $requiredByDate
         );
@@ -225,7 +226,7 @@ class CTPurchaseOrder extends CTCNC
             $_SERVER['PHP_SELF'],
             array(
                 'action'    => CTCNC_ACT_SEARCH,
-                'ordheadID' => $_REQUEST['ordheadID']
+                'ordheadID' => $this->getParam('ordheadID')
             )
         );
         header("Location: " . $urlNext);
@@ -235,24 +236,26 @@ class CTPurchaseOrder extends CTCNC
     /**
      * Creates new PO from passed sales order no and supplierID
      * @access private
+     * @throws Exception
      */
     function createPO()
     {
         $this->setMethodName('createPO');
-        if (!is_numeric($_REQUEST['supplierID'])) {
+        if (!is_numeric($this->getParam('supplierID'))) {
             $this->setFormErrorMessage('Supplier No must be numeric');;
         }
-        if (!is_numeric($_REQUEST['ordheadID'])) {
+        if (!is_numeric($this->getParam('ordheadID'))) {
             $this->setFormErrorMessage('Sales order no must be numeric');;
         } else {
             $buSalesOrder = new BUSalesOrder($this);
+            $dsOrdhead = new DataSet($this);
             if (!$buSalesOrder->getOrdheadByID(
-                $_REQUEST['ordheadID'],
+                $this->getParam('ordheadID'),
                 $dsOrdhead
             )) {
                 $this->setFormErrorMessage('sales order not found');
             } else {
-                if ($dsOrdhead->getValue('type') != 'I' & $dsOrdhead->getValue('type') != 'P') {
+                if ($dsOrdhead->getValue(DBEJOrdhead::type) != 'I' & $dsOrdhead->getValue(DBEJOrdhead::type) != 'P') {
                     $this->setFormErrorMessage('sales order is not initial or part-despatched status');
                 }
             }
@@ -263,8 +266,8 @@ class CTPurchaseOrder extends CTCNC
         }
 
         $porheadID = $this->buPurchaseOrder->createNewPO(
-            $_REQUEST['ordheadID'],
-            $_REQUEST['supplierID'],
+            $this->getParam('ordheadID'),
+            $this->getParam('supplierID'),
             $this->userID
         );
         $urlNext = Controller::buildLink(
@@ -282,6 +285,7 @@ class CTPurchaseOrder extends CTCNC
      * Run search based upon passed parameters
      * Display search form with results
      * @access private
+     * @throws Exception
      */
     function search()
     {
@@ -291,35 +295,35 @@ class CTPurchaseOrder extends CTCNC
             $_REQUEST[$key] = trim($value);
         }
         if (
-            $_REQUEST['supplierID'] .
-            $_REQUEST['porheadID'] .
-            $_REQUEST['ordheadID'] .
-            $_REQUEST['supplierRef'] .
-            $_REQUEST['orderType'] .
-            $_REQUEST['lineText'] .
-            $_REQUEST['fromDate'] .
-            $_REQUEST['toDate'] .
-            $_REQUEST['partNo']
-            == '') {
+        !($this->getParam('supplierID') .
+            $this->getParam('porheadID') .
+            $this->getParam('ordheadID') .
+            $this->getParam('supplierRef') .
+            $this->getParam('orderType') .
+            $this->getParam('lineText') .
+            $this->getParam('fromDate') .
+            $this->getParam('toDate') .
+            $this->getParam('partNo'))
+        ) {
             $this->setFormErrorMessage('Please specify at least one parameter');
         }
-        if (($_REQUEST['porheadID'] != '') AND (!is_numeric($_REQUEST['porheadID']))) {
-            $this->setFormErrorMessage('Order no must be numeric');;
+        if ($this->getParam('porheadID') && !is_numeric($this->getParam('porheadID'))) {
+            $this->setFormErrorMessage('Order no must be numeric');
         }
-        if (($_REQUEST['ordheadID'] != '') AND (!is_numeric($_REQUEST['ordheadID']))) {
-            $this->setFormErrorMessage('Sales order no must be numeric');;
+        if ($this->getParam('ordheadID') && !is_numeric($this->getParam('ordheadID'))) {
+            $this->setFormErrorMessage('Sales order no must be numeric');
         }
         if ($this->getFormError() == 0) {
             $this->buPurchaseOrder->search(
-                $_REQUEST['supplierID'],
-                $_REQUEST['porheadID'],
-                $_REQUEST['ordheadID'],
-                $_REQUEST['supplierRef'],
-                $_REQUEST['orderType'],
-                $_REQUEST['lineText'],
-                $_REQUEST['partNo'],
-                common_convertDateDMYToYMD($_REQUEST['fromDate']),
-                common_convertDateDMYToYMD($_REQUEST['toDate']),
+                $this->getParam('supplierID'),
+                $this->getParam('porheadID'),
+                $this->getParam('ordheadID'),
+                $this->getParam('supplierRef'),
+                $this->getParam('orderType'),
+                $this->getParam('lineText'),
+                $this->getParam('partNo'),
+                common_convertDateDMYToYMD($this->getParam('fromDate')),
+                common_convertDateDMYToYMD($this->getParam('toDate')),
                 $this->dsPorhead
             );
         }
@@ -330,7 +334,8 @@ class CTPurchaseOrder extends CTCNC
                     $_SERVER['PHP_SELF'],
                     array(
                         'action'    => CTCNC_ACT_DISPLAY_PO,
-                        'porheadID' => $this->dsPorhead->getValue('porheadID') // if this is set then will show
+                        'porheadID' => $this->dsPorhead->getValue(DBEJPorhead::porheadID)
+                        // if this is set then will show
                     )                                                                                                                    // remaining POs for SO
                 );
             header('Location: ' . $urlNext);
@@ -344,6 +349,7 @@ class CTPurchaseOrder extends CTCNC
     /**
      * Display the results of order search
      * @access private
+     * @throws Exception
      */
     function displaySearchForm()
     {
@@ -394,7 +400,7 @@ class CTPurchaseOrder extends CTCNC
             'orderTypes'
         );
         foreach ($this->orderTypeArray as $key => $value) {
-            $orderTypeSelected = ($_REQUEST['orderType'] == $key) ? CT_SELECTED : '';
+            $orderTypeSelected = ($this->getParam('orderType') == $key) ? CT_SELECTED : null;
             $this->template->set_var(
                 array(
                     'orderTypeSelected'    => $orderTypeSelected,
@@ -413,13 +419,13 @@ class CTPurchaseOrder extends CTCNC
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'      => CTCNC_ACT_SEARCH,
-                    'supplierID'  => $_REQUEST['supplierID'],
-                    'porheadID'   => $_REQUEST['porheadID'],
-                    'ordheadID'   => $_REQUEST['ordheadID'],
-                    'supplierRef' => $_REQUEST['supplierRef'],
-                    'type'        => $_REQUEST['orderType'],
-                    'lineText'    => $_REQUEST['lineText'],
-                    'partNo'      => $_REQUEST['partNo']
+                    'supplierID'  => $this->getParam('supplierID'),
+                    'porheadID'   => $this->getParam('porheadID'),
+                    'ordheadID'   => $this->getParam('ordheadID'),
+                    'supplierRef' => $this->getParam('supplierRef'),
+                    'type'        => $this->getParam('orderType'),
+                    'lineText'    => $this->getParam('lineText'),
+                    'partNo'      => $this->getParam('partNo')
                 )
             );
         if ($this->dsPorhead->rowCount() > 0) {
@@ -428,13 +434,11 @@ class CTPurchaseOrder extends CTCNC
                 'orderBlock',
                 'orders'
             );
-            $supplierNameCol = $this->dsPorhead->columnExists('supplierName');
-            $typeCol = $this->dsPorhead->columnExists('type');
-            $customerNameCol = $this->dsPorhead->columnExists('customerName');
-            $porheadIDCol = $this->dsPorhead->columnExists('porheadID');
-            $supplierRefCol = $this->dsPorhead->columnExists('supplierRef');
-            $printedCol = $this->dsPorhead->columnExists('printed');
-            $ordheadIDCol = $this->dsPorhead->columnExists('ordheadID');
+            $supplierNameCol = $this->dsPorhead->columnExists(DBEJPorhead::supplierName);
+            $typeCol = $this->dsPorhead->columnExists(DBEJPorhead::type);
+            $customerNameCol = $this->dsPorhead->columnExists(DBEJPorhead::customerName);
+            $porheadIDCol = $this->dsPorhead->columnExists(DBEJPorhead::porheadID);
+            $supplierRefCol = $this->dsPorhead->columnExists(DBEJPorhead::supplierRef);
             while ($this->dsPorhead->fetchNext()) {
                 $orderURL =
                     Controller::buildLink(
@@ -464,29 +468,29 @@ class CTPurchaseOrder extends CTCNC
             }
         }
 // search parameter section
-        if ($_REQUEST['supplierID'] != '') {
+        $supplierName = null;
+        if (($this->getParam('supplierID'))) {
             $buSupplier = new BUSupplier($this);
+            $dsSupplier = new DataSet($this);
             $buSupplier->getSupplierByID(
-                $_REQUEST['supplierID'],
+                $this->getParam('supplierID'),
                 $dsSupplier
             );
-            $supplierName = $dsSupplier->getValue('name');
-        } else {
-            $supplierName = '';
+            $supplierName = $dsSupplier->getValue(DBEJSupplier::name);
         }
 
         $this->template->set_var(
             array(
                 'supplierName'     => $supplierName,
-                'porheadID'        => $_REQUEST['porheadID'],
-                'ordheadID'        => $_REQUEST['ordheadID'],
-                'supplierID'       => $_REQUEST['supplierID'],
-                'orderType'        => $_REQUEST['orderType'],
-                'lineText'         => Controller::htmlDisplayText($_REQUEST['lineText']),
-                'partNo'           => $_REQUEST['partNo'],
-                'fromDate'         => $_REQUEST['fromDate'],
-                'toDate'           => $_REQUEST['toDate'],
-                'supplierRef'      => $_REQUEST['supplierRef'],
+                'porheadID'        => $this->getParam('porheadID'),
+                'ordheadID'        => $this->getParam('ordheadID'),
+                'supplierID'       => $this->getParam('supplierID'),
+                'orderType'        => $this->getParam('orderType'),
+                'lineText'         => Controller::htmlDisplayText($this->getParam('lineText')),
+                'partNo'           => $this->getParam('partNo'),
+                'fromDate'         => $this->getParam('fromDate'),
+                'toDate'           => $this->getParam('toDate'),
+                'supplierRef'      => $this->getParam('supplierRef'),
                 'submitURL'        => $submitURL,
                 'clearURL'         => $clearURL,
                 'urlCreateOrder'   => $urlCreateOrder,
@@ -505,38 +509,54 @@ class CTPurchaseOrder extends CTCNC
     /**
      * Display the results of order search
      * @access private
+     * @throws Exception
      */
     function displayOrder()
     {
         $this->setMethodName('displayOrder');
         $dsPorhead = &$this->dsPorhead;
         $dsPorline = &$this->dsPorline;
+        $urlContactPopup = null;
+        $urlContactEdit = null;
+        $urlSupplierPopup = null;
+        $urlSupplierEdit = null;
+        $urlUpdateHeader = null;
+        $urlDeleteOrder = null;
+        $txtDeleteOrder = null;
+        $urlSalesOrder = null;
+        $txtSalesOrder = null;
+        $urlGoodsIn = null;
+        $txtGoodsIn = null;
+        $urlGeneratePDF = null;
+        $txtGeneratePDF = null;
+
         if (!$this->formError) {
-            if ($_REQUEST['porheadID'] == '') {
+            if (!$this->getParam('porheadID')) {
                 $this->displayFatalError(CTPURCHASEORDER_MSG_PURCHASEORDERID_NOT_PASSED);
                 return;
             }
             $this->buPurchaseOrder->getOrderByID(
-                $_REQUEST['porheadID'],
+                $this->getParam('porheadID'),
                 $dsPorhead,
                 $dsPorline
             );
             $dsPorhead->fetchNext();
-        } else {    // if we are redisplaying header then only need lines
+        } else {    // if we are re-displaying header then only need lines
             $dsPorhead->initialise();
             $dsPorhead->fetchNext();
             $this->buPurchaseOrder->getLinesByID(
-                $dsPorhead->getValue('porheadID'),
+                $dsPorhead->getValue(DBEJPorhead::porheadID),
                 $dsPorline
             );
         }
-        $porheadID = $dsPorhead->getValue('porheadID');
-        $orderType = $dsPorhead->getValue('type');
+        $porheadID = $dsPorhead->getValue(DBEJPorhead::porheadID);
+        $orderType = $dsPorhead->getValue(DBEJPorhead::type);
         $disabled = CTCNC_HTML_DISABLED;                            // default - no editing
+        $title = null;
         switch ($orderType) {
             case 'I':
                 $title = 'Purchase Order - Initial';
-                $disabled = ''; // only initial orders may be edited
+                $disabled = null; // only initial orders may be edited
                 $urlUpdateHeader =
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
@@ -550,7 +570,7 @@ class CTPurchaseOrder extends CTCNC
                         CTCNC_PAGE_CONTACT,
                         array(
                             'action'     => CTCNC_ACT_CONTACT_POPUP,
-                            'supplierID' => $dsPorhead->getValue('supplierID'),
+                            'supplierID' => $dsPorhead->getValue(DBEJPorhead::supplierID),
                             'htmlFmt'    => CT_HTML_FMT_POPUP
                         )
                     );
@@ -589,8 +609,8 @@ class CTPurchaseOrder extends CTCNC
                 $txtDeleteOrder = 'Delete';
                 break;
             case 'P':
-                $title = 'Purchase Order - Part Receieved';
-                $disabled = ''; // only initial orders may be edited
+                $title = 'Purchase Order - Part Received';
+                $disabled = null; // only initial orders may be edited
                 $urlUpdateHeader =
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
@@ -604,7 +624,7 @@ class CTPurchaseOrder extends CTCNC
                         CTCNC_PAGE_CONTACT,
                         array(
                             'action'     => CTCNC_ACT_CONTACT_POPUP,
-                            'supplierID' => $dsPorhead->getValue('supplierID'),
+                            'supplierID' => $dsPorhead->getValue(DBEJPorhead::supplierID),
                             'htmlFmt'    => CT_HTML_FMT_POPUP
                         )
                     );
@@ -652,7 +672,7 @@ class CTPurchaseOrder extends CTCNC
 
         if (
             (($orderType == 'I') or ($orderType == 'P')) &
-            ($dsPorhead->getValue('directDeliveryFlag') == 'N')
+            ($dsPorhead->getValue(DBEJPorhead::directDeliveryFlag) == 'N')
         ) {
             $urlGoodsIn =
                 Controller::buildLink(
@@ -678,40 +698,36 @@ class CTPurchaseOrder extends CTCNC
         // if there is a sales order then display the delivery details etc
         $this->template->set_var(
             'delAdd1',
-            ''
+            null
         ); // default
         $dbeOrdhead = new DBEJOrdhead($this);
-        $dbeOrdhead->setValue(
-            'ordheadID',
-            $dsPorhead->getValue('ordheadID')
-        );
-        if ($dbeOrdhead->getRow()) {
+        if ($dbeOrdhead->getRow($dsPorhead->getValue(DBEJPorhead::ordheadID))) {
             $urlSalesOrder =
                 Controller::buildLink(
                     CTCNC_PAGE_SALESORDER,
                     array(
                         'action'    => CTCNC_ACT_DISP_SALESORDER,
-                        'ordheadID' => $dsPorhead->getValue('ordheadID')
+                        'ordheadID' => $dsPorhead->getValue(DBEJPorhead::ordheadID)
                     )
                 );
             $txtSalesOrder = 'Sales Order';
-            if ($dsPorhead->getValue('directDeliveryFlag') == 'Y') {
+            if ($dsPorhead->getValue(DBEJPorhead::directDeliveryFlag) == 'Y') {
                 $this->template->set_var(
                     array(
-                        'customerName' => Controller::htmlDisplayText($dbeOrdhead->getValue('customerName')),
-                        'delAdd1'      => Controller::htmlDisplayText($dbeOrdhead->getValue('delAdd1')),
-                        'delAdd2'      => Controller::htmlDisplayText($dbeOrdhead->getValue('delAdd2')),
-                        'delAdd3'      => Controller::htmlDisplayText($dbeOrdhead->getValue('delAdd3')),
-                        'delTown'      => Controller::htmlDisplayText($dbeOrdhead->getValue('delTown')),
-                        'delCounty'    => Controller::htmlDisplayText($dbeOrdhead->getValue('delCounty')),
-                        'delPostcode'  => Controller::htmlDisplayText($dbeOrdhead->getValue('delPostcode'))
+                        'customerName' => Controller::htmlDisplayText($dbeOrdhead->getValue(DBEJOrdhead::customerName)),
+                        'delAdd1'      => Controller::htmlDisplayText($dbeOrdhead->getValue(DBEJOrdhead::delAdd1)),
+                        'delAdd2'      => Controller::htmlDisplayText($dbeOrdhead->getValue(DBEJOrdhead::delAdd2)),
+                        'delAdd3'      => Controller::htmlDisplayText($dbeOrdhead->getValue(DBEJOrdhead::delAdd3)),
+                        'delTown'      => Controller::htmlDisplayText($dbeOrdhead->getValue(DBEJOrdhead::delTown)),
+                        'delCounty'    => Controller::htmlDisplayText($dbeOrdhead->getValue(DBEJOrdhead::delCounty)),
+                        'delPostcode'  => Controller::htmlDisplayText($dbeOrdhead->getValue(DBEJOrdhead::delPostcode))
                     )
                 );
             }
         }
         // get sales order delivery contact
         $dbeContact = new DBEContact($this);
-        $dbeContact->getRow($dbeOrdhead->getValue('delContactID'));
+        $dbeContact->getRow($dbeOrdhead->getValue(DBEJOrdhead::delContactID));
 
         // if there are lines then allow print of purchase order
         if ($dsPorline->rowCount() > 0) {
@@ -725,31 +741,34 @@ class CTPurchaseOrder extends CTCNC
                 );
             $txtGeneratePDF = 'Print';
         }
-        $ordheadID = ($dsPorhead->getValue('ordheadID') != 0 ? $dsPorhead->getValue('ordheadID') : '');
+        $ordheadID = ($dsPorhead->getValue(DBEJPorhead::ordheadID) ? $dsPorhead->getValue(
+            DBEJPorhead::ordheadID
+        ) : null);
 
+        $supplierLink = null;
         // If supplier has a web site then display link
-        if ($dsPorhead->getValue("webSiteURL") != '') {
-            $supplierLink = '<A HREF="' . $dsPorhead->getValue('webSiteURL') . '" target="_blank">Web Site</A>';
-        } else {
-            $supplierLink = '';
+        if ($dsPorhead->getValue(DBEJPorhead::webSiteURL)) {
+            $supplierLink = '<A HREF="' . $dsPorhead->getValue(
+                    DBEJPorhead::webSiteURL
+                ) . '" target="_blank">Web Site</A>';
         }
         // If contact has an email address then display email link
-        if ($dsPorhead->getValue("contactEmail") != '') {
+        $emailLink = null;
+        if ($dsPorhead->getValue(DBEJPorhead::contactEmail)) {
+            /** @noinspection HtmlDeprecatedAttribute */
             $emailLink =
-                '<A HREF="mailto:' . $dsPorhead->getValue('contactEmail') . '"' .
-                ' title="Send email to contact"><img src="images/email.gif" border="0"></A>';
-        } else {
-            $emailLink = '';
+                '<A HREF="mailto:' . $dsPorhead->getValue(DBEJPorhead::contactEmail) . '"' .
+                ' title="Send email to contact"><img src="images/email.gif" border="0" alt="email"></A>';
         }
 
         $this->template->set_var(
             array(
-                'supplierID'                   => $dsPorhead->getValue('supplierID'),
-                'type'                         => $dsPorhead->getValue('type'),
+                'supplierID'                   => $dsPorhead->getValue(DBEJPorhead::supplierID),
+                'type'                         => $dsPorhead->getValue(DBEJPorhead::type),
                 'porheadID'                    => $porheadID,
-                'userID'                       => $dsPorhead->getValue('userID'),
-                'orderUserID'                  => $dsPorhead->getValue('orderUserID'),
-                'contactID'                    => $dsPorhead->getValue('contactID'),
+                'userID'                       => $dsPorhead->getValue(DBEJPorhead::userID),
+                'orderUserID'                  => $dsPorhead->getValue(DBEJPorhead::orderUserID),
+                'contactID'                    => $dsPorhead->getValue(DBEJPorhead::contactID),
                 'contactName'                  => Controller::htmlInputText(
                     $dsPorhead->getValue(DBEJPorhead::contactName)
                 ),
@@ -812,6 +831,7 @@ class CTPurchaseOrder extends CTCNC
         );
         // payment method
         $buSupplier = new BUSupplier($this);
+        $dsPayMethod = new DataSet($this);
         $buSupplier->getAllPayMethods($dsPayMethod);
         $this->template->set_block(
             'PurchaseOrderHeadDisplay',
@@ -821,11 +841,11 @@ class CTPurchaseOrder extends CTCNC
         while ($dsPayMethod->fetchNext()) {
             $this->template->set_var(
                 array(
-                    'payMethodDescription' => $dsPayMethod->getValue('description'),
-                    'payMethodID'          => $dsPayMethod->getValue('payMethodID'),
+                    'payMethodDescription' => $dsPayMethod->getValue(DBEPayMethod::description),
+                    'payMethodID'          => $dsPayMethod->getValue(DBEPayMethod::payMethodID),
                     'payMethodSelected'    => ($dsPorhead->getValue(DBEJPorhead::payMethodID) == $dsPayMethod->getValue(
-                            'payMethodID'
-                        )) ? CT_SELECTED : ''
+                            DBEPayMethod::payMethodID
+                        )) ? CT_SELECTED : null
                 )
             );
             $this->template->parse(
@@ -864,10 +884,10 @@ class CTPurchaseOrder extends CTCNC
             while ($dsPorline->fetchNext()) {
                 $sequenceNo = $dsPorline->getValue(DBEJPorline::sequenceNo);
                 $itemDescription = $dsPorline->getValue(DBEJPorline::itemDescription);
-                if ($dsPorline->getValue('expectedDate') != '0000-00-00') {
+                if ($dsPorline->getValue(DBEPorline::expectedDate)) {
                     $expectedDate = Controller::dateYMDtoDMY($dsPorline->getValue(DBEJPorline::expectedDate));
                 } else {
-                    $expectedDate = '';
+                    $expectedDate = null;
                 }
                 $curTotalCost = $dsPorline->getValue(DBEJPorline::curUnitCost) * $dsPorline->getValue(
                         DBEJPorline::qtyOrdered
@@ -994,7 +1014,7 @@ class CTPurchaseOrder extends CTCNC
                 );
                 $this->template->set_var(
                     'salesOrderLineIcons',
-                    ''
+                    null
                 ); // clear for next line
             }
             $this->template->set_var(
@@ -1023,35 +1043,36 @@ class CTPurchaseOrder extends CTCNC
     /**
      * Edit/Add Order Line
      * @access private
+     * @throws Exception
      */
     function editOrderLine()
     {
         $this->setMethodName('editOrderLine');
         $this->setPageTitle('Purchase Order - Edit Line');
-        if ($_REQUEST['porheadID'] == '') {
-            $this->displayFatalError(CTPURCHASEORDER_MSG_PORHEADID_NOT_PASSED);
+        if (!$this->getParam('porheadID')) {
+            $this->displayFatalError('Purchase order ID not provided');
             return;
         }
         if (!$this->buPurchaseOrder->getOrderHeaderByID(
-            $_REQUEST['porheadID'],
+            $this->getParam('porheadID'),
             $this->dsPorhead
         )) {
             $this->displayFatalError(CTPURCHASEORDER_MSG_PURCHASEORDER_NOT_FND);
             return;
         }
-        if ($this->dsPorhead->getValue('type') != 'I') {
+        if ($this->dsPorhead->getValue(DBEJPorhead::type) != 'I') {
             $this->displayFatalError(CTPURCHASEORDER_MSG_MUST_BE_INITIAL);
             return;
         }
-        if ($_REQUEST['sequenceNo'] == '') {
+        if (!$this->getParam('sequenceNo')) {
             $this->displayFatalError(CTPURCHASEORDER_MSG_SEQNO_NOT_PASSED);
             return;
         }
         if (!$this->formError) {
-            if ($_REQUEST['action'] == CTPURCHASEORDER_ACT_EDIT_ORDLINE) {
+            if ($this->getAction() == CTPURCHASEORDER_ACT_EDIT_ORDLINE) {
                 if (!$this->buPurchaseOrder->getOrdlineByIDSeqNo(
-                    $_REQUEST['porheadID'],
-                    $_REQUEST['sequenceNo'],
+                    $this->getParam('porheadID'),
+                    $this->getParam('sequenceNo'),
                     $this->dsPorline
                 )) {
                     $this->displayFatalError(CTPURCHASEORDER_MSG_ORDLINE_NOT_FND);
@@ -1059,8 +1080,8 @@ class CTPurchaseOrder extends CTCNC
                 }
             } else {
                 $this->buPurchaseOrder->initialiseNewOrdline(
-                    $_REQUEST['porheadID'],
-                    $_REQUEST['sequenceNo'],
+                    $this->getParam('porheadID'),
+                    $this->getParam('sequenceNo'),
                     $this->dsPorline
                 );
             }
@@ -1088,7 +1109,10 @@ class CTPurchaseOrder extends CTCNC
         $this->parsePage();
     }
 
-    function orderLineForm($parentPage = 'PurchaseOrderLineEdit')
+    /**
+     * @throws Exception
+     */
+    function orderLineForm()
     {
         // Lines
         $this->template->set_var(
@@ -1110,7 +1134,7 @@ class CTPurchaseOrder extends CTCNC
                 'expectedDateMessage'    => $this->dsPorline->getMessage(DBEJPorline::expectedDate)
             )
         );
-        if ($_REQUEST['action'] == CTPURCHASEORDER_ACT_EDIT_ORDLINE) {
+        if ($this->getAction() == CTPURCHASEORDER_ACT_EDIT_ORDLINE) {
             $urlSubmit =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -1168,23 +1192,24 @@ class CTPurchaseOrder extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function updateOrderLine()
     {
         $this->setMethodName('updateOrderLine');
-        $this->formError = !$this->dsPorline->populateFromArray($_REQUEST['porline']);
+        $this->formError = !$this->dsPorline->populateFromArray($this->getParam('porline'));
         if ($this->formError) {                    // Form error so redisplay edit form
-            if ($_REQUEST['action'] == CTPURCHASEORDER_ACT_INSERT_ORDLINE) {
-                $_REQUEST['action'] = CTPURCHASEORDER_ACT_ADD_ORDLINE;
+            if ($this->getAction() == CTPURCHASEORDER_ACT_INSERT_ORDLINE) {
+                $this->setAction(CTPURCHASEORDER_ACT_ADD_ORDLINE);
             } else {
-                $_REQUEST['action'] = CTPURCHASEORDER_ACT_EDIT_ORDLINE;
+                $this->setAction(CTPURCHASEORDER_ACT_EDIT_ORDLINE);
             }
-            $_REQUEST['porheadID'] = $this->dsPorline->getValue('porheadID');
-            $_REQUEST['sequenceNo'] = $this->dsPorline->getValue('sequenceNo');
+            $this->setParam('porheadID', $this->dsPorline->getValue(DBEJPorline::porheadID));
+            $this->setParam('sequenceNo', $this->dsPorline->getValue(DBEJPorline::sequenceNo));
             $this->editOrderLine();
             exit;
         }
-        if ($_REQUEST['action'] == CTPURCHASEORDER_ACT_INSERT_ORDLINE) {
+        if ($this->getAction() == CTPURCHASEORDER_ACT_INSERT_ORDLINE) {
             $this->buPurchaseOrder->insertNewOrderLine($this->dsPorline);
         } else {
             $this->buPurchaseOrder->updateOrderLine(
@@ -1196,7 +1221,7 @@ class CTPurchaseOrder extends CTCNC
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'porheadID' => $this->dsPorline->getValue('porheadID'),
+                    'porheadID' => $this->dsPorline->getValue(DBEJPorline::porheadID),
                     'action'    => CTCNC_ACT_DISPLAY_PO
                 )
             );
@@ -1208,19 +1233,20 @@ class CTPurchaseOrder extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function moveOrderLineUp()
     {
         $this->setMethodName('moveOrderLineUp');
         $this->buPurchaseOrder->moveOrderLineUp(
-            $_REQUEST['porheadID'],
-            $_REQUEST['sequenceNo']
+            $this->getParam('porheadID'),
+            $this->getParam('sequenceNo')
         );
         $urlNext =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'porheadID' => $_REQUEST['porheadID'],
+                    'porheadID' => $this->getParam('porheadID'),
                     'action'    => CTCNC_ACT_DISPLAY_PO
                 )
             );
@@ -1232,19 +1258,20 @@ class CTPurchaseOrder extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function moveOrderLineDown()
     {
         $this->setMethodName('moveOrderLineDown');
         $this->buPurchaseOrder->moveOrderLineDown(
-            $_REQUEST['porheadID'],
-            $_REQUEST['sequenceNo']
+            $this->getParam('porheadID'),
+            $this->getParam('sequenceNo')
         );
         $urlNext =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'porheadID' => $_REQUEST['porheadID'],
+                    'porheadID' => $this->getParam('porheadID'),
                     'action'    => CTCNC_ACT_DISPLAY_PO
                 )
             );
@@ -1256,19 +1283,20 @@ class CTPurchaseOrder extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function deleteOrderLine()
     {
         $this->setMethodName('deleteOrderLine');
         $this->buPurchaseOrder->deleteOrderLine(
-            $_REQUEST['porheadID'],
-            $_REQUEST['sequenceNo']
+            $this->getParam('porheadID'),
+            $this->getParam('sequenceNo')
         );
         $urlNext =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'porheadID' => $_REQUEST['porheadID'],
+                    'porheadID' => $this->getParam('porheadID'),
                     'action'    => CTCNC_ACT_DISPLAY_PO
                 )
             );
@@ -1280,41 +1308,45 @@ class CTPurchaseOrder extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
      */
     function deleteOrder()
     {
         $this->setMethodName('deleteOrder');
-        if ($_REQUEST['porheadID'] == '') {
-            $this->displayFatalError(CTPURCHASEORDER_MSG_PORHEADID_NOT_PASSED);
+        if (!$this->getParam('porheadID')) {
+            $this->displayFatalError('Purchase order ID not provided');
             return;
         }
         if (!$this->buPurchaseOrder->getOrderHeaderByID(
-            $_REQUEST['porheadID'],
+            $this->getParam('porheadID'),
             $this->dsPorhead
         )) {
             $this->displayFatalError(CTPURCHASEORDER_MSG_PURCHASEORDER_NOT_FND);
             return;
         }
-        $this->buPurchaseOrder->deleteOrder($_REQUEST['porheadID']);
+        $this->buPurchaseOrder->deleteOrder($this->getParam('porheadID'));
 
         $urlNext =                        // default action
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'    => CTCNC_ACT_SEARCH,
-                    'ordheadID' => $this->dsPorhead->getValue('ordheadID') // if this is set then will show
+                    'ordheadID' => $this->dsPorhead->getValue(DBEJPorhead::ordheadID) // if this is set then will show
                 )                                                                                                                    // remaining POs for SO
             );
-        if ($this->dsPorhead->getValue('ordheadID') <> '') {
+        if ($this->dsPorhead->getValue(DBEJPorhead::ordheadID)) {
             $buSalesOrder = new BUSalesOrder($this);
-            $purchaseOrderCount = $buSalesOrder->countPurchaseOrders($this->dsPorhead->getValue('ordheadID'));
+            $purchaseOrderCount = $buSalesOrder->countPurchaseOrders(
+                $this->dsPorhead->getValue(DBEJPorhead::ordheadID)
+            );
             if ($purchaseOrderCount == 0) {
                 $urlNext =
                     Controller::buildLink(
                         CTCNC_PAGE_SALESORDER,
                         array(
                             'action'    => CTCNC_ACT_DISP_SALESORDER,
-                            'ordheadID' => $this->dsPorhead->getValue('ordheadID') // if this is set then will show
+                            'ordheadID' => $this->dsPorhead->getValue(DBEJPorhead::ordheadID)
+                            // if this is set then will show
                         )                                                                                                                    // remaining POs for SO
                     );
             }
@@ -1325,13 +1357,14 @@ class CTPurchaseOrder extends CTCNC
     /**
      * Update order header details
      * @access private
+     * @throws Exception
      */
     function updateHeader()
     {
         $this->setMethodName('updateHeader');
 
         $dsPorhead = &$this->dsPorhead;
-        $this->formError = (!$dsPorhead->populateFromArray($_REQUEST['porhead']));
+        $this->formError = (!$dsPorhead->populateFromArray($this->getParam('porhead')));
         if ($dsPorhead->getValue(DBEJPorhead::ordheadID) != 0) {
             $buSalesOrder = new BUSalesOrder($this);
             if (!$buSalesOrder->getOrdheadByID(
@@ -1369,7 +1402,7 @@ class CTPurchaseOrder extends CTCNC
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'porheadID' => $_REQUEST['porheadID'],
+                        'porheadID' => $this->getParam('porheadID'),
                         'action'    => CTCNC_ACT_DISPLAY_PO
                     )
                 );
@@ -1383,9 +1416,9 @@ class CTPurchaseOrder extends CTCNC
         $buPDFPurchaseOrder = new BUPDFPurchaseOrder(
             $this,
             $this->buPurchaseOrder,
-            $_REQUEST['porheadID']
+            $this->getParam('porheadID')
         );
-        $fileName = 'P0' . $_REQUEST['porheadID'];
+        $fileName = 'P0' . $this->getParam('porheadID');
         if ($pdfFile = $buPDFPurchaseOrder->generateFile()) {
             header('Pragma: public');
             header('Expires: 0');
@@ -1397,7 +1430,7 @@ class CTPurchaseOrder extends CTCNC
             readfile($pdfFile);
             unlink($pdfFile);
             $this->buPurchaseOrder->setOrderedFields(
-                $_REQUEST['porheadID'],
+                $this->getParam('porheadID'),
                 $this->userID
             );
             exit();
@@ -1406,9 +1439,8 @@ class CTPurchaseOrder extends CTCNC
 
     function parsePage()
     {
-        if ($_REQUEST['action'] == CTPURCHASEORDER_ACT_DISP_SEARCH) {
-            $urlLogo = '';
-        } else {
+        $urlLogo = null;
+        if ($this->getAction() != CTPURCHASEORDER_ACT_DISP_SEARCH) {
             $urlLogo =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -1425,5 +1457,4 @@ class CTPurchaseOrder extends CTCNC
         );
         parent::parsePage();
     }
-}// end of class
-?>
+}

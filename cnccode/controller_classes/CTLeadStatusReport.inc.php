@@ -14,6 +14,11 @@ require_once($cfg['path_bu'] . '/BULeadStatus.inc.php');
 class CTLeadStatusReport extends CTCNC
 {
 
+    /**
+     * @var BULeadStatus
+     */
+    public $buLeadStatus;
+
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
@@ -29,22 +34,21 @@ class CTLeadStatusReport extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
-
-        switch ($_REQUEST['action']) {
-
-            default:
-                $this->displayReport();
-                break;
-        }
-
+        $this->displayReport();
     }
 
     /**
      * Display report
      * @access private
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     function displayReport()
     {
@@ -55,17 +59,17 @@ class CTLeadStatusReport extends CTCNC
 
         $this->setPageTitle('Lead Status');
 
-        if (isset($_REQUEST['orderHotAlpha'])) {
-            $_SESSION['orderHotAlpha'] = $_REQUEST['orderHotAlpha'];
+        if ($this->getParam('orderHotAlpha')) {
+            $this->setSessionParam('orderHotAlpha', $this->getParam('orderHotAlpha'));
         }
-        if (isset($_REQUEST['orderWarmAlpha'])) {
-            $_SESSION['orderWarmAlpha'] = $_REQUEST['orderWarmAlpha'];
+        if ($this->getParam('orderWarmAlpha')) {
+            $this->setSessionParam('orderWarmAlpha', $this->getParam('orderWarmAlpha'));
         }
-        if (isset($_REQUEST['orderColdAlpha'])) {
-            $_SESSION['orderColdAlpha'] = $_REQUEST['orderColdAlpha'];
+        if ($this->getParam('orderColdAlpha')) {
+            $this->setSessionParam('orderColdAlpha', $this->getParam('orderColdAlpha'));
         }
-        if (isset($_REQUEST['orderDeadAlpha'])) {
-            $_SESSION['orderDeadAlpha'] = $_REQUEST['orderDeadAlpha'];
+        if ($this->getParam('orderDeadAlpha')) {
+            $this->setSessionParam('orderDeadAlpha', $this->getParam('orderDeadAlpha'));
         }
 
         $becameCustomerArray = $this->buLeadStatus->getBecameCustomerCounts();
@@ -82,8 +86,8 @@ class CTLeadStatusReport extends CTCNC
             $this->template->set_var(
 
                 array(
-                    'year' => $year,
-                    'becameCount' => $becameCount,
+                    'year'         => $year,
+                    'becameCount'  => $becameCount,
                     'droppedCount' => $droppedCount
                 )
 
@@ -95,7 +99,7 @@ class CTLeadStatusReport extends CTCNC
         /*
         Hot leads
         */
-        $hotLeads = $this->buLeadStatus->getLeadsByStatus(1, $_SESSION['orderHotAlpha']);
+        $hotLeads = $this->buLeadStatus->getLeadsByStatus(1, $this->getSessionParam('orderHotAlpha'));
 
         $this->template->set_block('LeadStatusReport', 'hotBlock', 'hots');
 
@@ -106,7 +110,7 @@ class CTLeadStatusReport extends CTCNC
                 Controller::buildLink(
                     'Customer.php',
                     array(
-                        'action' => 'dispEdit',
+                        'action'     => 'dispEdit',
                         'customerID' => $row['customerID']
                     )
                 );
@@ -115,7 +119,7 @@ class CTLeadStatusReport extends CTCNC
 
                 array(
                     'hotName' => $row['customerName'],
-                    'urlHot' => $urlHot
+                    'urlHot'  => $urlHot
                 )
 
             );
@@ -126,7 +130,7 @@ class CTLeadStatusReport extends CTCNC
         /*
         Warm leads
         */
-        $warmLeads = $this->buLeadStatus->getLeadsByStatus(2, $_SESSION['orderWarmAlpha']);
+        $warmLeads = $this->buLeadStatus->getLeadsByStatus(2, $this->getSessionParam('orderWarmAlpha'));
 
         $this->template->set_block('LeadStatusReport', 'warmBlock', 'warms');
 
@@ -137,7 +141,7 @@ class CTLeadStatusReport extends CTCNC
                 Controller::buildLink(
                     'Customer.php',
                     array(
-                        'action' => 'dispEdit',
+                        'action'     => 'dispEdit',
                         'customerID' => $row['customerID']
                     )
                 );
@@ -146,7 +150,7 @@ class CTLeadStatusReport extends CTCNC
 
                 array(
                     'warmName' => $row['customerName'],
-                    'urlWarm' => $urlWarm
+                    'urlWarm'  => $urlWarm
                 )
 
             );
@@ -157,7 +161,7 @@ class CTLeadStatusReport extends CTCNC
         /*
         Cold leads
         */
-        $coldLeads = $this->buLeadStatus->getLeadsByStatus(3, $_SESSION['orderColdAlpha']);
+        $coldLeads = $this->buLeadStatus->getLeadsByStatus(3, $this->getSessionParam('orderColdAlpha'));
 
         $this->template->set_block('LeadStatusReport', 'coldBlock', 'colds');
 
@@ -168,7 +172,7 @@ class CTLeadStatusReport extends CTCNC
                 Controller::buildLink(
                     'Customer.php',
                     array(
-                        'action' => 'dispEdit',
+                        'action'     => 'dispEdit',
                         'customerID' => $row['customerID']
                     )
                 );
@@ -177,7 +181,7 @@ class CTLeadStatusReport extends CTCNC
 
                 array(
                     'coldName' => $row['customerName'],
-                    'urlCold' => $urlCold
+                    'urlCold'  => $urlCold
                 )
 
             );
@@ -190,7 +194,7 @@ class CTLeadStatusReport extends CTCNC
         /*
         Dead leads
         */
-        $deadLeads = $this->buLeadStatus->getLeadsByStatus(4, $_SESSION['orderDeadAlpha']);
+        $deadLeads = $this->buLeadStatus->getLeadsByStatus(4, $this->getSessionParam('orderDeadAlpha'));
 
         $this->template->set_block('LeadStatusReport', 'deadBlock', 'deads');
 
@@ -201,7 +205,7 @@ class CTLeadStatusReport extends CTCNC
                 Controller::buildLink(
                     'Customer.php',
                     array(
-                        'action' => 'dispEdit',
+                        'action'     => 'dispEdit',
                         'customerID' => $row['customerID']
                     )
                 );
@@ -210,7 +214,7 @@ class CTLeadStatusReport extends CTCNC
 
                 array(
                     'deadName' => $row['customerName'],
-                    'urlDead' => $urlDead
+                    'urlDead'  => $urlDead
                 )
 
             );
@@ -224,4 +228,3 @@ class CTLeadStatusReport extends CTCNC
 
     }
 }// end of class
-?>

@@ -11,7 +11,8 @@ require_once($cfg["path_func"] . "/Common.inc.php");
 
 class BUUser extends Business
 {
-    var $dbeUser = "";
+    /** @var DBEUser */
+    public $dbeUser;
 
     /**
      * Constructor
@@ -37,6 +38,7 @@ class BUUser extends Business
     /**
      * Get all users
      * @parameter DataSet &$dsResults results
+     * @param $dsResults
      * @return bool : Success
      * @access public
      */
@@ -55,6 +57,8 @@ class BUUser extends Business
      * Get one users
      * @parameter integer $userID user
      * @parameter DataSet &$dsResults results
+     * @param $userID
+     * @param $dsResults
      * @return bool : Success
      * @access public
      */
@@ -73,11 +77,13 @@ class BUUser extends Business
 
     /**
      * Delete one user
+     * @param $ID
+     * @return bool
      */
     function deleteUser($ID)
     {
         $this->setMethodName('deleteUser');
-        if ($this->canDeleteUser($ID)) {
+        if ($this->canDeleteUser()) {
             return $this->dbeUser->deleteRow($ID);
         } else {
             return FALSE;
@@ -87,20 +93,21 @@ class BUUser extends Business
     /**
      *    canDeleteUser
      * Only allowed if type has no activities
+     * @param $id
+     * @return bool
      */
-    function canDeleteUser($ID)
+    function canDeleteUser($id)
     {
+        if ($id) {
+            return false;
+        }
         return FALSE;
     }
 
     function isSdManager($ID)
     {
         $this->dbeUser->getRow($ID);
-        if ($this->dbeUser->getValue('receiveSdManagerEmailFlag') == 'Y') {
-            return true;
-        } else {
-            return false;
-        }
+        return ($this->dbeUser->getValue(DBEUser::receiveSdManagerEmailFlag) == 'Y');
     }
 
     /*
@@ -230,7 +237,6 @@ class BUUser extends Business
     }
 
     function teamMembersPerformanceData($teamLevel,
-                                        $days,
                                         $hideExcluded = true
     )
     {
@@ -412,8 +418,8 @@ ORDER BY user_time_log.`loggedDate` DESC
             $this->dbeUser->getRow($userID);
 
             $dbeTeam = new DBETeam($this);
-            $dbeTeam->getRow($this->dbeUser->getValue('teamID'));
-            $ret = $dbeTeam->getValue('level');
+            $dbeTeam->getRow($this->dbeUser->getValue(DBEUser::teamID));
+            $ret = $dbeTeam->getValue(DBETeam::level);
         } else {
             $ret = 0;
         }
@@ -425,7 +431,7 @@ ORDER BY user_time_log.`loggedDate` DESC
     function getUsersByTeamLevel($teamLevel)
     {
         global $db;
-        $quey = "SELECT 
+        $query = "SELECT 
         c.cns_consno,
         CONCAT( SUBSTR(c.firstName, 1, 1), SUBSTR(c.`lastName`,1, 1) ) AS initials,
         concat(c.firstName, ' ', c.lastName) as userName
@@ -438,7 +444,7 @@ ORDER BY user_time_log.`loggedDate` DESC
         and c.excludeFromStatsFlag <> 'Y'
       ORDER BY
         firstName, lastName";
-        $db->query($quey);
+        $db->query($query);
         $ret = array();
 
         while ($db->next_record()) {
@@ -449,5 +455,4 @@ ORDER BY user_time_log.`loggedDate` DESC
 
     }
 
-}// End of class
-?>
+}

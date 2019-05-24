@@ -8,19 +8,32 @@
 
 class DBEJCallActType extends DBECallActType
 {
+    const itemDescription = "itemDescription";
+    const itemSalePrice = "itemSalePrice";
+
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->setAddColumnsOn();
-        $this->addColumn("itemDescription", DA_STRING, DA_NOT_NULL, "itm_desc");        // linked item
-        $this->addColumn("itemSalePrice", DA_STRING, DA_NOT_NULL, "itm_sstk_price");
+        $this->addColumn(
+            self::itemDescription,
+            DA_STRING,
+            DA_NOT_NULL,
+            "itm_desc"
+        );        // linked item
+        $this->addColumn(
+            self::itemSalePrice,
+            DA_STRING,
+            DA_NOT_NULL,
+            "itm_sstk_price"
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
