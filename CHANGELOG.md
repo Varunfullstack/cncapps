@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.0.0] - 2019-05-24
+### Changed
+- Issue 492 - Upgrade PHP & mySQL to the later versions
+
 ## [v2.4.2] - 2019-04-12
 ### Fixed
 - Fix issue with duplicated emails in contacts.
