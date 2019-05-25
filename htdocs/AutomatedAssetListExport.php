@@ -34,7 +34,7 @@ $labtechDB = new PDO(
     LABTECH_DB_PASSWORD,
     $options
 );
-$DBEOSSupportDates = new DBEOSSupportDates($this);
+$DBEOSSupportDates = new DBEOSSupportDates($thing);
 
 $DBEOSSupportDates->getRows();
 while ($DBEOSSupportDates->fetchNext()) {
@@ -53,6 +53,9 @@ while ($DBEOSSupportDates->fetchNext()) {
         ) . "' as version, '" . $date->format('d/m/Y') . "' as endOfSupportDate";
 }
 
+if(!$fakeTable){
+    $fakeTable = "select null as endOfSupportDate, null as osName, null as version";
+}
 
 $BUHeader = new BUHeader($thing);
 $dbeHeader = new DataSet($thing);
@@ -202,7 +205,9 @@ ORDER BY clients.name,
         echo '<div>Something went wrong...' . implode(
                 ',',
                 $statement->errorInfo()
-            ) . ' </div>';
+            );
+        var_dump($query);
+        echo ' </div>';
         continue;
     }
     $data = $statement->fetchAll(PDO::FETCH_ASSOC);
