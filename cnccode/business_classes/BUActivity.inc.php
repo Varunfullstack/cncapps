@@ -7083,7 +7083,7 @@ is currently a balance of ';
             }
 
 
-            if (!$dbeContact->rowCount) {
+            if (!$dbeContact || !$dbeContact->rowCount) {
 
                 echo "<div>We couldn't find a primary contact, -> to be logged</div>";
                 $prependMessage = '<div style="color: red">Failed to find primary contact associated with customer</div>';
@@ -8619,18 +8619,54 @@ is currently a balance of ';
         customerproblem
       SET
         cpr_date =  NOW(),
-        cpr_custno = '" . $record->getCustomerID() . "',
-        cpr_contno = '" . $contact['contactID'] . "',
-        cpr_problemno = '" . $record->getServiceRequestID() . "',
-        cpr_update_existing_request = '" . $updateExistingRequest . "',
-        cpr_source = '$source' " . ",
-        cpr_siteno = '" . $contact['siteNo'] . "',
-        cpr_serverguard_flag = '" . $record->getServerGuardFlag() . "',
-        cpr_send_email = '" . $record->getSendEmail() . "',
-        cpr_priority = '" . $record->getPriority() . "',
+        cpr_custno = ?,
+        cpr_contno = ?,
+        cpr_problemno = ?,
+        cpr_update_existing_request = ?,
+        cpr_source = ?,
+        cpr_siteno = ?,
+        cpr_serverguard_flag = ?,
+        cpr_send_email = ?,
+        cpr_priority = ?,
         cpr_reason = ?";
 
         $parameters = [
+            [
+                'type'  => 'i',
+                'value' => $record->getCustomerID()
+            ],
+            [
+                'type'  => 'i',
+                'value' => $contact['contactID']
+            ],
+            [
+                'type'  => 'i',
+                'value' => $record->getServiceRequestID()
+            ],
+            [
+                'type'  => 'i',
+                'value' => $updateExistingRequest
+            ],
+            [
+                'type'  => 's',
+                'value' => $source
+            ],
+            [
+                'type'  => 'i',
+                'value' => $contact['siteNo']
+            ],
+            [
+                'type'  => 's',
+                'value' => $record->getServerGuardFlag()
+            ],
+            [
+                'type'  => 's',
+                'value' => $record->getSendEmail()
+            ],
+            [
+                'type'  => 's',
+                'value' => $record->getPriority()
+            ],
             [
                 'type'  => 's',
                 'value' => $reason

@@ -1415,7 +1415,7 @@ class CTActivity extends CTCNC
                 'search'
             )
         ) {
-            $_SESSION['includeServerGuardUpdates'] = 1;
+            @$_SESSION['includeServerGuardUpdates'] = 1;
         } else {
             if (isset($_REQUEST['toggleIncludeServerGuardUpdates'])) {
                 $_SESSION['includeServerGuardUpdates'] = !$_SESSION['includeServerGuardUpdates'];
@@ -1423,7 +1423,7 @@ class CTActivity extends CTCNC
         }
 
         if (isset($_REQUEST['toggleContext'])) {
-            if ($_SESSION['context'] == 'project') {
+            if (@$_SESSION['context'] == 'project') {
                 $_SESSION['context'] = 'Problem';
             } else {
                 $_SESSION['context'] = 'project';
@@ -1445,15 +1445,15 @@ class CTActivity extends CTCNC
             $this->buActivity->getNavigateLinks(
                 $callActivityID,
                 $dbeCallActivity,
-                $_SESSION['includeTravel'],
-                $_SESSION['includeOperationalTasks'],
-                $_SESSION['includeServerGuardUpdates']
+                @$_SESSION['includeTravel'],
+                @$_SESSION['includeOperationalTasks'],
+                @$_SESSION['includeServerGuardUpdates']
             );
 
         /*
       Now decide what we should do about travel
       */
-        if (!$_SESSION['includeTravel'] && $dsCallActivity->getValue(DBEJCallActivity::travelFlag) == 'Y') {
+        if (!@$_SESSION['includeTravel'] && $dsCallActivity->getValue(DBEJCallActivity::travelFlag) == 'Y') {
 
             if ($dbeCallActivity->rowCount() > 0) {
 
