@@ -600,25 +600,11 @@ class Controller extends BaseObject
             "pageTitle",
             $this->getPageTitle()
         );
+        $this->template->set_var(
+            'environmentClass',
+            "class='environment-" . $GLOBALS['server_type'] . "'"
+        );
 
-        if ($GLOBALS ['server_type'] == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
-            $this->template->set_var(
-                "environmentTag",
-                'bgcolor="#FAE8EF"'
-            );
-        }
-        if ($GLOBALS['server_type'] == MAIN_CONFIG_SERVER_TYPE_TEST) {
-            $this->template->set_var(
-                "environmentTag",
-                'bgcolor=#f1f9d1'
-            );
-        }
-        if ($GLOBALS['server_type'] == MAIN_CONFIG_SERVER_TYPE_WEBSITE) {
-            $this->template->set_var(
-                "environmentTag",
-                'bgcolor=#f0f9ff'
-            );
-        }
 
         if ($this->getFormError()) {
             if ($this->getFormErrorMessage() != '') {

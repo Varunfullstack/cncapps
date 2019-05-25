@@ -21,8 +21,9 @@ $buMail = new BUMail($thing);
 
 $senderEmail = CONFIG_SUPPORT_EMAIL;
 $senderName = 'CNC Support Department';
-
+$toEmail = 'monthlysdreport@' . CONFIG_PUBLIC_DOMAIN;
 $hdrs = array(
+    'To'           => $toEmail,
     'From'         => $senderEmail,
     'Subject'      => 'Monthly Service Desk Report - ' . $buServiceDeskReport->getMonthName(
         ) . ' ' . $buServiceDeskReport->getYear(),
@@ -45,7 +46,7 @@ $hdrs = $buMail->mime->headers($hdrs);
 
 $buMail->putInQueue(
     $senderEmail,
-    'monthlysdreport@' . CONFIG_PUBLIC_DOMAIN,
+    $toEmail,
     $hdrs,
     $body
 );

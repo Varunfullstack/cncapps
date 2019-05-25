@@ -219,16 +219,4 @@ class CTIgnoredADDomains extends CTCNC
 
         $this->parsePage();
     }
-
-    function parsePage()
-    {
-        $urlLogo = '';
-        $this->template->set_var(
-            array(
-                'urlLogo' => $urlLogo,
-                'txtHome' => 'Home'
-            )
-        );
-        parent::parsePage();
-    }
 }// end of class

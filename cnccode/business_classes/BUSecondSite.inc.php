@@ -145,7 +145,7 @@ class BUSecondsite extends Business
                     !$server['secondsiteLocationPath'] OR
                     count($images) == 0
                 ) {
-                    $error = '2nd Site Backup Path Error Or No Images';
+                    $error = 'Offsite Backup Path Error Or No Images';
                     if (!$isSuspended) {
                         $this->imageCount += count($images);
                         $this->serverErrorCount++;
@@ -225,7 +225,7 @@ class BUSecondsite extends Business
                         $pattern = '/' . $image['imageName'];
                     }
 
-                    $pattern .= '.*(-cd.spi|spf)$/i';
+                    $pattern .= '.*(-cd\.spi|spf|(?<!-c[w|m|r])\.spi)$/i';
 
                     $matchedFiles = self::preg_ls(
                         $networkPath,
@@ -240,10 +240,14 @@ class BUSecondsite extends Business
                             /*
                             No matching files of any date
                             */
-                            $missingImages[] = 'No file in ' . $networkPath . ' matches pattern: ' . $pattern;
+                            $missingImages[] = 'No file in ' . $networkPath . ' matches pattern: ' . htmlentities(
+                                    $pattern
+                                );
                             $missingLetters[] = $image['imageName'];
 
-                            $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': No file in ' . $networkPath . ' matches pattern: ' . $pattern;
+                            $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': No file in ' . $networkPath . ' matches pattern: ' . htmlentities(
+                                    $pattern
+                                );
 
                             $this->logMessage(
                                 $errorMessage,
@@ -254,8 +258,6 @@ class BUSecondsite extends Business
                                 $image['secondSiteImageID'],
                                 self::STATUS_IMAGE_NOT_FOUND
                             );
-
-                            echo $pattern . " NOT FOUND<br/>";
                         }
                     } else {
                         /*
@@ -268,22 +270,14 @@ class BUSecondsite extends Business
                         $mostRecentFileTime = 0;
 
                         foreach ($matchedFiles as $file) {
-
                             $fileModifyTime = filemtime($file);
 
                             if ($fileModifyTime > $mostRecentFileTime) {
                                 $mostRecentFileTime = $fileModifyTime;
                                 $mostRecentFileName = $file;
                             }
-
-                            if ($fileModifyTime >= $timeToLookFrom) {
-                                $currentFileFound = true;
-                                break;      // got it
-                            }
                         }
-
-
-                        if (!$currentFileFound) {
+                        if (!$mostRecentFileTime >= $timeToLookFrom) {
 
                             $allServerImagesPassed = false;
                             if (!$isSuspended) {
@@ -595,7 +589,7 @@ class BUSecondsite extends Business
 
         $body = $template->get_var('output');
 
-        $subject = '2nd Site configuration warning - ' . $server['cus_name'] . ' - ' . $server['serverName'];
+        $subject = 'Offsite Site configuration warning - ' . $server['cus_name'] . ' - ' . $server['serverName'];
 
         $senderEmail = CONFIG_SUPPORT_EMAIL;
         $toEmail = '2sbadconfig@' . CONFIG_PUBLIC_DOMAIN;

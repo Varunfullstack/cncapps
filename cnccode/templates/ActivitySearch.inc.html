@@ -396,20 +396,6 @@
            class="singleBorder"
     >
         <tr>
-            <td colspan="{headerColSpan}"
-                class="listHeadText"
-            >&nbsp;
-            </td>
-            <td colspan="4"
-                align="center"
-            >Hours
-            </td>
-            <td nowrap
-                class="listHeadText"
-            >&nbsp;
-            </td>
-        </tr>
-        <tr>
             <td class="listHeadText">{checkAllBox}</td>
             <td nowrap
                 class="listHeadText"
@@ -419,12 +405,12 @@
             <td class="listHeadText"><a href="{requestUri}&sortColumn=reason">Description</a></td>
             <td class="listHeadText"><a href="{requestUri}&sortColumn=priority">Priority</a></td>
             <td class="listHeadText"><a href="{requestUri}&sortColumn=fixEngineer">Fixed By</a></td>
+            <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=workingHours">Fix</a></td>
+            <td class="listHeadText"><a href="{requestUri}&sortColumn=activityCount">Activities</a></td>
             <td class="listHeadText"><a href="{requestUri}&sortColumn=contractDescription">Contract</a></td>
             <td class="listHeadText"><a href="{requestUri}&sortColumn=rootCause">Root Cause</a></td>
             {weirdColumns}
-            <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=workingHours">Fix</a></td>
             <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=activityDurationHours">Activity</a></td>
-            <td class="listHeadText"><a href="{requestUri}&sortColumn=activityCount">Activities</a></td>
         </tr>
         <!-- BEGIN activityBlock -->
         <tr valign="top"
@@ -460,6 +446,14 @@
                 nowrap
             >{listFixEngineer}
             </td>
+            <td align="right"
+                nowrap
+            >{listWorkingHours}
+            </td>
+            <td align="right"
+                nowrap
+            >{listActivityCount}
+            </td>
             <td align="top"
                 nowrap
             >{listContractDescription}
@@ -469,18 +463,12 @@
             >{listRootCause}
             </td>
             {weirdFields}
-            <td align="right"
-                nowrap
-            >{listWorkingHours}
-            </td>
+
             <td align="right"
                 nowrap
             >{listActivityDurationHours}
             </td>
-            <td align="right"
-                nowrap
-            >{listActivityCount}
-            </td>
+
         </tr>
         <!-- END activityBlock -->
     </table>

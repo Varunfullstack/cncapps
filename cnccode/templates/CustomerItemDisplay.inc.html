@@ -241,7 +241,7 @@
         </TR>
 
         <tr id="secondsiteLocalExcludeFlag">
-            <td class="promptText">Exclude 2nd Site check on customer network</td>
+            <td class="promptText">Exclude Offsite Backup check on customer network</td>
             <td colspan="2">
                 <input
                         name="customerItem[1][secondsiteLocalExcludeFlag]"
@@ -254,7 +254,7 @@
         </tr>
 
         <tr id="secondSiteReplicationExcludeFlagRow">
-            <td class="promptText">Exclude 2nd Site Replication check on customer network</td>
+            <td class="promptText">Exclude Offsite Backup Replication check on customer network</td>
             <td colspan="2">
                 <input
                         name="customerItem[1][secondSiteReplicationExcludeFlag]"
@@ -267,7 +267,7 @@
         </tr>
 
         <tr>
-            <td class="promptText">2nd Site Suspended Until</td>
+            <td class="promptText">Offsite Backup Checks Suspended Until</td>
             <td colspan="2">
                 <input
                         name="customerItem[1][secondsiteValidationSuspendUntilDate]"
@@ -289,7 +289,7 @@
         </tr>
 
         <tr>
-            <td class="promptText">2nd Site images</td>
+            <td class="promptText">Offsite Backup images</td>
             <td>
                 <a href="{addSecondsiteImageUrl}">{addSecondsiteImageText}</a>
                 <table class="content"
@@ -323,7 +323,7 @@
 
 
         <tr>
-            <td class="promptText">2nd Site Backup Path</td>
+            <td class="promptText">Offsite Backup Path</td>
             <td colspan="2">
                 <input
                         name="customerItem[1][secondsiteLocationPath]"
@@ -340,7 +340,7 @@
             </td>
         </tr>
         <tr>
-            <td class="promptText">2nd Site Replication Path</td>
+            <td class="promptText">Offsite Backup Replication Path</td>
             <td colspan="2">
                 <input
                         name="customerItem[1][secondSiteReplicationPath]"
@@ -358,10 +358,9 @@
         </tr>
 
         <tr>
-            <td class="promptText">2nd Site Image Check Delay Days</td>
+            <td class="promptText">Offsite Backup Image Check Delay Days</td>
             <td colspan="2">
-                <select
-                        {secondsiteDisabled}
+                <select {secondsiteDisabled}
                         {disabled}
                         id="secondsiteImageDelayDays"
                         name="customerItem[1][secondsiteImageDelayDays]"
@@ -486,6 +485,15 @@
 <script type="text/javascript">
     $(document).ready(function () {
 
+        const backupPermission = {offsiteBackupDelayDisable};
+
+        if (!backupPermission) {
+            $('select#secondsiteImageDelayDays').attr("disabled", true);
+            $("input#secondsiteLocalExcludeFlag").attr('disabled', true);
+            $("input#secondSiteReplicationExcludeFlag").attr('disabled', true);
+        }
+
+
         if ({secondsiteLocalExcludeFlagShow} == 0) {
             $("tr#secondsiteLocalExcludeFlag").hide();
         }
@@ -500,7 +508,9 @@
                 $('select#secondsiteImageDelayDays').attr("disabled", true);
             } else {
                 $('input#secondSiteValidationSuspendUntilDate,input#secondsiteServerDriveLetters,input#secondsiteLocationPath').attr("readonly", false);
-                $('select#secondsiteImageDelayDays').attr("disabled", false);
+                if (backupPermission) {
+                    $('select#secondsiteImageDelayDays').attr("disabled", false);
+                }
             }
         });
         $("input#secondSiteReplicationExcludeFlag").click(function () {

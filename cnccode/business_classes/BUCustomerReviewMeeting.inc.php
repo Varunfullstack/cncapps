@@ -209,8 +209,11 @@ class BUCustomerReviewMeeting extends Business
 
             $subject = 'Review meeting with ' . $customer['customerName'] . ' due by ' . $customer['nextMeetingDate'];
 
+            $toEmail = $customer['accountManagerUsername'] . '@' . CONFIG_PUBLIC_DOMAIN;
+
             $hdrs = array(
                 'From'         => $senderEmail,
+                'To'           => $toEmail,
                 'Subject'      => $subject,
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
@@ -238,7 +241,7 @@ class BUCustomerReviewMeeting extends Business
 
             $buMail->putInQueue(
                 $senderEmail,
-                $customer['accountManagerUsername'] . '@' . CONFIG_PUBLIC_DOMAIN,
+                $toEmail,
                 $hdrs,
                 $body      // to SD Managers
             );
@@ -316,34 +319,6 @@ class BUCustomerReviewMeeting extends Business
 
         $reviewMeetingFolderPath = $documentFolderPath . '/Review Meetings';
 
-        $template = new Template (
-            $GLOBALS ["cfg"] ["path_templates"],
-            "remove"
-        );
-
-        /*
-        Template with html head etc
-        */
-        $template->set_file(
-            'page',
-            'CustomerReviewMeetingAgendaDocument.inc.html'
-        );
-
-        $template->set_var(
-            [
-                'htmlBody' => $htmlBody,
-                //                "waterMarkURL" => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png'
-            ]
-        );
-
-        $template->parse(
-            'output',
-            'page',
-            true
-        );
-
-        $htmlPage = $template->get_var('output');
-
         @mkdir(
             $reviewMeetingFolderPath,
             '0777',
@@ -357,7 +332,7 @@ class BUCustomerReviewMeeting extends Business
 
         file_put_contents(
             $tempFilePath,
-            $htmlPage
+            $htmlBody
         );
 
         $meetingDate = new DateTime($meetingDate);
@@ -392,7 +367,7 @@ class BUCustomerReviewMeeting extends Business
         if ($_error) {
             throw new Exception(json_encode($_error));
         } else {
-            unlink($tempFilePath);
+//            unlink($tempFilePath);
             return true;
         }
     }

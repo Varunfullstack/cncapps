@@ -75,6 +75,7 @@ if ($error) {
     $body = $buMail->mime->get();
 
     $hdrs = array(
+        'To'      => $send_to_email,
         'From' => BACKUP_ALERT_EMAIL_FROM_USER,
         'Subject' => BACKUP_ALERT_EMAIL_SUBJECT
     );
@@ -86,7 +87,7 @@ if ($error) {
         $send_to_email,
         $hdrs,
         $body
-    );
+        );
 
 } else {
     echo "Backup OK";

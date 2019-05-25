@@ -1,6 +1,37 @@
 # Changelog
 This project changes will be shown here.
 
+## [3.1.0]
+### Added
+- Issue 519 - Windows 10 version EOL Build notifications
+- Issue 487 - Auto add time to SR when fixing and within XX minutes under budget
+- Issue 515 - Report showing contacts with support & on the contract
+### Changed
+- Issue 531 - Create configuration settings for the new Design Environment 
+- Issue 524 - Automated Request table field change
+- Issue 533 - PO Status Report v7
+- Issue 545 - Password level modification
+- Issue 560 - Offsite Backup Image Validation Process
+- Issue 557 - Change Request Process GUI enhancement
+- Issue 550 - Rename 2nd Site links
+- Issue 547 - Time Request Denied Process
+- Issue 532 - Secondary LDAP server
+- Issue 529 - P5 default times when generated from Sales Order
+- Issue 564 - SD Manager Dashboard Show Critical SR
+- Issue 561 -  Asset List Export - show if disk is encrypted
+- Issue 525 - Activity Search page, move the columns of "fix time", "activities" after "Fixed By"
+- Issue 568 - Backup & Replication permissions
+- Issue 567 - Customer Review Meeting Agenda SR count
+### Fixed
+- Issue 551 - Contact Audit Log missing support level
+- Issue 552 - Contact Position field extension
+- Issue 554 - Block 'Work' Button for referred customers
+- Issue 526 - Special Attention Emails missing To field
+- Issue 566 - Change Request Cancel button doesn't delete activity if it's been autosaved already
+- Issue 546 - Prevent zNot in Use root cause
+### Removed
+- Issue 530 - Remove reference to faxing on generating a sales order
+
 ## [v3.0.0] - 2019-05-24
 ### Changed
 - Issue 492 - Upgrade PHP & mySQL to the later versions
@@ -18,7 +49,7 @@ This project changes will be shown here.
 - Archived passwords not observing access levels
 - Saving contacts when there are duplicate email addresses transposes the email onto other contacts. See attached video.
 - Emails from quote reminders are stuck in the queue.
-### Changed 
+### Changed
 - LDAP config
 
 ## [v2.4.0] - 2019-03-27

@@ -177,6 +177,18 @@
         });
 
     }
+
+    function confirmCancel() {
+        let text = 'Are you sure you want to cancel?';
+
+        if ($('[name="callActivity[1][callActTypeID]"]').val() == 59) {
+            text = "This will delete the Change Request activity, please confirm.";
+        }
+
+        if (confirm(text)) {
+            document.location = '{urlCancelEdit}'
+        }
+    }
 </script>
 <table width="100%">
     <tr>
@@ -266,10 +278,10 @@
            name="callActivity[1][hideFromCustomerFlag]"
            value="{hideFromCustomerFlag}"
     >
-    <input type="hidden"
-           name="callActivity[1][callActTypeID]"
-           value="{hiddenCallActTypeID}"
-    >
+    <!--    <input type="hidden"-->
+    <!--           name="callActivity[1][callActTypeID]"-->
+    <!--           value="{hiddenCallActTypeID}"-->
+    <!--    >-->
     <input type="hidden"
            name="callActivity[1][salesRequestStatus]"
            value="{salesRequestStatus}"
@@ -345,7 +357,7 @@
                     <input name="Cancel"
                            type="button"
                            value="Cancel"
-                           onclick="if(confirm('Are you sure you want to cancel?')) document.location='{urlCancelEdit}';"
+                           onclick="confirmCancel();"
                     />
 
                 </div>
@@ -411,7 +423,9 @@
         </tr>
         <tr>
             <td class="promptText">Contact</td>
-            <td class="mainHeadText" id="contactSelectorContainer">
+            <td class="mainHeadText"
+                id="contactSelectorContainer"
+            >
                 <select name="callActivity[1][contactID]"
                         required
                         onchange="checkChangedContact()"

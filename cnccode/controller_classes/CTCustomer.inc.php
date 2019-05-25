@@ -1404,7 +1404,9 @@ class CTCustomer extends CTCNC
   serverCareProduct,
   COALESCE(virtualServers,0) AS virtualServers,
   COALESCE(physicalServers,0) AS physicalServers,
-  COALESCE(serverCareContract,0) AS serverCareContract
+  COALESCE(serverCareContract,0) AS serverCareContract,
+  concat('M ',coalesce(mainCount, 0),', SV ',coalesce(supervisorCount,0),', S ', coalesce(supportCount, 0),', D ', coalesce(delegateCount, 0),', T ', coalesce(totalCount, 0)) as supportedUsers,
+  totalCount > serviceDeskUsers as moreUsersThanExpected 
 FROM
   customer
   LEFT JOIN
@@ -1451,6 +1453,25 @@ FROM
          AND custitem.`declinedFlag` <> 'Y'
    GROUP BY custitem.`cui_cuino`) test2
     ON customer.cus_custno = test2.customerId
+left join (
+    select 
+  contact.`con_custno`,
+  sum(contact.`supportLevel` = 'main') as mainCount,
+  SUM(
+    contact.`supportLevel` = 'supervisor'
+  ) AS supervisorCount,
+  SUM(
+    contact.`supportLevel` = 'support'
+  ) AS supportCount,
+  SUM(
+    contact.`supportLevel` = 'delegate'
+  ) AS delegateCount,
+  sum(1) as totalCount 
+from
+  contact 
+where supportLevel is not null 
+GROUP BY con_custno 
+) supportUsers on supportUsers.con_custno = customer.cus_custno
 WHERE serviceDeskProduct IS NOT NULL OR serverCareProduct IS NOT NULL
 ORDER BY cus_name ASC  ";
 
@@ -1533,7 +1554,9 @@ ORDER BY cus_name ASC  ";
                     'serverCareProduct'           => $row['serverCareProduct'],
                     'virtualServers'              => $row['virtualServers'],
                     'physicalServers'             => $row['physicalServers'],
-                    'serverCareContract'          => $row['serverCareContract']
+                    'serverCareContract'          => $row['serverCareContract'],
+                    'supportedUsers'              => $row['supportedUsers'],
+                    'moreThanExpectedClass'       => $row['moreUsersThanExpected'] ? "red" : null
 
                 )
             );
@@ -2872,6 +2895,12 @@ ORDER BY cus_name ASC  ";
 
         } // end foreach
 
+        $mainCount = 0;
+        $supervisorCount = 0;
+        $supportCount = 0;
+        $delegateCount = 0;
+        $totalCount = 0;
+
         while ($this->dsContact->fetchNext()) {
 
             $this->template->set_block(
@@ -2896,6 +2925,26 @@ ORDER BY cus_name ASC  ";
             $deleteContactLink = null;
 
             if ($this->dsContact->getValue(DBEContact::contactID)) {
+
+                if ($this->dsContact->getValue(DBEContact::supportLevel)) {
+
+                    switch ($this->dsContact->getValue(DBEContact::supportLevel)) {
+                        case 'main':
+                            $mainCount++;
+                            break;
+                        case 'supervisor':
+                            $supervisorCount++;
+                            break;
+                        case 'support':
+                            $supportCount++;
+                            break;
+                        case 'delegate':
+                            $delegateCount++;
+                            break;
+                    }
+                    $totalCount++;
+                }
+
                 $deleteContactURL =
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
@@ -3046,6 +3095,16 @@ ORDER BY cus_name ASC  ";
                     'dmLetterURL'                          => $dmLetterURL,
                     'deleteContactLink'                    => $deleteContactLink
                 )
+            );
+
+            $this->template->set_var(
+                [
+                    "mainCount"       => $mainCount,
+                    "supervisorCount" => $supervisorCount,
+                    "supportCount"    => $supportCount,
+                    "delegateCount"   => $delegateCount,
+                    "totalCount"      => $totalCount,
+                ]
             );
 
             $this->siteDropdown(
@@ -3689,10 +3748,6 @@ ORDER BY cus_name ASC  ";
 
         $dbeContact->getRow($contactID);
 
-        $dbeContact->setValue(
-            DBEContact::email,
-            null
-        );
         $dbeContact->setValue(
             DBEContact::email,
             null

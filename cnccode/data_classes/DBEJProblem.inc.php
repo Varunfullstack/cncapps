@@ -704,6 +704,9 @@ class DBEJProblem extends DBEProblem
                     $sql .= ' order by hoursRemaining desc';
                     break;
                 }
+            case 'critical':
+                $sql .= " and  " . $this->getDBColumnName(self::criticalFlag) . " = 'Y' order by hoursRemaining desc ";
+                break;
         }
 
         $sql .= ' limit ' . $limit;

@@ -43,8 +43,11 @@
 
         .reportSection {
             padding-bottom: 30px;
-            display: inline-block;
             width: 100%;
+        }
+
+        .reportSection.newPage {
+            page-break-before: always;
         }
 
         h1 {
@@ -110,7 +113,6 @@
         .ul3 li {
             width: 33%;
             list-style-type: none;
-            float: left;
             display: inline-block;
         }
 
@@ -172,8 +174,6 @@
         }
 
         tr {
-            page-break-before: always;
-            page-break-after: always;
             page-break-inside: avoid;
         }
 

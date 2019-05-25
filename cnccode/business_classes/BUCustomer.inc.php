@@ -897,7 +897,7 @@ class BUCustomer extends Business
         $dsCustomer->setValue(
             DBECustomer::pcxFlag,
             'N'
-        );          // 2nd site
+        );
         $dsCustomer->setValue(
             DBECustomer::specialAttentionFlag,
             'N'

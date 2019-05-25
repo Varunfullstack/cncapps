@@ -44,9 +44,9 @@
 </script>
 
 <!--<div style="position: relative">-->
-    <!--<img src="{waterMark}"-->
-         <!--style="position: absolute;left: 0px;top: 0px;z-index: 99; opacity: 0.5"-->
-    <!--/>-->
+<!--<img src="{waterMark}"-->
+<!--style="position: absolute;left: 0px;top: 0px;z-index: 99; opacity: 0.5"-->
+<!--/>-->
 <!--</div>-->
 
 <div class="reportSection">
@@ -66,6 +66,7 @@
     <h2>Support</h2>
 
     <table class="collapse">
+        <tbody>
         <tr>
             <th style="text-align: left;">SR Priority</th>
             <td style="text-align: center;">1</td>
@@ -83,6 +84,7 @@
             <td style="text-align: center;">{slaP4}</td>
             <td style="text-align: center;">{slaP5}</td>
         </tr>
+        </tbody>
     </table>
 </div>
 
@@ -103,15 +105,14 @@
 </div>
 
 <div class="reportSection">
-    <h2>Supported Users</h2>
-    <ul class="ul3">
-        {supportContactInfo}
-    </ul>
+    <h2>Supported Users - ({supportUsersCount} Total Named Contacts)</h2>
+    {supportContactInfo}
 </div>
 
-<div class="reportSection">
+<div class="reportSection newPage">
     <h2>Root Cause</h2>
     <table class="collapse rootCause">
+        <tbody>
         <!-- BEGIN rootCauseBlock -->
         <tr>
 
@@ -120,17 +121,26 @@
 
             <!-- END rootCauseBlock -->
         </tr>
+        </tbody>
     </table>
 </div>
 
 <div class="reportSection">
     <h2>Service Request Count</h2>
     <table class="collapse requestCount">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Raised Manually</th>
+            <th>Proactively Raised</th>
+        </tr>
+        </thead>
         <tbody>
         <!-- BEGIN userBlock -->
         <tr>
             <td>{srUserName}</td>
             <td>{srCount}</td>
+            <td>{srHiddenCount}</td>
         </tr>
         <!-- END userBlock -->
         </tbody>

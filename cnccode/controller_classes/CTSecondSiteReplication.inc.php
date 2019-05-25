@@ -139,7 +139,7 @@ class CTSecondSiteReplication extends CTSecondSite
 
         $passed = $this->buSecondsite->getImagesByStatus(BUSecondsite::STATUS_PASSED);
 
-        $this->setPageTitle('2nd Site Replication');
+        $this->setPageTitle('Offsite Backup Replication Status');
 
         $this->setTemplateFiles(array('SecondsiteList' => 'SecondsiteReplicationList.inc'));
 
@@ -384,7 +384,7 @@ class CTSecondSiteReplication extends CTSecondSite
 
         $urlNext =
             Controller::buildLink(
-                'SecondSiteReplication.php',
+                'OffsiteBackupReplicationStatus.php',
                 array()
             );
         header('Location: ' . $urlNext);
@@ -400,7 +400,7 @@ class CTSecondSiteReplication extends CTSecondSite
     {
         $ret =
             Controller::buildLink(
-                'SecondSiteReplication.php',
+                'OffsiteBackupReplicationStatus.php',
                 array(
                     'action'         => 'run',
                     'customerItemID' => $server_cuino

@@ -271,7 +271,12 @@ class BUServiceDeskReport extends Business
         $sql =
             "SELECT
           CONCAT(con_first_name, ' ' , con_last_name) AS name,
-          COUNT(*) AS count
+             SUM(
+    problem.pro_hide_from_customer_flag <> 'Y'
+  ) AS count,
+  SUM(
+    problem.pro_hide_from_customer_flag = 'Y'
+  ) AS hiddenCount
         FROM
           problem
           JOIN contact ON con_contno = pro_contno";
@@ -291,7 +296,6 @@ class BUServiceDeskReport extends Business
           pro_contno
         ORDER BY
           count DESC";
-
         return $this->db->query($sql);
 
     }
@@ -305,10 +309,10 @@ class BUServiceDeskReport extends Business
           COUNT(*) AS count
         FROM
           problem
-          JOIN rootcause ON rootcause.rtc_rootcauseno = problem.pro_rootcauseno";
+          JOIN rootcause ON rootcause.rtc_rootcauseno = problem.pro_rootcauseno ";
 
         $sql .=
-            " WHERE
+            " WHERE pro_hide_from_customer_flag <> 'Y' and
           DATE(pro_date_raised) BETWEEN '" . $this->startDate . "' AND '" . $this->endDate . "'";
 
         if ($this->customerID) {

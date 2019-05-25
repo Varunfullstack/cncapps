@@ -889,7 +889,7 @@ class CTActivity extends CTCNC
             if ($dsSearchForm->getValue(BUActivity::searchFormStatus) == 'CHECKED_T_AND_M' ||
                 $dsSearchForm->getValue(BUActivity::searchFormStatus) == 'CHECKED_NON_T_AND_M') {
                 $weirdColumns = '<td class="listHeadText"><div style="width: 100px">SO</div></td>';
-                $headerColSpan = 10;
+                $headerColSpan = 12;
             }
 
             $this->template->set_var(
@@ -1270,6 +1270,7 @@ class CTActivity extends CTCNC
 
     function parsePage()
     {
+        parent::parsePage();
         $urlLogo = null;
         $this->template->set_var(
             array(
@@ -1277,7 +1278,6 @@ class CTActivity extends CTCNC
                 'txtHome' => 'Home'
             )
         );
-        parent::parsePage();
     }
 
     function countParamsSet($array)
@@ -4623,7 +4623,10 @@ class CTActivity extends CTCNC
             exit;
         }
 
-        if ($dsCallActivity->getValue(DBEJCallActivity::callActTypeID) == 0) {                    //delete this activity
+        if (in_array(
+            $dsCallActivity->getValue(DBECallActivity::callActTypeID),
+            [0, 59]
+        )) {                    //delete this activity
 
             $this->buActivity->deleteCallActivity($this->getParam('callActivityID'));
 
@@ -6294,7 +6297,7 @@ class CTActivity extends CTCNC
 
             $nextURL =
                 Controller::buildLink(
-                    'CurrentActivityReport.php',
+                    'ChangeRequestDashboard.php',
                     array()
                 );
 
@@ -6375,8 +6378,9 @@ class CTActivity extends CTCNC
 
         $this->setPageTitle("Time Request");
         $requestorID = $dsCallActivity->getValue(DBECallActivity::userID);
-        $this->dbeUser->getRow($requestorID);
-        $teamID = $this->dbeUser->getValue(DBEUser::teamID);
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRow($requestorID);
+        $teamID = $dbeUser->getValue(DBEUser::teamID);
         $teamName = null;
         $usedMinutes = 0;
         $assignedMinutes = 0;

@@ -1,0 +1,385 @@
+<style>
+    .detail {
+        padding-left: 10px;
+    }
+
+    .OSSupportDatesItem {
+        display: flex;
+        flex-direction: row;
+        width: 300px;
+        padding: 2px;
+    }
+
+    .OSSupportDatesItem .buttons {
+        flex-basis: 100px;
+    }
+
+    .OSSupportDatesItem .email {
+        flex-basis: 200px;
+    }
+
+    input {
+        margin-bottom: 5px;
+        margin-top: 5px;
+    }
+
+    .detail input:invalid {
+        border-color: red;
+    }
+</style>
+
+<script type="text/javascript"
+        src=".javascript/handlebars-v4.0.11.js"
+></script>
+<script type="text/javascript"
+        src=".javascript/mustache.min.js"
+></script>
+<script type="application/javascript"
+        src=".javascript/mustache-wax.min.js"
+></script>
+
+<div id="dialog"
+     title="Dialog Title"
+>
+    <form class="detail"
+          onsubmit="return false;"
+    >
+        <input hidden
+               name="id"
+        >
+        <div>
+            <span>OS Name:</span>
+            <br>
+            <input type="text"
+                   name="name"
+                   required
+            >
+        </div>
+        <div>
+            <span>OS Version:</span>
+            <br>
+            <input type="text"
+                   name="version"
+                   required
+                   pattern="^\d+\.\d+\.\d+$"
+            >
+        </div>
+        <div>
+            <span>Availability Date:</span>
+            <br>
+            <input type="text"
+                   name="availabilityDate"
+                   required
+                   class="jqueryCalendar"
+            >
+        </div>
+        <div>
+            <span>EOL Date:</span>
+            <br>
+            <input type="text"
+                   name="endOfLifeDate"
+                   class="jqueryCalendar"
+            >
+        </div>
+        <div>
+            <button class="addButton"
+                    type="button"
+                    hidden
+            >Add
+            </button>
+            <button class="saveButton"
+                    type="button"
+                    hidden
+            >Save
+            </button>
+            <button class="cancelButton"
+                    type="button"
+            >Cancel
+            </button>
+        </div>
+
+    </form>
+</div>
+<script type="application/javascript">
+    let saveButton = null;
+    let addButton = null;
+    let cancelButton = null;
+    let list = null;
+
+
+    let dataTable = null;
+    let missingRowsTable = null;
+    let missingRowsDataTable = null;
+    let dialogElem = null;
+    let form = null;
+
+    function showEdit(data = null) {
+        if (data) {
+            form.elements['id'].value = data.id;
+            form.elements['name'].value = data.name;
+            form.elements['version'].value = data.version;
+            form.elements['availabilityDate'].value = data.availabilityDate;
+            form.elements['endOfLifeDate'].value = data.endOfLifeDate;
+        }
+
+        if (data && data.id) {
+            saveButton.show();
+            addButton.hide();
+        } else {
+            saveButton.hide();
+            addButton.show();
+        }
+
+        dialogElem.dialog('open');
+    }
+
+    function toggleDataTableButtons(enable) {
+        dataTable.buttons(["edit:name", "delete:name"]).enable(enable);
+    }
+
+    function cancelEdit() {
+        dialogElem.dialog("close");
+        form.elements['id'].value = null;
+        form.elements['name'].value = null;
+        form.elements['version'].value = null;
+        form.elements['availabilityDate'].value = null;
+        form.elements['endOfLifeDate'].value = null;
+    }
+
+    $(function () {
+        dialogElem = $("#dialog");
+        form = $('.detail')[0];
+        dialogElem.dialog({autoOpen: false, position: {my: 'center', at: "top"}, modal: true});
+
+        domainInput = $('[name="domain"]');
+        addButton = $('.addButton');
+        saveButton = $('.saveButton');
+        cancelButton = $('.cancelButton');
+        list = $('.list');
+        missingRowsTable = $('.missingRows');
+        missingRowsDataTable = missingRowsTable.DataTable(
+            {
+                dom: 'Blfrti', buttons: [
+                    {
+                        text: 'Add',
+                        action: (e, dt, node, config) => {
+                            const rows = missingRowsDataTable.rows({selected: true}).data();
+                            const newOSSupport = {
+                                "id": null,
+                                "name": rows[0].name,
+                                "version": rows[0].version,
+                                "availabilityDate": null,
+                                "endOfLifeDate": null
+                            };
+                            showEdit(newOSSupport);
+                        },
+                        name: 'add'
+                    }
+                ],
+                // serverSide: true,
+                ajax: {
+                    url: "{URLGetMissingRowsData}",
+                    type: "GET"
+                },
+                rowId: 'id',
+                select: {style: 'single'},
+                columns: [
+                    {data: "name"},
+                    {data: "version"},
+                ],
+                paging: false,
+                order: [
+                    [0, 'asc'],
+                ],
+                scrollY: '60vh',
+                scrollCollapse: true
+            }
+        );
+
+        missingRowsDataTable.buttons(["add:name"]).enable(false);
+        missingRowsDataTable.on('select', function (e, dt, type, indexes) {
+            if (type !== 'row') {
+                return;
+            }
+            missingRowsDataTable.buttons(["add:name"]).enable(true);
+        });
+
+        missingRowsDataTable.on('deselect', function (e, dt, type, indexes) {
+            if (type !== 'row') {
+                return;
+            }
+            missingRowsDataTable.buttons(["add:name"]).enable(true);
+        });
+
+
+        dataTable = list.DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'csv',
+                    bom: true
+                },
+                {
+                    text: 'Edit',
+                    action: (e, dt, node, config) => {
+                        const rows = dataTable.rows({selected: true}).data();
+                        showEdit(rows[0]);
+                    },
+                    name: 'edit'
+
+                },
+                {
+                    text: 'Delete',
+                    action: (e, dt, node, config) => {
+                        const rows = dataTable.rows({selected: true}).data();
+                        if (!confirm('are you sure you want to delete this entry?')) {
+                            return;
+                        }
+
+
+                        const urlDeleteItem = "{URLDeleteItem}&id=";
+                        const url = urlDeleteItem + rows[0].id;
+
+                        $.ajax({
+                            url: url,
+                            method: 'GET',
+                        }).then(function (result) {
+                            dataTable.ajax.reload();
+                            missingRowsDataTable.ajax.reload();
+                        })
+                    },
+                    name: 'delete'
+                },
+                {
+                    text: 'New',
+                    action: (e, dt, node, config) => {
+                        showEdit();
+                    },
+                },
+            ],
+            // serverSide: true,
+            ajax: {
+                url: "{URLGetData}",
+                type: "GET"
+            },
+            rowId: 'id',
+            select: {style: 'single'},
+            columns: [
+                {data: "name"},
+                {data: "version"},
+                {data: "availabilityDate"},
+                {data: "endOfLifeDate"}
+            ],
+            columnDefs: [
+                {type: "date-eu", targets: [2, 3]}
+            ],
+            paging: false,
+            order: [
+                [0, 'asc'],
+            ]
+        });
+
+        toggleDataTableButtons(false);
+        dataTable.on('select', function (e, dt, type, indexes) {
+            if (type !== 'row') {
+                return;
+            }
+            toggleDataTableButtons(true);
+        });
+
+        dataTable.on('deselect', function (e, dt, type, indexes) {
+            if (type !== 'row') {
+                return;
+            }
+            toggleDataTableButtons(false);
+        });
+
+
+        cancelButton.click(function () {
+            cancelEdit();
+        });
+
+        saveButton.click(function () {
+            if (!form.checkValidity()) {
+                return;
+            }
+
+            const data = Array.from(form.elements).reduce((acc, element) => {
+                if (element.name) acc[element.name] = element.value;
+                return acc
+            }, {});
+
+            $.ajax({
+                url: '{URLUpdateItem}',
+                method: 'POST',
+                type: 'post',
+                dataType: 'json',
+                data: data
+            }).then(function (result) {
+                cancelEdit();
+                dataTable.ajax.reload();
+                missingRowsDataTable.ajax.reload();
+            })
+
+        });
+
+        addButton.click(function () {
+
+            if (!form.checkValidity()) {
+                form.submit();
+                return;
+            }
+
+            const data = Array.from(form.elements).reduce((acc, element) => {
+                if (element.name) acc[element.name] = element.value;
+                return acc
+            }, {});
+
+            $.ajax({
+                url: '{URLAddItem}',
+                method: 'POST',
+                type: 'post',
+                dataType: 'json',
+                data: data
+            }).then(function (newItem) {
+                cancelEdit();
+                dataTable.ajax.reload();
+                missingRowsDataTable.ajax.reload();
+            })
+
+        });
+
+    });
+
+
+    var savedCustomerString;
+
+    function saveCustomerString() {
+        savedCustomerString = document.getElementById("customerString").value
+    }
+
+</script>
+
+<table class="list">
+    <thead>
+    <tr>
+        <th>OS Name</th>
+        <th>OS Version</th>
+        <th>Availability Date</th>
+        <th>EOL Date</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+<br>
+<h3>Missing OS information</h3>
+<table class="missingRows">
+    <thead>
+    <tr>
+        <th>OS Name</th>
+        <th>OS Version</th>
+    </tr>
+    </thead>
+</table>

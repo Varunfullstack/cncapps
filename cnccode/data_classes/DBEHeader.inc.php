@@ -88,12 +88,14 @@ class DBEHeader extends DBEntity
     const secondSiteReplicationAdditionalDelayAllowance = "secondSiteReplicationAdditionalDelayAllowance";
     const SDDashboardEngineersInSREngineersMaxCount = "SDDashboardEngineersInSREngineersMaxCount";
     const projectCommenceNotification = "projectCommenceNotification";
+    const OSSupportDatesThresholdDays = "OSSupportDatesThresholdDays";
+    const closingSRBufferMinutes = "closingSRBufferMinutes";
 
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -522,6 +524,18 @@ class DBEHeader extends DBEntity
 
         $this->addColumn(
             self::projectCommenceNotification,
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::OSSupportDatesThresholdDays,
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::closingSRBufferMinutes,
             DA_INTEGER,
             DA_NOT_NULL
         );

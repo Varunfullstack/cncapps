@@ -1063,6 +1063,9 @@ class CTCurrentActivityReport extends CTCNC
             );
             $totalActivityDurationHours = $serviceRequests->getValue(DBEJProblem::totalActivityDurationHours);
 
+            $dbeCustomer = new DBECustomer($this);
+            $dbeCustomer->getRow($dsResults->getValue('customerID'));
+            $hideWork = $dbeCustomer->getValue(DBECustomer::referredFlag) == 'Y';
             $this->template->set_var(
 
                 array(
@@ -1114,8 +1117,8 @@ class CTCurrentActivityReport extends CTCNC
                     ),
                     'alarmDateTime'              => $alarmDateTimeDisplay,
                     'bgColour'                   => $bgColour,
-                    'workBgColor'                => $workBgColor
-
+                    'workBgColor'                => $workBgColor,
+                    'workHidden'                 => $hideWork ? 'hidden' : null,
                 )
 
             );

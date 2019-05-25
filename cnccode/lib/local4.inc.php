@@ -166,6 +166,17 @@ class auSweetcode extends Auth
         include(PHPLIB_PAGE_LOGIN);
     }
 
+
+    function serviceping($host, $port = 389, $timeout = 1)
+    {
+        $op = fsockopen($host, $port, $errno, $errstr, $timeout);
+        if (!$op) return 0; //DC is N/A
+        else {
+            fclose($op); //explicitly close open socket connection
+            return 1; //DC is up & running, we can safely connect with ldap_connect
+        }
+    }
+
     function authenticate_on_ldap($username,
                                   $password
     )
@@ -173,12 +184,25 @@ class auSweetcode extends Auth
         if (!$password) {
             return false;
         }
+
         $domain = CONFIG_LDAP_DOMAIN;
-        $domaincontroller = CONFIG_LDAP_DOMAINCONTROLLER;
 
-        $adServer = "ldap://" . $domaincontroller . "." . $domain . ".local";
+// ##### STATIC DC LIST, if your DNS round robin is not setup
+//$dclist = array('10.111.222.111', '10.111.222.100', '10.111.222.200');
 
-        $ldap = ldap_connect($adServer);
+// ##### DYNAMIC DC LIST, reverse DNS lookup sorted by round-robin result
+        $dclist = gethostbynamel("$domain.local");
+        $dc = null;
+        foreach ($dclist as $k => $dc) if ($this->serviceping($dc) == true) break; else $dc = 0;
+//after this loop, either there will be at least one DC which is available at present, or $dc would return bool false while the next line stops program from further execution
+
+        if (!$dc) exit("NO DOMAIN CONTROLLERS AVAILABLE AT PRESENT, PLEASE TRY AGAIN LATER!"); //user being notified
+
+//        $domaincontroller = CONFIG_LDAP_DOMAINCONTROLLER;
+//
+//        $adServer = "ldap://" . $domaincontroller . "." . $domain . ".local";
+
+        $ldap = ldap_connect($dc) or die("DC N/A, PLEASE TRY AGAIN LATER.");
 
         $ldaprdn = $domain . "\\" . $username;
 
@@ -198,6 +222,7 @@ class auSweetcode extends Auth
             $ldaprdn,
             $password
         );
+
         if ($bind) {
             $ret = true;
         } else {
@@ -230,6 +255,7 @@ class auSweetcode extends Auth
             $GLOBALS['loginMessage'] = 'Login blocked: You are not on the CNC network';
             return false;
         }
+
 
         if (
             ($GLOBALS ['server_type'] != MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT

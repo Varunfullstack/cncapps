@@ -39,6 +39,7 @@ require_once($cfg ["path_dbe"] . "/DBEUtilityEmail.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg ["path_bu"] . "/BUStandardText.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJPorhead.inc.php");
+require_once($cfg["path_ct"] . "/CTProject.inc.php");
 
 define(
     'BUACTIVITY_RESOLVED',
@@ -722,6 +723,7 @@ class BUActivity extends Business
 
         $hdrs = array(
             'From'         => $senderEmail,
+            'To'           => $toEmail,
             'Subject'      => CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' - Completed Early',
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
@@ -2750,6 +2752,10 @@ class BUActivity extends Business
                 );
                 break;
             case 'D':
+                $this->logOperationalActivity(
+                    $dsCallActivity->getValue(DBECallActivity::problemID),
+                    '<p style="color: red;">Time request denied: ' . $comments . '</p>'
+                );
                 $this->sendTimeRequestDeniedEmail(
                     $dsCallActivity,
                     $requestingUser,
@@ -3107,13 +3113,10 @@ class BUActivity extends Business
 
         $template->setVar(
             array(
-                'problemID' => $problemID,
-
-                'userName' => $userName,
-
+                'problemID'       => $problemID,
+                'userName'        => $userName,
                 'urlLastActivity' => $urlLastActivity,
-
-                'requestReason' => $reason
+                'requestReason'   => $reason
             )
         );
 
@@ -3130,7 +3133,7 @@ class BUActivity extends Business
         $hdrs = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
-            'Subject'      => "Time Request Denied",
+            'Subject'      => "Time Request Denied - SR " . $problemID,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
@@ -5188,6 +5191,7 @@ is currently a balance of ';
 
         $hdrs = array(
             'From'         => $senderEmail,
+            'To'           => $toEmail,
             'Subject'      => $subject,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
@@ -6162,11 +6166,9 @@ is currently a balance of ';
         if ($dsInput->getValue(BURenContract::etaDate)) {
             $internalNotes .=
                 '<P>ETA: ' . Controller::dateYMDtoDMY($dsInput->getValue(BURenContract::etaDate)) . '</P><BR/>';
-
         } else {
             $internalNotes .=
                 '<P>ETA: TBA</P><BR/>';
-
         }
 
         /*
@@ -6261,6 +6263,44 @@ is currently a balance of ';
             DBEJProblem::linkedSalesOrderID,
             $ordheadID
         );
+
+        if ($dsInput->getValue(BURenContract::serviceRequestPriority) == 5) {
+            $buHeader = new BUHeader($this);
+            $dsHeader = new DataSet($this);
+            $buHeader->getHeader($dsHeader);
+            $dbeProblem->setValue(DBEProblem::imLimitMinutes, $dsHeader->getValue(DBEHeader::imTeamLimitMinutes));
+            $dsOrdlineBudget = new DataSet($this);
+            $buSalesOrder->getOrderByOrdheadID(
+                $ordheadID,
+                $dsOrdHead,
+                $dsOrdlineBudget
+            );
+
+            $minutesInADay = $dsHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
+
+            $normalMinutes = 0;
+            while ($dsOrdlineBudget->fetchNext()) {
+
+                if ($dsOrdlineBudget->getValue(DBEOrdline::lineType) == 'I') {
+                    switch ($dsOrdlineBudget->getValue(DBEOrdline::itemID)) {
+                        case CTProject::DAILY_LABOUR_CHARGE:
+                        case CTProject::DAILY_OOH_LABOUR_CHARGE:
+                            $normalMinutes += ((float)$dsOrdlineBudget->getValue(
+                                    DBEOrdline::qtyOrdered
+                                )) * $minutesInADay;
+                            break;
+                        case CTProject::HOURLY_LABOUR_CHARGE:
+                        case CTProject::HOURLY_OOH_LABOUR_CHARGE:
+                            $normalMinutes += ((float)$dsOrdlineBudget->getValue(DBEOrdline::qtyOrdered)) * 60;
+                            break;
+                    }
+                }
+            }
+
+            if ($normalMinutes > 0) {
+                $dbeProblem->setValue(DBEProblem::imLimitMinutes, $normalMinutes);
+            }
+        }
 
         $dbeProblem->insertRow();
         $reason = null;
@@ -7965,10 +8005,10 @@ is currently a balance of ';
      */
     function setProblemToFixed(
         $problemID,
-        $fixedUserID,
-        $contractCustomerItemID,
-        $rootCauseID,
-        $resolutionSummary
+        $fixedUserID = null,
+        $contractCustomerItemID = null,
+        $rootCauseID = null,
+        $resolutionSummary = null
     )
     {
         /*
@@ -7987,6 +8027,35 @@ is currently a balance of ';
         if (!$fixedUserID) {
             $fixedUserID = $this->loggedInUserID;
         }
+
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRow($fixedUserID);
+
+
+        $closingUserTeamID = $dbeUser->getValue(DBEUser::teamID);
+        $minutesToAdd = $this->dsHeader->getValue(DBEHeader::closingSRBufferMinutes);
+
+
+        switch ($closingUserTeamID) {
+            case 1:
+                $dbeProblem->setValue(
+                    DBEProblem::hdLimitMinutes,
+                    $dbeProblem->getValue(DBEProblem::hdLimitMinutes) + $minutesToAdd
+                );
+                break;
+            case 2:
+                $dbeProblem->setValue(
+                    DBEProblem::esLimitMinutes,
+                    $dbeProblem->getValue(DBEProblem::esLimitMinutes) + $minutesToAdd
+                );
+                break;
+            case 4:
+                $dbeProblem->setValue(
+                    DBEProblem::imLimitMinutes,
+                    $dbeProblem->getValue(DBEProblem::imLimitMinutes) + $minutesToAdd
+                );
+        }
+
 
         $dbeProblem->setValue(
             DBEJProblem::fixedUserID,
@@ -8326,14 +8395,20 @@ is currently a balance of ';
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($problemID);
 
+        $dbeProblem->setValue(DBEProblem::awaitingCustomerResponseFlag, 'N');
+        $dbeProblem->setValue(DBEProblem::alarmDate, null);
+        $dbeProblem->setValue(DBEProblem::alarmTime, null);
+        $dbeProblem->updateRow();
+
         $firstActivity = $this->getFirstActivityInProblem($problemID);
 
         $contactID = $firstActivity->getValue(DBECallActivity::contactID);
 
         $dbeContact = new DBEContact($this);
         $siteNo = $dbeContact->getValue(DBEContact::siteNo);
-
         $dbeCallActivity = new DBECallActivity($this);
+
+        $dbeCallActivity->setValue(DBEJCallActivity::awaitingCustomerResponseFlag, 'N');
 
         $dbeCallActivity->setValue(
             DBEJCallActivity::siteNo,
@@ -8373,6 +8448,7 @@ is currently a balance of ';
             DBEJCallActivity::userID,
             USER_SYSTEM
         );
+
         $dbeCallActivity->setValue(
             DBEJCallActivity::problemID,
             $dbeProblem->getValue(DBEProblem::problemID)
@@ -10078,7 +10154,6 @@ is currently a balance of ';
     )
     {
         $dbeJProblem = new DBEJProblem($this);
-
         $dbeJProblem->getDashBoardRows(
             $limit,
             $order,

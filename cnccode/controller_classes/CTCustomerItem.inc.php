@@ -864,7 +864,7 @@ class CTCustomerItem extends CTCNC
         $secondSiteLocationPathValidationText = null;
         if ($dsCustomerItem->getValue(DBEJCustomerItem::secondsiteLocationPath)) {
             /*
-            validate 2nd site location path
+            validate Offsite backup location path
             */
             if (!file_exists($dsCustomerItem->getValue(DBEJCustomerItem::secondsiteLocationPath))) {
                 $secondSiteLocationPathValidationText = 'Location is not available';
@@ -897,18 +897,13 @@ class CTCustomerItem extends CTCNC
             if secondsiteLocalExcludeFlag is set to exclude this server from checks then disable all secondsite input fields
             */
             if ($dsCustomerItem->getValue(DBEJCustomerItem::secondsiteLocalExcludeFlag) == 'Y') {
-
                 $secondsiteReadonly = CTCNC_HTML_READONLY;
-
                 $secondsiteDisabled = CTCNC_HTML_DISABLED;
             }
             if ($dsCustomerItem->getValue(DBECustomerItem::secondSiteReplicationExcludeFlag) == 'Y') {
-
                 $secondsiteReplicationReadonly = CTCNC_HTML_READONLY;
-
                 $secondsiteReplicationDisabled = CTCNC_HTML_DISABLED;
             }
-
         }
 
         $buUser = new BUUser($this);
@@ -1065,6 +1060,9 @@ class CTCustomerItem extends CTCNC
                 'secondsiteImageDelayDaysMessage'         => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::secondsiteImageDelayDays)
                 ),
+                'offsiteBackupDelayDisable'               => ($this->dbeUser->getValue(
+                        DBEUser::offsiteBackupAdditionalPermissionsFlag
+                    ) == 'Y') ? 'true' : 'false',
                 'secondSiteLocationPathValidationText'    => $secondSiteLocationPathValidationText,
                 'secondSiteReplicationPathValidationText' => $secondSiteReplicationPathValidationText,
                 'secondsiteLocalExcludeFlagShow'          => $secondsiteLocalExcludeFlagShow,
@@ -1081,7 +1079,6 @@ class CTCustomerItem extends CTCNC
                 "secondsiteReplicationDisabled"           => $secondsiteReplicationDisabled,
             )
         );
-
         $this->template->set_block(
             'CustomerItemDisplay',
             'secondsiteImageDelayDaysBlock',
@@ -1107,7 +1104,7 @@ class CTCustomerItem extends CTCNC
 
 
         /*
-        2nd Site Images
+        Offsite Backup Images
         */
         if ($this->getAction() != CTCUSTOMERITEM_ACT_ADD) {
 
@@ -1119,7 +1116,7 @@ class CTCustomerItem extends CTCNC
 
             $addSecondsiteImageURL =
                 Controller::buildLink(
-                    'SecondSite.php',
+                    'OffsiteBackupStatus.php',
                     array(
                         'action'         => 'add',
                         'customerItemID' => $dsCustomerItem->getValue(DBEJCustomerItem::customerItemID)
@@ -1128,7 +1125,7 @@ class CTCustomerItem extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'addSecondsiteImageText' => 'Add 2nd Site Image',
+                    'addSecondsiteImageText' => 'Add Offsite Backup Image',
                     'addSecondsiteImageUrl'  => $addSecondsiteImageURL
                 )
             );
@@ -1144,7 +1141,7 @@ class CTCustomerItem extends CTCNC
 
                 $deleteSecondsiteImageLink =
                     Controller::buildLink(
-                        'SecondSite.php',
+                        'OffsiteBackupStatus.php',
                         array(
                             'action'            => 'delete',
                             'secondsiteImageID' => $dsSecondsiteImage->getValue(DBESecondsiteImage::secondsiteImageID)
@@ -1154,7 +1151,7 @@ class CTCustomerItem extends CTCNC
 
                 $editSecondsiteImageLink =
                     Controller::buildLink(
-                        'SecondSite.php',
+                        'OffsiteBackupStatus.php',
                         array(
                             'action'            => 'edit',
                             'secondsiteImageID' => $dsSecondsiteImage->getValue(DBESecondsiteImage::secondsiteImageID)
@@ -1215,7 +1212,7 @@ class CTCustomerItem extends CTCNC
         }
 
         /*
-        end 2nd Site Images
+        end Offsite Backup Images
         */
 
         /*

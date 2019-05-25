@@ -661,7 +661,10 @@ class BUCustomerItem extends Business
         $dbeJContract->getRowsByCustomerItemID($customerItemID);
 
         while ($dbeJContract->fetchNext()) {
-            if ($dbeJContract->getValue(DBEJContract::itemTypeID) == CONFIG_2NDSITE_LOCAL_ITEMTYPEID) {
+            if (in_array(
+                $dbeJContract->getValue(DBEJContract::itemTypeID),
+                [CONFIG_2NDSITE_LOCAL_ITEMTYPEID, CONFIG_2NDSITE_CNC_ITEMTYPEID]
+            )) {
                 return true;
             }
         }

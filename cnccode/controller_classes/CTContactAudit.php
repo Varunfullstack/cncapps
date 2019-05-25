@@ -161,8 +161,7 @@ class CTContactAudit extends CTCNC
         $result = [];
 
         while ($test->fetchNext()) {
-            $row = $test->getRowAsAssocArray();
-            $result[] = $row;
+            $result[] = $test->getRowAsAssocArray();
         }
 
         return $result;

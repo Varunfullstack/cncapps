@@ -520,6 +520,7 @@ class BUProblemSLA extends Business
         $hdrs = array(
             'From'         => $senderEmail,
             'Subject'      => 'Special Attention Period Ends Soon For ' . $customer->cus_name,
+            'To'           => $toEmail,
             'Date'         => date("r"),
             'Content-Type' => 'text/html; charset=UTF-8'
         );
