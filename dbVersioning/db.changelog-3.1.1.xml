@@ -1,0 +1,20 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1558868080-0">
+        <tagDatabase tag="hotfix-3.1.1"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1558868080-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="NO">
+                SELECT `information_schema`.COLUMNS.`IS_NULLABLE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='quotation'
+                AND column_name='salutation'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint tableName="quotation" columnName="salutation" columnDataType="char(200)"/>
+    </changeSet>
+</databaseChangeLog>

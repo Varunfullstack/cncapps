@@ -176,7 +176,7 @@
         <createProcedure procedureName="getEasterDate">
             CREATE
             FUNCTION `getEasterDate`(year integer)
-            RETURNS DATE
+            RETURNS DATE deterministic
             BEGIN
             DECLARE K,M,S,A,D,R,OG,SZ,OE,OS INT;
             DECLARE EASTERDATE DATE;

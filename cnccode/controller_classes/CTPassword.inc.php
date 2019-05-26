@@ -72,7 +72,8 @@ class CTPassword extends CTCNC
             case 'list':
 
                 if (!$this->getParam('customerID')) {
-                    throw new Exception('Customer ID is not provided');
+                    $this->displayFatalError('Customer ID is not provided');
+                    exit;
                 }
                 $customerID = $this->getParam('customerID');
                 $this->displayList($customerID);

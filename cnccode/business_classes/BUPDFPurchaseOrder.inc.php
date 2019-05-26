@@ -149,10 +149,7 @@ class BUPDFPurchaseOrder extends BaseObject
     function generateFile()
     {
         $this->setMethodName('generateFile');
-        $tempFile = tempnam(
-            '/tmp',
-            'POR'
-        );            // temporary disk file
+        $tempFile = tmpfile();            // temporary disk file
         if (!$this->_buPurchaseOrder->getOrderByID(
             $this->_porheadID,
             $this->_dsPorhead,
@@ -185,10 +182,11 @@ class BUPDFPurchaseOrder extends BaseObject
             );
         }
         $this->_dbePayMethod->getRow($this->_dsPorhead->getValue(DBEPorhead::payMethodID));
+        $path = stream_get_meta_data($tempFile)['uri']; // eg: /tmp/phpFx0513a
         // initialisation
         $this->_buPDF = new BUPDF(
             $this,
-            $tempFile,
+            $path,
             'CNC accounts',
             date('d/m/Y'),
             'CNC Ltd',

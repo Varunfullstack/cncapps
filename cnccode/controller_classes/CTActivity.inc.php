@@ -5525,11 +5525,11 @@ class CTActivity extends CTCNC
             $_FILES['userfile']
         );
 
-        if ($_POST['gatherFixed']) {
+        if (@$_POST['gatherFixed']) {
             $this->redirectToFixed($this->getParam('callActivityID'));
         }
 
-        if ($_POST['edit']) {
+        if (@$_POST['edit']) {
             $this->redirectToEdit($this->getParam('callActivityID'));
             exit;
         }

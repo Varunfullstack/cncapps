@@ -1325,6 +1325,9 @@ class BUCustomer extends Business
                 DBEContact::othersFixedEmailFlag          => $this->dbeContact->getValue(
                     DBEContact::othersFixedEmailFlag
                 ),
+                DBEContact::othersClosureEmailFlag        => $this->dbeContact->getValue(
+                    DBEContact::othersClosureEmailFlag
+                )
             ];
         }
 
