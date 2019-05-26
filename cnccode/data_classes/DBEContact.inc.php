@@ -804,7 +804,7 @@ class DBEContact extends DBCNCEntity
 
         $updated = parent::updateRow();
 
-        if ($GLOBALS['auth']) {
+        if (isset($GLOBALS['auth'])) {
             $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
         } else {
             $currentLoggedInUserID = USER_SYSTEM;

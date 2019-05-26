@@ -1064,7 +1064,7 @@ class CTCurrentActivityReport extends CTCNC
             $totalActivityDurationHours = $serviceRequests->getValue(DBEJProblem::totalActivityDurationHours);
 
             $dbeCustomer = new DBECustomer($this);
-            $dbeCustomer->getRow($dsResults->getValue('customerID'));
+            $dbeCustomer->getRow($serviceRequests->getValue(DBEJProblem::customerID));
             $hideWork = $dbeCustomer->getValue(DBECustomer::referredFlag) == 'Y';
             $this->template->set_var(
 

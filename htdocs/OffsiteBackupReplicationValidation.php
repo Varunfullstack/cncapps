@@ -41,7 +41,7 @@ foreach ($buSecondsite->log as $logEntry) {
     if ($logEntry['type'] == BUSecondsite::LOG_TYPE_SUCCESS) {
         continue; // don't report successes in detail
     }
-
+    $class = null;
     switch ($logEntry['type']) {
 
         case BUSecondsite::LOG_TYPE_ERROR_INCOMPLETE:

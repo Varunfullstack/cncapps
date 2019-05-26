@@ -393,13 +393,21 @@ class BURenewal extends Business
             $row['notes'] = $dbeJRenContract->getValue(DBEJRenContract::notes);
             $row['expiryDate'] = $dbeJRenContract->getValue(DBEJRenContract::invoiceFromDate);
             $row['renewalTypeID'] = 2;
-            $row['calculatedExpiryDate'] = getExpiryDate(
-                DateTime::createFromFormat(
-                    'Y-m-d',
-                    $dbeJRenContract->getValue(DBECustomerItem::installationDate)
-                ),
-                $dbeJRenContract->getValue(DBECustomerItem::initialContractLength)
-            )->format('d/m/Y');
+
+            $installationDate = DateTime::createFromFormat(
+                'Y-m-d',
+                $dbeJRenContract->getValue(DBECustomerItem::installationDate)
+            );
+
+            if ($installationDate) {
+                $row['calculatedExpiryDate'] = getExpiryDate(
+                    $installationDate,
+                    $dbeJRenContract->getValue(
+                        DBECustomerItem::initialContractLength
+                    )
+                )->format('d/m/Y');
+            }
+
             /*
             Build list of covered items
             */

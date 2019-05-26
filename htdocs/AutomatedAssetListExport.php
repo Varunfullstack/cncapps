@@ -37,6 +37,7 @@ $labtechDB = new PDO(
 $DBEOSSupportDates = new DBEOSSupportDates($thing);
 
 $DBEOSSupportDates->getRows();
+$fakeTable = null;
 while ($DBEOSSupportDates->fetchNext()) {
     if (!$DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate)) {
         continue;
@@ -53,7 +54,7 @@ while ($DBEOSSupportDates->fetchNext()) {
         ) . "' as version, '" . $date->format('d/m/Y') . "' as endOfSupportDate";
 }
 
-if(!$fakeTable){
+if (!$fakeTable) {
     $fakeTable = "select null as endOfSupportDate, null as osName, null as version";
 }
 

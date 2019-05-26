@@ -1428,7 +1428,6 @@ class CTPurchaseOrder extends CTCNC
             header('Content-Transfer-Encoding: binary');
             header('Content-Length: ' . filesize($pdfFile));
             readfile($pdfFile);
-            unlink($pdfFile);
             $this->buPurchaseOrder->setOrderedFields(
                 $this->getParam('porheadID'),
                 $this->userID

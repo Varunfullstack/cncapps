@@ -160,7 +160,7 @@ class BUCustomerItem extends Business
                 $dsResults
             );
         } else {
-            if ($itemText{0} == '?') {  // get all customer items if ? passed in
+            if ($itemText && $itemText[0] == '?') {  // get all customer items if ? passed in
                 $itemText = null;
             }
             $this->dbeJCustomerItem->getRowsBySearchCriteria(
