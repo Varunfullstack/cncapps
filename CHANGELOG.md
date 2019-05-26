@@ -1,7 +1,13 @@
 # Changelog
 This project changes will be shown here.
 
-## [3.1.0]
+## [v3.1.1]
+### Fixed
+- Fixed issue with MySQL functions not having "characteristic" information
+
+
+
+## [v3.1.0] - 2019-05-25
 ### Added
 - Issue 519 - Windows 10 version EOL Build notifications
 - Issue 487 - Auto add time to SR when fixing and within XX minutes under budget
