@@ -413,6 +413,12 @@ class CTRenBroadband extends CTCNC
                 DBECustomer::accountName
             ) && $dsCustomer->getValue(DBECustomer::accountNumber);
 
+
+        $installationDate = DateTime::createFromFormat(
+            'Y-m-d',
+            $dsRenBroadband->getValue(DBECustomerItem::installationDate)
+        );
+
         $this->template->set_var(
             array(
                 'itemDescription'                      => Controller::htmlDisplayText(
@@ -645,13 +651,10 @@ class CTRenBroadband extends CTCNC
                 'disabled'                             => $disabled,
                 'readonly'                             => $readonly,
                 'urlEmailTo'                           => $urlEmailTo,
-                'calculatedExpiryDate'                 => getExpiryDate(
-                    DateTime::createFromFormat(
-                        'Y-m-d',
-                        $dsRenBroadband->getValue(DBECustomerItem::installationDate)
-                    ),
+                'calculatedExpiryDate'                 => $installationDate ? getExpiryDate(
+                    $installationDate,
                     $dsRenBroadband->getValue(DBECustomerItem::initialContractLength)
-                )->format('d/m/Y'),
+                )->format('d/m/Y') : null,
                 'allowDirectDebit'                     => $dsRenBroadband->getValue(
                     DBEJRenBroadband::allowDirectDebit
                 ) == 'Y' ? 'true' : 'false',

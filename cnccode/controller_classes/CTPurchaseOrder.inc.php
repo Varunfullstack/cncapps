@@ -48,7 +48,7 @@ define(
 );
 define(
     'CTPURCHASEORDER_ACT_DELETE',
-    'delete'
+    'deleteOrder'
 );
 define(
     'CTPURCHASEORDER_ACT_ADD_ORDLINE',
@@ -1325,7 +1325,6 @@ class CTPurchaseOrder extends CTCNC
             return;
         }
         $this->buPurchaseOrder->deleteOrder($this->getParam('porheadID'));
-
         $urlNext =                        // default action
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],

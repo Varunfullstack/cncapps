@@ -457,6 +457,17 @@ class CTRenContract extends CTCNC
                 DBECustomer::accountName
             ) && $dsCustomer->getValue(DBECustomer::accountNumber);
 
+        $expiryDate = null;
+        if ($installationDate = DateTime::createFromFormat(
+            'Y-m-d',
+            $dsRenContract->getValue(DBECustomerItem::installationDate)
+        )) {
+            $expiryDate = getExpiryDate(
+                $installationDate,
+                $dsRenContract->getValue(DBECustomerItem::initialContractLength)
+            )->format('d/m/Y');
+        }
+
 
         $this->template->set_var(
             array(
@@ -585,13 +596,7 @@ class CTRenContract extends CTCNC
                 'expiryDate'                         => Controller::dateYMDtoDMY(
                     $dsRenContract->getValue(DBEJRenContract::expiryDate)
                 ),
-                'calculatedExpiryDate'               => getExpiryDate(
-                    DateTime::createFromFormat(
-                        'Y-m-d',
-                        $dsRenContract->getValue(DBECustomerItem::installationDate)
-                    ),
-                    $dsRenContract->getValue(DBECustomerItem::initialContractLength)
-                )->format('d/m/Y'),
+                'calculatedExpiryDate'               => $expiryDate,
                 'expiryDateMessage'                  => Controller::htmlDisplayText(
                     $dsRenContract->getMessage(DBEJRenContract::expiryDate)
                 ),

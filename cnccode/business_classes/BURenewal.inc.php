@@ -394,19 +394,22 @@ class BURenewal extends Business
             $row['expiryDate'] = $dbeJRenContract->getValue(DBEJRenContract::invoiceFromDate);
             $row['renewalTypeID'] = 2;
 
-            $installationDate = DateTime::createFromFormat(
+
+            $expiryDate = null;
+
+            if ($installationDate = DateTime::createFromFormat(
                 'Y-m-d',
                 $dbeJRenContract->getValue(DBECustomerItem::installationDate)
-            );
-
-            if ($installationDate) {
-                $row['calculatedExpiryDate'] = getExpiryDate(
+            )) {
+                $expiryDate = getExpiryDate(
                     $installationDate,
                     $dbeJRenContract->getValue(
                         DBECustomerItem::initialContractLength
                     )
                 )->format('d/m/Y');
             }
+
+            $row['calculatedExpiryDate'] = $expiryDate;
 
             /*
             Build list of covered items
@@ -464,13 +467,22 @@ class BURenewal extends Business
             $row['expiryDate'] = $dbeJRenDomain->getValue(DBEJRenDomain::invoiceFromDate);
             $row['renewalTypeID'] = 4;
             $row['coveredItems'] = [];
-            $row['calculatedExpiryDate'] = getExpiryDate(
-                DateTime::createFromFormat(
-                    'Y-m-d',
-                    $dbeJRenDomain->getValue(DBECustomerItem::installationDate)
-                ),
-                $dbeJRenDomain->getValue(DBECustomerItem::initialContractLength)
-            )->format('d/m/Y');
+
+            $installationDate = DateTime::createFromFormat(
+                'Y-m-d',
+                $dbeJRenContract->getValue(DBECustomerItem::installationDate)
+            );
+            $calculatedExpiryDate = null;
+            if ($installationDate) {
+                $calculatedExpiryDate = getExpiryDate(
+                    $installationDate,
+                    $dbeJRenContract->getValue(
+                        DBECustomerItem::initialContractLength
+                    )
+                )->format('d/m/Y');
+            }
+            $row['calculatedExpiryDate'] = $calculatedExpiryDate;
+
 
             $returnArray[] = $row;
         }
@@ -507,13 +519,21 @@ class BURenewal extends Business
             $row['expiryDate'] = $dbeJRenBroadband->getValue(DBEJRenBroadband::invoiceFromDate);
             $row['renewalTypeID'] = 1;
             $row['coveredItems'] = [];
-            $row['calculatedExpiryDate'] = getExpiryDate(
-                DateTime::createFromFormat(
-                    'Y-m-d',
-                    $dbeJRenBroadband->getValue(DBECustomerItem::installationDate)
-                ),
-                $dbeJRenBroadband->getValue(DBECustomerItem::initialContractLength)
-            )->format('d/m/Y');
+            $installationDate = DateTime::createFromFormat(
+                'Y-m-d',
+                $dbeJRenBroadband->getValue(DBECustomerItem::installationDate)
+            );
+
+            $calculatedExpiryDate = null;
+            if ($installationDate) {
+                $calculatedExpiryDate = getExpiryDate(
+                    $installationDate,
+                    $dbeJRenBroadband->getValue(
+                        DBECustomerItem::initialContractLength
+                    )
+                )->format('d/m/Y');
+            }
+            $row['calculatedExpiryDate'] = $calculatedExpiryDate;
 
             $returnArray[] = $row;
         }
@@ -548,13 +568,21 @@ class BURenewal extends Business
             $row['expiryDate'] = $dbeJRenHosting->getValue(DBEJRenHosting::invoiceFromDate);
             $row['renewalTypeID'] = 5;
             $row['coveredItems'] = [];
-            $row['calculatedExpiryDate'] = getExpiryDate(
-                DateTime::createFromFormat(
-                    'Y-m-d',
-                    $dbeJRenHosting->getValue(DBECustomerItem::installationDate)
-                ),
-                $dbeJRenHosting->getValue(DBECustomerItem::initialContractLength)
-            )->format('d/m/Y');
+            $installationDate = DateTime::createFromFormat(
+                'Y-m-d',
+                $dbeJRenHosting->getValue(DBECustomerItem::installationDate)
+            );
+
+            $calculatedExpiryDate = null;
+            if ($installationDate) {
+                $calculatedExpiryDate = getExpiryDate(
+                    $installationDate,
+                    $dbeJRenHosting->getValue(
+                        DBECustomerItem::initialContractLength
+                    )
+                )->format('d/m/Y');
+            }
+            $row['calculatedExpiryDate'] = $calculatedExpiryDate;
             $returnArray[] = $row;
 
         }// end hosting

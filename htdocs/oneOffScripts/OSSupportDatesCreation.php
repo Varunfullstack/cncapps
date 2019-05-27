@@ -2,7 +2,7 @@
 
 require_once("../config.inc.php");
 require_once($cfg['path_dbe'] . '/DBEOSSupportDates.php');
-
+$thing = null;
 $dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
 $options = [
     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
@@ -90,7 +90,7 @@ foreach ($labtechData as $labtechDatum) {
         continue;
     }
 
-    $dbeOSSupportDates = new DBEOSSupportDates($this);
+    $dbeOSSupportDates = new DBEOSSupportDates($thing);
     $dbeOSSupportDates->setValue(DBEOSSupportDates::name, $labtechDatum['name']);
     $dbeOSSupportDates->setValue(DBEOSSupportDates::version, $version);
     $dbeOSSupportDates->setValue(DBEOSSupportDates::availabilityDate, $availabilityDate);

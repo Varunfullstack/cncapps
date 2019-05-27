@@ -748,6 +748,7 @@ class CTCustomerItem extends CTCNC
             } else {
                 $dsCustomerItem->initialise(); // form error so already have a dataset
             }
+
             $dsCustomerItem->fetchNext();
             $customerItemID = $dsCustomerItem->getValue(DBEJCustomerItem::customerItemID);
         } else {
@@ -909,8 +910,9 @@ class CTCustomerItem extends CTCNC
         $buUser = new BUUser($this);
 
         $suspendedByText = null;
+
         if (
-            $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteValidationSuspendUntilDate) &&
+            $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteSuspendedDate) &&
             $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteSuspendedByUserID)
         ) {
             $dsUser = new DataSet($this);

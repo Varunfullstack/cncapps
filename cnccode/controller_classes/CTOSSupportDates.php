@@ -31,12 +31,23 @@ class CTOSSupportDates extends CTCNC
     }
 
 
+    function delete()
+    {
+        $this->defaultAction();
+    }
+
+    function update()
+    {
+        $this->defaultAction();
+    }
+
+
     /**
      * Route to function based upon action passed
      */
     function defaultAction()
     {
-        switch ($_REQUEST['action']) {
+        switch (@$_REQUEST['action']) {
             case 'delete':
                 if (!isset($_REQUEST['id'])) {
                     http_response_code(400);

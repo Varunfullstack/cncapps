@@ -1180,7 +1180,7 @@ class BUActivity extends Business
                 $templateName = 'ServiceCompletionAlertEmail';
 
                 $completeDate = $dbeJProblem->getValue(DBEProblem::completeDate);
-
+                $fields['reason'] = $dbeFirstActivity->getValue(DBEJCallActivity::reason);
                 $fields['completeDate'] = Controller::dateYMDtoDMY($completeDate);
                 $fields['resolvedEngineerName'] = $dbeFixedUser->getValue(
                         DBEUser::firstName
