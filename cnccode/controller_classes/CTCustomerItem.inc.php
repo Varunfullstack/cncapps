@@ -910,13 +910,11 @@ class CTCustomerItem extends CTCNC
         $buUser = new BUUser($this);
 
         $suspendedByText = null;
-        var_debug($dsCustomerItem->getValue(DBEJCustomerItem::secondsiteValidationSuspendUntilDate));
 
         if (
             $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteSuspendedDate) &&
             $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteSuspendedByUserID)
         ) {
-            var_debug('we are here');
             $dsUser = new DataSet($this);
             $buUser->getUserByID(
                 $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteSuspendedByUserID),

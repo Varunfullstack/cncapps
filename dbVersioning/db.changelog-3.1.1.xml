@@ -23,5 +23,20 @@
             set sentDateTime = null
             where sentDateTime = '0000-00-00 00:00:00';
         </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1558868080-3">
+        <sql>
+            update contact
+            set supportLevel = null
+            where supportLevel = 'none'
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1558868080-4">
+        <sql>
+            update problem set pro_working_hours_calculated_to_time = null where pro_working_hours_calculated_to_time = '0000-00-00 00:00:00'
+        </sql>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>

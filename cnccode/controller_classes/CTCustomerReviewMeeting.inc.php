@@ -1201,6 +1201,9 @@ class CTCustomerReviewMeeting extends CTCNC
                 ];
             }
 
+            if ($dsSupportContact->getValue(DBEContact::supportLevel) == 'none') {
+                var_dump($dsSupportContact->getValue(DBEContact::contactID));
+            }
 
             $supportContactsCounts[$dsSupportContact->getValue(DBEContact::supportLevel)]++;
             $supportContactsCounts['total']++;

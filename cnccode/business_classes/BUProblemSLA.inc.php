@@ -121,15 +121,9 @@ class BUProblemSLA extends Business
 
         $percentageSLA = 0;
         while ($dsProblems->fetchNext()) {
-
-
             $this->dbeProblem->getRow($dsProblems->getValue(DBEProblem::problemID));
-
             $workingHours = $this->getWorkingHours($dsProblems->getValue(DBEProblem::problemID));
-
-
             $hoursToSLA = $dsProblems->getValue(DBEProblem::slaResponseHours) - $workingHours;
-
             /*
             Send an alert email to managers if within 20 minutes of SLA response hours and not priority 4 or 5
             */
@@ -686,7 +680,7 @@ class BUProblemSLA extends Business
                 }
             } else {
 
-                if ($pauseStart) {   // currently paused so record begining and end
+                if ($pauseStart) {   // currently paused so record beginning and end
 
                     $pauseArray[$pauseStart] = strtotime(
                         $this->dbeJCallActivity->getValue(
@@ -735,7 +729,7 @@ class BUProblemSLA extends Business
             $returnHours = $this->hoursCalculated;
         }
 
-        return $returnHours;
+        return round($returnHours,2);
 
     } // end of function
 
