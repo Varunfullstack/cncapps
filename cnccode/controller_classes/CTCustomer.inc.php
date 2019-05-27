@@ -3163,7 +3163,18 @@ ORDER BY cus_name ASC  ";
         /*
         List of sales orders with links. Very similar to code in CTSalesOrder
         */
-        if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) {
+        if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER && $this->dsCustomer->getValue(
+                DBECustomer::referredFlag
+            ) == 'Y') {
+
+            $ordersTemplate = new Template ($GLOBALS ["cfg"] ["path_templates"], "remove");
+            $ordersTemplate->setFile('OrdersTemplate', 'CustomerEditOrders.html');
+
+            $ordersTemplate->set_block(
+                'OrdersTemplate',
+                'orderBlock',
+                'orders'
+            );
 
             $dbeJOrdhead = new DBEJOrdhead($this);
             $dbeJOrdhead->getRowsBySearchCriteria(
@@ -3174,12 +3185,6 @@ ORDER BY cus_name ASC  ";
                 false,
                 false,
                 false
-            );
-
-            $this->template->set_block(
-                'CustomerEdit',
-                'orderBlock',
-                'orders'
             );
 
             while ($dbeJOrdhead->fetchNext()) {
@@ -3195,7 +3200,7 @@ ORDER BY cus_name ASC  ";
                         )
                     );
 
-                $this->template->set_var(
+                $ordersTemplate->set_var(
                     array(
                         'orderURL'  => $orderURL,
                         'ordheadID' => $ordheadID,
@@ -3208,13 +3213,20 @@ ORDER BY cus_name ASC  ";
                     )
                 );
 
-                $this->template->parse(
+                $ordersTemplate->parse(
                     'orders',
                     'orderBlock',
                     true
                 );
 
             }
+            $ordersTemplate->parse('output', 'OrdersTemplate');
+
+            $this->template->setVar(
+                [
+                    'orders' => $ordersTemplate->getVar('output')
+                ]
+            );
 
         }
         if ($this->dsCustomer->getValue(DBECustomer::customerID)) {
