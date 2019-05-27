@@ -410,6 +410,18 @@ class CTRenDomain extends CTCNC
 
         $this->parseInitialContractLength($dsRenDomain->getValue(DBECustomerItem::initialContractLength));
 
+        $expiryDate = null;
+        if ($installationDate = DateTime::createFromFormat(
+            'Y-m-d',
+            $dsRenDomain->getValue(DBECustomerItem::installationDate)
+        )) {
+            $expiryDate = getExpiryDate(
+                $installationDate,
+                $dsRenDomain->getValue(DBECustomerItem::initialContractLength)
+            )->format('d/m/Y');
+        }
+
+
         $this->template->set_var(
             array(
                 'pricePerMonth'                      => $pricePerMonth,
@@ -466,13 +478,7 @@ class CTRenDomain extends CTCNC
                 'internalNotes'                      => Controller::htmlTextArea(
                     $dsRenDomain->getValue(DBEJCustomerItem::internalNotes)
                 ),
-                'calculatedExpiryDate'               => getExpiryDate(
-                    DateTime::createFromFormat(
-                        'Y-m-d',
-                        $dsRenDomain->getValue(DBECustomerItem::installationDate)
-                    ),
-                    $dsRenDomain->getValue(DBECustomerItem::initialContractLength)
-                )->format('d/m/Y'),
+                'calculatedExpiryDate'               => $expiryDate,
 
             )
         );

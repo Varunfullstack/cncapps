@@ -184,6 +184,7 @@ class BUCustomerItem extends Business
     )
     {
         $this->setMethodName('getCustomerItemByID');
+        $this->dbeJCustomerItem->setShowSQLOn();
         $this->dbeJCustomerItem->getRow($ID);
         $this->getData(
             $this->dbeJCustomerItem,

@@ -430,6 +430,16 @@ class CTRenHosting extends CTCNC
                 DBECustomer::accountName
             ) && $dsCustomer->getValue(DBECustomer::accountNumber);
 
+        $expiryDate = null;
+        if ($installationDate = DateTime::createFromFormat(
+            'Y-m-d',
+            $dsRenHosting->getValue(DBECustomerItem::installationDate)
+        )) {
+            $expiryDate = getExpiryDate(
+                $installationDate,
+                $dsRenHosting->getValue(DBECustomerItem::initialContractLength)
+            )->format('d/m/Y');
+        }
 
         $this->template->set_var(
             array(
@@ -536,13 +546,7 @@ class CTRenHosting extends CTCNC
                 'internalNotes'                      => Controller::htmlTextArea(
                     $dsRenHosting->getValue(DBEJRenHosting::internalNotes)
                 ),
-                'calculatedExpiryDate'               => getExpiryDate(
-                    DateTime::createFromFormat(
-                        'Y-m-d',
-                        $dsRenHosting->getValue(DBECustomerItem::installationDate)
-                    ),
-                    $dsRenHosting->getValue(DBECustomerItem::initialContractLength)
-                )->format('d/m/Y'),
+                'calculatedExpiryDate'               => $expiryDate,
                 "allowDirectDebit"                   => $dsRenHosting->getValue(
                     DBEJRenHosting::allowDirectDebit
                 ) == 'Y' ? 'true' : 'false',

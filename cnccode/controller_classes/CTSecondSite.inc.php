@@ -560,7 +560,6 @@ class CTSecondSite extends CTCNC
     function run()
     {
         $this->buSecondsite->validateBackups($this->getParam('customerItemID'));
-
         $urlNext =
             Controller::buildLink(
                 'OffsiteBackupStatus.php',

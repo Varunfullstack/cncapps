@@ -2180,7 +2180,7 @@ class CTSalesOrder extends CTCNC
 
                             if ($sentDateTime = strtotime($this->dsQuotation->getValue(DBEQuotation::sentDateTime))) {
                                 $quoteSentDateTime = date(
-                                    "j/n/Y H:i:s",
+                                    "d/m/Y H:i:s",
                                     $sentDateTime
                                 );
                             }

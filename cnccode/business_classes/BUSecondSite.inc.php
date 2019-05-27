@@ -107,7 +107,6 @@ class BUSecondsite extends Business
             $error = false;
             $networkPath = false;
             $excludeFromChecks = false;
-
             $isSuspended = $this->isSuspended($server);
             $images = [];
             $timeToLookFrom = null;
@@ -219,7 +218,6 @@ class BUSecondsite extends Business
                     }
 
                     if (strlen($image['imageName']) == 1) {
-
                         $pattern = '/' . $server['serverName'] . '_' . $image['imageName'];
                     } else {
                         $pattern = '/' . $image['imageName'];
@@ -260,15 +258,8 @@ class BUSecondsite extends Business
                             );
                         }
                     } else {
-                        /*
-                        Got some matched patterns. Ensure one is up-to-date
-                        */
-                        $currentFileFound = false;
-
                         $mostRecentFileName = false;
-
                         $mostRecentFileTime = 0;
-
                         foreach ($matchedFiles as $file) {
                             $fileModifyTime = filemtime($file);
 
@@ -277,7 +268,7 @@ class BUSecondsite extends Business
                                 $mostRecentFileName = $file;
                             }
                         }
-                        if (!$mostRecentFileTime >= $timeToLookFrom) {
+                        if ($mostRecentFileTime < $timeToLookFrom) {
 
                             $allServerImagesPassed = false;
                             if (!$isSuspended) {
@@ -314,12 +305,10 @@ class BUSecondsite extends Business
                             );
 
                         } else {
-
                             $imageAgeDays = number_format(
                                 (time() - $mostRecentFileTime) / 86400,
                                 0
                             );
-
                             if ($imageAgeDays < 0) {
                                 $this->imageErrorCount++;
                                 $errorMessage = $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': Image is OUT-OF-DATE: ' . $mostRecentFileName . ' ' . DATE(
@@ -345,7 +334,6 @@ class BUSecondsite extends Business
                                 if (!$isSuspended) {
                                     $this->imagePassesCount++;
                                 }
-
 
                                 /*
                                 Passed all verification checks.
@@ -467,30 +455,27 @@ class BUSecondsite extends Business
 
     function isSuspended($server)
     {
+
         if (
-            $server['secondsiteValidationSuspendUntilDate'] &&
-            $server['secondsiteValidationSuspendUntilDate'] > date('Y-m-d')
+            !($server['secondsiteValidationSuspendUntilDate']) || $server['secondsiteValidationSuspendUntilDate'] <= date(
+                'Y-m-d'
+            )
         ) {
-
-            $message = 'Image validation suspended until ' . $server['secondsiteValidationSuspendUntilDate'];
-            $this->logMessage(
-                $server['cus_name'] . ' ' . $server['serverName'] . ' ' . $message,
-                self::LOG_TYPE_SUSPENDED
-            );
-
-            $this->suspendedCheckServers[] = $server;
-
-            $this->setImageStatusByServer(
-                $server['server_cuino'],
-                self::STATUS_SUSPENDED
-            );
-
-            $ret = true;
-        } else {
-            $ret = false;
+            return false;
         }
-        return $ret;
+        $message = 'Image validation suspended until ' . $server['secondsiteValidationSuspendUntilDate'];
+        $this->logMessage(
+            $server['cus_name'] . ' ' . $server['serverName'] . ' ' . $message,
+            self::LOG_TYPE_SUSPENDED
+        );
+        $this->suspendedCheckServers[] = $server;
 
+        $this->setImageStatusByServer(
+            $server['server_cuino'],
+            self::STATUS_SUSPENDED
+        );
+
+        return true;
     }
 
     function resetSuspendedUntilDate($cuino)
@@ -499,7 +484,9 @@ class BUSecondsite extends Business
             "UPDATE
     custitem 
     SET
-    secondsiteValidationSuspendUntilDate = NULL
+    secondsiteValidationSuspendUntilDate = NULL,
+        secondsiteSuspendedByUserID = null,
+        secondsiteSuspendedDate = null
     WHERE
     cui_cuino = $cuino";
 
@@ -641,27 +628,30 @@ class BUSecondsite extends Business
         imageTime = ?
       WHERE
         secondSiteImageID = ?";
-/** @var dbSweetcode $db */
+        /** @var dbSweetcode $db */
         $db = $GLOBALS['db'];
 
-        $db->preparedQuery($queryString, [
+        $db->preparedQuery(
+            $queryString,
             [
-                'type' => "s",
-                'value' => $status
-            ],
-            [
-                'type' => "s",
-                'value' => $imagePath
-            ],
-            [
-                'type' => "s",
-                'value' => $imageTime
-            ],
-            [
-                'type' => "i",
-                'value' => $secondSiteImageID
-            ],
-        ]);
+                [
+                    'type'  => "s",
+                    'value' => $status
+                ],
+                [
+                    'type'  => "s",
+                    'value' => $imagePath
+                ],
+                [
+                    'type'  => "s",
+                    'value' => $imageTime
+                ],
+                [
+                    'type'  => "i",
+                    'value' => $secondSiteImageID
+                ],
+            ]
+        );
     }
 
     function setImageStatusByServer($customerItemID,
@@ -751,7 +741,6 @@ class BUSecondsite extends Business
         $queryString .= " ORDER BY c.cus_name, serverName";
 
         $db = $GLOBALS['db'];
-
         $db->query($queryString);
 
         $servers = array();

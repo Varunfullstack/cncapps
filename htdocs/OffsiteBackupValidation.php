@@ -11,12 +11,14 @@ GLOBAL $cfg;
 require_once($cfg['path_bu'] . '/BUSecondsite.inc.php');
 $thing = null;
 $testRun = !!@$_REQUEST['testRun'];
+$customerItemID = @$_REQUEST['customerItemID'];
 $buSecondsite = new BUSecondsite($thing);
 
 set_time_limit(0); // unlimited execution time
 
+
 $buSecondsite->validateBackups(
-    null,
+    $customerItemID,
     $testRun
 );
 
