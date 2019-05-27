@@ -2177,10 +2177,14 @@ class CTSalesOrder extends CTCNC
                                 ) == 'pdf' && $this->dsQuotation->getValue(DBEQuotation::documentType) == 'quotation') {
                                 $txtReminder = "Send Reminder";
                             }
-                            $quoteSentDateTime = date(
-                                "j/n/Y H:i:s",
-                                strtotime($this->dsQuotation->getValue(DBEQuotation::sentDateTime))
-                            );
+
+                            if ($sentDateTime = strtotime($this->dsQuotation->getValue(DBEQuotation::sentDateTime))) {
+                                $quoteSentDateTime = date(
+                                    "j/n/Y H:i:s",
+                                    $sentDateTime
+                                );
+                            }
+
                         }
                     }
 

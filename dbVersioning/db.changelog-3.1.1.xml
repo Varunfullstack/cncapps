@@ -17,4 +17,11 @@
         </preConditions>
         <dropNotNullConstraint tableName="quotation" columnName="salutation" columnDataType="char(200)"/>
     </changeSet>
+    <changeSet author="pavwebdev" id="1558868080-2">
+        <sql>
+            update quotation
+            set sentDateTime = null
+            where sentDateTime = '0000-00-00 00:00:00';
+        </sql>
+    </changeSet>
 </databaseChangeLog>
