@@ -286,11 +286,8 @@ class DBEJProblem extends DBEProblem
               WHERE ca.caa_problemno = pro_problemno
               AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             )
-        
         WHERE pro_status IN ( 'I', 'P' )
-        
           AND CONCAT( pro_alarm_date, ' ', coalesce(pro_alarm_time, '00:00:00') )  > NOW()
-      
       ORDER BY pro_alarm_date, pro_alarm_time";
         $this->setQueryString($sql);
 
