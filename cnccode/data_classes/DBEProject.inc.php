@@ -198,7 +198,7 @@ FROM
   LEFT JOIN consultant engineer ON project.consultantID = engineer.cns_consno
   JOIN customer 
     ON cus_custno = project.customerID
-  LEFT JOIN (SELECT * FROM (SELECT  * FROM projectUpdates ORDER BY createdAt DESC) reOrderedProjectUpdates GROUP BY projectID) pu ON pu.projectID = project.`projectID`
+  LEFT JOIN projectUpdates pu on pu.`projectID` = project.`projectID` and  pu.`id` = (select max(a.id) from projectUpdates a where a.projectID = project.`projectID`)
 WHERE expiryDate >= NOW() OR expiryDate IS NULL
 ORDER BY customerName ASC";
 
