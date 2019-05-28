@@ -318,7 +318,7 @@ class CTCurrentActivityReport extends CTCNC
 
         $this->buActivity->allocateUserToRequest(
             $this->getParam('problemID'),
-            $this->getParam('userID'),
+            $this->getParam('userID') == 0 ? null : $this->getParam('userID'),
             $dbeUser
         );
 
@@ -845,7 +845,6 @@ class CTCurrentActivityReport extends CTCNC
                 $queueNo,
                 $serviceRequests
             );
-
         }
 
         $queueOptions = [
@@ -889,15 +888,13 @@ class CTCurrentActivityReport extends CTCNC
                 continue;
             }
 
-            if (
-                ($this->getSessionParam('selectedUserID') && $this->getSessionParam(
-                        'selectedUserID'
-                    ) != $serviceRequests->getValue(
-                        DBEJProblem::userID
-                    )) AND
-
-                $serviceRequests->getValue(DBEJProblem::userID) != '0'        // always show Unallocated
-            ) {
+            if ($this->getSessionParam('selectedUserID') &&
+                $serviceRequests->getValue(DBEJProblem::userID) &&
+                $this->getSessionParam(
+                    'selectedUserID'
+                ) != $serviceRequests->getValue(
+                    DBEJProblem::userID
+                )) {
                 continue;
             }
 
