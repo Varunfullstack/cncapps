@@ -5504,19 +5504,20 @@ class CTActivity extends CTCNC
         if (!$this->getParam('uploadDescription')) {
             $this->setFormErrorMessage('Please enter a description');
         }
-        if (!$_FILES['userfile']['name']) {
+
+        if (!@$_FILES['userfile']['name']) {
             $this->setFormErrorMessage('Please enter a file path');
         }
         if (!is_uploaded_file($_FILES['userfile']['tmp_name'])) {
             $this->setFormErrorMessage('Document not loaded - is it bigger than 6 MBytes?');
         }
         if ($this->formError) {
-            if ($_POST['gatherFixed']) {
+            if (@$_POST['gatherFixed']) {
 
                 $this->redirectToFixed($this->getParam('callActivityID'));
             }
 
-            if ($_POST['edit']) {
+            if (@$_POST['edit']) {
                 $this->editActivity();
                 exit;
             }
@@ -5527,7 +5528,7 @@ class CTActivity extends CTCNC
         $this->buActivity->uploadDocumentFile(
             $this->getParam('problemID'),
             $this->getParam('uploadDescription'),
-            $_FILES['userfile']
+            @$_FILES['userfile']
         );
 
         if (@$_POST['gatherFixed']) {

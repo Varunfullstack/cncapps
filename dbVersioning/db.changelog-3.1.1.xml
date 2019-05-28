@@ -35,8 +35,22 @@
     </changeSet>
     <changeSet author="pavwebdev" id="1558868080-4">
         <sql>
-            update problem set pro_working_hours_calculated_to_time = null where pro_working_hours_calculated_to_time = '0000-00-00 00:00:00'
+            update problem
+            set pro_working_hours_calculated_to_time = null
+            where pro_working_hours_calculated_to_time = '0000-00-00 00:00:00'
         </sql>
         <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1558868080-5">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT `information_schema`.COLUMNS.`COLUMN_TYPE` = 'varchar(50)'
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='calldocument'
+                AND column_name='description'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="calldocument" columnName="description" newDataType="varchar(150)"/>
     </changeSet>
 </databaseChangeLog>

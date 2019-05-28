@@ -5358,7 +5358,7 @@ is currently a balance of ';
      */
     function uploadDocumentFile($problemID,
                                 $description,
-                                &$userfile
+                                $userfile
     )
     {
         $this->setMethodName('uploadDocumentFile');
@@ -5393,6 +5393,15 @@ is currently a balance of ';
             DBEJCallDocument::problemID,
             $problemID
         );
+
+        if (strlen($fileName) > 100) {
+            $fileName = substr($fileName, -100);
+        }
+
+        if (strlen($description) > 149) {
+            $description = substr($description, 0, 149);
+        }
+
         $dbeCallDocument->setValue(
             DBEJCallDocument::file,
             fread(
@@ -8420,6 +8429,7 @@ is currently a balance of ';
         $contactID = $firstActivity->getValue(DBECallActivity::contactID);
 
         $dbeContact = new DBEContact($this);
+        $dbeContact->getRow($contactID);
         $siteNo = $dbeContact->getValue(DBEContact::siteNo);
         $dbeCallActivity = new DBECallActivity($this);
 

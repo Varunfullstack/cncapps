@@ -1331,11 +1331,9 @@ class CTSalesOrder extends CTCNC
     than non-value fields.
     */
         if (!$this->hasPermissions(PHPLIB_PERM_SALES)) {
-
             $restrictedView = CTCNC_HTML_DISABLED;
             $readOnly = CTCNC_HTML_DISABLED;
             $valuesDisabled = CTCNC_HTML_DISABLED;
-
         } else {
 
             $restrictedView = null;
@@ -2062,6 +2060,13 @@ class CTSalesOrder extends CTCNC
 
         if (!$restrictedView) {
 
+            $uploadQuoteDocURL =
+                $this->buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => CTSALESORDER_ACT_UPLOAD_QUOTE_DOC
+                    )
+                );
             $this->template->set_var(
                 array(
                     'urlSubmitOrderLines' => $urlSubmitOrderLines
