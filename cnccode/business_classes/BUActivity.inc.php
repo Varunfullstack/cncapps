@@ -5398,8 +5398,8 @@ is currently a balance of ';
             $fileName = substr($fileName, -100);
         }
 
-        if (strlen($description) > 149) {
-            $description = substr($description, 0, 149);
+        if (strlen($description) > 150) {
+            $description = substr($description, 0, 150);
         }
 
         $dbeCallDocument->setValue(

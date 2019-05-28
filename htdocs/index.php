@@ -1,15 +1,15 @@
 <?php
 require_once("config.inc.php");
 require_once($cfg["path_ct"] . "/CTHome.inc.php");
-/*
-if ( $_REQUEST[ 'action' ] == 'logout' ){
-  $sessionClass = PHPLIB_CLASSNAME_SESSION;
-  $sess = new $sessionClass;
-  $sess->delete();
-  header( 'Location:');
-  exit;
-}
-*/
+
+//if ($_REQUEST['action'] == 'logout') {
+//    $sessionClass = PHPLIB_CLASSNAME_SESSION;
+//    $sess = new $sessionClass;
+//    $sess->delete();
+//    header('Location:');
+//    exit;
+//}
+
 
 session_start();
 page_open(

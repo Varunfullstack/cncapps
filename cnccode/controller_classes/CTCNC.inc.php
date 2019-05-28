@@ -513,7 +513,7 @@ class CTCNC extends Controller
 
         self::getDbeUser();
 
-        switch ($this->getAction()) {
+        switch ($this->getParam('action')) {
             case CTCNC_ACT_LOGOUT :
                 $this->logout();
                 break;
@@ -609,7 +609,8 @@ class CTCNC extends Controller
         return ($flag == 'N' ? null : CT_CHECKED);
     }
 
-    protected function isAppraiser()
+    protected
+    function isAppraiser()
     {
         return $this->dbeUser->getValue(DBEUser::staffAppraiserFlag) == 'Y';
     }
