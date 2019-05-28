@@ -1386,14 +1386,14 @@ class CTActivity extends CTCNC
         if (
             $dsCallActivity->getValue(DBEJCallActivity::travelFlag) == 'Y' &&
             strstr(
-                $_SERVER['HTTP_REFERER'],
+                @$_SERVER['HTTP_REFERER'],
                 'search'
             )
         ) {
             $_SESSION['includeTravel'] = 1;
         } else {
             if (isset($_REQUEST['toggleIncludeTravel'])) {
-                $_SESSION['includeTravel'] = !$_SESSION['includeTravel'];
+                $_SESSION['includeTravel'] = !@$_SESSION['includeTravel'];
             }
         }
 
@@ -1403,7 +1403,7 @@ class CTActivity extends CTCNC
             $_SESSION['includeOperationalTasks'] = 1;
         } else {
             if (isset($_REQUEST['toggleIncludeOperationalTasks'])) {
-                $_SESSION['includeOperationalTasks'] = !$_SESSION['includeOperationalTasks'];
+                $_SESSION['includeOperationalTasks'] = !@$_SESSION['includeOperationalTasks'];
             }
         }
 
@@ -1418,7 +1418,7 @@ class CTActivity extends CTCNC
             @$_SESSION['includeServerGuardUpdates'] = 1;
         } else {
             if (isset($_REQUEST['toggleIncludeServerGuardUpdates'])) {
-                $_SESSION['includeServerGuardUpdates'] = !$_SESSION['includeServerGuardUpdates'];
+                $_SESSION['includeServerGuardUpdates'] = !@$_SESSION['includeServerGuardUpdates'];
             }
         }
 
