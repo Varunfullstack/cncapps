@@ -7468,11 +7468,12 @@ is currently a balance of ';
                     $filePath,
                     filesize($filePath),
                     'Imported',
-                    $filePath,
+                    basename($filePath),
                     $attachmentMimeType
                 );
 
                 fclose($handle);
+                unlink($filePath);
             } else {
                 $errorString = 'Failed to import attachment file ' . $filePath . '<BR/>';
                 echo $errorString;

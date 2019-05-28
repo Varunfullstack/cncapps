@@ -54,8 +54,6 @@ class BUImportRequests extends Business
         $toDelete = [];
         /** @var \CNCLTD\AutomatedRequest $automatedRequest */
         while ($automatedRequest = $db->nextObjectRecord(\CNCLTD\AutomatedRequest::class)) {
-
-
             echo 'Start processing ' . $automatedRequest->getAutomatedRequestID() . "<BR/>";
 
             echo '<br>Description: ';
