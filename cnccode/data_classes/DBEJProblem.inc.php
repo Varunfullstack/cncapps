@@ -289,10 +289,9 @@ class DBEJProblem extends DBEProblem
         
         WHERE pro_status IN ( 'I', 'P' )
         
-          AND CONCAT( pro_alarm_date, ' ', pro_alarm_time )  > NOW()
+          AND CONCAT( pro_alarm_date, ' ', coalesce(pro_alarm_time, '00:00:00') )  > NOW()
       
       ORDER BY pro_alarm_date, pro_alarm_time";
-
         $this->setQueryString($sql);
 
         return (parent::getRows());
