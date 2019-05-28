@@ -5208,7 +5208,6 @@ class CTActivity extends CTCNC
                 CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID,
                 $customerProblem['cpr_contno'],
                 $customerProblem['cpr_reason'],
-
                 false,
                 true
             );

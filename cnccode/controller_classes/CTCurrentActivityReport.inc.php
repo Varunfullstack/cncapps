@@ -318,7 +318,7 @@ class CTCurrentActivityReport extends CTCNC
 
         $this->buActivity->allocateUserToRequest(
             $this->getParam('problemID'),
-            $this->getParam('userID'),
+            $this->getParam('userID') == 0 ? null : $this->getParam('userID'),
             $dbeUser
         );
 
