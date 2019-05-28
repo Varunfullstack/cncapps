@@ -96,6 +96,7 @@ class BUPDF extends BaseObject
 //        $this->pdf->AddFont('DejaVu', '', 'DejaVuSansCondensed.ttf');
 //        $this->pdf->SetFont('DejaVu', '', 14);
         $this->setFilename($filename);        // Disk file to be created
+
 //        $this->open();
         $this->setInfo(
             "Author",

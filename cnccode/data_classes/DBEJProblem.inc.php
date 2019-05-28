@@ -327,7 +327,7 @@ class DBEJProblem extends DBEProblem
         
           AND ( " . $this->getDBColumnName(self::alarmDate) . " is null or CONCAT( " . $this->getDBColumnName(
                 self::alarmDate
-            ) . " , ' ' , " . $this->getDBColumnName(self::alarmTime) . " ) <= NOW() )";
+            ) . " , ' ' , coalesce(" . $this->getDBColumnName(self::alarmTime) . ", '00:00:00') ) <= NOW() )";
 
         if ($unassignedOnly) {
             $sql .= " AND pro_consno is null";
@@ -336,7 +336,9 @@ class DBEJProblem extends DBEProblem
             $sql .= " AND pro_consno is not null";
         }
 
-
+        if ($queueNo == 1) {
+            var_dump($sql);
+        }
         $this->setQueryString($sql);
 
         return (parent::getRows());

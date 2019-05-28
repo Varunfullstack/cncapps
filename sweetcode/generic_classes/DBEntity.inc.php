@@ -858,6 +858,10 @@ class DBEntity extends DataAccess
         $this->setMethodName('getValue');
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
+            if (!$this->db->Record) {
+                return null;
+            }
+
             if (!key_exists($ixColumn, $this->db->Record)) {
                 return $this->getDefaultValue($ixColumn);
             }

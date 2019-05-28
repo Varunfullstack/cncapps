@@ -144,7 +144,7 @@ class BUPDFPurchaseOrder extends BaseObject
      * Use the parameters passed in constructor to get list of invoices and generate a PDF file on
      * disk.
      * If no invoices are found then return FALSE
-     * @return String PDF disk file name or FALSE
+     * @return bool|resource PDF disk file name or FALSE
      */
     function generateFile()
     {

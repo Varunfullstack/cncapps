@@ -6042,6 +6042,7 @@ is currently a balance of ';
     {
         $dbeJProblem = new DBEJProblem($this);
 
+
         $dbeJProblem->getRowsByQueueNo(
             $queueNo,
             true
@@ -9407,6 +9408,7 @@ is currently a balance of ';
           pro_consno";
         $ret = [];
         $db->query($sql);
+        var_dump($sql);
         while ($db->next_record()) {
             $ret[] = $db->Record;
         }
