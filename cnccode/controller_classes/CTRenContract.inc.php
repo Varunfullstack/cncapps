@@ -801,7 +801,7 @@ class CTRenContract extends CTCNC
             $this->template->set_var(
                 array(
                     'renewalStatusSelected'    => $renewalStatusSelected,
-                    'renewalStatus'            => $key,
+                    'renewalStatusValue'       => $key,
                     'renewalStatusDescription' => $value
                 )
             );
