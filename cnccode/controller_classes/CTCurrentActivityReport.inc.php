@@ -1059,16 +1059,6 @@ class CTCurrentActivityReport extends CTCNC
                 1
             );
 
-            if ($dbeProblem->getValue(DBEProblem::problemID) == 548717) {
-                echo '<h1>';
-                var_dump($serviceRequests->getValue(DBEJProblem::workingHours));
-                var_dump(
-                    $serviceRequests->getValue(
-                        DBEJProblem::slaResponseHours
-                    )
-                );
-                echo '</h1>';
-            }
             $totalActivityDurationHours = $serviceRequests->getValue(DBEJProblem::totalActivityDurationHours);
 
             $dbeCustomer = new DBECustomer($this);
