@@ -4008,6 +4008,7 @@ class CTActivity extends CTCNC
       */
         $initial_disabled = null;
         $canChangeInitialDateAndTime = true;
+        $hiddenActivityType = null;
         if (
         in_array(
             $dsCallActivity->getValue(DBEJCallActivity::callActTypeID),
@@ -4019,6 +4020,9 @@ class CTActivity extends CTCNC
         ) {
             if (!$this->hasPermissions(PHPLIB_PERM_MAINTENANCE)) {
                 $initial_disabled = CTCNC_HTML_DISABLED;
+                $hiddenActivityType = " <input type=\"hidden\" name=\"callActivity[1][callActTypeID]\" value=\"" . $dsCallActivity->getValue(
+                        DBEJCallActivity::callActTypeID
+                    ) . "\">";
             }
 
 
@@ -4137,10 +4141,8 @@ class CTActivity extends CTCNC
 
         if ($dsCallActivity->getValue(DBEJCallActivity::onSiteFlag) == 'Y') {
             $onSiteFlag = 'Y';
-
         } else {
             $onSiteFlag = 'N';
-
         }
 
         if (isset($_FILES['userfile']) && $_FILES['userfile']['name']) {
@@ -4218,6 +4220,7 @@ class CTActivity extends CTCNC
                 'hiddenCallActTypeID'          => $dsCallActivity->getValue(DBEJCallActivity::callActTypeID),
                 'hiddenPriority'               => $dsCallActivity->getValue(DBEJCallActivity::priority),
                 'hiddenContractCustomerItemID' => $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID),
+                'hiddenActivityType'           => $hiddenActivityType,
                 'customerDetails'              => $customerDetails,
                 'contactPhone'                 => $buCustomer->getContactPhoneForHtml(
                     $dsCallActivity->getValue(DBEJCallActivity::contactID)
@@ -4678,9 +4681,12 @@ class CTActivity extends CTCNC
         );
         $dsCallActivity->post();
         $dbeCallActType = new DBEJCallActType($this);
-        if ($dsCallActivity->getValue(DBEJCallActivity::callActTypeID) == 0 || !$dsCallActivity->getValue(
-                DBEJCallActivity::callActTypeID
-            )) {
+
+
+        if (!$dsCallActivity->getValue(
+            DBEJCallActivity::callActTypeID
+        )) {
+
             $this->formError = true;
             $this->dsCallActivity->setMessage(
                 DBEJCallActivity::callActTypeID,
