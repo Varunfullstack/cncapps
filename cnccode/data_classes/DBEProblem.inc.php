@@ -104,7 +104,7 @@ class DBEProblem extends DBEntity
         );
         $this->addColumn(
             self::dateRaised,
-            DA_DATE,
+            DA_DATETIME,
             DA_ALLOW_NULL,
             "pro_date_raised"
         );

@@ -131,7 +131,7 @@ class BUProblemSLA extends Business
                 $hoursToSLA <= .3 &&                    // within one third of time to SLA
 
                 $this->dbeProblem->getValue(DBEProblem::sentSlaAlertFlag) == 'N' &&          // hasn't already been sent
-                $this->dbeProblem->getValue(DBEProblem::userID) != '' &&                     // is asssigned
+                $this->dbeProblem->getValue(DBEProblem::userID) != null &&                     // is asssigned
                 $this->dbeProblem->getValue(DBEProblem::userID) != USER_SYSTEM &&
                 $dsProblems->getValue(DBEProblem::priority) < 5
 

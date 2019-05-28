@@ -1678,11 +1678,17 @@ class BUActivity extends Business
 
         // if amended initial call activity date/time then set the problem date raised field to match
         if ($dsCallActivity->getValue(DBEJCallActivity::callActTypeID) == CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
+            var_dump(
+                $dsCallActivity->getValue(DBEJCallActivity::date),
+                $dsCallActivity->getValue(
+                    DBEJCallActivity::startTime
+                )
+            );
             $dbeProblem->setValue(
                 DBEJProblem::dateRaised,
                 $dsCallActivity->getValue(DBEJCallActivity::date) . ' ' . $dsCallActivity->getValue(
                     DBEJCallActivity::startTime
-                )
+                ) . ':00'
             );
         }
 
@@ -9218,7 +9224,7 @@ is currently a balance of ';
 
             $dbeCallActivity->setValue(
                 DBEJCallActivity::callActivityID,
-                0
+                null
             );
             $dbeCallActivity->setValue(
                 DBEJCallActivity::siteNo,
