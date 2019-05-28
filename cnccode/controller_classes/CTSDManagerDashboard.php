@@ -37,16 +37,16 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 $options = [];
 
 
-                if($this->getSessionParam('HD')) {
+                if ($this->getSessionParam('HD')) {
                     $options['HD'] = true;
                 }
-                if($this->getSessionParam('ES')) {
+                if ($this->getSessionParam('ES')) {
                     $options['ES'] = true;
                 }
-                if($this->getSessionParam('IM')) {
+                if ($this->getSessionParam('IM')) {
                     $options['IM'] = true;
                 }
-                if($this->getSessionParam('p5')) {
+                if ($this->getSessionParam('p5')) {
                     $options['p5'] = true;
                 }
 
@@ -64,11 +64,10 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
     function display()
     {
 
-        $isP5 = $this->getParam('showP5');
-
-        $showHelpDesk = $this->getParam('HD');
-        $showEscalation = $this->getParam('ES');
-        $showImplementation = $this->getParam('IM');
+        $isP5 = isset($_REQUEST['showP5']);
+        $showHelpDesk = isset($_REQUEST['HD']);
+        $showEscalation = isset($_REQUEST['ES']);
+        $showImplementation = isset($_REQUEST['IM']);
         $this->setSessionParam('HD', $showHelpDesk);
         $this->setSessionParam('ES', $showEscalation);
         $this->setSessionParam('IM', $showImplementation);
@@ -79,7 +78,6 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $this->setTemplateFiles(
             array('SDManagerDashboard' => 'SDManagerDashboard')
         );
-
         $buProblem = new BUActivity($this);
         $problems = new DataSet($this);
         $limit = 10;
@@ -92,12 +90,10 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $showEscalation,
             $showImplementation
         );
-
         $shortestSLARemaining = $this->renderQueue(
             $problems,
             'Shortest_SLA_Remaining'
         );
-
 
         $buProblem->getSDDashBoardData(
             $problems,
@@ -264,10 +260,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             'page',
             $templateName
         );
-
-
         $blockName = 'queue' . $name . 'Block';
-
         $template->set_block(
             'page',
             $blockName,
@@ -451,7 +444,6 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             'OUTPUT',
             'page'
         );
-
         return $template->getVar('OUTPUT');
 
     } // end render queue
