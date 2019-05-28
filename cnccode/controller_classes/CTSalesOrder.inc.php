@@ -4742,7 +4742,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
                     $buActivity->createSalesServiceRequest(
                         $this->getOrdheadID(),
                         $dsInput,
-                        $_SESSION['selectedOrderLine']
+                        @$_SESSION['selectedOrderLine']
                     );
                     unset($_SESSION['selectedOrderLine']);
                 } else {

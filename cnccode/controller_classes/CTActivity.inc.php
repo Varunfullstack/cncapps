@@ -1411,7 +1411,7 @@ class CTActivity extends CTCNC
         if (
             $dsCallActivity->getValue(DBEJCallActivity::callActTypeID) == CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID &&
             strstr(
-                $_SERVER['HTTP_REFERER'],
+                @$_SERVER['HTTP_REFERER'],
                 'search'
             )
         ) {
