@@ -368,7 +368,6 @@ ORDER BY user_time_log.`loggedDate` DESC
         ";
 
         $db->query($query);
-
         $rows = [];
         while ($db->next_record(1)) {
             $rows[] = $db->Record;
