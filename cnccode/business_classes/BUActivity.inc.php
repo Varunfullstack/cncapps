@@ -5630,40 +5630,34 @@ is currently a balance of ';
 
         }
 
-        if (!$navigateLinksArray ['next']) {
-
+        if (!@$navigateLinksArray ['next']) {
             $navigateLinksArray ['last'] = false;
-
         }
 
         if ($thisID !== $callActivityID) {
-
             $navigateLinksArray ['last'] = $thisID;
-
         }
 
-        if ($callActivityID == $navigateLinksArray ['first']) {
+        if ($callActivityID == @$navigateLinksArray ['first']) {
 
             $navigateLinksArray ['first'] = false;
 
         }
 
-        if ($navigateLinksArray ['next'] == $navigateLinksArray ['last']) {
+        if (@$navigateLinksArray ['next'] == @$navigateLinksArray ['last']) {
 
             $navigateLinksArray ['next'] = false;
 
         }
 
-        if ($navigateLinksArray ['first'] == $navigateLinksArray ['previous']) {
+        if (@$navigateLinksArray ['first'] == @$navigateLinksArray ['previous']) {
 
             $navigateLinksArray ['previous'] = false;
 
         }
 
-        if (!$navigateLinksArray ['thisRowNumber']) {
-
+        if (!@$navigateLinksArray ['thisRowNumber']) {
             $navigateLinksArray ['thisRowNumber'] = 1;
-
         }
 
         $dsCallActivity->initialise();
