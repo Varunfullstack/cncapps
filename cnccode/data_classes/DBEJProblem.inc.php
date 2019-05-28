@@ -336,9 +336,6 @@ class DBEJProblem extends DBEProblem
             $sql .= " AND pro_consno is not null";
         }
 
-        if ($queueNo == 1) {
-            var_dump($sql);
-        }
         $this->setQueryString($sql);
 
         return (parent::getRows());

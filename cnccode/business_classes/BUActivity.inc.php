@@ -9405,10 +9405,9 @@ is currently a balance of ';
           AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
 
             " GROUP BY
-          pro_consno";
+          pro_consno order by pro_consno";
         $ret = [];
         $db->query($sql);
-        var_dump($sql);
         while ($db->next_record()) {
             $ret[] = $db->Record;
         }
