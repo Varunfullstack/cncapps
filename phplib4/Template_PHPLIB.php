@@ -262,8 +262,7 @@ class Template_PHPLIB
                 echo '<br>The new value is ' . $this->_varVals[$varname];
             }
         } else {
-            reset($varname);
-            while (list($k, $v) = each($varname)) {
+            foreach ($varname as $k => $v) {
                 if (!empty($k))
                     if ($this->debug) print "array: set *$k* to *$v*<br>\n";
 
