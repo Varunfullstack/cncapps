@@ -7511,14 +7511,18 @@ is currently a balance of ';
             ON caa_siteno = add_siteno 
             AND pro_custno = add_custno
          
-      WHERE pro_custno = $customerID 
+      WHERE pro_custno = ?
         AND pro_monitor_name = ? 
         AND pro_monitor_agent_name = ? 
         AND pro_status NOT IN ('C') 
-        AND add_postcode = '$postcode'
+        AND add_postcode = ?
       ORDER BY pro_date_raised DESC";
 
         $parameters = [
+            [
+                'type'  => 'i',
+                'value' => $customerID
+            ],
             [
                 'type'  => 's',
                 'value' => $monitorName
@@ -7526,6 +7530,10 @@ is currently a balance of ';
             [
                 'type'  => 's',
                 'value' => $monitorAgentName
+            ],
+            [
+                'type'  => 's',
+                'value' => $postcode
             ],
         ];
         /**
@@ -8188,7 +8196,7 @@ is currently a balance of ';
         /* do stuff here */
 
 
-        $sql = "update callactivity  set caa_status  = 'C'  WHERE caa_problemno = $problemID and caa_endtime is not null";
+        $sql = "update callactivity  set caa_status  = 'C'  WHERE caa_problemno = ? and caa_endtime is not null";
         $result = $db->preparedQuery(
             $sql,
             [
@@ -8200,7 +8208,6 @@ is currently a balance of ';
         );
         $endtime = microtime(true);
         $timediff = $endtime - $starttime;
-        var_dump($timediff);
         return true;
     }
 
@@ -8793,13 +8800,17 @@ is currently a balance of ';
           SET
             pro_manager_comment = ?
           WHERE
-            pro_problemno = $problemID";
+            pro_problemno = ?";
 
         $parameters = [
             [
                 'type'  => 's',
                 'value' => $details,
             ],
+            [
+                'type'  => 'i',
+                'value' => $problemID,
+            ]
         ];
 
         $db->preparedQuery(

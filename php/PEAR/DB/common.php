@@ -2250,7 +2250,6 @@ class DB_common extends PEAR
         }
         $this->_next_query_manip = false;
         return $this->_last_query_manip;
-        $manip = $this->_next_query_manip;
     }
 
     // }}}

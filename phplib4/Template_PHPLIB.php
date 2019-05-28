@@ -165,16 +165,13 @@ class Template_PHPLIB
                 $this->halt("setFile: For handle $handle filename is empty.");
                 return false;
             }
-
             $this->file[$handle] = $this->_filename($filename);
-
         } else {
-
-            reset($handle);
-            while (list($h, $f) = each($handle)) {
+            foreach ($handle as $h => $f) {
                 $this->file[$h] = $this->_filename($f);
             }
         }
+        return true;
     }
 
     /**

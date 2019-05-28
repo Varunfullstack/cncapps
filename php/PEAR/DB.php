@@ -655,9 +655,6 @@ class DB
         return $obj;
     }
 
-    // }}}
-    // {{{ &connect()
-
     /**
      * Create a new DB object including a connection to the specified database
      *
@@ -691,8 +688,8 @@ class DB
      *
      * @uses DB::parseDSN(), DB_common::setOption(), PEAR::isError()
      */
-    function &connect($dsn,
-                      $options = array()
+    public static function &connect($dsn,
+                                    $options = array()
     )
     {
 
@@ -786,7 +783,7 @@ class DB
      *
      * @return bool  whether $value is DB_Error object
      */
-    function isError($value)
+    public static function isError($value)
     {
         return is_object($value) && is_a(
                 $value,
@@ -831,7 +828,7 @@ class DB
      *
      * @return boolean  whether $query is a data manipulation query
      */
-    function isManip($query)
+    public static function isManip($query)
     {
         $manips = 'INSERT|UPDATE|DELETE|REPLACE|'
             . 'CREATE|DROP|'
@@ -902,9 +899,6 @@ class DB
             : $errorMessages[DB_ERROR];
     }
 
-    // }}}
-    // {{{ parseDSN()
-
     /**
      * Parse a data source name
      *
@@ -939,7 +933,7 @@ class DB
      *  + username: User name for login
      *  + password: Password for login
      */
-    function parseDSN($dsn)
+    public static function parseDSN($dsn)
     {
         $parsed = array(
             'phptype'  => false,
