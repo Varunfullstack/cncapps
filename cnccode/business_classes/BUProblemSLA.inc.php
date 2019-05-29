@@ -111,7 +111,7 @@ class BUProblemSLA extends Business
         $this->dbeJProblem = new DBEJProblem($this);
     }
 
-    function monitor()
+    function monitor($dryRun = false)
     {
         $dsProblems = new DataSet($this);
         $this->buActivity->getProblemsByStatus(
@@ -129,24 +129,23 @@ class BUProblemSLA extends Business
             */
             if (
                 $hoursToSLA <= .3 &&                    // within one third of time to SLA
-
                 $this->dbeProblem->getValue(DBEProblem::sentSlaAlertFlag) == 'N' &&          // hasn't already been sent
                 $this->dbeProblem->getValue(DBEProblem::userID) != null &&                     // is asssigned
                 $this->dbeProblem->getValue(DBEProblem::userID) != USER_SYSTEM &&
                 $dsProblems->getValue(DBEProblem::priority) < 5
 
             ) {
+                if (!$dryRun) {
+                    $this->sendSlaAlertEmail(
+                        $dsProblems->getValue(DBEProblem::problemID),
+                        $percentageSLA
+                    );
 
-                $this->sendSlaAlertEmail(
-                    $dsProblems->getValue(DBEProblem::problemID),
-                    $percentageSLA
-                );
-
-                $this->dbeProblem->setValue(
-                    DBEProblem::sentSlaAlertFlag,
-                    'Y'
-                );
-
+                    $this->dbeProblem->setValue(
+                        DBEProblem::sentSlaAlertFlag,
+                        'Y'
+                    );
+                }
             }
 
             $this->dbeProblem->setValue(
@@ -167,8 +166,9 @@ class BUProblemSLA extends Business
 
             echo $this->dbeProblem->getValue(DBEProblem::problemID) . ': ' . $workingHours . '<BR/>';
 
-
-            $this->dbeProblem->updateRow();
+            if (!$dryRun) {
+                $this->dbeProblem->updateRow();
+            }
 
         }
 
@@ -203,7 +203,9 @@ class BUProblemSLA extends Business
                 DBEProblem::awaitingCustomerResponseFlag,
                 $this->awaitingCustomerResponseFlag
             );
-            $this->dbeProblem->updateRow();
+            if (!$dryRun) {
+                $this->dbeProblem->updateRow();
+            }
 
             echo $this->dbeProblem->getValue(DBEProblem::problemID) . ': ' . $workingHours . '<BR/>';
 
@@ -239,7 +241,9 @@ class BUProblemSLA extends Business
                 DBEProblem::awaitingCustomerResponseFlag,
                 $this->awaitingCustomerResponseFlag
             );
-            $this->dbeProblem->updateRow();
+            if (!$dryRun) {
+                $this->dbeProblem->updateRow();
+            }
 
             echo $this->dbeProblem->getValue(DBEProblem::problemID) . ': ' . $workingHours . '<BR/>';
 
@@ -729,7 +733,7 @@ class BUProblemSLA extends Business
             $returnHours = $this->hoursCalculated;
         }
 
-        return round($returnHours,2);
+        return round($returnHours, 2);
 
     } // end of function
 

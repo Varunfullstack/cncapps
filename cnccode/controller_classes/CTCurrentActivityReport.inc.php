@@ -123,22 +123,22 @@ class CTCurrentActivityReport extends CTCNC
         if (!$this->getSessionParam('displayToBeLoggedSectionFlag')) {
             $this->setSessionParam('displayToBeLoggedSectionFlag', 1);
         }
-        if (!$this->getSessionParam('displayQueue1Flag')) {
+        if (!isset($_SESSION['displayQueue1Flag'])) {
             $this->setSessionParam('displayQueue1Flag', 1);
         }
-        if (!$this->getSessionParam('displayQueue2Flag')) {
+        if (!isset($_SESSION['displayQueue2Flag'])) {
             $this->setSessionParam('displayQueue2Flag', 1);
         }
-        if (!$this->getSessionParam('displayQueue3Flag')) {
+        if (!isset($_SESSION['displayQueue3Flag'])) {
             $this->setSessionParam('displayQueue3Flag', 1);
         }
-        if (!$this->getSessionParam('displayQueue4Flag')) {
+        if (!isset($_SESSION['displayQueue4Flag'])) {
             $this->setSessionParam('displayQueue4Flag', 1);
         }
-        if (!$this->getSessionParam('displayQueue5Flag')) {
+        if (!isset($_SESSION['displayQueue5Flag'])) {
             $this->setSessionParam('displayQueue5Flag', 1);
         }
-        if (!$this->getSessionParam('displayQueue7Flag')) {
+        if (!isset($_SESSION['displayQueue7Flag'])) {
             $this->setSessionParam('displayQueue7Flag', 1);
         }
 

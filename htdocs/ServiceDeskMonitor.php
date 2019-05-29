@@ -10,7 +10,12 @@ require_once("config.inc.php");
 GLOBAL $cfg;
 require_once($cfg['path_bu'] . '/BUProblemSLA.inc.php');
 $thing = null;
+
+$dryRun = false;
+if(isset($_REQUEST['dryRun'])){
+    $dryRun = true;
+}
 $buProblemSLA = new BUProblemSLA($thing);
-$buProblemSLA->monitor();
+$buProblemSLA->monitor($dryRun);
 echo "Service Desk Monitor Routine Finished";
 ?>
