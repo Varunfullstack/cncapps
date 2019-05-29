@@ -492,7 +492,7 @@ class DBECallActivitySearch extends DBEntity
             */
             case 'CHECKED_T_AND_M':
                 $whereParameters .=
-                    " AND caa_status = 'C' AND " . $this->getDBColumnName(self::contractCustomerItemID) . "= 0
+                    " AND caa_status = 'C' AND " . $this->getDBColumnName(self::contractCustomerItemID) . " is null
             AND pro_status = 'F'
             AND pro_complete_date <= now()
             AND caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID;
@@ -502,14 +502,11 @@ class DBECallActivitySearch extends DBEntity
             */
             case 'CHECKED_NON_T_AND_M':
                 $whereParameters .=
-                    " AND caa_status = 'C' AND " . $this->getDBColumnName(self::contractCustomerItemID) . "<> 0
-
+                    " AND caa_status = 'C' AND " . $this->getDBColumnName(self::contractCustomerItemID) . " is not null 
             AND pro_status = 'F'
-
             AND pro_complete_date <= now()
             
-            AND " . $this->getDBColumnName(self::activityDurationHours) . "> 
-            
+            AND " . $this->getDBColumnName(self::activityDurationHours) . " > 
             (
               SELECT
                 hed_sr_autocomplete_threshold_hours
@@ -598,6 +595,7 @@ class DBECallActivitySearch extends DBEntity
             $statement .= " LIMIT 0, 150";
         }
 
+        var_dump($statement);
         $this->setQueryString($statement);
         $ret = (parent::getRows());
         return $ret;
