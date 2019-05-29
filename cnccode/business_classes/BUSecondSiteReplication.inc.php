@@ -156,10 +156,14 @@ class BUSecondsiteReplication extends BUSecondsite
                             /*
                             No matching files of any date
                             */
-                            $missingImages[] = 'No file in ' . $networkPath . ' matches pattern: ' . $pattern;
+                            $missingImages[] = 'No file in ' . $networkPath . ' matches pattern: ' . htmlentities(
+                                    $pattern
+                                );
                             $missingLetters[] = $image['imageName'];
 
-                            $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': No file in ' . $networkPath . ' matches pattern: ' . $pattern;
+                            $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': No file in ' . $networkPath . ' matches pattern: ' . htmlentities(
+                                    $pattern
+                                );
 
                             $this->logMessage(
                                 $errorMessage,
@@ -170,30 +174,20 @@ class BUSecondsiteReplication extends BUSecondsite
                                 $image['secondSiteImageID'],
                                 self::STATUS_IMAGE_NOT_FOUND
                             );
-
-                            echo $pattern . " NOT FOUND<br/>";
                         }
                     } else {
-                        /*
-                        Got some matched patterns. Ensure one is up-to-date
-                        */
-                        $currentFileFound = false;
-
                         $mostRecentFileName = false;
 
                         $mostRecentFileTime = 0;
 
                         foreach ($matchedFiles as $file) {
-
                             $fileModifyTime = filemtime($file);
-
                             if ($fileModifyTime > $mostRecentFileTime) {
                                 $mostRecentFileTime = $fileModifyTime;
                                 $mostRecentFileName = $file;
                             }
                         }
-
-                        if (!$mostRecentFileTime >= $timeToLookFrom) {
+                        if ($mostRecentFileTime < $timeToLookFrom) {
 
                             $allServerImagesPassed = false;
 
@@ -217,7 +211,6 @@ class BUSecondsiteReplication extends BUSecondsite
                                 $status = self::STATUS_OUT_OF_DATE;
                             } else {
                                 $status = self::STATUS_SUSPENDED;
-
                             }
 
                             $this->setImageStatus(
@@ -229,6 +222,32 @@ class BUSecondsiteReplication extends BUSecondsite
                                     $mostRecentFileTime
                                 )
                             );
+
+                        } else {
+                            $imageAgeDays = number_format(
+                                (time() - $mostRecentFileTime) / 86400,
+                                0
+                            );
+                            if ($imageAgeDays < 0) {
+                                $this->imageErrorCount++;
+                                $errorMessage = $errorMessage = $server['cus_name'] . ' ' . $server['serverName'] . ': Image is OUT-OF-DATE: ' . $mostRecentFileName . ' ' . DATE(
+                                        'd/m/Y H:i:s',
+                                        $mostRecentFileTime
+                                    );
+                                $this->logMessage(
+                                    $errorMessage,
+                                    self::STATUS_OUT_OF_DATE
+                                );
+                                $status = self::STATUS_OUT_OF_DATE;
+                                $this->setImageStatus(
+                                    $image['secondSiteImageID'],
+                                    $status,
+                                    $mostRecentFileName,
+                                    date(
+                                        'Y-m-d H:i:s',
+                                        $mostRecentFileTime
+                                    )
+                                );
 
                         } else {
                             if (!$isSuspended) {
@@ -261,6 +280,8 @@ class BUSecondsiteReplication extends BUSecondsite
                             and the suspended date reset.
                             */
                         }
+
+                    }
 
                     }
 

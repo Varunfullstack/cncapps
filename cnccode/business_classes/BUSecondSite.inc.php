@@ -117,7 +117,7 @@ class BUSecondsite extends Business
 
             if (
                 $server['itm_itemtypeno'] == CONFIG_2NDSITE_LOCAL_ITEMTYPEID &&
-                $server['secondsiteLocalExcludeFlag'] == 'Y'
+                $server[DBECustomerItem::secondsiteLocalExcludeFlag] == 'Y'
             ) {
                 $this->excludedLocalServers[] = $server;
 
