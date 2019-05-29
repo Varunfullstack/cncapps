@@ -1856,12 +1856,10 @@ class BUActivity extends Business
 
 
         if ($dbeCallActivity->getValue(DBEJCallActivity::userID) != USER_SYSTEM) {
-            $affectedRows = $this->updateTotalUserLoggedHours(
+            $this->updateTotalUserLoggedHours(
                 $dbeCallActivity->getValue(DBEJCallActivity::userID),
                 $dbeCallActivity->getValue(DBEJCallActivity::date)
             );
-            echo '<br/>Updated rows: ' . $affectedRows;
-
         }
 
         return $enteredEndTime;
@@ -3292,12 +3290,11 @@ class BUActivity extends Business
         $sql .= " order by loggedDate asc, userID";
         $result = $this->db->query($sql);
         while ($record = $result->fetch_assoc()) {
-
-            echo "User: " . $record['userID'] . " Date: " . $record['loggedDate'] . "<BR/>";
-            $this->updateTotalUserLoggedHours(
+            $affectedRows = $this->updateTotalUserLoggedHours(
                 $record['userID'],
                 $record['loggedDate']
             );
+            echo "User: " . $record['userID'] . " Date: " . $record['loggedDate'] . ", Affected Rows: $affectedRows <BR/> ";
         }
     }
 
