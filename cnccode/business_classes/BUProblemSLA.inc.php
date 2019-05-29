@@ -127,7 +127,7 @@ class BUProblemSLA extends Business
 
         $percentageSLA = 0;
         while ($dsProblems->fetchNext()) {
-            if ($problemID && $dsProblems->getValue(DBEJProblem::problemID) !== $problemID) {
+            if ($problemID && $dsProblems->getValue(DBEJProblem::problemID) != $problemID) {
                 continue;
             }
             $this->dbeProblem->getRow($dsProblems->getValue(DBEProblem::problemID));
@@ -189,7 +189,7 @@ class BUProblemSLA extends Business
         ); // in progress status
 
         while ($dsProblems->fetchNext()) {
-            if ($problemID && $dsProblems->getValue(DBEJProblem::problemID) !== $problemID) {
+            if ($problemID && $dsProblems->getValue(DBEJProblem::problemID) != $problemID) {
                 continue;
             }
             $workingHours = $this->getWorkingHours($dsProblems->getValue(DBEProblem::problemID));
@@ -229,7 +229,7 @@ class BUProblemSLA extends Business
         ); // in progress future alarm date status
 
         while ($dsProblems->fetchNext()) {
-            if ($problemID && $dsProblems->getValue(DBEJProblem::problemID) !== $problemID) {
+            if ($problemID && $dsProblems->getValue(DBEJProblem::problemID) != $problemID) {
                 continue;
             }
             $workingHours = $this->getWorkingHours($dsProblems->getValue(DBEProblem::problemID));
