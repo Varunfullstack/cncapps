@@ -667,6 +667,9 @@ class BUProblemSLA extends Business
     {
         $this->dbeJProblem->getRow($problemID);
 
+        if ($this->dryRun) {
+            $this->dbeJCallActivity->setShowSQLOn();
+        }
         $this->dbeJCallActivity->getRowsByProblemID(
             $problemID,
             false
