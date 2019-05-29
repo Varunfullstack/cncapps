@@ -41,7 +41,7 @@ class CNCMysqli
         if (self::$mysqliInstance === null) {
             self::$mysqliInstance = mysqli_init();
 
-            if (!self::$mysqliInstance->options(MYSQLI_INIT_COMMAND, 'SET AUTOCOMMIT = 0')) {
+            if (!self::$mysqliInstance->options(MYSQLI_INIT_COMMAND, 'SET AUTOCOMMIT = 1')) {
                 die('Setting MYSQLI_INIT_COMMAND failed');
             }
 
