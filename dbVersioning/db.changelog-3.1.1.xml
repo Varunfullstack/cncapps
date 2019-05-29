@@ -53,4 +53,17 @@
         </preConditions>
         <modifyDataType tableName="calldocument" columnName="description" newDataType="varchar(150)"/>
     </changeSet>
+    <changeSet author="pavwebdev" id="1558868080-6">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT `information_schema`.COLUMNS.`COLUMN_DEFAULT` IS NOT NULL
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='problem'
+                AND column_name='pro_working_hours_calculated_to_time'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropDefaultValue tableName="problem" columnName="pro_working_hours_calculated_to_time"/>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>
