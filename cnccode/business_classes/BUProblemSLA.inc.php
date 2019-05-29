@@ -758,16 +758,29 @@ class BUProblemSLA extends Business
             }
             $pauseArray[$pauseStart] = $utNow;
         }
+        if ($this->dryRun) {
+            echo "<div>" . __LINE__ . " </div>";
+        }
         /*
         This field is an optomisation to avoid always counting through from the start of
         the problem. The field is reset when a Request is amended to force a recalculation from
         the start of the problem raised date.
         */
         if ($this->dbeJProblem->getValue(DBEProblem::workingHoursCalculatedToTime)) {
+            if ($this->dryRun) {
+                echo "<div>" . __LINE__ . " </div>";
+            }
             $addHoursSinceLastCalculation = true;
             $utCalculationStart = strtotime($this->dbeJProblem->getValue(DBEProblem::workingHoursCalculatedToTime));
             if ($this->dryRun) {
-                echo '<div>This SR does have calculated time already: ' . print_r($utCalculationStart) . '</div>';
+                echo "<div>" . __LINE__ . " </div>";
+            }
+            if ($this->dryRun) {
+                echo '<div>This SR does have calculated time already: ' . print_r(
+                        $utCalculationStart
+                    ) . ', workingHoursCalculatedToTime: ' . $this->dbeJProblem->getValue(
+                        DBEProblem::workingHoursCalculatedToTime
+                    ) . '</div>';
             }
 
         } else {
@@ -849,7 +862,7 @@ class BUProblemSLA extends Business
         }
 
         if ($this->dryRun) {
-            echo '<div></div>';
+            echo "<div>start: $utStart, end: $utEnd </div>";
         }
 
         while ($utCounter < $utEnd) {
