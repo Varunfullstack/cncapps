@@ -3287,7 +3287,6 @@ class BUActivity extends Business
         $sql .= " and holiday = 0 ";
         $sql .= " order by loggedDate asc, userID";
         $result = $this->db->query($sql);
-        var_dump($sql);
         while ($record = $result->fetch_assoc()) {
 
             echo "User: " . $record['userID'] . " Date: " . $record['loggedDate'] . "<BR/>";
