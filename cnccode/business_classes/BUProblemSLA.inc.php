@@ -56,6 +56,10 @@ class BUProblemSLA extends Business
      * @var false|string
      */
     private $dateFourWeeksAgo;
+    /**
+     * @var bool
+     */
+    private $dryRun;
 
     /**
      * Constructor
@@ -111,9 +115,11 @@ class BUProblemSLA extends Business
         $this->dbeJProblem = new DBEJProblem($this);
     }
 
-    function monitor($dryRun = false)
+    function monitor($dryRun = false, $problemID = null)
     {
         $dsProblems = new DataSet($this);
+        $this->dryRun = $dryRun;
+
         $this->buActivity->getProblemsByStatus(
             'I',
             $dsProblems
@@ -121,6 +127,9 @@ class BUProblemSLA extends Business
 
         $percentageSLA = 0;
         while ($dsProblems->fetchNext()) {
+            if ($problemID && $dsProblems->getValue(DBEJProblem::problemID) !== $problemID) {
+                continue;
+            }
             $this->dbeProblem->getRow($dsProblems->getValue(DBEProblem::problemID));
             $workingHours = $this->getWorkingHours($dsProblems->getValue(DBEProblem::problemID));
             $hoursToSLA = $dsProblems->getValue(DBEProblem::slaResponseHours) - $workingHours;
@@ -180,7 +189,9 @@ class BUProblemSLA extends Business
         ); // in progress status
 
         while ($dsProblems->fetchNext()) {
-
+            if ($problemID && $dsProblems->getValue(DBEJProblem::problemID) !== $problemID) {
+                continue;
+            }
             $workingHours = $this->getWorkingHours($dsProblems->getValue(DBEProblem::problemID));
 
             $this->dbeProblem->getRow($dsProblems->getValue(DBEProblem::problemID));
@@ -218,7 +229,9 @@ class BUProblemSLA extends Business
         ); // in progress future alarm date status
 
         while ($dsProblems->fetchNext()) {
-
+            if ($problemID && $dsProblems->getValue(DBEJProblem::problemID) !== $problemID) {
+                continue;
+            }
             $workingHours = $this->getWorkingHours($dsProblems->getValue(DBEProblem::problemID));
 
             $this->dbeProblem->getRow($dsProblems->getValue(DBEProblem::problemID));
@@ -659,7 +672,13 @@ class BUProblemSLA extends Business
             false
         );
 
-        $utNow = date('U');                                                         // unix date now
+        $utNow = date('U');
+
+        if ($this->dryRun) {
+            echo '<div>Calculation Start: ' . $utNow . '</div>';
+        }
+
+        // unix date now
         /*
         Build an array of pauses for the problem
         i.e. activities with awaitingCustomer
@@ -669,28 +688,39 @@ class BUProblemSLA extends Business
         $pauseStart = false;
         $pauseArray = [];
         $this->dbeJCallActivity->fetchNext();
-
-
         while ($this->dbeJCallActivity->fetchNext()) {
 
             if ($this->dbeJCallActivity->getValue(DBEJCallActivity::awaitingCustomerResponseFlag) == 'Y') {
+                if ($this->dryRun) {
+                    echo '<div>Activity with AwaitingCustomerResponseFlag<div>';
+                }
                 if (!$pauseStart) {  // if not already paused
                     $pauseStart = strtotime(
                         $this->dbeJCallActivity->getValue(
                             DBEJCallActivity::date
                         ) . ' ' . $this->dbeJCallActivity->getValue(DBEJCallActivity::startTime)
                     );
-
+                    if ($this->dryRun) {
+                        echo '<div>New PauseStart Value: ' . $pauseStart . '</div>';
+                    }
                 }
             } else {
-
+                if ($this->dryRun) {
+                    echo '<div>Activity without AwaitingCustomerResponseFlag<div>';
+                }
                 if ($pauseStart) {   // currently paused so record beginning and end
-
+                    if ($this->dryRun) {
+                        echo '<div>We had a pause start, so we need to record the end of it: ' . $pauseStart . '</div>';
+                    }
                     $pauseArray[$pauseStart] = strtotime(
                         $this->dbeJCallActivity->getValue(
                             DBEJCallActivity::date
                         ) . ' ' . $this->dbeJCallActivity->getValue(DBEJCallActivity::startTime)
                     );
+
+                    if ($this->dryRun) {
+                        echo '<div>' . print_r($pauseArray) . '</div>';
+                    }
 
                     $pauseStart = false;
 
@@ -705,8 +735,10 @@ class BUProblemSLA extends Business
 
         // There wasn't an activity after the start pause so set end of the open pause to now
         if ($pauseStart) {
+            if ($this->dryRun) {
+                echo '<div>We could not find an activity that closed the pause..so we use the current time as closing</div>';
+            }
             $pauseArray[$pauseStart] = $utNow;
-
         }
         /*
         This field is an optomisation to avoid always counting through from the start of
@@ -716,9 +748,18 @@ class BUProblemSLA extends Business
         if ($this->dbeJProblem->getValue(DBEProblem::workingHoursCalculatedToTime)) {
             $addHoursSinceLastCalculation = true;
             $utCalculationStart = strtotime($this->dbeJProblem->getValue(DBEProblem::workingHoursCalculatedToTime));
+            if ($this->dryRun) {
+                echo '<div>This SR does have calculated time already: ' . print_r($utCalculationStart) . '</div>';
+            }
+
         } else {
             $addHoursSinceLastCalculation = false;
             $utCalculationStart = strtotime($this->dbeJProblem->getValue(DBEProblem::dateRaised));
+            if ($this->dryRun) {
+                echo '<div>This SR does NOT have calculated time already, so we look at the date raised: ' . $this->dbeJProblem->getValue(
+                        DBEProblem::dateRaised
+                    ) . ' -> calculationStart: ' . print_r($utCalculationStart) . '</div>';
+            }
         }
 
         $this->hoursCalculated = $this->getWorkingHoursBetweenUnixDates(
@@ -727,7 +768,13 @@ class BUProblemSLA extends Business
             $pauseArray
         );
 
+        if ($this->dryRun) {
+            echo '<div>Calculated hours: ' . $this->hoursCalculated . '</div>';
+        }
         if ($addHoursSinceLastCalculation) {
+            if ($this->dryRun) {
+                echo '<div>current Working Hours: ' . $this->dbeJProblem->getValue(DBEProblem::workingHours) . '</div>';
+            }
             $returnHours = $this->dbeJProblem->getValue(DBEProblem::workingHours) + $this->hoursCalculated;
         } else {
             $returnHours = $this->hoursCalculated;

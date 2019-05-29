@@ -12,10 +12,16 @@ require_once($cfg['path_bu'] . '/BUProblemSLA.inc.php');
 $thing = null;
 
 $dryRun = false;
-if(isset($_REQUEST['dryRun'])){
+if (isset($_REQUEST['dryRun'])) {
     $dryRun = true;
 }
+
+$problemID = null;
+if (isset($_REQUEST['problemID'])) {
+    $problemID = $_REQUEST['problemID'];
+}
+
 $buProblemSLA = new BUProblemSLA($thing);
-$buProblemSLA->monitor($dryRun);
+$buProblemSLA->monitor($dryRun, $problemID);
 echo "Service Desk Monitor Routine Finished";
 ?>
