@@ -1856,10 +1856,12 @@ class BUActivity extends Business
 
 
         if ($dbeCallActivity->getValue(DBEJCallActivity::userID) != USER_SYSTEM) {
-            $this->updateTotalUserLoggedHours(
+            $affectedRows = $this->updateTotalUserLoggedHours(
                 $dbeCallActivity->getValue(DBEJCallActivity::userID),
                 $dbeCallActivity->getValue(DBEJCallActivity::date)
             );
+            echo '<br/>Updated rows: ' . $affectedRows;
+
         }
 
         return $enteredEndTime;
@@ -2612,10 +2614,11 @@ class BUActivity extends Business
                 AND caa_endtime > '$startTime') 
             WHERE userID = $userID 
               AND loggedDate = '$date' ";
+        if (!$this->db->query($sql)) {
+            return false;
+        }
 
-        var_dump($sql);
-        $this->db->query($sql);
-
+        return $this->db->affected_rows;
     }
 
     /**
