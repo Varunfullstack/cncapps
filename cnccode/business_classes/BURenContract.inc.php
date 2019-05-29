@@ -352,7 +352,7 @@ class BURenContract extends Business
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::itemID,
-                        0
+                        null
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::supplierID,
@@ -488,7 +488,7 @@ class BURenContract extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::itemID,
-                    0
+                    null
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::description,
@@ -685,7 +685,7 @@ HEREDOC;
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::itemID,
-                        0
+                        null
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::supplierID,

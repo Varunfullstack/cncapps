@@ -262,7 +262,6 @@ class DBEJProblem extends DBEProblem
         $sql .= " ORDER BY pro_alarm_date, pro_alarm_time";
 
         $this->setQueryString($sql);
-
         return (parent::getRows());
     }
 
@@ -318,7 +317,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
 
         WHERE pro_status IN( 'I', 'P' )
@@ -337,7 +336,6 @@ class DBEJProblem extends DBEProblem
         }
 
         $this->setQueryString($sql);
-
         return (parent::getRows());
     }
 
@@ -361,7 +359,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
             
         WHERE " . $this->getPKWhere();
@@ -391,7 +389,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
         WHERE
@@ -421,7 +419,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
         WHERE
@@ -450,7 +448,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
         WHERE
@@ -484,7 +482,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
         WHERE
@@ -520,7 +518,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
         WHERE
@@ -553,7 +551,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
         WHERE
@@ -590,7 +588,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
         WHERE
@@ -635,7 +633,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
             
         WHERE " . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
@@ -737,7 +735,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
             
         WHERE " . $this->getDBColumnName(self::customerID) . ' <> 282  and ' . $this->getDBColumnName(
@@ -825,7 +823,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
-              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
         WHERE

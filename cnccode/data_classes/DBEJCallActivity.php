@@ -503,18 +503,18 @@ class DBEJCallActivity extends DBECallActivity
             " WHERE callactivity.caa_problemno = '" . mysqli_real_escape_string(
                 $this->db->link_id(),
                 $problemID
-            ) . "' AND callactivity.caa_problemno <> 0";
+            ) . "' AND callactivity.caa_problemno is not null";
 
         if (!$includeTravel) {           // isnull in case this is an incomplete activity with no call activity set yet
             $query .= " AND ( travelFlag <> 'Y' OR ISNULL(travelFlag) )";
         }
 
         if (!$includeOperationalTasks) {
-            $query .= " AND ( caa_callacttypeno <>  " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . " )";
+            $query .= " AND ( not caa_callacttypeno <=>  " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . " )";
         }
 
         if (!$includeServerGuardUpdates) {           // isnull in case this is an incomplete activity with no call activity set yet
-            $query .= " AND ( caa_callacttypeno <> " . CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID . " )";
+            $query .= " AND (not caa_callacttypeno <=> " . CONFIG_SERVER_GUARD_UPDATE_ACTIVITY_TYPE_ID . " )";
         }
 
         if ($fromDate) {
@@ -534,7 +534,6 @@ class DBEJCallActivity extends DBECallActivity
         } else {
             $query .= " ORDER BY caa_date, caa_starttime";
         }
-
         $this->setQueryString($query);
         return (parent::getRows());
     }

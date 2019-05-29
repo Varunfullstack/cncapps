@@ -145,13 +145,13 @@ class BUSageExport extends Business
                 $this->lastRecord = $db->Record; // make copy ready for VAT posting at end first invoice
             }
 
-            if ($db->Record['inh_custno'] <> $lastCustno) {
+            if ($db->Record['inh_custno'] != $lastCustno) {
                 $this->postSalesRow();
                 $lastCustno = $db->Record['inh_custno'];
             }
 
             // post VAT as a separate row after lines for each invoice
-            if ($db->Record['inh_invno'] <> $lastInvno AND $lastInvno <> -1) {
+            if ($db->Record['inh_invno'] != $lastInvno && $lastInvno != -1) {
                 $this->postTransVATRow();
                 $this->lastRecord = $db->Record; // make copy ready for VAT posting at end of lines
             }

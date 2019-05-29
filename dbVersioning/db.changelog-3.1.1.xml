@@ -66,4 +66,12 @@
         <dropDefaultValue tableName="problem" columnName="pro_working_hours_calculated_to_time"/>
         <rollback/>
     </changeSet>
+    <changeSet author="pavwebdev" id="1558868080-7">
+        <sql>
+            update ordline
+            set odl_itemno = null
+            where odl_itemno = 0
+        </sql>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>

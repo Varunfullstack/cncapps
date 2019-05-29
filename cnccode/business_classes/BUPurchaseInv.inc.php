@@ -359,10 +359,14 @@ class BUPurchaseInv extends Business
         $dbeItem = new DBEItem($this);
         $buRenewal = new BURenewal($this);
         while ($dsOrdline->fetchNext()) {
+            if (!$dsOrdline->getValue(DBEJOrdline::itemID)) {
+                continue;
+            }
             $dbeItem->getRow($dsOrdline->getValue(DBEJOrdline::itemID));
-            if ($dbeItem->getValue(DBEItem::renewalTypeID) > 0) {
+            if ($dbeItem->getValue(DBEItem::renewalTypeID)) {
+
                 if (!$dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID)) {
-                    $ret = 'You have not created all of the renewals';
+                    return 'You have not created all of the renewals';
                 } else {
                     $buRenewalObject = $buRenewal->getRenewalBusinessObject(
                         $dbeItem->getValue(DBEItem::renewalTypeID),

@@ -32,11 +32,6 @@ class CTContractReport extends CTCNC
         $_REQUEST['show_filters'] = 1;
         $_REQUEST['show_page_views'] = 1;
         $_REQUEST['show_order_by'] = 1;
-//		$_REQUEST['where_statement'] =
-//			'customer.cus_custno<>'.CONFIG_SALES_STOCK_CUSTOMERID . CR .
-//			'AND custitem.cui_expiry_date <> "0000-00-00"';
-
-//		$_REQUEST['page_view.page_view_id']=2;
         $_REQUEST['edit_url'] = 'CustomerItem.php?action=displayRenewalContract&customerItemID=';
         $this->setMethodName('defaultAction');
 // Parameters

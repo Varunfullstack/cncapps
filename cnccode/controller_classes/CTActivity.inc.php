@@ -5816,7 +5816,8 @@ class CTActivity extends CTCNC
                 'uploadErrors'                  => $errorFile,
                 'uploadURL'                     => $uploadURL,
                 'urlMessageToSales'             => $urlMessageToSales,
-                'urlSalesRequest'               => $urlSalesRequest
+                'urlSalesRequest'               => $urlSalesRequest,
+                'problemID'                     => $dsCallActivity->getValue(DBEJCallActivity::problemID)
             )
         );
 

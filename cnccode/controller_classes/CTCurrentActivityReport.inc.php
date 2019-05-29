@@ -981,15 +981,11 @@ class CTCurrentActivityReport extends CTCNC
             If the dashboard is filtered by customer then the Work button opens
             Activity edit
             */
-            if (
-                $serviceRequests->getValue(DBEJProblem::lastCallActTypeID) == 0
-            ) {
+            if ($serviceRequests->getValue(DBEJProblem::lastCallActTypeID) == null) {
                 $workBgColor = self::GREEN; // green = in progress
                 $workOnClick = "alert( 'Another user is currently working on this SR' ); return false";
             } else {
-
                 $workBgColor = self::CONTENT;
-
                 if ($this->getSessionParam('selectedCustomerID')) {
                     $urlWork =
                         Controller::buildLink(

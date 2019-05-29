@@ -747,7 +747,7 @@ if (SC_HTTP::sessionVar($show_page_views_tag)) {
                     if (!in_array($field, SC_HTTP::sessionVar($display_fields_tag))) {
                         continue;
                     }
-                    if ($business->isNumericType($field) && $business->getType($field) <> SC_DB_ID) {
+                    if ($business->isNumericType($field) && $business->getType($field) != SC_DB_ID) {
                         if (!isset($totals[$field])) {
                             $totals[$field] = 0;
                         }

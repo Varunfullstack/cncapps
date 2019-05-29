@@ -219,9 +219,8 @@ class BUPDFSalesQuote extends Business
                         );
                         $grandTotal += $total;
                     }
-                    if ($dsOrdline->getValue(
-                            DBEJOrdline::itemID
-                        ) != 0) {            // some item lines in old system did not have a related item record
+                    if ($dsOrdline->getValue(DBEJOrdline::itemID)) {
+                        // some item lines in old system did not have a related item record
                         $dsItem = new DataSet($this);
                         $buItem->getItemByID(
                             $dsOrdline->getValue(DBEJOrdline::itemID),
@@ -518,9 +517,8 @@ class BUPDFSalesQuote extends Business
                         150,
                         Controller::formatNumberCur($dsOrdline->getValue(DBEJOrdline::curUnitSale))
                     );
-                    if ($dsOrdline->getValue(
-                            DBEJOrdline::itemID
-                        ) != 0) {            // some item lines in old system did not have a related item record
+                    if ($dsOrdline->getValue(DBEJOrdline::itemID)) {
+                        // some item lines in old system did not have a related item record
                         $buItem->getItemByID(
                             $dsOrdline->getValue(DBEJOrdline::itemID),
                             $dsItem

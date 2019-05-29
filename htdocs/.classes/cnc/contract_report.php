@@ -36,114 +36,114 @@ class CNC_ContractReport extends SC_DB
         $this->addField(
             $this->getTableFieldName('cui_cuino'),
             array(
-                'label' => 'ID',
-                'help' => '',
-                'type' => SC_DB_ID,
-                'required' => false,
-                'unique' => true,
-                'default' => '',
-                'can_edit' => false,
+                'label'     => 'ID',
+                'help'      => '',
+                'type'      => SC_DB_ID,
+                'required'  => false,
+                'unique'    => true,
+                'default'   => '',
+                'can_edit'  => false,
                 'is_select' => false,
-                'in_db' => true,
-                'align' => 'center'
+                'in_db'     => true,
+                'align'     => 'center'
             )
         );
         $this->addField(
             $this->getTableFieldName('cui_users'),
             array(
-                'label' => 'Users',
-                'help' => '',
-                'type' => SC_DB_ID,
-                'required' => false,
-                'unique' => true,
-                'default' => '',
-                'can_edit' => false,
+                'label'     => 'Users',
+                'help'      => '',
+                'type'      => SC_DB_ID,
+                'required'  => false,
+                'unique'    => true,
+                'default'   => '',
+                'can_edit'  => false,
                 'is_select' => false,
-                'in_db' => true,
-                'align' => 'center'
+                'in_db'     => true,
+                'align'     => 'center'
             )
         );
         $this->addField(
             'customer.cus_name',
             array(
-                'label' => 'Customer',
-                'help' => '',
-                'type' => SC_DB_NAME,
-                'required' => false,
-                'unique' => false,
-                'default' => '',
-                'can_edit' => false,
-                'in_db' => true,
+                'label'     => 'Customer',
+                'help'      => '',
+                'type'      => SC_DB_NAME,
+                'required'  => false,
+                'unique'    => false,
+                'default'   => '',
+                'can_edit'  => false,
+                'in_db'     => true,
                 'is_select' => false
             )
         );
         $this->addField(
             'address.add_add1',
             array(
-                'label' => 'Site',
-                'help' => '',
-                'type' => SC_DB_STRING_50,
-                'required' => false,
-                'unique' => false,
-                'default' => '',
-                'can_edit' => false,
-                'in_db' => true,
+                'label'     => 'Site',
+                'help'      => '',
+                'type'      => SC_DB_STRING_50,
+                'required'  => false,
+                'unique'    => false,
+                'default'   => '',
+                'can_edit'  => false,
+                'in_db'     => true,
                 'is_select' => true
             )
         );
         $this->addField(
             'item.itm_desc',
             array(
-                'label' => 'Item',
-                'help' => '',
-                'type' => SC_DB_STRING_50,
-                'required' => false,
-                'unique' => false,
-                'default' => '',
-                'can_edit' => false,
-                'in_db' => true,
+                'label'     => 'Item',
+                'help'      => '',
+                'type'      => SC_DB_STRING_50,
+                'required'  => false,
+                'unique'    => false,
+                'default'   => '',
+                'can_edit'  => false,
+                'in_db'     => true,
                 'is_select' => true
             )
         );
         $this->addField(
             $this->getTableFieldName('cui_serial'),
             array(
-                'label' => 'Serial',
-                'help' => '',
-                'type' => SC_DB_STRING_10,
-                'required' => false,
-                'unique' => false,
-                'default' => '',
-                'can_edit' => false,
-                'in_db' => true,
+                'label'     => 'Serial',
+                'help'      => '',
+                'type'      => SC_DB_STRING_10,
+                'required'  => false,
+                'unique'    => false,
+                'default'   => '',
+                'can_edit'  => false,
+                'in_db'     => true,
                 'is_select' => false
             )
         );
         $this->addField(
             $this->getTableFieldName('cui_desp_date'),
             array(
-                'label' => 'Start',
-                'help' => '',
-                'type' => SC_DB_UK_DATE,
-                'required' => false,
-                'unique' => false,
-                'default' => '',
-                'can_edit' => false,
-                'in_db' => true,
+                'label'     => 'Start',
+                'help'      => '',
+                'type'      => SC_DB_UK_DATE,
+                'required'  => false,
+                'unique'    => false,
+                'default'   => '',
+                'can_edit'  => false,
+                'in_db'     => true,
                 'is_select' => false
             )
         );
         $this->addField(
             $this->getTableFieldName('cui_expiry_date'),
             array(
-                'label' => 'Expiry',
-                'help' => '',
-                'type' => SC_DB_UK_DATE,
-                'required' => false,
-                'unique' => false,
-                'default' => '',
-                'can_edit' => false,
-                'in_db' => true,
+                'label'     => 'Expiry',
+                'help'      => '',
+                'type'      => SC_DB_UK_DATE,
+                'required'  => false,
+                'unique'    => false,
+                'default'   => '',
+                'can_edit'  => false,
+                'in_db'     => true,
                 'is_select' => false
             )
         );
@@ -151,56 +151,56 @@ class CNC_ContractReport extends SC_DB
         $this->addField(
             $this->getTableFieldName('cui_sale_price'),
             array(
-                'label' => 'Value',
-                'help' => '',
-                'type' => SC_DB_DECIMAL,
-                'required' => false,
-                'unique' => false,
-                'default' => '',
-                'can_edit' => false,
-                'in_db' => true,
+                'label'     => 'Value',
+                'help'      => '',
+                'type'      => SC_DB_DECIMAL,
+                'required'  => false,
+                'unique'    => false,
+                'default'   => '',
+                'can_edit'  => false,
+                'in_db'     => true,
                 'is_select' => false
             )
         );
         $this->addField(
             $this->getTableFieldName('curGSCBalance'),
             array(
-                'label' => 'Balance',
-                'help' => '',
-                'type' => SC_DB_DECIMAL,
-                'required' => false,
-                'unique' => false,
-                'default' => '',
-                'can_edit' => false,
-                'in_db' => true,
+                'label'     => 'Balance',
+                'help'      => '',
+                'type'      => SC_DB_DECIMAL,
+                'required'  => false,
+                'unique'    => false,
+                'default'   => '',
+                'can_edit'  => false,
+                'in_db'     => true,
                 'is_select' => false
             )
         );
         $this->addField(
             'customer.gscTopUpAmount',
             array(
-                'label' => 'Top-Up',
-                'help' => '',
-                'type' => SC_DB_DECIMAL,
-                'required' => false,
-                'unique' => false,
-                'default' => '',
-                'can_edit' => false,
-                'in_db' => true,
+                'label'     => 'Top-Up',
+                'help'      => '',
+                'type'      => SC_DB_DECIMAL,
+                'required'  => false,
+                'unique'    => false,
+                'default'   => '',
+                'can_edit'  => false,
+                'in_db'     => true,
                 'is_select' => false
             )
         );
         $this->addField(
             $this->getTableFieldName('renewalStatus'),
             array(
-                'label' => 'Renewal Status',
-                'help' => 'R',
-                'type' => SC_DB_STRING_1,
-                'required' => false,
-                'unique' => false,
-                'default' => '',
-                'can_edit' => false,
-                'in_db' => true,
+                'label'     => 'Renewal Status',
+                'help'      => 'R',
+                'type'      => SC_DB_STRING_1,
+                'required'  => false,
+                'unique'    => false,
+                'default'   => '',
+                'can_edit'  => false,
+                'in_db'     => true,
                 'is_select' => false
             )
         );
@@ -217,7 +217,6 @@ class CNC_ContractReport extends SC_DB
             'AND customer.cus_custno <>' . CONFIG_SALES_STOCK_CUSTOMERID . CR .
             'AND item.renewalTypeID IS NOT NULL' . CR .
             'AND item.renewalTypeID <> 0';
-        //'AND custitem.cui_expiry_date <> 0000-00-00';
     }
 
     function getSQLFromSection()

@@ -392,23 +392,20 @@ class BUSalesOrder extends Business
 
         $orderType = $dsOrdhead->getValue(DBEOrdhead::type);
 
-        if (
-            ($orderType <> 'I') &
-            ($orderType <> 'Q')
-        ) {
+        if (($orderType != 'I') && ($orderType != 'Q')) {
             $this->raiseError('Must be quote or initial order');
             exit;
         }
 
         if (
-            ($orderType <> 'Q') &&
+            ($orderType != 'Q') &&
             $this->countPurchaseOrders($dsOrdhead->getValue(DBEOrdhead::ordheadID)) > 0
         ) {
             $this->raiseError('Cannot delete order because purchase orders exist');
             exit;
         }
 
-        if ($orderType <> 'Q') {
+        if ($orderType != 'Q') {
             $buInvoice = new BUInvoice($this);
             if ($buInvoice->countInvoicesByOrdheadID($dsOrdhead->getValue(DBEOrdhead::ordheadID)) > 0) {
                 $this->raiseError('Cannot delete order because invoices exist');

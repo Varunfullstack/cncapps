@@ -423,7 +423,7 @@ class BUDirectDebitContracts extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::itemID,
-                    0
+                    null
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::description,
@@ -507,7 +507,7 @@ class BUDirectDebitContracts extends Business
                         );
                         $dbeOrdline->setValue(
                             DBEOrdline::itemID,
-                            0
+                            null
                         );
                         $dbeOrdline->setValue(
                             DBEOrdline::supplierID,

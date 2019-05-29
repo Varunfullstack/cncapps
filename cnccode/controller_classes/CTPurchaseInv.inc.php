@@ -229,13 +229,9 @@ class CTPurchaseInv extends CTCNC
         $addCustomerItems = ($dsOrdhead->getValue(DBEJOrdhead::addItem) == 'Y');
 
         if ($this->dsPorhead->getValue(DBEJPorhead::directDeliveryFlag) == 'Y') {
-
             if ($errorMessage = $this->buPurchaseInv->renewalsNotCompleted($dsOrdline)) {
-
                 $this->setFormErrorMessage($errorMessage);
-
             }
-
         }
 
         $this->buPurchaseInv->getInitialValues(
@@ -447,7 +443,10 @@ class CTPurchaseInv extends CTCNC
             $this->display();
             exit;
         }
-        if (!$this->buPurchaseInv->invoiceNoIsUnique($this->getParam('purchaseInvoiceNo'), $this->getParam('porheadID'))) {
+        if (!$this->buPurchaseInv->invoiceNoIsUnique(
+            $this->getParam('purchaseInvoiceNo'),
+            $this->getParam('porheadID')
+        )) {
             $this->setFormErrorMessage('This purchase invoice no has already been used');
             $this->display();
             exit;

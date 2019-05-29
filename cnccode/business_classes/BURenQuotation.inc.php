@@ -403,7 +403,7 @@ class BURenQuotation extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::itemID,
-                    0
+                    null
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::description,
@@ -609,7 +609,7 @@ class BURenQuotation extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::itemID,
-                    0
+                    null
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::description,

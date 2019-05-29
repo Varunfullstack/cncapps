@@ -291,7 +291,7 @@ class BURenDomain extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::itemID,
-                    0
+                    null
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::description,
@@ -430,7 +430,7 @@ class BURenDomain extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::itemID,
-                    0
+                    null
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::description,

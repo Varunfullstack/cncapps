@@ -295,7 +295,7 @@ class BURenHosting extends Business
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::itemID,
-                        0
+                        null
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::supplierID,
@@ -432,7 +432,7 @@ class BURenHosting extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::itemID,
-                    0
+                    null
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::description,

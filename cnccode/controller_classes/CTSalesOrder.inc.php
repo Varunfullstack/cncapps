@@ -2476,7 +2476,7 @@ class CTSalesOrder extends CTCNC
     )
     {
         $this->setMethodName('checkUpdatedByAnotherUser');
-        if ($pageDate <> $orderDate) {
+        if ($pageDate != $orderDate) {
             $this->setFormErrorMessage(
                 '** ANOTHER USER HAS UPDATED THE ORDER **. Your action was abandoned and the latest version is now shown on this page'
             );
@@ -3462,9 +3462,8 @@ class CTSalesOrder extends CTCNC
                         173,
                         Controller::formatNumberCur($total)
                     );
-                    if ($dsOrdline->getValue(
-                            DBEOrdline::itemID
-                        ) != 0) {                        // some item lines in old system did not have a related item record
+                    if ($dsOrdline->getValue(DBEOrdline::itemID)) {
+                        // some item lines in old system did not have a related item record
                         $this->buItem->getItemByID(
                             $dsOrdline->getValue(DBEOrdline::itemID),
                             $dsItem
@@ -3777,9 +3776,8 @@ class CTSalesOrder extends CTCNC
                     /*
 					if we have item notes then add them to the description
 					*/
-                    if ($dsOrdline->getValue(
-                            DBEOrdline::itemID
-                        ) != 0) {// some item lines do not have a related item record
+                    if ($dsOrdline->getValue(DBEOrdline::itemID)) {
+                        // some item lines do not have a related item record
                         $dsItem = new DataSet($this);
                         $this->buItem->getItemByID(
                             $dsOrdline->getValue(DBEOrdline::itemID),
@@ -4463,9 +4461,7 @@ Do not print zero sale values
                     );
                     $grandTotal += $total;
                 }
-                if ($dsOrdline->getValue(
-                        DBEJOrdline::itemID
-                    ) != 0) {
+                if ($dsOrdline->getValue(DBEJOrdline::itemID)) {
                     // some item lines in old system did not have a related item record
                     $dsItem = new DataSet($this);
                     $this->buItem->getItemByID(

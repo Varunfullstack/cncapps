@@ -971,13 +971,9 @@ class BUActivity extends Business
         ); // 3rd param= descending date
 
         if ($dbeCallActivity->fetchNext()) {
-
             return $dbeCallActivity;
-
         } else {
-
             return false;
-
         }
     } // end sendUpdatedByAnotherUserEmail
 
@@ -3845,7 +3841,7 @@ class BUActivity extends Business
         JOIN problem ON pro_problemno = caa_problemno
       WHERE
         caa_problemno IN( $problemIDsAsString ) and caa_callacttypeno <> 43
-        AND pro_contract_cuino = 0";
+        AND pro_contract_cuino is null";
 
         $db->query($select);
         $finalActivityIDArray = [];
@@ -5736,8 +5732,7 @@ is currently a balance of ';
         $dbeProblem->getRow($dbeCallActivity->getValue(DBEJCallActivity::problemID));
 
         if (
-            trim($reason) &&
-            $reason <> $dbeCallActivity->getValue(DBEJCallActivity::reason)
+            trim($reason) && $reason != $dbeCallActivity->getValue(DBEJCallActivity::reason)
         ) {
             $dbeCallActivity->setValue(
                 DBEJCallActivity::reason,
@@ -5749,8 +5744,7 @@ is currently a balance of ';
         }
 
         if (
-            trim($internalNotes) &&
-            $internalNotes <> $dbeProblem->getValue(DBEJProblem::internalNotes)
+            trim($internalNotes) && $internalNotes != $dbeProblem->getValue(DBEJProblem::internalNotes)
         ) {
 
             $dbeProblem->setValue(
