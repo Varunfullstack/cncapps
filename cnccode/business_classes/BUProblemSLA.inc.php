@@ -703,6 +703,7 @@ class BUProblemSLA extends Business
             echo '<div>We have ' . $this->dbeJCallActivity->rowCount . ' activities to look at </div>';
         }
         while ($this->dbeJCallActivity->fetchNext()) {
+
             if ($this->dbeJCallActivity->getValue(DBEJCallActivity::awaitingCustomerResponseFlag) == 'Y') {
                 if ($this->dryRun) {
                     echo '<div>Activity with AwaitingCustomerResponseFlag<div>';
@@ -732,7 +733,7 @@ class BUProblemSLA extends Business
                     );
 
                     if ($this->dryRun) {
-                        echo '<div>' . print_r($pauseArray) . '</div>';
+                        echo '<div>' . json_encode($pauseArray) . '</div>';
                     }
 
                     $pauseStart = false;
@@ -745,6 +746,10 @@ class BUProblemSLA extends Business
                 DBEJCallActivity::awaitingCustomerResponseFlag
             );
         } // end while callactivity loop
+
+        if ($this->dryRun) {
+            echo "<div>" . __LINE__ . " </div>";
+        }
 
         // There wasn't an activity after the start pause so set end of the open pause to now
         if ($pauseStart) {
@@ -843,6 +848,10 @@ class BUProblemSLA extends Business
             $pauseStart = key($pauseArray);                       // the key is the start
         }
 
+        if ($this->dryRun) {
+            echo '<div></div>';
+        }
+
         while ($utCounter < $utEnd) {
 
             $dateAll = date(
@@ -888,7 +897,6 @@ class BUProblemSLA extends Business
             }
 
             if (!$pauseStart) {                                  // no pauses left
-
                 $includedSeconds += self::thirtySeconds;
                 $utCounter += self::thirtySeconds;
                 continue;
