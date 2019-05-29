@@ -2613,6 +2613,7 @@ class BUActivity extends Business
             WHERE userID = $userID 
               AND loggedDate = '$date' ";
 
+        var_dump($sql);
         $this->db->query($sql);
 
     }
