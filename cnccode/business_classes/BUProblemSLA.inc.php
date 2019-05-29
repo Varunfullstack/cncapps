@@ -690,12 +690,11 @@ class BUProblemSLA extends Business
 
         $pauseStart = false;
         $pauseArray = [];
-        $this->dbeJCallActivity->fetchNext();
+//        $this->dbeJCallActivity->fetchNext();
         if ($this->dryRun) {
             echo '<div>We have ' . $this->dbeJCallActivity->rowCount . ' activities to look at </div>';
         }
         while ($this->dbeJCallActivity->fetchNext()) {
-
             if ($this->dbeJCallActivity->getValue(DBEJCallActivity::awaitingCustomerResponseFlag) == 'Y') {
                 if ($this->dryRun) {
                     echo '<div>Activity with AwaitingCustomerResponseFlag<div>';
