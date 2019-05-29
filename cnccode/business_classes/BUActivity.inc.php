@@ -3289,7 +3289,8 @@ class BUActivity extends Business
         $sql .= " and holiday = 0 ";
         $sql .= " order by loggedDate asc, userID";
         $result = $this->db->query($sql);
-        while ($record = $result->fetch_assoc()) {
+        $userTimeLogs = $result->fetch_all(MYSQLI_ASSOC);
+        foreach ($userTimeLogs as $record) {
             $affectedRows = $this->updateTotalUserLoggedHours(
                 $record['userID'],
                 $record['loggedDate']
