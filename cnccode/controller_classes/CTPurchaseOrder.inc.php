@@ -1049,7 +1049,7 @@ class CTPurchaseOrder extends CTCNC
     {
         $this->setMethodName('editOrderLine');
         $this->setPageTitle('Purchase Order - Edit Line');
-        if (!$this->getParam('porheadID')) {
+        if ($this->getParam('porheadID') === null) {
             $this->displayFatalError('Purchase order ID not provided');
             return;
         }

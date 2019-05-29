@@ -2513,7 +2513,7 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError(CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL);
             return;
         }
-        if (!$this->getSequenceNo()) {
+        if ($this->getSequenceNo() === null) {
             $this->displayFatalError(CTSALESORDER_MSG_SEQNO_NOT_PASSED);
             return;
         }
