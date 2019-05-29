@@ -179,6 +179,10 @@ class BUProblemSLA extends Business
                 $this->dbeProblem->updateRow();
             }
 
+            if ($problemID) {
+                exit;
+            }
+
         }
 
         echo "<H2>In Progress</H2>";
@@ -219,7 +223,9 @@ class BUProblemSLA extends Business
             }
 
             echo $this->dbeProblem->getValue(DBEProblem::problemID) . ': ' . $workingHours . '<BR/>';
-
+            if ($problemID) {
+                exit;
+            }
         }
 
         $this->buActivity->getProblemsByStatus(
@@ -259,7 +265,9 @@ class BUProblemSLA extends Business
             }
 
             echo $this->dbeProblem->getValue(DBEProblem::problemID) . ': ' . $workingHours . '<BR/>';
-
+            if ($problemID) {
+                exit;
+            }
         }
 
     } // end function monitor
