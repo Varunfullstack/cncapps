@@ -5600,7 +5600,6 @@ class CTActivity extends CTCNC
         $row = mysqli_fetch_assoc($result);
 
         header('Content-type: ' . $row['fileMIMEType']);
-//      header('Content-Length: ' . $row['fileLength']);
         header('Content-Disposition: attachment; filename="' . $row['filename'] . '"');
 
         print $row['file'];
