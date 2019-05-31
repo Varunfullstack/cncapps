@@ -1771,6 +1771,8 @@ class CTSalesOrder extends CTCNC
         $curProfitGrandTotal = 0;
         $curCostGrandTotal = 0;
 
+        $firstLine = true;
+
         if ($dsOrdline->fetchNext()) {
             $this->template->set_block(
                 'SalesOrderDisplay',
@@ -1907,8 +1909,8 @@ class CTSalesOrder extends CTCNC
                         )) ? CT_CHECKED : null,
                         'urlMoveLineUp'      => $urlMoveLineUp,
                         'urlMoveLineDown'    => $urlMoveLineDown,
-                        'moveUpHidden'       => $dsOrdline->getValue(DBEOrdline::sequenceNo) > 0 ? null : 'hidden',
-                        'moveDownHidden'     => $dsOrdline->getValue(DBEOrdline::sequenceNo) < $dsOrdline->rowCount(
+                        'moveUpHidden'       => $firstLine ? 'hidden' : null,
+                        'moveDownHidden'     => $dsOrdline->getValue(DBEOrdline::sequenceNo) <= $dsOrdline->rowCount(
                         ) - 1 ? null : 'hidden',
                         'removeDescription'  => $removeDescription,
                         'urlEditLine'        => $urlEditLine,
@@ -2030,6 +2032,7 @@ class CTSalesOrder extends CTCNC
                     'salesOrderLineUpdateItemPriceIcon',
                     null
                 ); // clears for next time
+                $firstLine = false;
             } while ($dsOrdline->fetchNext());
         }
         // END OF ORDER LINES SECTION

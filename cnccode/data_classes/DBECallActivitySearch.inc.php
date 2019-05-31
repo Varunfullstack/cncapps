@@ -49,6 +49,7 @@ class DBECallActivitySearch extends DBEntity
     const activityCount = "activityCount";
     const linkedSalesOrderID = "linkedSalesOrderID";
     const managementReviewReason = "managementReviewReason";
+    const salesOrderID = 'salesOrderID';
 
     /**
      * calls constructor()
@@ -309,6 +310,13 @@ class DBECallActivitySearch extends DBEntity
             "pro_management_review_reason"
         );
 
+        $this->addColumn(
+            self::salesOrderID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            'pro_linked_ordno'
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -539,7 +547,7 @@ class DBECallActivitySearch extends DBEntity
 
         if ($contractCustomerItemID == '') {                        // Time and materials
             $whereParameters .=
-                " AND " . $this->getDBColumnName(self::contractCustomerItemID) . " = 0";
+                " AND " . $this->getDBColumnName(self::contractCustomerItemID) . " is null";
         } elseif ($contractCustomerItemID != 99) {        // anything other than All
             $whereParameters .=
                 " AND " . $this->getDBColumnName(self::contractCustomerItemID) . " = $contractCustomerItemID";
