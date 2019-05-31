@@ -310,10 +310,12 @@ class CTRenBroadband extends CTCNC
 
         if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
             $disabled = null;
+            $readonly = null;
             $pricePerMonth =
                 '<tr>
             <td class="promptText">Sale Price/Month </td>
-            <td class="fieldText"><input
+            <td class="fieldText">
+            <input
               name="renBroadband[1][salePricePerMonth]"
               type="text" value="' . Controller::htmlInputText(
                     $dsRenBroadband->getValue(DBEJRenBroadband::salePricePerMonth)
