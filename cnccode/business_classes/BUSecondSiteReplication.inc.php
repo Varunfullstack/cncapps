@@ -46,12 +46,8 @@ class BUSecondsiteReplication extends BUSecondsite
                 $this->suspendedServerCount++;
             }
 
-            if (
-                $server['itm_itemtypeno'] == CONFIG_2NDSITE_LOCAL_ITEMTYPEID &&
-                $server[DBECustomerItem::secondSiteReplicationExcludeFlag] == 'Y'
-            ) {
+            if ($server[DBECustomerItem::secondSiteReplicationExcludeFlag] == 'Y') {
                 $this->excludedLocalServers[] = $server;
-
                 $excludeFromChecks = true;
             } else {
 
@@ -249,39 +245,39 @@ class BUSecondsiteReplication extends BUSecondsite
                                     )
                                 );
 
-                        } else {
-                            if (!$isSuspended) {
-                                $this->imagePassesCount++;
+                            } else {
+                                if (!$isSuspended) {
+                                    $this->imagePassesCount++;
+                                }
+                                /*
+                                Passed all verification checks.
+                                */
+                                $this->logMessage(
+                                    $server['cus_name'] . ' ' . $server['serverName'] . ' Up-to-date image ' . $mostRecentFileName . ' ' . DATE(
+                                        'd/m/Y H:i:s',
+                                        $mostRecentFileTime
+                                    ),
+                                    self::LOG_TYPE_SUCCESS
+                                );
+
+                                $status = self::STATUS_PASSED;
+
+                                $this->setImageStatus(
+                                    $image['secondSiteImageID'],
+                                    $status,
+                                    $mostRecentFileName,
+                                    date(
+                                        'Y-m-d H:i:s',
+                                        $mostRecentFileTime
+                                    )
+                                );
+                                /*
+                                Note: If this server is suspended then it's status will now be set back to passed
+                                and the suspended date reset.
+                                */
                             }
-                            /*
-                            Passed all verification checks.
-                            */
-                            $this->logMessage(
-                                $server['cus_name'] . ' ' . $server['serverName'] . ' Up-to-date image ' . $mostRecentFileName . ' ' . DATE(
-                                    'd/m/Y H:i:s',
-                                    $mostRecentFileTime
-                                ),
-                                self::LOG_TYPE_SUCCESS
-                            );
 
-                            $status = self::STATUS_PASSED;
-
-                            $this->setImageStatus(
-                                $image['secondSiteImageID'],
-                                $status,
-                                $mostRecentFileName,
-                                date(
-                                    'Y-m-d H:i:s',
-                                    $mostRecentFileTime
-                                )
-                            );
-                            /*
-                            Note: If this server is suspended then it's status will now be set back to passed
-                            and the suspended date reset.
-                            */
                         }
-
-                    }
 
                     }
 
