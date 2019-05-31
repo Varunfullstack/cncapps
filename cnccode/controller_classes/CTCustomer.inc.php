@@ -294,6 +294,7 @@ class CTCustomer extends CTCNC
         )) {          // For some reason the dynamically generated call to setContact from retrieveHTMLVars does not
             return;                                // pass a valid array so I avoid a crash like this! Same for setSite() below.
         }
+
         foreach ($contactArray as $key => $value) {
 
             if (@$value['contactID']) {
@@ -824,14 +825,10 @@ class CTCustomer extends CTCNC
                 $this->getYN(@$value['prospectFlag'])
             );
 
-            var_dump(@$value['createDate']);
-            $this->dsCustomer->debug = true;
             $this->dsCustomer->setValue(
                 DBECustomer::createDate,
                 @$value['createDate']
             );
-            $this->dsCustomer->debug = false;
-
 
             $this->dsCustomer->setValue(
                 DBECustomer::gscTopUpAmount,

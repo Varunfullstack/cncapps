@@ -260,6 +260,10 @@
         width: 160px;
     }
 
+    .no-close .ui-dialog-titlebar-close {
+        display: none;
+    }
+
 </style>
 <script src=".javascript/jquery-form-validator-2.3.79.js"
 ></script>
@@ -843,7 +847,14 @@
     var validPassword = false;
     var validRepeatPassword = false;
 
+    let validatingContactsModal;
+
     $(function () {
+
+        validatingContactsModal = $('#validatingContactsModal').dialog({
+            autoOpen: false, width: 500, modal: true, dialogClass: 'no-close', position: {my: 'top', at: 'top'}
+        });
+        console.log(validatingContactsModal);
 
         $(".contactSupportLevel select").change(function () {
 
@@ -1385,8 +1396,7 @@
     const forceDirectDebit = {forceDirectDebit};
 
 
-    function checkMailShotOptions() {
-
+    function runValidations() {
         window.isSubmitting = true;
 
         const emails = {};
@@ -1405,46 +1415,6 @@
             }
 
         }
-
-        // var x = document.getElementsByClassName('stmCheckBox');
-        // var count = 0;
-        // var i = 0;
-        // do {
-        //     if (x[i].checked) {
-        //         count++;
-        //     }
-        //
-        //     i++;
-        // } while (count < 2 && i < x.length);
-        //
-        // if (count > 1) {
-        //     alert('There cannot be more than one "stm" option selected');
-        //     return false;
-        // }
-        //
-        // if (!count) {
-        //     alert('There needs to be at least one "stm" option selected');
-        //     return false;
-        // }
-        //
-        // x = document.getElementsByClassName('invCheckBox');
-        // count = 0;
-        // i = 0;
-        // do {
-        //     if (x[i].checked) {
-        //         count++;
-        //     }
-        //
-        //     i++;
-        // } while (count < 1 && i < x.length);
-        //
-        // if (!count) {
-        //     alert('There needs to be at least one "inv" option selected');
-        //     return false;
-        // }
-
-        // check that the selected primaryMainContact is in fact also a "main"
-        contactsTable
 
 
         if ({customerID} != 0 && !document.getElementById('prospectFlag').checked) {
@@ -1533,11 +1503,20 @@
         return true;
     }
 
+    function checkMailShotOptions() {
+        validatingContactsModal.dialog('open');
+        const toReturn = runValidations();
+        validatingContactsModal.dialog('close');
+        return toReturn;
+
+    }
+
     $(function () {
         loadNote('first');
     })
     //-->
 </script>
+
 <style>
     .redText td.content > input, .redText td.content > textarea, .redText td.content > select, .redText td.content > button {
         color: red !important;
@@ -2606,7 +2585,7 @@
         <br/>
         <br/>
         <h3 style="clear: both;">Contacts</h3>
-        <table >
+        <table>
             <thead style="font-size: small;">
             <tr>
                 <th>
@@ -3392,5 +3371,7 @@
         >
     </div>
 </form>
-
+<div id="validatingContactsModal">
+    <p>Validating contacts</p>
+</div>
 {orders}

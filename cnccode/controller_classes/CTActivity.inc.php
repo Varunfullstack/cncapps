@@ -781,14 +781,14 @@ class CTActivity extends CTCNC
         $this->breachedSlaDropdown($dsSearchForm->getValue(BUActivity::searchFormBreachedSlaOption));
 
         //Contract selection
-        if ($dsSearchForm->getValue(BUActivity::searchFormCustomerID)) {
-            $this->contractDropdown(
-                $dsSearchForm->getValue(BUActivity::searchFormCustomerID),
-                $dsSearchForm->getValue(BUActivity::searchFormContractCustomerItemID),
-                'ActivitySearch',
-                'contractBlock'
-            );
-        }
+
+        $this->contractDropdown(
+            $dsSearchForm->getValue(BUActivity::searchFormCustomerID),
+            $dsSearchForm->getValue(BUActivity::searchFormContractCustomerItemID),
+            'ActivitySearch',
+            'contractBlock'
+        );
+
 
         $this->userDropdown(
             $dsSearchForm->getValue(BUActivity::searchFormUserID),
@@ -888,7 +888,7 @@ class CTActivity extends CTCNC
 
             if ($dsSearchForm->getValue(BUActivity::searchFormStatus) == 'CHECKED_T_AND_M' ||
                 $dsSearchForm->getValue(BUActivity::searchFormStatus) == 'CHECKED_NON_T_AND_M') {
-                $weirdColumns = '<td class="listHeadText"><div style="width: 100px">SO</div></td>';
+                $weirdColumns = '';
                 $headerColSpan = 12;
             }
 
@@ -928,35 +928,31 @@ class CTActivity extends CTCNC
                 $contractField = $dsSearchResults->getValue($contractDescriptionCol);
 
                 $checkBox = null;
+                $dbeProblem = new DBEProblem($this);
+                $dbeProblem->getRow($problemID);
+                $salesOrderID = $dbeProblem->getValue(DBEProblem::linkedSalesOrderID);
+                $salesOrderLink = "";
+                if ($salesOrderID) {
+                    $salesOrderURL =
+                        Controller::buildLink(
+                            'SalesOrder.php',
+                            array(
+                                'action'    => 'displaySalesOrder',
+                                'ordheadID' => $salesOrderID
+                            )
+                        );
+
+                    $salesOrderLink = '<a href="' . $salesOrderURL . '" target="_blank">' . $salesOrderID . '</a>';
+                }
+
 
                 if (
                     $dsSearchForm->getValue(BUActivity::searchFormStatus) == 'CHECKED_T_AND_M' ||
                     $dsSearchForm->getValue(BUActivity::searchFormStatus) == 'CHECKED_NON_T_AND_M'
                 ) {
+                    $weirdFields = null;
                     $checkBox =
                         '<input type="checkbox" id="callActivityID" name="callActivityID[' . $callActivityID . ']" value="' . $callActivityID . '" />';
-
-                    $dbeProblem = new DBEProblem($this);
-                    $dbeProblem->getRow($problemID);
-
-
-                    $salesOrderID = $dbeProblem->getValue(DBEProblem::linkedSalesOrderID);
-                    $salesOrderLink = "";
-                    if ($salesOrderID) {
-                        $salesOrderURL =
-                            Controller::buildLink(
-                                'SalesOrder.php',
-                                array(
-                                    'action'    => 'displaySalesOrder',
-                                    'ordheadID' => $salesOrderID
-                                )
-                            );
-
-                        $salesOrderLink = '<a href="' . $salesOrderURL . '" target="_blank">' . $salesOrderID . '</a>';
-                    }
-
-                    $weirdFields = '<td class="listItemText">' . $salesOrderLink . '</td>';
-
 
                     $contracts = $this->getContractsForCustomer($dbeProblem->getValue(DBEProblem::customerID));
 
@@ -989,17 +985,12 @@ class CTActivity extends CTCNC
                     array(
                         'listCustomerName'          => $dsSearchResults->getValue($customerNameCol),
                         'listContractDescription'   => $contractField,
-                        //                        'listProjectDescription' => $dsSearchResults->getValue($projectDescriptionCol),
                         'listCallURL'               => $displayActivityURL,
                         'listCallActivityID'        => $dsSearchResults->getValue($callActivityIDCol),
                         'listProblemID'             => $problemID,
                         'listStatus'                => $dsSearchResults->getValue($statusCol),
                         'listDate'                  => Controller::dateYMDtoDMY($dsSearchResults->getValue($dateCol)),
-                        //                        'listStart'                 => $dsSearchResults->getValue($startCol),
-                        //                        'listEnd'                   => $dsSearchResults->getValue($endCol),
                         'listPriority'              => $dsSearchResults->getValue(DBECallActivitySearch::priority),
-                        //                        'listSlaResponseHours'      => $dsSearchResults->getValue(DBECallActivitySearch::slaResponseHours),
-                        //                        'listRespondedHours'        => $dsSearchResults->getValue(DBECallActivitySearch::respondedHours),
                         'listWorkingHours'          => $dsSearchResults->getValue(DBECallActivitySearch::workingHours),
                         'listActivityDurationHours' => $dsSearchResults->getValue(
                             DBECallActivitySearch::activityDurationHours
@@ -1007,6 +998,7 @@ class CTActivity extends CTCNC
                         'listRootCause'             => $dsSearchResults->getValue(DBECallActivitySearch::rootCause),
                         'listFixEngineer'           => $dsSearchResults->getValue(DBECallActivitySearch::fixEngineer),
                         'listActivityCount'         => $dsSearchResults->getValue(DBECallActivitySearch::activityCount),
+                        'listOrderLink'             => $salesOrderLink,
                         'reason'                    => substr(
                             common_stripEverything($reason),
                             0,
@@ -1147,10 +1139,12 @@ class CTActivity extends CTCNC
     {
         $buCustomerItem = new BUCustomerItem($this);
         $dsContract = new DataSet($this);
-        $buCustomerItem->getContractsByCustomerID(
-            $customerID,
-            $dsContract
-        );
+        if ($customerID) {
+            $buCustomerItem->getContractsByCustomerID(
+                $customerID,
+                $dsContract
+            );
+        }
 
         if ($contractCustomerItemID == '99') {
             $this->template->set_var(
@@ -1174,6 +1168,7 @@ class CTActivity extends CTCNC
         );
 
         $lastRenewalType = null;
+        $currentRow = 0;
         while ($dsContract->fetchNext()) {
             $optGroupOpen = null;
             $optGroupClose = null;
@@ -1201,7 +1196,8 @@ class CTActivity extends CTCNC
                     'contractCustomerItemID' => $dsContract->getValue(DBEJContract::customerItemID),
                     'contractDescription'    => $description,
                     'optGroupOpen'           => $optGroupOpen,
-                    'optGroupClose'          => $optGroupClose
+                    'optGroupClose'          => $optGroupClose,
+                    'optGroupCloseLast'      => $dsContract->rowCount() == $currentRow ? '</optgroup>' : 'null'
                 )
             );
             $this->template->parse(
@@ -1209,6 +1205,7 @@ class CTActivity extends CTCNC
                 $blockName,
                 true
             );
+            $currentRow++;
         }
 
     } //end userDropdown
@@ -5600,7 +5597,6 @@ class CTActivity extends CTCNC
         $row = mysqli_fetch_assoc($result);
 
         header('Content-type: ' . $row['fileMIMEType']);
-//      header('Content-Length: ' . $row['fileLength']);
         header('Content-Disposition: attachment; filename="' . $row['filename'] . '"');
 
         print $row['file'];

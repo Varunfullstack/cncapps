@@ -1,11 +1,20 @@
 # Changelog
 This project changes will be shown here.
 
-## [v3.1.1]
+## [v3.1.2] - 2019-05-31
+### Fixed
+- Fix issue downloading Portal Documents
+- Fix issue trying to save customer contacts
+- Fix issue preventing to edit several fields on RenBroadband
+- Fix issue with line arrows in Sales Orders
+- Fix issue with Activity search, when searching Activity Type = Initial and Contract T&M
+- Fix issue with Backup validations where the item type would determine if the server is excluded or not
+## Changed
+- Changed fields order in Activity search
+
+## [v3.1.1] - 2019-05-29
 ### Fixed
 - Fixed issue with MySQL functions not having "characteristic" information
-
-
 
 ## [v3.1.0] - 2019-05-25
 ### Added

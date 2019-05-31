@@ -196,8 +196,8 @@
                             value="{contractCustomerItemID}"
                     >{contractDescription}
                     </option>
+                    {optGroupCloseLast}
                     <!-- END contractBlock -->
-                    </optgroup>
                 </select>
                 <span class="formErrorMessage">{contractCustomerItemIDMessage}</span>
             </td>
@@ -404,13 +404,14 @@
             <td class="listHeadText"><a href="{requestUri}&sortColumn=date">Date</a></td>
             <td class="listHeadText"><a href="{requestUri}&sortColumn=reason">Description</a></td>
             <td class="listHeadText"><a href="{requestUri}&sortColumn=priority">Priority</a></td>
-            <td class="listHeadText"><a href="{requestUri}&sortColumn=fixEngineer">Fixed By</a></td>
-            <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=workingHours">Fix</a></td>
-            <td class="listHeadText"><a href="{requestUri}&sortColumn=activityCount">Activities</a></td>
+            <td class="listHeadText"><a href="{requestUri}&sortColumn=salesOrderID">Order</a></td>
+            <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=activityDurationHours">Activity</a></td>
             <td class="listHeadText"><a href="{requestUri}&sortColumn=contractDescription">Contract</a></td>
             <td class="listHeadText"><a href="{requestUri}&sortColumn=rootCause">Root Cause</a></td>
+            <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=workingHours">Elapsed</a></td>
+            <td class="listHeadText"><a href="{requestUri}&sortColumn=activityCount">Activities</a></td>
+            <td class="listHeadText"><a href="{requestUri}&sortColumn=fixEngineer">Fixed By</a></td>
             {weirdColumns}
-            <td class="listHeadTextRight"><a href="{requestUri}&sortColumn=activityDurationHours">Activity</a></td>
         </tr>
         <!-- BEGIN activityBlock -->
         <tr valign="top"
@@ -442,9 +443,20 @@
                 nowrap
             >{listPriority}
             </td>
+            <td align="top">
+                {listOrderLink}
+            </td>
+            <td align="right"
+                nowrap
+            >{listActivityDurationHours}
+            </td>
             <td align="top"
                 nowrap
-            >{listFixEngineer}
+            >{listContractDescription}
+            </td>
+            <td align="top"
+                nowrap
+            >{listRootCause}
             </td>
             <td align="right"
                 nowrap
@@ -456,19 +468,9 @@
             </td>
             <td align="top"
                 nowrap
-            >{listContractDescription}
-            </td>
-            <td align="top"
-                nowrap
-            >{listRootCause}
+            >{listFixEngineer}
             </td>
             {weirdFields}
-
-            <td align="right"
-                nowrap
-            >{listActivityDurationHours}
-            </td>
-
         </tr>
         <!-- END activityBlock -->
     </table>

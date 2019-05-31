@@ -82,7 +82,10 @@ class CTPortalCustomerDocument extends CTCNC
             } else {                                                                    // creating new
                 $dsPortalCustomerDocument->initialise();
                 $dsPortalCustomerDocument->setValue(DBEPortalCustomerDocument::portalCustomerDocumentID, '0');
-                $dsPortalCustomerDocument->setValue(DBEPortalCustomerDocument::customerID, $this->getParam('customerID'));
+                $dsPortalCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::customerID,
+                    $this->getParam('customerID')
+                );
                 $portalCustomerDocumentID = '0';
             }
         } else {                                                                        // form validation error
@@ -179,14 +182,18 @@ class CTPortalCustomerDocument extends CTCNC
             $dsPortalCustomerDocument
         );
 
-        header('Content - type: ' . $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::fileMimeType));
+        header('Content-Type: ' . $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::fileMimeType));
         header(
-            'Content - Disposition: inline; filename = "' . $dsPortalCustomerDocument->getValue(
+            'Content-Disposition: inline; filename = "' . $dsPortalCustomerDocument->getValue(
+                DBEPortalCustomerDocument::filename
+            ) . '"'
+        );
+        header(
+            'custom: filename = "' . $dsPortalCustomerDocument->getValue(
                 DBEPortalCustomerDocument::filename
             ) . '"'
         );
         print $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::file);
-
         exit;
     }
 
@@ -221,7 +228,9 @@ class CTPortalCustomerDocument extends CTCNC
     {
         $this->setMethodName('update');
 
-        $this->formError = (!$this->dsPortalCustomerDocument->populateFromArray($this->getParam('portalCustomerDocument')));
+        $this->formError = (!$this->dsPortalCustomerDocument->populateFromArray(
+            $this->getParam('portalCustomerDocument')
+        ));
         /*
         Need a file when creating new
         */

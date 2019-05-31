@@ -115,12 +115,8 @@ class BUSecondsite extends Business
                 $this->suspendedServerCount++;
             }
 
-            if (
-                $server['itm_itemtypeno'] == CONFIG_2NDSITE_LOCAL_ITEMTYPEID &&
-                $server[DBECustomerItem::secondsiteLocalExcludeFlag] == 'Y'
-            ) {
+            if ($server[DBECustomerItem::secondsiteLocalExcludeFlag] == 'Y') {
                 $this->excludedLocalServers[] = $server;
-
                 $excludeFromChecks = true;
             } else {
 
