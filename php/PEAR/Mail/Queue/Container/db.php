@@ -88,49 +88,30 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
      * @var string  the name of the sequence for this table
      */
     var $sequence = null;
+    private $fetchedCount;
+    private $startedRunning;
 
     // }}}
     // {{{ __construct()
 
-    function __construct($options)
-    {
-        return $this->Mail_Queue_Container_db($options);
-    }
-
-    // }}}
-    // {{{ Mail_Queue_Container_db()
-
     /**
-     * Constructor
-     *
-     * Mail_Queue_Container_db()
-     *
-     * @param mixed $options An associative array of option names and
-     *                          their values. See DB_common::setOption
-     *                          for more information about connection options.
-     *
-     * @access public
-     * @return Mail_Queue_Error
+     * Mail_Queue_Container_db constructor.
+     * @param $dsn
+     * @param $mailTable
+     * @param null $sequence
+     * @param null $pearErrorMode
      */
-    function Mail_Queue_Container_db($options)
+    function __construct($dsn, $mailTable, $sequence = null, $pearErrorMode = null)
     {
-        if (!is_array($options) || !isset($options['dsn'])) {
-            return new Mail_Queue_Error(
-                MAILQUEUE_ERROR_NO_OPTIONS,
-                $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
-                'No dns specified!'
-            );
-        }
-        if (isset($options['mail_table'])) {
-            $this->mail_table = $options['mail_table'];
-        }
-        $this->sequence = (isset($options['sequence']) ? $options['sequence'] : $this->mail_table);
+        parent::__construct();
+        $this->mail_table = $mailTable;
 
-        if (!empty($options['pearErrorMode'])) {
-            $this->pearErrorMode = $options['pearErrorMode'];
+        $this->sequence = (isset($sequence) ? $sequence : $this->mail_table);
+
+        if (!isset($pearErrorMode)) {
+            $this->pearErrorMode = $pearErrorMode;
         }
-        $dsn = array_key_exists('dsn', $options) ? $options['dsn'] : $options;
-        $this->db =& DB::connect($dsn, true);
+        $this->db = DB::connect($dsn, true);
 
         if (PEAR::isError($this->db)) {
             return new Mail_Queue_Error(
@@ -142,19 +123,43 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
             $this->db->setFetchMode(DB_FETCHMODE_ASSOC);
         }
         $this->setOption();
+        $this->startedRunning = date('Y-m-d H:i:s');
     }
 
-    // }}}
-    // {{{ _preload()
+    function fetchNext()
+    {
+
+    }
 
     /**
-     * Preload mail to queue.
-     *
-     * @return mixed  True on success else Mail_Queue_Error object.
-     * @access private
+     * @param $error Mail_Queue_Error
+     * @throws Exception
      */
-    function _preload()
+    function skip($error)
     {
+        if (!$this->currentMail) {
+            return;
+        }
+
+        $nextTry = (new DateTime())->add(new DateInterval('PT15M'))->format(DATE_MYSQL_DATETIME);
+
+        $query = sprintf(
+            "update %s set time_to_send = %s, instanceId = null, skippedReason = %s where id = %d",
+            $this->mail_table,
+            $this->db->quote($nextTry),
+            $error->getMessage(),
+            $this->currentMail->id
+        );
+        $this->db->query($query);
+    }
+
+    function get()
+    {
+        if (($this->fetchedCount + 1) > $this->limit) {
+            // we have fetched all the emails we needed
+            return null;
+        }
+
         if (!is_object($this->db) || !is_a($this->db, 'DB_Common')) {
             $msg = 'DB::connect failed';
             if (PEAR::isError($this->db)) {
@@ -165,6 +170,104 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
                 $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__, $msg
             );
         }
+
+        $query = sprintf(
+            "SELECT * FROM %s
+                           WHERE sent_time IS NULL
+                             AND try_sent < %d
+                             AND time_to_send <= %s
+                             and instanceId is null
+                        ORDER BY time_to_send limit 1",
+            $this->mail_table,
+            $this->try,
+            $this->db->quote($this->startedRunning)
+        );
+        $res = $this->db->query($query);
+        if (PEAR::isError($res)) {
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_QUERY_FAILED,
+                $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
+                'DB::query failed - "' . $query . '" - ' . $res->toString()
+            );
+        }
+
+        while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+            if (!is_array($row)) {
+                return new Mail_Queue_Error(
+                    MAILQUEUE_ERROR_QUERY_FAILED,
+                    $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
+                    'DB::query failed - "' . $query . '" - ' . $res->toString()
+                );
+            }
+
+            $delete_after_send = (bool)$row['delete_after_send'];
+
+            $headers = @unserialize($row['headers']);
+            if (!$headers) {
+                return new Mail_Queue_Error(
+                    MAILQUEUE_ERROR_QUERY_FAILED,
+                    $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
+                    'DB::unserialization of headers failed'
+                );
+            }
+            $body = @unserialize($row['body']);
+            if (!$body) {
+                return new Mail_Queue_Error(
+                    MAILQUEUE_ERROR_QUERY_FAILED,
+                    $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
+                    'DB::unserialization of body failed'
+                );
+            }
+
+            $toReturn = new Mail_Queue_Body(
+                $row['id'],
+                $row['create_time'],
+                $row['time_to_send'],
+                $row['sent_time'],
+                $row['id_user'],
+                $row['ip'],
+                $row['sender'],
+                $this->_isSerialized($row['recipient']) ? unserialize($row['recipient']) : $row['recipient'],
+                $headers,
+                $body,
+                $delete_after_send,
+                $row['try_sent']
+            );
+            $query = sprintf(
+                "update %s set instanceId = %d, skippedReason = null
+                           WHERE id = %d ",
+                $this->mail_table,
+                $this->instanceId,
+                $row['id']
+            );
+            $res = $this->db->query($query);
+            $this->fetchedCount++;
+            return $toReturn;
+
+        }
+        return null;
+    }
+
+    /**
+     * Preload mail to queue.
+     *
+     * @return mixed  True on success else Mail_Queue_Error object.
+     * @access private
+     */
+    function preload()
+    {
+        parent::preload();
+        if (!is_object($this->db) || !is_a($this->db, 'DB_Common')) {
+            $msg = 'DB::connect failed';
+            if (PEAR::isError($this->db)) {
+                $msg .= ': ' . DB::errorMessage($this->db);
+            }
+            return new Mail_Queue_Error(
+                MAILQUEUE_ERROR_CANNOT_CONNECT,
+                $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__, $msg
+            );
+        }
+
         $query = sprintf(
             "SELECT * FROM %s
                            WHERE sent_time IS NULL
@@ -186,6 +289,7 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
 
         $this->_last_item = 0;
         $this->queue_data = array(); //reset buffer
+        $ids = [];
         while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
             if (!is_array($row)) {
                 return new Mail_Queue_Error(
@@ -197,6 +301,7 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
 
             $delete_after_send = (bool)$row['delete_after_send'];
 
+            $ids[] = $row['id'];
             $this->queue_data[$this->_last_item] = new Mail_Queue_Body(
                 $row['id'],
                 $row['create_time'],
@@ -213,12 +318,18 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
             );
             $this->_last_item++;
         }
-
+        $query = sprintf(
+            "update %s set instanceId = %d
+                           WHERE id in (" . implode(',', $ids) . ")",
+            $this->mail_table,
+            $this->instanceId
+        );
+        $res = $this->db->query($query);
         return true;
     }
 
-    // }}}
-    // {{{ put()
+// }}}
+// {{{ put()
 
     /**
      * Put new mail in queue and save in database.
@@ -294,8 +405,8 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
         return $id;
     }
 
-    // }}}
-    // {{{ countSend()
+// }}}
+// {{{ countSend()
 
     /**
      * Check how many times mail was sent.
@@ -304,17 +415,19 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
      * @return mixed  Integer or Mail_Queue_Error class if error.
      * @access public
      */
-    function countSend($mail)
+    function countSend()
     {
-        if (!is_object($mail) || !is_a($mail, 'mail_queue_body')) {
-            return new Mail_Queue_Error(MAILQUEUE_ERROR_UNEXPECTED, __FILE__, __LINE__);
+
+        if (!$this->currentMail) {
+            return new Mail_Queue_Error(34);
         }
-        $count = $mail->_try();
+
+        $count = $this->currentMail->_try();
         $query = sprintf(
             "UPDATE %s SET try_sent = %d WHERE id = %d",
             $this->mail_table,
             $count,
-            $mail->getId()
+            $this->currentMail->getId()
         );
         $res = $this->db->query($query);
         if (PEAR::isError($res)) {
@@ -326,9 +439,6 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
         }
         return $count;
     }
-
-    // }}}
-    // {{{ setAsSent()
 
     /**
      * Set mail as already sent.
@@ -364,8 +474,8 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
         return true;
     }
 
-    // }}}
-    // {{{ getMailById()
+// }}}
+// {{{ getMailById()
 
     /**
      * Return mail by id $id (bypass mail_queue)
@@ -431,7 +541,7 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
         return (int)$count;
     }
 
-    // }}}
+// }}}
 
 
     /**
@@ -457,7 +567,7 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
         return true;
     }
 
-    // {{{ deleteMail()
+// {{{ deleteMail()
 
     /**
      * Remove from queue mail with $id identifier.
@@ -486,7 +596,7 @@ class Mail_Queue_Container_db extends Mail_Queue_Container
         return true;
     }
 
-    // }}}
+
 }
 
 ?>

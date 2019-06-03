@@ -100,6 +100,8 @@ class Mail_Queue_Container
     var $try;
     var $force_preload;
     var $buffer_size = 10; //number of mails in the queue
+    /** @var Mail_Queue_Body */
+    protected $currentMail;
 
     /**
      * Pear error mode (see PEAR doc)
@@ -108,53 +110,64 @@ class Mail_Queue_Container
      * @access private
      */
     var $pearErrorMode = PEAR_ERROR_RETURN;
-
-    // }}}
-    // {{{ get()
+    /**
+     * @var string
+     */
+    protected $instanceId;
 
     /**
-     * Get next mail from queue. When exclude first time preload all queue
-     *
-     * @return Mail_Queue_Body|Mail_Queue_Error|object|bool on success else Mail_Queue_Error
-     * @access    public
+     * Mail_Queue_Container constructor.
      */
-    function get()
+    protected function __construct()
     {
-        if (PEAR::isError($err = $this->preload())) {
-            return $err;
-        }
-        if ($err !== true) {
-            // limit met
-            return new Mail_Queue_Error(
-                MAILQUEUE_ERROR_CANNOT_INITIALIZE,
-                $this->pearErrorMode,
-                E_USER_ERROR,
-                __FILE__,
-                __LINE__,
-                'Cannot preload items: limit'
-            );
-        }
-
-        if (empty($this->queue_data)) {
-            return false;
-        }
-        if (!isset($this->queue_data[$this->_current_item])) {
-            //unlikely...
-            return new Mail_Queue_Error(
-                MAILQUEUE_ERROR_CANNOT_INITIALIZE,
-                $this->pearErrorMode,
-                E_USER_ERROR,
-                __FILE__,
-                __LINE__,
-                'No item: ' . $this->_current_item . ' in queue!'
-            );
-        }
-
-        $object = $this->queue_data[$this->_current_item];
-        unset($this->queue_data[$this->_current_item]);
-        $this->_current_item++;
-        return $object;
+        $this->instanceId = uniqid();
     }
+
+
+//    /**
+//     * Get next mail from queue. When exclude first time preload all queue
+//     *
+//     * @return Mail_Queue_Body|Mail_Queue_Error|object|bool on success else Mail_Queue_Error
+//     * @access    public
+//     */
+//    function get()
+//    {
+////        if (PEAR::isError($err = $this->preload())) {
+////            return $err;
+////        }
+////        if ($err !== true) {
+////            // limit met
+////            return new Mail_Queue_Error(
+////                MAILQUEUE_ERROR_CANNOT_INITIALIZE,
+////                $this->pearErrorMode,
+////                E_USER_ERROR,
+////                __FILE__,
+////                __LINE__,
+////                'Cannot preload items: limit'
+////            );
+////        }
+////
+////        if (empty($this->queue_data)) {
+////            return false;
+////        }
+////        if (!isset($this->queue_data[$this->_current_item])) {
+////            //unlikely...
+////            return new Mail_Queue_Error(
+////                MAILQUEUE_ERROR_CANNOT_INITIALIZE,
+////                $this->pearErrorMode,
+////                E_USER_ERROR,
+////                __FILE__,
+////                __LINE__,
+////                'No item: ' . $this->_current_item . ' in queue!'
+////            );
+////        }
+////
+////        $object = $this->queue_data[$this->_current_item];
+////        unset($this->queue_data[$this->_current_item]);
+////        $this->_current_item++;
+////        $this->currentMail = $object;
+////        return $object;
+//    }
 
     // }}}
     // {{{ skip()
@@ -162,15 +175,11 @@ class Mail_Queue_Container
     /**
      * Remove the current (problematic) mail from the buffer, but don't delete
      * it from the db: it might be a temporary issue.
+     * @param $error
      */
-    function skip()
+    function skip($error)
     {
-        if (!empty($this->queue_data)) {
-            if (isset($this->queue_data[$this->_current_item])) {
-                unset($this->queue_data[$this->_current_item]);
-                $this->_current_item++;
-            }
-        }
+
     }
 
     // }}}
@@ -241,7 +250,7 @@ class Mail_Queue_Container
      * @return mixed  Integer or false if error.
      * @access public
      */
-    function countSend($mail)
+    function countSend()
     {
         return false;
     }
@@ -328,10 +337,6 @@ class Mail_Queue_Container
                 $this->buffer_size,
                 $this->limit
             );
-        }
-
-        if (Mail_Queue::isError($err = $this->_preload())) {
-            return $err;
         }
 
         //restore limit
