@@ -1247,7 +1247,7 @@ class DB_common extends PEAR
      * Generates and executes a LIMIT query
      *
      * @param string $query the query
-     * @param intr $from the row to start to fetching (0 = the first row)
+     * @param int $from the row to start to fetching (0 = the first row)
      * @param int $count the numbers of rows to fetch
      * @param mixed $params array, string or numeric data to be used in
      *                         execution of the statement.  Quantity of items
