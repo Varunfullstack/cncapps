@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 558 - Overnight contact validation check
+
 ## [v3.1.2] - 2019-05-31
 ### Fixed
 - Fix issue downloading Portal Documents

@@ -8,6 +8,7 @@
 require_once($cfg['path_bu'] . '/BUContact.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
+require_once($cfg['path_bu'] . '/BUMail.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 // Messages
@@ -112,6 +113,9 @@ class CTContact extends CTCNC
             case CTCONTACT_ACT_CONTACT_UPDATE:
                 $this->checkPermissions(array(PHPLIB_PERM_MAINTENANCE, PHPLIB_PERM_SALES));
                 $this->contactUpdate();
+                break;
+            case 'validation':
+                $this->validateContacts();
                 break;
             case CTCNC_ACT_DISP_CONTACT_POPUP:
             default:
@@ -238,11 +242,6 @@ class CTContact extends CTCNC
             true
         );
         $this->parsePage();
-    }
-
-    function validateContact(&$dsContact)
-    {
-        //
     }
 
     /**
@@ -570,5 +569,186 @@ class CTContact extends CTCNC
             )
         );
         header('Location: ' . $urlNext);
+    }
+
+    private function validateContacts()
+    {
+        // find all the active customers
+        $buCustomer = new BUCustomer($this);
+        $dsCustomers = new DataSet($this);
+        $buCustomer->getActiveCustomers($dsCustomers, true);
+        $dbeContact = new DBEContact($this);
+
+        $customersFailingValidation = [];
+
+        while ($dsCustomers->fetchNext()) {
+            $customerID = $dsCustomers->getValue(DBECustomer::customerID);
+
+            $validationErrors = [
+                "contactErrors"  => [],
+                "customerErrors" => [],
+                "customerID"     => $customerID,
+                "customerName"   => $dsCustomers->getValue(DBECustomer::name)
+            ];
+            $dsContacts = new DataSet($this);
+            $buCustomer->getContactsByCustomerID($customerID, $dsContacts);
+            $atLeastOneAccount = false;
+            $atLeastOneInvoice = false;
+            $atLeastOneAtMostOneStatement = false;
+            $atLeastOneMain = false;
+            $atLeastOneReview = false;
+            $statementCount = 0;
+            $atLeastOneTopUp = !$buCustomer->hasPrepayContract($customerID);
+            $atLeastOneReport = false;
+
+            while ($dsContacts->fetchNext()) {
+                $contactErrors = [];
+
+                $contactID = $dsContacts->getValue(DBEContact::contactID);
+                if (!$dsContacts->getValue(DBEContact::firstName)) {
+                    $contactErrors[] = "First Name Required";
+                }
+
+                if (!$dsContacts->getValue(DBEContact::lastName)) {
+                    $contactErrors[] = "Last Name Required";
+                }
+
+                if (!$dsContacts->getValue(DBEContact::title)) {
+                    $contactErrors[] = "Title Required";
+                }
+
+                if ($email = $dsContacts->getValue(DBEContact::email)) {
+                    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                        $contactErrors[] = "Invalid Email";
+                    } else {
+                        if (!$dbeContact->validateUniqueEmail($email, $contactID)) {
+                            $contactErrors[] = "Duplicated Email";
+                        }
+                    }
+                }
+
+                if ($dsContacts->getValue(DBEContact::accountsFlag) == 'Y' && !$atLeastOneAccount) {
+                    $atLeastOneAccount = true;
+                }
+
+                if ($dsContacts->getValue(DBEContact::mailshot2Flag) == 'Y' && !$atLeastOneInvoice) {
+                    $atLeastOneInvoice = true;
+                }
+
+                if ($dsContacts->getValue(DBEContact::mailshot4Flag) == 'Y') {
+                    if (!$atLeastOneAtMostOneStatement && !$statementCount) {
+                        $atLeastOneAtMostOneStatement = true;
+                        $statementCount++;
+                    } else {
+                        $atLeastOneAtMostOneStatement = false;
+                    }
+                }
+
+                if ($dsContacts->getValue(
+                        DBEContact::supportLevel
+                    ) == DBEContact::supportLevelMain && !$atLeastOneMain) {
+                    $atLeastOneMain = true;
+                }
+
+                if ($dsContacts->getValue(DBEContact::reviewUser) == 'Y' && !$atLeastOneReview) {
+                    $atLeastOneReview = true;
+                }
+
+                if ($dsContacts->getValue(DBEContact::mailshot8Flag) == 'Y' && !$atLeastOneTopUp) {
+                    $atLeastOneTopUp = true;
+                }
+
+                if ($dsContacts->getValue(DBEContact::mailshot9Flag) == 'Y' && !$atLeastOneReport) {
+                    $atLeastOneReport = true;
+                }
+
+                if (count($contactErrors)) {
+                    $validationErrors['contactErrors'][] = [
+                        "contactID" => $contactID,
+                        "firstName" => $dsContacts->getValue(DBEContact::firstName),
+                        "lastName"  => $dsContacts->getValue(DBEContact::lastName),
+                        "errors"    => $contactErrors
+                    ];
+                }
+            }
+
+            // we went through all the contacts
+
+            if (!$atLeastOneAccount) {
+                $validationErrors['customerErrors'][] = "At least one contact must have Account flag checked";
+            }
+
+            if (!$atLeastOneInvoice) {
+                $validationErrors['customerErrors'][] = "At least one contact must have Invoice flag checked";
+            }
+
+            if (!$atLeastOneAtMostOneStatement) {
+                $validationErrors['customerErrors'][] = "At most and at least one contact must have Statement flag checked";
+            }
+
+            if (!$atLeastOneMain) {
+                $validationErrors['customerErrors'][] = "At least one contact must have Main as Support Level";
+            }
+
+            if (!$atLeastOneReview) {
+                $validationErrors['customerErrors'][] = "At least one contact must have Review flag checked";
+            }
+
+            if (!$atLeastOneTopUp) {
+                $validationErrors['customerErrors'][] = "At least one contact must have TopUp flag checked";
+            }
+
+            if (!$atLeastOneReport) {
+                $validationErrors['customerErrors'][] = "At least one contact must have Report flag checked";
+            }
+
+            if (count($validationErrors['customerErrors']) || count($validationErrors['contactErrors'])) {
+                $customersFailingValidation[] = $validationErrors;
+            }
+        }
+
+
+        if (count($customersFailingValidation)) {
+            $buMail = new BUMail($this);
+
+            $template = new Template(
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
+            $template->set_file(
+                'page',
+                'contactValidationFailedEmail.html'
+            );
+
+//            $technicianResponsibleName = $dbeJProblem->getValue(DBEJProblem::engineerName);
+//            $activityReason = $dbeLastActivity->getValue(DBEJCallActivity::reason);
+//
+//            if ($callActivityID) {
+//                $dbeCallActivity = new DBEJCallActivity($this);
+//                $dbeCallActivity->getRow($callActivityID);
+//                $technicianResponsibleName = $dbeCallActivity->getValue(DBEJCallActivity::userName);
+//                $activityReason = $dbeCallActivity->getValue(DBECallActivity::reason);
+//            }
+//
+//            $template->setVar(
+//                array(
+//                    'contactFirstName'      => $contact->getValue(DBEContact::firstName),
+//                    'activityRef'           => $problemID,
+//                    'CONFIG_SERVICE_REQUEST_DESC'
+//                                            => CONFIG_SERVICE_REQUEST_DESC,
+//                    'priority'              => $this->priorityArray[$dbeJProblem->getValue(DBEJProblem::priority)],
+//                    'reason'                => $dbeFirstActivity->getValue(DBEJCallActivity::reason),
+//                    'lastActivityReason'    => $activityReason,
+//                    'responseDetails'       => strtolower(
+//                        $this->getResponseDetails($dbeFirstActivity)
+//                    ),
+//                    'technicianResponsible' => $technicianResponsibleName
+//                )
+//            );
+
+            $template->parse('OUTPUT', 'page');
+            echo $template->getVar('OUTPUT');
+        }
+
     }
 }

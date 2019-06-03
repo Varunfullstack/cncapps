@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact Validation Failed</title>
+</head>
+<body style="font-family: Arial, sans-serif; font-size: 10pt;">
+<h2>
+    These contacts have failed the required validation, please review and correct.
+</h2>
+
+<ul>
+
+    <!-- BEGIN customersBlock -->
+    <li>
+        <div>{customerNameLink}</div>
+        <div>
+            Customer wide failed validations
+        </div>
+        <ul>
+            <!-- BEGIN customerWideBlock -->
+            <li>
+                {customerWideValidation}
+            </li>
+            <!-- END customerWideBlock -->
+        </ul>
+        <div>
+            Contacts failed validations
+        </div>
+        <ul>
+            <!-- BEGIN contactBlock -->
+            <li>
+
+            </li>
+            <!-- END contactBlock -->
+        </ul>
+
+    </li>
+    <!-- END customersBlock -->
+</ul>
+
+</body>
+</html>

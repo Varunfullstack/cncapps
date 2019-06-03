@@ -1718,9 +1718,9 @@ class BUCustomer extends Business
         return $dbeContact;
     }
 
-    public function getActiveCustomers(DataSet $dsCustomers)
+    public function getActiveCustomers(DataSet $dsCustomers, $ignoreProspects = false)
     {
-        $this->dbeCustomer->getActiveCustomers();
+        $this->dbeCustomer->getActiveCustomers($ignoreProspects);
         return $this->getData(
             $this->dbeCustomer,
             $dsCustomers
