@@ -531,6 +531,11 @@ class BURenContract extends Business
 
                 // SSL Installation charge
                 if ($isSslCertificate) {
+
+                    $dbeItem = new DBEItem($this);
+
+                    $dbeItem->getRow(CONFIG_CONSULTANCY_HOURLY_LABOUR_ITEMID);
+
                     $line++;
                     $description = 'Installation Charge';
                     $dbeOrdline->setValue(
@@ -547,7 +552,7 @@ class BURenContract extends Business
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::itemID,
-                        CONFIG_CONSULTANCY_DAY_LABOUR_ITEMID
+                        $dbeItem->getValue(DBEItem::itemID)
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::description,
@@ -563,8 +568,8 @@ class BURenContract extends Business
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::qtyOrdered,
-                        1
-                    ); // default 1
+                        0.5
+                    );
                     $dbeOrdline->setValue(
                         DBEOrdline::qtyDespatched,
                         0
@@ -575,7 +580,7 @@ class BURenContract extends Business
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::curUnitSale,
-                        35.00
+                        $dbeItem->getValue(DBEItem::curUnitSale)
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::curUnitCost,

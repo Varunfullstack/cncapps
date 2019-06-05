@@ -59,74 +59,72 @@
         }
     }
 
+    var tableID = 1;
+
+    function updateTables() {
+
+
+        $('.reportSection table').each(function () {
+            var rowCount = $('tbody tr', $(this)).length;
+
+            const createdElements = [];
+
+            if (rowCount > 50) {
+                $(this).addClass('thirdTable').attr('id', 'table' + tableID);
+                var firstCol = 'table' + tableID;
+                createdElements.push(tableID);
+                tableID++;
+                $(this).clone().appendTo($(this).parent()).attr('id', 'table' + tableID);
+                var secondCol = 'table' + tableID;
+                createdElements.push(tableID);
+                tableID++;
+                $(this).clone().appendTo($(this).parent()).attr('id', 'table' + tableID);
+                var thirdCol = 'table' + tableID;
+                createdElements.push(tableID);
+                tableID++;
+                var rowsPerTable = Math.ceil(rowCount / 3);
+                console.log('rows per table:' + rowsPerTable);
+                $("tbody tr:gt(" + (rowsPerTable) + ")", '#' + firstCol).remove();
+                $("tbody tr:gt(" + (rowsPerTable * 2) + ")", '#' + secondCol).remove();
+                $("tbody tr:lt(" + rowsPerTable + ")", '#' + secondCol).remove();
+                $("tbody tr:lt(" + (rowsPerTable * 2) + ")", '#' + thirdCol).remove();
+            } else if (rowCount > 20) {
+                $(this).addClass('overflow').attr('id', 'table' + tableID);
+
+                var leftCol = 'table' + tableID;
+                createdElements.push(tableID);
+                tableID++;
+                $(this).clone().appendTo($(this).parent()).attr('id', 'table' + tableID);
+                var rightCol = 'table' + tableID;
+                createdElements.push(tableID);
+                tableID++;
+
+                var split = Math.floor(rowCount / 2);
+                console.log('split: ' + split);
+                $("tbody tr:lt(" + (split) + ")", '#' + leftCol).remove();
+                $("tbody tr:gt(" + split + ")", '#' + rightCol).remove();
+            }
+            // if we had to split the tables, make sure they are wrapped into a div with text-align center
+            if (createdElements.length) {
+                $(this).parent().find('table').wrapAll('<div style="text-align: center"></div>');
+            }
+        });
+    }
+
+    function handleEditableText() {
+        var editableText = '<div class="ckeditorContent">' + CKEDITOR.instances['editableText'].getData() + "</div>";
+        $('#reportContent').append(editableText);
+        $('.ckeditorContent h2').each(function () {
+            $(this).nextUntil('h2').addBack().wrapAll("<div class='reportSection'></div>")
+        });
+    }
+
     $(function () {
         $('#create-pdf').click(function () {
             $(this).attr('disabled', true);
             //loop through sections looking for large tables
-            var tableID = 1;
-
-            $('.reportSection table').each(function () {
-                if (!$(this).hasClass('overflow') && !$(this).hasClass('thirdTable')) {
-                    var rowCount = $('tbody tr', $(this)).length;
-                    console.log(rowCount);
-                    if (rowCount > 50) {
-                        $(this).addClass('thirdTable').attr('id', 'table' + tableID);
-                        var firstCol = 'table' + tableID;
-                        tableID++;
-                        $(this).clone().appendTo($(this).parent()).attr('id', 'table' + tableID);
-                        var secondCol = 'table' + tableID;
-                        tableID++;
-                        $(this).clone().appendTo($(this).parent()).attr('id', 'table' + tableID);
-                        var thirdCol = 'table' + tableID;
-                        tableID++;
-                        $(this).parent().append('<div style="clear: both"></div>');
-
-                        var split1 = Math.ceil(rowCount / 3);
-                        var remainder = rowCount - split1;
-                        var split2 = Math.ceil(remainder / 2) + split1;
-
-                        console.log('total:' + rowCount);
-                        console.log('split1:' + split1);
-                        console.log('split2:' + split2);
-
-                        remainder = remainder - split2;
-                        $("tbody tr:gt(" + (split1 - 1) + ")", '#' + firstCol).remove();
-                        //First remove the final 3rd then the first third
-                        $("tbody tr:gt(" + (split2 - 1) + ")", '#' + secondCol).remove();
-                        $("tbody tr:lt(" + split1 + ")", '#' + secondCol).remove();
-                        $("tobdy tr:lt(" + (split2) + ")", '#' + thirdCol).remove();
-                    }
-                }
-            })
-
-            $('.reportSection table').each(function () {
-                if (!$(this).hasClass('overflow') && !$(this).hasClass('thirdTable')) {
-                    var rowCount = $('tbody tr', $(this)).length;
-                    console.log(rowCount);
-                    if (rowCount > 20) {
-                        $(this).addClass('overflow').attr('id', 'table' + tableID);
-
-                        var leftCol = 'table' + tableID;
-                        tableID++;
-                        $(this).clone().appendTo($(this).parent()).attr('id', 'table' + tableID);
-                        $(this).parent().append('<div style="clear: both"></div>');
-                        var rightCol = 'table' + tableID;
-                        tableID++;
-
-                        var split = Math.floor(rowCount / 2);
-                        console.log('split: ' + split);
-                        $("tbody tr:lt(" + (split + 1) + ")", '#' + leftCol).remove();
-                        $("tbody tr:gt(" + split + ")", '#' + rightCol).remove();
-                    }
-                }
-            })
-
-            var editableText = '<div class="ckeditorContent">' + CKEDITOR.instances['editableText'].getData() + "</div>";
-
-            $('#reportContent').append(editableText);
-
-            $('.ckeditorContent h2').wrap("<div class='reportSection'></div>");
-            $('.ckeditorContent table').wrap("<div class='reportSection'></div>");
+            updateTables();
+            handleEditableText();
 
             var sections = 1;
             $('h2').each(function () {
@@ -186,17 +184,29 @@
         background: #FFF;
         padding: 30px 40px;
         text-align: center;
+        font-size: 10pt;
     }
+
+    #reportContent h2 {
+         font-size: 16pt;
+     }
+    #reportContent h3 {
+        font-size: 14pt;
+    }
+
+    #reportContent th, #reportContent td {
+        border: 1px solid black;
+        font-size: 1em;
+        font-family: 'Open Sans', sans-serif;
+        font-kerning: normal;
+        letter-spacing: 0px;
+    }
+
 
     .pageBreak {
         page-break-after: always;
         border-bottom: 2px dotted #333;
         margin-bottom: 30px;
-    }
-
-    .rootCause {
-        width: 600px;
-        margin: 0 auto;
     }
 
     .requestCount {
@@ -217,17 +227,19 @@
     .collapse li div:first-child {
         width: 90%;
         display: inline-block;
-        float: left
     }
 
     .collapse li div:nth-child(2) {
         width: 10%;
         display: inline-block;
-        float: left
     }
 
     .reportSection table {
-        margin: 0 auto;
+        border-collapse: collapse;
+        margin-left: auto;
+        margin-right: auto;
+        padding-right: 1%;
+        padding-left: 1%;
     }
 
     .reportSection img {
@@ -235,20 +247,16 @@
         display: inline-block
     }
 
-    .overflow:nth-child(even) {
-        width: 48%;
-        float: right;
-        margin: 0 !important;
+    .overflow {
+        width: 42%;
+        display: inline-block;
+        vertical-align: top;
     }
 
-    .overflow:nth-child(odd) {
-        width: 48%;
-        float: left;
-        margin: 0 !important;
-    }
 
     .reportSection {
         width: 100%;
+        padding-bottom: 30px;
     }
 
     .reportSection.newPage {
@@ -259,10 +267,6 @@
         margin: 0 auto;
         display: inline-block;
         float: none
-    }
-
-    .reportSection table {
-        border-collapse: collapse
     }
 
     .reportSection td, .reportSection th {
@@ -287,13 +291,9 @@
     }
 
     .thirdTable {
-        width: 32%;
-        float: left;
-        margin: 0 2% 0 0 !important;
-    }
-
-    .thirdTable:nth-child(4) {
-        margin: 0 !important;
+        width: 31%;
+        display: inline-block;
+        vertical-align: top;
     }
 </style>
 

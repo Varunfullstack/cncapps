@@ -1711,6 +1711,12 @@ not a boolean, the given value is null, column given is not the PK, and there is
                 return $this->tryCreateDate($value);
             case DA_YN:
                 return $value == 'Y' ? 'Y' : 'N';
+            case DA_SUPPORT_LEVEL:
+                $validOptions = ['main', 'supervisor', 'support', 'delegate'];
+                return in_array(
+                    $value,
+                    $validOptions
+                ) ? $value : null;
             default:
                 return $value;
         }

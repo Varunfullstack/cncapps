@@ -1,6 +1,14 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.1.4] - 2019-06-05
+### Fixed
+- Clicking On print gives error while in Purchase order page
+- Cosmetic changes on Review Meeting Agenda Document
+- Fixed error while creating a new Customer
+- Fixed issue with Sales Order for SSL certificate renewals item type
+- Fixed footer row for Display Contract And Numbers Report
+
 ## [v3.1.3] - 2019-06-03
 ### Fixed 
 - Email sending issues

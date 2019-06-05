@@ -1417,7 +1417,7 @@
         }
 
 
-        if ({customerID} != 0 && !document.getElementById('prospectFlag').checked) {
+        if ({customerID} && !document.getElementById('prospectFlag').checked) {
             const primaryMainContactSelector = $('#primaryMainContactSelector');
             const value = $('#primaryMainContactSelector').val();
 
