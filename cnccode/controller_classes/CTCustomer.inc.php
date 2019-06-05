@@ -1964,7 +1964,7 @@ ORDER BY cus_name ASC  ";
         $deleteCustomerURL = null;
         $deleteCustomerText = null;
         if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) {
-            if ((!$this->formError) & ($this->getAction(
+            if ((!$this->formError) && ($this->getAction(
                     ) != CTCUSTOMER_ACT_DISP_SUCCESS)) {   // Not displaying form error page so get customer record
                 if (!$this->buCustomer->getCustomerByID(
                     $this->getCustomerID(),
@@ -1991,9 +1991,8 @@ ORDER BY cus_name ASC  ";
                 $deleteCustomerText = 'Delete Customer';
             }
         } else {
-
-            $this->dsCustomer->clearRows(
-            );      // Creating a new customer - creates new row on dataset, NOT on the database yet
+            $this->dsCustomer->clearRows();
+            // Creating a new customer - creates new row on dataset, NOT on the database yet
             $this->dsSite->clearRows();
             $this->dsContact->clearRows();
             $this->buCustomer->addNewCustomerRow($this->dsCustomer);
@@ -2152,7 +2151,13 @@ ORDER BY cus_name ASC  ";
                 )
             );
 
-        $mainContacts = $this->buCustomer->getMainSupportContacts($this->dsCustomer->getValue(DBECustomer::customerID));
+
+        $mainContacts = [];
+        if ($this->dsCustomer->getValue(DBECustomer::customerID)) {
+            $mainContacts = $this->buCustomer->getMainSupportContacts(
+                $this->dsCustomer->getValue(DBECustomer::customerID)
+            );
+        }
         $this->template->set_block(
             'CustomerEdit',
             'primaryMainContactBlock',
@@ -2178,8 +2183,10 @@ ORDER BY cus_name ASC  ";
 
 
         $buItem = new BUCustomerItem($this);
-
-        $forceDirectDebit = $buItem->clientHasDirectDebit($this->dsCustomer->getValue(DBECustomer::customerID));
+        $forceDirectDebit = false;
+        if ($this->dsCustomer->getValue(DBECustomer::customerID)) {
+            $forceDirectDebit = $buItem->clientHasDirectDebit($this->dsCustomer->getValue(DBECustomer::customerID));
+        }
 
         $this->template->set_var(
             array(
@@ -2193,7 +2200,7 @@ ORDER BY cus_name ASC  ";
                 'customerNotePopupLink'          => $this->getCustomerNotePopupLink($this->getCustomerID()),
                 'showInactiveContactsURL'        => $showInactiveContactsURL,
                 'showInactiveSitesURL'           => $showInactiveSitesURL,
-                'customerID'                     => $this->dsCustomer->getValue(DBECustomer::customerID),
+                'customerID'                     => $this->getCustomerID() ? $this->getCustomerID() : 'null',
                 'customerName'                   => $this->dsCustomer->getValue(DBECustomer::name),
                 'reviewCount'                    => $this->buCustomer->getReviewCount(),
                 'customerFolderLink'             => $customerFolderLink,
@@ -2838,7 +2845,6 @@ ORDER BY cus_name ASC  ";
             'templateCustomLetters',
             null
         );
-
 
         $this->siteDropdown(
             $this->dsCustomer->getValue(DBECustomer::customerID),
@@ -3536,6 +3542,9 @@ ORDER BY cus_name ASC  ";
         $blockName = 'selectSiteBlock'
     )
     {
+        if (!$customerID) {
+            return null;
+        }
         // Site selection
         $dbeSite = new DBESite($this);
         $dbeSite->setValue(
