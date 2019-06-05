@@ -21,7 +21,7 @@ This project changes will be shown here.
 - Fix issue with line arrows in Sales Orders
 - Fix issue with Activity search, when searching Activity Type = Initial and Contract T&M
 - Fix issue with Backup validations where the item type would determine if the server is excluded or not
-## Changed
+### Changed
 - Changed fields order in Activity search
 
 ## [v3.1.1] - 2019-05-29
