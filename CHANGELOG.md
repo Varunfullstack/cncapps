@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v3.1.4]
+## [v3.1.4] - 2019-06-05
 ### Fixed
 - Clicking On print gives error while in Purchase order page
 

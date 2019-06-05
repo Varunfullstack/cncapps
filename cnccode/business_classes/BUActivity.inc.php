@@ -6048,7 +6048,7 @@ is currently a balance of ';
     {
         $dbeJProblem = new DBEJProblem($this);
 
-
+        $dbeJProblem->setShowSQLOn(); //549770
         $dbeJProblem->getRowsByQueueNo(
             $queueNo,
             true
