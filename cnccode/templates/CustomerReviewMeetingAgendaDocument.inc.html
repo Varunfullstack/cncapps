@@ -50,6 +50,19 @@
             page-break-before: always;
         }
 
+        .reportSection table {
+            border-collapse: collapse;
+            margin-left: auto;
+            margin-right: auto;
+            padding-right: 1%;
+            padding-left: 1%;
+            word-wrap: break-word;
+        }
+
+        .reportSection table td {
+            word-break: break-all;
+        }
+
         h1 {
             font-size: 16pt;
             font-weight: bold;
@@ -65,18 +78,11 @@
             font-size: 14pt;
         }
 
-        table {
-            border-collapse: collapse;
-            padding: 10px;
-            margin: 5px auto;
-            float: left;
-        }
-
         p:nth-child(2) {
             text-align: center;
         }
 
-        table, th, td {
+        #reportContent th, #reportContent td {
             border: 1px solid black;
             font-size: 1em;
             font-family: 'Open Sans', sans-serif;
@@ -86,12 +92,6 @@
 
         .pageBreak {
             page-break-after: always;
-        }
-
-        table.collapse {
-            border-collapse: collapse;
-            margin: 0 auto;
-            border: 1px solid #666;
         }
 
         table.collapse td {
@@ -133,40 +133,15 @@
             page-break-after: always;
         }
 
-        .rootCause {
-            width: 600px;
-            margin: 0 auto;
-        }
-
-        .requestCount {
-            width: 450px;
-            margin: 0 auto;
-        }
-
-        .overflow:nth-child(odd) {
-            width: 48%;
-            float: right;
-            margin: 0 !important;
-        }
-
-        .overflow:nth-child(even) {
-            width: 48%;
-            float: left;
-            margin: 0 !important;
-        }
-
         .thirdTable {
-            width: 32%;
-            float: left;
-            margin: 0 2% 0 0 !important;
+            width: 31%;
+            display: inline-block;
+            vertical-align: top;
         }
 
-        .thirdTable:nth-child(4) {
-            margin: 0 !important;
-        }
 
         table.invisible, table.invisible th, table.invisible td {
-            border: none;
+            border: none !important;
         }
 
         thead {
@@ -177,13 +152,11 @@
             page-break-inside: avoid;
         }
 
-        table {
-            word-wrap: break-word;
+        table.overflow {
+            display: inline-block;
+            vertical-align: top;
         }
 
-        table td {
-            word-break: break-all;
-        }
 
         .ckeditorContent td, .ckeditorContent th {
             text-align: center;
@@ -209,7 +182,7 @@
     </style>
 
 </head>
-<body>
+<body id="reportContent">
 <div id="watermark">
     <!--<img src="{waterMarkURL}"/>-->
 </div>

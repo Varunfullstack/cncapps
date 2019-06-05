@@ -860,7 +860,7 @@ class BUCustomer extends Business
         $dsCustomer->setUpdateModeInsert();
         $dsCustomer->setValue(
             DBECustomer::customerID,
-            0
+            null
         );
         $dsCustomer->setValue(
             DBECustomer::name,
