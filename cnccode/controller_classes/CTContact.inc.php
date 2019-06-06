@@ -707,48 +707,118 @@ class CTContact extends CTCNC
             }
         }
 
+        if (!count($customersFailingValidation)) {
+            return;
+        }
+        $buMail = new BUMail($this);
 
-        if (count($customersFailingValidation)) {
-            $buMail = new BUMail($this);
+        $template = new Template(
+            EMAIL_TEMPLATE_DIR,
+            "remove"
+        );
+        $template->set_file(
+            'page',
+            'ContactValidationFailedEmail.html'
+        );
+        $template->setBlock('page', 'individualContactValidationErrorBlock', 'individualContactErrors');
+        $template->setBlock('page', 'contactBlock', 'contacts');
+        $template->setBlock('page', 'customerWideBlock', 'customerErrors');
+        $template->setBlock('page', 'customersBlock', 'customers');
 
-            $template = new Template(
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+        foreach ($customersFailingValidation as $customerErrors) {
+
+            $template->setVar(
+                [
+                    "customerNameLink" => "<a href='$_SERVER[HTTP_HOST]/Customer.php?action=dispEdit&customerID=$customerErrors[customerID]'>$customerErrors[customerName]</a>"
+                ]
             );
-            $template->set_file(
-                'page',
-                'contactValidationFailedEmail.html'
-            );
 
-//            $technicianResponsibleName = $dbeJProblem->getValue(DBEJProblem::engineerName);
-//            $activityReason = $dbeLastActivity->getValue(DBEJCallActivity::reason);
-//
-//            if ($callActivityID) {
-//                $dbeCallActivity = new DBEJCallActivity($this);
-//                $dbeCallActivity->getRow($callActivityID);
-//                $technicianResponsibleName = $dbeCallActivity->getValue(DBEJCallActivity::userName);
-//                $activityReason = $dbeCallActivity->getValue(DBECallActivity::reason);
-//            }
-//
-//            $template->setVar(
-//                array(
-//                    'contactFirstName'      => $contact->getValue(DBEContact::firstName),
-//                    'activityRef'           => $problemID,
-//                    'CONFIG_SERVICE_REQUEST_DESC'
-//                                            => CONFIG_SERVICE_REQUEST_DESC,
-//                    'priority'              => $this->priorityArray[$dbeJProblem->getValue(DBEJProblem::priority)],
-//                    'reason'                => $dbeFirstActivity->getValue(DBEJCallActivity::reason),
-//                    'lastActivityReason'    => $activityReason,
-//                    'responseDetails'       => strtolower(
-//                        $this->getResponseDetails($dbeFirstActivity)
-//                    ),
-//                    'technicianResponsible' => $technicianResponsibleName
-//                )
-//            );
+            if (!count($customerErrors["customerErrors"])) {
+                $template->setVar('customerErrors', "");
+            } else {
+                $firstValidation = true;
+                foreach ($customerErrors["customerErrors"] as $customerFailedValidation) {
+                    $template->setVar(
+                        [
+                            "customerWideValidation" => $customerErrors['customerName'] . $customerFailedValidation
+                        ]
+                    );
+                    $template->parse('customerErrors', 'customerWideBlock', !$firstValidation);
+                    if ($firstValidation) {
+                        $firstValidation = false;
+                    }
+                }
+            }
 
-            $template->parse('OUTPUT', 'page');
-            echo $template->getVar('OUTPUT');
+            if (!count($customerErrors['contactErrors'])) {
+                $template->setVar('contacts', "");
+            } else {
+
+                $firstContact = true;
+                foreach ($customerErrors['contactErrors'] as $contact) {
+                    $template->setVar(
+                        [
+                            "firstName" => $contact['firstName'],
+                            "lastName"  => $contact['lastName']
+                        ]
+                    );
+
+                    $template->parse('contacts', 'contactBlock', !$firstContact);
+                    if ($firstContact) {
+                        $firstContact = false;
+                    }
+
+                    $firstValidation = true;
+                    foreach ($contact['errors'] as $error) {
+                        $template->setVar(
+                            ["contactValidationError" => $error]
+                        );
+                        $template->parse(
+                            'individualContactErrors',
+                            'individualContactValidationErrorBlock',
+                            !$firstValidation
+                        );
+                        if ($firstValidation) {
+                            $firstValidation = false;
+                        }
+                    }
+
+                }
+            }
+            $template->parse('customers', 'customersBlock', true);
         }
 
+        $template->parse('OUTPUT', 'page');
+        $body = $template->getVar('OUTPUT');
+        echo $body;
+        $senderEmail = "sales@cnc-ltd.co.uk";
+        $toEmail = "contactvalidation@cnc-ltd.co.uk";
+        $subject = "Customers with invalid contact configurations";
+        $hdrs = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $buMail->mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
+
+        $hdrs = $buMail->mime->headers($hdrs);
+
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
     }
 }

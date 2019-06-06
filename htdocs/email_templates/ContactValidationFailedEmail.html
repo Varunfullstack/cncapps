@@ -3,6 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Contact Validation Failed</title>
+    <style>
+        body, p, td, th, a, div {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10pt;
+        }
+        .customerRow {
+            padding-bottom: 20px;
+        }
+
+        .customerLink {
+            font-size: 1.17em;
+            font-weight: bold;
+        }
+
+        .sectionTitle {
+            font-weight: bold;
+        }
+
+        .contactInfo {
+            font-style: italic;
+        }
+    </style>
 </head>
 <body style="font-family: Arial, sans-serif; font-size: 10pt;">
 <h2>
@@ -12,28 +34,41 @@
 <ul>
 
     <!-- BEGIN customersBlock -->
-    <li>
-        <div>{customerNameLink}</div>
-        <div>
+    <li class="customerRow">
+        <div class="customerLink">{customerNameLink}</div>
+        <div class="sectionTitle">
             Customer wide failed validations
         </div>
-        <ul>
+        <table>
             <!-- BEGIN customerWideBlock -->
-            <li>
-                {customerWideValidation}
-            </li>
+            <tr>
+                <td> {customerWideValidation}</td>
+            </tr>
             <!-- END customerWideBlock -->
-        </ul>
-        <div>
+        </table>
+        <div class="sectionTitle">
             Contacts failed validations
         </div>
-        <ul>
+        <table>
             <!-- BEGIN contactBlock -->
-            <li>
-
-            </li>
+            <tr>
+                <td>
+                    <div class="contactInfo">
+                        Contact {firstName} {lastName} has validation errors:
+                    </div>
+                    <table>
+                        <!-- BEGIN individualContactValidationErrorBlock -->
+                        <tr>
+                            <td>
+                                {contactValidationError}
+                            </td>
+                        </tr>
+                        <!-- END individualContactValidationErrorBlock -->
+                    </table>
+                </td>
+            </tr>
             <!-- END contactBlock -->
-        </ul>
+        </table>
 
     </li>
     <!-- END customersBlock -->
