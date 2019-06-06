@@ -489,7 +489,6 @@ class DBEJCallActivity extends DBECallActivity
         $includeOperationalTasks = true,
         $descendingDate = false,
         $fromDate = false,
-        // limits the number of activities returned
         $includeServerGuardUpdates = true,
         $activityType = null,
         $activityStatus = null

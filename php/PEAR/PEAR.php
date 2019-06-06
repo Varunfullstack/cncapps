@@ -33,8 +33,11 @@ define('PEAR_ERROR_CALLBACK', 16);
  */
 define('PEAR_ERROR_EXCEPTION', 32);
 /**#@-*/
-define('PEAR_ZE2', (function_exists('version_compare') &&
-    version_compare(zend_version(), "2-dev", "ge")));
+define(
+    'PEAR_ZE2',
+    (function_exists('version_compare') &&
+        version_compare(zend_version(), "2-dev", "ge"))
+);
 
 if (substr(PHP_OS, 0, 3) == 'WIN') {
     define('OS_WINDOWS', true);
@@ -203,8 +206,8 @@ class PEAR
      * You MUST use a reference, or they will not persist!
      *
      * @access public
-     * @param  string $class The calling classname, to prevent clashes
-     * @param  string $var The variable to retrieve.
+     * @param string $class The calling classname, to prevent clashes
+     * @param string $var The variable to retrieve.
      * @return mixed   A reference to the variable. If not set it will be
      *                 auto initialised to NULL.
      */
@@ -227,8 +230,8 @@ class PEAR
      * classes.
      *
      * @access public
-     * @param  mixed $func The function name (or array of class/method) to call
-     * @param  mixed $args The arguments to pass to the function
+     * @param mixed $func The function name (or array of class/method) to call
+     * @param mixed $args The arguments to pass to the function
      * @return void
      */
     function registerShutdownFunc($func, $args = array())
@@ -245,8 +248,8 @@ class PEAR
     /**
      * Tell whether a value is a PEAR error.
      *
-     * @param   mixed $data the value to test
-     * @param   int $code if $data is an error object, return true
+     * @param mixed $data the value to test
+     * @param int $code if $data is an error object, return true
      *                        only if $code is a string and
      *                        $obj->getMessage() == $code or
      *                        $code is an integer and $obj->getCode() == $code
@@ -409,7 +412,7 @@ class PEAR
      * This method deletes all occurences of the specified element from
      * the expected error codes stack.
      *
-     * @param  mixed $error_code error code that should be deleted
+     * @param mixed $error_code error code that should be deleted
      * @return mixed list of error codes that were deleted or error
      * @access public
      * @since PHP 4.3.0
@@ -481,7 +484,8 @@ class PEAR
                          $options = null,
                          $userinfo = null,
                          $error_class = null,
-                         $skipmsg = false)
+                         $skipmsg = false
+    )
     {
         // The error is yet a PEAR error object
         if (is_object($message)) {
@@ -753,7 +757,7 @@ function _PEAR_call_destructors()
             $_PEAR_destructor_object_list = array_reverse($_PEAR_destructor_object_list);
         }
 
-        while (list($k, $objref) = each($_PEAR_destructor_object_list)) {
+        foreach ($_PEAR_destructor_object_list as $k => $objref) {
             $classname = get_class($objref);
             while ($classname) {
                 $destructor = "_$classname";
@@ -829,8 +833,12 @@ class PEAR_Error
      * @access public
      *
      */
-    function __construct($message = 'unknown error', $code = null,
-                         $mode = null, $options = null, $userinfo = null)
+    function __construct($message = 'unknown error',
+                         $code = null,
+                         $mode = null,
+                         $options = null,
+                         $userinfo = null
+    )
     {
         if ($mode === null) {
             $mode = PEAR_ERROR_RETURN;
@@ -1021,9 +1029,11 @@ class PEAR_Error
     function toString()
     {
         $modes = array();
-        $levels = array(E_USER_NOTICE => 'notice',
+        $levels = array(
+            E_USER_NOTICE  => 'notice',
             E_USER_WARNING => 'warning',
-            E_USER_ERROR => 'error');
+            E_USER_ERROR   => 'error'
+        );
         if ($this->mode & PEAR_ERROR_CALLBACK) {
             if (is_array($this->callback)) {
                 $callback = (is_object($this->callback[0]) ?
@@ -1033,11 +1043,16 @@ class PEAR_Error
             } else {
                 $callback = $this->callback;
             }
-            return sprintf('[%s: message="%s" code=%d mode=callback ' .
+            return sprintf(
+                '[%s: message="%s" code=%d mode=callback ' .
                 'callback=%s prefix="%s" info="%s"]',
-                strtolower(get_class($this)), $this->message, $this->code,
-                $callback, $this->error_message_prefix,
-                $this->userinfo);
+                strtolower(get_class($this)),
+                $this->message,
+                $this->code,
+                $callback,
+                $this->error_message_prefix,
+                $this->userinfo
+            );
         }
         if ($this->mode & PEAR_ERROR_PRINT) {
             $modes[] = 'print';
@@ -1051,12 +1066,17 @@ class PEAR_Error
         if ($this->mode & PEAR_ERROR_RETURN) {
             $modes[] = 'return';
         }
-        return sprintf('[%s: message="%s" code=%d mode=%s level=%s ' .
+        return sprintf(
+            '[%s: message="%s" code=%d mode=%s level=%s ' .
             'prefix="%s" info="%s"]',
-            strtolower(get_class($this)), $this->message, $this->code,
-            implode("|", $modes), $levels[$this->level],
+            strtolower(get_class($this)),
+            $this->message,
+            $this->code,
+            implode("|", $modes),
+            $levels[$this->level],
             $this->error_message_prefix,
-            $this->userinfo);
+            $this->userinfo
+        );
     }
 }
 

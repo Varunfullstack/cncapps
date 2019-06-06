@@ -958,6 +958,29 @@ class BUActivity extends Business
         $dbeCallActivity->insertRow();
     }
 
+    function getFixedActivityInProblem($problemID)
+    {
+
+        $dbeCallActivity = new DBEJCallActivity($this);
+
+        $dbeCallActivity->getRowsByProblemID(
+            $problemID,
+            false,
+            false,
+            true,
+            null,
+            false,
+            57
+
+        );
+
+        if ($dbeCallActivity->fetchNext()) {
+            return $dbeCallActivity;
+        } else {
+            return false;
+        }
+    }
+
     function getLastActivityInProblem($problemID)
     {
 
@@ -1172,7 +1195,6 @@ class BUActivity extends Business
                 $fixedUserID = $dbeJProblem->getValue(DBEJProblem::fixedUserID);
                 $dbeFixedUser = new DBEUser($this);
                 $dbeFixedUser->getRow($fixedUserID);
-
                 $templateName = 'ServiceCompletionAlertEmail';
 
                 $completeDate = $dbeJProblem->getValue(DBEProblem::completeDate);
@@ -1192,10 +1214,10 @@ class BUActivity extends Business
                 $othersFlagName = DBEContact::othersClosureEmailFlag;
                 $templateName = 'ServiceCompletedEmail';
                 $subjectSuffix = 'Now Closed';
-
+                $fixedActivity = $this->getFixedActivityInProblem($problemID);
                 $fields['reason'] = $dbeFirstActivity->getValue(DBEJCallActivity::reason);
                 $fields['rootCause'] = $rootCause;
-                $fields['fixedActivityReason'] = $dbeLastActivity->getValue(DBEJCallActivity::reason);
+                $fields['fixedActivityReason'] = $fixedActivity->getValue(DBEJCallActivity::reason);
                 $fields['urlQuestionnaire'] = 'http://www.cnc-ltd.co.uk/questionnaire/index.php?problemno=' . $problemID . '&questionnaireno=1';
                 break;
         }
@@ -3508,12 +3530,18 @@ class BUActivity extends Business
 
         $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
 
+        $status = null;
+
+        if ($dbeJProblem->getValue(DBEJProblem::status)) {
+            $status = $this->problemStatusArray[$dbeJProblem->getValue(DBEJProblem::status)];
+        }
+
         $template->setVar(
             array(
                 'activityRef'    => $activityRef,
                 'customerName'   => $dbeJProblem->getValue(DBEJProblem::customerName),
                 'reason'         => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                'status'         => $this->problemStatusArray[$dbeJProblem->getValue(DBEJProblem::status)],
+                'status'         => $status,
                 'awaitingStatus' => ($dbeJProblem->getValue(
                         DBEJProblem::awaitingCustomerResponseFlag
                     ) == 'Y') ? 'Customer' : 'CNC',
@@ -3666,7 +3694,7 @@ class BUActivity extends Business
      * @return bool
      * @throws Exception
      */
-    function skipSalesOrdersForActivities(&$activityIDArray)
+    function skipSalesOrdersForActivities($activityIDArray)
     {
         $this->setMethodName('skipSalesOrdersForActivities');
 
@@ -3788,7 +3816,7 @@ class BUActivity extends Business
      * @return bool
      * @throws Exception
      */
-    function createSalesOrdersFromActivities(&$activityIDArray)
+    function createSalesOrdersFromActivities($activityIDArray)
     {
         $db = new dbSweetcode(); // database connection for query
 
