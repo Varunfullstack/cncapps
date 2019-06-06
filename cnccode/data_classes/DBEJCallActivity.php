@@ -23,7 +23,6 @@ class DBEJCallActivity extends DBECallActivity
     const allowExpensesFlag = "allowExpensesFlag";
     const travelFlag = "travelFlag";
     const allowSCRFlag = "allowSCRFlag";
-    const userID = "userID";
     const userName = "userName";
     const userAccount = "userAccount";
     const durationMinutes = "durationMinutes";
@@ -50,7 +49,6 @@ class DBEJCallActivity extends DBECallActivity
     const problemHideFromCustomerFlag = "problemHideFromCustomerFlag";
     const problemStatus = "problemStatus";
     const requestAwaitingCustomerResponseFlag = "requestAwaitingCustomerResponseFlag";
-    const internalNotes = "internalNotes";
     const completeDate = "completeDate";
     const alarmDate = "alarmDate";
     const alarmTime = "alarmTime";

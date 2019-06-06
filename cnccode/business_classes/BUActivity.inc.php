@@ -1642,6 +1642,7 @@ class BUActivity extends Business
             DBEJProblem::contractCustomerItemID,
             $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID)
         );
+
         $dbeProblem->setValue(
             DBEJProblem::internalNotes,
             $dsCallActivity->getValue(DBEJCallActivity::internalNotes)
