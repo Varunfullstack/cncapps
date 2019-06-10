@@ -1,0 +1,62 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1560157920-0">
+        <tagDatabase tag="hotfix-3.1.5"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1560157920-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT
+                data_type = 'varchar'
+                FROM
+                INFORMATION_SCHEMA.COLUMNS
+                WHERE table_schema = DATABASE()
+                AND TABLE_NAME = 'salesorder_document'
+                AND column_name = 'fileMimeType';
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="salesorder_document" columnName="fileMimeType" newDataType="varchar(255)"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1560157920-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT
+                data_type = 'timestamp'
+                FROM
+                INFORMATION_SCHEMA.COLUMNS
+                WHERE table_schema = DATABASE()
+                AND TABLE_NAME = 'portal_customer_document'
+                AND column_name = 'createdDate';
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="portal_customer_document" columnName="createdDate"
+                        newDataType="timestamp not null default current_timestamp"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1560157920-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="NO">
+                SELECT `information_schema`.COLUMNS.`IS_NULLABLE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='portal_customer_document'
+                AND column_name='filename'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint tableName="portal_customer_document" columnName="filename" columnDataType="char(100)"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1560157920-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="NO">
+                SELECT `information_schema`.COLUMNS.`IS_NULLABLE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='portal_customer_document'
+                AND column_name='file'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint tableName="portal_customer_document" columnName="file" columnDataType="longblob"/>
+    </changeSet>
+
+</databaseChangeLog>
