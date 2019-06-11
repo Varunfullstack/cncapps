@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v3.1.5]
+## [v3.1.5] - 2019-06-11
 ### Fixed
 - PO Status not sending emails
 - Sales Request process after fixed
