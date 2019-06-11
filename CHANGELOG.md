@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.1.6] - 2019-06-11
+### Fixed
+- Prepay Export not showing customer name
+
 ## [v3.1.5] - 2019-06-11
 ### Fixed
 - PO Status not sending emails
