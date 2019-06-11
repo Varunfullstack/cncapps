@@ -328,6 +328,9 @@ class DBEJCustomerItem extends DBECustomerItem
         $select =
             "SELECT COUNT(custitem.`cui_cuino`) as directDebitCount FROM custitem WHERE directDebitFlag = 'Y' AND `cui_custno` = $customerID";
         $db->query($select);
+        if (!$db->num_rows()) {
+            return 0;
+        }
         $db->next_record();
         return $db->Record['directDebitCount'];
     }

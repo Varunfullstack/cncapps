@@ -47,7 +47,9 @@ class DBEPorlineTotals extends DBEntity
             $this->getDBColumnName(self::qtyReceived) . "," .
             $this->getDBColumnName(self::qtyInvoiced) .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::porheadID) . "=" . $this->prepareForSQL(self::porheadID) .
+            " WHERE " . $this->getDBColumnName(self::porheadID) . "=" . $this->prepareForSQL(
+                $this->columnExists(self::porheadID)
+            ) .
             " GROUP BY " . $this->getDBColumnName(self::porheadID)
         );
         return (parent::getRow());

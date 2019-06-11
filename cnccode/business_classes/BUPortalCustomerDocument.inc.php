@@ -26,14 +26,19 @@ class BUPortalCustomerDocument extends Business
 
         /* file to add? */
         if ($userfile['name']) {
+
+
             $this->dbePortalCustomerDocument->getRow($this->dbePortalCustomerDocumentWithoutFile->getPKValue());
             $this->dbePortalCustomerDocument->setValue(
                 DBEPortalCustomerDocument::file,
                 fread(fopen($userfile ['tmp_name'], 'rb'), $userfile ['size'])
             );
+            echo '<h1>';
+            var_dump($userfile);
+            echo '</h1>';
             $this->dbePortalCustomerDocument->setValue(
                 DBEPortalCustomerDocument::filename,
-                ( string )$userfile ['name']
+                $userfile ['name']
             );
             $this->dbePortalCustomerDocument->setValue(
                 DBEPortalCustomerDocument::fileMimeType,

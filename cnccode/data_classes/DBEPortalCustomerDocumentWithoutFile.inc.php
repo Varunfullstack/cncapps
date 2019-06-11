@@ -19,8 +19,8 @@ class DBEPortalCustomerDocumentWithoutFile extends DBEntity
     /**
      * portals constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -33,11 +33,19 @@ class DBEPortalCustomerDocumentWithoutFile extends DBEntity
         $this->addColumn(self::startersFormFlag, DA_YN, DA_NOT_NULL);
         $this->addColumn(self::leaversFormFlag, DA_YN, DA_NOT_NULL);
         $this->addColumn(self::mainContactOnlyFlag, DA_YN, DA_NOT_NULL);
-        $this->addColumn(self::createdDate, DA_DATE, DA_NOT_NULL);
+        $this->addColumn(
+            self::createdDate,
+            DA_DATETIME,
+            DA_NOT_NULL,
+            null,
+            (new DateTime())->format(DATE_MYSQL_DATETIME)
+        );
         $this->addColumn(self::createdUserID, DA_ID, DA_ALLOW_NULL);
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
+
+
 }
 
 ?>

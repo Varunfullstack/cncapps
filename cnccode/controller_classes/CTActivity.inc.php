@@ -4676,6 +4676,7 @@ class CTActivity extends CTCNC
             DBEJCallActivity::internalNotes,
             $_POST['internalNotes']
         );
+
         $dsCallActivity->post();
         $dbeCallActType = new DBEJCallActType($this);
 
@@ -5031,7 +5032,6 @@ class CTActivity extends CTCNC
         $enteredEndTime = $this->buActivity->updateCallActivity(
             $this->dsCallActivity
         );
-
         /*
       If an end time was entered and this is a chargeable on site activity then see whether to
       create a travel activity automatically OR if one exists for today prompt whether another should be
