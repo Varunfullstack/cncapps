@@ -102,7 +102,7 @@ class BUPrepay extends Business
         $this->updateFlag = $updateFlag;
 
         $dsResults = new DataSet ($this);
-        $dsResults->addColumn(self::exportPrePayCustomerName, DA_DATE, DA_ALLOW_NULL);
+        $dsResults->addColumn(self::exportPrePayCustomerName, DA_STRING, DA_ALLOW_NULL);
         $dsResults->addColumn(self::exportPrePayPreviousBalance, DA_FLOAT, DA_ALLOW_NULL);
         $dsResults->addColumn(self::exportPrePayCurrentBalance, DA_FLOAT, DA_ALLOW_NULL);
         $dsResults->addColumn(self::exportPrePayExpiryDate, DA_STRING, DA_ALLOW_NULL);
@@ -732,9 +732,8 @@ class BUPrepay extends Business
                 );
         }
         $webFileLink = 'export/PP_' . substr($Record ['cus_name'], 0, 20) . $endDate . '.html';
-
         $dsResults->setUpdateModeInsert();
-        $dsResults->setValue(self::exportPrePayCustomerName, $Record ['cus_name']);
+        $dsResults->setValue(self::exportPrePayCustomerName, $Record['cus_name']);
         $dsResults->setValue(self::exportPrePayPreviousBalance, $Record ['curGSCBalance']);
         $dsResults->setValue(self::exportPrePayCurrentBalance, common_numberFormat($newBalance));
         $dsResults->setValue(self::exportPrePayExpiryDate, Controller::dateYMDtoDMY($Record ['cui_expiry_date']));
