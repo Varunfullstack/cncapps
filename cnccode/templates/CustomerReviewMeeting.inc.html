@@ -101,8 +101,8 @@
 
                 var split = Math.floor(rowCount / 2);
                 console.log('split: ' + split);
-                $("tbody tr:lt(" + (split) + ")", '#' + leftCol).remove();
-                $("tbody tr:gt(" + split + ")", '#' + rightCol).remove();
+                $("tbody tr:gt(" + (split) + ")", '#' + leftCol).remove();
+                $("tbody tr:lt(" + split + ")", '#' + rightCol).remove();
             }
             // if we had to split the tables, make sure they are wrapped into a div with text-align center
             if (createdElements.length) {
@@ -135,7 +135,7 @@
             var height = 0;
             //1305 px is page height including margins
             $('.reportSection').each(function () {
-                if ((height + $(this).outerHeight()) > 1305) {
+                if ((height + $(this).outerHeight()) > 1290) {
                     //if adding the next section would cause it to spill onto a new page add in a page break and reset the height count
                     $(this).addClass('newPage');
                     height = 0;
@@ -178,6 +178,7 @@
         text-align: left;
     }
 
+
     #reportContent {
         width: 810px;
         float: left;
@@ -187,9 +188,17 @@
         font-size: 10pt;
     }
 
+    #reportContent p {
+        margin-bottom: inherit;
+        margin-top: inherit;
+        margin-block-start: 1em;
+        margin-block-end: 1em;
+    }
+
     #reportContent h2 {
-         font-size: 16pt;
-     }
+        font-size: 16pt;
+    }
+
     #reportContent h3 {
         font-size: 14pt;
     }

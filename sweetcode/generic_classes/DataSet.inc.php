@@ -458,6 +458,11 @@ class DataSet extends DataAccess
                 );
                 $validation = $this->checkValid($fieldName, $value);
                 if ($validation !== true) {
+                    if ($this->debug) {
+                        echo '<br>Failed Validation:';
+                        echo "$fieldName: $value";
+                        echo '<br>';
+                    }
                     $this->setMessage(
                         $fieldName,
                         $validation

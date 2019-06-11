@@ -1,6 +1,16 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.1.5] - 2019-06-11
+### Fixed
+- PO Status not sending emails
+- Sales Request process after fixed
+- Notes reverting back (not reproducible)
+- Several improvements in Customer Meeting Agenda document
+- Uploading MS-Word document to Sales Order
+- Uploading Portal documents to customer's page
+- PrePay export not showing the right logo
+
 ## [v3.1.4] - 2019-06-05
 ### Fixed
 - Clicking On print gives error while in Purchase order page

@@ -3091,7 +3091,8 @@ class CTSalesOrder extends CTCNC
                 $this->setQuoteFileMessage(CTPROJECT_MSG_DOCUMENT_NOT_LOADED);
             }
         }
-        if ($_FILES['userfile']['size'] > CTPROJECT_MAX_DOCUMENT_FILE_SIZE) {
+
+        if (isset($_FILES['userFile']) && $_FILES['userfile']['size'] > CTPROJECT_MAX_DOCUMENT_FILE_SIZE) {
             $this->setQuoteFileMessage(CTPROJECT_MSG_DOCUMENT_TOO_BIG);
         }
         if ($this->formError) {

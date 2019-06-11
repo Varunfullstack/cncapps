@@ -81,12 +81,12 @@ class CTPortalCustomerDocument extends CTCNC
                 $portalCustomerDocumentID = $this->getParam('portalCustomerDocumentID');
             } else {                                                                    // creating new
                 $dsPortalCustomerDocument->initialise();
-                $dsPortalCustomerDocument->setValue(DBEPortalCustomerDocument::portalCustomerDocumentID, '0');
+                $dsPortalCustomerDocument->setValue(DBEPortalCustomerDocument::portalCustomerDocumentID, null);
                 $dsPortalCustomerDocument->setValue(
                     DBEPortalCustomerDocument::customerID,
                     $this->getParam('customerID')
                 );
-                $portalCustomerDocumentID = '0';
+                $portalCustomerDocumentID = null;
             }
         } else {                                                                        // form validation error
             $dsPortalCustomerDocument->initialise();
@@ -109,6 +109,8 @@ class CTPortalCustomerDocument extends CTCNC
             $urlDelete = '';
             $txtDelete = '';
         }
+
+
         $urlUpdate =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
@@ -127,8 +129,22 @@ class CTPortalCustomerDocument extends CTCNC
             );
         $this->setPageTitle('Edit Document');
         $this->setTemplateFiles(
-            array('PortalCustomerDocumentEdit' => 'PortalCustomerDocumentEdit . inc')
+            array('PortalCustomerDocumentEdit' => 'PortalCustomerDocumentEdit.inc')
         );
+
+        $createdDateString = (new DateTime())->format(DATE_MYSQL_DATETIME);
+
+        if ($dsPortalCustomerDocument->getValue(
+                DBEPortalCustomerDocument::createdDate
+            ) && $dsPortalCustomerDocument->getValue(
+                DBEPortalCustomerDocument::createdDate
+            ) != '0000-00-00 00:00:00') {
+            $createdDateString = $dsPortalCustomerDocument->getValue(
+                DBEPortalCustomerDocument::createdDate
+            );
+        }
+
+
         $this->template->set_var(
             array(
                 'customerID'                 => $dsPortalCustomerDocument->getValue(
@@ -162,6 +178,7 @@ class CTPortalCustomerDocument extends CTCNC
                 'mainContactOnlyFlagMessage' => Controller::htmlDisplayText(
                     $dsPortalCustomerDocument->getMessage(DBEPortalCustomerDocument::mainContactOnlyFlag)
                 ),
+                'createdDate'                => $createdDateString,
                 'urlUpdate'                  => $urlUpdate,
                 'urlDelete'                  => $urlDelete,
                 'txtDelete'                  => $txtDelete,
@@ -227,20 +244,25 @@ class CTPortalCustomerDocument extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-
-        $this->formError = (!$this->dsPortalCustomerDocument->populateFromArray(
+        $this->formError = !$this->dsPortalCustomerDocument->populateFromArray(
             $this->getParam('portalCustomerDocument')
-        ));
+        );
         /*
         Need a file when creating new
         */
 
-        if ($_FILES['userfile']['name'] == '' && $this->dsPortalCustomerDocument->getValue(
+        if ($_FILES['userfile']['name'] == '' && !$this->dsPortalCustomerDocument->getValue(
                 DBEPortalCustomerDocument::portalCustomerDocumentID
-            ) == '') {
+            )) {
             $this->setFormErrorMessage('Please enter a file path');
         } else {
             /* uploading a file */
+            if (!$this->dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::createdDate)) {
+                $this->dsPortalCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::createdDate,
+                    (new DateTime())->format(DATE_MYSQL_DATETIME)
+                );
+            }
 
             if ($_FILES['userfile']['name'] != '' && !is_uploaded_file($_FILES['userfile']['tmp_name'])) {
                 $this->setFormErrorMessage(
@@ -254,8 +276,8 @@ class CTPortalCustomerDocument extends CTCNC
 
         if ($this->formError) {
             if ($this->dsPortalCustomerDocument->getValue(
-                    DBEPortalCustomerDocument::portalCustomerDocumentID
-                ) == '') {                    // attempt to insert
+                DBEPortalCustomerDocument::portalCustomerDocumentID
+            )) {                    // attempt to insert
                 $this->setAction(CTPORTALCUSTOMERDOCUMENT_ACT_EDIT);
             } else {
                 $this->setAction(CTPORTALCUSTOMERDOCUMENT_ACT_ADD);
@@ -268,7 +290,7 @@ class CTPortalCustomerDocument extends CTCNC
 
         $urlNext =
             Controller::buildLink(
-                'Customer . php',
+                'Customer.php',
                 array(
                     'customerID' => $this->dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::customerID),
                     'action'     => CTCNC_ACT_DISP_EDIT

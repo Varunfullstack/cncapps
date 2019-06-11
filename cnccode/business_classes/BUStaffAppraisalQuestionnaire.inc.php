@@ -220,7 +220,7 @@ FROM
         'managerPending',
         'completed'
       )
-    ) AS STATUS 
+    ) AS status 
   FROM
     StaffAppraisalQuestionnaireAnswer a 
     LEFT JOIN `consultant` ON consultant.`cns_consno` = staffMemberID
