@@ -6,10 +6,11 @@ $thing = null;
 $buMail = new BUMail($thing);
 $result = $buMail->sendQueue();
 
-//
-//if($result instanceof Mail_Queue_Error){
-//var_dump($result);
-//
-//}
-echo 'All done';
+
+if ($result instanceof Mail_Queue_Error) {
+    var_dump($result->getMessage());
+    var_dump($result->getDebugInfo());
+} else {
+    echo 'All done';
+}
 ?>

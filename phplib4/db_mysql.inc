@@ -89,17 +89,20 @@ class DB_Sql
                 $Database
             );
 
+
+            if (!self::$Link_ID) {
+                $this->halt(
+                    "Failed to connect($Host, $User, \$Password) failed." . json_encode(mysqli_connect_error())
+                );
+                return 0;
+            }
+
             if (!self::$Link_ID->set_charset("utf8")) {
                 printf(
                     "Error loading utf8 charset: %s\n",
                     self::$Link_ID->error
                 );
                 exit();
-            }
-
-            if (!self::$Link_ID) {
-                $this->halt("connect($Host, $User, \$Password) failed.");
-                return 0;
             }
 
             if (!@mysqli_select_db(

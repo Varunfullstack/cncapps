@@ -5,6 +5,32 @@ This project changes will be shown here.
 ### Added
 - Issue 558 - Overnight contact validation check
 
+## [v3.1.6] - 2019-06-11
+### Fixed
+- Prepay Export not showing customer name
+
+## [v3.1.5] - 2019-06-11
+### Fixed
+- PO Status not sending emails
+- Sales Request process after fixed
+- Notes reverting back (not reproducible)
+- Several improvements in Customer Meeting Agenda document
+- Uploading MS-Word document to Sales Order
+- Uploading Portal documents to customer's page
+- PrePay export not showing the right logo
+
+## [v3.1.4] - 2019-06-05
+### Fixed
+- Clicking On print gives error while in Purchase order page
+- Cosmetic changes on Review Meeting Agenda Document
+- Fixed error while creating a new Customer
+- Fixed issue with Sales Order for SSL certificate renewals item type
+- Fixed footer row for Display Contract And Numbers Report
+
+## [v3.1.3] - 2019-06-03
+### Fixed 
+- Email sending issues
+
 ## [v3.1.2] - 2019-05-31
 ### Fixed
 - Fix issue downloading Portal Documents
@@ -13,7 +39,7 @@ This project changes will be shown here.
 - Fix issue with line arrows in Sales Orders
 - Fix issue with Activity search, when searching Activity Type = Initial and Contract T&M
 - Fix issue with Backup validations where the item type would determine if the server is excluded or not
-## Changed
+### Changed
 - Changed fields order in Activity search
 
 ## [v3.1.1] - 2019-05-29

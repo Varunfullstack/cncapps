@@ -191,6 +191,11 @@ class CTCustomerReviewMeeting extends CTCNC
                     $this->getPrepayContractBody($customerId)
                 );
 
+                $contractsTemplate->set_var(
+                    '24HourFlag',
+                    $dsCustomer->getValue(DBECustomer::support24HourFlag) == 'N' ? "Do you require 24x7 cover?" : null
+                );
+
                 $contractsTemplate->parse(
                     'output',
                     'contracts',
@@ -203,10 +208,7 @@ class CTCustomerReviewMeeting extends CTCNC
                     'contracts',
                     $contractsBody
                 );
-                $textTemplate->set_var(
-                    '24HourFlag',
-                    $dsCustomer->getValue(DBECustomer::support24HourFlag) == 'N' ? "Do you require 24x7 cover?" : null
-                );
+
                 $textTemplate->set_var(
                     'p1Incidents',
                     $this->getP1IncidentsBody($customerId)

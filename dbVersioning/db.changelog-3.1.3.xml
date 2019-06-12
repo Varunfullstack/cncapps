@@ -1,0 +1,58 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1559569378-0">
+        <tagDatabase tag="hotfix-3.1.3"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1559569378-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="mail_queue" columnName="instanceId"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="mail_queue">
+            <column name="instanceId" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1559569378-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="mail_queue" columnName="skippedReason"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="mail_queue">
+            <column name="skippedReason" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1559569378-3">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="mail_queue" columnName="is_sending"/>
+        </preConditions>
+        <dropColumn tableName="mail_queue" columnName="is_sending"/>
+        <rollback>
+            <addColumn tableName="mail_queue">
+                <column name="is_sending" type="tinyint(1)" defaultValue="0">
+                    <constraints nullable="false"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1559569378-4">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="mail_queue" columnName="time_started_sending"/>
+        </preConditions>
+        <dropColumn tableName="mail_queue" columnName="time_started_sending"/>
+        <rollback>
+            <addColumn tableName="mail_queue">
+                <column name="time_started_sending" type="datetime">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

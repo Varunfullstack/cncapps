@@ -178,6 +178,8 @@ class Mail_Queue extends PEAR
 {
     // {{{ Class vars
 
+    public $greeting;
+
     /**
      * Mail options: smtp, mail etc. see Mail::factory
      *
@@ -217,6 +219,7 @@ class Mail_Queue extends PEAR
      * @access private
      */
     var $_initErrors = array();
+    private $queued_as;
 
     // }}}
     // {{{ __construct
@@ -225,31 +228,7 @@ class Mail_Queue extends PEAR
                          $mail_options
     )
     {
-        return $this->Mail_Queue(
-            $container_options,
-            $mail_options
-        );
-    }
-
-    // }}}
-    // {{{ Mail_Queue
-
-    /**
-     * Mail_Queue constructor
-     *
-     * @param array $container_options Mail_Queue container options
-     * @param array $mail_options How send mails.
-     *
-     * @return Mail_Queue
-     *
-     * @access public
-     * @deprecated
-     */
-    function Mail_Queue($container_options,
-                        $mail_options
-    )
-    {
-        $this->PEAR();
+        parent::__construct();
         if (isset($mail_options['pearErrorMode'])) {
             $this->pearErrorMode = $mail_options['pearErrorMode'];
             // ugly hack to propagate 'pearErrorMode'
@@ -307,8 +286,9 @@ class Mail_Queue extends PEAR
         } else {
 
             unset($container_options['type']);
-
-            $this->container = new $container_class($container_options);
+            $this->container = new Mail_Queue_Container_db(
+                @$container_options['dsn'], @$container_options['mail_table']
+            );
             if (PEAR::isError($this->container)) {
                 array_push(
                     $this->_initErrors,
@@ -444,8 +424,19 @@ class Mail_Queue extends PEAR
     }
 
 
-    // }}}
-    // {{{ sendMailsInQueue()
+    private function callSkipCallback($messageID, $skipCallback = null)
+    {
+        if (!$skipCallback) {
+            return null;
+        }
+        return call_user_func(
+            $skipCallback,
+            array(
+                'id' => $messageID,
+            )
+        );
+
+    }
 
     /**
      * Send mails fom queue.
@@ -459,17 +450,12 @@ class Mail_Queue extends PEAR
      * @param integer $try Optional - hoh many times mailqueu should try send
      *                           each mail. If mail was sent succesful it will be
      *                           deleted from Mail_Queue.
-     * @param mixed $callback Optional, a callback (string or array) to save the
-     *                           SMTP ID and the SMTP greeting.
-     *
-     * @param null $callbackBeforeSend
      * @return mixed  True on success else MAILQUEUE_ERROR object.
+     * @throws Exception
      */
     function sendMailsInQueue($limit = MAILQUEUE_ALL,
                               $offset = MAILQUEUE_START,
-                              $try = MAILQUEUE_TRY,
-                              $callback = null,
-                              $callbackBeforeSend = null
+                              $try = MAILQUEUE_TRY
     )
     {
         if (!is_int($limit) || !is_int($offset) || !is_int($try)) {
@@ -479,103 +465,34 @@ class Mail_Queue extends PEAR
             );
         }
 
-        if ($callback !== null) {
-            if (!is_array($callback) && !is_string($callback)) {
-                return Mail_Queue::raiseError(
-                    "sendMailsInQueue(): callback must be a string or an array.",
-                    MAILQUEUE_ERROR_UNEXPECTED
-                );
-            }
-        }
-
-        if ($callbackBeforeSend !== null) {
-            if (!is_array($callbackBeforeSend) && !is_string($callbackBeforeSend)) {
-                return Mail_Queue::raiseError(
-                    "sendMailsInQueue(): callbackBeforeSend must be a string or an array.",
-                    MAILQUEUE_ERROR_UNEXPECTED
-                );
-            }
-        }
-
         $this->container->setOption(
             $limit,
             $offset,
             $try
         );
         while (($mail = $this->get()) && !PEAR::isError($mail)) {
-            /*
-            Karim Ahmed, Sweet Code
-            Added callback before send so that I can set my is_sending flag
-            */
-            $okToSend = true;
-
-            if ($callbackBeforeSend !== null) {
-                $queued_as = null;
-                $greeting = null;
-                if (isset($this->queued_as)) {
-                    $queued_as = $this->queued_as;
-                }
-                if (isset($this->greeting)) {
-                    $greeting = $this->greeting;
-                }
-                $okToSend = call_user_func(
-                    $callbackBeforeSend,
-                    array(
-                        'id'        => $mail->getId(),
-                        'queued_as' => $queued_as,
-                        'greeting'  => $greeting
-                    )
-                );
-            }
-
-            if (!$okToSend) {
-                $this->container->skip();       // already being sent
-                continue;
-            }
-            $this->container->countSend($mail);
-
+            $this->container->countSend();
             $result = $this->sendMail(
                 $mail,
                 true
             );
-
+            /** @var Mail_Queue_Error $result */
             if (PEAR::isError($result)) {
                 //remove the problematic mail from the buffer, but don't delete
                 //it from the db: it might be a temporary issue.
-                $this->container->skip();
+                $this->container->skip($result);
                 PEAR::raiseError(
                     'Error in sending mail: ' . $result->getMessage(),
                     MAILQUEUE_ERROR_CANNOT_SEND_MAIL,
                     PEAR_ERROR_TRIGGER,
                     E_USER_NOTICE
                 );
+
                 continue;
             }
-
-            //take care of callback first, as it may need to retrieve extra data
-            //from the mail_queue table.
-            if ($callback !== null) {
-                $queued_as = null;
-                $greeting = null;
-                if (isset($this->queued_as)) {
-                    $queued_as = $this->queued_as;
-                }
-                if (isset($this->greeting)) {
-                    $greeting = $this->greeting;
-                }
-                call_user_func(
-                    $callback,
-                    array(
-                        'id'        => $mail->getId(),
-                        'queued_as' => $queued_as,
-                        'greeting'  => $greeting
-                    )
-                );
-            }
-
             // delete email from queue?
             if ($mail->isDeleteAfterSend()) {
-                $status = $this->deleteMail($mail->getId());
+                $status = $this->container->deleteMail($mail->getId());
             }
 
             unset($mail);

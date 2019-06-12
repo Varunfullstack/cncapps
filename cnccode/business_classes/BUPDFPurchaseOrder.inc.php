@@ -466,7 +466,7 @@ class BUPDFPurchaseOrder extends BaseObject
         );
         $this->_buPDF->CR();
         if ($this->_dbePayMethod->getValue(DBEPayMethod::cardFlag) == 'Y') {
-            $dsCardholder = new DBEUser($this);
+            $dsCardholder = new DataSet($this);
             $this->_buSalesOrder->getUserByID(
                 $this->_dbePayMethod->getValue(DBEPayMethod::userID),
                 $dsCardholder

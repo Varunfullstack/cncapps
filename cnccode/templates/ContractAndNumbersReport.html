@@ -10,6 +10,7 @@
             ],
             paging: false,
             footerCallback: function (tfoot, data, start, end, display) {
+                debugger;
                 var api = this.api();
                 var intVal = function (i) {
                     return typeof i === 'string' ?
@@ -20,32 +21,32 @@
 
                 // Total over all pages
                 var total = api
-                    .column(3)
+                    .column(4)
                     .data()
                     .reduce(function (a, b) {
                         return intVal(a) + intVal(b);
                     }, 0);
 
                 // Update footer
-                $(api.column(3).footer()).html(
+                $(api.column(4).footer()).html(
                     'Total: £' + total
                 );
 
                 var serverCareTotal = api
-                    .column(8)
+                    .column(9)
                     .data()
                     .reduce(function (acc, item) {
                         return acc + intVal(item)
                     }, 0);
 
-                $(api.column(8).footer()).html(
+                $(api.column(9).footer()).html(
                     'Total: £' + serverCareTotal
                 );
 
                 var avgTotal = 0;
 
                 var costPerUserPerMonthTotalAVG = api
-                    .column(4)
+                    .column(5)
                     .data()
                     .reduce(function (a, b) {
                         var val = intVal(b);
@@ -57,7 +58,7 @@
                         return intVal(a) + intVal(b);
                     }, 0) / avgTotal;
 
-                $(api.column(4).footer()).html(
+                $(api.column(5).footer()).html(
                     'AVG £' + costPerUserPerMonthTotalAVG.toFixed(2)
                 );
 
@@ -73,17 +74,6 @@
                 );
 
                 var totalPhysicalServers = api
-                    .column(6)
-                    .data()
-                    .reduce(function (acc, item) {
-                        return acc + intVal(item);
-                    }, 0);
-
-                $(api.column(6).footer()).html(
-                    'Total: ' + totalPhysicalServers
-                );
-
-                var totalVirtualServers = api
                     .column(7)
                     .data()
                     .reduce(function (acc, item) {
@@ -91,6 +81,17 @@
                     }, 0);
 
                 $(api.column(7).footer()).html(
+                    'Total: ' + totalPhysicalServers
+                );
+
+                var totalVirtualServers = api
+                    .column(8)
+                    .data()
+                    .reduce(function (acc, item) {
+                        return acc + intVal(item);
+                    }, 0);
+
+                $(api.column(8).footer()).html(
                     'Total: ' + totalVirtualServers
                 )
 

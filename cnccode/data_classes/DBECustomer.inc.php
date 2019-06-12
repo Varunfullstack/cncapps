@@ -146,7 +146,9 @@ class DBECustomer extends DBCNCEntity
         $this->addColumn(
             self::gscTopUpAmount,
             DA_FLOAT,
-            DA_NOT_NULL
+            DA_NOT_NULL,
+            null,
+            '0.0'
         );                        // amount to top up general support contract by
         $this->addColumn(
             self::modifyDate,
@@ -166,12 +168,16 @@ class DBECustomer extends DBCNCEntity
         $this->addColumn(
             self::noOfServers,
             DA_INTEGER,
-            DA_ALLOW_NULL
+            DA_ALLOW_NULL,
+            null,
+            0
         );
         $this->addColumn(
             self::noOfSites,
             DA_INTEGER,
-            DA_ALLOW_NULL
+            DA_ALLOW_NULL,
+            null,
+            0
         );
         $this->addColumn(
             self::comments,

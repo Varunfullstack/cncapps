@@ -33,7 +33,6 @@ class BUMail extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
-
         $this->mime = new Mail_Mime;
         $this->mailQueue = new Mail_Queue (
             $GLOBALS['db_options'],
@@ -126,30 +125,17 @@ class BUMail extends Business
 
     public function sendQueue()
     {
-//        /*
-//        reset sending field if started sending time older than 15 minutes
-//        */
-//        $sql =
-//            "UPDATE
-//          mail_queue
-//        SET
-//          time_started_sending = null
-//        WHERE
-//          time_started_sending < DATE_SUB( NOW(), INTERVAL 15 MINUTE )";
-
-//        $this->db->query($sql);
         return $this->mailQueue->sendMailsInQueue(
             self::MAIL_QUEUE_SEND_LIMIT,
             0,
-            self::MAIL_QUEUE_TRY_LIMIT,
-            array($this, 'mailqueueCallBackAfterSend'),
-            array($this, 'mailqueueCallBackBeforeSend')
+            self::MAIL_QUEUE_TRY_LIMIT
         );
 
     }
 
     public function mailqueueCallBackBeforeSend($args)
     {
+        var_dump('Mailqueue call before send', $args);
         $mailId = $args['id'];
         $sql =
             "SELECT
@@ -162,13 +148,17 @@ class BUMail extends Business
         $result = $this->db->query($sql);
         $row = $result->fetch_object();
         $ret = false;
-        if (!$row->time_started_sending) {
+
+        if (!$row->time_started_sending || (DateTime::createFromFormat(
+                DATE_MYSQL_DATETIME,
+                $row->time_started_sending
+            )) <= ((new DateTime())->sub(new DateInterval('PT15M')))) {
             $ret = true;
             /*
             Set is_sending flag
             */
             $sql =
-                "UPDATE
+                "UPDATE 
           mail_queue
         SET
           time_started_sending = NOW()
@@ -202,6 +192,11 @@ class BUMail extends Business
 
         $this->db->query($sql);
         $this->db->commit();
+    }
+
+    public function mailQueueSkipCallback($mailID)
+    {
+
     }
 }
 
