@@ -59,7 +59,7 @@ class CTStarterAndLeaverReport extends CTCNC
             } else {
                 set_time_limit(240);
 
-                $results = $this->buCustomerAnalysisReport->getResults($dsSearchForm);
+                $results = $this->getData($dsSearchForm);
 
                 if ($this->getParam('Search') == 'Generate CSV') {
 
@@ -243,5 +243,10 @@ class CTStarterAndLeaverReport extends CTCNC
 
         $this->template->parse('CONTENTS', 'CustomerAnalysisReport', true);
         $this->parsePage();
+    }
+
+    private function getData(DSForm $dsSearchForm)
+    {
+
     }
 }
