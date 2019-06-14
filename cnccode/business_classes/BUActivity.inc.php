@@ -1228,10 +1228,15 @@ class BUActivity extends Business
 
         foreach ($mainSupportContacts as $supportContact) {
             if ($supportContact[DBEContact::contactID] == $contactID ||
-                $supportContact[$othersFlagName] != 'Y'
+                $supportContact[$othersFlagName] != 'Y' ||
+                ($supportContact[DBEContact::supportLevel] == DBEContact::supportLevelSupervisor &&
+                    $contact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelDelegate)
+                && $dbeJProblem->getValue(DBEProblem::authorisedBy) != $supportContact[DBEContact::contactID]
             ) {
                 continue;
             }
+
+
             if (!empty($emails)) {
                 $emails .= ',';
             }

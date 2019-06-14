@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased] 
+### Changed
+- Issue 576 - Delegate emails copy only to supervisor that raised / authorised them
+
 ## [v3.1.6] - 2019-06-11
 ### Fixed
 - Prepay Export not showing customer name
