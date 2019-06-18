@@ -247,6 +247,48 @@ class CTStarterAndLeaverReport extends CTCNC
 
     private function getData(DSForm $dsSearchForm)
     {
-
+        $sql = "SELECT
+'starters',
+  SUM(`pro_rootcauseno` = 58) AS starters,
+  AVG(pro_total_activity_duration_hours) AS averageDuration,
+  AVG(getOpenHours(pro_problemno)) AS averageOpenHours,
+  MAX(pro_total_activity_duration_hours) AS maxDuration,
+  MAX(getOpenHours(pro_problemno)) AS maxOpenHours,
+  MIN(pro_total_activity_duration_hours) AS minDuration,
+  MIN(getOpenHours(pro_problemno)) AS minOpenHours,
+  AVG(pro_total_activity_duration_hours * (SELECT hed_hourly_labour_cost FROM headert LIMIT 1)) AS averageCost,
+  SUM(pro_total_activity_duration_hours * (SELECT hed_hourly_labour_cost FROM headert LIMIT 1)) AS totalCost,
+  AVG((SELECT COUNT(*) FROM callactivity WHERE callactivity.`caa_problemno` = problem.`pro_problemno` AND callactivity.`caa_callacttypeno`= 11)) AS averageCustomerContact,
+  AVG((SELECT COUNT(*) FROM callactivity WHERE callactivity.`caa_problemno` = problem.`pro_problemno` AND callactivity.`caa_callacttypeno` = 8)) AS averageRemoteSupport,
+  AVG((SELECT COUNT(*) FROM callactivity WHERE callactivity.`caa_problemno` = problem.`pro_problemno` AND callactivity.`caa_callacttypeno` IN (8,11,18))) AS averageActivities
+FROM
+  problem
+WHERE `pro_custno` = 520
+  AND CAST(
+    problem.`pro_date_raised` AS DATE
+  ) BETWEEN '2018-01-01'
+  AND '2019-01-01' AND pro_rootcauseno  = 58 AND `pro_status` IN ('F', 'C') UNION 
+  SELECT
+  'leavers',
+  SUM(`pro_rootcauseno` = 62) AS leavers,
+  AVG(pro_total_activity_duration_hours) AS averageDuration,
+  AVG(getOpenHours(pro_problemno)) AS averageOpenHours,
+  MAX(pro_total_activity_duration_hours) AS maxDuration,
+  MAX(getOpenHours(pro_problemno)) AS maxOpenHours,
+  MIN(pro_total_activity_duration_hours) AS minDuration,
+  MIN(getOpenHours(pro_problemno)) AS minOpenHours,
+  AVG(pro_total_activity_duration_hours * (SELECT hed_hourly_labour_cost FROM headert LIMIT 1)) AS averageCost,
+  SUM(pro_total_activity_duration_hours * (SELECT hed_hourly_labour_cost FROM headert LIMIT 1)) AS totalCost,
+  AVG((SELECT COUNT(*) FROM callactivity WHERE callactivity.`caa_problemno` = problem.`pro_problemno` AND callactivity.`caa_callacttypeno` = 11)) AS averageCustomerContact,
+  AVG((SELECT COUNT(*) FROM callactivity WHERE callactivity.`caa_problemno` = problem.`pro_problemno` AND callactivity.`caa_callacttypeno` = 8)) AS averageRemoteSupport,
+  AVG((SELECT COUNT(*) FROM callactivity WHERE callactivity.`caa_problemno` = problem.`pro_problemno` AND callactivity.`caa_callacttypeno` IN (8,11,18))) AS averageActivities
+FROM
+  problem
+WHERE `pro_custno` = 520
+  AND CAST(
+    problem.`pro_date_raised` AS DATE
+  ) BETWEEN '2018-01-01'
+  AND '2019-01-01' AND pro_rootcauseno  =  62 AND `pro_status` IN ('F', 'C')
+ ";
     }
 }
