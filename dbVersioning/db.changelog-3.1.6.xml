@@ -1,0 +1,26 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1560873127-0">
+        <tagDatabase tag="hotfix-3.1.6"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1560873127-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT
+                column_default = '0000-00-00'
+                FROM
+                INFORMATION_SCHEMA.COLUMNS
+                WHERE table_schema = DATABASE()
+                AND TABLE_NAME = 'problem'
+                AND column_name = 'pro_alarm_date';
+            </sqlCheck>
+        </preConditions>
+        <dropDefaultValue tableName="problem" columnName="pro_alarm_date"/>
+        <sql>
+            update problem set pro_alarm_date = null where pro_alarm_date = '0000-00-00'
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>
