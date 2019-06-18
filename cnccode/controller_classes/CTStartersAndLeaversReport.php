@@ -22,7 +22,7 @@ class CTStartersAndLeaversReport extends CTCNC
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $roles = [
-            "accounts",
+            "reports",
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
