@@ -289,10 +289,13 @@ ORDER BY clients.name,
             );
 
             if (!$dbeCustomerDocument->getValue(DBEPortalCustomerDocument::createdDate)) {
+                echo 'we do not have a date';
                 $dbeCustomerDocument->setValue(
                     DBEPortalCustomerDocument::createdDate,
                     (new DateTime())->format(DATE_MYSQL_DATETIME)
                 );
+            } else {
+                echo ' we do have a "date" '. $dbeCustomerDocument->getValue(DBEPortalCustomerDocument::createdDate);
             }
 
             if (!$dbeCustomerDocument->rowCount) {
