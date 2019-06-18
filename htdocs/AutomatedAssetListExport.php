@@ -94,7 +94,7 @@ while ($dbeCustomer->fetchNext()) {
   cim_processorfamily.value AS \"CPU Type\",
   computers.totalmemory AS \"Memory\",
   SUM(drives.Size) AS \"Total Disk\",
-  if(exd.`Bitlocker Recovery Key` is not null and exd.`Bitlocker Recovery Key` <> '','Encrypted',null) as 'Drive Encryption',
+  if(exd.`Bitlocker Password/Key` is not null and exd.`Bitlocker Password/Key` <> '','Encrypted',null) as 'Drive Encryption',
   SUBSTRING_INDEX(
     computers.os,
     'Microsoft Windows ',
