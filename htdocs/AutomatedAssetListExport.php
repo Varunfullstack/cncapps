@@ -288,6 +288,13 @@ ORDER BY clients.name,
                 file_get_contents($fileName)
             );
 
+            if (!$dbeCustomerDocument->getValue(DBEPortalCustomerDocument::createdDate)) {
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::createdDate,
+                    (new DateTime())->format(DATE_MYSQL_DATETIME)
+                );
+            }
+
             if (!$dbeCustomerDocument->rowCount) {
                 $dbeCustomerDocument->setValue(
                     DBEPortalCustomerDocument::customerID,
@@ -318,10 +325,6 @@ ORDER BY clients.name,
                     'Y'
                 );
 
-                $dbeCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::createdDate,
-                    (new DateTime())->format(DATE_MYSQL_DATETIME)
-                );
 
                 $dbeCustomerDocument->insertRow();
             } else {
