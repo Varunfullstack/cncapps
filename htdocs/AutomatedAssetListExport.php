@@ -325,7 +325,6 @@ ORDER BY clients.name,
                     'Y'
                 );
 
-
                 $dbeCustomerDocument->insertRow();
             } else {
                 $dbeCustomerDocument->updateRow();
