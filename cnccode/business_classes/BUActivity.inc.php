@@ -7145,8 +7145,10 @@ is currently a balance of ';
                     ) . "</div>";
 
                 if ($this->isWhitelistedUtilityEmail($record->getSenderEmailAddress())) {
+                    echo '<div> The sender email is whitelisted</div>';
                     $forceHidden = true;
                 } else {
+                    echo '<div> The sender email is not whitelisted: raising request as to be logged</div>';
                     return $this->addCustomerRaisedRequest(
                         $record,
                         null,
@@ -7160,7 +7162,8 @@ is currently a balance of ';
             if (!$dbeContact || !$dbeContact->rowCount) {
 
                 echo "<div>We couldn't find a primary contact, -> to be logged</div>";
-                $prependMessage = '<div style="color: red">Failed to find primary contact associated with customer</div>';
+                $prependMessage = '<div style="color: red">Failed to find primary contact associated with customer, sender Email: ' . $record->getSenderEmailAddress(
+                    ) . '</div>';
                 return $this->addCustomerRaisedRequest(
                     $record,
                     null,

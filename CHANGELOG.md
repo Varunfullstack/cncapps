@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 586 - Utility emails going into To Be Logged as No Primary Contact
+
 ## [v3.1.6] - 2019-06-11
 ### Fixed
 - Prepay Export not showing customer name

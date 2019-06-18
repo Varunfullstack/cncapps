@@ -47,7 +47,7 @@ class BUImportRequests extends Business
         AND importErrorFound = 'N'
       ORDER BY
         automatedRequestId
-      LIMIT 15";
+      LIMIT 1";
 
         $db->query($sql);
 
