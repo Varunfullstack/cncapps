@@ -288,14 +288,14 @@ ORDER BY clients.name,
                 file_get_contents($fileName)
             );
 
-            if (!$dbeCustomerDocument->getValue(DBEPortalCustomerDocument::createdDate)) {
-                echo 'we do not have a date';
+            if (!$dbeCustomerDocument->getValue(
+                    DBEPortalCustomerDocument::createdDate
+                ) || $dbeCustomerDocument->getValue(DBEPortalCustomerDocument::createdDate) == '0000-00-00 00:00:00') {
+
                 $dbeCustomerDocument->setValue(
                     DBEPortalCustomerDocument::createdDate,
                     (new DateTime())->format(DATE_MYSQL_DATETIME)
                 );
-            } else {
-                echo ' we do have a "date" '. $dbeCustomerDocument->getValue(DBEPortalCustomerDocument::createdDate);
             }
 
             if (!$dbeCustomerDocument->rowCount) {
