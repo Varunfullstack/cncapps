@@ -51,6 +51,12 @@
     }
 </script>
 <P class="formErrorMessage">{formError}</P>
+<style>
+    .dataTable td, .dataTable th {
+        border: black 1px solid;
+        border-collapse: collapse;
+    }
+</style>
 <form name="searchForm"
       method="get"
       action="{urlSubmit}"
@@ -99,9 +105,9 @@
                 <input name="searchForm[1][startDate]"
                        value="{startDate}"
                        size="10"
-                       maxlength="7"
                        class="jqueryCalendar"
                        required
+                       placeholder="DD/MM/YYYY"
                 > <font class="formErrorMessage"> {startDateMessage} </font>
             </td>
         </tr>
@@ -115,9 +121,9 @@
                 <input name="searchForm[1][endDate]"
                        value="{endDate}"
                        size="10"
-                       maxlength="7"
                        class="jqueryCalendar"
                        required
+                       placeholder="DD/MM/YYYY"
                 > <font class="formErrorMessage"> {endDateMessage} </font>
             </td>
         </tr>
@@ -136,7 +142,7 @@
         </tr>
     </table>
     <p>&nbsp;</p>
-    <table>
+    <table class="dataTable">
         <thead>
         <tr>
             <th></th>
@@ -158,48 +164,48 @@
 
         <tr>
             <td>Starters</td>
-            <td align="right">{startersQuantity}</td>
-            <td align="right">{startersMaxDuration}</td>
-            <td align="right">{startersAvgDuration}</td>
-            <td align="right">{startersMinDuration}</td>
-            <td align="right">{startersMaxOpenHours}</td>
-            <td align="right">{startersAvgOpenHours}</td>
-            <td align="right">{startersMinOpenHours}</td>
-            <td align="right">{startersAvgCost}</td>
-            <td align="right">{startersTotalCost}</td>
-            <td align="right">{startersAvgCustomerContact}</td>
-            <td align="right">{startersAvgRemoteSupport}</td>
-            <td align="right">{startersAvgActivities}</td>
+            <td align="center">{startersQuantity}</td>
+            <td align="center">{startersMaxDuration}</td>
+            <td align="center">{startersAvgDuration}</td>
+            <td align="center">{startersMinDuration}</td>
+            <td align="center">{startersMaxOpenHours}</td>
+            <td align="center">{startersAvgOpenHours}</td>
+            <td align="center">{startersMinOpenHours}</td>
+            <td align="center">{startersAvgCost}</td>
+            <td align="center">{startersTotalCost}</td>
+            <td align="center">{startersAvgCustomerContact}</td>
+            <td align="center">{startersAvgRemoteSupport}</td>
+            <td align="center">{startersAvgActivities}</td>
         </tr>
         <tr>
             <td>Leavers</td>
-            <td align="right">{leaversQuantity}</td>
-            <td align="right">{leaversMaxDuration}</td>
-            <td align="right">{leaversAvgDuration}</td>
-            <td align="right">{leaversMinDuration}</td>
-            <td align="right">{leaversMaxOpenHours}</td>
-            <td align="right">{leaversAvgOpenHours}</td>
-            <td align="right">{leaversMinOpenHours}</td>
-            <td align="right">{leaversAvgCost}</td>
-            <td align="right">{leaversTotalCost}</td>
-            <td align="right">{leaversAvgCustomerContact}</td>
-            <td align="right">{leaversAvgRemoteSupport}</td>
-            <td align="right">{leaversAvgActivities}</td>
+            <td align="center">{leaversQuantity}</td>
+            <td align="center">{leaversMaxDuration}</td>
+            <td align="center">{leaversAvgDuration}</td>
+            <td align="center">{leaversMinDuration}</td>
+            <td align="center">{leaversMaxOpenHours}</td>
+            <td align="center">{leaversAvgOpenHours}</td>
+            <td align="center">{leaversMinOpenHours}</td>
+            <td align="center">{leaversAvgCost}</td>
+            <td align="center">{leaversTotalCost}</td>
+            <td align="center">{leaversAvgCustomerContact}</td>
+            <td align="center">{leaversAvgRemoteSupport}</td>
+            <td align="center">{leaversAvgActivities}</td>
         </tr>
         <tr>
             <td>Total</td>
-            <td align="right">{totalQuantity}</td>
-            <td align="right">{totalMaxDuration}</td>
-            <td align="right">{totalAvgDuration}</td>
-            <td align="right">{totalMinDuration}</td>
-            <td align="right">{totalMaxOpenHours}</td>
-            <td align="right">{totalAvgOpenHours}</td>
-            <td align="right">{totalMinOpenHours}</td>
-            <td align="right">{totalAvgCost}</td>
-            <td align="right">{totalTotalCost}</td>
-            <td align="right">{totalAvgCustomerContact}</td>
-            <td align="right">{totalAvgRemoteSupport}</td>
-            <td align="right">{totalAvgActivities}</td>
+            <td align="center">{totalQuantity}</td>
+            <td align="center">{totalMaxDuration}</td>
+            <td align="center">{totalAvgDuration}</td>
+            <td align="center">{totalMinDuration}</td>
+            <td align="center">{totalMaxOpenHours}</td>
+            <td align="center">{totalAvgOpenHours}</td>
+            <td align="center">{totalMinOpenHours}</td>
+            <td align="center">{totalAvgCost}</td>
+            <td align="center">{totalTotalCost}</td>
+            <td align="center">{totalAvgCustomerContact}</td>
+            <td align="center">{totalAvgRemoteSupport}</td>
+            <td align="center">{totalAvgActivities}</td>
         </tr>
 
 
