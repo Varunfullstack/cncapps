@@ -3,6 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Fixed
+- Issue 586 - Utility emails going into To Be Logged as No Primary Contact
 - Issue 585 - HTTP links in Standard text
 
 ## [v3.1.6] - 2019-06-11
