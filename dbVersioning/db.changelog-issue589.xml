@@ -8,13 +8,13 @@
     <changeSet author="pavwebdev" id="1560932972-1">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
-                SELECT COUNT(*) FROM porhead WHERE poh_ord_consno = 0
+                SELECT COUNT(*) = 0 FROM porhead WHERE poh_ord_consno = 0
             </sqlCheck>
         </preConditions>
         <sql>
             update porhead
             set poh_ord_consno = null
-            where poh_ord_cosno = 0
+            where poh_ord_consno = 0
         </sql>
         <rollback/>
     </changeSet>
