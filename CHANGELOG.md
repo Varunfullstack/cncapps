@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Changed
+- Issue 587 - Change Bitlocker encryption field lookup
 ### Fixed
 - Issue 586 - Utility emails going into To Be Logged as No Primary Contact
 - Issue 585 - HTTP links in Standard text

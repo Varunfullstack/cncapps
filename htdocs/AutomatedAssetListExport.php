@@ -94,7 +94,7 @@ while ($dbeCustomer->fetchNext()) {
   cim_processorfamily.value AS \"CPU Type\",
   computers.totalmemory AS \"Memory\",
   SUM(drives.Size) AS \"Total Disk\",
-  if(exd.`Bitlocker Recovery Key` is not null and exd.`Bitlocker Recovery Key` <> '','Encrypted',null) as 'Drive Encryption',
+  if(exd.`Bitlocker Password/Key` is not null and exd.`Bitlocker Password/Key` <> '','Encrypted',null) as 'Drive Encryption',
   SUBSTRING_INDEX(
     computers.os,
     'Microsoft Windows ',
@@ -288,6 +288,16 @@ ORDER BY clients.name,
                 file_get_contents($fileName)
             );
 
+            if (!$dbeCustomerDocument->getValue(
+                    DBEPortalCustomerDocument::createdDate
+                ) || $dbeCustomerDocument->getValue(DBEPortalCustomerDocument::createdDate) == '0000-00-00 00:00:00') {
+
+                $dbeCustomerDocument->setValue(
+                    DBEPortalCustomerDocument::createdDate,
+                    (new DateTime())->format(DATE_MYSQL_DATETIME)
+                );
+            }
+
             if (!$dbeCustomerDocument->rowCount) {
                 $dbeCustomerDocument->setValue(
                     DBEPortalCustomerDocument::customerID,
@@ -316,11 +326,6 @@ ORDER BY clients.name,
                 $dbeCustomerDocument->setValue(
                     DBEPortalCustomerDocument::mainContactOnlyFlag,
                     'Y'
-                );
-
-                $dbeCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::createdDate,
-                    (new DateTime())->format(DATE_MYSQL_DATETIME)
                 );
 
                 $dbeCustomerDocument->insertRow();
