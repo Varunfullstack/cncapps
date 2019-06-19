@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 558 - Overnight contact validation check
 ### Changed
 - Issue 587 - Change Bitlocker encryption field lookup
 ### Fixed
