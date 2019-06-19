@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 558 - Overnight contact validation check
 ### Changed
 - Issue 587 - Change Bitlocker encryption field lookup
+- Issue 576 - Delegate emails copy only to supervisor that raised / authorised them
 ### Fixed
 - Issue 586 - Utility emails going into To Be Logged as No Primary Contact
 - Issue 585 - HTTP links in Standard text
