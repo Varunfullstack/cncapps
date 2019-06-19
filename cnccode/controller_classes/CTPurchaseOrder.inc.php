@@ -1391,7 +1391,7 @@ class CTPurchaseOrder extends CTCNC
 
                 $dsPorhead->setValue(
                     DBEJPorhead::completionNotifiedFlag,
-                    $dbePurchaseOrder->getValue(DBEPorhead::deliveryConfirmedFlag)
+                    $dbePurchaseOrder->getValue(DBEPorhead::completionNotifiedFlag)
                 );
 
             }

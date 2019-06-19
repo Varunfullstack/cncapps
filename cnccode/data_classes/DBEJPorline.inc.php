@@ -9,6 +9,7 @@ class DBEJPorline extends DBEPorline
 {
     const itemDescription = "itemDescription";
     const partNo = "partNo";
+    const excludeFromPOCompletion = "excludeFromPOCompletion";
 
     /**
      * calls constructor()
@@ -33,6 +34,13 @@ class DBEJPorline extends DBEPorline
             DA_ALLOW_NULL,
             "itm_unit_of_sale"
         );
+
+        $this->addColumn(
+            self::excludeFromPOCompletion,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -97,6 +105,7 @@ class DBEJPorline extends DBEPorline
             " FROM " . $this->getTableName() .
             " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "= itm_itemno" .
             " WHERE " . $this->getDBColumnName(self::porheadID) . "=" . $this->getFormattedValue(self::porheadID) .
+            " AND " . $this->getDBColumnName(self::excludeFromPOCompletion) . " = 'N' " .
             " AND " . $this->getDBColumnName(self::qtyReceived) . " < " . $this->getDBColumnName(self::qtyOrdered)
         );
         if ($this->runQuery()) {

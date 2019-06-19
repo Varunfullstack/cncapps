@@ -62,10 +62,7 @@ FROM
     left join (select problem.pro_linked_ordno, min(problem.pro_problemno) as pro_problemno from problem group by problem.pro_linked_ordno) minServiceRequest on minServiceRequest.pro_linked_ordno = porhead.poh_ordno
   left join project 
     on project.ordHeadID = ordhead.odh_ordno
-WHERE poh_required_by is not null
-AND item.itm_desc NOT LIKE '%labour%'
-AND item.itm_desc NOT LIKE '%Office 365%'
-  AND item.itm_desc NOT LIKE '%carriage%'
+WHERE poh_required_by is not null and item.excludeFromPOCompletion = 'N'
 AND customer.cus_name <> 'CNC Operating Stock'
 and (porline.pol_cost > 0 or porline.pol_cost < 0)
   ORDER BY poh_required_by ASC, ordhead.`odh_custno` DESC, pol_porno ASC, `pol_lineno` ASC

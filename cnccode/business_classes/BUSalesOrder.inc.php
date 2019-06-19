@@ -2134,9 +2134,26 @@ WHERE odl_ordno = $ordheadID
             }
 
             if ($purchaseOrdersForSalesOrder->getValue(DBEPorhead::completionNotifiedFlag) == 'N') {
-                $shouldNotify = false;
-                echo '<div>We have found another purchase order that is not completed yet..so we cannot create the activity</div>';
-                break;
+
+                $buPurchaseOrder = new BUPurchaseOrder($this);
+                $ignore = new DataSet($this);
+                $porline = new DataSet($this);
+                $buPurchaseOrder->getOrderByID(
+                    $purchaseOrderHeader->getValue(DBEPorhead::porheadID),
+                    $ignore,
+                    $porline
+                );
+
+                while ($porline->fetchNext()) {
+                    if ($porline->getValue(DBEJPorline::excludeFromPOCompletion) != 'Y' && $porline->getValue(
+                            DBEJPorline::qtyOrdered
+                        ) < $porline->getValue(DBEJPorline::qtyReceived)) {
+                        $shouldNotify = false;
+                        echo '<div>We have found another purchase order that is not completed yet..so we cannot create the activity</div>';
+                        break 2;
+                    }
+                }
+
             }
         }
 
