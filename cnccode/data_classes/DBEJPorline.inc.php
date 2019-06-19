@@ -83,4 +83,28 @@ class DBEJPorline extends DBEPorline
         );
         return (parent::getRow());
     }
+
+    /**
+     * Return count of rows that still have items to be received
+     */
+    function countOutstandingRows()
+    {
+        if ($this->getValue(self::porheadID) == '') {
+            $this->raiseError('porheadID not set');
+        }
+        $this->setQueryString(
+            "SELECT COUNT(*)" .
+            " FROM " . $this->getTableName() .
+            " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "= itm_itemno" .
+            " WHERE " . $this->getDBColumnName(self::porheadID) . "=" . $this->getFormattedValue(self::porheadID) .
+            " AND " . $this->getDBColumnName(self::qtyReceived) . " < " . $this->getDBColumnName(self::qtyOrdered)
+        );
+        if ($this->runQuery()) {
+            if ($this->nextRecord()) {
+                $this->resetQueryString();
+                return ($this->getDBColumnValue(0));
+            }
+        }
+        return 0;
+    }
 }

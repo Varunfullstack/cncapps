@@ -108,14 +108,14 @@
         <tr>
             <td class="promptText">Manufacturer</td>
             <td class="field">
-                <input                        type="text"
-                        name="manufacturerName"
-                        id="manufacturerName"
-                        value="{manufacturerName}"
-                        onChange="javascript:validateManufacturerName()"
-                        onKeydown="javascript:checkFunctionKey()"
-                        size="50"
-                        maxlength="50"
+                <input type="text"
+                       name="manufacturerName"
+                       id="manufacturerName"
+                       value="{manufacturerName}"
+                       onChange="javascript:validateManufacturerName()"
+                       onKeydown="javascript:checkFunctionKey()"
+                       size="50"
+                       maxlength="50"
                 >
                 <font class="formErrorMessage">{manufacturerIDMessage}</font>
             </td>
@@ -254,6 +254,21 @@
                                maxlength="50"
                         >
 						<font class="formErrorMessage">{contractResponseTimeMessage}</font>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top"
+                class="promptText"
+            >Exclude item from PO Status Report
+            </td>
+            <td>
+                <span class="field">
+						<input type="checkbox"
+                               name="item[1][excludeFromPOCompletion]"
+                               value="Y"
+                               {excludeFromPOCompletionChecked}
+                        >
                 </span>
             </td>
         </tr>
