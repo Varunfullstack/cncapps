@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 585 - HTTP links in Standard text
+
 ## [v3.1.6] - 2019-06-11
 ### Fixed
 - Prepay Export not showing customer name
