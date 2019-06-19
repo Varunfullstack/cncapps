@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 589 - Unprinted Purchase Orders & P5 with no Sales Orders email tweaks
+
 ## [v3.1.7] - 2019-06-18
 ### Fixed
 - Remove the default of the problem table pro_alarm_date "0000-00-00"
