@@ -49,6 +49,8 @@ class CTStartersAndLeaversReport extends CTCNC
 
         $this->setTemplateFiles(array('StartersAndLeaversReport' => 'StartersAndLeaversReport'));
 
+        setlocale(LC_MONETARY, "en_GB");
+
         if (isset($_REQUEST ['searchForm'])) {
 
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
@@ -87,33 +89,34 @@ class CTStartersAndLeaversReport extends CTCNC
                 } else { // Screen Report
                     $this->template->setVar(
                         [
-                            "startersQuantity"           => $results[0]['quantity'],
+                            "startersQuantity"           => number_format($results[0]['quantity']),
                             "startersMaxDuration"        => number_format($results[0]['maxDuration'], 2),
                             "startersAvgDuration"        => number_format($results[0]['avgDuration'], 2),
                             "startersMinDuration"        => number_format($results[0]['minDuration'], 2),
+                            "startersTotalDuration"      => number_format($results[0]['totalDuration'], 2),
                             "startersMaxOpenHours"       => number_format($results[0]['maxOpenHours'], 2),
                             "startersAvgOpenHours"       => number_format($results[0]['avgOpenHours'], 2),
                             "startersMinOpenHours"       => number_format($results[0]['minOpenHours'], 2),
-                            "startersAvgCost"            => number_format($results[0]['avgCost'], 2),
-                            "startersTotalCost"          => number_format($results[0]['totalCost'], 2),
+                            "startersAvgCost"            => utf8MoneyFormat(UK_MONEY_FORMAT, $results[0]['avgCost']),
+                            "startersTotalCost"          => utf8MoneyFormat(UK_MONEY_FORMAT, $results[0]['totalCost']),
                             "startersAvgCustomerContact" => number_format($results[0]['avgCustomerContact'], 2),
                             "startersAvgRemoteSupport"   => number_format($results[0]['avgRemoteSupport'], 2),
                             "startersAvgActivities"      => number_format($results[0]['avgActivities'], 2),
-                            "leaversQuantity"            => number_format($results[1]['quantity'], 2),
+                            "leaversQuantity"            => number_format($results[1]['quantity']),
                             "leaversMaxDuration"         => number_format($results[1]['maxDuration'], 2),
                             "leaversAvgDuration"         => number_format($results[1]['avgDuration'], 2),
                             "leaversMinDuration"         => number_format($results[1]['minDuration'], 2),
+                            "leaversTotalDuration"       => number_format($results[1]['totalDuration'], 2),
                             "leaversMaxOpenHours"        => number_format($results[1]['maxOpenHours'], 2),
                             "leaversAvgOpenHours"        => number_format($results[1]['avgOpenHours'], 2),
                             "leaversMinOpenHours"        => number_format($results[1]['minOpenHours'], 2),
-                            "leaversAvgCost"             => number_format($results[1]['avgCost'], 2),
-                            "leaversTotalCost"           => number_format($results[1]['totalCost'], 2),
+                            "leaversAvgCost"             => utf8MoneyFormat(UK_MONEY_FORMAT, $results[1]['avgCost']),
+                            "leaversTotalCost"           => utf8MoneyFormat(UK_MONEY_FORMAT, $results[1]['totalCost']),
                             "leaversAvgCustomerContact"  => number_format($results[1]['avgCustomerContact'], 2),
                             "leaversAvgRemoteSupport"    => number_format($results[1]['avgRemoteSupport'], 2),
                             "leaversAvgActivities"       => number_format($results[1]['avgActivities'], 2),
                             "totalQuantity"              => number_format(
-                                $results[0]['quantity'] + $results[1]['quantity'],
-                                2
+                                $results[0]['quantity'] + $results[1]['quantity']
                             ),
                             "totalMaxDuration"           => number_format(
                                 $results[0]['maxDuration'] > $results[1]['maxDuration'] ? $results[0]['maxDuration'] : $results[1]['maxDuration'],
@@ -125,6 +128,10 @@ class CTStartersAndLeaversReport extends CTCNC
                             ),
                             "totalMinDuration"           => number_format(
                                 $results[0]['minDuration'] < $results[1]['minDuration'] ? $results[0]['minDuration'] : $results[1]['minDuration'],
+                                2
+                            ),
+                            "totalTotalDuration"         => number_format(
+                                $results[0]['totalDuration'] + $results[1]['totalDuration'],
                                 2
                             ),
                             "totalMaxOpenHours"          => number_format(
@@ -139,13 +146,13 @@ class CTStartersAndLeaversReport extends CTCNC
                                 $results[0]['minOpenHours'] < $results[1]['minOpenHours'] ? $results[0]['minOpenHours'] : $results[1]['minOpenHours'],
                                 2
                             ),
-                            "totalAvgCost"               => number_format(
-                                ($results[0]['avgCost'] + $results[1]['avgCost']) / 2,
-                                2
+                            "totalAvgCost"               => utf8MoneyFormat(
+                                UK_MONEY_FORMAT,
+                                ($results[0]['avgCost'] + $results[1]['avgCost']) / 2
                             ),
-                            "totalTotalCost"             => number_format(
-                                $results[0]['totalCost'] + $results[1]['totalCost'],
-                                2
+                            "totalTotalCost"             => utf8MoneyFormat(
+                                UK_MONEY_FORMAT,
+                                $results[0]['totalCost'] + $results[1]['totalCost']
                             ),
                             "totalAvgCustomerContact"    => number_format(
                                 ($results[0]['avgCustomerContact'] + $results[1]['avgCustomerContact']) / 2,
@@ -174,7 +181,7 @@ class CTStartersAndLeaversReport extends CTCNC
 
         $urlSubmit = Controller::buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
 
-        $this->setPageTitle('CustomerAnalysis Report');
+        $this->setPageTitle('Starters And Leavers Report');
         $customerString = null;
         if ($dsSearchForm->getValue(BUStartersAndLeaversReport::searchFormCustomerID)) {
             $buCustomer = new BUCustomer ($this);

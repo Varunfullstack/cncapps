@@ -8,7 +8,7 @@ BEGIN
     DECLARE initialStartTime TIME;
     DECLARE fixedEndDate DATE;
     DECLARE fixedEndTime TIME;
-    DECLARE totalSeconds INTEGER DEFAULT 0;
+    DECLARE totalSeconds bigint DEFAULT 0;
     DECLARE currentDate DATE;
     DECLARE currentStartTime TIME;
     DECLARE currentEndTime TIME;
@@ -49,6 +49,7 @@ BEGIN
                 dayOfTheWeek <> 1
                 AND dayOfTheWeek <> 7
                 AND NOT isBankHoliday(currentDate)
+                and currentStartTime < closeBusinessHour
             )
         THEN
             IF (

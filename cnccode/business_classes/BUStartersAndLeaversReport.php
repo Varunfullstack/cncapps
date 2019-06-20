@@ -62,6 +62,7 @@ class BUStartersAndLeaversReport extends Business
 'starters',
   SUM(`pro_rootcauseno` = 58) AS quantity,
   AVG(pro_total_activity_duration_hours) AS avgDuration,
+  sum(pro_total_activity_duration_hours) as totalDuration,
   AVG(getOpenHours(pro_problemno)) AS avgOpenHours,
   MAX(pro_total_activity_duration_hours) AS maxDuration,
   MAX(getOpenHours(pro_problemno)) AS maxOpenHours,
@@ -80,6 +81,7 @@ WHERE true $custNoQuery $dateQuery
   'leavers',
   SUM(`pro_rootcauseno` = 62) AS quantity,
   AVG(pro_total_activity_duration_hours) AS avgDuration,
+  sum(pro_total_activity_duration_hours) as totalDuration,
   AVG(getOpenHours(pro_problemno)) AS avgOpenHours,
   MAX(pro_total_activity_duration_hours) AS maxDuration,
   MAX(getOpenHours(pro_problemno)) AS maxOpenHours,
@@ -94,8 +96,6 @@ FROM
   problem
 WHERE true $custNoQuery $dateQuery AND pro_rootcauseno  =  62 AND `pro_status` IN ('F', 'C')
  ";
-
-
         $statement = $this->db->prepare($query);
         if (!$statement) {
             throw new Exception($this->db->error);
