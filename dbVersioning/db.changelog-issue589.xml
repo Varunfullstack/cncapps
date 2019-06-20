@@ -18,4 +18,32 @@
         </sql>
         <rollback/>
     </changeSet>
+    <changeSet author="pavwebdev" id="1560932972-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT column_default = "0" FROM information_schema.`COLUMNS` WHERE column_name = "pro_custno" AND
+                table_name = "problem" AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <dropDefaultValue tableName="problem" columnName="pro_custno"/>
+        <sql>
+            update problem
+            set pro_custno = null
+            where pro_custno = 0
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1560932972-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) = 0 FROM problem WHERE pro_linked_ordno = 0
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            update problem
+            set pro_linked_ordno = null
+            where pro_linked_ordno = 0
+        </sql>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>

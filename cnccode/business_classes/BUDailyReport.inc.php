@@ -934,7 +934,7 @@ class BUDailyReport extends Business
                    ON caa_problemno = pro_problemno AND caa_callacttypeno = 51
                   WHERE pro_priority = 5
                   AND pro_status != 'C' 
-                  AND pro_linked_ordno = 0
+                  AND pro_linked_ordno is null
                   AND pro_custno != 282";
         return $this->db->query($sql);
     }
