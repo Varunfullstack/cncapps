@@ -5,9 +5,17 @@ This project changes will be shown here.
 ### Fixed
 - Issue 590 - PO Status Report v8
 
-## [v3.1.7] - 2019-06-18
+## [v3.2.0] - 2019-06-20
+### Added
+- Issue 558 - Overnight contact validation check
+- Issue 527 - Starters & Leavers Report
+### Changed
+- Issue 587 - Change Bitlocker encryption field lookup
+- Issue 576 - Delegate emails copy only to supervisor that raised / authorised them
 ### Fixed
-- Remove the default of the problem table pro_alarm_date "0000-00-00"
+- Issue 586 - Utility emails going into To Be Logged as No Primary Contact
+- Issue 585 - HTTP links in Standard text
+- Issue 589 - Unprinted Purchase Orders & P5 with no Sales Orders email tweaks
 
 ## [v3.1.6] - 2019-06-11
 ### Fixed

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact Validation Failed</title>
+    <style>
+        body, p, td, th, a, div {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10pt;
+        }
+        .customerRow {
+            padding-bottom: 20px;
+        }
+
+        .customerLink {
+            font-size: 1.17em;
+            font-weight: bold;
+        }
+
+        .sectionTitle {
+            font-weight: bold;
+        }
+
+        .contactInfo {
+            font-style: italic;
+        }
+    </style>
+</head>
+<body style="font-family: Arial, sans-serif; font-size: 10pt;">
+<h2>
+    These contacts have failed the required validation, please review and correct.
+</h2>
+
+<ul>
+
+    <!-- BEGIN customersBlock -->
+    <li class="customerRow">
+        <div class="customerLink">{customerNameLink}</div>
+        <div class="sectionTitle">
+            Customer wide failed validations
+        </div>
+        <table>
+            <!-- BEGIN customerWideBlock -->
+            <tr>
+                <td> {customerWideValidation}</td>
+            </tr>
+            <!-- END customerWideBlock -->
+        </table>
+        <div class="sectionTitle">
+            Contacts failed validations
+        </div>
+        <table>
+            <!-- BEGIN contactBlock -->
+            <tr>
+                <td>
+                    <div class="contactInfo">
+                        Contact {firstName} {lastName} has validation errors:
+                    </div>
+                    <table>
+                        <!-- BEGIN individualContactValidationErrorBlock -->
+                        <tr>
+                            <td>
+                                {contactValidationError}
+                            </td>
+                        </tr>
+                        <!-- END individualContactValidationErrorBlock -->
+                    </table>
+                </td>
+            </tr>
+            <!-- END contactBlock -->
+        </table>
+
+    </li>
+    <!-- END customersBlock -->
+</ul>
+
+</body>
+</html>

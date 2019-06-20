@@ -824,12 +824,14 @@
             var tr = elem.closest('tr');
 
 
-            if (elem[0].value === 'main') {
+            if (elem[0].value === 'main' || elem[0].value === 'supervisor') {
                 // we want to show the
-                tr.find('.onlyMain').show();
-                tr.addClass('redText');
+                tr.find('.onlyMain').prop('disabled', false);
+                if (elem[0].value === 'main') {
+                    tr.addClass('redText');
+                }
             } else {
-                tr.find('.onlyMain').hide();
+                tr.find('.onlyMain').prop('disabled', true);
                 tr.removeClass('redText');
             }
         };

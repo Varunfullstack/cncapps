@@ -690,7 +690,6 @@ class DBECustomer extends DBCNCEntity
     function getActiveCustomers($ignoreProspects = false)
     {
         $this->setMethodName("getSpecialAttentionCustomers");
-
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
@@ -699,7 +698,6 @@ class DBECustomer extends DBCNCEntity
         if ($ignoreProspects) {
             $queryString .= " and " . $this->getDBColumnName(DBECustomer::prospectFlag) . " <> 'Y' ";
         }
-
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;
