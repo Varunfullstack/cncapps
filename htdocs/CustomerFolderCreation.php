@@ -18,7 +18,6 @@ $dsCustomers = new DataSet($thing);
 
 $buCustomer->getActiveCustomers($dsCustomers);
 
-
 while ($dsCustomers->fetchNext()) {
     $buCustomer->createCustomerFolder($dsCustomers->getValue(DBECustomer::customerID));
 }
