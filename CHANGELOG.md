@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 558 - Overnight contact validation check
+- Issue 527 - Starters & Leavers Report
 ### Changed
 - Issue 587 - Change Bitlocker encryption field lookup
 - Issue 576 - Delegate emails copy only to supervisor that raised / authorised them

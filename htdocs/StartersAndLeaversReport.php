@@ -8,7 +8,7 @@
  */
 
 require_once("config.inc.php");
-require_once($cfg["path_ct"] . "/CTStarterAndLeaverReport.php");
+require_once($cfg["path_ct"] . "/CTStartersAndLeaversReport.php");
 session_start();
 page_open(
     array(
@@ -20,7 +20,7 @@ page_open(
 );
 GLOBAL $cfg;
 header("Cache-control: private");
-$ctStandardText = new CTStarterAndLeaverReport(
+$ctStandardText = new CTStartersAndLeaversReport(
     $_SERVER['REQUEST_METHOD'],
     $_POST,
     $_GET,
