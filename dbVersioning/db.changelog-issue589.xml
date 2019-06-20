@@ -28,7 +28,7 @@
         <dropDefaultValue tableName="problem" columnName="pro_custno"/>
         <sql>
             update problem
-            set pro_custno = null
+            set pro_custno = 282
             where pro_custno = 0
         </sql>
         <rollback/>
