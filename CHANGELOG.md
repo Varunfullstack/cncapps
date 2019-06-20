@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v3.2.0] - 2019-06-20
 ### Added
 - Issue 558 - Overnight contact validation check
 - Issue 527 - Starters & Leavers Report
