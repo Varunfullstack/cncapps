@@ -494,6 +494,7 @@ class Controller extends BaseObject
      */
     function defaultAction()
     {
+
     }
 
     /**
@@ -509,6 +510,14 @@ class Controller extends BaseObject
      */
     function handleRequest()
     {
+
+
+        try {
+            throw new Exception('Called notify Purchase Order Completion');
+        } catch (\Exception $exception) {
+            error_log('HandleRequest called POST:' . json_encode($_REQUEST));
+        }
+
         $this->setMethodName("handleRequest");
         if (isset($_REQUEST['action'])) {
             $this->setAction($_REQUEST['action']);

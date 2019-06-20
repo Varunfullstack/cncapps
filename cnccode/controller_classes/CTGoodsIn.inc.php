@@ -112,6 +112,11 @@ class CTGoodsIn extends CTCNC
      */
     function defaultAction()
     {
+        try {
+            throw new Exception('Default Action called');
+        } catch (\Exception $exception) {
+            error_log('Default Action Called:' . $exception->getTraceAsString());
+        }
         switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:
                 $this->search();
@@ -490,48 +495,51 @@ class CTGoodsIn extends CTCNC
      */
     function receive()
     {
-        $dsGoodsIn = &$this->dsGoodsIn;
-        $this->buGoodsIn->initialiseReceiveDataset($dsGoodsIn);
-        if (!$this->getParam('porheadID')) {
-            $this->displayFatalError(CTGOODSIN_MSG_PORHEADID_NOT_PASSED);
-        }
-        if (!$dsGoodsIn->populateFromArray($this->getParam('receive'))) {
-            $this->setFormErrorMessage('Quantities entered must be numeric');
-            $this->displayGoodsIn();
-            exit;
-        }
-        if (!$this->buGoodsIn->validateQtys($dsGoodsIn)) {
-            $this->setFormErrorMessage('Quantities to receive must not exceed outstanding quantities');
-            $this->displayGoodsIn();
-            exit;
-        }
-        if (!$this->buGoodsIn->validateSerialNos($dsGoodsIn)) {
-            $this->setFormErrorMessage('Please complete the serial numbers');
-            $this->displayGoodsIn();
-            exit;
-        }
-        if (!$this->buGoodsIn->validateWarranties($dsGoodsIn)) {
-            $this->setFormErrorMessage('Please select warranties for all items');
-            $this->displayGoodsIn();
-            exit;
-        }
+        if ($_SERVER ['REQUEST_METHOD'] == 'POST') {
+            $dsGoodsIn = &$this->dsGoodsIn;
+            $this->buGoodsIn->initialiseReceiveDataset($dsGoodsIn);
+            if (!$this->getParam('porheadID')) {
+                $this->displayFatalError(CTGOODSIN_MSG_PORHEADID_NOT_PASSED);
+            }
+            if (!$dsGoodsIn->populateFromArray($this->getParam('receive'))) {
+                $this->setFormErrorMessage('Quantities entered must be numeric');
+                $this->displayGoodsIn();
+                exit;
+            }
+            if (!$this->buGoodsIn->validateQtys($dsGoodsIn)) {
+                $this->setFormErrorMessage('Quantities to receive must not exceed outstanding quantities');
+                $this->displayGoodsIn();
+                exit;
+            }
+            if (!$this->buGoodsIn->validateSerialNos($dsGoodsIn)) {
+                $this->setFormErrorMessage('Please complete the serial numbers');
+                $this->displayGoodsIn();
+                exit;
+            }
+            if (!$this->buGoodsIn->validateWarranties($dsGoodsIn)) {
+                $this->setFormErrorMessage('Please select warranties for all items');
+                $this->displayGoodsIn();
+                exit;
+            }
 
-        $this->buGoodsIn->receive(
-            $this->getParam('porheadID'),
-            $dsGoodsIn
-        );
-        $this->buPurchaseOrder->getHeaderByID(
-            $this->getParam('porheadID'),
-            $dsPorhead
-        );
-        $urlNext =
-            Controller::buildLink(
-                CTCNC_PAGE_PURCHASEORDER,
-                array(
-                    'action'    => CTCNC_ACT_DISPLAY_PO,
-                    'porheadID' => $this->getParam('porheadID')
-                )
+            $this->buGoodsIn->receive(
+                $this->getParam('porheadID'),
+                $dsGoodsIn
             );
-        header('Location: ' . $urlNext);
+            $this->buPurchaseOrder->getHeaderByID(
+                $this->getParam('porheadID'),
+                $dsPorhead
+            );
+            $urlNext =
+                Controller::buildLink(
+                    CTCNC_PAGE_PURCHASEORDER,
+                    array(
+                        'action'    => CTCNC_ACT_DISPLAY_PO,
+                        'porheadID' => $this->getParam('porheadID')
+                    )
+                );
+            header('HTTP/1.1 301 Moved Permanently');
+            header('Location: ' . $urlNext);
+        }
     }
 }

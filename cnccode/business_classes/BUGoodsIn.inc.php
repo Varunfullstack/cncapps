@@ -666,6 +666,8 @@ class BUGoodsIn extends Business
         $this->dbePorhead = new DBEPorhead($this);
         $buPurchaseOrder = new BUPurchaseOrder($this);
         $dsPorhead = new DataSet($this);
+
+
         $buPurchaseOrder->getHeaderByID(
             $porheadID,
             $dsPorhead
@@ -675,6 +677,10 @@ class BUGoodsIn extends Business
             $dsPorhead->getValue(DBEJPorhead::ordheadID),
             $this->dsOrdhead
         );
+
+        if (in_array($dsPorhead->getValue(DBEPorhead::type), ['C', 'A'])) {
+            return;
+        }
         /*
         If the supplier is an internal stock location call appropriate method with stock customerID otherwise
         use non-stock method.

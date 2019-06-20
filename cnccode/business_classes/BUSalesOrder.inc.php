@@ -2109,7 +2109,11 @@ WHERE odl_ordno = $ordheadID
     public function notifyPurchaseOrderCompletion(DBEPorhead $purchaseOrderHeader)
     {
         // we need to find out what is the related sales order first
-
+        try {
+            throw new Exception('Called notify Purchase Order Completion');
+        } catch (\Exception $exception) {
+            error_log('Notify Purchase Order Completion called:' . $exception->getTraceAsString());
+        }
         $salesOrderID = $purchaseOrderHeader->getValue(DBEPorhead::ordheadID);
 
         $purchaseOrdersForSalesOrder = new DBEPorhead($this);
