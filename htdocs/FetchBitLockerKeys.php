@@ -71,7 +71,7 @@ foreach ($computers as $computer) {
             }
             $fileName = $keyFolder . $computer->computerName . ".txt";
             echo '<div>Generating file ' . $fileName . '</div>';
-            $data = implode('\n', $data);
+            $data = implode('\n', $matches);
             file_put_contents(
                 $fileName,
                 $data
