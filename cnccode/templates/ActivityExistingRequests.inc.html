@@ -45,7 +45,14 @@ Technical Notes
         </td>
         <td>{contactPriority}</td>
         <td>{contactEngineerName}</td>
-        <td>{createFollowOnLink}</td>
+        <td>
+            <button type="button"
+                    onclick="submitThis()"
+                    class="fakeLink {supportClass}"
+            >
+                Log Activity
+            </button>
+        </td>
     </tr>
     <!-- END contactProblemBlock -->
 </table>
