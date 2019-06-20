@@ -22,5 +22,8 @@
                         itm_desc like '%labour%' or itm_desc like '%Office 365%' or itm_desc like '%carriage%', 'Y',
                         'N')
         </sql>
+        <rollback>
+            <dropColumn tableName="item" columnName="excludeFromPOCompletion"/>
+        </rollback>
     </changeSet>
 </databaseChangeLog>
