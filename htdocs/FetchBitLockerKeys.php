@@ -57,22 +57,26 @@ $previousCustomer = null;
 $keyFolder = null;
 foreach ($computers as $computer) {
     $matches = [];
-    if (preg_match(
-        "/[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}/",
+    if (preg_match_all(
+        "/[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}/m",
         $computer->bitlockerRecoveryKey,
         $matches
     )) {
-        if ($previousCustomer != $computer->customerID) {
-            $dir = $buCustomer->getCustomerFolderPath($computer->customerID);
-            $keyFolder = $dir . '/Current Documentation/Bitlocker Recovery Keys/';
-        }
-        $fileName = $keyFolder . $computer->computerName . ".txt";
-        echo '<div>Generating file ' . $fileName . '</div>';
 
-        file_put_contents(
-            $fileName,
-            $matches[0]
-        );
+        if (count($matches)) {
+            $matches = $matches[0];
+            if ($previousCustomer != $computer->customerID) {
+                $dir = $buCustomer->getCustomerFolderPath($computer->customerID);
+                $keyFolder = $dir . '/Current Documentation/Bitlocker Recovery Keys/';
+            }
+            $fileName = $keyFolder . $computer->computerName . ".txt";
+            echo '<div>Generating file ' . $fileName . '</div>';
+            $data = implode('\n', $data);
+            file_put_contents(
+                $fileName,
+                $data
+            );
+        }
     }
 
 }
