@@ -10,6 +10,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 586 - Utility emails going into To Be Logged as No Primary Contact
 - Issue 585 - HTTP links in Standard text
+- Issue 589 - Unprinted Purchase Orders & P5 with no Sales Orders email tweaks
 
 ## [v3.1.6] - 2019-06-11
 ### Fixed

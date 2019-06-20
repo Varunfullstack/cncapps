@@ -47,7 +47,7 @@ FROM
     ON ordhead.`odh_custno` = customer.`cus_custno` 
     LEFT JOIN supplier 
     ON supplier.`sup_suppno` = porhead.`poh_suppno`
-WHERE poh_ord_consno = 0 ";
+WHERE poh_ord_consno is null ";
 
 
 $result = $db1->query($query);
