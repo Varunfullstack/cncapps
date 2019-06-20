@@ -925,4 +925,28 @@ class DBEContact extends DBCNCEntity
         return $ret;
 
     }
+
+    public function validateUniqueEmail($email, $contactID)
+    {
+        $query = "select count(con_contno) as count from contact where con_email = ? and con_contno <> ?";
+
+        $parameters = [
+            [
+                'type'  => 's',
+                'value' => $email
+            ],
+            [
+                'type'  => 'd',
+                'value' => $contactID
+            ],
+        ];
+
+        $result = $this->db->preparedQuery($query, $parameters);
+        $data = $result->fetch_assoc();
+        if ($data['count'] > 0) {
+            false;
+        }
+
+        return true;
+    }
 }

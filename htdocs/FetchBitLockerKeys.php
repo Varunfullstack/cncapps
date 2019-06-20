@@ -40,7 +40,7 @@ FROM
   LEFT JOIN clients ON computers.`ClientID`  = clients.`ClientID`
   LEFT JOIN v_extradatacomputers 
     ON v_extradatacomputers.`computerid` = computers.`ComputerID` 
-    WHERE v_extradatacomputers.`Bitlocker Recovery Key` <> \'\'
+    WHERE v_extradatacomputers.`Bitlocker Enabled` and v_extradatacomputers.`Bitlocker Password/Key` regexp "[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}"
     ORDER BY ExternalID '
 );
 
@@ -56,16 +56,29 @@ $buCustomer = new BUCustomer($thing);
 $previousCustomer = null;
 $keyFolder = null;
 foreach ($computers as $computer) {
-    if ($previousCustomer != $computer->customerID) {
-        $dir = $buCustomer->getCustomerFolderPath($computer->customerID);
-        $keyFolder = $dir . '/Current Documentation/Bitlocker Recovery Keys/';
+    $matches = [];
+    if (preg_match_all(
+        "/[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}/m",
+        $computer->bitlockerRecoveryKey,
+        $matches
+    )) {
+
+        if (count($matches)) {
+            $matches = $matches[0];
+            if ($previousCustomer != $computer->customerID) {
+                $dir = $buCustomer->getCustomerFolderPath($computer->customerID);
+                $keyFolder = $dir . '/Current Documentation/Bitlocker Recovery Keys/';
+            }
+            $fileName = $keyFolder . $computer->computerName . ".txt";
+            echo '<div>Generating file ' . $fileName . '</div>';
+            $data = implode(PHP_EOL, $matches);
+            file_put_contents(
+                $fileName,
+                $data
+            );
+        }
     }
-    $fileName = $keyFolder . $computer->computerName . ".txt";
-    echo '<div>Generating file ' . $fileName . '</div>';
-    file_put_contents(
-        $fileName,
-        $computer->bitlockerRecoveryKey
-    );
+
 }
 
 ?>
