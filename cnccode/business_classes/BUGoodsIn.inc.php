@@ -686,7 +686,7 @@ class BUGoodsIn extends Business
         use non-stock method.
         */
         if (
-            ($dsPorhead->getValue(DBEJPorhead::supplierID) == CONFIG_SALES_STOCK_SUPPLIERID) OR
+            ($dsPorhead->getValue(DBEJPorhead::supplierID) == CONFIG_SALES_STOCK_SUPPLIERID) ||
             ($dsPorhead->getValue(DBEJPorhead::supplierID) == CONFIG_MAINT_STOCK_SUPPLIERID)
         ) {
             $this->receiveFromStock(

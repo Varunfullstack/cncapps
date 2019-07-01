@@ -112,11 +112,7 @@ class CTGoodsIn extends CTCNC
      */
     function defaultAction()
     {
-        try {
-            throw new Exception('Default Action called');
-        } catch (\Exception $exception) {
-            error_log('Default Action Called:' . $exception->getTraceAsString());
-        }
+
         switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:
                 $this->search();
