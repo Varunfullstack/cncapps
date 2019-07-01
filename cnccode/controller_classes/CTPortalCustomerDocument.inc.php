@@ -321,7 +321,7 @@ class CTPortalCustomerDocument extends CTCNC
         } else {
             $urlNext =
                 Controller::buildLink(
-                    'Customer . php',
+                    'Customer.php',
                     array(
                         'customerID' => $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::customerID),
                         'action'     => CTCNC_ACT_DISP_EDIT
