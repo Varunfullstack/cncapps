@@ -97,7 +97,7 @@ class DB_Sql
                 return 0;
             }
 
-            if (!self::$Link_ID->set_charset("utf8")) {
+            if (!self::$Link_ID->set_charset("utf8mb4")) {
                 printf(
                     "Error loading utf8 charset: %s\n",
                     self::$Link_ID->error

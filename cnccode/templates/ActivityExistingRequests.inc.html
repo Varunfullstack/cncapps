@@ -1,3 +1,74 @@
+<script>
+    const reason = '{reason}';
+    const customerID = {customerID};
+    const contactID = {contactID};
+
+    function addInputs(array, form) {
+        array.forEach((element) => {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = element.name;
+            input.value = element.value;
+            form.appendChild(input);
+        })
+    }
+
+    function submitNew() {
+        const form = document.createElement("form");
+        form.method = "post";
+        form.action = "/Activity.php";
+        addInputs([
+            {
+                name: 'action',
+                value: 'editServiceRequestHeader'
+            },
+            {
+                name: 'contactID',
+                value: contactID,
+            },
+            {
+                name: 'customerID',
+                value: customerID,
+            },
+            {
+                name: 'reason',
+                value: atob(reason),
+            }
+        ], form);
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function submitThis() {
+        const form = document.createElement("form"); // CREATE A NEW FORM TO DUMP ELEMENTS INTO FOR SUBMISSION
+        form.method = "post"; // CHOOSE FORM SUBMISSION METHOD, "GET" OR "POST"
+        form.action = "/Activity.php"; // TELL THE FORM WHAT PAGE TO SUBMIT TO
+        const elm$ = $(event.target);
+        // lets find the row where the data is stored
+        const data = elm$.data();
+
+        addInputs([
+            {
+                name: 'action',
+                value: 'createFollowOnActivity'
+            },
+            {
+                name: 'callActivityID',
+                value: data.activityId,
+            },
+            {
+                name: 'customerID',
+                value: customerID,
+            },
+            {
+                name: 'reason',
+                value: atob(reason),
+            }
+        ], form);
+        document.body.appendChild(form);
+        form.submit()
+    }
+</script>
 <style>
     .redRow {
         background: red;
@@ -48,7 +119,8 @@ Technical Notes
         <td>
             <button type="button"
                     onclick="submitThis()"
-                    class="fakeLink {supportClass}"
+                    class="fakeLink {shouldBeHidden}"
+                    data-activity-id="{contactActivityID}"
             >
                 Log Activity
             </button>
@@ -58,7 +130,7 @@ Technical Notes
 </table>
 <br>
 <p>
-    <button onclick="window.location = '{urlCreateNewSr}'">Log a new Service Request</button>
+    <button onclick="submitNew()">Log a new Service Request</button>
 </p>
 
 <h2>Recent Service Requests for the customer</h2>
@@ -96,7 +168,15 @@ Technical Notes
         </td>
         <td>{priority}</td>
         <td>{engineerName}</td>
-        <td><a href="{urlCreateFollowOn}">Log activity</a></td>
+        <td>
+            <button type="button"
+                    onclick="submitThis()"
+                    class="fakeLink"
+                    data-activity-id="{activityID}"
+            >
+                Log Activity
+            </button>
+        </td>
     </tr>
     <!-- END problemBlock -->
 </table>
