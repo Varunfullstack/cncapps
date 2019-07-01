@@ -5,6 +5,10 @@ This project changes will be shown here.
 ### Fixed
 - Issue 591 - URL too long with To Be Logged
 
+## [v3.2.1] - 2019-07-01
+### Fixed
+- Fixed problem with deleting Portal Documents from customer page
+
 ## [v3.2.0] - 2019-06-20
 ### Added
 - Issue 558 - Overnight contact validation check
