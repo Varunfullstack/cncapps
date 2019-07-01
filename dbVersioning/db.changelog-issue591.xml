@@ -7,14 +7,13 @@
     </changeSet>
     <changeSet author="pavwebdev" id="1561022092-1">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="consultant" columnName="offsiteBackupAdditionalPermissionsFlag"/>
-            </not>
+            <sqlCheck expectedResult="0">
+                SELECT table_collation = 'utf8mb4_0900_ai_ci' FROM information_schema.`TABLES` WHERE table_schema =
+                DATABASE() AND table_name = 'callactivity'
+            </sqlCheck>
         </preConditions>
-        <addColumn tableName="consultant">
-            <column name="offsiteBackupAdditionalPermissionsFlag" type="char(1)" defaultValue="N">
-                <constraints nullable="false"/>
-            </column>
-        </addColumn>
+        <sql>
+            ALTER TABLE callactivity CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+        </sql>
     </changeSet>
 </databaseChangeLog>
