@@ -4240,12 +4240,14 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError(CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL);
             return;
         }
+
+
         $this->buSalesOrder->updateHeader(
             $this->getOrdheadID(),
             $this->getParam('form')['custPORef'],
             $this->getParam('form')['paymentTermsID'],
-            $this->getParam('form')['partInvoice'] == 'Y' ? 'Y' : 'N',
-            $this->getParam('form')['addItem'] == 'Y' ? 'Y' : 'N'
+            isset($this->getParam('form')['partInvoice']) ? 'Y' : 'N',
+            isset($this->getParam('form')['addItem']) == 'Y' ? 'Y' : 'N'
         );
         header('Location: ' . $this->getDisplayOrderURL());
         exit;
