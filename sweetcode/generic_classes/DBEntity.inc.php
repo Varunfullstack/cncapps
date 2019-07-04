@@ -881,6 +881,25 @@ class DBEntity extends DataAccess
 
     function getValueNoCheckByColumnNumber($ixColumnNumber)
     {
+        if ($this->debug) {
+            echo '<div> getValueNoCheckByColumnNumber: ';
+            var_dump($ixColumnNumber);
+            echo '</div>';
+        }
+        if (!count($this->db->Record) || !key_exists(
+                $ixColumnNumber,
+                $this->db->Record
+            ) || !isset($this->db->Record[$ixColumnNumber])) {
+            return null;
+        }
+        $type = $this->getTypeByColumnNumberNoCheck($ixColumnNumber);
+        if ($type == DA_ID) {
+            return (int)$this->db->Record[$ixColumnNumber];
+        }
+
+        if ($type == DA_JSON_ARRAY) {
+            return json_decode($this->db->Record[$ixColumnNumber]);
+        }
         return $this->db->Record[$ixColumnNumber];
     }
 
