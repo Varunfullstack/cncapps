@@ -24,8 +24,71 @@
             <column name="licensesJSON" type="text">
                 <constraints nullable="false"/>
             </column>
+            <column name="mailboxLimit" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
         </createTable>
-
     </changeSet>
+    <changeSet author="pavwebdev" id="1562231827-2">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="office365License"/>
+                <sqlCheck expectedResult="1"><![CDATA[
+                    select count(*) <= 0 from office365License
+                ]]>
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <sql>
+            insert into office365License
+            values (1, "Business Enterprise ATP", 3, '["ATP", "POWER_BI_STANDARD", "POWERAPPS_INDIVIDUAL_USER"]',
+                    51200),
+                   (2, "Business Essentials ATP", 2, '["ATP_ENTERPRISE", "O365_BUSINESS_ESSENTIALS"]', 51200),
+                   (3, "ATP", 1, '["ATP_ENTERPRISE"]', 51200),
+                   (4, "Business Enterprise ATP", 4,
+                    '["ENTERPRISEPACK", "ATP_ENTERPRISE", "POWER_BI_STANDARD", "POWERAPPS_INDIVIDUAL_USER"]', 51200),
+                   (5, "Business Enterprise ATP", 2, '["ENTERPRISEPACK", "ATP_ENTERPRISE"]', 51200),
+                   (6, "Enterprise E3", 1, '["ENTERPRISEPACK"]', 51200),
+                   (7, "Enterprise E1", 1, '["EXCHANGESTANDARD"]', 51200),
+                   (8, "Business Essentials", 1, '["O365_BUSINESS_ESSENTIALS"]', 51200),
+                   (9, "Business Premium ATP", 2, '["O365_BUSINESS_PREMIUM", "ATP_ENTERPRISE"]', 51200),
+                   (10, "Business Premium", 1, '["O365_BUSINESS_PREMIUM"]', 51200),
+                   (11, "Power Bi", 1, '["POWER_BI_PRO"]', 51200),
+                   (12, "Power Bi", 1, '["POWER_BI_STANDARD"]', 51200),
+                   (13, "Business Essentials", 1, '["SMB_BUSINESS_ESSENTIALS"]', 51200),
+                   (14, "Business Premium", 1, '["SMB_BUSINESS_PREMIUM"]', 51200),
+                   (15, "Enterprise E1", 1, '["STANDARDPACK"]', 51200),
+                   (16, "Enterprise E2", 1, '["STANDARDWOFFPACK"]', 51200)
 
+        </sql>
+        <sql>
+            insert into db_sequence
+            values ('office365license', 17);
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="1562231827-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="office365MailboxYellowWarningThreshold"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column type="int(3)" name="office365MailboxYellowWarningThreshold" defaultValue="90">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="1562231827-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="office365MailboxRedWarningThreshold"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column type="int(3)" name="office365MailboxRedWarningThreshold" defaultValue="95">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

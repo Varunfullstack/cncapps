@@ -805,6 +805,11 @@ define(
 );
 
 define(
+    "POWERSHELL_DIR",
+    BASE_DRIVE . "/powershell"
+);
+
+define(
     "SWEETCODE_DIR",
     BASE_DRIVE . "/sweetcode"
 );

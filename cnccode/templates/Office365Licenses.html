@@ -1,19 +1,9 @@
 <style>
-    .list {
-        float: left;
-        border-right: solid 2px blue;
-        padding-right: 5px;
-    }
-
-    .detail {
-        float: left;
-        padding-left: 5px;
-    }
 
     .emailItem {
         display: flex;
         flex-direction: row;
-        width: 300px;
+        width: 500px;
         padding: 2px;
     }
 
@@ -22,7 +12,7 @@
     }
 
     .emailItem .email {
-        flex-basis: 200px;
+        flex-basis: 400px;
     }
 
 </style>
@@ -42,7 +32,7 @@
 >
     {% #licenses %}
     <div class="licenseItem"
-         data-idx="{% idx %}"
+         data-idx="{% index %}"
     >
         {% value %}
         <div class="buttons">
@@ -56,43 +46,57 @@
     {% /licenses %}
 </script>
 
-<script id="email-items-template"
+<script id="rule-items-template"
         type="text/template"
 >
-    {% #emailItems %}
-    <div class="emailItem"
-         data-id="{% id %}"
-    >
-        <div class="email">
-            <span>{% firstPart %}@{% lastPart %}</span>
-        </div>
-        <div class="buttons">
-            <button class="editButton">Edit</button>
-            <button class="deleteButton">Delete</button>
-        </div>
-    </div>
-    {% /emailItems %}
-    {% ^emailItems %}
-    There are no emails yet
-    {% /emailItems %}
+    <table>
+        <thead>
+        <tr>
+            <th>License Combination Assigned</th>
+            <th>Mailbox Limit(MB)</th>
+            <th>Friendly Name</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% #rules %}
+        <tr data-id="{% id %}"
+        >
+            <td>
+                {% #licenses %}
+                {% . %}
+                {% /licenses %}
+            </td>
+            <td>
+                {% mailboxLimit %}
+            </td>
+            <td>
+                {% replacement %}
+            </td>
+            <td class="buttons">
+                <button class="editButton">Edit</button>
+                <button class="deleteButton">Delete</button>
+            </td>
+        </tr>
+        {% /rules %}
+        </tbody>
+    </table>
+
 </script>
 <script type="application/javascript">
     let currentRule = null;
-    let lastPartInput = null;
-    let firstPartInput = null;
     let saveButton = null;
     let addButton = null;
     let cancelButton = null;
     let list = null;
     let detail = null;
 
-    let emailItems = [];
+    let rules = [];
 
-    function newCurrentRule() {
-        currentRule = {replacement: "", licenses: [], specificity: 0};
+    function newRule() {
+        return {replacement: "", licenses: [], specificity: 0};
     }
 
-    newCurrentRule();
 
     function putIndexInArray(array) {
         let putIndex = (value, index) => {
@@ -104,22 +108,12 @@
         return array.map(putIndex)
     }
 
-    function changeWildCard(value) {
-        if (value) {
-            lastPartInput.prop('disabled', true);
-            lastPartInput.val('*');
-        } else {
-            lastPartInput.prop('disabled', false);
-            lastPartInput.val('');
-        }
-    }
-
     $.ajax({
         url: '{URLGetData}',
         method: 'GET',
         dataType: 'JSON'
     }).then(function (result) {
-        emailItems = result;
+        rules = result;
         drawList();
     })
 
@@ -136,7 +130,6 @@
         lightGrayClass: function (number) {
 
             if (isNaN(parseFloat(number)) || !isFinite(number)) {
-                debugger;
                 return null;
             }
 
@@ -149,20 +142,23 @@
 
     };
     let editingItem = null;
-    let currentLicense = null;
+    let currentLicenseIndex = null;
 
     function drawList() {
-        const source = document.getElementById("email-items-template").innerHTML;
-        const context = {emailItems: emailItems};
+        const source = document.getElementById("rule-items-template").innerHTML;
+        const context = {rules: rules};
         const html = Mustache.to_html(source, context);
         list.html(html);
+    }
+
+    function jsonCopy(src) {
+        return JSON.parse(JSON.stringify(src));
     }
 
     let dialog = null;
     let dialogLicenseNameElm = null;
     let licensesList = null;
     $(function () {
-
         licensesList = $('.licensesList');
         const dialogElem = $('#licenseDialog');
         dialogLicenseNameElm = $('#licenseName');
@@ -175,36 +171,50 @@
             }
         });
 
-        lastPartInput = $('[name="lastPart"]');
-        firstPartInput = $('[name="firstPart"]');
+
         addButton = $('.addButton');
         saveButton = $('.saveButton');
         cancelButton = $('.cancelButton');
         detail = $('.detail');
         list = $('.list');
         drawList();
+        cancelEdit();
+        licensesList.on('click', '.editLicenseItem', function () {
+            $elm = $(this);
+
+            const data = $elm.closest('.licenseItem').data();
+            currentLicenseIndex = data.idx;
+
+            const currentLicense = currentRule.licenses[currentLicenseIndex];
+
+            if (!currentLicense) {
+                throw Error('Failed to find element to edit');
+            }
+
+            dialogLicenseNameElm.val(currentLicense);
+            showLicenseModal();
+        });
+        licensesList.on('click', '.deleteLicenseItem', function () {
+            $elm = $(this);
+
+            const data = $elm.closest('.licenseItem').data();
+            currentRule.licenses.splice(data.idx, 1);
+            drawLicenses();
+        });
+
         list.on('click', '.editButton', function (thing) {
             $elm = $(this);
 
-            const data = $elm.closest('.emailItem').data();
-            editingItem = emailItems.find(e => e.id === data.id);
+            const data = $elm.closest('tr').data();
+            editingItem = rules.find(e => e.id === data.id);
 
             if (!editingItem) {
                 throw Error('Failed to find element to edit');
             }
-
-            firstPartInput.val(editingItem.firstPart);
-            const isWildCard = editingItem.lastPart === '*';
-            changeWildCard(isWildCard);
-            lastPartInput.val(editingItem.lastPart);
-            $('[name="isWildCard"]').each(function () {
-                const $radio = $(this);
-                $radio.prop('checked', +$radio.val() == isWildCard);
-            });
+            setEditRule(jsonCopy(editingItem));
             cancelButton.show();
             saveButton.show();
             addButton.hide();
-            detail.data('editItemID', data.id);
         });
 
         list.on('click', '.deleteButton', function (thing) {
@@ -215,8 +225,8 @@
 
             $elm = $(this);
 
-            const data = $elm.closest('.emailItem').data();
-            const foundIndex = emailItems.findIndex(e => e.id === data.id);
+            const data = $elm.closest('tr').data();
+            const foundIndex = rules.findIndex(e => e.id === data.id);
 
             if (foundIndex < 0) {
                 throw Error('Failed to find element to delete');
@@ -228,7 +238,7 @@
                 url: url,
                 method: 'GET',
             }).then(function (result) {
-                emailItems.splice(foundIndex, 1);
+                rules.splice(foundIndex, 1);
                 drawList();
             })
         });
@@ -254,6 +264,12 @@
         return true;
     }
 
+    function arrayReplaceAt(array, index, value) {
+        const ret = array.slice(0);
+        ret[index] = value;
+        return ret;
+    }
+
     function addOrUpdateCurrentRule() {
         console.log('save button');
         if (!isRuleValid()) {
@@ -272,16 +288,20 @@
             dataType: 'json',
             data: currentRule
         }).then(function (result) {
-            editingItem.firstPart = data.firstPart;
-            editingItem.lastPart = data.lastPart;
-
+            if (!currentRule.id) {
+                rules.push(result);
+            } else {
+                const foundIndex = rules.findIndex(rule => currentRule.id === rule.id);
+                rules = arrayReplaceAt(rules, foundIndex, currentRule);
+            }
+            rules = rules.sort((a, b) => b.specificity - a.specificity);
             drawList();
             cancelEdit();
         })
     }
 
     function cancelEdit() {
-        newCurrentRule();
+        setEditRule(newRule());
         cancelButton.hide();
         saveButton.hide();
         addButton.show();
@@ -295,6 +315,13 @@
         dialog.dialog('close');
     }
 
+    function setEditRule(rule) {
+        currentRule = rule;
+        $('#replacementInput').val(rule.replacement);
+        $('#mailboxLimitInput').val(rule.mailboxLimit);
+        drawLicenses();
+    }
+
     function drawLicenses() {
         const source = document.getElementById("license-list-template").innerHTML;
         const context = {licenses: putIndexInArray(currentRule.licenses)};
@@ -306,19 +333,30 @@
         let value = dialogLicenseNameElm.val();
 
         if (!value) {
+            closeDialog();
             return;
         }
 
         value = value.toUpperCase();
 
-        if (!currentLicense) {
+        if (currentLicenseIndex === null) {
             currentRule.licenses.push(value);
+            currentRule.specificity = currentRule.licenses.length;
+        } else {
+            currentRule.licenses = arrayReplaceAt(currentRule.licenses, currentLicenseIndex, value);
         }
         closeDialog();
         dialogLicenseNameElm.val(null);
         drawLicenses();
     }
 
+    function updateReplacement() {
+        currentRule.replacement = $('#replacementInput').val();
+    }
+
+    function updateMailboxLimit() {
+        currentRule.mailboxLimit = $('#mailboxLimitInput').val();
+    }
 
 </script>
 <div id="licenseDialog">
@@ -337,30 +375,48 @@
     </div>
 </div>
 
-<div class="list">
-</div>
+
 <form class="detail"
       onsubmit="return false;"
 >
+
     <div>
-        <label>
-            Replacement
-            <input type="text"
-                   name="replacement"
-                   required
-            >
-        </label>
+        <div style="width: 100px; display: inline-block">
+            Mailbox Limit (MB)
+        </div>
+        <input type="number"
+               step="1"
+               name="mailboxLimit"
+               onchange="updateMailboxLimit()"
+               id="mailboxLimitInput"
+        >
     </div>
     <div>
-        Licenses:
+        <div style="width: 100px; display: inline-block">
+            Friendly Name
+        </div>
+        <input type="text"
+               name="replacement"
+               required
+               onchange="updateReplacement()"
+               id="replacementInput"
+        >
+    </div>
+    <div>
+        <div style="width: 100px; display: inline-block">
+            Licenses:
+        </div>
+        <button type="button"
+                onclick="showLicenseModal()"
+                style="margin-left: 3px;margin-right: 3px; padding: 2px;"
+        >Add License
+        </button>
         <div class="licensesList">
 
         </div>
-        <button onclick="showLicenseModal()">Add License</button>
     </div>
     <div>
         <button class="addButton"
-                type="button"
         >Add
         </button>
         <button class="saveButton"
@@ -376,3 +432,5 @@
     </div>
 
 </form>
+<div class="list">
+</div>

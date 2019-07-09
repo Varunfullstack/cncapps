@@ -56,6 +56,9 @@ class DBEntity extends DataAccess
     public $rowCount = 0;
     public $dbColName = [];
 
+    public const ORDER_DIRECTION_ASCENDING = "ASC";
+    public const ORDER_DIRECTION_DESCENDING = "DESC";
+
     // Array of database column names
 
     function __construct(&$owner)
@@ -585,9 +588,10 @@ class DBEntity extends DataAccess
      * Return all rows from DB
      * @access public
      * @param string $sortColumn
+     * @param string $orderDirection
      * @return bool Success
      */
-    function getRows($sortColumn = '')
+    function getRows($sortColumn = '', $orderDirection = null)
     {
         $this->setMethodName("getRows");
         if (!$this->getQueryString()) {
@@ -601,6 +605,11 @@ class DBEntity extends DataAccess
                 } else {
                     $queryString .= ' ORDER BY ' . $this->getDBColumnName($sortColumnNo);
                 }
+
+                if ($orderDirection) {
+                    $queryString .= " $orderDirection ";
+                }
+
             }
             $this->setQueryString($queryString);
         }
@@ -865,9 +874,32 @@ class DBEntity extends DataAccess
             if (!key_exists($ixColumn, $this->db->Record)) {
                 return $this->getDefaultValue($ixColumn);
             }
-            return $this->db->Record[$ixColumn] === null ? $this->getDefaultValue(
-                $ixColumn
-            ) : $this->db->Record[$ixColumn];
+            if ($this->db->Record[$ixColumn] === null) {
+                return $this->getDefaultValue($ixColumn);
+            }
+            return $this->getValueNoCheckByColumnNumber($ixColumn);
+        } else {
+            $this->raiseError("column " . $ixPassedColumn . " out of range");
+            return DA_OUT_OF_RANGE;
+        }
+    }
+
+    function getSQLValue($ixPassedColumn)
+    {
+        $this->setMethodName('getValue');
+        $ixColumn = $this->columnExists($ixPassedColumn);
+        if ($ixColumn != DA_OUT_OF_RANGE) {
+            if (!$this->db->Record) {
+                return null;
+            }
+
+            if (!key_exists($ixColumn, $this->db->Record)) {
+                return $this->getDefaultValue($ixColumn);
+            }
+            if ($this->db->Record[$ixColumn] === null) {
+                return $this->getDefaultValue($ixColumn);
+            }
+            return $this->db->Record[$ixColumn];
         } else {
             $this->raiseError("column " . $ixPassedColumn . " out of range");
             return DA_OUT_OF_RANGE;
@@ -921,7 +953,9 @@ class DBEntity extends DataAccess
         }
         $value = $this->prepareValue($ixColumn, $value);
         if ($this->debug) {
+            echo '<div> Value after prepare: ';
             var_debug($value);
+            echo '</div>';
         }
         $this->db->Record[$ixColumn] = $value;
         return TRUE;
@@ -1066,13 +1100,12 @@ class DBEntity extends DataAccess
     function prepareForSQL($colIdx)
     {
         $colType = $this->colType[$colIdx];
-        $value = $this->getValue($colIdx);
+        $value = $this->getSQLValue($colIdx);
 
         if ($value === null) {
             return 'null';
         }
         $value = $this->escapeValue($value);
-
         switch ($colType) {
             case DA_BOOLEAN:
                 return $value ? 1 : 0;
@@ -1092,7 +1125,6 @@ class DBEntity extends DataAccess
                 if ($value == '0000-00-00') {
                     return 'null';
                 }
-
             default:
                 return $this->quoteForColumnValues . $value . $this->quoteForColumnValues;
         }

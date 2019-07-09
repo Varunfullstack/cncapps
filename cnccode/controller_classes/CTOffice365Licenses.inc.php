@@ -41,6 +41,16 @@ class CTOffice365Licenses extends CTCNC
         $this->buActivity = new BUActivity($this);
     }
 
+    function delete()
+    {
+        $this->defaultAction();
+    }
+
+    function update()
+    {
+        $this->defaultAction();
+    }
+
     /**
      * Route to function based upon action passed
      * @throws Exception
@@ -63,7 +73,6 @@ class CTOffice365Licenses extends CTCNC
                     http_response_code(404);
                     exit;
                 }
-                $dbeOffice365License->setLogSQLOn();
                 $dbeOffice365License->deleteRow();
                 echo json_encode(["status" => "ok"]);
                 break;
@@ -83,13 +92,19 @@ class CTOffice365Licenses extends CTCNC
                 }
 
                 $dbeOffice365License->setValue(
-                    DBEOffice365License::firstPart,
-                    $this->getParam('firstPart')
+                    DBEOffice365License::replacement,
+                    $this->getParam('replacement')
                 );
                 $dbeOffice365License->setValue(
-                    DBEOffice365License::lastPart,
-                    $this->getParam('lastPart')
+                    DBEOffice365License::mailboxLimit,
+                    $this->getParam('mailboxLimit')
                 );
+
+                $dbeOffice365License->setValue(
+                    DBEOffice365License::specificity,
+                    count($this->getParam('licenses'))
+                );
+                $dbeOffice365License->setValue(DBEOffice365License::licensesJSON, $this->getParam('licenses'));
 
                 $dbeOffice365License->updateRow();
                 echo json_encode(["status" => "ok"]);
@@ -98,21 +113,28 @@ class CTOffice365Licenses extends CTCNC
                 $dbeOffice365License = new DBEOffice365License($this);
 
                 $dbeOffice365License->setValue(
-                    DBEOffice365License::firstPart,
-                    $this->getParam('firstPart')
+                    DBEOffice365License::replacement,
+                    $this->getParam('replacement')
                 );
                 $dbeOffice365License->setValue(
-                    DBEOffice365License::lastPart,
-                    $this->getParam('lastPart')
+                    DBEOffice365License::mailboxLimit,
+                    $this->getParam('mailboxLimit')
+                );
+                $dbeOffice365License->setValue(
+                    DBEOffice365License::specificity,
+                    count($this->getParam('licenses'))
                 );
 
+                $dbeOffice365License->setValue(DBEOffice365License::licensesJSON, $this->getParam('licenses'));
                 $dbeOffice365License->insertRow();
 
                 echo json_encode(
                     [
-                        "id"        => $dbeOffice365License->getValue(DBEOffice365License::id),
-                        "firstPart" => $dbeOffice365License->getValue(DBEOffice365License::firstPart),
-                        "lastPart"  => $dbeOffice365License->getValue(DBEOffice365License::lastPart)
+                        "id"           => $dbeOffice365License->getValue(DBEOffice365License::id),
+                        "replacement"  => $dbeOffice365License->getValue(DBEOffice365License::replacement),
+                        "specificity"  => $dbeOffice365License->getValue(DBEOffice365License::specificity),
+                        "licenses"     => $dbeOffice365License->getValue(DBEOffice365License::licensesJSON),
+                        "mailboxLimit" => $dbeOffice365License->getValue(DBEOffice365License::mailboxLimit)
                     ],
                     JSON_NUMERIC_CHECK
                 );
@@ -121,13 +143,19 @@ class CTOffice365Licenses extends CTCNC
             case 'getData':
                 $dbeOffice365Licenses = new DBEOffice365License($this);
 
-                $dbeOffice365Licenses->getRows();
+                $dbeOffice365Licenses->getRows(
+                    DBEOffice365License::specificity,
+                    DBEOffice365License::ORDER_DIRECTION_DESCENDING
+                );
                 $data = [];
                 while ($dbeOffice365Licenses->fetchNext()) {
                     $data[] = [
-                        "id"        => $dbeOffice365Licenses->getValue(DBEOffice365License::id),
-                        "firstPart" => $dbeOffice365Licenses->getValue(DBEOffice365License::firstPart),
-                        "lastPart"  => $dbeOffice365Licenses->getValue(DBEOffice365License::lastPart)
+                        "id"           => $dbeOffice365Licenses->getValue(DBEOffice365License::id),
+                        "replacement"  => $dbeOffice365Licenses->getValue(DBEOffice365License::replacement),
+                        "specificity"  => $dbeOffice365Licenses->getValue(DBEOffice365License::specificity),
+                        "licenses"     => $dbeOffice365Licenses->getValue(DBEOffice365License::licensesJSON),
+                        "mailboxLimit" => $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit),
+
                     ];
                 }
                 echo json_encode($data, JSON_NUMERIC_CHECK);
@@ -150,7 +178,7 @@ class CTOffice365Licenses extends CTCNC
      */
     function displayForm()
     {
-        $this->setPageTitle('Utility Emails');
+        $this->setPageTitle('Office 365 Licenses');
         $this->setTemplateFiles(
             'Office365License',
             'Office365Licenses'

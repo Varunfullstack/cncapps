@@ -23,8 +23,8 @@ class DBEPassword extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -142,6 +142,23 @@ class DBEPassword extends DBEntity
             ) . ' <> "" '
         );
         return (parent::getRows());
+    }
+
+    public function getOffice365PasswordByCustomerID(int $customerID)
+    {
+        $this->setMethodName('getOffice365PasswordByCustomerID');
+        if (!$customerID) {
+            throw new Exception("Customer ID Required");
+        }
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::customerID) . " = " . $customerID .
+            " and " . $this->getDBColumnName(self::serviceID) . ' = 10 '
+        );
+        $this->getRows();
+        $this->fetchFirst();
+        $this->resetQueryString();
     }
 }
 
