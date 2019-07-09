@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 604 - Contact Validation doesn't run on scheduled task
+
 ## [v3.2.1] - 2019-07-01
 ### Fixed
 - Fixed problem with deleting Portal Documents from customer page
