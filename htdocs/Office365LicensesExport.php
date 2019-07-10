@@ -40,6 +40,160 @@ $redThreshold = $dbeHeader->getValue(DBEHeader::office365MailboxRedWarningThresh
 if (!$yellowThreshold || !$redThreshold) {
     throw new Exception('Yellow and Red Threshold values are required');
 }
+function num2alpha($n)
+{
+    for ($r = ""; $n >= 0; $n = intval($n / 26) - 1)
+        $r = chr($n % 26 + 0x41) . $r;
+    return $r;
+}
+
+
+/**
+ * @param DataSet|DBECustomer $dbeCustomer
+ * @param $errorMsg
+ * @param null $stackTrace
+ * @param null $position
+ */
+function createFailedSR(DataSet $dbeCustomer, $errorMsg, $stackTrace = null, $position = null)
+{
+    $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
+    $buActivity = new BUActivity($thing);
+    $buCustomer = new BUCustomer($thing);
+    $primaryContact = $buCustomer->getPrimaryContact($customerID);
+    $buHeader = new BUHeader($thing);
+    $dsHeader = new DataSet($thing);
+    $buHeader->getHeader($dsHeader);
+
+
+    $slaResponseHours = $buActivity->getSlaResponseHours(
+        4,
+        $customerID,
+        $primaryContact->getValue(DBEContact::contactID)
+    );
+
+    $dbeProblem = new DBEProblem($thing);
+    $dbeProblem->setValue(DBEProblem::problemID, null);
+    $siteNo = $primaryContact->getValue(DBEContact::siteNo);
+    $dbeProblem->setValue(
+        DBEProblem::hdLimitMinutes,
+        $dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
+    );
+    $dbeProblem->setValue(
+        DBEProblem::esLimitMinutes,
+        $dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
+    );
+    $dbeProblem->setValue(
+        DBEProblem::imLimitMinutes,
+        $dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
+    );
+    $dbeProblem->setValue(
+        DBEProblem::slaResponseHours,
+        $slaResponseHours
+    );
+    $dbeProblem->setValue(
+        DBEProblem::customerID,
+        $customerID
+    );
+    $dbeProblem->setValue(
+        DBEProblem::status,
+        'I'
+    );
+    $dbeProblem->setValue(
+        DBEProblem::priority,
+        4
+    );
+    $dbeProblem->setValue(
+        DBEProblem::dateRaised,
+        date(DATE_MYSQL_DATETIME)
+    ); // default
+    $dbeProblem->setValue(
+        DBEProblem::contactID,
+        $primaryContact->getValue(DBEContact::contactID)
+    );
+    $dbeProblem->setValue(
+        DBEJProblem::hideFromCustomerFlag,
+        'Y'
+    );
+    $dbeProblem->setValue(
+        DBEJProblem::queueNo,
+        2
+    );
+
+    $dbeProblem->setValue(
+        DBEJProblem::rootCauseID,
+        83
+    );
+    $dbeProblem->setValue(
+        DBEJProblem::userID,
+        null
+    );        // not allocated
+    $dbeProblem->insertRow();
+
+    $dbeCallActivity = new DBECallActivity($thing);
+
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::callActivityID,
+        null
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::siteNo,
+        $siteNo
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::contactID,
+        $primaryContact->getValue(DBEContact::contactID)
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::callActTypeID,
+        CONFIG_INITIAL_ACTIVITY_TYPE_ID
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::date,
+        date(DATE_MYSQL_DATE)
+    );
+    $startTime = date('H:i');
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::startTime,
+        $startTime
+    );
+
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::endTime,
+        $startTime
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::status,
+        'C'
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::serverGuard,
+        'N'
+    );
+
+    $details = "Office 365 License Export Failed: " . $errorMsg;
+    if ($position) {
+        $details .= " " . $position;
+    }
+
+    if ($stackTrace) {
+        $details .= " " . $stackTrace;
+    }
+
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::reason,
+        $details
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::problemID,
+        $dbeProblem->getPKValue()
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::userID,
+        USER_SYSTEM
+    );
+
+    $dbeCallActivity->insertRow();
+}
 
 $buCustomer = new BUCustomer($thing);
 $buPassword = new BUPassword($thing);
@@ -73,17 +227,22 @@ do {
 
     if (!$data) {
         echo '<div>Failed to parse for customer: ' . $output . '</div>';
+        createFailedSR($dbeCustomer, "Could not parse Powershell response: $output");
         continue;
     }
     if (isset($data['error'])) {
         echo '<div>Failed to pull data for customer: ' . $data['errorMessage'] . '</div>';
+        createFailedSR($dbeCustomer, $data['errorMessage'], $data['stackTrace'], $data['position']);
         continue;
     }
-    echo '<pre>';
-    var_dump($data);
-
 // we are going to build an array from the data
     $mailboxLimits = [];
+    $totalizationRow = [
+        "Total"         => "Total",
+        "TotalMailBox"  => 0,
+        "Empty"         => null,
+        "LicensedUsers" => 0
+    ];
     foreach ($data as $key => $datum) {
         $values = [];
         $mailboxLimit = null;
@@ -93,38 +252,68 @@ do {
                 $datum['Licenses'] = [$datum['Licenses']];
             }
             $licenseValue = implode(" ", $datum['Licenses']);
-            $dbeOffice365Licenses->getRowForLicenses($datum['Licenses']);
-            if ($dbeOffice365Licenses->rowCount) {
-                $licenseValue = $dbeOffice365Licenses->getValue(DBEOffice365License::replacement);
-                $mailboxLimit = $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit);
+            foreach ($datum['Licenses'] as $license) {
+                $dbeOffice365Licenses->getRowForLicense($license);
+                if ($dbeOffice365Licenses->rowCount) {
+                    $licenseValue = str_replace(
+                        $license,
+                        $dbeOffice365Licenses->getValue(DBEOffice365License::replacement),
+                        $licenseValue
+                    );
+                    if (!$mailboxLimit && $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit)) {
+                        $mailboxLimit = $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit);
+                    }
+                }
             }
         }
+        $data[$key]['RecipientTypeDetails'] = $data[$key]['RecipientTypeDetails'] == "SharedMailbox" ? "Shared Mailbox" : ($data[$key]['RecipientTypeDetails'] == "UserMailbox" ? "User Mailbox" : $data[$key]['RecipientTypeDetails']);
         $data[$key]['Licenses'] = $licenseValue;
-        $data[$key]['IsLicensed'] = $data[$key]['IsLicensed'] ? 'True' : 'False';
+        $data[$key]['IsLicensed'] = $data[$key]['IsLicensed'] ? 'Yes' : 'No';
+        $totalizationRow['TotalMailBox'] += $datum['TotalItemSize'];
+        $totalizationRow['LicensedUsers'] += $datum['IsLicensed'];
 
         $mailboxLimits[] = $mailboxLimit;
     }
+
+//    uasort($data, function ($a, $b) { return $a['TotalItemSize'] - $b['TotalItemSize']; });
 
     $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
     $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
     $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
     $sheet = $spreadsheet->getActiveSheet();
-    $keys = array_keys($data[0]);
-    $sheet->fromArray($keys);
+    $dateTime = new DateTime();
+    $sheet->fromArray(["Report generated at " . $dateTime->format("d-m-Y H:i:s")]);
     $sheet->fromArray(
-        $data,
+        [
+            "Display Name",
+            "Mailbox Size (MB)",
+            "Mailbox Type",
+            "Is Licensed",
+            "Licenses"
+        ],
         null,
         'A2'
     );
-
-    $sheet->getStyle("A1:E1")->getFont()->setBold(true);
-
-    $sheet->setAutoFilter(
-        $sheet->calculateWorksheetDimension()
+    $sheet->fromArray(
+        $data,
+        null,
+        'A3'
+    );
+    $highestRow = count($data) + 3;
+    $totalizationRow['LicensedUsers'] = "$totalizationRow[LicensedUsers] Licensed Users";
+    $sheet->fromArray(
+        $totalizationRow,
+        null,
+        'A' . $highestRow
     );
 
+    $sheet->getStyle("A$highestRow:E$highestRow")->getFont()->setBold(true);
+
+    $sheet->getStyle("A2:E2")->getFont()->setBold(true);
+
     for ($i = 0; $i < count($data); $i++) {
-        $currentRow = 2 + $i;
+        $currentRow = 3 + $i;
+
         if ($mailboxLimits[$i]) {
             $usage = $data[$i]['TotalItemSize'] / $mailboxLimits[$i] * 100;
             $color = null;
@@ -144,8 +333,6 @@ do {
                     ->setARGB($color);
             }
         }
-
-
     }
 
     foreach (range('A', $sheet->getHighestDataColumn()) as $col) {

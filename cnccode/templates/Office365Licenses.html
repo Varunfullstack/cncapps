@@ -1,22 +1,3 @@
-<style>
-
-    .emailItem {
-        display: flex;
-        flex-direction: row;
-        width: 500px;
-        padding: 2px;
-    }
-
-    .emailItem .buttons {
-        flex-basis: 100px;
-    }
-
-    .emailItem .email {
-        flex-basis: 400px;
-    }
-
-</style>
-
 <script type="text/javascript"
         src=".javascript/handlebars-v4.0.11.js"
 ></script>
@@ -27,32 +8,13 @@
         src=".javascript/mustache-wax.min.js"
 ></script>
 
-<script id="license-list-template"
-        type="text/template"
->
-    {% #licenses %}
-    <div class="licenseItem"
-         data-idx="{% index %}"
-    >
-        {% value %}
-        <div class="buttons">
-            <button class="editLicenseItem">Edit</button>
-            <button class="deleteLicenseItem">Delete</button>
-        </div>
-    </div>
-    {% /licenses %}
-    {% ^licenses %}
-    No Licenses Defined
-    {% /licenses %}
-</script>
-
 <script id="rule-items-template"
         type="text/template"
 >
     <table>
         <thead>
         <tr>
-            <th>License Combination Assigned</th>
+            <th>License</th>
             <th>Mailbox Limit(MB)</th>
             <th>Friendly Name</th>
             <th></th>
@@ -63,9 +25,7 @@
         <tr data-id="{% id %}"
         >
             <td>
-                {% #licenses %}
-                {% . %}
-                {% /licenses %}
+                {% license %}
             </td>
             <td>
                 {% mailboxLimit %}
@@ -94,18 +54,7 @@
     let rules = [];
 
     function newRule() {
-        return {replacement: "", licenses: [], specificity: 0};
-    }
-
-
-    function putIndexInArray(array) {
-        let putIndex = (value, index) => {
-            return {
-                index,
-                value
-            }
-        }
-        return array.map(putIndex)
+        return {replacement: "", license: null};
     }
 
     $.ajax({
@@ -115,34 +64,11 @@
     }).then(function (result) {
         rules = result;
         drawList();
-    })
+    });
 
     Mustache.tags = ['{%', '%}'];
 
-    Mustache.Formatters = {
-        decimal: function (number) {
-            if (typeof number !== 'number') {
-                return number;
-            }
-
-            return number.toFixed(2);
-        },
-        lightGrayClass: function (number) {
-
-            if (isNaN(parseFloat(number)) || !isFinite(number)) {
-                return null;
-            }
-
-            if (number != 0) {
-                return null;
-            }
-
-            return "grey"
-        }
-
-    };
     let editingItem = null;
-    let currentLicenseIndex = null;
 
     function drawList() {
         const source = document.getElementById("rule-items-template").innerHTML;
@@ -155,23 +81,7 @@
         return JSON.parse(JSON.stringify(src));
     }
 
-    let dialog = null;
-    let dialogLicenseNameElm = null;
-    let licensesList = null;
     $(function () {
-        licensesList = $('.licensesList');
-        const dialogElem = $('#licenseDialog');
-        dialogLicenseNameElm = $('#licenseName');
-        dialog = dialogElem.dialog({
-            autoOpen: false,
-            modal: true,
-            position: {
-                my: "top left",
-                at: "top+20%"
-            }
-        });
-
-
         addButton = $('.addButton');
         saveButton = $('.saveButton');
         cancelButton = $('.cancelButton');
@@ -179,30 +89,7 @@
         list = $('.list');
         drawList();
         cancelEdit();
-        licensesList.on('click', '.editLicenseItem', function () {
-            $elm = $(this);
-
-            const data = $elm.closest('.licenseItem').data();
-            currentLicenseIndex = data.idx;
-
-            const currentLicense = currentRule.licenses[currentLicenseIndex];
-
-            if (!currentLicense) {
-                throw Error('Failed to find element to edit');
-            }
-
-            dialogLicenseNameElm.val(currentLicense);
-            showLicenseModal();
-        });
-        licensesList.on('click', '.deleteLicenseItem', function () {
-            $elm = $(this);
-
-            const data = $elm.closest('.licenseItem').data();
-            currentRule.licenses.splice(data.idx, 1);
-            drawLicenses();
-        });
-
-        list.on('click', '.editButton', function (thing) {
+        list.on('click', '.editButton', function () {
             $elm = $(this);
 
             const data = $elm.closest('tr').data();
@@ -217,7 +104,7 @@
             addButton.hide();
         });
 
-        list.on('click', '.deleteButton', function (thing) {
+        list.on('click', '.deleteButton', function () {
 
             if (!confirm('are you sure you want to delete this entry?')) {
                 return;
@@ -237,7 +124,7 @@
             $.ajax({
                 url: url,
                 method: 'GET',
-            }).then(function (result) {
+            }).then(function () {
                 rules.splice(foundIndex, 1);
                 drawList();
             })
@@ -255,10 +142,6 @@
     function isRuleValid() {
         if (!detail[0].checkValidity()) {
             detail.submit();
-            return false;
-        }
-        if (!currentRule.licenses.length) {
-            alert('Please add at least one License');
             return false;
         }
         return true;
@@ -294,7 +177,6 @@
                 const foundIndex = rules.findIndex(rule => currentRule.id === rule.id);
                 rules = arrayReplaceAt(rules, foundIndex, currentRule);
             }
-            rules = rules.sort((a, b) => b.specificity - a.specificity);
             drawList();
             cancelEdit();
         })
@@ -307,47 +189,15 @@
         addButton.show();
     }
 
-    function showLicenseModal() {
-        dialog.dialog('open');
-    }
-
-    function closeDialog() {
-        dialog.dialog('close');
-    }
-
     function setEditRule(rule) {
         currentRule = rule;
         $('#replacementInput').val(rule.replacement);
         $('#mailboxLimitInput').val(rule.mailboxLimit);
-        drawLicenses();
+        $('#licenseInput').val(rule.license);
     }
 
-    function drawLicenses() {
-        const source = document.getElementById("license-list-template").innerHTML;
-        const context = {licenses: putIndexInArray(currentRule.licenses)};
-        const html = Mustache.to_html(source, context);
-        licensesList.html(html);
-    }
-
-    function addOrSaveLicense() {
-        let value = dialogLicenseNameElm.val();
-
-        if (!value) {
-            closeDialog();
-            return;
-        }
-
-        value = value.toUpperCase();
-
-        if (currentLicenseIndex === null) {
-            currentRule.licenses.push(value);
-            currentRule.specificity = currentRule.licenses.length;
-        } else {
-            currentRule.licenses = arrayReplaceAt(currentRule.licenses, currentLicenseIndex, value);
-        }
-        closeDialog();
-        dialogLicenseNameElm.val(null);
-        drawLicenses();
+    function updateLicense() {
+        currentRule.license = $('#licenseInput').val();
     }
 
     function updateReplacement() {
@@ -359,23 +209,6 @@
     }
 
 </script>
-<div id="licenseDialog">
-    <div>
-        <label for="licenseName">
-            License Name
-        </label>
-        <input name="licenseName"
-               id="licenseName"
-        >
-    </div>
-    <br>
-    <div>
-        <button onclick="addOrSaveLicense()">OK</button>
-        <button>Cancel</button>
-    </div>
-</div>
-
-
 <form class="detail"
       onsubmit="return false;"
 >
@@ -404,16 +237,14 @@
     </div>
     <div>
         <div style="width: 100px; display: inline-block">
-            Licenses:
+            License
         </div>
-        <button type="button"
-                onclick="showLicenseModal()"
-                style="margin-left: 3px;margin-right: 3px; padding: 2px;"
-        >Add License
-        </button>
-        <div class="licensesList">
-
-        </div>
+        <input type="text"
+               name="license"
+               required
+               onchange="updateLicense()"
+               id="licenseInput"
+        >
     </div>
     <div>
         <button class="addButton"

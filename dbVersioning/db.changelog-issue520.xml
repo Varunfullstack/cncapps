@@ -18,10 +18,7 @@
             <column name="replacement" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="specificity" type="int(2)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="licensesJSON" type="text">
+            <column name="license" type="text">
                 <constraints nullable="false"/>
             </column>
             <column name="mailboxLimit" type="int(11)">
@@ -41,29 +38,22 @@
         </preConditions>
         <sql>
             insert into office365License
-            values (1, "Business Enterprise ATP", 3, '["ATP", "POWER_BI_STANDARD", "POWERAPPS_INDIVIDUAL_USER"]',
-                    51200),
-                   (2, "Business Essentials ATP", 2, '["ATP_ENTERPRISE", "O365_BUSINESS_ESSENTIALS"]', 51200),
-                   (3, "ATP", 1, '["ATP_ENTERPRISE"]', 51200),
-                   (4, "Business Enterprise ATP", 4,
-                    '["ENTERPRISEPACK", "ATP_ENTERPRISE", "POWER_BI_STANDARD", "POWERAPPS_INDIVIDUAL_USER"]', 51200),
-                   (5, "Business Enterprise ATP", 2, '["ENTERPRISEPACK", "ATP_ENTERPRISE"]', 51200),
-                   (6, "Enterprise E3", 1, '["ENTERPRISEPACK"]', 51200),
-                   (7, "Enterprise E1", 1, '["EXCHANGESTANDARD"]', 51200),
-                   (8, "Business Essentials", 1, '["O365_BUSINESS_ESSENTIALS"]', 51200),
-                   (9, "Business Premium ATP", 2, '["O365_BUSINESS_PREMIUM", "ATP_ENTERPRISE"]', 51200),
-                   (10, "Business Premium", 1, '["O365_BUSINESS_PREMIUM"]', 51200),
-                   (11, "Power Bi", 1, '["POWER_BI_PRO"]', 51200),
-                   (12, "Power Bi", 1, '["POWER_BI_STANDARD"]', 51200),
-                   (13, "Business Essentials", 1, '["SMB_BUSINESS_ESSENTIALS"]', 51200),
-                   (14, "Business Premium", 1, '["SMB_BUSINESS_PREMIUM"]', 51200),
-                   (15, "Enterprise E1", 1, '["STANDARDPACK"]', 51200),
-                   (16, "Enterprise E2", 1, '["STANDARDWOFFPACK"]', 51200)
-
+            values (1, "Advanced Threat Protection", "ATP_ENTERPRISE", 51200),
+                   (2, "Enterprise E3", "ENTERPRISEPACK", 51200),
+                   (3, "Enterprise E4", "EXCHANGESTANDARD", 51200),
+                   (4, "Business Essentials", "O365_BUSINESS_ESSENTIALS", 51200),
+                   (5, "Business Premium", "O365_BUSINESS_PREMIUM", 51200),
+                   (6, "Power Bi", "POWER_BI_PRO", 51200),
+                   (7, "Power Bi", "POWER_BI_STANDARD", 51200),
+                   (8, "Business Essentials", "SMB_BUSINESS_ESSENTIALS", 51200),
+                   (9, "Business Premium", "SMB_BUSINESS_PREMIUM", 51200),
+                   (10, "Enterprise E7", "STANDARDPACK", 51200),
+                   (11, "Enterprise E8", "STANDARDWOFFPACK", 51200)
         </sql>
         <sql>
             insert into db_sequence
-            values ('office365license', 17);
+            values ('office365license', 12)
+            ON DUPLICATE KEY UPDATE nextid = 12
         </sql>
         <rollback/>
     </changeSet>

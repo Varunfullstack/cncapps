@@ -9,8 +9,7 @@ class DBEOffice365License extends DBEntity
 {
     const id = "id";
     const replacement = "replacement";
-    const specificity = "specificity";
-    const licensesJSON = "licensesJSON";
+    const license = "license";
     const mailboxLimit = "mailboxLimit";
 
     /**
@@ -35,16 +34,10 @@ class DBEOffice365License extends DBEntity
             DA_NOT_NULL
         );
         $this->addColumn(
-            self::specificity,
-            DA_INTEGER,
+            self::license,
+            DA_STRING,
             DA_NOT_NULL
         );
-        $this->addColumn(
-            self::licensesJSON,
-            DA_JSON_ARRAY,
-            DA_NOT_NULL
-        );
-
         $this->addColumn(
             self::mailboxLimit,
             DA_INTEGER,
@@ -55,31 +48,18 @@ class DBEOffice365License extends DBEntity
         $this->setPK(0);
     }
 
-    public function getRowForLicenses(array $value)
+    public function getRowForLicense($license)
     {
-        $licenseWhere = null;
-
-        $specificity = 0;
-        foreach ($value as $license) {
-            if (!preg_match('/:(.*)/', $license, $matches)) {
-                return;
-            }
-
-            $specificity++;
-            if ($licenseWhere) {
-                $licenseWhere .= " and ";
-            }
-            $licenseWhere .= $this->getDBColumnName(self::licensesJSON) . " like  '%$matches[1]%' ";
+        if (!preg_match('/:(.*)/', $license, $matches)) {
+            return;
         }
 
-        if (!$specificity) {
-            throw new Exception('Empty Array??');
-        }
+        $licenseWhere = $this->getDBColumnName(self::license) . " like  '%$matches[1]%' ";
 
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $licenseWhere . " and specificity = " . $specificity
+            " WHERE " . $licenseWhere
         );
         $this->getRows();
         $this->fetchFirst();

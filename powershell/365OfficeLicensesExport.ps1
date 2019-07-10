@@ -21,27 +21,27 @@ try
     Import-PSSession $Session -DisableNameChecking | Out-Null
     Start-Sleep -s 5
     $Report = @()
-    $Mailboxes = Get-Mailbox -ResultSize Unlimited | where { $_.RecipientTypeDetails -ne "DiscoveryMailbox" }
-    $MSOLDomain = Get-MsolDomain | where { $_.Authentication -eq "Managed" -and $_.IsDefault -eq "True" }
+    $Mailboxes = Get-Mailbox -ResultSize Unlimited | Where-Object { $_.RecipientTypeDetails -ne "DiscoveryMailbox" }
+    $MSOLDomain = Get-MsolDomain | Where-Object { $_.Authentication -eq "Managed" -and $_.IsDefault -eq "True" }
     foreach ($mailbox in $Mailboxes)
     {
         $DisplayName = $mailbox.DisplayName
         $UserPrincipalName = $mailbox.UserPrincipalName
         $UserDomain = $UserPrincipalName.Split('@')[1]
-        $Alias = $mailbox.alias
         $MailboxStat = Get-MailboxStatistics $UserPrincipalName
-        $TotalItemSize = $MailboxStat | select @{ name = "TotalItemSize"; expression = { [math]::Round(($_.TotalItemSize.ToString().Split("(")[1].Split(" ")[0].Replace(",", "")/1MB), 2) } }
+        $TotalItemSize = $MailboxStat | Select-Object @{ name = "TotalItemSize"; expression = { [math]::Round(($_.TotalItemSize.ToString().Split("(")[1].Split(" ")[0].Replace(",", "")/1MB), 2) } }
         $TotalItemSize = $TotalItemSize.TotalItemSize
         $RecipientTypeDetails = $mailbox.RecipientTypeDetails
         $MSOLUSER = Get-MsolUser -UserPrincipalName $UserPrincipalName
         if ($UserDomain -eq $MSOLDomain.name)
         {
-            $DaysToExpiry = $MSOLUSER |  select @{ Name = "DaysToExpiry"; Expression = { (New-TimeSpan -start (get-date) -end ($_.LastPasswordChangeTimestamp + $MSOLPasswordPolicy)).Days } }; $DaysToExpiry = $DaysToExpiry.DaysToExpiry
+            $DaysToExpiry = $MSOLUSER |  Select-Object @{ Name = "DaysToExpiry"; Expression = { (New-TimeSpan -start (get-date) -end ($_.LastPasswordChangeTimestamp + $MSOLPasswordPolicy)).Days } }; $DaysToExpiry = $DaysToExpiry.DaysToExpiry
         }
-        $Information = $MSOLUSER | select @{ Name = 'DisplayName'; Expression = { [String]::join(";", $DisplayName) } }, @{ Name = 'TotalItemSize'; Expression = { [String]::join(";", $TotalItemSize) } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { $_.Licenses.AccountSkuId } }
-        $Report = $Report + $Information
+        $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName }}, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { $_.Licenses.AccountSkuId } }
+        $Report += $Information
 
     }
+    $Report = $Report| Sort-Object TotalItemSize
     Get-PSSession | Remove-PSSession
     Remove-TypeData System.Array
     $JSOn = ConvertTo-Json $Report
@@ -49,5 +49,7 @@ try
 }
 catch
 {
-    Write-Host "{`"error`": true, `"errorMessage`": `"$PSItem`"}"
+    $stackTrace = $PSItem.ScriptStackTrace
+    $positionMessage = $PSItem.InvocationInfo.PositionMessage
+    Write-Host "{`"error`": true, `"errorMessage`": `"$PSItem`", `"stackTrace`":`"$stackTrace`", `"position`":`"$positionMessage`" }"
 }
