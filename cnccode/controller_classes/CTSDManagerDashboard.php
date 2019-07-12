@@ -283,6 +283,17 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
 
             $buActivity = new BUActivity($this);
 
+            $urlAllocateAdditionalTime =
+                Controller::buildLink(
+                    'Activity.php',
+                    array(
+                        'action'    => 'allocateAdditionalTime',
+                        'problemID' => $problems->getValue(DBEJProblem::problemID)
+                    )
+                );
+
+            $linkAllocateAdditionalTime = '<a href="' . $urlAllocateAdditionalTime . ' " target="_blank" title="Allocate additional time"><img src="/images/clock.png" width="20px" alt="time">';
+
             $activityCount = $buActivity->getActivityCount($problems->getValue(DBEJProblem::problemID));
 
             $bgColour = $this->getResponseColour(
@@ -416,7 +427,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                     'alarmDateTime'              => $alarmDateTimeDisplay,
                     'bgColour'                   => $bgColour,
                     'workBgColor'                => $workBgColor,
-                    'activityCount'              => $activityCount
+                    'activityCount'              => $activityCount,
+                    'allocateAdditionalTimeLink' => $linkAllocateAdditionalTime
 
                 )
 

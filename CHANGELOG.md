@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+Issue 597 - Allocate time from SD Manager Dashboard
+
 ## [v3.2.1] - 2019-07-01
 ### Fixed
 - Fixed problem with deleting Portal Documents from customer page
