@@ -3719,6 +3719,15 @@ class CTActivity extends CTCNC
             if ($activitiesByProblemID->getValue(DBEJCallActivity::hideFromCustomerFlag) == 'Y') {
                 $activityHiddenText = 'Hidden From Customer';
             }
+
+            $dbeContact = new DBEContact($this);
+            $dbeContact->getRow($activitiesByProblemID->getValue(DBEJCallActivity::contactID));
+            $siteNo = $dbeContact->getValue(DBEContact::siteNo);
+
+            $buSite = new BUSite($this);
+            $dsSite = new DataSet($this);
+            $buSite->getSiteByID($dbeProblem->getValue(DBEProblem::customerID), $siteNo, $dsSite);
+
             $this->template->set_var(
                 array(
                     'reason'             => $activitiesByProblemID->getValue(DBEJCallActivity::reason),
@@ -3734,7 +3743,8 @@ class CTActivity extends CTCNC
                         2
                     ),
                     'userName'           => $activitiesByProblemID->getValue(DBEJCallActivity::userName),
-                    'activityHiddenText' => $activityHiddenText
+                    'activityHiddenText' => $activityHiddenText,
+                    'siteAddress'        => $dsSite->getValue(DBESite::add1)
                 )
             );
 
