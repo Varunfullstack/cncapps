@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 596 - Email import formatting improvements
+
 ## [v3.2.1] - 2019-07-01
 ### Fixed
 - Fixed problem with deleting Portal Documents from customer page
