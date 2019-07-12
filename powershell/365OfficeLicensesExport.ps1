@@ -37,19 +37,32 @@ try
         {
             $DaysToExpiry = $MSOLUSER |  Select-Object @{ Name = "DaysToExpiry"; Expression = { (New-TimeSpan -start (get-date) -end ($_.LastPasswordChangeTimestamp + $MSOLPasswordPolicy)).Days } }; $DaysToExpiry = $DaysToExpiry.DaysToExpiry
         }
-        $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName }}, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { $_.Licenses.AccountSkuId } }
+        $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { [array]$_.Licenses.AccountSkuId } }
         $Report += $Information
 
     }
-    $Report = $Report| Sort-Object TotalItemSize
+    [array]$Report = $Report | Sort-Object TotalItemSize -Descending
     Get-PSSession | Remove-PSSession
     Remove-TypeData System.Array
+    if (-Not$Report)
+    {
+        Write-Host "{}"
+        exit
+    }
     $JSOn = ConvertTo-Json $Report
-    Write-Host $JSOn
+    $decodedJSON = [Text.Encoding]::UTF8.GetString([Text.Encoding]::GetEncoding(28591).GetBytes($JSOn))
+    Write-Host $decodedJSON
 }
 catch
 {
     $stackTrace = $PSItem.ScriptStackTrace
     $positionMessage = $PSItem.InvocationInfo.PositionMessage
-    Write-Host "{`"error`": true, `"errorMessage`": `"$PSItem`", `"stackTrace`":`"$stackTrace`", `"position`":`"$positionMessage`" }"
+    $object = @{
+        error = $true
+        errorMessage = [String]::Concat("", $PSItem)
+        stackTrace = $stackTrace
+        position = $positionMessage
+    }
+    $erroJSON = ConvertTo-Json $object
+    Write-Host $erroJSON
 }

@@ -13,11 +13,17 @@ require_once($cfg["path_dbe"] . "/DBEOSSupportDates.php");
 require_once($cfg["path_dbe"] . "/DBEHeader.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
 require_once($cfg["path_dbe"] . "/DBEOffice365License.php");
+require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
+require_once($cfg["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
+require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
 require './../vendor/autoload.php';
 global $db;
+
+// increasing execution time to infinity...
+ini_set('max_execution_time', 0);
 
 $dbeCustomer = new DBECustomer($thing);
 
@@ -49,13 +55,17 @@ function num2alpha($n)
 
 
 /**
- * @param DataSet|DBECustomer $dbeCustomer
+ * @param DBECustomer $dbeCustomer
  * @param $errorMsg
  * @param null $stackTrace
  * @param null $position
  */
-function createFailedSR(DataSet $dbeCustomer, $errorMsg, $stackTrace = null, $position = null)
+function createFailedSR(DBECustomer $dbeCustomer, $errorMsg, $stackTrace = null, $position = null)
 {
+    echo '<html lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Office 365 License Export</title>
+</head><body>';
     $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
     $buActivity = new BUActivity($thing);
     $buCustomer = new BUCustomer($thing);
@@ -216,16 +226,16 @@ do {
 
     $userName = $buPassword->decrypt($dbePassword->getValue(DBEPassword::username));
     $password = $buPassword->decrypt($dbePassword->getValue(DBEPassword::password));
-
-
     $path = POWERSHELL_DIR . "/365OfficeLicensesExport.ps1";
-
-    $cmd = "powershell.exe -executionpolicy bypass -NoProfile -command $path -User '$userName' -Password '$password'";
+    $cmd = "powershell.exe -executionpolicy bypass -NoProfile -command $path -User '" . escapeshellarg(
+            $userName
+        ) . "' -Password '" . escapeshellarg(
+            $password
+        ) . "'";
     $output = shell_exec($cmd);
+    $data = json_decode($output, true, 512);
 
-    $data = json_decode($output, true);
-
-    if (!$data) {
+    if (!isset($data)) {
         echo '<div>Failed to parse for customer: ' . $output . '</div>';
         createFailedSR($dbeCustomer, "Could not parse Powershell response: $output");
         continue;
@@ -243,13 +253,21 @@ do {
         "Empty"         => null,
         "LicensedUsers" => 0
     ];
+
+    if (!count($data)) {
+        echo '<div>The customer does not have any licenses</div>';
+        continue;
+    }
+
     foreach ($data as $key => $datum) {
         $values = [];
         $mailboxLimit = null;
         $licenseValue = null;
         if ($datum['Licenses']) {
             if (!is_array($datum['Licenses'])) {
-                $datum['Licenses'] = [$datum['Licenses']];
+                $datum['Licenses'] = [
+                    $datum['Licenses']
+                ];
             }
             $licenseValue = implode(" ", $datum['Licenses']);
             foreach ($datum['Licenses'] as $license) {
@@ -275,7 +293,6 @@ do {
         $mailboxLimits[] = $mailboxLimit;
     }
 
-//    uasort($data, function ($a, $b) { return $a['TotalItemSize'] - $b['TotalItemSize']; });
 
     $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
     $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
@@ -310,6 +327,8 @@ do {
     $sheet->getStyle("A$highestRow:E$highestRow")->getFont()->setBold(true);
 
     $sheet->getStyle("A2:E2")->getFont()->setBold(true);
+
+    $sheet->getStyle("A1:E$highestRow")->getAlignment()->setHorizontal('center');
 
     for ($i = 0; $i < count($data); $i++) {
         $currentRow = 3 + $i;
@@ -416,8 +435,7 @@ do {
 } while ($dbeCustomer->fetchNext());
 
 
-
-
+echo '</body></html>';
 
 
 
