@@ -45,16 +45,22 @@ if (isset($options['c'])) {
 if (isset($options['customer'])) {
     $customerID = $options['customer'];
 }
-
+var_dump($customerID);
 
 $dbeCustomer = new DBECustomer($thing);
 
 if (isset($customerID)) {
     $dbeCustomer->getRow($customerID);
+    if (!$dbeCustomer->rowCount) {
+        cli_echo("Customer not found", "error");
+        exit;
+    }
 } else {
     $dbeCustomer->getActiveCustomers(true);
     $dbeCustomer->fetchNext();
 }
+
+
 $BUHeader = new BUHeader($thing);
 $dbeHeader = new DataSet($thing);
 $BUHeader->getHeader($dbeHeader);
@@ -444,6 +450,6 @@ do {
 
         cli_echo('All good!!. Creating file ' . $fileName, 'success');
     } catch (\Exception $exception) {
-        cli_echo('Failed to save file, possibly file open','warning');
+        cli_echo('Failed to save file, possibly file open', 'warning');
     }
 } while ($dbeCustomer->fetchNext());
