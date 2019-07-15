@@ -281,14 +281,16 @@ class Template_PHPLIB
      */
     function subst($handle)
     {
+        if ($this->debug) {
+            var_debug($this->_varKeys);
+            var_debug($this->_varVals);
+            var_dump($this->getVar($handle));
+        }
         if (!$this->_loadFile($handle)) {
             $this->halt("subst: unable to load $handle.");
             return false;
         }
-        if ($this->debug) {
-            var_debug($this->_varKeys);
-            var_debug($this->_varVals);
-        }
+
         return @str_replace(
             $this->_varKeys,
             $this->_varVals,
