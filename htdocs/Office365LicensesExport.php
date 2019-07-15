@@ -45,8 +45,6 @@ if (isset($options['c'])) {
 if (isset($options['customer'])) {
     $customerID = $options['customer'];
 }
-var_dump($customerID);
-
 $dbeCustomer = new DBECustomer($thing);
 
 if (isset($customerID)) {
