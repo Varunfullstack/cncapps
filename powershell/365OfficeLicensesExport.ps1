@@ -28,7 +28,7 @@ try
         $DisplayName = $mailbox.DisplayName
         $UserPrincipalName = $mailbox.UserPrincipalName
         $UserDomain = $UserPrincipalName.Split('@')[1]
-        $MailboxStat = Get-MailboxStatistics $UserPrincipalName
+        $MailboxStat = Get-MailboxStatistics $UserPrincipalName -WarningAction SilentlyContinue
         $TotalItemSize = $MailboxStat | Select-Object @{ name = "TotalItemSize"; expression = { [math]::Round(($_.TotalItemSize.ToString().Split("(")[1].Split(" ")[0].Replace(",", "")/1MB), 2) } }
         $TotalItemSize = $TotalItemSize.TotalItemSize
         $RecipientTypeDetails = $mailbox.RecipientTypeDetails
