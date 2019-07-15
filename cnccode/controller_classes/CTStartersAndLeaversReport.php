@@ -63,7 +63,6 @@ class CTStartersAndLeaversReport extends CTCNC
                     "rowBlock",
                     "rows"
                 );
-
                 foreach ($results as $row) {
                     $this->template->set_var(
                         [
