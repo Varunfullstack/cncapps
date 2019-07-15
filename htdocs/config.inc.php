@@ -227,6 +227,20 @@ if (get_magic_quotes_gpc()) {
 /*
 End Strip all slashes from request variables (includes cookies)
 */
+
+function is_cli()
+{
+    if (defined('STDIN')) {
+        return true;
+    }
+
+    if (empty($_SERVER['REMOTE_ADDR']) and !isset($_SERVER['HTTP_USER_AGENT']) and count($_SERVER['argv']) > 0) {
+        return true;
+    }
+
+    return false;
+}
+
 /**
  * @param $value
  * @return array|string
@@ -389,6 +403,30 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
 } else {                // command line call so assume live and force HTTP_HOST value
     $server_type = getEnvironmentByPath();
     $GLOBALS['isRunningFromCommandLine'] = true;
+}
+
+function cli_echo($string, $color = null)
+{
+    $restoreColor = "\e[0m";
+    $applyColorCode = null;
+    switch ($color) {
+        case "error":
+            $applyColorCode = "\e[31m";
+            break;
+        case "success":
+            $applyColorCode = "\e[32m";
+            break;
+        case 'info':
+            $applyColorCode = "\e[36m";
+            break;
+        case 'warning':
+            $applyColorCode = "\e[33m";
+    }
+
+    if ($applyColorCode) {
+        $string = $applyColorCode . $string . $restoreColor;
+    }
+    echo $string . PHP_EOL;
 }
 
 define(

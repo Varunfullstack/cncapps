@@ -26,24 +26,35 @@ global $db;
 ini_set('max_execution_time', 0);
 
 
+if (!is_cli()) {
+    echo 'This script can only be ran from command line';
+    exit;
+}
+
+
+// Script example.php
+$shortopts = "c:";  // Required value
+$longopts = array(
+    "customer::",     // Required value
+);
+$options = getopt($shortopts, $longopts);
+$customerID = null;
+if (isset($options['c'])) {
+    $customerID = $options['c'];
+}
+if (isset($options['customer'])) {
+    $customerID = $options['customer'];
+}
+
 
 $dbeCustomer = new DBECustomer($thing);
 
-if (isset($_REQUEST['customerID'])) {
-
-    $dbeCustomer->getRow($_REQUEST['customerID']);
-    echo $dbeCustomer->getValue(DBECustomer::name);
+if (isset($customerID)) {
+    $dbeCustomer->getRow($customerID);
 } else {
     $dbeCustomer->getActiveCustomers(true);
     $dbeCustomer->fetchNext();
 }
-if(defined('STDIN') )
-    echo("Running from CLI"); 
-else 
-  echo("Not Running from CLI");
-var_dump($_REQUEST);
-exit;
-
 $BUHeader = new BUHeader($thing);
 $dbeHeader = new DataSet($thing);
 $BUHeader->getHeader($dbeHeader);
@@ -69,10 +80,6 @@ function num2alpha($n)
  */
 function createFailedSR(DBECustomer $dbeCustomer, $errorMsg, $stackTrace = null, $position = null)
 {
-    echo '<html lang="en"><head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Office 365 License Export</title>
-</head><body>';
     $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
     $buActivity = new BUActivity($thing);
     $buCustomer = new BUCustomer($thing);
@@ -220,14 +227,14 @@ do {
     $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
     $customerName = $dbeCustomer->getValue(DBECustomer::name);
 
-    echo '<div>Getting Office 365 Data for Customer: ' . $customerID . ' - ' . $customerName . '</div>';
+    cli_echo('Getting Office 365 Data for Customer: ' . $customerID . ' - ' . $customerName, 'info');
 
     // we have to pull from passwords.. the service 10
 
     $dbePassword = $buCustomer->getOffice365PasswordItem($customerID);
 
     if (!$dbePassword->rowCount) {
-        echo '<div> This customer does not have a Office 365 Admin Portal service password</div>';
+        cli_echo('This customer does not have a Office 365 Admin Portal service password', 'warning');
         continue;
     }
 
@@ -243,12 +250,12 @@ do {
     $data = json_decode($output, true, 512);
 
     if (!isset($data)) {
-        echo '<div>Failed to parse for customer: ' . $output . '</div>';
+        cli_echo('Failed to parse for customer: ' . $output, 'error');
         createFailedSR($dbeCustomer, "Could not parse Powershell response: $output");
         continue;
     }
     if (isset($data['error'])) {
-        echo '<div>Failed to pull data for customer: ' . $data['errorMessage'] . '</div>';
+        cli_echo('Failed to pull data for customer: ' . $data['errorMessage'], 'error');
         createFailedSR($dbeCustomer, $data['errorMessage'], $data['stackTrace'], $data['position']);
         continue;
     }
@@ -262,7 +269,7 @@ do {
     ];
 
     if (!count($data)) {
-        echo '<div>The customer does not have any licenses</div>';
+        cli_echo('The customer does not have any licenses', 'warning');
         continue;
     }
 
@@ -435,15 +442,8 @@ do {
             $dbeCustomerDocument->updateRow();
         }
 
-        echo '<div>All good!!. Creating file ' . $fileName . '</div>';
+        cli_echo('All good!!. Creating file ' . $fileName, 'success');
     } catch (\Exception $exception) {
-        echo '<div>Failed to save file, possibly file open</div>';
+        cli_echo('Failed to save file, possibly file open','warning');
     }
 } while ($dbeCustomer->fetchNext());
-
-
-echo '</body></html>';
-
-
-
-
