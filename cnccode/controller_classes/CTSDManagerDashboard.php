@@ -78,6 +78,33 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $this->setTemplateFiles(
             array('SDManagerDashboard' => 'SDManagerDashboard')
         );
+
+        $openSrsByUser = $this->buActivity->getOpenSrsByUser();
+
+        $this->template->set_block(
+            'SDManagerDashboard',
+            'userSrCountBlock',
+            'userSrCount'
+        );
+
+        foreach ($openSrsByUser as $row) {
+
+            $this->template->set_var(
+
+                array(
+                    'openSrInitials' => $row['initials'],
+                    'openSrCount'    => $row['count']
+                )
+            );
+
+            $this->template->parse(
+                'userSrCount',
+                'userSrCountBlock',
+                true
+            );
+
+        }
+
         $buProblem = new BUActivity($this);
         $problems = new DataSet($this);
         $limit = 10;
