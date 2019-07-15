@@ -25,6 +25,8 @@ global $db;
 // increasing execution time to infinity...
 ini_set('max_execution_time', 0);
 
+
+
 $dbeCustomer = new DBECustomer($thing);
 
 if (isset($_REQUEST['customerID'])) {
@@ -36,6 +38,8 @@ if (isset($_REQUEST['customerID'])) {
     $dbeCustomer->fetchNext();
 }
 
+var_dump($_REQUEST);
+exit;
 
 $BUHeader = new BUHeader($thing);
 $dbeHeader = new DataSet($thing);
