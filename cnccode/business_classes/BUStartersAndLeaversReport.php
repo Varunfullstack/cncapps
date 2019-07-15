@@ -58,8 +58,11 @@ class BUStartersAndLeaversReport extends Business
         }
         $params = array_merge($custParams, $dateParams);
 
-        $query = "SELECT
-'starters',
+        $query = " 
+select * from (
+SELECT
+       customer.`cus_name` as customerName,
+'starters' as type,
   SUM(`pro_rootcauseno` = 58) AS quantity,
   AVG(pro_total_activity_duration_hours) AS avgDuration,
   sum(pro_total_activity_duration_hours) as totalDuration,
@@ -75,10 +78,13 @@ class BUStartersAndLeaversReport extends Business
   AVG((SELECT COUNT(*) FROM callactivity WHERE callactivity.`caa_problemno` = problem.`pro_problemno` AND callactivity.`caa_callacttypeno` IN (8,11,18))) AS avgActivities
 FROM
   problem
+  LEFT JOIN customer
+    ON problem.`pro_custno` = customer.`cus_custno`
 WHERE true $custNoQuery $dateQuery
-   AND pro_rootcauseno  = 58 AND `pro_status` IN ('F', 'C') UNION 
+   AND pro_rootcauseno  = 58 AND `pro_status` IN ('F', 'C')  group by pro_custno UNION 
   SELECT
-  'leavers',
+         customer.`cus_name` as customerName,
+  'leavers' as type,
   SUM(`pro_rootcauseno` = 62) AS quantity,
   AVG(pro_total_activity_duration_hours) AS avgDuration,
   sum(pro_total_activity_duration_hours) as totalDuration,
@@ -94,7 +100,9 @@ WHERE true $custNoQuery $dateQuery
   AVG((SELECT COUNT(*) FROM callactivity WHERE callactivity.`caa_problemno` = problem.`pro_problemno` AND callactivity.`caa_callacttypeno` IN (8,11,18))) AS avgActivities
 FROM
   problem
-WHERE true $custNoQuery $dateQuery AND pro_rootcauseno  =  62 AND `pro_status` IN ('F', 'C')
+   LEFT JOIN customer
+    ON problem.`pro_custno` = customer.`cus_custno`
+WHERE true $custNoQuery $dateQuery AND pro_rootcauseno  =  62 AND `pro_status` IN ('F', 'C')  group by pro_custno) t order by customerName 
  ";
         $statement = $this->db->prepare($query);
         if (!$statement) {
@@ -121,6 +129,36 @@ WHERE true $custNoQuery $dateQuery AND pro_rootcauseno  =  62 AND `pro_status` I
         }
         $result = $statement->get_result();
 
-        return $result->fetch_all(MYSQLI_ASSOC);
+        $rows = $result->fetch_all(MYSQLI_ASSOC);
+        $previousCustomer = null;
+        $toReturn = [];
+        $totalRow = null;
+        foreach ($rows as $row) {
+            $toReturn[] = $row;
+            if ($row['customerName'] !== $previousCustomer) {
+                if ($previousCustomer) {
+                    $toReturn[] = $totalRow;
+                }
+                $totalRow = [
+                    'customerName'       => $row['customerName'],
+                    "type"               => "Total",
+                    "quantity"           => $row['quantity'],
+                    "avgDuration"        => $row['avgDuration'],
+                    "totalDuration"      => $row['totalDuration'],
+                    "avgOpenHours"       => $row['avgOpenHours'],
+                    "maxDuration"        => $row['maxDuration'],
+                    "maxOpenHours"       => $row['maxOpenHours'],
+                    "minDuration"        => $row['minDuration'],
+                    "minOpenHours"       => $row['minOpenHours'],
+                    "avgCost"            => $row['avgCost'],
+                    "totalCost"          => $row['totalCost'],
+                    "avgCustomerContact" => $row['avgCustomerContact'],
+                    "avgRemoteSupport"   => $row['avgRemoteSupport'],
+                    "avgActivities"      => $row['avgActivities'],
+                ];
+            }
+
+
+        }
     }
 }
