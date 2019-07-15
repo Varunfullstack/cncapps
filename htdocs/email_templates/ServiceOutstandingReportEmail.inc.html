@@ -16,10 +16,22 @@
             border-spacing: 1px;
         }
 
+        tr.red-row {
+            background-color: #FFC7CE !important;
+        }
+
+        tr.amber-row {
+            background-color: #FFEB9C !important;
+
+        }
+
         -->
     </style>
     <script>
         const isDashboard = {isDashboard};
+        const amberThreshold = {amberThreshold};
+        const redThreshold = {redThreshold};
+
 
         if (isDashboard) {
             $(document).ready(function () {
@@ -42,7 +54,20 @@
                     order: [
                         [4, 'asc'],
                         [5, 'desc']
-                    ]
+                    ],
+                    rowCallback: function (row, data, index) {
+                        let toAddClass = null;
+                        if (data[5] >= amberThreshold) {
+                            toAddClass = 'amber-row'
+                        }
+                        if (data[5] >= redThreshold) {
+                            toAddClass = 'red-row'
+                        }
+                        if (toAddClass) {
+                            $(row).addClass(toAddClass);
+                        }
+                        console.log(data);
+                    }
                 });
             });
         }
@@ -95,7 +120,7 @@
     </thead>
     <tbody>
     <!-- BEGIN requestBlock -->
-    <tr>
+    <tr class="{rowClass}">
         <td align="center">{customer}</td>
         <td align="center"><a href="{urlRequest}">{serviceRequestID}</a></td>
         <td align="center">{description}</td>

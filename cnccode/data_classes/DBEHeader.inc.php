@@ -90,6 +90,8 @@ class DBEHeader extends DBEntity
     const projectCommenceNotification = "projectCommenceNotification";
     const OSSupportDatesThresholdDays = "OSSupportDatesThresholdDays";
     const closingSRBufferMinutes = "closingSRBufferMinutes";
+    const sevenDayerAmberDays = "sevenDayerAmberDays";
+    const sevenDayerRedDays = "sevenDayerRedDays";
 
     /**
      * calls constructor()
@@ -539,6 +541,9 @@ class DBEHeader extends DBEntity
             DA_INTEGER,
             DA_NOT_NULL
         );
+
+        $this->addColumn(self::sevenDayerAmberDays, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::sevenDayerRedDays, DA_INTEGER, DA_NOT_NULL);
 
         $this->setPK(0);
         $this->setAddColumnsOff();
