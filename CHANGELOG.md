@@ -3,7 +3,7 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Fixed
-- Issue 602 - SR Searching bug
+- Issue 608 - Starters And Leavers Report Enhancements
 
 ## [v3.2.1] - 2019-07-01
 ### Fixed
