@@ -37,7 +37,10 @@ if (isset($_REQUEST['customerID'])) {
     $dbeCustomer->getActiveCustomers(true);
     $dbeCustomer->fetchNext();
 }
-
+if(defined('STDIN') )
+    echo("Running from CLI"); 
+else 
+  echo("Not Running from CLI");
 var_dump($_REQUEST);
 exit;
 
