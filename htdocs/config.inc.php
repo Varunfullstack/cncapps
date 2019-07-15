@@ -330,6 +330,39 @@ $onPavilionWebServer = false;
 $GLOBALS['php7'] = true;
 $php7 = true;
 
+
+function getEnvironmentByPath()
+{
+
+    if (strpos(__DIR__, 'cncapps') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cncapps';
+        return MAIN_CONFIG_SERVER_TYPE_LIVE;
+    }
+
+    if (strpos(__DIR__, 'cncdev7') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cncdev';
+        return MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
+    }
+
+    if (strpos(__DIR__, 'cnctest') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cnctest';
+        return MAIN_CONFIG_SERVER_TYPE_TEST;
+    }
+
+    if (strpos(__DIR__, 'cncweb') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cncweb';
+        return MAIN_CONFIG_SERVER_TYPE_WEBSITE;
+    }
+
+    if (strpos(__DIR__, 'cncdesign') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cncdesign';
+        return MAIN_CONFIG_SERVER_TYPE_DESIGN;
+    }
+
+    return MAIN_CONFIG_SERVER_TYPE_LIVE;
+}
+
+
 if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line calls
     switch ($_SERVER['HTTP_HOST']) {
 
@@ -354,13 +387,9 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
     $GLOBALS['isRunningFromCommandLine'] = false;
 
 } else {                // command line call so assume live and force HTTP_HOST value
-    $script_path = strtolower($argv[0]);
-
-    $server_type = MAIN_CONFIG_SERVER_TYPE_LIVE;
+    $server_type = getEnvironmentByPath();
     $GLOBALS['isRunningFromCommandLine'] = true;
-    $_SERVER['HTTP_HOST'] = 'cncapps';
 }
-
 
 define(
     'CONFIG_PUBLIC_DOMAIN',
