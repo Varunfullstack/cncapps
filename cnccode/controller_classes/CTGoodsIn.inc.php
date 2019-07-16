@@ -532,6 +532,6 @@ class CTGoodsIn extends CTCNC
                     'porheadID' => $this->getParam('porheadID')
                 )
             );
-        header('Location: ' . $urlNext);
+//        header('Location: ' . $urlNext);
     }
 }
