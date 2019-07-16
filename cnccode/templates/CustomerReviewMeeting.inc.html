@@ -101,8 +101,8 @@
 
                 var split = Math.floor(rowCount / 2);
                 console.log('split: ' + split);
-                $("tbody tr:gt(" + (split) + ")", '#' + leftCol).remove();
-                $("tbody tr:lt(" + split + ")", '#' + rightCol).remove();
+                $("tbody tr:gt(" + split + ")", '#' + leftCol).remove();
+                $("tbody tr:lt(" + split + 1 + ")", '#' + rightCol).remove();
             }
             // if we had to split the tables, make sure they are wrapped into a div with text-align center
             if (createdElements.length) {

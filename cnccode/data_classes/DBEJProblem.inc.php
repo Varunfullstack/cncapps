@@ -448,6 +448,7 @@ class DBEJProblem extends DBEProblem
                 MAX( ca.caa_callactivityno )
               FROM callactivity ca
               WHERE ca.caa_problemno = pro_problemno
+              and (pro_status in ('F','C') and ca.caa_callacttypeno = " . CONFIG_FIXED_ACTIVITY_TYPE_ID . " or ca.caa_callacttypeno <=> " . CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID . ")
               AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
             ) 
            LEFT JOIN consultant ON cns_consno = pro_consno
