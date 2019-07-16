@@ -33,6 +33,16 @@ class ItemNotYetReceived
     protected $isRequiredAtLeastAWeekAgo;
     protected $serviceRequestID;
     protected $deliveryConfirmedFlag;
+    protected $expectedOn;
+
+    /**
+     * @return mixed
+     */
+    public function getExpectedOn()
+    {
+        return $this->returnDateIfValue($this->expectedOn);
+    }
+
 
     /**
      * @return mixed

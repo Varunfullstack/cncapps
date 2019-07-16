@@ -2108,6 +2108,8 @@ WHERE odl_ordno = $ordheadID
 
     public function notifyPurchaseOrderCompletion(DBEPorhead $purchaseOrderHeader)
     {
+        // we need to find out what is the related sales order first
+
         $salesOrderID = $purchaseOrderHeader->getValue(DBEPorhead::ordheadID);
 
         $purchaseOrdersForSalesOrder = new DBEPorhead($this);
@@ -2130,6 +2132,11 @@ WHERE odl_ordno = $ordheadID
                 echo '<div> This is the same as the one we are processing</div>';
                 continue;
             }
+            $dbePorline = new DBEJPorline($this);
+            $dbePorline->setValue(
+                DBEJPorline::porheadID,
+                $purchaseOrdersForSalesOrder->getValue(DBEPorhead::porheadID)
+            );
 
             if ($purchaseOrdersForSalesOrder->getValue(DBEPorhead::completionNotifiedFlag) == 'N') {
 

@@ -112,7 +112,6 @@ class CTGoodsIn extends CTCNC
      */
     function defaultAction()
     {
-
         switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:
                 $this->search();
