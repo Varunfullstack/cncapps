@@ -1384,7 +1384,7 @@ class CTPurchaseOrder extends CTCNC
 
             if ($dbePurchaseOrder->getValue(DBEPorhead::deliveryConfirmedFlag) == 'N' && $dsPorhead->getValue(
                     DBEJPorhead::deliveryConfirmedFlag
-                ) == 'Y') {
+                ) == 'Y' && $dbePurchaseOrder->getValue(DBEJPorhead::completionNotifiedFlag) == 'N') {
                 $buSalesOrder = new BUSalesOrder($this);
 
                 $buSalesOrder->notifyPurchaseOrderCompletion($dbePurchaseOrder);
@@ -1395,6 +1395,7 @@ class CTPurchaseOrder extends CTCNC
                 );
 
             }
+
             $this->buPurchaseOrder->updateHeader($dsPorhead);
 
             $urlNext =

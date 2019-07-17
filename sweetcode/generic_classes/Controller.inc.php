@@ -543,7 +543,6 @@ class Controller extends BaseObject
                 $this->defaultAction();
                 break;
         }
-        //$this->pageClose();
     }
 
     /**

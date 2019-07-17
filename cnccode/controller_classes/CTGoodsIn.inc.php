@@ -129,6 +129,7 @@ class CTGoodsIn extends CTCNC
                 $this->displaySearchForm();
                 break;
         }
+        exit;
     }
 
     /**
@@ -490,6 +491,7 @@ class CTGoodsIn extends CTCNC
      */
     function receive()
     {
+
         if ($_SERVER ['REQUEST_METHOD'] == 'POST') {
             $dsGoodsIn = &$this->dsGoodsIn;
             $this->buGoodsIn->initialiseReceiveDataset($dsGoodsIn);
@@ -516,7 +518,6 @@ class CTGoodsIn extends CTCNC
                 $this->displayGoodsIn();
                 exit;
             }
-
             $this->buGoodsIn->receive(
                 $this->getParam('porheadID'),
                 $dsGoodsIn
@@ -533,8 +534,9 @@ class CTGoodsIn extends CTCNC
                         'porheadID' => $this->getParam('porheadID')
                     )
                 );
-            header('HTTP/1.1 301 Moved Permanently');
-            header('Location: ' . $urlNext);
+//            header('HTTP/1.1 301 Moved Permanently');
+//            header('Location: ' . $urlNext);
+            exit;
         }
     }
 }
