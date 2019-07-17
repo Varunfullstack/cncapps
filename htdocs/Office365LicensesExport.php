@@ -41,10 +41,13 @@ $options = getopt($shortopts, $longopts);
 $customerID = null;
 if (isset($options['c'])) {
     $customerID = $options['c'];
+    unset($options['c']);
 }
 if (isset($options['customer'])) {
     $customerID = $options['customer'];
+    unset($options['customer']);
 }
+
 $dbeCustomer = new DBECustomer($thing);
 
 if (isset($customerID)) {
