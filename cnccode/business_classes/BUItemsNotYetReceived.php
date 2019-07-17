@@ -44,7 +44,6 @@ class BUItemsNotYetReceived extends Business
     pol_qty_ord <> pol_qty_rec as hasNotBeenReceivedYet,
     pol_qty_ord AS orderedQuantity,
     ordhead.odh_ordno as salesOrderID,
-    pol_exp_date as expectedOn,
     project.projectID,
     poh_required_by > (now() - INTERVAL 1 week ) as isRequiredAtLeastAWeekAgo,
     minServiceRequest.`pro_problemno` as serviceRequestID

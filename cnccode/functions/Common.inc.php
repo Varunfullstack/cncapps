@@ -38,6 +38,7 @@ function common_isAnInternalStockSupplier($supplierID)
 }
 
 
+
 function common_convertDateDMYToYMD($dateDMY)
 {
     if ($dateDMY != '') {
@@ -533,21 +534,6 @@ function checkContactPassword($password)
     }
 
     return true;
-}
-
-/**
- * @return DateTime
- * @throws Exception
- */
-function getNextBusinessDay()
-{
-    $dateToTest = new DateTime();
-
-    do {
-        $dateToTest->add(new DateInterval('P1D'));
-        $bankHolidays = common_getUKBankHolidays($dateToTest->format('Y'));
-    } while (in_array($dateToTest->format('Y-m-d'), $bankHolidays));
-    return $dateToTest;
 }
 
 function common_getUKBankHolidays($year)

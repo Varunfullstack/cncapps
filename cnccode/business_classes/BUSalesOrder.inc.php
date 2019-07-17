@@ -2132,15 +2132,8 @@ WHERE odl_ordno = $ordheadID
                 echo '<div> This is the same as the one we are processing</div>';
                 continue;
             }
-            $dbePorline = new DBEJPorline($this);
-            $dbePorline->setValue(
-                DBEJPorline::porheadID,
-                $purchaseOrdersForSalesOrder->getValue(DBEPorhead::porheadID)
-            );
 
-            if ($purchaseOrdersForSalesOrder->getValue(
-                    DBEJPorhead::deliveryConfirmedFlag
-                ) == 'N' && $dbePorline->countOutstandingRows()) {
+            if ($purchaseOrdersForSalesOrder->getValue(DBEPorhead::completionNotifiedFlag) == 'N') {
                 $shouldNotify = false;
                 echo '<div>We have found another purchase order that is not completed yet..so we cannot create the activity</div>';
                 break;
