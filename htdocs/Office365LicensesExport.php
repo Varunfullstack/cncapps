@@ -290,7 +290,7 @@ do {
                     $datum['Licenses']
                 ];
             }
-            $licenseValue = implode(" ", $datum['Licenses']);
+            $licenseValue = implode(", ", $datum['Licenses']);
             foreach ($datum['Licenses'] as $license) {
                 $dbeOffice365Licenses->getRowForLicense($license);
                 if ($dbeOffice365Licenses->rowCount) {

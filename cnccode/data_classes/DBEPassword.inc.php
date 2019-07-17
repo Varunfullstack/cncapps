@@ -154,7 +154,9 @@ class DBEPassword extends DBEntity
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(self::customerID) . " = " . $customerID .
-            " and " . $this->getDBColumnName(self::serviceID) . ' = 10 '
+            " and " . $this->getDBColumnName(self::serviceID) . ' = 10  and ' . $this->getDBColumnName(
+                self::archivedBy
+            ) . 'is null'
         );
         $this->getRows();
         $this->fetchFirst();
