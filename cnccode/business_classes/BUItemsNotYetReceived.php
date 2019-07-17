@@ -20,6 +20,7 @@ class BUItemsNotYetReceived extends Business
   customer.`cus_name` as customerName,
   item.`itm_desc` as itemDescription,
   supplier.`sup_name` as supplierName,
+       itm_itemno as itemId,
   IF(
     poh_direct_del = 'N',
     'CNC',
@@ -45,6 +46,7 @@ class BUItemsNotYetReceived extends Business
     pol_qty_ord AS orderedQuantity,
     ordhead.odh_ordno as salesOrderID,
     pol_exp_date as expectedOn,
+    pol_cost as cost,
     project.projectID,
     poh_required_by > (now() - INTERVAL 1 week ) as isRequiredAtLeastAWeekAgo,
     minServiceRequest.`pro_problemno` as serviceRequestID
