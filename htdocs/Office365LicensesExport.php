@@ -19,7 +19,7 @@ require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
-require './../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 global $db;
 
 // increasing execution time to infinity...
