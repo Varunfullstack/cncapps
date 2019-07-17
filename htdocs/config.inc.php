@@ -1,5 +1,73 @@
 <?php
 
+function is_cli()
+{
+    if (defined('STDIN')) {
+        return true;
+    }
+
+    if (empty($_SERVER['REMOTE_ADDR']) and !isset($_SERVER['HTTP_USER_AGENT']) and count($_SERVER['argv']) > 0) {
+        return true;
+    }
+
+    return false;
+}
+
+function cli_echo($string, $color = null)
+{
+    $restoreColor = "\e[0m";
+    $applyColorCode = null;
+    switch ($color) {
+        case "error":
+            $applyColorCode = "\e[31m";
+            break;
+        case "success":
+            $applyColorCode = "\e[32m";
+            break;
+        case 'info':
+            $applyColorCode = "\e[36m";
+            break;
+        case 'warning':
+            $applyColorCode = "\e[33m";
+    }
+
+    if ($applyColorCode) {
+        $string = $applyColorCode . $string . $restoreColor;
+    }
+    echo $string . PHP_EOL;
+}
+
+function getEnvironmentByPath()
+{
+
+    if (strpos(__DIR__, 'cncapps') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cncapps';
+        return MAIN_CONFIG_SERVER_TYPE_LIVE;
+    }
+
+    if (strpos(__DIR__, 'cncdev7') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cncdev';
+        return MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
+    }
+
+    if (strpos(__DIR__, 'cnctest') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cnctest';
+        return MAIN_CONFIG_SERVER_TYPE_TEST;
+    }
+
+    if (strpos(__DIR__, 'cncweb') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cncweb';
+        return MAIN_CONFIG_SERVER_TYPE_WEBSITE;
+    }
+
+    if (strpos(__DIR__, 'cncdesign') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cncdesign';
+        return MAIN_CONFIG_SERVER_TYPE_DESIGN;
+    }
+
+    return MAIN_CONFIG_SERVER_TYPE_LIVE;
+}
+
 function money_format($format, $number)
 {
     $regex = '/%((?:[\^!\-]|\+|\(|\=.)*)([0-9]+)?' .
@@ -354,11 +422,8 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
     $GLOBALS['isRunningFromCommandLine'] = false;
 
 } else {                // command line call so assume live and force HTTP_HOST value
-    $script_path = strtolower($argv[0]);
-
-    $server_type = MAIN_CONFIG_SERVER_TYPE_LIVE;
+    $server_type = getEnvironmentByPath();
     $GLOBALS['isRunningFromCommandLine'] = true;
-    $_SERVER['HTTP_HOST'] = 'cncapps';
 }
 
 
