@@ -13,7 +13,6 @@ require_once($cfg["path_dbe"] . "/DBEUser.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
-require './../vendor/autoload.php';
 global $db;
 
 if (!is_cli()) {
