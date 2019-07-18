@@ -125,8 +125,6 @@ class CTItemsNotYetReceived extends CTCNC
                 $projectLink = "<a href='" . $projectURL . "' target='_blank'>" . $item->getProjectName() . "</a>";
             }
 
-
-            // http://cnctest:86/PurchaseOrder.php?action=editOrdline&porheadID=54085&sequenceNo=18
             $expectedDate = $this->getDateOrNA($item->getExpectedOn());
             $purchaseOrderLineLink = null;
             if ($expectedDate) {
