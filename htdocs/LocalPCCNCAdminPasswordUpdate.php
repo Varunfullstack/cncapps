@@ -75,7 +75,7 @@ foreach ($data as $datum) {
             $dbePassword->setValue(DBEPassword::customerID, $datum['customerID']);
             $dbePassword->setValue(DBEPassword::serviceID, 24);
             $dbePassword->setValue(DBEPassword::level, 1);
-            $dbePassword->setValue(DBEPassword::username, $buPassword->encrypt('cncadmin'));
+            $dbePassword->setValue(DBEPassword::username, $buPassword->encrypt('localpccncadmin'));
             $dbePassword->setValue(DBEPassword::password, $buPassword->encrypt($datum['password']));
             $dbePassword->insertRow();
             cli_echo('Inserted new Local PC CNC Admin Password Item!', 'success');

@@ -416,7 +416,6 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
             break;
         case 'cncdesign:89':
             $server_type = MAIN_CONFIG_SERVER_TYPE_DESIGN;
-
     }
 
     $GLOBALS['isRunningFromCommandLine'] = false;
