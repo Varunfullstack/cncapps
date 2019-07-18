@@ -30,12 +30,10 @@ if (!is_cli()) {
     echo 'This script can only be ran from command line';
     exit;
 }
-
-
 // Script example.php
-$shortopts = "c:d:";
+$shortopts = "c:d";
 $longopts = array(
-    "customer::",
+    "customer:",
 );
 $options = getopt($shortopts, $longopts);
 $customerID = null;
@@ -105,15 +103,30 @@ do {
     $userName = $buPassword->decrypt($dbePassword->getValue(DBEPassword::username));
     $password = $buPassword->decrypt($dbePassword->getValue(DBEPassword::password));
     $path = POWERSHELL_DIR . "/365OfficeLicensesExport.ps1";
-    $cmd = "powershell.exe -executionpolicy bypass -NoProfile -command $path -User '" . escapeshellarg(
-            $userName
-        ) . "' -Password '" . escapeshellarg(
-            $password
-        ) . "'";
+
+    $cmdParts = [
+        "powershell.exe",
+        "-executionpolicy",
+        "bypass",
+        "-NoProfile",
+        "-command",
+        $path,
+        "-User",
+        base64_encode($userName),
+        "-Password",
+        base64_encode($password)
+    ];
+    $escaped = implode(' ', array_map('escape_win32_argv', $cmdParts));
+    /* In almost all cases, escape for cmd.exe as well - the only exception is
+       when using proc_open() with the bypass_shell option. cmd doesn't handle
+       arguments individually, so the entire command line string can be escaped,
+       no need to process arguments individually */
+    $cmd = escape_win32_cmd($escaped);
+
     if ($debugMode) {
         cli_echo('The powershell line to execute is :' . $cmd, 'info');
     }
-    $output = shell_exec($cmd);
+    $output = noshell_exec($cmd);
     $data = json_decode($output, true, 512);
 
     if (!isset($data)) {

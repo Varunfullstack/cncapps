@@ -1,6 +1,8 @@
 Param($User, $Password)
-$securePassword = ConvertTo-SecureString $Password -AsPlainText -Force
-$Credentials = New-Object System.Management.Automation.PSCredential($User, $securePassword)
+$decodedPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($Password))
+$decodedUser = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($User))
+$securePassword = ConvertTo-SecureString $decodedPassword -AsPlainText -Force
+$Credentials = New-Object System.Management.Automation.PSCredential($decodedUser, $securePassword)
 Import-Module msonline
 try
 {
