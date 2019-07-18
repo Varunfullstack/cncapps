@@ -36,6 +36,17 @@ class ItemNotYetReceived
     protected $expectedOn;
     protected $cost;
     protected $itemId;
+    protected $lineSequenceNumber;
+
+    /**
+     * @return mixed
+     */
+    public function getLineSequenceNumber()
+    {
+        return $this->lineSequenceNumber;
+    }
+
+
 
     private function isCarriage(){
         return $this->itemId == 1491;

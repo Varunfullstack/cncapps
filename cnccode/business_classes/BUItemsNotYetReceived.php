@@ -21,6 +21,7 @@ class BUItemsNotYetReceived extends Business
   item.`itm_desc` as itemDescription,
   supplier.`sup_name` as supplierName,
        itm_itemno as itemId,
+       pol_lineno as lineSequenceNumber,
   IF(
     poh_direct_del = 'N',
     'CNC',

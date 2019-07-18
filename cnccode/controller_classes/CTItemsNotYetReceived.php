@@ -126,6 +126,25 @@ class CTItemsNotYetReceived extends CTCNC
             }
 
 
+            // http://cnctest:86/PurchaseOrder.php?action=editOrdline&porheadID=54085&sequenceNo=18
+            $expectedDate = $this->getDateOrNA($item->getExpectedOn());
+            $purchaseOrderLineLink = null;
+            if ($expectedDate) {
+                $purchaseOrderLineURL =
+                    Controller::buildLink(
+                        "PurchaseOrder.php",
+                        [
+                            "porheadID"  => $item->getPurchaseOrderId(),
+                            "action"     => "editOrdline",
+                            "sequenceNo" => $item->getLineSequenceNumber()
+                        ]
+
+                    );
+
+                $purchaseOrderLineLink = "<a href='" . $purchaseOrderLineURL . "' target='_blank'>" . $expectedDate . "</a>";
+            }
+
+
             $this->template->set_var(
                 [
                     "style"             => $style,
@@ -137,7 +156,7 @@ class CTItemsNotYetReceived extends CTCNC
                     "orderedQty"        => $item->getOrderedQuantity(),
                     "direct"            => $item->getDirect(),
                     "purchaseOrderDate" => $this->getDateOrNA($item->getPurchaseOrderDate()),
-                    "expectedOn"        => $this->getDateOrNA($item->getExpectedOn()),
+                    "expectedOn"        => $purchaseOrderLineLink,
                     "futureDate"        => $this->getDateOrNA($item->getFutureDate()),
                     "requiredByDate"    => $this->getDateOrNA($item->getPurchaseOrderRequiredBy()),
                     "supplierRef"       => $item->getSupplierRef(),
