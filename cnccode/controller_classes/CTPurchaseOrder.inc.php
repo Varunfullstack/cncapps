@@ -1101,7 +1101,7 @@ class CTPurchaseOrder extends CTCNC
         $this->orderLineForm();
         $this->template->setVar(
             'disableOnPartReceive',
-            $this->dsPorhead->getValue(DBEPorhead::type) == 'P' ? 'disabled' : null
+            $this->dsPorhead->getValue(DBEPorhead::type) == 'P' ? 'readonly' : null
         );
         $this->template->parse(
             'purchaseOrderLineEditJS',
