@@ -884,7 +884,9 @@ class CTPurchaseOrder extends CTCNC
             while ($dsPorline->fetchNext()) {
                 $sequenceNo = $dsPorline->getValue(DBEJPorline::sequenceNo);
                 $itemDescription = $dsPorline->getValue(DBEJPorline::itemDescription);
-                if ($dsPorline->getValue(DBEPorline::expectedDate) && $dsPorline->getValue(DBEPorline::curUnitCost) && $dsPorline->getValue(DBEPorline::itemID) != 1491 ) {
+                if ($dsPorline->getValue(DBEPorline::expectedDate) && (float)$dsPorline->getValue(
+                        DBEPorline::curUnitCost
+                    ) && $dsPorline->getValue(DBEPorline::itemID) != 1491) {
                     $expectedDate = Controller::dateYMDtoDMY($dsPorline->getValue(DBEJPorline::expectedDate));
                 } else {
                     $expectedDate = null;
