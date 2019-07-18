@@ -40,22 +40,41 @@
             insert into office365License
             values (1, "Advanced Threat Protection", "ATP_ENTERPRISE", 51200),
                    (2, "Enterprise E3", "ENTERPRISEPACK", 51200),
-                   (3, "Enterprise E4", "EXCHANGESTANDARD", 51200),
+                   (3, "Enterprise E1", "EXCHANGESTANDARD", 51200),
                    (4, "Business Essentials", "O365_BUSINESS_ESSENTIALS", 51200),
                    (5, "Business Premium", "O365_BUSINESS_PREMIUM", 51200),
                    (6, "Power Bi", "POWER_BI_PRO", 51200),
                    (7, "Power Bi", "POWER_BI_STANDARD", 51200),
                    (8, "Business Essentials", "SMB_BUSINESS_ESSENTIALS", 51200),
                    (9, "Business Premium", "SMB_BUSINESS_PREMIUM", 51200),
-                   (10, "Enterprise E7", "STANDARDPACK", 51200),
-                   (11, "Enterprise E8", "STANDARDWOFFPACK", 51200)
+                   (10, "Enterprise E1", "STANDARDPACK", 51200),
+                   (11, "Enterprise E2", "STANDARDWOFFPACK", 51200),
+                   (12, "Intune", "INTUNE_A", 51200),
+                   (13, "MS Visio", "VISIOCLIENT", 51200),
+                   (14, "Flow", "FLOW_Free", 51200),
+                   (15, "Dynamics 365 P1 Trial for Information Workers", "DYN365_ENTERPRISE_P1_IW", 51200),
+                   (16, "MS Project Professional", "PROJECTPROFESSIONAL", 51200),
+                   (17, "Office 365 ProPlus", "OFFICESUBSCRIPTION", 51200),
+                   (18, "Exchange Archiving Online", "EXCHANGEENTERPRISE", 51200),
+                   (19, "MS Teams", "TEAMS_COMMERCIAL_TRIAL", 51200),
+                   (20, "MS Teams", "MS_TEAMS_IW", 51200),
+                   (21, "Office 365 ProPlus for students", "OFFICESUBSCRIPTION_STUDENT", 51200),
+                   (22, "Enterprise E2 for students", "EXCHANGEENTERPRISE_STUDENT", 51200),
+                   (23, "Office 365 A1 for students", "STANDARDWOFFPACK_STUDENT", 51200),
+                   (24, "Office 365 A1 for faculty", "STANDARDWOFFPACK_FACULTY", 51200)
         </sql>
         <sql>
             insert into db_sequence
-            values ('office365license', 12)
-            ON DUPLICATE KEY UPDATE nextid = 12
+            values ('office365license', 24)
+            ON DUPLICATE KEY UPDATE nextid = 24
         </sql>
-        <rollback/>
+        <rollback>
+            <sql>
+                delete
+                from db_sequence
+                where seq_name = 'office365license'
+            </sql>
+        </rollback>
     </changeSet>
     <changeSet id="1562231827-3" author="pavwebdev">
         <preConditions onFail="MARK_RAN">

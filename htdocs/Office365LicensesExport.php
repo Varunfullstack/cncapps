@@ -19,7 +19,7 @@ require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 global $db;
 
 // increasing execution time to infinity...
@@ -33,9 +33,9 @@ if (!is_cli()) {
 
 
 // Script example.php
-$shortopts = "c:";  // Required value
+$shortopts = "c:d:";
 $longopts = array(
-    "customer::",     // Required value
+    "customer::",
 );
 $options = getopt($shortopts, $longopts);
 $customerID = null;
@@ -46,6 +46,11 @@ if (isset($options['c'])) {
 if (isset($options['customer'])) {
     $customerID = $options['customer'];
     unset($options['customer']);
+}
+
+$debugMode = false;
+if (isset($options['d'])) {
+    $debugMode = true;
 }
 
 $dbeCustomer = new DBECustomer($thing);
@@ -78,154 +83,6 @@ function num2alpha($n)
     return $r;
 }
 
-
-/**
- * @param DBECustomer $dbeCustomer
- * @param $errorMsg
- * @param null $stackTrace
- * @param null $position
- */
-function createFailedSR(DBECustomer $dbeCustomer, $errorMsg, $stackTrace = null, $position = null)
-{
-    $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
-    $buActivity = new BUActivity($thing);
-    $buCustomer = new BUCustomer($thing);
-    $primaryContact = $buCustomer->getPrimaryContact($customerID);
-    $buHeader = new BUHeader($thing);
-    $dsHeader = new DataSet($thing);
-    $buHeader->getHeader($dsHeader);
-
-
-    $slaResponseHours = $buActivity->getSlaResponseHours(
-        4,
-        $customerID,
-        $primaryContact->getValue(DBEContact::contactID)
-    );
-
-    $dbeProblem = new DBEProblem($thing);
-    $dbeProblem->setValue(DBEProblem::problemID, null);
-    $siteNo = $primaryContact->getValue(DBEContact::siteNo);
-    $dbeProblem->setValue(
-        DBEProblem::hdLimitMinutes,
-        $dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
-    );
-    $dbeProblem->setValue(
-        DBEProblem::esLimitMinutes,
-        $dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
-    );
-    $dbeProblem->setValue(
-        DBEProblem::imLimitMinutes,
-        $dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
-    );
-    $dbeProblem->setValue(
-        DBEProblem::slaResponseHours,
-        $slaResponseHours
-    );
-    $dbeProblem->setValue(
-        DBEProblem::customerID,
-        $customerID
-    );
-    $dbeProblem->setValue(
-        DBEProblem::status,
-        'I'
-    );
-    $dbeProblem->setValue(
-        DBEProblem::priority,
-        4
-    );
-    $dbeProblem->setValue(
-        DBEProblem::dateRaised,
-        date(DATE_MYSQL_DATETIME)
-    ); // default
-    $dbeProblem->setValue(
-        DBEProblem::contactID,
-        $primaryContact->getValue(DBEContact::contactID)
-    );
-    $dbeProblem->setValue(
-        DBEJProblem::hideFromCustomerFlag,
-        'Y'
-    );
-    $dbeProblem->setValue(
-        DBEJProblem::queueNo,
-        2
-    );
-
-    $dbeProblem->setValue(
-        DBEJProblem::rootCauseID,
-        83
-    );
-    $dbeProblem->setValue(
-        DBEJProblem::userID,
-        null
-    );        // not allocated
-    $dbeProblem->insertRow();
-
-    $dbeCallActivity = new DBECallActivity($thing);
-
-    $dbeCallActivity->setValue(
-        DBEJCallActivity::callActivityID,
-        null
-    );
-    $dbeCallActivity->setValue(
-        DBEJCallActivity::siteNo,
-        $siteNo
-    );
-    $dbeCallActivity->setValue(
-        DBEJCallActivity::contactID,
-        $primaryContact->getValue(DBEContact::contactID)
-    );
-    $dbeCallActivity->setValue(
-        DBEJCallActivity::callActTypeID,
-        CONFIG_INITIAL_ACTIVITY_TYPE_ID
-    );
-    $dbeCallActivity->setValue(
-        DBEJCallActivity::date,
-        date(DATE_MYSQL_DATE)
-    );
-    $startTime = date('H:i');
-    $dbeCallActivity->setValue(
-        DBEJCallActivity::startTime,
-        $startTime
-    );
-
-    $dbeCallActivity->setValue(
-        DBEJCallActivity::endTime,
-        $startTime
-    );
-    $dbeCallActivity->setValue(
-        DBEJCallActivity::status,
-        'C'
-    );
-    $dbeCallActivity->setValue(
-        DBEJCallActivity::serverGuard,
-        'N'
-    );
-
-    $details = "Office 365 License Export Failed: " . $errorMsg;
-    if ($position) {
-        $details .= " " . $position;
-    }
-
-    if ($stackTrace) {
-        $details .= " " . $stackTrace;
-    }
-
-    $dbeCallActivity->setValue(
-        DBEJCallActivity::reason,
-        $details
-    );
-    $dbeCallActivity->setValue(
-        DBEJCallActivity::problemID,
-        $dbeProblem->getPKValue()
-    );
-    $dbeCallActivity->setValue(
-        DBEJCallActivity::userID,
-        USER_SYSTEM
-    );
-
-    $dbeCallActivity->insertRow();
-}
-
 $buCustomer = new BUCustomer($thing);
 $buPassword = new BUPassword($thing);
 $dbeOffice365Licenses = new DBEOffice365License($thing);
@@ -253,6 +110,9 @@ do {
         ) . "' -Password '" . escapeshellarg(
             $password
         ) . "'";
+    if ($debugMode) {
+        cli_echo('The powershell line to execute is :' . $cmd, 'info');
+    }
     $output = shell_exec($cmd);
     $data = json_decode($output, true, 512);
 
@@ -291,6 +151,14 @@ do {
                 ];
             }
             $licenseValue = implode(", ", $datum['Licenses']);
+
+            if ($licenseValue && strpos(
+                    strtolower($datum['DisplayName']),
+                    'leaver'
+                ) != false && $datum['RecipientTypeDetails'] == 'SharedMailbox') {
+                raiseCustomerLeaverWithLicenseSR($dbeCustomer, $datum['DisplayName']);
+            }
+
             foreach ($datum['Licenses'] as $license) {
                 $dbeOffice365Licenses->getRowForLicense($license);
                 if ($dbeOffice365Licenses->rowCount) {
@@ -302,6 +170,8 @@ do {
                     if (!$mailboxLimit && $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit)) {
                         $mailboxLimit = $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit);
                     }
+                } else {
+                    raiseCNCRequest($license, $dbeCustomer, $datum['DisplayName']);
                 }
             }
         }
@@ -454,3 +324,422 @@ do {
         cli_echo('Failed to save file, possibly file open', 'warning');
     }
 } while ($dbeCustomer->fetchNext());
+
+/**
+ * @param DBECustomer $dbeCustomer
+ * @param $errorMsg
+ * @param null $stackTrace
+ * @param null $position
+ */
+function raiseCustomerLeaverWithLicenseSR(DBECustomer $dbeCustomer, $userName)
+{
+    $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
+    $buActivity = new BUActivity($thing);
+    $buCustomer = new BUCustomer($thing);
+    $primaryContact = $buCustomer->getPrimaryContact($customerID);
+    $buHeader = new BUHeader($thing);
+    $dsHeader = new DataSet($thing);
+    $buHeader->getHeader($dsHeader);
+
+
+    $slaResponseHours = $buActivity->getSlaResponseHours(
+        4,
+        $customerID,
+        $primaryContact->getValue(DBEContact::contactID)
+    );
+
+    $dbeProblem = new DBEProblem($thing);
+    $dbeProblem->setValue(DBEProblem::problemID, null);
+    $siteNo = $primaryContact->getValue(DBEContact::siteNo);
+    $dbeProblem->setValue(
+        DBEProblem::hdLimitMinutes,
+        $dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
+    );
+    $dbeProblem->setValue(
+        DBEProblem::esLimitMinutes,
+        $dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
+    );
+    $dbeProblem->setValue(
+        DBEProblem::imLimitMinutes,
+        $dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
+    );
+    $dbeProblem->setValue(
+        DBEProblem::slaResponseHours,
+        $slaResponseHours
+    );
+    $dbeProblem->setValue(
+        DBEProblem::customerID,
+        $customerID
+    );
+    $dbeProblem->setValue(
+        DBEProblem::status,
+        'I'
+    );
+    $dbeProblem->setValue(
+        DBEProblem::priority,
+        4
+    );
+    $dbeProblem->setValue(
+        DBEProblem::dateRaised,
+        date(DATE_MYSQL_DATETIME)
+    ); // default
+    $dbeProblem->setValue(
+        DBEProblem::contactID,
+        $primaryContact->getValue(DBEContact::contactID)
+    );
+    $dbeProblem->setValue(
+        DBEJProblem::hideFromCustomerFlag,
+        'Y'
+    );
+    $dbeProblem->setValue(
+        DBEJProblem::queueNo,
+        2
+    );
+
+    $dbeProblem->setValue(
+        DBEJProblem::rootCauseID,
+        86
+    );
+    $dbeProblem->setValue(
+        DBEJProblem::userID,
+        null
+    );        // not allocated
+    $dbeProblem->insertRow();
+
+    $dbeCallActivity = new DBECallActivity($thing);
+
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::callActivityID,
+        null
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::siteNo,
+        $siteNo
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::contactID,
+        $primaryContact->getValue(DBEContact::contactID)
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::callActTypeID,
+        CONFIG_INITIAL_ACTIVITY_TYPE_ID
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::date,
+        date(DATE_MYSQL_DATE)
+    );
+    $startTime = date('H:i');
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::startTime,
+        $startTime
+    );
+
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::endTime,
+        $startTime
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::status,
+        'C'
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::serverGuard,
+        'N'
+    );
+
+    $details = "<p>User $userName is marked as leaver but still has a license assigned to it, please review and correct.</p>";
+
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::reason,
+        $details
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::problemID,
+        $dbeProblem->getPKValue()
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::userID,
+        USER_SYSTEM
+    );
+
+    $dbeCallActivity->insertRow();
+}
+
+/**
+ * @param DBECustomer $dbeCustomer
+ * @param $errorMsg
+ * @param null $stackTrace
+ * @param null $position
+ */
+function createFailedSR(DBECustomer $dbeCustomer, $errorMsg, $stackTrace = null, $position = null)
+{
+    $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
+    $buActivity = new BUActivity($thing);
+    $buCustomer = new BUCustomer($thing);
+    $primaryContact = $buCustomer->getPrimaryContact($customerID);
+    $buHeader = new BUHeader($thing);
+    $dsHeader = new DataSet($thing);
+    $buHeader->getHeader($dsHeader);
+
+
+    $slaResponseHours = $buActivity->getSlaResponseHours(
+        4,
+        $customerID,
+        $primaryContact->getValue(DBEContact::contactID)
+    );
+
+    $dbeProblem = new DBEProblem($thing);
+    $dbeProblem->setValue(DBEProblem::problemID, null);
+    $siteNo = $primaryContact->getValue(DBEContact::siteNo);
+    $dbeProblem->setValue(
+        DBEProblem::hdLimitMinutes,
+        $dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
+    );
+    $dbeProblem->setValue(
+        DBEProblem::esLimitMinutes,
+        $dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
+    );
+    $dbeProblem->setValue(
+        DBEProblem::imLimitMinutes,
+        $dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
+    );
+    $dbeProblem->setValue(
+        DBEProblem::slaResponseHours,
+        $slaResponseHours
+    );
+    $dbeProblem->setValue(
+        DBEProblem::customerID,
+        $customerID
+    );
+    $dbeProblem->setValue(
+        DBEProblem::status,
+        'I'
+    );
+    $dbeProblem->setValue(
+        DBEProblem::priority,
+        4
+    );
+    $dbeProblem->setValue(
+        DBEProblem::dateRaised,
+        date(DATE_MYSQL_DATETIME)
+    ); // default
+    $dbeProblem->setValue(
+        DBEProblem::contactID,
+        $primaryContact->getValue(DBEContact::contactID)
+    );
+    $dbeProblem->setValue(
+        DBEJProblem::hideFromCustomerFlag,
+        'Y'
+    );
+    $dbeProblem->setValue(
+        DBEJProblem::queueNo,
+        2
+    );
+
+    $dbeProblem->setValue(
+        DBEJProblem::rootCauseID,
+        83
+    );
+    $dbeProblem->setValue(
+        DBEJProblem::userID,
+        null
+    );        // not allocated
+    $dbeProblem->insertRow();
+
+    $dbeCallActivity = new DBECallActivity($thing);
+
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::callActivityID,
+        null
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::siteNo,
+        $siteNo
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::contactID,
+        $primaryContact->getValue(DBEContact::contactID)
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::callActTypeID,
+        CONFIG_INITIAL_ACTIVITY_TYPE_ID
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::date,
+        date(DATE_MYSQL_DATE)
+    );
+    $startTime = date('H:i');
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::startTime,
+        $startTime
+    );
+
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::endTime,
+        $startTime
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::status,
+        'C'
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::serverGuard,
+        'N'
+    );
+
+    $details = "Office 365 License Export Failed: " . $errorMsg;
+    if ($position) {
+        $details .= " " . $position;
+    }
+
+    if ($stackTrace) {
+        $details .= " " . $stackTrace;
+    }
+
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::reason,
+        $details
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::problemID,
+        $dbeProblem->getPKValue()
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::userID,
+        USER_SYSTEM
+    );
+
+    $dbeCallActivity->insertRow();
+}
+
+function raiseCNCRequest($license, DBECustomer $dbeCustomer, $licenseUser)
+{
+    $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
+    $buActivity = new BUActivity($thing);
+    $buCustomer = new BUCustomer($thing);
+    $primaryContact = $buCustomer->getPrimaryContact(282);
+    $buHeader = new BUHeader($thing);
+    $dsHeader = new DataSet($thing);
+    $buHeader->getHeader($dsHeader);
+
+
+    $slaResponseHours = $buActivity->getSlaResponseHours(
+        4,
+        282,
+        $primaryContact->getValue(DBEContact::contactID)
+    );
+
+    $dbeProblem = new DBEProblem($thing);
+    $dbeProblem->setValue(DBEProblem::problemID, null);
+    $siteNo = $primaryContact->getValue(DBEContact::siteNo);
+    $dbeProblem->setValue(
+        DBEProblem::hdLimitMinutes,
+        $dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
+    );
+    $dbeProblem->setValue(
+        DBEProblem::esLimitMinutes,
+        $dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
+    );
+    $dbeProblem->setValue(
+        DBEProblem::imLimitMinutes,
+        $dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
+    );
+    $dbeProblem->setValue(
+        DBEProblem::slaResponseHours,
+        $slaResponseHours
+    );
+    $dbeProblem->setValue(
+        DBEProblem::customerID,
+        $customerID
+    );
+    $dbeProblem->setValue(
+        DBEProblem::status,
+        'I'
+    );
+    $dbeProblem->setValue(
+        DBEProblem::priority,
+        4
+    );
+    $dbeProblem->setValue(
+        DBEProblem::dateRaised,
+        date(DATE_MYSQL_DATETIME)
+    ); // default
+    $dbeProblem->setValue(
+        DBEProblem::contactID,
+        $primaryContact->getValue(DBEContact::contactID)
+    );
+
+    $dbeProblem->setValue(
+        DBEJProblem::queueNo,
+        1
+    );
+
+    $dbeProblem->setValue(
+        DBEJProblem::rootCauseID,
+        83
+    );
+    $dbeProblem->setValue(
+        DBEJProblem::userID,
+        null
+    );        // not allocated
+    $dbeProblem->insertRow();
+
+    $dbeCallActivity = new DBECallActivity($thing);
+
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::callActivityID,
+        null
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::siteNo,
+        $siteNo
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::contactID,
+        $primaryContact->getValue(DBEContact::contactID)
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::callActTypeID,
+        CONFIG_INITIAL_ACTIVITY_TYPE_ID
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::date,
+        date(DATE_MYSQL_DATE)
+    );
+    $startTime = date('H:i');
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::startTime,
+        $startTime
+    );
+
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::endTime,
+        $startTime
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::status,
+        'C'
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::serverGuard,
+        'N'
+    );
+
+    $details = "<p>License $license was not found for customer " . $dbeCustomer->getValue(DBECustomer::name) . " which is assigned to user $licenseUser.</p>
+<p>Please add this license within CNCAPPS and rerun the license export process for this customer</p>";
+
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::reason,
+        $details
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::problemID,
+        $dbeProblem->getPKValue()
+    );
+    $dbeCallActivity->setValue(
+        DBEJCallActivity::userID,
+        USER_SYSTEM
+    );
+
+    $dbeCallActivity->insertRow();
+}
