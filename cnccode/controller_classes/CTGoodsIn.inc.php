@@ -534,8 +534,8 @@ class CTGoodsIn extends CTCNC
                         'porheadID' => $this->getParam('porheadID')
                     )
                 );
-//            header('HTTP/1.1 301 Moved Permanently');
-//            header('Location: ' . $urlNext);
+            header('HTTP/1.1 301 Moved Permanently');
+            header('Location: ' . $urlNext);
             exit;
         }
     }

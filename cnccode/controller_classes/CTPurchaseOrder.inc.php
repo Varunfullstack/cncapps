@@ -27,7 +27,7 @@ define(
 );
 define(
     'CTPURCHASEORDER_MSG_MUST_BE_INITIAL',
-    'Must be an initial order'
+    'Must be an initial order or part received'
 );
 define(
     'CTPURCHASEORDER_MSG_SEQNO_NOT_PASSED',
@@ -884,7 +884,9 @@ class CTPurchaseOrder extends CTCNC
             while ($dsPorline->fetchNext()) {
                 $sequenceNo = $dsPorline->getValue(DBEJPorline::sequenceNo);
                 $itemDescription = $dsPorline->getValue(DBEJPorline::itemDescription);
-                if ($dsPorline->getValue(DBEPorline::expectedDate) && (float)$dsPorline->getValue(
+                if ($dsPorhead->getValue(DBEJPorhead::orderedByName) && $dsPorline->getValue(
+                        DBEPorline::expectedDate
+                    ) && (float)$dsPorline->getValue(
                         DBEPorline::curUnitCost
                     ) && $dsPorline->getValue(DBEPorline::itemID) != 1491) {
                     $expectedDate = Controller::dateYMDtoDMY($dsPorline->getValue(DBEJPorline::expectedDate));
@@ -1062,10 +1064,12 @@ class CTPurchaseOrder extends CTCNC
             $this->displayFatalError(CTPURCHASEORDER_MSG_PURCHASEORDER_NOT_FND);
             return;
         }
-        if ($this->dsPorhead->getValue(DBEJPorhead::type) != 'I') {
+
+        if (!in_array($this->dsPorhead->getValue(DBEJPorhead::type), ['I', 'P'])) {
             $this->displayFatalError(CTPURCHASEORDER_MSG_MUST_BE_INITIAL);
             return;
         }
+
         if (!$this->getParam('sequenceNo')) {
             $this->displayFatalError(CTPURCHASEORDER_MSG_SEQNO_NOT_PASSED);
             return;
@@ -1090,19 +1094,20 @@ class CTPurchaseOrder extends CTCNC
         }
         $this->setTemplateFiles(
             array(
-//				'PurchaseOrderHeadDisplay' =>  'PurchaseOrderHeadDisplay.inc',
-'PurchaseOrderLineEdit'   => 'PurchaseOrderLineEdit.inc',
-'PurchaseOrderLineEditJS' => 'PurchaseOrderLineEditJS.inc' // javascript
+                'PurchaseOrderLineEdit'   => 'PurchaseOrderLineEdit.inc',
+                'PurchaseOrderLineEditJS' => 'PurchaseOrderLineEditJS.inc' // javascript
             )
         );
-//		$this->displayPurchaseOrderHeader($dsPorhead);
         $this->orderLineForm();
+        $this->template->setVar(
+            'disableOnPartReceive',
+            $this->dsPorhead->getValue(DBEPorhead::type) == 'P' ? 'disabled' : null
+        );
         $this->template->parse(
             'purchaseOrderLineEditJS',
             'PurchaseOrderLineEditJS',
             true
         );
-//		$this->template->parse('purchaseOrderHeadDisplay', 	'purchaseOrderHeadDisplay', true);
         $this->template->parse(
             'CONTENTS',
             'PurchaseOrderLineEdit',
