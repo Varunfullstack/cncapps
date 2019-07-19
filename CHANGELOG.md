@@ -14,6 +14,7 @@ This project changes will be shown here.
 - Issue 604 - Contact Validation doesn't run on scheduled task
 - Issue 591 - URL too long with To Be Logged
 - Issue 595 - Stuck email enhancements
+- Issue 608 - Starters And Leavers Report Enhancements
 
 ## [v3.2.1] - 2019-07-01
 ### Fixed
