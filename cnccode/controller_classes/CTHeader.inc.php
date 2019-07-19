@@ -522,6 +522,18 @@ class CTHeader extends CTCNC
                 DBEHeader::closingSRBufferMinutes . 'Message'                        => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::closingSRBufferMinutes)
                 ),
+                DBEHeader::sevenDayerAmberDays                                       => $dsHeader->getValue(
+                    DBEHeader::sevenDayerAmberDays
+                ),
+                DBEHeader::sevenDayerAmberDays . 'Message'                           => $dsHeader->getMessage(
+                    DBEHeader::sevenDayerAmberDays
+                ),
+                DBEHeader::sevenDayerRedDays                                         => $dsHeader->getValue(
+                    DBEHeader::sevenDayerRedDays
+                ),
+                DBEHeader::sevenDayerRedDays . 'Message'                             => $dsHeader->getMessage(
+                    DBEHeader::sevenDayerRedDays
+                ),
                 'urlItemPopup'                                                       => $urlItemPopup,
                 'urlUpdate'                                                          => $urlUpdate
             )

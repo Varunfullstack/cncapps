@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 596 - Email import formatting improvements
 - Issue 603 - Include Site on SR History Popup
 - Issue 600 - Change Request reminders
+- Issue 609 - 7 dayer formatting improvements
 ### Fixed
 - Issue 604 - Contact Validation doesn't run on scheduled task
 - Issue 591 - URL too long with To Be Logged
