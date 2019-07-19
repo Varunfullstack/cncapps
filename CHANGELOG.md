@@ -12,6 +12,7 @@ This project changes will be shown here.
 - Issue 600 - Change Request reminders
 - Issue 609 - 7 dayer formatting improvements
 - Issue 607 - Customer Review Meeting Enhancements
+- Issue 611 - Hide passwords for referred customers
 ### Fixed
 - Issue 604 - Contact Validation doesn't run on scheduled task
 - Issue 591 - URL too long with To Be Logged
