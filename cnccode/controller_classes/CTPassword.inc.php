@@ -178,12 +178,23 @@ class CTPassword extends CTCNC
         $this->setMethodName('displayList');
 
         $this->setPageTitle('Passwords');
+        $dbeCustomer->getRow($customerID);
+
+        if ($dbeCustomer->getValue(DBECustomer::referredFlag) == 'Y') {
+            $this->setTemplateFiles('PasswordReferred', 'PasswordReferred.inc');
+            $this->template->parse(
+                'CONTENTS',
+                'PasswordReferred',
+                true
+            );
+            $this->parsePage();
+            return;
+        }
 
         $this->setTemplateFiles(
             array('PasswordList' => 'PasswordList.inc')
         );
 
-        $dbeCustomer->getRow($customerID);
         $dsPassword = new DBEJPassword($this);
         $dsPassword->getRowsByCustomerIDAndPasswordLevel(
             $customerID,
