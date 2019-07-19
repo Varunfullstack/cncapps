@@ -1,0 +1,14 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1560932972-0">
+        <tagDatabase tag="issue598"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1560932972-1">
+      <sql><![CDATA[
+          update quotation set documentType = 'manualUpload' where fileExtension <> 'pdf' and documentType = 'quotation'
+      ]]></sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>
