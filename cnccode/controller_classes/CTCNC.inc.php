@@ -534,9 +534,7 @@ class CTCNC extends Controller
 
     function hasPermissions($levels)
     {
-
         if ($this->isRunningFromCommandLine()) {
-
             return true;
         }
 
@@ -544,6 +542,7 @@ class CTCNC extends Controller
             ",",
             self::getDbeUser()->getValue(DBEUser::perms)
         );
+
         if (is_array($levels)) {
 
             return array_intersect(

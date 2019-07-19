@@ -92,6 +92,8 @@ class DBEHeader extends DBEntity
     const closingSRBufferMinutes = "closingSRBufferMinutes";
     const sevenDayerAmberDays = "sevenDayerAmberDays";
     const sevenDayerRedDays = "sevenDayerRedDays";
+    const office365MailboxYellowWarningThreshold = "office365MailboxYellowWarningThreshold";
+    const office365MailboxRedWarningThreshold = "office365MailboxRedWarningThreshold";
 
     /**
      * calls constructor()
@@ -538,6 +540,17 @@ class DBEHeader extends DBEntity
 
         $this->addColumn(
             self::closingSRBufferMinutes,
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::office365MailboxYellowWarningThreshold,
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::office365MailboxRedWarningThreshold,
             DA_INTEGER,
             DA_NOT_NULL
         );

@@ -162,6 +162,25 @@ class DBEPassword extends DBEntity
         $this->fetchFirst();
         $this->resetQueryString();
     }
+
+    public function getOffice365PasswordByCustomerID(int $customerID)
+    {
+        $this->setMethodName('getOffice365PasswordByCustomerID');
+        if (!$customerID) {
+            throw new Exception("Customer ID Required");
+        }
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::customerID) . " = " . $customerID .
+            " and " . $this->getDBColumnName(self::serviceID) . ' = 10  and ' . $this->getDBColumnName(
+                self::archivedBy
+            ) . ' is null'
+        );
+        $this->getRows();
+        $this->fetchFirst();
+        $this->resetQueryString();
+    }
 }
 
 ?>

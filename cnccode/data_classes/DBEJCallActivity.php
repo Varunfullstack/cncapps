@@ -6,6 +6,9 @@
  * Time: 11:10
  */
 
+
+require_once __DIR__ . '/DBECallActivity.inc.php';
+
 /*
 * Call activity join
 * @authors Karim Ahmed

@@ -534,6 +534,19 @@ class CTHeader extends CTCNC
                 DBEHeader::sevenDayerRedDays . 'Message'                             => $dsHeader->getMessage(
                     DBEHeader::sevenDayerRedDays
                 ),
+                DBEHeader::office365MailboxYellowWarningThreshold                    => $dsHeader->getValue(
+                    DBEHeader::office365MailboxYellowWarningThreshold
+                ),
+                DBEHeader::office365MailboxYellowWarningThreshold . 'Message'        => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEHeader::office365MailboxYellowWarningThreshold)
+                ),
+                DBEHeader::office365MailboxRedWarningThreshold                    => $dsHeader->getValue(
+                    DBEHeader::office365MailboxRedWarningThreshold
+                ),
+                DBEHeader::office365MailboxRedWarningThreshold . 'Message'        => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEHeader::office365MailboxRedWarningThreshold)
+                ),
+
                 'urlItemPopup'                                                       => $urlItemPopup,
                 'urlUpdate'                                                          => $urlUpdate
             )

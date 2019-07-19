@@ -56,4 +56,20 @@ class DBEPortalCustomerDocument extends DBEPortalCustomerDocumentWithoutFile
         $this->fetchFirst();
         $this->resetQueryString();
     }
+
+    public function getCurrentOffice365Licenses($customerID)
+    {
+        $queryString = "select " . $this->getDBColumnNamesAsString(
+            ) . " from " . $this->tableName . " where " . $this->getDBColumnName(
+                self::customerID
+            ) . " = $customerID and " . $this->getDBColumnName(
+                self::filename
+            ) . " = 'O365 Licenses.xlsx' limit 1";
+        $this->queryString = $queryString;
+
+        $this->getRows();
+        $this->fetchFirst();
+        $this->resetQueryString();
+    }
+
 }
