@@ -142,7 +142,7 @@ $FCKEditor->Value = $file;
         to <?php echo $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(
                 DBEContact::lastName
             ) ?></h1>
-    <h2><?php echo stripslashes($_REQUEST['contactName']) ?></h2>
+    <h2><?php echo isset($_REQUEST['contactName']) ? stripslashes($_REQUEST['contactName']) : null ?></h2>
     <!--suppress HtmlDeprecatedAttribute -->
     <table width="800"
            border="0"

@@ -814,6 +814,26 @@ class PEAR_Error
     var $backtrace = null;
 
     /**
+     * Behaves like trigger_error, but appends part of a stack trace to the error
+     * message. This allows you to see where trigger_error was called from, instead
+     * of just seeing the file and line number of the call to trigger_error.
+     *
+     * @param string error_msg   The designated error message for this error
+     * @param string  error_type  The designated error type for this error (E_USER_*)
+     * @param int context     Number of stack frames to append, defaults to 1
+     * @return  FALSE if wrong error_type is specified, TRUE otherwise
+     */
+    function trigger_error_with_context($error_msg, $error_type, $context = 1)
+    {
+        try {
+            throw new Exception($error_msg);
+        } catch (\Exception $exception) {
+            $error_msg .= " stack: " . $exception->getTraceAsString();
+        }
+        return trigger_error($error_msg, $error_type);
+    }
+
+    /**
      * PEAR_Error constructor
      *
      * @param string $message message
@@ -884,7 +904,7 @@ class PEAR_Error
         }
 
         if ($this->mode & PEAR_ERROR_TRIGGER) {
-            trigger_error($this->getMessage(), $this->level);
+            $this->trigger_error_with_context($this->getMessage(), $this->level);
         }
 
         if ($this->mode & PEAR_ERROR_DIE) {
