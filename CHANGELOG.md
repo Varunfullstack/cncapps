@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 601 - Storing Local PC CNC Admin Passwords
 - Issue 597 - Allocate time from SD Manager Dashboard
 - Issue 520 - Office 365 login and scripting
+- Issue 598 - Sales Order quote sending enhancements
 ### Changed
 - Issue 596 - Email import formatting improvements
 - Issue 603 - Include Site on SR History Popup
