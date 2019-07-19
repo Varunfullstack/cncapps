@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 596 - Email import formatting improvements
 ### Fixed
 - Issue 604 - Contact Validation doesn't run on scheduled task
+- Issue 591 - URL too long with To Be Logged
 
 ## [v3.2.1] - 2019-07-01
 ### Fixed

@@ -31,6 +31,26 @@ TD, INPUT, SELECT, TEXTAREA {
     padding: 2px;
 }
 
+.fakeLink {
+    background: none;
+    border: none;
+    color: blue;
+    cursor: pointer;
+    outline: none;
+}
+
+.fakeLink.mainSupportContact {
+    color: red;
+}
+
+.fakeLink:hover {
+    text-decoration: underline;
+}
+
+.fakeLink:active {
+    color: red;
+}
+
 .redText {
     color: red;
 }
