@@ -461,7 +461,7 @@ function raiseCustomerLeaverWithLicenseSR(DBECustomer $dbeCustomer, $userName)
         'N'
     );
 
-    $details = "<p>User $userName is marked as leaver but still has a license assigned to it, please review and correct.</p>";
+    $details = "<p>User $userName is marked as leaver but still has an Office 365 license assigned to it, please review and correct.</p>";
 
     $dbeCallActivity->setValue(
         DBEJCallActivity::reason,
