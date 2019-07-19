@@ -361,9 +361,9 @@ class CTPassword extends CTCNC
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $passwordForm = $this->getParam('password')[1];
-
             $passwordForm['encrypted'] = 1;
             $passwordID = $passwordForm['passwordID'];
+
             if ($passwordID) {
                 $dbePassword->getRow($passwordID);
                 $previousPassword = $dbePassword->getValue(DBEPassword::password);

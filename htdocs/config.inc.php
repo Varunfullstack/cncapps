@@ -13,22 +13,27 @@ function escape_win32_argv(string $value): string
     }
 
     $quote = false;
-    $replacer = function($match) use($value, &$quote) {
+    $replacer = function ($match) use ($value, &$quote) {
         switch ($match[0][0]) { // only inspect the first byte of the match
 
             case '"': // double quotes are escaped and must be quoted
                 $match[0] = '\\"';
-            case ' ': case "\t": // spaces and tabs are ok but must be quoted
-            $quote = true;
-            return $match[0];
+            case ' ':
+            case "\t": // spaces and tabs are ok but must be quoted
+                $quote = true;
+                return $match[0];
 
             case '\\': // matching backslashes are escaped if quoted
                 return $match[0] . $match[0];
 
-            default: throw new InvalidArgumentException(sprintf(
-                                                            "Invalid byte at offset %d: 0x%02X",
-                                                            strpos($value, $match[0]), ord($match[0])
-                                                        ));
+            default:
+                throw new InvalidArgumentException(
+                    sprintf(
+                        "Invalid byte at offset %d: 0x%02X",
+                        strpos($value, $match[0]),
+                        ord($match[0])
+                    )
+                );
         }
     };
 
@@ -54,7 +59,7 @@ function escape_win32_cmd(string $value): string
 /** Like shell_exec() but bypass cmd.exe */
 function noshell_exec(string $command): string
 {
-    static $descriptors = [['pipe', 'r'],['pipe', 'w'],['pipe', 'w']],
+    static $descriptors = [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']],
     $options = ['bypass_shell' => true];
 
     if (!$proc = proc_open($command, $descriptors, $pipes, null, null, $options)) {
@@ -475,7 +480,6 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
     $server_type = getEnvironmentByPath();
     $GLOBALS['isRunningFromCommandLine'] = true;
 }
-
 function cli_echo($string, $color = null)
 {
     $restoreColor = "\e[0m";

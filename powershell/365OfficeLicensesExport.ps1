@@ -14,10 +14,9 @@ try
     {
         throw "Failed to connect to MSOLService:$PSItem"
     }
-    $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $Credentials -Authentication Basic -AllowRedirection
+    $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $Credentials -Authentication Basic -AllowRedirection -ErrorAction Stop
     if (!$Session)
     {
-        write-host $Session.GetType()
         throw "No session"
     }
     Import-PSSession $Session -DisableNameChecking | Out-Null
@@ -46,7 +45,7 @@ try
     [array]$Report = $Report | Sort-Object TotalItemSize -Descending
     Get-PSSession | Remove-PSSession
     Remove-TypeData System.Array
-    if (-Not$Report)
+    if (-Not $Report)
     {
         Write-Host "{}"
         exit

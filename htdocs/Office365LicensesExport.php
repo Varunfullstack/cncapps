@@ -103,7 +103,6 @@ do {
     $userName = $buPassword->decrypt($dbePassword->getValue(DBEPassword::username));
     $password = $buPassword->decrypt($dbePassword->getValue(DBEPassword::password));
     $path = POWERSHELL_DIR . "/365OfficeLicensesExport.ps1";
-
     $cmdParts = [
         "powershell.exe",
         "-executionpolicy",
@@ -168,13 +167,14 @@ do {
             if ($licenseValue && strpos(
                     strtolower($datum['DisplayName']),
                     'leaver'
-                ) != false && $datum['RecipientTypeDetails'] == 'SharedMailbox') {
+                ) !== false && $datum['RecipientTypeDetails'] == 'SharedMailbox') {
+                cli_echo('Raising a Customer Leaver with License SR', 'warning');
                 raiseCustomerLeaverWithLicenseSR($dbeCustomer, $datum['DisplayName']);
             }
 
             foreach ($datum['Licenses'] as $license) {
                 $dbeOffice365Licenses->getRowForLicense($license);
-                if ($dbeOffice365Licenses->rowCount) {
+                if ($dbeOffice365Licenses->rowCount()) {
                     $licenseValue = str_replace(
                         $license,
                         $dbeOffice365Licenses->getValue(DBEOffice365License::replacement),
@@ -184,6 +184,7 @@ do {
                         $mailboxLimit = $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit);
                     }
                 } else {
+                    cli_echo('Raising a License not found SR', 'warning');
                     raiseCNCRequest($license, $dbeCustomer, $datum['DisplayName']);
                 }
             }
@@ -627,10 +628,10 @@ function createFailedSR(DBECustomer $dbeCustomer, $errorMsg, $stackTrace = null,
 
 function raiseCNCRequest($license, DBECustomer $dbeCustomer, $licenseUser)
 {
-    $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
+    $customerID = 282;
     $buActivity = new BUActivity($thing);
     $buCustomer = new BUCustomer($thing);
-    $primaryContact = $buCustomer->getPrimaryContact(282);
+    $primaryContact = $buCustomer->getPrimaryContact($customerID);
     $buHeader = new BUHeader($thing);
     $dsHeader = new DataSet($thing);
     $buHeader->getHeader($dsHeader);
@@ -638,7 +639,7 @@ function raiseCNCRequest($license, DBECustomer $dbeCustomer, $licenseUser)
 
     $slaResponseHours = $buActivity->getSlaResponseHours(
         4,
-        282,
+        $customerID,
         $primaryContact->getValue(DBEContact::contactID)
     );
 
