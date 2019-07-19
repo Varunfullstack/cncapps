@@ -116,7 +116,7 @@ class DBEProblem extends DBEntity
         );
         $this->addColumn(
             self::fixedDate,
-            DA_DATE,
+            DA_DATETIME,
             DA_ALLOW_NULL,
             "pro_fixed_date"
         );

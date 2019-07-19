@@ -17,6 +17,7 @@ This project changes will be shown here.
 - Issue 595 - Stuck email enhancements
 - Issue 608 - Starters And Leavers Report Enhancements
 - Issue 590 - PO Status Report v8
+- Issue 610 - Service requests fixed yesterday Negative Duration
 
 ## [v3.2.1] - 2019-07-01
 ### Fixed
