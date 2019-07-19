@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 601 - Storing Local PC CNC Admin Passwords
+- Issue 597 - Allocate time from SD Manager Dashboard
 ### Changed
 - Issue 596 - Email import formatting improvements
 - Issue 603 - Include Site on SR History Popup
