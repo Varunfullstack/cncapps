@@ -494,6 +494,7 @@ class Controller extends BaseObject
      */
     function defaultAction()
     {
+
     }
 
     /**
@@ -542,7 +543,6 @@ class Controller extends BaseObject
                 $this->defaultAction();
                 break;
         }
-        //$this->pageClose();
     }
 
     /**

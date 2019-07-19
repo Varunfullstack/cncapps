@@ -20,6 +20,8 @@ class BUItemsNotYetReceived extends Business
   customer.`cus_name` as customerName,
   item.`itm_desc` as itemDescription,
   supplier.`sup_name` as supplierName,
+       itm_itemno as itemId,
+       pol_lineno as lineSequenceNumber,
   IF(
     poh_direct_del = 'N',
     'CNC',
@@ -44,6 +46,8 @@ class BUItemsNotYetReceived extends Business
     pol_qty_ord <> pol_qty_rec as hasNotBeenReceivedYet,
     pol_qty_ord AS orderedQuantity,
     ordhead.odh_ordno as salesOrderID,
+    pol_exp_date as expectedOn,
+    pol_cost as cost,
     project.projectID,
     poh_required_by > (now() - INTERVAL 1 week ) as isRequiredAtLeastAWeekAgo,
     minServiceRequest.`pro_problemno` as serviceRequestID
@@ -62,10 +66,7 @@ FROM
     left join (select problem.pro_linked_ordno, min(problem.pro_problemno) as pro_problemno from problem group by problem.pro_linked_ordno) minServiceRequest on minServiceRequest.pro_linked_ordno = porhead.poh_ordno
   left join project 
     on project.ordHeadID = ordhead.odh_ordno
-WHERE poh_required_by is not null
-AND item.itm_desc NOT LIKE '%labour%'
-AND item.itm_desc NOT LIKE '%Office 365%'
-  AND item.itm_desc NOT LIKE '%carriage%'
+WHERE poh_required_by is not null and item.excludeFromPOCompletion = 'N'
 AND customer.cus_name <> 'CNC Operating Stock'
 and (porline.pol_cost > 0 or porline.pol_cost < 0)
   ORDER BY poh_required_by ASC, ordhead.`odh_custno` DESC, pol_porno ASC, `pol_lineno` ASC

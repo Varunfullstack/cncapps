@@ -18,8 +18,7 @@
                 var qtyOS = qtyOSElements[index];
                 if (qtySetZero && !qtyToReceive.disabled) {
                     qtyToReceive.value = qtyOS.value;
-                }
-                else {
+                } else {
                     qtyToReceive.value = 0;
                 }
             });
@@ -234,11 +233,10 @@
         </tr>
         <!-- END orderLineBlock -->
         <tr>
-            <td colspan="5"><input type="button"
-                                   name="Submit"
-                                   value="Receive"
-                                   onClick="submit();"
-            >
+            <td colspan="5">
+                <input type="submit"
+                       value="Receive"
+                >
             </td>
         </tr>
     </table>

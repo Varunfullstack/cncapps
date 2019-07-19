@@ -16,6 +16,7 @@ This project changes will be shown here.
 - Issue 591 - URL too long with To Be Logged
 - Issue 595 - Stuck email enhancements
 - Issue 608 - Starters And Leavers Report Enhancements
+- Issue 590 - PO Status Report v8
 
 ## [v3.2.1] - 2019-07-01
 ### Fixed

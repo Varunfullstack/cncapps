@@ -8441,7 +8441,6 @@ is currently a balance of ';
      */
     public function createPurchaseOrderCompletedSalesActivity($problemID)
     {
-
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($problemID);
 

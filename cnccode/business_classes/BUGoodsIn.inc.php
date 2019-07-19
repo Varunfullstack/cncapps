@@ -666,6 +666,8 @@ class BUGoodsIn extends Business
         $this->dbePorhead = new DBEPorhead($this);
         $buPurchaseOrder = new BUPurchaseOrder($this);
         $dsPorhead = new DataSet($this);
+
+
         $buPurchaseOrder->getHeaderByID(
             $porheadID,
             $dsPorhead
@@ -675,12 +677,16 @@ class BUGoodsIn extends Business
             $dsPorhead->getValue(DBEJPorhead::ordheadID),
             $this->dsOrdhead
         );
+
+        if (in_array($dsPorhead->getValue(DBEPorhead::type), ['C', 'A'])) {
+            return;
+        }
         /*
         If the supplier is an internal stock location call appropriate method with stock customerID otherwise
         use non-stock method.
         */
         if (
-            ($dsPorhead->getValue(DBEJPorhead::supplierID) == CONFIG_SALES_STOCK_SUPPLIERID) OR
+            ($dsPorhead->getValue(DBEJPorhead::supplierID) == CONFIG_SALES_STOCK_SUPPLIERID) ||
             ($dsPorhead->getValue(DBEJPorhead::supplierID) == CONFIG_MAINT_STOCK_SUPPLIERID)
         ) {
             $this->receiveFromStock(
@@ -805,7 +811,11 @@ class BUGoodsIn extends Business
                 DBEJPorline::porheadID,
                 $porheadID
             );
-            if (($dbePorline->countOutstandingRows() == 0)) {
+
+            $dbeJPorline = new DBEJPorline($this);
+            $dbeJPorline->setValue(DBEJPorline::porheadID, $porheadID);
+
+            if (($dbeJPorline->countOutstandingRows() == 0)) {
                 if ($dsPorhead->getValue(DBEPorhead::completionNotifiedFlag) != 'Y') {
                     $this->buSalesOrder->notifyPurchaseOrderCompletion($this->dbePorhead);
                 }
@@ -995,7 +1005,11 @@ class BUGoodsIn extends Business
                 DBEJPorline::porheadID,
                 $porheadID
             );
-            if (($dbePorline->countOutstandingRows() == 0)) {
+
+            $dbeJPorline = new DBEJPorline($this);
+            $dbeJPorline->setValue(DBEJPorline::porheadID, $porheadID);
+
+            if (($dbeJPorline->countOutstandingRows() == 0)) {
                 if ($dsPorhead->getValue(DBEPorhead::completionNotifiedFlag) != 'Y') {
                     $this->buSalesOrder->notifyPurchaseOrderCompletion($this->dbePorhead);
                 }
