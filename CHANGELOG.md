@@ -6,6 +6,8 @@ This project changes will be shown here.
 - Issue 601 - Storing Local PC CNC Admin Passwords
 ### Changed
 - Issue 596 - Email import formatting improvements
+### Fixed
+- Issue 604 - Contact Validation doesn't run on scheduled task
 
 ## [v3.2.1] - 2019-07-01
 ### Fixed
