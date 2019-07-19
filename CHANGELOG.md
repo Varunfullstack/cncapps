@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 603 - Include Site on SR History Popup
 - Issue 600 - Change Request reminders
 - Issue 609 - 7 dayer formatting improvements
+- Issue 607 - Customer Review Meeting Enhancements
 ### Fixed
 - Issue 604 - Contact Validation doesn't run on scheduled task
 - Issue 591 - URL too long with To Be Logged
