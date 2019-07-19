@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v3.3.0] - 
 ### Added
 - Issue 601 - Storing Local PC CNC Admin Passwords
 - Issue 597 - Allocate time from SD Manager Dashboard
