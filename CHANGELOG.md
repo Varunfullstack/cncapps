@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 601 - Storing Local PC CNC Admin Passwords
+### Changed
+- Issue 596 - Email import formatting improvements
 
 ## [v3.2.1] - 2019-07-01
 ### Fixed
