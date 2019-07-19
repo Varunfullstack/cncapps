@@ -2178,6 +2178,11 @@ class CTSalesOrder extends CTCNC
                                 );
                             $txtDelete = CTSALESORDER_TXT_DELETE;
                             $txtSendQuote = CTSALESORDER_TXT_SEND;
+                            if ($this->dsQuotation->getValue(DBEQuotation::documentType) == 'manualUpload') {
+                                $txtSendQuote = 'Flag as sent';
+                            }
+
+
                             $quoteSentDateTime = 'Not sent';
                         } else {
                             if ($this->dsQuotation->getValue(
@@ -3150,7 +3155,7 @@ class CTSalesOrder extends CTCNC
         );
         $this->dsQuotation->setValue(
             DBEQuotation::documentType,
-            'quotation'
+            'manualUpload'
         );
         $this->dsQuotation->post();
         $this->buSalesOrder->insertQuotation($this->dsQuotation);
@@ -3699,7 +3704,7 @@ class CTSalesOrder extends CTCNC
         $this->dsQuotation->fetchNext();
         $updateDB = TRUE;
         // if this is a PDF file then send an email to the customer else simply st the sent date.
-        if ($this->dsQuotation->getValue(DBEQuotation::fileExtension) == 'pdf') {
+        if ($this->dsQuotation->getValue(DBEQuotation::documentType) == 'quotation') {
             $buPDFSalesQuote = new BUPDFSalesQuote($this);
             $updateDB = $buPDFSalesQuote->sendPDFEmailQuote($this->getQuotationID());
         }
