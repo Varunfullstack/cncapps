@@ -9,6 +9,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 604 - Contact Validation doesn't run on scheduled task
 - Issue 591 - URL too long with To Be Logged
+- Issue 595 - Stuck email enhancements
 
 ## [v3.2.1] - 2019-07-01
 ### Fixed
