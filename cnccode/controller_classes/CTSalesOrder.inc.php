@@ -2200,7 +2200,8 @@ class CTSalesOrder extends CTCNC
 
                         }
                     }
-
+                    $documentType = $this->dsQuotation->getValue(DBEQuotation::documentType);
+                    $documentType = $documentType == 'manualUpload' ? 'Manual Upload' : $documentType;
 
                     $this->template->set_var(
                         array(
@@ -2212,7 +2213,7 @@ class CTSalesOrder extends CTCNC
                             'quoteVersionNo'     => $this->dsQuotation->getValue(DBEQuotation::versionNo),
                             'quoteSentDateTime'  => $quoteSentDateTime,
                             'quoteUserName'      => $this->dsQuotation->getValue(DBEJQuotation::userName),
-                            'documentType'       => $this->dsQuotation->getValue(DBEQuotation::documentType),
+                            'documentType'       => $documentType,
                             "txtReminder"        => $txtReminder,
                             'quotationID'        => $this->dsQuotation->getValue(DBEQuotation::quotationID)
                         )
