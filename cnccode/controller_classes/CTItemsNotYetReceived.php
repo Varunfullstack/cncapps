@@ -127,7 +127,7 @@ class CTItemsNotYetReceived extends CTCNC
 
             $expectedDate = $this->getDateOrNA($item->getExpectedOn());
             $purchaseOrderLineLink = null;
-            if ($expectedDate) {
+            if ($expectedDate && $item->color() != 'red') {
                 $purchaseOrderLineURL =
                     Controller::buildLink(
                         "PurchaseOrder.php",

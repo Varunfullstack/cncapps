@@ -476,7 +476,6 @@ $GLOBALS['php7'] = true;
 $php7 = true;
 
 
-
 if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line calls
     switch ($_SERVER['HTTP_HOST']) {
 
@@ -512,6 +511,7 @@ define(
     "DB_HOST",
     "localhost"
 );
+
 switch ($server_type) {
 
     case MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT:
@@ -944,6 +944,10 @@ define(
 define(
     "APPLICATION_DIR",
     BASE_DRIVE . "/cnccode"
+);
+define(
+    'APPLICATION_LOGS',
+    BASE_DRIVE . '/logs'
 );
 
 define(
