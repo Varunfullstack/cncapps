@@ -39,7 +39,7 @@
         <sql>
             insert into office365License
             values (1, "Advanced Threat Protection", "ATP_ENTERPRISE", 51200),
-                   (2, "Enterprise E3", "ENTERPRISEPACK", 51200),
+                   (2, "Enterprise E3", "ENTERPRISEPACK", 102400),
                    (3, "Enterprise E1", "EXCHANGESTANDARD", 51200),
                    (4, "Business Essentials", "O365_BUSINESS_ESSENTIALS", 51200),
                    (5, "Business Premium", "O365_BUSINESS_PREMIUM", 51200),
@@ -55,7 +55,7 @@
                    (15, "Dynamics 365 P1 Trial for Information Workers", "DYN365_ENTERPRISE_P1_IW", 51200),
                    (16, "MS Project Professional", "PROJECTPROFESSIONAL", 51200),
                    (17, "Office 365 ProPlus", "OFFICESUBSCRIPTION", 51200),
-                   (18, "Exchange Archiving Online", "EXCHANGEENTERPRISE", 51200),
+                   (18, "Exchange Archiving Online", "EXCHANGEENTERPRISE", 102400),
                    (19, "MS Teams", "TEAMS_COMMERCIAL_TRIAL", 51200),
                    (20, "MS Teams", "MS_TEAMS_IW", 51200),
                    (21, "Office 365 ProPlus for students", "OFFICESUBSCRIPTION_STUDENT", 51200),
