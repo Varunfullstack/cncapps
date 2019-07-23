@@ -2178,6 +2178,11 @@ class CTSalesOrder extends CTCNC
                                 );
                             $txtDelete = CTSALESORDER_TXT_DELETE;
                             $txtSendQuote = CTSALESORDER_TXT_SEND;
+                            if ($this->dsQuotation->getValue(DBEQuotation::documentType) == 'manualUpload') {
+                                $txtSendQuote = 'Flag as sent';
+                            }
+
+
                             $quoteSentDateTime = 'Not sent';
                         } else {
                             if ($this->dsQuotation->getValue(
@@ -2195,7 +2200,8 @@ class CTSalesOrder extends CTCNC
 
                         }
                     }
-
+                    $documentType = $this->dsQuotation->getValue(DBEQuotation::documentType);
+                    $documentType = $documentType == 'manualUpload' ? 'Manual Upload' : $documentType;
 
                     $this->template->set_var(
                         array(
@@ -2207,7 +2213,7 @@ class CTSalesOrder extends CTCNC
                             'quoteVersionNo'     => $this->dsQuotation->getValue(DBEQuotation::versionNo),
                             'quoteSentDateTime'  => $quoteSentDateTime,
                             'quoteUserName'      => $this->dsQuotation->getValue(DBEJQuotation::userName),
-                            'documentType'       => $this->dsQuotation->getValue(DBEQuotation::documentType),
+                            'documentType'       => $documentType,
                             "txtReminder"        => $txtReminder,
                             'quotationID'        => $this->dsQuotation->getValue(DBEQuotation::quotationID)
                         )
@@ -3150,7 +3156,7 @@ class CTSalesOrder extends CTCNC
         );
         $this->dsQuotation->setValue(
             DBEQuotation::documentType,
-            'quotation'
+            'manualUpload'
         );
         $this->dsQuotation->post();
         $this->buSalesOrder->insertQuotation($this->dsQuotation);
@@ -3699,7 +3705,7 @@ class CTSalesOrder extends CTCNC
         $this->dsQuotation->fetchNext();
         $updateDB = TRUE;
         // if this is a PDF file then send an email to the customer else simply st the sent date.
-        if ($this->dsQuotation->getValue(DBEQuotation::fileExtension) == 'pdf') {
+        if ($this->dsQuotation->getValue(DBEQuotation::documentType) == 'quotation') {
             $buPDFSalesQuote = new BUPDFSalesQuote($this);
             $updateDB = $buPDFSalesQuote->sendPDFEmailQuote($this->getQuotationID());
         }
@@ -4240,12 +4246,14 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError(CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL);
             return;
         }
+
+
         $this->buSalesOrder->updateHeader(
             $this->getOrdheadID(),
             $this->getParam('form')['custPORef'],
             $this->getParam('form')['paymentTermsID'],
-            $this->getParam('form')['partInvoice'] == 'Y' ? 'Y' : 'N',
-            $this->getParam('form')['addItem'] == 'Y' ? 'Y' : 'N'
+            isset($this->getParam('form')['partInvoice']) ? 'Y' : 'N',
+            isset($this->getParam('form')['addItem']) == 'Y' ? 'Y' : 'N'
         );
         header('Location: ' . $this->getDisplayOrderURL());
         exit;

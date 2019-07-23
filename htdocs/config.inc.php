@@ -1,5 +1,149 @@
 <?php
 
+function is_cli()
+{
+    if (defined('STDIN')) {
+        return true;
+    }
+
+    if (empty($_SERVER['REMOTE_ADDR']) and !isset($_SERVER['HTTP_USER_AGENT']) and count($_SERVER['argv']) > 0) {
+        return true;
+    }
+
+    return false;
+}
+
+function cli_echo($string, $color = null)
+{
+    $restoreColor = "\e[0m";
+    $applyColorCode = null;
+    switch ($color) {
+        case "error":
+            $applyColorCode = "\e[31m";
+            break;
+        case "success":
+            $applyColorCode = "\e[32m";
+            break;
+        case 'info':
+            $applyColorCode = "\e[36m";
+            break;
+        case 'warning':
+            $applyColorCode = "\e[33m";
+    }
+
+    if ($applyColorCode) {
+        $string = $applyColorCode . $string . $restoreColor;
+    }
+    echo $string . PHP_EOL;
+}
+
+function getEnvironmentByPath()
+{
+
+    if (strpos(__DIR__, 'cncapps') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cncapps';
+        return MAIN_CONFIG_SERVER_TYPE_LIVE;
+    }
+
+    if (strpos(__DIR__, 'cncdev7') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cncdev';
+        return MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
+    }
+
+    if (strpos(__DIR__, 'cnctest') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cnctest';
+        return MAIN_CONFIG_SERVER_TYPE_TEST;
+    }
+
+    if (strpos(__DIR__, 'cncweb') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cncweb';
+        return MAIN_CONFIG_SERVER_TYPE_WEBSITE;
+    }
+
+    if (strpos(__DIR__, 'cncdesign') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cncdesign';
+        return MAIN_CONFIG_SERVER_TYPE_DESIGN;
+    }
+
+    return MAIN_CONFIG_SERVER_TYPE_LIVE;
+}
+
+
+function escape_win32_argv(string $value): string
+{
+    static $expr = '( 
+        [\x00-\x20\x7F"] # control chars, whitespace or double quote 
+      | \\\\++ (?=("|$)) # backslashes followed by a quote or at the end 
+    )ux';
+
+    if ($value === '') {
+        return '""';
+    }
+
+    $quote = false;
+    $replacer = function ($match) use ($value, &$quote) {
+        switch ($match[0][0]) { // only inspect the first byte of the match
+
+            case '"': // double quotes are escaped and must be quoted
+                $match[0] = '\\"';
+            case ' ':
+            case "\t": // spaces and tabs are ok but must be quoted
+                $quote = true;
+                return $match[0];
+
+            case '\\': // matching backslashes are escaped if quoted
+                return $match[0] . $match[0];
+
+            default:
+                throw new InvalidArgumentException(
+                    sprintf(
+                        "Invalid byte at offset %d: 0x%02X",
+                        strpos($value, $match[0]),
+                        ord($match[0])
+                    )
+                );
+        }
+    };
+
+    $escaped = preg_replace_callback($expr, $replacer, (string)$value);
+
+    if ($escaped === null) {
+        throw preg_last_error() === PREG_BAD_UTF8_ERROR
+            ? new InvalidArgumentException("Invalid UTF-8 string")
+            : new Error("PCRE error: " . preg_last_error());
+    }
+
+    return $quote // only quote when needed
+        ? '"' . $escaped . '"'
+        : $value;
+}
+
+/** Escape cmd.exe metacharacters with ^ */
+function escape_win32_cmd(string $value): string
+{
+    return preg_replace('([()%!^"<>&|])', '^$0', $value);
+}
+
+/** Like shell_exec() but bypass cmd.exe */
+function noshell_exec(string $command): string
+{
+    static $descriptors = [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']],
+    $options = ['bypass_shell' => true];
+
+    if (!$proc = proc_open($command, $descriptors, $pipes, null, null, $options)) {
+        throw new \Error('Creating child process failed');
+    }
+
+    fclose($pipes[0]);
+    $result = stream_get_contents($pipes[1]);
+    fclose($pipes[1]);
+    stream_get_contents($pipes[2]);
+    fclose($pipes[2]);
+    proc_close($proc);
+
+    return $result;
+}
+
 function money_format($format, $number)
 {
     $regex = '/%((?:[\^!\-]|\+|\(|\=.)*)([0-9]+)?' .
@@ -227,6 +371,7 @@ if (get_magic_quotes_gpc()) {
 /*
 End Strip all slashes from request variables (includes cookies)
 */
+
 /**
  * @param $value
  * @return array|string
@@ -330,6 +475,7 @@ $onPavilionWebServer = false;
 $GLOBALS['php7'] = true;
 $php7 = true;
 
+
 if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line calls
     switch ($_SERVER['HTTP_HOST']) {
 
@@ -348,19 +494,14 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
             break;
         case 'cncdesign:89':
             $server_type = MAIN_CONFIG_SERVER_TYPE_DESIGN;
-
     }
 
     $GLOBALS['isRunningFromCommandLine'] = false;
 
 } else {                // command line call so assume live and force HTTP_HOST value
-    $script_path = strtolower($argv[0]);
-
-    $server_type = MAIN_CONFIG_SERVER_TYPE_LIVE;
+    $server_type = getEnvironmentByPath();
     $GLOBALS['isRunningFromCommandLine'] = true;
-    $_SERVER['HTTP_HOST'] = 'cncapps';
 }
-
 
 define(
     'CONFIG_PUBLIC_DOMAIN',
@@ -370,6 +511,7 @@ define(
     "DB_HOST",
     "localhost"
 );
+
 switch ($server_type) {
 
     case MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT:
@@ -802,6 +944,15 @@ define(
 define(
     "APPLICATION_DIR",
     BASE_DRIVE . "/cnccode"
+);
+define(
+    'APPLICATION_LOGS',
+    BASE_DRIVE . '/logs'
+);
+
+define(
+    "POWERSHELL_DIR",
+    BASE_DRIVE . "/powershell"
 );
 
 define(

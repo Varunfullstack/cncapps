@@ -183,26 +183,29 @@ class CTItem extends CTCNC
             // This template runs a javascript function NOT inside HTML and so must use stripslashes()
             $this->template->set_var(
                 array(
-                    'submitDescription' => addslashes($dsItem->getValue(DBEItem::description)),
+                    'submitDescription'       => addslashes($dsItem->getValue(DBEItem::description)),
                     // for javascript
-                    'itemID'            => $dsItem->getValue(DBEItem::itemID),
-                    'curUnitCost'       => number_format(
+                    'itemID'                  => $dsItem->getValue(DBEItem::itemID),
+                    'curUnitCost'             => number_format(
                         $dsItem->getValue(DBEItem::curUnitCost),
                         2,
                         '.',
                         ''
                     ),
-                    'curUnitSale'       => number_format(
+                    'curUnitSale'             => number_format(
                         $dsItem->getValue(DBEItem::curUnitSale),
                         2,
                         '.',
                         ''
                     ),
-                    'qtyOrdered'        => $dsItem->getValue(DBEItem::salesStockQty),
+                    'qtyOrdered'              => $dsItem->getValue(DBEItem::salesStockQty),
                     // to indicate number in stock
-                    'slaResponseHours'  => $dsItem->getValue(DBEItem::contractResponseTime),
-                    'partNo'            => $dsItem->getValue(DBEItem::partNo),
-                    'allowDirectDebit'  => $dsItem->getValue(DBEItem::allowDirectDebit) == 'Y' ? 'true' : 'false'
+                    'slaResponseHours'        => $dsItem->getValue(DBEItem::contractResponseTime),
+                    'partNo'                  => $dsItem->getValue(DBEItem::partNo),
+                    'allowDirectDebit'        => $dsItem->getValue(DBEItem::allowDirectDebit) == 'Y' ? 'true' : 'false',
+                    'excludeFromPOCompletion' => $dsItem->getValue(
+                        DBEItem::excludeFromPOCompletion
+                    ) == 'Y' ? 'true' : 'false'
                 )
             );
         } else {
@@ -253,30 +256,35 @@ class CTItem extends CTCNC
                 while ($dsItem->fetchNext()) {
                     $this->template->set_var(
                         array(
-                            'itemDescription'   => Controller::htmlDisplayText($dsItem->getValue(DBEItem::description)),
+                            'itemDescription'         => Controller::htmlDisplayText(
+                                $dsItem->getValue(DBEItem::description)
+                            ),
                             // this complicated thing is to cope with Javascript quote problems!
-                            'submitDescription' => Controller::htmlInputText(
+                            'submitDescription'       => Controller::htmlInputText(
                                 addslashes($dsItem->getValue(DBEItem::description))
                             ),
-                            'itemID'            => $dsItem->getValue(DBEItem::itemID),
-                            'curUnitCost'       => number_format(
+                            'itemID'                  => $dsItem->getValue(DBEItem::itemID),
+                            'curUnitCost'             => number_format(
                                 $dsItem->getValue(DBEItem::curUnitCost),
                                 2,
                                 '.',
                                 ''
                             ),
-                            'curUnitSale'       => number_format(
+                            'curUnitSale'             => number_format(
                                 $dsItem->getValue(DBEItem::curUnitSale),
                                 2,
                                 '.',
                                 ''
                             ),
-                            'qtyOrdered'        => $dsItem->getValue(DBEItem::salesStockQty),
+                            'qtyOrdered'              => $dsItem->getValue(DBEItem::salesStockQty),
                             // to indicate number in stock
-                            'partNo'            => $dsItem->getValue(DBEItem::partNo),
-                            'slaResponseHours'  => $dsItem->getValue(DBEItem::contractResponseTime),
-                            'allowDirectDebit'  => $dsItem->getValue(
+                            'partNo'                  => $dsItem->getValue(DBEItem::partNo),
+                            'slaResponseHours'        => $dsItem->getValue(DBEItem::contractResponseTime),
+                            'allowDirectDebit'        => $dsItem->getValue(
                                 DBEItem::allowDirectDebit
+                            ) == 'Y' ? 'true' : 'false',
+                            'excludeFromPOCompletion' => $dsItem->getValue(
+                                DBEItem::excludeFromPOCompletion
                             ) == 'Y' ? 'true' : 'false'
                         )
                     );
@@ -350,35 +358,50 @@ class CTItem extends CTCNC
         );
         $this->template->set_var(
             array(
-                'itemID'                  => $this->dsItem->getValue(DBEItem::itemID),
-                'description'             => Controller::htmlInputText($this->dsItem->getValue(DBEItem::description)),
-                'descriptionMessage'      => Controller::htmlDisplayText(
+                'itemID'                         => $this->dsItem->getValue(DBEItem::itemID),
+                'description'                    => Controller::htmlInputText(
+                    $this->dsItem->getValue(DBEItem::description)
+                ),
+                'descriptionMessage'             => Controller::htmlDisplayText(
                     $this->dsItem->getMessage(DBEItem::description)
                 ),
-                'curUnitSale'             => Controller::htmlInputText($this->dsItem->getValue(DBEItem::curUnitSale)),
-                'curUnitSaleMessage'      => Controller::htmlDisplayText(
+                'curUnitSale'                    => Controller::htmlInputText(
+                    $this->dsItem->getValue(DBEItem::curUnitSale)
+                ),
+                'curUnitSaleMessage'             => Controller::htmlDisplayText(
                     $this->dsItem->getMessage(DBEItem::curUnitSale)
                 ),
-                'curUnitCost'             => Controller::htmlInputText($this->dsItem->getValue(DBEItem::curUnitCost)),
-                'curUnitCostMessage'      => Controller::htmlDisplayText(
+                'curUnitCost'                    => Controller::htmlInputText(
+                    $this->dsItem->getValue(DBEItem::curUnitCost)
+                ),
+                'curUnitCostMessage'             => Controller::htmlDisplayText(
                     $this->dsItem->getMessage(DBEItem::curUnitCost)
                 ),
-                'discontinuedFlagChecked' => Controller::htmlChecked(
+                'discontinuedFlagChecked'        => Controller::htmlChecked(
                     $this->dsItem->getValue(DBEItem::discontinuedFlag)
                 ),
-                'servercareFlagChecked'   => Controller::htmlChecked($this->dsItem->getValue(DBEItem::servercareFlag)),
-                'serialNoFlagChecked'     => Controller::htmlChecked($this->dsItem->getValue(DBEItem::serialNoFlag)),
-                'partNo'                  => Controller::htmlInputText($this->dsItem->getValue(DBEItem::partNo)),
-                'notes'                   => Controller::htmlTextArea($this->dsItem->getValue(DBEItem::notes)),
-                'contractResponseTime'    => Controller::htmlInputText(
+                'servercareFlagChecked'          => Controller::htmlChecked(
+                    $this->dsItem->getValue(DBEItem::servercareFlag)
+                ),
+                'serialNoFlagChecked'            => Controller::htmlChecked(
+                    $this->dsItem->getValue(DBEItem::serialNoFlag)
+                ),
+                'partNo'                         => Controller::htmlInputText($this->dsItem->getValue(DBEItem::partNo)),
+                'notes'                          => Controller::htmlTextArea($this->dsItem->getValue(DBEItem::notes)),
+                'contractResponseTime'           => Controller::htmlInputText(
                     $this->dsItem->getValue(DBEItem::contractResponseTime)
                 ),
-                'urlManufacturerPopup'    => $urlManufacturerPopup,
-                'urlManufacturerEdit'     => $urlManufacturerEdit,
-                'manufacturerID'          => $this->dsItem->getValue(DBEItem::manufacturerID),
-                'manufacturerName'        => $manufacturerName,
-                'urlSubmit'               => $urlSubmit,
-                'allowDirectDebitChecked' => Controller::htmlChecked($this->dsItem->getValue(DBEItem::allowDirectDebit))
+                'urlManufacturerPopup'           => $urlManufacturerPopup,
+                'urlManufacturerEdit'            => $urlManufacturerEdit,
+                'manufacturerID'                 => $this->dsItem->getValue(DBEItem::manufacturerID),
+                'manufacturerName'               => $manufacturerName,
+                'urlSubmit'                      => $urlSubmit,
+                'allowDirectDebitChecked'        => Controller::htmlChecked(
+                    $this->dsItem->getValue(DBEItem::allowDirectDebit)
+                ),
+                'excludeFromPOCompletionChecked' => Controller::htmlChecked(
+                    $this->dsItem->getValue(DBEItem::excludeFromPOCompletion)
+                )
             )
         );
         $this->parseItemTypeSelector($this->dsItem->getValue(DBEItem::itemTypeID));

@@ -91,6 +91,8 @@ class CTCustomerReviewMeeting extends CTCNC
                     $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormEndYearMonth)
                 ))->modify('last day of this month');
 
+                $reportRangeDate = $startDate->format('F Y') . " to " . $endDate->format('F Y');
+
                 $customerId = $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID);
                 $buCustomer = new BUCustomer($this);
                 $buActivity = new BUActivity($this);
@@ -131,6 +133,7 @@ class CTCustomerReviewMeeting extends CTCNC
                     'CustomerReviewMeetingEditable.html'
                 );
 
+                $textTemplate->setVar('reportDate', $reportRangeDate);
 
                 $nonEditableTemplate->set_var(
                     array(
@@ -143,7 +146,8 @@ class CTCustomerReviewMeeting extends CTCNC
                         'slaP3'        => $dsCustomer->getValue(DBECustomer::slaP3),
                         'slaP4'        => $dsCustomer->getValue(DBECustomer::slaP4),
                         'slaP5'        => $dsCustomer->getValue(DBECustomer::slaP5),
-                        "waterMarkURL" => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png'
+                        "waterMarkURL" => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png',
+                        'reportDate'   => $reportRangeDate
                     )
                 );
 

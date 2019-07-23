@@ -7376,7 +7376,7 @@ is currently a balance of ';
             $record->getServerGuardFlag()
         );
 
-        $details = $record->getSubjectLine();
+        $details = $record->getSubjectLine()." ";
 
         if (!$forcedDetails) {
             $details .= $record->getTextBody();
@@ -8441,7 +8441,6 @@ is currently a balance of ';
      */
     public function createPurchaseOrderCompletedSalesActivity($problemID)
     {
-
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($problemID);
 

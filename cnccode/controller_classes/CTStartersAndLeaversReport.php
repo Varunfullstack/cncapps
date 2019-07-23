@@ -58,118 +58,33 @@ class CTStartersAndLeaversReport extends CTCNC
             } else {
                 set_time_limit(240);
                 $results = $buStartersAndLeaversReport->getReportData($dsSearchForm);
-
-                if ($this->getParam('Search') == 'Generate CSV') {
-
-                    $template = new Template ($cfg["path_templates"], "remove");
-
-                    $template->set_file('page', 'StartersAndLeaversReport.inc.csv');
-
-                    $template->set_block('page', 'contractsBlock', 'contracts');
-                    foreach ($results as $contractName => $row) {
-                        $template->set_var(
-                            array(
-                                'contract'    => $contractName,
-                                'sales'       => $row['sales'],
-                                'cost'        => $row['cost'],
-                                'labour'      => $row['labourCost'],
-                                'labourHours' => $row['labourHours'],
-                            )
-                        );
-                        $template->parse('contracts', 'contractsBlock', true);
-                    }
-                    $template->parse('output', 'page', true);
-
-                    $output = $template->get_var('output');
-
-                    Header('Content-type: text/plain');
-                    Header('Content-Disposition: attachment; filename=StartersAndLeaversReport.csv');
-                    echo $output;
-                    exit;
-                } else { // Screen Report
-                    $this->template->setVar(
+                $this->template->set_block(
+                    "StartersAndLeaversReport",
+                    "rowBlock",
+                    "rows"
+                );
+                foreach ($results as $row) {
+                    $this->template->set_var(
                         [
-                            "startersQuantity"           => number_format($results[0]['quantity']),
-                            "startersMaxDuration"        => number_format($results[0]['maxDuration'], 2),
-                            "startersAvgDuration"        => number_format($results[0]['avgDuration'], 2),
-                            "startersMinDuration"        => number_format($results[0]['minDuration'], 2),
-                            "startersTotalDuration"      => number_format($results[0]['totalDuration'], 2),
-                            "startersMaxOpenHours"       => number_format($results[0]['maxOpenHours'], 2),
-                            "startersAvgOpenHours"       => number_format($results[0]['avgOpenHours'], 2),
-                            "startersMinOpenHours"       => number_format($results[0]['minOpenHours'], 2),
-                            "startersAvgCost"            => utf8MoneyFormat(UK_MONEY_FORMAT, $results[0]['avgCost']),
-                            "startersTotalCost"          => utf8MoneyFormat(UK_MONEY_FORMAT, $results[0]['totalCost']),
-                            "startersAvgCustomerContact" => number_format($results[0]['avgCustomerContact'], 2),
-                            "startersAvgRemoteSupport"   => number_format($results[0]['avgRemoteSupport'], 2),
-                            "startersAvgActivities"      => number_format($results[0]['avgActivities'], 2),
-                            "leaversQuantity"            => number_format($results[1]['quantity']),
-                            "leaversMaxDuration"         => number_format($results[1]['maxDuration'], 2),
-                            "leaversAvgDuration"         => number_format($results[1]['avgDuration'], 2),
-                            "leaversMinDuration"         => number_format($results[1]['minDuration'], 2),
-                            "leaversTotalDuration"       => number_format($results[1]['totalDuration'], 2),
-                            "leaversMaxOpenHours"        => number_format($results[1]['maxOpenHours'], 2),
-                            "leaversAvgOpenHours"        => number_format($results[1]['avgOpenHours'], 2),
-                            "leaversMinOpenHours"        => number_format($results[1]['minOpenHours'], 2),
-                            "leaversAvgCost"             => utf8MoneyFormat(UK_MONEY_FORMAT, $results[1]['avgCost']),
-                            "leaversTotalCost"           => utf8MoneyFormat(UK_MONEY_FORMAT, $results[1]['totalCost']),
-                            "leaversAvgCustomerContact"  => number_format($results[1]['avgCustomerContact'], 2),
-                            "leaversAvgRemoteSupport"    => number_format($results[1]['avgRemoteSupport'], 2),
-                            "leaversAvgActivities"       => number_format($results[1]['avgActivities'], 2),
-                            "totalQuantity"              => number_format(
-                                $results[0]['quantity'] + $results[1]['quantity']
-                            ),
-                            "totalMaxDuration"           => number_format(
-                                $results[0]['maxDuration'] > $results[1]['maxDuration'] ? $results[0]['maxDuration'] : $results[1]['maxDuration'],
-                                2
-                            ),
-                            "totalAvgDuration"           => number_format(
-                                ($results[0]['avgDuration'] + $results[1]['avgDuration']) / 2,
-                                2
-                            ),
-                            "totalMinDuration"           => number_format(
-                                $results[0]['minDuration'] < $results[1]['minDuration'] ? $results[0]['minDuration'] : $results[1]['minDuration'],
-                                2
-                            ),
-                            "totalTotalDuration"         => number_format(
-                                $results[0]['totalDuration'] + $results[1]['totalDuration'],
-                                2
-                            ),
-                            "totalMaxOpenHours"          => number_format(
-                                $results[0]['maxOpenHours'] > $results[1]['maxOpenHours'] ? $results[0]['maxOpenHours'] : $results[1]['maxOpenHours'],
-                                2
-                            ),
-                            "totalAvgOpenHours"          => number_format(
-                                ($results[0]['avgOpenHours'] + $results[1]['avgOpenHours']) / 2,
-                                2
-                            ),
-                            "totalMinOpenHours"          => number_format(
-                                $results[0]['minOpenHours'] < $results[1]['minOpenHours'] ? $results[0]['minOpenHours'] : $results[1]['minOpenHours'],
-                                2
-                            ),
-                            "totalAvgCost"               => utf8MoneyFormat(
-                                UK_MONEY_FORMAT,
-                                ($results[0]['avgCost'] + $results[1]['avgCost']) / 2
-                            ),
-                            "totalTotalCost"             => utf8MoneyFormat(
-                                UK_MONEY_FORMAT,
-                                $results[0]['totalCost'] + $results[1]['totalCost']
-                            ),
-                            "totalAvgCustomerContact"    => number_format(
-                                ($results[0]['avgCustomerContact'] + $results[1]['avgCustomerContact']) / 2,
-                                2
-                            ),
-                            "totalAvgRemoteSupport"      => number_format(
-                                ($results[0]['avgRemoteSupport'] + $results[1]['avgRemoteSupport']) / 2,
-                                2
-                            ),
-                            "totalAvgActivities"         => number_format(
-                                ($results[0]['avgActivities'] + $results[1]['avgActivities']) / 2,
-                                2
-                            ),
+                            "customerName"       => $row['customerName'],
+                            "type"               => $row['type'],
+                            "quantity"           => number_format($row['quantity']),
+                            "maxDuration"        => number_format($row['maxDuration'], 2),
+                            "avgDuration"        => number_format($row['avgDuration'], 2),
+                            "minDuration"        => number_format($row['minDuration'], 2),
+                            "totalDuration"      => number_format($row['totalDuration'], 2),
+                            "maxOpenHours"       => number_format($row['maxOpenHours'], 2),
+                            "avgOpenHours"       => number_format($row['avgOpenHours'], 2),
+                            "minOpenHours"       => number_format($row['minOpenHours'], 2),
+                            "avgCost"            => utf8MoneyFormat(UK_MONEY_FORMAT, $row['avgCost']),
+                            "totalCost"          => utf8MoneyFormat(UK_MONEY_FORMAT, $row['totalCost']),
+                            "avgCustomerContact" => number_format($row['avgCustomerContact'], 2),
+                            "avgRemoteSupport"   => number_format($row['avgRemoteSupport'], 2),
+                            "avgActivities"      => number_format($row['avgActivities'], 2),
                         ]
                     );
+                    $this->template->parse('rows', "rowBlock", true);
                 }
-
             }
 
         }

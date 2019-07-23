@@ -179,6 +179,7 @@ class BUItem extends Business
             DBEItem::renewalTypeID,
             $renewalTypeID
         );
+
         $newDBEItem->post();
         return TRUE;
     }

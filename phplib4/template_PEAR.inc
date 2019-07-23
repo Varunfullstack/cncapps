@@ -133,10 +133,10 @@ class Template extends Template_PHPLIB
                 if (isset($m[1][0])) $this->setVar($handle, $m[1][0]);
         */
         $value = null;
+
         if (isset($m[1]) && isset($m[1][0])) {
             $value = $m[1][0];
         }
-
         $this->setVar($handle, $value);
         $this->setVar($parent, $str);
         return true;

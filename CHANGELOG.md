@@ -1,6 +1,27 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.3.0] - 2019-07-23
+### Added
+- Issue 601 - Storing Local PC CNC Admin Passwords
+- Issue 597 - Allocate time from SD Manager Dashboard
+- Issue 520 - Office 365 login and scripting
+- Issue 598 - Sales Order quote sending enhancements
+### Changed
+- Issue 596 - Email import formatting improvements
+- Issue 603 - Include Site on SR History Popup
+- Issue 600 - Change Request reminders
+- Issue 609 - 7 dayer formatting improvements
+- Issue 607 - Customer Review Meeting Enhancements
+- Issue 611 - Hide passwords for referred customers
+### Fixed
+- Issue 604 - Contact Validation doesn't run on scheduled task
+- Issue 591 - URL too long with To Be Logged
+- Issue 595 - Stuck email enhancements
+- Issue 608 - Starters And Leavers Report Enhancements
+- Issue 590 - PO Status Report v8
+- Issue 610 - Service requests fixed yesterday Negative Duration
+
 ## [v3.2.1] - 2019-07-01
 ### Fixed
 - Fixed problem with deleting Portal Documents from customer page

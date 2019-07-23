@@ -3021,17 +3021,6 @@ class CTActivity extends CTCNC
         );
 
         while ($dsContactSrs->fetchNext()) {
-
-            $urlCreateFollowOn =
-                Controller::buildLink(
-                    'Activity.php',
-                    array(
-                        'action'         => 'createFollowOnActivity',
-                        'callActivityID' => $dsContactSrs->getValue(DBEJProblem::lastCallActivityID),
-                        'reason'         => $this->getParam('reason')
-                    )
-                );
-
             $urlProblemHistoryPopup =
                 Controller::buildLink(
                     'Activity.php',
@@ -3057,9 +3046,10 @@ class CTActivity extends CTCNC
                         100
                     ),
                     'contactEngineerName'           => $dsContactSrs->getValue(DBEJProblem::engineerName),
-                    'createFollowOnLink'            => $dsContactSrs->getValue(
+                    'shouldBeHidden'                => $dsContactSrs->getValue(
                         DBEJProblem::status
-                    ) == 'C' ? null : "<a href=" . $urlCreateFollowOn . ">Log activity</a>",
+                    ) == 'C' ? 'hidden' : null,
+                    'contactActivityID'             => $dsContactSrs->getValue(DBEJProblem::lastCallActivityID),
                     'contactUrlProblemHistoryPopup' => $urlProblemHistoryPopup,
                     'contactPriority'               => $dsContactSrs->getValue(DBEJProblem::priority),
                     'contactPriorityClass'          => $dsContactSrs->getValue(
@@ -3119,7 +3109,7 @@ class CTActivity extends CTCNC
                         100
                     ),
                     'engineerName'           => $dsActiveSrs->getValue(DBEJProblem::engineerName),
-                    'urlCreateFollowOn'      => $urlCreateFollowOn,
+                    'activityID'             => $dsActiveSrs->getValue(DBEJProblem::lastCallActivityID),
                     'urlProblemHistoryPopup' => $urlProblemHistoryPopup,
                     'priority'               => $dsActiveSrs->getValue(DBEJProblem::priority),
                     'priorityClass'          => $dsActiveSrs->getValue(
@@ -3146,7 +3136,13 @@ class CTActivity extends CTCNC
                 )
             );
 
-        $this->template->set_var(array('urlCreateNewSr' => $urlCreateNewSr));
+        $this->template->set_var(
+            [
+                'reason'     => base64_encode($this->getParam('reason')),
+                'customerID' => $this->getParam('customerID'),
+                'contactID'  => $this->getParam('contactID'),
+            ]
+        );
 
         $this->template->parse(
             'CONTENTS',
@@ -3719,6 +3715,15 @@ class CTActivity extends CTCNC
             if ($activitiesByProblemID->getValue(DBEJCallActivity::hideFromCustomerFlag) == 'Y') {
                 $activityHiddenText = 'Hidden From Customer';
             }
+
+            $dbeContact = new DBEContact($this);
+            $dbeContact->getRow($activitiesByProblemID->getValue(DBEJCallActivity::contactID));
+            $siteNo = $dbeContact->getValue(DBEContact::siteNo);
+
+            $buSite = new BUSite($this);
+            $dsSite = new DataSet($this);
+            $buSite->getSiteByID($dbeProblem->getValue(DBEProblem::customerID), $siteNo, $dsSite);
+
             $this->template->set_var(
                 array(
                     'reason'             => $activitiesByProblemID->getValue(DBEJCallActivity::reason),
@@ -3734,7 +3739,8 @@ class CTActivity extends CTCNC
                         2
                     ),
                     'userName'           => $activitiesByProblemID->getValue(DBEJCallActivity::userName),
-                    'activityHiddenText' => $activityHiddenText
+                    'activityHiddenText' => $activityHiddenText,
+                    'siteAddress'        => $dsSite->getValue(DBESite::add1)
                 )
             );
 

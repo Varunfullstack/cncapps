@@ -74,6 +74,10 @@ define(
     "DA_ARRAY",
     "array"
 );
+define(
+    "DA_JSON_ARRAY",
+    "json_array"
+);
 
 define(
     'DA_SUPPORT_LEVEL',
@@ -1263,6 +1267,11 @@ class DataAccess extends BaseObject
         if ($type == DA_ID) {
             return (int)$this->row[$ixColumnNumber];
         }
+
+        if ($type == DA_JSON_ARRAY) {
+            return json_decode($this->row[$ixColumnNumber]);
+        }
+
         return $this->row[$ixColumnNumber];
 
     }
@@ -1711,6 +1720,8 @@ not a boolean, the given value is null, column given is not the PK, and there is
                 return $this->tryCreateDate($value);
             case DA_YN:
                 return $value == 'Y' ? 'Y' : 'N';
+            case DA_JSON_ARRAY:
+                return json_encode($value, JSON_NUMERIC_CHECK);
             case DA_SUPPORT_LEVEL:
                 $validOptions = ['main', 'supervisor', 'support', 'delegate'];
                 return in_array(
