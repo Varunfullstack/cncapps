@@ -606,7 +606,7 @@ class BUProblemSLA extends Business
                 'SlaAlertEmail.inc.html'
             );
 
-            $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+            $urlActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
                 );
 
             $template->setVar(

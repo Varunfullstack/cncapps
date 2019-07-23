@@ -5367,7 +5367,7 @@ class CTActivity extends CTCNC
         }
 
         $urlActivity =
-            'http://' . $_SERVER['HTTP_HOST'] .
+            SITE_URL.
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(

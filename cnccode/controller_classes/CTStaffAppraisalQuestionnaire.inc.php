@@ -1823,7 +1823,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $subject = "Staff Appraisal";
 
             $appraisalURL = Controller::buildLink(
-                'http://cncapps/staffAppraisalQuestionnaire.php',
+                SITE_URL .'/staffAppraisalQuestionnaire.php',
                 [
                     "action"          => "employeeAnswer",
                     "questionnaireID" => $questionnaireID
@@ -1943,7 +1943,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             ) . " " . $staffMember->getValue(DBEUser::lastName);
 
         $appraisalURL = Controller::buildLink(
-            'http://cncapps/staffAppraisalQuestionnaire.php',
+            SITE_URL .'/staffAppraisalQuestionnaire.php',
             [
                 "action"          => "managerAnswer",
                 "questionnaireID" => $dbeQuestionnaireAnswer->getValue(

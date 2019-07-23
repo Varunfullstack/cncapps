@@ -1,31 +1,35 @@
 <html>
 <head>
-  <style type="text/css">
-    <!--
-    BODY, P, TD, TH {
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 10pt;
-    }
-    h1{
-      font-size: 14pt;
-      font-weight: bold;
+    <style type="text/css">
+        <!--
+        BODY, P, TD, TH {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10pt;
+        }
 
-    }
-    h2{
-      font-size: 11pt;
-      font-weight: bold;
+        h1 {
+            font-size: 14pt;
+            font-weight: bold;
 
-    }
-    a{
-      font-weight: bold;
-    }
-    -->
-  </style>
+        }
+
+        h2 {
+            font-size: 11pt;
+            font-weight: bold;
+
+        }
+
+        a {
+            font-weight: bold;
+        }
+
+        -->
+    </style>
 </head>
 <body>
-  <table>
+<table>
     <thead>
-      <tr>
+    <tr>
         <th>Customer</th>
         <th>Sale(&pound;)</th>
         <th>Cost(&pound;)</th>
@@ -33,24 +37,24 @@
         <th>Profit(&pound;)</th>
         <th>Profit(%)</th>
         <th>Labour(Hours)</th>
-      </tr>
+    </tr>
     </thead>
     <tbody>
-      <!-- BEGIN customersBlock -->
-      <tr class="{profitAlertClass}">
-        <td><a href="http://{serverHost}/{customerAnalysisUrl}">{customerName}</a></td>
+    <!-- BEGIN customersBlock -->
+    <tr class="{profitAlertClass}">
+        <td><a href="{customerAnalysisUrl}">{customerName}</a></td>
         <td align="right">{sales}</td>
         <td align="right">{cost}</td>
         <td align="right">{labourCost}</td>
         <td align="right">{profit}</td>
         <td align="right">{profitPercent}</td>
         <td align="right">{labourHours}</td>
-      </tr>
-      <!-- END customersBlock -->
-      <tr>
+    </tr>
+    <!-- END customersBlock -->
+    <tr>
         <td colspan="6">&nbsp;</td>
-      </tr>
-      <tr>
+    </tr>
+    <tr>
         <td>TOTALS</td>
         <td align="right">{totalSales}</td>
         <td align="right">{totalCost}</td>
@@ -58,7 +62,7 @@
         <td align="right">{totalProfit}</td>
         <td align="right">{totalProfitPercent}</td>
         <td align="right">{totalLabourHours}</td>
-      </tr>
+    </tr>
     </tbody>
-  </table>	
+</table>
 </body>
