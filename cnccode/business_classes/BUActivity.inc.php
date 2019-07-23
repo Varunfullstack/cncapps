@@ -465,6 +465,147 @@ class BUActivity extends Business
         $dbeProblem->updateRow();
     }
 
+    private function sendMonitoringEmails($callActivityID)
+    {
+        $buMail = new BUMail($this);
+
+        $dbeJCallActivity = new DBEJCallActivity($this);
+        $dbeJCallActivity->getRow($callActivityID);
+
+        $validActivityTypeIDs = [
+            4,
+            7,
+            8,
+            11,
+            18,
+            57,
+            55,
+            59,
+        ];
+
+        if (!in_array(
+            $dbeJCallActivity->getValue(DBEJCallActivity::callActTypeID),
+            $validActivityTypeIDs
+        )) {
+            return;
+        }
+
+        $monitoringPeople = $this->getPeopleMonitoringProblem($dbeJCallActivity->getValue(DBEJCallActivity::problemID));
+
+
+        $senderEmail = CONFIG_SUPPORT_EMAIL;
+//        $senderName = 'CNC Support Department';
+
+        $activityRef = $dbeJCallActivity->getValue(DBEJCallActivity::problemID) . ' ' . $dbeJCallActivity->getValue(
+                DBEJCallActivity::customerName
+            );
+
+        $template = new Template(
+            EMAIL_TEMPLATE_DIR,
+            "remove"
+        );
+        $template->set_file(
+            'page',
+            'MonitoringEmail.inc.html'
+        );
+
+        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+            );
+
+        $durationHours = common_convertHHMMToDecimal(
+                $dbeJCallActivity->getValue(DBEJCallActivity::endTime)
+            ) - common_convertHHMMToDecimal($dbeJCallActivity->getValue(DBEJCallActivity::startTime));
+
+        $awaitingCustomerResponse = null;
+
+        if ($dbeJCallActivity->getValue(DBEJCallActivity::requestAwaitingCustomerResponseFlag) == 'Y') {
+            $awaitingCustomerResponse = 'Awaiting Customer';
+        } else {
+            $awaitingCustomerResponse = 'Awaiting CNC';
+        }
+
+
+        $template->setVar(
+            array(
+                'activityRef'                 => $activityRef,
+                'activityDate'                => $dbeJCallActivity->getValue(DBEJCallActivity::date),
+                'activityStartTime'           => $dbeJCallActivity->getValue(DBEJCallActivity::startTime),
+                'activityEndTime'             => $dbeJCallActivity->getValue(DBEJCallActivity::endTime),
+                'activityTypeName'            => $dbeJCallActivity->getValue(DBEJCallActivity::activityType),
+                'urlActivity'                 => $urlActivity,
+                'userName'                    => $dbeJCallActivity->getValue(DBEJCallActivity::userName),
+                'durationHours'               => round(
+                    $durationHours,
+                    2
+                ),
+                'requestStatus'               => $this->problemStatusArray[$dbeJCallActivity->getValue(
+                    DBEJCallActivity::problemStatus
+                )],
+                'awaitingCustomerResponse'    => $awaitingCustomerResponse,
+                'customerName'                => $dbeJCallActivity->getValue(DBEJCallActivity::customerName),
+                'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC
+            )
+        );
+
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
+
+        $body = $template->get_var('output');
+
+        $buMail->mime->setHTMLBody($body);
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
+        foreach ($monitoringPeople as $monitoringPerson) {
+            $toEmail = $monitoringPerson['cns_logname'] . '@cnc-ltd.co.uk';
+
+            $hdrs = array(
+                'From'         => $senderEmail,
+                'To'           => $toEmail,
+                'Subject'      => 'Monitored SR ' . $dbeJCallActivity->getValue(
+                        DBEJCallActivity::problemID
+                    ) . ' For ' . $dbeJCallActivity->getValue(DBEJCallActivity::customerName),
+                'Date'         => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->putInQueue(
+                $senderEmail,
+                $toEmail,
+                $hdrs,
+                $body
+            );
+        }
+
+
+    }
+
+    private function getPeopleMonitoringProblem($problemID)
+    {
+        global $db;
+
+        $sql = "SELECT * FROM problem_monitoring left join consultant on problem_monitoring.cons_no = consultant.cns_consno WHERE problemId = $problemID";
+
+
+        $db->query($sql);
+        $data = [];
+        while ($db->next_record()) {
+            $data[] = $db->Record;
+        }
+        return $data;
+    }
+
     /**
      * Send an email alert to the internal email address against given further action type
      * @param $callActivityID
