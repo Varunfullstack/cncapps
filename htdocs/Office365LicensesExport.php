@@ -242,12 +242,21 @@ do {
     );
     $highestRow = count($data) + 2;
     $totalizationRow['LicensedUsers'] = "$totalizationRow[LicensedUsers] Licensed Users";
-    $totalizationRow['TotalMailBox'] = $totalizationRow['TotalMailBox'];
     $sheet->fromArray(
         $totalizationRow,
         null,
         'A' . $highestRow
     );
+
+    $sheet->setCellValue(
+        "B$highestRow",
+        '=sum(B2:B' . ($highestRow - 1) . ')'
+    );
+    $sheet->setCellValue(
+        "D$highestRow",
+        '=countif(D2:D' . ($highestRow - 1) . ', "yes") & " Licensed Users"'
+    );
+
     $sheet->fromArray(["Report generated at " . $dateTime->format("d-m-Y H:i:s")], null, 'A' . ($highestRow + 2));
 
     $sheet->getStyle("A$highestRow:E$highestRow")->getFont()->setBold(true);
@@ -361,7 +370,7 @@ do {
 
         $logger->info('All good!!. Creating file ' . $fileName);
     } catch (Exception $exception) {
-        $logger->warning('Failed to save file, possibly file open');
+        $logger->error('Failed to save file, possibly file open: ' . $exception->getMessage());
     }
 } while ($dbeCustomer->fetchNext());
 
