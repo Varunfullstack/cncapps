@@ -7,6 +7,11 @@
  * Time: 11:26
  */
 
+use CNCLTD\LoggerCLI;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 require_once("config.inc.php");
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
 require_once($cfg["path_dbe"] . "/DBEOSSupportDates.php");
@@ -21,7 +26,7 @@ require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
 global $db;
 $logName = 'office365LicenseExport';
-$logger = new \CNCLTD\LoggerCLI($logName);
+$logger = new LoggerCLI($logName);
 
 // increasing execution time to infinity...
 ini_set('max_execution_time', 0);
@@ -207,14 +212,14 @@ do {
         $data[$key]['Licenses'] = $licenseValue;
         $data[$key]['IsLicensed'] = $data[$key]['IsLicensed'] ? 'Yes' : 'No';
         $totalizationRow['TotalMailBox'] += $datum['TotalItemSize'];
-        $data[$key]['TotalItemSize'] = number_format($datum['TotalItemSize']);
+        $data[$key]['TotalItemSize'] = $datum['TotalItemSize'];
         $totalizationRow['LicensedUsers'] += $datum['IsLicensed'];
 
         $mailboxLimits[] = $mailboxLimit;
     }
 
 
-    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $spreadsheet = new Spreadsheet();
     $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
     $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
     $sheet = $spreadsheet->getActiveSheet();
@@ -237,7 +242,7 @@ do {
     );
     $highestRow = count($data) + 2;
     $totalizationRow['LicensedUsers'] = "$totalizationRow[LicensedUsers] Licensed Users";
-    $totalizationRow['TotalMailBox'] = number_format($totalizationRow['TotalMailBox']);
+    $totalizationRow['TotalMailBox'] = $totalizationRow['TotalMailBox'];
     $sheet->fromArray(
         $totalizationRow,
         null,
@@ -255,7 +260,7 @@ do {
         $currentRow = 3 + $i;
 
         if ($mailboxLimits[$i]) {
-            $usage = floatval(preg_replace('/,/', "", $data[$i]['TotalItemSize'])) / $mailboxLimits[$i] * 100;
+            $usage = $data[$i]['TotalItemSize'] / $mailboxLimits[$i] * 100;
             $color = null;
             if ($usage >= $dbeHeader->getValue(DBEHeader::office365MailboxYellowWarningThreshold)) {
                 $color = "FFFFEB9C";
@@ -268,19 +273,24 @@ do {
             if ($color) {
                 $sheet->getStyle("A$currentRow:E$currentRow")
                     ->getFill()
-                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                    ->setFillType(Fill::FILL_SOLID)
                     ->getStartColor()
                     ->setARGB($color);
             }
         }
     }
 
+    $mailboxColumn = $sheet->getStyle("B2:B$highestRow");
+    $mailboxColumn->getNumberFormat()->setFormatCode("#,##0");
+    $mailboxColumn->getAlignment()->setHorizontal('right');
+
+
     foreach (range('A', $sheet->getHighestDataColumn()) as $col) {
         $sheet->getColumnDimension($col)
             ->setAutoSize(true);
     }
 
-    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    $writer = new Xlsx($spreadsheet);
     $customerFolder = $buCustomer->getCustomerFolderPath($customerID);
     $folderName = $customerFolder . "\Review Meetings\\";
     if (!file_exists($folderName)) {
@@ -350,7 +360,7 @@ do {
         }
 
         $logger->info('All good!!. Creating file ' . $fileName);
-    } catch (\Exception $exception) {
+    } catch (Exception $exception) {
         $logger->warning('Failed to save file, possibly file open');
     }
 } while ($dbeCustomer->fetchNext());

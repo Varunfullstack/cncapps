@@ -61,12 +61,18 @@
                    (21, "Office 365 ProPlus for students", "OFFICESUBSCRIPTION_STUDENT", 51200),
                    (22, "Enterprise E2 for students", "EXCHANGEENTERPRISE_STUDENT", 51200),
                    (23, "Office 365 A1 for students", "STANDARDWOFFPACK_STUDENT", 51200),
-                   (24, "Office 365 A1 for faculty", "STANDARDWOFFPACK_FACULTY", 51200)
+                   (24, "Office 365 A1 for faculty", "STANDARDWOFFPACK_FACULTY", 51200),
+                   (25, "Exchange Archiving Online", "EXCHANGEARCHIVE_ADDON", 102400),
+                   (26, "Enterprise E5", "ENTERPRISEPREMIUM", 102400),
+                   (27, "PowerApps Plan 2 Trial", "POWERAPPS_VIRAL", null),
+                   (28, "Dynamics 365 for Marketing", "DYN365_BUSINESS_MARKETING", null),
+                   (29, "Dynamics 365 Customer Service Insights Trial", "DYN365_AI_SERVICE_INSIGHTS", null),
+                   (30, "Dynamics 365 Business Central for IWs", "PROJECT_MADEIRA_PREVIEW_IW_SKU", null)
         </sql>
         <sql>
             insert into db_sequence
-            values ('office365license', 24)
-            ON DUPLICATE KEY UPDATE nextid = 24
+            values ('office365license', (select max(id) + 1 from office365license))
+            ON DUPLICATE KEY UPDATE nextid = (select max(id) + 1 from office365license)
         </sql>
         <rollback>
             <sql>
