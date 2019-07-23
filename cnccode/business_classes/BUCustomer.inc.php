@@ -1727,5 +1727,18 @@ class BUCustomer extends Business
         );
     }
 
+    /**
+     * @param int $customerID
+     * @return DBEPassword
+     * @throws Exception
+     */
+    public function getOffice365PasswordItem(int $customerID)
+    {
+        $dbePassword = new DBEPassword($this);
+
+        $dbePassword->getOffice365PasswordByCustomerID($customerID);
+        return $dbePassword;
+    }
+
 
 }

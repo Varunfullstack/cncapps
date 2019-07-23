@@ -1,0 +1,109 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1562231827-0">
+        <tagDatabase tag="issue520"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1562231827-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="office365License"/>
+            </not>
+        </preConditions>
+        <createTable tableName="office365License">
+            <column name="id" type="int(11)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="replacement" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="license" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mailboxLimit" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1562231827-2">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="office365License"/>
+                <sqlCheck expectedResult="1"><![CDATA[
+                    select count(*) <= 0 from office365License
+                ]]>
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <sql>
+            insert into office365License
+            values (1, "Advanced Threat Protection", "ATP_ENTERPRISE", 51200),
+                   (2, "Enterprise E3", "ENTERPRISEPACK", 102400),
+                   (3, "Enterprise E1", "EXCHANGESTANDARD", 51200),
+                   (4, "Business Essentials", "O365_BUSINESS_ESSENTIALS", 51200),
+                   (5, "Business Premium", "O365_BUSINESS_PREMIUM", 51200),
+                   (6, "Power Bi", "POWER_BI_PRO", 51200),
+                   (7, "Power Bi", "POWER_BI_STANDARD", 51200),
+                   (8, "Business Essentials", "SMB_BUSINESS_ESSENTIALS", 51200),
+                   (9, "Business Premium", "SMB_BUSINESS_PREMIUM", 51200),
+                   (10, "Enterprise E1", "STANDARDPACK", 51200),
+                   (11, "Enterprise E2", "STANDARDWOFFPACK", 51200),
+                   (12, "Intune", "INTUNE_A", 51200),
+                   (13, "MS Visio", "VISIOCLIENT", 51200),
+                   (14, "Flow", "FLOW_Free", 51200),
+                   (15, "Dynamics 365 P1 Trial for Information Workers", "DYN365_ENTERPRISE_P1_IW", 51200),
+                   (16, "MS Project Professional", "PROJECTPROFESSIONAL", 51200),
+                   (17, "Office 365 ProPlus", "OFFICESUBSCRIPTION", 51200),
+                   (18, "Exchange Archiving Online", "EXCHANGEENTERPRISE", 102400),
+                   (19, "MS Teams", "TEAMS_COMMERCIAL_TRIAL", 51200),
+                   (20, "MS Teams", "MS_TEAMS_IW", 51200),
+                   (21, "Office 365 ProPlus for students", "OFFICESUBSCRIPTION_STUDENT", 51200),
+                   (22, "Enterprise E2 for students", "EXCHANGEENTERPRISE_STUDENT", 51200),
+                   (23, "Office 365 A1 for students", "STANDARDWOFFPACK_STUDENT", 51200),
+                   (24, "Office 365 A1 for faculty", "STANDARDWOFFPACK_FACULTY", 51200),
+                   (25, "Exchange Archiving Online", "EXCHANGEARCHIVE_ADDON", 102400),
+                   (26, "Enterprise E5", "ENTERPRISEPREMIUM", 102400),
+                   (27, "PowerApps Plan 2 Trial", "POWERAPPS_VIRAL", null),
+                   (28, "Dynamics 365 for Marketing", "DYN365_BUSINESS_MARKETING", null),
+                   (29, "Dynamics 365 Customer Service Insights Trial", "DYN365_AI_SERVICE_INSIGHTS", null),
+                   (30, "Dynamics 365 Business Central for IWs", "PROJECT_MADEIRA_PREVIEW_IW_SKU", null)
+        </sql>
+        <sql>
+            insert into db_sequence
+            values ('office365license', (select max(id) + 1 from office365license))
+            ON DUPLICATE KEY UPDATE nextid = (select max(id) + 1 from office365license)
+        </sql>
+        <rollback>
+            <sql>
+                delete
+                from db_sequence
+                where seq_name = 'office365license'
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet id="1562231827-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="office365MailboxYellowWarningThreshold"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column type="int(3)" name="office365MailboxYellowWarningThreshold" defaultValue="90">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="1562231827-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="office365MailboxRedWarningThreshold"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column type="int(3)" name="office365MailboxRedWarningThreshold" defaultValue="95">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

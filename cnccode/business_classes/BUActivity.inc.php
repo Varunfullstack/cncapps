@@ -7137,7 +7137,7 @@ function addCustomerRaisedRequest(AutomatedRequest $record,
             $record->getServerGuardFlag()
         );
 
-        $details = $record->getSubjectLine();
+        $details = $record->getSubjectLine()." ";
 
         if (!$forcedDetails) {
             $details .= $record->getTextBody();
@@ -8587,7 +8587,6 @@ function addCustomerRaisedRequest(AutomatedRequest $record,
      */
     public function createPurchaseOrderCompletedSalesActivity($problemID)
     {
-
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->getRow($problemID);
 

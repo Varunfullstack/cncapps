@@ -78,6 +78,33 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $this->setTemplateFiles(
             array('SDManagerDashboard' => 'SDManagerDashboard')
         );
+
+        $openSrsByUser = $this->buActivity->getOpenSrsByUser();
+
+        $this->template->set_block(
+            'SDManagerDashboard',
+            'userSrCountBlock',
+            'userSrCount'
+        );
+
+        foreach ($openSrsByUser as $row) {
+
+            $this->template->set_var(
+
+                array(
+                    'openSrInitials' => $row['initials'],
+                    'openSrCount'    => $row['count']
+                )
+            );
+
+            $this->template->parse(
+                'userSrCount',
+                'userSrCountBlock',
+                true
+            );
+
+        }
+
         $buProblem = new BUActivity($this);
         $problems = new DataSet($this);
         $limit = 10;
@@ -283,6 +310,17 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
 
             $buActivity = new BUActivity($this);
 
+            $urlAllocateAdditionalTime =
+                Controller::buildLink(
+                    'Activity.php',
+                    array(
+                        'action'    => 'allocateAdditionalTime',
+                        'problemID' => $problems->getValue(DBEJProblem::problemID)
+                    )
+                );
+
+            $linkAllocateAdditionalTime = '<a href="' . $urlAllocateAdditionalTime . ' " target="_blank" title="Allocate additional time"><img src="/images/clock.png" width="20px" alt="time">';
+
             $activityCount = $buActivity->getActivityCount($problems->getValue(DBEJProblem::problemID));
 
             $bgColour = $this->getResponseColour(
@@ -416,7 +454,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                     'alarmDateTime'              => $alarmDateTimeDisplay,
                     'bgColour'                   => $bgColour,
                     'workBgColor'                => $workBgColor,
-                    'activityCount'              => $activityCount
+                    'activityCount'              => $activityCount,
+                    'allocateAdditionalTimeLink' => $linkAllocateAdditionalTime
 
                 )
 

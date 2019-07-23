@@ -84,9 +84,9 @@
                 tableID++;
                 var rowsPerTable = Math.ceil(rowCount / 3);
                 console.log('rows per table:' + rowsPerTable);
-                $("tbody tr:gt(" + (rowsPerTable) + ")", '#' + firstCol).remove();
-                $("tbody tr:gt(" + (rowsPerTable * 2) + ")", '#' + secondCol).remove();
+                $("tbody tr:gt(" + (rowsPerTable - 1) + ")", '#' + firstCol).remove();
                 $("tbody tr:lt(" + rowsPerTable + ")", '#' + secondCol).remove();
+                $("tbody tr:gt(" + (rowsPerTable - 1) + ")", '#' + secondCol).remove();
                 $("tbody tr:lt(" + (rowsPerTable * 2) + ")", '#' + thirdCol).remove();
             } else if (rowCount > 20) {
                 $(this).addClass('overflow').attr('id', 'table' + tableID);
@@ -101,7 +101,7 @@
 
                 var split = Math.floor(rowCount / 2);
                 console.log('split: ' + split);
-                $("tbody tr:gt(" + (split) + ")", '#' + leftCol).remove();
+                $("tbody tr:gt(" + (split - 1) + ")", '#' + leftCol).remove();
                 $("tbody tr:lt(" + split + ")", '#' + rightCol).remove();
             }
             // if we had to split the tables, make sure they are wrapped into a div with text-align center
@@ -303,6 +303,10 @@
         width: 31%;
         display: inline-block;
         vertical-align: top;
+    }
+
+    .thirdTable td {
+        white-space: pre-wrap;
     }
 </style>
 

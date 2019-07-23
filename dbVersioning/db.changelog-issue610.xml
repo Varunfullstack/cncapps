@@ -1,0 +1,25 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1560932972-0">
+        <tagDatabase tag="issue610"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1560932972-1">
+        <sql>
+            UPDATE
+                problem
+            SET pro_fixed_date =
+                    (SELECT CONCAT(
+                                    c.`caa_date`,
+                                    ' ',
+                                    c.`caa_starttime`
+                                )
+                     FROM callactivity c
+                     WHERE c.`caa_callacttypeno` = 57
+                       AND c.`caa_problemno` = problem.`pro_problemno`)
+            WHERE DATE_FORMAT(pro_fixed_date, '%Y-%m-%d') >= '2019-05-25'
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

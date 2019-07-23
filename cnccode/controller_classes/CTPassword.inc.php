@@ -93,12 +93,14 @@ class CTPassword extends CTCNC
         /** @var DSForm $dsSearchForm */
         $this->buPassword->initialiseSearchForm($dsSearchForm);
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
-                $this->setFormErrorOn();
-            } else {
-                $customerID = $dsSearchForm->getValue(DBEPassword::customerID);
-                header("Location: Password.php?action=list&customerID=$customerID");
-                exit;
+            if (isset($_REQUEST['searchForm'])) {
+                if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
+                    $this->setFormErrorOn();
+                } else {
+                    $customerID = $dsSearchForm->getValue(DBEPassword::customerID);
+                    header("Location: Password.php?action=list&customerID=$customerID");
+                    exit;
+                }
             }
 
         }
@@ -178,12 +180,23 @@ class CTPassword extends CTCNC
         $this->setMethodName('displayList');
 
         $this->setPageTitle('Passwords');
+        $dbeCustomer->getRow($customerID);
+
+        if ($dbeCustomer->getValue(DBECustomer::referredFlag) == 'Y') {
+            $this->setTemplateFiles('PasswordReferred', 'PasswordReferred.inc');
+            $this->template->parse(
+                'CONTENTS',
+                'PasswordReferred',
+                true
+            );
+            $this->parsePage();
+            return;
+        }
 
         $this->setTemplateFiles(
             array('PasswordList' => 'PasswordList.inc')
         );
 
-        $dbeCustomer->getRow($customerID);
         $dsPassword = new DBEJPassword($this);
         $dsPassword->getRowsByCustomerIDAndPasswordLevel(
             $customerID,
@@ -361,9 +374,9 @@ class CTPassword extends CTCNC
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $passwordForm = $this->getParam('password')[1];
-
             $passwordForm['encrypted'] = 1;
             $passwordID = $passwordForm['passwordID'];
+
             if ($passwordID) {
                 $dbePassword->getRow($passwordID);
                 $previousPassword = $dbePassword->getValue(DBEPassword::password);

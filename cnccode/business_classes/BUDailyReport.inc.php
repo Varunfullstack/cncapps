@@ -224,6 +224,10 @@ class BUDailyReport extends Business
                 '', $nothing, $nothing, $nothing, $nothing
             );
 
+            $buHeader = new BUHeader($this);
+            $dsHeader = new DataSet($this);
+            $buHeader->getHeader($dsHeader);
+
             do {
                 $urlRequest =
                     $controller->buildLink(
@@ -250,7 +254,14 @@ class BUDailyReport extends Business
                         'priority'         => $row[7],
                         'teamName'         => $row[8],
                         'awaiting'         => $row[10] == 'I' ? 'Not Started' : ($row[9] == 'Y' ? 'Customer' : 'CNC'),
-                        'urlRequest'       => $urlRequest
+                        'urlRequest'       => $urlRequest,
+                        'rowClass'         => $row[4] >= $dsHeader->getValue(
+                            DBEHeader::sevenDayerRedDays
+                        ) ? 'red-row' : ($row[4] >= $dsHeader->getValue(
+                            DBEHeader::sevenDayerAmberDays
+                        ) ? 'amber-row' : ''),
+                        'amberThreshold'   => $dsHeader->getValue(DBEHeader::sevenDayerAmberDays),
+                        'redThreshold'     => $dsHeader->getValue(DBEHeader::sevenDayerRedDays)
                     )
                 );
 

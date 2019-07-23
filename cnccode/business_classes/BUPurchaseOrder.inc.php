@@ -263,12 +263,11 @@ class BUPurchaseOrder extends Business
             DBEPorline::stockcat,
             $dsOrdline->getValue(DBEJOrdline::stockcat)
         );
+
+
         $dbePorline->setValue(
             DBEPorline::expectedDate,
-            date(
-                'Y-m-d',
-                strtotime('+ 3 days')
-            )
+            getNextBusinessDay()->format('Y-m-d')
         ); // today + 3 days
         $dbePorline->insertRow();
     }

@@ -6,6 +6,23 @@
         src='popcalendar/popcalendar.js'
 ></script>
 <script language='JavaScript'>
+
+    $(function () {
+        $('.dataTable').dataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'csv',
+                    bom: true
+                }
+            ],
+            paging: false,
+            order: [
+                [0, 'asc'],
+            ]
+        });
+    })
+
     var state = 'none'; // display status
     var savedCustomerString
 
@@ -145,7 +162,8 @@
     <table class="dataTable">
         <thead>
         <tr>
-            <th></th>
+            <th>Customer</th>
+            <th>Type</th>
             <th>Quantity</th>
             <th>Max SR Work Time</th>
             <th>Avg. SR Work Time</th>
@@ -162,57 +180,25 @@
         </tr>
         </thead>
         <tbody>
-
+        <!-- BEGIN rowBlock -->
         <tr>
-            <td>Starters</td>
-            <td align="center">{startersQuantity}</td>
-            <td align="center">{startersMaxDuration}</td>
-            <td align="center">{startersAvgDuration}</td>
-            <td align="center">{startersMinDuration}</td>
-            <td align="center">{startersTotalDuration}</td>
-            <td align="center">{startersMaxOpenHours}</td>
-            <td align="center">{startersAvgOpenHours}</td>
-            <td align="center">{startersMinOpenHours}</td>
-            <td align="center">{startersAvgCost}</td>
-            <td align="center">{startersTotalCost}</td>
-            <td align="center">{startersAvgCustomerContact}</td>
-            <td align="center">{startersAvgRemoteSupport}</td>
-            <td align="center">{startersAvgActivities}</td>
+            <td>{customerName}</td>
+            <td>{type}</td>
+            <td align="center">{quantity}</td>
+            <td align="center">{maxDuration}</td>
+            <td align="center">{avgDuration}</td>
+            <td align="center">{minDuration}</td>
+            <td align="center">{totalDuration}</td>
+            <td align="center">{maxOpenHours}</td>
+            <td align="center">{avgOpenHours}</td>
+            <td align="center">{minOpenHours}</td>
+            <td align="center">{avgCost}</td>
+            <td align="center">{totalCost}</td>
+            <td align="center">{avgCustomerContact}</td>
+            <td align="center">{avgRemoteSupport}</td>
+            <td align="center">{avgActivities}</td>
         </tr>
-        <tr>
-            <td>Leavers</td>
-            <td align="center">{leaversQuantity}</td>
-            <td align="center">{leaversMaxDuration}</td>
-            <td align="center">{leaversAvgDuration}</td>
-            <td align="center">{leaversMinDuration}</td>
-            <td align="center">{leaversTotalDuration}</td>
-            <td align="center">{leaversMaxOpenHours}</td>
-            <td align="center">{leaversAvgOpenHours}</td>
-            <td align="center">{leaversMinOpenHours}</td>
-            <td align="center">{leaversAvgCost}</td>
-            <td align="center">{leaversTotalCost}</td>
-            <td align="center">{leaversAvgCustomerContact}</td>
-            <td align="center">{leaversAvgRemoteSupport}</td>
-            <td align="center">{leaversAvgActivities}</td>
-        </tr>
-        <tr>
-            <td>Total</td>
-            <td align="center">{totalQuantity}</td>
-            <td align="center">{totalMaxDuration}</td>
-            <td align="center">{totalAvgDuration}</td>
-            <td align="center">{totalMinDuration}</td>
-            <td align="center">{totalTotalDuration}</td>
-            <td align="center">{totalMaxOpenHours}</td>
-            <td align="center">{totalAvgOpenHours}</td>
-            <td align="center">{totalMinOpenHours}</td>
-            <td align="center">{totalAvgCost}</td>
-            <td align="center">{totalTotalCost}</td>
-            <td align="center">{totalAvgCustomerContact}</td>
-            <td align="center">{totalAvgRemoteSupport}</td>
-            <td align="center">{totalAvgActivities}</td>
-        </tr>
-
-
+        <!-- END rowBlock -->
         </tbody>
     </table>
 </form>

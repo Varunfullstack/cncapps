@@ -9,6 +9,7 @@ class DBEJPorline extends DBEPorline
 {
     const itemDescription = "itemDescription";
     const partNo = "partNo";
+    const excludeFromPOCompletion = "excludeFromPOCompletion";
 
     /**
      * calls constructor()
@@ -33,6 +34,13 @@ class DBEJPorline extends DBEPorline
             DA_ALLOW_NULL,
             "itm_unit_of_sale"
         );
+
+        $this->addColumn(
+            self::excludeFromPOCompletion,
+            DA_YN,
+            DA_NOT_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -82,5 +90,30 @@ class DBEJPorline extends DBEPorline
             " AND " . $this->getDBColumnName(self::sequenceNo) . "=" . $this->getFormattedValue(self::sequenceNo)
         );
         return (parent::getRow());
+    }
+
+    /**
+     * Return count of rows that still have items to be received
+     */
+    function countOutstandingRows()
+    {
+        if ($this->getValue(self::porheadID) == '') {
+            $this->raiseError('porheadID not set');
+        }
+        $this->setQueryString(
+            "SELECT COUNT(*)" .
+            " FROM " . $this->getTableName() .
+            " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "= itm_itemno" .
+            " WHERE " . $this->getDBColumnName(self::porheadID) . "=" . $this->getFormattedValue(self::porheadID) .
+            " AND " . $this->getDBColumnName(self::excludeFromPOCompletion) . " = 'N' " .
+            " AND " . $this->getDBColumnName(self::qtyReceived) . " < " . $this->getDBColumnName(self::qtyOrdered)
+        );
+        if ($this->runQuery()) {
+            if ($this->nextRecord()) {
+                $this->resetQueryString();
+                return ($this->getDBColumnValue(0));
+            }
+        }
+        return 0;
     }
 }

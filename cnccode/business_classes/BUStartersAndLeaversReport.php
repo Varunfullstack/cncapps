@@ -58,8 +58,11 @@ class BUStartersAndLeaversReport extends Business
         }
         $params = array_merge($custParams, $dateParams);
 
-        $query = "SELECT
-'starters',
+        $query = " 
+select * from (
+SELECT
+       customer.`cus_name` as customerName,
+'starters' as type,
   SUM(`pro_rootcauseno` = 58) AS quantity,
   AVG(pro_total_activity_duration_hours) AS avgDuration,
   sum(pro_total_activity_duration_hours) as totalDuration,
@@ -75,10 +78,13 @@ class BUStartersAndLeaversReport extends Business
   AVG((SELECT COUNT(*) FROM callactivity WHERE callactivity.`caa_problemno` = problem.`pro_problemno` AND callactivity.`caa_callacttypeno` IN (8,11,18))) AS avgActivities
 FROM
   problem
+  LEFT JOIN customer
+    ON problem.`pro_custno` = customer.`cus_custno`
 WHERE true $custNoQuery $dateQuery
-   AND pro_rootcauseno  = 58 AND `pro_status` IN ('F', 'C') UNION 
+   AND pro_rootcauseno  = 58 AND `pro_status` IN ('F', 'C')  group by pro_custno UNION 
   SELECT
-  'leavers',
+         customer.`cus_name` as customerName,
+  'leavers' as type,
   SUM(`pro_rootcauseno` = 62) AS quantity,
   AVG(pro_total_activity_duration_hours) AS avgDuration,
   sum(pro_total_activity_duration_hours) as totalDuration,
@@ -94,7 +100,9 @@ WHERE true $custNoQuery $dateQuery
   AVG((SELECT COUNT(*) FROM callactivity WHERE callactivity.`caa_problemno` = problem.`pro_problemno` AND callactivity.`caa_callacttypeno` IN (8,11,18))) AS avgActivities
 FROM
   problem
-WHERE true $custNoQuery $dateQuery AND pro_rootcauseno  =  62 AND `pro_status` IN ('F', 'C')
+   LEFT JOIN customer
+    ON problem.`pro_custno` = customer.`cus_custno`
+WHERE true $custNoQuery $dateQuery AND pro_rootcauseno  =  62 AND `pro_status` IN ('F', 'C')  group by pro_custno) t order by customerName 
  ";
         $statement = $this->db->prepare($query);
         if (!$statement) {
@@ -121,6 +129,70 @@ WHERE true $custNoQuery $dateQuery AND pro_rootcauseno  =  62 AND `pro_status` I
         }
         $result = $statement->get_result();
 
-        return $result->fetch_all(MYSQLI_ASSOC);
+        $rows = $result->fetch_all(MYSQLI_ASSOC);
+        $previousCustomer = null;
+        $toReturn = [];
+        $totalRow = null;
+        foreach ($rows as $row) {
+            $toReturn[] = $row;
+            if ($row['customerName'] !== $previousCustomer) {
+                if ($previousCustomer) {
+                    $toReturn[] = $totalRow;
+                }
+                $totalRow = $this->createTotalRow($row);
+            }
+
+            $totalRow = $this->updateTotalRow($totalRow, $row);
+            $previousCustomer = $row['customerName'];
+        }
+
+        $toReturn[] = $totalRow;
+
+
+        return $toReturn;
+    }
+
+    function createTotalRow($row)
+    {
+        return [
+            'customerName'       => $row['customerName'],
+            "type"               => "Total",
+            "quantity"           => 0,
+            "avgDuration"        => 0,
+            "totalDuration"      => 0,
+            "avgOpenHours"       => 0,
+            "maxDuration"        => 0,
+            "maxOpenHours"       => 0,
+            "minDuration"        => INF,
+            "minOpenHours"       => INF,
+            "avgCost"            => 0,
+            "totalCost"          => 0,
+            "avgCustomerContact" => 0,
+            "avgRemoteSupport"   => 0,
+            "avgActivities"      => 0,
+            "count"              => 1
+        ];
+    }
+
+    function updateTotalRow($totalRow, $row)
+    {
+        return [
+            'customerName'       => $row['customerName'],
+            "type"               => "Total",
+            'quantity'           => $totalRow['quantity'] + $row['quantity'],
+            'count'              => $totalRow['count']++,
+            'avgDuration'        => ($totalRow['avgDuration'] + $row['avgDuration']) / $totalRow['count'],
+            'totalDuration'      => $totalRow['totalDuration'] + $row['totalDuration'],
+            "avgOpenHours"       => ($totalRow['avgOpenHours'] + $row['avgOpenHours']) / $totalRow['count'],
+            "maxDuration"        => $row['maxDuration'] > $totalRow['maxDuration'] ? $row['maxDuration'] : $totalRow['maxDuration'],
+            "maxOpenHours"       => $row['maxOpenHours'] > $totalRow['maxOpenHours'] ? $row['maxOpenHours'] : $totalRow['maxOpenHours'],
+            "minDuration"        => $row['minDuration'] < $totalRow['minDuration'] ? $row['minDuration'] : $totalRow['minDuration'],
+            "minOpenHours"       => $row['minOpenHours'] < $totalRow['minOpenHours'] ? $row['minOpenHours'] : $totalRow['minOpenHours'],
+            "avgCost"            => ($totalRow["avgCost"] + $row['avgCost']) / $totalRow['count'],
+            "totalCost"          => $totalRow["totalCost"] + $row['totalCost'],
+            "avgCustomerContact" => ($totalRow["avgCustomerContact"] + $row['avgCustomerContact']) / $totalRow["count"],
+            "avgRemoteSupport"   => ($totalRow["avgRemoteSupport"] + $row['avgRemoteSupport']) / $totalRow['count'],
+            "avgActivities"      => ($totalRow["avgActivities"] + $row['avgActivities']) / $totalRow['count'],
+        ];
     }
 }

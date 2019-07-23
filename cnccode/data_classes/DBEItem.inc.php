@@ -27,6 +27,7 @@ class DBEItem extends DBCNCEntity
     const contractResponseTime = "contractResponseTime";
     const renewalTypeID = "renewalTypeID";
     const allowDirectDebit = "allowDirectDebit";
+    const excludeFromPOCompletion = "excludeFromPOCompletion";
 
     /**
      * calls constructor()
@@ -149,6 +150,13 @@ class DBEItem extends DBCNCEntity
             self::allowDirectDebit,
             DA_YN,
             DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::excludeFromPOCompletion,
+            DA_YN,
+            DA_NOT_NULL,
+            null,
+            'N'
         );
         $this->setPK(0);
         $this->setAddColumnsOff();

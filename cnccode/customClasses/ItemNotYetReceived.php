@@ -33,6 +33,36 @@ class ItemNotYetReceived
     protected $isRequiredAtLeastAWeekAgo;
     protected $serviceRequestID;
     protected $deliveryConfirmedFlag;
+    protected $expectedOn;
+    protected $cost;
+    protected $itemId;
+    protected $lineSequenceNumber;
+
+    /**
+     * @return mixed
+     */
+    public function getLineSequenceNumber()
+    {
+        return $this->lineSequenceNumber;
+    }
+
+
+
+    private function isCarriage(){
+        return $this->itemId == 1491;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExpectedOn()
+    {
+        if(!$this->cost || $this->isCarriage()){
+            return null;
+        }
+        return $this->returnDateIfValue($this->expectedOn);
+    }
+
 
     /**
      * @return mixed

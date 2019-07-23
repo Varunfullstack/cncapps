@@ -16,7 +16,9 @@
         "ext-pdo": "*",
         "ext-ldap": "*",
         "ext-ctype": "*",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "monolog/monolog": "^1.24",
+        "bramus/monolog-colored-line-formatter": "^3.0"
     },
     "autoload": {
         "psr-4": {

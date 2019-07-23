@@ -1,0 +1,14 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1561025663-0">
+        <tagDatabase tag="release-3.3.0"/>
+    </changeSet>
+    <include file="db.changelog-issue591.xml"/>
+    <include file="db.changelog-issue609.xml"/>
+    <include file="db.changelog-issue590.xml"/>
+    <include file="db.changelog-issue610.xml"/>
+    <include file="db.changelog-issue520.xml"/>
+    <include file="db.changelog-issue598.xml"/>
+</databaseChangeLog>

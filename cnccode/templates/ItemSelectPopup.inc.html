@@ -22,7 +22,7 @@
                     opener.document.getElementById("qtyOrdered").value = qtyOrdered;
                 }
 
-                    debugger;
+                debugger;
                 if (opener.document.getElementById('allowDirectDebit')) {
                     opener.document.getElementById('allowDirectDebit').value = allowDirectDebit;
                     opener.checkDirectDebit();
@@ -86,10 +86,9 @@
                 {partNo}
             </td>
             <td class="listItemText">
-                <input
-                        type="checkbox"
-                        name="discontinueItemIDs[]"
-                        value="{itemID}"
+                <input type="checkbox"
+                       name="discontinueItemIDs[]"
+                       value="{itemID}"
                 >
             </td>
         </tr>
