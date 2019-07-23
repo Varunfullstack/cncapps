@@ -41,7 +41,7 @@ function getEnvironmentByPath()
 {
 
     if (strpos(__DIR__, 'cncapps') !== false) {
-        $_SERVER['HTTP_HOST'] = 'cncapps.cnc-ltd-co.uk';
+        $_SERVER['HTTP_HOST'] = 'cncapps.cnc-ltd.co.uk';
         return MAIN_CONFIG_SERVER_TYPE_LIVE;
     }
 
