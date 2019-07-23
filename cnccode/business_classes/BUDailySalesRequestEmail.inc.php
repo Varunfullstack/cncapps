@@ -60,7 +60,7 @@ class BUDailySalesRequestEmail extends Business
 
             do {
 
-                $urlOrder = 'http://' . $_SERVER ['HTTP_HOST'] . '/SalesOrder.php?action=displaySalesOrder&ordheadID=' . $row->odh_ordno;
+                $urlOrder = SITE_URL. '/SalesOrder.php?action=displaySalesOrder&ordheadID=' . $row->odh_ordno;
 
                 $template->set_var(
                     array(

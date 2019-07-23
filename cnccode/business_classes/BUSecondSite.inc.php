@@ -34,27 +34,17 @@ class BUSecondsite extends Business
     public $serverErrorCount = 0;
     public $imageErrorCount = 0;
     public $imagePassesCount = 0;
-    protected $suspendedCheckServers = [];
     public $delayedCheckServers = [];
     public $excludedLocalServers = [];
     /** @var mysqli $db */
     public $db;
-
+    protected $suspendedCheckServers = [];
 
     function __construct(&$owner)
     {
         parent::__construct($owner);
         $this->dbeSecondsiteImage = new DBESecondsiteImage($this);
     }
-
-    function getActivityModel()
-    {
-        if (!$this->buActivity) {
-            $this->buActivity = new BUActivity($this);
-        }
-        return $this->buActivity;
-    }
-
 
     public function getDelayedCheckServers()
     {
@@ -69,13 +59,6 @@ class BUSecondsite extends Business
     public function getExcludedLocalServers()
     {
         return $this->excludedLocalServers;
-    }
-
-    function logMessage($message,
-                        $type = self::LOG_TYPE_SUCCESS
-    )
-    {
-        $this->log[] = array('type' => $type, 'message' => $message);
     }
 
     /**
@@ -449,6 +432,55 @@ class BUSecondsite extends Business
         }
     }
 
+    public function getServers($customerItemID = false)
+    {
+        $queryString =
+            "SELECT
+        ci.cui_cuino,
+        ci.cui_custno AS custno,
+        c.cus_name,
+        i.itm_itemtypeno,
+        ser.cui_cuino AS server_cuino,
+        ser.cui_cust_ref AS serverName,
+        ser.secondsiteLocationPath,
+        ser.secondsiteValidationSuspendUntilDate,
+        ser.secondsiteImageDelayDays,
+        ser.secondsiteLocalExcludeFlag,
+        delayuser.cns_name AS delayUser,
+        ser.secondsiteImageDelayDate,
+        suspenduser.cns_name AS suspendUser,
+        ser.secondsiteSuspendedDate
+
+      FROM
+        custitem ci
+        JOIN customer c ON c.cus_custno = ci.cui_custno
+        JOIN custitem_contract ON custitem_contract.`cic_contractcuino` = ci.cui_cuino
+        JOIN custitem ser ON ser.cui_cuino = custitem_contract.cic_cuino
+        JOIN item i ON i.itm_itemno = ci.cui_itemno
+        LEFT JOIN consultant delayuser ON delayuser.cns_consno = ser.secondsiteImageDelayUserID
+        LEFT JOIN consultant suspenduser ON suspenduser.cns_consno = ser.secondsiteSuspendedByUserID
+
+      WHERE
+        i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")
+        AND ci.declinedFlag <> 'Y'";
+
+        if ($customerItemID) {
+            $queryString .= " AND ser.cui_cuino = $customerItemID";
+        }
+
+        $queryString .= " ORDER BY c.cus_name, serverName";
+
+        $db = $GLOBALS['db'];
+        $db->query($queryString);
+
+        $servers = array();
+        while ($db->next_record()) {
+            $servers[] = $db->Record;
+        }
+
+        return $servers;
+    }
+
     function isSuspended($server)
     {
 
@@ -474,6 +506,30 @@ class BUSecondsite extends Business
         return true;
     }
 
+    function logMessage($message,
+                        $type = self::LOG_TYPE_SUCCESS
+    )
+    {
+        $this->log[] = array('type' => $type, 'message' => $message);
+    }
+
+    function setImageStatusByServer($customerItemID,
+                                    $status
+    )
+    {
+        $queryString =
+            "UPDATE
+        secondsite_image 
+      SET
+        status = '$status'
+      WHERE
+        customerItemID = $customerItemID";
+
+        $db = $GLOBALS['db'];
+
+        $db->query($queryString);
+    }
+
     function resetSuspendedUntilDate($cuino)
     {
         $queryString =
@@ -491,6 +547,113 @@ class BUSecondsite extends Business
         $db->query($queryString);
 
     }
+
+    public function getImagesByServer($customerItemID)
+    {
+        $queryString =
+            "SELECT
+        secondSiteImageID,
+        imageName,
+        status
+      FROM
+        secondsite_image
+
+      WHERE
+        customerItemID = $customerItemID";
+
+        $db = $GLOBALS['db'];
+
+        $db->query($queryString);
+
+        $images = array();
+        while ($db->next_record()) {
+            $images[] = $db->Record;
+        }
+
+        return $images;
+    }
+
+    function getActivityModel()
+    {
+        if (!$this->buActivity) {
+            $this->buActivity = new BUActivity($this);
+        }
+        return $this->buActivity;
+    }
+
+    function sendBadConfigurationEmail($server,
+                                       $errorMessage,
+                                       $networkPath = false
+    )
+    {
+
+        $template = new Template(
+            EMAIL_TEMPLATE_DIR,
+            "remove"
+        );
+        $template->set_file(
+            'page',
+            'secondsiteBadConfigurationEmail.inc.html'
+        );
+
+        $template->setVar(
+            array(
+                'customerName'    => $server['cus_name'],
+                'cuino'           => $server['server_cuino'],
+                'serverName'      => $server['serverName'],
+                'errorMessage'    => addslashes($errorMessage),
+                'networkPath'     => addslashes($networkPath),
+                'customerItemURL' => SITE_URL . "/CustomerItem.php?action=displayCI&customerItemID=" . $server['server_cuino']
+            )
+        );
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
+
+        $body = $template->get_var('output');
+
+        $subject = 'Offsite Site configuration warning - ' . $server['cus_name'] . ' - ' . $server['serverName'];
+
+        $senderEmail = CONFIG_SUPPORT_EMAIL;
+        $toEmail = '2sbadconfig@' . CONFIG_PUBLIC_DOMAIN;
+
+        $hdrs = array(
+            'To'           => $toEmail,
+            'From'         => $senderEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $buMail = new BUMail($this);
+
+        $buMail->mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
+
+        $hdrs = $buMail->mime->headers($hdrs);
+
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
+
+    }
+
+    /*
+    Get second site images by server
+    */
 
     function preg_ls($path = ".",
                      $pat = "/.*/"
@@ -540,74 +703,9 @@ class BUSecondsite extends Business
         return $ret;
     }
 
-    function sendBadConfigurationEmail($server,
-                                       $errorMessage,
-                                       $networkPath = false
-    )
-    {
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-        $template->set_file(
-            'page',
-            'secondsiteBadConfigurationEmail.inc.html'
-        );
-
-        $template->setVar(
-            array(
-                'customerName' => $server['cus_name'],
-                'cuino'        => $server['server_cuino'],
-                'serverName'   => $server['serverName'],
-                'errorMessage' => addslashes($errorMessage),
-                'networkPath'  => addslashes($networkPath)
-            )
-        );
-        $template->parse(
-            'output',
-            'page',
-            true
-        );
-
-        $body = $template->get_var('output');
-
-        $subject = 'Offsite Site configuration warning - ' . $server['cus_name'] . ' - ' . $server['serverName'];
-
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
-        $toEmail = '2sbadconfig@' . CONFIG_PUBLIC_DOMAIN;
-
-        $hdrs = array(
-            'To'           => $toEmail,
-            'From'         => $senderEmail,
-            'Subject'      => $subject,
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
-
-        $buMail = new BUMail($this);
-
-        $buMail->mime->setHTMLBody($body);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body
-        );
-
-    }
+    /*
+    Get second site images by status
+    */
 
     function setImageStatus($secondSiteImageID,
                             $status,
@@ -648,103 +746,6 @@ class BUSecondsite extends Business
                 ],
             ]
         );
-    }
-
-    function setImageStatusByServer($customerItemID,
-                                    $status
-    )
-    {
-        $queryString =
-            "UPDATE
-        secondsite_image 
-      SET
-        status = '$status'
-      WHERE
-        customerItemID = $customerItemID";
-
-        $db = $GLOBALS['db'];
-
-        $db->query($queryString);
-    }
-
-    /*
-    Get second site images by server
-    */
-    public function getImagesByServer($customerItemID)
-    {
-        $queryString =
-            "SELECT
-        secondSiteImageID,
-        imageName,
-        status
-      FROM
-        secondsite_image
-
-      WHERE
-        customerItemID = $customerItemID";
-
-        $db = $GLOBALS['db'];
-
-        $db->query($queryString);
-
-        $images = array();
-        while ($db->next_record()) {
-            $images[] = $db->Record;
-        }
-
-        return $images;
-    }
-
-    /*
-    Get second site images by status
-    */
-    public function getServers($customerItemID = false)
-    {
-        $queryString =
-            "SELECT
-        ci.cui_cuino,
-        ci.cui_custno AS custno,
-        c.cus_name,
-        i.itm_itemtypeno,
-        ser.cui_cuino AS server_cuino,
-        ser.cui_cust_ref AS serverName,
-        ser.secondsiteLocationPath,
-        ser.secondsiteValidationSuspendUntilDate,
-        ser.secondsiteImageDelayDays,
-        ser.secondsiteLocalExcludeFlag,
-        delayuser.cns_name AS delayUser,
-        ser.secondsiteImageDelayDate,
-        suspenduser.cns_name AS suspendUser,
-        ser.secondsiteSuspendedDate
-
-      FROM
-        custitem ci
-        JOIN customer c ON c.cus_custno = ci.cui_custno
-        JOIN custitem_contract ON custitem_contract.`cic_contractcuino` = ci.cui_cuino
-        JOIN custitem ser ON ser.cui_cuino = custitem_contract.cic_cuino
-        JOIN item i ON i.itm_itemno = ci.cui_itemno
-        LEFT JOIN consultant delayuser ON delayuser.cns_consno = ser.secondsiteImageDelayUserID
-        LEFT JOIN consultant suspenduser ON suspenduser.cns_consno = ser.secondsiteSuspendedByUserID
-
-      WHERE
-        i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")
-        AND ci.declinedFlag <> 'Y'";
-
-        if ($customerItemID) {
-            $queryString .= " AND ser.cui_cuino = $customerItemID";
-        }
-
-        $queryString .= " ORDER BY c.cus_name, serverName";
-
-        $db = $GLOBALS['db'];
-        $db->query($queryString);
-
-        $servers = array();
-        while ($db->next_record()) {
-            $servers[] = $db->Record;
-        }
-
-        return $servers;
     }
 
     function updateSecondsiteImage(&$dsData)

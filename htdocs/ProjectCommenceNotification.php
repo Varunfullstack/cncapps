@@ -78,7 +78,7 @@ while ($dbeProject->fetchNext()) {
             "projectDescription"  => $dbeProject->getValue(DBEProject::description),
             "customerName"        => $dbeCustomer->getValue(DBECustomer::name),
             "projectCommenceDate" => $dbeProject->getValue(DBEProject::commenceDate),
-            "salesOrderLink"      => "<a href='http://cncapps/SalesOrder.php?action=displaySalesOrder&ordheadID=$linkedSalesOrderID'>Sales Order</a>"
+            "salesOrderLink"      => "<a href='" . SITE_URL . "/SalesOrder.php?action=displaySalesOrder&ordheadID=$linkedSalesOrderID'>Sales Order</a>"
         ]
     );
 

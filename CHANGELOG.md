@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.4.0] - 2019-07-23
+### Changed
+- Issue 198 - Deliver the website over HTTPS
+- Remove ports from urls
+
 ## [v3.3.0] - 2019-07-23
 ### Added
 - Issue 601 - Storing Local PC CNC Admin Passwords

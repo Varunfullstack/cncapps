@@ -67,7 +67,7 @@ class BUDailyReport extends Business
 
                 $urlRequest =
                     $controller->buildLink(
-                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        SITE_URL. '/Activity.php',
                         array(
                             'problemID' => $row[1],
                             'action'    => 'displayLastActivity'
@@ -231,7 +231,7 @@ class BUDailyReport extends Business
             do {
                 $urlRequest =
                     $controller->buildLink(
-                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        SITE_URL. '/Activity.php',
                         array(
                             'problemID' => $row[1],
                             'action'    => 'displayLastActivity'
@@ -426,7 +426,7 @@ class BUDailyReport extends Business
 
                 $urlRequest =
                     $controller->buildLink(
-                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        SITE_URL. '/Activity.php',
                         array(
                             'problemID' => $row[1],
                             'action'    => 'displayLastActivity'
@@ -435,7 +435,7 @@ class BUDailyReport extends Business
 
                 $urlActivity =
                     $controller->buildLink(
-                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        SITE_URL. '/Activity.php',
                         array(
                             'callActivityID' => $row[2],
                             'action'         => 'displayActivity'
@@ -518,7 +518,7 @@ class BUDailyReport extends Business
 
                 $urlRequest =
                     $controller->buildLink(
-                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        SITE_URL. '/Activity.php',
                         array(
                             'problemID' => $row[1],
                             'action'    => 'displayLastActivity'
@@ -527,7 +527,7 @@ class BUDailyReport extends Business
 
                 $urlActivity =
                     $controller->buildLink(
-                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        SITE_URL. '/Activity.php',
                         array(
                             'callActivityID' => $row[2],
                             'action'         => 'displayActivity'
@@ -845,7 +845,7 @@ class BUDailyReport extends Business
             do {
                 $urlRequest =
                     $controller->buildLink(
-                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        SITE_URL. '/Activity.php',
                         array(
                             'problemID' => $row[1],
                             'action'    => 'displayLastActivity'
@@ -999,7 +999,7 @@ class BUDailyReport extends Business
             do {
                 $urlRequest =
                     $controller->buildLink(
-                        'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php',
+                        SITE_URL. '/Activity.php',
                         array(
                             'problemID' => $row[1],
                             'action'    => 'displayLastActivity'

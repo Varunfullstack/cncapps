@@ -32,7 +32,7 @@ function processChangeRequestsEmails()
     while ($dbejCallActivity->fetchNext()) {
         $problemID = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
         $lastActivity = $buActivity->getLastActivityInProblem($problemID);
-        $srLink = 'http://cncapps/Activity.php?callActivityID=' . $lastActivity->getValue(
+        $srLink = SITE_URL .'/Activity.php?callActivityID=' . $lastActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&action=displayActivity';
 
@@ -40,7 +40,7 @@ function processChangeRequestsEmails()
         $srLink = "<a href='$srLink'>SR</a>";
 
         $processCRLink =
-            'http://cncapps/Activity.php?callActivityID=' . $dbejCallActivity->getValue(
+            SITE_URL .'/Activity.php?callActivityID=' . $dbejCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&action=changeRequestReview';
 
@@ -107,7 +107,7 @@ function processTimeRequestsEmails()
         $row = [];
         $problemID = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
         $lastActivity = $buActivity->getLastActivityInProblem($problemID);
-        $srLink = 'http://cncapps/Activity.php?callActivityID=' . $lastActivity->getValue(
+        $srLink = SITE_URL .'/Activity.php?callActivityID=' . $lastActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&action=displayActivity';
 
@@ -115,7 +115,7 @@ function processTimeRequestsEmails()
         $srLink = "<a href='$srLink'>SR</a>";
 
         $processCRLink =
-            'http://cncapps/Activity.php?callActivityID=' . $dbejCallActivity->getValue(
+            SITE_URL .'/Activity.php?callActivityID=' . $dbejCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&action=timeRequestReview';
 
