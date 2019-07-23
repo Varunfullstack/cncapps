@@ -54,7 +54,7 @@ if ($db->num_rows()) {
     while ($db->next_record(MYSQLI_ASSOC)) {
 
 
-        $customerURL = "http://" . $_SERVER['HTTP_HOST'] . Controller::formatForHTML(
+        $customerURL = SITE_URL  . Controller::formatForHTML(
                 '/Customer.php?action=dispEdit&customerID=' . $db->Record['id'],
                 1
             );

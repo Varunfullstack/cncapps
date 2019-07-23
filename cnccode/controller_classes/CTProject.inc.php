@@ -1434,7 +1434,7 @@ GROUP BY caa_callacttypeno,
                 foreach ($problems as $problemID) {
 
                     $link = Controller::buildLink(
-                        "http://cncapps/Activity.php",
+                        SITE_URL ."/Activity.php",
                         [
                             "action"    => 'displayFirstActivity',
                             "problemID" => $problemID

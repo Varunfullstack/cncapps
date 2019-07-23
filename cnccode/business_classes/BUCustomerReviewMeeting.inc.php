@@ -84,7 +84,7 @@ class BUCustomerReviewMeeting extends Business
             );
 
             $urlCustomer =
-                'http://' . $_SERVER ['HTTP_HOST'] . '/Customer.php?customerID=' . $customer['customerID'] . '&action=dispEdit';
+                SITE_URL. '/Customer.php?customerID=' . $customer['customerID'] . '&action=dispEdit';
 
             $template->setVar(
                 array(
@@ -513,7 +513,7 @@ class BUCustomerReviewMeeting extends Business
                     $totalLabourHours,
                     2
                 ),
-                "waterMarkURL"       => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png'
+                "waterMarkURL"       => SITE_URL. '/images/CNC_watermarkActualSize.png'
             )
         );
         /*

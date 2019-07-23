@@ -132,7 +132,7 @@ class CTQuestionnaire extends CTCNC
                     );
                 $urlView =
                     Controller::buildLink(
-                        'http://cnc-ltd.co.uk/questionnaire/index.php',
+                        'https://cnc-ltd.co.uk/questionnaire/index.php',
                         array(
                             'questionnaireno' => $questionnaireID
                         )

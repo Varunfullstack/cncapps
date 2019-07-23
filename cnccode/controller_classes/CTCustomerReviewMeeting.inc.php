@@ -90,7 +90,7 @@ class CTCustomerReviewMeeting extends CTCNC
         $agendaTemplate->set_var(
             [
                 'htmlBody' => $text,
-                'URL'      => "http://" . $_SERVER['HTTP_HOST'] . '/images/test.png'
+                'URL'      => SITE_URL. '/images/test.png'
             ]
         );
 
@@ -218,7 +218,7 @@ class CTCustomerReviewMeeting extends CTCNC
                         'slaP3'        => $dsCustomer->getValue(DBECustomer::slaP3),
                         'slaP4'        => $dsCustomer->getValue(DBECustomer::slaP4),
                         'slaP5'        => $dsCustomer->getValue(DBECustomer::slaP5),
-                        "waterMarkURL" => "http://" . $_SERVER['HTTP_HOST'] . '/images/CNC_watermarkActualSize.png',
+                        "waterMarkURL" => SITE_URL. '/images/CNC_watermarkActualSize.png',
                         'reportDate'   => $reportRangeDate
                     )
                 );

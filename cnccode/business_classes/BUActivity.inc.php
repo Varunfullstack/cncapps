@@ -506,7 +506,7 @@ class BUActivity extends Business
         }
 
 
-        $activityURL = "http://" . $_SERVER['HTTP_HOST'] . Controller::formatForHTML(
+        $activityURL = SITE_URL . Controller::formatForHTML(
                 '/Activity.php?action=displayActivity&callActivityID=' . $callActivityID,
                 1
             );
@@ -697,7 +697,7 @@ class BUActivity extends Business
 
         $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
 
-        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
         $template->setVar(
@@ -1218,7 +1218,7 @@ function getLastActivityInProblem($problemID)
                 $fields['reason'] = $dbeFirstActivity->getValue(DBEJCallActivity::reason);
                 $fields['rootCause'] = $rootCause;
                 $fields['fixedActivityReason'] = $fixedActivity->getValue(DBEJCallActivity::reason);
-                $fields['urlQuestionnaire'] = 'http://www.cnc-ltd.co.uk/questionnaire/index.php?problemno=' . $problemID . '&questionnaireno=1';
+                $fields['urlQuestionnaire'] = 'https://www.cnc-ltd.co.uk/questionnaire/index.php?problemno=' . $problemID . '&questionnaireno=1';
                 break;
         }
 
@@ -1490,7 +1490,7 @@ function getLastActivityInProblem($problemID)
 
         $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
 
-        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
         $template->setVar(
@@ -1998,7 +1998,7 @@ function getLastActivityInProblem($problemID)
 
         $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
 
-        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
         $template->setVar(
@@ -2134,7 +2134,7 @@ function getLastActivityInProblem($problemID)
         $dbeJCallActivity->getRow($callActivity->getValue(DBECallActivity::callActivityID));
 
 
-        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
         $template->setVar(
@@ -2214,7 +2214,7 @@ function getLastActivityInProblem($problemID)
             'SpecialAttentionEmail.inc.html'
         );
 
-        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
         $durationHours = common_convertHHMMToDecimal(
@@ -2315,7 +2315,7 @@ function sendCriticalEmail($callActivityID)
             'CriticalEmail.inc.html'
         );
 
-        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
         $durationHours = common_convertHHMMToDecimal(
@@ -2422,7 +2422,7 @@ function sendCriticalEmail($callActivityID)
             'FutureVisitEmail.inc.html'
         );
 
-        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
         $template->setVar(
@@ -2508,11 +2508,11 @@ function sendCriticalEmail($callActivityID)
 
         $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
 
-        $urlChangeControlRequest = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=changeRequestReview&callActivityID=' . $dbeCallActivity->getValue(
+        $urlChangeControlRequest = SITE_URL. '/Activity.php?action=changeRequestReview&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&fromEmail=true';
 
-        $urlLastActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
+        $urlLastActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
 
@@ -2831,7 +2831,7 @@ function sendCriticalEmail($callActivityID)
 
         $userName = $requestingUser->getValue(DBEUser::firstName) . ' ' . $requestingUser->getValue(DBEUser::lastName);
 
-        $urlLastActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
+        $urlLastActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
 
@@ -3069,11 +3069,11 @@ function createChangeRequestActivity($callActivityID,
 
         $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
 
-        $urlChangeControlRequest = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=changeControlRequest&callActivityID=' . $dbeCallActivity->getValue(
+        $urlChangeControlRequest = SITE_URL. '/Activity.php?action=changeControlRequest&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
 
-        $urlLastActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
+        $urlLastActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
 
@@ -5055,7 +5055,7 @@ is currently a balance of ';
 
         $subject = 'Similar activity added for ' . $dbeJProblem->getValue(DBEJProblem::customerName);
 
-        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
         $template->setVar(
@@ -5806,7 +5806,7 @@ is currently a balance of ';
         $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
         $dbeJLastCallActivity = $this->getLastActivityInProblem($problemID);
 
-        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getPKValue(
+        $urlActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeJLastCallActivity->getPKValue(
             );
 
         $assignedByUserName = (string)$DBUser->getValue(DBEUser::name);
@@ -6381,10 +6381,10 @@ function toggleCriticalFlag($problemID)
 
         $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
 
-        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
-        $projectURL = 'http://' . $_SERVER ['HTTP_HOST'] . '/Project.php?action=add&customerID=' . $dbeJCallActivity->getValue(
+        $projectURL = SITE_URL. '/Project.php?action=add&customerID=' . $dbeJCallActivity->getValue(
                 DBEJCallActivity::customerID
             );
 
@@ -7785,7 +7785,7 @@ function addCustomerRaisedRequest(AutomatedRequest $record,
 
         $dbeJCallActivity = $this->getFirstActivityInProblem($problemID);
 
-        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+        $urlActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
             );
 
         $template->setVar(
@@ -8488,7 +8488,7 @@ function addCustomerRaisedRequest(AutomatedRequest $record,
         $fixedBy = $dbeJCallActivity->getValue(DBEJCallActivity::userName);
         $fixSummary = $dbeJCallActivity->getValue(DBEJCallActivity::reason);
 
-        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $initialID;
+        $urlActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $initialID;
 
 
         $template->setVar(
@@ -9682,7 +9682,7 @@ function addCustomerRaisedRequest(AutomatedRequest $record,
             'ManagementReviewSummaryAddedEmail.inc.html'
         );
 
-        $urlActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJProblem->getValue(
+        $urlActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeJProblem->getValue(
                 DBEJCallActivity::callActivityID
             );
 
@@ -10093,11 +10093,11 @@ function addCustomerRaisedRequest(AutomatedRequest $record,
         $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
 
 
-        $urlSalesRequestReview = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=salesRequestReview&callActivityID=' . $salesRequestActivity->getValue(
+        $urlSalesRequestReview = SITE_URL. '/Activity.php?action=salesRequestReview&callActivityID=' . $salesRequestActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&fromEmail=true';
 
-        $urlLastActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $lastActivity->getValue(
+        $urlLastActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $lastActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
 

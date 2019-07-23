@@ -132,12 +132,12 @@ if (!$outputToScreen) {
 
             $style = "style='color:" . $itemNotYetReceived->color() . "'";
 
-            $purchaseOrderURL = "http://cncapps/PurchaseOrder.php?action=display&porheadID=" . $itemNotYetReceived->getPurchaseOrderId(
+            $purchaseOrderURL = SITE_URL ."/PurchaseOrder.php?action=display&porheadID=" . $itemNotYetReceived->getPurchaseOrderId(
                 );
 
             $purchaseOrderLink = "<a href='$purchaseOrderURL'>" . $itemNotYetReceived->getPurchaseOrderId() . "</a>";
 
-            $salesOrderURL = "http://cncapps/SalesOrder.php?action=displaySalesOrder&ordheadID=" . $itemNotYetReceived->getSalesOrderId(
+            $salesOrderURL = SITE_URL ."/SalesOrder.php?action=displaySalesOrder&ordheadID=" . $itemNotYetReceived->getSalesOrderId(
                 );
 
             $salesOrderLink = "<a href='" . $salesOrderURL . "'>" . $itemNotYetReceived->getSalesOrderId() . "</a>";
@@ -146,14 +146,14 @@ if (!$outputToScreen) {
 
             if ($itemNotYetReceived->getProjectID()) {
 
-                $projectURL = "http://cncapps/Project.php?projectID=" . $itemNotYetReceived->getProjectID(
+                $projectURL = SITE_URL ."/Project.php?projectID=" . $itemNotYetReceived->getProjectID(
                     ) . "&action=edit";
                 $projectLink = "<a href='" . $projectURL . "'>" . $itemNotYetReceived->getProjectName() . "</a>";
             }
 
             $serviceRequestLink = "";
             if ($itemNotYetReceived->getServiceRequestID()) {
-                $serviceRequestURL = "http://cncapps/Activity.php?problemID=" . $itemNotYetReceived->getServiceRequestID(
+                $serviceRequestURL = SITE_URL ."/Activity.php?problemID=" . $itemNotYetReceived->getServiceRequestID(
                     ) . "&action=displayLastActivity";
                 $serviceRequestLink = "<a href='" . $serviceRequestURL . "'>" . $itemNotYetReceived->getServiceRequestID(
                     ) . "</a>";
