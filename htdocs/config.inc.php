@@ -483,7 +483,7 @@ $environment = [
 if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line calls
     switch ($_SERVER['HTTP_HOST']) {
 
-        case 'cncapps.cnc-ltd-co.uk':
+        case 'cncapps.cnc-ltd.co.uk':
             $server_type = MAIN_CONFIG_SERVER_TYPE_LIVE;
             break;
         case 'cncdev.cnc-ltd.co.uk':
