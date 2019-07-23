@@ -7,6 +7,11 @@
  * Time: 11:26
  */
 
+use CNCLTD\LoggerCLI;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 require_once("config.inc.php");
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
 require_once($cfg["path_dbe"] . "/DBEOSSupportDates.php");
@@ -19,8 +24,9 @@ require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
-require __DIR__ . '/../vendor/autoload.php';
 global $db;
+$logName = 'office365LicenseExport';
+$logger = new LoggerCLI($logName);
 
 // increasing execution time to infinity...
 ini_set('max_execution_time', 0);
@@ -56,15 +62,13 @@ $dbeCustomer = new DBECustomer($thing);
 if (isset($customerID)) {
     $dbeCustomer->getRow($customerID);
     if (!$dbeCustomer->rowCount) {
-        cli_echo("Customer not found", "error");
+        $logger->error("Customer not found");
         exit;
     }
 } else {
     $dbeCustomer->getActiveCustomers(true);
     $dbeCustomer->fetchNext();
 }
-
-
 $BUHeader = new BUHeader($thing);
 $dbeHeader = new DataSet($thing);
 $BUHeader->getHeader($dbeHeader);
@@ -89,14 +93,14 @@ do {
     $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
     $customerName = $dbeCustomer->getValue(DBECustomer::name);
 
-    cli_echo('Getting Office 365 Data for Customer: ' . $customerID . ' - ' . $customerName, 'info');
+    $logger->info('Getting Office 365 Data for Customer: ' . $customerID . ' - ' . $customerName);
 
     // we have to pull from passwords.. the service 10
 
     $dbePassword = $buCustomer->getOffice365PasswordItem($customerID);
 
     if (!$dbePassword->rowCount) {
-        cli_echo('This customer does not have a Office 365 Admin Portal service password', 'warning');
+        $logger->warning('This customer does not have a Office 365 Admin Portal service password');
         continue;
     }
 
@@ -123,18 +127,18 @@ do {
     $cmd = escape_win32_cmd($escaped);
 
     if ($debugMode) {
-        cli_echo('The powershell line to execute is :' . $cmd, 'info');
+        $logger->notice('The powershell line to execute is :' . $cmd);
     }
     $output = noshell_exec($cmd);
     $data = json_decode($output, true, 512);
 
     if (!isset($data)) {
-        cli_echo('Failed to parse for customer: ' . $output, 'error');
+        $logger->error('Failed to parse for customer: ' . $output);
         createFailedSR($dbeCustomer, "Could not parse Powershell response: $output");
         continue;
     }
     if (isset($data['error'])) {
-        cli_echo('Failed to pull data for customer: ' . $data['errorMessage'], 'error');
+        $logger->error('Failed to pull data for customer: ' . $data['errorMessage']);
         createFailedSR($dbeCustomer, $data['errorMessage'], $data['stackTrace'], $data['position']);
         continue;
     }
@@ -148,7 +152,7 @@ do {
     ];
 
     if (!count($data)) {
-        cli_echo('The customer does not have any licenses', 'warning');
+        $logger->warning('The customer does not have any licenses');
         continue;
     }
 
@@ -168,7 +172,7 @@ do {
                     strtolower($datum['DisplayName']),
                     'leaver'
                 ) !== false && $datum['RecipientTypeDetails'] == 'SharedMailbox') {
-                cli_echo('Raising a Customer Leaver with License SR', 'warning');
+                $logger->warning('Raising a Customer Leaver with License SR');
                 raiseCustomerLeaverWithLicenseSR($dbeCustomer, $datum['DisplayName']);
             }
 
@@ -184,27 +188,42 @@ do {
                         $mailboxLimit = $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit);
                     }
                 } else {
-                    cli_echo('Raising a License not found SR', 'warning');
+                    $logger->warning('Raising a License not found SR');
                     raiseCNCRequest($license, $dbeCustomer, $datum['DisplayName']);
                 }
             }
         }
-        $data[$key]['RecipientTypeDetails'] = $data[$key]['RecipientTypeDetails'] == "SharedMailbox" ? "Shared Mailbox" : ($data[$key]['RecipientTypeDetails'] == "UserMailbox" ? "User Mailbox" : $data[$key]['RecipientTypeDetails']);
+        $licensesArray = explode(", ", $licenseValue);
+        sort($licensesArray);
+        $licenseValue = implode(", ", $licensesArray);
+
+        switch ($data[$key]['RecipientTypeDetails']) {
+            case "SharedMailbox":
+                $data[$key]['RecipientTypeDetails'] = "Shared";
+                break;
+            case "UserMailbox":
+                $data[$key]['RecipientTypeDetails'] = "User";
+                break;
+            case 'RoomMailbox':
+                $data[$key]['RecipientTypeDetails'] = "Room";
+                break;
+        }
+
         $data[$key]['Licenses'] = $licenseValue;
         $data[$key]['IsLicensed'] = $data[$key]['IsLicensed'] ? 'Yes' : 'No';
         $totalizationRow['TotalMailBox'] += $datum['TotalItemSize'];
+        $data[$key]['TotalItemSize'] = $datum['TotalItemSize'];
         $totalizationRow['LicensedUsers'] += $datum['IsLicensed'];
 
         $mailboxLimits[] = $mailboxLimit;
     }
 
 
-    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $spreadsheet = new Spreadsheet();
     $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
     $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
     $sheet = $spreadsheet->getActiveSheet();
     $dateTime = new DateTime();
-    $sheet->fromArray(["Report generated at " . $dateTime->format("d-m-Y H:i:s")]);
     $sheet->fromArray(
         [
             "Display Name",
@@ -214,14 +233,14 @@ do {
             "Licenses"
         ],
         null,
-        'A2'
+        'A1'
     );
     $sheet->fromArray(
         $data,
         null,
-        'A3'
+        'A2'
     );
-    $highestRow = count($data) + 3;
+    $highestRow = count($data) + 2;
     $totalizationRow['LicensedUsers'] = "$totalizationRow[LicensedUsers] Licensed Users";
     $sheet->fromArray(
         $totalizationRow,
@@ -229,9 +248,20 @@ do {
         'A' . $highestRow
     );
 
+    $sheet->setCellValue(
+        "B$highestRow",
+        '=sum(B2:B' . ($highestRow - 1) . ')'
+    );
+    $sheet->setCellValue(
+        "D$highestRow",
+        '=countif(D2:D' . ($highestRow - 1) . ', "yes") & " Licensed Users"'
+    );
+
+    $sheet->fromArray(["Report generated at " . $dateTime->format("d-m-Y H:i:s")], null, 'A' . ($highestRow + 2));
+
     $sheet->getStyle("A$highestRow:E$highestRow")->getFont()->setBold(true);
 
-    $sheet->getStyle("A2:E2")->getFont()->setBold(true);
+    $sheet->getStyle("A1:E1")->getFont()->setBold(true);
 
     $sheet->getStyle("A1:E$highestRow")->getAlignment()->setHorizontal('center');
 
@@ -252,19 +282,24 @@ do {
             if ($color) {
                 $sheet->getStyle("A$currentRow:E$currentRow")
                     ->getFill()
-                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                    ->setFillType(Fill::FILL_SOLID)
                     ->getStartColor()
                     ->setARGB($color);
             }
         }
     }
 
+    $mailboxColumn = $sheet->getStyle("B2:B$highestRow");
+    $mailboxColumn->getNumberFormat()->setFormatCode("#,##0");
+    $mailboxColumn->getAlignment()->setHorizontal('right');
+
+
     foreach (range('A', $sheet->getHighestDataColumn()) as $col) {
         $sheet->getColumnDimension($col)
             ->setAutoSize(true);
     }
 
-    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    $writer = new Xlsx($spreadsheet);
     $customerFolder = $buCustomer->getCustomerFolderPath($customerID);
     $folderName = $customerFolder . "\Review Meetings\\";
     if (!file_exists($folderName)) {
@@ -275,7 +310,7 @@ do {
         );
     }
 
-    $fileName = $folderName . "O365 Licenses.xlsx";
+    $fileName = $folderName . "Current Mailbox Extract.xlsx";
     try {
         $writer->save(
             $fileName
@@ -333,9 +368,9 @@ do {
             $dbeCustomerDocument->updateRow();
         }
 
-        cli_echo('All good!!. Creating file ' . $fileName, 'success');
-    } catch (\Exception $exception) {
-        cli_echo('Failed to save file, possibly file open', 'warning');
+        $logger->info('All good!!. Creating file ' . $fileName);
+    } catch (Exception $exception) {
+        $logger->error('Failed to save file, possibly file open: ' . $exception->getMessage());
     }
 } while ($dbeCustomer->fetchNext());
 
@@ -407,7 +442,7 @@ function raiseCustomerLeaverWithLicenseSR(DBECustomer $dbeCustomer, $userName)
     );
     $dbeProblem->setValue(
         DBEJProblem::queueNo,
-        2
+        3
     );
 
     $dbeProblem->setValue(

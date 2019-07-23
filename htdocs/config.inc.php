@@ -372,19 +372,6 @@ if (get_magic_quotes_gpc()) {
 End Strip all slashes from request variables (includes cookies)
 */
 
-function is_cli()
-{
-    if (defined('STDIN')) {
-        return true;
-    }
-
-    if (empty($_SERVER['REMOTE_ADDR']) and !isset($_SERVER['HTTP_USER_AGENT']) and count($_SERVER['argv']) > 0) {
-        return true;
-    }
-
-    return false;
-}
-
 /**
  * @param $value
  * @return array|string
@@ -489,38 +476,6 @@ $GLOBALS['php7'] = true;
 $php7 = true;
 
 
-function getEnvironmentByPath()
-{
-
-    if (strpos(__DIR__, 'cncapps') !== false) {
-        $_SERVER['HTTP_HOST'] = 'cncapps';
-        return MAIN_CONFIG_SERVER_TYPE_LIVE;
-    }
-
-    if (strpos(__DIR__, 'cncdev7') !== false) {
-        $_SERVER['HTTP_HOST'] = 'cncdev';
-        return MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
-    }
-
-    if (strpos(__DIR__, 'cnctest') !== false) {
-        $_SERVER['HTTP_HOST'] = 'cnctest';
-        return MAIN_CONFIG_SERVER_TYPE_TEST;
-    }
-
-    if (strpos(__DIR__, 'cncweb') !== false) {
-        $_SERVER['HTTP_HOST'] = 'cncweb';
-        return MAIN_CONFIG_SERVER_TYPE_WEBSITE;
-    }
-
-    if (strpos(__DIR__, 'cncdesign') !== false) {
-        $_SERVER['HTTP_HOST'] = 'cncdesign';
-        return MAIN_CONFIG_SERVER_TYPE_DESIGN;
-    }
-
-    return MAIN_CONFIG_SERVER_TYPE_LIVE;
-}
-
-
 if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line calls
     switch ($_SERVER['HTTP_HOST']) {
 
@@ -547,29 +502,6 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
     $server_type = getEnvironmentByPath();
     $GLOBALS['isRunningFromCommandLine'] = true;
 }
-function cli_echo($string, $color = null)
-{
-    $restoreColor = "\e[0m";
-    $applyColorCode = null;
-    switch ($color) {
-        case "error":
-            $applyColorCode = "\e[31m";
-            break;
-        case "success":
-            $applyColorCode = "\e[32m";
-            break;
-        case 'info':
-            $applyColorCode = "\e[36m";
-            break;
-        case 'warning':
-            $applyColorCode = "\e[33m";
-    }
-
-    if ($applyColorCode) {
-        $string = $applyColorCode . $string . $restoreColor;
-    }
-    echo $string . PHP_EOL;
-}
 
 define(
     'CONFIG_PUBLIC_DOMAIN',
@@ -579,6 +511,7 @@ define(
     "DB_HOST",
     "localhost"
 );
+
 switch ($server_type) {
 
     case MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT:
@@ -1011,6 +944,10 @@ define(
 define(
     "APPLICATION_DIR",
     BASE_DRIVE . "/cnccode"
+);
+define(
+    'APPLICATION_LOGS',
+    BASE_DRIVE . '/logs'
 );
 
 define(

@@ -146,14 +146,14 @@ class Controller extends BaseObject
         &$cfg
     )
     {
+        $this->cfg =& $cfg;
+        $this->createTemplate();
         $this->BaseObjectNoOwner();
         $this->pageOpen();
         $this->postVars =& $postVars;
         $this->getVars =& $getVars;
         $this->cookieVars =& $cookieVars;
-        $this->cfg =& $cfg;
         $this->requestMethod = $requestMethod;
-        $this->createTemplate();
         $this->setFormErrorOff();
 
     }

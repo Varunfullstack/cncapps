@@ -93,12 +93,14 @@ class CTPassword extends CTCNC
         /** @var DSForm $dsSearchForm */
         $this->buPassword->initialiseSearchForm($dsSearchForm);
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
-                $this->setFormErrorOn();
-            } else {
-                $customerID = $dsSearchForm->getValue(DBEPassword::customerID);
-                header("Location: Password.php?action=list&customerID=$customerID");
-                exit;
+            if (isset($_REQUEST['searchForm'])) {
+                if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
+                    $this->setFormErrorOn();
+                } else {
+                    $customerID = $dsSearchForm->getValue(DBEPassword::customerID);
+                    header("Location: Password.php?action=list&customerID=$customerID");
+                    exit;
+                }
             }
 
         }

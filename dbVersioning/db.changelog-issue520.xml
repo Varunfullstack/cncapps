@@ -39,7 +39,7 @@
         <sql>
             insert into office365License
             values (1, "Advanced Threat Protection", "ATP_ENTERPRISE", 51200),
-                   (2, "Enterprise E3", "ENTERPRISEPACK", 51200),
+                   (2, "Enterprise E3", "ENTERPRISEPACK", 102400),
                    (3, "Enterprise E1", "EXCHANGESTANDARD", 51200),
                    (4, "Business Essentials", "O365_BUSINESS_ESSENTIALS", 51200),
                    (5, "Business Premium", "O365_BUSINESS_PREMIUM", 51200),
@@ -55,18 +55,24 @@
                    (15, "Dynamics 365 P1 Trial for Information Workers", "DYN365_ENTERPRISE_P1_IW", 51200),
                    (16, "MS Project Professional", "PROJECTPROFESSIONAL", 51200),
                    (17, "Office 365 ProPlus", "OFFICESUBSCRIPTION", 51200),
-                   (18, "Exchange Archiving Online", "EXCHANGEENTERPRISE", 51200),
+                   (18, "Exchange Archiving Online", "EXCHANGEENTERPRISE", 102400),
                    (19, "MS Teams", "TEAMS_COMMERCIAL_TRIAL", 51200),
                    (20, "MS Teams", "MS_TEAMS_IW", 51200),
                    (21, "Office 365 ProPlus for students", "OFFICESUBSCRIPTION_STUDENT", 51200),
                    (22, "Enterprise E2 for students", "EXCHANGEENTERPRISE_STUDENT", 51200),
                    (23, "Office 365 A1 for students", "STANDARDWOFFPACK_STUDENT", 51200),
-                   (24, "Office 365 A1 for faculty", "STANDARDWOFFPACK_FACULTY", 51200)
+                   (24, "Office 365 A1 for faculty", "STANDARDWOFFPACK_FACULTY", 51200),
+                   (25, "Exchange Archiving Online", "EXCHANGEARCHIVE_ADDON", 102400),
+                   (26, "Enterprise E5", "ENTERPRISEPREMIUM", 102400),
+                   (27, "PowerApps Plan 2 Trial", "POWERAPPS_VIRAL", null),
+                   (28, "Dynamics 365 for Marketing", "DYN365_BUSINESS_MARKETING", null),
+                   (29, "Dynamics 365 Customer Service Insights Trial", "DYN365_AI_SERVICE_INSIGHTS", null),
+                   (30, "Dynamics 365 Business Central for IWs", "PROJECT_MADEIRA_PREVIEW_IW_SKU", null)
         </sql>
         <sql>
             insert into db_sequence
-            values ('office365license', 24)
-            ON DUPLICATE KEY UPDATE nextid = 24
+            values ('office365license', (select max(id) + 1 from office365license))
+            ON DUPLICATE KEY UPDATE nextid = (select max(id) + 1 from office365license)
         </sql>
         <rollback>
             <sql>
