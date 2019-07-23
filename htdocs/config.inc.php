@@ -41,27 +41,27 @@ function getEnvironmentByPath()
 {
 
     if (strpos(__DIR__, 'cncapps') !== false) {
-        $_SERVER['HTTP_HOST'] = 'cncapps';
+        $_SERVER['HTTP_HOST'] = 'cncapps.cnc-ltd-co.uk';
         return MAIN_CONFIG_SERVER_TYPE_LIVE;
     }
 
     if (strpos(__DIR__, 'cncdev7') !== false) {
-        $_SERVER['HTTP_HOST'] = 'cncdev';
+        $_SERVER['HTTP_HOST'] = 'cncdev.cnc-ltd.co.uk';
         return MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
     }
 
     if (strpos(__DIR__, 'cnctest') !== false) {
-        $_SERVER['HTTP_HOST'] = 'cnctest';
+        $_SERVER['HTTP_HOST'] = 'cnctest.cnc-ltd.co.uk';
         return MAIN_CONFIG_SERVER_TYPE_TEST;
     }
 
     if (strpos(__DIR__, 'cncweb') !== false) {
-        $_SERVER['HTTP_HOST'] = 'cncweb';
+        $_SERVER['HTTP_HOST'] = 'cncweb.cnc-ltd.co.uk';
         return MAIN_CONFIG_SERVER_TYPE_WEBSITE;
     }
 
     if (strpos(__DIR__, 'cncdesign') !== false) {
-        $_SERVER['HTTP_HOST'] = 'cncdesign';
+        $_SERVER['HTTP_HOST'] = 'cncdesign.cnc-ltd.co.uk';
         return MAIN_CONFIG_SERVER_TYPE_DESIGN;
     }
 
@@ -475,6 +475,10 @@ $onPavilionWebServer = false;
 $GLOBALS['php7'] = true;
 $php7 = true;
 
+$environment = [
+
+];
+
 
 if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line calls
     switch ($_SERVER['HTTP_HOST']) {
@@ -482,16 +486,16 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
         case 'cncapps.cnc-ltd-co.uk':
             $server_type = MAIN_CONFIG_SERVER_TYPE_LIVE;
             break;
-        case 'cncdev.cnc-ltd.co.uk:485':
+        case 'cncdev.cnc-ltd.co.uk':
             $server_type = MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
             break;
-        case 'cnctest.cnc-ltd.co.uk:486':
+        case 'cnctest.cnc-ltd.co.uk':
             $server_type = MAIN_CONFIG_SERVER_TYPE_TEST;
             break;
-        case 'cncweb.cnc-ltd.co.uk:487':
+        case 'cncweb.cnc-ltd.co.uk':
             $server_type = MAIN_CONFIG_SERVER_TYPE_WEBSITE;
             break;
-        case 'cncdesign.cnc-ltd.co.uk:488':
+        case 'cncdesign.cnc-ltd.co.uk':
             $server_type = MAIN_CONFIG_SERVER_TYPE_DESIGN;
     }
 
