@@ -134,7 +134,7 @@ foreach ($engineers as $row) {
             ?>
             <TR>
                 <TD>
-                    <A href="http://<?php echo $_SERVER['HTTP_HOST'] ?>/Activity.php?action=displayActivity&callActivityID=<?php print $i[0] ?>"><?php print $i[0] ?></A>
+                    <A href="<?= SITE_URL ?>/Activity.php?action=displayActivity&callActivityID=<?php print $i[0] ?>"><?php print $i[0] ?></A>
                 </TD>
                 <TD>
                     <?php print $i[1] ?>
@@ -259,7 +259,7 @@ foreach ($managers as $managerId => $manager) {
                     }
                     ?>
                     <TD>
-                        <A href="http://<?= $_SERVER['HTTP_HOST'] ?>/Activity.php?action=displayActivity&callActivityID=<?= $openActivity[0] ?>"><?= $openActivity[0] ?></A>
+                        <A href="<?= SITE_URL ?>/Activity.php?action=displayActivity&callActivityID=<?= $openActivity[0] ?>"><?= $openActivity[0] ?></A>
                     </TD>
 
                     <TD>

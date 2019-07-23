@@ -66,6 +66,78 @@ class CTCustomerReviewMeeting extends CTCNC
     }
 
     /**
+     * Create PDF reports and save to disk
+     *
+     * @throws Exception
+     */
+
+    function generatePdf()
+    {
+
+        $text = $this->getParam('html');
+
+        $agendaTemplate = new Template (
+            $GLOBALS ["cfg"] ["path_templates"],
+            "remove"
+        );
+
+        $agendaTemplate->set_file(
+            'page',
+            'CustomerReviewMeetingAgendaDocument.inc.html'
+        );
+
+
+        $agendaTemplate->set_var(
+            [
+                'htmlBody' => $text,
+                'URL'      => "http://" . $_SERVER['HTTP_HOST'] . '/images/test.png'
+            ]
+        );
+
+        $agendaTemplate->parse(
+            'output',
+            'page',
+            true
+        );
+
+
+        $html = $agendaTemplate->get_var('output');
+        try {
+            $this->buCustomerReviewMeeting->generateAgendaPdf(
+                $this->getParam('customerID'),
+                $html,
+                $this->getParam('meetingDateYmd')
+            );
+        } catch (Exception $exception) {
+            http_response_code(500);
+            return ["status" => $exception->getMessage(), "description" => "Failed to generate files"];
+        }
+
+        $startDate = (DateTime::createFromFormat(
+            "m/Y",
+            $this->getParam('startYearMonth')
+        ))->modify('first day of this month ');
+        $endDate = (DateTime::createFromFormat(
+            "m/Y",
+            $this->getParam('endYearMonth')
+        ))->modify('last day of this month');
+
+        $this->buCustomerReviewMeeting->generateSalesPdf(
+            $this->getParam('customerID'),
+            $startDate,
+            $endDate,
+            $this->getParam('meetingDateYmd')
+        );
+
+        $this->buCustomerReviewMeeting->generateMeetingNotes(
+            $this->getParam('customerID'),
+            $this->getParam('meetingDateYmd')
+        );
+
+        return ["status" => "ok"];
+    }
+
+    /**
      * @throws Exception
      */
     function search()
@@ -262,7 +334,7 @@ class CTCustomerReviewMeeting extends CTCNC
                             'reviewHeading'        => 'Review Item ' . $itemNo . '. SR no ' . $dsReviews->getValue(
                                     DBEProblem::problemID
                                 ),
-                            'urlServiceRequest'    => $urlServiceRequest,
+                            'urlServiceRequest'    => SITE_URL . '/' . $urlServiceRequest,
                             'managementReviewText' => $dsReviews->getValue(DBEProblem::managementReviewReason),
                         )
                     );
@@ -464,6 +536,177 @@ class CTCustomerReviewMeeting extends CTCNC
         $this->parsePage();
     }
 
+    private function getSupportedUsersData(BUContact $buContact,
+                                           $customerId,
+                                           $customerName
+    )
+    {
+        /** @var DataSet $dsSupportContact */
+        $dsSupportContact = null;
+        $buContact->getSupportContacts(
+            $dsSupportContact,
+            $customerId
+        );
+
+        $supportContacts = [
+            "main"       => [],
+            "supervisor" => [],
+            "support"    => [],
+            "delegate"   => []
+        ];
+
+        $duplicates = [];
+        $userMap = [];
+        $count = 0;
+        while ($dsSupportContact->fetchNext()) {
+
+            $firstName = $dsSupportContact->getValue(DBEContact::firstName);
+            $lastName = $dsSupportContact->getValue(DBEContact::lastName);
+            $userId = $dsSupportContact->getValue(DBEContact::contactID);
+            $key = strtolower($firstName . $lastName);
+            if (isset($userMap[$key])) {
+
+                if (!isset($duplicates[$userMap[$key]['id']])) {
+                    $duplicates[$userMap[$key]['id']] = $userMap[$key];
+                }
+
+                $duplicates[$userId] = [
+                    "firstName"  => $firstName,
+                    "lastName"   => $lastName,
+                    "id"         => $userId,
+                    "customerId" => $customerId
+                ];
+            } else {
+                $userMap[$key] = [
+                    "firstName"  => $firstName,
+                    "lastName"   => $lastName,
+                    "id"         => $userId,
+                    "customerId" => $customerId
+                ];
+            }
+
+
+            $supportContacts[$dsSupportContact->getValue(DBEContact::supportLevel)][] = [
+                "firstName" => $firstName,
+                "lastName"  => $lastName
+            ];
+            $count++;
+        }
+
+        if (count($duplicates)) {
+            // send email to sales@cnc-ltd.co.uk with the list of duplicates
+            $buMail = new BUMail($this);
+
+            $senderEmail = CONFIG_SUPPORT_EMAIL;
+
+            $senderName = 'CNC Support Department';
+
+            $toEmail = 'sales@cnc-ltd.co.uk';
+
+            $template = new Template(
+                $GLOBALS ["cfg"]["path_templates"],
+                "remove"
+            );
+            $template->set_file(
+                'page',
+                'CustomerReviewMeetingContactDuplicates.html'
+            );
+
+            $template->set_var(
+                'customerName',
+                $customerName
+            );
+
+            $template->set_block(
+                'page',
+                'contactBlock',
+                'contacts'
+            );
+
+            foreach ($duplicates as $key => $row) {
+
+                $template->set_var(
+                    array(
+                        'contactID'        => $row['id'],
+                        'contactFirstName' => $row['firstName'],
+                        'contactLastName'  => $row['lastName'],
+
+                    )
+                );
+
+                $template->parse(
+                    'contacts',
+                    'contactBlock',
+                    true
+                );
+            }
+
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
+
+            $body = $template->get_var('output');
+
+            $subject = 'Possible duplicated customer contacts';
+
+            $hdrs = array(
+                'From'         => $senderEmail,
+                'To'           => $toEmail,
+                'Subject'      => $subject,
+                'Date'         => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            $buMail->mime->setHTMLBody($body);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
+            );
+            $body = $buMail->mime->get($mime_params);
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->putInQueue(
+                $senderEmail,
+                $toEmail,
+                $hdrs,
+                $body,
+                true
+            );
+
+        }
+
+        $sectionTemplate = '<div style="clear: both;margin-bottom: 22px"></div><div style="font-weight: bold; font-size: small;text-align: left; ">{type} Contacts ({count})</div>
+    <br>
+    <ul class="ul3">
+        {contactData}
+    </ul>';
+
+        $toReturn = "";
+        foreach ($supportContacts as $type => $data) {
+
+            $contactsInfo = "";
+            foreach ($data as $contact) {
+                $contactsInfo .= "<li>" . $contact['firstName'] . ' ' . $contact['lastName'] . "</li>";
+            }
+            $currentSection = "" . $sectionTemplate;
+            $currentSection = str_replace('{type}', ucfirst($type), $currentSection);
+            $currentSection = str_replace('{count}', count($supportContacts[$type]), $currentSection);
+            $currentSection = str_replace('{contactData}', $contactsInfo, $currentSection);
+            $toReturn .= $currentSection;
+        }
+
+        return [
+            "data"  => $toReturn,
+            "count" => $count
+        ];
+    }
+
     private function getServerCareContractBody($customerId,
                                                $supportContactsCount
     )
@@ -549,78 +792,6 @@ class CTCustomerReviewMeeting extends CTCNC
 
         return $serverCareContractsTemplate->get_var('output');
 
-    }
-
-    /**
-     * Create PDF reports and save to disk
-     *
-     * @throws Exception
-     */
-
-    function generatePdf()
-    {
-
-        $text = $this->getParam('html');
-
-        $agendaTemplate = new Template (
-            $GLOBALS ["cfg"] ["path_templates"],
-            "remove"
-        );
-
-        $agendaTemplate->set_file(
-            'page',
-            'CustomerReviewMeetingAgendaDocument.inc.html'
-        );
-
-
-        $agendaTemplate->set_var(
-            [
-                'htmlBody' => $text,
-                'URL'      => "http://" . $_SERVER['HTTP_HOST'] . '/images/test.png'
-            ]
-        );
-
-        $agendaTemplate->parse(
-            'output',
-            'page',
-            true
-        );
-
-
-        $html = $agendaTemplate->get_var('output');
-        try {
-            $this->buCustomerReviewMeeting->generateAgendaPdf(
-                $this->getParam('customerID'),
-                $html,
-                $this->getParam('meetingDateYmd')
-            );
-        } catch (Exception $exception) {
-            http_response_code(500);
-            return ["status" => $exception->getMessage(), "description" => "Failed to generate files"];
-        }
-
-        $startDate = (DateTime::createFromFormat(
-            "m/Y",
-            $this->getParam('startYearMonth')
-        ))->modify('first day of this month ');
-        $endDate = (DateTime::createFromFormat(
-            "m/Y",
-            $this->getParam('endYearMonth')
-        ))->modify('last day of this month');
-
-        $this->buCustomerReviewMeeting->generateSalesPdf(
-            $this->getParam('customerID'),
-            $startDate,
-            $endDate,
-            $this->getParam('meetingDateYmd')
-        );
-
-        $this->buCustomerReviewMeeting->generateMeetingNotes(
-            $this->getParam('customerID'),
-            $this->getParam('meetingDateYmd')
-        );
-
-        return ["status" => "ok"];
     }
 
     private function getServiceDeskContractBody($customerId)
@@ -872,285 +1043,36 @@ class CTCustomerReviewMeeting extends CTCNC
         return $thirdPartyServerAccess;
     }
 
-    private function generateCharts($data,
-                                    $customerId
-    )
+    /**
+     * @param DBECustomer|DataSet $dsCustomer
+     * @return string
+     */
+    private function getReviewMeetingFrequencyBody($dsCustomer)
     {
+        $value = $dsCustomer->getValue(DBECustomer::reviewMeetingFrequencyMonths);
 
-        $serverCareIncidents = [
-            "title"   => "ServerCare Incidents",
-            "columns" => ["Dates", "ServerSR", "AvgResponse", "Changes"],
-            "data"    => []
-        ];
+        switch ($value) {
+            case 1:
+                $frequency = 'Monthly';
+                break;
+            case 2:
+                $frequency = 'Two-monthly';
+                break;
+            case 3:
+                $frequency = 'Quarterly';
+                break;
+            case 6:
+                $frequency = 'Six-monthly';
+                break;
+            case 12:
+                $frequency = 'Annually';
+                break;
 
-        $serviceDesk = [
-            "title"   => "ServiceDesk/Pre-Pay Incidents",
-            "columns" => ["Dates", "UserSR", "AvgResponse", "Changes",],
-            "data"    => []
-        ];
-
-        $otherContracts = [
-            "title"   => "Other Contract Incidents",
-            "columns" => ["Dates", "OtherSR", "AvgResponse", "Changes",],
-            "data"    => []
-        ];
-
-        $totalSR = [
-            "title"   => "Total SR's",
-            "columns" => ["Dates", "P1-3", "P4",],
-            "data"    => []
-        ];
-
-
-        foreach ($data as $datum) {
-
-
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['serverCareCount1And3'],
-                number_format(
-                    $datum['serverCareHoursResponded'],
-                    1
-                ),
-                $datum['serverCareCount4']
-            ];
-
-            $serverCareIncidents['data'][] = $row;
-
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['serviceDeskCount1And3'] + $datum['prepayCount1And3'],
-                number_format(
-                    $datum['serviceDeskHoursResponded'] + $datum['prepayHoursResponded'],
-                    1
-                ),
-                $datum['serviceDeskCount4'] + $datum['prepayCount4'],
-            ];
-
-            $serviceDesk['data'][] = $row;
-
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['otherCount1And3'],
-                number_format(
-                    $datum['otherHoursResponded'],
-                    1
-                ),
-                $datum['otherCount4'],
-            ];
-
-            $otherContracts['data'][] = $row;
-
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'],
-                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'],
-            ];
-
-            $totalSR['data'][] = $row;
-        }
-        $BUCustomerItem = new BUCustomerItem($this);
-        /** @var DataSet $datasetContracts */
-        $datasetContracts = null;
-        $BUCustomerItem->getServerCareValidContractsByCustomerID(
-            $customerId,
-            $datasetContracts
-        );
-
-        return [
-            "serverCareIncidents" => $serverCareIncidents,
-            "serviceDesk"         => $serviceDesk,
-            "otherContracts"      => $otherContracts,
-            "totalSR"             => $totalSR,
-            "renderServerCare"    => !!$datasetContracts->rowCount()
-        ];
-    }
-
-    private function getSupportedUsersData(BUContact $buContact,
-                                           $customerId,
-                                           $customerName
-    )
-    {
-        /** @var DataSet $dsSupportContact */
-        $dsSupportContact = null;
-        $buContact->getSupportContacts(
-            $dsSupportContact,
-            $customerId
-        );
-
-        $supportContacts = [
-            "main"       => [],
-            "supervisor" => [],
-            "support"    => [],
-            "delegate"   => []
-        ];
-
-        $duplicates = [];
-        $userMap = [];
-        $count = 0;
-        while ($dsSupportContact->fetchNext()) {
-
-            $firstName = $dsSupportContact->getValue(DBEContact::firstName);
-            $lastName = $dsSupportContact->getValue(DBEContact::lastName);
-            $userId = $dsSupportContact->getValue(DBEContact::contactID);
-            $key = strtolower($firstName . $lastName);
-            if (isset($userMap[$key])) {
-
-                if (!isset($duplicates[$userMap[$key]['id']])) {
-                    $duplicates[$userMap[$key]['id']] = $userMap[$key];
-                }
-
-                $duplicates[$userId] = [
-                    "firstName"  => $firstName,
-                    "lastName"   => $lastName,
-                    "id"         => $userId,
-                    "customerId" => $customerId
-                ];
-            } else {
-                $userMap[$key] = [
-                    "firstName"  => $firstName,
-                    "lastName"   => $lastName,
-                    "id"         => $userId,
-                    "customerId" => $customerId
-                ];
-            }
-
-
-            $supportContacts[$dsSupportContact->getValue(DBEContact::supportLevel)][] = [
-                "firstName" => $firstName,
-                "lastName"  => $lastName
-            ];
-            $count++;
+            default:
+                $frequency = 'N/A';
         }
 
-        if (count($duplicates)) {
-            // send email to sales@cnc-ltd.co.uk with the list of duplicates
-            $buMail = new BUMail($this);
-
-            $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-            $senderName = 'CNC Support Department';
-
-            $toEmail = 'sales@cnc-ltd.co.uk';
-
-            $template = new Template(
-                $GLOBALS ["cfg"]["path_templates"],
-                "remove"
-            );
-            $template->set_file(
-                'page',
-                'CustomerReviewMeetingContactDuplicates.html'
-            );
-
-            $template->set_var(
-                'customerName',
-                $customerName
-            );
-
-            $template->set_block(
-                'page',
-                'contactBlock',
-                'contacts'
-            );
-
-            foreach ($duplicates as $key => $row) {
-
-                $template->set_var(
-                    array(
-                        'contactID'        => $row['id'],
-                        'contactFirstName' => $row['firstName'],
-                        'contactLastName'  => $row['lastName'],
-
-                    )
-                );
-
-                $template->parse(
-                    'contacts',
-                    'contactBlock',
-                    true
-                );
-            }
-
-            $template->parse(
-                'output',
-                'page',
-                true
-            );
-
-            $body = $template->get_var('output');
-
-            $subject = 'Possible duplicated customer contacts';
-
-            $hdrs = array(
-                'From'         => $senderEmail,
-                'To'           => $toEmail,
-                'Subject'      => $subject,
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
-            $buMail->mime->setHTMLBody($body);
-
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-            $body = $buMail->mime->get($mime_params);
-
-            $hdrs = $buMail->mime->headers($hdrs);
-
-            $buMail->putInQueue(
-                $senderEmail,
-                $toEmail,
-                $hdrs,
-                $body,
-                true
-            );
-
-        }
-
-        $sectionTemplate = '<div style="clear: both;margin-bottom: 22px"></div><div style="font-weight: bold; font-size: small;text-align: left; ">{type} Contacts ({count})</div>
-    <br>
-    <ul class="ul3">
-        {contactData}
-    </ul>';
-
-        $toReturn = "";
-        foreach ($supportContacts as $type => $data) {
-
-            $contactsInfo = "";
-            foreach ($data as $contact) {
-                $contactsInfo .= "<li>" . $contact['firstName'] . ' ' . $contact['lastName'] . "</li>";
-            }
-            $currentSection = "" . $sectionTemplate;
-            $currentSection = str_replace('{type}', ucfirst($type), $currentSection);
-            $currentSection = str_replace('{count}', count($supportContacts[$type]), $currentSection);
-            $currentSection = str_replace('{contactData}', $contactsInfo, $currentSection);
-            $toReturn .= $currentSection;
-        }
-
-        return [
-            "data"  => $toReturn,
-            "count" => $count
-        ];
+        return "<h2>Review Meeting Frequency - " . $frequency . "</h2>";
     }
 
     private function getSupportedUsersLevelsCount(BUContact $buContact,
@@ -1308,35 +1230,113 @@ class CTCustomerReviewMeeting extends CTCNC
         ];
     }
 
-    /**
-     * @param DBECustomer|DataSet $dsCustomer
-     * @return string
-     */
-    private function getReviewMeetingFrequencyBody($dsCustomer)
+    private function generateCharts($data,
+                                    $customerId
+    )
     {
-        $value = $dsCustomer->getValue(DBECustomer::reviewMeetingFrequencyMonths);
 
-        switch ($value) {
-            case 1:
-                $frequency = 'Monthly';
-                break;
-            case 2:
-                $frequency = 'Two-monthly';
-                break;
-            case 3:
-                $frequency = 'Quarterly';
-                break;
-            case 6:
-                $frequency = 'Six-monthly';
-                break;
-            case 12:
-                $frequency = 'Annually';
-                break;
+        $serverCareIncidents = [
+            "title"   => "ServerCare Incidents",
+            "columns" => ["Dates", "ServerSR", "AvgResponse", "Changes"],
+            "data"    => []
+        ];
 
-            default:
-                $frequency = 'N/A';
+        $serviceDesk = [
+            "title"   => "ServiceDesk/Pre-Pay Incidents",
+            "columns" => ["Dates", "UserSR", "AvgResponse", "Changes",],
+            "data"    => []
+        ];
+
+        $otherContracts = [
+            "title"   => "Other Contract Incidents",
+            "columns" => ["Dates", "OtherSR", "AvgResponse", "Changes",],
+            "data"    => []
+        ];
+
+        $totalSR = [
+            "title"   => "Total SR's",
+            "columns" => ["Dates", "P1-3", "P4",],
+            "data"    => []
+        ];
+
+
+        foreach ($data as $datum) {
+
+
+            $row = [
+                substr(
+                    $datum['monthName'],
+                    0,
+                    3
+                ) . "-" . $datum['year'],
+                $datum['serverCareCount1And3'],
+                number_format(
+                    $datum['serverCareHoursResponded'],
+                    1
+                ),
+                $datum['serverCareCount4']
+            ];
+
+            $serverCareIncidents['data'][] = $row;
+
+            $row = [
+                substr(
+                    $datum['monthName'],
+                    0,
+                    3
+                ) . "-" . $datum['year'],
+                $datum['serviceDeskCount1And3'] + $datum['prepayCount1And3'],
+                number_format(
+                    $datum['serviceDeskHoursResponded'] + $datum['prepayHoursResponded'],
+                    1
+                ),
+                $datum['serviceDeskCount4'] + $datum['prepayCount4'],
+            ];
+
+            $serviceDesk['data'][] = $row;
+
+            $row = [
+                substr(
+                    $datum['monthName'],
+                    0,
+                    3
+                ) . "-" . $datum['year'],
+                $datum['otherCount1And3'],
+                number_format(
+                    $datum['otherHoursResponded'],
+                    1
+                ),
+                $datum['otherCount4'],
+            ];
+
+            $otherContracts['data'][] = $row;
+
+            $row = [
+                substr(
+                    $datum['monthName'],
+                    0,
+                    3
+                ) . "-" . $datum['year'],
+                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'],
+                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'],
+            ];
+
+            $totalSR['data'][] = $row;
         }
+        $BUCustomerItem = new BUCustomerItem($this);
+        /** @var DataSet $datasetContracts */
+        $datasetContracts = null;
+        $BUCustomerItem->getServerCareValidContractsByCustomerID(
+            $customerId,
+            $datasetContracts
+        );
 
-        return "<h2>Review Meeting Frequency - " . $frequency . "</h2>";
+        return [
+            "serverCareIncidents" => $serverCareIncidents,
+            "serviceDesk"         => $serviceDesk,
+            "otherContracts"      => $otherContracts,
+            "totalSR"             => $totalSR,
+            "renderServerCare"    => !!$datasetContracts->rowCount()
+        ];
     }
 }

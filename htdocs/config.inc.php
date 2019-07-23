@@ -330,22 +330,29 @@ $onPavilionWebServer = false;
 $GLOBALS['php7'] = true;
 $php7 = true;
 
+
+const environments = [
+
+];
+
+
+
 if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line calls
     switch ($_SERVER['HTTP_HOST']) {
 
-        case 'cncapps':
+        case 'cncapps.cnc-ltd-co.uk':
             $server_type = MAIN_CONFIG_SERVER_TYPE_LIVE;
             break;
         case 'cncdev.cnc-ltd.co.uk:485':
             $server_type = MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
             break;
-        case 'cnctest:86':
+        case 'cnctest.cnc-ltd.co.uk:486':
             $server_type = MAIN_CONFIG_SERVER_TYPE_TEST;
             break;
-        case 'cncweb:88':
+        case 'cncweb.cnc-ltd.co.uk:487':
             $server_type = MAIN_CONFIG_SERVER_TYPE_WEBSITE;
             break;
-        case 'cncdesign:89':
+        case 'cncdesign.cnc-ltd.co.uk:488':
             $server_type = MAIN_CONFIG_SERVER_TYPE_DESIGN;
 
     }
@@ -360,6 +367,7 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
     $_SERVER['HTTP_HOST'] = 'cncapps';
 }
 
+define('SITE_URL', "https://" . $_SERVER['HTTP_HOST']);
 
 define(
     'CONFIG_PUBLIC_DOMAIN',
