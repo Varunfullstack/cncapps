@@ -336,9 +336,8 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
         case 'cncapps':
             $server_type = MAIN_CONFIG_SERVER_TYPE_LIVE;
             break;
-        case 'cncdev:85':
+        case 'cncdev.cnc-ltd.co.uk:485':
             $server_type = MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT;
-
             break;
         case 'cnctest:86':
             $server_type = MAIN_CONFIG_SERVER_TYPE_TEST;
