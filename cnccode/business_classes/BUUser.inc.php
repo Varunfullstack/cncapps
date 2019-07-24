@@ -273,7 +273,6 @@ class BUUser extends Business
                       user_time_log.loggedDate ASC";
 
         $db->query($query);
-
         $rows = [];
         while ($db->next_record(1)) {
             $rows[] = $db->Record;
