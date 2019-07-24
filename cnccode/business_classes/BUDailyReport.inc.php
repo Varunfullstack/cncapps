@@ -12,6 +12,8 @@ require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_gc"] . "/Controller.inc.php");
 require_once($cfg["path_func"] . "/Common.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
+require_once($cfg["path_bu"] . "/BUHeader.inc.php");
+
 
 class BUDailyReport extends Business
 {

@@ -1,6 +1,13 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.4.1] - 2019-07-24
+### Fixed
+- Running task e:\sites\cncapps\htdocs\call_url.php https://cncapps.cnc-ltd.co.uk/DailyReportCMD.php?action=outstandingIncidents&daysAgo=7 gives error:
+  HTTP Error: 500'daysAgo' is not recognized as an internal or external command, operable program or batch file.
+- Users are reporting they can't see their own performance graphs on the home page. 
+-  Error 500 processing a time request. Fatal error: Uncaught Error: Call to undefined method BUActivity::allocateAdditionalTime() 
+
 ## [v3.4.0] - 2019-07-23
 ### Changed
 - Issue 198 - Deliver the website over HTTPS

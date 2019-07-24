@@ -109,6 +109,216 @@ class CTHome extends CTCNC
     }
 
     /**
+     * @param $team
+     * @return array
+     * @throws Exception
+     */
+    private function showLastWeekHelpDeskData($team
+    )
+    {
+        $isStandardUser = false;
+        if (!$this->buUser->isSdManager($this->userID)) {
+            if ($this->buUser->getLevelByUserID($this->userID) <= 3) {
+                $team = $this->buUser->getLevelByUserID($this->userID);
+                $isStandardUser = true;
+            } else {
+                return [];
+            }
+        }
+        $dbeUser = $this->getDbeUser();
+        $dbeUser->setValue(
+            DBEUser::userID,
+            $this->userID
+        );
+        $dbeUser->getRow();
+
+        $graphs = [];
+
+        $dataStructure = [
+            "cols"       => [
+                ["id" => "dates", "label" => "Dates", "type" => 'date'],
+            ],
+            "rows"       => [
+
+            ],
+            "dataPoints" => [
+
+            ],
+            "userName"   => null
+        ];
+
+
+        $results = $this->buUser->teamMembersPerformanceData(
+            $team,
+            $this->buUser->isSdManager($this->userID)
+        );
+
+        foreach ($results as $result) {
+            if ($isStandardUser && $result['userID'] != $this->dbeUser->getValue(DBEUser::userID)) {
+                continue;
+            }
+
+            // if the user doesn't have a graph yet create it
+            if (!isset($graphs[$result['userID']])) {
+                $graphs[$result['userID']] = $dataStructure;
+                $graphs[$result['userID']]['cols'][] = [
+                    "id"    => $result['userID'],
+                    "label" => $result['userLabel'],
+                    'type'  => 'number'
+                ];
+                $graphs[$result['userID']]['userName'] = $result['userLabel'];
+            }
+
+            $cell = [
+                "c" =>
+                    [
+                        ["v" => (new DateTime($result['loggedDate']))->format(DATE_ISO8601)],
+                        ["v" => $result['loggedHours']]
+                    ]
+            ];
+
+            $graphs[$result['userID']]['rows'][] = $cell;
+        }
+
+        $toReturn = [];
+
+        foreach ($graphs as $userID => $graph) {
+            $toReturn[] = array_merge(
+                ["userID" => $userID],
+                $graph
+            );
+        }
+
+        usort(
+            $toReturn,
+            function ($a,
+                      $b
+            ) {
+                return strcmp(
+                    $a['userName'],
+                    $b['userName']
+                );
+            }
+        );
+
+        return $toReturn;
+    }
+
+    /**
+     * @param $engineerID
+     * @param $startDate
+     * @param $endDate
+     * @return array
+     * @throws Exception
+     */
+    private function getDetailedChartsData($engineerID,
+                                           $startDate,
+                                           $endDate
+    )
+    {
+        if (!$this->buUser->isSdManager($this->userID)) {
+            return $this->buUser->getEngineerDetailedData(
+                $this->userID,
+                (new DateTime($startDate)),
+                (new DateTime($endDate))
+            );
+        }
+        // we need to pull data
+        $data = $this->buUser->getEngineerDetailedData(
+            $engineerID,
+            (new DateTime($startDate)),
+            (new DateTime($endDate))
+        );
+        return $data;
+
+    }
+
+    /**
+     * @param $engineerID
+     * @param $startDate
+     * @param $endDate
+     * @throws Exception
+     */
+    private function showDetailCharts($engineerID,
+                                      $startDate,
+                                      $endDate
+    )
+    {
+        $this->setTemplateFiles(
+            'detailedCharts',
+            'HomeDetailCharts.inc'
+        );
+        if (!$engineerID) {
+            $this->formError = "Engineer ID not given";
+            $this->formErrorMessage = "Engineer ID not given";
+            return;
+        }
+
+        $dbeUser = new DBEUser($this);
+
+        $dbeUser->setValue(
+            DBEJUser::userID,
+            $engineerID
+        );
+        $dbeUser->getRow();
+
+        $this->template->set_var(
+            [
+                "dataFetchUrl" => Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => self::GetDetailedChartsDataAction
+                    )
+                ),
+                "engineerID"   => $engineerID,
+                "engineerName" => $dbeUser->getValue(DBEJUser::firstName) . ' ' . $dbeUser->getValue(
+                        DBEJUser::lastName
+                    ),
+                "startDate"    => $startDate,
+                "endDate"      => $endDate
+            ]
+
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'detailedCharts',
+            true
+        );
+        $this->parsePage();
+    }
+
+    private function getFirstTimeFixData()
+    {
+        global $db;
+        $db->query("select firstTimeFix from homeData limit 1");
+
+        $db->next_record(MYSQLI_ASSOC);
+
+        return $db->Record['firstTimeFix'];
+    }
+
+    private function getFixedAndReopenData()
+    {
+        global $db;
+        $db->query("select fixedAndReopenData from homeData limit 1");
+
+        $db->next_record(MYSQLI_ASSOC);
+
+        return $db->Record['fixedAndReopenData'];
+    }
+
+    private function getUpcomingVisitsData()
+    {
+        global $db;
+        $db->query("select upcomingVisitsData from homeData limit 1");
+
+        $db->next_record(MYSQLI_ASSOC);
+
+        return $db->Record['upcomingVisitsData'];
+    } // end display projects
+
+    /**
      * @throws Exception
      */
     function display()
@@ -176,53 +386,35 @@ class CTHome extends CTCNC
 
 
         $this->parsePage();
-    }
+    } // end displayTeamPerformanceReport
 
     /**
-     * @return mixed
      * @throws Exception
      */
-    function displayFixedAndReopen()
+    private function displayUpcomingVisits()
     {
-
-        $template = new Template (
-            $GLOBALS ["cfg"] ["path_templates"],
-            "remove"
-        );
-        $template->setFile(
-            'FixedAndReopened',
-            'HomeFixedAndReopened.inc.html'
+        $this->setTemplateFiles(
+            'upcomingVisits',
+            'upcomingVisits'
         );
 
-        $template->set_var(
+        $this->template->set_var(
             [
-                "fetchDataURL" => Controller::buildLink(
+                "upcomingVisitsFetchDataURL" => Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     [
-                        'action' => self::getFixedAndReopenData
+                        'action' => self::getUpcomingVisitsData
                     ]
                 )
             ]
         );
 
-        $template->parse(
-            'OUTPUT',
-            'FixedAndReopened',
+        $this->template->parse(
+            'CONTENTS',
+            'upcomingVisits',
             true
         );
-
-        return $template->getVar('OUTPUT');
-    }
-
-    private function getFixedAndReopenData()
-    {
-        global $db;
-        $db->query("select fixedAndReopenData from homeData limit 1");
-
-        $db->next_record(MYSQLI_ASSOC);
-
-        return $db->Record['fixedAndReopenData'];
-    }
+    } // end displayUserLoggingPerformanceReport
 
     function displaySalesFigures()
     {
@@ -305,197 +497,71 @@ class CTHome extends CTCNC
     }
 
     /**
-     * Displays list of customers to review
-     *
+     * @return mixed
      * @throws Exception
      */
-    function displayReviewList()
+    private function displayFirstTimeFixFigures()
     {
-
-        $this->setMethodName('displayReviewList');
-
         $this->setTemplateFiles(
-            'CustomerReviewList',
-            'CustomerReviewList.inc'
+            'firstTimeFigures',
+            'FirstTimeFigures'
         );
 
-        $this->template->set_block(
-            'CustomerReviewList',
-            'reviewBlock',
-            'reviews'
+        $this->template->set_var(
+            [
+                "fetchDataURL" => Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    [
+                        'action' => self::getFirstTimeFixData
+                    ]
+                )
+            ]
         );
 
-        $this->buCustomer = new BUCustomer($this);
-        $dsCustomer = new DataSet($this);
-        if ($this->buCustomer->getDailyCallList($this, $dsCustomer)) {
+        $this->template->parse(
+            'OUTPUT',
+            'firstTimeFigures',
+            true
+        );
+        return $this->template->getVar('OUTPUT');
 
-
-            while ($dsCustomer->fetchNext()) {
-
-                $linkURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => 'displayEditForm',
-                            'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
-                        )
-                    );
-
-                if ($dsCustomer->getValue(DBECustomer::reviewUserID)) {
-                    $dsUser = new DataSet($this);
-                    $this->buUser->getUserByID(
-                        $dsCustomer->getValue(DBECustomer::reviewUserID),
-                        $dsUser
-                    );
-                    $user = $dsUser->getValue(DBEUser::name);
-                } else {
-                    $user = false;
-                }
-
-                $this->template->set_var(
-                    array(
-                        'customerName' => $dsCustomer->getValue(DBECustomer::name),
-                        'reviewDate'   => $dsCustomer->getValue(DBECustomer::reviewDate),
-                        'reviewTime'   => $dsCustomer->getValue(DBECustomer::reviewTime),
-                        'reviewAction' => $dsCustomer->getValue(DBECustomer::reviewAction),
-                        'reviewUser'   => $user,
-                        'linkURL'      => $linkURL
-                    )
-                );
-
-                $this->template->parse(
-                    'reviews',
-                    'reviewBlock',
-                    true
-                );
-
-            }
-
-            $this->template->parse(
-                'CONTENTS',
-                'CustomerReviewList',
-                true
-            );
-
-        }
     }
 
     /**
+     * @return mixed
      * @throws Exception
      */
-    function displayProjects()
+    function displayFixedAndReopen()
     {
-        $this->setTemplateFiles(
-            'DashboardProjectList',
-            'DashboardProjectList.inc'
+
+        $template = new Template (
+            $GLOBALS ["cfg"] ["path_templates"],
+            "remove"
+        );
+        $template->setFile(
+            'FixedAndReopened',
+            'HomeFixedAndReopened.inc.html'
         );
 
-        $this->template->set_block(
-            'DashboardProjectList',
-            'projectBlock',
-            'projects'
+        $template->set_var(
+            [
+                "fetchDataURL" => Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    [
+                        'action' => self::getFixedAndReopenData
+                    ]
+                )
+            ]
         );
 
-        $buProject = new BUProject($this);
-
-        $projects = $buProject->getCurrentProjects();
-
-
-        foreach ($projects as $project) {
-
-            $hasProjectPlan = !!$project['planFileName'];
-
-            $projectPlanDownloadURL =
-                Controller::buildLink(
-                    '/Project.php',
-                    [
-                        'action'    => CTProject::DOWNLOAD_PROJECT_PLAN,
-                        'projectID' => $project['projectID']
-                    ]
-                );
-
-            $downloadProjectPlanClass = $hasProjectPlan ? null : 'class="redText"';
-            $downloadProjectPlanURL = $hasProjectPlan ? "href='$projectPlanDownloadURL' target='_blank' " : 'href="#"';
-            $projectPlanLink = "<a id='projectPlanLink' $downloadProjectPlanClass $downloadProjectPlanURL>Project Plan</a>";
-
-            $editProjectLink =
-                Controller::buildLink(
-                    'Project.php',
-                    array(
-                        'action'     => 'edit',
-                        'projectID'  => $project['projectID'],
-                        'backToHome' => true
-                    )
-                );
-
-            $lastUpdated = 'No updates';
-
-            $lastUpdatedURL =
-                Controller::buildLink(
-                    'Project.php',
-                    [
-                        'action'  => 'lastUpdate',
-                        'htmlFmt' => 'popup'
-                    ]
-                );
-
-            if ($project['createdBy']) {
-                $editProjectLink =
-                    Controller::buildLink(
-                        'Project.php',
-                        array(
-                            'action'     => 'edit',
-                            'projectID'  => $project['projectID'],
-                            'backToHome' => true
-                        )
-                    );
-                /** @noinspection JSUnresolvedFunction */
-                /** @noinspection BadExpressionStatementJS */
-                $lastUpdated = '<a href="#" onclick="showLastUpdatedPopup(' . $project['projectID'] . ')" >Status</a>';
-            }
-
-            $historyPopupURL = Controller::buildLink(
-                'Project.php',
-                array(
-                    'action'  => 'historyPopup',
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-
-            $this->template->set_var(
-                array(
-                    'projectID'       => $project['projectID'],
-                    'customerName'    => $project['customerName'],
-                    'description'     => $project['description'],
-                    'notes'           => $project['notes'],
-                    'projectPlanLink' => $projectPlanLink,
-                    'commenceDate'    => $project['commenceDate'] ? strftime(
-                        "%d/%m/%Y",
-                        strtotime($project['commenceDate'])
-                    ) : null,
-                    'urlEdit'         => $editProjectLink,
-                    'engineerName'    => $project['engineerName'],
-                    'lastUpdatePopup' => $lastUpdated,
-                    'lastUpdateURL'   => $lastUpdatedURL,
-                    'historyPopupURL' => $historyPopupURL
-                )
-            );
-
-            $this->template->parse(
-                'projects',
-                'projectBlock',
-                true
-            );
-
-        }
-
-        $this->template->parse(
-            'CONTENTS',
-            'DashboardProjectList',
+        $template->parse(
+            'OUTPUT',
+            'FixedAndReopened',
             true
         );
 
-    } // end display projects
+        return $template->getVar('OUTPUT');
+    }
 
     function displayTeamPerformanceReport()
     {
@@ -693,89 +759,7 @@ class CTHome extends CTCNC
             true
         );
 
-    } // end displayTeamPerformanceReport
-
-    function displayUserPerformanceReport()
-    {
-        $this->setTemplateFiles(
-            'DashboardUserPerformanceReport',
-            'DashboardUserPerformanceReport.inc'
-        );
-
-        $teamLevel = $this->buUser->getLevelByUserID($this->userID);
-        $targetLogPercentage = 0;
-        switch ($teamLevel) {
-            case 1:
-                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::hdTeamTargetLogPercentage);
-                break;
-            case 2:
-                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::esTeamTargetLogPercentage);
-                break;
-            case 3:
-                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::imTeamTargetLogPercentage);
-                break;
-        }
-
-        /* Extract data and build report */
-        $weekly = $this->buUser->getUserPerformanceByUser(
-            $this->userID,
-            7
-        );
-
-        $monthly = $this->buUser->getUserPerformanceByUser(
-            $this->userID,
-            31
-        );
-
-        if ($weekly['performancePercentage'] < $targetLogPercentage) {
-
-            $this->template->set_var(
-                'weeklyPercentageClass',
-                'performance-warn'
-            );
-        }
-
-        if ($monthly['performancePercentage'] < $targetLogPercentage) {
-
-            $this->template->set_var(
-                'monthlyPercentageClass',
-                'performance-warn'
-            );
-        }
-
-        $this->template->set_var(
-            array(
-                'targetPercentage' => $targetLogPercentage,
-
-                'weeklyPercentage' => number_format(
-                    $weekly['performancePercentage'],
-                    2
-                ),
-
-                'weeklyHours' => number_format(
-                    $weekly['loggedHours'],
-                    2
-                ),
-
-                'monthlyPercentage' => number_format(
-                    $monthly['performancePercentage'],
-                    2
-                ),
-
-                'monthlyHours' => number_format(
-                    $monthly['loggedHours'],
-                    2
-                ),
-            )
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'DashboardUserPerformanceReport',
-            true
-        );
-
-    } // end displayUserLoggingPerformanceReport
+    }
 
     function displayAllUsersPerformanceReport()
     {
@@ -1040,6 +1024,88 @@ class CTHome extends CTCNC
 
     }
 
+    function displayUserPerformanceReport()
+    {
+        $this->setTemplateFiles(
+            'DashboardUserPerformanceReport',
+            'DashboardUserPerformanceReport.inc'
+        );
+
+        $teamLevel = $this->buUser->getLevelByUserID($this->userID);
+        $targetLogPercentage = 0;
+        switch ($teamLevel) {
+            case 1:
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::hdTeamTargetLogPercentage);
+                break;
+            case 2:
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::esTeamTargetLogPercentage);
+                break;
+            case 3:
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::imTeamTargetLogPercentage);
+                break;
+        }
+
+        /* Extract data and build report */
+        $weekly = $this->buUser->getUserPerformanceByUser(
+            $this->userID,
+            7
+        );
+
+        $monthly = $this->buUser->getUserPerformanceByUser(
+            $this->userID,
+            31
+        );
+
+        if ($weekly['performancePercentage'] < $targetLogPercentage) {
+
+            $this->template->set_var(
+                'weeklyPercentageClass',
+                'performance-warn'
+            );
+        }
+
+        if ($monthly['performancePercentage'] < $targetLogPercentage) {
+
+            $this->template->set_var(
+                'monthlyPercentageClass',
+                'performance-warn'
+            );
+        }
+
+        $this->template->set_var(
+            array(
+                'targetPercentage' => $targetLogPercentage,
+
+                'weeklyPercentage' => number_format(
+                    $weekly['performancePercentage'],
+                    2
+                ),
+
+                'weeklyHours' => number_format(
+                    $weekly['loggedHours'],
+                    2
+                ),
+
+                'monthlyPercentage' => number_format(
+                    $monthly['performancePercentage'],
+                    2
+                ),
+
+                'monthlyHours' => number_format(
+                    $monthly['loggedHours'],
+                    2
+                ),
+            )
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'DashboardUserPerformanceReport',
+            true
+        );
+
+    }
+
     private function displayCharts()
     {
         $this->setTemplateFiles(
@@ -1062,262 +1128,196 @@ class CTHome extends CTCNC
     }
 
     /**
-     * @param $team
-     * @return array
+     * Displays list of customers to review
+     *
      * @throws Exception
      */
-    private function showLastWeekHelpDeskData($team
-    )
+    function displayReviewList()
     {
-        $isStandardUser = false;
-        if (!$this->buUser->isSdManager($this->userID)) {
-            if ($this->buUser->getLevelByUserID($this->userID) <= 3) {
-                $team = $this->buUser->getLevelByUserID($this->userID);
-                $isStandardUser = true;
-            } else {
-                return [];
-            }
-        }
-        $dbeUser = $this->getDbeUser();
-        $dbeUser->setValue(
-            DBEUser::userID,
-            $this->userID
-        );
-        $dbeUser->getRow();
 
-        $graphs = [];
+        $this->setMethodName('displayReviewList');
 
-        $dataStructure = [
-            "cols"       => [
-                ["id" => "dates", "label" => "Dates", "type" => 'date'],
-            ],
-            "rows"       => [
-
-            ],
-            "dataPoints" => [
-
-            ],
-            "userName"   => null
-        ];
-
-
-        $results = $this->buUser->teamMembersPerformanceData(
-            $team,
-            $this->buUser->isSdManager($this->userID)
-        );
-
-        foreach ($results as $result) {
-            if ($isStandardUser && $result['userID'] !== $this->dbeUser->getValue(DBEUser::userID)) {
-                continue;
-            }
-
-            // if the user doesn't have a graph yet create it
-            if (!isset($graphs[$result['userID']])) {
-                $graphs[$result['userID']] = $dataStructure;
-                $graphs[$result['userID']]['cols'][] = [
-                    "id"    => $result['userID'],
-                    "label" => $result['userLabel'],
-                    'type'  => 'number'
-                ];
-                $graphs[$result['userID']]['userName'] = $result['userLabel'];
-            }
-
-            $cell = [
-                "c" =>
-                    [
-                        ["v" => (new DateTime($result['loggedDate']))->format(DATE_ISO8601)],
-                        ["v" => $result['loggedHours']]
-                    ]
-            ];
-
-            $graphs[$result['userID']]['rows'][] = $cell;
-        }
-
-        $toReturn = [];
-
-        foreach ($graphs as $userID => $graph) {
-            $toReturn[] = array_merge(
-                ["userID" => $userID],
-                $graph
-            );
-        }
-
-        usort(
-            $toReturn,
-            function ($a,
-                      $b
-            ) {
-                return strcmp(
-                    $a['userName'],
-                    $b['userName']
-                );
-            }
-        );
-
-        return $toReturn;
-    }
-
-    /**
-     * @param $engineerID
-     * @param $startDate
-     * @param $endDate
-     * @throws Exception
-     */
-    private function showDetailCharts($engineerID,
-                                      $startDate,
-                                      $endDate
-    )
-    {
         $this->setTemplateFiles(
-            'detailedCharts',
-            'HomeDetailCharts.inc'
+            'CustomerReviewList',
+            'CustomerReviewList.inc'
         );
-        if (!$engineerID) {
-            $this->formError = "Engineer ID not given";
-            $this->formErrorMessage = "Engineer ID not given";
-            return;
-        }
 
-        $dbeUser = new DBEUser($this);
-
-        $dbeUser->setValue(
-            DBEJUser::userID,
-            $engineerID
+        $this->template->set_block(
+            'CustomerReviewList',
+            'reviewBlock',
+            'reviews'
         );
-        $dbeUser->getRow();
 
-        $this->template->set_var(
-            [
-                "dataFetchUrl" => Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
+        $this->buCustomer = new BUCustomer($this);
+        $dsCustomer = new DataSet($this);
+        if ($this->buCustomer->getDailyCallList($this, $dsCustomer)) {
+
+
+            while ($dsCustomer->fetchNext()) {
+
+                $linkURL =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'     => 'displayEditForm',
+                            'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
+                        )
+                    );
+
+                if ($dsCustomer->getValue(DBECustomer::reviewUserID)) {
+                    $dsUser = new DataSet($this);
+                    $this->buUser->getUserByID(
+                        $dsCustomer->getValue(DBECustomer::reviewUserID),
+                        $dsUser
+                    );
+                    $user = $dsUser->getValue(DBEUser::name);
+                } else {
+                    $user = false;
+                }
+
+                $this->template->set_var(
                     array(
-                        'action' => self::GetDetailedChartsDataAction
+                        'customerName' => $dsCustomer->getValue(DBECustomer::name),
+                        'reviewDate'   => $dsCustomer->getValue(DBECustomer::reviewDate),
+                        'reviewTime'   => $dsCustomer->getValue(DBECustomer::reviewTime),
+                        'reviewAction' => $dsCustomer->getValue(DBECustomer::reviewAction),
+                        'reviewUser'   => $user,
+                        'linkURL'      => $linkURL
                     )
-                ),
-                "engineerID"   => $engineerID,
-                "engineerName" => $dbeUser->getValue(DBEJUser::firstName) . ' ' . $dbeUser->getValue(
-                        DBEJUser::lastName
-                    ),
-                "startDate"    => $startDate,
-                "endDate"      => $endDate
-            ]
+                );
 
-        );
+                $this->template->parse(
+                    'reviews',
+                    'reviewBlock',
+                    true
+                );
 
-        $this->template->parse(
-            'CONTENTS',
-            'detailedCharts',
-            true
-        );
-        $this->parsePage();
-    }
+            }
 
-    /**
-     * @param $engineerID
-     * @param $startDate
-     * @param $endDate
-     * @return array
-     * @throws Exception
-     */
-    private function getDetailedChartsData($engineerID,
-                                           $startDate,
-                                           $endDate
-    )
-    {
-        if (!$this->buUser->isSdManager($this->userID)) {
-            return $this->buUser->getEngineerDetailedData(
-                $this->userID,
-                (new DateTime($startDate)),
-                (new DateTime($endDate))
+            $this->template->parse(
+                'CONTENTS',
+                'CustomerReviewList',
+                true
             );
+
         }
-        // we need to pull data
-        $data = $this->buUser->getEngineerDetailedData(
-            $engineerID,
-            (new DateTime($startDate)),
-            (new DateTime($endDate))
-        );
-        return $data;
-
-    }
-
-    /**
-     * @return mixed
-     * @throws Exception
-     */
-    private function displayFirstTimeFixFigures()
-    {
-        $this->setTemplateFiles(
-            'firstTimeFigures',
-            'FirstTimeFigures'
-        );
-
-        $this->template->set_var(
-            [
-                "fetchDataURL" => Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    [
-                        'action' => self::getFirstTimeFixData
-                    ]
-                )
-            ]
-        );
-
-        $this->template->parse(
-            'OUTPUT',
-            'firstTimeFigures',
-            true
-        );
-        return $this->template->getVar('OUTPUT');
-
-    }
-
-    private function getFirstTimeFixData()
-    {
-        global $db;
-        $db->query("select firstTimeFix from homeData limit 1");
-
-        $db->next_record(MYSQLI_ASSOC);
-
-        return $db->Record['firstTimeFix'];
-    }
-
-    private function getUpcomingVisitsData()
-    {
-        global $db;
-        $db->query("select upcomingVisitsData from homeData limit 1");
-
-        $db->next_record(MYSQLI_ASSOC);
-
-        return $db->Record['upcomingVisitsData'];
     }
 
     /**
      * @throws Exception
      */
-    private function displayUpcomingVisits()
+    function displayProjects()
     {
         $this->setTemplateFiles(
-            'upcomingVisits',
-            'upcomingVisits'
+            'DashboardProjectList',
+            'DashboardProjectList.inc'
         );
 
-        $this->template->set_var(
-            [
-                "upcomingVisitsFetchDataURL" => Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    [
-                        'action' => self::getUpcomingVisitsData
-                    ]
-                )
-            ]
+        $this->template->set_block(
+            'DashboardProjectList',
+            'projectBlock',
+            'projects'
         );
+
+        $buProject = new BUProject($this);
+
+        $projects = $buProject->getCurrentProjects();
+
+
+        foreach ($projects as $project) {
+
+            $hasProjectPlan = !!$project['planFileName'];
+
+            $projectPlanDownloadURL =
+                Controller::buildLink(
+                    '/Project.php',
+                    [
+                        'action'    => CTProject::DOWNLOAD_PROJECT_PLAN,
+                        'projectID' => $project['projectID']
+                    ]
+                );
+
+            $downloadProjectPlanClass = $hasProjectPlan ? null : 'class="redText"';
+            $downloadProjectPlanURL = $hasProjectPlan ? "href='$projectPlanDownloadURL' target='_blank' " : 'href="#"';
+            $projectPlanLink = "<a id='projectPlanLink' $downloadProjectPlanClass $downloadProjectPlanURL>Project Plan</a>";
+
+            $editProjectLink =
+                Controller::buildLink(
+                    'Project.php',
+                    array(
+                        'action'     => 'edit',
+                        'projectID'  => $project['projectID'],
+                        'backToHome' => true
+                    )
+                );
+
+            $lastUpdated = 'No updates';
+
+            $lastUpdatedURL =
+                Controller::buildLink(
+                    'Project.php',
+                    [
+                        'action'  => 'lastUpdate',
+                        'htmlFmt' => 'popup'
+                    ]
+                );
+
+            if ($project['createdBy']) {
+                $editProjectLink =
+                    Controller::buildLink(
+                        'Project.php',
+                        array(
+                            'action'     => 'edit',
+                            'projectID'  => $project['projectID'],
+                            'backToHome' => true
+                        )
+                    );
+                /** @noinspection JSUnresolvedFunction */
+                /** @noinspection BadExpressionStatementJS */
+                $lastUpdated = '<a href="#" onclick="showLastUpdatedPopup(' . $project['projectID'] . ')" >Status</a>';
+            }
+
+            $historyPopupURL = Controller::buildLink(
+                'Project.php',
+                array(
+                    'action'  => 'historyPopup',
+                    'htmlFmt' => CT_HTML_FMT_POPUP
+                )
+            );
+
+            $this->template->set_var(
+                array(
+                    'projectID'       => $project['projectID'],
+                    'customerName'    => $project['customerName'],
+                    'description'     => $project['description'],
+                    'notes'           => $project['notes'],
+                    'projectPlanLink' => $projectPlanLink,
+                    'commenceDate'    => $project['commenceDate'] ? strftime(
+                        "%d/%m/%Y",
+                        strtotime($project['commenceDate'])
+                    ) : null,
+                    'urlEdit'         => $editProjectLink,
+                    'engineerName'    => $project['engineerName'],
+                    'lastUpdatePopup' => $lastUpdated,
+                    'lastUpdateURL'   => $lastUpdatedURL,
+                    'historyPopupURL' => $historyPopupURL
+                )
+            );
+
+            $this->template->parse(
+                'projects',
+                'projectBlock',
+                true
+            );
+
+        }
 
         $this->template->parse(
             'CONTENTS',
-            'upcomingVisits',
+            'DashboardProjectList',
             true
         );
+
     }
 
 }
