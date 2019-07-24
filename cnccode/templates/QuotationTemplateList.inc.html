@@ -43,10 +43,10 @@
     >
         <tr>
             <td class="listHeadText">Description</td>
-            <td class="listHeadText">One Per Customer</td>
+            <td class="listHeadText">Linked Sales Order</td>
             <td class="listHeadText"></td>
         </tr>
-        <!-- BEGIN passwordServiceBlock -->
+        <!-- BEGIN quotationTemplateBlock -->
         <tr valign="top"
             onMouseOver="this.bgColor='#ffffcc';"
             onMouseOut="this.bgColor='';"
@@ -59,7 +59,7 @@
             <td class="orderLineItem"
                 style="height: 100%;"
             >
-                <DIV align="left">{onePerCustomer}</div>
+                <DIV align="left">{linkedSalesOrderId}</div>
             </td>
             <td class="orderLineItem container">
                 <DIV align="left"
@@ -82,14 +82,14 @@
 
                         <button class="sortOrderActionButton"
                                 {sortOrderUp}
-                                name="sortOrder[{passwordServiceID}]"
+                                name="sortOrder[{id}]"
                                 value="up"
                         >
                             <i class='fa fa-angle-up'></i>
                         </button>
                         <button class="sortOrderActionButton"
                                 {sortOrderTop}
-                                name="sortOrder[{passwordServiceID}]"
+                                name="sortOrder[{id}]"
                                 value="top"
                         >
                             <i class='fa fa-angle-double-up'></i>
@@ -98,14 +98,14 @@
                     <div>
                         <button class="sortOrderActionButton"
                                 {sortOrderDown}
-                                name="sortOrder[{passwordServiceID}]"
+                                name="sortOrder[{id}]"
                                 value="down"
                         >
                             <i class='fa fa-angle-down'></i>
                         </button>
                         <button class="sortOrderActionButton"
                                 {sortOrderBottom}
-                                name="sortOrder[{passwordServiceID}]"
+                                name="sortOrder[{id}]"
                                 value="bottom"
                         >
                             <i class='fa fa-angle-double-down'></i>
@@ -114,7 +114,6 @@
                 </div>
             </td>
         </tr>
-        <!-- END passwordServiceBlock -->
+        <!-- END quotationTemplateBlock -->
     </table>
 </form>
-<!-- End Template: FurtherActionList.inc.html -->

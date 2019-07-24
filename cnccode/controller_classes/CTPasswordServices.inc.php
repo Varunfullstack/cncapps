@@ -80,7 +80,7 @@ class CTPasswordServices extends CTCNC
                 $this->update();
                 break;
             /** @noinspection PhpMissingBreakStatementInspection */
-            case CT_PASSWORD_SERVICE_ACT_CHANGE_ORDER:
+            case ctQuotationTemplates_ACT_CHANGE_ORDER:
                 $this->changeOrder();
             case CTPASSWORDSERVICE_ACT_DISPLAY_LIST:
             default:

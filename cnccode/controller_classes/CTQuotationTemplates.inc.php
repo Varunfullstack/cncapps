@@ -1,6 +1,6 @@
 <?php
 /**
- * Password service controller class
+ * Quotation template controller class
  * CNC Ltd
  *
  * @access public
@@ -32,7 +32,7 @@ define(
 );
 
 define(
-    'CT_PASSWORD_SERVICE_ACT_CHANGE_ORDER',
+    'ctQuotationTemplates_ACT_CHANGE_ORDER',
     'changeOrder'
 );
 
@@ -80,7 +80,7 @@ class CTQuotationTemplates extends CTCNC
                 $this->update();
                 break;
             /** @noinspection PhpMissingBreakStatementInspection */
-            case CT_PASSWORD_SERVICE_ACT_CHANGE_ORDER:
+            case ctQuotationTemplates_ACT_CHANGE_ORDER:
                 $this->changeOrder();
             case ctQuotationTemplates_ACT_DISPLAY_LIST:
             default:
@@ -89,7 +89,7 @@ class CTQuotationTemplates extends CTCNC
         }
     }
 
-/**
+    /**
      * Edit/Add Further Action
      * @access private
      * @throws Exception
@@ -103,10 +103,10 @@ class CTQuotationTemplates extends CTCNC
 
             if ($this->getAction() == ctQuotationTemplates_ACT_EDIT) {
                 $this->buQuotationTemplate->getQuotationTemplateByID(
-                    $this->getParam('quotationTemplateID'),
+                    $this->getParam('id'),
                     $dsQuotationTemplate
                 );
-                $quotationTemplateID = $this->getParam('quotationTemplateID');
+                $quotationTemplateID = $this->getParam('id');
             } else {                                                                    // creating new
                 $dsQuotationTemplate->initialise();
                 $dsQuotationTemplate->setValue(
@@ -133,8 +133,8 @@ class CTQuotationTemplates extends CTCNC
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action'              => ctQuotationTemplates_ACT_DELETE,
-                        'quotationTemplateID' => $quotationTemplateID
+                        'action' => ctQuotationTemplates_ACT_DELETE,
+                        'id'     => $quotationTemplateID
                     )
                 );
             $txtDelete = 'Delete';
@@ -143,8 +143,8 @@ class CTQuotationTemplates extends CTCNC
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action'              => ctQuotationTemplates_ACT_UPDATE,
-                    'quotationTemplateID' => $quotationTemplateID
+                    'action' => ctQuotationTemplates_ACT_UPDATE,
+                    'id'     => $quotationTemplateID
                 )
             );
         $urlDisplayList =
@@ -154,9 +154,9 @@ class CTQuotationTemplates extends CTCNC
                     'action' => ctQuotationTemplates_ACT_DISPLAY_LIST
                 )
             );
-        $title = 'Edit Password Service';
+        $title = 'Edit Quotation Template';
         if (!$quotationTemplateID) {
-            $title = "Create Password Service";
+            $title = "Create Quotation Template";
         }
         $this->setPageTitle($title);
         $this->setTemplateFiles(
@@ -164,24 +164,30 @@ class CTQuotationTemplates extends CTCNC
         );
         $this->template->set_var(
             array(
-                'quotationTemplateID'   => $quotationTemplateID,
-                'sortOrder'             => Controller::htmlInputText(
+                'id'                        => $quotationTemplateID,
+                'sortOrder'                 => Controller::htmlInputText(
                     $dsQuotationTemplate->getValue(DBEQuotationTemplate::sortOrder)
                 ),
-                'sortOrderMessage'      => Controller::htmlDisplayText(
+                'sortOrderMessage'          => Controller::htmlDisplayText(
                     $dsQuotationTemplate->getMessage(DBEQuotationTemplate::sortOrder)
                 ),
-                'description'           => Controller::htmlInputText(
+                'description'               => Controller::htmlInputText(
                     $dsQuotationTemplate->getValue(DBEQuotationTemplate::description)
                 ),
-                'descriptionMessage'    => Controller::htmlDisplayText(
+                'descriptionMessage'        => Controller::htmlDisplayText(
                     $dsQuotationTemplate->getMessage(DBEQuotationTemplate::description)
                 ),
-                'updateOrCreate'        => !$quotationTemplateID ? 'Create' : 'Update',
-                'urlUpdate'             => $urlUpdate,
-                'urlDelete'             => $urlDelete,
-                'txtDelete'             => $txtDelete,
-                'urlDisplayList'        => $urlDisplayList
+                'linkedSalesOrderId'        => Controller::htmlDisplayText(
+                    $dsQuotationTemplate->getValue(DBEQuotationTemplate::linkedSalesOrderId)
+                ),
+                'linkedSalesOrderIdMessage' => Controller::htmlDisplayText(
+                    $dsQuotationTemplate->getMessage(DBEQuotationTemplate::linkedSalesOrderId)
+                ),
+                'updateOrCreate'            => !$quotationTemplateID ? 'Create' : 'Update',
+                'urlUpdate'                 => $urlUpdate,
+                'urlDelete'                 => $urlDelete,
+                'txtDelete'                 => $txtDelete,
+                'urlDisplayList'            => $urlDisplayList
             )
         );
 
@@ -203,7 +209,7 @@ class CTQuotationTemplates extends CTCNC
     {
         $this->setMethodName('delete');
         try {
-            $this->buQuotationTemplate->deleteQuotationTemplate($this->getParam('quotationTemplateID'));
+            $this->buQuotationTemplate->deleteQuotationTemplate($this->getParam('id'));
             $urlNext =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -219,7 +225,7 @@ class CTQuotationTemplates extends CTCNC
         }
     }
 
-        /**
+    /**
      * Update call Further Action details
      * @access private
      * @throws Exception
@@ -229,28 +235,30 @@ class CTQuotationTemplates extends CTCNC
         $this->setMethodName('update');
         $this->formError = (!$this->dsQuotationTemplate->populateFromArray($this->getParam('quotationTemplate')));
 
+        if (!$this->dsQuotationTemplate->getValue(DBEQuotationTemplate::id)) {
+            $this->setAction(ctQuotationTemplates_ACT_EDIT);
+        } else {
+            $this->setAction(ctQuotationTemplates_ACT_CREATE);
+        }
         if ($this->formError) {
-            if (!$this->dsQuotationTemplate->getValue(
-                DBEQuotationTemplate::id
-            )) {                    // attempt to insert
-                $this->setAction(ctQuotationTemplates_ACT_EDIT);
-            } else {
-                $this->setAction(ctQuotationTemplates_ACT_CREATE);
-            }
             $this->edit();
             exit;
         }
 
-        $this->buQuotationTemplate->updateQuotationTemplate($this->dsQuotationTemplate);
+
+        if (!$this->buQuotationTemplate->updateQuotationTemplate($this->dsQuotationTemplate)) {
+            $this->edit();
+            exit;
+        };
 
         $urlNext =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'quotationTemplateID' => $this->dsQuotationTemplate->getValue(
+                    'id'     => $this->dsQuotationTemplate->getValue(
                         DBEQuotationTemplate::id
                     ),
-                    'action'              => CTCNC_ACT_VIEW
+                    'action' => CTCNC_ACT_VIEW
                 )
             );
         header('Location: ' . $urlNext);
@@ -292,7 +300,7 @@ class CTQuotationTemplates extends CTCNC
     function displayList()
     {
         $this->setMethodName('displayList');
-        $this->setPageTitle('Password service');
+        $this->setPageTitle('Quotation Templates');
         $this->setTemplateFiles(
             array('QuotationTemplateList' => 'QuotationTemplateList.inc')
         );
@@ -330,8 +338,8 @@ class CTQuotationTemplates extends CTCNC
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action'              => ctQuotationTemplates_ACT_EDIT,
-                        'quotationTemplateID' => $quotationTemplateID
+                        'action' => ctQuotationTemplates_ACT_EDIT,
+                        'id'     => $quotationTemplateID
                     )
                 );
             $txtEdit = '[edit]';
@@ -340,8 +348,8 @@ class CTQuotationTemplates extends CTCNC
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action'              => ctQuotationTemplates_ACT_DELETE,
-                        'quotationTemplateID' => $quotationTemplateID
+                        'action' => ctQuotationTemplates_ACT_DELETE,
+                        'id'     => $quotationTemplateID
                     )
                 );
             $txtDelete = '[delete]';
@@ -366,21 +374,21 @@ class CTQuotationTemplates extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'quotationTemplateID' => $quotationTemplateID,
-                    'description'         => Controller::htmlDisplayText(
+                    'id'                 => $quotationTemplateID,
+                    'description'        => Controller::htmlDisplayText(
                         $dbeQuotationTemplate->getValue(DBEQuotationTemplate::description)
                     ),
-                    'onePerCustomer'      => Controller::htmlDisplayText(
-                        $dbeQuotationTemplate->getValue(DBEQuotationTemplate::id) ? 'Yes' : 'No'
+                    'linkedSalesOrderId' => Controller::htmlDisplayText(
+                        $dbeQuotationTemplate->getValue(DBEQuotationTemplate::linkedSalesOrderId)
                     ),
-                    'urlEdit'             => $urlEdit,
-                    'urlDelete'           => $urlDelete,
-                    'txtEdit'             => $txtEdit,
-                    'txtDelete'           => $txtDelete,
-                    'sortOrderUp'         => $up ? null : 'disabled',
-                    'sortOrderDown'       => $down ? null : 'disabled',
-                    'sortOrderTop'        => $top ? null : 'disabled',
-                    'sortOrderBottom'     => $bottom ? null : 'disabled',
+                    'urlEdit'            => $urlEdit,
+                    'urlDelete'          => $urlDelete,
+                    'txtEdit'            => $txtEdit,
+                    'txtDelete'          => $txtDelete,
+                    'sortOrderUp'        => $up ? null : 'disabled',
+                    'sortOrderDown'      => $down ? null : 'disabled',
+                    'sortOrderTop'       => $top ? null : 'disabled',
+                    'sortOrderBottom'    => $bottom ? null : 'disabled',
                 )
             );
             $this->template->parse(

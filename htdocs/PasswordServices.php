@@ -12,7 +12,7 @@ page_open(
 );
 GLOBAL $cfg;
 header("Cache-control: private");
-$ctStandardText= new CTQuotationTemplates(
+$ctStandardText= new CTPasswordServices(
 	$_SERVER['REQUEST_METHOD'],
 	$_POST,
 	$_GET,

@@ -13,6 +13,9 @@
         </preConditions>
         <createTable tableName="quotationTemplate">
             <column name="id" type="int(11)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="linkedSalesOrderId" type="int(11)">
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="text"/>
