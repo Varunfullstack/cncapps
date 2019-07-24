@@ -1,6 +1,6 @@
 <?php
 require_once("config.inc.php");
-require_once($cfg["path_ct"]."/CTPasswordServices.inc.php");
+require_once($cfg["path_ct"]."/CTQuotationTemplates.inc.php");
 session_start();
 page_open(
 	array(
