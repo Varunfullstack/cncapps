@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 605 - Sales Quotation & Online Ordering
+
 ## [v3.4.1] - 2019-07-24
 ### Fixed
 - Running task e:\sites\cncapps\htdocs\call_url.php https://cncapps.cnc-ltd.co.uk/DailyReportCMD.php?action=outstandingIncidents&daysAgo=7 gives error:
