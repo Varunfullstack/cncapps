@@ -21,7 +21,12 @@ if (isset($_REQUEST['problemID'])) {
     $problemID = $_REQUEST['problemID'];
 }
 
+$debug = null;
+if (isset($_REQUEST['debug'])) {
+    $debug = $_REQUEST['debug'];
+}
+
 $buProblemSLA = new BUProblemSLA($thing);
-$buProblemSLA->monitor($dryRun, $problemID);
+$buProblemSLA->monitor($dryRun, $problemID, $debug);
 echo "Service Desk Monitor Routine Finished";
 ?>

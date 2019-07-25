@@ -59,7 +59,7 @@ class BUProblemSLA extends Business
     /**
      * @var bool
      */
-    private $dryRun;
+    private $debug;
 
     /**
      * Constructor
@@ -115,11 +115,10 @@ class BUProblemSLA extends Business
         $this->dbeJProblem = new DBEJProblem($this);
     }
 
-    function monitor($dryRun = false, $problemID = null)
+    function monitor($dryRun = false, $problemID = null, $debug = false)
     {
         $dsProblems = new DataSet($this);
-        $this->dryRun = $dryRun;
-
+        $this->debug = $debug;
         $this->buActivity->getProblemsByStatus(
             'I',
             $dsProblems
@@ -127,8 +126,18 @@ class BUProblemSLA extends Business
 
         $percentageSLA = 0;
         while ($dsProblems->fetchNext()) {
+            if ($debug) {
+                echo '<div>looking at SR: ' . $dsProblems->getValue(DBEJProblem::problemID) . '</div>';
+            }
             if ($problemID && $dsProblems->getValue(DBEJProblem::problemID) != $problemID) {
+                if ($debug) {
+                    echo '<div>The current SR does not match the one provided by URL - ignoring</div>';
+                }
                 continue;
+            } else {
+                if ($debug) {
+                    echo '<h1>Continuing!</h1>';
+                }
             }
             $this->dbeProblem->getRow($dsProblems->getValue(DBEProblem::problemID));
             $workingHours = $this->getWorkingHours($dsProblems->getValue(DBEProblem::problemID));
@@ -273,6 +282,370 @@ class BUProblemSLA extends Business
     } // end function monitor
 
     /**
+     * Calculate number of working hours for a problem
+     *
+     * @param integer $problemID
+     * @return bool|float|int|string
+     */
+    function getWorkingHours($problemID)
+    {
+        $this->dbeJProblem->getRow($problemID);
+
+        if ($this->debug) {
+            $this->dbeJCallActivity->setShowSQLOn();
+        }
+        $this->dbeJCallActivity->getRowsByProblemID(
+            $problemID,
+            false
+        );
+
+        $utNow = date('U');
+
+        if ($this->debug) {
+            echo '<div>Calculation Start: ' . $utNow . '</div>';
+        }
+
+        // unix date now
+        /*
+        Build an array of pauses for the problem
+        i.e. activities with awaitingCustomer
+        */
+        $this->awaitingCustomerResponseFlag = false;
+
+        $pauseStart = false;
+        $pauseArray = [];
+        if ($this->debug) {
+            echo '<div>We have ' . $this->dbeJCallActivity->rowCount . ' activities to look at </div>';
+        }
+        while ($this->dbeJCallActivity->fetchNext()) {
+            if ($this->dbeJCallActivity->getValue(DBEJCallActivity::awaitingCustomerResponseFlag) == 'Y') {
+                if ($this->debug) {
+                    echo '<div>Activity with AwaitingCustomerResponseFlag<div>';
+                }
+                if (!$pauseStart) {  // if not already paused
+                    $pauseStart = strtotime(
+                        $this->dbeJCallActivity->getValue(
+                            DBEJCallActivity::date
+                        ) . ' ' . $this->dbeJCallActivity->getValue(DBEJCallActivity::startTime)
+                    );
+                    if ($this->debug) {
+                        echo '<div>New PauseStart Value: ' . $pauseStart . '</div>';
+                    }
+                }
+            } else {
+                if ($this->debug) {
+                    echo '<div>Activity without AwaitingCustomerResponseFlag<div>';
+                }
+                if ($pauseStart) {   // currently paused so record beginning and end
+                    if ($this->debug) {
+                        echo '<div>We had a pause start, so we need to record the end of it: ' . $pauseStart . '</div>';
+                    }
+                    $pauseArray[$pauseStart] = strtotime(
+                        $this->dbeJCallActivity->getValue(
+                            DBEJCallActivity::date
+                        ) . ' ' . $this->dbeJCallActivity->getValue(DBEJCallActivity::startTime)
+                    );
+
+                    if ($this->debug) {
+                        echo '<div>' . json_encode($pauseArray) . '</div>';
+                    }
+                    $pauseStart = false;
+                }
+
+            }
+
+            $this->awaitingCustomerResponseFlag = $this->dbeJCallActivity->getValue(
+                DBEJCallActivity::awaitingCustomerResponseFlag
+            );
+        } // end while callactivity loop
+
+
+        // There wasn't an activity after the start pause so set end of the open pause to now
+        if ($pauseStart) {
+            if ($this->debug) {
+                echo '<div>We could not find an activity that closed the pause..so we use the current time as closing: ' . $utNow . ' </div>';
+            }
+            $pauseArray[$pauseStart] = $utNow;
+        }
+        /*
+        This field is an optomisation to avoid always counting through from the start of
+        the problem. The field is reset when a Request is amended to force a recalculation from
+        the start of the problem raised date.
+        */
+        if ($this->dbeJProblem->getValue(DBEProblem::workingHoursCalculatedToTime)) {
+            $addHoursSinceLastCalculation = true;
+            $utCalculationStart = strtotime($this->dbeJProblem->getValue(DBEProblem::workingHoursCalculatedToTime));
+            if ($this->debug) {
+                echo '<div>This SR does have calculated time already: ' . print_r(
+                        $utCalculationStart
+                    ) . ', workingHoursCalculatedToTime: ' . $this->dbeJProblem->getValue(
+                        DBEProblem::workingHoursCalculatedToTime
+                    ) . '</div>';
+            }
+
+        } else {
+            $addHoursSinceLastCalculation = false;
+            $utCalculationStart = strtotime($this->dbeJProblem->getValue(DBEProblem::dateRaised));
+            if ($this->debug) {
+                echo '<div>This SR does NOT have calculated time already, so we look at the date raised: ' . $this->dbeJProblem->getValue(
+                        DBEProblem::dateRaised
+                    ) . ' -> calculationStart: ' . $utCalculationStart . '</div>';
+            }
+        }
+
+        if ($this->debug) {
+            echo '<div> calculationStart: ' . $utCalculationStart . ", now: " . $utNow . ", pauseArray ";
+            var_dump($pauseArray);
+            echo "</div>";
+        }
+
+        $this->hoursCalculated = $this->getWorkingHoursBetweenUnixDates(
+            $utCalculationStart,
+            $utNow,
+            $pauseArray
+        );
+
+        if ($this->debug) {
+            echo '<div>Calculated hours: ' . $this->hoursCalculated . '</div>';
+        }
+        if ($addHoursSinceLastCalculation) {
+            if ($this->debug) {
+                echo '<div>current Working Hours: ' . $this->dbeJProblem->getValue(DBEProblem::workingHours) . '</div>';
+            }
+            $returnHours = $this->dbeJProblem->getValue(DBEProblem::workingHours) + $this->hoursCalculated;
+        } else {
+            $returnHours = $this->hoursCalculated;
+        }
+
+        return round($returnHours, 2);
+
+    } // end function autoCompletion
+
+    function getWorkingHoursBetweenUnixDates($utStart,
+                                             $utEnd,
+                                             $pauseArray = []
+    )
+    {
+        /*
+        Step through in 5 minute intervals ignoring weekends and holidays
+        */
+
+
+        $utCounter = $utStart;
+        $includedSeconds = 0;
+        $pauseStart = null;
+        $pauseEnd = null;
+        if (count($pauseArray)) {
+            $pauseEnd = current($pauseArray);                     // the value is the end
+            $pauseStart = key($pauseArray);                       // the key is the start
+        }
+
+
+        while ($utCounter < $utEnd) {
+            if ($this->debug) {
+                echo "<div>currentTime: " . date('Y-m-d H:i:s', $utCounter) . ", end: " . date(
+                        'Y-m-d H:i:s',
+                        $utEnd
+                    ) . " pauseStart: " . date('Y-m-d H:i:s', $pauseStart) . ", pauseEnd: " . date(
+                        'Y-m-d H:i:s',
+                        $pauseEnd
+                    ) . " </div>";
+
+            }
+            $dateAll = date(
+                'Y-m-d H:i N',
+                $utCounter
+            );
+
+            $dateYMD = substr(
+                $dateAll,
+                0,
+                10
+            );
+            $time = substr(
+                $dateAll,
+                11,
+                5
+            );
+            $dayOfWeek = substr(
+                $dateAll,
+                17,
+                1
+            );
+
+
+            $isWeekend = $dayOfWeek > 5;
+            $isBankHolidays = in_array($dateYMD, $this->ukBankHolidays);
+            $isAfterHours = $time > $this->endSupportTime;
+
+            if ($this->debug) {
+                echo "<div> isWeekend: " . ($isWeekend ? 'True' : 'False') . " isHolidays: " . ($isBankHolidays ? "True" : "False") . " isAfterHours: " . ($isAfterHours ? 'True' : 'False') . "</div>";
+            }
+
+            if (
+                $isWeekend ||
+                $isBankHolidays ||
+                $isAfterHours
+            ) {
+                // then skip to start of next day
+                if ($this->debug) {
+                    echo '<div>Skip day!</div>';
+                }
+                $utCounter = strtotime(
+                    $dateYMD . ' ' . $this->startSupportTime . ' + 1 DAY'
+                );          // skip counter forward by one day
+                continue;
+            }
+
+            if ($time < $this->startSupportTime) {               // before office start time
+                if ($this->debug) {
+                    echo '<div>Current time before company open hours</div>';
+                }
+                $utCounter = strtotime($dateYMD . ' ' . $this->startSupportTime); // skip to start of this working day
+                continue;
+
+            }
+
+            if (!$pauseStart) {
+                // no pauses left
+                if ($this->debug) {
+                    echo '<div>There are no pauses left, add thirty seconds</div>';
+                }
+                $includedSeconds += self::thirtySeconds;
+                $utCounter += self::thirtySeconds;
+                continue;
+
+            }
+
+            if ($utCounter <= $pauseStart) {                     // havent reached start of next pause
+                if ($this->debug) {
+                    echo '<div>We haven not reached the next pause ..so add 30 seconds</div>';
+                }
+                $includedSeconds += self::thirtySeconds;
+                $utCounter += self::thirtySeconds;
+                continue;
+            }
+
+            if ($utCounter <= $pauseEnd) {                       // still within a pause
+                if ($this->debug) {
+                    echo '<div>we are still within the pause</div>';
+                }
+                $utCounter += self::thirtySeconds;
+                continue;
+            } else {                                                 // reached end of current pause so load next
+                // get Next pause. returns false if none left
+                $pauseEnd = next($pauseArray);
+                $pauseStart = key($pauseArray);
+            }
+            if ($this->debug) {
+                echo '<div>utCounter: ' . $utCounter . ', includedSeconds: ' . $includedSeconds . '</div>';
+            }
+        }
+
+        return ($includedSeconds / self::hour);
+    }
+
+    /**
+     * Sends email to managers when request is near SLA
+     *
+     * @param $problemID
+     * @param $percentage
+     */
+    function sendSlaAlertEmail(
+        $problemID,
+        $percentage
+    )
+    {
+        $buMail = new BUMail($this);
+
+        $dbeJProblem = new DBEJProblem($this);
+        $dbeJProblem->getRow($problemID);
+
+        if ($dbeJCallActivity = $this->buActivity->getFirstActivityInProblem($problemID)) {
+
+            $senderEmail = CONFIG_SUPPORT_EMAIL;
+
+            if ($dbeJProblem->getValue(DBEJProblem::engineerLogname)) {
+                $toEmail = $dbeJProblem->getValue(DBEJProblem::engineerLogname) . '@' . CONFIG_PUBLIC_DOMAIN;
+            } else {
+                $toEmail = false;
+            }
+
+            if ($toEmail) {
+                $toEmail .= ',';
+            }
+            $toEmail .= 'slabreachalert@' . CONFIG_PUBLIC_DOMAIN;
+
+            $activityRef = $dbeJCallActivity->getValue(DBEJCallActivity::problemID);
+
+            $template = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
+            $template->set_file(
+                'page',
+                'SlaAlertEmail.inc.html'
+            );
+
+            $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
+                );
+
+            $template->setVar(
+                array(
+                    'urlActivity'                 => $urlActivity,
+                    'customerName'                => $dbeJProblem->getValue(DBEJProblem::customerName),
+                    'activityRef'                 => $activityRef,
+                    'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
+                    'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC,
+                    'percentage'                  => number_format(
+                        $percentage,
+                        0
+                    )
+                )
+            );
+
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
+
+            $body = $template->get_var('output');
+
+            $hdrs = array(
+                'To'           => $toEmail,
+                'From'         => $senderEmail,
+                'Subject'      => 'WARNING - SR for ' . $dbeJProblem->getValue(
+                        DBEJProblem::customerName
+                    ) . 'assigned to ' . $dbeJProblem->getValue(DBEJProblem::engineerName) . ' close to breaching SLA',
+                'Date'         => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            $buMail->mime->setHTMLBody($body);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
+            );
+            $body = $buMail->mime->get($mime_params);
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->putInQueue(
+                $senderEmail,
+                $toEmail,
+                $hdrs,
+                $body
+            );
+
+        } // end if ( $dbeJCallActivity = $this->buActivity->getFirstActivityInProblem( $problemID ) ){
+
+    }
+
+    /**
      * @throws Exception
      */
     function autoCompletion()
@@ -409,7 +782,7 @@ class BUProblemSLA extends Business
 
         }    // end while fetch next
 
-    } // end function autoCompletion
+    }
 
     /**
      * Delete any fixed SRs that had no human intervention.
@@ -477,7 +850,6 @@ class BUProblemSLA extends Business
 
     }
 
-
     /**
      * Send an email to managers alerting them to impending end of special attention customer periods
      *
@@ -502,7 +874,7 @@ class BUProblemSLA extends Business
         while ($row = $results->fetch_object()) {
             $this->sendSpecialAttentionEmailAlert($row);
         }
-    }
+    } // end of function
 
     function sendSpecialAttentionEmailAlert($customer)
     {
@@ -565,257 +937,6 @@ class BUProblemSLA extends Business
     }
 
     /**
-     * Sends email to managers when request is near SLA
-     *
-     * @param $problemID
-     * @param $percentage
-     */
-    function sendSlaAlertEmail(
-        $problemID,
-        $percentage
-    )
-    {
-        $buMail = new BUMail($this);
-
-        $dbeJProblem = new DBEJProblem($this);
-        $dbeJProblem->getRow($problemID);
-
-        if ($dbeJCallActivity = $this->buActivity->getFirstActivityInProblem($problemID)) {
-
-            $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-            if ($dbeJProblem->getValue(DBEJProblem::engineerLogname)) {
-                $toEmail = $dbeJProblem->getValue(DBEJProblem::engineerLogname) . '@' . CONFIG_PUBLIC_DOMAIN;
-            } else {
-                $toEmail = false;
-            }
-
-            if ($toEmail) {
-                $toEmail .= ',';
-            }
-            $toEmail .= 'slabreachalert@' . CONFIG_PUBLIC_DOMAIN;
-
-            $activityRef = $dbeJCallActivity->getValue(DBEJCallActivity::problemID);
-
-            $template = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
-            );
-            $template->set_file(
-                'page',
-                'SlaAlertEmail.inc.html'
-            );
-
-            $urlActivity = SITE_URL. '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
-                );
-
-            $template->setVar(
-                array(
-                    'urlActivity'                 => $urlActivity,
-                    'customerName'                => $dbeJProblem->getValue(DBEJProblem::customerName),
-                    'activityRef'                 => $activityRef,
-                    'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                    'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC,
-                    'percentage'                  => number_format(
-                        $percentage,
-                        0
-                    )
-                )
-            );
-
-            $template->parse(
-                'output',
-                'page',
-                true
-            );
-
-            $body = $template->get_var('output');
-
-            $hdrs = array(
-                'To'           => $toEmail,
-                'From'         => $senderEmail,
-                'Subject'      => 'WARNING - SR for ' . $dbeJProblem->getValue(
-                        DBEJProblem::customerName
-                    ) . 'assigned to ' . $dbeJProblem->getValue(DBEJProblem::engineerName) . ' close to breaching SLA',
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
-            $buMail->mime->setHTMLBody($body);
-
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-            $body = $buMail->mime->get($mime_params);
-
-            $hdrs = $buMail->mime->headers($hdrs);
-
-            $buMail->putInQueue(
-                $senderEmail,
-                $toEmail,
-                $hdrs,
-                $body
-            );
-
-        } // end if ( $dbeJCallActivity = $this->buActivity->getFirstActivityInProblem( $problemID ) ){
-
-    }
-
-
-    /**
-     * Calculate number of working hours for a problem
-     *
-     * @param integer $problemID
-     * @return bool|float|int|string
-     */
-    function getWorkingHours($problemID)
-    {
-        $this->dbeJProblem->getRow($problemID);
-
-        if ($this->dryRun) {
-            $this->dbeJCallActivity->setShowSQLOn();
-        }
-        $this->dbeJCallActivity->getRowsByProblemID(
-            $problemID,
-            false
-        );
-
-        $utNow = date('U');
-
-        if ($this->dryRun) {
-            echo '<div>Calculation Start: ' . $utNow . '</div>';
-        }
-
-        // unix date now
-        /*
-        Build an array of pauses for the problem
-        i.e. activities with awaitingCustomer
-        */
-        $this->awaitingCustomerResponseFlag = false;
-
-        $pauseStart = false;
-        $pauseArray = [];
-//        $this->dbeJCallActivity->fetchNext();
-        if ($this->dryRun) {
-            echo '<div>We have ' . $this->dbeJCallActivity->rowCount . ' activities to look at </div>';
-        }
-        while ($this->dbeJCallActivity->fetchNext()) {
-
-            if ($this->dbeJCallActivity->getValue(DBEJCallActivity::awaitingCustomerResponseFlag) == 'Y') {
-                if ($this->dryRun) {
-                    echo '<div>Activity with AwaitingCustomerResponseFlag<div>';
-                }
-                if (!$pauseStart) {  // if not already paused
-                    $pauseStart = strtotime(
-                        $this->dbeJCallActivity->getValue(
-                            DBEJCallActivity::date
-                        ) . ' ' . $this->dbeJCallActivity->getValue(DBEJCallActivity::startTime)
-                    );
-                    if ($this->dryRun) {
-                        echo '<div>New PauseStart Value: ' . $pauseStart . '</div>';
-                    }
-                }
-            } else {
-                if ($this->dryRun) {
-                    echo '<div>Activity without AwaitingCustomerResponseFlag<div>';
-                }
-                if ($pauseStart) {   // currently paused so record beginning and end
-                    if ($this->dryRun) {
-                        echo '<div>We had a pause start, so we need to record the end of it: ' . $pauseStart . '</div>';
-                    }
-                    $pauseArray[$pauseStart] = strtotime(
-                        $this->dbeJCallActivity->getValue(
-                            DBEJCallActivity::date
-                        ) . ' ' . $this->dbeJCallActivity->getValue(DBEJCallActivity::startTime)
-                    );
-
-                    if ($this->dryRun) {
-                        echo '<div>' . json_encode($pauseArray) . '</div>';
-                    }
-
-                    $pauseStart = false;
-
-                }
-
-            }
-
-            $this->awaitingCustomerResponseFlag = $this->dbeJCallActivity->getValue(
-                DBEJCallActivity::awaitingCustomerResponseFlag
-            );
-        } // end while callactivity loop
-
-        if ($this->dryRun) {
-            echo "<div>" . __LINE__ . " </div>";
-        }
-
-        // There wasn't an activity after the start pause so set end of the open pause to now
-        if ($pauseStart) {
-            if ($this->dryRun) {
-                echo '<div>We could not find an activity that closed the pause..so we use the current time as closing</div>';
-            }
-            $pauseArray[$pauseStart] = $utNow;
-        }
-        if ($this->dryRun) {
-            echo "<div>" . __LINE__ . " </div>";
-        }
-        /*
-        This field is an optomisation to avoid always counting through from the start of
-        the problem. The field is reset when a Request is amended to force a recalculation from
-        the start of the problem raised date.
-        */
-        if ($this->dbeJProblem->getValue(DBEProblem::workingHoursCalculatedToTime)) {
-            if ($this->dryRun) {
-                echo "<div>" . __LINE__ . " </div>";
-            }
-            $addHoursSinceLastCalculation = true;
-            $utCalculationStart = strtotime($this->dbeJProblem->getValue(DBEProblem::workingHoursCalculatedToTime));
-            if ($this->dryRun) {
-                echo "<div>" . __LINE__ . " </div>";
-            }
-            if ($this->dryRun) {
-                echo '<div>This SR does have calculated time already: ' . print_r(
-                        $utCalculationStart
-                    ) . ', workingHoursCalculatedToTime: ' . $this->dbeJProblem->getValue(
-                        DBEProblem::workingHoursCalculatedToTime
-                    ) . '</div>';
-            }
-
-        } else {
-            $addHoursSinceLastCalculation = false;
-            $utCalculationStart = strtotime($this->dbeJProblem->getValue(DBEProblem::dateRaised));
-            if ($this->dryRun) {
-                echo '<div>This SR does NOT have calculated time already, so we look at the date raised: ' . $this->dbeJProblem->getValue(
-                        DBEProblem::dateRaised
-                    ) . ' -> calculationStart: ' . print_r($utCalculationStart) . '</div>';
-            }
-        }
-
-        $this->hoursCalculated = $this->getWorkingHoursBetweenUnixDates(
-            $utCalculationStart,
-            $utNow,
-            $pauseArray
-        );
-
-        if ($this->dryRun) {
-            echo '<div>Calculated hours: ' . $this->hoursCalculated . '</div>';
-        }
-        if ($addHoursSinceLastCalculation) {
-            if ($this->dryRun) {
-                echo '<div>current Working Hours: ' . $this->dbeJProblem->getValue(DBEProblem::workingHours) . '</div>';
-            }
-            $returnHours = $this->dbeJProblem->getValue(DBEProblem::workingHours) + $this->hoursCalculated;
-        } else {
-            $returnHours = $this->hoursCalculated;
-        }
-
-        return round($returnHours, 2);
-
-    } // end of function
-
-    /**
      * This is to fix the problem where the working hours were being updated
      * when the request was completed
      *
@@ -842,98 +963,6 @@ class BUProblemSLA extends Business
             $this->dbeProblem->updateRow();
 
         }
-    }
-
-    function getWorkingHoursBetweenUnixDates($utStart,
-                                             $utEnd,
-                                             $pauseArray = []
-    )
-    {
-        /*
-        Step through in 5 minute intervals ignoring weekends and holidays
-        */
-        $utCounter = $utStart;
-        $includedSeconds = 0;
-        $pauseStart = null;
-        $pauseEnd = null;
-        if (count($pauseArray)) {
-            $pauseEnd = current($pauseArray);                     // the value is the end
-            $pauseStart = key($pauseArray);                       // the key is the start
-        }
-
-        if ($this->dryRun) {
-            echo "<div>start: $utStart, end: $utEnd </div>";
-        }
-
-        while ($utCounter < $utEnd) {
-
-            $dateAll = date(
-                'Y-m-d H:i N',
-                $utCounter
-            );
-
-            $dateYMD = substr(
-                $dateAll,
-                0,
-                10
-            );
-            $time = substr(
-                $dateAll,
-                11,
-                5
-            );
-            $dayOfWeek = substr(
-                $dateAll,
-                17,
-                1
-            );
-
-            if (
-                $dayOfWeek > 5 ||                                   // if weekend
-                in_array(
-                    $dateYMD,
-                    $this->ukBankHolidays
-                ) ||      // or bank holiday
-                $time > $this->endSupportTime                       // or after office end
-            ) {                                                    // then skip to start of next day
-                $utCounter = strtotime(
-                    $dateYMD . ' ' . $this->startSupportTime . ' + 1 DAY'
-                );;            // skip counter forward by one day
-                continue;
-            }
-
-            if ($time < $this->startSupportTime) {               // before office start time
-
-                $utCounter = strtotime($dateYMD . ' ' . $this->startSupportTime); // skip to start of this working day
-                continue;
-
-            }
-
-            if (!$pauseStart) {                                  // no pauses left
-                $includedSeconds += self::thirtySeconds;
-                $utCounter += self::thirtySeconds;
-                continue;
-
-            }
-
-            if ($utCounter <= $pauseStart) {                     // havent reached start of next pause
-                $includedSeconds += self::thirtySeconds;
-                $utCounter += self::thirtySeconds;
-                continue;
-            }
-
-            if ($utCounter <= $pauseEnd) {                       // still within a pause
-                $utCounter += self::thirtySeconds;
-                continue;
-            } else {                                                 // reached end of current pause so load next
-                // get Next pause. returns false if none left
-                $pauseEnd = next($pauseArray);
-                $pauseStart = key($pauseArray);
-            }
-
-        }
-
-        return ($includedSeconds / self::hour);
     } // end  getWorkingHoursBetweenDates
 
     /**
