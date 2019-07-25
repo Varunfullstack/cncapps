@@ -177,6 +177,7 @@
                 const foundIndex = rules.findIndex(rule => currentRule.id === rule.id);
                 rules = arrayReplaceAt(rules, foundIndex, currentRule);
             }
+            rules.sort((a, b) => a.replacement.localeCompare(b.replacement))
             drawList();
             cancelEdit();
         })
