@@ -1,9 +1,15 @@
 # Changelog
 This project changes will be shown here.
 
-## [v3.4.2]
+## [v3.4.2] - 2019-07-25
+### Added
+- Add links below the Add button on Office365Licenses.php
+### Changed 
+- Change the description of the portal document from O365 Licenses to Current Mailbox List
+- On Office365Licenses.php sort on Friendly Name alphabetically ascending.
+- Make all mentions to cnc-ltd.co.uk have be actual links with https
 ### Fixed
-- When exporting the license information for customer 6478, Gavin Travica should be red in the export as he has a 51200 mailbox limit but it's not showing as that. 
+- When exporting the license information for customer 6478, Gavin Travica should be red in the export as he has a 51200 mailbox limit but it's not showing as that.
 
 ## [v3.4.1] - 2019-07-24
 ### Fixed
