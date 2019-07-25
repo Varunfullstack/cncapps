@@ -64,7 +64,7 @@ class DBEPortalCustomerDocument extends DBEPortalCustomerDocumentWithoutFile
                 self::customerID
             ) . " = $customerID and " . $this->getDBColumnName(
                 self::filename
-            ) . " = 'O365 Licenses.xlsx' limit 1";
+            ) . " = 'Current Mailbox Extract.xlsx' limit 1";
         $this->queryString = $queryString;
 
         $this->getRows();
