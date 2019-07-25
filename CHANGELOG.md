@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.4.2]
+### Fixed
+- When exporting the license information for customer 6478, Gavin Travica should be red in the export as he has a 51200 mailbox limit but it's not showing as that. 
+
 ## [v3.4.1] - 2019-07-24
 ### Fixed
 - Running task e:\sites\cncapps\htdocs\call_url.php https://cncapps.cnc-ltd.co.uk/DailyReportCMD.php?action=outstandingIncidents&daysAgo=7 gives error:
