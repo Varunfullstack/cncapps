@@ -1,9 +1,15 @@
 # Changelog
 This project changes will be shown here.
 
-## [v3.4.3] -
+## [v3.4.3] - 2019-07-26
+### Changed
+- On SDManagerDashboard.php please move the sorting order so that Critical Requests sit between “current open P1 requests” and “oldest updated SRs”.
+- Allow "parts used" and "Sales request" from within editing activity page
 ### Fixed
 - StartersAndLeaversReport.php average cost for the Total row
+- When editing customer item the CNC Serverguard section, it lists out the 3 virtual machines, but when you go into these items, it does not show that the CNC ServerGuard checkbox is checked
+- Email address with an apostrophe caused the automated import process to fail
+- Fix issue with Review Meeting agenda documents not generated correctly 
 
 ## [v3.4.2] - 2019-07-25
 ### Added
