@@ -90,7 +90,7 @@ class CTCustomerReviewMeeting extends CTCNC
         $agendaTemplate->set_var(
             [
                 'htmlBody' => $text,
-                'URL'      => SITE_URL. '/images/test.png'
+                'URL'      => SITE_URL . '/images/test.png'
             ]
         );
 
@@ -210,6 +210,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 $nonEditableTemplate->set_var(
                     array(
                         'customerName' => $dsCustomer->getValue(DBECustomer::name),
+                        'siteURL'      => SITE_URL,
                         'meetingDate'  => self::dateYMDtoDMY(
                             $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormMeetingDate)
                         ),
@@ -218,7 +219,7 @@ class CTCustomerReviewMeeting extends CTCNC
                         'slaP3'        => $dsCustomer->getValue(DBECustomer::slaP3),
                         'slaP4'        => $dsCustomer->getValue(DBECustomer::slaP4),
                         'slaP5'        => $dsCustomer->getValue(DBECustomer::slaP5),
-                        "waterMarkURL" => SITE_URL. '/images/CNC_watermarkActualSize.png',
+                        "waterMarkURL" => SITE_URL . '/images/CNC_watermarkActualSize.png',
                         'reportDate'   => $reportRangeDate
                     )
                 );

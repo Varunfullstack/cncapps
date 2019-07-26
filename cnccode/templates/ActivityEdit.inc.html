@@ -5,11 +5,16 @@
 <script type="text/javascript"
         src="ckeditor/ckeditor.js"
 ></script>
-<link rel="stylesheet"
-      href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"
->
-<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script type="application/javascript"
+        src=".javascript/salesRequest.js"
+></script>
 <script language='JavaScript'>
+    window.callActivityID = "{callActivityID}";
+    window.problemID = "{problemID}";
+
+    function showSalesRequestDialog() {
+        startSalesRequest(problemID);
+    }
 
     var authorisedByName = "{authorisedByName}";
     $(function () {
@@ -56,32 +61,6 @@
         }
     }
 
-
-    // function validateHhMm(value) {
-    //     return /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/.test(value);
-    // }
-
-    // function checkDate() {
-    //
-    //     var activityType = $('#contractID').val();
-    //
-    //     console.log();
-    //
-    //     var startTimeElm = $('#startTime');
-    //     var endTimeElm = $('#endTime');
-    //
-    //     //check if the startTime is a valid date
-    //     if (validateHhMm(startTimeElm.val()) && validateHhMm(endTimeElm.val())) {
-    //         // we only care about this if this activity is one that affects the time
-    //
-    //
-    //         var startTime = moment(startTimeElm.val(), 'HH:mm');
-    //         var endTime = moment(endTimeElm.val(), 'HH:mm');
-    //
-    //         console.log(endTime.diff(startTime) / 1000 / 60);
-    //     }
-    //
-    // }
 
     function setFormChanged() {
         formChanged = true;
@@ -190,6 +169,7 @@
         }
     }
 </script>
+<script src=".javascript/sendPartsUsed.js"></script>
 <table width="100%">
     <tr>
         <td>{activityWizardHeader} {contractListPopupLink} {thirdPartyContactLink} {contactHistoryLink}</td>
@@ -350,13 +330,19 @@
                            value="Update"
                            id="updateBtn"
                     >
-
                     <input name="Cancel"
                            type="button"
                            value="Cancel"
                            onclick="confirmCancel();"
                     />
-
+                    <button type="button"
+                            class="partsUsedButton"
+                    >Parts Used
+                    </button>
+                    <button type="button"
+                            onclick="showSalesRequestDialog()"
+                    >Sales Request
+                    </button>
                 </div>
 
 
@@ -769,6 +755,14 @@
                            value="Cancel"
                            onclick="if(confirm('Are you sure you want to cancel?')) document.location='{urlCancelEdit}';"
                     />
+                    <button type="button"
+                            class="partsUsedButton"
+                    >Parts Used
+                    </button>
+                    <button type="button"
+                            onclick="showSalesRequestDialog()"
+                    >Sales Request
+                    </button>
                 </div>
             </td>
         </tr>
