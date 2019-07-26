@@ -147,6 +147,10 @@ class CTActivity extends CTCNC
             ""    => "All"
         );
     /**
+     * @var DSForm
+     */
+    public $dsCallActivity;
+    /**
      *
      * @var DSForm
      */
@@ -174,10 +178,6 @@ class CTActivity extends CTCNC
                         => "Checked Non-T&M Due Completion",
             "UNCHECKED" => "Unchecked"
         );
-    /**
-     * @var DSForm
-     */
-    public $dsCallActivity;
 
     function __construct($requestMethod,
                          $postVars,
@@ -224,26 +224,6 @@ class CTActivity extends CTCNC
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
-        }
-    }
-
-
-    private function assignContracts()
-    {
-        $activities = $this->getParam('callActivityID');
-        $problems = $this->getParam('problem');
-
-        $dbeCallActivity = new DBECallActivity($this);
-        $dbeProblem = new DBEProblem($this);
-        foreach ($activities as $activityID => $rubbish) {
-            $dbeCallActivity->getRow($activityID);
-            $problemID = $dbeCallActivity->getValue(DBECallActivity::problemID);
-            $dbeProblem->getRow($problemID);
-            $dbeProblem->setValue(
-                DBEProblem::contractCustomerItemID,
-                $problems[$problemID]['contract']
-            );
-            $dbeProblem->updateRow();
         }
     }
 
@@ -470,6 +450,17 @@ class CTActivity extends CTCNC
         }
     }
 
+    private function updateSession(string $string, $value)
+    {
+        $sessionValue = $this->getSessionParam($this->sessionKey);
+        if (!$sessionValue) {
+            $sessionValue = [];
+        }
+
+        $sessionValue[$string] = $value;
+        $this->setSessionParam($this->sessionKey, $sessionValue);
+    }
+
     /**
      * Create sales orders from checked activities
      *
@@ -518,7 +509,26 @@ class CTActivity extends CTCNC
         }
     } // end function salesRequest
 
-    /**
+        private function assignContracts()
+    {
+        $activities = $this->getParam('callActivityID');
+        $problems = $this->getParam('problem');
+
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeProblem = new DBEProblem($this);
+        foreach ($activities as $activityID => $rubbish) {
+            $dbeCallActivity->getRow($activityID);
+            $problemID = $dbeCallActivity->getValue(DBECallActivity::problemID);
+            $dbeProblem->getRow($problemID);
+            $dbeProblem->setValue(
+                DBEProblem::contractCustomerItemID,
+                $problems[$problemID]['contract']
+            );
+            $dbeProblem->updateRow();
+        }
+    } // end function displaySearchForm
+
+/**
      * Skip creation of sales order but authorise checked activities of given call
      *
      * @access private
@@ -532,7 +542,7 @@ class CTActivity extends CTCNC
             $this->buActivity->skipSalesOrdersForActivities($this->getParam('callActivityID'));
         }
         $this->search();
-    } // end function displaySearchForm
+    }
 
     /**
      * @throws Exception
@@ -1127,10 +1137,9 @@ class CTActivity extends CTCNC
                 true
             );
         }
-    }
+    } //end userDropdown
 
-
-    function contractDropdown(
+function contractDropdown(
         $customerID,
         $contractCustomerItemID,
         $templateName = 'ActivityCreate6',
@@ -1208,9 +1217,9 @@ class CTActivity extends CTCNC
             $currentRow++;
         }
 
-    } //end userDropdown
+    }
 
-    function userDropdown($userID,
+        function userDropdown($userID,
                           $templateName,
                           $activeUsersOnly = true
     )
@@ -1246,9 +1255,9 @@ class CTActivity extends CTCNC
                 true
             );
         }
-    }
+    } // end activityCreate1
 
-    function removeQuerystringVar($url,
+function removeQuerystringVar($url,
                                   $key
     )
     {
@@ -1263,9 +1272,39 @@ class CTActivity extends CTCNC
             -1
         );
         return $url;
-    } // end activityCreate1
+    }
 
-    function parsePage()
+    private function getContractsForCustomer($customerID)
+    {
+        $buCustomerItem = new BUCustomerItem($this);
+        $dsContract = new DataSet($this);
+        $buCustomerItem->getContractsByCustomerID(
+            $customerID,
+            $dsContract
+        );
+
+        $data = [];
+
+        while ($dsContract->fetchNext()) {
+
+            if (!isset($data[$dsContract->getValue(DBEJContract::renewalType)])) {
+                $data[$dsContract->getValue(DBEJContract::renewalType)] = [];
+            }
+            $data[$dsContract->getValue(DBEJContract::renewalType)][] = [
+                "description" => $dsContract->getValue(DBEJContract::itemDescription) . ' ' . $dsContract->getValue(
+                        DBEJContract::adslPhone
+                    ) . ' ' . $dsContract->getValue(DBEJContract::notes) . ' ' . $dsContract->getValue(
+                        DBEJContract::postcode
+                    ),
+                "id"          => $dsContract->getValue(DBEJContract::customerItemID)
+
+            ];
+
+        }
+        return $data;
+    }
+
+        function parsePage()
     {
         parent::parsePage();
         $urlLogo = null;
@@ -1275,9 +1314,9 @@ class CTActivity extends CTCNC
                 'txtHome' => 'Home'
             )
         );
-    }
+    } // end contractDropdown
 
-    function countParamsSet($array)
+        function countParamsSet($array)
     {
         $count = 0;
         $elements = $array[1];
@@ -1287,7 +1326,7 @@ class CTActivity extends CTCNC
             }
         }
         return $count;
-    }
+    } // end siteDropdown
 
     function generateCSV()
     {
@@ -1337,7 +1376,98 @@ class CTActivity extends CTCNC
         }
         $this->pageClose();
         exit;
-    } // end contractDropdown
+    }// end displayProjects
+
+    /**
+     * @throws Exception
+     */
+    function serviceRequestsForContactPopup()
+    {
+        $this->setTemplateFiles(
+            'ServiceRequestsForContactPopup',
+            'ServiceRequestsForContactPopup'
+        );
+        $dsContactSrs = $this->buActivity->getProblemsByContact($this->getParam('contactID'));
+
+
+        $dbeContact = new DBEContact($this);
+        $dbeContact->getRow($this->getParam('contactID'));
+        $this->setPageTitle(
+            'Service Requests For ' . $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
+                DBEContact::lastName
+            )
+        );
+
+        $this->template->set_block(
+            'ServiceRequestsForContactPopup',
+            'contactProblemBlock',
+            'contactProblems'
+        );
+
+        while ($dsContactSrs->fetchNext()) {
+
+            $urlCreateFollowOn =
+                Controller::buildLink(
+                    'Activity.php',
+                    array(
+                        'action'         => 'createFollowOnActivity',
+                        'callActivityID' => $dsContactSrs->getValue(DBEJProblem::lastCallActivityID),
+                        'reason'         => $this->getParam('reason')
+                    )
+                );
+
+            $urlProblemHistoryPopup =
+                Controller::buildLink(
+                    'Activity.php',
+                    array(
+                        'action'    => 'problemHistoryPopup',
+                        'problemID' => $dsContactSrs->getValue(DBEJProblem::problemID),
+                        'htmlFmt'   => CT_HTML_FMT_POPUP
+                    )
+                );
+
+            $this->template->set_var(
+                array(
+                    'contactProblemID'              => $dsContactSrs->getValue(DBEJProblem::problemID),
+                    'contactDateRaised'             => Controller::dateYMDtoDMY(
+                        $dsContactSrs->getValue(DBEJProblem::dateRaised)
+                    ),
+                    'contactReason'                 => self::truncate(
+                        $dsContactSrs->getValue(DBEJProblem::reason),
+                        100
+                    ),
+                    'contactLastReason'             => self::truncate(
+                        $dsContactSrs->getValue(DBEJProblem::lastReason),
+                        100
+                    ),
+                    'contactEngineerName'           => $dsContactSrs->getValue(DBEJProblem::engineerName),
+                    'createFollowOnLink'            => $dsContactSrs->getValue(
+                        DBEJProblem::status
+                    ) == 'C' ? null : "<a href=" . $urlCreateFollowOn . ">Log activity</a>",
+                    'contactUrlProblemHistoryPopup' => $urlProblemHistoryPopup,
+                    'contactPriority'               => $dsContactSrs->getValue(DBEJProblem::priority),
+                    'contactPriorityClass'          => $dsContactSrs->getValue(
+                        DBEJProblem::priority
+                    ) == 1 ? 'class="redRow"' : null
+                )
+            );
+
+            $this->template->parse(
+                'contactProblems',
+                'contactProblemBlock',
+                true
+            );
+
+        }
+        $this->template->parse(
+            'CONTENTS',
+            'ServiceRequestsForContactPopup',
+            true
+        );
+        $this->parsePage();
+
+        exit;
+    }// end create5
 
     /**
      * Edit/Add Activity
@@ -2281,9 +2411,12 @@ class CTActivity extends CTCNC
             true
         );
         $this->parsePage();
-    } // end siteDropdown
+    }// end displayOpenSrs
 
-    /**
+
+//----------------
+
+/**
      * @param $customerID
      * @return string
      * @throws Exception
@@ -2303,9 +2436,9 @@ class CTActivity extends CTCNC
         $renewalsLink = '<a href="' . $renewalsLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
 
         return $renewalsLink;
-    }// end displayProjects
+    }
 
-    /**
+/**
      * @param DataSet|DBECustomer $dsCustomer
      * @return string
      */
@@ -2319,9 +2452,9 @@ class CTActivity extends CTCNC
         }
 
         return null;
-    }// end create5
+    }
 
-    /**
+/**
      * @param $customerID
      * @return mixed|string
      * @throws Exception
@@ -2336,10 +2469,14 @@ class CTActivity extends CTCNC
             )
         );
 
-    }// end displayOpenSrs
+    }
 
-
-//----------------
+    private
+    function checkMonitoring($problemID
+    )
+    {
+        return $this->buActivity->checkMonitoringFlag($problemID);
+    }
 
     /**
      * @param $problemID
@@ -2385,29 +2522,7 @@ class CTActivity extends CTCNC
         return $passwordLink;
     }
 
-    /**
-     * @param $customerID
-     * @return string
-     * @throws Exception
-     */
-    function getThirdPartyContactLink($customerID)
-    {
-        $thirdPartyContactLinkURL =
-            Controller::buildLink(
-                'ThirdPartyContact.php',
-                array(
-                    'action'     => 'list',
-                    'customerID' => $customerID
-                )
-            );
-
-
-        $thirdPartyContactLink = '| <a href="' . $thirdPartyContactLinkURL . '" target="_blank" title="ThirdPartyContacts">Third Party Contacts</a>';
-
-        return $thirdPartyContactLink;
-    }
-
-    /**
+        /**
      * @return string
      * @throws Exception
      */
@@ -2430,7 +2545,29 @@ class CTActivity extends CTCNC
           \'scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0\')" >Generate Password</a> ';
 
         return $passwordLink;
-    }
+    }// end function editActivity()
+
+        /**
+     * @param $customerID
+     * @return string
+     * @throws Exception
+     */
+    function getThirdPartyContactLink($customerID)
+    {
+        $thirdPartyContactLinkURL =
+            Controller::buildLink(
+                'ThirdPartyContact.php',
+                array(
+                    'action'     => 'list',
+                    'customerID' => $customerID
+                )
+            );
+
+
+        $thirdPartyContactLink = '| <a href="' . $thirdPartyContactLinkURL . '" target="_blank" title="ThirdPartyContacts">Third Party Contacts</a>';
+
+        return $thirdPartyContactLink;
+    }// end function editLinkedSalesOrder()
 
     /**
      * @param $customerID
@@ -2453,6 +2590,25 @@ class CTActivity extends CTCNC
         $contractListPopupLink = '| <a href="' . $contractListPopupLinkURL . '" target="_blank" title="Contracts">Contracts</a>';
 
         return $contractListPopupLink;
+    }
+
+    /**
+     * @param $contactID
+     * @return string
+     * @throws Exception
+     */
+    private function getServiceRequestForContactLink($contactID)
+    {
+        $contactHistory =
+            Controller::buildLink(
+                'Activity.php',
+                array(
+                    'action'    => 'displayServiceRequestForContactPopup',
+                    'contactID' => $contactID,
+                    'htmlFmt'   => CT_HTML_FMT_POPUP
+                )
+            );
+        return '| <a href="#" title="Contact SR History" onclick="window.open(\'' . $contactHistory . '\', \'reason\', \'scrollbars=yes,resizable=yes,height=400,width=1225,copyhistory=no, menubar=0\')">Contact SR History</a>';
     }
 
     /**
@@ -2565,9 +2721,9 @@ class CTActivity extends CTCNC
         }
 
 
-    }// end function editActivity()
+    } // end cancelEdit
 
-    /**
+/**
      * @throws Exception
      */
     function displayFirstActivity()
@@ -2576,9 +2732,9 @@ class CTActivity extends CTCNC
 
         $this->redirectToDisplay($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
 
-    }// end function editLinkedSalesOrder()
+    }
 
-    /**
+        /**
      * Redirect to call page
      * @access private
      * @param $callActivityID
@@ -2596,25 +2752,7 @@ class CTActivity extends CTCNC
             );
         header('Location: ' . $urlNext);
         exit;
-    }
-
-    /**
-     * @param $callActivityID
-     * @throws Exception
-     */
-    function redirectToFixed($callActivityID)
-    {
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'callActivityID' => $callActivityID,
-                    'action'         => 'gatherFixedInformation'
-                )
-            );
-        header('Location: ' . $urlNext);
-        exit;
-    }
+    }// end function displayActivity()
 
     /**
      * @throws Exception
@@ -2627,7 +2765,7 @@ class CTActivity extends CTCNC
 
     }
 
-    /**
+/**
      * Create wizard step 1: Customer, site and contact selection
      * @access private
      * @param bool $referred
@@ -2834,7 +2972,7 @@ class CTActivity extends CTCNC
         );
         $this->parsePage();
 
-    } // end cancelEdit
+    }
 
     /**
      * edit a value only SR
@@ -2962,7 +3100,7 @@ class CTActivity extends CTCNC
 
         }
 
-    }// end function displayActivity()
+    }  // end finaliseProblem
 
     /**
      * @throws Exception
@@ -3426,7 +3564,7 @@ class CTActivity extends CTCNC
 
     }
 
-    function siteDropdown(
+        function siteDropdown(
         $customerID,
         $siteNo,
         $templateName = 'ActivityCreate6',
@@ -3484,9 +3622,85 @@ class CTActivity extends CTCNC
             );
         }
 
-    }
+    }    // end allocateAdditionalTime
 
-    /**
+        private function onlyMainAndSupervisorsDropdown($templateName,
+                                                    $customerID,
+                                                    $contactID
+    )
+    {
+        $dbeContact = new DBEContact($this);
+        $dbeSite = new DBESite($this);
+
+        $dbeContact->getRowsByCustomerID(
+            $customerID,
+            false,
+            true
+        );
+
+        $this->template->set_block(
+            $templateName,
+            'contactOnlyMainAndSupervisorsBlock',
+            'contactsOnlyMainAndSupervisor'
+        );
+
+        $lastSiteNo = null;
+        while ($dbeContact->fetchNext()) {
+            $contactSelected = ($contactID == $dbeContact->getValue(DBEContact::contactID)) ? CT_SELECTED : null;
+
+            if ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelMain) {
+                $startMainContactStyle = '*';
+                $endMainContactStyle = '*';
+            } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelSupervisor) {
+                $startMainContactStyle = '- Supervisor';
+                $endMainContactStyle = '- Supervisor';
+            } else {
+                continue;
+            }
+
+            $dbeSite->setValue(
+                DBESite::customerID,
+                $dbeContact->getValue(DBEContact::customerID)
+            );
+            $dbeSite->setValue(
+                DBESite::siteNo,
+                $dbeContact->getValue(DBEContact::siteNo)
+            );
+            $dbeSite->getRow();
+
+            $name = $dbeContact->getValue(DBEContact::firstName) . ' ' . $dbeContact->getValue(DBEContact::lastName);
+
+            if ($dbeContact->getValue(DBEContact::position)) {
+                $name .= ' (' . $dbeContact->getValue(DBEContact::position) . ')';
+            }
+
+            $optGroupOpen = null;
+            if ($dbeContact->getValue(DBEContact::siteNo) != $lastSiteNo) {
+                $optGroupOpen = '<optgroup label="' . $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
+                        DBESite::town
+                    ) . ' ' . $dbeSite->getValue(DBESite::postcode) . '">';
+            }
+            $lastSiteNo = $dbeContact->getValue(DBEContact::siteNo);
+
+            $this->template->set_var(
+                array(
+                    'contactSelected'       => $contactSelected,
+                    'contactID'             => $dbeContact->getValue(DBEContact::contactID),
+                    'contactName'           => $name,
+                    'startMainContactStyle' => $startMainContactStyle,
+                    'endMainContactStyle'   => $endMainContactStyle,
+                    'optGroupOpen'          => $optGroupOpen
+                )
+            );
+            $this->template->parse(
+                'contactsOnlyMainAndSupervisor',
+                'contactOnlyMainAndSupervisorsBlock',
+                true
+            );
+        }
+    }    // end allocateAddition
+
+/**
      * @param $customerID
      * @param $contactID
      * @param string $templateName
@@ -3572,9 +3786,9 @@ class CTActivity extends CTCNC
             );
         }
 
-    }  // end finaliseProblem
+    }
 
-    /**
+        /**
      * @throws Exception
      */
     function createTravel()
@@ -3612,7 +3826,7 @@ class CTActivity extends CTCNC
 
         $this->redirectToDisplay($this->getParam('callActivityID'));
         exit;
-    }
+    }// end changeRequestApproval
 
     /**
      * @throws Exception
@@ -3684,7 +3898,7 @@ class CTActivity extends CTCNC
         $this->parsePage();
     }
 
-    /**
+/**
      * @throws Exception
      */
     function problemHistoryPopup()
@@ -3788,100 +4002,9 @@ class CTActivity extends CTCNC
         $this->parsePage();
 
         exit;
-    }    // end allocateAdditionalTime
+    }
 
-    /**
-     * @throws Exception
-     */
-    function serviceRequestsForContactPopup()
-    {
-        $this->setTemplateFiles(
-            'ServiceRequestsForContactPopup',
-            'ServiceRequestsForContactPopup'
-        );
-        $dsContactSrs = $this->buActivity->getProblemsByContact($this->getParam('contactID'));
-
-
-        $dbeContact = new DBEContact($this);
-        $dbeContact->getRow($this->getParam('contactID'));
-        $this->setPageTitle(
-            'Service Requests For ' . $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
-                DBEContact::lastName
-            )
-        );
-
-        $this->template->set_block(
-            'ServiceRequestsForContactPopup',
-            'contactProblemBlock',
-            'contactProblems'
-        );
-
-        while ($dsContactSrs->fetchNext()) {
-
-            $urlCreateFollowOn =
-                Controller::buildLink(
-                    'Activity.php',
-                    array(
-                        'action'         => 'createFollowOnActivity',
-                        'callActivityID' => $dsContactSrs->getValue(DBEJProblem::lastCallActivityID),
-                        'reason'         => $this->getParam('reason')
-                    )
-                );
-
-            $urlProblemHistoryPopup =
-                Controller::buildLink(
-                    'Activity.php',
-                    array(
-                        'action'    => 'problemHistoryPopup',
-                        'problemID' => $dsContactSrs->getValue(DBEJProblem::problemID),
-                        'htmlFmt'   => CT_HTML_FMT_POPUP
-                    )
-                );
-
-            $this->template->set_var(
-                array(
-                    'contactProblemID'              => $dsContactSrs->getValue(DBEJProblem::problemID),
-                    'contactDateRaised'             => Controller::dateYMDtoDMY(
-                        $dsContactSrs->getValue(DBEJProblem::dateRaised)
-                    ),
-                    'contactReason'                 => self::truncate(
-                        $dsContactSrs->getValue(DBEJProblem::reason),
-                        100
-                    ),
-                    'contactLastReason'             => self::truncate(
-                        $dsContactSrs->getValue(DBEJProblem::lastReason),
-                        100
-                    ),
-                    'contactEngineerName'           => $dsContactSrs->getValue(DBEJProblem::engineerName),
-                    'createFollowOnLink'            => $dsContactSrs->getValue(
-                        DBEJProblem::status
-                    ) == 'C' ? null : "<a href=" . $urlCreateFollowOn . ">Log activity</a>",
-                    'contactUrlProblemHistoryPopup' => $urlProblemHistoryPopup,
-                    'contactPriority'               => $dsContactSrs->getValue(DBEJProblem::priority),
-                    'contactPriorityClass'          => $dsContactSrs->getValue(
-                        DBEJProblem::priority
-                    ) == 1 ? 'class="redRow"' : null
-                )
-            );
-
-            $this->template->parse(
-                'contactProblems',
-                'contactProblemBlock',
-                true
-            );
-
-        }
-        $this->template->parse(
-            'CONTENTS',
-            'ServiceRequestsForContactPopup',
-            true
-        );
-        $this->parsePage();
-
-        exit;
-    }    // end allocateAddition
-
-    /**
+        /**
      * @throws Exception
      */
     function customerProblemPopup()
@@ -3913,9 +4036,9 @@ class CTActivity extends CTCNC
 
         $this->parsePage();
         exit;
-    }
+    }  // end finaliseProblem
 
-    /**
+/**
      * Edit/Add Activity
      * @access private
      * @throws Exception
@@ -4447,7 +4570,7 @@ class CTActivity extends CTCNC
             true
         );
         $this->parsePage();
-    }// end changeRequestApproval
+    }
 
     private
     function activityTypeDropdown($callActTypeID
@@ -4567,7 +4690,7 @@ class CTActivity extends CTCNC
 
     }
 
-    /**
+/**
      * Delete Activity
      *
      * @access private
@@ -4605,7 +4728,7 @@ class CTActivity extends CTCNC
                 );
         }
         header('Location: ' . $urlNext);
-    }  // end finaliseProblem
+    }
 
     /**
      * Cancel Edit/Add Activity
@@ -5367,7 +5490,7 @@ class CTActivity extends CTCNC
         }
 
         $urlActivity =
-            SITE_URL.
+            SITE_URL .
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
@@ -5547,6 +5670,42 @@ class CTActivity extends CTCNC
     }
 
     /**
+     * @param $callActivityID
+     * @throws Exception
+     */
+    function redirectToFixed($callActivityID)
+    {
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'callActivityID' => $callActivityID,
+                    'action'         => 'gatherFixedInformation'
+                )
+            );
+        header('Location: ' . $urlNext);
+        exit;
+    }
+
+    /**
+     * @param $callActivityID
+     * @throws Exception
+     */
+    function redirectToEdit($callActivityID)
+    {
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'callActivityID' => $callActivityID,
+                    'action'         => CTACTIVITY_ACT_EDIT_ACTIVITY
+                )
+            );
+        header('Location: ' . $urlNext);
+        exit;
+    }
+
+    /**
      * Generate page required to embed file
      * this is done because simply calling documentView() with PDF files causes
      * IE to call documentView a second time! this is a known problem. The workaround
@@ -5639,6 +5798,26 @@ class CTActivity extends CTCNC
         }
 
         return $this->redirectToDisplay($callActivityID);
+    }
+
+    /**
+     * @param $callActivityID
+     * @throws Exception
+     */
+    private
+    function redirectToGather($callActivityID
+    )
+    {
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'callActivityID' => $callActivityID,
+                    'action'         => 'gatherFixedInformation'
+                )
+            );
+        header('Location: ' . $urlNext);
+        exit;
     }
 
     /**
@@ -6129,119 +6308,6 @@ class CTActivity extends CTCNC
     /**
      * @throws Exception
      */
-    function salesRequestReview()
-    {
-        $this->setMethodName('salesRequestReview');
-
-        $callActivityID = $this->getParam('callActivityID');
-        $dsCallActivity = new DataSet($this);
-        $this->buActivity->getActivityByID(
-            $callActivityID,
-            $dsCallActivity
-        );
-
-        if ($dsCallActivity->getValue(DBECallActivity::salesRequestStatus) !== 'O') {
-
-            $this->template->setVar(
-                'CONTENTS',
-                'This Sales Request has already been processed',
-                true
-            );
-            $this->parsePage();
-            exit;
-        }
-
-        $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
-
-        $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem($problemID);
-
-        $this->setTemplateFiles(
-            array(
-                'ServiceSalesRequestReview' => 'ServiceSalesRequestReview.inc'
-            )
-        );
-
-        $this->setPageTitle("Review Sales Request");
-
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-            switch ($this->getParam('Submit')) {
-
-                case 'Approve':
-                    $option = 'A';
-
-                    break;
-
-                case 'Deny':
-                    $option = 'D';
-                    break;
-                default:
-                    throw new Exception('Action not valid');
-            }
-
-            $this->buActivity->salesRequestProcess(
-                $callActivityID,
-                $this->userID,
-                $option,
-                $this->getParam('comments')
-            );
-
-            $nextURL =
-                Controller::buildLink(
-                    'SalesRequestDashboard.php',
-                    array()
-                );
-            header('Location: ' . $nextURL);
-            exit;
-        }
-
-        $urlProblemHistoryPopup =
-            Controller::buildLink(
-                'Activity.php',
-                array(
-                    'action'    => 'problemHistoryPopup',
-                    'problemID' => $problemID,
-                    'htmlFmt'   => CT_HTML_FMT_POPUP
-                )
-            );
-
-
-        $submitURL =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW,
-                )
-            );
-
-        $this->template->set_var(
-            array(
-                'callActivityID' => $callActivityID,
-
-                'problemID' => $problemID,
-
-                'customerID' => $dbeFirstActivity->getValue(DBEJCallActivity::customerID),
-
-                'customerName'           => $dbeFirstActivity->getValue(DBEJCallActivity::customerName),
-                'requestDetails'         => $dsCallActivity->getValue(DBEJCallActivity::reason),
-                'userName'               => $dsCallActivity->getValue(DBEJCallActivity::userName),
-                'submitUrl'              => $submitURL,
-                'urlProblemHistoryPopup' => $urlProblemHistoryPopup
-            )
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'ServiceSalesRequestReview',
-            true
-        );
-
-        $this->parsePage();
-    }
-
-    /**
-     * @throws Exception
-     */
     function changeRequestReview()
     {
 
@@ -6722,31 +6788,15 @@ class CTActivity extends CTCNC
         $message = $this->getParam('message');
         $callActivityID = $this->getParam('callActivityID');
 
+        if (!$callActivityID) {
+            http_response_code(400);
+            return ['error' => true, 'errorDescription' => "callActivityID is missing"];
+        }
+
         $this->buActivity->sendEmailToSales(
             $callActivityID,
             $message
         );
-        return ["status" => "ok"];
-    }
-
-    function sendSalesRequest()
-    {
-        $this->setMethodName('sendSalesRequest');
-
-        $message = $this->getParam('message');
-        $problemID = $this->getParam('problemID');
-        $type = $this->getParam('type');
-
-        try {
-
-            $this->buActivity->sendSalesRequest(
-                $problemID,
-                $message,
-                $type
-            );
-        } catch (Exception $exception) {
-            return ["status" => "error", "message" => $exception->getMessage()];
-        }
         return ["status" => "ok"];
     }
 
@@ -6791,10 +6841,247 @@ class CTActivity extends CTCNC
         echo date('H') . ':' . date('i');
     }
 
-    function updateHistoricUserTimeLogs(DateTime $startDate = null)
+        function updateHistoricUserTimeLogs(DateTime $startDate = null)
     {
         $this->buActivity->updateAllHistoricUserLoggedHours($startDate);
         echo "Done";
+    }// end contactDropdown
+
+    /**
+     * @throws Exception
+     */
+    private
+    function toggleMonitoringFlag()
+    {
+        if (!$this->getParam('callActivityID')) {
+            echo 'callActivityID not passed';
+        }
+        $dsActivity = new DataSet($this);
+        $this->buActivity->getActivityByID(
+            $this->getParam('callActivityID'),
+            $dsActivity
+        );
+
+        $this->buActivity->toggleMonitoringFlag($dsActivity->getValue(DBEJCallActivity::problemID));
+
+        $this->redirectToDisplay($this->getParam('callActivityID'));
+    }
+
+    /**
+     * @throws Exception
+     */
+    private
+    function unhideSR()
+    {
+
+        if (!$this->getParam('callActivityID')) {
+
+            echo 'callActivityID not passed';
+
+        }
+        $dsActivity = new DataSet($this);
+        $this->buActivity->getActivityByID(
+            $this->getParam('callActivityID'),
+            $dsActivity
+        );
+
+        $firstName = $this->dbeUser->getValue(DBEUser::firstName);
+        $lastName = $this->dbeUser->getValue(DBEUser::lastName);
+
+        $this->buActivity->unhideSR($dsActivity->getValue(DBEJCallActivity::problemID));
+
+        $this->buActivity->logOperationalActivity(
+            $dsActivity->getValue(DBEJCallActivity::problemID),
+            $firstName . ' ' . $lastName . " converted this from a hidden SR to a visible SR."
+        );
+
+        $this->redirectToDisplay($this->getParam('callActivityID'));
+    }
+
+    function sendSalesRequest()
+    {
+        $this->setMethodName('sendSalesRequest');
+
+        $message = $this->getParam('message');
+        $problemID = $this->getParam('problemID');
+        $type = $this->getParam('type');
+
+        try {
+
+            $this->buActivity->sendSalesRequest(
+                $problemID,
+                $message,
+                $type
+            );
+        } catch (Exception $exception) {
+            return ["status" => "error", "message" => $exception->getMessage()];
+        }
+        return ["status" => "ok"];
+    }
+
+    /**
+     * @throws Exception
+     */
+    function salesRequestReview()
+    {
+        $this->setMethodName('salesRequestReview');
+
+        $callActivityID = $this->getParam('callActivityID');
+        $dsCallActivity = new DataSet($this);
+        $this->buActivity->getActivityByID(
+            $callActivityID,
+            $dsCallActivity
+        );
+
+        if ($dsCallActivity->getValue(DBECallActivity::salesRequestStatus) !== 'O') {
+
+            $this->template->setVar(
+                'CONTENTS',
+                'This Sales Request has already been processed',
+                true
+            );
+            $this->parsePage();
+            exit;
+        }
+
+        $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
+
+        $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem($problemID);
+
+        $this->setTemplateFiles(
+            array(
+                'ServiceSalesRequestReview' => 'ServiceSalesRequestReview.inc'
+            )
+        );
+
+        $this->setPageTitle("Review Sales Request");
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            switch ($this->getParam('Submit')) {
+
+                case 'Approve':
+                    $option = 'A';
+
+                    break;
+
+                case 'Deny':
+                    $option = 'D';
+                    break;
+                default:
+                    throw new Exception('Action not valid');
+            }
+
+            $this->buActivity->salesRequestProcess(
+                $callActivityID,
+                $this->userID,
+                $option,
+                $this->getParam('comments')
+            );
+
+            $nextURL =
+                Controller::buildLink(
+                    'SalesRequestDashboard.php',
+                    array()
+                );
+            header('Location: ' . $nextURL);
+            exit;
+        }
+
+        $urlProblemHistoryPopup =
+            Controller::buildLink(
+                'Activity.php',
+                array(
+                    'action'    => 'problemHistoryPopup',
+                    'problemID' => $problemID,
+                    'htmlFmt'   => CT_HTML_FMT_POPUP
+                )
+            );
+
+
+        $submitURL =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTACTIVITY_ACT_CHANGE_REQUEST_REVIEW,
+                )
+            );
+
+        $this->template->set_var(
+            array(
+                'callActivityID' => $callActivityID,
+
+                'problemID' => $problemID,
+
+                'customerID' => $dbeFirstActivity->getValue(DBEJCallActivity::customerID),
+
+                'customerName'           => $dbeFirstActivity->getValue(DBEJCallActivity::customerName),
+                'requestDetails'         => $dsCallActivity->getValue(DBEJCallActivity::reason),
+                'userName'               => $dsCallActivity->getValue(DBEJCallActivity::userName),
+                'submitUrl'              => $submitURL,
+                'urlProblemHistoryPopup' => $urlProblemHistoryPopup
+            )
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'ServiceSalesRequestReview',
+            true
+        );
+
+        $this->parsePage();
+    }
+
+    /**
+     * @return bool|float|int|string
+     * @throws Exception
+     */
+    private function getContactNotes()
+    {
+        $contactId = @$this->getParam('contactID');
+
+        if (!$contactId) {
+            throw new Exception('Contact ID is missing');
+        }
+
+        $dbeContact = new DBEContact($this);
+        $dbeContact->getRow($contactId);
+
+        return $dbeContact->getValue(DBEContact::notes);
+    }
+
+    /**
+     * @return array
+     * @throws Exception
+     */
+    private function getAuthorisingContacts()
+    {
+
+        $customerID = @$this->getParam('customerID');
+
+        if (!$customerID) {
+            throw new Exception('Customer ID is missing');
+        }
+
+        $buContact = new BUContact($this);
+        $dsResults = new DataSet($this);
+        $buContact->getAuthorisingContacts(
+            $dsResults,
+            $customerID
+        );
+
+
+        $contacts = [];
+
+        while ($dsResults->fetchNext()) {
+            $contacts[] = [
+                'id'           => $dsResults->getValue(DBEContact::contactID),
+                'supportLevel' => $dsResults->getValue(DBEContact::supportLevel),
+                'firstName'    => $dsResults->getValue(DBEContact::firstName),
+                'lastName'     => $dsResults->getValue(DBEContact::lastName)
+            ];
+        }
+        return $contacts;
     }
 
     function secsToText($time)
@@ -6902,7 +7189,7 @@ class CTActivity extends CTCNC
 
     }
 
-    /**
+/**
      * @throws Exception
      */
     function promptCreateTravel()
@@ -6961,290 +7248,6 @@ class CTActivity extends CTCNC
         );
         $this->parsePage();
 
-    }// end contactDropdown
-
-    /**
-     * @param $callActivityID
-     * @throws Exception
-     */
-    function redirectToEdit($callActivityID)
-    {
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'callActivityID' => $callActivityID,
-                    'action'         => CTACTIVITY_ACT_EDIT_ACTIVITY
-                )
-            );
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    /**
-     * @param $callActivityID
-     * @throws Exception
-     */
-    private
-    function redirectToGather($callActivityID
-    )
-    {
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'callActivityID' => $callActivityID,
-                    'action'         => 'gatherFixedInformation'
-                )
-            );
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    /**
-     * @throws Exception
-     */
-    private
-    function toggleMonitoringFlag()
-    {
-        if (!$this->getParam('callActivityID')) {
-            echo 'callActivityID not passed';
-        }
-        $dsActivity = new DataSet($this);
-        $this->buActivity->getActivityByID(
-            $this->getParam('callActivityID'),
-            $dsActivity
-        );
-
-        $this->buActivity->toggleMonitoringFlag($dsActivity->getValue(DBEJCallActivity::problemID));
-
-        $this->redirectToDisplay($this->getParam('callActivityID'));
-    }
-
-    private
-    function checkMonitoring($problemID
-    )
-    {
-        return $this->buActivity->checkMonitoringFlag($problemID);
-    }
-
-    /**
-     * @throws Exception
-     */
-    private
-    function unhideSR()
-    {
-
-        if (!$this->getParam('callActivityID')) {
-
-            echo 'callActivityID not passed';
-
-        }
-        $dsActivity = new DataSet($this);
-        $this->buActivity->getActivityByID(
-            $this->getParam('callActivityID'),
-            $dsActivity
-        );
-
-        $firstName = $this->dbeUser->getValue(DBEUser::firstName);
-        $lastName = $this->dbeUser->getValue(DBEUser::lastName);
-
-        $this->buActivity->unhideSR($dsActivity->getValue(DBEJCallActivity::problemID));
-
-        $this->buActivity->logOperationalActivity(
-            $dsActivity->getValue(DBEJCallActivity::problemID),
-            $firstName . ' ' . $lastName . " converted this from a hidden SR to a visible SR."
-        );
-
-        $this->redirectToDisplay($this->getParam('callActivityID'));
-    }
-
-    private function onlyMainAndSupervisorsDropdown($templateName,
-                                                    $customerID,
-                                                    $contactID
-    )
-    {
-        $dbeContact = new DBEContact($this);
-        $dbeSite = new DBESite($this);
-
-        $dbeContact->getRowsByCustomerID(
-            $customerID,
-            false,
-            true
-        );
-
-        $this->template->set_block(
-            $templateName,
-            'contactOnlyMainAndSupervisorsBlock',
-            'contactsOnlyMainAndSupervisor'
-        );
-
-        $lastSiteNo = null;
-        while ($dbeContact->fetchNext()) {
-            $contactSelected = ($contactID == $dbeContact->getValue(DBEContact::contactID)) ? CT_SELECTED : null;
-
-            if ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelMain) {
-                $startMainContactStyle = '*';
-                $endMainContactStyle = '*';
-            } elseif ($dbeContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelSupervisor) {
-                $startMainContactStyle = '- Supervisor';
-                $endMainContactStyle = '- Supervisor';
-            } else {
-                continue;
-            }
-
-            $dbeSite->setValue(
-                DBESite::customerID,
-                $dbeContact->getValue(DBEContact::customerID)
-            );
-            $dbeSite->setValue(
-                DBESite::siteNo,
-                $dbeContact->getValue(DBEContact::siteNo)
-            );
-            $dbeSite->getRow();
-
-            $name = $dbeContact->getValue(DBEContact::firstName) . ' ' . $dbeContact->getValue(DBEContact::lastName);
-
-            if ($dbeContact->getValue(DBEContact::position)) {
-                $name .= ' (' . $dbeContact->getValue(DBEContact::position) . ')';
-            }
-
-            $optGroupOpen = null;
-            if ($dbeContact->getValue(DBEContact::siteNo) != $lastSiteNo) {
-                $optGroupOpen = '<optgroup label="' . $dbeSite->getValue(DBESite::add1) . ' ' . $dbeSite->getValue(
-                        DBESite::town
-                    ) . ' ' . $dbeSite->getValue(DBESite::postcode) . '">';
-            }
-            $lastSiteNo = $dbeContact->getValue(DBEContact::siteNo);
-
-            $this->template->set_var(
-                array(
-                    'contactSelected'       => $contactSelected,
-                    'contactID'             => $dbeContact->getValue(DBEContact::contactID),
-                    'contactName'           => $name,
-                    'startMainContactStyle' => $startMainContactStyle,
-                    'endMainContactStyle'   => $endMainContactStyle,
-                    'optGroupOpen'          => $optGroupOpen
-                )
-            );
-            $this->template->parse(
-                'contactsOnlyMainAndSupervisor',
-                'contactOnlyMainAndSupervisorsBlock',
-                true
-            );
-        }
-    }
-
-    /**
-     * @return bool|float|int|string
-     * @throws Exception
-     */
-    private function getContactNotes()
-    {
-        $contactId = @$this->getParam('contactID');
-
-        if (!$contactId) {
-            throw new Exception('Contact ID is missing');
-        }
-
-        $dbeContact = new DBEContact($this);
-        $dbeContact->getRow($contactId);
-
-        return $dbeContact->getValue(DBEContact::notes);
-    }
-
-    /**
-     * @param $contactID
-     * @return string
-     * @throws Exception
-     */
-    private function getServiceRequestForContactLink($contactID)
-    {
-        $contactHistory =
-            Controller::buildLink(
-                'Activity.php',
-                array(
-                    'action'    => 'displayServiceRequestForContactPopup',
-                    'contactID' => $contactID,
-                    'htmlFmt'   => CT_HTML_FMT_POPUP
-                )
-            );
-        return '| <a href="#" title="Contact SR History" onclick="window.open(\'' . $contactHistory . '\', \'reason\', \'scrollbars=yes,resizable=yes,height=400,width=1225,copyhistory=no, menubar=0\')">Contact SR History</a>';
-    }
-
-    /**
-     * @return array
-     * @throws Exception
-     */
-    private function getAuthorisingContacts()
-    {
-
-        $customerID = @$this->getParam('customerID');
-
-        if (!$customerID) {
-            throw new Exception('Customer ID is missing');
-        }
-
-        $buContact = new BUContact($this);
-        $dsResults = new DataSet($this);
-        $buContact->getAuthorisingContacts(
-            $dsResults,
-            $customerID
-        );
-
-
-        $contacts = [];
-
-        while ($dsResults->fetchNext()) {
-            $contacts[] = [
-                'id'           => $dsResults->getValue(DBEContact::contactID),
-                'supportLevel' => $dsResults->getValue(DBEContact::supportLevel),
-                'firstName'    => $dsResults->getValue(DBEContact::firstName),
-                'lastName'     => $dsResults->getValue(DBEContact::lastName)
-            ];
-        }
-        return $contacts;
-    }
-
-    private function getContractsForCustomer($customerID)
-    {
-        $buCustomerItem = new BUCustomerItem($this);
-        $dsContract = new DataSet($this);
-        $buCustomerItem->getContractsByCustomerID(
-            $customerID,
-            $dsContract
-        );
-
-        $data = [];
-
-        while ($dsContract->fetchNext()) {
-
-            if (!isset($data[$dsContract->getValue(DBEJContract::renewalType)])) {
-                $data[$dsContract->getValue(DBEJContract::renewalType)] = [];
-            }
-            $data[$dsContract->getValue(DBEJContract::renewalType)][] = [
-                "description" => $dsContract->getValue(DBEJContract::itemDescription) . ' ' . $dsContract->getValue(
-                        DBEJContract::adslPhone
-                    ) . ' ' . $dsContract->getValue(DBEJContract::notes) . ' ' . $dsContract->getValue(
-                        DBEJContract::postcode
-                    ),
-                "id"          => $dsContract->getValue(DBEJContract::customerItemID)
-
-            ];
-
-        }
-        return $data;
-    }
-
-    private function updateSession(string $string, $value)
-    {
-        $sessionValue = $this->getSessionParam($this->sessionKey);
-        if (!$sessionValue) {
-            $sessionValue = [];
-        }
-
-        $sessionValue[$string] = $value;
-        $this->setSessionParam($this->sessionKey, $sessionValue);
     }
 
 }
