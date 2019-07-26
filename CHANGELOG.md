@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.4.3] -
+### Fixed
+- StartersAndLeaversReport.php average cost for the Total row
+
 ## [v3.4.2] - 2019-07-25
 ### Added
 - Add links below the Add button on Office365Licenses.php

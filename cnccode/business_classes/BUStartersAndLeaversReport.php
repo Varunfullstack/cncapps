@@ -155,44 +155,50 @@ WHERE true $custNoQuery $dateQuery AND pro_rootcauseno  =  62 AND `pro_status` I
     function createTotalRow($row)
     {
         return [
-            'customerName'       => $row['customerName'],
-            "type"               => "Total",
-            "quantity"           => 0,
-            "avgDuration"        => 0,
-            "totalDuration"      => 0,
-            "avgOpenHours"       => 0,
-            "maxDuration"        => 0,
-            "maxOpenHours"       => 0,
-            "minDuration"        => INF,
-            "minOpenHours"       => INF,
-            "avgCost"            => 0,
-            "totalCost"          => 0,
-            "avgCustomerContact" => 0,
-            "avgRemoteSupport"   => 0,
-            "avgActivities"      => 0,
-            "count"              => 1
+            'customerName'         => $row['customerName'],
+            "type"                 => "Total",
+            "quantity"             => 0,
+            "avgDuration"          => 0,
+            "totalDuration"        => 0,
+            "maxDuration"          => 0,
+            "minDuration"          => INF,
+            "totalOpenHours"       => 0,
+            "avgOpenHours"         => 0,
+            "maxOpenHours"         => 0,
+            "minOpenHours"         => INF,
+            "avgCost"              => 0,
+            "totalCost"            => 0,
+            "avgCustomerContact"   => 0,
+            "avgRemoteSupport"     => 0,
+            "avgActivities"        => 0,
+            "totalCustomerContact" => 0,
+            "totalRemoteSupport"   => 0,
+            "totalActivities"      => 0,
+            "count"                => 0
         ];
     }
 
     function updateTotalRow($totalRow, $row)
     {
-        return [
-            'customerName'       => $row['customerName'],
-            "type"               => "Total",
-            'quantity'           => $totalRow['quantity'] + $row['quantity'],
-            'count'              => $totalRow['count']++,
-            'avgDuration'        => ($totalRow['avgDuration'] + $row['avgDuration']) / $totalRow['count'],
-            'totalDuration'      => $totalRow['totalDuration'] + $row['totalDuration'],
-            "avgOpenHours"       => ($totalRow['avgOpenHours'] + $row['avgOpenHours']) / $totalRow['count'],
-            "maxDuration"        => $row['maxDuration'] > $totalRow['maxDuration'] ? $row['maxDuration'] : $totalRow['maxDuration'],
-            "maxOpenHours"       => $row['maxOpenHours'] > $totalRow['maxOpenHours'] ? $row['maxOpenHours'] : $totalRow['maxOpenHours'],
-            "minDuration"        => $row['minDuration'] < $totalRow['minDuration'] ? $row['minDuration'] : $totalRow['minDuration'],
-            "minOpenHours"       => $row['minOpenHours'] < $totalRow['minOpenHours'] ? $row['minOpenHours'] : $totalRow['minOpenHours'],
-            "avgCost"            => ($totalRow["avgCost"] + $row['avgCost']) / $totalRow['count'],
-            "totalCost"          => $totalRow["totalCost"] + $row['totalCost'],
-            "avgCustomerContact" => ($totalRow["avgCustomerContact"] + $row['avgCustomerContact']) / $totalRow["count"],
-            "avgRemoteSupport"   => ($totalRow["avgRemoteSupport"] + $row['avgRemoteSupport']) / $totalRow['count'],
-            "avgActivities"      => ($totalRow["avgActivities"] + $row['avgActivities']) / $totalRow['count'],
-        ];
+
+        $totalRow['quantity'] += $row['quantity'];
+        $totalRow['count']++;
+        $totalRow['totalDuration'] += $row['totalDuration'];
+        $totalRow['avgDuration'] = $totalRow['totalDuration'] / $totalRow['quantity'];
+        $totalRow["maxDuration"] = $row['maxDuration'] > $totalRow['maxDuration'] ? $row['maxDuration'] : $totalRow['maxDuration'];
+        $totalRow["minDuration"] = $row['minDuration'] < $totalRow['minDuration'] ? $row['minDuration'] : $totalRow['minDuration'];
+        $totalRow["totalOpenHours"] += ($row['avgOpenHours'] * $row['quantity']);
+        $totalRow["avgOpenHours"] = $totalRow['totalOpenHours'] / $totalRow['quantity'];
+        $totalRow["maxOpenHours"] = $row['maxOpenHours'] > $totalRow['maxOpenHours'] ? $row['maxOpenHours'] : $totalRow['maxOpenHours'];
+        $totalRow["minOpenHours"] = $row['minOpenHours'] < $totalRow['minOpenHours'] ? $row['minOpenHours'] : $totalRow['minOpenHours'];
+        $totalRow["totalCost"] += $row['totalCost'];
+        $totalRow["avgCost"] = $totalRow['totalCost'] / $totalRow['quantity'];
+        $totalRow['totalCustomerContact'] += ($row['avgCustomerContact'] * $row['quantity']);
+        $totalRow["avgCustomerContact"] = $totalRow['totalCustomerContact'] / $totalRow["quantity"];
+        $totalRow['totalRemoteSupport'] += ($row['avgRemoteSupport'] * $row['quantity']);
+        $totalRow["avgRemoteSupport"] = $totalRow['totalRemoteSupport'] / $totalRow['quantity'];
+        $totalRow['totalActivities'] += ($row['avgActivities'] * $row['quantity']);
+        $totalRow["avgActivities"] = $totalRow['totalActivities'] / $totalRow['quantity'];
+        return $totalRow;
     }
 }

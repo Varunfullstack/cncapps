@@ -22,14 +22,15 @@
 <script language='JavaScript'
         src='popcalendar/popcalendar.js'
 ></script>
+
 <script type="text/JavaScript">
-    <!--
+    window.callActivityID = "{callActivityID}";
+
     function MM_jumpMenu(targ, selObj, restore) { //v3.0
         eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
         if (restore) selObj.selectedIndex = 0;
     }
 
-    //-->
     function managerCommentPopup() {
         window.open(
             '{urlManagerComment}',
@@ -48,6 +49,7 @@
 
     }
 </script>
+<script src=".javascript/sendPartsUsed.js"></script>
 {activityWizardHeader} {contractListPopupLink} {thirdPartyContactLink} {contactHistoryLink}
 <table width="1000"
        border="0"
@@ -523,67 +525,10 @@
         </td>
     </tr>
 </table>
-
-
-<div id="partsUsedDialog"
-     title="Parts Used"
->
-    <textarea id="partsUsedText"
-              cols="30"
-              rows="10"
-    ></textarea>
-    <br>
-    <div>
-        <button onclick="sendPartsUsedToSales()">Send</button>
-        <button onclick="cancelPartsUsed()">Cancel</button>
-    </div>
-</div>
 <script>
-    $('#partsUsedDialog').dialog({autoOpen: false, width: 910});
-
-    CKEDITOR.replace('partsUsedText', {
-            customConfig: '/ckeditor_config.js'
-        }
-    );
-
-    function showPartsUsedDialog() {
-        $('#partsUsedDialog').dialog('open');
-    }
-
     function showSalesRequestDialog() {
         startSalesRequest({problemID});
     }
-
-
-    function sendPartsUsedToSales() {
-        var object = {
-            message: CKEDITOR.instances.partsUsedText.getData(),
-            callActivityID: {callActivityID}
-        };
-
-        $.ajax({
-            url: '{urlMessageToSales}',
-            method: 'POST',
-            type: 'post',
-            dataType: 'json',
-            data: object
-        }).then(function (result) {
-            if (result.status == 'error') {
-                throw 'Failed to send message';
-            } else {
-                $('#partsUsedDialog').dialog('close');
-                alert('Submitted OK');
-            }
-        }).catch(function () {
-            alert('Failed to send message');
-        });
-    }
-
-    function cancelPartsUsed() {
-        $('#partsUsedDialog').dialog('close');
-    }
-
-
 </script>
 <table>
     <tr>
@@ -591,7 +536,7 @@
             class="promptTextLeft"
             valign="top"
         >
-            <button onclick="showPartsUsedDialog()">Parts Used</button>
+            <button class="partsUsedButton">Parts Used</button>
         </td>
         <td colspan="4"
             class="promptTextLeft"

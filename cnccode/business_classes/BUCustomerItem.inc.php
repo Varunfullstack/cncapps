@@ -200,23 +200,6 @@ class BUCustomerItem extends Business
         return $this->dbeJCustomerItem->getCountCustomerDirectDebitItems($clientID) > 0;
     }
 
-    /**
-     * @param $customerID
-     * @param $dsResults
-     */
-    function getContractsByCustomerID($customerID,
-                                      &$dsResults
-    )
-    {
-        $this->setMethodName('getContractsByCustomerID');
-        $dbeJContract = new DBEJContract($this);
-        $dbeJContract->getRowsByCustomerID($customerID);
-        $this->getData(
-            $dbeJContract,
-            $dsResults
-        );
-    }
-
     function getServerCareValidContractsByCustomerID($customerID,
                                                      &$dsResults
     )
@@ -653,6 +636,23 @@ class BUCustomerItem extends Business
 
         }
         return false;
+    }
+
+    /**
+     * @param $customerID
+     * @param $dsResults
+     */
+    function getContractsByCustomerID($customerID,
+                                      &$dsResults
+    )
+    {
+        $this->setMethodName('getContractsByCustomerID');
+        $dbeJContract = new DBEJContract($this);
+        $dbeJContract->getRowsByCustomerID($customerID);
+        $this->getData(
+            $dbeJContract,
+            $dsResults
+        );
     }
 
     function serverIsUnderLocalSecondsiteContract($customerItemID)

@@ -14,8 +14,8 @@ class DBEUtilityEmail extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -45,9 +45,8 @@ class DBEUtilityEmail extends DBEntity
     {
         $this->setMethodName("getRowsByEmail");
 
-        $domain = extractDomainFromEmail($email);
-        $mailbox = extractMailboxNameFromEmail($email);
-
+        $domain = mysqli_real_escape_string($this->db->link_id(), extractDomainFromEmail($email));
+        $mailbox = mysqli_real_escape_string($this->db->link_id(), extractMailboxNameFromEmail($email));
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
