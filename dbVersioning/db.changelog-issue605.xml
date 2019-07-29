@@ -30,4 +30,19 @@
             </sql>
         </rollback>
     </changeSet>
+    <changeSet author="pavwebdev" id="1563960329-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                select cus_name = "CNC Test Customer" from customer where cus_custno = 420
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            update customer set cus_name = "CNC Template Customer" where cus_custno = 420
+        </sql>
+        <rollback>
+            <sql>
+                update customer set cus_name = "CNC Test" where cus_custno = 420
+            </sql>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>
