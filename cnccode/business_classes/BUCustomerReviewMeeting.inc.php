@@ -84,7 +84,7 @@ class BUCustomerReviewMeeting extends Business
             );
 
             $urlCustomer =
-                SITE_URL. '/Customer.php?customerID=' . $customer['customerID'] . '&action=dispEdit';
+                SITE_URL . '/Customer.php?customerID=' . $customer['customerID'] . '&action=dispEdit';
 
             $template->setVar(
                 array(
@@ -262,45 +262,6 @@ class BUCustomerReviewMeeting extends Business
 
     } // end function
 
-    public function initialiseSearchForm(&$dsData)
-    {
-        $dsData = new DSForm($this);
-
-        $checkMonthYear = function ($value) {
-            if (!$value) {
-                return false;
-            }
-
-            return !!DateTime::createFromFormat(
-                'm/Y',
-                $value
-            );
-        };
-
-        $dsData->addColumn(
-            self::searchFormCustomerID,
-            DA_STRING,
-            DA_NOT_NULL
-        );
-        $dsData->addColumn(
-            self::searchFormStartYearMonth,
-            DA_STRING,
-            DA_NOT_NULL,
-            $checkMonthYear
-        );
-        $dsData->addColumn(
-            self::searchFormEndYearMonth,
-            DA_STRING,
-            DA_NOT_NULL,
-            $checkMonthYear
-        );
-        $dsData->addColumn(
-            self::searchFormMeetingDate,
-            DA_DATE,
-            DA_NOT_NULL
-        );
-    }
-
     /**
      * @param $customerID
      * @param $htmlBody
@@ -367,7 +328,7 @@ class BUCustomerReviewMeeting extends Business
         if ($_error) {
             throw new Exception(json_encode($_error));
         } else {
-//            unlink($tempFilePath);
+            unlink($tempFilePath);
             return true;
         }
     }
@@ -485,6 +446,7 @@ class BUCustomerReviewMeeting extends Business
         $template->set_var(
             array(
                 'customerName'       => $dsCustomer->getValue(DBECustomer::name),
+                'siteURL'            => SITE_URL,
                 'startYearMonth'     => $startDate->format('Y-m'),
                 'meetingDate'        => $meetingDate,
                 'endYearMonth'       => $endDate->format('Y-m'),
@@ -513,7 +475,7 @@ class BUCustomerReviewMeeting extends Business
                     $totalLabourHours,
                     2
                 ),
-                "waterMarkURL"       => SITE_URL. '/images/CNC_watermarkActualSize.png'
+                "waterMarkURL"       => SITE_URL . '/images/CNC_watermarkActualSize.png'
             )
         );
         /*
@@ -725,6 +687,45 @@ class BUCustomerReviewMeeting extends Business
         );
 
         return $htmlPage;
+    }
+
+    public function initialiseSearchForm(&$dsData)
+    {
+        $dsData = new DSForm($this);
+
+        $checkMonthYear = function ($value) {
+            if (!$value) {
+                return false;
+            }
+
+            return !!DateTime::createFromFormat(
+                'm/Y',
+                $value
+            );
+        };
+
+        $dsData->addColumn(
+            self::searchFormCustomerID,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $dsData->addColumn(
+            self::searchFormStartYearMonth,
+            DA_STRING,
+            DA_NOT_NULL,
+            $checkMonthYear
+        );
+        $dsData->addColumn(
+            self::searchFormEndYearMonth,
+            DA_STRING,
+            DA_NOT_NULL,
+            $checkMonthYear
+        );
+        $dsData->addColumn(
+            self::searchFormMeetingDate,
+            DA_DATE,
+            DA_NOT_NULL
+        );
     }
 
     /**

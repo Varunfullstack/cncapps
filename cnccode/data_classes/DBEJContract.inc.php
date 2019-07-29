@@ -100,7 +100,6 @@ class DBEJContract extends DBECustomerItem
             " JOIN renewalType ON renewalType.renewalTypeID = item.renewalTypeID" .
             " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno " .
             " WHERE cic_cuino=" . $customerItemID .
-            " AND " . $this->getDBColumnName(self::itemID) . "<>" . CONFIG_DEF_SERVERGUARD_ANNUAL_CHARGE_ITEMID .
             "   AND renewalType.allowSrLogging = 'Y'
        ORDER BY renewalType.description, itm_desc";
 

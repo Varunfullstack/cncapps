@@ -214,7 +214,9 @@ do {
         $totalizationRow['TotalMailBox'] += $datum['TotalItemSize'];
         $data[$key]['TotalItemSize'] = $datum['TotalItemSize'];
         $totalizationRow['LicensedUsers'] += $datum['IsLicensed'];
-
+        if ($debugMode) {
+            $data[$key][] = $mailboxLimit;
+        }
         $mailboxLimits[] = $mailboxLimit;
     }
 
@@ -266,7 +268,7 @@ do {
     $sheet->getStyle("A1:E$highestRow")->getAlignment()->setHorizontal('center');
 
     for ($i = 0; $i < count($data); $i++) {
-        $currentRow = 3 + $i;
+        $currentRow = 2 + $i;
 
         if ($mailboxLimits[$i]) {
             $usage = $data[$i]['TotalItemSize'] / $mailboxLimits[$i] * 100;
@@ -309,18 +311,18 @@ do {
             true
         );
     }
-
-    $fileName = $folderName . "Current Mailbox Extract.xlsx";
+    $fileName = "Current Mailbox Extract.xlsx";
+    $filePath = $folderName . $fileName;
     try {
         $writer->save(
-            $fileName
+            $filePath
         );
         $dbeCustomerDocument = new DBEPortalCustomerDocument($thing);
         $dbeCustomerDocument->getCurrentOffice365Licenses($customerID);
 
         $dbeCustomerDocument->setValue(
             DBEPortalCustomerDocument::file,
-            file_get_contents($fileName)
+            file_get_contents($filePath)
         );
 
         if (!$dbeCustomerDocument->getValue(
@@ -340,11 +342,11 @@ do {
             );
             $dbeCustomerDocument->setValue(
                 DBEPortalCustomerDocument::description,
-                'O365 Licenses'
+                'Current Mailbox List'
             );
             $dbeCustomerDocument->setValue(
                 DBEPortalCustomerDocument::filename,
-                "O365 Licenses.xlsx"
+                $fileName
             );
             $dbeCustomerDocument->setValue(
                 DBEPortalCustomerDocument::fileMimeType,
@@ -376,9 +378,7 @@ do {
 
 /**
  * @param DBECustomer $dbeCustomer
- * @param $errorMsg
- * @param null $stackTrace
- * @param null $position
+ * @param $userName
  */
 function raiseCustomerLeaverWithLicenseSR(DBECustomer $dbeCustomer, $userName)
 {

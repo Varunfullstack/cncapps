@@ -134,7 +134,7 @@ class CTOffice365Licenses extends CTCNC
             case 'getData':
                 $dbeOffice365Licenses = new DBEOffice365License($this);
 
-                $dbeOffice365Licenses->getRows();
+                $dbeOffice365Licenses->getRows(DBEOffice365License::replacement);
                 $data = [];
                 while ($dbeOffice365Licenses->fetchNext()) {
                     $data[] = [

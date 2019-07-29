@@ -197,6 +197,28 @@ class CTCustomerItem extends CTCNC
         }
     }
 
+    function applyContractUpdates($action)
+    {
+        $this->setMethodName('applyContractUpdates');
+
+        if ($this->getParam('customerItemIDs')) {
+
+            if ($action == 'add') {
+                $this->buCustomerItem->addContractToCustomerItems(
+                    $this->getParam('contractID'),
+                    $this->getParam('customerItemIDs')
+                );
+            } else {
+                $this->buCustomerItem->removeContractFromCustomerItems(
+                    $this->getParam('contractID'),
+                    $this->getParam('customerItemIDs')
+                );
+
+            }
+
+        }
+    }
+
     /**
      * Run search based upon passed parameters
      * Display search form with results
@@ -324,15 +346,11 @@ class CTCustomerItem extends CTCNC
             $serverNameCol = $this->dsCustomerItem->columnExists(DBECustomerItem::serverName);
 
 
-            if (
-            $dsSearchForm->getValue(BUCustomerItem::searchFormCustomerID)
-            ) {
-
+            if ($dsSearchForm->getValue(BUCustomerItem::searchFormCustomerID)) {
                 $this->parseContractSelector(
                     $dsSearchForm->getValue(BUCustomerItem::searchFormCustomerID),
                     'CustomerItemSearchContractSelector'
                 );
-
             }
 
             while ($this->dsCustomerItem->fetchNext()) {
@@ -398,56 +416,80 @@ class CTCustomerItem extends CTCNC
     }
 
     /**
-     * User search results to download a CSV file
+     * Display the renewal status drop-down selector
      *
      * @access private
+     * @param $renewalStatus
      */
-    function generateCSV()
+    function parseRenewalSelector($renewalStatus)
     {
-        $fileName = 'CUSTOMER_ITEMS.CSV';
-        Header('Content-type: text/plain');
-        Header('Content-Disposition: attachment; filename=' . $fileName);
-        echo 'Customer,Site,Description,SerialNo,Contracts,ServerName' . "\n";
-
-        while ($this->dsCustomerItem->fetchNext()) {
-
-            $contracts =
-                $this->buCustomerItem->getContractDescriptionsByCustomerItemId(
-                    $this->dsCustomerItem->getValue(DBEJCustomerItem::customerItemID)
-                );
-
-            echo
-                '"' . $this->getExcelValue($this->dsCustomerItem->getValue(DBEJCustomerItem::customerName)) . '",' .
-                '"' . $this->getExcelValue($this->dsCustomerItem->getValue(DBEJCustomerItem::siteDescription)) . '",' .
-                '"' . $this->getExcelValue($this->dsCustomerItem->getValue(DBEJCustomerItem::itemDescription)) . '",' .
-                '"' . $this->getExcelValue($this->dsCustomerItem->getValue(DBEJCustomerItem::serialNo)) . '",' .
-                '"' . $this->getExcelValue($contracts) . '",' .
-                '"' . $this->getExcelValue($this->dsCustomerItem->getValue(DBEJCustomerItem::serverName)) . '"' . "\n";
+        foreach ($this->renewalStatusArray as $key => $value) {
+            $renewalStatusSelected = ($renewalStatus == $key) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    'renewalStatusSelected'    => $renewalStatusSelected,
+                    'renewalStatus'            => $key,
+                    'renewalStatusDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'renewalStatus',
+                'renewalStatusBlock',
+                true
+            );
         }
-        $this->pageClose();
-        exit;
     }
 
-    function getExcelValue($value)
+    /**
+     * put your comment there...
+     *
+     * @param mixed $customerID
+     * @param mixed $templateName
+     * @param array $contractIDs
+     */
+    function parseContractSelector($customerID,
+                                   $templateName,
+                                   $contractIDs = []
+    )
     {
-
-        $value = str_replace(
-            ',',
-            '',
-            $value
+        $dsContract = new DataSet($this);
+        $this->buCustomerItem->getContractsByCustomerID(
+            $customerID,
+            $dsContract
         );
-        $value = str_replace(
-            "\r\n",
-            " ",
-            $value
-        );      // remove carriage returns
-        $value = str_replace(
-            "\"",
-            "",
-            $value
-        );        // and double quotes
 
-        return $value;
+        $this->template->set_block(
+            $templateName,
+            'contractBlock',
+            'contracts'
+        );
+
+        while ($dsContract->fetchNext()) {
+            $selected = null;
+
+            if ($contractIDs && count($contractIDs) > 0) {
+
+                if (in_array(
+                    $dsContract->getValue(DBEJCustomerItem::customerItemID),
+                    $contractIDs
+                )) {
+                    $selected = CT_CHECKED;
+                }
+            }
+
+            $this->template->set_var(
+                array(
+                    'contractDescription' => $dsContract->getValue(DBEJCustomerItem::itemDescription),
+                    'contractID'          => $dsContract->getValue(DBEJCustomerItem::customerItemID),
+                    'contractSelected'    => $selected
+                )
+            );
+            $this->template->parse(
+                'contracts',
+                'contractBlock',
+                true
+            );
+        } // while
     }
 
     /**
@@ -523,202 +565,62 @@ class CTCustomerItem extends CTCNC
     }
 
     /**
-     * Display the renewal status drop-down selector
+     * User search results to download a CSV file
      *
      * @access private
-     * @param $renewalStatus
      */
-    function parseRenewalSelector($renewalStatus)
+    function generateCSV()
     {
-        foreach ($this->renewalStatusArray as $key => $value) {
-            $renewalStatusSelected = ($renewalStatus == $key) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    'renewalStatusSelected'    => $renewalStatusSelected,
-                    'renewalStatus'            => $key,
-                    'renewalStatusDescription' => $value
-                )
-            );
-            $this->template->parse(
-                'renewalStatus',
-                'renewalStatusBlock',
-                true
-            );
+        $fileName = 'CUSTOMER_ITEMS.CSV';
+        Header('Content-type: text/plain');
+        Header('Content-Disposition: attachment; filename=' . $fileName);
+        echo 'Customer,Site,Description,SerialNo,Contracts,ServerName' . "\n";
+
+        while ($this->dsCustomerItem->fetchNext()) {
+
+            $contracts =
+                $this->buCustomerItem->getContractDescriptionsByCustomerItemId(
+                    $this->dsCustomerItem->getValue(DBEJCustomerItem::customerItemID)
+                );
+
+            echo
+                '"' . $this->getExcelValue($this->dsCustomerItem->getValue(DBEJCustomerItem::customerName)) . '",' .
+                '"' . $this->getExcelValue($this->dsCustomerItem->getValue(DBEJCustomerItem::siteDescription)) . '",' .
+                '"' . $this->getExcelValue($this->dsCustomerItem->getValue(DBEJCustomerItem::itemDescription)) . '",' .
+                '"' . $this->getExcelValue($this->dsCustomerItem->getValue(DBEJCustomerItem::serialNo)) . '",' .
+                '"' . $this->getExcelValue($contracts) . '",' .
+                '"' . $this->getExcelValue($this->dsCustomerItem->getValue(DBEJCustomerItem::serverName)) . '"' . "\n";
         }
+        $this->pageClose();
+        exit;
     }
 
-    /**
-     * Display the second site delay days drop-down selector
-     *
-     * @access private
-     * @param $delayDays
-     */
-    function parseSecondsiteImageDelayDaysSelector($delayDays)
+    function getExcelValue($value)
     {
-        foreach ($this->secondsiteImageDelayDays as $key => $value) {
 
-            $delayDaysSelected = ($delayDays == $key) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    'delayDaysSelected'    => $delayDaysSelected,
-                    'delayDaysValue'       => $key,
-                    'delayDaysDescription' => $value
-                )
-            );
-            $this->template->parse(
-                'secondsiteImageDelayDays',
-                'secondsiteImageDelayDaysBlock',
-                true
-            );
-        }
-    }
+        $value = str_replace(
+            ',',
+            '',
+            $value
+        );
+        $value = str_replace(
+            "\r\n",
+            " ",
+            $value
+        );      // remove carriage returns
+        $value = str_replace(
+            "\"",
+            "",
+            $value
+        );        // and double quotes
 
-    /**
-     * Display the popup selector form
-     * @throws Exception
-     */
-    function displayItemSelectPopup()
-    {
-        $this->setMethodName('displayItemSelectPopup');
-        // this may be required in a number of situations
-        $dsSearch = new DataSet($this);
-        $this->buCustomerItem->initialiseSearchForm($dsSearch);
-        $dsSearch->setValue(
-            BUCustomerItem::searchFormItemText,
-            $this->getParam('itemDescription')
-        );
-        $dsSearch->setValue(
-            BUCustomerItem::searchFormCustomerID,
-            $this->getParam('customerID')
-        );
-        $dsCustomerItem = new DataSet($this);
-        $this->buCustomerItem->search(
-            $dsSearch,
-            $dsCustomerItem
-        );
-        if ($dsCustomerItem->rowCount() == 0) {
-            $dsSearch->setValue(
-                BUCustomerItem::searchFormItemText,
-                null
-            );
-            $dsSearch->setValue(
-                BUCustomerItem::searchFormSerialNo,
-                $this->getParam('itemDescription')
-            );
-        }
-        $this->buCustomerItem->search(
-            $dsSearch,
-            $dsCustomerItem
-        );
-        $this->template->set_var(
-            array(
-                'parentIDField'         => $_SESSION['parentIDField'],
-                'parentWarrantyIDField' => $_SESSION['parentWarrantyIDField'],
-                'parentDescField'       => $_SESSION['parentDescField']
-            )
-        );
-        if ($dsCustomerItem->rowCount() == 1) {
-            $this->setTemplateFiles(
-                'CustomerItemSelect',
-                'CustomerItemSelectOne.inc'
-            );
-            // This template runs a javascript function NOT inside HTML and so must use stripslashes()
-            $dsCustomerItem->fetchNext();
-            $this->template->set_var(
-                array(
-                    'itemDescription'  => addslashes($dsCustomerItem->getValue(DBEJCustomerItem::itemDescription)),
-                    // for javascript
-                    'warrantyID'       => $dsCustomerItem->getValue(DBEJCustomerItem::warrantyID),
-                    'customerItemID'   => $dsCustomerItem->getValue(DBEJCustomerItem::customerItemID),
-                    'allowDirectDebit' => $dsCustomerItem->getValue(
-                        DBEItem::allowDirectDebit
-                    ) === 'Y' ? 'true' : 'false'
-                )
-            );
-        } else {
-            if ($dsCustomerItem->rowCount() == 0) {
-                $this->template->set_var(
-                    array(
-                        'itemDescription' => $this->getParam('itemDescription'),
-                    )
-                );
-                $this->setTemplateFiles(
-                    'CustomerItemSelect',
-                    'CustomerItemSelectNone.inc'
-                );
-            }
-            if ($dsCustomerItem->rowCount() > 1) {
-                $this->setTemplateFiles(
-                    'CustomerItemSelect',
-                    'CustomerItemSelectPopup.inc'
-                );
-            }
-            // Parameters
-            $this->setPageTitle('Customer Item Selection');
-            if ($dsCustomerItem->rowCount() > 0) {
-                $this->template->set_block(
-                    'CustomerItemSelect',
-                    'itemBlock',
-                    'items'
-                );
-                while ($dsCustomerItem->fetchNext()) {
-                    $this->template->set_var(
-                        array(
-                            'itemDescription'   => Controller::htmlDisplayText(
-                                $dsCustomerItem->getValue(DBEJCustomerItem::itemDescription)
-                            ),
-                            'serialNo'          => Controller::htmlDisplayText(
-                                $dsCustomerItem->getValue(DBEJCustomerItem::serialNo)
-                            ),
-                            'purchaseDate'      => Controller::dateYMDtoDMY(
-                                $dsCustomerItem->getValue(DBEJCustomerItem::sOrderDate)
-                            ),
-                            'submitDescription' => Controller::htmlInputText(
-                                addslashes($dsCustomerItem->getValue(DBEJCustomerItem::itemDescription))
-                            ),
-                            'customerItemID'    => $dsCustomerItem->getValue(DBEJCustomerItem::customerItemID),
-                            'warrantyID'        => $dsCustomerItem->getValue(DBEJCustomerItem::warrantyID),
-                            'allowDirectDebit'  => $dsCustomerItem->getValue(
-                                DBEItem::allowDirectDebit
-                            ) === 'Y' ? 'true' : 'false'
-                        )
-                    );
-                    $this->template->parse(
-                        'items',
-                        'itemBlock',
-                        true
-                    );
-                }
-            }
-        } // not ($dsItem->rowCount()==1)
-        $this->template->parse(
-            'CONTENTS',
-            'CustomerItemSelect',
-            true
-        );
-        $this->parsePage();
+        return $value;
     }
     /**
      * Display the popup list of items under given contract (for CTActivity)
      *
      * @access private
      */
-    /**
-     * Display the results of order search
-     * @access private
-     * @throws Exception
-     */
-    function displayRenewalContract()
-    {
-        $buCustomerItem = &$this->buCustomerItem;
-        $buCustomerItem->getCustomerItemByID(
-            $this->getParam('customerItemID'),
-            $dsCustomerItem
-        );
-        $url = $this->getContractUrl($dsCustomerItem);
-        header('Location: ' . $url);
-        exit;
-    }
 
     /**
      * @throws Exception
@@ -1301,7 +1203,79 @@ class CTCustomerItem extends CTCNC
             true
         );
         $this->parsePage();
+    }
+
+    /**
+     * Display the second site delay days drop-down selector
+     *
+     * @access private
+     * @param $delayDays
+     */
+    function parseSecondsiteImageDelayDaysSelector($delayDays)
+    {
+        foreach ($this->secondsiteImageDelayDays as $key => $value) {
+
+            $delayDaysSelected = ($delayDays == $key) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    'delayDaysSelected'    => $delayDaysSelected,
+                    'delayDaysValue'       => $key,
+                    'delayDaysDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'secondsiteImageDelayDays',
+                'secondsiteImageDelayDaysBlock',
+                true
+            );
+        }
     } // end display()
+
+    function parseWarrantySelector($warrantyID)
+    {
+        // Manufacturer selector
+
+        $dbeWarranty = new DBEWarranty($this);
+        $dbeWarranty->getRows();
+        $this->template->set_block(
+            'CustomerItemDisplay',
+            'warrantyBlock',
+            'warranties'
+        );
+        while ($dbeWarranty->fetchNext()) {
+            $this->template->set_var(
+                array(
+                    'warrantyDescription' => $dbeWarranty->getValue(DBEWarranty::description),
+                    'warrantyID'          => $dbeWarranty->getValue(DBEWarranty::warrantyID),
+                    'warrantySelected'    => ($warrantyID == $dbeWarranty->getValue(
+                            DBEWarranty::warrantyID
+                        )) ? CT_SELECTED : null
+                )
+            );
+            $this->template->parse(
+                'warranties',
+                'warrantyBlock',
+                true
+            );
+        } // while ($dbeWarranty->fetchNext()
+    }// end function addCustomerItem()
+
+    /**
+     * Display the results of order search
+     * @access private
+     * @throws Exception
+     */
+    function displayRenewalContract()
+    {
+        $buCustomerItem = &$this->buCustomerItem;
+        $buCustomerItem->getCustomerItemByID(
+            $this->getParam('customerItemID'),
+            $dsCustomerItem
+        );
+        $url = $this->getContractUrl($dsCustomerItem);
+        header('Location: ' . $url);
+        exit;
+    }
 
     /**
      * Edit/Add Activity
@@ -1417,106 +1391,6 @@ class CTCustomerItem extends CTCNC
             true
         );
         $this->parsePage();
-    }// end function addCustomerItem()
-
-    /**
-     * Redirect to display
-     * @access private
-     * @param $customerItemID
-     * @throws Exception
-     */
-    function redirectToDisplay($customerItemID)
-    {
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'customerItemID' => $customerItemID,
-                    'action'         => CTCUSTOMERITEM_ACT_DISPLAY
-                )
-            );
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    function parseWarrantySelector($warrantyID)
-    {
-        // Manufacturer selector
-
-        $dbeWarranty = new DBEWarranty($this);
-        $dbeWarranty->getRows();
-        $this->template->set_block(
-            'CustomerItemDisplay',
-            'warrantyBlock',
-            'warranties'
-        );
-        while ($dbeWarranty->fetchNext()) {
-            $this->template->set_var(
-                array(
-                    'warrantyDescription' => $dbeWarranty->getValue(DBEWarranty::description),
-                    'warrantyID'          => $dbeWarranty->getValue(DBEWarranty::warrantyID),
-                    'warrantySelected'    => ($warrantyID == $dbeWarranty->getValue(
-                            DBEWarranty::warrantyID
-                        )) ? CT_SELECTED : null
-                )
-            );
-            $this->template->parse(
-                'warranties',
-                'warrantyBlock',
-                true
-            );
-        } // while ($dbeWarranty->fetchNext()
-    }
-
-    /**
-     * put your comment there...
-     *
-     * @param mixed $customerID
-     * @param mixed $templateName
-     * @param array $contractIDs
-     */
-    function parseContractSelector($customerID,
-                                   $templateName,
-                                   $contractIDs = []
-    )
-    {
-        $dsContract = new DataSet($this);
-        $this->buCustomerItem->getContractsByCustomerID(
-            $customerID,
-            $dsContract
-        );
-
-        $this->template->set_block(
-            $templateName,
-            'contractBlock',
-            'contracts'
-        );
-
-        while ($dsContract->fetchNext()) {
-            $selected = null;
-            if ($contractIDs && count($contractIDs) > 0) {
-
-                if (in_array(
-                    $dsContract->getValue(DBEJCustomerItem::customerItemID),
-                    $contractIDs
-                )) {
-                    $selected = CT_CHECKED;
-                }
-            }
-
-            $this->template->set_var(
-                array(
-                    'contractDescription' => $dsContract->getValue(DBEJCustomerItem::itemDescription),
-                    'contractID'          => $dsContract->getValue(DBEJCustomerItem::customerItemID),
-                    'contractSelected'    => $selected
-                )
-            );
-            $this->template->parse(
-                'contracts',
-                'contractBlock',
-                true
-            );
-        } // while
     }
 
     /**
@@ -1585,6 +1459,185 @@ class CTCustomerItem extends CTCNC
     }
 
     /**
+     * Display the popup selector form
+     * @throws Exception
+     */
+    function displayItemSelectPopup()
+    {
+        $this->setMethodName('displayItemSelectPopup');
+        // this may be required in a number of situations
+        $dsSearch = new DataSet($this);
+        $this->buCustomerItem->initialiseSearchForm($dsSearch);
+        $dsSearch->setValue(
+            BUCustomerItem::searchFormItemText,
+            $this->getParam('itemDescription')
+        );
+        $dsSearch->setValue(
+            BUCustomerItem::searchFormCustomerID,
+            $this->getParam('customerID')
+        );
+        $dsCustomerItem = new DataSet($this);
+        $this->buCustomerItem->search(
+            $dsSearch,
+            $dsCustomerItem
+        );
+        if ($dsCustomerItem->rowCount() == 0) {
+            $dsSearch->setValue(
+                BUCustomerItem::searchFormItemText,
+                null
+            );
+            $dsSearch->setValue(
+                BUCustomerItem::searchFormSerialNo,
+                $this->getParam('itemDescription')
+            );
+        }
+        $this->buCustomerItem->search(
+            $dsSearch,
+            $dsCustomerItem
+        );
+        $this->template->set_var(
+            array(
+                'parentIDField'         => $_SESSION['parentIDField'],
+                'parentWarrantyIDField' => $_SESSION['parentWarrantyIDField'],
+                'parentDescField'       => $_SESSION['parentDescField']
+            )
+        );
+        if ($dsCustomerItem->rowCount() == 1) {
+            $this->setTemplateFiles(
+                'CustomerItemSelect',
+                'CustomerItemSelectOne.inc'
+            );
+            // This template runs a javascript function NOT inside HTML and so must use stripslashes()
+            $dsCustomerItem->fetchNext();
+            $this->template->set_var(
+                array(
+                    'itemDescription'  => addslashes($dsCustomerItem->getValue(DBEJCustomerItem::itemDescription)),
+                    // for javascript
+                    'warrantyID'       => $dsCustomerItem->getValue(DBEJCustomerItem::warrantyID),
+                    'customerItemID'   => $dsCustomerItem->getValue(DBEJCustomerItem::customerItemID),
+                    'allowDirectDebit' => $dsCustomerItem->getValue(
+                        DBEItem::allowDirectDebit
+                    ) === 'Y' ? 'true' : 'false'
+                )
+            );
+        } else {
+            if ($dsCustomerItem->rowCount() == 0) {
+                $this->template->set_var(
+                    array(
+                        'itemDescription' => $this->getParam('itemDescription'),
+                    )
+                );
+                $this->setTemplateFiles(
+                    'CustomerItemSelect',
+                    'CustomerItemSelectNone.inc'
+                );
+            }
+            if ($dsCustomerItem->rowCount() > 1) {
+                $this->setTemplateFiles(
+                    'CustomerItemSelect',
+                    'CustomerItemSelectPopup.inc'
+                );
+            }
+            // Parameters
+            $this->setPageTitle('Customer Item Selection');
+            if ($dsCustomerItem->rowCount() > 0) {
+                $this->template->set_block(
+                    'CustomerItemSelect',
+                    'itemBlock',
+                    'items'
+                );
+                while ($dsCustomerItem->fetchNext()) {
+                    $this->template->set_var(
+                        array(
+                            'itemDescription'   => Controller::htmlDisplayText(
+                                $dsCustomerItem->getValue(DBEJCustomerItem::itemDescription)
+                            ),
+                            'serialNo'          => Controller::htmlDisplayText(
+                                $dsCustomerItem->getValue(DBEJCustomerItem::serialNo)
+                            ),
+                            'purchaseDate'      => Controller::dateYMDtoDMY(
+                                $dsCustomerItem->getValue(DBEJCustomerItem::sOrderDate)
+                            ),
+                            'submitDescription' => Controller::htmlInputText(
+                                addslashes($dsCustomerItem->getValue(DBEJCustomerItem::itemDescription))
+                            ),
+                            'customerItemID'    => $dsCustomerItem->getValue(DBEJCustomerItem::customerItemID),
+                            'warrantyID'        => $dsCustomerItem->getValue(DBEJCustomerItem::warrantyID),
+                            'allowDirectDebit'  => $dsCustomerItem->getValue(
+                                DBEItem::allowDirectDebit
+                            ) === 'Y' ? 'true' : 'false'
+                        )
+                    );
+                    $this->template->parse(
+                        'items',
+                        'itemBlock',
+                        true
+                    );
+                }
+            }
+        } // not ($dsItem->rowCount()==1)
+        $this->template->parse(
+            'CONTENTS',
+            'CustomerItemSelect',
+            true
+        );
+        $this->parsePage();
+    }
+
+    /**
+     * Upload new document from local disk
+     * @access private
+     * @throws Exception
+     */
+    function uploadDocument()
+    {
+        // validate
+        if (!$this->getParam('uploadDescription')) {
+            $this->setFormErrorMessage('Please enter a description');
+        }
+        if (!$_FILES['userfile']['name']) {
+            $this->setFormErrorMessage('Please enter a file path');
+        }
+        if (!is_uploaded_file($_FILES['userfile']['tmp_name'])) {                    // Possible hack?
+            $this->setFormErrorMessage('Document not loaded - is it bigger that 6 MBytes?');
+        }
+        if ($this->formError) {
+            $this->buCustomerItem->getCustomerItemByID(
+                $this->getParam('customerItemID'),
+                $this->dsCustomerItem
+            );
+            $this->display();
+            exit;
+        }
+        $this->buCustomerItem->uploadDocumentFile(
+            $this->getParam('customerItemID'),
+            $this->getParam('uploadDescription'),
+            $_FILES['userfile']
+        );
+        $this->redirectToDisplay($this->getParam('customerItemID'));
+    }
+
+    /**
+     * Redirect to display
+     * @access private
+     * @param $customerItemID
+     * @throws Exception
+     */
+    function redirectToDisplay($customerItemID)
+    {
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'customerItemID' => $customerItemID,
+                    'action'         => CTCUSTOMERITEM_ACT_DISPLAY
+                )
+            );
+        header('Location: ' . $urlNext);
+        exit;
+    }
+
+    /**
      * Generate page required to embed file
      * this is done because simply calling documentView() with PDF files causes
      * IE to call documentView a second time! this is a known problem. The workaround
@@ -1633,39 +1686,6 @@ class CTCustomerItem extends CTCNC
         );
         print $dbeCustomerItemDocument->getValue(DBEJCustomerItemDocument::file);
         exit;
-    }
-
-    /**
-     * Upload new document from local disk
-     * @access private
-     * @throws Exception
-     */
-    function uploadDocument()
-    {
-        // validate
-        if (!$this->getParam('uploadDescription')) {
-            $this->setFormErrorMessage('Please enter a description');
-        }
-        if (!$_FILES['userfile']['name']) {
-            $this->setFormErrorMessage('Please enter a file path');
-        }
-        if (!is_uploaded_file($_FILES['userfile']['tmp_name'])) {                    // Possible hack?
-            $this->setFormErrorMessage('Document not loaded - is it bigger that 6 MBytes?');
-        }
-        if ($this->formError) {
-            $this->buCustomerItem->getCustomerItemByID(
-                $this->getParam('customerItemID'),
-                $this->dsCustomerItem
-            );
-            $this->display();
-            exit;
-        }
-        $this->buCustomerItem->uploadDocumentFile(
-            $this->getParam('customerItemID'),
-            $this->getParam('uploadDescription'),
-            $_FILES['userfile']
-        );
-        $this->redirectToDisplay($this->getParam('customerItemID'));
     }
 
     /**
@@ -1751,28 +1771,6 @@ class CTCustomerItem extends CTCNC
             readfile($pdfFile);
             unlink($pdfFile);
             exit();
-        }
-    }
-
-    function applyContractUpdates($action)
-    {
-        $this->setMethodName('applyContractUpdates');
-
-        if ($this->getParam('customerItemIDs')) {
-
-            if ($action == 'add') {
-                $this->buCustomerItem->addContractToCustomerItems(
-                    $this->getParam('contractID'),
-                    $this->getParam('customerItemIDs')
-                );
-            } else {
-                $this->buCustomerItem->removeContractFromCustomerItems(
-                    $this->getParam('contractID'),
-                    $this->getParam('customerItemIDs')
-                );
-
-            }
-
         }
     }
 
