@@ -994,7 +994,6 @@ class CTCustomerItem extends CTCNC
 
 
         $this->parseWarrantySelector($dsCustomerItem->getValue(DBEJCustomerItem::warrantyID));
-        var_dump($this->contractIDs);
         $this->parseContractSelector(
             $this->dsCustomerItem->getValue(DBEJCustomerItem::customerID),
             'CustomerItemDisplay',
