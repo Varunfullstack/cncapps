@@ -267,52 +267,28 @@ class CTQuotationTemplates extends CTCNC
         header('Location: ' . $urlNext);
     }
 
-        /**
+    /**
      * Display the popup selector form
      * @access private
      * @throws Exception
      */
     function displayPopup()
     {
-        common_decodeQueryArray($_REQUEST);
 
-        if ($this->getParam('renewalTypeID')) {
-            $renewalTypeID = $this->getParam('renewalTypeID');
-        } else {
-            $renewalTypeID = false;
-        }
-
-        $this->setMethodName('displayItemSelectPopup');
-        // this may be required in a number of situations
-        $urlCreate = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action'        => CTCNC_ACT_ITEM_ADD,
-                'renewalTypeID' => $renewalTypeID,
-                'htmlFmt'       => CT_HTML_FMT_POPUP
-            )
+        $dsResults = new DataSet($this);
+        $this->buQuotationTemplate->getByNameMatch(
+            $this->getParam('description'),
+            $dsResults,
         );
 
-        // A single slash means create new item
-        if ($this->getParam('itemDescription'){0} == '/') {
-            header('Location: ' . $urlCreate);
-            exit;
-        }
-        $dsItem = new DataSet($this);
-        $this->buItem->getItemsByNameMatch(
-            $this->getParam('itemDescription'),
-            $dsItem,
-            $renewalTypeID
-        );
-
-        $this->template->set_var(
-            array(
-                'parentIDField'               => @$_SESSION['itemParentIDField'],
-                'parentSlaResponseHoursField' => @$_SESSION['itemParentSlaResponseHoursField'],
-                'parentDescField'             => @$_SESSION['itemParentDescField']
-            )
-        );
-        if ($dsItem->rowCount() == 1) {
+//        $this->template->set_var(
+//            array(
+//                'parentIDField'               => @$_SESSION['itemParentIDField'],
+//                'parentSlaResponseHoursField' => @$_SESSION['itemParentSlaResponseHoursField'],
+//                'parentDescField'             => @$_SESSION['itemParentDescField']
+//            )
+//        );
+        if ($dsResults->rowCount() == 1) {
             $this->setTemplateFiles(
                 'ItemSelect',
                 'ItemSelectOne.inc'
@@ -320,33 +296,33 @@ class CTQuotationTemplates extends CTCNC
             // This template runs a javascript function NOT inside HTML and so must use stripslashes()
             $this->template->set_var(
                 array(
-                    'submitDescription'       => addslashes($dsItem->getValue(DBEItem::description)),
+                    'submitDescription'       => addslashes($dsResults->getValue(DBEItem::description)),
                     // for javascript
-                    'itemID'                  => $dsItem->getValue(DBEItem::itemID),
+                    'itemID'                  => $dsResults->getValue(DBEItem::itemID),
                     'curUnitCost'             => number_format(
-                        $dsItem->getValue(DBEItem::curUnitCost),
+                        $dsResults->getValue(DBEItem::curUnitCost),
                         2,
                         '.',
                         ''
                     ),
                     'curUnitSale'             => number_format(
-                        $dsItem->getValue(DBEItem::curUnitSale),
+                        $dsResults->getValue(DBEItem::curUnitSale),
                         2,
                         '.',
                         ''
                     ),
-                    'qtyOrdered'              => $dsItem->getValue(DBEItem::salesStockQty),
+                    'qtyOrdered'              => $dsResults->getValue(DBEItem::salesStockQty),
                     // to indicate number in stock
-                    'slaResponseHours'        => $dsItem->getValue(DBEItem::contractResponseTime),
-                    'partNo'                  => $dsItem->getValue(DBEItem::partNo),
-                    'allowDirectDebit'        => $dsItem->getValue(DBEItem::allowDirectDebit) == 'Y' ? 'true' : 'false',
-                    'excludeFromPOCompletion' => $dsItem->getValue(
+                    'slaResponseHours'        => $dsResults->getValue(DBEItem::contractResponseTime),
+                    'partNo'                  => $dsResults->getValue(DBEItem::partNo),
+                    'allowDirectDebit'        => $dsResults->getValue(DBEItem::allowDirectDebit) == 'Y' ? 'true' : 'false',
+                    'excludeFromPOCompletion' => $dsResults->getValue(
                         DBEItem::excludeFromPOCompletion
                     ) == 'Y' ? 'true' : 'false'
                 )
             );
         } else {
-            if ($dsItem->rowCount() == 0) {
+            if ($dsResults->rowCount() == 0) {
                 $this->template->set_var(
                     array(
                         'itemDescription' => $this->getParam('itemDescription'),
@@ -357,7 +333,7 @@ class CTQuotationTemplates extends CTCNC
                     'ItemSelectNone.inc'
                 );
             }
-            if ($dsItem->rowCount() > 1) {
+            if ($dsResults->rowCount() > 1) {
                 $this->setTemplateFiles(
                     'ItemSelect',
                     'ItemSelectPopup.inc'
@@ -384,43 +360,43 @@ class CTQuotationTemplates extends CTCNC
 
             // Parameters
             $this->setPageTitle('Item Selection');
-            if ($dsItem->rowCount() > 0) {
+            if ($dsResults->rowCount() > 0) {
                 $this->template->set_block(
                     'ItemSelect',
                     'itemBlock',
                     'items'
                 );
-                while ($dsItem->fetchNext()) {
+                while ($dsResults->fetchNext()) {
                     $this->template->set_var(
                         array(
                             'itemDescription'         => Controller::htmlDisplayText(
-                                $dsItem->getValue(DBEItem::description)
+                                $dsResults->getValue(DBEItem::description)
                             ),
                             // this complicated thing is to cope with Javascript quote problems!
                             'submitDescription'       => Controller::htmlInputText(
-                                addslashes($dsItem->getValue(DBEItem::description))
+                                addslashes($dsResults->getValue(DBEItem::description))
                             ),
-                            'itemID'                  => $dsItem->getValue(DBEItem::itemID),
+                            'itemID'                  => $dsResults->getValue(DBEItem::itemID),
                             'curUnitCost'             => number_format(
-                                $dsItem->getValue(DBEItem::curUnitCost),
+                                $dsResults->getValue(DBEItem::curUnitCost),
                                 2,
                                 '.',
                                 ''
                             ),
                             'curUnitSale'             => number_format(
-                                $dsItem->getValue(DBEItem::curUnitSale),
+                                $dsResults->getValue(DBEItem::curUnitSale),
                                 2,
                                 '.',
                                 ''
                             ),
-                            'qtyOrdered'              => $dsItem->getValue(DBEItem::salesStockQty),
+                            'qtyOrdered'              => $dsResults->getValue(DBEItem::salesStockQty),
                             // to indicate number in stock
-                            'partNo'                  => $dsItem->getValue(DBEItem::partNo),
-                            'slaResponseHours'        => $dsItem->getValue(DBEItem::contractResponseTime),
-                            'allowDirectDebit'        => $dsItem->getValue(
+                            'partNo'                  => $dsResults->getValue(DBEItem::partNo),
+                            'slaResponseHours'        => $dsResults->getValue(DBEItem::contractResponseTime),
+                            'allowDirectDebit'        => $dsResults->getValue(
                                 DBEItem::allowDirectDebit
                             ) == 'Y' ? 'true' : 'false',
-                            'excludeFromPOCompletion' => $dsItem->getValue(
+                            'excludeFromPOCompletion' => $dsResults->getValue(
                                 DBEItem::excludeFromPOCompletion
                             ) == 'Y' ? 'true' : 'false'
                         )
@@ -441,7 +417,7 @@ class CTQuotationTemplates extends CTCNC
         $this->parsePage();
     }// end function editFurther Action()
 
-function changeOrder()
+    function changeOrder()
     {
         if (!$this->getParam('sortOrder')) {
             return;

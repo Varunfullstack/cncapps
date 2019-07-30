@@ -25,6 +25,36 @@ class BUQuotationTemplate extends Business
         $this->dbeQuotationTemplate = new DBEQuotationTemplate($this);
     }
 
+    function getByNameMatch($matchString,
+                            &$dsResults
+    )
+    {
+        $matchString = trim($matchString);
+        if (!$matchString) {
+            $this->raiseError("String is empty");
+        }
+
+        if (is_numeric($matchString)) {
+            return $this->getById($matchString, $dsResults);
+        }
+
+        $this->dbeQuotationTemplate->getRowsByDescriptionMatch($matchString);
+        $this->getData(
+            $this->dbeQuotationTemplate,
+            $dsResults
+        );
+        return true;
+    }
+
+    function getById($ID, $dsResults)
+    {
+        return ($this->getDatasetByPK(
+            $ID,
+            $this->dbeQuotationTemplate,
+            $dsResults
+        ));
+    }
+
     function updateQuotationTemplate(DataSet $dsData)
     {
         // we have to check if the linked sales order id is valid
