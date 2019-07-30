@@ -1,0 +1,68 @@
+<script>
+    function clearForm() {
+        document.createTemplatedQuotationForm.reset();
+    }
+
+    const openTabURL = '{openTabURL}';
+    if (openTabURL) {
+        window.open(openTabURL, '_blank').focus();
+    }
+
+</script>
+<form method="post"
+      action=""
+      name="createTemplatedQuotationForm"
+>
+    <table>
+        <tbody>
+        <tr>
+            <td class="promptText">Customer:</td>
+            <td>
+                <input type="hidden"
+                       name="form[customerID]"
+                       id="customerID"
+                       value="{customerID}"
+                >
+                <input type="text"
+                       name="form[customerString]"
+                       id="customerString"
+                       value="{customerString}"
+                       customer-picker="customerID"
+                       size="50"
+                       maxlength="50"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Template:</td>
+            <td>
+                <select name="form[templates][]"
+                        multiple
+                        required
+                >
+                    <!-- BEGIN templatesBlock -->
+                    <option value="{templateID}"
+                            {selected}
+                    >{description}
+                    </option>
+                    <!-- END templatesBlock -->
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Existing Quotation</td>
+            <td>
+                <input type="text"
+                       value="{existingQuotationID}"
+                       name="form[existingQuotationID]"
+                >
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <button>Create</button>
+    <button type="button"
+            onclick="clearForm();"
+    >Clear
+    </button>
+</form>

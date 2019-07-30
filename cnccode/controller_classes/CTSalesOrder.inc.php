@@ -22,6 +22,7 @@ require_once($cfg["path_bu"] . "/BUPDF.inc.php");
 require_once($cfg["path_dbe"] . "/DBEPaymentTerms.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 require_once($cfg["path_dbe"] . "/DBEStandardText.inc.php");
+require_once($cfg["path_dbe"] . "/DBEQuotationTemplate.inc.php");
 require_once($cfg["path_func"] . "/Common.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 // Parameters
@@ -65,6 +66,10 @@ define(
 define(
     'CTSALESORDER_ACT_CREATE_QUOTE',
     'createQuote'
+);
+define(
+    'CTSALESORDER_ACT_CREATE_TEMPLATED_QUOTE',
+    'createTemplatedQuote'
 );
 define(
     'CTSALESORDER_ACT_CREATE_ORDER',
@@ -453,111 +458,6 @@ class CTSalesOrder extends CTCNC
     {
     }
 
-    function setSiteNo($siteNo)
-    {
-        $this->siteNo = $siteNo;
-    }
-
-    function getSiteNo()
-    {
-        return $this->siteNo;
-    }
-
-    function setSequenceNo($no)
-    {
-        $this->sequenceNo = $no;
-    }
-
-    function getSequenceNo()
-    {
-        return $this->sequenceNo;
-    }
-
-    function setContactID($id)
-    {
-        $this->contactID = $id;
-    }
-
-    function getContactID()
-    {
-        return $this->contactID;
-    }
-
-    function setCustomerID($customerID)
-    {
-        $this->setNumericVar(
-            'customerID',
-            $customerID
-        );
-    }
-
-    function getCustomerID()
-    {
-        return $this->customerID;
-    }
-
-    function setUpdateSupplierID($updateSupplierID)
-    {
-        $this->setNumericVar(
-            'updateSupplierID',
-            $updateSupplierID
-        );
-    }
-
-    function getUpdateSupplierID()
-    {
-        return $this->updateSupplierID;
-    }
-
-    function setFromOrdheadID($ID)
-    {
-        $this->setNumericVar(
-            'fromOrdheadID',
-            $ID
-        );
-    }
-
-    function getFromOrdheadID()
-    {
-        return $this->fromOrdheadID;
-    }
-
-    function setQuotationID($quotationID)
-    {
-        $this->setNumericVar(
-            'quotationID',
-            $quotationID
-        );
-    }
-
-    function getQuotationID()
-    {
-        return $this->quotationID;
-    }
-
-    function setOrdheadID($ordheadID)
-    {
-        $this->ordheadID = trim($ordheadID);
-    }
-
-    function getOrdheadID()
-    {
-        return $this->ordheadID;
-    }
-
-    function setQuotationUserID($userID)
-    {
-        $this->setNumericVar(
-            'quotationUserID',
-            $userID
-        );
-    }
-
-    function getQuotationUserID()
-    {
-        return $this->quotationUserID;
-    }
-
     function getServiceRequestCustomerItemID()
     {
         return $this->serviceRequestCustomerItemID;
@@ -566,241 +466,6 @@ class CTSalesOrder extends CTCNC
     function setServiceRequestCustomerItemID($value)
     {
         $this->serviceRequestCustomerItemID = $value;
-    }
-
-    function setOrderType($orderType)
-    {
-        $this->orderType = $orderType;
-    }
-
-    function getOrderType()
-    {
-        return $this->orderType;
-    }
-
-    function setSalutation($salutation)
-    {
-        $this->salutation = $salutation;
-    }
-
-    function getSalutation()
-    {
-        return $this->salutation;
-    }
-
-    function setEmailSubject($message)
-    {
-        $this->emailSubject = $message;
-    }
-
-    function getEmailSubject()
-    {
-        return $this->emailSubject;
-    }
-
-    function setIntroduction($text)
-    {
-        $this->introduction = $text;
-    }
-
-    function getIntroduction()
-    {
-        return $this->introduction;
-    }
-
-    function setCustPORef($ref)
-    {
-        $this->custPORef = $ref;
-    }
-
-    function getCustPORef()
-    {
-        return $this->custPORef;
-    }
-
-    function setLineText($text)
-    {
-        $this->lineText = $text;
-    }
-
-    function getLineText()
-    {
-        return $this->lineText;
-    }
-
-    function getTypeDescription($type)
-    {
-        return $this->orderTypeArray[$type];
-    }
-
-    function getToDate()
-    {
-        return $this->toDate;
-    }
-
-    function getToDateYMD()
-    {
-        return $this->convertDateYMD($this->getToDate());
-    }
-
-    function setToDate($date)
-    {
-        $this->toDate = $date;
-    }
-
-    function getFromDate()
-    {
-        return $this->fromDate;
-    }
-
-    function getFromDateYMD()
-    {
-        return $this->convertDateYMD($this->getFromDate());
-    }
-
-    function setFromDate($date)
-    {
-        $this->fromDate = $date;
-    }
-
-    /**
-     * @param $dateDMY
-     * @return string
-     */
-    function convertDateYMD($dateDMY)
-    {
-        if (!$dateDMY) {
-            return null;
-        }
-        $dateArray = explode(
-            '/',
-            $dateDMY
-        );
-        return ($dateArray[2] . '-' . str_pad(
-                $dateArray[1],
-                2,
-                '0',
-                STR_PAD_LEFT
-            ) . '-' . str_pad(
-                $dateArray[0],
-                2,
-                '0',
-                STR_PAD_LEFT
-            ));
-    }
-
-    function setCustomerString($customerString)
-    {
-        $this->customerString = $customerString;
-    }
-
-    function getCustomerString()
-    {
-        return $this->customerString;
-    }
-
-    function setCustomerStringMessage($message)
-    {
-        if (func_get_arg(0)) $this->setFormErrorOn();
-        $this->customerStringMessage = $message;
-    }
-
-    function getCustomerStringMessage()
-    {
-        return $this->customerStringMessage;
-    }
-
-    function setFromDateMessage($message)
-    {
-        if (func_get_arg(0)) $this->setFormErrorOn();
-        $this->fromDateMessage = $message;
-    }
-
-    function getFromDateMessage()
-    {
-        return $this->fromDateMessage;
-    }
-
-    function setToDateMessage($message)
-    {
-        if (func_get_arg(0)) $this->setFormErrorOn();
-        $this->toDateMessage = $message;
-    }
-
-    function getToDateMessage()
-    {
-        return $this->toDateMessage;
-    }
-
-    function setUserMessage($message)
-    {
-        if (func_get_arg(0)) $this->setFormErrorOn();
-        $this->userMessage = $message;
-    }
-
-    function getUserMessage()
-    {
-        return $this->userMessage;
-    }
-
-    function setLinesMessage($message)
-    {
-        if (func_get_arg(0)) $this->setFormErrorOn();
-        $this->linesMessage = $message;
-    }
-
-    function getLinesMessage()
-    {
-        return $this->linesMessage;
-    }
-
-    function setUploadUserMessage($message)
-    {
-        if (func_get_arg(0)) $this->setFormErrorOn();
-        $this->uploadUserMessage = $message;
-    }
-
-    function getUploadUserMessage()
-    {
-        return $this->uploadUserMessage;
-    }
-
-    function setOrdheadIDMessage($message)
-    {
-        if (func_get_arg(0)) $this->setFormErrorOn();
-        $this->ordheadIDMessage = $message;
-    }
-
-    function getOrdheadIDMessage()
-    {
-        return $this->ordheadIDMessage;
-    }
-
-    function setQuoteFileMessage($message)
-    {
-        if (func_get_arg(0)) $this->setFormErrorOn();
-        $this->quoteFileMessage = $message;
-    }
-
-    function getQuoteFileMessage()
-    {
-        return $this->quoteFileMessage;
-    }
-
-    function setSelectedOrderLines($array)
-    {
-        if (!is_array($array)) {
-            return FALSE;
-        }
-        foreach ($array as $value) {
-            $this->dsSelectedOrderLine->setUpdateModeInsert();
-            $this->dsSelectedOrderLine->setValue(
-                DBEOrdline::sequenceNo,
-                $value
-            );
-            $this->dsSelectedOrderLine->post();
-        }
-        return TRUE;
     }
 
     /**
@@ -927,10 +592,95 @@ class CTSalesOrder extends CTCNC
             case 'sendReminder':
                 $this->sendReminderQuote();
                 break;
+            case CTSALESORDER_ACT_CREATE_TEMPLATED_QUOTE:
+                $this->createTemplatedQuote();
+                break;
             default:
                 $this->displaySearchForm();
                 break;
         }
+    }
+
+    /**
+     * Search for customers using customerString
+     * @access private
+     * @throws Exception
+     */
+    function search()
+    {
+        $this->setMethodName('search');
+        $this->setCustomerID(
+            $this->getParam('customerID')
+        ); // Have to do this because I couldn't use Javascript to set form[customerID]
+        if (
+            (!is_numeric($this->getOrdheadID())) &
+            ($this->getOrdheadID())
+        ) {
+            $this->setOrdheadIDMessage(CTSALESORDER_NOT_NUMERIC);
+        }
+        if (($this->getFromDate()) && (!$this->isValidDate($this->getFromDate()))) {
+            $this->setFromDateMessage(CTCNC_MSG_INVALID_DATE);
+        }
+        if (($this->getToDate()) && (!$this->isValidDate($this->getToDate()))) {
+            $this->setToDateMessage(CTCNC_MSG_INVALID_DATE);
+        }
+        if ($this->getFormError()) {
+            $this->displaySearchForm();
+            return;
+        }
+        if (($this->getToDateYMD()) && ($this->getFromDateYMD())) {
+            if ($this->getToDateYMD() < $this->getFromDateYMD()) {
+                $this->setToDateMessage(CTSALESORDER_TO_DATE_SMALLER);
+            }
+        }
+        if ($this->getFormError()) {
+            $this->displaySearchForm();
+            return;
+        }
+        $this->setMethodName('search');
+        $this->buSalesOrder->search(
+            $this->getCustomerID(),
+            $this->getOrdheadID(),
+            $this->getOrderType(),
+            $this->getCustPORef(),
+            $this->getLineText(),
+            $this->getFromDateYMD(),
+            $this->getToDateYMD(),
+            $this->getQuotationUserID(),
+            $this->dsOrdhead
+        );
+        $this->setAction(CTSALESORDER_ACT_DISP_SEARCH);
+        $this->defaultAction();
+    }
+
+    function getOrdheadID()
+    {
+        return $this->ordheadID;
+    }
+
+    function setOrdheadID($ordheadID)
+    {
+        $this->ordheadID = trim($ordheadID);
+    }
+
+    function getFromDate()
+    {
+        return $this->fromDate;
+    }
+
+    function setFromDate($date)
+    {
+        $this->fromDate = $date;
+    }
+
+    function getToDate()
+    {
+        return $this->toDate;
+    }
+
+    function setToDate($date)
+    {
+        $this->toDate = $date;
     }
 
     /**
@@ -973,6 +723,15 @@ class CTSalesOrder extends CTCNC
                     'action' => CTSALESORDER_ACT_CREATE_QUOTE
                 )
             );
+
+        $createTemplatedQuoteURL =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTSALESORDER_ACT_CREATE_TEMPLATED_QUOTE
+                )
+            );
+
         $createOrderURL =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
@@ -1093,22 +852,23 @@ class CTSalesOrder extends CTCNC
         }
         $this->template->set_var(
             array(
-                'customerString'        => $this->getCustomerString(),
-                'customerStringMessage' => $this->getCustomerStringMessage(),
-                'toDateMessage'         => $this->getToDateMessage(),
-                'fromDateMessage'       => $this->getFromDateMessage(),
-                'customerID'            => $this->getCustomerID(),
-                'ordheadID'             => $this->getOrdheadID(),
-                'fromDate'              => $this->getFromDate(),
-                'toDate'                => $this->getToDate(),
-                'ordheadIDMessage'      => $this->getOrdheadIDMessage(),
-                'custPORef'             => $this->getCustPORef(),
-                'lineText'              => Controller::htmlDisplayText($this->getLineText()),
-                'submitURL'             => $submitURL,
-                'clearURL'              => $clearURL,
-                'createQuoteURL'        => $createQuoteURL,
-                'createOrderURL'        => $createOrderURL,
-                'customerPopupURL'      => $customerPopupURL,
+                'customerString'          => $this->getCustomerString(),
+                'customerStringMessage'   => $this->getCustomerStringMessage(),
+                'toDateMessage'           => $this->getToDateMessage(),
+                'fromDateMessage'         => $this->getFromDateMessage(),
+                'customerID'              => $this->getCustomerID(),
+                'ordheadID'               => $this->getOrdheadID(),
+                'fromDate'                => $this->getFromDate(),
+                'toDate'                  => $this->getToDate(),
+                'ordheadIDMessage'        => $this->getOrdheadIDMessage(),
+                'custPORef'               => $this->getCustPORef(),
+                'lineText'                => Controller::htmlDisplayText($this->getLineText()),
+                'submitURL'               => $submitURL,
+                'clearURL'                => $clearURL,
+                'createQuoteURL'          => $createQuoteURL,
+                'createOrderURL'          => $createOrderURL,
+                'createTemplatedQuoteURL' => $createTemplatedQuoteURL,
+                'customerPopupURL'        => $customerPopupURL,
             )
         );
         $this->template->parse(
@@ -1120,55 +880,216 @@ class CTSalesOrder extends CTCNC
     }
 
     /**
-     * Search for customers using customerString
+     * Get and parse order type drop-down selector
+     * @access private
+     * @param $orderType
+     */
+    function parseOrderTypeSelector($orderType)
+    {
+        foreach ($this->orderTypeArray as $key => $value) {
+            $orderTypeSelected = ($orderType == $key) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    'orderTypeSelected'    => $orderTypeSelected,
+                    'orderType'            => $key,
+                    'orderTypeDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'orderTypes',
+                'orderTypeBlock',
+                true
+            );
+        }
+    }
+
+    function getOrderType()
+    {
+        return $this->orderType;
+    }
+
+    function setOrderType($orderType)
+    {
+        $this->orderType = $orderType;
+    }
+
+    function parseUserSelector($userID)
+    {
+        $dsUser = new DataSet($this);
+        $this->buSalesOrder->getSalesUsers($dsUser);
+
+        while ($dsUser->fetchNext()) {
+            $userSelected = ($userID == $dsUser->getValue(DBEUser::userID)) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    'userSelected' => $userSelected,
+                    'userID'       => $dsUser->getValue(DBEUser::userID),
+                    'userName'     => $dsUser->getValue(DBEUser::name)
+                )
+            );
+            $this->template->parse(
+                'users',
+                'userBlock',
+                true
+            );
+        }
+    }
+
+    function getQuotationUserID()
+    {
+        return $this->quotationUserID;
+    }
+
+    function setQuotationUserID($userID)
+    {
+        $this->setNumericVar(
+            'quotationUserID',
+            $userID
+        );
+    }
+
+    function getCustomerID()
+    {
+        return $this->customerID;
+    }
+
+    function setCustomerID($customerID)
+    {
+        $this->setNumericVar(
+            'customerID',
+            $customerID
+        );
+    }
+
+    function getLineText()
+    {
+        return $this->lineText;
+    }
+
+    function setLineText($text)
+    {
+        $this->lineText = $text;
+    }
+
+    /**
      * @access private
      * @throws Exception
      */
-    function search()
+    function getDisplayOrderURL()
     {
-        $this->setMethodName('search');
-        $this->setCustomerID(
-            $this->getParam('customerID')
-        ); // Have to do this because I couldn't use Javascript to set form[customerID]
-        if (
-            (!is_numeric($this->getOrdheadID())) &
-            ($this->getOrdheadID())
-        ) {
-            $this->setOrdheadIDMessage(CTSALESORDER_NOT_NUMERIC);
-        }
-        if (($this->getFromDate()) && (!$this->isValidDate($this->getFromDate()))) {
-            $this->setFromDateMessage(CTCNC_MSG_INVALID_DATE);
-        }
-        if (($this->getToDate()) && (!$this->isValidDate($this->getToDate()))) {
-            $this->setToDateMessage(CTCNC_MSG_INVALID_DATE);
-        }
-        if ($this->getFormError()) {
-            $this->displaySearchForm();
-            return;
-        }
-        if (($this->getToDateYMD()) && ($this->getFromDateYMD())) {
-            if ($this->getToDateYMD() < $this->getFromDateYMD()) {
-                $this->setToDateMessage(CTSALESORDER_TO_DATE_SMALLER);
-            }
-        }
-        if ($this->getFormError()) {
-            $this->displaySearchForm();
-            return;
-        }
-        $this->setMethodName('search');
-        $this->buSalesOrder->search(
-            $this->getCustomerID(),
-            $this->getOrdheadID(),
-            $this->getOrderType(),
-            $this->getCustPORef(),
-            $this->getLineText(),
-            $this->getFromDateYMD(),
-            $this->getToDateYMD(),
-            $this->getQuotationUserID(),
-            $this->dsOrdhead
+        return Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'    => CTCNC_ACT_DISP_SALESORDER,
+                'ordheadID' => $this->getOrdheadID()
+            )
         );
-        $this->setAction(CTSALESORDER_ACT_DISP_SEARCH);
-        $this->defaultAction();
+
+    }
+
+    function getTypeDescription($type)
+    {
+        return $this->orderTypeArray[$type];
+    }
+
+    function getCustomerString()
+    {
+        return $this->customerString;
+    }
+
+    function setCustomerString($customerString)
+    {
+        $this->customerString = $customerString;
+    }
+
+    function getCustomerStringMessage()
+    {
+        return $this->customerStringMessage;
+    }
+
+    function setCustomerStringMessage($message)
+    {
+        if (func_get_arg(0)) $this->setFormErrorOn();
+        $this->customerStringMessage = $message;
+    }
+
+    function getToDateMessage()
+    {
+        return $this->toDateMessage;
+    }
+
+    function setToDateMessage($message)
+    {
+        if (func_get_arg(0)) $this->setFormErrorOn();
+        $this->toDateMessage = $message;
+    }
+
+    function getFromDateMessage()
+    {
+        return $this->fromDateMessage;
+    }
+
+    function setFromDateMessage($message)
+    {
+        if (func_get_arg(0)) $this->setFormErrorOn();
+        $this->fromDateMessage = $message;
+    }
+
+    function getOrdheadIDMessage()
+    {
+        return $this->ordheadIDMessage;
+    }
+
+    function setOrdheadIDMessage($message)
+    {
+        if (func_get_arg(0)) $this->setFormErrorOn();
+        $this->ordheadIDMessage = $message;
+    }
+
+    function getCustPORef()
+    {
+        return $this->custPORef;
+    }
+
+    function setCustPORef($ref)
+    {
+        $this->custPORef = $ref;
+    }
+
+    function getToDateYMD()
+    {
+        return $this->convertDateYMD($this->getToDate());
+    }
+
+    /**
+     * @param $dateDMY
+     * @return string
+     */
+    function convertDateYMD($dateDMY)
+    {
+        if (!$dateDMY) {
+            return null;
+        }
+        $dateArray = explode(
+            '/',
+            $dateDMY
+        );
+        return ($dateArray[2] . '-' . str_pad(
+                $dateArray[1],
+                2,
+                '0',
+                STR_PAD_LEFT
+            ) . '-' . str_pad(
+                $dateArray[0],
+                2,
+                '0',
+                STR_PAD_LEFT
+            ));
+    }
+
+    function getFromDateYMD()
+    {
+        return $this->convertDateYMD($this->getFromDate());
     }
 
     /**
@@ -2467,108 +2388,138 @@ class CTSalesOrder extends CTCNC
                 true
             );
         }// foreach
-    } // End function Display Sales Order Header
+    }
 
-    /**
-     * This function deals with the case where another user has updated the order we are attempting
-     * to update.
-     * $pageDate has been POSTED from the page and indicates the version of the record we intend to change
-     * if, however, the orderDate is different then another user has already updated the record and so
-     * we must not. Instead, we display a message and load the latest version of the record.
-     * @access private
-     * @param $pageDate
-     * @param $orderDate
-     * @throws Exception
-     */
-    function checkUpdatedByAnotherUser($pageDate,
-                                       $orderDate
+    function getFromOrdheadID()
+    {
+        return $this->fromOrdheadID;
+    }
+
+    function setFromOrdheadID($ID)
+    {
+        $this->setNumericVar(
+            'fromOrdheadID',
+            $ID
+        );
+    }
+
+    function getLinesMessage()
+    {
+        return $this->linesMessage;
+    }
+
+    function setLinesMessage($message)
+    {
+        if (func_get_arg(0)) $this->setFormErrorOn();
+        $this->linesMessage = $message;
+    }
+
+    function getCurrentDocumentsLink($customerID,
+                                     &$buCustomer
     )
     {
-        $this->setMethodName('checkUpdatedByAnotherUser');
-        if ($pageDate != $orderDate) {
-            $this->setFormErrorMessage(
-                '** ANOTHER USER HAS UPDATED THE ORDER **. Your action was abandoned and the latest version is now shown on this page'
-            );
-            $this->displayOrder();
-            exit;
+
+        if (!$buCustomer) {
+            $buCustomer = new BUCustomer($this);
         }
+        $currentDocumentsLink = null;
+        if ($buCustomer->customerFolderExists($customerID)) {
+            $currentDocumentsPath = $buCustomer->checkCurrentDocumentsFolderExists($customerID);
+            $currentDocumentsLink = '<a href="file:' . $currentDocumentsPath . '" target="_blank" title="Documentation">Documentation</a>';
+        }
+        return $currentDocumentsLink;
+    }
+
+    function getSalutation()
+    {
+        return $this->salutation;
+    }
+
+    function setSalutation($salutation)
+    {
+        $this->salutation = $salutation;
+    }
+
+    function getIntroduction()
+    {
+        return $this->introduction;
+    }
+
+    function setIntroduction($text)
+    {
+        $this->introduction = $text;
+    }
+
+    function getEmailSubject()
+    {
+        return $this->emailSubject;
+    }
+
+    function setEmailSubject($message)
+    {
+        $this->emailSubject = $message;
+    }
+
+    function getUserMessage()
+    {
+        return $this->userMessage;
+    }
+
+    function setUserMessage($message)
+    {
+        if (func_get_arg(0)) $this->setFormErrorOn();
+        $this->userMessage = $message;
+    }
+
+    function getUploadUserMessage()
+    {
+        return $this->uploadUserMessage;
+    }
+
+    function setUploadUserMessage($message)
+    {
+        if (func_get_arg(0)) $this->setFormErrorOn();
+        $this->uploadUserMessage = $message;
+    }
+
+    function getQuoteFileMessage()
+    {
+        return $this->quoteFileMessage;
+    }
+
+    function setQuoteFileMessage($message)
+    {
+        if (func_get_arg(0)) $this->setFormErrorOn();
+        $this->quoteFileMessage = $message;
     }
 
     /**
-     * Edit/Add Order Line
-     * @access private
-     * @throws Exception
+     * @param $dsQuotation DataSet
+     * @return bool
      */
-    function editOrderLine()
+    private function checkQuoteDocFile($dsQuotation)
     {
-        $this->setMethodName('editOrderLine');
-        if (!$this->getOrdheadID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return;
+        $quoteFile = $dsQuotation->getValue(DBEQuotation::ordheadID) . '_' . $dsQuotation->getValue(
+                DBEQuotation::versionNo
+            );
+        if (!$dsQuotation->getValue(DBEQuotation::fileExtension)) {
+            $quoteFile .= '.pdf';
+        } else {
+            $quoteFile .= '.' . $this->dsQuotation->getValue(
+                    DBEQuotation::fileExtension
+                );        // if no extension in DB then assume PDF
         }
-        $dsOrdhead = new DataSet($this);
-        if (!$this->buSalesOrder->getOrdheadByID(
-            $this->getOrdheadID(),
-            $dsOrdhead
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
-            return;
-        }
-        $this->checkUpdatedByAnotherUser(
-            $this->getParam('updatedTime'),
-            $dsOrdhead->getValue(DBEOrdhead::updatedTime)
-        );
-        if (($dsOrdhead->getValue(DBEOrdhead::type) != 'Q') & ($dsOrdhead->getValue(DBEOrdhead::type) != 'I')) {
-            $this->displayFatalError(CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL);
-            return;
-        }
-        if ($this->getSequenceNo() === null) {
-            $this->displayFatalError(CTSALESORDER_MSG_SEQNO_NOT_PASSED);
-            return;
-        }
-        if (!$this->formError) {
-            if ($this->getAction() == CTSALESORDER_ACT_EDIT_ORDLINE) {
-                if (!$this->buSalesOrder->getOrdlineByIDSeqNo(
-                    $this->getOrdheadID(),
-                    $this->getSequenceNo(),
-                    $this->dsOrdline
-                )) {
-                    $this->displayFatalError(CTSALESORDER_MSG_ORDLINE_NOT_FND);
-                    return;
-                }
-            } else {
-                $this->buSalesOrder->initialiseNewOrdline(
-                    $this->getOrdheadID(),
-                    $this->getSequenceNo(),
-                    $this->dsOrdline
-                );
-            }
-        }
-        $this->setTemplateFiles(
-            array(
-                'SalesOrderHeadDisplay' => 'SalesOrderHeadDisplay.inc',
-                'SalesOrderLineEdit'    => 'SalesOrderLineEdit.inc',
-                'SalesOrderLineEditJS'  => 'SalesOrderLineEditJS.inc' // javascript
-            )
-        );
-        $this->displaySalesOrderHeader($dsOrdhead);
-        $this->orderLineForm($dsOrdhead);
-        $this->template->parse(
-            'salesOrderLineEditJS',
-            'SalesOrderLineEditJS',
-            true
-        );
-        $this->template->parse(
-            'salesOrderHeadDisplay',
-            'SalesOrderHeadDisplay',
-            true
-        );
-        $this->template->parse(
-            'CONTENTS',
-            'SalesOrderLineEdit',
-            true
-        );
-        $this->parsePage();
+        return file_exists('quotes/' . $quoteFile);
+    }
+
+    function getSequenceNo()
+    {
+        return $this->sequenceNo;
+    }
+
+    function setSequenceNo($no)
+    {
+        $this->sequenceNo = $no;
     }
 
     /**
@@ -2646,6 +2597,14 @@ class CTSalesOrder extends CTCNC
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
+        $urlTemplatePopup =
+            Controller::buildLink(
+                "QuotationTemplate.php",
+                array(
+                    'action'  => CTCNC_ACT_DISP_TEMPLATE_QUOTATION_POPUP,
+                    'htmlFmt' => CT_HTML_FMT_POPUP
+                )
+            );
         $urlItemEdit =
             Controller::buildLink(
                 CTCNC_PAGE_ITEM,
@@ -2695,7 +2654,8 @@ class CTSalesOrder extends CTCNC
                 array(
                     "I" => "Item",
                     "C" => "Comment",
-                    "S" => "Sales Order"
+                    "S" => "Sales Order",
+                    "T" => "Template"
                 );
         }
 
@@ -2719,459 +2679,298 @@ class CTSalesOrder extends CTCNC
                 true
             );
         }
+    }
+
+
+
+
+    /**
+     * @param $ordheadID
+     * @param $templateName
+     * @throws Exception
+     */
+    function documents($ordheadID,
+                       $templateName
+    )
+    {
+        $this->template->set_block(
+            $templateName,
+            'salesOrderDocumentBlock',
+            'salesOrderDocuments'
+        );
+
+        $buSalesOrderDocument = new BUSalesOrderDocument($this);
+        $dsSalesOrderDocument = new DataSet($this);
+        $buSalesOrderDocument->getDocumentsByOrdheadID(
+            $ordheadID,
+            $dsSalesOrderDocument
+        );
+
+        $urlAddDocument =
+            Controller::buildLink(
+                'SalesOrderDocument.php',
+                array(
+                    'action'    => 'add',
+                    'ordheadID' => $ordheadID
+                )
+            );
+
+
+        $this->template->set_var(
+            array(
+                'txtAddDocument' => 'Add document',
+                'urlAddDocument' => $urlAddDocument
+            )
+        );
+
+        while ($dsSalesOrderDocument->fetchNext()) {
+
+            $urlEditDocument =
+                Controller::buildLink(
+                    'SalesOrderDocument.php',
+                    array(
+                        'action'               => 'edit',
+                        'salesOrderDocumentID' => $dsSalesOrderDocument->getValue(
+                            DBESalesOrderDocument::salesOrderDocumentID
+                        )
+                    )
+                );
+
+            $urlViewFile =
+                Controller::buildLink(
+                    'SalesOrderDocument.php',
+                    array(
+                        'action'               => 'viewFile',
+                        'salesOrderDocumentID' => $dsSalesOrderDocument->getValue(
+                            DBESalesOrderDocument::salesOrderDocumentID
+                        )
+                    )
+                );
+
+            $urlDeleteDocument =
+                Controller::buildLink(
+                    'SalesOrderDocument.php',
+                    array(
+                        'action'               => 'delete',
+                        'salesOrderDocumentID' => $dsSalesOrderDocument->getValue(
+                            DBESalesOrderDocument::salesOrderDocumentID
+                        )
+                    )
+                );
+
+            $createdDate = null;
+            if ($dsSalesOrderDocument->getValue(DBESalesOrderDocument::createdDate)) {
+                $createdDate = date_format(
+                    date_create($dsSalesOrderDocument->getValue(DBESalesOrderDocument::createdDate)),
+                    'd/m/Y H:i:s'
+                );
+            }
+
+            $this->template->set_var(
+                array(
+                    'description'       => $dsSalesOrderDocument->getValue(DBESalesOrderDocument::description),
+                    'filename'          => $dsSalesOrderDocument->getValue(DBESalesOrderDocument::filename),
+                    'createdDate'       => $createdDate,
+                    'urlViewFile'       => $urlViewFile,
+                    'urlEditDocument'   => $urlEditDocument,
+                    'urlDeleteDocument' => $urlDeleteDocument,
+                )
+            );
+            $this->template->parse(
+                'salesOrderDocuments',
+                'salesOrderDocumentBlock',
+                true
+            );
+
+        } // end while
+
+        $this->template->parse(
+            'salesOrderDisplayDocuments',
+            'SalesOrderDisplayDocuments',
+            true
+        );
+    }
+
+    /**
+     * send quote.
+     * @access private
+     * @throws Exception
+     */
+    function sendQuoteDoc()
+    {
+        $this->setMethodName('sendQuoteDoc');
+        if (!$this->getQuotationID()) {
+            $this->displayFatalError(CTSALESORDER_MSG_QUOTEID_NOT_PASSED);
+            return;
+        }
+        if (!$this->buSalesOrder->getQuoteByID(
+            $this->getQuotationID(),
+            $this->dsQuotation
+        )) {
+            $this->displayFatalError(CTSALESORDER_MSG_QUOTE_NOT_FOUND);
+            return;
+        }
+        $this->dsQuotation->fetchNext();
+        $updateDB = TRUE;
+        // if this is a PDF file then send an email to the customer else simply st the sent date.
+        if ($this->dsQuotation->getValue(DBEQuotation::documentType) == 'quotation') {
+            $buPDFSalesQuote = new BUPDFSalesQuote($this);
+            $updateDB = $buPDFSalesQuote->sendPDFEmailQuote($this->getQuotationID());
+        }
+        if ($updateDB) {
+            $this->dsQuotation->setUpdateModeUpdate();
+            $this->dsQuotation->setValue(
+                DBEQuotation::sentDateTime,
+                date('Y-m-d H:i:s')
+            );
+            $this->dsQuotation->post();
+            $this->buSalesOrder->insertQuotation($this->dsQuotation);
+        }
+        $this->setOrdheadID($this->dsQuotation->getValue(DBEQuotation::ordheadID));
+        header('Location: ' . $this->getDisplayOrderURL());
+        exit;
+    }
+
+    function getQuotationID()
+    {
+        return $this->quotationID;
+    }
+
+    function setQuotationID($quotationID)
+    {
+        $this->setNumericVar(
+            'quotationID',
+            $quotationID
+        );
+    } // End function Display Sales Order Header
+
+    /**
+     * delete a quote document
+     * @access private
+     * @throws Exception
+     */
+    function deleteQuoteDoc()
+    {
+        $this->setMethodName('deleteQuoteDoc');
+        if (!$this->getQuotationID()) {
+            $this->displayFatalError(CTSALESORDER_MSG_QUOTEID_NOT_PASSED);
+            return;
+        }
+        if (!$this->buSalesOrder->getQuoteByID(
+            $this->getQuotationID(),
+            $this->dsQuotation
+        )) {
+            $this->displayFatalError(CTSALESORDER_MSG_QUOTE_NOT_FOUND);
+            return;
+        }
+        $this->setOrdheadID($this->dsQuotation->getValue(DBEQuotation::ordheadID));
+        $quoteFile =
+            'quotes/' .
+            $this->dsQuotation->getValue(DBEQuotation::ordheadID) . '_' . $this->dsQuotation->getValue(
+                DBEQuotation::versionNo
+            ) . '.' .
+            $this->dsQuotation->getValue(DBEQuotation::fileExtension);
+        $this->buSalesOrder->deleteQuotationDoc($this->getQuotationID());
+        unlink($quoteFile);
+        header('Location: ' . $this->getDisplayOrderURL());
+        exit;
+    }
+
+    /**
+     * Update order lines details
+     * This is when the Update button has been clicked from the SalesOrderDisplay screen
+     * and processes an array of order line information:
+     * Qty, Unit Cost and Unit Sale.
+     * @access private
+     * @throws Exception
+     */
+    function updateLines()
+    {
+        $this->setMethodName('updateLines');
+        if (!$this->getParam('ordheadID')) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
+            return;
+        } else {
+            $this->setOrdheadID($this->getParam('ordheadID'));
+        }
+        $dsOrdhead = new DataSet($this);
+        if (!$this->buSalesOrder->getOrdheadByID(
+            $this->getOrdheadID(),
+            $dsOrdhead
+        )) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
+            return;
+        }
+        $this->checkUpdatedByAnotherUser(
+            $this->getParam('updatedTime'),
+            $dsOrdhead->getValue(DBEOrdhead::updatedTime)
+        );
+        if (($dsOrdhead->getValue(DBEOrdhead::type) != 'Q') & ($dsOrdhead->getValue(DBEOrdhead::type) != 'I')) {
+            $this->displayFatalError(CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL);
+            return;
+        }
+        $dbeJOrdline = new DBEJOrdline($this);
+        $this->dsOrdline = new DataSet($this);
+        $this->dsOrdline->copyColumnsFrom($dbeJOrdline);
+        if (!$this->dsOrdline->populateFromArray($this->getParam('ordline'))) {
+            $this->lineValidationError = 'One or more order line values are invalid';
+            $this->displayOrder();
+        } else {
+            // update the order
+            $this->buSalesOrder->updateOrderLineValues(
+                $this->getOrdheadID(),
+                $this->dsOrdline
+            );
+            header('Location: ' . $this->getDisplayOrderURL());
+        }
+    }
+
+    /**
+     * This function deals with the case where another user has updated the order we are attempting
+     * to update.
+     * $pageDate has been POSTED from the page and indicates the version of the record we intend to change
+     * if, however, the orderDate is different then another user has already updated the record and so
+     * we must not. Instead, we display a message and load the latest version of the record.
+     * @access private
+     * @param $pageDate
+     * @param $orderDate
+     * @throws Exception
+     */
+    function checkUpdatedByAnotherUser($pageDate,
+                                       $orderDate
+    )
+    {
+        $this->setMethodName('checkUpdatedByAnotherUser');
+        if ($pageDate != $orderDate) {
+            $this->setFormErrorMessage(
+                '** ANOTHER USER HAS UPDATED THE ORDER **. Your action was abandoned and the latest version is now shown on this page'
+            );
+            $this->displayOrder();
+            exit;
+        }
     }// end function orderLineForm()
 
     /**
-     * Update/Insert order line
+     * Convert quote to order
+     *
+     * 1. If all lines have been selected using checkboxes and Convert To Order
+     * button has been pressed then the status of the quote is set to Initial Order.
+     *
+     * 2. If Copy To Order button has been pressed then a new Initial Order is created with the
+     * lines selected. The quote is left intact.
+     *
+     * 3. If some lines have been selected using checkboxes and Convert To Order
+     * button has been pressed then do 2.
      *
      * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
      * @throws Exception
      */
-    function updateOrderLine()
-    {
-        $this->setMethodName('updateOrderLine');
-        // pasting lines from another Sales Order
-        if ($this->getParam('ordline')[1]['lineType'] == 'S') {
-            $this->pasteLinesFromSO();
-            exit;
-        }
-        $this->dsOrdline = new DataSet($this);
-        $dbeOrdline = new DBEOrdline($this);
-        $this->dsOrdline->copyColumnsFrom($dbeOrdline);
-        $this->dsOrdline->addColumn(
-            self::descriptionMessage,
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsOrdline->addColumn(
-            self::supplierName,
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsOrdline->addColumn(
-            self::supplierNameMessage,
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsOrdline->addColumn(
-            self::qtyOrderedMessage,
-            DA_STRING,
-            DA_NOT_NULL
-        );
-        $this->dsOrdline->addColumn(
-            self::curUnitCostMessage,
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $this->dsOrdline->addColumn(
-            self::curUnitSaleMessage,
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        if ($this->getParam('ordline')[1]['lineType'] == "I") {                    // Item line
-            $this->dsOrdline->setNull(
-                DBEOrdline::itemID,
-                DA_NOT_NULL
-            );
-            $this->dsOrdline->setNull(
-                DBEOrdline::supplierID,
-                DA_NOT_NULL
-            );
-            $this->dsOrdline->setNull(
-                DBEOrdline::qtyOrdered,
-                DA_NOT_NULL
-            );
-            $this->dsOrdline->setNull(
-                DBEOrdline::curUnitCost,
-                DA_NOT_NULL
-            );
-            $this->dsOrdline->setNull(
-                DBEOrdline::curUnitSale,
-                DA_NOT_NULL
-            );
-            $this->dsOrdline->setNull(
-                DBEJOrdline::supplierName,
-                DA_NOT_NULL
-            );
-            $this->dsOrdline->setNull(
-                DBEOrdline::description,
-                DA_NOT_NULL
-            );
-        } else {                                                                                                        // Comment line
-            $this->dsOrdline->setNull(
-                DBEOrdline::itemID,
-                DA_ALLOW_NULL
-            );
-            $this->dsOrdline->setNull(
-                DBEOrdline::qtyOrdered,
-                DA_ALLOW_NULL
-            );
-            $this->dsOrdline->setNull(
-                DBEOrdline::curUnitCost,
-                DA_ALLOW_NULL
-            );
-            $this->dsOrdline->setNull(
-                DBEOrdline::curUnitSale,
-                DA_ALLOW_NULL
-            );
-            $this->dsOrdline->setNull(
-                DBEJOrdline::supplierName,
-                DA_ALLOW_NULL
-            );
-            $this->dsOrdline->setNull(
-                DBEOrdline::supplierID,
-                DA_ALLOW_NULL
-            );
-            $this->dsOrdline->setNull(
-                DBEOrdline::description,
-                DA_NOT_NULL
-            );
-        }
-        $this->formError = !$this->dsOrdline->populateFromArray($this->getParam('ordline'));
-
-        $this->setOrdheadID($this->dsOrdline->getValue(DBEOrdhead::ordheadID));
-        $dsOrdhead = new DataSet($this);
-        if (!$this->buSalesOrder->getOrdheadByID(
-            $this->getOrdheadID(),
-            $dsOrdhead
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
-            return;
-        }
-        $this->checkUpdatedByAnotherUser(
-            $this->getParam('updatedTime'),
-            $dsOrdhead->getValue(DBEOrdhead::updatedTime)
-        );
-
-        // Validate Item line
-        if ($this->formError) {                    // Form error so redisplay edit form
-            if ($this->getAction() == CTSALESORDER_ACT_INSERT_ORDLINE) {
-                $this->setAction(CTSALESORDER_ACT_ADD_ORDLINE);
-            } else {
-                $this->setAction(CTSALESORDER_ACT_UPDATE_ORDLINE);
-            }
-            $this->setSequenceNo($this->dsOrdline->getValue(DBEOrdline::sequenceNo));
-            $this->editOrderLine();
-            exit;
-        }
-        if ($this->getAction() == CTSALESORDER_ACT_INSERT_ORDLINE) {
-            $this->buSalesOrder->insertNewOrderLine($this->dsOrdline);
-        } else {
-            $this->buSalesOrder->updateOrderLine($this->dsOrdline);
-        }
-        header('Location: ' . $this->getDisplayOrderURL());
-    }
-
-    /**
-     * Paste lines from another Sales Order onto the end of this one
-     * $this->getParam('ordline')[1]['description'] holds ordheadID of order to paste from
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function pasteLinesFromSO()
-    {
-        $this->setMethodName('pasteLinesFromSO');
-        $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
-        if (!is_numeric($this->getParam('ordline')[1]['description'])) {
-            $this->setFormErrorMessage('Sales order number must be numeric');
-            $this->displayOrder();
-            return;
-        }
-        if (!$this->buSalesOrder->getOrdheadByID(
-            $this->getParam('ordline')[1]['description'],
-            $dsOrdhead
-        )) {
-            $this->setFormErrorMessage('The sales order you are trying to paste from does not exist');
-            $this->displayOrder();
-            return;
-        }
-        $this->buSalesOrder->pasteLinesFromOrder(
-            $this->getParam('ordline')[1]['description'],
-            $this->getOrdheadID()
-        );
-        $this->displayOrder();
-        exit;
-    }
-
-    /**
-     * Move order line up
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function moveOrderLineUp()
-    {
-        $this->setMethodName('moveOrderLineUp');
-        $this->moveOrderLineValidation();
-        $this->buSalesOrder->moveOrderLineUp(
-            $this->getOrdheadID(),
-            $this->getSequenceNo()
-        );
-        header('Location: ' . $this->getDisplayOrderURL());
-    }
-
-    /**
-     * Move order line down
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function moveOrderLineDown()
-    {
-        $this->setMethodName('moveOrderLineDown');
-        $this->moveOrderLineValidation();
-        $this->buSalesOrder->moveOrderLineDown(
-            $this->getOrdheadID(),
-            $this->getSequenceNo()
-        );
-        header('Location: ' . $this->getDisplayOrderURL());
-    }
-
-    /**
-     * Delete order line
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function deleteOrderLine()
-    {
-        $this->setMethodName('deleteOrderLine');
-        if (!$this->buSalesOrder->getOrdheadByID(
-            $this->getOrdheadID(),
-            $dsOrdhead
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
-        }
-        $this->moveOrderLineValidation();
-        $this->buSalesOrder->deleteOrderLine(
-            $this->getOrdheadID(),
-            $this->getSequenceNo()
-        );
-        header('Location: ' . $this->getDisplayOrderURL());
-    }
-
-    /**
-     * @throws Exception
-     */
-    function moveOrderLineValidation()
+    function convertToOrder()
     {
         if (!$this->getOrdheadID()) {
             $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
+            return false;
         }
-        $dsOrdhead = new DataSet($this);
-        if (!$this->buSalesOrder->getOrdheadByID(
-            $this->getOrdheadID(),
-            $dsOrdhead
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
-        }
-        $this->checkUpdatedByAnotherUser(
-            $this->getParam('updatedTime'),
-            $dsOrdhead->getValue(DBEOrdhead::updatedTime)
-        );
-        if ($this->getSequenceNo() === null) {
-            $this->displayFatalError(CTSALESORDER_MSG_SEQNO_NOT_PASSED);
-        }
-    }
-
-    /**
-     * Update order address
-     * @access private
-     * @throws Exception
-     */
-    function updateAddress()
-    {
-        $this->setMethodName('updateAddress');
-        if (!$this->getOrdheadID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return;
-        }
-        $dsOrdhead = new DataSet($this);
-        if (!$this->buSalesOrder->getOrderWithCustomerName(
-            $this->getOrdheadID(),
-            $dsOrdhead,
-            $dsOrdline,
-            $dsDeliveryContact
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
-            return;
-        }
-        if (($dsOrdhead->getValue(DBEOrdhead::type) != 'Q') & ($dsOrdhead->getValue(DBEOrdhead::type) != 'I')) {
-            $this->displayFatalError(CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL);
-            return;
-        }
-        $this->checkUpdatedByAnotherUser(
-            $this->getParam('updatedTime'),
-            $dsOrdhead->getValue(DBEOrdhead::updatedTime)
-        );
-        if ($this->getAction() == CTSALESORDER_ACT_UPDATE_INV_ADDRESS) {
-            $this->buSalesOrder->updateInvoiceAddress(
-                $this->getOrdheadID(),
-                $this->getSiteNo()
-            );
-        } else {
-            $this->buSalesOrder->updateDeliveryAddress(
-                $this->getOrdheadID(),
-                $this->getSiteNo()
-            );
-        }
-        header('Location: ' . $this->getDisplayOrderURL());
-        exit;
-    }
-
-    /**
-     * Update order contact
-     * @access private
-     * @throws Exception
-     */
-    function updateContact()
-    {
-        $this->setMethodName('updateContact');
-        if (!$this->getOrdheadID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return;
-        }
-        if (!$this->getContactID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_CONTACTID_NOT_PASSED);
-            return;
-        }
-        $dsOrdhead = new DataSet($this);
-        if (!$this->buSalesOrder->getOrderWithCustomerName(
-            $this->getOrdheadID(),
-            $dsOrdhead,
-            $dsOrdline,
-            $dsDeliveryContact
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
-            return;
-        }
-        $this->checkUpdatedByAnotherUser(
-            $this->getParam('updatedTime'),
-            $dsOrdhead->getValue(DBEOrdhead::updatedTime)
-        );
-        if (($dsOrdhead->getValue(DBEOrdhead::type) != 'Q') & ($dsOrdhead->getValue(DBEOrdhead::type) != 'I')) {
-            $this->displayFatalError(CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL);
-            return;
-        }
-        if ($this->getAction() == CTSALESORDER_ACT_UPDATE_INV_CONTACT) {
-            $this->buSalesOrder->updateInvoiceContact(
-                $this->getOrdheadID(),
-                $this->getContactID()
-            );
-        } else {
-            $this->buSalesOrder->updateDeliveryContact(
-                $this->getOrdheadID(),
-                $this->getContactID()
-            );
-        }
-        header('Location: ' . $this->getDisplayOrderURL());
-        exit;
-    }
-
-    /**
-     * upload a quote document from local client
-     * @access private
-     * @throws Exception
-     */
-    function uploadQuoteDoc()
-    {
-        $this->setMethodName('uploadQuoteDoc');
-        if (!$this->getOrdheadID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return FALSE;
-        }
-        if (!$_FILES['quoteFile']['name']) {
-            $this->setQuoteFileMessage('You must specify a document to load');
-        }
-        if ($_FILES['quoteFile']['name']) {                // User has sent a file
-            if (!is_uploaded_file($_FILES['quoteFile']['tmp_name'])) {                    // Possible hack?
-                $this->setQuoteFileMessage(CTPROJECT_MSG_DOCUMENT_NOT_LOADED);
-            }
-            if ($_FILES['quoteFile']['size'] == 0) {
-                $this->setQuoteFileMessage(CTPROJECT_MSG_DOCUMENT_NOT_LOADED);
-            }
-        }
-
-        if (isset($_FILES['userFile']) && $_FILES['userfile']['size'] > CTPROJECT_MAX_DOCUMENT_FILE_SIZE) {
-            $this->setQuoteFileMessage(CTPROJECT_MSG_DOCUMENT_TOO_BIG);
-        }
-        if ($this->formError) {
-            $this->displayOrder();                // redisplay with error message(s)
-            exit;
-        }
-        // Insert into database
-        $dsOrdhead = new DataSet($this);
-        if (!$this->buSalesOrder->getOrderWithCustomerName(
-            $this->getOrdheadID(),
-            $dsOrdhead,
-            $dsOrdline,
-            $dsDeliveryContact
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
-        }
-        $versionNo = $this->buSalesOrder->getNextQuoteVersion($this->getOrdheadID());
-        $quoteFile = $GLOBALS['cfg']['quote_path'] . '/' . $this->getOrdheadID() . '_' . $versionNo;//.'.pdf';
-        $extension = substr(
-            $_FILES['quoteFile']['name'],
-            strpos(
-                $_FILES['quoteFile']['name'],
-                '.'
-            ) + 1,
-            3
-        );
-        move_uploaded_file(
-            $_FILES['quoteFile']['tmp_name'],
-            $quoteFile . '.' . $extension
-        ); // use original extension
-        $this->dsQuotation->setUpdateModeInsert();
-        $this->dsQuotation->setValue(
-            DBEQuotation::versionNo,
-            $versionNo
-        );
-        $this->dsQuotation->setValue(
-            DBEQuotation::ordheadID,
-            $dsOrdhead->getValue(DBEOrdhead::ordheadID)
-        );
-        $this->dsQuotation->setValue(
-            DBEQuotation::userID,
-            $this->userID
-        );
-        $this->dsQuotation->setValue(
-            DBEQuotation::sentDateTime,
-            null
-        );
-        $this->dsQuotation->setValue(
-            DBEQuotation::salutation,
-            $this->getSalutation()
-        );
-        $this->dsQuotation->setValue(
-            DBEQuotation::fileExtension,
-            $extension
-        );
-        $this->dsQuotation->setValue(
-            DBEQuotation::documentType,
-            'manualUpload'
-        );
-        $this->dsQuotation->post();
-        $this->buSalesOrder->insertQuotation($this->dsQuotation);
-        header('Location: ' . $this->getDisplayOrderURL());
-        exit;
-    }
-
-    /**
-     * generate a PDF quote.
-     * @access private
-     * @throws Exception
-     */
-    function generateQuoteDoc()
-    {
-        $this->setMethodName('generateQuoteDoc');
         if (count($this->postVars['selectedOrderLine']) == 0) {
             $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
             $this->displayOrder();
@@ -3179,38 +2978,160 @@ class CTSalesOrder extends CTCNC
         } else {
             $this->setSelectedOrderLines($this->postVars['selectedOrderLine']);
         }
-        if (!$this->getSalutation()) {
-            $this->setUserMessage(CTSALESORDER_MSG_SELECT_SALUTATION);
-            $this->displayOrder();
+        $convertToOrder = ($this->getAction() == CTSALESORDER_ACT_CONVERT_TO_ORDER); // determine action to take below
+        $this->setOrdheadID(
+            $this->buSalesOrder->convertQuoteToOrder(
+                $this->getOrdheadID(),
+                $convertToOrder,
+                $this->dsSelectedOrderLine
+            )
+        );
+        header('Location: ' . $this->getDisplayOrderURL());
+        exit;
+    }
+
+    function setSelectedOrderLines($array)
+    {
+        if (!is_array($array)) {
             return FALSE;
         }
-        if (!$this->getIntroduction()) {
-            $this->setUserMessage(CTSALESORDER_MSG_SELECT_INTRODUCTION);
-            $this->displayOrder();
-            return FALSE;
+        foreach ($array as $value) {
+            $this->dsSelectedOrderLine->setUpdateModeInsert();
+            $this->dsSelectedOrderLine->setValue(
+                DBEOrdline::sequenceNo,
+                $value
+            );
+            $this->dsSelectedOrderLine->post();
         }
+        return TRUE;
+    }
+
+    /**
+     * @return bool
+     * @throws Exception
+     */
+    function insertFromOrder()
+    {
         if (!$this->getOrdheadID()) {
             $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return FALSE;
+            return false;
         }
-        //$this->buildQuote($quoteFile, $versionNo);
+        if (!$this->getFromOrdheadID()) {
+            $this->setLinesMessage('No From Sales Order entered');
+            $this->displayOrder();
+            return false;
+        }
 
-        $buPDFSalesQuote = new BUPDFSalesQuote($this);
-        try {
-            $buPDFSalesQuote->generate(
-                $this->getOrdheadID(),
-                $this->getSalutation(),
-                $this->getIntroduction(),
-                $this->getEmailSubject(),
-                $this->dsSelectedOrderLine
-            );
-            header('Location: ' . $this->getDisplayOrderURL());
-        } catch (Exception $exception) {
-            $this->setUserMessage($exception->getMessage());
+        if (!$this->buSalesOrder->getOrdheadByID(
+            $this->getFromOrdheadID(),
+            $dsOrdhead
+        )) {
+            $this->setLinesMessage('From Sales Order not found');
+            $this->displayOrder();
+            return false;
+        }
+
+        if (count($this->postVars['selectedOrderLine']) != 1) {
+            $this->setLinesMessage('Select a line before which to insert order');
             $this->displayOrder();
             return FALSE;
         }
-        return true;
+        $this->buSalesOrder->pasteLinesFromOrder(
+            $this->getFromOrdheadID(),
+            $this->getOrdheadID(),
+            false,
+            $this->postVars['selectedOrderLine'][0]
+        );
+        header('Location: ' . $this->getDisplayOrderURL());
+        exit;
+    }
+
+    /**
+     * Delete order lines
+     *    Deletes selected lines from order
+     * @access private
+     * @throws Exception
+     */
+    function deleteLines()
+    {
+        if (!$this->getOrdheadID()) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
+            return false;
+        }
+        if (!$this->buSalesOrder->getOrderWithCustomerName(
+            $this->getOrdheadID(),
+            $dsOrdhead,
+            $dsOrdline,
+            $dsDeliveryContact
+        )) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
+            return false;
+        }
+        if (count($this->postVars['selectedOrderLine']) == 0) {
+            $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
+            $this->displayOrder();
+            return FALSE;
+        } else {
+            $this->setSelectedOrderLines($this->postVars['selectedOrderLine']);
+        }
+        $this->buSalesOrder->deleteLines(
+            $this->getOrdheadID(),
+            $this->dsSelectedOrderLine
+        );
+        header('Location: ' . $this->getDisplayOrderURL());
+        exit;
+    }
+
+    /**
+     * @return bool|void
+     * @throws Exception
+     */
+    function changeSupplier()
+    {
+        if (!$this->getOrdheadID()) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
+            return false;
+        }
+        if (!$this->getUpdateSupplierID()) {
+            $this->setLinesMessage('Supplier not set');
+            $this->displayOrder();
+            return FALSE;
+        }
+        if (!$this->buSalesOrder->getOrderWithCustomerName(
+            $this->getOrdheadID(),
+            $dsOrdhead,
+            $dsOrdline,
+            $dsDeliveryContact
+        )) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
+            return;
+        }
+        if (count($this->postVars['selectedOrderLine']) == 0) {
+            $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
+            $this->displayOrder();
+            return FALSE;
+        } else {
+            $this->setSelectedOrderLines($this->postVars['selectedOrderLine']);
+        }
+        $this->buSalesOrder->changeSupplier(
+            $this->getOrdheadID(),
+            $this->getUpdateSupplierID(),
+            $this->dsSelectedOrderLine
+        );
+        header('Location: ' . $this->getDisplayOrderURL());
+    }
+
+    function getUpdateSupplierID()
+    {
+        return $this->updateSupplierID;
+    }
+
+    function setUpdateSupplierID($updateSupplierID)
+    {
+        $this->setNumericVar(
+            'updateSupplierID',
+            $updateSupplierID
+        );
     }
 
     /**
@@ -3601,136 +3522,13 @@ class CTSalesOrder extends CTCNC
     }
 
     /**
-     * @throws Exception
-     */
-    function sendReminderQuote()
-    {
-        $this->setMethodName('sendReminderQuote');
-        if (!$this->getQuotationID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_QUOTEID_NOT_PASSED);
-            return;
-        }
-        if (!$this->buSalesOrder->getQuoteByID(
-            $this->getQuotationID(),
-            $this->dsQuotation
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_QUOTE_NOT_FOUND);
-            return;
-        }
-        $this->dsQuotation->fetchNext();
-        if (!$this->emailSubject) {
-            $this->displayFatalError('Email Subject Missing');
-            return;
-        }
-
-        if ($this->dsQuotation->getValue(DBEJQuotation::fileExtension) == 'pdf') {
-            $buPDFSalesQuote = new BUPDFSalesQuote($this);
-            $buPDFSalesQuote->sendReminderPDFEmailQuote(
-                $this->getQuotationID(),
-                $this->emailSubject
-            );
-            $ordHeadID = $this->dsQuotation->getValue(DBEQuotation::ordheadID);
-            $dbeQuotation = new DBEQuotation($this);
-            $dbeQuotation->setValue(
-                DBEQuotation::ordheadID,
-                $ordHeadID
-            );
-
-            $versionNo = $this->buSalesOrder->getNextQuoteVersion($ordHeadID);
-            $previousVersion = $this->dsQuotation->getValue(DBEQuotation::versionNo);
-            $previousFile = 'quotes/' . $ordHeadID . '_' . $previousVersion . '.pdf';
-            $newFile = 'quotes/' . $ordHeadID . '_' . $versionNo . '.pdf';
-
-            copy(
-                $previousFile,
-                $newFile
-            );
-
-            $dbeQuotation->setValue(
-                DBEQuotation::versionNo,
-                $versionNo
-            );
-            $dbeQuotation->setValue(
-                DBEQuotation::salutation,
-                $this->dsQuotation->getValue(DBEQuotation::salutation)
-            );
-            $dbeQuotation->setValue(
-                DBEQuotation::emailSubject,
-                $this->dsQuotation->getValue(DBEQuotation::emailSubject)
-            );
-            $dbeQuotation->setValue(
-                DBEQuotation::sentDateTime,
-                date('Y-m-d H:i:s')
-            );
-            $dbeQuotation->setValue(
-                DBEQuotation::userID,
-                $this->dsQuotation->getValue(DBEQuotation::userID)
-            );
-            $dbeQuotation->setValue(
-                DBEQuotation::fileExtension,
-                $this->dsQuotation->getValue(DBEQuotation::fileExtension)
-            );
-            $dbeQuotation->setValue(
-                DBEQuotation::documentType,
-                'reminder'
-            );
-            $dbeQuotation->insertRow();
-
-        }
-
-        $this->setOrdheadID($this->dsQuotation->getValue(DBEJQuotation::ordheadID));
-        header('Location: ' . $this->getDisplayOrderURL());
-        exit;
-    }
-
-    /**
-     * send quote.
+     * generate a PDF quote.
      * @access private
      * @throws Exception
      */
-    function sendQuoteDoc()
+    function generateQuoteDoc()
     {
-        $this->setMethodName('sendQuoteDoc');
-        if (!$this->getQuotationID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_QUOTEID_NOT_PASSED);
-            return;
-        }
-        if (!$this->buSalesOrder->getQuoteByID(
-            $this->getQuotationID(),
-            $this->dsQuotation
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_QUOTE_NOT_FOUND);
-            return;
-        }
-        $this->dsQuotation->fetchNext();
-        $updateDB = TRUE;
-        // if this is a PDF file then send an email to the customer else simply st the sent date.
-        if ($this->dsQuotation->getValue(DBEQuotation::documentType) == 'quotation') {
-            $buPDFSalesQuote = new BUPDFSalesQuote($this);
-            $updateDB = $buPDFSalesQuote->sendPDFEmailQuote($this->getQuotationID());
-        }
-        if ($updateDB) {
-            $this->dsQuotation->setUpdateModeUpdate();
-            $this->dsQuotation->setValue(
-                DBEQuotation::sentDateTime,
-                date('Y-m-d H:i:s')
-            );
-            $this->dsQuotation->post();
-            $this->buSalesOrder->insertQuotation($this->dsQuotation);
-        }
-        $this->setOrdheadID($this->dsQuotation->getValue(DBEQuotation::ordheadID));
-        header('Location: ' . $this->getDisplayOrderURL());
-        exit;
-    }
-
-    /**
-     * generate a CSV of the selected lines.
-     * @access private
-     * @throws Exception
-     */
-    function downloadCSV()
-    {
-        $this->setMethodName('downloadCSV');
+        $this->setMethodName('generateQuoteDoc');
         if (count($this->postVars['selectedOrderLine']) == 0) {
             $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
             $this->displayOrder();
@@ -3738,11 +3536,73 @@ class CTSalesOrder extends CTCNC
         } else {
             $this->setSelectedOrderLines($this->postVars['selectedOrderLine']);
         }
+        if (!$this->getSalutation()) {
+            $this->setUserMessage(CTSALESORDER_MSG_SELECT_SALUTATION);
+            $this->displayOrder();
+            return FALSE;
+        }
+        if (!$this->getIntroduction()) {
+            $this->setUserMessage(CTSALESORDER_MSG_SELECT_INTRODUCTION);
+            $this->displayOrder();
+            return FALSE;
+        }
         if (!$this->getOrdheadID()) {
             $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
             return FALSE;
         }
-        $dsOrdline = new DataSet($this);
+        //$this->buildQuote($quoteFile, $versionNo);
+
+        $buPDFSalesQuote = new BUPDFSalesQuote($this);
+        try {
+            $buPDFSalesQuote->generate(
+                $this->getOrdheadID(),
+                $this->getSalutation(),
+                $this->getIntroduction(),
+                $this->getEmailSubject(),
+                $this->dsSelectedOrderLine
+            );
+            header('Location: ' . $this->getDisplayOrderURL());
+        } catch (Exception $exception) {
+            $this->setUserMessage($exception->getMessage());
+            $this->displayOrder();
+            return FALSE;
+        }
+        return true;
+    }
+
+    /**
+     * upload a quote document from local client
+     * @access private
+     * @throws Exception
+     */
+    function uploadQuoteDoc()
+    {
+        $this->setMethodName('uploadQuoteDoc');
+        if (!$this->getOrdheadID()) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
+            return FALSE;
+        }
+        if (!$_FILES['quoteFile']['name']) {
+            $this->setQuoteFileMessage('You must specify a document to load');
+        }
+        if ($_FILES['quoteFile']['name']) {                // User has sent a file
+            if (!is_uploaded_file($_FILES['quoteFile']['tmp_name'])) {                    // Possible hack?
+                $this->setQuoteFileMessage(CTPROJECT_MSG_DOCUMENT_NOT_LOADED);
+            }
+            if ($_FILES['quoteFile']['size'] == 0) {
+                $this->setQuoteFileMessage(CTPROJECT_MSG_DOCUMENT_NOT_LOADED);
+            }
+        }
+
+        if (isset($_FILES['userFile']) && $_FILES['userfile']['size'] > CTPROJECT_MAX_DOCUMENT_FILE_SIZE) {
+            $this->setQuoteFileMessage(CTPROJECT_MSG_DOCUMENT_TOO_BIG);
+        }
+        if ($this->formError) {
+            $this->displayOrder();                // redisplay with error message(s)
+            exit;
+        }
+        // Insert into database
+        $dsOrdhead = new DataSet($this);
         if (!$this->buSalesOrder->getOrderWithCustomerName(
             $this->getOrdheadID(),
             $dsOrdhead,
@@ -3751,98 +3611,51 @@ class CTSalesOrder extends CTCNC
         )) {
             $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
         }
-
-        $fileName = 'order.csv';
-        Header('Content-type: text/plain');
-        Header('Content-Disposition: attachment; filename=' . $fileName);
-
-        print    "quantity, description , unitSale\n";
-
-        while ($dsOrdline->fetchNext()) {
-
-            if ($this->dsSelectedOrderLine->search(
-                'sequenceNo',
-                $dsOrdline->getValue(DBEOrdline::sequenceNo)
-            )) {
-
-                if ($dsOrdline->getValue(DBEJOrdline::itemDescription)) {
-                    $description = $dsOrdline->getValue(DBEJOrdline::itemDescription);                // from item table
-                } else {
-                    $description = $dsOrdline->getValue(DBEOrdline::description);
-                }
-                $qtyOrdered = null;
-                $unitSale = null;
-
-                if ($dsOrdline->getValue(DBEOrdline::lineType) == "I") { // item line
-
-                    $qtyOrdered = number_format(
-                        $dsOrdline->getValue(DBEOrdline::qtyOrdered),
-                        2
-                    );
-                    $unitSale = number_format(
-                        $dsOrdline->getValue(DBEOrdline::curUnitSale),
-                        2
-                    );
-                    /*
-					if we have item notes then add them to the description
-					*/
-                    if ($dsOrdline->getValue(DBEOrdline::itemID)) {
-                        // some item lines do not have a related item record
-                        $dsItem = new DataSet($this);
-                        $this->buItem->getItemByID(
-                            $dsOrdline->getValue(DBEOrdline::itemID),
-                            $dsItem
-                        );
-
-                        if ($dsItem->getValue(DBEItem::notes)) {
-                            $description .= "\n" . str_replace(
-                                    chr(13),
-                                    '',
-                                    $dsItem->getValue(DBEItem::notes)
-                                );
-                        }
-                    }
-
-                }
-
-                print    '"' . $qtyOrdered . '","' . $description . '","' . $unitSale . "\"\n";
-
-
-            }
-        }
-
-        $this->pageClose();
-        exit;
-    }
-
-    /**
-     * delete a quote document
-     * @access private
-     * @throws Exception
-     */
-    function deleteQuoteDoc()
-    {
-        $this->setMethodName('deleteQuoteDoc');
-        if (!$this->getQuotationID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_QUOTEID_NOT_PASSED);
-            return;
-        }
-        if (!$this->buSalesOrder->getQuoteByID(
-            $this->getQuotationID(),
-            $this->dsQuotation
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_QUOTE_NOT_FOUND);
-            return;
-        }
-        $this->setOrdheadID($this->dsQuotation->getValue(DBEQuotation::ordheadID));
-        $quoteFile =
-            'quotes/' .
-            $this->dsQuotation->getValue(DBEQuotation::ordheadID) . '_' . $this->dsQuotation->getValue(
-                DBEQuotation::versionNo
-            ) . '.' .
-            $this->dsQuotation->getValue(DBEQuotation::fileExtension);
-        $this->buSalesOrder->deleteQuotationDoc($this->getQuotationID());
-        unlink($quoteFile);
+        $versionNo = $this->buSalesOrder->getNextQuoteVersion($this->getOrdheadID());
+        $quoteFile = $GLOBALS['cfg']['quote_path'] . '/' . $this->getOrdheadID() . '_' . $versionNo;//.'.pdf';
+        $extension = substr(
+            $_FILES['quoteFile']['name'],
+            strpos(
+                $_FILES['quoteFile']['name'],
+                '.'
+            ) + 1,
+            3
+        );
+        move_uploaded_file(
+            $_FILES['quoteFile']['tmp_name'],
+            $quoteFile . '.' . $extension
+        ); // use original extension
+        $this->dsQuotation->setUpdateModeInsert();
+        $this->dsQuotation->setValue(
+            DBEQuotation::versionNo,
+            $versionNo
+        );
+        $this->dsQuotation->setValue(
+            DBEQuotation::ordheadID,
+            $dsOrdhead->getValue(DBEOrdhead::ordheadID)
+        );
+        $this->dsQuotation->setValue(
+            DBEQuotation::userID,
+            $this->userID
+        );
+        $this->dsQuotation->setValue(
+            DBEQuotation::sentDateTime,
+            null
+        );
+        $this->dsQuotation->setValue(
+            DBEQuotation::salutation,
+            $this->getSalutation()
+        );
+        $this->dsQuotation->setValue(
+            DBEQuotation::fileExtension,
+            $extension
+        );
+        $this->dsQuotation->setValue(
+            DBEQuotation::documentType,
+            'manualUpload'
+        );
+        $this->dsQuotation->post();
+        $this->buSalesOrder->insertQuotation($this->dsQuotation);
         header('Location: ' . $this->getDisplayOrderURL());
         exit;
     }
@@ -3948,140 +3761,13 @@ class CTSalesOrder extends CTCNC
     }
 
     /**
-     * Get and parse order type drop-down selector
-     * @access private
-     * @param $orderType
-     */
-    function parseOrderTypeSelector($orderType)
-    {
-        foreach ($this->orderTypeArray as $key => $value) {
-            $orderTypeSelected = ($orderType == $key) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    'orderTypeSelected'    => $orderTypeSelected,
-                    'orderType'            => $key,
-                    'orderTypeDescription' => $value
-                )
-            );
-            $this->template->parse(
-                'orderTypes',
-                'orderTypeBlock',
-                true
-            );
-        }
-    }
-
-    function parseUserSelector($userID)
-    {
-        $dsUser = new DataSet($this);
-        $this->buSalesOrder->getSalesUsers($dsUser);
-
-        while ($dsUser->fetchNext()) {
-            $userSelected = ($userID == $dsUser->getValue(DBEUser::userID)) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    'userSelected' => $userSelected,
-                    'userID'       => $dsUser->getValue(DBEUser::userID),
-                    'userName'     => $dsUser->getValue(DBEUser::name)
-                )
-            );
-            $this->template->parse(
-                'users',
-                'userBlock',
-                true
-            );
-        }
-    }
-
-    /**
-     * Get and parse user drop-down selector
-     * @access private
-     * @param $siteNo
-     * @param $dsSite DataSet|DBESite
-     * @param $blockVar
-     * @param $block
-     */
-    function parseSiteSelector($siteNo,
-                               &$dsSite,
-                               $blockVar,
-                               $block
-    )
-    {
-        while ($dsSite->fetchNext()) {
-            $siteSelected = ($dsSite->getValue(DBESite::siteNo) == $siteNo) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    $block . 'Selected' => $siteSelected,
-                    $block . 'SiteNo'   => $dsSite->getValue(DBESite::siteNo),
-                    $block . 'Add1'     => $dsSite->getValue(DBESite::add1),
-                    $block . 'Add2'     => $dsSite->getValue(DBESite::add2),
-                    $block . 'Add3'     => $dsSite->getValue(DBESite::add3),
-                    $block . 'Town'     => $dsSite->getValue(DBESite::town),
-                    $block . 'County'   => $dsSite->getValue(DBESite::county),
-                    $block . 'Postcode' => $dsSite->getValue(DBESite::postcode)
-                )
-            );
-            $this->template->parse(
-                $blockVar,
-                $block,
-                true
-            );
-        }
-    }
-
-    /**
-     * Get and parse contact drop-down selector
-     * @access private
-     * @param $contactID
-     * @param $dsContact DBEContact|DataSet
-     * @param $blockVar
-     * @param $block
-     */
-    function parseContactSelector($contactID,
-                                  &$dsContact,
-                                  $blockVar,
-                                  $block
-    )
-    {
-        while ($dsContact->fetchNext()) {
-            $contactSelected = ($dsContact->getValue(DBEContact::contactID) == $contactID) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    $block . 'Selected'  => $contactSelected,
-                    $block . 'ContactID' => $dsContact->getValue(DBEContact::contactID),
-                    $block . 'FirstName' => $dsContact->getValue(DBEContact::firstName),
-                    $block . 'LastName'  => $dsContact->getValue(DBEContact::lastName)
-                )
-            );
-            $this->template->parse(
-                $blockVar,
-                $block,
-                true
-            );
-        }
-    }
-
-    /**
-     * Convert quote to order
-     *
-     * 1. If all lines have been selected using checkboxes and Convert To Order
-     * button has been pressed then the status of the quote is set to Initial Order.
-     *
-     * 2. If Copy To Order button has been pressed then a new Initial Order is created with the
-     * lines selected. The quote is left intact.
-     *
-     * 3. If some lines have been selected using checkboxes and Convert To Order
-     * button has been pressed then do 2.
-     *
+     * generate a CSV of the selected lines.
      * @access private
      * @throws Exception
      */
-    function convertToOrder()
+    function downloadCSV()
     {
-        if (!$this->getOrdheadID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return false;
-        }
+        $this->setMethodName('downloadCSV');
         if (count($this->postVars['selectedOrderLine']) == 0) {
             $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
             $this->displayOrder();
@@ -4089,71 +3775,11 @@ class CTSalesOrder extends CTCNC
         } else {
             $this->setSelectedOrderLines($this->postVars['selectedOrderLine']);
         }
-        $convertToOrder = ($this->getAction() == CTSALESORDER_ACT_CONVERT_TO_ORDER); // determine action to take below
-        $this->setOrdheadID(
-            $this->buSalesOrder->convertQuoteToOrder(
-                $this->getOrdheadID(),
-                $convertToOrder,
-                $this->dsSelectedOrderLine
-            )
-        );
-        header('Location: ' . $this->getDisplayOrderURL());
-        exit;
-    }
-
-    /**
-     * @return bool
-     * @throws Exception
-     */
-    function insertFromOrder()
-    {
         if (!$this->getOrdheadID()) {
             $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return false;
-        }
-        if (!$this->getFromOrdheadID()) {
-            $this->setLinesMessage('No From Sales Order entered');
-            $this->displayOrder();
-            return false;
-        }
-
-        if (!$this->buSalesOrder->getOrdheadByID(
-            $this->getFromOrdheadID(),
-            $dsOrdhead
-        )) {
-            $this->setLinesMessage('From Sales Order not found');
-            $this->displayOrder();
-            return false;
-        }
-
-        if (count($this->postVars['selectedOrderLine']) != 1) {
-            $this->setLinesMessage('Select a line before which to insert order');
-            $this->displayOrder();
             return FALSE;
         }
-        $this->buSalesOrder->pasteLinesFromOrder(
-            $this->getFromOrdheadID(),
-            $this->getOrdheadID(),
-            false,
-            $this->postVars['selectedOrderLine'][0]
-        );
-        header('Location: ' . $this->getDisplayOrderURL());
-        exit;
-    }
-
-
-    /**
-     * Delete order lines
-     *    Deletes selected lines from order
-     * @access private
-     * @throws Exception
-     */
-    function deleteLines()
-    {
-        if (!$this->getOrdheadID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return false;
-        }
+        $dsOrdline = new DataSet($this);
         if (!$this->buSalesOrder->getOrderWithCustomerName(
             $this->getOrdheadID(),
             $dsOrdhead,
@@ -4161,38 +3787,84 @@ class CTSalesOrder extends CTCNC
             $dsDeliveryContact
         )) {
             $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
-            return false;
         }
-        if (count($this->postVars['selectedOrderLine']) == 0) {
-            $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
-            $this->displayOrder();
-            return FALSE;
-        } else {
-            $this->setSelectedOrderLines($this->postVars['selectedOrderLine']);
+
+        $fileName = 'order.csv';
+        Header('Content-type: text/plain');
+        Header('Content-Disposition: attachment; filename=' . $fileName);
+
+        print    "quantity, description , unitSale\n";
+
+        while ($dsOrdline->fetchNext()) {
+
+            if ($this->dsSelectedOrderLine->search(
+                'sequenceNo',
+                $dsOrdline->getValue(DBEOrdline::sequenceNo)
+            )) {
+
+                if ($dsOrdline->getValue(DBEJOrdline::itemDescription)) {
+                    $description = $dsOrdline->getValue(DBEJOrdline::itemDescription);                // from item table
+                } else {
+                    $description = $dsOrdline->getValue(DBEOrdline::description);
+                }
+                $qtyOrdered = null;
+                $unitSale = null;
+
+                if ($dsOrdline->getValue(DBEOrdline::lineType) == "I") { // item line
+
+                    $qtyOrdered = number_format(
+                        $dsOrdline->getValue(DBEOrdline::qtyOrdered),
+                        2
+                    );
+                    $unitSale = number_format(
+                        $dsOrdline->getValue(DBEOrdline::curUnitSale),
+                        2
+                    );
+                    /*
+					if we have item notes then add them to the description
+					*/
+                    if ($dsOrdline->getValue(DBEOrdline::itemID)) {
+                        // some item lines do not have a related item record
+                        $dsItem = new DataSet($this);
+                        $this->buItem->getItemByID(
+                            $dsOrdline->getValue(DBEOrdline::itemID),
+                            $dsItem
+                        );
+
+                        if ($dsItem->getValue(DBEItem::notes)) {
+                            $description .= "\n" . str_replace(
+                                    chr(13),
+                                    '',
+                                    $dsItem->getValue(DBEItem::notes)
+                                );
+                        }
+                    }
+
+                }
+
+                print    '"' . $qtyOrdered . '","' . $description . '","' . $unitSale . "\"\n";
+
+
+            }
         }
-        $this->buSalesOrder->deleteLines(
-            $this->getOrdheadID(),
-            $this->dsSelectedOrderLine
-        );
-        header('Location: ' . $this->getDisplayOrderURL());
+
+        $this->pageClose();
         exit;
     }
 
     /**
-     * @return bool|void
+     * Update order address
+     * @access private
      * @throws Exception
      */
-    function changeSupplier()
+    function updateAddress()
     {
+        $this->setMethodName('updateAddress');
         if (!$this->getOrdheadID()) {
             $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return false;
+            return;
         }
-        if (!$this->getUpdateSupplierID()) {
-            $this->setLinesMessage('Supplier not set');
-            $this->displayOrder();
-            return FALSE;
-        }
+        $dsOrdhead = new DataSet($this);
         if (!$this->buSalesOrder->getOrderWithCustomerName(
             $this->getOrdheadID(),
             $dsOrdhead,
@@ -4202,17 +3874,430 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
             return;
         }
-        if (count($this->postVars['selectedOrderLine']) == 0) {
-            $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
-            $this->displayOrder();
-            return FALSE;
-        } else {
-            $this->setSelectedOrderLines($this->postVars['selectedOrderLine']);
+        if (($dsOrdhead->getValue(DBEOrdhead::type) != 'Q') & ($dsOrdhead->getValue(DBEOrdhead::type) != 'I')) {
+            $this->displayFatalError(CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL);
+            return;
         }
-        $this->buSalesOrder->changeSupplier(
+        $this->checkUpdatedByAnotherUser(
+            $this->getParam('updatedTime'),
+            $dsOrdhead->getValue(DBEOrdhead::updatedTime)
+        );
+        if ($this->getAction() == CTSALESORDER_ACT_UPDATE_INV_ADDRESS) {
+            $this->buSalesOrder->updateInvoiceAddress(
+                $this->getOrdheadID(),
+                $this->getSiteNo()
+            );
+        } else {
+            $this->buSalesOrder->updateDeliveryAddress(
+                $this->getOrdheadID(),
+                $this->getSiteNo()
+            );
+        }
+        header('Location: ' . $this->getDisplayOrderURL());
+        exit;
+    }
+
+    function getSiteNo()
+    {
+        return $this->siteNo;
+    }
+
+    function setSiteNo($siteNo)
+    {
+        $this->siteNo = $siteNo;
+    }
+
+    /**
+     * Update order contact
+     * @access private
+     * @throws Exception
+     */
+    function updateContact()
+    {
+        $this->setMethodName('updateContact');
+        if (!$this->getOrdheadID()) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
+            return;
+        }
+        if (!$this->getContactID()) {
+            $this->displayFatalError(CTSALESORDER_MSG_CONTACTID_NOT_PASSED);
+            return;
+        }
+        $dsOrdhead = new DataSet($this);
+        if (!$this->buSalesOrder->getOrderWithCustomerName(
             $this->getOrdheadID(),
-            $this->getUpdateSupplierID(),
-            $this->dsSelectedOrderLine
+            $dsOrdhead,
+            $dsOrdline,
+            $dsDeliveryContact
+        )) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
+            return;
+        }
+        $this->checkUpdatedByAnotherUser(
+            $this->getParam('updatedTime'),
+            $dsOrdhead->getValue(DBEOrdhead::updatedTime)
+        );
+        if (($dsOrdhead->getValue(DBEOrdhead::type) != 'Q') & ($dsOrdhead->getValue(DBEOrdhead::type) != 'I')) {
+            $this->displayFatalError(CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL);
+            return;
+        }
+        if ($this->getAction() == CTSALESORDER_ACT_UPDATE_INV_CONTACT) {
+            $this->buSalesOrder->updateInvoiceContact(
+                $this->getOrdheadID(),
+                $this->getContactID()
+            );
+        } else {
+            $this->buSalesOrder->updateDeliveryContact(
+                $this->getOrdheadID(),
+                $this->getContactID()
+            );
+        }
+        header('Location: ' . $this->getDisplayOrderURL());
+        exit;
+    }
+
+    function getContactID()
+    {
+        return $this->contactID;
+    }
+
+    function setContactID($id)
+    {
+        $this->contactID = $id;
+    }
+
+    /**
+     * Edit/Add Order Line
+     * @access private
+     * @throws Exception
+     */
+    function editOrderLine()
+    {
+        $this->setMethodName('editOrderLine');
+        if (!$this->getOrdheadID()) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
+            return;
+        }
+        $dsOrdhead = new DataSet($this);
+        if (!$this->buSalesOrder->getOrdheadByID(
+            $this->getOrdheadID(),
+            $dsOrdhead
+        )) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
+            return;
+        }
+        $this->checkUpdatedByAnotherUser(
+            $this->getParam('updatedTime'),
+            $dsOrdhead->getValue(DBEOrdhead::updatedTime)
+        );
+        if (($dsOrdhead->getValue(DBEOrdhead::type) != 'Q') & ($dsOrdhead->getValue(DBEOrdhead::type) != 'I')) {
+            $this->displayFatalError(CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL);
+            return;
+        }
+        if ($this->getSequenceNo() === null) {
+            $this->displayFatalError(CTSALESORDER_MSG_SEQNO_NOT_PASSED);
+            return;
+        }
+        if (!$this->formError) {
+            if ($this->getAction() == CTSALESORDER_ACT_EDIT_ORDLINE) {
+                if (!$this->buSalesOrder->getOrdlineByIDSeqNo(
+                    $this->getOrdheadID(),
+                    $this->getSequenceNo(),
+                    $this->dsOrdline
+                )) {
+                    $this->displayFatalError(CTSALESORDER_MSG_ORDLINE_NOT_FND);
+                    return;
+                }
+            } else {
+                $this->buSalesOrder->initialiseNewOrdline(
+                    $this->getOrdheadID(),
+                    $this->getSequenceNo(),
+                    $this->dsOrdline
+                );
+            }
+        }
+        $this->setTemplateFiles(
+            array(
+                'SalesOrderHeadDisplay' => 'SalesOrderHeadDisplay.inc',
+                'SalesOrderLineEdit'    => 'SalesOrderLineEdit.inc',
+                'SalesOrderLineEditJS'  => 'SalesOrderLineEditJS.inc' // javascript
+            )
+        );
+        $this->displaySalesOrderHeader($dsOrdhead);
+        $this->orderLineForm($dsOrdhead);
+        $this->template->parse(
+            'salesOrderLineEditJS',
+            'SalesOrderLineEditJS',
+            true
+        );
+        $this->template->parse(
+            'salesOrderHeadDisplay',
+            'SalesOrderHeadDisplay',
+            true
+        );
+        $this->template->parse(
+            'CONTENTS',
+            'SalesOrderLineEdit',
+            true
+        );
+        $this->parsePage();
+    }
+
+    /**
+     * Update/Insert order line
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function updateOrderLine()
+    {
+        $this->setMethodName('updateOrderLine');
+        // pasting lines from another Sales Order
+        if ($this->getParam('ordline')[1]['lineType'] == 'S') {
+            $this->pasteLinesFromSO();
+            exit;
+        }
+        $this->dsOrdline = new DataSet($this);
+        $dbeOrdline = new DBEOrdline($this);
+        $this->dsOrdline->copyColumnsFrom($dbeOrdline);
+        $this->dsOrdline->addColumn(
+            self::descriptionMessage,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsOrdline->addColumn(
+            self::supplierName,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsOrdline->addColumn(
+            self::supplierNameMessage,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsOrdline->addColumn(
+            self::qtyOrderedMessage,
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $this->dsOrdline->addColumn(
+            self::curUnitCostMessage,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->dsOrdline->addColumn(
+            self::curUnitSaleMessage,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        if ($this->getParam('ordline')[1]['lineType'] == "I") {                    // Item line
+            $this->dsOrdline->setNull(
+                DBEOrdline::itemID,
+                DA_NOT_NULL
+            );
+            $this->dsOrdline->setNull(
+                DBEOrdline::supplierID,
+                DA_NOT_NULL
+            );
+            $this->dsOrdline->setNull(
+                DBEOrdline::qtyOrdered,
+                DA_NOT_NULL
+            );
+            $this->dsOrdline->setNull(
+                DBEOrdline::curUnitCost,
+                DA_NOT_NULL
+            );
+            $this->dsOrdline->setNull(
+                DBEOrdline::curUnitSale,
+                DA_NOT_NULL
+            );
+            $this->dsOrdline->setNull(
+                DBEJOrdline::supplierName,
+                DA_NOT_NULL
+            );
+            $this->dsOrdline->setNull(
+                DBEOrdline::description,
+                DA_NOT_NULL
+            );
+        } else {                                                                                                        // Comment line
+            $this->dsOrdline->setNull(
+                DBEOrdline::itemID,
+                DA_ALLOW_NULL
+            );
+            $this->dsOrdline->setNull(
+                DBEOrdline::qtyOrdered,
+                DA_ALLOW_NULL
+            );
+            $this->dsOrdline->setNull(
+                DBEOrdline::curUnitCost,
+                DA_ALLOW_NULL
+            );
+            $this->dsOrdline->setNull(
+                DBEOrdline::curUnitSale,
+                DA_ALLOW_NULL
+            );
+            $this->dsOrdline->setNull(
+                DBEJOrdline::supplierName,
+                DA_ALLOW_NULL
+            );
+            $this->dsOrdline->setNull(
+                DBEOrdline::supplierID,
+                DA_ALLOW_NULL
+            );
+            $this->dsOrdline->setNull(
+                DBEOrdline::description,
+                DA_NOT_NULL
+            );
+        }
+        $this->formError = !$this->dsOrdline->populateFromArray($this->getParam('ordline'));
+
+        $this->setOrdheadID($this->dsOrdline->getValue(DBEOrdhead::ordheadID));
+        $dsOrdhead = new DataSet($this);
+        if (!$this->buSalesOrder->getOrdheadByID(
+            $this->getOrdheadID(),
+            $dsOrdhead
+        )) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
+            return;
+        }
+        $this->checkUpdatedByAnotherUser(
+            $this->getParam('updatedTime'),
+            $dsOrdhead->getValue(DBEOrdhead::updatedTime)
+        );
+
+        // Validate Item line
+        if ($this->formError) {                    // Form error so redisplay edit form
+            if ($this->getAction() == CTSALESORDER_ACT_INSERT_ORDLINE) {
+                $this->setAction(CTSALESORDER_ACT_ADD_ORDLINE);
+            } else {
+                $this->setAction(CTSALESORDER_ACT_UPDATE_ORDLINE);
+            }
+            $this->setSequenceNo($this->dsOrdline->getValue(DBEOrdline::sequenceNo));
+            $this->editOrderLine();
+            exit;
+        }
+        if ($this->getAction() == CTSALESORDER_ACT_INSERT_ORDLINE) {
+            $this->buSalesOrder->insertNewOrderLine($this->dsOrdline);
+        } else {
+            $this->buSalesOrder->updateOrderLine($this->dsOrdline);
+        }
+        header('Location: ' . $this->getDisplayOrderURL());
+    }
+
+    /**
+     * Paste lines from another Sales Order onto the end of this one
+     * $this->getParam('ordline')[1]['description'] holds ordheadID of order to paste from
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function pasteLinesFromSO()
+    {
+        $this->setMethodName('pasteLinesFromSO');
+        $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
+        if (!is_numeric($this->getParam('ordline')[1]['description'])) {
+            $this->setFormErrorMessage('Sales order number must be numeric');
+            $this->displayOrder();
+            return;
+        }
+        if (!$this->buSalesOrder->getOrdheadByID(
+            $this->getParam('ordline')[1]['description'],
+            $dsOrdhead
+        )) {
+            $this->setFormErrorMessage('The sales order you are trying to paste from does not exist');
+            $this->displayOrder();
+            return;
+        }
+        $this->buSalesOrder->pasteLinesFromOrder(
+            $this->getParam('ordline')[1]['description'],
+            $this->getOrdheadID()
+        );
+        $this->displayOrder();
+        exit;
+    }
+
+    /**
+     * Move order line up
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function moveOrderLineUp()
+    {
+        $this->setMethodName('moveOrderLineUp');
+        $this->moveOrderLineValidation();
+        $this->buSalesOrder->moveOrderLineUp(
+            $this->getOrdheadID(),
+            $this->getSequenceNo()
+        );
+        header('Location: ' . $this->getDisplayOrderURL());
+    }
+
+    /**
+     * @throws Exception
+     */
+    function moveOrderLineValidation()
+    {
+        if (!$this->getOrdheadID()) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
+        }
+        $dsOrdhead = new DataSet($this);
+        if (!$this->buSalesOrder->getOrdheadByID(
+            $this->getOrdheadID(),
+            $dsOrdhead
+        )) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
+        }
+        $this->checkUpdatedByAnotherUser(
+            $this->getParam('updatedTime'),
+            $dsOrdhead->getValue(DBEOrdhead::updatedTime)
+        );
+        if ($this->getSequenceNo() === null) {
+            $this->displayFatalError(CTSALESORDER_MSG_SEQNO_NOT_PASSED);
+        }
+    }
+
+    /**
+     * Move order line down
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function moveOrderLineDown()
+    {
+        $this->setMethodName('moveOrderLineDown');
+        $this->moveOrderLineValidation();
+        $this->buSalesOrder->moveOrderLineDown(
+            $this->getOrdheadID(),
+            $this->getSequenceNo()
+        );
+        header('Location: ' . $this->getDisplayOrderURL());
+    }
+
+    /**
+     * Delete order line
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function deleteOrderLine()
+    {
+        $this->setMethodName('deleteOrderLine');
+        if (!$this->buSalesOrder->getOrdheadByID(
+            $this->getOrdheadID(),
+            $dsOrdhead
+        )) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
+        }
+        $this->moveOrderLineValidation();
+        $this->buSalesOrder->deleteOrderLine(
+            $this->getOrdheadID(),
+            $this->getSequenceNo()
         );
         header('Location: ' . $this->getDisplayOrderURL());
     }
@@ -4257,55 +4342,6 @@ class CTSalesOrder extends CTCNC
         );
         header('Location: ' . $this->getDisplayOrderURL());
         exit;
-    }
-
-    /**
-     * Update order lines details
-     * This is when the Update button has been clicked from the SalesOrderDisplay screen
-     * and processes an array of order line information:
-     * Qty, Unit Cost and Unit Sale.
-     * @access private
-     * @throws Exception
-     */
-    function updateLines()
-    {
-        $this->setMethodName('updateLines');
-        if (!$this->getParam('ordheadID')) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return;
-        } else {
-            $this->setOrdheadID($this->getParam('ordheadID'));
-        }
-        $dsOrdhead = new DataSet($this);
-        if (!$this->buSalesOrder->getOrdheadByID(
-            $this->getOrdheadID(),
-            $dsOrdhead
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
-            return;
-        }
-        $this->checkUpdatedByAnotherUser(
-            $this->getParam('updatedTime'),
-            $dsOrdhead->getValue(DBEOrdhead::updatedTime)
-        );
-        if (($dsOrdhead->getValue(DBEOrdhead::type) != 'Q') & ($dsOrdhead->getValue(DBEOrdhead::type) != 'I')) {
-            $this->displayFatalError(CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL);
-            return;
-        }
-        $dbeJOrdline = new DBEJOrdline($this);
-        $this->dsOrdline = new DataSet($this);
-        $this->dsOrdline->copyColumnsFrom($dbeJOrdline);
-        if (!$this->dsOrdline->populateFromArray($this->getParam('ordline'))) {
-            $this->lineValidationError = 'One or more order line values are invalid';
-            $this->displayOrder();
-        } else {
-            // update the order
-            $this->buSalesOrder->updateOrderLineValues(
-                $this->getOrdheadID(),
-                $this->dsOrdline
-            );
-            header('Location: ' . $this->getDisplayOrderURL());
-        }
     }
 
     /**
@@ -4613,22 +4649,6 @@ now that the notes are in a text field we need to split the lines up for the PDF
     }
 
     /**
-     * @access private
-     * @throws Exception
-     */
-    function getDisplayOrderURL()
-    {
-        return Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action'    => CTCNC_ACT_DISP_SALESORDER,
-                'ordheadID' => $this->getOrdheadID()
-            )
-        );
-
-    }
-
-    /**
      * @throws Exception
      */
     function updateItemPrice()
@@ -4649,32 +4669,6 @@ now that the notes are in a text field we need to split the lines up for the PDF
 
         header('Location: ' . $this->getDisplayOrderURL());
 
-    }
-
-    /**
-     * Store selected SO lines in session var then redirect to serviceRequest()
-     * @return bool
-     * @throws Exception
-     */
-    function serviceRequestFromLines()
-    {
-        if (count($this->postVars['selectedOrderLine']) == 0) {
-            $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
-            $this->displayOrder();
-            return FALSE;
-        } else {
-            $this->setSessionParam('selectedOrderLine', $this->postVars['selectedOrderLine']);
-            $redirectUrl =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'    => 'serviceRequest',
-                        'ordheadID' => $this->getOrdheadID()
-                    )
-                );
-            header('Location: ' . $redirectUrl);
-        }
-        return true;
     }
 
     /**
@@ -4838,39 +4832,6 @@ now that the notes are in a text field we need to split the lines up for the PDF
 
     }
 
-    function standardTextList(
-        $template,
-        $block
-    )
-    {
-
-        $dbeStandardText = new DBEStandardText($this);
-
-        $dbeStandardText->getRowsByTypeID(3);
-
-        $this->template->set_block(
-            $template,
-            $block,
-            'rows'
-        );
-
-        while ($dbeStandardText->fetchNext()) {
-
-            $this->template->set_var(
-                array(
-                    'standardTextContent'     => htmlentities($dbeStandardText->getValue(DBEStandardText::stt_text)),
-                    'standardTextDescription' => $dbeStandardText->getValue(DBEStandardText::stt_desc)
-                )
-            );
-            $this->template->parse(
-                'rows',
-                $block,
-                true
-            );
-        }
-
-    }
-
     function contractDropdown(
         $customerID,
         $serviceRequestCustomerItemID,
@@ -4925,7 +4886,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
             );
         }
 
-    } // end contractDropdown
+    }
 
     function priorityDropdown(
         $serviceRequestPriority,
@@ -4959,148 +4920,372 @@ now that the notes are in a text field we need to split the lines up for the PDF
             );
         }
 
-    } // end contractDropdown
-
-    function getCurrentDocumentsLink($customerID,
-                                     &$buCustomer
-    )
-    {
-
-        if (!$buCustomer) {
-            $buCustomer = new BUCustomer($this);
-        }
-        $currentDocumentsLink = null;
-        if ($buCustomer->customerFolderExists($customerID)) {
-            $currentDocumentsPath = $buCustomer->checkCurrentDocumentsFolderExists($customerID);
-            $currentDocumentsLink = '<a href="file:' . $currentDocumentsPath . '" target="_blank" title="Documentation">Documentation</a>';
-        }
-        return $currentDocumentsLink;
     }
 
-    /**
-     * @param $ordheadID
-     * @param $templateName
-     * @throws Exception
-     */
-    function documents($ordheadID,
-                       $templateName
+    function standardTextList(
+        $template,
+        $block
     )
     {
+
+        $dbeStandardText = new DBEStandardText($this);
+
+        $dbeStandardText->getRowsByTypeID(3);
+
         $this->template->set_block(
-            $templateName,
-            'salesOrderDocumentBlock',
-            'salesOrderDocuments'
+            $template,
+            $block,
+            'rows'
         );
 
-        $buSalesOrderDocument = new BUSalesOrderDocument($this);
-        $dsSalesOrderDocument = new DataSet($this);
-        $buSalesOrderDocument->getDocumentsByOrdheadID(
-            $ordheadID,
-            $dsSalesOrderDocument
-        );
-
-        $urlAddDocument =
-            Controller::buildLink(
-                'SalesOrderDocument.php',
-                array(
-                    'action'    => 'add',
-                    'ordheadID' => $ordheadID
-                )
-            );
-
-
-        $this->template->set_var(
-            array(
-                'txtAddDocument' => 'Add document',
-                'urlAddDocument' => $urlAddDocument
-            )
-        );
-
-        while ($dsSalesOrderDocument->fetchNext()) {
-
-            $urlEditDocument =
-                Controller::buildLink(
-                    'SalesOrderDocument.php',
-                    array(
-                        'action'               => 'edit',
-                        'salesOrderDocumentID' => $dsSalesOrderDocument->getValue(
-                            DBESalesOrderDocument::salesOrderDocumentID
-                        )
-                    )
-                );
-
-            $urlViewFile =
-                Controller::buildLink(
-                    'SalesOrderDocument.php',
-                    array(
-                        'action'               => 'viewFile',
-                        'salesOrderDocumentID' => $dsSalesOrderDocument->getValue(
-                            DBESalesOrderDocument::salesOrderDocumentID
-                        )
-                    )
-                );
-
-            $urlDeleteDocument =
-                Controller::buildLink(
-                    'SalesOrderDocument.php',
-                    array(
-                        'action'               => 'delete',
-                        'salesOrderDocumentID' => $dsSalesOrderDocument->getValue(
-                            DBESalesOrderDocument::salesOrderDocumentID
-                        )
-                    )
-                );
-
-            $createdDate = null;
-            if ($dsSalesOrderDocument->getValue(DBESalesOrderDocument::createdDate)) {
-                $createdDate = date_format(
-                    date_create($dsSalesOrderDocument->getValue(DBESalesOrderDocument::createdDate)),
-                    'd/m/Y H:i:s'
-                );
-            }
+        while ($dbeStandardText->fetchNext()) {
 
             $this->template->set_var(
                 array(
-                    'description'       => $dsSalesOrderDocument->getValue(DBESalesOrderDocument::description),
-                    'filename'          => $dsSalesOrderDocument->getValue(DBESalesOrderDocument::filename),
-                    'createdDate'       => $createdDate,
-                    'urlViewFile'       => $urlViewFile,
-                    'urlEditDocument'   => $urlEditDocument,
-                    'urlDeleteDocument' => $urlDeleteDocument,
+                    'standardTextContent'     => htmlentities($dbeStandardText->getValue(DBEStandardText::stt_text)),
+                    'standardTextDescription' => $dbeStandardText->getValue(DBEStandardText::stt_desc)
                 )
             );
             $this->template->parse(
-                'salesOrderDocuments',
-                'salesOrderDocumentBlock',
+                'rows',
+                $block,
                 true
             );
+        }
 
-        } // end while
-
-        $this->template->parse(
-            'salesOrderDisplayDocuments',
-            'SalesOrderDisplayDocuments',
-            true
-        );
     }
 
     /**
-     * @param $dsQuotation DataSet
+     * Store selected SO lines in session var then redirect to serviceRequest()
      * @return bool
+     * @throws Exception
      */
-    private function checkQuoteDocFile($dsQuotation)
+    function serviceRequestFromLines()
     {
-        $quoteFile = $dsQuotation->getValue(DBEQuotation::ordheadID) . '_' . $dsQuotation->getValue(
-                DBEQuotation::versionNo
-            );
-        if (!$dsQuotation->getValue(DBEQuotation::fileExtension)) {
-            $quoteFile .= '.pdf';
+        if (count($this->postVars['selectedOrderLine']) == 0) {
+            $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
+            $this->displayOrder();
+            return FALSE;
         } else {
-            $quoteFile .= '.' . $this->dsQuotation->getValue(
-                    DBEQuotation::fileExtension
-                );        // if no extension in DB then assume PDF
+            $this->setSessionParam('selectedOrderLine', $this->postVars['selectedOrderLine']);
+            $redirectUrl =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'    => 'serviceRequest',
+                        'ordheadID' => $this->getOrdheadID()
+                    )
+                );
+            header('Location: ' . $redirectUrl);
         }
-        return file_exists('quotes/' . $quoteFile);
+        return true;
+    } // end contractDropdown
+
+    /**
+     * @throws Exception
+     */
+    function sendReminderQuote()
+    {
+        $this->setMethodName('sendReminderQuote');
+        if (!$this->getQuotationID()) {
+            $this->displayFatalError(CTSALESORDER_MSG_QUOTEID_NOT_PASSED);
+            return;
+        }
+        if (!$this->buSalesOrder->getQuoteByID(
+            $this->getQuotationID(),
+            $this->dsQuotation
+        )) {
+            $this->displayFatalError(CTSALESORDER_MSG_QUOTE_NOT_FOUND);
+            return;
+        }
+        $this->dsQuotation->fetchNext();
+        if (!$this->emailSubject) {
+            $this->displayFatalError('Email Subject Missing');
+            return;
+        }
+
+        if ($this->dsQuotation->getValue(DBEJQuotation::fileExtension) == 'pdf') {
+            $buPDFSalesQuote = new BUPDFSalesQuote($this);
+            $buPDFSalesQuote->sendReminderPDFEmailQuote(
+                $this->getQuotationID(),
+                $this->emailSubject
+            );
+            $ordHeadID = $this->dsQuotation->getValue(DBEQuotation::ordheadID);
+            $dbeQuotation = new DBEQuotation($this);
+            $dbeQuotation->setValue(
+                DBEQuotation::ordheadID,
+                $ordHeadID
+            );
+
+            $versionNo = $this->buSalesOrder->getNextQuoteVersion($ordHeadID);
+            $previousVersion = $this->dsQuotation->getValue(DBEQuotation::versionNo);
+            $previousFile = 'quotes/' . $ordHeadID . '_' . $previousVersion . '.pdf';
+            $newFile = 'quotes/' . $ordHeadID . '_' . $versionNo . '.pdf';
+
+            copy(
+                $previousFile,
+                $newFile
+            );
+
+            $dbeQuotation->setValue(
+                DBEQuotation::versionNo,
+                $versionNo
+            );
+            $dbeQuotation->setValue(
+                DBEQuotation::salutation,
+                $this->dsQuotation->getValue(DBEQuotation::salutation)
+            );
+            $dbeQuotation->setValue(
+                DBEQuotation::emailSubject,
+                $this->dsQuotation->getValue(DBEQuotation::emailSubject)
+            );
+            $dbeQuotation->setValue(
+                DBEQuotation::sentDateTime,
+                date('Y-m-d H:i:s')
+            );
+            $dbeQuotation->setValue(
+                DBEQuotation::userID,
+                $this->dsQuotation->getValue(DBEQuotation::userID)
+            );
+            $dbeQuotation->setValue(
+                DBEQuotation::fileExtension,
+                $this->dsQuotation->getValue(DBEQuotation::fileExtension)
+            );
+            $dbeQuotation->setValue(
+                DBEQuotation::documentType,
+                'reminder'
+            );
+            $dbeQuotation->insertRow();
+
+        }
+
+        $this->setOrdheadID($this->dsQuotation->getValue(DBEJQuotation::ordheadID));
+        header('Location: ' . $this->getDisplayOrderURL());
+        exit;
+    } // end contractDropdown
+
+    function createTemplatedQuote()
+    {
+
+        $dsInput = new DSForm($this);
+        $dsInput->addColumn(
+            "customerID",
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $dsInput->addColumn(
+            "customerString",
+            DA_STRING,
+            DA_NOT_NULL
+        );
+        $dsInput->addColumn(
+            "templates",
+            DA_ARRAY,
+            DA_ALLOW_NULL
+        );
+        $dsInput->addColumn(
+            "existingQuotationID",
+            DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+        $openTabURL = null;
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if ($dsInput->populateFromArray(
+                [$this->getParam('form')]
+            )) {
+                try {
+                    $destinationQuoteID = $this->createTemplatedQuoteDocument(
+                        $dsInput->getValue('customerID'),
+                        $dsInput->getValue('templates'),
+                        $dsInput->getValue('existingQuotationID')
+                    );
+                    $openTabURL = "/SalesOrder.php?action=displaySalesOrder&ordheadID=$destinationQuoteID";
+                } catch (Exception $exception) {
+                    $this->formErrorMessage = $exception->getMessage();
+                    $this->formError = true;
+                }
+            };
+        } else {
+            if ($this->getParam('customerID')) {
+                $dbeCustomer = new DBECustomer($this);
+                $dbeCustomer->getRow($this->getParam('customerID'));
+                if (!$dbeCustomer->rowCount()) {
+                    $this->raiseError('The customer provided does not exist');
+                    exit;
+                }
+                $dsInput->setValue('customerID', $this->getParam('customerID'));
+                $dsInput->setValue('customerString', $dbeCustomer->getValue(DBECustomer::name));
+            }
+        }
+
+        $this->setTemplateFiles('TemplatedQuote', 'TemplatedQuote');
+        $this->setPageTitle('Create Templated Sales Quotation');
+
+        $this->template->setVar(
+            [
+                "customerID"          => $dsInput->getValue('customerID'),
+                "customerString"      => $dsInput->getValue('customerString'),
+                'existingQuotationID' => $dsInput->getValue('existingQuotationID'),
+                'openTabURL'          => $openTabURL
+            ]
+        );
+
+        $this->template->setBlock('TemplatedQuote', 'templatesBlock', 'templates');
+        $this->quoteTemplatesSelector($dsInput->getValue('templates'), 'templates', 'templatesBlock');
+
+        $this->template->parse('CONTENTS', 'TemplatedQuote');
+        $this->parsePage();
+    }
+
+    /**
+     * @param $customerID
+     * @param $templateIDs
+     * @param $existingQuotationID
+     * @return bool
+     * @throws Exception
+     */
+    private function createTemplatedQuoteDocument($customerID, array $templateIDs, $existingQuotationID)
+    {
+        // check that the customer exits
+        $dbeCustomer = new DBECustomer($this);
+        $dbeCustomer->getRow($customerID);
+        if (!$dbeCustomer->rowCount()) {
+            throw new Exception('Customer does not exist');
+        }
+        $destinationQuotation = null;
+        //check the existingQuotationID refers to an existing quotation, which actually belongs to the customer given
+        $dbeSalesOrderHeader = new DBEOrdhead($this);
+        if ($existingQuotationID) {
+
+            $dbeSalesOrderHeader->getRow($existingQuotationID);
+            if (!$dbeSalesOrderHeader->rowCount()) {
+                throw new Exception('The given existing quotation does not exist');
+            }
+            if ($dbeSalesOrderHeader->getValue(DBEOrdhead::type) != 'Q') {
+                throw new Exception('The given existing quotation is not of Quotation type');
+            }
+            if ($dbeSalesOrderHeader->getValue(DBEOrdhead::customerID) != $customerID) {
+                throw new Exception('The given existing quotation does not belong to the given customer');
+            }
+            $destinationQuotation = $existingQuotationID;
+        } else {
+            // we have to create the quotation from scratch
+            $dsOrdline = new DataSet($this);
+            $dsOrdhead = new DataSet($this);
+            $this->buSalesOrder->initialiseQuote($dsOrdhead, $dsOrdline, $dbeCustomer);
+            $destinationQuotation = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
+        }
+
+        $dbeTemplateQuotation = new DBEQuotationTemplate($this);
+        foreach ($templateIDs as $templateID) {
+            $dbeTemplateQuotation->getRow($templateID);
+            $salesOrderID = $dbeTemplateQuotation->getValue(DBEQuotationTemplate::linkedSalesOrderId);
+            $this->buSalesOrder->pasteLinesFromOrder($salesOrderID, $destinationQuotation);
+        }
+        return $destinationQuotation;
+    }
+
+    /**
+     * Get and parse user drop-down selector
+     * @access private
+     * @param $selectedTemplateIds
+     * @param $blockVar
+     * @param $block
+     */
+    function quoteTemplatesSelector($selectedTemplateIds,
+                                    $blockVar,
+                                    $block
+    )
+    {
+        $dbeQuoteTemplates = new DBEQuotationTemplate($this);
+        $dbeQuoteTemplates->getRows();
+        while ($dbeQuoteTemplates->fetchNext()) {
+            $templateID = $dbeQuoteTemplates->getValue(DBEQuotationTemplate::id);
+            $selected = in_array(
+                $templateID,
+                $selectedTemplateIds
+            ) ? CT_SELECTED : null;
+            $this->template->set_var(
+                [
+                    "templateID"  => $templateID,
+                    "description" => $dbeQuoteTemplates->getValue(DBEQuotationTemplate::description),
+                    "selected"    => $selected
+                ]
+            );
+            $this->template->parse(
+                $blockVar,
+                $block,
+                true
+            );
+        }
+    }
+
+    /**
+     * Get and parse user drop-down selector
+     * @access private
+     * @param $siteNo
+     * @param $dsSite DataSet|DBESite
+     * @param $blockVar
+     * @param $block
+     */
+    function parseSiteSelector($siteNo,
+                               &$dsSite,
+                               $blockVar,
+                               $block
+    )
+    {
+        while ($dsSite->fetchNext()) {
+            $siteSelected = ($dsSite->getValue(DBESite::siteNo) == $siteNo) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    $block . 'Selected' => $siteSelected,
+                    $block . 'SiteNo'   => $dsSite->getValue(DBESite::siteNo),
+                    $block . 'Add1'     => $dsSite->getValue(DBESite::add1),
+                    $block . 'Add2'     => $dsSite->getValue(DBESite::add2),
+                    $block . 'Add3'     => $dsSite->getValue(DBESite::add3),
+                    $block . 'Town'     => $dsSite->getValue(DBESite::town),
+                    $block . 'County'   => $dsSite->getValue(DBESite::county),
+                    $block . 'Postcode' => $dsSite->getValue(DBESite::postcode)
+                )
+            );
+            $this->template->parse(
+                $blockVar,
+                $block,
+                true
+            );
+        }
+    }
+
+    /**
+     * Get and parse contact drop-down selector
+     * @access private
+     * @param $contactID
+     * @param $dsContact DBEContact|DataSet
+     * @param $blockVar
+     * @param $block
+     */
+    function parseContactSelector($contactID,
+                                  &$dsContact,
+                                  $blockVar,
+                                  $block
+    )
+    {
+        while ($dsContact->fetchNext()) {
+            $contactSelected = ($dsContact->getValue(DBEContact::contactID) == $contactID) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    $block . 'Selected'  => $contactSelected,
+                    $block . 'ContactID' => $dsContact->getValue(DBEContact::contactID),
+                    $block . 'FirstName' => $dsContact->getValue(DBEContact::firstName),
+                    $block . 'LastName'  => $dsContact->getValue(DBEContact::lastName)
+                )
+            );
+            $this->template->parse(
+                $blockVar,
+                $block,
+                true
+            );
+        }
     } // end function documents
 
 }

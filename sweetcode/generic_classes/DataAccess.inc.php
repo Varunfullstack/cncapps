@@ -217,6 +217,151 @@ class DataAccess extends BaseObject
     public $debug;
     public $colDefaultValue = [];
 
+    function __construct(&$owner)
+    {
+        BaseObject::__construct($owner);
+        $this->clear();
+    }
+
+    /**
+     * Clear-down the object as if it has just been created with no rows or columns
+     * @access public
+     * @return boolean Success
+     */
+    function clear()
+    {
+        $this->clearColumns();
+        $this->clearRows();
+        $this->resetPK();
+        $this->setAddColumnsOn();
+        $this->setClearRowsBeforeReplicateOff();
+        $this->resetUpdateMode();
+        $this->resetCallbackMethod(DA_AFTER_COLUMNS_CREATED);
+        $this->resetCallbackMethod(DA_BEFORE_POST);
+        $this->resetCallbackMethod(DA_AFTER_POST);
+        $this->eof = FALSE;
+        $this->initialise();
+        return TRUE;
+    }
+
+    /**
+     * Remove all columns
+     * @access public
+     * @return boolean Success
+     */
+    function clearColumns()
+    {
+        $this->setMethodName("clearColumns");
+        $this->clearRows();
+        $this->colName = array();
+        $this->colType = array();
+        $this->colNull = array();
+        return TRUE;
+    }
+
+    /**
+     * Remove all row data
+     * @access public
+     * @return boolean Success
+     */
+    function clearRows()
+    {
+        $this->setMethodName("clearRows");
+        $this->clearCurrentRow();
+        return TRUE;
+    }
+
+    /**
+     * Clear current row data
+     * @access public
+     * @return boolean Success
+     */
+    function clearCurrentRow()
+    {
+        $this->row = array();    // clear the "current row" array
+        return TRUE;
+    }
+
+    /**
+     * Reset the primary key
+     * @access public
+     * @return bool Success: TRUE or FALSE
+     */
+    function resetPK()
+    {
+        $this->pk = DA_PK_NOT_SET;
+        return TRUE;
+    }
+
+    /**
+     * Allow columns to be added to the object
+     * @access public
+     * @return bool Success
+     */
+    function setAddColumnsOn()
+    {
+        return ($this->allowAddColumns = TRUE);
+    }
+
+    /**
+     * Control the action of the replicate method so that the destination set is added to
+     * @access public
+     * @return bool success
+     */
+    function setClearRowsBeforeReplicateOff()
+    {
+        $this->clearRowsBeforeReplicate = FALSE;
+        return TRUE;
+    }
+
+    /**
+     * Reset update mode of dataset
+     * @access private
+     * @return boolean Success
+     */
+    function resetUpdateMode()
+    {
+        $this->updateMode = DA_MODE_NONE;
+        return TRUE;
+    }
+
+    /**
+     * Reset one of the callback methods
+     * @access public
+     * @param integer $methodType DA_AFTER_COLUMNS_CREATED DA_BEFORE_POST DA_AFTER_POST
+     * @return  bool
+     */
+    function resetCallbackMethod($methodType)
+    {
+        $this->setMethodName("resetCallbackMethod");
+        switch ($methodType) {
+            case DA_AFTER_COLUMNS_CREATED:
+                $this->afterColumnsCreatedMethod = "";
+                break;
+            case DA_BEFORE_POST:
+                $this->beforePostMethod = "";
+                break;
+            case DA_AFTER_POST:
+                $this->afterPostMethod = "";
+                break;
+            default:
+                $this->raiseError($methodType . " is not a valid callback method type");
+        }
+        return TRUE;
+    }
+
+    /**
+     * Initialise the object so that the row pointer is at the first row. Does not affect data rows.
+     * Override this and call parent::initialise() at end
+     * @access public
+     * @return boolean Success
+     */
+    function initialise()
+    {
+        $this->firstRowFetched = FALSE;
+        return TRUE;
+    }
+
     function enableDebugging()
     {
         $this->debug = true;
@@ -227,12 +372,6 @@ class DataAccess extends BaseObject
         $this->debug = false;
     }
 
-    function __construct(&$owner)
-    {
-        BaseObject::__construct($owner);
-        $this->clear();
-    }
-
     function setIgnoreNULLOn()
     {
         $this->ignoreNULL = TRUE;
@@ -241,21 +380,6 @@ class DataAccess extends BaseObject
     function setIgnoreNULLOff()
     {
         $this->ignoreNULL = FALSE;
-    }
-
-    function getIgnoreNULL()
-    {
-        return $this->ignoreNULL;
-    }
-
-    function setNewRowValue($value)
-    {
-        $this->newRowValue = $value;
-    }
-
-    function getNewRowValue()
-    {
-        return $this->newRowValue;
     }
 
     /**
@@ -441,190 +565,23 @@ class DataAccess extends BaseObject
     }
 
     /**
-     * @param DataAccess $data
-     */
-    function composeRow(&$data)
-    {
-        for ($ixCol = 0; $ixCol < $data->_colCount; $ixCol++) { // Only add data column exists
-//			if ($this->columnExists($data->getName($ixCol))!=DA_OUT_OF_RANGE){
-            $this->failOutOfRange = FALSE;
-            $this->setValue(
-                $data->getName($ixCol),
-                $data->getValueNoCheckByColumnNumber($ixCol)
-            );
-        }
-    }
-
-    /**
-     * Assign one of the callback methods to call the given method on the given callback object
-     * @access public
-     * @param integer $methodType DA_AFTER_COLUMNS_CREATED DA_BEFORE_POST DA_AFTER_POST
-     * @param BaseObject $object Reference to callback object
-     * @param $methodName
-     * @return  bool
-     */
-    function setCallbackMethod($methodType,
-                               &$object,
-                               $methodName
-    )
-    {
-        $this->setMethodName("setCallbackMethod");
-        if (!is_object($object))
-            $this->raiseError("No callback object passed");
-        if ($methodName == "")
-            $this->raiseError("No method passed");
-        if (!method_exists(
-            $object,
-            $methodName
-        ))
-            $this->raiseError("Method " . $methodName . "() does not exist on the callback object");
-
-        switch ($methodType) {
-            case DA_AFTER_COLUMNS_CREATED:
-                $this->afterColumnsCreatedObject =& $object;
-                $this->afterColumnsCreatedMethod = $methodName;
-                break;
-            case DA_BEFORE_POST:
-                $this->beforePostObject =& $object;
-                $this->beforePostMethod = $methodName;
-                break;
-            case DA_AFTER_POST:
-                $this->afterPostObject =& $object;
-                $this->afterPostMethod = $methodName;
-                break;
-            default:
-                $this->raiseError($methodType . " is not a valid callback method type");
-        }
-        return TRUE;
-    }
-
-    /**
-     * Reset one of the callback methods
-     * @access public
-     * @param integer $methodType DA_AFTER_COLUMNS_CREATED DA_BEFORE_POST DA_AFTER_POST
-     * @return  bool
-     */
-    function resetCallbackMethod($methodType)
-    {
-        $this->setMethodName("resetCallbackMethod");
-        switch ($methodType) {
-            case DA_AFTER_COLUMNS_CREATED:
-                $this->afterColumnsCreatedMethod = "";
-                break;
-            case DA_BEFORE_POST:
-                $this->beforePostMethod = "";
-                break;
-            case DA_AFTER_POST:
-                $this->afterPostMethod = "";
-                break;
-            default:
-                $this->raiseError($methodType . " is not a valid callback method type");
-        }
-        return TRUE;
-    }
-
-    /**
-     * Call a callback method on the callback object
-     *    Notes: Builds and executes the appropriate PHP code dynamically. To speed things up, we assume
-     * that all validation has been done when callback object and methods were assigned!
+     * Get count of columns
      * @access private
-     * @param $methodType
-     * @param DataAccess &$data Reference of source dataaccess object to be passed back
-     * @return  bool
+     * @return integer Number of columns
      */
-    function callback($methodType,
-                      &$data
-    )
+    function colCount()
     {
-        $ret = TRUE;
-        switch ($methodType) {
-            case DA_AFTER_COLUMNS_CREATED:
-                $cmd = "\$ret=\$this->afterColumnsCreatedObject->" . $this->afterColumnsCreatedMethod;
-                break;
-            case DA_BEFORE_POST:
-                $cmd = "\$ret=\$this->beforePostObject->" . $this->beforePostMethod;
-                break;
-            case DA_AFTER_POST:
-                $cmd = "\$ret=\$this->afterPostObject->" . $this->afterPostMethod;
-                break;
-            default:
-                $this->raiseError($methodType . " is not a valid callback method");
-        }
-        $cmd = $cmd . "(\$data,\$this);";
-        eval($cmd);
-        return $ret;
+        return count($this->colName);
     }
 
     /**
-     * Cause replicate function to call the post() function on the destination
+     * Report value of class var
      * @access public
-     * @return  bool
+     * @return bool on or off
      */
-    function setPostRowOn()
+    function getClearRowsBeforeReplicate()
     {
-        $this->postRow = TRUE;
-        return TRUE;
-    }
-
-    /**
-     * Cause replicate function to not call the post() function on the destination
-     * @access public
-     * @return  bool
-     */
-    function setPostRowOff()
-    {
-        $this->postRow = FALSE;
-        return TRUE;
-    }
-
-    /**
-     * Search the given column for the first value matching parameter passed
-     * @access public
-     * @param string $ixColumn Name or number of column
-     * @param string $value Value to search for
-     * @return bool Found: TRUE or FALSE
-     */
-    function search($ixColumn,
-                    $value
-    )
-    {
-        $ret = FALSE;
-        $ixColumnNumber = $this->columnExists($ixColumn);
-        if ($ixColumnNumber != DA_OUT_OF_RANGE) {
-            $this->initialise();
-            while ($this->fetchNext()) {
-                if ($this->getValue($ixColumnNumber) == $value) {
-                    $ret = TRUE;
-                    break;// out of the loop
-                }
-            }
-        } else {
-            $this->raiseError("Search Column " . $ixColumn . " out of range");
-            $ret = FALSE;
-        }
-        return $ret;
-    }
-
-    /**
-     * Set the literal for quoting column values to single quote character
-     * @access public
-     * @return bool Success: TRUE or FALSE
-     */
-    function setQuoteForColumnValuesSingle()
-    {
-        $this->quoteForColumnValues = DA_QUOTE_SINGLE;
-        return TRUE;
-    }
-
-    /**
-     * Set the literal for quoting column values to double quote character
-     * @access public
-     * @return bool Success: TRUE or FALSE
-     */
-    function setQuoteForColumnValuesDouble()
-    {
-        $this->quoteForColumnValues = DA_QUOTE_DOUBLE;
-        return TRUE;
+        return $this->clearRowsBeforeReplicate;
     }
 
     /** don't think this is needed KA20/5/2002
@@ -638,118 +595,52 @@ class DataAccess extends BaseObject
      * return $this->class_name;
      * }
      */
+
     /**
-     * Reset the primary key
+     * Copy columns from given dataset
      * @access public
-     * @return bool Success: TRUE or FALSE
+     * @param $data
+     * @return boolean Success
      */
-    function resetPK()
+    function copyColumnsFrom($data)
     {
-        $this->pk = DA_PK_NOT_SET;
+        $this->setMethodName("copyColumnsFrom");
+        if (!is_subclass_of(
+            $data,
+            DA_CLASSNAME_DATAACCESS
+        )) {
+            $this->raiseError("The object passed is not a subclass of " . DA_CLASSNAME_DATAACCESS);
+        }
+        for ($ixCol = 0; $ixCol < $data->_colCount; $ixCol++) {
+            $this->copyColumn(
+                $data,
+                $ixCol
+            );
+        }
         return TRUE;
     }
 
     /**
-     * Set the primary key value
-     * @access public
-     * @param string PK value
-     * @return bool Success: TRUE or FALSE
+     * Add a column to this dataset
+     * if the column does not exist and we are allowed to add columns, add it
+     * @access Public
+     * @param DataAccess $data
+     * @param integer $ixCol Column on source dataset to be added to this one
      */
-    function setPKValue($value)
+    function copyColumn($data,
+                        $ixCol
+    )
     {
-        return ($this->setValue(
-            $this->getPKName(),
-            $value
-        ));
-    }
-
-    /**
-     * Set the primary key column (name or column number)
-     * @access public
-     * @param $ixPassedColumn
-     * @return bool Success: TRUE or FALSE
-     */
-    function setPK($ixPassedColumn)
-    {
-        $ixColumn = $this->columnExists($ixPassedColumn);
-        if ($ixColumn != DA_OUT_OF_RANGE) {
-            $this->pk = $ixColumn;
-            $ret = TRUE;
-        } else {
-            $this->raiseError("Primary Key Column " . $ixPassedColumn . " out of range");
-            $ret = FALSE;
+        $ixThisColumn = $this->columnExists($data->getName($ixCol));
+        if (($ixThisColumn == -1) && ($this->allowAddColumns)) {
+            $this->addColumnNoCheck(
+                $data->getName($ixCol),
+                $data->getType($ixCol),
+                $data->getPk() == $ixCol ? DA_ALLOW_NULL : $data->getNull($ixCol),
+                $data->getDefaultValue($ixCol),
+                $data->getValidationFunction($ixCol)
+            );
         }
-        return $ret;
-    }
-
-    /**
-     * Get the primary key column number
-     * @access public
-     * @return integer Column number
-     */
-    function getPK()
-    {
-        return $this->pk;
-    }
-
-    /**
-     * Get the primary key column name
-     * @access public
-     * @return string Column name or empty string
-     */
-    function getPKName()
-    {
-        if ($this->getPK() == DA_PK_NOT_SET) {
-            return "";
-        } else {
-            return $this->getName($this->getPK());
-        }
-    }
-
-    /**
-     * Get the primary key value
-     * @access public
-     * @return string PK Column value
-     */
-    function getPKValue()
-    {
-        if ($this->getPK() == DA_PK_NOT_SET) {
-            $this->raiseError("No PK set");
-            return false;
-        }
-        return $this->getValue($this->getPK());
-    }
-
-    /**
-     * Control the action of the replicate method so that the destination is cleared first
-     * @access public
-     * @return bool success
-     */
-    function setClearRowsBeforeReplicateOn()
-    {
-        $this->clearRowsBeforeReplicate = TRUE;
-        return TRUE;
-    }
-
-    /**
-     * Control the action of the replicate method so that the destination set is added to
-     * @access public
-     * @return bool success
-     */
-    function setClearRowsBeforeReplicateOff()
-    {
-        $this->clearRowsBeforeReplicate = FALSE;
-        return TRUE;
-    }
-
-    /**
-     * Report value of class var
-     * @access public
-     * @return bool on or off
-     */
-    function getClearRowsBeforeReplicate()
-    {
-        return $this->clearRowsBeforeReplicate;
     }
 
     /**
@@ -806,83 +697,19 @@ class DataAccess extends BaseObject
     }
 
     /**
-     * Return column number
-     * This is very similar to columnExists but it will raise an error if the column
-     * does not exist. Use it to save checking yourself afterwards
-     * @access private
-     * @param string column Column name or number
-     * @return string column number or DA_OUT_OF_RANGE (instead of FALSE because FALSE is zero)
+     * Get column name by index
+     * @access public
+     * @param integer $ixColumn Column number
+     * @return string Column name or empty string of out of range
      */
-    function getValidColumnNo($ixColumn)
+    function getName($ixColumn)
     {
-        $columnNo = $this->columnExists($ixColumn);
-        if ($columnNo == DA_OUT_OF_RANGE) {
-            $this->raiseError(DA_MSG_COLUMN_DOES_NOT_EXIST);
-            return false;
+        if ($this->columnExists($ixColumn) != DA_OUT_OF_RANGE) {
+            return $this->colName[$ixColumn];
+        } else {
+            $this->raiseError("Column " . $ixColumn . " out of range");
+            return "";
         }
-        return $columnNo;
-
-    }
-
-    /**
-     * Allow columns to be added to the object
-     * @access public
-     * @return bool Success
-     */
-    function setAddColumnsOn()
-    {
-        return ($this->allowAddColumns = TRUE);
-    }
-
-    /**
-     * Prevent columns from being added to the object - useful during replicate
-     * @access public
-     * @return bool Success
-     */
-    function setAddColumnsOff()
-    {
-        return ($this->allowAddColumns = FALSE);
-    }
-
-    /**
-     * Add a new column to the object
-     * @param $name
-     * @param $type
-     * @param $allowNull
-     * @param $defaultValue
-     * @param $validationFunction
-     * @return integer New column number or DA_COLUMN_NOT_ADDED
-     * @access public
-     */
-    function addColumn($name,
-                       $type,
-                       $allowNull,
-                       $defaultValue = null,
-                       $validationFunction = null
-    )
-    {
-        // In case the destination dataset doesn't want all of the
-        // source dataset's columns
-        $ret = DA_COLUMN_NOT_ADDED;
-        if ($this->allowAddColumns) {
-            // add a column name only once
-            $ixColumn = $this->columnExists($name);
-            if ($ixColumn == DA_OUT_OF_RANGE) {
-                $ixColumn = $this->_colCount;    // Add to end
-                $this->setNameAndType(
-                    $ixColumn,
-                    $name,
-                    $type,
-                    $allowNull,
-                    $defaultValue,
-                    $validationFunction
-                );
-            }
-            $ret = $ixColumn;        // found column
-
-            $this->_colCount = $this->colCount(); // Added this to avoid overhead of calling colCount()
-        }                                            // between index(column no) and name
-        return $ret;
     }
 
     /**
@@ -961,22 +788,6 @@ class DataAccess extends BaseObject
     }
 
     /**
-     * Get column name by index
-     * @access public
-     * @param integer $ixColumn Column number
-     * @return string Column name or empty string of out of range
-     */
-    function getName($ixColumn)
-    {
-        if ($this->columnExists($ixColumn) != DA_OUT_OF_RANGE) {
-            return $this->colName[$ixColumn];
-        } else {
-            $this->raiseError("Column " . $ixColumn . " out of range");
-            return "";
-        }
-    }
-
-    /**
      * Set column name for given column
      * NOTE: Adds new column if it doesn't exist already
      * @access public
@@ -993,34 +804,6 @@ class DataAccess extends BaseObject
         $this->colNameInverse[$name] = $ixColumn;
         $this->_colCount = $this->colCount();
         return TRUE;
-    }
-
-    /**
-     * Get column type
-     * @access public
-     * @param $ixPassedColumn
-     * @return string Column type. See constants for list.
-     */
-    function getType($ixPassedColumn)
-    {
-        $ixColumn = $this->columnExists($ixPassedColumn);
-        if ($ixColumn != DA_OUT_OF_RANGE) {
-            return $this->colType[$ixColumn];
-        } else {
-            $this->raiseError("Column " . $ixPassedColumn . " out of range");
-            return DA_OUT_OF_RANGE;
-        }
-    }
-
-    /**
-     * Get column type
-     * @access public
-     * @param integer $ixColumn Column number
-     * @return string Column type. See constants for list.
-     */
-    function getTypeByColumnNumberNoCheck($ixColumn)
-    {
-        return $this->colType[$ixColumn];
     }
 
     /**
@@ -1046,22 +829,6 @@ class DataAccess extends BaseObject
     }
 
     /**
-     * Get column null status
-     * @access public
-     * @param $ixPassedColumn
-     * @return integer Nulls allowed: DA_ALLOW_NULL DA_NOT_NULL or DA_OUT_OF_RANGE
-     */
-    function getNull($ixPassedColumn)
-    {
-        $ixColumn = $this->columnExists($ixPassedColumn);
-        if ($ixColumn == DA_OUT_OF_RANGE) {
-            $this->raiseError("GetNull(): Column " . $ixPassedColumn . " out of range");
-            return DA_OUT_OF_RANGE;
-        }
-        return $this->colNull[$ixColumn];
-    }
-
-    /**
      * Set column type
      * @access private
      * @param integer $ixColumn Column number
@@ -1083,126 +850,180 @@ class DataAccess extends BaseObject
         return $ret;
     }
 
-    /**
-     * Set column to allow empty values
-     * @access private
-     * @param integer $ixColumn Column number
-     * @return boolean Success
-     */
-    function setAllowEmpty($ixColumn)
+    private
+    function setDefaultValue($ixColumn,
+                             $defaultValue
+    )
     {
-        return ($this->setNull(
-            $ixColumn,
-            DA_ALLOW_NULL
-        ));
-    }
-
-    /**
-     * Set column to NOT allow empty values
-     * @access private
-     * @param integer $ixColumn Column number
-     * @return boolean Success
-     */
-    function setNotAllowEmpty($ixColumn)
-    {
-        return ($this->setNull(
-            $ixColumn,
-            DA_NOT_NULL
-        ));
-    }
-
-    /**
-     * Set all column values to empty
-     * @access private
-     * @return boolean Success
-     */
-    function setRowBlank()
-    {
-        for ($ix = 0; $ix < $this->_colCount; $ix++) {
-            $this->row[$ix] = "";
+        if ($this->debug) {
+            echo '<div>Setting default value of column: ' . $ixColumn . ' -> ' . $defaultValue . '</div>';
         }
-        return TRUE;
-    }
+        $ret = FALSE;
+        $ixColumn = $this->columnExists($ixColumn);
+        if ($ixColumn != DA_OUT_OF_RANGE) {
+            if ($this->debug) {
+                echo '<div>the Column does exist and the default value is assigned</div>';
+            }
+            $this->colDefaultValue[$ixColumn] = $defaultValue;
+            if ($this->debug) {
+                var_dump($this->colDefaultValue);
+            }
 
-    /**
-     * Get count of columns
-     * @access private
-     * @return integer Number of columns
-     */
-    function colCount()
-    {
-        return count($this->colName);
-    }
-
-    /**
-     * Reset update mode of dataset
-     * @access private
-     * @return boolean Success
-     */
-    function resetUpdateMode()
-    {
-        $this->updateMode = DA_MODE_NONE;
-        return TRUE;
-    }
-
-    /**
-     * When post is called, insert a new row
-     * @access private
-     * @return boolean Success
-     */
-    function setUpdateModeInsert()
-    {
-        $this->updateMode = DA_MODE_INSERT;
-        return TRUE;
-    }
-
-    /**
-     * When post is called, update the current row
-     * @access private
-     * @return boolean Success
-     */
-    function setUpdateModeUpdate()
-    {
-        $this->updateMode = DA_MODE_UPDATE;
-        return TRUE;
-    }
-
-    /**
-     * When post is called, delete the current row
-     * @access private
-     * @return boolean Success
-     */
-    function setUpdateModeDelete()
-    {
-        $this->updateMode = DA_MODE_DELETE;
-        return TRUE;
-    }
-
-    /**
-     * Get the current update mode
-     * @access private
-     * @return integer DA_MODE_NONE,DA_MODE_DELETE, DA_MODE_INSERT, DA_MODE_UPDATE
-     */
-    function getUpdateMode()
-    {
-        return $this->updateMode;
-    }
-
-    /**
-     * Make an update to the current row on the data set
-     * Action depends upon value of $this->getUpdateMode()
-     * @access public
-     * @return boolean Success status
-     */
-    function post()
-    {
-        if ($this->getUpdateMode() == DA_MODE_NONE) {
-            $this->raiseError("Could not post row because UpdateMode not set");
-            return FALSE;
+            $ret = TRUE;
         } else {
-            return TRUE;
+            $this->raiseError("SetDefaultValue(): Column " . $ixColumn . " out of range");
         }
-        // inherited post method must be implemented here
+        return $ret;
+    }
+
+    protected
+    function setValidationFunction($ixColumn,
+                                   $validationFunction
+    )
+    {
+        $ret = FALSE;
+        $ixColumn = $this->columnExists($ixColumn);
+        if ($ixColumn != DA_OUT_OF_RANGE) {
+            $this->colValidation[$ixColumn] = $validationFunction;
+            $ret = TRUE;
+        } else {
+            $this->raiseError("SetNull(): Column " . $ixColumn . " out of range");
+        }
+        return $ret;
+    }
+
+    /**
+     * Get column type
+     * @access public
+     * @param $ixPassedColumn
+     * @return string Column type. See constants for list.
+     */
+    function getType($ixPassedColumn)
+    {
+        $ixColumn = $this->columnExists($ixPassedColumn);
+        if ($ixColumn != DA_OUT_OF_RANGE) {
+            return $this->colType[$ixColumn];
+        } else {
+            $this->raiseError("Column " . $ixPassedColumn . " out of range");
+            return DA_OUT_OF_RANGE;
+        }
+    }
+
+    /**
+     * Get the primary key column number
+     * @access public
+     * @return integer Column number
+     */
+    function getPK()
+    {
+        return $this->pk;
+    }
+
+    /**
+     * Set the primary key column (name or column number)
+     * @access public
+     * @param $ixPassedColumn
+     * @return bool Success: TRUE or FALSE
+     */
+    function setPK($ixPassedColumn)
+    {
+        $ixColumn = $this->columnExists($ixPassedColumn);
+        if ($ixColumn != DA_OUT_OF_RANGE) {
+            $this->pk = $ixColumn;
+            $ret = TRUE;
+        } else {
+            $this->raiseError("Primary Key Column " . $ixPassedColumn . " out of range");
+            $ret = FALSE;
+        }
+        return $ret;
+    }
+
+    /**
+     * Get column null status
+     * @access public
+     * @param $ixPassedColumn
+     * @return integer Nulls allowed: DA_ALLOW_NULL DA_NOT_NULL or DA_OUT_OF_RANGE
+     */
+    function getNull($ixPassedColumn)
+    {
+        $ixColumn = $this->columnExists($ixPassedColumn);
+        if ($ixColumn == DA_OUT_OF_RANGE) {
+            $this->raiseError("GetNull(): Column " . $ixPassedColumn . " out of range");
+            return DA_OUT_OF_RANGE;
+        }
+        return $this->colNull[$ixColumn];
+    }
+
+    protected function getDefaultValue($ixPassedColumn)
+    {
+        $ixColumn = $this->columnExists($ixPassedColumn);
+        if ($ixColumn != DA_OUT_OF_RANGE) {
+            return $this->colDefaultValue[$ixColumn];
+        }
+        $this->raiseError("GetDefaultValue(): Column " . $ixPassedColumn . " out of range");
+        return DA_OUT_OF_RANGE;
+    }
+
+    /**
+     * @param $ixPassedColumn
+     * @return null|Callable
+     */
+    protected
+    function getValidationFunction($ixPassedColumn
+    )
+    {
+        $ixColumn = $this->columnExists($ixPassedColumn);
+        if ($ixColumn == DA_OUT_OF_RANGE) {
+            $this->raiseError("GetValidationFunction(): Column " . $ixPassedColumn . " out of range");
+            return null;
+        }
+        return $this->colValidation[$ixColumn];
+    }
+
+    /**
+     * Get the primary key column name
+     * @access public
+     * @return string Column name or empty string
+     */
+    function getPKName()
+    {
+        if ($this->getPK() == DA_PK_NOT_SET) {
+            return "";
+        } else {
+            return $this->getName($this->getPK());
+        }
+    }
+
+    /**
+     * Call a callback method on the callback object
+     *    Notes: Builds and executes the appropriate PHP code dynamically. To speed things up, we assume
+     * that all validation has been done when callback object and methods were assigned!
+     * @access private
+     * @param $methodType
+     * @param DataAccess &$data Reference of source dataaccess object to be passed back
+     * @return  bool
+     */
+    function callback($methodType,
+                      &$data
+    )
+    {
+        $ret = TRUE;
+        switch ($methodType) {
+            case DA_AFTER_COLUMNS_CREATED:
+                $cmd = "\$ret=\$this->afterColumnsCreatedObject->" . $this->afterColumnsCreatedMethod;
+                break;
+            case DA_BEFORE_POST:
+                $cmd = "\$ret=\$this->beforePostObject->" . $this->beforePostMethod;
+                break;
+            case DA_AFTER_POST:
+                $cmd = "\$ret=\$this->afterPostObject->" . $this->afterPostMethod;
+                break;
+            default:
+                $this->raiseError($methodType . " is not a valid callback method");
+        }
+        $cmd = $cmd . "(\$data,\$this);";
+        eval($cmd);
+        return $ret;
     }
 
     /**
@@ -1219,10 +1040,46 @@ class DataAccess extends BaseObject
     }
 
     /**
+     * Cause replicate function to call the post() function on the destination
+     * @access public
+     * @return  bool
+     */
+    function setPostRowOn()
+    {
+        $this->postRow = TRUE;
+        return TRUE;
+    }
+
+    /**
+     * When post is called, insert a new row
+     * @access private
+     * @return boolean Success
+     */
+    function setUpdateModeInsert()
+    {
+        $this->updateMode = DA_MODE_INSERT;
+        return TRUE;
+    }
+
+    /**
+     * Get the primary key value
+     * @access public
+     * @return string PK Column value
+     */
+    function getPKValue()
+    {
+        if ($this->getPK() == DA_PK_NOT_SET) {
+            $this->raiseError("No PK set");
+            return false;
+        }
+        return $this->getValue($this->getPK());
+    }
+
+    /**
      * Get column value by name or column number
      * @access public
      * @param $ixPassedColumn
-     * @return string|int|float|bool Column value
+     * @return string|int|float|bool|array Column value
      */
     function getValue($ixPassedColumn)
     {
@@ -1234,17 +1091,6 @@ class DataAccess extends BaseObject
             $this->raiseError("column " . $ixPassedColumn . " out of range");
             return DA_OUT_OF_RANGE;
         }
-    }
-
-    /**
-     * Alias for getValueNoCheckByColumnNumber
-     * @access public
-     * @param $ixColumnNumber
-     * @return mixed Column value
-     */
-    function getValueByColumnNumber($ixColumnNumber)
-    {
-        return $this->getValueNoCheckByColumnNumber($ixColumnNumber);
     }
 
     /**
@@ -1275,20 +1121,42 @@ class DataAccess extends BaseObject
         return $this->row[$ixColumnNumber];
 
     }
+
     /**
-     * Set row values assuming the arguments are in column index order
-     * NOTE: Not sure this is called - please test and remove if not
+     * Get column type
      * @access public
-     * function setRowValues($arg){
-     * $numArgs = func_num_args();
-     * if ($numArgs>0){
-     * for($ixArg=0;$ixArg<($numArgs);$ixArg++){
-     * $value = func_get_arg($ixArg);
-     * $this->setValue($ixArg, $value);
-     * }
-     * }
-     * }
+     * @param integer $ixColumn Column number
+     * @return string Column type. See constants for list.
      */
+    function getTypeByColumnNumberNoCheck($ixColumn)
+    {
+        return $this->colType[$ixColumn];
+    }
+
+    function getNewRowValue()
+    {
+        return $this->newRowValue;
+    }
+
+    function setNewRowValue($value)
+    {
+        $this->newRowValue = $value;
+    }
+
+    /**
+     * Set the primary key value
+     * @access public
+     * @param string PK value
+     * @return bool Success: TRUE or FALSE
+     */
+    function setPKValue($value)
+    {
+        return ($this->setValue(
+            $this->getPKName(),
+            $value
+        ));
+    }
+
     /**
      * Set column value by name or index
      * @access public
@@ -1376,314 +1244,6 @@ not a boolean, the given value is null, column given is not the PK, and there is
         }
     }
 
-
-    /**
-     * Set column value by index without any error checking
-     * @access public
-     * @param $ixPassedColumn
-     * @param string $value Value
-     * @return void Success
-     */
-    function setValueNoCheckByColumnNumber($ixPassedColumn,
-                                           $value
-    )
-    {
-        $this->row[$ixPassedColumn] = $value;
-    }
-
-    /**
-     * Initialise the object so that the row pointer is at the first row. Does not affect data rows.
-     * Override this and call parent::initialise() at end
-     * @access public
-     * @return boolean Success
-     */
-    function initialise()
-    {
-        $this->firstRowFetched = FALSE;
-        return TRUE;
-    }
-
-    /**
-     * Clear-down the object as if it has just been created with no rows or columns
-     * @access public
-     * @return boolean Success
-     */
-    function clear()
-    {
-        $this->clearColumns();
-        $this->clearRows();
-        $this->resetPK();
-        $this->setAddColumnsOn();
-        $this->setClearRowsBeforeReplicateOff();
-        $this->resetUpdateMode();
-        $this->resetCallbackMethod(DA_AFTER_COLUMNS_CREATED);
-        $this->resetCallbackMethod(DA_BEFORE_POST);
-        $this->resetCallbackMethod(DA_AFTER_POST);
-        $this->eof = FALSE;
-        $this->initialise();
-        return TRUE;
-    }
-
-    /**
-     * Remove all columns
-     * @access public
-     * @return boolean Success
-     */
-    function clearColumns()
-    {
-        $this->setMethodName("clearColumns");
-        $this->clearRows();
-        $this->colName = array();
-        $this->colType = array();
-        $this->colNull = array();
-        return TRUE;
-    }
-
-    /**
-     * Remove all row data
-     * @access public
-     * @return boolean Success
-     */
-    function clearRows()
-    {
-        $this->setMethodName("clearRows");
-        $this->clearCurrentRow();
-        return TRUE;
-    }
-
-    /**
-     * Clear current row data
-     * @access public
-     * @return boolean Success
-     */
-    function clearCurrentRow()
-    {
-        $this->row = array();    // clear the "current row" array
-        return TRUE;
-    }
-
-    /**
-     * Build and return string of CSV column names
-     * @access private
-     * @return string Column names as CSV string
-     */
-    function getColumnNamesAsString()
-    {
-        $this->setMethodName("getColumnNamesAsString");
-        $colString = "";
-        for ($ixCol = 0; $ixCol < $this->_colCount; $ixCol++) {
-            if ($colString != "") $colString = $colString . DA_COLUMN_SEPARATOR;
-            $colString = $colString . $this->getName($ixCol);
-        }
-        return $colString;
-    }
-
-    /**
-     * Build and return string of CSV column values with single quotes
-     * @access private
-     * @return string
-     */
-    function getColumnValuesAsString()
-    {
-        $this->setMethodName("getColumnValuesAsString");
-        $colString = "";
-        for ($ixCol = 0; $ixCol < $this->_colCount; $ixCol++) {
-            if ($colString != "") $colString = $colString . DA_COLUMN_SEPARATOR;
-            $colString = $colString .
-                $this->quoteForColumnValues .
-                $this->getValue($ixCol) .
-                $this->quoteForColumnValues;
-        }
-        return $colString;
-    }
-
-    /**
-     * Copy columns from given dataset
-     * @access public
-     * @param $data
-     * @return boolean Success
-     */
-    function copyColumnsFrom($data)
-    {
-        $this->setMethodName("copyColumnsFrom");
-        if (!is_subclass_of(
-            $data,
-            DA_CLASSNAME_DATAACCESS
-        )) {
-            $this->raiseError("The object passed is not a subclass of " . DA_CLASSNAME_DATAACCESS);
-        }
-        for ($ixCol = 0; $ixCol < $data->_colCount; $ixCol++) {
-            $this->copyColumn(
-                $data,
-                $ixCol
-            );
-        }
-        return TRUE;
-    }
-
-    /**
-     * Add a column to this dataset
-     * if the column does not exist and we are allowed to add columns, add it
-     * @access Public
-     * @param DataAccess $data
-     * @param integer $ixCol Column on source dataset to be added to this one
-     */
-    function copyColumn($data,
-                        $ixCol
-    )
-    {
-        $ixThisColumn = $this->columnExists($data->getName($ixCol));
-        if (($ixThisColumn == -1) && ($this->allowAddColumns)) {
-            $this->addColumnNoCheck(
-                $data->getName($ixCol),
-                $data->getType($ixCol),
-                $data->getPk() == $ixCol ? DA_ALLOW_NULL : $data->getNull($ixCol),
-                $data->getDefaultValue($ixCol),
-                $data->getValidationFunction($ixCol)
-            );
-        }
-    }
-
-    /**
-     * Build and return string of escaped CSV column values for use in Excel
-     * @access private
-     * @return string
-     */
-    function getColumnValuesForExcel()
-    {
-        $this->setMethodName("getColumnValuesForExcel");
-        $colString = "";
-        for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
-            if ($colString != "") $colString = $colString . DA_COLUMN_SEPARATOR;
-            $value = $this->getExcelValue($ixCol);
-            $colString = $colString .
-//				$this->quoteForColumnValues.
-                $value;//.
-//				$this->quoteForColumnValues;
-        }
-        return $colString;
-    }
-
-    function getExcelValue($ixCol)
-    {
-
-        $value = $this->getValue($ixCol);
-        $value = str_replace(
-            ',',
-            '',
-            $value
-        );
-        $value = str_replace(
-            "\r\n",
-            " ",
-            $value
-        );            // remove carriage returns
-        $value = str_replace(
-            "\"",
-            "",
-            $value
-        );                // and double quotes
-
-        return $value;
-    }
-
-    private
-    function setDefaultValue($ixColumn,
-                             $defaultValue
-    )
-    {
-        if ($this->debug) {
-            echo '<div>Setting default value of column: ' . $ixColumn . ' -> ' . $defaultValue . '</div>';
-        }
-        $ret = FALSE;
-        $ixColumn = $this->columnExists($ixColumn);
-        if ($ixColumn != DA_OUT_OF_RANGE) {
-            if ($this->debug) {
-                echo '<div>the Column does exist and the default value is assigned</div>';
-            }
-            $this->colDefaultValue[$ixColumn] = $defaultValue;
-            if ($this->debug) {
-                var_dump($this->colDefaultValue);
-            }
-
-            $ret = TRUE;
-        } else {
-            $this->raiseError("SetDefaultValue(): Column " . $ixColumn . " out of range");
-        }
-        return $ret;
-    }
-
-    protected
-    function setValidationFunction($ixColumn,
-                                   $validationFunction
-    )
-    {
-        $ret = FALSE;
-        $ixColumn = $this->columnExists($ixColumn);
-        if ($ixColumn != DA_OUT_OF_RANGE) {
-            $this->colValidation[$ixColumn] = $validationFunction;
-            $ret = TRUE;
-        } else {
-            $this->raiseError("SetNull(): Column " . $ixColumn . " out of range");
-        }
-        return $ret;
-    }
-
-    /**
-     * @param $ixPassedColumn
-     * @return null|Callable
-     */
-    protected
-    function getValidationFunction($ixPassedColumn
-    )
-    {
-        $ixColumn = $this->columnExists($ixPassedColumn);
-        if ($ixColumn == DA_OUT_OF_RANGE) {
-            $this->raiseError("GetValidationFunction(): Column " . $ixPassedColumn . " out of range");
-            return null;
-        }
-        return $this->colValidation[$ixColumn];
-    }
-
-    protected function getDefaultValue($ixPassedColumn)
-    {
-        $ixColumn = $this->columnExists($ixPassedColumn);
-        if ($ixColumn != DA_OUT_OF_RANGE) {
-            return $this->colDefaultValue[$ixColumn];
-        }
-        $this->raiseError("GetDefaultValue(): Column " . $ixPassedColumn . " out of range");
-        return DA_OUT_OF_RANGE;
-    }
-
-    private function tryCreateDateTime($string)
-    {
-        if (!$string) {
-            return null;
-        }
-        if ($string == '0000-00-00 00:00:00') {
-            return null;
-        }
-
-        $date = DateTime::createFromFormat(
-            'd/m/Y H:i:s',
-            $string
-        );
-
-        if ($date) {
-            return $date->format(DATE_MYSQL_DATETIME);
-        }
-
-        $date = DateTime::createFromFormat(
-            'Y-m-d H:i:s',
-            $string
-        );
-
-        if (!$date) {
-            return null;
-        }
-        return $date->format(DATE_MYSQL_DATETIME);
-    }
-
     /**
      * @param $colIdx
      * @param $value
@@ -1731,6 +1291,483 @@ not a boolean, the given value is null, column given is not the PK, and there is
             default:
                 return $value;
         }
+    }
+
+    private function tryCreateDateTime($string)
+    {
+        if (!$string) {
+            return null;
+        }
+        if ($string == '0000-00-00 00:00:00') {
+            return null;
+        }
+
+        $date = DateTime::createFromFormat(
+            'd/m/Y H:i:s',
+            $string
+        );
+
+        if ($date) {
+            return $date->format(DATE_MYSQL_DATETIME);
+        }
+
+        $date = DateTime::createFromFormat(
+            'Y-m-d H:i:s',
+            $string
+        );
+
+        if (!$date) {
+            return null;
+        }
+        return $date->format(DATE_MYSQL_DATETIME);
+    }
+
+    private function tryCreateDate($string)
+    {
+        if (!$string) {
+            return null;
+        }
+        if ($string == '0000-00-00') {
+            return null;
+        }
+
+        $date = DateTime::createFromFormat(
+            'd/m/Y',
+            $string
+        );
+
+        if ($date) {
+            return $date->format(DATE_MYSQL_DATE);
+        }
+
+        $date = DateTime::createFromFormat(
+            'Y-m-d',
+            $string
+        );
+
+        if ($date) {
+            return $date->format(DATE_MYSQL_DATE);
+        }
+
+        $date = DateTime::createFromFormat('Y-m-d H:i:s', $string);
+
+        if (!$date) {
+            return null;
+        }
+
+        return $date->format(DATE_MYSQL_DATE);
+    }
+
+    function getIgnoreNULL()
+    {
+        return $this->ignoreNULL;
+    }
+
+    /**
+     * When post is called, update the current row
+     * @access private
+     * @return boolean Success
+     */
+    function setUpdateModeUpdate()
+    {
+        $this->updateMode = DA_MODE_UPDATE;
+        return TRUE;
+    }
+
+    /**
+     * Set column value by index without any error checking
+     * @access public
+     * @param $ixPassedColumn
+     * @param string $value Value
+     * @return void Success
+     */
+    function setValueNoCheckByColumnNumber($ixPassedColumn,
+                                           $value
+    )
+    {
+        $this->row[$ixPassedColumn] = $value;
+    }
+
+    /**
+     * Make an update to the current row on the data set
+     * Action depends upon value of $this->getUpdateMode()
+     * @access public
+     * @return boolean Success status
+     */
+    function post()
+    {
+        if ($this->getUpdateMode() == DA_MODE_NONE) {
+            $this->raiseError("Could not post row because UpdateMode not set");
+            return FALSE;
+        } else {
+            return TRUE;
+        }
+        // inherited post method must be implemented here
+    }
+    /**
+     * Set row values assuming the arguments are in column index order
+     * NOTE: Not sure this is called - please test and remove if not
+     * @access public
+     * function setRowValues($arg){
+     * $numArgs = func_num_args();
+     * if ($numArgs>0){
+     * for($ixArg=0;$ixArg<($numArgs);$ixArg++){
+     * $value = func_get_arg($ixArg);
+     * $this->setValue($ixArg, $value);
+     * }
+     * }
+     * }
+     */
+
+    /**
+     * Get the current update mode
+     * @access private
+     * @return integer DA_MODE_NONE,DA_MODE_DELETE, DA_MODE_INSERT, DA_MODE_UPDATE
+     */
+    function getUpdateMode()
+    {
+        return $this->updateMode;
+    }
+
+    /**
+     * @param DataAccess $data
+     */
+    function composeRow(&$data)
+    {
+        for ($ixCol = 0; $ixCol < $data->_colCount; $ixCol++) { // Only add data column exists
+//			if ($this->columnExists($data->getName($ixCol))!=DA_OUT_OF_RANGE){
+            $this->failOutOfRange = FALSE;
+            $this->setValue(
+                $data->getName($ixCol),
+                $data->getValueNoCheckByColumnNumber($ixCol)
+            );
+        }
+    }
+
+    /**
+     * Assign one of the callback methods to call the given method on the given callback object
+     * @access public
+     * @param integer $methodType DA_AFTER_COLUMNS_CREATED DA_BEFORE_POST DA_AFTER_POST
+     * @param BaseObject $object Reference to callback object
+     * @param $methodName
+     * @return  bool
+     */
+    function setCallbackMethod($methodType,
+                               &$object,
+                               $methodName
+    )
+    {
+        $this->setMethodName("setCallbackMethod");
+        if (!is_object($object))
+            $this->raiseError("No callback object passed");
+        if ($methodName == "")
+            $this->raiseError("No method passed");
+        if (!method_exists(
+            $object,
+            $methodName
+        ))
+            $this->raiseError("Method " . $methodName . "() does not exist on the callback object");
+
+        switch ($methodType) {
+            case DA_AFTER_COLUMNS_CREATED:
+                $this->afterColumnsCreatedObject =& $object;
+                $this->afterColumnsCreatedMethod = $methodName;
+                break;
+            case DA_BEFORE_POST:
+                $this->beforePostObject =& $object;
+                $this->beforePostMethod = $methodName;
+                break;
+            case DA_AFTER_POST:
+                $this->afterPostObject =& $object;
+                $this->afterPostMethod = $methodName;
+                break;
+            default:
+                $this->raiseError($methodType . " is not a valid callback method type");
+        }
+        return TRUE;
+    }
+
+    /**
+     * Cause replicate function to not call the post() function on the destination
+     * @access public
+     * @return  bool
+     */
+    function setPostRowOff()
+    {
+        $this->postRow = FALSE;
+        return TRUE;
+    }
+
+    /**
+     * Search the given column for the first value matching parameter passed
+     * @access public
+     * @param string $ixColumn Name or number of column
+     * @param string $value Value to search for
+     * @return bool Found: TRUE or FALSE
+     */
+    function search($ixColumn,
+                    $value
+    )
+    {
+        $ret = FALSE;
+        $ixColumnNumber = $this->columnExists($ixColumn);
+        if ($ixColumnNumber != DA_OUT_OF_RANGE) {
+            $this->initialise();
+            while ($this->fetchNext()) {
+                if ($this->getValue($ixColumnNumber) == $value) {
+                    $ret = TRUE;
+                    break;// out of the loop
+                }
+            }
+        } else {
+            $this->raiseError("Search Column " . $ixColumn . " out of range");
+            $ret = FALSE;
+        }
+        return $ret;
+    }
+
+    /**
+     * Set the literal for quoting column values to single quote character
+     * @access public
+     * @return bool Success: TRUE or FALSE
+     */
+    function setQuoteForColumnValuesSingle()
+    {
+        $this->quoteForColumnValues = DA_QUOTE_SINGLE;
+        return TRUE;
+    }
+
+    /**
+     * Set the literal for quoting column values to double quote character
+     * @access public
+     * @return bool Success: TRUE or FALSE
+     */
+    function setQuoteForColumnValuesDouble()
+    {
+        $this->quoteForColumnValues = DA_QUOTE_DOUBLE;
+        return TRUE;
+    }
+
+    /**
+     * Control the action of the replicate method so that the destination is cleared first
+     * @access public
+     * @return bool success
+     */
+    function setClearRowsBeforeReplicateOn()
+    {
+        $this->clearRowsBeforeReplicate = TRUE;
+        return TRUE;
+    }
+
+    /**
+     * Return column number
+     * This is very similar to columnExists but it will raise an error if the column
+     * does not exist. Use it to save checking yourself afterwards
+     * @access private
+     * @param string column Column name or number
+     * @return string column number or DA_OUT_OF_RANGE (instead of FALSE because FALSE is zero)
+     */
+    function getValidColumnNo($ixColumn)
+    {
+        $columnNo = $this->columnExists($ixColumn);
+        if ($columnNo == DA_OUT_OF_RANGE) {
+            $this->raiseError(DA_MSG_COLUMN_DOES_NOT_EXIST);
+            return false;
+        }
+        return $columnNo;
+
+    }
+
+    /**
+     * Prevent columns from being added to the object - useful during replicate
+     * @access public
+     * @return bool Success
+     */
+    function setAddColumnsOff()
+    {
+        return ($this->allowAddColumns = FALSE);
+    }
+
+    /**
+     * Add a new column to the object
+     * @param $name
+     * @param $type
+     * @param $allowNull
+     * @param $defaultValue
+     * @param $validationFunction
+     * @return integer New column number or DA_COLUMN_NOT_ADDED
+     * @access public
+     */
+    function addColumn($name,
+                       $type,
+                       $allowNull,
+                       $defaultValue = null,
+                       $validationFunction = null
+    )
+    {
+        // In case the destination dataset doesn't want all of the
+        // source dataset's columns
+        $ret = DA_COLUMN_NOT_ADDED;
+        if ($this->allowAddColumns) {
+            // add a column name only once
+            $ixColumn = $this->columnExists($name);
+            if ($ixColumn == DA_OUT_OF_RANGE) {
+                $ixColumn = $this->_colCount;    // Add to end
+                $this->setNameAndType(
+                    $ixColumn,
+                    $name,
+                    $type,
+                    $allowNull,
+                    $defaultValue,
+                    $validationFunction
+                );
+            }
+            $ret = $ixColumn;        // found column
+
+            $this->_colCount = $this->colCount(); // Added this to avoid overhead of calling colCount()
+        }                                            // between index(column no) and name
+        return $ret;
+    }
+
+    /**
+     * Set column to allow empty values
+     * @access private
+     * @param integer $ixColumn Column number
+     * @return boolean Success
+     */
+    function setAllowEmpty($ixColumn)
+    {
+        return ($this->setNull(
+            $ixColumn,
+            DA_ALLOW_NULL
+        ));
+    }
+
+    /**
+     * Set column to NOT allow empty values
+     * @access private
+     * @param integer $ixColumn Column number
+     * @return boolean Success
+     */
+    function setNotAllowEmpty($ixColumn)
+    {
+        return ($this->setNull(
+            $ixColumn,
+            DA_NOT_NULL
+        ));
+    }
+
+    /**
+     * Set all column values to empty
+     * @access private
+     * @return boolean Success
+     */
+    function setRowBlank()
+    {
+        for ($ix = 0; $ix < $this->_colCount; $ix++) {
+            $this->row[$ix] = "";
+        }
+        return TRUE;
+    }
+
+    /**
+     * When post is called, delete the current row
+     * @access private
+     * @return boolean Success
+     */
+    function setUpdateModeDelete()
+    {
+        $this->updateMode = DA_MODE_DELETE;
+        return TRUE;
+    }
+
+    /**
+     * Alias for getValueNoCheckByColumnNumber
+     * @access public
+     * @param $ixColumnNumber
+     * @return mixed Column value
+     */
+    function getValueByColumnNumber($ixColumnNumber)
+    {
+        return $this->getValueNoCheckByColumnNumber($ixColumnNumber);
+    }
+
+    /**
+     * Build and return string of CSV column names
+     * @access private
+     * @return string Column names as CSV string
+     */
+    function getColumnNamesAsString()
+    {
+        $this->setMethodName("getColumnNamesAsString");
+        $colString = "";
+        for ($ixCol = 0; $ixCol < $this->_colCount; $ixCol++) {
+            if ($colString != "") $colString = $colString . DA_COLUMN_SEPARATOR;
+            $colString = $colString . $this->getName($ixCol);
+        }
+        return $colString;
+    }
+
+    /**
+     * Build and return string of CSV column values with single quotes
+     * @access private
+     * @return string
+     */
+    function getColumnValuesAsString()
+    {
+        $this->setMethodName("getColumnValuesAsString");
+        $colString = "";
+        for ($ixCol = 0; $ixCol < $this->_colCount; $ixCol++) {
+            if ($colString != "") $colString = $colString . DA_COLUMN_SEPARATOR;
+            $colString = $colString .
+                $this->quoteForColumnValues .
+                $this->getValue($ixCol) .
+                $this->quoteForColumnValues;
+        }
+        return $colString;
+    }
+
+    /**
+     * Build and return string of escaped CSV column values for use in Excel
+     * @access private
+     * @return string
+     */
+    function getColumnValuesForExcel()
+    {
+        $this->setMethodName("getColumnValuesForExcel");
+        $colString = "";
+        for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
+            if ($colString != "") $colString = $colString . DA_COLUMN_SEPARATOR;
+            $value = $this->getExcelValue($ixCol);
+            $colString = $colString .
+//				$this->quoteForColumnValues.
+                $value;//.
+//				$this->quoteForColumnValues;
+        }
+        return $colString;
+    }
+
+    function getExcelValue($ixCol)
+    {
+
+        $value = $this->getValue($ixCol);
+        $value = str_replace(
+            ',',
+            '',
+            $value
+        );
+        $value = str_replace(
+            "\r\n",
+            " ",
+            $value
+        );            // remove carriage returns
+        $value = str_replace(
+            "\"",
+            "",
+            $value
+        );                // and double quotes
+
+        return $value;
     }
 
     function checkValid($columnNameOrIndex, $value)
@@ -1784,42 +1821,6 @@ not a boolean, the given value is null, column given is not the PK, and there is
                 ) ? true : DATASET_MSG_INVALID_SUPPORT_LEVEL;
         }
         return true;
-    }
-
-    private function tryCreateDate($string)
-    {
-        if (!$string) {
-            return null;
-        }
-        if ($string == '0000-00-00') {
-            return null;
-        }
-
-        $date = DateTime::createFromFormat(
-            'd/m/Y',
-            $string
-        );
-
-        if ($date) {
-            return $date->format(DATE_MYSQL_DATE);
-        }
-
-        $date = DateTime::createFromFormat(
-            'Y-m-d',
-            $string
-        );
-
-        if ($date) {
-            return $date->format(DATE_MYSQL_DATE);
-        }
-
-        $date = DateTime::createFromFormat('Y-m-d H:i:s', $string);
-
-        if (!$date) {
-            return null;
-        }
-
-        return $date->format(DATE_MYSQL_DATE);
     }
 
 }

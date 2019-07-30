@@ -95,110 +95,6 @@ class BUSalesOrder extends Business
         return true;
     }
 
-    /**
-     * @param $ordheadID
-     * @param DataSet $dsOrdhead
-     * @param DataSet $dsJOrdline
-     * @param $dsDeliveryContact
-     * @return bool
-     */
-    function getOrderWithCustomerName($ordheadID,
-                                      &$dsOrdhead,
-                                      &$dsJOrdline,
-                                      &$dsDeliveryContact
-    )
-    {
-        $this->setMethodName('getOrderWithCustomerName');
-        if (!$ordheadID) {
-            $this->raiseError('order ID not passed');
-            return false;
-        }
-        $dbeJOrdline = new DBEJOrdline($this);
-        $dbeJOrdhead = new DBEJOrdhead($this);
-        $ret = ($this->getDatasetByPK(
-            $ordheadID,
-            $dbeJOrdhead,
-            $dsOrdhead
-        ));
-        if (!$ret) {
-            $this->raiseError('order not found');
-        }
-        $dbeJOrdline->setValue(
-            DBEJOrdline::ordheadID,
-            $ordheadID
-        );
-        $dbeJOrdline->getRowsByColumn(
-            DBEJOrdline::ordheadID
-        );
-        $this->getData(
-            $dbeJOrdline,
-            $dsJOrdline
-        );
-        $dsJOrdline->sortAscending(DBEJOrdline::sequenceNo);
-        $buCustomer = new BUCustomer($this);
-        $buCustomer->getContactByID(
-            $dsOrdhead->getValue(DBEOrdhead::delContactID),
-            $dsDeliveryContact
-        );
-        return true;
-    }
-
-    function getOrderByOrdheadID($ordheadID,
-                                 &$dsOrdhead,
-                                 &$dsOrdline
-    )
-    {
-        $this->setMethodName('getOrderByOrdheadID');
-        $ret = FALSE;
-        if (!$ordheadID) {
-            $this->raiseError('order ID not passed');
-        } else {
-            $dbeOrdline = new DBEOrdline($this);
-            $dbeOrdhead = new DBEOrdhead($this);
-            $ret = ($this->getDatasetByPK(
-                $ordheadID,
-                $dbeOrdhead,
-                $dsOrdhead
-            ));
-            if (!$ret) {
-                $this->raiseError('order not found');
-            }
-
-            $dbeOrdline->setValue(
-                DBEOrdline::ordheadID,
-                $ordheadID
-            );
-            $dbeOrdline->getRowsByColumn(
-                DBEOrdline::ordheadID,
-                DBEOrdline::sequenceNo
-            );
-            $this->getData(
-                $dbeOrdline,
-                $dsOrdline
-            );
-        }
-
-        return $ret;
-    }
-
-    function getOrdheadByID($ordheadID,
-                            &$dsOrdhead
-    )
-    {
-        $this->setMethodName('getOrdheadByID');
-        if (!$ordheadID) {
-            $this->raiseError('order ID not passed');
-            return false;
-        } else {
-            $dbeJOrdhead = new DBEJOrdhead($this);
-            return ($this->getDatasetByPK(
-                $ordheadID,
-                $dbeJOrdhead,
-                $dsOrdhead
-            ));
-        }
-    }
-
     function getOrdlineByIDSeqNo($ordheadID,
                                  $sequenceNo,
                                  &$dsOrdline
@@ -245,16 +141,6 @@ class BUSalesOrder extends Business
             $this->dbeQuotation
         );
         return $dsData->getValue(DBEQuotation::quotationID);
-    }
-
-    function deleteQuotationDoc($quotationID)
-    {
-        $this->setMethodName('deleteQuotationDoc');
-        if (!$quotationID) {
-            $this->raiseError('quotationID not passed');
-        }
-        $this->dbeQuotation->setPKValue($quotationID);
-        return ($this->dbeQuotation->deleteRow());
     }
 
     /**
@@ -448,6 +334,45 @@ class BUSalesOrder extends Business
         return TRUE;
     }
 
+    function getOrdheadByID($ordheadID,
+                            &$dsOrdhead
+    )
+    {
+        $this->setMethodName('getOrdheadByID');
+        if (!$ordheadID) {
+            $this->raiseError('order ID not passed');
+            return false;
+        } else {
+            $dbeJOrdhead = new DBEJOrdhead($this);
+            return ($this->getDatasetByPK(
+                $ordheadID,
+                $dbeJOrdhead,
+                $dsOrdhead
+            ));
+        }
+    }
+
+    function countPurchaseOrders($ordheadID)
+    {
+        $this->setMethodName('countPurchaseOrders');
+        $dbePorhead = new DBEPorhead($this);
+        $dbePorhead->setValue(
+            DBEPorhead::ordheadID,
+            $ordheadID
+        );
+        return ($dbePorhead->countRowsByColumn(DBEPorhead::ordheadID));
+    }
+
+    function deleteQuotationDoc($quotationID)
+    {
+        $this->setMethodName('deleteQuotationDoc');
+        if (!$quotationID) {
+            $this->raiseError('quotationID not passed');
+        }
+        $this->dbeQuotation->setPKValue($quotationID);
+        return ($this->dbeQuotation->deleteRow());
+    }
+
     /**
      * Initialise fields for new order
      * @parameter integer $customerID
@@ -484,7 +409,7 @@ class BUSalesOrder extends Business
      * @parameter integer $customerID
      * @param DataSet $dsOrdhead
      * @param DataSet $dsOrdline
-     * @param DataSet $dsCustomer
+     * @param DataSet|DBECustomer $dsCustomer
      * @param string $type
      * @param bool $directDebit
      * @param string $transactionType
@@ -493,7 +418,7 @@ class BUSalesOrder extends Business
      */
     function initialiseQuote(&$dsOrdhead,
                              &$dsOrdline,
-                             &$dsCustomer,
+                             $dsCustomer,
                              $type = 'Q',
                              $directDebit = false,
                              $transactionType = "01"
@@ -1078,6 +1003,88 @@ class BUSalesOrder extends Business
     }
 
     /**
+     * @param $ordheadID
+     * @param $sequenceNo
+     * @param $dsOrdline
+     */
+    function initialiseNewOrdline($ordheadID,
+                                  $sequenceNo,
+                                  &$dsOrdline
+    )
+    {
+        $this->setMethodName('initialiseNewOrdline');
+        if (!$ordheadID) {
+            $this->raiseError('ordheadID not passed');
+        }
+        if (!$sequenceNo) {
+            $this->raiseError('sequenceNo not passed');
+        }
+        $dbeJOrdline = new DBEJOrdline($this);
+        $dsOrdline = new DataSet($this);
+        $dsOrdline->copyColumnsFrom($dbeJOrdline);
+        $dsOrdline->setUpdateModeInsert();
+        $dsOrdline->setValue(
+            DBEOrdline::ordheadID,
+            $ordheadID
+        );
+        $dsOrdline->setValue(
+            DBEOrdline::itemID,
+            null
+        );
+        $dsOrdline->setValue(
+            DBEOrdline::supplierID,
+            null
+        );
+        $dsOrdline->setValue(
+            DBEOrdline::sequenceNo,
+            $sequenceNo
+        );
+        $dsOrdline->setValue(
+            DBEOrdline::lineType,
+            'I'
+        );    // default item line
+        $dsOrdline->setValue(
+            DBEOrdline::qtyOrdered,
+            1
+        );    // default 1
+        $dsOrdline->post();
+    }
+
+    /**
+     * @param DataSet $dsOrdline
+     */
+    function insertNewOrderLine(&$dsOrdline)
+    {
+        $this->setMethodName('insertNewOrdline');
+//count rows
+        $dsOrdline->fetchNext();
+        $dbeOrdline = new DBEOrdline($this);
+        $dbeOrdline->setValue(
+            DBEOrdline::ordheadID,
+            $dsOrdline->getValue(DBEOrdline::ordheadID)
+        );
+        if ($dbeOrdline->countRowsByColumn(DBEOrdline::ordheadID) > 0) {
+            // shuffle down existing rows before inserting new one
+            $dbeOrdline->setValue(
+                DBEOrdline::ordheadID,
+                $dsOrdline->getValue(DBEOrdline::ordheadID)
+            );
+            $dbeOrdline->setValue(
+                DBEOrdline::sequenceNo,
+                $dsOrdline->getValue(DBEOrdline::sequenceNo)
+            );
+            $dbeOrdline->shuffleRowsDown();
+        }
+        $this->updateOrderLine(
+            $dsOrdline,
+            "I"
+        );
+        $dbeOrdhead = new DBEOrdhead($this);
+        $dbeOrdhead->setPKValue($dsOrdline->getValue(DBEOrdline::ordheadID));
+        $dbeOrdhead->setUpdatedTime();
+    }
+
+    /**
      * @param DataSet $dsOrdline
      * @param string $action
      */
@@ -1200,89 +1207,6 @@ class BUSalesOrder extends Business
         $dbeOrdhead->setUpdatedTime();
     }
 
-
-    /**
-     * @param $ordheadID
-     * @param $sequenceNo
-     * @param $dsOrdline
-     */
-    function initialiseNewOrdline($ordheadID,
-                                  $sequenceNo,
-                                  &$dsOrdline
-    )
-    {
-        $this->setMethodName('initialiseNewOrdline');
-        if (!$ordheadID) {
-            $this->raiseError('ordheadID not passed');
-        }
-        if (!$sequenceNo) {
-            $this->raiseError('sequenceNo not passed');
-        }
-        $dbeJOrdline = new DBEJOrdline($this);
-        $dsOrdline = new DataSet($this);
-        $dsOrdline->copyColumnsFrom($dbeJOrdline);
-        $dsOrdline->setUpdateModeInsert();
-        $dsOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $ordheadID
-        );
-        $dsOrdline->setValue(
-            DBEOrdline::itemID,
-            null
-        );
-        $dsOrdline->setValue(
-            DBEOrdline::supplierID,
-            null
-        );
-        $dsOrdline->setValue(
-            DBEOrdline::sequenceNo,
-            $sequenceNo
-        );
-        $dsOrdline->setValue(
-            DBEOrdline::lineType,
-            'I'
-        );    // default item line
-        $dsOrdline->setValue(
-            DBEOrdline::qtyOrdered,
-            1
-        );    // default 1
-        $dsOrdline->post();
-    }
-
-    /**
-     * @param DataSet $dsOrdline
-     */
-    function insertNewOrderLine(&$dsOrdline)
-    {
-        $this->setMethodName('insertNewOrdline');
-//count rows
-        $dsOrdline->fetchNext();
-        $dbeOrdline = new DBEOrdline($this);
-        $dbeOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $dsOrdline->getValue(DBEOrdline::ordheadID)
-        );
-        if ($dbeOrdline->countRowsByColumn(DBEOrdline::ordheadID) > 0) {
-            // shuffle down existing rows before inserting new one
-            $dbeOrdline->setValue(
-                DBEOrdline::ordheadID,
-                $dsOrdline->getValue(DBEOrdline::ordheadID)
-            );
-            $dbeOrdline->setValue(
-                DBEOrdline::sequenceNo,
-                $dsOrdline->getValue(DBEOrdline::sequenceNo)
-            );
-            $dbeOrdline->shuffleRowsDown();
-        }
-        $this->updateOrderLine(
-            $dsOrdline,
-            "I"
-        );
-        $dbeOrdhead = new DBEOrdhead($this);
-        $dbeOrdhead->setPKValue($dsOrdline->getValue(DBEOrdline::ordheadID));
-        $dbeOrdhead->setUpdatedTime();
-    }
-
     function moveOrderLineUp($ordheadID,
                              $sequenceNo
     )
@@ -1332,43 +1256,6 @@ class BUSalesOrder extends Business
             $sequenceNo
         );
         $dbeOrdline->moveRow('DOWN');
-        $dbeOrdhead = new DBEOrdhead($this);
-        $dbeOrdhead->setPKValue($ordheadID);
-        $dbeOrdhead->setUpdatedTime();
-    }
-
-    function deleteOrderLine($ordheadID,
-                             $sequenceNo
-    )
-    {
-        if (!$ordheadID) {
-            $this->raiseError('ordheadID not passed');
-        }
-
-        if (!$sequenceNo) {
-            $sequenceNo = 0;
-        }
-
-
-        $dbeOrdline = new DBEOrdline($this);
-        $dbeOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $ordheadID
-        );
-        $dbeOrdline->setValue(
-            DBEOrdline::sequenceNo,
-            $sequenceNo
-        );
-        $dbeOrdline->deleteRow();
-        $dbeOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $ordheadID
-        );
-        $dbeOrdline->setValue(
-            DBEOrdline::sequenceNo,
-            $sequenceNo
-        );
-        $dbeOrdline->shuffleRowsUp();
         $dbeOrdhead = new DBEOrdhead($this);
         $dbeOrdhead->setPKValue($ordheadID);
         $dbeOrdhead->setUpdatedTime();
@@ -1531,8 +1418,93 @@ class BUSalesOrder extends Business
         return $ret;
     }
 
-
     /**
+     * @param $ordheadID
+     * @param DataSet $dsOrdhead
+     * @param DataSet $dsJOrdline
+     * @param $dsDeliveryContact
+     * @return bool
+     */
+    function getOrderWithCustomerName($ordheadID,
+                                      &$dsOrdhead,
+                                      &$dsJOrdline,
+                                      &$dsDeliveryContact
+    )
+    {
+        $this->setMethodName('getOrderWithCustomerName');
+        if (!$ordheadID) {
+            $this->raiseError('order ID not passed');
+            return false;
+        }
+        $dbeJOrdline = new DBEJOrdline($this);
+        $dbeJOrdhead = new DBEJOrdhead($this);
+        $ret = ($this->getDatasetByPK(
+            $ordheadID,
+            $dbeJOrdhead,
+            $dsOrdhead
+        ));
+        if (!$ret) {
+            $this->raiseError('order not found');
+        }
+        $dbeJOrdline->setValue(
+            DBEJOrdline::ordheadID,
+            $ordheadID
+        );
+        $dbeJOrdline->getRowsByColumn(
+            DBEJOrdline::ordheadID
+        );
+        $this->getData(
+            $dbeJOrdline,
+            $dsJOrdline
+        );
+        $dsJOrdline->sortAscending(DBEJOrdline::sequenceNo);
+        $buCustomer = new BUCustomer($this);
+        $buCustomer->getContactByID(
+            $dsOrdhead->getValue(DBEOrdhead::delContactID),
+            $dsDeliveryContact
+        );
+        return true;
+    }
+
+    function getOrderByOrdheadID($ordheadID,
+                                 &$dsOrdhead,
+                                 &$dsOrdline
+    )
+    {
+        $this->setMethodName('getOrderByOrdheadID');
+        $ret = FALSE;
+        if (!$ordheadID) {
+            $this->raiseError('order ID not passed');
+        } else {
+            $dbeOrdline = new DBEOrdline($this);
+            $dbeOrdhead = new DBEOrdhead($this);
+            $ret = ($this->getDatasetByPK(
+                $ordheadID,
+                $dbeOrdhead,
+                $dsOrdhead
+            ));
+            if (!$ret) {
+                $this->raiseError('order not found');
+            }
+
+            $dbeOrdline->setValue(
+                DBEOrdline::ordheadID,
+                $ordheadID
+            );
+            $dbeOrdline->getRowsByColumn(
+                DBEOrdline::ordheadID,
+                DBEOrdline::sequenceNo
+            );
+            $this->getData(
+                $dbeOrdline,
+                $dsOrdline
+            );
+        }
+
+        return $ret;
+    }
+
+/**
      * @param $ordheadID
      * @param $supplierID
      * @param DataSet $dsSelectedOrderLine
@@ -1700,6 +1672,43 @@ class BUSalesOrder extends Business
         return TRUE;
     }
 
+    function deleteOrderLine($ordheadID,
+                             $sequenceNo
+    )
+    {
+        if (!$ordheadID) {
+            $this->raiseError('ordheadID not passed');
+        }
+
+        if (!$sequenceNo) {
+            $sequenceNo = 0;
+        }
+
+
+        $dbeOrdline = new DBEOrdline($this);
+        $dbeOrdline->setValue(
+            DBEOrdline::ordheadID,
+            $ordheadID
+        );
+        $dbeOrdline->setValue(
+            DBEOrdline::sequenceNo,
+            $sequenceNo
+        );
+        $dbeOrdline->deleteRow();
+        $dbeOrdline->setValue(
+            DBEOrdline::ordheadID,
+            $ordheadID
+        );
+        $dbeOrdline->setValue(
+            DBEOrdline::sequenceNo,
+            $sequenceNo
+        );
+        $dbeOrdline->shuffleRowsUp();
+        $dbeOrdhead = new DBEOrdhead($this);
+        $dbeOrdhead->setPKValue($ordheadID);
+        $dbeOrdhead->setUpdatedTime();
+    }
+
     function updateHeader(
         $ordheadID,
         $custPORef,
@@ -1814,17 +1823,6 @@ class BUSalesOrder extends Business
         ));
     }
 
-    function countPurchaseOrders($ordheadID)
-    {
-        $this->setMethodName('countPurchaseOrders');
-        $dbePorhead = new DBEPorhead($this);
-        $dbePorhead->setValue(
-            DBEPorhead::ordheadID,
-            $ordheadID
-        );
-        return ($dbePorhead->countRowsByColumn(DBEPorhead::ordheadID));
-    }
-
     function countLinkedServiceRequests($ordheadID)
     {
         $this->setMethodName('countLinkedServiceRequests');
@@ -1834,18 +1832,6 @@ class BUSalesOrder extends Business
             $ordheadID
         );
         return ($dbeProblem->countRowsByColumn(DBEProblem::linkedSalesOrderID));
-    }
-
-    function getLinkedServiceRequestID($ordheadID)
-    {
-        $this->setMethodName('getLinkedServiceRequestID');
-        $dbeProblem = new DBEProblem($this);
-        $dbeProblem->setValue(
-            DBEProblem::linkedSalesOrderID,
-            $ordheadID
-        );
-        $dbeProblem->getRowByColumn(DBEProblem::linkedSalesOrderID);
-        return $dbeProblem->getValue(DBEProblem::problemID);
     }
 
     /**
@@ -2165,6 +2151,18 @@ WHERE odl_ordno = $ordheadID
 
         $purchaseOrderHeader->updateRow();
 
+    }
+
+    function getLinkedServiceRequestID($ordheadID)
+    {
+        $this->setMethodName('getLinkedServiceRequestID');
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->setValue(
+            DBEProblem::linkedSalesOrderID,
+            $ordheadID
+        );
+        $dbeProblem->getRowByColumn(DBEProblem::linkedSalesOrderID);
+        return $dbeProblem->getValue(DBEProblem::problemID);
     }
 
 }
