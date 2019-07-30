@@ -276,142 +276,76 @@ class CTQuotationTemplates extends CTCNC
     {
 
         $dsResults = new DataSet($this);
-        $this->buQuotationTemplate->getByNameMatch(
-            $this->getParam('description'),
-            $dsResults,
-        );
+        $this->buQuotationTemplate->getByNameMatch($this->getParam('description'), $dsResults);
 
-//        $this->template->set_var(
-//            array(
-//                'parentIDField'               => @$_SESSION['itemParentIDField'],
-//                'parentSlaResponseHoursField' => @$_SESSION['itemParentSlaResponseHoursField'],
-//                'parentDescField'             => @$_SESSION['itemParentDescField']
-//            )
-//        );
+        $this->template->set_var(
+            array(
+                'parentIDField'               => $this->getParam('parentIDField'),
+                'parentDescField'             => $this->getParam('parentDescField'),
+                'parentLinkedSalesOrderField' => $this->getParam('parentLinkedSalesOrderField')
+            )
+        );
         if ($dsResults->rowCount() == 1) {
             $this->setTemplateFiles(
-                'ItemSelect',
-                'ItemSelectOne.inc'
+                'QuotationTemplateSelect',
+                'QuotationTemplateSelectOne.inc'
             );
             // This template runs a javascript function NOT inside HTML and so must use stripslashes()
             $this->template->set_var(
                 array(
-                    'submitDescription'       => addslashes($dsResults->getValue(DBEItem::description)),
+                    'description'        => addslashes($dsResults->getValue(DBEQuotationTemplate::description)),
                     // for javascript
-                    'itemID'                  => $dsResults->getValue(DBEItem::itemID),
-                    'curUnitCost'             => number_format(
-                        $dsResults->getValue(DBEItem::curUnitCost),
-                        2,
-                        '.',
-                        ''
-                    ),
-                    'curUnitSale'             => number_format(
-                        $dsResults->getValue(DBEItem::curUnitSale),
-                        2,
-                        '.',
-                        ''
-                    ),
-                    'qtyOrdered'              => $dsResults->getValue(DBEItem::salesStockQty),
-                    // to indicate number in stock
-                    'slaResponseHours'        => $dsResults->getValue(DBEItem::contractResponseTime),
-                    'partNo'                  => $dsResults->getValue(DBEItem::partNo),
-                    'allowDirectDebit'        => $dsResults->getValue(DBEItem::allowDirectDebit) == 'Y' ? 'true' : 'false',
-                    'excludeFromPOCompletion' => $dsResults->getValue(
-                        DBEItem::excludeFromPOCompletion
-                    ) == 'Y' ? 'true' : 'false'
+                    'id'                 => $dsResults->getValue(DBEQuotationTemplate::id),
+                    'linkedSalesOrderID' => $dsResults->getValue(DBEQuotationTemplate::linkedSalesOrderId),
                 )
             );
         } else {
             if ($dsResults->rowCount() == 0) {
                 $this->template->set_var(
                     array(
-                        'itemDescription' => $this->getParam('itemDescription'),
+                        'description' => $this->getParam(DBEQuotationTemplate::description),
                     )
                 );
                 $this->setTemplateFiles(
-                    'ItemSelect',
-                    'ItemSelectNone.inc'
+                    'QuotationTemplateSelect',
+                    'QuotationTemplateSelectNone.inc'
                 );
             }
             if ($dsResults->rowCount() > 1) {
                 $this->setTemplateFiles(
-                    'ItemSelect',
-                    'ItemSelectPopup.inc'
+                    'QuotationTemplateSelect',
+                    'QuotationTemplateSelectPopup.inc'
                 );
             }
 
-            $returnTo = $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'];
-
-            $urlDiscontinue =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'   => 'discontinue',
-                        'returnTo' => $returnTo
-                    )
-                );
-
-            $this->template->set_var(
-                array(
-                    'urlItemCreate'  => $urlCreate,
-                    'urlDiscontinue' => $urlDiscontinue
-                )
-            );
-
             // Parameters
-            $this->setPageTitle('Item Selection');
+            $this->setPageTitle('Quotation Template Selection');
             if ($dsResults->rowCount() > 0) {
                 $this->template->set_block(
-                    'ItemSelect',
-                    'itemBlock',
-                    'items'
+                    'QuotationTemplateSelect',
+                    'quotationTemplateBlock',
+                    'quotationTemplates'
                 );
                 while ($dsResults->fetchNext()) {
                     $this->template->set_var(
                         array(
-                            'itemDescription'         => Controller::htmlDisplayText(
-                                $dsResults->getValue(DBEItem::description)
-                            ),
-                            // this complicated thing is to cope with Javascript quote problems!
-                            'submitDescription'       => Controller::htmlInputText(
-                                addslashes($dsResults->getValue(DBEItem::description))
-                            ),
-                            'itemID'                  => $dsResults->getValue(DBEItem::itemID),
-                            'curUnitCost'             => number_format(
-                                $dsResults->getValue(DBEItem::curUnitCost),
-                                2,
-                                '.',
-                                ''
-                            ),
-                            'curUnitSale'             => number_format(
-                                $dsResults->getValue(DBEItem::curUnitSale),
-                                2,
-                                '.',
-                                ''
-                            ),
-                            'qtyOrdered'              => $dsResults->getValue(DBEItem::salesStockQty),
-                            // to indicate number in stock
-                            'partNo'                  => $dsResults->getValue(DBEItem::partNo),
-                            'slaResponseHours'        => $dsResults->getValue(DBEItem::contractResponseTime),
-                            'allowDirectDebit'        => $dsResults->getValue(
-                                DBEItem::allowDirectDebit
-                            ) == 'Y' ? 'true' : 'false',
-                            'excludeFromPOCompletion' => $dsResults->getValue(
-                                DBEItem::excludeFromPOCompletion
-                            ) == 'Y' ? 'true' : 'false'
+                            'description'        => addslashes($dsResults->getValue(DBEQuotationTemplate::description)),
+                            'id'                 => $dsResults->getValue(DBEQuotationTemplate::id),
+                            'linkedSalesOrderID' => $dsResults->getValue(DBEQuotationTemplate::linkedSalesOrderId),
                         )
                     );
+
                     $this->template->parse(
-                        'items',
-                        'itemBlock',
+                        'quotationTemplates',
+                        'quotationTemplateBlock',
                         true
                     );
                 }
             }
-        } // not ($dsItem->rowCount()==1)
+        }
         $this->template->parse(
             'CONTENTS',
-            'ItemSelect',
+            'QuotationTemplateSelect',
             true
         );
         $this->parsePage();
@@ -429,16 +363,16 @@ class CTQuotationTemplates extends CTCNC
 
             switch ($value) {
                 case 'top':
-                    $dbeQuotationTemplate->moveItemToTop($quotationTemplateID);
+                    $dbeQuotationTemplate->moveQuotationTemplateToTop($quotationTemplateID);
                     break;
                 case 'bottom':
-                    $dbeQuotationTemplate->moveItemToBottom($quotationTemplateID);
+                    $dbeQuotationTemplate->moveQuotationTemplateToBottom($quotationTemplateID);
                     break;
                 case 'down':
-                    $dbeQuotationTemplate->moveItemDown($quotationTemplateID);
+                    $dbeQuotationTemplate->moveQuotationTemplateDown($quotationTemplateID);
                     break;
                 case 'up':
-                    $dbeQuotationTemplate->moveItemUp($quotationTemplateID);
+                    $dbeQuotationTemplate->moveQuotationTemplateUp($quotationTemplateID);
                     break;
             }
 

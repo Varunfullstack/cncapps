@@ -2682,8 +2682,6 @@ class CTSalesOrder extends CTCNC
     }
 
 
-
-
     /**
      * @param $ordheadID
      * @param $templateName
@@ -4058,6 +4056,11 @@ class CTSalesOrder extends CTCNC
             $this->pasteLinesFromSO();
             exit;
         }
+        if ($this->getParam('ordline')[1]['lineType'] == 'T') {
+            $this->pasteLinesFromQuotationTemplate();
+            exit;
+        }
+
         $this->dsOrdline = new DataSet($this);
         $dbeOrdline = new DBEOrdline($this);
         $this->dsOrdline->copyColumnsFrom($dbeOrdline);
@@ -4215,7 +4218,37 @@ class CTSalesOrder extends CTCNC
             $this->getOrdheadID()
         );
         $this->displayOrder();
-        exit;
+    }
+
+    /**
+     * Paste lines from another Sales Order onto the end of this one
+     * $this->getParam('ordline')[1]['description'] holds ordheadID of order to paste from
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function pasteLinesFromQuotationTemplate()
+    {
+        $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
+        if (!is_numeric($this->getParam('ordline')[1]['itemID'])) {
+            $this->setFormErrorMessage('Sales order number must be numeric');
+            $this->displayOrder();
+            return;
+        }
+        if (!$this->buSalesOrder->getOrdheadByID(
+            $this->getParam('ordline')[1]['itemID'],
+            $dsOrdhead
+        )) {
+            $this->setFormErrorMessage('The sales order you are trying to paste from does not exist');
+            $this->displayOrder();
+            return;
+        }
+        $this->buSalesOrder->pasteLinesFromOrder(
+            $this->getParam('ordline')[1]['itemID'],
+            $this->getOrdheadID()
+        );
+        $this->displayOrder();
     }
 
     /**

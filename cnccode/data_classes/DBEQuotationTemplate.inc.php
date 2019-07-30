@@ -238,10 +238,9 @@ SET
             " FROM " . $this->getTableName() .
             " WHERE 1=1";
         $queryString .=
-            " AND MATCH (" . $this->getDBColumnName(self::description) . ")
-				AGAINST ('" . $this->getValue(
+            " AND " . $this->getDBColumnName(self::description) . " like '%" . $this->getValue(
                 self::description
-            ) . "' IN BOOLEAN MODE) ORDER BY " . $this->getDBColumnName(self::description) .
+            ) . "%' ORDER BY " . $this->getDBColumnName(self::description) .
             " LIMIT 0,200";
         $this->setQueryString($queryString);
         $ret = (parent::getRows());

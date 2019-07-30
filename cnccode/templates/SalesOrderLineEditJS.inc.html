@@ -1,6 +1,6 @@
 <script language='JavaScript'>
     function validateItemDescription() {
-        if (document.getElementById("lineType").value == "I") {
+        if (document.getElementById("lineType").value === "I") {
             if (Trim(document.getElementById("itemDescription").value) != "") {
                 window.open('{urlItemPopup}&itemDescription=' +
                     escape(encodeURIComponent(document.getElementById("itemDescription").value)) +
@@ -10,13 +10,13 @@
             }
         }
 
-        if (document.getElementById('lineType').value == 'T') {
-            if (Trim(document.getElementById("itemDescription").value) != "") {
-                window.open('{urlTemplatePopup}&templateDescription=' +
+        if (document.getElementById('lineType').value === 'T') {
+            if (Trim(document.getElementById("itemDescription").value)) {
+                window.open('QuotationTemplates.php?action=dispTemplateQuotationPopup&htmlFmt=popup&description=' +
                     escape(encodeURIComponent(document.getElementById("itemDescription").value)) +
-                    '&parentIDField=itemID' +
+                    '&parentLinkedSalesOrderField=itemID' +
                     '&parentDescField=itemDescription',
-                    'items', 'scrollbars=yes,resizable=no,width=610,height=560,copyhistory=no, menubar=0')
+                    'Quotation Templates', 'scrollbars=yes,resizable=no,width=610,height=560,copyhistory=no, menubar=0')
             }
         }
     }

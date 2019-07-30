@@ -37,23 +37,16 @@
             </sqlCheck>
         </preConditions>
         <sql>
-            update customer set cus_name = "CNC Template Customer" where cus_custno = 420
+            update customer
+            set cus_name = "CNC Template Customer"
+            where cus_custno = 420
         </sql>
         <rollback>
             <sql>
-                update customer set cus_name = "CNC Test" where cus_custno = 420
+                update customer
+                set cus_name = "CNC Test"
+                where cus_custno = 420
             </sql>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="1563960329-3">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists tableName="quotationTemplate" indexName="quotationTemplate_description_full_index"/>
-            </not>
-        </preConditions>
-        <createIndex indexName="quotationTemplate_description_full_index" tableName="quotationTemplate">
-            <column name="description"/>
-        </createIndex>
-    </changeSet>
-
 </databaseChangeLog>

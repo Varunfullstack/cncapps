@@ -1,0 +1,26 @@
+<html>
+<head>
+    <script type="text/javascript">
+        function submitItem(id, description, linkedSalesOrderId) {
+            if ((opener) && (!opener.closed)) {
+                if (opener.document.getElementById("{parentIDField}")) {
+                    opener.document.getElementById("{parentIDField}").value = id;
+                }
+                if (opener.document.getElementById("{parentDescField}")) {
+                    opener.document.getElementById("{parentDescField}").value = description;
+                }
+
+                if (opener.document.getElementById("{parentLinkedSalesOrderField}")) {
+                    opener.document.getElementById("{parentLinkedSalesOrderField}").value = linkedSalesOrderId;
+                }
+                window.close();
+            }
+        }
+
+        submitItem({id}, "{description}", "{linkedSalesOrderID}");
+    </script>
+</head>
+<body>
+
+</body>
+</html>
