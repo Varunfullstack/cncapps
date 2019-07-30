@@ -272,7 +272,7 @@
            border="0"
     >
         <tr>
-            <td colspan="4">
+            <td colspan="5">
                 <div align="left">
                     <input type="submit"
                            name="Fixed"
@@ -335,17 +335,15 @@
                            value="Cancel"
                            onclick="confirmCancel();"
                     />
-                    <button type="button"
-                            class="partsUsedButton"
-                    >Parts Used
-                    </button>
-                    <button type="button"
-                            onclick="showSalesRequestDialog()"
-                    >Sales Request
-                    </button>
+                    <input type="button"
+                           class="partsUsedButton"
+                           value="Parts Used"
+                    >
+                    <input type="button"
+                           onclick="showSalesRequestDialog()"
+                           value="Sales Request"
+                    >
                 </div>
-
-
             </td>
         </tr>
 
@@ -755,14 +753,15 @@
                            value="Cancel"
                            onclick="if(confirm('Are you sure you want to cancel?')) document.location='{urlCancelEdit}';"
                     />
-                    <button type="button"
-                            class="partsUsedButton"
-                    >Parts Used
-                    </button>
-                    <button type="button"
-                            onclick="showSalesRequestDialog()"
-                    >Sales Request
-                    </button>
+                    <input type="button"
+                           class="partsUsedButton"
+                           value="Parts Used"
+                    >
+
+                    <input type="button"
+                           onclick="showSalesRequestDialog()"
+                           value="Sales Request"
+                    >
                 </div>
             </td>
         </tr>

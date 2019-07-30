@@ -5,6 +5,12 @@ This project changes will be shown here.
 ### Added
 - Issue 605 - Sales Quotation & Online Ordering
 
+## [v3.4.4] - 2019-07-30
+### Fixed
+- Customer.php, the link to 'Create Customer Folder' doesn't work because of the relative path.
+### Changed
+- When editing an activity, the buttons for Parts Used & Sales Requests, shrink the font so that it's the same as the other buttons on that page.
+
 ## [v3.4.3] - 2019-07-26
 ### Changed
 - On SDManagerDashboard.php please move the sorting order so that Critical Requests sit between “current open P1 requests” and “oldest updated SRs”.
