@@ -2086,7 +2086,7 @@ ORDER BY cus_name ASC  ";
                     )
                 );
             $customerFolderLink =
-                '<a href="http:' . $urlCreateCustomerFolder . '" title="Create Folder">Create Customer Folder</a>';
+                '<a href="' . $urlCreateCustomerFolder . '" title="Create Folder">Create Customer Folder</a>';
         }
         $renewalLinkURL =
             Controller::buildLink(
