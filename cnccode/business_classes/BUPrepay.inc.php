@@ -199,7 +199,6 @@ class BUPrepay extends Business
           ( caa_starttime <> caa_endtime OR curValue <> 0 )" .                   // time was logged or this is a value (e.g. topUp)
             " GROUP BY pro_problemno
       ORDER BY pro_custno, pro_problemno, pro_date_raised";
-        var_dump($queryString);
         $db->query($queryString);
 
         $ret = FALSE; // indicates there were no statements to export
@@ -297,7 +296,6 @@ class BUPrepay extends Business
 
                 $htmlFileHandle = fopen($filepath . '.html', 'wb');
                 if (!$htmlFileHandle) {
-                    var_dump('first instance ...');
                     print_r(error_get_last());
                     $this->raiseError("Unable to open html file " . $filepath);
                 }
@@ -448,7 +446,6 @@ class BUPrepay extends Business
                     ) . $date->format('Y-m-d');
                 $htmlFileHandle = fopen($filepath . '.html', 'wb');
                 if (!$htmlFileHandle) {
-                    var_dump('second instance ...');
                     print_r(error_get_last());
                     $this->raiseError("Unable to open html file " . $filepath);
                 }
@@ -575,7 +572,7 @@ class BUPrepay extends Business
         return $topUpValue;
     }
 
-        function createTopUpSalesOrder(&$Record, $topUpValue)
+    function createTopUpSalesOrder(&$Record, $topUpValue)
     {
         $this->setMethodName('createTopUpSalesOrder');
 
@@ -777,7 +774,7 @@ is currently a balance of ';
 
     }
 
-function getActivitiesByServiceRequest($serviceRequestRecord)
+    function getActivitiesByServiceRequest($serviceRequestRecord)
     {
 
         $db = new dbSweetcode (); // database connection for query
