@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.4.5] - 2019-07-31
+### Fixed
+- PrePay Statement Export Not Posting Top Ups
+
 ## [v3.4.4] - 2019-07-30
 ### Fixed
 - Customer.php, the link to 'Create Customer Folder' doesn't work because of the relative path.

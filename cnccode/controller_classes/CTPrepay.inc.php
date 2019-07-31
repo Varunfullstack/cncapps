@@ -131,7 +131,10 @@ class CTPrepay extends CTCNC
                         'expiryDate'      => $dsResults->getValue(BUPrepay::exportPrePayExpiryDate),
                         'contacts'        => $dsResults->getValue(BUPrepay::exportPrePayContacts),
                         'contractType'    => $dsResults->getValue(BUPrepay::exportPrePayContractType),
-                        'webFileLink'     => $dsResults->getValue(BUPrepay::exportPrePayWebFileLink)
+                        'webFileLink'     => $dsResults->getValue(BUPrepay::exportPrePayWebFileLink),
+                        'redClass'        => $dsResults->getValue(
+                            BUPrepay::exportPrePayCurrentBalance
+                        ) < 100 ? 'redRow' : null
                     )
                 );
                 $this->template->parse('results', 'resultBlock', true);
