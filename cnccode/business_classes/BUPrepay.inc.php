@@ -42,8 +42,10 @@ class BUPrepay extends Business
     const exportPrePayContacts = "contacts";
     const exportPrePayContractType = "contractType";
     const exportPrePayWebFileLink = "webFileLink";
-
-
+    /**
+     * @var DBEJCallActivity
+     */
+    public $dbeJCallActivity;
     /** @var DBEUser */
     private $dbeUser;
     /** @var BUCustomer */
@@ -53,10 +55,6 @@ class BUPrepay extends Business
     /** @var DSForm */
     private $dsData;
     private $updateFlag = false;
-    /**
-     * @var DBEJCallActivity
-     */
-    public $dbeJCallActivity;
     /**
      * @var bool|float|int|string
      */
@@ -93,6 +91,11 @@ class BUPrepay extends Business
 
     }
 
+    /**
+     * @param $dsData
+     * @param bool $updateFlag
+     * @return bool|DataSet
+     */
     function exportPrePayActivities($dsData, $updateFlag = false)
     {
 
@@ -137,11 +140,9 @@ class BUPrepay extends Business
             " AND	cus_custno <> " . CONFIG_SALES_STOCK_CUSTOMERID .
             " AND	renewalStatus  <> 'D'";
 
-
         $db->query($queryString);
         while ($db->next_record()) {
             $validContracts [$db->Record ['cui_cuino']] = 0; // initialise to no activity
-
         }
 
 //        $dbUpdate = new dbSweetcode (); // database connection for update query
@@ -179,9 +180,9 @@ class BUPrepay extends Business
       WHERE itm_itemno = " . $this->dsHeader->getValue(
                 DBEHeader::gscItemID
             ) .              // Activity logged against PrePay contract
-            " AND DATE(pro_fixed_date) <= '" . $this->dsData->getValue(
+            " AND (DATE(pro_fixed_date) <= '" . $this->dsData->getValue(
                 self::exportDataSetEndDate
-            ) . "'" .   // Request was raised before run date
+            ) . "' or pro_fixed_date is null) " .   // Request was raised before run date
             " AND cui_desp_date <= '" . $this->dsData->getValue(
                 self::exportDataSetEndDate
             ) . "'" .     // Contract had started before run date
@@ -198,7 +199,7 @@ class BUPrepay extends Business
           ( caa_starttime <> caa_endtime OR curValue <> 0 )" .                   // time was logged or this is a value (e.g. topUp)
             " GROUP BY pro_problemno
       ORDER BY pro_custno, pro_problemno, pro_date_raised";
-
+        var_dump($queryString);
         $db->query($queryString);
 
         $ret = FALSE; // indicates there were no statements to export
@@ -574,7 +575,209 @@ class BUPrepay extends Business
         return $topUpValue;
     }
 
-    function getActivitiesByServiceRequest($serviceRequestRecord)
+        function createTopUpSalesOrder(&$Record, $topUpValue)
+    {
+        $this->setMethodName('createTopUpSalesOrder');
+
+        $this->buCustomer->getCustomerByID($Record ['custno'], $dsCustomer);
+
+        // create sales order header with correct field values
+        $buSalesOrder = new BUSalesOrder ($this);
+        $dsOrdhead = new DataSet($this);
+        $buSalesOrder->initialiseOrder($dsOrdhead, $dbeOrdline, $dsCustomer);
+        $dsOrdhead->setUpdateModeUpdate();
+        $dsOrdhead->setvalue(DBEJOrdhead::custPORef, 'Top Up');
+        $dsOrdhead->setvalue(DBEJOrdhead::addItem, 'N');
+        $dsOrdhead->setvalue(DBEJOrdhead::partInvoice, 'N');
+        $dsOrdhead->setvalue(DBEJOrdhead::paymentTermsID, CONFIG_PAYMENT_TERMS_30_DAYS);
+        $dsOrdhead->post();
+        $buSalesOrder->updateHeader(
+            $dsOrdhead->getValue(DBEJOrdhead::ordheadID),
+            $dsOrdhead->getValue(DBEJOrdhead::custPORef),
+            $dsOrdhead->getValue(DBEJOrdhead::paymentTermsID),
+            $dsOrdhead->getValue(DBEJOrdhead::partInvoice),
+            $dsOrdhead->getValue(DBEJOrdhead::addItem)
+        );
+
+        $ordheadID = $dsOrdhead->getValue(DBEJOrdhead::ordheadID);
+        $sequenceNo = 1;
+
+        // get topUp item details
+        $dbeItem = new DBEItem ($this);
+        $dbeItem->getRow(CONFIG_DEF_PREPAY_TOPUP_ITEMID);
+
+        // create order line
+        $dbeOrdline = new DBEOrdline ($this);
+        $dbeOrdline->setValue(DBEJOrdline::ordheadID, $ordheadID);
+        $dbeOrdline->setValue(DBEJOrdline::sequenceNo, $sequenceNo);
+        $dbeOrdline->setValue(DBEJOrdline::customerID, $Record ['custno']);
+        $dbeOrdline->setValue(DBEJOrdline::qtyDespatched, 0);
+        $dbeOrdline->setValue(DBEJOrdline::qtyLastDespatched, 0);
+        $dbeOrdline->setValue(DBEJOrdline::supplierID, CONFIG_SALES_STOCK_SUPPLIERID);
+        $dbeOrdline->setValue(DBEJOrdline::lineType, 'I');
+        $dbeOrdline->setValue(DBEJOrdline::sequenceNo, $sequenceNo);
+        $dbeOrdline->setValue(DBEJOrdline::stockcat, 'R');
+        $dbeOrdline->setValue(DBEJOrdline::itemID, CONFIG_DEF_PREPAY_TOPUP_ITEMID);
+        $dbeOrdline->setValue(DBEJOrdline::qtyOrdered, 1);
+        $dbeOrdline->setValue(DBEJOrdline::curUnitCost, 0);
+        $dbeOrdline->setValue(DBEJOrdline::curTotalCost, 0);
+        $dbeOrdline->setValue(DBEJOrdline::curUnitSale, $topUpValue);
+        $dbeOrdline->setValue(DBEJOrdline::curTotalSale, $topUpValue);
+        $dbeOrdline->setValue(DBEJOrdline::description, $dbeItem->getValue(DBEItem::description));
+        $dbeOrdline->insertRow();
+        return $dsOrdhead->getValue(DBEJOrdhead::ordheadID);
+    }    // end function
+
+    /**
+     * @param $Record
+     * @param DataSet $dsResults
+     * @param DataSet|DBEContact $dsStatementContact
+     * @param $newBalance
+     * @param $topUpAmount
+     * @param $endDate
+     */
+    function postRowToSummaryFile(&$Record, &$dsResults, &$dsStatementContact, $newBalance, $topUpAmount, $endDate)
+    {
+        $contacts = '';
+        while ($dsStatementContact->fetchNext()) {
+            $contacts .= $dsStatementContact->getValue(DBEContact::firstName) . ' ' . $dsStatementContact->getValue(
+                    DBEContact::lastName
+                );
+        }
+        $webFileLink = 'export/PP_' . substr($Record ['cus_name'], 0, 20) . $endDate . '.html';
+        $dsResults->setUpdateModeInsert();
+        $dsResults->setValue(self::exportPrePayCustomerName, $Record['cus_name']);
+        $dsResults->setValue(self::exportPrePayPreviousBalance, $Record ['curGSCBalance']);
+        $dsResults->setValue(self::exportPrePayCurrentBalance, common_numberFormat($newBalance));
+        $dsResults->setValue(self::exportPrePayExpiryDate, Controller::dateYMDtoDMY($Record ['cui_expiry_date']));
+        $dsResults->setValue(self::exportPrePayTopUp, common_numberFormat($topUpAmount));
+        $dsResults->setValue(self::exportPrePayContacts, $contacts);
+        $dsResults->setValue(self::exportPrePayContractType, $Record ['ity_desc']);
+        $dsResults->setValue(self::exportPrePayWebFileLink, $webFileLink);
+        $dsResults->post();
+    }
+
+    /**
+     * @param $statementFilepath
+     * @param $custno
+     * @param DataSet|DBEContact $dsContact
+     * @param $balance
+     * @param $date
+     * @param $topUpValue
+     */
+    function sendStatement($statementFilepath, $custno, &$dsContact, $balance, $date, $topUpValue)
+    {
+
+        $buMail = new BUMail($this);
+
+        $buMail->mime->addAttachment($statementFilepath, 'text/html');
+
+        $id_user = $GLOBALS ['auth']->is_authenticated();
+        $this->dbeUser->getRow($id_user);
+        $senderEmail = CONFIG_SALES_EMAIL;
+        $senderName = 'CNC Sales';
+
+        while ($dsContact->fetchNext()) {
+            // Send email with attachment
+            $message = '<body><p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
+            $message .= 'Dear ' . $dsContact->getValue(DBEContact::firstName) . ',';
+            $message .= '</span></p>';
+            $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
+            // Temporary:
+            $message .= 'Please find attached your latest Pre-Pay Contract statement, on which there
+is currently a balance of ';
+            $message .= '&pound;' . common_numberFormat($balance) . ' + VAT.';
+            $message .= '</p>';
+
+            $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
+            $message .= 'If you have any queries relating to any of the items detailed on this statement, then please notify us within 7 days so that we can make any adjustments if applicable.';
+            $message .= '</p>';
+
+            if ($balance <= 100) {
+                $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
+                $message .= 'If no response to the contrary is received within 7 days of this statement, then we will automatically raise an invoice for &pound;' . common_numberFormat(
+                        $topUpValue * (1 + ($this->standardVatRate / 100))
+                    ) . ' Inc VAT.';
+                $message .= '</p>';
+            }
+
+            $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
+            $message .= 'Are you aware that you can receive up to &pound;500 for the referral of any company made to CNC that results in the purchase of a support contract?  Please call us for further information.';
+            $message .= '</p>';
+
+            $message .= common_getHTMLEmailFooter($senderName, $senderEmail);
+
+            $subject = 'Pre-Pay Contract Statement: ' . Controller::dateYMDtoDMY($date);
+
+            $toEmail = $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(
+                    DBEContact::lastName
+                ) . '<' . $dsContact->getValue(DBEContact::email) . '>';
+
+            // create mime
+            $html = '<html lang="en">' . $message . '</html>';
+
+            $hdrs = array(
+                'From'         => $senderName . " <" . $senderEmail . ">",
+                'To'           => $toEmail,
+                'Subject'      => $subject,
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            $buMail->mime->setHTMLBody($html);
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
+            );
+            $body = $buMail->mime->get($mime_params);
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->putInQueue(
+                $senderEmail,
+                $toEmail,
+                $hdrs,
+                $body
+            );
+
+        } // end while
+        /*
+        Update DB
+        */
+        $this->save($statementFilepath, $custno, $balance);
+    }
+
+    /*
+        Create sales order for top-up
+    */
+
+    function save($filename, $custno, $balance)
+    {
+        $db = $GLOBALS['db'];
+
+        $fileString = mysqli_real_escape_string($db->link_id(), file_get_contents($filename));
+
+        $sql =
+
+            "INSERT INTO
+        prepaystatement(
+          pre_custno,
+          pre_date,
+          pre_file,
+          pre_balance
+        )
+        VALUES(
+          $custno,
+          NOW(),
+          '$fileString',
+          $balance
+        )";
+
+        $db->query($sql);
+
+    }
+
+function getActivitiesByServiceRequest($serviceRequestRecord)
     {
 
         $db = new dbSweetcode (); // database connection for query
@@ -712,36 +915,6 @@ class BUPrepay extends Business
         );
 
 
-    }    // end function
-
-
-    /**
-     * @param $Record
-     * @param DataSet $dsResults
-     * @param DataSet|DBEContact $dsStatementContact
-     * @param $newBalance
-     * @param $topUpAmount
-     * @param $endDate
-     */
-    function postRowToSummaryFile(&$Record, &$dsResults, &$dsStatementContact, $newBalance, $topUpAmount, $endDate)
-    {
-        $contacts = '';
-        while ($dsStatementContact->fetchNext()) {
-            $contacts .= $dsStatementContact->getValue(DBEContact::firstName) . ' ' . $dsStatementContact->getValue(
-                    DBEContact::lastName
-                );
-        }
-        $webFileLink = 'export/PP_' . substr($Record ['cus_name'], 0, 20) . $endDate . '.html';
-        $dsResults->setUpdateModeInsert();
-        $dsResults->setValue(self::exportPrePayCustomerName, $Record['cus_name']);
-        $dsResults->setValue(self::exportPrePayPreviousBalance, $Record ['curGSCBalance']);
-        $dsResults->setValue(self::exportPrePayCurrentBalance, common_numberFormat($newBalance));
-        $dsResults->setValue(self::exportPrePayExpiryDate, Controller::dateYMDtoDMY($Record ['cui_expiry_date']));
-        $dsResults->setValue(self::exportPrePayTopUp, common_numberFormat($topUpAmount));
-        $dsResults->setValue(self::exportPrePayContacts, $contacts);
-        $dsResults->setValue(self::exportPrePayContractType, $Record ['ity_desc']);
-        $dsResults->setValue(self::exportPrePayWebFileLink, $webFileLink);
-        $dsResults->post();
     }
 
     function postRowToPrePayExportFile(
@@ -768,179 +941,6 @@ class BUPrepay extends Business
         $this->template->parse('lines', 'lineBlock', true);
 
         $this->totalCost += $requestValue;
-    }
-
-    /*
-        Create sales order for top-up
-    */
-    function createTopUpSalesOrder(&$Record, $topUpValue)
-    {
-        $this->setMethodName('createTopUpSalesOrder');
-
-        $this->buCustomer->getCustomerByID($Record ['custno'], $dsCustomer);
-
-        // create sales order header with correct field values
-        $buSalesOrder = new BUSalesOrder ($this);
-        $dsOrdhead = new DataSet($this);
-        $buSalesOrder->initialiseOrder($dsOrdhead, $dbeOrdline, $dsCustomer);
-        $dsOrdhead->setUpdateModeUpdate();
-        $dsOrdhead->setvalue(DBEJOrdhead::custPORef, 'Top Up');
-        $dsOrdhead->setvalue(DBEJOrdhead::addItem, 'N');
-        $dsOrdhead->setvalue(DBEJOrdhead::partInvoice, 'N');
-        $dsOrdhead->setvalue(DBEJOrdhead::paymentTermsID, CONFIG_PAYMENT_TERMS_30_DAYS);
-        $dsOrdhead->post();
-        $buSalesOrder->updateHeader(
-            $dsOrdhead->getValue(DBEJOrdhead::ordheadID),
-            $dsOrdhead->getValue(DBEJOrdhead::custPORef),
-            $dsOrdhead->getValue(DBEJOrdhead::paymentTermsID),
-            $dsOrdhead->getValue(DBEJOrdhead::partInvoice),
-            $dsOrdhead->getValue(DBEJOrdhead::addItem)
-        );
-
-        $ordheadID = $dsOrdhead->getValue(DBEJOrdhead::ordheadID);
-        $sequenceNo = 1;
-
-        // get topUp item details
-        $dbeItem = new DBEItem ($this);
-        $dbeItem->getRow(CONFIG_DEF_PREPAY_TOPUP_ITEMID);
-
-        // create order line
-        $dbeOrdline = new DBEOrdline ($this);
-        $dbeOrdline->setValue(DBEJOrdline::ordheadID, $ordheadID);
-        $dbeOrdline->setValue(DBEJOrdline::sequenceNo, $sequenceNo);
-        $dbeOrdline->setValue(DBEJOrdline::customerID, $Record ['custno']);
-        $dbeOrdline->setValue(DBEJOrdline::qtyDespatched, 0);
-        $dbeOrdline->setValue(DBEJOrdline::qtyLastDespatched, 0);
-        $dbeOrdline->setValue(DBEJOrdline::supplierID, CONFIG_SALES_STOCK_SUPPLIERID);
-        $dbeOrdline->setValue(DBEJOrdline::lineType, 'I');
-        $dbeOrdline->setValue(DBEJOrdline::sequenceNo, $sequenceNo);
-        $dbeOrdline->setValue(DBEJOrdline::stockcat, 'R');
-        $dbeOrdline->setValue(DBEJOrdline::itemID, CONFIG_DEF_PREPAY_TOPUP_ITEMID);
-        $dbeOrdline->setValue(DBEJOrdline::qtyOrdered, 1);
-        $dbeOrdline->setValue(DBEJOrdline::curUnitCost, 0);
-        $dbeOrdline->setValue(DBEJOrdline::curTotalCost, 0);
-        $dbeOrdline->setValue(DBEJOrdline::curUnitSale, $topUpValue);
-        $dbeOrdline->setValue(DBEJOrdline::curTotalSale, $topUpValue);
-        $dbeOrdline->setValue(DBEJOrdline::description, $dbeItem->getValue(DBEItem::description));
-        $dbeOrdline->insertRow();
-        return $dsOrdhead->getValue(DBEJOrdhead::ordheadID);
-    }
-
-
-    /**
-     * @param $statementFilepath
-     * @param $custno
-     * @param DataSet|DBEContact $dsContact
-     * @param $balance
-     * @param $date
-     * @param $topUpValue
-     */
-    function sendStatement($statementFilepath, $custno, &$dsContact, $balance, $date, $topUpValue)
-    {
-
-        $buMail = new BUMail($this);
-
-        $buMail->mime->addAttachment($statementFilepath, 'text/html');
-
-        $id_user = $GLOBALS ['auth']->is_authenticated();
-        $this->dbeUser->getRow($id_user);
-        $senderEmail = CONFIG_SALES_EMAIL;
-        $senderName = 'CNC Sales';
-
-        while ($dsContact->fetchNext()) {
-            // Send email with attachment
-            $message = '<body><p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
-            $message .= 'Dear ' . $dsContact->getValue(DBEContact::firstName) . ',';
-            $message .= '</span></p>';
-            $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
-            // Temporary:
-            $message .= 'Please find attached your latest Pre-Pay Contract statement, on which there
-is currently a balance of ';
-            $message .= '&pound;' . common_numberFormat($balance) . ' + VAT.';
-            $message .= '</p>';
-
-            $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
-            $message .= 'If you have any queries relating to any of the items detailed on this statement, then please notify us within 7 days so that we can make any adjustments if applicable.';
-            $message .= '</p>';
-
-            if ($balance <= 100) {
-                $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
-                $message .= 'If no response to the contrary is received within 7 days of this statement, then we will automatically raise an invoice for &pound;' . common_numberFormat(
-                        $topUpValue * (1 + ($this->standardVatRate / 100))
-                    ) . ' Inc VAT.';
-                $message .= '</p>';
-            }
-
-            $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
-            $message .= 'Are you aware that you can receive up to &pound;500 for the referral of any company made to CNC that results in the purchase of a support contract?  Please call us for further information.';
-            $message .= '</p>';
-
-            $message .= common_getHTMLEmailFooter($senderName, $senderEmail);
-
-            $subject = 'Pre-Pay Contract Statement: ' . Controller::dateYMDtoDMY($date);
-
-            $toEmail = $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(
-                    DBEContact::lastName
-                ) . '<' . $dsContact->getValue(DBEContact::email) . '>';
-
-            // create mime
-            $html = '<html lang="en">' . $message . '</html>';
-
-            $hdrs = array(
-                'From'         => $senderName . " <" . $senderEmail . ">",
-                'To'           => $toEmail,
-                'Subject'      => $subject,
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
-            $buMail->mime->setHTMLBody($html);
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-            $body = $buMail->mime->get($mime_params);
-            $hdrs = $buMail->mime->headers($hdrs);
-
-            $buMail->putInQueue(
-                $senderEmail,
-                $toEmail,
-                $hdrs,
-                $body
-            );
-
-        } // end while
-        /*
-        Update DB
-        */
-        $this->save($statementFilepath, $custno, $balance);
-    }
-
-    function save($filename, $custno, $balance)
-    {
-        $db = $GLOBALS['db'];
-
-        $fileString = mysqli_real_escape_string($db->link_id(), file_get_contents($filename));
-
-        $sql =
-
-            "INSERT INTO
-        prepaystatement(
-          pre_custno,
-          pre_date,
-          pre_file,
-          pre_balance
-        )
-        VALUES(
-          $custno,
-          NOW(),
-          '$fileString',
-          $balance
-        )";
-
-        $db->query($sql);
-
     }
 
 }

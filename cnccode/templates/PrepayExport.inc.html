@@ -67,6 +67,16 @@
         </tr>
     </form>
 </table>
+<style>
+    .highlight:hover {
+        background-color: #FFFFCC;
+    }
+
+    .redRow {
+        background-color: #FFC7CE;
+    }
+
+</style>
 <table width="100%"
        class="singleBorder"
 >
@@ -74,17 +84,17 @@
         <td class="listHeadText">Customer</td>
         <td class="listHeadText">Contract</td>
         <td class="listHeadText">Expiry date</td>
-        <td class="listHeadText">Balance</td>
+        <td class="listHeadText">Previous Balance</td>
+        <td class="listHeadText">Remaining Balance</td>
         <td class="listHeadText">Top-up Due</td>
         <td class="listHeadText">Statement</td>
     </tr>
     <!-- BEGIN resultBlock -->
-    <tr onMouseOver="this.bgColor='#FFFFCC';"
-        onMouseOut="this.bgColor='';"
-    >
+    <tr class="highlight {redClass}">
         <td>{customerName}</td>
         <td>{contractType}</td>
         <td>{expiryDate}</td>
+        <td>{previousBalance}</td>
         <td>{currentBalance}</td>
         <td>{topUp}</td>
         <td><A href="{webFileLink}"
