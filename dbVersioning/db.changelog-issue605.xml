@@ -139,6 +139,80 @@
             </column>
         </addColumn>
     </changeSet>
-
-
+    <changeSet author="pavwebdev" id="1563960329-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="quotationLines"/>
+            </not>
+        </preConditions>
+        <createTable tableName="quotationLines">
+            <column name="id" type="int(11)">
+                <constraints primaryKey="true" primaryKeyName="PRIMARY" nullable="false"/>
+            </column>
+            <column name="quotationID" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sequenceNo" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lineType" type="char(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ordheadID" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customerID" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="itemID" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="stockcat" type="char(1)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="description" type="varchar(70)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="qtyOrdered" type="decimal(7,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="qtyDespatched" type="decimal(7,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="qtyLastDespatched" type="decimal(7,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="supplierID" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="curUnitCost" type="decimal(7,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="curTotalCost" type="decimal(7,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="curUnitSale" type="decimal(7,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="curTotalSale" type="decimal(7,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="renewalCustomerItemID" type="int(11) unsigned">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1563960329-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="quotationLines" foreignKeyName="fk_quotationID"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="quotationLines" baseColumnNames="quotationID"
+                                 constraintName="fk_quotationID"
+                                 referencedTableName="quotation"
+                                 referencedColumnNames="quotationID"
+                                 onDelete="CASCADE"
+        />
+    </changeSet>
 </databaseChangeLog>
