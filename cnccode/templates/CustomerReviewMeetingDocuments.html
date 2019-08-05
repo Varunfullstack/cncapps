@@ -7,7 +7,7 @@
         height: 13px;
     }
 
-    .promptText{
+    .promptText {
         color: #992211;
         white-space: nowrap;
         text-align: left;
@@ -151,69 +151,68 @@
             if (result.status == 'error') {
                 alert('Failed to retrieve data');
             } else {
-                if (result.length) {
-                    result.reverse();
 
-                    $('#currentMeetingSection').show();
-                    $('#previousMeetingSection').show();
+                result.reverse();
 
-                    $('#currentMeetingTable tbody').html("");
-                    $('#previousMeetingsTable tbody').html("");
+                $('#currentMeetingSection').show();
+                $('#previousMeetingSection').show();
+
+                $('#currentMeetingTable tbody').html("");
+                $('#previousMeetingsTable tbody').html("");
 
 
-                    result.forEach((item, idx) => {
-                            if (!idx) {
-                                // this is the first item which dictates the current
-                                $('#currentMeetingTable tbody').append(
-                                    "<tr data-document-id='" + item.documentID + "'>" +
-                                    "<td>" + item.reviewMeetingDate + "</td>" +
-                                    "<td><a href='?action=downloadDocument&documentID=" + item.documentID + "' target='_blank'>" + item.fileName + "</a></td>" +
-                                    "<td>" + item.uploadedBy + "</td>" +
-                                    "<td>" + item.uploadedAt + "</td>" +
-                                    "<td>" + "<button onclick='deleteDocument(" + item.documentID + ")'><i class='fa fa-trash-o'></i></button>" + "</td>" +
-                                    "</tr>"
-                                );
-                                return;
-                            }
-
-                            if (item.reviewMeetingDate === result[0].reviewMeetingDate) {
-                                $('#currentMeetingTable tbody').append(
-                                    "<tr  data-document-id='" + item.documentID + "'>" +
-                                    "<td>" + item.reviewMeetingDate + "</td>" +
-                                    "<td><a href='?action=downloadDocument&documentID=" + item.documentID + "' target='_blank'>" + item.fileName + "</a></td>" +
-                                    "<td>" + item.uploadedBy + "</td>" +
-                                    "<td>" + item.uploadedAt + "</td>" +
-                                    "<td>" + "<button onclick='deleteDocument(" + item.documentID + ")'><i class='fa fa-trash-o'></i></button>" + "</td>" +
-                                    "</tr>"
-                                );
-                                return;
-                            }
-
-                            if (result[idx - 1].reviewMeetingDate != item.reviewMeetingDate && result[idx - 1].reviewMeetingDate != result[0].reviewMeetingDate) {
-                                $('#previousMeetingsTable tbody').append(
-                                    "<tr class='spacerRow'>" +
-                                    "<td></td>" +
-                                    "<td></td>" +
-                                    "<td></td>" +
-                                    "<td></td>" +
-                                    "</tr>"
-                                );
-
-                            }
-
-                            $('#previousMeetingsTable tbody').append(
-                                "<tr id='" + item.documentID + "'>" +
+                result.forEach((item, idx) => {
+                        if (!idx) {
+                            // this is the first item which dictates the current
+                            $('#currentMeetingTable tbody').append(
+                                "<tr data-document-id='" + item.documentID + "'>" +
                                 "<td>" + item.reviewMeetingDate + "</td>" +
                                 "<td><a href='?action=downloadDocument&documentID=" + item.documentID + "' target='_blank'>" + item.fileName + "</a></td>" +
                                 "<td>" + item.uploadedBy + "</td>" +
                                 "<td>" + item.uploadedAt + "</td>" +
+                                "<td>" + "<button onclick='deleteDocument(" + item.documentID + ")'><i class='fa fa-trash-o'></i></button>" + "</td>" +
+                                "</tr>"
+                            );
+                            return;
+                        }
+
+                        if (item.reviewMeetingDate === result[0].reviewMeetingDate) {
+                            $('#currentMeetingTable tbody').append(
+                                "<tr  data-document-id='" + item.documentID + "'>" +
+                                "<td>" + item.reviewMeetingDate + "</td>" +
+                                "<td><a href='?action=downloadDocument&documentID=" + item.documentID + "' target='_blank'>" + item.fileName + "</a></td>" +
+                                "<td>" + item.uploadedBy + "</td>" +
+                                "<td>" + item.uploadedAt + "</td>" +
+                                "<td>" + "<button onclick='deleteDocument(" + item.documentID + ")'><i class='fa fa-trash-o'></i></button>" + "</td>" +
+                                "</tr>"
+                            );
+                            return;
+                        }
+
+                        if (result[idx - 1].reviewMeetingDate != item.reviewMeetingDate && result[idx - 1].reviewMeetingDate != result[0].reviewMeetingDate) {
+                            $('#previousMeetingsTable tbody').append(
+                                "<tr class='spacerRow'>" +
+                                "<td></td>" +
+                                "<td></td>" +
+                                "<td></td>" +
+                                "<td></td>" +
                                 "</tr>"
                             );
 
                         }
-                    )
 
-                }
+                        $('#previousMeetingsTable tbody').append(
+                            "<tr id='" + item.documentID + "'>" +
+                            "<td>" + item.reviewMeetingDate + "</td>" +
+                            "<td><a href='?action=downloadDocument&documentID=" + item.documentID + "' target='_blank'>" + item.fileName + "</a></td>" +
+                            "<td>" + item.uploadedBy + "</td>" +
+                            "<td>" + item.uploadedAt + "</td>" +
+                            "</tr>"
+                        );
+
+                    }
+                )
+
             }
         }).catch(function () {
 
@@ -242,8 +241,7 @@
                     }
                 }
             }
-        }
-        else {
+        } else {
             $('#uploadSection').hide();
         }
     }
@@ -257,7 +255,10 @@
 <table>
     <tbody>
     <tr>
-        <td class="promptText" style="width: 115px">Customer</td>
+        <td class="promptText"
+            style="width: 115px"
+        >Customer
+        </td>
         <td>
             <input type="hidden"
                    name="activity[1][customerID]"
@@ -296,7 +297,10 @@
     <tbody>
 
     <tr>
-        <td class="promptText" style="width: 115px">Files</td>
+        <td class="promptText"
+            style="width: 115px"
+        >Files
+        </td>
         <td>
             <input type="file"
                    multiple
