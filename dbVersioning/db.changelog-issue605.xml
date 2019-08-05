@@ -126,7 +126,6 @@
             </column>
         </addColumn>
     </changeSet>
-
     <changeSet author="pavwebdev" id="1563960329-9">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -214,5 +213,17 @@
                                  referencedColumnNames="quotationID"
                                  onDelete="CASCADE"
         />
+    </changeSet>
+    <changeSet author="pavwebdev" id="1563960329-12">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="confirmationCode"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="confirmationCode" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>

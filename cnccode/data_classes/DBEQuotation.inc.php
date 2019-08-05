@@ -24,6 +24,7 @@ class DBEQuotation extends DBEntity
     const deliverySiteCounty = "deliverySiteCounty";
     const deliverySitePostCode = "deliverySitePostCode";
     const deliveryContactID = "deliveryContactID";
+    const confirmCode = "confirmationCode";
 
     /**
      * calls constructor()
@@ -113,6 +114,11 @@ class DBEQuotation extends DBEntity
         $this->addColumn(
             self::deliveryContactID,
             DA_ID,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::confirmCode,
+            DA_STRING,
             DA_ALLOW_NULL
         );
 

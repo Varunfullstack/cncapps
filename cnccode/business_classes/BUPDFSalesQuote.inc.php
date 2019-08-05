@@ -197,6 +197,8 @@ class BUPDFSalesQuote extends Business
         $dsQuotation->setValue(DBEQuotation::deliverySiteTown, $dsOrdhead->getValue(DBEOrdhead::delTown));
         $dsQuotation->setValue(DBEQuotation::deliverySiteCounty, $dsOrdhead->getValue(DBEOrdhead::delCounty));
         $dsQuotation->setValue(DBEQuotation::deliverySitePostCode, $dsOrdhead->getValue(DBEOrdhead::delPostcode));
+        $confirmationCode = uniqid(null, true);
+        $dsQuotation->setValue(DBEQuotation::confirmCode, $confirmationCode);
         $dsQuotation->post();
         $quotationNextId = $this->buSalesOrder->insertQuotation($dsQuotation);
 
@@ -335,9 +337,9 @@ class BUPDFSalesQuote extends Business
         $buPDF->setFont();
         $buPDF->CR();
         $buPDF->CR();
-        $buPDF->printString('If you would like to proceed with this quotation, then please click on');
-        $buPDF->printString(' this link ', 'https://www.cnc-ltd.co.uk/');
-        $buPDF->printString('which will automatically email you an e-signable order form document to sign.');
+        $buPDF->printString('If you would like to proceed with this quotation, then please click on ');
+        $buPDF->printString('this link', "https://www.cnc-ltd.co.uk/api/acceptQuotation?code=$confirmationCode");
+        $buPDF->printString(' which will automatically email you an e-signable order form document to sign.');
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printString('Once this is received by us we will be able to process your order.');

@@ -18,7 +18,9 @@
         "ext-ctype": "*",
         "ext-curl": "*",
         "monolog/monolog": "^1.24",
-        "bramus/monolog-colored-line-formatter": "^3.0"
+        "bramus/monolog-colored-line-formatter": "^3.0",
+        "slim/slim": "4.0.0",
+        "slim/psr7": "^0.4.0"
     },
     "autoload": {
         "psr-4": {

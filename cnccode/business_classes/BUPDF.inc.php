@@ -301,6 +301,7 @@ class BUPDF extends BaseObject
         if ($link) {
             $this->pdf->SetTextColor(0, 0, 255);
             $this->setFontStyle('U');
+            $this->setFont();
         }
 
         $this->pdf->Write(
@@ -312,6 +313,7 @@ class BUPDF extends BaseObject
         if ($link) {
             $this->pdf->SetTextColor(0);
             $this->setFontStyle($previousFontStyle);
+            $this->setFont();
         }
 
         return TRUE;
@@ -362,10 +364,10 @@ class BUPDF extends BaseObject
 
     // Right Justified
 
-    function close()
+    function getData()
     {
         $this->pdf->Output(
-            'F',
+            'S',
             $this->getFilename(),
             true
         );
@@ -379,6 +381,15 @@ class BUPDF extends BaseObject
     function setFilename($filename)
     {
         $this->filename = $filename;
+    }
+
+    function close()
+    {
+        $this->pdf->Output(
+            'F',
+            $this->getFilename(),
+            true
+        );
     }
 
     function placeImageAt($filename,
