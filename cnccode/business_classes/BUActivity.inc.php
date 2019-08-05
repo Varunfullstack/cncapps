@@ -1183,7 +1183,7 @@ class BUActivity extends Business
                     );
 
                 $subjectSuffix = 'Pending Closure on ' . Controller::dateYMDtoDMY($completeDate);
-
+                $fields['rootCause'] = $rootCause;
                 break;
             case self::ClosureCustomerEmailCategory:
                 $selfFlagName = DBEContact::closureEmailFlag;
