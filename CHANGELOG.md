@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+### [v3.4.6] - unreleased
+- SR Pending Closure email shows rootCause placeholder instead of the actual rootCause
+- CustomerReviewMeetingDocuments.php, last item is never removed until page refresh
+
 ## [v3.4.5] - 2019-07-31
 ### Fixed
 - PrePay Statement Export Not Posting Top Ups
