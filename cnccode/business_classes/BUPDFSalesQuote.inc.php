@@ -272,8 +272,16 @@ class BUPDFSalesQuote extends Business
         $buPDF->setFont();
         $buPDF->CR();
         $buPDF->CR();
+        $buPDF->printString('If you would like to proceed with this quotation, then please click on');
+        $buPDF->printString(' this link ', 'https://www.cnc-ltd.co.uk/');
+        $buPDF->printString('which will automatically email you an e-signable order form document to sign.');
+        $buPDF->CR();
+        $buPDF->CR();
+        $buPDF->printString('Once this is received by us we will be able to process your order.');
+        $buPDF->CR();
+        $buPDF->CR();
         $buPDF->printString(
-            'If you would like to proceed with this quotation then please forward your written order to us at your earliest convenience.'
+            'If any of the quantities are incorrect or you wish to remove an item, then please drop us an email with the details and we will amend the quote accordingly and send you a new quotation with an updated link'
         );
         $buPDF->CR();
         $buPDF->CR();
@@ -373,220 +381,6 @@ class BUPDFSalesQuote extends Business
             TOTAL_WIDTH
         );
 
-        // Second page is Order Form
-        $buPDF->startPage();
-        $buPDF->setBoldOff();
-        $buPDF->setFontSize(10);
-        $buPDF->setFontFamily(BUPDF_FONT_ARIAL);
-        $buPDF->setFont();
-        $buPDF->printStringAt(
-            110,
-            'From:'
-        );
-        $firstName = $dsDeliveryContact->getValue(DBEContact::firstName);
-        $buPDF->printStringAt(
-            130,
-            $dsDeliveryContact->getValue(
-                DBEContact::title
-            ) . ' ' . $firstName{0} . ' ' . $dsDeliveryContact->getValue(DBEContact::lastName)
-        );
-        $buPDF->CR();
-        $buPDF->printStringAt(
-            130,
-            $dsOrdhead->getValue(DBEJOrdhead::customerName)
-        );
-        $buPDF->CR();
-        $buPDF->printStringAt(
-            130,
-            $dsOrdhead->getValue(DBEJOrdhead::delAdd1)
-        );
-        if ($dsOrdhead->getValue(DBEJOrdhead::delAdd2) != '') {
-            $buPDF->CR();
-            $buPDF->printStringAt(
-                130,
-                $dsOrdhead->getValue(DBEJOrdhead::delAdd2)
-            );
-        }
-        if ($dsOrdhead->getValue(DBEJOrdhead::delAdd3) != '') {
-            $buPDF->CR();
-            $buPDF->printStringAt(
-                130,
-                $dsOrdhead->getValue(DBEJOrdhead::delAdd3)
-            );
-        }
-        $buPDF->CR();
-        $buPDF->printStringAt(
-            130,
-            $dsOrdhead->getValue(DBEJOrdhead::delTown)
-        );
-        if ($dsOrdhead->getValue(DBEJOrdhead::delCounty) != '') {
-            $buPDF->CR();
-            $buPDF->printStringAt(
-                130,
-                $dsOrdhead->getValue(DBEJOrdhead::delCounty)
-            );
-        }
-        $buPDF->CR();
-        $buPDF->printStringAt(
-            130,
-            $dsOrdhead->getValue(DBEJOrdhead::delPostcode)
-        );
-        $buPDF->CR();
-        $buPDF->printString($dsUser->getValue(DBEUser::firstName) . ' ' . $dsUser->getValue(DBEUser::lastName));
-        $buPDF->CR();
-        $buHeader = new BUHeader($this);
-        $dsHeader = new DataSet($this);
-        $buHeader->getHeader($dsHeader);
-        $buPDF->printString($dsHeader->getValue(DBEHeader::name));
-        $buPDF->CR();
-        $buPDF->printString($dsHeader->getValue(DBEHeader::add1));
-        $buPDF->CR();
-        $buPDF->printString($dsHeader->getValue(DBEHeader::add2));
-        $buPDF->CR();
-        $buPDF->printString($dsHeader->getValue(DBEHeader::add3));
-        $buPDF->CR();
-        $buPDF->printString($dsHeader->getValue(DBEHeader::town));
-        $buPDF->CR();
-        $buPDF->printString($dsHeader->getValue(DBEHeader::county));
-        $buPDF->CR();
-        $buPDF->printString($dsHeader->getValue(DBEHeader::postcode));
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printString(date('l, jS F Y'));
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printString('Dear ' . $dsUser->getValue(DBEUser::firstName) . ',');
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printString(
-            'With reference to your recent quotation ' . $ordheadID . '/' . $versionNo .
-            ', please accept this as confirmation that we wish to proceed and order the following goods/services:'
-        );
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->setBoldOn();
-        $buPDF->setFont();
-        $boxTop = $buPDF->getYPos();
-        $buPDF->printStringRJAt(
-            28,
-            'Qty'
-        );
-        $buPDF->box(
-            QTY_LEFT,
-            $boxTop,
-            ALL_WIDTH,
-            $buPDF->getFontSize() / 2
-        );
-        $buPDF->printStringAt(
-            40,
-            'Details'
-        );
-        $buPDF->printStringRJAt(
-            150,
-            'Unit'
-        );
-        $buPDF->printStringRJAt(
-            173,
-            'Total'
-        );
-        $buPDF->setBoldOff();
-        $buPDF->setFont();
-        $buPDF->CR();
-        $dsOrdline->initialise();
-        while ($dsOrdline->fetchNext()) {
-            if (
-                $dsSelectedOrderLine &&
-                $dsSelectedOrderLine->search(
-                    'sequenceNo',
-                    $dsOrdline->getValue(DBEJOrdline::sequenceNo)
-                )
-            ) {
-                if ($dsOrdline->getValue(DBEJOrdline::lineType) == "I") {
-                    if ($dsOrdline->getValue(DBEJOrdline::itemDescription) != '') {
-                        $buPDF->printStringAt(
-                            40,
-                            $dsOrdline->getValue(DBEJOrdline::itemDescription)
-                        );
-                    } else {
-                        $buPDF->printStringAt(
-                            40,
-                            $dsOrdline->getValue(DBEJOrdline::description)
-                        );
-                    }
-                    $buPDF->printStringRJAt(
-                        150,
-                        Controller::formatNumberCur($dsOrdline->getValue(DBEJOrdline::curUnitSale))
-                    );
-                    if ($dsOrdline->getValue(DBEJOrdline::itemID)) {
-                        // some item lines in old system did not have a related item record
-                        $buItem->getItemByID(
-                            $dsOrdline->getValue(DBEJOrdline::itemID),
-                            $dsItem
-                        );
-                    }
-                } else {
-                    $buPDF->printStringAt(
-                        40,
-                        $dsOrdline->getValue(DBEJOrdline::description)
-                    ); // comment line
-                }
-                $buPDF->box(
-                    QTY_LEFT,
-                    $buPDF->getYPos(),
-                    ALL_WIDTH,
-                    $buPDF->getFontSize() / 2
-                );
-                $buPDF->CR();
-            }
-        }
-        $buPDF->setBoldOn();
-        $buPDF->setFont();
-        $buPDF->printStringAt(
-            UNIT_LEFT,
-            'Grand total'
-        ); // comment line
-
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printStringRJAt(
-            UNIT_LEFT - 2,
-            'Our official order no:'
-        );
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printStringRJAt(
-            UNIT_LEFT - 2,
-            'Name:'
-        );
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printStringRJAt(
-            UNIT_LEFT - 2,
-            'Signed:'
-        );
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printStringRJAt(
-            UNIT_LEFT - 2,
-            'Date:'
-        );
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printStringRJAt(
-            UNIT_LEFT - 2,
-            'Position:'
-        );
-        $buPDF->CR();
-        $buPDF->setBoldOn();
-        $buPDF->printString('All prices are subject to VAT at the standard rate.');
-        $buPDF->setBoldOff();
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printString('Please return a signed copy to sales@cnc-ltd.co.uk');
-        $buPDF->endPage();
-        // End of second page
         $buPDF->close();
 
         // Insert into database
@@ -625,6 +419,38 @@ class BUPDFSalesQuote extends Business
             DBEQuotation::documentType,
             'quotation'
         );
+
+        $dsQuotation->setValue(
+            DBEQuotation::deliveryContactID,
+            $dsOrdhead->getValue(DBEOrdhead::delContactID)
+        );
+
+        $dsQuotation->setValue(
+            DBEQuotation::deliverySiteAdd1,
+            $dsOrdhead->getValue(DBEOrdhead::delAdd1)
+        );
+        $dsQuotation->setValue(
+            DBEQuotation::deliverySiteAdd2,
+            $dsOrdhead->getValue(DBEOrdhead::delAdd2)
+        );
+        $dsQuotation->setValue(
+            DBEQuotation::deliverySiteAdd3,
+            $dsOrdhead->getValue(DBEOrdhead::delAdd3)
+        );
+        $dsQuotation->setValue(
+            DBEQuotation::deliverySiteTown,
+            $dsOrdhead->getValue(DBEOrdhead::delTown)
+        );
+        $dsQuotation->setValue(
+            DBEQuotation::deliverySiteCounty,
+            $dsOrdhead->getValue(DBEOrdhead::delCounty)
+        );
+        $dsQuotation->setValue(
+            DBEQuotation::deliverySitePostCode,
+            $dsOrdhead->getValue(DBEOrdhead::delPostcode)
+        );
+
+
         $dsQuotation->post();
         return $this->buSalesOrder->insertQuotation($dsQuotation);
 

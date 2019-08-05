@@ -96,8 +96,12 @@ define(
     'genQuickQuote'
 ); // generate quick quote using selector
 define(
-    'CTSALESORDER_ACT_CREATE_ORDER_FORM',
-    'genOrderForm'
+    'CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM',
+    'genManualOrderForm'
+);
+define(
+    'CTSALESORDER_ACT_CREATE_E_SIGNED_ORDER_FORM',
+    'genESignedOrderForm'
 );
 define(
     'CTSALESORDER_ACT_CHANGE_SUPPLIER',
@@ -513,9 +517,13 @@ class CTSalesOrder extends CTCNC
                 $this->checkPermissions(PHPLIB_PERM_SALES);
                 $this->changeSupplier();
                 break;
-            case CTSALESORDER_ACT_CREATE_ORDER_FORM:
+            case CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM:
                 $this->checkPermissions(PHPLIB_PERM_SALES);
                 $this->generateOrderForm();
+                break;
+            case CTSALESORDER_ACT_CREATE_E_SIGNED_ORDER_FORM:
+                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->generateOrderForm(true);
                 break;
             case CTSALESORDER_ACT_CREATE_QUICK_QUOTE:
                 $this->checkPermissions(PHPLIB_PERM_SALES);
@@ -1219,7 +1227,8 @@ class CTSalesOrder extends CTCNC
             if ($orderType == 'I') {
                 $actions[CTSALESORDER_ACT_SEND_CONFIRMATION] = 'send confirmation email';
             }
-            $actions[CTSALESORDER_ACT_CREATE_ORDER_FORM] = 'create order form';
+            $actions[CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM] = 'create manual order form';
+            $actions[CTSALESORDER_ACT_CREATE_E_SIGNED_ORDER_FORM] = 'create e-signed order form';
             $actions[CTSALESORDER_ACT_CHANGE_SUPPLIER] = 'change supplier';
             $actions[CTSALESORDER_ACT_DOWNLOAD_CSV] = 'download CSV';
             $actions[CTSALESORDER_ACT_CREATE_SR_FROM_LINES] = 'create new SR';
@@ -3135,9 +3144,11 @@ class CTSalesOrder extends CTCNC
     /**
      * generate a PDF order form.
      * @access private
+     * @param bool $isESigned
+     * @return bool
      * @throws Exception
      */
-    function generateOrderForm()
+    function generateOrderForm($isESigned = false)
     {
         $this->setMethodName('generateOrderForm');
         if (count($this->postVars['selectedOrderLine']) == 0) {
@@ -3151,12 +3162,15 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
             return FALSE;
         }
-        $this->buildOrderForm();
+        $this->buildOrderForm($isESigned);
         header('Location: ' . $this->getDisplayOrderURL());
         exit;
     }
 
-    function buildOrderForm()
+    /**
+     * @param bool $isESigned
+     */
+    function buildOrderForm($isESigned = false)
     {
         $dsOrdhead = new DataSet($this);
         $dsOrdline = new DataSet($this);
@@ -3472,9 +3486,19 @@ class CTSalesOrder extends CTCNC
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->CR();
-        $buPDF->printString(
-            'Please return a signed copy to sales@cnc-ltd.co.uk'
-        );
+        $pkValue = null;
+        if ($isESigned) {
+            $dbeQuotation = new DBEQuotation($this);
+            //$pkValue = $dbeQuotation->getNextPKValue();
+            $buPDF->printString('If you accept this quote, please ');
+//            $buPDF->set
+            $buPDF->printString('click here', 'https://cnc-ltd.co.uk');
+        } else {
+            $buPDF->printString(
+                'Please return a signed copy to sales@cnc-ltd.co.uk'
+            );
+        }
+
         $buPDF->endPage();
         // End of second page
         $buPDF->close();
@@ -3483,6 +3507,7 @@ class CTSalesOrder extends CTCNC
         $this->dsQuotation = new DataSet($this);
         $this->dsQuotation->copyColumnsFrom($this->buSalesOrder->dbeQuotation);
         $this->dsQuotation->setUpdateModeInsert();
+
         $this->dsQuotation->setValue(
             DBEQuotation::versionNo,
             $versionNo
@@ -3517,6 +3542,8 @@ class CTSalesOrder extends CTCNC
         );
         $this->dsQuotation->post();
         $this->buSalesOrder->insertQuotation($this->dsQuotation);
+
+
     }
 
     /**

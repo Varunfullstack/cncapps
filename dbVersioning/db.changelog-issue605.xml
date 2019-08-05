@@ -49,4 +49,96 @@
             </sql>
         </rollback>
     </changeSet>
+    <changeSet author="pavwebdev" id="1563960329-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="deliveryContactID"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="deliveryContactID" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="1563960329-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="deliverySiteAdd1"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="deliverySiteAdd1" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="1563960329-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="deliverySiteAdd2"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="deliverySiteAdd2" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="1563960329-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="deliverySiteAdd3"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="deliverySiteAdd3" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="1563960329-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="deliverySiteTown"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="deliverySiteTown" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="1563960329-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="deliverySiteCounty"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="deliverySiteCounty" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="1563960329-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="deliverySitePostCode"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="deliverySitePostCode" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
 </databaseChangeLog>

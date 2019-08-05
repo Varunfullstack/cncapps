@@ -17,6 +17,13 @@ class DBEQuotation extends DBEntity
     const userID = "userID";
     const fileExtension = "fileExtension";
     const documentType = "documentType";
+    const deliverySiteAdd1 = "deliverySiteAdd1";
+    const deliverySiteAdd2 = "deliverySiteAdd2";
+    const deliverySiteAdd3 = "deliverySiteAdd3";
+    const deliverySiteTown = "deliverySiteTown";
+    const deliverySiteCounty = "deliverySiteCounty";
+    const deliverySitePostCode = "deliverySitePostCode";
+    const deliveryContactID = "deliveryContactID";
 
     /**
      * calls constructor()
@@ -73,6 +80,42 @@ class DBEQuotation extends DBEntity
             DA_STRING,
             DA_ALLOW_NULL
         );
+        $this->addColumn(
+            self::deliverySiteAdd1,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::deliverySiteAdd2,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::deliverySiteAdd3,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::deliverySiteTown,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::deliverySiteCounty,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::deliverySitePostCode,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::deliveryContactID,
+            DA_ID,
+            DA_ALLOW_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
