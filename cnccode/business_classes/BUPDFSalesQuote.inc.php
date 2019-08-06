@@ -6,8 +6,8 @@ require_once($cfg["path_dbe"] . "/DBEQuotationLine.php");
 
 class BUPDFSalesQuote extends Business
 {
-
-    var $buSalesOrder = '';
+    /** @var BUSalesOrder */
+    public $buSalesOrder;
 
     /**
      * Constructor
@@ -119,7 +119,9 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         $firstName = $dsDeliveryContact->getValue(DBEContact::firstName);
         $buPDF->printString(
-            $dsDeliveryContact->getValue(DBEContact::title) . ' ' . $firstName{0} . ' ' . $dsDeliveryContact->getValue(
+            $dsDeliveryContact->getValue(
+                DBEContact::title
+            ) . ' ' . $firstName{0} . ' ' . $dsDeliveryContact->getValue(
                 DBEContact::lastName
             )
         );
@@ -216,14 +218,26 @@ class BUPDFSalesQuote extends Business
             $dbeQuotationLine = new DBEQuotationLine($this);
             $dbeQuotationLine->setValue(DBEQuotationLine::id, null);
             $dbeQuotationLine->setValue(DBEQuotationLine::quotationID, $quotationNextId);
-            $dbeQuotationLine->setValue(DBEQuotationLine::sequenceNo, $dsOrdline->getValue(DBEJOrdline::sequenceNo));
+            $dbeQuotationLine->setValue(
+                DBEQuotationLine::sequenceNo,
+                $dsOrdline->getValue(DBEJOrdline::sequenceNo)
+            );
             $dbeQuotationLine->setValue(DBEQuotationLine::lineType, $dsOrdline->getValue(DBEJOrdline::lineType));
             $dbeQuotationLine->setValue(DBEQuotationLine::ordheadID, $dsOrdline->getValue(DBEJOrdline::ordheadID));
-            $dbeQuotationLine->setValue(DBEQuotationLine::customerID, $dsOrdline->getValue(DBEJOrdline::customerID));
+            $dbeQuotationLine->setValue(
+                DBEQuotationLine::customerID,
+                $dsOrdline->getValue(DBEJOrdline::customerID)
+            );
             $dbeQuotationLine->setValue(DBEQuotationLine::itemID, $dsOrdline->getValue(DBEJOrdline::itemID));
             $dbeQuotationLine->setValue(DBEQuotationLine::stockcat, $dsOrdline->getValue(DBEJOrdline::stockcat));
-            $dbeQuotationLine->setValue(DBEQuotationLine::description, $dsOrdline->getValue(DBEJOrdline::description));
-            $dbeQuotationLine->setValue(DBEQuotationLine::qtyOrdered, $dsOrdline->getValue(DBEJOrdline::qtyOrdered));
+            $dbeQuotationLine->setValue(
+                DBEQuotationLine::description,
+                $dsOrdline->getValue(DBEJOrdline::description)
+            );
+            $dbeQuotationLine->setValue(
+                DBEQuotationLine::qtyOrdered,
+                $dsOrdline->getValue(DBEJOrdline::qtyOrdered)
+            );
             $dbeQuotationLine->setValue(
                 DBEQuotationLine::qtyDespatched,
                 $dsOrdline->getValue(DBEJOrdline::qtyDespatched)
@@ -232,13 +246,22 @@ class BUPDFSalesQuote extends Business
                 DBEQuotationLine::qtyLastDespatched,
                 $dsOrdline->getValue(DBEJOrdline::qtyLastDespatched)
             );
-            $dbeQuotationLine->setValue(DBEQuotationLine::supplierID, $dsOrdline->getValue(DBEJOrdline::supplierID));
-            $dbeQuotationLine->setValue(DBEQuotationLine::curUnitCost, $dsOrdline->getValue(DBEJOrdline::curUnitCost));
+            $dbeQuotationLine->setValue(
+                DBEQuotationLine::supplierID,
+                $dsOrdline->getValue(DBEJOrdline::supplierID)
+            );
+            $dbeQuotationLine->setValue(
+                DBEQuotationLine::curUnitCost,
+                $dsOrdline->getValue(DBEJOrdline::curUnitCost)
+            );
             $dbeQuotationLine->setValue(
                 DBEQuotationLine::curTotalCost,
                 $dsOrdline->getValue(DBEJOrdline::curTotalCost)
             );
-            $dbeQuotationLine->setValue(DBEQuotationLine::curUnitSale, $dsOrdline->getValue(DBEJOrdline::curUnitSale));
+            $dbeQuotationLine->setValue(
+                DBEQuotationLine::curUnitSale,
+                $dsOrdline->getValue(DBEJOrdline::curUnitSale)
+            );
             $dbeQuotationLine->setValue(
                 DBEQuotationLine::curTotalSale,
                 $dsOrdline->getValue(DBEJOrdline::curTotalSale)
@@ -712,4 +735,4 @@ class BUPDFSalesQuote extends Business
 
     }
 
-} // end class  
+}

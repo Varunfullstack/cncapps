@@ -2,5 +2,6 @@
 /.idea
 
 sessions/*
-!.gitkeep
 logs/*
+cache/*
+!.gitkeep
