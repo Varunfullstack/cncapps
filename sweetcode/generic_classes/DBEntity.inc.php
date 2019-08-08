@@ -43,8 +43,8 @@ define(
 
 class DBEntity extends DataAccess
 {
-        public const ORDER_DIRECTION_ASCENDING = "ASC";        // a new database connection purely for nextid function.
-        public const ORDER_DIRECTION_DESCENDING = "DESC";            // Initialised PHPLib database object
+    public const ORDER_DIRECTION_ASCENDING = "ASC";        // a new database connection purely for nextid function.
+    public const ORDER_DIRECTION_DESCENDING = "DESC";            // Initialised PHPLib database object
     /** @var dbSweetcode|MDB_PEAR_PROXY|mixed|object|PDO */
     public $pkdb;// SQL query statement
     /** @var dbSweetcode|MDB_PEAR_PROXY|mixed|object|PDO */
@@ -53,8 +53,8 @@ class DBEntity extends DataAccess
     public $tableName = "";    // For debug purposes - TRUE causes all SQL statements to be output
     public $showSQL = false;        // For comparison during update
     public $logSQL = false;    // For comparison during update
-public $rowBefore;
-public $arrayRowBefore;
+    public $rowBefore;
+    public $arrayRowBefore;
     public $rowCount = 0;
     public $dbColName = [];
 
@@ -442,6 +442,25 @@ public $arrayRowBefore;
     }
 
     /**
+     * Get DB Column Name
+     * @access public
+     * @param $ixColumnPassed
+     * @return string Database column name.
+     */
+    function getDBColumnName($ixColumnPassed)
+    {
+        $ixColumn = $this->columnExists($ixColumnPassed);
+        if ($ixColumn != DA_OUT_OF_RANGE) {
+            return $this->dbColName[$ixColumn];
+        } else {
+            $this->raiseError(
+                "getDBColumnName: Could not get DB column name because column " . $ixColumnPassed . " out of range"
+            );
+            return DA_OUT_OF_RANGE;
+        }
+    }
+
+    /**
      * Return current database entity name
      * @access public
      * @return  string Entity name
@@ -509,6 +528,70 @@ public $arrayRowBefore;
         return $this->prepareForSQL($ixColumn);
     }
 
+    function prepareForSQL($colIdx)
+    {
+        $colType = $this->colType[$colIdx];
+        $value = $this->getSQLValue($colIdx);
+
+        if ($value === null) {
+            return 'null';
+        }
+        $value = $this->escapeValue($value);
+        switch ($colType) {
+            case DA_BOOLEAN:
+                return $value ? 1 : 0;
+            case DA_INTEGER:
+            case DA_FLOAT:
+            case DA_ID:
+                if ($value === '') {
+                    return 'null';
+                }
+
+                return $value;
+            case DA_DATETIME:
+                if ($value == '0000-00-00 00:00:00') {
+                    return 'null';
+                }
+            case DA_DATE:
+                if ($value == '0000-00-00') {
+                    return 'null';
+                }
+            default:
+                return $this->quoteForColumnValues . $value . $this->quoteForColumnValues;
+        }
+
+    }
+
+    function getSQLValue($ixPassedColumn)
+    {
+        $this->setMethodName('getValue');
+        $ixColumn = $this->columnExists($ixPassedColumn);
+        if ($ixColumn != DA_OUT_OF_RANGE) {
+            if (!$this->db->Record) {
+                return null;
+            }
+
+            if (!key_exists($ixColumn, $this->db->Record)) {
+                return $this->getDefaultValue($ixColumn);
+            }
+            if ($this->db->Record[$ixColumn] === null) {
+                return $this->getDefaultValue($ixColumn);
+            }
+            return $this->db->Record[$ixColumn];
+        } else {
+            $this->raiseError("column " . $ixPassedColumn . " out of range");
+            return DA_OUT_OF_RANGE;
+        }
+    }
+
+    function escapeValue($value)
+    {
+        return mysqli_real_escape_string(
+            $this->db->link_id(),
+            $value
+        );
+    }
+
     function getArrayRowBefore()
     {
         return $this->arrayRowBefore;
@@ -560,7 +643,9 @@ public $arrayRowBefore;
         $this->setYNFlags();
         if ($this->getQueryString() == "") {
             if ($this->getPK() != DA_PK_NOT_SET) {
-                $this->setPKValue($this->getNextPKValue());
+                if ($this->pkAutoIncrement) {
+                    $this->setPKValue($this->getNextPKValue());
+                }
             }
             $this->setQueryString(
                 "INSERT INTO " . $this->getTableName() .
@@ -821,89 +906,6 @@ public $arrayRowBefore;
             }
         }
         return $colString;
-    }
-
-    /**
-     * Get DB Column Name
-     * @access public
-     * @param $ixColumnPassed
-     * @return string Database column name.
-     */
-    function getDBColumnName($ixColumnPassed)
-    {
-        $ixColumn = $this->columnExists($ixColumnPassed);
-        if ($ixColumn != DA_OUT_OF_RANGE) {
-            return $this->dbColName[$ixColumn];
-        } else {
-            $this->raiseError(
-                "getDBColumnName: Could not get DB column name because column " . $ixColumnPassed . " out of range"
-            );
-            return DA_OUT_OF_RANGE;
-        }
-    }
-
-    function prepareForSQL($colIdx)
-    {
-        $colType = $this->colType[$colIdx];
-        $value = $this->getSQLValue($colIdx);
-
-        if ($value === null) {
-            return 'null';
-        }
-        $value = $this->escapeValue($value);
-        switch ($colType) {
-            case DA_BOOLEAN:
-                return $value ? 1 : 0;
-            case DA_INTEGER:
-            case DA_FLOAT:
-            case DA_ID:
-                if ($value === '') {
-                    return 'null';
-                }
-
-                return $value;
-            case DA_DATETIME:
-                if ($value == '0000-00-00 00:00:00') {
-                    return 'null';
-                }
-            case DA_DATE:
-                if ($value == '0000-00-00') {
-                    return 'null';
-                }
-            default:
-                return $this->quoteForColumnValues . $value . $this->quoteForColumnValues;
-        }
-
-    }
-
-    function getSQLValue($ixPassedColumn)
-    {
-        $this->setMethodName('getValue');
-        $ixColumn = $this->columnExists($ixPassedColumn);
-        if ($ixColumn != DA_OUT_OF_RANGE) {
-            if (!$this->db->Record) {
-                return null;
-            }
-
-            if (!key_exists($ixColumn, $this->db->Record)) {
-                return $this->getDefaultValue($ixColumn);
-            }
-            if ($this->db->Record[$ixColumn] === null) {
-                return $this->getDefaultValue($ixColumn);
-            }
-            return $this->db->Record[$ixColumn];
-        } else {
-            $this->raiseError("column " . $ixPassedColumn . " out of range");
-            return DA_OUT_OF_RANGE;
-        }
-    }
-
-    function escapeValue($value)
-    {
-        return mysqli_real_escape_string(
-            $this->db->link_id(),
-            $value
-        );
     }
 
     /**

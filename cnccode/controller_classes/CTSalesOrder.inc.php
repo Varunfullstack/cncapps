@@ -23,6 +23,7 @@ require_once($cfg["path_dbe"] . "/DBEPaymentTerms.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 require_once($cfg["path_dbe"] . "/DBEStandardText.inc.php");
 require_once($cfg["path_dbe"] . "/DBEQuotationTemplate.inc.php");
+require_once($cfg["path_dbe"] . "/DBESignableEnvelope.inc.php");
 require_once($cfg["path_func"] . "/Common.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 // Parameters
@@ -2014,13 +2015,13 @@ class CTSalesOrder extends CTCNC
             );
             // if this is a quote with item lines then display upload and "generate quick-quote" forms
             if (
-                ($orderType == 'Q') &
+                ($orderType == 'Q') &&
                 ($dsOrdline->rowCount() > 0)
             ) {
-                if ((!$this->getSalutation()) & (!$this->getFormError())) {
+                if ((!$this->getSalutation()) && (!$this->getFormError())) {
                     $this->setSalutation('Dear ' . $dsDeliveryContact->getValue(DBEContact::firstName));
                 }
-                if ((!$this->getIntroduction()) & (!$this->getFormError())) {
+                if ((!$this->getIntroduction()) && (!$this->getFormError())) {
                     if ($dsOrdhead->getValue(DBEOrdhead::quotationIntroduction)) {
                         $this->setIntroduction($dsOrdhead->getValue(DBEOrdhead::quotationIntroduction));
                     } else {
@@ -2031,6 +2032,30 @@ class CTSalesOrder extends CTCNC
                     if ($dsOrdhead->getValue(DBEOrdhead::quotationSubject)) {
                         $this->setEmailSubject($dsOrdhead->getValue(DBEOrdhead::quotationSubject));
                     }
+                }
+
+                $this->template->setBlock('SalesOrderGenerateQuotes', 'quickQuoteTextBlock', 'quickQuoteText');
+
+
+                $dbeStandardText = new DBEStandardText($this);
+                $dbeStandardText->getRowsByTypeID(8, DBEStandardText::stt_standardtextno);
+                $selected = false;
+                while ($dbeStandardText->fetchNext()) {
+                    $selectedText = null;
+                    if (!$selected) {
+                        $selectedText = CT_SELECTED;
+                        $selected = true;
+                    }
+                    $this->template->set_var(
+                        [
+                            "quickQuoteTextSelected"    => $selectedText,
+                            "quickQuoteTextValue"       => base64_encode(
+                                $dbeStandardText->getValue(DBEStandardText::stt_text)
+                            ),
+                            "quickQuoteTextDescription" => $dbeStandardText->getValue(DBEStandardText::stt_desc)
+                        ]
+                    );
+                    $this->template->parse('quickQuoteText', 'quickQuoteTextBlock', true);
                 }
 
                 $this->template->set_var(
@@ -2132,6 +2157,12 @@ class CTSalesOrder extends CTCNC
                     }
                     $documentType = $this->dsQuotation->getValue(DBEQuotation::documentType);
                     $documentType = $documentType == 'manualUpload' ? 'Manual Upload' : $documentType;
+                    $signableStatus = null;
+                    if ($this->dsQuotation->getValue(DBEQuotation::signableEnvelopeID)) {
+                        $dbeEnvelop = new DBESignableEnvelope($this);
+                        $dbeEnvelop->getRow($this->dsQuotation->getValue(DBEQuotation::signableEnvelopeID));
+                        $signableStatus = $dbeEnvelop->getValue(DBESignableEnvelope::status);
+                    }
 
                     $this->template->set_var(
                         array(
@@ -2144,6 +2175,7 @@ class CTSalesOrder extends CTCNC
                             'quoteSentDateTime'  => $quoteSentDateTime,
                             'quoteUserName'      => $this->dsQuotation->getValue(DBEJQuotation::userName),
                             'documentType'       => $documentType,
+                            "signableStatus"     => $signableStatus,
                             "txtReminder"        => $txtReminder,
                             'quotationID'        => $this->dsQuotation->getValue(DBEQuotation::quotationID)
                         )

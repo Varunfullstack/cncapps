@@ -157,6 +157,11 @@ class BUPDF extends BaseObject
         }
     }
 
+    function writeHTML($html)
+    {
+        $this->pdf->WriteHTML($html);
+    }
+
     function open()
     {
         $this->pdf->open();
@@ -366,7 +371,7 @@ class BUPDF extends BaseObject
 
     function getData()
     {
-        $this->pdf->Output(
+        return $this->pdf->Output(
             'S',
             $this->getFilename(),
             true

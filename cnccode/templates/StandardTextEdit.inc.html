@@ -16,7 +16,10 @@
         disableNativeSpellChecker: false,
         toolbar_CNCToolbar:
             [
-                {name: 'line1', items: ['Source', '-', '-', 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor']},
+                {
+                    name: 'line1',
+                    items: ['Source', '-', '-', 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor']
+                },
                 ['NumberedList', 'BulletedList'],
                 ['Table'],
                 ['Format', 'Font', 'FontSize'],
@@ -41,7 +44,6 @@
     });
 
     function checkTags() {
-        debugger;
         var selectedOptions = $('#typeSelector').find(":selected");
         var customConfig = Object.assign({}, config);
         if (selectedOptions.length) {

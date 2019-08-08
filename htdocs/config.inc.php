@@ -595,6 +595,10 @@ switch ($server_type) {
             'CONFIG_PREPAY_EMAIL',
             CONFIG_CATCHALL_EMAIL
         );
+        define(
+            'API_URL',
+            'https://dev.cnc-ltd.co.uk:666/api'
+        );
 
         break;
 
@@ -670,6 +674,11 @@ switch ($server_type) {
         ini_set(
             'display_errors',
             'off'
+        );
+
+        define(
+            'API_URL',
+            'https://www.cnc-ltd.co.uk/api'
         );
 
         $GLOBALS['mail_options'] =
@@ -756,6 +765,11 @@ switch ($server_type) {
             'CONFIG_PREPAY_EMAIL',
             CONFIG_CATCHALL_EMAIL
         );
+        define(
+            'API_URL',
+            'https://dev.cnc-ltd.co.uk:666/api'
+        );
+
         break;
 
     case MAIN_CONFIG_SERVER_TYPE_WEBSITE:
@@ -833,6 +847,10 @@ switch ($server_type) {
         define(
             'CONFIG_PREPAY_EMAIL',
             CONFIG_CATCHALL_EMAIL
+        );
+        define(
+            'API_URL',
+            'https://dev.cnc-ltd.co.uk:666/api'
         );
 
         break;
@@ -912,6 +930,10 @@ switch ($server_type) {
         define(
             'CONFIG_PREPAY_EMAIL',
             CONFIG_CATCHALL_EMAIL
+        );
+        define(
+            'API_URL',
+            'https://dev.cnc-ltd.co.uk:666/api'
         );
 
         $GLOBALS['request_mail_options'] =

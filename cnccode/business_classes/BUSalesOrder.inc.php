@@ -21,6 +21,7 @@ require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUItem.inc.php');
 require_once($cfg['path_bu'] . '/BUInvoice.inc.php');
 require_once($cfg["path_dbe"] . "/DBEPorhead.inc.php");
+require_once($cfg["path_dbe"] . "/DBEQuotationLine.php");
 
 class BUSalesOrder extends Business
 {
@@ -2165,13 +2166,8 @@ WHERE odl_ordno = $ordheadID
         return $dbeProblem->getValue(DBEProblem::problemID);
     }
 
-    function createSignableOrderForm($quotationID)
+    function createSignableOrderForm(DBEQuotation $dbeQuotation)
     {
-        $dbeQuotation = new DBEQuotation($this);
-        $dbeQuotation->getRows($quotationID);
-        if (!$dbeQuotation->rowCount()) {
-            throw new Exception('Failed to pull quotation, it does not exist', 5401);
-        }
         $dsDeliveryContact = new DBEContact($this);
         $dsDeliveryContact->getRow($dbeQuotation->getValue(DBEQuotation::deliveryContactID));
         $ordHeadID = $dbeQuotation->getValue(DBEQuotation::ordheadID);
@@ -2181,9 +2177,8 @@ WHERE odl_ordno = $ordheadID
         $dbeUser = new DBEUser($this);
         $dbeUser->getRow($dbeQuotation->getValue(DBEQuotation::userID));
 
-        $dbeOrdHead = new DBEOrdhead($this);
+        $dbeOrdHead = new DBEJOrdhead($this);
         $dbeOrdHead->getRow($ordHeadID);
-
         $buPDF = new BUPDF(
             $this,
             $orderFile,
@@ -2440,13 +2435,21 @@ WHERE odl_ordno = $ordheadID
         $buPDF->CR();
         $buPDF->printStringRJAt(
             UNIT_LEFT - 2,
-            'Our official order no: {text?:signer1:officialOrderNo}'
+            'Our official order no: '
+        );
+        $buPDF->printStringAt(
+            UNIT_LEFT,
+            '{text?:signer1:officialOrderNo}'
         );
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printStringRJAt(
             UNIT_LEFT - 2,
-            'Name: ' . $dsDeliveryContact->getValue(DBEContact::firstName) . " " . $dsDeliveryContact->getValue(
+            'Name: '
+        );
+        $buPDF->printStringAt(
+            UNIT_LEFT,
+            $dsDeliveryContact->getValue(DBEContact::firstName) . " " . $dsDeliveryContact->getValue(
                 DBEContact::lastName
             )
         );
@@ -2454,13 +2457,21 @@ WHERE odl_ordno = $ordheadID
         $buPDF->CR();
         $buPDF->printStringRJAt(
             UNIT_LEFT - 2,
-            'Position: {text?:signer1:position}'
+            'Position: '
+        );
+        $buPDF->printStringAt(
+            UNIT_LEFT,
+            "{text?:signer1:position}"
         );
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printStringRJAt(
             UNIT_LEFT - 2,
-            'Signature: {signature:signer1:Please+Sign+Here}'
+            'Signature: '
+        );
+        $buPDF->printStringAt(
+            UNIT_LEFT,
+            "{signature:signer1:Please+Sign+Here}"
         );
         $buPDF->CR();
         $buPDF->CR();
@@ -2472,9 +2483,7 @@ WHERE odl_ordno = $ordheadID
         $buPDF->CR();
         $pkValue = null;
         $buPDF->endPage();
-        $buPDF->close();
-
-
+        return $buPDF->getData();
     }
 
 }

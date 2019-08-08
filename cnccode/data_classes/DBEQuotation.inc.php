@@ -25,6 +25,8 @@ class DBEQuotation extends DBEntity
     const deliverySitePostCode = "deliverySitePostCode";
     const deliveryContactID = "deliveryContactID";
     const confirmCode = "confirmationCode";
+    const signableEnvelopeID = "signableEnvelopeID";
+
 
     /**
      * calls constructor()
@@ -121,9 +123,14 @@ class DBEQuotation extends DBEntity
             DA_STRING,
             DA_ALLOW_NULL
         );
+        $this->addColumn(
+            self::signableEnvelopeID,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
 
-        $this->setPK(0);
         $this->setAddColumnsOff();
+        $this->setPK(0);
     }
 
     function getNextVersionNo()

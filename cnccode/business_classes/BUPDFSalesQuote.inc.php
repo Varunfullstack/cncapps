@@ -3,6 +3,7 @@ require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUPDF.inc.php");
 require_once($cfg["path_bu"] . "/BUItem.inc.php");
 require_once($cfg["path_dbe"] . "/DBEQuotationLine.php");
+require_once($cfg["path_bu"] . "/BUSalesOrder.inc.php");
 
 class BUPDFSalesQuote extends Business
 {
@@ -153,7 +154,7 @@ class BUPDFSalesQuote extends Business
         $buPDF->printString($salutation . ',');
         $buPDF->CR();
         $buPDF->CR();
-        $buPDF->printString($introduction);
+        $buPDF->writeHTML($introduction);
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->setBoldOn();
@@ -361,7 +362,7 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printString('If you would like to proceed with this quotation, then please click on ');
-        $buPDF->printString('this link', "https://www.cnc-ltd.co.uk/api/acceptQuotation?code=$confirmationCode");
+        $buPDF->printString('this link', API_URL . "/acceptQuotation?code=$confirmationCode");
         $buPDF->printString(' which will automatically email you an e-signable order form document to sign.');
         $buPDF->CR();
         $buPDF->CR();

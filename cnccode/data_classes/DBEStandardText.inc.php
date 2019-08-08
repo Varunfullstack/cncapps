@@ -69,13 +69,6 @@ class DBEStandardText extends DBEntity
         $this->setAddColumnsOff();
     }
 
-    private function defaultOrdering()
-    {
-        return " order by " . $this->getDBColumnName(self::stt_standardtexttypeno) . " asc , " . $this->getDBColumnName(
-                self::stt_desc
-            );
-    }
-
     function getRows($sortColumn = '')
     {
         $this->setMethodName("getRows");
@@ -98,7 +91,14 @@ class DBEStandardText extends DBEntity
         return ($this->runQuery());
     }
 
-    function getRowsByTypeID($standardTextTypeID)
+    private function defaultOrdering()
+    {
+        return " order by " . $this->getDBColumnName(self::stt_standardtexttypeno) . " asc , " . $this->getDBColumnName(
+                self::stt_desc
+            );
+    }
+
+    function getRowsByTypeID($standardTextTypeID, $orderColumn = null)
     {
         $this->setMethodName("getRowsInGroup");
 
@@ -106,7 +106,12 @@ class DBEStandardText extends DBEntity
             " FROM " . $this->getTableName() .
             " WHERE stt_standardtexttypeno = " . $standardTextTypeID;
 
-        $query .= $this->defaultOrdering();
+        if ($orderColumn) {
+            $query .= ' ORDER BY ' . $this->getDBColumnName($orderColumn);
+        } else {
+            $query .= $this->defaultOrdering();
+        }
+
         $this->setQueryString($query);
 
         return (parent::getRows());

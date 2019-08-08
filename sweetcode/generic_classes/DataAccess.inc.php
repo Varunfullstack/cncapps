@@ -216,6 +216,10 @@ class DataAccess extends BaseObject
     public $colValidation = [];
     public $debug;
     public $colDefaultValue = [];
+    /**
+     * @var bool
+     */
+    protected $pkAutoIncrement;
 
     function __construct(&$owner)
     {
@@ -925,8 +929,9 @@ class DataAccess extends BaseObject
      * @param $ixPassedColumn
      * @return bool Success: TRUE or FALSE
      */
-    function setPK($ixPassedColumn)
+    function setPK($ixPassedColumn, $pkAutoIncrement = true)
     {
+        $this->pkAutoIncrement = $pkAutoIncrement;
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn != DA_OUT_OF_RANGE) {
             $this->pk = $ixColumn;
