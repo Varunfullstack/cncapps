@@ -101,10 +101,6 @@ define(
     'genManualOrderForm'
 );
 define(
-    'CTSALESORDER_ACT_CREATE_E_SIGNED_ORDER_FORM',
-    'genESignedOrderForm'
-);
-define(
     'CTSALESORDER_ACT_CHANGE_SUPPLIER',
     'changeSupplier'
 );
@@ -521,10 +517,6 @@ class CTSalesOrder extends CTCNC
             case CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM:
                 $this->checkPermissions(PHPLIB_PERM_SALES);
                 $this->generateOrderForm();
-                break;
-            case CTSALESORDER_ACT_CREATE_E_SIGNED_ORDER_FORM:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
-                $this->generateOrderForm(true);
                 break;
             case CTSALESORDER_ACT_CREATE_QUICK_QUOTE:
                 $this->checkPermissions(PHPLIB_PERM_SALES);
@@ -1229,7 +1221,6 @@ class CTSalesOrder extends CTCNC
                 $actions[CTSALESORDER_ACT_SEND_CONFIRMATION] = 'send confirmation email';
             }
             $actions[CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM] = 'create manual order form';
-            $actions[CTSALESORDER_ACT_CREATE_E_SIGNED_ORDER_FORM] = 'create e-signed order form';
             $actions[CTSALESORDER_ACT_CHANGE_SUPPLIER] = 'change supplier';
             $actions[CTSALESORDER_ACT_DOWNLOAD_CSV] = 'download CSV';
             $actions[CTSALESORDER_ACT_CREATE_SR_FROM_LINES] = 'create new SR';
@@ -2638,14 +2629,6 @@ class CTSalesOrder extends CTCNC
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
-        $urlTemplatePopup =
-            Controller::buildLink(
-                "QuotationTemplate.php",
-                array(
-                    'action'  => CTCNC_ACT_DISP_TEMPLATE_QUOTATION_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
         $urlItemEdit =
             Controller::buildLink(
                 CTCNC_PAGE_ITEM,
@@ -3180,7 +3163,7 @@ class CTSalesOrder extends CTCNC
      * @return bool
      * @throws Exception
      */
-    function generateOrderForm($isESigned = false)
+    function generateOrderForm()
     {
         $this->setMethodName('generateOrderForm');
         if (count($this->postVars['selectedOrderLine']) == 0) {
@@ -3194,15 +3177,15 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
             return FALSE;
         }
-        $this->buildOrderForm($isESigned);
+        $this->buildOrderForm();
         header('Location: ' . $this->getDisplayOrderURL());
         exit;
     }
 
     /**
-     * @param bool $isESigned
+     *
      */
-    function buildOrderForm($isESigned = false)
+    function buildOrderForm()
     {
         $dsOrdhead = new DataSet($this);
         $dsOrdline = new DataSet($this);
@@ -3519,18 +3502,9 @@ class CTSalesOrder extends CTCNC
         $buPDF->CR();
         $buPDF->CR();
         $pkValue = null;
-        if ($isESigned) {
-            $dbeQuotation = new DBEQuotation($this);
-            //$pkValue = $dbeQuotation->getNextPKValue();
-            $buPDF->printString('If you accept this quote, please ');
-//            $buPDF->set
-            $buPDF->printString('click here', 'https://cnc-ltd.co.uk');
-        } else {
-            $buPDF->printString(
-                'Please return a signed copy to sales@cnc-ltd.co.uk'
-            );
-        }
-
+        $buPDF->printString(
+            'Please return a signed copy to sales@cnc-ltd.co.uk'
+        );
         $buPDF->endPage();
         // End of second page
         $buPDF->close();
@@ -5156,6 +5130,9 @@ now that the notes are in a text field we need to split the lines up for the PDF
         exit;
     } // end contractDropdown
 
+    /**
+     * @throws Exception
+     */
     function createTemplatedQuote()
     {
 
