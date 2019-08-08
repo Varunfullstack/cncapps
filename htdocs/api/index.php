@@ -44,7 +44,7 @@ $app->group(
         $group->get(
             '/',
             function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
-                $response->getBody()->write('<h1>test</h1>');
+                $response->getBody()->write('<h1>CNC API v1</h1>');
                 return $response;
             }
         );
