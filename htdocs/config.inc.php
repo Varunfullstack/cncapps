@@ -767,7 +767,7 @@ switch ($server_type) {
         );
         define(
             'API_URL',
-            'https://dev.cnc-ltd.co.uk:666/api'
+            'https://www.cnc-ltd.co.uk:4481/api'
         );
 
         break;
