@@ -2153,6 +2153,17 @@ class CTSalesOrder extends CTCNC
                         $dbeEnvelop = new DBESignableEnvelope($this);
                         $dbeEnvelop->getRow($this->dsQuotation->getValue(DBEQuotation::signableEnvelopeID));
                         $signableStatus = $dbeEnvelop->getValue(DBESignableEnvelope::status);
+
+                        if ($signableStatus == "signed-envelop" || $signableStatus == "signed-envelope-complete") {
+                            $txtReminder = null;
+                        }
+
+                        if ($dbeEnvelop->getValue(DBESignableEnvelope::downloadLink)) {
+                            $signableStatus = "<a href='" . $dbeEnvelop->getValue(
+                                    DBESignableEnvelope::downloadLink
+                                ) . "'>$signableStatus</a>";
+                        }
+
                     }
 
                     $this->template->set_var(

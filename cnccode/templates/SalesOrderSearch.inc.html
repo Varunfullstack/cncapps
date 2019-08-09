@@ -34,7 +34,7 @@
     }
 
     function createTemplatedQuote() {
-        document.location = '{createTemplatedQuoteURL}' + (document.searchForm.customerID.value ? "&customerID=" + document.searchForm.customerID.value : null)
+        document.location = '{createTemplatedQuoteURL}' + (document.searchForm.customerID.value ? ("&customerID=" + document.searchForm.customerID.value) : "")
     }
 
     function createOrder() {
@@ -60,7 +60,7 @@
       action="{submitURL}"
       AUTOCOMPLETE="off"
 >
-    <table width="500px"
+    <table width="600px"
            border="0"
            cellspacing="0"
            cellpadding="1"
