@@ -387,7 +387,7 @@ class CTQuoteTemplates extends CTCNC
     function displayList()
     {
         $this->setMethodName('displayList');
-        $this->setPageTitle('Quotation Templates');
+        $this->setPageTitle('Quote Templates');
         $this->setTemplateFiles(
             array('QuotationTemplateList' => 'QuotationTemplateList.inc')
         );
