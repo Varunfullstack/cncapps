@@ -39,6 +39,8 @@
     CKEDITOR.config.resize_minWidth = '760';
 
     $(function () {
+
+
         editor = CKEDITOR.replace('standardTextEditor', config);
         checkTags();
     });
@@ -48,7 +50,9 @@
         var customConfig = Object.assign({}, config);
         if (selectedOptions.length) {
             var option = selectedOptions[0];
-            updateType(option.value);
+            if (!updateType(option.value)) {
+                return;
+            }
             var tags = option.getAttribute('data-tags');
 
             if (tags) {
@@ -60,6 +64,11 @@
     }
 
     function updateType(type) {
+        if (type == '{salesQuotationTypeID}') {
+            destroyEditorInstance();
+            return false
+        }
+
         if (type == '{salesRequestTypeID}') {
             $('#salesRequestEmailRow').show();
             $('#salesRequestUnassignFlagRow').show();
@@ -69,10 +78,17 @@
             $('#salesRequestUnassignFlagRow').hide();
             $('#salesRequestEmailRow input').attr('required', false);
         }
+        return true;
+    }
+
+    function destroyEditorInstance() {
+        if (CKEDITOR.instances.standardTextEditor) {
+            CKEDITOR.instances.standardTextEditor.destroy();
+        }
     }
 
     function recreateEditor(config) {
-        CKEDITOR.instances.standardTextEditor.destroy();
+        destroyEditorInstance();
         CKEDITOR.replace('standardTextEditor', config);
     }
 

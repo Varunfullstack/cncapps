@@ -2019,7 +2019,7 @@ class CTSalesOrder extends CTCNC
                         $this->setIntroduction(CTSALESORDER_TXT_INTRODUCTION);
                     }
                 }
-                if ((!$this->getEmailSubject()) & (!$this->getFormError())) {
+                if ((!$this->getEmailSubject()) && (!$this->getFormError())) {
                     if ($dsOrdhead->getValue(DBEOrdhead::quotationSubject)) {
                         $this->setEmailSubject($dsOrdhead->getValue(DBEOrdhead::quotationSubject));
                     }
@@ -2154,7 +2154,7 @@ class CTSalesOrder extends CTCNC
                         $dbeEnvelop->getRow($this->dsQuotation->getValue(DBEQuotation::signableEnvelopeID));
                         $signableStatus = $dbeEnvelop->getValue(DBESignableEnvelope::status);
 
-                        if ($signableStatus == "signed-envelop" || $signableStatus == "signed-envelope-complete") {
+                        if ($signableStatus == "signed-envelope" || $signableStatus == "signed-envelope-complete") {
                             $txtReminder = null;
                         }
 
@@ -3592,7 +3592,11 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
             return FALSE;
         }
-        //$this->buildQuote($quoteFile, $versionNo);
+        if (!$this->getEmailSubject()) {
+            $this->setFormErrorMessage('Email Subject is required');
+            $this->setFormErrorOn();
+            return $this->displayOrder();
+        }
 
         $buPDFSalesQuote = new BUPDFSalesQuote($this);
         try {

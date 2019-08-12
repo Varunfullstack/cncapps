@@ -32,7 +32,7 @@ define(
     'updateStandardText'
 );
 
-class CTSTANDARDTEXT extends CTCNC
+class CTStandardText extends CTCNC
 {
     /** @var DSForm */
     public $dsStandardText;
@@ -102,6 +102,237 @@ class CTSTANDARDTEXT extends CTCNC
                 $this->displayList();
                 break;
         }
+    }
+
+    /**
+     * Edit/Add Further Action
+     * @access private
+     * @throws Exception
+     */
+    function edit()
+    {
+        $this->setMethodName('edit');
+        $dsStandardText = &$this->dsStandardText; // ref to class var
+
+        if (!$this->getFormError()) {
+            if ($this->getAction() == CTSTANDARDTEXT_ACT_EDIT) {
+                $this->buStandardText->getStandardTextByID(
+                    $this->getParam('stt_standardtextno'),
+                    $dsStandardText
+                );
+                $stt_standardtextno = $this->getParam('stt_standardtextno');
+            } else {                                                                    // creating new
+                $dsStandardText->initialise();
+                $dsStandardText->setValue(
+                    DBEStandardText::stt_standardtextno,
+                    null
+                );
+                $stt_standardtextno = null;
+            }
+        } else {                                                                        // form validation error
+            $dsStandardText->initialise();
+            $dsStandardText->fetchNext();
+            $stt_standardtextno = $dsStandardText->getValue(DBEStandardText::stt_standardtextno);
+        }
+        $urlDelete = null;
+        $txtDelete = null;
+
+        if ($this->getAction() == CTSTANDARDTEXT_ACT_EDIT) {
+            $urlDelete =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'             => CTSTANDARDTEXT_ACT_DELETE,
+                        'stt_standardtextno' => $stt_standardtextno
+                    )
+                );
+            $txtDelete = 'Delete';
+        }
+        $urlUpdate =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'             => CTSTANDARDTEXT_ACT_UPDATE,
+                    'stt_standardtextno' => $stt_standardtextno
+                )
+            );
+        $urlDisplayList =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTSTANDARDTEXT_ACT_DISPLAY_LIST
+                )
+            );
+        $this->setPageTitle('Edit Standard Text');
+        $this->setTemplateFiles(
+            array('StandardTextEdit' => 'StandardTextEdit.inc')
+        );
+
+        /* type selector */
+        // activity status selector
+        $this->template->set_block(
+            'StandardTextEdit',
+            'typeBlock',
+            'types'
+        ); // ss avoids naming conflict!
+
+        $dbeStandardTextType = new DBEStandardTextType($this);
+
+        $dbeStandardTextType->getRows('description');
+
+        $salesRequestTypeID = null;
+        $salesQuotationTypeID = null;
+        while ($dbeStandardTextType->fetchNext()) {
+            $selected = ($dsStandardText->getValue(
+                    DBEStandardText::stt_standardtexttypeno
+                ) == $dbeStandardTextType->getPKValue()) ? CT_SELECTED : null;
+            if ($dbeStandardTextType->getValue(DBEStandardTextType::description) == 'Sales Request') {
+                $salesRequestTypeID = $dbeStandardTextType->getValue(DBEStandardTextType::standardTextTypeID);
+            }
+
+            if ($dbeStandardTextType->getValue(DBEStandardTextType::description) == 'Sales Quotation Text') {
+                $salesQuotationTypeID = $dbeStandardTextType->getValue(DBEStandardTextType::standardTextTypeID);
+            }
+
+            $this->template->set_var(
+                array(
+                    'typeSelected'           => $selected,
+                    'stt_standardtexttypeno' => $dbeStandardTextType->getValue(DBEStandardTextType::standardTextTypeID),
+                    'typeDescription'        => $dbeStandardTextType->getValue(DBEStandardTextType::description),
+                    'variables'              => $dbeStandardTextType->getValue(DBEStandardTextType::variables)
+                )
+            );
+            $this->template->parse(
+                'types',
+                'typeBlock',
+                true
+            );
+        }
+
+        $this->template->set_var(
+            array(
+                'stt_standardtextno'              => $stt_standardtextno,
+                'stt_desc'                        => Controller::htmlInputText(
+                    $dsStandardText->getValue(DBEStandardText::stt_desc)
+                ),
+                'stt_descMessage'                 => Controller::htmlDisplayText(
+                    $dsStandardText->getMessage(DBEStandardText::stt_desc)
+                ),
+                'stt_text'                        => Controller::htmlInputText(
+                    $dsStandardText->getValue(DBEStandardText::stt_text)
+                ),
+                'stt_textMessage'                 => Controller::htmlDisplayText(
+                    $dsStandardText->getMessage(DBEStandardText::stt_text)
+                ),
+                'urlUpdate'                       => $urlUpdate,
+                'urlDelete'                       => $urlDelete,
+                'txtDelete'                       => $txtDelete,
+                'urlDisplayList'                  => $urlDisplayList,
+                'salesRequestTypeID'              => $salesRequestTypeID,
+                'salesQuotationTypeID'            => $salesQuotationTypeID,
+                'salesRequestEmail'               => $dsStandardText->getValue(DBEStandardText::salesRequestEmail),
+                'salesRequestUnassignFlagChecked' => $this->getChecked(
+                    $dsStandardText->getValue(DBEStandardText::salesRequestUnassignFlag)
+                )
+            )
+        );
+
+
+        $this->template->parse(
+            'CONTENTS',
+            'StandardTextEdit',
+            true
+        );
+        $this->parsePage();
+    }
+
+    /**
+     * Delete Further Action
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function delete()
+    {
+        $this->setMethodName('delete');
+        if (!$this->buStandardText->deleteStandardText($this->getParam('stt_standardtextno'))) {
+            $this->displayFatalError('Cannot delete this row');
+            exit;
+        } else {
+            $urlNext =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => CTSTANDARDTEXT_ACT_DISPLAY_LIST
+                    )
+                );
+            header('Location: ' . $urlNext);
+            exit;
+        }
+    }// end function editFurther Action()
+
+    /**
+     * Update call Further Action details
+     * @access private
+     * @throws Exception
+     */
+    function update()
+    {
+        $this->setMethodName('update');
+        $this->formError = (!$this->dsStandardText->populateFromArray($this->getParam('standardText')));
+
+        if ($this->formError) {
+            if (!$this->dsStandardText->getValue(
+                DBEStandardText::stt_standardtextno
+            )) {                    // attempt to insert
+                $this->setAction(CTSTANDARDTEXT_ACT_EDIT);
+            } else {
+                $this->setAction(CTSTANDARDTEXT_ACT_CREATE);
+            }
+            $this->edit();
+            exit;
+        }
+
+        $this->buStandardText->updateStandardText($this->dsStandardText);
+
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'stt_standardtextno' => $this->dsStandardText->getValue(DBEStandardText::stt_standardtextno),
+                    'action'             => CTCNC_ACT_VIEW
+                )
+            );
+        header('Location: ' . $urlNext);
+    }
+
+    private function getStandardTextOptions()
+    {
+        $DBEStandardTextType = new DBEStandardTextType($this);
+        $DBEStandardTextType->setValue(
+            DBEStandardTextType::description,
+            'Sales Request'
+        );
+        $DBEStandardTextType->getRowsByColumn(DBEStandardTextType::description);
+        $DBEStandardTextType->fetchNext();
+        $dsOptions = new DataSet($this);
+        $this->buStandardText->getStandardTextByTypeID(
+            $DBEStandardTextType->getValue(DBEStandardTextType::standardTextTypeID),
+            $dsOptions
+        );
+
+        $options = [];
+
+        while ($dsOptions->fetchNext()) {
+            $options[] = [
+                "id"       => $dsOptions->getValue(DBEStandardText::stt_standardtextno),
+                "template" => $dsOptions->getValue(DBEStandardText::stt_text),
+                'name'     => $dsOptions->getValue(DBEStandardText::stt_desc)
+            ];
+        }
+
+        return $options;
     }
 
     /**
@@ -193,229 +424,5 @@ class CTSTANDARDTEXT extends CTCNC
             true
         );
         $this->parsePage();
-    }
-
-    /**
-     * Edit/Add Further Action
-     * @access private
-     * @throws Exception
-     */
-    function edit()
-    {
-        $this->setMethodName('edit');
-        $dsStandardText = &$this->dsStandardText; // ref to class var
-
-        if (!$this->getFormError()) {
-            if ($this->getAction() == CTSTANDARDTEXT_ACT_EDIT) {
-                $this->buStandardText->getStandardTextByID(
-                    $this->getParam('stt_standardtextno'),
-                    $dsStandardText
-                );
-                $stt_standardtextno = $this->getParam('stt_standardtextno');
-            } else {                                                                    // creating new
-                $dsStandardText->initialise();
-                $dsStandardText->setValue(
-                    DBEStandardText::stt_standardtextno,
-                    null
-                );
-                $stt_standardtextno = null;
-            }
-        } else {                                                                        // form validation error
-            $dsStandardText->initialise();
-            $dsStandardText->fetchNext();
-            $stt_standardtextno = $dsStandardText->getValue(DBEStandardText::stt_standardtextno);
-        }
-        $urlDelete = null;
-        $txtDelete = null;
-
-        if ($this->getAction() == CTSTANDARDTEXT_ACT_EDIT) {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'             => CTSTANDARDTEXT_ACT_DELETE,
-                        'stt_standardtextno' => $stt_standardtextno
-                    )
-                );
-            $txtDelete = 'Delete';
-        }
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'             => CTSTANDARDTEXT_ACT_UPDATE,
-                    'stt_standardtextno' => $stt_standardtextno
-                )
-            );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTSTANDARDTEXT_ACT_DISPLAY_LIST
-                )
-            );
-        $this->setPageTitle('Edit Standard Text');
-        $this->setTemplateFiles(
-            array('StandardTextEdit' => 'StandardTextEdit.inc')
-        );
-
-        /* type selector */
-        // activity status selector
-        $this->template->set_block(
-            'StandardTextEdit',
-            'typeBlock',
-            'types'
-        ); // ss avoids naming conflict!
-
-        $dbeStandardTextType = new DBEStandardTextType($this);
-
-        $dbeStandardTextType->getRows('description');
-
-        $salesRequestTypeID = null;
-        while ($dbeStandardTextType->fetchNext()) {
-            $selected = ($dsStandardText->getValue(
-                    DBEStandardText::stt_standardtexttypeno
-                ) == $dbeStandardTextType->getPKValue()) ? CT_SELECTED : null;
-            if ($dbeStandardTextType->getValue(DBEStandardTextType::description) == 'Sales Request') {
-                $salesRequestTypeID = $dbeStandardTextType->getValue(DBEStandardTextType::standardTextTypeID);
-            }
-            $this->template->set_var(
-                array(
-                    'typeSelected'           => $selected,
-                    'stt_standardtexttypeno' => $dbeStandardTextType->getValue(DBEStandardTextType::standardTextTypeID),
-                    'typeDescription'        => $dbeStandardTextType->getValue(DBEStandardTextType::description),
-                    'variables'              => $dbeStandardTextType->getValue(DBEStandardTextType::variables)
-                )
-            );
-            $this->template->parse(
-                'types',
-                'typeBlock',
-                true
-            );
-        }
-
-        $this->template->set_var(
-            array(
-                'stt_standardtextno'              => $stt_standardtextno,
-                'stt_desc'                        => Controller::htmlInputText(
-                    $dsStandardText->getValue(DBEStandardText::stt_desc)
-                ),
-                'stt_descMessage'                 => Controller::htmlDisplayText(
-                    $dsStandardText->getMessage(DBEStandardText::stt_desc)
-                ),
-                'stt_text'                        => Controller::htmlInputText(
-                    $dsStandardText->getValue(DBEStandardText::stt_text)
-                ),
-                'stt_textMessage'                 => Controller::htmlDisplayText(
-                    $dsStandardText->getMessage(DBEStandardText::stt_text)
-                ),
-                'urlUpdate'                       => $urlUpdate,
-                'urlDelete'                       => $urlDelete,
-                'txtDelete'                       => $txtDelete,
-                'urlDisplayList'                  => $urlDisplayList,
-                'salesRequestTypeID'              => $salesRequestTypeID,
-                'salesRequestEmail'               => $dsStandardText->getValue(DBEStandardText::salesRequestEmail),
-                'salesRequestUnassignFlagChecked' => $this->getChecked(
-                    $dsStandardText->getValue(DBEStandardText::salesRequestUnassignFlag)
-                )
-            )
-        );
-
-
-        $this->template->parse(
-            'CONTENTS',
-            'StandardTextEdit',
-            true
-        );
-        $this->parsePage();
-    }// end function editFurther Action()
-
-    /**
-     * Update call Further Action details
-     * @access private
-     * @throws Exception
-     */
-    function update()
-    {
-        $this->setMethodName('update');
-        $this->formError = (!$this->dsStandardText->populateFromArray($this->getParam('standardText')));
-
-        if ($this->formError) {
-            if (!$this->dsStandardText->getValue(
-                DBEStandardText::stt_standardtextno
-            )) {                    // attempt to insert
-                $this->setAction(CTSTANDARDTEXT_ACT_EDIT);
-            } else {
-                $this->setAction(CTSTANDARDTEXT_ACT_CREATE);
-            }
-            $this->edit();
-            exit;
-        }
-
-        $this->buStandardText->updateStandardText($this->dsStandardText);
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'stt_standardtextno' => $this->dsStandardText->getValue(DBEStandardText::stt_standardtextno),
-                    'action'             => CTCNC_ACT_VIEW
-                )
-            );
-        header('Location: ' . $urlNext);
-    }
-
-    /**
-     * Delete Further Action
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function delete()
-    {
-        $this->setMethodName('delete');
-        if (!$this->buStandardText->deleteStandardText($this->getParam('stt_standardtextno'))) {
-            $this->displayFatalError('Cannot delete this row');
-            exit;
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTSTANDARDTEXT_ACT_DISPLAY_LIST
-                    )
-                );
-            header('Location: ' . $urlNext);
-            exit;
-        }
-    }
-
-    private function getStandardTextOptions()
-    {
-        $DBEStandardTextType = new DBEStandardTextType($this);
-        $DBEStandardTextType->setValue(
-            DBEStandardTextType::description,
-            'Sales Request'
-        );
-        $DBEStandardTextType->getRowsByColumn(DBEStandardTextType::description);
-        $DBEStandardTextType->fetchNext();
-        $dsOptions = new DataSet($this);
-        $this->buStandardText->getStandardTextByTypeID(
-            $DBEStandardTextType->getValue(DBEStandardTextType::standardTextTypeID),
-            $dsOptions
-        );
-
-        $options = [];
-
-        while ($dsOptions->fetchNext()) {
-            $options[] = [
-                "id"       => $dsOptions->getValue(DBEStandardText::stt_standardtextno),
-                "template" => $dsOptions->getValue(DBEStandardText::stt_text),
-                'name'     => $dsOptions->getValue(DBEStandardText::stt_desc)
-            ];
-        }
-
-        return $options;
     }
 }

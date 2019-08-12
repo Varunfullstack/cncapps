@@ -154,7 +154,7 @@ class BUPDFSalesQuote extends Business
         $buPDF->printString($salutation . ',');
         $buPDF->CR();
         $buPDF->CR();
-        $buPDF->writeHTML($introduction);
+        $buPDF->printString($introduction);
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->setBoldOn();

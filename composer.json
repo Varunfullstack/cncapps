@@ -3,7 +3,7 @@
         "dompdf/dompdf": "^0.8.2",
         "setasign/fpdi": "^2.0",
         "setasign/fpdi-protection": "^2.0",
-        "syonix/changelog-viewer": "^0.1.7",
+        "syonix/changelog-viewer": "^0.1.8",
         "signable/signable-php": "*@dev",
         "tijsverkoyen/css-to-inline-styles": "^2.2",
         "phpoffice/phpword": "^0.15.0",
@@ -24,8 +24,7 @@
         "twig/twig": "^2.0",
         "php-di/php-di": "^6.0",
         "ext-bcmath": "*",
-        "ext-calendar": "*",
-        "ext-spltype": "*"
+        "ext-calendar": "*"
     },
     "autoload": {
         "psr-4": {

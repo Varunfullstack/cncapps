@@ -5,13 +5,12 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-//require_once(PDF_DIR . '/fpdf.php');                // Free PDF from http://www.fpdf.org/
 require_once(PDF_DIR . '/fpdf_protection.php');
 
 define(
     'FPDF_FONTPATH',
     PDF_DIR . '/font/'
-);    // Used by fpdf class
+);
 define(
     'BUPDF_A4_WIDTH',
     595
@@ -32,7 +31,7 @@ define(
 class BUPDF extends BaseObject
 {
     public $pdf;                    // fpdf object
-    var $currentXPos = '';    // Position accross page from LHS
+    var $currentXPos = '';    // Position across page from LHS
     var $currentYPos = '';    // Position up page from bottom
     var $margin = '';                // Non-print area
     var $pageWidth = '';        // Position up page from bottom
@@ -84,7 +83,7 @@ class BUPDF extends BaseObject
             $this->raiseError('Only A4 paper size supported at present');
             return FALSE;
         }
-//		$this->pdf = pdf_new();
+
         $this->pdf = new FPDF_Protection();
         if ($encrypted) {
             $this->pdf->SetProtection(
@@ -93,11 +92,8 @@ class BUPDF extends BaseObject
                 '[V.^DW_uA^2~vER$'
             );
         }
-//        $this->pdf->AddFont('DejaVu', '', 'DejaVuSansCondensed.ttf');
-//        $this->pdf->SetFont('DejaVu', '', 14);
         $this->setFilename($filename);        // Disk file to be created
 
-//        $this->open();
         $this->setInfo(
             "Author",
             $author
@@ -117,7 +113,6 @@ class BUPDF extends BaseObject
         $this->setFontFamily(BUPDF_FONT_ARIAL);
         $this->setFontSize(10);
         $this->setPaperSize($paperSize);
-
     }
 
     function setInfo($element,
@@ -157,17 +152,9 @@ class BUPDF extends BaseObject
         }
     }
 
-    function writeHTML($html)
-    {
-        $this->pdf->WriteHTML($html);
-    }
-
-    function open()
-    {
-        $this->pdf->open();
-        return TRUE;
-    }
-
+    /**
+     * @return bool
+     */
     function startPage()
     {
         $this->pageNo++;
@@ -238,12 +225,6 @@ class BUPDF extends BaseObject
         return TRUE;
     }
 
-    function setBoldUnderlineOn()
-    {
-        $this->setFontStyle('BU');
-        return TRUE;
-    }
-
     /**
      * NOTE: This is flakey at present cause you cant combine font styles e.g. Bold and Italic
      * needs changing to remove B from a concatonated string instead
@@ -272,15 +253,11 @@ class BUPDF extends BaseObject
         return $this->pdf->GetY();
     }
 
-    /*
-        function moveDown($lineCount){
-            $this->currentYPos -= ($lineCount * $this->getFontSize());
-    //		pdf_moveto($this->pdf, $this->currentXPos, $this->currentYPos);
-            $this->pdf->SetY($this->currentYPos);
-            return TRUE;
-        }
-    */
-
+    /***
+     * @param $position
+     * @param $string
+     * @return bool
+     */
     function printStringAt($position,
                            $string
     )
@@ -297,6 +274,11 @@ class BUPDF extends BaseObject
         return TRUE;
     }
 
+    /**
+     * @param $string
+     * @param null $link
+     * @return bool
+     */
     function printString($string, $link = null)
     {
         if ($this->detectUTF8($string)) {
@@ -353,6 +335,11 @@ class BUPDF extends BaseObject
         );
     }
 
+    /**
+     * @param $position
+     * @param $string
+     * @return bool
+     */
     function printStringRJAt($position,
                              $string
     )
@@ -369,6 +356,9 @@ class BUPDF extends BaseObject
 
     // Right Justified
 
+    /**
+     * @return string
+     */
     function getData()
     {
         return $this->pdf->Output(
@@ -388,6 +378,8 @@ class BUPDF extends BaseObject
         $this->filename = $filename;
     }
 
+    /**
+     */
     function close()
     {
         $this->pdf->Output(
@@ -431,5 +423,4 @@ class BUPDF extends BaseObject
             $height
         );
     }
-}// End of class
-?>
+}

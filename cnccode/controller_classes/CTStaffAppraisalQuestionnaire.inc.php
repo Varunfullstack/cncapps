@@ -19,7 +19,6 @@ require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEStaffAppraisalObjectives.php');
 require_once($cfg['path_dbe'] . '/DBEStaffAppraisalQuestion.inc.php');
 require_once($cfg['path_bu'] . '/BUMail.inc.php');
-require_once(PDF_DIR . '/fpdf_protection.php');
 
 class CTStaffAppraisalQuestionnaire extends CTCNC
 {
