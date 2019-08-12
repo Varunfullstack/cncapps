@@ -9,6 +9,24 @@ class BUPDFSalesQuote extends Business
 {
     /** @var BUSalesOrder */
     public $buSalesOrder;
+    private $footerImage;
+    /**
+     * @var float|int
+     */
+    private $footerImageRatio;
+    private $footerImageWidth;
+    /**
+     * @var float|int
+     */
+    private $footerHeight;
+    /**
+     * @var float|int
+     */
+    private $footerPosition;
+    /**
+     * @var bool
+     */
+    private $shouldShowFooter;
 
     /**
      * Constructor
@@ -80,14 +98,31 @@ class BUPDFSalesQuote extends Business
         );
 
         $buPDF = new BUPDF(
-            $this,
-            $quoteFile,
-            $dsUser->getValue(DBEUser::name),
-            $ordheadID . '/' . $versionNo,
-            'CNC Ltd',
-            'Quotation',
-            'A4'
+            $this, $quoteFile, $dsUser->getValue(DBEUser::name), $ordheadID . '/' . $versionNo, 'CNC Ltd', 'Quotation'
         );
+
+        $this->footerImage = $GLOBALS['cfg']['cncaddress_path'];
+        list($originalWidth, $originalHeight) = getimagesize($this->footerImage);
+        $this->footerImageRatio = $originalHeight / $originalWidth;
+        $this->footerImageWidth = $buPDF->pdf->GetPageWidth() - 10 - 10;
+        $this->footerHeight = ($this->footerImageWidth * $this->footerImageRatio) + 10;
+        $this->footerPosition = $buPDF->pdf->GetPageHeight() - $this->footerHeight;
+        $this->shouldShowFooter = true;
+
+        $buPDF->footerCallback(
+            function (FPDF_Protection $pdf) {
+                if ($this->shouldShowFooter) {
+                    $pdf->Image(
+                        $GLOBALS['cfg']['cncaddress_path'],
+                        0,
+                        $pdf->GetPageHeight() - ($this->footerImageWidth * $this->footerImageRatio),
+                        $this->footerImageWidth
+                    );
+                    $this->shouldShowFooter = false;
+                }
+            }
+        );
+
         // First page is quote
         $buPDF->startPage();
 
@@ -112,7 +147,7 @@ class BUPDFSalesQuote extends Business
         $buPDF->setFont();
         $buPDF->CR();
         $buPDF->CR();
-        $buPDF->printString('Quotation: ' . $ordheadID . '/' . $versionNo);
+        $buPDF->printString('Quote: ' . $ordheadID . '/' . $versionNo);
         $buPDF->setFontSize(10);
         $buPDF->setBoldOff();
         $buPDF->setFont();
@@ -361,7 +396,7 @@ class BUPDFSalesQuote extends Business
         $buPDF->setFont();
         $buPDF->CR();
         $buPDF->CR();
-        $buPDF->printString('If you would like to proceed with this quotation, then please click on ');
+        $buPDF->printString('If you would like to proceed with this quote, then please click on ');
         $buPDF->printString('this link', API_URL . "/acceptQuotation?code=$confirmationCode");
         $buPDF->printString(' which will automatically email you an e-signable order form document to sign.');
         $buPDF->CR();
@@ -370,7 +405,7 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printString(
-            'If any of the quantities are incorrect or you wish to remove an item, then please drop us an email with the details and we will amend the quote accordingly and send you a new quotation with an updated link'
+            'If you need to vary the quote in any way, please email the changes to sales@cnc-ltd.co.uk, quoting ' . $ordheadID . '/' . $versionNo . ' and we will send a revised order form to you.'
         );
         $buPDF->CR();
         $buPDF->CR();
@@ -414,12 +449,6 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         $buPDF->printString('E. & O. E.');
         $buPDF->CR();
-        $buPDF->placeImageAt(
-            $GLOBALS['cfg']['cncaddress_path'],
-            'PNG',
-            6,
-            200
-        );
         $buPDF->endPage();
         // End of First page
 

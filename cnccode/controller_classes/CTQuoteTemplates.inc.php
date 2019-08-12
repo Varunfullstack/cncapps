@@ -36,7 +36,7 @@ define(
     'changeOrder'
 );
 
-class CTQuotationTemplates extends CTCNC
+class CTQuoteTemplates extends CTCNC
 {
     public $dsQuotationTemplate;
     /** @var BUQuotationTemplate */
@@ -363,16 +363,16 @@ class CTQuotationTemplates extends CTCNC
 
             switch ($value) {
                 case 'top':
-                    $dbeQuotationTemplate->moveQuotationTemplateToTop($quotationTemplateID);
+                    $dbeQuotationTemplate->moveItemToTop($quotationTemplateID);
                     break;
                 case 'bottom':
-                    $dbeQuotationTemplate->moveQuotationTemplateToBottom($quotationTemplateID);
+                    $dbeQuotationTemplate->moveItemToBottom($quotationTemplateID);
                     break;
                 case 'down':
-                    $dbeQuotationTemplate->moveQuotationTemplateDown($quotationTemplateID);
+                    $dbeQuotationTemplate->moveItemDown($quotationTemplateID);
                     break;
                 case 'up':
-                    $dbeQuotationTemplate->moveQuotationTemplateUp($quotationTemplateID);
+                    $dbeQuotationTemplate->moveItemUp($quotationTemplateID);
                     break;
             }
 
@@ -461,21 +461,24 @@ class CTQuotationTemplates extends CTCNC
 
             $this->template->set_var(
                 array(
-                    'id'                 => $quotationTemplateID,
-                    'description'        => Controller::htmlDisplayText(
+                    'id'                  => $quotationTemplateID,
+                    'description'         => Controller::htmlDisplayText(
                         $dbeQuotationTemplate->getValue(DBEQuotationTemplate::description)
                     ),
-                    'linkedSalesOrderId' => Controller::htmlDisplayText(
+                    'linkedSalesOrderId'  => Controller::htmlDisplayText(
                         $dbeQuotationTemplate->getValue(DBEQuotationTemplate::linkedSalesOrderId)
                     ),
-                    'urlEdit'            => $urlEdit,
-                    'urlDelete'          => $urlDelete,
-                    'txtEdit'            => $txtEdit,
-                    'txtDelete'          => $txtDelete,
-                    'sortOrderUp'        => $up ? null : 'disabled',
-                    'sortOrderDown'      => $down ? null : 'disabled',
-                    'sortOrderTop'       => $top ? null : 'disabled',
-                    'sortOrderBottom'    => $bottom ? null : 'disabled',
+                    'linkedSalesOrderURL' => "SalesOrder.php?action=displaySalesOrder&ordheadID= " . $dbeQuotationTemplate->getValue(
+                            DBEQuotationTemplate::linkedSalesOrderId
+                        ),
+                    'urlEdit'             => $urlEdit,
+                    'urlDelete'           => $urlDelete,
+                    'txtEdit'             => $txtEdit,
+                    'txtDelete'           => $txtDelete,
+                    'sortOrderUp'         => $up ? null : 'disabled',
+                    'sortOrderDown'       => $down ? null : 'disabled',
+                    'sortOrderTop'        => $top ? null : 'disabled',
+                    'sortOrderBottom'     => $bottom ? null : 'disabled',
                 )
             );
             $this->template->parse(

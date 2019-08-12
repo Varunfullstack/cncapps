@@ -3222,8 +3222,7 @@ class CTSalesOrder extends CTCNC
             $this->dsUser->getValue(DBEUser::name),
             $this->getOrdheadID() . '/' . $versionNo,
             'CNC Ltd',
-            'Customer Order Form',
-            'A4'
+            'Customer Order Form'
         );
 
         $buPDF->startPage();
@@ -4460,8 +4459,7 @@ class CTSalesOrder extends CTCNC
             $this->dsUser->getValue(DBEUser::name),
             $this->getOrdheadID() . '/' . $versionNo,
             'CNC Ltd',
-            'Order Confirmation',
-            'A4'
+            'Order Confirmation'
         );
         $buPDF->startPage();
         $buPDF->placeImageAt(

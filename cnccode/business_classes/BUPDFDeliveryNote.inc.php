@@ -91,13 +91,7 @@ class BUPDFDeliveryNote extends BaseObject
         $this->_dsOrdhead->fetchNext();
         $pdfFile = DELIVERY_NOTES_DIR . '/' . $this->_dsOrdhead->getValue('ordheadID') . '_' . $this->_noteNo . '.pdf';
         $this->_buPDF = new BUPDF(
-            $this,
-            $pdfFile,
-            'CNC',
-            date('d/m/Y'),
-            'CNC Ltd',
-            'Delivery Note',
-            'A4'
+            $this, $pdfFile, 'CNC', date('d/m/Y'), 'CNC Ltd', 'Delivery Note'
         );
         $this->produceNote();
         $this->_buPDF->close();

@@ -337,9 +337,25 @@
                 from standardText
                 where stt_desc = "Standard Quick Quote";
                 update db_sequence
-                set nextid = (select max(stt_standardtextno) + 1 from standardText) where seq_name = "standardtext";
+                set nextid = (select max(stt_standardtextno) + 1 from standardText)
+                where seq_name = "standardtext";
             </sql>
         </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565251716-18">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="ordhead" columnName="signableProcessed"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="ordhead">
+            <column name="signableProcessed" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            update ordhead set signableProcessed = 1;
+        </sql>
     </changeSet>
 
 

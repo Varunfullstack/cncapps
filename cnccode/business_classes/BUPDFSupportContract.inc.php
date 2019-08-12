@@ -111,14 +111,7 @@ class BUPDFSupportContract extends BaseObject
         $this->_dsContract->fetchNext();
         $pdfFile = DELIVERY_NOTES_DIR . '/' . $this->_dsContract->getValue(DBEJContract::customerItemID) . '.pdf';
         $this->_buPDF = new BUPDF(
-            $this,
-            $pdfFile,
-            'CNC',
-            date('d/m/Y'),
-            'CNC Ltd',
-            'Contract Schedule',
-            'A4',
-            $encrypted
+            $this, $pdfFile, 'CNC', date('d/m/Y'), 'CNC Ltd', 'Contract Schedule', $encrypted
         );
         $this->produceContract();
         $this->_buPDF->close();

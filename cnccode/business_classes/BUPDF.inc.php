@@ -34,8 +34,6 @@ class BUPDF extends BaseObject
     var $currentXPos = '';    // Position across page from LHS
     var $currentYPos = '';    // Position up page from bottom
     var $margin = '';                // Non-print area
-    var $pageWidth = '';        // Position up page from bottom
-    var $pageLength = '';        // Position up page from bottom
     var $pageNo = 0;
     var $fontFamily = '';
     var $fontStyle = '';
@@ -48,7 +46,6 @@ class BUPDF extends BaseObject
                          $title,
                          $creator,
                          $subject,
-                         $paperSize,
                          $encrypted = true
     )
     {
@@ -75,15 +72,6 @@ class BUPDF extends BaseObject
             $this->raiseError('No subject passed');
             return FALSE;
         }
-        if ($paperSize == '') {
-            $this->raiseError('No paper size passed');
-            return FALSE;
-        }
-        if ($paperSize != 'A4') {
-            $this->raiseError('Only A4 paper size supported at present');
-            return FALSE;
-        }
-
         $this->pdf = new FPDF_Protection();
         if ($encrypted) {
             $this->pdf->SetProtection(
@@ -112,7 +100,6 @@ class BUPDF extends BaseObject
         );
         $this->setFontFamily(BUPDF_FONT_ARIAL);
         $this->setFontSize(10);
-        $this->setPaperSize($paperSize);
     }
 
     function setInfo($element,
@@ -138,18 +125,6 @@ class BUPDF extends BaseObject
                 break;
         }
         return TRUE;
-    }
-
-    function setPaperSize($paperSize)
-    {
-        if ($paperSize != 'A4') {
-            $this->raiseError('Only A4 paper size supported at present');
-            return FALSE;
-        } else {
-            $this->margin = 50;
-            $this->pageWidth = BUPDF_A4_WIDTH;
-            $this->pageLength = BUPDF_A4_LENGTH;
-        }
     }
 
     /**
@@ -423,4 +398,10 @@ class BUPDF extends BaseObject
             $height
         );
     }
+
+    public function footerCallback(Closure $param)
+    {
+        $this->pdf->setFooterCallback($param);
+    }
+
 }

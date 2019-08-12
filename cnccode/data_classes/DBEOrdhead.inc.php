@@ -62,6 +62,7 @@ class DBEOrdhead extends DBEntity
     const quotationCreateDate = "quotationCreateDate";
     const directDebitFlag = "ordhead.directDebitFlag";
     const transactionType = 'ordhead.transactionType';
+    const signableProcessed = "signableProcessed";
 
     /**
      * calls constructor()
@@ -402,6 +403,12 @@ class DBEOrdhead extends DBEntity
             DA_ALLOW_NULL
         );
 
+        $this->addColumn(
+            self::signableProcessed,
+            DA_BOOLEAN,
+            DA_NOT_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -490,6 +497,18 @@ class DBEOrdhead extends DBEntity
                 return ($this->getDBColumnValue(0));
             }
         }
+        return false;
+    }
+
+    public function getSignableNotProcessedOrders()
+    {
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::signableProcessed) . "=  0 and " . $this->getDBColumnName(
+                self::type
+            ) . " <> 'Q' "
+        );
+        parent::getRows();
         return false;
     }
 

@@ -66,15 +66,10 @@ class FPDF_Protection extends FPDF
     protected $Ovalue;             //O entry in pdf document
     protected $Pvalue;             //P entry in pdf document
     protected $enc_obj_id;         //encryption object id
-    protected $PRE;
-    protected $B;
-    protected $I;
-    protected $U;
-    protected $HREF;
-    protected $fontList;
-    protected $issetfont;
-    protected $issetcolor;
-    private $bi;
+    /**
+     * @var Closure
+     */
+    private $footerCallback;
 
     /**
      * Function to set permissions as well as user and owner passwords
@@ -199,6 +194,27 @@ class FPDF_Protection extends FPDF
         $this->_put('/O (' . $this->_escape($this->Ovalue) . ')');
         $this->_put('/U (' . $this->_escape($this->Uvalue) . ')');
         $this->_put('/P ' . $this->Pvalue);
+    }
+
+    function _puttrailer()
+    {
+        parent::_puttrailer();
+        if ($this->encrypted) {
+            $this->_put('/Encrypt ' . $this->enc_obj_id . ' 0 R');
+            $this->_put('/ID [()()]');
+        }
+    }
+
+    function setFooterCallback(Closure $closure)
+    {
+        $this->footerCallback = $closure;
+    }
+
+    function Footer()
+    {
+        if ($this->footerCallback) {
+            ($this->footerCallback)($this);
+        }
     }
 }
 

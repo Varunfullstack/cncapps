@@ -165,4 +165,14 @@ class DBEQuotation extends DBEntity
         );
         return (parent::runQuery());
     }
+
+    public function getQuotesWithSignableDocumentForSalesOrder(int $salesOrderID)
+    {
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::ordheadID) . " = " . $salesOrderID . " and " . $this->getDBColumnName(self::signableEnvelopeID) . " is not null"
+        );
+        parent::getRows();
+    }
 }

@@ -5,13 +5,8 @@
 ></script>
 <script>
 
-
-    $(function () {
-        CKEDITOR.replace('introduction', {customConfig: '/ckeditor_config.js'});
-    });
-
     function changeText() {
-        CKEDITOR.instances.introduction.setData(atob($(event.target).val()));
+        $('#introduction').val(atob($(event.target).val()));
     }
 </script>
 <table width="650px"

@@ -2180,13 +2180,7 @@ WHERE odl_ordno = $ordheadID
         $dbeOrdHead = new DBEJOrdhead($this);
         $dbeOrdHead->getRow($ordHeadID);
         $buPDF = new BUPDF(
-            $this,
-            $orderFile,
-            "CNC Sales",
-            $ordHeadID . '/' . $versionNo,
-            'CNC Ltd',
-            'Customer Order Form',
-            'A4'
+            $this, $orderFile, "CNC Sales", $ordHeadID . '/' . $versionNo, 'CNC Ltd', 'Customer Order Form'
         );
 
         $buPDF->startPage();
@@ -2358,7 +2352,7 @@ WHERE odl_ordno = $ordheadID
         $buPDF->CR();
         $dsOrdline = new DBEQuotationLine($this);
         $dsOrdline->setValue(DBEQuotationLine::quotationID, $dbeQuotation->getValue(DBEQuotation::quotationID));
-        $dsOrdline->getRowByColumn(DBEQuotationLine::quotationID);
+        $dsOrdline->getRowsByColumn(DBEQuotationLine::quotationID);
 
         $grand_total = 0;
 
@@ -2439,7 +2433,7 @@ WHERE odl_ordno = $ordheadID
         );
         $buPDF->printStringAt(
             UNIT_LEFT,
-            '{text?:signer1:officialOrderNo}'
+            '{text?:signer1:Official+Order+No}'
         );
         $buPDF->CR();
         $buPDF->CR();
