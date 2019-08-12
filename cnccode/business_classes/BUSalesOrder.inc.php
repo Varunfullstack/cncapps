@@ -2455,7 +2455,7 @@ WHERE odl_ordno = $ordheadID
         );
         $buPDF->printStringAt(
             UNIT_LEFT,
-            "{text?:signer1:position}"
+            "{text?:signer1:Position}"
         );
         $buPDF->CR();
         $buPDF->CR();
