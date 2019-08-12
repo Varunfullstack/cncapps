@@ -406,7 +406,9 @@ class DBEOrdhead extends DBEntity
         $this->addColumn(
             self::signableProcessed,
             DA_BOOLEAN,
-            DA_NOT_NULL
+            DA_NOT_NULL,
+            null,
+            0
         );
 
         $this->setPK(0);
