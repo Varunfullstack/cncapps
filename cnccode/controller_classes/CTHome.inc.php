@@ -590,164 +590,94 @@ class CTHome extends CTCNC
 
         /* Extract data and build report */
         $results = $buTeamPerformance->getQuarterlyRecordsByYear(date('Y'));
-
         foreach ($results as $result) {
+            $esSLAPerformanceClass = 'performance-warn';
+            $esFixHoursClass = 'performance-warn';
+            $esQtyClass = 'performance-warn';
 
-            if (round($result['esTeamActualSlaPercentage']) < $result['esTeamTargetSlaPercentage']) {
+            $hdSLAPerformanceClass = 'performance-warn';
+            $hdFixHoursClass = 'performance-warn';
+            $hdQtyClass = 'performance-warn';
 
-                $this->template->set_var(
-                    'esTeamActualSlaPercentage' . $result['quarter'] . 'Class',
-                    'performance-warn'
-                );
+            $imSLAPerformanceClass = 'performance-warn';
+            $imFixHoursClass = 'performance-warn';
+            $imQtyClass = 'performance-warn';
+            if (round($result['esTeamActualSlaPercentage']) >= $result['esTeamTargetSlaPercentage']) {
+                $esSLAPerformanceClass = 'performance-green';
             }
 
-            if (round($result['esTeamActualSlaPercentage']) == 100) {
-                $this->template->setVar(
-                    'esTeamActualSlaPercentage' . $result['quarter'] . 'Class',
-                    'performance-green'
-                );
+            if (round($result['hdTeamActualSlaPercentage']) >= $result['hdTeamTargetSlaPercentage']) {
+                $hdSLAPerformanceClass = 'performance-green';
             }
 
-            if (round($result['hdTeamActualSlaPercentage']) < $result['hdTeamTargetSlaPercentage']) {
-
-                $this->template->set_var(
-                    'hdTeamActualSlaPercentage' . $result['quarter'] . 'Class',
-                    'performance-warn'
-                );
+            if (round($result['imTeamActualSlaPercentage']) >= $result['imTeamTargetSlaPercentage']) {
+                $imSLAPerformanceClass = 'performance-green';
             }
 
-            if (round($result['hdTeamActualSlaPercentage']) == 100) {
-                $this->template->setVar(
-                    'hdTeamActualSlaPercentage' . $result['quarter'] . 'Class',
-                    'performance-green'
-                );
+            if ($result['esTeamActualFixQty'] >= $result['esTeamTargetFixQty']) {
+                $esQtyClass = 'performance-green';
             }
 
-            if (round($result['imTeamActualSlaPercentage']) < $result['imTeamTargetSlaPercentage']) {
-
-                $this->template->set_var(
-                    'imTeamActualSlaPercentage' . $result['quarter'] . 'Class',
-                    'performance-warn'
-                );
+            if ($result['hdTeamActualFixQty'] >= $result['hdTeamTargetFixQty']) {
+                $hdQtyClass = 'performance-green';
             }
 
-
-            if (round($result['imTeamActualSlaPercentage']) == 100) {
-                $this->template->setVar(
-                    'imTeamActualSlaPercentage' . $result['quarter'] . 'Class',
-                    'performance-green'
-                );
+            if ($result['imTeamActualFixQty'] >= $result['imTeamTargetFixQty']) {
+                $imQtyClass = 'performance-green';
             }
 
-
-            if ($result['esTeamActualFixQty'] < $result['esTeamTargetFixQty']) {
-
-                $this->template->set_var(
-                    'esTeamActualFixQty' . $result['quarter'] . 'Class',
-                    'performance-warn'
-                );
+            if ($result['esTeamActualFixHours'] >= $result['esTeamTargetFixHours']) {
+                $esFixHoursClass = 'performance-green';
             }
 
-            if ($result['hdTeamActualFixQty'] < $result['hdTeamTargetFixQty']) {
-
-                $this->template->set_var(
-                    'hdTeamActualFixQty' . $result['quarter'] . 'Class',
-                    'performance-warn'
-                );
+            if ($result['hdTeamActualFixHours'] >= $result['hdTeamTargetFixHours']) {
+                $hdFixHoursClass = 'performance-green';
             }
 
-            if ($result['imTeamActualFixQty'] < $result['imTeamTargetFixQty']) {
-
-                $this->template->set_var(
-                    'imTeamActualFixQty' . $result['quarter'] . 'Class',
-                    'performance-warn'
-                );
-            }
-
-            if ($result['esTeamActualFixHours'] > $result['esTeamTargetFixHours']) {
-
-                $this->template->set_var(
-                    'esTeamActualFixHours' . $result['quarter'] . 'Class',
-                    'performance-warn'
-                );
-            }
-
-            if ($result['esTeamTargetFixHours'] - $result['esTeamActualFixHours'] > 1) {
-
-                $this->template->set_var(
-                    'esTeamActualFixHours' . $result['quarter'] . 'Class',
-                    'performance-green'
-                );
-            }
-
-            if ($result['hdTeamActualFixHours'] > $result['hdTeamTargetFixHours']) {
-
-                $this->template->set_var(
-                    'hdTeamActualFixHours' . $result['quarter'] . 'Class',
-                    'performance-warn'
-                );
-            }
-
-            if ($result['hdTeamTargetFixHours'] - $result['hdTeamActualFixHours'] > 1) {
-
-                $this->template->set_var(
-                    'hdTeamActualFixHours' . $result['quarter'] . 'Class',
-                    'performance-green'
-                );
-            }
-
-            if ($result['imTeamActualFixHours'] > $result['imTeamTargetFixHours']) {
-
-                $this->template->set_var(
-                    'imTeamActualFixHours' . $result['quarter'] . 'Class',
-                    'performance-warn'
-                );
-            }
-
-            if ($result['imTeamTargetFixHours'] - $result['imTeamActualFixHours'] > 1) {
-
-                $this->template->set_var(
-                    'imTeamActualFixHours' . $result['quarter'] . 'Class',
-                    'performance-green'
-                );
+            if ($result['imTeamActualFixHours'] >= $result['imTeamTargetFixHours']) {
+                $imFixHoursClass = 'performance-green';
             }
 
             $this->template->set_var(
                 array(
-                    'esTeamActualSlaPercentage' . $result['quarter'] => number_format(
+                    'esTeamActualSlaPercentage' . $result['quarter']           => number_format(
                         $result['esTeamActualSlaPercentage'],
                         0
                     ),
-
-                    'esTeamActualFixHours' . $result['quarter'] => number_format(
+                    'esTeamActualFixHours' . $result['quarter']                => number_format(
                         $result['esTeamActualFixHours'],
                         2
                     ),
-
-                    'esTeamActualFixQty' . $result['quarter'] => $result['esTeamActualFixQty'],
-
-                    'imTeamActualSlaPercentage' . $result['quarter'] => number_format(
+                    'esTeamActualFixQty' . $result['quarter']                  => $result['esTeamActualFixQty'],
+                    'imTeamActualSlaPercentage' . $result['quarter']           => number_format(
                         $result['imTeamActualSlaPercentage'],
                         0
                     ),
-
-                    'imTeamActualFixHours' . $result['quarter'] => number_format(
+                    'imTeamActualFixHours' . $result['quarter']                => number_format(
                         $result['imTeamActualFixHours'],
                         2
                     ),
-
-                    'imTeamActualFixQty' . $result['quarter'] => $result['imTeamActualFixQty'],
-
-                    'hdTeamActualSlaPercentage' . $result['quarter'] => number_format(
+                    'imTeamActualFixQty' . $result['quarter']                  => $result['imTeamActualFixQty'],
+                    'hdTeamActualSlaPercentage' . $result['quarter']           => number_format(
                         $result['hdTeamActualSlaPercentage'],
                         0
                     ),
-
-                    'hdTeamActualFixHours' . $result['quarter'] => number_format(
+                    'hdTeamActualFixHours' . $result['quarter']                => number_format(
                         $result['hdTeamActualFixHours'],
                         2
                     ),
-                    'hdTeamActualFixQty' . $result['quarter']   => $result['hdTeamActualFixQty']
+                    'hdTeamActualFixQty' . $result['quarter']                  => $result['hdTeamActualFixQty'],
+                    'hdTeamActualSlaPercentage' . $result['quarter'] . 'Class' => $hdSLAPerformanceClass,
+                    'hdTeamActualFixHours' . $result['quarter'] . 'Class'      => $hdFixHoursClass,
+                    'hdTeamActualFixQty' . $result['quarter'] . 'Class'        => $hdQtyClass,
+                    'esTeamActualSlaPercentage' . $result['quarter'] . 'Class' => $esSLAPerformanceClass,
+                    'esTeamActualFixHours' . $result['quarter'] . 'Class'      => $esFixHoursClass,
+                    'esTeamActualFixQty' . $result['quarter'] . 'Class'        => $esQtyClass,
+                    'imTeamActualSlaPercentage' . $result['quarter'] . 'Class' => $imSLAPerformanceClass,
+                    'imTeamActualFixHours' . $result['quarter'] . 'Class'      => $imFixHoursClass,
+                    'imTeamActualFixQty' . $result['quarter'] . 'Class'        => $imQtyClass,
+
+
                 )
             );
 

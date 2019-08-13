@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 623 - Full asset list export to secure area
 ### Fixed
 - Issue 630 - PO Status v9
+- Issue 634 - Change team targets to either green or red
 
 ## [v3.4.6] - 2019-08-05
 ### Fixed
