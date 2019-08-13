@@ -12,7 +12,7 @@
 
         if (document.getElementById('lineType').value === 'T') {
             if (Trim(document.getElementById("itemDescription").value)) {
-                window.open('QuotationTemplates.php?action=dispTemplateQuotationPopup&htmlFmt=popup&description=' +
+                window.open('quoteTemplates.php?action=dispTemplateQuotationPopup&htmlFmt=popup&description=' +
                     escape(encodeURIComponent(document.getElementById("itemDescription").value)) +
                     '&parentLinkedSalesOrderField=itemID' +
                     '&parentDescField=itemDescription',
