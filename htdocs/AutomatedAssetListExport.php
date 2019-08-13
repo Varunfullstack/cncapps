@@ -381,7 +381,7 @@ ORDER BY clients.name,
         echo '<div>No Data was found</div>';
     }
 };
-
+$tempFileName = null;
 if ($generateSummary) {
     echo '<h1>Generating Summary</h1>';
     $summarySheet->setAutoFilter($summarySheet->calculateWorksheetDimension());
@@ -414,20 +414,22 @@ if ($generateSummary) {
             $zip->addFile($tempFileName, 'Asset List Export.xlsx');
             $zip->setEncryptionName('Asset List Export.xlsx', ZipArchive::EM_AES_256, $password);
             $zip->close();
-            unlink($tempFileName);
+
             $dbePassword = new DBEPassword($thing);
             $dbePassword->getAutomatedFullAssetListPasswordItem();
             $dbePassword->setValue(DBEPassword::password, $buPassword->encrypt($password));
             $dbePassword->setValue(DBEPassword::username, null);
             $dbePassword->setValue(DBEPassword::level, 5);
             $dbePassword->setValue(DBEPassword::notes, 'Full List of Asset information');
-            $dbePassword->setValue(DBEPassword::URL, 'file:'.$definitiveFileName);
+            $dbePassword->setValue(DBEPassword::URL, $buPassword->encrypt('file:' . $definitiveFileName));
             $dbePassword->updateRow();
         }
     } catch (Exception $exception) {
         echo '<div>Failed to save Summary file, possibly file open</div>';
     }
-
+    if ($tempFileName && file_exists($tempFileName)) {
+        unlink($tempFileName);
+    }
 }
 
 
