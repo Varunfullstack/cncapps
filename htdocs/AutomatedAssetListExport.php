@@ -286,7 +286,7 @@ ORDER BY clients.name,
                     ->getStartColor()
                     ->setARGB($color);
 
-                if ($summarySheet) {
+                if ($generateSummary) {
                     $currentSummaryStyleRow = $currentSummaryRow + $i;
                     $summarySheet->getStyle("A$currentSummaryStyleRow:U$currentSummaryStyleRow")
                         ->getFill()
@@ -382,7 +382,7 @@ ORDER BY clients.name,
     }
 };
 
-if ($summarySheet) {
+if ($generateSummary) {
     echo '<h1>Generating Summary</h1>';
     $summarySheet->setAutoFilter($summarySheet->calculateWorksheetDimension());
     foreach (range('A', $summarySheet->getHighestDataColumn()) as $col) {
