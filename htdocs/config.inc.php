@@ -610,7 +610,7 @@ switch ($server_type) {
         );
         define(
             "TECHNICAL_DIR",
-            "\\\\cncltd\\cnc\\Company\\Technical"
+            "\\\\cncltd\\cnc\\Company\\Technical\\Asset List Export"
         );
         define(
             "BASE_DRIVE",

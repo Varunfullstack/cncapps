@@ -390,7 +390,7 @@ if ($generateSummary) {
             ->setAutoSize(true);
     }
     $password = \CNCLTD\Utils::generateStrongPassword(16);
-    $summarySpreadSheet->getSecurity()->setLockWindows(true)->setLockStructure(true)->setWorkbookPassword($password);
+
     $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($summarySpreadSheet);
     $folderName = TECHNICAL_DIR;
     if (!file_exists($folderName)) {
@@ -400,23 +400,30 @@ if ($generateSummary) {
             true
         );
     }
-    $fileName = $folderName . "\\Asset List Export.xlsx";
-    echo $fileName;
+    $tempFileName = $folderName . "\\temp.xlsx";
+
     $buPassword = new BUPassword($thing);
     try {
         $writer->save(
-            $fileName
+            $tempFileName
         );
-
-        $dbePassword = new DBEPassword($thing);
-        $dbePassword->getAutomatedFullAssetListPasswordItem();
-        $dbePassword->setValue(DBEPassword::password, $buPassword->encrypt($password));
-        $dbePassword->setValue(DBEPassword::username, null);
-        $dbePassword->setValue(DBEPassword::level, 5);
-        $dbePassword->setValue(DBEPassword::notes, 'Full List of Asset information');
-        $dbePassword->setValue(DBEPassword::URL, ' \cncltd\cnc\company\Technical\Asset List Export.xlsx');
-        $dbePassword->updateRow();
-
+        $definitiveFileName = $folderName . "\\Asset List Export.zip";
+        $zip = new ZipArchive();
+        $res = $zip->open($definitiveFileName, ZipArchive::CREATE);
+        if ($res === true) {
+            $zip->addFile($tempFileName, 'Asset List Export.xlsx');
+            $zip->setEncryptionName('Asset List Export.xlsx', ZipArchive::EM_AES_256, $password);
+            $zip->close();
+            unlink($tempFileName);
+            $dbePassword = new DBEPassword($thing);
+            $dbePassword->getAutomatedFullAssetListPasswordItem();
+            $dbePassword->setValue(DBEPassword::password, $buPassword->encrypt($password));
+            $dbePassword->setValue(DBEPassword::username, null);
+            $dbePassword->setValue(DBEPassword::level, 5);
+            $dbePassword->setValue(DBEPassword::notes, 'Full List of Asset information');
+            $dbePassword->setValue(DBEPassword::URL, ' \cncltd\cnc\company\Technical\Asset List Export.xlsx');
+            $dbePassword->updateRow();
+        }
     } catch (Exception $exception) {
         echo '<div>Failed to save Summary file, possibly file open</div>';
     }
