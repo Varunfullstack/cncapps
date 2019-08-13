@@ -71,7 +71,7 @@ $app->group(
                     $response->getBody()->write(
                         $twig->render(
                             'acceptQuotation.html.twig',
-                            ["message" => "The Quotation to be signed was not found"]
+                            ["message" => "The Quote to be signed was not found"]
                         )
                     );
                     return $response->withStatus(400);
@@ -82,7 +82,7 @@ $app->group(
                     $response->getBody()->write(
                         $twig->render(
                             'acceptQuotation.html.twig',
-                            ["message" => "The Quotation is already being processed in Signable"]
+                            ["message" => "The Quote is already being processed in Signable"]
                         )
                     );
                     return $response->withStatus(400);
@@ -176,7 +176,7 @@ $app->group(
                 $response->getBody()->write(
                     $twig->render(
                         'acceptQuotation.html.twig',
-                        ["message" => "An email from Signable will arrive shortly"]
+                        ["message" => "You will now receive an email from Signable with details on how to confirm your order."]
                     )
                 );
                 return $response;
