@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 630 - PO Status v9
+
 ## [v3.4.6] - 2019-08-05
 ### Fixed
 - SR Pending Closure email shows rootCause placeholder instead of the actual rootCause
