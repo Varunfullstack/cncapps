@@ -150,23 +150,34 @@ class CTItemsNotYetReceived extends CTCNC
 
             $this->template->set_var(
                 [
-                    "style"             => $style,
-                    "purchaseOrderLink" => $purchaseOrderLink,
-                    "purchaseOrderId"   => $item->getPurchaseOrderId(),
-                    "customerName"      => $item->getCustomerName(),
-                    "itemDescription"   => $item->getItemDescription(),
-                    "supplierName"      => $item->getSupplierName(),
-                    "orderedQty"        => $item->getOrderedQuantity(),
-                    "direct"            => $item->getDirect(),
-                    "purchaseOrderDate" => $this->getDateOrNA($item->getPurchaseOrderDate()),
-                    "expectedOn"        => $purchaseOrderLineLink,
-                    "futureDate"        => $this->getDateOrNA($item->getFutureDate()),
-                    "requiredByDate"    => $this->getDateOrNA($item->getPurchaseOrderRequiredBy()),
-                    "supplierRef"       => $item->getSupplierRef(),
-                    "color"             => $item->color(),
-                    "projectLink"       => $projectLink,
-                    "salesOrderLink"    => $salesOrderLink,
-                    "SRLink"            => $serviceRequestLink
+                    "style"                 => $style,
+                    "purchaseOrderLink"     => $purchaseOrderLink,
+                    "purchaseOrderId"       => $item->getPurchaseOrderId(),
+                    "customerName"          => $item->getCustomerName(),
+                    "itemDescription"       => $item->getItemDescription(),
+                    "supplierName"          => $item->getSupplierName(),
+                    "orderedQty"            => $item->getOrderedQuantity(),
+                    "direct"                => $item->getDirect(),
+                    "purchaseOrderDate"     => $this->getDateOrNA($item->getPurchaseOrderDate()),
+                    "purchaseOrderDateSort" => $item->getPurchaseOrderDate() ? $item->getPurchaseOrderDate()->format(
+                        DATE_MYSQL_DATE
+                    ) : null,
+                    "expectedOn"            => $purchaseOrderLineLink,
+                    "expectedOnSort"        => $item->getExpectedOn() ? $item->getExpectedOn()->format(
+                        DATE_MYSQL_DATE
+                    ) : null,
+                    "futureDate"            => $this->getDateOrNA($item->getFutureDate()),
+                    "futureDateSort"        => $item->getFutureDate() ? $item->getFutureDate()->format(
+                        DATE_MYSQL_DATE
+                    ) : null,
+                    "requiredByDate"        => $this->getDateOrNA($item->getPurchaseOrderRequiredBy()),
+                    "requiredByDateSort"    => $item->getPurchaseOrderRequiredBy() ? $item->getPurchaseOrderRequiredBy(
+                    )->format(DATE_MYSQL_DATE) : null,
+                    "supplierRef"           => $item->getSupplierRef(),
+                    "color"                 => $item->color(),
+                    "projectLink"           => $projectLink,
+                    "salesOrderLink"        => $salesOrderLink,
+                    "SRLink"                => $serviceRequestLink
                 ]
             );
 

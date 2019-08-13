@@ -5,6 +5,8 @@ This project changes will be shown here.
 ### Added
 - Issue 605 - Sales Quotation & Online Ordering
 - Issue 623 - Full asset list export to secure area
+### Fixed
+- Issue 630 - PO Status v9
 
 ## [v3.4.6] - 2019-08-05
 ### Fixed

@@ -39,6 +39,14 @@ class ItemNotYetReceived
     protected $lineSequenceNumber;
 
     /**
+     * @return array
+     */
+    public static function getItems(): array
+    {
+        return self::$items;
+    }
+
+    /**
      * @return mixed
      */
     public function getLineSequenceNumber()
@@ -46,23 +54,45 @@ class ItemNotYetReceived
         return $this->lineSequenceNumber;
     }
 
-
-
-    private function isCarriage(){
-        return $this->itemId == 1491;
-    }
-
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getExpectedOn()
     {
-        if(!$this->cost || $this->isCarriage()){
+        if (!$this->cost || $this->isCarriage()) {
             return null;
         }
         return $this->returnDateIfValue($this->expectedOn);
     }
 
+    private function isCarriage()
+    {
+        return $this->itemId == 1491;
+    }
+
+    /**
+     * @param $value
+     * @param string $format
+     * @return \DateTime|null
+     */
+    private function returnDateIfValue($value,
+                                       $format = 'Y-m-d'
+    )
+    {
+        if (!$value) {
+            return null;
+        }
+        $dateTime = \DateTime::createFromFormat(
+            $format,
+            $value
+        );
+
+        if (!$dateTime) {
+            return null;
+        }
+
+        return $dateTime;
+    }
 
     /**
      * @return mixed
@@ -71,7 +101,6 @@ class ItemNotYetReceived
     {
         return $this->deliveryConfirmedFlag == 'Y';
     }
-
 
     /**
      * @return mixed
@@ -89,7 +118,6 @@ class ItemNotYetReceived
         return (int)$this->isRequiredAtLeastAWeekAgo;
     }
 
-
     /**
      * @return mixed
      */
@@ -97,7 +125,6 @@ class ItemNotYetReceived
     {
         return $this->projectID;
     }
-
 
     /**
      * @return mixed
@@ -108,15 +135,6 @@ class ItemNotYetReceived
             $this->orderedQuantity,
             0
         );
-    }
-
-
-    /**
-     * @return array
-     */
-    public static function getItems(): array
-    {
-        return self::$items;
     }
 
     /**
@@ -149,15 +167,6 @@ class ItemNotYetReceived
     public function getHasBeenOrdered()
     {
         return $this->hasBeenOrdered;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getPurchaseOrderId()
-    {
-        return $this->purchaseOrderId;
     }
 
     /**
@@ -217,31 +226,6 @@ class ItemNotYetReceived
     }
 
     /**
-     * @param $value
-     * @param string $format
-     * @return \DateTime|null
-     */
-    private function returnDateIfValue($value,
-                                       $format = 'Y-m-d'
-    )
-    {
-        if (!$value) {
-            return null;
-        }
-        $dateTime = \DateTime::createFromFormat(
-            $format,
-            $value
-        );
-
-        if (!$dateTime) {
-            return null;
-        }
-
-        return $dateTime;
-    }
-
-
-    /**
      * @return mixed
      */
     public function getSupplierRef()
@@ -256,7 +240,6 @@ class ItemNotYetReceived
     {
         return $this->projectName;
     }
-
 
     public function isOrange()
     {
@@ -289,6 +272,14 @@ class ItemNotYetReceived
             return !$this->hasBeenOrdered ? 'red' : ($this->hasNotBeenReceivedYet ? 'orange' : "black");
         }
         return 'green';
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPurchaseOrderId()
+    {
+        return $this->purchaseOrderId;
     }
 
     public function getSalesOrderId()
