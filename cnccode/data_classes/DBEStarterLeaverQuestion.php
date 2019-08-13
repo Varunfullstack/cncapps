@@ -25,8 +25,8 @@ class DBEStarterLeaverQuestion extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -210,7 +210,7 @@ SET sortOrder =
     public function getCustomers()
     {
         $this->db->query(
-            "SELECT customerID, customer.cus_name as customerName, sum(starterLeaverQuestion.formType = 'leaver') as leavers, sum(starterLeaverQuestion.formType = 'starter') as starters FROM starterLeaverQuestion LEFT JOIN customer ON starterLeaverQuestion.customerID = customer.`cus_custno` GROUP BY customerID"
+            "SELECT customerID, customer.cus_name as customerName, sum(starterLeaverQuestion.formType = 'leaver') as leavers, sum(starterLeaverQuestion.formType = 'starter') as starters FROM starterLeaverQuestion LEFT JOIN customer ON starterLeaverQuestion.customerID = customer.`cus_custno` GROUP BY customerID order by customerName"
         );
         $customers = [];
 

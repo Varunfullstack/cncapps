@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 642 - Starter Leaver Management Sorting
+
 ## [v3.4.6] - 2019-08-05
 ### Fixed
 - SR Pending Closure email shows rootCause placeholder instead of the actual rootCause
