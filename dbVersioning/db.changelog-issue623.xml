@@ -1,0 +1,38 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1565697271-0">
+        <tagDatabase tag="issue623"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565697271-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select count(*) from passwordService where passwordServiceID = 26
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            insert into passwordService
+            values (26, "Automate Full Asset List", 1, 23);
+            update db_sequence
+            set nextid = (select max(passwordService.passwordServiceID) + 1 from passwordService)
+            where seq_name = 'passwordService';
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565697271-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select count(*) from password where pas_custno = 282 and serviceID = 26
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            insert into password
+            values ((select nextid from db_sequence where seq_name = "password"), 282, null, null, null, 5, null, null,
+                    null, 26, 1);
+            update db_sequence
+            set nextid = (select max(pas_passwordno) + 1 from password)
+            where seq_name = 'password';
+        </sql>
+    </changeSet>
+</databaseChangeLog>

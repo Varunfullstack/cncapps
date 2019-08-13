@@ -534,6 +534,10 @@ switch ($server_type) {
             "\\\\cncltd\\cnc\\Company\\scr\\dev"
         );
         define(
+            "TECHNICAL_DIR",
+            "\\\\cncltd\\cnc\\Customer\\dev\\Computer & Network Consultants Ltd"
+        );
+        define(
             "CUSTOMER_DIR_FROM_BROWSER",
             "//cncltd/cnc/customer/dev"
         );
@@ -608,7 +612,10 @@ switch ($server_type) {
             'CONFIG_CATCHALL_EMAIL',
             'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN
         );
-
+        define(
+            "TECHNICAL_DIR",
+            "\\\\cncltd\\cnc\\Company\\Technical\\Asset List Export"
+        );
         define(
             "BASE_DRIVE",
             dirname(__DIR__)
@@ -699,9 +706,14 @@ switch ($server_type) {
             dirname(__DIR__)
         );
         define(
+            "TECHNICAL_DIR",
+            "\\\\cncltd\\cnc\\Customer\\dev\\Computer & Network Consultants Ltd"
+        );
+        define(
             "SCR_DIR",
             "\\\\cncltd\\cnc\\Company\\scr\\dev"
         );
+
         define(
             "CUSTOMER_DIR_FROM_BROWSER",
             "//cncltd/cnc/customer/dev"
@@ -777,6 +789,10 @@ switch ($server_type) {
         define(
             "DB_NAME",
             "cncweb"
+        );
+        define(
+            "TECHNICAL_DIR",
+            "\\\\cncltd\\cnc\\Customer\\dev\\Computer & Network Consultants Ltd"
         );
         define(
             "BASE_DRIVE",
@@ -859,6 +875,10 @@ switch ($server_type) {
         define(
             "DB_NAME",
             "cnctest"
+        );
+        define(
+            "TECHNICAL_DIR",
+            "\\\\cncltd\\cnc\\Customer\\dev\\Computer & Network Consultants Ltd"
         );
         define(
             "BASE_DRIVE",
