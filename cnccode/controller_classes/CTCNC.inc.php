@@ -23,6 +23,10 @@ define(
     'dispItemPopup'
 );
 define(
+    'CTCNC_ACT_DISP_TEMPLATE_QUOTATION_POPUP',
+    'dispTemplateQuotationPopup'
+);
+define(
     'CTCNC_ACT_CUSTOMERITEM_POPUP',
     'dispCItemPopup'
 );
@@ -164,6 +168,7 @@ define(
     'CTCNC_PAGE_SALESORDER',
     'SalesOrder.php'
 );
+
 define(
     'CTCNC_PAGE_PURCHASEORDER',
     'PurchaseOrder.php'
@@ -249,6 +254,25 @@ class CTCNC extends Controller
         );
     }
 
+    /**
+     * Is the request from the command line (or scheduled task)
+     *
+     * @return mixed
+     */
+    function isRunningFromCommandLine()
+    {
+        return ($GLOBALS['isRunningFromCommandLine']);
+
+    }
+
+    function getDbeUser()
+    {
+        if (!$this->dbeUser) {
+            $this->dbeUser = new DBEUser ($this);
+        }
+        return $this->dbeUser;
+    }
+
     static function truncate($reason,
                              $length = 100
     )
@@ -259,11 +283,6 @@ class CTCNC extends Controller
             $length
         );
 
-    }
-
-    protected function isSdManager()
-    {
-        return $this->dbeUser->getValue(DBEJUser::receiveSdManagerEmailFlag) == 'Y';
     }
 
     function canAccess($roles)
@@ -281,35 +300,8 @@ class CTCNC extends Controller
 
     }
 
-    function getDbeUser()
-    {
-        if (!$this->dbeUser) {
-            $this->dbeUser = new DBEUser ($this);
-        }
-        return $this->dbeUser;
-    }
-
     function getUser()
     {
-
-    }
-
-    function getDbeTeam()
-    {
-        if (!$this->dbeTeam) {
-            $this->dbeTeam = new DBETeam ($this);
-        }
-        return $this->dbeTeam;
-    }
-
-    /**
-     * Is the request from the command line (or scheduled task)
-     *
-     * @return mixed
-     */
-    function isRunningFromCommandLine()
-    {
-        return ($GLOBALS['isRunningFromCommandLine']);
 
     }
 
@@ -330,13 +322,6 @@ class CTCNC extends Controller
             $dateArray [0],
             $dateArray [2]
         );
-    }
-
-    function logout()
-    {
-        $GLOBALS ['sess']->delete();
-        header("Location: index.php");
-        exit;
     }
 
     /**
@@ -504,34 +489,6 @@ class CTCNC extends Controller
         parent::parsePage();
     }
 
-
-    function initialProcesses()
-    {
-        if ($this->getParam('htmlFmt')) {
-            $this->setHTMLFmt($_REQUEST ['htmlFmt']);
-        }
-
-        self::getDbeUser();
-
-        switch ($this->getParam('action')) {
-            case CTCNC_ACT_LOGOUT :
-                $this->logout();
-                break;
-        }
-    }
-
-    function checkPermissions($levels)
-    {
-        if (!$this->hasPermissions($levels)) {
-            $this->displayFatalError('You do not have the permissions required for the requested operation');
-        }
-    }
-
-    function isUserSDManager()
-    {
-        return self::getDbeUser()->getValue(DBEUser::receiveSdManagerEmailFlag) == 'Y';
-    }
-
     function hasPermissions($levels)
     {
         if ($this->isRunningFromCommandLine()) {
@@ -560,6 +517,46 @@ class CTCNC extends Controller
         return true;
     }
 
+    function isUserSDManager()
+    {
+        return self::getDbeUser()->getValue(DBEUser::receiveSdManagerEmailFlag) == 'Y';
+    }
+
+    protected
+    function isAppraiser()
+    {
+        return $this->dbeUser->getValue(DBEUser::staffAppraiserFlag) == 'Y';
+    }
+
+    function initialProcesses()
+    {
+        if ($this->getParam('htmlFmt')) {
+            $this->setHTMLFmt($_REQUEST ['htmlFmt']);
+        }
+
+        self::getDbeUser();
+
+        switch ($this->getParam('action')) {
+            case CTCNC_ACT_LOGOUT :
+                $this->logout();
+                break;
+        }
+    }
+
+    function logout()
+    {
+        $GLOBALS ['sess']->delete();
+        header("Location: index.php");
+        exit;
+    }
+
+    function checkPermissions($levels)
+    {
+        if (!$this->hasPermissions($levels)) {
+            $this->displayFatalError('You do not have the permissions required for the requested operation');
+        }
+    }
+
     function teamLevelIs($level)
     {
         $dbeUser = $this->getDbeUser();
@@ -585,6 +582,14 @@ class CTCNC extends Controller
         return $ret;
     }
 
+    function getDbeTeam()
+    {
+        if (!$this->dbeTeam) {
+            $this->dbeTeam = new DBETeam ($this);
+        }
+        return $this->dbeTeam;
+    }
+
     function canChangeSrPriority()
     {
         $dbeUser = $this->getDbeUser();
@@ -608,9 +613,8 @@ class CTCNC extends Controller
         return ($flag == 'N' ? null : CT_CHECKED);
     }
 
-    protected
-    function isAppraiser()
+    protected function isSdManager()
     {
-        return $this->dbeUser->getValue(DBEUser::staffAppraiserFlag) == 'Y';
+        return $this->dbeUser->getValue(DBEJUser::receiveSdManagerEmailFlag) == 'Y';
     }
 }

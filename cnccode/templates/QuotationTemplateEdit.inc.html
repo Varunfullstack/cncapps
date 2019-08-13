@@ -1,0 +1,86 @@
+<script type="text/javascript"
+        src="ckeditor/ckeditor.js"
+></script>
+<style>
+    {
+        display: inline !important
+    }
+    .cke_combo__tokens .cke_combo_text {
+        width: 70px;
+    }
+</style>
+<!-- Template: FurtherActionEdit.inc.html -->
+<TABLE width="200px"
+       border="0"
+       cellpadding="2"
+       cellspacing="1"
+>
+    <TR>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        >
+            <a href="{urlDisplayList}">Back to list</a>
+        </TD>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        >
+            <a href="{urlDelete}">{txtDelete}</a>
+        </TD>
+    </TR>
+</table>
+<FORM method="post"
+      action="{urlUpdate}"
+      name="quotationTemplate"
+      AUTOCOMPLETE="OFF"
+>
+    <table border="0">
+        <input type="hidden"
+               name="quotationTemplate[1][id]"
+               value="{id}"
+        >
+        <input type="hidden"
+               name="quotationTemplate[1][sortOrder]"
+               value="{sortOrder}"
+        >
+        <tr>
+            <td class="promptText">Description</td>
+            <td class="fieldText">
+                <input name="quotationTemplate[1][description]"
+                       type="text"
+                       value="{description}"
+                       size="50"
+                       maxlength="50"
+                       required
+                >
+                <span class="formErrorMessage">{descriptionMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top"
+                class="promptText"
+            >
+                Linked Sales Order Id
+            </td>
+            <td class="fieldText">
+                <input name="quotationTemplate[1][linkedSalesOrderId]"
+                       value="{linkedSalesOrderId}"
+                       type="number"
+                       step="0"
+                       required
+                >
+                <span class="formErrorMessage">{linkedSalesOrderIdMessage}</span></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="formErrorMessage">
+                <input type="submit"
+                       name="Submit"
+                       value="{updateOrCreate}"
+                >
+            </td>
+        </tr>
+    </table>
+</form>
+<!-- End Template: FurtherActionEdit.inc.html -->

@@ -13,33 +13,33 @@ class DB_Sql
 {
 
     /* public: connection parameters */
-    var $Host = "";
-    var $Database = "";
-    var $User = "";
-    var $Password = "";
-
-    /* public: configuration parameters */
-    var $Auto_Free = 0;     ## Set to 1 for automatic mysql_free_result()
-    var $Debug = 0;     ## Set to 1 for debugging messages.
-    var $Halt_On_Error = "report"; ## "yes" (halt with message), "no" (ignore errors quietly), "report" (ignore errror, but spit a warning)
-    var $PConnect = 0;     ## Set to 1 to use persistent database connections
-    var $Seq_Table = "db_sequence";
-
-    /* public: result array and current row number */
-    var $Record = array();
-    var $Row;
-
-    /* public: current error number and error text */
-    var $Errno = 0;
-    var $Error = "";
-
-    /* public: this is an api revision, not a CVS revision. */
-    var $type = "mysql";
-    var $revision = "1.2";
     /**
      * @var mysqli
      */
     public static $Link_ID = null;
+    var $Host = "";
+    var $Database = "";
+    var $User = "";
+
+    /* public: configuration parameters */
+        var $Password = "";     ## Set to 1 for automatic mysql_free_result()
+    var $Auto_Free = 0;     ## Set to 1 for debugging messages.
+    var $Debug = 0; ## "yes" (halt with message), "no" (ignore errors quietly), "report" (ignore errror, but spit a warning)
+    var $Halt_On_Error = "report";     ## Set to 1 to use persistent database connections
+var $PConnect = 0;
+
+    /* public: result array and current row number */
+    var $Seq_Table = "db_sequence";
+    var $Record = array();
+
+    /* public: current error number and error text */
+    var $Row;
+    var $Errno = 0;
+
+    /* public: this is an api revision, not a CVS revision. */
+    var $Error = "";
+    var $type = "mysql";
+    var $revision = "1.2";
     var $Query_ID = null;
 
     var $locked = false;      ## set to true while we have a lock
@@ -50,20 +50,47 @@ class DB_Sql
         $this->query($query);
     }
 
-    /**
-     * @return mysqli
-     */
-    function link_id()
+    function query($Query_String)
     {
-        return self::$Link_ID;
-    }
+        /* No empty queries, please, since PHP4 chokes on them. */
+        if ($Query_String == "")
+            /* The empty query string is passed on from the constructor,
+             * when calling the class without a query, e.g. in situations
+             * like these: '$db = new DB_Sql_Subclass;'
+             */
+            return 0;
 
-    function query_id()
-    {
+        if (!$this->connect()) {
+            return 0; /* we already complained in connect() about that. */
+        };
+
+        # New query, discard previous result.
+        if ($this->Query_ID) {
+            $this->free();
+        }
+
+        if ($this->Debug)
+            printf(
+                "Debug: query = %s<br>\n",
+                $Query_String
+            );
+
+        $this->Query_ID = mysqli_query(
+            self::$Link_ID,
+            $Query_String
+        );
+        $this->Row = 0;
+        $this->Errno = mysqli_errno(self::$Link_ID);
+        $this->Error = mysqli_error(self::$Link_ID);
+        if (!$this->Query_ID) {
+            debug_print_backtrace();
+            $this->halt("Invalid SQL: " . $Query_String);
+        }
+
+        # Will return nada if it fails. That's fine.
         return $this->Query_ID;
     }
 
-    /* public: connection management */
     function connect($Database = "",
                      $Host = "",
                      $User = "",
@@ -117,11 +144,74 @@ class DB_Sql
         return self::$Link_ID;
     }
 
+    /* public: connection management */
+
+    function halt($msg)
+    {
+        $this->Error = @mysqli_error(self::$Link_ID);
+        $this->Errno = @mysqli_errno(self::$Link_ID);
+
+        if ($this->locked) {
+            $this->unlock();
+        }
+
+        if ($this->Halt_On_Error == "no")
+            return;
+
+        $this->haltmsg($msg);
+
+        if ($this->Halt_On_Error != "report")
+            die("Session halted.");
+    }
+
     /* public: discard the query result */
+
+    function unlock()
+    {
+
+        // set before unlock to avoid potential loop
+        $this->locked = false;
+
+        if (!$this->query("unlock tables")) {
+            $this->halt("unlock() failed.");
+            return false;
+        }
+        return true;
+    }
+
+    function haltmsg($msg)
+    {
+        printf(
+            "</td></tr></table><b>Database error:</b> %s<br>\n",
+            $msg
+        );
+        printf(
+            "<b>MySQL Error</b>: %s (%s)<br>\n",
+            $this->Errno,
+            $this->Error
+        );
+    }
+
+
+    /* public: perform a query */
+
     function free()
     {
         @mysqli_free_result($this->Query_ID);
         $this->Query_ID = 0;
+    }
+
+    /**
+     * @return mysqli
+     */
+    function link_id()
+    {
+        return self::$Link_ID;
+    }
+
+    function query_id()
+    {
+        return $this->Query_ID;
     }
 
     /**
@@ -198,48 +288,7 @@ class DB_Sql
         return $result;
     }
 
-
-    /* public: perform a query */
-    function query($Query_String)
-    {
-        /* No empty queries, please, since PHP4 chokes on them. */
-        if ($Query_String == "")
-            /* The empty query string is passed on from the constructor,
-             * when calling the class without a query, e.g. in situations
-             * like these: '$db = new DB_Sql_Subclass;'
-             */
-            return 0;
-
-        if (!$this->connect()) {
-            return 0; /* we already complained in connect() about that. */
-        };
-
-        # New query, discard previous result.
-        if ($this->Query_ID) {
-            $this->free();
-        }
-
-        if ($this->Debug)
-            printf(
-                "Debug: query = %s<br>\n",
-                $Query_String
-            );
-
-        $this->Query_ID = mysqli_query(
-            self::$Link_ID,
-            $Query_String
-        );
-        $this->Row = 0;
-        $this->Errno = mysqli_errno(self::$Link_ID);
-        $this->Error = mysqli_error(self::$Link_ID);
-        if (!$this->Query_ID) {
-            debug_print_backtrace();
-            $this->halt("Invalid SQL: " . $Query_String);
-        }
-
-        # Will return nada if it fails. That's fine.
-        return $this->Query_ID;
-    }
+    /* public: walk result set */
 
     function next_record_object($className)
     {
@@ -258,6 +307,8 @@ class DB_Sql
         return $object;
     }
 
+    /* public: position in result set */
+
     function nextObjectRecord($className)
     {
         if (!$this->Query_ID) {
@@ -275,30 +326,18 @@ class DB_Sql
         return $object;
     }
 
+    /* public: table locking */
 
-    /* public: walk result set */
-    function next_record($fetchMode = MYSQLI_BOTH)
+    function fetchAll($fetchMode = MYSQLI_ASSOC)
     {
         if (!$this->Query_ID) {
             $this->halt("next_record called with no query pending.");
             return 0;
         }
-        $this->Record = @mysqli_fetch_array(
-            $this->Query_ID,
-            $fetchMode
-        );
-        $this->Row += 1;
-        $this->Errno = mysqli_errno(self::$Link_ID);
-        $this->Error = mysqli_error(self::$Link_ID);
 
-        $stat = is_array($this->Record);
-        if (!$stat && $this->Auto_Free) {
-            $this->free();
-        }
-        return $stat;
+        return mysqli_fetch_all($this->Query_ID, $fetchMode);
     }
 
-    /* public: position in result set */
     function seek($pos = 0)
     {
         $status = @mysqli_data_seek(
@@ -325,76 +364,16 @@ class DB_Sql
         return 1;
     }
 
-    /* public: table locking */
-    function lock($table,
-                  $mode = "write"
-    )
-    {
-        $query = "lock tables ";
-        if (is_array($table)) {
-            foreach ($table as $key => $value) {
-                // text keys are "read", "read local", "write", "low priority write"
-                if (is_int($key)) $key = $mode;
-                if (strpos(
-                    $value,
-                    ","
-                )) {
-                    $query .= str_replace(
-                            ",",
-                            " $key, ",
-                            $value
-                        ) . " $key, ";
-                } else {
-                    $query .= "$value $key, ";
-                }
-            }
-            $query = substr(
-                $query,
-                0,
-                -2
-            );
-        } elseif (strpos(
-            $table,
-            ","
-        )) {
-            $query .= str_replace(
-                    ",",
-                    " $mode, ",
-                    $table
-                ) . " $mode";
-        } else {
-            $query .= "$table $mode";
-        }
-        if (!$this->query($query)) {
-            $this->halt("lock() failed.");
-            return false;
-        }
-        $this->locked = true;
-        return true;
-    }
-
-    function unlock()
-    {
-
-        // set before unlock to avoid potential loop
-        $this->locked = false;
-
-        if (!$this->query("unlock tables")) {
-            $this->halt("unlock() failed.");
-            return false;
-        }
-        return true;
-    }
-
     /* public: evaluate the result (size, width) */
-    function affected_rows()
-    {
-        return @mysqli_affected_rows(self::$Link_ID);
-    }
 
     function num_rows()
     {
         return @mysqli_num_rows($this->Query_ID);
+    }
+
+    function affected_rows()
+    {
+        return @mysqli_affected_rows(self::$Link_ID);
     }
 
     function num_fields()
@@ -413,14 +392,6 @@ class DB_Sql
         print $this->num_rows();
     }
 
-    function f($Name)
-    {
-        if (isset($this->Record[$Name])) {
-            return $this->Record[$Name];
-        }
-        return null;
-    }
-
     function p($Name)
     {
         if (isset($this->Record[$Name])) {
@@ -428,7 +399,6 @@ class DB_Sql
         }
     }
 
-    /* public: sequence numbers */
     function nextid($seq_name)
     {
         $locked = false;
@@ -492,7 +462,90 @@ class DB_Sql
         return $nextid;
     }
 
+    /* public: sequence numbers */
+
+    function lock($table,
+                  $mode = "write"
+    )
+    {
+        $query = "lock tables ";
+        if (is_array($table)) {
+            foreach ($table as $key => $value) {
+                // text keys are "read", "read local", "write", "low priority write"
+                if (is_int($key)) $key = $mode;
+                if (strpos(
+                    $value,
+                    ","
+                )) {
+                    $query .= str_replace(
+                            ",",
+                            " $key, ",
+                            $value
+                        ) . " $key, ";
+                } else {
+                    $query .= "$value $key, ";
+                }
+            }
+            $query = substr(
+                $query,
+                0,
+                -2
+            );
+        } elseif (strpos(
+            $table,
+            ","
+        )) {
+            $query .= str_replace(
+                    ",",
+                    " $mode, ",
+                    $table
+                ) . " $mode";
+        } else {
+            $query .= "$table $mode";
+        }
+        if (!$this->query($query)) {
+            $this->halt("lock() failed.");
+            return false;
+        }
+        $this->locked = true;
+        return true;
+    }
+
     /* public: return table metadata */
+
+    function next_record($fetchMode = MYSQLI_BOTH)
+    {
+        if (!$this->Query_ID) {
+            $this->halt("next_record called with no query pending.");
+            return 0;
+        }
+        $this->Record = @mysqli_fetch_array(
+            $this->Query_ID,
+            $fetchMode
+        );
+        $this->Row += 1;
+        $this->Errno = mysqli_errno(self::$Link_ID);
+        $this->Error = mysqli_error(self::$Link_ID);
+
+        $stat = is_array($this->Record);
+        if (!$stat && $this->Auto_Free) {
+            $this->free();
+        }
+        return $stat;
+    }
+
+    /* public: find available table names */
+
+    function f($Name)
+    {
+        if (isset($this->Record[$Name])) {
+            return $this->Record[$Name];
+        }
+        return null;
+    }
+
+    /* private: error handling */
+
     function metadata($table = "",
                       $full = false
     )
@@ -583,7 +636,6 @@ class DB_Sql
         return $res;
     }
 
-    /* public: find available table names */
     function table_names()
     {
         $this->connect();
@@ -602,38 +654,6 @@ class DB_Sql
 
         @mysqli_free_result($h);
         return $return;
-    }
-
-    /* private: error handling */
-    function halt($msg)
-    {
-        $this->Error = @mysqli_error(self::$Link_ID);
-        $this->Errno = @mysqli_errno(self::$Link_ID);
-
-        if ($this->locked) {
-            $this->unlock();
-        }
-
-        if ($this->Halt_On_Error == "no")
-            return;
-
-        $this->haltmsg($msg);
-
-        if ($this->Halt_On_Error != "report")
-            die("Session halted.");
-    }
-
-    function haltmsg($msg)
-    {
-        printf(
-            "</td></tr></table><b>Database error:</b> %s<br>\n",
-            $msg
-        );
-        printf(
-            "<b>MySQL Error</b>: %s (%s)<br>\n",
-            $this->Errno,
-            $this->Error
-        );
     }
 
 }

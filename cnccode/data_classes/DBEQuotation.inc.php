@@ -17,6 +17,16 @@ class DBEQuotation extends DBEntity
     const userID = "userID";
     const fileExtension = "fileExtension";
     const documentType = "documentType";
+    const deliverySiteAdd1 = "deliverySiteAdd1";
+    const deliverySiteAdd2 = "deliverySiteAdd2";
+    const deliverySiteAdd3 = "deliverySiteAdd3";
+    const deliverySiteTown = "deliverySiteTown";
+    const deliverySiteCounty = "deliverySiteCounty";
+    const deliverySitePostCode = "deliverySitePostCode";
+    const deliveryContactID = "deliveryContactID";
+    const confirmCode = "confirmationCode";
+    const signableEnvelopeID = "signableEnvelopeID";
+
 
     /**
      * calls constructor()
@@ -73,8 +83,54 @@ class DBEQuotation extends DBEntity
             DA_STRING,
             DA_ALLOW_NULL
         );
-        $this->setPK(0);
+        $this->addColumn(
+            self::deliverySiteAdd1,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::deliverySiteAdd2,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::deliverySiteAdd3,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::deliverySiteTown,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::deliverySiteCounty,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::deliverySitePostCode,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::deliveryContactID,
+            DA_ID,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::confirmCode,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::signableEnvelopeID,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
+
         $this->setAddColumnsOff();
+        $this->setPK(0);
     }
 
     function getNextVersionNo()
@@ -108,5 +164,15 @@ class DBEQuotation extends DBEntity
             ) . ' = ' . $this->getValue(self::ordheadID)
         );
         return (parent::runQuery());
+    }
+
+    public function getQuotesWithSignableDocumentForSalesOrder(int $salesOrderID)
+    {
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::ordheadID) . " = " . $salesOrderID . " and " . $this->getDBColumnName(self::signableEnvelopeID) . " is not null"
+        );
+        parent::getRows();
     }
 }

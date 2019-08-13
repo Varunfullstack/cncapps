@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 605 - Sales Quotation & Online Ordering
+
 ## [v3.4.6] - 2019-08-05
 ### Fixed
 - SR Pending Closure email shows rootCause placeholder instead of the actual rootCause
