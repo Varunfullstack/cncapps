@@ -421,7 +421,7 @@ if ($generateSummary) {
             $dbePassword->setValue(DBEPassword::username, null);
             $dbePassword->setValue(DBEPassword::level, 5);
             $dbePassword->setValue(DBEPassword::notes, 'Full List of Asset information');
-            $dbePassword->setValue(DBEPassword::URL, ' \cncltd\cnc\company\Technical\Asset List Export.xlsx');
+            $dbePassword->setValue(DBEPassword::URL, 'file:'.$definitiveFileName);
             $dbePassword->updateRow();
         }
     } catch (Exception $exception) {
