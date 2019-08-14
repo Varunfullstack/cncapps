@@ -114,6 +114,9 @@ if (!$outputToScreen) {
                 Ordered On
             </th>
             <th>
+                Expected On
+            </th>
+            <th>
                 Visit Booked For
             </th>
             <th>
