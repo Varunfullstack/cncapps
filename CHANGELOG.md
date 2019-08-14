@@ -1,12 +1,13 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v3.5.0] - 2019-08-14
 ### Added
 - Issue 605 - Sales Quotation & Online Ordering
 - Issue 623 - Full asset list export to secure area
 ### Changed
 - Issue 642 - Starter Leaver Management Sorting
+- Issue 639 - New CNC Address change
 ### Fixed
 - Issue 630 - PO Status v9
 - Issue 634 - Change team targets to either green or red

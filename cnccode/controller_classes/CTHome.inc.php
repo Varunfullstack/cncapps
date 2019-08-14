@@ -626,15 +626,15 @@ class CTHome extends CTCNC
                 $imQtyClass = 'performance-green';
             }
 
-            if ($result['esTeamActualFixHours'] >= $result['esTeamTargetFixHours']) {
+            if ($result['esTeamActualFixHours'] <= $result['esTeamTargetFixHours']) {
                 $esFixHoursClass = 'performance-green';
             }
 
-            if ($result['hdTeamActualFixHours'] >= $result['hdTeamTargetFixHours']) {
+            if ($result['hdTeamActualFixHours'] <= $result['hdTeamTargetFixHours']) {
                 $hdFixHoursClass = 'performance-green';
             }
 
-            if ($result['imTeamActualFixHours'] >= $result['imTeamTargetFixHours']) {
+            if ($result['imTeamActualFixHours'] <= $result['imTeamTargetFixHours']) {
                 $imFixHoursClass = 'performance-green';
             }
 

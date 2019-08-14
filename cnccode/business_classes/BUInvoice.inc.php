@@ -21,6 +21,16 @@ require_once($cfg['path_dbe'] . '/DBEInvoiceTotals.inc.php');
 
 class BUInvoice extends Business
 {
+    const searchFormCustomerID = 'customerID';
+    const searchFormStartDate = 'startDate';
+    const searchFormEndDate = 'endDate';
+    const searchFormStartInvheadID = 'startInvheadID';
+    const searchFormEndInvheadID = 'endInvheadID';
+    const searchFormPrintedFlag = 'printedFlag';
+    const searchFormInvheadID = 'invheadID';
+    const searchFormOrdheadID = 'ordheadID';
+    const searchFormCustomerName = 'customerName';
+    const searchFormInvoiceType = 'invoiceType';
     /** @var DBEInvhead */
     public $dbeInvhead;
     /** @var DBEJInvhead */
@@ -43,18 +53,6 @@ class BUInvoice extends Business
         $this->dbeJInvline = new DBEJInvline($this);
         $this->buSageExport = new BUSageExport($this);
     }
-
-
-    const searchFormCustomerID = 'customerID';
-    const searchFormStartDate = 'startDate';
-    const searchFormEndDate = 'endDate';
-    const searchFormStartInvheadID = 'startInvheadID';
-    const searchFormEndInvheadID = 'endInvheadID';
-    const searchFormPrintedFlag = 'printedFlag';
-    const searchFormInvheadID = 'invheadID';
-    const searchFormOrdheadID = 'ordheadID';
-    const searchFormCustomerName = 'customerName';
-    const searchFormInvoiceType = 'invoiceType';
 
     /**
      * initialise values for input of date range
@@ -193,25 +191,6 @@ class BUInvoice extends Business
             $endInvheadID
         );
 
-        return ($this->getData(
-            $this->dbeJInvhead,
-            $dsResults
-        ));
-    }
-
-    /**
-     * Get unprinted Invoice rows
-     * @param $dsResults
-     * @param bool $directDebit
-     * @return bool &$dsResults results
-     * @access public
-     */
-    function getUnprintedInvoices(&$dsResults,
-                                  $directDebit = false
-    )
-    {
-        $this->setMethodName('getUnprintedInvoices');
-        $this->dbeJInvhead->getUnprintedRows($directDebit);
         return ($this->getData(
             $this->dbeJInvhead,
             $dsResults
@@ -601,6 +580,14 @@ class BUInvoice extends Business
         ));
     }
 
+    function createNewCreditNote($customerID)
+    {
+        return ($this->createNewInvoice(
+            $customerID,
+            'C'
+        ));
+    }
+
     /**
      * @param $customerID
      * @param string $type
@@ -728,14 +715,6 @@ class BUInvoice extends Business
         ); // not printed
         $dbeInvhead->insertRow();
         return ($dbeInvhead->getPKValue());
-    }
-
-    function createNewCreditNote($customerID)
-    {
-        return ($this->createNewInvoice(
-            $customerID,
-            'C'
-        ));
     }
 
     function getInvoiceByID($invheadID,
@@ -1099,23 +1078,6 @@ class BUInvoice extends Business
         );
     }
 
-    function getInvoiceValue($invheadID)
-    {
-        $dbeInvline = new DBEInvline($this);
-        $dbeInvline->setValue(
-            DBEInvline::invheadID,
-            $invheadID
-        );
-        $dbeInvline->getRowsByColumn(DBEInvline::invheadID);
-        $value = 0;
-        while ($dbeInvline->fetchNext()) {
-            if ($dbeInvline->getValue(DBEInvline::lineType) == 'I') {
-                $value += $dbeInvline->getValue(DBEInvline::qty) * $dbeInvline->getValue(DBEInvline::curUnitSale);
-            }
-        }
-        return $value;
-    }
-
     /**
      * update one invoice line
      * @param DSForm $dsInvline Record
@@ -1256,6 +1218,24 @@ class BUInvoice extends Business
 
     }
 
+    /**
+     * Get unprinted Invoice rows
+     * @param $dsResults
+     * @param bool $directDebit
+     * @return bool &$dsResults results
+     * @access public
+     */
+    function getUnprintedInvoices(&$dsResults,
+                                  $directDebit = false
+    )
+    {
+        $this->setMethodName('getUnprintedInvoices');
+        $this->dbeJInvhead->getUnprintedRows($directDebit);
+        return ($this->getData(
+            $this->dbeJInvhead,
+            $dsResults
+        ));
+    }
 
     function printDirectDebitInvoices($dateToUse,
                                       $privateKey
@@ -1407,24 +1387,36 @@ class BUInvoice extends Business
                     $fileName
                 );
 
+                $buHeader = new BUHeader($this);
+                /** @var DBEHeader $dsHeader */
+                $dsHeader = null;
+                $buHeader->getHeader($dsHeader);
+
                 $contactName = $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(
                         DBEContact::lastName
                     );
                 $template->setVar(
                     [
-                        "contactName"  => $contactName,
-                        "companyName"  => $dsCustomer->getValue(DBECustomer::name),
-                        "addressLine1" => $dsSite->getValue(DBESite::add1),
-                        "town"         => $dsSite->getValue(DBESite::town),
-                        "county"       => $dsSite->getValue(DBESite::county),
-                        "postCode"     => $dsSite->getValue(DBESite::postcode),
-                        "date"         => (new DateTime())->format('d M Y'),
-                        "invoiceNo"    => $dsInvhead->getValue(DBEInvhead::invheadID),
-                        "paymentDate"  => $paymentDate,
-                        "totalAmount"  => number_format(
+                        "contactName"    => $contactName,
+                        "companyName"    => $dsCustomer->getValue(DBECustomer::name),
+                        "addressLine1"   => $dsSite->getValue(DBESite::add1),
+                        "town"           => $dsSite->getValue(DBESite::town),
+                        "county"         => $dsSite->getValue(DBESite::county),
+                        "postCode"       => $dsSite->getValue(DBESite::postcode),
+                        "date"           => (new DateTime())->format('d M Y'),
+                        "invoiceNo"      => $dsInvhead->getValue(DBEInvhead::invheadID),
+                        "paymentDate"    => $paymentDate,
+                        "totalAmount"    => number_format(
                             $totalAmount,
                             2
-                        )
+                        ),
+                        "cncCompanyName" => $dsHeader->getValue(DBEHeader::name),
+                        'cncAddLine1'    => $dsHeader->getValue(DBEHeader::add1) . ' ' . $dsHeader->getValue(
+                                DBEHeader::add2
+                            ),
+                        'cncAddLine2'    => $dsHeader->getValue(DBEHeader::add3),
+                        'cncTown'        => $dsHeader->getValue(DBEHeader::town),
+                        'cncPostCode'    => $dsHeader->getValue(DBEHeader::postcode)
                     ]
                 );
 
@@ -1518,6 +1510,51 @@ class BUInvoice extends Business
         return count($invoiceNumbers);
     }
 
+    public function calculateDirectDebitPaymentDate(DateTime $date)
+    {
+        $lastYearBh = common_getUKBankHolidays($date->format('Y') - 1);
+        $thisYearBh = common_getUKBankHolidays($date->format('Y'));
+        $nextYearBh = common_getUKBankHolidays((int)$date->format('Y') + 1);
+
+        $bankHolidays = array_merge(
+            $lastYearBh,
+            $thisYearBh,
+            $nextYearBh
+        );
+        $dateCloned = clone $date;
+        $counter = 0;
+        while ($counter < 5) {
+            $dateCloned->add(new DateInterval('P1D'));
+
+            if (in_array(
+                    $dateCloned->format('Y-m-d'),
+                    $bankHolidays
+                ) || $dateCloned->format('N') > 5) {
+                continue; // ignore holidays
+            }
+            $counter++;
+        }
+
+        return $dateCloned;
+    }
+
+    function getInvoiceValue($invheadID)
+    {
+        $dbeInvline = new DBEInvline($this);
+        $dbeInvline->setValue(
+            DBEInvline::invheadID,
+            $invheadID
+        );
+        $dbeInvline->getRowsByColumn(DBEInvline::invheadID);
+        $value = 0;
+        while ($dbeInvline->fetchNext()) {
+            if ($dbeInvline->getValue(DBEInvline::lineType) == 'I') {
+                $value += $dbeInvline->getValue(DBEInvline::qty) * $dbeInvline->getValue(DBEInvline::curUnitSale);
+            }
+        }
+        return $value;
+    }
+
     public function generateBankExport($bankData)
     {
         $fd = fopen(
@@ -1548,34 +1585,6 @@ class BUInvoice extends Business
         $csv = stream_get_contents($fd);
         fclose($fd); //
         return $csv;
-    }
-
-    public function calculateDirectDebitPaymentDate(DateTime $date)
-    {
-        $lastYearBh = common_getUKBankHolidays($date->format('Y') - 1);
-        $thisYearBh = common_getUKBankHolidays($date->format('Y'));
-        $nextYearBh = common_getUKBankHolidays((int)$date->format('Y') + 1);
-
-        $bankHolidays = array_merge(
-            $lastYearBh,
-            $thisYearBh,
-            $nextYearBh
-        );
-        $dateCloned = clone $date;
-        $counter = 0;
-        while ($counter < 5) {
-            $dateCloned->add(new DateInterval('P1D'));
-
-            if (in_array(
-                    $dateCloned->format('Y-m-d'),
-                    $bankHolidays
-                ) || $dateCloned->format('N') > 5) {
-                continue; // ignore holidays
-            }
-            $counter++;
-        }
-
-        return $dateCloned;
     }
 
     /**
