@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v3.5.0]
+## [v3.5.0] - 2019-08-14
 ### Added
 - Issue 605 - Sales Quotation & Online Ordering
 - Issue 623 - Full asset list export to secure area
