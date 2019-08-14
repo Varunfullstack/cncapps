@@ -16,7 +16,10 @@
         disableNativeSpellChecker: false,
         toolbar_CNCToolbar:
             [
-                {name: 'line1', items: ['Source', '-', '-', 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor']},
+                {
+                    name: 'line1',
+                    items: ['Source', '-', '-', 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor']
+                },
                 ['NumberedList', 'BulletedList'],
                 ['Table'],
                 ['Format', 'Font', 'FontSize'],
@@ -36,17 +39,20 @@
     CKEDITOR.config.resize_minWidth = '760';
 
     $(function () {
+
+
         editor = CKEDITOR.replace('standardTextEditor', config);
         checkTags();
     });
 
     function checkTags() {
-        debugger;
         var selectedOptions = $('#typeSelector').find(":selected");
         var customConfig = Object.assign({}, config);
         if (selectedOptions.length) {
             var option = selectedOptions[0];
-            updateType(option.value);
+            if (!updateType(option.value)) {
+                return;
+            }
             var tags = option.getAttribute('data-tags');
 
             if (tags) {
@@ -58,6 +64,11 @@
     }
 
     function updateType(type) {
+        if (type == '{salesQuotationTypeID}') {
+            destroyEditorInstance();
+            return false
+        }
+
         if (type == '{salesRequestTypeID}') {
             $('#salesRequestEmailRow').show();
             $('#salesRequestUnassignFlagRow').show();
@@ -67,10 +78,17 @@
             $('#salesRequestUnassignFlagRow').hide();
             $('#salesRequestEmailRow input').attr('required', false);
         }
+        return true;
+    }
+
+    function destroyEditorInstance() {
+        if (CKEDITOR.instances.standardTextEditor) {
+            CKEDITOR.instances.standardTextEditor.destroy();
+        }
     }
 
     function recreateEditor(config) {
-        CKEDITOR.instances.standardTextEditor.destroy();
+        destroyEditorInstance();
         CKEDITOR.replace('standardTextEditor', config);
     }
 

@@ -11,16 +11,17 @@ require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
 require_once($cfg["path_dbe"] . "/DBEOSSupportDates.php");
 require_once($cfg["path_dbe"] . "/DBEHeader.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
+require_once($cfg["path_dbe"] . "/DBEPassword.inc.php");
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
+require_once($cfg['path_bu'] . '/BUPassword.inc.php');
 require './../vendor/autoload.php';
 global $db;
 
 $dbeCustomer = new DBECustomer($thing);
 
 $dbeCustomer->getActiveCustomers();
-
-
+$generateSummary = isset($_REQUEST['generateSummary']);
 $customerIDs = [];
 
 //we are going to use this to add to the monitoring db
@@ -72,6 +73,16 @@ $thresholdDate = new DateTime();
 $thresholdDate->add(new DateInterval('P' . $thresholdDays . 'D'));
 
 $today = new DateTime();
+
+if ($generateSummary) {
+    $summarySpreadSheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $summarySpreadSheet->getDefaultStyle()->getFont()->setName('Arial');
+    $summarySpreadSheet->getDefaultStyle()->getFont()->setSize(10);
+    $summarySheet = $summarySpreadSheet->getActiveSheet();
+    $isHeaderSet = false;
+    $currentSummaryRow = 1;
+}
+
 while ($dbeCustomer->fetchNext()) {
 
     $query = /** @lang MySQL */
@@ -224,6 +235,23 @@ ORDER BY clients.name,
             null,
             'A2'
         );
+        if ($generateSummary) {
+            if (!$isHeaderSet) {
+                $summarySheet->fromArray(array_merge(["Customer Name"], $keys));
+                $currentSummaryRow = 2;
+                $summarySheet->getStyle("A1:U1")->getFont()->setBold(true);
+                $isHeaderSet = true;
+            }
+
+            $summaryData = array_map(
+                function ($originalData) use ($customerName) {
+                    return array_merge(["Customer Name" => $customerName], $originalData);
+                },
+                $data
+            );
+
+            $summarySheet->fromArray($summaryData, null, 'A' . $currentSummaryRow);
+        }
 
         $sheet->getStyle("A1:T1")->getFont()->setBold(true);
 
@@ -241,6 +269,7 @@ ORDER BY clients.name,
                 continue;
             }
             $currentRow = 2 + $i;
+
             $color = null;
             if ($date <= $thresholdDate) {
                 $color = "FFFFEB9C";
@@ -256,9 +285,19 @@ ORDER BY clients.name,
                     ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                     ->getStartColor()
                     ->setARGB($color);
-            }
-        }
 
+                if ($generateSummary) {
+                    $currentSummaryStyleRow = $currentSummaryRow + $i;
+                    $summarySheet->getStyle("A$currentSummaryStyleRow:U$currentSummaryStyleRow")
+                        ->getFill()
+                        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                        ->getStartColor()
+                        ->setARGB($color);
+                }
+            }
+
+        }
+        $currentSummaryRow += count($data);
         foreach (range('A', $sheet->getHighestDataColumn()) as $col) {
             $sheet->getColumnDimension($col)
                 ->setAutoSize(true);
@@ -342,7 +381,56 @@ ORDER BY clients.name,
         echo '<div>No Data was found</div>';
     }
 };
+$tempFileName = null;
+if ($generateSummary) {
+    echo '<h1>Generating Summary</h1>';
+    $summarySheet->setAutoFilter($summarySheet->calculateWorksheetDimension());
+    foreach (range('A', $summarySheet->getHighestDataColumn()) as $col) {
+        $summarySheet->getColumnDimension($col)
+            ->setAutoSize(true);
+    }
+    $password = \CNCLTD\Utils::generateStrongPassword(16);
 
+    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($summarySpreadSheet);
+    $folderName = TECHNICAL_DIR;
+    if (!file_exists($folderName)) {
+        mkdir(
+            $folderName,
+            0777,
+            true
+        );
+    }
+    $tempFileName = $folderName . "\\temp.xlsx";
+
+    $buPassword = new BUPassword($thing);
+    try {
+        $writer->save(
+            $tempFileName
+        );
+        $definitiveFileName = $folderName . "\\Asset List Export.zip";
+        $zip = new ZipArchive();
+        $res = $zip->open($definitiveFileName, ZipArchive::CREATE);
+        if ($res === true) {
+            $zip->addFile($tempFileName, 'Asset List Export.xlsx');
+            $zip->setEncryptionName('Asset List Export.xlsx', ZipArchive::EM_AES_256, $password);
+            $zip->close();
+
+            $dbePassword = new DBEPassword($thing);
+            $dbePassword->getAutomatedFullAssetListPasswordItem();
+            $dbePassword->setValue(DBEPassword::password, $buPassword->encrypt($password));
+            $dbePassword->setValue(DBEPassword::username, null);
+            $dbePassword->setValue(DBEPassword::level, 5);
+            $dbePassword->setValue(DBEPassword::notes, 'Full List of Asset information');
+            $dbePassword->setValue(DBEPassword::URL, $buPassword->encrypt('file:' . $definitiveFileName));
+            $dbePassword->updateRow();
+        }
+    } catch (Exception $exception) {
+        echo '<div>Failed to save Summary file, possibly file open</div>';
+    }
+    if ($tempFileName && file_exists($tempFileName)) {
+        unlink($tempFileName);
+    }
+}
 
 
 

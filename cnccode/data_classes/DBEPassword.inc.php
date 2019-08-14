@@ -181,6 +181,20 @@ class DBEPassword extends DBEntity
         $this->fetchFirst();
         $this->resetQueryString();
     }
+
+    public function getAutomatedFullAssetListPasswordItem()
+    {
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::customerID) . " = 282 and " . $this->getDBColumnName(
+                self::serviceID
+            ) . ' = 26'
+        );
+        $this->getRows();
+        $this->fetchFirst();
+        $this->resetQueryString();
+    }
 }
 
 ?>

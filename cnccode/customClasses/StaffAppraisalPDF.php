@@ -8,14 +8,6 @@
 
 namespace CNCLTD;
 
-//require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-//require_once($cfg['path_bu'] . '/BUStaffAppraisalQuestionnaire.inc.php');
-//require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-//require_once($cfg['path_dbe'] . '/DBEStaffAppraisalObjectives.php');
-//require_once($cfg['path_bu'] . '/BUMail.inc.php');
-//require_once(PDF_DIR . '/fpdf_protection.php');
-
-
 class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
 {
 

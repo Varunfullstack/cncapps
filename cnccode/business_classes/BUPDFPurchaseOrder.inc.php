@@ -185,13 +185,7 @@ class BUPDFPurchaseOrder extends BaseObject
         $path = stream_get_meta_data($tempFile)['uri']; // eg: /tmp/phpFx0513a
         // initialisation
         $this->_buPDF = new BUPDF(
-            $this,
-            $path,
-            'CNC accounts',
-            date('d/m/Y'),
-            'CNC Ltd',
-            'Purchase Order',
-            'A4'
+            $this, $path, 'CNC accounts', date('d/m/Y'), 'CNC Ltd', 'Purchase Order'
         );
         $this->producePurchaseOrder();
         $this->_buPDF->close();

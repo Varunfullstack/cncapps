@@ -5,13 +5,12 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-//require_once(PDF_DIR . '/fpdf.php');                // Free PDF from http://www.fpdf.org/
 require_once(PDF_DIR . '/fpdf_protection.php');
 
 define(
     'FPDF_FONTPATH',
     PDF_DIR . '/font/'
-);    // Used by fpdf class
+);
 define(
     'BUPDF_A4_WIDTH',
     595
@@ -32,11 +31,9 @@ define(
 class BUPDF extends BaseObject
 {
     public $pdf;                    // fpdf object
-    var $currentXPos = '';    // Position accross page from LHS
+    var $currentXPos = '';    // Position across page from LHS
     var $currentYPos = '';    // Position up page from bottom
     var $margin = '';                // Non-print area
-    var $pageWidth = '';        // Position up page from bottom
-    var $pageLength = '';        // Position up page from bottom
     var $pageNo = 0;
     var $fontFamily = '';
     var $fontStyle = '';
@@ -49,7 +46,6 @@ class BUPDF extends BaseObject
                          $title,
                          $creator,
                          $subject,
-                         $paperSize,
                          $encrypted = true
     )
     {
@@ -76,15 +72,6 @@ class BUPDF extends BaseObject
             $this->raiseError('No subject passed');
             return FALSE;
         }
-        if ($paperSize == '') {
-            $this->raiseError('No paper size passed');
-            return FALSE;
-        }
-        if ($paperSize != 'A4') {
-            $this->raiseError('Only A4 paper size supported at present');
-            return FALSE;
-        }
-//		$this->pdf = pdf_new();
         $this->pdf = new FPDF_Protection();
         if ($encrypted) {
             $this->pdf->SetProtection(
@@ -93,11 +80,8 @@ class BUPDF extends BaseObject
                 '[V.^DW_uA^2~vER$'
             );
         }
-//        $this->pdf->AddFont('DejaVu', '', 'DejaVuSansCondensed.ttf');
-//        $this->pdf->SetFont('DejaVu', '', 14);
         $this->setFilename($filename);        // Disk file to be created
 
-//        $this->open();
         $this->setInfo(
             "Author",
             $author
@@ -116,66 +100,6 @@ class BUPDF extends BaseObject
         );
         $this->setFontFamily(BUPDF_FONT_ARIAL);
         $this->setFontSize(10);
-        $this->setPaperSize($paperSize);
-
-    }
-
-
-    function setFilename($filename)
-    {
-        $this->filename = $filename;
-    }
-
-    function getFilename()
-    {
-        return $this->filename;
-    }
-
-    function setFontFamily($family)
-    {
-        $this->fontFamily = $family;
-    }
-
-    function getFontFamily()
-    {
-        return $this->fontFamily;
-    }
-
-    function setFontSize($size)
-    {
-        $this->fontSize = $size;
-    }
-
-    function getFontSize()
-    {
-        return $this->fontSize;
-    }
-
-    function setFontStyle($style)
-    {
-        $this->fontStyle = $style;
-    }
-
-    function getFontStyle()
-    {
-        return $this->fontStyle;
-    }
-
-    function setFont()
-    {
-        $this->setMethodName('setFont');
-        $this->pdf->SetFont(
-            $this->getFontFamily(),
-            $this->getFontStyle(),
-            $this->getFontSize()
-        );
-        return TRUE;
-    }
-
-    function open()
-    {
-        $this->pdf->open();
-        return TRUE;
     }
 
     function setInfo($element,
@@ -203,18 +127,9 @@ class BUPDF extends BaseObject
         return TRUE;
     }
 
-    function setPaperSize($paperSize)
-    {
-        if ($paperSize != 'A4') {
-            $this->raiseError('Only A4 paper size supported at present');
-            return FALSE;
-        } else {
-            $this->margin = 50;
-            $this->pageWidth = BUPDF_A4_WIDTH;
-            $this->pageLength = BUPDF_A4_LENGTH;
-        }
-    }
-
+    /**
+     * @return bool
+     */
     function startPage()
     {
         $this->pageNo++;
@@ -226,6 +141,47 @@ class BUPDF extends BaseObject
         );
         $this->setFont();
         return TRUE;
+    }
+
+    function setFont()
+    {
+        $this->setMethodName('setFont');
+        $this->pdf->SetFont(
+            $this->getFontFamily(),
+            $this->getFontStyle(),
+            $this->getFontSize()
+        );
+        return TRUE;
+    }
+
+    function getFontFamily()
+    {
+        return $this->fontFamily;
+    }
+
+    function setFontFamily($family)
+    {
+        $this->fontFamily = $family;
+    }
+
+    function getFontStyle()
+    {
+        return $this->fontStyle;
+    }
+
+    function setFontStyle($style)
+    {
+        $this->fontStyle = $style;
+    }
+
+    function getFontSize()
+    {
+        return $this->fontSize;
+    }
+
+    function setFontSize($size)
+    {
+        $this->fontSize = $size;
     }
 
     /**
@@ -241,12 +197,6 @@ class BUPDF extends BaseObject
     function setBoldItalicOn()
     {
         $this->setFontStyle('BI');
-        return TRUE;
-    }
-
-    function setBoldUnderlineOn()
-    {
-        $this->setFontStyle('BU');
         return TRUE;
     }
 
@@ -266,21 +216,6 @@ class BUPDF extends BaseObject
         return TRUE;
     }
 
-    /*
-        function moveDown($lineCount){
-            $this->currentYPos -= ($lineCount * $this->getFontSize());
-    //		pdf_moveto($this->pdf, $this->currentXPos, $this->currentYPos);
-            $this->pdf->SetY($this->currentYPos);
-            return TRUE;
-        }
-    */
-    function moveXTo($position)
-    {
-        $this->currentXPos = $position;
-        $this->pdf->SetX($position);
-        return TRUE;
-    }
-
     function moveYTo($position)
     {
         $this->currentYPos = $position;
@@ -291,6 +226,59 @@ class BUPDF extends BaseObject
     function getYPos()
     {
         return $this->pdf->GetY();
+    }
+
+    /***
+     * @param $position
+     * @param $string
+     * @return bool
+     */
+    function printStringAt($position,
+                           $string
+    )
+    {
+        $this->moveXTo($position);
+        $this->printString($string);
+        return TRUE;
+    }
+
+    function moveXTo($position)
+    {
+        $this->currentXPos = $position;
+        $this->pdf->SetX($position);
+        return TRUE;
+    }
+
+    /**
+     * @param $string
+     * @param null $link
+     * @return bool
+     */
+    function printString($string, $link = null)
+    {
+        if ($this->detectUTF8($string)) {
+            $string = utf8_decode($string);
+        }
+        $previousFontStyle = $this->getFontStyle();
+        if ($link) {
+            $this->pdf->SetTextColor(0, 0, 255);
+            $this->setFontStyle('U');
+            $this->setFont();
+        }
+
+        $this->pdf->Write(
+            ($this->getFontSize() / 2),
+            $string,
+            $link
+        );
+
+        if ($link) {
+            $this->pdf->SetTextColor(0);
+            $this->setFontStyle($previousFontStyle);
+            $this->setFont();
+        }
+
+        return TRUE;
     }
 
     /*
@@ -305,17 +293,6 @@ class BUPDF extends BaseObject
             return TRUE;
         }
     */
-    function printString($string)
-    {
-        if ($this->detectUTF8($string)) {
-            $string = utf8_decode($string);
-        }
-        $this->pdf->Write(
-            ($this->getFontSize() / 2),
-            $string
-        ); // Fix bug where auto line break adds blank line
-        return TRUE;
-    }
 
     function detectUTF8($string)
     {
@@ -333,16 +310,11 @@ class BUPDF extends BaseObject
         );
     }
 
-    function printStringAt($position,
-                           $string
-    )
-    {
-        $this->moveXTo($position);
-        $this->printString($string);
-        return TRUE;
-    }
-
-    // Right Justified
+    /**
+     * @param $position
+     * @param $string
+     * @return bool
+     */
     function printStringRJAt($position,
                              $string
     )
@@ -357,6 +329,32 @@ class BUPDF extends BaseObject
     {
     }
 
+    // Right Justified
+
+    /**
+     * @return string
+     */
+    function getData()
+    {
+        return $this->pdf->Output(
+            'S',
+            $this->getFilename(),
+            true
+        );
+    }
+
+    function getFilename()
+    {
+        return $this->filename;
+    }
+
+    function setFilename($filename)
+    {
+        $this->filename = $filename;
+    }
+
+    /**
+     */
     function close()
     {
         $this->pdf->Output(
@@ -400,5 +398,10 @@ class BUPDF extends BaseObject
             $height
         );
     }
-}// End of class
-?>
+
+    public function footerCallback(Closure $param)
+    {
+        $this->pdf->setFooterCallback($param);
+    }
+
+}

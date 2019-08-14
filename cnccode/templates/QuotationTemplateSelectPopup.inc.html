@@ -1,0 +1,46 @@
+<html>
+<head>
+    <script type="text/javascript">
+        function submitItem(id, description, linkedSalesOrderId) {
+            if ((opener) && (!opener.closed)) {
+                if (opener.document.getElementById("{parentIDField}")) {
+                    opener.document.getElementById("{parentIDField}").value = id;
+                }
+                if (opener.document.getElementById("{parentDescField}")) {
+                    opener.document.getElementById("{parentDescField}").value = description;
+                }
+
+                if (opener.document.getElementById("{parentLinkedSalesOrderField}")) {
+                    opener.document.getElementById("{parentLinkedSalesOrderField}").value = linkedSalesOrderId;
+                }
+                window.close();
+            }
+        }
+    </script>
+</head>
+<body>
+<table>
+    <tr>
+        <TD colspan="2">
+            <INPUT type="button"
+                   name="create"
+                   value="Create New"
+                   onclick="document.location='quoteTemplates.php?action=createQuotationTemplate';"
+            >
+            <INPUT type="button"
+                   name="close"
+                   value="Close"
+                   onclick="window.close();"
+            >
+        </TD>
+    </tr>
+    <!-- BEGIN quotationTemplateBlock -->
+    <tr>
+        <td class="listItemText">
+            <a href="javascript:submitItem({id}, '{description}', '{linkedSalesOrderID}');">{description}</a>
+        </td>
+    </tr>
+    <!-- END quotationTemplateBlock -->
+</table>
+</body>
+</html>

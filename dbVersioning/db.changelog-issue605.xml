@@ -1,0 +1,362 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1565251716-0">
+        <tagDatabase tag="issue605"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565251716-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="quotationTemplate"/>
+            </not>
+        </preConditions>
+        <createTable tableName="quotationTemplate">
+            <column name="id" type="int(11)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="linkedSalesOrderId" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text"/>
+            <column name="sortOrder" type="int(11)" defaultValue="0"/>
+        </createTable>
+        <rollback>
+            <dropTable tableName="quotationTemplate"/>
+            <sql>
+                delete
+                from db_sequence
+                where seq_name = "quotationTemplate"
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565251716-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                select cus_name = "CNC Test Customer" from customer where cus_custno = 420
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            update customer
+            set cus_name = "CNC Template Customer"
+            where cus_custno = 420
+        </sql>
+        <rollback>
+            <sql>
+                update customer
+                set cus_name = "CNC Test"
+                where cus_custno = 420
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565251716-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="deliveryContactID"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="deliveryContactID" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="1565251716-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="deliverySiteAdd1"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="deliverySiteAdd1" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="1565251716-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="deliverySiteAdd2"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="deliverySiteAdd2" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="1565251716-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="deliverySiteAdd3"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="deliverySiteAdd3" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="1565251716-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="deliverySiteTown"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="deliverySiteTown" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="1565251716-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="deliverySiteCounty"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="deliverySiteCounty" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565251716-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="deliverySitePostCode"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="deliverySitePostCode" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565251716-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="quotationLines"/>
+            </not>
+        </preConditions>
+        <createTable tableName="quotationLines">
+            <column name="id" type="int(11)">
+                <constraints primaryKey="true" primaryKeyName="PRIMARY" nullable="false"/>
+            </column>
+            <column name="quotationID" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sequenceNo" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lineType" type="char(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ordheadID" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customerID" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="itemID" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="stockcat" type="char(1)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="description" type="varchar(70)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="qtyOrdered" type="decimal(7,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="qtyDespatched" type="decimal(7,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="qtyLastDespatched" type="decimal(7,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="supplierID" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="curUnitCost" type="decimal(7,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="curTotalCost" type="decimal(7,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="curUnitSale" type="decimal(7,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="curTotalSale" type="decimal(7,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="renewalCustomerItemID" type="int(11) unsigned">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565251716-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="quotationLines" foreignKeyName="fk_quotationID"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="quotationLines" baseColumnNames="quotationID"
+                                 constraintName="fk_quotationID"
+                                 referencedTableName="quotation"
+                                 referencedColumnNames="quotationID"
+                                 onDelete="CASCADE"
+        />
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565251716-12">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="confirmationCode"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="confirmationCode" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565251716-12">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="confirmationCode"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="confirmationCode" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565251716-13">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="signableEnvelope"/>
+            </not>
+        </preConditions>
+        <createTable tableName="signableEnvelope">
+            <column name="id" type="varchar(50)">
+                <constraints primaryKey="true" primaryKeyName="PRIMARY"/>
+            </column>
+            <column name="status" type="varchar(25)" defaultValue="processing">
+                <constraints nullable="false"/>
+            </column>
+            <column name="downloadLink" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="processingClass" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="processingArguments" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="createdAt" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updatedAt" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565251716-14">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT table_collation = 'utf8mb4_0900_ai_ci' FROM information_schema.`TABLES` WHERE table_schema =
+                DATABASE() AND table_name = 'quotation'
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            ALTER TABLE quotation
+                CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565251716-15">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="quotation" columnName="signableEnvelopeID"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="quotation">
+            <column name="signableEnvelopeID" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="quotation" baseColumnNames="signableEnvelopeID"
+                                 constraintName="fk_signableEnvelopeID"
+                                 referencedTableName="signableEnvelope"
+                                 referencedColumnNames="id" onDelete="SET NULL"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565251716-16">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select count(*) from standardTextType where sty_desc = "Sales Quotation Text"
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            insert into standardTextType
+            values (8, "Sales Quotation Text", null)
+        </sql>
+        <rollback>
+            <sql>
+                delete
+                from standardTextType
+                where sty_desc = "Sales Quotation Text"
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565251716-17">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select count(*) from standardText where stt_desc = "Standard Quick Quote"
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            insert into standardText
+            values ((select nextid from db_sequence where seq_name = "standardtext"), "Standard Quick Quote",
+                    "With reference to your recent enquiry, I have great pleasure in providing you with the following prices:",
+                    (select sty_standardtexttypeno from standardTextType where sty_desc = "Sales Quotation Text"), null,
+                    "N");
+            update db_sequence
+            set nextid = nextid + 1
+            where seq_name = "standardtext";
+        </sql>
+        <rollback>
+            <sql>
+                delete
+                from standardText
+                where stt_desc = "Standard Quick Quote";
+                update db_sequence
+                set nextid = (select max(stt_standardtextno) + 1 from standardText)
+                where seq_name = "standardtext";
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1565251716-18">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="ordhead" columnName="signableProcessed"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="ordhead">
+            <column name="signableProcessed" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            update ordhead set signableProcessed = 1;
+        </sql>
+    </changeSet>
+
+
+</databaseChangeLog>

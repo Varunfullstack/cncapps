@@ -1,11 +1,21 @@
 <!-- Template: SalesOrderGenerateQuotes.inc.html -->
 <BR/>
-<table width="600px"
+<script type="text/javascript"
+        src="ckeditor/ckeditor.js"
+></script>
+<script>
+
+    function changeText() {
+        $('#introduction').val(atob($(event.target).val()));
+    }
+</script>
+<table width="650px"
        border="0"
        cellspacing="1"
        cellpadding="0"
 
-    ><tr>
+>
+    <tr>
         <td width="100%"
             valign="top"
         >
@@ -50,7 +60,8 @@
                                value="{emailSubject}"
                                maxlength="60"
                                size="70"
-                        id="emailSubject">
+                               id="emailSubject"
+                        >
                     </td>
                 </tr>
                 <tr>
@@ -59,9 +70,25 @@
                     </td>
                     <td>
                         <textarea name="form[introduction]"
+                                  id="introduction"
                                   cols="80"
                                   rows="3"
                         >{introduction}</textarea><font class="formErrorMessage">{introductionMessage}</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="promptText">
+                        <div align="right">Quote Introduction Text</div>
+                    </td>
+                    <td>
+                        <select onchange="changeText()">
+                            <!-- BEGIN quickQuoteTextBlock -->
+                            <option {quickQuoteTextSelected}
+                                    value="{quickQuoteTextValue}"
+                            >{quickQuoteTextDescription}
+                            </option>
+                            <!-- END quickQuoteTextBlock -->
+                        </select>
                     </td>
                 </tr>
 

@@ -155,13 +155,7 @@ class BUPDFInvoice extends BaseObject
         );            // temporary disk file
 
         $this->_buPDF = new BUPDF(
-            $this,
-            $tempFile,
-            'CNC accounts',
-            date('d/m/Y'),
-            'CNC Ltd',
-            'Sales Invoice',
-            'A4'
+            $this, $tempFile, 'CNC accounts', date('d/m/Y'), 'CNC Ltd', 'Sales Invoice'
         );
 
         $this->produceInvoice();
@@ -194,13 +188,7 @@ class BUPDFInvoice extends BaseObject
             );      // temporary disk file
 
             $this->_buPDF = new BUPDF(
-                $this,
-                $tempFile,
-                'CNC accounts',
-                date('d/m/Y'),
-                'CNC Ltd',
-                'Sales Invoices',
-                'A4'
+                $this, $tempFile, 'CNC accounts', date('d/m/Y'), 'CNC Ltd', 'Sales Invoices'
             );
             do {
                 // Generate each invoice

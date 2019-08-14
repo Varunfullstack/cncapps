@@ -22,8 +22,7 @@
                     '&parentDescField=customerString',
                     'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
             }
-        }
-        else {
+        } else {
             document.searchForm.customerID.value = "";
         }
     }
@@ -32,6 +31,10 @@
         if (document.searchForm.customerID.value != "") {
             document.location = '{createQuoteURL}&customerID=' + escape(document.searchForm.customerID.value)
         }
+    }
+
+    function createTemplatedQuote() {
+        document.location = '{createTemplatedQuoteURL}' + (document.searchForm.customerID.value ? ("&customerID=" + document.searchForm.customerID.value) : "")
     }
 
     function createOrder() {
@@ -57,7 +60,7 @@
       action="{submitURL}"
       AUTOCOMPLETE="off"
 >
-    <table width="500px"
+    <table width="600px"
            border="0"
            cellspacing="0"
            cellpadding="1"
@@ -188,8 +191,13 @@
                 >
                 <input type="button"
                        name="CreateQuote"
-                       value="New Quote"
+                       value="New Manual Quote"
                        onClick="createQuote();"
+                >
+                <input type="button"
+                       name="TemplatedQuote"
+                       value="New Templated Quote"
+                       onClick="createTemplatedQuote();"
                 >
                 <input type="button"
                        name="CreateOrder"

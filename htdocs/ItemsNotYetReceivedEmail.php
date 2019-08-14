@@ -10,6 +10,7 @@
 require_once("config.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_bu"] . '/BUItemsNotYetReceived.php');
+require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 $outputToScreen = isset($_GET['toScreen']);
 $thing = null;
 $buItemsNotYetReceived = new BUItemsNotYetReceived($thing);
@@ -113,6 +114,9 @@ if (!$outputToScreen) {
                 Ordered On
             </th>
             <th>
+                Expected On
+            </th>
+            <th>
                 Visit Booked For
             </th>
             <th>
@@ -132,12 +136,12 @@ if (!$outputToScreen) {
 
             $style = "style='color:" . $itemNotYetReceived->color() . "'";
 
-            $purchaseOrderURL = SITE_URL ."/PurchaseOrder.php?action=display&porheadID=" . $itemNotYetReceived->getPurchaseOrderId(
+            $purchaseOrderURL = SITE_URL . "/PurchaseOrder.php?action=display&porheadID=" . $itemNotYetReceived->getPurchaseOrderId(
                 );
 
             $purchaseOrderLink = "<a href='$purchaseOrderURL'>" . $itemNotYetReceived->getPurchaseOrderId() . "</a>";
 
-            $salesOrderURL = SITE_URL ."/SalesOrder.php?action=displaySalesOrder&ordheadID=" . $itemNotYetReceived->getSalesOrderId(
+            $salesOrderURL = SITE_URL . "/SalesOrder.php?action=displaySalesOrder&ordheadID=" . $itemNotYetReceived->getSalesOrderId(
                 );
 
             $salesOrderLink = "<a href='" . $salesOrderURL . "'>" . $itemNotYetReceived->getSalesOrderId() . "</a>";
@@ -146,14 +150,14 @@ if (!$outputToScreen) {
 
             if ($itemNotYetReceived->getProjectID()) {
 
-                $projectURL = SITE_URL ."/Project.php?projectID=" . $itemNotYetReceived->getProjectID(
+                $projectURL = SITE_URL . "/Project.php?projectID=" . $itemNotYetReceived->getProjectID(
                     ) . "&action=edit";
                 $projectLink = "<a href='" . $projectURL . "'>" . $itemNotYetReceived->getProjectName() . "</a>";
             }
 
             $serviceRequestLink = "";
             if ($itemNotYetReceived->getServiceRequestID()) {
-                $serviceRequestURL = SITE_URL ."/Activity.php?problemID=" . $itemNotYetReceived->getServiceRequestID(
+                $serviceRequestURL = SITE_URL . "/Activity.php?problemID=" . $itemNotYetReceived->getServiceRequestID(
                     ) . "&action=displayLastActivity";
                 $serviceRequestLink = "<a href='" . $serviceRequestURL . "'>" . $itemNotYetReceived->getServiceRequestID(
                     ) . "</a>";
@@ -189,6 +193,24 @@ if (!$outputToScreen) {
                 <td>
                     <?= $itemNotYetReceived->getPurchaseOrderDate() ? $itemNotYetReceived->getPurchaseOrderDate(
                     )->format('d/m/Y') : '' ?>
+                </td>
+                <td>
+                    <?php
+                    $expectedDate = $itemNotYetReceived->getExpectedOn() ? $itemNotYetReceived->getExpectedOn()->format(
+                        'd/m/Y'
+                    ) : null;
+                    $purchaseOrderLineLink = null;
+                    if ($itemNotYetReceived->color() == 'green') {
+                        $purchaseOrderLineLink = 'Received';
+                    } else {
+                        if ($expectedDate && $itemNotYetReceived->color() != 'red') {
+                            $purchaseOrderLineURL = SITE_URL . "/PurchaseOrder.php?porheadID=" . $itemNotYetReceived->getPurchaseOrderId(
+                                ) . "&action=editOrdline&sequenceNo=" . $itemNotYetReceived->getLineSequenceNumber();
+                            $purchaseOrderLineLink = "<a href='" . $purchaseOrderLineURL . "' target='_blank'>" . $expectedDate . "</a>";
+                        }
+                    }
+                    echo $purchaseOrderLineLink
+                    ?>
                 </td>
                 <td>
                     <?= $itemNotYetReceived->getFutureDate() ? $itemNotYetReceived->getFutureDate()->format(
