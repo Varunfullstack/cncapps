@@ -576,15 +576,13 @@ class CTHome extends CTCNC
             array(
                 'esTeamTargetSlaPercentage' => $this->dsHeader->getValue(DBEHeader::esTeamTargetSlaPercentage),
                 'esTeamTargetFixHours'      => $this->dsHeader->getValue(DBEHeader::esTeamTargetFixHours),
-                'esTeamTargetFixQty'        => $this->dsHeader->getValue(DBEHeader::esTeamTargetFixQtyPerMonth) * 3,
 
                 'imTeamTargetSlaPercentage' => $this->dsHeader->getValue(DBEHeader::imTeamTargetSlaPercentage),
                 'imTeamTargetFixHours'      => $this->dsHeader->getValue(DBEHeader::imTeamTargetFixHours),
-                'imTeamTargetFixQty'        => $this->dsHeader->getValue(DBEHeader::imTeamTargetFixQtyPerMonth) * 3,
 
                 'hdTeamTargetSlaPercentage' => $this->dsHeader->getValue(DBEHeader::hdTeamTargetSlaPercentage),
                 'hdTeamTargetFixHours'      => $this->dsHeader->getValue(DBEHeader::hdTeamTargetFixHours),
-                'hdTeamTargetFixQty'        => $this->dsHeader->getValue(DBEHeader::hdTeamTargetFixQtyPerMonth) * 3
+
             )
         );
 
@@ -593,15 +591,15 @@ class CTHome extends CTCNC
         foreach ($results as $result) {
             $esSLAPerformanceClass = 'performance-warn';
             $esFixHoursClass = 'performance-warn';
-            $esQtyClass = 'performance-warn';
+
 
             $hdSLAPerformanceClass = 'performance-warn';
             $hdFixHoursClass = 'performance-warn';
-            $hdQtyClass = 'performance-warn';
+
 
             $imSLAPerformanceClass = 'performance-warn';
             $imFixHoursClass = 'performance-warn';
-            $imQtyClass = 'performance-warn';
+
             if (round($result['esTeamActualSlaPercentage']) >= $result['esTeamTargetSlaPercentage']) {
                 $esSLAPerformanceClass = 'performance-green';
             }
@@ -613,19 +611,6 @@ class CTHome extends CTCNC
             if (round($result['imTeamActualSlaPercentage']) >= $result['imTeamTargetSlaPercentage']) {
                 $imSLAPerformanceClass = 'performance-green';
             }
-
-            if ($result['esTeamActualFixQty'] >= $result['esTeamTargetFixQty']) {
-                $esQtyClass = 'performance-green';
-            }
-
-            if ($result['hdTeamActualFixQty'] >= $result['hdTeamTargetFixQty']) {
-                $hdQtyClass = 'performance-green';
-            }
-
-            if ($result['imTeamActualFixQty'] >= $result['imTeamTargetFixQty']) {
-                $imQtyClass = 'performance-green';
-            }
-
             if ($result['esTeamActualFixHours'] <= $result['esTeamTargetFixHours']) {
                 $esFixHoursClass = 'performance-green';
             }
@@ -669,15 +654,10 @@ class CTHome extends CTCNC
                     'hdTeamActualFixQty' . $result['quarter']                  => $result['hdTeamActualFixQty'],
                     'hdTeamActualSlaPercentage' . $result['quarter'] . 'Class' => $hdSLAPerformanceClass,
                     'hdTeamActualFixHours' . $result['quarter'] . 'Class'      => $hdFixHoursClass,
-                    'hdTeamActualFixQty' . $result['quarter'] . 'Class'        => $hdQtyClass,
                     'esTeamActualSlaPercentage' . $result['quarter'] . 'Class' => $esSLAPerformanceClass,
                     'esTeamActualFixHours' . $result['quarter'] . 'Class'      => $esFixHoursClass,
-                    'esTeamActualFixQty' . $result['quarter'] . 'Class'        => $esQtyClass,
                     'imTeamActualSlaPercentage' . $result['quarter'] . 'Class' => $imSLAPerformanceClass,
                     'imTeamActualFixHours' . $result['quarter'] . 'Class'      => $imFixHoursClass,
-                    'imTeamActualFixQty' . $result['quarter'] . 'Class'        => $imQtyClass,
-
-
                 )
             );
 
