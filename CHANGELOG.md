@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.5.1] - 2019-08-15
+### Fixed
+- Home page team performance for SR quantities don't always appear to have the correct colour.
+
 ## [v3.5.0] - 2019-08-14
 ### Added
 - Issue 605 - Sales Quotation & Online Ordering
