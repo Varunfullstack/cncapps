@@ -50,6 +50,17 @@ $app->group(
         );
 
         $group->get(
+            '/signedConfirmation',
+            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+                $twig = $this->get('twig');
+                $response->getBody()->write(
+                    $twig->render('signedConfirmation.html.twig', ["message" => "Code not provided"])
+                );
+                return $response;
+            }
+        );
+
+        $group->get(
             '/acceptQuotation',
             function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
                 /** @var Environment $twig */
@@ -138,7 +149,7 @@ $app->group(
                         $envelopeParties,
                         null,
                         false,
-                        null,
+                        API_URL . '/signedConfirmation',
                         0,
                         $expiration
                     );
