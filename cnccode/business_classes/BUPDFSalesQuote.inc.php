@@ -397,6 +397,8 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printString('If you would like to proceed with this quote, then please click on ');
+        var_dump(API_URL . "/acceptQuotation?code=$confirmationCode");
+        exit;
         $buPDF->printString('this link', API_URL . "/acceptQuotation?code=$confirmationCode");
         $buPDF->printString(' which will automatically email you an e-signable order form document to sign.');
         $buPDF->CR();
