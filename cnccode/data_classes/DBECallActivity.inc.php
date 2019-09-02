@@ -346,7 +346,7 @@ class DBECallActivity extends DBEntity
        SET
         caa_status = 'A'
        WHERE
-        caa_problemno = $problemID"
+        caa_problemno = $problemID "
         );
         $this->runQuery();
     }

@@ -4019,14 +4019,25 @@ class BUActivity extends Business
 
 
         while ($dbeJCallActivity->fetchNext()) {
-            /*
-      Set all activities on the parent SR to Authorised status
-      */
-            $dbeCallActivity->setAllActivitiesToAuthorisedByProblemID(
-                $dbeJCallActivity->getValue(DBEJCallActivity::problemID)
-            );
+
+            // so here we have to check if this activity is related to an SR that has the contract set to Pre-pay, if
+            // that's the case ...we don't want to set the activities to authorised
+
+            $dbeProblem = new DBEJProblem($this);
+            $dbeProblem->getRow($dbeJCallActivity->getValue(DBEJCallActivity::problemID));
+            $customerItem = new DBEJCustomerItem($this);
+            $customerItem->getRow($dbeProblem->getValue(DBEJProblem::contractCustomerItemID));
+            $DBItem = new DBEItem($this);
+            $DBItem->getRow($customerItem->getValue(DBECustomerItem::itemID));
+            if ($DBItem->getValue(DBEItem::itemTypeID) !== CONFIG_PREPAY_ITEMTYPEID) {
+                // Set all activities on the parent SR to Authorised status
+                $dbeCallActivity->setAllActivitiesToAuthorisedByProblemID(
+                    $dbeJCallActivity->getValue(DBEJCallActivity::problemID)
+                );
+            }
+
             $this->setProblemToCompleted($dbeJCallActivity->getValue(DBEJCallActivity::problemID));
-        } // end while($dbeJCallActivity->fetchNext())
+        }
         return true;
     }
 
