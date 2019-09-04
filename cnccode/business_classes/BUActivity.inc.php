@@ -4091,7 +4091,7 @@ class BUActivity extends Business
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
-            date(date('H:i'))
+            date('H:i')
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::status,
