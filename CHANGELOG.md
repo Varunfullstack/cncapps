@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v3.5.2] - 2019-09-02
+## [v3.5.2] - 2019-09-04
 ### Fixed
 - PrePay SRs not being billed
 
