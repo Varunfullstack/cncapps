@@ -197,8 +197,10 @@ class BUPrepay extends Business
             " AND caa_status = 'C'" .                                                // Activity completed
             " AND
           ( caa_starttime <> caa_endtime OR curValue <> 0 )" .                   // time was logged or this is a value (e.g. topUp)
-            " GROUP BY pro_problemno
+            " GROUP BY pro_problemno 
       ORDER BY pro_custno, pro_problemno, pro_date_raised";
+
+        var_dump($queryString);
         $db->query($queryString);
 
         $ret = FALSE; // indicates there were no statements to export
