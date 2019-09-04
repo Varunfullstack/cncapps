@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Allow Monitor / Critical SR at the point of logging
+
 ## [v3.5.1] - 2019-08-15
 ### Fixed
 - Home page team performance for SR quantities don't always appear to have the correct colour.
