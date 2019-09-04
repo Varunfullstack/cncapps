@@ -55,7 +55,7 @@ $query =
      JOIN callacttype ON cat_callacttypeno = caa_callacttypeno
      JOIN consultant ON caa_consno = cns_consno
      JOIN customer ON pro_custno = cus_custno
-     WHERE caa_endtime = ""
+     WHERE (caa_endtime = "" or caa_endtime is null) 
      AND caa_date <= NOW()';                                                // and on-site
 
 $resultSet = $localDb->query($query);
@@ -77,7 +77,7 @@ foreach ($engineers as $row) {
         ' JOIN callacttype ON cat_callacttypeno = caa_callacttypeno' .
         ' JOIN consultant ON caa_consno = cns_consno' .
         ' JOIN customer ON pro_custno = cus_custno' .
-        ' WHERE caa_endtime = ""' .
+        ' WHERE (caa_endtime = "" or caa_endtime is null) ' .
         ' AND caa_date <= NOW()' .                                                                // in the past
         ' AND caa_consno = ' . $row['cns_consno'] .
         ' ORDER BY caa_date, pro_custno';
