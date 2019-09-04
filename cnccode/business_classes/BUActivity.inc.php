@@ -4019,14 +4019,25 @@ class BUActivity extends Business
 
 
         while ($dbeJCallActivity->fetchNext()) {
-            /*
-      Set all activities on the parent SR to Authorised status
-      */
-            $dbeCallActivity->setAllActivitiesToAuthorisedByProblemID(
-                $dbeJCallActivity->getValue(DBEJCallActivity::problemID)
-            );
+
+            // so here we have to check if this activity is related to an SR that has the contract set to Pre-pay, if
+            // that's the case ...we don't want to set the activities to authorised
+
+            $dbeProblem = new DBEJProblem($this);
+            $dbeProblem->getRow($dbeJCallActivity->getValue(DBEJCallActivity::problemID));
+            $customerItem = new DBEJCustomerItem($this);
+            $customerItem->getRow($dbeProblem->getValue(DBEJProblem::contractCustomerItemID));
+            $DBItem = new DBEItem($this);
+            $DBItem->getRow($customerItem->getValue(DBECustomerItem::itemID));
+            if ($DBItem->getValue(DBEItem::itemTypeID) !== CONFIG_PREPAY_ITEMTYPEID) {
+                // Set all activities on the parent SR to Authorised status
+                $dbeCallActivity->setAllActivitiesToAuthorisedByProblemID(
+                    $dbeJCallActivity->getValue(DBEJCallActivity::problemID)
+                );
+            }
+
             $this->setProblemToCompleted($dbeJCallActivity->getValue(DBEJCallActivity::problemID));
-        } // end while($dbeJCallActivity->fetchNext())
+        }
         return true;
     }
 
@@ -4080,7 +4091,7 @@ class BUActivity extends Business
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::endTime,
-            date(date('H:i'))
+            date('H:i')
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::status,
@@ -8691,7 +8702,7 @@ is currently a balance of ';
       FROM
           callactivity
       WHERE
-          caa_endtime is null
+          (caa_endtime is null or caa_endtime = '')
             AND
             caa_problemno = " . $problemID;
 
@@ -8784,7 +8795,7 @@ is currently a balance of ';
         /** @var $db dbSweetcode */
         global $db;
         /* do stuff here */
-        $sql = "update callactivity  set caa_status  = 'C'  WHERE caa_problemno = ? and caa_endtime is not null";
+        $sql = "update callactivity  set caa_status  = 'C'  WHERE caa_problemno = ? and caa_endtime is not null and caa_endtime <> '' ";
         $db->preparedQuery(
             $sql,
             [
@@ -10233,7 +10244,7 @@ is currently a balance of ';
 
       WHERE
         callacttype.`travelFlag` = 'N'
-        AND caa_endtime is not null";
+        AND caa_endtime is not null and caa_endtime <> '' ";
 
         if ($days) {
             $sql .=

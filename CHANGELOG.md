@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.5.2] - 2019-09-04
+### Fixed
+- PrePay SRs not being billed
+
 ## [v3.5.1] - 2019-08-15
 ### Fixed
 - Home page team performance for SR quantities don't always appear to have the correct colour.

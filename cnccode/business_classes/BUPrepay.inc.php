@@ -197,8 +197,10 @@ class BUPrepay extends Business
             " AND caa_status = 'C'" .                                                // Activity completed
             " AND
           ( caa_starttime <> caa_endtime OR curValue <> 0 )" .                   // time was logged or this is a value (e.g. topUp)
-            " GROUP BY pro_problemno
+            " GROUP BY pro_problemno 
       ORDER BY pro_custno, pro_problemno, pro_date_raised";
+
+        var_dump($queryString);
         $db->query($queryString);
 
         $ret = FALSE; // indicates there were no statements to export
@@ -811,7 +813,7 @@ is currently a balance of ';
           JOIN contact ON caa_contno = con_contno
         WHERE
           caa_problemno = " . $serviceRequestRecord['pro_problemno'] .
-            " AND itm_itemno = " . $this->dsHeader->getValue(DBEHeader::gscItemID) . " AND caa_endtime IS NOT NULL
+            " AND itm_itemno = " . $this->dsHeader->getValue(DBEHeader::gscItemID) . " AND caa_endtime IS NOT NULL and caa_endtime <> ''
           AND caa_status = 'C'
           AND caa_callacttypeno NOT IN( " .                                     // Activity type not engineer travel or proactive
             CONFIG_ENGINEER_TRAVEL_ACTIVITY_TYPE_ID . "," .

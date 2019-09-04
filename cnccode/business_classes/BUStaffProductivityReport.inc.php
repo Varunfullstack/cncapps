@@ -128,7 +128,7 @@ class BUStaffProductivityReport extends Business
         pro_custno = 282
         AND caa_date BETWEEN '$startDate' AND '$endDate'
         AND caa_starttime is not null
-        AND caa_endtime is not null
+        AND caa_endtime is not null and caa_endtime <> ''
         AND caa_consno = $userID";
 
         //echo $query . '<BR/>';
@@ -220,7 +220,7 @@ class BUStaffProductivityReport extends Business
         AND caa_date BETWEEN '$startDate' AND '$endDate'
         AND( caa_endtime <> caa_starttime )
         AND caa_starttime is not null
-        AND caa_endtime is not null
+        AND caa_endtime is not null and caa_endtime <> ''
       ORDER BY
         caa_date";
 
