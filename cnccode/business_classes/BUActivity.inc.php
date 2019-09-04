@@ -8702,7 +8702,7 @@ is currently a balance of ';
       FROM
           callactivity
       WHERE
-          caa_endtime is null
+          (caa_endtime is null or caa_endtime = '')
             AND
             caa_problemno = " . $problemID;
 
@@ -8795,7 +8795,7 @@ is currently a balance of ';
         /** @var $db dbSweetcode */
         global $db;
         /* do stuff here */
-        $sql = "update callactivity  set caa_status  = 'C'  WHERE caa_problemno = ? and caa_endtime is not null";
+        $sql = "update callactivity  set caa_status  = 'C'  WHERE caa_problemno = ? and caa_endtime is not null and caa_endtime <> '' ";
         $db->preparedQuery(
             $sql,
             [
@@ -10244,7 +10244,7 @@ is currently a balance of ';
 
       WHERE
         callacttype.`travelFlag` = 'N'
-        AND caa_endtime is not null";
+        AND caa_endtime is not null and caa_endtime <> '' ";
 
         if ($days) {
             $sql .=

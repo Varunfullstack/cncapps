@@ -811,7 +811,7 @@ is currently a balance of ';
           JOIN contact ON caa_contno = con_contno
         WHERE
           caa_problemno = " . $serviceRequestRecord['pro_problemno'] .
-            " AND itm_itemno = " . $this->dsHeader->getValue(DBEHeader::gscItemID) . " AND caa_endtime IS NOT NULL
+            " AND itm_itemno = " . $this->dsHeader->getValue(DBEHeader::gscItemID) . " AND caa_endtime IS NOT NULL and caa_endtime <> ''
           AND caa_status = 'C'
           AND caa_callacttypeno NOT IN( " .                                     // Activity type not engineer travel or proactive
             CONFIG_ENGINEER_TRAVEL_ACTIVITY_TYPE_ID . "," .

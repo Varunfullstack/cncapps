@@ -1047,7 +1047,7 @@ FROM
     ON callactivity.`caa_callacttypeno` = callacttype.`cat_callacttypeno` 
   LEFT JOIN consultant 
     ON `callactivity`.`caa_consno` = consultant.`cns_consno` 
-WHERE pro_linked_ordno = $salesOrderID and caa_starttime <> '' and caa_starttime is not null and caa_endtime <> '' and caa_starttime is not null 
+WHERE pro_linked_ordno = $salesOrderID and caa_starttime <> '' and caa_starttime is not null and caa_endtime <> '' and caa_endtime is not null 
 and callactivity.`caa_callacttypeno` <> 51 and callactivity.`caa_callacttypeno` <> 60 and callactivity.`caa_callacttypeno` <> 35 and caa_consno <> 67
 GROUP BY caa_callacttypeno,
   caa_consno";

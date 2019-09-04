@@ -528,7 +528,7 @@ class DBECallActivitySearch extends DBEntity
             case 'UNCHECKED':              // UnChecked
                 $whereParameters .=
                     " AND caa_status = 'O'
-            AND caa_endtime <> ''";
+            AND caa_endtime <> '' and caa_endtime is not null ";
                 break;
             case 'FIXED':
                 $whereParameters .=
