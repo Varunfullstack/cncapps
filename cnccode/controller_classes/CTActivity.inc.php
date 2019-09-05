@@ -509,7 +509,7 @@ class CTActivity extends CTCNC
         }
     } // end function salesRequest
 
-        private function assignContracts()
+    private function assignContracts()
     {
         $activities = $this->getParam('callActivityID');
         $problems = $this->getParam('problem');
@@ -528,7 +528,7 @@ class CTActivity extends CTCNC
         }
     } // end function displaySearchForm
 
-/**
+    /**
      * Skip creation of sales order but authorise checked activities of given call
      *
      * @access private
@@ -1139,7 +1139,7 @@ class CTActivity extends CTCNC
         }
     } //end userDropdown
 
-function contractDropdown(
+    function contractDropdown(
         $customerID,
         $contractCustomerItemID,
         $templateName = 'ActivityCreate6',
@@ -1219,7 +1219,7 @@ function contractDropdown(
 
     }
 
-        function userDropdown($userID,
+    function userDropdown($userID,
                           $templateName,
                           $activeUsersOnly = true
     )
@@ -1257,7 +1257,7 @@ function contractDropdown(
         }
     } // end activityCreate1
 
-function removeQuerystringVar($url,
+    function removeQuerystringVar($url,
                                   $key
     )
     {
@@ -1304,7 +1304,7 @@ function removeQuerystringVar($url,
         return $data;
     }
 
-        function parsePage()
+    function parsePage()
     {
         parent::parsePage();
         $urlLogo = null;
@@ -1316,7 +1316,7 @@ function removeQuerystringVar($url,
         );
     } // end contractDropdown
 
-        function countParamsSet($array)
+    function countParamsSet($array)
     {
         $count = 0;
         $elements = $array[1];
@@ -2416,7 +2416,7 @@ function removeQuerystringVar($url,
 
 //----------------
 
-/**
+    /**
      * @param $customerID
      * @return string
      * @throws Exception
@@ -2438,7 +2438,7 @@ function removeQuerystringVar($url,
         return $renewalsLink;
     }
 
-/**
+    /**
      * @param DataSet|DBECustomer $dsCustomer
      * @return string
      */
@@ -2454,7 +2454,7 @@ function removeQuerystringVar($url,
         return null;
     }
 
-/**
+    /**
      * @param $customerID
      * @return mixed|string
      * @throws Exception
@@ -2522,7 +2522,7 @@ function removeQuerystringVar($url,
         return $passwordLink;
     }
 
-        /**
+    /**
      * @return string
      * @throws Exception
      */
@@ -2547,7 +2547,7 @@ function removeQuerystringVar($url,
         return $passwordLink;
     }// end function editActivity()
 
-        /**
+    /**
      * @param $customerID
      * @return string
      * @throws Exception
@@ -2723,7 +2723,7 @@ function removeQuerystringVar($url,
 
     } // end cancelEdit
 
-/**
+    /**
      * @throws Exception
      */
     function displayFirstActivity()
@@ -2734,7 +2734,7 @@ function removeQuerystringVar($url,
 
     }
 
-        /**
+    /**
      * Redirect to call page
      * @access private
      * @param $callActivityID
@@ -2765,7 +2765,7 @@ function removeQuerystringVar($url,
 
     }
 
-/**
+    /**
      * Create wizard step 1: Customer, site and contact selection
      * @access private
      * @param bool $referred
@@ -3320,8 +3320,10 @@ function removeQuerystringVar($url,
                 );
             } else {
                 $this->updateSession('hideFromCustomerFlag', 'N');
-
             }
+
+            $this->updateSession('criticalSRFlag', $this->getParam('criticalSRFlag') ? 'Y' : 'N');
+            $this->updateSession('monitorSRFlag', $this->getParam('monitorSRFlag') ? 'Y' : 'N');
 
             $this->updateSession('internalNotes', $this->getParam('internalNotes'));
 
@@ -3564,7 +3566,7 @@ function removeQuerystringVar($url,
 
     }
 
-        function siteDropdown(
+    function siteDropdown(
         $customerID,
         $siteNo,
         $templateName = 'ActivityCreate6',
@@ -3624,7 +3626,7 @@ function removeQuerystringVar($url,
 
     }    // end allocateAdditionalTime
 
-        private function onlyMainAndSupervisorsDropdown($templateName,
+    private function onlyMainAndSupervisorsDropdown($templateName,
                                                     $customerID,
                                                     $contactID
     )
@@ -3700,7 +3702,7 @@ function removeQuerystringVar($url,
         }
     }    // end allocateAddition
 
-/**
+    /**
      * @param $customerID
      * @param $contactID
      * @param string $templateName
@@ -3788,7 +3790,7 @@ function removeQuerystringVar($url,
 
     }
 
-        /**
+    /**
      * @throws Exception
      */
     function createTravel()
@@ -3898,7 +3900,7 @@ function removeQuerystringVar($url,
         $this->parsePage();
     }
 
-/**
+    /**
      * @throws Exception
      */
     function problemHistoryPopup()
@@ -4004,7 +4006,7 @@ function removeQuerystringVar($url,
         exit;
     }
 
-        /**
+    /**
      * @throws Exception
      */
     function customerProblemPopup()
@@ -4038,7 +4040,7 @@ function removeQuerystringVar($url,
         exit;
     }  // end finaliseProblem
 
-/**
+    /**
      * Edit/Add Activity
      * @access private
      * @throws Exception
@@ -4690,7 +4692,7 @@ function removeQuerystringVar($url,
 
     }
 
-/**
+    /**
      * Delete Activity
      *
      * @access private
@@ -6841,7 +6843,7 @@ function removeQuerystringVar($url,
         echo date('H') . ':' . date('i');
     }
 
-        function updateHistoricUserTimeLogs(DateTime $startDate = null)
+    function updateHistoricUserTimeLogs(DateTime $startDate = null)
     {
         $this->buActivity->updateAllHistoricUserLoggedHours($startDate);
         echo "Done";
@@ -6850,8 +6852,7 @@ function removeQuerystringVar($url,
     /**
      * @throws Exception
      */
-    private
-    function toggleMonitoringFlag()
+    private function toggleMonitoringFlag()
     {
         if (!$this->getParam('callActivityID')) {
             echo 'callActivityID not passed';
@@ -7189,7 +7190,7 @@ function removeQuerystringVar($url,
 
     }
 
-/**
+    /**
      * @throws Exception
      */
     function promptCreateTravel()

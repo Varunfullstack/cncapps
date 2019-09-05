@@ -5291,6 +5291,12 @@ is currently a balance of ';
             DBEProblem::hideFromCustomerFlag,
             @$_SESSION [$sessionKey] ['hideFromCustomerFlag']
         );
+
+        $dbeProblem->setValue(
+            DBEProblem::criticalFlag,
+            @$_SESSION [$sessionKey] ['criticalSRFlag']
+        );
+
         $dbeProblem->setValue(
             DBEProblem::internalNotes,
             @$_SESSION [$sessionKey] ['internalNotes']
@@ -5308,6 +5314,10 @@ is currently a balance of ';
             @$_SESSION [$sessionKey] ['projectID']
         );
         $dbeProblem->insertRow();
+
+        if ($_SESSION[$sessionKey]['monitorSRFlag'] === 'Y') {
+            $this->toggleMonitoringFlag($dbeProblem->getPKValue());
+        }
 
         $endTime = $this->getEndtime(
             @$_SESSION [$sessionKey] ['callActTypeID'],
