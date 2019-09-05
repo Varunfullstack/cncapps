@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 488 - Consider all SRs that are P1-P3 as critical once time is over XX hours.
+
 ## [v3.5.2] - 2019-09-04
 ### Fixed
 - PrePay SRs not being billed
