@@ -624,7 +624,7 @@ class DBEJProblem extends DBEProblem
             " FROM " . $this->getTableName() .
             " LEFT JOIN customer ON cus_custno = pro_custno
            LEFT JOIN consultant ON cns_consno = pro_consno
-
+           left join team on consultant.teamID = team.teamID
           JOIN callactivity `initial`
             ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
             " JOIN callactivity `last`
@@ -656,7 +656,7 @@ class DBEJProblem extends DBEProblem
         if ($isP5) {
             $sql .= 'and ' . $this->getDBColumnName(
                     self::priority
-                ) . ' = 5 ';
+                ) . ' = 5 and  team.' . DBETeam::level . " <= 3";
         } else {
             $sql .= 'and ' . $this->getDBColumnName(
                     self::priority
@@ -667,13 +667,13 @@ class DBEJProblem extends DBEProblem
 
         switch ($orderBy) {
             case 'shortestSLARemaining':
-                {
+            {
 
-                    $sql .= ' and ' . $this->getDBColumnName(
-                            self::status
-                        ) . ' = "I" and initial.caa_date < date(NOW() + interval 1  day) order by hoursRemaining desc';
-                    break;
-                }
+                $sql .= ' and ' . $this->getDBColumnName(
+                        self::status
+                    ) . ' = "I" and initial.caa_date < date(NOW() + interval 1  day) order by hoursRemaining desc';
+                break;
+            }
             case 'currentOpenP1Requests':
 
                 $sql .= ' and ' . $this->getDBColumnName(
@@ -684,20 +684,20 @@ class DBEJProblem extends DBEProblem
                 break;
 
             case 'oldestUpdatedSR':
-                {
-                    $sql .= ' order by last.caa_date asc, last.caa_starttime desc';
-                    break;
-                }
+            {
+                $sql .= ' order by last.caa_date asc, last.caa_starttime desc';
+                break;
+            }
             case 'mostHoursLogged':
-                {
-                    $sql .= ' order by ' . $this->getDBColumnName(self::totalActivityDurationHours) . ' desc';
-                    break;
-                }
+            {
+                $sql .= ' order by ' . $this->getDBColumnName(self::totalActivityDurationHours) . ' desc';
+                break;
+            }
             case 'longestOpenSR':
-                {
-                    $sql .= ' order by hoursRemaining desc';
-                    break;
-                }
+            {
+                $sql .= ' order by hoursRemaining desc';
+                break;
+            }
             case 'critical':
                 $sql .= " and  " . $this->getDBColumnName(self::criticalFlag) . " = 'Y' order by hoursRemaining desc ";
                 break;
