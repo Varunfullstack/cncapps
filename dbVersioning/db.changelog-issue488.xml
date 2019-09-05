@@ -18,7 +18,7 @@
             </column>
         </addColumn>
     </changeSet>
-    <changeSet author="pavwebdev" id="1567671159-1">
+    <changeSet author="pavwebdev" id="1567671159-2">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="headert" columnName="autoCriticalP2Hours"/>
@@ -30,7 +30,7 @@
             </column>
         </addColumn>
     </changeSet>
-    <changeSet author="pavwebdev" id="1567671159-1">
+    <changeSet author="pavwebdev" id="1567671159-3">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="headert" columnName="autoCriticalP3Hours"/>
