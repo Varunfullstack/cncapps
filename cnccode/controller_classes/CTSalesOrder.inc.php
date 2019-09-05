@@ -2129,7 +2129,6 @@ class CTSalesOrder extends CTCNC
                                 $txtSendQuote = 'Flag as sent';
                             }
 
-
                             $quoteSentDateTime = 'Not sent';
                         } else {
                             if ($this->dsQuotation->getValue(
