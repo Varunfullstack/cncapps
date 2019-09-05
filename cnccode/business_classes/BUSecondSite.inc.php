@@ -16,6 +16,7 @@ class BUSecondsite extends Business
     const STATUS_BAD_CONFIG = 'BAD_CONFIG';
     const STATUS_OUT_OF_DATE = 'OUT_OF_DATE';
     const STATUS_SUSPENDED = 'SUSPENDED';
+    const STATUS_EXCLUDED = 'EXCLUDED';
 
     const LOG_TYPE_ERROR_PATH_MISSING = 0;
     const LOG_TYPE_ERROR_INCOMPLETE = 1;
@@ -797,6 +798,8 @@ class BUSecondsite extends Business
 
     function getImagesByStatus($status)
     {
+
+
         $queryString =
             "SELECT
         ci.cui_cuino,
@@ -823,11 +826,15 @@ class BUSecondsite extends Business
         JOIN secondsite_image ssi ON ssi.customerItemID = ser.cui_cuino
 
       WHERE
-        i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")
-        AND ci.declinedFlag <> 'Y'
-        AND status = '$status'
-      
-      ORDER BY c.cus_name, serverName, ssi.imageName";
+        i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")  AND ci.declinedFlag <> 'Y' ";
+
+        if ($status == self::STATUS_EXCLUDED) {
+            $queryString .= " AND ci.secondsiteLocalExcludeFlag = 'Y' ";
+        } else {
+            $queryString .= " AND status = '$status' ";
+        }
+
+        $queryString .= "ORDER BY c.cus_name, serverName, ssi.imageName";
 
         $db = $GLOBALS['db'];
 

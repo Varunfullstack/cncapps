@@ -247,6 +247,7 @@ class CTSecondSite extends CTCNC
         $badConfig = $this->buSecondsite->getImagesByStatus(BUSecondsite::STATUS_BAD_CONFIG);
 
         $passed = $this->buSecondsite->getImagesByStatus(BUSecondsite::STATUS_PASSED);
+        $excluded = $this->buSecondsite->getImagesByStatus(BUSecondsite::STATUS_EXCLUDED);
 
         $this->setPageTitle('Offsite Backup Status');
 
@@ -493,6 +494,45 @@ class CTSecondSite extends CTCNC
             );
 
         }
+
+        $this->template->setBlock(
+            'SecondsiteList',
+            'excludedBlock',
+            'excluded'
+        );
+
+        foreach ($excluded as $record) {
+
+//            $imageTime = strftime(
+//                "%d/%m/%Y %H:%M:%S",
+//                strtotime($record['imageTime'])
+//            );
+//
+//            $imageAgeDays = number_format(
+//                (time() - strtotime($record['imageTime'])) / 86400,
+//                0
+//            );
+
+            $this->template->set_var(
+
+                array(
+                    'urlServer'    => $this->getEditUrl($record['server_cuino']),
+                    'customerName' => $record['cus_name'],
+                    'serverName'   => $record['serverName'],
+//                    'imageName'    => $record['imageName'],
+//                    'imagePath'    => $record['imagePath'],
+//                    'imageTime'    => $imageTime,
+//                    'imageAgeDays' => $imageAgeDays
+                )
+            );
+
+            $this->template->parse(
+                'excluded',
+                'excludedBlock',
+                true
+            );
+        }
+
 
         $this->template->setBlock(
             'SecondsiteList',
