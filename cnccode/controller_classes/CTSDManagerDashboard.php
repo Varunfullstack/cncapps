@@ -46,8 +46,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 if ($this->getSessionParam('IM')) {
                     $options['IM'] = true;
                 }
-                if ($this->getSessionParam('p5')) {
-                    $options['p5'] = true;
+                if ($this->getSessionParam('showP5')) {
+                    $options['showP5'] = true;
                 }
 
                 $this->allocateUser($options);
@@ -71,7 +71,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $this->setSessionParam('HD', $showHelpDesk);
         $this->setSessionParam('ES', $showEscalation);
         $this->setSessionParam('IM', $showImplementation);
-        $this->setSessionParam('p5', $isP5);
+        $this->setSessionParam('showP5', $isP5);
 
         $this->setPageTitle('SD Manager Dashboard' . ($isP5 ? ' Priority 5' : null));
 

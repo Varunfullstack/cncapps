@@ -704,7 +704,6 @@ class DBEJProblem extends DBEProblem
         }
 
         $sql .= ' limit ' . $limit;
-
         $this->setQueryString($sql);
 
         return (parent::getRow());
