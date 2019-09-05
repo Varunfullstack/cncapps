@@ -10,7 +10,7 @@
 
 use CNCLTD\LoggerCLI;
 
-require_once("htdocs/config.inc.php");
+require_once(__DIR__."/../htdocs/config.inc.php");
 require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 global $db;
