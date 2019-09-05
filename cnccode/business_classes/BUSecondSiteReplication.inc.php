@@ -91,7 +91,6 @@ class BUSecondsiteReplication extends BUSecondsite
                             self::STATUS_BAD_CONFIG
                         );
                     }
-
                 } else {
 
                     $networkPath = $server['secondSiteReplicationPath'];
@@ -112,6 +111,16 @@ class BUSecondsiteReplication extends BUSecondsite
                                 $server['server_cuino'],
                                 self::STATUS_SERVER_NOT_FOUND
                             );
+
+                            if (!$customerItemID && !$testRun) {
+                                $this->getActivityModel()->raiseSecondSiteLocationNotFoundRequest(
+                                    $server['custno'],
+                                    $server['serverName'],
+                                    $server['server_cuino'],
+                                    $server['cui_cuino'],
+                                    $networkPath
+                                );
+                            }
                         }
                     }
                 }
@@ -281,106 +290,31 @@ class BUSecondsiteReplication extends BUSecondsite
 
                     }
 
+
                 }// end drives
 
                 if ($allServerImagesPassed) {
                     $this->resetSuspendedUntilDate($server['server_cuino']);
                 }
+
+                if (!$isSuspended && count($missingImages) > 0 && !$customerItemID && !$testRun) {
+
+                    $this->getActivityModel()->raiseSecondSiteMissingImageRequest(
+                        $server['custno'],
+                        $server['serverName'],
+                        $server['server_cuino'],
+                        $server['cui_cuino'],
+                        $missingLetters,
+                        $missingImages
+                    );
+
+                }
+
             } // if not error
 
         } // end foreach contracts
     }
 
-
-    function setImageStatus($secondSiteImageID,
-                            $status,
-                            $imagePath = null,
-                            $imageTime = null
-    )
-    {
-
-        $queryString =
-            "UPDATE
-        secondsite_image 
-      SET
-        replicationStatus = ?,
-        replicationImagePath = ?,
-        replicationImageTime = ?
-      WHERE
-        secondSiteImageID = ?";
-        /** @var dbSweetcode $db */
-        $db = $GLOBALS['db'];
-
-        $db->preparedQuery(
-            $queryString,
-            [
-                [
-                    'type'  => "s",
-                    'value' => $status
-                ],
-                [
-                    'type'  => "s",
-                    'value' => $imagePath
-                ],
-                [
-                    'type'  => "s",
-                    'value' => $imageTime
-                ],
-                [
-                    'type'  => "i",
-                    'value' => $secondSiteImageID
-                ],
-            ]
-        );
-    }
-
-    function setImageStatusByServer($customerItemID,
-                                    $status
-    )
-    {
-        $queryString =
-            "UPDATE
-        secondsite_image 
-      SET
-        replicationStatus = '$status'
-      WHERE
-        customerItemID = $customerItemID";
-
-        $db = $GLOBALS['db'];
-
-        $db->query($queryString);
-    }
-
-    /*
-    Get second site images by server
-    */
-    public function getImagesByServer($customerItemID)
-    {
-        $queryString =
-            "SELECT
-        secondSiteImageID,
-        imageName,
-        replicationStatus
-      FROM
-        secondsite_image
-      WHERE
-        customerItemID = $customerItemID";
-
-        $db = $GLOBALS['db'];
-
-        $db->query($queryString);
-
-        $images = array();
-        while ($db->next_record()) {
-            $images[] = $db->Record;
-        }
-
-        return $images;
-    }
-
-    /*
-    Get second site images by status
-    */
     public function getServers($customerItemID = false)
     {
         $queryString =
@@ -429,6 +363,97 @@ class BUSecondsiteReplication extends BUSecondsite
         }
 
         return $servers;
+    }
+
+    public function getImagesByServer($customerItemID)
+    {
+        $queryString =
+            "SELECT
+        secondSiteImageID,
+        imageName,
+        replicationStatus
+      FROM
+        secondsite_image
+      WHERE
+        customerItemID = $customerItemID";
+
+        $db = $GLOBALS['db'];
+
+        $db->query($queryString);
+
+        $images = array();
+        while ($db->next_record()) {
+            $images[] = $db->Record;
+        }
+
+        return $images;
+    }
+
+    /*
+    Get second site images by server
+    */
+
+    function setImageStatusByServer($customerItemID,
+                                    $status
+    )
+    {
+        $queryString =
+            "UPDATE
+        secondsite_image 
+      SET
+        replicationStatus = '$status'
+      WHERE
+        customerItemID = $customerItemID";
+
+        $db = $GLOBALS['db'];
+
+        $db->query($queryString);
+    }
+
+    /*
+    Get second site images by status
+    */
+
+    function setImageStatus($secondSiteImageID,
+                            $status,
+                            $imagePath = null,
+                            $imageTime = null
+    )
+    {
+
+        $queryString =
+            "UPDATE
+        secondsite_image 
+      SET
+        replicationStatus = ?,
+        replicationImagePath = ?,
+        replicationImageTime = ?
+      WHERE
+        secondSiteImageID = ?";
+        /** @var dbSweetcode $db */
+        $db = $GLOBALS['db'];
+
+        $db->preparedQuery(
+            $queryString,
+            [
+                [
+                    'type'  => "s",
+                    'value' => $status
+                ],
+                [
+                    'type'  => "s",
+                    'value' => $imagePath
+                ],
+                [
+                    'type'  => "s",
+                    'value' => $imageTime
+                ],
+                [
+                    'type'  => "i",
+                    'value' => $secondSiteImageID
+                ],
+            ]
+        );
     }
 
     function getImagesByStatus($status)
