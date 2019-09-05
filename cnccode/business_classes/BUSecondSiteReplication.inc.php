@@ -486,10 +486,14 @@ class BUSecondsiteReplication extends BUSecondsite
 
       WHERE
         i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")
-        AND ci.declinedFlag <> 'Y'
-        AND replicationStatus = '$status'
-        and ser.secondSiteReplicationExcludeFlag <> 'Y'      
-      ORDER BY c.cus_name, serverName, ssi.imageName";
+        AND ci.declinedFlag <> 'Y'";
+
+        if ($status === self::STATUS_EXCLUDED) {
+            $queryString .= " AND ci.secondSiteReplicationExcludeFlag = 'Y' ";
+        } else {
+            $queryString .= " AND ci.secondSiteReplicationExcludeFlag <> 'Y' AND replicationStatus = '$status' ";
+        }
+        $queryString .= " ORDER BY c.cus_name, serverName, ssi.imageName";
 
         $db = $GLOBALS['db'];
 

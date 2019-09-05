@@ -831,7 +831,7 @@ class BUSecondsite extends Business
         if ($status == self::STATUS_EXCLUDED) {
             $queryString .= " AND ci.secondsiteLocalExcludeFlag = 'Y' ";
         } else {
-            $queryString .= " AND status = '$status' ";
+            $queryString .= " AND status = '$status' and ci.secondsiteLocalExcludeFlag <> 'Y' ";
         }
 
         $queryString .= "ORDER BY c.cus_name, serverName, ssi.imageName";
