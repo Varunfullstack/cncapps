@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 644 - Quote Reminder Tweaking
+
 ## [v3.5.2] - 2019-09-04
 ### Fixed
 - PrePay SRs not being billed
