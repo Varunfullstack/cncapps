@@ -4023,13 +4023,13 @@ class BUActivity extends Business
             $dbeProblem = new DBEJProblem($this);
             $dbeProblem->getRow($dbeJCallActivity->getValue(DBEJCallActivity::problemID));
             $shouldSetActivitiesToAuthorised = true;
-            if($dbeProblem->getValue(DBEJProblem::contractCustomerItemID)){
-            // so here we have to check if this activity is related to an SR that has the contract set to Pre-pay, if
-            // that's the case ...we don't want to set the activities to authorised
-            $customerItem = new DBEJCustomerItem($this);
-            $customerItem->getRow($dbeProblem->getValue(DBEJProblem::contractCustomerItemID));
-            $DBItem = new DBEItem($this);
-            $DBItem->getRow($customerItem->getValue(DBECustomerItem::itemID));
+            if ($dbeProblem->getValue(DBEJProblem::contractCustomerItemID)) {
+                // so here we have to check if this activity is related to an SR that has the contract set to Pre-pay, if
+                // that's the case ...we don't want to set the activities to authorised
+                $customerItem = new DBEJCustomerItem($this);
+                $customerItem->getRow($dbeProblem->getValue(DBEJProblem::contractCustomerItemID));
+                $DBItem = new DBEItem($this);
+                $DBItem->getRow($customerItem->getValue(DBECustomerItem::itemID));
                 if ($DBItem->getValue(DBEItem::itemTypeID) == CONFIG_PREPAY_ITEMTYPEID) {
                     $shouldSetActivitiesToAuthorised = false;
                 }
