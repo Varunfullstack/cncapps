@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 641 - Office 365 License Export v2
+
 ## [v3.5.3] - 2019-09-09
 ### Fixed
 - Issue with skip sales order in Activity.php when the SR is not related to a contract

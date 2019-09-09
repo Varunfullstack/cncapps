@@ -11,6 +11,7 @@ class DBEOffice365License extends DBEntity
     const replacement = "replacement";
     const license = "license";
     const mailboxLimit = "mailboxLimit";
+    const reportOnSpareLicenses = "reportOnSpareLicenses";
 
     /**
      * calls constructor()
@@ -42,6 +43,11 @@ class DBEOffice365License extends DBEntity
             self::mailboxLimit,
             DA_INTEGER,
             DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::reportOnSpareLicenses,
+            DA_BOOLEAN,
+            DA_NOT_NULL
         );
 
         $this->setAddColumnsOff();
