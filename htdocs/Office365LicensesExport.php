@@ -503,9 +503,10 @@ function processLicenses(Spreadsheet $spreadSheet,
         null,
         'A' . ($highestRow + 1)
     );
-    $licensesSheet->getStyle("A$highestRow:D$highestRow")->getFont()->setBold(true);
-    $licensesSheet->getStyle("A1:D1")->getFont()->setBold(true);
-    $licensesSheet->getStyle("A1:D$highestRow")->getAlignment()->setHorizontal('center');
+    $highestCol = $licensesSheet->getHighestDataColumn();
+    $licensesSheet->getStyle("A$highestRow:$highestCol$highestRow")->getFont()->setBold(true);
+    $licensesSheet->getStyle("A1:".$highestCol."1")->getFont()->setBold(true);
+    $licensesSheet->getStyle("A1:$highestCol$highestRow")->getAlignment()->setHorizontal('center');
     foreach (range('A', $licensesSheet->getHighestDataColumn()) as $col) {
         $licensesSheet->getColumnDimension($col)
             ->setAutoSize(true);
