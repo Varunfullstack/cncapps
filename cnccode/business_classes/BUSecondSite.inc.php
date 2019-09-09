@@ -374,7 +374,7 @@ class BUSecondsite extends Business
             $db = $GLOBALS['db'];
 
             //check if we have already stored information for today
-            $query = "SELECT created_at FROM backup_performance_log WHERE created_at = date(now())";
+            $query = "SELECT created_at FROM backup_performance_log WHERE created_at = date(now()) and not isReplication";
 
             $db->query($query);
             $db->next_record();
@@ -941,7 +941,7 @@ class BUSecondsite extends Business
         }
 
         $query = "SELECT SUM(passes)/ SUM(images) as successRate, MONTH FROM (
-            SELECT MONTH(created_at) AS MONTH, images, passes FROM backup_performance_log WHERE YEAR(created_at) = '$year'
+            SELECT MONTH(created_at) AS MONTH, images, passes FROM backup_performance_log WHERE YEAR(created_at) = '$year' and not isReplication
 ) t GROUP BY t.month";
 
         $result = $this->db->query($query);
@@ -962,7 +962,7 @@ class BUSecondsite extends Business
 
     function getPerformanceDataAvailableYears()
     {
-        $query = "SELECT  DISTINCT YEAR(created_at) AS YEAR  FROM    backup_performance_log";
+        $query = "SELECT  DISTINCT YEAR(created_at) AS YEAR  FROM    backup_performance_log where not isReplication";
         $result = $this->db->query($query);
 
         return array_map(

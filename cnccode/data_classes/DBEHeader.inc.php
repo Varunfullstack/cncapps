@@ -80,6 +80,7 @@ class DBEHeader extends DBEntity
     const RemoteSupportMinWarnHours = "RemoteSupportMinWarnHours";
     const ImplementationTeamMinutesInADay = "imTeamMinutesInADay";
     const backupTargetSuccessRate = "backupTargetSuccessRate";
+    const backupReplicationTargetSuccessRate = "backupReplicationTargetSuccessRate";
     const customerReviewMeetingText = "customerReviewMeetingText";
     const serviceDeskNotification24hBegin = "serviceDeskNotification24hBegin";
     const serviceDeskNotification24hEnd = "serviceDeskNotification24hEnd";
@@ -482,6 +483,11 @@ class DBEHeader extends DBEntity
             DA_INTEGER,
             DA_NOT_NULL,
             "hed_backup_target_success_rate"
+        );
+        $this->addColumn(
+            self::backupReplicationTargetSuccessRate,
+            DA_INTEGER,
+            DA_NOT_NULL
         );
         $this->addColumn(
             self::customerReviewMeetingText,

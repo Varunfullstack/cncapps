@@ -71,7 +71,35 @@ class CTHeader extends CTCNC
         }
     }
 
-    /**
+        /**
+     * Update
+     * @access private
+     * @throws Exception
+     */
+    function update()
+    {
+        $this->setMethodName('update');
+        $this->formError = (!$this->dsHeader->populateFromArray($this->getParam('header')));
+
+        if ($this->formError) {
+            $this->setAction(CTHEADER_ACT_EDIT);
+            $this->edit();
+            exit;
+        }
+
+        $this->buHeader->updateHeader($this->dsHeader);
+
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTCNC_ACT_VIEW
+                )
+            );
+        header('Location: ' . $urlNext);
+    }// end function editHeader()
+
+/**
      * Edit/Add Header
      * @access private
      * @throws Exception
@@ -486,6 +514,9 @@ class CTHeader extends CTCNC
                 DBEHeader::backupTargetSuccessRate                                   => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::backupTargetSuccessRate)
                 ),
+                DBEHeader::backupReplicationTargetSuccessRate                        => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEHeader::backupReplicationTargetSuccessRate)
+                ),
                 DBEHeader::SDDashboardEngineersInSREngineersMaxCount                 => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::SDDashboardEngineersInSREngineersMaxCount)
                 ),
@@ -540,15 +571,15 @@ class CTHeader extends CTCNC
                 DBEHeader::office365MailboxYellowWarningThreshold . 'Message'        => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::office365MailboxYellowWarningThreshold)
                 ),
-                DBEHeader::office365MailboxRedWarningThreshold                    => $dsHeader->getValue(
+                DBEHeader::office365MailboxRedWarningThreshold                       => $dsHeader->getValue(
                     DBEHeader::office365MailboxRedWarningThreshold
                 ),
-                DBEHeader::office365MailboxRedWarningThreshold . 'Message'        => Controller::htmlDisplayText(
+                DBEHeader::office365MailboxRedWarningThreshold . 'Message'           => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::office365MailboxRedWarningThreshold)
                 ),
 
-                'urlItemPopup'                                                       => $urlItemPopup,
-                'urlUpdate'                                                          => $urlUpdate
+                'urlItemPopup' => $urlItemPopup,
+                'urlUpdate'    => $urlUpdate
             )
         );
 
@@ -583,34 +614,6 @@ class CTHeader extends CTCNC
             true
         );
         $this->parsePage();
-    }// end function editHeader()
-
-    /**
-     * Update
-     * @access private
-     * @throws Exception
-     */
-    function update()
-    {
-        $this->setMethodName('update');
-        $this->formError = (!$this->dsHeader->populateFromArray($this->getParam('header')));
-
-        if ($this->formError) {
-            $this->setAction(CTHEADER_ACT_EDIT);
-            $this->edit();
-            exit;
-        }
-
-        $this->buHeader->updateHeader($this->dsHeader);
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTCNC_ACT_VIEW
-                )
-            );
-        header('Location: ' . $urlNext);
     }
 
     /**

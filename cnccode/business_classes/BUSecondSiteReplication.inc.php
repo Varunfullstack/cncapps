@@ -313,6 +313,70 @@ class BUSecondsiteReplication extends BUSecondsite
             } // if not error
 
         } // end foreach contracts
+
+        if (!$customerItemID && !$testRun) {
+            /** @var dbSweetcode $db */
+            $db = $GLOBALS['db'];
+
+            //check if we have already stored information for today
+            $query = "SELECT created_at FROM backup_performance_log WHERE created_at = date(now()) and isReplication";
+
+            $db->query($query);
+            $db->next_record();
+            $data = $db->Record;
+
+            if ($data['created_at']) {
+                return;
+            }
+
+            $query = "INSERT INTO backup_performance_log (
+                      created_at,
+                      servers,
+                      images,
+                      server_errors,
+                      image_errors,
+                      suspended_servers,
+                      passes,
+                      success_rate,
+                      isReplication
+                    ) VALUES (now(), ?, ?, ?, ?, ?, ?, ?, 1)";
+            $db->preparedQuery(
+                $query,
+                [
+                    [
+                        "type"  => "i",
+                        "value" => $this->serverCount
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $this->imageCount
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $this->serverErrorCount,
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $this->imageErrorCount,
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $this->suspendedServerCount,
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $this->imagePassesCount,
+                    ],
+                    [
+                        "type"  => "d",
+                        "value" => $this->imageCount ? ($this->imagePassesCount / $this->imageCount) * 100 : 0
+                    ]
+
+                ]
+            );
+
+        }
+
     }
 
     public function getServers($customerItemID = false)
@@ -507,4 +571,45 @@ class BUSecondsiteReplication extends BUSecondsite
         return $images;
 
     }
+
+    function getPerformanceDataForYear($year = null)
+    {
+
+        if (!$year) {
+            $year = date("Y");
+        }
+
+        $query = "SELECT SUM(passes)/ SUM(images) as successRate, MONTH FROM (
+            SELECT MONTH(created_at) AS MONTH, images, passes FROM backup_performance_log WHERE YEAR(created_at) = '$year' and isReplication
+) t GROUP BY t.month";
+
+        $result = $this->db->query($query);
+
+        $data = [
+        ];
+
+        for ($i = 0; $i < 12; $i++) {
+            $data[$i + 1] = "N/A";
+        }
+
+        while ($row = $result->fetch_assoc()) {
+            $data[$row['MONTH']] = $row['successRate'] * 100;
+        }
+
+        return $data;
+    }
+
+    function getPerformanceDataAvailableYears()
+    {
+        $query = "SELECT  DISTINCT YEAR(created_at) AS YEAR  FROM    backup_performance_log where isReplication";
+        $result = $this->db->query($query);
+
+        return array_map(
+            function ($item) {
+                return $item[0];
+            },
+            $result->fetch_all()
+        );
+    }
+
 }

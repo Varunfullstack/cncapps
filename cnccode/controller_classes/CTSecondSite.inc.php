@@ -7,7 +7,7 @@ class CTSecondSite extends CTCNC
 {
     /** @var DSForm */
     public $dsSecondsiteImage;
-    /** @var buSecondsite */
+    /** @var BUSecondsite */
     public $buSecondsite;
 
     function __construct($requestMethod,
@@ -503,26 +503,12 @@ class CTSecondSite extends CTCNC
 
         foreach ($excluded as $record) {
 
-//            $imageTime = strftime(
-//                "%d/%m/%Y %H:%M:%S",
-//                strtotime($record['imageTime'])
-//            );
-//
-//            $imageAgeDays = number_format(
-//                (time() - strtotime($record['imageTime'])) / 86400,
-//                0
-//            );
-
             $this->template->set_var(
 
                 array(
                     'urlServer'    => $this->getEditUrl($record['server_cuino']),
                     'customerName' => $record['cus_name'],
                     'serverName'   => $record['serverName'],
-//                    'imageName'    => $record['imageName'],
-//                    'imagePath'    => $record['imagePath'],
-//                    'imageTime'    => $imageTime,
-//                    'imageAgeDays' => $imageAgeDays
                 )
             );
 
@@ -580,7 +566,7 @@ class CTSecondSite extends CTCNC
         $this->parsePage();
     }
 
-    private function validateAndRound($value)
+    protected function validateAndRound($value)
     {
         if (!is_numeric($value)) {
             return $value;
