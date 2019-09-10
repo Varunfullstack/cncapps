@@ -293,9 +293,7 @@ function processMailboxes(Spreadsheet $spreadSheet,
         $licenseValue = null;
         if ($datum['Licenses']) {
             if (!is_array($datum['Licenses'])) {
-                $datum['Licenses'] = [
-                    $datum['Licenses']
-                ];
+                $datum['Licenses'] = explode(" ", $datum['Licenses']);
             }
             $licenseValue = implode(", ", $datum['Licenses']);
 
@@ -303,7 +301,7 @@ function processMailboxes(Spreadsheet $spreadSheet,
                     strtolower($datum['DisplayName']),
                     'leaver'
                 ) !== false && $datum['RecipientTypeDetails'] == 'SharedMailbox') {
-                $logger->warning('Raising a Customer Leaver with License SR');
+                $logger->warning('Raising a Customer Leaver with License SR while processing Mailboxes');
                 raiseCustomerLeaverWithLicenseSR($dbeCustomer, $datum['DisplayName']);
             }
 
@@ -319,7 +317,7 @@ function processMailboxes(Spreadsheet $spreadSheet,
                         $mailboxLimit = $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit);
                     }
                 } else {
-                    $logger->warning('Raising a License not found SR');
+                    $logger->warning('Raising a License not found SR while processing Mailboxes:' . $license);
                     raiseCNCRequest($license, $dbeCustomer, $datum['DisplayName']);
                 }
             }
@@ -474,7 +472,7 @@ function processLicenses(Spreadsheet $spreadSheet,
                 ];
             }
         } else {
-            $logger->warning('Raising a License not found SR');
+            $logger->warning('Raising a License not found SR while processing Licenses');
             raiseCNCRequest($datum['AccountSkuId'], $dbeCustomer);
         }
     }
