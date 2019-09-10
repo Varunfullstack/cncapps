@@ -459,9 +459,10 @@ function processLicenses(Spreadsheet $spreadSheet,
     $dateTime = new DateTime();
     $sparedLicenseErrors = [];
     foreach ($licenses as $key => $datum) {
+
         $dbeOffice365Licenses->getRowForLicense($datum['AccountSkuId']);
         if ($dbeOffice365Licenses->rowCount()) {
-            $licenses[$key]['AccountSkId'] = str_replace(
+            $licenses[$key]['AccountSkuId'] = str_replace(
                 $datum['AccountSkuId'],
                 $dbeOffice365Licenses->getValue(DBEOffice365License::replacement),
                 $datum['AccountSkuId']
@@ -476,18 +477,25 @@ function processLicenses(Spreadsheet $spreadSheet,
             }
         } else {
             $logger->warning('Raising a License not found SR');
-            raiseCNCRequest($datum['AccountSkuId'], $dbeCustomer, $datum['DisplayName']);
+            raiseCNCRequest($datum['AccountSkuId'], $dbeCustomer);
         }
     }
+
+    if(count($sparedLicenseErrors)){
+        // we have found some spared licenses errors...lets send an email to inform about this
+        $buMail = new BUMail($thing);
+        $buMail->send()
+
+    }
+
     $licensesSheet = $spreadSheet->createSheet();
     $licensesSheet->setTitle('Licenses');
 
     $licensesSheet->fromArray(
         [
-            "AccountSkuId",
-            "ActiveUnits",
-            "WarningUnits",
-            "ConsumedUnits",
+            "License Name",
+            "Number of Licenses",
+            "Number of Unallocated Licenses"
         ],
         null,
         'A1'
@@ -505,7 +513,7 @@ function processLicenses(Spreadsheet $spreadSheet,
     );
     $highestCol = $licensesSheet->getHighestDataColumn();
     $licensesSheet->getStyle("A$highestRow:$highestCol$highestRow")->getFont()->setBold(true);
-    $licensesSheet->getStyle("A1:".$highestCol."1")->getFont()->setBold(true);
+    $licensesSheet->getStyle("A1:" . $highestCol . "1")->getFont()->setBold(true);
     $licensesSheet->getStyle("A1:$highestCol$highestRow")->getAlignment()->setHorizontal('center');
     foreach (range('A', $licensesSheet->getHighestDataColumn()) as $col) {
         $licensesSheet->getColumnDimension($col)
