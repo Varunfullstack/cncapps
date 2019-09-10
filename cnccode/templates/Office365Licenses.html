@@ -17,6 +17,7 @@
             <th>License</th>
             <th>Mailbox Limit(MB)</th>
             <th>Friendly Name</th>
+            <th>Report on Spare Licenses</th>
             <th></th>
         </tr>
         </thead>
@@ -32,6 +33,14 @@
             </td>
             <td>
                 {% replacement %}
+            </td>
+            <td>
+                {% #reportOnSpareLicenses %}
+                <i class='fa fa-check'></i>
+                {% /reportOnSpareLicenses %}
+                {% ^reportOnSpareLicenses %}
+                <i class='fa fa-times'></i>
+                {% /reportOnSpareLicenses %}
             </td>
             <td class="buttons">
                 <button class="editButton">Edit</button>
@@ -54,7 +63,7 @@
     let rules = [];
 
     function newRule() {
-        return {replacement: "", license: null};
+        return {replacement: "", license: null, mailboxLimit: null, reportOnSpareLicenses: false};
     }
 
     $.ajax({
@@ -195,6 +204,7 @@
         $('#replacementInput').val(rule.replacement);
         $('#mailboxLimitInput').val(rule.mailboxLimit);
         $('#licenseInput').val(rule.license);
+        $('#reportOnSpareLicensesInput')[0].checked = (rule.reportOnSpareLicenses);
     }
 
     function updateLicense() {
@@ -207,6 +217,10 @@
 
     function updateMailboxLimit() {
         currentRule.mailboxLimit = $('#mailboxLimitInput').val();
+    }
+
+    function updateReportOnSpareLicenses() {
+        currentRule.reportOnSpareLicenses = $('#reportOnSpareLicensesInput').is(':checked');
     }
 
 </script>
@@ -245,6 +259,17 @@
                required
                onchange="updateLicense()"
                id="licenseInput"
+        >
+    </div>
+    <div>
+        <div style="width: 100px; display: inline-block">
+            Report on spare licenses
+        </div>
+        <input type="checkbox"
+               value="Y"
+               name="reportOnSpareLicenses"
+               onchange="updateReportOnSpareLicenses()"
+               id="reportOnSpareLicensesInput"
         >
     </div>
     <div>

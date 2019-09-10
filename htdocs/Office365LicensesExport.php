@@ -467,13 +467,11 @@ function processLicenses(Spreadsheet $spreadSheet,
                 $dbeOffice365Licenses->getValue(DBEOffice365License::replacement),
                 $datum['AccountSkuId']
             );
-            if ($dbeOffice365Licenses->getValue(DBEOffice365License::reportOnSpareLicenses)) {
-                if ($datum['ActiveUnits'] > $datum['ConsumedUnits']) {
-                    $sparedLicenseErrors[] = [
-                        "licenseName" => $licenses[$key]['AccountSkId'],
-                        "quantity"    => $datum['ActiveUnits'] - $datum['ConsumedUnits']
-                    ];
-                }
+            if ($dbeOffice365Licenses->getValue(DBEOffice365License::reportOnSpareLicenses) && $datum['Unallocated']) {
+                $sparedLicenseErrors[] = [
+                    "licenseName" => $licenses[$key]['AccountSkuId'],
+                    "quantity"    => $datum['Unallocated']
+                ];
             }
         } else {
             $logger->warning('Raising a License not found SR');
@@ -481,10 +479,79 @@ function processLicenses(Spreadsheet $spreadSheet,
         }
     }
 
-    if(count($sparedLicenseErrors)){
+    if (count($sparedLicenseErrors)) {
         // we have found some spared licenses errors...lets send an email to inform about this
         $buMail = new BUMail($thing);
-        $buMail->send()
+
+
+        $template = new Template (
+            EMAIL_TEMPLATE_DIR,
+            "remove"
+        );
+
+        $template->set_file(
+            array(
+                'page' => 'SpareLicensesEmail.html',
+            )
+        );
+
+        $template->set_block('page', 'licensesBlock', 'licenses');
+        $template->setVar(
+            [
+                "customerName" => $dbeCustomer->getValue(DBECustomer::name)
+            ]
+        );
+        foreach ($sparedLicenseErrors as $licenseError) {
+            $template->setVar(
+                [
+                    "licenseName" => $licenseError['licenseName'],
+                    "quantity"    => $licenseError['quantity'],
+                ]
+            );
+            $template->parse("licenses", 'licensesBlock', true);
+        }
+
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
+
+        $body = $template->get_var('output');
+
+        $subject = "Unallocated O365 licenses for customer " . $dbeCustomer->getValue(DBECustomer::name);
+        $emailTo = CONFIG_SALES_EMAIL;
+
+        $hdrs = array(
+            'From'         => CONFIG_SUPPORT_EMAIL,
+            'To'           => $emailTo,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $mime = new Mail_mime();
+
+        $mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+
+        $body = $mime->get($mime_params);
+
+        $hdrs = $mime->headers($hdrs);
+
+
+        $buMail->putInQueue(
+            CONFIG_SUPPORT_EMAIL,
+            "O365sparelicenses@cnc-ltd.co.uk",
+            $hdrs,
+            $body
+        );
 
     }
 
