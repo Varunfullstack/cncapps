@@ -547,15 +547,14 @@ class BUSecondsiteReplication extends BUSecondsite
         JOIN custitem ser ON ser.cui_cuino = custitem_contract.cic_cuino
         JOIN item i ON i.itm_itemno = ci.cui_itemno
         JOIN secondsite_image ssi ON ssi.customerItemID = ser.cui_cuino
-
       WHERE
         i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")
         AND ci.declinedFlag <> 'Y'";
 
         if ($status === self::STATUS_EXCLUDED) {
-            $queryString .= " AND ci.secondSiteReplicationExcludeFlag = 'Y' ";
+            $queryString .= " AND ser.secondSiteReplicationExcludeFlag = 'Y' group by serverName ";
         } else {
-            $queryString .= " AND ci.secondSiteReplicationExcludeFlag <> 'Y' AND replicationStatus = '$status' ";
+            $queryString .= " AND ser.secondSiteReplicationExcludeFlag <> 'Y' AND replicationStatus = '$status' ";
         }
         $queryString .= " ORDER BY c.cus_name, serverName, ssi.imageName";
 

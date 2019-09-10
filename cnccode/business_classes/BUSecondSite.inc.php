@@ -829,12 +829,14 @@ class BUSecondsite extends Business
         i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")  AND ci.declinedFlag <> 'Y' ";
 
         if ($status == self::STATUS_EXCLUDED) {
-            $queryString .= " AND ci.secondsiteLocalExcludeFlag = 'Y' ";
+            $queryString .= " AND ser.secondsiteLocalExcludeFlag = 'Y' group by serverName ";
         } else {
-            $queryString .= " AND status = '$status' and ci.secondsiteLocalExcludeFlag <> 'Y' ";
+            $queryString .= " AND status = '$status' and ser.secondsiteLocalExcludeFlag <> 'Y' ";
         }
 
         $queryString .= "ORDER BY c.cus_name, serverName, ssi.imageName";
+
+        var_dump($queryString);
 
         $db = $GLOBALS['db'];
 
