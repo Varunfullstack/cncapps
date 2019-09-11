@@ -1,0 +1,44 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1568110331-0">
+        <tagDatabase tag="issue646"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1568110331-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="sevenDayerTarget"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="sevenDayerTarget" type="int(11)" defaultValue="25">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1568110331-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sevenDayersPerformanceLog"/>
+            </not>
+        </preConditions>
+        <createTable tableName="sevenDayersPerformanceLog">
+            <column name="date" type="date">
+                <constraints primaryKey="true" primaryKeyName="PRIMARY" nullable="false"/>
+            </column>
+            <column name="olderThan7Days" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="averageAgeDays" type="decimal(5,1)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="totalClosedSRs" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="target" type="int(5)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

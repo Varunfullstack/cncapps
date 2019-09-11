@@ -7,7 +7,7 @@ class CTSecondSite extends CTCNC
 {
     /** @var DSForm */
     public $dsSecondsiteImage;
-    /** @var buSecondsite */
+    /** @var BUSecondsite */
     public $buSecondsite;
 
     function __construct($requestMethod,

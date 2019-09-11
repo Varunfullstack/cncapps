@@ -528,6 +528,12 @@ class CTHeader extends CTCNC
                 DBEHeader::sevenDayerAmberDays . 'Message'                           => $dsHeader->getMessage(
                     DBEHeader::sevenDayerAmberDays
                 ),
+                DBEHeader::sevenDayerTarget                                       => $dsHeader->getValue(
+                    DBEHeader::sevenDayerTarget
+                ),
+                DBEHeader::sevenDayerTarget . 'Message'                           => $dsHeader->getMessage(
+                    DBEHeader::sevenDayerTarget
+                ),
                 DBEHeader::sevenDayerRedDays                                         => $dsHeader->getValue(
                     DBEHeader::sevenDayerRedDays
                 ),

@@ -53,7 +53,7 @@ class CTDailyReport extends CTCNC
         switch ($this->getAction()) {
 
             case 'fixedIncidents' :
-                $this->buDailyReport->fixedIncidents($this->daysAgo);
+                $this->buDailyReport->fixedIncidents($this->daysAgo, true);
                 break;
             case 'focActivities' :
                 $this->buDailyReport->focActivities($this->daysAgo);
@@ -64,12 +64,16 @@ class CTDailyReport extends CTCNC
             case 'outstandingIncidents' :
                 $onScreen = isset($_GET['onScreen']);
                 $dashboard = isset($_GET['dashboard']);
+                $generateLog = isset($_GET['generateLog']);
+                $selectedYear = isset($_GET['selectedYear']) ? $_GET['selectedYear'] : null;
 
                 $html = $this->buDailyReport->outstandingIncidents(
                     $this->daysAgo,
                     null,
                     $onScreen,
-                    $dashboard
+                    $dashboard,
+                    $generateLog,
+                    $selectedYear
                 );
 
                 if ($dashboard) {
