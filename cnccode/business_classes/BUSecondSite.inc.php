@@ -833,15 +833,9 @@ class BUSecondsite extends Business
         } else {
             $queryString .= " AND status = '$status' and ser.secondsiteLocalExcludeFlag <> 'Y' ";
         }
-
         $queryString .= "ORDER BY c.cus_name, serverName, ssi.imageName";
-
-        var_dump($queryString);
-
         $db = $GLOBALS['db'];
-
         $db->query($queryString);
-
         $images = array();
         while ($db->next_record()) {
             $images[] = $db->Record;
