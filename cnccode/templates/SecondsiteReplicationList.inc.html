@@ -1,4 +1,78 @@
 <!-- Template: CurrentActivityReport.inc.html -->
+<style>
+    .success {
+        color: green;
+    }
+
+    .fail {
+        color: red;
+    }
+
+</style>
+<script>
+    $(function () {
+        $('#yearSelector').change(function () {
+            $('#searchForm').submit();
+        })
+    })
+</script>
+
+
+<form name="searchForm" method="get" action="{urlSubmit}" id="searchForm">
+    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+        <tr>
+
+            <td>
+                <select name="searchYear" id="yearSelector">
+                    <!-- BEGIN availableYearsBlock -->
+                    <option value="{year}" {selectedYear}>{year}</option>
+                    <!-- END availableYearsBlock -->
+                </select>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<table id="team-performance">
+    <thead>
+    <tr>
+        <th>&nbsp;</th>
+        <th>Target</th>
+        <th>Jan</th>
+        <th>Feb</th>
+        <th>Mar</th>
+        <th>Apr</th>
+        <th>May</th>
+        <th>Jun</th>
+        <th>Jul</th>
+        <th>Aug</th>
+        <th>Sep</th>
+        <th>Oct</th>
+        <th>Nov</th>
+        <th>Dec</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <tr>
+        <th>Backup Success Rate %</th>
+        <td>{backupTargetSuccessRate}</td>
+        <td class="{monthSuccessRate1Class}">{monthSuccessRate1}</td>
+        <td class="{monthSuccessRate2Class}">{monthSuccessRate2}</td>
+        <td class="{monthSuccessRate3Class}">{monthSuccessRate3}</td>
+        <td class="{monthSuccessRate4Class}">{monthSuccessRate4}</td>
+        <td class="{monthSuccessRate5Class}">{monthSuccessRate5}</td>
+        <td class="{monthSuccessRate6Class}">{monthSuccessRate6}</td>
+        <td class="{monthSuccessRate7Class}">{monthSuccessRate7}</td>
+        <td class="{monthSuccessRate8Class}">{monthSuccessRate8}</td>
+        <td class="{monthSuccessRate9Class}">{monthSuccessRate9}</td>
+        <td class="{monthSuccessRate10Class}">{monthSuccessRate10}</td>
+        <td class="{monthSuccessRate11Class}">{monthSuccessRate11}</td>
+        <td class="{monthSuccessRate12Class}">{monthSuccessRate12}</td>
+    </tr>
+    </tbody>
+</table>
+
 <h2>Out of date</h2>
 <table class="second-site-image"
        id="out-of-date"
@@ -158,7 +232,23 @@
     <!-- END suspendedBlock -->
     </tbody>
 </table>
-
+<h2>Excluded</h2>
+<table class="second-site-image" id="excluded" class="table-bordered" width="100%">
+    <thead>
+    <tr>
+        <th width="20%">Customer</th>
+        <th width="10%">Server</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN excludedBlock -->
+    <tr>
+        <td>{customerName}</td>
+        <td><a href="{urlServer}" target="_blank">{serverName}</a></td>
+    </tr>
+    <!-- END excludedBlock -->
+    </tbody>
+</table>
 <h2>Passed</h2>
 <table class="second-site-image"
        id="passed"

@@ -94,9 +94,7 @@ do {
     $customerName = $dbeCustomer->getValue(DBECustomer::name);
 
     $logger->info('Getting Office 365 Data for Customer: ' . $customerID . ' - ' . $customerName);
-
     // we have to pull from passwords.. the service 10
-
     $dbePassword = $buCustomer->getOffice365PasswordItem($customerID);
 
     if (!$dbePassword->rowCount) {
@@ -142,165 +140,51 @@ do {
         createFailedSR($dbeCustomer, $data['errorMessage'], $data['stackTrace'], $data['position']);
         continue;
     }
-// we are going to build an array from the data
-    $mailboxLimits = [];
-    $totalizationRow = [
-        "Total"         => "Total",
-        "TotalMailBox"  => 0,
-        "Empty"         => null,
-        "LicensedUsers" => 0
-    ];
 
-    if (!count($data)) {
-        $logger->warning('The customer does not have any licenses');
-        continue;
-    }
-
-    foreach ($data as $key => $datum) {
-        $values = [];
-        $mailboxLimit = null;
-        $licenseValue = null;
-        if ($datum['Licenses']) {
-            if (!is_array($datum['Licenses'])) {
-                $datum['Licenses'] = [
-                    $datum['Licenses']
-                ];
-            }
-            $licenseValue = implode(", ", $datum['Licenses']);
-
-            if ($licenseValue && strpos(
-                    strtolower($datum['DisplayName']),
-                    'leaver'
-                ) !== false && $datum['RecipientTypeDetails'] == 'SharedMailbox') {
-                $logger->warning('Raising a Customer Leaver with License SR');
-                raiseCustomerLeaverWithLicenseSR($dbeCustomer, $datum['DisplayName']);
-            }
-
-            foreach ($datum['Licenses'] as $license) {
-                $dbeOffice365Licenses->getRowForLicense($license);
-                if ($dbeOffice365Licenses->rowCount()) {
-                    $licenseValue = str_replace(
-                        $license,
-                        $dbeOffice365Licenses->getValue(DBEOffice365License::replacement),
-                        $licenseValue
-                    );
-                    if (!$mailboxLimit && $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit)) {
-                        $mailboxLimit = $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit);
-                    }
-                } else {
-                    $logger->warning('Raising a License not found SR');
-                    raiseCNCRequest($license, $dbeCustomer, $datum['DisplayName']);
-                }
-            }
-        }
-        $licensesArray = explode(", ", $licenseValue);
-        sort($licensesArray);
-        $licenseValue = implode(", ", $licensesArray);
-
-        switch ($data[$key]['RecipientTypeDetails']) {
-            case "SharedMailbox":
-                $data[$key]['RecipientTypeDetails'] = "Shared";
-                break;
-            case "UserMailbox":
-                $data[$key]['RecipientTypeDetails'] = "User";
-                break;
-            case 'RoomMailbox':
-                $data[$key]['RecipientTypeDetails'] = "Room";
-                break;
-        }
-
-        $data[$key]['Licenses'] = $licenseValue;
-        $data[$key]['IsLicensed'] = $data[$key]['IsLicensed'] ? 'Yes' : 'No';
-        $totalizationRow['TotalMailBox'] += $datum['TotalItemSize'];
-        $data[$key]['TotalItemSize'] = $datum['TotalItemSize'];
-        $totalizationRow['LicensedUsers'] += $datum['IsLicensed'];
-        if ($debugMode) {
-            $data[$key][] = $mailboxLimit;
-        }
-        $mailboxLimits[] = $mailboxLimit;
-    }
-
+    $mailboxes = $data['mailboxes'];
+    $licenses = $data['licenses'];
 
     $spreadsheet = new Spreadsheet();
     $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
     $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
-    $sheet = $spreadsheet->getActiveSheet();
-    $dateTime = new DateTime();
-    $sheet->fromArray(
-        [
-            "Display Name",
-            "Mailbox Size (MB)",
-            "Mailbox Type",
-            "Is Licensed",
-            "Licenses"
-        ],
-        null,
-        'A1'
-    );
-    $sheet->fromArray(
-        $data,
-        null,
-        'A2'
-    );
-    $highestRow = count($data) + 2;
-    $totalizationRow['LicensedUsers'] = "$totalizationRow[LicensedUsers] Licensed Users";
-    $sheet->fromArray(
-        $totalizationRow,
-        null,
-        'A' . $highestRow
-    );
-
-    $sheet->setCellValue(
-        "B$highestRow",
-        '=sum(B2:B' . ($highestRow - 1) . ')'
-    );
-    $sheet->setCellValue(
-        "D$highestRow",
-        '=countif(D2:D' . ($highestRow - 1) . ', "yes") & " Licensed Users"'
-    );
-
-    $sheet->fromArray(["Report generated at " . $dateTime->format("d-m-Y H:i:s")], null, 'A' . ($highestRow + 2));
-
-    $sheet->getStyle("A$highestRow:E$highestRow")->getFont()->setBold(true);
-
-    $sheet->getStyle("A1:E1")->getFont()->setBold(true);
-
-    $sheet->getStyle("A1:E$highestRow")->getAlignment()->setHorizontal('center');
-
-    for ($i = 0; $i < count($data); $i++) {
-        $currentRow = 2 + $i;
-
-        if ($mailboxLimits[$i]) {
-            $usage = $data[$i]['TotalItemSize'] / $mailboxLimits[$i] * 100;
-            $color = null;
-            if ($usage >= $dbeHeader->getValue(DBEHeader::office365MailboxYellowWarningThreshold)) {
-                $color = "FFFFEB9C";
-            }
-
-            if ($usage >= $dbeHeader->getValue(DBEHeader::office365MailboxRedWarningThreshold)) {
-                $color = "FFFFC7CE";
-            }
-
-            if ($color) {
-                $sheet->getStyle("A$currentRow:E$currentRow")
-                    ->getFill()
-                    ->setFillType(Fill::FILL_SOLID)
-                    ->getStartColor()
-                    ->setARGB($color);
-            }
+    if (count($mailboxes)) {
+        try {
+            processMailboxes(
+                $spreadsheet,
+                $mailboxes,
+                $logger,
+                $dbeCustomer,
+                $dbeOffice365Licenses,
+                $debugMode,
+                $dbeHeader
+            );
+        } catch (\Exception $exception) {
+            $logger->error('Failed to process mailboxes for customer: ' . $exception->getMessage());
         }
     }
 
-    $mailboxColumn = $sheet->getStyle("B2:B$highestRow");
-    $mailboxColumn->getNumberFormat()->setFormatCode("#,##0");
-    $mailboxColumn->getAlignment()->setHorizontal('right');
-
-
-    foreach (range('A', $sheet->getHighestDataColumn()) as $col) {
-        $sheet->getColumnDimension($col)
-            ->setAutoSize(true);
+    if (count($licenses)) {
+        try {
+            processLicenses(
+                $spreadsheet,
+                $licenses,
+                $logger,
+                $dbeCustomer,
+                $dbeOffice365Licenses,
+                $debugMode,
+                $dbeHeader
+            );
+        } catch (\Exception $exception) {
+            $logger->error('Failed to process licenses for customer: ' . $exception->getMessage());
+        }
     }
 
+    if (!count($mailboxes) && !count($licenses)) {
+        $logger->warning('This customer does not have a licences nor mailboxes');
+        continue;
+    }
+
+    $spreadsheet->removeSheetByIndex(0);
     $writer = new Xlsx($spreadsheet);
     $customerFolder = $buCustomer->getCustomerFolderPath($customerID);
     $folderName = $customerFolder . "\Review Meetings\\";
@@ -375,6 +259,332 @@ do {
         $logger->error('Failed to save file, possibly file open: ' . $exception->getMessage());
     }
 } while ($dbeCustomer->fetchNext());
+
+/**
+ * @param Spreadsheet $spreadSheet
+ * @param $mailboxes
+ * @param LoggerCLI $logger
+ * @param DBECustomer $dbeCustomer
+ * @param DBEOffice365License $dbeOffice365Licenses
+ * @param $debugMode
+ * @param DBEHeader|DataSet $dbeHeader
+ * @throws \PhpOffice\PhpSpreadsheet\Exception
+ */
+function processMailboxes(Spreadsheet $spreadSheet,
+                          $mailboxes,
+                          LoggerCLI $logger,
+                          DBECustomer $dbeCustomer,
+                          DBEOffice365License $dbeOffice365Licenses,
+                          $debugMode,
+                          $dbeHeader
+)
+{
+    $dateTime = new DateTime();
+    $mailboxLimits = [];
+    $totalizationRow = [
+        "Total"         => "Total",
+        "TotalMailBox"  => 0,
+        "Empty"         => null,
+        "LicensedUsers" => 0
+    ];
+
+    foreach ($mailboxes as $key => $datum) {
+        $mailboxLimit = null;
+        $licenseValue = null;
+        if ($datum['Licenses']) {
+            if (!is_array($datum['Licenses'])) {
+                $datum['Licenses'] = explode(" ", $datum['Licenses']);
+            }
+            $licenseValue = implode(", ", $datum['Licenses']);
+
+            if ($licenseValue && strpos(
+                    strtolower($datum['DisplayName']),
+                    'leaver'
+                ) !== false && $datum['RecipientTypeDetails'] == 'SharedMailbox') {
+                $logger->warning('Raising a Customer Leaver with License SR while processing Mailboxes');
+                raiseCustomerLeaverWithLicenseSR($dbeCustomer, $datum['DisplayName']);
+            }
+
+            foreach ($datum['Licenses'] as $license) {
+                $dbeOffice365Licenses->getRowForLicense($license);
+                if ($dbeOffice365Licenses->rowCount()) {
+                    $licenseValue = str_replace(
+                        $license,
+                        $dbeOffice365Licenses->getValue(DBEOffice365License::replacement),
+                        $licenseValue
+                    );
+                    if (!$mailboxLimit && $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit)) {
+                        $mailboxLimit = $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit);
+                    }
+                } else {
+                    $logger->warning('Raising a License not found SR while processing Mailboxes:' . $license);
+                    raiseCNCRequest($license, $dbeCustomer, $datum['DisplayName']);
+                }
+            }
+        }
+        $licensesArray = explode(", ", $licenseValue);
+        sort($licensesArray);
+        $licenseValue = implode(", ", $licensesArray);
+
+        switch ($mailboxes[$key]['RecipientTypeDetails']) {
+            case "SharedMailbox":
+                $mailboxes[$key]['RecipientTypeDetails'] = "Shared";
+                break;
+            case "UserMailbox":
+                $mailboxes[$key]['RecipientTypeDetails'] = "User";
+                break;
+            case 'RoomMailbox':
+                $mailboxes[$key]['RecipientTypeDetails'] = "Room";
+                break;
+        }
+
+        $mailboxes[$key]['Licenses'] = $licenseValue;
+        $mailboxes[$key]['IsLicensed'] = $mailboxes[$key]['IsLicensed'] ? 'Yes' : 'No';
+        $totalizationRow['TotalMailBox'] += $datum['TotalItemSize'];
+        $mailboxes[$key]['TotalItemSize'] = $datum['TotalItemSize'];
+        $totalizationRow['LicensedUsers'] += $datum['IsLicensed'];
+        if ($debugMode) {
+            $mailboxes[$key][] = $mailboxLimit;
+        }
+        $mailboxLimits[] = $mailboxLimit;
+    }
+
+    $mailboxesSheet = $spreadSheet->createSheet();
+    $mailboxesSheet->setTitle('Mailboxes');
+    $mailboxesSheet->fromArray(
+        [
+            "Display Name",
+            "Mailbox Size (MB)",
+            "Mailbox Type",
+            "Is Licensed",
+            "Licenses"
+        ],
+        null,
+        'A1'
+    );
+    $mailboxesSheet->fromArray(
+        $mailboxes,
+        null,
+        'A2'
+    );
+    $highestRow = count($mailboxes) + 2;
+    $totalizationRow['LicensedUsers'] = "$totalizationRow[LicensedUsers] Licensed Users";
+    $mailboxesSheet->fromArray(
+        $totalizationRow,
+        null,
+        'A' . $highestRow
+    );
+
+    $mailboxesSheet->setCellValue(
+        "B$highestRow",
+        '=sum(B2:B' . ($highestRow - 1) . ')'
+    );
+    $mailboxesSheet->setCellValue(
+        "D$highestRow",
+        '=countif(D2:D' . ($highestRow - 1) . ', "yes") & " Licensed Users"'
+    );
+
+    $mailboxesSheet->fromArray(
+        ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
+        null,
+        'A' . ($highestRow + 2)
+    );
+
+    $mailboxesSheet->getStyle("A$highestRow:E$highestRow")->getFont()->setBold(true);
+
+    $mailboxesSheet->getStyle("A1:E1")->getFont()->setBold(true);
+
+    $mailboxesSheet->getStyle("A1:E$highestRow")->getAlignment()->setHorizontal('center');
+
+    for ($i = 0; $i < count($mailboxes); $i++) {
+        $currentRow = 2 + $i;
+
+        if ($mailboxLimits[$i]) {
+            $usage = $mailboxes[$i]['TotalItemSize'] / $mailboxLimits[$i] * 100;
+            $color = null;
+            if ($usage >= $dbeHeader->getValue(DBEHeader::office365MailboxYellowWarningThreshold)) {
+                $color = "FFFFEB9C";
+            }
+
+            if ($usage >= $dbeHeader->getValue(DBEHeader::office365MailboxRedWarningThreshold)) {
+                $color = "FFFFC7CE";
+            }
+
+            if ($color) {
+                $mailboxesSheet->getStyle("A$currentRow:E$currentRow")
+                    ->getFill()
+                    ->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()
+                    ->setARGB($color);
+            }
+        }
+    }
+
+    $mailboxColumn = $mailboxesSheet->getStyle("B2:B$highestRow");
+    $mailboxColumn->getNumberFormat()->setFormatCode("#,##0");
+    $mailboxColumn->getAlignment()->setHorizontal('right');
+
+
+    foreach (range('A', $mailboxesSheet->getHighestDataColumn()) as $col) {
+        $mailboxesSheet->getColumnDimension($col)
+            ->setAutoSize(true);
+    }
+}
+
+/**
+ * @param Spreadsheet $spreadSheet
+ * @param $licenses
+ * @param LoggerCLI $logger
+ * @param DBECustomer $dbeCustomer
+ * @param DBEOffice365License $dbeOffice365Licenses
+ * @param $debugMode
+ * @param DBEHeader|DataSet $dbeHeader
+ * @throws \PhpOffice\PhpSpreadsheet\Exception
+ */
+function processLicenses(Spreadsheet $spreadSheet,
+                         $licenses,
+                         LoggerCLI $logger,
+                         DBECustomer $dbeCustomer,
+                         DBEOffice365License $dbeOffice365Licenses,
+                         $debugMode,
+                         $dbeHeader
+)
+{
+    $thing = null;
+    if (!$licenses || !count($licenses)) {
+        return;
+    }
+    $dateTime = new DateTime();
+    $sparedLicenseErrors = [];
+    foreach ($licenses as $key => $datum) {
+
+        $dbeOffice365Licenses->getRowForLicense($datum['AccountSkuId']);
+        if ($dbeOffice365Licenses->rowCount()) {
+            $licenses[$key]['AccountSkuId'] = str_replace(
+                $datum['AccountSkuId'],
+                $dbeOffice365Licenses->getValue(DBEOffice365License::replacement),
+                $datum['AccountSkuId']
+            );
+            if ($dbeOffice365Licenses->getValue(DBEOffice365License::reportOnSpareLicenses) && $datum['Unallocated']) {
+                $sparedLicenseErrors[] = [
+                    "licenseName" => $licenses[$key]['AccountSkuId'],
+                    "quantity"    => $datum['Unallocated']
+                ];
+            }
+        } else {
+            $logger->warning('Raising a License not found SR while processing Licenses');
+            raiseCNCRequest($datum['AccountSkuId'], $dbeCustomer);
+        }
+    }
+
+    if (count($sparedLicenseErrors)) {
+        // we have found some spared licenses errors...lets send an email to inform about this
+        $buMail = new BUMail($thing);
+
+
+        $template = new Template (
+            EMAIL_TEMPLATE_DIR,
+            "remove"
+        );
+
+        $template->set_file(
+            array(
+                'page' => 'SpareLicensesEmail.html',
+            )
+        );
+
+        $template->set_block('page', 'licensesBlock', 'licenses');
+        $template->setVar(
+            [
+                "customerName" => $dbeCustomer->getValue(DBECustomer::name)
+            ]
+        );
+        foreach ($sparedLicenseErrors as $licenseError) {
+            $template->setVar(
+                [
+                    "licenseName" => $licenseError['licenseName'],
+                    "quantity"    => $licenseError['quantity'],
+                ]
+            );
+            $template->parse("licenses", 'licensesBlock', true);
+        }
+
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
+
+        $body = $template->get_var('output');
+
+        $subject = "Unallocated O365 licenses for customer " . $dbeCustomer->getValue(DBECustomer::name);
+        $emailTo = CONFIG_SALES_EMAIL;
+
+        $hdrs = array(
+            'From'         => CONFIG_SUPPORT_EMAIL,
+            'To'           => $emailTo,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $mime = new Mail_mime();
+
+        $mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+
+        $body = $mime->get($mime_params);
+
+        $hdrs = $mime->headers($hdrs);
+
+
+        $buMail->putInQueue(
+            CONFIG_SUPPORT_EMAIL,
+            "O365sparelicenses@cnc-ltd.co.uk",
+            $hdrs,
+            $body
+        );
+
+    }
+
+    $licensesSheet = $spreadSheet->createSheet();
+    $licensesSheet->setTitle('Licenses');
+
+    $licensesSheet->fromArray(
+        [
+            "License Name",
+            "Number of Licenses",
+            "Number of Unallocated Licenses"
+        ],
+        null,
+        'A1'
+    );
+    $licensesSheet->fromArray(
+        $licenses,
+        null,
+        'A2'
+    );
+    $highestRow = count($licenses) + 2;
+    $licensesSheet->fromArray(
+        ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
+        null,
+        'A' . ($highestRow + 1)
+    );
+    $highestCol = $licensesSheet->getHighestDataColumn();
+    $licensesSheet->getStyle("A$highestRow:$highestCol$highestRow")->getFont()->setBold(true);
+    $licensesSheet->getStyle("A1:" . $highestCol . "1")->getFont()->setBold(true);
+    $licensesSheet->getStyle("A1:$highestCol$highestRow")->getAlignment()->setHorizontal('center');
+    foreach (range('A', $licensesSheet->getHighestDataColumn()) as $col) {
+        $licensesSheet->getColumnDimension($col)
+            ->setAutoSize(true);
+    }
+}
 
 /**
  * @param DBECustomer $dbeCustomer
@@ -661,7 +871,7 @@ function createFailedSR(DBECustomer $dbeCustomer, $errorMsg, $stackTrace = null,
     $dbeCallActivity->insertRow();
 }
 
-function raiseCNCRequest($license, DBECustomer $dbeCustomer, $licenseUser)
+function raiseCNCRequest($license, DBECustomer $dbeCustomer, $licenseUser = null)
 {
     $customerID = 282;
     $buActivity = new BUActivity($thing);
@@ -774,7 +984,9 @@ function raiseCNCRequest($license, DBECustomer $dbeCustomer, $licenseUser)
         'N'
     );
 
-    $details = "<p>License $license was not found for customer " . $dbeCustomer->getValue(DBECustomer::name) . " which is assigned to user $licenseUser.</p>
+    $details = "<p>License $license was not found for customer " . $dbeCustomer->getValue(
+            DBECustomer::name
+        ) . ($licenseUser ? " which is assigned to user $licenseUser." : '') . "</p>
 <p>Please add this license within CNCAPPS and rerun the license export process for this customer</p>";
 
     $dbeCallActivity->setValue(

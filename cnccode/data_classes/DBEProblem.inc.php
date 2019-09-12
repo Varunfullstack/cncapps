@@ -388,4 +388,18 @@ class DBEProblem extends DBEntity
 
         return parent::getRows();
     }
+
+    public function getToCheckCriticalFlagSRs()
+    {
+        $this->setQueryString(
+
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(self::status) . " in ('I','P') AND " . $this->getDBColumnName(
+                self::priority
+            ) . " in (1,2,3)"
+        );
+
+        return parent::getRows();
+    }
 }

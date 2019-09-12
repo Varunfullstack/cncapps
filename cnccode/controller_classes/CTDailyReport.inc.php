@@ -53,7 +53,7 @@ class CTDailyReport extends CTCNC
         switch ($this->getAction()) {
 
             case 'fixedIncidents' :
-                $this->buDailyReport->fixedIncidents($this->daysAgo);
+                $this->buDailyReport->fixedIncidents($this->daysAgo, true);
                 break;
             case 'focActivities' :
                 $this->buDailyReport->focActivities($this->daysAgo);
@@ -64,12 +64,16 @@ class CTDailyReport extends CTCNC
             case 'outstandingIncidents' :
                 $onScreen = isset($_GET['onScreen']);
                 $dashboard = isset($_GET['dashboard']);
+                $generateLog = isset($_GET['generateLog']);
+                $selectedYear = isset($_GET['selectedYear']) ? $_GET['selectedYear'] : null;
 
                 $html = $this->buDailyReport->outstandingIncidents(
                     $this->daysAgo,
                     null,
                     $onScreen,
-                    $dashboard
+                    $dashboard,
+                    $generateLog,
+                    $selectedYear
                 );
 
                 if ($dashboard) {
@@ -108,6 +112,40 @@ class CTDailyReport extends CTCNC
                 break;
             case 'contactOpenSRReport':
                 $this->buDailyReport->contactOpenSRReport();
+                break;
+            case 'outstandingReportAvailableYears':
+                echo json_encode($this->buDailyReport->getOutstandingReportAvailableYears(), JSON_NUMERIC_CHECK);
+                break;
+            case 'outstandingReportPerformanceDataForYear':
+                if (!isset($_REQUEST['year'])) {
+                    throw new Exception('Year is missing');
+                }
+                echo json_encode(
+                    $this->buDailyReport->getOutstandingReportPerformanceDataForYear($_REQUEST['year']),
+                    JSON_NUMERIC_CHECK
+                );
+                break;
+            case 'showGraphs':
+                $this->setTemplateFiles(['graphs' => 'SevenDayersGraphs']);
+                $this->template->parse(
+                    'CONTENTS',
+                    'graphs',
+                    true
+                );
+                $this->parsePage();
+
+                break;
+            case 'outstandingReportPerformanceDataBetweenDates':
+                if (!isset($_REQUEST['startDate']) || !isset($_REQUEST['endDate'])) {
+                    throw new Exception('startDate and endDate are mandatory fields');
+                }
+                $startDate = new DateTime($_REQUEST['startDate']);
+                $endDate = new DateTime($_REQUEST['endDate']);
+
+                echo json_encode(
+                    $this->buDailyReport->getOutstandingReportPerformanceDataBetweenDates($startDate, $endDate),
+                    JSON_NUMERIC_CHECK
+                );
                 break;
             default :
                 break;

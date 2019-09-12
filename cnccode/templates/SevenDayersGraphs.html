@@ -1,0 +1,127 @@
+<script type="text/javascript"
+        src="https://www.gstatic.com/charts/loader.js"
+></script>
+<script type="text/javascript">
+    let startDate = moment().subtract(6, 'months');
+    let endDate = moment();
+
+    const currentURL = new URL(location.href);
+
+    if (currentURL.searchParams.get('startDate')) {
+        startDate = moment(currentURL.searchParams.get('startDate'), 'YYYY-MM-DD');
+    }
+
+    if (currentURL.searchParams.get('endDate')) {
+        endDate = moment(currentURL.searchParams.get('endDate'), 'YYYY-MM-DD');
+    }
+
+    $(() => {
+        $('#startDate').val(startDate.format('DD/MM/YYYY'));
+        $('#endDate').val(endDate.format('DD/MM/YYYY'));
+    })
+
+    if (!window.googleChartsLoaded) {
+        google.charts.load('current', {'packages': ['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+        window.googleChartsLoaded = true;
+    }
+
+    function changeDates() {
+        startDate = moment($('#startDate').val(), 'DD/MM/YYYY');
+        endDate = moment($('#endDate').val(), 'DD/MM/YYYY');
+        currentURL.searchParams.set('startDate', startDate.format('YYYY-MM-DD'));
+        currentURL.searchParams.set('endDate', endDate.format('YYYY-MM-DD'));
+        window.history.pushState({path: currentURL.toString()}, '', currentURL.toString());
+        drawChart();
+    }
+
+    function fetchPerformanceDataForYear(startDate, endDate) {
+        return $.ajax({
+            url: '?action=outstandingReportPerformanceDataBetweenDates',
+            method: 'POST',
+            data: {startDate: startDate.format('YYYY-MM-DD'), endDate: endDate.format('YYYY-MM-DD')},
+            dataType: 'JSON'
+        });
+    }
+
+    function drawChart() {
+
+        // we have to pull fresh data
+        fetchPerformanceDataForYear(startDate, endDate).then(data => {
+            const visualizationData = new google.visualization.DataTable();
+            visualizationData.addColumn('date', 'Date');
+            visualizationData.addColumn('number', 'Older Than 7 Days');
+            visualizationData.addColumn('number', 'Average Age Days');
+            visualizationData.addColumn('number', 'Total Closed SRs');
+            visualizationData.addColumn('number', 'Older Than 7 Days Target');
+            visualizationData.addRows(data.map(item => {
+                return [
+                    moment(item.date).toDate(),
+                    item.olderThan7Days,
+                    item.averageAgeDays,
+                    item.totalClosedSRs,
+                    item.target
+                ]
+            }));
+            const options = {
+                title: 'Service Request Closures and 7 Dayers',
+                legend: {position: 'right'},
+                height: 500,
+                width: 1000,
+                trendlines: {
+                    0: {
+                        labelInLegend: "Older than 7 Days Trend",
+                        visibleInLegend: true,
+                        lineWidth: 1,
+                    },
+                    2: {
+                        labelInLegend: 'Total Closed SRs Trend',
+                        visibleInLegend: true,
+                        lineWidth: 1,
+                    }
+                }
+            };
+            const chart = new google.visualization.LineChart(document.getElementById('chart'));
+            chart.draw(visualizationData, options);
+        });
+    }
+</script>
+
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <label>Start Date:</label>
+        </td>
+        <td>
+            <input type="text"
+                   name="startDate"
+                   id="startDate"
+                   size="10"
+                   maxlength="10"
+                   autocomplete="off"
+                   class="jQueryCalendar"
+                   onchange="changeDates()"
+            >
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>End Date:</label>
+        </td>
+        <td>
+            <input type="text"
+                   name="endDate"
+                   id="endDate"
+                   size="10"
+                   maxlength="10"
+                   autocomplete="off"
+                   class="jQueryCalendar"
+                   onchange="changeDates()"
+            >
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div id="chart"></div>

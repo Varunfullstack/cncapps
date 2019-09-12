@@ -7,7 +7,7 @@ class CTSecondSite extends CTCNC
 {
     /** @var DSForm */
     public $dsSecondsiteImage;
-    /** @var buSecondsite */
+    /** @var BUSecondsite */
     public $buSecondsite;
 
     function __construct($requestMethod,
@@ -247,6 +247,7 @@ class CTSecondSite extends CTCNC
         $badConfig = $this->buSecondsite->getImagesByStatus(BUSecondsite::STATUS_BAD_CONFIG);
 
         $passed = $this->buSecondsite->getImagesByStatus(BUSecondsite::STATUS_PASSED);
+        $excluded = $this->buSecondsite->getImagesByStatus(BUSecondsite::STATUS_EXCLUDED);
 
         $this->setPageTitle('Offsite Backup Status');
 
@@ -496,6 +497,31 @@ class CTSecondSite extends CTCNC
 
         $this->template->setBlock(
             'SecondsiteList',
+            'excludedBlock',
+            'excluded'
+        );
+
+        foreach ($excluded as $record) {
+
+            $this->template->set_var(
+
+                array(
+                    'urlServer'    => $this->getEditUrl($record['server_cuino']),
+                    'customerName' => $record['cus_name'],
+                    'serverName'   => $record['serverName'],
+                )
+            );
+
+            $this->template->parse(
+                'excluded',
+                'excludedBlock',
+                true
+            );
+        }
+
+
+        $this->template->setBlock(
+            'SecondsiteList',
             'passedBlock',
             'passed'
         );
@@ -540,7 +566,7 @@ class CTSecondSite extends CTCNC
         $this->parsePage();
     }
 
-    private function validateAndRound($value)
+    protected function validateAndRound($value)
     {
         if (!is_numeric($value)) {
             return $value;

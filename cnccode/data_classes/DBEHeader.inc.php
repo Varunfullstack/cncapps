@@ -28,27 +28,17 @@ class DBEHeader extends DBEntity
     const gscItemID = "gscItemID";
     const portalPin = "portalPin";
     const portal24HourPin = "portal24HourPin";
-    const mailshot1FlagDef = "mailshot1FlagDef";
     const mailshot2FlagDef = "mailshot2FlagDef";
     const mailshot3FlagDef = "mailshot3FlagDef";
     const mailshot4FlagDef = "mailshot4FlagDef";
-    const mailshot5FlagDef = "mailshot5FlagDef";
-    const mailshot6FlagDef = "mailshot6FlagDef";
-    const mailshot7FlagDef = "mailshot7FlagDef";
     const mailshot8FlagDef = "mailshot8FlagDef";
     const mailshot9FlagDef = "mailshot9FlagDef";
-    const mailshot10FlagDef = "mailshot10FlagDef";
     const mailshot11FlagDef = "mailshot11FlagDef";
-    const mailshot1FlagDesc = "mailshot1FlagDesc";
     const mailshot2FlagDesc = "mailshot2FlagDesc";
     const mailshot3FlagDesc = "mailshot3FlagDesc";
     const mailshot4FlagDesc = "mailshot4FlagDesc";
-    const mailshot5FlagDesc = "mailshot5FlagDesc";
-    const mailshot6FlagDesc = "mailshot6FlagDesc";
-    const mailshot7FlagDesc = "mailshot7FlagDesc";
     const mailshot8FlagDesc = "mailshot8FlagDesc";
     const mailshot9FlagDesc = "mailshot9FlagDesc";
-    const mailshot10FlagDesc = "mailshot10FlagDesc";
     const mailshot11FlagDesc = "mailshot11FlagDesc";
     const hourlyLabourCost = "hourlyLabourCost";
     const highActivityAlertCount = "highActivityAlertCount";
@@ -80,6 +70,7 @@ class DBEHeader extends DBEntity
     const RemoteSupportMinWarnHours = "RemoteSupportMinWarnHours";
     const ImplementationTeamMinutesInADay = "imTeamMinutesInADay";
     const backupTargetSuccessRate = "backupTargetSuccessRate";
+    const backupReplicationTargetSuccessRate = "backupReplicationTargetSuccessRate";
     const customerReviewMeetingText = "customerReviewMeetingText";
     const serviceDeskNotification24hBegin = "serviceDeskNotification24hBegin";
     const serviceDeskNotification24hEnd = "serviceDeskNotification24hEnd";
@@ -94,6 +85,10 @@ class DBEHeader extends DBEntity
     const sevenDayerRedDays = "sevenDayerRedDays";
     const office365MailboxYellowWarningThreshold = "office365MailboxYellowWarningThreshold";
     const office365MailboxRedWarningThreshold = "office365MailboxRedWarningThreshold";
+    const autoCriticalP1Hours = "autoCriticalP1Hours";
+    const autoCriticalP2Hours = "autoCriticalP2Hours";
+    const autoCriticalP3Hours = "autoCriticalP3Hours";
+    const sevenDayerTarget = "sevenDayerTarget";
 
     /**
      * calls constructor()
@@ -484,6 +479,11 @@ class DBEHeader extends DBEntity
             "hed_backup_target_success_rate"
         );
         $this->addColumn(
+            self::backupReplicationTargetSuccessRate,
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
             self::customerReviewMeetingText,
             DA_STRING,
             DA_ALLOW_NULL,
@@ -556,7 +556,11 @@ class DBEHeader extends DBEntity
         );
 
         $this->addColumn(self::sevenDayerAmberDays, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::sevenDayerTarget, DA_INTEGER, DA_NOT_NULL);
         $this->addColumn(self::sevenDayerRedDays, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::autoCriticalP1Hours, DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn(self::autoCriticalP2Hours, DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn(self::autoCriticalP3Hours, DA_FLOAT, DA_NOT_NULL);
 
         $this->setPK(0);
         $this->setAddColumnsOff();

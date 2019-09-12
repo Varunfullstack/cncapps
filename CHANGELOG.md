@@ -1,6 +1,17 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.6.0] - 2019-09-12
+### Added
+- Allow Monitor / Critical SR at the point of logging
+### Changed
+- Issue 649 - Offsite Backup Replication Checks Enhancements
+- Issue 641 - Office 365 License Export v2
+- Issue 488 - Consider all SRs that are P1-P3 as critical once time is over XX hours.
+- Issue 644 - Quote Reminder Tweaking
+- Issue 627 - SD Manager P5 team filtering
+- Issue 646 - 7 dayer targets
+
 ## [v3.5.3] - 2019-09-09
 ### Fixed
 - Issue with skip sales order in Activity.php when the SR is not related to a contract

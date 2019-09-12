@@ -1,0 +1,46 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="1567671159-0">
+        <tagDatabase tag="issue488"/>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="1567671159-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="autoCriticalP1Hours"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="autoCriticalP1Hours" type="decimal(5,2)" defaultValue="3.0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1567671159-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="autoCriticalP2Hours"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="autoCriticalP2Hours" type="decimal(5,2)" defaultValue="3.0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="1567671159-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="autoCriticalP3Hours"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="autoCriticalP3Hours" type="decimal(5,2)" defaultValue="3.0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

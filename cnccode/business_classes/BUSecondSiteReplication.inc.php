@@ -91,7 +91,6 @@ class BUSecondsiteReplication extends BUSecondsite
                             self::STATUS_BAD_CONFIG
                         );
                     }
-
                 } else {
 
                     $networkPath = $server['secondSiteReplicationPath'];
@@ -112,6 +111,16 @@ class BUSecondsiteReplication extends BUSecondsite
                                 $server['server_cuino'],
                                 self::STATUS_SERVER_NOT_FOUND
                             );
+
+                            if (!$customerItemID && !$testRun) {
+                                $this->getActivityModel()->raiseSecondSiteLocationNotFoundRequest(
+                                    $server['custno'],
+                                    $server['serverName'],
+                                    $server['server_cuino'],
+                                    $server['cui_cuino'],
+                                    $networkPath
+                                );
+                            }
                         }
                     }
                 }
@@ -281,106 +290,95 @@ class BUSecondsiteReplication extends BUSecondsite
 
                     }
 
+
                 }// end drives
 
                 if ($allServerImagesPassed) {
                     $this->resetSuspendedUntilDate($server['server_cuino']);
                 }
+
+                if (!$isSuspended && count($missingImages) > 0 && !$customerItemID && !$testRun) {
+
+                    $this->getActivityModel()->raiseSecondSiteMissingImageRequest(
+                        $server['custno'],
+                        $server['serverName'],
+                        $server['server_cuino'],
+                        $server['cui_cuino'],
+                        $missingLetters,
+                        $missingImages
+                    );
+
+                }
+
             } // if not error
 
         } // end foreach contracts
-    }
 
+        if (!$customerItemID && !$testRun) {
+            /** @var dbSweetcode $db */
+            $db = $GLOBALS['db'];
 
-    function setImageStatus($secondSiteImageID,
-                            $status,
-                            $imagePath = null,
-                            $imageTime = null
-    )
-    {
+            //check if we have already stored information for today
+            $query = "SELECT created_at FROM backup_performance_log WHERE created_at = date(now()) and isReplication";
 
-        $queryString =
-            "UPDATE
-        secondsite_image 
-      SET
-        replicationStatus = ?,
-        replicationImagePath = ?,
-        replicationImageTime = ?
-      WHERE
-        secondSiteImageID = ?";
-        /** @var dbSweetcode $db */
-        $db = $GLOBALS['db'];
+            $db->query($query);
+            $db->next_record();
+            $data = $db->Record;
 
-        $db->preparedQuery(
-            $queryString,
-            [
+            if ($data['created_at']) {
+                return;
+            }
+
+            $query = "INSERT INTO backup_performance_log (
+                      created_at,
+                      servers,
+                      images,
+                      server_errors,
+                      image_errors,
+                      suspended_servers,
+                      passes,
+                      success_rate,
+                      isReplication
+                    ) VALUES (now(), ?, ?, ?, ?, ?, ?, ?, 1)";
+            $db->preparedQuery(
+                $query,
                 [
-                    'type'  => "s",
-                    'value' => $status
-                ],
-                [
-                    'type'  => "s",
-                    'value' => $imagePath
-                ],
-                [
-                    'type'  => "s",
-                    'value' => $imageTime
-                ],
-                [
-                    'type'  => "i",
-                    'value' => $secondSiteImageID
-                ],
-            ]
-        );
-    }
+                    [
+                        "type"  => "i",
+                        "value" => $this->serverCount
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $this->imageCount
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $this->serverErrorCount,
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $this->imageErrorCount,
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $this->suspendedServerCount,
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $this->imagePassesCount,
+                    ],
+                    [
+                        "type"  => "d",
+                        "value" => $this->imageCount ? ($this->imagePassesCount / $this->imageCount) * 100 : 0
+                    ]
 
-    function setImageStatusByServer($customerItemID,
-                                    $status
-    )
-    {
-        $queryString =
-            "UPDATE
-        secondsite_image 
-      SET
-        replicationStatus = '$status'
-      WHERE
-        customerItemID = $customerItemID";
+                ]
+            );
 
-        $db = $GLOBALS['db'];
-
-        $db->query($queryString);
-    }
-
-    /*
-    Get second site images by server
-    */
-    public function getImagesByServer($customerItemID)
-    {
-        $queryString =
-            "SELECT
-        secondSiteImageID,
-        imageName,
-        replicationStatus
-      FROM
-        secondsite_image
-      WHERE
-        customerItemID = $customerItemID";
-
-        $db = $GLOBALS['db'];
-
-        $db->query($queryString);
-
-        $images = array();
-        while ($db->next_record()) {
-            $images[] = $db->Record;
         }
 
-        return $images;
     }
 
-    /*
-    Get second site images by status
-    */
     public function getServers($customerItemID = false)
     {
         $queryString =
@@ -431,6 +429,97 @@ class BUSecondsiteReplication extends BUSecondsite
         return $servers;
     }
 
+    public function getImagesByServer($customerItemID)
+    {
+        $queryString =
+            "SELECT
+        secondSiteImageID,
+        imageName,
+        replicationStatus
+      FROM
+        secondsite_image
+      WHERE
+        customerItemID = $customerItemID";
+
+        $db = $GLOBALS['db'];
+
+        $db->query($queryString);
+
+        $images = array();
+        while ($db->next_record()) {
+            $images[] = $db->Record;
+        }
+
+        return $images;
+    }
+
+    /*
+    Get second site images by server
+    */
+
+    function setImageStatusByServer($customerItemID,
+                                    $status
+    )
+    {
+        $queryString =
+            "UPDATE
+        secondsite_image 
+      SET
+        replicationStatus = '$status'
+      WHERE
+        customerItemID = $customerItemID";
+
+        $db = $GLOBALS['db'];
+
+        $db->query($queryString);
+    }
+
+    /*
+    Get second site images by status
+    */
+
+    function setImageStatus($secondSiteImageID,
+                            $status,
+                            $imagePath = null,
+                            $imageTime = null
+    )
+    {
+
+        $queryString =
+            "UPDATE
+        secondsite_image 
+      SET
+        replicationStatus = ?,
+        replicationImagePath = ?,
+        replicationImageTime = ?
+      WHERE
+        secondSiteImageID = ?";
+        /** @var dbSweetcode $db */
+        $db = $GLOBALS['db'];
+
+        $db->preparedQuery(
+            $queryString,
+            [
+                [
+                    'type'  => "s",
+                    'value' => $status
+                ],
+                [
+                    'type'  => "s",
+                    'value' => $imagePath
+                ],
+                [
+                    'type'  => "s",
+                    'value' => $imageTime
+                ],
+                [
+                    'type'  => "i",
+                    'value' => $secondSiteImageID
+                ],
+            ]
+        );
+    }
+
     function getImagesByStatus($status)
     {
         $queryString =
@@ -458,13 +547,16 @@ class BUSecondsiteReplication extends BUSecondsite
         JOIN custitem ser ON ser.cui_cuino = custitem_contract.cic_cuino
         JOIN item i ON i.itm_itemno = ci.cui_itemno
         JOIN secondsite_image ssi ON ssi.customerItemID = ser.cui_cuino
-
       WHERE
         i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")
-        AND ci.declinedFlag <> 'Y'
-        AND replicationStatus = '$status'
-        and ser.secondSiteReplicationExcludeFlag <> 'Y'      
-      ORDER BY c.cus_name, serverName, ssi.imageName";
+        AND ci.declinedFlag <> 'Y'";
+
+        if ($status === self::STATUS_EXCLUDED) {
+            $queryString .= " AND ser.secondSiteReplicationExcludeFlag = 'Y' group by serverName ";
+        } else {
+            $queryString .= " AND ser.secondSiteReplicationExcludeFlag <> 'Y' AND replicationStatus = '$status' ";
+        }
+        $queryString .= " ORDER BY c.cus_name, serverName, ssi.imageName";
 
         $db = $GLOBALS['db'];
 
@@ -478,4 +570,45 @@ class BUSecondsiteReplication extends BUSecondsite
         return $images;
 
     }
+
+    function getPerformanceDataForYear($year = null)
+    {
+
+        if (!$year) {
+            $year = date("Y");
+        }
+
+        $query = "SELECT SUM(passes)/ SUM(images) as successRate, MONTH FROM (
+            SELECT MONTH(created_at) AS MONTH, images, passes FROM backup_performance_log WHERE YEAR(created_at) = '$year' and isReplication
+) t GROUP BY t.month";
+
+        $result = $this->db->query($query);
+
+        $data = [
+        ];
+
+        for ($i = 0; $i < 12; $i++) {
+            $data[$i + 1] = "N/A";
+        }
+
+        while ($row = $result->fetch_assoc()) {
+            $data[$row['MONTH']] = $row['successRate'] * 100;
+        }
+
+        return $data;
+    }
+
+    function getPerformanceDataAvailableYears()
+    {
+        $query = "SELECT  DISTINCT YEAR(created_at) AS YEAR  FROM    backup_performance_log where isReplication";
+        $result = $this->db->query($query);
+
+        return array_map(
+            function ($item) {
+                return $item[0];
+            },
+            $result->fetch_all()
+        );
+    }
+
 }

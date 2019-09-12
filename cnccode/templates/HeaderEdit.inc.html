@@ -703,6 +703,52 @@
             > <span class="formErrorMessage">{remoteSupportWarnMinHoursMessage}</span></td>
         </tr>
 
+
+        <tr>
+            <td class="promptText">Auto critical P1 after XX hours</td>
+            <td class="field">
+                <input {DISABLED}
+                       required
+                       type="number"
+                       title="SR Chargeable hours after which consider SR as critical"
+                       name="header[1][autoCriticalP1Hours]"
+                       value="{autoCriticalP1Hours}"
+                       size="5"
+                       maxlength="5"
+                       step="0.01"
+                > <span class="formErrorMessage">{autoCriticalP1HoursMessage}</span></td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Auto critical P2 after XX hours</td>
+            <td class="field">
+                <input {DISABLED}
+                       required
+                       type="number"
+                       title="SR Chargeable hours after which consider SR as critical"
+                       name="header[1][autoCriticalP2Hours]"
+                       value="{autoCriticalP2Hours}"
+                       size="5"
+                       maxlength="5"
+                       step="0.01"
+                > <span class="formErrorMessage">{autoCriticalP2HoursMessage}</span></td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Auto critical P3 after XX hours</td>
+            <td class="field">
+                <input {DISABLED}
+                       required
+                       type="number"
+                       title="SR Chargeable hours after which consider SR as critical"
+                       name="header[1][autoCriticalP3Hours]"
+                       value="{autoCriticalP3Hours}"
+                       size="5"
+                       maxlength="5"
+                       step="0.01"
+                > <span class="formErrorMessage">{autoCriticalP3HoursMessage}</span></td>
+        </tr>
+
         <tr>
             <td class="promptText">Allowed client IP pattern</td>
             <td class="inputText">
@@ -732,6 +778,21 @@
                         maxlength="5"
                         required
                 > <span class="formErrorMessage">{backupTargetSuccessRateMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Backup Replication target success rate</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][backupReplicationTargetSuccessRate]"
+                        value="{backupReplicationTargetSuccessRate}"
+                        title="The target % rate of success for backup replication"
+                        size="5"
+                        maxlength="5"
+                        required
+                > <span class="formErrorMessage">{backupReplicationTargetSuccessRateMessage}</span>
             </td>
         </tr>
         <tr>
@@ -773,6 +834,19 @@
                 <span class="formErrorMessage">{OSSupportDatesThresholdDaysMessage}</span>
             </td>
         </tr>
+        <tr>
+            <td class="promptText">7 Day Target</td>
+            <td class="inputText">
+                <input {DISABLED}
+                       type="number"
+                       name="header[1][sevenDayerTarget]"
+                       value="{sevenDayerTarget}"
+                       title="7 Day Target"
+                       required
+                >
+                <span class="formErrorMessage">{sevenDayerTargetMessage}</span>
+            </td>
+        </tr>
          <tr>
             <td class="promptText">7 Dayer Amber Days</td>
             <td class="inputText">
@@ -786,7 +860,7 @@
                 <span class="formErrorMessage">{sevenDayerAmberDaysMessage}</span>
             </td>
         </tr>
-         <tr>
+        <tr>
             <td class="promptText">7 Dayer Red Days</td>
             <td class="inputText">
                 <input {DISABLED}

@@ -16,6 +16,7 @@ class BUSecondsite extends Business
     const STATUS_BAD_CONFIG = 'BAD_CONFIG';
     const STATUS_OUT_OF_DATE = 'OUT_OF_DATE';
     const STATUS_SUSPENDED = 'SUSPENDED';
+    const STATUS_EXCLUDED = 'EXCLUDED';
 
     const LOG_TYPE_ERROR_PATH_MISSING = 0;
     const LOG_TYPE_ERROR_INCOMPLETE = 1;
@@ -373,7 +374,7 @@ class BUSecondsite extends Business
             $db = $GLOBALS['db'];
 
             //check if we have already stored information for today
-            $query = "SELECT created_at FROM backup_performance_log WHERE created_at = date(now())";
+            $query = "SELECT created_at FROM backup_performance_log WHERE created_at = date(now()) and not isReplication";
 
             $db->query($query);
             $db->next_record();
@@ -434,6 +435,8 @@ class BUSecondsite extends Business
 
     public function getServers($customerItemID = false)
     {
+        $secondsiteCNCItemTypeId = CONFIG_2NDSITE_CNC_ITEMTYPEID;
+        $secondsiteLocalItemTypeId = CONFIG_2NDSITE_LOCAL_ITEMTYPEID;
         $queryString =
             "SELECT
         ci.cui_cuino,
@@ -459,9 +462,8 @@ class BUSecondsite extends Business
         JOIN item i ON i.itm_itemno = ci.cui_itemno
         LEFT JOIN consultant delayuser ON delayuser.cns_consno = ser.secondsiteImageDelayUserID
         LEFT JOIN consultant suspenduser ON suspenduser.cns_consno = ser.secondsiteSuspendedByUserID
-
       WHERE
-        i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")
+        i.itm_itemtypeno IN (    $secondsiteCNCItemTypeId , $secondsiteLocalItemTypeId )
         AND ci.declinedFlag <> 'Y'";
 
         if ($customerItemID) {
@@ -797,6 +799,8 @@ class BUSecondsite extends Business
 
     function getImagesByStatus($status)
     {
+
+
         $queryString =
             "SELECT
         ci.cui_cuino,
@@ -823,16 +827,16 @@ class BUSecondsite extends Business
         JOIN secondsite_image ssi ON ssi.customerItemID = ser.cui_cuino
 
       WHERE
-        i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")
-        AND ci.declinedFlag <> 'Y'
-        AND status = '$status'
-      
-      ORDER BY c.cus_name, serverName, ssi.imageName";
+        i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")  AND ci.declinedFlag <> 'Y' ";
 
+        if ($status == self::STATUS_EXCLUDED) {
+            $queryString .= " AND ser.secondsiteLocalExcludeFlag = 'Y' group by serverName ";
+        } else {
+            $queryString .= " AND status = '$status' and ser.secondsiteLocalExcludeFlag <> 'Y' ";
+        }
+        $queryString .= "ORDER BY c.cus_name, serverName, ssi.imageName";
         $db = $GLOBALS['db'];
-
         $db->query($queryString);
-
         $images = array();
         while ($db->next_record()) {
             $images[] = $db->Record;
@@ -934,7 +938,7 @@ class BUSecondsite extends Business
         }
 
         $query = "SELECT SUM(passes)/ SUM(images) as successRate, MONTH FROM (
-            SELECT MONTH(created_at) AS MONTH, images, passes FROM backup_performance_log WHERE YEAR(created_at) = '$year'
+            SELECT MONTH(created_at) AS MONTH, images, passes FROM backup_performance_log WHERE YEAR(created_at) = '$year' and not isReplication
 ) t GROUP BY t.month";
 
         $result = $this->db->query($query);
@@ -955,7 +959,7 @@ class BUSecondsite extends Business
 
     function getPerformanceDataAvailableYears()
     {
-        $query = "SELECT  DISTINCT YEAR(created_at) AS YEAR  FROM    backup_performance_log";
+        $query = "SELECT  DISTINCT YEAR(created_at) AS YEAR  FROM    backup_performance_log where not isReplication";
         $result = $this->db->query($query);
 
         return array_map(
