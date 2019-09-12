@@ -21,7 +21,7 @@ try
     }
     Import-PSSession $Session -DisableNameChecking | Out-Null
     Start-Sleep -s 5
-    $Report = @()
+    $MailboxesReport = @()
     $Mailboxes = Get-Mailbox -ResultSize Unlimited | Where-Object { $_.RecipientTypeDetails -ne "DiscoveryMailbox" }
     $MSOLDomain = Get-MsolDomain | Where-Object { $_.Authentication -eq "Managed" -and $_.IsDefault -eq "True" }
     foreach ($mailbox in $Mailboxes)
@@ -39,13 +39,18 @@ try
             $DaysToExpiry = $MSOLUSER |  Select-Object @{ Name = "DaysToExpiry"; Expression = { (New-TimeSpan -start (get-date) -end ($_.LastPasswordChangeTimestamp + $MSOLPasswordPolicy)).Days } }; $DaysToExpiry = $DaysToExpiry.DaysToExpiry
         }
         $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { [array]$_.Licenses.AccountSkuId } }
-        $Report += $Information
+        $MailboxesReport += $Information
 
     }
-    [array]$Report = $Report | Sort-Object TotalItemSize -Descending
+    [array]$MailboxesReport = $MailboxesReport | Sort-Object TotalItemSize -Descending
+    $LicensesData = Get-MsolAccountSku | Select-Object AccountSkuId, ActiveUnits, @{ Name = 'Unallocated'; Expression = { $_.ActiveUnits - $_.ConsumedUnits } }
+    $Report = @{
+        mailboxes = $MailboxesReport
+        licenses = $LicensesData
+    }
     Get-PSSession | Remove-PSSession
     Remove-TypeData System.Array
-    if (-Not $Report)
+    if (-Not$Report)
     {
         Write-Host "{}"
         exit

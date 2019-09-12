@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 649 - Offsite Backup Replication Checks Enhancements
+- Issue 641 - Office 365 License Export v2
 
 ## [v3.5.3] - 2019-09-09
 ### Fixed
