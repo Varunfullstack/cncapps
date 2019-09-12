@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 641 - Office 365 License Export v2
 - Issue 488 - Consider all SRs that are P1-P3 as critical once time is over XX hours.
 - Issue 644 - Quote Reminder Tweaking
+- Issue 627 - SD Manager P5 team filtering
 
 ## [v3.5.3] - 2019-09-09
 ### Fixed
