@@ -19,7 +19,7 @@ $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
 switch ($action) {
 
     case 'fixedIncidents' :
-        $buDailyReport->fixedIncidents($daysAgo);
+        $buDailyReport->fixedIncidents($daysAgo, true);
         break;
     case 'focActivities' :
         $buDailyReport->focActivities($daysAgo);
@@ -28,7 +28,7 @@ switch ($action) {
         $buDailyReport->prepayOverValue($daysAgo);
         break;
     case 'outstandingIncidents' :
-        $buDailyReport->outstandingIncidents($daysAgo, false, $onScreen);
+        $buDailyReport->outstandingIncidents($daysAgo, false, $onScreen, false, true);
         break;
     case 'outstandingPriorityFiveIncidents' :
         $buDailyReport->outstandingIncidents($daysAgo, true);

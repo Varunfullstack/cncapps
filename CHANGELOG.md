@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 488 - Consider all SRs that are P1-P3 as critical once time is over XX hours.
 - Issue 644 - Quote Reminder Tweaking
 - Issue 627 - SD Manager P5 team filtering
+- Issue 646 - 7 dayer targets
 
 ## [v3.5.3] - 2019-09-09
 ### Fixed

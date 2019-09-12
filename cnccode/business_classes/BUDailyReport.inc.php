@@ -7,6 +7,7 @@
  *
  * NOTE: calls to BUMail::putInQueue with 5th parameter true sends email to users flagged SDManager
  */
+
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_gc"] . "/Controller.inc.php");
@@ -23,7 +24,46 @@ class BUDailyReport extends Business
         parent::__construct($owner);
     }
 
-    function fixedIncidents($daysAgo)
+    function getOutstandingReportAvailableYears()
+    {
+        $query = "SELECT  DISTINCT YEAR(date) AS year  FROM  sevenDayersPerformanceLog";
+        $result = $this->db->query($query);
+        return array_map(function ($item) { return $item['year']; }, $result->fetch_all(MYSQLI_ASSOC));
+    }
+
+    function getOutstandingReportPerformanceDataForYear($year)
+    {
+        $query = "SELECT
+  avg(olderThan7Days) as olderThan7DaysAvg,
+  avg(target) as targetAvg,
+  `month`
+FROM
+  (SELECT
+    MONTH(`date`) AS `month`,
+    olderThan7Days,
+    target
+  FROM
+    sevenDayersPerformanceLog where year(`date`) = '$year'
+  ) t
+GROUP BY t.month;
+";
+        $result = $this->db->query($query);
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    function getOutstandingReportPerformanceDataBetweenDates(DateTime $startDate, DateTime $endDate)
+    {
+        $query = "SELECT *  FROM sevenDayersPerformanceLog where `date` between ? and ?";
+        $startDateString = $startDate->format(DATE_MYSQL_DATE);
+        $endDateString = $endDate->format(DATE_MYSQL_DATE);
+        $statement = $this->db->prepare($query);
+        $statement->bind_param('ss', $startDateString, $endDateString);
+        $statement->execute();
+        $result = $statement->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    function fixedIncidents($daysAgo, $generateLog = false)
     {
         $this->setMethodName('fixedIncidents');
 
@@ -69,7 +109,7 @@ class BUDailyReport extends Business
 
                 $urlRequest =
                     $controller->buildLink(
-                        SITE_URL. '/Activity.php',
+                        SITE_URL . '/Activity.php',
                         array(
                             'problemID' => $row[1],
                             'action'    => 'displayLastActivity'
@@ -130,7 +170,6 @@ class BUDailyReport extends Business
                     'totalRequests' => $requests
                 ]
             );
-
             $template->parse(
                 'output',
                 'page',
@@ -157,8 +196,107 @@ class BUDailyReport extends Business
             echo $body;
 
         }
-
+        if ($generateLog) {
+            $date = (new DateTime())->format(DATE_MYSQL_DATE);
+            $query = "INSERT INTO sevenDayersPerformanceLog (date, totalClosedSRs) VALUES ('$date', $requests)  ON DUPLICATE KEY UPDATE totalClosedSRs = $requests;";
+            $this->db->query($query);
+        }
     }
+
+    function getFixedRequests($daysAgo = 1)
+    {
+        $sql =
+            "SELECT 
+        cus_name AS `customer`,
+        pro_problemno AS `requestID`,
+        cns_name AS `fixedBy`,
+        (SELECT 
+          reason 
+        FROM
+          callactivity 
+        WHERE caa_problemno = pro_problemno 
+          AND caa_callacttypeno = 51
+        LIMIT 1) AS `description`,
+        TIMEDIFF(pro_fixed_date, pro_date_raised) AS `openHours`,
+        pro_total_activity_duration_hours AS `timeSpentHours`,
+        pro_responded_hours AS `responseHours`,
+        pro_working_hours AS `cncOfficeHours`,
+        IFNULL (itm_desc,'T&M') AS `contract`
+    FROM
+        problem 
+        JOIN customer 
+          ON cus_custno = pro_custno 
+        JOIN consultant 
+          ON pro_fixed_consno = cns_consno 
+        LEFT JOIN custitem
+          ON pro_contract_cuino = cui_cuino
+        LEFT JOIN item
+          ON cui_itemno = itm_itemno
+        
+      WHERE
+        pro_status IN ( 'F', 'C' )
+        AND
+          DATE(pro_fixed_date) = DATE(
+          DATE_SUB(NOW(), INTERVAL " . $daysAgo . " DAY)
+        ) 
+      ORDER BY customer,
+        pro_problemno ";
+
+        return $this->db->query($sql);
+    } // end function outstandingIncidents
+
+    function sendByEmailTo($toEmail,
+                           $subject,
+                           $body,
+                           $attachment = false,
+                           $senderEmail = CONFIG_SALES_EMAIL
+    )
+    {
+
+        $buMail = new BUMail($this);
+
+        $hdrs = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $cssToInlineStyles = new \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles();
+        $body = $cssToInlineStyles->convert($body);
+
+        $buMail->mime->setHTMLBody($body);
+
+        if ($attachment) {
+            $buMail->mime->addAttachment(
+                $attachment,
+                'text/plain',
+                'report.csv',
+                false
+            );
+        }
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
+
+        $hdrs = $buMail->mime->headers($hdrs);
+
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body      // to SD Managers
+        );
+
+        echo "SENT";
+
+    } // end function
 
     /**
      * Customer
@@ -172,11 +310,17 @@ class BUDailyReport extends Business
      * @param bool $priorityFiveOnly
      * @param bool $onScreen
      * @param bool $dashboard
+     * @param bool $generateLog
+     * @param null $selectedYear
+     * @return mixed
+     * @throws Exception
      */
     function outstandingIncidents($daysAgo,
                                   $priorityFiveOnly = false,
                                   $onScreen = false,
-                                  $dashboard = false
+                                  $dashboard = false,
+                                  $generateLog = false,
+                                  $selectedYear = null
     )
     {
 
@@ -233,7 +377,7 @@ class BUDailyReport extends Business
             do {
                 $urlRequest =
                     $controller->buildLink(
-                        SITE_URL. '/Activity.php',
+                        SITE_URL . '/Activity.php',
                         array(
                             'problemID' => $row[1],
                             'action'    => 'displayLastActivity'
@@ -312,9 +456,10 @@ class BUDailyReport extends Business
             );
             $csvFile = $csvTemplate->get_var('output');
             $select = "";
+            $performance = "";
             if ($dashboard) {
 
-                $select = '<span>Select Days:</span><select onchange="changeDays()">';
+                $select = '<div style="width: 150px;display: inline-block">Select Days:</div><select onchange="changeDays()">';
 
                 foreach ([0, 1, 2, 3, 4, 5, 6, 7] as $day) {
 
@@ -325,18 +470,107 @@ class BUDailyReport extends Business
                 }
                 $select .= '</select>';
 
+                $query = "SELECT  DISTINCT YEAR(date) AS YEAR  FROM  sevenDayersPerformanceLog";
+                $result = $this->db->query($query);
+                $data = $result->fetch_all(MYSQLI_ASSOC);
+
+                $selectedYear = $selectedYear ? $selectedYear : (new DateTime())->format('Y');
+
+                $performance = '<script> function yearChanged(){
+                 let url = new URL(location.href);
+                 url.searchParams.set("selectedYear", this.event.target.value);
+                 location.href = url.toString();
+} </script>   
+                <select name="searchYear" id="yearSelector" onchange="yearChanged()">
+                   ';
+
+                foreach ($data as $datum) {
+                    $performance .= '<option value="' . $datum['YEAR'] . '"';
+                    if ($datum['YEAR'] == $selectedYear) {
+                        $performance .= " selected='selected' ";
+                    }
+                    $performance .= '>' . $datum['YEAR'] . '</option>';
+                }
+
+                $performance .= '
+                </select>
+<table id="team-performance">
+    <thead>
+    <tr>
+        <th>&nbsp;</th>
+        <th>Jan</th>
+        <th>Feb</th>
+        <th>Mar</th>
+        <th>Apr</th>
+        <th>May</th>
+        <th>Jun</th>
+        <th>Jul</th>
+        <th>Aug</th>
+        <th>Sep</th>
+        <th>Oct</th>
+        <th>Nov</th>
+        <th>Dec</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th>Average Number of 7 Dayers</th>
+        <td class="success">98.5</td>
+        <td class="success">98.4</td>
+        <td class="success">98.2</td>
+        <td class="fail">97.7</td>
+        <td class="success">98.7</td>
+        <td class="success">98.2</td>
+        <td class="fail">97.9</td>
+        <td class="success">98.2</td>
+        <td class="success">N/A</td>
+        <td class="success">N/A</td>
+        <td class="success">N/A</td>
+        <td class="success">N/A</td>
+    </tr>
+    <tr>
+     <th>Target</th>
+        <td class="success">98.5</td>
+        <td class="success">98.4</td>
+        <td class="success">98.2</td>
+        <td class="fail">97.7</td>
+        <td class="success">98.7</td>
+        <td class="success">98.2</td>
+        <td class="fail">97.9</td>
+        <td class="success">98.2</td>
+        <td class="success">N/A</td>
+        <td class="success">N/A</td>
+        <td class="success">N/A</td>
+        <td class="success">N/A</td>
+        </tr>
+    </tbody>
+</table><br>';
 
             }
+            $avgDays = $totalRequests ? number_format(
+                $openFor / $totalRequests,
+                1
+            ) : null;
 
+            if ($generateLog) {
+                $date = (new DateTime())->format(DATE_MYSQL_DATE);
+                // we don't have an entry for today ..so create it
+                $query = "insert into sevenDayersPerformanceLog(date, olderThan7Days, averageAgeDays, target) values ('$date', $totalRequests,$avgDays," . $dsHeader->getValue(
+                        DBEHeader::sevenDayerTarget
+                    ) . ") on duplicate key update olderThan7Days = $totalRequests, averageAgeDays = $avgDays, target =  " . $dsHeader->getValue(
+                        DBEHeader::sevenDayerTarget
+                    );
+                $this->db->query($query);
+
+            }
+            $avgDays = $totalRequests ? number_format($openFor / $totalRequests, 1) : null;
             $template->setVar(
                 array(
                     'daysAgo'            => $daysAgo,
                     'totalRequests'      => $totalRequests,
-                    'avgDays'            => $totalRequests ? number_format(
-                        $openFor / $totalRequests,
-                        1
-                    ) : 'N/A',
+                    'avgDays'            => $avgDays === null ? 'N/A' : $avgDays,
                     'selectDaysSelector' => $select,
+                    'performance'        => $performance,
                     'isDashboard'        => $dashboard ? 'true' : 'false'
                 )
             );
@@ -394,232 +628,6 @@ class BUDailyReport extends Business
             }
         }
 
-    } // end function outstandingIncidents
-
-    function focActivities($daysAgo)
-    {
-
-        $this->setMethodName('focActivities');
-
-        $activities = $this->getFocActivities($daysAgo);
-
-        if ($row = $activities->fetch_row()) {
-
-            $template = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
-            );
-
-            $template->set_file(
-                'page',
-                'ServiceFocReportEmail.inc.html'
-            );
-
-            $template->set_block(
-                'page',
-                'activityBlock',
-                'activities'
-            );
-
-            $controller = new Controller(
-                '', $nothing, $nothing, $nothing, $nothing
-            );
-            do {
-
-                $urlRequest =
-                    $controller->buildLink(
-                        SITE_URL. '/Activity.php',
-                        array(
-                            'problemID' => $row[1],
-                            'action'    => 'displayLastActivity'
-                        )
-                    );
-
-                $urlActivity =
-                    $controller->buildLink(
-                        SITE_URL. '/Activity.php',
-                        array(
-                            'callActivityID' => $row[2],
-                            'action'         => 'displayActivity'
-                        )
-                    );
-                $template->setVar(
-                    array(
-                        'customer'         => $row[0],
-                        'serviceRequestID' => $row[1],
-                        'activityID'       => $row[2],
-                        'technician'       => $row[3],
-                        'hours'            => number_format(
-                            $row[4],
-                            2
-                        ),
-                        'contract'         => $row[5],
-                        'category'         => $row[6],
-                        'urlRequest'       => $urlRequest,
-                        'urlActivity'      => $urlActivity
-                    )
-                );
-
-                $template->parse(
-                    'activities',
-                    'activityBlock',
-                    true
-                );
-
-            } while ($row = $activities->fetch_row());
-
-            $template->parse(
-                'output',
-                'page',
-                true
-            );
-
-            $body = $template->get_var('output');
-
-            $this->sendByEmailTo(
-                'focyesterday@' . CONFIG_PUBLIC_DOMAIN,
-                'FOC activities logged yesterday',
-                $body
-            );
-
-            echo $body;
-
-        }
-
-    } // end function
-
-    function prepayOverValue($daysAgo)
-    {
-        $this->setMethodName('focActivities');
-
-        $activities = $this->getPrePayActivitiesOverValue($daysAgo);
-
-        if ($row = $activities->fetch_row()) {
-
-            $template = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
-            );
-
-            $template->set_file(
-                'page',
-                'ServicePrepayOverValueReportEmail.inc.html'
-            );
-
-            $template->set_block(
-                'page',
-                'activityBlock',
-                'activities'
-            );
-
-            $controller = new Controller(
-                '', $nothing, $nothing, $nothing, $nothing
-            );
-
-            do {
-
-                $urlRequest =
-                    $controller->buildLink(
-                        SITE_URL. '/Activity.php',
-                        array(
-                            'problemID' => $row[1],
-                            'action'    => 'displayLastActivity'
-                        )
-                    );
-
-                $urlActivity =
-                    $controller->buildLink(
-                        SITE_URL. '/Activity.php',
-                        array(
-                            'callActivityID' => $row[2],
-                            'action'         => 'displayActivity'
-                        )
-                    );
-                $template->setVar(
-                    array(
-                        'customer'         => $row[0],
-                        'serviceRequestID' => $row[1],
-                        'activityID'       => $row[2],
-                        'value'            => number_format(
-                            $row[3],
-                            2
-                        ),
-                        'technician'       => $row[4],
-                        'urlRequest'       => $urlRequest,
-                        'urlActivity'      => $urlActivity,
-                        'contract'         => $row[8]
-                    )
-                );
-
-                $template->parse(
-                    'activities',
-                    'activityBlock',
-                    true
-                );
-
-            } while ($row = $activities->fetch_row());
-
-            $template->parse(
-                'output',
-                'page',
-                true
-            );
-
-            $body = $template->get_var('output');
-
-            echo $body;
-
-            $this->sendByEmailTo(
-                CONFIG_SALES_MANAGER_EMAIL,
-                'Pre-pay activities logged yesterday over GBP 100 in value',
-                $body
-            );
-
-        }
-
-
-    } // end function
-
-    function getFixedRequests($daysAgo = 1)
-    {
-        $sql =
-            "SELECT 
-        cus_name AS `customer`,
-        pro_problemno AS `requestID`,
-        cns_name AS `fixedBy`,
-        (SELECT 
-          reason 
-        FROM
-          callactivity 
-        WHERE caa_problemno = pro_problemno 
-          AND caa_callacttypeno = 51
-        LIMIT 1) AS `description`,
-        TIMEDIFF(pro_fixed_date, pro_date_raised) AS `openHours`,
-        pro_total_activity_duration_hours AS `timeSpentHours`,
-        pro_responded_hours AS `responseHours`,
-        pro_working_hours AS `cncOfficeHours`,
-        IFNULL (itm_desc,'T&M') AS `contract`
-    FROM
-        problem 
-        JOIN customer 
-          ON cus_custno = pro_custno 
-        JOIN consultant 
-          ON pro_fixed_consno = cns_consno 
-        LEFT JOIN custitem
-          ON pro_contract_cuino = cui_cuino
-        LEFT JOIN item
-          ON cui_itemno = itm_itemno
-        
-      WHERE
-        pro_status IN ( 'F', 'C' )
-        AND
-          DATE(pro_fixed_date) = DATE(
-          DATE_SUB(NOW(), INTERVAL " . $daysAgo . " DAY)
-        ) 
-      ORDER BY customer,
-        pro_problemno ";
-
-        return $this->db->query($sql);
     } // end function
 
     function getOustandingRequests($daysAgo = 1,
@@ -676,6 +684,98 @@ class BUDailyReport extends Business
         pro_problemno";
 
         return $this->db->query($sql);
+    } // end function
+
+    function focActivities($daysAgo)
+    {
+
+        $this->setMethodName('focActivities');
+
+        $activities = $this->getFocActivities($daysAgo);
+
+        if ($row = $activities->fetch_row()) {
+
+            $template = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
+
+            $template->set_file(
+                'page',
+                'ServiceFocReportEmail.inc.html'
+            );
+
+            $template->set_block(
+                'page',
+                'activityBlock',
+                'activities'
+            );
+
+            $controller = new Controller(
+                '', $nothing, $nothing, $nothing, $nothing
+            );
+            do {
+
+                $urlRequest =
+                    $controller->buildLink(
+                        SITE_URL . '/Activity.php',
+                        array(
+                            'problemID' => $row[1],
+                            'action'    => 'displayLastActivity'
+                        )
+                    );
+
+                $urlActivity =
+                    $controller->buildLink(
+                        SITE_URL . '/Activity.php',
+                        array(
+                            'callActivityID' => $row[2],
+                            'action'         => 'displayActivity'
+                        )
+                    );
+                $template->setVar(
+                    array(
+                        'customer'         => $row[0],
+                        'serviceRequestID' => $row[1],
+                        'activityID'       => $row[2],
+                        'technician'       => $row[3],
+                        'hours'            => number_format(
+                            $row[4],
+                            2
+                        ),
+                        'contract'         => $row[5],
+                        'category'         => $row[6],
+                        'urlRequest'       => $urlRequest,
+                        'urlActivity'      => $urlActivity
+                    )
+                );
+
+                $template->parse(
+                    'activities',
+                    'activityBlock',
+                    true
+                );
+
+            } while ($row = $activities->fetch_row());
+
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
+
+            $body = $template->get_var('output');
+
+            $this->sendByEmailTo(
+                'focyesterday@' . CONFIG_PUBLIC_DOMAIN,
+                'FOC activities logged yesterday',
+                $body
+            );
+
+            echo $body;
+
+        }
+
     }
 
     function getFocActivities($daysAgo = 1)
@@ -712,6 +812,98 @@ class BUDailyReport extends Business
         return $this->db->query($sql);
     }
 
+    function prepayOverValue($daysAgo)
+    {
+        $this->setMethodName('focActivities');
+
+        $activities = $this->getPrePayActivitiesOverValue($daysAgo);
+
+        if ($row = $activities->fetch_row()) {
+
+            $template = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
+
+            $template->set_file(
+                'page',
+                'ServicePrepayOverValueReportEmail.inc.html'
+            );
+
+            $template->set_block(
+                'page',
+                'activityBlock',
+                'activities'
+            );
+
+            $controller = new Controller(
+                '', $nothing, $nothing, $nothing, $nothing
+            );
+
+            do {
+
+                $urlRequest =
+                    $controller->buildLink(
+                        SITE_URL . '/Activity.php',
+                        array(
+                            'problemID' => $row[1],
+                            'action'    => 'displayLastActivity'
+                        )
+                    );
+
+                $urlActivity =
+                    $controller->buildLink(
+                        SITE_URL . '/Activity.php',
+                        array(
+                            'callActivityID' => $row[2],
+                            'action'         => 'displayActivity'
+                        )
+                    );
+                $template->setVar(
+                    array(
+                        'customer'         => $row[0],
+                        'serviceRequestID' => $row[1],
+                        'activityID'       => $row[2],
+                        'value'            => number_format(
+                            $row[3],
+                            2
+                        ),
+                        'technician'       => $row[4],
+                        'urlRequest'       => $urlRequest,
+                        'urlActivity'      => $urlActivity,
+                        'contract'         => $row[8]
+                    )
+                );
+
+                $template->parse(
+                    'activities',
+                    'activityBlock',
+                    true
+                );
+
+            } while ($row = $activities->fetch_row());
+
+            $template->parse(
+                'output',
+                'page',
+                true
+            );
+
+            $body = $template->get_var('output');
+
+            echo $body;
+
+            $this->sendByEmailTo(
+                CONFIG_SALES_MANAGER_EMAIL,
+                'Pre-pay activities logged yesterday over GBP 100 in value',
+                $body
+            );
+
+        }
+
+
+    }
+
     function getPrePayActivitiesOverValue($daysAgo = 1)
     {
         $sql =
@@ -743,59 +935,6 @@ class BUDailyReport extends Business
           cus_name, caa_problemno";
 
         return $this->db->query($sql);
-    }
-
-    function sendByEmailTo($toEmail,
-                           $subject,
-                           $body,
-                           $attachment = false,
-                           $senderEmail = CONFIG_SALES_EMAIL
-    )
-    {
-
-        $buMail = new BUMail($this);
-
-        $hdrs = array(
-            'From'         => $senderEmail,
-            'To'           => $toEmail,
-            'Subject'      => $subject,
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
-
-        $cssToInlineStyles = new \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles();
-        $body = $cssToInlineStyles->convert($body);
-
-        $buMail->mime->setHTMLBody($body);
-
-        if ($attachment) {
-            $buMail->mime->addAttachment(
-                $attachment,
-                'text/plain',
-                'report.csv',
-                false
-            );
-        }
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body      // to SD Managers
-        );
-
-        echo "SENT";
-
     }
 
     public function p5IncidentsWithoutSalesOrders()
@@ -847,7 +986,7 @@ class BUDailyReport extends Business
             do {
                 $urlRequest =
                     $controller->buildLink(
-                        SITE_URL. '/Activity.php',
+                        SITE_URL . '/Activity.php',
                         array(
                             'problemID' => $row[1],
                             'action'    => 'displayLastActivity'
@@ -1001,7 +1140,7 @@ class BUDailyReport extends Business
             do {
                 $urlRequest =
                     $controller->buildLink(
-                        SITE_URL. '/Activity.php',
+                        SITE_URL . '/Activity.php',
                         array(
                             'problemID' => $row[1],
                             'action'    => 'displayLastActivity'
@@ -1199,34 +1338,6 @@ WHERE pro_priority = 5
 
     }
 
-    private function getFirstLinesDetails($details,
-                                          $maxCharacters
-    )
-    {
-        $details = strip_tags($details);
-        $details = preg_replace(
-            "!\s+!",
-            ' ',
-            $details
-        );
-
-        $lines = preg_split(
-            "/\./",
-            $details
-        );
-        $result = "";
-        $counter = 0;
-
-        do {
-            if ($counter) {
-                $result .= '.';
-            }
-            $result .= $lines[$counter];
-            $counter++;
-        } while ($counter < count($lines) && strlen($result) < $maxCharacters);
-        return $result;
-    }
-
     private function getContactOpenSRReportData()
     {
         $sql = "SELECT
@@ -1273,5 +1384,33 @@ ORDER BY pro_date_raised";
 
         return $result;
 
+    }
+
+    private function getFirstLinesDetails($details,
+                                          $maxCharacters
+    )
+    {
+        $details = strip_tags($details);
+        $details = preg_replace(
+            "!\s+!",
+            ' ',
+            $details
+        );
+
+        $lines = preg_split(
+            "/\./",
+            $details
+        );
+        $result = "";
+        $counter = 0;
+
+        do {
+            if ($counter) {
+                $result .= '.';
+            }
+            $result .= $lines[$counter];
+            $counter++;
+        } while ($counter < count($lines) && strlen($result) < $maxCharacters);
+        return $result;
     }
 }

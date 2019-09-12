@@ -435,6 +435,8 @@ class BUSecondsite extends Business
 
     public function getServers($customerItemID = false)
     {
+        $secondsiteCNCItemTypeId = CONFIG_2NDSITE_CNC_ITEMTYPEID;
+        $secondsiteLocalItemTypeId = CONFIG_2NDSITE_LOCAL_ITEMTYPEID;
         $queryString =
             "SELECT
         ci.cui_cuino,
@@ -460,9 +462,8 @@ class BUSecondsite extends Business
         JOIN item i ON i.itm_itemno = ci.cui_itemno
         LEFT JOIN consultant delayuser ON delayuser.cns_consno = ser.secondsiteImageDelayUserID
         LEFT JOIN consultant suspenduser ON suspenduser.cns_consno = ser.secondsiteSuspendedByUserID
-
       WHERE
-        i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")
+        i.itm_itemtypeno IN (    $secondsiteCNCItemTypeId , $secondsiteLocalItemTypeId )
         AND ci.declinedFlag <> 'Y'";
 
         if ($customerItemID) {
