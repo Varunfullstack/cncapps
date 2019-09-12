@@ -113,6 +113,40 @@ class CTDailyReport extends CTCNC
             case 'contactOpenSRReport':
                 $this->buDailyReport->contactOpenSRReport();
                 break;
+            case 'outstandingReportAvailableYears':
+                echo json_encode($this->buDailyReport->getOutstandingReportAvailableYears(), JSON_NUMERIC_CHECK);
+                break;
+            case 'outstandingReportPerformanceDataForYear':
+                if (!isset($_REQUEST['year'])) {
+                    throw new Exception('Year is missing');
+                }
+                echo json_encode(
+                    $this->buDailyReport->getOutstandingReportPerformanceDataForYear($_REQUEST['year']),
+                    JSON_NUMERIC_CHECK
+                );
+                break;
+            case 'showGraphs':
+                $this->setTemplateFiles(['graphs' => 'SevenDayersGraphs']);
+                $this->template->parse(
+                    'CONTENTS',
+                    'graphs',
+                    true
+                );
+                $this->parsePage();
+
+                break;
+            case 'outstandingReportPerformanceDataBetweenDates':
+                if (!isset($_REQUEST['startDate']) || !isset($_REQUEST['endDate'])) {
+                    throw new Exception('startDate and endDate are mandatory fields');
+                }
+                $startDate = new DateTime($_REQUEST['startDate']);
+                $endDate = new DateTime($_REQUEST['endDate']);
+
+                echo json_encode(
+                    $this->buDailyReport->getOutstandingReportPerformanceDataBetweenDates($startDate, $endDate),
+                    JSON_NUMERIC_CHECK
+                );
+                break;
             default :
                 break;
         }

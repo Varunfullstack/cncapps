@@ -25,16 +25,134 @@
 
         }
 
+        .success {
+            color: green;
+        }
+
+        .failure {
+            color: red;
+        }
+
         -->
     </style>
+    <script type="text/javascript"
+            src=".javascript/handlebars-v4.0.11.js"
+    ></script>
+    <script type="text/javascript"
+            src=".javascript/mustache.min.js"
+    ></script>
+    <script type="application/javascript"
+            src=".javascript/mustache-wax.min.js"
+    ></script>
+    <script id="performance-table-template"
+            type="text/template"
+    >
+        <table>
+            <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th>Jan</th>
+                <th>Feb</th>
+                <th>Mar</th>
+                <th>Apr</th>
+                <th>May</th>
+                <th>Jun</th>
+                <th>Jul</th>
+                <th>Aug</th>
+                <th>Sep</th>
+                <th>Oct</th>
+                <th>Nov</th>
+                <th>Dec</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th>Average Number of 7 Dayers</th>
+                {% #values %}
+                <td class="{% class %}">{% value %}</td>
+                {% /values %}
+            </tr>
+            <tr>
+                <th>Target</th>
+                {% #values %}
+                <td class="{% class %}">{% target %}</td>
+                {% /values %}
+            </tr>
+            </tbody>
+        </table>
+    </script>
     <script>
+        Mustache.tags = ['{%', '%}'];
         const isDashboard = {isDashboard};
         const amberThreshold = {amberThreshold};
         const redThreshold = {redThreshold};
+        let availableYears = [];
+        let selectedYear = (new Date()).getFullYear();
 
+        function redrawYearSelector() {
+            const yearSelectorElm = $('#yearSelector');
+            yearSelectorElm.html('');
+            availableYears.forEach(year => {
+                // noinspection EqualityComparisonWithCoercionJS
+                const option = new Option(year, year, selectedYear == year, selectedYear == year);
+                yearSelectorElm.append(option)
+            })
+        }
+
+        function fetchPerformanceDataForYear(year) {
+            return $.ajax({
+                url: '?action=outstandingReportPerformanceDataForYear',
+                method: 'POST',
+                data: {year: year},
+                dataType: 'JSON'
+            });
+        }
+
+        function yearChanged() {
+            selectedYear = $('#yearSelector').val();
+            redrawPerformanceData();
+        }
+
+        function redrawPerformanceData() {
+            return fetchPerformanceDataForYear(selectedYear).then(data => {
+                let context = {values: []};
+                for (let i = 1; i <= 12; i++) {
+                    const foundItem = data.find((item) => item.month === i);
+                    if (!foundItem) {
+                        context.values.push({value: 'N/A', target: 'N/A', class: 'none'});
+                        continue;
+                    }
+                    context.values.push({
+                        value: foundItem.olderThan7DaysAvg.toFixed(1),
+                        target: foundItem.targetAvg.toFixed(1),
+                        class: (foundItem.olderThan7DaysAvg <= foundItem.targetAvg ? 'success' : 'failure')
+                    })
+                }
+                console.log(context);
+                const source = document.getElementById("performance-table-template").innerHTML;
+                const html = Mustache.to_html(source, context);
+                $('#performanceTableContainer').html(html);
+
+            })
+        }
 
         if (isDashboard) {
             $(document).ready(function () {
+
+                $('#dashboard').show();
+                // we have to pull the years available
+                $.ajax({
+                    url: '?action=outstandingReportAvailableYears',
+                    method: 'GET',
+                    dataType: 'JSON'
+                }).then(function (serverAvailableYears) {
+                    availableYears = serverAvailableYears;
+                    redrawYearSelector();
+                    // we have drawn the selector, now we have to draw the numbers
+                    redrawPerformanceData();
+                });
+
+
                 dataTable = $('#myTable').DataTable({
                     dom: 'Blfrtip',
                     buttons: [
@@ -98,12 +216,39 @@
 </head>
 <body>
 <h1>Service Requests Open For More Than {daysAgo} Days</h1>
-{performance}
-{selectDaysSelector}
+<div style="display: none"
+     id="dashboard"
+>
+    <div>
+        <a href="?action=showGraphs"
+           target="_blank"
+        >Graphs</a>
+    </div>
+    <div style="width: 150px;display: inline-block">Select Year:</div>
+    <select name="searchYear"
+            id="yearSelector"
+            onchange="yearChanged()"
+    >
+    </select>
+    <div id="performanceTableContainer"></div>
+    <br>
+    <div style="width: 150px;display: inline-block">Select Days:</div>
+    <select onchange="changeDays()">
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option selected=""
+                value="7"
+        >7
+        </option>
+    </select>
+</div>
 <h3> Total Requests: {totalRequests} </h3>
 <h3> Average Age in Days: {avgDays}</h3>
-
-
 <table id="myTable">
     <thead>
     <tr>
@@ -123,7 +268,9 @@
     <!-- BEGIN requestBlock -->
     <tr class="{rowClass}">
         <td align="center">{customer}</td>
-        <td align="center"><a href="{urlRequest}" target="_blank">{serviceRequestID}</a></td>
+        <td align="center"><a href="{urlRequest}"
+                              target="_blank"
+        >{serviceRequestID}</a></td>
         <td align="center">{description}</td>
         <td align="center">{assignedTo}</td>
         <td align="center">{teamName}</td>

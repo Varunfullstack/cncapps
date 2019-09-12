@@ -7,6 +7,7 @@
  *
  * NOTE: calls to BUMail::putInQueue with 5th parameter true sends email to users flagged SDManager
  */
+
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_gc"] . "/Controller.inc.php");
@@ -21,6 +22,45 @@ class BUDailyReport extends Business
     function __construct(&$owner)
     {
         parent::__construct($owner);
+    }
+
+    function getOutstandingReportAvailableYears()
+    {
+        $query = "SELECT  DISTINCT YEAR(date) AS year  FROM  sevenDayersPerformanceLog";
+        $result = $this->db->query($query);
+        return array_map(function ($item) { return $item['year']; }, $result->fetch_all(MYSQLI_ASSOC));
+    }
+
+    function getOutstandingReportPerformanceDataForYear($year)
+    {
+        $query = "SELECT
+  avg(olderThan7Days) as olderThan7DaysAvg,
+  avg(target) as targetAvg,
+  `month`
+FROM
+  (SELECT
+    MONTH(`date`) AS `month`,
+    olderThan7Days,
+    target
+  FROM
+    sevenDayersPerformanceLog where year(`date`) = '$year'
+  ) t
+GROUP BY t.month;
+";
+        $result = $this->db->query($query);
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    function getOutstandingReportPerformanceDataBetweenDates(DateTime $startDate, DateTime $endDate)
+    {
+        $query = "SELECT *  FROM sevenDayersPerformanceLog where `date` between ? and ?";
+        $startDateString = $startDate->format(DATE_MYSQL_DATE);
+        $endDateString = $endDate->format(DATE_MYSQL_DATE);
+        $statement = $this->db->prepare($query);
+        $statement->bind_param('ss', $startDateString, $endDateString);
+        $statement->execute();
+        $result = $statement->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
     }
 
     function fixedIncidents($daysAgo, $generateLog = false)
@@ -419,7 +459,7 @@ class BUDailyReport extends Business
             $performance = "";
             if ($dashboard) {
 
-                $select = '<span>Select Days:</span><select onchange="changeDays()">';
+                $select = '<div style="width: 150px;display: inline-block">Select Days:</div><select onchange="changeDays()">';
 
                 foreach ([0, 1, 2, 3, 4, 5, 6, 7] as $day) {
 
@@ -440,12 +480,7 @@ class BUDailyReport extends Business
                  let url = new URL(location.href);
                  url.searchParams.set("selectedYear", this.event.target.value);
                  location.href = url.toString();
-} </script>
-<form name="searchForm" method="get" action="" id="searchForm">
-    <table width="500px" border="0" cellspacing="0" cellpadding="1">
-        <tbody><tr>
-
-            <td>
+} </script>   
                 <select name="searchYear" id="yearSelector" onchange="yearChanged()">
                    ';
 
@@ -459,14 +494,10 @@ class BUDailyReport extends Business
 
                 $performance .= '
                 </select>
-            </td>
-        </tr>
-    </tbody></table>
-</form><table id="team-performance">
+<table id="team-performance">
     <thead>
     <tr>
         <th>&nbsp;</th>
-        <th>Target</th>
         <th>Jan</th>
         <th>Feb</th>
         <th>Mar</th>
@@ -482,10 +513,8 @@ class BUDailyReport extends Business
     </tr>
     </thead>
     <tbody>
-
     <tr>
-        <th>Backup Success Rate %</th>
-        <td>98</td>
+        <th>Average Number of 7 Dayers</th>
         <td class="success">98.5</td>
         <td class="success">98.4</td>
         <td class="success">98.2</td>
@@ -499,8 +528,23 @@ class BUDailyReport extends Business
         <td class="success">N/A</td>
         <td class="success">N/A</td>
     </tr>
+    <tr>
+     <th>Target</th>
+        <td class="success">98.5</td>
+        <td class="success">98.4</td>
+        <td class="success">98.2</td>
+        <td class="fail">97.7</td>
+        <td class="success">98.7</td>
+        <td class="success">98.2</td>
+        <td class="fail">97.9</td>
+        <td class="success">98.2</td>
+        <td class="success">N/A</td>
+        <td class="success">N/A</td>
+        <td class="success">N/A</td>
+        <td class="success">N/A</td>
+        </tr>
     </tbody>
-</table>';
+</table><br>';
 
             }
             $avgDays = $totalRequests ? number_format(
