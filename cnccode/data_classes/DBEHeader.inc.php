@@ -95,6 +95,9 @@ class DBEHeader extends DBEntity
     const sevenDayerRedDays = "sevenDayerRedDays";
     const office365MailboxYellowWarningThreshold = "office365MailboxYellowWarningThreshold";
     const office365MailboxRedWarningThreshold = "office365MailboxRedWarningThreshold";
+    const autoCriticalP1Hours = "autoCriticalP1Hours";
+    const autoCriticalP2Hours = "autoCriticalP2Hours";
+    const autoCriticalP3Hours = "autoCriticalP3Hours";
 
     /**
      * calls constructor()
@@ -563,6 +566,9 @@ class DBEHeader extends DBEntity
 
         $this->addColumn(self::sevenDayerAmberDays, DA_INTEGER, DA_NOT_NULL);
         $this->addColumn(self::sevenDayerRedDays, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::autoCriticalP1Hours, DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn(self::autoCriticalP2Hours, DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn(self::autoCriticalP3Hours, DA_FLOAT, DA_NOT_NULL);
 
         $this->setPK(0);
         $this->setAddColumnsOff();

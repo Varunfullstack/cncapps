@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 649 - Offsite Backup Replication Checks Enhancements
 - Issue 641 - Office 365 License Export v2
+- Issue 488 - Consider all SRs that are P1-P3 as critical once time is over XX hours.
 
 ## [v3.5.3] - 2019-09-09
 ### Fixed

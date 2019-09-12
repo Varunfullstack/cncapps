@@ -703,6 +703,52 @@
             > <span class="formErrorMessage">{remoteSupportWarnMinHoursMessage}</span></td>
         </tr>
 
+
+        <tr>
+            <td class="promptText">Auto critical P1 after XX hours</td>
+            <td class="field">
+                <input {DISABLED}
+                       required
+                       type="number"
+                       title="SR Chargeable hours after which consider SR as critical"
+                       name="header[1][autoCriticalP1Hours]"
+                       value="{autoCriticalP1Hours}"
+                       size="5"
+                       maxlength="5"
+                       step="0.01"
+                > <span class="formErrorMessage">{autoCriticalP1HoursMessage}</span></td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Auto critical P2 after XX hours</td>
+            <td class="field">
+                <input {DISABLED}
+                       required
+                       type="number"
+                       title="SR Chargeable hours after which consider SR as critical"
+                       name="header[1][autoCriticalP2Hours]"
+                       value="{autoCriticalP2Hours}"
+                       size="5"
+                       maxlength="5"
+                       step="0.01"
+                > <span class="formErrorMessage">{autoCriticalP2HoursMessage}</span></td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Auto critical P3 after XX hours</td>
+            <td class="field">
+                <input {DISABLED}
+                       required
+                       type="number"
+                       title="SR Chargeable hours after which consider SR as critical"
+                       name="header[1][autoCriticalP3Hours]"
+                       value="{autoCriticalP3Hours}"
+                       size="5"
+                       maxlength="5"
+                       step="0.01"
+                > <span class="formErrorMessage">{autoCriticalP3HoursMessage}</span></td>
+        </tr>
+
         <tr>
             <td class="promptText">Allowed client IP pattern</td>
             <td class="inputText">
@@ -788,7 +834,7 @@
                 <span class="formErrorMessage">{OSSupportDatesThresholdDaysMessage}</span>
             </td>
         </tr>
-         <tr>
+        <tr>
             <td class="promptText">7 Dayer Amber Days</td>
             <td class="inputText">
                 <input {DISABLED}
@@ -801,7 +847,7 @@
                 <span class="formErrorMessage">{sevenDayerAmberDaysMessage}</span>
             </td>
         </tr>
-         <tr>
+        <tr>
             <td class="promptText">7 Dayer Red Days</td>
             <td class="inputText">
                 <input {DISABLED}
