@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Allow Monitor / Critical SR at the point of logging
 ### Changed
 - Issue 649 - Offsite Backup Replication Checks Enhancements
 - Issue 641 - Office 365 License Export v2
