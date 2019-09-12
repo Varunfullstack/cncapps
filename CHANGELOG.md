@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v3.6.0]
 ### Added
 - Allow Monitor / Critical SR at the point of logging
 ### Changed
