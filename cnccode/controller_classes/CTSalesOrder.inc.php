@@ -1694,7 +1694,7 @@ class CTSalesOrder extends CTCNC
         $curCostGrandTotal = 0;
 
         $firstLine = true;
-
+        $hasGreenArrow = false;
         if ($dsOrdline->fetchNext()) {
             $this->template->set_block(
                 'SalesOrderDisplay',
@@ -1728,6 +1728,7 @@ class CTSalesOrder extends CTCNC
                     if ($dsOrdline->getValue(DBEOrdline::renewalCustomerItemID)) {
                         $iconColor = 'green';
                         $createItem = false;
+                        $hasGreenArrow = true;
                     }
 
 
@@ -2128,12 +2129,13 @@ class CTSalesOrder extends CTCNC
                                 $txtSendQuote = 'Flag as sent';
                             }
 
-
                             $quoteSentDateTime = 'Not sent';
                         } else {
                             if ($this->dsQuotation->getValue(
                                     DBEQuotation::fileExtension
-                                ) == 'pdf' && $this->dsQuotation->getValue(DBEQuotation::documentType) == 'quotation') {
+                                ) == 'pdf' && $this->dsQuotation->getValue(
+                                    DBEQuotation::documentType
+                                ) == 'quotation' && $hasGreenArrow) {
                                 $txtReminder = "Send Reminder";
                             }
 
