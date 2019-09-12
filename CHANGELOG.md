@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 612 - Show holiday on performance graphs
+
 ## [v3.5.3] - 2019-09-09
 ### Fixed
 - Issue with skip sales order in Activity.php when the SR is not related to a contract

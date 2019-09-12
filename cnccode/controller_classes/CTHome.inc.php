@@ -136,7 +136,7 @@ class CTHome extends CTCNC
 
         $dataStructure = [
             "cols"       => [
-                ["id" => "dates", "label" => "Dates", "type" => 'date'],
+                ["id" => "dates", "label" => "Dates", "type" => 'date',""],
             ],
             "rows"       => [
 
@@ -172,7 +172,7 @@ class CTHome extends CTCNC
             $cell = [
                 "c" =>
                     [
-                        ["v" => (new DateTime($result['loggedDate']))->format(DATE_ISO8601)],
+                        ["v" => (new DateTime($result['loggedDate']))->format(DATE_ISO8601), "p" => ["style" => 'border: 1px solid green;']],
                         ["v" => $result['loggedHours']]
                     ]
             ];
