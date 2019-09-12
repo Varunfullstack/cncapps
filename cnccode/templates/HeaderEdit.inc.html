@@ -735,6 +735,21 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">Backup Replication target success rate</td>
+            <td class="inputText">
+                <input
+                        {DISABLED}
+                        type="text"
+                        name="header[1][backupReplicationTargetSuccessRate]"
+                        value="{backupReplicationTargetSuccessRate}"
+                        title="The target % rate of success for backup replication"
+                        size="5"
+                        maxlength="5"
+                        required
+                > <span class="formErrorMessage">{backupReplicationTargetSuccessRateMessage}</span>
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">2S Replication Additional Delay Allowance</td>
             <td class="inputText">
                 <input

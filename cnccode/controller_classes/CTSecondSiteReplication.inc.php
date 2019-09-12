@@ -126,6 +126,13 @@ class CTSecondSiteReplication extends CTSecondSite
     function listAll()
     {
         $this->setMethodName('list');
+        $selectedYear = @$this->getParam('searchYear');
+
+        if (!$selectedYear) {
+            $selectedYear = date('Y');
+        }
+        $performanceData = $this->buSecondsite->getPerformanceDataForYear($selectedYear);
+
 
         $outOfDate = $this->buSecondsite->getImagesByStatus(BUSecondsite::STATUS_OUT_OF_DATE);
 
@@ -138,13 +145,70 @@ class CTSecondSiteReplication extends CTSecondSite
         $badConfig = $this->buSecondsite->getImagesByStatus(BUSecondsite::STATUS_BAD_CONFIG);
 
         $passed = $this->buSecondsite->getImagesByStatus(BUSecondsite::STATUS_PASSED);
+        $excluded = $this->buSecondsite->getImagesByStatus(BUSecondsite::STATUS_EXCLUDED);
 
         $this->setPageTitle('Offsite Backup Replication Status');
 
         $this->setTemplateFiles(array('SecondsiteList' => 'SecondsiteReplicationList.inc'));
 
         $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
+
+        $target = $dsHeader->getValue(DBEHeader::backupReplicationTargetSuccessRate);
+
+        $this->template->set_var(
+            [
+                "backupTargetSuccessRate" => $target,
+                "monthSuccessRate1Class"  => $performanceData[1] >= $target ? 'success' : 'fail',
+                "monthSuccessRate1"       => $this->validateAndRound($performanceData[1]),
+                "monthSuccessRate2Class"  => $performanceData[2] >= $target ? 'success' : 'fail',
+                "monthSuccessRate2"       => $this->validateAndRound($performanceData[2]),
+                "monthSuccessRate3Class"  => $performanceData[3] >= $target ? 'success' : 'fail',
+                "monthSuccessRate3"       => $this->validateAndRound($performanceData[3]),
+                "monthSuccessRate4Class"  => $performanceData[4] >= $target ? 'success' : 'fail',
+                "monthSuccessRate4"       => $this->validateAndRound($performanceData[4]),
+                "monthSuccessRate5Class"  => $performanceData[5] >= $target ? 'success' : 'fail',
+                "monthSuccessRate5"       => $this->validateAndRound($performanceData[5]),
+                "monthSuccessRate6Class"  => $performanceData[6] >= $target ? 'success' : 'fail',
+                "monthSuccessRate6"       => $this->validateAndRound($performanceData[6]),
+                "monthSuccessRate7Class"  => $performanceData[7] >= $target ? 'success' : 'fail',
+                "monthSuccessRate7"       => $this->validateAndRound($performanceData[7]),
+                "monthSuccessRate8Class"  => $performanceData[8] >= $target ? 'success' : 'fail',
+                "monthSuccessRate8"       => $this->validateAndRound($performanceData[8]),
+                "monthSuccessRate9Class"  => $performanceData[9] >= $target ? 'success' : 'fail',
+                "monthSuccessRate9"       => $this->validateAndRound($performanceData[9]),
+                "monthSuccessRate10Class" => $performanceData[10] >= $target ? 'success' : 'fail',
+                "monthSuccessRate10"      => $this->validateAndRound($performanceData[10]),
+                "monthSuccessRate11Class" => $performanceData[11] >= $target ? 'success' : 'fail',
+                "monthSuccessRate11"      => $this->validateAndRound($performanceData[11]),
+                "monthSuccessRate12Class" => $performanceData[12] >= $target ? 'success' : 'fail',
+                "monthSuccessRate12"      => $this->validateAndRound($performanceData[12])
+            ]
+        );
+
+        $this->template->setBlock(
+            'SecondsiteList',
+            'availableYearsBlock',
+            'availableYears'
+        );
+
+        $years = $this->buSecondsite->getPerformanceDataAvailableYears();
+
+        foreach ($years as $year) {
+            $this->template->set_var(
+                [
+                    "year"         => $year,
+                    "selectedYear" => $year == $selectedYear ? 'selected' : null
+                ]
+            );
+            $this->template->parse(
+                'availableYears',
+                'availableYearsBlock',
+                true
+            );
+        };
+
 
         $this->template->setBlock(
             'SecondsiteList',
@@ -334,6 +398,31 @@ class CTSecondSiteReplication extends CTSecondSite
 
         $this->template->setBlock(
             'SecondsiteList',
+            'excludedBlock',
+            'excluded'
+        );
+
+        foreach ($excluded as $record) {
+
+            $this->template->set_var(
+
+                array(
+                    'urlServer'    => $this->getEditUrl($record['server_cuino']),
+                    'customerName' => $record['cus_name'],
+                    'serverName'   => $record['serverName'],
+                )
+            );
+
+            $this->template->parse(
+                'excluded',
+                'excludedBlock',
+                true
+            );
+        }
+
+
+        $this->template->setBlock(
+            'SecondsiteList',
             'passedBlock',
             'passed'
         );
@@ -372,25 +461,6 @@ class CTSecondSiteReplication extends CTSecondSite
         $this->parsePage();
     }
 
-
-    /**
-     * Run validation
-     *
-     * @throws Exception
-     */
-    function run()
-    {
-        $this->buSecondsite->validateBackups($this->getParam('customerItemID'));
-
-        $urlNext =
-            Controller::buildLink(
-                'OffsiteBackupReplicationStatus.php',
-                array()
-            );
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
     /**
      * @param $server_cuino
      * @return mixed|string
@@ -408,5 +478,23 @@ class CTSecondSiteReplication extends CTSecondSite
             );
 
         return $ret;
+    }
+
+    /**
+     * Run validation
+     *
+     * @throws Exception
+     */
+    function run()
+    {
+        $this->buSecondsite->validateBackups($this->getParam('customerItemID'));
+
+        $urlNext =
+            Controller::buildLink(
+                'OffsiteBackupReplicationStatus.php',
+                array()
+            );
+        header('Location: ' . $urlNext);
+        exit;
     }
 }

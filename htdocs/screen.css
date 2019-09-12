@@ -586,7 +586,10 @@ table#bad-config, table#image-not-found, table#server-not-found, table#out-of-da
 
 table#suspended {
     background-color: #F2F7E4;
+}
 
+table#excluded {
+    background-color: #a2bf95;
 }
 
 .hiddenText {
