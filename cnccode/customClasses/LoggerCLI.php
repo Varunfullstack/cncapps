@@ -26,7 +26,7 @@ class LoggerCLI
         $this->log = new Logger('logger');
         $logFileName = $logName . '-' . $date->format('Ymd\THis') . ".log";
         $logPath = APPLICATION_LOGS . '/' . $logFileName;
-        $this->log->pushHandler(new StreamHandler($logPath, Logger::INFO));
+        $this->log->pushHandler(new \Monolog\Handler\RotatingFileHandler($logPath, 14, Logger::INFO));
         $consoleHandler = new StreamHandler('php://stdout', Logger::INFO);
         $consoleHandler->setFormatter(new ColoredLineFormatter());
         $this->log->pushHandler($consoleHandler);
