@@ -43,7 +43,7 @@ try
 
     }
     [array]$MailboxesReport = $MailboxesReport | Sort-Object TotalItemSize -Descending
-    $LicensesData = Get-MsolAccountSku | Select-Object AccountSkuId, ActiveUnits, @{ Name = 'Unallocated'; Expression = { $_.ActiveUnits - $_.ConsumedUnits } }
+    [array]$LicensesData = Get-MsolAccountSku | Select-Object AccountSkuId, ActiveUnits, @{ Name = 'Unallocated'; Expression = { $_.ActiveUnits - $_.ConsumedUnits } }
     $Report = @{
         mailboxes = $MailboxesReport
         licenses = $LicensesData

@@ -900,8 +900,7 @@ switch ($server_type) {
             'CONFIG_CATCHALL_EMAIL',
             'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN
         );
-//            error_reporting(E_ALL & ~E_STRICT)
-        error_reporting(E_ALL & ~E_WARNING);
+        error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
         ini_set(
             'display_errors',
             'on'

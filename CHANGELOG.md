@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.6.1] - 2019-09-13
+### Fixed
+- Fixed issue with 'Select Days' in DailyReport.php?action=outstandingIncidents&onScreen=true&dashboard=true&daysAgo=7
+- Fixed issue with Unallocated O365 licenses Email
+- Fixed issue with process updating sevenDayerPerformanceLog setting the wrong date
+
 ## [v3.6.0] - 2019-09-12
 ### Added
 - Allow Monitor / Critical SR at the point of logging
