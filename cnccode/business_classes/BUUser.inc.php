@@ -245,6 +245,7 @@ class BUUser extends Business
                       userID,
                       user_time_log.loggedDate AS loggedDate,
                       loggedHours,
+                      holiday,
                       CONCAT(
                         consultant.`firstName`,
                         ' ',

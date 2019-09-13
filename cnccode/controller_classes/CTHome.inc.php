@@ -66,9 +66,7 @@ class CTHome extends CTCNC
                     $team = $this->getParam('team');
                 }
                 echo json_encode(
-                    $this->showLastWeekHelpDeskData(
-                        $team
-                    ),
+                    $this->getLastWeekPerformanceDataForTeam($team),
                     JSON_NUMERIC_CHECK
                 );
                 break;
@@ -113,8 +111,7 @@ class CTHome extends CTCNC
      * @return array
      * @throws Exception
      */
-    private function showLastWeekHelpDeskData($team
-    )
+    private function getLastWeekPerformanceDataForTeam($team)
     {
         $isStandardUser = false;
         if (!$this->buUser->isSdManager($this->userID)) {
@@ -131,23 +128,7 @@ class CTHome extends CTCNC
             $this->userID
         );
         $dbeUser->getRow();
-
-        $graphs = [];
-
-        $dataStructure = [
-            "cols"       => [
-                ["id" => "dates", "label" => "Dates", "type" => 'date',""],
-            ],
-            "rows"       => [
-
-            ],
-            "dataPoints" => [
-
-            ],
-            "userName"   => null
-        ];
-
-
+        $usersData = [];
         $results = $this->buUser->teamMembersPerformanceData(
             $team,
             $this->buUser->isSdManager($this->userID)
@@ -159,38 +140,21 @@ class CTHome extends CTCNC
             }
 
             // if the user doesn't have a graph yet create it
-            if (!isset($graphs[$result['userID']])) {
-                $graphs[$result['userID']] = $dataStructure;
-                $graphs[$result['userID']]['cols'][] = [
-                    "id"    => $result['userID'],
-                    "label" => $result['userLabel'],
-                    'type'  => 'number'
-                ];
-                $graphs[$result['userID']]['userName'] = $result['userLabel'];
+            if (!isset($usersData[$result['userID']])) {
+                $usersData[$result['userID']]['userID'] = $result['userID'];
+                $usersData[$result['userID']]['userName'] = $result['userLabel'];
+                $usersData[$result['userID']]['dataPoints'] = [];
             }
 
-            $cell = [
-                "c" =>
-                    [
-                        ["v" => (new DateTime($result['loggedDate']))->format(DATE_ISO8601), "p" => ["style" => 'border: 1px solid green;']],
-                        ["v" => $result['loggedHours']]
-                    ]
+            $usersData[$result['userID']]['dataPoints'][] = [
+                'date'        => (new DateTime($result['loggedDate']))->format(DATE_ISO8601),
+                'loggedHours' => $result['loggedHours'],
+                'isHolidays'  => $result['holiday']
             ];
-
-            $graphs[$result['userID']]['rows'][] = $cell;
-        }
-
-        $toReturn = [];
-
-        foreach ($graphs as $userID => $graph) {
-            $toReturn[] = array_merge(
-                ["userID" => $userID],
-                $graph
-            );
         }
 
         usort(
-            $toReturn,
+            $usersData,
             function ($a,
                       $b
             ) {
@@ -201,7 +165,7 @@ class CTHome extends CTCNC
             }
         );
 
-        return $toReturn;
+        return $usersData;
     }
 
     /**
@@ -316,7 +280,7 @@ class CTHome extends CTCNC
         $db->next_record(MYSQLI_ASSOC);
 
         return $db->Record['upcomingVisitsData'];
-    } // end display projects
+    }
 
     /**
      * @throws Exception
@@ -386,7 +350,7 @@ class CTHome extends CTCNC
 
 
         $this->parsePage();
-    } // end displayTeamPerformanceReport
+    } // end display projects
 
     /**
      * @throws Exception
@@ -414,7 +378,7 @@ class CTHome extends CTCNC
             'upcomingVisits',
             true
         );
-    } // end displayUserLoggingPerformanceReport
+    } // end displayTeamPerformanceReport
 
     function displaySalesFigures()
     {
@@ -494,7 +458,7 @@ class CTHome extends CTCNC
         );
 
 
-    }
+    } // end displayUserLoggingPerformanceReport
 
     /**
      * @return mixed
@@ -1229,5 +1193,4 @@ class CTHome extends CTCNC
         );
 
     }
-
 }
