@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 606 - Sweetcode in URL
+
 ## [v3.6.1] - 2019-09-13
 ### Fixed
 - Fixed issue with 'Select Days' in DailyReport.php?action=outstandingIncidents&onScreen=true&dashboard=true&daysAgo=7
