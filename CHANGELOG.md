@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 559 - Improve OpenCallEmail.php code
+
 ## [v3.6.0] - 2019-09-12
 ### Added
 - Allow Monitor / Critical SR at the point of logging
