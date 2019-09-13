@@ -24,7 +24,7 @@ class LoggerCLI
     {
         $date = new \DateTime();
         $this->log = new Logger('logger');
-        $logFileName = $logName . '-' . $date->format('Ymd\THis') . ".log";
+        $logFileName = $logName . ".log";
         $logPath = APPLICATION_LOGS . '/' . $logFileName;
         $this->log->pushHandler(new \Monolog\Handler\RotatingFileHandler($logPath, 14, Logger::INFO));
         $consoleHandler = new StreamHandler('php://stdout', Logger::INFO);
