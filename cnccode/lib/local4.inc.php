@@ -21,7 +21,7 @@ define(
 );
 define(
     'PHPLIB_CLASSNAME_SESSION',
-    'seSweetcode'
+    'CNCCode'
 );
 define(
     'PHPLIB_CLASSNAME_USER',
@@ -136,7 +136,7 @@ class CtSweetcode extends CT_File
     var $file_path = PHPLIB_SESSIONS_DIR;  ## Path where to store the session files
 }
 
-class seSweetcode extends Session
+class CNCCode extends Session
 {
     var $classname = PHPLIB_CLASSNAME_SESSION;
     var $cookiename = "";     ## defaults to classname
