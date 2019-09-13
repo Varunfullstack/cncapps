@@ -197,7 +197,7 @@ GROUP BY t.month;
 
         }
         if ($generateLog) {
-            $date = (new DateTime())->format(DATE_MYSQL_DATE);
+            $date = (new DateTime('yesterday'))->format(DATE_MYSQL_DATE);
             $query = "INSERT INTO sevenDayersPerformanceLog (date, totalClosedSRs) VALUES ('$date', $requests)  ON DUPLICATE KEY UPDATE totalClosedSRs = $requests;";
             $this->db->query($query);
         }

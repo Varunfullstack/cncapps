@@ -78,12 +78,6 @@ $redThreshold = $dbeHeader->getValue(DBEHeader::office365MailboxRedWarningThresh
 if (!$yellowThreshold || !$redThreshold) {
     throw new Exception('Yellow and Red Threshold values are required');
 }
-function num2alpha($n)
-{
-    for ($r = ""; $n >= 0; $n = intval($n / 26) - 1)
-        $r = chr($n % 26 + 0x41) . $r;
-    return $r;
-}
 
 $buCustomer = new BUCustomer($thing);
 $buPassword = new BUPassword($thing);
@@ -365,14 +359,16 @@ function processMailboxes(Spreadsheet $spreadSheet,
     $mailboxesSheet->fromArray(
         $mailboxes,
         null,
-        'A2'
+        'A2',
+        true
     );
     $highestRow = count($mailboxes) + 2;
     $totalizationRow['LicensedUsers'] = "$totalizationRow[LicensedUsers] Licensed Users";
     $mailboxesSheet->fromArray(
         $totalizationRow,
         null,
-        'A' . $highestRow
+        'A' . $highestRow,
+        true
     );
 
     $mailboxesSheet->setCellValue(
@@ -457,7 +453,6 @@ function processLicenses(Spreadsheet $spreadSheet,
     $dateTime = new DateTime();
     $sparedLicenseErrors = [];
     foreach ($licenses as $key => $datum) {
-
         $dbeOffice365Licenses->getRowForLicense($datum['AccountSkuId']);
         if ($dbeOffice365Licenses->rowCount()) {
             $licenses[$key]['AccountSkuId'] = str_replace(
@@ -568,7 +563,8 @@ function processLicenses(Spreadsheet $spreadSheet,
     $licensesSheet->fromArray(
         $licenses,
         null,
-        'A2'
+        'A2',
+        true
     );
     $highestRow = count($licenses) + 2;
     $licensesSheet->fromArray(
