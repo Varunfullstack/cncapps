@@ -88,7 +88,7 @@
         const redThreshold = {redThreshold};
         let availableYears = [];
         let selectedYear = (new Date()).getFullYear();
-
+        const currentURL = new URL(location.href);
         function redrawYearSelector() {
             const yearSelectorElm = $('#yearSelector');
             yearSelectorElm.html('');
@@ -128,7 +128,6 @@
                         class: (foundItem.olderThan7DaysAvg <= foundItem.targetAvg ? 'success' : 'failure')
                     })
                 }
-                console.log(context);
                 const source = document.getElementById("performance-table-template").innerHTML;
                 const html = Mustache.to_html(source, context);
                 $('#performanceTableContainer').html(html);
@@ -138,8 +137,9 @@
 
         if (isDashboard) {
             $(document).ready(function () {
-
                 $('#dashboard').show();
+
+                $('#selectDaysSelector').val(currentURL.searchParams.get('daysAgo'));
                 // we have to pull the years available
                 $.ajax({
                     url: '?action=outstandingReportAvailableYears',
@@ -184,7 +184,6 @@
                         if (toAddClass) {
                             $(row).addClass(toAddClass);
                         }
-                        console.log(data);
                     }
                 });
             });
@@ -233,7 +232,9 @@
     <div id="performanceTableContainer"></div>
     <br>
     <div style="width: 150px;display: inline-block">Select Days:</div>
-    <select onchange="changeDays()">
+    <select onchange="changeDays()"
+            id="selectDaysSelector"
+    >
         <option value="0">0</option>
         <option value="1">1</option>
         <option value="2">2</option>
@@ -241,10 +242,7 @@
         <option value="4">4</option>
         <option value="5">5</option>
         <option value="6">6</option>
-        <option selected=""
-                value="7"
-        >7
-        </option>
+        <option value="7">7</option>
     </select>
 </div>
 <h3> Total Requests: {totalRequests} </h3>
