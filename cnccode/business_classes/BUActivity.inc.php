@@ -5459,6 +5459,33 @@ is currently a balance of ';
   get first last next and previous activities in this chain
   */
 
+    public function toggleMonitoringFlag($problemID)
+    {
+        global $db;
+        $userID = $this->loggedInUserID;
+        if (!self::checkMonitoringFlag($problemID)) {
+            //we need to enable it
+            $db->query("insert into problem_monitoring(problemId, cons_no) values ($problemID, $userID)");
+            return;
+        }
+
+        //we need to disable it
+        $db->query("delete from problem_monitoring where problemId = $problemID and cons_no = $userID");
+    }
+
+    public function checkMonitoringFlag($problemID)
+    {
+        global $db;
+
+        $userID = $this->loggedInUserID;
+
+        $sql = "SELECT * FROM problem_monitoring WHERE problemId = $problemID and cons_no = $userID";
+
+
+        $db->query($sql);
+        return !!$db->num_rows();
+    }
+
     /**
      * Calculate end time from start time for special types of activity
      *
@@ -6235,7 +6262,21 @@ is currently a balance of ';
         );
 
         $this->dbeProblem->updateRow();
-    }
+    } // end email to customer
+
+    /**
+     * Create copy of this activity but with:
+     *    start time now and end time not set
+     *   User = current user
+     *    date = today
+     *    reason = finalStatus( from old activity )
+     *    Status = not completed
+     *
+     * $moveToUsersQueue: Whether to move the SR to the logged in user's queue
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     */
 
     /**
      * Sends email to new user when service request reallocated
@@ -6348,21 +6389,7 @@ is currently a balance of ';
             $dbeJProblem,
             $dsResults
         );
-    } // end email to customer
-
-    /**
-     * Create copy of this activity but with:
-     *    start time now and end time not set
-     *   User = current user
-     *    date = today
-     *    reason = finalStatus( from old activity )
-     *    Status = not completed
-     *
-     * $moveToUsersQueue: Whether to move the SR to the logged in user's queue
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     */
+    }
 
     /**
      * Get problems by status
@@ -6386,7 +6413,7 @@ is currently a balance of ';
             $dsResults
         );
 
-    }
+    } // end email to customer
 
     /**
      * Get future dated SRs
@@ -6442,7 +6469,7 @@ is currently a balance of ';
         $dsResults->setClearRowsBeforeReplicateOff();
 
         $dsResults->replicate($dsAssignedResults);
-    } // end email to customer
+    }
 
     /**
      * Get active problems by customer
@@ -8546,6 +8573,77 @@ is currently a balance of ';
         return true;
     }
 
+//    function processIsSenderAuthorised($details,
+//                                       $contact,
+//                                       $record,
+//                                       &$errorString
+//    )
+//    {
+//
+//
+//        if ($contact && $contact['supportLevel']) {
+//
+//            $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
+//            $details .= 'New request from email received from ' . $record['senderEmailAddress'] . ' on ' . date(
+//                    CONFIG_MYSQL_DATETIME
+//                );
+//
+//            $this->raiseNewRequestFromImport(
+//                $record,
+//                $details,
+//                $contact
+//            );
+//
+//            return true;
+//        }
+//
+//        if ($contact) {
+//            if ($contact['isMainContact']) {
+//                $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
+//                $details .= 'This email is from an unauthorised contact and needs to be confirmed' . "\n\n";
+//                $details .= 'New request from ' . $record['senderEmailAddress'] . ' on ' . date(CONFIG_MYSQL_DATETIME);
+//
+//                $this->raiseNewRequestFromImport(
+//                    $record,
+//                    $details,
+//                    $contact
+//                );
+//                return true;
+//            } else {
+//                $errorString = 'Domain for ' . $record['senderEmailAddress'] . ' matches customer ' . $contact['customerID'] . ' but no main contact assigned for customer<br/>';
+//
+//                echo $errorString;
+//
+//                $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
+//                $details .= 'Email received from ' . $record['senderEmailAddress'] . ' on ' . date(
+//                        CONFIG_MYSQL_DATETIME
+//                    );
+//
+//                $this->addCustomerRaisedRequest(
+//                    $record,
+//                    $contact,
+//                    false,
+//                    $details,
+//                    'C'
+//                );
+//                return false;
+//            }
+//        } else {
+//            /* unknown domain */
+//            $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
+//            $details .= 'Email received from ' . $record['senderEmailAddress'] . ' on ' . date(CONFIG_MYSQL_DATETIME);
+//
+//            $this->addCustomerRaisedRequest(
+//                $record,
+//                $contact,
+//                false,
+//                $details,
+//                'C'
+//            );
+//            return true;
+//        }
+//    }
+
     /**
      * Set the problem to fixed
      *
@@ -8700,7 +8798,7 @@ is currently a balance of ';
         );
 
         return true;
-    }
+    } // end clearSystemSRQueue
 
     /**
      * @param $problemID
@@ -8735,77 +8833,6 @@ is currently a balance of ';
 
     }
 
-//    function processIsSenderAuthorised($details,
-//                                       $contact,
-//                                       $record,
-//                                       &$errorString
-//    )
-//    {
-//
-//
-//        if ($contact && $contact['supportLevel']) {
-//
-//            $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
-//            $details .= 'New request from email received from ' . $record['senderEmailAddress'] . ' on ' . date(
-//                    CONFIG_MYSQL_DATETIME
-//                );
-//
-//            $this->raiseNewRequestFromImport(
-//                $record,
-//                $details,
-//                $contact
-//            );
-//
-//            return true;
-//        }
-//
-//        if ($contact) {
-//            if ($contact['isMainContact']) {
-//                $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
-//                $details .= 'This email is from an unauthorised contact and needs to be confirmed' . "\n\n";
-//                $details .= 'New request from ' . $record['senderEmailAddress'] . ' on ' . date(CONFIG_MYSQL_DATETIME);
-//
-//                $this->raiseNewRequestFromImport(
-//                    $record,
-//                    $details,
-//                    $contact
-//                );
-//                return true;
-//            } else {
-//                $errorString = 'Domain for ' . $record['senderEmailAddress'] . ' matches customer ' . $contact['customerID'] . ' but no main contact assigned for customer<br/>';
-//
-//                echo $errorString;
-//
-//                $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
-//                $details .= 'Email received from ' . $record['senderEmailAddress'] . ' on ' . date(
-//                        CONFIG_MYSQL_DATETIME
-//                    );
-//
-//                $this->addCustomerRaisedRequest(
-//                    $record,
-//                    $contact,
-//                    false,
-//                    $details,
-//                    'C'
-//                );
-//                return false;
-//            }
-//        } else {
-//            /* unknown domain */
-//            $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
-//            $details .= 'Email received from ' . $record['senderEmailAddress'] . ' on ' . date(CONFIG_MYSQL_DATETIME);
-//
-//            $this->addCustomerRaisedRequest(
-//                $record,
-//                $contact,
-//                false,
-//                $details,
-//                'C'
-//            );
-//            return true;
-//        }
-//    }
-
     public function closeActivitiesWithEndTime($problemID)
     {
         /** @var $db dbSweetcode */
@@ -8822,7 +8849,7 @@ is currently a balance of ';
             ]
         );
         return true;
-    } // end clearSystemSRQueue
+    }
 
     function getActivitiesByProblemID($problemID)
     {
@@ -9049,7 +9076,7 @@ is currently a balance of ';
         $ret['customerID'] = $customerID;
         return $ret;
 
-    }
+    } // end sendPriorityOneReopenedEmail
 
     /**
      * @param $problemID
@@ -9259,7 +9286,7 @@ is currently a balance of ';
 
 
         return null;
-    } // end sendPriorityOneReopenedEmail
+    } // end sendServiceReallocatedEmail
 
     function getManagerComment($problemID)
     {
@@ -9309,7 +9336,11 @@ is currently a balance of ';
             $sql,
             $parameters
         );
-    } // end sendServiceReallocatedEmail
+    }
+
+    /*
+  Send email to SD Managers requesting more time to be allocated to SR
+  */
 
     /**
      * @param DataSet $dbeProblem
@@ -9509,10 +9540,6 @@ is currently a balance of ';
 
     }
 
-    /*
-  Send email to SD Managers requesting more time to be allocated to SR
-  */
-
     /**
      * Remove all SRs assigned to system user
      *
@@ -9575,6 +9602,7 @@ is currently a balance of ';
      * @param $contractCustomerItemID
      * @param $missingLetters
      * @param $missingImages
+     * @param bool $isReplication
      * @throws Exception
      */
     function raiseSecondSiteMissingImageRequest(
@@ -9583,10 +9611,13 @@ is currently a balance of ';
         $serverCustomerItemID,
         $contractCustomerItemID,
         $missingLetters,
-        $missingImages
+        $missingImages,
+        $isReplication = false
     )
     {
-        $detailsWithoutDriveLetters = '<p><strong>The following image(s) have not been found for ' . $serverName;
+
+        $detailsWithoutDriveLetters = '<p><strong>' . ($isReplication ? 'Replication - ' : '') . 'The following image(s) have not been found for ' . $serverName;
+
         $details = $detailsWithoutDriveLetters . ': ' . implode(
                 ',',
                 $missingLetters
@@ -9829,6 +9860,7 @@ is currently a balance of ';
      * @param $serverCustomerItemID
      * @param $contractCustomerItemID
      * @param $networkPath
+     * @param bool $isReplication
      * @throws Exception
      */
     function raiseSecondSiteLocationNotFoundRequest(
@@ -9836,10 +9868,11 @@ is currently a balance of ';
         $serverName,
         $serverCustomerItemID,
         $contractCustomerItemID,
-        $networkPath
+        $networkPath,
+        $isReplication = false
     )
     {
-        $details = '<p><strong>Image Location ' . $networkPath . ' cannot be found for ' . $serverName . '</p>';
+        $details = '<p><strong>' . ($isReplication ? 'Replication - ' : null) . 'Image Location ' . $networkPath . ' cannot be found for ' . $serverName . '</p>';
 
         $this->createSecondsiteSR(
             $customerID,
@@ -10364,33 +10397,6 @@ is currently a balance of ';
             4,
             $excludedActivityID
         );
-    }
-
-    public function toggleMonitoringFlag($problemID)
-    {
-        global $db;
-        $userID = $this->loggedInUserID;
-        if (!self::checkMonitoringFlag($problemID)) {
-            //we need to enable it
-            $db->query("insert into problem_monitoring(problemId, cons_no) values ($problemID, $userID)");
-            return;
-        }
-
-        //we need to disable it
-        $db->query("delete from problem_monitoring where problemId = $problemID and cons_no = $userID");
-    }
-
-    public function checkMonitoringFlag($problemID)
-    {
-        global $db;
-
-        $userID = $this->loggedInUserID;
-
-        $sql = "SELECT * FROM problem_monitoring WHERE problemId = $problemID and cons_no = $userID";
-
-
-        $db->query($sql);
-        return !!$db->num_rows();
     }
 
     public function unhideSR($problemID)

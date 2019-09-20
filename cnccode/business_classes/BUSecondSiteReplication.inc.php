@@ -118,7 +118,8 @@ class BUSecondsiteReplication extends BUSecondsite
                                     $server['serverName'],
                                     $server['server_cuino'],
                                     $server['cui_cuino'],
-                                    $networkPath
+                                    $networkPath,
+                                    true
                                 );
                             }
                         }
@@ -305,7 +306,8 @@ class BUSecondsiteReplication extends BUSecondsite
                         $server['server_cuino'],
                         $server['cui_cuino'],
                         $missingLetters,
-                        $missingImages
+                        $missingImages,
+                        true
                     );
 
                 }
