@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.6.2] - 2019-09-20
+### Fixed
+- Fixed issue with Replication Status reopening Backup SR's when it should only reopen/create issues for Replication
+
 ## [v3.6.1] - 2019-09-13
 ### Fixed
 - Fixed issue with 'Select Days' in DailyReport.php?action=outstandingIncidents&onScreen=true&dashboard=true&daysAgo=7
