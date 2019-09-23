@@ -321,6 +321,19 @@
                         </td>
                     </tr>
                     <tr>
+                        <td></td>
+                        <td>
+                            <input type="submit"
+                                   name="Export"
+                                   value="Export CSV"
+                            >
+                            <button type="button"
+                                    onclick="download3CXExport()"
+                            >3CX Address Book Export
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
                         <td class="promptText">From Email Address</td>
                         <td>
                             <input type="text"
@@ -370,14 +383,6 @@
                                    value="Send Email"
                                    onclick="if(!confirm('Are you sure you want to send these emails?')) return(false)"
                             >
-                            <input type="submit"
-                                   name="Export"
-                                   value="Export CSV"
-                            >
-                            <button type="button"
-                                    onclick="download3CXExport()"
-                            >3CX Address Book Export
-                            </button>
                         </td>
                     </tr>
                 </table>
