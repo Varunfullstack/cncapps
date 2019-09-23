@@ -120,15 +120,29 @@ class CTCustomer extends CTCNC
 {
     const GET_CUSTOMER_REVIEW_CONTACTS = "getCustomerReviewContacts";
     const DECRYPT = "decrypt";
+    const contactFormTitleClass = 'TitleClass';
+        const contactFormFirstNameClass = 'FirstNameClass';                      // Used when searching for an entity by string
+        const contactFormLastNameClass = 'LastNameClass';                      // Used when searching for an entity by string
+        const contactFormEmailClass = 'EmailClass';                      // Used when searching for an entity by string
+        const contactFormHasPassword = 'hasPassword';                      // Used when searching for an entity by string
+        const siteFormAdd1Class = 'Add1Class';                      // Used when searching for an entity by string
+        const siteFormTownClass = 'TownClass';                      // Used when searching for an entity by string
+        const siteFormPostcodeClass = 'PostcodeClass';                      // Used when searching for an entity by string
+        const customerFormNameClass = 'NameClass';                                // Used when searching for customer
+    const customerFormInvoiceSiteMessage = 'InvoiceSiteMessage';
+    const customerFormDeliverSiteMessage = 'DeliverSiteMessage';
+    const customerFormSectorMessage = 'SectorMessage';
+    const customerFormSpecialAttentionEndDateMessage = 'specialAttentionEndDateMessage';
+    const customerFormLastReviewMeetingDateMessage = 'lastReviewMeetingDateMessage';
     public $customerID;
-    public $customerString;                      // Used when searching for an entity by string
-    public $contactString;                      // Used when searching for an entity by string
-    public $phoneString;                      // Used when searching for an entity by string
-    public $newCustomerFromDate;                      // Used when searching for an entity by string
-    public $newCustomerToDate;                      // Used when searching for an entity by string
-    public $droppedCustomerFromDate;                      // Used when searching for an entity by string
-    public $droppedCustomerToDate;                      // Used when searching for an entity by string
-    public $address;                                // Used when searching for customer
+public $customerString;
+public $contactString;
+public $phoneString;
+public $newCustomerFromDate;
+public $newCustomerToDate;
+public $droppedCustomerFromDate;
+public $droppedCustomerToDate;
+public $address;
     public $buCustomer;
     public $customerStringMessage;
     public $dsCustomer;
@@ -137,25 +151,6 @@ class CTCustomer extends CTCNC
     public $siteNo;
     public $contactID;
     public $dsHeader;
-
-    const contactFormTitleClass = 'TitleClass';
-    const contactFormFirstNameClass = 'FirstNameClass';
-    const contactFormLastNameClass = 'LastNameClass';
-    const contactFormEmailClass = 'EmailClass';
-    const contactFormHasPassword = 'hasPassword';
-
-    const siteFormAdd1Class = 'Add1Class';
-    const siteFormTownClass = 'TownClass';
-    const siteFormPostcodeClass = 'PostcodeClass';
-
-    const customerFormNameClass = 'NameClass';
-    const customerFormInvoiceSiteMessage = 'InvoiceSiteMessage';
-    const customerFormDeliverSiteMessage = 'DeliverSiteMessage';
-    const customerFormSectorMessage = 'SectorMessage';
-    const customerFormSpecialAttentionEndDateMessage = 'specialAttentionEndDateMessage';
-    const customerFormLastReviewMeetingDateMessage = 'lastReviewMeetingDateMessage';
-
-
     var $orderTypeArray = array(
         "I" => "Initial",
         "Q" => "Quotation",
@@ -564,6 +559,11 @@ class CTCustomer extends CTCNC
         }
     }
 
+    function getYN($flag)
+    {
+        return ($flag == 'Y' ? $flag : 'N');
+    }
+
     function setSite(&$siteArray)
     {
         if (!is_array($siteArray)) {
@@ -670,45 +670,6 @@ class CTCustomer extends CTCNC
             );
             $this->dsSite->post();
         }
-    }
-
-    function setCustomerID($customerID)
-    {
-        $this->setNumericVar(
-            'customerID',
-            $customerID
-        );
-    }
-
-    function getCustomerID()
-    {
-        return $this->customerID;
-    }
-
-    function setSiteNo($siteNo)
-    {
-        $this->setNumericVar(
-            'siteNo',
-            $siteNo
-        );
-    }
-
-    function getSiteNo()
-    {
-        return $this->siteNo;
-    }
-
-    function setContactID($contactID)
-    {
-        $this->setNumericVar(
-            'contactID',
-            $contactID
-        );
-    }
-
-    function getContactID()
-    {
-        return $this->contactID;
     }
 
     function setCustomer(&$customerArray)
@@ -976,108 +937,6 @@ class CTCustomer extends CTCNC
         }
     }
 
-
-    function setCustomerString($customerString)
-    {
-        $this->customerString = $customerString;
-    }
-
-    function getCustomerString()
-    {
-        return $this->customerString;
-    }
-
-    function setContactString($contactString)
-    {
-        $this->contactString = $contactString;
-    }
-
-    function getContactString()
-    {
-        return $this->contactString;
-    }
-
-    function setPhoneString($phoneString)
-    {
-        $this->phoneString = $phoneString;
-    }
-
-    function getPhoneString()
-    {
-        return $this->phoneString;
-    }
-
-    function setAddress($address)
-    {
-        $this->address = $address;
-    }
-
-    function getAddress()
-    {
-        return $this->address;
-    }
-
-    function setCustomerStringMessage($message)
-    {
-        if (func_get_arg(0) != "") $this->setFormErrorOn();
-        $this->customerStringMessage = $message;
-    }
-
-    function getCustomerStringMessage()
-    {
-        return $this->customerStringMessage;
-    }
-
-    function setNewCustomerFromDate($newCustomerFromDate)
-    {
-        $this->newCustomerFromDate = $newCustomerFromDate;
-    }
-
-    function getNewCustomerFromDate()
-    {
-        return $this->newCustomerFromDate;
-    }
-
-    function setNewCustomerToDate($newCustomerToDate)
-    {
-        $this->newCustomerToDate = $newCustomerToDate;
-    }
-
-    function getNewCustomerToDate()
-    {
-        return $this->newCustomerToDate;
-    }
-
-    function setDroppedCustomerFromDate($droppedCustomerFromDate)
-    {
-        $this->droppedCustomerFromDate = $droppedCustomerFromDate;
-    }
-
-    function getDroppedCustomerFromDate()
-    {
-        return $this->droppedCustomerFromDate;
-    }
-
-    function setDroppedCustomerToDate($droppedCustomerToDate)
-    {
-        $this->droppedCustomerToDate = $droppedCustomerToDate;
-    }
-
-    function getDroppedCustomerToDate()
-    {
-        return $this->droppedCustomerToDate;
-    }
-
-    function getYN($flag)
-    {
-        return ($flag == 'Y' ? $flag : 'N');
-    }
-
-    function getChecked($flag)
-    {
-        return ($flag == 'N' ? null : CT_CHECKED);
-    }
-
     function convertDateYMD($dateDMY)
     {
         if ($dateDMY) {
@@ -1099,11 +958,6 @@ class CTCustomer extends CTCNC
         } else {
             return null;
         }
-    }
-
-    function getOrderTypeDescription($type)
-    {
-        return $this->orderTypeArray[$type];
     }
 
     /**
@@ -1269,6 +1123,19 @@ class CTCustomer extends CTCNC
 
     }
 
+    function getCustomerID()
+    {
+        return $this->customerID;
+    }
+
+    function setCustomerID($customerID)
+    {
+        $this->setNumericVar(
+            'customerID',
+            $customerID
+        );
+    }
+
     /**
      * Displays next prospect to review (if any)
      *
@@ -1384,449 +1251,125 @@ class CTCustomer extends CTCNC
 
     }
 
-
-    private function getContractAndNumberData()
-    {
-        global $db; //PHPLib DB object
-
-
-        $queryString =
-            "SELECT
-  `cus_custno`,
-  cus_name AS customerName,
-  serviceDeskProduct,
-  COALESCE(serviceDeskUsers,0) AS serviceDeskUsers,
-  COALESCE(serviceDeskContract,0) AS serviceDeskContract,
-  COALESCE(serviceDeskCostPerUserMonth,0) AS serviceDeskCostPerUserMonth,
-  serverCareProduct,
-  COALESCE(virtualServers,0) AS virtualServers,
-  COALESCE(physicalServers,0) AS physicalServers,
-  COALESCE(serverCareContract,0) AS serverCareContract,
-  concat('M ',coalesce(mainCount, 0),', SV ',coalesce(supervisorCount,0),', S ', coalesce(supportCount, 0),', D ', coalesce(delegateCount, 0),', T ', coalesce(totalCount, 0)) as supportedUsers,
-  totalCount > serviceDeskUsers as moreUsersThanExpected 
-FROM
-  customer
-  LEFT JOIN
-  (SELECT
-     `cui_custno`                      AS customerId,
-     itm_desc                          AS serviceDeskProduct,
-     custitem.`cui_users`              AS serviceDeskUsers,
-     round(custitem.cui_sale_price, 0) AS serviceDeskContract,
-     ROUND(
-         custitem.cui_sale_price / custitem.cui_users / 12,
-         2
-     )                                 AS serviceDeskCostPerUserMonth
-   FROM
-     custitem
-     LEFT JOIN item
-       ON item.`itm_itemno` = custitem.`cui_itemno`
-   WHERE itm_desc LIKE '%servicedesk%'
-         AND itm_discontinued <> 'Y'
-         AND custitem.`declinedFlag` <> 'Y') AS test1
-    ON test1.customerId = customer.`cus_custno`
-  LEFT JOIN
-  (SELECT
-     custitem.`cui_custno`               AS customerId,
-     item.itm_desc                       AS serverCareProduct,
-     SUM(
-         serverItem.`itm_desc` LIKE '%virtual%'
-     )                                   AS virtualServers,
-     SUM(
-         serverItem.itm_desc NOT LIKE '%virtual%'
-     )                                   AS physicalServers,
-     round(custitem.`cui_sale_price`, 0) AS serverCareContract
-   FROM
-     custitem
-     LEFT JOIN item
-       ON item.`itm_itemno` = custitem.`cui_itemno`
-     LEFT JOIN custitem_contract
-       ON custitem_contract.`cic_contractcuino` = cui_cuino
-     LEFT JOIN custitem AS servers
-       ON custitem_contract.`cic_cuino` = servers.cui_cuino
-     LEFT JOIN item AS serverItem
-       ON servers.cui_itemno = serverItem.`itm_itemno`
-   WHERE item.`itm_desc` LIKE '%servercare%'
-         AND item.itm_discontinued <> 'Y'
-         AND custitem.`declinedFlag` <> 'Y'
-   GROUP BY custitem.`cui_cuino`) test2
-    ON customer.cus_custno = test2.customerId
-left join (
-    select 
-  contact.`con_custno`,
-  sum(contact.`supportLevel` = 'main') as mainCount,
-  SUM(
-    contact.`supportLevel` = 'supervisor'
-  ) AS supervisorCount,
-  SUM(
-    contact.`supportLevel` = 'support'
-  ) AS supportCount,
-  SUM(
-    contact.`supportLevel` = 'delegate'
-  ) AS delegateCount,
-  sum(1) as totalCount 
-from
-  contact 
-where supportLevel is not null 
-GROUP BY con_custno 
-) supportUsers on supportUsers.con_custno = customer.cus_custno
-WHERE serviceDeskProduct IS NOT NULL OR serverCareProduct IS NOT NULL
-ORDER BY cus_name ASC  ";
-
-        $db->query($queryString);
-        return $db;
-    }
-
-    function csvContractAndNumbersReport()
-    {
-        $csv_export = '';
-        $db = $this->getContractAndNumberData();
-
-        $headersSet = false;
-
-        while ($db->next_record()) {
-            $row = $db->Record;
-            if (!$headersSet) {
-                foreach (array_keys($row) as $key) {
-                    if (!is_numeric($key)) {
-                        $csv_export .= $key . ';';
-                    }
-                }
-            }
-            $this->template->set_var(
-                array(
-                    'customerName'                => $row["customerName"],
-                    'serviceDeskProduct'          => $row['serviceDeskProduct'],
-                    'serviceDeskUsers'            => $row['serviceDeskUsers'],
-                    'serviceDeskContract'         => $row['serviceDeskContract'],
-                    'serviceDeskCostPerUserMonth' => $row['serviceDeskCostPerUserMonth'],
-                    'serverCareProduct'           => $row['serverCareProduct'],
-                    'virtualServers'              => $row['virtualServers'],
-                    'physicalServers'             => $row['physicalServers'],
-                    'serverCareContract'          => $row['serverCareContract']
-
-                )
-            );
-
-            $this->template->parse(
-                'contracts',
-                'contractItemBlock',
-                true
-            );
-
-        }
-    }
-
     /**
+     * Search for customers using customerString
+     * @access private
      * @throws Exception
      */
-    function displayContractAndNumbersReport()
+    function search()
     {
-
-        $this->setPageTitle("Service Contracts Ratio");
-
-        $this->setTemplateFiles(
-            'ContractAndNumbersReport',
-            'ContractAndNumbersReport'
-        );
-
-
-        $db = $this->getContractAndNumberData();
-
-
-        $this->template->set_block(
-            'ContractAndNumbersReport',
-            'contractItemBlock',
-            'contracts'
-        );
-
-        while ($db->next_record()) {
-            $row = $db->Record;
-            $this->template->set_var(
-                array(
-                    'customerName'                => $row["customerName"],
-                    'serviceDeskProduct'          => $row['serviceDeskProduct'],
-                    'serviceDeskUsers'            => $row['serviceDeskUsers'],
-                    'serviceDeskContract'         => $row['serviceDeskContract'],
-                    'serviceDeskCostPerUserMonth' => $row['serviceDeskCostPerUserMonth'],
-                    'serverCareProduct'           => $row['serverCareProduct'],
-                    'virtualServers'              => $row['virtualServers'],
-                    'physicalServers'             => $row['physicalServers'],
-                    'serverCareContract'          => $row['serverCareContract'],
-                    'supportedUsers'              => $row['supportedUsers'],
-                    'moreThanExpectedClass'       => $row['moreUsersThanExpected'] ? "red" : null
-
-                )
-            );
-
-            $this->template->parse(
-                'contracts',
-                'contractItemBlock',
-                true
-            );
+        $this->setMethodName('search');
+// Parameter validation
+        if (!$this->buCustomer->getCustomersByNameMatch(
+            $this->dsCustomer,
+            $this->getContactString(),
+            $this->getPhoneString(),
+            $this->getCustomerString(),
+            $this->getAddress(),
+            $this->convertDateYMD($this->getNewCustomerFromDate()),
+            $this->convertDateYMD($this->getNewCustomerToDate()),
+            $this->convertDateYMD($this->getDroppedCustomerFromDate()),
+            $this->convertDateYMD($this->getDroppedCustomerToDate())
+        )
+        ) {
+            $this->setCustomerStringMessage(CTCUSTOMER_MSG_NONE_FND);
         }
+        if (($this->formError) || ($this->dsCustomer->rowCount() > 1)) {
+            $this->displaySearchForm();
+        } else {
+            // reload with this customer
+            $nextURL =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'     => CTCNC_ACT_DISP_EDIT,
+                        'customerID' => $this->dsCustomer->getValue(DBECustomer::customerID)
+                    )
+                );
+            header('Location: ' . $nextURL);
+            exit;
 
-
-        $this->template->parse(
-            'CONTENTS',
-            'ContractAndNumbersReport',
-            true
-        );
-
-
-        $this->parsePage();
-
-        exit;
+        }
     }
 
-    /**
-     * Displays list of customers with 24 Hour Support
-     *
-     * @throws Exception
-     */
-    function display24HourSupportCustomers()
+    function getContactString()
     {
-        $this->setMethodName('display24HourSupportCustomers');
-
-        $this->setPageTitle("24 Hour Support Customers");
-        $dsCustomer = new DataSet($this);
-        if ($this->buCustomer->get24HourSupportCustomers($dsCustomer)) {
-
-            $this->setTemplateFiles(
-                'Customer24HourSupport',
-                'Customer24HourSupport.inc'
-            );
-
-            $this->template->set_block(
-                'Customer24HourSupport',
-                'customerBlock',
-                'customers'
-            );
-
-            while ($dsCustomer->fetchNext()) {
-
-                $linkURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => 'dispEdit',
-                            'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
-                        )
-                    );
-
-
-                $this->template->set_var(
-                    array(
-                        'customerName' => $dsCustomer->getValue(DBECustomer::name),
-                        'linkURL'      => $linkURL
-                    )
-                );
-
-                $this->template->parse(
-                    'customers',
-                    'customerBlock',
-                    true
-                );
-
-            }
-
-            $this->template->parse(
-                'CONTENTS',
-                'Customer24HourSupport',
-                true
-            );
-
-        } else {
-
-            $this->setTemplateFiles(
-                'SimpleMessage',
-                'SimpleMessage.inc'
-            );
-            $this->template->set_var(
-                'message',
-                'There are no 24 Hour Support customers'
-            );
-        }
-
-        $this->parsePage();
-
-        exit;
+        return $this->contactString;
     }
 
-    /**
-     * Displays list of customers with Special Attention flag set
-     *
-     * @throws Exception
-     */
-    function displaySpecialAttentionCustomers()
+    function setContactString($contactString)
     {
-        $this->setMethodName('displaySpecialAttentionCustomers');
+        $this->contactString = $contactString;
+    }
 
-        $this->setPageTitle("Special Attention Customers");
-        global $cfg;
-        $customerTemplate = new Template (
-            $cfg["path_templates"],
-            "remove"
-        );
+    function getPhoneString()
+    {
+        return $this->phoneString;
+    }
 
-        $contactTemplate = new Template(
-            $cfg["path_templates"],
-            "remove"
-        );
+    function setPhoneString($phoneString)
+    {
+        $this->phoneString = $phoneString;
+    }
 
+    function getCustomerString()
+    {
+        return $this->customerString;
+    }
 
-        $this->setTemplateFiles(
-            'SpecialAttention',
-            'SpecialAttention'
-        );
+    function setCustomerString($customerString)
+    {
+        $this->customerString = $customerString;
+    }
 
-        $buContact = new BUContact($this);
-        $dsContact = new DataSet($this);
-        if ($buContact->getSpecialAttentionContacts($dsContact)) {
-            $contactTemplate->setFile(
-                'ContactSpecialAttention',
-                'ContactSpecialAttention.html'
-            );
+    function getAddress()
+    {
+        return $this->address;
+    }
 
-            $contactTemplate->set_block(
-                'ContactSpecialAttention',
-                'contactBlock',
-                'contacts'
-            );
-            $dbeCustomer = new DBECustomer($this);
-            while ($dsContact->fetchNext()) {
+    function setAddress($address)
+    {
+        $this->address = $address;
+    }
 
-                $linkURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => 'dispEdit',
-                            'customerID' => $dsContact->getValue(DBEContact::customerID)
-                        )
-                    );
+    function getNewCustomerFromDate()
+    {
+        return $this->newCustomerFromDate;
+    }
 
-                if ($dbeCustomer->getValue(DBECustomer::customerID) != $dsContact->getValue(DBEContact::customerID)) {
-                    $dbeCustomer->getRow($dsContact->getValue(DBEContact::customerID));
-                }
+    function setNewCustomerFromDate($newCustomerFromDate)
+    {
+        $this->newCustomerFromDate = $newCustomerFromDate;
+    }
 
-                $contactTemplate->set_var(
-                    array(
-                        'contactName'  => ($dsContact->getValue(DBEContact::firstName) . " " . $dsContact->getValue(
-                                DBEContact::lastName
-                            )),
-                        'linkURL'      => $linkURL,
-                        'customerName' => $dbeCustomer->getValue(DBECustomer::name)
-                    )
-                );
+    function getNewCustomerToDate()
+    {
+        return $this->newCustomerToDate;
+    }
 
-                $contactTemplate->parse(
-                    'contacts',
-                    'contactBlock',
-                    true
-                );
+    function setNewCustomerToDate($newCustomerToDate)
+    {
+        $this->newCustomerToDate = $newCustomerToDate;
+    }
 
-            }
+    function getDroppedCustomerFromDate()
+    {
+        return $this->droppedCustomerFromDate;
+    }
 
-            $contactTemplate->parse(
-                'OUTPUT',
-                'ContactSpecialAttention',
-                true
-            );
+    function setDroppedCustomerFromDate($droppedCustomerFromDate)
+    {
+        $this->droppedCustomerFromDate = $droppedCustomerFromDate;
+    }
 
+    function getDroppedCustomerToDate()
+    {
+        return $this->droppedCustomerToDate;
+    }
 
-        } else {
-            $contactTemplate->setFile(
-                'SimpleMessage',
-                'SimpleMessage.inc.html'
-            );
-
-            $contactTemplate->set_var(array('message' => 'There are no special attention contacts'));
-
-            $contactTemplate->parse(
-                'OUTPUT',
-                'SimpleMessage',
-                true
-            );
-        };
-        $dsCustomer = new DataSet($this);
-        if ($this->buCustomer->getSpecialAttentionCustomers($dsCustomer)) {
-
-
-            $customerTemplate->setFile(
-                'CustomerSpecialAttention',
-                'CustomerSpecialAttention.inc.html'
-            );
-
-            $customerTemplate->set_block(
-                'CustomerSpecialAttention',
-                'customerBlock',
-                'customers'
-            );
-
-            while ($dsCustomer->fetchNext()) {
-
-                $linkURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => 'dispEdit',
-                            'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
-                        )
-                    );
-
-
-                $customerTemplate->set_var(
-                    array(
-                        'customerName'            => $dsCustomer->getValue(DBECustomer::name),
-                        'specialAttentionEndDate' => $dsCustomer->getValue(DBECustomer::specialAttentionEndDate),
-                        'linkURL'                 => $linkURL
-                    )
-                );
-
-                $customerTemplate->parse(
-                    'customers',
-                    'customerBlock',
-                    true
-                );
-
-            }
-
-            $customerTemplate->parse(
-                'OUTPUT',
-                'CustomerSpecialAttention',
-                true
-            );
-
-        } else {
-
-            $customerTemplate->setFile(
-                'SimpleMessage',
-                'SimpleMessage.inc.html'
-            );
-
-            $customerTemplate->set_var(array('message' => 'There are no special attention customers'));
-
-            $customerTemplate->parse(
-                'OUTPUT',
-                'SimpleMessage',
-                true
-            );
-        }
-
-        $this->template->setVar(
-            [
-                "customerSpecialAttention" => $customerTemplate->getVar('OUTPUT'),
-                "contactSpecialAttention"  => $contactTemplate->getVar('OUTPUT')
-            ]
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'SpecialAttention'
-        );
-
-        $this->parsePage();
-
-        exit;
+    function setDroppedCustomerToDate($droppedCustomerToDate)
+    {
+        $this->droppedCustomerToDate = $droppedCustomerToDate;
     }
 
     /**
@@ -1912,45 +1455,15 @@ ORDER BY cus_name ASC  ";
         $this->parsePage();
     }
 
-    /**
-     * Search for customers using customerString
-     * @access private
-     * @throws Exception
-     */
-    function search()
+    function getCustomerStringMessage()
     {
-        $this->setMethodName('search');
-// Parameter validation
-        if (!$this->buCustomer->getCustomersByNameMatch(
-            $this->dsCustomer,
-            $this->getContactString(),
-            $this->getPhoneString(),
-            $this->getCustomerString(),
-            $this->getAddress(),
-            $this->convertDateYMD($this->getNewCustomerFromDate()),
-            $this->convertDateYMD($this->getNewCustomerToDate()),
-            $this->convertDateYMD($this->getDroppedCustomerFromDate()),
-            $this->convertDateYMD($this->getDroppedCustomerToDate())
-        )
-        ) {
-            $this->setCustomerStringMessage(CTCUSTOMER_MSG_NONE_FND);
-        }
-        if (($this->formError) || ($this->dsCustomer->rowCount() > 1)) {
-            $this->displaySearchForm();
-        } else {
-            // reload with this customer
-            $nextURL =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'     => CTCNC_ACT_DISP_EDIT,
-                        'customerID' => $this->dsCustomer->getValue(DBECustomer::customerID)
-                    )
-                );
-            header('Location: ' . $nextURL);
-            exit;
+        return $this->customerStringMessage;
+    }
 
-        }
+    function setCustomerStringMessage($message)
+    {
+        if (func_get_arg(0) != "") $this->setFormErrorOn();
+        $this->customerStringMessage = $message;
     }
 
     /**
@@ -3248,271 +2761,6 @@ ORDER BY cus_name ASC  ";
     }
 
     /**
-     * Delete customer and associated sites/contacts
-     * @access private
-     * @throws Exception
-     */
-    function deleteCustomer()
-    {
-        $this->setMethodName('deleteCustomer');
-        if (!$this->getCustomerID()) {
-            $this->displayFatalError('CustomerID not passed');
-        }
-        if ($this->buCustomer->canDeleteCustomer(
-            $this->getCustomerID(),
-            $this->userID
-        )) {
-            $this->buCustomer->deleteCustomer($this->getCustomerID());
-
-            $nextURL =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTCUSTOMER_ACT_DISP_SEARCH
-                    )
-                );
-        } else {
-            $this->setFormErrorMessage('Cannot delete this customer - dependencies exist');
-            $this->setAction(CTCNC_ACT_DISP_EDIT);
-            $this->buCustomer->getCustomerByID(
-                $this->getCustomerID(),
-                $this->dsCustomer
-            );
-            $this->displayEditForm();
-            exit;
-        }
-
-        header('Location: ' . $nextURL);
-        exit;
-    }
-
-    /**
-     * Delete sites and associated contacts
-     * @access private
-     * @throws Exception
-     */
-    function deleteSite()
-    {
-        $this->setMethodName('deleteSite');
-        if (!$this->getCustomerID()) {
-            $this->displayFatalError('CustomerID not passed');
-        }
-        if (!$this->getSiteNo()) {
-            $this->displayFatalError('SiteNo not passed');
-        }
-        if ($this->buCustomer->canDeleteSite(
-            $this->getCustomerID(),
-            $this->getSiteNo()
-        )) {
-            $this->buCustomer->deleteSite(
-                $this->getCustomerID(),
-                $this->getSiteNo()
-            );
-        } else {
-            throw new Exception('Cannot delete this site - dependencies exist');
-        }
-        $nextURL =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => CTCNC_ACT_DISP_EDIT,
-                    'customerID' => $this->getCustomerID()
-                )
-            );
-        header('Location: ' . $nextURL);
-        exit;
-    }
-
-    /**
-     * Delete contact
-     * @access private
-     * @throws Exception
-     */
-    function deleteContact()
-    {
-        $this->setMethodName('deleteContact');
-        if (!$this->getContactID()) {
-            $this->displayFatalError('ContactID not passed');
-        }
-        $dsContact = new DataSet($this);
-        $this->buCustomer->getContactByID(
-            $this->getContactID(),
-            $dsContact
-        );
-        $this->setCustomerID($dsContact->getValue(DBEContact::customerID));
-
-        $nextURL =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => CTCNC_ACT_DISP_EDIT,
-                    'customerID' => $this->getCustomerID()
-                )
-            );
-
-        if ($this->buCustomer->canDeleteContact($this->getContactID())) {
-            $this->buCustomer->deleteContact($this->getContactID());
-        } else {
-            // Display a message page.
-            $this->setTemplateFiles(
-                'Message',
-                'Message.inc'
-            );
-
-            $message =
-                'Cannot delete contact ' .
-                $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(DBEContact::lastName) .
-                ' because dependencies exist in the database';
-
-            $this->template->set_var(
-                array(
-                    'message' => $message,
-                    'nextURL' => $nextURL
-                )
-            );
-            $this->template->parse(
-                'CONTENTS',
-                'Message',
-                true
-            );
-            $this->parsePage();
-            exit;
-        }
-        header('Location: ' . $nextURL);
-        exit;
-    }
-
-    /**
-     * Update details
-     * @access private
-     * @throws Exception
-     */
-    function update()
-    {
-        $this->setMethodName('update');
-        $this->setCustomerID($this->dsCustomer->getValue(DBECustomer::customerID));
-
-
-        if (!$this->formError) {
-            // Update the database
-            if ($this->getCustomerID() == 0) {      // New customer
-                $this->buCustomer->insertCustomer(
-                    $this->dsCustomer,
-                    $this->dsSite,
-                    $this->dsContact
-                );
-                $this->dsCustomer->initialise();
-                $this->dsCustomer->fetchNext();
-                $this->setCustomerID($this->dsCustomer->getValue(DBECustomer::customerID));
-            } else {                // Updates to customer and updates/inserts to sites and contacts
-                $this->buCustomer->updateCustomer($this->dsCustomer);
-                $this->buCustomer->updateSite($this->dsSite);
-                if (isset($this->postVars["form"]["contact"])) {
-                    $this->buCustomer->updateContact($this->dsContact);
-                }
-            }
-            $this->setAction(CTCUSTOMER_ACT_DISP_SUCCESS);
-            if ($this->getSessionParam('save_page')) {
-                header('Location: ' . $_SESSION['save_page']);
-                exit;
-            } else {
-                $nextURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => CTCNC_ACT_DISP_EDIT,
-                            'customerID' => $this->getCustomerID()
-                        )
-                    );
-
-                header('Location: ' . $nextURL);
-                exit;
-            }
-        } else {
-            $this->displayEditForm();
-        }
-    }
-
-    /**
-     * Display the popup selector form
-     * @access private
-     * @throws Exception
-     */
-    function displayCustomerSelectPopup()
-    {
-        $this->setMethodName('displayCustomerSelectPopup');
-        $this->buCustomer->getCustomersByNameMatch(
-            $this->dsCustomer,
-            null,
-            null,
-            $this->getCustomerString(),
-            null,
-            null,
-            null,
-            null,
-            null
-        );
-        if ($this->dsCustomer->rowCount() == 1) {
-            $this->setTemplateFiles(
-                'CustomerSelect',
-                'CustomerSelectOne.inc'
-            );
-        }
-        if ($this->dsCustomer->rowCount() == 0) {
-            $this->template->set_var(
-                'customerString',
-                $this->getCustomerString()
-            );
-            $this->setTemplateFiles(
-                'CustomerSelect',
-                'CustomerSelectNone.inc'
-            );
-        }
-        if ($this->dsCustomer->rowCount() > 1) {
-            $this->setTemplateFiles(
-                'CustomerSelect',
-                'CustomerSelectPopup.inc'
-            );
-        }
-        // fields to populate on parent page
-        $this->template->set_var(
-            array(
-                'parentIDField'   => $_SESSION['parentIDField'],
-                'parentDescField' => $_SESSION['parentDescField']
-            )
-        );
-
-// Parameters
-        $this->setPageTitle('Customer Selection');
-        if ($this->dsCustomer->rowCount() > 0) {
-            $this->template->set_block(
-                'CustomerSelect',
-                'customerBlock',
-                'customers'
-            );
-            while ($this->dsCustomer->fetchNext()) {
-                $this->template->set_var(
-                    array(
-                        'customerName' => addslashes($this->dsCustomer->getValue(DBECustomer::name)),
-                        'customerID'   => $this->dsCustomer->getValue(DBECustomer::customerID)
-                    )
-                );
-                $this->template->parse(
-                    'customers',
-                    'customerBlock',
-                    true
-                );
-            }
-        }
-        $this->template->parse(
-            'CONTENTS',
-            'CustomerSelect',
-            true
-        );
-        $this->parsePage();
-    }
-
-    /**
      * @param $customerID
      * @return string
      * @throws Exception
@@ -3535,7 +2783,58 @@ ORDER BY cus_name ASC  ";
         return '<A HREF="' . $url . ' " target="_blank" >Notes History</A>';
     }
 
-    function siteDropdown(
+    function getChecked($flag)
+    {
+        return ($flag == 'N' ? null : CT_CHECKED);
+    }
+
+    function getSiteNo()
+    {
+        return $this->siteNo;
+    }
+
+    function setSiteNo($siteNo)
+    {
+        $this->setNumericVar(
+            'siteNo',
+            $siteNo
+        );
+    }
+
+    /**
+     * Get and parse contact drop-down selector
+     * @access private
+     * @param $contactID
+     * @param DataSet $dsContact
+     * @param $blockVar
+     * @param $blockName
+     */
+    function parseContactSelector($contactID,
+                                  &$dsContact,
+                                  $blockVar,
+                                  $blockName
+    )
+    {
+        $dsContact->initialise();
+        while ($dsContact->fetchNext()) {
+            $contactSelected = ($dsContact->getValue(DBEContact::contactID) == $contactID) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    $blockName . 'Selected'  => $contactSelected,
+                    $blockName . 'ContactID' => $dsContact->getValue(DBEContact::contactID),
+                    $blockName . 'FirstName' => $dsContact->getValue(DBEContact::firstName),
+                    $blockName . 'LastName'  => $dsContact->getValue(DBEContact::lastName)
+                )
+            );
+            $this->template->parse(
+                $blockVar,
+                $blockName,
+                true
+            );
+        }
+    }
+
+function siteDropdown(
         $customerID,
         $siteNo,
         $templateName = "selectSites",
@@ -3572,39 +2871,11 @@ ORDER BY cus_name ASC  ";
             );
         }
 
-    } // end siteDropdown
+    }
 
-    /**
-     * Get and parse contact drop-down selector
-     * @access private
-     * @param $contactID
-     * @param DataSet $dsContact
-     * @param $blockVar
-     * @param $blockName
-     */
-    function parseContactSelector($contactID,
-                                  &$dsContact,
-                                  $blockVar,
-                                  $blockName
-    )
+    function getOrderTypeDescription($type)
     {
-        $dsContact->initialise();
-        while ($dsContact->fetchNext()) {
-            $contactSelected = ($dsContact->getValue(DBEContact::contactID) == $contactID) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    $blockName . 'Selected'  => $contactSelected,
-                    $blockName . 'ContactID' => $dsContact->getValue(DBEContact::contactID),
-                    $blockName . 'FirstName' => $dsContact->getValue(DBEContact::firstName),
-                    $blockName . 'LastName'  => $dsContact->getValue(DBEContact::lastName)
-                )
-            );
-            $this->template->parse(
-                $blockVar,
-                $blockName,
-                true
-            );
-        }
+        return $this->orderTypeArray[$type];
     }
 
     /**
@@ -3717,6 +2988,687 @@ ORDER BY cus_name ASC  ";
 
     }
 
+    /**
+     * Delete contact
+     * @access private
+     * @throws Exception
+     */
+    function deleteContact()
+    {
+        $this->setMethodName('deleteContact');
+        if (!$this->getContactID()) {
+            $this->displayFatalError('ContactID not passed');
+        }
+        $dsContact = new DataSet($this);
+        $this->buCustomer->getContactByID(
+            $this->getContactID(),
+            $dsContact
+        );
+        $this->setCustomerID($dsContact->getValue(DBEContact::customerID));
+
+        $nextURL =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'     => CTCNC_ACT_DISP_EDIT,
+                    'customerID' => $this->getCustomerID()
+                )
+            );
+
+        if ($this->buCustomer->canDeleteContact($this->getContactID())) {
+            $this->buCustomer->deleteContact($this->getContactID());
+        } else {
+            // Display a message page.
+            $this->setTemplateFiles(
+                'Message',
+                'Message.inc'
+            );
+
+            $message =
+                'Cannot delete contact ' .
+                $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(DBEContact::lastName) .
+                ' because dependencies exist in the database';
+
+            $this->template->set_var(
+                array(
+                    'message' => $message,
+                    'nextURL' => $nextURL
+                )
+            );
+            $this->template->parse(
+                'CONTENTS',
+                'Message',
+                true
+            );
+            $this->parsePage();
+            exit;
+        }
+        header('Location: ' . $nextURL);
+        exit;
+    }
+
+    function getContactID()
+    {
+        return $this->contactID;
+    }
+
+    function setContactID($contactID)
+    {
+        $this->setNumericVar(
+            'contactID',
+            $contactID
+        );
+    }
+
+    /**
+     * Delete sites and associated contacts
+     * @access private
+     * @throws Exception
+     */
+    function deleteSite()
+    {
+        $this->setMethodName('deleteSite');
+        if (!$this->getCustomerID()) {
+            $this->displayFatalError('CustomerID not passed');
+        }
+        if (!$this->getSiteNo()) {
+            $this->displayFatalError('SiteNo not passed');
+        }
+        if ($this->buCustomer->canDeleteSite(
+            $this->getCustomerID(),
+            $this->getSiteNo()
+        )) {
+            $this->buCustomer->deleteSite(
+                $this->getCustomerID(),
+                $this->getSiteNo()
+            );
+        } else {
+            throw new Exception('Cannot delete this site - dependencies exist');
+        }
+        $nextURL =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'     => CTCNC_ACT_DISP_EDIT,
+                    'customerID' => $this->getCustomerID()
+                )
+            );
+        header('Location: ' . $nextURL);
+        exit;
+    }
+
+    /**
+     * Delete customer and associated sites/contacts
+     * @access private
+     * @throws Exception
+     */
+    function deleteCustomer()
+    {
+        $this->setMethodName('deleteCustomer');
+        if (!$this->getCustomerID()) {
+            $this->displayFatalError('CustomerID not passed');
+        }
+        if ($this->buCustomer->canDeleteCustomer(
+            $this->getCustomerID(),
+            $this->userID
+        )) {
+            $this->buCustomer->deleteCustomer($this->getCustomerID());
+
+            $nextURL =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => CTCUSTOMER_ACT_DISP_SEARCH
+                    )
+                );
+        } else {
+            $this->setFormErrorMessage('Cannot delete this customer - dependencies exist');
+            $this->setAction(CTCNC_ACT_DISP_EDIT);
+            $this->buCustomer->getCustomerByID(
+                $this->getCustomerID(),
+                $this->dsCustomer
+            );
+            $this->displayEditForm();
+            exit;
+        }
+
+        header('Location: ' . $nextURL);
+        exit;
+    }
+
+    /**
+     * Display the popup selector form
+     * @access private
+     * @throws Exception
+     */
+    function displayCustomerSelectPopup()
+    {
+        $this->setMethodName('displayCustomerSelectPopup');
+        $this->buCustomer->getCustomersByNameMatch(
+            $this->dsCustomer,
+            null,
+            null,
+            $this->getCustomerString(),
+            null,
+            null,
+            null,
+            null,
+            null
+        );
+        if ($this->dsCustomer->rowCount() == 1) {
+            $this->setTemplateFiles(
+                'CustomerSelect',
+                'CustomerSelectOne.inc'
+            );
+        }
+        if ($this->dsCustomer->rowCount() == 0) {
+            $this->template->set_var(
+                'customerString',
+                $this->getCustomerString()
+            );
+            $this->setTemplateFiles(
+                'CustomerSelect',
+                'CustomerSelectNone.inc'
+            );
+        }
+        if ($this->dsCustomer->rowCount() > 1) {
+            $this->setTemplateFiles(
+                'CustomerSelect',
+                'CustomerSelectPopup.inc'
+            );
+        }
+        // fields to populate on parent page
+        $this->template->set_var(
+            array(
+                'parentIDField'   => $_SESSION['parentIDField'],
+                'parentDescField' => $_SESSION['parentDescField']
+            )
+        );
+
+// Parameters
+        $this->setPageTitle('Customer Selection');
+        if ($this->dsCustomer->rowCount() > 0) {
+            $this->template->set_block(
+                'CustomerSelect',
+                'customerBlock',
+                'customers'
+            );
+            while ($this->dsCustomer->fetchNext()) {
+                $this->template->set_var(
+                    array(
+                        'customerName' => addslashes($this->dsCustomer->getValue(DBECustomer::name)),
+                        'customerID'   => $this->dsCustomer->getValue(DBECustomer::customerID)
+                    )
+                );
+                $this->template->parse(
+                    'customers',
+                    'customerBlock',
+                    true
+                );
+            }
+        }
+        $this->template->parse(
+            'CONTENTS',
+            'CustomerSelect',
+            true
+        );
+        $this->parsePage();
+    }
+
+    /**
+     * Displays list of customers with 24 Hour Support
+     *
+     * @throws Exception
+     */
+    function display24HourSupportCustomers()
+    {
+        $this->setMethodName('display24HourSupportCustomers');
+
+        $this->setPageTitle("24 Hour Support Customers");
+        $dsCustomer = new DataSet($this);
+        if ($this->buCustomer->get24HourSupportCustomers($dsCustomer)) {
+
+            $this->setTemplateFiles(
+                'Customer24HourSupport',
+                'Customer24HourSupport.inc'
+            );
+
+            $this->template->set_block(
+                'Customer24HourSupport',
+                'customerBlock',
+                'customers'
+            );
+
+            while ($dsCustomer->fetchNext()) {
+
+                $linkURL =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'     => 'dispEdit',
+                            'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
+                        )
+                    );
+
+
+                $this->template->set_var(
+                    array(
+                        'customerName' => $dsCustomer->getValue(DBECustomer::name),
+                        'linkURL'      => $linkURL
+                    )
+                );
+
+                $this->template->parse(
+                    'customers',
+                    'customerBlock',
+                    true
+                );
+
+            }
+
+            $this->template->parse(
+                'CONTENTS',
+                'Customer24HourSupport',
+                true
+            );
+
+        } else {
+
+            $this->setTemplateFiles(
+                'SimpleMessage',
+                'SimpleMessage.inc'
+            );
+            $this->template->set_var(
+                'message',
+                'There are no 24 Hour Support customers'
+            );
+        }
+
+        $this->parsePage();
+
+        exit;
+    }
+
+    /**
+     * Displays list of customers with Special Attention flag set
+     *
+     * @throws Exception
+     */
+    function displaySpecialAttentionCustomers()
+    {
+        $this->setMethodName('displaySpecialAttentionCustomers');
+
+        $this->setPageTitle("Special Attention Customers");
+        global $cfg;
+        $customerTemplate = new Template (
+            $cfg["path_templates"],
+            "remove"
+        );
+
+        $contactTemplate = new Template(
+            $cfg["path_templates"],
+            "remove"
+        );
+
+
+        $this->setTemplateFiles(
+            'SpecialAttention',
+            'SpecialAttention'
+        );
+
+        $buContact = new BUContact($this);
+        $dsContact = new DataSet($this);
+        if ($buContact->getSpecialAttentionContacts($dsContact)) {
+            $contactTemplate->setFile(
+                'ContactSpecialAttention',
+                'ContactSpecialAttention.html'
+            );
+
+            $contactTemplate->set_block(
+                'ContactSpecialAttention',
+                'contactBlock',
+                'contacts'
+            );
+            $dbeCustomer = new DBECustomer($this);
+            while ($dsContact->fetchNext()) {
+
+                $linkURL =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'     => 'dispEdit',
+                            'customerID' => $dsContact->getValue(DBEContact::customerID)
+                        )
+                    );
+
+                if ($dbeCustomer->getValue(DBECustomer::customerID) != $dsContact->getValue(DBEContact::customerID)) {
+                    $dbeCustomer->getRow($dsContact->getValue(DBEContact::customerID));
+                }
+
+                $contactTemplate->set_var(
+                    array(
+                        'contactName'  => ($dsContact->getValue(DBEContact::firstName) . " " . $dsContact->getValue(
+                                DBEContact::lastName
+                            )),
+                        'linkURL'      => $linkURL,
+                        'customerName' => $dbeCustomer->getValue(DBECustomer::name)
+                    )
+                );
+
+                $contactTemplate->parse(
+                    'contacts',
+                    'contactBlock',
+                    true
+                );
+
+            }
+
+            $contactTemplate->parse(
+                'OUTPUT',
+                'ContactSpecialAttention',
+                true
+            );
+
+
+        } else {
+            $contactTemplate->setFile(
+                'SimpleMessage',
+                'SimpleMessage.inc.html'
+            );
+
+            $contactTemplate->set_var(array('message' => 'There are no special attention contacts'));
+
+            $contactTemplate->parse(
+                'OUTPUT',
+                'SimpleMessage',
+                true
+            );
+        };
+        $dsCustomer = new DataSet($this);
+        if ($this->buCustomer->getSpecialAttentionCustomers($dsCustomer)) {
+
+
+            $customerTemplate->setFile(
+                'CustomerSpecialAttention',
+                'CustomerSpecialAttention.inc.html'
+            );
+
+            $customerTemplate->set_block(
+                'CustomerSpecialAttention',
+                'customerBlock',
+                'customers'
+            );
+
+            while ($dsCustomer->fetchNext()) {
+
+                $linkURL =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'     => 'dispEdit',
+                            'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
+                        )
+                    );
+
+
+                $customerTemplate->set_var(
+                    array(
+                        'customerName'            => $dsCustomer->getValue(DBECustomer::name),
+                        'specialAttentionEndDate' => $dsCustomer->getValue(DBECustomer::specialAttentionEndDate),
+                        'linkURL'                 => $linkURL
+                    )
+                );
+
+                $customerTemplate->parse(
+                    'customers',
+                    'customerBlock',
+                    true
+                );
+
+            }
+
+            $customerTemplate->parse(
+                'OUTPUT',
+                'CustomerSpecialAttention',
+                true
+            );
+
+        } else {
+
+            $customerTemplate->setFile(
+                'SimpleMessage',
+                'SimpleMessage.inc.html'
+            );
+
+            $customerTemplate->set_var(array('message' => 'There are no special attention customers'));
+
+            $customerTemplate->parse(
+                'OUTPUT',
+                'SimpleMessage',
+                true
+            );
+        }
+
+        $this->template->setVar(
+            [
+                "customerSpecialAttention" => $customerTemplate->getVar('OUTPUT'),
+                "contactSpecialAttention"  => $contactTemplate->getVar('OUTPUT')
+            ]
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'SpecialAttention'
+        );
+
+        $this->parsePage();
+
+        exit;
+    }
+
+    /**
+     * @throws Exception
+     */
+    function displayContractAndNumbersReport()
+    {
+
+        $this->setPageTitle("Service Contracts Ratio");
+
+        $this->setTemplateFiles(
+            'ContractAndNumbersReport',
+            'ContractAndNumbersReport'
+        );
+
+
+        $db = $this->getContractAndNumberData();
+
+
+        $this->template->set_block(
+            'ContractAndNumbersReport',
+            'contractItemBlock',
+            'contracts'
+        );
+
+        while ($db->next_record()) {
+            $row = $db->Record;
+            $this->template->set_var(
+                array(
+                    'customerName'                => $row["customerName"],
+                    'serviceDeskProduct'          => $row['serviceDeskProduct'],
+                    'serviceDeskUsers'            => $row['serviceDeskUsers'],
+                    'serviceDeskContract'         => $row['serviceDeskContract'],
+                    'serviceDeskCostPerUserMonth' => $row['serviceDeskCostPerUserMonth'],
+                    'serverCareProduct'           => $row['serverCareProduct'],
+                    'virtualServers'              => $row['virtualServers'],
+                    'physicalServers'             => $row['physicalServers'],
+                    'serverCareContract'          => $row['serverCareContract'],
+                    'supportedUsers'              => $row['supportedUsers'],
+                    'moreThanExpectedClass'       => $row['moreUsersThanExpected'] ? "red" : null
+
+                )
+            );
+
+            $this->template->parse(
+                'contracts',
+                'contractItemBlock',
+                true
+            );
+        }
+
+
+        $this->template->parse(
+            'CONTENTS',
+            'ContractAndNumbersReport',
+            true
+        );
+
+
+        $this->parsePage();
+
+        exit;
+    }
+
+        private function getContractAndNumberData()
+    {
+        global $db; //PHPLib DB object
+
+
+        $queryString =
+            "SELECT
+  `cus_custno`,
+  cus_name AS customerName,
+  serviceDeskProduct,
+  COALESCE(serviceDeskUsers,0) AS serviceDeskUsers,
+  COALESCE(serviceDeskContract,0) AS serviceDeskContract,
+  COALESCE(serviceDeskCostPerUserMonth,0) AS serviceDeskCostPerUserMonth,
+  serverCareProduct,
+  COALESCE(virtualServers,0) AS virtualServers,
+  COALESCE(physicalServers,0) AS physicalServers,
+  COALESCE(serverCareContract,0) AS serverCareContract,
+  concat('M ',coalesce(mainCount, 0),', SV ',coalesce(supervisorCount,0),', S ', coalesce(supportCount, 0),', D ', coalesce(delegateCount, 0),', T ', coalesce(totalCount, 0)) as supportedUsers,
+  totalCount > serviceDeskUsers as moreUsersThanExpected 
+FROM
+  customer
+  LEFT JOIN
+  (SELECT
+     `cui_custno`                      AS customerId,
+     itm_desc                          AS serviceDeskProduct,
+     sum(custitem.`cui_users`)              AS serviceDeskUsers,
+     sum(round(custitem.cui_sale_price, 0)) AS serviceDeskContract,
+     sum(ROUND(
+         custitem.cui_sale_price / custitem.cui_users / 12,
+         2
+     ))                                 AS serviceDeskCostPerUserMonth
+   FROM
+     custitem
+     LEFT JOIN item
+       ON item.`itm_itemno` = custitem.`cui_itemno`
+   WHERE itm_desc LIKE '%servicedesk%'
+         AND itm_discontinued <> 'Y'
+         AND custitem.`declinedFlag` <> 'Y' 
+      group by custitem.`cui_custno` 
+      ) AS test1
+    ON test1.customerId = customer.`cus_custno`
+  LEFT JOIN
+  (SELECT
+  custitem.`cui_custno` AS customerId,
+  item.`itm_desc` as serverCareProduct,
+  SUM(
+    ROUND(custitem.`cui_sale_price`, 0)
+  ) AS serverCareContract,
+  SUM(physicalServers) AS physicalServers,
+  SUM(virtualServers) AS virtualServers
+FROM
+  custitem
+  LEFT JOIN item
+    ON item.`itm_itemno` = custitem.`cui_itemno`
+  LEFT JOIN
+    (SELECT
+      custitem_contract.cic_contractcuino,
+      SUM(
+        serverItem.`itm_desc` NOT LIKE '%virtual%'
+      ) AS physicalServers,
+      SUM(
+        serverItem.`itm_desc` LIKE '%virtual%'
+      ) AS virtualServers
+    FROM
+      custitem_contract
+      LEFT JOIN custitem AS servers
+        ON custitem_contract.`cic_cuino` = servers.cui_cuino
+      LEFT JOIN item AS serverItem
+        ON servers.cui_itemno = serverItem.`itm_itemno`
+    GROUP BY custitem_contract.cic_contractcuino) b
+    ON b.`cic_contractcuino` = cui_cuino
+WHERE item.`itm_desc` LIKE '%servercare%'
+  AND item.itm_discontinued <> 'Y'
+  AND custitem.`declinedFlag` <> 'Y'
+GROUP BY custitem.`cui_custno`) test2
+    ON customer.cus_custno = test2.customerId
+left join (
+    select 
+  contact.`con_custno`,
+  sum(contact.`supportLevel` = 'main') as mainCount,
+  SUM(
+    contact.`supportLevel` = 'supervisor'
+  ) AS supervisorCount,
+  SUM(
+    contact.`supportLevel` = 'support'
+  ) AS supportCount,
+  SUM(
+    contact.`supportLevel` = 'delegate'
+  ) AS delegateCount,
+  sum(1) as totalCount 
+from
+  contact 
+where supportLevel is not null 
+GROUP BY con_custno 
+) supportUsers on supportUsers.con_custno = customer.cus_custno
+WHERE serviceDeskProduct IS NOT NULL OR serverCareProduct IS NOT NULL
+ORDER BY cus_name ASC  ";
+
+        $db->query($queryString);
+        return $db;
+    } // end siteDropdown
+
+    function csvContractAndNumbersReport()
+    {
+        $csv_export = '';
+        $db = $this->getContractAndNumberData();
+
+        $headersSet = false;
+
+        while ($db->next_record()) {
+            $row = $db->Record;
+            if (!$headersSet) {
+                foreach (array_keys($row) as $key) {
+                    if (!is_numeric($key)) {
+                        $csv_export .= $key . ';';
+                    }
+                }
+            }
+            $this->template->set_var(
+                array(
+                    'customerName'                => $row["customerName"],
+                    'serviceDeskProduct'          => $row['serviceDeskProduct'],
+                    'serviceDeskUsers'            => $row['serviceDeskUsers'],
+                    'serviceDeskContract'         => $row['serviceDeskContract'],
+                    'serviceDeskCostPerUserMonth' => $row['serviceDeskCostPerUserMonth'],
+                    'serverCareProduct'           => $row['serverCareProduct'],
+                    'virtualServers'              => $row['virtualServers'],
+                    'physicalServers'             => $row['physicalServers'],
+                    'serverCareContract'          => $row['serverCareContract']
+
+                )
+            );
+
+            $this->template->parse(
+                'contracts',
+                'contractItemBlock',
+                true
+            );
+
+        }
+    }
 
     /**
      * @return bool
@@ -3900,5 +3852,56 @@ ORDER BY cus_name ASC  ";
         }
 
         return $contacts;
+    }
+
+    /**
+     * Update details
+     * @access private
+     * @throws Exception
+     */
+    function update()
+    {
+        $this->setMethodName('update');
+        $this->setCustomerID($this->dsCustomer->getValue(DBECustomer::customerID));
+
+
+        if (!$this->formError) {
+            // Update the database
+            if ($this->getCustomerID() == 0) {      // New customer
+                $this->buCustomer->insertCustomer(
+                    $this->dsCustomer,
+                    $this->dsSite,
+                    $this->dsContact
+                );
+                $this->dsCustomer->initialise();
+                $this->dsCustomer->fetchNext();
+                $this->setCustomerID($this->dsCustomer->getValue(DBECustomer::customerID));
+            } else {                // Updates to customer and updates/inserts to sites and contacts
+                $this->buCustomer->updateCustomer($this->dsCustomer);
+                $this->buCustomer->updateSite($this->dsSite);
+                if (isset($this->postVars["form"]["contact"])) {
+                    $this->buCustomer->updateContact($this->dsContact);
+                }
+            }
+            $this->setAction(CTCUSTOMER_ACT_DISP_SUCCESS);
+            if ($this->getSessionParam('save_page')) {
+                header('Location: ' . $_SESSION['save_page']);
+                exit;
+            } else {
+                $nextURL =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'     => CTCNC_ACT_DISP_EDIT,
+                            'customerID' => $this->getCustomerID()
+                        )
+                    );
+
+                header('Location: ' . $nextURL);
+                exit;
+            }
+        } else {
+            $this->displayEditForm();
+        }
     }
 }
