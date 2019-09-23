@@ -187,7 +187,7 @@ class BUContactExport extends Business
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
-            $possibleOrQueries .= " cus_custno =  " . $dsSearchForm->getValue(DBEContact::customerID)." ";
+            $possibleOrQueries .= " cus_custno =  " . $dsSearchForm->getValue(DBEContact::customerID) . " ";
         }
         if ($dsSearchForm->getValue(DBECustomer::prospectFlag)) {
             if (strlen($possibleOrQueries)) {
@@ -259,8 +259,6 @@ class BUContactExport extends Business
             $query .= " and (" . $possibleOrQueries . ")";
         }
 
-        var_dump($query);
-        exit;
         return $this->db->query($query);
 
     }
