@@ -25,15 +25,12 @@ class CTContactExport extends CTCNC
     const searchFormMailshot8Flag = 'mailshot8Flag';
     const searchFormMailshot9Flag = 'mailshot9Flag';
     const searchFormExportEmailOnlyFlag = 'exportEmailOnlyFlag';
-    const searchFormBroadbandRenewalFlag = 'broadbandRenewalFlag';
     const searchFormBroadbandIsp = 'broadbandIsp';
     const searchFormQuotationRenewalFlag = 'quotationRenewalFlag';
     const searchFormContractRenewalFlag = 'contractRenewalFlag';
     const searchFormContractItemID = 'contractItemID';
     const searchFormQuotationItemID = 'quotationItemID';
     const searchFormProspectFlag = 'prospectFlag';
-    const searchFormNoOfPCs = 'noOfPCs';
-    const searchFormNoOfServers = 'noOfServers';
     const searchFormNewCustomerFromDate = 'newCustomerFromDate';
     const searchFormNewCustomerToDate = 'newCustomerToDate';
     const searchFormDroppedCustomerFromDate = 'droppedCustomerFromDate';
@@ -53,16 +50,6 @@ class CTContactExport extends CTCNC
      * @access  private
      */
     public $dsContact;
-    public $noOfPCs =
-        array(
-            '0',
-            '1-5',
-            '6-10',
-            '11-25',
-            '26-50',
-            '51-99',
-            '100+'
-        );
     public $prospectFlags =
         array(
             'Customers and Prospects' => null,
@@ -111,7 +98,6 @@ class CTContactExport extends CTCNC
                         "base64Data" => $this->phone3CXExport()
                     ]
                 );
-//                echo "<a href='data:application/x-zip-compressed;base64," . . "' download='export.zip' >Download Zip</a>";
                 exit;
             default:
                 $this->export();
@@ -170,11 +156,6 @@ class CTContactExport extends CTCNC
             DA_ALLOW_NULL
         );
         $dsSearchForm->addColumn(
-            self::searchFormBroadbandRenewalFlag,
-            DA_YN,
-            DA_ALLOW_NULL
-        );
-        $dsSearchForm->addColumn(
             self::searchFormBroadbandIsp,
             DA_STRING,
             DA_ALLOW_NULL
@@ -205,16 +186,6 @@ class CTContactExport extends CTCNC
         $dsSearchForm->addColumn(
             self::searchFormProspectFlag,
             DA_YN,
-            DA_ALLOW_NULL
-        );
-        $dsSearchForm->addColumn(
-            self::searchFormNoOfPCs,
-            DA_STRING,
-            DA_ALLOW_NULL
-        );
-        $dsSearchForm->addColumn(
-            self::searchFormNoOfServers,
-            DA_INTEGER,
             DA_ALLOW_NULL
         );
 
@@ -456,24 +427,10 @@ class CTContactExport extends CTCNC
                 'hrUserChecked'                => Controller::htmlChecked(
                     $dsSearchForm->getValue(DBEContact::hrUser)
                 ),
-                'noOfPCs'                      => $dsSearchForm->getValue(self::searchFormNoOfPCs),
-                'noOfServers'                  => $dsSearchForm->getValue(self::searchFormNoOfServers),
                 'newCustomerFromDate'          => $dsSearchForm->getValue(self::searchFormNewCustomerFromDate),
                 'newCustomerToDate'            => $dsSearchForm->getValue(self::searchFormNewCustomerToDate),
                 'droppedCustomerFromDate'      => $dsSearchForm->getValue(self::searchFormDroppedCustomerFromDate),
                 'droppedCustomerToDate'        => $dsSearchForm->getValue(self::searchFormDroppedCustomerToDate),
-                'broadbandRenewalFlagChecked'
-                                               => Controller::htmlChecked(
-                    $dsSearchForm->getValue(self::searchFormBroadbandRenewalFlag)
-                ),
-                'quotationRenewalFlagChecked'
-                                               => Controller::htmlChecked(
-                    $dsSearchForm->getValue(self::searchFormQuotationRenewalFlag)
-                ),
-                'contractRenewalFlagChecked'
-                                               => Controller::htmlChecked(
-                    $dsSearchForm->getValue(self::searchFormContractRenewalFlag)
-                ),
                 'broadbandIsp'                 => $dsSearchForm->getValue(self::searchFormBroadbandIsp),
                 'fromEmailAddress'             => $dsSearchForm->getValue(self::searchFormFromEmailAddress),
                 'emailSubject'                 => $dsSearchForm->getValue(self::searchFormEmailSubject),
@@ -573,26 +530,6 @@ class CTContactExport extends CTCNC
             $this->template->parse(
                 'sectors',
                 'sectorBlock',
-                true
-            );
-        }
-
-        $this->template->set_block(
-            'ContactExport',
-            'noOfPCsBlock',
-            'noOfPCs'
-        );
-
-        foreach ($this->noOfPCs as $index => $value) {
-            $this->template->set_var(
-                array(
-                    'noOfPCsValue'    => $value,
-                    'noOfPCsSelected' => $value == $dsSearchForm->getValue(self::searchFormNoOfPCs) ? CT_SELECTED : null
-                )
-            );
-            $this->template->parse(
-                'noOfPCs',
-                'noOfPCsBlock',
                 true
             );
         }

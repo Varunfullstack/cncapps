@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 583 - Contact Extraction Improvements
+
 ## [v3.6.2] - 2019-09-20
 ### Fixed
 - Fixed issue with Replication Status reopening Backup SR's when it should only reopen/create issues for Replication
