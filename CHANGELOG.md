@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 654 - Set all contacts to support level None
+
 ## [v3.6.2] - 2019-09-20
 ### Fixed
 - Fixed issue with Replication Status reopening Backup SR's when it should only reopen/create issues for Replication
