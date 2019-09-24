@@ -130,6 +130,7 @@ class CTExpenseType extends CTCNC
                     $dsExpenseType->getMessage(DBEExpenseType::description)
                 ),
                 'taxableChecked'     => $dsExpenseType->getValue(DBEExpenseType::taxable) ? 'checked' : null,
+                'approvalRequiredChecked' => $dsExpenseType->getValue(DBEExpenseType::approvalRequired) ? 'checked' : null,
                 'mileageFlagChecked' => Controller::htmlChecked($dsExpenseType->getValue(DBEExpenseType::mileageFlag)),
                 'vatFlagChecked'     => Controller::htmlChecked($dsExpenseType->getValue(DBEExpenseType::vatFlag)),
                 'urlUpdate'          => $urlUpdate,
