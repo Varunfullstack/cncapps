@@ -944,7 +944,7 @@ class DBEContact extends DBCNCEntity
         $result = $this->db->preparedQuery($query, $parameters);
         $data = $result->fetch_assoc();
         if ($data['count'] > 0) {
-            false;
+            return false;
         }
 
         return true;

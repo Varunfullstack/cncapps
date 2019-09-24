@@ -553,7 +553,7 @@ GROUP BY t.month;
             ) : null;
 
             if ($generateLog) {
-                $date = (new DateTime())->format(DATE_MYSQL_DATE);
+                $date = (new DateTime('yesterday'))->format(DATE_MYSQL_DATE);
                 // we don't have an entry for today ..so create it
                 $query = "insert into sevenDayersPerformanceLog(date, olderThan7Days, averageAgeDays, target) values ('$date', $totalRequests,$avgDays," . $dsHeader->getValue(
                         DBEHeader::sevenDayerTarget
