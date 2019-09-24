@@ -377,7 +377,7 @@ WHERE customer.`cus_referred` <> 'Y'
         $buHeader->getHeader($dsHeader);
         $contractItemIDs = array();
 
-
+        $searchCriteria = 'AND';
         if ($this->getParam('Export') || $this->getParam('SendEmail')) {
 
             $searchForm = $this->getParam('searchForm')[1];
@@ -391,7 +391,7 @@ WHERE customer.`cus_referred` <> 'Y'
             if (isset($searchForm['supportLevel'])) {
                 $searchForm['supportLevel'] = json_encode($searchForm['supportLevel']);
             }
-            var_dump($searchForm);;
+
             $dsSearchForm->populateFromArray([$searchForm]);
 
             if ($this->getParam('contractItemIDs')) {
@@ -406,7 +406,6 @@ WHERE customer.`cus_referred` <> 'Y'
             }
             $dsSearchForm->setValue(self::searchCriteria, $this->getParam('searchCriteria'));
             $searchCriteria = $this->getParam('searchCriteria');
-            var_dump($searchCriteria);
             $results =
                 $this->buContactExport->search(
                     $dsSearchForm,
@@ -564,7 +563,9 @@ WHERE customer.`cus_referred` <> 'Y'
                 'emailSubjectMessage'          => $dsSearchForm->getMessage(self::searchFormEmailSubject),
                 'emailBodyMessage'             => $dsSearchForm->getMessage(self::searchFormEmailBody),
                 'urlCustomerPopup'             => $urlCustomerPopup,
-                'urlSubmit'                    => $urlSubmit
+                'urlSubmit'                    => $urlSubmit,
+                "andSelected"                  => $searchCriteria == 'AND' ? 'selected' : null,
+                "orSelected"                   => $searchCriteria == 'OR' ? 'selected' : null,
             )
         );
 
