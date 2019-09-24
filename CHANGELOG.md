@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 625 - Overtime & Expenses approval
+
 ## [v3.8.4] - 2019-12-11
 ### Fixed
 - Fixed issue with Asset List export disk size calculations

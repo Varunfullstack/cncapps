@@ -64,63 +64,6 @@ class CTExpenseType extends CTCNC
     }
 
     /**
-     * Display list of types
-     * @access private
-     * @throws Exception
-     */
-    function displayList()
-    {
-        $this->setMethodName('displayList');
-        $this->setPageTitle('Expense Types');
-        $this->setTemplateFiles(
-            array('ExpenseTypeList' => 'ExpenseTypeList.inc')
-        );
-        $dsExpenseType = new DataSet($this);
-
-        $this->buExpenseType->getAllTypes($dsExpenseType);
-
-        $urlCreate = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTEXPENSETYPE_ACT_CREATE
-            )
-        );
-
-        $this->template->set_var(
-            array('urlCreate' => $urlCreate)
-        );
-
-        if ($dsExpenseType->rowCount() > 0) {
-            $this->template->set_block('ExpenseTypeList', 'typeBlock', 'types');
-            while ($dsExpenseType->fetchNext()) {
-                $expenseTypeID = $dsExpenseType->getValue(DBEExpenseType::expenseTypeID);
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'        => CTEXPENSETYPE_ACT_EDIT,
-                            'expenseTypeID' => $expenseTypeID
-                        )
-                    );
-                $txtEdit = '[edit]';
-                $this->template->set_var(
-                    array(
-                        'expenseTypeID' => $expenseTypeID,
-                        'description'   => Controller::htmlDisplayText(
-                            $dsExpenseType->getValue(DBEExpenseType::description)
-                        ),
-                        'urlEdit'       => $urlEdit,
-                        'txtEdit'       => $txtEdit
-                    )
-                );
-                $this->template->parse('types', 'typeBlock', true);
-            }
-        }
-        $this->template->parse('CONTENTS', 'ExpenseTypeList', true);
-        $this->parsePage();
-    }
-
-    /**
      * Edit/Add Expense Type
      * @access private
      * @throws Exception
@@ -186,6 +129,7 @@ class CTExpenseType extends CTCNC
                 'descriptionMessage' => Controller::htmlDisplayText(
                     $dsExpenseType->getMessage(DBEExpenseType::description)
                 ),
+                'taxableChecked'     => $dsExpenseType->getValue(DBEExpenseType::taxable) ? 'checked' : null,
                 'mileageFlagChecked' => Controller::htmlChecked($dsExpenseType->getValue(DBEExpenseType::mileageFlag)),
                 'vatFlagChecked'     => Controller::htmlChecked($dsExpenseType->getValue(DBEExpenseType::vatFlag)),
                 'urlUpdate'          => $urlUpdate,
@@ -196,6 +140,31 @@ class CTExpenseType extends CTCNC
         );
         $this->template->parse('CONTENTS', 'ExpenseTypeEdit', true);
         $this->parsePage();
+    }
+
+    /**
+     * Delete Expense Type
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function delete()
+    {
+        $this->setMethodName('delete');
+        if (!$this->buExpenseType->deleteExpenseType($this->getParam('expenseTypeID'))) {
+            $this->displayFatalError('Cannot delete this expense type');
+            exit;
+        } else {
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTEXPENSETYPE_ACT_DISPLAY_LIST
+                )
+            );
+            header('Location: ' . $urlNext);
+            exit;
+        }
     }// end function editExpense Type()
 
     /**
@@ -232,27 +201,60 @@ class CTExpenseType extends CTCNC
     }
 
     /**
-     * Delete Expense Type
-     *
+     * Display list of types
      * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
      * @throws Exception
      */
-    function delete()
+    function displayList()
     {
-        $this->setMethodName('delete');
-        if (!$this->buExpenseType->deleteExpenseType($this->getParam('expenseTypeID'))) {
-            $this->displayFatalError('Cannot delete this expense type');
-            exit;
-        } else {
-            $urlNext = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTEXPENSETYPE_ACT_DISPLAY_LIST
-                )
-            );
-            header('Location: ' . $urlNext);
-            exit;
+        $this->setMethodName('displayList');
+        $this->setPageTitle('Expense Types');
+        $this->setTemplateFiles(
+            array('ExpenseTypeList' => 'ExpenseTypeList.inc')
+        );
+        $dsExpenseType = new DataSet($this);
+
+        $this->buExpenseType->getAllTypes($dsExpenseType);
+
+        $urlCreate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTEXPENSETYPE_ACT_CREATE
+            )
+        );
+
+        $this->template->set_var(
+            array('urlCreate' => $urlCreate)
+        );
+
+        if ($dsExpenseType->rowCount() > 0) {
+            $this->template->set_block('ExpenseTypeList', 'typeBlock', 'types');
+            while ($dsExpenseType->fetchNext()) {
+                $expenseTypeID = $dsExpenseType->getValue(DBEExpenseType::expenseTypeID);
+                $urlEdit =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'        => CTEXPENSETYPE_ACT_EDIT,
+                            'expenseTypeID' => $expenseTypeID
+                        )
+                    );
+                $txtEdit = '[edit]';
+
+                $this->template->set_var(
+                    array(
+                        'expenseTypeID' => $expenseTypeID,
+                        'description'   => Controller::htmlDisplayText(
+                            $dsExpenseType->getValue(DBEExpenseType::description)
+                        ),
+                        'urlEdit'       => $urlEdit,
+                        'txtEdit'       => $txtEdit
+                    )
+                );
+                $this->template->parse('types', 'typeBlock', true);
+            }
         }
+        $this->template->parse('CONTENTS', 'ExpenseTypeList', true);
+        $this->parsePage();
     }
 }

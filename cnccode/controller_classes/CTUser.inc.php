@@ -517,19 +517,21 @@ class CTUser extends CTCNC
                 'receiveSdManagerEmailFlagChecked'           => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::receiveSdManagerEmailFlag)
                 ),
-
-                'appearInQueueFlagChecked' => Controller::htmlChecked($dsUser->getValue(DBEJUser::appearInQueueFlag)),
-
-                'changePriorityFlagChecked' => Controller::htmlChecked(
+                'autoApproveExpensesChecked'                 => $dsUser->getValue(
+                    DBEJUser::autoApproveExpenses
+                ) ? 'checked' : null,
+                'appearInQueueFlagChecked'                   => Controller::htmlChecked(
+                    $dsUser->getValue(DBEJUser::appearInQueueFlag)
+                ),
+                'changePriorityFlagChecked'                  => Controller::htmlChecked(
                     $dsUser->getValue(
                         DBEJUser::changePriorityFlag
                     )
                 ),
-
-                'weekdayOvertimeFlagChecked'          => Controller::htmlChecked(
+                'weekdayOvertimeFlagChecked'                 => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::weekdayOvertimeFlag)
                 ),
-                'helpdeskFlagChecked'                 => Controller::htmlChecked(
+                'helpdeskFlagChecked'                        => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::helpdeskFlag)
                 ),
                 'createRenewalSalesOrdersFlagChecked' => Controller::htmlChecked(
@@ -628,6 +630,38 @@ class CTUser extends CTCNC
                 );
             }
         }
+
+        $dbeExpenseApprover = new DBEUser($this);
+        $dbeExpenseApprover->getRows();
+        $this->template->set_block(
+            'UserEdit',
+            'expenseApproverBlock',
+            'expenseApprovers'
+        );
+        while ($dbeExpenseApprover->fetchNext()) {
+            if ($dbeExpenseApprover->getValue(DBEJUser::userID) != $dsUser->getValue(
+                    DBEJUser::userID
+                )) {                // exclude this user
+                $expenseApproverSelected = ($dsUser->getValue(
+                        DBEJUser::expenseApproverID
+                    ) == $dbeExpenseApprover->getValue(
+                        DBEJUser::userID
+                    )) ? CT_SELECTED : null;
+                $this->template->set_var(
+                    array(
+                        'expenseApproverSelected' => $expenseApproverSelected,
+                        'expenseApproverID'       => $dbeExpenseApprover->getValue(DBEJUser::userID),
+                        'expenseApproverName'     => $dbeExpenseApprover->getValue(DBEJUser::name)
+                    )
+                );
+                $this->template->parse(
+                    'expenseApprovers',
+                    'expenseApproverBlock',
+                    true
+                );
+            }
+        }
+
 
         // team selection
         $dbeTeam = new DBETeam($this);
