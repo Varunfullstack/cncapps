@@ -144,6 +144,7 @@ while ($dsCustomers->fetchNext()) {
 }
 
 if (!count($customersFailingValidation)) {
+    echo 'No Errors were found';
     return;
 }
 $buMail = new BUMail($thing);
