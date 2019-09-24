@@ -253,110 +253,6 @@ class CTUser extends CTCNC
     }
 
     /**
-     * Display list of users
-     * @access private
-     * @throws Exception
-     */
-    function displayList()
-    {
-        $this->setMethodName('displayList');
-        $this->setPageTitle('Users');
-        $this->setTemplateFiles(
-            array('UserList' => 'UserList.inc')
-        );
-        $dsUser = new DataSet($this);
-        $this->buUser->getAllUsers($dsUser);
-
-        $txtCreate = null;
-        $urlCreate = null;
-
-        if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
-            $urlCreate =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTUSER_ACT_CREATE
-                    )
-                );
-            $txtCreate = 'Create new user';
-        }
-
-        $this->template->set_var(
-            array(
-                'urlCreate' => $urlCreate,
-                'txtCreate' => $txtCreate
-            )
-        );
-
-        if ($dsUser->rowCount() > 0) {
-            $this->template->set_block(
-                'UserList',
-                'userBlock',
-                'users'
-            );
-            while ($dsUser->fetchNext()) {
-                $userID = $dsUser->getValue(DBEJUser::userID);
-
-                $urlEdit = null;
-                $txtEdit = null;
-                if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
-
-                    $urlEdit =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action' => CTUSER_ACT_EDIT,
-                                'userID' => $userID
-                            )
-                        );
-
-                    $txtEdit = '[edit]';
-                }
-
-                $urlReportAbsent =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => CTUSER_ACT_ABSENCE_EDIT,
-                            'userID' => $userID
-                        )
-                    );
-                $txtReportAbsent = '[record absence]';
-
-                $this->template->set_var(
-                    array(
-                        'userID' => $userID,
-
-                        'firstName' => Controller::htmlDisplayText($dsUser->getValue(DBEJUser::firstName)),
-
-                        'lastName' => Controller::htmlDisplayText($dsUser->getValue(DBEJUser::lastName)),
-
-                        'urlReportAbsent'
-                        => $urlReportAbsent,
-
-                        'txtReportAbsent'
-                        => $txtReportAbsent,
-
-                        'urlEdit' => $urlEdit,
-                        'txtEdit' => $txtEdit
-                    )
-                );
-                $this->template->parse(
-                    'users',
-                    'userBlock',
-                    true
-                );
-            }//while $dsUser->fetchNext()
-        }
-        $this->template->parse(
-            'CONTENTS',
-            'UserList',
-            true
-        );
-        $this->parsePage();
-    }
-
-    /**
      * Edit/Add Expense Type
      * @access private
      * @throws Exception
@@ -617,19 +513,23 @@ class CTUser extends CTCNC
                 'receiveSdManagerEmailFlagChecked'           => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::receiveSdManagerEmailFlag)
                 ),
-
-                'appearInQueueFlagChecked' => Controller::htmlChecked($dsUser->getValue(DBEJUser::appearInQueueFlag)),
-
-                'changePriorityFlagChecked' => Controller::htmlChecked(
+                'autoApproveExpensesChecked'                 => $dsUser->getValue(
+                    DBEJUser::autoApproveExpenses
+                ) ? 'checked' : null,
+                'appearInQueueFlagChecked'                   => Controller::htmlChecked(
+                    $dsUser->getValue(DBEJUser::appearInQueueFlag)
+                ),
+                'changePriorityFlagChecked'                  => Controller::htmlChecked(
                     $dsUser->getValue(
                         DBEJUser::changePriorityFlag
                     )
                 ),
-
-                'weekdayOvertimeFlagChecked' => Controller::htmlChecked(
+                'weekdayOvertimeFlagChecked'                 => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::weekdayOvertimeFlag)
                 ),
-                'helpdeskFlagChecked'        => Controller::htmlChecked($dsUser->getValue(DBEJUser::helpdeskFlag)),
+                'helpdeskFlagChecked'                        => Controller::htmlChecked(
+                    $dsUser->getValue(DBEJUser::helpdeskFlag)
+                ),
 
                 'salesChecked' => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
@@ -725,6 +625,38 @@ class CTUser extends CTCNC
             }
         }
 
+        $dbeExpenseApprover = new DBEUser($this);
+        $dbeExpenseApprover->getRows();
+        $this->template->set_block(
+            'UserEdit',
+            'expenseApproverBlock',
+            'expenseApprovers'
+        );
+        while ($dbeExpenseApprover->fetchNext()) {
+            if ($dbeExpenseApprover->getValue(DBEJUser::userID) != $dsUser->getValue(
+                    DBEJUser::userID
+                )) {                // exclude this user
+                $expenseApproverSelected = ($dsUser->getValue(
+                        DBEJUser::expenseApproverID
+                    ) == $dbeExpenseApprover->getValue(
+                        DBEJUser::userID
+                    )) ? CT_SELECTED : null;
+                $this->template->set_var(
+                    array(
+                        'expenseApproverSelected' => $expenseApproverSelected,
+                        'expenseApproverID'       => $dbeExpenseApprover->getValue(DBEJUser::userID),
+                        'expenseApproverName'     => $dbeExpenseApprover->getValue(DBEJUser::name)
+                    )
+                );
+                $this->template->parse(
+                    'expenseApprovers',
+                    'expenseApproverBlock',
+                    true
+                );
+            }
+        }
+
+
         // team selection
         $dbeTeam = new DBETeam($this);
         $dbeTeam->getRows();
@@ -785,43 +717,33 @@ class CTUser extends CTCNC
             true
         );
         $this->parsePage();
-    }// end function edit()
-
-
-    private function updateEncryptedData(array $userData, DataAccess $dsUser)
-    {
-        $dsUser->setUpdateModeUpdate();
-
-
-        $keys = [
-            'dateOfBirth',
-            'pensionAdditionalPayments',
-            'salary',
-            'salarySacrifice',
-            'nationalInsuranceNumber',
-            'address1',
-            'address2',
-            'address3',
-            'town',
-            'county',
-            'postcode',
-        ];
-
-
-        foreach ($keys as $key) {
-            $encryptedKeyName = 'encrypted' . ucfirst($key);
-            $encryptedValue = $this->dsUser->getValue($encryptedKeyName);
-            if (isset($userData[$key]) && $userData[$key]) {
-                $encryptedValue = Encryption::encrypt(
-                    USER_ENCRYPTION_PUBLIC_KEY,
-                    $userData[$key]
-                );
-
-            }
-            $this->dsUser->setValue($encryptedKeyName, $encryptedValue);
-        }
-        $dsUser->post();
     }
+
+    /**
+     * Delete Expense Type
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function delete()
+    {
+        $this->setMethodName('delete');
+        if (!$this->buUser->deleteUser($this->getParam('userID'))) {
+            $this->displayFatalError('Cannot delete this user');
+            exit;
+        }
+
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTUSER_ACT_DISPLAY_LIST
+            )
+        );
+        header('Location: ' . $urlNext);
+        exit;
+
+    }// end function edit()
 
     /**
      * Update call user details
@@ -868,30 +790,39 @@ class CTUser extends CTCNC
         header('Location: ' . $urlNext);
     }
 
-    /**
-     * Delete Expense Type
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function delete()
+    private function updateEncryptedData(array $userData, DataAccess $dsUser)
     {
-        $this->setMethodName('delete');
-        if (!$this->buUser->deleteUser($this->getParam('userID'))) {
-            $this->displayFatalError('Cannot delete this user');
-            exit;
+        $dsUser->setUpdateModeUpdate();
+
+
+        $keys = [
+            'dateOfBirth',
+            'pensionAdditionalPayments',
+            'salary',
+            'salarySacrifice',
+            'nationalInsuranceNumber',
+            'address1',
+            'address2',
+            'address3',
+            'town',
+            'county',
+            'postcode',
+        ];
+
+
+        foreach ($keys as $key) {
+            $encryptedKeyName = 'encrypted' . ucfirst($key);
+            $encryptedValue = $this->dsUser->getValue($encryptedKeyName);
+            if (isset($userData[$key]) && $userData[$key]) {
+                $encryptedValue = Encryption::encrypt(
+                    USER_ENCRYPTION_PUBLIC_KEY,
+                    $userData[$key]
+                );
+
+            }
+            $this->dsUser->setValue($encryptedKeyName, $encryptedValue);
         }
-
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTUSER_ACT_DISPLAY_LIST
-            )
-        );
-        header('Location: ' . $urlNext);
-        exit;
-
+        $dsUser->post();
     }
 
     /**
@@ -987,6 +918,110 @@ class CTUser extends CTCNC
             true
         );
 
+        $this->parsePage();
+    }
+
+    /**
+     * Display list of users
+     * @access private
+     * @throws Exception
+     */
+    function displayList()
+    {
+        $this->setMethodName('displayList');
+        $this->setPageTitle('Users');
+        $this->setTemplateFiles(
+            array('UserList' => 'UserList.inc')
+        );
+        $dsUser = new DataSet($this);
+        $this->buUser->getAllUsers($dsUser);
+
+        $txtCreate = null;
+        $urlCreate = null;
+
+        if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
+            $urlCreate =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => CTUSER_ACT_CREATE
+                    )
+                );
+            $txtCreate = 'Create new user';
+        }
+
+        $this->template->set_var(
+            array(
+                'urlCreate' => $urlCreate,
+                'txtCreate' => $txtCreate
+            )
+        );
+
+        if ($dsUser->rowCount() > 0) {
+            $this->template->set_block(
+                'UserList',
+                'userBlock',
+                'users'
+            );
+            while ($dsUser->fetchNext()) {
+                $userID = $dsUser->getValue(DBEJUser::userID);
+
+                $urlEdit = null;
+                $txtEdit = null;
+                if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
+
+                    $urlEdit =
+                        Controller::buildLink(
+                            $_SERVER['PHP_SELF'],
+                            array(
+                                'action' => CTUSER_ACT_EDIT,
+                                'userID' => $userID
+                            )
+                        );
+
+                    $txtEdit = '[edit]';
+                }
+
+                $urlReportAbsent =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action' => CTUSER_ACT_ABSENCE_EDIT,
+                            'userID' => $userID
+                        )
+                    );
+                $txtReportAbsent = '[record absence]';
+
+                $this->template->set_var(
+                    array(
+                        'userID' => $userID,
+
+                        'firstName' => Controller::htmlDisplayText($dsUser->getValue(DBEJUser::firstName)),
+
+                        'lastName' => Controller::htmlDisplayText($dsUser->getValue(DBEJUser::lastName)),
+
+                        'urlReportAbsent'
+                        => $urlReportAbsent,
+
+                        'txtReportAbsent'
+                        => $txtReportAbsent,
+
+                        'urlEdit' => $urlEdit,
+                        'txtEdit' => $txtEdit
+                    )
+                );
+                $this->template->parse(
+                    'users',
+                    'userBlock',
+                    true
+                );
+            }//while $dsUser->fetchNext()
+        }
+        $this->template->parse(
+            'CONTENTS',
+            'UserList',
+            true
+        );
         $this->parsePage();
     }
 }

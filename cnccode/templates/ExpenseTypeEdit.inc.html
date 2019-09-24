@@ -1,40 +1,105 @@
 <!-- Template: ActvityTypeEdit.inc.html -->
-<TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
-	<TR> 
-		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDisplayList}">Back to list</a></TD>
-		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
-	</TR>
+<TABLE width="200px"
+       border="0"
+       cellpadding="2"
+       cellspacing="1"
+>
+    <TR>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlDisplayList}">Back to list</a></TD>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlDelete}">{txtDelete}</a></TD>
+    </TR>
 </table>
-<FORM  method="post" action="{urlUpdate}" name="expenseType" AUTOCOMPLETE="OFF">
-	<table width="700px" border="0">
-		<input
-			type="hidden"
-			name="expenseType[1][expenseTypeID]"
-			value="{expenseTypeID}"
-		>
-		<tr> 
-			<td width="115" class="promptText">Type</td>
-			<td width="575" class="fieldText"> <input
-					name="expenseType[1][description]"
-					type="text" value="{description}"
-					size="50"
-					maxlength="50"
-				> <span class="formErrorMessage">{descriptionMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Mileage</td>
-			<td class="fieldText"> <INPUT name="expenseType[1][mileageFlag]" {DISABLED} type="checkbox" value="Y" {mileageFlagChecked}> 
+<FORM method="post"
+      action="{urlUpdate}"
+      name="expenseType"
+      AUTOCOMPLETE="OFF"
+>
+    <table width="700px"
+           border="0"
+    >
+        <input
+                type="hidden"
+                name="expenseType[1][expenseTypeID]"
+                value="{expenseTypeID}"
+        >
+        <tr>
+            <td width="115"
+                class="promptText"
+            >Type
+            </td>
+            <td width="575"
+                class="fieldText"
+            ><input
+                    name="expenseType[1][description]"
+                    type="text"
+                    value="{description}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{descriptionMessage}</span></td>
+        </tr>
+        <tr>
+            <td width="115"
+                class="promptText"
+            >Taxable
+            </td>
+            <td width="575"
+                class="fieldText"
+            >
+                <input name="expenseType[1][taxable]"
+                       type="checkbox"
+                       value="1"
+					   {taxableChecked}
+                >
+            </td>
+        </tr>
+		<tr>
+			<td width="115"
+				class="promptText"
+			>Approval Required
+			</td>
+			<td width="575"
+				class="fieldText"
+			>
+				<input name="expenseType[1][approvalRequired]"
+					   type="checkbox"
+					   value="1"
+					   {approvalRequiredChecked}
+				>
 			</td>
 		</tr>
-		<tr> 
-			<td class="promptText">VAT included</td>
-			<td class="fieldText"> <INPUT name="expenseType[1][vatFlag]" {DISABLED} type="checkbox" value="Y" {vatFlagChecked}> 
-			</td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
-		</tr>
-	</table>
+        <tr>
+            <td class="promptText">Mileage</td>
+            <td class="fieldText"><INPUT name="expenseType[1][mileageFlag]"
+                                         {DISABLED}
+                                         type="checkbox"
+                                         value="Y"
+                                         {mileageFlagChecked}
+            >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">VAT included</td>
+            <td class="fieldText"><INPUT name="expenseType[1][vatFlag]"
+                                         {DISABLED}
+                                         type="checkbox"
+                                         value="Y"
+                                         {vatFlagChecked}
+            >
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="formErrorMessage"><input type="submit"
+                                                name="Submit"
+                                                value="Update"
+            ></td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: ActvityTypeEdit.inc.html -->

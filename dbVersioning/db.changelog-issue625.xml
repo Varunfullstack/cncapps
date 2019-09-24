@@ -1,0 +1,99 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="625-0">
+        <tagDatabase tag="issue625"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="consultant" columnName="expenseApproverID"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="expenseApproverID" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="consultant" columnName="autoApproveExpenses"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="autoApproveExpenses" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expensetype" columnName="taxable"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expensetype">
+            <column name="taxable" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expensetype" columnName="approvalRequired"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expensetype">
+            <column name="approvalRequired" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="expenseTypeActivityAvailability"/>
+            </not>
+        </preConditions>
+        <createTable tableName="expenseTypeActivityAvailability">
+            <column name="expenseTypeID" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="activityTypeID" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql>
+            insert into expenseTypeActivityAvailability
+            SELECT ext_expensetypeno AS expenseTypeID, a.cat_callacttypeno AS activityTypeID
+            FROM expenseType
+                     JOIN (SELECT cat_callacttypeno FROM callacttype WHERE cat_allow_exp_flag = 'Y') a
+        </sql>
+        <rollback>
+            <dropTable tableName="expenseTypeActivityAvailability"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-6">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="cat_allow_exp_flag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="cat_allow_exp_flag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="cat_allow_exp_flag" type="char(1)" defaultValue="N">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+            <sql>
+                update callacttype
+                set cat_allow_exp_flag = if((select count(*)
+                                             from expenseTypeActivityAvailability
+                                             where activityTypeID = callacttype.cat_callacttypeno) > 0, 'Y', 'N')
+            </sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

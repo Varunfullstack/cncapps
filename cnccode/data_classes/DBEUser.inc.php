@@ -63,6 +63,8 @@ class DBEUser extends DBEntity
     const changeSRContractsFlag = 'changeSRContractsFlag';
     const starterLeaverQuestionManagementFlag = 'starterLeaverQuestionManagementFlag';
     const offsiteBackupAdditionalPermissionsFlag = 'offsiteBackupAdditionalPermissionsFlag';
+    const expenseApproverID = 'expenseApproverID';
+    const autoApproveExpenses = 'autoApproveExpenses';
 
     /**
      * calls constructor()
@@ -87,6 +89,7 @@ class DBEUser extends DBEntity
             DA_ALLOW_NULL,
             "cns_manager"
         );
+
         $this->addColumn(
             self::name,
             DA_STRING,
@@ -360,6 +363,19 @@ class DBEUser extends DBEntity
             self::offsiteBackupAdditionalPermissionsFlag,
             DA_YN,
             DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::expenseApproverID,
+            DA_ID,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::autoApproveExpenses,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
         );
 
         $this->setPK(0);

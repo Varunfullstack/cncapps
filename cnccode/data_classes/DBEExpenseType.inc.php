@@ -11,6 +11,8 @@ class DBEExpenseType extends DBEntity
     const description = "description";
     const mileageFlag = "mileageFlag";
     const vatFlag = "vatFlag";
+    const taxable = 'taxable';
+    const approvalRequired = "approvalRequired";
 
     /**
      * calls constructor()
@@ -47,6 +49,21 @@ class DBEExpenseType extends DBEntity
             DA_ALLOW_NULL,
             "ext_vat_flag"
         );
+        $this->addColumn(
+            self::taxable,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+        $this->addColumn(
+            self::approvalRequired,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
