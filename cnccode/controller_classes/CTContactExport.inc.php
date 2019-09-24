@@ -435,6 +435,7 @@ WHERE customer.`cus_referred` <> 'Y'
                         'Required'
                     );
                 }
+
                 if (count($dsSearchForm->message) == 0) {
                     $this->buContactExport->sendEmail(
                         $dsSearchForm,

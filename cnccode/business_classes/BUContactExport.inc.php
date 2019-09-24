@@ -293,9 +293,9 @@ class BUContactExport extends Business
             );
 
             // add name to top of email
-            $thisBody = '<P>' . $row['FirstName'] . ",</P > " . $body;
-
-            $buMail->mime->setHTMLBody($thisBody);
+            $body = str_replace('[%ContactFirstName%]', $row['FirstName'], $body);
+            $body = str_replace('[%ContactLastName%]', $row['LastName'], $body);
+            $buMail->mime->setHTMLBody($body);
 
             $mime_params = array(
                 'text_encoding' => '7bit',

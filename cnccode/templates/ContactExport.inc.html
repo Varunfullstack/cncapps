@@ -280,6 +280,10 @@
                         </td>
                     </tr>
                     <tr>
+                        <td></td>
+                        <td>(AND)</td>
+                    </tr>
+                    <tr>
                         <td class="promptText">
                             <div align="right">Support Level</div>
                         </td>
@@ -371,7 +375,30 @@
                                 {emailBody}
                             </textarea>
                             <script>
-                                reason = CKEDITOR.replace('emailBody', {customConfig: '/ckeditor_config.js'});
+                                const config = {
+                                    contentsCss: '/screen.css',
+                                    toolbarStartupExpanded: false,
+                                    disableNativeSpellChecker: false,
+                                    toolbar_CNCToolbar:
+                                        [
+                                            {
+                                                name: 'line1',
+                                                items: ['Source', '-', '-', 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor']
+                                            },
+                                            ['NumberedList', 'BulletedList'],
+                                            ['Table'],
+                                            ['Format', 'Font', 'FontSize'],
+                                            ['Anchor', 'Link'],
+                                            ['Undo', 'Redo'],
+                                            {name: 'tokens', items: ['tokens']}
+                                        ],
+                                    toolbar: 'CNCToolbar',
+                                    extraPlugins: 'tokens,font',
+                                    removePlugins: 'tableselection',
+                                    fontSize_sizes: '8/8pt;9/9pt;10/10pt;11/11pt;12/12pt;14/14pt;16/16pt;18/18pt;20/20pt;22/22pt;24/24pt;26/26pt;28/28pt;36/36pt;48/48pt;72/72pt',
+                                    tags: ["ContactFirstName", "ContactLastName"]
+                                };
+                                const reason = CKEDITOR.replace('emailBody', config);
                             </script>
                         </td>
                     </tr>
