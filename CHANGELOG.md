@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 654 - Set all contacts to support level None
+
 ## [v3.6.3]
 ### Fixed
 - Fixed issue with contactValidation.php
