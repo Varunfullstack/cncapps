@@ -451,7 +451,7 @@ class CTSalesOrder extends CTCNC
     {
     }
 
-    function setSeSweetcode($dummy)
+    function setCNCCode($dummy)
     {
     }
 

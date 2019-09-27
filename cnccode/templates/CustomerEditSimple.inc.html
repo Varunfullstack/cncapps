@@ -713,6 +713,25 @@
     </tr>
 </script>
 <script type="text/JavaScript">
+
+    function setContactsToNoneAndReferCustomer() {
+        if (!confirm('This is will change all contacts to the support level of None & refer the customer. Please confirm that you want to continue.')) {
+            return;
+        }
+        const currentURL = new URL(location.href);
+        const customerID = currentURL.searchParams.get('customerID');
+        $.ajax({
+            method: 'POST',
+            dataType: 'JSON',
+            data: {
+                action: 'removeSupportAndRefer',
+                customerID: customerID
+            }
+        }).then(result => {
+            window.location.reload();
+        });
+    }
+
     let contactsTableErrors;
 
 
@@ -733,6 +752,7 @@
     })
 
     var isShowingInactive = {isShowingInactive};
+
 
     function clearRow(contactID) {
 
@@ -1589,6 +1609,11 @@
            value="Cancel"
            onClick="document.location='{cancelURL}';"
     >
+    <button type="button"
+            onclick="setContactsToNoneAndReferCustomer()"
+    >
+        Set all users to no support
+    </button>
     <input {disabled}
            name="displayInactiveSites"
            type="button"
@@ -3371,6 +3396,11 @@
                value="Cancel"
                onClick="document.location='{cancelURL}';"
         >
+        <button type="button"
+                onclick="setContactsToNoneAndReferCustomer()"
+        >
+            Set all users to no support
+        </button>
     </div>
 </form>
 <div id="validatingContactsModal">

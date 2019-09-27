@@ -245,6 +245,7 @@ class BUUser extends Business
                       userID,
                       user_time_log.loggedDate AS loggedDate,
                       loggedHours,
+                      holiday,
                       CONCAT(
                         consultant.`firstName`,
                         ' ',
@@ -328,6 +329,7 @@ class BUUser extends Business
   ) AS fiveDaysToLog,
   loggedDate,
   user_time_log.`loggedHours`,
+               holiday,
   userID,
   CASE
     team.`level`
@@ -365,7 +367,6 @@ WHERE userID = $engineerID
   AND loggedDate <= '" . $endDate->format('Y-m-d') . "' 
 ORDER BY user_time_log.`loggedDate` DESC 
         ";
-
         $db->query($query);
         $rows = [];
         while ($db->next_record(1)) {

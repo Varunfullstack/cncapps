@@ -101,8 +101,6 @@
             this.source = document.getElementById("member-item-template").innerHTML;
             this.data.then(function (data) {
                 data.forEach(function (item) {
-
-
                     var id = teamId + '-' + item.userID;
                     var context = {
                         name: item.userName,
@@ -115,6 +113,34 @@
 
                     var test = that.container.find('#' + id);
 
+                    var dataTable = new google.visualization.DataTable();
+                    dataTable.addColumn('date', 'Dates');
+                    dataTable.addColumn('number', 'Hours Logged');
+                    dataTable.addColumn({type:'string', role:'style'});
+
+                    dataTable.addRows(
+                        item.dataPoints.map(function (row) {
+                            return [
+                                new Date(row['date']),
+                                row['loggedHours'],
+                                row['isHolidays'] ? 'green': null,
+                            ]
+                        })
+                    );
+
+                    var options = {
+                        'title': 'Hours Logged Over Time',
+                        seriesType: 'bars',
+                        series: {
+                            1: {type: 'line'},
+                            2: {type: 'line'}
+                        },
+                        legend: {
+                            position: 'bottom'
+                        },
+                        vAxis: {title: 'Hours Logged'}
+                    };
+
                     var storedOptions = {
                         title: item.userName,
                         trendlines: {0: {}},
@@ -122,12 +148,6 @@
                     };
 
                     var chart = new google.visualization.ColumnChart(test[0]);
-
-
-                    var dataTable = new google.visualization.DataTable(
-                        {cols: item.cols, rows: convertToActualDate(item.rows)}
-                    );
-
                     chart.draw(dataTable, storedOptions);
                 })
             })

@@ -1,7 +1,21 @@
 # Changelog
 This project changes will be shown here.
 
-## [v3.6.3]
+## [v3.7.0] 
+### Added
+- Issue 654 - Set all contacts to support level None
+### Changed
+- Issue 559 - Improve OpenCallEmail.php code
+- Issue 633 - Set retention rules for log files
+- Issue 606 - Sweetcode in URL
+- Issue 612 - Show holiday on performance graphs
+- Issue 583 - Contact Extraction Improvements
+### Fixed
+- Issue 635 - Duplication of contracts within the ratio page
+### Removed
+- Issue 652 - Disable myphpadmin from being used / allowing logins
+
+## [v3.6.3] - 2019-09-23
 ### Fixed
 - Fixed issue with contactValidation.php
 - Fixed Seven Dayer Performance seems to be using wrong date

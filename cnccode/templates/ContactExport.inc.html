@@ -57,10 +57,14 @@
     }
 
     var state = 'none'; // display status
-    var savedCustomerString
+    var savedCustomerString;
 
     function saveCustomerString() {
         savedCustomerString = document.getElementById("customerString").value
+    }
+
+    function clearSupportLevelSelector() {
+        $("#supportLevelSelector option:selected").prop("selected", false);
     }
 
     function validateCustomerString() {
@@ -102,6 +106,21 @@
         <tr valign="top">
             <td>
                 <table>
+                    <tr>
+                        <td class="promptText">Search Criteria Requirements</td>
+                        <td>
+                            <select name="searchCriteria">
+                                <option value="AND"
+                                        {andSelected}
+                                >AND
+                                </option>
+                                <option value="OR"
+                                        {orSelected}
+                                >OR
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
                     <tr>
                         <td class="promptText">Customer</td>
                         <td>
@@ -150,32 +169,6 @@
                                     Customers
                                 </option>
                             </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="promptText">
-                            No of PCs
-                        </td>
-                        <td>
-                            <input type="text"
-                                   size="5"
-                                   maxlength="10"
-                                   name="searchForm[1][noOfPCs]"
-                                   value="{noOfPCs}"
-                            >
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="promptText">
-                            No of Servers
-                        </td>
-                        <td>
-                            <input type="text"
-                                   size="5"
-                                   maxlength="10"
-                                   name="searchForm[1][noOfServers]"
-                                   value="{noOfServers}"
-                            >
                         </td>
                     </tr>
                     <tr>
@@ -240,6 +233,18 @@
                     </tr>
                     <tr>
                         <td class="promptText">
+                            <div align="right">{mailshot11FlagDesc}</div>
+                        </td>
+                        <td>
+                            <input type="checkbox"
+                                   name="searchForm[1][mailshot11Flag]"
+                                   value="Y"
+                                   {mailshot11FlagChecked}
+                            >
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="promptText">
                             <div align="right">{mailshot9FlagDesc}</div>
                         </td>
                         <td>
@@ -275,6 +280,10 @@
                         </td>
                     </tr>
                     <tr>
+                        <td></td>
+                        <td>(AND)</td>
+                    </tr>
+                    <tr>
                         <td class="promptText">
                             <div align="right">Support Level</div>
                         </td>
@@ -284,6 +293,7 @@
                                 <select name="searchForm[1][supportLevel][]"
                                         style="height: 90px"
                                         multiple
+                                        id="supportLevelSelector"
                                 >
                                     <!-- BEGIN supportLevelBlock -->
                                     <option {supportLevelSelected}
@@ -294,59 +304,13 @@
                                     </option>
                                     <!-- END supportLevelBlock -->
                                 </select>
+                                <button type="button"
+                                        onclick="clearSupportLevelSelector()"
+                                >Clear
+                                </button>
                             </div>
-                        </td>
-                    </tr>
 
-                    <tr>
-                        <td class="promptText">New Between</td>
-                        <td><input
-                                type="text"
-                                name="form[newCustomerFromDate]"
-                                id="newCustomerFromDate"
-                                value="{newCustomerFromDate}"
-                                size="10"
-                                maxlength="10"
-                                autocomplete="off"
-                                class="jQueryCalendar"
-                        >
-                            <font class="formErrorMessage">{newCustomerFromDateMessage}</font>
-                            and <input
-                                    type="text"
-                                    name="form[newCustomerToDate]"
-                                    id="newCustomerToDate"
-                                    value="{newCustomerToDate}"
-                                    size="10"
-                                    maxlength="10"
-                                    autocomplete="off"
-                                    class="jQueryCalendar"
-                            >
-                            <font class="formErrorMessage">{newCustomerToDateMessage}</font></td>
-                    </tr>
-                    <tr>
-                        <td class="promptText">Lost Between</td>
-                        <td><input
-                                type="text"
-                                name="form[droppedCustomerFromDate]"
-                                id="droppedCustomerFromDate"
-                                value="{droppedCustomerFromDate}"
-                                size="10"
-                                maxlength="10"
-                                autocomplete="off"
-                                class="jQueryCalendar"
-                        >
-                            <font class="formErrorMessage">{droppedCustomerFromDateMessage}</font>
-                            and <input
-                                    type="text"
-                                    name="form[droppedCustomerToDate]"
-                                    id="droppedCustomerToDate"
-                                    value="{droppedCustomerToDate}"
-                                    size="10"
-                                    maxlength="10"
-                                    autocomplete="off"
-                                    class="jQueryCalendar"
-                            >
-                            <font class="formErrorMessage">{droppedCustomerToDateMessage}</font></td>
+                        </td>
                     </tr>
                     <tr>
                         <td class="promptText">
@@ -361,23 +325,17 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="promptText">
-                            <div align="right">Broadband Renewal</div>
-                        </td>
+                        <td></td>
                         <td>
-                            <input type="checkbox"
-                                   name="searchForm[1][broadbandRenewalFlag]"
-                                   value="Y"
-                                   {broadbandRenewalFlagChecked}
+                            <input type="submit"
+                                   name="Export"
+                                   value="Export CSV"
                             >
-                            ISP <input type="text"
-                                       maxlength="10"
-                                       size="5"
-                                       name="searchForm[1][broadbandIsp]"
-                                       value="{broadbandIsp}"
-                        >
+                            <button type="button"
+                                    onclick="download3CXExport()"
+                            >3CX Address Book Export
+                            </button>
                         </td>
-
                     </tr>
                     <tr>
                         <td class="promptText">From Email Address</td>
@@ -413,9 +371,34 @@
                                       name="searchForm[1][emailBody]"
                                       cols="30"
                                       rows="20"
-                            >{emailBody}</textarea>
+                            >
+                                {emailBody}
+                            </textarea>
                             <script>
-                                reason = CKEDITOR.replace('emailBody', {customConfig: '/ckeditor_config.js'});
+                                const config = {
+                                    contentsCss: '/screen.css',
+                                    toolbarStartupExpanded: false,
+                                    disableNativeSpellChecker: false,
+                                    toolbar_CNCToolbar:
+                                        [
+                                            {
+                                                name: 'line1',
+                                                items: ['Source', '-', '-', 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor']
+                                            },
+                                            ['NumberedList', 'BulletedList'],
+                                            ['Table'],
+                                            ['Format', 'Font', 'FontSize'],
+                                            ['Anchor', 'Link'],
+                                            ['Undo', 'Redo'],
+                                            {name: 'tokens', items: ['tokens']}
+                                        ],
+                                    toolbar: 'CNCToolbar',
+                                    extraPlugins: 'tokens,font',
+                                    removePlugins: 'tableselection',
+                                    fontSize_sizes: '8/8pt;9/9pt;10/10pt;11/11pt;12/12pt;14/14pt;16/16pt;18/18pt;20/20pt;22/22pt;24/24pt;26/26pt;28/28pt;36/36pt;48/48pt;72/72pt',
+                                    tags: ["ContactFirstName", "ContactLastName"]
+                                };
+                                const reason = CKEDITOR.replace('emailBody', config);
                             </script>
                         </td>
                     </tr>
@@ -427,14 +410,6 @@
                                    value="Send Email"
                                    onclick="if(!confirm('Are you sure you want to send these emails?')) return(false)"
                             >
-                            <input type="submit"
-                                   name="Export"
-                                   value="Export CSV"
-                            >
-                            <button type="button"
-                                    onclick="download3CXExport()"
-                            >3CX Address Book Export
-                            </button>
                         </td>
                     </tr>
                 </table>
@@ -442,16 +417,10 @@
             <td valign="top">
                 <table>
                     <tr valign="top">
-                        <td class="listHeadText">
+                        <td class="listHeadText"
+                            colspan="2"
+                        >
                             Contract Renewal
-                        </td>
-                        <td class="listHeadText">
-                            <input type="checkbox"
-                                   class="contractRenewalFlag"
-                                   name="searchForm[1][contractRenewalFlag]"
-                                   value="Y"
-                                   {contractRenewalFlagChecked}
-                            >
                         </td>
                     </tr>
                     <!-- BEGIN contractItemBlock -->
@@ -469,52 +438,11 @@
                     </tr>
                 </table>
             </td>
-            <td valign="top">
-                <table>
-                    <tr valign="top">
-                        <td class="listHeadText">
-                            Quotation Renewal
-                        </td>
-                        <td class="listHeadText">
-                            <input type="checkbox"
-                                   class="quotationRenewalFlag"
-                                   name="searchForm[1][quotationRenewalFlag]"
-                                   value="Y"
-                                   {quotationRenewalFlagChecked}
-                            >
-                        </td>
-                    </tr>
-                    <!-- BEGIN quotationItemBlock -->
-                    <tr>
-                        <td class="promptText">{quotationItemDescription}</td>
-                        <td>
-                            <input type="checkbox"
-                                   class="quotationItem"
-                                   name="quotationItemIDs[]"
-                                   value="{quotationItemID}"
-                                   {quotationItemIDChecked}
-                            >
-                        </td>
-                        <!-- END quotationItemBlock -->
-                    </tr>
-                </table>
-            </td>
         </tr>
 
     </table>
 </form>
 <script>
-    /*
-     Handler for change of a quotation item checkbox: set the main quotation item check box on
-     */
-    $('.quotationItem').change(function () {
-
-        if ($(this).attr('checked')) {
-
-            $('.quotationRenewalFlag').attr('checked', true);
-
-        }
-    });
     /*
      Handler for change of a contract item checkbox: set the main contract item check box on
      */

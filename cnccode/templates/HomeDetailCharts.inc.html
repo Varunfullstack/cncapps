@@ -66,6 +66,7 @@
                 var data = new google.visualization.DataTable();
                 data.addColumn('date', 'Dates');
                 data.addColumn('number', 'Hours Logged');
+                data.addColumn({type:'string', role:'style'});
                 data.addColumn('number', 'Average over 5 days');
                 data.addColumn('number', 'Average over Month');
 
@@ -74,8 +75,9 @@
                         return [
                             new Date(row['loggedDate']),
                             row['loggedHours'],
+                            row['holiday'] ? 'green': null,
                             row['fiveDaysAvg'],
-                            row['monthAvg']
+                            row['monthAvg'],
                         ]
                     })
                 );

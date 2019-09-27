@@ -26,68 +26,103 @@ define(
     '%e/%c/%Y'
 );
 
-
 $domain = 'cnc-ltd.co.uk';
 
-if (!$localDb = mysqli_connect(
-    DB_HOST,
+
+//we are going to use this to add to the monitoring db
+$dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME;
+$options = [
+    PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
+];
+
+if (!$pdoDB = new PDO(
+    $dsn,
     DB_USER,
-    DB_PASSWORD
+    DB_PASSWORD,
+    $options
 )) {
     echo 'Could not connect to mysql host ' . DB_HOST;
     exit;
 }
 
-/*
-get list of engineers with open calls
-*/
-$localDb->select_db(DB_NAME);
 
-$outputEmails = isset($_GET['outputEmails']);
+class EngineerActivity
+{
+    public $activityId;
+    public $customerName;
+    public $engineerName;
+    public $engineerLogName;
+    public $engineerId;
+    public $activityDate;
+    public $engineerManagerId;
+}
+
+$outputEmails = isset($_REQUEST['outputEmails']);
 
 $query =
     'SELECT
-		DISTINCT CONCAT(firstName, " ", lastName) AS Engineer,
-		cns_logname,
-		cns_consno 
-	 FROM callactivity  
-     JOIN problem ON pro_problemno = caa_problemno
-     JOIN callacttype ON cat_callacttypeno = caa_callacttypeno
-     JOIN consultant ON caa_consno = cns_consno
-     JOIN customer ON pro_custno = cus_custno
-     WHERE (caa_endtime = "" or caa_endtime is null) 
-     AND caa_date <= NOW()';                                                // and on-site
+  caa_callactivityno as activityId,
+  cus_name as customerName,
+  CONCAT(firstName, " ", lastName) AS engineerName,
+  cns_logname as engineerLogName,
+  cns_consno as engineerId,
+  caa_date as activityDate,
+  cns_manager as engineerManagerId
+FROM 
+  callactivity 
+  JOIN problem
+    ON pro_problemno = caa_problemno
+  JOIN callacttype
+    ON cat_callacttypeno = caa_callacttypeno
+  JOIN consultant
+    ON caa_consno = cns_consno
+  JOIN customer
+    ON pro_custno = cus_custno
+WHERE caa_date <= NOW()
+  AND (
+    caa_endtime = ""
+    OR caa_endtime IS NULL
+  )
+ORDER BY engineerName,
+  caa_date,
+  pro_custno';                                                // and on-site
 
-$resultSet = $localDb->query($query);
+$pdoStatement = $pdoDB->query($query);
 
 //this finds all the engineers that have open activities
 /*
 Send each engineer an email
 */
-$engineers = $resultSet->fetch_all(MYSQLI_ASSOC);
-
+/** @var EngineerActivity[] $activities */
+$activities = $pdoStatement->fetchAll(PDO::FETCH_CLASS, EngineerActivity::class);
 $buMail = new BUMail($thing);
+$engineers = array_reduce(
+    $activities,
+    function ($acc, EngineerActivity $engineerActivity) {
+        if (!isset($acc[$engineerActivity->engineerId])) {
+            $acc[$engineerActivity->engineerId] = [];
+        }
+        $acc[$engineerActivity->engineerId][] = $engineerActivity;
+        return $acc;
+    },
+    []
+);
+
 
 $managers = [];
-foreach ($engineers as $row) {
-    $query =
-        'SELECT caa_callactivityno, cus_name, CONCAT(firstName, " ", lastName) as name, caa_date, cns_manager ' .
-        ' FROM callactivity ' .
-        ' JOIN problem ON pro_problemno = caa_problemno' .
-        ' JOIN callacttype ON cat_callacttypeno = caa_callacttypeno' .
-        ' JOIN consultant ON caa_consno = cns_consno' .
-        ' JOIN customer ON pro_custno = cus_custno' .
-        ' WHERE (caa_endtime = "" or caa_endtime is null) ' .
-        ' AND caa_date <= NOW()' .                                                                // in the past
-        ' AND caa_consno = ' . $row['cns_consno'] .
-        ' ORDER BY caa_date, pro_custno';
+/**
+ * @var int $engineerId
+ * @var EngineerActivity[] $engineerActivities
+ */
+foreach ($engineers as $engineerId => $engineerActivities) {
 
-    $result = $localDb->query($query);
     $sender_name = "Call System";
     $sender_email = OS_CALL_EMAIL_FROM_USER;
     $headers = "From: " . $sender_name . " <" . $sender_email . ">\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/html";
+    $logName = null;
+    $engineerName = null;
     if (!$outputEmails) {
         ob_start();
     }
@@ -109,38 +144,44 @@ foreach ($engineers as $row) {
             </TD>
         </TR>
         <?php
-        while ($i = $result->fetch_row()) {
-            $managerId = $i[4];
-            if ($managerId && (strtotime($i[3]) <= strtotime(
+        foreach ($engineerActivities as $engineerActivity) {
+            if (!$logName) {
+                $logName = $engineerActivity->engineerLogName;
+            }
+            if (!$engineerName) {
+                $engineerName = $engineerActivity->engineerName;
+            }
+            $managerId = $engineerActivity->engineerManagerId;
+            if ($managerId && (strtotime($engineerActivity->activityDate) <= strtotime(
                         '-5 days',
                         time()
                     ))) {
-                //this guy has a manager and this activity was open more than two days ago
+                //this guy has a manager and this activity was open more than 5 days ago
                 if (!isset($managers[$managerId])) {
                     $managers[$managerId] = (object)[
                         "minionConsultants" => []
                     ];
                 }
 
-                if (!isset($managers[$managerId]->minionConsultants[$row['cns_consno']])) {
-                    $managers[$managerId]->minionConsultants[$row['cns_consno']] = (object)[
-                        "name"           => $row['Engineer'],
+                if (!isset($managers[$managerId]->minionConsultants[$engineerId])) {
+                    $managers[$managerId]->minionConsultants[$engineerId] = (object)[
+                        "name"           => $engineerActivity->engineerName,
                         "openActivities" => []
                     ];
                 }
 
-                $managers[$managerId]->minionConsultants[$row['cns_consno']]->openActivities[] = $i;
+                $managers[$managerId]->minionConsultants[$engineerId]->openActivities[] = $engineerActivity;
             }
             ?>
             <TR>
                 <TD>
-                    <A href="<?= SITE_URL ?>/Activity.php?action=displayActivity&callActivityID=<?php print $i[0] ?>"><?php print $i[0] ?></A>
+                    <A href="<?= SITE_URL ?>/Activity.php?action=displayActivity&callActivityID=<?php print $engineerActivity->activityId ?>"><?php print $engineerActivity->activityId ?></A>
                 </TD>
                 <TD>
-                    <?php print $i[1] ?>
+                    <?php print $engineerActivity->customerName ?>
                 </TD>
                 <TD>
-                    <?php print $i[3] ?>
+                    <?php print $engineerActivity->activityDate ?>
                 </TD>
             </TR>
             <?php
@@ -168,7 +209,7 @@ foreach ($engineers as $row) {
 
         $body = $buMail->mime->get($mime_params);
 
-        $sendTo = $row['cns_logname'] . '@' . $domain;
+        $sendTo = $logName . '@' . $domain;
         $hdrs = array(
             'To'           => $sendTo,
             'From'         => CONFIG_SALES_MANAGER_EMAIL,
@@ -177,8 +218,6 @@ foreach ($engineers as $row) {
         );
 
         $hdrs = $buMail->mime->headers($hdrs);
-
-
         $sent = $buMail->send(
             $sendTo,
             $hdrs,
@@ -186,10 +225,10 @@ foreach ($engineers as $row) {
         );
 
         if ($sent) {
-            echo 'email sent to ' . $row['Engineer'] . ' email: ' . $sendTo;
+            echo 'email sent to ' . $engineerName . ' email: ' . $sendTo;
             echo '<br>';
         } else {
-            echo 'failed to send email to ' . $row['Engineer'] . ' email: ' . $sendTo;
+            echo 'failed to send email to ' . $engineerName . ' email: ' . $sendTo;
             echo '<br>';
         }
     }
@@ -198,9 +237,9 @@ foreach ($engineers as $row) {
 foreach ($managers as $managerId => $manager) {
     //get information about the manager
 
-    $managersRows = $localDb->query('SELECT cns_logname FROM consultant WHERE cns_consno = ' . $managerId);
+    $managersRows = $pdoDB->query('SELECT cns_logname FROM consultant WHERE cns_consno = ' . $managerId);
 
-    $managerRow = $managersRows->fetch_assoc();
+    $managerRow = $managersRows->fetch(PDO::FETCH_ASSOC);
 
     if (!$managerRow) {
         echo "<br>Manager with id $managerId not found, skipping<br>";
@@ -243,9 +282,8 @@ foreach ($managers as $managerId => $manager) {
         </TR>
         <?php
         foreach ($manager->minionConsultants as $minionConsultant) {
-
             $isFirst = true;
-
+            /** @var EngineerActivity $openActivity */
             foreach ($minionConsultant->openActivities as $openActivity) {
 
                 ?>
@@ -259,14 +297,14 @@ foreach ($managers as $managerId => $manager) {
                     }
                     ?>
                     <TD>
-                        <A href="<?= SITE_URL ?>/Activity.php?action=displayActivity&callActivityID=<?= $openActivity[0] ?>"><?= $openActivity[0] ?></A>
+                        <A href="<?= SITE_URL ?>/Activity.php?action=displayActivity&callActivityID=<?= $engineerActivity->activityId ?>"><?= $engineerActivity->activityId ?></A>
                     </TD>
 
                     <TD>
-                        <?= $openActivity[1] ?>
+                        <?= $engineerActivity->customerName ?>
                     </TD>
                     <TD>
-                        <?= $openActivity[3] ?>
+                        <?= $engineerActivity->activityDate ?>
                     </TD>
                 </TR>
                 <?php
@@ -318,6 +356,7 @@ foreach ($managers as $managerId => $manager) {
         } else {
             echo 'failed to send email to ' . $managerRow['cns_logname'] . ' email: ' . $sendTo;
         }
+        echo '<br>';
     }
 
 }
