@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 654 - Set all contacts to support level None
 ### Changed
 - Issue 559 - Improve OpenCallEmail.php code
+- Issue 633 - Set retention rules for log files
 ### Removed
 - Issue 652 - Disable myphpadmin from being used / allowing logins
 
