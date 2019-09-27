@@ -21,6 +21,7 @@ require_once($cfg['path_dbe'] . '/DBECallDocument.inc.php');
 require_once($cfg['path_dbe'] . '/DBECallActType.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJCallActType.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
+require_once($cfg['path_bu'] . '/BUExpenseType.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
 require_once($cfg['path_bu'] . '/BUSite.inc.php');
 require_once($cfg['path_bu'] . '/BUContact.inc.php');
@@ -1696,7 +1697,11 @@ class CTActivity extends CTCNC
 
         $urlViewExpenses = null;
         $txtViewExpenses = null;
-        if ($dsCallActivity->getValue(DBEJCallActivity::allowExpensesFlag) == 'Y') {
+        $buExpenseType = new BUExpenseType($this);
+        $expenseTypes = $buExpenseType->getExpenseTypesAllowedForActivityTypeID(
+            $dsCallActivity->getValue(DBEJCallActivity::callActTypeID)
+        );
+        if (count($expenseTypes)) {
             $urlViewExpenses =
                 Controller::buildLink(
                     'Expense.php',
@@ -2340,8 +2345,7 @@ class CTActivity extends CTCNC
 
         }
         $totalValue = 0;
-        if ($dsCallActivity->getValue(DBEJCallActivity::allowExpensesFlag) == 'Y') {
-
+        if (count($expenseTypes)) {
             $buExpense = new BUExpense($this);
 
             $this->template->set_var(

@@ -23,7 +23,6 @@ class DBEJCallActivity extends DBECallActivity
     const activityType = "activityType";
     const requireCheckFlag = "requireCheckFlag";
     const onSiteFlag = "onSiteFlag";
-    const allowExpensesFlag = "allowExpensesFlag";
     const travelFlag = "travelFlag";
     const allowSCRFlag = "allowSCRFlag";
     const userName = "userName";
@@ -103,12 +102,6 @@ class DBEJCallActivity extends DBECallActivity
             DA_YN,
             DA_NOT_NULL,
             "cat_on_site_flag"
-        );
-        $this->addColumn(
-            self::allowExpensesFlag,
-            DA_YN,
-            DA_ALLOW_NULL,
-            "cat_allow_exp_flag"
         );
         $this->addColumn(
             self::travelFlag,

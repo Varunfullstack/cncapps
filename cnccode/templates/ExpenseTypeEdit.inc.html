@@ -82,11 +82,35 @@
             <td width="575"
                 class="fieldText"
             >
-                <select name="expenseType[1][activityApplicability]">
+                <select name="expenseTypeActivities[]"
+                        multiple
+                        size="7"
+                        required
+                >
+                    <!-- BEGIN activityBlock -->
+                    <option {activitySelected}
+                            value="{activityID}"
+                    >{activityName}
+                    </option>
+                    <!-- END activityBlock -->
                 </select>
             </td>
         </tr>
-
+        <tr>
+            <td width="115"
+                class="promptText"
+            >Receipt Required
+            </td>
+            <td width="575"
+                class="fieldText"
+            >
+                <input name="expenseType[1][receiptRequired]"
+                       type="checkbox"
+                       value="1"
+                       {receiptRequiredChecked}
+                >
+            </td>
+        </tr>
         <tr>
             <td class="promptText">Mileage</td>
             <td class="fieldText">

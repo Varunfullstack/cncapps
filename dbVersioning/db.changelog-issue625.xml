@@ -96,4 +96,100 @@
             </sql>
         </rollback>
     </changeSet>
+    <changeSet author="pavwebdev" id="625-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expensetype" columnName="receiptRequired"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expensetype">
+            <column name="receiptRequired" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="625-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expense" columnName="dateSubmitted"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expense">
+            <column name="dateSubmitted" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expense" columnName="dateApproved"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expense">
+            <column name="dateApproved" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expense" columnName="approvedBy"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expense">
+            <column name="approvedBy" type="bigint(11)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expense" columnName="deniedReason"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expense">
+            <column name="deniedReason" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-12">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="receipt"/>
+            </not>
+        </preConditions>
+        <createTable tableName="receipt">
+            <column name="id" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fileMIMEType" remarks="File Mime type" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expenseId" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="filePath" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-13">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="consultant" columnName="isExpenseApprover"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="isExpenseApprover" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
 </databaseChangeLog>

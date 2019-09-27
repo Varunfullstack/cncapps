@@ -11,41 +11,9 @@ require_once($cfg['path_bu'] . '/BUExpense.inc.php');
 require_once($cfg['path_bu'] . '/BUExpenseType.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-// Actions
-define(
-    'CTEXPENSE_ACT_EDIT_EXPENSE',
-    'editExpense'
-);
-define(
-    'CTEXPENSE_ACT_UPDATE_EXPENSE',
-    'updateExpense'
-);
-define(
-    'CTEXPENSE_ACT_CREATE_EXPENSE',
-    'createExpense'
-);
-define(
-    'CTEXPENSE_ACT_DELETE_EXPENSE',
-    'deleteExpense'
-);
-define(
-    'CTACTIVITY_ACT_EDIT_CALL',
-    'editCall'
-);
-define(
-    'CTEXPENSE_ACT_EXPORT_FORM',
-    'exportForm'
-);
-define(
-    'CTEXPENSE_ACT_EXPORT_GENERATE',
-    'exportGenerate'
-);
-define(
-    'CTEXPENSE_ACT_EXPORT_TRIAL',
-    'exportTrial'
-);
+require_once($cfg['path_dbe'] . '/DBEReceipt.php');
 
-class CTExpense extends CTCNC
+class CTReceipt extends CTCNC
 {
     /** @var DSForm */
     public $dsExpenseExport;
@@ -73,7 +41,6 @@ class CTExpense extends CTCNC
             $cfg
         );
         $roles = [
-            "accounts",
             "technical",
             "sales"
         ];
@@ -81,11 +48,6 @@ class CTExpense extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
-        $this->buExpense = new BUExpense($this);
-        $this->dsSearchForm = new DSForm($this);
-        $this->dsSearchResults = new DSForm($this);
-        $this->dsExpense = new DSForm($this);
-        $this->dsExpense->copyColumnsFrom($this->buExpense->dbeJExpense);
     }
 
     /**
@@ -95,30 +57,21 @@ class CTExpense extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
-            case CTCNC_ACT_VIEW:
-                $this->displayExpenses();
-                break;
-            case CTEXPENSE_ACT_EDIT_EXPENSE:
-                $this->editExpense();
-                break;
-            case CTEXPENSE_ACT_DELETE_EXPENSE:
-                $this->deleteExpense();
-                break;
-            case CTEXPENSE_ACT_UPDATE_EXPENSE:
-                $this->updateExpense();
-                break;
-            case CTEXPENSE_ACT_CREATE_EXPENSE:
-                $this->createExpense();
-                break;
-            case CTEXPENSE_ACT_EXPORT_FORM:
-                $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
-                $this->exportExpenseForm();
-                break;
-            case CTEXPENSE_ACT_EXPORT_GENERATE:
-            case CTEXPENSE_ACT_EXPORT_TRIAL:
-                $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
-                $this->exportExpenseGenerate();
-                break;
+            case 'show':
+                $receiptID = $this->getParam('receiptID');
+                if (!$receiptID) {
+                    $this->displayFatalError('Receipt ID required');
+                }
+
+                $dbeReceipt = new DBEReceipt($this);
+                $dbeReceipt->getRow($receiptID);
+
+                $dbeReceipt->getValue(DBEReceipt::expenseId);
+                $dbeExpense = new DBEExpense($this);
+                $dbeExpense->getValue(DBEExpense::callActivityID);
+
+
+
             default:
                 $this->displayFatalError('No valid action passed');
                 exit;
@@ -168,7 +121,6 @@ class CTExpense extends CTCNC
                     'callActivityID' => $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
                 )
             );
-
 
 
         $this->template->set_var(
@@ -262,6 +214,66 @@ class CTExpense extends CTCNC
         );
         $this->parsePage();
     }
+
+/**
+     * Delete Expense
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function deleteExpense()
+    {
+        $this->setMethodName('deleteExpense');
+        $this->buExpense->getExpenseByID(
+            $this->getParam('expenseID'),
+            $dsExpense
+        );
+        if (!$this->buExpense->canDeleteExpense($this->getParam('expenseID'))) {
+            $this->displayFatalError('Cannot delete expense - already exported');
+            exit;
+        } else {
+            $callActivityID = $this->buExpense->deleteExpense($this->getParam('expenseID'));
+        }
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'         => CTCNC_ACT_VIEW,
+                    'callActivityID' => $callActivityID
+                )
+            );
+        header('Location: ' . $urlNext);
+    }
+
+        /**
+     * Update expense details
+     * @access private
+     * @throws Exception
+     */
+    function updateExpense()
+    {
+        $this->setMethodName('updateExpense');
+        $this->formError = (!$this->dsExpense->populateFromArray($this->getParam('expense')));
+
+
+        if ($this->formError) {
+            $this->editExpense();
+            exit;
+        }
+
+        $this->buExpense->updateExpense($this->dsExpense);
+
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'callActivityID' => $this->dsExpense->getValue(DBEJExpense::callActivityID),
+                    'action'         => CTCNC_ACT_VIEW
+                )
+            );
+        header('Location: ' . $urlNext);
+    }// end function editExpense()
 
     /**
      * Edit/Add Expense
@@ -378,66 +390,6 @@ class CTExpense extends CTCNC
     }
 
     /**
-     * Delete Expense
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function deleteExpense()
-    {
-        $this->setMethodName('deleteExpense');
-        $this->buExpense->getExpenseByID(
-            $this->getParam('expenseID'),
-            $dsExpense
-        );
-        if (!$this->buExpense->canDeleteExpense($this->getParam('expenseID'))) {
-            $this->displayFatalError('Cannot delete expense - already exported');
-            exit;
-        } else {
-            $callActivityID = $this->buExpense->deleteExpense($this->getParam('expenseID'));
-        }
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'         => CTCNC_ACT_VIEW,
-                    'callActivityID' => $callActivityID
-                )
-            );
-        header('Location: ' . $urlNext);
-    }// end function editExpense()
-
-    /**
-     * Update expense details
-     * @access private
-     * @throws Exception
-     */
-    function updateExpense()
-    {
-        $this->setMethodName('updateExpense');
-        $this->formError = (!$this->dsExpense->populateFromArray($this->getParam('expense')));
-
-
-        if ($this->formError) {
-            $this->editExpense();
-            exit;
-        }
-
-        $this->buExpense->updateExpense($this->dsExpense);
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'callActivityID' => $this->dsExpense->getValue(DBEJExpense::callActivityID),
-                    'action'         => CTCNC_ACT_VIEW
-                )
-            );
-        header('Location: ' . $urlNext);
-    }
-
-    /**
      * Create new call activity
      * inserts a new activity to the DB then displays it
      * @access private
@@ -460,46 +412,6 @@ class CTExpense extends CTCNC
                 )
             );
         header('Location: ' . $urlNext);
-    }
-
-    /**
-     * Export expenses that have not previously been exported
-     * @access private
-     * @throws Exception
-     */
-    function exportExpenseForm()
-    {
-        $urlSubmit = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTEXPENSE_ACT_EXPORT_GENERATE
-            )
-        );
-        $this->setPageTitle('Export Expenses and Overtime');
-        $this->setTemplateFiles(
-            'ExpenseExport',
-            'ExpenseExport.inc'
-        );
-        if (!$this->getFormError()) {
-            $this->buExpense->initialiseExportDataset($this->dsExpenseExport); // we reuse this form
-        }
-        $this->template->set_var(
-            array(
-                'endDate'        => Controller::dateYMDtoDMY(
-                    $this->dsExpenseExport->getValue(BUExpense::exportDataSetEndDate)
-                ),
-                'endDateMessage' => Controller::dateYMDtoDMY(
-                    $this->dsExpenseExport->getMessage(BUExpense::exportDataSetEndDate)
-                ),
-                'urlSubmit'      => $urlSubmit
-            )
-        );
-        $this->template->parse(
-            'CONTENTS',
-            'ExpenseExport',
-            true
-        );
-        $this->parsePage();
     }
 
     /**
@@ -543,5 +455,45 @@ class CTExpense extends CTCNC
             $this->exportExpenseForm();
         }
         // to display
+    }
+
+    /**
+     * Export expenses that have not previously been exported
+     * @access private
+     * @throws Exception
+     */
+    function exportExpenseForm()
+    {
+        $urlSubmit = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTEXPENSE_ACT_EXPORT_GENERATE
+            )
+        );
+        $this->setPageTitle('Export Expenses and Overtime');
+        $this->setTemplateFiles(
+            'ExpenseExport',
+            'ExpenseExport.inc'
+        );
+        if (!$this->getFormError()) {
+            $this->buExpense->initialiseExportDataset($this->dsExpenseExport); // we reuse this form
+        }
+        $this->template->set_var(
+            array(
+                'endDate'        => Controller::dateYMDtoDMY(
+                    $this->dsExpenseExport->getValue(BUExpense::exportDataSetEndDate)
+                ),
+                'endDateMessage' => Controller::dateYMDtoDMY(
+                    $this->dsExpenseExport->getMessage(BUExpense::exportDataSetEndDate)
+                ),
+                'urlSubmit'      => $urlSubmit
+            )
+        );
+        $this->template->parse(
+            'CONTENTS',
+            'ExpenseExport',
+            true
+        );
+        $this->parsePage();
     }
 }

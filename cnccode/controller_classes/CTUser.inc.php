@@ -514,6 +514,9 @@ class CTUser extends CTCNC
                 'staffAppraiserFlagChecked'                  => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::staffAppraiserFlag)
                 ),
+                "isExpenseApproverChecked"                   => $dsUser->getValue(
+                    DBEUser::isExpenseApprover
+                ) ? 'checked' : null,
                 'receiveSdManagerEmailFlagChecked'           => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::receiveSdManagerEmailFlag)
                 ),

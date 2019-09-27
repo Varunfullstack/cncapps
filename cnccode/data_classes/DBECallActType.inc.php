@@ -15,7 +15,6 @@ class DBECallActType extends DBEntity
     const minHours = "minHours";
     const customerEmailFlag = "customerEmailFlag";
     const requireCheckFlag = "requireCheckFlag";
-    const allowExpensesFlag = "allowExpensesFlag";
     const allowReasonFlag = "allowReasonFlag";
     const allowActionFlag = "allowActionFlag";
     const allowFinalStatusFlag = "allowFinalStatusFlag";
@@ -54,10 +53,6 @@ class DBECallActType extends DBEntity
                          DA_YN,
                          DA_NOT_NULL,
                          "cat_req_check_flag");        // rquires checking before sales order
-        $this->addColumn(self::allowExpensesFlag,
-                         DA_YN,
-                         DA_NOT_NULL,
-                         "cat_allow_exp_flag");    // allow expenses against this type
         $this->addColumn(self::allowReasonFlag,
                          DA_YN,
                          DA_NOT_NULL,
