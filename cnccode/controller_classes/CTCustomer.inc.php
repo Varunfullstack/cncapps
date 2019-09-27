@@ -3565,45 +3565,56 @@ FROM
   (SELECT
      `cui_custno`                      AS customerId,
      itm_desc                          AS serviceDeskProduct,
-     custitem.`cui_users`              AS serviceDeskUsers,
-     round(custitem.cui_sale_price, 0) AS serviceDeskContract,
-     ROUND(
+     sum(custitem.`cui_users`)              AS serviceDeskUsers,
+     sum(round(custitem.cui_sale_price, 0)) AS serviceDeskContract,
+     sum(ROUND(
          custitem.cui_sale_price / custitem.cui_users / 12,
          2
-     )                                 AS serviceDeskCostPerUserMonth
+     ))                                 AS serviceDeskCostPerUserMonth
    FROM
      custitem
      LEFT JOIN item
        ON item.`itm_itemno` = custitem.`cui_itemno`
    WHERE itm_desc LIKE '%servicedesk%'
          AND itm_discontinued <> 'Y'
-         AND custitem.`declinedFlag` <> 'Y') AS test1
+         AND custitem.`declinedFlag` <> 'Y' 
+      group by custitem.`cui_custno` 
+      ) AS test1
     ON test1.customerId = customer.`cus_custno`
   LEFT JOIN
   (SELECT
-     custitem.`cui_custno`               AS customerId,
-     item.itm_desc                       AS serverCareProduct,
-     SUM(
-         serverItem.`itm_desc` LIKE '%virtual%'
-     )                                   AS virtualServers,
-     SUM(
-         serverItem.itm_desc NOT LIKE '%virtual%'
-     )                                   AS physicalServers,
-     round(custitem.`cui_sale_price`, 0) AS serverCareContract
-   FROM
-     custitem
-     LEFT JOIN item
-       ON item.`itm_itemno` = custitem.`cui_itemno`
-     LEFT JOIN custitem_contract
-       ON custitem_contract.`cic_contractcuino` = cui_cuino
-     LEFT JOIN custitem AS servers
-       ON custitem_contract.`cic_cuino` = servers.cui_cuino
-     LEFT JOIN item AS serverItem
-       ON servers.cui_itemno = serverItem.`itm_itemno`
-   WHERE item.`itm_desc` LIKE '%servercare%'
-         AND item.itm_discontinued <> 'Y'
-         AND custitem.`declinedFlag` <> 'Y'
-   GROUP BY custitem.`cui_cuino`) test2
+  custitem.`cui_custno` AS customerId,
+  item.`itm_desc` as serverCareProduct,
+  SUM(
+    ROUND(custitem.`cui_sale_price`, 0)
+  ) AS serverCareContract,
+  SUM(physicalServers) AS physicalServers,
+  SUM(virtualServers) AS virtualServers
+FROM
+  custitem
+  LEFT JOIN item
+    ON item.`itm_itemno` = custitem.`cui_itemno`
+  LEFT JOIN
+    (SELECT
+      custitem_contract.cic_contractcuino,
+      SUM(
+        serverItem.`itm_desc` NOT LIKE '%virtual%'
+      ) AS physicalServers,
+      SUM(
+        serverItem.`itm_desc` LIKE '%virtual%'
+      ) AS virtualServers
+    FROM
+      custitem_contract
+      LEFT JOIN custitem AS servers
+        ON custitem_contract.`cic_cuino` = servers.cui_cuino
+      LEFT JOIN item AS serverItem
+        ON servers.cui_itemno = serverItem.`itm_itemno`
+    GROUP BY custitem_contract.cic_contractcuino) b
+    ON b.`cic_contractcuino` = cui_cuino
+WHERE item.`itm_desc` LIKE '%servercare%'
+  AND item.itm_discontinued <> 'Y'
+  AND custitem.`declinedFlag` <> 'Y'
+GROUP BY custitem.`cui_custno`) test2
     ON customer.cus_custno = test2.customerId
 left join (
     select 
@@ -3625,7 +3636,7 @@ where supportLevel is not null
 GROUP BY con_custno 
 ) supportUsers on supportUsers.con_custno = customer.cus_custno
 WHERE serviceDeskProduct IS NOT NULL OR serverCareProduct IS NOT NULL
-ORDER BY cus_name ASC  ";
+ORDER BY cus_name ASC   ";
 
         $db->query($queryString);
         return $db;
