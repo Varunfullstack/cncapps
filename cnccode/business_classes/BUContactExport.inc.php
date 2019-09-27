@@ -51,6 +51,7 @@ class BUContactExport extends Business
         con_last_name AS LastName,
         con_first_name AS FirstName,
         con_position AS Position,
+        supportLevel as SupportLevel,
         cus_name AS Company,
         add_add1 AS BusinessStreet,
         add_add2 AS BusinessStreet2,
@@ -61,7 +62,6 @@ class BUContactExport extends Business
         add_phone AS BusinessPhone,
         con_phone AS BusinessPhone2,
         con_mobile_phone AS Mobile,
-        con_fax AS BusinessFax,
         con_email AS EmailAddress,
         CONCAT(con_first_name,' ',con_last_name) AS DisplayName,
         cus_prospect AS Prospect";
