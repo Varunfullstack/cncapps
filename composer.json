@@ -24,7 +24,8 @@
         "twig/twig": "^2.0",
         "php-di/php-di": "^6.0",
         "ext-bcmath": "*",
-        "ext-calendar": "*"
+        "ext-calendar": "*",
+        "intervention/image": "^2.5"
     },
     "autoload": {
         "psr-4": {

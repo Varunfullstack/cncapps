@@ -2,6 +2,36 @@
 <script language='JavaScript'
         src="CommonJS.js"
 ></script>
+<script>
+    function uploadReceipt(expenseID) {
+        const file = event.target.files[0];
+
+        // Allowed types
+        var mime_types = ['image/jpeg', 'application/pdf'];
+
+        // Validate MIME type
+        if (mime_types.indexOf(file.type) === -1) {
+            alert('Error : Incorrect file type');
+            return;
+        }
+
+        // Max 2 Mb allowed
+        if (file.type === 'application/pdf' && file.size > 500 * 1024) {
+            alert('Error : Exceeded PDF size 500KB');
+            return;
+        }
+
+        const data = new FormData();
+        data.append('upfile', file);
+        data.append('expenseID', expenseID);
+        data.append('action', 'upload');
+        fetch(`/Receipt.php`, {method: 'POST', body: data}).then((response) => {
+            console.log(response);
+        })
+
+
+    }
+</script>
 <TABLE width="100"
        border="0"
        cellpadding="2"
@@ -58,6 +88,7 @@
     <tr valign="top"
         onMouseOver="this.bgColor='#ffffcc';"
         onMouseOut="this.bgColor='';"
+        data-expense-id="{expenseID}"
     >
         <td class="orderLineItem">
             <DIV align="left">{expenseType}</div>
@@ -76,9 +107,10 @@
         </td>
         <td class="orderLineItem">
             <DIV align="left"></div>
-            <DIV align="left"><A href="{urlEdit}"
-                                 title="Edit expense details"
-            >{txtEdit}</A>
+            <DIV align="left">
+                <A href="{urlEdit}"
+                   title="Edit expense details"
+                >{txtEdit}</A>
                 <A href="{urlDelete}"
                    title="Delete this expense record"
                    onClick="if(!confirm('Are you sure you want to remove this expense?')) return(false)"

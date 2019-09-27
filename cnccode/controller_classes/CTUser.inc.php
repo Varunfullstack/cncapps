@@ -629,34 +629,30 @@ class CTUser extends CTCNC
         }
 
         $dbeExpenseApprover = new DBEUser($this);
-        $dbeExpenseApprover->getRows();
+        $dbeExpenseApprover->getApproverUsers();
         $this->template->set_block(
             'UserEdit',
             'expenseApproverBlock',
             'expenseApprovers'
         );
         while ($dbeExpenseApprover->fetchNext()) {
-            if ($dbeExpenseApprover->getValue(DBEJUser::userID) != $dsUser->getValue(
+            $expenseApproverSelected = ($dsUser->getValue(
+                    DBEJUser::expenseApproverID
+                ) == $dbeExpenseApprover->getValue(
                     DBEJUser::userID
-                )) {                // exclude this user
-                $expenseApproverSelected = ($dsUser->getValue(
-                        DBEJUser::expenseApproverID
-                    ) == $dbeExpenseApprover->getValue(
-                        DBEJUser::userID
-                    )) ? CT_SELECTED : null;
-                $this->template->set_var(
-                    array(
-                        'expenseApproverSelected' => $expenseApproverSelected,
-                        'expenseApproverID'       => $dbeExpenseApprover->getValue(DBEJUser::userID),
-                        'expenseApproverName'     => $dbeExpenseApprover->getValue(DBEJUser::name)
-                    )
-                );
-                $this->template->parse(
-                    'expenseApprovers',
-                    'expenseApproverBlock',
-                    true
-                );
-            }
+                )) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    'expenseApproverSelected' => $expenseApproverSelected,
+                    'expenseApproverID'       => $dbeExpenseApprover->getValue(DBEJUser::userID),
+                    'expenseApproverName'     => $dbeExpenseApprover->getValue(DBEJUser::name)
+                )
+            );
+            $this->template->parse(
+                'expenseApprovers',
+                'expenseApproverBlock',
+                true
+            );
         }
 
 

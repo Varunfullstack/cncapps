@@ -469,6 +469,17 @@ class DBEUser extends DBEntity
         $this->setQueryString($query);
         return parent::getRows();
     }
+
+    public function getApproverUsers()
+    {
+        $query = "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(
+                self::isExpenseApprover
+            ) . " = 1  and " . $this->getDBColumnName(self::activeFlag) . " = 'Y'";
+        $this->setQueryString($query);
+        return parent::getRows();
+    }
 }
 
 ?>

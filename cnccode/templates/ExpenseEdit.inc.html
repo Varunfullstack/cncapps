@@ -1,126 +1,166 @@
 <!-- Template: ActvityDisplay.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
-<script language='JavaScript' src='popcalendar/popcalendar.js'></script>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+></script>
 <script language='JavaScript'>
-function checkFunctionKey(field){
- 	if (event.keyCode == 120){			// F9 - edit
-		switch (field.id){
-			case "siteDesc": 
-				if (document.getElementById("siteNo").value != ""){
-					window.open(
-						'{urlSiteEdit}&customerID={customerID}' +
-						'&siteNo=' + escape(document.getElementById("SiteNo").value) +
-						'&parentIDField=siteNo' +
-						'&parentDescField=siteDesc',
-						'address','scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
-					);
-				}
-				break;
-		}		
- 	}
- 	return;
-}
-function validateSiteDesc(){
-	if (Trim(document.getElementById("siteDesc").value) != ""){
-		window.open(
-			'{urlSitePopup}&customerID={customerID}'+
-			'&siteDesc=' + escape(document.getElementById("siteDesc").value) +
-			'&parentIDField=siteNo' +
-			'&parentDescField=siteDesc',
-			'address',
-			'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
-		)
-	}
-}
+    function checkFunctionKey(field) {
+        if (event.keyCode == 120) {			// F9 - edit
+            switch (field.id) {
+                case "siteDesc":
+                    if (document.getElementById("siteNo").value != "") {
+                        window.open(
+                            '{urlSiteEdit}&customerID={customerID}' +
+                            '&siteNo=' + escape(document.getElementById("SiteNo").value) +
+                            '&parentIDField=siteNo' +
+                            '&parentDescField=siteDesc',
+                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                        );
+                    }
+                    break;
+            }
+        }
+        return;
+    }
+
+    function validateSiteDesc() {
+        if (Trim(document.getElementById("siteDesc").value) != "") {
+            window.open(
+                '{urlSitePopup}&customerID={customerID}' +
+                '&siteDesc=' + escape(document.getElementById("siteDesc").value) +
+                '&parentIDField=siteNo' +
+                '&parentDescField=siteDesc',
+                'address',
+                'scrollbars=yes,resizable=yes,width=500,height=550,copyhistory=no, menubar=0'
+            )
+        }
+    }
 </SCRIPT>
-<TABLE width="100px" border="0" cellpadding="2" cellspacing="1">
-	<TR> 
-		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDisplayExpenses}">Expenses</a></TD>
-	</TR>
+<TABLE width="100px"
+       border="0"
+       cellpadding="2"
+       cellspacing="1"
+>
+    <TR>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlDisplayExpenses}">Expenses</a></TD>
+    </TR>
 </table>
-<table class="singleBorder" width="700px" border="0">
-	<tr> 
-		<td class="promptText">Activity ID</td>
-		<td class="mainHeadText">{callActivityID}</td>
-		<td class="promptText">Date</td>
-		<td class="mainHeadText">{date}</td>
-	</tr>
-	<tr> 
-		<td class="promptText">Customer</td>
-		<td class="mainHeadText">{customerName}</td>
-		<td class="promptText">Site</td>
-		<td class="mainHeadText">{siteDesc}</td>
-	</tr>
-	<tr> 
-		<td class="promptText">Type</td>
-		<td class="mainHeadText">{activityType}</td>
-		<td class="promptText">User</td>
-		<td class="mainHeadText">{activityUserName}</td>
-	</tr>
+<table class="singleBorder"
+       width="700px"
+       border="0"
+>
+    <tr>
+        <td class="promptText">Activity ID</td>
+        <td class="mainHeadText">{callActivityID}</td>
+        <td class="promptText">Date</td>
+        <td class="mainHeadText">{date}</td>
+    </tr>
+    <tr>
+        <td class="promptText">Customer</td>
+        <td class="mainHeadText">{customerName}</td>
+        <td class="promptText">Site</td>
+        <td class="mainHeadText">{siteDesc}</td>
+    </tr>
+    <tr>
+        <td class="promptText">Type</td>
+        <td class="mainHeadText">{activityType}</td>
+        <td class="promptText">User</td>
+        <td class="mainHeadText">{activityUserName}</td>
+    </tr>
 </table>
-<FORM  method="post" action="{urlUpdateExpense}" name="expense">
-  <table class="singleBorder" width="700px" border="0">
-		<input
-			type="hidden"
-			name="expense[1][expenseID]"
-			value="{expenseID}"
-		>
-		<input
-			type="hidden"
-			name="expense[1][userID]"
-			value="{userID}"
-		>
-		<input
-			type="hidden"
-			name="expense[1][callActivityID]"
-			value="{callActivityID}"
-		>
-		<input
-			type="hidden"
-			name="expense[1][exportedFlag]"
-			value="{exportedFlag}"
-		>
-		<tr> 
-			<td width="115" class="promptText">Type</td>
-			<td width="575" class="fieldText"> <select
-					type="text"
-					name="expense[1][expenseTypeID]"
-				>
-					<!-- BEGIN expenseTypeBlock -->
-					<option {expenseTypeSelected} value="{expenseTypeID}">{expenseTypeDesc}</option>
-					<!-- END expenseTypeBlock -->
-				</select> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Mileage</td>
-			<td class="fieldText"> <input
-					type="text"
-					name="expense[1][mileage]"
-					value="{mileage}"
-					size="10"
-					maxlength="10"
-				> <span class="formErrorMessage">{mileageMessage}</span> </td>
-		</tr>
-		<tr> 
-			<td class="promptText">Value</td>
-			<td class="fieldText"> <input
-					type="text"
-					name="expense[1][value]"
-					value="{value}"
-					size="10"
-					maxlength="10"
-				> <span class="formErrorMessage">{valueMessage}</span> </td>
-		</tr>
-		<tr>
-			<td class="promptText">VAT Included in Value?</td>
-			<td class="fieldText">
- 				<INPUT name="expense[1][vatFlag]" type="checkbox" value="Y" {vatFlagChecked}>
- 			</td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
-		</tr>
-	</table>
+<FORM method="post"
+      action="{urlUpdateExpense}"
+      name="expense"
+>
+    <table class="singleBorder"
+           width="700px"
+           border="0"
+    >
+        <input
+                type="hidden"
+                name="expense[1][expenseID]"
+                value="{expenseID}"
+        >
+        <input
+                type="hidden"
+                name="expense[1][userID]"
+                value="{userID}"
+        >
+        <input
+                type="hidden"
+                name="expense[1][callActivityID]"
+                value="{callActivityID}"
+        >
+        <input
+                type="hidden"
+                name="expense[1][exportedFlag]"
+                value="{exportedFlag}"
+        >
+        <tr>
+            <td width="115"
+                class="promptText"
+            >Type
+            </td>
+            <td width="575"
+                class="fieldText"
+            >
+                <select type="text"
+                        name="expense[1][expenseTypeID]"
+                >
+                    <!-- BEGIN expenseTypeBlock -->
+                    <option {expenseTypeSelected}
+                            value="{expenseTypeID}"
+                    >{expenseTypeDesc}
+                    </option>
+                    <!-- END expenseTypeBlock -->
+                </select></td>
+        </tr>
+        <tr>
+            <td class="promptText">Mileage</td>
+            <td class="fieldText"><input
+                    type="text"
+                    name="expense[1][mileage]"
+                    value="{mileage}"
+                    size="10"
+                    maxlength="10"
+            > <span class="formErrorMessage">{mileageMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Value</td>
+            <td class="fieldText">
+                <input
+                        type="text"
+                        name="expense[1][value]"
+                        value="{value}"
+                        size="10"
+                        maxlength="10"
+                >
+                <span class="formErrorMessage">{valueMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">VAT Included in Value?</td>
+            <td class="fieldText">
+                <INPUT name="expense[1][vatFlag]"
+                       type="checkbox"
+                       value="Y"
+                       {vatFlagChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="formErrorMessage">
+                <input type="submit"
+                       name="Submit"
+                       value="Update"
+                >
+            </td>
+        </tr>
+    </table>
 </FORM>
 <!-- End Template: ActvityDisplay.inc.html -->
