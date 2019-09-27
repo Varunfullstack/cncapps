@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 654 - Set all contacts to support level None
+### Changed
+- Issue 559 - Improve OpenCallEmail.php code
 ### Removed
 - Issue 652 - Disable myphpadmin from being used / allowing logins
 
