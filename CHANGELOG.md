@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 633 - Set retention rules for log files
 - Issue 606 - Sweetcode in URL
 - Issue 612 - Show holiday on performance graphs
+- Issue 583 - Contact Extraction Improvements
 ### Removed
 - Issue 652 - Disable myphpadmin from being used / allowing logins
 
