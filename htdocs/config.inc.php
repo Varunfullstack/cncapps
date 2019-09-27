@@ -1041,6 +1041,11 @@ define(
     "CONFIG_SQL_LOG",
     BASE_DRIVE . "/htdocs/log_file/sql_log.html"
 );
+define(
+    'RECEIPT_PATH',
+    BASE_DRIVE . '/receipts/'
+);
+
 $cfg['quote_path'] = BASE_DRIVE . "/htdocs/quotes";
 define(
     "PHPLIB_SESSIONS_DIR",

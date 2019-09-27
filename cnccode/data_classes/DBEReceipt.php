@@ -46,6 +46,13 @@ class DBEReceipt extends DBEntity
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
+
+    public function getReceiptByExpenseId($expenseID)
+    {
+        $this->queryString = "select " . $this->getDBColumnNamesAsString(
+            ) . " from " . $this->tableName . " where " . $this->getDBColumnName(self::expenseId) . " = $expenseID";
+        $this->getRow();
+    }
 }
 
 ?>

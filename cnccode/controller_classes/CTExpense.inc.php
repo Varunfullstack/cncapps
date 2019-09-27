@@ -11,6 +11,7 @@ require_once($cfg['path_bu'] . '/BUExpense.inc.php');
 require_once($cfg['path_bu'] . '/BUExpenseType.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
+require_once($cfg['path_dbe'] . '/DBEReceipt.php');
 // Actions
 define(
     'CTEXPENSE_ACT_EDIT_EXPENSE',
@@ -170,7 +171,6 @@ class CTExpense extends CTCNC
             );
 
 
-
         $this->template->set_var(
             array(
                 'callActivityID'      => $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
@@ -208,6 +208,26 @@ class CTExpense extends CTCNC
             );
             while ($dsExpense->fetchNext()) {
                 $expenseID = $dsExpense->getValue(DBEJExpense::expenseID);
+                $expenseTypeID = $dsExpense->getValue(DBEJExpense::expenseTypeID);
+                $dbeExpenseType = new DBEExpenseType($this);
+                $dbeExpenseType->getRow($expenseTypeID);
+                $uploadReceipt = null;
+                if ($dbeExpenseType->getValue(DBEExpenseType::receiptRequired)) {
+                    $dbeReceipt = new DBEReceipt($this);
+                    $dbeReceipt->getReceiptByExpenseId($expenseID);
+
+                    if ($dbeReceipt->rowCount()) {
+                        $uploadReceipt = "<a href='/Receipt.php?action=show&receiptID=" . $dbeReceipt->getValue(
+                                DBEReceipt::id
+                            ) . "' target='_blank'>See Receipt</a>";
+                    } else {
+                        $uploadReceipt = 'Upload Required <input type="file" accept="image/jpeg,application/pdf" onchange="uploadReceipt(' . $expenseID . ')" >';
+                    }
+
+
+                }
+
+
                 $urlEdit =
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
@@ -238,7 +258,8 @@ class CTExpense extends CTCNC
                         'urlEdit'        => $urlEdit,
                         'urlDelete'      => $urlDelete,
                         'txtEdit'        => $txtEdit,
-                        'txtDelete'      => $txtDelete
+                        'txtDelete'      => $txtDelete,
+                        'receiptUpload'  => $uploadReceipt,
                     )
                 );
 
