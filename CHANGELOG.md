@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 559 - Improve OpenCallEmail.php code
 - Issue 633 - Set retention rules for log files
 - Issue 606 - Sweetcode in URL
+- Issue 612 - Show holiday on performance graphs
 ### Removed
 - Issue 652 - Disable myphpadmin from being used / allowing logins
 
