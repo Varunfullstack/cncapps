@@ -9,6 +9,7 @@
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUExpenseType.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
+require_once($cfg['path_dbe'] . '/DBECallActType.inc.php');
 // Actions
 define('CTEXPENSETYPE_ACT_DISPLAY_LIST', 'expenseTypeList');
 define('CTEXPENSETYPE_ACT_CREATE', 'createExpenseType');
@@ -120,27 +121,71 @@ class CTExpenseType extends CTCNC
         $this->setTemplateFiles(
             array('ExpenseTypeEdit' => 'ExpenseTypeEdit.inc')
         );
+
+
+        $this->template->setBlock('ExpenseTypeEdit', 'activityBlock', 'activities');
+
+        $selectedActivities = $this->getActivitiesForExpenseType($expenseTypeID);
+        $dbeActivityType = new DBECallActType($this);
+        $dbeActivityType->getRows();
+        while ($dbeActivityType->fetchNext()) {
+            $this->template->setVar(
+                [
+                    "activitySelected" => in_array(
+                        $dbeActivityType->getValue(DBECallActType::callActTypeID),
+                        $selectedActivities
+                    ) ? 'selected' : null,
+                    "activityID"       => $dbeActivityType->getValue(DBECallActType::callActTypeID),
+                    "activityName"     => $dbeActivityType->getValue(DBECallActType::description)
+                ]
+            );
+            $this->template->parse('activities', 'activityBlock', true);
+        }
+
+
         $this->template->set_var(
             array(
-                'expenseTypeID'      => $dsExpenseType->getValue(DBEExpenseType::expenseTypeID),
-                'description'        => Controller::htmlInputText(
+                'expenseTypeID'           => $dsExpenseType->getValue(DBEExpenseType::expenseTypeID),
+                'description'             => Controller::htmlInputText(
                     $dsExpenseType->getValue(DBEExpenseType::description)
                 ),
-                'descriptionMessage' => Controller::htmlDisplayText(
+                'descriptionMessage'      => Controller::htmlDisplayText(
                     $dsExpenseType->getMessage(DBEExpenseType::description)
                 ),
-                'taxableChecked'     => $dsExpenseType->getValue(DBEExpenseType::taxable) ? 'checked' : null,
-                'approvalRequiredChecked' => $dsExpenseType->getValue(DBEExpenseType::approvalRequired) ? 'checked' : null,
-                'mileageFlagChecked' => Controller::htmlChecked($dsExpenseType->getValue(DBEExpenseType::mileageFlag)),
-                'vatFlagChecked'     => Controller::htmlChecked($dsExpenseType->getValue(DBEExpenseType::vatFlag)),
-                'urlUpdate'          => $urlUpdate,
-                'urlDelete'          => $urlDelete,
-                'txtDelete'          => $txtDelete,
-                'urlDisplayList'     => $urlDisplayList
+                'taxableChecked'          => $dsExpenseType->getValue(DBEExpenseType::taxable) ? 'checked' : null,
+                'approvalRequiredChecked' => $dsExpenseType->getValue(
+                    DBEExpenseType::approvalRequired
+                ) ? 'checked' : null,
+                'receiptRequiredChecked' => $dsExpenseType->getValue(
+                    DBEExpenseType::receiptRequired
+                ) ? 'checked' : null,
+                'mileageFlagChecked'      => Controller::htmlChecked(
+                    $dsExpenseType->getValue(DBEExpenseType::mileageFlag)
+                ),
+                'vatFlagChecked'          => Controller::htmlChecked($dsExpenseType->getValue(DBEExpenseType::vatFlag)),
+                'urlUpdate'               => $urlUpdate,
+                'urlDelete'               => $urlDelete,
+                'txtDelete'               => $txtDelete,
+                'urlDisplayList'          => $urlDisplayList
             )
         );
         $this->template->parse('CONTENTS', 'ExpenseTypeEdit', true);
         $this->parsePage();
+    }
+
+    private function getActivitiesForExpenseType($expenseTypeID)
+    {
+        global $db;
+        $result = $db->preparedQuery(
+            'select activityTypeID  from expenseTypeActivityAvailability where expenseTypeID = ?',
+            [["type" => "i", "value" => $expenseTypeID]]
+        );
+
+        $selectedActivitiesArray = $result->fetch_all(MYSQLI_ASSOC);
+        return array_map(
+            function ($activityArray) { return $activityArray['activityTypeID']; },
+            $selectedActivitiesArray
+        );
     }
 
     /**
@@ -176,7 +221,7 @@ class CTExpenseType extends CTCNC
     function update()
     {
         $this->setMethodName('update');
-        print_r($this->getParam('expenseType'));
+
         $this->formError = (!$this->dsExpenseType->populateFromArray($this->getParam('expenseType')));
         if ($this->formError) {
             if (!$this->dsExpenseType->getValue(DBEExpenseType::expenseTypeID)) {
@@ -189,6 +234,11 @@ class CTExpenseType extends CTCNC
         }
 
         $this->buExpenseType->updateExpenseType($this->dsExpenseType);
+        $newActivities = $this->getParam('expenseTypeActivities');
+        $this->updateActivitiesForExpenseType(
+            $newActivities,
+            $this->dsExpenseType->getValue(DBEExpenseType::expenseTypeID)
+        );
 
         $urlNext =
             Controller::buildLink(
@@ -199,6 +249,67 @@ class CTExpenseType extends CTCNC
                 )
             );
         header('Location: ' . $urlNext);
+    }
+
+    private function updateActivitiesForExpenseType($newActivities, $expenseTypeID)
+    {
+
+        $currentActivities = $this->getActivitiesForExpenseType($expenseTypeID);
+
+        $toAddActivities = array_reduce(
+            $newActivities,
+            function ($acc, $newActivity) use (&$currentActivities) {
+                $foundKey = array_search($newActivity, $currentActivities, false);
+                if ($foundKey !== false) {
+                    // we have an activity that was there already
+                    array_splice($currentActivities, $foundKey, 1);
+                    return $acc;
+                }
+
+                $acc[] = $newActivity;
+                return $acc;
+            },
+            []
+        );
+        global $db;
+
+        if (count($currentActivities)) {
+
+            $toDeleteQuestionMarks = implode(
+                ',',
+                array_map(function () { return '?'; }, $currentActivities)
+            );
+            $toDeleteParams = array_map(
+                function ($toDeleteActivityID) { return ["type" => "i", "value" => $toDeleteActivityID]; },
+                $currentActivities
+            );
+
+            $result = $db->preparedQuery(
+                "delete from expenseTypeActivityAvailability where activityTypeID in ($toDeleteQuestionMarks)",
+                $toDeleteParams
+            );
+        }
+
+        if (count($toAddActivities)) {
+            $toAddQuestionMarks = implode(
+                ',',
+                array_map(function () { return '(?,?)'; }, $toAddActivities)
+            );
+            $toAddParams = array_reduce(
+                $toAddActivities,
+                function ($acc, $toAddActivityID) use ($expenseTypeID) {
+                    $acc[] = ["type" => "i", "value" => $expenseTypeID];
+                    $acc[] = ["type" => "i", "value" => $toAddActivityID];
+                    return $acc;
+                },
+                []
+            );
+            $result = $db->preparedQuery(
+                "insert into expenseTypeActivityAvailability values $toAddQuestionMarks",
+                $toAddParams
+            );
+        }
+        return true;
     }
 
     /**

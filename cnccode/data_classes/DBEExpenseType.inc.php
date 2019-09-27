@@ -13,6 +13,7 @@ class DBEExpenseType extends DBEntity
     const vatFlag = "vatFlag";
     const taxable = 'taxable';
     const approvalRequired = "approvalRequired";
+    const receiptRequired = "receiptRequired";
 
     /**
      * calls constructor()
@@ -58,6 +59,13 @@ class DBEExpenseType extends DBEntity
         );
         $this->addColumn(
             self::approvalRequired,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+        $this->addColumn(
+            self::receiptRequired,
             DA_BOOLEAN,
             DA_NOT_NULL,
             null,

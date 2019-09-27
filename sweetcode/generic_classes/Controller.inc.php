@@ -130,7 +130,8 @@ class Controller extends BaseObject
      */
     public $template;                    // PHPLib template object
     var $cfg;                            // Configuration variables
-    var $db = "";                                // PHPLib DB object
+    /** @var dbSweetcode */
+    var $db;                                // PHPLib DB object
     var $pageTitle = "";
     var $formError = FALSE;
     var $docType = CT_DOC_TYPE_HTML;

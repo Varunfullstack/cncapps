@@ -122,7 +122,6 @@ class CTActivityType extends CTCNC
                         ),
                         'allowSCRFlag'          => $dsCallActType->getValue(DBECallActType::allowSCRFlag),
                         'requireCheckFlag'      => $dsCallActType->getValue(DBECallActType::requireCheckFlag),
-                        'allowExpensesFlag'     => $dsCallActType->getValue(DBECallActType::allowExpensesFlag),
                         'allowReasonFlag'       => $dsCallActType->getValue(DBECallActType::allowReasonFlag),
                         'allowActionFlag'       => $dsCallActType->getValue(DBECallActType::allowActionFlag),
                         'allowFinalStatusFlag'  => $dsCallActType->getValue(DBECallActType::allowFinalStatusFlag),
@@ -260,9 +259,6 @@ class CTActivityType extends CTCNC
                 ),
                 'requireCheckFlagChecked'      => Controller::htmlChecked(
                     $dsCallActType->getValue(DBECallActType::requireCheckFlag)
-                ),
-                'allowExpensesFlagChecked'     => Controller::htmlChecked(
-                    $dsCallActType->getValue(DBECallActType::allowExpensesFlag)
                 ),
                 'allowReasonFlagChecked'       => Controller::htmlChecked(
                     $dsCallActType->getValue(DBECallActType::allowReasonFlag)

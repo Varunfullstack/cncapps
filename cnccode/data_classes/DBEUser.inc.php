@@ -65,6 +65,7 @@ class DBEUser extends DBEntity
     const offsiteBackupAdditionalPermissionsFlag = 'offsiteBackupAdditionalPermissionsFlag';
     const expenseApproverID = 'expenseApproverID';
     const autoApproveExpenses = 'autoApproveExpenses';
+    const isExpenseApprover = "isExpenseApprover";
 
     /**
      * calls constructor()
@@ -372,6 +373,14 @@ class DBEUser extends DBEntity
         );
         $this->addColumn(
             self::autoApproveExpenses,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+
+        $this->addColumn(
+            self::isExpenseApprover,
             DA_BOOLEAN,
             DA_NOT_NULL,
             null,
