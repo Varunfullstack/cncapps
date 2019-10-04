@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 638 - Allow Multiple dropping of files when uploading documents
+
 ## [v3.7.0] 
 ### Added
 - Issue 654 - Set all contacts to support level None

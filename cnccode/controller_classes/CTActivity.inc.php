@@ -8,6 +8,8 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+global $cfg;
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
@@ -3389,6 +3391,8 @@ class CTActivity extends CTCNC
           Upload file
           */
                 if (isset($_FILES['userfile']) && $_FILES['userfile']['name']) {
+                    var_dump($_FILES['userfile']['name']);
+                    exit;
                     $this->buActivity->uploadDocumentFile(
                         $dsCallActivity->getValue(DBEJCallActivity::problemID),
                         $this->getParam('uploadDescription'),
