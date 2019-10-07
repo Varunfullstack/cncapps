@@ -3390,15 +3390,11 @@ class CTActivity extends CTCNC
                 /*
           Upload file
           */
-                if (isset($_FILES['userfile']) && $_FILES['userfile']['name']) {
-                    var_dump($_FILES['userfile']['name']);
-                    exit;
-                    $this->buActivity->uploadDocumentFile(
-                        $dsCallActivity->getValue(DBEJCallActivity::problemID),
-                        $this->getParam('uploadDescription'),
-                        $_FILES['userfile']
-                    );
-                }
+
+                $this->handleUploads(
+                    $dsCallActivity->getValue(DBEJCallActivity::problemID),
+                    $this->getParam('uploadDescription')
+                );
 
                 /*
           Add to queue so return to dashboard
@@ -4278,10 +4274,9 @@ class CTActivity extends CTCNC
         }
 
         if (isset($_FILES['userfile']) && $_FILES['userfile']['name']) {
-            $this->buActivity->uploadDocumentFile(
+            $this->handleUploads(
                 $dsCallActivity->getValue(DBEJCallActivity::problemID),
-                $this->getParam('uploadDescription'),
-                $_FILES['userfile']
+                $this->getParam('uploadDescription')
             );
         }
 
@@ -5622,6 +5617,36 @@ class CTActivity extends CTCNC
         $this->redirectToDisplay($this->getParam('callActivityID'));
     }
 
+    private function handleUploads($problemID, $description)
+    {
+        $fileCount = count($_FILES['userfile']['name']);
+        $hasError = false;
+        for ($i = 0; $i < $fileCount; $i++) {
+            if (!is_uploaded_file($_FILES['userfile']['tmp_name'][$i])) {
+                $hasError = true;
+                continue;
+            }
+
+            $file = [
+                'tmp_name' => $_FILES['userfile']['tmp_name'][$i],
+                'size'     => $_FILES['userfile']['size'][$i],
+                'name'     => $_FILES['userfile']['name'][$i],
+                'type'     => $_FILES['userfile']['type'][$i]
+            ];
+            $fileDescription = $description;
+            if ($i > 0) {
+                $fileDescription .= ("-" . $i);
+            }
+            $this->buActivity->uploadDocumentFile(
+                $problemID,
+                $fileDescription,
+                $file
+            );
+        }
+
+        return !$hasError;
+    }
+
     /**
      * Upload new document from local disk
      * @access private
@@ -5640,13 +5665,15 @@ class CTActivity extends CTCNC
         if (!@$_FILES['userfile']['name']) {
             $this->setFormErrorMessage('Please enter a file path');
         }
-        if (!is_uploaded_file($_FILES['userfile']['tmp_name'])) {
-            $this->setFormErrorMessage('Document not loaded - is it bigger than 6 MBytes?');
+
+        if (!$this->handleUploads($this->getParam('problemID'), $this->getParam('uploadDescription'))) {
+            $this->setFormErrorMessage('Failed Uploading file: File larger than 6mb?');
         }
+
         if ($this->formError) {
             if (@$_POST['gatherFixed']) {
-
                 $this->redirectToFixed($this->getParam('callActivityID'));
+                exit;
             }
 
             if (@$_POST['edit']) {
@@ -5657,14 +5684,10 @@ class CTActivity extends CTCNC
             $this->displayActivity();
             exit;
         }
-        $this->buActivity->uploadDocumentFile(
-            $this->getParam('problemID'),
-            $this->getParam('uploadDescription'),
-            @$_FILES['userfile']
-        );
 
         if (@$_POST['gatherFixed']) {
             $this->redirectToFixed($this->getParam('callActivityID'));
+            exit;
         }
 
         if (@$_POST['edit']) {
@@ -5927,10 +5950,9 @@ class CTActivity extends CTCNC
         }
 
         if (!$errorFile && isset($_FILES['userfile']) && $_FILES['userfile']['name']) {
-            $this->buActivity->uploadDocumentFile(
+            $this->handleUploads(
                 $dsCallActivity->getValue(DBEJCallActivity::problemID),
-                $this->getParam('uploadDescription'),
-                $_FILES['userfile']
+                $this->getParam('uploadDescription')
             );
         }
 

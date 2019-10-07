@@ -452,18 +452,21 @@
                         </td>
                         <td>
                             <input
-                                    name="userfile"
+                                    name="userfile[]"
                                     type="file"
                                     value="{userfile}"
                                     size="30"
                                     class="dragUploader"
                                     data-description="uploadDescription"
+                                    multiple
                             >
                         </td>
-                        <td colspan="2"><input type="submit"
-                                               name="Submit2"
-                                               value="Upload"
-                        ></td>
+                        <td colspan="2">
+                            <input type="submit"
+                                   name="Submit2"
+                                   value="Upload"
+                            >
+                        </td>
                         <td>&nbsp;</td>
                     </tr>
                 </form>
