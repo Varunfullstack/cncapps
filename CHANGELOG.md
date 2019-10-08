@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 661 - Review Meetings show primary active site
+
 ## [v3.7.0] 
 ### Added
 - Issue 654 - Set all contacts to support level None

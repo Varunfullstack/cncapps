@@ -5,6 +5,8 @@
  * Date: 05/12/2018
  * Time: 12:43
  */
+
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerReviewMeeting.inc.php');
 
@@ -47,6 +49,7 @@ class CTCustomerReviewMeetingsReport extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -84,17 +87,10 @@ class CTCustomerReviewMeetingsReport extends CTCNC
 
         while ($dbeCustomer->fetchNext()) {
 
-            $dbeSite = new DBESite($this);
-            $dbeSite->setValue(
-                DBESite::customerID,
-                $dbeCustomer->getValue(DBECustomer::customerID)
-            );
-            $dbeSite->setValue(
-                DBESite::siteNo,
-                0
-            );
-
-            $dbeSite->getRowByCustomerIDSiteNo();
+            $BUSite = new BUSite($this);
+            $dsResults = new DataSet($this);
+            $BUSite->getActiveSitesByCustomer($dbeCustomer->getValue(DBECustomer::customerID), $dsResults);
+            $dsResults->fetchNext();
 
 
             $lastReviewMeetingDate = DateTime::createFromFormat(
@@ -134,7 +130,7 @@ class CTCustomerReviewMeetingsReport extends CTCNC
                 $style = $dateDiff->days <= (7 * 6) ? 'style="background-color: #ffb3b3"' : '';
             }
 
-            $locationString = $dbeSite->getValue(DBESite::town) . ', ' . $dbeSite->getValue(DBESite::postcode);
+            $locationString = $dsResults->getValue(DBESite::town) . ', ' . $dsResults->getValue(DBESite::postcode);
 
             $customerURL = Controller::buildLink(
                 'Customer.php',
