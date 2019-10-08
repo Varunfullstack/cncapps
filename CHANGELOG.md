@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 669 - Asset list extract remove duplicated logged in users names
+
 ## [v3.7.0] 
 ### Added
 - Issue 654 - Set all contacts to support level None
