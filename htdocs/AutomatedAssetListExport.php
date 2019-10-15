@@ -75,13 +75,13 @@ $thresholdDate->add(new DateInterval('P' . $thresholdDays . 'D'));
 
 $today = new DateTime();
 
+$currentSummaryRow = 1;
 if ($generateSummary) {
     $summarySpreadSheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
     $summarySpreadSheet->getDefaultStyle()->getFont()->setName('Arial');
     $summarySpreadSheet->getDefaultStyle()->getFont()->setSize(10);
     $summarySheet = $summarySpreadSheet->getActiveSheet();
     $isHeaderSet = false;
-    $currentSummaryRow = 1;
 }
 
 while ($dbeCustomer->fetchNext()) {
