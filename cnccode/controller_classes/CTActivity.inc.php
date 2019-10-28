@@ -3392,8 +3392,7 @@ class CTActivity extends CTCNC
           */
 
                 $this->handleUploads(
-                    $dsCallActivity->getValue(DBEJCallActivity::problemID),
-                    $this->getParam('uploadDescription')
+                    $dsCallActivity->getValue(DBEJCallActivity::problemID)
                 );
 
                 /*
@@ -4274,10 +4273,7 @@ class CTActivity extends CTCNC
         }
 
         if (isset($_FILES['userfile']) && $_FILES['userfile']['name']) {
-            $this->handleUploads(
-                $dsCallActivity->getValue(DBEJCallActivity::problemID),
-                $this->getParam('uploadDescription')
-            );
+            $this->handleUploads($dsCallActivity->getValue(DBEJCallActivity::problemID));
         }
 
         $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
@@ -5617,7 +5613,7 @@ class CTActivity extends CTCNC
         $this->redirectToDisplay($this->getParam('callActivityID'));
     }
 
-    private function handleUploads($problemID, $description)
+    private function handleUploads($problemID)
     {
         $fileCount = count($_FILES['userfile']['name']);
         $hasError = false;
@@ -5633,13 +5629,9 @@ class CTActivity extends CTCNC
                 'name'     => $_FILES['userfile']['name'][$i],
                 'type'     => $_FILES['userfile']['type'][$i]
             ];
-            $fileDescription = $description;
-            if ($i > 0) {
-                $fileDescription .= ("-" . $i);
-            }
             $this->buActivity->uploadDocumentFile(
                 $problemID,
-                $fileDescription,
+                $_FILES['userfile']['name'][$i],
                 $file
             );
         }
@@ -5666,7 +5658,7 @@ class CTActivity extends CTCNC
             $this->setFormErrorMessage('Please enter a file path');
         }
 
-        if (!$this->handleUploads($this->getParam('problemID'), $this->getParam('uploadDescription'))) {
+        if (!$this->handleUploads($this->getParam('problemID'))) {
             $this->setFormErrorMessage('Failed Uploading file: File larger than 6mb?');
         }
 
@@ -5950,10 +5942,7 @@ class CTActivity extends CTCNC
         }
 
         if (!$errorFile && isset($_FILES['userfile']) && $_FILES['userfile']['name']) {
-            $this->handleUploads(
-                $dsCallActivity->getValue(DBEJCallActivity::problemID),
-                $this->getParam('uploadDescription')
-            );
+            $this->handleUploads($dsCallActivity->getValue(DBEJCallActivity::problemID));
         }
 
         $submitURL =
