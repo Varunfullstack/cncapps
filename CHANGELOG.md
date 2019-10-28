@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 670 - Mailbox Export script identify Equipment Mailboxes
+
 ## [v3.7.0] 
 ### Added
 - Issue 654 - Set all contacts to support level None

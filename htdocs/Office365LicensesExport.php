@@ -330,6 +330,9 @@ function processMailboxes(Spreadsheet $spreadSheet,
             case 'RoomMailbox':
                 $mailboxes[$key]['RecipientTypeDetails'] = "Room";
                 break;
+            case 'EquipmentMailbox':
+                $mailboxes[$key]['RecipientTypeDetails'] = "Equipment";
+                break;
         }
 
         $mailboxes[$key]['Licenses'] = $licenseValue;
