@@ -23,6 +23,8 @@ $(function () {
                 return;
             }
         }
-        $('input[name="' + destination + '"]').val(e.target.files[0].name);
+        if (destination) {
+            $('input[name="' + destination + '"]').val(e.target.files[0].name);
+        }
     })
 });

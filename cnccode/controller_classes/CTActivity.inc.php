@@ -3391,9 +3391,7 @@ class CTActivity extends CTCNC
           Upload file
           */
 
-                $this->handleUploads(
-                    $dsCallActivity->getValue(DBEJCallActivity::problemID)
-                );
+                $this->handleUploads($dsCallActivity->getValue(DBEJCallActivity::problemID));
 
                 /*
           Add to queue so return to dashboard
@@ -3565,6 +3563,32 @@ class CTActivity extends CTCNC
 
     }
 
+    private function handleUploads($problemID)
+    {
+        $fileCount = count($_FILES['userfile']['name']);
+        $hasError = false;
+        for ($i = 0; $i < $fileCount; $i++) {
+            if (!is_uploaded_file($_FILES['userfile']['tmp_name'][$i])) {
+                $hasError = true;
+                continue;
+            }
+
+            $file = [
+                'tmp_name' => $_FILES['userfile']['tmp_name'][$i],
+                'size'     => $_FILES['userfile']['size'][$i],
+                'name'     => $_FILES['userfile']['name'][$i],
+                'type'     => $_FILES['userfile']['type'][$i]
+            ];
+            $this->buActivity->uploadDocumentFile(
+                $problemID,
+                $file['name'],
+                $file
+            );
+        }
+
+        return !$hasError;
+    }    // end allocateAdditionalTime
+
     function siteDropdown(
         $customerID,
         $siteNo,
@@ -3623,7 +3647,7 @@ class CTActivity extends CTCNC
             );
         }
 
-    }    // end allocateAdditionalTime
+    }    // end allocateAddition
 
     private function onlyMainAndSupervisorsDropdown($templateName,
                                                     $customerID,
@@ -3699,7 +3723,7 @@ class CTActivity extends CTCNC
                 true
             );
         }
-    }    // end allocateAddition
+    }
 
     /**
      * @param $customerID
@@ -3787,7 +3811,7 @@ class CTActivity extends CTCNC
             );
         }
 
-    }
+    }// end changeRequestApproval
 
     /**
      * @throws Exception
@@ -3827,7 +3851,7 @@ class CTActivity extends CTCNC
 
         $this->redirectToDisplay($this->getParam('callActivityID'));
         exit;
-    }// end changeRequestApproval
+    }
 
     /**
      * @throws Exception
@@ -4003,7 +4027,7 @@ class CTActivity extends CTCNC
         $this->parsePage();
 
         exit;
-    }
+    }  // end finaliseProblem
 
     /**
      * @throws Exception
@@ -4037,7 +4061,7 @@ class CTActivity extends CTCNC
 
         $this->parsePage();
         exit;
-    }  // end finaliseProblem
+    }
 
     /**
      * Edit/Add Activity
@@ -5605,38 +5629,11 @@ class CTActivity extends CTCNC
      * @access private
      * @throws Exception
      */
-    private
-    function sendVisitEmail()
+    private function sendVisitEmail()
     {
         $this->setMethodName('sendVisitEmail');
         $this->buActivity->sendSiteVisitEmail($this->getParam('callActivityID'));
         $this->redirectToDisplay($this->getParam('callActivityID'));
-    }
-
-    private function handleUploads($problemID)
-    {
-        $fileCount = count($_FILES['userfile']['name']);
-        $hasError = false;
-        for ($i = 0; $i < $fileCount; $i++) {
-            if (!is_uploaded_file($_FILES['userfile']['tmp_name'][$i])) {
-                $hasError = true;
-                continue;
-            }
-
-            $file = [
-                'tmp_name' => $_FILES['userfile']['tmp_name'][$i],
-                'size'     => $_FILES['userfile']['size'][$i],
-                'name'     => $_FILES['userfile']['name'][$i],
-                'type'     => $_FILES['userfile']['type'][$i]
-            ];
-            $this->buActivity->uploadDocumentFile(
-                $problemID,
-                $_FILES['userfile']['name'][$i],
-                $file
-            );
-        }
-
-        return !$hasError;
     }
 
     /**
@@ -5650,10 +5647,6 @@ class CTActivity extends CTCNC
         if (!$this->getParam('problemID')) {
             $this->setFormErrorMessage('problemID not passed');
         }
-        if (!$this->getParam('uploadDescription')) {
-            $this->setFormErrorMessage('Please enter a description');
-        }
-
         if (!@$_FILES['userfile']['name']) {
             $this->setFormErrorMessage('Please enter a file path');
         }

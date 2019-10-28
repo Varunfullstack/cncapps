@@ -437,28 +437,14 @@
                       method="post"
                       enctype="multipart/form-data"
                 >
-                    <input type="hidden"
-                           name="MAX_FILE_SIZE"
-                           value="6291456"
-                    >
-                    <!-- max 6 mbyte -->
                     <tr>
-                        <td class=""><input name="uploadDescription"
-                                            type="text"
-                                            size="45"
-                                            maxlength="50"
-                                            value="{uploadDescription}"
-                        >
-                        </td>
                         <td>
-                            <input
-                                    name="userfile[]"
-                                    type="file"
-                                    value="{userfile}"
-                                    size="30"
-                                    class="dragUploader"
-                                    data-description="uploadDescription"
-                                    multiple
+                            <input name="userfile[]"
+                                   type="file"
+                                   value="{userfile}"
+                                   size="30"
+                                   class="dragUploader"
+                                   multiple
                             >
                         </td>
                         <td colspan="2">
