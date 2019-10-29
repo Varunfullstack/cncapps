@@ -63,6 +63,20 @@ while ($dsCustomers->fetchNext()) {
             }
         }
 
+        if ($dsContacts->getValue(DBEContact::phone) && !preg_match(
+                "/^\d+$/",
+                $dsContacts->getValue(DBEContact::phone)
+            )) {
+            $contactErrors[] = "Invalid Phone Number: " . $dsContacts->getValue(DBEContact::phone);
+        }
+
+        if ($dsContacts->getValue(DBEContact::mobilePhone) && !preg_match(
+                "/^\d+$/",
+                $dsContacts->getValue(DBEContact::mobilePhone)
+            )) {
+            $contactErrors[] = "Invalid Mobile Phone Number: " . $dsContacts->getValue(DBEContact::mobilePhone);
+        }
+
         if ($dsContacts->getValue(DBEContact::accountsFlag) == 'Y' && !$atLeastOneAccount) {
             $atLeastOneAccount = true;
         }
