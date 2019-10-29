@@ -8,6 +8,8 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+global $cfg;
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
@@ -442,6 +444,9 @@ class CTActivity extends CTCNC
             case 'authorisingContacts':
                 echo json_encode(['data' => $this->getAuthorisingContacts()]);
                 break;
+            case 'checkPrepay':
+                echo json_encode(["hiddenCharges" => $this->hasHiddenCharges($this->getParam('problemID'))]);
+                break;
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
                 $this->displaySearchForm();
@@ -507,7 +512,7 @@ class CTActivity extends CTCNC
 
             header('Location: ' . $urlNext);
         }
-    } // end function salesRequest
+    }
 
     private function assignContracts()
     {
@@ -526,7 +531,7 @@ class CTActivity extends CTCNC
             );
             $dbeProblem->updateRow();
         }
-    } // end function displaySearchForm
+    } // end function salesRequest
 
     /**
      * Skip creation of sales order but authorise checked activities of given call
@@ -542,7 +547,7 @@ class CTActivity extends CTCNC
             $this->buActivity->skipSalesOrdersForActivities($this->getParam('callActivityID'));
         }
         $this->search();
-    }
+    } // end function displaySearchForm
 
     /**
      * @throws Exception
@@ -1137,7 +1142,7 @@ class CTActivity extends CTCNC
                 true
             );
         }
-    } //end userDropdown
+    }
 
     function contractDropdown(
         $customerID,
@@ -1206,7 +1211,8 @@ class CTActivity extends CTCNC
                     'contractDescription'    => $description,
                     'optGroupOpen'           => $optGroupOpen,
                     'optGroupClose'          => $optGroupClose,
-                    'optGroupCloseLast'      => $dsContract->rowCount() == $currentRow ? '</optgroup>' : 'null'
+                    'optGroupCloseLast'      => $dsContract->rowCount() == $currentRow ? '</optgroup>' : 'null',
+                    'prepayContract'         => $dsContract->getValue(DBEJContract::itemTypeID) == 57
                 )
             );
             $this->template->parse(
@@ -1217,7 +1223,7 @@ class CTActivity extends CTCNC
             $currentRow++;
         }
 
-    }
+    } //end userDropdown
 
     function userDropdown($userID,
                           $templateName,
@@ -1255,7 +1261,7 @@ class CTActivity extends CTCNC
                 true
             );
         }
-    } // end activityCreate1
+    }
 
     function removeQuerystringVar($url,
                                   $key
@@ -1272,7 +1278,7 @@ class CTActivity extends CTCNC
             -1
         );
         return $url;
-    }
+    } // end activityCreate1
 
     private function getContractsForCustomer($customerID)
     {
@@ -1314,7 +1320,7 @@ class CTActivity extends CTCNC
                 'txtHome' => 'Home'
             )
         );
-    } // end contractDropdown
+    }
 
     function countParamsSet($array)
     {
@@ -1326,7 +1332,7 @@ class CTActivity extends CTCNC
             }
         }
         return $count;
-    } // end siteDropdown
+    } // end contractDropdown
 
     function generateCSV()
     {
@@ -1376,7 +1382,7 @@ class CTActivity extends CTCNC
         }
         $this->pageClose();
         exit;
-    }// end displayProjects
+    } // end siteDropdown
 
     /**
      * @throws Exception
@@ -1467,7 +1473,7 @@ class CTActivity extends CTCNC
         $this->parsePage();
 
         exit;
-    }// end create5
+    }// end displayProjects
 
     /**
      * Edit/Add Activity
@@ -2411,10 +2417,7 @@ class CTActivity extends CTCNC
             true
         );
         $this->parsePage();
-    }// end displayOpenSrs
-
-
-//----------------
+    }// end create5
 
     /**
      * @param $customerID
@@ -2436,7 +2439,10 @@ class CTActivity extends CTCNC
         $renewalsLink = '<a href="' . $renewalsLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
 
         return $renewalsLink;
-    }
+    }// end displayOpenSrs
+
+
+//----------------
 
     /**
      * @param DataSet|DBECustomer $dsCustomer
@@ -2545,7 +2551,7 @@ class CTActivity extends CTCNC
           \'scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0\')" >Generate Password</a> ';
 
         return $passwordLink;
-    }// end function editActivity()
+    }
 
     /**
      * @param $customerID
@@ -2567,7 +2573,7 @@ class CTActivity extends CTCNC
         $thirdPartyContactLink = '| <a href="' . $thirdPartyContactLinkURL . '" target="_blank" title="ThirdPartyContacts">Third Party Contacts</a>';
 
         return $thirdPartyContactLink;
-    }// end function editLinkedSalesOrder()
+    }// end function editActivity()
 
     /**
      * @param $customerID
@@ -2590,7 +2596,7 @@ class CTActivity extends CTCNC
         $contractListPopupLink = '| <a href="' . $contractListPopupLinkURL . '" target="_blank" title="Contracts">Contracts</a>';
 
         return $contractListPopupLink;
-    }
+    }// end function editLinkedSalesOrder()
 
     /**
      * @param $contactID
@@ -2721,7 +2727,7 @@ class CTActivity extends CTCNC
         }
 
 
-    } // end cancelEdit
+    }
 
     /**
      * @throws Exception
@@ -2732,7 +2738,7 @@ class CTActivity extends CTCNC
 
         $this->redirectToDisplay($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
 
-    }
+    } // end cancelEdit
 
     /**
      * Redirect to call page
@@ -2752,7 +2758,7 @@ class CTActivity extends CTCNC
             );
         header('Location: ' . $urlNext);
         exit;
-    }// end function displayActivity()
+    }
 
     /**
      * @throws Exception
@@ -2763,7 +2769,7 @@ class CTActivity extends CTCNC
 
         $this->redirectToDisplay($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
 
-    }
+    }// end function displayActivity()
 
     /**
      * Create wizard step 1: Customer, site and contact selection
@@ -3100,7 +3106,7 @@ class CTActivity extends CTCNC
 
         }
 
-    }  // end finaliseProblem
+    }
 
     /**
      * @throws Exception
@@ -3290,7 +3296,7 @@ class CTActivity extends CTCNC
 
         $this->parsePage();
 
-    }
+    }  // end finaliseProblem
 
     /**
      * Create Service Request
@@ -3624,7 +3630,7 @@ class CTActivity extends CTCNC
             );
         }
 
-    }    // end allocateAdditionalTime
+    }
 
     private function onlyMainAndSupervisorsDropdown($templateName,
                                                     $customerID,
@@ -3700,7 +3706,7 @@ class CTActivity extends CTCNC
                 true
             );
         }
-    }    // end allocateAddition
+    }    // end allocateAdditionalTime
 
     /**
      * @param $customerID
@@ -3788,7 +3794,7 @@ class CTActivity extends CTCNC
             );
         }
 
-    }
+    }    // end allocateAddition
 
     /**
      * @throws Exception
@@ -3828,7 +3834,7 @@ class CTActivity extends CTCNC
 
         $this->redirectToDisplay($this->getParam('callActivityID'));
         exit;
-    }// end changeRequestApproval
+    }
 
     /**
      * @throws Exception
@@ -3898,7 +3904,7 @@ class CTActivity extends CTCNC
             true
         );
         $this->parsePage();
-    }
+    }// end changeRequestApproval
 
     /**
      * @throws Exception
@@ -4038,7 +4044,7 @@ class CTActivity extends CTCNC
 
         $this->parsePage();
         exit;
-    }  // end finaliseProblem
+    }
 
     /**
      * Edit/Add Activity
@@ -4572,7 +4578,7 @@ class CTActivity extends CTCNC
             true
         );
         $this->parsePage();
-    }
+    }  // end finaliseProblem
 
     private
     function activityTypeDropdown($callActTypeID
@@ -5996,6 +6002,9 @@ class CTActivity extends CTCNC
                 'historyLink'                   => $this->getProblemHistoryLink(
                     $dsCallActivity->getValue(DBEJCallActivity::problemID)
                 ),
+                'SRLink'                        => "<a href='Activity.php?action=displayLastActivity&problemID=" . $dsCallActivity->getValue(
+                        DBEJCallActivity::problemID
+                    ) . "' target='_blank'>SR</a>",
                 'uploadErrors'                  => $errorFile,
                 'uploadURL'                     => $uploadURL,
                 'urlMessageToSales'             => $urlMessageToSales,
@@ -6847,7 +6856,7 @@ class CTActivity extends CTCNC
     {
         $this->buActivity->updateAllHistoricUserLoggedHours($startDate);
         echo "Done";
-    }// end contactDropdown
+    }
 
     /**
      * @throws Exception
@@ -6866,7 +6875,7 @@ class CTActivity extends CTCNC
         $this->buActivity->toggleMonitoringFlag($dsActivity->getValue(DBEJCallActivity::problemID));
 
         $this->redirectToDisplay($this->getParam('callActivityID'));
-    }
+    }// end contactDropdown
 
     /**
      * @throws Exception
@@ -7083,6 +7092,35 @@ class CTActivity extends CTCNC
             ];
         }
         return $contacts;
+    }
+
+    private function hasHiddenCharges($problemID)
+    {
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getRow($problemID);
+        if ($dbeProblem->getValue(DBEProblem::hideFromCustomerFlag) == 'Y' && $dbeProblem->getValue(
+                DBEProblem::chargeableActivityDurationHours
+            ) > 0) {
+            return true;
+        }
+
+        $query = "SELECT
+  COUNT(*) > 0 AS hiddenChargeableActivities
+FROM
+  callactivity
+  JOIN callacttype
+    ON cat_callacttypeno = caa_callacttypeno
+  JOIN item AS at_item
+    ON cat_itemno = at_item.itm_itemno
+WHERE caa_problemno = ?
+  AND callactivity.`caa_hide_from_customer_flag` = 'Y'
+  AND at_item.itm_sstk_price > 0";
+        /** @var dbSweetcode $db */
+        global $db;
+        $result = $db->preparedQuery($query, [["type" => "i", "value" => $problemID]]);
+        $test = $result->fetch_assoc();
+
+        return !!$test['hiddenChargeableActivities'];
     }
 
     function secsToText($time)

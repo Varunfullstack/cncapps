@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 535 - PrePay statements, alert if hidden charges on the SR
+
 ## [v3.7.0] 
 ### Added
 - Issue 654 - Set all contacts to support level None
