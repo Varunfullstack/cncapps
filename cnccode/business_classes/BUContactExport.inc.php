@@ -60,8 +60,8 @@ class BUContactExport extends Business
         add_county AS BusinessState,
         add_postcode AS BusinessPostalCode,
         add_phone AS BusinessPhone,
-        con_phone AS BusinessPhone2,
-        con_mobile_phone AS Mobile,
+        if(con_phone, concat(\"=\",\"\"\"\"\"\",con_phone,\"\"\"\"\"\"),null)  AS BusinessPhone2,
+        if(con_mobile_phone, concat(\"=\",\"\"\"\"\"\",con_mobile_phone,\"\"\"\"\"\"), null) AS Mobile,
         con_email AS EmailAddress,
         CONCAT(con_first_name,' ',con_last_name) AS DisplayName,
         cus_prospect AS Prospect";
