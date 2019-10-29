@@ -3376,12 +3376,6 @@ class CTActivity extends CTCNC
             if (!$_SESSION[$this->sessionKey]['priority'] = $this->getParam('priority')) {
                 $error['priority'] = 'Required';
             }
-            if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name'] && !$this->getParam(
-                    'uploadDescription'
-                )) {
-                $error['file'] = 'Description Required';
-            }
-
 
             if (count($error) == 0) {
                 /* Create initial activity */
