@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 672 - Office 365 licensing billing improvements
+
 ## [v3.7.0] 
 ### Added
 - Issue 654 - Set all contacts to support level None

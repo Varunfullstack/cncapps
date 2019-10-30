@@ -45,4 +45,5 @@
     <include file="db.changelog-3.5.0.xml"/>
     <include file="db.changelog-3.5.2.xml"/>
     <include file="db.changelog-3.6.0.xml"/>
+    <include file="db.changelog-issue672.xml"/>
 </databaseChangeLog>
