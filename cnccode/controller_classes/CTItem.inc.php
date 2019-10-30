@@ -11,6 +11,7 @@ require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_dbe'] . '/DBEWarranty.inc.php');
 require_once($cfg['path_dbe'] . '/DBERenewalType.inc.php');
+require_once($cfg['path_dbe'] . '/DBEItemBillingCategory.php');
 require_once($cfg['path_func'] . '/Common.inc.php');
 // Messages
 define(
@@ -128,6 +129,350 @@ class CTItem extends CTCNC
         if ($this->getParam('parentSlaResponseHoursField')) {
             $this->setSessionParam('itemParentSlaResponseHoursField', $this->getParam('parentSlaResponseHoursField'));
         }
+    }
+
+    /**
+     * Add/Edit Item
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function itemForm()
+    {
+        $this->setMethodName('itemForm');
+        // initialisation stuff
+        if ($this->getAction() == CTCNC_ACT_ITEM_ADD) {
+            if ($this->getParam('renewalTypeID')) {
+                $renewalTypeID = $this->getParam('renewalTypeID');
+            } else {
+                $renewalTypeID = false;
+            }
+            $urlSubmit = $this->itemFormPrepareAdd($renewalTypeID);
+        } else {
+            $urlSubmit = $this->itemFormPrepareEdit();
+        }
+
+        $urlManufacturerPopup =
+            Controller::buildLink(
+                'Manufacturer.php',
+                array(
+                    'action'  => 'displayPopup',
+                    'htmlFmt' => CT_HTML_FMT_POPUP
+                )
+            );
+
+        $urlManufacturerEdit =
+            Controller::buildLink(
+                'Manufacturer.php',
+                array(
+                    'action'  => 'editManufacturer',
+                    'htmlFmt' => CT_HTML_FMT_POPUP
+                )
+            );
+
+        $manufacturerName = null;
+        if ($this->dsItem->getValue(DBEItem::manufacturerID)) {
+            $dbeManufacturer = new DBEManufacturer($this);
+            $dbeManufacturer->getRow($this->dsItem->getValue(DBEItem::manufacturerID));
+            $manufacturerName = $dbeManufacturer->getValue(DBEManufacturer::name);
+        }
+
+        // template
+        $this->setTemplateFiles(
+            'ItemEdit',
+            'ItemEdit.inc'
+        );
+        $this->template->set_var(
+            array(
+                'itemID'                         => $this->dsItem->getValue(DBEItem::itemID),
+                'description'                    => Controller::htmlInputText(
+                    $this->dsItem->getValue(DBEItem::description)
+                ),
+                'descriptionMessage'             => Controller::htmlDisplayText(
+                    $this->dsItem->getMessage(DBEItem::description)
+                ),
+                'curUnitSale'                    => Controller::htmlInputText(
+                    $this->dsItem->getValue(DBEItem::curUnitSale)
+                ),
+                'curUnitSaleMessage'             => Controller::htmlDisplayText(
+                    $this->dsItem->getMessage(DBEItem::curUnitSale)
+                ),
+                'curUnitCost'                    => Controller::htmlInputText(
+                    $this->dsItem->getValue(DBEItem::curUnitCost)
+                ),
+                'curUnitCostMessage'             => Controller::htmlDisplayText(
+                    $this->dsItem->getMessage(DBEItem::curUnitCost)
+                ),
+                'discontinuedFlagChecked'        => Controller::htmlChecked(
+                    $this->dsItem->getValue(DBEItem::discontinuedFlag)
+                ),
+                'servercareFlagChecked'          => Controller::htmlChecked(
+                    $this->dsItem->getValue(DBEItem::servercareFlag)
+                ),
+                'serialNoFlagChecked'            => Controller::htmlChecked(
+                    $this->dsItem->getValue(DBEItem::serialNoFlag)
+                ),
+                'partNo'                         => Controller::htmlInputText($this->dsItem->getValue(DBEItem::partNo)),
+                'notes'                          => Controller::htmlTextArea($this->dsItem->getValue(DBEItem::notes)),
+                'contractResponseTime'           => Controller::htmlInputText(
+                    $this->dsItem->getValue(DBEItem::contractResponseTime)
+                ),
+                'urlManufacturerPopup'           => $urlManufacturerPopup,
+                'urlManufacturerEdit'            => $urlManufacturerEdit,
+                'manufacturerID'                 => $this->dsItem->getValue(DBEItem::manufacturerID),
+                'manufacturerName'               => $manufacturerName,
+                'urlSubmit'                      => $urlSubmit,
+                'allowDirectDebitChecked'        => Controller::htmlChecked(
+                    $this->dsItem->getValue(DBEItem::allowDirectDebit)
+                ),
+                'excludeFromPOCompletionChecked' => Controller::htmlChecked(
+                    $this->dsItem->getValue(DBEItem::excludeFromPOCompletion)
+                )
+            )
+        );
+        $this->parseItemTypeSelector($this->dsItem->getValue(DBEItem::itemTypeID));
+        $this->parseRenewalTypeSelector($this->dsItem->getValue(DBEItem::renewalTypeID));
+        $this->parseWarrantySelector($this->dsItem->getValue(DBEItem::warrantyID));
+        $this->parseItemBillingCategorySelector($this->dsItem->getValue(DBEItem::itemBillingCategoryID));
+        $this->template->parse(
+            'CONTENTS',
+            'ItemEdit',
+            true
+        );
+        $this->parsePage();
+    }
+
+    /**
+     * Prepare for add
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @param bool $renewalTypeID
+     * @return mixed|string
+     * @throws Exception
+     */
+    function itemFormPrepareAdd($renewalTypeID = false)
+    {
+        // If form error then preserve values in $this->dsItem else initialise new
+        $this->setPageTitle(CTITEM_TXT_NEW_ITEM);
+        if (!$this->getFormError()) {
+            $this->buItem->initialiseNewItem(
+                $this->dsItem,
+                $renewalTypeID
+            );
+        }
+        return (
+        Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'  => CTITEM_ACT_ITEM_INSERT,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        )
+        );
+    }
+
+    /**
+     * Prepare for edit
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function itemFormPrepareEdit()
+    {
+        $this->setPageTitle(CTITEM_TXT_UPDATE_ITEM);
+        // if updating and not a form error then validate passed id and get row from DB
+        if (!$this->getFormError()) {
+            if (empty($this->getParam('itemID'))) {
+                $this->displayFatalError(CTITEM_MSG_ITEMID_NOT_PASSED);
+            }
+            if (!$this->buItem->getItemByID(
+                $this->getParam('itemID'),
+                $this->dsItem
+            )) {
+                $this->displayFatalError(CTITEM_MSG_ITEM_NOT_FND);
+            }
+        }
+        return (
+        Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'  => CTITEM_ACT_ITEM_UPDATE,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        )
+        );
+    }
+
+    function parseItemTypeSelector($itemTypeID)
+    {
+        $dsItemType = new DataSet($this);
+        $this->buItem->getAllItemTypes($dsItemType);
+        $this->template->set_block(
+            'ItemEdit',
+            'itemTypeBlock',
+            'itemTypes'
+        );
+        while ($dsItemType->fetchNext()) {
+            $this->template->set_var(
+                array(
+                    'itemTypeDescription' => $dsItemType->getValue(DBEItemType::description),
+                    'itemTypeID'          => $dsItemType->getValue(DBEItemType::itemTypeID),
+                    'itemTypeSelected'    => ($itemTypeID == $dsItemType->getValue(
+                            DBEItemType::itemTypeID
+                        )) ? CT_SELECTED : null
+                )
+            );
+            $this->template->parse(
+                'itemTypes',
+                'itemTypeBlock',
+                true
+            );
+        }
+    }
+
+    function parseRenewalTypeSelector($renewalTypeID)
+    {
+        $dbeRenewalType = new DBERenewalType($this);
+        $dbeRenewalType->getRows();
+        $this->template->set_block(
+            'ItemEdit',
+            'renewalTypeBlock',
+            'renewals'
+        );
+
+        $allowedDirectDebitRenewals = [1, 2, 5];
+
+        while ($dbeRenewalType->fetchNext()) {
+            $this->template->set_var(
+                array(
+                    'renewalTypeDescription'   => $dbeRenewalType->getValue(DBERenewalType::description),
+                    'renewalTypeID'            => $dbeRenewalType->getValue(DBERenewalType::renewalTypeID),
+                    'renewalAllowsDirectDebit' => in_array(
+                        $dbeRenewalType->getValue(DBERenewalType::renewalTypeID),
+                        $allowedDirectDebitRenewals
+                    ) ? 'data-allows-direct-debit="true"' : null,
+                    'renewalTypeSelected'      => ($renewalTypeID == $dbeRenewalType->getValue(
+                            DBERenewalType::renewalTypeID
+                        )) ? CT_SELECTED : null
+                )
+            );
+            $this->template->parse(
+                'renewals',
+                'renewalTypeBlock',
+                true
+            );
+        } // while ($dbeRenewalType->fetchNext()
+    }
+
+    function parseWarrantySelector($warrantyID)
+    {
+        // Manufacturer selector
+        $dbeWarranty = new DBEWarranty($this);
+        $dbeWarranty->getRows();
+        $this->template->set_block(
+            'ItemEdit',
+            'warrantyBlock',
+            'warranties'
+        );
+        while ($dbeWarranty->fetchNext()) {
+            $this->template->set_var(
+                array(
+                    'warrantyDescription' => $dbeWarranty->getValue(DBEWarranty::description),
+                    'warrantyID'          => $dbeWarranty->getValue(DBEWarranty::warrantyID),
+                    'warrantySelected'    => ($warrantyID == $dbeWarranty->getValue(
+                            DBEWarranty::warrantyID
+                        )) ? CT_SELECTED : null
+                )
+            );
+            $this->template->parse(
+                'warranties',
+                'warrantyBlock',
+                true
+            );
+        } // while ($dbeWarranty->fetchNext()
+    }
+
+    function parseItemBillingCategorySelector($itemBillingCategoryID)
+    {
+        $dbeItemBillingCategory = new DBEItemBillingCategory($this);
+        $dbeItemBillingCategory->getRows(DBEItemBillingCategory::name);
+        $this->template->set_block(
+            'ItemEdit',
+            'itemBillingCategoryBlock',
+            'itemBillingCategories'
+        );
+        while ($dbeItemBillingCategory->fetchNext()) {
+            $this->template->set_var(
+                array(
+                    'itemBillingCategoryName'     => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::name),
+                    'itemBillingCategoryID'       => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::id),
+                    'itemBillingCategorySelected' => ($itemBillingCategoryID == $dbeItemBillingCategory->getValue(
+                            DBEItemBillingCategory::id
+                        )) ? CT_SELECTED : null
+                )
+            );
+            $this->template->parse(
+                'itemBillingCategories',
+                'itemBillingCategoryBlock',
+                true
+            );
+        }
+    }
+
+    /**
+     * Update item record
+     * @access private
+     * @throws Exception
+     */
+    function itemUpdate()
+    {
+        $this->setMethodName('itemUpdate');
+        if (!$this->getParam('item')) {
+            $this->displayFatalError(CTITEM_MSG_ITEM_ARRAY_NOT_PASSED);
+            return;
+        }
+
+        //$this->buItem->initialiseNewItem($this->dsItem);
+        if (!$this->dsItem->populateFromArray($this->getParam('item'))) {
+            $this->setFormErrorOn();
+            if ($this->getAction() == CTITEM_ACT_ITEM_INSERT) {
+                $this->setAction(CTCNC_ACT_ITEM_ADD);
+            } else {
+                $this->setAction(CTCNC_ACT_ITEM_EDIT);
+            }
+            $this->setParam('itemID', $this->dsItem->getValue(DBEItem::itemID));
+            $this->itemForm();
+            exit;
+        }
+        $this->buItem->updateItem($this->dsItem);
+        $itemID = $this->dsItem->getPKValue();
+
+        // this forces update of itemID back through Javascript to parent HTML window
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'          => CTCNC_ACT_DISP_ITEM_POPUP,
+                'itemDescription' => $itemID,
+                'htmlFmt'         => CT_HTML_FMT_POPUP
+            )
+        );
+        header('Location: ' . $urlNext);
+    }
+
+    function discontinue()
+    {
+        $this->setMethodName('discontinue');
+        if ($this->getParam('discontinueItemIDs')) {
+
+            $this->buItem->discontinue(
+                $this->getParam('discontinueItemIDs')
+            );
+
+        }
+        header('Location: ' . $this->getParam('returnTo'));
     }
 
     /**
@@ -304,207 +649,6 @@ class CTItem extends CTCNC
         $this->parsePage();
     }
 
-    /**
-     * Add/Edit Item
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function itemForm()
-    {
-        $this->setMethodName('itemForm');
-        // initialisation stuff
-        if ($this->getAction() == CTCNC_ACT_ITEM_ADD) {
-            if ($this->getParam('renewalTypeID')) {
-                $renewalTypeID = $this->getParam('renewalTypeID');
-            } else {
-                $renewalTypeID = false;
-            }
-            $urlSubmit = $this->itemFormPrepareAdd($renewalTypeID);
-        } else {
-            $urlSubmit = $this->itemFormPrepareEdit();
-        }
-
-        $urlManufacturerPopup =
-            Controller::buildLink(
-                'Manufacturer.php',
-                array(
-                    'action'  => 'displayPopup',
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-
-        $urlManufacturerEdit =
-            Controller::buildLink(
-                'Manufacturer.php',
-                array(
-                    'action'  => 'editManufacturer',
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-
-        $manufacturerName = null;
-        if ($this->dsItem->getValue(DBEItem::manufacturerID)) {
-            $dbeManufacturer = new DBEManufacturer($this);
-            $dbeManufacturer->getRow($this->dsItem->getValue(DBEItem::manufacturerID));
-            $manufacturerName = $dbeManufacturer->getValue(DBEManufacturer::name);
-        }
-
-        // template
-        $this->setTemplateFiles(
-            'ItemEdit',
-            'ItemEdit.inc'
-        );
-        $this->template->set_var(
-            array(
-                'itemID'                         => $this->dsItem->getValue(DBEItem::itemID),
-                'description'                    => Controller::htmlInputText(
-                    $this->dsItem->getValue(DBEItem::description)
-                ),
-                'descriptionMessage'             => Controller::htmlDisplayText(
-                    $this->dsItem->getMessage(DBEItem::description)
-                ),
-                'curUnitSale'                    => Controller::htmlInputText(
-                    $this->dsItem->getValue(DBEItem::curUnitSale)
-                ),
-                'curUnitSaleMessage'             => Controller::htmlDisplayText(
-                    $this->dsItem->getMessage(DBEItem::curUnitSale)
-                ),
-                'curUnitCost'                    => Controller::htmlInputText(
-                    $this->dsItem->getValue(DBEItem::curUnitCost)
-                ),
-                'curUnitCostMessage'             => Controller::htmlDisplayText(
-                    $this->dsItem->getMessage(DBEItem::curUnitCost)
-                ),
-                'discontinuedFlagChecked'        => Controller::htmlChecked(
-                    $this->dsItem->getValue(DBEItem::discontinuedFlag)
-                ),
-                'servercareFlagChecked'          => Controller::htmlChecked(
-                    $this->dsItem->getValue(DBEItem::servercareFlag)
-                ),
-                'serialNoFlagChecked'            => Controller::htmlChecked(
-                    $this->dsItem->getValue(DBEItem::serialNoFlag)
-                ),
-                'partNo'                         => Controller::htmlInputText($this->dsItem->getValue(DBEItem::partNo)),
-                'notes'                          => Controller::htmlTextArea($this->dsItem->getValue(DBEItem::notes)),
-                'contractResponseTime'           => Controller::htmlInputText(
-                    $this->dsItem->getValue(DBEItem::contractResponseTime)
-                ),
-                'urlManufacturerPopup'           => $urlManufacturerPopup,
-                'urlManufacturerEdit'            => $urlManufacturerEdit,
-                'manufacturerID'                 => $this->dsItem->getValue(DBEItem::manufacturerID),
-                'manufacturerName'               => $manufacturerName,
-                'urlSubmit'                      => $urlSubmit,
-                'allowDirectDebitChecked'        => Controller::htmlChecked(
-                    $this->dsItem->getValue(DBEItem::allowDirectDebit)
-                ),
-                'excludeFromPOCompletionChecked' => Controller::htmlChecked(
-                    $this->dsItem->getValue(DBEItem::excludeFromPOCompletion)
-                )
-            )
-        );
-        $this->parseItemTypeSelector($this->dsItem->getValue(DBEItem::itemTypeID));
-        $this->parseRenewalTypeSelector($this->dsItem->getValue(DBEItem::renewalTypeID));
-        $this->parseWarrantySelector($this->dsItem->getValue(DBEItem::warrantyID));
-        $this->template->parse(
-            'CONTENTS',
-            'ItemEdit',
-            true
-        );
-        $this->parsePage();
-    }
-
-    /**
-     * Prepare for add
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @param bool $renewalTypeID
-     * @return mixed|string
-     * @throws Exception
-     */
-    function itemFormPrepareAdd($renewalTypeID = false)
-    {
-        // If form error then preserve values in $this->dsItem else initialise new
-        $this->setPageTitle(CTITEM_TXT_NEW_ITEM);
-        if (!$this->getFormError()) {
-            $this->buItem->initialiseNewItem(
-                $this->dsItem,
-                $renewalTypeID
-            );
-        }
-        return (
-        Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action'  => CTITEM_ACT_ITEM_INSERT,
-                'htmlFmt' => CT_HTML_FMT_POPUP
-            )
-        )
-        );
-    }
-
-    /**
-     * Prepare for edit
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function itemFormPrepareEdit()
-    {
-        $this->setPageTitle(CTITEM_TXT_UPDATE_ITEM);
-        // if updating and not a form error then validate passed id and get row from DB
-        if (!$this->getFormError()) {
-            if (empty($this->getParam('itemID'))) {
-                $this->displayFatalError(CTITEM_MSG_ITEMID_NOT_PASSED);
-            }
-            if (!$this->buItem->getItemByID(
-                $this->getParam('itemID'),
-                $this->dsItem
-            )) {
-                $this->displayFatalError(CTITEM_MSG_ITEM_NOT_FND);
-            }
-        }
-        return (
-        Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action'  => CTITEM_ACT_ITEM_UPDATE,
-                'htmlFmt' => CT_HTML_FMT_POPUP
-            )
-        )
-        );
-    }
-
-    function parseItemTypeSelector($itemTypeID)
-    {
-        $dsItemType = new DataSet($this);
-        $this->buItem->getAllItemTypes($dsItemType);
-        $this->template->set_block(
-            'ItemEdit',
-            'itemTypeBlock',
-            'itemTypes'
-        );
-        while ($dsItemType->fetchNext()) {
-            $this->template->set_var(
-                array(
-                    'itemTypeDescription' => $dsItemType->getValue(DBEItemType::description),
-                    'itemTypeID'          => $dsItemType->getValue(DBEItemType::itemTypeID),
-                    'itemTypeSelected'    => ($itemTypeID == $dsItemType->getValue(
-                            DBEItemType::itemTypeID
-                        )) ? CT_SELECTED : null
-                )
-            );
-            $this->template->parse(
-                'itemTypes',
-                'itemTypeBlock',
-                true
-            );
-        }
-    }
-
     function parseManufacturerSelector($manufacturerID)
     {
         $dsManufacturer = new DataSet($this);
@@ -530,121 +674,5 @@ class CTItem extends CTCNC
                 true
             );
         }
-    }
-
-    function parseWarrantySelector($warrantyID)
-    {
-        // Manufacturer selector
-        $dbeWarranty = new DBEWarranty($this);
-        $dbeWarranty->getRows();
-        $this->template->set_block(
-            'ItemEdit',
-            'warrantyBlock',
-            'warranties'
-        );
-        while ($dbeWarranty->fetchNext()) {
-            $this->template->set_var(
-                array(
-                    'warrantyDescription' => $dbeWarranty->getValue(DBEWarranty::description),
-                    'warrantyID'          => $dbeWarranty->getValue(DBEWarranty::warrantyID),
-                    'warrantySelected'    => ($warrantyID == $dbeWarranty->getValue(
-                            DBEWarranty::warrantyID
-                        )) ? CT_SELECTED : null
-                )
-            );
-            $this->template->parse(
-                'warranties',
-                'warrantyBlock',
-                true
-            );
-        } // while ($dbeWarranty->fetchNext()
-    }
-
-    function parseRenewalTypeSelector($renewalTypeID)
-    {
-        // Manufacturer selector
-        $dbeRenewalType = new DBERenewalType($this);
-        $dbeRenewalType->getRows();
-        $this->template->set_block(
-            'ItemEdit',
-            'renewalTypeBlock',
-            'renewals'
-        );
-
-        $allowedDirectDebitRenewals = [1, 2, 5];
-
-        while ($dbeRenewalType->fetchNext()) {
-            $this->template->set_var(
-                array(
-                    'renewalTypeDescription'   => $dbeRenewalType->getValue(DBERenewalType::description),
-                    'renewalTypeID'            => $dbeRenewalType->getValue(DBERenewalType::renewalTypeID),
-                    'renewalAllowsDirectDebit' => in_array(
-                        $dbeRenewalType->getValue(DBERenewalType::renewalTypeID),
-                        $allowedDirectDebitRenewals
-                    ) ? 'data-allows-direct-debit="true"' : null,
-                    'renewalTypeSelected'      => ($renewalTypeID == $dbeRenewalType->getValue(
-                            DBERenewalType::renewalTypeID
-                        )) ? CT_SELECTED : null
-                )
-            );
-            $this->template->parse(
-                'renewals',
-                'renewalTypeBlock',
-                true
-            );
-        } // while ($dbeRenewalType->fetchNext()
-    }
-
-    /**
-     * Update item record
-     * @access private
-     * @throws Exception
-     */
-    function itemUpdate()
-    {
-        $this->setMethodName('itemUpdate');
-        if (!$this->getParam('item')) {
-            $this->displayFatalError(CTITEM_MSG_ITEM_ARRAY_NOT_PASSED);
-            return;
-        }
-
-        //$this->buItem->initialiseNewItem($this->dsItem);
-        if (!$this->dsItem->populateFromArray($this->getParam('item'))) {
-            $this->setFormErrorOn();
-            if ($this->getAction() == CTITEM_ACT_ITEM_INSERT) {
-                $this->setAction(CTCNC_ACT_ITEM_ADD);
-            } else {
-                $this->setAction(CTCNC_ACT_ITEM_EDIT);
-            }
-            $this->setParam('itemID', $this->dsItem->getValue(DBEItem::itemID));
-            $this->itemForm();
-            exit;
-        }
-        $this->buItem->updateItem($this->dsItem);
-        $itemID = $this->dsItem->getPKValue();
-
-        // this forces update of itemID back through Javascript to parent HTML window
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action'          => CTCNC_ACT_DISP_ITEM_POPUP,
-                'itemDescription' => $itemID,
-                'htmlFmt'         => CT_HTML_FMT_POPUP
-            )
-        );
-        header('Location: ' . $urlNext);
-    }
-
-    function discontinue()
-    {
-        $this->setMethodName('discontinue');
-        if ($this->getParam('discontinueItemIDs')) {
-
-            $this->buItem->discontinue(
-                $this->getParam('discontinueItemIDs')
-            );
-
-        }
-        header('Location: ' . $this->getParam('returnTo'));
     }
 }

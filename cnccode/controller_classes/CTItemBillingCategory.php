@@ -1,23 +1,11 @@
 <?php
-/**
- * Expense controller class
- * CNC Ltd
- *
- * @access public
- * @authors Karim Ahmed - Sweet Code Limited
- */
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg['path_dbe'] . '/DBEOffice365License.php');
+require_once($cfg['path_dbe'] . '/DBEItemBillingCategory.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 
-// Actions
 class CTItemBillingCategory extends CTCNC
 {
-    /** @var BUActivity */
-    public $buActivity;
-    public $dsOffice365License;
-
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -60,15 +48,15 @@ class CTItemBillingCategory extends CTCNC
                     throw new Exception('ID is missing');
                 }
 
-                $dbeOffice365License = new DBEOffice365License($this);
+                $dbeItemBillingCategory = new DBEItemBillingCategory($this);
 
-                $dbeOffice365License->getRow($this->getParam('id'));
+                $dbeItemBillingCategory->getRow($this->getParam('id'));
 
-                if (!$dbeOffice365License->rowCount) {
+                if (!$dbeItemBillingCategory->rowCount) {
                     http_response_code(404);
                     exit;
                 }
-                $dbeOffice365License->deleteRow();
+                $dbeItemBillingCategory->deleteRow();
                 echo json_encode(["status" => "ok"]);
                 break;
             case 'update':
@@ -77,80 +65,50 @@ class CTItemBillingCategory extends CTCNC
                     throw new Exception('ID is missing');
                 }
 
-                $dbeOffice365License = new DBEOffice365License($this);
+                $dbeItemBillingCategory = new DBEItemBillingCategory($this);
 
-                $dbeOffice365License->getRow($this->getParam('id'));
+                $dbeItemBillingCategory->getRow($this->getParam('id'));
 
-                if (!$dbeOffice365License->rowCount) {
+                if (!$dbeItemBillingCategory->rowCount) {
                     http_response_code(404);
                     exit;
                 }
 
-                $dbeOffice365License->setValue(
-                    DBEOffice365License::replacement,
-                    $this->getParam('replacement')
+                $dbeItemBillingCategory->setValue(
+                    DBEItemBillingCategory::name,
+                    $this->getParam('name')
                 );
-                $dbeOffice365License->setValue(
-                    DBEOffice365License::mailboxLimit,
-                    $this->getParam('mailboxLimit')
-                );
-
-                $dbeOffice365License->setValue(DBEOffice365License::license, $this->getParam('license'));
-                $dbeOffice365License->setValue(
-                    DBEOffice365License::reportOnSpareLicenses,
-                    !!$this->getParam('reportOnSpareLicenses')
-                );
-
-                $dbeOffice365License->updateRow();
+                $dbeItemBillingCategory->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
             case 'create':
-                $dbeOffice365License = new DBEOffice365License($this);
+                $dbeItemBillingCategory = new DBEItemBillingCategory($this);
 
-                $dbeOffice365License->setValue(
-                    DBEOffice365License::replacement,
-                    $this->getParam('replacement')
+                $dbeItemBillingCategory->setValue(
+                    DBEItemBillingCategory::name,
+                    $this->getParam('name')
                 );
-                $dbeOffice365License->setValue(
-                    DBEOffice365License::mailboxLimit,
-                    $this->getParam('mailboxLimit')
-                );
-
-                $dbeOffice365License->setValue(DBEOffice365License::license, $this->getParam('license'));
-                $dbeOffice365License->setValue(
-                    DBEOffice365License::reportOnSpareLicenses,
-                    !!$this->getParam('reportOnSpareLicenses')
-                );
-                $dbeOffice365License->insertRow();
+                $dbeItemBillingCategory->insertRow();
 
                 echo json_encode(
                     [
-                        "id"                    => $dbeOffice365License->getValue(DBEOffice365License::id),
-                        "replacement"           => $dbeOffice365License->getValue(DBEOffice365License::replacement),
-                        "license"               => $dbeOffice365License->getValue(DBEOffice365License::license),
-                        "mailboxLimit"          => $dbeOffice365License->getValue(DBEOffice365License::mailboxLimit),
-                        "reportOnSpareLicenses" => $dbeOffice365License->getValue(
-                            DBEOffice365License::reportOnSpareLicenses
-                        )
+                        "id"   => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::id),
+                        "name" => $dbeItemBillingCategory->getValue(
+                            DBEItemBillingCategory::name
+                        ),
                     ],
                     JSON_NUMERIC_CHECK
                 );
 
                 break;
             case 'getData':
-                $dbeOffice365Licenses = new DBEOffice365License($this);
-
-                $dbeOffice365Licenses->getRows(DBEOffice365License::replacement);
+                $dbeItemBillingCategories = new DBEItemBillingCategory($this);
+                $dbeItemBillingCategories->getRows(DBEItemBillingCategory::name);
                 $data = [];
-                while ($dbeOffice365Licenses->fetchNext()) {
+                while ($dbeItemBillingCategories->fetchNext()) {
                     $data[] = [
-                        "id"                    => $dbeOffice365Licenses->getValue(DBEOffice365License::id),
-                        "replacement"           => $dbeOffice365Licenses->getValue(DBEOffice365License::replacement),
-                        "license"               => $dbeOffice365Licenses->getValue(DBEOffice365License::license),
-                        "mailboxLimit"          => $dbeOffice365Licenses->getValue(DBEOffice365License::mailboxLimit),
-                        "reportOnSpareLicenses" => $dbeOffice365Licenses->getValue(
-                            DBEOffice365License::reportOnSpareLicenses
-                        )
+                        "id"   => $dbeItemBillingCategories->getValue(DBEItemBillingCategory::id),
+                        "name" => $dbeItemBillingCategories->getValue(DBEItemBillingCategory::name),
                     ];
                 }
                 echo json_encode($data, JSON_NUMERIC_CHECK);
@@ -173,15 +131,15 @@ class CTItemBillingCategory extends CTCNC
      */
     function displayForm()
     {
-        $this->setPageTitle('Office 365 Licenses');
+        $this->setPageTitle('Item Billing Category');
         $this->setTemplateFiles(
-            'Office365License',
-            'Office365Licenses'
+            'ItemBillingCategory',
+            'ItemBillingCategories'
         );
 
         $this->template->parse(
             'CONTENTS',
-            'Office365License',
+            'ItemBillingCategory',
             true
         );
 
@@ -228,16 +186,4 @@ class CTItemBillingCategory extends CTCNC
     {
         $this->defaultAction();
     }
-
-//    function parsePage()
-//    {
-//        $urlLogo = '';
-//        $this->template->set_var(
-//            array(
-//                'urlLogo' => $urlLogo,
-//                'txtHome' => 'Home'
-//            )
-//        );
-//        parent::parsePage();
-//    }
-}// end of class
+}

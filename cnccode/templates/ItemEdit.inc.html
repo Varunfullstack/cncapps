@@ -240,6 +240,25 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">Item Billing Category</td>
+            <td class="field">
+                <select type="text"
+                        id="itemBillingCategoryID"
+                        name="item[1][itemBillingCategoryID]"
+                >
+                    <option value=""
+                    >
+                    </option>
+                    <!-- BEGIN itemBillingCategoryBlock -->
+                    <option {itemBillingCategorySelected}
+                            value="{itemBillingCategoryID}"
+                    >{itemBillingCategoryName}
+                    </option>
+                    <!-- END itemBillingCategoryBlock -->
+                </select>
+            </td>
+        </tr>
+        <tr>
             <td valign="top"
                 class="promptText"
             >Contract Response Time

@@ -23,14 +23,26 @@
     <changeSet author="pavwebdev" id="issue672-2">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="item" columnName="itemBillingCategoryId"/>
+                <columnExists tableName="item" columnName="itemBillingCategoryID"/>
             </not>
         </preConditions>
         <addColumn tableName="item">
-            <column name="itemBillingCategoryId" type="int(11)" defaultValue="null">
-                <constraints foreignKeyName="fk-item-itemBillingCategory" referencedTableName="itemBillingCategory"
-                             referencedColumnNames="id" nullable="true"/>
+            <column name="itemBillingCategoryID" type="int(11)" defaultValue="null">
+                <constraints nullable="true"/>
             </column>
         </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue672-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="item" foreignKeyName="fk_itemBillingCategoryID"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="item" baseColumnNames="itemBillingCategoryID"
+                                 constraintName="fk_itemBillingCategoryID"
+                                 referencedTableName="itemBillingCategory"
+                                 referencedColumnNames="id"
+                                 onDelete="RESTRICT"
+        />
     </changeSet>
 </databaseChangeLog>

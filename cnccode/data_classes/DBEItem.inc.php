@@ -28,6 +28,7 @@ class DBEItem extends DBCNCEntity
     const renewalTypeID = "renewalTypeID";
     const allowDirectDebit = "allowDirectDebit";
     const excludeFromPOCompletion = "excludeFromPOCompletion";
+    const itemBillingCategoryID = "itemBillingCategoryID";
 
     /**
      * calls constructor()
@@ -157,6 +158,11 @@ class DBEItem extends DBCNCEntity
             DA_NOT_NULL,
             null,
             'N'
+        );
+        $this->addColumn(
+            self::itemBillingCategoryID,
+            DA_ID,
+            DA_ALLOW_NULL
         );
         $this->setPK(0);
         $this->setAddColumnsOff();
