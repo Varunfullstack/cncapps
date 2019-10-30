@@ -1,5 +1,6 @@
 <?php
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg['path_ct'] . '/CTContact.inc.php');
 require_once($cfg['path_bu'] . '/BUContact.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
@@ -23,6 +24,7 @@ while ($dsCustomers->fetchNext()) {
     $validationErrors = [
         "contactErrors"  => [],
         "customerErrors" => [],
+        "siteErrors"     => [],
         "customerID"     => $customerID,
         "customerName"   => $dsCustomers->getValue(DBECustomer::name)
     ];
@@ -121,6 +123,31 @@ while ($dsCustomers->fetchNext()) {
             ];
         }
     }
+    $dbeSite = new DBESite($thing);
+    $dbeSite->setValue(DBESite::customerID, $customerID);
+    $dbeSite->getRowsByCustomerID();
+    while ($dbeSite->fetchNext()) {
+        $siteErrors = [];
+
+        if (!$dbeSite->getValue(DBESite::maxTravelHours)) {
+            $siteErrors[] = "Max Travel hours must be greater than 0";
+        }
+
+        if ($dbeSite->getValue(DBESite::phone) && !preg_match(
+                "/^\d+$/",
+                $dbeSite->getValue(DBESite::phone)
+            )) {
+            $siteErrors[] = "Invalid Phone Number: " . $dbeSite->getValue(DBESite::phone);
+        }
+
+        if (count($siteErrors)) {
+            $validationErrors['siteErrors'][] = [
+                "postCode" => $dbeSite->getValue(DBESite::postcode),
+                "errors"   => $siteErrors
+            ];
+        }
+    }
+
 
     // we went through all the contacts
 
@@ -172,7 +199,9 @@ $template->set_file(
     'ContactValidationFailedEmail.html'
 );
 $template->setBlock('page', 'individualContactValidationErrorBlock', 'individualContactErrors');
+$template->setBlock('page', 'individualSiteValidationErrorBlock', 'individualSiteErrors');
 $template->setBlock('page', 'contactBlock', 'contacts');
+$template->setBlock('page', 'sitesBlock', 'sites');
 $template->setBlock('page', 'customerWideBlock', 'customerErrors');
 $template->setBlock('page', 'customersBlock', 'customers');
 
@@ -227,6 +256,40 @@ foreach ($customersFailingValidation as $customerErrors) {
                 $template->parse(
                     'individualContactErrors',
                     'individualContactValidationErrorBlock',
+                    !$firstValidation
+                );
+                if ($firstValidation) {
+                    $firstValidation = false;
+                }
+            }
+
+        }
+    }
+    if (!count($customerErrors['siteErrors'])) {
+        $template->setVar('sites', "");
+    } else {
+
+        $firstSite = true;
+        foreach ($customerErrors['siteErrors'] as $site) {
+            $template->setVar(
+                [
+                    "postCode" => $site['postCode'],
+                ]
+            );
+
+            $template->parse('sites', 'sitesBlock', !$firstSite);
+            if ($firstSite) {
+                $firstSite = false;
+            }
+
+            $firstValidation = true;
+            foreach ($site['errors'] as $error) {
+                $template->setVar(
+                    ["siteValidationError" => $error]
+                );
+                $template->parse(
+                    'individualSiteErrors',
+                    'individualSiteValidationErrorBlock',
                     !$firstValidation
                 );
                 if ($firstValidation) {

@@ -8,6 +8,7 @@
             font-family: Arial, Helvetica, sans-serif;
             font-size: 10pt;
         }
+
         .customerRow {
             padding-bottom: 20px;
         }
@@ -68,6 +69,30 @@
                 </td>
             </tr>
             <!-- END contactBlock -->
+        </table>
+        <div class="sectionTitle">
+            Sites failed validations
+        </div>
+        <table>
+            <!-- BEGIN sitesBlock -->
+            <tr>
+                <td>
+                    <div class="contactInfo">
+                        Site {postCode} has validation errors:
+                    </div>
+                    <table>
+                        <!-- BEGIN individualSiteValidationErrorBlock -->
+                        <tr>
+                            <td>
+                                {siteValidationError}
+                            </td>
+                        </tr>
+                        <!-- END individualSiteValidationErrorBlock -->
+                    </table>
+                </td>
+            </tr>
+            <!-- END sitesBlock -->
+
         </table>
 
     </li>
