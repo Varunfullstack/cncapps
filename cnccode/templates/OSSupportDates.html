@@ -26,6 +26,14 @@
     .detail input:invalid {
         border-color: red;
     }
+
+    tr.expired {
+        background-color: #FFC7CE !important;
+    }
+
+    tr.expirationWarning {
+        background-color: #FFEB9C !important;
+    }
 </style>
 
 <script type="text/javascript"
@@ -276,7 +284,19 @@
             paging: false,
             order: [
                 [0, 'asc'],
-            ]
+            ],
+            createdRow: (row, data, dataIndex) => {
+                const eolDate = moment(data.endOfLifeDate, "DD/MM/YYYY");
+                const todayDate = moment();
+                if (todayDate.isSameOrAfter(eolDate)) {
+                    $(row).addClass('expired');
+                } else {
+                    const thresholdDate = moment(eolDate).subtract(data.threshold, 'days');
+                    if (todayDate.isSameOrAfter(thresholdDate)) {
+                        $(row).addClass('expirationWarning');
+                    }
+                }
+            }
         });
 
         toggleDataTableButtons(false);
@@ -359,7 +379,12 @@
     }
 
 </script>
-
+<div>
+    <a href="https://docs.microsoft.com/en-us/windows/release-information/"
+       target="_blank"
+    >Build Numbers & Support Dates</a>
+</div>
+<br>
 <table class="list">
     <thead>
     <tr>

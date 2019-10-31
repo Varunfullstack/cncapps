@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 666 - System Header & Review Meeting Text Formatting
 - Issue 673 - O365 Report on Spare Licenses not saving
 - Issue 670 - Mailbox Export script identify Equipment Mailboxes
+- Issue 664 - Colour OS Support Dates
 
 ## [v3.7.0] 
 ### Added
