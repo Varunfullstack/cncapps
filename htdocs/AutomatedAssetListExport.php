@@ -7,6 +7,7 @@
  */
 
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
 require_once($cfg["path_dbe"] . "/DBEOSSupportDates.php");
 require_once($cfg["path_dbe"] . "/DBEHeader.inc.php");
@@ -74,13 +75,13 @@ $thresholdDate->add(new DateInterval('P' . $thresholdDays . 'D'));
 
 $today = new DateTime();
 
+$currentSummaryRow = 1;
 if ($generateSummary) {
     $summarySpreadSheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
     $summarySpreadSheet->getDefaultStyle()->getFont()->setName('Arial');
     $summarySpreadSheet->getDefaultStyle()->getFont()->setSize(10);
     $summarySheet = $summarySpreadSheet->getActiveSheet();
     $isHeaderSet = false;
-    $currentSummaryRow = 1;
 }
 
 while ($dbeCustomer->fetchNext()) {
@@ -223,6 +224,32 @@ ORDER BY clients.name,
         continue;
     }
     $data = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($data as $key => $datum) {
+        $text = $datum['Last User'];
+        $text = str_replace('null', "", $text);
+        $possibleAnswer = $text;
+        $lastCount = 0;
+        for ($i = 1; $i <= strlen($text); $i++) {
+            $toCheck = substr($text, 0, strlen($text) - $i);
+            if (!strlen($toCheck)) {
+                continue;
+            }
+            $count = substr_count($text, $toCheck);
+            if ($count > $lastCount) {
+                $lastCount = $count;
+                $possibleResult = str_replace($toCheck, "", $text);
+                if (!strlen($possibleResult)) {
+                    $possibleAnswer = $toCheck;
+                }
+            }
+
+        }
+
+        $data[$key]['Last User'] = $possibleAnswer;
+    }
+
+
     if (count($data)) {
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');

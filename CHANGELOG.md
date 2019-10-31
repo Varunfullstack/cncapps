@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 673 - O365 Report on Spare Licenses not saving
 - Issue 670 - Mailbox Export script identify Equipment Mailboxes
 - Issue 664 - Colour OS Support Dates
+- Issue 669 - Asset list extract remove duplicated logged in users names
 
 ## [v3.7.0] 
 ### Added
