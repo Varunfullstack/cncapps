@@ -199,8 +199,8 @@ class BUActivity extends Business
                 5 => $this->dsHeader->getValue(DBEHeader::priority5Desc)
             );
 
-        if (isset($GLOBALS ['auth'])) {
-            $this->loggedInUserID = $GLOBALS ['auth']->is_authenticated();
+        if (isset($GLOBALS['auth'])) {
+            $this->loggedInUserID = $GLOBALS['auth']->is_authenticated();
         } else {
             $this->loggedInUserID = USER_SYSTEM;
         }
@@ -5802,9 +5802,10 @@ is currently a balance of ';
             DBEJCallDocument::fileLength,
             ( int )$fileSizeBytes
         );
+
         $dbeCallDocument->setValue(
             DBEJCallDocument::createUserID,
-            ( string )$this->loggedInUserID
+            $this->loggedInUserID
         );
         $dbeCallDocument->setValue(
             DBEJCallDocument::createDate,

@@ -2,6 +2,10 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Changed
+- Issue 638 - Allow Multiple dropping of files when uploading documents
+
+## [v3.7.0] 
 ### Added
 - Issue 654 - Set all contacts to support level None
 ### Changed
@@ -15,7 +19,7 @@ This project changes will be shown here.
 ### Removed
 - Issue 652 - Disable myphpadmin from being used / allowing logins
 
-## [v3.6.3]
+## [v3.6.3] - 2019-09-23
 ### Fixed
 - Fixed issue with contactValidation.php
 - Fixed Seven Dayer Performance seems to be using wrong date

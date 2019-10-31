@@ -826,28 +826,20 @@
                 </tr>
                 <!-- END documentBlock -->
                 <tr>
-                    <td class="promptTextLeft">Description</td>
+                    <td class="promptTextLeft"></td>
                     <td colspan="4">
                         <form action="{urlUploadFile}"
                               method="post"
                               enctype="multipart/form-data"
                         >
-                            <input name="uploadDescription"
-                                   type="text"
-                                   size="45"
-                                   maxlength="150"
-                                   value="{uploadDescription}"
-                            >
                             <input type="hidden"
                                    name="edit"
                                    value="true"
                             >
-                            <input
-                                    name="userfile"
-                                    type="file"
-                                    value="{userfile}"
-                                    class="dragUploader"
-                                    data-description="uploadDescription"
+                            <input name="userfile[]"
+                                   type="file"
+                                   class="dragUploader"
+                                   multiple
                             >
                             <input type="submit"
                                    name="uploadFile"
