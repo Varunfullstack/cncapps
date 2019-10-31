@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 670 - Mailbox Export script identify Equipment Mailboxes
 - Issue 664 - Colour OS Support Dates
 - Issue 669 - Asset list extract remove duplicated logged in users names
+- Issue 661 - Review Meetings show primary active site
 ### Fixed
 - Issue 663 - Password Service Sorting not working
 
