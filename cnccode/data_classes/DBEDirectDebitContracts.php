@@ -158,7 +158,6 @@ class DBEDirectDebitContracts extends DBECustomerItem
      *
      * WHen the invoice has been generated, the total invoice months is increased by the invoice period months
      * so the renewal gets picked up again.
-     * @param bool $directDebit
      */
     function getRenewalsDueRows()
     {

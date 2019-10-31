@@ -113,33 +113,25 @@ class DBEJRenContract extends DBECustomerItem
 
     function getRow()
     {
-        $statement =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
-      JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
-			JOIN customer ON  cus_custno = cui_custno
-      JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
-		 WHERE " . $this->getPKWhere() .
+        $statement = $this->getBaseQuery() . " WHERE " . $this->getPKWhere() .
             " AND renewalTypeID = 2";
-
         $this->setQueryString($statement);
         $ret = (parent::getRow());
     }
 
-    function getRows($orderBy = false)
+    private function getBaseQuery()
     {
-
-        $statement =
-            "SELECT " . $this->getDBColumnNamesAsString() .
+        return "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
-      JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
-			WHERE declinedFlag = 'N'
-        AND renewalTypeID = 2";
+      JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno";
+    }
 
+    function getRows($orderBy = false)
+    {
+        $statement = $this->getBaseQuery() . " WHERE declinedFlag = 'N' AND renewalTypeID = 2";
         if ($orderBy) {
             $statement .= " ORDER BY $orderBy";
         } else {
@@ -153,18 +145,11 @@ class DBEJRenContract extends DBECustomerItem
     function getRowsByCustomerID($customerID)
     {
 
-        $statement =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " JOIN item ON  itm_itemno = cui_itemno
-      JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
-			JOIN customer ON  cus_custno = cui_custno
-      JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
-			WHERE declinedFlag = 'N'
-				AND cui_custno = $customerID		
-        AND renewalTypeID = 2      
+        $statement = $this->getBaseQuery() .
+            " WHERE declinedFlag = 'N'
+				AND cui_custno = " . $this->escapeValue($customerID) .
+            " AND renewalTypeID = 2      
 			ORDER BY cus_name";
-
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }
@@ -177,9 +162,9 @@ class DBEJRenContract extends DBECustomerItem
      * WHen the invoice has been generated, the total invoice months is increased by the invoice period months
      * so the renewal gets picked up again.
      * @param bool $ignorePrePayContracts
+     * @param null $itemBillingCategoryID
      */
-    function getRenewalsDueRows($ignorePrePayContracts = true
-    )
+    function getRenewalsDueRows($ignorePrePayContracts = true, $itemBillingCategoryID = null)
     {
 
         $statement =
@@ -196,6 +181,12 @@ class DBEJRenContract extends DBECustomerItem
 
         if ($ignorePrePayContracts) {
             $statement .= ' and itm_itemno <> 4111';
+        }
+
+        if ($itemBillingCategoryID) {
+            $statement .= " and item.itemBillingCategoryID = " . $this->escapeValue($itemBillingCategoryID);
+        } else {
+            $statement .= " and item.itemBillingCategoryID is null ";
         }
 
         $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc, isSSL";
@@ -228,6 +219,11 @@ class DBEJRenContract extends DBECustomerItem
 
         $this->setQueryString($statement);
         $ret = (parent::getRows());
+    }
+
+    function searchByTerm($term, $itemsPerPage, $page)
+    {
+        $query = $this->getBaseQuery().' where item.itm_desc like "%'.$this->escapeValue($term).'%" and renewalTypeID = 2';
     }
 
 }

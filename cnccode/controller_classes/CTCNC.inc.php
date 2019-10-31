@@ -371,6 +371,22 @@ class CTCNC extends Controller
         if ($this->hasPermissions(PHPLIB_PERM_SALES)) {
 
             $this->setTemplateFiles(array('ScreenSales' => $screenSalesTemplate));
+
+            if ($dbeUser->getValue(DBEUser::createRenewalSalesOrdersFlag) == 'Y') {
+                $this->template->setVar(
+                    [
+                        "createRenewalSalesOrders" =>
+                            "<TR>
+    <TD align=\"left\"
+        nowrap=\"nowrap\"
+    >
+        <a href=\"CreateRenewalSalesOrdersManager.php\">Create Renewal Sales Orders</a>
+    </TD>
+</TR>"
+                    ]
+                );
+            }
+
             $this->template->parse(
                 'screenSales',
                 'ScreenSales',

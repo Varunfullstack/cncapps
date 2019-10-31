@@ -86,166 +86,7 @@ class CTRenBroadband extends CTCNC
         }
     }
 
-    /**
-     * Display list of types
-     * @access private
-     * @throws Exception
-     */
-    function displayList()
-    {
-        $this->setMethodName('displayList');
-        $this->setPageTitle('Internet Services');
-        $this->setTemplateFiles(
-            array('RenBroadbandList' => 'RenBroadbandList.inc')
-        );
-        $dsRenBroadband = new DataSet($this);
-        $this->buRenBroadband->getAll(
-            $dsRenBroadband,
-            $this->getParam('orderBy')
-        );
-
-        if ($dsRenBroadband->rowCount() > 0) {
-            $this->template->set_block(
-                'RenBroadbandList',
-                'rowBlock',
-                'rows'
-            );
-            while ($dsRenBroadband->fetchNext()) {
-
-                $customerItemID = $dsRenBroadband->getValue(DBEJRenBroadband::customerItemID);
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'edit',
-                            'ID'     => $customerItemID
-                        )
-                    );
-
-                $urlList =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'list'
-                        )
-                    );
-
-                $txtEdit = '[edit]';
-
-                $this->template->set_var(
-                    array(
-                        'customerItemID'    => $customerItemID,
-                        'customerName'      => $dsRenBroadband->getValue(DBEJRenBroadband::customerName),
-                        'itemDescription'   => $dsRenBroadband->getValue(DBEJRenBroadband::itemDescription),
-                        'ispID'             => $dsRenBroadband->getValue(DBEJRenBroadband::ispID),
-                        'adslPhone'         => $dsRenBroadband->getValue(DBEJRenBroadband::adslPhone),
-                        'salePricePerMonth' => $dsRenBroadband->getValue(DBEJRenBroadband::salePricePerMonth),
-                        'costPricePerMonth' => $dsRenBroadband->getValue(DBEJRenBroadband::costPricePerMonth),
-                        'invoiceFromDate'   => Controller::dateYMDtoDMY(
-                            $dsRenBroadband->getValue(DBEJRenBroadband::invoiceFromDate)
-                        ),
-                        'invoiceToDate'     => Controller::dateYMDtoDMY(
-                            $dsRenBroadband->getValue(DBEJRenBroadband::invoiceToDate)
-                        ),
-                        'urlEdit'           => $urlEdit,
-                        'urlList'           => $urlList,
-                        'txtEdit'           => $txtEdit
-                    )
-                );
-                $this->template->parse(
-                    'rows',
-                    'rowBlock',
-                    true
-                );
-            }//while $dsRenBroadband->fetchNext()
-        }
-        $this->template->parse(
-            'CONTENTS',
-            'RenBroadbandList',
-            true
-        );
-        $this->parsePage();
-    }
-
-    /**
-     * Called from sales order line to edit a renewal.
-     * The page passes
-     * ordheadID
-     * sequenceNo (line)
-     * renewalCustomerItemID (blank if renewal not created yet
-     *
-     *
-     * @throws Exception
-     */
-    function editFromSalesOrder()
-    {
-        $buSalesOrder = new BUSalesOrder($this);
-        $dsOrdline = new DataSet($this);
-        $buSalesOrder->getOrdlineByIDSeqNo(
-            $this->getParam('ordheadID'),
-            $this->getParam('sequenceNo'),
-            $dsOrdline
-        );
-
-        $renewalCustomerItemID = $dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
-
-        // has the order line get a renewal already?
-        if (!$renewalCustomerItemID) {
-
-
-            // create a new record first
-            $dsOrdhead = new DataSet($this);
-            $buSalesOrder->getOrderByOrdheadID(
-                $this->getParam('ordheadID'),
-                $dsOrdhead,
-                $dsDontNeedOrdline
-            );
-
-            $this->buRenBroadband->createNewRenewal(
-                $dsOrdhead->getValue(DBEJOrdhead::customerID),
-                $dsOrdline->getValue(DBEJOrdline::itemID),
-                $renewalCustomerItemID,
-                $dsOrdhead->getValue(DBEJOrdhead::delSiteNo)                // returned by function
-            );
-
-
-            // For despatch, prevents the renewal appearing again today during despatch process.
-            $dbeOrdline = new DBEOrdline($this);
-
-            $dbeOrdline->setValue(
-                DBEJOrdline::ordheadID,
-                $dsOrdline->getValue(DBEJOrdline::ordheadID)
-            );
-            $dbeOrdline->setValue(
-                DBEJOrdline::sequenceNo,
-                $dsOrdline->getValue(DBEJOrdline::sequenceNo)
-            );
-
-            $dbeOrdline->getRow();
-            $dbeOrdline->setValue(
-                DBEJOrdline::renewalCustomerItemID,
-                $renewalCustomerItemID
-            );
-
-            $dbeOrdline->updateRow();
-
-        }
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'edit',
-                    'ID'     => $renewalCustomerItemID
-                )
-            );
-
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    /**
+/**
      * Edit/Add Activity
      * @access private
      * @throws Exception
@@ -695,7 +536,129 @@ class CTRenBroadband extends CTCNC
             true
         );
         $this->parsePage();
+    }
+
+    private function parseInitialContractLength($initialContractLength)
+    {
+        foreach (self::InitialContractLengthValues as $value) {
+            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    'initialContractLengthSelected'    => $initialContractLengthSelected,
+                    'initialContractLength'            => $value,
+                    'initialContractLengthDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'initialContractLengths',
+                'initialContractLengthBlock',
+                true
+            );
+        }
+    }
+
+        /**
+     * Called from sales order line to edit a renewal.
+     * The page passes
+     * ordheadID
+     * sequenceNo (line)
+     * renewalCustomerItemID (blank if renewal not created yet
+     *
+     *
+     * @throws Exception
+     */
+    function editFromSalesOrder()
+    {
+        $buSalesOrder = new BUSalesOrder($this);
+        $dsOrdline = new DataSet($this);
+        $buSalesOrder->getOrdlineByIDSeqNo(
+            $this->getParam('ordheadID'),
+            $this->getParam('sequenceNo'),
+            $dsOrdline
+        );
+
+        $renewalCustomerItemID = $dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
+
+        // has the order line get a renewal already?
+        if (!$renewalCustomerItemID) {
+
+
+            // create a new record first
+            $dsOrdhead = new DataSet($this);
+            $buSalesOrder->getOrderByOrdheadID(
+                $this->getParam('ordheadID'),
+                $dsOrdhead,
+                $dsDontNeedOrdline
+            );
+
+            $this->buRenBroadband->createNewRenewal(
+                $dsOrdhead->getValue(DBEJOrdhead::customerID),
+                $dsOrdline->getValue(DBEJOrdline::itemID),
+                $renewalCustomerItemID,
+                $dsOrdhead->getValue(DBEJOrdhead::delSiteNo)                // returned by function
+            );
+
+
+            // For despatch, prevents the renewal appearing again today during despatch process.
+            $dbeOrdline = new DBEOrdline($this);
+
+            $dbeOrdline->setValue(
+                DBEJOrdline::ordheadID,
+                $dsOrdline->getValue(DBEJOrdline::ordheadID)
+            );
+            $dbeOrdline->setValue(
+                DBEJOrdline::sequenceNo,
+                $dsOrdline->getValue(DBEJOrdline::sequenceNo)
+            );
+
+            $dbeOrdline->getRow();
+            $dbeOrdline->setValue(
+                DBEJOrdline::renewalCustomerItemID,
+                $renewalCustomerItemID
+            );
+
+            $dbeOrdline->updateRow();
+
+        }
+
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'edit',
+                    'ID'     => $renewalCustomerItemID
+                )
+            );
+
+        header('Location: ' . $urlNext);
+        exit;
     }// end function editActivity()
+
+    /**
+     * Delete Activity
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function delete()
+    {
+        $this->setMethodName('delete');
+        if (!$this->buRenBroadband->deleteRenBroadband($this->getParam('customerItemID'))) {
+            $this->displayFatalError('Cannot delete this broadband contract');
+            exit;
+        } else {
+            $urlNext =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'list'
+                    )
+                );
+            header('Location: ' . $urlNext);
+            exit;
+        }
+    }
 
     /**
      * Update call activity type details
@@ -745,41 +708,12 @@ class CTRenBroadband extends CTCNC
     }
 
     /**
-     * Delete Activity
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function delete()
-    {
-        $this->setMethodName('delete');
-        if (!$this->buRenBroadband->deleteRenBroadband($this->getParam('customerItemID'))) {
-            $this->displayFatalError('Cannot delete this broadband contract');
-            exit;
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'list'
-                    )
-                );
-            header('Location: ' . $urlNext);
-            exit;
-        }
-    }
-
-    /**
      * This function creates sales orders for the broadband renewals that are due
      *
      */
     function createRenewalsSalesOrders()
     {
-
         $this->buRenBroadband->createRenewalsSalesOrders();
-
-
     }
 
     /**
@@ -808,22 +742,85 @@ class CTRenBroadband extends CTCNC
 
     }// end function emailTo()
 
-    private function parseInitialContractLength($initialContractLength)
+    /**
+     * Display list of types
+     * @access private
+     * @throws Exception
+     */
+    function displayList()
     {
-        foreach (self::InitialContractLengthValues as $value) {
-            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    'initialContractLengthSelected'    => $initialContractLengthSelected,
-                    'initialContractLength'            => $value,
-                    'initialContractLengthDescription' => $value
-                )
+        $this->setMethodName('displayList');
+        $this->setPageTitle('Internet Services');
+        $this->setTemplateFiles(
+            array('RenBroadbandList' => 'RenBroadbandList.inc')
+        );
+        $dsRenBroadband = new DataSet($this);
+        $this->buRenBroadband->getAll(
+            $dsRenBroadband,
+            $this->getParam('orderBy')
+        );
+
+        if ($dsRenBroadband->rowCount() > 0) {
+            $this->template->set_block(
+                'RenBroadbandList',
+                'rowBlock',
+                'rows'
             );
-            $this->template->parse(
-                'initialContractLengths',
-                'initialContractLengthBlock',
-                true
-            );
+            while ($dsRenBroadband->fetchNext()) {
+
+                $customerItemID = $dsRenBroadband->getValue(DBEJRenBroadband::customerItemID);
+
+                $urlEdit =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action' => 'edit',
+                            'ID'     => $customerItemID
+                        )
+                    );
+
+                $urlList =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action' => 'list'
+                        )
+                    );
+
+                $txtEdit = '[edit]';
+
+                $this->template->set_var(
+                    array(
+                        'customerItemID'    => $customerItemID,
+                        'customerName'      => $dsRenBroadband->getValue(DBEJRenBroadband::customerName),
+                        'itemDescription'   => $dsRenBroadband->getValue(DBEJRenBroadband::itemDescription),
+                        'ispID'             => $dsRenBroadband->getValue(DBEJRenBroadband::ispID),
+                        'adslPhone'         => $dsRenBroadband->getValue(DBEJRenBroadband::adslPhone),
+                        'salePricePerMonth' => $dsRenBroadband->getValue(DBEJRenBroadband::salePricePerMonth),
+                        'costPricePerMonth' => $dsRenBroadband->getValue(DBEJRenBroadband::costPricePerMonth),
+                        'invoiceFromDate'   => Controller::dateYMDtoDMY(
+                            $dsRenBroadband->getValue(DBEJRenBroadband::invoiceFromDate)
+                        ),
+                        'invoiceToDate'     => Controller::dateYMDtoDMY(
+                            $dsRenBroadband->getValue(DBEJRenBroadband::invoiceToDate)
+                        ),
+                        'urlEdit'           => $urlEdit,
+                        'urlList'           => $urlList,
+                        'txtEdit'           => $txtEdit
+                    )
+                );
+                $this->template->parse(
+                    'rows',
+                    'rowBlock',
+                    true
+                );
+            }//while $dsRenBroadband->fetchNext()
         }
+        $this->template->parse(
+            'CONTENTS',
+            'RenBroadbandList',
+            true
+        );
+        $this->parsePage();
     }
 }

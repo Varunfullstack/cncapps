@@ -1,9 +1,17 @@
-<script src="popcalendar/popcalendar.js"></script>
+<script src="popcalendar/popcalendar.js">
+</script>
 <script language='JavaScript'
         src="CommonJS.js"
-></script>
+>
+</script>
 <script src=".javascript/DirectDebitLogic.js"
-></script>
+>
+</script>
+<style>
+    .fieldText input[type=number] {
+        width: 95px;
+    }
+</style>
 <script language='JavaScript'>
     const clientCheckDirectDebit = {clientCheckDirectDebit};
     $(function () {
@@ -87,6 +95,21 @@
         }
     }
 
+    function recalculateSalePrice() {
+        const monthSale = $('#unitSale').val() * $('#units').val();
+        $('#annualSalePrice').val((monthSale * 12).toFixed(2));
+    }
+
+    function recalculatePrices() {
+        recalculateSalePrice();
+        recalculateCostPrice();
+    }
+
+    function recalculateCostPrice() {
+        const monthCost = $('#unitCost').val() * $('#units').val();
+        $('#annualCostPrice').val((monthCost * 12).toFixed(2));
+    }
+
 </script>
 <!-- Template: RenContractEdit.inc.html -->
 <TABLE width="200px"
@@ -98,7 +121,9 @@
         <TD width="100px"
             class="navigateLink"
             valign="top"
-        ><a href="{urlDelete}">{txtDelete}</a></TD>
+        >
+            <a href="{urlDelete}">{txtDelete}</a>
+        </TD>
     </TR>
 </table>
 <FORM method="post"
@@ -175,36 +200,75 @@
         </TR>
         <tr>
             <td class="promptText">Item</td>
-            <td class="field"><input type="hidden"
-                                     name="renContract[1][itemID]"
-                                     id="itemID"
-                                     value="{itemID}"
-            > <input type="text"
-                     {readonly}
-                     name="renContract[1][itemDescription]"
-                     id="itemDescription"
-                     value="{itemDescription}"
-                     onChange="javascript:validateItemDescription()"
-                     onKeydown="javascript:checkFunctionKey(itemDescription)"
-                     size="50"
-                     maxlength="50"
-            > <font class="formErrorMessage">{itemDescriptionMessage}</font></td>
+            <td class="field">
+                <input type="hidden"
+                       name="renContract[1][itemID]"
+                       id="itemID"
+                       value="{itemID}"
+                >
+                <input type="text"
+                       {readonly}
+                       name="renContract[1][itemDescription]"
+                       id="itemDescription"
+                       value="{itemDescription}"
+                       onChange="javascript:validateItemDescription()"
+                       onKeydown="javascript:checkFunctionKey(itemDescription)"
+                       size="50"
+                       maxlength="50"
+                > <font class="formErrorMessage">{itemDescriptionMessage}</font>
+            </td>
         </tr>
         {prices}
         <tr>
+            <td class="promptText">Number of Users/Units</td>
+            <td class="fieldText">
+                <input name="renContract[1][users]"
+                       type="number"
+                       value="{users}"
+                       title="Users"
+                       onkeyup="recalculatePrices()"
+                       id="units"
+                >
+                <span class="formErrorMessage">{usersMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Unit Sale Price/Month</td>
+            <td class="fieldText">
+                <input type="number"
+                       value="{unitSalePriceMonth}"
+                       onkeyup="recalculateSalePrice()"
+                       id="unitSale"
+                       step="0.01"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Unit Cost Price/Month</td>
+            <td class="fieldText">
+                <input type="number"
+                       value="{unitCostPriceMonth}"
+                       onkeyup="recalculateCostPrice()"
+                       id="unitCost"
+                       step="0.01"
+                >
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">Installation Date</td>
-            <td class="fieldText"><input name="renContract[1][installationDate]"
-                                         type="text"
-                                         value="{installationDate}"
-                                         {readonly}
-                                         size="10"
-                                         maxlength="10"
-                                         class="jqueryCalendar"
-                                         data-jqueryCalendarBeforeShowDay="beforeShowDay"
-                                         required
-                                         readonly="readonly"
-                                         id="installationDate"
-            >
+            <td class="fieldText">
+                <input name="renContract[1][installationDate]"
+                       type="text"
+                       value="{installationDate}"
+                       {readonly}
+                       size="10"
+                       maxlength="10"
+                       class="jqueryCalendar"
+                       data-jqueryCalendarBeforeShowDay="beforeShowDay"
+                       required
+                       readonly="readonly"
+                       id="installationDate"
+                >
                 <span class="formErrorMessage">{installationDateMessage}</span>
             </td>
             <td class="promptText">
@@ -225,14 +289,16 @@
         </tr>
         <tr>
             <td class="promptText">Total Invoiced (months)</td>
-            <td class="fieldText"><input name="renContract[1][totalInvoiceMonths]"
-                                         type="text"
-                                         value="{totalInvoiceMonths}"
-                                         {readonly}
-                                         size="10"
-                                         maxlength="10"
-            >
-                <span class="formErrorMessage">{totalInvoiceMonthsMessage}</span></td>
+            <td class="fieldText">
+                <input name="renContract[1][totalInvoiceMonths]"
+                       type="text"
+                       value="{totalInvoiceMonths}"
+                       {readonly}
+                       size="10"
+                       maxlength="10"
+                >
+                <span class="formErrorMessage">{totalInvoiceMonthsMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Invoice Interval (months)</td>
@@ -245,7 +311,8 @@
                        maxlength="10"
                        id="invoiceInterval"
                 >
-                <span class="formErrorMessage">{invoicePeriodMonthsMessage}</span></td>
+                <span class="formErrorMessage">{invoicePeriodMonthsMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText">Contract Expiry Date</td>
@@ -277,19 +344,10 @@
                        size="45"
                        maxlength="45"
                 >
-                <span class="formErrorMessage">{notesMessage}</span></td>
+                <span class="formErrorMessage">{notesMessage}</span>
+            </td>
         </tr>
-        <tr>
-            <td class="promptText">Number of Users</td>
-            <td class="fieldText"><input name="renContract[1][users]"
-                                         type="text"
-                                         value="{users}"
-                                         title="Users"
-                                         size="10"
-                                         maxlength="10"
-            >
-                <span class="formErrorMessage">{usersMessage}</span></td>
-        </tr>
+
         {declined}
         <tr>
             <td class="promptText">Part No</td>
@@ -308,22 +366,25 @@
                        autocomplete="off"
                        class="jQueryCalendar"
                 >
-                <font class="formErrorMessage">{despatchDateMessage}</font></TD>
+                <font class="formErrorMessage">{despatchDateMessage}</font>
+            </TD>
         </TR>
         {renContractPrePayFields}
         <TR>
             <TD class="promptText">Billing End Date</TD>
-            <TD class="field"><input type="text"
-                                     id="expiryDate"
-                                     {readonly}
-                                     name="renContract[1][expiryDate]"
-                                     size="10"
-                                     maxlength="10"
-                                     value="{expiryDate}"
-                                     autocomplete="off"
-                                     class="jQueryCalendar"
-            >
-                <font class="formErrorMessage">{expiryDateMessage}</font></TD>
+            <TD class="field">
+                <input type="text"
+                       id="expiryDate"
+                       {readonly}
+                       name="renContract[1][expiryDate]"
+                       size="10"
+                       maxlength="10"
+                       value="{expiryDate}"
+                       autocomplete="off"
+                       class="jQueryCalendar"
+                >
+                <font class="formErrorMessage">{expiryDateMessage}</font>
+            </TD>
         </TR>
 
         <tr>
@@ -334,14 +395,16 @@
                 <select {disabled}
                         name="renContract[1][renewalStatus]"
                 >
-                    <option value=""></option>
+                    <option value="">
+                    </option>
                     <!-- BEGIN renewalStatusBlock -->
                     <option {renewalStatusSelected}
                             value="{renewalStatusValue}"
                     >{renewalStatusDescription}
                     </option>
                     <!-- END renewalStatusBlock -->
-                </select></td>
+                </select>
+            </td>
         </tr>
         <tr>
             <td valign="top"
@@ -441,9 +504,11 @@
 <table class="singleBorder">
     <!-- BEGIN coveredItemsBlock -->
     <tr class="singleBorder">
-        <td><a href="{coveredItemUrl}"
+        <td>
+            <a href="{coveredItemUrl}"
                target="_blank"
-        >{coveredItemDescription}</a></td>
+            >{coveredItemDescription}</a>
+        </td>
         <td>{coveredItemSerialNo}</td>
     </tr>
     <!-- END coveredItemsBlock -->

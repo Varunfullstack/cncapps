@@ -205,7 +205,6 @@ class DBEJRenQuotation extends DBECustomerItem
      * Get all renewals due in 1 months time
      *
      * i.e. Start date plus 11 months
-     *
      */
     function getRenewalsDueRows()
     {
@@ -223,8 +222,8 @@ class DBEJRenQuotation extends DBECustomerItem
         CURDATE() >= ( DATE_ADD(`startDate`, INTERVAL 11 MONTH) )
 			  AND dateGenerated IS NULL
 		    AND declinedFlag = 'N'
-        AND renewalTypeID = 3 and directDebitFlag <> 'Y'
-		 ORDER BY cui_custno,  custitem.renQuotationTypeID";
+        AND renewalTypeID = 3 and directDebitFlag <> 'Y'";
+        $statement .= "ORDER BY cui_custno,  custitem . renQuotationTypeID";
 
         $this->setQueryString($statement);
         $ret = (parent::getRows());
@@ -250,10 +249,10 @@ class DBEJRenQuotation extends DBECustomerItem
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
       JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
-      JOIN renQuotationType ON  renQuotationType.renQuotationTypeID = custitem.renQuotationTypeID
-      WHERE cui_cuino IN ( " . $commaListOfIDs . " )
-        AND renewalTypeID = 3 and directDebitFlag <> 'Y'
-      ORDER BY cui_custno,  custitem.renQuotationTypeID
+      JOIN renQuotationType ON  renQuotationType . renQuotationTypeID = custitem . renQuotationTypeID
+      WHERE cui_cuino IN(" . $commaListOfIDs . ")
+    AND renewalTypeID = 3 and directDebitFlag <> 'Y'
+      ORDER BY cui_custno,  custitem . renQuotationTypeID
      ";
 
         $this->setQueryString($statement);
@@ -277,10 +276,10 @@ class DBEJRenQuotation extends DBECustomerItem
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
-			JOIN renQuotationType ON  renQuotationType.renQuotationTypeID = custitem.renQuotationTypeID
-			WHERE dateGenerated > DATE_SUB( CURDATE(), INTERVAL 2 WEEK )
+			JOIN renQuotationType ON  renQuotationType . renQuotationTypeID = custitem . renQuotationTypeID
+			WHERE dateGenerated > DATE_SUB(CURDATE(), INTERVAL 2 WEEK )
 		 AND declinedFlag = 'N'
-     AND renewalTypeID = 3
+    AND renewalTypeID = 3
 		 ORDER BY cui_custno
 		 ";
 

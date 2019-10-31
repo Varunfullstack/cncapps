@@ -113,6 +113,24 @@ class CTItemBillingCategory extends CTCNC
                 }
                 echo json_encode($data, JSON_NUMERIC_CHECK);
                 break;
+            case 'searchName':
+                $term = '';
+                if (isset($_REQUEST['term'])) {
+                    $term = $_REQUEST['term'];
+                }
+                $dbeItemBillingCategories = new DBEItemBillingCategory($this);
+                $dbeItemBillingCategories->getRows(DBEItemBillingCategory::name);
+                $data = [];
+                while ($dbeItemBillingCategories->fetchNext()) {
+                    if (preg_match(
+                        '/.*' . $term . '.*/i',
+                        $dbeItemBillingCategories->getValue(DBEItemBillingCategory::name)
+                    )) {
+                        $data[] = $dbeItemBillingCategories->getValue(DBEItemBillingCategory::name);
+                    }
+                }
+                echo json_encode($data);
+                break;
             case 'displayForm':
             default:
                 $this->displayForm();

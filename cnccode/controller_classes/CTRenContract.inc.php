@@ -24,15 +24,6 @@ class CTRenContract extends CTCNC
     const siteDesc = 'siteDesc';
     const costPrice = 'costPrice';
     const salePrice = 'salePrice';
-
-    public $dsRenContract;
-    public $buRenContract;
-    public $buCustomerItem;
-    public $renewalStatusArray = array(
-        "D" => "Declined",
-        "R" => "Renewed"
-    );
-
     const InitialContractLengthValues = [
         12,
         24,
@@ -40,6 +31,13 @@ class CTRenContract extends CTCNC
         48,
         60
     ];
+    public $dsRenContract;
+    public $buRenContract;
+    public $buCustomerItem;
+    public $renewalStatusArray = array(
+        "D" => "Declined",
+        "R" => "Renewed"
+    );
 
     function __construct($requestMethod,
                          $postVars,
@@ -132,163 +130,45 @@ class CTRenContract extends CTCNC
             case 'createRenewalsSalesOrders':
                 $this->createRenewalsSalesOrders();
                 break;
+            case 'searchDesc':
+                $itemsPerPage = 20;
+                $page = 1;
+                $term = '';
+                if (isset($_REQUEST['term'])) {
+                    $term = $_REQUEST['term'];
+                }
+
+                if (isset($_REQUEST['itemsPerPage'])) {
+                    $itemsPerPage = $_REQUEST['itemsPerPage'];
+                }
+
+                if (isset($_REQUEST['page'])) {
+                    $page = $_REQUEST['page'];
+                }
+
+                global $db;
+                $result = $db->preparedQuery(
+                    "select distinct(itm_desc) as contractDesc from custitem left join item ON itm_itemno = cui_itemno where declinedFlag = 'N' and directDebitFlag <> 'Y'
+        AND renewalTypeID = 2 and itm_desc like ? order by contractDesc",
+                    [
+                        [
+                            "type"  => "s",
+                            "value" => '%' . $term . '%'
+                        ]
+                    ]
+                );
+                if (!$result) {
+                    echo json_encode(["error" => $db->errorInfo()]);
+                    http_response_code(400);
+                }
+                $data = $result->fetch_all(MYSQLI_NUM);
+                echo json_encode(array_column($data, 0));
+                break;
             case 'list':
             default:
                 $this->displayList();
                 break;
         }
-    }
-
-    /**
-     * Display list of types
-     * @access private
-     * @throws Exception
-     */
-    function displayList()
-    {
-        $this->setMethodName('displayList');
-        $this->setPageTitle('Contract Renewals');
-        $this->setTemplateFiles(
-            array('RenContractList' => 'RenContractList.inc')
-        );
-        $dsRenContract = new DataSet($this);
-        $this->buRenContract->getAll(
-            $dsRenContract,
-            $this->getParam('orderBy')
-        );
-
-        if ($dsRenContract->rowCount() > 0) {
-            $this->template->set_block(
-                'RenContractList',
-                'rowBlock',
-                'rows'
-            );
-            while ($dsRenContract->fetchNext()) {
-
-                $customerItemID = $dsRenContract->getValue(DBEJRenContract::customerItemID);
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'edit',
-                            'ID'     => $customerItemID
-                        )
-                    );
-                $txtEdit = '[edit]';
-
-                $urlList =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'list'
-                        )
-                    );
-
-                $this->template->set_var(
-                    array(
-                        'customerName'    => $dsRenContract->getValue(DBEJRenContract::customerName),
-                        'itemDescription' => $dsRenContract->getValue(DBEJRenContract::itemDescription),
-                        'invoiceFromDate' => Controller::dateYMDtoDMY(
-                            $dsRenContract->getValue(DBEJRenContract::invoiceFromDate)
-                        ),
-                        'invoiceToDate'   => Controller::dateYMDtoDMY(
-                            $dsRenContract->getValue(DBEJRenContract::invoiceToDate)
-                        ),
-                        'notes'           => Controller::dateYMDtoDMY($dsRenContract->getValue(DBEJRenContract::notes)),
-                        'urlEdit'         => $urlEdit,
-                        'urlList'         => $urlList,
-                        'txtEdit'         => $txtEdit
-                    )
-                );
-                $this->template->parse(
-                    'rows',
-                    'rowBlock',
-                    true
-                );
-            }//while $dsRenContract->fetchNext()
-        }
-        $this->template->parse(
-            'CONTENTS',
-            'RenContractList',
-            true
-        );
-        $this->parsePage();
-    }
-
-    /**
-     * Called from sales order line to edit a renewal.
-     * The page passes
-     * ordheadID
-     * sequenceNo (line)
-     * renewalCustomerItemID (blank if renewal not created yet
-     *
-     *
-     * @throws Exception
-     */
-    function editFromSalesOrder()
-    {
-        $buSalesOrder = new BUSalesOrder($this);
-        $dsOrdline = new DataSet($this);
-        $buSalesOrder->getOrdlineByIDSeqNo(
-            $this->getParam('ordheadID'),
-            $this->getParam('sequenceNo'),
-            $dsOrdline
-        );
-
-        $renewalCustomerItemID = $dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
-
-        // has the order line get a renewal already?
-        if (!$renewalCustomerItemID) {
-            // create a new record first
-            $dsOrdhead = new DataSet($this);
-            $buSalesOrder->getOrderByOrdheadID(
-                $this->getParam('ordheadID'),
-                $dsOrdhead,
-                $dsDontNeedOrdline
-            );
-
-            $this->buRenContract->createNewRenewal(
-                $dsOrdhead->getValue(DBEJOrdhead::customerID),
-                $dsOrdline->getValue(DBEJOrdline::itemID),
-                $renewalCustomerItemID,
-                $dsOrdhead->getValue(DBEJOrdhead::delSiteNo)                // returned by function
-            );
-
-
-            // For despatch, prevents the renewal appearing again today during despatch process.
-            $dbeOrdline = new DBEOrdline($this);
-
-            $dbeOrdline->setValue(
-                DBEJOrdline::ordheadID,
-                $dsOrdline->getValue(DBEJOrdline::ordheadID)
-            );
-            $dbeOrdline->setValue(
-                DBEJOrdline::sequenceNo,
-                $dsOrdline->getValue(DBEJOrdline::sequenceNo)
-            );
-
-            $dbeOrdline->getRow();
-            $dbeOrdline->setValue(
-                DBEJOrdline::renewalCustomerItemID,
-                $renewalCustomerItemID
-            );
-
-            $dbeOrdline->updateRow();
-
-        }
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'edit',
-                    'ID'     => $renewalCustomerItemID
-                )
-            );
-
-        header('Location: ' . $urlNext);
-        exit;
     }
 
     /**
@@ -374,10 +254,12 @@ class CTRenContract extends CTCNC
             $prices =
                 '<tr>
             <td class="promptText">Sale Price/Annum </td>
-            <td class="fieldText"><input
-              name="renContract[1][curUnitSale]"
+            <td class="fieldText">
+            <input name="renContract[1][curUnitSale]"
               type="text" value="' . Controller::htmlInputText($dsRenContract->getValue(DBEJRenContract::curUnitSale)) . '"
               size="10"
+              id="annualSalePrice"
+              readonly
               maxlength="10">
                     <span class="formErrorMessage">' . Controller::htmlDisplayText(
                     $dsRenContract->getMessage(DBEJRenContract::curUnitSale)
@@ -387,9 +269,10 @@ class CTRenContract extends CTCNC
             <td class="promptText">Cost Price/Annum</td>
             <td class="fieldText"><input
               name="renContract[1][curUnitCost]"
+              id="annualCostPrice"
               type="text" value="' . Controller::htmlInputText($dsRenContract->getValue(DBEJRenContract::curUnitCost)) . '"
-              {readonly}
               size="10"
+              readonly
               maxlength="10" />
                     <span class="formErrorMessage">' . Controller::htmlDisplayText(
                     $dsRenContract->getMessage(DBEJRenContract::curUnitCost)
@@ -468,7 +351,6 @@ class CTRenContract extends CTCNC
             )->format('d/m/Y');
         }
 
-
         $this->template->set_var(
             array(
                 'customerItemID'                     => $dsRenContract->getValue(DBEJRenContract::customerItemID),
@@ -481,6 +363,12 @@ class CTRenContract extends CTCNC
                 'users'                              => Controller::htmlDisplayText(
                     $dsRenContract->getValue(DBEJRenContract::users)
                 ),
+                'unitSalePriceMonth'                 => ($dsRenContract->getValue(
+                            DBEJRenContract::curUnitSale
+                        ) / 12) / $dsRenContract->getValue(DBEJRenContract::users),
+                'unitCostPriceMonth'                 => ($dsRenContract->getValue(
+                            DBEJRenContract::curUnitCost
+                        ) / 12) / $dsRenContract->getValue(DBEJRenContract::users),
                 'siteDesc'                           => Controller::htmlDisplayText(
                     $dsRenContract->getValue(DBEJRenContract::siteName)
                 ),
@@ -729,6 +617,125 @@ class CTRenContract extends CTCNC
     }
 
     /**
+     * Display the renewal status drop-down selector
+     *
+     * @access private
+     * @param $renewalStatus
+     */
+    function parseRenewalSelector($renewalStatus)
+    {
+        foreach ($this->renewalStatusArray as $key => $value) {
+            $renewalStatusSelected = ($renewalStatus == $key) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    'renewalStatusSelected'    => $renewalStatusSelected,
+                    'renewalStatusValue'       => $key,
+                    'renewalStatusDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'renewalStatus',
+                'renewalStatusBlock',
+                true
+            );
+        }
+    }
+
+    private function parseInitialContractLength($initialContractLength)
+    {
+        foreach (self::InitialContractLengthValues as $value) {
+            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    'initialContractLengthSelected'    => $initialContractLengthSelected,
+                    'initialContractLength'            => $value,
+                    'initialContractLengthDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'initialContractLengths',
+                'initialContractLengthBlock',
+                true
+            );
+        }
+    }
+
+    /**
+     * Called from sales order line to edit a renewal.
+     * The page passes
+     * ordheadID
+     * sequenceNo (line)
+     * renewalCustomerItemID (blank if renewal not created yet
+     *
+     *
+     * @throws Exception
+     */
+    function editFromSalesOrder()
+    {
+        $buSalesOrder = new BUSalesOrder($this);
+        $dsOrdline = new DataSet($this);
+        $buSalesOrder->getOrdlineByIDSeqNo(
+            $this->getParam('ordheadID'),
+            $this->getParam('sequenceNo'),
+            $dsOrdline
+        );
+
+        $renewalCustomerItemID = $dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
+
+        // has the order line get a renewal already?
+        if (!$renewalCustomerItemID) {
+            // create a new record first
+            $dsOrdhead = new DataSet($this);
+            $buSalesOrder->getOrderByOrdheadID(
+                $this->getParam('ordheadID'),
+                $dsOrdhead,
+                $dsDontNeedOrdline
+            );
+
+            $this->buRenContract->createNewRenewal(
+                $dsOrdhead->getValue(DBEJOrdhead::customerID),
+                $dsOrdline->getValue(DBEJOrdline::itemID),
+                $renewalCustomerItemID,
+                $dsOrdhead->getValue(DBEJOrdhead::delSiteNo)                // returned by function
+            );
+
+
+            // For despatch, prevents the renewal appearing again today during despatch process.
+            $dbeOrdline = new DBEOrdline($this);
+
+            $dbeOrdline->setValue(
+                DBEJOrdline::ordheadID,
+                $dsOrdline->getValue(DBEJOrdline::ordheadID)
+            );
+            $dbeOrdline->setValue(
+                DBEJOrdline::sequenceNo,
+                $dsOrdline->getValue(DBEJOrdline::sequenceNo)
+            );
+
+            $dbeOrdline->getRow();
+            $dbeOrdline->setValue(
+                DBEJOrdline::renewalCustomerItemID,
+                $renewalCustomerItemID
+            );
+
+            $dbeOrdline->updateRow();
+
+        }
+
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'edit',
+                    'ID'     => $renewalCustomerItemID
+                )
+            );
+
+        header('Location: ' . $urlNext);
+        exit;
+    }
+
+    /**
      * Update call activity type details
      * @access private
      * @throws Exception
@@ -789,46 +796,79 @@ class CTRenContract extends CTCNC
     }
 
     /**
-     * Display the renewal status drop-down selector
-     *
+     * Display list of types
      * @access private
-     * @param $renewalStatus
+     * @throws Exception
      */
-    function parseRenewalSelector($renewalStatus)
+    function displayList()
     {
-        foreach ($this->renewalStatusArray as $key => $value) {
-            $renewalStatusSelected = ($renewalStatus == $key) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    'renewalStatusSelected'    => $renewalStatusSelected,
-                    'renewalStatusValue'       => $key,
-                    'renewalStatusDescription' => $value
-                )
-            );
-            $this->template->parse(
-                'renewalStatus',
-                'renewalStatusBlock',
-                true
-            );
-        }
-    }
+        $this->setMethodName('displayList');
+        $this->setPageTitle('Contract Renewals');
+        $this->setTemplateFiles(
+            array('RenContractList' => 'RenContractList.inc')
+        );
+        $dsRenContract = new DataSet($this);
+        $this->buRenContract->getAll(
+            $dsRenContract,
+            $this->getParam('orderBy')
+        );
 
-    private function parseInitialContractLength($initialContractLength)
-    {
-        foreach (self::InitialContractLengthValues as $value) {
-            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    'initialContractLengthSelected'    => $initialContractLengthSelected,
-                    'initialContractLength'            => $value,
-                    'initialContractLengthDescription' => $value
-                )
+        if ($dsRenContract->rowCount() > 0) {
+            $this->template->set_block(
+                'RenContractList',
+                'rowBlock',
+                'rows'
             );
-            $this->template->parse(
-                'initialContractLengths',
-                'initialContractLengthBlock',
-                true
-            );
+            while ($dsRenContract->fetchNext()) {
+
+                $customerItemID = $dsRenContract->getValue(DBEJRenContract::customerItemID);
+
+                $urlEdit =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action' => 'edit',
+                            'ID'     => $customerItemID
+                        )
+                    );
+                $txtEdit = '[edit]';
+
+                $urlList =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action' => 'list'
+                        )
+                    );
+
+                $this->template->set_var(
+                    array(
+                        'customerName'    => $dsRenContract->getValue(DBEJRenContract::customerName),
+                        'itemDescription' => $dsRenContract->getValue(DBEJRenContract::itemDescription),
+                        'invoiceFromDate' => Controller::dateYMDtoDMY(
+                            $dsRenContract->getValue(DBEJRenContract::invoiceFromDate)
+                        ),
+                        'invoiceToDate'   => Controller::dateYMDtoDMY(
+                            $dsRenContract->getValue(DBEJRenContract::invoiceToDate)
+                        ),
+                        'notes'           => Controller::dateYMDtoDMY($dsRenContract->getValue(DBEJRenContract::notes)),
+                        'urlEdit'         => $urlEdit,
+                        'urlList'         => $urlList,
+                        'txtEdit'         => $txtEdit
+                    )
+                );
+                $this->template->parse(
+                    'rows',
+                    'rowBlock',
+                    true
+                );
+            }//while $dsRenContract->fetchNext()
         }
+        $this->template->parse(
+            'CONTENTS',
+            'RenContractList',
+            true
+        );
+        $this->parsePage();
     }
 }

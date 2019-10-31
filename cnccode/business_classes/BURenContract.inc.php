@@ -131,11 +131,11 @@ class BURenContract extends Business
 
     /**
      * @param string $toEmail
+     * @param null $itemBillingCategory
      */
-    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL
-    )
+    function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL, $itemBillingCategory = null)
     {
-        $this->dbeJRenContract->getRenewalsDueRows();
+        $this->dbeJRenContract->getRenewalsDueRows($itemBillingCategory);
 
         $buMail = new BUMail($this);
         $senderEmail = CONFIG_SALES_EMAIL;
@@ -195,16 +195,17 @@ class BURenContract extends Business
     }
 
     /**
+     * @param null $itemBillingCategoryID
      * @throws Exception
      */
-    function createRenewalsSalesOrders()
+    function createRenewalsSalesOrders($itemBillingCategoryID = null)
     {
         $buSalesOrder = new BUSalesOrder ($this);
 
         $buInvoice = new BUInvoice ($this);
         $buActivity = new BUActivity ($this);
 
-        $this->dbeJRenContract->getRenewalsDueRows();
+        $this->dbeJRenContract->getRenewalsDueRows(null, $itemBillingCategoryID);
 
         $dsRenContract = new DSForm($this);
         $dsRenContract->replicate($this->dbeJRenContract);
@@ -326,7 +327,7 @@ class BURenContract extends Business
                 /**
                  * add notes as a comment line (if they exist)
                  */
-                if ($dsRenContract->getValue(DBEJRenContract::notes)) {
+                if ($dsRenContract->getValue(DBEJRenContract::notes) && !$itemBillingCategoryID) {
 
                     $line++;
 
@@ -440,8 +441,8 @@ class BURenContract extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::qtyOrdered,
-                    1
-                ); // default 1
+                    $itemBillingCategoryID ? $dbeJCustomerItem->getValue(DBEJCustomerItem::users) : 1
+                );
                 $dbeOrdline->setValue(
                     DBEOrdline::qtyDespatched,
                     0
@@ -452,13 +453,20 @@ class BURenContract extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::curUnitSale,
-                    ($dbeJCustomerItem->getValue(DBECustomerItem::curUnitSale) / 12) *
-                    $dsRenContract->getValue(DBECustomerItem::invoicePeriodMonths)
+                    $itemBillingCategoryID ?
+                        ($dbeJCustomerItem->getValue(DBECustomerItem::curUnitSale) / 12 / $dsRenContract->getValue(
+                                DBEJRenContract::users
+                            )) : (($dbeJCustomerItem->getValue(DBECustomerItem::curUnitSale) / 12) *
+                        $dsRenContract->getValue(DBECustomerItem::invoicePeriodMonths))
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::curUnitCost,
-                    ($dbeJCustomerItem->getValue(DBECustomerItem::curUnitCost) / 12) *
-                    $dsRenContract->getValue(DBECustomerItem::invoicePeriodMonths)
+                    $itemBillingCategoryID ? ($dbeJCustomerItem->getValue(
+                            DBECustomerItem::curUnitCost
+                        ) / 12 / $dsRenContract->getValue(
+                            DBEJRenContract::users
+                        )) : ($dbeJCustomerItem->getValue(DBECustomerItem::curUnitCost) / 12) *
+                        $dsRenContract->getValue(DBECustomerItem::invoicePeriodMonths)
                 );
 
                 $dbeOrdline->insertRow();

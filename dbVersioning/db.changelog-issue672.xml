@@ -45,4 +45,16 @@
                                  onDelete="RESTRICT"
         />
     </changeSet>
+    <changeSet author="pavwebdev" id="issue672-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="consultant" columnName="createRenewalSalesOrdersFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="createRenewalSalesOrdersFlag" type="char(1)" defaultValue="N">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

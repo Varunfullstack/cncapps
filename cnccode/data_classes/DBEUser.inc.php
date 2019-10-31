@@ -63,6 +63,7 @@ class DBEUser extends DBEntity
     const changeSRContractsFlag = 'changeSRContractsFlag';
     const starterLeaverQuestionManagementFlag = 'starterLeaverQuestionManagementFlag';
     const offsiteBackupAdditionalPermissionsFlag = 'offsiteBackupAdditionalPermissionsFlag';
+    const createRenewalSalesOrdersFlag = "createRenewalSalesOrdersFlag";
 
     /**
      * calls constructor()
@@ -358,6 +359,11 @@ class DBEUser extends DBEntity
 
         $this->addColumn(
             self::offsiteBackupAdditionalPermissionsFlag,
+            DA_YN,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::createRenewalSalesOrdersFlag,
             DA_YN,
             DA_NOT_NULL
         );
