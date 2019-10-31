@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUPasswordService.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -68,6 +69,7 @@ class CTPasswordServices extends CTCNC
     function defaultAction()
     {
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
+
         switch ($this->getAction()) {
             case CTPasswordService_ACT_EDIT:
             case CTPasswordService_ACT_CREATE:
@@ -80,7 +82,7 @@ class CTPasswordServices extends CTCNC
                 $this->update();
                 break;
             /** @noinspection PhpMissingBreakStatementInspection */
-            case ctQuotationTemplates_ACT_CHANGE_ORDER:
+            case CT_PASSWORD_SERVICE_ACT_CHANGE_ORDER:
                 $this->changeOrder();
             case CTPASSWORDSERVICE_ACT_DISPLAY_LIST:
             default:
