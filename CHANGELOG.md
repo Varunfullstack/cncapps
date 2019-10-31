@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 535 - PrePay statements, alert if hidden charges on the SR
 - Issue 666 - System Header & Review Meeting Text Formatting
 - Issue 673 - O365 Report on Spare Licenses not saving
+- Issue 670 - Mailbox Export script identify Equipment Mailboxes
 
 ## [v3.7.0] 
 ### Added
