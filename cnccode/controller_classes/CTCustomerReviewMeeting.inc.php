@@ -299,10 +299,6 @@ class CTCustomerReviewMeeting extends CTCNC
                     )
                 );
                 $textTemplate->set_var(
-                    'thirdPartyServerAccess',
-                    $this->getThirdPartyServerAccessBody($customerId)
-                );
-                $textTemplate->set_var(
                     'reviewMeetingFrequency',
                     $this->getReviewMeetingFrequencyBody($dsCustomer)
                 );
@@ -1019,33 +1015,6 @@ class CTCustomerReviewMeeting extends CTCNC
         );
 
         return $startersAndLeaversTemplate->get_var('output');
-    }
-
-    private function getThirdPartyServerAccessBody($customerId)
-    {
-        $BUCustomerItem = new BUCustomerItem($this);
-        /** @var DataSet $datasetContracts */
-        $datasetContracts = null;
-        $BUCustomerItem->getServerCareValidContractsByCustomerID(
-            $customerId,
-            $datasetContracts
-        );
-
-        $thirdPartyServerAccess = null;
-
-        if ($datasetContracts->rowCount()) {
-            $test = new BUCustomerItem($this);
-            $datasetServerWatch = new DataSet($this);
-            $test->getServerWatchContractByCustomerID(
-                $customerId,
-                $datasetServerWatch
-            );
-            if (!$datasetServerWatch->rowCount()) {
-                $thirdPartyServerAccess = "<h2>Third-Party Server Access</h2>";
-            }
-
-        }
-        return $thirdPartyServerAccess;
     }
 
     /**

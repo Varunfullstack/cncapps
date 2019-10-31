@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 638 - Allow Multiple dropping of files when uploading documents
 - Issue 535 - PrePay statements, alert if hidden charges on the SR
+- Issue 666 - System Header & Review Meeting Text Formatting
 
 ## [v3.7.0] 
 ### Added
