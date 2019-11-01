@@ -37,6 +37,7 @@ class DBECallActivity extends DBEntity
     const secondsiteErrorServer = "secondsiteErrorServer";
     const secondsiteErrorCustomerItemID = "secondsiteErrorCustomerItemID";
     const salesRequestStatus = 'salesRequestStatus';
+    const isSalesRequestSR = 'isSalesRequestSR';
 
     /**
      * calls constructor()
@@ -222,6 +223,14 @@ class DBECallActivity extends DBEntity
             self::salesRequestStatus,
             DA_TEXT,
             DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::isSalesRequestSR,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
         );
 
         $this->setPK(0);

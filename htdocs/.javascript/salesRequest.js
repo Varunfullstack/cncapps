@@ -39,14 +39,27 @@ function changeTemplate() {
     CKEDITOR.instances.salesRequestText.setData(html);
 }
 
+function startCreateSalesRequest(customerID, domElement) {
+    initializeSalesRequest();
+    salesRequest.customerID = customerID;
+    domElement.innerHTML = salesRequestDialogTemplate;
+    hookCKEditor();
+    populateOptions();
+}
+
 function sendSalesRequest() {
     var object = {
         message: CKEDITOR.instances.salesRequestText.getData(),
         type: $('#templateSelector').val()
     };
 
+    let URL = 'Activity.php?action=sendSalesRequest&problemID=' + window.salesRequest.problemID;
+    if (window.salesRequest.customerID) {
+        URL = 'CreateSalesRequest.php?action=createSalesRequest&customerID=' + window.salesRequest.customerID;
+    }
+
     $.ajax({
-        url: 'Activity.php?action=sendSalesRequest&problemID=' + window.salesRequest.problemID,
+        url: URL,
         method: 'POST',
         type: 'post',
         dataType: 'json',
@@ -64,25 +77,24 @@ function sendSalesRequest() {
 }
 
 function cancelSalesRequest() {
-    window.salesRequest.dialogTemplate.dialog('close');
+    $('#templateSelector').val("");
+    CKEDITOR.instances.salesRequestText.setData("");
+    if (window.salesRequest.dialogTemplate) {
+        window.salesRequest.dialogTemplate.dialog('close');
+    }
+    if (window.salesRequest.onCancel) {
+        window.salesRequest.onCancel();
+    }
+
 }
 
-function startSalesRequest(problemID) {
+function initializeSalesRequest() {
     if (!window.salesRequest) {
         window.salesRequest = {};
     }
-    window.salesRequest.problemID = problemID;
+}
 
-    if (!window.salesRequest.dialogTemplate) {
-        window.salesRequest.dialogTemplate = $(salesRequestDialogTemplate).dialog({autoOpen: true, width: 910});
-        CKEDITOR.replace('salesRequestText', {customConfig: '/ckeditor_config.js'});
-    } else {
-        window.salesRequest.dialogTemplate.dialog('open');
-    }
-
-    // we need to pull the available templates
-
-
+function populateOptions() {
     $.ajax({
         url: 'StandardText.php?action=getSalesRequestOptions',
         method: 'get',
@@ -99,4 +111,23 @@ function startSalesRequest(problemID) {
         )
 
     });
+}
+
+function hookCKEditor() {
+    CKEDITOR.replace('salesRequestText', {customConfig: '/ckeditor_config.js'});
+}
+
+function startSalesRequest(problemID, domElement = null) {
+    initializeSalesRequest();
+    window.salesRequest.problemID = problemID;
+
+    if (!window.salesRequest.dialogTemplate) {
+        window.salesRequest.dialogTemplate = $(salesRequestDialogTemplate).dialog({autoOpen: true, width: 910});
+        hookCKEditor();
+    } else {
+        window.salesRequest.dialogTemplate.dialog('open');
+    }
+
+    // we need to pull the available templates
+    populateOptions();
 }

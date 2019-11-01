@@ -7,6 +7,7 @@
  */
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
+require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 
 class CTCreateSalesRequest extends CTCNC
 {
@@ -35,15 +36,51 @@ class CTCreateSalesRequest extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
 
         switch ($this->getAction()) {
+            case 'createSalesRequest':
+                if (!isset($_REQUEST['customerID'])) {
+                    echo json_encode(["error" => "Customer ID is missing"]);
+                    http_response_code(400);
+                    exit;
+                }
+                $customerID = $_REQUEST['customerID'];
+
+                if (!isset($_REQUEST['message'])) {
+                    echo json_encode(["error" => "Message is missing"]);
+                    http_response_code(400);
+                    exit;
+                }
+                $message = $_REQUEST['message'];
+                if (!isset($_REQUEST['type'])) {
+                    echo json_encode(["error" => "Type is missing"]);
+                    http_response_code(400);
+                    exit;
+                }
+                $type = $_REQUEST['type'];
+                try {
+                    $this->createSalesRequest($customerID, $message, $type);
+                } catch (\Exception $exception) {
+                    echo json_encode(["error" => $exception->getMessage()]);
+                    http_response_code(400);
+                    exit;
+                }
+                echo json_encode(["status" => "ok"]);
+                break;
             default:
                 $this->showPage();
                 break;
         }
+    }
+
+    function createSalesRequest($customerID, $message, $type)
+    {
+        $buActivity = new BUActivity($this);
+        $buActivity->sendSalesRequest(null, $message, $type, true, $customerID);
     }
 
     /**
@@ -52,74 +89,15 @@ class CTCreateSalesRequest extends CTCNC
     function showPage()
     {
         $this->setTemplateFiles(
-            'ChangeRequestDashboard',
-            'ChangeRequestDashboard'
+            'CreateSalesRequest',
+            'CreateSalesRequest'
         );
 
-        $this->setPageTitle('Change Request Dashboard');
-
-        $dbejCallActivity = new DBEJCallActivity($this);
-        $dbejCallActivity->getPendingChangeRequestRows();
-
-        $this->template->set_block(
-            'ChangeRequestDashboard',
-            'ChangeRequestsBlock',
-            'changeRequests'
-        );
-
-        $buActivity = new BUActivity($this);
-
-        while ($dbejCallActivity->fetchNext()) {
-
-            $lastActivity = $buActivity->getLastActivityInProblem(
-                $dbejCallActivity->getValue(DBEJCallActivity::problemID)
-            );
-            $srLink = Controller::buildLink(
-                'Activity.php',
-                [
-                    "callActivityID" => $lastActivity->getValue(DBEJCallActivity::callActivityID),
-                    "action"         => "displayActivity"
-                ]
-            );
-
-            $srLink = "<a href='$srLink'>SR</a>";
-
-//            http://cncdev7:85/Activity.php?action=changeRequestReview&callActivityID=1813051&fromEmail=true
-
-            $processCRLink = Controller::buildLink(
-                'Activity.php',
-                [
-                    "callActivityID" => $dbejCallActivity->getValue(DBEJCallActivity::callActivityID),
-                    "action"         => "changeRequestReview"
-                ]
-            );
-
-            $processCRLink = "<a href='$processCRLink'>Process Change Request</a>";
-
-            $this->template->set_var(
-                [
-                    'customerName'      => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
-                    'srLink'            => $srLink,
-                    'changeRequested'   => $dbejCallActivity->getValue(DBEJCallActivity::reason),
-                    'requestedBy'       => $dbejCallActivity->getValue(DBEJCallActivity::userAccount),
-                    'requestedDateTime' => $dbejCallActivity->getValue(
-                            DBEJCallActivity::date
-                        ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime),
-                    'processCRLink'     => $processCRLink,
-                ]
-            );
-
-            $this->template->parse(
-                'changeRequests',
-                'ChangeRequestsBlock',
-                true
-            );
-        }
-
+        $this->setPageTitle('Create Sales Request');
 
         $this->template->parse(
             'CONTENTS',
-            'ChangeRequestDashboard',
+            'CreateSalesRequest',
             true
         );
         $this->parsePage();
