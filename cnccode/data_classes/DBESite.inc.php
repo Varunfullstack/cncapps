@@ -207,10 +207,10 @@ class DBESite extends DBCNCEntity
     /**
      * Return all rows from DB
      * @access public
-     * @param string $activeFlag
+     * @param bool $activeFlag
      * @return bool Success
      */
-    function getRowsByCustomerID($activeFlag = 'Y')
+    function getRowsByCustomerID($activeFlag = true)
     {
         $this->setMethodName("getRowsByCustomerID");
         if ($this->getValue(self::customerID) == "") {
@@ -221,7 +221,7 @@ class DBESite extends DBCNCEntity
             ' FROM ' . $this->getTableName() .
             ' WHERE ' . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID);
 
-        if ($activeFlag == 'Y') {
+        if ($activeFlag) {
             $queryString .= ' AND add_active_flag = "Y"';
         }
 
