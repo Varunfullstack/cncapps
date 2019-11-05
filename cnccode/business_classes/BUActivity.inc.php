@@ -10531,8 +10531,6 @@ is currently a balance of ';
             $dbeCustomer->getRow($customerID);
             $dbeContact->getMainSupportRowsByCustomerID($customerID);
             $dbeContact->fetchNext();
-
-
             $dbeProblem->setValue(
                 DBEProblem::hdLimitMinutes,
                 $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
@@ -10568,11 +10566,6 @@ is currently a balance of ';
             $dbeProblem->setValue(
                 DBEProblem::dateRaised,
                 date(DATE_MYSQL_DATETIME)
-            );
-
-            $dbeProblem->setValue(
-                DBEProblem::contactID,
-                $dbeContact->getValue(DBEContact::contactID)
             );
 
             $dbeProblem->setValue(
