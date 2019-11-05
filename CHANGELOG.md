@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 659 - Record daily replication / backup targets in database
+
 ## [v3.7.0] 
 ### Added
 - Issue 654 - Set all contacts to support level None
