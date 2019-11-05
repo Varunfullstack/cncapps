@@ -9,6 +9,8 @@
 </style>
 <script>
 
+    let table = null;
+
     function changeUsers() {
         console.log($(event.target).data());
         const loadingIndicator = event.target.nextElementSibling;
@@ -55,7 +57,16 @@
             $(this).html('<input type="text" placeholder="Search ' + title + '" />');
             const autocompleteURL = $(this).data().autocompleteUrl;
             const autocompleteTermField = 'term' || $(this).data().autocompleteTermField;
-            $(this).find('input').autocomplete({
+            const performSearch = function (value, column) {
+                if (table.column(column).search() != value) {
+                    table.column(column)
+                        .search(value);
+                    table.draw();
+                }
+            };
+
+            const filterInput = $(this).find('input');
+            filterInput.autocomplete({
                 minLength: 0,
                 source: function (request, responseCB) {
                     const data = {};
@@ -72,20 +83,17 @@
                     })
 
                 },
-                delay: 200
+                delay: 200,
+                select: function (event, ui) {
+                    performSearch(ui.item.value, i);
+                }
             }).focus(function () {
                 $(this).autocomplete("search", $(this).val());
-            });
-            $('input', this).on('change', function () {
-                if (table.column(i).search() !== this.value) {
-                    table
-                        .column(i)
-                        .search(this.value)
-                        .draw();
-                }
+            }).on('change', function () {
+                performSearch(filterInput[0].value, i);
             });
         });
-        const table = $('#example').DataTable({
+        table = $('#example').DataTable({
             dom: "lrtip",
             serverSide: true,
             ajax: '?action=getData',
