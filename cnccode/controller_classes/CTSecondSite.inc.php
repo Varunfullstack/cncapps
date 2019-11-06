@@ -166,6 +166,32 @@ class CTSecondSite extends CTCNC
     /**
      * @throws Exception
      */
+    function delete()
+    {
+        $this->setMethodName('delete');
+        $dsSecondsiteImage = new DataSet($this);
+        $this->buSecondsite->getSecondsiteImageByID(
+            $this->getParam('secondsiteImageID'),
+            $dsSecondsiteImage
+        );
+
+        $this->buSecondsite->deleteSecondsiteImage($this->getParam('secondsiteImageID'));
+
+        $urlNext =
+            Controller::buildLink(
+                'CustomerItem.php',
+                array(
+                    'action'         => 'displayCI',
+                    'customerItemID' => $dsSecondsiteImage->getValue(DBESecondSiteImage::customerItemID)
+                )
+            );
+        header('Location: ' . $urlNext);
+        exit;
+    }
+
+    /**
+     * @throws Exception
+     */
     function update()
     {
         $this->setMethodName('update');
@@ -195,29 +221,206 @@ class CTSecondSite extends CTCNC
     }
 
     /**
+     * Run validation
+     *
      * @throws Exception
      */
-    function delete()
+    function run()
     {
-        $this->setMethodName('delete');
-        $dsSecondsiteImage = new DataSet($this);
-        $this->buSecondsite->getSecondsiteImageByID(
-            $this->getParam('secondsiteImageID'),
-            $dsSecondsiteImage
-        );
-
-        $this->buSecondsite->deleteSecondsiteImage($this->getParam('secondsiteImageID'));
-
+        $this->buSecondsite->validateBackups($this->getParam('customerItemID'));
         $urlNext =
             Controller::buildLink(
-                'CustomerItem.php',
-                array(
-                    'action'         => 'displayCI',
-                    'customerItemID' => $dsSecondsiteImage->getValue(DBESecondSiteImage::customerItemID)
-                )
+                'OffsiteBackupStatus.php',
+                array()
             );
         header('Location: ' . $urlNext);
         exit;
+    }
+
+    /**
+     * @throws Exception
+     */
+    function failureAnalysis()
+    {
+        global $cfg;
+
+        if (!$this->isUserSDManager()) {
+            $roles = [
+                "reports"
+            ];
+            if (!self::hasPermissions($roles)) {
+                Header("Location: /NotAllowed.php");
+                exit;
+            }
+        }
+        $this->setMethodName('failureAnalysis');
+
+        $dsSearchForm = new DSForm ($this);
+
+        $this->buSecondsite->initialiseSearchForm($dsSearchForm);
+
+        $this->setTemplateFiles(array('SecondsiteFailureAnalysisReport' => 'SecondsiteFailureAnalysisReport.inc'));
+
+        if (isset($_REQUEST ['searchForm'])) {
+
+            if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
+                $this->setFormErrorOn();
+            } else {
+                set_time_limit(240);
+
+                if ($results = $this->buSecondsite->getResults($dsSearchForm)) {
+
+                    if ($this->getParam('Search') == 'Generate CSV') {
+
+                        $template = new Template (
+                            $cfg["path_templates"],
+                            "remove"
+                        );
+
+                        $template->set_file(
+                            'page',
+                            'SecondsiteFailureAnalysisReport.inc.csv'
+                        );
+
+                        $template->set_block(
+                            'page',
+                            'rowsBlock',
+                            'rows'
+                        );
+
+                        foreach ($results as $row) {
+                            $template->set_var(
+                                array(
+                                    'customerName' => $row['customerName'],
+                                    'serverName'   => $row['serverName'],
+                                    'period'       => $row['period'],
+                                    'errors'       => $row['errors']
+                                )
+                            );
+                            $template->parse(
+                                'rows',
+                                'rowsBlock',
+                                true
+                            );
+                        }
+                        $template->parse(
+                            'output',
+                            'page',
+                            true
+                        );
+
+                        $output = $template->get_var('output');
+
+                        Header('Content-type: text/plain');
+                        Header('Content-Disposition: attachment; filename=SecondsiteFailureAnalysisReport.csv');
+                        echo $output;
+                        exit;
+                    } else { // Screen Report
+
+                        $this->template->set_block(
+                            'SecondsiteFailureAnalysisReport',
+                            'rowsBlock',
+                            'rows'
+                        );
+
+                        if ($this->getParam('orderBy')) {
+                            foreach ($results as $key => $row) {
+                                $customerName[$key] = $row['customerName'];
+                                $serverName[$key] = $row['serverName'];
+                                $period[$key] = $row['period'];
+                                $errors[$key] = $row['errors'];
+                            }
+
+                            if ($this->getSessionParam('secondsiteSortDirection') == SORT_DESC) {
+                                $this->setSessionParam('secondsiteSortDirection', SORT_ASC);
+                            } else {
+                                $this->setSessionParam('secondsiteSortDirection', SORT_DESC);
+
+                            }
+
+                            array_multisort(
+                                $$this->getParam('orderBy'),
+                                $_SESSION['secondsiteSortDirection'],
+                                $results
+                            );
+                        }
+                        foreach ($results as $key => $row) {
+
+                            $reportUrl =
+                                Controller::buildLink(
+                                    'OffsiteBackupStatus.php',
+                                    array(
+                                        'action'                        => 'failureAnalysis',
+                                        'searchForm[1][customerID]'     => $_REQUEST ['searchForm'][1]['customerID'],
+                                        'searchForm[1][startYearMonth]' => $_REQUEST ['searchForm'][1]['startYearMonth'],
+                                        'searchForm[1][endYearMonth]'   => $_REQUEST ['searchForm'][1]['endYearMonth'],
+                                    )
+                                );
+
+                            $this->template->set_var(
+                                array(
+                                    'customerName' => $row['customerName'],
+                                    'serverName'   => $row['serverName'],
+                                    'period'       => $row['period'],
+                                    'errors'       => $row['errors'],
+                                    'reportUrl'    => $reportUrl
+                                )
+                            );
+                            $this->template->parse(
+                                'rows',
+                                'rowsBlock',
+                                true
+                            );
+                        }
+
+                    }
+
+                }// if searchForm
+
+            }
+
+        }
+        $urlCustomerPopup = Controller::buildLink(
+            CTCNC_PAGE_CUSTOMER,
+            array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP)
+        );
+
+        $urlSubmit = Controller::buildLink(
+            $_SERVER ['PHP_SELF'],
+            array('action' => 'failureAnalysis')
+        );
+
+        $this->setPageTitle('Second Site Failure Analysis Report');
+        $customerString = null;
+        if ($dsSearchForm->getValue(BUSecondSite::searchFormCustomerID) != 0) {
+            $buCustomer = new BUCustomer ($this);
+            $dsCustomer = new DataSet($this);
+            $buCustomer->getCustomerByID(
+                $dsSearchForm->getValue(BUSecondSite::searchFormCustomerID),
+                $dsCustomer
+            );
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
+        }
+
+        $this->template->set_var(
+            array(
+                'formError'        => $this->formError,
+                'customerID'       => $dsSearchForm->getValue(BUSecondSite::searchFormCustomerID),
+                'customerString'   => $customerString,
+                'startYearMonth'   => $dsSearchForm->getValue(BUSecondSite::searchFormStartYearMonth),
+                'endYearMonth'     => $dsSearchForm->getValue(BUSecondSite::searchFormEndYearMonth),
+                'urlCustomerPopup' => $urlCustomerPopup,
+                'urlSubmit'        => $urlSubmit,
+            )
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'SecondsiteFailureAnalysisReport',
+            true
+        );
+        $this->parsePage();
+
     }
 
     /**
@@ -252,43 +455,7 @@ class CTSecondSite extends CTCNC
         $this->setPageTitle('Offsite Backup Status');
 
         $this->setTemplateFiles(array('SecondsiteList' => 'SecondsiteList.inc'));
-
-        $buHeader = new BUHeader($this);
-        $dsHeader = new DataSet($this);
-        $buHeader->getHeader($dsHeader);
-
-        $target = $dsHeader->getValue(DBEHeader::backupTargetSuccessRate);
-
-        $this->template->set_var(
-            [
-                "backupTargetSuccessRate" => $target,
-                "monthSuccessRate1Class"  => $performanceData[1] >= $target ? 'success' : 'fail',
-                "monthSuccessRate1"       => $this->validateAndRound($performanceData[1]),
-                "monthSuccessRate2Class"  => $performanceData[2] >= $target ? 'success' : 'fail',
-                "monthSuccessRate2"       => $this->validateAndRound($performanceData[2]),
-                "monthSuccessRate3Class"  => $performanceData[3] >= $target ? 'success' : 'fail',
-                "monthSuccessRate3"       => $this->validateAndRound($performanceData[3]),
-                "monthSuccessRate4Class"  => $performanceData[4] >= $target ? 'success' : 'fail',
-                "monthSuccessRate4"       => $this->validateAndRound($performanceData[4]),
-                "monthSuccessRate5Class"  => $performanceData[5] >= $target ? 'success' : 'fail',
-                "monthSuccessRate5"       => $this->validateAndRound($performanceData[5]),
-                "monthSuccessRate6Class"  => $performanceData[6] >= $target ? 'success' : 'fail',
-                "monthSuccessRate6"       => $this->validateAndRound($performanceData[6]),
-                "monthSuccessRate7Class"  => $performanceData[7] >= $target ? 'success' : 'fail',
-                "monthSuccessRate7"       => $this->validateAndRound($performanceData[7]),
-                "monthSuccessRate8Class"  => $performanceData[8] >= $target ? 'success' : 'fail',
-                "monthSuccessRate8"       => $this->validateAndRound($performanceData[8]),
-                "monthSuccessRate9Class"  => $performanceData[9] >= $target ? 'success' : 'fail',
-                "monthSuccessRate9"       => $this->validateAndRound($performanceData[9]),
-                "monthSuccessRate10Class" => $performanceData[10] >= $target ? 'success' : 'fail',
-                "monthSuccessRate10"      => $this->validateAndRound($performanceData[10]),
-                "monthSuccessRate11Class" => $performanceData[11] >= $target ? 'success' : 'fail',
-                "monthSuccessRate11"      => $this->validateAndRound($performanceData[11]),
-                "monthSuccessRate12Class" => $performanceData[12] >= $target ? 'success' : 'fail',
-                "monthSuccessRate12"      => $this->validateAndRound($performanceData[12])
-            ]
-        );
-
+        $this->renderSuccessRate($this->template, $performanceData);
         $this->template->setBlock(
             'SecondsiteList',
             'availableYearsBlock',
@@ -566,6 +733,25 @@ class CTSecondSite extends CTCNC
         $this->parsePage();
     }
 
+    function renderSuccessRate($template, $performanceData)
+    {
+        for ($i = 1; $i <= 12; $i++) {
+            $data = [];
+            $successClassName = "monthSuccessRate" . $i . "Class";
+            $monthTargetRateName = "monthTargetRate$i";
+            $monthSuccessRateName = "monthSuccessRate$i";
+            $data[$successClassName] = "";
+            $data[$monthTargetRateName] = "N/A";
+            $data[$monthSuccessRateName] = "N/A";
+            if (isset($performanceData[$i])) {
+                $data[$successClassName] = $performanceData[$i]['successRate'] >= $performanceData[$i]['targetRate'] ? 'success' : 'fail';
+                $data[$monthTargetRateName] = $this->validateAndRound($performanceData[$i]['targetRate']);
+                $data[$monthSuccessRateName] = $this->validateAndRound($performanceData[$i]['successRate']);
+            }
+            $template->set_var($data);
+        }
+    }
+
     protected function validateAndRound($value)
     {
         if (!is_numeric($value)) {
@@ -575,39 +761,6 @@ class CTSecondSite extends CTCNC
         return round(
             $value,
             1
-        );
-    }
-
-    /**
-     * Run validation
-     *
-     * @throws Exception
-     */
-    function run()
-    {
-        $this->buSecondsite->validateBackups($this->getParam('customerItemID'));
-        $urlNext =
-            Controller::buildLink(
-                'OffsiteBackupStatus.php',
-                array()
-            );
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    /**
-     * @param $server_cuino
-     * @return mixed|string
-     * @throws Exception
-     */
-    function getRunUrl($server_cuino)
-    {
-        return Controller::buildLink(
-            'OffsiteBackupStatus.php',
-            array(
-                'action'         => 'run',
-                'customerItemID' => $server_cuino
-            )
         );
     }
 
@@ -630,190 +783,21 @@ class CTSecondSite extends CTCNC
     /*
     Report of second site validation failures for given customer/date range
     */
+
     /**
+     * @param $server_cuino
+     * @return mixed|string
      * @throws Exception
      */
-    function failureAnalysis()
+    function getRunUrl($server_cuino)
     {
-        global $cfg;
-
-        if (!$this->isUserSDManager()) {
-            $roles = [
-                "reports"
-            ];
-            if (!self::hasPermissions($roles)) {
-                Header("Location: /NotAllowed.php");
-                exit;
-            }
-        }
-        $this->setMethodName('failureAnalysis');
-
-        $dsSearchForm = new DSForm ($this);
-
-        $this->buSecondsite->initialiseSearchForm($dsSearchForm);
-
-        $this->setTemplateFiles(array('SecondsiteFailureAnalysisReport' => 'SecondsiteFailureAnalysisReport.inc'));
-
-        if (isset($_REQUEST ['searchForm'])) {
-
-            if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
-                $this->setFormErrorOn();
-            } else {
-                set_time_limit(240);
-
-                if ($results = $this->buSecondsite->getResults($dsSearchForm)) {
-
-                    if ($this->getParam('Search') == 'Generate CSV') {
-
-                        $template = new Template (
-                            $cfg["path_templates"],
-                            "remove"
-                        );
-
-                        $template->set_file(
-                            'page',
-                            'SecondsiteFailureAnalysisReport.inc.csv'
-                        );
-
-                        $template->set_block(
-                            'page',
-                            'rowsBlock',
-                            'rows'
-                        );
-
-                        foreach ($results as $row) {
-                            $template->set_var(
-                                array(
-                                    'customerName' => $row['customerName'],
-                                    'serverName'   => $row['serverName'],
-                                    'period'       => $row['period'],
-                                    'errors'       => $row['errors']
-                                )
-                            );
-                            $template->parse(
-                                'rows',
-                                'rowsBlock',
-                                true
-                            );
-                        }
-                        $template->parse(
-                            'output',
-                            'page',
-                            true
-                        );
-
-                        $output = $template->get_var('output');
-
-                        Header('Content-type: text/plain');
-                        Header('Content-Disposition: attachment; filename=SecondsiteFailureAnalysisReport.csv');
-                        echo $output;
-                        exit;
-                    } else { // Screen Report
-
-                        $this->template->set_block(
-                            'SecondsiteFailureAnalysisReport',
-                            'rowsBlock',
-                            'rows'
-                        );
-
-                        if ($this->getParam('orderBy')) {
-                            foreach ($results as $key => $row) {
-                                $customerName[$key] = $row['customerName'];
-                                $serverName[$key] = $row['serverName'];
-                                $period[$key] = $row['period'];
-                                $errors[$key] = $row['errors'];
-                            }
-
-                            if ($this->getSessionParam('secondsiteSortDirection') == SORT_DESC) {
-                                $this->setSessionParam('secondsiteSortDirection', SORT_ASC);
-                            } else {
-                                $this->setSessionParam('secondsiteSortDirection', SORT_DESC);
-
-                            }
-
-                            array_multisort(
-                                $$this->getParam('orderBy'),
-                                $_SESSION['secondsiteSortDirection'],
-                                $results
-                            );
-                        }
-                        foreach ($results as $key => $row) {
-
-                            $reportUrl =
-                                Controller::buildLink(
-                                    'OffsiteBackupStatus.php',
-                                    array(
-                                        'action'                        => 'failureAnalysis',
-                                        'searchForm[1][customerID]'     => $_REQUEST ['searchForm'][1]['customerID'],
-                                        'searchForm[1][startYearMonth]' => $_REQUEST ['searchForm'][1]['startYearMonth'],
-                                        'searchForm[1][endYearMonth]'   => $_REQUEST ['searchForm'][1]['endYearMonth'],
-                                    )
-                                );
-
-                            $this->template->set_var(
-                                array(
-                                    'customerName' => $row['customerName'],
-                                    'serverName'   => $row['serverName'],
-                                    'period'       => $row['period'],
-                                    'errors'       => $row['errors'],
-                                    'reportUrl'    => $reportUrl
-                                )
-                            );
-                            $this->template->parse(
-                                'rows',
-                                'rowsBlock',
-                                true
-                            );
-                        }
-
-                    }
-
-                }// if searchForm
-
-            }
-
-        }
-        $urlCustomerPopup = Controller::buildLink(
-            CTCNC_PAGE_CUSTOMER,
-            array('action' => CTCNC_ACT_DISP_CUST_POPUP, 'htmlFmt' => CT_HTML_FMT_POPUP)
-        );
-
-        $urlSubmit = Controller::buildLink(
-            $_SERVER ['PHP_SELF'],
-            array('action' => 'failureAnalysis')
-        );
-
-        $this->setPageTitle('Second Site Failure Analysis Report');
-        $customerString = null;
-        if ($dsSearchForm->getValue(BUSecondSite::searchFormCustomerID) != 0) {
-            $buCustomer = new BUCustomer ($this);
-            $dsCustomer = new DataSet($this);
-            $buCustomer->getCustomerByID(
-                $dsSearchForm->getValue(BUSecondSite::searchFormCustomerID),
-                $dsCustomer
-            );
-            $customerString = $dsCustomer->getValue(DBECustomer::name);
-        }
-
-        $this->template->set_var(
+        return Controller::buildLink(
+            'OffsiteBackupStatus.php',
             array(
-                'formError'        => $this->formError,
-                'customerID'       => $dsSearchForm->getValue(BUSecondSite::searchFormCustomerID),
-                'customerString'   => $customerString,
-                'startYearMonth'   => $dsSearchForm->getValue(BUSecondSite::searchFormStartYearMonth),
-                'endYearMonth'     => $dsSearchForm->getValue(BUSecondSite::searchFormEndYearMonth),
-                'urlCustomerPopup' => $urlCustomerPopup,
-                'urlSubmit'        => $urlSubmit,
+                'action'         => 'run',
+                'customerItemID' => $server_cuino
             )
         );
-
-        $this->template->parse(
-            'CONTENTS',
-            'SecondsiteFailureAnalysisReport',
-            true
-        );
-        $this->parsePage();
-
     }
 
     protected function getImageTime($time)

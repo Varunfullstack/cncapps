@@ -384,6 +384,10 @@ class BUSecondsite extends Business
                 return;
             }
 
+            $buHeader = new BUHeader($this);
+            $dsHeader = new DataSet($this);
+            $buHeader->getHeader($dsHeader);
+
             $query = "INSERT INTO backup_performance_log (
                       created_at,
                       servers,
@@ -392,8 +396,9 @@ class BUSecondsite extends Business
                       image_errors,
                       suspended_servers,
                       passes,
-                      success_rate
-                    ) VALUES (now(), ?, ?, ?, ?, ?, ?, ?)";
+                      success_rate,
+                                    target
+                    ) VALUES (now(), ?, ?, ?, ?, ?, ?, ?, ?)";
             $db->preparedQuery(
                 $query,
                 [
@@ -424,7 +429,11 @@ class BUSecondsite extends Business
                     [
                         "type"  => "d",
                         "value" => $this->imageCount ? ($this->imagePassesCount / $this->imageCount) * 100 : 0
-                    ]
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $dsHeader->getValue(DBEHeader::backupTargetSuccessRate)
+                    ],
 
                 ]
             );
@@ -930,28 +939,30 @@ class BUSecondsite extends Business
 
     }
 
-    function getPerformanceDataForYear($year = null)
+    function getPerformanceDataForYear($year = null, $isReplication = FALSE)
     {
 
         if (!$year) {
             $year = date("Y");
         }
 
-        $query = "SELECT SUM(passes)/ SUM(images) as successRate, MONTH FROM (
-            SELECT MONTH(created_at) AS MONTH, images, passes FROM backup_performance_log WHERE YEAR(created_at) = '$year' and not isReplication
-) t GROUP BY t.month";
+        $query = "SELECT (SUM(passes)/ SUM(images))*100 as successRate, avg(target) as targetRate, MONTH FROM (
+            SELECT MONTH(created_at) AS MONTH, images, passes, target FROM backup_performance_log WHERE YEAR(created_at) = '$year' ";
+
+        if (!$isReplication) {
+            $query .= " and not isReplication ";
+        } else {
+            $query .= " and isReplication ";
+        }
+
+        $query .= " ) t GROUP BY t.month";
 
         $result = $this->db->query($query);
 
-        $data = [
-        ];
-
-        for ($i = 0; $i < 12; $i++) {
-            $data[$i + 1] = "N/A";
-        }
+        $data = [        ];
 
         while ($row = $result->fetch_assoc()) {
-            $data[$row['MONTH']] = $row['successRate'] * 100;
+            $data[$row['MONTH']] = $row;
         }
 
         return $data;
