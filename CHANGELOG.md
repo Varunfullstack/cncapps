@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 592 - Security Improvements
+
 ## [v3.7.0] 
 ### Added
 - Issue 654 - Set all contacts to support level None
