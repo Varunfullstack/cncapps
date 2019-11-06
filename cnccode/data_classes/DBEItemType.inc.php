@@ -11,12 +11,15 @@ class DBEItemType extends DBCNCEntity
     const itemTypeID = "itemTypeID";
     const description = "description";
     const stockcat = "stockcat";
+    const reocurring = "reocurring";
+    const active = "active";
+
 
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -41,6 +44,21 @@ class DBEItemType extends DBCNCEntity
             DA_NOT_NULL,
             "ity_stockcat"
         );
+        $this->addColumn(
+            self::reocurring,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
+        );
+        $this->addColumn(
+            self::active,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            true
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
