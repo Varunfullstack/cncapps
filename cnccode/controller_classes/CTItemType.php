@@ -9,6 +9,7 @@
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEItemType.inc.php');
+require_once($cfg['path_dbe'] . '/DBEStockcat.inc.php');
 
 // Actions
 class CTItemType extends CTCNC
@@ -82,20 +83,16 @@ class CTItemType extends CTCNC
                 }
 
                 $DBEItemType->setValue(
-                    DBEItemType::replacement,
-                    $this->getParam('replacement')
+                    DBEItemType::description,
+                    $this->getParam('description')
                 );
                 $DBEItemType->setValue(
-                    DBEItemType::mailboxLimit,
-                    $this->getParam('mailboxLimit')
+                    DBEItemType::stockcat,
+                    $this->getParam('stockcat')
                 );
 
-                $DBEItemType->setValue(DBEItemType::license, $this->getParam('license'));
-                $DBEItemType->setValue(
-                    DBEItemType::reportOnSpareLicenses,
-                    !!$this->getParam('reportOnSpareLicenses')
-                );
-
+                $DBEItemType->setValue(DBEItemType::active, !!$this->getParam('active'));
+                $DBEItemType->setValue(DBEItemType::reocurring, !!$this->getParam('reocurring'));
                 $DBEItemType->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
@@ -103,34 +100,50 @@ class CTItemType extends CTCNC
                 $DBEItemType = new DBEItemType($this);
 
                 $DBEItemType->setValue(
-                    DBEItemType::replacement,
-                    $this->getParam('replacement')
+                    DBEItemType::description,
+                    $this->getParam('description')
                 );
                 $DBEItemType->setValue(
-                    DBEItemType::mailboxLimit,
-                    $this->getParam('mailboxLimit')
+                    DBEItemType::stockcat,
+                    $this->getParam('stockcat')
                 );
 
-                $DBEItemType->setValue(DBEItemType::license, $this->getParam('license'));
-                $DBEItemType->setValue(
-                    DBEItemType::reportOnSpareLicenses,
-                    !!$this->getParam('reportOnSpareLicenses')
-                );
+                $DBEItemType->setValue(DBEItemType::active, !!$this->getParam('active'));
+                $DBEItemType->setValue(DBEItemType::reocurring, !!$this->getParam('reocurring'));
                 $DBEItemType->insertRow();
 
                 echo json_encode(
                     [
-                        "id"                    => $DBEItemType->getValue(DBEItemType::id),
-                        "replacement"           => $DBEItemType->getValue(DBEItemType::replacement),
-                        "license"               => $DBEItemType->getValue(DBEItemType::license),
-                        "mailboxLimit"          => $DBEItemType->getValue(DBEItemType::mailboxLimit),
-                        "reportOnSpareLicenses" => $DBEItemType->getValue(
-                            DBEItemType::reportOnSpareLicenses
-                        )
+                        "id"          => $DBEItemType->getValue(DBEItemType::itemTypeID),
+                        "description" => $DBEItemType->getValue(DBEItemType::description),
+                        "active"      => $DBEItemType->getValue(DBEItemType::active),
+                        "reocurring"  => $DBEItemType->getValue(DBEItemType::reocurring),
+                        "stockcat"    => $DBEItemType->getValue(DBEItemType::stockcat),
                     ],
                     JSON_NUMERIC_CHECK
                 );
 
+                break;
+            case 'getStockCat':
+                $dbeStockCat = new DBEStockcat($this);
+                $dbeStockCat->getRows(DBEStockcat::description);
+
+                $data = [];
+                while ($dbeStockCat->fetchNext()) {
+                    $data[] = [
+                        "stockcat"      => $dbeStockCat->getValue(DBEStockcat::stockcat),
+                        "description"   => $dbeStockCat->getValue(DBEStockcat::description),
+                        "salNom"        => $dbeStockCat->getValue(DBEStockcat::salNom),
+                        "purCust"       => $dbeStockCat->getValue(DBEStockcat::purCust),
+                        "purSalesStk"   => $dbeStockCat->getValue(DBEStockcat::purSalesStk),
+                        "purMaintStk"   => $dbeStockCat->getValue(DBEStockcat::purMaintStk),
+                        "purAsset"      => $dbeStockCat->getValue(DBEStockcat::purAsset),
+                        "purOper"       => $dbeStockCat->getValue(DBEStockcat::purOper),
+                        "serialReqFlag" => $dbeStockCat->getValue(DBEStockcat::serialReqFlag),
+                        "postMovement"  => $dbeStockCat->getValue(DBEStockcat::postMovement),
+                    ];
+                }
+                echo json_encode($data, JSON_NUMERIC_CHECK);
                 break;
             case 'getData':
                 $DBEItemTypes = new DBEItemType($this);
@@ -139,7 +152,7 @@ class CTItemType extends CTCNC
                 $data = [];
                 while ($DBEItemTypes->fetchNext()) {
                     $data[] = [
-                        "itemTypeID"  => $DBEItemTypes->getValue(DBEItemType::itemTypeID),
+                        "id"          => $DBEItemTypes->getValue(DBEItemType::itemTypeID),
                         "description" => $DBEItemTypes->getValue(DBEItemType::description),
                         "active"      => $DBEItemTypes->getValue(DBEItemType::active),
                         "reocurring"  => $DBEItemTypes->getValue(DBEItemType::reocurring),
@@ -171,6 +184,7 @@ class CTItemType extends CTCNC
             'ItemType',
             'ItemTypes'
         );
+
 
         $this->template->parse(
             'CONTENTS',

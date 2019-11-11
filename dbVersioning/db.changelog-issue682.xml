@@ -38,6 +38,7 @@
             set reocurring = 1
             where ity_itemtypeno in (3, 4, 9, 10, 23, 28, 29, 46, 47, 53, 54, 55, 56, 57, 58, 59, 60);
         </sql>
+        <rollback/>
     </changeSet>
     <changeSet author="pavwebdev" id="issue682-4">
         <preConditions onFail="MARK_RAN">
@@ -50,6 +51,15 @@
                   (59, 36, 14, 15, 6, 60, 49, 50, 51, 52, 22, 19, 20, 40, 48, 17, 31, 32, 33, 44, 45, 46, 47, 28, 55,
                    56, 57, 10);
         </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue682-5">
+        <sql>
+            update db_sequence
+            set nextid = (select max(ity_itemtypeno) + 1 from itemtype)
+            where seq_name = "itemtype"
+        </sql>
+        <rollback/>
     </changeSet>
 
 
