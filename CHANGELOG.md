@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 675 - OBRS suspension logic for passed check
+
 ## [v3.7.0] 
 ### Added
 - Issue 654 - Set all contacts to support level None
