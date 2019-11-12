@@ -85,9 +85,9 @@ foreach ($servers as $server) {
         array(
             'customerName'       => $server['cus_name'],
             'serverName'         => $server['serverName'],
-            'suspendedUntilDate' => $server['secondsiteValidationSuspendUntilDate'],
+            'suspendedUntilDate' => $server['suspendedUntilDate'],
             'suspendUser'        => $server['suspendUser'],
-            'suspendedDate'      => $server['secondsiteSuspendedDate']
+            'suspendedDate'      => $server['suspendedDate']
         )
     );
     $template->parse(

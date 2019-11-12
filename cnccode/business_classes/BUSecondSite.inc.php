@@ -1,4 +1,5 @@
 <?php
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_dbe"] . "/DBESecondsiteImage.inc.php");
@@ -104,13 +105,13 @@ class BUSecondsite extends Business
                 $excludeFromChecks = true;
             } else {
 
-                if (!$isSuspended && $server['secondsiteValidationSuspendUntilDate']) {
+                if (!$isSuspended && $server['suspendedUntilDate']) {
                     $this->resetSuspendedUntilDate($server['server_cuino']);
                 }
 
-                if ($server['secondsiteImageDelayDays']) {
+                if ($server['imageDelayDays']) {
                     $timeToLookFrom = strtotime(
-                        '-' . $server['secondsiteImageDelayDays'] . ' days',
+                        '-' . $server['imageDelayDays'] . ' days',
                         $defaultTimeToLookFrom
                     );
                     $this->delayedCheckServers[] = $server;
@@ -446,13 +447,13 @@ class BUSecondsite extends Business
         ser.cui_cuino AS server_cuino,
         ser.cui_cust_ref AS serverName,
         ser.secondsiteLocationPath,
-        ser.secondsiteValidationSuspendUntilDate,
-        ser.secondsiteImageDelayDays,
+        ser.secondsiteValidationSuspendUntilDate as suspendedUntilDate,
+        ser.secondsiteImageDelayDays as imageDelayDays,
         ser.secondsiteLocalExcludeFlag,
         delayuser.cns_name AS delayUser,
-        ser.secondsiteImageDelayDate,
+        ser.secondsiteImageDelayDate as imageDelayDate,
         suspenduser.cns_name AS suspendUser,
-        ser.secondsiteSuspendedDate
+        ser.secondsiteSuspendedDate as suspendedDate
 
       FROM
         custitem ci
@@ -487,13 +488,13 @@ class BUSecondsite extends Business
     {
 
         if (
-            !($server['secondsiteValidationSuspendUntilDate']) || $server['secondsiteValidationSuspendUntilDate'] <= date(
+            !($server['suspendedUntilDate']) || $server['suspendedUntilDate'] <= date(
                 'Y-m-d'
             )
         ) {
             return false;
         }
-        $message = 'Image validation suspended until ' . $server['secondsiteValidationSuspendUntilDate'];
+        $message = 'Image validation suspended until ' . $server['suspendedUntilDate'];
         $this->logMessage(
             $server['cus_name'] . ' ' . $server['serverName'] . ' ' . $message,
             self::LOG_TYPE_SUSPENDED

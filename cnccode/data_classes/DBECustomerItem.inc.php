@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBECustomerItem extends DBCNCEntity
@@ -79,6 +80,9 @@ class DBECustomerItem extends DBCNCEntity
     const secondsiteValidationSuspendUntilDate = "secondsiteValidationSuspendUntilDate";
     const secondsiteSuspendedDate = "secondsiteSuspendedDate";
     const secondsiteSuspendedByUserID = "secondsiteSuspendedByUserID";
+    const offsiteReplicationValidationSuspendedUntilDate = "offsiteReplicationValidationSuspendedUntilDate";
+    const offsiteReplicationSuspendedByUserID = "offsiteReplicationSuspendedByUserID";
+    const offsiteReplicationSuspendedDate = "offsiteReplicationSuspendedDate";
     const secondsiteImageDelayDays = "secondsiteImageDelayDays";
     const secondsiteImageDelayDate = "secondsiteImageDelayDate";
     const secondsiteImageDelayUserID = "secondsiteImageDelayUserID";
@@ -533,16 +537,34 @@ class DBECustomerItem extends DBCNCEntity
             "custitem.secondsiteValidationSuspendUntilDate"
         );
         $this->addColumn(
+            self::offsiteReplicationValidationSuspendedUntilDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "custitem.offsiteReplicationValidationSuspendedUntilDate"
+        );
+        $this->addColumn(
             self::secondsiteSuspendedDate,
             DA_DATE,
             DA_ALLOW_NULL,
             "custitem.secondsiteSuspendedDate"
         );
         $this->addColumn(
+            self::offsiteReplicationSuspendedDate,
+            DA_DATE,
+            DA_ALLOW_NULL,
+            "custitem.offsiteReplicationSuspendedDate"
+        );
+        $this->addColumn(
             self::secondsiteSuspendedByUserID,
             DA_ID,
             DA_ALLOW_NULL,
             "custitem.secondsiteSuspendedByUserID"
+        );
+        $this->addColumn(
+            self::offsiteReplicationSuspendedByUserID,
+            DA_ID,
+            DA_ALLOW_NULL,
+            "custitem.offsiteReplicationSuspendedByUserID"
         );
         $this->addColumn(
             self::secondsiteImageDelayDays,
@@ -793,6 +815,34 @@ class DBECustomerItem extends DBCNCEntity
 
     }
 
+    function addContract($customerItemID,
+                         $contractID
+    )
+    {
+        $statement =
+            "SELECT
+        cic_contractcuino
+      FROM
+        custitem_contract
+      WHERE
+        cic_cuino = $customerItemID
+        AND cic_contractcuino = $contractID";
+
+        $this->db->query($statement);
+        if (!$this->db->next_record()) {
+
+            $statement =
+                "INSERT INTO
+          custitem_contract
+        SET
+          cic_cuino = $customerItemID,
+          cic_contractcuino = $contractID";
+
+            $this->db->query($statement);
+        }
+
+    }
+
     function updateContract($customerItemID,
                             $contractIDs = []
     )
@@ -862,34 +912,6 @@ class DBECustomerItem extends DBCNCEntity
         AND cic_contractcuino = $contractID";
 
         return $this->db->query($statement);
-
-    }
-
-    function addContract($customerItemID,
-                         $contractID
-    )
-    {
-        $statement =
-            "SELECT
-        cic_contractcuino
-      FROM
-        custitem_contract
-      WHERE
-        cic_cuino = $customerItemID
-        AND cic_contractcuino = $contractID";
-
-        $this->db->query($statement);
-        if (!$this->db->next_record()) {
-
-            $statement =
-                "INSERT INTO
-          custitem_contract
-        SET
-          cic_cuino = $customerItemID,
-          cic_contractcuino = $contractID";
-
-            $this->db->query($statement);
-        }
 
     }
 

@@ -811,7 +811,7 @@ class CTCustomerItem extends CTCNC
 
         $buUser = new BUUser($this);
 
-        $suspendedByText = null;
+        $offsiteBackupSuspendedByText = null;
 
         if (
             $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteSuspendedDate) &&
@@ -823,9 +823,28 @@ class CTCustomerItem extends CTCNC
                 $dsUser
             );
 
-            $suspendedByText =
+            $offsiteBackupSuspendedByText =
                 $dsUser->getValue(DBEUser::name) . ' on ' .
                 Controller::dateYMDtoDMY($dsCustomerItem->getValue(DBEJCustomerItem::secondsiteSuspendedDate));
+        }
+
+        $offsiteReplicationSuspendedByText = null;
+
+        if (
+            $dsCustomerItem->getValue(DBEJCustomerItem::offsiteReplicationSuspendedDate) &&
+            $dsCustomerItem->getValue(DBEJCustomerItem::offsiteReplicationSuspendedByUserID)
+        ) {
+            $dsUser = new DataSet($this);
+            $buUser->getUserByID(
+                $dsCustomerItem->getValue(DBEJCustomerItem::offsiteReplicationSuspendedByUserID),
+                $dsUser
+            );
+
+            $offsiteReplicationSuspendedByText =
+                $dsUser->getValue(DBEUser::name) . ' on ' .
+                Controller::dateYMDtoDMY(
+                    $dsCustomerItem->getValue(DBEJCustomerItem::offsiteReplicationSuspendedDate)
+                );
         }
 
         $imageDelayByText = null;
@@ -845,118 +864,128 @@ class CTCustomerItem extends CTCNC
 
         $this->template->set_var(
             array(
-                'urlSubmit'                                   => $urlSubmit,
-                'urlContractPopup'                            => $urlContractPopup,
-                'urlItemPopup'                                => $urlItemPopup,
-                'urlCustomerPopup'                            => $urlCustomerPopup,
-                'urlItemEdit'                                 => $urlItemEdit,
-                'customerItemID'                              => $dsCustomerItem->getValue(
+                'urlSubmit'                                           => $urlSubmit,
+                'urlContractPopup'                                    => $urlContractPopup,
+                'urlItemPopup'                                        => $urlItemPopup,
+                'urlCustomerPopup'                                    => $urlCustomerPopup,
+                'urlItemEdit'                                         => $urlItemEdit,
+                'customerItemID'                                      => $dsCustomerItem->getValue(
                     DBEJCustomerItem::customerItemID
                 ),
-                'siteNo'                                      => $dsCustomerItem->getValue(DBEJCustomerItem::siteNo),
-                'siteDesc'                                    => Controller::htmlDisplayText(
+                'siteNo'                                              => $dsCustomerItem->getValue(
+                    DBEJCustomerItem::siteNo
+                ),
+                'siteDesc'                                            => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::siteDescription)
                 ),
-                'serverName'                                  => Controller::htmlDisplayText(
+                'serverName'                                          => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::serverName)
                 ),
-                'urlSiteEdit'                                 => $urlSiteEdit,
-                'urlSitePopup'                                => $urlSitePopup,
-                'customerID'                                  => $dsCustomerItem->getValue(
+                'urlSiteEdit'                                         => $urlSiteEdit,
+                'urlSitePopup'                                        => $urlSitePopup,
+                'customerID'                                          => $dsCustomerItem->getValue(
                     DBEJCustomerItem::customerID
                 ),
-                'customerName'                                => Controller::htmlDisplayText(
+                'customerName'                                        => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::customerName)
                 ),
-                'itemID'                                      => $dsCustomerItem->getValue(DBEJCustomerItem::itemID),
-                'itemDescription'                             => Controller::htmlDisplayText(
+                'itemID'                                              => $dsCustomerItem->getValue(
+                    DBEJCustomerItem::itemID
+                ),
+                'itemDescription'                                     => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::itemDescription)
                 ),
-                'partNo'                                      => Controller::htmlDisplayText(
+                'partNo'                                              => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::partNo)
                 ),
-                'serialNo'                                    => Controller::htmlDisplayText(
+                'serialNo'                                            => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::serialNo)
                 ),
-                'ordheadID'                                   => Controller::htmlDisplayText(
+                'ordheadID'                                           => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::ordheadID)
                 ),
-                'ordheadIDMessage'                            => Controller::htmlDisplayText(
+                'ordheadIDMessage'                                    => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::ordheadID)
                 ),
-                'porheadID'                                   => Controller::htmlDisplayText(
+                'porheadID'                                           => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::porheadID)
                 ),
-                'porheadIDMessage'                            => Controller::htmlDisplayText(
+                'porheadIDMessage'                                    => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::porheadID)
                 ),
-                'curUnitSale'                                 => Controller::htmlDisplayText(
+                'curUnitSale'                                         => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::curUnitSale)
                 ),
-                'curUnitSaleMessage'                          => Controller::htmlDisplayText(
+                'curUnitSaleMessage'                                  => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::curUnitSale)
                 ),
-                'curUnitCost'                                 => $dsCustomerItem->getValue(
+                'curUnitCost'                                         => $dsCustomerItem->getValue(
                     DBEJCustomerItem::curUnitCost
                 ),
-                'curUnitCostMessage'                          => Controller::htmlDisplayText(
+                'curUnitCostMessage'                                  => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::curUnitCost)
                 ),
-                'sOrderDate'                                  => Controller::dateYMDtoDMY(
+                'sOrderDate'                                          => Controller::dateYMDtoDMY(
                     $dsCustomerItem->getValue(DBEJCustomerItem::sOrderDate)
                 ),
-                'sOrderDateMessage'                           => Controller::htmlDisplayText(
+                'sOrderDateMessage'                                   => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::sOrderDate)
                 ),
-                'expiryDate'                                  => Controller::dateYMDtoDMY(
+                'expiryDate'                                          => Controller::dateYMDtoDMY(
                     $dsCustomerItem->getValue(DBEJCustomerItem::expiryDate)
                 ),
-                'expiryDateMessage'                           => Controller::htmlDisplayText(
+                'expiryDateMessage'                                   => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::expiryDate)
                 ),
-                'curGSCBalance'                               => Controller::htmlDisplayText(
+                'curGSCBalance'                                       => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::curGSCBalance)
                 ),
-                'curGSCBalanceMessage'                        => Controller::htmlDisplayText(
+                'curGSCBalanceMessage'                                => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::curGSCBalance)
                 ),
-                'customerItemNotes'                           => Controller::htmlTextArea(
+                'customerItemNotes'                                   => Controller::htmlTextArea(
                     $dsCustomerItem->getValue(DBEJCustomerItem::customerItemNotes)
                 ),
-                'internalNotes'                               => Controller::htmlTextArea(
+                'internalNotes'                                       => Controller::htmlTextArea(
                     $dsCustomerItem->getValue(DBEJCustomerItem::internalNotes)
                 ),
-                'slaResponseHours'                            => $dsCustomerItem->getValue(
+                'slaResponseHours'                                    => $dsCustomerItem->getValue(
                     DBEJCustomerItem::slaResponseHours
                 ),
-                'despatchDate'                                => Controller::dateYMDtoDMY(
+                'despatchDate'                                        => Controller::dateYMDtoDMY(
                     $dsCustomerItem->getValue(DBEJCustomerItem::despatchDate)
                 ),
-                'despatchDateMessage'                         => Controller::htmlDisplayText(
+                'despatchDateMessage'                                 => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::despatchDate)
                 ),
-                'secondsiteLocationPath'                      => $dsCustomerItem->getValue(
+                'secondsiteLocationPath'                              => $dsCustomerItem->getValue(
                     DBEJCustomerItem::secondsiteLocationPath
                 ),
-                'secondsiteLocationPathMessage'               => Controller::htmlDisplayText(
+                'secondsiteLocationPathMessage'                       => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::secondsiteLocationPath)
                 ),
-                'secondSiteReplicationPath'                   => $dsCustomerItem->getValue(
+                'secondSiteReplicationPath'                           => $dsCustomerItem->getValue(
                     DBECustomerItem::secondSiteReplicationPath
                 ),
-                'secondSiteReplicationPathMessage'            => Controller::htmlDisplayText(
+                'secondSiteReplicationPathMessage'                    => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::secondSiteReplicationPath)
                 ),
-                'secondsiteValidationSuspendUntilDate'        => Controller::dateYMDtoDMY(
+                'secondsiteValidationSuspendUntilDate'                => Controller::dateYMDtoDMY(
                     $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteValidationSuspendUntilDate)
                 ),
-                'secondsiteValidationSuspendUntilDateMessage' => Controller::htmlDisplayText(
+                'secondsiteValidationSuspendUntilDateMessage'         => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::secondsiteValidationSuspendUntilDate)
                 ),
+                'offsiteReplicationValidationSuspendUntilDate'        => Controller::dateYMDtoDMY(
+                    $dsCustomerItem->getValue(DBEJCustomerItem::offsiteReplicationValidationSuspendedUntilDate)
+                ),
+                'offsiteReplicationValidationSuspendUntilDateMessage' => Controller::htmlDisplayText(
+                    $dsCustomerItem->getMessage(DBECustomerItem::offsiteReplicationValidationSuspendedUntilDate)
+                ),
 
-                'suspendedByText' => $suspendedByText,
-
-                'imageDelayByText' => $imageDelayByText,
+                'offsiteBackupSuspendedByText'      => $offsiteBackupSuspendedByText,
+                'offsiteReplicationSuspendedByText' => $offsiteReplicationSuspendedByText,
+                'imageDelayByText'                  => $imageDelayByText,
 
                 'secondsiteImageDelayDays'                => Controller::htmlDisplayText(
                     $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteImageDelayDays)
