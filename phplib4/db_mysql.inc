@@ -83,8 +83,7 @@ var $PConnect = 0;
         $this->Errno = mysqli_errno(self::$Link_ID);
         $this->Error = mysqli_error(self::$Link_ID);
         if (!$this->Query_ID) {
-            debug_print_backtrace();
-            $this->halt("Invalid SQL: " . $Query_String);
+//            $this->halt("Invalid SQL: " . $Query_String);
         }
 
         # Will return nada if it fails. That's fine.
