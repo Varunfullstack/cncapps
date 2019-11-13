@@ -92,7 +92,7 @@ class CTItemType extends CTCNC
                 );
 
                 $DBEItemType->setValue(DBEItemType::active, !!$this->getParam('active'));
-                $DBEItemType->setValue(DBEItemType::reocurring, !!$this->getParam('reocurring'));
+                $DBEItemType->setValue(DBEItemType::reoccurring, !!$this->getParam('reoccurring'));
                 $DBEItemType->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
@@ -109,7 +109,7 @@ class CTItemType extends CTCNC
                 );
 
                 $DBEItemType->setValue(DBEItemType::active, !!$this->getParam('active'));
-                $DBEItemType->setValue(DBEItemType::reocurring, !!$this->getParam('reocurring'));
+                $DBEItemType->setValue(DBEItemType::reoccurring, !!$this->getParam('reoccurring'));
                 $DBEItemType->insertRow();
 
                 echo json_encode(
@@ -117,7 +117,7 @@ class CTItemType extends CTCNC
                         "id"          => $DBEItemType->getValue(DBEItemType::itemTypeID),
                         "description" => $DBEItemType->getValue(DBEItemType::description),
                         "active"      => $DBEItemType->getValue(DBEItemType::active),
-                        "reocurring"  => $DBEItemType->getValue(DBEItemType::reocurring),
+                        "reoccurring"  => $DBEItemType->getValue(DBEItemType::reoccurring),
                         "stockcat"    => $DBEItemType->getValue(DBEItemType::stockcat),
                     ],
                     JSON_NUMERIC_CHECK
@@ -126,7 +126,7 @@ class CTItemType extends CTCNC
                 break;
             case 'getStockCat':
                 $dbeStockCat = new DBEStockcat($this);
-                $dbeStockCat->getRows(DBEStockcat::description);
+                $dbeStockCat->getRows(DBEStockcat::stockcat);
 
                 $data = [];
                 while ($dbeStockCat->fetchNext()) {
@@ -155,7 +155,7 @@ class CTItemType extends CTCNC
                         "id"          => $DBEItemTypes->getValue(DBEItemType::itemTypeID),
                         "description" => $DBEItemTypes->getValue(DBEItemType::description),
                         "active"      => $DBEItemTypes->getValue(DBEItemType::active),
-                        "reocurring"  => $DBEItemTypes->getValue(DBEItemType::reocurring),
+                        "reoccurring"  => $DBEItemTypes->getValue(DBEItemType::reoccurring),
                         "stockcat"    => $DBEItemTypes->getValue(DBEItemType::stockcat),
                     ];
                 }

@@ -8,11 +8,11 @@
     <changeSet author="pavwebdev" id="issue682-1">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="itemtype" columnName="reocurring"/>
+                <columnExists tableName="itemtype" columnName="reoccurring"/>
             </not>
         </preConditions>
         <addColumn tableName="itemtype">
-            <column name="reocurring" type="tinyint(1)" defaultValue="0">
+            <column name="reoccurring" type="tinyint(1)" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
@@ -31,18 +31,18 @@
     </changeSet>
     <changeSet author="pavwebdev" id="issue682-3">
         <preConditions onFail="MARK_RAN">
-            <columnExists tableName="itemtype" columnName="reocurring"/>
+            <columnExists tableName="itemtype" columnName="reoccurring"/>
         </preConditions>
         <sql>
             update itemtype
-            set reocurring = 1
+            set reoccurring = 1
             where ity_itemtypeno in (3, 4, 9, 10, 23, 28, 29, 46, 47, 53, 54, 55, 56, 57, 58, 59, 60);
         </sql>
         <rollback/>
     </changeSet>
     <changeSet author="pavwebdev" id="issue682-4">
         <preConditions onFail="MARK_RAN">
-            <columnExists tableName="itemtype" columnName="reocurring"/>
+            <columnExists tableName="itemtype" columnName="reoccurring"/>
         </preConditions>
         <sql>
             update itemtype

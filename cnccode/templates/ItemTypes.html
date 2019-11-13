@@ -16,7 +16,7 @@
         <tr>
             <th>Description</th>
             <th>Stockcat</th>
-            <th>Reocurring</th>
+            <th>reoccurring</th>
             <th>Active</th>
             <th></th>
         </tr>
@@ -32,12 +32,12 @@
                 {% stockcat %}
             </td>
             <td>
-                {% #reocurring %}
+                {% #reoccurring %}
                 <i class='fa fa-check'></i>
-                {% /reocurring %}
-                {% ^reocurring %}
+                {% /reoccurring %}
+                {% ^reoccurring %}
                 <i class='fa fa-times'></i>
-                {% /reocurring %}
+                {% /reoccurring %}
             </td>
             <td>
                 {% #active %}
@@ -72,7 +72,7 @@
     let rules = [];
 
     function newRule() {
-        return {id: null, description: "", active: null, reocurring: null, stockcat: null};
+        return {id: null, description: "", active: null, reoccurring: null, stockcat: null};
     }
 
     $.ajax({
@@ -214,7 +214,7 @@
         $('#activeInput')[0].checked = rule.active;
         $('#descriptionInput').val(rule.description);
         $('#licenseInput').val(rule.license);
-        $('#reocurringInput')[0].checked = rule.reocurring;
+        $('#reoccurringInput')[0].checked = rule.reoccurring;
         renderStockCat(rule);
     }
 
@@ -239,8 +239,8 @@
         currentRule.description = $('#descriptionInput').val();
     }
 
-    function updateReocurring() {
-        currentRule.reocurring = $('#reocurringInput').is(':checked');
+    function updatereoccurring() {
+        currentRule.reoccurring = $('#reoccurringInput').is(':checked');
     }
 
     function updateStockcat() {
@@ -286,13 +286,13 @@
     </div>
     <div>
         <div style="width: 100px; display: inline-block">
-            Reocurring
+            reoccurring
         </div>
         <input type="checkbox"
                value="true"
-               name="reocurring"
-               onchange="updateReocurring()"
-               id="reocurringInput"
+               name="reoccurring"
+               onchange="updatereoccurring()"
+               id="reoccurringInput"
         >
     </div>
     <div>

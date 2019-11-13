@@ -11,7 +11,7 @@ class DBEItemType extends DBCNCEntity
     const itemTypeID = "itemTypeID";
     const description = "description";
     const stockcat = "stockcat";
-    const reocurring = "reocurring";
+    const reoccurring = "reoccurring";
     const active = "active";
 
 
@@ -45,7 +45,7 @@ class DBEItemType extends DBCNCEntity
             "ity_stockcat"
         );
         $this->addColumn(
-            self::reocurring,
+            self::reoccurring,
             DA_BOOLEAN,
             DA_NOT_NULL,
             null,
