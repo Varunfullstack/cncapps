@@ -90,9 +90,8 @@ class CTItemType extends CTCNC
                     DBEItemType::stockcat,
                     $this->getParam('stockcat')
                 );
-
-                $DBEItemType->setValue(DBEItemType::active, !!$this->getParam('active'));
-                $DBEItemType->setValue(DBEItemType::reoccurring, !!$this->getParam('reoccurring'));
+                $DBEItemType->setValue(DBEItemType::active, !!json_decode($this->getParam('active')));
+                $DBEItemType->setValue(DBEItemType::reoccurring, !!json_decode($this->getParam('reoccurring')));
                 $DBEItemType->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
@@ -117,7 +116,7 @@ class CTItemType extends CTCNC
                         "id"          => $DBEItemType->getValue(DBEItemType::itemTypeID),
                         "description" => $DBEItemType->getValue(DBEItemType::description),
                         "active"      => $DBEItemType->getValue(DBEItemType::active),
-                        "reoccurring"  => $DBEItemType->getValue(DBEItemType::reoccurring),
+                        "reoccurring" => $DBEItemType->getValue(DBEItemType::reoccurring),
                         "stockcat"    => $DBEItemType->getValue(DBEItemType::stockcat),
                     ],
                     JSON_NUMERIC_CHECK
@@ -155,7 +154,7 @@ class CTItemType extends CTCNC
                         "id"          => $DBEItemTypes->getValue(DBEItemType::itemTypeID),
                         "description" => $DBEItemTypes->getValue(DBEItemType::description),
                         "active"      => $DBEItemTypes->getValue(DBEItemType::active),
-                        "reoccurring"  => $DBEItemTypes->getValue(DBEItemType::reoccurring),
+                        "reoccurring" => $DBEItemTypes->getValue(DBEItemType::reoccurring),
                         "stockcat"    => $DBEItemTypes->getValue(DBEItemType::stockcat),
                     ];
                 }
