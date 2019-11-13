@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 683 - Fixed SR manual completion monitor
+
 ## [v3.7.0] 
 ### Added
 - Issue 654 - Set all contacts to support level None
