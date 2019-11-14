@@ -16,7 +16,7 @@
         <tr>
             <th>Description</th>
             <th>Stockcat</th>
-            <th>reoccurring</th>
+            <th>Reoccurring</th>
             <th>Active</th>
             <th></th>
         </tr>
@@ -223,11 +223,13 @@
         for (let i = select.options.length - 1; i >= 0; i--) {
             select.remove(i);
         }
+        select.add(new Option('-- Please Select --', null, true, !item.stockcat));
         stockCatOptionsPromise.then(stockCatOptions => {
             stockCatOptions.forEach(option => {
                 select.add(new Option(option.stockcat, option.stockcat, false, item.stockcat == option.stockcat))
             })
         });
+
     }
 
 
@@ -286,7 +288,7 @@
     </div>
     <div>
         <div style="width: 100px; display: inline-block">
-            reoccurring
+            Reoccurring
         </div>
         <input type="checkbox"
                value="true"
