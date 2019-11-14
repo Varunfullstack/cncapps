@@ -1,4 +1,11 @@
 {% extends "wrapper.html.twig" %}
+
+{% block styles %}
+
+.content table td, .content table th {
+    padding: 0 15px 0 15px;
+}
+{% endblock %}
 {% block content %}
     <p>
         This service requests need to be reviewed and then completed, please review
@@ -20,7 +27,7 @@
                 Fixed Date
             </th>
             <th>
-                Outstanding For
+                Days Since Fixed
             </th>
         </tr>
         </thead>

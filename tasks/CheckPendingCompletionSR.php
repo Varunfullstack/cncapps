@@ -13,6 +13,7 @@ use Twig\Environment;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
+global $server_type;
 require_once($cfg ['path_bu'] . '/BUMail.inc.php');
 /** @var $db dbSweetcode */
 global $db;
@@ -28,7 +29,7 @@ if (!is_cli()) {
 }
 
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../twig/internal/');
-$twig = new Environment($loader, ["cache" => __DIR__ . '/../cache']);
+$twig = new Environment($loader, ["cache" => __DIR__ . '/../cache', "debug" => $server_type != MAIN_CONFIG_SERVER_TYPE_LIVE]);
 
 // Script example.php
 $shortopts = "d";
@@ -93,6 +94,7 @@ WHERE caa_status = \'C\'
   FROM
     headert
   LIMIT 1)
+  and pro_priority <> 5
 ORDER BY managerID,
   outstandingFor DESC'
 );
@@ -120,6 +122,9 @@ sendEmail($twig, $items, $lastManager);
 
 function sendEmail($twig, $items, $managerName)
 {
+    if (!count($items)) {
+        return;
+    }
     $thing = null;
     $buMail = new BUMail($thing);
     $senderEmail = CONFIG_SUPPORT_EMAIL;

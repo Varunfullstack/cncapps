@@ -28,11 +28,17 @@
             border-spacing: 1px;
         }
 
+        table td, table th {
+            text-align: left;
+        }
+
+        {% block styles %}
+        {% endblock %}
         -->
     </style>
 </head>
 <body>
-<div id="content">
+<div id="content" class="content">
     <p>
         {% block content %}
         {% endblock %}
