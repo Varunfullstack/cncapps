@@ -363,12 +363,8 @@ class CTRenContract extends CTCNC
                 'users'                              => Controller::htmlDisplayText(
                     $dsRenContract->getValue(DBEJRenContract::users)
                 ),
-                'unitSalePriceMonth'                 => ($dsRenContract->getValue(
-                            DBEJRenContract::curUnitSale
-                        ) / 12) / $dsRenContract->getValue(DBEJRenContract::users),
-                'unitCostPriceMonth'                 => ($dsRenContract->getValue(
-                            DBEJRenContract::curUnitCost
-                        ) / 12) / $dsRenContract->getValue(DBEJRenContract::users),
+                'salePricePerMonth'                 => $dsRenContract->getValue(DBECustomerItem::salePricePerMonth),
+                'costPricePerMonth'                 => $dsRenContract->getValue(DBECustomerItem::costPricePerMonth),
                 'siteDesc'                           => Controller::htmlDisplayText(
                     $dsRenContract->getValue(DBEJRenContract::siteName)
                 ),

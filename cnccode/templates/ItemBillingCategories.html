@@ -15,22 +15,31 @@
         <thead>
         <tr>
             <th>Name</th>
+            <th>Arrears Billing</th>
             <th></th>
         </tr>
         </thead>
         <tbody>
-        {% #itemBillingCategorys %}
+        {% #itemBillingCategories %}
         <tr data-id="{% id %}"
         >
             <td>
                 {% name %}
+            </td>
+            <td>
+                {% #arrearsBilling %}
+                <i class='fa fa-check'></i>
+                {% /arrearsBilling %}
+                {% ^arrearsBilling %}
+                <i class='fa fa-times'></i>
+                {% /arrearsBilling %}
             </td>
             <td class="buttons">
                 <button class="editButton">Edit</button>
                 <button class="deleteButton">Delete</button>
             </td>
         </tr>
-        {% /itemBillingCategorys %}
+        {% /itemBillingCategories %}
         </tbody>
     </table>
 
@@ -43,10 +52,10 @@
     let list = null;
     let detail = null;
 
-    let itemBillingCategorys = [];
+    let itemBillingCategories = [];
 
     function newItemBillingCategory() {
-        return {id: null, name: null};
+        return {id: null, name: null, arrearsBilling: false};
     }
 
     $.ajax({
@@ -54,7 +63,7 @@
         method: 'GET',
         dataType: 'JSON'
     }).then(function (result) {
-        itemBillingCategorys = result;
+        itemBillingCategories = result;
         drawList();
     });
 
@@ -64,7 +73,7 @@
 
     function drawList() {
         const source = document.getElementById("itemBillingCategory-items-template").innerHTML;
-        const context = {itemBillingCategorys: itemBillingCategorys};
+        const context = {itemBillingCategories: itemBillingCategories};
         const html = Mustache.to_html(source, context);
         list.html(html);
     }
@@ -85,7 +94,7 @@
             $elm = $(this);
 
             const data = $elm.closest('tr').data();
-            editingItem = itemBillingCategorys.find(e => e.id === data.id);
+            editingItem = itemBillingCategories.find(e => e.id === data.id);
 
             if (!editingItem) {
                 throw Error('Failed to find element to edit');
@@ -105,7 +114,7 @@
             $elm = $(this);
 
             const data = $elm.closest('tr').data();
-            const foundIndex = itemBillingCategorys.findIndex(e => e.id === data.id);
+            const foundIndex = itemBillingCategories.findIndex(e => e.id === data.id);
 
             if (foundIndex < 0) {
                 throw Error('Failed to find element to delete');
@@ -117,7 +126,7 @@
                 url: url,
                 method: 'GET',
             }).then(function () {
-                itemBillingCategorys.splice(foundIndex, 1);
+                itemBillingCategories.splice(foundIndex, 1);
                 drawList();
             })
         });
@@ -153,7 +162,6 @@
 
         const addURL = '{URLAddItem}';
         const updateURL = '{URLUpdateItem}';
-
         const url = currentItemBillingCategory.id ? updateURL : addURL;
 
         $.ajax({
@@ -164,12 +172,12 @@
             data: currentItemBillingCategory
         }).then(function (result) {
             if (!currentItemBillingCategory.id) {
-                itemBillingCategorys.push(result);
+                itemBillingCategories.push(result);
             } else {
-                const foundIndex = itemBillingCategorys.findIndex(itemBillingCategory => currentItemBillingCategory.id === itemBillingCategory.id);
-                itemBillingCategorys = arrayReplaceAt(itemBillingCategorys, foundIndex, currentItemBillingCategory);
+                const foundIndex = itemBillingCategories.findIndex(itemBillingCategory => currentItemBillingCategory.id === itemBillingCategory.id);
+                itemBillingCategories = arrayReplaceAt(itemBillingCategories, foundIndex, currentItemBillingCategory);
             }
-            itemBillingCategorys.sort((a, b) => a.name.localeCompare(b.name));
+            itemBillingCategories.sort((a, b) => a.name.localeCompare(b.name));
             drawList();
             cancelEdit();
         })
@@ -185,6 +193,11 @@
     function setEditItemBillingCategory(itemBillingCategory) {
         currentItemBillingCategory = itemBillingCategory;
         $('#nameInput').val(itemBillingCategory.name);
+        document.getElementById('arrearsBillingInput').checked = itemBillingCategory.arrearsBilling;
+    }
+
+    function updateArrearsBilling() {
+        currentItemBillingCategory.arrearsBilling = document.getElementById('arrearsBillingInput').checked;
     }
 
     function updateName() {
@@ -205,6 +218,16 @@
                name="name"
                onchange="updateName()"
                id="nameInput"
+        >
+    </div>
+    <div>
+        <div style="width: 100px; display: inline-block">
+            Arrears Billing
+        </div>
+        <input type="checkbox"
+               name="arrearsBilling"
+               onchange="updateArrearsBilling()"
+               id="arrearsBillingInput"
         >
     </div>
     <div>

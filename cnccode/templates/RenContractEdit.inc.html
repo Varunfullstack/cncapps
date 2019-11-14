@@ -157,14 +157,6 @@
                value="{siteNo}"
         >
         <input type="hidden"
-               name="renContract[1][curUnitSale]"
-               value="{curUnitSale}"
-        >
-        <input type="hidden"
-               name="renContract[1][curUnitCost]"
-               value="{curUnitCost}"
-        >
-        <input type="hidden"
                name="renContract[1][invoiceFromDate]"
                value="{invoiceFromDate}"
         >
@@ -236,10 +228,11 @@
             <td class="promptText">Unit Sale Price/Month</td>
             <td class="fieldText">
                 <input type="number"
-                       value="{unitSalePriceMonth}"
+                       value="{salePricePerMonth}"
                        onkeyup="recalculateSalePrice()"
                        id="unitSale"
                        step="0.01"
+                       name="renContract[1][salePricePerMonth]"
                 >
             </td>
         </tr>
@@ -247,10 +240,11 @@
             <td class="promptText">Unit Cost Price/Month</td>
             <td class="fieldText">
                 <input type="number"
-                       value="{unitCostPriceMonth}"
+                       value="{costPricePerMonth}"
                        onkeyup="recalculateCostPrice()"
                        id="unitCost"
                        step="0.01"
+                       name="renContract[1][costPricePerMonth]"
                 >
             </td>
         </tr>

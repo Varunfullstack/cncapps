@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class DBEJRenContract extends DBECustomerItem
@@ -17,6 +18,7 @@ class DBEJRenContract extends DBECustomerItem
     const invoiceToDate = "invoiceToDate";
     const invoiceFromDateYMD = "invoiceFromDateYMD";
     const invoiceToDateYMD = "invoiceToDateYMD";
+    const isArrears = 'isArrears';
 
 
     function __construct(&$owner)
@@ -57,7 +59,7 @@ class DBEJRenContract extends DBECustomerItem
             self::invoiceFromDate,
             DA_DATE,
             DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%d/%m/%Y')"
+            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%d/%m/%Y') as invoiceFromDate"
         );
         $this->addColumn(
             self::invoiceToDate,
@@ -68,19 +70,19 @@ class DBEJRenContract extends DBECustomerItem
  					DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ),
  					INTERVAL 1 DAY
  				)
- 				, '%d/%m/%Y')"
+ 				, '%d/%m/%Y') as invoiceToDate"
         );
         $this->addColumn(
             self::invoiceFromDateYMD,
             DA_DATE,
             DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%Y-%m-%d') as invoiceFromDateYMD"
+            "DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ) as invoiceFromDateYMD"
         );
         $this->addColumn(
             self::invoiceToDateYMD,
             DA_DATE,
             DA_NOT_NULL,
-            "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ), '%Y-%m-%d') as invoiceToDateYMD"
+            "DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ) as invoiceToDateYMD"
         );
         $this->addColumn(
             self::curUnitSale,
@@ -108,6 +110,16 @@ class DBEJRenContract extends DBECustomerItem
             "itm_desc like '%SSL%' as isSSL "
         );
 
+        $this->addColumn(
+            self::isArrears,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            "COALESCE(
+    itemBillingCategory.arrearsBilling,
+    0
+  ) as isArrears"
+        );
+
         $this->setAddColumnsOff();
     }
 
@@ -126,7 +138,10 @@ class DBEJRenContract extends DBECustomerItem
             " JOIN item ON  itm_itemno = cui_itemno
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
-      JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno";
+      JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
+       LEFT JOIN itemBillingCategory
+         ON item.itemBillingCategoryID = itemBillingCategory.id
+      ";
     }
 
     function getRows($orderBy = false)
@@ -161,10 +176,9 @@ class DBEJRenContract extends DBECustomerItem
      *
      * WHen the invoice has been generated, the total invoice months is increased by the invoice period months
      * so the renewal gets picked up again.
-     * @param bool $ignorePrePayContracts
      * @param null $itemBillingCategoryID
      */
-    function getRenewalsDueRows($ignorePrePayContracts = true, $itemBillingCategoryID = null)
+    function getRenewalsDueRows($itemBillingCategoryID = null)
     {
 
         $statement =
@@ -175,13 +189,19 @@ class DBEJRenContract extends DBECustomerItem
       JOIN itemtype ON  ity_itemtypeno = itm_itemtypeno
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
-		 WHERE CURDATE() >= ( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` - 1 MONTH ) )
+      LEFT JOIN itemBillingCategory
+         ON item.itemBillingCategoryID = itemBillingCategory.id
+		 WHERE 
+		 (not coalesce(itemBillingCategory.arrearsBilling, 0) and CURDATE() >=  DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` - 1 MONTH ) ) or (itemBillingCategory.arrearsBilling and curdate() > DATE_SUB(
+      DATE_ADD(
+        `installationDate`,
+        INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH
+      ),
+      INTERVAL 1 DAY
+    ))
 		 AND declinedFlag = 'N'
-     AND renewalTypeID = 2 and directDebitFlag <> 'Y'";
+     AND renewalTypeID = 2 and directDebitFlag <> 'Y' and item.itm_itemtypeno <> 57";
 
-        if ($ignorePrePayContracts) {
-            $statement .= ' and itm_itemno <> 4111';
-        }
 
         if ($itemBillingCategoryID) {
             $statement .= " and item.itemBillingCategoryID = " . $this->escapeValue($itemBillingCategoryID);
@@ -190,6 +210,7 @@ class DBEJRenContract extends DBECustomerItem
         }
 
         $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc, isSSL";
+        var_dump($statement);
         $this->setQueryString($statement);
         parent::getRows();
     }
@@ -223,7 +244,9 @@ class DBEJRenContract extends DBECustomerItem
 
     function searchByTerm($term, $itemsPerPage, $page)
     {
-        $query = $this->getBaseQuery().' where item.itm_desc like "%'.$this->escapeValue($term).'%" and renewalTypeID = 2';
+        $query = $this->getBaseQuery() . ' where item.itm_desc like "%' . $this->escapeValue(
+                $term
+            ) . '%" and renewalTypeID = 2';
     }
 
 }

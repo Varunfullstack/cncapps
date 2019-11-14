@@ -18,6 +18,9 @@
             <column name="name" type="varchar(50)">
                 <constraints nullable="false"/>
             </column>
+            <column name="arrearsBilling" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
     <changeSet author="pavwebdev" id="issue672-2">

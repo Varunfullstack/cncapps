@@ -10,6 +10,7 @@ class DBEItemBillingCategory extends DBEntity
 {
     const id = "id";
     const name = "name";
+    const arrearsBilling = "arrearsBilling";
 
     /**
      * calls constructor()
@@ -32,6 +33,14 @@ class DBEItemBillingCategory extends DBEntity
             DA_TEXT,
             DA_NOT_NULL
         );
+        $this->addColumn(
+            self::arrearsBilling,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
+        );
+
 
         $this->setAddColumnsOff();
         $this->setPK(0);

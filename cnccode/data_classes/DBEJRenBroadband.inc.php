@@ -192,7 +192,7 @@ class DBEJRenBroadband extends DBECustomerItem
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 		 WHERE CURDATE() >= ( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` - 1 MONTH ) )
      AND renewalTypeID = 1
-		 AND declinedFlag = 'N' and directDebitFlag <> 'Y'";
+		 AND declinedFlag = 'N' and directDebitFlag <> 'Y' and item.itm_itemtypeno <> 57";
         $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";
         $this->setQueryString($statement);
         $ret = (parent::getRows());

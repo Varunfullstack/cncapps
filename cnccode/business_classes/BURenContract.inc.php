@@ -205,7 +205,7 @@ class BURenContract extends Business
         $buInvoice = new BUInvoice ($this);
         $buActivity = new BUActivity ($this);
 
-        $this->dbeJRenContract->getRenewalsDueRows(null, $itemBillingCategoryID);
+        $this->dbeJRenContract->getRenewalsDueRows($itemBillingCategoryID);
 
         $dsRenContract = new DSForm($this);
         $dsRenContract->replicate($this->dbeJRenContract);

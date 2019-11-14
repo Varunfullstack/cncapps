@@ -172,6 +172,19 @@ WHERE declinedFlag = 'N'
                 }
 
                 $dbeCustomerItem->setValue(DBECustomerItem::users, $_REQUEST['users']);
+                $dbeCustomerItem->setValue(
+                    DBECustomerItem::curUnitCost,
+                    $_REQUEST['users'] * $dbeCustomerItem->getValue(
+                        DBECustomerItem::costPricePerMonth
+                    ) * 12
+                );
+                $dbeCustomerItem->setValue(
+                    DBECustomerItem::curUnitSale,
+                    $_REQUEST['users'] * $dbeCustomerItem->getValue(
+                        DBECustomerItem::salePricePerMonth
+                    ) * 12
+                );
+
                 $dbeCustomerItem->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;

@@ -180,7 +180,7 @@ class DBEJRenDomain extends DBECustomerItem
 				DATE_FORMAT( DATE_ADD( CURDATE(), INTERVAL 1 MONTH ), '%Y%m' ) >=
 				DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%Y%m' )
 			 	AND declinedFlag = 'N'
-        AND renewalTypeID = 4 and directDebitFlag <> 'Y'";
+        AND renewalTypeID = 4 and directDebitFlag <> 'Y' and item.itm_itemtypeno <> 57";
         $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";
         $this->setQueryString($statement);
         $ret = (parent::getRows());

@@ -78,6 +78,10 @@ class CTItemBillingCategory extends CTCNC
                     DBEItemBillingCategory::name,
                     $this->getParam('name')
                 );
+                $dbeItemBillingCategory->setValue(
+                    DBEItemBillingCategory::arrearsBilling,
+                    json_decode($this->getParam('arrearsBilling'))
+                );
                 $dbeItemBillingCategory->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
@@ -88,14 +92,17 @@ class CTItemBillingCategory extends CTCNC
                     DBEItemBillingCategory::name,
                     $this->getParam('name')
                 );
+                $dbeItemBillingCategory->setValue(
+                    DBEItemBillingCategory::arrearsBilling,
+                    json_decode($this->getParam('arrearsBilling'))
+                );
                 $dbeItemBillingCategory->insertRow();
 
                 echo json_encode(
                     [
-                        "id"   => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::id),
-                        "name" => $dbeItemBillingCategory->getValue(
-                            DBEItemBillingCategory::name
-                        ),
+                        "id"             => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::id),
+                        "name"           => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::name),
+                        "arrearsBilling" => $dbeItemBillingCategory->getValue(DBEItemBillingCategory::arrearsBilling)
                     ],
                     JSON_NUMERIC_CHECK
                 );
@@ -107,8 +114,9 @@ class CTItemBillingCategory extends CTCNC
                 $data = [];
                 while ($dbeItemBillingCategories->fetchNext()) {
                     $data[] = [
-                        "id"   => $dbeItemBillingCategories->getValue(DBEItemBillingCategory::id),
-                        "name" => $dbeItemBillingCategories->getValue(DBEItemBillingCategory::name),
+                        "id"             => $dbeItemBillingCategories->getValue(DBEItemBillingCategory::id),
+                        "name"           => $dbeItemBillingCategories->getValue(DBEItemBillingCategory::name),
+                        "arrearsBilling" => $dbeItemBillingCategories->getValue(DBEItemBillingCategory::arrearsBilling)
                     ];
                 }
                 echo json_encode($data, JSON_NUMERIC_CHECK);
