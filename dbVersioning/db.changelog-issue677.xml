@@ -17,4 +17,16 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue677-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="password" columnName="salesPassword"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="password">
+            <column name="salesPassword" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
