@@ -19,6 +19,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 663 - Password Service Sorting not working
 - Issue 592 - Security Improvements
+- Issue 683 - Fixed SR manual completion monitor
 
 ## [v3.7.0] 
 ### Added

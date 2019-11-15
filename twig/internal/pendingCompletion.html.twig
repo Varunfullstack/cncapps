@@ -1,0 +1,56 @@
+{% extends "wrapper.html.twig" %}
+
+{% block styles %}
+
+.content table td, .content table th {
+    padding: 0 15px 0 15px;
+}
+{% endblock %}
+{% block content %}
+    <p>
+        This service requests need to be reviewed and then completed, please review
+        <a href="{{ searchLink }}">here</a>
+    </p>
+    <table>
+        <thead>
+        <tr>
+            <th>
+                SR Number
+            </th>
+            <th>
+                Customer Name
+            </th>
+            <th>
+                Fixed By
+            </th>
+            <th>
+                Fixed Date
+            </th>
+            <th>
+                Days Since Fixed
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>
+                    <a href="{{ item.activityLink }}">{{ item.serviceRequest }}</a>
+                </td>
+                <td>
+                    {{ item.customerName }}
+                </td>
+                <td>
+                    {{ item.fixedBy }}
+                </td>
+                <td>
+                    {{ item.fixedDate }}
+                </td>
+                <td>
+                    {{ item.outstandingFor }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
