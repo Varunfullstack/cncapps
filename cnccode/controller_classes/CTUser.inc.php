@@ -9,6 +9,7 @@
 
 use CNCLTD\Encryption;
 
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -252,7 +253,7 @@ class CTUser extends CTCNC
         }
     }
 
-/**
+    /**
      * Edit/Add Expense Type
      * @access private
      * @throws Exception
@@ -686,7 +687,7 @@ class CTUser extends CTCNC
         $this->parsePage();
     }
 
-        /**
+    /**
      * Delete Expense Type
      *
      * @access private
