@@ -17,6 +17,7 @@ This project changes will be shown here.
 - Issue 668 - Phone number cleansing
 ### Fixed
 - Issue 663 - Password Service Sorting not working
+- Issue 592 - Security Improvements
 
 ## [v3.7.0] 
 ### Added
