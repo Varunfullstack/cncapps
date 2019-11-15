@@ -1,0 +1,30 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue659-0">
+        <tagDatabase tag="issue659"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue659-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="backup_performance_log" columnName="target"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="backup_performance_log">
+            <column name="target" type="int(3)" defaultValue="95">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue659-2">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="backup_performance_log" columnName="target"/>
+        </preConditions>
+        <sql>
+            update backup_performance_log
+            set target = if(isReplication, (select backupReplicationTargetSuccessRate from headert limit 1),
+                            (select hed_backup_target_success_rate from headert limit 1));
+        </sql>
+    </changeSet>
+</databaseChangeLog>

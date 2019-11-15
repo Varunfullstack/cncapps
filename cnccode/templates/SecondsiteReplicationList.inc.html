@@ -18,14 +18,27 @@
 </script>
 
 
-<form name="searchForm" method="get" action="{urlSubmit}" id="searchForm">
-    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+<form name="searchForm"
+      method="get"
+      action="{urlSubmit}"
+      id="searchForm"
+>
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
         <tr>
 
             <td>
-                <select name="searchYear" id="yearSelector">
+                <select name="searchYear"
+                        id="yearSelector"
+                >
                     <!-- BEGIN availableYearsBlock -->
-                    <option value="{year}" {selectedYear}>{year}</option>
+                    <option value="{year}"
+                            {selectedYear}
+                    >{year}
+                    </option>
                     <!-- END availableYearsBlock -->
                 </select>
             </td>
@@ -37,7 +50,6 @@
     <thead>
     <tr>
         <th>&nbsp;</th>
-        <th>Target</th>
         <th>Jan</th>
         <th>Feb</th>
         <th>Mar</th>
@@ -56,7 +68,6 @@
 
     <tr>
         <th>Backup Success Rate %</th>
-        <td>{backupTargetSuccessRate}</td>
         <td class="{monthSuccessRate1Class}">{monthSuccessRate1}</td>
         <td class="{monthSuccessRate2Class}">{monthSuccessRate2}</td>
         <td class="{monthSuccessRate3Class}">{monthSuccessRate3}</td>
@@ -69,6 +80,21 @@
         <td class="{monthSuccessRate10Class}">{monthSuccessRate10}</td>
         <td class="{monthSuccessRate11Class}">{monthSuccessRate11}</td>
         <td class="{monthSuccessRate12Class}">{monthSuccessRate12}</td>
+    </tr>
+    <tr>
+        <th>Backup Target Rate %</th>
+        <td>{monthTargetRate1}</td>
+        <td>{monthTargetRate2}</td>
+        <td>{monthTargetRate3}</td>
+        <td>{monthTargetRate4}</td>
+        <td>{monthTargetRate5}</td>
+        <td>{monthTargetRate6}</td>
+        <td>{monthTargetRate7}</td>
+        <td>{monthTargetRate8}</td>
+        <td>{monthTargetRate9}</td>
+        <td>{monthTargetRate10}</td>
+        <td>{monthTargetRate11}</td>
+        <td>{monthTargetRate12}</td>
     </tr>
     </tbody>
 </table>
@@ -233,7 +259,11 @@
     </tbody>
 </table>
 <h2>Excluded</h2>
-<table class="second-site-image" id="excluded" class="table-bordered" width="100%">
+<table class="second-site-image"
+       id="excluded"
+       class="table-bordered"
+       width="100%"
+>
     <thead>
     <tr>
         <th width="20%">Customer</th>
@@ -244,7 +274,9 @@
     <!-- BEGIN excludedBlock -->
     <tr>
         <td>{customerName}</td>
-        <td><a href="{urlServer}" target="_blank">{serverName}</a></td>
+        <td><a href="{urlServer}"
+               target="_blank"
+        >{serverName}</a></td>
     </tr>
     <!-- END excludedBlock -->
     </tbody>

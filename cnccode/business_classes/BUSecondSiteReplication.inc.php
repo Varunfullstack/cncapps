@@ -331,6 +331,9 @@ class BUSecondsiteReplication extends BUSecondsite
                 return;
             }
 
+            $buHeader = new BUHeader($this);
+            $buHeader->getHeader($dsHeader);
+
             $query = "INSERT INTO backup_performance_log (
                       created_at,
                       servers,
@@ -341,7 +344,7 @@ class BUSecondsiteReplication extends BUSecondsite
                       passes,
                       success_rate,
                       isReplication
-                    ) VALUES (now(), ?, ?, ?, ?, ?, ?, ?, 1)";
+                    ) VALUES (now(), ?, ?, ?, ?, ?, ?, ?, 1, ?)";
             $db->preparedQuery(
                 $query,
                 [
@@ -372,8 +375,11 @@ class BUSecondsiteReplication extends BUSecondsite
                     [
                         "type"  => "d",
                         "value" => $this->imageCount ? ($this->imagePassesCount / $this->imageCount) * 100 : 0
+                    ],
+                    [
+                        "type"  => "d",
+                        "value" => $dsHeader->getValue(DBEHeader::backupReplicationTargetSuccessRate)
                     ]
-
                 ]
             );
 
@@ -573,36 +579,9 @@ class BUSecondsiteReplication extends BUSecondsite
 
     }
 
-    function getPerformanceDataForYear($year = null)
-    {
-
-        if (!$year) {
-            $year = date("Y");
-        }
-
-        $query = "SELECT SUM(passes)/ SUM(images) as successRate, MONTH FROM (
-            SELECT MONTH(created_at) AS MONTH, images, passes FROM backup_performance_log WHERE YEAR(created_at) = '$year' and isReplication
-) t GROUP BY t.month";
-
-        $result = $this->db->query($query);
-
-        $data = [
-        ];
-
-        for ($i = 0; $i < 12; $i++) {
-            $data[$i + 1] = "N/A";
-        }
-
-        while ($row = $result->fetch_assoc()) {
-            $data[$row['MONTH']] = $row['successRate'] * 100;
-        }
-
-        return $data;
-    }
-
     function getPerformanceDataAvailableYears()
     {
-        $query = "SELECT  DISTINCT YEAR(created_at) AS YEAR  FROM    backup_performance_log where isReplication";
+        $query = "SELECT  DISTINCT YEAR(created_at) AS YEAR  FROM backup_performance_log where isReplication";
         $result = $this->db->query($query);
 
         return array_map(
