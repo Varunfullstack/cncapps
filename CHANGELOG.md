@@ -15,6 +15,7 @@ This project changes will be shown here.
 - Issue 669 - Asset list extract remove duplicated logged in users names
 - Issue 661 - Review Meetings show primary active site
 - Issue 668 - Phone number cleansing
+- Issue 682 - Item Type Amendments
 ### Fixed
 - Issue 663 - Password Service Sorting not working
 - Issue 592 - Security Improvements

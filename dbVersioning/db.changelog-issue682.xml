@@ -1,0 +1,66 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue682-0">
+        <tagDatabase tag="issue682"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue682-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="itemtype" columnName="reoccurring"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="itemtype">
+            <column name="reoccurring" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue682-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="itemtype" columnName="active"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="itemtype">
+            <column name="active" type="tinyint(1)" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue682-3">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="itemtype" columnName="reoccurring"/>
+        </preConditions>
+        <sql>
+            update itemtype
+            set reoccurring = 1
+            where ity_itemtypeno in (3, 4, 9, 10, 23, 28, 29, 46, 47, 53, 54, 55, 56, 57, 58, 59, 60);
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue682-4">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="itemtype" columnName="reoccurring"/>
+        </preConditions>
+        <sql>
+            update itemtype
+            set active = 0
+            where ity_itemtypeno in
+                  (59, 36, 14, 15, 6, 60, 49, 50, 51, 52, 22, 19, 20, 40, 48, 17, 31, 32, 33, 44, 45, 46, 47, 28, 55,
+                   56, 57, 10);
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue682-5">
+        <sql>
+            update db_sequence
+            set nextid = (select max(ity_itemtypeno) + 1 from itemtype)
+            where seq_name = "itemtype"
+        </sql>
+        <rollback/>
+    </changeSet>
+
+
+</databaseChangeLog>
