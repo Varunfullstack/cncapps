@@ -25,11 +25,23 @@
         data.append('upfile', file);
         data.append('expenseID', expenseID);
         data.append('action', 'upload');
-        fetch(`/Receipt.php`, {method: 'POST', body: data}).then((response) => {
-            console.log(response);
-        })
+        fetch(`/Receipt.php`, {method: 'POST', body: data})
+            .then((response) => {
+                response.json().then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+                    const receiptContainerHTMLElement = document.querySelector('tr[data-expense-id="' + expenseID + '"] .receiptContainer');
+                    receiptContainerHTMLElement.innerHTML = "";
+                    const anchor = document.createElement('a');
+                    anchor.href = '/Receipt.php?action=show&receiptID=' + data.receiptId;
+                    anchor.text = 'See Receipt';
+                    anchor.target = '_blank';
+                    receiptContainerHTMLElement.appendChild(anchor);
+                })
 
-
+            })
     }
 </script>
 <TABLE width="100"
@@ -103,7 +115,10 @@
             <DIV align="left">{vatFlag}</div>
         </td>
         <td class="orderLineItem">
-            <DIV align="left">{receiptUpload}</div>
+            <DIV align="left"
+                 class="receiptContainer"
+            >{receiptUpload}
+            </div>
         </td>
         <td class="orderLineItem">
             <DIV align="left"></div>
