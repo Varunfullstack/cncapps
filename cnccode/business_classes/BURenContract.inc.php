@@ -4,6 +4,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_bu"] . "/BUCustomerItem.inc.php");
 require_once($cfg ["path_bu"] . "/BUActivity.inc.php");
@@ -441,7 +442,7 @@ class BURenContract extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::qtyOrdered,
-                    $itemBillingCategoryID ? $dbeJCustomerItem->getValue(DBEJCustomerItem::users) : 1
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::users)
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::qtyDespatched,
@@ -453,20 +454,17 @@ class BURenContract extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::curUnitSale,
-                    $itemBillingCategoryID ?
-                        ($dbeJCustomerItem->getValue(DBECustomerItem::curUnitSale) / 12 / $dsRenContract->getValue(
-                                DBEJRenContract::users
-                            )) : (($dbeJCustomerItem->getValue(DBECustomerItem::curUnitSale) / 12) *
-                        $dsRenContract->getValue(DBECustomerItem::invoicePeriodMonths))
+                    $dbeJCustomerItem->getValue(DBECustomerItem::salePricePerMonth) * $dbeJCustomerItem->getValue(
+                        DBECustomerItem::invoicePeriodMonths
+                    )
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::curUnitCost,
-                    $itemBillingCategoryID ? ($dbeJCustomerItem->getValue(
-                            DBECustomerItem::curUnitCost
-                        ) / 12 / $dsRenContract->getValue(
-                            DBEJRenContract::users
-                        )) : ($dbeJCustomerItem->getValue(DBECustomerItem::curUnitCost) / 12) *
-                        $dsRenContract->getValue(DBECustomerItem::invoicePeriodMonths)
+                    $dbeJCustomerItem->getValue(
+                        DBECustomerItem::curUnitCost
+                    ) * $dbeJCustomerItem->getValue(
+                        DBECustomerItem::invoicePeriodMonths
+                    )
                 );
 
                 $dbeOrdline->insertRow();

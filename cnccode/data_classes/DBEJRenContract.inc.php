@@ -192,7 +192,16 @@ class DBEJRenContract extends DBECustomerItem
       LEFT JOIN itemBillingCategory
          ON item.itemBillingCategoryID = itemBillingCategory.id
 		 WHERE 
-		 (not coalesce(itemBillingCategory.arrearsBilling, 0) and CURDATE() >=  DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` - 1 MONTH ) ) or (itemBillingCategory.arrearsBilling and curdate() > DATE_SUB(
+		 CURDATE() >= IF(
+  COALESCE(
+    itemBillingCategory.arrearsBilling,
+    0
+  ),
+  DATE_ADD(
+    `installationDate`,
+    INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH
+  ),
+  DATE_SUB(
       DATE_ADD(
         `installationDate`,
         INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH
@@ -201,16 +210,12 @@ class DBEJRenContract extends DBECustomerItem
     ))
 		 AND declinedFlag = 'N'
      AND renewalTypeID = 2 and directDebitFlag <> 'Y' and item.itm_itemtypeno <> 57";
-
-
         if ($itemBillingCategoryID) {
             $statement .= " and item.itemBillingCategoryID = " . $this->escapeValue($itemBillingCategoryID);
         } else {
             $statement .= " and item.itemBillingCategoryID is null ";
         }
-
         $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc, isSSL";
-        var_dump($statement);
         $this->setQueryString($statement);
         parent::getRows();
     }

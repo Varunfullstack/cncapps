@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BURenContract.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
@@ -363,8 +364,8 @@ class CTRenContract extends CTCNC
                 'users'                              => Controller::htmlDisplayText(
                     $dsRenContract->getValue(DBEJRenContract::users)
                 ),
-                'salePricePerMonth'                 => $dsRenContract->getValue(DBECustomerItem::salePricePerMonth),
-                'costPricePerMonth'                 => $dsRenContract->getValue(DBECustomerItem::costPricePerMonth),
+                'salePricePerMonth'                  => $dsRenContract->getValue(DBECustomerItem::salePricePerMonth),
+                'costPricePerMonth'                  => $dsRenContract->getValue(DBECustomerItem::costPricePerMonth),
                 'siteDesc'                           => Controller::htmlDisplayText(
                     $dsRenContract->getValue(DBEJRenContract::siteName)
                 ),
