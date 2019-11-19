@@ -113,6 +113,15 @@
                         return '<input value="' + data + '" onchange="changeUsers()" data-contract-id="' + row.contractID + '"><div class="progressIndicator"></div>'
                     }
                 },
+                {data: 'invoicePeriodMonths'},
+                {
+                    data: 'invoiceFromDate',
+                    sortable: false,
+                    render: function (data, type, row) {
+                        return "from " + row.invoiceFromDate + " to " + row.invoiceToDate;
+
+                    }
+                }
             ]
         });
     })
@@ -130,6 +139,8 @@
         <th data-autocomplete-url="/Customer.php?action=searchName">Customer</th>
         <th data-autocomplete-url="/ItemBillingCategory.php?action=searchName">Item Billing Category</th>
         <th data-no-search="true">Number of Users</th>
+        <th data-no-search="true">Invoice Interval(Months)</th>
+        <th data-no-search="true">Next Invoice Period</th>
     </tr>
     </thead>
     <tfoot>
@@ -138,6 +149,8 @@
         <th>Customer</th>
         <th>Item Billing Category</th>
         <th>Number of Users</th>
+        <th>Invoice Interval(Months)</th>
+        <th>Next Invoice Period</th>
     </tr>
     </tfoot>
 </table>

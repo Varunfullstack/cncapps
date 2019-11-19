@@ -22,6 +22,22 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <sql>
+            insert into itemBillingCategory
+            values (1, "Duo", 1),
+                   (2, "Exclaimer", 1),
+                   (3, "Office 365 Backup", 1),
+                   (4, "Office 365", 1),
+                   (5, "SPLA", 1);
+            delete
+            from db_sequence
+            where seq_name = "itembillingcategory";
+            INSERT INTO db_sequence
+            VALUES ("itembillingcategory", (select max(id) + 1 from itemBillingCategory))
+        </sql>
+        <rollback>
+            <dropTable tableName="itemBillingCategory"/>
+        </rollback>
     </changeSet>
     <changeSet author="pavwebdev" id="issue672-2">
         <preConditions onFail="MARK_RAN">
@@ -59,5 +75,19 @@
                 <constraints nullable="false"/>
             </column>
         </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue672-5">
+        <sql>
+            UPDATE
+                custitem
+                    JOIN item
+                    ON itm_itemno = cui_itemno
+                    JOIN itemtype
+                    ON ity_itemtypeno = itm_itemtypeno
+            SET salePricePerMonth = cui_sale_price / 12 / cui_users,
+                costPricePerMonth = cui_cost_price / 12 / cui_users
+            WHERE renewalTypeID = 2
+        </sql>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>

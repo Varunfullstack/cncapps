@@ -461,7 +461,7 @@ class BURenContract extends Business
                 $dbeOrdline->setValue(
                     DBEOrdline::curUnitCost,
                     $dbeJCustomerItem->getValue(
-                        DBECustomerItem::curUnitCost
+                        DBECustomerItem::costPricePerMonth
                     ) * $dbeJCustomerItem->getValue(
                         DBECustomerItem::invoicePeriodMonths
                     )

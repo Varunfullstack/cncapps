@@ -54,11 +54,14 @@ class CTRenewalsUpdate extends CTCNC
                     "contractName",
                     "customerName",
                     "itemBillingCategoryName",
+                    "numberOfUsers",
+                    "invoicePeriodMonths",
                 ];
                 $columnsDefinition = [
                     "contractName"            => "item.`itm_desc`",
                     "customerName"            => "customer.`cus_name`",
-                    "itemBillingCategoryName" => "itemBillingCategory.name"
+                    "itemBillingCategoryName" => "itemBillingCategory.name",
+                    "invoicePeriodMonths"     => "custitem.invoicePeriodMonths",
                 ];
 
                 /** @var dbSweetcode $db */
@@ -74,7 +77,15 @@ class CTRenewalsUpdate extends CTCNC
   item.`itm_desc` AS contractName,
   customer.`cus_name` AS customerName,
   itemBillingCategory.name AS itemBillingCategoryName,
-  custitem.`cui_users` AS numberOfUsers
+  custitem.`cui_users` AS numberOfUsers,
+       DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%d/%m/%Y') as invoiceFromDate,
+DATE_FORMAT(
+ 				DATE_SUB(
+ 					DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH ),
+ 					INTERVAL 1 DAY
+ 				)
+ 				, '%d/%m/%Y') as invoiceToDate,
+       invoicePeriodMonths
 FROM
   custitem
   LEFT JOIN item
@@ -111,13 +122,17 @@ WHERE declinedFlag = 'N'
                 $orderBy = [];
                 if (count($order)) {
                     foreach ($order as $orderItem) {
+                        if (!isset($columnsNames[(int)$orderItem['column']])) {
+                            continue;
+                        }
                         $orderBy[] = mysqli_real_escape_string(
                             $db->link_id(),
                             $columnsDefinition[$columnsNames[(int)$orderItem['column']]] . " " . $orderItem['dir']
                         );
                     }
-
-                    $defaultQuery .= (" order by " . implode(' , ', $orderBy));
+                    if (count($orderBy)) {
+                        $defaultQuery .= (" order by " . implode(' , ', $orderBy));
+                    }
                 }
 
                 $countResult = $db->preparedQuery(
@@ -140,7 +155,10 @@ WHERE declinedFlag = 'N'
                             "contractName"            => $row['contractName'],
                             "customerName"            => $row['customerName'],
                             "itemBillingCategoryName" => $row['itemBillingCategoryName'],
-                            "numberOfUsers"           => $row['numberOfUsers']
+                            "numberOfUsers"           => $row['numberOfUsers'],
+                            "invoicePeriodMonths"     => $row['invoicePeriodMonths'],
+                            "invoiceFromDate"         => $row['invoiceFromDate'],
+                            "invoiceToDate"           => $row['invoiceToDate'],
                         ];
                     },
                     $result->fetch_all(MYSQLI_ASSOC)

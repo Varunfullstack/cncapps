@@ -592,6 +592,7 @@ class CTItem extends CTCNC
 
             // Parameters
             $this->setPageTitle('Item Selection');
+            $dbeItemBillingCategory = new DBEItemBillingCategory($this);
             if ($dsItem->rowCount() > 0) {
                 $this->template->set_block(
                     'ItemSelect',
@@ -599,6 +600,11 @@ class CTItem extends CTCNC
                     'items'
                 );
                 while ($dsItem->fetchNext()) {
+                    $itemBillingCategory = null;
+                    if ($dsItem->getValue(DBEItem::itemBillingCategoryID)) {
+                        $dbeItemBillingCategory->getRow($dsItem->getValue(DBEItem::itemBillingCategoryID));
+                        $itemBillingCategory = $dbeItemBillingCategory->getValue(DBEItemBillingCategory::name);
+                    }
                     $this->template->set_var(
                         array(
                             'itemDescription'         => Controller::htmlDisplayText(
@@ -625,9 +631,13 @@ class CTItem extends CTCNC
                             // to indicate number in stock
                             'partNo'                  => $dsItem->getValue(DBEItem::partNo),
                             'slaResponseHours'        => $dsItem->getValue(DBEItem::contractResponseTime),
+                            "itemBillingCategory"     => $itemBillingCategory,
                             'allowDirectDebit'        => $dsItem->getValue(
                                 DBEItem::allowDirectDebit
                             ) == 'Y' ? 'true' : 'false',
+                            'allowDirectDebitValue'   => $dsItem->getValue(
+                                DBEitem::allowDirectDebit
+                            ) == 'Y' ? 'Y' : null,
                             'excludeFromPOCompletion' => $dsItem->getValue(
                                 DBEItem::excludeFromPOCompletion
                             ) == 'Y' ? 'true' : 'false'
