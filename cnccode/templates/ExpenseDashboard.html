@@ -1,0 +1,96 @@
+<script>
+    $(function () {
+        $('#dataTable').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'csv',
+                    bom: true
+                }
+            ],
+            columnDefs: [],
+            serverSide: true,
+            ajax: {
+                url: "?action=getData",
+                type: "GET"
+            },
+            paging: false,
+            order: [
+                [0, 'asc'],
+            ]
+        })
+    })
+</script>
+
+<table id="dataTable">
+    <thead>
+    <tr>
+        <th>
+            Staff Name
+        </th>
+        <th>
+            SR Number
+        </th>
+        <th>
+            Date of expense
+        </th>
+        <th>
+            Expense Type
+        </th>
+        <th>
+            Expense Value
+        </th>
+        <th>
+            Overtime Duration
+        </th>
+        <th>
+            Project
+        </th>
+        <th>
+            Approved Date
+        </th>
+        <th>
+            Approved By
+        </th>
+        <th>
+            Approved Status
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN TimeRequestsBlock -->
+    <tr>
+        <td>
+            {customerName}
+        </td>
+        <td>
+            {srLink}
+        </td>
+        <td>
+            {requesterTeam}
+        </td>
+        <td>
+            {requestedBy}
+        </td>
+        <td>
+            {requestedDateTime}
+        </td>
+        <td>
+            {notes}
+        </td>
+        <td>
+            {chargeableHours}
+        </td>
+        <td>
+            {timeSpentSoFar}
+        </td>
+        <td>
+            {timeLeftOnBudget}
+        </td>
+        <td>
+            {processCRLink}
+        </td>
+    </tr>
+    <!-- END TimeRequestsBlock -->
+    </tbody>
+</table>

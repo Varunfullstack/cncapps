@@ -124,11 +124,11 @@
     <changeSet author="pavwebdev" id="625-9">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="expense" columnName="dateApproved"/>
+                <columnExists tableName="expense" columnName="approvedDate"/>
             </not>
         </preConditions>
         <addColumn tableName="expense">
-            <column name="dateApproved" type="datetime">
+            <column name="approvedDate" type="datetime">
                 <constraints nullable="true"/>
             </column>
         </addColumn>
@@ -199,6 +199,93 @@
         <addColumn tableName="headert">
             <column name="minimumOvertimeMinutesRequired" type="int(4)" defaultValue="5">
                 <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-15">
+        <sql>
+            INSERT INTO expensetype VALUE (
+                                           (SELECT db_sequence.`nextid`
+                                            FROM db_sequence
+                                            WHERE `db_sequence`.`seq_name` = "expensetype"),
+                                           "Call Out",
+                                           "N",
+                                           "N",
+                                           1,
+                                           1,
+                                           0
+                );
+            update db_sequence
+            set nextid = nextid + 1
+            where seq_name = "expensetype";
+            insert into expenseTypeActivityAvailability value ((select ext_expensetypeno from expensetype where ext_desc = "Call Out"),
+                                                               8);
+        </sql>
+        <rollback>
+            <sql>
+                delete
+                from expensetype
+                where ext_desc = "Call Out";
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-16">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="callactengineer"/>
+        </preConditions>
+        <dropTable tableName="callactengineer"/>
+        <rollback>
+            <createTable tableName="callactengineer">
+                <column defaultValueNumeric="0" name="cae_callactengno" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="cae_callactivityno" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="cae_item" type="SMALLINT">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="cae_consno" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="cae_expn_exp_flag" type="CHAR(1)"/>
+                <column name="cae_ot_exp_flag" type="CHAR(1)"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-17">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callactivity" columnName="overtimeApprovedDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callactivity">
+            <column name="overtimeApprovedDate" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-18">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callactivity" columnName="overtimeApprovedBy"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callactivity">
+            <column name="overtimeApprovedBy" type="bigint(11)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-19">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callactivity" columnName="overtimeDeniedReason"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callactivity">
+            <column name="overtimeDeniedReason" type="longtext">
+                <constraints nullable="true"/>
             </column>
         </addColumn>
     </changeSet>

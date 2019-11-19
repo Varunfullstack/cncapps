@@ -37,6 +37,9 @@ class DBECallActivity extends DBEntity
     const secondsiteErrorServer = "secondsiteErrorServer";
     const secondsiteErrorCustomerItemID = "secondsiteErrorCustomerItemID";
     const salesRequestStatus = 'salesRequestStatus';
+    const overtimeApprovedDate = "overtimeApprovedDate";
+    const overtimeApprovedBy = "overtimeApprovedBy";
+    const overtimeDeniedReason = "overtimeDeniedReason";
 
     /**
      * calls constructor()
@@ -223,6 +226,10 @@ class DBECallActivity extends DBEntity
             DA_TEXT,
             DA_ALLOW_NULL
         );
+
+        $this->addColumn(self::overtimeApprovedDate, DA_DATETIME, DA_ALLOW_NULL);
+        $this->addColumn(self::overtimeApprovedBy, DA_ID, DA_ALLOW_NULL);
+        $this->addColumn(self::overtimeDeniedReason, DA_STRING, DA_ALLOW_NULL);
 
         $this->setPK(0);
         $this->setAddColumnsOff();

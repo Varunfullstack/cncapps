@@ -71,7 +71,7 @@ class CTHeader extends CTCNC
         }
     }
 
-        /**
+    /**
      * Update
      * @access private
      * @throws Exception
@@ -99,7 +99,7 @@ class CTHeader extends CTCNC
         header('Location: ' . $urlNext);
     }// end function editHeader()
 
-/**
+    /**
      * Edit/Add Header
      * @access private
      * @throws Exception
@@ -463,6 +463,12 @@ class CTHeader extends CTCNC
                 'remoteSupportWarnHoursMessage'                                      => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::remoteSupportWarnHours)
                 ),
+                DBEHeader::minimumOvertimeMinutesRequired                            => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::remoteSupportWarnHours)
+                ),
+                DBEHeader::minimumOvertimeMinutesRequired . 'Message'                => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEHeader::minimumOvertimeMinutesRequired)
+                ),
                 'customerReviewMeetingText'                                          => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::customerReviewMeetingText)
                 ),
@@ -520,10 +526,10 @@ class CTHeader extends CTCNC
                 DBEHeader::sevenDayerAmberDays . 'Message'                           => $dsHeader->getMessage(
                     DBEHeader::sevenDayerAmberDays
                 ),
-                DBEHeader::sevenDayerTarget                                       => $dsHeader->getValue(
+                DBEHeader::sevenDayerTarget                                          => $dsHeader->getValue(
                     DBEHeader::sevenDayerTarget
                 ),
-                DBEHeader::sevenDayerTarget . 'Message'                           => $dsHeader->getMessage(
+                DBEHeader::sevenDayerTarget . 'Message'                              => $dsHeader->getMessage(
                     DBEHeader::sevenDayerTarget
                 ),
                 DBEHeader::sevenDayerRedDays                                         => $dsHeader->getValue(
@@ -562,8 +568,8 @@ class CTHeader extends CTCNC
                 DBEHeader::autoCriticalP3Hours . 'Message'                           => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::autoCriticalP3Hours)
                 ),
-                'urlItemPopup' => $urlItemPopup,
-                'urlUpdate'    => $urlUpdate
+                'urlItemPopup'                                                       => $urlItemPopup,
+                'urlUpdate'                                                          => $urlUpdate
             ]
         );
 

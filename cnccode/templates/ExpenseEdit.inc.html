@@ -6,6 +6,78 @@
         src='popcalendar/popcalendar.js'
 ></script>
 <script language='JavaScript'>
+
+    const userMileageRate = {userMileageRate};
+    let isMileage = false;
+
+    $(function () {
+        checkOptions();
+    })
+
+    function checkOptions() {
+        checkMileage();
+        checkVAT();
+    }
+
+    function checkVAT() {
+        const expenseTypeSelector = document.getElementById('expenseTypeSelector');
+        const selected = expenseTypeSelector.selectedOptions.length && expenseTypeSelector.selectedOptions[0];
+
+        if (!selected || !selected.dataset.allowsTax) {
+            disableTax();
+            return;
+        }
+        enableTax();
+    }
+
+    function disableTax() {
+        const VATRow = document.getElementById('VATRow');
+        VATRow.style.display = "none";
+    }
+
+    function enableTax() {
+        const VATRow = document.getElementById('VATRow');
+        VATRow.style.display = null;
+    }
+
+    function checkMileage() {
+        const expenseTypeSelector = document.getElementById('expenseTypeSelector');
+        const selected = expenseTypeSelector.selectedOptions.length && expenseTypeSelector.selectedOptions[0];
+
+        if (!selected || !selected.dataset.isMileage) {
+            disableMileage();
+            return;
+        }
+        enableMileage();
+    }
+
+    function disableMileage() {
+        isMileage = false;
+        const mileageRow = document.getElementById('mileageRow');
+        const totalInput = document.getElementById('totalInput');
+        mileageRow.style.display = 'none';
+        totalInput.readOnly = false;
+
+    }
+
+    function enableMileage() {
+        isMileage = true;
+        const mileageRow = document.getElementById('mileageRow');
+        const totalInput = document.getElementById('totalInput');
+        mileageRow.style.display = null;
+        totalInput.readOnly = true;
+    }
+
+    function updateTotal() {
+        if (!isMileage) {
+            return;
+        }
+        const totalInput = document.getElementById('totalInput');
+        const mileageInput = document.getElementById('mileageInput');
+        totalInput.value = mileageInput.value * userMileageRate;
+
+    }
+
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {			// F9 - edit
             switch (field.id) {
@@ -81,26 +153,39 @@
            width="700px"
            border="0"
     >
-        <input
-                type="hidden"
-                name="expense[1][expenseID]"
-                value="{expenseID}"
+        <input type="hidden"
+               name="expense[1][expenseID]"
+               value="{expenseID}"
         >
-        <input
-                type="hidden"
-                name="expense[1][userID]"
-                value="{userID}"
+        <input type="hidden"
+               name="expense[1][userID]"
+               value="{userID}"
         >
-        <input
-                type="hidden"
-                name="expense[1][callActivityID]"
-                value="{callActivityID}"
+        <input type="hidden"
+               name="expense[1][callActivityID]"
+               value="{callActivityID}"
         >
-        <input
-                type="hidden"
-                name="expense[1][exportedFlag]"
-                value="{exportedFlag}"
+        <input type="hidden"
+               name="expense[1][exportedFlag]"
+               value="{exportedFlag}"
         >
+        <input type="hidden"
+               name="expense[1][dateSubmitted]"
+               value="{dateSubmitted}"
+        >
+        <input type="hidden"
+               name="expense[1][approvedDate]"
+               value="{dateApproved}"
+        >
+        <input type="hidden"
+               name="expense[1][approvedBy]"
+               value="{approvedBy}"
+        >
+        <input type="hidden"
+               name="expense[1][deniedReason]"
+               value="{deniedReason}"
+        >
+
         <tr>
             <td width="115"
                 class="promptText"
@@ -111,38 +196,44 @@
             >
                 <select type="text"
                         name="expense[1][expenseTypeID]"
+                        onchange="checkOptions()"
+                        id="expenseTypeSelector"
                 >
                     <!-- BEGIN expenseTypeBlock -->
                     <option {expenseTypeSelected}
                             value="{expenseTypeID}"
+                            {isMileage}
+                            {allowsTax}
                     >{expenseTypeDesc}
                     </option>
                     <!-- END expenseTypeBlock -->
                 </select></td>
         </tr>
-        <tr>
+        <tr id="mileageRow">
             <td class="promptText">Mileage</td>
-            <td class="fieldText"><input
-                    type="text"
-                    name="expense[1][mileage]"
-                    value="{mileage}"
-                    size="10"
-                    maxlength="10"
-            > <span class="formErrorMessage">{mileageMessage}</span></td>
+            <td class="fieldText">
+                <input type="text"
+                       name="expense[1][mileage]"
+                       value="{mileage}"
+                       size="10"
+                       maxlength="10"
+                       onchange="updateTotal()"
+                       id="mileageInput"
+                > <span class="formErrorMessage">{mileageMessage}</span></td>
         </tr>
         <tr>
             <td class="promptText">Value</td>
             <td class="fieldText">
-                <input
-                        type="text"
-                        name="expense[1][value]"
-                        value="{value}"
-                        size="10"
-                        maxlength="10"
+                <input id="totalInput"
+                       type="text"
+                       name="expense[1][value]"
+                       value="{value}"
+                       size="10"
+                       maxlength="10"
                 >
                 <span class="formErrorMessage">{valueMessage}</span></td>
         </tr>
-        <tr>
+        <tr id="VATRow">
             <td class="promptText">VAT Included in Value?</td>
             <td class="fieldText">
                 <INPUT name="expense[1][vatFlag]"

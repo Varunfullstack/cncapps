@@ -330,6 +330,10 @@ class CTExpense extends CTCNC
         $this->setTemplateFiles(
             array('ExpenseEdit' => 'ExpenseEdit.inc')
         );
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRow($dsExpense->getValue(DBEJExpense::userID));
+        $userMileageRate = $dbeUser->getValue(DBEUser::petrolRate);
+
         $this->template->set_var(
             array(
                 'expenseID'           => $this->getParam('expenseID'),
@@ -352,11 +356,16 @@ class CTExpense extends CTCNC
                 'value'               => Controller::htmlInputText($dsExpense->getValue(DBEJExpense::value)),
                 'valueMessage'        => Controller::htmlDisplayText($dsExpense->getMessage(DBEJExpense::value)),
                 'vatFlagChecked'      => Controller::htmlChecked($dsExpense->getValue(DBEJExpense::vatFlag)),
+                'dateSubmitted'       => $dsExpense->getValue(DBEExpense::dateSubmitted),
+                'approvedDate'        => $dsExpense->getValue(DBEExpense::approvedDate),
+                'approvedBy'          => $dsExpense->getValue(DBEExpense::approvedBy),
+                'deniedReason'        => $dsExpense->getValue(DBEExpense::deniedReason),
                 'userID'              => $dsExpense->getValue(DBEJExpense::userID), // hidden field on form
                 'activityUserName'    => $dsCallActivity->getValue(DBEJCallActivity::userName),
                 'urlUpdateExpense'    => $urlUpdateExpense,
                 'exportedFlag'        => $dsExpense->getValue(DBEJExpense::exportedFlag),
-                'urlDisplayExpenses'  => $urlDisplayExpenses
+                'urlDisplayExpenses'  => $urlDisplayExpenses,
+                'userMileageRate'     => $userMileageRate
             )
         );
         $dbeExpenseType = new DBEExpenseType($this);
@@ -381,7 +390,13 @@ class CTExpense extends CTCNC
                 array(
                     'expenseTypeSelected' => $expenseTypeSelected,
                     'expenseTypeID'       => $dbeExpenseType->getValue(DBEExpenseType::expenseTypeID),
-                    'expenseTypeDesc'     => $dbeExpenseType->getValue(DBEExpenseType::description)
+                    'expenseTypeDesc'     => $dbeExpenseType->getValue(DBEExpenseType::description),
+                    "isMileage"           => $dbeExpenseType->getValue(
+                        DBEExpenseType::mileageFlag
+                    ) == 'Y' ? 'data-is-mileage="1"' : '',
+                    "allowsTax"           => $dbeExpenseType->getValue(
+                        DBEExpenseType::vatFlag
+                    ) == 'Y' ? 'data-allows-tax="1"' : ''
                 )
             );
             $this->template->parse(

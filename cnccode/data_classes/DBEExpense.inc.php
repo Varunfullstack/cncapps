@@ -15,7 +15,7 @@ class DBEExpense extends DBEntity
     const vatFlag = "vatFlag";
     const exportedFlag = "exportedFlag";
     const dateSubmitted = "dateSubmitted";
-    const dateApproved = "dateApproved";
+    const approvedDate = "approvedDate";
     const approvedBy = "approvedBy";
     const deniedReason = "deniedReason";
 
@@ -74,7 +74,7 @@ class DBEExpense extends DBEntity
         );
 
         $this->addColumn(self::dateSubmitted, DA_DATETIME, DA_ALLOW_NULL);
-        $this->addColumn(self::dateApproved, DA_DATETIME, DA_ALLOW_NULL);
+        $this->addColumn(self::approvedDate, DA_DATETIME, DA_ALLOW_NULL);
         $this->addColumn(self::approvedBy, DA_ID, DA_ALLOW_NULL);
         $this->addColumn(self::deniedReason, DA_TEXT, DA_ALLOW_NULL);
 
