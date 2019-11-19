@@ -772,6 +772,18 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">Minimum Overtime Minutes Required</td>
+            <td class="field">
+                <input {DISABLED}
+                       required
+                       type="number"
+                       name="header[1][minimumOvertimeMinutesRequired]"
+                       value="{minimumOvertimeMinutesRequired}"
+                       step="1"
+                       style="width: 64px"
+                > <span class="formErrorMessage">{remoteSupportWarnHoursMessage}</span></td>
+        </tr>
+        <tr>
             <td class="promptText">Remote Support Activity Min Warn Hours</td>
             <td class="field">
                 <input
@@ -797,8 +809,6 @@
                        title="SR Chargeable hours after which consider SR as critical"
                        name="header[1][autoCriticalP1Hours]"
                        value="{autoCriticalP1Hours}"
-                       size="5"
-                       maxlength="5"
                        step="0.01"
                 > <span class="formErrorMessage">{autoCriticalP1HoursMessage}</span>
             </td>

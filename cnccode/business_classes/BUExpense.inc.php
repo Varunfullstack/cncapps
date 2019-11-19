@@ -89,6 +89,20 @@ class BUExpense extends Business
             DBEExpense::vatFlag,
             $dbeExpenseType->getValue(DBEExpenseType::vatFlag)
         );            // default for this expense type
+        $dbeExpense->setValue(
+            DBEExpense::dateSubmitted,
+            date('d/m/Y H:i:s')
+        );
+
+
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRow($dbeCallActivity->getValue(DBECallActivity::userID));
+
+        if ($dbeUser->getValue(DBEUser::autoApproveExpenses)) {
+            $dbeExpense->setValue(DBEExpense::approvedBy, USER_SYSTEM);
+            $dbeExpense->setValue(DBEExpense::approvedDate, date('d/m/Y H:i:s'));
+        }
+
         $dbeExpense->insertRow();
 
         $expenseID = $dbeExpense->getPKValue();
@@ -547,6 +561,50 @@ class BUExpense extends Business
     *
     * if $runType = CTEXPENSE_ACT_EXPORT_TRIAL then we only send the summary email and don't update exported flags 
     */
+
+    function sendSummaryEmail(
+        $filename,
+        $email_body
+    )
+    {
+        require_once("Mail.php");
+
+        $mail = Mail::factory(
+            'smtp',
+            $GLOBALS['mail_options']
+        );
+
+        $hdrs = array(
+            'From'    => 'grahaml@cnc-ltd.co.uk',
+            'To'      => CONFIG_SALES_MANAGER_EMAIL,
+            'Subject' => $email_body
+        );
+
+        $crlf = "\r\n";
+
+        $mime = new Mail_mime($crlf);
+
+        $mime->setTXTBody($email_body);
+
+        $mime->addAttachment($filename);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+        $body = $mime->get($mime_params);
+
+        $hdrs = $mime->headers($hdrs);
+
+        $mail->send(
+            CONFIG_SALES_MANAGER_EMAIL,
+            $hdrs,
+            $body
+        );
+    }
+
     /**
      * @param DataSet $dsData
      * @param $runType
@@ -931,49 +989,6 @@ class BUExpense extends Business
 
         $mail->send(
             $email_to,
-            $hdrs,
-            $body
-        );
-    }
-
-    function sendSummaryEmail(
-        $filename,
-        $email_body
-    )
-    {
-        require_once("Mail.php");
-
-        $mail = Mail::factory(
-            'smtp',
-            $GLOBALS['mail_options']
-        );
-
-        $hdrs = array(
-            'From'    => 'grahaml@cnc-ltd.co.uk',
-            'To'      => CONFIG_SALES_MANAGER_EMAIL,
-            'Subject' => $email_body
-        );
-
-        $crlf = "\r\n";
-
-        $mime = new Mail_mime($crlf);
-
-        $mime->setTXTBody($email_body);
-
-        $mime->addAttachment($filename);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-        $body = $mime->get($mime_params);
-
-        $hdrs = $mime->headers($hdrs);
-
-        $mail->send(
-            CONFIG_SALES_MANAGER_EMAIL,
             $hdrs,
             $body
         );

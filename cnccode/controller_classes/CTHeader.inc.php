@@ -463,6 +463,12 @@ class CTHeader extends CTCNC
                 'remoteSupportWarnHoursMessage'                                      => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::remoteSupportWarnHours)
                 ),
+                DBEHeader::minimumOvertimeMinutesRequired                            => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::remoteSupportWarnHours)
+                ),
+                DBEHeader::minimumOvertimeMinutesRequired . 'Message'                => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEHeader::minimumOvertimeMinutesRequired)
+                ),
                 'customerReviewMeetingText'                                          => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::customerReviewMeetingText)
                 ),
