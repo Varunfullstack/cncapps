@@ -190,6 +190,18 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="625-14">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="minimumOvertimeMinutesRequired"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="minimumOvertimeMinutesRequired" type="int(4)" defaultValue="5">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 
 
 </databaseChangeLog>
