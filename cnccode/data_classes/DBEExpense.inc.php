@@ -81,6 +81,24 @@ class DBEExpense extends DBEntity
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
+
+    public function getNotExportedRowsForUser(int $userID)
+    {
+        $userID = $this->escapeValue($userID);
+        $this->queryString = "SELECT
+  " . $this->getDBColumnNamesAsString() . "
+FROM
+  " . $this->getTableName() . "
+  LEFT JOIN `callactivity`
+    ON `callactivity`.`caa_callactivityno` = " . $this->getDBColumnName(self::callActivityID) . "
+  LEFT JOIN consultant
+    ON callactivity.`caa_consno` = consultant.`cns_consno`
+WHERE (callactivity.`caa_consno` = $userID OR consultant.`expenseApproverID` = $userID) AND " . $this->getDBColumnName(
+                self::exportedFlag
+            ) . " <> 'Y'";
+
+        $this->getRows();
+    }
 }
 
 ?>
