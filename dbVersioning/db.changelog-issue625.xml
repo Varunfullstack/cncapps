@@ -289,6 +289,29 @@
             </column>
         </addColumn>
     </changeSet>
-
-
+    <changeSet author="pavwebdev" id="625-20">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="expense" columnName="dateSubmitted"/>
+        </preConditions>
+        <sql>
+            UPDATE expense
+            SET dateSubmitted = CONCAT((SELECT callactivity.`caa_date`
+                                        FROM callactivity
+                                        WHERE callactivity.`caa_callactivityno` = expense.`exp_callactivityno`),
+                                       " 12:00:00")
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-21">
+        <preConditions>
+            <not>
+                <columnExists tableName="consultant" columnName="globalExpenseApprover"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="globalExpenseApprover" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

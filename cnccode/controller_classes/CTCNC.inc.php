@@ -439,6 +439,19 @@ class CTCNC extends Controller
                 );
             }
 
+            if ($this->hasPermissions(PHPLIB_PERM_SALES)) {
+                $this->template->setVar(
+                    'expensesMenu',
+                    '<TR>
+    <TD align="left"
+        nowrap="nowrap"
+    >
+        <A href="ExpenseDashboard.php">Expenses/Overtime</a>
+    </TD>
+</TR>'
+                );
+            }
+
             $this->template->parse(
                 'screenTechnical',
                 'ScreenTechnical',

@@ -68,6 +68,7 @@ class DBEUser extends DBEntity
     const expenseApproverID = 'expenseApproverID';
     const autoApproveExpenses = 'autoApproveExpenses';
     const isExpenseApprover = "isExpenseApprover";
+    const globalExpenseApprover = "globalExpenseApprover";
 
     /**
      * calls constructor()
@@ -395,6 +396,14 @@ class DBEUser extends DBEntity
 
         $this->addColumn(
             self::isExpenseApprover,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+
+        $this->addColumn(
+            self::globalExpenseApprover,
             DA_BOOLEAN,
             DA_NOT_NULL,
             null,

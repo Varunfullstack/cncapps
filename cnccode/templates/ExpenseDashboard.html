@@ -1,23 +1,48 @@
 <script>
     $(function () {
         $('#dataTable').DataTable({
-            dom: 'Blfrtip',
-            buttons: [
+            dom: 'lfrtip',
+            columns: [
+                {data: "staffName", name: 'staffName'},
                 {
-                    extend: 'csv',
-                    bom: true
-                }
+                    data: "serviceRequestId", name: "serviceRequestId", render: (data, type, row, meta) => {
+                        return '<a href="Activity.php?action=displayActivity&callActivityID=' + row.activityId + '" target="_blank">' + data + '</a>';
+                    }
+                },
+                {
+                    data: "dateSubmitted", name: "dateSubmitted", render: (data) => {
+                        if (!data) {
+                            return null;
+                        }
+                        return moment(data, "YYYY-MM-DD HH:mm:ss").format('DD/MM/YYYY');
+                    }
+                },
+                {data: "expenseTypeDescription", name: "expenseTypeDescription"},
+                {
+                    data: "value", name: "value", render: (data) => {
+                        if (!+data) {
+                            return null;
+                        }
+                        return "&pound;" + data.toFixed(2);
+                    }
+                },
+                {data: "projectDescription", name: "projectDescription"},
+                {
+                    data: "approvedDate", name: "approvedDate", render: (data) => {
+                        if (!data) {
+                            return null;
+                        }
+                        return moment(data, "YYYY-MM-DD HH:mm:ss").format('DD/MM/YYYY HH:mm');
+                    }
+                },
+                {data: "approverName", name: "approverName"},
+                {data: 'status', name: 'status'}
             ],
-            columnDefs: [],
             serverSide: true,
             ajax: {
-                url: "?action=getData",
+                url: "?action=getExpensesData",
                 type: "GET"
-            },
-            paging: false,
-            order: [
-                [0, 'asc'],
-            ]
+            }
         })
     })
 </script>
@@ -41,9 +66,6 @@
             Expense Value
         </th>
         <th>
-            Overtime Duration
-        </th>
-        <th>
             Project
         </th>
         <th>
@@ -58,39 +80,5 @@
     </tr>
     </thead>
     <tbody>
-    <!-- BEGIN TimeRequestsBlock -->
-    <tr>
-        <td>
-            {customerName}
-        </td>
-        <td>
-            {srLink}
-        </td>
-        <td>
-            {requesterTeam}
-        </td>
-        <td>
-            {requestedBy}
-        </td>
-        <td>
-            {requestedDateTime}
-        </td>
-        <td>
-            {notes}
-        </td>
-        <td>
-            {chargeableHours}
-        </td>
-        <td>
-            {timeSpentSoFar}
-        </td>
-        <td>
-            {timeLeftOnBudget}
-        </td>
-        <td>
-            {processCRLink}
-        </td>
-    </tr>
-    <!-- END TimeRequestsBlock -->
     </tbody>
 </table>
