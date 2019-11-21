@@ -1,15 +1,92 @@
+<style>
+    .pending td {
+        color: red;
+    }
+</style>
 <script>
+    let expensesTable = null;
+    let overtimeTable = null;
 
     function approveExpense(expenseId) {
-
+        fetch("?action=approveExpense&id=" + expenseId)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    return alert(data.error);
+                }
+                expensesTable.ajax.reload();
+            })
     }
 
     function denyExpense(expenseId) {
+        const reason = prompt("Please provide a reason for denying this expense");
+        if (!reason) {
+            return alert('Reason cannot be empty');
+        }
+        fetch("?action=denyExpense&id=" + expenseId + "&denyReason=" + reason)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    return alert(data.error);
+                }
+                expensesTable.ajax.reload();
+            })
 
     }
 
+    function deleteExpense(expenseId) {
+        if (!confirm('Are you sure you want to delete this expense?')) {
+            return;
+        }
+
+        fetch("?action=deleteExpense&id=" + expenseId)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    return alert(data.error);
+                }
+                expensesTable.ajax.reload();
+            })
+    }
+
+    function approveOvertime(expenseId) {
+        fetch("?action=approveOvertime&id=" + expenseId)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    return alert(data.error);
+                }
+                overtimeTable.ajax.reload();
+            })
+    }
+
+    function denyOvertime(expenseId) {
+        const reason = prompt("Please provide a reason for denying this overtime");
+        if (!reason) {
+            return alert('Reason cannot be empty');
+        }
+        fetch("?action=denyOvertime&id=" + expenseId + "&denyReason=" + reason)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    return alert(data.error);
+                }
+                overtimeTable.ajax.reload();
+            })
+    }
+
     $(function () {
-        $('#expensesTable').DataTable({
+        expensesTable = $('#expensesTable').DataTable({
             dom: 'lfrtip',
             columns: [
                 {data: "staffName", name: 'staffName'},
@@ -56,18 +133,25 @@
                         }
 
                         if (row.status === 'Pending') {
-                            return '<button onchange="approveExpense(' + row.id + ')" data-expense-id="row.id">Approve</button><button onchange="denyExpense(' + row.id + ')">Deny</button> ';
+                            return '<button onclick="approveExpense(' + row.id + ')" data-expense-id="row.id">Approve</button><button onclick="denyExpense(' + row.id + ')">Deny</button><button onclick="deleteExpense(' + row.id + ')">Delete</button> ';
                         }
+                        return "";
                     }
                 }
             ],
+            order: [[8, "desc"], [2, "asc"]],
             serverSide: true,
             ajax: {
                 url: "?action=getExpensesData",
                 type: "GET"
+            },
+            createdRow: (row, data, index) => {
+                if (data.status === 'Pending') {
+                    $(row).addClass('pending');
+                }
             }
         });
-        $('#overtimeTable').DataTable({
+        overtimeTable = $('#overtimeTable').DataTable({
             dom: 'lfrtip',
             columns: [
                 {data: "staffName", name: 'staffName'},
@@ -102,8 +186,24 @@
                     }
                 },
                 {data: "approverName", name: "approverName"},
-                {data: 'status', name: 'status'}
+                {data: 'status', name: 'status'},
+                {
+                    data: 'status',
+                    sortable: false,
+                    searchable: false,
+                    render: (data, type, row, meta) => {
+                        if (row.isSelf) {
+                            return "";
+                        }
+
+                        if (row.status === 'Pending') {
+                            return '<button onclick="approveOvertime(' + row.activityId + ')" data-expense-id="row.id">Approve</button><button onclick="denyOvertime(' + row.activityId + ')">Deny</button>';
+                        }
+                        return "";
+                    }
+                }
             ],
+            order: [[7, "desc"], [2, "asc"]],
             serverSide: true,
             ajax: {
                 url: "?action=getOvertimeData",
@@ -113,6 +213,11 @@
             language: {
                 'loadingRecords': '&nbsp;',
                 'processing': 'Loading...'
+            },
+            createdRow: (row, data, index) => {
+                if (data.status === 'Pending') {
+                    $(row).addClass('pending');
+                }
             }
         })
     })
@@ -182,6 +287,9 @@
         </th>
         <th>
             Approved Status
+        </th>
+        <th>
+
         </th>
     </tr>
     </thead>

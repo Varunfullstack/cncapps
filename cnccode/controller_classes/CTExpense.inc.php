@@ -226,26 +226,31 @@ class CTExpense extends CTCNC
 
 
                 }
+                $urlEdit = $urlDelete = $txtEdit = $txtDelete = null;
 
+                if ($dsExpense->getValue(DBEExpense::exportedFlag) != 'Y' && !$dsExpense->getValue(
+                        DBEExpense::deniedReason
+                    ) && !$dsExpense->getValue(DBEExpense::approvedBy)) {
+                    $urlEdit =
+                        Controller::buildLink(
+                            $_SERVER['PHP_SELF'],
+                            array(
+                                'action'    => CTEXPENSE_ACT_EDIT_EXPENSE,
+                                'expenseID' => $expenseID
+                            )
+                        );
+                    $txtEdit = '[edit]';
+                    $urlDelete =
+                        Controller::buildLink(
+                            $_SERVER['PHP_SELF'],
+                            array(
+                                'action'    => CTEXPENSE_ACT_DELETE_EXPENSE,
+                                'expenseID' => $expenseID
+                            )
+                        );
+                    $txtDelete = '[delete]';
+                }
 
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'    => CTEXPENSE_ACT_EDIT_EXPENSE,
-                            'expenseID' => $expenseID
-                        )
-                    );
-                $txtEdit = '[edit]';
-                $urlDelete =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'    => CTEXPENSE_ACT_DELETE_EXPENSE,
-                            'expenseID' => $expenseID
-                        )
-                    );
-                $txtDelete = '[delete]';
 
                 $this->template->set_var(
                     array(
@@ -430,9 +435,9 @@ class CTExpense extends CTCNC
         if (!$this->buExpense->canDeleteExpense($this->getParam('expenseID'))) {
             $this->displayFatalError('Cannot delete expense - already exported');
             exit;
-        } else {
-            $callActivityID = $this->buExpense->deleteExpense($this->getParam('expenseID'));
         }
+        $callActivityID = $this->buExpense->deleteExpense($this->getParam('expenseID'));
+
         $urlNext =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
