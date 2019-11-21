@@ -791,56 +791,16 @@ class BUExpense extends Business
                 $startTime = common_convertHHMMToDecimal($db->Record['caa_starttime']);
                 $endTime = common_convertHHMMToDecimal($db->Record['caa_endtime']);
 
-                /*
-                if this is a weekend day then the whole lot is overtime else work out how many hours
-                are out of office hours
-                */
-                if ($db->Record['weekday'] == 0 OR $db->Record['weekday'] == 6) {
-                    $overtime = $endTime - $startTime;
-                } else {
-                    /*
-                    If this is a helpdesk staff then evening overtime is only allowed on activities that start after office end time
-                    */
-                    // overtime is hours before and after this engineer's office hours
-                    if ($db->Record['cns_helpdesk_flag'] == 'Y') {
-                        $officeStartTime = $helpdeskStartTime;
-                        $officeEndTime = $helpdeskEndTime;
-                        $overtime = 0;
-                        if ($startTime < $officeStartTime) {
-                            if ($endTime < $officeStartTime) {
-                                $overtime = $endTime - $startTime;
-                            } else {
-                                $overtime = $officeStartTime - $startTime;
-                            }
-                        }
-                        if ($endTime > $officeEndTime) {
-                            if ($startTime >= $officeEndTime) {
-                                $overtime += $endTime - $startTime;
-                            }
-                        }
-                    } else {
-                        /*
-                        non-helpdesk engineers get any time spent after office end hours irrespective of start time
-                        */
-                        $officeStartTime = $projectStartTime;
-                        $officeEndTime = $projectEndTime;
-                        $overtime = 0;
-                        if ($startTime < $officeStartTime) {
-                            if ($endTime < $officeStartTime) {
-                                $overtime = $endTime - $startTime;
-                            } else {
-                                $overtime = $officeStartTime - $startTime;
-                            }
-                        }
-                        if ($endTime > $officeEndTime) {
-                            if ($startTime > $officeEndTime) {
-                                $overtime += $endTime - $startTime;
-                            } else {
-                                $overtime += $endTime - $officeEndTime;
-                            }
-                        }
-                    }
-                }
+                $overtime = $this->calculateOvertime(
+                    $startTime,
+                    $endTime,
+                    $helpdeskStartTime,
+                    $helpdeskEndTime,
+                    $db->Record["cns_helpdesk_flag"] == 'Y',
+                    $projectStartTime,
+                    $projectEndTime,
+                    $db->Record["weekday"]
+                );
 
                 if ($overtime) {
 
@@ -992,6 +952,68 @@ class BUExpense extends Business
             $hdrs,
             $body
         );
+    }
+
+    function calculateOvertime($shiftStartTime,
+                               $shiftEndTime,
+                               $helpdeskStartTime,
+                               $helpdeskEndTime,
+                               $isHelpdeskUser,
+                               $projectStartTime,
+                               $projectEndTime,
+                               $weekDay
+    )
+    {
+        /*
+               if this is a weekend day then the whole lot is overtime else work out how many hours
+               are out of office hours
+               */
+        if ($weekDay == 0 OR $weekDay == 6) {
+            return $shiftEndTime - $shiftStartTime;
+        }
+        /*
+        If this is a helpdesk staff then evening overtime is only allowed on activities that start after office end time
+        */
+        // overtime is hours before and after this engineer's office hours
+        if ($isHelpdeskUser) {
+            $officeStartTime = $helpdeskStartTime;
+            $officeEndTime = $helpdeskEndTime;
+            $overtime = 0;
+            if ($shiftStartTime < $officeStartTime) {
+                if ($shiftEndTime < $officeStartTime) {
+                    $overtime = $shiftEndTime - $shiftStartTime;
+                } else {
+                    $overtime = $officeStartTime - $shiftStartTime;
+                }
+            }
+            if ($shiftEndTime > $officeEndTime) {
+                if ($shiftStartTime >= $officeEndTime) {
+                    $overtime += $shiftEndTime - $shiftStartTime;
+                }
+            }
+            return $overtime;
+        }
+        /*
+        non-helpdesk engineers get any time spent after office end hours irrespective of start time
+        */
+        $officeStartTime = $projectStartTime;
+        $officeEndTime = $projectEndTime;
+        $overtime = 0;
+        if ($shiftStartTime < $officeStartTime) {
+            if ($shiftEndTime < $officeStartTime) {
+                $overtime = $shiftEndTime - $shiftStartTime;
+            } else {
+                $overtime = $officeStartTime - $shiftStartTime;
+            }
+        }
+        if ($shiftEndTime > $officeEndTime) {
+            if ($shiftStartTime > $officeEndTime) {
+                $overtime += $shiftEndTime - $shiftStartTime;
+            } else {
+                $overtime += $shiftEndTime - $officeEndTime;
+            }
+        }
+        return $overtime;
     }
 
     public function getTotalExpensesForSalesOrder($salesOrderID)

@@ -1115,7 +1115,7 @@ class DataAccess extends BaseObject
             return null;
         }
         $type = $this->getTypeByColumnNumberNoCheck($ixColumnNumber);
-        if ($type == DA_ID) {
+        if ($type == DA_ID || $type == DA_INTEGER) {
             return (int)$this->row[$ixColumnNumber];
         }
 
