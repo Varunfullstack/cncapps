@@ -6,6 +6,8 @@
  * Time: 10:39
  */
 
+use Twig\Environment;
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUExpense.inc.php');
@@ -39,6 +41,7 @@ class CTExpenseDashboard extends CTCNC
 
     /**
      * Route to function based upon action passed
+     * @throws Exception
      */
     function defaultAction()
     {
@@ -70,10 +73,10 @@ class CTExpenseDashboard extends CTCNC
     approver.`lastName`
   ) AS approverName,
   IF(
-    expense.`approvedBy`,
+    expense.`approvedBy` is not null,
     "Approved",
     IF(
-      expense.`deniedReason`,
+      expense.`deniedReason` is not null,
       "Denied",
       "Pending"
     )
@@ -193,15 +196,16 @@ WHERE
   project.`projectID` AS projectId,
   approver.cns_name as approverName,
   IF(
-    callactivity.`overtimeApprovedBy`,
+    callactivity.`overtimeApprovedBy` is not null,
     "Approved",
     IF(
-      callactivity.`overtimeDeniedReason`,
+      callactivity.`overtimeDeniedReason` is not null,
       "Denied",
       "Pending"
     )
   ) AS `status`,
-  callactivity.`overtimeApprovedDate` as approvedDate
+  callactivity.`overtimeApprovedDate` as approvedDate,
+       callactivity.caa_consno = ? as isSelf
 FROM
   callactivity
   JOIN problem
@@ -260,6 +264,7 @@ WHERE
                 $limit = $_REQUEST['length'];
 
                 $parameters = [
+                    ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
@@ -355,7 +360,7 @@ WHERE
                 try {
                     $this->processExpense($expenseId);
                     $response = ["status" => 'ok'];
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     http_response_code(400);
                     $response = ["error" => $exception->getMessage()];
                 }
@@ -367,20 +372,80 @@ WHERE
                 try {
                     $this->processExpense($expenseId, true, $denyReason);
                     $response = ["status" => 'ok'];
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     http_response_code(400);
                     $response = ["error" => $exception->getMessage()];
                 }
                 echo json_encode($response, JSON_NUMERIC_CHECK);
                 break;
-
+            case 'deleteExpense':
+                $expenseId = @$_REQUEST['id'];
+                try {
+                    $this->deleteExpense($expenseId);
+                    $response = ["status" => 'ok'];
+                } catch (Exception $exception) {
+                    http_response_code(400);
+                    $response = ["error" => $exception->getMessage()];
+                }
+                echo json_encode($response, JSON_NUMERIC_CHECK);
+                break;
+            case "approveOvertime":
+                $activityId = @$_REQUEST['id'];
+                try {
+                    $this->processOvertime($activityId);
+                    $response = ["status" => 'ok'];
+                } catch (Exception $exception) {
+                    http_response_code(400);
+                    $response = ["error" => $exception->getMessage()];
+                }
+                echo json_encode($response, JSON_NUMERIC_CHECK);
+                break;
+            case "denyOvertime":
+                $activityId = @$_REQUEST['id'];
+                $denyReason = @$_REQUEST['denyReason'];
+                try {
+                    $this->processOvertime($activityId, true, $denyReason);
+                    $response = ["status" => 'ok'];
+                } catch (Exception $exception) {
+                    http_response_code(400);
+                    $response = ["error" => $exception->getMessage()];
+                }
+                echo json_encode($response, JSON_NUMERIC_CHECK);
+                break;
             default:
                 $this->displayReport();
                 break;
         }
     }
 
+    /**
+     * @param $id
+     * @param bool $deny
+     * @param null $denyReason
+     * @throws Exception
+     */
     function processExpense($id, $deny = false, $denyReason = null)
+    {
+        $dbeExpense = $this->checkProcessExpense($id);
+        if ($deny) {
+            if (!$denyReason) {
+                throw new Exception('Please provide a deny reason');
+            }
+            $dbeExpense->setValue(DBEExpense::deniedReason, $denyReason);
+            $this->sendDeniedExpenseEmail($dbeExpense);
+        } else {
+            $dbeExpense->setValue(DBEExpense::approvedBy, $this->userID);
+            $dbeExpense->setValue(DBEExpense::approvedDate, (new DateTime())->format(DATE_MYSQL_DATETIME));
+        }
+        $dbeExpense->updateRow();
+    }
+
+    /**
+     * @param $id
+     * @return DBEExpense
+     * @throws Exception
+     */
+    function checkProcessExpense($id)
     {
         if (!$id) {
             throw new Exception('Please provide the id of the expense to approve');
@@ -390,6 +455,10 @@ WHERE
         $dbeExpense->getRow($id);
         if (!$dbeExpense->rowCount()) {
             throw new Exception('Could not find any expenses with the provided ID');
+        }
+
+        if ($dbeExpense->getValue(DBEExpense::exportedFlag) == 'Y') {
+            throw new Exception('This expense has already been exported');
         }
 
         if ($dbeExpense->getValue(DBEExpense::deniedReason) || $dbeExpense->getValue(DBEExpense::approvedBy)) {
@@ -409,19 +478,149 @@ WHERE
             ) != $this->userID) {
             throw new Exception('You are not allowed to process this expense');
         }
+        return $dbeExpense;
+    }
 
+    /**
+     * @param $dbeExpense DBEExpense
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    function sendDeniedExpenseEmail($dbeExpense)
+    {
+        /** @var Environment */
+        global $twig;
+        $activityId = $dbeExpense->getValue(DBEExpense::callActivityID);
+        $dbeCallActivity = new DBEJCallActivity($this);
+        $dbeCallActivity->getRow($activityId);
+        $toEmail = $dbeCallActivity->getValue(DBEJCallActivity::userAccount) . "@" . CONFIG_PUBLIC_DOMAIN;
+        $affectedUser = new DBEUser($this);
+        $affectedUser->getRow($dbeCallActivity->getValue(DBECallActivity::userID))
+        $fromEmail = CONFIG_SALES_EMAIL;
+        $dbeExpenseType = new DBEExpenseType($this);
+        $dbeExpenseType->getRow($dbeExpense->getValue(DBEExpense::expenseID));
+        $buMail = new BUMail($this);
+        $body = $twig->render(
+            'deniedExpenseEmail.html.twig',
+            [
+                "expense" => [
+                    "type"   => $dbeExpenseType->getValue(DBEExpenseType::description),
+                    "value"  => "&pound;" . number_format($dbeExpense->getValue(DBEExpense::value), 2),
+                    "reason" => $dbeExpense->getValue(DBEExpense::deniedReason)
+                ]
+            ]
+        );
+
+        $subject = "Your expense request has been denied";
+
+        $hdrs = array(
+            'From'         => $fromEmail,
+            'To'           => $toEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $buMail->mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
+
+        $hdrs = $buMail->mime->headers($hdrs);
+
+        $buMail->putInQueue(
+            $fromEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
+
+    }
+
+    /**
+     * @param $id
+     * @throws Exception
+     */
+    function deleteExpense($id)
+    {
+        $dbeExpense = $this->checkProcessExpense($id);
+        $dbeExpense->deleteRow();
+    }
+
+    /**
+     * @param $activityId
+     * @param bool $deny
+     * @param null $denyReason
+     * @throws Exception
+     */
+    private function processOvertime($activityId, $deny = false, $denyReason = null)
+    {
+        $dbeCallActivity = $this->checkProcessOvertime($activityId);
         if ($deny) {
             if (!$denyReason) {
                 throw new Exception('Please provide a deny reason');
             }
-            $dbeExpense->setValue(DBEExpense::deniedReason, $denyReason);
+            $dbeCallActivity->setValue(DBECallActivity::overtimeDeniedReason, $denyReason);
         } else {
-            $dbeExpense->setValue(DBEExpense::approvedBy, $this->userID);
-            $dbeExpense->setValue(DBEExpense::approvedDate, (new DateTime())->format(DATE_MYSQL_DATETIME));
+            $dbeCallActivity->setValue(DBECallActivity::overtimeApprovedBy, $this->userID);
+            $dbeCallActivity->setValue(
+                DBECallActivity::overtimeApprovedDate,
+                (new DateTime())->format(DATE_MYSQL_DATETIME)
+            );
         }
-        $dbeExpense->updateRow();
+        $dbeCallActivity->updateRow();
     }
 
+    /**
+     * @param $activityId
+     * @return DBECallActivity
+     * @throws Exception
+     */
+    function checkProcessOvertime($activityId)
+    {
+        if (!$activityId) {
+            throw new Exception('Please provide the id of the overtime to approve');
+        }
+
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->getRow($activityId);
+        if (!$dbeCallActivity->rowCount()) {
+            throw new Exception('Could not find any overtime related activity with the provided ID');
+        }
+
+        if ($dbeCallActivity->getValue(DBECallActivity::overtimeExportedFlag) == 'Y') {
+            throw new Exception('This overtime has already been exported');
+        }
+
+        if ($dbeCallActivity->getValue(DBECallActivity::overtimeDeniedReason) || $dbeCallActivity->getValue(
+                DBECallActivity::overtimeApprovedBy
+            )) {
+            throw new Exception('This overtime has already been processed');
+        }
+
+        if ($dbeCallActivity->getValue(DBECallActivity::userID) == $this->userID) {
+            throw new Exception('You cannot process your own expenses');
+        }
+
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRow($dbeCallActivity->getValue(DBECallActivity::userID));
+        if (!$this->dbeUser->getValue(DBEUser::globalExpenseApprover) && $dbeUser->getValue(
+                DBEUser::expenseApproverID
+            ) != $this->userID) {
+            throw new Exception('You are not allowed to process this overtime');
+        }
+        return $dbeCallActivity;
+    }
+
+    /**
+     * @throws Exception
+     */
     function displayReport()
     {
 
@@ -440,16 +639,5 @@ WHERE
             true
         );
         $this->parsePage();
-    }
-
-    /**
-     * @param DBEExpense|DataSet $dsExpense
-     * @return string
-     */
-    private function getExpenseStatus($dsExpense)
-    {
-        return $dsExpense->getValue(
-            DBEExpense::approvedDate
-        ) ? "Approved" : ($dsExpense->getValue(DBEExpense::deniedReason) ? "Denied" : "Pending");
     }
 }

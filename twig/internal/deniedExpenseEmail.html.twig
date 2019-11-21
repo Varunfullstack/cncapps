@@ -1,0 +1,7 @@
+{% extends "wrapper.html.twig" %}
+{% block content %}
+    Your expense for {{ expense.type }} for {{ expense.value }} has been denied because of the following reason:
+    <p>
+        {{ expense.deniedReason }}
+    </p>
+{% endblock %}

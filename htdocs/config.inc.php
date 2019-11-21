@@ -1,5 +1,7 @@
 <?php
 
+use Twig\Environment;
+
 function is_cli()
 {
     if (defined('STDIN')) {
@@ -516,6 +518,7 @@ define(
     "DB_HOST",
     "localhost"
 );
+
 
 switch ($server_type) {
 
@@ -1061,7 +1064,10 @@ $GLOBALS['db_options'] =
 
 
 require BASE_DRIVE . '/vendor/autoload.php';
-// disable DOMPDF's internal autoloader if you are using Composer
+
+$loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../twig/internal');
+$twig = new Environment($loader, ["cache" => __DIR__ . '/../cache']);
+
 define(
     'DOMPDF_ENABLE_AUTOLOAD',
     false

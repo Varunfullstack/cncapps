@@ -40,6 +40,7 @@ class DBECallActivity extends DBEntity
     const overtimeApprovedDate = "overtimeApprovedDate";
     const overtimeApprovedBy = "overtimeApprovedBy";
     const overtimeDeniedReason = "overtimeDeniedReason";
+    const overtimeExportedFlag = 'overtimeExportedFlag';
 
     /**
      * calls constructor()
@@ -230,6 +231,7 @@ class DBECallActivity extends DBEntity
         $this->addColumn(self::overtimeApprovedDate, DA_DATETIME, DA_ALLOW_NULL);
         $this->addColumn(self::overtimeApprovedBy, DA_ID, DA_ALLOW_NULL);
         $this->addColumn(self::overtimeDeniedReason, DA_STRING, DA_ALLOW_NULL);
+        $this->addColumn(self::overtimeExportedFlag, DA_YN, DA_NOT_NULL, 'caa_ot_exp_flag', 'N');
 
         $this->setPK(0);
         $this->setAddColumnsOff();

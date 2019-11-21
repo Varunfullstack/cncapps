@@ -123,7 +123,9 @@ class BUExpense extends Business
         $dbeExpense = new DBEExpense($this);
         $dbeExpense->getRow($expenseID);
 
-        if ($dbeExpense->getValue(DBEExpense::exportedFlag) == 'Y') {
+        if ($dbeExpense->getValue(DBEExpense::exportedFlag) == 'Y' || $dbeExpense->getValue(
+                DBEExpense::deniedReason
+            ) || $dbeExpense->getValue(DBEExpense::approvedBy)) {
             return false;
         } else {
             return true;
