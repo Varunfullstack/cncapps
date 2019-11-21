@@ -75,13 +75,20 @@ class BURenContract extends Business
         ));
     }
 
+    /**
+     * @param $customerID
+     * @param DataSet|DBEOrdline $orderLineDS
+     * @param $customerItemID
+     * @param int $siteNo
+     */
     function createNewRenewal(
         $customerID,
-        $itemID,
+        $orderLineDS,
         &$customerItemID,
         $siteNo = 0
     )
     {
+        $itemID = $orderLineDS->getValue(DBEOrdline::itemID);
         // create a customer item
         $dbeItem = new DBEItem ($this);
         $dbeItem->getRow($itemID);
@@ -113,13 +120,22 @@ class BURenContract extends Business
 
         $dsCustomerItem->setValue(
             DBEJCustomerItem::curUnitCost,
-            $dbeItem->getValue(DBEItem::curUnitCost)
+            $dbeItem->getValue(DBEItem::curUnitCost) * $orderLineDS->getValue(DBEOrdline::qtyOrdered) * 12
         );
         $dsCustomerItem->setValue(
             DBEJCustomerItem::curUnitSale,
+            $dbeItem->getValue(DBEItem::curUnitSale) * $orderLineDS->getValue(DBEOrdline::qtyOrdered) * 12
+        );
+        $dsCustomerItem->setValue(
+            DBEJCustomerItem::salePricePerMonth,
             $dbeItem->getValue(DBEItem::curUnitSale)
         );
-
+        $dsCustomerItem->setValue(
+            DBEJCustomerItem::costPricePerMonth,
+            $dbeItem->getValue(DBEItem::curUnitCost)
+        );
+        $dsCustomerItem->setValue(DBEJCustomerItem::users, $orderLineDS->getValue(DBEOrdline::qtyOrdered));
+        $dsCustomerItem->setValue(DBEJCustomerItem::invoicePeriodMonths, 1);
         $dsCustomerItem->post();
 
         $buCustomerItem = new BUCustomerItem ($this);

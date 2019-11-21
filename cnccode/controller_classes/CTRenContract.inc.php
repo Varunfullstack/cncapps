@@ -691,7 +691,7 @@ class CTRenContract extends CTCNC
 
             $this->buRenContract->createNewRenewal(
                 $dsOrdhead->getValue(DBEJOrdhead::customerID),
-                $dsOrdline->getValue(DBEJOrdline::itemID),
+                $dsOrdline,
                 $renewalCustomerItemID,
                 $dsOrdhead->getValue(DBEJOrdhead::delSiteNo)                // returned by function
             );

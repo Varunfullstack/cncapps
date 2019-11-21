@@ -83,10 +83,22 @@
                     JOIN item
                     ON itm_itemno = cui_itemno
                     JOIN itemtype
+                    ON ity_itemtypeno = itm_itemtypeno SET `cui_users` = 1,
+                                                           custitem.`salePricePerMonth` = cui_sale_price / 12,
+                                                           custitem.`costPricePerMonth` = cui_cost_price / 12
+            WHERE renewalTypeID = 2
+              AND (NOT cui_users
+                OR cui_users IS NULL);
+            UPDATE
+                custitem
+                    JOIN item
+                    ON itm_itemno = cui_itemno
+                    JOIN itemtype
                     ON ity_itemtypeno = itm_itemtypeno
             SET salePricePerMonth = cui_sale_price / 12 / cui_users,
                 costPricePerMonth = cui_cost_price / 12 / cui_users
-            WHERE renewalTypeID = 2
+            WHERE renewalTypeID = 2;
+
         </sql>
         <rollback/>
     </changeSet>
