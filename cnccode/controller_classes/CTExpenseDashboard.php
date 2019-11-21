@@ -8,6 +8,7 @@
 
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
+require_once($cfg['path_bu'] . '/BUExpense.inc.php');
 require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
 
 class CTExpenseDashboard extends CTCNC
@@ -76,7 +77,8 @@ class CTExpenseDashboard extends CTCNC
       "Denied",
       "Pending"
     )
-  ) AS status
+  ) AS status,
+       callactivity.caa_consno = ? as isSelf
 FROM
   expense
   LEFT JOIN `callactivity`
@@ -91,7 +93,9 @@ FROM
     ON project.`projectID` = problem.`pro_projectno`
   LEFT JOIN consultant approver
     ON approver.`cns_consno` = expense.`approvedBy`
-WHERE (
+WHERE 
+      caa_endtime and caa_endtime is not null and
+      (
     callactivity.`caa_consno` = ?
     OR consultant.`expenseApproverID` = ?
     OR ((SELECT 1 FROM consultant globalApprovers WHERE globalApprovers.globalExpenseApprover AND globalApprovers.cns_consno = ?) = 1 AND consultant.`activeFlag` = "Y")
@@ -102,6 +106,7 @@ WHERE (
                 $limit = $_REQUEST['length'];
 
                 $parameters = [
+                    ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
@@ -167,10 +172,254 @@ WHERE (
                     JSON_NUMERIC_CHECK
                 );
                 break;
+            case "getOvertimeData" :
+                // we have to retrieve the data for the user + if the user is someones approver
+
+                $queryString = 'SELECT
+  caa_date as dateSubmitted,
+  DATE_FORMAT(caa_date, \'%w\') AS `weekday`,
+  caa_callactivityno as activityId,
+  caa_problemno as serviceRequestId,
+  time_to_sec(caa_starttime) as activityStartTimeSeconds,
+  time_to_sec(caa_endtime) as activityEndTimeSeconds,
+  consultant.cns_name as staffName,
+  consultant.cns_helpdesk_flag = \'Y\' as helpdeskUser,
+  time_to_sec(hed_hd_starttime) as helpdeskStartTimeSeconds,
+  time_to_sec(hed_hd_endtime) as helpdeskEndTimeSeconds,
+  time_to_sec(hed_pro_starttime) as projectStartTimeSeconds,
+  time_to_sec(hed_pro_endtime) as projectEndTimeSeconds,
+  consultant.`cns_consno` AS userId,
+  project.`description` AS projectDescription,
+  project.`projectID` AS projectId,
+  approver.cns_name as approverName,
+  IF(
+    callactivity.`overtimeApprovedBy`,
+    "Approved",
+    IF(
+      callactivity.`overtimeDeniedReason`,
+      "Denied",
+      "Pending"
+    )
+  ) AS `status`,
+  callactivity.`overtimeApprovedDate` as approvedDate
+FROM
+  callactivity
+  JOIN problem
+    ON pro_problemno = caa_problemno
+  JOIN callacttype
+    ON caa_callacttypeno = cat_callacttypeno
+  JOIN customer
+    ON pro_custno = cus_custno
+  JOIN consultant
+    ON caa_consno = cns_consno
+  left join consultant approver
+    ON approver.`cns_consno` = callactivity.`overtimeApprovedBy`
+  join headert
+    on headert.`headerID` = 1
+  left join project
+    on project.`projectID` = problem.`pro_projectno`
+WHERE 
+      caa_endtime and caa_endtime is not null and
+      (caa_status = \'C\'
+    OR caa_status = \'A\')
+  AND caa_ot_exp_flag = \'N\'
+  AND (
+    (
+      consultant.weekdayOvertimeFlag = \'Y\'
+      AND DATE_FORMAT(caa_date, \'%w\') IN (0, 1, 2, 3, 4, 5, 6)
+    )
+    OR (
+      consultant.weekdayOvertimeFlag = \'N\'
+      AND DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
+    )
+  )
+  AND (
+    caa_endtime > hed_pro_endtime
+    OR caa_starttime < hed_pro_starttime
+    OR caa_endtime > `hed_hd_endtime`
+    OR caa_starttime < hed_hd_starttime
+    OR DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
+  )
+  AND (caa_endtime <> caa_starttime)
+  AND callacttype.engineerOvertimeFlag = \'Y\'
+  AND (
+    callactivity.`caa_consno` = ?
+    OR consultant.`expenseApproverID` = ?
+    OR (
+      (SELECT
+        1
+      FROM
+        consultant globalApprovers
+      WHERE globalApprovers.globalExpenseApprover
+        AND globalApprovers.cns_consno = ?) = 1
+    )
+  )
+';
+
+                $offset = $_REQUEST['start'];
+                $limit = $_REQUEST['length'];
+
+                $parameters = [
+                    ["type" => "i", "value" => $this->userID],
+                    ["type" => "i", "value" => $this->userID],
+                    ["type" => "i", "value" => $this->userID],
+                ];
+                /** @var dbSweetcode $db */
+                global $db;
+                $countResult = $db->preparedQuery(
+                    $queryString,
+                    $parameters
+                );
+                $totalCount = $countResult->num_rows;
+
+                $search = $_REQUEST['search']['value'];
+                $filteredCount = $totalCount;
+                if ($search) {
+                    $queryString .= " and (consultant.cns_name like ? or problem.`pro_problemno` like ? or  project.`description` like ?) ";
+                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
+                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
+                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
+                    $countResult = $db->preparedQuery(
+                        $queryString,
+                        $parameters
+                    );
+                    $filteredCount = $countResult->num_rows;
+                }
+
+                $columns = $_REQUEST['columns'];
+                $order = $_REQUEST['order'];
+                $orderItems = [];
+                foreach ($order as $orderItem) {
+                    $orderItems[] = mysqli_real_escape_string(
+                        $db->link_id(),
+                        "{$columns[$orderItem['column']]['name']} {$orderItem['dir']}"
+                    );
+                }
+                if (count($orderItems)) {
+                    $queryString .= " order by " . implode(', ', $orderItems);
+                }
+
+                $queryString .= " limit ?, ?";
+                $parameters[] = ["type" => "i", "value" => $offset];
+                $parameters[] = ["type" => "i", "value" => $limit];
+
+                $result = $db->preparedQuery(
+                    $queryString,
+                    $parameters
+                );
+                $data = $result->fetch_all(MYSQLI_ASSOC);
+                $buExpense = new BUExpense($this);
+                $buHeader = new BUHeader($this);
+                $dbeHeader = new DataSet($this);
+                $buHeader->getHeader($dbeHeader);
+                $overtimeMinutes = $dbeHeader->getValue(DBEHeader::minimumOvertimeMinutesRequired);
+                foreach ($data as $key => $datum) {
+                    $data[$key]['overtimeDuration'] = $buExpense->calculateOvertime(
+                        $datum['activityStartTimeSeconds'],
+                        $datum['activityEndTimeSeconds'],
+                        $datum['helpdeskStartTimeSeconds'],
+                        $datum['helpdeskEndTimeSeconds'],
+                        $datum['helpdeskUser'],
+                        $datum['projectStartTimeSeconds'],
+                        $datum['projectEndTimeSeconds'],
+                        $datum['weekday']
+                    );
+                    $data[$key]['minOvertimeMinutes'] = $overtimeMinutes;
+                }
+                $data = array_values(
+                    array_filter(
+                        $data,
+                        function ($datum) use ($overtimeMinutes, &$totalCount, &$filteredCount) {
+                            if (($datum['overtimeDuration'] / 60) < $overtimeMinutes) {
+                                $totalCount--;
+                                $filteredCount--;
+                                return false;
+                            }
+                            return true;
+                        }
+                    )
+                );
+
+                echo json_encode(
+                    [
+                        "draw"            => $_REQUEST['draw'],
+                        "recordsTotal"    => $totalCount,
+                        "recordsFiltered" => $filteredCount,
+                        "data"            => $data
+                    ],
+                    JSON_NUMERIC_CHECK
+                );
+                break;
+            case "approveExpense":
+                $expenseId = @$_REQUEST['id'];
+                try {
+                    $this->processExpense($expenseId);
+                    $response = ["status" => 'ok'];
+                } catch (\Exception $exception) {
+                    http_response_code(400);
+                    $response = ["error" => $exception->getMessage()];
+                }
+                echo json_encode($response, JSON_NUMERIC_CHECK);
+                break;
+            case "denyExpense":
+                $expenseId = @$_REQUEST['id'];
+                $denyReason = @$_REQUEST['denyReason'];
+                try {
+                    $this->processExpense($expenseId, true, $denyReason);
+                    $response = ["status" => 'ok'];
+                } catch (\Exception $exception) {
+                    http_response_code(400);
+                    $response = ["error" => $exception->getMessage()];
+                }
+                echo json_encode($response, JSON_NUMERIC_CHECK);
+                break;
+
             default:
                 $this->displayReport();
                 break;
         }
+    }
+
+    function processExpense($id, $deny = false, $denyReason = null)
+    {
+        if (!$id) {
+            throw new Exception('Please provide the id of the expense to approve');
+        }
+
+        $dbeExpense = new DBEExpense($this);
+        $dbeExpense->getRow($id);
+        if (!$dbeExpense->rowCount()) {
+            throw new Exception('Could not find any expenses with the provided ID');
+        }
+
+        if ($dbeExpense->getValue(DBEExpense::deniedReason) || $dbeExpense->getValue(DBEExpense::approvedBy)) {
+            throw new Exception('This expense has already been processed');
+        }
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->getRow($dbeExpense->getValue(DBEExpense::callActivityID));
+
+        if ($dbeCallActivity->getValue(DBECallActivity::userID) == $this->userID) {
+            throw new Exception('You cannot process your own expenses');
+        }
+
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRow($dbeCallActivity->getValue(DBECallActivity::userID));
+        if (!$this->dbeUser->getValue(DBEUser::globalExpenseApprover) && $dbeUser->getValue(
+                DBEUser::expenseApproverID
+            ) != $this->userID) {
+            throw new Exception('You are not allowed to process this expense');
+        }
+
+        if ($deny) {
+            if (!$denyReason) {
+                throw new Exception('Please provide a deny reason');
+            }
+            $dbeExpense->setValue(DBEExpense::deniedReason, $denyReason);
+        } else {
+            $dbeExpense->setValue(DBEExpense::approvedBy, $this->userID);
+            $dbeExpense->setValue(DBEExpense::approvedDate, (new DateTime())->format(DATE_MYSQL_DATETIME));
+        }
+        $dbeExpense->updateRow();
     }
 
     function displayReport()
