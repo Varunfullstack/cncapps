@@ -124,9 +124,7 @@ function common_convertHHMMToDecimal($hhMM)
         3,
         2
     );
-
     $minutesAsFraction = $minutes / 60;
-
     return +common_numberFormat($hours + $minutesAsFraction);
 }
 
@@ -451,7 +449,7 @@ function getExpiryDate(DateTime $installDate,
     );
 
     if ($firstExpiryDate > $nextExpiryDate) {
-        $nextExpiryDate = clone  $firstExpiryDate;
+        $nextExpiryDate = clone $firstExpiryDate;
     }
 
     if ($debug) {

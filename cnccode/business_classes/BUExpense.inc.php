@@ -688,10 +688,6 @@ class BUExpense extends Business
         use the system overtime to get staff overtime limits. This is used to
         make the overtime start time earlier than the office start time
         */
-        $projectStartTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::projectStartTime));
-        $projectEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::projectEndTime));
-        $helpdeskStartTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::helpdeskStartTime));
-        $helpdeskEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::helpdeskEndTime));
 
 
         $db->query($queryString);
@@ -790,19 +786,7 @@ class BUExpense extends Business
 
                 }// end if ( $runType == 'Export' )
 
-                $startTime = common_convertHHMMToDecimal($db->Record['caa_starttime']);
-                $endTime = common_convertHHMMToDecimal($db->Record['caa_endtime']);
-
-                $overtime = $this->calculateOvertime(
-                    $startTime,
-                    $endTime,
-                    $helpdeskStartTime,
-                    $helpdeskEndTime,
-                    $db->Record["cns_helpdesk_flag"] == 'Y',
-                    $projectStartTime,
-                    $projectEndTime,
-                    $db->Record["weekday"]
-                );
+                $overtime = $this->calculateOvertime($db->Record['caa_callactivityno']);
 
                 if ($overtime) {
 
@@ -956,16 +940,27 @@ class BUExpense extends Business
         );
     }
 
-    function calculateOvertime($shiftStartTime,
-                               $shiftEndTime,
-                               $helpdeskStartTime,
-                               $helpdeskEndTime,
-                               $isHelpdeskUser,
-                               $projectStartTime,
-                               $projectEndTime,
-                               $weekDay
-    )
+    /**
+     * @param $activityId
+     * @return float|int The overtime calculated in decimal hours
+     */
+    function calculateOvertime($activityId)
     {
+        $dbejCallactivity = new DBEJCallActivity($this);
+        $dbejCallactivity->getRow($activityId);
+        $dsHeader = new DataSet($this);
+        $buHeader = new BUHeader($this);
+        $buHeader->getHeader($dsHeader);
+        $projectStartTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::projectStartTime));
+        $projectEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::projectEndTime));
+        $helpdeskStartTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::helpdeskStartTime));
+        $helpdeskEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::helpdeskEndTime));
+        $shiftStartTime = common_convertHHMMToDecimal($dbejCallactivity->getValue(DBEJCallActivity::startTime));
+        $shiftEndTime = common_convertHHMMToDecimal($dbejCallactivity->getValue(DBEJCallActivity::endTime));
+        $affectedUser = new DBEUser($this);
+        $affectedUser->getRow($dbejCallactivity->getValue(DBEJCallActivity::userID));
+        $isHelpdeskUser = $affectedUser->getValue(DBEUser::helpdeskFlag) == 'Y';
+        $weekDay = date('w', strtotime($dbejCallactivity->getValue(DBEJCallActivity::date)));
         /*
                if this is a weekend day then the whole lot is overtime else work out how many hours
                are out of office hours

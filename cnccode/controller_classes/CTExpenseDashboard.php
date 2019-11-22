@@ -319,23 +319,14 @@ WHERE
                 $buHeader->getHeader($dbeHeader);
                 $overtimeMinutes = $dbeHeader->getValue(DBEHeader::minimumOvertimeMinutesRequired);
                 foreach ($data as $key => $datum) {
-                    $data[$key]['overtimeDuration'] = $buExpense->calculateOvertime(
-                        $datum['activityStartTimeSeconds'],
-                        $datum['activityEndTimeSeconds'],
-                        $datum['helpdeskStartTimeSeconds'],
-                        $datum['helpdeskEndTimeSeconds'],
-                        $datum['helpdeskUser'],
-                        $datum['projectStartTimeSeconds'],
-                        $datum['projectEndTimeSeconds'],
-                        $datum['weekday']
-                    );
+                    $data[$key]['overtimeDuration'] = $buExpense->calculateOvertime($datum['activityId']);
                     $data[$key]['minOvertimeMinutes'] = $overtimeMinutes;
                 }
                 $data = array_values(
                     array_filter(
                         $data,
                         function ($datum) use ($overtimeMinutes, &$totalCount, &$filteredCount) {
-                            if (($datum['overtimeDuration'] / 60) < $overtimeMinutes) {
+                            if (($datum['overtimeDuration'] * 60) < $overtimeMinutes) {
                                 $totalCount--;
                                 $filteredCount--;
                                 return false;
@@ -495,19 +486,18 @@ WHERE
         $dbeCallActivity = new DBEJCallActivity($this);
         $dbeCallActivity->getRow($activityId);
         $toEmail = $dbeCallActivity->getValue(DBEJCallActivity::userAccount) . "@" . CONFIG_PUBLIC_DOMAIN;
-        $affectedUser = new DBEUser($this);
-        $affectedUser->getRow($dbeCallActivity->getValue(DBECallActivity::userID))
-        $fromEmail = CONFIG_SALES_EMAIL;
+        $fromEmail = $this->dbeUser->getValue(DBEUser::username) . "@" . CONFIG_PUBLIC_DOMAIN;
         $dbeExpenseType = new DBEExpenseType($this);
-        $dbeExpenseType->getRow($dbeExpense->getValue(DBEExpense::expenseID));
+        $dbeExpenseType->getRow($dbeExpense->getValue(DBEExpense::expenseTypeID));
         $buMail = new BUMail($this);
+
         $body = $twig->render(
             'deniedExpenseEmail.html.twig',
             [
                 "expense" => [
-                    "type"   => $dbeExpenseType->getValue(DBEExpenseType::description),
-                    "value"  => "&pound;" . number_format($dbeExpense->getValue(DBEExpense::value), 2),
-                    "reason" => $dbeExpense->getValue(DBEExpense::deniedReason)
+                    "type"         => $dbeExpenseType->getValue(DBEExpenseType::description),
+                    "value"        => number_format($dbeExpense->getValue(DBEExpense::value), 2),
+                    "deniedReason" => $dbeExpense->getValue(DBEExpense::deniedReason)
                 ]
             ]
         );
@@ -567,6 +557,7 @@ WHERE
                 throw new Exception('Please provide a deny reason');
             }
             $dbeCallActivity->setValue(DBECallActivity::overtimeDeniedReason, $denyReason);
+            $this->sendDeniedOvertimeEmail($dbeCallActivity);
         } else {
             $dbeCallActivity->setValue(DBECallActivity::overtimeApprovedBy, $this->userID);
             $dbeCallActivity->setValue(
@@ -616,6 +607,80 @@ WHERE
             throw new Exception('You are not allowed to process this overtime');
         }
         return $dbeCallActivity;
+    }
+
+    /**
+     * @param $dbeCallActivity DBECallActivity
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    function sendDeniedOvertimeEmail($dbeCallActivity)
+    {
+        /** @var Environment */
+        global $twig;
+        $dbeJCallactivity = new DBEJCallActivity($this);
+        $dbeJCallactivity->getRow($dbeCallActivity->getValue(DBECallActivity::callActivityID));
+        $toEmail = $dbeJCallactivity->getValue(DBEJCallActivity::userAccount) . "@" . CONFIG_PUBLIC_DOMAIN;
+        $fromEmail = $this->dbeUser->getValue(DBEUser::username) . "@" . CONFIG_PUBLIC_DOMAIN;
+        $buMail = new BUMail($this);
+        $buExpense = new BUExpense($this);
+        $dsHeader = new DataSet($this);
+        $buHeader = new BUHeader($this);
+        $buHeader->getHeader($dsHeader);
+
+        $affectedUser = new DBEUser($this);
+        $affectedUser->getRow($dbeJCallactivity->getValue(DBECallActivity::userID));
+
+
+        $body = $twig->render(
+            'deniedOvertimeEmail.html.twig',
+            [
+                "overtime" => [
+                    "customerName" => $dbeJCallactivity->getValue(DBEJCallActivity::customerName),
+                    "duration"     => number_format(
+                        $buExpense->calculateOvertime(
+                            $dbeJCallactivity->getValue(DBEJCallActivity::callActivityID)
+                        ),
+                        2
+                    ),
+                    "date"         => (new DateTime($dbeJCallactivity->getValue(DBECallActivity::date)))->format(
+                        'd-m-Y'
+                    ),
+                    "deniedReason" => $dbeCallActivity->getValue(DBECallActivity::overtimeDeniedReason),
+                ]
+            ]
+        );
+
+        $subject = "Your overtime request has been denied";
+
+        $hdrs = array(
+            'From'         => $fromEmail,
+            'To'           => $toEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $buMail->mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+        $body = $buMail->mime->get($mime_params);
+
+        $hdrs = $buMail->mime->headers($hdrs);
+
+        $buMail->putInQueue(
+            $fromEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
+
     }
 
     /**
