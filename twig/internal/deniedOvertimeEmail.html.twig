@@ -1,0 +1,7 @@
+{% extends "wrapper.html.twig" %}
+{% block content %}
+    Your overtime for {{ overtime.customerName }} for  {{ overtime.duration }} on {{ overtime.date }} has been denied because of the following reason:
+    <p>
+        {{ overtime.deniedReason }}
+    </p>
+{% endblock %}

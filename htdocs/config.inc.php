@@ -1067,6 +1067,7 @@ require BASE_DRIVE . '/vendor/autoload.php';
 
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../twig/internal');
 $twig = new Environment($loader, ["cache" => __DIR__ . '/../cache']);
+$twig->addExtension(new \Twig\Extra\Intl\IntlExtension());
 
 define(
     'DOMPDF_ENABLE_AUTOLOAD',
