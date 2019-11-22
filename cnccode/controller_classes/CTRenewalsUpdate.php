@@ -69,7 +69,7 @@ class CTRenewalsUpdate extends CTCNC
                 $countQuery = "select count(*) from custitem left join item ON itm_itemno = cui_itemno LEFT JOIN customer
     ON custitem.`cui_custno` = customer.`cus_custno`
   LEFT JOIN itemBillingCategory
-    ON item.`itemBillingCategoryId` = itemBillingCategory.id where declinedFlag = 'N' and directDebitFlag <> 'Y' AND renewalTypeID = 2";
+    ON item.`itemBillingCategoryId` = itemBillingCategory.id where declinedFlag = 'N'  AND renewalTypeID = 2";
                 $totalCountResult = $db->query($countQuery);
                 $totalCount = $totalCountResult->fetch_row()[0];
                 $defaultQuery = "SELECT
@@ -78,6 +78,7 @@ class CTRenewalsUpdate extends CTCNC
   customer.`cus_name` AS customerName,
   itemBillingCategory.name AS itemBillingCategoryName,
   custitem.`cui_users` AS numberOfUsers,
+       directDebitFlag = 'Y' as directDebit,
        DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%d/%m/%Y') as invoiceFromDate,
 DATE_FORMAT(
  				DATE_SUB(
@@ -95,7 +96,6 @@ FROM
   LEFT JOIN itemBillingCategory
     ON item.`itemBillingCategoryId` = itemBillingCategory.id
 WHERE declinedFlag = 'N'
-  AND directDebitFlag <> 'Y'
   AND renewalTypeID = 2 ";
                 $columnSearch = [];
                 $parameters = [];

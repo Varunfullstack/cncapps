@@ -121,6 +121,12 @@
                         return "from " + row.invoiceFromDate + " to " + row.invoiceToDate;
 
                     }
+                },
+                {
+                    data: 'directDebit',
+                    render: function (data) {
+                        return data ? 'Yes' : '';
+                    }
                 }
             ]
         });
@@ -141,6 +147,7 @@
         <th data-no-search="true">Number of Users</th>
         <th data-no-search="true">Invoice Interval(Months)</th>
         <th data-no-search="true">Next Invoice Period</th>
+        <th data-no-search="true">DD</th>
     </tr>
     </thead>
     <tfoot>
@@ -151,6 +158,7 @@
         <th>Number of Users</th>
         <th>Invoice Interval(Months)</th>
         <th>Next Invoice Period</th>
+        <th>DD</th>
     </tr>
     </tfoot>
 </table>
