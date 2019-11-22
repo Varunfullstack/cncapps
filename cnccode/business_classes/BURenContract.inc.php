@@ -239,11 +239,10 @@ class BURenContract extends Business
         $previousCustomerID = 99999;
 
         $generateInvoice = false;
-        $generatedOrder = false;
+
         $line = null;
         echo "<div> Contract Renewals - START </div>";
         while ($dsRenContract->fetchNext()) {
-            $generatedOrder = false;
             ?>
             <div>
                 contract number: <?= $dsRenContract->getValue(DBECustomerItem::customerItemID) ?>
@@ -254,15 +253,10 @@ class BURenContract extends Business
                  * Group many contracts for same customer under one sales order
          * unless it is an SSL cert in which case it has it's own order
                  */
-                if (strpos(
-                        $dbeJCustomerItem->getValue(DBEJCustomerItem::itemDescription),
-                        'SSL'
-                    ) !== false) {
-                    $isSslCertificate = true;
-                } else {
-                    $isSslCertificate = false;
-                }
-
+                $isSslCertificate = strpos(
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::itemDescription),
+                    'SSL'
+                ) !== false ? true : false;
                 if (
                     $previousCustomerID != $dbeJCustomerItem->getValue(DBEJCustomerItem::customerID) ||
                     $isSslCertificate ||
@@ -274,7 +268,7 @@ class BURenContract extends Business
                     /*
                     If generating invoices and an order has been started
                     */
-                    if ($generateInvoice && $dsOrdhead) {
+                    if ($generateInvoice && !!$dsOrdhead) {
 
                         $buSalesOrder->setStatusCompleted($dsOrdhead->getValue(DBEOrdhead::ordheadID));
 
@@ -309,7 +303,6 @@ class BURenContract extends Business
                         $dsOrdline,
                         $dsCustomer
                     );
-                    $generatedOrder = true;
                     $line = -1;    // initialise sales order line seq
 
                     ?>
@@ -777,7 +770,7 @@ class BURenContract extends Business
         /*
         Finish off last automatic invoice
         */
-        if ($generateInvoice && $generatedOrder) {
+        if ($generateInvoice) {
 
             $buSalesOrder->setStatusCompleted($dsOrdhead->getValue(DBEOrdhead::ordheadID));
 
