@@ -56,12 +56,16 @@ class CTRenewalsUpdate extends CTCNC
                     "itemBillingCategoryName",
                     "numberOfUsers",
                     "invoicePeriodMonths",
+                    'nextInvoicePeriod',
+                    "directDebit"
                 ];
                 $columnsDefinition = [
                     "contractName"            => "item.`itm_desc`",
                     "customerName"            => "customer.`cus_name`",
                     "itemBillingCategoryName" => "itemBillingCategory.name",
                     "invoicePeriodMonths"     => "custitem.invoicePeriodMonths",
+                    'nextInvoicePeriod'       => "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%d/%m/%Y') ",
+                    "directDebit"             => "directDebitFlag"
                 ];
 
                 /** @var dbSweetcode $db */
@@ -90,7 +94,7 @@ DATE_FORMAT(
 FROM
   custitem
   LEFT JOIN item
-    ON itm_itemno = cui_itemno
+    ON itm_itemno = cui_itemno  
   LEFT JOIN customer
     ON custitem.`cui_custno` = customer.`cus_custno`
   LEFT JOIN itemBillingCategory
@@ -134,7 +138,7 @@ WHERE declinedFlag = 'N'
                         $defaultQuery .= (" order by " . implode(' , ', $orderBy));
                     }
                 }
-
+//                var_dump($defaultQuery);
                 $countResult = $db->preparedQuery(
                     $countQuery,
                     $parameters
@@ -159,6 +163,7 @@ WHERE declinedFlag = 'N'
                             "invoicePeriodMonths"     => $row['invoicePeriodMonths'],
                             "invoiceFromDate"         => $row['invoiceFromDate'],
                             "invoiceToDate"           => $row['invoiceToDate'],
+                            "directDebit"             => $row['directDebit']
                         ];
                     },
                     $result->fetch_all(MYSQLI_ASSOC)
