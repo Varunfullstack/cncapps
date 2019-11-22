@@ -201,13 +201,8 @@ class DBEJRenContract extends DBECustomerItem
     `installationDate`,
     INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH
   ),
-  DATE_SUB(
-      DATE_ADD(
-        `installationDate`,
-        INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH
-      ),
-      INTERVAL 1 DAY
-    ))
+  DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` - 1 MONTH )
+  )
 		 AND declinedFlag = 'N'
      AND renewalTypeID = 2 and directDebitFlag <> 'Y' and item.itm_itemtypeno <> 57";
         if ($itemBillingCategoryID) {
