@@ -90,6 +90,7 @@ class DBEHeader extends DBEntity
     const autoCriticalP3Hours = "autoCriticalP3Hours";
     const sevenDayerTarget = "sevenDayerTarget";
     const minimumOvertimeMinutesRequired = "minimumOvertimeMinutesRequired";
+    const expensesNextProcessingDate = "expensesNextProcessingDate";
 
     /**
      * calls constructor()
@@ -563,6 +564,7 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::autoCriticalP2Hours, DA_FLOAT, DA_NOT_NULL);
         $this->addColumn(self::autoCriticalP3Hours, DA_FLOAT, DA_NOT_NULL);
         $this->addColumn(self::minimumOvertimeMinutesRequired, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::expensesNextProcessingDate, DA_DATE, DA_ALLOW_NULL);
 
         $this->setPK(0);
         $this->setAddColumnsOff();

@@ -19,10 +19,14 @@
       name="header"
       AUTOCOMPLETE="OFF"
 >
-    <input
-            name="header[1][headerID]"
+    <input            name="header[1][headerID]"
             type="hidden"
             value="{headerID}"
+    >
+    <input type="hidden"
+           name="header[1][expensesNextProcessingDate]"
+           id="expensesNextProcessingDate"
+           value="{expensesNextProcessingDate}"
     >
     <table width="700px"
            border="0"
@@ -573,12 +577,12 @@
         </tr>
         <tr>
             <td class="promptText">GSC Item</td>
-            <td class="field"><input
-                    type="hidden"
-                    name="header[1][gscItemID]"
-                    id="gscItemID"
-                    value="{gscItemID}"
-            > <input
+            <td class="field">
+                <input type="hidden"
+                       name="header[1][gscItemID]"
+                       id="gscItemID"
+                       value="{gscItemID}"
+                > <input
                     {DISABLED}
                     required
                     type="text"
