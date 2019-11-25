@@ -1,9 +1,23 @@
 <!-- Template: ExpenseExport.inc.html -->
 <script type="application/javascript">
+    let theForm = null;
+    const checkExport = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // which submit button is clicked
+        let activeElement = document.activeElement;
+        if (activeElement.type === 'submit' && activeElement.value === 'Export' && !$('#expensesNextProcessingDate').val()) {
+            alert('Next Month\'s processing date is required!');
+            return false;
+        }
+        // some action, firing beacon with the value of the submit button
+        theForm.submit();
+    };
     $(function () {
-        window.fromDate = $('#fromDate').get(0);
-        window.toDate = $('#toDate').get(0);
+        theForm = $('form[name="expenseExportForm"]')[0];
+        theForm.addEventListener('submit', checkExport);
     })
+
 </script>
 <form name="expenseExportForm"
       method="post"
@@ -18,26 +32,44 @@
         <tr>
             <td width="20%"
                 class="promptText"
+            >Next Month's Processing Date
+            </td>
+            <td class="field">
+                <input type="text"
+                       name="expenseExport[1][expensesNextProcessingDate]"
+                       id="expensesNextProcessingDate"
+                       size="10"
+                       maxlength="10"
+                       class="jqueryCalendar"
+                       autocomplete="off"
+                >
+                <font class="formErrorMessage">{endDateMessage}</font></td>
+        </tr>
+        <tr>
+            <td width="20%"
+                class="promptText"
             >End Date
             </td>
-            <td class="field"><input
-                    type="text"
-                    name="expenseExport[1][endDate]"
-                    id="endDate"
-                    value="{endDate}"
-                    size="10"
-                    maxlength="10"
-                    class="jqueryCalendar"
-                    autocomplete="off"
-            >
+            <td class="field">
+                <input type="text"
+                       name="expenseExport[1][endDate]"
+                       id="endDate"
+                       value="{endDate}"
+                       size="10"
+                       maxlength="10"
+                       class="jqueryCalendar"
+                       autocomplete="off"
+                       required
+                >
                 <font class="formErrorMessage">{endDateMessage}</font></td>
         </tr>
         <tr>
             <td>&nbsp;</td>
-            <td><input type="submit"
+            <td>
+                <input type="submit"
                        name="exportType2"
                        value="Trial"
-            />
+                />
                 <input type="submit"
                        name="exportType"
                        value="Export"

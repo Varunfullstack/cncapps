@@ -16,6 +16,7 @@ require_once($cfg["path_func"] . "/activity.inc.php");
 class BUExpense extends Business
 {
     const exportDataSetEndDate = 'endDate';
+    const expensesNextProcessingDate = "expensesNextProcessingDate";
     public $dbeJExpense;
 
     /**
@@ -212,6 +213,11 @@ class BUExpense extends Business
             DA_DATE,
             DA_ALLOW_NULL
         );
+        $dsData->addColumn(
+            self::expensesNextProcessingDate,
+            DA_DATE,
+            DA_ALLOW_NULL
+        );
     }
 
     /**
@@ -279,7 +285,7 @@ class BUExpense extends Business
         WHERE
         expense.exp_exported_flag <> 'Y'
         AND callactivity.caa_date <= '" . $dsData->getValue(self::exportDataSetEndDate) . "'" .
-            " AND callactivity.caa_status IN ('C','A')
+            " AND callactivity.caa_status IN ('C','A') and expense.approvedBy is not null
         ORDER BY cns_name, caa_date, caa_starttime";
 
         $db->query($queryString);
@@ -682,6 +688,7 @@ class BUExpense extends Business
     )
     AND( caa_endtime <> caa_starttime )
     AND callacttype.engineerOvertimeFlag = 'Y'
+    and overtimeApprovedBy is not null
     ORDER BY cns_name, caa_date";
 
         /*

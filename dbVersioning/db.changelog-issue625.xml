@@ -314,4 +314,16 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="625-22">
+        <preConditions>
+            <not>
+                <columnExists tableName="headert" columnName="expensesNextProcessingDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="expensesNextProcessingDate" type="date">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

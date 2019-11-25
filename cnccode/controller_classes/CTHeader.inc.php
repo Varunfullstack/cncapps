@@ -153,6 +153,7 @@ class CTHeader extends CTCNC
                 'add1Message'                            => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::add1)
                 ),
+                'expensesNextProcessingDate'             => $dsHeader->getValue(DBEHeader::expensesNextProcessingDate),
                 'add2'                                   => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::add2)
                 ),
