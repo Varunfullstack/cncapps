@@ -20,9 +20,9 @@
       name="header"
       AUTOCOMPLETE="OFF"
 >
-    <input            name="header[1][headerID]"
-            type="hidden"
-            value="{headerID}"
+    <input name="header[1][headerID]"
+           type="hidden"
+           value="{headerID}"
     >
     <input type="hidden"
            name="header[1][expensesNextProcessingDate]"
@@ -786,6 +786,18 @@
                        step="1"
                        style="width: 64px"
                 > <span class="formErrorMessage">{remoteSupportWarnHoursMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Days In Advance Expenses Next Month Alert</td>
+            <td class="inputText">
+                <input {DISABLED}
+                       type="number"
+                       name="header[1][daysInAdvanceExpensesNextMonthAlert]"
+                       value="{daysInAdvanceExpensesNextMonthAlert}"
+                       title="The days before Next Month's Processing date that we are going to start sending alerts about unauthorized expenses or overtime"
+                       required
+                >
+            </td>
         </tr>
         <tr>
             <td class="promptText">Remote Support Activity Min Warn Hours</td>

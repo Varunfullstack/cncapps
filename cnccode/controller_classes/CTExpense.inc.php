@@ -555,25 +555,27 @@ class CTExpense extends CTCNC
             $this->exportExpenseForm(); //redisplay with errors
         } else {
             // do export
-            $overtimeExported = $this->buExpense->exportEngineerOvertime(
-                $this->dsExpenseExport,
-                $this->getParam('exportType')
-            );
-            $expensesExported = $this->buExpense->exportEngineerExpenses(
+            $expensesExported = $this->buExpense->exportOvertimeAndExpenses(
                 $this->dsExpenseExport,
                 $this->getParam('exportType')
             );
 
             if ($this->getParam('exportType') == 'Export') {
-
-                if ($overtimeExported OR $expensesExported) {
+                $dbeHeader = new DBEHeader($this);
+                $dbeHeader->getRow(1);
+                $dbeHeader->setValue(
+                    DBEHeader::expensesNextProcessingDate,
+                    $this->dsExpenseExport->getValue(BUExpense::expensesNextProcessingDate)
+                );
+                $dbeHeader->updateRow();
+                if ($expensesExported) {
                     $this->setFormErrorMessage('Export files created and emails sent');
                 } else {
                     $this->setFormErrorMessage('No data to export for this date');
                 }
             } else { // trial
 
-                if ($overtimeExported OR $expensesExported) {
+                if ($expensesExported) {
                     $this->setFormErrorMessage('There are records to export. Email sent to the sales manager');
                 } else {
                     $this->setFormErrorMessage('No data to export for this date');

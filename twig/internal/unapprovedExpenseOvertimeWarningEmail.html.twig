@@ -1,0 +1,72 @@
+{% extends "wrapper.html.twig" %}
+{# @var overtimeActivities \CNCLTD\PendingOvertime[] #}
+{# @var expenses \CNCLTD\PendingExpense[] #}
+{# @var approverName #}
+{# @var approverUserName #}
+{# @var processingDate #}
+{# @var serverURL #}
+{% block content %}
+    <p>These are the items you have not yet approved, please <a href="{{ serverURL }}/ExpenseDashboard.php"
+                                                                target="_blank"
+        >review</a> before {{ processingDate }}
+    </p>
+    <br>
+    {% if expenses|length > 0 %}
+        <h3>Expenses</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Staff Name</th>
+                <th>SR Number</th>
+                <th>Date of expense</th>
+                <th>Expense Type</th>
+                <th>Expense Value</th>
+                <th>Project</th>
+            </thead>
+            <tbody>
+            {% for expense in expenses %}
+                <tr>
+                    <td>{{ expense.staffName }}</td>
+                    <td>
+                        <a href="{{ serverURL }}/Activity.php?action=displayActivity&callActivityID={{ expense.activityId }}" {{ expense.serviceRequestId }}
+                    </td>
+                    <td>{{ expense.dateSubmitted }}</td>
+                    <td>{{ expense.expenseTypeDescription }} </td>
+                    <td>{{ expense.value }}</td>
+                    <td>{{ expense.projectDescription }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <br><br>
+    {% endif %}
+    {% if overtimeActivities|length > 0 %}
+        <h3>Overtime</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Staff Name</th>
+                <th>SR Number</th>
+                <th>Date of overtime</th>
+                <th>Overtime Duration</th>
+                <th>Project</th>
+            </thead>
+            <tbody>
+            {% for overtime in overtimeActivities %}
+                <tr>
+                    <td>{{ overtime.staffName }}</td>
+                    <td>
+                        <a href="{{ serverURL }}/Activity.php?action=displayActivity&callActivityID={{ overtime.activityId }}" {{ overtime.serviceRequestId }}
+                    </td>
+                    <td>{{ overtime.dateSubmitted }}</td>
+                    <td>{{ overtime.overtimeValue }} </td>
+                    <td>{{ overtime.projectDescription }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <br>
+    {% endif %}
+
+{% endblock %}

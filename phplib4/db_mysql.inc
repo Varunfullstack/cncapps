@@ -249,7 +249,6 @@ class DB_Sql
             self::$Link_ID,
             $queryString
         );
-
         $a_params = array();
         $param_type = '';
         $n = count($parameters);

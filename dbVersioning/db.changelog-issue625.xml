@@ -320,9 +320,110 @@
                 <columnExists tableName="headert" columnName="expensesNextProcessingDate"/>
             </not>
         </preConditions>
-        <addColumn tableName="consultant">
+        <addColumn tableName="headert">
             <column name="expensesNextProcessingDate" type="date">
                 <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-23">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(routine_name) > 0
+                FROM INFORMATION_SCHEMA.ROUTINES
+                WHERE
+                ROUTINE_TYPE="FUNCTION"
+                AND ROUTINE_SCHEMA=DATABASE()
+                AND ROUTINE_NAME = 'getCurrentVatRate';
+            </sqlCheck>
+        </preConditions>
+        <createProcedure procedureName="getCurrentVatRate">
+            CREATE FUNCTION `getCurrentVatRate`() RETURNS DECIMAL (4, 2) NOT DETERMINISTIC READS SQL DATA
+            BEGIN
+            DECLARE vat DECIMAL (4, 2);
+            SELECT
+            CASE
+            WHEN headert.`hed_std_vatcode` = "T0"
+            THEN
+            (SELECT
+            vat.`vat_rate_t0`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T1"
+            THEN
+            (SELECT
+            vat.`vat_rate_t1`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T2"
+            THEN
+            (SELECT
+            vat.`vat_rate_t2`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T3"
+            THEN
+            (SELECT
+            vat.`vat_rate_t3`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T4"
+            THEN
+            (SELECT
+            vat.`vat_rate_t4`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T5"
+            THEN
+            (SELECT
+            vat.`vat_rate_t5`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T6"
+            THEN
+            (SELECT
+            vat.`vat_rate_t6`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T7"
+            THEN
+            (SELECT
+            vat.`vat_rate_t7`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T8"
+            THEN
+            (SELECT
+            vat.`vat_rate_t8`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T9"
+            THEN
+            (SELECT
+            vat.`vat_rate_t9`
+            FROM
+            vat)
+            END INTO vat
+            FROM
+            headert;
+            RETURN vat/100;
+            END
+        </createProcedure>
+        <rollback>
+            <sql>
+                drop function if exists getCurrentVatRate
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-24">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="daysInAdvanceExpensesNextMonthAlert"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="daysInAdvanceExpensesNextMonthAlert" defaultValue="2" type="int(2)">
+                <constraints nullable="false"/>
             </column>
         </addColumn>
     </changeSet>
