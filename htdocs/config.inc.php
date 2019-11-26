@@ -1066,7 +1066,10 @@ $GLOBALS['db_options'] =
 require BASE_DRIVE . '/vendor/autoload.php';
 
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../twig/internal');
-$twig = new Environment($loader, ["cache" => __DIR__ . '/../cache']);
+$twig = new Environment(
+    $loader,
+    ["cache" => __DIR__ . '/../cache', "debug" => $server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE]
+);
 $twig->addExtension(new \Twig\Extra\Intl\IntlExtension());
 
 define(

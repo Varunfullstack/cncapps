@@ -149,10 +149,12 @@
                 if (data.status === 'Pending') {
                     $(row).addClass('pending');
                 }
-            }
+            },
+            stateSave: true,
         });
         overtimeTable = $('#overtimeTable').DataTable({
             dom: 'lfrtip',
+            stateSave: true,
             columns: [
                 {data: "staffName", name: 'staffName'},
                 {

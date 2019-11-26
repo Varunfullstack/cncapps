@@ -506,6 +506,9 @@ class CTHeader extends CTCNC
                 DBEHeader::projectCommenceNotification                               => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::projectCommenceNotification)
                 ),
+                DBEHeader::daysInAdvanceExpensesNextMonthAlert                       => $dsHeader->getValue(
+                    DBEHeader::daysInAdvanceExpensesNextMonthAlert
+                ),
                 DBEHeader::projectCommenceNotification . 'Message'                   => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::projectCommenceNotification)
                 ),

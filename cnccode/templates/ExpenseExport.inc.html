@@ -2,26 +2,23 @@
 <script type="application/javascript">
     let theForm = null;
     const checkExport = function (e) {
-        e.preventDefault();
-        e.stopPropagation();
         // which submit button is clicked
         let activeElement = document.activeElement;
         if (activeElement.type === 'submit' && activeElement.value === 'Export' && !$('#expensesNextProcessingDate').val()) {
             alert('Next Month\'s processing date is required!');
             return false;
         }
-        // some action, firing beacon with the value of the submit button
-        theForm.submit();
+        return true;
     };
     $(function () {
         theForm = $('form[name="expenseExportForm"]')[0];
-        theForm.addEventListener('submit', checkExport);
     })
 
 </script>
 <form name="expenseExportForm"
       method="post"
       action="{urlSubmit}"
+      onsubmit="return checkExport(this)"
 >
     <P>Export engineer expenses for activities up to the date entered. </P>
     <table width="100%"
@@ -67,13 +64,14 @@
             <td>&nbsp;</td>
             <td>
                 <input type="submit"
-                       name="exportType2"
+                       name="exportType"
                        value="Trial"
                 />
                 <input type="submit"
                        name="exportType"
                        value="Export"
-                ></td>
+                >
+            </td>
         </tr>
     </table>
 </form>
