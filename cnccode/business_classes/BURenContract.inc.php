@@ -120,11 +120,11 @@ class BURenContract extends Business
 
         $dsCustomerItem->setValue(
             DBEJCustomerItem::curUnitCost,
-            $dbeItem->getValue(DBEItem::curUnitCost) * $orderLineDS->getValue(DBEOrdline::qtyOrdered) * 12
+            $orderLineDS->getValue(DBEOrdline::curUnitCost) * $orderLineDS->getValue(DBEOrdline::qtyOrdered) * 12
         );
         $dsCustomerItem->setValue(
             DBEJCustomerItem::curUnitSale,
-            $dbeItem->getValue(DBEItem::curUnitSale) * $orderLineDS->getValue(DBEOrdline::qtyOrdered) * 12
+            $orderLineDS->getValue(DBEOrdline::curUnitSale) * $orderLineDS->getValue(DBEOrdline::qtyOrdered) * 12
         );
         $dsCustomerItem->setValue(
             DBEJCustomerItem::salePricePerMonth,

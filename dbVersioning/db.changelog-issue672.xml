@@ -83,9 +83,10 @@
                     JOIN item
                     ON itm_itemno = cui_itemno
                     JOIN itemtype
-                    ON ity_itemtypeno = itm_itemtypeno SET `cui_users` = 1,
-                                                           custitem.`salePricePerMonth` = cui_sale_price / 12,
-                                                           custitem.`costPricePerMonth` = cui_cost_price / 12
+                    ON ity_itemtypeno = itm_itemtypeno
+            SET `cui_users`                  = 1,
+                custitem.`salePricePerMonth` = cui_sale_price / 12,
+                custitem.`costPricePerMonth` = cui_cost_price / 12
             WHERE renewalTypeID = 2
               AND (NOT cui_users
                 OR cui_users IS NULL);
@@ -102,4 +103,22 @@
         </sql>
         <rollback/>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue672-6">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT
+                numeric_precision = 2
+                FROM
+                INFORMATION_SCHEMA.COLUMNS
+                WHERE table_schema = DATABASE()
+                AND TABLE_NAME = 'custItem'
+                AND column_name = 'salePricePerMonth';
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="custItem" columnName="salePricePerMonth" newDataType="decimal(7,3)"/>
+        <rollback>
+            <modifyDataType columnName="salePricePerMonth" newDataType="decimal(6,2)" tableName="custItem"/>
+        </rollback>
+    </changeSet>
+
 </databaseChangeLog>
