@@ -1,0 +1,165 @@
+<style>
+    .progressIndicator {
+        position: relative;
+    }
+
+    .loading:not(:required):after {
+        font-size: 7px !important;
+    }
+</style>
+<script>
+
+    let table = null;
+
+    function changeUsers() {
+        console.log($(event.target).data());
+        const loadingIndicator = event.target.nextElementSibling;
+
+        const rowOverlay = document.createElement('div');
+        const td = event.target.parentElement;
+        const tr = td.parentElement;
+        const trPosition = tr.getBoundingClientRect();
+        rowOverlay.style.height = String(trPosition.height);
+        rowOverlay.style.width = String(trPosition.width);
+        rowOverlay.style.left = String(trPosition.left);
+        rowOverlay.style.top = String(trPosition.top);
+        rowOverlay.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
+        rowOverlay.style.position = 'absolute';
+        const indicatorHolder = document.createElement('div');
+        indicatorHolder.style.position = 'relative';
+
+        const indicator = document.createElement('div');
+        indicator.className = "loading";
+        indicator.style.top = String(trPosition.height);
+        indicatorHolder.append(indicator);
+        rowOverlay.append(indicatorHolder);
+        document.body.append(rowOverlay);
+        $.ajax(
+            '?action=updateUsers',
+            {
+                method: 'POST',
+                dataType: 'json',
+                data: {contractID: $(event.target).data().contractId, users: event.target.value}
+            }
+        ).then(result => {
+            rowOverlay.parentNode.removeChild(rowOverlay);
+        })
+    }
+
+    $(function () {
+        $('#example thead tr').clone(true).appendTo('#example thead');
+        $('#example thead tr:eq(1) th').each(function (i) {
+            var title = $(this).text();
+            if ($(this).data().noSearch) {
+                $(this).html('');
+                return;
+            }
+            $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+            const autocompleteURL = $(this).data().autocompleteUrl;
+            const autocompleteTermField = 'term' || $(this).data().autocompleteTermField;
+            const performSearch = function (value, column) {
+                if (table.column(column).search() != value) {
+                    table.column(column)
+                        .search(value);
+                    table.draw();
+                }
+            };
+
+            const filterInput = $(this).find('input');
+            filterInput.autocomplete({
+                minLength: 0,
+                source: function (request, responseCB) {
+                    const data = {};
+                    data[autocompleteTermField] = request.term;
+                    $.ajax(
+                        autocompleteURL,
+                        {
+                            method: 'POST',
+                            dataType: 'json',
+                            data: data
+                        }
+                    ).then(response => {
+                        responseCB(response);
+                    })
+
+                },
+                delay: 200,
+                select: function (event, ui) {
+                    performSearch(ui.item.value, i);
+                }
+            }).focus(function () {
+                $(this).autocomplete("search", $(this).val());
+            }).on('change', function () {
+                performSearch(filterInput[0].value, i);
+            });
+        });
+        table = $('#example').DataTable({
+            dom: "lrtip",
+            serverSide: true,
+            ajax: '?action=getData',
+            orderCellsTop: true,
+            fixedHeader: true,
+            pageLength: 50,
+            columns: [
+                {
+                    data: "contractName", render: function (data, type, row) {
+                        return "<a href='RenContract.php?action=edit&ID=" + row.contractID + "' target='_blank'>" + data + "</a>";
+                    }
+                },
+                {data: "customerName"},
+                {data: "itemBillingCategoryName"},
+                {
+                    data: "numberOfUsers", sortable: false, searchable: false, render: function (data, type, row) {
+                        return '<input value="' + data + '" onchange="changeUsers()" data-contract-id="' + row.contractID + '"><div class="progressIndicator"></div>'
+                    }
+                },
+                {data: 'invoicePeriodMonths'},
+                {
+                    data: 'invoiceFromDate',
+                    sortable: false,
+                    render: function (data, type, row) {
+                        return "from " + row.invoiceFromDate + " to " + row.invoiceToDate;
+
+                    }
+                },
+                {
+                    data: 'directDebit',
+                    name: 'directDebit',
+                    render: function (data) {
+                        return data ? 'Yes' : '';
+                    }
+                }
+            ]
+        });
+    })
+</script>
+<table id="example"
+       class="display"
+       style="width:100%"
+>
+    <thead>
+    <tr>
+        <th data-autocomplete-url="/RenContract.php?action=searchDesc"
+            data-autocomplete-term-field="term"
+        >Contract
+        </th>
+        <th data-autocomplete-url="/Customer.php?action=searchName">Customer</th>
+        <th data-autocomplete-url="/ItemBillingCategory.php?action=searchName">Item Billing Category</th>
+        <th data-no-search="true">Number of Users</th>
+        <th data-no-search="true">Invoice Interval(Months)</th>
+        <th data-no-search="true">Next Invoice Period</th>
+        <th data-no-search="true">DD</th>
+    </tr>
+    </thead>
+    <tfoot>
+    <tr>
+        <th>Contract</th>
+        <th>Customer</th>
+        <th>Item Billing Category</th>
+        <th>Number of Users</th>
+        <th>Invoice Interval(Months)</th>
+        <th>Next Invoice Period</th>
+        <th>DD</th>
+    </tr>
+    </tfoot>
+</table>

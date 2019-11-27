@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 680 - Quick Create Sales Request
 - Issue 659 - Record daily replication / backup targets in database
 - Issue 677 - Sales Passwords list
+- Issue 672 - Office 365 licensing billing improvements
 ### Changed
 - Issue 638 - Allow Multiple dropping of files when uploading documents
 - Issue 535 - PrePay statements, alert if hidden charges on the SR

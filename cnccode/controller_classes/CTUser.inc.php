@@ -94,7 +94,7 @@ class CTUser extends CTCNC
         }
         $this->buUser = new BUUser($this);
         $this->dsUser = new DSForm($this);
-        $this->dsUser->copyColumnsFrom($this->buUser->dbeUser, false);
+        $this->dsUser->copyColumnsFrom($this->buUser->dbeUser);
         $this->dsUser->setNull(DBEUser::userID, DA_ALLOW_NULL);
 
         $this->dsUser->setAddColumnsOn();
@@ -526,12 +526,16 @@ class CTUser extends CTCNC
                     )
                 ),
 
-                'weekdayOvertimeFlagChecked' => Controller::htmlChecked(
+                'weekdayOvertimeFlagChecked'          => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::weekdayOvertimeFlag)
                 ),
-                'helpdeskFlagChecked'        => Controller::htmlChecked($dsUser->getValue(DBEJUser::helpdeskFlag)),
-
-                'salesChecked' => (strpos(
+                'helpdeskFlagChecked'                 => Controller::htmlChecked(
+                    $dsUser->getValue(DBEJUser::helpdeskFlag)
+                ),
+                'createRenewalSalesOrdersFlagChecked' => Controller::htmlChecked(
+                    $dsUser->getValue(DBEJUser::createRenewalSalesOrdersFlag)
+                ),
+                'salesChecked'                        => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
                         PHPLIB_PERM_SALES
                     ) !== FALSE) ? CT_CHECKED : null,

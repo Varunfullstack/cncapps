@@ -64,6 +64,7 @@ class DBEUser extends DBEntity
     const starterLeaverQuestionManagementFlag = 'starterLeaverQuestionManagementFlag';
     const offsiteBackupAdditionalPermissionsFlag = 'offsiteBackupAdditionalPermissionsFlag';
     const salesPasswordAccess = 'salesPasswordAccess';
+    const createRenewalSalesOrdersFlag = "createRenewalSalesOrdersFlag";
 
     /**
      * calls constructor()
@@ -368,6 +369,11 @@ class DBEUser extends DBEntity
             DA_NOT_NULL,
             null,
             false
+        );
+        $this->addColumn(
+            self::createRenewalSalesOrdersFlag,
+            DA_YN,
+            DA_NOT_NULL
         );
 
         $this->setPK(0);

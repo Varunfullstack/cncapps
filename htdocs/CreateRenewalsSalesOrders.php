@@ -20,20 +20,27 @@ $buRenContract = new BURenContract($thing);
 $buRenQuotation = new BURenQuotation($thing);
 $buRenDomain = new BURenDomain($thing);
 $buRenHosting = new BURenHosting($thing);
-
+$itemBillingCategory = null;
+if (isset($_REQUEST['itemBillingCategory'])) {
+    $itemBillingCategory = $_REQUEST['itemBillingCategory'];
+}
 $toEmail = "CreateRenewalSalesOrders@cnc-ltd.co.uk";
 
-$buRenBroadband->emailRenewalsSalesOrdersDue($toEmail);
-$buRenContract->emailRenewalsSalesOrdersDue($toEmail);
-$buRenHosting->emailRenewalsSalesOrdersDue($toEmail);
-$buRenQuotation->emailRenewalsQuotationsDue($toEmail);
-$buRenQuotation->emailRecentlyGeneratedQuotes($toEmail);
-$buRenDomain->emailRenewalsSalesOrdersDue($toEmail);
+if (!$itemBillingCategory) {
+    $buRenBroadband->emailRenewalsSalesOrdersDue($toEmail);
+    $buRenHosting->emailRenewalsSalesOrdersDue($toEmail);
+    $buRenQuotation->emailRenewalsQuotationsDue($toEmail);
+    $buRenQuotation->emailRecentlyGeneratedQuotes($toEmail);
+    $buRenDomain->emailRenewalsSalesOrdersDue($toEmail);
+}
+$buRenContract->emailRenewalsSalesOrdersDue($toEmail, $itemBillingCategory);
 
-$buRenBroadband->createRenewalsSalesOrders();
-$buRenContract->createRenewalsSalesOrders();
-$buRenHosting->createRenewalsSalesOrders();
-$buRenQuotation->createRenewalsQuotations();
-$buRenDomain->createRenewalsSalesOrders();
+if (!$itemBillingCategory) {
+    $buRenBroadband->createRenewalsSalesOrders();
+    $buRenHosting->createRenewalsSalesOrders();
+    $buRenQuotation->createRenewalsQuotations();
+    $buRenDomain->createRenewalsSalesOrders();
+}
+$buRenContract->createRenewalsSalesOrders($itemBillingCategory);
 echo "PROCESS COMPLETED";
 ?>

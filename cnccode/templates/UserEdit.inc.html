@@ -812,6 +812,18 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">Create Renewal Sales Orders</td>
+            <td class="fieldText">
+                <input name="user[1][createRenewalSalesOrdersFlag]"
+                       type="checkbox"
+                       id="user[1][createRenewalSalesOrdersFlag]"
+                       value="Y"
+                       {DISABLED}
+                       {createRenewalSalesOrdersFlagChecked}
+                />
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">Sales Password Access</td>
             <td class="fieldText">
                 <input name="user[1][salesPasswordAccess]"
@@ -829,12 +841,13 @@
         </tr>
         <tr>
             <td class="promptText">Active</td>
-            <td class="fieldText"><INPUT name="user[1][activeFlag]"
-                                         {DISABLED}
-                                         type="checkbox"
-                                         value="Y"
-                                         {activeFlagChecked}
-            ></td>
+            <td class="fieldText">
+                <INPUT name="user[1][activeFlag]"
+                       {DISABLED}
+                       type="checkbox"
+                       value="Y"
+                       {activeFlagChecked}
+                ></td>
         </tr>
 
         <tr>
