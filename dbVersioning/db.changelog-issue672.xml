@@ -77,40 +77,6 @@
         </addColumn>
     </changeSet>
     <changeSet author="pavwebdev" id="issue672-5">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
-                SELECT
-                numeric_precision = 2
-                FROM
-                INFORMATION_SCHEMA.COLUMNS
-                WHERE table_schema = DATABASE()
-                AND TABLE_NAME = 'custItem'
-                AND column_name = 'salePricePerMonth';
-            </sqlCheck>
-        </preConditions>
-        <modifyDataType tableName="custItem" columnName="salePricePerMonth" newDataType="decimal(7,3)"/>
-        <rollback>
-            <modifyDataType columnName="salePricePerMonth" newDataType="decimal(6,2)" tableName="custItem"/>
-        </rollback>
-    </changeSet>
-    <changeSet author="pavwebdev" id="issue672-6">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
-                SELECT
-                numeric_precision = 2
-                FROM
-                INFORMATION_SCHEMA.COLUMNS
-                WHERE table_schema = DATABASE()
-                AND TABLE_NAME = 'custItem'
-                AND column_name = 'costPricePerMonth';
-            </sqlCheck>
-        </preConditions>
-        <modifyDataType tableName="custItem" columnName="costPricePerMonth" newDataType="decimal(7,3)"/>
-        <rollback>
-            <modifyDataType columnName="costPricePerMonth" newDataType="decimal(6,2)" tableName="custItem"/>
-        </rollback>
-    </changeSet>
-    <changeSet author="pavwebdev" id="issue672-7">
         <sql>
             UPDATE
                 custitem
@@ -133,7 +99,15 @@
             SET salePricePerMonth = cui_sale_price / 12 / cui_users,
                 costPricePerMonth = cui_cost_price / 12 / cui_users
             WHERE renewalTypeID = 2;
-
+            UPDATE
+                custitem
+                    JOIN item
+                    ON itm_itemno = cui_itemno
+                    JOIN itemtype
+                    ON ity_itemtypeno = itm_itemtypeno
+            SET cui_sale_price = salePricePerMonth * 12 * cui_users,
+                cui_cost_price = costPricePerMonth * 12 * cui_users
+            WHERE renewalTypeID = 2;
         </sql>
         <rollback/>
     </changeSet>
