@@ -5,7 +5,7 @@
  * Date: 24/01/2019
  * Time: 16:30
  */
-
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBEPassword.inc.php");
 
 class DBEJPassword extends DBEPassword
@@ -16,8 +16,8 @@ class DBEJPassword extends DBEPassword
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -39,17 +39,6 @@ class DBEJPassword extends DBEPassword
         $this->setAddColumnsOff();
     }
 
-    private function getBasicQuery()
-    {
-        return "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() . ' LEFT JOIN customer ON ' . $this->getTableName(
-            ) . '.' . $this->getDBColumnName(self::customerID) . '= customer.cus_custno ' .
-            ' left join passwordService on ' . $this->getTableName() . "." . $this->getDBColumnName(
-                self::serviceID
-            ) . " =  passwordService.passwordServiceID ";
-
-    }
-
     /**
      * Return all rows from DB
      * @access public
@@ -67,6 +56,17 @@ class DBEJPassword extends DBEPassword
         return (parent::getRows());
     }
 
+    private function getBasicQuery()
+    {
+        return "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() . ' LEFT JOIN customer ON ' . $this->getTableName(
+            ) . '.' . $this->getDBColumnName(self::customerID) . '= customer.cus_custno ' .
+            ' left join passwordService on ' . $this->getTableName() . "." . $this->getDBColumnName(
+                self::serviceID
+            ) . " =  passwordService.passwordServiceID ";
+
+    }
+
     function getRow($id = "")
     {
         $this->setMethodName("getRow");
@@ -82,7 +82,8 @@ class DBEJPassword extends DBEPassword
 
     function getRowsByCustomerIDAndPasswordLevel($customerID,
                                                  $passwordLevel = null,
-                                                 $archived = false
+                                                 $archived = false,
+                                                 $salesPasswordAccess = false
     )
     {
         $query = $this->getBasicQuery() . " where 1=1 ";
@@ -105,8 +106,11 @@ class DBEJPassword extends DBEPassword
         if (isset($passwordLevel)) {
             $passwordLevelQuery = " and " . $this->getDBColumnName(self::level) . " <= " . $passwordLevel;
         }
-
         $query .= $passwordLevelQuery;
+
+        if (!$salesPasswordAccess) {
+            $query .= " and salesPassword = 0 ";
+        }
 
         $query .= " order by passwordService.passwordServiceID IS NULL, passwordService.onePerCustomer DESC,
   passwordService.description ";

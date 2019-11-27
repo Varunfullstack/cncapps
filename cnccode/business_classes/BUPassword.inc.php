@@ -49,20 +49,20 @@ class BUPassword extends Business
         ));
     }
 
-    function getRowsByCustomerIDAndPasswordLevel($customerID,
-                                                 $passwordLevel,
-                                                 &$dsResults
-    )
-    {
-        $this->dbePassword->getRowsByCustomerIDAndPasswordLevel(
-            $customerID,
-            $passwordLevel
-        );
-        return ($this->getData(
-            $this->dbePassword,
-            $dsResults
-        ));
-    }
+//    function getRowsByCustomerIDAndPasswordLevel($customerID,
+//                                                 $passwordLevel,
+//                                                 &$dsResults
+//    )
+//    {
+//        $this->dbePassword->getRowsByCustomerIDAndPasswordLevel(
+//            $customerID,
+//            $passwordLevel
+//        );
+//        return ($this->getData(
+//            $this->dbePassword,
+//            $dsResults
+//        ));
+//    }
 
     function archive($passwordID,
                      DBEUser $archivingUser
