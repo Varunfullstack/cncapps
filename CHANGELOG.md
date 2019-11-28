@@ -18,11 +18,12 @@ This project changes will be shown here.
 - Issue 661 - Review Meetings show primary active site
 - Issue 668 - Phone number cleansing
 - Issue 682 - Item Type Amendments
+- Issue 685 - Prevent Creation of Quotes without a signature
 ### Fixed
 - Issue 663 - Password Service Sorting not working
 - Issue 592 - Security Improvements
 - Issue 683 - Fixed SR manual completion monitor
-
+ 
 ## [v3.7.0] 
 ### Added
 - Issue 654 - Set all contacts to support level None
