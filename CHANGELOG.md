@@ -24,6 +24,7 @@ This project changes will be shown here.
 - Issue 663 - Password Service Sorting not working
 - Issue 592 - Security Improvements
 - Issue 683 - Fixed SR manual completion monitor
+- Fixed issue with Office 365 Licenses not saving "Report on spare licences" when unchecked
  
 ## [v3.7.0] 
 ### Added

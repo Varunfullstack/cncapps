@@ -84,6 +84,25 @@ if ($generateSummary) {
     $isHeaderSet = false;
 }
 
+
+function longestRepeatedSubstring($str)
+{
+    $n = strlen($str);
+    $index = 2;
+    $recordSubstitution = 0;
+    $recordProspect = null;
+    do {
+        $prospect = substr($str, 0, $index);
+        $index++;
+        $substitutionCount = $n - strlen(str_replace($prospect, '', $str));
+        if ($substitutionCount > $recordSubstitution) {
+            $recordSubstitution = $substitutionCount;
+            $recordProspect = $prospect;
+        }
+    } while ($index < $n && ($n - $recordSubstitution > strlen($recordProspect)));
+    return $recordProspect;
+}
+
 while ($dbeCustomer->fetchNext()) {
 
     $query = /** @lang MySQL */
@@ -224,29 +243,10 @@ ORDER BY clients.name,
         continue;
     }
     $data = $statement->fetchAll(PDO::FETCH_ASSOC);
-
     foreach ($data as $key => $datum) {
         $text = $datum['Last User'];
         $text = str_replace('null', "", $text);
-        $possibleAnswer = $text;
-        $lastCount = 0;
-        for ($i = 1; $i <= strlen($text); $i++) {
-            $toCheck = substr($text, 0, strlen($text) - $i);
-            if (!strlen($toCheck)) {
-                continue;
-            }
-            $count = substr_count($text, $toCheck);
-            if ($count > $lastCount) {
-                $lastCount = $count;
-                $possibleResult = str_replace($toCheck, "", $text);
-                if (!strlen($possibleResult)) {
-                    $possibleAnswer = $toCheck;
-                }
-            }
-
-        }
-
-        $data[$key]['Last User'] = $possibleAnswer;
+        $data[$key]['Last User'] = longestRepeatedSubstring($text);
     }
 
 
