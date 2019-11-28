@@ -98,7 +98,8 @@ do {
 
     $userName = $buPassword->decrypt($dbePassword->getValue(DBEPassword::username));
     $password = $buPassword->decrypt($dbePassword->getValue(DBEPassword::password));
-    $path = POWERSHELL_DIR . "/365OfficeLicensesExport.ps1";
+//    $path = POWERSHELL_DIR . "/365OfficeLicensesExport.ps1";
+    $path = POWERSHELL_DIR . "/test.ps1";
     $cmdParts = [
         "powershell.exe",
         "-executionpolicy",
