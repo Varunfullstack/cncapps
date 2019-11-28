@@ -79,6 +79,14 @@ $template->set_block(
 
 $servers = $buSecondsite->getSuspendedCheckServers();
 
+if (!count($servers)) {
+    $template->setVar(
+        'suspendedServers',
+        "",
+        false
+    );
+}
+
 foreach ($servers as $server) {
 
     $template->set_var(
