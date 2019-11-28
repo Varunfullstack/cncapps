@@ -1206,8 +1206,10 @@ class CTSalesOrder extends CTCNC
         // Initialise an array of actions that may be performed upon this order: they are displayed in a drop-down
         // below the lines section and will be applied to the selected (checked) lines
         $actions = array();
+        $quickQuoteDisabled = false;
         if ($dsOrdline->rowCount() > 0) {                        // There are lines
             if ($orderType == 'Q') {
+                $quickQuoteDisabled = !$this->dbeUser->getValue(DBEUser::signatureFilename);
                 $actions[CTSALESORDER_ACT_CREATE_QUICK_QUOTE] = 'create quick quote';
                 $actions[CTSALESORDER_ACT_COPY_TO_ORDER] = 'copy to order';
                 $actions[CTSALESORDER_ACT_CONVERT_TO_ORDER] = 'convert to order';
@@ -1237,7 +1239,8 @@ class CTSalesOrder extends CTCNC
                     array(
                         'SELECTED'          => ($this->getAction() == $action) ? CT_SELECTED : null,
                         'action'            => $action,
-                        'actionDescription' => $actionDescription
+                        'actionDescription' => $actionDescription,
+                        'disabled'          => $quickQuoteDisabled && $action == CTSALESORDER_ACT_CREATE_QUICK_QUOTE ? 'disabled' : null
                     )
                 );
                 $this->template->parse(
@@ -3595,6 +3598,12 @@ class CTSalesOrder extends CTCNC
         }
         if (!$this->getEmailSubject()) {
             $this->setFormErrorMessage('Email Subject is required');
+            $this->setFormErrorOn();
+            return $this->displayOrder();
+        }
+
+        if (!$this->dbeUser->getValue(DBEUser::signatureFilename)) {
+            $this->setFormErrorMessage('User does not have signature file assigned, please assign one to continue');
             $this->setFormErrorOn();
             return $this->displayOrder();
         }
