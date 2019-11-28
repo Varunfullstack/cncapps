@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v3.8.0]
 ### Added
 - Issue 680 - Quick Create Sales Request
 - Issue 659 - Record daily replication / backup targets in database
