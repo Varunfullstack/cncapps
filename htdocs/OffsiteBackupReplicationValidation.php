@@ -79,15 +79,23 @@ $template->set_block(
 
 $servers = $buSecondsite->getSuspendedCheckServers();
 
+if (!count($servers)) {
+    $template->setVar(
+        'suspendedServers',
+        "",
+        false
+    );
+}
+
 foreach ($servers as $server) {
 
     $template->set_var(
         array(
             'customerName'       => $server['cus_name'],
             'serverName'         => $server['serverName'],
-            'suspendedUntilDate' => $server['secondsiteValidationSuspendUntilDate'],
+            'suspendedUntilDate' => $server['suspendedUntilDate'],
             'suspendUser'        => $server['suspendUser'],
-            'suspendedDate'      => $server['secondsiteSuspendedDate']
+            'suspendedDate'      => $server['suspendedDate']
         )
     );
     $template->parse(

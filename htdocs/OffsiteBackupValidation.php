@@ -86,9 +86,9 @@ foreach ($servers as $server) {
         array(
             'customerName' => $server['cus_name'],
             'serverName'   => $server['serverName'],
-            'delayDays'    => $server['secondsiteImageDelayDays'],
+            'delayDays'    => $server['imageDelayDays'],
             'delayUser'    => $server['delayUser'],
-            'delayDate'    => $server['secondsiteImageDelayDate']
+            'delayDate'    => $server['imageDelayDate']
         )
     );
     $template->parse(
@@ -107,15 +107,23 @@ $template->set_block(
 
 $servers = $buSecondsite->getSuspendedCheckServers();
 
+if (!count($servers)) {
+    $template->setVar(
+        'suspendedServers',
+        "",
+        false
+    );
+}
+
 foreach ($servers as $server) {
 
     $template->set_var(
         array(
             'customerName'       => $server['cus_name'],
             'serverName'         => $server['serverName'],
-            'suspendedUntilDate' => $server['secondsiteValidationSuspendUntilDate'],
+            'suspendedUntilDate' => $server['suspendedUntilDate'],
             'suspendUser'        => $server['suspendUser'],
-            'suspendedDate'      => $server['secondsiteSuspendedDate']
+            'suspendedDate'      => $server['suspendedDate']
         )
     );
     $template->parse(
@@ -123,7 +131,6 @@ foreach ($servers as $server) {
         'suspendedCheckServerBlock',
         true
     );
-
 }
 
 $template->set_block(

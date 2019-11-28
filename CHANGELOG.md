@@ -19,6 +19,7 @@ This project changes will be shown here.
 - Issue 668 - Phone number cleansing
 - Issue 682 - Item Type Amendments
 - Issue 685 - Prevent Creation of Quotes without a signature
+- Issue 675 - OBRS suspension logic for passed check
 ### Fixed
 - Issue 663 - Password Service Sorting not working
 - Issue 592 - Security Improvements

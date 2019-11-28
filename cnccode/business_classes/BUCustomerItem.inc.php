@@ -313,7 +313,34 @@ class BUCustomerItem extends Business
                 DBECustomerItem::secondsiteSuspendedDate,
                 $dbeCustomerItem->getValue(DBECustomerItem::secondsiteSuspendedDate)
             );
+        }
 
+
+        if (
+            $dsCustomerItem->getValue(DBECustomerItem::offsiteReplicationValidationSuspendedUntilDate) &&
+            $dbeCustomerItem->getValue(
+                DBECustomerItem::offsiteReplicationValidationSuspendedUntilDate
+            ) != $dsCustomerItem->getValue(
+                DBECustomerItem::offsiteReplicationValidationSuspendedUntilDate
+            )
+        ) {
+            $dsCustomerItem->setValue(
+                DBECustomerItem::offsiteReplicationSuspendedByUserID,
+                $GLOBALS ['auth']->is_authenticated()
+            );
+            $dsCustomerItem->setValue(
+                DBECustomerItem::offsiteReplicationSuspendedDate,
+                date(DATE_MYSQL_DATE)
+            );
+        } else {
+            $dsCustomerItem->setValue(
+                DBECustomerItem::offsiteReplicationSuspendedByUserID,
+                $dbeCustomerItem->getValue(DBECustomerItem::offsiteReplicationSuspendedByUserID)
+            );
+            $dsCustomerItem->setValue(
+                DBECustomerItem::offsiteReplicationSuspendedDate,
+                $dbeCustomerItem->getValue(DBECustomerItem::offsiteReplicationSuspendedDate)
+            );
         }
 
         /*
