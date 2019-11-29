@@ -354,7 +354,9 @@ function processMailboxes(Spreadsheet $spreadSheet,
             "Mailbox Size (MB)",
             "Mailbox Type",
             "Is Licensed",
-            "Licenses"
+            "Licenses",
+            "Webmail Enabled",
+            "MFA Enabled"
         ],
         null,
         'A1'
@@ -389,11 +391,11 @@ function processMailboxes(Spreadsheet $spreadSheet,
         'A' . ($highestRow + 2)
     );
 
-    $mailboxesSheet->getStyle("A$highestRow:E$highestRow")->getFont()->setBold(true);
+    $mailboxesSheet->getStyle("A$highestRow:G$highestRow")->getFont()->setBold(true);
 
-    $mailboxesSheet->getStyle("A1:E1")->getFont()->setBold(true);
+    $mailboxesSheet->getStyle("A1:G1")->getFont()->setBold(true);
 
-    $mailboxesSheet->getStyle("A1:E$highestRow")->getAlignment()->setHorizontal('center');
+    $mailboxesSheet->getStyle("A1:G$highestRow")->getAlignment()->setHorizontal('center');
 
     for ($i = 0; $i < count($mailboxes); $i++) {
         $currentRow = 2 + $i;

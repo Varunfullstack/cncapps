@@ -84,6 +84,38 @@ if ($generateSummary) {
     $isHeaderSet = false;
 }
 
+
+function getUnrepeatedUsername($str)
+{
+    $n = strlen($str);
+    if ($n < 6) {
+        return $str;
+    }
+    $length = 3;
+    $match = false;
+    do {
+        $prospect = substr($str, 0, $length);
+        $restOfTheString = substr($str, $length, $length);
+        if (strlen($restOfTheString) < $length) {
+            return $str;
+        }
+        if ($restOfTheString == $prospect) {
+            // we have a match...but we need to analyze next part of the string...just in case
+            if ($length * 2 == $n) {
+                return $prospect;
+            }
+            $nextRestOfString = substr($str, $length * 2, $length);
+            if ($prospect == $nextRestOfString) {
+                return $prospect;
+            }
+        }
+
+        $length++;
+    } while (!$match && $length < $n);
+
+    return $prospect;
+}
+
 while ($dbeCustomer->fetchNext()) {
 
     $query = /** @lang MySQL */
@@ -224,29 +256,10 @@ ORDER BY clients.name,
         continue;
     }
     $data = $statement->fetchAll(PDO::FETCH_ASSOC);
-
     foreach ($data as $key => $datum) {
         $text = $datum['Last User'];
         $text = str_replace('null', "", $text);
-        $possibleAnswer = $text;
-        $lastCount = 0;
-        for ($i = 1; $i <= strlen($text); $i++) {
-            $toCheck = substr($text, 0, strlen($text) - $i);
-            if (!strlen($toCheck)) {
-                continue;
-            }
-            $count = substr_count($text, $toCheck);
-            if ($count > $lastCount) {
-                $lastCount = $count;
-                $possibleResult = str_replace($toCheck, "", $text);
-                if (!strlen($possibleResult)) {
-                    $possibleAnswer = $toCheck;
-                }
-            }
-
-        }
-
-        $data[$key]['Last User'] = $possibleAnswer;
+        $data[$key]['Last User'] = getUnrepeatedUsername($text);
     }
 
 

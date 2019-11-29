@@ -1,0 +1,78 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="release-v3.8.0-0">
+        <tagDatabase tag="release-3.8.0"/>
+    </changeSet>
+    <include file="db.changelog-issue680.xml"/>
+    <include file="db.changelog-issue659.xml"/>
+    <include file="db.changelog-issue682.xml"/>
+    <include file="db.changelog-issue683.xml"/>
+    <include file="db.changelog-issue677.xml"/>
+    <include file="db.changelog-issue672.xml"/>
+    <include file="db.changelog-issue675.xml"/>
+    <changeSet id="release-v3.8.0-1" author="pavilionweb">
+        <sql>
+            UPDATE
+                item
+            SET
+                item.`itm_itemtypeno` =
+                    CASE
+                        item.`itm_itemtypeno`
+                        WHEN 6
+                            THEN 2
+                        WHEN 10
+                            THEN 9
+                        WHEN 14
+                            THEN 13
+                        WHEN 15
+                            THEN 13
+                        WHEN 17
+                            THEN 16
+                        WHEN 19
+                            THEN 18
+                        WHEN 20
+                            THEN 18
+                        WHEN 22
+                            THEN 21
+                        WHEN 31
+                            THEN 30
+                        WHEN 32
+                            THEN 30
+                        WHEN 33
+                            THEN 30
+                        WHEN 36
+                            THEN 35
+                        WHEN 40
+                            THEN 18
+                        WHEN 44
+                            THEN 30
+                        WHEN 45
+                            THEN 30
+                        WHEN 46
+                            THEN 30
+                        WHEN 47
+                            THEN 30
+                        WHEN 49
+                            THEN 12
+                        WHEN 50
+                            THEN 12
+                        WHEN 51
+                            THEN 12
+                        WHEN 52
+                            THEN 12
+                        WHEN 55
+                            THEN 23
+                        WHEN 56
+                            THEN 23
+                        WHEN 57
+                            THEN 23
+                        WHEN 59
+                            THEN 58
+                        ELSE item.`itm_itemtypeno`
+                        END
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

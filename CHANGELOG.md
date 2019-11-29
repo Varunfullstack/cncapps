@@ -1,12 +1,13 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v3.8.0]
 ### Added
 - Issue 680 - Quick Create Sales Request
 - Issue 659 - Record daily replication / backup targets in database
 - Issue 677 - Sales Passwords list
 - Issue 672 - Office 365 licensing billing improvements
+- Issue 681 - Mailbox Export Enhancements
 ### Changed
 - Issue 638 - Allow Multiple dropping of files when uploading documents
 - Issue 535 - PrePay statements, alert if hidden charges on the SR
@@ -24,6 +25,7 @@ This project changes will be shown here.
 - Issue 663 - Password Service Sorting not working
 - Issue 592 - Security Improvements
 - Issue 683 - Fixed SR manual completion monitor
+- Fixed issue with Office 365 Licenses not saving "Report on spare licences" when unchecked
  
 ## [v3.7.0] 
 ### Added

@@ -98,7 +98,7 @@ class CTOffice365Licenses extends CTCNC
                 $dbeOffice365License->setValue(DBEOffice365License::license, $this->getParam('license'));
                 $dbeOffice365License->setValue(
                     DBEOffice365License::reportOnSpareLicenses,
-                    !!$this->getParam('reportOnSpareLicenses')
+                    json_decode($this->getParam('reportOnSpareLicenses'))
                 );
 
                 $dbeOffice365License->updateRow();
