@@ -1,11 +1,14 @@
 <?php
-
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEOSSupportDates.php');
+require_once ($cfg['path_bu'] . '/BUHeader.inc.php');
 
 class CTOSSupportDates extends CTCNC
 {
     var $buActivity;
+    /** @var DBEHeader */
+    private $dsSystemHeader;
 
     function __construct($requestMethod,
                          $postVars,
@@ -28,6 +31,10 @@ class CTOSSupportDates extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+
+        $buHeader = new BUHeader($this);
+        $buHeader->getHeader($this->dsSystemHeader);
+
     }
 
 
@@ -141,6 +148,7 @@ class CTOSSupportDates extends CTCNC
                         "version"          => $DBEOSSupportDates->getValue($DBEOSSupportDates::version),
                         "availabilityDate" => $DBEOSSupportDates->getValue($DBEOSSupportDates::availabilityDate),
                         "endOfLifeDate"    => $DBEOSSupportDates->getValue($DBEOSSupportDates::endOfLifeDate),
+                        "threshold"        => $this->dsSystemHeader->getValue(DBEHeader::OSSupportDatesThresholdDays)
                     ],
                     JSON_NUMERIC_CHECK
                 );
@@ -179,6 +187,7 @@ class CTOSSupportDates extends CTCNC
                         "version"          => $DBEOSSupportDates->getValue(DBEOSSupportDates::version),
                         "availabilityDate" => $availabilityDateString,
                         "endOfLifeDate"    => $endOfLifeDateString,
+                        "threshold"        => $this->dsSystemHeader->getValue(DBEHeader::OSSupportDatesThresholdDays)
                     ];
                 }
                 echo json_encode(

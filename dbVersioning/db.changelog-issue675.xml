@@ -1,0 +1,44 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue675-0">
+        <tagDatabase tag="issue675"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue675-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="custItem" columnName="offsiteReplicationValidationSuspendedUntilDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="custItem">
+            <column name="offsiteReplicationValidationSuspendedUntilDate" type="date">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue675-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="custItem" columnName="offsiteReplicationSuspendedByUserID"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="custItem">
+            <column name="offsiteReplicationSuspendedByUserID" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue675-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="custItem" columnName="offsiteReplicationSuspendedDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="custItem">
+            <column name="offsiteReplicationSuspendedDate" type="date">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

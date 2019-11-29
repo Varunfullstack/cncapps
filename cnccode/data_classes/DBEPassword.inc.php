@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEPassword extends DBEntity
@@ -19,6 +20,7 @@ class DBEPassword extends DBEntity
     const archivedBy = 'archivedBy';
     const serviceID = 'serviceID';
     const encrypted = 'encrypted';
+    const salesPassword = 'salesPassword';
 
     /**
      * calls constructor()
@@ -96,6 +98,14 @@ class DBEPassword extends DBEntity
             self::encrypted,
             DA_INTEGER,
             DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::salesPassword,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
         );
 
         $this->setAddColumnsOff();

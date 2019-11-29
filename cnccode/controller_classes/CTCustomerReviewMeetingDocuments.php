@@ -72,7 +72,6 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
 
                 $dbeUser = new DBEUser($this);
 
-
                 while ($dbeDocuments->fetchNext()) {
 
                     $dbeUser->getRow(

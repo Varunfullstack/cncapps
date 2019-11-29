@@ -198,4 +198,11 @@ class BUSite extends Business
         }
         return $sageRef;
     }
+
+    public function getActiveSitesByCustomer(int $customerID, DataSet $dsResults)
+    {
+        $this->dbeJSite->setValue(DBESite::customerID, $customerID);
+        $this->dbeJSite->getRowsByColumn(DBESite::customerID);
+        return $this->getData($this->dbeJSite, $dsResults);
+    }
 }

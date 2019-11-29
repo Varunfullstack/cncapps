@@ -1,7 +1,4 @@
 <!-- Template: ActivityDisplay.inc.html -->
-<script type="text/javascript"
-        src="ckeditor/ckeditor.js"
-></script>
 <script type="application/javascript"
         src=".javascript/salesRequest.js"
 ></script>
@@ -437,33 +434,22 @@
                       method="post"
                       enctype="multipart/form-data"
                 >
-                    <input type="hidden"
-                           name="MAX_FILE_SIZE"
-                           value="6291456"
-                    >
-                    <!-- max 6 mbyte -->
                     <tr>
-                        <td class=""><input name="uploadDescription"
-                                            type="text"
-                                            size="45"
-                                            maxlength="50"
-                                            value="{uploadDescription}"
-                        >
-                        </td>
                         <td>
-                            <input
-                                    name="userfile"
-                                    type="file"
-                                    value="{userfile}"
-                                    size="30"
-                                    class="dragUploader"
-                                    data-description="uploadDescription"
+                            <input name="userfile[]"
+                                   type="file"
+                                   value="{userfile}"
+                                   size="30"
+                                   class="dragUploader"
+                                   multiple
                             >
                         </td>
-                        <td colspan="2"><input type="submit"
-                                               name="Submit2"
-                                               value="Upload"
-                        ></td>
+                        <td colspan="2">
+                            <input type="submit"
+                                   name="Submit2"
+                                   value="Upload"
+                            >
+                        </td>
                         <td>&nbsp;</td>
                     </tr>
                 </form>

@@ -1,4 +1,5 @@
 <?php
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_dbe"] . "/DBESecondsiteImage.inc.php");
@@ -51,12 +52,11 @@ class BUSecondsiteReplication extends BUSecondsite
                 $excludeFromChecks = true;
             } else {
 
-                if (!$isSuspended && $server['secondsiteValidationSuspendUntilDate']) {
+                if (!$isSuspended && $server['suspendedUntilDate']) {
                     $this->resetSuspendedUntilDate($server['server_cuino']);
                 }
 
-
-                $days = @$server['secondsiteImageDelayDays'];
+                $days = @$server['imageDelayDays'];
                 $dsHeader = new DataSet($this);
                 $buHeader = new BUHeader($this);
                 $buHeader->getHeader($dsHeader);
@@ -331,6 +331,9 @@ class BUSecondsiteReplication extends BUSecondsite
                 return;
             }
 
+            $buHeader = new BUHeader($this);
+            $buHeader->getHeader($dsHeader);
+
             $query = "INSERT INTO backup_performance_log (
                       created_at,
                       servers,
@@ -341,7 +344,7 @@ class BUSecondsiteReplication extends BUSecondsite
                       passes,
                       success_rate,
                       isReplication
-                    ) VALUES (now(), ?, ?, ?, ?, ?, ?, ?, 1)";
+                    ) VALUES (now(), ?, ?, ?, ?, ?, ?, ?, 1, ?)";
             $db->preparedQuery(
                 $query,
                 [
@@ -372,12 +375,33 @@ class BUSecondsiteReplication extends BUSecondsite
                     [
                         "type"  => "d",
                         "value" => $this->imageCount ? ($this->imagePassesCount / $this->imageCount) * 100 : 0
+                    ],
+                    [
+                        "type"  => "d",
+                        "value" => $dsHeader->getValue(DBEHeader::backupReplicationTargetSuccessRate)
                     ]
-
                 ]
             );
 
         }
+
+    }
+
+    function resetSuspendedUntilDate($cuino)
+    {
+        $queryString =
+            "UPDATE
+    custitem 
+    SET
+    offsiteReplicationValidationSuspendedUntilDate = NULL,
+        offsiteReplicationSuspendedByUserID = null,
+        offsiteReplicationSuspendedDate = null
+    WHERE
+    cui_cuino = $cuino";
+
+        $db = $GLOBALS['db'];
+
+        $db->query($queryString);
 
     }
 
@@ -392,14 +416,14 @@ class BUSecondsiteReplication extends BUSecondsite
         ser.cui_cuino AS server_cuino,
         ser.cui_cust_ref AS serverName,
         ser.secondSiteReplicationPath, 
-        ser.secondsiteValidationSuspendUntilDate,
-        ser.secondsiteImageDelayDays,
+        ser.offsiteReplicationValidationSuspendedUntilDate as suspendedUntilDate,
+        ser.secondsiteImageDelayDays as imageDelayDays,
         ser.secondsiteLocalExcludeFlag,
         ser.secondSiteReplicationExcludeFlag,
         delayuser.cns_name AS delayUser,
-        ser.secondsiteImageDelayDate,
-        suspenduser.cns_name AS suspendUser,
-        ser.secondsiteSuspendedDate
+        ser.secondsiteImageDelayDate as imageDelayDate,
+        suspenduser.cns_name AS suspendUser ,
+        ser.offsiteReplicationSuspendedDate as suspendedDate
       FROM
         custitem ci
         JOIN customer c ON c.cus_custno = ci.cui_custno
@@ -407,8 +431,7 @@ class BUSecondsiteReplication extends BUSecondsite
         JOIN custitem ser ON ser.cui_cuino = custitem_contract.cic_cuino
         JOIN item i ON i.itm_itemno = ci.cui_itemno
         LEFT JOIN consultant delayuser ON delayuser.cns_consno = ser.secondsiteImageDelayUserID
-        LEFT JOIN consultant suspenduser ON suspenduser.cns_consno = ser.secondsiteSuspendedByUserID
-
+        LEFT JOIN consultant suspenduser ON suspenduser.cns_consno = ser.offsiteReplicationSuspendedByUserID
       WHERE
         i.itm_itemtypeno IN ( " . CONFIG_2NDSITE_CNC_ITEMTYPEID . "," . CONFIG_2NDSITE_LOCAL_ITEMTYPEID . ")
         AND ci.declinedFlag <> 'Y'";
@@ -573,36 +596,9 @@ class BUSecondsiteReplication extends BUSecondsite
 
     }
 
-    function getPerformanceDataForYear($year = null)
-    {
-
-        if (!$year) {
-            $year = date("Y");
-        }
-
-        $query = "SELECT SUM(passes)/ SUM(images) as successRate, MONTH FROM (
-            SELECT MONTH(created_at) AS MONTH, images, passes FROM backup_performance_log WHERE YEAR(created_at) = '$year' and isReplication
-) t GROUP BY t.month";
-
-        $result = $this->db->query($query);
-
-        $data = [
-        ];
-
-        for ($i = 0; $i < 12; $i++) {
-            $data[$i + 1] = "N/A";
-        }
-
-        while ($row = $result->fetch_assoc()) {
-            $data[$row['MONTH']] = $row['successRate'] * 100;
-        }
-
-        return $data;
-    }
-
     function getPerformanceDataAvailableYears()
     {
-        $query = "SELECT  DISTINCT YEAR(created_at) AS YEAR  FROM    backup_performance_log where isReplication";
+        $query = "SELECT  DISTINCT YEAR(created_at) AS YEAR  FROM backup_performance_log where isReplication";
         $result = $this->db->query($query);
 
         return array_map(

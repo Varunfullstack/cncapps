@@ -284,20 +284,12 @@
         </tr>
 
         <tr>
-            <td class="promptTextLeft">Description</td>
             <td colspan="4">
-                <input name="uploadDescription"
-                       type="text"
-                       size="45"
-                       maxlength="50"
-                       value="{uploadDescription}"
-                >
-                <input
-                        name="userfile"
-                        type="file"
-                        value="{userfile}"
-                        class="dragUploader"
-                        data-description="uploadDescription"
+                <input name="userfile[]"
+                       type="file"
+                       value="{userfile}"
+                       class="dragUploader"
+                       multiple
                 >
             </td>
         </tr>

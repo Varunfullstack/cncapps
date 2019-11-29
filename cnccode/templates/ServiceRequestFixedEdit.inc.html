@@ -29,7 +29,8 @@
 
 <table width="100%">
     <tr>
-        <td>{activityWizardHeader} {contractListPopupLink} {thirdPartyContactLink} {historyLink} {contactHistoryLink}
+        <td>{activityWizardHeader} {contractListPopupLink} {thirdPartyContactLink} {SRLink} {historyLink}
+            {contactHistoryLink}
         </td>
         <td align="right"
             id="autoUpdateLabel"
@@ -179,18 +180,11 @@
                     <tr>
                         <td class="promptTextLeft">Description</td>
                         <td colspan="4">
-                            <input name="uploadDescription"
-                                   type="text"
-                                   size="45"
-                                   maxlength="50"
-                                   value="{uploadDescription}"
-                            >
-                            <input
-                                    name="userfile"
-                                    type="file"
-                                    value="{userfile}"
-                                    class="dragUploader"
-                                    data-description="uploadDescription"
+                            <input name="userfile[]"
+                                   type="file"
+                                   value="{userfile}"
+                                   class="dragUploader"
+                                   multiple
                             >
                             <input type="submit"
                                    name="gatherFixed"

@@ -101,7 +101,7 @@ class DBEJCallDocument extends DBECallDocument
         $this->setAddColumnsOn();
         $this->addColumn(
             self::createUserName,
-            DA_ID,
+            DA_STRING,
             DA_NOT_NULL,
             "CONCAT(firstName, ' ', lastName)"
         );

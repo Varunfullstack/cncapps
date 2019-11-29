@@ -1,18 +1,52 @@
-    <tr>
-      <td  class="promptText">Contract</td>
-      <td class="mainHeadText"><select
-          name="contractCustomerItemID"
-          type="text"
-          >
-          <option value="99" {noContractSelected} >Please select</option>
-          <option value="" {tandMSelected}>T &amp; M</option>
-          <!-- BEGIN contractBlock -->
-          {optGroupClose}
-          {optGroupOpen}
-          <option {contractSelected} value="{contractCustomerItemID}">{contractDescription}</option>
-          {optGroupCloseLast}
-          <!-- END contractBlock -->
+<script>
+    function checkPrepay() {
+        const selector = event.target;
+        const data = event.target.selectedOptions[0].dataset;
+        if (data && data.prepay) {
+            $.ajax({
+                url: '?action=checkPrepay',
+                method: 'POST',
+                type: 'post',
+                data: {
+                    action: "checkPrepay",
+                    problemID: {problemID}
+                },
+                dataType: 'JSON'
+            }).then(function (result) {
+                if (result.hiddenCharges) {
+                    alert("There are hidden chargeable activities on this request, you must change these if you are going to use the PrePay contact");
+                    selector.selectedIndex = 0;
+                }
+            });
+        }
+
+    }
+</script>
+<tr>
+    <td class="promptText">Contract</td>
+    <td class="mainHeadText">
+        <select name="contractCustomerItemID"
+                onchange="checkPrepay()"
+        >
+            <option value="99"
+                    {noContractSelected}
+            >Please select
+            </option>
+            <option value=""
+                    {tandMSelected}
+            >T &amp; M
+            </option>
+            <!-- BEGIN contractBlock -->
+            {optGroupClose}
+            {optGroupOpen}
+            <option {contractSelected}
+                    value="{contractCustomerItemID}"
+                    data-prepay="{prepayContract}"
+            >{contractDescription}
+            </option>
+            {optGroupCloseLast}
+            <!-- END contractBlock -->
         </select>
         <span class="formErrorMessage">{contractCustomerItemIDMessage}</span>
-      </td>
-    </tr>
+    </td>
+</tr>

@@ -71,7 +71,7 @@ class CTHeader extends CTCNC
         }
     }
 
-        /**
+    /**
      * Update
      * @access private
      * @throws Exception
@@ -99,7 +99,7 @@ class CTHeader extends CTCNC
         header('Location: ' . $urlNext);
     }// end function editHeader()
 
-/**
+    /**
      * Edit/Add Header
      * @access private
      * @throws Exception
@@ -520,10 +520,10 @@ class CTHeader extends CTCNC
                 DBEHeader::sevenDayerAmberDays . 'Message'                           => $dsHeader->getMessage(
                     DBEHeader::sevenDayerAmberDays
                 ),
-                DBEHeader::sevenDayerTarget                                       => $dsHeader->getValue(
+                DBEHeader::sevenDayerTarget                                          => $dsHeader->getValue(
                     DBEHeader::sevenDayerTarget
                 ),
-                DBEHeader::sevenDayerTarget . 'Message'                           => $dsHeader->getMessage(
+                DBEHeader::sevenDayerTarget . 'Message'                              => $dsHeader->getMessage(
                     DBEHeader::sevenDayerTarget
                 ),
                 DBEHeader::sevenDayerRedDays                                         => $dsHeader->getValue(
@@ -562,8 +562,14 @@ class CTHeader extends CTCNC
                 DBEHeader::autoCriticalP3Hours . 'Message'                           => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::autoCriticalP3Hours)
                 ),
-                'urlItemPopup' => $urlItemPopup,
-                'urlUpdate'    => $urlUpdate
+                DBEHeader::closureReminderDays                                       => $dsHeader->getValue(
+                    DBEHeader::closureReminderDays
+                ),
+                DBEHeader::closureReminderDays . 'Message'                           => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEHeader::closureReminderDays)
+                ),
+                'urlItemPopup'                                                       => $urlItemPopup,
+                'urlUpdate'                                                          => $urlUpdate
             ]
         );
 

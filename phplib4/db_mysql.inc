@@ -22,11 +22,11 @@ class DB_Sql
     var $User = "";
 
     /* public: configuration parameters */
-        var $Password = "";     ## Set to 1 for automatic mysql_free_result()
+    var $Password = "";     ## Set to 1 for automatic mysql_free_result()
     var $Auto_Free = 0;     ## Set to 1 for debugging messages.
     var $Debug = 0; ## "yes" (halt with message), "no" (ignore errors quietly), "report" (ignore errror, but spit a warning)
     var $Halt_On_Error = "report";     ## Set to 1 to use persistent database connections
-var $PConnect = 0;
+    var $PConnect = 0;
 
     /* public: result array and current row number */
     var $Seq_Table = "db_sequence";
@@ -83,8 +83,7 @@ var $PConnect = 0;
         $this->Errno = mysqli_errno(self::$Link_ID);
         $this->Error = mysqli_error(self::$Link_ID);
         if (!$this->Query_ID) {
-            debug_print_backtrace();
-            $this->halt("Invalid SQL: " . $Query_String);
+//            $this->halt("Invalid SQL: " . $Query_String);
         }
 
         # Will return nada if it fails. That's fine.
@@ -246,16 +245,12 @@ var $PConnect = 0;
                 $queryString
             );
 
-        if (!$parameters) {
-            return null;
-        }
         $statement = mysqli_prepare(
             self::$Link_ID,
             $queryString
         );
 
         $a_params = array();
-
         $param_type = '';
         $n = count($parameters);
         for ($i = 0; $i < $n; $i++) {
@@ -276,6 +271,7 @@ var $PConnect = 0;
         mysqli_stmt_execute($statement);
 
         $result = mysqli_stmt_get_result($statement);
+
         $this->Row = 0;
         $this->Errno = mysqli_errno(self::$Link_ID);
         $this->Error = mysqli_error(self::$Link_ID);

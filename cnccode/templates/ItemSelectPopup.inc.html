@@ -66,8 +66,21 @@
                 />
             </td>
         </tr>
+    </table>
+    <table>
+        <thead>
         <tr>
-            <td colspan="2">&nbsp;</td>
+            <th>Name</th>
+            <th>Part Number</th>
+            <th>Item Billing Category</th>
+            <th>Allow Direct Debit</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr>
+            <td colspan="4">&nbsp;</td>
             <td align="left">
                 <input type="checkbox"
                        name="checkAllBox"
@@ -85,6 +98,12 @@
             <td class="listItemText">
                 {partNo}
             </td>
+            <td>
+                {itemBillingCategory}
+            </td>
+            <td>
+                {allowDirectDebitValue}
+            </td>
             <td class="listItemText">
                 <input type="checkbox"
                        name="discontinueItemIDs[]"
@@ -93,6 +112,7 @@
             </td>
         </tr>
         <!-- END itemBlock -->
+        </tbody>
     </table>
 </form>
 </body>

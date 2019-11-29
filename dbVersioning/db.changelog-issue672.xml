@@ -1,0 +1,114 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue672-0">
+        <tagDatabase tag="issue672"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue672-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="itemBillingCategory"/>
+            </not>
+        </preConditions>
+        <createTable tableName="itemBillingCategory">
+            <column name="id" type="int(11)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="arrearsBilling" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql>
+            insert into itemBillingCategory
+            values (1, "Duo", 1),
+                   (2, "Exclaimer", 1),
+                   (3, "Office 365 Backup", 1),
+                   (4, "Office 365", 1),
+                   (5, "SPLA", 1);
+            delete
+            from db_sequence
+            where seq_name = "itembillingcategory";
+            INSERT INTO db_sequence
+            VALUES ("itembillingcategory", (select max(id) + 1 from itemBillingCategory))
+        </sql>
+        <rollback>
+            <dropTable tableName="itemBillingCategory"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue672-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="item" columnName="itemBillingCategoryID"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="item">
+            <column name="itemBillingCategoryID" type="int(11)" defaultValue="null">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue672-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="item" foreignKeyName="fk_itemBillingCategoryID"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="item" baseColumnNames="itemBillingCategoryID"
+                                 constraintName="fk_itemBillingCategoryID"
+                                 referencedTableName="itemBillingCategory"
+                                 referencedColumnNames="id"
+                                 onDelete="RESTRICT"
+        />
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue672-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="consultant" columnName="createRenewalSalesOrdersFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="createRenewalSalesOrdersFlag" type="char(1)" defaultValue="N">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue672-5">
+        <sql>
+            UPDATE
+                custitem
+                    JOIN item
+                    ON itm_itemno = cui_itemno
+                    JOIN itemtype
+                    ON ity_itemtypeno = itm_itemtypeno
+            SET `cui_users`                  = 1,
+                custitem.`salePricePerMonth` = cui_sale_price / 12,
+                custitem.`costPricePerMonth` = cui_cost_price / 12
+            WHERE renewalTypeID = 2
+              AND (NOT cui_users
+                OR cui_users IS NULL);
+            UPDATE
+                custitem
+                    JOIN item
+                    ON itm_itemno = cui_itemno
+                    JOIN itemtype
+                    ON ity_itemtypeno = itm_itemtypeno
+            SET salePricePerMonth = cui_sale_price / 12 / cui_users,
+                costPricePerMonth = cui_cost_price / 12 / cui_users
+            WHERE renewalTypeID = 2;
+            UPDATE
+                custitem
+                    JOIN item
+                    ON itm_itemno = cui_itemno
+                    JOIN itemtype
+                    ON ity_itemtypeno = itm_itemtypeno
+            SET cui_sale_price = salePricePerMonth * 12 * cui_users,
+                cui_cost_price = costPricePerMonth * 12 * cui_users
+            WHERE renewalTypeID = 2;
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

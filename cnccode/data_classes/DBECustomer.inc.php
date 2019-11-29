@@ -698,6 +698,7 @@ class DBECustomer extends DBCNCEntity
         if ($ignoreProspects) {
             $queryString .= " and " . $this->getDBColumnName(DBECustomer::prospectFlag) . " <> 'Y' ";
         }
+        $queryString .= " order by cus_name ";
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;

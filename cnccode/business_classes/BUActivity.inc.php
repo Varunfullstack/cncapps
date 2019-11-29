@@ -10,6 +10,7 @@
 
 use CNCLTD\AutomatedRequest;
 
+global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_gc"] . "/Controller.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEJContract.inc.php");
@@ -199,8 +200,8 @@ class BUActivity extends Business
                 5 => $this->dsHeader->getValue(DBEHeader::priority5Desc)
             );
 
-        if (isset($GLOBALS ['auth'])) {
-            $this->loggedInUserID = $GLOBALS ['auth']->is_authenticated();
+        if (isset($GLOBALS['auth'])) {
+            $this->loggedInUserID = $GLOBALS['auth']->is_authenticated();
         } else {
             $this->loggedInUserID = USER_SYSTEM;
         }
@@ -2879,21 +2880,44 @@ class BUActivity extends Business
         );
 
         $dbeCallActivity->updateRow();
+
+        if ($dsCallActivity->getValue(DBECallActivity::isSalesRequestSR)) {
+            $dbeCustomer = new DBECustomer($this);
+            $dbeCustomer->getRow($problem->getValue(DBEProblem::customerID));
+            $initialActivity = $this->getFirstActivityInProblem($problem->getValue(DBEProblem::problemID));
+            $dbeUser = new DBEUser($this);
+            $dbeUser->getRow($initialActivity->getValue(DBECallActivity::userID));
+            $resolutionSummary = "The sales request for " . $dbeCustomer->getValue(
+                    DBECustomer::name
+                ) .
+                " submitted by " .
+                $dbeUser->getValue(DBEUser::firstName) .
+                " " .
+                $dbeUser->getValue(DBEUser::lastName) .
+                " was " .
+                ($approval ? "approved" : "denied") .
+                " by " . $userName;
+            $this->createFixedActivity($dbeCallActivity->getValue(DBECallActivity::problemID), $resolutionSummary);
+            $problem->setValue(DBEProblem::status, 'F');
+            $problem->updateRow();
+        }
+
     }
 
     /**
      * @param $problemID
      * @param $message
      * @param string $status
+     * @param bool $isSR
      * @return DBEJCallActivity
      */
-    private function createSalesRequestActivity($problemID,
-                                                $message,
-                                                $status = "C"
+    public function createSalesRequestActivity($problemID,
+                                               $message,
+                                               $status = "C",
+                                               $isSR = false
     )
     {
         $lastActivity = $this->getLastActivityInProblem($problemID);
-
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($lastActivity->getValue(DBEJCallActivity::callActivityID));
         $dbeCallActivity->setPKValue(null);
@@ -2917,6 +2941,7 @@ class BUActivity extends Business
             DBEJCallActivity::callActTypeID,
             CONFIG_SALES_ACTIVITY_TYPE_ID
         );
+        $dbeCallActivity->setValue(DBEJCallActivity::isSalesRequestSR, $isSR);
         $dbeCallActivity->setValue(
             DBEJCallActivity::reason,
             $message
@@ -3043,6 +3068,128 @@ class BUActivity extends Business
         );
     }
 
+    /**
+     * @param $problemID
+     * @param $resolutionSummary
+     * @param bool $zeroTime
+     * @throws Exception
+     */
+    function createFixedActivity($problemID,
+                                 $resolutionSummary,
+                                 $zeroTime = false
+    )
+    {
+        /*
+    Start with duplicate of last activity
+    */
+
+        $dbeLastActivity = $this->getLastActivityInProblem($problemID);
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->getRow($dbeLastActivity->getValue(DBEJCallActivity::callActivityID));
+
+        $dbeCallActivity->setPKValue(null);
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::date,
+            date(DATE_MYSQL_DATE)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::startTime,
+            date('H:i')
+        );
+
+        $endTime = $dbeCallActivity->getValue(DBEJCallActivity::startTime);
+
+        if (!$zeroTime) {
+            $endTime = $this->getEndtime(CONFIG_FIXED_ACTIVITY_TYPE_ID);
+            $dbeProblem = new DBEProblem($this);
+            $dbeProblem->getRow($problemID);
+            $dbeProblem->setValue(
+                DBEProblem::esLimitMinutes,
+                $dbeProblem->getValue(DBEProblem::esLimitMinutes) + 3
+            );
+            $dbeProblem->setValue(
+                DBEProblem::hdLimitMinutes,
+                $dbeProblem->getValue(DBEProblem::hdLimitMinutes) + 3
+            );
+            $dbeProblem->setValue(
+                DBEProblem::imLimitMinutes,
+                $dbeProblem->getValue(DBEProblem::imLimitMinutes) + 3
+            );
+            $dbeProblem->updateRow();
+        }
+
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::endTime,
+            $endTime
+        );
+
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::userID,
+            $this->loggedInUserID
+        );
+
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActTypeID,
+            CONFIG_FIXED_ACTIVITY_TYPE_ID
+        );
+
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::siteNo,
+            $dbeLastActivity->getValue(DBEJCallActivity::siteNo)
+        );
+
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::reason,
+            $resolutionSummary
+        );
+
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::serverGuard,
+            'N'
+        );
+        $dbeCallActivity->insertRow();
+    }
+
+    /**
+     * Calculate end time from start time for special types of activity
+     *
+     * @param mixed $callActTypeID
+     * @param mixed $startTime Optional. If false then use current time
+     * @return string
+     * @throws Exception
+     */
+    function getEndtime($callActTypeID,
+                        $startTime = false
+    )
+    {
+        if (!$startTime) {
+            $startTime = null; // use time now
+        }
+
+        switch ($callActTypeID) {
+
+            case CONFIG_INITIAL_ACTIVITY_TYPE_ID:
+                $minutesToAdd = 5;
+                break;
+
+            case CONFIG_FIXED_ACTIVITY_TYPE_ID:
+                $minutesToAdd = 3;
+                break;
+
+            case CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID:
+                $minutesToAdd = 7;
+                break;
+
+            default:
+                $minutesToAdd = 0;
+                break;
+
+        }
+        $date = new DateTime($startTime);
+        $date->modify('+' . $minutesToAdd . ' minutes');
+        return $date->format('H:i');
+    }
+
     public function timeRequestProcess($callActivityID,
                                        $userID,
                                        $response,
@@ -3103,6 +3250,11 @@ class BUActivity extends Business
 
         $dbeCallActivity->post();
     }
+
+    /*
+  Check to se whether this site record requires travel hours added to the site record.
+  i.e. is this a chargeable activity and does this site have zero travel hours.
+  */
 
     /**
      * Allocate additional hours to SR
@@ -3257,11 +3409,6 @@ class BUActivity extends Business
             $body
         );
     }
-
-    /*
-  Check to se whether this site record requires travel hours added to the site record.
-  i.e. is this a chargeable activity and does this site have zero travel hours.
-  */
 
     /**
      * @param DataAccess $dbeCallActivity
@@ -3748,6 +3895,8 @@ class BUActivity extends Business
 
     }
 
+//end completeSRs
+
     function deleteCallActivity($callActivityID)
     {
 
@@ -3806,8 +3955,6 @@ class BUActivity extends Business
         return $count;
 
     }
-
-//end completeSRs
 
     function sendServiceRemovedEmail($problemID)
     {
@@ -3895,7 +4042,7 @@ class BUActivity extends Business
             $hdrs,
             $body
         );
-    }
+    } // end check default site contacts exists
 
     function setActivityStatusChecked($callactivityID)
     {
@@ -3908,6 +4055,13 @@ class BUActivity extends Business
         return ($dbeCallActivity->updateRow());
     }
 
+    /*
+    work out whether a top-up is required and if so then generate one
+    We generate a top-up T&M call so that this can later be amended and/or checked and used to generate a sales
+    order for the top-up amount.
+    This call will now appear on
+  */
+
     function setActivityStatusAuthorised($callactivityID)
     {
         $dbeCallActivity = new DBECallActivity($this);
@@ -3917,7 +4071,7 @@ class BUActivity extends Business
             'A'
         );
         return ($dbeCallActivity->updateRow());
-    } // end check default site contacts exists
+    }
 
     /**
      * sets problem into pause mode by setting flag on activity
@@ -3957,13 +4111,6 @@ class BUActivity extends Business
             );
         }
     }
-
-    /*
-    work out whether a top-up is required and if so then generate one
-    We generate a top-up T&M call so that this can later be amended and/or checked and used to generate a sales
-    order for the top-up amount.
-    This call will now appear on
-  */
 
     /**
      * sets alarm
@@ -5108,6 +5255,10 @@ is currently a balance of ';
         return true;
     }
 
+    /*
+  get first last next and previous activities in this chain
+  */
+
     function createActivityFromCustomerID(
         $customerID,
         $userID = false,
@@ -5455,10 +5606,6 @@ is currently a balance of ';
         return $dsCallActivity;
     }
 
-    /*
-  get first last next and previous activities in this chain
-  */
-
     public function toggleMonitoringFlag($problemID)
     {
         global $db;
@@ -5484,46 +5631,6 @@ is currently a balance of ';
 
         $db->query($sql);
         return !!$db->num_rows();
-    }
-
-    /**
-     * Calculate end time from start time for special types of activity
-     *
-     * @param mixed $callActTypeID
-     * @param mixed $startTime Optional. If false then use current time
-     * @return string
-     * @throws Exception
-     */
-    function getEndtime($callActTypeID,
-                        $startTime = false
-    )
-    {
-        if (!$startTime) {
-            $startTime = null; // use time now
-        }
-
-        switch ($callActTypeID) {
-
-            case CONFIG_INITIAL_ACTIVITY_TYPE_ID:
-                $minutesToAdd = 5;
-                break;
-
-            case CONFIG_FIXED_ACTIVITY_TYPE_ID:
-                $minutesToAdd = 3;
-                break;
-
-            case CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID:
-                $minutesToAdd = 7;
-                break;
-
-            default:
-                $minutesToAdd = 0;
-                break;
-
-        }
-        $date = new DateTime($startTime);
-        $date->modify('+' . $minutesToAdd . ' minutes');
-        return $date->format('H:i');
     }
 
     function sendServiceReAddedEmail($newProblemID,
@@ -5802,9 +5909,10 @@ is currently a balance of ';
             DBEJCallDocument::fileLength,
             ( int )$fileSizeBytes
         );
+
         $dbeCallDocument->setValue(
             DBEJCallDocument::createUserID,
-            ( string )$this->loggedInUserID
+            $this->loggedInUserID
         );
         $dbeCallDocument->setValue(
             DBEJCallDocument::createDate,
@@ -6224,7 +6332,21 @@ is currently a balance of ';
             $dsCallActivity
         );
         return $dsCallActivity;
-    }
+    } // end email to customer
+
+    /**
+     * Create copy of this activity but with:
+     *    start time now and end time not set
+     *   User = current user
+     *    date = today
+     *    reason = finalStatus( from old activity )
+     *    Status = not completed
+     *
+     * $moveToUsersQueue: Whether to move the SR to the logged in user's queue
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     */
 
     /**
      * Allocate an technician to a request, sending an email to the engineer if this request
@@ -6262,21 +6384,7 @@ is currently a balance of ';
         );
 
         $this->dbeProblem->updateRow();
-    } // end email to customer
-
-    /**
-     * Create copy of this activity but with:
-     *    start time now and end time not set
-     *   User = current user
-     *    date = today
-     *    reason = finalStatus( from old activity )
-     *    Status = not completed
-     *
-     * $moveToUsersQueue: Whether to move the SR to the logged in user's queue
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     */
+    }
 
     /**
      * Sends email to new user when service request reallocated
@@ -6389,7 +6497,7 @@ is currently a balance of ';
             $dbeJProblem,
             $dsResults
         );
-    }
+    } // end email to customer
 
     /**
      * Get problems by status
@@ -6413,7 +6521,7 @@ is currently a balance of ';
             $dsResults
         );
 
-    } // end email to customer
+    }
 
     /**
      * Get future dated SRs
@@ -8532,47 +8640,6 @@ is currently a balance of ';
         return $dbeCallActivity->countEngineerRowsByProblem($problemID);
     }
 
-    /**
-     * sets problem out of pause mode by un-setting flag on activity
-     *
-     * @param mixed $callactivityID
-     * @param mixed $date
-     * @param mixed $time
-     * @return bool
-     */
-    function setActivityAwaitingCNC($callactivityID,
-                                    $date = null,
-                                    $time = null
-    )
-    {
-        $dbeCallActivity = new DBECallActivity($this);
-        $dbeCallActivity->getRow($callactivityID);
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::awaitingCustomerResponseFlag,
-            'N'
-        );
-        $dbeCallActivity->updateRow();
-
-        $dbeProblem = new DBEProblem($this);
-        $dbeProblem->getRow($dbeCallActivity->getValue(DBEJCallActivity::problemID));
-        $dbeProblem->setValue(
-            DBEJProblem::awaitingCustomerResponseFlag,
-            'N'
-        );
-        $dbeProblem->updateRow();
-        /*
-    do we have an alarm time?
-    */
-        if ($date) {
-            $this->setProblemAlarm(
-                $dbeCallActivity->getValue(DBEJCallActivity::problemID),
-                $date,
-                $time
-            );
-        }
-        return true;
-    }
-
 //    function processIsSenderAuthorised($details,
 //                                       $contact,
 //                                       $record,
@@ -8643,6 +8710,47 @@ is currently a balance of ';
 //            return true;
 //        }
 //    }
+
+    /**
+     * sets problem out of pause mode by un-setting flag on activity
+     *
+     * @param mixed $callactivityID
+     * @param mixed $date
+     * @param mixed $time
+     * @return bool
+     */
+    function setActivityAwaitingCNC($callactivityID,
+                                    $date = null,
+                                    $time = null
+    )
+    {
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->getRow($callactivityID);
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::awaitingCustomerResponseFlag,
+            'N'
+        );
+        $dbeCallActivity->updateRow();
+
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getRow($dbeCallActivity->getValue(DBEJCallActivity::problemID));
+        $dbeProblem->setValue(
+            DBEJProblem::awaitingCustomerResponseFlag,
+            'N'
+        );
+        $dbeProblem->updateRow();
+        /*
+    do we have an alarm time?
+    */
+        if ($date) {
+            $this->setProblemAlarm(
+                $dbeCallActivity->getValue(DBEJCallActivity::problemID),
+                $date,
+                $time
+            );
+        }
+        return true;
+    } // end clearSystemSRQueue
 
     /**
      * Set the problem to fixed
@@ -8798,7 +8906,7 @@ is currently a balance of ';
         );
 
         return true;
-    } // end clearSystemSRQueue
+    }
 
     /**
      * @param $problemID
@@ -8860,88 +8968,6 @@ is currently a balance of ';
 
         return $this->dbeJCallActivity;
 
-    }
-
-    /**
-     * @param $problemID
-     * @param $resolutionSummary
-     * @param bool $zeroTime
-     * @throws Exception
-     */
-    function createFixedActivity($problemID,
-                                 $resolutionSummary,
-                                 $zeroTime = false
-    )
-    {
-        /*
-    Start with duplicate of last activity
-    */
-
-        $dbeLastActivity = $this->getLastActivityInProblem($problemID);
-        $dbeCallActivity = new DBECallActivity($this);
-        $dbeCallActivity->getRow($dbeLastActivity->getValue(DBEJCallActivity::callActivityID));
-
-        $dbeCallActivity->setPKValue(null);
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::date,
-            date(DATE_MYSQL_DATE)
-        );
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::startTime,
-            date('H:i')
-        );
-
-        $endTime = $dbeCallActivity->getValue(DBEJCallActivity::startTime);
-
-        if (!$zeroTime) {
-            $endTime = $this->getEndtime(CONFIG_FIXED_ACTIVITY_TYPE_ID);
-            $dbeProblem = new DBEProblem($this);
-            $dbeProblem->getRow($problemID);
-            $dbeProblem->setValue(
-                DBEProblem::esLimitMinutes,
-                $dbeProblem->getValue(DBEProblem::esLimitMinutes) + 3
-            );
-            $dbeProblem->setValue(
-                DBEProblem::hdLimitMinutes,
-                $dbeProblem->getValue(DBEProblem::hdLimitMinutes) + 3
-            );
-            $dbeProblem->setValue(
-                DBEProblem::imLimitMinutes,
-                $dbeProblem->getValue(DBEProblem::imLimitMinutes) + 3
-            );
-            $dbeProblem->updateRow();
-        }
-
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::endTime,
-            $endTime
-        );
-
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::userID,
-            $this->loggedInUserID
-        );
-
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::callActTypeID,
-            CONFIG_FIXED_ACTIVITY_TYPE_ID
-        );
-
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::siteNo,
-            $dbeLastActivity->getValue(DBEJCallActivity::siteNo)
-        );
-
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::reason,
-            $resolutionSummary
-        );
-
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::serverGuard,
-            'N'
-        );
-        $dbeCallActivity->insertRow();
     }
 
     /**
@@ -10488,20 +10514,148 @@ is currently a balance of ';
      * @param $problemID
      * @param $message
      * @param $type
+     * @param bool $createSR
+     * @param null $customerID
      * @throws Exception
      */
     public function sendSalesRequest($problemID,
                                      $message,
-                                     $type
+                                     $type,
+                                     $createSR = false,
+                                     $customerID = null
     )
     {
+        $dbeContact = new DBEContact($this);
+        $dbeCustomer = new DBECustomer($this);
+        if ($createSR) {
+            $dbeProblem = new DBEProblem($this);
+            $dbeCustomer->getRow($customerID);
+            $dbeContact->getMainSupportRowsByCustomerID($customerID);
+            $dbeContact->fetchNext();
+            $dbeProblem->setValue(
+                DBEProblem::hdLimitMinutes,
+                $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
+            );
+            $dbeProblem->setValue(
+                DBEProblem::esLimitMinutes,
+                $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
+            );
+            $dbeProblem->setValue(
+                DBEProblem::imLimitMinutes,
+                $this->dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
+            );
+            $dbeProblem->setValue(
+                DBEProblem::slaResponseHours,
+                $this->getSlaResponseHours(
+                    5,
+                    $customerID,
+                    $dbeContact->getValue(DBEContact::contactID)
+                )
+            );
+            $dbeProblem->setValue(
+                DBEProblem::customerID,
+                $customerID
+            );
+            $dbeProblem->setValue(
+                DBEProblem::status,
+                'P'
+            );
+            $dbeProblem->setValue(
+                DBEProblem::priority,
+                5
+            );
+            $dbeProblem->setValue(
+                DBEProblem::dateRaised,
+                date(DATE_MYSQL_DATETIME)
+            );
+
+            $dbeProblem->setValue(
+                DBEJProblem::hideFromCustomerFlag,
+                'Y'
+            );
+
+            $dbeProblem->setValue(
+                DBEJProblem::queueNo,
+                7
+            );
+            $dbeProblem->setValue(
+                DBEJProblem::rootCauseID,
+                59
+            );
+
+            $dbeProblem->setValue(
+                DBEJProblem::awaitingCustomerResponseFlag,
+                'N'
+            );
+
+            $dbeProblem->setValue(
+                DBEJProblem::userID,
+                $this->dbeUser->getValue(DBEUser::userID)
+            );
+            $dbeProblem->insertRow();
+            $problemID = $dbeProblem->getPKValue();
+
+            $dbeSite = new DBESite($this);
+            $dbeSite->setValue(DBESite::customerID, $customerID);
+            $dbeSite->getRowsByCustomerID();
+            $dbeSite->fetchNext();
+            $dbeCallActivity = new DBECallActivity($this);
+            $dbeCallActivity->setValue(DBEJCallActivity::curValue, '0.00');
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::callActivityID,
+                0
+            );
+            $dbeCallActivity->setValue(DBECallActivity::problemID, $problemID);
+            $dbeCallActivity->setValue(DBECallActivity::userID, $this->loggedInUserID);
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::siteNo,
+                $dbeSite->getValue(DBESite::siteNo)
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::contactID,
+                $dbeContact->getValue(DBEContact::contactID)
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::callActTypeID,
+                CONFIG_INITIAL_ACTIVITY_TYPE_ID
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::date,
+                date(DATE_MYSQL_DATE)
+            );
+            $startTime = date('H:i', strtotime("-1 minutes"));
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::startTime,
+                $startTime
+            );
+
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::endTime,
+                $startTime
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::status,
+                'C'
+            );
+            $dbeCallActivity->setValue(
+                DBECallActivity::reason,
+                "Request for " . $dbeCustomer->getValue(
+                    DBECustomer::name
+                ) . " submitted by " . $this->dbeUser->getValue(DBEUser::firstName) . " " . $this->dbeUser->getValue(
+                    DBEUser::lastName
+                )
+            );
+            $dbeCallActivity->insertRow();
+
+        }
+
         // we have to create an open "sales activity"
         $salesRequestActivity = $this->createSalesRequestActivity(
             $problemID,
             $message,
-            "O"
+            "O",
+            $createSR
         );
-
 
         $buStandardText = new BUStandardText($this);
 

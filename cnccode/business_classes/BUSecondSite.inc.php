@@ -1,4 +1,5 @@
 <?php
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_dbe"] . "/DBESecondsiteImage.inc.php");
@@ -104,13 +105,13 @@ class BUSecondsite extends Business
                 $excludeFromChecks = true;
             } else {
 
-                if (!$isSuspended && $server['secondsiteValidationSuspendUntilDate']) {
+                if (!$isSuspended && $server['suspendedUntilDate']) {
                     $this->resetSuspendedUntilDate($server['server_cuino']);
                 }
 
-                if ($server['secondsiteImageDelayDays']) {
+                if ($server['imageDelayDays']) {
                     $timeToLookFrom = strtotime(
-                        '-' . $server['secondsiteImageDelayDays'] . ' days',
+                        '-' . $server['imageDelayDays'] . ' days',
                         $defaultTimeToLookFrom
                     );
                     $this->delayedCheckServers[] = $server;
@@ -384,6 +385,10 @@ class BUSecondsite extends Business
                 return;
             }
 
+            $buHeader = new BUHeader($this);
+            $dsHeader = new DataSet($this);
+            $buHeader->getHeader($dsHeader);
+
             $query = "INSERT INTO backup_performance_log (
                       created_at,
                       servers,
@@ -392,8 +397,9 @@ class BUSecondsite extends Business
                       image_errors,
                       suspended_servers,
                       passes,
-                      success_rate
-                    ) VALUES (now(), ?, ?, ?, ?, ?, ?, ?)";
+                      success_rate,
+                                    target
+                    ) VALUES (now(), ?, ?, ?, ?, ?, ?, ?, ?)";
             $db->preparedQuery(
                 $query,
                 [
@@ -424,7 +430,11 @@ class BUSecondsite extends Business
                     [
                         "type"  => "d",
                         "value" => $this->imageCount ? ($this->imagePassesCount / $this->imageCount) * 100 : 0
-                    ]
+                    ],
+                    [
+                        "type"  => "i",
+                        "value" => $dsHeader->getValue(DBEHeader::backupTargetSuccessRate)
+                    ],
 
                 ]
             );
@@ -446,13 +456,13 @@ class BUSecondsite extends Business
         ser.cui_cuino AS server_cuino,
         ser.cui_cust_ref AS serverName,
         ser.secondsiteLocationPath,
-        ser.secondsiteValidationSuspendUntilDate,
-        ser.secondsiteImageDelayDays,
+        ser.secondsiteValidationSuspendUntilDate as suspendedUntilDate,
+        ser.secondsiteImageDelayDays as imageDelayDays,
         ser.secondsiteLocalExcludeFlag,
         delayuser.cns_name AS delayUser,
-        ser.secondsiteImageDelayDate,
+        ser.secondsiteImageDelayDate as imageDelayDate,
         suspenduser.cns_name AS suspendUser,
-        ser.secondsiteSuspendedDate
+        ser.secondsiteSuspendedDate as suspendedDate
 
       FROM
         custitem ci
@@ -487,13 +497,13 @@ class BUSecondsite extends Business
     {
 
         if (
-            !($server['secondsiteValidationSuspendUntilDate']) || $server['secondsiteValidationSuspendUntilDate'] <= date(
+            !($server['suspendedUntilDate']) || $server['suspendedUntilDate'] <= date(
                 'Y-m-d'
             )
         ) {
             return false;
         }
-        $message = 'Image validation suspended until ' . $server['secondsiteValidationSuspendUntilDate'];
+        $message = 'Image validation suspended until ' . $server['suspendedUntilDate'];
         $this->logMessage(
             $server['cus_name'] . ' ' . $server['serverName'] . ' ' . $message,
             self::LOG_TYPE_SUSPENDED
@@ -930,28 +940,30 @@ class BUSecondsite extends Business
 
     }
 
-    function getPerformanceDataForYear($year = null)
+    function getPerformanceDataForYear($year = null, $isReplication = FALSE)
     {
 
         if (!$year) {
             $year = date("Y");
         }
 
-        $query = "SELECT SUM(passes)/ SUM(images) as successRate, MONTH FROM (
-            SELECT MONTH(created_at) AS MONTH, images, passes FROM backup_performance_log WHERE YEAR(created_at) = '$year' and not isReplication
-) t GROUP BY t.month";
+        $query = "SELECT (SUM(passes)/ SUM(images))*100 as successRate, avg(target) as targetRate, MONTH FROM (
+            SELECT MONTH(created_at) AS MONTH, images, passes, target FROM backup_performance_log WHERE YEAR(created_at) = '$year' ";
+
+        if (!$isReplication) {
+            $query .= " and not isReplication ";
+        } else {
+            $query .= " and isReplication ";
+        }
+
+        $query .= " ) t GROUP BY t.month";
 
         $result = $this->db->query($query);
 
-        $data = [
-        ];
-
-        for ($i = 0; $i < 12; $i++) {
-            $data[$i + 1] = "N/A";
-        }
+        $data = [        ];
 
         while ($row = $result->fetch_assoc()) {
-            $data[$row['MONTH']] = $row['successRate'] * 100;
+            $data[$row['MONTH']] = $row;
         }
 
         return $data;

@@ -1,0 +1,31 @@
+<script>
+    function processRenewal() {
+        if (!confirm('Are you sure?')) {
+            return;
+        }
+        const optionSelected = $('#renewalProcessSelector')[0].selectedOptions[0];
+        $('body').loadingModal({
+            text: 'Please wait while finishing the operation...'
+        });
+
+        $.ajax(optionSelected.dataset.url).then(result => {
+            $('body').loadingModal('hide');
+            alert('Operation Completed');
+        })
+
+    }
+</script>
+<select id="renewalProcessSelector">
+    <option data-url="CreateRenewalsSalesOrders.php">
+        Daily Renewals
+    </option>
+    <option data-url="CreateDirectDebitSalesOrders.php">
+        Direct Debit Renewals
+    </option>
+    <!-- BEGIN actionsBlock -->
+    <option data-url="{actionURL}">
+        {description} Renewals
+    </option>
+    <!-- END actionsBlock -->
+</select>
+<button onclick="processRenewal()">Process Renewal</button>

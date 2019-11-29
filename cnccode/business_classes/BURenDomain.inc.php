@@ -110,20 +110,6 @@ class BURenDomain extends Business
         // create a renewal
     }
 
-    function getRenewalIDByCustomerItemID($customerItemID)
-    {
-
-        $this->dbeRenDomain->setValue(
-            DBEJRenDomain::customerItemID,
-            $customerItemID
-        );
-        $this->dbeRenDomain->getRowsByColumn(DBEJRenDomain::customerItemID);
-        $this->dbeRenDomain->fetchNext();
-
-        return ($this->dbeRenDomain->getPKValue());
-
-    }
-
     function emailRenewalsSalesOrdersDue($toEmail = CONFIG_SALES_MANAGER_EMAIL)
     {
         $this->dbeJRenDomain->getRenewalsDueRows();
@@ -193,8 +179,6 @@ class BURenDomain extends Business
         $buSalesOrder = new BUSalesOrder ($this);
 
         $buInvoice = new BUInvoice ($this);
-
-
         $this->dbeJRenDomain->getRenewalsDueRows();
 
         $dbeRenDomainUpdate = new DBECustomerItem($this);
@@ -533,6 +517,20 @@ class BURenDomain extends Business
             return false;
         }
         return true;
+    }
+
+    function getRenewalIDByCustomerItemID($customerItemID)
+    {
+
+        $this->dbeRenDomain->setValue(
+            DBEJRenDomain::customerItemID,
+            $customerItemID
+        );
+        $this->dbeRenDomain->getRowsByColumn(DBEJRenDomain::customerItemID);
+        $this->dbeRenDomain->fetchNext();
+
+        return ($this->dbeRenDomain->getPKValue());
+
     }
 } // End of class
 ?>

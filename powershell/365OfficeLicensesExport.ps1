@@ -19,7 +19,7 @@ try
     {
         throw "No session"
     }
-    Import-PSSession $Session -DisableNameChecking | Out-Null
+    Import-PSSession $Session -DisableNameChecking -AllowClobber | Out-Null
     Start-Sleep -s 5
     $MailboxesReport = @()
     $Mailboxes = Get-Mailbox -ResultSize Unlimited | Where-Object { $_.RecipientTypeDetails -ne "DiscoveryMailbox" }
@@ -34,13 +34,14 @@ try
         $TotalItemSize = $TotalItemSize.TotalItemSize
         $RecipientTypeDetails = $mailbox.RecipientTypeDetails
         $MSOLUSER = Get-MsolUser -UserPrincipalName $UserPrincipalName
+        if((Get-CASMailbox -Identity $UserPrincipalName).OWAEnabled){$OWA = 'Yes' } else {$OWA = 'No'}
+        $2FA = if((Get-MsolUser -UserPrincipalName $UserPrincipalName).StrongAuthenticationRequirements.Count){'Yes'} else {'No'}
         if ($UserDomain -eq $MSOLDomain.name)
         {
             $DaysToExpiry = $MSOLUSER |  Select-Object @{ Name = "DaysToExpiry"; Expression = { (New-TimeSpan -start (get-date) -end ($_.LastPasswordChangeTimestamp + $MSOLPasswordPolicy)).Days } }; $DaysToExpiry = $DaysToExpiry.DaysToExpiry
         }
-        $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { [array]$_.Licenses.AccountSkuId } }
+        $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { [array]$_.Licenses.AccountSkuId }}, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }
         $MailboxesReport += $Information
-
     }
     [array]$MailboxesReport = $MailboxesReport | Sort-Object TotalItemSize -Descending
     [array]$LicensesData = Get-MsolAccountSku | Select-Object AccountSkuId, ActiveUnits, @{ Name = 'Unallocated'; Expression = { $_.ActiveUnits - $_.ConsumedUnits } }
@@ -70,5 +71,6 @@ catch
         position = $positionMessage
     }
     $erroJSON = ConvertTo-Json $object
+    Get-PSSession | Remove-PSSession
     Write-Host $erroJSON
 }

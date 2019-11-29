@@ -11,8 +11,8 @@ use CNCLTD\LoggerCLI;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
 require_once($cfg["path_dbe"] . "/DBEOSSupportDates.php");
 require_once($cfg["path_dbe"] . "/DBEHeader.inc.php");
@@ -330,6 +330,9 @@ function processMailboxes(Spreadsheet $spreadSheet,
             case 'RoomMailbox':
                 $mailboxes[$key]['RecipientTypeDetails'] = "Room";
                 break;
+            case 'EquipmentMailbox':
+                $mailboxes[$key]['RecipientTypeDetails'] = "Equipment";
+                break;
         }
 
         $mailboxes[$key]['Licenses'] = $licenseValue;
@@ -351,7 +354,9 @@ function processMailboxes(Spreadsheet $spreadSheet,
             "Mailbox Size (MB)",
             "Mailbox Type",
             "Is Licensed",
-            "Licenses"
+            "Licenses",
+            "Webmail Enabled",
+            "MFA Enabled"
         ],
         null,
         'A1'
@@ -386,11 +391,11 @@ function processMailboxes(Spreadsheet $spreadSheet,
         'A' . ($highestRow + 2)
     );
 
-    $mailboxesSheet->getStyle("A$highestRow:E$highestRow")->getFont()->setBold(true);
+    $mailboxesSheet->getStyle("A$highestRow:G$highestRow")->getFont()->setBold(true);
 
-    $mailboxesSheet->getStyle("A1:E1")->getFont()->setBold(true);
+    $mailboxesSheet->getStyle("A1:G1")->getFont()->setBold(true);
 
-    $mailboxesSheet->getStyle("A1:E$highestRow")->getAlignment()->setHorizontal('center');
+    $mailboxesSheet->getStyle("A1:G$highestRow")->getAlignment()->setHorizontal('center');
 
     for ($i = 0; $i < count($mailboxes); $i++) {
         $currentRow = 2 + $i;

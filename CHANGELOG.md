@@ -1,6 +1,32 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.8.0]
+### Added
+- Issue 680 - Quick Create Sales Request
+- Issue 659 - Record daily replication / backup targets in database
+- Issue 677 - Sales Passwords list
+- Issue 672 - Office 365 licensing billing improvements
+- Issue 681 - Mailbox Export Enhancements
+### Changed
+- Issue 638 - Allow Multiple dropping of files when uploading documents
+- Issue 535 - PrePay statements, alert if hidden charges on the SR
+- Issue 666 - System Header & Review Meeting Text Formatting
+- Issue 673 - O365 Report on Spare Licenses not saving
+- Issue 670 - Mailbox Export script identify Equipment Mailboxes
+- Issue 664 - Colour OS Support Dates
+- Issue 669 - Asset list extract remove duplicated logged in users names
+- Issue 661 - Review Meetings show primary active site
+- Issue 668 - Phone number cleansing
+- Issue 682 - Item Type Amendments
+- Issue 685 - Prevent Creation of Quotes without a signature
+- Issue 675 - OBRS suspension logic for passed check
+### Fixed
+- Issue 663 - Password Service Sorting not working
+- Issue 592 - Security Improvements
+- Issue 683 - Fixed SR manual completion monitor
+- Fixed issue with Office 365 Licenses not saving "Report on spare licences" when unchecked
+ 
 ## [v3.7.0] 
 ### Added
 - Issue 654 - Set all contacts to support level None

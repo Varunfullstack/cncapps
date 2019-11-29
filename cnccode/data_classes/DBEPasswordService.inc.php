@@ -5,6 +5,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEPasswordService extends DBEntity
@@ -18,8 +19,8 @@ class DBEPasswordService extends DBEntity
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)

@@ -7,6 +7,7 @@
  */
 
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
 require_once($cfg["path_dbe"] . "/DBEOSSupportDates.php");
 require_once($cfg["path_dbe"] . "/DBEHeader.inc.php");
@@ -74,13 +75,45 @@ $thresholdDate->add(new DateInterval('P' . $thresholdDays . 'D'));
 
 $today = new DateTime();
 
+$currentSummaryRow = 1;
 if ($generateSummary) {
     $summarySpreadSheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
     $summarySpreadSheet->getDefaultStyle()->getFont()->setName('Arial');
     $summarySpreadSheet->getDefaultStyle()->getFont()->setSize(10);
     $summarySheet = $summarySpreadSheet->getActiveSheet();
     $isHeaderSet = false;
-    $currentSummaryRow = 1;
+}
+
+
+function getUnrepeatedUsername($str)
+{
+    $n = strlen($str);
+    if ($n < 6) {
+        return $str;
+    }
+    $length = 3;
+    $match = false;
+    do {
+        $prospect = substr($str, 0, $length);
+        $restOfTheString = substr($str, $length, $length);
+        if (strlen($restOfTheString) < $length) {
+            return $str;
+        }
+        if ($restOfTheString == $prospect) {
+            // we have a match...but we need to analyze next part of the string...just in case
+            if ($length * 2 == $n) {
+                return $prospect;
+            }
+            $nextRestOfString = substr($str, $length * 2, $length);
+            if ($prospect == $nextRestOfString) {
+                return $prospect;
+            }
+        }
+
+        $length++;
+    } while (!$match && $length < $n);
+
+    return $prospect;
 }
 
 while ($dbeCustomer->fetchNext()) {
@@ -223,6 +256,13 @@ ORDER BY clients.name,
         continue;
     }
     $data = $statement->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($data as $key => $datum) {
+        $text = $datum['Last User'];
+        $text = str_replace('null', "", $text);
+        $data[$key]['Last User'] = getUnrepeatedUsername($text);
+    }
+
+
     if (count($data)) {
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');

@@ -9,6 +9,7 @@
 
 use CNCLTD\Encryption;
 
+global $cfg;
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
@@ -1085,6 +1086,32 @@ class CTCustomer extends CTCNC
                     http_response_code(400);
                 }
                 echo json_encode($response);
+                break;
+            case 'searchName':
+                $itemsPerPage = 20;
+                $page = 1;
+                $term = '';
+                if (isset($_REQUEST['term'])) {
+                    $term = $_REQUEST['term'];
+                }
+
+                if (isset($_REQUEST['itemsPerPage'])) {
+                    $itemsPerPage = $_REQUEST['itemsPerPage'];
+                }
+
+                if (isset($_REQUEST['page'])) {
+                    $page = $_REQUEST['page'];
+                }
+                $dsResult = new DataSet($this);
+                $buCustomer = new BUCustomer($this);
+                $buCustomer->getActiveCustomers($dsResult);
+                $customers = [];
+                while ($dsResult->fetchNext()) {
+                    if (preg_match('/.*' . $term . '.*/i', $dsResult->getValue(DBECustomer::name))) {
+                        $customers[] = $dsResult->getValue(DBECustomer::name);
+                    }
+                }
+                echo json_encode($customers);
                 break;
             default:
                 $this->displaySearchForm();
