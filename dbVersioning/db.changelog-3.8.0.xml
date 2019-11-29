@@ -1,0 +1,51 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="release-v3.8.0-0">
+        <tagDatabase tag="release-3.8.0"/>
+    </changeSet>
+    <include file="db.changelog-issue680.xml"/>
+    <include file="db.changelog-issue659.xml"/>
+    <include file="db.changelog-issue682.xml"/>
+    <include file="db.changelog-issue683.xml"/>
+    <include file="db.changelog-issue677.xml"/>
+    <include file="db.changelog-issue672.xml"/>
+    <include file="db.changelog-issue675.xml"/>
+    <changeSet id="release-v3.8.0-1" author="pavilionweb">
+        <sql>
+            update itm
+            set itm_itemtypeno =
+                    case itm_itemtypeno
+                        when 6 then 2
+                        when 10 then 9
+                        when 14 then 13
+                        when 15 then 13
+                        when 17 then 16
+                        when 19 then 18
+                        when 20 then 18
+                        when 22 then 21
+                        when 31 then 30
+                        when 32 then 30
+                        when 33 then 30
+                        when 36 then 35
+                        when 40 then 18
+                        when 44 then 30
+                        when 45 then 30
+                        when 46 then 30
+                        when 47 then 30
+                        when 49 then 12
+                        when 50 then 12
+                        when 51 then 12
+                        when 52 then 12
+                        when 55 then 23
+                        when 56 then 23
+                        when 57 then 23
+                        when 59 then 58
+                        else
+                            itm_itemtypeno
+                        end
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>
