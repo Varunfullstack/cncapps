@@ -85,22 +85,35 @@ if ($generateSummary) {
 }
 
 
-function longestRepeatedSubstring($str)
+function getUnrepeatedUsername($str)
 {
     $n = strlen($str);
-    $index = 2;
-    $recordSubstitution = 0;
-    $recordProspect = null;
+    if ($n < 6) {
+        return $str;
+    }
+    $length = 3;
+    $match = false;
     do {
-        $prospect = substr($str, 0, $index);
-        $index++;
-        $substitutionCount = $n - strlen(str_replace($prospect, '', $str));
-        if ($substitutionCount > $recordSubstitution) {
-            $recordSubstitution = $substitutionCount;
-            $recordProspect = $prospect;
+        $prospect = substr($str, 0, $length);
+        $restOfTheString = substr($str, $length, $length);
+        if (strlen($restOfTheString) < $length) {
+            return $str;
         }
-    } while ($index < $n && ($n - $recordSubstitution > strlen($recordProspect)));
-    return $recordProspect;
+        if ($restOfTheString == $prospect) {
+            // we have a match...but we need to analyze next part of the string...just in case
+            if ($length * 2 == $n) {
+                return $prospect;
+            }
+            $nextRestOfString = substr($str, $length * 2, $length);
+            if ($prospect == $nextRestOfString) {
+                return $prospect;
+            }
+        }
+
+        $length++;
+    } while (!$match && $length < $n);
+
+    return $prospect;
 }
 
 while ($dbeCustomer->fetchNext()) {
@@ -222,6 +235,7 @@ ORDER BY clients.name,
   computers.os,
   computers.name,
   software.name";
+        var_dump($query);
 
     $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
     $customerName = $dbeCustomer->getValue(DBECustomer::name);
@@ -246,7 +260,7 @@ ORDER BY clients.name,
     foreach ($data as $key => $datum) {
         $text = $datum['Last User'];
         $text = str_replace('null', "", $text);
-        $data[$key]['Last User'] = longestRepeatedSubstring($text);
+        $data[$key]['Last User'] = getUnrepeatedUsername($text);
     }
 
 
