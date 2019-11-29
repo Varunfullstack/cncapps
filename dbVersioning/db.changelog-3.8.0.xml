@@ -14,37 +14,64 @@
     <include file="db.changelog-issue675.xml"/>
     <changeSet id="release-v3.8.0-1" author="pavilionweb">
         <sql>
-            update itm
-            set itm_itemtypeno =
-                    case itm_itemtypeno
-                        when 6 then 2
-                        when 10 then 9
-                        when 14 then 13
-                        when 15 then 13
-                        when 17 then 16
-                        when 19 then 18
-                        when 20 then 18
-                        when 22 then 21
-                        when 31 then 30
-                        when 32 then 30
-                        when 33 then 30
-                        when 36 then 35
-                        when 40 then 18
-                        when 44 then 30
-                        when 45 then 30
-                        when 46 then 30
-                        when 47 then 30
-                        when 49 then 12
-                        when 50 then 12
-                        when 51 then 12
-                        when 52 then 12
-                        when 55 then 23
-                        when 56 then 23
-                        when 57 then 23
-                        when 59 then 58
-                        else
-                            itm_itemtypeno
-                        end
+            UPDATE
+                item
+            SET
+                item.`itm_itemtypeno` =
+                    CASE
+                        item.`itm_itemtypeno`
+                        WHEN 6
+                            THEN 2
+                        WHEN 10
+                            THEN 9
+                        WHEN 14
+                            THEN 13
+                        WHEN 15
+                            THEN 13
+                        WHEN 17
+                            THEN 16
+                        WHEN 19
+                            THEN 18
+                        WHEN 20
+                            THEN 18
+                        WHEN 22
+                            THEN 21
+                        WHEN 31
+                            THEN 30
+                        WHEN 32
+                            THEN 30
+                        WHEN 33
+                            THEN 30
+                        WHEN 36
+                            THEN 35
+                        WHEN 40
+                            THEN 18
+                        WHEN 44
+                            THEN 30
+                        WHEN 45
+                            THEN 30
+                        WHEN 46
+                            THEN 30
+                        WHEN 47
+                            THEN 30
+                        WHEN 49
+                            THEN 12
+                        WHEN 50
+                            THEN 12
+                        WHEN 51
+                            THEN 12
+                        WHEN 52
+                            THEN 12
+                        WHEN 55
+                            THEN 23
+                        WHEN 56
+                            THEN 23
+                        WHEN 57
+                            THEN 23
+                        WHEN 59
+                            THEN 58
+                        ELSE item.`itm_itemtypeno`
+                        END
         </sql>
         <rollback/>
     </changeSet>
