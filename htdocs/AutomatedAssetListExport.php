@@ -235,7 +235,6 @@ ORDER BY clients.name,
   computers.os,
   computers.name,
   software.name";
-        var_dump($query);
 
     $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
     $customerName = $dbeCustomer->getValue(DBECustomer::name);
