@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.8.1]
+### Fixed
+- Creating a new Service Request from the new Create Sales order, it's putting in the value $internalNotes.
+- Offsite Replication Checks Suspended Until doesn't show the value entered.
+
 ## [v3.8.0]
 ### Added
 - Issue 680 - Quick Create Sales Request

@@ -66,8 +66,6 @@
                             THEN 23
                         WHEN 56
                             THEN 23
-                        WHEN 57
-                            THEN 23
                         WHEN 59
                             THEN 58
                         ELSE item.`itm_itemtypeno`
