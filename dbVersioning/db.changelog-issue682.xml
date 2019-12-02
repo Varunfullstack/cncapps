@@ -36,7 +36,7 @@
         <sql>
             update itemtype
             set reoccurring = 1
-            where ity_itemtypeno in (3, 4, 9, 10, 23, 28, 29, 46, 47, 53, 54, 55, 56, 58, 59, 60);
+            where ity_itemtypeno in (3, 4, 9, 10, 23, 28, 29, 46, 47, 53, 54, 55, 56, 57, 58, 59, 60);
         </sql>
         <rollback/>
     </changeSet>
@@ -48,8 +48,7 @@
             update itemtype
             set active = 0
             where ity_itemtypeno in
-                  (59, 36, 14, 15, 6, 60, 49, 50, 51, 52, 22, 19, 20, 40, 48, 17, 31, 32, 33, 44, 45, 46, 47, 28, 55,
-                   56, 10);
+                  (59, 36, 14, 15, 6, 60, 49, 50, 51, 52, 22, 19, 20, 40, 48, 17, 31, 32, 33, 44, 45, 46, 47, 28, 10);
         </sql>
         <rollback/>
     </changeSet>
