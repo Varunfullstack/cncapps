@@ -1,0 +1,20 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="hotfix-v3.8.1-0">
+        <tagDatabase tag="hotfix-v3.8.1"/>
+    </changeSet>
+    <changeSet id="hotfix-v3.8.1-1" author="pavilionweb">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="text">
+                SELECT `information_schema`.COLUMNS.`COLUMN_TYPE`
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_name='ordhead'
+                AND column_name='odh_ref_cust'
+                AND table_schema = DATABASE()
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="ordhead" columnName="odh_ref_cust" newDataType="char(23)"/>
+    </changeSet>
+</databaseChangeLog>

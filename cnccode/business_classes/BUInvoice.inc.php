@@ -31,7 +31,7 @@ class BUInvoice extends Business
     const searchFormOrdheadID = 'ordheadID';
     const searchFormCustomerName = 'customerName';
     const searchFormInvoiceType = 'invoiceType';
-    /** @var DBEInvhead */
+    /** @var DBEInvhead|DataSet */
     public $dbeInvhead;
     /** @var DBEJInvhead */
     public $dbeJInvhead;
@@ -441,9 +441,9 @@ class BUInvoice extends Business
             DBEInvhead::datePrinted,
             null
         );
-
+        $this->dbeInvhead->setShowSQLOn();
         $this->dbeInvhead->insertRow();
-
+        exit;
         return $this->dbeInvhead->getPKValue();
     }
 
