@@ -16,5 +16,8 @@
             </sqlCheck>
         </preConditions>
         <modifyDataType tableName="ordhead" columnName="odh_ref_cust" newDataType="char(23)"/>
+        <rollback>
+            <modifyDataType tableName="ordhead" columnName="odh_ref_cust" newDataType="text"/>
+        </rollback>
     </changeSet>
 </databaseChangeLog>
