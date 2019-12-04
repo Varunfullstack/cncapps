@@ -4,6 +4,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEInvhead.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJInvhead.inc.php");
@@ -31,7 +32,7 @@ class BUInvoice extends Business
     const searchFormOrdheadID = 'ordheadID';
     const searchFormCustomerName = 'customerName';
     const searchFormInvoiceType = 'invoiceType';
-    /** @var DBEInvhead */
+    /** @var DBEInvhead|DataSet */
     public $dbeInvhead;
     /** @var DBEJInvhead */
     public $dbeJInvhead;
@@ -441,9 +442,7 @@ class BUInvoice extends Business
             DBEInvhead::datePrinted,
             null
         );
-
         $this->dbeInvhead->insertRow();
-
         return $this->dbeInvhead->getPKValue();
     }
 

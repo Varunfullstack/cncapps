@@ -5889,6 +5889,10 @@ class CTActivity extends CTCNC
                 $error['rootCauseID'] = 'Required';
             }
 
+            if ($dsCallActivity->getValue(DBEJCallActivity::problemID) == 0) {
+                $error['problemID'] = 'Problem ID is not set!';
+            }
+
             if (!count($error)) {
 
                 $this->buActivity->setProblemToFixed(
