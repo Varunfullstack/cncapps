@@ -5,6 +5,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
@@ -34,165 +35,6 @@ class BUCustomerAnalysisReport extends Business
     }
 
     /**
-     * Get list of contract items in the date/customer range
-     * @param $customerID
-     * @return bool|mysqli_result
-     */
-    function getContractItems($customerID)
-    {
-        $sql =
-            "
-        SELECT
-          itm_itemno AS `ID`,
-          itm_desc AS `Contract`
-          
-        FROM
-          custitem
-          JOIN item ON itm_itemno = cui_itemno
-          
-        WHERE
-          item.renewalTypeID <> 0
-          AND declinedFlag = 'N'";
-
-        if ($customerID) {
-            $sql .= " AND cui_custno = $customerID";
-        }
-
-        $sql .=
-            " GROUP BY
-          itm_itemno
-        ORDER BY
-          itm_desc";
-
-        return $this->db->query($sql);
-    }
-
-    function getTandMLabourHours($customerID, DateTimeInterface $startDate, DateTimeInterface $endDate)
-    {
-        $sql =
-            "
-      SELECT
-        SUM( inl_qty ) as hours
-        
-      FROM
-        invline
-        JOIN invhead ON inh_invno = inl_invno
-        
-      WHERE
-        inh_type = 'I'
-        AND inl_line_type = 'I'
-        AND inh_date_printed_yearmonth BETWEEN '" . $startDate->format('Ym') . "' AND '" . $endDate->format('Ym') . "'
-        AND inl_itemno = " . CONFIG_CONSULTANCY_DAY_LABOUR_ITEMID;
-
-        if ($customerID) {
-            $sql .= " AND invhead.inh_custno = $customerID";
-        }
-
-        return $this->db->query($sql)->fetch_array();
-    }
-
-    /**
-     * @param $customerID
-     * @param $contractId
-     * @param DateTimeInterface $startDate
-     * @param DateTimeInterface $endDate
-     * @return mixed
-     */
-    function getContractLabourHours($customerID, $contractId, DateTimeInterface $startDate, DateTimeInterface $endDate)
-    {
-        $sql =
-            "SELECT
-        SUM( pro_total_activity_duration_hours ) as hours
-        
-      FROM
-        problem
-        JOIN custitem ON cui_cuino = pro_contract_cuino
-        
-      WHERE
-        pro_total_activity_duration_hours IS NOT NULL
-        AND problem.pro_date_raised BETWEEN '" . $startDate->format('Y-m-d') . "' AND '" . $endDate->format('Y-m-d') . "'
-        AND cui_itemno = $contractId";
-
-        if ($customerID) {
-            $sql .= " AND pro_custno = $customerID";
-        }
-        return $this->db->query($sql)->fetch_array();
-    }
-
-    function getContractValues($customerID, $contractId)
-    {
-        $sql =
-            "
-        SELECT
-          SUM( `salePricePerMonth` ) AS salePricePerMonth,
-          SUM( `costPricePerMonth` ) AS costPricePerMonth,
-          SUM( `cui_cost_price` / 12 ) AS cui_cost_price,
-          SUM( `cui_sale_price` / 12 ) AS cui_sale_price,
-          SUM( `salePrice`  * `qty` / 12 ) AS salePrice,
-          SUM( `costPrice`  * `qty` / 12 ) AS costPrice,
-          SUM( `itm_sstk_price` / 12 ) AS itemSalePrice,
-          SUM( `itm_sstk_cost` / 12 ) AS itemCostPrice
-          
-        FROM
-          custitem
-          JOIN item ON itm_itemno = cui_itemno
-          
-        WHERE
-          cui_itemno = $contractId
-          AND renewalTypeID <> 0          
-          AND declinedFlag = 'N'";
-
-        if ($customerID) {
-            $sql .= " AND custitem.cui_custno = $customerID";
-        }
-        $row = $this->db->query($sql)->fetch_array();
-
-        /* Per month values in different fields depending upon renewal type */
-        if ($row['salePricePerMonth'] > 0) {
-            $perMonthSale = $row['salePricePerMonth'];
-            $perMonthCost = $row['costPricePerMonth'];
-        } elseif ($row['cui_sale_price'] > 0) {
-            $perMonthSale = $row['cui_sale_price'];
-            $perMonthCost = $row['cui_cost_price'];
-        } elseif ($row['salePrice'] > 0) {
-            $perMonthSale = $row['salePrice'];
-            $perMonthCost = $row['costPrice'];
-        } else {
-            $perMonthSale = $row['itemSalePrice'];
-            $perMonthCost = $row['itemCostPrice'];
-        }
-        return array(
-            'perMonthSale' => $perMonthSale,
-            'perMonthCost' => $perMonthCost,
-        );
-
-    }
-
-    function getOtherSales($customerID, DateTimeInterface $startDate, DateTimeInterface $endDate)
-    {
-        $sql =
-            "
-    SELECT
-      SUM( inl_qty *  inl_cost_price) AS `cost`,
-      SUM( inl_qty * inl_unit_price ) AS `sale`
-    FROM
-      invline
-      JOIN invhead ON inh_invno = inl_invno
-      JOIN item ON inl_itemno = itm_itemno
-    WHERE
-      inh_type = 'I'
-      AND inl_line_type = 'I'
-      AND inh_date_printed_yearmonth BETWEEN '" . $startDate->format('Ym') . "' AND '" . $endDate->format('Ym') . "'
-      AND item.renewalTypeID = 0"; // excludes contracts
-
-        if ($customerID) {
-            $sql .= " AND invhead.inh_custno = $customerID";
-        }
-
-        return $this->db->query($sql)->fetch_array();
-    }
-
-    /**
      * @param DSForm $searchForm
      * @return mixed
      */
@@ -219,12 +61,12 @@ class BUCustomerAnalysisReport extends Business
 
         $hourlyRate = $dsHeader->getValue(DBEHeader::hourlyLabourCost);
 
-        $test = new BUItem($this);
+        $hourlyLabourChargeItem = new BUItem($this);
         /**
          * @var DataSet $data
          */
-        $data = null;
-        $test->getItemByID(2237, $data);
+        $data = new DataSet($this);
+        $hourlyLabourChargeItem->getItemByID(2237, $data);
 
         $hourlyLabourCharge = $data->getValue(DBEItem::curUnitSale);
 
@@ -315,6 +157,172 @@ class BUCustomerAnalysisReport extends Business
 
     }
 
+    /**
+     * Get list of contract items in the date/customer range
+     * @param $customerID
+     * @return bool|mysqli_result
+     */
+    function getContractItems($customerID)
+    {
+        $sql =
+            "
+        SELECT
+          itm_itemno AS `ID`,
+          itm_desc AS `Contract`
+          
+        FROM
+          custitem
+          JOIN item ON itm_itemno = cui_itemno
+          
+        WHERE
+          item.renewalTypeID <> 0
+          AND declinedFlag = 'N'";
+
+        if ($customerID) {
+            $sql .= " AND cui_custno = $customerID";
+        }
+
+        $sql .=
+            " GROUP BY
+          itm_itemno
+        ORDER BY
+          itm_desc";
+
+        return $this->db->query($sql);
+    }
+
+    /**
+     * @param $customerID
+     * @param $contractId
+     * @param DateTimeInterface $startDate
+     * @param DateTimeInterface $endDate
+     * @return mixed
+     */
+    function getContractLabourHours($customerID, $contractId, DateTimeInterface $startDate, DateTimeInterface $endDate)
+    {
+        $sql =
+            "SELECT
+        SUM( pro_total_activity_duration_hours ) as hours
+        
+      FROM
+        problem
+        JOIN custitem ON cui_cuino = pro_contract_cuino
+        
+      WHERE
+        pro_total_activity_duration_hours IS NOT NULL
+        AND problem.pro_date_raised BETWEEN '" . $startDate->format('Y-m-d') . "' AND '" . $endDate->format('Y-m-d') . "'
+        AND cui_itemno = $contractId";
+
+        if ($customerID) {
+            $sql .= " AND pro_custno = $customerID";
+        }
+        return $this->db->query($sql)->fetch_array();
+    }
+
+    function getContractValues($customerID, $contractId)
+    {
+        $sql =
+            "
+        SELECT
+          SUM( `salePricePerMonth` ) AS salePricePerMonth,
+          SUM( `costPricePerMonth` ) AS costPricePerMonth,
+               sum(cui_users) as users,
+          SUM( `cui_cost_price` / 12 ) AS cui_cost_price,
+          SUM( `cui_sale_price` / 12 ) AS cui_sale_price,
+          SUM( `salePrice`  * `qty` / 12 ) AS salePrice,
+          SUM( `costPrice`  * `qty` / 12 ) AS costPrice,
+          
+          SUM( `itm_sstk_price` / 12 ) AS itemSalePrice,
+          SUM( `itm_sstk_cost` / 12 ) AS itemCostPrice
+          
+        FROM
+          custitem
+          JOIN item ON itm_itemno = cui_itemno
+          
+        WHERE
+          cui_itemno = $contractId
+          AND renewalTypeID <> 0          
+          AND declinedFlag = 'N'";
+
+        if ($customerID) {
+            $sql .= " AND custitem.cui_custno = $customerID";
+        }
+        $row = $this->db->query($sql)->fetch_array();
+
+        /* Per month values in different fields depending upon renewal type */
+        if ($row['salePricePerMonth'] > 0) {
+            if ($row['users'] > 0) {
+                $perMonthSale = $row['cui_sale_price'];
+                $perMonthCost = $row['cui_cost_price'];
+            } else {
+                $perMonthSale = $row['salePricePerMonth'];
+                $perMonthCost = $row['costPricePerMonth'];
+            }
+        } elseif ($row['cui_sale_price'] > 0) {
+            $perMonthSale = $row['cui_sale_price'];
+            $perMonthCost = $row['cui_cost_price'];
+        } elseif ($row['salePrice'] > 0) {
+            $perMonthSale = $row['salePrice'];
+            $perMonthCost = $row['costPrice'];
+        } else {
+            $perMonthSale = $row['itemSalePrice'];
+            $perMonthCost = $row['itemCostPrice'];
+
+        }
+        return array(
+            'perMonthSale' => $perMonthSale,
+            'perMonthCost' => $perMonthCost,
+        );
+
+    }
+
+    function getOtherSales($customerID, DateTimeInterface $startDate, DateTimeInterface $endDate)
+    {
+        $sql =
+            "
+    SELECT
+      SUM( inl_qty *  inl_cost_price) AS `cost`,
+      SUM( inl_qty * inl_unit_price ) AS `sale`
+    FROM
+      invline
+      JOIN invhead ON inh_invno = inl_invno
+      JOIN item ON inl_itemno = itm_itemno
+    WHERE
+      inh_type = 'I'
+      AND inl_line_type = 'I'
+      AND inh_date_printed_yearmonth BETWEEN '" . $startDate->format('Ym') . "' AND '" . $endDate->format('Ym') . "'
+      AND item.renewalTypeID = 0"; // excludes contracts
+
+        if ($customerID) {
+            $sql .= " AND invhead.inh_custno = $customerID";
+        }
+
+        return $this->db->query($sql)->fetch_array();
+    }
+
+    function getTandMLabourHours($customerID, DateTimeInterface $startDate, DateTimeInterface $endDate)
+    {
+        $sql =
+            "
+      SELECT
+        SUM( inl_qty ) as hours
+        
+      FROM
+        invline
+        JOIN invhead ON inh_invno = inl_invno
+        
+      WHERE
+        inh_type = 'I'
+        AND inl_line_type = 'I'
+        AND inh_date_printed_yearmonth BETWEEN '" . $startDate->format('Ym') . "' AND '" . $endDate->format('Ym') . "'
+        AND inl_itemno = " . CONFIG_CONSULTANCY_DAY_LABOUR_ITEMID;
+
+        if ($customerID) {
+            $sql .= " AND invhead.inh_custno = $customerID";
+        }
+
+        return $this->db->query($sql)->fetch_array();
+    }
 
     /**
      * @param $startYearMonth

@@ -976,10 +976,10 @@ class CTCustomerItem extends CTCNC
                 'secondsiteValidationSuspendUntilDateMessage'         => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::secondsiteValidationSuspendUntilDate)
                 ),
-                'offsiteReplicationValidationSuspendUntilDate'        => Controller::dateYMDtoDMY(
+                'offsiteReplicationValidationSuspendedUntilDate'        => Controller::dateYMDtoDMY(
                     $dsCustomerItem->getValue(DBEJCustomerItem::offsiteReplicationValidationSuspendedUntilDate)
                 ),
-                'offsiteReplicationValidationSuspendUntilDateMessage' => Controller::htmlDisplayText(
+                'offsiteReplicationValidationSuspendedUntilDateMessage' => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::offsiteReplicationValidationSuspendedUntilDate)
                 ),
 
