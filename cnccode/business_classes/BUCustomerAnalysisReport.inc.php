@@ -65,7 +65,7 @@ class BUCustomerAnalysisReport extends Business
         /**
          * @var DataSet $data
          */
-        $data = null;
+        $data = new DataSet($this);
         $hourlyLabourChargeItem->getItemByID(2237, $data);
 
         $hourlyLabourCharge = $data->getValue(DBEItem::curUnitSale);
