@@ -115,12 +115,6 @@ $managers = [];
  * @var EngineerActivity[] $engineerActivities
  */
 foreach ($engineers as $engineerId => $engineerActivities) {
-
-    $sender_name = "Call System";
-    $sender_email = OS_CALL_EMAIL_FROM_USER;
-    $headers = "From: " . $sender_name . " <" . $sender_email . ">\r\n";
-    $headers .= "MIME-Version: 1.0\r\n";
-    $headers .= "Content-Type: text/html";
     $logName = null;
     $engineerName = null;
     if (!$outputEmails) {
@@ -151,6 +145,8 @@ foreach ($engineers as $engineerId => $engineerActivities) {
             if (!$engineerName) {
                 $engineerName = $engineerActivity->engineerName;
             }
+
+
             $managerId = $engineerActivity->engineerManagerId;
             if ($managerId && (strtotime($engineerActivity->activityDate) <= strtotime(
                         '-5 days',
@@ -212,7 +208,7 @@ foreach ($engineers as $engineerId => $engineerActivities) {
         $sendTo = $logName . '@' . $domain;
         $hdrs = array(
             'To'           => $sendTo,
-            'From'         => CONFIG_SALES_MANAGER_EMAIL,
+            'From'         => CONFIG_SUPPORT_EMAIL,
             'Subject'      => $emailSubject,
             'Content-Type' => 'text/html; charset=UTF-8'
         );
@@ -246,12 +242,6 @@ foreach ($managers as $managerId => $manager) {
         continue;
     }
 
-    $sender_name = "Call System";
-    $sender_email = OS_CALL_EMAIL_FROM_USER;
-
-    $headers = "From: " . $sender_name . " <" . $sender_email . ">\r\n";
-    $headers .= "MIME-Version: 1.0\r\n";
-    $headers .= "Content-Type: text/html";
     if (!$outputEmails) {
         ob_start();
     }
@@ -297,14 +287,14 @@ foreach ($managers as $managerId => $manager) {
                     }
                     ?>
                     <TD>
-                        <A href="<?= SITE_URL ?>/Activity.php?action=displayActivity&callActivityID=<?= $engineerActivity->activityId ?>"><?= $engineerActivity->activityId ?></A>
+                        <A href="<?= SITE_URL ?>/Activity.php?action=displayActivity&callActivityID=<?= $openActivity->activityId ?>"><?= $openActivity->activityId ?></A>
                     </TD>
 
                     <TD>
-                        <?= $engineerActivity->customerName ?>
+                        <?= $openActivity->customerName ?>
                     </TD>
                     <TD>
-                        <?= $engineerActivity->activityDate ?>
+                        <?= $openActivity->activityDate ?>
                     </TD>
                 </TR>
                 <?php
@@ -317,11 +307,13 @@ foreach ($managers as $managerId => $manager) {
     </TABLE>
     </HTML>
     <?php
+
     if (!$outputEmails) {
         $body = ob_get_contents();
         ob_end_clean();
 
         $emailSubject = "Your managed engineers have open requests";
+
 
         $buMail->mime->setHTMLBody($body);
 
@@ -333,18 +325,14 @@ foreach ($managers as $managerId => $manager) {
         );
 
         $body = $buMail->mime->get($mime_params);
-
         $sendTo = $managerRow['cns_logname'] . '@' . $domain;
         $hdrs = array(
             'To'           => $sendTo,
-            'From'         => CONFIG_SALES_MANAGER_EMAIL,
+            'From'         => CONFIG_SUPPORT_EMAIL,
             'Subject'      => $emailSubject,
             'Content-Type' => 'text/html; charset=UTF-8'
         );
-
         $hdrs = $buMail->mime->headers($hdrs);
-
-
         $sent = $buMail->send(
             $sendTo,
             $hdrs,
