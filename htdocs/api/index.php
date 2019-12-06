@@ -8,7 +8,7 @@ use Signable\Party;
 use Twig\Environment;
 
 require_once __DIR__ . '/../config.inc.php';
-
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBEQuotation.inc.php");
 require_once($cfg["path_dbe"] . "/DBESignableEnvelope.inc.php");
 require_once($cfg["path_bu"] . "/BUSalesOrder.inc.php");
@@ -56,6 +56,56 @@ $app->group(
                 $response->getBody()->write(
                     $twig->render('signedConfirmation.html.twig', ["message" => "Code not provided"])
                 );
+                return $response;
+            }
+        );
+
+        $group->get(
+            '/stats',
+            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+                global $db;
+
+                $db->query(
+                    "SELECT
+  SUM(1) AS raised,
+  AVG(problem.`pro_responded_hours`) AS responseTime,
+  AVG(
+   IF(pro_status IN (\"F\",\"C\"),   
+   problem.`pro_responded_hours` < 
+    CASE
+      problem.`pro_priority`
+      WHEN 1
+      THEN customer.`cus_sla_p1`
+      WHEN 2
+      THEN customer.`cus_sla_p2`
+      WHEN 3
+      THEN customer.`cus_sla_p3`
+      WHEN 4
+      THEN customer.`cus_sla_p4`
+      ELSE 0
+    END,
+    NULL) 
+  ) AS slaMet,
+    AVG(IF(pro_status IN (\"F\",\"C\"),getOpenHours(problem.`pro_problemno`) < 8, NULL)) AS closedWithin8Hours,
+    AVG(IF(pro_status =\"C\",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
+    SUM(pro_status IN(\"F\",\"C\")) AS `fixed`,
+    AVG(IF(pro_status IN (\"F\",\"C\"), problem.`pro_chargeable_activity_duration_hours`,NULL)) AS avgChargeableTime,
+    AVG(IF(pro_status IN (\"F\",\"C\"), problem.pro_working_hours,NULL)) AS avgTimeAwaitingCNC,
+    AVG(IF(pro_status IN (\"F\",\"C\"), getOpenHours(problem.`pro_problemno`),NULL)) AS avgTimeFromRaiseToFixHours
+FROM
+  problem
+  LEFT JOIN callactivity initial
+    ON initial.`caa_problemno` = problem.`pro_problemno`
+    AND initial.`caa_callacttypeno` = 51
+  JOIN customer
+    ON problem.`pro_custno` = customer.`cus_custno`
+WHERE 
+   caa_date BETWEEN NOW() - INTERVAL 30 DAY
+  AND NOW()
+  AND pro_priority < 5"
+                );
+                $data = $db->fetchAll(MYSQLI_ASSOC);
+                $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
                 return $response;
             }
         );
