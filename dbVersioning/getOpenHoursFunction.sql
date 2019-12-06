@@ -17,26 +17,30 @@ BEGIN
     DECLARE closeBusinessHour TIME;
     SELECT `hed_bill_starttime`,
            hed_bill_endtime
-           INTO openBusinessHour,
-               closeBusinessHour
+    INTO openBusinessHour,
+        closeBusinessHour
     FROM headert
     LIMIT 1;
     SELECT callactivity.`caa_starttime`,
            callactivity.`caa_date`
-           INTO initialStartTime,
-               initialStartDate
+    INTO initialStartTime,
+        initialStartDate
     FROM callactivity
     WHERE callactivity.`caa_problemno` = serviceRequestID
       AND callactivity.`caa_callacttypeno` = 51;
     SELECT callactivity.`caa_endtime`,
            callactivity.`caa_date`
-           INTO fixedEndTime,
-               fixedEndDate
+    INTO fixedEndTime,
+        fixedEndDate
     FROM callactivity
     WHERE callactivity.`caa_problemno` = serviceRequestID
       AND callactivity.`caa_callacttypeno` = 57
     ORDER BY caa_date DESC
     LIMIT 1;
+
+    if (fixedEndDate is null) then
+        return null;
+    end if;
     SET currentDate = initialStartDate;
     SET currentStartTime = initialStartTime;
     IF currentStartTime < openBusinessHour THEN
