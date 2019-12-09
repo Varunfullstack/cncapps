@@ -7,6 +7,7 @@
  */
 
 namespace CNCLTD;
+require_once __DIR__."/../../cnccode/fpdf/fpdf_protection.php";
 
 class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
 {
@@ -251,33 +252,6 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         );
     }
 
-    public function Header()
-    {
-        if ($this->hideHeader) {
-            return;
-        }
-        $this->Image(
-            $this->headerImage,
-            $this->GetPageWidth(
-            ) - ($this->headerImageWidth + $this->rightMargin + $this->headerImagePositionFromRightMargin),
-            $this->headerImagePositionFromTopEdge,
-            $this->headerImageWidth
-        );
-    }
-
-    public function Footer()
-    {
-        if ($this->hideFooter) {
-            return;
-        }
-        $this->Image(
-            $this->footerImage,
-            $this->leftMargin,
-            $this->GetPageHeight() - ($this->footerImageWidth * $this->footerImageRatio),
-            $this->footerImageWidth
-        );
-    }
-
     private function renderQuestion(\DBEStaffAppraisalQuestion $dbeQuestions,
                                     $questionnaireAnswerID,
                                     $previousQuestionType
@@ -437,46 +411,81 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         $this->SetFontSize(10);
     }
 
-    /**
-     * MultiCell with alignment as in Cell.
-     * @param float $w
-     * @param float $h
-     * @param string $text
-     * @param mixed $border
-     * @param int $ln
-     * @param string $align
-     * @param boolean $fill
-     */
-    private function MultiAlignCell($w,
-                                    $h,
-                                    $text,
-                                    $border = 0,
-                                    $ln = 0,
-                                    $align = 'L',
-                                    $fill = false
+    private function newPageIfNeeded(array $thing,
+                                     $h,
+                                     $considerHeader = false
     )
     {
-        // Store reset values for (x,y) positions
-        $x = $this->GetX() + $w;
-        $y = $this->GetY();
+        $maxLineBreaks = 0;
+        foreach ($thing as $item) {
 
-        // Make a call to FPDF's MultiCell
-        $this->MultiCell(
-            $w,
-            $h,
-            $text,
-            $border,
-            $align,
-            $fill
-        );
-
-        // Reset the line position to the right, like in Cell
-        if ($ln == 0) {
-            $this->SetXY(
-                $x,
-                $y
+            $lineBreaks = 0;
+            // Output text with automatic or explicit line breaks
+            $cw = &$this->CurrentFont['cw'];
+            $txt = $item[1];
+            $w = $item[0];
+            $wmax = ($w - 2 * $this->cMargin) * 1000 / $this->FontSize;
+            $s = str_replace(
+                "\r",
+                '',
+                $txt
             );
+            $nb = strlen($s);
+            if ($nb > 0 && $s[$nb - 1] == "\n")
+                $nb--;
+            $b = 0;
+            $sep = -1;
+            $i = 0;
+            $j = 0;
+            $l = 0;
+            $ns = 0;
+            $nl = 1;
+            while ($i < $nb) {
+                // Get next character
+                $c = $s[$i];
+                if ($c == ' ') {
+                    $sep = $i;
+                    $ls = $l;
+                    $ns++;
+                }
+                $l += $cw[$c];
+                if ($l > $wmax) {
+                    // Automatic line break
+                    if ($sep == -1) {
+                        if ($i == $j) {
+                            $i++;
+                        }
+                        if ($this->ws > 0) {
+                            $this->ws = 0;
+                            $this->_out('0 Tw');
+                        }
+
+                        $lineBreaks++;
+                    } else {
+                        $lineBreaks++;
+                        $i = $sep + 1;
+                    }
+                    $sep = -1;
+                    $j = $i;
+                    $l = 0;
+                    $ns = 0;
+                    $nl++;
+                } else
+                    $i++;
+            }
+            // Last chunk
+            if ($this->ws > 0) {
+                $this->ws = 0;
+                $this->_out('0 Tw');
+            }
+
+            if ($lineBreaks > $maxLineBreaks) {
+                $maxLineBreaks = $lineBreaks;
+            }
         }
+        return ($this->GetY(
+            ) + (($maxLineBreaks + 2) * $this->questionSeparation) + ($considerHeader ? 25 : 0) > $this->GetPageHeight(
+            ) - $this->footerHeight);
     }
 
     function NewMultiCell($w,
@@ -674,81 +683,51 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         return $lineBreaks;
     }
 
-    private function newPageIfNeeded(array $thing,
-                                     $h,
-                                     $considerHeader = false
-    )
+    private function renderObjectives($questionnaireAnswerID)
     {
-        $maxLineBreaks = 0;
-        foreach ($thing as $item) {
+        $dbeObjective = new \DBEStaffAppraisalObjectives($this);
 
-            $lineBreaks = 0;
-            // Output text with automatic or explicit line breaks
-            $cw = &$this->CurrentFont['cw'];
-            $txt = $item[1];
-            $w = $item[0];
-            $wmax = ($w - 2 * $this->cMargin) * 1000 / $this->FontSize;
-            $s = str_replace(
-                "\r",
-                '',
-                $txt
-            );
-            $nb = strlen($s);
-            if ($nb > 0 && $s[$nb - 1] == "\n")
-                $nb--;
-            $b = 0;
-            $sep = -1;
-            $i = 0;
-            $j = 0;
-            $l = 0;
-            $ns = 0;
-            $nl = 1;
-            while ($i < $nb) {
-                // Get next character
-                $c = $s[$i];
-                if ($c == ' ') {
-                    $sep = $i;
-                    $ls = $l;
-                    $ns++;
+        $dbeObjective->getRowsByAnswerID($questionnaireAnswerID);
+
+        $shouldPrintHeader = true;
+        while ($dbeObjective->fetchNext()) {
+            if (!empty($dbeObjective->getValue(\DBEStaffAppraisalObjectives::requirement)) ||
+                !empty($dbeObjective->getValue(\DBEStaffAppraisalObjectives::measure)) ||
+                !empty($dbeObjective->getValue(\DBEStaffAppraisalObjectives::comment))) {
+
+                // do I need to print the header?
+                $objectiveDescription = $dbeObjective->getValue(\DBEStaffAppraisalObjectives::requirement);
+                $objectiveMeasure = $dbeObjective->getValue(\DBEStaffAppraisalObjectives::measure);
+                $objectivesComment = $dbeObjective->getValue(\DBEStaffAppraisalObjectives::comment);
+
+                $widths = [
+                    [$this->objectiveDescriptionWidth, $objectiveDescription],
+                    [$this->objectiveMeasureWidth, $objectiveMeasure],
+                    [$this->objectiveCommentWidth, $objectivesComment]
+                ];
+                $pageAdded = false;
+                if ($this->newPageIfNeeded(
+                    $widths,
+                    $this->questionSeparation,
+                    $shouldPrintHeader
+                )) {
+                    $this->AddPage();
+                    $this->SetY($this->headerHeight);
+                    $pageAdded = true;
                 }
-                $l += $cw[$c];
-                if ($l > $wmax) {
-                    // Automatic line break
-                    if ($sep == -1) {
-                        if ($i == $j) {
-                            $i++;
-                        }
-                        if ($this->ws > 0) {
-                            $this->ws = 0;
-                            $this->_out('0 Tw');
-                        }
 
-                        $lineBreaks++;
-                    } else {
-                        $lineBreaks++;
-                        $i = $sep + 1;
-                    }
-                    $sep = -1;
-                    $j = $i;
-                    $l = 0;
-                    $ns = 0;
-                    $nl++;
-                } else
-                    $i++;
-            }
-            // Last chunk
-            if ($this->ws > 0) {
-                $this->ws = 0;
-                $this->_out('0 Tw');
-            }
+                if ($pageAdded || $shouldPrintHeader) {
+                    $this->renderObjectiveHeaders();
+                }
 
-            if ($lineBreaks > $maxLineBreaks) {
-                $maxLineBreaks = $lineBreaks;
+                $this->renderObjectiveLine(
+                    $objectiveDescription,
+                    $objectiveMeasure,
+                    $objectivesComment
+                );
+                $shouldPrintHeader = false;
             }
         }
-        return ($this->GetY(
-            ) + (($maxLineBreaks + 2) * $this->questionSeparation) + ($considerHeader ? 25 : 0) > $this->GetPageHeight(
-            ) - $this->footerHeight);
     }
 
     private function renderObjectiveHeaders()
@@ -801,53 +780,6 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
 
         for ($i = $lineBreaks + 2; $i > 0; $i--) {
             $this->Ln($this->questionSeparation);
-        }
-    }
-
-    private function renderObjectives($questionnaireAnswerID)
-    {
-        $dbeObjective = new \DBEStaffAppraisalObjectives($this);
-
-        $dbeObjective->getRowsByAnswerID($questionnaireAnswerID);
-
-        $shouldPrintHeader = true;
-        while ($dbeObjective->fetchNext()) {
-            if (!empty($dbeObjective->getValue(\DBEStaffAppraisalObjectives::requirement)) ||
-                !empty($dbeObjective->getValue(\DBEStaffAppraisalObjectives::measure)) ||
-                !empty($dbeObjective->getValue(\DBEStaffAppraisalObjectives::comment))) {
-
-                // do I need to print the header?
-                $objectiveDescription = $dbeObjective->getValue(\DBEStaffAppraisalObjectives::requirement);
-                $objectiveMeasure = $dbeObjective->getValue(\DBEStaffAppraisalObjectives::measure);
-                $objectivesComment = $dbeObjective->getValue(\DBEStaffAppraisalObjectives::comment);
-
-                $widths = [
-                    [$this->objectiveDescriptionWidth, $objectiveDescription],
-                    [$this->objectiveMeasureWidth, $objectiveMeasure],
-                    [$this->objectiveCommentWidth, $objectivesComment]
-                ];
-                $pageAdded = false;
-                if ($this->newPageIfNeeded(
-                    $widths,
-                    $this->questionSeparation,
-                    $shouldPrintHeader
-                )) {
-                    $this->AddPage();
-                    $this->SetY($this->headerHeight);
-                    $pageAdded = true;
-                }
-
-                if ($pageAdded || $shouldPrintHeader) {
-                    $this->renderObjectiveHeaders();
-                }
-
-                $this->renderObjectiveLine(
-                    $objectiveDescription,
-                    $objectiveMeasure,
-                    $objectivesComment
-                );
-                $shouldPrintHeader = false;
-            }
         }
     }
 
@@ -990,6 +922,75 @@ class StaffAppraisalPDF extends \setasign\Fpdi\Fpdi
         );
         for ($i = $lineBreaks; $i > 0; $i--) {
             $this->Ln($this->questionSeparation);
+        }
+    }
+
+    public function Header()
+    {
+        if ($this->hideHeader) {
+            return;
+        }
+        $this->Image(
+            $this->headerImage,
+            $this->GetPageWidth(
+            ) - ($this->headerImageWidth + $this->rightMargin + $this->headerImagePositionFromRightMargin),
+            $this->headerImagePositionFromTopEdge,
+            $this->headerImageWidth
+        );
+    }
+
+    public function Footer()
+    {
+        if ($this->hideFooter) {
+            return;
+        }
+        $this->Image(
+            $this->footerImage,
+            $this->leftMargin,
+            $this->GetPageHeight() - ($this->footerImageWidth * $this->footerImageRatio),
+            $this->footerImageWidth
+        );
+    }
+
+    /**
+     * MultiCell with alignment as in Cell.
+     * @param float $w
+     * @param float $h
+     * @param string $text
+     * @param mixed $border
+     * @param int $ln
+     * @param string $align
+     * @param boolean $fill
+     */
+    private function MultiAlignCell($w,
+                                    $h,
+                                    $text,
+                                    $border = 0,
+                                    $ln = 0,
+                                    $align = 'L',
+                                    $fill = false
+    )
+    {
+        // Store reset values for (x,y) positions
+        $x = $this->GetX() + $w;
+        $y = $this->GetY();
+
+        // Make a call to FPDF's MultiCell
+        $this->MultiCell(
+            $w,
+            $h,
+            $text,
+            $border,
+            $align,
+            $fill
+        );
+
+        // Reset the line position to the right, like in Cell
+        if ($ln == 0) {
+            $this->SetXY(
+                $x,
+                $y
+            );
         }
     }
 

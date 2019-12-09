@@ -5,7 +5,7 @@
  * Date: 22/11/2018
  * Time: 15:25
  */
-
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBEStaffAppraisalObjectives extends DBCNCEntity
@@ -113,7 +113,9 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
         // descendent class.
 
         $this->setYNFlags();
+
         if ($this->getQueryString() == "") {
+
             $this->setQueryString(
                 "INSERT INTO " . $this->getTableName() .
                 "(" .
@@ -137,12 +139,13 @@ class DBEStaffAppraisalObjectives extends DBCNCEntity
     function getUpdateString()
     {
         $colString = "";
+
         for ($ixCol = 0; $ixCol < $this->colCount(); $ixCol++) {
             // exclude primary key columns
             if (($this->getName($ixCol) != self::questionnaireAnswerID) && ($this->getName($ixCol) != self::id)) {
                 if ($colString != "") $colString = $colString . ",";
                 $colString = $colString . $this->getDBColumnName($ixCol) . "=" .
-                    $this->prepareForSQL($this->getValue($ixCol));
+                    $this->prepareForSQL($ixCol);
             }
         }
         return $colString;
