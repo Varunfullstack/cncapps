@@ -178,7 +178,8 @@ class DBEJRenDomain extends DBECustomerItem
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 			WHERE
-				 CURDATE() >= ( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + 1 MONTH ) )
+					DATE_FORMAT( DATE_ADD( CURDATE(), INTERVAL 1 MONTH ), '%Y%m' ) >=
+				DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%Y%m' )
 			 	AND declinedFlag = 'N'
         AND renewalTypeID = 4 and directDebitFlag <> 'Y' and item.itm_itemtypeno <> 57";
         $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";

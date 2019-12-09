@@ -199,7 +199,7 @@ class DBEJRenContract extends DBECustomerItem
   ),
   DATE_ADD(
     `installationDate`,
-    INTERVAL `totalInvoiceMonths` + `invoicePeriodMonths` MONTH + 1 MONTH
+    INTERVAL `totalInvoiceMonths` + 1 MONTH 
   ),
   DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` - 1 MONTH )
   )
