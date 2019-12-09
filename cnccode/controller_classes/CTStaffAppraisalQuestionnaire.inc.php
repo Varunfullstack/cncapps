@@ -237,7 +237,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
             $dbeObjective = new DBEStaffAppraisalObjectives($this);
 
-            for ($i = 1; $i < 5; $i++) {
+            for ($i = 0; $i < 4; $i++) {
 
                 $dbeObjective->setValue(
                     DBEStaffAppraisalObjectives::id,
@@ -347,7 +347,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $this->template->set_var(
                 array(
                     "id"        => $dbeObjective->getValue(DBEStaffAppraisalObjectives::id),
-                    "number"    => $dbeObjective->getValue(DBEStaffAppraisalObjectives::id) + 1,
+                    "number"    => $dbeObjective->getValue(DBEStaffAppraisalObjectives::id),
                     "objective" => $dbeObjective->getValue(DBEStaffAppraisalObjectives::requirement),
                     "measure"   => $dbeObjective->getValue(DBEStaffAppraisalObjectives::measure),
                     "comment"   => $dbeObjective->getValue(DBEStaffAppraisalObjectives::comment)
@@ -974,7 +974,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
             $dbeObjective = new DBEStaffAppraisalObjectives($this);
 
-            for ($i = 1; $i < 5; $i++) {
+            for ($i = 0; $i < 4; $i++) {
                 $dbeObjective->setValue(
                     DBEStaffAppraisalObjectives::id,
                     $i
@@ -1057,7 +1057,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             (new DateTime())->format(COMMON_MYSQL_DATETIME)
         );
         $dbeQuestionnaire->updateRow();
-        exit;
         return $this->showManagerQuestionnaireList();
     }
 
@@ -1735,11 +1734,11 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $currentObjective = $objectives[$objectiveID];
 
             $updateObjective = new DBEStaffAppraisalObjectives($this);
+            $updateObjective->setValue(DBEStaffAppraisalObjectives::id, $objectiveID);
             $updateObjective->setValue(
                 DBEStaffAppraisalObjectives::questionnaireAnswerID,
                 $questionnaireAnswerID
             );
-            $updateObjective->getRow($objectiveID);
             $updateObjective->setValue(
                 DBEStaffAppraisalObjectives::comment,
                 $currentObjective['comment']

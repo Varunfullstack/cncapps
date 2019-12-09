@@ -21,4 +21,21 @@
             delete from answertype where ant_answertypeno = 6
         </rollback>
     </changeSet>
+    <changeSet id="hotfix-v3.8.2-2" author="pavilionweb">
+        <sql>
+            UPDATE db_sequence
+            SET nextid = (SELECT MAX(staffappraisalquestion.`id`) FROM staffappraisalquestion)
+            WHERE db_sequence.`seq_name` = "staffappraisalquestion";
+            UPDATE db_sequence
+            SET nextid = (SELECT MAX(staffappraisalquestionanswer.answerID) FROM staffappraisalquestionanswer)
+            WHERE db_sequence.`seq_name` = "staffappraisalquestionanswer";
+            UPDATE db_sequence
+            SET nextid = (SELECT MAX(staffappraisalquestionnaire.`id`) FROM staffappraisalquestionnaire)
+            WHERE db_sequence.`seq_name` = "staffappraisalquestionnaire";
+            UPDATE db_sequence
+            SET nextid = (SELECT MAX(staffappraisalquestionnaireanswer.`id`) FROM staffappraisalquestionnaireanswer)
+            WHERE db_sequence.`seq_name` = "staffappraisalquestionnaireanswer";
+        </sql>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>
