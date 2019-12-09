@@ -52,8 +52,8 @@ BEGIN
         IF (
                 dayOfTheWeek <> 1
                 AND dayOfTheWeek <> 7
-                AND NOT isBankHoliday(currentDate)
                 and currentStartTime < closeBusinessHour
+                AND NOT isBankHoliday(currentDate)
             )
         THEN
             IF (
