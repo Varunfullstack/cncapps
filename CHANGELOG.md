@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-### [v3.8.2] - 2019-12-09
+## [v3.8.2] - 2019-12-09
 ### Fixed
 - The Renewal Report PDF has some incorrect values
 - Create Renewal Sales Orders tweak
