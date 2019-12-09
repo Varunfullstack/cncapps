@@ -13,6 +13,7 @@ use Signable\DocumentWithoutTemplate;
 use Signable\Envelopes;
 use Signable\Party;
 
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUStaffAppraisalQuestionnaire.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -1320,6 +1321,24 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 break;
             case 5:
                 $possibleResponses = [0, 1, 2, 3, 4, 5, 6, 7];
+                $dbeQuestionType = new DBEAnswerType($this);
+                $dbeQuestionType->getRow($questionType);
+
+                $answerOptionsString = $dbeQuestionType->getValue(DBEAnswerType::answerOptions);
+
+                $answerOptions = json_decode($answerOptionsString);
+                $question = $this->renderMultipleChoiceQuestion(
+                    $questionDescription,
+                    $possibleResponses,
+                    $dbeQuestionAnswer,
+                    $questionID,
+                    $isRequired,
+                    $isManager,
+                    $answerOptions
+                );
+                break;
+            case 6:
+                $possibleResponses = [0, 1, 2, 3];
                 $dbeQuestionType = new DBEAnswerType($this);
                 $dbeQuestionType->getRow($questionType);
 

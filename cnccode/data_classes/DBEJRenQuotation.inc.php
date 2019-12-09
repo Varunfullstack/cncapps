@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class DBEJRenQuotation extends DBECustomerItem
@@ -219,7 +220,7 @@ class DBEJRenQuotation extends DBECustomerItem
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 			JOIN renQuotationType ON  renQuotationType.renQuotationTypeID = custitem.renQuotationTypeID
 			WHERE
-        CURDATE() >= ( DATE_ADD(`startDate`, INTERVAL 11 MONTH) )
+        CURDATE() >= ( DATE_ADD(`startDate`, INTERVAL 13 MONTH) )
 			  AND dateGenerated IS NULL
 		    AND declinedFlag = 'N'
         AND renewalTypeID = 3 and directDebitFlag <> 'Y' and item.itm_itemtypeno <> 57";

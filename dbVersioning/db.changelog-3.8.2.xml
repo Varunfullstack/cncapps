@@ -1,0 +1,24 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="hotfix-v3.8.2-0">
+        <tagDatabase tag="hotfix-v3.8.2"/>
+    </changeSet>
+    <changeSet id="hotfix-v3.8.2-1" author="pavilionweb">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select count(*) from answertype where ant_answertypeno = 6
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            insert into answertype
+            values (6, "Rating on a scale of 1 to 4",
+                    '["N/A","Needs a lot of improvement","Some improvement needed","Better than required","Not possible to improve"]',
+                    1)
+        </sql>
+        <rollback>
+            delete from answertype where ant_answertypeno = 6
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

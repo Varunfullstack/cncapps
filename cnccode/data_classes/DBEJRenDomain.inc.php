@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class DBEJRenDomain extends DBECustomerItem
@@ -177,8 +178,7 @@ class DBEJRenDomain extends DBECustomerItem
 			JOIN customer ON  cus_custno = cui_custno
       JOIN address ON  add_custno = cui_custno AND add_siteno = cui_siteno
 			WHERE
-				DATE_FORMAT( DATE_ADD( CURDATE(), INTERVAL 1 MONTH ), '%Y%m' ) >=
-				DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%Y%m' )
+				 CURDATE() >= ( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` + 1 MONTH ) )
 			 	AND declinedFlag = 'N'
         AND renewalTypeID = 4 and directDebitFlag <> 'Y' and item.itm_itemtypeno <> 57";
         $statement .= " ORDER BY cui_custno, autoGenerateContractInvoice asc";

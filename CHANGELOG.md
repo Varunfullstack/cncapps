@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+### [v3.8.2]
+### Fixed
+- The Renewal Report PDF has some incorrect values
+- Create Renewal Sales Orders tweak
+
+
 ## [v3.8.1] - 2019-12-04
 ### Fixed
 - Creating a new Service Request from the new Create Sales order, it's putting in the value $internalNotes.
