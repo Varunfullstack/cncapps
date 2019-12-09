@@ -13,6 +13,7 @@ use Signable\DocumentWithoutTemplate;
 use Signable\Envelopes;
 use Signable\Party;
 
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUStaffAppraisalQuestionnaire.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -152,646 +153,524 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         }
     }
 
-    /**
-     * Display list of questionnaires
-     * @access private
-     * @throws Exception
-     */
-    function displayList()
-    {
-
-        if (!self::isAppraiser()) {
-            Header("Location: /NotAllowed.php");
-            exit;
-        }
-        $this->setMethodName('displayList');
-        $this->setPageTitle('Questionnaires');
-        $this->setTemplateFiles(
-            array('QuestionnaireList' => 'StaffAppraisalQuestionnaireList.inc')
-        );
-        $dsQuestionnaire = new DataSet($this);
-        $this->buQuestionnaire->getAll($dsQuestionnaire);
-
-        $urlCreate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'create'
-                )
-            );
-
-        $this->template->set_var(
-            array('urlCreate' => $urlCreate)
-        );
-
-        if ($dsQuestionnaire->rowCount() > 0) {
-
-            $this->template->set_block(
-                'QuestionnaireList',
-                'QuestionnaireBlock',
-                'rows'
-            );
-
-            while ($dsQuestionnaire->fetchNext()) {
-
-                $questionnaireID = $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::id);
-
-                $urlDisplayQuestionList =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'          => 'displayQuestionList',
-                            'questionnaireID' => $questionnaireID
-                        )
-                    );
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'          => 'edit',
-                            'questionnaireID' => $questionnaireID
-                        )
-                    );
-                $txtEdit = '[edit]';
-
-                $sendURL = Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    [
-                        'action'          => 'sendQuestionnaire',
-                        'questionnaireID' => $questionnaireID
-                    ]
-                );
-                $sendLink = "<a href='$sendURL'>[Send To Staff members]</a>";
-                $dateSent = $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::dateSent);
-                if ($dateSent) {
-                    $sendLink = "";
-                }
-
-                $urlDelete = null;
-                $txtDelete = null;
-                if ($this->buQuestionnaire->canDeleteQuestionnaire($questionnaireID)) {
-                    $urlDelete =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'          => 'delete',
-                                'questionnaireID' => $questionnaireID
-                            )
-                        );
-                    $txtDelete = '[delete]';
-                }
-
-                $this->template->set_var(
-                    array(
-                        'questionnaireID'        => $questionnaireID,
-                        'description'            => Controller::htmlDisplayText(
-                            $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::description)
-                        ),
-                        'urlEdit'                => $urlEdit,
-                        'urlDisplayQuestionList' => $urlDisplayQuestionList,
-                        'urlDelete'              => $urlDelete,
-                        'txtEdit'                => $txtEdit,
-                        'txtDelete'              => $txtDelete,
-                        'sendLink'               => $sendLink
-                    )
-                );
-
-                $this->template->parse(
-                    'rows',
-                    'QuestionnaireBlock',
-                    true
-                );
-
-            }//while $dsQuestionnaire->fetchNext()
-
-        }
-
-        $sendURL = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            [
-                'action' => 'sendQuestionnaire',
-            ]
-        );
-
-        $this->template->setVar(
-            ["sendQuestionnaireURL" => $sendURL]
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'QuestionnaireList',
-            true
-        );
-        $this->parsePage();
-    }
-
-    /**
-     * Edit/Add Further Action
-     * @access private
-     * @throws Exception
-     */
-    function edit()
-    {
-        $this->setMethodName('edit');
-        $dsQuestionnaire = &$this->dsQuestionnaire; // ref to class var
-
-        if (!$this->getFormError()) {
-            if ($this->getAction() == 'edit') {
-                $this->buQuestionnaire->getQuestionnaireByID(
-                    $this->getParam('questionnaireID'),
-                    $dsQuestionnaire
-                );
-                $questionnaireID = $this->getParam('questionnaireID');
-            } else {                                                                    // creating new
-                $dsQuestionnaire->initialise();
-                $dsQuestionnaire->setValue(
-                    DBEStaffAppraisalQuestionnaire::id,
-                    '0'
-                );
-                $questionnaireID = '0';
-            }
-        } else {                                                                        // form validation error
-            $dsQuestionnaire->initialise();
-            $dsQuestionnaire->fetchNext();
-            $questionnaireID = $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::id);
-        }
-        $urlDelete = null;
-        $txtDelete = null;
-        if ($this->getAction() == 'edit' && $this->buQuestionnaire->canDeleteQuestionnaire(
-                $this->getParam('questionnaireID')
-            )) {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'          => 'delete',
-                        'questionnaireID' => $questionnaireID
-                    )
-                );
-            $txtDelete = 'Delete';
-        }
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'          => 'update',
-                    'questionnaireID' => $questionnaireID
-                )
-            );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'displayList'
-                )
-            );
-        $this->setPageTitle('Edit Questionnaire');
-        $this->setTemplateFiles(
-            array('QuestionnaireEdit' => 'StaffAppraisalQuestionnaireEdit.inc')
-        );
-        $this->template->set_var(
-            array(
-                'id'                 => $questionnaireID,
-                'description'        => Controller::htmlInputText(
-                    $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::description)
-                ),
-                'descriptionMessage' => Controller::htmlDisplayText(
-                    $dsQuestionnaire->getMessage(DBEStaffAppraisalQuestionnaire::description)
-                ),
-                //                'intro'               => Controller::htmlInputText($dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::intro)),
-                //                'introMessage'        => Controller::htmlDisplayText($dsQuestionnaire->getMessage(DBEStaffAppraisalQuestionnaire::intro)),
-                //                'thankYou'            => Controller::htmlInputText($dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::thankYou)),
-                //                'thankYouMessage'     => Controller::htmlDisplayText($dsQuestionnaire->getMessage(DBEStaffAppraisalQuestionnaire::thankYou)),
-                //                'rating1Desc'         => Controller::htmlInputText($dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::rating1Desc)),
-                //                'rating1DescMessage'  => Controller::htmlDisplayText($dsQuestionnaire->getMessage(DBEStaffAppraisalQuestionnaire::rating1Desc)),
-                //                'rating5Desc'         => Controller::htmlInputText($dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::rating5Desc)),
-                //                'rating5DescMessage'  => Controller::htmlDisplayText($dsQuestionnaire->getMessage(DBEStaffAppraisalQuestionnaire::rating5Desc)),
-                //                'nameRequiredChecked' => Controller::htmlChecked($dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::nameRequired)),
-                //                'nameRequiredMessage' => Controller::htmlDisplayText($dsQuestionnaire->getMessage(DBEStaffAppraisalQuestionnaire::nameRequired)),
-                'urlUpdate'          => $urlUpdate,
-                'urlDelete'          => $urlDelete,
-                'txtDelete'          => $txtDelete,
-                'urlDisplayList'     => $urlDisplayList
-            )
-        );
-        $this->template->parse(
-            'CONTENTS',
-            'QuestionnaireEdit',
-            true
-        );
-        $this->parsePage();
-    }// end function editFurther Action()
-
-    /**
-     * Update call Further Action details
-     * @access private
-     * @throws Exception
-     */
-    function update()
-    {
-        $this->setMethodName('update');
-        $this->formError = (!$this->dsQuestionnaire->populateFromArray($this->getParam('questionnaire')));
-        if ($this->formError) {
-            if ($this->dsQuestionnaire->getValue(
-                DBEStaffAppraisalQuestionnaire::id
-            )) {                    // attempt to insert
-                $this->setAction('edit');
-            } else {
-                $this->setAction('create');
-            }
-            $this->edit();
-            exit;
-        }
-
-        $this->buQuestionnaire->updateQuestionnaire($this->dsQuestionnaire);
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'questionnaireID' => $this->dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::id),
-                    'action'          => 'view'
-                )
-            );
-        header('Location: ' . $urlNext);
-    }
-
-    /**
-     * Delete Questionnaire
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function delete()
-    {
-        $this->setMethodName('delete');
-        if (!$this->buQuestionnaire->deleteQuestionnaire($this->getParam('questionnaireID'))) {
-            $this->displayFatalError('Cannot delete this row');
-            exit;
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'displayList'
-                    )
-                );
-            header('Location: ' . $urlNext);
-            exit;
-        }
-    }
-
-    /**
-     * Display list of questions
-     * @access private
-     * @throws Exception
-     */
-    function displayQuestions()
-    {
-        $this->setMethodName('displayQuestions');
-        $this->setTemplateFiles(
-            array('QuestionList' => 'StaffAppraisalQuestionList.inc')
-        );
-        $dsQuestion = new DataSet($this);
-        $this->buQuestionnaire->getAllQuestions(
-            $this->getParam('questionnaireID'),
-            $dsQuestion
-        );
-        $dsQuestionnaire = new DataSet($this);
-        $this->buQuestionnaire->getQuestionnaireByID(
-            $dsQuestion->getValue(DBEStaffAppraisalQuestion::questionnaireID),
-            $dsQuestionnaire
-        );
-
-        $this->setPageTitle($dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::description));
-
-        $urlCreate = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action'          => 'createQuestion',
-                'questionnaireID' => $this->getParam('questionnaireID')
-
-            )
-        );
-
-        $urlReturnToQuestionnaireList = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            []
-        );
-
-        $this->template->set_var(
-            [
-                'urlCreate'                    => $urlCreate,
-                'urlReturnToQuestionnaireList' => $urlReturnToQuestionnaireList
-            ]
-        );
-
-        if ($dsQuestion->rowCount() > 0) {
-
-            $this->template->set_block(
-                'QuestionList',
-                'QuestionBlock',
-                'rows'
-            );
-
-            while ($dsQuestion->fetchNext()) {
-
-                $questionID = $dsQuestion->getValue(DBEStaffAppraisalQuestion::id);
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => 'editQuestion',
-                            'questionID' => $questionID
-                        )
-                    );
-                $txtEdit = '[edit]';
-
-                $urlDelete = null;
-                $txtDelete = null;
-                if ($this->buQuestionnaire->canDeleteQuestionnaire($questionID)) {
-                    $urlDelete =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'     => 'delete',
-                                'questionID' => $questionID
-                            )
-                        );
-                    $txtDelete = '[delete]';
-                }
-                $this->template->set_var(
-                    array(
-                        'questionID'               => $questionID,
-                        'description'              => Controller::htmlDisplayText(
-                            $dsQuestion->getValue(DBEStaffAppraisalQuestion::description)
-                        ),
-                        'answerType'               => Controller::htmlDisplayText(
-                            $dsQuestion->getValue(DBEJStaffAppraisalQuestion::answerTypeName)
-                        ),
-                        'orderSequence'            => Controller::htmlDisplayText(
-                            $dsQuestion->getValue(DBEStaffAppraisalQuestion::orderSequence)
-                        ),
-                        'activeFlag'               => Controller::htmlDisplayText(
-                            $dsQuestion->getValue(DBEStaffAppraisalQuestion::activeFlag)
-                        ),
-                        'questionnaireDescription' => Controller::htmlDisplayText(
-                            $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::description)
-                        ),
-                        'urlEdit'                  => $urlEdit,
-                        'urlDelete'                => $urlDelete,
-                        'txtEdit'                  => $txtEdit,
-                        'txtDelete'                => $txtDelete,
-
-                    )
-                );
-
-                $this->template->parse(
-                    'rows',
-                    'QuestionBlock',
-                    true
-                );
-
-            }//while $dsQuestion->fetchNext()
-        }
-        $this->template->parse(
-            'CONTENTS',
-            'QuestionList',
-            true
-        );
-        $this->parsePage();
-    }
-
-    /**
-     * Edit/Add Further Action
-     * @access private
-     * @throws Exception
-     */
-    function editQuestion()
-    {
-        $this->setMethodName('editQuestion');
-        $dsQuestion = &$this->dsQuestion; // ref to class var
-
-        if (!$this->getFormError()) {
-            if ($this->getAction() == 'editQuestion') {
-                $this->buQuestionnaire->getQuestionByID(
-                    $this->getParam('questionID'),
-                    $dsQuestion
-                );
-                $questionID = $this->getParam('questionID');
-            } else {                                  // creating new
-                $dsQuestion->initialise();
-                $dsQuestion->setValue(
-                    DBEStaffAppraisalQuestion::id,
-                    '0'
-                );
-                $dsQuestion->setValue(
-                    DBEStaffAppraisalQuestion::questionnaireID,
-                    $this->getParam('questionnaireID')
-                );
-                $questionID = '0';
-            }
-        } else {                                    // form validation error
-            $dsQuestion->initialise();
-            $dsQuestion->fetchNext();
-            $questionID = $dsQuestion->getValue(DBEStaffAppraisalQuestion::id);
-        }
-        $urlDelete = null;
-        $txtDelete = null;
-        if (
-            $this->getAction() == 'editQuestion' &&
-            $this->buQuestionnaire->canDeleteQuestionnaire($this->getParam('questionID'))
-        ) {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'     => 'deleteQuestion',
-                        'questionID' => $questionID
-                    )
-                );
-            $txtDelete = 'Delete';
-        }
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => 'updateQuestion',
-                    'questionID' => $questionID
-                )
-            );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'          => 'displayQuestionList',
-                    'questionnaireID' => $dsQuestion->getValue(DBEStaffAppraisalQuestion::questionnaireID)
-                )
-            );
-        $this->setPageTitle('Edit Question');
-        $this->setTemplateFiles(
-            array('QuestionEdit' => 'StaffAppraisalQuestionEdit.inc')
-        );
-        $this->template->set_var(
-            array(
-                'questionID'           => $questionID,
-                'questionnaireID'      => $dsQuestion->getValue(DBEStaffAppraisalQuestion::questionnaireID),
-                'orderSequence'        => Controller::htmlInputText(
-                    $dsQuestion->getValue(DBEStaffAppraisalQuestion::orderSequence)
-                ),
-                'orderSequenceMessage' => Controller::htmlDisplayText(
-                    $dsQuestion->getMessage(DBEStaffAppraisalQuestion::orderSequence)
-                ),
-                'description'          => Controller::htmlInputText(
-                    $dsQuestion->getValue(DBEStaffAppraisalQuestion::description)
-                ),
-                'descriptionMessage'   => Controller::htmlDisplayText(
-                    $dsQuestion->getMessage(DBEStaffAppraisalQuestion::description)
-                ),
-                'activeFlagChecked'    => $dsQuestion->getValue(
-                    DBEStaffAppraisalQuestion::activeFlag
-                ) == 'Y' ? 'CHECKED' : null,
-                'activeFlagMessage'    => Controller::htmlDisplayText(
-                    $dsQuestion->getMessage(DBEStaffAppraisalQuestion::activeFlag)
-                ),
-                'requiredFlagChecked'  => $dsQuestion->getValue(
-                    DBEStaffAppraisalQuestion::requiredFlag
-                ) == 'Y' ? 'CHECKED' : null,
-                'requiredFlagMessage'  => Controller::htmlDisplayText(
-                    $dsQuestion->getMessage(DBEStaffAppraisalQuestion::requiredFlag)
-                ),
-                'urlUpdate'            => $urlUpdate,
-                'urlDelete'            => $urlDelete,
-                'txtDelete'            => $txtDelete,
-                'urlDisplayList'       => $urlDisplayList
-            )
-        );
-        /*
-        Answer types
-        */
-        $this->answerTypeDropdown($dsQuestion->getValue(DBEStaffAppraisalQuestion::answerTypeID));
-
-        $this->template->parse(
-            'CONTENTS',
-            'QuestionEdit',
-            true
-        );
-        $this->parsePage();
-    }// end function editQuestion Action()
-
-    function answerTypeDropdown(
-        $answerTypeID,
-        $templateName = 'QuestionEdit',
-        $blockName = 'answerTypeBlock'
+    private function getPDFQuestionnaire($questionnaireAnswerID,
+                                         $passPhrase
     )
     {
-        // Display list of answerTypes that are current at given activity date
-        $this->buQuestionnaire->dbeAnswerType->getRows();
 
-        $this->template->set_block(
-            $templateName,
-            $blockName,
-            'answerTypes'
+        $questionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
+        $questionnaireAnswer->getRow($questionnaireAnswerID);
+
+
+        $mainPDF = new CNCLTD\StaffAppraisalPDF(
+            $questionnaireAnswer,
+            $passPhrase
         );
 
-        while ($this->buQuestionnaire->dbeAnswerType->fetchNext()) {
+        $fileName = PDF_TEMP_DIR . '/test.pdf';
+        $mainPDF->Output(
+            'F',
+            $fileName,
+            true
+        );
 
-            $answerTypeSelected = ($this->buQuestionnaire->dbeAnswerType->getValue(
-                    DBEAnswerType::answerTypeID
-                ) == $answerTypeID) ? CT_SELECTED : null;
-
-            $shouldBeConfig = (int)$this->buQuestionnaire->dbeAnswerType->getValue(
-                DBEAnswerType::needsOptions
-            );
-
-            $isConfigured = $this->buQuestionnaire->dbeAnswerType->getValue(DBEAnswerType::answerOptions);
-
-            $configFailed = $shouldBeConfig && !$isConfigured;
-
-            $this->template->set_var(
-                array(
-                    'answerTypeID'          => $this->buQuestionnaire->dbeAnswerType->getValue(
-                        DBEAnswerType::answerTypeID
-                    ),
-                    'answerTypeDescription' => $this->buQuestionnaire->dbeAnswerType->getValue(
-                            DBEAnswerType::description
-                        ) . ($configFailed ? ' (Needs configuration)' : null)
-                    ,
-                    'answerTypeSelected'    => $answerTypeSelected,
-                    'disabled'              => $configFailed ? 'disabled' : null
-                )
-            );
-
-            $this->template->parse(
-                'answerTypes',
-                $blockName,
-                true
-            );
-
-
-        }
-
-    }// end questionTypeDropdown
-
-    /**
-     * Update details
-     * @access private
-     * @throws Exception
-     */
-    function updateQuestion()
-    {
-        $this->setMethodName('updateQuestion');
-        $this->formError = (!$this->dsQuestion->populateFromArray($this->getParam('question')));
-        if ($this->formError) {
-            if ($this->dsQuestion->getValue(DBEStaffAppraisalQuestion::id) == null) {          // attempt to insert
-                $this->setAction('editQuestion');
-            } else {
-                $this->setAction('createQuestion');
-            }
-            $this->edit();
-            exit;
-        }
-
-        $this->buQuestionnaire->updateQuestion($this->dsQuestion);
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'questionnaireID' => $this->dsQuestion->getValue(DBEStaffAppraisalQuestion::questionnaireID),
-                    'action'          => 'displayQuestionList'
-                )
-            );
-        header('Location: ' . $urlNext);
+        return $fileName;
     }
 
     /**
-     * Delete Question
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
+     * @param $questionnaireID
      * @throws Exception
      */
-    function deleteQuestion()
+    private function showEmployeeAnswer($questionnaireID)
     {
-        $this->setMethodName('deleteQuestion');
-        if (!$this->buQuestionnaire->deleteQuestion($this->getParam('questionID'))) {
-            $this->displayFatalError('Cannot delete this row');
+
+        if (!$questionnaireID) {
+            $this->displayFatalError('Questionnaire ID is missing');
             exit;
-        } else {
-            $urlNext =
-                Controller::buildLink(
+        }
+
+        //check if the questionnaire exists...
+        $dbeQuestionnaire = new DBEStaffAppraisalQuestionnaire($this);
+
+        $dbeQuestionnaire->getRow($questionnaireID);
+
+        if (!$dbeQuestionnaire->rowCount()) {
+            $this->displayFatalError('The questionnaire does not exist');
+            exit;
+        }
+
+        $this->setPageTitle($dbeQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::description));
+
+        // we first need to know if there's a questionnaire answer for this questionnaire ID and user
+        $dbeQuestionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
+        $staffID = $this->userID;
+        $dbeQuestionnaireAnswer->getRowByQuestionnaireAndStaff(
+            $questionnaireID,
+            $staffID
+        );
+        $managerID = $this->dbeUser->getValue(DBEUser::managerID);
+        if (!$managerID) {
+            $this->displayFatalError('The logged in user does not have a valid manager assigned');
+            exit;
+        }
+
+        if (!$dbeQuestionnaireAnswer->rowCount()) {
+            // we need to create it as there's none
+            $dbeQuestionnaireAnswer->setValue(
+                DBEStaffAppraisalQuestionnaireAnswer::staffMemberID,
+                $staffID
+            );
+            $dbeQuestionnaireAnswer->setValue(
+                DBEStaffAppraisalQuestionnaireAnswer::questionnaireID,
+                $questionnaireID
+            );
+
+            $dbeQuestionnaireAnswer->setValue(
+                DBEStaffAppraisalQuestionnaireAnswer::managerID,
+                $managerID
+            );
+
+            $dbeQuestionnaireAnswer->insertRow();
+            $questionnaireAnswerID = $dbeQuestionnaireAnswer->getPKValue();
+
+            // we have to create the 4 Objectives
+
+            $dbeObjective = new DBEStaffAppraisalObjectives($this);
+
+            for ($i = 0; $i < 4; $i++) {
+
+                $dbeObjective->setValue(
+                    DBEStaffAppraisalObjectives::id,
+                    $i
+                );
+                $dbeObjective->setValue(
+                    DBEStaffAppraisalObjectives::questionnaireAnswerID,
+                    $questionnaireAnswerID
+                );
+                $dbeObjective->insertRow();
+            }
+        }
+
+
+        //here we should have a valid and populated questionnaire answer :D
+        $this->setTemplateFiles(
+            array('StaffAppraisalEmployeeView' => 'StaffAppraisalEmployeeView')
+        );
+        $questionnaireAnswerID = $dbeQuestionnaireAnswer->getPKValue();
+        $managerID = $dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::managerID);
+
+        $dbeManager = new DBEUser($this);
+        $dbeManager->getRow($managerID);
+
+        $this->template->setVar(
+            [
+                "employeeName"             => $this->dbeUser->getValue(
+                        DBEUser::firstName
+                    ) . ' ' . $this->dbeUser->getValue(
+                        DBEUser::lastName
+                    ),
+                "managerName"              => $dbeManager->getValue(DBEUser::firstName) . ' ' . $dbeManager->getValue(
+                        DBEUser::lastName
+                    ),
+                "employeeStartDate"        => $this->dbeUser->getValue(DBEUser::startDate),
+                "employeePosition"         => $this->dbeUser->getValue(
+                    DBEUser::jobTitle
+                ),
+                "displayManager"           => "style='display: none'",
+                "completeQuestionnaireURL" => Controller::buildLink(
                     $_SERVER['PHP_SELF'],
                     array(
-                        'action' => 'displayQuestionList'
+                        'action' => 'completeQuestionnaire'
                     )
-                );
-            header('Location: ' . $urlNext);
-            exit;
+                ),
+                "completePerson"           => "staffMember"
+            ]
+        );
+
+        $dbeQuestions = new DBEStaffAppraisalQuestion($this);
+
+        $dbeQuestions->getRowsForQuestionnaire($questionnaireID);
+
+
+        $previousQuestionType = null;
+        $questionsBody = "";
+        while ($dbeQuestions->fetchNext()) {
+            $currentQuestionType = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID);
+
+            if ($previousQuestionType != $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID)) {
+                // depending on what was the previous question we need to finish it
+                $questionsBody .= $this->getQuestionFinish($previousQuestionType);
+
+                // now we look at the current question type..to see if we need a header or not
+                $questionsBody .= $this->getQuestionHeader($currentQuestionType);
+            }
+
+            // now we render the actual question
+            $questionsBody .= $this->renderQuestion(
+                $dbeQuestions,
+                $questionnaireAnswerID
+            );
+
+            $previousQuestionType = $currentQuestionType;
         }
+
+        //we have to finish off the last question
+        $questionsBody .= $this->getQuestionFinish($previousQuestionType);
+
+        $this->template->setVar(
+            [
+                "questions"                => $questionsBody,
+                "autoSaveQuestionnaireURL" => Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'autoSave'
+                    )
+                ),
+                "questionnaireAnswerID"    => $questionnaireAnswerID
+            ]
+        );
+
+
+        // render objectives
+
+        $this->template->set_block(
+            "StaffAppraisalEmployeeView",
+            "objectivesBlock",
+            'objectives'
+        );
+
+        $dbeObjective = new DBEStaffAppraisalObjectives($this);
+
+        $dbeObjective->getRowsByAnswerID($questionnaireAnswerID);
+
+        while ($dbeObjective->fetchNext()) {
+            $this->template->set_var(
+                array(
+                    "id"        => $dbeObjective->getValue(DBEStaffAppraisalObjectives::id),
+                    "number"    => $dbeObjective->getValue(DBEStaffAppraisalObjectives::id),
+                    "objective" => $dbeObjective->getValue(DBEStaffAppraisalObjectives::requirement),
+                    "measure"   => $dbeObjective->getValue(DBEStaffAppraisalObjectives::measure),
+                    "comment"   => $dbeObjective->getValue(DBEStaffAppraisalObjectives::comment)
+                )
+            );
+            $this->template->parse(
+                'objectives',
+                "objectivesBlock",
+                true
+            );
+        }
+
+
+        $this->template->parse(
+            'CONTENTS',
+            'StaffAppraisalEmployeeView',
+            true
+        );
+        $this->parsePage();
+
+    }// end function editFurther Action()
+
+    private function getQuestionFinish($questionType,
+                                       $isManager = false
+    )
+    {
+        $questionFinish = "";
+        switch ($questionType) {
+            case 2: // yes/no
+            case 5: // 1 to 7
+            case 6: // 1 to 4
+            case 1: // 1 to 5
+                // we would need to close the table
+                $questionFinish = '</tbody></table>';
+                break;
+            case 3:
+            case 4:
+                $questionFinish = "<br>";
+                if ($isManager) {
+                    $questionFinish = '</tbody></table>';
+                }
+                break;
+        }
+
+        // we would need to put a break
+        $questionFinish .= "<br>";
+        return $questionFinish;
     }
+
+    private function getQuestionHeader($questionType,
+                                       $isManager = false
+    )
+    {
+        $header = "";
+        switch ($questionType) {
+            case 3:
+            case 4:
+                if ($isManager) {
+                    $header = "<table>
+                                <thead>
+                                <tr>
+                                    <th>Question</th>
+                                    <th>Staff Answer</th>
+                                    <th>Manager Answer</th>
+                                </tr>
+                                </thead>
+                                <tbody>";
+                }
+                break;
+            case 2 : // yes/no answerType
+                $header = "<table>
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    " . ($isManager ? "<th>Staff Answer</th>" : null) . "
+                                    <th>N/A</th>
+                                    <th>Yes</th>
+                                    <th>No</th>
+                                    " . ($isManager ? "<th>Manager Comment</th>" : null) . "
+                                    </tr>
+                                </thead>
+                            <tbody>";
+                break;
+            case 6:
+                // for this we need to pull the config
+                $dbeQuestionType = new DBEAnswerType($this);
+                $dbeQuestionType->getRow($questionType);
+
+                $answerOptionsString = $dbeQuestionType->getValue(DBEAnswerType::answerOptions);
+
+                $answerOptions = json_decode($answerOptionsString);
+
+                $header = "<table class='1To4Question'>
+                                <thead>
+                                    <tr>
+                                    <td></td>" . ($isManager ? "<th>Staff Answer</th>" : null);
+
+                foreach ($answerOptions as $key => $option) {
+                    $header .= "<th>$option</th>";
+                }
+
+                if ($isManager) {
+                    $header .= "<th>Manager Comment</th>";
+                }
+
+                $header .= "        </tr>
+                                </thead>
+                                <tbody>";
+                break;
+            case 5:
+                // for this we need to pull the config
+                $dbeQuestionType = new DBEAnswerType($this);
+                $dbeQuestionType->getRow($questionType);
+
+                $answerOptionsString = $dbeQuestionType->getValue(DBEAnswerType::answerOptions);
+
+                $answerOptions = json_decode($answerOptionsString);
+
+                $header = "<table class='1To7Question'>
+                                <thead>
+                                    <tr>
+                                    <td></td>" . ($isManager ? "<th>Staff Answer</th>" : null);
+
+                foreach ($answerOptions as $key => $option) {
+                    $header .= "<th>$option</th>";
+                }
+
+                if ($isManager) {
+                    $header .= "<th>Manager Comment</th>";
+                }
+
+                $header .= "        </tr>
+                                </thead>
+                                <tbody>";
+                break;
+            case 1:
+
+                $header = "<table class='1To7Question'>
+                                <thead>
+                                    <tr>
+                                        <th></th> " .
+                    ($isManager ? "<th>Staff Answer</th>" : null) .
+                    "<th>N/A</th>
+                                        <th>Below Expectations</th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th>Above Expectations</th>" .
+                    ($isManager ? "<th>Manager Comment</th>" : null) .
+                    "</tr>
+                                </thead>
+                                <tbody>";
+                break;
+        }
+        return $header;
+    }
+
+    private function renderQuestion(DBEStaffAppraisalQuestion $dbeQuestions,
+                                    $questionnaireAnswerID,
+                                    $isManager = false
+    )
+    {
+        // we now look at the current question and render it as we should
+        $questionDescription = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::description);
+        $questionID = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::id);
+        $questionType = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID);
+        $question = "";
+
+        $dbeQuestionAnswer = new DBEStaffAppraisalQuestionAnswer($this);
+        $dbeQuestionAnswer->getRowByIDAndQuestionnaireAnswerID(
+            $dbeQuestions->getValue(DBEStaffAppraisalQuestion::id),
+            $questionnaireAnswerID
+        );
+
+        $isRequired = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::requiredFlag) == 'Y';
+
+        switch ($questionType) {
+            case 2: //
+                $possibleResponses = ['N/A', 'Yes', 'No'];
+                $question = $this->renderMultipleChoiceQuestion(
+                    $questionDescription,
+                    $possibleResponses,
+                    $dbeQuestionAnswer,
+                    $questionID,
+                    $isRequired,
+                    $isManager
+                );
+                break;
+            case 5:
+                $possibleResponses = [0, 1, 2, 3, 4, 5, 6, 7];
+                $dbeQuestionType = new DBEAnswerType($this);
+                $dbeQuestionType->getRow($questionType);
+
+                $answerOptionsString = $dbeQuestionType->getValue(DBEAnswerType::answerOptions);
+
+                $answerOptions = json_decode($answerOptionsString);
+                $question = $this->renderMultipleChoiceQuestion(
+                    $questionDescription,
+                    $possibleResponses,
+                    $dbeQuestionAnswer,
+                    $questionID,
+                    $isRequired,
+                    $isManager,
+                    $answerOptions
+                );
+                break;
+            case 6:
+                $possibleResponses = [0, 1, 2, 3, 4];
+                $dbeQuestionType = new DBEAnswerType($this);
+                $dbeQuestionType->getRow($questionType);
+
+                $answerOptionsString = $dbeQuestionType->getValue(DBEAnswerType::answerOptions);
+
+                $answerOptions = json_decode($answerOptionsString);
+                $question = $this->renderMultipleChoiceQuestion(
+                    $questionDescription,
+                    $possibleResponses,
+                    $dbeQuestionAnswer,
+                    $questionID,
+                    $isRequired,
+                    $isManager,
+                    $answerOptions
+                );
+                break;
+            case 1:
+                $possibleResponses = [0, 1, 2, 3, 4, 5];
+
+                $question = $this->renderMultipleChoiceQuestion(
+                    $questionDescription,
+                    $possibleResponses,
+                    $dbeQuestionAnswer,
+                    $questionID,
+                    $isRequired,
+                    $isManager
+                );
+                break;
+            case 3:
+            case 4:
+                $value = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::staffAnswer);
+                $required = $isRequired ? "required='required'" : null;
+                $managerAnswer = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::managerAnswer);
+                $question = "<p>$questionDescription " . ($isRequired ? '<span class="requiredStar">*</span>' : null) .
+                    "</p><br><textarea rows='5' name='question[$questionID][staffMemberAnswer]'>$value</textarea><br><br>";
+                if ($isManager) {
+                    /** @noinspection HtmlDeprecatedAttribute */
+                    $question = "
+                    <tr>
+                        <td width='20%'>$questionDescription</td>
+                        <td width='40%'>$value</td>
+                        <td width='40%'><textarea rows='10' name='question[$questionID][managerAnswer]' $required>$managerAnswer</textarea></td>
+                    </tr>
+                    ";
+                }
+
+                break;
+        }
+
+
+        return $question;
+    }
+
+    /**
+     * @param string $questionDescription
+     * @param array $possibleResponses
+     * @param DBEStaffAppraisalQuestionAnswer $dbeQuestionAnswer
+     * @param int $questionID
+     * @param boolean $isRequired
+     * @param bool $isManager
+     * @param null $answerOptions
+     * @return string
+     */
+    private function renderMultipleChoiceQuestion($questionDescription,
+                                                  $possibleResponses,
+                                                  $dbeQuestionAnswer,
+                                                  $questionID,
+                                                  $isRequired,
+                                                  $isManager = false,
+                                                  $answerOptions = null
+    )
+    {
+        $question = "<tr><!--suppress HtmlDeprecatedAttribute --><td width='15%'>$questionDescription " . ($isRequired ? '<span class="requiredStar">*</span>' : null) . "</td>";
+        $required = $isRequired ? "required='required'" : null;
+
+        $whoAnswers = "staffMemberAnswer";
+
+        if ($isManager) {
+            $staffAnswer = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::staffAnswer);
+            if ($answerOptions) {
+                $staffAnswer = $answerOptions[$staffAnswer];
+            }
+
+            $question .= "<td>" . $staffAnswer . "</td>";
+            $whoAnswers = "managerAnswer";
+        }
+
+
+        foreach ($possibleResponses as $possibleResponse) {
+            $checked = "";
+
+            $valueKey = DBEStaffAppraisalQuestionAnswer::staffAnswer;
+
+            if ($isManager) {
+                $valueKey = DBEStaffAppraisalQuestionAnswer::managerAnswer;
+            }
+            if ($dbeQuestionAnswer->getValue($valueKey) == $possibleResponse) {
+                $checked = "checked='checked'";
+            }
+
+            $question .=
+                "<td>
+                  <input type='radio' name='question[$questionID][$whoAnswers]' $checked value='$possibleResponse' $required>
+                </td>";
+        }
+
+        if ($isManager) {
+            $managerComment = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::managerComment);
+            /** @noinspection HtmlDeprecatedAttribute */
+            $question .= "<td width='20%'><textarea name='question[$questionID][managerComment]'  rows='5'>$managerComment</textarea></td>";
+        }
+
+        $question .= "</tr>";
+        return $question;
+    }// end function editQuestion Action()
 
     /**
      * @param $questionnaireID
@@ -984,46 +863,95 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             true
         );
         $this->parsePage();
+    }// end questionTypeDropdown
+
+    private function showManagerQuestionnaireList()
+    {
+        if (!self::isAppraiser()) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
+        $this->setMethodName('displayQuestions');
+        $this->setTemplateFiles(
+            array('StaffAppraisalManagerQuestionnaireList' => 'StaffAppraisalManagerQuestionnaireList.inc')
+        );
+        $stats = $this->buQuestionnaire->getStats($this->userID);
+
+
+        if (count($stats)) {
+
+            $this->template->set_block(
+                'StaffAppraisalManagerQuestionnaireList',
+                'QuestionnaireBlock',
+                'rows'
+            );
+
+            foreach ($stats as $stat) {
+
+                $questionnaireID = $stat['id'];
+
+                $this->template->set_var(
+                    array(
+                        'questionnaireID' => $questionnaireID,
+                        'description'     => $stat['description'],
+                        'staffPending'    => $stat['staffPending'],
+                        'managerPending'  => $stat['managerPending'],
+                        'completed'       => $stat['completed'],
+                    )
+                );
+
+                $this->template->parse(
+                    'rows',
+                    'QuestionnaireBlock',
+                    true
+                );
+            }//while $dsQuestionnaire->fetchNext()
+        }
+
+        $this->template->parse(
+            'CONTENTS',
+            'StaffAppraisalManagerQuestionnaireList',
+            true
+        );
+        $this->parsePage();
     }
 
     /**
      * @param $questionnaireID
      * @throws Exception
      */
-    private function showEmployeeAnswer($questionnaireID)
+    private function sendQuestionnaire($questionnaireID)
     {
-
         if (!$questionnaireID) {
-            $this->displayFatalError('Questionnaire ID is missing');
-            exit;
+            throw new Exception('QuestionnaireID is missing');
         }
 
-        //check if the questionnaire exists...
         $dbeQuestionnaire = new DBEStaffAppraisalQuestionnaire($this);
 
         $dbeQuestionnaire->getRow($questionnaireID);
 
         if (!$dbeQuestionnaire->rowCount()) {
-            $this->displayFatalError('The questionnaire does not exist');
-            exit;
+            throw new Exception('The questionnaire does not exist');
         }
 
-        $this->setPageTitle($dbeQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::description));
+        $dateSent = $dbeQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::dateSent);
 
-        // we first need to know if there's a questionnaire answer for this questionnaire ID and user
-        $dbeQuestionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
-        $staffID = $this->userID;
-        $dbeQuestionnaireAnswer->getRowByQuestionnaireAndStaff(
-            $questionnaireID,
-            $staffID
-        );
-        $managerID = $this->dbeUser->getValue(DBEUser::managerID);
-        if (!$managerID) {
-            $this->displayFatalError('The logged in user does not have a valid manager assigned');
-            exit;
+
+        if ($dateSent) {
+            throw new Exception('This questionnaire has already been sent');
         }
 
-        if (!$dbeQuestionnaireAnswer->rowCount()) {
+        // we need to pull the list of employees to which we are going to send this
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getAppraisalUsers();
+
+        $buMail = new BUMail($this);
+        while ($dbeUser->fetchNext()) {
+
+            // we have to create the answer for the user, and send the link through email
+            $dbeQuestionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
+            $staffID = $dbeUser->getValue(DBEUser::userID);
+            $managerID = $dbeUser->getValue(DBEUser::managerID);
             // we need to create it as there's none
             $dbeQuestionnaireAnswer->setValue(
                 DBEStaffAppraisalQuestionnaireAnswer::staffMemberID,
@@ -1046,8 +974,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
 
             $dbeObjective = new DBEStaffAppraisalObjectives($this);
 
-            for ($i = 1; $i < 5; $i++) {
-
+            for ($i = 0; $i < 4; $i++) {
                 $dbeObjective->setValue(
                     DBEStaffAppraisalObjectives::id,
                     $i
@@ -1058,382 +985,612 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
                 );
                 $dbeObjective->insertRow();
             }
-        }
-
-
-        //here we should have a valid and populated questionnaire answer :D
-        $this->setTemplateFiles(
-            array('StaffAppraisalEmployeeView' => 'StaffAppraisalEmployeeView')
-        );
-        $questionnaireAnswerID = $dbeQuestionnaireAnswer->getPKValue();
-        $managerID = $dbeQuestionnaireAnswer->getValue(DBEStaffAppraisalQuestionnaireAnswer::managerID);
-
-        $dbeManager = new DBEUser($this);
-        $dbeManager->getRow($managerID);
-
-        $this->template->setVar(
-            [
-                "employeeName"             => $this->dbeUser->getValue(
-                        DBEUser::firstName
-                    ) . ' ' . $this->dbeUser->getValue(
-                        DBEUser::lastName
-                    ),
-                "managerName"              => $dbeManager->getValue(DBEUser::firstName) . ' ' . $dbeManager->getValue(
-                        DBEUser::lastName
-                    ),
-                "employeeStartDate"        => $this->dbeUser->getValue(DBEUser::startDate),
-                "employeePosition"         => $this->dbeUser->getValue(
-                    DBEUser::jobTitle
-                ),
-                "displayManager"           => "style='display: none'",
-                "completeQuestionnaireURL" => Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'completeQuestionnaire'
-                    )
-                ),
-                "completePerson"           => "staffMember"
-            ]
-        );
-
-        $dbeQuestions = new DBEStaffAppraisalQuestion($this);
-
-        $dbeQuestions->getRowsForQuestionnaire($questionnaireID);
-
-
-        $previousQuestionType = null;
-        $questionsBody = "";
-        while ($dbeQuestions->fetchNext()) {
-            $currentQuestionType = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID);
-
-            if ($previousQuestionType != $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID)) {
-                // depending on what was the previous question we need to finish it
-                $questionsBody .= $this->getQuestionFinish($previousQuestionType);
-
-                // now we look at the current question type..to see if we need a header or not
-                $questionsBody .= $this->getQuestionHeader($currentQuestionType);
-            }
-
-            // now we render the actual question
-            $questionsBody .= $this->renderQuestion(
-                $dbeQuestions,
-                $questionnaireAnswerID
+            $template = new Template (
+                EMAIL_TEMPLATE_DIR,
+                "remove"
             );
 
-            $previousQuestionType = $currentQuestionType;
-        }
-
-        //we have to finish off the last question
-        $questionsBody .= $this->getQuestionFinish($previousQuestionType);
-
-        $this->template->setVar(
-            [
-                "questions"                => $questionsBody,
-                "autoSaveQuestionnaireURL" => Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'autoSave'
-                    )
-                ),
-                "questionnaireAnswerID"    => $questionnaireAnswerID
-            ]
-        );
-
-
-        // render objectives
-
-        $this->template->set_block(
-            "StaffAppraisalEmployeeView",
-            "objectivesBlock",
-            'objectives'
-        );
-
-        $dbeObjective = new DBEStaffAppraisalObjectives($this);
-
-        $dbeObjective->getRowsByAnswerID($questionnaireAnswerID);
-
-        while ($dbeObjective->fetchNext()) {
-            $this->template->set_var(
-                array(
-                    "id"        => $dbeObjective->getValue(DBEStaffAppraisalObjectives::id),
-                    "number"    => $dbeObjective->getValue(DBEStaffAppraisalObjectives::id) + 1,
-                    "objective" => $dbeObjective->getValue(DBEStaffAppraisalObjectives::requirement),
-                    "measure"   => $dbeObjective->getValue(DBEStaffAppraisalObjectives::measure),
-                    "comment"   => $dbeObjective->getValue(DBEStaffAppraisalObjectives::comment)
-                )
+            $template->setFile(
+                'StaffAppraisalLinkEmail',
+                'StaffAppraisalLinkEmail.html'
             );
-            $this->template->parse(
-                'objectives',
-                "objectivesBlock",
-                true
+
+            $subject = "Staff Appraisal";
+
+            $appraisalURL = Controller::buildLink(
+                SITE_URL . '/staffAppraisalQuestionnaire.php',
+                [
+                    "action"          => "employeeAnswer",
+                    "questionnaireID" => $questionnaireID
+                ]
+            );
+
+            $template->setVar(
+                [
+                    "staffName"        => $dbeUser->getValue(DBEUser::firstName),
+                    "appraisalLinkURL" => $appraisalURL,
+                ]
+            );
+
+            $template->parse(
+                'OUTPUT',
+                "StaffAppraisalLinkEmail"
+            );
+
+            $body = $template->getVar('OUTPUT');
+
+            $emailTo = $dbeUser->getValue(DBEUser::username) . "@cnc-ltd.co.uk";
+
+            $hdrs = array(
+                'From'         => CONFIG_SUPPORT_EMAIL,
+                'To'           => $emailTo,
+                'Subject'      => $subject,
+                'Date'         => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            $mime = new Mail_mime();
+
+            $mime->setHTMLBody($body);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
+            );
+
+            $body = $mime->get($mime_params);
+
+            $hdrs = $mime->headers($hdrs);
+
+            $buMail->putInQueue(
+                CONFIG_SUPPORT_EMAIL,
+                $emailTo,
+                $hdrs,
+                $body
             );
         }
 
-
-        $this->template->parse(
-            'CONTENTS',
-            'StaffAppraisalEmployeeView',
-            true
+        $dbeQuestionnaire->setValue(
+            DBEStaffAppraisalQuestionnaire::dateSent,
+            (new DateTime())->format(COMMON_MYSQL_DATETIME)
         );
-        $this->parsePage();
-
-    }
-
-    private function getQuestionFinish($questionType,
-                                       $isManager = false
-    )
-    {
-        $questionFinish = "";
-        switch ($questionType) {
-            case 2: // yes/no
-            case 5: // 1 to 7
-            case 1: // 1 to 5
-                // we would need to close the table
-                $questionFinish = '</tbody></table>';
-                break;
-            case 3:
-            case 4:
-                $questionFinish = "<br>";
-                if ($isManager) {
-                    $questionFinish = '</tbody></table>';
-                }
-                break;
-        }
-
-        // we would need to put a break
-        $questionFinish .= "<br>";
-        return $questionFinish;
-    }
-
-    private function getQuestionHeader($questionType,
-                                       $isManager = false
-    )
-    {
-        $header = "";
-        switch ($questionType) {
-            case 3:
-            case 4:
-                if ($isManager) {
-                    $header = "<table>
-                                <thead>
-                                <tr>
-                                    <th>Question</th>
-                                    <th>Staff Answer</th>
-                                    <th>Manager Answer</th>
-                                </tr>
-                                </thead>
-                                <tbody>";
-                }
-                break;
-            case 2 : // yes/no answerType
-                $header = "<table>
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    " . ($isManager ? "<th>Staff Answer</th>" : null) . "
-                                    <th>N/A</th>
-                                    <th>Yes</th>
-                                    <th>No</th>
-                                    " . ($isManager ? "<th>Manager Comment</th>" : null) . "
-                                    </tr>
-                                </thead>
-                            <tbody>";
-                break;
-            case 5:
-                // for this we need to pull the config
-                $dbeQuestionType = new DBEAnswerType($this);
-                $dbeQuestionType->getRow($questionType);
-
-                $answerOptionsString = $dbeQuestionType->getValue(DBEAnswerType::answerOptions);
-
-                $answerOptions = json_decode($answerOptionsString);
-
-                $header = "<table class='1To7Question'>
-                                <thead>
-                                    <tr>
-                                    <td></td>" . ($isManager ? "<th>Staff Answer</th>" : null);
-
-                foreach ($answerOptions as $key => $option) {
-                    $header .= "<th>$option</th>";
-                }
-
-                if ($isManager) {
-                    $header .= "<th>Manager Comment</th>";
-                }
-
-                $header .= "        </tr>
-                                </thead>
-                                <tbody>";
-                break;
-            case 1:
-
-                $header = "<table class='1To7Question'>
-                                <thead>
-                                    <tr>
-                                        <th></th> " .
-                    ($isManager ? "<th>Staff Answer</th>" : null) .
-                    "<th>N/A</th>
-                                        <th>Below Expectations</th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                        <th>Above Expectations</th>" .
-                    ($isManager ? "<th>Manager Comment</th>" : null) .
-                    "</tr>
-                                </thead>
-                                <tbody>";
-                break;
-        }
-        return $header;
-    }
-
-    private function renderQuestion(DBEStaffAppraisalQuestion $dbeQuestions,
-                                    $questionnaireAnswerID,
-                                    $isManager = false
-    )
-    {
-        // we now look at the current question and render it as we should
-        $questionDescription = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::description);
-        $questionID = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::id);
-        $questionType = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::answerTypeID);
-        $question = "";
-
-        $dbeQuestionAnswer = new DBEStaffAppraisalQuestionAnswer($this);
-        $dbeQuestionAnswer->getRowByIDAndQuestionnaireAnswerID(
-            $dbeQuestions->getValue(DBEStaffAppraisalQuestion::id),
-            $questionnaireAnswerID
-        );
-
-        $isRequired = $dbeQuestions->getValue(DBEStaffAppraisalQuestion::requiredFlag) == 'Y';
-
-        switch ($questionType) {
-            case 2: //
-                $possibleResponses = ['N/A', 'Yes', 'No'];
-                $question = $this->renderMultipleChoiceQuestion(
-                    $questionDescription,
-                    $possibleResponses,
-                    $dbeQuestionAnswer,
-                    $questionID,
-                    $isRequired,
-                    $isManager
-                );
-                break;
-            case 5:
-                $possibleResponses = [0, 1, 2, 3, 4, 5, 6, 7];
-                $dbeQuestionType = new DBEAnswerType($this);
-                $dbeQuestionType->getRow($questionType);
-
-                $answerOptionsString = $dbeQuestionType->getValue(DBEAnswerType::answerOptions);
-
-                $answerOptions = json_decode($answerOptionsString);
-                $question = $this->renderMultipleChoiceQuestion(
-                    $questionDescription,
-                    $possibleResponses,
-                    $dbeQuestionAnswer,
-                    $questionID,
-                    $isRequired,
-                    $isManager,
-                    $answerOptions
-                );
-                break;
-            case 1:
-                $possibleResponses = [0, 1, 2, 3, 4, 5];
-
-                $question = $this->renderMultipleChoiceQuestion(
-                    $questionDescription,
-                    $possibleResponses,
-                    $dbeQuestionAnswer,
-                    $questionID,
-                    $isRequired,
-                    $isManager
-                );
-                break;
-            case 3:
-            case 4:
-                $value = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::staffAnswer);
-                $required = $isRequired ? "required='required'" : null;
-                $managerAnswer = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::managerAnswer);
-                $question = "<p>$questionDescription " . ($isRequired ? '<span class="requiredStar">*</span>' : null) .
-                    "</p><br><textarea rows='5' name='question[$questionID][staffMemberAnswer]'>$value</textarea><br><br>";
-                if ($isManager) {
-                    /** @noinspection HtmlDeprecatedAttribute */
-                    $question = "
-                    <tr>
-                        <td width='20%'>$questionDescription</td>
-                        <td width='40%'>$value</td>
-                        <td width='40%'><textarea rows='10' name='question[$questionID][managerAnswer]' $required>$managerAnswer</textarea></td>
-                    </tr>
-                    ";
-                }
-
-                break;
-        }
-
-
-        return $question;
+        $dbeQuestionnaire->updateRow();
+        return $this->showManagerQuestionnaireList();
     }
 
     /**
-     * @param string $questionDescription
-     * @param array $possibleResponses
-     * @param DBEStaffAppraisalQuestionAnswer $dbeQuestionAnswer
-     * @param int $questionID
-     * @param boolean $isRequired
-     * @param bool $isManager
-     * @param null $answerOptions
-     * @return string
+     * @param $type
+     * @param $questionnaireID
+     * @return array
+     * @throws Exception
      */
-    private function renderMultipleChoiceQuestion($questionDescription,
-                                                  $possibleResponses,
-                                                  $dbeQuestionAnswer,
-                                                  $questionID,
-                                                  $isRequired,
-                                                  $isManager = false,
-                                                  $answerOptions = null
+    private function getQuestionnaireManagerData($type,
+                                                 $questionnaireID
     )
     {
-        $question = "<tr><!--suppress HtmlDeprecatedAttribute --><td width='15%'>$questionDescription " . ($isRequired ? '<span class="requiredStar">*</span>' : null) . "</td>";
-        $required = $isRequired ? "required='required'" : null;
-
-        $whoAnswers = "staffMemberAnswer";
-
-        if ($isManager) {
-            $staffAnswer = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::staffAnswer);
-            if ($answerOptions) {
-                $staffAnswer = $answerOptions[$staffAnswer];
-            }
-
-            $question .= "<td>" . $staffAnswer . "</td>";
-            $whoAnswers = "managerAnswer";
+        if (!isset($type)) {
+            throw new Exception('Type is missing');
         }
 
-
-        foreach ($possibleResponses as $possibleResponse) {
-            $checked = "";
-
-            $valueKey = DBEStaffAppraisalQuestionAnswer::staffAnswer;
-
-            if ($isManager) {
-                $valueKey = DBEStaffAppraisalQuestionAnswer::managerAnswer;
-            }
-            if ($dbeQuestionAnswer->getValue($valueKey) == $possibleResponse) {
-                $checked = "checked='checked'";
-            }
-
-            $question .=
-                "<td>
-                  <input type='radio' name='question[$questionID][$whoAnswers]' $checked value='$possibleResponse' $required>
-                </td>";
+        if (!isset($questionnaireID)) {
+            throw new Exception('Questionnaire ID is missing');
         }
 
-        if ($isManager) {
-            $managerComment = $dbeQuestionAnswer->getValue(DBEStaffAppraisalQuestionAnswer::managerComment);
-            /** @noinspection HtmlDeprecatedAttribute */
-            $question .= "<td width='20%'><textarea name='question[$questionID][managerComment]'  rows='5'>$managerComment</textarea></td>";
+        return $this->buQuestionnaire->getManagerData(
+            $this->userID,
+            $type,
+            $questionnaireID
+        );
+    }
+
+    /**
+     * Edit/Add Further Action
+     * @access private
+     * @throws Exception
+     */
+    function editQuestion()
+    {
+        $this->setMethodName('editQuestion');
+        $dsQuestion = &$this->dsQuestion; // ref to class var
+
+        if (!$this->getFormError()) {
+            if ($this->getAction() == 'editQuestion') {
+                $this->buQuestionnaire->getQuestionByID(
+                    $this->getParam('questionID'),
+                    $dsQuestion
+                );
+                $questionID = $this->getParam('questionID');
+            } else {                                  // creating new
+                $dsQuestion->initialise();
+                $dsQuestion->setValue(
+                    DBEStaffAppraisalQuestion::id,
+                    '0'
+                );
+                $dsQuestion->setValue(
+                    DBEStaffAppraisalQuestion::questionnaireID,
+                    $this->getParam('questionnaireID')
+                );
+                $questionID = '0';
+            }
+        } else {                                    // form validation error
+            $dsQuestion->initialise();
+            $dsQuestion->fetchNext();
+            $questionID = $dsQuestion->getValue(DBEStaffAppraisalQuestion::id);
+        }
+        $urlDelete = null;
+        $txtDelete = null;
+        if (
+            $this->getAction() == 'editQuestion' &&
+            $this->buQuestionnaire->canDeleteQuestionnaire($this->getParam('questionID'))
+        ) {
+            $urlDelete =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'     => 'deleteQuestion',
+                        'questionID' => $questionID
+                    )
+                );
+            $txtDelete = 'Delete';
+        }
+        $urlUpdate =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'     => 'updateQuestion',
+                    'questionID' => $questionID
+                )
+            );
+        $urlDisplayList =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'          => 'displayQuestionList',
+                    'questionnaireID' => $dsQuestion->getValue(DBEStaffAppraisalQuestion::questionnaireID)
+                )
+            );
+        $this->setPageTitle('Edit Question');
+        $this->setTemplateFiles(
+            array('QuestionEdit' => 'StaffAppraisalQuestionEdit.inc')
+        );
+        $this->template->set_var(
+            array(
+                'questionID'           => $questionID,
+                'questionnaireID'      => $dsQuestion->getValue(DBEStaffAppraisalQuestion::questionnaireID),
+                'orderSequence'        => Controller::htmlInputText(
+                    $dsQuestion->getValue(DBEStaffAppraisalQuestion::orderSequence)
+                ),
+                'orderSequenceMessage' => Controller::htmlDisplayText(
+                    $dsQuestion->getMessage(DBEStaffAppraisalQuestion::orderSequence)
+                ),
+                'description'          => Controller::htmlInputText(
+                    $dsQuestion->getValue(DBEStaffAppraisalQuestion::description)
+                ),
+                'descriptionMessage'   => Controller::htmlDisplayText(
+                    $dsQuestion->getMessage(DBEStaffAppraisalQuestion::description)
+                ),
+                'activeFlagChecked'    => $dsQuestion->getValue(
+                    DBEStaffAppraisalQuestion::activeFlag
+                ) == 'Y' ? 'CHECKED' : null,
+                'activeFlagMessage'    => Controller::htmlDisplayText(
+                    $dsQuestion->getMessage(DBEStaffAppraisalQuestion::activeFlag)
+                ),
+                'requiredFlagChecked'  => $dsQuestion->getValue(
+                    DBEStaffAppraisalQuestion::requiredFlag
+                ) == 'Y' ? 'CHECKED' : null,
+                'requiredFlagMessage'  => Controller::htmlDisplayText(
+                    $dsQuestion->getMessage(DBEStaffAppraisalQuestion::requiredFlag)
+                ),
+                'urlUpdate'            => $urlUpdate,
+                'urlDelete'            => $urlDelete,
+                'txtDelete'            => $txtDelete,
+                'urlDisplayList'       => $urlDisplayList
+            )
+        );
+        /*
+        Answer types
+        */
+        $this->answerTypeDropdown($dsQuestion->getValue(DBEStaffAppraisalQuestion::answerTypeID));
+
+        $this->template->parse(
+            'CONTENTS',
+            'QuestionEdit',
+            true
+        );
+        $this->parsePage();
+    }
+
+    function answerTypeDropdown(
+        $answerTypeID,
+        $templateName = 'QuestionEdit',
+        $blockName = 'answerTypeBlock'
+    )
+    {
+        // Display list of answerTypes that are current at given activity date
+        $this->buQuestionnaire->dbeAnswerType->getRows();
+
+        $this->template->set_block(
+            $templateName,
+            $blockName,
+            'answerTypes'
+        );
+
+        while ($this->buQuestionnaire->dbeAnswerType->fetchNext()) {
+
+            $answerTypeSelected = ($this->buQuestionnaire->dbeAnswerType->getValue(
+                    DBEAnswerType::answerTypeID
+                ) == $answerTypeID) ? CT_SELECTED : null;
+
+            $shouldBeConfig = (int)$this->buQuestionnaire->dbeAnswerType->getValue(
+                DBEAnswerType::needsOptions
+            );
+
+            $isConfigured = $this->buQuestionnaire->dbeAnswerType->getValue(DBEAnswerType::answerOptions);
+
+            $configFailed = $shouldBeConfig && !$isConfigured;
+
+            $this->template->set_var(
+                array(
+                    'answerTypeID'          => $this->buQuestionnaire->dbeAnswerType->getValue(
+                        DBEAnswerType::answerTypeID
+                    ),
+                    'answerTypeDescription' => $this->buQuestionnaire->dbeAnswerType->getValue(
+                            DBEAnswerType::description
+                        ) . ($configFailed ? ' (Needs configuration)' : null)
+                    ,
+                    'answerTypeSelected'    => $answerTypeSelected,
+                    'disabled'              => $configFailed ? 'disabled' : null
+                )
+            );
+
+            $this->template->parse(
+                'answerTypes',
+                $blockName,
+                true
+            );
+
+
         }
 
-        $question .= "</tr>";
-        return $question;
+    }
+
+    /**
+     * Delete Question
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function deleteQuestion()
+    {
+        $this->setMethodName('deleteQuestion');
+        if (!$this->buQuestionnaire->deleteQuestion($this->getParam('questionID'))) {
+            $this->displayFatalError('Cannot delete this row');
+            exit;
+        } else {
+            $urlNext =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'displayQuestionList'
+                    )
+                );
+            header('Location: ' . $urlNext);
+            exit;
+        }
+    }
+
+    /**
+     * Update details
+     * @access private
+     * @throws Exception
+     */
+    function updateQuestion()
+    {
+        $this->setMethodName('updateQuestion');
+        $this->formError = (!$this->dsQuestion->populateFromArray($this->getParam('question')));
+        if ($this->formError) {
+            if ($this->dsQuestion->getValue(DBEStaffAppraisalQuestion::id) == null) {          // attempt to insert
+                $this->setAction('editQuestion');
+            } else {
+                $this->setAction('createQuestion');
+            }
+            $this->edit();
+            exit;
+        }
+
+        $this->buQuestionnaire->updateQuestion($this->dsQuestion);
+
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'questionnaireID' => $this->dsQuestion->getValue(DBEStaffAppraisalQuestion::questionnaireID),
+                    'action'          => 'displayQuestionList'
+                )
+            );
+        header('Location: ' . $urlNext);
+    }
+
+    /**
+     * Edit/Add Further Action
+     * @access private
+     * @throws Exception
+     */
+    function edit()
+    {
+        $this->setMethodName('edit');
+        $dsQuestionnaire = &$this->dsQuestionnaire; // ref to class var
+
+        if (!$this->getFormError()) {
+            if ($this->getAction() == 'edit') {
+                $this->buQuestionnaire->getQuestionnaireByID(
+                    $this->getParam('questionnaireID'),
+                    $dsQuestionnaire
+                );
+                $questionnaireID = $this->getParam('questionnaireID');
+            } else {                                                                    // creating new
+                $dsQuestionnaire->initialise();
+                $dsQuestionnaire->setValue(
+                    DBEStaffAppraisalQuestionnaire::id,
+                    '0'
+                );
+                $questionnaireID = '0';
+            }
+        } else {                                                                        // form validation error
+            $dsQuestionnaire->initialise();
+            $dsQuestionnaire->fetchNext();
+            $questionnaireID = $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::id);
+        }
+        $urlDelete = null;
+        $txtDelete = null;
+        if ($this->getAction() == 'edit' && $this->buQuestionnaire->canDeleteQuestionnaire(
+                $this->getParam('questionnaireID')
+            )) {
+            $urlDelete =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'          => 'delete',
+                        'questionnaireID' => $questionnaireID
+                    )
+                );
+            $txtDelete = 'Delete';
+        }
+        $urlUpdate =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'          => 'update',
+                    'questionnaireID' => $questionnaireID
+                )
+            );
+        $urlDisplayList =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'displayList'
+                )
+            );
+        $this->setPageTitle('Edit Questionnaire');
+        $this->setTemplateFiles(
+            array('QuestionnaireEdit' => 'StaffAppraisalQuestionnaireEdit.inc')
+        );
+        $this->template->set_var(
+            array(
+                'id'                 => $questionnaireID,
+                'description'        => Controller::htmlInputText(
+                    $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::description)
+                ),
+                'descriptionMessage' => Controller::htmlDisplayText(
+                    $dsQuestionnaire->getMessage(DBEStaffAppraisalQuestionnaire::description)
+                ),
+                //                'intro'               => Controller::htmlInputText($dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::intro)),
+                //                'introMessage'        => Controller::htmlDisplayText($dsQuestionnaire->getMessage(DBEStaffAppraisalQuestionnaire::intro)),
+                //                'thankYou'            => Controller::htmlInputText($dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::thankYou)),
+                //                'thankYouMessage'     => Controller::htmlDisplayText($dsQuestionnaire->getMessage(DBEStaffAppraisalQuestionnaire::thankYou)),
+                //                'rating1Desc'         => Controller::htmlInputText($dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::rating1Desc)),
+                //                'rating1DescMessage'  => Controller::htmlDisplayText($dsQuestionnaire->getMessage(DBEStaffAppraisalQuestionnaire::rating1Desc)),
+                //                'rating5Desc'         => Controller::htmlInputText($dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::rating5Desc)),
+                //                'rating5DescMessage'  => Controller::htmlDisplayText($dsQuestionnaire->getMessage(DBEStaffAppraisalQuestionnaire::rating5Desc)),
+                //                'nameRequiredChecked' => Controller::htmlChecked($dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::nameRequired)),
+                //                'nameRequiredMessage' => Controller::htmlDisplayText($dsQuestionnaire->getMessage(DBEStaffAppraisalQuestionnaire::nameRequired)),
+                'urlUpdate'          => $urlUpdate,
+                'urlDelete'          => $urlDelete,
+                'txtDelete'          => $txtDelete,
+                'urlDisplayList'     => $urlDisplayList
+            )
+        );
+        $this->template->parse(
+            'CONTENTS',
+            'QuestionnaireEdit',
+            true
+        );
+        $this->parsePage();
+    }
+
+    /**
+     * Display list of questions
+     * @access private
+     * @throws Exception
+     */
+    function displayQuestions()
+    {
+        $this->setMethodName('displayQuestions');
+        $this->setTemplateFiles(
+            array('QuestionList' => 'StaffAppraisalQuestionList.inc')
+        );
+        $dsQuestion = new DataSet($this);
+        $this->buQuestionnaire->getAllQuestions(
+            $this->getParam('questionnaireID'),
+            $dsQuestion
+        );
+        $dsQuestionnaire = new DataSet($this);
+        $this->buQuestionnaire->getQuestionnaireByID(
+            $dsQuestion->getValue(DBEStaffAppraisalQuestion::questionnaireID),
+            $dsQuestionnaire
+        );
+
+        $this->setPageTitle($dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::description));
+
+        $urlCreate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'          => 'createQuestion',
+                'questionnaireID' => $this->getParam('questionnaireID')
+
+            )
+        );
+
+        $urlReturnToQuestionnaireList = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            []
+        );
+
+        $this->template->set_var(
+            [
+                'urlCreate'                    => $urlCreate,
+                'urlReturnToQuestionnaireList' => $urlReturnToQuestionnaireList
+            ]
+        );
+
+        if ($dsQuestion->rowCount() > 0) {
+
+            $this->template->set_block(
+                'QuestionList',
+                'QuestionBlock',
+                'rows'
+            );
+
+            while ($dsQuestion->fetchNext()) {
+
+                $questionID = $dsQuestion->getValue(DBEStaffAppraisalQuestion::id);
+
+                $urlEdit =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'     => 'editQuestion',
+                            'questionID' => $questionID
+                        )
+                    );
+                $txtEdit = '[edit]';
+
+                $urlDelete = null;
+                $txtDelete = null;
+                if ($this->buQuestionnaire->canDeleteQuestionnaire($questionID)) {
+                    $urlDelete =
+                        Controller::buildLink(
+                            $_SERVER['PHP_SELF'],
+                            array(
+                                'action'     => 'delete',
+                                'questionID' => $questionID
+                            )
+                        );
+                    $txtDelete = '[delete]';
+                }
+                $this->template->set_var(
+                    array(
+                        'questionID'               => $questionID,
+                        'description'              => Controller::htmlDisplayText(
+                            $dsQuestion->getValue(DBEStaffAppraisalQuestion::description)
+                        ),
+                        'answerType'               => Controller::htmlDisplayText(
+                            $dsQuestion->getValue(DBEJStaffAppraisalQuestion::answerTypeName)
+                        ),
+                        'orderSequence'            => Controller::htmlDisplayText(
+                            $dsQuestion->getValue(DBEStaffAppraisalQuestion::orderSequence)
+                        ),
+                        'activeFlag'               => Controller::htmlDisplayText(
+                            $dsQuestion->getValue(DBEStaffAppraisalQuestion::activeFlag)
+                        ),
+                        'questionnaireDescription' => Controller::htmlDisplayText(
+                            $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::description)
+                        ),
+                        'urlEdit'                  => $urlEdit,
+                        'urlDelete'                => $urlDelete,
+                        'txtEdit'                  => $txtEdit,
+                        'txtDelete'                => $txtDelete,
+
+                    )
+                );
+
+                $this->template->parse(
+                    'rows',
+                    'QuestionBlock',
+                    true
+                );
+
+            }//while $dsQuestion->fetchNext()
+        }
+        $this->template->parse(
+            'CONTENTS',
+            'QuestionList',
+            true
+        );
+        $this->parsePage();
+    }
+
+    /**
+     * Delete Questionnaire
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function delete()
+    {
+        $this->setMethodName('delete');
+        if (!$this->buQuestionnaire->deleteQuestionnaire($this->getParam('questionnaireID'))) {
+            $this->displayFatalError('Cannot delete this row');
+            exit;
+        } else {
+            $urlNext =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'displayList'
+                    )
+                );
+            header('Location: ' . $urlNext);
+            exit;
+        }
+    }
+
+    /**
+     * Update call Further Action details
+     * @access private
+     * @throws Exception
+     */
+    function update()
+    {
+        $this->setMethodName('update');
+        $this->formError = (!$this->dsQuestionnaire->populateFromArray($this->getParam('questionnaire')));
+        if ($this->formError) {
+            if ($this->dsQuestionnaire->getValue(
+                DBEStaffAppraisalQuestionnaire::id
+            )) {                    // attempt to insert
+                $this->setAction('edit');
+            } else {
+                $this->setAction('create');
+            }
+            $this->edit();
+            exit;
+        }
+
+        $this->buQuestionnaire->updateQuestionnaire($this->dsQuestionnaire);
+
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'questionnaireID' => $this->dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::id),
+                    'action'          => 'view'
+                )
+            );
+        header('Location: ' . $urlNext);
     }
 
     /**
@@ -1577,11 +1734,11 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             $currentObjective = $objectives[$objectiveID];
 
             $updateObjective = new DBEStaffAppraisalObjectives($this);
+            $updateObjective->setValue(DBEStaffAppraisalObjectives::id, $objectiveID);
             $updateObjective->setValue(
                 DBEStaffAppraisalObjectives::questionnaireAnswerID,
                 $questionnaireAnswerID
             );
-            $updateObjective->getRow($objectiveID);
             $updateObjective->setValue(
                 DBEStaffAppraisalObjectives::comment,
                 $currentObjective['comment']
@@ -1664,252 +1821,6 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
         Header("Location: /");
     }
 
-
-    private function getPDFQuestionnaire($questionnaireAnswerID,
-                                         $passPhrase
-    )
-    {
-
-        $questionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
-        $questionnaireAnswer->getRow($questionnaireAnswerID);
-
-
-        $mainPDF = new CNCLTD\StaffAppraisalPDF(
-            $questionnaireAnswer,
-            $passPhrase
-        );
-
-        $fileName = PDF_TEMP_DIR . '/test.pdf';
-        $mainPDF->Output(
-            'F',
-            $fileName,
-            true
-        );
-
-        return $fileName;
-    }
-
-    private function showManagerQuestionnaireList()
-    {
-        if (!self::isAppraiser()) {
-            Header("Location: /NotAllowed.php");
-            exit;
-        }
-        $this->setMethodName('displayQuestions');
-        $this->setTemplateFiles(
-            array('StaffAppraisalManagerQuestionnaireList' => 'StaffAppraisalManagerQuestionnaireList.inc')
-        );
-        $stats = $this->buQuestionnaire->getStats($this->userID);
-
-
-        if (count($stats)) {
-
-            $this->template->set_block(
-                'StaffAppraisalManagerQuestionnaireList',
-                'QuestionnaireBlock',
-                'rows'
-            );
-
-            foreach ($stats as $stat) {
-
-                $questionnaireID = $stat['id'];
-
-                $this->template->set_var(
-                    array(
-                        'questionnaireID' => $questionnaireID,
-                        'description'     => $stat['description'],
-                        'staffPending'    => $stat['staffPending'],
-                        'managerPending'  => $stat['managerPending'],
-                        'completed'       => $stat['completed'],
-                    )
-                );
-
-                $this->template->parse(
-                    'rows',
-                    'QuestionnaireBlock',
-                    true
-                );
-            }//while $dsQuestionnaire->fetchNext()
-        }
-
-        $this->template->parse(
-            'CONTENTS',
-            'StaffAppraisalManagerQuestionnaireList',
-            true
-        );
-        $this->parsePage();
-    }
-
-    /**
-     * @param $questionnaireID
-     * @throws Exception
-     */
-    private function sendQuestionnaire($questionnaireID)
-    {
-        if (!$questionnaireID) {
-            throw new Exception('QuestionnaireID is missing');
-        }
-
-        $dbeQuestionnaire = new DBEStaffAppraisalQuestionnaire($this);
-
-        $dbeQuestionnaire->getRow($questionnaireID);
-
-        if (!$dbeQuestionnaire->rowCount()) {
-            throw new Exception('The questionnaire does not exist');
-        }
-
-        $dateSent = $dbeQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::dateSent);
-
-
-        if ($dateSent) {
-            throw new Exception('This questionnaire has already been sent');
-        }
-
-        // we need to pull the list of employees to which we are going to send this
-        $dbeUser = new DBEUser($this);
-        $dbeUser->getAppraisalUsers();
-
-        $buMail = new BUMail($this);
-        while ($dbeUser->fetchNext()) {
-
-            // we have to create the answer for the user, and send the link through email
-            $dbeQuestionnaireAnswer = new DBEStaffAppraisalQuestionnaireAnswer($this);
-            $staffID = $dbeUser->getValue(DBEUser::userID);
-            $managerID = $dbeUser->getValue(DBEUser::managerID);
-            // we need to create it as there's none
-            $dbeQuestionnaireAnswer->setValue(
-                DBEStaffAppraisalQuestionnaireAnswer::staffMemberID,
-                $staffID
-            );
-            $dbeQuestionnaireAnswer->setValue(
-                DBEStaffAppraisalQuestionnaireAnswer::questionnaireID,
-                $questionnaireID
-            );
-
-            $dbeQuestionnaireAnswer->setValue(
-                DBEStaffAppraisalQuestionnaireAnswer::managerID,
-                $managerID
-            );
-
-            $dbeQuestionnaireAnswer->insertRow();
-            $questionnaireAnswerID = $dbeQuestionnaireAnswer->getPKValue();
-
-            // we have to create the 4 Objectives
-
-            $dbeObjective = new DBEStaffAppraisalObjectives($this);
-
-            for ($i = 1; $i < 5; $i++) {
-                $dbeObjective->setValue(
-                    DBEStaffAppraisalObjectives::id,
-                    $i
-                );
-                $dbeObjective->setValue(
-                    DBEStaffAppraisalObjectives::questionnaireAnswerID,
-                    $questionnaireAnswerID
-                );
-                $dbeObjective->insertRow();
-            }
-            $template = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
-            );
-
-            $template->setFile(
-                'StaffAppraisalLinkEmail',
-                'StaffAppraisalLinkEmail.html'
-            );
-
-            $subject = "Staff Appraisal";
-
-            $appraisalURL = Controller::buildLink(
-                SITE_URL .'/staffAppraisalQuestionnaire.php',
-                [
-                    "action"          => "employeeAnswer",
-                    "questionnaireID" => $questionnaireID
-                ]
-            );
-
-            $template->setVar(
-                [
-                    "staffName"        => $dbeUser->getValue(DBEUser::firstName),
-                    "appraisalLinkURL" => $appraisalURL,
-                ]
-            );
-
-            $template->parse(
-                'OUTPUT',
-                "StaffAppraisalLinkEmail"
-            );
-
-            $body = $template->getVar('OUTPUT');
-
-            $emailTo = $dbeUser->getValue(DBEUser::username) . "@cnc-ltd.co.uk";
-
-            $hdrs = array(
-                'From'         => CONFIG_SUPPORT_EMAIL,
-                'To'           => $emailTo,
-                'Subject'      => $subject,
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
-            $mime = new Mail_mime();
-
-            $mime->setHTMLBody($body);
-
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-
-            $body = $mime->get($mime_params);
-
-            $hdrs = $mime->headers($hdrs);
-
-            $buMail->putInQueue(
-                CONFIG_SUPPORT_EMAIL,
-                $emailTo,
-                $hdrs,
-                $body
-            );
-        }
-
-        $dbeQuestionnaire->setValue(
-            DBEStaffAppraisalQuestionnaire::dateSent,
-            (new DateTime())->format(COMMON_MYSQL_DATETIME)
-        );
-        $dbeQuestionnaire->updateRow();
-        exit;
-        return $this->showManagerQuestionnaireList();
-    }
-
-    /**
-     * @param $type
-     * @param $questionnaireID
-     * @return array
-     * @throws Exception
-     */
-    private function getQuestionnaireManagerData($type,
-                                                 $questionnaireID
-    )
-    {
-        if (!isset($type)) {
-            throw new Exception('Type is missing');
-        }
-
-        if (!isset($questionnaireID)) {
-            throw new Exception('Questionnaire ID is missing');
-        }
-
-        return $this->buQuestionnaire->getManagerData(
-            $this->userID,
-            $type,
-            $questionnaireID
-        );
-    }
-
     /**
      * @param DBEStaffAppraisalQuestionnaireAnswer $dbeQuestionnaireAnswer
      * @throws Exception
@@ -1942,7 +1853,7 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             ) . " " . $staffMember->getValue(DBEUser::lastName);
 
         $appraisalURL = Controller::buildLink(
-            SITE_URL .'/staffAppraisalQuestionnaire.php',
+            SITE_URL . '/staffAppraisalQuestionnaire.php',
             [
                 "action"          => "managerAnswer",
                 "questionnaireID" => $dbeQuestionnaireAnswer->getValue(
@@ -2075,5 +1986,138 @@ class CTStaffAppraisalQuestionnaire extends CTCNC
             return true;
         }
         return false;
+    }
+
+    /**
+     * Display list of questionnaires
+     * @access private
+     * @throws Exception
+     */
+    function displayList()
+    {
+
+        if (!self::isAppraiser()) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
+        $this->setMethodName('displayList');
+        $this->setPageTitle('Questionnaires');
+        $this->setTemplateFiles(
+            array('QuestionnaireList' => 'StaffAppraisalQuestionnaireList.inc')
+        );
+        $dsQuestionnaire = new DataSet($this);
+        $this->buQuestionnaire->getAll($dsQuestionnaire);
+
+        $urlCreate =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'create'
+                )
+            );
+
+        $this->template->set_var(
+            array('urlCreate' => $urlCreate)
+        );
+
+        if ($dsQuestionnaire->rowCount() > 0) {
+
+            $this->template->set_block(
+                'QuestionnaireList',
+                'QuestionnaireBlock',
+                'rows'
+            );
+
+            while ($dsQuestionnaire->fetchNext()) {
+
+                $questionnaireID = $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::id);
+
+                $urlDisplayQuestionList =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'          => 'displayQuestionList',
+                            'questionnaireID' => $questionnaireID
+                        )
+                    );
+                $urlEdit =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'          => 'edit',
+                            'questionnaireID' => $questionnaireID
+                        )
+                    );
+                $txtEdit = '[edit]';
+
+                $sendURL = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    [
+                        'action'          => 'sendQuestionnaire',
+                        'questionnaireID' => $questionnaireID
+                    ]
+                );
+                $sendLink = "<a href='$sendURL'>[Send To Staff members]</a>";
+                $dateSent = $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::dateSent);
+                if ($dateSent) {
+                    $sendLink = "";
+                }
+
+                $urlDelete = null;
+                $txtDelete = null;
+                if ($this->buQuestionnaire->canDeleteQuestionnaire($questionnaireID)) {
+                    $urlDelete =
+                        Controller::buildLink(
+                            $_SERVER['PHP_SELF'],
+                            array(
+                                'action'          => 'delete',
+                                'questionnaireID' => $questionnaireID
+                            )
+                        );
+                    $txtDelete = '[delete]';
+                }
+
+                $this->template->set_var(
+                    array(
+                        'questionnaireID'        => $questionnaireID,
+                        'description'            => Controller::htmlDisplayText(
+                            $dsQuestionnaire->getValue(DBEStaffAppraisalQuestionnaire::description)
+                        ),
+                        'urlEdit'                => $urlEdit,
+                        'urlDisplayQuestionList' => $urlDisplayQuestionList,
+                        'urlDelete'              => $urlDelete,
+                        'txtEdit'                => $txtEdit,
+                        'txtDelete'              => $txtDelete,
+                        'sendLink'               => $sendLink
+                    )
+                );
+
+                $this->template->parse(
+                    'rows',
+                    'QuestionnaireBlock',
+                    true
+                );
+
+            }//while $dsQuestionnaire->fetchNext()
+
+        }
+
+        $sendURL = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            [
+                'action' => 'sendQuestionnaire',
+            ]
+        );
+
+        $this->template->setVar(
+            ["sendQuestionnaireURL" => $sendURL]
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'QuestionnaireList',
+            true
+        );
+        $this->parsePage();
     }
 }
