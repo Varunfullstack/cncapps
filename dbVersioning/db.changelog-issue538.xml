@@ -24,11 +24,4 @@
             <dropColumn tableName="problem" columnName="openHours"/>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue538-2">
-        <preConditions>
-            <not>
-                <tableExists tableName="customerContactRefreshToken"
-            </not>
-        </preConditions>
-    </changeSet>
 </databaseChangeLog>
