@@ -37,7 +37,150 @@ $container->set(
         return $logger;
     }
 );
+$app->group(
+    '/internal-api',
+    function (\Slim\Routing\RouteCollectorProxy $group) {
+        $group->get(
+            '/',
+            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+                $response->getBody()->write('CNC Internal API');
+                return $response;
+            }
+        );
+        $group->get(
+            '/customerStats/{customerId}',
+            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+                $queryParams = $request->getQueryParams();
+                $endDate = new DateTime();
+                $startDate = (clone $endDate)->sub(new DateInterval('P365D'));
+                if (isset($queryParams['startDate'])) {
+                    $startDateString = $queryParams['startDate'];
+                    $startDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
+                    if (!$startDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The start date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
 
+                if (isset($queryParams['endDate'])) {
+                    $endDateString = $queryParams['endDate'];
+                    $endDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
+                    if (!$endDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The end date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+                $params = [
+                    ["type" => "i", "value" => $args['customerId']],
+                    ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
+                    ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
+                ];
+
+                $query = "SELECT 
+    pro_priority as priority,
+    SUM(1) AS raised,
+    AVG(problem.`pro_responded_hours`) AS responseTime,
+    AVG(IF(pro_status IN ('F' , 'C'),
+        problem.`pro_responded_hours` < CASE problem.`pro_priority`
+            WHEN 1 THEN customer.`cus_sla_p1`
+            WHEN 2 THEN customer.`cus_sla_p2`
+            WHEN 3 THEN customer.`cus_sla_p3`
+            WHEN 4 THEN customer.`cus_sla_p4`
+            ELSE 0
+        END,
+        NULL)) AS slaMet,
+    AVG(IF(pro_status IN ('F' , 'C'),
+        openHours < 8,
+        NULL)) AS closedWithin8Hours,
+    AVG(IF(pro_status = 'C',
+        problem.`pro_reopened_date` IS NOT NULL,
+        NULL)) AS reopened,
+    SUM(pro_status IN ('F' , 'C')) AS `fixed`,
+    AVG(IF(pro_status IN ('F' , 'C'),
+        problem.`pro_chargeable_activity_duration_hours`,
+        NULL)) AS avgChargeableTime,
+    AVG(IF(pro_status IN ('F' , 'C'),
+        problem.pro_working_hours,
+        NULL)) AS avgTimeAwaitingCNC,
+    AVG(IF(pro_status IN ('F' , 'C'),
+        openHours,
+        NULL)) AS avgTimeFromRaiseToFixHours
+FROM
+    problem
+        LEFT JOIN
+    callactivity initial ON initial.`caa_problemno` = problem.`pro_problemno`
+        AND initial.`caa_callacttypeno` = 51
+        JOIN
+    customer ON problem.`pro_custno` = customer.`cus_custno`
+WHERE
+
+        problem.pro_custno = ?
+  and caa_date between ? and ?
+        AND pro_priority < 5
+        group by pro_priority
+        order by pro_priority ";
+                /** @var $db dbSweetcode */
+                global $db;
+                $statement = $db->preparedQuery($query, $params);
+                $data = $statement->fetch_all(MYSQLI_ASSOC);
+                $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
+                return $response;
+            }
+        );
+        $group->get(
+            '/stats',
+            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+                global $db;
+                $db->query(
+                    'SELECT
+  SUM(1) AS raised,
+  AVG(problem.`pro_responded_hours`) AS responseTime,
+  AVG(
+   IF(pro_status IN ("F","C"),   
+   problem.`pro_responded_hours` < 
+    CASE
+      problem.`pro_priority`
+      WHEN 1
+      THEN customer.`cus_sla_p1`
+      WHEN 2
+      THEN customer.`cus_sla_p2`
+      WHEN 3
+      THEN customer.`cus_sla_p3`
+      WHEN 4
+      THEN customer.`cus_sla_p4`
+      ELSE 0
+    END,
+    NULL) 
+  ) AS slaMet,
+    AVG(IF(pro_status IN ("F","C"), openHours < 8, NULL)) AS closedWithin8Hours,
+    AVG(IF(pro_status ="C",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
+    SUM(pro_status IN("F","C")) AS `fixed`,
+    AVG(IF(pro_status IN ("F","C"), problem.`pro_chargeable_activity_duration_hours`,NULL)) AS avgChargeableTime,
+    AVG(IF(pro_status IN ("F","C"), problem.pro_working_hours,NULL)) AS avgTimeAwaitingCNC,
+    AVG(IF(pro_status IN ("F","C"), openHours,NULL)) AS avgTimeFromRaiseToFixHours
+FROM
+  problem
+  LEFT JOIN callactivity initial
+    ON initial.`caa_problemno` = problem.`pro_problemno`
+    AND initial.`caa_callacttypeno` = 51
+  JOIN customer
+    ON problem.`pro_custno` = customer.`cus_custno`
+WHERE 
+   caa_date BETWEEN NOW() - INTERVAL 30 DAY
+  AND NOW()
+  AND pro_priority < 5'
+                );
+                $data = $db->fetchAll(MYSQLI_ASSOC);
+                $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
+                return $response;
+            }
+        );
+    }
+);
 $app->group(
     '/api',
     function (\Slim\Routing\RouteCollectorProxy $group) {
@@ -56,56 +199,6 @@ $app->group(
                 $response->getBody()->write(
                     $twig->render('signedConfirmation.html.twig', ["message" => "Code not provided"])
                 );
-                return $response;
-            }
-        );
-
-        $group->get(
-            '/stats',
-            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
-                global $db;
-
-                $db->query(
-                    "SELECT
-  SUM(1) AS raised,
-  AVG(problem.`pro_responded_hours`) AS responseTime,
-  AVG(
-   IF(pro_status IN (\"F\",\"C\"),   
-   problem.`pro_responded_hours` < 
-    CASE
-      problem.`pro_priority`
-      WHEN 1
-      THEN customer.`cus_sla_p1`
-      WHEN 2
-      THEN customer.`cus_sla_p2`
-      WHEN 3
-      THEN customer.`cus_sla_p3`
-      WHEN 4
-      THEN customer.`cus_sla_p4`
-      ELSE 0
-    END,
-    NULL) 
-  ) AS slaMet,
-    AVG(IF(pro_status IN (\"F\",\"C\"),getOpenHours(problem.`pro_problemno`) < 8, NULL)) AS closedWithin8Hours,
-    AVG(IF(pro_status =\"C\",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
-    SUM(pro_status IN(\"F\",\"C\")) AS `fixed`,
-    AVG(IF(pro_status IN (\"F\",\"C\"), problem.`pro_chargeable_activity_duration_hours`,NULL)) AS avgChargeableTime,
-    AVG(IF(pro_status IN (\"F\",\"C\"), problem.pro_working_hours,NULL)) AS avgTimeAwaitingCNC,
-    AVG(IF(pro_status IN (\"F\",\"C\"), getOpenHours(problem.`pro_problemno`),NULL)) AS avgTimeFromRaiseToFixHours
-FROM
-  problem
-  LEFT JOIN callactivity initial
-    ON initial.`caa_problemno` = problem.`pro_problemno`
-    AND initial.`caa_callacttypeno` = 51
-  JOIN customer
-    ON problem.`pro_custno` = customer.`cus_custno`
-WHERE 
-   caa_date BETWEEN NOW() - INTERVAL 30 DAY
-  AND NOW()
-  AND pro_priority < 5"
-                );
-                $data = $db->fetchAll(MYSQLI_ASSOC);
-                $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
                 return $response;
             }
         );

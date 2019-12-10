@@ -27,7 +27,8 @@ BEGIN
         initialStartDate
     FROM callactivity
     WHERE callactivity.`caa_problemno` = serviceRequestID
-      AND callactivity.`caa_callacttypeno` = 51;
+      AND callactivity.`caa_callacttypeno` = 51 order by caa_date limit 1;
+
     SELECT callactivity.`caa_endtime`,
            callactivity.`caa_date`
     INTO fixedEndTime,
