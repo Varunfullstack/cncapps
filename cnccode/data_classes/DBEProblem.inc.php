@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEProblem extends DBEntity
@@ -56,6 +57,7 @@ class DBEProblem extends DBEntity
     const startedUserID = "startedUserID";
     const reopenedDate = "reopenedDate";
     const authorisedBy = "authorisedBy";
+    const openHours = "openHours";
 
     /**
      * calls constructor()
@@ -360,6 +362,12 @@ class DBEProblem extends DBEntity
         $this->addColumn(
             self::authorisedBy,
             DA_INTEGER,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::openHours,
+            DA_FLOAT,
             DA_ALLOW_NULL
         );
 

@@ -66,11 +66,22 @@ $app->group(
                 global $db;
 
                 $db->query(
-                    "SELECT
+                    'SELECT
+
   SUM(1) AS raised,
-  AVG(problem.`pro_responded_hours`) AS responseTime,
-  AVG(
-   IF(pro_status IN (\"F\",\"C\"),   
+  AVG(respondedHours) AS responseTime,
+  AVG(slaMet ) AS avgSLAMet,
+    AVG(openHours < 8, NULL) AS closedWithin8Hours,
+    AVG(reopened) AS avgReopened,
+    SUM(fixed) AS `fixedCount`,
+    AVG(chargeableTime) AS avgChargeableTime,
+    AVG(awaitingCNC) AS avgTimeAwaitingCNC,
+    AVG(openHours) AS avgTimeFromRaiseToFixHours
+FROM
+  (
+    SELECT
+           pro_responded_hours as respondedHours,
+           IF(pro_status IN ("F","C"),   
    problem.`pro_responded_hours` < 
     CASE
       problem.`pro_priority`
@@ -83,26 +94,24 @@ $app->group(
       WHEN 4
       THEN customer.`cus_sla_p4`
       ELSE 0
-    END,
-    NULL) 
-  ) AS slaMet,
-    AVG(IF(pro_status IN (\"F\",\"C\"),getOpenHours(problem.`pro_problemno`) < 8, NULL)) AS closedWithin8Hours,
-    AVG(IF(pro_status =\"C\",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
-    SUM(pro_status IN(\"F\",\"C\")) AS `fixed`,
-    AVG(IF(pro_status IN (\"F\",\"C\"), problem.`pro_chargeable_activity_duration_hours`,NULL)) AS avgChargeableTime,
-    AVG(IF(pro_status IN (\"F\",\"C\"), problem.pro_working_hours,NULL)) AS avgTimeAwaitingCNC,
-    AVG(IF(pro_status IN (\"F\",\"C\"), getOpenHours(problem.`pro_problemno`),NULL)) AS avgTimeFromRaiseToFixHours
-FROM
-  problem
-  LEFT JOIN callactivity initial
-    ON initial.`caa_problemno` = problem.`pro_problemno`
+    END,null) as slaMet,
+    IF(pro_status ="C",problem.`pro_reopened_date` IS NOT NULL, NULL) AS reopened,
+    pro_status IN("F","C") AS `fixed`,
+    IF(pro_status IN ("F","C"), problem.`pro_chargeable_activity_duration_hours`,NULL) AS chargeableTime,
+    IF(pro_status IN ("F","C"), problem.pro_working_hours,NULL) AS awaitingCNC,
+    IF(pro_status IN ("F","C"), getOpenHours(problem.`pro_problemno`),NULL) AS openHours
+    FROM problem
+    LEFT JOIN callactivity initial
+    ON initial.`caa_problemno` = p.`pro_problemno`
     AND initial.`caa_callacttypeno` = 51
-  JOIN customer
+    JOIN customer
     ON problem.`pro_custno` = customer.`cus_custno`
-WHERE 
+    WHERE 
    caa_date BETWEEN NOW() - INTERVAL 30 DAY
   AND NOW()
-  AND pro_priority < 5"
+  AND pro_priority < 5
+  ) 
+  '
                 );
                 $data = $db->fetchAll(MYSQLI_ASSOC);
                 $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));

@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 538 - Reporting for customer SRs / performance analysis
+
 ## [v3.8.2] - 2019-12-09
 ### Fixed
 - The Renewal Report PDF has some incorrect values
