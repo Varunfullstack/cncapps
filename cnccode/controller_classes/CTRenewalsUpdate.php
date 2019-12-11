@@ -64,7 +64,7 @@ class CTRenewalsUpdate extends CTCNC
                     "customerName"            => "customer.`cus_name`",
                     "itemBillingCategoryName" => "itemBillingCategory.name",
                     "invoicePeriodMonths"     => "custitem.invoicePeriodMonths",
-                    'nextInvoicePeriod'       => "DATE_FORMAT( DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH ), '%d/%m/%Y') ",
+                    'nextInvoicePeriod'       => 'DATE_ADD(`installationDate`, INTERVAL `totalInvoiceMonths` MONTH )',
                     "directDebit"             => "directDebitFlag"
                 ];
 
@@ -129,16 +129,15 @@ WHERE declinedFlag = 'N'
                         if (!isset($columnsNames[(int)$orderItem['column']])) {
                             continue;
                         }
-                        $orderBy[] = mysqli_real_escape_string(
-                            $db->link_id(),
-                            $columnsDefinition[$columnsNames[(int)$orderItem['column']]] . " " . $orderItem['dir']
-                        );
+                        $orderBy[] = $columnsDefinition[$columnsNames[(int)$orderItem['column']]] . " " . mysqli_real_escape_string(
+                                $db->link_id(),
+                                $orderItem['dir']
+                            );
                     }
                     if (count($orderBy)) {
                         $defaultQuery .= (" order by " . implode(' , ', $orderBy));
                     }
                 }
-//                var_dump($defaultQuery);
                 $countResult = $db->preparedQuery(
                     $countQuery,
                     $parameters
@@ -148,6 +147,7 @@ WHERE declinedFlag = 'N'
                 $defaultQuery .= " limit ?,?";
                 $parameters[] = ["type" => "i", "value" => $offset];
                 $parameters[] = ["type" => "i", "value" => $limit];
+//                var_dump($defaultQuery);
                 $result = $db->preparedQuery(
                     $defaultQuery,
                     $parameters

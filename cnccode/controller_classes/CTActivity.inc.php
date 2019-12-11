@@ -2835,6 +2835,7 @@ class CTActivity extends CTCNC
             address.add_phone,
             supportLevel,
             con_position,
+            cus_referred,
             specialAttentionContactFlag,
             (
               SELECT
@@ -2961,7 +2962,8 @@ class CTActivity extends CTCNC
                         'contactID'            => $row['con_contno'],
                         'contact_notes'        => $row['con_notes'],
                         'contact_supportLevel' => $row['supportLevel'],
-                        'contract'             => $row['hasPrepay'] ? 'PrePay' : ($row['hasServiceDesk'] ? $row['hasServiceDesk'] : 'T&M Authorisation Required')
+                        'contract'             => $row['hasPrepay'] ? 'PrePay' : ($row['hasServiceDesk'] ? $row['hasServiceDesk'] : 'T&M Authorisation Required'),
+                        'referredDisabled'     => $row['cus_referred'] == 'Y' ? "disabled" : null,
                     )
                 );
                 $this->template->parse(
