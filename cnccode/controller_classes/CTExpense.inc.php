@@ -265,6 +265,9 @@ class CTExpense extends CTCNC
                         'txtEdit'        => $txtEdit,
                         'txtDelete'      => $txtDelete,
                         'receiptUpload'  => $uploadReceipt,
+                        'status'         => $dsExpense->getValue(
+                            DBEExpense::approvedBy
+                        ) ? 'Approved' : ($dsExpense->getValue(DBEExpense::deniedReason) ? 'Denied' : 'Pending')
                     )
                 );
 
@@ -401,7 +404,8 @@ class CTExpense extends CTCNC
                     ) == 'Y' ? 'data-is-mileage="1"' : '',
                     "allowsTax"           => $dbeExpenseType->getValue(
                         DBEExpenseType::vatFlag
-                    ) == 'Y' ? 'data-allows-tax="1"' : ''
+                    ) == 'Y' ? 'data-allows-tax="1"' : '',
+
                 )
             );
             $this->template->parse(

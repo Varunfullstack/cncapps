@@ -86,44 +86,44 @@ if ($generateSummary) {
 while ($dbeCustomer->fetchNext()) {
 
     $query = /** @lang MySQL */
-        "SELECT 
-  locations.name AS \"Location\",
-  computers.name AS \"Computer Name\",
-  SUBSTRING_INDEX(lastusername, '\\\', - 1) AS \"Last User\",
-  computers.localaddress AS \"IP Address\",
+        'SELECT 
+  locations.name AS "Location",
+  computers.name AS "Computer Name",
+  SUBSTRING_INDEX(lastusername, \'\\\\\', - 1) AS "Last User",
+  computers.localaddress AS "IP Address",
    DATE_FORMAT(
     computers.lastContact,
-    '%d/%m/%Y %H:%i:%s'
-  ) AS \"Last Contact\",
-  inv_chassis.productname AS \"Model\",
-  if(inv_chassis.serialnumber like '%VMware%', null,inv_chassis.serialnumber )        AS \"Serial No.\",
+    \'%d/%m/%Y %H:%i:%s\'
+  ) AS "Last Contact",
+  inv_chassis.productname AS "Model",
+  if(inv_chassis.serialnumber like \'%VMware%\', null,inv_chassis.serialnumber )        AS "Serial No.",
   DATE_FORMAT(
-    STR_TO_DATE(inv_bios.biosdate, '%m/%d/%Y'),
-    '%d/%m/%Y'
-  ) AS \"BIOS Date\",
-  inv_processor.name AS \"CPU\",
-  cim_processorfamily.value AS \"CPU Type\",
-  computers.totalmemory AS \"Memory\",
-  SUM(drives.Size) AS \"Total Disk\",
-  if(exd.`Bitlocker Enabled` and exd.`Bitlocker Password/Key` regexp '[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}','Encrypted',null) as 'Drive Encryption',
+    STR_TO_DATE(inv_bios.biosdate, \'%m/%d/%Y\'),
+    \'%d/%m/%Y\'
+  ) AS "BIOS Date",
+  inv_processor.name AS "CPU",
+  cim_processorfamily.value AS "CPU Type",
+  computers.totalmemory AS "Memory",
+  SUM(drives.Size) AS "Total Disk",
+  if(exd.`Bitlocker Enabled` and exd.`Bitlocker Password/Key` regexp \'[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}\',\'Encrypted\',null) as \'Drive Encryption\',
   SUBSTRING_INDEX(
     computers.os,
-    'Microsoft Windows ',
+    \'Microsoft Windows \',
     - 1
-  ) AS \"Operating System\",
-  computers.version AS \"Version\",
-       (select endOfSupportDate from ($fakeTable) f where computers.os = f.osName and computers.version like concat('%', f.version, '%') limit 1) as `OS End of Support Date`,
-  computers.domain AS 'Domain',
+  ) AS "Operating System",
+  computers.version AS "Version",
+       (select endOfSupportDate from ($fakeTable) f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `OS End of Support Date`,
+  computers.domain AS \'Domain\',
   SUBSTRING_INDEX(
     software.name,
-    'Microsoft Office ',
+    \'Microsoft Office \',
     - 1
-  ) AS \"Office Version\",
+  ) AS "Office Version",
   virusscanners.name AS AV,
   DATE_FORMAT(
-    STR_TO_DATE(computers.VirusDefs, '%Y%m%d'),
-    '%d/%m/%Y'
-  ) AS \"AV Definition\" 
+    STR_TO_DATE(computers.VirusDefs, \'%Y%m%d\'),
+    \'%d/%m/%Y\'
+  ) AS "AV Definition" 
 FROM
   computers 
   LEFT JOIN (clients) 
@@ -146,34 +146,34 @@ FROM
   LEFT JOIN (software) 
     ON (
       computers.computerid = software.computerid 
-      AND software.name LIKE \"%microsoft office%\" 
-      AND software.name NOT LIKE \"%visio%\" 
-      AND software.name NOT LIKE \"%Activation%\" 
-      AND software.name NOT LIKE \"%Access%\" 
-      AND software.name NOT LIKE \"%Communicator%\" 
-      AND software.name NOT LIKE \"%Converter%\" 
-      AND software.name NOT LIKE \"%Excel%\" 
-      AND software.name NOT LIKE \"%Frontpage%\" 
-      AND software.name NOT LIKE \"%Infopage%\" 
-      AND software.name NOT LIKE \"%demand%\" 
-      AND software.name NOT LIKE \"%outlook%\" 
-      AND software.name NOT LIKE \"%onenote%\" 
-      AND software.name NOT LIKE \"%powerpoint%\" 
-      AND software.name NOT LIKE \"%project%\" 
-      AND software.name NOT LIKE \"%sharepoint%\" 
-      AND software.name NOT LIKE \"%web%\" 
-      AND software.name NOT LIKE \"%word%\" 
-      AND software.name NOT LIKE \"%Live%\" 
-      AND software.name NOT LIKE \"%Assemblies%\" 
-      AND software.name NOT LIKE \"%Validation%\" 
-      AND software.name NOT LIKE \"%Click-to-run%\" 
-      AND software.name NOT LIKE \"%Sounds%\" 
-      AND software.name NOT LIKE \"%Language%\" 
-      AND software.name NOT LIKE \"%Resource%\" 
-      AND software.name NOT LIKE \"%communications%\" 
-      AND software.name NOT LIKE \"%media%\" 
-      AND software.name NOT LIKE \"%ODF%\" 
-      AND software.name NOT LIKE \"%SDK%\"
+      AND software.name LIKE "%microsoft office%" 
+      AND software.name NOT LIKE "%visio%" 
+      AND software.name NOT LIKE "%Activation%" 
+      AND software.name NOT LIKE "%Access%" 
+      AND software.name NOT LIKE "%Communicator%" 
+      AND software.name NOT LIKE "%Converter%" 
+      AND software.name NOT LIKE "%Excel%" 
+      AND software.name NOT LIKE "%Frontpage%" 
+      AND software.name NOT LIKE "%Infopage%" 
+      AND software.name NOT LIKE "%demand%" 
+      AND software.name NOT LIKE "%outlook%" 
+      AND software.name NOT LIKE "%onenote%" 
+      AND software.name NOT LIKE "%powerpoint%" 
+      AND software.name NOT LIKE "%project%" 
+      AND software.name NOT LIKE "%sharepoint%" 
+      AND software.name NOT LIKE "%web%" 
+      AND software.name NOT LIKE "%word%" 
+      AND software.name NOT LIKE "%Live%" 
+      AND software.name NOT LIKE "%Assemblies%" 
+      AND software.name NOT LIKE "%Validation%" 
+      AND software.name NOT LIKE "%Click-to-run%" 
+      AND software.name NOT LIKE "%Sounds%" 
+      AND software.name NOT LIKE "%Language%" 
+      AND software.name NOT LIKE "%Resource%" 
+      AND software.name NOT LIKE "%communications%" 
+      AND software.name NOT LIKE "%media%" 
+      AND software.name NOT LIKE "%ODF%" 
+      AND software.name NOT LIKE "%SDK%"
     ) 
   LEFT JOIN (inv_bios) 
     ON (
@@ -186,9 +186,9 @@ FROM
   LEFT JOIN (drives) 
     ON (
       computers.computerid = drives.computerid 
-      AND drives.filesystem = \"NTFS\" 
-      AND drives.missing = \"0\" 
-      AND drives.internal = \"1\"
+      AND drives.filesystem = "NTFS" 
+      AND drives.missing = "0" 
+      AND drives.internal = "1"
     )  
   LEFT JOIN (virusscanners) 
     ON (
@@ -201,7 +201,7 @@ GROUP BY computers.computerid
 ORDER BY clients.name,
   computers.os,
   computers.name,
-  software.name";
+  software.name';
 
     $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
     $customerName = $dbeCustomer->getValue(DBECustomer::name);

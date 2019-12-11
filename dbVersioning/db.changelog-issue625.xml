@@ -205,7 +205,7 @@
     <changeSet author="pavwebdev" id="625-15">
         <sql>
             INSERT INTO expensetype VALUE (
-                                           (SELECT db_sequence.`nextid`
+                                           (SELECT db_sequence.`nextid` + 1
                                             FROM db_sequence
                                             WHERE `db_sequence`.`seq_name` = "expensetype"),
                                            "Call Out",
@@ -424,6 +424,18 @@
         <addColumn tableName="headert">
             <column name="daysInAdvanceExpensesNextMonthAlert" defaultValue="2" type="int(2)">
                 <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-25">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expenseType" columnName="maximumAutoApprovalAmount"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expenseType">
+            <column name="maximumAutoApprovalAmount" type="decimal(10,2)">
+                <constraints nullable="true"/>
             </column>
         </addColumn>
     </changeSet>

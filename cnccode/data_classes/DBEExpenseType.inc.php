@@ -14,6 +14,7 @@ class DBEExpenseType extends DBEntity
     const taxable = 'taxable';
     const approvalRequired = "approvalRequired";
     const receiptRequired = "receiptRequired";
+    const maximumAutoApprovalAmount = "maximumAutoApprovalAmount";
 
     /**
      * calls constructor()
@@ -70,6 +71,11 @@ class DBEExpenseType extends DBEntity
             DA_NOT_NULL,
             null,
             0
+        );
+        $this->addColumn(
+            self::maximumAutoApprovalAmount,
+            DA_FLOAT,
+            DA_ALLOW_NULL
         );
 
         $this->setPK(0);
