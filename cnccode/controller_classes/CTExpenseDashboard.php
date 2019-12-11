@@ -159,7 +159,6 @@ WHERE
                 $queryString .= " limit ?, ?";
                 $parameters[] = ["type" => "i", "value" => $offset];
                 $parameters[] = ["type" => "i", "value" => $limit];
-
                 $result = $db->preparedQuery(
                     $queryString,
                     $parameters

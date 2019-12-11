@@ -100,6 +100,7 @@ class BUExpense extends Business
             DBEExpense::dateSubmitted,
             date('d/m/Y H:i:s')
         );
+        $dbeExpense->setValue(DBEExpense::deniedReason, null);
         $dbeExpense->insertRow();
         $expenseID = $dbeExpense->getPKValue();
         return ($expenseID);
