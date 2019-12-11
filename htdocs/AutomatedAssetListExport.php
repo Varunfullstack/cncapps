@@ -134,7 +134,7 @@ while ($dbeCustomer->fetchNext()) {
     STR_TO_DATE(inv_bios.biosdate, '%m/%d/%Y'),
     '%d/%m/%Y'
   ) AS \"BIOS Date\",
-  inv_processor.name AS \"CPU\",
+  processor.name AS \"CPU\",
   cim_processorfamily.value AS \"CPU Type\",
   computers.totalmemory AS \"Memory\",
   SUM(drives.Size) AS \"Total Disk\",
@@ -167,15 +167,16 @@ FROM
     ON (
       computers.locationid = locations.locationid
     ) 
-  LEFT JOIN (inv_processor) 
-    ON (
-      computers.computerid = inv_processor.computerid 
-      AND inv_processor.enabled = 1
-    ) 
-  LEFT JOIN (cim_processorfamily) 
-    ON (
-      inv_processor.family = cim_processorfamily.id
-    ) 
+  LEFT JOIN
+(SELECT
+*
+FROM
+inv_processor
+WHERE inv_processor.Enabled = 1
+GROUP BY inv_processor.computerid) processor
+ON computers.computerid = processor.computerid
+LEFT JOIN (cim_processorfamily)
+ON processor.family = cim_processorfamily.id
   LEFT JOIN (software) 
     ON (
       computers.computerid = software.computerid 

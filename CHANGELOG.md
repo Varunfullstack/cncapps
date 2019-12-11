@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.8.4] - 2019-12-11
+### Fixed
+- Fixed issue with Asset List export disk size calculations
+
 ## [v3.8.3] - 2019-12-11
 ### Fixed
 - if a customer is referred you must not be able to raise an SR for that customer
