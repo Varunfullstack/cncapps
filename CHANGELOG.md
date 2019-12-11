@@ -1,6 +1,13 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.8.3] - 2019-12-11
+### Fixed
+- if a customer is referred you must not be able to raise an SR for that customer
+- CreateRenewalsSalesOrdersManager.php, it doesn't do anything anymore
+- CheckPendingCompletionSR.php looks like the fixed date and days since fixed is pulling from initial, not the fixed activity
+- Renewals Update - Allow sorting by "Next Invoice Period"
+
 ## [v3.8.2] - 2019-12-09
 ### Fixed
 - The Renewal Report PDF has some incorrect values
@@ -14,7 +21,7 @@ This project changes will be shown here.
 - Offsite Replication Checks Suspended Until doesn't show the value entered.
 
 ## [v3.8.0] - 2019-11-29
-### Added
+### Added 
 - Issue 680 - Quick Create Sales Request
 - Issue 659 - Record daily replication / backup targets in database
 - Issue 677 - Sales Passwords list

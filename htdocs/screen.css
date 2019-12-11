@@ -51,6 +51,11 @@ TD, INPUT, SELECT, TEXTAREA {
     color: red;
 }
 
+.fakeLink[disabled]{
+    color: inherit;
+    cursor: inherit;
+}
+
 .redText {
     color: red;
 }
