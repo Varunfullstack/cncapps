@@ -42,15 +42,18 @@ if (isset($options['d'])) {
 $thing = null;
 $db->query(
     'SELECT
-  caa_callactivityno as activityId,
-  caa_problemno as serviceRequestId,
+  initialActivity.caa_callactivityno AS activityId,
+  pro_problemno AS serviceRequestId,
   CONCAT(
     fix_consultant.firstName,
     \' \',
     fix_consultant.lastName
   ) AS fixedBy,
-  DATEDIFF(CURRENT_DATE(), caa_date) AS outstandingFor,
-  caa_date AS fixedDate,
+  DATEDIFF(
+    CURRENT_DATE(),
+    fixedActivity.`caa_date`
+  ) AS outstandingFor,
+  fixedActivity.`caa_date` AS fixedDate,
   customer.`cus_name` AS customerName,
   IF(
     fix_consultant.cns_manager = 0
@@ -60,11 +63,14 @@ $db->query(
   ) AS managerID,
   manager.`cns_logname` AS managerEmail
 FROM
-  callactivity
-  LEFT JOIN callacttype
-    ON caa_callacttypeno = cat_callacttypeno
-  LEFT JOIN problem
-    ON problem.pro_problemno = callactivity.caa_problemno
+  problem
+  JOIN callactivity fixedActivity
+    ON fixedActivity.`caa_problemno` = problem.`pro_problemno`
+    AND fixedActivity.caa_callacttypeno = 57
+  JOIN callactivity initialActivity
+    ON initialActivity.`caa_problemno` = problem.`pro_problemno`
+    AND initialActivity.caa_callacttypeno = 51
+    AND initialActivity.caa_status = \'C\'
   LEFT JOIN project
     ON project.projectID = problem.pro_projectno
   LEFT JOIN consultant AS fix_consultant
@@ -78,8 +84,7 @@ FROM
       fix_consultant.`cns_consno`,
       fix_consultant.cns_manager
     )
-WHERE caa_status = \'C\'
-  AND pro_contract_cuino IS NOT NULL
+WHERE pro_contract_cuino IS NOT NULL
   AND pro_status = \'F\'
   AND pro_complete_date <= NOW()
   AND pro_total_activity_duration_hours >
@@ -87,14 +92,16 @@ WHERE caa_status = \'C\'
     hed_sr_autocomplete_threshold_hours
   FROM
     headert)
-  AND caa_callacttypeno = 51
-  AND DATEDIFF(CURRENT_DATE(), caa_date) >=
+  AND DATEDIFF(
+    CURRENT_DATE(),
+    fixedActivity.`caa_date`
+  ) >=
   (SELECT
     headert.closureReminderDays
   FROM
     headert
   LIMIT 1)
-  and pro_priority <> 5
+  AND pro_priority <> 5
 ORDER BY managerID,
   outstandingFor DESC'
 );
