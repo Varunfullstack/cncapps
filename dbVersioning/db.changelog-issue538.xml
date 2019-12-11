@@ -18,7 +18,8 @@
         </addColumn>
         <sql>
             update problem
-            set openHours = getOpenHours(pro_problemno);
+            set openHours = getOpenHours(pro_problemno)
+            where date(pro_date_raised) > '2016-12-31';
         </sql>
         <rollback>
             <dropColumn tableName="problem" columnName="openHours"/>
