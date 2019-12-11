@@ -99,6 +99,28 @@ WHERE (callactivity.`caa_consno` = $userID OR consultant.`expenseApproverID` = $
 
         $this->getRows();
     }
+
+    public function getUnapprovedExpense()
+    {
+        $this->queryString = "SELECT
+  " . $this->getDBColumnNamesAsString() . "
+FROM
+  " . $this->getTableName() . " 
+  LEFT JOIN `callactivity`
+    ON `callactivity`.`caa_callactivityno` = " . $this->getDBColumnName(self::callActivityID) . " 
+    LEFT JOIN consultant
+    ON callactivity.`caa_consno` = consultant.`cns_consno`
+    left join expensetype on expensetype.ext_expensetypeno = expense.exp_expensetypeno
+   where " . $this->getDBColumnName(
+                self::approvedDate
+            ) . " is null and " . $this->getDBColumnName(self::deniedReason) . " is null AND " . $this->getDBColumnName(
+                self::exportedFlag
+            ) . " <> 'Y'  
+            and consultant.autoApproveExpenses
+            and exp_value <= maximumAutoApprovalAmount
+            ";
+        return $this->getRows();
+    }
 }
 
 ?>

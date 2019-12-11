@@ -145,28 +145,31 @@ class CTExpenseType extends CTCNC
 
         $this->template->set_var(
             array(
-                'expenseTypeID'           => $dsExpenseType->getValue(DBEExpenseType::expenseTypeID),
-                'description'             => Controller::htmlInputText(
+                'expenseTypeID'             => $dsExpenseType->getValue(DBEExpenseType::expenseTypeID),
+                'description'               => Controller::htmlInputText(
                     $dsExpenseType->getValue(DBEExpenseType::description)
                 ),
-                'descriptionMessage'      => Controller::htmlDisplayText(
+                'descriptionMessage'        => Controller::htmlDisplayText(
                     $dsExpenseType->getMessage(DBEExpenseType::description)
                 ),
-                'taxableChecked'          => $dsExpenseType->getValue(DBEExpenseType::taxable) ? 'checked' : null,
-                'approvalRequiredChecked' => $dsExpenseType->getValue(
+                'taxableChecked'            => $dsExpenseType->getValue(DBEExpenseType::taxable) ? 'checked' : null,
+                'approvalRequiredChecked'   => $dsExpenseType->getValue(
                     DBEExpenseType::approvalRequired
                 ) ? 'checked' : null,
-                'receiptRequiredChecked' => $dsExpenseType->getValue(
+                'receiptRequiredChecked'    => $dsExpenseType->getValue(
                     DBEExpenseType::receiptRequired
                 ) ? 'checked' : null,
-                'mileageFlagChecked'      => Controller::htmlChecked(
+                'mileageFlagChecked'        => Controller::htmlChecked(
                     $dsExpenseType->getValue(DBEExpenseType::mileageFlag)
                 ),
-                'vatFlagChecked'          => Controller::htmlChecked($dsExpenseType->getValue(DBEExpenseType::vatFlag)),
-                'urlUpdate'               => $urlUpdate,
-                'urlDelete'               => $urlDelete,
-                'txtDelete'               => $txtDelete,
-                'urlDisplayList'          => $urlDisplayList
+                'vatFlagChecked'            => Controller::htmlChecked(
+                    $dsExpenseType->getValue(DBEExpenseType::vatFlag)
+                ),
+                'maximumAutoApprovalAmount' => $dsExpenseType->getValue(DBEExpenseType::maximumAutoApprovalAmount),
+                'urlUpdate'                 => $urlUpdate,
+                'urlDelete'                 => $urlDelete,
+                'txtDelete'                 => $txtDelete,
+                'urlDisplayList'            => $urlDisplayList
             )
         );
         $this->template->parse('CONTENTS', 'ExpenseTypeEdit', true);

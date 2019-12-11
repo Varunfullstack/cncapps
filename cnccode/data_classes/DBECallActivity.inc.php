@@ -368,4 +368,49 @@ class DBECallActivity extends DBEntity
         );
         $this->runQuery();
     }
+
+    public function getUnapprovedOvertime()
+    {
+        $this->queryString = "SELECT
+  " . $this->getDBColumnNamesAsString() . "
+FROM
+  " . $this->getTableName() . "
+  LEFT JOIN consultant
+    ON callactivity.`caa_consno` = consultant.`cns_consno` 
+      JOIN headert
+    ON headert.`headerID` = 1
+  where " . $this->getDBColumnName(
+                self::overtimeApprovedDate
+            ) . " is null and " . $this->getDBColumnName(
+                self::overtimeDeniedReason
+            ) . " is null AND " . $this->getDBColumnName(
+                self::overtimeExportedFlag
+            ) . " <> 'Y'
+            and consultant.autoApproveExpenses
+           and caa_endtime AND caa_endtime IS NOT NULL AND
+      (caa_status = 'C'
+    OR caa_status = 'A')
+  AND caa_ot_exp_flag = 'N'
+  AND (
+    (
+      consultant.weekdayOvertimeFlag = 'Y'
+      AND DATE_FORMAT(caa_date, '%w') IN (0, 1, 2, 3, 4, 5, 6)
+    )
+    OR (
+      consultant.weekdayOvertimeFlag = 'N'
+      AND DATE_FORMAT(caa_date, '%w') IN (0, 6)
+    )
+  )
+  AND (
+    caa_endtime > hed_pro_endtime
+    OR caa_starttime < hed_pro_starttime
+    OR caa_endtime > `hed_hd_endtime`
+    OR caa_starttime < hed_hd_starttime
+    OR DATE_FORMAT(caa_date, '%w') IN (0, 6)
+  )
+  AND (caa_endtime <> caa_starttime)
+  AND callacttype.engineerOvertimeFlag = 'Y' 
+            ";
+        return $this->getRows();
+    }
 }

@@ -100,20 +100,8 @@ class BUExpense extends Business
             DBEExpense::dateSubmitted,
             date('d/m/Y H:i:s')
         );
-
-
-        $dbeUser = new DBEUser($this);
-        $dbeUser->getRow($dbeCallActivity->getValue(DBECallActivity::userID));
-
-        if ($dbeUser->getValue(DBEUser::autoApproveExpenses)) {
-            $dbeExpense->setValue(DBEExpense::approvedBy, USER_SYSTEM);
-            $dbeExpense->setValue(DBEExpense::approvedDate, date('d/m/Y H:i:s'));
-        }
-
         $dbeExpense->insertRow();
-
         $expenseID = $dbeExpense->getPKValue();
-
         return ($expenseID);
     }
 
