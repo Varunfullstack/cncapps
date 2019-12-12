@@ -17,7 +17,9 @@ $(function () {
                     changeMonth: true,
                     changeYear: true,
                     firstDay: 1,
-                    beforeShowDay: window[beforeShowDayFunction]
+                    beforeShowDay: window[beforeShowDayFunction],
+                    showOtherMonths: true,
+                    selectOtherMonths: true
                 }
             );
         })
