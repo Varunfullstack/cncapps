@@ -461,9 +461,12 @@ class CTExpense extends CTCNC
     function updateExpense()
     {
         $this->setMethodName('updateExpense');
-        $this->formError = (!$this->dsExpense->populateFromArray($this->getParam('expense')));
-
-
+        $expenseToUpdate = $this->getParam('expense')[1];
+        $expenseID = $expenseToUpdate['expenseID'];
+        $dbeExpense = new DBEExpense($this);
+        $dbeExpense->getRow($expenseID);
+        $expenseToUpdate[DBEExpense::deniedReason] = $dbeExpense->getValue(DBEExpense::deniedReason);
+        $this->formError = (!$this->dsExpense->populateFromArray([$expenseToUpdate]));
         if ($this->formError) {
             $this->editExpense();
             exit;
@@ -561,7 +564,8 @@ class CTExpense extends CTCNC
             // do export
             $expensesExported = $this->buExpense->exportOvertimeAndExpenses(
                 $this->dsExpenseExport,
-                $this->getParam('exportType')
+                $this->getParam('exportType'),
+                $this->dbeUser
             );
 
             if ($this->getParam('exportType') == 'Export') {
@@ -573,14 +577,14 @@ class CTExpense extends CTCNC
                 );
                 $dbeHeader->updateRow();
                 if ($expensesExported) {
-                    $this->setFormErrorMessage('Export files created and emails sent');
+                    $this->setFormErrorMessage('Data sent to CNC Payroll');
                 } else {
                     $this->setFormErrorMessage('No data to export for this date');
                 }
             } else { // trial
 
                 if ($expensesExported) {
-                    $this->setFormErrorMessage('There are records to export. Email sent to the sales manager');
+                    $this->setFormErrorMessage('Trial data sent to CNC Payroll');
                 } else {
                     $this->setFormErrorMessage('No data to export for this date');
                 }

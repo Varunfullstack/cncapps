@@ -376,7 +376,8 @@ class DBECallActivity extends DBEntity
 FROM
   " . $this->getTableName() . "
   LEFT JOIN consultant
-    ON callactivity.`caa_consno` = consultant.`cns_consno` 
+    ON callactivity.`caa_consno` = consultant.`cns_consno`
+    left join callacttype on callacttype.cat_callacttypeno = callactivity.caa_callacttypeno
       JOIN headert
     ON headert.`headerID` = 1
   where " . $this->getDBColumnName(

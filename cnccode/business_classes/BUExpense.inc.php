@@ -219,10 +219,12 @@ class BUExpense extends Business
      * Export engineer expenses to file
      * @param DataSet $dsData
      * @param string $runType
+     * @param DBEUser $dbeUser
      * @return bool
      */
     function exportOvertimeAndExpenses(&$dsData,
-                                       $runType
+                                       $runType,
+                                       $dbeUser
     )
     {
         /** @var dbSweetcode $db */
@@ -246,6 +248,7 @@ class BUExpense extends Business
                 0,
                 4
             );
+
         foreach ($expenses as $expenseExportItem) {
 
             if (!isset($engineersData[$expenseExportItem->engineerName])) {
@@ -275,6 +278,7 @@ class BUExpense extends Business
         }
 
         foreach ($overtimeActivities as $overtimeExportItem) {
+
             if (!isset($engineersData[$overtimeExportItem->engineerName])) {
                 $engineersData[$overtimeExportItem->engineerName] = [
                     "expenses"           => [],
@@ -413,7 +417,7 @@ class BUExpense extends Business
                 $journalCSVString = $this->array2csv($expenseJournalCSVData);
             }
 
-            $this->sendResultToEmail($summaryCSVString, $journalCSVString);
+            $this->sendResultToEmail($dbeUser, $summaryCSVString, $journalCSVString);
         }
 
         return true;
@@ -445,21 +449,20 @@ class BUExpense extends Business
   `cns_employee_no` as employeeNumber,
                consultant.firstName as engineerFirstName,
                consultant.lastName as engineerLastName,
-               
-  ROUND(IF(
+               IF(
     expense.exp_vat_flag = 'Y',
     expense.exp_value - (
       expense.`exp_value` / (1 + getCurrentVatRate ())
     ),
     0
-  ),2) AS VATValue,
-  ROUND(IF(
+  ) AS VATValue,
+  IF(
     expense.`exp_vat_flag` = 'Y',
     (
       expense.`exp_value` / (1 + getCurrentVatRate ())
     ),
     expense.`exp_value`
-  ),2) AS netValue
+  ) AS netValue
 FROM
   expense
   INNER JOIN callactivity
@@ -681,11 +684,16 @@ ORDER BY cns_name,
         return $csv;
     }
 
-    function sendResultToEmail($summaryCSVString, $journalCSVString = null)
+    /**
+     * @param DBEUser $fromUser
+     * @param $summaryCSVString
+     * @param null $journalCSVString
+     */
+    function sendResultToEmail($fromUser, $summaryCSVString, $journalCSVString = null)
     {
         $buMail = new BUMail($this);
-        $fromEmail = 'grahaml@cnc-ltd.co.uk';
         $toEmail = "payroll@cnc-ltd.co.uk";
+        $fromEmail = $fromUser->getValue(DBEUser::username) . "@" . CONFIG_PUBLIC_DOMAIN;
         $hdrs = array(
             'From'    => $fromEmail,
             'To'      => $toEmail,

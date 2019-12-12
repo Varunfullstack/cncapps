@@ -103,7 +103,15 @@
                         return moment(data, "YYYY-MM-DD HH:mm:ss").format('DD/MM/YYYY');
                     }
                 },
-                {data: "expenseTypeDescription", name: "expenseTypeDescription"},
+                {
+                    data: "expenseTypeDescription", name: "expenseTypeDescription", render: (data, type, row) => {
+                        if (!row.receiptId) {
+                            return data;
+                        }
+
+                        return data + " <a href='/Receipt.php?action=show&receiptID=" + row.receiptId + "' target='_blank' >(Receipt)</a>"
+                    }
+                },
                 {
                     data: "value", name: "value", render: (data) => {
                         if (!+data) {

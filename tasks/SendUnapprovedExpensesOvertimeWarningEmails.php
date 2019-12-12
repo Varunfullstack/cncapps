@@ -51,6 +51,10 @@ $nextProcessingDate = DateTime::createFromFormat(
     DATE_MYSQL_DATE,
     $dsHeader->getValue(DBEHeader::expensesNextProcessingDate)
 );
+if (!$nextProcessingDate) {
+    $logger->error('The next processing date has not been set. Stopping process');
+    exit;
+}
 $expensesNextProcessingDateStart = (clone $nextProcessingDate)->sub(new DateInterval('P' . $daysInAdvance . "D"));
 $logger->info('Start date' . $expensesNextProcessingDateStart->format(DATE_MYSQL_DATE));
 
@@ -109,8 +113,8 @@ foreach ($approvers as $approver) {
     $toEmail = $approver['approverUserName'] . '@' . CONFIG_PUBLIC_DOMAIN;
     $subject = "You have overtime or expenses requests that are waiting to be approved.";
     $hdrs = array(
-        'From' => $fromEmail,
-        'To' => $toEmail,
+        'From'    => $fromEmail,
+        'To'      => $toEmail,
         'Subject' => $subject
     );
     $mime = new Mail_mime();
