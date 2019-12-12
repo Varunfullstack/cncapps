@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 702 - Renewal Report to show users & direct debit
+
 ## [v3.8.4] - 2019-12-11
 ### Fixed
 - Fixed issue with Asset List export disk size calculations
