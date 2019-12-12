@@ -81,13 +81,15 @@ class CTExpenseDashboard extends CTCNC
       "Pending"
     )
   ) AS status,
-       callactivity.caa_consno = ? as isSelf
+       callactivity.caa_consno = ? as isSelf,
+       receipt.id as receiptId
 FROM
   expense
   LEFT JOIN `callactivity`
     ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
   LEFT JOIN consultant
     ON callactivity.`caa_consno` = consultant.`cns_consno`
+      left join receipt on receipt.expenseId = expense.exp_expenseno
   LEFT JOIN `expensetype`
     ON `expensetype`.`ext_expensetypeno` = expense.`exp_expensetypeno`
   LEFT JOIN problem

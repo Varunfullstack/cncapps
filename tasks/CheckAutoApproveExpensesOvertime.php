@@ -12,6 +12,8 @@ use CNCLTD\LoggerCLI;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
+require_once($cfg["path_dbe"] . "/DBEExpense.inc.php");
+require_once($cfg["path_dbe"] . "/DBECallActivity.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 global $db;
 $logName = 'CheckAutoApproveExpensesOvertime';
@@ -46,7 +48,7 @@ while ($expense->nextRecord()) {
         'The user with ID : ' . $userID . ' owner of this expense has auto approve enable, proceeding to approve expense '
     );
     $dbeExpense = new DBEExpense($thing);
-    $dbeExpense->getRow($userID);
+    $dbeExpense->getRow($expense->getValue(DBEExpense::expenseID));
     $dbeExpense->setValue(DBEExpense::approvedBy, USER_SYSTEM);
     $dbeExpense->setValue(DBEExpense::approvedDate, date(DATE_MYSQL_DATETIME));
     $dbeExpense->updateRow();
