@@ -10,7 +10,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 require_once("config.inc.php");
-
+global $cfg;
 require_once($cfg["path_bu"] . "/BUActivity.inc.php");
 
 $date = @$_REQUEST['date'];
