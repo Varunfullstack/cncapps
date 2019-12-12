@@ -396,6 +396,11 @@ class BUPDFSalesQuote extends Business
         $buPDF->setFont();
         $buPDF->CR();
         $buPDF->CR();
+        $buPDF->printString(
+            'This quotation is subject to our terms and conditions which are available <a href="https://www.cnc-ltd.co.uk/terms-and-conditions">here</a>'
+        );
+        $buPDF->CR();
+        $buPDF->CR();
         $buPDF->printString('If you would like to proceed with this quote, then please click on ');
         $buPDF->printString('this link', API_URL . "/acceptQuotation?code=$confirmationCode");
         $buPDF->printString(' which will automatically email you an e-signable order form document to sign.');
@@ -405,7 +410,7 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printString(
-            'If you need to vary the quote in any way, please email the changes to sales@cnc-ltd.co.uk, quoting ' . $ordheadID . '/' . $versionNo . ' and we will send a revised order form to you.'
+            'If you need to vary the quote in any way, please email the changes to <a href="mailto:sales@cnc-ltd.co.uk?Subject=Quote%20' . $ordheadID . '/' . $versionNo . '">sales@cnc-ltd.co.uk</a>, quoting ' . $ordheadID . '/' . $versionNo . ' and we will send a revised order form to you.'
         );
         $buPDF->CR();
         $buPDF->CR();

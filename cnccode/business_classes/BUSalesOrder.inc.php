@@ -2469,6 +2469,16 @@ WHERE odl_ordno = $ordheadID
         );
         $buPDF->CR();
         $buPDF->CR();
+        $buPDF->printStringRJAt(
+            UNIT_LEFT - 2,
+            'This order is subject to our terms and conditions which are available <a href="https://www.cnc-ltd.co.uk/terms-and-conditions">here</a> and by ticking this box you have read and agreed to them.'
+        );
+        $buPDF->printStringAt(
+            UNIT_LEFT,
+            "{check:signer1:I+have+read+and+I+accept+the+terms+and+conditions}"
+        );
+        $buPDF->CR();
+        $buPDF->CR();
         $buPDF->setBoldOn();
         $buPDF->printString('All prices are subject to VAT at the standard rate.');
         $buPDF->setBoldOff();
