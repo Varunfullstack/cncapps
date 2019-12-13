@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 706 - Create Sales Request - allow attachments
+
 ## [v3.8.4] - 2019-12-11
 ### Fixed
 - Fixed issue with Asset List export disk size calculations
