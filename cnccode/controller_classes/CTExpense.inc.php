@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUExpense.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
@@ -123,31 +124,6 @@ class CTExpense extends CTCNC
                 exit;
                 break;
         }
-    }
-
-    /**
-     * Create new call activity
-     * inserts a new activity to the DB then displays it
-     * @access private
-     * @throws Exception
-     */
-    function createExpense()
-    {
-        $this->setMethodName('createExpense');
-        if (!$this->getParam('callActivityID')) {
-            throw new Exception('Call activity ID not provided');
-        }
-        $expenseID = $this->buExpense->createExpenseFromCallActivityID($this->getParam('callActivityID'));
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'expenseID' => $expenseID,
-                    'action'    => CTEXPENSE_ACT_EDIT_EXPENSE
-                )
-            );
-        header('Location: ' . $urlNext);
     }
 
     /**
@@ -285,7 +261,7 @@ class CTExpense extends CTCNC
         $this->parsePage();
     }
 
-    /**
+/**
      * Edit/Add Expense
      * @access private
      * @throws Exception
@@ -390,6 +366,37 @@ class CTExpense extends CTCNC
             true
         );
         $this->parsePage();
+    }
+
+        /**
+     * Delete Expense
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function deleteExpense()
+    {
+        $this->setMethodName('deleteExpense');
+        $this->buExpense->getExpenseByID(
+            $this->getParam('expenseID'),
+            $dsExpense
+        );
+        if (!$this->buExpense->canDeleteExpense($this->getParam('expenseID'))) {
+            $this->displayFatalError('Cannot delete expense - already exported');
+            exit;
+        } else {
+            $callActivityID = $this->buExpense->deleteExpense($this->getParam('expenseID'));
+        }
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'         => CTCNC_ACT_VIEW,
+                    'callActivityID' => $callActivityID
+                )
+            );
+        header('Location: ' . $urlNext);
     }// end function editExpense()
 
     /**
@@ -422,31 +429,25 @@ class CTExpense extends CTCNC
     }
 
     /**
-     * Delete Expense
-     *
+     * Create new call activity
+     * inserts a new activity to the DB then displays it
      * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
      * @throws Exception
      */
-    function deleteExpense()
+    function createExpense()
     {
-        $this->setMethodName('deleteExpense');
-        $this->buExpense->getExpenseByID(
-            $this->getParam('expenseID'),
-            $dsExpense
-        );
-        if (!$this->buExpense->canDeleteExpense($this->getParam('expenseID'))) {
-            $this->displayFatalError('Cannot delete expense - already exported');
-            exit;
-        } else {
-            $callActivityID = $this->buExpense->deleteExpense($this->getParam('expenseID'));
+        $this->setMethodName('createExpense');
+        if (!$this->getParam('callActivityID')) {
+            throw new Exception('Call activity ID not provided');
         }
+        $expenseID = $this->buExpense->createExpenseFromCallActivityID($this->getParam('callActivityID'));
+
         $urlNext =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action'         => CTCNC_ACT_VIEW,
-                    'callActivityID' => $callActivityID
+                    'expenseID' => $expenseID,
+                    'action'    => CTEXPENSE_ACT_EDIT_EXPENSE
                 )
             );
         header('Location: ' . $urlNext);

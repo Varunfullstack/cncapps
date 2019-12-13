@@ -1,4 +1,5 @@
 <?php
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUPDF.inc.php");
 require_once($cfg["path_bu"] . "/BUItem.inc.php");
@@ -409,8 +410,13 @@ class BUPDFSalesQuote extends Business
         $buPDF->printString('Once this is received by us we will be able to process your order.');
         $buPDF->CR();
         $buPDF->CR();
+        $buPDF->printString('If you need to vary the quote in any way, please email the changes to ');
         $buPDF->printString(
-            'If you need to vary the quote in any way, please email the changes to <a href="mailto:sales@cnc-ltd.co.uk?Subject=Quote%20' . $ordheadID . '/' . $versionNo . '">sales@cnc-ltd.co.uk</a>, quoting ' . $ordheadID . '/' . $versionNo . ' and we will send a revised order form to you.'
+            'sales@cnc-ltd.co.uk',
+            'mailto:sales@cnc-ltd.co.uk?Subject=Quote%20' . $ordheadID . '/' . $versionNo
+        );
+        $buPDF->printString(
+            ', quoting ' . $ordheadID . '/' . $versionNo . ' and we will send a revised order form to you.'
         );
         $buPDF->CR();
         $buPDF->CR();

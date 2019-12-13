@@ -5,6 +5,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJOrdhead.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJOrdline.inc.php");
@@ -2469,10 +2470,12 @@ WHERE odl_ordno = $ordheadID
         );
         $buPDF->CR();
         $buPDF->CR();
-        $buPDF->printStringRJAt(
-            UNIT_LEFT - 2,
-            'This order is subject to our terms and conditions which are available <a href="https://www.cnc-ltd.co.uk/terms-and-conditions">here</a> and by ticking this box you have read and agreed to them.'
-        );
+        $text = 'This order is subject to our terms and conditions which are available here and by ticking this box you have read and agreed to them.';
+        $textWidth = $buPDF->pdf->GetStringWidth($text);
+        $buPDF->moveXTo(UNIT_LEFT - 2 - $textWidth);
+        $buPDF->printString('This order is subject to our terms and conditions which are available ');
+        $buPDF->printString('here', "https://www.cnc-ltd.co.uk/terms-and-conditions");
+        $buPDF->printString(' and by ticking this box you have read and agreed to them.');
         $buPDF->printStringAt(
             UNIT_LEFT,
             "{check:signer1:I+have+read+and+I+accept+the+terms+and+conditions}"
