@@ -136,7 +136,7 @@
                     sortable: false,
                     searchable: false,
                     render: (data, type, row, meta) => {
-                        if (row.isSelf) {
+                        if (row.isSelf && !row.isApprover) {
                             return "";
                         }
 
@@ -202,7 +202,7 @@
                     sortable: false,
                     searchable: false,
                     render: (data, type, row, meta) => {
-                        if (row.isSelf) {
+                        if (row.isSelf && !row.isApprover) {
                             return "";
                         }
 
