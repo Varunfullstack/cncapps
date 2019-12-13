@@ -82,7 +82,13 @@ class CTExpenseDashboard extends CTCNC
     )
   ) AS status,
        callactivity.caa_consno = ? as isSelf,
-       receipt.id as receiptId
+       receipt.id as receiptId,
+         ((SELECT
+        1
+      FROM
+        consultant globalApprovers
+      WHERE globalApprovers.globalExpenseApprover
+        AND globalApprovers.cns_consno = ?) = 1 or consultant.`expenseApproverID` = ?) as isApprover
 FROM
   expense
   LEFT JOIN `callactivity`
@@ -111,6 +117,8 @@ WHERE
                 $limit = $_REQUEST['length'];
 
                 $parameters = [
+                    ["type" => "i", "value" => $this->userID],
+                    ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
@@ -206,7 +214,13 @@ WHERE
     )
   ) AS `status`,
   callactivity.`overtimeApprovedDate` as approvedDate,
-       callactivity.caa_consno = ? as isSelf
+       callactivity.caa_consno = ? as isSelf,
+       ((SELECT
+        1
+      FROM
+        consultant globalApprovers
+      WHERE globalApprovers.globalExpenseApprover
+        AND globalApprovers.cns_consno = ?) = 1 or consultant.`expenseApproverID` = ?) as isApprover
 FROM
   callactivity
   JOIN problem
@@ -265,6 +279,8 @@ WHERE
                 $limit = $_REQUEST['length'];
 
                 $parameters = [
+                    ["type" => "i", "value" => $this->userID],
+                    ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
                     ["type" => "i", "value" => $this->userID],
