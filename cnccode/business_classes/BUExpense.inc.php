@@ -697,14 +697,14 @@ ORDER BY cns_name,
         $hdrs = array(
             'From'    => $fromEmail,
             'To'      => $toEmail,
-            'Subject' => 'Expenses/Overtime'
+            'Subject' => 'Expenses/Overtime Export'
         );
 
         $crlf = "\r\n";
 
         $mime = new Mail_mime($crlf);
 
-        $mime->setTXTBody('This are the expenses overtime data');
+        $mime->setTXTBody('Please find attached the expenses and overtime data.');
 
         $mime->addAttachment($summaryCSVString, 'application/octet-stream', 'Monthly Summary Report.csv', false);
         if ($journalCSVString) {
