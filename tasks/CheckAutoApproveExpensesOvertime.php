@@ -69,6 +69,6 @@ while ($callactivity->nextRecord()) {
     $activity->getRow($callactivity->getValue(DBECallActivity::callActivityID));
     $activity->setValue(DBECallActivity::overtimeApprovedBy, USER_SYSTEM);
     $activity->setValue(DBECallActivity::overtimeApprovedDate, date(DATE_MYSQL_DATETIME));
-    $dbeExpense->updateRow();
+    $activity->updateRow();
 }
 
