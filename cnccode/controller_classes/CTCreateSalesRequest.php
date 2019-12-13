@@ -62,8 +62,9 @@ class CTCreateSalesRequest extends CTCNC
                     exit;
                 }
                 $type = $_REQUEST['type'];
+                $files = @$_FILES['file'];
                 try {
-                    $this->createSalesRequest($customerID, $message, $type);
+                    $this->createSalesRequest($customerID, $message, $type, $files);
                 } catch (\Exception $exception) {
                     echo json_encode(["error" => $exception->getMessage()]);
                     http_response_code(400);
@@ -77,10 +78,10 @@ class CTCreateSalesRequest extends CTCNC
         }
     }
 
-    function createSalesRequest($customerID, $message, $type)
+    function createSalesRequest($customerID, $message, $type, $files = null)
     {
         $buActivity = new BUActivity($this);
-        $buActivity->sendSalesRequest(null, $message, $type, true, $customerID);
+        $buActivity->sendSalesRequest(null, $message, $type, true, $customerID, $files);
     }
 
     /**

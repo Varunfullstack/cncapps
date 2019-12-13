@@ -192,7 +192,7 @@ class DBEntity extends DataAccess
             $this->firstRowFetched = FALSE;
             $ret = TRUE;
         } else {
-            $this->raiseError("Query problem");
+            $this->raiseError("Query problem: " . $this->db->Error);
             $ret = FALSE;
         }
         return $ret;

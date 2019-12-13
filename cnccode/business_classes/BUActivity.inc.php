@@ -10516,13 +10516,15 @@ is currently a balance of ';
      * @param $type
      * @param bool $createSR
      * @param null $customerID
+     * @param null $files
      * @throws Exception
      */
     public function sendSalesRequest($problemID,
                                      $message,
                                      $type,
                                      $createSR = false,
-                                     $customerID = null
+                                     $customerID = null,
+                                     $files = null
     )
     {
         $dbeContact = new DBEContact($this);
@@ -10603,7 +10605,7 @@ is currently a balance of ';
             $dbeCallActivity->setValue(DBEJCallActivity::curValue, '0.00');
             $dbeCallActivity->setValue(
                 DBEJCallActivity::callActivityID,
-                0
+                null
             );
             $dbeCallActivity->setValue(DBECallActivity::problemID, $problemID);
             $dbeCallActivity->setValue(DBECallActivity::userID, $this->loggedInUserID);
@@ -10646,7 +10648,6 @@ is currently a balance of ';
                 )
             );
             $dbeCallActivity->insertRow();
-
         }
 
         // we have to create an open "sales activity"
@@ -10656,6 +10657,38 @@ is currently a balance of ';
             "O",
             $createSR
         );
+
+        if ($files) {
+            foreach ($files['name'] as $idx => $fileItem) {
+                $dbeCallDocument = new DBECallDocument($this);
+                $dbeCallDocument->setValue(DBECallDocument::callActivityID, $salesRequestActivity->getValue(DBECallActivity::callActivityID));
+                $dbeCallDocument->setValue(DBECallDocument::problemID, $problemID);
+                $dbeCallDocument->setValue(
+                    DBECallDocument::createDate,
+                    (new DateTime())->format(DATE_MYSQL_DATETIME)
+                );
+                $dbeCallDocument->setValue(
+                    DBECallDocument::createUserID,
+                    $this->dbeUser->getValue(DBEUser::userID)
+                );
+                $dbeCallDocument->setValue(DBECallDocument::description, $files['name'][$idx]);
+                $dbeCallDocument->setValue(DBECallDocument::fileLength, $files['size'][$idx]);
+                $dbeCallDocument->setValue(DBECallDocument::fileMIMEType, $files['type'][$idx]);
+                $dbeCallDocument->setValue(DBECallDocument::filename, $files['name'][$idx]);
+                $dbeCallDocument->setValue(
+                    DBECallDocument::file,
+                    fread(
+                        fopen(
+                            $files['tmp_name'][$idx],
+                            'rb'
+                        ),
+                        $files['size'][$idx]
+                    )
+                );
+//                    $dbeCallDocument->setShowSQLOn();
+                $dbeCallDocument->insertRow();
+            }
+        }
 
         $buStandardText = new BUStandardText($this);
 
