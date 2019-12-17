@@ -1,0 +1,66 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue689-0">
+        <tagDatabase tag="issue689"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue689-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="solarwindsPartnerName"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="solarwindsPartnerName" type="text" defaultValue="CNC Ltd (grahaml@cnc-ltd.co.uk)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue689-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="solarwindsUsername"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="solarwindsUsername" type="text" defaultValue="support@cnc-ltd.co.uk">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue689-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="solarwindsPassword"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="solarwindsPassword" type="text" defaultValue="E3!@EuU5Z@C*=x^M">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue689-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="contractUsersLog"/>
+            </not>
+        </preConditions>
+        <createTable tableName="contractUsersLog">
+            <column name="id" type="bigint(11)" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="PRIMARY" nullable="false"/>
+            </column>
+            <column name="contractId" type="bigint(11)">
+                <constraints foreignKeyName="contract_pk" referencedTableName="custitem"
+                             referencedColumnNames="cui_cuino" nullable="false" deleteCascade="true"/>
+            </column>
+            <column name="users" type="int(6)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="createdAt" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
