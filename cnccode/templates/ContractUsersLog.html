@@ -1,0 +1,286 @@
+<!-- Template: Customer.inc.html -->
+<script type='application/javascript'
+        src='CommonJS.js'
+>
+</script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.3/dist/loadingoverlay.min.js"></script>
+
+<script type="application/javascript">
+
+    var savedCustomerString;
+
+    function saveCustomerString() {
+        savedCustomerString = document.getElementById("customerString").value
+    }
+
+    function validateCustomerString() {
+        if (Trim(document.getElementById("customerString").value) != "") {
+            if (document.getElementById("customerString").value != savedCustomerString) {
+                window.open('{customerPopupURL}&customerString=' +
+                    escape(document.getElementById("customerString").value) +
+                    '&parentIDField=customerID' +
+                    '&parentDescField=customerString',
+                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+            }
+        } else {
+            document.form.customerID.value = "";
+        }
+    }
+
+    function createQuote() {
+        if (document.searchForm.customerID.value != "") {
+            document.location = '{createQuoteURL}&customerID=' + escape(document.searchForm.customerID.value)
+        }
+    }
+
+    function createOrder() {
+        if (document.searchForm.customerID.value != "") {
+            document.location = '{createOrderURL}&customerID=' + escape(document.searchForm.customerID.value)
+        }
+    }
+
+    function submitOnReturn() {
+        if (event.keyCode == 13) {
+            document.searchForm.submit();
+        }
+    }
+
+    function validateCustomerStringOnReturn() {
+        if (event.keyCode == 13) {
+            validateCustomerString();
+        }
+    }
+
+    $(document).ready(function () {
+        dataTable = $('#myTable').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                // {
+                //     extend: 'csv',
+                //     bom: true,
+                //     exportOptions: {
+                //         orthogonal: 'data'
+                //     }
+                // },
+                {
+                    extend: 'excel'
+                }
+            ],
+            paging: false,
+            columns: [
+                {data: "createdByUserName"},
+                {data: "createdByContactName"},
+                {data: "action"},
+                {data: "createdAt"},
+                {data: "customerName"},
+                {data: "title"},
+                {data: "firstName"},
+                {data: "lastName"},
+                {data: "email"},
+                {data: "contactID"},
+                {data: "siteNo"},
+                {data: "supportLevel"},
+                {data: "position"},
+                {data: "phone"},
+                {data: "mobilePhone"},
+                {data: "sendMailshotFlag"},
+                {data: "mailshot2Flag"},
+                {data: "mailshot3Flag"},
+                {data: "mailshot4Flag"},
+                {data: "mailshot8Flag"},
+                {data: "mailshot9Flag"},
+                {data: "mailshot11Flag"},
+                {data: "notes"},
+                {data: "workStartedEmailFlag"},
+                {data: "initialLoggingEmailFlag"},
+                {data: "workUpdatesEmailFlag"},
+                {data: "fixedEmailFlag"},
+                {data: "pendingClosureEmailFlag"},
+                {data: "closureEmailFlag"},
+                {data: "othersInitialLoggingEmailFlag"},
+                {data: "othersWorkStartedEmailFlag"},
+                {data: "othersWorkUpdatesEmailFlag"},
+                {data: "othersFixedEmailFlag"},
+                {data: "othersPendingClosureEmailFlag"},
+                {data: "othersClosureEmailFlag"},
+                {data: "pendingLeaverFlag"},
+                {data: "pendingLeaverDate"}
+            ]
+        });
+    });
+
+    function searchContactAudit() {
+        // get the customer ID if there's one
+
+        var customerId = $('#customerID').val();
+        var startDate = $('#startDate').val();
+        var firstName = $('#firstName').val();
+        var lastName = $('#lastName').val();
+        var endDate = $('#endDate').val();
+        var data = {};
+
+        customerId ? data.customerId = customerId : null;
+        startDate ? data.startDate = startDate : null;
+        endDate ? data.endDate = endDate : null;
+        firstName ? data.firstName = firstName : null;
+        lastName ? data.lastName = lastName : null;
+
+        $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+        $.ajax({
+            url: '?action=doSearch',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: data
+        }).then(function (result) {
+
+            if (result.status == 'error') {
+                alert('Failed to retrieve data');
+            } else {
+                dataTable.clear();
+                dataTable.rows.add(result);
+                dataTable.draw();
+
+            }
+        }).catch(function () {
+
+        }).then(function () {
+            $.LoadingOverlay('hide');
+        });
+        return false;
+    }
+</script>
+
+<form name="form"
+      method="post"
+      onsubmit="return searchContactAudit();"
+>
+    <table border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
+        <tr>
+            <td class="promptText">Customer Name</td>
+            <td>
+                <input
+                        type="hidden"
+                        name="customerID"
+                        id="customerID"
+                        value="{customerID}"
+                >
+                <input type="text"
+                       id="customerString"
+                       onFocus="javascript:saveCustomerString()"
+                       onBlur="javascript:validateCustomerString()"
+                       onKeypress="javascript:validateCustomerStringOnReturn()"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Contact First Name</td>
+            <td>
+                <input type="text"
+                       id="firstName"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Contact Last Name</td>
+            <td>
+                <input type="text"
+                       id="lastName"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Created Between</div>
+            </td>
+            <td>
+                <input
+                        type="text"
+                        id="startDate"
+                        size="10"
+                        maxlength="10"
+                        onKeypress="javascript:submitOnReturn()"
+                        class="jqueryCalendar"
+                        autocomplete="off"
+                >
+                and <input
+                    type="text"
+                    id="endDate"
+                    size="10"
+                    maxlength="10"
+                    onKeypress="javascript:submitOnReturn()"
+                    class="jqueryCalendar"
+                    autocomplete="off"
+            >
+            </td>
+        </tr>
+        <tr>
+            <td valign="top">&nbsp;</td>
+            <td>
+                <input type="submit"
+                       name="Go"
+                       value="Search"
+                >
+            </td>
+        </tr>
+
+    </table>
+</form>
+<table width="100%"
+       border="0"
+       cellspacing="0"
+       cellpadding="1"
+       id="myTable"
+>
+    <thead>
+    <tr>
+        <th>CNC Modifier</th>
+        <th>Customer Modifier</th>
+        <th>Action</th>
+        <th>Change Data</th>
+        <th>Customer</th>
+        <th>Title</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email</th>
+        <th>Contact ID</th>
+        <th>Site No</th>
+        <th>Support Level</th>
+        <th>Position</th>
+        <th>Phone</th>
+        <th>Mobile</th>
+        <th>Mailshot</th>
+        <th>Invoice</th>
+        <th>Newsletter</th>
+        <th>Statement</th>
+        <th>Top Up</th>
+        <th>Reports</th>
+        <th>SR Reports</th>
+        <th>Notes</th>
+        <th>Work Started</th>
+        <th>initialLoggingEmailFlag</th>
+        <th>workUpdatesEmailFlag</th>
+        <th>fixedEmailFlag</th>
+        <th>pendingClosureEmailFlag</th>
+        <th>closureEmailFlag</th>
+        <th>othersInitialLoggingEmailFlag</th>
+        <th>othersWorkStartedEmailFlag</th>
+        <th>othersWorkUpdatesEmailFlag</th>
+        <th>othersFixedEmailFlag</th>
+        <th>othersPendingClosureEmailFlag</th>
+        <th>othersClosureEmailFlag</th>
+        <th>pendingLeaverFlag</th>
+        <th>pendingLeaverDate</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<!-- End Template: Customer.inc.html -->
