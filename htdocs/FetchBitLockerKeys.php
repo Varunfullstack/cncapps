@@ -40,7 +40,7 @@ FROM
   LEFT JOIN clients ON computers.`ClientID`  = clients.`ClientID`
   LEFT JOIN v_extradatacomputers 
     ON v_extradatacomputers.`computerid` = computers.`ComputerID` 
-    WHERE v_extradatacomputers.`Bitlocker Enabled` and v_extradatacomputers.`Bitlocker Password/Key` regexp "[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}"
+    WHERE v_extradatacomputers.`Bitlocker Password/Key` regexp "[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}"
     ORDER BY ExternalID '
 );
 
