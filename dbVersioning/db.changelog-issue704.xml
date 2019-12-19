@@ -46,6 +46,38 @@
                 holiday     = 0
             WHERE holiday = 1
               AND loggedHours > 0
+              AND (SELECT ROUND(
+                                  COALESCE(
+                                              SUM(
+                                                      COALESCE(
+                                                                  TIME_TO_SEC(
+                                                                          IF(
+                                                                                  caa_endtime > '18:30',
+                                                                                  '18:30',
+                                                                                  caa_endtime
+                                                                              )
+                                                                      ) - TIME_TO_SEC(
+                                                                          IF(
+                                                                                  caa_starttime < '07:00',
+                                                                                  '07:00',
+                                                                                  caa_starttime
+                                                                              )
+                                                                      ),
+                                                                  0
+                                                          )
+                                                  ) / 3600,
+                                              0
+                                      ),
+                                  2
+                              )
+                   FROM callactivity
+                            JOIN callacttype
+                                 ON cat_callacttypeno = caa_callacttypeno
+                   WHERE caa_consno = userID
+                     AND caa_date = loggedDate
+                     AND callacttype.travelFlag <> 'Y'
+                     AND caa_starttime < '18:30'
+                     AND caa_endtime > '07:00') > 0
             ]]>
         </sql>
         <rollback/>
