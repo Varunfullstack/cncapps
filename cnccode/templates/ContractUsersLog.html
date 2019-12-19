@@ -126,7 +126,11 @@
                 },
                 {data: "office365BackupUsers"},
                 {data: "contractUsers"},
-                {data: "createdAt"},
+                {
+                    data: "createdAt", render: (data) => {
+                        return moment(data, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm')
+                    }
+                },
             ]
         });
     });

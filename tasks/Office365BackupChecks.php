@@ -16,7 +16,7 @@ require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUMail.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomerItem.inc.php');
 
-$logName = 'SolarwindsChecks';
+$logName = 'Office365BackupChecks';
 $logger = new LoggerCLI($logName);
 
 // increasing execution time to infinity...

@@ -70,8 +70,11 @@ class CTContractUsersAudit extends CTCNC
             "createdAt",
         ];
         $columnsDefinition = [
-            "customerName" => "customer.cus_name",
-            "contractID"   => "custitem.cui_cuino",
+            "customerName"         => "customer.cus_name",
+            "contractID"           => "custitem.cui_cuino",
+            "office365BackupUsers" => "users",
+            "contractUsers"        => "currentUsers",
+            "createdAt"            => "createdAt",
         ];
 
         /** @var dbSweetcode $db */
