@@ -1,12 +1,13 @@
 # Changelog
 This project changes will be shown here.
-## [v3.8.5] - 2019-12-18
-### Fixed
-- Fix issue with FetchBitLocker not pulling certain customers because of labtech quirks
 
 ## [unreleased]
 ### Changed
 - Issue 703 - New calendar
+
+## [v3.8.5] - 2019-12-18
+### Fixed
+- Fix issue with FetchBitLocker not pulling certain customers because of labtech quirks
 
 ## [v3.8.4] - 2019-12-11
 ### Fixed
