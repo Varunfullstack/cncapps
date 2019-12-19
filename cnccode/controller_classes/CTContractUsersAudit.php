@@ -6,6 +6,7 @@
  * Time: 12:33
  */
 
+global $cfg;
 require_once($cfg['path_bu'] . '/BUContact.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -14,18 +15,6 @@ require_once $cfg['path_dbe'] . '/DBEJContactAudit.php';
 
 class CTContractUsersAudit extends CTCNC
 {
-    /**
-     * Dataset for contact record storage.
-     *
-     * @var     DSForm
-     * @access  private
-     */
-    var $dsContact = '';
-    /**
-     * @var BUContact
-     */
-    private $buContact;
-
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -47,9 +36,6 @@ class CTContractUsersAudit extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
-        $this->buContact = new BUContact($this);
-        $this->dsContact = new DSForm($this);    // new specialised dataset with form message support
-        $this->dsContact->copyColumnsFrom($this->buContact->dbeContact);
     }
 
     /**
@@ -59,20 +45,135 @@ class CTContractUsersAudit extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
-            case 'doSearch':
-                echo json_encode(
-                    $this->searchContactAudit(
-                        $this->getParam('customerId'),
-                        $this->getParam('startDate'),
-                        $this->getParam('endDate'),
-                        $this->getParam('firstName'),
-                        $this->getParam('lastName')
-                    )
-                );
+            case 'getData':
+                return $this->getData();
                 break;
             default:
                 $this->displaySearchForm();
         }
+    }
+
+    function getData()
+    {
+        $draw = $_REQUEST['draw'];
+        $columns = $_REQUEST['columns'];
+        $search = $_REQUEST['search'];
+        $order = $_REQUEST['order'];
+        $offset = $_REQUEST['start'];
+        $limit = $_REQUEST['length'];
+
+        $columnsNames = [
+            "customerName",
+            "contractID",
+            "office365BackupUsers",
+            "contractUsers",
+            "createdAt",
+        ];
+        $columnsDefinition = [
+            "customerName" => "customer.cus_name",
+            "contractID"   => "custitem.cui_cuino",
+        ];
+
+        /** @var dbSweetcode $db */
+        global $db;
+        $countQuery = "select count(*) from contractUsersLog left join custItem ON contractId = custItem.cui_cuino LEFT JOIN customer
+    ON custitem.`cui_custno` = customer.`cus_custno`";
+        $totalCountResult = $db->query($countQuery);
+        $totalCount = $totalCountResult->fetch_row()[0];
+        $defaultQuery = "select 
+customer.cus_name as customerName,
+contractID,
+users as office365BackupUsers,
+currentUsers as contractUsers,
+createdAt
+from contractUsersLog left join custItem ON contractId = custItem.cui_cuino LEFT JOIN customer
+    ON custitem.`cui_custno` = customer.`cus_custno` where 1 = 1 ";
+        $columnSearch = [];
+        $parameters = [];
+        foreach ($columns as $column) {
+            if (!isset($columnsDefinition[$column['data']])) {
+                continue;
+            }
+
+            if ($column['search']['value']) {
+                $columnSearch[] = $columnsDefinition[$column['data']] . " like ?";
+                $parameters[] = [
+                    "type"  => "s",
+                    "value" => "%" . $column['search']['value'] . "%"
+                ];
+            }
+        }
+
+        if (count($columnSearch)) {
+            $wherePart = " and " . implode(" and ", $columnSearch);
+            $defaultQuery .= $wherePart;
+            $countQuery .= $wherePart;
+        }
+
+        $startDate = @$_REQUEST['startDate'];
+        $endDate = @$_REQUEST['endDate'];
+
+        if ($startDate) {
+            $defaultQuery .= " and createdAt >= ? ";
+            $parameters[] = ["type" => "s", "value" => $startDate];
+
+        }
+        if ($endDate) {
+            $defaultQuery .= " and createdAt <= ? ";
+            $parameters[] = ["type" => "s", "value" => $endDate];
+        }
+
+
+        $orderBy = [];
+        if (count($order)) {
+            foreach ($order as $orderItem) {
+                if (!isset($columnsNames[(int)$orderItem['column']])) {
+                    continue;
+                }
+                $orderBy[] = $columnsDefinition[$columnsNames[(int)$orderItem['column']]] . " " . mysqli_real_escape_string(
+                        $db->link_id(),
+                        $orderItem['dir']
+                    );
+            }
+            if (count($orderBy)) {
+                $defaultQuery .= (" order by " . implode(' , ', $orderBy));
+            }
+        }
+
+        $countResult = $db->preparedQuery(
+            $countQuery,
+            $parameters
+        );
+        $filteredCount = $countResult->fetch_row()[0];
+
+        $defaultQuery .= " limit ?,?";
+        $parameters[] = ["type" => "i", "value" => $offset];
+        $parameters[] = ["type" => "i", "value" => $limit];
+        $result = $db->preparedQuery(
+            $defaultQuery,
+            $parameters
+        );
+        $data = array_map(
+            function ($row) {
+                return [
+                    "customerName"         => $row['customerName'],
+                    "contractID"           => $row['contractID'],
+                    "office365BackupUsers" => $row['office365BackupUsers'],
+                    "contractUsers"        => $row['contractUsers'],
+                    "createdAt"            => $row['createdAt'],
+                ];
+            },
+            $result->fetch_all(MYSQLI_ASSOC)
+        );
+
+        echo json_encode(
+            [
+                "draw"            => $draw,
+                "recordsTotal"    => $totalCount,
+                "recordsFiltered" => $filteredCount,
+                "data"            => $data
+            ]
+        );
     }
 
     /**
@@ -90,34 +191,7 @@ class CTContractUsersAudit extends CTCNC
             'ContractUsersLog'
         );
 // Parameters
-        $this->setPageTitle("Contact Audit Log");
-        $submitURL = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array('action' => 'search')
-        );
-        $customerPopupURL =
-            Controller::buildLink(
-                CTCNC_PAGE_CUSTOMER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-        $this->template->set_var(
-            array(
-                'contactString'           => "",
-                'phoneString'             => "",
-                'customerString'          => "",
-                'address'                 => "",
-                'customerStringMessage'   => "",
-                'newCustomerFromDate'     => "",
-                'newCustomerToDate'       => "",
-                'droppedCustomerFromDate' => "",
-                'droppedCustomerToDate'   => "",
-                'submitURL'               => $submitURL,
-                'customerPopupURL'        => $customerPopupURL,
-            )
-        );
+        $this->setPageTitle("Contract Users Log");
         $this->template->parse(
             'CONTENTS',
             'CustomerSearch',
@@ -125,45 +199,4 @@ class CTContractUsersAudit extends CTCNC
         );
         $this->parsePage();
     }
-
-
-    private function searchContactAudit($customerID = null,
-                                        $startDate = null,
-                                        $endDate = null,
-                                        $firstName = null,
-                                        $lastName = null
-    )
-    {
-        $test = new DBEJContactAudit($this);
-
-        if ($startDate) {
-            $startDate = DateTime::createFromFormat(
-                'd/m/Y',
-                $startDate
-            );
-        }
-
-        if ($endDate) {
-            $endDate = DateTime::createFromFormat(
-                'd/m/Y',
-                $endDate
-            );
-        }
-
-        $test->search(
-            $customerID,
-            $startDate,
-            $endDate,
-            $firstName,
-            $lastName
-        );
-
-        $result = [];
-
-        while ($test->fetchNext()) {
-            $result[] = $test->getRowAsAssocArray();
-        }
-
-        return $result;
-    }
-}// end of class
+}

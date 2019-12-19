@@ -31,18 +31,6 @@
         }
     }
 
-    function createQuote() {
-        if (document.searchForm.customerID.value != "") {
-            document.location = '{createQuoteURL}&customerID=' + escape(document.searchForm.customerID.value)
-        }
-    }
-
-    function createOrder() {
-        if (document.searchForm.customerID.value != "") {
-            document.location = '{createOrderURL}&customerID=' + escape(document.searchForm.customerID.value)
-        }
-    }
-
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
@@ -56,101 +44,95 @@
     }
 
     $(document).ready(function () {
+
+        $('#myTable thead tr').clone(true).appendTo('#myTable thead');
+        $('#myTable thead tr:eq(1) th').each(function (i) {
+            var title = $(this).text();
+            if ($(this).data().noSearch) {
+                $(this).html('');
+                return;
+            }
+            $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+            const autocompleteURL = $(this).data().autocompleteUrl;
+            const autocompleteTermField = 'term' || $(this).data().autocompleteTermField;
+            const performSearch = function (value, column) {
+                if (dataTable.column(column).search() != value) {
+                    dataTable.column(column)
+                        .search(value);
+                    dataTable.draw();
+                }
+            };
+
+            const filterInput = $(this).find('input');
+            filterInput.autocomplete({
+                minLength: 0,
+                source: function (request, responseCB) {
+                    const data = {};
+                    data[autocompleteTermField] = request.term;
+                    $.ajax(
+                        autocompleteURL,
+                        {
+                            method: 'POST',
+                            dataType: 'json',
+                            data: data
+                        }
+                    ).then(response => {
+                        responseCB(response);
+                    })
+
+                },
+                delay: 200,
+                select: function (event, ui) {
+                    performSearch(ui.item.value, i);
+                }
+            }).focus(function () {
+                $(this).autocomplete("search", $(this).val());
+            }).on('change', function () {
+                performSearch(filterInput[0].value, i);
+            });
+        });
+
         dataTable = $('#myTable').DataTable({
-            dom: 'Blfrtip',
+            dom: 'Blrtip',
             buttons: [
-                // {
-                //     extend: 'csv',
-                //     bom: true,
-                //     exportOptions: {
-                //         orthogonal: 'data'
-                //     }
-                // },
                 {
                     extend: 'excel'
                 }
             ],
-            paging: false,
+            orderCellsTop: true,
+            fixedHeader: true,
+            pageLength: 50,
+            paging: true,
+            serverSide: true,
+            ajax: {
+                url: "?action=getData", data: (data) => {
+                    const startDate = $('#startDate').val();
+                    const endDate = $('#endDate').val();
+                    if (startDate) {
+                        data.startDate = moment(startDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    }
+                    if (endDate) {
+                        data.endDate = moment(endDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    }
+                }
+            },
             columns: [
-                {data: "createdByUserName"},
-                {data: "createdByContactName"},
-                {data: "action"},
-                {data: "createdAt"},
                 {data: "customerName"},
-                {data: "title"},
-                {data: "firstName"},
-                {data: "lastName"},
-                {data: "email"},
-                {data: "contactID"},
-                {data: "siteNo"},
-                {data: "supportLevel"},
-                {data: "position"},
-                {data: "phone"},
-                {data: "mobilePhone"},
-                {data: "sendMailshotFlag"},
-                {data: "mailshot2Flag"},
-                {data: "mailshot3Flag"},
-                {data: "mailshot4Flag"},
-                {data: "mailshot8Flag"},
-                {data: "mailshot9Flag"},
-                {data: "mailshot11Flag"},
-                {data: "notes"},
-                {data: "workStartedEmailFlag"},
-                {data: "initialLoggingEmailFlag"},
-                {data: "workUpdatesEmailFlag"},
-                {data: "fixedEmailFlag"},
-                {data: "pendingClosureEmailFlag"},
-                {data: "closureEmailFlag"},
-                {data: "othersInitialLoggingEmailFlag"},
-                {data: "othersWorkStartedEmailFlag"},
-                {data: "othersWorkUpdatesEmailFlag"},
-                {data: "othersFixedEmailFlag"},
-                {data: "othersPendingClosureEmailFlag"},
-                {data: "othersClosureEmailFlag"},
-                {data: "pendingLeaverFlag"},
-                {data: "pendingLeaverDate"}
+                {
+                    data: "contractID",
+                    render: function (data, type, row) {
+                        return "<a href='RenContract.php?action=edit&ID=" + row.contractID + "' target='_blank'>" + data + "</a>";
+                    }
+                },
+                {data: "office365BackupUsers"},
+                {data: "contractUsers"},
+                {data: "createdAt"},
             ]
         });
     });
 
     function searchContactAudit() {
-        // get the customer ID if there's one
-
-        var customerId = $('#customerID').val();
-        var startDate = $('#startDate').val();
-        var firstName = $('#firstName').val();
-        var lastName = $('#lastName').val();
-        var endDate = $('#endDate').val();
-        var data = {};
-
-        customerId ? data.customerId = customerId : null;
-        startDate ? data.startDate = startDate : null;
-        endDate ? data.endDate = endDate : null;
-        firstName ? data.firstName = firstName : null;
-        lastName ? data.lastName = lastName : null;
-
-        $.LoadingOverlay("show", {text: 'Running your search, please wait'});
-        $.ajax({
-            url: '?action=doSearch',
-            method: 'POST',
-            type: 'post',
-            dataType: 'json',
-            data: data
-        }).then(function (result) {
-
-            if (result.status == 'error') {
-                alert('Failed to retrieve data');
-            } else {
-                dataTable.clear();
-                dataTable.rows.add(result);
-                dataTable.draw();
-
-            }
-        }).catch(function () {
-
-        }).then(function () {
-            $.LoadingOverlay('hide');
-        });
+        dataTable.ajax.reload();
         return false;
     }
 </script>
@@ -163,39 +145,6 @@
            cellspacing="0"
            cellpadding="1"
     >
-        <tr>
-            <td class="promptText">Customer Name</td>
-            <td>
-                <input
-                        type="hidden"
-                        name="customerID"
-                        id="customerID"
-                        value="{customerID}"
-                >
-                <input type="text"
-                       id="customerString"
-                       onFocus="javascript:saveCustomerString()"
-                       onBlur="javascript:validateCustomerString()"
-                       onKeypress="javascript:validateCustomerStringOnReturn()"
-                >
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Contact First Name</td>
-            <td>
-                <input type="text"
-                       id="firstName"
-                >
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Contact Last Name</td>
-            <td>
-                <input type="text"
-                       id="lastName"
-                >
-            </td>
-        </tr>
         <tr>
             <td class="promptText">
                 <div align="right">Created Between</div>
@@ -241,43 +190,11 @@
 >
     <thead>
     <tr>
-        <th>CNC Modifier</th>
-        <th>Customer Modifier</th>
-        <th>Action</th>
-        <th>Change Data</th>
-        <th>Customer</th>
-        <th>Title</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Email</th>
-        <th>Contact ID</th>
-        <th>Site No</th>
-        <th>Support Level</th>
-        <th>Position</th>
-        <th>Phone</th>
-        <th>Mobile</th>
-        <th>Mailshot</th>
-        <th>Invoice</th>
-        <th>Newsletter</th>
-        <th>Statement</th>
-        <th>Top Up</th>
-        <th>Reports</th>
-        <th>SR Reports</th>
-        <th>Notes</th>
-        <th>Work Started</th>
-        <th>initialLoggingEmailFlag</th>
-        <th>workUpdatesEmailFlag</th>
-        <th>fixedEmailFlag</th>
-        <th>pendingClosureEmailFlag</th>
-        <th>closureEmailFlag</th>
-        <th>othersInitialLoggingEmailFlag</th>
-        <th>othersWorkStartedEmailFlag</th>
-        <th>othersWorkUpdatesEmailFlag</th>
-        <th>othersFixedEmailFlag</th>
-        <th>othersPendingClosureEmailFlag</th>
-        <th>othersClosureEmailFlag</th>
-        <th>pendingLeaverFlag</th>
-        <th>pendingLeaverDate</th>
+        <th data-autocomplete-url="/Customer.php?action=searchName">Customer Name</th>
+        <th data-no-search="true">Contract</th>
+        <th data-no-search="true">Office 365 Backup Users</th>
+        <th data-no-search="true">Contract Users</th>
+        <th data-no-search="true">Created At</th>
     </tr>
     </thead>
     <tbody>
