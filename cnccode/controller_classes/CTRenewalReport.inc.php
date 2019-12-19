@@ -20,6 +20,7 @@ use Signable\DocumentWithoutTemplate;
 use Signable\Envelopes;
 use Signable\Party;
 
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJContract.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJRenContract.inc.php');
@@ -133,355 +134,6 @@ class CTRenewalReport extends CTCNC
 
         }
     }
-
-    /**
-     * @param $customerID
-     * @param $contractsIDs
-     * @return mixed|string
-     * @throws CrossReferenceException
-     * @throws FilterException
-     * @throws PdfParserException
-     * @throws PdfTypeException
-     * @throws PdfReaderException
-     */
-    function generatePDFContract($customerID,
-                                 $contractsIDs
-    )
-    {
-        $mainPDF = new Fpdi();
-        $this->addPages(
-            $mainPDF,
-            $contractsIDs
-        );
-
-        $pageCount = $mainPDF->setSourceFile(
-            PDF_RESOURCE_DIR . '/Terms & Conditions April 2018 branded.pdf'
-        );
-        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-            $pageId = $mainPDF->importPage($pageNo);
-            $s = $mainPDF->getTemplatesize($pageId);
-            $mainPDF->AddPage(
-                $s['orientation'],
-                $s
-            );
-            $mainPDF->useImportedPage($pageId);
-        }
-
-        $pageCount = $mainPDF->setSourceFile(PDF_RESOURCE_DIR . '/lastPage.pdf');
-        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-            $pageId = $mainPDF->importPage($pageNo);
-            $s = $mainPDF->getTemplatesize($pageId);
-            $mainPDF->AddPage(
-                $s['orientation'],
-                $s
-            );
-            $mainPDF->useImportedPage($pageId);
-        }
-
-        $fileName = PDF_TEMP_DIR . '/' . $customerID . '-Contracts.pdf';
-
-        $mainPDF->Output(
-            'F',
-            $fileName,
-            true
-        );
-
-        $fileName = str_replace(
-            BASE_DRIVE . '/htdocs',
-            "",
-            $fileName
-        );
-
-        return $fileName;
-    }
-
-    /**
-     * @param Fpdi $mainPDF
-     * @param $contractsIDs
-     * @throws CrossReferenceException
-     * @throws FilterException
-     * @throws PdfParserException
-     * @throws PdfReaderException
-     * @throws PdfTypeException
-     */
-    function addPages(Fpdi $mainPDF,
-                      $contractsIDs
-    )
-    {
-
-        foreach ($contractsIDs as $contractID) {
-            // Validation and setting of variables
-
-            $buCustomerItem = new BUCustomerItem($this);
-            $dsContract = new DataSet($this);
-            $buCustomerItem->getCustomerItemByID(
-                $contractID,
-                $dsContract
-            );
-            $buCustomerItem->getCustomerItemsByContractID(
-                $contractID,
-                $dsCustomerItem
-            );
-
-            $buSite = new BUSite($this);
-            $buActivity = new BUActivity($this);
-            $buCustomer = new BUCustomer($this);
-            $buCustomer->getCustomerByID(
-                $dsContract->getValue(DBEJCustomerItem::customerID),
-                $dsCustomer
-            );
-            $buSite->getSiteByID(
-                $dsContract->getValue(DBEJCustomerItem::customerID),
-                $dsContract->getValue(DBEJCustomerItem::siteNo),
-                $dsSite
-            );
-            $customerHasServiceDeskContract = $buCustomerItem->customerHasServiceDeskContract(
-                $dsContract->getValue(DBEJCustomerItem::customerID)
-            );
-
-            $buPDFSupportContract =
-                new BUPDFSupportContract(
-                    $this,
-                    $dsContract,
-                    $dsCustomerItem,
-                    $dsSite,
-                    $dsCustomer,
-                    $buActivity,
-                    $customerHasServiceDeskContract
-                );
-
-            $pdfFile = $buPDFSupportContract->generateFile(false);
-
-            $pageCount = $mainPDF->setSourceFile($pdfFile);
-            for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-                $pageId = $mainPDF->importPage($pageNo);
-                $s = $mainPDF->getTemplatesize($pageId);
-                $mainPDF->AddPage(
-                    $s['orientation'],
-                    $s
-                );
-                $mainPDF->useImportedPage($pageId);
-            }
-        }
-
-    }
-
-
-    function generateEnvelope($fileName,
-                              $firstName,
-                              $lastName,
-                              $email,
-                              $customerID
-    )
-    {
-
-    }
-
-    private function sendPDFContract($PDFPath,
-                                     $contactID,
-                                     $templateID,
-                                     $customerID
-    )
-    {
-        ApiClient::setApiKey("fc2d9ba05f3f3d9f2e9de4d831e8fed9");
-
-        $envDocs = [];
-
-        $file = basename($PDFPath);
-
-        $fileName = PDF_TEMP_DIR . '/' . $file;
-
-        $dbeContact = new DBEContact($this);
-
-        $dbeContact->getRow($contactID);
-
-        $firstName = $dbeContact->getValue(DBEContact::firstName);
-        $lastName = $dbeContact->getValue(DBEContact::lastName);
-        $email = $dbeContact->getValue(DBEContact::email);
-        global $server_type;
-        if ($server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE) {
-            $email = "sales@cnc-ltd.co.uk";
-        }
-
-        $envelopeDocument = new DocumentWithoutTemplate(
-            'CNC Contracts with Terms & Conditions',
-            null,
-            base64_encode(file_get_contents($fileName)),
-            "CNCContractsTCs.pdf"
-        );
-
-        $envDocs[] = $envelopeDocument;
-
-        $envelopeParties = [];
-
-        $envelopeParty = new Party(
-            $firstName . ' ' . $lastName,
-            $email,
-            'signer1',
-            'Please sign here',
-            'no',
-            false
-        );
-        $envelopeParties[] = $envelopeParty;
-
-
-        $response = Envelopes::createNewWithoutTemplate(
-            "Document #" . $customerID . "_" . uniqid(),
-            $envDocs,
-            $envelopeParties,
-            null,
-            false,
-            null,
-            0,
-            0
-        );
-
-
-
-        if ($response && $response->http == 202) {
-            $buMail = new BUMail($this);
-
-            $hdrs = array(
-                'From'         => 'support@cnc-ltd.co.uk',
-                'To'           => $email,
-                'Subject'      => "CNC Contracts and Terms & Conditions to be signed",
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
-            $buStandardText = new BUStandardText($this);
-            $standardTexts = new DataSet($this);
-            $buStandardText->getStandardTextByID(
-                $templateID,
-                $standardTexts
-            );
-
-            $body = $standardTexts->getValue(DBEStandardText::stt_text);
-
-            $body = str_replace(
-                "[%contactFirstName%]",
-                $firstName,
-                $body
-            );
-            $body = str_replace(
-                "[%contactLastName%]",
-                $lastName,
-                $body
-            );
-
-            $buMail->mime->setHTMLBody($body);
-
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-
-            $body = $buMail->mime->get($mime_params);
-
-            $hdrs = $buMail->mime->headers($hdrs);
-
-            $buMail->send(
-                $email,
-                $hdrs,
-                $body
-            );
-
-            $dbeCustomer = new DBECustomer($this);
-            $dbeCustomer->getRow($customerID);
-            $dbeCustomer->setValue(
-                DBECustomer::lastContractSent,
-                "Documents last sent to " . $firstName . ' ' . $lastName . " on " .
-                (new DateTime())->format('d/m/Y h:i') .
-                " by " .
-                $this->dbeUser->getValue(DBEUser::firstName) .
-                " " .
-                $this->dbeUser->getValue(DBEUser::lastName)
-            );
-            $dbeCustomer->updateRow();
-
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * @throws Exception
-     */
-    function search()
-    {
-
-        $this->setMethodName('search');
-        $report = null;
-        if (isset ($_REQUEST ['searchForm']) == 'POST') {
-            if (!$this->dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
-            } else {
-                if (!$this->dsSearchForm->getValue(self::searchFormCustomerID)) {
-                    $this->setFormErrorOn();
-                } else {
-                    $customerID = $this->dsSearchForm->getValue(self::searchFormCustomerID);
-                    $report = $this->produceReport($customerID);
-                }
-
-            }
-
-        }
-
-        $this->setMethodName('displaySearchForm');
-
-        $this->setTemplateFiles(
-            array(
-                'RenewalReportSearch' => 'RenewalReportSearch.inc'
-            )
-        );
-
-        $urlSubmit = Controller::buildLink(
-            $_SERVER ['PHP_SELF'],
-            array('action' => CTCNC_ACT_SEARCH)
-        );
-
-
-        $this->setPageTitle('Renewal Report');
-        $customerString = null;
-        if ($this->dsSearchForm->getValue(self::searchFormCustomerID) != 0) {
-            $buCustomer = new BUCustomer ($this);
-            $dsCustomer = new DataSet($this);
-            $buCustomer->getCustomerByID(
-                $this->dsSearchForm->getValue(self::searchFormCustomerID),
-                $dsCustomer
-            );
-            $customerString = $dsCustomer->getValue(DBECustomer::name);
-        }
-        $urlCustomerPopup = Controller::buildLink(
-            CTCNC_PAGE_CUSTOMER,
-            array(
-                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                'htmlFmt' => CT_HTML_FMT_POPUP
-            )
-        );
-
-        $this->template->set_var(
-            array(
-                'formError'         => $this->formError,
-                'customerID'        => $this->dsSearchForm->getValue(self::searchFormCustomerID),
-                'customerIDMessage' => $this->dsSearchForm->getMessage(self::searchFormCustomerID),
-                'customerString'    => $customerString,
-                'urlCustomerPopup'  => $urlCustomerPopup,
-                'urlSubmit'         => $urlSubmit,
-                'report'            => $report
-            )
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'RenewalReportSearch',
-            true
-        );
-
-        $this->parsePage();
-
-    } // end function displaySearchForm
 
     /**
      * @access private
@@ -660,6 +312,8 @@ class CTRenewalReport extends CTCNC
                     'customerID'           => $customerID,
                     'checkbox'             => $checkbox,
                     'calculatedExpiryDate' => $item['calculatedExpiryDate'],
+                    'units'                => $item['units'],
+                    'directDebit'          => $item['directDebit'] ? 'Yes' : null,
                 )
             );
 
@@ -779,6 +433,353 @@ class CTRenewalReport extends CTCNC
         }
 
         return true;
+    }
+
+    /**
+     * @param $customerID
+     * @param $contractsIDs
+     * @return mixed|string
+     * @throws CrossReferenceException
+     * @throws FilterException
+     * @throws PdfParserException
+     * @throws PdfTypeException
+     * @throws PdfReaderException
+     */
+    function generatePDFContract($customerID,
+                                 $contractsIDs
+    )
+    {
+        $mainPDF = new Fpdi();
+        $this->addPages(
+            $mainPDF,
+            $contractsIDs
+        );
+
+        $pageCount = $mainPDF->setSourceFile(
+            PDF_RESOURCE_DIR . '/Terms & Conditions April 2018 branded.pdf'
+        );
+        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+            $pageId = $mainPDF->importPage($pageNo);
+            $s = $mainPDF->getTemplatesize($pageId);
+            $mainPDF->AddPage(
+                $s['orientation'],
+                $s
+            );
+            $mainPDF->useImportedPage($pageId);
+        }
+
+        $pageCount = $mainPDF->setSourceFile(PDF_RESOURCE_DIR . '/lastPage.pdf');
+        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+            $pageId = $mainPDF->importPage($pageNo);
+            $s = $mainPDF->getTemplatesize($pageId);
+            $mainPDF->AddPage(
+                $s['orientation'],
+                $s
+            );
+            $mainPDF->useImportedPage($pageId);
+        }
+
+        $fileName = PDF_TEMP_DIR . '/' . $customerID . '-Contracts.pdf';
+
+        $mainPDF->Output(
+            'F',
+            $fileName,
+            true
+        );
+
+        $fileName = str_replace(
+            BASE_DRIVE . '/htdocs',
+            "",
+            $fileName
+        );
+
+        return $fileName;
+    }
+
+    /**
+     * @param Fpdi $mainPDF
+     * @param $contractsIDs
+     * @throws CrossReferenceException
+     * @throws FilterException
+     * @throws PdfParserException
+     * @throws PdfReaderException
+     * @throws PdfTypeException
+     */
+    function addPages(Fpdi $mainPDF,
+                      $contractsIDs
+    )
+    {
+
+        foreach ($contractsIDs as $contractID) {
+            // Validation and setting of variables
+
+            $buCustomerItem = new BUCustomerItem($this);
+            $dsContract = new DataSet($this);
+            $buCustomerItem->getCustomerItemByID(
+                $contractID,
+                $dsContract
+            );
+            $buCustomerItem->getCustomerItemsByContractID(
+                $contractID,
+                $dsCustomerItem
+            );
+
+            $buSite = new BUSite($this);
+            $buActivity = new BUActivity($this);
+            $buCustomer = new BUCustomer($this);
+            $buCustomer->getCustomerByID(
+                $dsContract->getValue(DBEJCustomerItem::customerID),
+                $dsCustomer
+            );
+            $buSite->getSiteByID(
+                $dsContract->getValue(DBEJCustomerItem::customerID),
+                $dsContract->getValue(DBEJCustomerItem::siteNo),
+                $dsSite
+            );
+            $customerHasServiceDeskContract = $buCustomerItem->customerHasServiceDeskContract(
+                $dsContract->getValue(DBEJCustomerItem::customerID)
+            );
+
+            $buPDFSupportContract =
+                new BUPDFSupportContract(
+                    $this,
+                    $dsContract,
+                    $dsCustomerItem,
+                    $dsSite,
+                    $dsCustomer,
+                    $buActivity,
+                    $customerHasServiceDeskContract
+                );
+
+            $pdfFile = $buPDFSupportContract->generateFile(false);
+
+            $pageCount = $mainPDF->setSourceFile($pdfFile);
+            for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+                $pageId = $mainPDF->importPage($pageNo);
+                $s = $mainPDF->getTemplatesize($pageId);
+                $mainPDF->AddPage(
+                    $s['orientation'],
+                    $s
+                );
+                $mainPDF->useImportedPage($pageId);
+            }
+        }
+
+    }
+
+    private function sendPDFContract($PDFPath,
+                                     $contactID,
+                                     $templateID,
+                                     $customerID
+    )
+    {
+        ApiClient::setApiKey("fc2d9ba05f3f3d9f2e9de4d831e8fed9");
+
+        $envDocs = [];
+
+        $file = basename($PDFPath);
+
+        $fileName = PDF_TEMP_DIR . '/' . $file;
+
+        $dbeContact = new DBEContact($this);
+
+        $dbeContact->getRow($contactID);
+
+        $firstName = $dbeContact->getValue(DBEContact::firstName);
+        $lastName = $dbeContact->getValue(DBEContact::lastName);
+        $email = $dbeContact->getValue(DBEContact::email);
+        global $server_type;
+        if ($server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE) {
+            $email = "sales@cnc-ltd.co.uk";
+        }
+
+        $envelopeDocument = new DocumentWithoutTemplate(
+            'CNC Contracts with Terms & Conditions',
+            null,
+            base64_encode(file_get_contents($fileName)),
+            "CNCContractsTCs.pdf"
+        );
+
+        $envDocs[] = $envelopeDocument;
+
+        $envelopeParties = [];
+
+        $envelopeParty = new Party(
+            $firstName . ' ' . $lastName,
+            $email,
+            'signer1',
+            'Please sign here',
+            'no',
+            false
+        );
+        $envelopeParties[] = $envelopeParty;
+
+
+        $response = Envelopes::createNewWithoutTemplate(
+            "Document #" . $customerID . "_" . uniqid(),
+            $envDocs,
+            $envelopeParties,
+            null,
+            false,
+            null,
+            0,
+            0
+        );
+
+
+        if ($response && $response->http == 202) {
+            $buMail = new BUMail($this);
+
+            $hdrs = array(
+                'From'         => 'support@cnc-ltd.co.uk',
+                'To'           => $email,
+                'Subject'      => "CNC Contracts and Terms & Conditions to be signed",
+                'Date'         => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            $buStandardText = new BUStandardText($this);
+            $standardTexts = new DataSet($this);
+            $buStandardText->getStandardTextByID(
+                $templateID,
+                $standardTexts
+            );
+
+            $body = $standardTexts->getValue(DBEStandardText::stt_text);
+
+            $body = str_replace(
+                "[%contactFirstName%]",
+                $firstName,
+                $body
+            );
+            $body = str_replace(
+                "[%contactLastName%]",
+                $lastName,
+                $body
+            );
+
+            $buMail->mime->setHTMLBody($body);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
+            );
+
+            $body = $buMail->mime->get($mime_params);
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->send(
+                $email,
+                $hdrs,
+                $body
+            );
+
+            $dbeCustomer = new DBECustomer($this);
+            $dbeCustomer->getRow($customerID);
+            $dbeCustomer->setValue(
+                DBECustomer::lastContractSent,
+                "Documents last sent to " . $firstName . ' ' . $lastName . " on " .
+                (new DateTime())->format('d/m/Y h:i') .
+                " by " .
+                $this->dbeUser->getValue(DBEUser::firstName) .
+                " " .
+                $this->dbeUser->getValue(DBEUser::lastName)
+            );
+            $dbeCustomer->updateRow();
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @throws Exception
+     */
+    function search()
+    {
+
+        $this->setMethodName('search');
+        $report = null;
+        if (isset ($_REQUEST ['searchForm']) == 'POST') {
+            if (!$this->dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
+            } else {
+                if (!$this->dsSearchForm->getValue(self::searchFormCustomerID)) {
+                    $this->setFormErrorOn();
+                } else {
+                    $customerID = $this->dsSearchForm->getValue(self::searchFormCustomerID);
+                    $report = $this->produceReport($customerID);
+                }
+
+            }
+
+        }
+
+        $this->setMethodName('displaySearchForm');
+
+        $this->setTemplateFiles(
+            array(
+                'RenewalReportSearch' => 'RenewalReportSearch.inc'
+            )
+        );
+
+        $urlSubmit = Controller::buildLink(
+            $_SERVER ['PHP_SELF'],
+            array('action' => CTCNC_ACT_SEARCH)
+        );
+
+
+        $this->setPageTitle('Renewal Report');
+        $customerString = null;
+        if ($this->dsSearchForm->getValue(self::searchFormCustomerID) != 0) {
+            $buCustomer = new BUCustomer ($this);
+            $dsCustomer = new DataSet($this);
+            $buCustomer->getCustomerByID(
+                $this->dsSearchForm->getValue(self::searchFormCustomerID),
+                $dsCustomer
+            );
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
+        }
+        $urlCustomerPopup = Controller::buildLink(
+            CTCNC_PAGE_CUSTOMER,
+            array(
+                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
+
+        $this->template->set_var(
+            array(
+                'formError'         => $this->formError,
+                'customerID'        => $this->dsSearchForm->getValue(self::searchFormCustomerID),
+                'customerIDMessage' => $this->dsSearchForm->getMessage(self::searchFormCustomerID),
+                'customerString'    => $customerString,
+                'urlCustomerPopup'  => $urlCustomerPopup,
+                'urlSubmit'         => $urlSubmit,
+                'report'            => $report
+            )
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'RenewalReportSearch',
+            true
+        );
+
+        $this->parsePage();
+
+    } // end function displaySearchForm
+
+    function generateEnvelope($fileName,
+                              $firstName,
+                              $lastName,
+                              $email,
+                              $customerID
+    )
+    {
+
     }
 
 }

@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 703 - New calendar
+- Issue 702 - Renewal Report to show users & direct debit
 
 ## [v3.8.5] - 2019-12-18
 ### Fixed
