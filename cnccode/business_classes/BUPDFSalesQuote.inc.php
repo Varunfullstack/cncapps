@@ -397,9 +397,8 @@ class BUPDFSalesQuote extends Business
         $buPDF->setFont();
         $buPDF->CR();
         $buPDF->CR();
-        $buPDF->printString(
-            'This quotation is subject to our terms and conditions which are available <a href="https://www.cnc-ltd.co.uk/terms-and-conditions">here</a>'
-        );
+        $buPDF->printString('This quotation is subject to our terms and conditions which are available ');
+        $buPDF->printString('here', "https://www.cnc-ltd.co.uk/terms-and-conditions");
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printString('If you would like to proceed with this quote, then please click on ');

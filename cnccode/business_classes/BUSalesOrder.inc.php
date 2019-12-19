@@ -2470,16 +2470,18 @@ WHERE odl_ordno = $ordheadID
         );
         $buPDF->CR();
         $buPDF->CR();
-        $text = 'This order is subject to our terms and conditions which are available here and by ticking this box you have read and agreed to them.';
-        $textWidth = $buPDF->pdf->GetStringWidth($text);
-        $buPDF->moveXTo(UNIT_LEFT - 2 - $textWidth);
-        $buPDF->printString('This order is subject to our terms and conditions which are available ');
+        $buPDF->printString('This order is subject to our terms and conditions which are ');
+        $buPDF->CR();
+        $buPDF->printString('available ');
         $buPDF->printString('here', "https://www.cnc-ltd.co.uk/terms-and-conditions");
-        $buPDF->printString(' and by ticking this box you have read and agreed to them.');
+        $buPDF->printString(' and by ticking this box you have read and agreed');
         $buPDF->printStringAt(
             UNIT_LEFT,
-            "{check:signer1:I+have+read+and+I+accept+the+terms+and+conditions}"
+            "{check:signer1:accept}"
         );
+        $buPDF->CR();
+        $buPDF->printString('to them.');
+
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->setBoldOn();
