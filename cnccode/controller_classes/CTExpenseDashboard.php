@@ -189,17 +189,9 @@ WHERE
 
                 $queryString = 'SELECT
   caa_date as dateSubmitted,
-  DATE_FORMAT(caa_date, \'%w\') AS `weekday`,
   caa_callactivityno as activityId,
   caa_problemno as serviceRequestId,
-  time_to_sec(caa_starttime) as activityStartTimeSeconds,
-  time_to_sec(caa_endtime) as activityEndTimeSeconds,
   consultant.cns_name as staffName,
-  consultant.cns_helpdesk_flag = \'Y\' as helpdeskUser,
-  time_to_sec(hed_hd_starttime) as helpdeskStartTimeSeconds,
-  time_to_sec(hed_hd_endtime) as helpdeskEndTimeSeconds,
-  time_to_sec(hed_pro_starttime) as projectStartTimeSeconds,
-  time_to_sec(hed_pro_endtime) as projectEndTimeSeconds,
   consultant.`cns_consno` AS userId,
   project.`description` AS projectDescription,
   project.`projectID` AS projectId,
@@ -226,7 +218,7 @@ FROM
   JOIN problem
     ON pro_problemno = caa_problemno
   JOIN callacttype
-    ON caa_callacttypeno = cat_callacttypeno
+    ON caa_callacttypeno = cat_callacttypeno AND callacttype.engineerOvertimeFlag = \'Y\'
   JOIN customer
     ON pro_custno = cus_custno
   JOIN consultant
@@ -243,24 +235,21 @@ WHERE
     OR caa_status = \'A\')
   AND caa_ot_exp_flag = \'N\'
   AND (
-    (
+     DATE_FORMAT(caa_date, \'%w\') IN (0, 6) or (
       consultant.weekdayOvertimeFlag = \'Y\'
-      AND DATE_FORMAT(caa_date, \'%w\') IN (0, 1, 2, 3, 4, 5, 6)
-    )
-    OR (
-      consultant.weekdayOvertimeFlag = \'N\'
-      AND DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
+      AND DATE_FORMAT(caa_date, \'%w\') IN (1, 2, 3, 4, 5)
     )
   )
   AND (
     caa_endtime > hed_pro_endtime
-    OR caa_starttime < hed_pro_starttime
-    OR caa_endtime > `hed_hd_endtime`
-    OR caa_starttime < hed_hd_starttime
-    OR DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
+   OR caa_starttime < hed_pro_starttime
+   OR caa_endtime > `hed_hd_endtime`
+   OR caa_starttime < hed_hd_starttime
+   OR 
+    DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
   )
   AND (caa_endtime <> caa_starttime)
-  AND callacttype.engineerOvertimeFlag = \'Y\'
+  
   AND (
     callactivity.`caa_consno` = ?
     OR consultant.`expenseApproverID` = ?

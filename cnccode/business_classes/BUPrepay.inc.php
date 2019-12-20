@@ -5,6 +5,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_gc"] . "/Controller.inc.php");
 require_once($cfg ["path_dbe"] . "/DBECallActivity.inc.php");
@@ -114,7 +115,6 @@ class BUPrepay extends Business
         $dsResults->addColumn(self::exportPrePayContractType, DA_STRING, DA_ALLOW_NULL);
         $dsResults->addColumn(self::exportPrePayWebFileLink, DA_STRING, DA_ALLOW_NULL); // link to statement
 
-
         $dbeVat = new DBEVat($this);
         $dbeVat->getRow();
         $vatCode = $this->dsHeader->getValue(DBEHeader::stdVATCode);
@@ -151,6 +151,8 @@ class BUPrepay extends Business
         /*
         Bring out a list of PrePay Service Requests to be included in the statement run
         */
+        $prepayOvertimeActivities = [];
+
         $queryString =
             "SELECT
         pro_problemno,
@@ -161,8 +163,10 @@ class BUPrepay extends Business
         cui_cuino,
         ity_desc,
         cui_expiry_date,
-        curGSCBalance        
-                
+        curGSCBalance,
+       callactivity.caa_callactivityno as activityId,
+       caa_starttime,
+       caa_endtime
       FROM callactivity
         JOIN problem
           ON pro_problemno = caa_problemno
@@ -200,7 +204,6 @@ class BUPrepay extends Business
             " GROUP BY pro_problemno 
       ORDER BY pro_custno, pro_problemno, pro_date_raised";
 
-
         $db->query($queryString);
 
         $ret = FALSE; // indicates there were no statements to export
@@ -210,7 +213,20 @@ class BUPrepay extends Business
         // ensure all customers have at least one statement contact
         $last_custno = '9999';
         $htmlFileHandle = null;
+        $buExpense = new BUExpense($this);
+
         while ($db->next_record()) {
+            $overtime = $buExpense->calculateOvertime($db->Record['activityId']);
+            if ($overtime) {
+                $prepayOvertimeActivities[] = [
+                    "customerName"     => $db->Record['cus_name'],
+                    "serviceRequestId" => $db->Record['pro_problemno'],
+                    "activityId"       => $db->Record['activityId'],
+                    "startTime"        => $db->Record['caa_starttime'],
+                    "endTime"          => $db->Record['caa_endtime'],
+                    "overtime"         => $overtime
+                ];
+            }
 
             if ($db->Record ['custno'] != $last_custno) {
                 if ($last_custno != '9999') {
@@ -225,6 +241,15 @@ class BUPrepay extends Business
                 }
             }
             $last_custno = $db->Record ['custno'];
+        }
+        if (count($prepayOvertimeActivities)) {
+            $csvFileName = SAGE_EXPORT_DIR . '/PrePayOOH' . (new DateTime())->format('d-m-Y') . '.csv';
+            $csvFileHandler = fopen($csvFileName, "w");
+            fputcsv($csvFileHandler, array_keys($prepayOvertimeActivities[0]));
+            foreach ($prepayOvertimeActivities as $prepayOvertimeActivity) {
+                fputcsv($csvFileHandler, array_values($prepayOvertimeActivity));
+            }
+            fclose($csvFileHandler);
         }
 
         $db->query($queryString);
@@ -539,12 +564,6 @@ class BUPrepay extends Business
         }
     }
 
-    /*
-          work out whether a top-up is required and if so then generate one
-          We generate a top-up T&M call so that this can later be amended and/or checked and used to generate a sales
-          order for the top-up amount.
-          This call will now appear on
-      */
     function doTopUp(&$Record)
     {
         $newBalance = $Record ['curGSCBalance'] + $this->totalCost;
@@ -573,6 +592,13 @@ class BUPrepay extends Business
 
         return $topUpValue;
     }
+
+    /*
+          work out whether a top-up is required and if so then generate one
+          We generate a top-up T&M call so that this can later be amended and/or checked and used to generate a sales
+          order for the top-up amount.
+          This call will now appear on
+      */
 
     function createTopUpSalesOrder(&$Record, $topUpValue)
     {
@@ -625,7 +651,7 @@ class BUPrepay extends Business
         $dbeOrdline->setValue(DBEJOrdline::description, $dbeItem->getValue(DBEItem::description));
         $dbeOrdline->insertRow();
         return $dsOrdhead->getValue(DBEJOrdhead::ordheadID);
-    }    // end function
+    }
 
     /**
      * @param $Record
@@ -654,7 +680,7 @@ class BUPrepay extends Business
         $dsResults->setValue(self::exportPrePayContractType, $Record ['ity_desc']);
         $dsResults->setValue(self::exportPrePayWebFileLink, $webFileLink);
         $dsResults->post();
-    }
+    }    // end function
 
     /**
      * @param $statementFilepath
@@ -746,10 +772,6 @@ is currently a balance of ';
         $this->save($statementFilepath, $custno, $balance);
     }
 
-    /*
-        Create sales order for top-up
-    */
-
     function save($filename, $custno, $balance)
     {
         $db = $GLOBALS['db'];
@@ -775,6 +797,10 @@ is currently a balance of ';
         $db->query($sql);
 
     }
+
+    /*
+        Create sales order for top-up
+    */
 
     function getActivitiesByServiceRequest($serviceRequestRecord)
     {
@@ -940,6 +966,97 @@ is currently a balance of ';
         $this->template->parse('lines', 'lineBlock', true);
 
         $this->totalCost += $requestValue;
+    }
+
+    function generateOvertimePrepayCSV(DateTimeInterface $date)
+    {
+        $query = "SELECT
+  caa_date as dateSubmitted,
+  DATE_FORMAT(caa_date, '%w') AS `weekday`,
+  caa_callactivityno as activityId,
+  caa_problemno as serviceRequestId,
+  time_to_sec(caa_starttime) as activityStartTimeSeconds,
+  time_to_sec(caa_endtime) as activityEndTimeSeconds,
+  consultant.cns_name as staffName,
+  consultant.cns_helpdesk_flag = 'Y' as helpdeskUser,
+  time_to_sec(hed_hd_starttime) as helpdeskStartTimeSeconds,
+  time_to_sec(hed_hd_endtime) as helpdeskEndTimeSeconds,
+  time_to_sec(hed_pro_starttime) as projectStartTimeSeconds,
+  time_to_sec(hed_pro_endtime) as projectEndTimeSeconds,
+  consultant.`cns_consno` AS userId,
+  project.`description` AS projectDescription,
+  project.`projectID` AS projectId,
+  approver.cns_name as approverName,
+  IF(
+    callactivity.`overtimeApprovedBy` is not null,
+    \"Approved\",
+    IF(
+      callactivity.`overtimeDeniedReason` is not null,
+      \"Denied\",
+      \"Pending\"
+    )
+  ) AS `status`,
+  callactivity.`overtimeApprovedDate` as approvedDate,
+       callactivity.caa_consno = ? as isSelf,
+       ((SELECT
+        1
+      FROM
+        consultant globalApprovers
+      WHERE globalApprovers.globalExpenseApprover
+        AND globalApprovers.cns_consno = ?) = 1 or consultant.`expenseApproverID` = ?) as isApprover
+FROM
+  callactivity
+  JOIN problem
+    ON pro_problemno = caa_problemno
+  JOIN callacttype
+    ON caa_callacttypeno = cat_callacttypeno
+  JOIN customer
+    ON pro_custno = cus_custno
+  JOIN consultant
+    ON caa_consno = cns_consno
+  left join consultant approver
+    ON approver.`cns_consno` = callactivity.`overtimeApprovedBy`
+  join headert
+    on headert.`headerID` = 1
+  left join project
+    on project.`projectID` = problem.`pro_projectno`
+WHERE 
+      caa_endtime and caa_endtime is not null and
+      (caa_status = 'C'
+    OR caa_status = 'A')
+  AND caa_ot_exp_flag = 'N'
+  AND (
+    (
+      consultant.weekdayOvertimeFlag = 'Y'
+      AND DATE_FORMAT(caa_date, '%w') IN (0, 1, 2, 3, 4, 5, 6)
+    )
+    OR (
+      consultant.weekdayOvertimeFlag = 'N'
+      AND DATE_FORMAT(caa_date, '%w') IN (0, 6)
+    )
+  )
+  AND (
+    caa_endtime > hed_pro_endtime
+   OR caa_starttime < hed_pro_starttime
+   OR caa_endtime > `hed_hd_endtime`
+   OR caa_starttime < hed_hd_starttime
+   OR 
+    DATE_FORMAT(caa_date, '%w') IN (0, 6)
+  )
+  AND (caa_endtime <> caa_starttime)
+  AND callacttype.engineerOvertimeFlag = 'Y'
+  AND (
+    callactivity.`caa_consno` = ?
+    OR consultant.`expenseApproverID` = ?
+    OR (
+      (SELECT
+        1
+      FROM
+        consultant globalApprovers
+      WHERE globalApprovers.globalExpenseApprover
+        AND globalApprovers.cns_consno = ?) = 1
+    )
+  )";
     }
 
 }

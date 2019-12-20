@@ -439,4 +439,19 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="625-26">
+        <sql>
+            UPDATE
+                callactivity
+                    LEFT JOIN consultant
+                    ON consultant.`cns_consno` = callactivity.`caa_consno`
+                    LEFT JOIN callacttype
+                    ON callacttype.`cat_callacttypeno` = callactivity.`caa_callacttypeno`
+            SET callactivity.`caa_ot_exp_flag` = 'Y'
+            WHERE consultant.weekdayOvertimeFlag = 'N'
+              AND callacttype.`engineerOvertimeFlag` = 'Y'
+              AND DATE_FORMAT(caa_date, '%w') IN (1, 2, 3, 4, 5);
+        </sql>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>

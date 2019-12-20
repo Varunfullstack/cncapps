@@ -15,6 +15,6 @@ class OvertimeExportItem
     public $engineerFirstName;
     public $engineerLastName;
     public $activityDate;
-    public $activityStartTime;
-    public $activityEndTime;
+    public $allowWeekDayOvertime;
+    public $weekendOvertime;
 }
