@@ -47,46 +47,7 @@ const salesRequestDialogTemplate = "<div id=\"salesRequestDialog\"\n" +
     "        </button>\n" +
     "        <button onclick=\"cancelSalesRequest()\">Cancel</button>\n" +
     "    </div>\n" +
-    "</div>" +
-    "<style>" +
-    "#drop-area {\n" +
-    "  border: 2px dashed #ccc;\n" +
-    "  border-radius: 20px;\n" +
-    "  width: 480px;\n" +
-    "  font-family: sans-serif;\n" +
-    "  margin: 35px auto;\n" +
-    "  padding: 20px;\n" +
-    "}\n" +
-    "#drop-area.highlight {\n" +
-    "  border-color: purple;\n" +
-    "}\n" +
-    "p {\n" +
-    "  margin-top: 0;\n" +
-    "}\n" +
-    ".my-form {\n" +
-    "  margin-bottom: 10px;\n" +
-    "}\n" +
-    "#gallery {margin-top: 10px;display: flex; flex-direction: column;}" +
-    ".button {\n" +
-    "  display: inline-block;\n" +
-    "  padding: 10px;\n" +
-    "  background: #ccc;\n" +
-    "  cursor: pointer;\n" +
-    "  border-radius: 5px;\n" +
-    "  border: 1px solid #ccc;\n" +
-    "}\n" +
-    ".button:hover {\n" +
-    "  background: #ddd;\n" +
-    "}\n" +
-    "#fileElem {\n" +
-    "  display: none;\n" +
-    "}" +
-    ".item{" +
-    " width:250px;display: flex;flex-direction: row; " +
-    "}" +
-    ".item .fileName{ flex-grow: 1; margin: auto}" +
-    ".item button {flex-grow: 0}" +
-    "</style>";
+    "</div>";
 
 const fileItem =
     `<div class="item">
@@ -180,9 +141,11 @@ function drawFiles() {
 function sendSalesRequest() {
 
     const fd = new FormData();
-    window.salesRequest.files.forEach(file => {
-        fd.append("file[]", file);
-    });
+    if (window.salesRequest.files) {
+        window.salesRequest.files.forEach(file => {
+            fd.append("file[]", file);
+        });
+    }
 
     fd.append('message', CKEDITOR.instances.salesRequestText.getData());
     fd.append('type', $('#templateSelector').val());

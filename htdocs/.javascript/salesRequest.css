@@ -1,0 +1,59 @@
+
+#salesRequestDialog #drop-area {
+    border: 2px dashed #ccc;
+    border-radius: 20px;
+    width: 480px;
+    font-family: sans-serif;
+    margin: 35px auto;
+    padding: 20px;
+}
+
+#salesRequestDialog #drop-area.highlight {
+    border-color: purple;
+}
+
+#salesRequestDialog p {
+    margin-top: 0;
+}
+
+#salesRequestDialog .my-form {
+    margin-bottom: 10px;
+}
+
+#salesRequestDialog #gallery {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+#salesRequestDialog .button {
+    display: inline-block;
+    padding: 10px;
+    background: #ccc;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#salesRequestDialog .button:hover {
+    background: #ddd;
+}
+
+#salesRequestDialog #fileElem {
+    display: none;
+}
+
+#salesRequestDialog .item {
+    width: 250px;
+    display: flex;
+    flex-direction: row;
+}
+
+#salesRequestDialog .item .fileName {
+    flex-grow: 1;
+    margin: auto
+}
+
+#salesRequestDialog .item button {
+    flex-grow: 0
+}
