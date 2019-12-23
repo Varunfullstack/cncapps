@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUTeamPerformance.inc.php');
 require_once($cfg ['path_bu'] . '/BUHeader.inc.php');
@@ -99,7 +100,10 @@ class CTTeamPerformanceReport extends CTCNC
 
                 foreach ($results as $result) {
 
-                    if ($result['esTeamActualSlaPercentage'] < $result['esTeamTargetSlaPercentage']) {
+                    if (round($result['esTeamActualSlaPercentage'], 1) < round(
+                            $result['esTeamTargetSlaPercentage'],
+                            1
+                        )) {
 
                         $this->template->set_var(
                             'esTeamActualSlaPercentage' . $result['month'] . 'Class',
@@ -107,7 +111,10 @@ class CTTeamPerformanceReport extends CTCNC
                         );
                     }
 
-                    if ($result['hdTeamActualSlaPercentage'] < $result['hdTeamTargetSlaPercentage']) {
+                    if (round($result['hdTeamActualSlaPercentage'], 1) < round(
+                            $result['hdTeamTargetSlaPercentage'],
+                            1
+                        )) {
 
                         $this->template->set_var(
                             'hdTeamActualSlaPercentage' . $result['month'] . 'Class',
@@ -115,7 +122,10 @@ class CTTeamPerformanceReport extends CTCNC
                         );
                     }
 
-                    if ($result['imTeamActualSlaPercentage'] < $result['imTeamTargetSlaPercentage']) {
+                    if (round($result['imTeamActualSlaPercentage'], 1) < round(
+                            $result['imTeamTargetSlaPercentage'],
+                            1
+                        )) {
 
                         $this->template->set_var(
                             'imTeamActualSlaPercentage' . $result['month'] . 'Class',
@@ -174,21 +184,21 @@ class CTTeamPerformanceReport extends CTCNC
                         array(
                             'esTeamActualSlaPercentage' . $result['month']  => number_format(
                                 $result['esTeamActualSlaPercentage'],
-                                0
+                                1
                             ),
                             'esTeamActualFixHours' . $result['month']       => $result['esTeamActualFixHours'],
                             'esTeamActualFixQtyPerMonth' . $result['month'] => $result['esTeamActualFixQtyPerMonth'],
 
                             'imTeamActualSlaPercentage' . $result['month']  => number_format(
                                 $result['imTeamActualSlaPercentage'],
-                                0
+                                1
                             ),
                             'imTeamActualFixHours' . $result['month']       => $result['imTeamActualFixHours'],
                             'imTeamActualFixQtyPerMonth' . $result['month'] => $result['imTeamActualFixQtyPerMonth'],
 
                             'hdTeamActualSlaPercentage' . $result['month']  => number_format(
                                 $result['hdTeamActualSlaPercentage'],
-                                0
+                                1
                             ),
                             'hdTeamActualFixHours' . $result['month']       => $result['hdTeamActualFixHours'],
                             'hdTeamActualFixQtyPerMonth' . $result['month'] => $result['hdTeamActualFixQtyPerMonth']

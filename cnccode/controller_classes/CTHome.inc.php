@@ -6,7 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBESalesOrderTotals.inc.php');
 require_once($cfg['path_dbe'] . '/DBEInvoiceTotals.inc.php');
@@ -564,15 +564,15 @@ class CTHome extends CTCNC
             $imSLAPerformanceClass = 'performance-warn';
             $imFixHoursClass = 'performance-warn';
 
-            if (round($result['esTeamActualSlaPercentage']) >= $result['esTeamTargetSlaPercentage']) {
+            if (round($result['esTeamActualSlaPercentage'],1) >= round($result['esTeamTargetSlaPercentage'],1)) {
                 $esSLAPerformanceClass = 'performance-green';
             }
 
-            if (round($result['hdTeamActualSlaPercentage']) >= $result['hdTeamTargetSlaPercentage']) {
+            if (round($result['hdTeamActualSlaPercentage'],1) >= round($result['hdTeamTargetSlaPercentage'],1)) {
                 $hdSLAPerformanceClass = 'performance-green';
             }
 
-            if (round($result['imTeamActualSlaPercentage']) >= $result['imTeamTargetSlaPercentage']) {
+            if (round($result['imTeamActualSlaPercentage'], 1) >= round($result['imTeamTargetSlaPercentage'], 1)) {
                 $imSLAPerformanceClass = 'performance-green';
             }
             if ($result['esTeamActualFixHours'] <= $result['esTeamTargetFixHours']) {
@@ -591,7 +591,7 @@ class CTHome extends CTCNC
                 array(
                     'esTeamActualSlaPercentage' . $result['quarter']           => number_format(
                         $result['esTeamActualSlaPercentage'],
-                        0
+                        1
                     ),
                     'esTeamActualFixHours' . $result['quarter']                => number_format(
                         $result['esTeamActualFixHours'],
@@ -600,7 +600,7 @@ class CTHome extends CTCNC
                     'esTeamActualFixQty' . $result['quarter']                  => $result['esTeamActualFixQty'],
                     'imTeamActualSlaPercentage' . $result['quarter']           => number_format(
                         $result['imTeamActualSlaPercentage'],
-                        0
+                        1
                     ),
                     'imTeamActualFixHours' . $result['quarter']                => number_format(
                         $result['imTeamActualFixHours'],
@@ -609,7 +609,7 @@ class CTHome extends CTCNC
                     'imTeamActualFixQty' . $result['quarter']                  => $result['imTeamActualFixQty'],
                     'hdTeamActualSlaPercentage' . $result['quarter']           => number_format(
                         $result['hdTeamActualSlaPercentage'],
-                        0
+                        1
                     ),
                     'hdTeamActualFixHours' . $result['quarter']                => number_format(
                         $result['hdTeamActualFixHours'],
