@@ -7,7 +7,7 @@
     These customers are missing Contract IDs within the Office 365 Backup Portal:
     {% for item in items %}
         <p>
-            {% item.name %}
+            {{ item.name }}
         </p>
     {% endfor %}
 {% endblock %}

@@ -7,11 +7,14 @@
  */
 
 use CNCLTD\LoggerCLI;
+use Twig\Environment;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
 global $db;
-global $twig;
+
+$loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../twig/internal');
+$twig = new Environment($loader, ["cache" => __DIR__ . '/../cache']);
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUMail.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomerItem.inc.php');
@@ -80,7 +83,11 @@ try {
             $customerItem = new DBECustomerItem($thing);
             $customerItem->getRow($accountInfo->contractId);
             if ($customerItem->getValue(DBECustomerItem::users) === null) {
-                var_dump($accountInfo->contractId);
+                $customerItem->setValue(DBECustomerItem::users, 0);
+                $updateCustomerItem = new DBECustomerItem($thing);
+                $updateCustomerItem->getRow($accountInfo->contractId);
+                $updateCustomerItem->setValue(DBECustomerItem::users, 0);
+                $updateCustomerItem->updateRow();
             }
             $db->preparedQuery(
                 "insert into contractUsersLog(contractId,users, currentUsers) values (?,?,?)",

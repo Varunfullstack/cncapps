@@ -117,12 +117,12 @@ from contractUsersLog left join custItem ON contractId = custItem.cui_cuino LEFT
         $endDate = @$_REQUEST['endDate'];
 
         if ($startDate) {
-            $defaultQuery .= " and createdAt >= ? ";
+            $defaultQuery .= " and date(createdAt) >= ? ";
             $parameters[] = ["type" => "s", "value" => $startDate];
 
         }
         if ($endDate) {
-            $defaultQuery .= " and createdAt <= ? ";
+            $defaultQuery .= " and date(createdAt) <= ? ";
             $parameters[] = ["type" => "s", "value" => $endDate];
         }
 

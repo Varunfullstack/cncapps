@@ -49,7 +49,7 @@ class SolarwindsBackupAPI
                         "I1",
                         "TL",
                         "AA1600",
-                        "D5F20"
+                        "TM"
                     ]
                 ]
             ]
@@ -75,7 +75,7 @@ class SolarwindsBackupAPI
                         $lastSuccessfulBackupDate->setTimestamp($setting[$key]);
                     } elseif ($key == 'I1') {
                         $name = $setting[$key];
-                    } elseif ($key == 'D5F20') {
+                    } elseif ($key == 'TM') {
                         $protectedUsers = $setting[$key];
                     }
                 }
