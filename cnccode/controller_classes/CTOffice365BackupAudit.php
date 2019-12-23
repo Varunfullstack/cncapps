@@ -13,7 +13,7 @@ require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once $cfg['path_dbe'] . '/DBEJContactAudit.php';
 
-class CTContractUsersAudit extends CTCNC
+class CTOffice365BackupAudit extends CTCNC
 {
     function __construct($requestMethod,
                          $postVars,
@@ -191,10 +191,10 @@ from contractUsersLog left join custItem ON contractId = custItem.cui_cuino LEFT
         $this->setMethodName('displaySearchForm');
         $this->setTemplateFiles(
             'CustomerSearch',
-            'ContractUsersLog'
+            'Office365BackupAudit'
         );
 // Parameters
-        $this->setPageTitle("Contract Users Log");
+        $this->setPageTitle("Office 365 Backup Audit");
         $this->template->parse(
             'CONTENTS',
             'CustomerSearch',

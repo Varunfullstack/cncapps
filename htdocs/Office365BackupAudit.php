@@ -7,7 +7,8 @@
  */
 
 require_once("config.inc.php");
-require_once($cfg["path_ct"] . "/CTContractUsersAudit.php");
+global $cfg;
+require_once($cfg["path_ct"] . "/CTOffice365BackupAudit.php");
 session_start();
 page_open(
     array(
@@ -19,7 +20,7 @@ page_open(
 );
 GLOBAL $cfg;
 header("Cache-control: private");
-$ctContact = new CTContractUsersAudit(
+$ctContact = new CTOffice365BackupAudit(
     $_SERVER['REQUEST_METHOD'],
     $_POST,
     $_GET,
