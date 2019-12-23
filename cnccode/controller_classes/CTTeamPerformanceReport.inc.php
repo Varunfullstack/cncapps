@@ -100,7 +100,10 @@ class CTTeamPerformanceReport extends CTCNC
 
                 foreach ($results as $result) {
 
-                    if ($result['esTeamActualSlaPercentage'] < $result['esTeamTargetSlaPercentage']) {
+                    if (round($result['esTeamActualSlaPercentage'], 1) < round(
+                            $result['esTeamTargetSlaPercentage'],
+                            1
+                        )) {
 
                         $this->template->set_var(
                             'esTeamActualSlaPercentage' . $result['month'] . 'Class',
@@ -108,7 +111,10 @@ class CTTeamPerformanceReport extends CTCNC
                         );
                     }
 
-                    if ($result['hdTeamActualSlaPercentage'] < $result['hdTeamTargetSlaPercentage']) {
+                    if (round($result['hdTeamActualSlaPercentage'], 1) < round(
+                            $result['hdTeamTargetSlaPercentage'],
+                            1
+                        )) {
 
                         $this->template->set_var(
                             'hdTeamActualSlaPercentage' . $result['month'] . 'Class',
@@ -116,7 +122,10 @@ class CTTeamPerformanceReport extends CTCNC
                         );
                     }
 
-                    if ($result['imTeamActualSlaPercentage'] < $result['imTeamTargetSlaPercentage']) {
+                    if (round($result['imTeamActualSlaPercentage'], 1) < round(
+                            $result['imTeamTargetSlaPercentage'],
+                            1
+                        )) {
 
                         $this->template->set_var(
                             'imTeamActualSlaPercentage' . $result['month'] . 'Class',
