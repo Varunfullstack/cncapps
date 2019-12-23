@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 703 - New calendar
 - Issue 702 - Renewal Report to show users & direct debit
 - Issue 713 - Show 1 decimal place on home page Team Performance
+- Issue 715 - Create SR from Sales Order formatting improvements
 
 ## [v3.8.5] - 2019-12-18
 ### Fixed

@@ -1,13 +1,4 @@
 <!-- Template: SalesOrderVisitRequest.inc.html -->
-<script language='JavaScript'
-        src='popcalendar/popcalendar.js'
-></script>
-<script type="text/javascript"
-        src="ckeditor/ckeditor.js"
-></script>
-<script type="text/javascript"
-        src="ckfinder/ckfinder.js"
-></script>
 <script type="text/javascript">
     $(function () {
         window.etaDate = $('#etaDate').get(0);
@@ -97,6 +88,7 @@
                 <select id="tablefields"
                         name="standardText"
                         multiple="multiple"
+                        size="16"
                 >
                     <!-- BEGIN standardTextBlock -->
                     <option value="{standardTextContent}"
@@ -122,13 +114,11 @@
                     reason = CKEDITOR.replace(
                         'serviceRequestText',
                         {
-                            customConfig: '/ckeditor_config.js',
-                            toolbar: 'CNCToolbarImage'
+                            customConfig: '/ckeditor_config.js'
                         }
                     );
                     reason.config.width = "100%";
-                    reason.config.height = "500px";
-                    reason.addCss('body { font-size: 10pt; }');
+                    reason.config.height = "250px";
                 </script>
             </td>
         </tr>
