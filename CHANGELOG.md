@@ -1,5 +1,10 @@
 # Changelog
 This project changes will be shown here.
+
+## [unreleased]
+### Changed
+- Issue 713 - Show 1 decimal place on home page Team Performance
+
 ## [v3.8.5] - 2019-12-18
 ### Fixed
 - Fix issue with FetchBitLocker not pulling certain customers because of labtech quirks
