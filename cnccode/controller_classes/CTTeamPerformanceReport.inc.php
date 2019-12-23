@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUTeamPerformance.inc.php');
 require_once($cfg ['path_bu'] . '/BUHeader.inc.php');
@@ -174,21 +175,21 @@ class CTTeamPerformanceReport extends CTCNC
                         array(
                             'esTeamActualSlaPercentage' . $result['month']  => number_format(
                                 $result['esTeamActualSlaPercentage'],
-                                0
+                                1
                             ),
                             'esTeamActualFixHours' . $result['month']       => $result['esTeamActualFixHours'],
                             'esTeamActualFixQtyPerMonth' . $result['month'] => $result['esTeamActualFixQtyPerMonth'],
 
                             'imTeamActualSlaPercentage' . $result['month']  => number_format(
                                 $result['imTeamActualSlaPercentage'],
-                                0
+                                1
                             ),
                             'imTeamActualFixHours' . $result['month']       => $result['imTeamActualFixHours'],
                             'imTeamActualFixQtyPerMonth' . $result['month'] => $result['imTeamActualFixQtyPerMonth'],
 
                             'hdTeamActualSlaPercentage' . $result['month']  => number_format(
                                 $result['hdTeamActualSlaPercentage'],
-                                0
+                                1
                             ),
                             'hdTeamActualFixHours' . $result['month']       => $result['hdTeamActualFixHours'],
                             'hdTeamActualFixQtyPerMonth' . $result['month'] => $result['hdTeamActualFixQtyPerMonth']
