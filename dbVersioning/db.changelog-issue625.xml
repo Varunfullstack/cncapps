@@ -1,0 +1,457 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="625-0">
+        <tagDatabase tag="issue625"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="consultant" columnName="expenseApproverID"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="expenseApproverID" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="consultant" columnName="autoApproveExpenses"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="autoApproveExpenses" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expensetype" columnName="taxable"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expensetype">
+            <column name="taxable" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expensetype" columnName="approvalRequired"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expensetype">
+            <column name="approvalRequired" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="expenseTypeActivityAvailability"/>
+            </not>
+        </preConditions>
+        <createTable tableName="expenseTypeActivityAvailability">
+            <column name="expenseTypeID" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="activityTypeID" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql>
+            insert into expenseTypeActivityAvailability
+            SELECT ext_expensetypeno AS expenseTypeID, a.cat_callacttypeno AS activityTypeID
+            FROM expenseType
+                     JOIN (SELECT cat_callacttypeno FROM callacttype WHERE cat_allow_exp_flag = 'Y') a
+        </sql>
+        <rollback>
+            <dropTable tableName="expenseTypeActivityAvailability"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-6">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="callacttype" columnName="cat_allow_exp_flag"/>
+        </preConditions>
+        <dropColumn tableName="callacttype" columnName="cat_allow_exp_flag"/>
+        <rollback>
+            <addColumn tableName="callacttype">
+                <column name="cat_allow_exp_flag" type="char(1)" defaultValue="N">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+            <sql>
+                update callacttype
+                set cat_allow_exp_flag = if((select count(*)
+                                             from expenseTypeActivityAvailability
+                                             where activityTypeID = callacttype.cat_callacttypeno) > 0, 'Y', 'N')
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expensetype" columnName="receiptRequired"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expensetype">
+            <column name="receiptRequired" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="pavwebdev" id="625-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expense" columnName="dateSubmitted"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expense">
+            <column name="dateSubmitted" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expense" columnName="approvedDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expense">
+            <column name="approvedDate" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expense" columnName="approvedBy"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expense">
+            <column name="approvedBy" type="bigint(11)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expense" columnName="deniedReason"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expense">
+            <column name="deniedReason" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-12">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="receipt"/>
+            </not>
+        </preConditions>
+        <createTable tableName="receipt">
+            <column name="id" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fileMIMEType" remarks="File Mime type" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expenseId" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="filePath" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-13">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="consultant" columnName="isExpenseApprover"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="isExpenseApprover" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-14">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="minimumOvertimeMinutesRequired"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="minimumOvertimeMinutesRequired" type="int(4)" defaultValue="5">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-15">
+        <sql>
+            INSERT INTO expensetype VALUE (
+                                           (SELECT db_sequence.`nextid` + 1
+                                            FROM db_sequence
+                                            WHERE `db_sequence`.`seq_name` = "expensetype"),
+                                           "Call Out",
+                                           "N",
+                                           "N",
+                                           1,
+                                           1,
+                                           0
+                );
+            update db_sequence
+            set nextid = nextid + 1
+            where seq_name = "expensetype";
+            insert into expenseTypeActivityAvailability value ((select ext_expensetypeno from expensetype where ext_desc = "Call Out"),
+                                                               8);
+        </sql>
+        <rollback>
+            <sql>
+                delete
+                from expensetype
+                where ext_desc = "Call Out";
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-16">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="callactengineer"/>
+        </preConditions>
+        <dropTable tableName="callactengineer"/>
+        <rollback>
+            <createTable tableName="callactengineer">
+                <column defaultValueNumeric="0" name="cae_callactengno" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="cae_callactivityno" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="cae_item" type="SMALLINT">
+                    <constraints nullable="false"/>
+                </column>
+                <column defaultValueNumeric="0" name="cae_consno" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="cae_expn_exp_flag" type="CHAR(1)"/>
+                <column name="cae_ot_exp_flag" type="CHAR(1)"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-17">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callactivity" columnName="overtimeApprovedDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callactivity">
+            <column name="overtimeApprovedDate" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-18">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callactivity" columnName="overtimeApprovedBy"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callactivity">
+            <column name="overtimeApprovedBy" type="bigint(11)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-19">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callactivity" columnName="overtimeDeniedReason"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callactivity">
+            <column name="overtimeDeniedReason" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-20">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="expense" columnName="dateSubmitted"/>
+        </preConditions>
+        <sql>
+            UPDATE expense
+            SET dateSubmitted = CONCAT((SELECT callactivity.`caa_date`
+                                        FROM callactivity
+                                        WHERE callactivity.`caa_callactivityno` = expense.`exp_callactivityno`),
+                                       " 12:00:00")
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-21">
+        <preConditions>
+            <not>
+                <columnExists tableName="consultant" columnName="globalExpenseApprover"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="globalExpenseApprover" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-22">
+        <preConditions>
+            <not>
+                <columnExists tableName="headert" columnName="expensesNextProcessingDate"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="expensesNextProcessingDate" type="date">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-23">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(routine_name) > 0
+                FROM INFORMATION_SCHEMA.ROUTINES
+                WHERE
+                ROUTINE_TYPE="FUNCTION"
+                AND ROUTINE_SCHEMA=DATABASE()
+                AND ROUTINE_NAME = 'getCurrentVatRate';
+            </sqlCheck>
+        </preConditions>
+        <createProcedure procedureName="getCurrentVatRate">
+            CREATE FUNCTION `getCurrentVatRate`() RETURNS DECIMAL (4, 2) NOT DETERMINISTIC READS SQL DATA
+            BEGIN
+            DECLARE vat DECIMAL (4, 2);
+            SELECT
+            CASE
+            WHEN headert.`hed_std_vatcode` = "T0"
+            THEN
+            (SELECT
+            vat.`vat_rate_t0`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T1"
+            THEN
+            (SELECT
+            vat.`vat_rate_t1`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T2"
+            THEN
+            (SELECT
+            vat.`vat_rate_t2`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T3"
+            THEN
+            (SELECT
+            vat.`vat_rate_t3`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T4"
+            THEN
+            (SELECT
+            vat.`vat_rate_t4`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T5"
+            THEN
+            (SELECT
+            vat.`vat_rate_t5`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T6"
+            THEN
+            (SELECT
+            vat.`vat_rate_t6`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T7"
+            THEN
+            (SELECT
+            vat.`vat_rate_t7`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T8"
+            THEN
+            (SELECT
+            vat.`vat_rate_t8`
+            FROM
+            vat)
+            WHEN headert.`hed_std_vatcode` = "T9"
+            THEN
+            (SELECT
+            vat.`vat_rate_t9`
+            FROM
+            vat)
+            END INTO vat
+            FROM
+            headert;
+            RETURN vat/100;
+            END
+        </createProcedure>
+        <rollback>
+            <sql>
+                drop function if exists getCurrentVatRate
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-24">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="daysInAdvanceExpensesNextMonthAlert"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="daysInAdvanceExpensesNextMonthAlert" defaultValue="2" type="int(2)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-25">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="expenseType" columnName="maximumAutoApprovalAmount"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="expenseType">
+            <column name="maximumAutoApprovalAmount" type="decimal(10,2)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="625-26">
+        <sql>
+            UPDATE
+                callactivity
+                    LEFT JOIN consultant
+                    ON consultant.`cns_consno` = callactivity.`caa_consno`
+                    LEFT JOIN callacttype
+                    ON callacttype.`cat_callacttypeno` = callactivity.`caa_callacttypeno`
+            SET callactivity.`caa_ot_exp_flag` = 'Y'
+            WHERE consultant.weekdayOvertimeFlag = 'N'
+              AND callacttype.`engineerOvertimeFlag` = 'Y'
+              AND DATE_FORMAT(caa_date, '%w') IN (1, 2, 3, 4, 5);
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

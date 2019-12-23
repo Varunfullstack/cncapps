@@ -647,14 +647,16 @@ class DBEntity extends DataAccess
                     $this->setPKValue($this->getNextPKValue());
                 }
             }
-            $this->setQueryString(
-                "INSERT INTO " . $this->getTableName() .
+            $query = "INSERT INTO " . $this->getTableName() .
                 "(" .
                 $this->getDBColumnNamesAsString() .
                 ")VALUES(" .
                 $this->getColumnValuesAsString() .
-                ")"
-            );
+                ")";
+            if ($this->debug) {
+                var_dump($query);
+            }
+            $this->setQueryString($query);
         }
 
         $ret = $this->runQuery();
@@ -721,7 +723,7 @@ class DBEntity extends DataAccess
             return null;
         }
         $type = $this->getTypeByColumnNumberNoCheck($ixColumnNumber);
-        if ($type == DA_ID) {
+        if ($type == DA_ID || $type == DA_INTEGER) {
             return (int)$this->db->Record[$ixColumnNumber];
         }
 

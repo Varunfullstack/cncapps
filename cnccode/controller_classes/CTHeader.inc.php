@@ -153,6 +153,7 @@ class CTHeader extends CTCNC
                 'add1Message'                            => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::add1)
                 ),
+                'expensesNextProcessingDate'             => $dsHeader->getValue(DBEHeader::expensesNextProcessingDate),
                 'add2'                                   => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::add2)
                 ),
@@ -463,6 +464,12 @@ class CTHeader extends CTCNC
                 'remoteSupportWarnHoursMessage'                                      => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::remoteSupportWarnHours)
                 ),
+                DBEHeader::minimumOvertimeMinutesRequired                            => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::minimumOvertimeMinutesRequired)
+                ),
+                DBEHeader::minimumOvertimeMinutesRequired . 'Message'                => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEHeader::minimumOvertimeMinutesRequired)
+                ),
                 'customerReviewMeetingText'                                          => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::customerReviewMeetingText)
                 ),
@@ -498,6 +505,9 @@ class CTHeader extends CTCNC
                 ),
                 DBEHeader::projectCommenceNotification                               => Controller::htmlInputText(
                     $dsHeader->getValue(DBEHeader::projectCommenceNotification)
+                ),
+                DBEHeader::daysInAdvanceExpensesNextMonthAlert                       => $dsHeader->getValue(
+                    DBEHeader::daysInAdvanceExpensesNextMonthAlert
                 ),
                 DBEHeader::projectCommenceNotification . 'Message'                   => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::projectCommenceNotification)

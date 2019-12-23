@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Added
 - Issue 689 - Solarwinds cloud O365 backup API
 - Issue 706 - Create Sales Request - allow attachments
+- Issue 625 - Overtime & Expenses approval
 ### Changed
 - Issue 703 - New calendar
 - Issue 702 - Renewal Report to show users & direct debit

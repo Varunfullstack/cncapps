@@ -81,6 +81,8 @@
         updateHoursWorkedInAWeek();
         updateLengthOfService();
         generateEmptyInputs();
+        checkApproverSelector();
+        updateHiddenExpenseApproverValue();
     });
 
     function updateLengthOfService() {
@@ -106,6 +108,17 @@
             message = "Length Of Service: " + newValue + " years";
         }
         $('#lengthOfService').html(message);
+    }
+
+
+    function checkApproverSelector() {
+        const autoApproveExpensesCheckbox = $('#autoApproveExpensesCheckbox')[0];
+        $('#hiddenExpenseApprover').attr('disabled', !autoApproveExpensesCheckbox.checked);
+        $('#expenseApproverSelector').attr('disabled', !!autoApproveExpensesCheckbox.checked);
+    }
+
+    function updateHiddenExpenseApproverValue() {
+        $('#hiddenExpenseApprover').val($('#expenseApproverSelector').val());
     }
 
     function updateHoursWorkedInAWeek() {
@@ -166,76 +179,6 @@
 
         parent.find('button').hide();
     }
-
-    // function editEncrypted() {
-    //     return editEncryptedNew();
-    //     const el = $(element);
-    //     const parent = el.closest('td');
-    //
-    //     let encryptedValue = parent.find('.encrypted').val();
-    //     let promise;
-    //
-    //     if (encryptedValue) {
-    //         let passPhrase = window.storedPassPhrase;
-    //         if (!passPhrase) {
-    //             passPhrase = prompt('Please provide secure passphrase');
-    //             storePassPhrase(passPhrase);
-    //         }
-    //         if (!passPhrase) {
-    //             return;
-    //         }
-    //
-    //         const formData = new FormData();
-    //
-    //         formData.append('passphrase', passPhrase);
-    //         formData.append('encryptedData', encryptedValue);
-    //         if (extraData) {
-    //             formData.append('extraData', extraData)
-    //         }
-    //         promise = fetch('?action=decrypt', {
-    //             method: 'POST',
-    //             body: formData
-    //         }).then(response => {
-    //             if (response.ok) {
-    //                 return response.json()
-    //             }
-    //             return null;
-    //         }).then(json => {
-    //             if (json) {
-    //                 return json;
-    //             } else {
-    //                 return {decryptedData: ''};
-    //             }
-    //         })
-    //     } else {
-    //         promise = new Promise(resolve => {
-    //             resolve({decryptedData: ''})
-    //         });
-    //     }
-    //
-    //     return promise.then(data => {
-    //         let additionalAttributes = "";
-    //         if (additionalAttribute) {
-    //             additionalAttributes = Object.keys(additionalAttribute).reduce((acc, key) => {
-    //                 acc += " " + key + " ='" + additionalAttribute[key] + "'";
-    //                 return acc;
-    //             }, "")
-    //         }
-    //
-    //         parent.append('<input id="' + id + '" ' + additionalAttributes + (additionalClass ? " class='" + additionalClass + "'" : '') + ' name="user[1][' + id + ']" value="' + data.decryptedData + '">');
-    //
-    //         if (data.extraData) {
-    //             parent.append('<span>' + data.extraData + '</span>');
-    //         }
-    //
-    //         if (additionalFunction) {
-    //             additionalFunction();
-    //         }
-    //
-    //         el.hide();
-    //     })
-    //
-    // }
 </script>
 <TABLE width="200px"
        border="0"
@@ -361,6 +304,42 @@
                 </option>
                 <!-- END managerBlock -->
             </select></td>
+        </tr>
+        <tr>
+            <td class="promptText">Automatically Approve This Users Expenses</td>
+            <td class="fieldText">
+                <input name="user[1][autoApproveExpenses]"
+                       type="checkbox"
+                       value="1"
+                       id="autoApproveExpensesCheckbox"
+                       {DISABLED}
+                       {autoApproveExpensesChecked}
+                       onchange="checkApproverSelector()"
+                />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Expenses/overtime approver</td>
+            <td class="fieldText">
+                <input name="user[1][expenseApproverID]"
+                       type="hidden"
+                       id="hiddenExpenseApprover"
+                       disabled
+                >
+                <select {DISABLED}
+                        type="text"
+                        name="user[1][expenseApproverID]"
+                        id="expenseApproverSelector"
+                        onchange="updateHiddenExpenseApproverValue()"
+                >
+                    <option value="0">None</option>
+                    <!-- BEGIN expenseApproverBlock -->
+                    <option {expenseApproverSelected}
+                            value="{expenseApproverID}"
+                    >{expenseApproverName}
+                    </option>
+                    <!-- END expenseApproverBlock -->
+                </select></td>
         </tr>
         <tr>
             <td class="promptText">Username</td>
@@ -718,13 +697,14 @@
 
         <tr>
             <td class="promptText">Change Approver</td>
-            <td class="fieldText"><input name="user[1][changeApproverFlag]"
-                                         type="checkbox"
-                                         id="user[1][changeApproverFlag]"
-                                         value="Y"
-                                         {DISABLED}
-                                         {changeApproverFlagChecked}
-            />
+            <td class="fieldText">
+                <input name="user[1][changeApproverFlag]"
+                       type="checkbox"
+                       id="user[1][changeApproverFlag]"
+                       value="Y"
+                       {DISABLED}
+                       {changeApproverFlagChecked}
+                />
             </td>
         </tr>
         <tr>
@@ -808,6 +788,30 @@
                        value="Y"
                        {DISABLED}
                        {staffAppraiserFlagChecked}
+                />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Expense Approver</td>
+            <td class="fieldText">
+                <input name="user[1][isExpenseApprover]"
+                       type="checkbox"
+                       id="user[1][isExpenseApprover]"
+                       value="1"
+                       {DISABLED}
+                       {isExpenseApproverChecked}
+                />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Global Expense Approver</td>
+            <td class="fieldText">
+                <input name="user[1][globalExpenseApprover]"
+                       type="checkbox"
+                       id="user[1][globalExpenseApprover]"
+                       value="1"
+                       {DISABLED}
+                       {globalExpenseApproverChecked}
                 />
             </td>
         </tr>

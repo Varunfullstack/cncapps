@@ -1,60 +1,151 @@
 <!-- Template: ExpensesList.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
-<TABLE width="100" border="0" cellpadding="2" cellspacing="1">
-	<TR> 
-		<TD width="100px" class="navigateLink" valign="top"> <a href="{urlCallActivity}">Activity</a> 
-		</TD>
-	</TR>
+<script language='JavaScript'
+        src="CommonJS.js"
+></script>
+<script>
+    function uploadReceipt(expenseID) {
+        const file = event.target.files[0];
+
+        // Allowed types
+        var mime_types = ['image/jpeg', 'application/pdf'];
+
+        // Validate MIME type
+        if (mime_types.indexOf(file.type) === -1) {
+            alert('Error : Incorrect file type');
+            return;
+        }
+
+        // Max 2 Mb allowed
+        if (file.type === 'application/pdf' && file.size > 500 * 1024) {
+            alert('Error : Exceeded PDF size 500KB');
+            return;
+        }
+
+        const data = new FormData();
+        data.append('upfile', file);
+        data.append('expenseID', expenseID);
+        data.append('action', 'upload');
+        fetch(`/Receipt.php`, {method: 'POST', body: data})
+            .then((response) => {
+                response.json().then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+                    const receiptContainerHTMLElement = document.querySelector('tr[data-expense-id="' + expenseID + '"] .receiptContainer');
+                    receiptContainerHTMLElement.innerHTML = "";
+                    const anchor = document.createElement('a');
+                    anchor.href = '/Receipt.php?action=show&receiptID=' + data.receiptId;
+                    anchor.text = 'See Receipt';
+                    anchor.target = '_blank';
+                    receiptContainerHTMLElement.appendChild(anchor);
+                })
+
+            })
+    }
+</script>
+<TABLE width="100"
+       border="0"
+       cellpadding="2"
+       cellspacing="1"
+>
+    <TR>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlCallActivity}">Activity</a>
+        </TD>
+    </TR>
 </table>
-<table class="singleBorder" width="700px" border="0">
-	<tr> 
-		<td class="promptText">Activity ID</td>
-		<td class="mainHeadText">{callActivityID}</td>
-		<td class="promptText">Date</td>
-		<td class="mainHeadText">{date}</td>
-	</tr>
-	<tr> 
-		<td class="promptText">Customer</td>
-		<td class="mainHeadText">{customerName}</td>
-		<td class="promptText">Site</td>
-		<td class="mainHeadText">{siteDesc}</td>
-	</tr>
-	<tr> 
-		<td class="promptText">Type</td>
-		<td class="mainHeadText">{activityType}</td>
-		<td class="promptText">User</td>
-		<td class="mainHeadText">{activityUserName}</td>
-	</tr>
+<table class="singleBorder"
+       width="700px"
+       border="0"
+>
+    <tr>
+        <td class="promptText">Activity ID</td>
+        <td class="mainHeadText">{callActivityID}</td>
+        <td class="promptText">Date</td>
+        <td class="mainHeadText">{date}</td>
+    </tr>
+    <tr>
+        <td class="promptText">Customer</td>
+        <td class="mainHeadText">{customerName}</td>
+        <td class="promptText">Site</td>
+        <td class="mainHeadText">{siteDesc}</td>
+    </tr>
+    <tr>
+        <td class="promptText">Type</td>
+        <td class="mainHeadText">{activityType}</td>
+        <td class="promptText">User</td>
+        <td class="mainHeadText">{activityUserName}</td>
+    </tr>
 </table>
 <BR>
-<A href="{urlCreate}">[create new expense]</A> 
-<table class="singleBorder" width="700" border="0" cellspacing="1" cellpadding="2">
-	<tr> 
-		<td class="listHeadText">Expense</td>
-		<td class="listHeadText">Miles</td>
-		<td class="listHeadText">Amount</td>
-		<td class="listHeadText">VAT included</td>
-		<td class="listHeadText">&nbsp;</td>
-	</tr>
-	<!-- BEGIN expenseBlock -->
-	<tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';"> 
-		<td class="orderLineItem"><DIV align="left">{expenseType}</div></td>
-		<td class="orderLineItem"><DIV align="left">{mileage}</div></td>
-		<td class="orderLineItem"><DIV align="left">{value}</div></td>
-		<td class="orderLineItem"><DIV align="left">{vatFlag}</div></td>
-		<td class="orderLineItem"><DIV align="left"></div>
-			<DIV align="left"> <A href="{urlEdit}" title="Edit expense details">{txtEdit}</A> 
-				<A href="{urlDelete}"  title="Delete this expense record" onClick="if(!confirm('Are you sure you want to remove this expense?')) return(false)">{txtDelete}</A> 
-			</DIV>
-		</td>
-	</tr>
-	<!-- END expenseBlock -->
-	<tr> 
-		<td  class="listHeadText">Total</td>
-		<td  class="listHeadText">&nbsp;</td>
-		<td  class="listHeadText">{totalValue}</td>
-		<td  class="listHeadText">&nbsp;</td>
-		<td  class="listHeadText">&nbsp;</td>
-	</tr>
+<A href="{urlCreate}">[create new expense]</A>
+<table class="singleBorder"
+       width="700"
+       border="0"
+       cellspacing="1"
+       cellpadding="2"
+>
+    <tr>
+        <td class="listHeadText">Expense</td>
+        <td class="listHeadText">Miles</td>
+        <td class="listHeadText">Amount</td>
+        <td class="listHeadText">VAT included</td>
+        <td class="listHeadText">Status</td>
+        <td class="listHeadText">Receipt</td>
+        <td class="listHeadText">&nbsp;</td>
+    </tr>
+    <!-- BEGIN expenseBlock -->
+    <tr valign="top"
+        onMouseOver="this.bgColor='#ffffcc';"
+        onMouseOut="this.bgColor='';"
+        data-expense-id="{expenseID}"
+    >
+        <td class="orderLineItem">
+            <DIV align="left">{expenseType}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{mileage}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{value}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{vatFlag}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{status}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left"
+                 class="receiptContainer"
+            >{receiptUpload}
+            </div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left"></div>
+            <DIV align="left">
+                <A href="{urlEdit}"
+                   title="Edit expense details"
+                >{txtEdit}</A>
+                <A href="{urlDelete}"
+                   title="Delete this expense record"
+                   onClick="if(!confirm('Are you sure you want to remove this expense?')) return(false)"
+                >{txtDelete}</A>
+            </DIV>
+        </td>
+    </tr>
+    <!-- END expenseBlock -->
+    <tr>
+        <td class="listHeadText">Total</td>
+        <td class="listHeadText">&nbsp;</td>
+        <td class="listHeadText">{totalValue}</td>
+        <td class="listHeadText"
+            colspan="4"
+        >&nbsp;
+        </td>
+    </tr>
 </table>
 <!-- End Template: ExpensesList.inc.html -->

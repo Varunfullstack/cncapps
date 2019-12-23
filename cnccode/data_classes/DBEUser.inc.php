@@ -65,6 +65,10 @@ class DBEUser extends DBEntity
     const offsiteBackupAdditionalPermissionsFlag = 'offsiteBackupAdditionalPermissionsFlag';
     const salesPasswordAccess = 'salesPasswordAccess';
     const createRenewalSalesOrdersFlag = "createRenewalSalesOrdersFlag";
+    const expenseApproverID = 'expenseApproverID';
+    const autoApproveExpenses = 'autoApproveExpenses';
+    const isExpenseApprover = "isExpenseApprover";
+    const globalExpenseApprover = "globalExpenseApprover";
 
     /**
      * calls constructor()
@@ -89,6 +93,7 @@ class DBEUser extends DBEntity
             DA_ALLOW_NULL,
             "cns_manager"
         );
+
         $this->addColumn(
             self::name,
             DA_STRING,
@@ -376,6 +381,35 @@ class DBEUser extends DBEntity
             DA_NOT_NULL
         );
 
+        $this->addColumn(
+            self::expenseApproverID,
+            DA_ID,
+            DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::autoApproveExpenses,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+
+        $this->addColumn(
+            self::isExpenseApprover,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+
+        $this->addColumn(
+            self::globalExpenseApprover,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -455,6 +489,17 @@ class DBEUser extends DBEntity
                 ',',
                 $ignoredUsers
             ) . ")";
+        $this->setQueryString($query);
+        return parent::getRows();
+    }
+
+    public function getApproverUsers()
+    {
+        $query = "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE " . $this->getDBColumnName(
+                self::isExpenseApprover
+            ) . " = 1  and " . $this->getDBColumnName(self::activeFlag) . " = 'Y'";
         $this->setQueryString($query);
         return parent::getRows();
     }

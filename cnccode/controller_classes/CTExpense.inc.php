@@ -8,8 +8,10 @@
  */
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUExpense.inc.php');
+require_once($cfg['path_bu'] . '/BUExpenseType.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
+require_once($cfg['path_dbe'] . '/DBEReceipt.php');
 // Actions
 define(
     'CTEXPENSE_ACT_EDIT_EXPENSE',
@@ -126,31 +128,6 @@ class CTExpense extends CTCNC
     }
 
     /**
-     * Create new call activity
-     * inserts a new activity to the DB then displays it
-     * @access private
-     * @throws Exception
-     */
-    function createExpense()
-    {
-        $this->setMethodName('createExpense');
-        if (!$this->getParam('callActivityID')) {
-            throw new Exception('Call activity ID not provided');
-        }
-        $expenseID = $this->buExpense->createExpenseFromCallActivityID($this->getParam('callActivityID'));
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'expenseID' => $expenseID,
-                    'action'    => CTEXPENSE_ACT_EDIT_EXPENSE
-                )
-            );
-        header('Location: ' . $urlNext);
-    }
-
-    /**
      * Display list of expenses for given callActivity
      * @access private
      * @throws Exception
@@ -193,6 +170,7 @@ class CTExpense extends CTCNC
                 )
             );
 
+
         $this->template->set_var(
             array(
                 'callActivityID'      => $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
@@ -230,24 +208,49 @@ class CTExpense extends CTCNC
             );
             while ($dsExpense->fetchNext()) {
                 $expenseID = $dsExpense->getValue(DBEJExpense::expenseID);
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'    => CTEXPENSE_ACT_EDIT_EXPENSE,
-                            'expenseID' => $expenseID
-                        )
-                    );
-                $txtEdit = '[edit]';
-                $urlDelete =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'    => CTEXPENSE_ACT_DELETE_EXPENSE,
-                            'expenseID' => $expenseID
-                        )
-                    );
-                $txtDelete = '[delete]';
+                $expenseTypeID = $dsExpense->getValue(DBEJExpense::expenseTypeID);
+                $dbeExpenseType = new DBEExpenseType($this);
+                $dbeExpenseType->getRow($expenseTypeID);
+                $uploadReceipt = null;
+                if ($dbeExpenseType->getValue(DBEExpenseType::receiptRequired)) {
+                    $dbeReceipt = new DBEReceipt($this);
+                    $dbeReceipt->getReceiptByExpenseId($expenseID);
+
+                    if ($dbeReceipt->rowCount()) {
+                        $uploadReceipt = "<a href='/Receipt.php?action=show&receiptID=" . $dbeReceipt->getValue(
+                                DBEReceipt::id
+                            ) . "' target='_blank'>See Receipt</a>";
+                    } else {
+                        $uploadReceipt = 'Upload Required <input type="file" accept="image/jpeg,application/pdf" onchange="uploadReceipt(' . $expenseID . ')" >';
+                    }
+
+
+                }
+                $urlEdit = $urlDelete = $txtEdit = $txtDelete = null;
+
+                if ($dsExpense->getValue(DBEExpense::exportedFlag) != 'Y' && !$dsExpense->getValue(
+                        DBEExpense::deniedReason
+                    ) && !$dsExpense->getValue(DBEExpense::approvedBy)) {
+                    $urlEdit =
+                        Controller::buildLink(
+                            $_SERVER['PHP_SELF'],
+                            array(
+                                'action'    => CTEXPENSE_ACT_EDIT_EXPENSE,
+                                'expenseID' => $expenseID
+                            )
+                        );
+                    $txtEdit = '[edit]';
+                    $urlDelete =
+                        Controller::buildLink(
+                            $_SERVER['PHP_SELF'],
+                            array(
+                                'action'    => CTEXPENSE_ACT_DELETE_EXPENSE,
+                                'expenseID' => $expenseID
+                            )
+                        );
+                    $txtDelete = '[delete]';
+                }
+
 
                 $this->template->set_var(
                     array(
@@ -260,7 +263,11 @@ class CTExpense extends CTCNC
                         'urlEdit'        => $urlEdit,
                         'urlDelete'      => $urlDelete,
                         'txtEdit'        => $txtEdit,
-                        'txtDelete'      => $txtDelete
+                        'txtDelete'      => $txtDelete,
+                        'receiptUpload'  => $uploadReceipt,
+                        'status'         => $dsExpense->getValue(
+                            DBEExpense::approvedBy
+                        ) ? 'Approved' : ($dsExpense->getValue(DBEExpense::deniedReason) ? 'Denied' : 'Pending')
                     )
                 );
 
@@ -331,6 +338,10 @@ class CTExpense extends CTCNC
         $this->setTemplateFiles(
             array('ExpenseEdit' => 'ExpenseEdit.inc')
         );
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRow($dsExpense->getValue(DBEJExpense::userID));
+        $userMileageRate = $dbeUser->getValue(DBEUser::petrolRate);
+
         $this->template->set_var(
             array(
                 'expenseID'           => $this->getParam('expenseID'),
@@ -353,11 +364,16 @@ class CTExpense extends CTCNC
                 'value'               => Controller::htmlInputText($dsExpense->getValue(DBEJExpense::value)),
                 'valueMessage'        => Controller::htmlDisplayText($dsExpense->getMessage(DBEJExpense::value)),
                 'vatFlagChecked'      => Controller::htmlChecked($dsExpense->getValue(DBEJExpense::vatFlag)),
+                'dateSubmitted'       => $dsExpense->getValue(DBEExpense::dateSubmitted),
+                'approvedDate'        => $dsExpense->getValue(DBEExpense::approvedDate),
+                'approvedBy'          => $dsExpense->getValue(DBEExpense::approvedBy),
+                'deniedReason'        => $dsExpense->getValue(DBEExpense::deniedReason),
                 'userID'              => $dsExpense->getValue(DBEJExpense::userID), // hidden field on form
                 'activityUserName'    => $dsCallActivity->getValue(DBEJCallActivity::userName),
                 'urlUpdateExpense'    => $urlUpdateExpense,
                 'exportedFlag'        => $dsExpense->getValue(DBEJExpense::exportedFlag),
-                'urlDisplayExpenses'  => $urlDisplayExpenses
+                'urlDisplayExpenses'  => $urlDisplayExpenses,
+                'userMileageRate'     => $userMileageRate
             )
         );
         $dbeExpenseType = new DBEExpenseType($this);
@@ -367,7 +383,14 @@ class CTExpense extends CTCNC
             'expenseTypeBlock',
             'expenseTypes'
         );
+        $buExpenseType = new BUExpenseType($this);
+        $allowedExpenses = $buExpenseType->getExpenseTypesAllowedForActivityTypeID(
+            $dsCallActivity->getValue(DBECallActivity::callActTypeID)
+        );
         while ($dbeExpenseType->fetchNext()) {
+            if (!in_array($dbeExpenseType->getValue(DBEExpenseType::expenseTypeID), $allowedExpenses)) {
+                continue;
+            }
             $expenseTypeSelected = ($dsExpense->getValue(DBEJExpense::expenseTypeID) == $dbeExpenseType->getValue(
                     DBEExpenseType::expenseTypeID
                 )) ? CT_SELECTED : null;
@@ -375,7 +398,14 @@ class CTExpense extends CTCNC
                 array(
                     'expenseTypeSelected' => $expenseTypeSelected,
                     'expenseTypeID'       => $dbeExpenseType->getValue(DBEExpenseType::expenseTypeID),
-                    'expenseTypeDesc'     => $dbeExpenseType->getValue(DBEExpenseType::description)
+                    'expenseTypeDesc'     => $dbeExpenseType->getValue(DBEExpenseType::description),
+                    "isMileage"           => $dbeExpenseType->getValue(
+                        DBEExpenseType::mileageFlag
+                    ) == 'Y' ? 'data-is-mileage="1"' : '',
+                    "allowsTax"           => $dbeExpenseType->getValue(
+                        DBEExpenseType::vatFlag
+                    ) == 'Y' ? 'data-allows-tax="1"' : '',
+
                 )
             );
             $this->template->parse(
@@ -390,35 +420,6 @@ class CTExpense extends CTCNC
             true
         );
         $this->parsePage();
-    }// end function editExpense()
-
-    /**
-     * Update expense details
-     * @access private
-     * @throws Exception
-     */
-    function updateExpense()
-    {
-        $this->setMethodName('updateExpense');
-        $this->formError = (!$this->dsExpense->populateFromArray($this->getParam('expense')));
-
-
-        if ($this->formError) {
-            $this->editExpense();
-            exit;
-        }
-
-        $this->buExpense->updateExpense($this->dsExpense);
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'callActivityID' => $this->dsExpense->getValue(DBEJExpense::callActivityID),
-                    'action'         => CTCNC_ACT_VIEW
-                )
-            );
-        header('Location: ' . $urlNext);
     }
 
     /**
@@ -438,15 +439,72 @@ class CTExpense extends CTCNC
         if (!$this->buExpense->canDeleteExpense($this->getParam('expenseID'))) {
             $this->displayFatalError('Cannot delete expense - already exported');
             exit;
-        } else {
-            $callActivityID = $this->buExpense->deleteExpense($this->getParam('expenseID'));
         }
+        $callActivityID = $this->buExpense->deleteExpense($this->getParam('expenseID'));
+
         $urlNext =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
                     'action'         => CTCNC_ACT_VIEW,
                     'callActivityID' => $callActivityID
+                )
+            );
+        header('Location: ' . $urlNext);
+    }// end function editExpense()
+
+    /**
+     * Update expense details
+     * @access private
+     * @throws Exception
+     */
+    function updateExpense()
+    {
+        $this->setMethodName('updateExpense');
+        $expenseToUpdate = $this->getParam('expense')[1];
+        $expenseID = $expenseToUpdate['expenseID'];
+        $dbeExpense = new DBEExpense($this);
+        $dbeExpense->getRow($expenseID);
+        $expenseToUpdate[DBEExpense::deniedReason] = $dbeExpense->getValue(DBEExpense::deniedReason);
+        $this->formError = (!$this->dsExpense->populateFromArray([$expenseToUpdate]));
+        if ($this->formError) {
+            $this->editExpense();
+            exit;
+        }
+
+        $this->buExpense->updateExpense($this->dsExpense);
+
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'callActivityID' => $this->dsExpense->getValue(DBEJExpense::callActivityID),
+                    'action'         => CTCNC_ACT_VIEW
+                )
+            );
+        header('Location: ' . $urlNext);
+    }
+
+    /**
+     * Create new call activity
+     * inserts a new activity to the DB then displays it
+     * @access private
+     * @throws Exception
+     */
+    function createExpense()
+    {
+        $this->setMethodName('createExpense');
+        if (!$this->getParam('callActivityID')) {
+            throw new Exception('Call activity ID not provided');
+        }
+        $expenseID = $this->buExpense->createExpenseFromCallActivityID($this->getParam('callActivityID'));
+
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'expenseID' => $expenseID,
+                    'action'    => CTEXPENSE_ACT_EDIT_EXPENSE
                 )
             );
         header('Location: ' . $urlNext);
@@ -504,26 +562,29 @@ class CTExpense extends CTCNC
             $this->exportExpenseForm(); //redisplay with errors
         } else {
             // do export
-            $overtimeExported = $this->buExpense->exportEngineerOvertime(
+            $expensesExported = $this->buExpense->exportOvertimeAndExpenses(
                 $this->dsExpenseExport,
-                $this->getParam('exportType')
-            );
-            $expensesExported = $this->buExpense->exportEngineerExpenses(
-                $this->dsExpenseExport,
-                $this->getParam('exportType')
+                $this->getParam('exportType'),
+                $this->dbeUser
             );
 
             if ($this->getParam('exportType') == 'Export') {
-
-                if ($overtimeExported OR $expensesExported) {
-                    $this->setFormErrorMessage('Export files created and emails sent');
+                $dbeHeader = new DBEHeader($this);
+                $dbeHeader->getRow(1);
+                $dbeHeader->setValue(
+                    DBEHeader::expensesNextProcessingDate,
+                    $this->dsExpenseExport->getValue(BUExpense::expensesNextProcessingDate)
+                );
+                $dbeHeader->updateRow();
+                if ($expensesExported) {
+                    $this->setFormErrorMessage('Data sent to CNC Payroll');
                 } else {
                     $this->setFormErrorMessage('No data to export for this date');
                 }
             } else { // trial
 
-                if ($overtimeExported OR $expensesExported) {
-                    $this->setFormErrorMessage('There are records to export. Email sent to the sales manager');
+                if ($expensesExported) {
+                    $this->setFormErrorMessage('Trial data sent to CNC Payroll');
                 } else {
                     $this->setFormErrorMessage('No data to export for this date');
                 }

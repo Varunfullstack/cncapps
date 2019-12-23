@@ -68,4 +68,19 @@ class BUExpenseType extends Business
         $dbeExpense->setValue(DBEExpense::expenseTypeID, $ID);
         return $dbeExpense->countRowsByColumn(DBEExpense::expenseTypeID) < 1;
     }
+
+    public function getExpenseTypesAllowedForActivityTypeID($activityTypeID)
+    {
+        global $db;
+        $result = $db->preparedQuery(
+            'select expenseTypeID   from expenseTypeActivityAvailability where activityTypeID = ?',
+            [["type" => "i", "value" => $activityTypeID]]
+        );
+
+        $selectedActivitiesArray = $result->fetch_all(MYSQLI_ASSOC);
+        return array_map(
+            function ($activityArray) { return $activityArray['expenseTypeID']; },
+            $selectedActivitiesArray
+        );
+    }
 }

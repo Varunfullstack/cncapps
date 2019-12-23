@@ -1,0 +1,309 @@
+<style>
+    .pending td {
+        color: red;
+    }
+</style>
+<script>
+    let expensesTable = null;
+    let overtimeTable = null;
+
+    function approveExpense(expenseId) {
+        fetch("?action=approveExpense&id=" + expenseId)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    return alert(data.error);
+                }
+                expensesTable.ajax.reload();
+            })
+    }
+
+    function denyExpense(expenseId) {
+        const reason = prompt("Please provide a reason for denying this expense");
+        if (!reason) {
+            return alert('Reason cannot be empty');
+        }
+        fetch("?action=denyExpense&id=" + expenseId + "&denyReason=" + reason)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    return alert(data.error);
+                }
+                expensesTable.ajax.reload();
+            })
+
+    }
+
+    function deleteExpense(expenseId) {
+        if (!confirm('Are you sure you want to delete this expense?')) {
+            return;
+        }
+
+        fetch("?action=deleteExpense&id=" + expenseId)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    return alert(data.error);
+                }
+                expensesTable.ajax.reload();
+            })
+    }
+
+    function approveOvertime(expenseId) {
+        fetch("?action=approveOvertime&id=" + expenseId)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    return alert(data.error);
+                }
+                overtimeTable.ajax.reload();
+            })
+    }
+
+    function denyOvertime(expenseId) {
+        const reason = prompt("Please provide a reason for denying this overtime");
+        if (!reason) {
+            return alert('Reason cannot be empty');
+        }
+        fetch("?action=denyOvertime&id=" + expenseId + "&denyReason=" + reason)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    return alert(data.error);
+                }
+                overtimeTable.ajax.reload();
+            })
+    }
+
+    $(function () {
+        expensesTable = $('#expensesTable').DataTable({
+            dom: 'lfrtip',
+            columns: [
+                {data: "staffName", name: 'staffName'},
+                {
+                    data: "serviceRequestId", name: "serviceRequestId", render: (data, type, row, meta) => {
+                        return '<a href="Activity.php?action=displayActivity&callActivityID=' + row.activityId + '" target="_blank">' + data + '</a>';
+                    }
+                },
+                {
+                    data: "dateSubmitted", name: "dateSubmitted", render: (data) => {
+                        if (!data) {
+                            return null;
+                        }
+                        return moment(data, "YYYY-MM-DD HH:mm:ss").format('DD/MM/YYYY');
+                    }
+                },
+                {
+                    data: "expenseTypeDescription", name: "expenseTypeDescription", render: (data, type, row) => {
+                        if (!row.receiptId) {
+                            return data;
+                        }
+
+                        return data + " <a href='/Receipt.php?action=show&receiptID=" + row.receiptId + "' target='_blank' >(Receipt)</a>"
+                    }
+                },
+                {
+                    data: "value", name: "value", render: (data) => {
+                        if (!+data) {
+                            return null;
+                        }
+                        return "&pound;" + data.toFixed(2);
+                    }
+                },
+                {data: "projectDescription", name: "projectDescription"},
+                {
+                    data: "approvedDate", name: "approvedDate", render: (data) => {
+                        if (!data) {
+                            return null;
+                        }
+                        return moment(data, "YYYY-MM-DD HH:mm:ss").format('DD/MM/YYYY HH:mm');
+                    }
+                },
+                {data: "approverName", name: "approverName"},
+                {data: 'status', name: 'status'},
+                {
+                    data: 'status',
+                    sortable: false,
+                    searchable: false,
+                    render: (data, type, row, meta) => {
+                        if (row.isSelf && !row.isApprover) {
+                            return "";
+                        }
+
+                        if (row.status === 'Pending') {
+                            return '<button onclick="approveExpense(' + row.id + ')" data-expense-id="row.id">Approve</button><button onclick="denyExpense(' + row.id + ')">Deny</button><button onclick="deleteExpense(' + row.id + ')">Delete</button> ';
+                        }
+                        return "";
+                    }
+                }
+            ],
+            order: [[8, "desc"], [2, "asc"]],
+            serverSide: true,
+            ajax: {
+                url: "?action=getExpensesData",
+                type: "GET"
+            },
+            createdRow: (row, data, index) => {
+                if (data.status === 'Pending') {
+                    $(row).addClass('pending');
+                }
+            },
+            stateSave: true,
+        });
+        overtimeTable = $('#overtimeTable').DataTable({
+            dom: 'lfrtip',
+            stateSave: true,
+            columns: [
+                {data: "staffName", name: 'staffName'},
+                {
+                    data: "serviceRequestId", name: "serviceRequestId", render: (data, type, row, meta) => {
+                        return '<a href="Activity.php?action=displayActivity&callActivityID=' + row.activityId + '" target="_blank">' + data + '</a>';
+                    }
+                },
+                {
+                    data: "dateSubmitted", name: "dateSubmitted", render: (data) => {
+                        if (!data) {
+                            return null;
+                        }
+                        return moment(data, "YYYY-MM-DD HH:mm:ss").format('DD/MM/YYYY');
+                    }
+                },
+                {
+                    data: "overtimeDuration", name: "overtimeDuration", sortable: false, render: (data, type, row) => {
+                        if (!data) {
+                            return '';
+                        }
+                        return data.toFixed(2);
+                    }
+                },
+                {data: "projectDescription", name: "projectDescription"},
+                {
+                    data: "approvedDate", name: "approvedDate", render: (data) => {
+                        if (!data) {
+                            return null;
+                        }
+                        return moment(data, "YYYY-MM-DD HH:mm:ss").format('DD/MM/YYYY HH:mm');
+                    }
+                },
+                {data: "approverName", name: "approverName"},
+                {data: 'status', name: 'status'},
+                {
+                    data: 'status',
+                    sortable: false,
+                    searchable: false,
+                    render: (data, type, row, meta) => {
+                        if (row.isSelf && !row.isApprover) {
+                            return "";
+                        }
+
+                        if (row.status === 'Pending') {
+                            return '<button onclick="approveOvertime(' + row.activityId + ')" data-expense-id="row.id">Approve</button><button onclick="denyOvertime(' + row.activityId + ')">Deny</button>';
+                        }
+                        return "";
+                    }
+                }
+            ],
+            order: [[7, "desc"], [2, "asc"]],
+            serverSide: true,
+            ajax: {
+                url: "?action=getOvertimeData",
+                type: "GET"
+            },
+            processing: true,
+            language: {
+                'loadingRecords': '&nbsp;',
+                'processing': 'Loading...'
+            },
+            createdRow: (row, data, index) => {
+                if (data.status === 'Pending') {
+                    $(row).addClass('pending');
+                }
+            }
+        })
+    })
+</script>
+<h1>Expenses</h1>
+<table id="expensesTable">
+    <thead>
+    <tr>
+        <th>
+            Staff Name
+        </th>
+        <th>
+            SR Number
+        </th>
+        <th>
+            Date of expense
+        </th>
+        <th>
+            Expense Type
+        </th>
+        <th>
+            Expense Value
+        </th>
+        <th>
+            Project
+        </th>
+        <th>
+            Approved Date
+        </th>
+        <th>
+            Approved By
+        </th>
+        <th>
+            Approved Status
+        </th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<br>
+<br>
+<h1>Overtime</h1>
+<table id="overtimeTable">
+    <thead>
+    <tr>
+        <th>
+            Staff Name
+        </th>
+        <th>
+            SR Number
+        </th>
+        <th>
+            Date of overtime
+        </th>
+        <th>
+            Overtime Duration
+        </th>
+        <th>
+            Project
+        </th>
+        <th>
+            Approved Date
+        </th>
+        <th>
+            Approved By
+        </th>
+        <th>
+            Approved Status
+        </th>
+        <th>
+
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>

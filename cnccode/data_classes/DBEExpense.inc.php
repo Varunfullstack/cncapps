@@ -14,6 +14,10 @@ class DBEExpense extends DBEntity
     const value = "value";
     const vatFlag = "vatFlag";
     const exportedFlag = "exportedFlag";
+    const dateSubmitted = "dateSubmitted";
+    const approvedDate = "approvedDate";
+    const approvedBy = "approvedBy";
+    const deniedReason = "deniedReason";
 
     /**
      * calls constructor()
@@ -68,8 +72,54 @@ class DBEExpense extends DBEntity
             DA_NOT_NULL,
             "exp_exported_flag"
         );
+
+        $this->addColumn(self::dateSubmitted, DA_DATETIME, DA_ALLOW_NULL);
+        $this->addColumn(self::approvedDate, DA_DATETIME, DA_ALLOW_NULL);
+        $this->addColumn(self::approvedBy, DA_INTEGER, DA_ALLOW_NULL);
+        $this->addColumn(self::deniedReason, DA_TEXT, DA_ALLOW_NULL, null, null);
+
         $this->setPK(0);
         $this->setAddColumnsOff();
+    }
+
+    public function getNotExportedRowsForUser(int $userID)
+    {
+        $userID = $this->escapeValue($userID);
+        $this->queryString = "SELECT
+  " . $this->getDBColumnNamesAsString() . "
+FROM
+  " . $this->getTableName() . "
+  LEFT JOIN `callactivity`
+    ON `callactivity`.`caa_callactivityno` = " . $this->getDBColumnName(self::callActivityID) . "
+  LEFT JOIN consultant
+    ON callactivity.`caa_consno` = consultant.`cns_consno`
+WHERE (callactivity.`caa_consno` = $userID OR consultant.`expenseApproverID` = $userID) AND " . $this->getDBColumnName(
+                self::exportedFlag
+            ) . " <> 'Y'";
+
+        $this->getRows();
+    }
+
+    public function getUnapprovedExpense()
+    {
+        $this->queryString = "SELECT
+  " . $this->getDBColumnNamesAsString() . "
+FROM
+  " . $this->getTableName() . " 
+  LEFT JOIN `callactivity`
+    ON `callactivity`.`caa_callactivityno` = " . $this->getDBColumnName(self::callActivityID) . " 
+    LEFT JOIN consultant
+    ON callactivity.`caa_consno` = consultant.`cns_consno`
+    left join expensetype on expensetype.ext_expensetypeno = expense.exp_expensetypeno
+   where " . $this->getDBColumnName(
+                self::approvedDate
+            ) . " is null and " . $this->getDBColumnName(self::deniedReason) . " is null AND " . $this->getDBColumnName(
+                self::exportedFlag
+            ) . " <> 'Y'  
+            and consultant.autoApproveExpenses
+            and exp_value <= maximumAutoApprovalAmount
+            ";
+        return $this->getRows();
     }
 }
 

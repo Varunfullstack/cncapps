@@ -20,10 +20,14 @@
       name="header"
       AUTOCOMPLETE="OFF"
 >
-    <input
-            name="header[1][headerID]"
-            type="hidden"
-            value="{headerID}"
+    <input name="header[1][headerID]"
+           type="hidden"
+           value="{headerID}"
+    >
+    <input type="hidden"
+           name="header[1][expensesNextProcessingDate]"
+           id="expensesNextProcessingDate"
+           value="{expensesNextProcessingDate}"
     >
     <table width="700px"
            border="0"
@@ -650,11 +654,11 @@
         <tr>
             <td class="promptText">GSC Item</td>
             <td class="field">
-                <input
-                        type="hidden"
-                        name="header[1][gscItemID]"
-                        id="gscItemID"
-                        value="{gscItemID}"
+
+                <input type="hidden"
+                       name="header[1][gscItemID]"
+                       id="gscItemID"
+                       value="{gscItemID}"
                 > <input
                     {DISABLED}
                     required
@@ -772,6 +776,30 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">Minimum Overtime Minutes Required</td>
+            <td class="field">
+                <input {DISABLED}
+                       required
+                       type="number"
+                       name="header[1][minimumOvertimeMinutesRequired]"
+                       value="{minimumOvertimeMinutesRequired}"
+                       step="1"
+                       style="width: 64px"
+                > <span class="formErrorMessage">{minimumOvertimeMinutesRequiredMessage}</span></td>
+        </tr>
+        <tr>
+            <td class="promptText">Days In Advance Expenses Next Month Alert</td>
+            <td class="inputText">
+                <input {DISABLED}
+                       type="number"
+                       name="header[1][daysInAdvanceExpensesNextMonthAlert]"
+                       value="{daysInAdvanceExpensesNextMonthAlert}"
+                       title="The days before Next Month's Processing date that we are going to start sending alerts about unauthorized expenses or overtime"
+                       required
+                >
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">Remote Support Activity Min Warn Hours</td>
             <td class="field">
                 <input
@@ -797,8 +825,6 @@
                        title="SR Chargeable hours after which consider SR as critical"
                        name="header[1][autoCriticalP1Hours]"
                        value="{autoCriticalP1Hours}"
-                       size="5"
-                       maxlength="5"
                        step="0.01"
                 > <span class="formErrorMessage">{autoCriticalP1HoursMessage}</span>
             </td>

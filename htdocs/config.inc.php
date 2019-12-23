@@ -1,5 +1,7 @@
 <?php
 
+use Twig\Environment;
+
 function is_cli()
 {
     if (defined('STDIN')) {
@@ -516,6 +518,7 @@ define(
     "DB_HOST",
     "localhost"
 );
+
 
 switch ($server_type) {
 
@@ -1041,6 +1044,11 @@ define(
     "CONFIG_SQL_LOG",
     BASE_DRIVE . "/htdocs/log_file/sql_log.html"
 );
+define(
+    'RECEIPT_PATH',
+    BASE_DRIVE . '/receipts/'
+);
+
 $cfg['quote_path'] = BASE_DRIVE . "/htdocs/quotes";
 define(
     "PHPLIB_SESSIONS_DIR",
@@ -1056,7 +1064,14 @@ $GLOBALS['db_options'] =
 
 
 require BASE_DRIVE . '/vendor/autoload.php';
-// disable DOMPDF's internal autoloader if you are using Composer
+
+$loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../twig/internal');
+$twig = new Environment(
+    $loader,
+    ["cache" => __DIR__ . '/../cache', "debug" => $server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE]
+);
+$twig->addExtension(new \Twig\Extra\Intl\IntlExtension());
+
 define(
     'DOMPDF_ENABLE_AUTOLOAD',
     false
