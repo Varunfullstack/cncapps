@@ -5,10 +5,11 @@
  * Date: 22/08/2018
  * Time: 10:39
  */
-
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
+require_once($cfg['path_dbe'] . '/DBECallDocumentWithoutFile.php');
 
 class CTSalesRequestDashboard extends CTCNC
 {
@@ -87,8 +88,6 @@ class CTSalesRequestDashboard extends CTCNC
 
             $srLink = "<a href='$srLink' target='_blank'>SR</a>";
 
-//            http://cncdev7:85/Activity.php?action=salesRequestReview&callActivityID=1813051&fromEmail=true
-
             $processCRLink = Controller::buildLink(
                 'Activity.php',
                 [
@@ -98,6 +97,23 @@ class CTSalesRequestDashboard extends CTCNC
             );
 
             $processCRLink = "<a href='$processCRLink' target='_blank'>Process Sales Request</a>";
+
+            $attachments = "";
+
+            $dbeJCallDocument = new DBECallDocumentWithoutFile($this);
+            $dbeJCallDocument->setValue(
+                DBECallDocumentWithoutFile::callActivityID,
+                $dbejCallActivity->getValue(DBECallActivity::callActivityID)
+            );
+            $dbeJCallDocument->getRowsByColumn(DBECallDocumentWithoutFile::callActivityID);
+
+            while ($dbeJCallDocument->fetchNext()) {
+                $attachments .= "<a href=\"/Activity.php?action=viewFile&callDocumentID=" . $dbeJCallDocument->getValue(
+                        DBECallDocumentWithoutFile::callDocumentID
+                    ) . "\"
+                            target=\"_blank\"
+        ><i class=\"fa fa-paperclip\"></i></a>";
+            }
 
             $this->template->set_var(
                 [
@@ -109,6 +125,7 @@ class CTSalesRequestDashboard extends CTCNC
                             DBEJCallActivity::date
                         ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime),
                     'processCRLink'     => $processCRLink,
+                    'attachments'       => $attachments
                 ]
             );
 
