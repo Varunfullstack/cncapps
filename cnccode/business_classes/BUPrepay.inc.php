@@ -151,7 +151,6 @@ class BUPrepay extends Business
         /*
         Bring out a list of PrePay Service Requests to be included in the statement run
         */
-        $prepayOvertimeActivities = [];
 
         $queryString =
             "SELECT
@@ -216,18 +215,6 @@ class BUPrepay extends Business
         $buExpense = new BUExpense($this);
 
         while ($db->next_record()) {
-            $overtime = $buExpense->calculateOvertime($db->Record['activityId']);
-            if ($overtime) {
-                $prepayOvertimeActivities[] = [
-                    "customerName"     => $db->Record['cus_name'],
-                    "serviceRequestId" => $db->Record['pro_problemno'],
-                    "activityId"       => $db->Record['activityId'],
-                    "startTime"        => $db->Record['caa_starttime'],
-                    "endTime"          => $db->Record['caa_endtime'],
-                    "overtime"         => $overtime
-                ];
-            }
-
             if ($db->Record ['custno'] != $last_custno) {
                 if ($last_custno != '9999') {
                     $dsStatementContact = new DataSet($this);
@@ -242,22 +229,20 @@ class BUPrepay extends Business
             }
             $last_custno = $db->Record ['custno'];
         }
-        if (count($prepayOvertimeActivities)) {
-            $csvFileName = SAGE_EXPORT_DIR . '/PrePayOOH' . (new DateTime())->format('d-m-Y') . '.csv';
-            $csvFileHandler = fopen($csvFileName, "w");
-            fputcsv($csvFileHandler, array_keys($prepayOvertimeActivities[0]));
-            foreach ($prepayOvertimeActivities as $prepayOvertimeActivity) {
-                fputcsv($csvFileHandler, array_values($prepayOvertimeActivity));
-            }
-            fclose($csvFileHandler);
-        }
+
 
         $db->query($queryString);
 
         $last_custno = '9999';
         $filepath = null;
         $date = DateTime::createFromFormat(DATE_MYSQL_DATE, $this->dsData->getValue(self::exportDataSetEndDate));
-
+        $csvFileName = SAGE_EXPORT_DIR . '/PrePayOOH' . (new DateTime())->format('d-m-Y') . '.csv';
+        $csvFileHandler = fopen($csvFileName, "w");
+        fputcsv(
+            $csvFileHandler,
+            ["customerName", "serviceRequestId", "activityId", "date", "startTime", "endTime", "overtime"]
+        );
+        fclose($csvFileHandler);
         while ($db->next_record()) {
 
             $validContracts [$db->Record ['cui_cuino']] = 1; // flag contract as having activity
@@ -379,7 +364,6 @@ class BUPrepay extends Business
             $lastRecord = $db->Record;
 
             $this->getActivitiesByServiceRequest($db->Record);
-
         }
         //close file
 
@@ -827,8 +811,9 @@ is currently a balance of ';
           itm_sstk_price,
           reason,
           con_first_name,
-          con_last_name
-
+          con_last_name,
+          cus_name,
+          pro_problemno
         FROM
           callactivity
           JOIN problem ON pro_problemno = caa_problemno
@@ -837,6 +822,7 @@ is currently a balance of ';
           JOIN item ON cui_itemno = itm_itemno
           JOIN itemtype ON ity_itemtypeno = itm_itemtypeno
           JOIN contact ON caa_contno = con_contno
+          join customer on problem.pro_custno = customer.cus_custno
         WHERE
           caa_problemno = " . $serviceRequestRecord['pro_problemno'] .
             " AND itm_itemno = " . $this->dsHeader->getValue(DBEHeader::gscItemID) . " AND caa_endtime IS NOT NULL and caa_endtime <> ''
@@ -854,7 +840,24 @@ is currently a balance of ';
         $dbeCallActivity = null;
         $reason = null;
         $customerContact = null;
+        $prepayOvertimeActivities = [];
+        $buExpense = new BUExpense($this);
         while ($db->next_record()) {
+
+            $overtime = $buExpense->calculateOvertime($db->Record['caa_callactivityno']);
+            if ($overtime) {
+                $prepayOvertimeActivities[] = [
+                    "customerName"     => $db->Record['cus_name'],
+                    "serviceRequestId" => $db->Record['pro_problemno'],
+                    "activityId"       => $db->Record['caa_callactivityno'],
+                    "date"             => DateTime::createFromFormat(DATE_MYSQL_DATE, $db->Record['caa_date'])->format(
+                        'd/m/Y'
+                    ),
+                    "startTime"        => $db->Record['caa_starttime'],
+                    "endTime"          => $db->Record['caa_endtime'],
+                    "overtime"         => round($overtime, 1)
+                ];
+            }
 
             if ($db->Record ['curValueFlag'] == 'Y') { // This is a monetary value activity such as top-up or adjustment
 
@@ -930,6 +933,15 @@ is currently a balance of ';
             }
 
         } // end while $db->next_record
+
+        if (count($prepayOvertimeActivities)) {
+            $csvFileName = SAGE_EXPORT_DIR . '/PrePayOOH' . (new DateTime())->format('d-m-Y') . '.csv';
+            $csvFileHandler = fopen($csvFileName, "a");
+            foreach ($prepayOvertimeActivities as $prepayOvertimeActivity) {
+                fputcsv($csvFileHandler, array_values($prepayOvertimeActivity));
+            }
+            fclose($csvFileHandler);
+        }
 
         $this->postRowToPrePayExportFile(
             $serviceRequestRecord,
