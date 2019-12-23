@@ -568,6 +568,24 @@ class CTHeader extends CTCNC
                 DBEHeader::closureReminderDays . 'Message'                           => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::closureReminderDays)
                 ),
+                DBEHeader::solarwindsPartnerName                                     => $dsHeader->getValue(
+                    DBEHeader::solarwindsPartnerName
+                ),
+                DBEHeader::solarwindsPartnerName . 'Message'                         => $dsHeader->getMessage(
+                    DBEHeader::solarwindsPartnerName
+                ),
+                DBEHeader::solarwindsUsername                                        => $dsHeader->getValue(
+                    DBEHeader::solarwindsUsername
+                ),
+                DBEHeader::solarwindsUsername . 'Message'                            => $dsHeader->getMessage(
+                    DBEHeader::solarwindsUsername
+                ),
+                DBEHeader::solarwindsPassword                                        => $dsHeader->getValue(
+                    DBEHeader::solarwindsPassword
+                ),
+                DBEHeader::solarwindsPassword . 'Message'                            => $dsHeader->getMessage(
+                    DBEHeader::solarwindsPassword
+                ),
                 'urlItemPopup'                                                       => $urlItemPopup,
                 'urlUpdate'                                                          => $urlUpdate
             ]

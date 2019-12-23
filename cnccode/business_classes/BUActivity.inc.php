@@ -9619,6 +9619,200 @@ is currently a balance of ';
 
     }
 
+    function raiseSolarwindsFailedBackupRequest(\CNCLTD\SolarwindsAccountItem $accountItem)
+    {
+        $dbeCustomerItem = new DBEJRenContract($this);
+        $dbeCustomerItem->setValue(DBEJRenContract::customerItemID, $accountItem->contractId);
+        $dbeCustomerItem->getRow();
+        $details = "<p>Customer " . $dbeCustomerItem->getValue(DBEJRenContract::customerName) . " has not had a successful Office 365 backup for over 24 hours.</p>
+                    <p>The last backup was " . $accountItem->lastSuccessfulBackupDate->format('d-m-Y H:i') . ".</p>";
+        $priority = 2;
+
+        $dbeProblem = new DBEProblem($this);
+
+        $dbeContact = new DBEContact($this);
+        $customerID = $dbeCustomerItem->getValue(DBECustomerItem::customerID);
+        $dbeContact->getMainSupportRowsByCustomerID($customerID);
+
+        if (!$dbeContact->fetchNext()) {
+            return; // no main support contact so abort
+        }
+
+        $dbeCallActivity = new DBECallActivity($this);
+        /*
+    Is there an existing activity for this exact problem?
+
+    If so, we will append to that SR
+    */
+        $callActivityID = $this->getActivityWithMatchingDescriptionAndContractForCustomer(
+            $customerID,
+            $accountItem->contractId,
+            $details
+        );
+
+        $slaResponseHours =
+            $this->getSlaResponseHours(
+                $priority,
+                $customerID,
+                $dbeContact->getValue(DBEContact::contactID)
+            );
+
+        if (!$callActivityID) {
+            /* create new issue */
+            $dbeProblem->setValue(
+                DBEProblem::slaResponseHours,
+                $slaResponseHours
+            );
+            $dbeProblem->setValue(
+                DBEProblem::customerID,
+                $customerID
+            );
+            $dbeProblem->setValue(
+                DBEProblem::status,
+                'I'
+            );
+            $dbeProblem->setValue(
+                DBEProblem::priority,
+                $priority
+            );
+            $dbeProblem->setValue(
+                DBEProblem::queueNo,
+                2
+            );
+            $dbeProblem->setValue(
+                DBEProblem::dateRaised,
+                date(DATE_MYSQL_DATETIME)
+            );
+            $dbeProblem->setValue(
+                DBEProblem::contactID,
+                $dbeContact->getValue(DBEContact::contactID)
+            );
+            $dbeProblem->setValue(
+                DBEProblem::hideFromCustomerFlag,
+                'Y'
+            );
+            $dbeProblem->setValue(
+                DBEProblem::contractCustomerItemID,
+                $accountItem->contractId
+            );
+            $dbeProblem->setValue(
+                DBEProblem::hdLimitMinutes,
+                $this->dsHeader->getValue(DBEHeader::hdTeamLimitMinutes)
+            );
+            $dbeProblem->setValue(
+                DBEProblem::esLimitMinutes,
+                $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
+            );
+            $dbeProblem->setValue(
+                DBEProblem::imLimitMinutes,
+                $this->dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
+            );
+            $dbeProblem->setValue(
+                DBEProblem::userID,
+                null
+            );        // not allocated
+            $dbeProblem->insertRow();
+
+            $problemID = $dbeProblem->getPKValue();
+
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::callActivityID,
+                null
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::siteNo,
+                $dbeContact->getValue(DBEContact::siteNo)
+            ); // contact default siteno
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::contactID,
+                $dbeContact->getValue(DBEContact::contactID)
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::callActTypeID,
+                CONFIG_INITIAL_ACTIVITY_TYPE_ID
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::date,
+                date(DATE_MYSQL_DATE)
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::startTime,
+                date('H:i')
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::endTime,
+                date('H:i')
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::status,
+                'C'
+            );
+
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::reason,
+                $details
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::problemID,
+                $problemID
+            );
+            $dbeCallActivity->setValue(
+                DBEJCallActivity::userID,
+                USER_SYSTEM
+            );
+
+            $dbeCallActivity->insertRow();
+
+        } else {
+            $this->createFollowOnActivity(
+                $callActivityID,
+                CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID,
+                $dbeContact->getValue(DBEContact::contactID),
+                $details,
+                false,
+                true
+            );
+        }
+
+    }
+
+    /**
+     * Get existing activity that is in progress or fixed
+     *
+     * @param mixed $customerID
+     * @param mixed $contractCustomerItemID
+     * @param mixed $matchText
+     * @return bool
+     */
+    private function getActivityWithMatchingDescriptionAndContractForCustomer($customerID,
+                                                                              $contractCustomerItemID,
+                                                                              $matchText
+    )
+    {
+
+        global $db;
+
+        $sql = "
+        SELECT
+          ca.caa_callactivityno
+        FROM
+          callactivity ca
+          JOIN problem p ON p.pro_problemno = ca.caa_problemno
+        WHERE
+          p.pro_custno = " . $customerID . "
+          AND p.pro_contract_cuino = " . $contractCustomerItemID . "
+          AND p.pro_status IN ('P', 'F' )
+          AND ca.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . "
+          AND ca.reason LIKE '%" . trim(addslashes($matchText)) . "%'";
+
+        $db->query($sql);
+        if ($db->next_record()) {
+            return $db->Record['caa_callactivityno'];
+        } else {
+            return false;
+        }
+    }
+
     /**
      * New 2ndSite validation error request
      *
@@ -9699,7 +9893,7 @@ is currently a balance of ';
 
     If so, we will append to that SR
     */
-        $callActivityID = $this->getExisting2ndSiteActivityID(
+        $callActivityID = $this->getActivityWithMatchingDescriptionAndContractForCustomer(
             $customerID,
             $contractCustomerItemID,
             $matchText
@@ -9841,43 +10035,6 @@ is currently a balance of ';
             );
         }
 
-    }
-
-    /**
-     * Get existing activity that is in progress or fixed
-     *
-     * @param mixed $customerID
-     * @param mixed $contractCustomerItemID
-     * @param mixed $matchText
-     * @return bool
-     */
-    private function getExisting2ndSiteActivityID($customerID,
-                                                  $contractCustomerItemID,
-                                                  $matchText
-    )
-    {
-
-        global $db;
-
-        $sql = "
-        SELECT
-          ca.caa_callactivityno
-        FROM
-          callactivity ca
-          JOIN problem p ON p.pro_problemno = ca.caa_problemno
-        WHERE
-          p.pro_custno = " . $customerID . "
-          AND p.pro_contract_cuino = " . $contractCustomerItemID . "
-          AND p.pro_status IN ('P', 'F' )
-          AND ca.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID . "
-          AND ca.reason LIKE '%" . trim(addslashes($matchText)) . "%'";
-
-        $db->query($sql);
-        if ($db->next_record()) {
-            return $db->Record['caa_callactivityno'];
-        } else {
-            return false;
-        }
     }
 
     /**

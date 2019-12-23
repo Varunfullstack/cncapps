@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 689 - Solarwinds cloud O365 backup API
 ### Changed
 - Issue 703 - New calendar
 - Issue 702 - Renewal Report to show users & direct debit

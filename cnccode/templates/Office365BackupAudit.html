@@ -1,0 +1,207 @@
+<!-- Template: Customer.inc.html -->
+<script type='application/javascript'
+        src='CommonJS.js'
+>
+</script>
+<script language='JavaScript'
+        src='popcalendar/popcalendar.js'
+>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.3/dist/loadingoverlay.min.js"></script>
+
+<script type="application/javascript">
+
+    var savedCustomerString;
+
+    function saveCustomerString() {
+        savedCustomerString = document.getElementById("customerString").value
+    }
+
+    function validateCustomerString() {
+        if (Trim(document.getElementById("customerString").value) != "") {
+            if (document.getElementById("customerString").value != savedCustomerString) {
+                window.open('{customerPopupURL}&customerString=' +
+                    escape(document.getElementById("customerString").value) +
+                    '&parentIDField=customerID' +
+                    '&parentDescField=customerString',
+                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
+            }
+        } else {
+            document.form.customerID.value = "";
+        }
+    }
+
+    function submitOnReturn() {
+        if (event.keyCode == 13) {
+            document.searchForm.submit();
+        }
+    }
+
+    function validateCustomerStringOnReturn() {
+        if (event.keyCode == 13) {
+            validateCustomerString();
+        }
+    }
+
+    $(document).ready(function () {
+
+        $('#myTable thead tr').clone(true).appendTo('#myTable thead');
+        $('#myTable thead tr:eq(1) th').each(function (i) {
+            var title = $(this).text();
+            if ($(this).data().noSearch) {
+                $(this).html('');
+                return;
+            }
+            $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+            const autocompleteURL = $(this).data().autocompleteUrl;
+            const autocompleteTermField = 'term' || $(this).data().autocompleteTermField;
+            const performSearch = function (value, column) {
+                if (dataTable.column(column).search() != value) {
+                    dataTable.column(column)
+                        .search(value);
+                    dataTable.draw();
+                }
+            };
+
+            const filterInput = $(this).find('input');
+            filterInput.autocomplete({
+                minLength: 0,
+                source: function (request, responseCB) {
+                    const data = {};
+                    data[autocompleteTermField] = request.term;
+                    $.ajax(
+                        autocompleteURL,
+                        {
+                            method: 'POST',
+                            dataType: 'json',
+                            data: data
+                        }
+                    ).then(response => {
+                        responseCB(response);
+                    })
+
+                },
+                delay: 200,
+                select: function (event, ui) {
+                    performSearch(ui.item.value, i);
+                }
+            }).focus(function () {
+                $(this).autocomplete("search", $(this).val());
+            }).on('change', function () {
+                performSearch(filterInput[0].value, i);
+            });
+        });
+
+        dataTable = $('#myTable').DataTable({
+            dom: 'Blrtip',
+            buttons: [
+                {
+                    extend: 'excel'
+                }
+            ],
+            orderCellsTop: true,
+            fixedHeader: true,
+            pageLength: 50,
+            paging: true,
+            serverSide: true,
+            ajax: {
+                url: "?action=getData", data: (data) => {
+                    const startDate = $('#startDate').val();
+                    const endDate = $('#endDate').val();
+                    if (startDate) {
+                        data.startDate = moment(startDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    }
+                    if (endDate) {
+                        data.endDate = moment(endDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    }
+                }
+            },
+            columns: [
+                {data: "customerName"},
+                {
+                    data: "contractID",
+                    render: function (data, type, row) {
+                        return "<a href='RenContract.php?action=edit&ID=" + row.contractID + "' target='_blank'>" + data + "</a>";
+                    }
+                },
+                {data: "office365BackupUsers"},
+                {data: "contractUsers"},
+                {
+                    data: "createdAt", render: (data) => {
+                        return moment(data, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY HH:mm')
+                    }
+                },
+            ]
+        });
+    });
+
+    function searchContactAudit() {
+        dataTable.ajax.reload();
+        return false;
+    }
+</script>
+
+<form name="form"
+      method="post"
+      onsubmit="return searchContactAudit();"
+>
+    <table border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
+        <tr>
+            <td class="promptText">
+                <div align="right">Created Between</div>
+            </td>
+            <td>
+                <input
+                        type="text"
+                        id="startDate"
+                        size="10"
+                        maxlength="10"
+                        onKeypress="javascript:submitOnReturn()"
+                        class="jqueryCalendar"
+                        autocomplete="off"
+                >
+                and <input
+                    type="text"
+                    id="endDate"
+                    size="10"
+                    maxlength="10"
+                    onKeypress="javascript:submitOnReturn()"
+                    class="jqueryCalendar"
+                    autocomplete="off"
+            >
+            </td>
+        </tr>
+        <tr>
+            <td valign="top">&nbsp;</td>
+            <td>
+                <input type="submit"
+                       name="Go"
+                       value="Search"
+                >
+            </td>
+        </tr>
+
+    </table>
+</form>
+<table width="100%"
+       border="0"
+       cellspacing="0"
+       cellpadding="1"
+       id="myTable"
+>
+    <thead>
+    <tr>
+        <th data-autocomplete-url="/Customer.php?action=searchName">Customer Name</th>
+        <th data-no-search="true">Contract</th>
+        <th data-no-search="true">Office 365 Backup Users</th>
+        <th data-no-search="true">Contract Users</th>
+        <th data-no-search="true">Created At</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<!-- End Template: Customer.inc.html -->

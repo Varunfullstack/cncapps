@@ -8,7 +8,7 @@ use Signable\Party;
 use Twig\Environment;
 
 require_once __DIR__ . '/../config.inc.php';
-
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBEQuotation.inc.php");
 require_once($cfg["path_dbe"] . "/DBESignableEnvelope.inc.php");
 require_once($cfg["path_bu"] . "/BUSalesOrder.inc.php");
