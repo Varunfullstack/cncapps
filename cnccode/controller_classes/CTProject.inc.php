@@ -1471,11 +1471,17 @@ GROUP BY caa_callacttypeno,
                 $outHoursBudget = $project['outOfHoursBudgetDays'];
                 $outHoursUsed = $hoursUsed['outHoursUsed'];
             }
+            $commencementDate = null;
+            if ($project['commenceDate']) {
+                $commencementDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $project['commenceDate'])->format(
+                    'd-m-Y'
+                );
+            }
 
             $this->template->setVar(
                 [
                     "description"      => $projectLink,
-                    "commenceDate"     => $project['commenceDate'],
+                    "commenceDate"     => $commencementDate,
                     'customerName'     => $project['customerName'],
                     "projectPlanLink"  => $projectPlanLink,
                     "latestUpdate"     => $lastUpdated,
