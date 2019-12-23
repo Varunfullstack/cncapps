@@ -1,5 +1,10 @@
 # Changelog
 This project changes will be shown here.
+
+## [unreleased]
+### Changed
+- Issue 715 - Create SR from Sales Order formatting improvements
+
 ## [v3.8.5] - 2019-12-18
 ### Fixed
 - Fix issue with FetchBitLocker not pulling certain customers because of labtech quirks
