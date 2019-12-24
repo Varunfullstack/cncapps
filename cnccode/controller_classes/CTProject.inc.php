@@ -847,9 +847,15 @@ class CTProject extends CTCNC
         $project->setValue(DBEProject::ordHeadID, null);
 
         $project->updateRow();
-        $this->setParam('projectID', $projectId);
-        $this->setAction(CTPROJECT_ACT_EDIT);
-        $this->edit();
+        $urlNext =
+            Controller::buildLink(
+                'Project.php',
+                array(
+                    'action'    => CTPROJECT_ACT_EDIT,
+                    'projectID' => $projectId
+                )
+            );
+        header('Location: ' . $urlNext);
     }
 
     /**

@@ -1402,9 +1402,107 @@ class CTActivity extends CTCNC
         $dbeProblem->getRow($problemId);
         $dbeProblem->setValue(DBEProblem::linkedSalesOrderID, null);
         $dbeProblem->updateRow();
-        $this->setParam('callActivityID', $activityId);
-        $this->displayActivity();
+        $urlNext =
+            Controller::buildLink(
+                'Activity.php',
+                array(
+                    'action'         => 'displayActivity',
+                    'callActivityID' => $activityId
+                )
+            );
+        header('Location: ' . $urlNext);
     }
+
+    /**
+     * @throws Exception
+     */
+    function serviceRequestsForContactPopup()
+    {
+        $this->setTemplateFiles(
+            'ServiceRequestsForContactPopup',
+            'ServiceRequestsForContactPopup'
+        );
+        $dsContactSrs = $this->buActivity->getProblemsByContact($this->getParam('contactID'));
+
+
+        $dbeContact = new DBEContact($this);
+        $dbeContact->getRow($this->getParam('contactID'));
+        $this->setPageTitle(
+            'Service Requests For ' . $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
+                DBEContact::lastName
+            )
+        );
+
+        $this->template->set_block(
+            'ServiceRequestsForContactPopup',
+            'contactProblemBlock',
+            'contactProblems'
+        );
+
+        while ($dsContactSrs->fetchNext()) {
+
+            $urlCreateFollowOn =
+                Controller::buildLink(
+                    'Activity.php',
+                    array(
+                        'action'         => 'createFollowOnActivity',
+                        'callActivityID' => $dsContactSrs->getValue(DBEJProblem::lastCallActivityID),
+                        'reason'         => $this->getParam('reason')
+                    )
+                );
+
+            $urlProblemHistoryPopup =
+                Controller::buildLink(
+                    'Activity.php',
+                    array(
+                        'action'    => 'problemHistoryPopup',
+                        'problemID' => $dsContactSrs->getValue(DBEJProblem::problemID),
+                        'htmlFmt'   => CT_HTML_FMT_POPUP
+                    )
+                );
+
+            $this->template->set_var(
+                array(
+                    'contactProblemID'              => $dsContactSrs->getValue(DBEJProblem::problemID),
+                    'contactDateRaised'             => Controller::dateYMDtoDMY(
+                        $dsContactSrs->getValue(DBEJProblem::dateRaised)
+                    ),
+                    'contactReason'                 => self::truncate(
+                        $dsContactSrs->getValue(DBEJProblem::reason),
+                        100
+                    ),
+                    'contactLastReason'             => self::truncate(
+                        $dsContactSrs->getValue(DBEJProblem::lastReason),
+                        100
+                    ),
+                    'contactEngineerName'           => $dsContactSrs->getValue(DBEJProblem::engineerName),
+                    'createFollowOnLink'            => $dsContactSrs->getValue(
+                        DBEJProblem::status
+                    ) == 'C' ? null : "<a href=" . $urlCreateFollowOn . ">Log activity</a>",
+                    'contactUrlProblemHistoryPopup' => $urlProblemHistoryPopup,
+                    'contactPriority'               => $dsContactSrs->getValue(DBEJProblem::priority),
+                    'contactPriorityClass'          => $dsContactSrs->getValue(
+                        DBEJProblem::priority
+                    ) == 1 ? 'class="redRow"' : null
+                )
+            );
+
+            $this->template->parse(
+                'contactProblems',
+                'contactProblemBlock',
+                true
+            );
+
+        }
+        $this->template->parse(
+            'CONTENTS',
+            'ServiceRequestsForContactPopup',
+            true
+        );
+        $this->parsePage();
+
+        exit;
+    }// end create5
 
     /**
      * Edit/Add Activity
@@ -2349,9 +2447,12 @@ class CTActivity extends CTCNC
             true
         );
         $this->parsePage();
-    }// end create5
+    }// end displayOpenSrs
 
-        /**
+
+//----------------
+
+/**
      * @param $customerID
      * @return string
      * @throws Exception
@@ -2371,10 +2472,7 @@ class CTActivity extends CTCNC
         $renewalsLink = '<a href="' . $renewalsLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
 
         return $renewalsLink;
-    }// end displayOpenSrs
-
-
-//----------------
+    }
 
     /**
      * @param DataSet|DBECustomer $dsCustomer
@@ -2460,7 +2558,7 @@ class CTActivity extends CTCNC
         return $passwordLink;
     }
 
-/**
+        /**
      * @return string
      * @throws Exception
      */
@@ -2483,7 +2581,7 @@ class CTActivity extends CTCNC
           \'scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0\')" >Generate Password</a> ';
 
         return $passwordLink;
-    }
+    }// end function editActivity()
 
     /**
      * @param $customerID
@@ -2505,9 +2603,9 @@ class CTActivity extends CTCNC
         $thirdPartyContactLink = '| <a href="' . $thirdPartyContactLinkURL . '" target="_blank" title="ThirdPartyContacts">Third Party Contacts</a>';
 
         return $thirdPartyContactLink;
-    }// end function editActivity()
+    }// end function editLinkedSalesOrder()
 
-        /**
+/**
      * @param $customerID
      * @return string
      * @throws Exception
@@ -2528,7 +2626,7 @@ class CTActivity extends CTCNC
         $contractListPopupLink = '| <a href="' . $contractListPopupLinkURL . '" target="_blank" title="Contracts">Contracts</a>';
 
         return $contractListPopupLink;
-    }// end function editLinkedSalesOrder()
+    }
 
     /**
      * @param $contactID
@@ -2568,13 +2666,13 @@ class CTActivity extends CTCNC
                 );
             $linkMarkup = '| <a href="?action=unlinkSalesOrder&activityId=' . $activityId . '" onclick="return confirm(\'Are you sure you want to unlink this request to Sales Order ' . $linkedOrdheadID . '?\');">Unlink</a>  <a href="' . $linkURL . '" target="_blank" title="Sales Order">Sales Order</a>';
         } else {
-            $linkMarkup = '| <a href="#" onclick="linkedSalesOrderPopup()">Sales Order</a>';
+            $linkMarkup = '| <a href="#" onclick="linkedSalesOrderPopup();">Sales Order</a>';
         }
 
         return $linkMarkup;
     }
 
-/**
+        /**
      * Documents display and upload
      *
      * @param $callActivityID
@@ -2660,97 +2758,6 @@ class CTActivity extends CTCNC
         }
 
 
-    }
-
-    /**
-     * @throws Exception
-     */
-    function serviceRequestsForContactPopup()
-    {
-        $this->setTemplateFiles(
-            'ServiceRequestsForContactPopup',
-            'ServiceRequestsForContactPopup'
-        );
-        $dsContactSrs = $this->buActivity->getProblemsByContact($this->getParam('contactID'));
-
-
-        $dbeContact = new DBEContact($this);
-        $dbeContact->getRow($this->getParam('contactID'));
-        $this->setPageTitle(
-            'Service Requests For ' . $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
-                DBEContact::lastName
-            )
-        );
-
-        $this->template->set_block(
-            'ServiceRequestsForContactPopup',
-            'contactProblemBlock',
-            'contactProblems'
-        );
-
-        while ($dsContactSrs->fetchNext()) {
-
-            $urlCreateFollowOn =
-                Controller::buildLink(
-                    'Activity.php',
-                    array(
-                        'action'         => 'createFollowOnActivity',
-                        'callActivityID' => $dsContactSrs->getValue(DBEJProblem::lastCallActivityID),
-                        'reason'         => $this->getParam('reason')
-                    )
-                );
-
-            $urlProblemHistoryPopup =
-                Controller::buildLink(
-                    'Activity.php',
-                    array(
-                        'action'    => 'problemHistoryPopup',
-                        'problemID' => $dsContactSrs->getValue(DBEJProblem::problemID),
-                        'htmlFmt'   => CT_HTML_FMT_POPUP
-                    )
-                );
-
-            $this->template->set_var(
-                array(
-                    'contactProblemID'              => $dsContactSrs->getValue(DBEJProblem::problemID),
-                    'contactDateRaised'             => Controller::dateYMDtoDMY(
-                        $dsContactSrs->getValue(DBEJProblem::dateRaised)
-                    ),
-                    'contactReason'                 => self::truncate(
-                        $dsContactSrs->getValue(DBEJProblem::reason),
-                        100
-                    ),
-                    'contactLastReason'             => self::truncate(
-                        $dsContactSrs->getValue(DBEJProblem::lastReason),
-                        100
-                    ),
-                    'contactEngineerName'           => $dsContactSrs->getValue(DBEJProblem::engineerName),
-                    'createFollowOnLink'            => $dsContactSrs->getValue(
-                        DBEJProblem::status
-                    ) == 'C' ? null : "<a href=" . $urlCreateFollowOn . ">Log activity</a>",
-                    'contactUrlProblemHistoryPopup' => $urlProblemHistoryPopup,
-                    'contactPriority'               => $dsContactSrs->getValue(DBEJProblem::priority),
-                    'contactPriorityClass'          => $dsContactSrs->getValue(
-                        DBEJProblem::priority
-                    ) == 1 ? 'class="redRow"' : null
-                )
-            );
-
-            $this->template->parse(
-                'contactProblems',
-                'contactProblemBlock',
-                true
-            );
-
-        }
-        $this->template->parse(
-            'CONTENTS',
-            'ServiceRequestsForContactPopup',
-            true
-        );
-        $this->parsePage();
-
-        exit;
     } // end cancelEdit
 
     /**
