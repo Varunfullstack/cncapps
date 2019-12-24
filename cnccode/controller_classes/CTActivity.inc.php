@@ -259,6 +259,9 @@ class CTActivity extends CTCNC
                 return $this->search();
 
                 break;
+            case 'unlinkSalesOrder':
+                $this->unlinkSalesOrder();
+                break;
             case 'displayServiceRequestForContactPopup':
                 $this->serviceRequestsForContactPopup();
                 break;
@@ -1384,96 +1387,24 @@ class CTActivity extends CTCNC
         exit;
     } // end siteDropdown
 
-    /**
-     * @throws Exception
-     */
-    function serviceRequestsForContactPopup()
+    private function unlinkSalesOrder()
     {
-        $this->setTemplateFiles(
-            'ServiceRequestsForContactPopup',
-            'ServiceRequestsForContactPopup'
-        );
-        $dsContactSrs = $this->buActivity->getProblemsByContact($this->getParam('contactID'));
+        $activityId = @$_REQUEST['activityId'];
 
-
-        $dbeContact = new DBEContact($this);
-        $dbeContact->getRow($this->getParam('contactID'));
-        $this->setPageTitle(
-            'Service Requests For ' . $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
-                DBEContact::lastName
-            )
-        );
-
-        $this->template->set_block(
-            'ServiceRequestsForContactPopup',
-            'contactProblemBlock',
-            'contactProblems'
-        );
-
-        while ($dsContactSrs->fetchNext()) {
-
-            $urlCreateFollowOn =
-                Controller::buildLink(
-                    'Activity.php',
-                    array(
-                        'action'         => 'createFollowOnActivity',
-                        'callActivityID' => $dsContactSrs->getValue(DBEJProblem::lastCallActivityID),
-                        'reason'         => $this->getParam('reason')
-                    )
-                );
-
-            $urlProblemHistoryPopup =
-                Controller::buildLink(
-                    'Activity.php',
-                    array(
-                        'action'    => 'problemHistoryPopup',
-                        'problemID' => $dsContactSrs->getValue(DBEJProblem::problemID),
-                        'htmlFmt'   => CT_HTML_FMT_POPUP
-                    )
-                );
-
-            $this->template->set_var(
-                array(
-                    'contactProblemID'              => $dsContactSrs->getValue(DBEJProblem::problemID),
-                    'contactDateRaised'             => Controller::dateYMDtoDMY(
-                        $dsContactSrs->getValue(DBEJProblem::dateRaised)
-                    ),
-                    'contactReason'                 => self::truncate(
-                        $dsContactSrs->getValue(DBEJProblem::reason),
-                        100
-                    ),
-                    'contactLastReason'             => self::truncate(
-                        $dsContactSrs->getValue(DBEJProblem::lastReason),
-                        100
-                    ),
-                    'contactEngineerName'           => $dsContactSrs->getValue(DBEJProblem::engineerName),
-                    'createFollowOnLink'            => $dsContactSrs->getValue(
-                        DBEJProblem::status
-                    ) == 'C' ? null : "<a href=" . $urlCreateFollowOn . ">Log activity</a>",
-                    'contactUrlProblemHistoryPopup' => $urlProblemHistoryPopup,
-                    'contactPriority'               => $dsContactSrs->getValue(DBEJProblem::priority),
-                    'contactPriorityClass'          => $dsContactSrs->getValue(
-                        DBEJProblem::priority
-                    ) == 1 ? 'class="redRow"' : null
-                )
-            );
-
-            $this->template->parse(
-                'contactProblems',
-                'contactProblemBlock',
-                true
-            );
-
+        if (!$activityId) {
+            throw new Exception('Activity ID is missing');
         }
-        $this->template->parse(
-            'CONTENTS',
-            'ServiceRequestsForContactPopup',
-            true
-        );
-        $this->parsePage();
 
-        exit;
-    }// end displayProjects
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->getRow($activityId);
+        $problemId = $dbeCallActivity->getValue(DBECallActivity::problemID);
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getRow($problemId);
+        $dbeProblem->setValue(DBEProblem::linkedSalesOrderID, null);
+        $dbeProblem->updateRow();
+        $this->setParam('callActivityID', $activityId);
+        $this->displayActivity();
+    }
 
     /**
      * Edit/Add Activity
@@ -2262,7 +2193,8 @@ class CTActivity extends CTCNC
                     $dsCallActivity->getValue(DBECallActivity::contactID)
                 ),
                 'salesOrderLink'                     => $this->getSalesOrderLink(
-                    $dsCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID)
+                    $dsCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
+                    $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
                 ),
                 'contactNotes'                       => $dsCallActivity->getValue(DBEJCallActivity::contactNotes),
                 'techNotes'                          => $dsCallActivity->getValue(DBEJCallActivity::techNotes),
@@ -2419,7 +2351,7 @@ class CTActivity extends CTCNC
         $this->parsePage();
     }// end create5
 
-    /**
+        /**
      * @param $customerID
      * @return string
      * @throws Exception
@@ -2528,7 +2460,7 @@ class CTActivity extends CTCNC
         return $passwordLink;
     }
 
-    /**
+/**
      * @return string
      * @throws Exception
      */
@@ -2575,7 +2507,7 @@ class CTActivity extends CTCNC
         return $thirdPartyContactLink;
     }// end function editActivity()
 
-    /**
+        /**
      * @param $customerID
      * @return string
      * @throws Exception
@@ -2619,10 +2551,11 @@ class CTActivity extends CTCNC
 
     /**
      * @param $linkedOrdheadID
+     * @param $activityId
      * @return string
      * @throws Exception
      */
-    function getSalesOrderLink($linkedOrdheadID)
+    function getSalesOrderLink($linkedOrdheadID, $activityId)
     {
         if ($linkedOrdheadID) {
             $linkURL =
@@ -2633,7 +2566,7 @@ class CTActivity extends CTCNC
                         'ordheadID' => $linkedOrdheadID
                     )
                 );
-            $linkMarkup = '| <a href="' . $linkURL . '" target="_blank" title="Sales Order">Sales Order</a>';
+            $linkMarkup = '| <a href="?action=unlinkSalesOrder&activityId=' . $activityId . '" onclick="return confirm(\'Are you sure you want to unlink this request to Sales Order ' . $linkedOrdheadID . '?\');">Unlink</a>  <a href="' . $linkURL . '" target="_blank" title="Sales Order">Sales Order</a>';
         } else {
             $linkMarkup = '| <a href="#" onclick="linkedSalesOrderPopup()">Sales Order</a>';
         }
@@ -2641,7 +2574,7 @@ class CTActivity extends CTCNC
         return $linkMarkup;
     }
 
-    /**
+/**
      * Documents display and upload
      *
      * @param $callActivityID
@@ -2732,13 +2665,104 @@ class CTActivity extends CTCNC
     /**
      * @throws Exception
      */
+    function serviceRequestsForContactPopup()
+    {
+        $this->setTemplateFiles(
+            'ServiceRequestsForContactPopup',
+            'ServiceRequestsForContactPopup'
+        );
+        $dsContactSrs = $this->buActivity->getProblemsByContact($this->getParam('contactID'));
+
+
+        $dbeContact = new DBEContact($this);
+        $dbeContact->getRow($this->getParam('contactID'));
+        $this->setPageTitle(
+            'Service Requests For ' . $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
+                DBEContact::lastName
+            )
+        );
+
+        $this->template->set_block(
+            'ServiceRequestsForContactPopup',
+            'contactProblemBlock',
+            'contactProblems'
+        );
+
+        while ($dsContactSrs->fetchNext()) {
+
+            $urlCreateFollowOn =
+                Controller::buildLink(
+                    'Activity.php',
+                    array(
+                        'action'         => 'createFollowOnActivity',
+                        'callActivityID' => $dsContactSrs->getValue(DBEJProblem::lastCallActivityID),
+                        'reason'         => $this->getParam('reason')
+                    )
+                );
+
+            $urlProblemHistoryPopup =
+                Controller::buildLink(
+                    'Activity.php',
+                    array(
+                        'action'    => 'problemHistoryPopup',
+                        'problemID' => $dsContactSrs->getValue(DBEJProblem::problemID),
+                        'htmlFmt'   => CT_HTML_FMT_POPUP
+                    )
+                );
+
+            $this->template->set_var(
+                array(
+                    'contactProblemID'              => $dsContactSrs->getValue(DBEJProblem::problemID),
+                    'contactDateRaised'             => Controller::dateYMDtoDMY(
+                        $dsContactSrs->getValue(DBEJProblem::dateRaised)
+                    ),
+                    'contactReason'                 => self::truncate(
+                        $dsContactSrs->getValue(DBEJProblem::reason),
+                        100
+                    ),
+                    'contactLastReason'             => self::truncate(
+                        $dsContactSrs->getValue(DBEJProblem::lastReason),
+                        100
+                    ),
+                    'contactEngineerName'           => $dsContactSrs->getValue(DBEJProblem::engineerName),
+                    'createFollowOnLink'            => $dsContactSrs->getValue(
+                        DBEJProblem::status
+                    ) == 'C' ? null : "<a href=" . $urlCreateFollowOn . ">Log activity</a>",
+                    'contactUrlProblemHistoryPopup' => $urlProblemHistoryPopup,
+                    'contactPriority'               => $dsContactSrs->getValue(DBEJProblem::priority),
+                    'contactPriorityClass'          => $dsContactSrs->getValue(
+                        DBEJProblem::priority
+                    ) == 1 ? 'class="redRow"' : null
+                )
+            );
+
+            $this->template->parse(
+                'contactProblems',
+                'contactProblemBlock',
+                true
+            );
+
+        }
+        $this->template->parse(
+            'CONTENTS',
+            'ServiceRequestsForContactPopup',
+            true
+        );
+        $this->parsePage();
+
+        exit;
+    } // end cancelEdit
+
+    /**
+     * @throws Exception
+     */
     function displayFirstActivity()
     {
         $dbeCallActivity = $this->buActivity->getFirstActivityInProblem($this->getParam('problemID'));
 
         $this->redirectToDisplay($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
 
-    } // end cancelEdit
+    }
 
     /**
      * Redirect to call page
@@ -2758,7 +2782,7 @@ class CTActivity extends CTCNC
             );
         header('Location: ' . $urlNext);
         exit;
-    }
+    }// end function displayActivity()
 
     /**
      * @throws Exception
@@ -2769,7 +2793,7 @@ class CTActivity extends CTCNC
 
         $this->redirectToDisplay($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
 
-    }// end function displayActivity()
+    }
 
     /**
      * Create wizard step 1: Customer, site and contact selection
@@ -3108,7 +3132,7 @@ class CTActivity extends CTCNC
 
         }
 
-    }
+    }  // end finaliseProblem
 
     /**
      * @throws Exception
@@ -3298,7 +3322,7 @@ class CTActivity extends CTCNC
 
         $this->parsePage();
 
-    }  // end finaliseProblem
+    }
 
     /**
      * Create Service Request
@@ -3561,7 +3585,7 @@ class CTActivity extends CTCNC
 
         $this->parsePage();
 
-    }
+    }    // end allocateAdditionalTime
 
     private function handleUploads($problemID)
     {
@@ -3587,7 +3611,7 @@ class CTActivity extends CTCNC
         }
 
         return !$hasError;
-    }    // end allocateAdditionalTime
+    }
 
     function siteDropdown(
         $customerID,
@@ -3851,7 +3875,7 @@ class CTActivity extends CTCNC
 
         $this->redirectToDisplay($this->getParam('callActivityID'));
         exit;
-    }
+    }// end changeRequestApproval
 
     /**
      * @throws Exception
@@ -3921,7 +3945,7 @@ class CTActivity extends CTCNC
             true
         );
         $this->parsePage();
-    }// end changeRequestApproval
+    }  // end finaliseProblem
 
     /**
      * @throws Exception
@@ -4027,7 +4051,7 @@ class CTActivity extends CTCNC
         $this->parsePage();
 
         exit;
-    }  // end finaliseProblem
+    }
 
     /**
      * @throws Exception
@@ -4061,7 +4085,7 @@ class CTActivity extends CTCNC
 
         $this->parsePage();
         exit;
-    }
+    }  // end finaliseProblem
 
     /**
      * Edit/Add Activity
@@ -4420,7 +4444,8 @@ class CTActivity extends CTCNC
                 ),
                 'generatePasswordLink'         => $this->getGeneratePasswordLink(),
                 'salesOrderLink'               => $this->getSalesOrderLink(
-                    $dsCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID)
+                    $dsCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
+                    $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
                 ),
                 'urlLinkedSalesOrder'          => $urlLinkedSalesOrder,
                 'problemHistoryLink'           => $this->getProblemHistoryLink(
@@ -4591,7 +4616,7 @@ class CTActivity extends CTCNC
             true
         );
         $this->parsePage();
-    }  // end finaliseProblem
+    }
 
     private
     function activityTypeDropdown($callActTypeID
@@ -6862,7 +6887,7 @@ class CTActivity extends CTCNC
     {
         $this->buActivity->updateAllHistoricUserLoggedHours($startDate);
         echo "Done";
-    }
+    }// end contactDropdown
 
     /**
      * @throws Exception
@@ -6881,7 +6906,7 @@ class CTActivity extends CTCNC
         $this->buActivity->toggleMonitoringFlag($dsActivity->getValue(DBEJCallActivity::problemID));
 
         $this->redirectToDisplay($this->getParam('callActivityID'));
-    }// end contactDropdown
+    }
 
     /**
      * @throws Exception
