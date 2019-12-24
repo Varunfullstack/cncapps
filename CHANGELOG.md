@@ -1,5 +1,10 @@
 # Changelog
 This project changes will be shown here.
+
+## [unreleased]
+### Added
+- Issue 712 - Add ability to unlink SR from Sales Order & Project
+
 ## [v3.8.5] - 2019-12-18
 ### Fixed
 - Fix issue with FetchBitLocker not pulling certain customers because of labtech quirks
