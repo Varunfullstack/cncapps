@@ -1,5 +1,9 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased]
+### Changed
+- Issue 716 - 3CX Address Book Export reduce to 500 rows
+
 ## [v3.8.5] - 2019-12-18
 ### Fixed
 - Fix issue with FetchBitLocker not pulling certain customers because of labtech quirks
