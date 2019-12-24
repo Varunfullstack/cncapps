@@ -328,17 +328,13 @@
                     ]).then(getContext)
                         .then((data) => {
                             const context = {item: data};
-                            console.log(context);
                             reportSectionElement.innerHTML = Mustache.to_html(dataTableTemplate, context);
                         })
-
-
                 }
 
                 function getContext([customerBreakDown, customerSummarised, breakDown, summarised]) {
 
                     const higherIsBetter = (customer, allCustomers) => {
-                        console.log(customer, allCustomers);
                         return customer >= allCustomers ? "performance-green" : 'performance-warn'
                     };
                     const lowerIsBetter = (customer, allCustomers) => {
