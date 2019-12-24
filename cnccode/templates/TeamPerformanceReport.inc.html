@@ -217,7 +217,7 @@
     </table>
 </form>
 <br>
-<h2>SR Statistics</h2>
+<h1>SR Statistics</h1>
 <table border="0"
        cellspacing="0"
        cellpadding="1"
@@ -279,6 +279,7 @@
 
                 function showStats() {
                     if (!customerIdInput.value) {
+                        alert('There is no customer ID set, please select a customer');
                         return;
                     }
 
@@ -309,69 +310,132 @@
                         customerStatsURL.searchParams.append(key, commonParams[key]);
                         customerBreakDownStatsURL.searchParams.append(key, commonParams[key]);
                     });
-
+                    reportSectionElement.innerHTML = "<div class='loading' style='position: absolute'></div>";
                     Promise.all([
-                        Promise.all([
-                            fetch(customerBreakDownStatsURL).then(response => {
-                                return response.json();
-                            }),
-                            fetch(customerStatsURL).then(response => {
-                                return response.json();
-                            })
-                        ]).then(getContext),
-                        Promise.all(
-                            [
-                                fetch(breakDownStatsURL).then(response => {
-                                    return response.json();
-                                }),
-                                fetch(statsURL).then(response => {
-                                    return response.json();
-                                })
-                            ]
-                        ).then(getContext)
-                    ]).then(([clientContext, summaryContext]) => {
-                        debugger;
-                        const html = Mustache.to_html(dataTableTemplate, {
-                            item: [
-                                {name: 'Customer', data: clientContext},
-                                {name: 'All', data: summaryContext}
-                            ]
-                        });
-                        reportSectionElement.innerHTML = html;
-                    })
+
+                        fetch(customerBreakDownStatsURL).then(response => {
+                            return response.json();
+                        }),
+                        fetch(customerStatsURL).then(response => {
+                            return response.json();
+                        }),
+                        fetch(breakDownStatsURL).then(response => {
+                            return response.json();
+                        }),
+                        fetch(statsURL).then(response => {
+                            return response.json();
+                        })
+                    ]).then(getContext)
+                        .then((data) => {
+                            const context = {item: data};
+                            console.log(context);
+                            reportSectionElement.innerHTML = Mustache.to_html(dataTableTemplate, context);
+                        })
 
 
                 }
 
-                function getContext([breakDown, summarised]) {
-                    const labels = {
-                        "raised": "Total SRs Raised",
-                        "fixed": "Total SRs fixed",
-                        "responseTime": "Average Response Time",
-                        "slaMet": "% of SLAs Met",
-                        "closedWithin8Hours": "% Closed within 8 hours of being raised",
-                        "reopened": "% Reopened SRs",
-                        "avgChargeableTime": "Average Time of work carried out",
-                        "avgTimeAwaitingCNC": "Average Time Awaiting CNC",
-                        "avgTimeFromRaiseToFixHours": "Average Time from initial to Fixed"
+                function getContext([customerBreakDown, customerSummarised, breakDown, summarised]) {
+
+                    const higherIsBetter = (customer, allCustomers) => {
+                        console.log(customer, allCustomers);
+                        return customer >= allCustomers ? "performance-green" : 'performance-warn'
                     };
-                    const data = [];
+                    const lowerIsBetter = (customer, allCustomers) => {
+                        return customer <= allCustomers ? "performance-green" : 'performance-warn'
+                    };
+                    const noColour = (customer, allCustomers) => {
+                        return null;
+                    };
+
+                    const labels = {
+                        "raised": {
+                            label: "Total SRs Raised",
+                            format: x => x,
+                            assignClass: noColour
+                        },
+                        "fixed": {
+                            label: "Total SRs fixed",
+                            format: x => x,
+                            assignClass: noColour
+                        },
+                        "responseTime": {
+                            label: "Average Response Time",
+                            format: x => x.toFixed(2),
+                            assignClass: lowerIsBetter
+                        },
+                        "slaMet": {
+                            label: "% of SLAs Met",
+                            format: x => (x * 100).toFixed(2),
+                            assignClass: higherIsBetter
+                        },
+                        "closedWithin8Hours": {
+                            label: "% Closed within 8 hours of being raised",
+                            format: x => (x * 100).toFixed(2),
+                            assignClass: higherIsBetter
+                        },
+                        "reopened": {
+                            label: "% Reopened SRs",
+                            format: x => (x * 100).toFixed(2),
+                            assignClass: lowerIsBetter
+                        },
+                        "avgChargeableTime": {
+                            label: "Average Time of work carried out",
+                            format: x => x.toFixed(2),
+                            assignClass: lowerIsBetter
+                        },
+                        "avgTimeAwaitingCNC": {
+                            label: "Average Time Awaiting CNC",
+                            format: x => x.toFixed(2),
+                            assignClass: lowerIsBetter
+                        },
+                        "avgTimeFromRaiseToFixHours": {
+                            label: "Average Time from initial to Fixed",
+                            format: x => x.toFixed(2),
+                            assignClass: lowerIsBetter
+                        },
+                    };
+                    const customersData = [];
+                    const allData = [];
+                    const data = [
+                        {name: 'Customer', data: customersData},
+                        {name: 'All Customers', data: allData}
+                    ];
                     Object.keys(summarised).forEach(key => {
                         if (!labels[key]) {
                             return;
                         }
-                        const p1 = breakDown.find(x => x.priority === 1);
-                        const p2 = breakDown.find(x => x.priority === 2);
-                        const p3 = breakDown.find(x => x.priority === 3);
-                        const p4 = breakDown.find(x => x.priority === 4);
-                        data.push(
+                        const allP1 = breakDown.find(x => x.priority === 1);
+                        const allP2 = breakDown.find(x => x.priority === 2);
+                        const allP3 = breakDown.find(x => x.priority === 3);
+                        const allP4 = breakDown.find(x => x.priority === 4);
+                        const customerP1 = customerBreakDown.find(x => x.priority === 1);
+                        const customerP2 = customerBreakDown.find(x => x.priority === 2);
+                        const customerP3 = customerBreakDown.find(x => x.priority === 3);
+                        const customerP4 = customerBreakDown.find(x => x.priority === 4);
+                        customersData.push(
                             {
-                                "description": labels[key],
-                                "p1": p1 ? p1[key] : null,
-                                "p2": p2 ? p2[key] : null,
-                                "p3": p3 ? p3[key] : null,
-                                "p4": p4 ? p4[key] : null,
-                                "all": summarised[key]
+                                "description": labels[key].label,
+                                "p1": customerP1 ? labels[key].format(customerP1[key]) : null,
+                                "p1Class": customerP1 ? labels[key].assignClass(customerP1[key], allP1[key]) : null,
+                                "p2": customerP2 ? labels[key].format(customerP2[key]) : null,
+                                "p2Class": customerP2 ? labels[key].assignClass(customerP2[key], allP2[key]) : null,
+                                "p3": customerP3 ? labels[key].format(customerP3[key]) : null,
+                                "p3Class": customerP3 ? labels[key].assignClass(customerP3[key], allP3[key]) : null,
+                                "p4": customerP4 ? labels[key].format(customerP4[key]) : null,
+                                "p4Class": customerP4 ? labels[key].assignClass(customerP4[key], allP4[key]) : null,
+                                "all": labels[key].format(customerSummarised[key]),
+                                "allClass": labels[key].assignClass(customerSummarised[key], summarised[key])
+                            }
+                        );
+                        allData.push(
+                            {
+                                "description": labels[key].label,
+                                "p1": allP1 ? labels[key].format(allP1[key]) : null,
+                                "p2": allP2 ? labels[key].format(allP2[key]) : null,
+                                "p3": allP3 ? labels[key].format(allP3[key]) : null,
+                                "p4": allP4 ? labels[key].format(allP4[key]) : null,
+                                "all": labels[key].format(summarised[key]),
                             }
                         )
 
@@ -383,46 +447,45 @@
         </td>
     </tr>
 </table>
+<style>
+    #reportSection th {
+        width: 30px;
+    }
+</style>
 <div id="reportSection">
 
 </div>
 <script id="reportData"
         type="text/template"
->{% #item %}
-<h3>{% name %}</h3>
-<table>
-    <thead>
-    <tr>
-        <th></th>
-        <th>P1</th>
-        <th>P2</th>
-        <th>P3</th>
-        <th>P4</th>
-        <th>All</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% #data %}
-    <tr>
-        <td>
-            {% description %}
-        </td>
-        <td>
-            {% p1 %}
-        </td>
-        <td>
-            {% p2 %}
-        </td>
-        <td>
-            {% p3 %}
-        </td>
-        <td>
-            {% p4 %}
-        </td>
-        <td>{% all %}</td>
-    </tr>
-    {% /data %}
-    </tbody>
-</table>
-{% /item %}
+>
+    {% #item %}
+    <br>
+    <h3>{% name %}</h3>
+    <table>
+        <thead>
+        <tr>
+            <th></th>
+            <th>P1</th>
+            <th>P2</th>
+            <th>P3</th>
+            <th>P4</th>
+            <th>All</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% #data %}
+        <tr>
+            <td>
+                {% description %}
+            </td>
+            <td class="{% p1Class %}"> {% p1 %}</td>
+            <td class="{% p2Class %}"> {% p2 %}</td>
+            <td class="{% p3Class %}"> {% p3 %}</td>
+            <td class="{% p4Class %}"> {% p4 %}</td>
+            <td class="{% allClass %}">{% all %}</td>
+        </tr>
+        {% /data %}
+        </tbody>
+    </table>
+    {% /item %}
 </script>

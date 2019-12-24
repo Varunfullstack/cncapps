@@ -82,6 +82,7 @@ $app->group(
                 ];
                 $isBreakDown = isset($queryParams['breakDown']);
                 $query = "select SUM(1) AS raised,
+    SUM(pro_status IN ('F' , 'C')) AS `fixed`,
     AVG(problem.`pro_responded_hours`) AS responseTime,
     AVG(IF(pro_status IN ('F' , 'C'),
         problem.`pro_responded_hours` < CASE problem.`pro_priority`
@@ -98,7 +99,6 @@ $app->group(
     AVG(IF(pro_status = 'C',
         problem.`pro_reopened_date` IS NOT NULL,
         NULL)) AS reopened,
-    SUM(pro_status IN ('F' , 'C')) AS `fixed`,
     AVG(IF(pro_status IN ('F' , 'C'),
         problem.`pro_chargeable_activity_duration_hours`,
         NULL)) AS avgChargeableTime,
@@ -125,6 +125,7 @@ WHERE
                     $query = "SELECT 
     pro_priority as priority,
     SUM(1) AS raised,
+    SUM(pro_status IN ('F' , 'C')) AS `fixed`,
     AVG(problem.`pro_responded_hours`) AS responseTime,
     AVG(IF(pro_status IN ('F' , 'C'),
         problem.`pro_responded_hours` < CASE problem.`pro_priority`
@@ -141,7 +142,6 @@ WHERE
     AVG(IF(pro_status = 'C',
         problem.`pro_reopened_date` IS NOT NULL,
         NULL)) AS reopened,
-    SUM(pro_status IN ('F' , 'C')) AS `fixed`,
     AVG(IF(pro_status IN ('F' , 'C'),
         problem.`pro_chargeable_activity_duration_hours`,
         NULL)) AS avgChargeableTime,
@@ -217,6 +217,7 @@ WHERE
                 $isBreakDown = isset($queryParams['breakDown']);
                 $query = 'SELECT
   SUM(1) AS raised,
+    SUM(pro_status IN("F","C")) AS `fixed`,
   AVG(problem.`pro_responded_hours`) AS responseTime,
   AVG(
    IF(pro_status IN ("F","C"),   
@@ -237,7 +238,6 @@ WHERE
   ) AS slaMet,
     AVG(IF(pro_status IN ("F","C"), openHours < 8, NULL)) AS closedWithin8Hours,
     AVG(IF(pro_status ="C",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
-    SUM(pro_status IN("F","C")) AS `fixed`,
     AVG(IF(pro_status IN ("F","C"), problem.`pro_chargeable_activity_duration_hours`,NULL)) AS avgChargeableTime,
     AVG(IF(pro_status IN ("F","C"), problem.pro_working_hours,NULL)) AS avgTimeAwaitingCNC,
     AVG(IF(pro_status IN ("F","C"), openHours,NULL)) AS avgTimeFromRaiseToFixHours
@@ -254,6 +254,7 @@ WHERE  caa_date between ? and ?
                     $query = 'SELECT
        pro_priority as priority,
   SUM(1) AS raised,
+    SUM(pro_status IN("F","C")) AS `fixed`,
   AVG(problem.`pro_responded_hours`) AS responseTime,
   AVG(
    IF(pro_status IN ("F","C"),   
@@ -274,7 +275,6 @@ WHERE  caa_date between ? and ?
   ) AS slaMet,
     AVG(IF(pro_status IN ("F","C"), openHours < 8, NULL)) AS closedWithin8Hours,
     AVG(IF(pro_status ="C",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
-    SUM(pro_status IN("F","C")) AS `fixed`,
     AVG(IF(pro_status IN ("F","C"), problem.`pro_chargeable_activity_duration_hours`,NULL)) AS avgChargeableTime,
     AVG(IF(pro_status IN ("F","C"), problem.pro_working_hours,NULL)) AS avgTimeAwaitingCNC,
     AVG(IF(pro_status IN ("F","C"), openHours,NULL)) AS avgTimeFromRaiseToFixHours
