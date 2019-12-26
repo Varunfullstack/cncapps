@@ -38,7 +38,9 @@ BEGIN
       AND callactivity.`caa_callacttypeno` = 57
     ORDER BY caa_date DESC
     LIMIT 1;
-
+    if (initialStartDate is null) then
+        return null;
+    end if;
     if (fixedEndDate is null) then
         return null;
     end if;
