@@ -260,6 +260,9 @@ class CTActivity extends CTCNC
                 return $this->search();
 
                 break;
+            case 'unlinkSalesOrder':
+                $this->unlinkSalesOrder();
+                break;
             case 'displayServiceRequestForContactPopup':
                 $this->serviceRequestsForContactPopup();
                 break;
@@ -1385,6 +1388,32 @@ class CTActivity extends CTCNC
         exit;
     } // end siteDropdown
 
+    private function unlinkSalesOrder()
+    {
+        $activityId = @$_REQUEST['activityId'];
+
+        if (!$activityId) {
+            throw new Exception('Activity ID is missing');
+        }
+
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->getRow($activityId);
+        $problemId = $dbeCallActivity->getValue(DBECallActivity::problemID);
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getRow($problemId);
+        $dbeProblem->setValue(DBEProblem::linkedSalesOrderID, null);
+        $dbeProblem->updateRow();
+        $urlNext =
+            Controller::buildLink(
+                'Activity.php',
+                array(
+                    'action'         => 'displayActivity',
+                    'callActivityID' => $activityId
+                )
+            );
+        header('Location: ' . $urlNext);
+    }
+
     /**
      * @throws Exception
      */
@@ -1474,7 +1503,7 @@ class CTActivity extends CTCNC
         $this->parsePage();
 
         exit;
-    }// end displayProjects
+    }// end create5
 
     /**
      * Edit/Add Activity
@@ -2267,7 +2296,8 @@ class CTActivity extends CTCNC
                     $dsCallActivity->getValue(DBECallActivity::contactID)
                 ),
                 'salesOrderLink'                     => $this->getSalesOrderLink(
-                    $dsCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID)
+                    $dsCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
+                    $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
                 ),
                 'contactNotes'                       => $dsCallActivity->getValue(DBEJCallActivity::contactNotes),
                 'techNotes'                          => $dsCallActivity->getValue(DBEJCallActivity::techNotes),
@@ -2421,9 +2451,12 @@ class CTActivity extends CTCNC
             true
         );
         $this->parsePage();
-    }// end create5
+    }// end displayOpenSrs
 
-    /**
+
+//----------------
+
+/**
      * @param $customerID
      * @return string
      * @throws Exception
@@ -2443,10 +2476,7 @@ class CTActivity extends CTCNC
         $renewalsLink = '<a href="' . $renewalsLinkURL . '" target="_blank" title="Renewals">Renewal Information</a>';
 
         return $renewalsLink;
-    }// end displayOpenSrs
-
-
-//----------------
+    }
 
     /**
      * @param DataSet|DBECustomer $dsCustomer
@@ -2532,7 +2562,7 @@ class CTActivity extends CTCNC
         return $passwordLink;
     }
 
-    /**
+        /**
      * @return string
      * @throws Exception
      */
@@ -2555,7 +2585,7 @@ class CTActivity extends CTCNC
           \'scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0\')" >Generate Password</a> ';
 
         return $passwordLink;
-    }
+    }// end function editActivity()
 
     /**
      * @param $customerID
@@ -2577,9 +2607,9 @@ class CTActivity extends CTCNC
         $thirdPartyContactLink = '| <a href="' . $thirdPartyContactLinkURL . '" target="_blank" title="ThirdPartyContacts">Third Party Contacts</a>';
 
         return $thirdPartyContactLink;
-    }// end function editActivity()
+    }// end function editLinkedSalesOrder()
 
-    /**
+/**
      * @param $customerID
      * @return string
      * @throws Exception
@@ -2600,7 +2630,7 @@ class CTActivity extends CTCNC
         $contractListPopupLink = '| <a href="' . $contractListPopupLinkURL . '" target="_blank" title="Contracts">Contracts</a>';
 
         return $contractListPopupLink;
-    }// end function editLinkedSalesOrder()
+    }
 
     /**
      * @param $contactID
@@ -2623,10 +2653,11 @@ class CTActivity extends CTCNC
 
     /**
      * @param $linkedOrdheadID
+     * @param $activityId
      * @return string
      * @throws Exception
      */
-    function getSalesOrderLink($linkedOrdheadID)
+    function getSalesOrderLink($linkedOrdheadID, $activityId)
     {
         if ($linkedOrdheadID) {
             $linkURL =
@@ -2637,15 +2668,15 @@ class CTActivity extends CTCNC
                         'ordheadID' => $linkedOrdheadID
                     )
                 );
-            $linkMarkup = '| <a href="' . $linkURL . '" target="_blank" title="Sales Order">Sales Order</a>';
+            $linkMarkup = '| <a href="?action=unlinkSalesOrder&activityId=' . $activityId . '" onclick="return confirm(\'Are you sure you want to unlink this request to Sales Order ' . $linkedOrdheadID . '?\');">Unlink</a>  <a href="' . $linkURL . '" target="_blank" title="Sales Order">Sales Order</a>';
         } else {
-            $linkMarkup = '| <a href="#" onclick="linkedSalesOrderPopup()">Sales Order</a>';
+            $linkMarkup = '| <a href="#" onclick="linkedSalesOrderPopup();">Sales Order</a>';
         }
 
         return $linkMarkup;
     }
 
-    /**
+        /**
      * Documents display and upload
      *
      * @param $callActivityID
@@ -2731,7 +2762,7 @@ class CTActivity extends CTCNC
         }
 
 
-    }
+    } // end cancelEdit
 
     /**
      * @throws Exception
@@ -2742,7 +2773,7 @@ class CTActivity extends CTCNC
 
         $this->redirectToDisplay($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
 
-    } // end cancelEdit
+    }
 
     /**
      * Redirect to call page
@@ -2762,7 +2793,7 @@ class CTActivity extends CTCNC
             );
         header('Location: ' . $urlNext);
         exit;
-    }
+    }// end function displayActivity()
 
     /**
      * @throws Exception
@@ -2773,7 +2804,7 @@ class CTActivity extends CTCNC
 
         $this->redirectToDisplay($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
 
-    }// end function displayActivity()
+    }
 
     /**
      * Create wizard step 1: Customer, site and contact selection
@@ -3112,7 +3143,7 @@ class CTActivity extends CTCNC
 
         }
 
-    }
+    }  // end finaliseProblem
 
     /**
      * @throws Exception
@@ -3302,7 +3333,7 @@ class CTActivity extends CTCNC
 
         $this->parsePage();
 
-    }  // end finaliseProblem
+    }
 
     /**
      * Create Service Request
@@ -3565,7 +3596,7 @@ class CTActivity extends CTCNC
 
         $this->parsePage();
 
-    }
+    }    // end allocateAdditionalTime
 
     private function handleUploads($problemID)
     {
@@ -3591,7 +3622,7 @@ class CTActivity extends CTCNC
         }
 
         return !$hasError;
-    }    // end allocateAdditionalTime
+    }
 
     function siteDropdown(
         $customerID,
@@ -3855,7 +3886,7 @@ class CTActivity extends CTCNC
 
         $this->redirectToDisplay($this->getParam('callActivityID'));
         exit;
-    }
+    }// end changeRequestApproval
 
     /**
      * @throws Exception
@@ -3925,7 +3956,7 @@ class CTActivity extends CTCNC
             true
         );
         $this->parsePage();
-    }// end changeRequestApproval
+    }  // end finaliseProblem
 
     /**
      * @throws Exception
@@ -4031,7 +4062,7 @@ class CTActivity extends CTCNC
         $this->parsePage();
 
         exit;
-    }  // end finaliseProblem
+    }
 
     /**
      * @throws Exception
@@ -4065,7 +4096,7 @@ class CTActivity extends CTCNC
 
         $this->parsePage();
         exit;
-    }
+    }  // end finaliseProblem
 
     /**
      * Edit/Add Activity
@@ -4424,7 +4455,8 @@ class CTActivity extends CTCNC
                 ),
                 'generatePasswordLink'         => $this->getGeneratePasswordLink(),
                 'salesOrderLink'               => $this->getSalesOrderLink(
-                    $dsCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID)
+                    $dsCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
+                    $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
                 ),
                 'urlLinkedSalesOrder'          => $urlLinkedSalesOrder,
                 'problemHistoryLink'           => $this->getProblemHistoryLink(
@@ -4595,7 +4627,7 @@ class CTActivity extends CTCNC
             true
         );
         $this->parsePage();
-    }  // end finaliseProblem
+    }
 
     private
     function activityTypeDropdown($callActTypeID
@@ -6866,7 +6898,7 @@ class CTActivity extends CTCNC
     {
         $this->buActivity->updateAllHistoricUserLoggedHours($startDate);
         echo "Done";
-    }
+    }// end contactDropdown
 
     /**
      * @throws Exception
@@ -6885,7 +6917,7 @@ class CTActivity extends CTCNC
         $this->buActivity->toggleMonitoringFlag($dsActivity->getValue(DBEJCallActivity::problemID));
 
         $this->redirectToDisplay($this->getParam('callActivityID'));
-    }// end contactDropdown
+    }
 
     /**
      * @throws Exception

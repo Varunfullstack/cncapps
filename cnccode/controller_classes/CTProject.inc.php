@@ -11,6 +11,7 @@ use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\Settings;
 use PhpOffice\PhpWord\SimpleType\JcTable;
 
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
 require_once($cfg['path_bu'] . '/BUSalesOrder.inc.php');
@@ -147,6 +148,9 @@ class CTProject extends CTCNC
                 break;
             case 'editLinkedSalesOrder':
                 $this->editLinkedSalesOrder();
+                break;
+            case 'unlinkSalesOrder':
+                $this->unlinkSalesOrder();
                 break;
             case self::UPLOAD_PROJECT_PLAN:
                 $response = [];
@@ -450,7 +454,10 @@ class CTProject extends CTCNC
                 'lastUpdateEngineer'      => $row['createdBy'],
                 'lastUpdateComment'       => $row['comment'],
                 'historyPopupURL'         => $historyPopupURL,
-                'salesOrderLink'          => $this->getSalesOrderLink($dsProject->getValue(DBEProject::ordHeadID)),
+                'salesOrderLink'          => $this->getSalesOrderLink(
+                    $dsProject->getValue(DBEProject::ordHeadID),
+                    $dsProject->getValue(DBEProject::projectID)
+                ),
                 'urlLinkedSalesOrder'     => $urlLinkedSalesOrder,
                 'uploadProjectPlanURL'    => $uploadProjectPlanURL,
                 'hasProjectPlan'          => $hasProjectPlan ? "true" : "false",
@@ -507,10 +514,11 @@ class CTProject extends CTCNC
 
     /**
      * @param $linkedOrdheadID
+     * @param $projectID
      * @return string
      * @throws Exception
      */
-    function getSalesOrderLink($linkedOrdheadID)
+    function getSalesOrderLink($linkedOrdheadID, $projectID)
     {
         if ($linkedOrdheadID) {
 
@@ -522,7 +530,7 @@ class CTProject extends CTCNC
                         'ordheadID' => $linkedOrdheadID
                     )
                 );
-            return '<a href="' . $linkURL . '" target="_blank" title="Sales Order">Sales Order</a>';
+            return '<a href="?action=unlinkSalesOrder&projectId=' . $projectID . '" onclick="return confirm(\'Are you sure you want to unlink this project to Sales Order ' . $linkedOrdheadID . '?\');">Unlink</a> <a href="' . $linkURL . '" target="_blank" title="Sales Order">Sales Order</a>';
         }
         return ' <a href="#" style="color: red" onclick="linkedSalesOrderPopup()">Sales Order</a>';
     }
@@ -821,6 +829,33 @@ class CTProject extends CTCNC
             true
         );
         $this->parsePage();
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function unlinkSalesOrder()
+    {
+        $projectId = @$_REQUEST['projectId'];
+
+        if (!$projectId) {
+            throw new Exception('Project ID is missing');
+        }
+
+        $project = new DBEProject($this);
+        $project->getRow($projectId);
+        $project->setValue(DBEProject::ordHeadID, null);
+
+        $project->updateRow();
+        $urlNext =
+            Controller::buildLink(
+                'Project.php',
+                array(
+                    'action'    => CTPROJECT_ACT_EDIT,
+                    'projectID' => $projectId
+                )
+            );
+        header('Location: ' . $urlNext);
     }
 
     /**

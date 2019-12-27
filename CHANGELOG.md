@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 706 - Create Sales Request - allow attachments
 - Issue 625 - Overtime & Expenses approval
 - Issue 538 - Reporting for customer SRs / performance analysis
+- Issue 712 - Add ability to unlink SR from Sales Order & Project
 ### Changed
 - Issue 703 - New calendar
 - Issue 702 - Renewal Report to show users & direct debit
@@ -43,7 +44,7 @@ This project changes will be shown here.
 - Offsite Replication Checks Suspended Until doesn't show the value entered.
 
 ## [v3.8.0] - 2019-11-29
-### Added
+### Added 
 - Issue 680 - Quick Create Sales Request
 - Issue 659 - Record daily replication / backup targets in database
 - Issue 677 - Sales Passwords list
