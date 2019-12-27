@@ -2714,7 +2714,8 @@ class BUActivity extends Business
                 AND caa_date = loggedDate 
                 AND callacttype.travelFlag <> 'Y' 
                 AND caa_starttime < '$endTime' 
-                AND caa_endtime > '$startTime') 
+                AND caa_endtime > '$startTime'),
+                holiday = 0
             WHERE userID = $userID 
               AND loggedDate = '$date' ";
         if (!$this->db->query($sql)) {
@@ -10341,7 +10342,6 @@ is currently a balance of ';
             "SELECT
         team.level as teamLevel,
         consultant.standardDayHours
-        
       FROM
         consultant
         JOIN team ON team.teamID = consultant.teamID
