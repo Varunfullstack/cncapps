@@ -13,6 +13,7 @@ This project changes will be shown here.
 - Issue 713 - Show 1 decimal place on home page Team Performance
 - Issue 715 - Create SR from Sales Order formatting improvements
 - Issue 710 - Project date sorting
+- Issue 716 - 3CX Address Book Export reduce to 500 rows
 
 ## [v3.8.5] - 2019-12-18
 ### Fixed
@@ -42,7 +43,7 @@ This project changes will be shown here.
 - Offsite Replication Checks Suspended Until doesn't show the value entered.
 
 ## [v3.8.0] - 2019-11-29
-### Added
+### Added 
 - Issue 680 - Quick Create Sales Request
 - Issue 659 - Record daily replication / backup targets in database
 - Issue 677 - Sales Passwords list

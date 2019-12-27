@@ -5,6 +5,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_bu'] . '/BUContactExport.inc.php');
 require_once($cfg['path_bu'] . '/BUContact.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
@@ -173,10 +174,10 @@ WHERE customer.`cus_referred` <> 'Y'
             $file,
             $header
         );
-
+        $maxRows = 499;
 
         while ($db->next_record(MYSQLI_ASSOC)) {
-            if ($count == 999) {
+            if ($count == $maxRows) {
                 // we need to close the previous file
                 fclose($file);
                 $zip->addFile($files[count($files) - 1]);
