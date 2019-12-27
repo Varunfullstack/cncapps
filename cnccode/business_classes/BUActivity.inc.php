@@ -2618,8 +2618,19 @@ class BUActivity extends Business
         );
 
         $body = $template->get_var('output');
-
         $toEmail = 'changerequest@' . CONFIG_PUBLIC_DOMAIN;
+
+        $emailsByTeam = [
+            1 => "changerequestshelpdesk@cnc-ltd.co.uk",
+            2 => "changerequestsEscalations@cnc-ltd.co.uk",
+            4 => "changerequestssmallprojects@cnc-ltd.co.uk",
+            5 => "changerequestsprojects@cnc-ltd.co.uk",
+        ];
+
+        if (isset($emailsByTeam[$this->dbeUser->getValue(DBEUser::teamID)])) {
+            $toEmail = $emailsByTeam[$this->dbeUser->getValue(DBEUser::teamID)];
+        }
+
 
         $subject = 'Change Request for ' . $dsInitialCallActivity->getValue(
                 DBEJCallActivity::customerName
@@ -3708,7 +3719,20 @@ class BUActivity extends Business
     */
         $this->dbeUser->getRow($requestingUserID);
 
-        $toEmail = 'changerequestreply@' . CONFIG_PUBLIC_DOMAIN . ',' . $this->dbeUser->getValue(
+        $toEmail = 'changerequestreply@' . CONFIG_PUBLIC_DOMAIN;
+
+        $emailsByTeam = [
+            1 => "changerequestshelpdesk@cnc-ltd.co.uk",
+            2 => "changerequestsEscalations@cnc-ltd.co.uk",
+            4 => "changerequestssmallprojects@cnc-ltd.co.uk",
+            5 => "changerequestsprojects@cnc-ltd.co.uk",
+        ];
+
+        if (isset($emailsByTeam[$this->dbeUser->getValue(DBEUser::teamID)])) {
+            $toEmail = $emailsByTeam[$this->dbeUser->getValue(DBEUser::teamID)];
+        }
+
+        $toEmail .= ',' . $this->dbeUser->getValue(
                 DBEUser::username
             ) . '@' . CONFIG_PUBLIC_DOMAIN;
 
@@ -5403,7 +5427,7 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEProblem::smallProjectsTeamLimitMinutes,
-            $this->dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
+            $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
         );
         $dbeProblem->setValue(
             DBEProblem::customerID,
@@ -6762,7 +6786,10 @@ is currently a balance of ';
             $buHeader = new BUHeader($this);
             $dsHeader = new DataSet($this);
             $buHeader->getHeader($dsHeader);
-            $dbeProblem->setValue(DBEProblem::smallProjectsTeamLimitMinutes, $dsHeader->getValue(DBEHeader::imTeamLimitMinutes));
+            $dbeProblem->setValue(
+                DBEProblem::smallProjectsTeamLimitMinutes,
+                $dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
+            );
             $dsOrdlineBudget = new DataSet($this);
             $buSalesOrder->getOrderByOrdheadID(
                 $ordheadID,
@@ -6770,7 +6797,7 @@ is currently a balance of ';
                 $dsOrdlineBudget
             );
 
-            $minutesInADay = $dsHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
+            $minutesInADay = $dsHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay);
 
             $normalMinutes = 0;
             while ($dsOrdlineBudget->fetchNext()) {
@@ -7625,7 +7652,7 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEProblem::smallProjectsTeamLimitMinutes,
-            $this->dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
+            $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
         );
         $dbeProblem->setValue(
             DBEProblem::slaResponseHours,
@@ -9760,7 +9787,7 @@ is currently a balance of ';
             );
             $dbeProblem->setValue(
                 DBEProblem::smallProjectsTeamLimitMinutes,
-                $this->dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
+                $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
             );
             $dbeProblem->setValue(
                 DBEProblem::userID,
@@ -10542,7 +10569,7 @@ is currently a balance of ';
             );
             $dbeProblem->setValue(
                 DBEProblem::smallProjectsTeamLimitMinutes,
-                $this->dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
+                $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
             );
             $dbeProblem->setValue(
                 DBEProblem::slaResponseHours,

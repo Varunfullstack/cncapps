@@ -530,7 +530,7 @@ class CTProject extends CTCNC
             switch ($this->dsProject->getValue(self::inHoursMeasure)) {
                 case 'hours':
                     $toAddMinutes = (int)$this->dsProject->getValue(self::inHoursQuantity) * 60;
-                    $toAddDays = $toAddMinutes / $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
+                    $toAddDays = $toAddMinutes / $dbeHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay);
                     break;
                 case 'days':
                     $toAddDays = (float)$this->dsProject->getValue(self::inHoursQuantity);
@@ -551,7 +551,7 @@ class CTProject extends CTCNC
             switch ($this->dsProject->getValue(self::outOfHoursMeasure)) {
                 case'hours':
                     $toAddMinutes = (int)$this->dsProject->getValue(self::outOfHoursQuantity) * 60;
-                    $toAddDays = $toAddMinutes / $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
+                    $toAddDays = $toAddMinutes / $dbeHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay);
                     break;
                 case 'days':
                     $toAddDays = (float)$this->dsProject->getValue(self::outOfHoursQuantity);
@@ -902,7 +902,7 @@ class CTProject extends CTCNC
         $BUHeader = new BUHeader($this);
         $dbeHeader = new DataSet($this);
         $BUHeader->getHeader($dbeHeader);
-        $minutesInADay = $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
+        $minutesInADay = $dbeHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay);
 
         $normalMinutes = 0;
         $oohMinutes = 0;
@@ -1089,7 +1089,7 @@ GROUP BY caa_callacttypeno,
                 "ooHoursAllocated" => 'N/A',
                 "ooHoursUsed"      => 'N/A',
             ],
-            "minutesPerDay"    => $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay),
+            "minutesPerDay"    => $dbeHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay),
             "data"             => []
         ];
         if (!$dbeProject->getValue(DBEProject::ordHeadID)) {
@@ -1240,7 +1240,7 @@ GROUP BY caa_callacttypeno,
         $data = [
             "inHoursUsed"   => 0,
             "outHoursUsed"  => 0,
-            "minutesPerDay" => $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay)
+            "minutesPerDay" => $dbeHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay)
         ];
         if (!$dbeProject->getValue(DBEProject::ordHeadID)) {
             return $data;

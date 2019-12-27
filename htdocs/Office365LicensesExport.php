@@ -621,7 +621,7 @@ function raiseCustomerLeaverWithLicenseSR(DBECustomer $dbeCustomer, $userName)
     );
     $dbeProblem->setValue(
         DBEProblem::smallProjectsTeamLimitMinutes,
-        $dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
+        $dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
     );
     $dbeProblem->setValue(
         DBEProblem::slaResponseHours,
@@ -761,7 +761,7 @@ function createFailedSR(DBECustomer $dbeCustomer, $errorMsg, $stackTrace = null,
     );
     $dbeProblem->setValue(
         DBEProblem::smallProjectsTeamLimitMinutes,
-        $dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
+        $dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
     );
     $dbeProblem->setValue(
         DBEProblem::slaResponseHours,
@@ -902,7 +902,7 @@ function raiseCNCRequest($license, DBECustomer $dbeCustomer, $licenseUser = null
     );
     $dbeProblem->setValue(
         DBEProblem::smallProjectsTeamLimitMinutes,
-        $dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
+        $dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
     );
     $dbeProblem->setValue(
         DBEProblem::slaResponseHours,

@@ -32,13 +32,9 @@
         </preConditions>
         <addColumn tableName="team">
             <column name="leaderId" type="int(11)">
-                <constraints nullable="false" foreignKeyName="fk_consultant_id" referencedTableName="consultant"
-                             referencedColumnNames="cns_consno"/>
+                <constraints nullable="false"/>
             </column>
         </addColumn>
-        <rollback>
-            <dropColumn tableName="team" columnName="leaderId"/>
-        </rollback>
         <sql>
             update team
             set leaderId = CASE teamID
@@ -50,7 +46,57 @@
                 END
         </sql>
         <rollback/>
+        <addForeignKeyConstraint baseTableName="team" baseColumnNames="leaderId" constraintName="fk_consultant_id"
+                                 referencedTableName="consultant"
+                                 referencedColumnNames="cns_consno"/>
     </changeSet>
 
-
+    <changeSet author="pavwebdev" id="issue697-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="projectTeamTargetLogPercentage"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="projectTeamTargetLogPercentage" type="int" defaultValue="73">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue697-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="projectTeamLimitMinutes"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="projectTeamLimitMinutes" type="int" defaultValue="45">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue697-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="projectTeamMinutesInADay"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="projectTeamMinutesInADay" type="int" defaultValue="480">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue697-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="pendingTimeLimitActionThresholdMinutes"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="pendingTimeLimitActionThresholdMinutes" type="int" defaultValue="20">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

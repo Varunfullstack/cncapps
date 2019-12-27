@@ -6180,7 +6180,7 @@ class CTActivity extends CTCNC
                     $buHeader = new BUHeader($this);
                     /** @var $dsHeader DataSet */
                     $buHeader->getHeader($dsHeader);
-                    $minutesInADay = $dsHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
+                    $minutesInADay = $dsHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay);
 
                     $minutes = $minutesInADay * $this->getParam('allocatedTimeValue');
             }
@@ -6529,7 +6529,7 @@ class CTActivity extends CTCNC
                     $buHeader = new BUHeader($this);
                     /** @var $dsHeader DataSet */
                     $buHeader->getHeader($dsHeader);
-                    $minutesInADay = $dsHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay);
+                    $minutesInADay = $dsHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay);
 
                     $minutes = $minutesInADay * $this->getParam('allocatedTimeValue');
             }

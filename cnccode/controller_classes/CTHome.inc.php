@@ -541,8 +541,8 @@ class CTHome extends CTCNC
                 'esTeamTargetSlaPercentage' => $this->dsHeader->getValue(DBEHeader::esTeamTargetSlaPercentage),
                 'esTeamTargetFixHours'      => $this->dsHeader->getValue(DBEHeader::esTeamTargetFixHours),
 
-                'imTeamTargetSlaPercentage' => $this->dsHeader->getValue(DBEHeader::imTeamTargetSlaPercentage),
-                'imTeamTargetFixHours'      => $this->dsHeader->getValue(DBEHeader::imTeamTargetFixHours),
+                'smallProjectsTeamTargetSlaPercentage' => $this->dsHeader->getValue(DBEHeader::smallProjectsTeamTargetSlaPercentage),
+                'smallProjectsTeamTargetFixHours'      => $this->dsHeader->getValue(DBEHeader::smallProjectsTeamTargetFixHours),
 
                 'hdTeamTargetSlaPercentage' => $this->dsHeader->getValue(DBEHeader::hdTeamTargetSlaPercentage),
                 'hdTeamTargetFixHours'      => $this->dsHeader->getValue(DBEHeader::hdTeamTargetFixHours),
@@ -572,7 +572,7 @@ class CTHome extends CTCNC
                 $hdSLAPerformanceClass = 'performance-green';
             }
 
-            if (round($result['imTeamActualSlaPercentage']) >= $result['imTeamTargetSlaPercentage']) {
+            if (round($result['imTeamActualSlaPercentage']) >= $result['smallProjectsTeamTargetSlaPercentage']) {
                 $imSLAPerformanceClass = 'performance-green';
             }
             if ($result['esTeamActualFixHours'] <= $result['esTeamTargetFixHours']) {
@@ -583,7 +583,7 @@ class CTHome extends CTCNC
                 $hdFixHoursClass = 'performance-green';
             }
 
-            if ($result['imTeamActualFixHours'] <= $result['imTeamTargetFixHours']) {
+            if ($result['imTeamActualFixHours'] <= $result['smallProjectsTeamTargetFixHours']) {
                 $imFixHoursClass = 'performance-green';
             }
 
@@ -646,7 +646,7 @@ class CTHome extends CTCNC
 
         $esTeamTargetLogPercentage = $this->dsHeader->getValue(DBEHeader::esTeamTargetLogPercentage);
 
-        $imTeamTargetLogPercentage = $this->dsHeader->getValue(DBEHeader::imTeamTargetLogPercentage);
+        $smallProjectsTeamTargetLogPercentage = $this->dsHeader->getValue(DBEHeader::smallProjectsTeamTargetLogPercentage);
 
         $hdUsers = $this->buUser->getUsersByTeamLevel(1);
 
@@ -834,19 +834,19 @@ class CTHome extends CTCNC
 
             $weeklyPercentageClass = null;
 
-            if ($weekly['performancePercentage'] < $imTeamTargetLogPercentage) {
+            if ($weekly['performancePercentage'] < $smallProjectsTeamTargetLogPercentage) {
                 $weeklyPercentageClass = 'performance-warn';
             }
 
-            if ($weekly['performancePercentage'] >= $imTeamTargetLogPercentage) {
+            if ($weekly['performancePercentage'] >= $smallProjectsTeamTargetLogPercentage) {
                 $weeklyPercentageClass = 'performance-green';
             }
 
             $monthlyPercentageClass = null;
-            if ($monthly['performancePercentage'] < $imTeamTargetLogPercentage) {
+            if ($monthly['performancePercentage'] < $smallProjectsTeamTargetLogPercentage) {
                 $monthlyPercentageClass = 'performance-warn';
             }
-            if ($monthly['performancePercentage'] >= $imTeamTargetLogPercentage) {
+            if ($monthly['performancePercentage'] >= $smallProjectsTeamTargetLogPercentage) {
                 $monthlyPercentageClass = 'performance-green';
             }
 
@@ -854,7 +854,7 @@ class CTHome extends CTCNC
                 array(
                     'initials' => $user['initials'],
 
-                    'targetPercentage' => $imTeamTargetLogPercentage,
+                    'targetPercentage' => $smallProjectsTeamTargetLogPercentage,
 
                     'weeklyPercentage' => number_format(
                         $weekly['performancePercentage'],
@@ -915,7 +915,7 @@ class CTHome extends CTCNC
                 $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::esTeamTargetLogPercentage);
                 break;
             case 3:
-                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::imTeamTargetLogPercentage);
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::smallProjectsTeamTargetLogPercentage);
                 break;
         }
 

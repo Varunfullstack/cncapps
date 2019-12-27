@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUTeam.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -67,88 +68,6 @@ class CTTeam extends CTCNC
                 $this->displayList();
                 break;
         }
-    }
-
-    /**
-     * @throws Exception
-     */
-    function displayList()
-    {
-        $this->setMethodName('displayList');
-        $this->setPageTitle('User Teams');
-        $this->setTemplateFiles(
-            array('TeamList' => 'TeamList.inc')
-        );
-
-        $teams = $this->buTeam->getAll();
-
-        $urlCreate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTTEAM_ACT_CREATE
-                )
-            );
-
-        $this->template->set_var(
-            array('urlCreate' => $urlCreate)
-        );
-
-        if (count($teams) > 0) {
-
-            $this->template->set_block(
-                'TeamList',
-                'TeamBlock',
-                'teams'
-            );
-
-            foreach ($teams as $team) {
-
-                $teamID = $team['teamID'];
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => CTTEAM_ACT_EDIT,
-                            'teamID' => $teamID
-                        )
-                    );
-                $txtEdit = '[edit]';
-
-                $urlDelete = null;
-                $txtDelete = null;
-                if ($this->buTeam->canDelete($teamID)) {
-                    $urlDelete =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action' => CTTEAM_ACT_DELETE,
-                                'teamID' => $teamID
-                            )
-                        );
-                    $txtDelete = '[delete]';
-                }
-                $this->template->set_var(
-                    array(
-                        'teamID'       => $teamID,
-                        'name'         => Controller::htmlDisplayText($team['name']),
-                        'teamRoleName' => Controller::htmlDisplayText($team['teamRoleName']),
-                        'level'        => Controller::htmlDisplayText($team['level']),
-                        'activeFlag'   => Controller::htmlDisplayText($team['activeFlag']),
-                        'urlEdit'      => $urlEdit,
-                        'urlDelete'    => $urlDelete,
-                        'txtEdit'      => $txtEdit,
-                        'txtDelete'    => $txtDelete
-                    )
-                );
-
-                $this->template->parse('teams', 'TeamBlock', true);
-
-            }//while $dsTeam->fetchNext()
-        }
-        $this->template->parse('CONTENTS', 'TeamList', true);
-        $this->parsePage();
     }
 
     /**
@@ -239,8 +158,49 @@ class CTTeam extends CTCNC
             $this->template->parse('teamRoles', 'teamRoleBlock', true);
         }
 
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRows();
+        $this->template->set_block('TeamEdit', 'leaderBlock', 'leaders');
+
+        while ($dbeUser->fetchNext()) {
+            $leaderSelected = ($dbeUser->getValue(DBEUser::userID) == $dsTeam->getValue(
+                    DBETeam::leaderId
+                )) ? CT_SELECTED : null;
+
+            $this->template->set_var(
+                [
+                    "leaderID"       => $dbeUser->getValue(DBEUser::userID),
+                    "leaderSelected" => $leaderSelected,
+                    "leaderName"     => $dbeUser->getValue(DBEUser::name)
+                ]
+            );
+            $this->template->parse('leaders', 'leaderBlock', true);
+        }
+
         $this->template->parse('CONTENTS', 'TeamEdit', true);
         $this->parsePage();
+    }
+
+    /**
+     * @throws Exception
+     */
+    function delete()
+    {
+        $this->setMethodName('delete');
+        if (!$this->buTeam->deleteTeam($this->getParam('teamID'))) {
+            $this->displayFatalError('Cannot delete this Team');
+            exit;
+        } else {
+            $urlNext =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => CTTEAM_ACT_DISPLAY_LIST
+                    )
+                );
+            header('Location: ' . $urlNext);
+            exit;
+        }
     }// end function edit
 
     /**
@@ -275,22 +235,83 @@ class CTTeam extends CTCNC
     /**
      * @throws Exception
      */
-    function delete()
+    function displayList()
     {
-        $this->setMethodName('delete');
-        if (!$this->buTeam->deleteTeam($this->getParam('teamID'))) {
-            $this->displayFatalError('Cannot delete this Team');
-            exit;
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
+        $this->setMethodName('displayList');
+        $this->setPageTitle('User Teams');
+        $this->setTemplateFiles(
+            array('TeamList' => 'TeamList.inc')
+        );
+
+        $teams = $this->buTeam->getAll();
+
+        $urlCreate =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTTEAM_ACT_CREATE
+                )
+            );
+
+        $this->template->set_var(
+            array('urlCreate' => $urlCreate)
+        );
+
+        if (count($teams) > 0) {
+
+            $this->template->set_block(
+                'TeamList',
+                'TeamBlock',
+                'teams'
+            );
+
+            foreach ($teams as $team) {
+
+                $teamID = $team['teamID'];
+
+                $urlEdit =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action' => CTTEAM_ACT_EDIT,
+                            'teamID' => $teamID
+                        )
+                    );
+                $txtEdit = '[edit]';
+
+                $urlDelete = null;
+                $txtDelete = null;
+                if ($this->buTeam->canDelete($teamID)) {
+                    $urlDelete =
+                        Controller::buildLink(
+                            $_SERVER['PHP_SELF'],
+                            array(
+                                'action' => CTTEAM_ACT_DELETE,
+                                'teamID' => $teamID
+                            )
+                        );
+                    $txtDelete = '[delete]';
+                }
+                $this->template->set_var(
                     array(
-                        'action' => CTTEAM_ACT_DISPLAY_LIST
+                        'teamID'       => $teamID,
+                        'name'         => Controller::htmlDisplayText($team['name']),
+                        'teamRoleName' => Controller::htmlDisplayText($team['teamRoleName']),
+                        'level'        => Controller::htmlDisplayText($team['level']),
+                        'activeFlag'   => Controller::htmlDisplayText($team['activeFlag']),
+                        'leaderName'   => Controller::htmlDisplayText($team['leaderName']),
+                        'urlEdit'      => $urlEdit,
+                        'urlDelete'    => $urlDelete,
+                        'txtEdit'      => $txtEdit,
+                        'txtDelete'    => $txtDelete
                     )
                 );
-            header('Location: ' . $urlNext);
-            exit;
+
+                $this->template->parse('teams', 'TeamBlock', true);
+
+            }//while $dsTeam->fetchNext()
         }
+        $this->template->parse('CONTENTS', 'TeamList', true);
+        $this->parsePage();
     }
 }

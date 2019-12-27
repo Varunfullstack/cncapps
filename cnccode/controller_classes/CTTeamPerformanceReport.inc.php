@@ -85,9 +85,9 @@ class CTTeamPerformanceReport extends CTCNC
                         'hdTeamTargetFixHours'       => $dsHeader->getValue(DBEJHeader::hdTeamTargetFixHours),
                         'hdTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEJHeader::hdTeamTargetFixQtyPerMonth),
 
-                        'imTeamTargetSlaPercentage'  => $dsHeader->getValue(DBEJHeader::imTeamTargetSlaPercentage),
-                        'imTeamTargetFixHours'       => $dsHeader->getValue(DBEJHeader::imTeamTargetFixHours),
-                        'imTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEJHeader::imTeamTargetFixQtyPerMonth)
+                        'smallProjectsTeamTargetSlaPercentage'  => $dsHeader->getValue(DBEJHeader::smallProjectsTeamTargetSlaPercentage),
+                        'smallProjectsTeamTargetFixHours'       => $dsHeader->getValue(DBEJHeader::smallProjectsTeamTargetFixHours),
+                        'smallProjectsTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEJHeader::smallProjectsTeamTargetFixQtyPerMonth)
 
                     )
                 );
@@ -115,7 +115,7 @@ class CTTeamPerformanceReport extends CTCNC
                         );
                     }
 
-                    if ($result['imTeamActualSlaPercentage'] < $result['imTeamTargetSlaPercentage']) {
+                    if ($result['imTeamActualSlaPercentage'] < $result['smallProjectsTeamTargetSlaPercentage']) {
 
                         $this->template->set_var(
                             'imTeamActualSlaPercentage' . $result['month'] . 'Class',
@@ -139,7 +139,7 @@ class CTTeamPerformanceReport extends CTCNC
                         );
                     }
 
-                    if ($result['imTeamActualFixQtyPerMonth'] < $result['imTeamTargetFixQtyPerMonth']) {
+                    if ($result['imTeamActualFixQtyPerMonth'] < $result['smallProjectsTeamTargetFixQtyPerMonth']) {
 
                         $this->template->set_var(
                             'imTeamActualFixQtyPerMonth' . $result['month'] . 'Class',
@@ -162,7 +162,7 @@ class CTTeamPerformanceReport extends CTCNC
                         );
                     }
 
-                    if ($result['imTeamActualFixHours'] > $result['imTeamTargetFixHours']) {
+                    if ($result['imTeamActualFixHours'] > $result['smallProjectsTeamTargetFixHours']) {
 
                         $this->template->set_var(
                             'imTeamActualFixHours' . $result['month'] . 'Class',

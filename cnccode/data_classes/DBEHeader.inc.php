@@ -49,27 +49,30 @@ class DBEHeader extends DBEntity
     const priority4Desc = "priority4Desc";
     const priority5Desc = "priority5Desc";
     const allowedClientIpPattern = "allowedClientIpPattern";
-    const hdTeamLimitMinutes = "hdTeamLimitHours";
-    const esTeamLimitMinutes = "esTeamLimitHours";
-    const imTeamLimitMinutes = "imTeamLimitHours";
+    const hdTeamLimitMinutes = "hdTeamLimitMinutes";
+    const esTeamLimitMinutes = "esTeamLimitMinutes";
+    const smallProjectsTeamLimitMinutes = "smallProjectsTeamLimitMinutes";
     const hdTeamTargetLogPercentage = "hdTeamTargetLogPercentage";
     const esTeamTargetLogPercentage = "esTeamTargetLogPercentage";
-    const imTeamTargetLogPercentage = "imTeamTargetLogPercentage";
+    const smallProjectsTeamTargetLogPercentage = "smallProjectsTeamTargetLogPercentage";
     const hdTeamTargetSlaPercentage = "hdTeamTargetSlaPercentage";
     const esTeamTargetSlaPercentage = "esTeamTargetSlaPercentage";
-    const imTeamTargetSlaPercentage = "imTeamTargetSlaPercentage";
+    const smallProjectsTeamTargetSlaPercentage = "smallProjectsTeamTargetSlaPercentage";
     const hdTeamTargetFixHours = "hdTeamTargetFixHours";
     const esTeamTargetFixHours = "esTeamTargetFixHours";
-    const imTeamTargetFixHours = "imTeamTargetFixHours";
+    const smallProjectsTeamTargetFixHours = "smallProjectsTeamTargetFixHours";
     const hdTeamTargetFixQtyPerMonth = "hdTeamTargetFixQtyPerMonth";
     const esTeamTargetFixQtyPerMonth = "esTeamTargetFixQtyPerMonth";
-    const imTeamTargetFixQtyPerMonth = "imTeamTargetFixQtyPerMonth";
+    const smallProjectsTeamTargetFixQtyPerMonth = "smallProjectsTeamTargetFixQtyPerMonth";
+    const projectTeamTargetLogPercentage = "projectTeamTargetLogPercentage";
+    const projectTeamLimitMinutes = "projectTeamLimitMinutes";
+    const projectTeamMinutesInADay = "projectTeamMinutesInADay";
     const srAutocompleteThresholdHours = "srAutocompleteThresholdHours";
     const srPromptContractThresholdHours = "srPromptContractThresholdHours";
     const remoteSupportWarnHours = "remoteSupportWarnHours";
     const customerContactWarnHours = "customerContactWarnHours";
     const RemoteSupportMinWarnHours = "RemoteSupportMinWarnHours";
-    const ImplementationTeamMinutesInADay = "imTeamMinutesInADay";
+    const smallProjectsTeamMinutesInADay = "smallProjectsTeamMinutesInADay";
     const backupTargetSuccessRate = "backupTargetSuccessRate";
     const backupReplicationTargetSuccessRate = "backupReplicationTargetSuccessRate";
     const customerReviewMeetingText = "customerReviewMeetingText";
@@ -91,6 +94,7 @@ class DBEHeader extends DBEntity
     const autoCriticalP3Hours = "autoCriticalP3Hours";
     const sevenDayerTarget = "sevenDayerTarget";
     const closureReminderDays = "closureReminderDays";
+    const pendingTimeLimitActionThresholdMinutes = "pendingTimeLimitActionThresholdMinutes";
 
     /**
      * calls constructor()
@@ -361,10 +365,16 @@ class DBEHeader extends DBEntity
             "hed_es_team_limit_minutes"
         );
         $this->addColumn(
-            self::imTeamLimitMinutes,
+            self::smallProjectsTeamLimitMinutes,
             DA_FLOAT,
             DA_NOT_NULL,
             "hed_im_team_limit_minutes"
+        );
+
+        $this->addColumn(
+            self::projectTeamLimitMinutes,
+            DA_FLOAT,
+            DA_NOT_NULL
         );
         $this->addColumn(
             self::hdTeamTargetLogPercentage,
@@ -379,10 +389,15 @@ class DBEHeader extends DBEntity
             "hed_es_team_target_log_percentage"
         );
         $this->addColumn(
-            self::imTeamTargetLogPercentage,
+            self::smallProjectsTeamTargetLogPercentage,
             DA_FLOAT,
             DA_NOT_NULL,
             "hed_im_team_target_log_percentage"
+        );
+        $this->addColumn(
+            self::projectTeamTargetLogPercentage,
+            DA_FLOAT,
+            DA_NOT_NULL
         );
         $this->addColumn(
             self::hdTeamTargetSlaPercentage,
@@ -397,7 +412,7 @@ class DBEHeader extends DBEntity
             "hed_es_team_target_sla_percentage"
         );
         $this->addColumn(
-            self::imTeamTargetSlaPercentage,
+            self::smallProjectsTeamTargetSlaPercentage,
             DA_INTEGER,
             DA_NOT_NULL,
             "hed_im_team_target_sla_percentage"
@@ -415,7 +430,7 @@ class DBEHeader extends DBEntity
             "hed_es_team_target_fix_hours"
         );
         $this->addColumn(
-            self::imTeamTargetFixHours,
+            self::smallProjectsTeamTargetFixHours,
             DA_FLOAT,
             DA_NOT_NULL,
             "hed_im_team_target_fix_hours"
@@ -433,7 +448,7 @@ class DBEHeader extends DBEntity
             "hed_es_team_target_fix_qty_per_month"
         );
         $this->addColumn(
-            self::imTeamTargetFixQtyPerMonth,
+            self::smallProjectsTeamTargetFixQtyPerMonth,
             DA_INTEGER,
             DA_NOT_NULL,
             "hed_im_team_target_fix_qty_per_month"
@@ -469,10 +484,15 @@ class DBEHeader extends DBEntity
             'hed_remote_support_min_warn_hours'
         );
         $this->addColumn(
-            self::ImplementationTeamMinutesInADay,
+            self::smallProjectsTeamMinutesInADay,
             DA_INTEGER,
             DA_NOT_NULL,
             'hed_im_team_minutes_in_a_day'
+        );
+        $this->addColumn(
+            self::projectTeamMinutesInADay,
+            DA_INTEGER,
+            DA_NOT_NULL
         );
         $this->addColumn(
             self::backupTargetSuccessRate,
@@ -564,6 +584,7 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::autoCriticalP2Hours, DA_FLOAT, DA_NOT_NULL);
         $this->addColumn(self::autoCriticalP3Hours, DA_FLOAT, DA_NOT_NULL);
         $this->addColumn(self::closureReminderDays, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::pendingTimeLimitActionThresholdMinutes, DA_INTEGER, DA_NOT_NULL);
 
         $this->setPK(0);
         $this->setAddColumnsOff();

@@ -1,3 +1,8 @@
+<style>
+    tr.warning {
+        background-color: red !important;
+    }
+</style>
 <script>
     setTimeout(() => {
         window.location.reload();
@@ -40,7 +45,7 @@
     </thead>
     <tbody>
     <!-- BEGIN TimeRequestsBlock -->
-    <tr>
+    <tr class="{alertRow}">
         <td>
             {customerName}
         </td>
