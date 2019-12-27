@@ -1,204 +1,487 @@
 <!-- Template: ContractsAnalysisReport.inc.html -->
 <P class="formErrorMessage">{formError}</P>
-<form name="searchForm" method="get" action="{urlSubmit}">
-  <table width="500px" border="0" cellspacing="0" cellpadding="1">
-    <tr> 
-      <td width="100" class="promptText">Year (YYYY)</td>
-      <td>
-        <input
-          type="text"
-          name="searchForm[1][year]"
-          value="{year}"
-          placeholder="YYYY"
-          size="4"
-          maxlength="4"
-        >
-      </td>
-    </tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td>
-        <input type="submit" name="Search" value="Run">
-      </td>
-		</tr>
-	</table>
-	<p>&nbsp;</p>
-  <table id="team-performance">
-    <thead>
-      <tr>
-        <th>&nbsp;</th>
-        <th>Target</th>
-        <th>Jan</th>
-        <th>Feb</th>
-        <th>Mar</th>
-        <th>Apr</th>
-        <th>May</th>
-        <th>Jun</th>
-        <th>Jul</th>
-        <th>Aug</th>
-        <th>Sep</th>
-        <th>Oct</th>
-        <th>Nov</th>
-        <th>Dec</th>
-      </tr>
-    </thead>
-    <tbody>
-      
-      <tr>
-        <th>HD SLA %</th>
-        <td>{hdTeamTargetSlaPercentage}</td>
-        <td class="{hdTeamActualSlaPercentage1Class}">{hdTeamActualSlaPercentage1}</td>
-        <td class="{hdTeamActualSlaPercentage2Class}">{hdTeamActualSlaPercentage2}</td>
-        <td class="{hdTeamActualSlaPercentage3Class}">{hdTeamActualSlaPercentage3}</td>
-        <td class="{hdTeamActualSlaPercentage4Class}">{hdTeamActualSlaPercentage4}</td>
-        <td class="{hdTeamActualSlaPercentage5Class}">{hdTeamActualSlaPercentage5}</td>
-        <td class="{hdTeamActualSlaPercentage6Class}">{hdTeamActualSlaPercentage6}</td>
-        <td class="{hdTeamActualSlaPercentage7Class}">{hdTeamActualSlaPercentage7}</td>
-        <td class="{hdTeamActualSlaPercentage8Class}">{hdTeamActualSlaPercentage8}</td>
-        <td class="{hdTeamActualSlaPercentage9Class}">{hdTeamActualSlaPercentage9}</td>
-        <td class="{hdTeamActualSlaPercentage10Class}">{hdTeamActualSlaPercentage10}</td>
-        <td class="{hdTeamActualSlaPercentage11Class}">{hdTeamActualSlaPercentage11}</td>
-        <td class="{hdTeamActualSlaPercentage12Class}">{hdTeamActualSlaPercentage12}</td>
-      </tr>
-      <tr>
-        <th>HD Fix Hours</th>
-        <td>{hdTeamTargetFixHours}</td>
-        <td class="{hdTeamActualFixHours1Class}">{hdTeamActualFixHours1}</td>
-        <td class="{hdTeamActualFixHours2Class}">{hdTeamActualFixHours2}</td>
-        <td class="{hdTeamActualFixHours3Class}">{hdTeamActualFixHours3}</td>
-        <td class="{hdTeamActualFixHours4Class}">{hdTeamActualFixHours4}</td>
-        <td class="{hdTeamActualFixHours5Class}">{hdTeamActualFixHours5}</td>
-        <td class="{hdTeamActualFixHours6Class}">{hdTeamActualFixHours6}</td>
-        <td class="{hdTeamActualFixHours7Class}">{hdTeamActualFixHours7}</td>
-        <td class="{hdTeamActualFixHours8Class}">{hdTeamActualFixHours8}</td>
-        <td class="{hdTeamActualFixHours9Class}">{hdTeamActualFixHours9}</td>
-        <td class="{hdTeamActualFixHours10Class}">{hdTeamActualFixHours10}</td>
-        <td class="{hdTeamActualFixHours11Class}">{hdTeamActualFixHours11}</td>
-        <td class="{hdTeamActualFixHours12Class}">{hdTeamActualFixHours12}</td>
-      </tr>
-      <tr>
-        <th>HD Qty</th>
-        <td>{hdTeamTargetFixQtyPerMonth}</td>
-        <td class="{hdTeamActualFixQtyPerMonth1Class}">{hdTeamActualFixQtyPerMonth1}</td>
-        <td class="{hdTeamActualFixQtyPerMonth2Class}">{hdTeamActualFixQtyPerMonth2}</td>
-        <td class="{hdTeamActualFixQtyPerMonth3Class}">{hdTeamActualFixQtyPerMonth3}</td>
-        <td class="{hdTeamActualFixQtyPerMonth4Class}">{hdTeamActualFixQtyPerMonth4}</td>
-        <td class="{hdTeamActualFixQtyPerMonth5Class}">{hdTeamActualFixQtyPerMonth5}</td>
-        <td class="{hdTeamActualFixQtyPerMonth6Class}">{hdTeamActualFixQtyPerMonth6}</td>
-        <td class="{hdTeamActualFixQtyPerMonth7Class}">{hdTeamActualFixQtyPerMonth7}</td>
-        <td class="{hdTeamActualFixQtyPerMonth8Class}">{hdTeamActualFixQtyPerMonth8}</td>
-        <td class="{hdTeamActualFixQtyPerMonth9Class}">{hdTeamActualFixQtyPerMonth9}</td>
-        <td class="{hdTeamActualFixQtyPerMonth10Class}">{hdTeamActualFixQtyPerMonth10}</td>
-        <td class="{hdTeamActualFixQtyPerMonth11Class}">{hdTeamActualFixQtyPerMonth11}</td>
-        <td class="{hdTeamActualFixQtyPerMonth12Class}">{hdTeamActualFixQtyPerMonth12}</td>
-      </tr>
+<form name="searchForm"
+      method="get"
+      action="{urlSubmit}"
+>
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
+        <tr>
+            <td width="100"
+                class="promptText"
+            >Year (YYYY)
+            </td>
+            <td>
+                <input
+                        type="text"
+                        name="searchForm[1][year]"
+                        value="{year}"
+                        placeholder="YYYY"
+                        size="4"
+                        maxlength="4"
+                >
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <input type="submit"
+                       name="Search"
+                       value="Run"
+                >
+            </td>
+        </tr>
+    </table>
+    <p>&nbsp;</p>
+    <table id="team-performance">
+        <thead>
+        <tr>
+            <th>&nbsp;</th>
+            <th>Target</th>
+            <th>Jan</th>
+            <th>Feb</th>
+            <th>Mar</th>
+            <th>Apr</th>
+            <th>May</th>
+            <th>Jun</th>
+            <th>Jul</th>
+            <th>Aug</th>
+            <th>Sep</th>
+            <th>Oct</th>
+            <th>Nov</th>
+            <th>Dec</th>
+        </tr>
+        </thead>
+        <tbody>
 
-      <tr>
-        <td colspan="13">&nbsp;</td>
-      </tr>
-      
-      <tr>
-        <th>Esc SLA %</th>
-        <td>{esTeamTargetSlaPercentage}</td>
-        <td class="{esTeamActualSlaPercentage1Class}">{esTeamActualSlaPercentage1}</td>
-        <td class="{esTeamActualSlaPercentage2Class}">{esTeamActualSlaPercentage2}</td>
-        <td class="{esTeamActualSlaPercentage3Class}">{esTeamActualSlaPercentage3}</td>
-        <td class="{esTeamActualSlaPercentage4Class}">{esTeamActualSlaPercentage4}</td>
-        <td class="{esTeamActualSlaPercentage5Class}">{esTeamActualSlaPercentage5}</td>
-        <td class="{esTeamActualSlaPercentage6Class}">{esTeamActualSlaPercentage6}</td>
-        <td class="{esTeamActualSlaPercentage7Class}">{esTeamActualSlaPercentage7}</td>
-        <td class="{esTeamActualSlaPercentage8Class}">{esTeamActualSlaPercentage8}</td>
-        <td class="{esTeamActualSlaPercentage9Class}">{esTeamActualSlaPercentage9}</td>
-        <td class="{esTeamActualSlaPercentage10Class}">{esTeamActualSlaPercentage10}</td>
-        <td class="{esTeamActualSlaPercentage11Class}">{esTeamActualSlaPercentage11}</td>
-        <td class="{esTeamActualSlaPercentage12Class}">{esTeamActualSlaPercentage12}</td>
-      </tr>
-      <tr>
-        <th>Esc Fix Hours</th>
-        <td>{esTeamTargetFixHours}</td>
-        <td class="{esTeamActualFixHours1Class}">{esTeamActualFixHours1}</td>
-        <td class="{esTeamActualFixHours2Class}">{esTeamActualFixHours2}</td>
-        <td class="{esTeamActualFixHours3Class}">{esTeamActualFixHours3}</td>
-        <td class="{esTeamActualFixHours4Class}">{esTeamActualFixHours4}</td>
-        <td class="{esTeamActualFixHours5Class}">{esTeamActualFixHours5}</td>
-        <td class="{esTeamActualFixHours6Class}">{esTeamActualFixHours6}</td>
-        <td class="{esTeamActualFixHours7Class}">{esTeamActualFixHours7}</td>
-        <td class="{esTeamActualFixHours8Class}">{esTeamActualFixHours8}</td>
-        <td class="{esTeamActualFixHours9Class}">{esTeamActualFixHours9}</td>
-        <td class="{esTeamActualFixHours10Class}">{esTeamActualFixHours10}</td>
-        <td class="{esTeamActualFixHours11Class}">{esTeamActualFixHours11}</td>
-        <td class="{esTeamActualFixHours12Class}">{esTeamActualFixHours12}</td>
-      </tr>
-      <tr>
-        <th>Esc Qty</th>
-        <td>{esTeamTargetFixQtyPerMonth}</td>
-        <td class="{esTeamActualFixQtyPerMonth1Class}">{esTeamActualFixQtyPerMonth1}</td>
-        <td class="{esTeamActualFixQtyPerMonth2Class}">{esTeamActualFixQtyPerMonth2}</td>
-        <td class="{esTeamActualFixQtyPerMonth3Class}">{esTeamActualFixQtyPerMonth3}</td>
-        <td class="{esTeamActualFixQtyPerMonth4Class}">{esTeamActualFixQtyPerMonth4}</td>
-        <td class="{esTeamActualFixQtyPerMonth5Class}">{esTeamActualFixQtyPerMonth5}</td>
-        <td class="{esTeamActualFixQtyPerMonth6Class}">{esTeamActualFixQtyPerMonth6}</td>
-        <td class="{esTeamActualFixQtyPerMonth7Class}">{esTeamActualFixQtyPerMonth7}</td>
-        <td class="{esTeamActualFixQtyPerMonth8Class}">{esTeamActualFixQtyPerMonth8}</td>
-        <td class="{esTeamActualFixQtyPerMonth9Class}">{esTeamActualFixQtyPerMonth9}</td>
-        <td class="{esTeamActualFixQtyPerMonth10Class}">{esTeamActualFixQtyPerMonth10}</td>
-        <td class="{esTeamActualFixQtyPerMonth11Class}">{esTeamActualFixQtyPerMonth11}</td>
-        <td class="{esTeamActualFixQtyPerMonth12Class}">{esTeamActualFixQtyPerMonth12}</td>
-      </tr>
+        <tr>
+            <th>HD SLA %</th>
+            <td>{hdTeamTargetSlaPercentage}</td>
+            <td class="{hdTeamActualSlaPercentage1Class}">{hdTeamActualSlaPercentage1}</td>
+            <td class="{hdTeamActualSlaPercentage2Class}">{hdTeamActualSlaPercentage2}</td>
+            <td class="{hdTeamActualSlaPercentage3Class}">{hdTeamActualSlaPercentage3}</td>
+            <td class="{hdTeamActualSlaPercentage4Class}">{hdTeamActualSlaPercentage4}</td>
+            <td class="{hdTeamActualSlaPercentage5Class}">{hdTeamActualSlaPercentage5}</td>
+            <td class="{hdTeamActualSlaPercentage6Class}">{hdTeamActualSlaPercentage6}</td>
+            <td class="{hdTeamActualSlaPercentage7Class}">{hdTeamActualSlaPercentage7}</td>
+            <td class="{hdTeamActualSlaPercentage8Class}">{hdTeamActualSlaPercentage8}</td>
+            <td class="{hdTeamActualSlaPercentage9Class}">{hdTeamActualSlaPercentage9}</td>
+            <td class="{hdTeamActualSlaPercentage10Class}">{hdTeamActualSlaPercentage10}</td>
+            <td class="{hdTeamActualSlaPercentage11Class}">{hdTeamActualSlaPercentage11}</td>
+            <td class="{hdTeamActualSlaPercentage12Class}">{hdTeamActualSlaPercentage12}</td>
+        </tr>
+        <tr>
+            <th>HD Fix Hours</th>
+            <td>{hdTeamTargetFixHours}</td>
+            <td class="{hdTeamActualFixHours1Class}">{hdTeamActualFixHours1}</td>
+            <td class="{hdTeamActualFixHours2Class}">{hdTeamActualFixHours2}</td>
+            <td class="{hdTeamActualFixHours3Class}">{hdTeamActualFixHours3}</td>
+            <td class="{hdTeamActualFixHours4Class}">{hdTeamActualFixHours4}</td>
+            <td class="{hdTeamActualFixHours5Class}">{hdTeamActualFixHours5}</td>
+            <td class="{hdTeamActualFixHours6Class}">{hdTeamActualFixHours6}</td>
+            <td class="{hdTeamActualFixHours7Class}">{hdTeamActualFixHours7}</td>
+            <td class="{hdTeamActualFixHours8Class}">{hdTeamActualFixHours8}</td>
+            <td class="{hdTeamActualFixHours9Class}">{hdTeamActualFixHours9}</td>
+            <td class="{hdTeamActualFixHours10Class}">{hdTeamActualFixHours10}</td>
+            <td class="{hdTeamActualFixHours11Class}">{hdTeamActualFixHours11}</td>
+            <td class="{hdTeamActualFixHours12Class}">{hdTeamActualFixHours12}</td>
+        </tr>
+        <tr>
+            <th>HD Qty</th>
+            <td>{hdTeamTargetFixQtyPerMonth}</td>
+            <td class="{hdTeamActualFixQtyPerMonth1Class}">{hdTeamActualFixQtyPerMonth1}</td>
+            <td class="{hdTeamActualFixQtyPerMonth2Class}">{hdTeamActualFixQtyPerMonth2}</td>
+            <td class="{hdTeamActualFixQtyPerMonth3Class}">{hdTeamActualFixQtyPerMonth3}</td>
+            <td class="{hdTeamActualFixQtyPerMonth4Class}">{hdTeamActualFixQtyPerMonth4}</td>
+            <td class="{hdTeamActualFixQtyPerMonth5Class}">{hdTeamActualFixQtyPerMonth5}</td>
+            <td class="{hdTeamActualFixQtyPerMonth6Class}">{hdTeamActualFixQtyPerMonth6}</td>
+            <td class="{hdTeamActualFixQtyPerMonth7Class}">{hdTeamActualFixQtyPerMonth7}</td>
+            <td class="{hdTeamActualFixQtyPerMonth8Class}">{hdTeamActualFixQtyPerMonth8}</td>
+            <td class="{hdTeamActualFixQtyPerMonth9Class}">{hdTeamActualFixQtyPerMonth9}</td>
+            <td class="{hdTeamActualFixQtyPerMonth10Class}">{hdTeamActualFixQtyPerMonth10}</td>
+            <td class="{hdTeamActualFixQtyPerMonth11Class}">{hdTeamActualFixQtyPerMonth11}</td>
+            <td class="{hdTeamActualFixQtyPerMonth12Class}">{hdTeamActualFixQtyPerMonth12}</td>
+        </tr>
 
-      <tr>
-        <td colspan="13"><HR></td>
-      </tr>
+        <tr>
+            <td colspan="13">&nbsp;</td>
+        </tr>
 
-      <tr>
-        <th>Imp SLA %</th>
-        <td>{imTeamTargetSlaPercentage}</td>
-        <td class="{imTeamActualSlaPercentage1Class}">{imTeamActualSlaPercentage1}</td>
-        <td class="{imTeamActualSlaPercentage2Class}">{imTeamActualSlaPercentage2}</td>
-        <td class="{imTeamActualSlaPercentage3Class}">{imTeamActualSlaPercentage3}</td>
-        <td class="{imTeamActualSlaPercentage4Class}">{imTeamActualSlaPercentage4}</td>
-        <td class="{imTeamActualSlaPercentage5Class}">{imTeamActualSlaPercentage5}</td>
-        <td class="{imTeamActualSlaPercentage6Class}">{imTeamActualSlaPercentage6}</td>
-        <td class="{imTeamActualSlaPercentage7Class}">{imTeamActualSlaPercentage7}</td>
-        <td class="{imTeamActualSlaPercentage8Class}">{imTeamActualSlaPercentage8}</td>
-        <td class="{imTeamActualSlaPercentage9Class}">{imTeamActualSlaPercentage9}</td>
-        <td class="{imTeamActualSlaPercentage10Class}">{imTeamActualSlaPercentage10}</td>
-        <td class="{imTeamActualSlaPercentage11Class}">{imTeamActualSlaPercentage11}</td>
-        <td class="{imTeamActualSlaPercentage12Class}">{imTeamActualSlaPercentage12}</td>
-      </tr>
-      <tr>
-        <th>Imp Fix Hours</th>
-        <td>{imTeamTargetFixHours}</td>
-        <td class="{imTeamActualFixHours1Class}">{imTeamActualFixHours1}</td>
-        <td class="{imTeamActualFixHours2Class}">{imTeamActualFixHours2}</td>
-        <td class="{imTeamActualFixHours3Class}">{imTeamActualFixHours3}</td>
-        <td class="{imTeamActualFixHours4Class}">{imTeamActualFixHours4}</td>
-        <td class="{imTeamActualFixHours5Class}">{imTeamActualFixHours5}</td>
-        <td class="{imTeamActualFixHours6Class}">{imTeamActualFixHours6}</td>
-        <td class="{imTeamActualFixHours7Class}">{imTeamActualFixHours7}</td>
-        <td class="{imTeamActualFixHours8Class}">{imTeamActualFixHours8}</td>
-        <td class="{imTeamActualFixHours9Class}">{imTeamActualFixHours9}</td>
-        <td class="{imTeamActualFixHours10Class}">{imTeamActualFixHours10}</td>
-        <td class="{imTeamActualFixHours11Class}">{imTeamActualFixHours11}</td>
-        <td class="{imTeamActualFixHours12Class}">{imTeamActualFixHours12}</td>
-      </tr>
-      <tr>
-        <th>Imp Qty</th>
-        <td>{imTeamTargetFixQtyPerMonth}</td>
-        <td class="{imTeamActualFixQtyPerMonth1Class}">{imTeamActualFixQtyPerMonth1}</td>
-        <td class="{imTeamActualFixQtyPerMonth2Class}">{imTeamActualFixQtyPerMonth2}</td>
-        <td class="{imTeamActualFixQtyPerMonth3Class}">{imTeamActualFixQtyPerMonth3}</td>
-        <td class="{imTeamActualFixQtyPerMonth4Class}">{imTeamActualFixQtyPerMonth4}</td>
-        <td class="{imTeamActualFixQtyPerMonth5Class}">{imTeamActualFixQtyPerMonth5}</td>
-        <td class="{imTeamActualFixQtyPerMonth6Class}">{imTeamActualFixQtyPerMonth6}</td>
-        <td class="{imTeamActualFixQtyPerMonth7Class}">{imTeamActualFixQtyPerMonth7}</td>
-        <td class="{imTeamActualFixQtyPerMonth8Class}">{imTeamActualFixQtyPerMonth8}</td>
-        <td class="{imTeamActualFixQtyPerMonth9Class}">{imTeamActualFixQtyPerMonth9}</td>
-        <td class="{imTeamActualFixQtyPerMonth10Class}">{imTeamActualFixQtyPerMonth10}</td>
-        <td class="{imTeamActualFixQtyPerMonth11Class}">{imTeamActualFixQtyPerMonth11}</td>
-        <td class="{imTeamActualFixQtyPerMonth12Class}">{imTeamActualFixQtyPerMonth12}</td>
-      </tr>
-    </tbody>
-  </table>	
+        <tr>
+            <th>Esc SLA %</th>
+            <td>{esTeamTargetSlaPercentage}</td>
+            <td class="{esTeamActualSlaPercentage1Class}">{esTeamActualSlaPercentage1}</td>
+            <td class="{esTeamActualSlaPercentage2Class}">{esTeamActualSlaPercentage2}</td>
+            <td class="{esTeamActualSlaPercentage3Class}">{esTeamActualSlaPercentage3}</td>
+            <td class="{esTeamActualSlaPercentage4Class}">{esTeamActualSlaPercentage4}</td>
+            <td class="{esTeamActualSlaPercentage5Class}">{esTeamActualSlaPercentage5}</td>
+            <td class="{esTeamActualSlaPercentage6Class}">{esTeamActualSlaPercentage6}</td>
+            <td class="{esTeamActualSlaPercentage7Class}">{esTeamActualSlaPercentage7}</td>
+            <td class="{esTeamActualSlaPercentage8Class}">{esTeamActualSlaPercentage8}</td>
+            <td class="{esTeamActualSlaPercentage9Class}">{esTeamActualSlaPercentage9}</td>
+            <td class="{esTeamActualSlaPercentage10Class}">{esTeamActualSlaPercentage10}</td>
+            <td class="{esTeamActualSlaPercentage11Class}">{esTeamActualSlaPercentage11}</td>
+            <td class="{esTeamActualSlaPercentage12Class}">{esTeamActualSlaPercentage12}</td>
+        </tr>
+        <tr>
+            <th>Esc Fix Hours</th>
+            <td>{esTeamTargetFixHours}</td>
+            <td class="{esTeamActualFixHours1Class}">{esTeamActualFixHours1}</td>
+            <td class="{esTeamActualFixHours2Class}">{esTeamActualFixHours2}</td>
+            <td class="{esTeamActualFixHours3Class}">{esTeamActualFixHours3}</td>
+            <td class="{esTeamActualFixHours4Class}">{esTeamActualFixHours4}</td>
+            <td class="{esTeamActualFixHours5Class}">{esTeamActualFixHours5}</td>
+            <td class="{esTeamActualFixHours6Class}">{esTeamActualFixHours6}</td>
+            <td class="{esTeamActualFixHours7Class}">{esTeamActualFixHours7}</td>
+            <td class="{esTeamActualFixHours8Class}">{esTeamActualFixHours8}</td>
+            <td class="{esTeamActualFixHours9Class}">{esTeamActualFixHours9}</td>
+            <td class="{esTeamActualFixHours10Class}">{esTeamActualFixHours10}</td>
+            <td class="{esTeamActualFixHours11Class}">{esTeamActualFixHours11}</td>
+            <td class="{esTeamActualFixHours12Class}">{esTeamActualFixHours12}</td>
+        </tr>
+        <tr>
+            <th>Esc Qty</th>
+            <td>{esTeamTargetFixQtyPerMonth}</td>
+            <td class="{esTeamActualFixQtyPerMonth1Class}">{esTeamActualFixQtyPerMonth1}</td>
+            <td class="{esTeamActualFixQtyPerMonth2Class}">{esTeamActualFixQtyPerMonth2}</td>
+            <td class="{esTeamActualFixQtyPerMonth3Class}">{esTeamActualFixQtyPerMonth3}</td>
+            <td class="{esTeamActualFixQtyPerMonth4Class}">{esTeamActualFixQtyPerMonth4}</td>
+            <td class="{esTeamActualFixQtyPerMonth5Class}">{esTeamActualFixQtyPerMonth5}</td>
+            <td class="{esTeamActualFixQtyPerMonth6Class}">{esTeamActualFixQtyPerMonth6}</td>
+            <td class="{esTeamActualFixQtyPerMonth7Class}">{esTeamActualFixQtyPerMonth7}</td>
+            <td class="{esTeamActualFixQtyPerMonth8Class}">{esTeamActualFixQtyPerMonth8}</td>
+            <td class="{esTeamActualFixQtyPerMonth9Class}">{esTeamActualFixQtyPerMonth9}</td>
+            <td class="{esTeamActualFixQtyPerMonth10Class}">{esTeamActualFixQtyPerMonth10}</td>
+            <td class="{esTeamActualFixQtyPerMonth11Class}">{esTeamActualFixQtyPerMonth11}</td>
+            <td class="{esTeamActualFixQtyPerMonth12Class}">{esTeamActualFixQtyPerMonth12}</td>
+        </tr>
+
+        <tr>
+            <td colspan="13">
+                <HR>
+            </td>
+        </tr>
+
+        <tr>
+            <th>Imp SLA %</th>
+            <td>{imTeamTargetSlaPercentage}</td>
+            <td class="{imTeamActualSlaPercentage1Class}">{imTeamActualSlaPercentage1}</td>
+            <td class="{imTeamActualSlaPercentage2Class}">{imTeamActualSlaPercentage2}</td>
+            <td class="{imTeamActualSlaPercentage3Class}">{imTeamActualSlaPercentage3}</td>
+            <td class="{imTeamActualSlaPercentage4Class}">{imTeamActualSlaPercentage4}</td>
+            <td class="{imTeamActualSlaPercentage5Class}">{imTeamActualSlaPercentage5}</td>
+            <td class="{imTeamActualSlaPercentage6Class}">{imTeamActualSlaPercentage6}</td>
+            <td class="{imTeamActualSlaPercentage7Class}">{imTeamActualSlaPercentage7}</td>
+            <td class="{imTeamActualSlaPercentage8Class}">{imTeamActualSlaPercentage8}</td>
+            <td class="{imTeamActualSlaPercentage9Class}">{imTeamActualSlaPercentage9}</td>
+            <td class="{imTeamActualSlaPercentage10Class}">{imTeamActualSlaPercentage10}</td>
+            <td class="{imTeamActualSlaPercentage11Class}">{imTeamActualSlaPercentage11}</td>
+            <td class="{imTeamActualSlaPercentage12Class}">{imTeamActualSlaPercentage12}</td>
+        </tr>
+        <tr>
+            <th>Imp Fix Hours</th>
+            <td>{imTeamTargetFixHours}</td>
+            <td class="{imTeamActualFixHours1Class}">{imTeamActualFixHours1}</td>
+            <td class="{imTeamActualFixHours2Class}">{imTeamActualFixHours2}</td>
+            <td class="{imTeamActualFixHours3Class}">{imTeamActualFixHours3}</td>
+            <td class="{imTeamActualFixHours4Class}">{imTeamActualFixHours4}</td>
+            <td class="{imTeamActualFixHours5Class}">{imTeamActualFixHours5}</td>
+            <td class="{imTeamActualFixHours6Class}">{imTeamActualFixHours6}</td>
+            <td class="{imTeamActualFixHours7Class}">{imTeamActualFixHours7}</td>
+            <td class="{imTeamActualFixHours8Class}">{imTeamActualFixHours8}</td>
+            <td class="{imTeamActualFixHours9Class}">{imTeamActualFixHours9}</td>
+            <td class="{imTeamActualFixHours10Class}">{imTeamActualFixHours10}</td>
+            <td class="{imTeamActualFixHours11Class}">{imTeamActualFixHours11}</td>
+            <td class="{imTeamActualFixHours12Class}">{imTeamActualFixHours12}</td>
+        </tr>
+        <tr>
+            <th>Imp Qty</th>
+            <td>{imTeamTargetFixQtyPerMonth}</td>
+            <td class="{imTeamActualFixQtyPerMonth1Class}">{imTeamActualFixQtyPerMonth1}</td>
+            <td class="{imTeamActualFixQtyPerMonth2Class}">{imTeamActualFixQtyPerMonth2}</td>
+            <td class="{imTeamActualFixQtyPerMonth3Class}">{imTeamActualFixQtyPerMonth3}</td>
+            <td class="{imTeamActualFixQtyPerMonth4Class}">{imTeamActualFixQtyPerMonth4}</td>
+            <td class="{imTeamActualFixQtyPerMonth5Class}">{imTeamActualFixQtyPerMonth5}</td>
+            <td class="{imTeamActualFixQtyPerMonth6Class}">{imTeamActualFixQtyPerMonth6}</td>
+            <td class="{imTeamActualFixQtyPerMonth7Class}">{imTeamActualFixQtyPerMonth7}</td>
+            <td class="{imTeamActualFixQtyPerMonth8Class}">{imTeamActualFixQtyPerMonth8}</td>
+            <td class="{imTeamActualFixQtyPerMonth9Class}">{imTeamActualFixQtyPerMonth9}</td>
+            <td class="{imTeamActualFixQtyPerMonth10Class}">{imTeamActualFixQtyPerMonth10}</td>
+            <td class="{imTeamActualFixQtyPerMonth11Class}">{imTeamActualFixQtyPerMonth11}</td>
+            <td class="{imTeamActualFixQtyPerMonth12Class}">{imTeamActualFixQtyPerMonth12}</td>
+        </tr>
+        </tbody>
+    </table>
 </form>
-<!-- End Template: ContractAnalysisReport.inc.html -->
+<br>
+<h1>SR Statistics</h1>
+<table border="0"
+       cellspacing="0"
+       cellpadding="1"
+>
+    <tr>
+        <td class="promptText">Customer Name</td>
+        <td>
+            <input
+                    type="hidden"
+                    name="customerID"
+                    id="customerID"
+                    value="{customerID}"
+            >
+            <input type="text"
+                   id="customerString"
+                   customer-picker
+            >
+        </td>
+    </tr>
+    <tr>
+        <td class="promptText">
+            <div align="right">Between</div>
+        </td>
+        <td>
+            <input type="text"
+                   id="startDate"
+                   size="10"
+                   maxlength="10"
+                   class="jqueryCalendar"
+                   autocomplete="off"
+            >
+            and <input
+                type="text"
+                id="endDate"
+                size="10"
+                maxlength="10"
+                class="jqueryCalendar"
+                autocomplete="off"
+        >
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <script>
+                let startDateInput = null;
+                let endDateInput = null;
+                let customerIdInput = null;
+                let dataTableTemplate = null;
+                let reportSectionElement = null;
+                $(() => {
+                    Mustache.tags = ['{%', '%}'];
+                    startDateInput = document.getElementById('startDate');
+                    endDateInput = document.getElementById('endDate');
+                    customerIdInput = document.getElementById('customerID');
+                    dataTableTemplate = document.getElementById('reportData').innerHTML;
+                    reportSectionElement = document.getElementById('reportSection');
+                });
+
+
+                function showStats() {
+                    if (!customerIdInput.value) {
+                        alert('There is no customer ID set, please select a customer');
+                        return;
+                    }
+
+                    const customerId = customerIdInput.value;
+                    const startDateString = startDateInput.value;
+                    const endDateString = endDateInput.value;
+
+                    const commonParams = {};
+
+                    if (startDateString) {
+                        commonParams.startDate = moment(startDateString, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    }
+
+                    if (endDateString) {
+                        commonParams.endDate = moment(endDateString, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                    }
+                    const getUrl = window.location;
+                    const baseUrl = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+                    const statsURL = new URL('/internal-api/stats', baseUrl);
+                    const breakDownStatsURL = new URL('/internal-api/stats', baseUrl);
+                    breakDownStatsURL.searchParams.append('breakDown', 'true');
+                    const customerStatsURL = new URL('/internal-api/customerStats/' + customerId, baseUrl);
+                    const customerBreakDownStatsURL = new URL('/internal-api/customerStats/' + customerId, baseUrl);
+                    customerBreakDownStatsURL.searchParams.append('breakDown', 'true');
+                    Object.keys(commonParams).forEach(key => {
+                        statsURL.searchParams.append(key, commonParams[key]);
+                        breakDownStatsURL.searchParams.append(key, commonParams[key]);
+                        customerStatsURL.searchParams.append(key, commonParams[key]);
+                        customerBreakDownStatsURL.searchParams.append(key, commonParams[key]);
+                    });
+                    reportSectionElement.innerHTML = "<div class='loading' style='position: absolute'></div>";
+                    Promise.all([
+
+                        fetch(customerBreakDownStatsURL).then(response => {
+                            return response.json();
+                        }),
+                        fetch(customerStatsURL).then(response => {
+                            return response.json();
+                        }),
+                        fetch(breakDownStatsURL).then(response => {
+                            return response.json();
+                        }),
+                        fetch(statsURL).then(response => {
+                            return response.json();
+                        })
+                    ]).then(getContext)
+                        .then((data) => {
+                            const context = {item: data};
+                            reportSectionElement.innerHTML = Mustache.to_html(dataTableTemplate, context);
+                        })
+                }
+
+                function getContext([customerBreakDown, customerSummarised, breakDown, summarised]) {
+
+                    const higherIsBetter = (customer, allCustomers) => {
+                        return customer >= allCustomers ? "performance-green" : 'performance-warn'
+                    };
+                    const lowerIsBetter = (customer, allCustomers) => {
+                        return customer <= allCustomers ? "performance-green" : 'performance-warn'
+                    };
+                    const noColour = (customer, allCustomers) => {
+                        return null;
+                    };
+
+                    const labels = {
+                        "raised": {
+                            label: "Total SRs Raised",
+                            format: x => x,
+                            assignClass: noColour
+                        },
+                        "fixed": {
+                            label: "Total SRs fixed",
+                            format: x => x,
+                            assignClass: noColour
+                        },
+                        "responseTime": {
+                            label: "Average Response Time",
+                            format: x => x.toFixed(2),
+                            assignClass: lowerIsBetter
+                        },
+                        "slaMet": {
+                            label: "% of SLAs Met",
+                            format: x => (x * 100).toFixed(2),
+                            assignClass: higherIsBetter
+                        },
+                        "closedWithin8Hours": {
+                            label: "% Closed within 8 hours of being raised",
+                            format: x => (x * 100).toFixed(2),
+                            assignClass: higherIsBetter
+                        },
+                        "reopened": {
+                            label: "% Reopened SRs",
+                            format: x => (x * 100).toFixed(2),
+                            assignClass: lowerIsBetter
+                        },
+                        "avgChargeableTime": {
+                            label: "Average Time of work carried out",
+                            format: x => x.toFixed(2),
+                            assignClass: lowerIsBetter
+                        },
+                        "avgTimeAwaitingCNC": {
+                            label: "Average Time Awaiting CNC",
+                            format: x => x.toFixed(2),
+                            assignClass: lowerIsBetter
+                        },
+                        "avgTimeFromRaiseToFixHours": {
+                            label: "Average Time from initial to Fixed",
+                            format: x => x.toFixed(2),
+                            assignClass: lowerIsBetter
+                        },
+                    };
+                    const customersData = [];
+                    const allData = [];
+                    const data = [
+                        {name: 'Customer', data: customersData},
+                        {name: 'All Customers', data: allData}
+                    ];
+                    Object.keys(summarised).forEach(key => {
+                        if (!labels[key]) {
+                            return;
+                        }
+                        const allP1 = breakDown.find(x => x.priority === 1);
+                        const allP2 = breakDown.find(x => x.priority === 2);
+                        const allP3 = breakDown.find(x => x.priority === 3);
+                        const allP4 = breakDown.find(x => x.priority === 4);
+                        const customerP1 = customerBreakDown.find(x => x.priority === 1);
+                        const customerP2 = customerBreakDown.find(x => x.priority === 2);
+                        const customerP3 = customerBreakDown.find(x => x.priority === 3);
+                        const customerP4 = customerBreakDown.find(x => x.priority === 4);
+                        customersData.push(
+                            {
+                                "description": labels[key].label,
+                                "p1": customerP1 ? labels[key].format(customerP1[key]) : null,
+                                "p1Class": customerP1 ? labels[key].assignClass(customerP1[key], allP1[key]) : null,
+                                "p2": customerP2 ? labels[key].format(customerP2[key]) : null,
+                                "p2Class": customerP2 ? labels[key].assignClass(customerP2[key], allP2[key]) : null,
+                                "p3": customerP3 ? labels[key].format(customerP3[key]) : null,
+                                "p3Class": customerP3 ? labels[key].assignClass(customerP3[key], allP3[key]) : null,
+                                "p4": customerP4 ? labels[key].format(customerP4[key]) : null,
+                                "p4Class": customerP4 ? labels[key].assignClass(customerP4[key], allP4[key]) : null,
+                                "all": labels[key].format(customerSummarised[key]),
+                                "allClass": labels[key].assignClass(customerSummarised[key], summarised[key])
+                            }
+                        );
+                        allData.push(
+                            {
+                                "description": labels[key].label,
+                                "p1": allP1 ? labels[key].format(allP1[key]) : null,
+                                "p2": allP2 ? labels[key].format(allP2[key]) : null,
+                                "p3": allP3 ? labels[key].format(allP3[key]) : null,
+                                "p4": allP4 ? labels[key].format(allP4[key]) : null,
+                                "all": labels[key].format(summarised[key]),
+                            }
+                        )
+
+                    });
+                    return data;
+                }
+            </script>
+            <button onclick="showStats()">Go!</button>
+        </td>
+    </tr>
+</table>
+<style>
+    #reportSection th {
+        width: 30px;
+    }
+</style>
+<div id="reportSection">
+
+</div>
+<script id="reportData"
+        type="text/template"
+>
+    {% #item %}
+    <br>
+    <h3>{% name %}</h3>
+    <table>
+        <thead>
+        <tr>
+            <th></th>
+            <th>P1</th>
+            <th>P2</th>
+            <th>P3</th>
+            <th>P4</th>
+            <th>All</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% #data %}
+        <tr>
+            <td>
+                {% description %}
+            </td>
+            <td class="{% p1Class %}"> {% p1 %}</td>
+            <td class="{% p2Class %}"> {% p2 %}</td>
+            <td class="{% p3Class %}"> {% p3 %}</td>
+            <td class="{% p4Class %}"> {% p4 %}</td>
+            <td class="{% allClass %}">{% all %}</td>
+        </tr>
+        {% /data %}
+        </tbody>
+    </table>
+    {% /item %}
+</script>

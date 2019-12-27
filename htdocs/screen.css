@@ -556,6 +556,10 @@ span#imRemainMinutes {
 
 }
 
+.performance-green {
+    background-color: #B2FFB2;
+}
+
 table#team-performance td, th {
     text-align: right;
 }
@@ -596,6 +600,7 @@ table#suspended {
 table#excluded {
     background-color: #a2bf95;
 }
+
 
 .hiddenText {
     text-align: center;

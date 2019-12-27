@@ -1690,6 +1690,20 @@ class BUActivity extends Business
             $totalTravelHours
         );
 
+        if (in_array($dbeProblem->getValue(DBEProblem::status), ["F", "C"])) {
+            /** @var $db dbSweetcode */
+            global $db;
+            $db->preparedQuery(
+                'select getOpenHours(?)',
+                [["type" => "i", "value" => $dbeProblem->getValue(DBEProblem::problemID)]]
+            );
+            $db->next_record(MYSQLI_NUM);
+            $dbeProblem->setValue(
+                DBEProblem::openHours,
+                $db->Record[0]
+            );
+        }
+
         $dbeProblem->setValue(
             DBEJProblem::chargeableActivityDurationHours,
             $chargeableHours
@@ -4272,6 +4286,17 @@ class BUActivity extends Business
             'N'
         );
 
+        /** @var $db dbSweetcode */
+        global $db;
+        $db->preparedQuery(
+            'select getOpenHours(?)',
+            [["type" => "i", "value" => $dbeProblem->getValue(DBEProblem::problemID)]]
+        );
+        $db->next_record(MYSQLI_NUM);
+        $dbeProblem->setValue(
+            DBEProblem::openHours,
+            $db->Record[0]
+        );
         $dbeProblem->updateRow();
 
         $this->sendEmailToCustomer(
@@ -8860,6 +8885,21 @@ is currently a balance of ';
             DBEJProblem::completeDate,
             $buProblemSLA->getCompleteDate()
         );
+
+        if (in_array($dbeProblem->getValue(DBEProblem::status), ["F", "C"])) {
+            /** @var $db dbSweetcode */
+            global $db;
+            $db->preparedQuery(
+                'select getOpenHours(?)',
+                [["type" => "i", "value" => $dbeProblem->getValue(DBEProblem::problemID)]]
+            );
+            $db->next_record(MYSQLI_NUM);
+            $dbeProblem->setValue(
+                DBEProblem::openHours,
+                $db->Record[0]
+            );
+        }
+
         $dbeProblem->updateRow();
 
         $this->closeActivitiesWithEndTime($problemID);
@@ -8889,6 +8929,21 @@ is currently a balance of ';
             $resolutionSummary,
             $fixedUserID == USER_SYSTEM
         );
+
+
+        /** @var $db dbSweetcode */
+        global $db;
+        $db->preparedQuery(
+            'select getOpenHours(?)',
+            [["type" => "i", "value" => $dbeProblem->getValue(DBEProblem::problemID)]]
+        );
+        $db->next_record(MYSQLI_NUM);
+        $dbeProblem->setValue(
+            DBEProblem::openHours,
+            $db->Record[0]
+        );
+        $dbeProblem->updateRow();
+
 
         $this->sendMonitoringEmails(
             $this->getLastActivityInProblem($problemID)->getValue(DBEJCallActivity::callActivityID)

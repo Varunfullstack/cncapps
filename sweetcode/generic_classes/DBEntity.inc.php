@@ -35,6 +35,7 @@
  * has been applied to POST, GET and COOKIE arrays)
  * This means we can be safe to always apply mysql_escape_string() to values going into DB without doubling-up.
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/DataAccess.inc.php");
 define(
     "DBE_DB_COLUMN_NAME",
@@ -47,7 +48,7 @@ class DBEntity extends DataAccess
     public const ORDER_DIRECTION_DESCENDING = "DESC";            // Initialised PHPLib database object
     /** @var dbSweetcode|MDB_PEAR_PROXY|mixed|object|PDO */
     public $pkdb;// SQL query statement
-    /** @var dbSweetcode|MDB_PEAR_PROXY|mixed|object|PDO */
+    /** @var dbSweetcode */
     public $db;    // RDBMS table name
     public $queryString = "";    // For debug purposes - TRUE causes all SQL statements to be output
     public $tableName = "";    // For debug purposes - TRUE causes all SQL statements to be output
@@ -192,6 +193,10 @@ class DBEntity extends DataAccess
             $this->firstRowFetched = FALSE;
             $ret = TRUE;
         } else {
+            global $server_type;
+            if ($server_type == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
+                var_dump($this->db->Error);
+            }
             $this->raiseError("Query problem: " . $this->db->Error);
             $ret = FALSE;
         }

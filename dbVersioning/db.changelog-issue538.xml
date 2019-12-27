@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue538-0">
+        <tagDatabase tag="issue538"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue538-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="openHours"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="openHours" type="decimal(10,2)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <sql>
+            update problem
+            set openHours = getOpenHours(pro_problemno)
+            where date(pro_date_raised) > '2016-12-31';
+        </sql>
+        <rollback>
+            <dropColumn tableName="problem" columnName="openHours"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
