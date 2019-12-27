@@ -43,7 +43,7 @@ This project changes will be shown here.
 - Offsite Replication Checks Suspended Until doesn't show the value entered.
 
 ## [v3.8.0] - 2019-11-29
-### Added 
+### Added
 - Issue 680 - Quick Create Sales Request
 - Issue 659 - Record daily replication / backup targets in database
 - Issue 677 - Sales Passwords list
