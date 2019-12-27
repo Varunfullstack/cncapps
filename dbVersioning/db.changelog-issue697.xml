@@ -24,4 +24,33 @@
             </sql>
         </rollback>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue697-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="team" columnName="leaderId"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="team">
+            <column name="leaderId" type="int(11)">
+                <constraints nullable="false" foreignKeyName="fk_consultant_id" referencedTableName="consultant"
+                             referencedColumnNames="cns_consno"/>
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="team" columnName="leaderId"/>
+        </rollback>
+        <sql>
+            update team
+            set leaderId = CASE teamID
+                               WHEN 1 THEN 85
+                               WHEN 2 THEN 99
+                               WHEN 4 THEN 50
+                               when 5 then 47
+                               else 2
+                END
+        </sql>
+        <rollback/>
+    </changeSet>
+
+
 </databaseChangeLog>
