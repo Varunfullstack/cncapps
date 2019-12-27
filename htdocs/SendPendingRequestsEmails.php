@@ -148,8 +148,8 @@ function processTimeRequestsEmails()
                 $storeArray = &$pendingESRequests;
                 break;
             case 4:
-                $usedMinutes = $buActivity->getIMTeamUsedTime($problemID);
-                $assignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
+                $usedMinutes = $buActivity->getSPTeamUsedTime($problemID);
+                $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
                 $teamName = 'Implementation';
                 $storeArray = &$pendingIMRequests;
         }

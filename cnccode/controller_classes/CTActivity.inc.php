@@ -3363,13 +3363,16 @@ class CTActivity extends CTCNC
                 $this->updateSession('queueNo', 2);
                 $isAddToQueue = true;
             }
-            if ($this->getParam("imtQ")) {
+            if ($this->getParam("smallProjectsQueue")) {
                 $this->updateSession('queueNo', 3);
                 $isAddToQueue = true;
             }
-
             if ($this->getParam('salesQ')) {
                 $this->updateSession('queueNo', 4);
+                $isAddToQueue = true;
+            }
+            if ($this->getParam("projectsQueue")) {
+                $this->updateSession('queueNo', 5);
                 $isAddToQueue = true;
             }
 
@@ -4303,7 +4306,7 @@ class CTActivity extends CTCNC
         $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
         $hdUsedMinutes = $this->buActivity->getHDTeamUsedTime($problemID);
         $esUsedMinutes = $this->buActivity->getESTeamUsedTime($problemID);
-        $imUsedMinutes = $this->buActivity->getIMTeamUsedTime($problemID);
+        $imUsedMinutes = $this->buActivity->getSPTeamUsedTime($problemID);
         $hdUsedMinutesNotInclusive = $this->buActivity->getHDTeamUsedTime(
             $problemID,
             $callActivityID
@@ -4312,7 +4315,7 @@ class CTActivity extends CTCNC
             $problemID,
             $callActivityID
         );
-        $imUsedMinutesNotInclusive = $this->buActivity->getIMTeamUsedTime(
+        $imUsedMinutesNotInclusive = $this->buActivity->getSPTeamUsedTime(
             $problemID,
             $callActivityID
         );
@@ -4327,7 +4330,7 @@ class CTActivity extends CTCNC
 
         $hdAssignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
         $esAssignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
-        $imAssignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
+        $imAssignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
 
 
         $urlLinkedSalesOrder =
@@ -5028,11 +5031,11 @@ class CTActivity extends CTCNC
                             }
 
                             if ($teamID == 4) {
-                                $usedTime = $this->buActivity->getIMTeamUsedTime(
+                                $usedTime = $this->buActivity->getSPTeamUsedTime(
                                     $problemID,
                                     $callActivityID
                                 );
-                                $allocatedTime = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
+                                $allocatedTime = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
                             }
 
                             if ($usedTime + $durationMinutes > $allocatedTime) {
@@ -6488,8 +6491,8 @@ class CTActivity extends CTCNC
                 $teamName = 'Escalation';
                 break;
             case 4:
-                $usedMinutes = $this->buActivity->getIMTeamUsedTime($problemID);
-                $assignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
+                $usedMinutes = $this->buActivity->getSPTeamUsedTime($problemID);
+                $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
                 $teamName = 'Implementation';
         }
 

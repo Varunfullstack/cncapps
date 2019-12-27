@@ -367,7 +367,7 @@ class CTBookSalesVisit extends CTCNC
             $buActivity->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
         );
         $dbeProblem->setValue(
-            DBEProblem::imLimitMinutes,
+            DBEProblem::smallProjectsTeamLimitMinutes,
             $buActivity->dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
         );
         $dbeProblem->setValue(

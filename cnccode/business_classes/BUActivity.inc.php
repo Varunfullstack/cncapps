@@ -146,9 +146,9 @@ class BUActivity extends Business
         array(
             "1" => "Helpdesk",
             "2" => "Escalations",
-            "3" => "Implementations",
+            "3" => "Small Projecst",
             "4" => "Sales",
-            "5" => "Managers",
+            "5" => "Projects",
             "6" => "Fixed",
             "7" => "Future"
         );
@@ -1032,9 +1032,9 @@ class BUActivity extends Business
                     }
                     break;
                 case 4:
-                    if ($dbeProblem->getValue(DBEProblem::imLimitMinutes) <= 0) {
+                    if ($dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes) <= 0) {
                         $dbeProblem->setValue(
-                            DBEProblem::imLimitMinutes,
+                            DBEProblem::smallProjectsTeamLimitMinutes,
                             5
                         );
                     }
@@ -3112,8 +3112,8 @@ class BUActivity extends Business
                 $dbeProblem->getValue(DBEProblem::hdLimitMinutes) + 3
             );
             $dbeProblem->setValue(
-                DBEProblem::imLimitMinutes,
-                $dbeProblem->getValue(DBEProblem::imLimitMinutes) + 3
+                DBEProblem::smallProjectsTeamLimitMinutes,
+                $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes) + 3
             );
             $dbeProblem->updateRow();
         }
@@ -3295,11 +3295,11 @@ class BUActivity extends Business
             );
         } else {
             $this->dbeProblem->setValue(
-                DBEProblem::imLimitMinutes,
-                $this->dbeProblem->getValue(DBEProblem::imLimitMinutes) + $minutes
+                DBEProblem::smallProjectsTeamLimitMinutes,
+                $this->dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes) + $minutes
             );
             $this->dbeProblem->setValue(
-                DBEProblem::imTimeAlertFlag,
+                DBEProblem::smallProjectsTeamTimeAlertFlag,
                 'N'
             );
         }
@@ -5402,7 +5402,7 @@ is currently a balance of ';
             $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
         );
         $dbeProblem->setValue(
-            DBEProblem::imLimitMinutes,
+            DBEProblem::smallProjectsTeamLimitMinutes,
             $this->dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
         );
         $dbeProblem->setValue(
@@ -6762,7 +6762,7 @@ is currently a balance of ';
             $buHeader = new BUHeader($this);
             $dsHeader = new DataSet($this);
             $buHeader->getHeader($dsHeader);
-            $dbeProblem->setValue(DBEProblem::imLimitMinutes, $dsHeader->getValue(DBEHeader::imTeamLimitMinutes));
+            $dbeProblem->setValue(DBEProblem::smallProjectsTeamLimitMinutes, $dsHeader->getValue(DBEHeader::imTeamLimitMinutes));
             $dsOrdlineBudget = new DataSet($this);
             $buSalesOrder->getOrderByOrdheadID(
                 $ordheadID,
@@ -6792,7 +6792,7 @@ is currently a balance of ';
             }
 
             if ($normalMinutes > 0) {
-                $dbeProblem->setValue(DBEProblem::imLimitMinutes, $normalMinutes);
+                $dbeProblem->setValue(DBEProblem::smallProjectsTeamLimitMinutes, $normalMinutes);
             }
         }
 
@@ -7624,7 +7624,7 @@ is currently a balance of ';
             $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
         );
         $dbeProblem->setValue(
-            DBEProblem::imLimitMinutes,
+            DBEProblem::smallProjectsTeamLimitMinutes,
             $this->dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
         );
         $dbeProblem->setValue(
@@ -8818,8 +8818,8 @@ is currently a balance of ';
                 break;
             case 4:
                 $dbeProblem->setValue(
-                    DBEProblem::imLimitMinutes,
-                    $dbeProblem->getValue(DBEProblem::imLimitMinutes) + $minutesToAdd
+                    DBEProblem::smallProjectsTeamLimitMinutes,
+                    $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes) + $minutesToAdd
                 );
         }
 
@@ -9759,7 +9759,7 @@ is currently a balance of ';
                 $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
             );
             $dbeProblem->setValue(
-                DBEProblem::imLimitMinutes,
+                DBEProblem::smallProjectsTeamLimitMinutes,
                 $this->dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
             );
             $dbeProblem->setValue(
@@ -10414,7 +10414,7 @@ is currently a balance of ';
         );
     }
 
-    public function getIMTeamUsedTime($problemID,
+    public function getSPTeamUsedTime($problemID,
                                       $excludedActivityID = null
     )
     {
@@ -10541,7 +10541,7 @@ is currently a balance of ';
                 $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
             );
             $dbeProblem->setValue(
-                DBEProblem::imLimitMinutes,
+                DBEProblem::smallProjectsTeamLimitMinutes,
                 $this->dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
             );
             $dbeProblem->setValue(
