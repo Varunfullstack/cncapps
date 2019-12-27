@@ -76,18 +76,18 @@ class BUTeamPerformance extends Business
 
         }
         /*
-        Implementations team (team level 3)
+        Small Projects team (team level 3)
         */
-        $imTeamTotal = $this->getCount($year, $month, 3);
+        $smallProjectsTeamTotal = $this->getCount($year, $month, 3);
 
-        $imTeamWithinSla = $this->getCount($year, $month, 3, true);
+        $smallProjectsTeamWithinSla = $this->getCount($year, $month, 3, true);
 
-        $imTeamFixAverageHours = $this->getFixAverageHours($year, $month, 3);
+        $smallProjectsTeamFixAverageHours = $this->getFixAverageHours($year, $month, 3);
 
-        if ($imTeamTotal > 0) {
-            $imTeamActualSlaPercentage = $imTeamWithinSla / $imTeamTotal * 100;
+        if ($smallProjectsTeamTotal > 0) {
+            $smallProjectsTeamActualSlaPercentage = $smallProjectsTeamWithinSla / $smallProjectsTeamTotal * 100;
         } else {
-            $imTeamActualSlaPercentage = 100;
+            $smallProjectsTeamActualSlaPercentage = 100;
 
         }
 
@@ -112,9 +112,9 @@ class BUTeamPerformance extends Business
                 'smallProjectsTeamTargetSlaPercentage'  => $dsHeader->getValue(DBEHeader::smallProjectsTeamTargetSlaPercentage),
                 'smallProjectsTeamTargetFixHours'       => $dsHeader->getValue(DBEHeader::smallProjectsTeamTargetFixHours),
                 'smallProjectsTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEHeader::smallProjectsTeamTargetFixQtyPerMonth),
-                'imTeamActualSlaPercentage'  => $imTeamActualSlaPercentage,
-                'imTeamActualFixHours'       => $imTeamFixAverageHours,
-                'imTeamActualFixQtyPerMonth' => $this->getFixCount($year, $month, 3)
+                'smallProjectsTeamActualSlaPercentage'  => $smallProjectsTeamActualSlaPercentage,
+                'smallProjectsTeamActualFixHours'       => $smallProjectsTeamFixAverageHours,
+                'smallProjectsTeamActualFixQtyPerMonth' => $this->getFixCount($year, $month, 3)
             );
 
         $this->updatePerformanceRecord($record);
@@ -327,12 +327,19 @@ class BUTeamPerformance extends Business
           AVG(`esTeamActualFixHours`) AS esTeamActualFixHours,
           SUM(`esTeamActualFixQtyPerMonth`) AS esTeamActualFixQty,
 
-          AVG(`imTeamTargetSlaPercentage`) AS imTeamTargetSlaPercentage,
+          AVG(`imTeamTargetSlaPercentage`) AS smallProjectsTeamTargetSlaPercentage,
           AVG(`imTeamTargetFixHours`) AS smallProjectsTeamTargetFixHours,
-          SUM(`imTeamTargetFixQtyPerMonth`) AS imTeamTargetFixQty,
-          AVG(`imTeamActualSlaPercentage`) AS imTeamActualSlaPercentage,
-          AVG(`imTeamActualFixHours`) AS imTeamActualFixHours,
-          SUM(`imTeamActualFixQtyPerMonth`) AS imTeamActualFixQty
+          SUM(`imTeamTargetFixQtyPerMonth`) AS smallProjectsTeamTargetFixQty,
+          AVG(`imTeamActualSlaPercentage`) AS smallProjectsTeamActualSlaPercentage,
+          AVG(`imTeamActualFixHours`) AS smallProjectsTeamActualFixHours,
+          SUM(`imTeamActualFixQtyPerMonth`) AS smallProjectsTeamActualFixQty,
+          
+          AVG(`projectTeamTargetSlaPercentage`) AS projectTeamTargetSlaPercentage,
+          AVG(`projectTeamTargetFixHours`) AS projectTeamTargetFixHours,
+          SUM(`projectTeamTargetFixQtyPerMonth`) AS projectTeamTargetFixQty,
+          AVG(`projectTeamActualSlaPercentage`) AS projectTeamActualSlaPercentage,
+          AVG(`projectTeamActualFixHours`) AS projectTeamActualFixHours,
+          SUM(`projectTeamActualFixQtyPerMonth`) AS projectTeamActualFixQty
         FROM
           `team_performance`
         WHERE
@@ -348,9 +355,12 @@ class BUTeamPerformance extends Business
           END
         )";
 
+        var_dump($sql);
         $statement = $this->connection->prepare($sql);
 
         $statement->execute(array($year));
+
+        var_dump($statement->errorInfo());
 
         return $statement->fetchAll(); // an array of all records for year
 

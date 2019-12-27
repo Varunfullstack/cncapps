@@ -123,7 +123,7 @@ class CTTimeRequestDashboard extends CTCNC
                 case 4:
                     $usedMinutes = $buActivity->getSPTeamUsedTime($problemID);
                     $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
-                    $teamName = 'Implementation';
+                    $teamName = 'Small Projects';
             }
 
             $leftOnBudget = $assignedMinutes - $usedMinutes;

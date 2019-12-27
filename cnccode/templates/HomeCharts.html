@@ -116,14 +116,14 @@
                     var dataTable = new google.visualization.DataTable();
                     dataTable.addColumn('date', 'Dates');
                     dataTable.addColumn('number', 'Hours Logged');
-                    dataTable.addColumn({type:'string', role:'style'});
+                    dataTable.addColumn({type: 'string', role: 'style'});
 
                     dataTable.addRows(
                         item.dataPoints.map(function (row) {
                             return [
                                 new Date(row['date']),
                                 row['loggedHours'],
-                                row['isHolidays'] ? 'green': null,
+                                row['isHolidays'] ? 'green' : null,
                             ]
                         })
                     );
@@ -216,7 +216,8 @@
     >Help Desk Team
     </option>
     <option value="2">Escalations Team</option>
-    <option value="3">Implementations Team</option>
+    <option value="3">Small Projects Team</option>
+    <option value="5">Projects Team</option>
 </select>
 <br>
 <br>

@@ -353,76 +353,82 @@ class CTHeader extends CTCNC
 
                 'hdTeamLimitMinutes' => Controller::htmlInputText($dsHeader->getValue(DBEJHeader::hdTeamLimitMinutes)),
 
-                'hdTeamLimitMinutesMessage'            => Controller::htmlDisplayText(
+                'hdTeamLimitMinutesMessage'             => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::hdTeamLimitMinutes)
                 ),
-                'esTeamLimitMinutes'                   => Controller::htmlInputText(
+                'esTeamLimitMinutes'                    => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::esTeamLimitMinutes)
                 ),
-                'esTeamLimitMinutesMessage'            => Controller::htmlDisplayText(
+                'esTeamLimitMinutesMessage'             => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::esTeamLimitMinutes)
                 ),
-                'smallProjectsTeamLimitMinutes'        => Controller::htmlInputText(
+                'smallProjectsTeamLimitMinutes'         => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::smallProjectsTeamLimitMinutes)
                 ),
-                'smallProjectsTeamLimitMinutesMessage' => Controller::htmlDisplayText(
+                'smallProjectsTeamLimitMinutesMessage'  => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::smallProjectsTeamLimitMinutes)
                 ),
-                'projectTeamLimitMinutes'              => Controller::htmlInputText(
+                'projectTeamLimitMinutes'               => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::projectTeamLimitMinutes)
                 ),
-                'projectTeamLimitMinutesMessage'       => Controller::htmlDisplayText(
+                'projectTeamLimitMinutesMessage'        => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::projectTeamLimitMinutes)
                 ),
-                'hdTeamTargetLogPercentage'            => Controller::htmlInputText(
+                'hdTeamTargetLogPercentage'             => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::hdTeamTargetLogPercentage)
                 ),
-                'hdTeamTargetSlaPercentage'            => Controller::htmlInputText(
+                'hdTeamTargetSlaPercentage'             => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::hdTeamTargetSlaPercentage)
                 ),
-                'hdTeamTargetSlaPercentageMessage'     => Controller::htmlDisplayText(
+                'hdTeamTargetSlaPercentageMessage'      => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::hdTeamTargetSlaPercentage)
                 ),
-                'hdTeamTargetFixHours'                 => Controller::htmlInputText(
+                'hdTeamTargetFixHours'                  => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::hdTeamTargetFixHours)
                 ),
-                'hdTeamTargetFixHoursMessage'          => Controller::htmlDisplayText(
+                'hdTeamTargetFixHoursMessage'           => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::hdTeamTargetFixHours)
                 ),
-                'hdTeamTargetFixQtyPerMonth'           => Controller::htmlInputText(
+                'hdTeamTargetFixQtyPerMonth'            => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::hdTeamTargetFixQtyPerMonth)
                 ),
-                'hdTeamTargetFixQtyPerMonthMessage'    => Controller::htmlDisplayText(
+                'hdTeamTargetFixQtyPerMonthMessage'     => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::hdTeamTargetFixQtyPerMonth)
                 ),
-                'esTeamTargetLogPercentage'            => Controller::htmlInputText(
+                'esTeamTargetLogPercentage'             => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::esTeamTargetLogPercentage)
                 ),
-                'esTeamTargetSlaPercentage'            => Controller::htmlInputText(
+                'esTeamTargetSlaPercentage'             => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::esTeamTargetSlaPercentage)
                 ),
-                'esTeamTargetSlaPercentageMessage'     => Controller::htmlDisplayText(
+                'esTeamTargetSlaPercentageMessage'      => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::esTeamTargetSlaPercentage)
                 ),
-                'esTeamTargetFixHours'                 => Controller::htmlInputText(
+                'projectTeamTargetSlaPercentage'        => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::projectTeamTargetSlaPercentage)
+                ),
+                'projectTeamTargetSlaPercentageMessage' => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::projectTeamTargetSlaPercentage)
+                ),
+                'esTeamTargetFixHours'                  => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::esTeamTargetFixHours)
                 ),
-                'esTeamTargetFixHoursMessage'          => Controller::htmlDisplayText(
+                'esTeamTargetFixHoursMessage'           => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::esTeamTargetFixHours)
                 ),
-                'esTeamTargetFixQtyPerMonth'           => Controller::htmlInputText(
+                'esTeamTargetFixQtyPerMonth'            => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::esTeamTargetFixQtyPerMonth)
                 ),
-                'esTeamTargetFixQtyPerMonthMessage'    => Controller::htmlDisplayText(
+                'esTeamTargetFixQtyPerMonthMessage'     => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::esTeamTargetFixQtyPerMonth)
                 ),
-                'smallProjectsTeamTargetLogPercentage' => Controller::htmlInputText(
+                'smallProjectsTeamTargetLogPercentage'  => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::smallProjectsTeamTargetLogPercentage)
                 ),
-                'projectTeamTargetLogPercentage'       => Controller::htmlInputText(
+                'projectTeamTargetLogPercentage'        => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::projectTeamTargetLogPercentage)
                 ),
-                'smallProjectsTeamTargetSlaPercentage' => Controller::htmlInputText(
+                'smallProjectsTeamTargetSlaPercentage'  => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::smallProjectsTeamTargetSlaPercentage)
                 ),
 
@@ -431,6 +437,9 @@ class CTHeader extends CTCNC
                 ),
                 'smallProjectsTeamTargetFixHours'                                    => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::smallProjectsTeamTargetFixHours)
+                ),
+                'projectTeamTargetFixHours'                                          => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::projectTeamTargetFixHours)
                 ),
                 'smallProjectsTeamMinutesInADay'                                     => Controller::htmlDisplayText(
                     $dsHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay)
@@ -446,6 +455,12 @@ class CTHeader extends CTCNC
                 ),
                 'smallProjectsTeamTargetFixQtyPerMonthMessage'                       => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::smallProjectsTeamTargetFixQtyPerMonth)
+                ),
+                'projectTeamTargetFixQtyPerMonth'                              => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::projectTeamTargetFixQtyPerMonth)
+                ),
+                'projectTeamTargetFixQtyPerMonthMessage'                       => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::projectTeamTargetFixQtyPerMonth)
                 ),
                 'srAutocompleteThresholdHours'                                       => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::srAutocompleteThresholdHours)

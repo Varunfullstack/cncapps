@@ -6212,7 +6212,7 @@ class CTActivity extends CTCNC
             } elseif ($dbeFirstActivity->getValue(DBEJCallActivity::queueNo) == 2) {
                 $teamLevel = 2;
             } else {
-                $teamLevel = 3;           // implementations
+                $teamLevel = 3;           // Small Projects
 
             }
         }
@@ -6493,7 +6493,7 @@ class CTActivity extends CTCNC
             case 4:
                 $usedMinutes = $this->buActivity->getSPTeamUsedTime($problemID);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
-                $teamName = 'Implementation';
+                $teamName = 'Small Projects';
         }
 
         $leftOnBudget = $assignedMinutes - $usedMinutes;

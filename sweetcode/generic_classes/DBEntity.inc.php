@@ -192,6 +192,10 @@ class DBEntity extends DataAccess
             $this->firstRowFetched = FALSE;
             $ret = TRUE;
         } else {
+            global $server_type;
+            if($server_type == 'development'){
+                var_dump($this->db->Error);
+            }
             $this->raiseError("Query problem");
             $ret = FALSE;
         }

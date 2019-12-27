@@ -99,4 +99,113 @@
             </column>
         </addColumn>
     </changeSet>
+
+    <changeSet author="pavwebdev" id="issue697-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="projectTeamTargetSlaPercentage"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="projectTeamTargetSlaPercentage" type="int" defaultValue="98">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue697-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="projectTeamTargetFixHours"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="projectTeamTargetFixHours" type="decimal(5,2)" defaultValue="7.5">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue697-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="projectTeamTargetFixQtyPerMonth"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="projectTeamTargetFixQtyPerMonth" type="int" defaultValue="400">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue697-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="team_performance" columnName="projectTeamTargetSlaPercentage"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="team_performance">
+            <column name="projectTeamTargetSlaPercentage" type="decimal(5,2)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue697-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="team_performance" columnName="projectTeamTargetFixHours"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="team_performance">
+            <column name="projectTeamTargetFixHours" type="decimal(5,2)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue697-12">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="team_performance" columnName="projectTeamTargetQtyPerMonth"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="team_performance">
+            <column name="projectTeamTargetQtyPerMonth" type="int(3)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue697-13">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="team_performance" columnName="projectTeamActualSlaPercentage"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="team_performance">
+            <column name="projectTeamActualSlaPercentage" type="decimal(5,2)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue697-14">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="team_performance" columnName="projectTeamActualFixHours"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="team_performance">
+            <column name="projectTeamActualFixHours" type="decimal(5,2)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue697-15">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="team_performance" columnName="projectTeamActualQtyPerMonth"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="team_performance">
+            <column name="projectTeamActualQtyPerMonth" type="int(3)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

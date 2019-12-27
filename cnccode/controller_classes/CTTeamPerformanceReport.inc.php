@@ -115,10 +115,10 @@ class CTTeamPerformanceReport extends CTCNC
                         );
                     }
 
-                    if ($result['imTeamActualSlaPercentage'] < $result['smallProjectsTeamTargetSlaPercentage']) {
+                    if ($result['smallProjectsTeamActualSlaPercentage'] < $result['smallProjectsTeamTargetSlaPercentage']) {
 
                         $this->template->set_var(
-                            'imTeamActualSlaPercentage' . $result['month'] . 'Class',
+                            'smallProjectsTeamActualSlaPercentage' . $result['month'] . 'Class',
                             'performance-warn'
                         );
                     }
@@ -139,10 +139,10 @@ class CTTeamPerformanceReport extends CTCNC
                         );
                     }
 
-                    if ($result['imTeamActualFixQtyPerMonth'] < $result['smallProjectsTeamTargetFixQtyPerMonth']) {
+                    if ($result['smallProjectsTeamActualFixQtyPerMonth'] < $result['smallProjectsTeamTargetFixQtyPerMonth']) {
 
                         $this->template->set_var(
-                            'imTeamActualFixQtyPerMonth' . $result['month'] . 'Class',
+                            'smallProjectsTeamActualFixQtyPerMonth' . $result['month'] . 'Class',
                             'performance-warn'
                         );
                     }
@@ -162,10 +162,10 @@ class CTTeamPerformanceReport extends CTCNC
                         );
                     }
 
-                    if ($result['imTeamActualFixHours'] > $result['smallProjectsTeamTargetFixHours']) {
+                    if ($result['smallProjectsTeamActualFixHours'] > $result['smallProjectsTeamTargetFixHours']) {
 
                         $this->template->set_var(
-                            'imTeamActualFixHours' . $result['month'] . 'Class',
+                            'smallProjectsTeamActualFixHours' . $result['month'] . 'Class',
                             'performance-warn'
                         );
                     }
@@ -179,12 +179,12 @@ class CTTeamPerformanceReport extends CTCNC
                             'esTeamActualFixHours' . $result['month']       => $result['esTeamActualFixHours'],
                             'esTeamActualFixQtyPerMonth' . $result['month'] => $result['esTeamActualFixQtyPerMonth'],
 
-                            'imTeamActualSlaPercentage' . $result['month']  => number_format(
-                                $result['imTeamActualSlaPercentage'],
+                            'smallProjectsTeamActualSlaPercentage' . $result['month']  => number_format(
+                                $result['smallProjectsTeamActualSlaPercentage'],
                                 0
                             ),
-                            'imTeamActualFixHours' . $result['month']       => $result['imTeamActualFixHours'],
-                            'imTeamActualFixQtyPerMonth' . $result['month'] => $result['imTeamActualFixQtyPerMonth'],
+                            'smallProjectsTeamActualFixHours' . $result['month']       => $result['smallProjectsTeamActualFixHours'],
+                            'smallProjectsTeamActualFixQtyPerMonth' . $result['month'] => $result['smallProjectsTeamActualFixQtyPerMonth'],
 
                             'hdTeamActualSlaPercentage' . $result['month']  => number_format(
                                 $result['hdTeamActualSlaPercentage'],

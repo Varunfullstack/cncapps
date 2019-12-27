@@ -67,10 +67,10 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $isP5 = isset($_REQUEST['showP5']);
         $showHelpDesk = isset($_REQUEST['HD']);
         $showEscalation = isset($_REQUEST['ES']);
-        $showImplementation = isset($_REQUEST['IM']);
+        $showSmallProjects = isset($_REQUEST['SP']);
         $this->setSessionParam('HD', $showHelpDesk);
         $this->setSessionParam('ES', $showEscalation);
-        $this->setSessionParam('IM', $showImplementation);
+        $this->setSessionParam('IM', $showSmallProjects);
         $this->setSessionParam('showP5', $isP5);
 
         $this->setPageTitle('SD Manager Dashboard' . ($isP5 ? ' Priority 5' : null));
@@ -115,7 +115,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $isP5,
             $showHelpDesk,
             $showEscalation,
-            $showImplementation
+            $showSmallProjects
         );
         $shortestSLARemaining = $this->renderQueue(
             $problems,
@@ -129,7 +129,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $isP5,
             $showHelpDesk,
             $showEscalation,
-            $showImplementation
+            $showSmallProjects
         );
 
         $criticalSR = $this->renderQueue(
@@ -144,7 +144,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $isP5,
             $showHelpDesk,
             $showEscalation,
-            $showImplementation
+            $showSmallProjects
         );
 
         $currentOpenP1Requests = $this->renderQueue(
@@ -159,7 +159,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $isP5,
             $showHelpDesk,
             $showEscalation,
-            $showImplementation
+            $showSmallProjects
         );
 
         $oldestUpdatedSR = $this->renderQueue(
@@ -174,7 +174,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $isP5,
             $showHelpDesk,
             $showEscalation,
-            $showImplementation
+            $showSmallProjects
         );
 
         $longestOpenSR = $this->renderQueue(
@@ -189,7 +189,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $isP5,
             $showHelpDesk,
             $showEscalation,
-            $showImplementation
+            $showSmallProjects
         );
 
         $mostHoursLogged = $this->renderQueue(
@@ -213,7 +213,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $isP5,
             $showHelpDesk,
             $showEscalation,
-            $showImplementation
+            $showSmallProjects
         );
 
 
@@ -226,14 +226,14 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $this->renderOpenSRByCustomer(
             $showHelpDesk,
             $showEscalation,
-            $showImplementation
+            $showSmallProjects
         );
 
         $this->template->setVar(
             [
                 "helpDeskChecked"                  => $showHelpDesk ? "checked" : null,
                 "escalationChecked"                => $showEscalation ? "checked" : null,
-                "implementationChecked"            => $showImplementation ? "checked" : null,
+                "smallProjectsChecked"             => $showSmallProjects ? "checked" : null,
                 "shortestSLARemaining"             => $shortestSLARemaining,
                 "currentOpenP1Requests"            => $currentOpenP1Requests,
                 "oldestUpdatedSR"                  => $oldestUpdatedSR,
@@ -499,12 +499,12 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
     /**
      * @param bool $showHelpDesk
      * @param bool $showEscalation
-     * @param bool $showImplementation
+     * @param bool $showSmallProjects
      * @throws Exception
      */
     private function renderOpenSRByCustomer($showHelpDesk = true,
                                             $showEscalation = true,
-                                            $showImplementation = true
+                                            $showSmallProjects = true
     )
     {
         $rowCount = 0;
@@ -537,7 +537,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             $query .= ' and pro_queue_no <> 2 ';
         }
 
-        if (!$showImplementation) {
+        if (!$showSmallProjects) {
             $query .= ' and pro_queue_no <> 3 ';
         }
 

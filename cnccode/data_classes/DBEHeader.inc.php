@@ -95,6 +95,9 @@ class DBEHeader extends DBEntity
     const sevenDayerTarget = "sevenDayerTarget";
     const closureReminderDays = "closureReminderDays";
     const pendingTimeLimitActionThresholdMinutes = "pendingTimeLimitActionThresholdMinutes";
+    const projectTeamTargetSlaPercentage = "projectTeamTargetSlaPercentage";
+    const projectTeamTargetFixHours = "projectTeamTargetFixHours";
+    const projectTeamTargetFixQtyPerMonth = 'projectTeamTargetFixQtyPerMonth';
 
     /**
      * calls constructor()
@@ -417,6 +420,12 @@ class DBEHeader extends DBEntity
             DA_NOT_NULL,
             "hed_im_team_target_sla_percentage"
         );
+
+        $this->addColumn(
+            self::projectTeamTargetSlaPercentage,
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
         $this->addColumn(
             self::hdTeamTargetFixHours,
             DA_FLOAT,
@@ -436,10 +445,20 @@ class DBEHeader extends DBEntity
             "hed_im_team_target_fix_hours"
         );
         $this->addColumn(
+            self::projectTeamTargetFixHours,
+            DA_FLOAT,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
             self::hdTeamTargetFixQtyPerMonth,
             DA_INTEGER,
             DA_NOT_NULL,
             "hed_hd_team_target_fix_qty_per_month"
+        );
+        $this->addColumn(
+            self::projectTeamTargetFixQtyPerMonth,
+            DA_INTEGER,
+            DA_NOT_NULL
         );
         $this->addColumn(
             self::esTeamTargetFixQtyPerMonth,

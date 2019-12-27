@@ -541,12 +541,19 @@ class CTHome extends CTCNC
                 'esTeamTargetSlaPercentage' => $this->dsHeader->getValue(DBEHeader::esTeamTargetSlaPercentage),
                 'esTeamTargetFixHours'      => $this->dsHeader->getValue(DBEHeader::esTeamTargetFixHours),
 
-                'smallProjectsTeamTargetSlaPercentage' => $this->dsHeader->getValue(DBEHeader::smallProjectsTeamTargetSlaPercentage),
-                'smallProjectsTeamTargetFixHours'      => $this->dsHeader->getValue(DBEHeader::smallProjectsTeamTargetFixHours),
+                'smallProjectsTeamTargetSlaPercentage' => $this->dsHeader->getValue(
+                    DBEHeader::smallProjectsTeamTargetSlaPercentage
+                ),
+                'smallProjectsTeamTargetFixHours'      => $this->dsHeader->getValue(
+                    DBEHeader::smallProjectsTeamTargetFixHours
+                ),
 
-                'hdTeamTargetSlaPercentage' => $this->dsHeader->getValue(DBEHeader::hdTeamTargetSlaPercentage),
-                'hdTeamTargetFixHours'      => $this->dsHeader->getValue(DBEHeader::hdTeamTargetFixHours),
-
+                'hdTeamTargetSlaPercentage'      => $this->dsHeader->getValue(DBEHeader::hdTeamTargetSlaPercentage),
+                'hdTeamTargetFixHours'           => $this->dsHeader->getValue(DBEHeader::hdTeamTargetFixHours),
+                'projectTeamTargetSlaPercentage' => $this->dsHeader->getValue(
+                    DBEHeader::projectTeamTargetSlaPercentage
+                ),
+                'projectTeamTargetFixHours'      => $this->dsHeader->getValue(DBEHeader::projectTeamTargetFixHours)
             )
         );
 
@@ -561,8 +568,11 @@ class CTHome extends CTCNC
             $hdFixHoursClass = 'performance-warn';
 
 
-            $imSLAPerformanceClass = 'performance-warn';
-            $imFixHoursClass = 'performance-warn';
+            $smallProjectsTeamSLAPerformanceClass = 'performance-warn';
+            $smallProjectsTeamFixHoursClass = 'performance-warn';
+
+            $projectTeamSLAPerformanceClass = 'performance-warn';
+            $projectTeamFixHoursClass = 'performance-warn';
 
             if (round($result['esTeamActualSlaPercentage']) >= $result['esTeamTargetSlaPercentage']) {
                 $esSLAPerformanceClass = 'performance-green';
@@ -572,9 +582,18 @@ class CTHome extends CTCNC
                 $hdSLAPerformanceClass = 'performance-green';
             }
 
-            if (round($result['imTeamActualSlaPercentage']) >= $result['smallProjectsTeamTargetSlaPercentage']) {
-                $imSLAPerformanceClass = 'performance-green';
+            if (round(
+                    $result['smallProjectsTeamActualSlaPercentage']
+                ) >= $result['smallProjectsTeamTargetSlaPercentage']) {
+                $smallProjectsTeamSLAPerformanceClass = 'performance-green';
             }
+
+            if (round(
+                    $result['projectTeamActualSlaPercentage']
+                ) >= $result['projectTeamTargetSlaPercentage']) {
+                $projectTeamSLAPerformanceClass = 'performance-green';
+            }
+
             if ($result['esTeamActualFixHours'] <= $result['esTeamTargetFixHours']) {
                 $esFixHoursClass = 'performance-green';
             }
@@ -583,45 +602,60 @@ class CTHome extends CTCNC
                 $hdFixHoursClass = 'performance-green';
             }
 
-            if ($result['imTeamActualFixHours'] <= $result['smallProjectsTeamTargetFixHours']) {
-                $imFixHoursClass = 'performance-green';
+            if ($result['smallProjectsTeamActualFixHours'] <= $result['smallProjectsTeamTargetFixHours']) {
+                $smallProjectsTeamFixHoursClass = 'performance-green';
+            }
+
+            if ($result['projectTeamActualFixHours'] <= $result['projectTeamTargetFixHours']) {
+                $projectTeamFixHoursClass = 'performance-green';
             }
 
             $this->template->set_var(
                 array(
-                    'esTeamActualSlaPercentage' . $result['quarter']           => number_format(
+                    'esTeamActualSlaPercentage' . $result['quarter']                      => number_format(
                         $result['esTeamActualSlaPercentage'],
                         0
                     ),
-                    'esTeamActualFixHours' . $result['quarter']                => number_format(
+                    'esTeamActualFixHours' . $result['quarter']                           => number_format(
                         $result['esTeamActualFixHours'],
                         2
                     ),
-                    'esTeamActualFixQty' . $result['quarter']                  => $result['esTeamActualFixQty'],
-                    'imTeamActualSlaPercentage' . $result['quarter']           => number_format(
-                        $result['imTeamActualSlaPercentage'],
-                        0
-                    ),
-                    'imTeamActualFixHours' . $result['quarter']                => number_format(
-                        $result['imTeamActualFixHours'],
+                    'esTeamActualFixQty' . $result['quarter']                             => $result['esTeamActualFixQty'],
+                    'smallProjectsTeamActualSlaPercentage' . $result['quarter']           => number_format(
+                    $result['smallProjectsTeamActualSlaPercentage'],
+                    0
+                ),
+                    'smallProjectsTeamActualFixHours' . $result['quarter']                => number_format(
+                        $result['smallProjectsTeamActualFixHours'],
                         2
                     ),
-                    'imTeamActualFixQty' . $result['quarter']                  => $result['imTeamActualFixQty'],
-                    'hdTeamActualSlaPercentage' . $result['quarter']           => number_format(
+                    'smallProjectsTeamActualFixQty' . $result['quarter']                  => $result['smallProjectsTeamActualFixQty'],
+                    'projectTeamActualSlaPercentage' . $result['quarter']           => number_format(
+                        $result['projectTeamActualSlaPercentage'],
+                        0
+                    ),
+                    'projectTeamActualFixHours' . $result['quarter']                => number_format(
+                        $result['projectTeamActualFixHours'],
+                        2
+                    ),
+                    'projectTeamActualFixQty' . $result['quarter']                  => $result['projectTeamActualFixQty'],
+                    'hdTeamActualSlaPercentage' . $result['quarter']                      => number_format(
                         $result['hdTeamActualSlaPercentage'],
                         0
                     ),
-                    'hdTeamActualFixHours' . $result['quarter']                => number_format(
+                    'hdTeamActualFixHours' . $result['quarter']                           => number_format(
                         $result['hdTeamActualFixHours'],
                         2
                     ),
-                    'hdTeamActualFixQty' . $result['quarter']                  => $result['hdTeamActualFixQty'],
-                    'hdTeamActualSlaPercentage' . $result['quarter'] . 'Class' => $hdSLAPerformanceClass,
-                    'hdTeamActualFixHours' . $result['quarter'] . 'Class'      => $hdFixHoursClass,
-                    'esTeamActualSlaPercentage' . $result['quarter'] . 'Class' => $esSLAPerformanceClass,
-                    'esTeamActualFixHours' . $result['quarter'] . 'Class'      => $esFixHoursClass,
-                    'imTeamActualSlaPercentage' . $result['quarter'] . 'Class' => $imSLAPerformanceClass,
-                    'imTeamActualFixHours' . $result['quarter'] . 'Class'      => $imFixHoursClass,
+                    'hdTeamActualFixQty' . $result['quarter']                             => $result['hdTeamActualFixQty'],
+                    'hdTeamActualSlaPercentage' . $result['quarter'] . 'Class'            => $hdSLAPerformanceClass,
+                    'hdTeamActualFixHours' . $result['quarter'] . 'Class'                 => $hdFixHoursClass,
+                    'esTeamActualSlaPercentage' . $result['quarter'] . 'Class'            => $esSLAPerformanceClass,
+                    'esTeamActualFixHours' . $result['quarter'] . 'Class'                 => $esFixHoursClass,
+                    'smallProjectsTeamActualSlaPercentage' . $result['quarter'] . 'Class' => $smallProjectsTeamSLAPerformanceClass,
+                    'smallProjectsTeamActualFixHours' . $result['quarter'] . 'Class'      => $smallProjectsTeamFixHoursClass,
+                    'projectTeamActualSlaPercentage' . $result['quarter'] . 'Class' => $projectTeamSLAPerformanceClass,
+                    'projectTeamActualFixHours' . $result['quarter'] . 'Class'      => $projectTeamFixHoursClass,
                 )
             );
 
@@ -646,7 +680,9 @@ class CTHome extends CTCNC
 
         $esTeamTargetLogPercentage = $this->dsHeader->getValue(DBEHeader::esTeamTargetLogPercentage);
 
-        $smallProjectsTeamTargetLogPercentage = $this->dsHeader->getValue(DBEHeader::smallProjectsTeamTargetLogPercentage);
+        $smallProjectsTeamTargetLogPercentage = $this->dsHeader->getValue(
+            DBEHeader::smallProjectsTeamTargetLogPercentage
+        );
 
         $hdUsers = $this->buUser->getUsersByTeamLevel(1);
 
@@ -811,7 +847,7 @@ class CTHome extends CTCNC
             );
         }
         /*
-        Implementation team users
+        Small Projects team users
         */
         $this->template->set_block(
             'DashboardAllUsersPerformanceReport',
