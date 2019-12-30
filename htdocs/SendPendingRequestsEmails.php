@@ -8,6 +8,7 @@
 
 
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg['path_dbe'] . '/DBECallActivity.inc.php');
 require_once($cfg["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg["path_bu"] . "/BUActivity.inc.php");
@@ -32,7 +33,7 @@ function processChangeRequestsEmails()
     while ($dbejCallActivity->fetchNext()) {
         $problemID = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
         $lastActivity = $buActivity->getLastActivityInProblem($problemID);
-        $srLink = SITE_URL .'/Activity.php?callActivityID=' . $lastActivity->getValue(
+        $srLink = SITE_URL . '/Activity.php?callActivityID=' . $lastActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&action=displayActivity';
 
@@ -40,7 +41,7 @@ function processChangeRequestsEmails()
         $srLink = "<a href='$srLink'>SR</a>";
 
         $processCRLink =
-            SITE_URL .'/Activity.php?callActivityID=' . $dbejCallActivity->getValue(
+            SITE_URL . '/Activity.php?callActivityID=' . $dbejCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&action=changeRequestReview';
 
@@ -100,6 +101,7 @@ function processTimeRequestsEmails()
     $pendingHDRequests = [];
     $pendingESRequests = [];
     $pendingIMRequests = [];
+    $pendingProjectRequests = [];
     $buActivity = new BUActivity($thing);
 
     while ($dbejCallActivity->fetchNext()) {
@@ -107,7 +109,7 @@ function processTimeRequestsEmails()
         $row = [];
         $problemID = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
         $lastActivity = $buActivity->getLastActivityInProblem($problemID);
-        $srLink = SITE_URL .'/Activity.php?callActivityID=' . $lastActivity->getValue(
+        $srLink = SITE_URL . '/Activity.php?callActivityID=' . $lastActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&action=displayActivity';
 
@@ -115,7 +117,7 @@ function processTimeRequestsEmails()
         $srLink = "<a href='$srLink'>SR</a>";
 
         $processCRLink =
-            SITE_URL .'/Activity.php?callActivityID=' . $dbejCallActivity->getValue(
+            SITE_URL . '/Activity.php?callActivityID=' . $dbejCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&action=timeRequestReview';
 
@@ -150,8 +152,14 @@ function processTimeRequestsEmails()
             case 4:
                 $usedMinutes = $buActivity->getSPTeamUsedTime($problemID);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
-                $teamName = 'Implementation';
+                $teamName = 'Small Projects';
                 $storeArray = &$pendingIMRequests;
+                break;
+            case 5:
+                $usedMinutes = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
+                $assignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
+                $teamName = 'Projects';
+                $storeArray = &$pendingProjectRequests;
         }
 
         $leftOnBudget = $assignedMinutes - $usedMinutes;
@@ -181,8 +189,12 @@ function processTimeRequestsEmails()
         $pendingESRequests
     );
     sendTimeRequestsEmail(
-        'imptimerequest@cnc-ltd.co.uk',
+        'sptimerequest@cnc-ltd.co.uk',
         $pendingIMRequests
+    );
+    sendTimeRequestsEmail(
+        'projectstimerequest@cnc-ltd.co.uk',
+        $pendingProjectRequests
     );
 }
 

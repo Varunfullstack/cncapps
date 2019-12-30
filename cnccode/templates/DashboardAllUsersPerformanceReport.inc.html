@@ -116,6 +116,41 @@
             </tbody>
         </table>
     </div>
+    <div class="performanceItem">
+        <h3>Projects</h3>
+        <table id="user-performance-project"
+               width="350px"
+        >
+            <thead>
+            <tr>
+                <th width="30%">User</th>
+                <th width="30%">Target %</th>
+                <th colspan="2">Week</th>
+                <th colspan="2">Month</th>
+            </tr>
+            <tr>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>%</th>
+                <th>Hours</th>
+                <th>%</th>
+                <th>Hours</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- BEGIN projectUserBlock -->
+            <tr>
+                <th>{initials}</th>
+                <td style="text-align: center;">{targetPercentage}</td>
+                <td class="{weeklyPercentageClass}">{weeklyPercentage}</td>
+                <td>{weeklyHours}</td>
+                <td class="{monthlyPercentageClass}">{monthlyPercentage}</td>
+                <td>{monthlyHours}</td>
+            </tr>
+            <!-- END projectUserBlock -->
+            </tbody>
+        </table>
+    </div>
 </div>
 
 

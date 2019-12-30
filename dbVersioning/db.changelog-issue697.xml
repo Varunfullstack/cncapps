@@ -163,11 +163,11 @@
     <changeSet author="pavwebdev" id="issue697-12">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="team_performance" columnName="projectTeamTargetQtyPerMonth"/>
+                <columnExists tableName="team_performance" columnName="projectTeamTargetFixQtyPerMonth"/>
             </not>
         </preConditions>
         <addColumn tableName="team_performance">
-            <column name="projectTeamTargetQtyPerMonth" type="int(3)">
+            <column name="projectTeamTargetFixQtyPerMonth" type="int(3)">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
@@ -199,12 +199,48 @@
     <changeSet author="pavwebdev" id="issue697-15">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="team_performance" columnName="projectTeamActualQtyPerMonth"/>
+                <columnExists tableName="team_performance" columnName="projectTeamActualFixQtyPerMonth"/>
             </not>
         </preConditions>
         <addColumn tableName="team_performance">
-            <column name="projectTeamActualQtyPerMonth" type="int(3)">
+            <column name="projectTeamActualFixQtyPerMonth" type="int(3)">
                 <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue697-16">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="projectTeamLimitMinutes"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="projectTeamLimitMinutes" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue697-17">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="projectTeamTimeAlertFlag"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="problem">
+            <column name="projectTeamTimeAlertFlag" type="char(1)" defaultValue="N">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue697-18">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callactivity" columnName="requestType"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callactivity">
+            <column name="requestType" type="int(11)" defaultValue="68">
+                <constraints nullable="true"/>
             </column>
         </addColumn>
     </changeSet>

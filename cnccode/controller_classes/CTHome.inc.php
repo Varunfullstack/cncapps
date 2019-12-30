@@ -7,6 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBESalesOrderTotals.inc.php');
 require_once($cfg['path_dbe'] . '/DBEInvoiceTotals.inc.php');
@@ -622,23 +623,23 @@ class CTHome extends CTCNC
                     ),
                     'esTeamActualFixQty' . $result['quarter']                             => $result['esTeamActualFixQty'],
                     'smallProjectsTeamActualSlaPercentage' . $result['quarter']           => number_format(
-                    $result['smallProjectsTeamActualSlaPercentage'],
-                    0
-                ),
+                        $result['smallProjectsTeamActualSlaPercentage'],
+                        0
+                    ),
                     'smallProjectsTeamActualFixHours' . $result['quarter']                => number_format(
                         $result['smallProjectsTeamActualFixHours'],
                         2
                     ),
                     'smallProjectsTeamActualFixQty' . $result['quarter']                  => $result['smallProjectsTeamActualFixQty'],
-                    'projectTeamActualSlaPercentage' . $result['quarter']           => number_format(
+                    'projectTeamActualSlaPercentage' . $result['quarter']                 => number_format(
                         $result['projectTeamActualSlaPercentage'],
                         0
                     ),
-                    'projectTeamActualFixHours' . $result['quarter']                => number_format(
+                    'projectTeamActualFixHours' . $result['quarter']                      => number_format(
                         $result['projectTeamActualFixHours'],
                         2
                     ),
-                    'projectTeamActualFixQty' . $result['quarter']                  => $result['projectTeamActualFixQty'],
+                    'projectTeamActualFixQty' . $result['quarter']                        => $result['projectTeamActualFixQty'],
                     'hdTeamActualSlaPercentage' . $result['quarter']                      => number_format(
                         $result['hdTeamActualSlaPercentage'],
                         0
@@ -654,8 +655,8 @@ class CTHome extends CTCNC
                     'esTeamActualFixHours' . $result['quarter'] . 'Class'                 => $esFixHoursClass,
                     'smallProjectsTeamActualSlaPercentage' . $result['quarter'] . 'Class' => $smallProjectsTeamSLAPerformanceClass,
                     'smallProjectsTeamActualFixHours' . $result['quarter'] . 'Class'      => $smallProjectsTeamFixHoursClass,
-                    'projectTeamActualSlaPercentage' . $result['quarter'] . 'Class' => $projectTeamSLAPerformanceClass,
-                    'projectTeamActualFixHours' . $result['quarter'] . 'Class'      => $projectTeamFixHoursClass,
+                    'projectTeamActualSlaPercentage' . $result['quarter'] . 'Class'       => $projectTeamSLAPerformanceClass,
+                    'projectTeamActualFixHours' . $result['quarter'] . 'Class'            => $projectTeamFixHoursClass,
                 )
             );
 
@@ -684,11 +685,14 @@ class CTHome extends CTCNC
             DBEHeader::smallProjectsTeamTargetLogPercentage
         );
 
+        $projectTeamTargetLogPercentage = $this->dsHeader->getValue(DBEHeader::projectTeamTargetLogPercentage);
+
         $hdUsers = $this->buUser->getUsersByTeamLevel(1);
 
         $esUsers = $this->buUser->getUsersByTeamLevel(2);
 
         $imUsers = $this->buUser->getUsersByTeamLevel(3);
+        $projectUsers = $this->buUser->getUsersByTeamLevel(5);
 
         /*
         Extract data and build report
@@ -925,6 +929,85 @@ class CTHome extends CTCNC
             );
         }
 
+        /*
+        Projects team users
+        */
+        $this->template->set_block(
+            'DashboardAllUsersPerformanceReport',
+            'projectUserBlock',
+            'projectUsers'
+        );
+
+        foreach ($projectUsers as $user) {
+
+            $weekly = $this->buUser->getUserPerformanceByUser(
+                $user['cns_consno'],
+                7
+            );
+
+            $monthly = $this->buUser->getUserPerformanceByUser(
+                $user['cns_consno'],
+                30
+            );
+
+
+            $weeklyPercentageClass = null;
+
+            if ($weekly['performancePercentage'] < $projectTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-warn';
+            }
+
+            if ($weekly['performancePercentage'] >= $projectTeamTargetLogPercentage) {
+                $weeklyPercentageClass = 'performance-green';
+            }
+
+            $monthlyPercentageClass = null;
+            if ($monthly['performancePercentage'] < $projectTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-warn';
+            }
+            if ($monthly['performancePercentage'] >= $projectTeamTargetLogPercentage) {
+                $monthlyPercentageClass = 'performance-green';
+            }
+
+            $this->template->set_var(
+                array(
+                    'initials' => $user['initials'],
+
+                    'targetPercentage' => $projectTeamTargetLogPercentage,
+
+                    'weeklyPercentage' => number_format(
+                        $weekly['performancePercentage'],
+                        2
+                    ),
+
+                    'weeklyHours' => number_format(
+                        $weekly['loggedHours'],
+                        2
+                    ),
+
+                    'monthlyPercentage' => number_format(
+                        $monthly['performancePercentage'],
+                        2
+                    ),
+
+                    'monthlyHours' => number_format(
+                        $monthly['loggedHours'],
+                        2
+                    ),
+
+                    'weeklyPercentageClass' => $weeklyPercentageClass,
+
+                    'monthlyPercentageClass' => $monthlyPercentageClass
+                )
+            );
+
+            $this->template->parse(
+                'projectUsers',
+                'projectUserBlock',
+                true
+            );
+        }
+
 
         $this->template->parse(
             'CONTENTS',
@@ -953,6 +1036,8 @@ class CTHome extends CTCNC
             case 3:
                 $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::smallProjectsTeamTargetLogPercentage);
                 break;
+            case 5:
+                $targetLogPercentage = $this->dsHeader->getValue(DBEHeader::projectTeamTargetLogPercentage);
         }
 
         /* Extract data and build report */

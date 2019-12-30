@@ -5,6 +5,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 
@@ -91,6 +92,22 @@ class BUTeamPerformance extends Business
 
         }
 
+        /*
+       Projects team (team level 5)
+       */
+        $projectTeamTotal = $this->getCount($year, $month, 5);
+
+        $projectTeamWithinSla = $this->getCount($year, $month, 5, true);
+
+        $projectTeamFixAverageHours = $this->getFixAverageHours($year, $month, 5);
+
+        if ($projectTeamTotal > 0) {
+            $projectTeamActualSlaPercentage = $projectTeamWithinSla / $projectTeamTotal * 100;
+        } else {
+            $projectTeamActualSlaPercentage = 100;
+
+        }
+
         $record =
             array(
                 'year'                       => $year,
@@ -109,12 +126,25 @@ class BUTeamPerformance extends Business
                 'esTeamActualFixHours'       => $esTeamFixAverageHours,
                 'esTeamActualFixQtyPerMonth' => $this->getFixCount($year, $month, 2),
 
-                'smallProjectsTeamTargetSlaPercentage'  => $dsHeader->getValue(DBEHeader::smallProjectsTeamTargetSlaPercentage),
-                'smallProjectsTeamTargetFixHours'       => $dsHeader->getValue(DBEHeader::smallProjectsTeamTargetFixHours),
-                'smallProjectsTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEHeader::smallProjectsTeamTargetFixQtyPerMonth),
+                'smallProjectsTeamTargetSlaPercentage'  => $dsHeader->getValue(
+                    DBEHeader::smallProjectsTeamTargetSlaPercentage
+                ),
+                'smallProjectsTeamTargetFixHours'       => $dsHeader->getValue(
+                    DBEHeader::smallProjectsTeamTargetFixHours
+                ),
+                'smallProjectsTeamTargetFixQtyPerMonth' => $dsHeader->getValue(
+                    DBEHeader::smallProjectsTeamTargetFixQtyPerMonth
+                ),
                 'smallProjectsTeamActualSlaPercentage'  => $smallProjectsTeamActualSlaPercentage,
                 'smallProjectsTeamActualFixHours'       => $smallProjectsTeamFixAverageHours,
-                'smallProjectsTeamActualFixQtyPerMonth' => $this->getFixCount($year, $month, 3)
+                'smallProjectsTeamActualFixQtyPerMonth' => $this->getFixCount($year, $month, 3),
+
+                'projectTeamTargetSlaPercentage'  => $dsHeader->getValue(DBEHeader::projectTeamTargetSlaPercentage),
+                'projectTeamTargetFixHours'       => $dsHeader->getValue(DBEHeader::projectTeamTargetFixHours),
+                'projectTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEHeader::projectTeamTargetFixQtyPerMonth),
+                'projectTeamActualSlaPercentage'  => $projectTeamActualSlaPercentage,
+                'projectTeamActualFixHours'       => $projectTeamFixAverageHours,
+                'projectTeamActualFixQtyPerMonth' => $this->getFixCount($year, $month, 3)
             );
 
         $this->updatePerformanceRecord($record);
@@ -354,14 +384,8 @@ class BUTeamPerformance extends Business
             WHEN MONTH BETWEEN 10 AND 12 THEN 4
           END
         )";
-
-        var_dump($sql);
         $statement = $this->connection->prepare($sql);
-
         $statement->execute(array($year));
-
-        var_dump($statement->errorInfo());
-
         return $statement->fetchAll(); // an array of all records for year
 
     }

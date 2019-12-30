@@ -124,13 +124,18 @@ class CTTimeRequestDashboard extends CTCNC
                     $usedMinutes = $buActivity->getSPTeamUsedTime($problemID);
                     $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
                     $teamName = 'Small Projects';
+                    break;
+                case 5:
+                    $usedMinutes = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
+                    $assignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
+                    $teamName = 'Projects';
             }
 
             $leftOnBudget = $assignedMinutes - $usedMinutes;
             $requestedDateTimeString = $dbejCallActivity->getValue(
                     DBEJCallActivity::date
                 ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime) . ":00";
-            $requestedDateTime = DateTime::createFromFormat(DATE_MYSQL_DATETIME);
+            $requestedDateTime = DateTime::createFromFormat(DATE_MYSQL_DATETIME, $requestedDateTimeString);
             $alertTime = (new DateTime(''))->sub(
                 new DateInterval('PT' . $dsHeader->getValue(DBEHeader::pendingTimeLimitActionThresholdMinutes) . "M")
             );

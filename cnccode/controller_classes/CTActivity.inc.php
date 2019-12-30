@@ -4307,6 +4307,10 @@ class CTActivity extends CTCNC
         $hdUsedMinutes = $this->buActivity->getHDTeamUsedTime($problemID);
         $esUsedMinutes = $this->buActivity->getESTeamUsedTime($problemID);
         $imUsedMinutes = $this->buActivity->getSPTeamUsedTime($problemID);
+        $projectUsedMinutes = $this->buActivity->getUsedTimeForProblemAndTeam(
+            $problemID,
+            5
+        );
         $hdUsedMinutesNotInclusive = $this->buActivity->getHDTeamUsedTime(
             $problemID,
             $callActivityID
@@ -4317,6 +4321,11 @@ class CTActivity extends CTCNC
         );
         $imUsedMinutesNotInclusive = $this->buActivity->getSPTeamUsedTime(
             $problemID,
+            $callActivityID
+        );
+        $projectUsedMinutesNotInclusive = $this->buActivity->getUsedTimeForProblemAndTeam(
+            $problemID,
+            5,
             $callActivityID
         );
 
@@ -4331,6 +4340,7 @@ class CTActivity extends CTCNC
         $hdAssignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
         $esAssignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
         $imAssignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
+        $projectTeamAssignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
 
 
         $urlLinkedSalesOrder =
@@ -4356,132 +4366,131 @@ class CTActivity extends CTCNC
 
         $this->template->set_var(
             array(
-                'level'                        => $level,
-                'onSiteFlag'                   => $onSiteFlag,
-                'allocatedUserID'              => $dsCallActivity->getValue(DBEJCallActivity::allocatedUserID),
-                'reason'                       => $dsCallActivity->getValue(DBEJCallActivity::reason),
-                'reasonMessage'                => $dsCallActivity->getMessage(DBEJCallActivity::reason),
-                'internalNotes'                => $dsCallActivity->getValue(DBEJCallActivity::internalNotes),
-                'callActivityID'               => $callActivityID,
-                'problemStatus'                => $dsCallActivity->getValue(DBEJCallActivity::problemStatus),
-                'problemStatusMessage'         => $dsCallActivity->getMessage(DBEJCallActivity::problemStatus),
-                'problemID'                    => $dsCallActivity->getValue(DBEJCallActivity::problemID),
-                'customerID'                   => $dsCallActivity->getValue(DBEJCallActivity::customerID),
-                'hiddenCallActTypeID'          => $dsCallActivity->getValue(DBEJCallActivity::callActTypeID),
-                'hiddenPriority'               => $dsCallActivity->getValue(DBEJCallActivity::priority),
-                'hiddenContractCustomerItemID' => $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID),
-                'hiddenActivityType'           => $hiddenActivityType,
-                'customerDetails'              => $customerDetails,
-                'contactPhone'                 => $buCustomer->getContactPhoneForHtml(
+                'level'                          => $level,
+                'onSiteFlag'                     => $onSiteFlag,
+                'allocatedUserID'                => $dsCallActivity->getValue(DBEJCallActivity::allocatedUserID),
+                'reason'                         => $dsCallActivity->getValue(DBEJCallActivity::reason),
+                'reasonMessage'                  => $dsCallActivity->getMessage(DBEJCallActivity::reason),
+                'internalNotes'                  => $dsCallActivity->getValue(DBEJCallActivity::internalNotes),
+                'callActivityID'                 => $callActivityID,
+                'problemStatus'                  => $dsCallActivity->getValue(DBEJCallActivity::problemStatus),
+                'problemStatusMessage'           => $dsCallActivity->getMessage(DBEJCallActivity::problemStatus),
+                'problemID'                      => $dsCallActivity->getValue(DBEJCallActivity::problemID),
+                'customerID'                     => $dsCallActivity->getValue(DBEJCallActivity::customerID),
+                'hiddenCallActTypeID'            => $dsCallActivity->getValue(DBEJCallActivity::callActTypeID),
+                'hiddenPriority'                 => $dsCallActivity->getValue(DBEJCallActivity::priority),
+                'hiddenContractCustomerItemID'   => $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID),
+                'hiddenActivityType'             => $hiddenActivityType,
+                'customerDetails'                => $customerDetails,
+                'contactPhone'                   => $buCustomer->getContactPhoneForHtml(
                     $dsCallActivity->getValue(DBEJCallActivity::contactID)
                 ),
-                'expenseExportFlag'            => $dsCallActivity->getValue(DBEJCallActivity::expenseExportFlag),
-                'customerName'                 => Controller::htmlDisplayText(
+                'expenseExportFlag'              => $dsCallActivity->getValue(DBEJCallActivity::expenseExportFlag),
+                'customerName'                   => Controller::htmlDisplayText(
                     $dsCallActivity->getValue(DBEJCallActivity::customerName)
                 ),
-                'customerNameDisplayClass'     => $this->getCustomerNameDisplayClass($dsCustomer),
-                'urlCustomer'                  => $this->getCustomerUrl(
+                'customerNameDisplayClass'       => $this->getCustomerNameDisplayClass($dsCustomer),
+                'urlCustomer'                    => $this->getCustomerUrl(
                     $dsCallActivity->getValue(DBEJCallActivity::customerID)
                 ),
-                'date'                         => Controller::dateYMDtoDMY(
+                'date'                           => Controller::dateYMDtoDMY(
                     $dsCallActivity->getValue(DBEJCallActivity::date)
                 ),
-                'dateMessage'                  => $dsCallActivity->getMessage(DBEJCallActivity::date),
-                'curValue'                     => $dsCallActivity->getValue(DBEJCallActivity::curValue),
-                'startTime'                    => $dsCallActivity->getValue(DBEJCallActivity::startTime),
-                'startTimeMessage'             => $dsCallActivity->getMessage(DBEJCallActivity::startTime),
-                'endTime'                      => $dsCallActivity->getValue(DBEJCallActivity::endTime),
-                'endTimeMessage'               => $dsCallActivity->getMessage(DBEJCallActivity::endTime),
-                'internalNotesMessage'         => $dsCallActivity->getMessage(DBEJCallActivity::internalNotes),
-                'siteDesc'                     => Controller::htmlInputText(
+                'dateMessage'                    => $dsCallActivity->getMessage(DBEJCallActivity::date),
+                'curValue'                       => $dsCallActivity->getValue(DBEJCallActivity::curValue),
+                'startTime'                      => $dsCallActivity->getValue(DBEJCallActivity::startTime),
+                'startTimeMessage'               => $dsCallActivity->getMessage(DBEJCallActivity::startTime),
+                'endTime'                        => $dsCallActivity->getValue(DBEJCallActivity::endTime),
+                'endTimeMessage'                 => $dsCallActivity->getMessage(DBEJCallActivity::endTime),
+                'internalNotesMessage'           => $dsCallActivity->getMessage(DBEJCallActivity::internalNotes),
+                'siteDesc'                       => Controller::htmlInputText(
                     $dsCallActivity->getValue(DBEJCallActivity::siteDesc)
                 ),
-                'siteNoMessage'                => Controller::htmlDisplayText(
+                'siteNoMessage'                  => Controller::htmlDisplayText(
                     $dsCallActivity->getMessage(DBEJCallActivity::siteNo)
                 ),
-                'status'                       => $dsCallActivity->getValue(DBEJCallActivity::status),
-                'contactNotes'                 => $dsCallActivity->getValue(DBEJCallActivity::contactNotes),
-                'techNotes'                    => $dsCallActivity->getValue(DBEJCallActivity::techNotes),
-                'userIDMessage'                => Controller::htmlDisplayText(
+                'status'                         => $dsCallActivity->getValue(DBEJCallActivity::status),
+                'contactNotes'                   => $dsCallActivity->getValue(DBEJCallActivity::contactNotes),
+                'techNotes'                      => $dsCallActivity->getValue(DBEJCallActivity::techNotes),
+                'userIDMessage'                  => Controller::htmlDisplayText(
                     $dsCallActivity->getMessage(DBEJCallActivity::userID)
                 ),
-                'callActTypeIDMessage'         => Controller::htmlDisplayText(
+                'callActTypeIDMessage'           => Controller::htmlDisplayText(
                     $dsCallActivity->getMessage(DBEJCallActivity::callActTypeID)
                 ),
-                'urlDisplayActivity'           => $urlDisplayActivity,
-                'urlCancelEdit'                => $urlCancelEdit,
-                'urlUpdateActivity'            => $urlUpdateActivity,
-                'renewalsLink'                 => $renewalsLink,
-                'passwordLink'                 => $this->getPasswordLink(
+                'urlDisplayActivity'             => $urlDisplayActivity,
+                'urlCancelEdit'                  => $urlCancelEdit,
+                'urlUpdateActivity'              => $urlUpdateActivity,
+                'renewalsLink'                   => $renewalsLink,
+                'passwordLink'                   => $this->getPasswordLink(
                     $dsCallActivity->getValue(DBEJCallActivity::customerID)
                 ),
-                'thirdPartyContactLink'        => $this->getThirdPartyContactLink(
+                'thirdPartyContactLink'          => $this->getThirdPartyContactLink(
                     $dsCallActivity->getValue(DBEJCallActivity::customerID)
                 ),
-                'contactHistoryLink'           => $this->getServiceRequestForContactLink(
+                'contactHistoryLink'             => $this->getServiceRequestForContactLink(
                     $dsCallActivity->getValue(DBECallActivity::contactID)
                 ),
-                'generatePasswordLink'         => $this->getGeneratePasswordLink(),
-                'salesOrderLink'               => $this->getSalesOrderLink(
+                'generatePasswordLink'           => $this->getGeneratePasswordLink(),
+                'salesOrderLink'                 => $this->getSalesOrderLink(
                     $dsCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID)
                 ),
-                'urlLinkedSalesOrder'          => $urlLinkedSalesOrder,
-                'problemHistoryLink'           => $this->getProblemHistoryLink(
+                'urlLinkedSalesOrder'            => $urlLinkedSalesOrder,
+                'problemHistoryLink'             => $this->getProblemHistoryLink(
                     $dsCallActivity->getValue(DBEJCallActivity::problemID)
                 ),
-                'projectLink'                  => BUProject::getCurrentProjectLink(
+                'projectLink'                    => BUProject::getCurrentProjectLink(
                     $dsCallActivity->getValue(DBEJCallActivity::customerID)
                 ),
-                'contractListPopupLink'        => $this->getContractListPopupLink(
+                'contractListPopupLink'          => $this->getContractListPopupLink(
                     $dsCallActivity->getValue(DBEJCallActivity::customerID)
                 ),
-                'DISABLED'                     => $disabled,
-                'COMPLETE_DISABLED'            => $complete_disabled,
-                'INITIAL_DISABLED'             => $initial_disabled,
-                'INITIAL_DATE_DISABLED'        => $canChangeInitialDateAndTime ? null : "disabled",
-                'PRIORITY_DISABLED'            => $priority_disabled,
-                'CONTRACT_DISABLED'            => $contract_disabled,
-                'setTimeNowLink'               => $setTimeNowLink,
-                'calendarLinkDate'             => $calendarLinkDate,
-                'completeDate'                 => Controller::dateYMDtoDMY(
+                'DISABLED'                       => $disabled,
+                'COMPLETE_DISABLED'              => $complete_disabled,
+                'INITIAL_DISABLED'               => $initial_disabled,
+                'INITIAL_DATE_DISABLED'          => $canChangeInitialDateAndTime ? null : "disabled",
+                'PRIORITY_DISABLED'              => $priority_disabled,
+                'CONTRACT_DISABLED'              => $contract_disabled,
+                'setTimeNowLink'                 => $setTimeNowLink,
+                'calendarLinkDate'               => $calendarLinkDate,
+                'completeDate'                   => Controller::dateYMDtoDMY(
                     $dsCallActivity->getValue(DBEJCallActivity::completeDate)
                 ),
-                'contactIDMessage'             => Controller::htmlDisplayText(
+                'contactIDMessage'               => Controller::htmlDisplayText(
                     $dsCallActivity->getMessage(DBEJCallActivity::contactID)
                 ),
-                'alarmDate'                    => Controller::dateYMDtoDMY(
+                'alarmDate'                      => Controller::dateYMDtoDMY(
                     $dsCallActivity->getValue(DBEJCallActivity::alarmDate)
                 ),
-                'alarmTime'                    => $dsCallActivity->getValue(
+                'alarmTime'                      => $dsCallActivity->getValue(
                     DBEJCallActivity::alarmTime
                 ) != '00:00:00' ? $dsCallActivity->getValue(DBEJCallActivity::alarmTime) : null,
-                'alarmDateMessage'             => Controller::htmlDisplayText(
+                'alarmDateMessage'               => Controller::htmlDisplayText(
                     $dsCallActivity->getMessage(DBEJCallActivity::alarmDate)
                 ),
-                'alarmTimeMessage'             => Controller::htmlDisplayText(
+                'alarmTimeMessage'               => Controller::htmlDisplayText(
                     $dsCallActivity->getMessage(DBEJCallActivity::alarmTime)
                 ),
-
-                'hideFromCustomerFlagChecked' => Controller::htmlChecked($hideFromCustomerFlag),
-
-                'hideFromCustomerDisabled' => $hideFromCustomerDisabled,
-
-                'hdRemainMinutes'           => $hdAssignedMinutes - $hdUsedMinutes,
-                'esRemainMinutes'           => $esAssignedMinutes - $esUsedMinutes,
-                'imRemainMinutes'           => $imAssignedMinutes - $imUsedMinutes,
-                'hdUsedMinutesNotInclusive' => $hdUsedMinutesNotInclusive,
-                'esUsedMinutesNotInclusive' => $esUsedMinutesNotInclusive,
-                'imUsedMinutesNotInclusive' => $imUsedMinutesNotInclusive,
-                'hdAssignedMinutes'         => $hdAssignedMinutes,
-                'hdUsedMinutes'             => $hdUsedMinutes,
-                'esAssignedMinutes'         => $esAssignedMinutes,
-                'esUsedMinutes'             => $esUsedMinutes,
-                'imAssignedMinutes'         => $imAssignedMinutes,
-                'imUsedMinutes'             => $imUsedMinutes,
-                'userWarned'                => $this->userWarned,
-                'authoriseHide'             => $authorisedByName ? null : 'hidden',
-                'authorisedByName'          => $authorisedByName,
-                'salesRequestStatus'        => $dsCallActivity->getValue(DBECallActivity::salesRequestStatus)
+                'hideFromCustomerFlagChecked'    => Controller::htmlChecked($hideFromCustomerFlag),
+                'hideFromCustomerDisabled'       => $hideFromCustomerDisabled,
+                'hdRemainMinutes'                => $hdAssignedMinutes - $hdUsedMinutes,
+                'esRemainMinutes'                => $esAssignedMinutes - $esUsedMinutes,
+                'imRemainMinutes'                => $imAssignedMinutes - $imUsedMinutes,
+                'projectRemainMinutes'           => $projectTeamAssignedMinutes - $projectUsedMinutes,
+                'hdUsedMinutesNotInclusive'      => $hdUsedMinutesNotInclusive,
+                'esUsedMinutesNotInclusive'      => $esUsedMinutesNotInclusive,
+                'imUsedMinutesNotInclusive'      => $imUsedMinutesNotInclusive,
+                'projectUsedMinutesNotInclusive' => $projectUsedMinutesNotInclusive,
+                'hdAssignedMinutes'              => $hdAssignedMinutes,
+                'hdUsedMinutes'                  => $hdUsedMinutes,
+                'esAssignedMinutes'              => $esAssignedMinutes,
+                'esUsedMinutes'                  => $esUsedMinutes,
+                'imAssignedMinutes'              => $imAssignedMinutes,
+                'imUsedMinutes'                  => $imUsedMinutes,
+                'userWarned'                     => $this->userWarned,
+                'authoriseHide'                  => $authorisedByName ? null : 'hidden',
+                'authorisedByName'               => $authorisedByName,
+                'salesRequestStatus'             => $dsCallActivity->getValue(DBECallActivity::salesRequestStatus)
             )
         );
 
@@ -5036,6 +5045,15 @@ class CTActivity extends CTCNC
                                     $callActivityID
                                 );
                                 $allocatedTime = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
+                            }
+
+                            if ($teamID == 5) {
+                                $usedTime = $this->buActivity->getUsedTimeForProblemAndTeam(
+                                    $problemID,
+                                    5,
+                                    $callActivityID
+                                );
+                                $allocatedTime = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
                             }
 
                             if ($usedTime + $durationMinutes > $allocatedTime) {
@@ -6211,22 +6229,26 @@ class CTActivity extends CTCNC
                 $teamLevel = 1;
             } elseif ($dbeFirstActivity->getValue(DBEJCallActivity::queueNo) == 2) {
                 $teamLevel = 2;
-            } else {
+            } elseif ($dbeFirstActivity->getValue(DBEJCallActivity::queueNo) == 3) {
                 $teamLevel = 3;           // Small Projects
-
+            } else {
+                $teamLevel = 5;           // Small Projects
             }
         }
 
         $teamLevel1Selected = null;
         $teamLevel2Selected = null;
         $teamLevel3Selected = null;
+        $teamLevel5Selected = null;
 
         if ($teamLevel == 1) {
             $teamLevel1Selected = CT_SELECTED;
         } elseif ($teamLevel == 2) {
             $teamLevel2Selected = CT_SELECTED;
-        } else {
+        } elseif ($teamLevel == 3) {
             $teamLevel3Selected = CT_SELECTED;
+        } else {
+            $teamLevel5Selected = CT_SELECTED;
         }
 
         $urlProblemHistoryPopup =
@@ -6252,6 +6274,7 @@ class CTActivity extends CTCNC
                 'teamLevel1Selected'     => $teamLevel1Selected,
                 'teamLevel2Selected'     => $teamLevel2Selected,
                 'teamLevel3Selected'     => $teamLevel3Selected,
+                'teamLevel5Selected'     => $teamLevel5Selected,
                 'problemID'              => $this->getParam('problemID'),
                 'customerID'             => $dbeFirstActivity->getValue(DBEJCallActivity::customerID),
                 'customerName'           => $dbeFirstActivity->getValue(DBEJCallActivity::customerName),
@@ -6494,6 +6517,11 @@ class CTActivity extends CTCNC
                 $usedMinutes = $this->buActivity->getSPTeamUsedTime($problemID);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
                 $teamName = 'Small Projects';
+                break;
+            case 5:
+                $usedMinutes = $this->buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
+                $assignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
+                $teamName = 'Projects';
         }
 
         $leftOnBudget = $assignedMinutes - $usedMinutes;

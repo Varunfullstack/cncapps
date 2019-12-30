@@ -146,7 +146,7 @@ class BUActivity extends Business
         array(
             "1" => "Helpdesk",
             "2" => "Escalations",
-            "3" => "Small Projecst",
+            "3" => "Small Projects",
             "4" => "Sales",
             "5" => "Projects",
             "6" => "Fixed",
@@ -1035,6 +1035,14 @@ class BUActivity extends Business
                     if ($dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes) <= 0) {
                         $dbeProblem->setValue(
                             DBEProblem::smallProjectsTeamLimitMinutes,
+                            5
+                        );
+                    }
+                    break;
+                case 5:
+                    if ($dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes) <= 0) {
+                        $dbeProblem->setValue(
+                            DBEProblem::projectTeamLimitMinutes,
                             5
                         );
                     }
@@ -2872,7 +2880,10 @@ class BUActivity extends Business
 
         $newCallActivity = $this->createSalesRequestActivity(
             $dsCallActivity->getValue(DBEJCallActivity::problemID),
-            $reason
+            $reason,
+            'C',
+            false,
+            $dsCallActivity->getValue(DBECallActivity::requestType)
         );
 
 
@@ -2920,12 +2931,14 @@ class BUActivity extends Business
      * @param $message
      * @param string $status
      * @param bool $isSR
+     * @param int $standardTextId
      * @return DBEJCallActivity
      */
     public function createSalesRequestActivity($problemID,
                                                $message,
                                                $status = "C",
-                                               $isSR = false
+                                               $isSR = false,
+                                               $standardTextId = null
     )
     {
         $lastActivity = $this->getLastActivityInProblem($problemID);
@@ -2948,6 +2961,12 @@ class BUActivity extends Business
             DBEJCallActivity::userID,
             $this->loggedInUserID
         );
+        if ($standardTextId) {
+            $dbeCallActivity->setValue(
+                DBECallActivity::requestType,
+                $standardTextId
+            );
+        }
         $dbeCallActivity->setValue(
             DBEJCallActivity::callActTypeID,
             CONFIG_SALES_ACTIVITY_TYPE_ID
@@ -3041,7 +3060,11 @@ class BUActivity extends Business
     */
         $this->dbeUser->getRow($requestingUserID);
 
-        $toEmail = 'salesRequestReply@' . CONFIG_PUBLIC_DOMAIN . ',' . $this->dbeUser->getValue(
+        $dbeStandardText = new DBEStandardText($this);
+        $dbeStandardText->getRow($dbeCallActivity->getValue(DBECallActivity::requestType));
+        $toEmail = $dbeStandardText->getValue(DBEStandardText::salesRequestEmail);
+
+        $toEmail .= ',' . $this->dbeUser->getValue(
                 DBEUser::username
             ) . '@' . CONFIG_PUBLIC_DOMAIN;
 
@@ -3123,8 +3146,8 @@ class BUActivity extends Business
                 $dbeProblem->getValue(DBEProblem::hdLimitMinutes) + 3
             );
             $dbeProblem->setValue(
-                DBEProblem::smallProjectsTeamLimitMinutes,
-                $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes) + 3
+                DBEProblem::projectTeamLimitMinutes,
+                $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes) + 3
             );
             $dbeProblem->updateRow();
         }
@@ -3304,13 +3327,22 @@ class BUActivity extends Business
                 DBEProblem::esTimeAlertFlag,
                 'N'
             );
-        } else {
+        } elseif ($level == 3) {
             $this->dbeProblem->setValue(
                 DBEProblem::smallProjectsTeamLimitMinutes,
                 $this->dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes) + $minutes
             );
             $this->dbeProblem->setValue(
                 DBEProblem::smallProjectsTeamTimeAlertFlag,
+                'N'
+            );
+        } else {
+            $this->dbeProblem->setValue(
+                DBEProblem::projectTeamLimitMinutes,
+                $this->dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes) + $minutes
+            );
+            $this->dbeProblem->setValue(
+                DBEProblem::projectTeamTimeAlertFlag,
                 'N'
             );
         }
@@ -5430,6 +5462,10 @@ is currently a balance of ';
             $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
         );
         $dbeProblem->setValue(
+            DBEProblem::projectTeamLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
             DBEProblem::customerID,
             @$_SESSION [$sessionKey] ['customerID']
         );
@@ -6651,12 +6687,14 @@ is currently a balance of ';
      * @param $ordheadID
      * @param DataSet $dsInput
      * @param bool|int $selectedOrderLine
+     * @param int $queue
      * @return string
      * @throws Exception
      */
     function createSalesServiceRequest($ordheadID,
                                        $dsInput,
-                                       $selectedOrderLine = false
+                                       $selectedOrderLine = false,
+                                       int $queue = 3
     )
     {
         $buSalesOrder = new BUSalesOrder($this);
@@ -6743,8 +6781,8 @@ is currently a balance of ';
         );
         $dbeProblem->setValue(
             DBEJProblem::queueNo,
-            3
-        );      //Managers
+            $queue
+        );
         $dbeProblem->setValue(
             DBEJProblem::rootCauseID,
             null
@@ -6786,9 +6824,13 @@ is currently a balance of ';
             $buHeader = new BUHeader($this);
             $dsHeader = new DataSet($this);
             $buHeader->getHeader($dsHeader);
+
+            $queueProblemColumn = $queue == 3 ? DBEProblem::smallProjectsTeamLimitMinutes : DBEProblem::projectTeamLimitMinutes;
+            $queueHeaderColumn = $queue == 3 ? DBEHeader::smallProjectsTeamLimitMinutes : DBEHeader::projectTeamLimitMinutes;
+
             $dbeProblem->setValue(
-                DBEProblem::smallProjectsTeamLimitMinutes,
-                $dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
+                $queueProblemColumn,
+                $queueHeaderColumn
             );
             $dsOrdlineBudget = new DataSet($this);
             $buSalesOrder->getOrderByOrdheadID(
@@ -6819,7 +6861,7 @@ is currently a balance of ';
             }
 
             if ($normalMinutes > 0) {
-                $dbeProblem->setValue(DBEProblem::smallProjectsTeamLimitMinutes, $normalMinutes);
+                $dbeProblem->setValue($queueProblemColumn, $normalMinutes);
             }
         }
 
@@ -7653,6 +7695,10 @@ is currently a balance of ';
         $dbeProblem->setValue(
             DBEProblem::smallProjectsTeamLimitMinutes,
             $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::projectTeamLimitMinutes,
+            $this->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
         );
         $dbeProblem->setValue(
             DBEProblem::slaResponseHours,
@@ -8848,6 +8894,12 @@ is currently a balance of ';
                     DBEProblem::smallProjectsTeamLimitMinutes,
                     $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes) + $minutesToAdd
                 );
+                break;
+            case 5:
+                $dbeProblem->setValue(
+                    DBEProblem::projectTeamLimitMinutes,
+                    $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes) + $minutesToAdd
+                );
         }
 
 
@@ -9790,6 +9842,11 @@ is currently a balance of ';
                 $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
             );
             $dbeProblem->setValue(
+                DBEProblem::projectTeamLimitMinutes,
+                $this->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
+            );
+
+            $dbeProblem->setValue(
                 DBEProblem::userID,
                 null
             );        // not allocated
@@ -10156,7 +10213,6 @@ is currently a balance of ';
             "SELECT
         team.level as teamLevel,
         consultant.standardDayHours
-        
       FROM
         consultant
         JOIN team ON team.teamID = consultant.teamID
@@ -10572,6 +10628,10 @@ is currently a balance of ';
                 $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
             );
             $dbeProblem->setValue(
+                DBEProblem::projectTeamLimitMinutes,
+                $this->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
+            );
+            $dbeProblem->setValue(
                 DBEProblem::slaResponseHours,
                 $this->getSlaResponseHours(
                     5,
@@ -10675,15 +10735,6 @@ is currently a balance of ';
             $dbeCallActivity->insertRow();
 
         }
-
-        // we have to create an open "sales activity"
-        $salesRequestActivity = $this->createSalesRequestActivity(
-            $problemID,
-            $message,
-            "O",
-            $createSR
-        );
-
         $buStandardText = new BUStandardText($this);
 
         $dbeStandardText = new DataSet($this);
@@ -10691,6 +10742,16 @@ is currently a balance of ';
             $type,
             $dbeStandardText
         );
+
+        // we have to create an open "sales activity"
+        $salesRequestActivity = $this->createSalesRequestActivity(
+            $problemID,
+            $message,
+            "O",
+            $createSR,
+            $dbeStandardText->getValue(DBEStandardText::stt_standardtextno)
+        );
+
         $destEmail = $dbeStandardText->getValue(DBEStandardText::salesRequestEmail);
         $problem = new DBEProblem($this);
         $problem->getRow($problemID);

@@ -1103,6 +1103,7 @@ class CTCurrentActivityReport extends CTCNC
             $hdUsedMinutes = $buActivity->getHDTeamUsedTime($problemID);
             $esUsedMinutes = $buActivity->getESTeamUsedTime($problemID);
             $spUsedMinutes = $buActivity->getSPTeamUsedTime($problemID);
+            $projectUsedMinutes = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
 
             $dbeProblem = new DBEProblem($this);
             $dbeProblem->setValue(
@@ -1114,10 +1115,12 @@ class CTCurrentActivityReport extends CTCNC
             $hdAssignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
             $esAssignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
             $smallProjectsTeamAssignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
+            $projectTeamAssignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
 
             $hdRemaining = $hdAssignedMinutes - $hdUsedMinutes;
             $esRemaining = $esAssignedMinutes - $esUsedMinutes;
             $smallProjectsTeamRemaining = $smallProjectsTeamAssignedMinutes - $spUsedMinutes;
+            $projectTeamRemaining = $projectTeamAssignedMinutes - $projectUsedMinutes;
 
 
             $hoursRemaining = number_format(
@@ -1145,9 +1148,11 @@ class CTCurrentActivityReport extends CTCNC
                     'hdRemaining'                => $hdRemaining,
                     'esRemaining'                => $esRemaining,
                     'smallProjectsTeamRemaining' => $smallProjectsTeamRemaining,
+                    "projectTeamRemaining"       => $projectTeamRemaining,
                     'hdColor'                    => $this->pickColor($hdRemaining),
                     'esColor'                    => $this->pickColor($esRemaining),
                     'smallProjectsTeamColor'     => $this->pickColor($smallProjectsTeamRemaining),
+                    'projectTeamColor'           => $this->pickColor($projectTeamRemaining),
                     'urlCustomer'                => $urlCustomer,
                     'time'                       => $serviceRequests->getValue(DBEJProblem::lastStartTime),
                     'date'                       => Controller::dateYMDtoDMY(

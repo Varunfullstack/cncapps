@@ -6,11 +6,12 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUEscalationReport.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
-class CTEscalationReport extends CTCNC
+class CTTeamAndUserStatistics extends CTCNC
 {
     const searchFormFromDate = 'fromDate';
     const searchFormToDate = 'toDate';

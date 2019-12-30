@@ -5,7 +5,7 @@
  * Date: 22/08/2018
  * Time: 10:39
  */
-
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg ["path_dbe"] . "/DBEJCallActivity.php");
@@ -61,8 +61,18 @@ class CTChangeRequestDashboard extends CTCNC
 
         $this->setPageTitle('Change Request Dashboard');
 
+        $showHelpDesk = isset($_REQUEST['HD']);
+        $showEscalation = isset($_REQUEST['ES']);
+        $showSmallProjects = isset($_REQUEST['SP']);
+        $showProjects = isset($_REQUEST['P']);
+
         $dbejCallActivity = new DBEJCallActivity($this);
-        $dbejCallActivity->getPendingChangeRequestRows();
+        $dbejCallActivity->getPendingChangeRequestRows(
+            $showHelpDesk,
+            $showEscalation,
+            $showSmallProjects,
+            $showProjects
+        );
 
         $this->template->set_block(
             'ChangeRequestDashboard',
@@ -118,6 +128,15 @@ class CTChangeRequestDashboard extends CTCNC
                 true
             );
         }
+
+        $this->template->set_var(
+            [
+                "helpDeskChecked"      => $showHelpDesk ? "checked" : null,
+                "escalationChecked"    => $showEscalation ? "checked" : null,
+                "smallProjectsChecked" => $showSmallProjects ? "checked" : null,
+                "projectsChecked"      => $showProjects ? "checked" : null
+            ]
+        );
 
 
         $this->template->parse(

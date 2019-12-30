@@ -1,4 +1,5 @@
 <?php
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCurrentActivityReport.inc.php');
 require_once($cfg['path_bu'] . '/BUSecondSite.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -43,8 +44,8 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 if ($this->getSessionParam('ES')) {
                     $options['ES'] = true;
                 }
-                if ($this->getSessionParam('IM')) {
-                    $options['IM'] = true;
+                if ($this->getSessionParam('SP')) {
+                    $options['SP'] = true;
                 }
                 if ($this->getSessionParam('showP5')) {
                     $options['showP5'] = true;
@@ -70,7 +71,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $showSmallProjects = isset($_REQUEST['SP']);
         $this->setSessionParam('HD', $showHelpDesk);
         $this->setSessionParam('ES', $showEscalation);
-        $this->setSessionParam('IM', $showSmallProjects);
+        $this->setSessionParam('SP', $showSmallProjects);
         $this->setSessionParam('showP5', $isP5);
 
         $this->setPageTitle('SD Manager Dashboard' . ($isP5 ? ' Priority 5' : null));

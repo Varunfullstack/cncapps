@@ -553,7 +553,11 @@ span#imRemainMinutes {
     color: red;
     font-size: large;
     font-weight: bold;
-
+}
+span#projectRemainMinutes {
+    color: red;
+    font-size: large;
+    font-weight: bold;
 }
 
 table#team-performance td, th {
