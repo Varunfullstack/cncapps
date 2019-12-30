@@ -232,16 +232,4 @@
             </column>
         </addColumn>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue697-18">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="callactivity" columnName="requestType"/>
-            </not>
-        </preConditions>
-        <addColumn tableName="callactivity">
-            <column name="requestType" type="int(11)" defaultValue="68">
-                <constraints nullable="true"/>
-            </column>
-        </addColumn>
-    </changeSet>
 </databaseChangeLog>

@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v3.9.0] - 2019-12-30
 ### Added
 - Issue 689 - Solarwinds cloud O365 backup API
 - Issue 706 - Create Sales Request - allow attachments

@@ -253,42 +253,7 @@
             </createTable>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="625-17">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="callactivity" columnName="overtimeApprovedDate"/>
-            </not>
-        </preConditions>
-        <addColumn tableName="callactivity">
-            <column name="overtimeApprovedDate" type="datetime">
-                <constraints nullable="true"/>
-            </column>
-        </addColumn>
-    </changeSet>
-    <changeSet author="pavwebdev" id="625-18">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="callactivity" columnName="overtimeApprovedBy"/>
-            </not>
-        </preConditions>
-        <addColumn tableName="callactivity">
-            <column name="overtimeApprovedBy" type="bigint(11)">
-                <constraints nullable="true"/>
-            </column>
-        </addColumn>
-    </changeSet>
-    <changeSet author="pavwebdev" id="625-19">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="callactivity" columnName="overtimeDeniedReason"/>
-            </not>
-        </preConditions>
-        <addColumn tableName="callactivity">
-            <column name="overtimeDeniedReason" type="longtext">
-                <constraints nullable="true"/>
-            </column>
-        </addColumn>
-    </changeSet>
+
     <changeSet author="pavwebdev" id="625-20">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="expense" columnName="dateSubmitted"/>
