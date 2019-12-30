@@ -6451,7 +6451,7 @@ class CTActivity extends CTCNC
 
             $nextURL =
                 Controller::buildLink(
-                    'ChangeRequestDashboard.php',
+                    'ChangeRequestDashboard.php?HD&ES&SP&P',
                     array()
                 );
 
