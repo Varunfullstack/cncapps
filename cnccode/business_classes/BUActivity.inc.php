@@ -6853,10 +6853,11 @@ is currently a balance of ';
 
             $queueProblemColumn = $queue == 3 ? DBEProblem::smallProjectsTeamLimitMinutes : DBEProblem::projectTeamLimitMinutes;
             $queueHeaderColumn = $queue == 3 ? DBEHeader::smallProjectsTeamLimitMinutes : DBEHeader::projectTeamLimitMinutes;
+            $minutesInADayColumn = $queue == 3 ? DBEHeader::smallProjectsTeamMinutesInADay : DBEHeader::projectTeamMinutesInADay;
 
             $dbeProblem->setValue(
                 $queueProblemColumn,
-                $queueHeaderColumn
+                $dsHeader->getValue($queueHeaderColumn)
             );
             $dsOrdlineBudget = new DataSet($this);
             $buSalesOrder->getOrderByOrdheadID(
@@ -6865,7 +6866,7 @@ is currently a balance of ';
                 $dsOrdlineBudget
             );
 
-            $minutesInADay = $dsHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay);
+            $minutesInADay = $dsHeader->getValue($minutesInADayColumn);
 
             $normalMinutes = 0;
             while ($dsOrdlineBudget->fetchNext()) {
