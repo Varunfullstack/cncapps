@@ -1,7 +1,7 @@
 <?php
 require_once("config.inc.php");
 global $cfg;
-require_once($cfg["path_ct"] . "/CTTeamAndUsersStatistics.inc.php");
+require_once($cfg["path_ct"] . "/CTTeamAndUserStatistics.inc.php");
 session_start();
 page_open(
     array(
