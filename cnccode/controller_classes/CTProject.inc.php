@@ -998,57 +998,6 @@ class CTProject extends CTCNC
 
     }
 
-    /**
-     * @return array
-     * @throws Exception
-     */
-    private function fetchBudgetData()
-    {
-        if (!$this->getParam('projectID')) {
-            throw new Exception('Project ID is missing');
-        }
-
-
-        $dbeProject = new DBEProject($this);
-        $dbeProject->getRow($this->getParam('projectID'));
-        $buHeader = new BUHeader($this);
-        $dbeHeader = new DataSet($this);
-        $buHeader->getHeader($dbeHeader);
-
-
-        $data = [
-            "salesOrderID"     => (int)$dbeProject->getValue(DBEProject::ordHeadID),
-            "calculatedBudget" => $dbeProject->getValue(DBEProject::calculatedBudget) == 'Y',
-            "stats"            => [
-                "inHoursAllocated" => 'N/A',
-                "inHoursUsed"      => 'N/A',
-                "ooHoursAllocated" => 'N/A',
-                "ooHoursUsed"      => 'N/A',
-            ],
-            "minutesPerDay"    => $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay),
-            "data"             => []
-        ];
-        if (!$dbeProject->getValue(DBEProject::ordHeadID)) {
-            return $data;
-        }
-
-        $salesOrderID = $dbeProject->getValue(DBEProject::ordHeadID);
-
-        $data['data'] = $this->usedBudgetData($salesOrderID);
-
-        $buExpense = new BUExpense($this);
-
-        $data['stats']['expenses'] = $buExpense->getTotalExpensesForSalesOrder($salesOrderID);
-
-        if ($dbeProject->getValue(DBEProject::calculatedBudget) != 'Y') {
-            return $data;
-        }
-
-        $data['stats']['inHoursAllocated'] = $dbeProject->getValue(DBEProject::inHoursBudgetDays);
-        $data['stats']['ooHoursAllocated'] = $dbeProject->getValue(DBEProject::outOfHoursBudgetDays);
-
-        return $data;
-    }
 
     private function usedBudgetData($salesOrderID)
     {
@@ -1145,219 +1094,6 @@ GROUP BY caa_callacttypeno,
         while ($db->next_record(MYSQLI_ASSOC)) {
             $data[] = $db->Record;
         }
-        return $data;
-    }
-
-    /**
-     * @return array
-     * @throws Exception
-     */
-    private function fetchBudgetData()
-    {
-        if (!$this->getParam('projectID')) {
-            throw new Exception('Project ID is missing');
-        }
-
-
-        $dbeProject = new DBEProject($this);
-        $dbeProject->getRow($this->getParam('projectID'));
-        $buHeader = new BUHeader($this);
-        $dbeHeader = new DataSet($this);
-        $buHeader->getHeader($dbeHeader);
-
-
-        $data = [
-            "salesOrderID"     => (int)$dbeProject->getValue(DBEProject::ordHeadID),
-            "calculatedBudget" => $dbeProject->getValue(DBEProject::calculatedBudget) == 'Y',
-            "stats"            => [
-                "inHoursAllocated" => 'N/A',
-                "inHoursUsed"      => 'N/A',
-                "ooHoursAllocated" => 'N/A',
-                "ooHoursUsed"      => 'N/A',
-            ],
-            "minutesPerDay"    => $dbeHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay),
-            "data"             => []
-        ];
-        if (!$dbeProject->getValue(DBEProject::ordHeadID)) {
-            return $data;
-        }
-
-        $salesOrderID = $dbeProject->getValue(DBEProject::ordHeadID);
-
-        $data['data'] = $this->usedBudgetData($salesOrderID);
-
-        $buExpense = new BUExpense($this);
-
-        $data['stats']['expenses'] = $buExpense->getTotalExpensesForSalesOrder($salesOrderID);
-
-        if ($dbeProject->getValue(DBEProject::calculatedBudget) != 'Y') {
-            return $data;
-        }
-
-        $data['stats']['inHoursAllocated'] = $dbeProject->getValue(DBEProject::inHoursBudgetDays);
-        $data['stats']['ooHoursAllocated'] = $dbeProject->getValue(DBEProject::outOfHoursBudgetDays);
-
-        return $data;
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function showList()
-    {
-
-
-        $this->setPageTitle('Projects');
-        $this->setTemplateFiles(
-            array('ProjectList' => 'ProjectList')
-        );
-
-        $dbeProject = new DBEProject($this);
-
-        $this->template->set_block(
-            'ProjectList',
-            'projectBlock',
-            'project'
-        );
-        $currentProjects = $dbeProject->getCurrentProjects();
-
-        foreach ($currentProjects as $project) {
-            $hasProjectPlan = !!$project['planFileName'];
-
-            $projectPlanDownloadURL =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    [
-                        'action'    => self::DOWNLOAD_PROJECT_PLAN,
-                        'projectID' => $project['projectID']
-                    ]
-                );
-
-            $downloadProjectPlanClass = $hasProjectPlan ? '' : 'class="redText"';
-            $downloadProjectPlanURL = $hasProjectPlan ? "href='$projectPlanDownloadURL' target='_blank' " : 'href="#"';
-            $projectPlanLink = "<a id='projectPlanLink' $downloadProjectPlanClass $downloadProjectPlanURL>Project Plan</a>";
-
-            $historyPopupURL = Controller::buildLink(
-                'Project.php',
-                array(
-                    'action'    => 'historyPopup',
-                    'htmlFmt'   => CT_HTML_FMT_POPUP,
-                    'projectID' => $project['projectID']
-                )
-            );
-
-            $projectEditURL = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                [
-                    "action"    => 'edit',
-                    "projectID" => $project['projectID']
-                ]
-            );
-
-            $projectLink = "<a href='$projectEditURL'>$project[description]</a>";
-
-            $lastUpdated = 'No updates';
-
-            if ($project['createdBy']) {
-                $lastUpdated = "<span style='font-weight: bold'>" . substr(
-                        $project['createdAt'],
-                        0,
-                        -8
-                    ) . " by $project[createdBy]:</span> $project[comment]";
-            }
-
-            $inHoursBudget = "Uncalculated";
-            $inHoursUsed = "Uncalculated";
-            $outHoursBudget = "Uncalculated";
-            $outHoursUsed = "Uncalculated";
-
-
-            if ($project['calculatedBudget'] == 'Y') {
-                $hoursUsed = $this->calculateInHoursOutHoursUsed($project['projectID']);
-                $inHoursBudget = $project['inHoursBudgetDays'];
-                $inHoursUsed = $hoursUsed['inHoursUsed'];
-                $outHoursBudget = $project['outOfHoursBudgetDays'];
-                $outHoursUsed = $hoursUsed['outHoursUsed'];
-            }
-
-            $this->template->setVar(
-                [
-                    "description"      => $projectLink,
-                    "commenceDate"     => $project['commenceDate'],
-                    'customerName'     => $project['customerName'],
-                    "projectPlanLink"  => $projectPlanLink,
-                    "latestUpdate"     => $lastUpdated,
-                    "historyPopupURL"  => $historyPopupURL,
-                    "inHoursBudget"    => $inHoursBudget,
-                    "inHoursUsed"      => $inHoursUsed,
-                    "inHoursRed"       => $inHoursUsed > $inHoursBudget ? 'class="redText"' : '',
-                    "outHoursRed"      => $outHoursUsed > $outHoursBudget ? 'class="redText"' : '',
-                    "outHoursBudget"   => $outHoursBudget,
-                    "outHoursUsed"     => $outHoursUsed,
-                    'assignedEngineer' => $project['engineerName']
-                ]
-            );
-            $this->template->parse(
-                'project',
-                'projectBlock',
-                true
-            );
-        }
-
-        $this->template->parse(
-            'CONTENTS',
-            'ProjectList',
-            true
-        );
-
-        $this->parsePage();
-    }
-
-
-    private function calculateInHoursOutHoursUsed($projectID)
-    {
-        $dbeProject = new DBEProject($this);
-        $dbeProject->getRow($projectID);
-        $buHeader = new BUHeader($this);
-        $dbeHeader = new DataSet($this);
-        $buHeader->getHeader($dbeHeader);
-
-
-        $data = [
-            "inHoursUsed"   => 0,
-            "outHoursUsed"  => 0,
-            "minutesPerDay" => $dbeHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay)
-        ];
-        if (!$dbeProject->getValue(DBEProject::ordHeadID)) {
-            return $data;
-        }
-
-        $salesOrderID = $dbeProject->getValue(DBEProject::ordHeadID);
-
-        $activities = $this->usedBudgetData($salesOrderID);
-
-        $chargeableActivities = [4, 8];
-
-        foreach ($activities as $activity) {
-            if (!in_array(
-                $activity['caa_callacttypeno'],
-                $chargeableActivities
-            )) {
-                continue;
-            }
-
-            $data['inHoursUsed'] += $activity['inHours'];
-            $data['outHoursUsed'] += $activity['outHours'];
-        }
-
-        $data['inHoursUsed'] = round(
-            ($data['inHoursUsed'] * 60) / $data['minutesPerDay'],
-            2
-        );
-        $data['outHoursUsed'] = round(
-            ($data['outHoursUsed'] * 60) / $data['minutesPerDay'],
-            2
-        );
         return $data;
     }
 
@@ -1606,7 +1342,7 @@ GROUP BY caa_callacttypeno,
         $data = [
             "inHoursUsed"   => 0,
             "outHoursUsed"  => 0,
-            "minutesPerDay" => $dbeHeader->getValue(DBEHeader::ImplementationTeamMinutesInADay)
+            "minutesPerDay" => $dbeHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay)
         ];
         if (!$dbeProject->getValue(DBEProject::ordHeadID)) {
             return $data;
@@ -1638,6 +1374,58 @@ GROUP BY caa_callacttypeno,
             ($data['outHoursUsed'] * 60) / $data['minutesPerDay'],
             2
         );
+        return $data;
+    }
+
+    /**
+     * @return array
+     * @throws Exception
+     */
+    private function fetchBudgetData()
+    {
+        if (!$this->getParam('projectID')) {
+            throw new Exception('Project ID is missing');
+        }
+
+
+        $dbeProject = new DBEProject($this);
+        $dbeProject->getRow($this->getParam('projectID'));
+        $buHeader = new BUHeader($this);
+        $dbeHeader = new DataSet($this);
+        $buHeader->getHeader($dbeHeader);
+
+
+        $data = [
+            "salesOrderID"     => (int)$dbeProject->getValue(DBEProject::ordHeadID),
+            "calculatedBudget" => $dbeProject->getValue(DBEProject::calculatedBudget) == 'Y',
+            "stats"            => [
+                "inHoursAllocated" => 'N/A',
+                "inHoursUsed"      => 'N/A',
+                "ooHoursAllocated" => 'N/A',
+                "ooHoursUsed"      => 'N/A',
+            ],
+            "minutesPerDay"    => $dbeHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay),
+            "data"             => []
+        ];
+        if (!$dbeProject->getValue(DBEProject::ordHeadID)) {
+            return $data;
+        }
+
+        $salesOrderID = $dbeProject->getValue(DBEProject::ordHeadID);
+
+        $data['data'] = $this->usedBudgetData($salesOrderID);
+
+        $buExpense = new BUExpense($this);
+
+        $data['stats']['expenses'] = $buExpense->getTotalExpensesForSalesOrder($salesOrderID);
+
+        if ($dbeProject->getValue(DBEProject::calculatedBudget) != 'Y') {
+            return $data;
+        }
+
+        $data['stats']['inHoursAllocated'] = $dbeProject->getValue(DBEProject::inHoursBudgetDays);
+        $data['stats']['ooHoursAllocated'] = $dbeProject->getValue(DBEProject::outOfHoursBudgetDays);
+
         return $data;
     }
 
