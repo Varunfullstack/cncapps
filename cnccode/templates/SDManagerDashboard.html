@@ -11,7 +11,7 @@
     filters = {
         helpDesk: 'HD',
         escalation: 'ES',
-        implementation: 'IM'
+        smallProjects: 'SP'
     };
 
     function changeFilter() {
@@ -61,10 +61,10 @@
            id="escalation"
            onchange="changeFilter()"
     >
-    <label for="implementation">IMT</label>
+    <label for="smallProjects">SP</label>
     <input type="checkbox"
-           {implementationChecked}
-           id="implementation"
+           {smallProjectsChecked}
+           id="smallProjects"
            onchange="changeFilter()"
     >
 

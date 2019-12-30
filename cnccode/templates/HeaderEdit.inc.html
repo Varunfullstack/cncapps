@@ -3,7 +3,7 @@
         src="ckeditor/ckeditor.js"
 >
 </script>
-<script language='JavaScript'>
+<script type="application/javascript">
     function validateItemDescription() {
         if (Trim(document.getElementById("gscItemDescription").value) != "") {
             window.open('{urlItemPopup}&itemDescription=' +
@@ -360,12 +360,12 @@
                         {DISABLED}
                         required
                         type="text"
-                        name="header[1][hdTeamLimitHours]"
-                        value="{hdTeamLimitHours}"
-                        title="Default limit in hours that members of HD team have to solve SRs"
+                        name="header[1][hdTeamLimitMinutes]"
+                        value="{hdTeamLimitMinutes}"
+                        title="Default limit in minutes that members of HD team have to solve SRs"
                         size="5"
                         maxlength="5"
-                > <span class="formErrorMessage">{hdTeamLimitHoursMessage}</span>
+                > <span class="formErrorMessage">{hdTeamLimitMinutesMessage}</span>
             </td>
         </tr>
 
@@ -455,12 +455,12 @@
                         {DISABLED}
                         required
                         type="text"
-                        name="header[1][esTeamLimitHours]"
-                        value="{esTeamLimitHours}"
-                        title="Default limit in hours that members of Escalation team have to solve SRs"
+                        name="header[1][esTeamLimitMinutes]"
+                        value="{esTeamLimitMinutes}"
+                        title="Default limit in minutes that members of Escalation team have to solve SRs"
                         size="5"
                         maxlength="5"
-                > <span class="formErrorMessage">{esTeamLimitHoursMessage}</span>
+                > <span class="formErrorMessage">{esTeamLimitMinutesMessage}</span>
             </td>
         </tr>
 
@@ -513,97 +513,191 @@
         </tr>
 
         <tr>
-            <td class="promptText">Implementation Team Target Log %</td>
+            <td class="promptText">Small Projects Team Target Log %</td>
             <td class="field">
                 <input
                         {DISABLED}
                         required
                         type="text"
-                        name="header[1][imTeamTargetLogPercentage]"
-                        value="{imTeamTargetLogPercentage}"
-                        title="Target % of time to be logged in a day for Implementation team"
+                        name="header[1][smallProjectsTeamTargetLogPercentage]"
+                        value="{smallProjectsTeamTargetLogPercentage}"
+                        title="Target % of time to be logged in a day for Small Projects team"
                         size="5"
                         maxlength="5"
-                > <span class="formErrorMessage">{imTeamTargetLogPercentageMessage}</span>
+                > <span class="formErrorMessage">{smallProjectsTeamTargetLogPercentageMessage}</span>
             </td>
         </tr>
 
         <tr>
-            <td class="promptText">Implementation Team SR Default Limit Minutes</td>
+            <td class="promptText">Small Projects Team SR Default Limit Minutes</td>
             <td class="field">
                 <input
                         {DISABLED}
                         required
                         type="text"
-                        name="header[1][imTeamLimitHours]"
-                        value="{imTeamLimitHours}"
-                        title="Default limit in hours that members of Implementation team have to solve SRs"
+                        name="header[1][smallProjectsTeamLimitMinutes]"
+                        value="{smallProjectsTeamLimitMinutes}"
+                        title="Default limit in minutes that members of Small Projects team have to solve SRs"
                         size="5"
                         maxlength="5"
-                > <span class="formErrorMessage">{imTeamLimitHoursMessage}</span>
+                > <span class="formErrorMessage">{smallProjectsTeamLimitMinutesMessage}</span>
             </td>
         </tr>
 
         <tr>
-            <td class="promptText">Implementation Team Minutes in a day</td>
+            <td class="promptText">Small Projects Team Minutes in a day</td>
             <td class="field">
                 <input
                         {DISABLED}
                         required
                         type="text"
-                        name="header[1][imTeamMinutesInADay]"
-                        value="{imTeamMinutesInADay}"
-                        title="The amount of minutes in a day for the Implementation Team"
+                        name="header[1][smallProjectsTeamMinutesInADay]"
+                        value="{smallProjectsTeamMinutesInADay}"
+                        title="The amount of minutes in a day for the Small Projects Team"
                         size="5"
                         maxlength="5"
-                > <span class="formErrorMessage">{imTeamMinutesInADayMessage}</span>
+                > <span class="formErrorMessage">{smallProjectsTeamMinutesInADayMessage}</span>
             </td>
         </tr>
         <tr>
-            <td class="promptText">Implementation Team Target SLA Response %</td>
+            <td class="promptText">Small Projects Team Target SLA Response %</td>
             <td class="field">
                 <input
                         {DISABLED}
                         required
                         type="text"
-                        name="header[1][imTeamTargetSlaPercentage]"
-                        value="{imTeamTargetSlaPercentage}"
+                        name="header[1][smallProjectsTeamTargetSlaPercentage]"
+                        value="{smallProjectsTeamTargetSlaPercentage}"
                         title="Target % of SRs to be responded to within SLA"
                         size="5"
                         maxlength="5"
-                > <span class="formErrorMessage">{imTeamTargetSlaPercentageMessage}</span>
+                > <span class="formErrorMessage">{smallProjectsTeamTargetSlaPercentageMessage}</span>
             </td>
         </tr>
 
         <tr>
-            <td class="promptText">Implementation Team Target Fix Hours</td>
+            <td class="promptText">Small Projects Team Target Fix Hours</td>
             <td class="field">
                 <input
                         {DISABLED}
                         required
                         type="text"
-                        name="header[1][imTeamTargetFixHours]"
-                        value="{imTeamTargetFixHours}"
+                        name="header[1][smallProjectsTeamTargetFixHours]"
+                        value="{smallProjectsTeamTargetFixHours}"
                         title="Target hours for SRs to be fixed to within"
                         size="5"
                         maxlength="5"
-                > <span class="formErrorMessage">{imTeamTargetFixHoursMessage}</span>
+                > <span class="formErrorMessage">{smallProjectsTeamTargetFixHoursMessage}</span>
             </td>
         </tr>
 
         <tr>
-            <td class="promptText">Implementation Team Target Fix Qty Per Month</td>
+            <td class="promptText">Small Projects Team Target Fix Qty Per Month</td>
             <td class="field">
                 <input
                         {DISABLED}
                         required
                         type="text"
-                        name="header[1][imTeamTargetFixQtyPerMonth]"
-                        value="{imTeamTargetFixQtyPerMonth}"
+                        name="header[1][smallProjectsTeamTargetFixQtyPerMonth]"
+                        value="{smallProjectsTeamTargetFixQtyPerMonth}"
                         title="Target number of SRs fix per month"
                         size="5"
                         maxlength="5"
-                > <span class="formErrorMessage">{imTeamTargetFixQtyPerMonthMessage}</span>
+                > <span class="formErrorMessage">{smallProjectsTeamTargetFixQtyPerMonthMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Project Team Target Log %</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        required
+                        type="text"
+                        name="header[1][projectTeamTargetLogPercentage]"
+                        value="{projectTeamTargetLogPercentage}"
+                        title="Target % of time to be logged in a day for Project team"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{projectTeamTargetLogPercentageMessage}</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Project Team SR Default Limit Minutes</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        required
+                        type="text"
+                        name="header[1][projectTeamLimitMinutes]"
+                        value="{projectTeamLimitMinutes}"
+                        title="Default limit in minutes that members of Project team have to solve SRs"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{projectTeamLimitHoursMessage}</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Project Team Minutes in a day</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        required
+                        type="text"
+                        name="header[1][projectTeamMinutesInADay]"
+                        value="{projectTeamMinutesInADay}"
+                        title="The amount of minutes in a day for the Project Team"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{projectTeamMinutesInADayMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Project Team Target SLA Response %</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        required
+                        type="text"
+                        name="header[1][projectTeamTargetSlaPercentage]"
+                        value="{projectTeamTargetSlaPercentage}"
+                        title="Target % of SRs to be responded to within SLA"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{projectTeamTargetSlaPercentageMessage}</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Project Team Target Fix Hours</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        required
+                        type="text"
+                        name="header[1][projectTeamTargetFixHours]"
+                        value="{projectTeamTargetFixHours}"
+                        title="Target hours for SRs to be fixed to within"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{projectTeamTargetFixHoursMessage}</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="promptText">Project Team Target Fix Qty Per Month</td>
+            <td class="field">
+                <input
+                        {DISABLED}
+                        required
+                        type="text"
+                        name="header[1][projectTeamTargetFixQtyPerMonth]"
+                        value="{projectTeamTargetFixQtyPerMonth}"
+                        title="Target number of SRs fix per month"
+                        size="5"
+                        maxlength="5"
+                > <span class="formErrorMessage">{projectTeamTargetFixQtyPerMonthMessage}</span>
             </td>
         </tr>
         <tr>
@@ -1013,6 +1107,19 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">Pending Time Limit Action Threshold Minutes</td>
+            <td class="inputText">
+                <input {DISABLED}
+                       type="number"
+                       name="header[1][pendingTimeLimitActionThresholdMinutes]"
+                       value="{pendingTimeLimitActionThresholdMinutes}"
+                       title="Threshold Minutes"
+                       required
+                >
+                <span class="formErrorMessage">{pendingTimeLimitActionThresholdMinutesMessage}</span>
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">Solarwinds Partner Name</td>
             <td class="inputText">
                 <input {DISABLED}
@@ -1375,3 +1482,4 @@
         <!-- END portalDocumentBlock -->
     </table>
     <!-- End Template: HeaderEdit.inc.html -->
+</div>

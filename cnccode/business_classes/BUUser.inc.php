@@ -272,7 +272,6 @@ class BUUser extends Business
 
         $query .= " ORDER BY userID,
                       user_time_log.loggedDate ASC";
-
         $db->query($query);
         $rows = [];
         while ($db->next_record(1)) {

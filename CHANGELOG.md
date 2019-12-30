@@ -15,6 +15,7 @@ This project changes will be shown here.
 - Issue 715 - Create SR from Sales Order formatting improvements
 - Issue 710 - Project date sorting
 - Issue 716 - 3CX Address Book Export reduce to 500 rows
+- Issue 697 - CNC Company changes.
 
 ## [v3.8.5] - 2019-12-18
 ### Fixed

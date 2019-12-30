@@ -48,16 +48,18 @@ class DBEProblem extends DBEntity
     const queueNo = "queueNo";
     const hdLimitMinutes = "hdLimitHours";
     const esLimitMinutes = "esLimitHours";
-    const imLimitMinutes = "imLimitHours";
+    const smallProjectsTeamLimitMinutes = "imLimitHours";
+    const projectTeamLimitMinutes = 'projectTeamLimitMinutes';
     const hdTimeAlertFlag = "hdTimeAlertFlag";
     const esTimeAlertFlag = "esTimeAlertFlag";
-    const imTimeAlertFlag = "imTimeAlertFlag";
+    const smallProjectsTeamTimeAlertFlag = "imTimeAlertFlag";
     const hdPauseCount = "hdPauseCount";
     const managementReviewReason = "managementReviewReason";
     const startedUserID = "startedUserID";
     const reopenedDate = "reopenedDate";
     const authorisedBy = "authorisedBy";
     const openHours = "openHours";
+    const projectTeamTimeAlertFlag = "projectTeamTimeAlertFlag";
 
     /**
      * calls constructor()
@@ -317,10 +319,15 @@ class DBEProblem extends DBEntity
             "pro_es_limit_minutes"
         );
         $this->addColumn(
-            self::imLimitMinutes,
+            self::smallProjectsTeamLimitMinutes,
             DA_INTEGER,
             DA_NOT_NULL,
             "pro_im_limit_minutes"
+        );
+        $this->addColumn(
+            self::projectTeamLimitMinutes,
+            DA_INTEGER,
+            DA_NOT_NULL
         );
         $this->addColumn(
             self::hdTimeAlertFlag,
@@ -335,10 +342,15 @@ class DBEProblem extends DBEntity
             "pro_es_time_alert_flag"
         );
         $this->addColumn(
-            self::imTimeAlertFlag,
+            self::smallProjectsTeamTimeAlertFlag,
             DA_YN,
             DA_ALLOW_NULL,
             "pro_im_time_alert_flag"
+        );
+        $this->addColumn(
+            self::projectTeamTimeAlertFlag,
+            DA_YN,
+            DA_ALLOW_NULL
         );
         $this->addColumn(
             self::hdPauseCount,

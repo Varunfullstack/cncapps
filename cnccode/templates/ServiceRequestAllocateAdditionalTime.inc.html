@@ -24,20 +24,31 @@
 </script>
 
 
-<FORM method="post" action="{urlUpdateActivity}" name="callActivity" AUTOCOMPLETE="off">
-    <input type="hidden" name="problemID" value="{problemID}">
+<FORM method="post"
+      action="{urlUpdateActivity}"
+      name="callActivity"
+      AUTOCOMPLETE="off"
+>
+    <input type="hidden"
+           name="problemID"
+           value="{problemID}"
+    >
 
     <p><A
             href="#"
             onClick="window.open(
           '{urlProblemHistoryPopup}',
           'reason',
-          'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false">View SR history
+          'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false"
+    >View SR history
     </A></p>
     <table>
         <tr>
             <td class="promptText">SR</td>
-            <td colspan="3" class="mainHeadText">{problemID}</td>
+            <td colspan="3"
+                class="mainHeadText"
+            >{problemID}
+            </td>
         </tr>
         <tr>
             <td class="promptText">Customer</td>
@@ -47,10 +58,25 @@
         <tr>
             <td class="promptText">Team</td>
             <td class="mainHeadText">
-                <select name="teamLevel" id="teamSelector">
-                    <option {teamLevel1Selected} value="1">Helpdesk</option>
-                    <option {teamLevel2Selected} value="2">Escalations</option>
-                    <option {teamLevel3Selected} value="3">Implementations</option>
+                <select name="teamLevel"
+                        id="teamSelector"
+                >
+                    <option {teamLevel1Selected}
+                            value="1"
+                    >Helpdesk
+                    </option>
+                    <option {teamLevel2Selected}
+                            value="2"
+                    >Escalations
+                    </option>
+                    <option {teamLevel3Selected}
+                            value="3"
+                    >Small Projects
+                    </option>
+                    <option {teamLevel5Selected}
+                            value="5"
+                    >Project
+                    </option>
                 </select>
             </td>
         </tr>
@@ -65,16 +91,25 @@
                        required
                 >
                 <span></span>
-                <select name="allocatedTimeAmount" id="allocatedTimeAmountSelector">
+                <select name="allocatedTimeAmount"
+                        id="allocatedTimeAmountSelector"
+                >
                     <option value="minutes">Minutes</option>
                     <option value="hours">Hours</option>
-                    <option value="days" id="dayOption" hidden>Days</option>
+                    <option value="days"
+                            id="dayOption"
+                            hidden
+                    >Days
+                    </option>
                 </select>
             </td>
         </tr>
 
         <tr>
-            <td class="promptText" style="vertical-align: top;">Comments</td>
+            <td class="promptText"
+                style="vertical-align: top;"
+            >Comments
+            </td>
             <td>
                 <textarea name="comments">{comments}</textarea>
                 <script type="text/javascript">
@@ -86,7 +121,10 @@
 
         <tr>
             <td colspan="2">
-                <input type="submit" name="Submit" value="Save">
+                <input type="submit"
+                       name="Submit"
+                       value="Save"
+                >
             </td>
         </tr>
     </table>

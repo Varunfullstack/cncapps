@@ -17,8 +17,6 @@ require_once __DIR__ . '/DBECallActivity.inc.php';
 
 class DBEJCallActivity extends DBECallActivity
 {
-    var $fromString;
-
     const itemID = "itemID";
     const activityType = "activityType";
     const requireCheckFlag = "requireCheckFlag";
@@ -66,7 +64,7 @@ class DBEJCallActivity extends DBECallActivity
     const hdPauseCount = "hdPauseCount";
     const allocatedUserID = "allocatedUserID";
     const queueNo = "queueNo";
-
+    var $fromString;
 
     /**
      * calls constructor()
@@ -550,13 +548,43 @@ class DBEJCallActivity extends DBECallActivity
         return 0;
     }
 
-    function getPendingChangeRequestRows()
+    /**
+     * @param bool $showHelpDesk
+     * @param bool $showEscalations
+     * @param bool $showSmallProjects
+     * @param bool $showProjects
+     * @return bool
+     */
+    function getPendingChangeRequestRows($showHelpDesk = true,
+                                         $showEscalations = true,
+                                         $showSmallProjects = true,
+                                         $showProjects = true
+    )
     {
+
+
         $query =
             "SELECT " .
             $this->getDBColumnNamesAsString() .
             " FROM " . $this->fromString .
-            " WHERE callactivity.caa_status = 'O' and caa_callacttypeno = 59";
+            " WHERE callactivity.caa_status = 'O' and caa_callacttypeno = 59 ";
+
+        if (!$showHelpDesk) {
+            $query .= " and pro_queue_no <> 1 ";
+        }
+
+        if (!$showEscalations) {
+            $query .= " and  pro_queue_no <> 2 ";
+        }
+
+        if (!$showSmallProjects) {
+            $query .= " and pro_queue_no <> 3 ";
+        }
+
+        if (!$showProjects) {
+            $query .= " and pro_queue_no <> 5 ";
+        }
+
         $this->setQueryString($query);
         return (parent::getRows());
     }

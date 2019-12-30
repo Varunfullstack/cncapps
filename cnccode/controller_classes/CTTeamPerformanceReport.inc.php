@@ -86,9 +86,9 @@ class CTTeamPerformanceReport extends CTCNC
                         'hdTeamTargetFixHours'       => $dsHeader->getValue(DBEJHeader::hdTeamTargetFixHours),
                         'hdTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEJHeader::hdTeamTargetFixQtyPerMonth),
 
-                        'imTeamTargetSlaPercentage'  => $dsHeader->getValue(DBEJHeader::imTeamTargetSlaPercentage),
-                        'imTeamTargetFixHours'       => $dsHeader->getValue(DBEJHeader::imTeamTargetFixHours),
-                        'imTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEJHeader::imTeamTargetFixQtyPerMonth)
+                        'smallProjectsTeamTargetSlaPercentage'  => $dsHeader->getValue(DBEJHeader::smallProjectsTeamTargetSlaPercentage),
+                        'smallProjectsTeamTargetFixHours'       => $dsHeader->getValue(DBEJHeader::smallProjectsTeamTargetFixHours),
+                        'smallProjectsTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEJHeader::smallProjectsTeamTargetFixQtyPerMonth)
 
                     )
                 );
@@ -122,13 +122,13 @@ class CTTeamPerformanceReport extends CTCNC
                         );
                     }
 
-                    if (round($result['imTeamActualSlaPercentage'], 1) < round(
-                            $result['imTeamTargetSlaPercentage'],
+                    if (round($result['smallProjectsTeamActualSlaPercentage'], 1) < round(
+                            $result['smallProjectsTeamTargetSlaPercentage'],
                             1
                         )) {
 
                         $this->template->set_var(
-                            'imTeamActualSlaPercentage' . $result['month'] . 'Class',
+                            'smallProjectsTeamActualSlaPercentage' . $result['month'] . 'Class',
                             'performance-warn'
                         );
                     }
@@ -149,10 +149,10 @@ class CTTeamPerformanceReport extends CTCNC
                         );
                     }
 
-                    if ($result['imTeamActualFixQtyPerMonth'] < $result['imTeamTargetFixQtyPerMonth']) {
+                    if ($result['smallProjectsTeamActualFixQtyPerMonth'] < $result['smallProjectsTeamTargetFixQtyPerMonth']) {
 
                         $this->template->set_var(
-                            'imTeamActualFixQtyPerMonth' . $result['month'] . 'Class',
+                            'smallProjectsTeamActualFixQtyPerMonth' . $result['month'] . 'Class',
                             'performance-warn'
                         );
                     }
@@ -172,10 +172,10 @@ class CTTeamPerformanceReport extends CTCNC
                         );
                     }
 
-                    if ($result['imTeamActualFixHours'] > $result['imTeamTargetFixHours']) {
+                    if ($result['smallProjectsTeamActualFixHours'] > $result['smallProjectsTeamTargetFixHours']) {
 
                         $this->template->set_var(
-                            'imTeamActualFixHours' . $result['month'] . 'Class',
+                            'smallProjectsTeamActualFixHours' . $result['month'] . 'Class',
                             'performance-warn'
                         );
                     }
@@ -189,12 +189,12 @@ class CTTeamPerformanceReport extends CTCNC
                             'esTeamActualFixHours' . $result['month']       => $result['esTeamActualFixHours'],
                             'esTeamActualFixQtyPerMonth' . $result['month'] => $result['esTeamActualFixQtyPerMonth'],
 
-                            'imTeamActualSlaPercentage' . $result['month']  => number_format(
-                                $result['imTeamActualSlaPercentage'],
+                            'smallProjectsTeamActualSlaPercentage' . $result['month']  => number_format(
+                                $result['smallProjectsTeamActualSlaPercentage'],
                                 1
                             ),
-                            'imTeamActualFixHours' . $result['month']       => $result['imTeamActualFixHours'],
-                            'imTeamActualFixQtyPerMonth' . $result['month'] => $result['imTeamActualFixQtyPerMonth'],
+                            'smallProjectsTeamActualFixHours' . $result['month']       => $result['smallProjectsTeamActualFixHours'],
+                            'smallProjectsTeamActualFixQtyPerMonth' . $result['month'] => $result['smallProjectsTeamActualFixQtyPerMonth'],
 
                             'hdTeamActualSlaPercentage' . $result['month']  => number_format(
                                 $result['hdTeamActualSlaPercentage'],

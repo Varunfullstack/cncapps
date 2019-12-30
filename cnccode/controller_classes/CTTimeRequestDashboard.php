@@ -69,6 +69,10 @@ class CTTimeRequestDashboard extends CTCNC
 
         $buActivity = new BUActivity($this);
 
+        $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
+        $buHeader->getHeader($dsHeader);
+
         while ($dbejCallActivity->fetchNext()) {
             $problemID = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
             $lastActivity = $buActivity->getLastActivityInProblem($problemID);
@@ -117,12 +121,24 @@ class CTTimeRequestDashboard extends CTCNC
                     $teamName = 'Escalation';
                     break;
                 case 4:
-                    $usedMinutes = $buActivity->getIMTeamUsedTime($problemID);
-                    $assignedMinutes = $dbeProblem->getValue(DBEProblem::imLimitMinutes);
-                    $teamName = 'Implementation';
+                    $usedMinutes = $buActivity->getSPTeamUsedTime($problemID);
+                    $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
+                    $teamName = 'Small Projects';
+                    break;
+                case 5:
+                    $usedMinutes = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
+                    $assignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
+                    $teamName = 'Projects';
             }
 
             $leftOnBudget = $assignedMinutes - $usedMinutes;
+            $requestedDateTimeString = $dbejCallActivity->getValue(
+                    DBEJCallActivity::date
+                ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime) . ":00";
+            $requestedDateTime = DateTime::createFromFormat(DATE_MYSQL_DATETIME, $requestedDateTimeString);
+            $alertTime = (new DateTime(''))->sub(
+                new DateInterval('PT' . $dsHeader->getValue(DBEHeader::pendingTimeLimitActionThresholdMinutes) . "M")
+            );
 
             $this->template->set_var(
                 [
@@ -130,14 +146,13 @@ class CTTimeRequestDashboard extends CTCNC
                     'srLink'            => $srLink,
                     'notes'             => $dbejCallActivity->getValue(DBEJCallActivity::reason),
                     'requestedBy'       => $dbejCallActivity->getValue(DBEJCallActivity::userName),
-                    'requestedDateTime' => $dbejCallActivity->getValue(
-                            DBEJCallActivity::date
-                        ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime),
+                    'requestedDateTime' => $requestedDateTimeString,
                     'processCRLink'     => $processCRLink,
                     'chargeableHours'   => $dbeProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
                     'timeSpentSoFar'    => round($usedMinutes),
                     'timeLeftOnBudget'  => $leftOnBudget,
-                    'requesterTeam'     => $teamName
+                    'requesterTeam'     => $teamName,
+                    'alertRow'          => $requestedDateTime < $alertTime ? 'warning' : null,
                 ]
             );
 

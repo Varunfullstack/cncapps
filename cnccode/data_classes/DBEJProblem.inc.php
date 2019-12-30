@@ -614,7 +614,7 @@ class DBEJProblem extends DBEProblem
                                      $isP5 = false,
                                      $showHelpDesk = true,
                                      $showEscalation = true,
-                                     $showImplementation = true
+                                     $showSmallProjects = true
     )
     {
         $sql =
@@ -649,7 +649,7 @@ class DBEJProblem extends DBEProblem
             $sql .= ' and pro_queue_no <> 2 ';
         }
 
-        if (!$showImplementation) {
+        if (!$showSmallProjects) {
             $sql .= ' and pro_queue_no <> 3 ';
         }
 
@@ -715,7 +715,7 @@ class DBEJProblem extends DBEProblem
                                                   $isP5 = false,
                                                   $showHelpDesk = true,
                                                   $showEscalation = true,
-                                                  $showImplementation = true
+                                                  $showSmallProjects = true
     )
     {
         $sql =
@@ -750,7 +750,7 @@ class DBEJProblem extends DBEProblem
             $sql .= ' and pro_queue_no <> 2 ';
         }
 
-        if (!$showImplementation) {
+        if (!$showSmallProjects) {
             $sql .= ' and pro_queue_no <> 3 ';
         }
 

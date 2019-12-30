@@ -3,7 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
-
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBETeam extends DBEntity
@@ -14,6 +14,7 @@ class DBETeam extends DBEntity
     const teamRoleID = "teamRoleID";
     const level = "level";
     const activeFlag = "activeFlag";
+    const leaderId = "leaderId";
 
 
     /**
@@ -50,6 +51,11 @@ class DBETeam extends DBEntity
         $this->addColumn(
             self::activeFlag,
             DA_YN,
+            DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::leaderId,
+            DA_ID,
             DA_NOT_NULL
         );
         $this->setPK(0);

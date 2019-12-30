@@ -1,5 +1,6 @@
 <?php
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg["path_bu"] . "/BUTeamPerformance.inc.php");
 $thing = null;
 $buTeamPerformance = new BUTeamPerformance($thing);

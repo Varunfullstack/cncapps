@@ -20,7 +20,7 @@ body.environment-development {
 }
 
 .oddRows > tbody > tr:nth-child(odd) {
-    background-color: rgb(250, 250, 250) !important;
+    background-color: rgb(250, 250, 250);
 }
 
 TD, INPUT, SELECT, TEXTAREA {
@@ -553,7 +553,11 @@ span#imRemainMinutes {
     color: red;
     font-size: large;
     font-weight: bold;
-
+}
+span#projectRemainMinutes {
+    color: red;
+    font-size: large;
+    font-weight: bold;
 }
 
 .performance-green {

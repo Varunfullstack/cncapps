@@ -4,6 +4,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBECallActivity extends DBEntity
@@ -42,6 +43,7 @@ class DBECallActivity extends DBEntity
     const overtimeDeniedReason = "overtimeDeniedReason";
     const overtimeExportedFlag = 'overtimeExportedFlag';
     const isSalesRequestSR = 'isSalesRequestSR';
+    const requestType = 'requestType';
 
     /**
      * calls constructor()
@@ -240,6 +242,12 @@ class DBECallActivity extends DBEntity
             DA_NOT_NULL,
             null,
             0
+        );
+
+        $this->addColumn(
+            self::requestType,
+            DA_ID,
+            DA_ALLOW_NULL
         );
 
         $this->setPK(0);

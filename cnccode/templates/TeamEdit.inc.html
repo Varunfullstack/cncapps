@@ -63,6 +63,19 @@
             > <span class="formErrorMessage">{levelMessage}</span></td>
         </tr>
         <tr>
+            <td class="promptText">Leader</td>
+            <td>
+                <select name="team[1][leaderId]">
+                    <!-- BEGIN leaderBlock -->
+                    <option value="{leaderID}"
+                            {leaderSelected}
+                    >{leaderName}
+                    </option>
+                    <!-- END leaderBlock -->
+                </select> <span class="formErrorMessage">{leaderMessage}</span>
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">Active</td>
             <td class="fieldText"><input type="checkbox"
                                          name="team[1][activeFlag]"

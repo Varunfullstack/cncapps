@@ -194,10 +194,10 @@ class DBEntity extends DataAccess
             $ret = TRUE;
         } else {
             global $server_type;
-            if ($server_type == MAIN_CONFIG_SERVER_TYPE_DEVELOPMENT) {
+            if($server_type == 'development'){
                 var_dump($this->db->Error);
             }
-            $this->raiseError("Query problem: " . $this->db->Error);
+            $this->raiseError("Query problem");
             $ret = FALSE;
         }
         return $ret;

@@ -104,181 +104,6 @@ class CTBookSalesVisit extends CTCNC
     /**
      * @throws Exception
      */
-    function showForm()
-    {
-        $customerString = null;
-        $urlCustomerPopup = null;
-        $dsSearchForm = &$this->dsSearchForm; // ref to global
-        $bookedActivity = null;
-        if ($this->getParam('booked')) {
-            $bookedActivity = $this->getParam('booked');
-        }
-
-        if (!$this->hasPermissions(PHPLIB_PERM_CUSTOMER)) {
-            $urlCustomerPopup = Controller::buildLink(
-                CTCNC_PAGE_CUSTOMER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-        }
-
-
-        $this->setTemplateFiles(
-            'BookSalesVisit',
-            'BookSalesVisit'
-        );
-
-        $urlSubmit = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => self::ACTION_BOOK_SALES_VISIT
-            )
-        );
-        $this->setPageTitle('Create Sales Meeting Booking ');
-        if ($dsSearchForm->getValue(self::searchFormCustomerID) != 0) {
-            $buCustomer = new BUCustomer($this);
-            $dsCustomer = new DataSet($this);
-            $buCustomer->getCustomerByID(
-                $dsSearchForm->getValue(self::searchFormCustomerID),
-                $dsCustomer
-            );
-            $customerString = $dsCustomer->getValue(DBECustomer::name);
-        }
-        $contactString = '';
-        if ($dsSearchForm->getValue(self::searchFormContactID)) {
-            $dbeContact = new DBEContact($this);
-            $dbeContact->getRow($dsSearchForm->getValue(self::searchFormContactID));
-            $contactString = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
-                    DBEContact::lastName
-                );
-        }
-        $bookedActivityURL = '';
-        if ($bookedActivity) {
-            $bookedActivityURL = Controller::buildLink(
-                'Activity.php',
-                array(
-                    'action'         => 'displayActivity',
-                    'callActivityID' => $bookedActivity
-                )
-            );
-        }
-
-        $this->template->set_var(
-            array(
-                'formError'              => $this->formError,
-                'customerID'             => $this->dsSearchForm->getValue(self::searchFormCustomerID),
-                'customerIDMessage'      => $this->dsSearchForm->getMessage(self::searchFormCustomerID),
-                'attendees'              => $this->dsSearchForm->getValue(self::searchFormAttendees),
-                'attendeesMessage'       => $this->dsSearchForm->getMessage(self::searchFormAttendees),
-                'typeOfMeetingIDMessage' => $this->dsSearchForm->getMessage(self::searchFormTypeOfMeetingID),
-                'contactID'              => $this->dsSearchForm->getValue(self::searchFormContactID),
-                'contactIDMessage'       => $this->dsSearchForm->getMessage(self::searchFormContactID),
-                'contactString'          => $contactString,
-                'meetingDate'            => $this->dsSearchForm->getValue(self::searchFormMeetingDate),
-                'meetingDateMessage'     => $this->dsSearchForm->getMessage(self::searchFormMeetingDate),
-                'meetingTime'            => $this->dsSearchForm->getValue(self::searchFormMeetingTime),
-                'meetingTimeMessage'     => $this->dsSearchForm->getMessage(self::searchFormMeetingTime),
-                'customerString'         => $customerString,
-                'urlCustomerPopup'       => $urlCustomerPopup,
-                'urlSubmit'              => $urlSubmit,
-                'bookedActivityURL'      => $bookedActivityURL
-            )
-        );
-
-
-        // activity type selector
-        $this->template->set_block(
-            'BookSalesVisit',
-            'attendeesBlock',
-            'attendees'
-        );
-
-        $dbeUser = new DBEUser($this);
-        $dbeUser->getActiveUsers();
-
-        $selectedAttendees = [];
-
-        if ($this->dsSearchForm->getValue(self::searchFormAttendees)) {
-            $selectedAttendees = json_decode(
-                $this->dsSearchForm->getValue(self::searchFormAttendees)
-            );
-        }
-
-        while ($dbeUser->fetchNext()) {
-            $selected = in_array(
-                $dbeUser->getValue(DBEUser::userID),
-                $selectedAttendees
-            );
-            $this->template->setVar(
-                [
-                    'attendeeID'       => $dbeUser->getValue(DBEUser::userID),
-                    'attendeeName'     => $dbeUser->getValue(DBEUser::name),
-                    'attendeeSelected' => $selected ? 'selected' : ''
-                ]
-            );
-
-            $this->template->parse(
-                'attendees',
-                'attendeesBlock',
-                true
-            );
-        }
-
-
-        $dbeStandardTextType = new DBEStandardTextType($this);
-
-        $dbeStandardTextType->setValue(
-            DBEStandardTextType::description,
-            'Sales Meeting Type'
-        );
-        $dbeStandardTextType->getRowsByColumn(DBEStandardTextType::description);
-
-        $dbeStandardTextType->fetchNext();
-        $standardTextTypeID = $dbeStandardTextType->getValue(DBEStandardTextType::standardTextTypeID);
-
-        $DBEStandardText = new DBEStandardText($this);
-        $DBEStandardText->getRowsByTypeID($standardTextTypeID);
-
-        $this->template->set_block(
-            'BookSalesVisit',
-            'typeOfMeetingBlock',
-            'typeOfMeetings'
-        );
-
-        while ($DBEStandardText->fetchNext()) {
-
-            $selected = $this->dsSearchForm->getValue(self::searchFormTypeOfMeetingID) == $DBEStandardText->getValue(
-                    DBEStandardText::stt_standardtextno
-                );
-            $this->template->setVar(
-                [
-                    'typeOfMeetingID'          => $DBEStandardText->getValue(DBEStandardText::stt_standardtextno),
-                    'typeOfMeetingDescription' => $DBEStandardText->getValue(DBEStandardText::stt_desc),
-                    'typeOfMeetingSelected'    => $selected ? 'selected' : ''
-                ]
-            );
-
-            $this->template->parse(
-                'typeOfMeetings',
-                'typeOfMeetingBlock',
-                true
-            );
-        }
-
-
-        $this->template->parse(
-            'CONTENTS',
-            'BookSalesVisit',
-            true
-        );
-        $this->parsePage();
-    }
-
-    /**
-     * @throws Exception
-     */
     private function bookSalesVisit()
     {
 
@@ -367,8 +192,12 @@ class CTBookSalesVisit extends CTCNC
             $buActivity->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
         );
         $dbeProblem->setValue(
-            DBEProblem::imLimitMinutes,
-            $buActivity->dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
+            DBEProblem::smallProjectsTeamLimitMinutes,
+            $buActivity->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::projectTeamLimitMinutes,
+            $buActivity->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
         );
         $dbeProblem->setValue(
             DBEProblem::slaResponseHours,
@@ -558,5 +387,180 @@ class CTBookSalesVisit extends CTCNC
         $this->dsSearchForm->clear();
         $this->setParam('booked', $firstActivityCreated);
         return $this->showForm();
+    }
+
+    /**
+     * @throws Exception
+     */
+    function showForm()
+    {
+        $customerString = null;
+        $urlCustomerPopup = null;
+        $dsSearchForm = &$this->dsSearchForm; // ref to global
+        $bookedActivity = null;
+        if ($this->getParam('booked')) {
+            $bookedActivity = $this->getParam('booked');
+        }
+
+        if (!$this->hasPermissions(PHPLIB_PERM_CUSTOMER)) {
+            $urlCustomerPopup = Controller::buildLink(
+                CTCNC_PAGE_CUSTOMER,
+                array(
+                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                    'htmlFmt' => CT_HTML_FMT_POPUP
+                )
+            );
+        }
+
+
+        $this->setTemplateFiles(
+            'BookSalesVisit',
+            'BookSalesVisit'
+        );
+
+        $urlSubmit = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => self::ACTION_BOOK_SALES_VISIT
+            )
+        );
+        $this->setPageTitle('Create Sales Meeting Booking ');
+        if ($dsSearchForm->getValue(self::searchFormCustomerID) != 0) {
+            $buCustomer = new BUCustomer($this);
+            $dsCustomer = new DataSet($this);
+            $buCustomer->getCustomerByID(
+                $dsSearchForm->getValue(self::searchFormCustomerID),
+                $dsCustomer
+            );
+            $customerString = $dsCustomer->getValue(DBECustomer::name);
+        }
+        $contactString = '';
+        if ($dsSearchForm->getValue(self::searchFormContactID)) {
+            $dbeContact = new DBEContact($this);
+            $dbeContact->getRow($dsSearchForm->getValue(self::searchFormContactID));
+            $contactString = $dbeContact->getValue(DBEContact::firstName) . " " . $dbeContact->getValue(
+                    DBEContact::lastName
+                );
+        }
+        $bookedActivityURL = '';
+        if ($bookedActivity) {
+            $bookedActivityURL = Controller::buildLink(
+                'Activity.php',
+                array(
+                    'action'         => 'displayActivity',
+                    'callActivityID' => $bookedActivity
+                )
+            );
+        }
+
+        $this->template->set_var(
+            array(
+                'formError'              => $this->formError,
+                'customerID'             => $this->dsSearchForm->getValue(self::searchFormCustomerID),
+                'customerIDMessage'      => $this->dsSearchForm->getMessage(self::searchFormCustomerID),
+                'attendees'              => $this->dsSearchForm->getValue(self::searchFormAttendees),
+                'attendeesMessage'       => $this->dsSearchForm->getMessage(self::searchFormAttendees),
+                'typeOfMeetingIDMessage' => $this->dsSearchForm->getMessage(self::searchFormTypeOfMeetingID),
+                'contactID'              => $this->dsSearchForm->getValue(self::searchFormContactID),
+                'contactIDMessage'       => $this->dsSearchForm->getMessage(self::searchFormContactID),
+                'contactString'          => $contactString,
+                'meetingDate'            => $this->dsSearchForm->getValue(self::searchFormMeetingDate),
+                'meetingDateMessage'     => $this->dsSearchForm->getMessage(self::searchFormMeetingDate),
+                'meetingTime'            => $this->dsSearchForm->getValue(self::searchFormMeetingTime),
+                'meetingTimeMessage'     => $this->dsSearchForm->getMessage(self::searchFormMeetingTime),
+                'customerString'         => $customerString,
+                'urlCustomerPopup'       => $urlCustomerPopup,
+                'urlSubmit'              => $urlSubmit,
+                'bookedActivityURL'      => $bookedActivityURL
+            )
+        );
+
+
+        // activity type selector
+        $this->template->set_block(
+            'BookSalesVisit',
+            'attendeesBlock',
+            'attendees'
+        );
+
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getActiveUsers();
+
+        $selectedAttendees = [];
+
+        if ($this->dsSearchForm->getValue(self::searchFormAttendees)) {
+            $selectedAttendees = json_decode(
+                $this->dsSearchForm->getValue(self::searchFormAttendees)
+            );
+        }
+
+        while ($dbeUser->fetchNext()) {
+            $selected = in_array(
+                $dbeUser->getValue(DBEUser::userID),
+                $selectedAttendees
+            );
+            $this->template->setVar(
+                [
+                    'attendeeID'       => $dbeUser->getValue(DBEUser::userID),
+                    'attendeeName'     => $dbeUser->getValue(DBEUser::name),
+                    'attendeeSelected' => $selected ? 'selected' : ''
+                ]
+            );
+
+            $this->template->parse(
+                'attendees',
+                'attendeesBlock',
+                true
+            );
+        }
+
+
+        $dbeStandardTextType = new DBEStandardTextType($this);
+
+        $dbeStandardTextType->setValue(
+            DBEStandardTextType::description,
+            'Sales Meeting Type'
+        );
+        $dbeStandardTextType->getRowsByColumn(DBEStandardTextType::description);
+
+        $dbeStandardTextType->fetchNext();
+        $standardTextTypeID = $dbeStandardTextType->getValue(DBEStandardTextType::standardTextTypeID);
+
+        $DBEStandardText = new DBEStandardText($this);
+        $DBEStandardText->getRowsByTypeID($standardTextTypeID);
+
+        $this->template->set_block(
+            'BookSalesVisit',
+            'typeOfMeetingBlock',
+            'typeOfMeetings'
+        );
+
+        while ($DBEStandardText->fetchNext()) {
+
+            $selected = $this->dsSearchForm->getValue(self::searchFormTypeOfMeetingID) == $DBEStandardText->getValue(
+                    DBEStandardText::stt_standardtextno
+                );
+            $this->template->setVar(
+                [
+                    'typeOfMeetingID'          => $DBEStandardText->getValue(DBEStandardText::stt_standardtextno),
+                    'typeOfMeetingDescription' => $DBEStandardText->getValue(DBEStandardText::stt_desc),
+                    'typeOfMeetingSelected'    => $selected ? 'selected' : ''
+                ]
+            );
+
+            $this->template->parse(
+                'typeOfMeetings',
+                'typeOfMeetingBlock',
+                true
+            );
+        }
+
+
+        $this->template->parse(
+            'CONTENTS',
+            'BookSalesVisit',
+            true
+        );
+        $this->parsePage();
     }
 }

@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerNote.inc.php');
@@ -4835,11 +4836,15 @@ now that the notes are in a text field we need to split the lines up for the PDF
             }
 
             if (!$formError) {
+
+                $queue = $_REQUEST['queue'] == "Create For Small Projects" ? 3 : 5;
+
                 if ($dsInput->getValue(self::etaDate)) {
                     $buActivity->createSalesServiceRequest(
                         $this->getOrdheadID(),
                         $dsInput,
-                        @$_SESSION['selectedOrderLine']
+                        @$_SESSION['selectedOrderLine'],
+                        $queue
                     );
                     unset($_SESSION['selectedOrderLine']);
                 } else {

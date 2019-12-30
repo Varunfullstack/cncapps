@@ -1,3 +1,49 @@
+<script>
+    filters = {
+        helpDesk: 'HD',
+        escalation: 'ES',
+        smallProjects: 'SP',
+        projects: 'P'
+    };
+
+    function changeFilter() {
+        var urlString = window.location.origin + window.location.pathname;
+        var url = new URL(urlString);
+        Object.keys(filters).forEach(function (key) {
+            if (document.getElementById(key).checked) {
+                url.searchParams.append(filters[key], null);
+            }
+        });
+        window.location.href = url.toString();
+    }
+</script>
+<div id="filters">
+    <label for="helpDesk">HD</label>
+    <input type="checkbox"
+           {helpDeskChecked}
+           id="helpDesk"
+           onchange="changeFilter()"
+    >
+    <label for="escalation">ES</label>
+    <input type="checkbox"
+           {escalationChecked}
+           id="escalation"
+           onchange="changeFilter()"
+    >
+    <label for="smallProjects">SP</label>
+    <input type="checkbox"
+           {smallProjectsChecked}
+           id="smallProjects"
+           onchange="changeFilter()"
+    >
+    <label for="projects">P</label>
+    <input type="checkbox"
+           {projectsChecked}
+           id="projects"
+           onchange="changeFilter()"
+    >
+
+</div>
 <table class="oddRows">
     <thead>
     <tr>
