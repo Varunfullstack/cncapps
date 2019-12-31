@@ -83,6 +83,7 @@ class CTExpenseDashboard extends CTCNC
   ) AS status,
        callactivity.caa_consno = ? as isSelf,
        receipt.id as receiptId,
+       expensetype.receiptRequired,
          ((SELECT
         1
       FROM
