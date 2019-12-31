@@ -4345,14 +4345,13 @@ class BUActivity extends Business
 
         /** @var $db dbSweetcode */
         global $db;
-        $db->preparedQuery(
+        $statement = $db->preparedQuery(
             'select getOpenHours(?)',
             [["type" => "i", "value" => $dbeProblem->getValue(DBEProblem::problemID)]]
         );
-        $db->next_record(MYSQLI_NUM);
         $dbeProblem->setValue(
             DBEProblem::openHours,
-            $db->Record[0]
+            $statement->fetch_array(MYSQLI_NUM)[0]
         );
         $dbeProblem->updateRow();
 
@@ -10971,7 +10970,10 @@ is currently a balance of ';
         if ($files) {
             foreach ($files['name'] as $idx => $fileItem) {
                 $dbeCallDocument = new DBECallDocument($this);
-                $dbeCallDocument->setValue(DBECallDocument::callActivityID, $salesRequestActivity->getValue(DBECallActivity::callActivityID));
+                $dbeCallDocument->setValue(
+                    DBECallDocument::callActivityID,
+                    $salesRequestActivity->getValue(DBECallActivity::callActivityID)
+                );
                 $dbeCallDocument->setValue(DBECallDocument::problemID, $problemID);
                 $dbeCallDocument->setValue(
                     DBECallDocument::createDate,
@@ -10999,7 +11001,6 @@ is currently a balance of ';
                 $dbeCallDocument->insertRow();
             }
         }
-
 
 
         $destEmail = $dbeStandardText->getValue(DBEStandardText::salesRequestEmail);

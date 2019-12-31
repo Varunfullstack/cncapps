@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEExpense extends DBEntity
@@ -116,8 +117,7 @@ FROM
             ) . " is null and " . $this->getDBColumnName(self::deniedReason) . " is null AND " . $this->getDBColumnName(
                 self::exportedFlag
             ) . " <> 'Y'  
-            and consultant.autoApproveExpenses
-            and exp_value <= maximumAutoApprovalAmount
+            and (exp_value <= maximumAutoApprovalAmount or consultant.autoApproveExpenses)
             ";
         return $this->getRows();
     }

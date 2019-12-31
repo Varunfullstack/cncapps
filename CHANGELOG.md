@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.9.1] - 2019-12-31
+### Fixed
+
+
 ## [v3.9.0] - 2019-12-30
 ### Added
 - Issue 689 - Solarwinds cloud O365 backup API
