@@ -56,11 +56,12 @@ if (!$nextProcessingDate) {
     exit;
 }
 $expensesNextProcessingDateStart = (clone $nextProcessingDate)->sub(new DateInterval('P' . $daysInAdvance . "D"));
-$logger->info('Start date' . $expensesNextProcessingDateStart->format(DATE_MYSQL_DATE));
+$logger->info('Start date: ' . $expensesNextProcessingDateStart->format(DATE_MYSQL_DATE));
 
 $today = new DateTime();
 if ($today < $expensesNextProcessingDateStart) {
     $logger->info('It is not the date yet, stop processing');
+    exit;
 }
 
 /** @var $twig Environment */

@@ -386,28 +386,29 @@ GROUP BY t.month;
 
                 $template->setVar(
                     array(
-                        'customer'         => $row[0],
-                        'serviceRequestID' => $row[1],
-                        'assignedTo'       => $row[2],
-                        'description'      => substr(
+                        'customer'            => $row[0],
+                        'serviceRequestID'    => $row[1],
+                        'assignedTo'          => $row[2],
+                        'description'         => substr(
                             common_stripEverything($row[3]),
                             0,
                             50
                         ),
-                        'durationHours'    => $row[4],
-                        'timeSpentHours'   => $row[5],
-                        'lastUpdatedDate'  => $row[6],
-                        'priority'         => $row[7],
-                        'teamName'         => $row[8],
-                        'awaiting'         => $row[10] == 'I' ? 'Not Started' : ($row[9] == 'Y' ? 'Customer' : 'CNC'),
-                        'urlRequest'       => $urlRequest,
-                        'rowClass'         => $row[4] >= $dsHeader->getValue(
+                        'durationHours'       => $row[4],
+                        'timeSpentHours'      => $row[5],
+                        'lastUpdatedDate'     => $row[6] ? Controller::dateYMDtoDMY($row[6]) : null,
+                        'lastUpdatedDateSort' => $row[6],
+                        'priority'            => $row[7],
+                        'teamName'            => $row[8],
+                        'awaiting'            => $row[10] == 'I' ? 'Not Started' : ($row[9] == 'Y' ? 'Customer' : 'CNC'),
+                        'urlRequest'          => $urlRequest,
+                        'rowClass'            => $row[4] >= $dsHeader->getValue(
                             DBEHeader::sevenDayerRedDays
                         ) ? 'red-row' : ($row[4] >= $dsHeader->getValue(
                             DBEHeader::sevenDayerAmberDays
                         ) ? 'amber-row' : ''),
-                        'amberThreshold'   => $dsHeader->getValue(DBEHeader::sevenDayerAmberDays),
-                        'redThreshold'     => $dsHeader->getValue(DBEHeader::sevenDayerRedDays)
+                        'amberThreshold'      => $dsHeader->getValue(DBEHeader::sevenDayerAmberDays),
+                        'redThreshold'        => $dsHeader->getValue(DBEHeader::sevenDayerRedDays)
                     )
                 );
 

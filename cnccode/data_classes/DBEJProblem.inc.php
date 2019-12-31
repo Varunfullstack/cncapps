@@ -169,7 +169,7 @@ class DBEJProblem extends DBEProblem
         );
         $this->addColumn(
             self::lastStartTime,
-            DA_INTEGER,
+            DA_STRING,
             DA_ALLOW_NULL,
             "last.caa_starttime"
         );
@@ -181,7 +181,7 @@ class DBEJProblem extends DBEProblem
         );
         $this->addColumn(
             self::lastDate,
-            DA_INTEGER,
+            DA_DATE,
             DA_ALLOW_NULL,
             "last.caa_date"
         );
@@ -334,7 +334,6 @@ class DBEJProblem extends DBEProblem
         } else {
             $sql .= " AND pro_consno is not null";
         }
-
         $this->setQueryString($sql);
         return (parent::getRows());
     }

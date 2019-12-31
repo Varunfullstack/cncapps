@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.9.1] - 2019-12-31
+### Fixed
+- Issue with current service requests updated column
+- Issue with processing T&M SR
+- Formatting DailyReport outstandingIncidents
+
 ## [v3.9.0] - 2019-12-30
 ### Added
 - Issue 689 - Solarwinds cloud O365 backup API

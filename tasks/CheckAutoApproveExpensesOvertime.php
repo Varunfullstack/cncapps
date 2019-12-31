@@ -45,7 +45,7 @@ while ($expense->nextRecord()) {
     $activity->getRow($expense->getValue(DBEExpense::callActivityID));
     $userID = $activity->getValue(DBECallActivity::userID);
     $logger->info(
-        'The user with ID : ' . $userID . ' owner of this expense has auto approve enable, proceeding to approve expense '
+        'The user with ID : ' . $userID . ' owner of this expense has auto approve enable, or the value is below the threshold proceeding to approve expense '
     );
     $dbeExpense = new DBEExpense($thing);
     $dbeExpense->getRow($expense->getValue(DBEExpense::expenseID));
