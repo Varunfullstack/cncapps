@@ -924,8 +924,8 @@ class CTCurrentActivityReport extends CTCNC
             '<option value="1">H</option>',
             '<option value="2">E</option>',
             '<option value="3">SP</option>',
+            '<option value="5">P</option>',
             '<option value="4">S</option>',
-            '<option value="5">P</option>'
         ];
 
         unset($queueOptions[$queueNo]);

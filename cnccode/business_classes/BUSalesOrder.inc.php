@@ -106,7 +106,7 @@ class BUSalesOrder extends Business
         if (!$ordheadID) {
             $this->raiseError('order ID not passed');
         }
-        if ($sequenceNo == null) {
+        if ($sequenceNo === null) {
             $this->raiseError('sequenceNo not passed');
         }
         $dbeJOrdline = new DBEJOrdline($this);
