@@ -1,6 +1,16 @@
 # Changelog
 This project changes will be shown here.
 
+## [3.9.2] - 2020-01-02
+### Fixed
+- Fixed issue with time being allocated to the wrong team, when the team of the requestor is Small Projects.
+- Fixed issue with despatching.
+- Fixed issue with elapsed column not showing correctly on Search Service Requests
+- Fixed issue with SR Statistics having a wrong number of reopen issues
+- Fixed issue with import requests not importing correctly.
+### Changed
+- Change order of queues in CurrentActivityReport
+
 ## [v3.9.1] - 2019-12-31
 ### Fixed
 - Issue with current service requests updated column

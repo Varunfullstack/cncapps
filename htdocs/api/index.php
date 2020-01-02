@@ -167,7 +167,6 @@ WHERE
         order by pro_priority ";
                 }
 
-
                 /** @var $db dbSweetcode */
                 global $db;
                 $statement = $db->preparedQuery($query, $params);

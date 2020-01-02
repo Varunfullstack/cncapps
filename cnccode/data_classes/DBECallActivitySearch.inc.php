@@ -262,7 +262,7 @@ class DBECallActivitySearch extends DBEntity
         );
         $this->addColumn(
             self::workingHours,
-            DA_INTEGER,
+            DA_FLOAT,
             DA_ALLOW_NULL,
             "pro_working_hours"
         );

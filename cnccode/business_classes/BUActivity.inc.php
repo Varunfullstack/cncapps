@@ -3311,12 +3311,12 @@ class BUActivity extends Business
      * Add hours to clock of team of allocated user
      *
      * @param mixed $problemID
-     * @param $level
+     * @param $teamID
      * @param $minutes
      * @param $comments
      */
     public function allocateAdditionalTime($problemID,
-                                           $level,
+                                           $teamID,
                                            $minutes,
                                            $comments
     )
@@ -3324,7 +3324,7 @@ class BUActivity extends Business
         $this->dbeProblem = new DBEProblem($this);
         $this->dbeProblem->getRow($problemID);
 
-        if ($level == 1) {
+        if ($teamID == 1) {
             $this->dbeProblem->setValue(
                 DBEProblem::hdLimitMinutes,
                 $this->dbeProblem->getValue(DBEProblem::hdLimitMinutes) + $minutes
@@ -3333,7 +3333,7 @@ class BUActivity extends Business
                 DBEProblem::hdTimeAlertFlag,
                 'N'
             ); // reset alert flag
-        } elseif ($level == 2) {
+        } elseif ($teamID == 2) {
             $this->dbeProblem->setValue(
                 DBEProblem::esLimitMinutes,
                 $this->dbeProblem->getValue(DBEProblem::esLimitMinutes) + $minutes
@@ -3342,7 +3342,7 @@ class BUActivity extends Business
                 DBEProblem::esTimeAlertFlag,
                 'N'
             );
-        } elseif ($level == 3) {
+        } elseif ($teamID == 4) {
             $this->dbeProblem->setValue(
                 DBEProblem::smallProjectsTeamLimitMinutes,
                 $this->dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes) + $minutes
@@ -8124,6 +8124,18 @@ is currently a balance of ';
                     $attachmentMimeType = null;   // failed to locate magic file for MimeTypes
                 }
 
+                // Trying to prevent a bug with finfo_file that duplicates the mimeType
+                if (substr_count($attachmentMimeType, "/") > 1) {
+                    $forwardSlashPosition = strpos($attachmentMimeType, '/');
+                    $startOfNextMimeTypePosition = strpos(
+                        $attachmentMimeType,
+                        substr($attachmentMimeType, 0, $forwardSlashPosition),
+                        $forwardSlashPosition + 2
+                    );
+                    $attachmentMimeType = substr($attachmentMimeType, 0, $startOfNextMimeTypePosition - 1);
+                }
+
+
                 $this->addDocument(
                     $problemID,
                     $filePath,
@@ -8969,11 +8981,11 @@ is currently a balance of ';
         if (in_array($dbeProblem->getValue(DBEProblem::status), ["F", "C"])) {
             /** @var $db dbSweetcode */
             global $db;
-            $db->preparedQuery(
+            $statement = $db->preparedQuery(
                 'select getOpenHours(?)',
                 [["type" => "i", "value" => $dbeProblem->getValue(DBEProblem::problemID)]]
             );
-            $db->next_record(MYSQLI_NUM);
+            $statement->fetch_row();
             $dbeProblem->setValue(
                 DBEProblem::openHours,
                 $db->Record[0]
