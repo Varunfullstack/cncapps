@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [3.9.3] - 2020-01-02
+
+
 ## [3.9.2] - 2020-01-02
 ### Fixed
 - Fixed issue with time being allocated to the wrong team, when the team of the requestor is Small Projects.

@@ -4,13 +4,14 @@
  * @access virtual
  * @author Karim Ahmed
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 //require_once($cfg["path_dbe"]."/DBEScoTrans.inc.php");
 class DBCNCEntity extends DBEntity
 {
-    protected $dbeNextPK = '';                // need this one for getting next PK. it is created in descendent
-    const nextID = "nextID";
+    const nextID = "nextID";                // need this one for getting next PK. it is created in descendent
+    protected $dbeNextPK = '';
 
     function __construct(&$owner)
     {

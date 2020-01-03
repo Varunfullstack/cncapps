@@ -131,6 +131,7 @@ while ($dsCustomers->fetchNext()) {
         if (!$dbeSite->getValue(DBESite::maxTravelHours)) {
             $siteErrors[] = "Max Travel hours must be greater than 0";
         }
+
         if ($dbeSite->getValue(DBESite::phone) && !preg_match(
                 "/^\d+$/",
                 $dbeSite->getValue(DBESite::phone)
@@ -177,7 +178,9 @@ while ($dsCustomers->fetchNext()) {
         $validationErrors['customerErrors'][] = "At least one contact must have Report flag checked";
     }
 
-    if (count($validationErrors['customerErrors']) || count($validationErrors['contactErrors'])) {
+    if (count($validationErrors['customerErrors']) || count($validationErrors['contactErrors']) || count(
+            $validationErrors['siteErrors']
+        )) {
         $customersFailingValidation[] = $validationErrors;
     }
 }

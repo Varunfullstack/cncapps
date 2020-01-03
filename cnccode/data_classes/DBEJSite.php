@@ -5,7 +5,7 @@
  * Date: 30/05/2018
  * Time: 12:14
  */
-
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBESite.inc.php");
 
 class DBEJSite extends DBESite
