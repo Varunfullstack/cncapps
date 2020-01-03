@@ -1010,7 +1010,7 @@ class CTActivity extends CTCNC
                         'listStatus'                => $dsSearchResults->getValue($statusCol),
                         'listDate'                  => Controller::dateYMDtoDMY($dsSearchResults->getValue($dateCol)),
                         'listPriority'              => $dsSearchResults->getValue(DBECallActivitySearch::priority),
-                        'listWorkingHours'          => $dsSearchResults->getValue(DBECallActivitySearch::workingHours),
+                        'listWorkingHours'          => number_format($dsSearchResults->getValue(DBECallActivitySearch::workingHours),2),
                         'listActivityDurationHours' => $dsSearchResults->getValue(
                             DBECallActivitySearch::activityDurationHours
                         ),
