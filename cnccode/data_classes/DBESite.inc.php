@@ -5,6 +5,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBESite extends DBCNCEntity
@@ -118,7 +119,7 @@ class DBESite extends DBCNCEntity
         );
         $this->addColumn(
             self::maxTravelHours,
-            DA_INTEGER,
+            DA_FLOAT,
             DA_ALLOW_NULL,
             "add_max_travel_hours"
         );

@@ -732,7 +732,9 @@ class DBEntity extends DataAccess
         if ($type == DA_ID || $type == DA_INTEGER) {
             return (int)$this->db->Record[$ixColumnNumber];
         }
-
+        if ($type == DA_FLOAT) {
+            return (float)$this->db->Record[$ixColumnNumber];
+        }
         if ($type == DA_JSON_ARRAY) {
             return json_decode($this->db->Record[$ixColumnNumber]);
         }

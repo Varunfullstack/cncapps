@@ -613,7 +613,8 @@ class DBEJProblem extends DBEProblem
                                      $isP5 = false,
                                      $showHelpDesk = true,
                                      $showEscalation = true,
-                                     $showSmallProjects = true
+                                     $showSmallProjects = true,
+                                     $showProjects = true
     )
     {
         $sql =
@@ -650,6 +651,10 @@ class DBEJProblem extends DBEProblem
 
         if (!$showSmallProjects) {
             $sql .= ' and pro_queue_no <> 3 ';
+        }
+
+        if (!$showProjects) {
+            $sql .= ' and pro_queue_no <> 5 ';
         }
 
         if ($isP5) {
@@ -714,7 +719,8 @@ class DBEJProblem extends DBEProblem
                                                   $isP5 = false,
                                                   $showHelpDesk = true,
                                                   $showEscalation = true,
-                                                  $showSmallProjects = true
+                                                  $showSmallProjects = true,
+                                                  $showProjects = true
     )
     {
         $sql =
@@ -751,6 +757,9 @@ class DBEJProblem extends DBEProblem
 
         if (!$showSmallProjects) {
             $sql .= ' and pro_queue_no <> 3 ';
+        }
+        if (!$showProjects) {
+            $sql .= ' and pro_queue_no <> 5 ';
         }
 
 

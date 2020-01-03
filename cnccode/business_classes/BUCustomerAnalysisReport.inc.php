@@ -55,10 +55,7 @@ class BUCustomerAnalysisReport extends Business
             $searchForm->getValue(self::searchFormEndYearMonth)
         )->modify('last day of this month');
 
-        $diff = $startDate->diff($endDate);
-
-        $numberOfMonths = round($diff->days / 30);
-
+        $numberOfMonths = $startDate->diff($endDate)->m + 1 + ($startDate->diff($endDate)->y * 12);
         $hourlyRate = $dsHeader->getValue(DBEHeader::hourlyLabourCost);
 
         $hourlyLabourChargeItem = new BUItem($this);
@@ -224,16 +221,16 @@ class BUCustomerAnalysisReport extends Business
         $sql =
             "
         SELECT
-          SUM( `salePricePerMonth` ) AS salePricePerMonth,
-          SUM( `costPricePerMonth` ) AS costPricePerMonth,
-               sum(cui_users) as users,
-          SUM( `cui_cost_price` / 12 ) AS cui_cost_price,
-          SUM( `cui_sale_price` / 12 ) AS cui_sale_price,
-          SUM( `salePrice`  * `qty` / 12 ) AS salePrice,
-          SUM( `costPrice`  * `qty` / 12 ) AS costPrice,
+           `salePricePerMonth`  AS salePricePerMonth,
+           `costPricePerMonth`  AS costPricePerMonth,
+               cui_users as users,
+           `cui_cost_price` / 12  AS cui_cost_price,
+           `cui_sale_price` / 12  AS cui_sale_price,
+           `salePrice`  * `qty` / 12  AS salePrice,
+           `costPrice`  * `qty` / 12  AS costPrice,
           
-          SUM( `itm_sstk_price` / 12 ) AS itemSalePrice,
-          SUM( `itm_sstk_cost` / 12 ) AS itemCostPrice
+           `itm_sstk_price` / 12  AS itemSalePrice,
+           `itm_sstk_cost` / 12  AS itemCostPrice
           
         FROM
           custitem
@@ -247,27 +244,29 @@ class BUCustomerAnalysisReport extends Business
         if ($customerID) {
             $sql .= " AND custitem.cui_custno = $customerID";
         }
-        $row = $this->db->query($sql)->fetch_array();
-
-        /* Per month values in different fields depending upon renewal type */
-        if ($row['salePricePerMonth'] > 0) {
-            if ($row['users'] > 0) {
-                $perMonthSale = $row['cui_sale_price'];
-                $perMonthCost = $row['cui_cost_price'];
+        $rows = $this->db->query($sql);
+        $perMonthCost = 0;
+        $perMonthSale = 0;
+        while ($row = $rows->fetch_array()) {
+            /* Per month values in different fields depending upon renewal type */
+            if ($row['salePricePerMonth'] > 0) {
+                if ($row['users'] > 0) {
+                    $perMonthSale += $row['cui_sale_price'];
+                    $perMonthCost += $row['cui_cost_price'];
+                } else {
+                    $perMonthSale += $row['salePricePerMonth'];
+                    $perMonthCost += $row['costPricePerMonth'];
+                }
+            } elseif ($row['cui_sale_price'] > 0) {
+                $perMonthSale += $row['cui_sale_price'];
+                $perMonthCost += $row['cui_cost_price'];
+            } elseif ($row['salePrice'] > 0) {
+                $perMonthSale += $row['salePrice'];
+                $perMonthCost += $row['costPrice'];
             } else {
-                $perMonthSale = $row['salePricePerMonth'];
-                $perMonthCost = $row['costPricePerMonth'];
+                $perMonthSale += $row['itemSalePrice'];
+                $perMonthCost += $row['itemCostPrice'];
             }
-        } elseif ($row['cui_sale_price'] > 0) {
-            $perMonthSale = $row['cui_sale_price'];
-            $perMonthCost = $row['cui_cost_price'];
-        } elseif ($row['salePrice'] > 0) {
-            $perMonthSale = $row['salePrice'];
-            $perMonthCost = $row['costPrice'];
-        } else {
-            $perMonthSale = $row['itemSalePrice'];
-            $perMonthCost = $row['itemCostPrice'];
-
         }
         return array(
             'perMonthSale' => $perMonthSale,
