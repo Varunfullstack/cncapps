@@ -1,15 +1,19 @@
 # Changelog
 This project changes will be shown here.
 
+## [3.9.4] - 2020-01-03
+### Fixed
+- Fixed issue with decimals
+
 ## [3.9.3] - 2020-01-03
-## Added
+### Added
 - Added Type of sales request to the dashboard
 - Added the ability to create signable quotes for all the sales orders except completed
-## Changed
+### Changed
 - Changed SD Manager to match the new queue naming convention
 - Changed Sales Orders actions to have a specific order
 - Changed Signable API Message to accommodate to the new team naming convention
-## Fixed
+### Fixed
 - Fixed issue with Contact Validation not validating sites correctly
 - Fixed issue with CustomerAnalysisReport not showing the correct values
 - Fixed issue with Root Cause showing as a number while displaying an activity

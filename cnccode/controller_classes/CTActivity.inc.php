@@ -1010,9 +1010,13 @@ class CTActivity extends CTCNC
                         'listStatus'                => $dsSearchResults->getValue($statusCol),
                         'listDate'                  => Controller::dateYMDtoDMY($dsSearchResults->getValue($dateCol)),
                         'listPriority'              => $dsSearchResults->getValue(DBECallActivitySearch::priority),
-                        'listWorkingHours'          => number_format($dsSearchResults->getValue(DBECallActivitySearch::workingHours),2),
-                        'listActivityDurationHours' => $dsSearchResults->getValue(
-                            DBECallActivitySearch::activityDurationHours
+                        'listWorkingHours'          => number_format(
+                            $dsSearchResults->getValue(DBECallActivitySearch::workingHours),
+                            2
+                        ),
+                        'listActivityDurationHours' => number_format(
+                            $dsSearchResults->getValue(DBECallActivitySearch::activityDurationHours),
+                            2
                         ),
                         'listRootCause'             => $dsSearchResults->getValue(DBECallActivitySearch::rootCause),
                         'listFixEngineer'           => $dsSearchResults->getValue(DBECallActivitySearch::fixEngineer),
@@ -2456,7 +2460,7 @@ class CTActivity extends CTCNC
 
 //----------------
 
-/**
+    /**
      * @param $customerID
      * @return string
      * @throws Exception
@@ -2562,7 +2566,7 @@ class CTActivity extends CTCNC
         return $passwordLink;
     }
 
-        /**
+    /**
      * @return string
      * @throws Exception
      */
@@ -2609,7 +2613,7 @@ class CTActivity extends CTCNC
         return $thirdPartyContactLink;
     }// end function editLinkedSalesOrder()
 
-/**
+    /**
      * @param $customerID
      * @return string
      * @throws Exception
@@ -2676,7 +2680,7 @@ class CTActivity extends CTCNC
         return $linkMarkup;
     }
 
-        /**
+    /**
      * Documents display and upload
      *
      * @param $callActivityID
