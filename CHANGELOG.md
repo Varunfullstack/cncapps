@@ -8,10 +8,13 @@ This project changes will be shown here.
 ## Changed
 - Changed SD Manager to match the new queue naming convention
 - Changed Sales Orders actions to have a specific order
+- Changed Signable API Message to accommodate to the new team naming convention
 ## Fixed
 - Fixed issue with Contact Validation not validating sites correctly
 - Fixed issue with CustomerAnalysisReport not showing the correct values
-
+- Fixed issue with Root Cause showing as a number while displaying an activity
+- Fixed issue with column names while running TeamPerformanceUpdate
+- Fixed issue with manual time allocation going to the wrong team
 
 ## [3.9.2] - 2020-01-02
 ### Fixed
