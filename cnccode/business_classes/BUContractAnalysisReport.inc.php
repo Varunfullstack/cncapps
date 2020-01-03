@@ -5,6 +5,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
@@ -30,6 +31,102 @@ class BUContractAnalysisReport extends Business
         $dsData->setValue(self::searchFormStartYearMonth, null);
         $dsData->addColumn(self::searchFormEndYearMonth, DA_STRING, DA_ALLOW_NULL);
         $dsData->setValue(self::searchFormEndYearMonth, null);
+    }
+
+    /**
+     * @param DSForm $searchForm
+     * @return array|bool
+     */
+    function getResults($searchForm)
+    {
+        $buHeader = new BUHeader($this);
+        $dsHeader = new DataSet($this);
+        $buHeader->getHeader($dsHeader);
+
+        $contracts = $searchForm->getValue(self::searchFormContracts);
+        $startDate = (DateTime::createFromFormat(
+            "m/Y",
+            $searchForm->getValue(self::searchFormStartYearMonth)
+        ))->modify('first day of this month ');
+        $endDate = (DateTime::createFromFormat(
+            "m/Y",
+            $searchForm->getValue(self::searchFormEndYearMonth)
+        ))->modify('last day of this month');
+
+        $numberOfMonths = $startDate->diff($endDate)->m + 1 + ($startDate->diff($endDate)->y * 12);
+        $hourlyRate = $dsHeader->getValue(DBEHeader::hourlyLabourCost);
+
+        $nothingFoundForSpecifiedContractString = false;
+
+        if ($contracts) {
+
+            $contractItemIDs = $this->getContractItemIDs($contracts);
+
+            if (is_null($contractItemIDs)) {
+                $nothingFoundForSpecifiedContractString = true;
+            }
+        } else {
+            $contractItemIDs = false;
+        }
+
+        if ($nothingFoundForSpecifiedContractString) {
+            return false;
+
+        }
+        $customers = $this->getCustomers($contractItemIDs);
+
+        $customersArray = array();
+
+        while ($row = $customers->fetch_array()) {
+            $customersArray[] = $row;
+        }
+        $results = [];
+
+        foreach ($customersArray as $customer) {
+            /*
+            Sales
+            */
+            $labourHoursRow =
+                $this->getLabourHours(
+                    $customer['customerID'],
+                    $startDate,
+                    $endDate,
+                    $contractItemIDs
+                );
+
+            $contractValues =
+                $this->getContractValues(
+                    $customer['customerID'],
+                    $contractItemIDs
+                );
+            $cost = round($contractValues['perMonthCost'] * $numberOfMonths, 2);
+            $sales = round($contractValues['perMonthSale'] * $numberOfMonths, 2);
+            $labourCost = round($labourHoursRow[0] * $hourlyRate, 2);
+            $prepayValues = $this->getPrepayValues($startDate, $endDate, $customer['customerID'], $contractItemIDs);
+            $sales = round($sales + $prepayValues['sales'], 2);
+            $profit = $sales - $cost - $labourCost;
+
+            //get prepay data
+            $profitPercent = null;
+            if ($sales > 0) {
+                $profitPercent = number_format(100 - (($cost + $labourCost) / $sales) * 100, 2);
+            }
+
+
+            $results[$customer['Customer']] =
+                array(
+                    'customerID'    => $customer['customerID'],
+                    'sales'         => $sales,
+                    'cost'          => $cost,
+                    'profit'        => $profit,
+                    'labourCost'    => $labourCost,
+                    'profitPercent' => $profitPercent,
+                    'labourHours'   => $labourHoursRow[0]
+                );
+        }
+
+        return $results;
+
     }
 
     /**
@@ -117,6 +214,7 @@ class BUContractAnalysisReport extends Business
         SELECT
           salePricePerMonth,
           costPricePerMonth,
+          cui_users as users,
           `cui_cost_price` / 12 AS cui_cost_price,
           `cui_sale_price` / 12 AS cui_sale_price,
           `salePrice`  * `qty` / 12 AS salePrice,
@@ -145,8 +243,13 @@ class BUContractAnalysisReport extends Business
         while ($row = $rows->fetch_array()) {
 
             if ($row['salePricePerMonth'] > 0) {
-                $perMonthSale += $row['salePricePerMonth'];
-                $perMonthCost += $row['costPricePerMonth'];
+                if ($row['users'] > 0) {
+                    $perMonthSale += $row['cui_sale_price'];
+                    $perMonthCost += $row['cui_cost_price'];
+                } else {
+                    $perMonthSale += $row['salePricePerMonth'];
+                    $perMonthCost += $row['costPricePerMonth'];
+                }
             } elseif ($row['cui_sale_price'] > 0) {
                 $perMonthSale += $row['cui_sale_price'];
                 $perMonthCost += $row['cui_cost_price'];
@@ -163,103 +266,6 @@ class BUContractAnalysisReport extends Business
             'perMonthSale' => $perMonthSale,
             'perMonthCost' => $perMonthCost,
         );
-
-    }
-
-    /**
-     * @param DSForm $searchForm
-     * @return array|bool
-     */
-    function getResults($searchForm)
-    {
-        $buHeader = new BUHeader($this);
-        $dsHeader = new DataSet($this);
-        $buHeader->getHeader($dsHeader);
-
-        $contracts = $searchForm->getValue(self::searchFormContracts);
-        $startDate = (DateTime::createFromFormat(
-            "m/Y",
-            $searchForm->getValue(self::searchFormStartYearMonth)
-        ))->modify('first day of this month ');
-        $endDate = (DateTime::createFromFormat(
-            "m/Y",
-            $searchForm->getValue(self::searchFormEndYearMonth)
-        ))->modify('last day of this month');
-
-        $numberOfMonths = $startDate->diff($endDate)->m + ($startDate->diff($endDate)->y * 12);
-
-        $hourlyRate = $dsHeader->getValue(DBEHeader::hourlyLabourCost);
-
-        $nothingFoundForSpecifiedContractString = false;
-
-        if ($contracts) {
-
-            $contractItemIDs = $this->getContractItemIDs($contracts);
-
-            if (is_null($contractItemIDs)) {
-                $nothingFoundForSpecifiedContractString = true;
-            }
-        } else {
-            $contractItemIDs = false;
-        }
-
-        if ($nothingFoundForSpecifiedContractString) {
-            return false;
-
-        }
-        $customers = $this->getCustomers($contractItemIDs);
-
-        $customersArray = array();
-
-        while ($row = $customers->fetch_array()) {
-            $customersArray[] = $row;
-        }
-        $results = [];
-
-        foreach ($customersArray as $customer) {
-            /*
-            Sales
-            */
-            $labourHoursRow =
-                $this->getLabourHours(
-                    $customer['customerID'],
-                    $startDate,
-                    $endDate,
-                    $contractItemIDs
-                );
-
-            $contractValues =
-                $this->getContractValues(
-                    $customer['customerID'],
-                    $contractItemIDs
-                );
-            $cost = round($contractValues['perMonthCost'] * $numberOfMonths, 2);
-            $sales = round($contractValues['perMonthSale'] * $numberOfMonths, 2);
-            $labourCost = round($labourHoursRow[0] * $hourlyRate, 2);
-            $prepayValues = $this->getPrepayValues($startDate, $endDate, $customer['customerID'], $contractItemIDs);
-            $sales = round($sales + $prepayValues['sales'], 2);
-            $profit = $sales - $cost - $labourCost;
-
-            //get prepay data
-            $profitPercent = null;
-            if ($sales > 0) {
-                $profitPercent = number_format(100 - (($cost + $labourCost) / $sales) * 100, 2);
-            }
-
-
-            $results[$customer['Customer']] =
-                array(
-                    'customerID'    => $customer['customerID'],
-                    'sales'         => $sales,
-                    'cost'          => $cost,
-                    'profit'        => $profit,
-                    'labourCost'    => $labourCost,
-                    'profitPercent' => $profitPercent,
-                    'labourHours'   => $labourHoursRow[0]
-                );
-        }
-
-        return $results;
 
     }
 

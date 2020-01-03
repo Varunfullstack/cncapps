@@ -10747,7 +10747,8 @@ is currently a balance of ';
                                        $isP5 = false,
                                        $showHelpDesk = true,
                                        $showEscalation = true,
-                                       $showSmallProjects = true
+                                       $showSmallProjects = true,
+                                       $showProjects = true
     )
     {
         $dbeJProblem = new DBEJProblem($this);
@@ -10757,7 +10758,8 @@ is currently a balance of ';
             $isP5,
             $showHelpDesk,
             $showEscalation,
-            $showSmallProjects
+            $showSmallProjects,
+            $showProjects
         );
 
         $this->getData(
@@ -10796,7 +10798,8 @@ is currently a balance of ';
                                                     $isP5 = false,
                                                     $showHelpDesk = true,
                                                     $showEscalation = true,
-                                                    $showSmallProjects = true
+                                                    $showSmallProjects = true,
+                                                    $showProjects = true
     )
     {
         $dbeJProblem = new DBEJProblem($this);
@@ -10808,7 +10811,8 @@ is currently a balance of ';
             $isP5,
             $showHelpDesk,
             $showEscalation,
-            $showSmallProjects
+            $showSmallProjects,
+            $showProjects
         );
 
         $this->getData(

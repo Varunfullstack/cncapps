@@ -115,6 +115,10 @@ class CTSalesRequestDashboard extends CTCNC
         ><i class=\"fa fa-paperclip\"></i></a>";
             }
 
+            $dbeStandardText = new DBEStandardText($this);
+            $dbeStandardText->getRow($dbejCallActivity->getValue(DBEJCallActivity::requestType));
+
+
             $this->template->set_var(
                 [
                     'customerName'      => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
@@ -125,7 +129,8 @@ class CTSalesRequestDashboard extends CTCNC
                             DBEJCallActivity::date
                         ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime),
                     'processCRLink'     => $processCRLink,
-                    'attachments'       => $attachments
+                    'attachments'       => $attachments,
+                    'type'              => $dbeStandardText->getValue(DBEStandardText::stt_desc)
                 ]
             );
 

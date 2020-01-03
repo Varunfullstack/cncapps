@@ -1210,8 +1210,6 @@ class CTSalesOrder extends CTCNC
         $quickQuoteDisabled = false;
         if ($dsOrdline->rowCount() > 0) {                        // There are lines
             if ($orderType == 'Q') {
-                $quickQuoteDisabled = !$this->dbeUser->getValue(DBEUser::signatureFilename);
-                $actions[CTSALESORDER_ACT_CREATE_QUICK_QUOTE] = 'create quick quote';
                 $actions[CTSALESORDER_ACT_COPY_TO_ORDER] = 'copy to order';
                 $actions[CTSALESORDER_ACT_CONVERT_TO_ORDER] = 'convert to order';
             }
@@ -1223,6 +1221,12 @@ class CTSalesOrder extends CTCNC
             if ($orderType == 'I') {
                 $actions[CTSALESORDER_ACT_SEND_CONFIRMATION] = 'send confirmation email';
             }
+
+            if($orderType !== 'C'){
+                $quickQuoteDisabled = !$this->dbeUser->getValue(DBEUser::signatureFilename);
+                $actions[CTSALESORDER_ACT_CREATE_QUICK_QUOTE] = 'create Signable quote';
+            }
+
             $actions[CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM] = 'create manual order form';
             $actions[CTSALESORDER_ACT_CHANGE_SUPPLIER] = 'change supplier';
             $actions[CTSALESORDER_ACT_DOWNLOAD_CSV] = 'download CSV';
