@@ -1222,7 +1222,7 @@ class CTSalesOrder extends CTCNC
                 $actions[CTSALESORDER_ACT_SEND_CONFIRMATION] = 'send confirmation email';
             }
 
-            if($orderType !== 'C'){
+            if ($orderType !== 'C') {
                 $quickQuoteDisabled = !$this->dbeUser->getValue(DBEUser::signatureFilename);
                 $actions[CTSALESORDER_ACT_CREATE_QUICK_QUOTE] = 'create Signable quote';
             }
@@ -1231,8 +1231,28 @@ class CTSalesOrder extends CTCNC
             $actions[CTSALESORDER_ACT_CHANGE_SUPPLIER] = 'change supplier';
             $actions[CTSALESORDER_ACT_DOWNLOAD_CSV] = 'download CSV';
             $actions[CTSALESORDER_ACT_CREATE_SR_FROM_LINES] = 'create new SR';
-
         }
+        $order = [
+            CTSALESORDER_ACT_CREATE_QUICK_QUOTE,
+            CTSALESORDER_ACT_COPY_TO_ORDER,
+            CTSALESORDER_ACT_CONVERT_TO_ORDER,
+            CTSALESORDER_ACT_DELETE_LINES,
+            CTSALESORDER_ACT_UPDATE_LINES,
+            CTSALESORDER_ACT_INSERT_FROM_ORDER,
+            CTSALESORDER_ACT_SEND_CONFIRMATION,
+            CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM,
+            CTSALESORDER_ACT_CHANGE_SUPPLIER,
+            CTSALESORDER_ACT_DOWNLOAD_CSV,
+            CTSALESORDER_ACT_CREATE_SR_FROM_LINES,
+        ];
+
+        uksort(
+            $actions,
+            function ($a, $b) use ($order) {
+                return array_search($a, $order) - array_search($b, $order);
+            }
+        );
+
         if (count($actions) > 0) {
             $this->template->set_block(
                 'SalesOrderDisplay',

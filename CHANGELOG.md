@@ -2,6 +2,15 @@
 This project changes will be shown here.
 
 ## [3.9.3] - 2020-01-02
+## Added
+- Added Type of sales request to the dashboard
+- Added the ability to create signable quotes for all the sales orders except completed
+## Changed
+- Changed SD Manager to match the new queue naming convention
+- Changed Sales Orders actions to have a specific order
+## Fixed
+- Fixed issue with Contact Validation not validating sites correctly
+- Fixed issue with CustomerAnalysisReport not showing the correct values
 
 
 ## [3.9.2] - 2020-01-02
