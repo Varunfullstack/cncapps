@@ -1850,7 +1850,7 @@ class CTSalesOrder extends CTCNC
                     array(
                         'salesOrderLineDesc' => $salesOrderLineDesc,
                         'description'        => $dsOrdline->getValue(DBEOrdline::description),
-                        'qtyOrdered'         => $dsOrdline->getValue(DBEOrdline::qtyOrdered),
+                        'qtyOrdered'         => number_format($dsOrdline->getValue(DBEOrdline::qtyOrdered),2),
                         'lineType'           => $dsOrdline->getValue(DBEOrdline::lineType),
                         'partNo'             => Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::partNo)),
                         'sequenceNo'         => $dsOrdline->getValue(DBEOrdline::sequenceNo),
@@ -1900,19 +1900,18 @@ class CTSalesOrder extends CTCNC
                                 'stockcat'                => $dsOrdline->getValue(DBEOrdline::stockcat),
                                 'renewalIcon'             => $renewalIcon,
                                 'lineSupplierName'        => $supplierName,
-                                'curUnitCost'             => $dsOrdline->getValue(DBEOrdline::curUnitCost),
-                                'curCostTotal'            => Controller::formatNumber($curCostTotal),
-                                'curUnitSale'             => $dsOrdline->getValue(DBEOrdline::curUnitSale),
-                                'curSaleTotal'            => Controller::formatNumber($curSaleTotal),
-                                'curProfit'               => Controller::formatNumber($curProfit),
-                                'percProfit'              => Controller::formatNumber(
-                                    $percProfit,
-                                    1
+                                'curUnitCost'             => number_format(
+                                    $dsOrdline->getValue(DBEOrdline::curUnitCost),
+                                    2
                                 ),
+                                'curCostTotal'            => number_format($curCostTotal, 2),
+                                'curUnitSale'             => number_format(                                    $dsOrdline->getValue(DBEOrdline::curUnitSale),                                    2                                ),
+                                'curSaleTotal'           => number_format($curSaleTotal, 2),
+                                'curProfit'               => number_format($curProfit, 2),
+                                'percProfit'              => number_format($percProfit, 2),
                                 'orderLineProfitClass'    => ($curProfit < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
                                 'orderLineSaleTotalClass' => ($curSaleTotal < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
                                 'orderLineCostTotalClass' => ($curCostTotal < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM
-                                //,
                             )
                         );
                         $curSaleGrandTotal += $curSaleTotal;
