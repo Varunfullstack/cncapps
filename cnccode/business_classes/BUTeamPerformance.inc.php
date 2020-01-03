@@ -126,18 +126,18 @@ class BUTeamPerformance extends Business
                 'esTeamActualFixHours'       => $esTeamFixAverageHours,
                 'esTeamActualFixQtyPerMonth' => $this->getFixCount($year, $month, 2),
 
-                'smallProjectsTeamTargetSlaPercentage'  => $dsHeader->getValue(
+                'imTeamTargetSlaPercentage'  => $dsHeader->getValue(
                     DBEHeader::smallProjectsTeamTargetSlaPercentage
                 ),
-                'smallProjectsTeamTargetFixHours'       => $dsHeader->getValue(
+                'imTeamTargetFixHours'       => $dsHeader->getValue(
                     DBEHeader::smallProjectsTeamTargetFixHours
                 ),
-                'smallProjectsTeamTargetFixQtyPerMonth' => $dsHeader->getValue(
+                'imTeamTargetFixQtyPerMonth' => $dsHeader->getValue(
                     DBEHeader::smallProjectsTeamTargetFixQtyPerMonth
                 ),
-                'smallProjectsTeamActualSlaPercentage'  => $smallProjectsTeamActualSlaPercentage,
-                'smallProjectsTeamActualFixHours'       => $smallProjectsTeamFixAverageHours,
-                'smallProjectsTeamActualFixQtyPerMonth' => $this->getFixCount($year, $month, 3),
+                'imTeamActualSlaPercentage'  => $smallProjectsTeamActualSlaPercentage,
+                'imTeamActualFixHours'       => $smallProjectsTeamFixAverageHours,
+                'imTeamActualFixQtyPerMonth' => $this->getFixCount($year, $month, 3),
 
                 'projectTeamTargetSlaPercentage'  => $dsHeader->getValue(DBEHeader::projectTeamTargetSlaPercentage),
                 'projectTeamTargetFixHours'       => $dsHeader->getValue(DBEHeader::projectTeamTargetFixHours),

@@ -3311,12 +3311,12 @@ class BUActivity extends Business
      * Add hours to clock of team of allocated user
      *
      * @param mixed $problemID
-     * @param $teamID
+     * @param $teamLevel
      * @param $minutes
      * @param $comments
      */
     public function allocateAdditionalTime($problemID,
-                                           $teamID,
+                                           $teamLevel,
                                            $minutes,
                                            $comments
     )
@@ -3324,7 +3324,7 @@ class BUActivity extends Business
         $this->dbeProblem = new DBEProblem($this);
         $this->dbeProblem->getRow($problemID);
 
-        if ($teamID == 1) {
+        if ($teamLevel == 1) {
             $this->dbeProblem->setValue(
                 DBEProblem::hdLimitMinutes,
                 $this->dbeProblem->getValue(DBEProblem::hdLimitMinutes) + $minutes
@@ -3333,7 +3333,7 @@ class BUActivity extends Business
                 DBEProblem::hdTimeAlertFlag,
                 'N'
             ); // reset alert flag
-        } elseif ($teamID == 2) {
+        } elseif ($teamLevel == 2) {
             $this->dbeProblem->setValue(
                 DBEProblem::esLimitMinutes,
                 $this->dbeProblem->getValue(DBEProblem::esLimitMinutes) + $minutes
@@ -3342,7 +3342,7 @@ class BUActivity extends Business
                 DBEProblem::esTimeAlertFlag,
                 'N'
             );
-        } elseif ($teamID == 4) {
+        } elseif ($teamLevel == 3) {
             $this->dbeProblem->setValue(
                 DBEProblem::smallProjectsTeamLimitMinutes,
                 $this->dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes) + $minutes

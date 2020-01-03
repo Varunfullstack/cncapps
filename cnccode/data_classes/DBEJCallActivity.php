@@ -304,7 +304,7 @@ class DBEJCallActivity extends DBECallActivity
         );
         $this->addColumn(
             self::rootCauseDescription,
-            DA_INTEGER,
+            DA_TEXT,
             DA_ALLOW_NULL,
             "rootcause.rtc_desc"
         );

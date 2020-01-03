@@ -6268,7 +6268,7 @@ class CTActivity extends CTCNC
             } elseif ($dbeFirstActivity->getValue(DBEJCallActivity::queueNo) == 3) {
                 $teamLevel = 3;           // Small Projects
             } else {
-                $teamLevel = 5;           // Small Projects
+                $teamLevel = 5;           // Projects
             }
         }
 
