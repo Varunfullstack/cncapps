@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [3.9.3] - 2020-01-02
+## [3.9.3] - 2020-01-03
 ## Added
 - Added Type of sales request to the dashboard
 - Added the ability to create signable quotes for all the sales orders except completed
