@@ -1850,7 +1850,7 @@ class CTSalesOrder extends CTCNC
                     array(
                         'salesOrderLineDesc' => $salesOrderLineDesc,
                         'description'        => $dsOrdline->getValue(DBEOrdline::description),
-                        'qtyOrdered'         => number_format($dsOrdline->getValue(DBEOrdline::qtyOrdered),2),
+                        'qtyOrdered'         => number_format($dsOrdline->getValue(DBEOrdline::qtyOrdered), 2, '.', ''),
                         'lineType'           => $dsOrdline->getValue(DBEOrdline::lineType),
                         'partNo'             => Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::partNo)),
                         'sequenceNo'         => $dsOrdline->getValue(DBEOrdline::sequenceNo),
@@ -1903,10 +1903,18 @@ class CTSalesOrder extends CTCNC
                                 'curUnitCost'             => number_format(
                                     $dsOrdline->getValue(DBEOrdline::curUnitCost),
                                     2
+                                    ,
+                                    '.',
+                                    ''
                                 ),
                                 'curCostTotal'            => number_format($curCostTotal, 2),
-                                'curUnitSale'             => number_format(                                    $dsOrdline->getValue(DBEOrdline::curUnitSale),                                    2                                ),
-                                'curSaleTotal'           => number_format($curSaleTotal, 2),
+                                'curUnitSale'             => number_format(
+                                    $dsOrdline->getValue(DBEOrdline::curUnitSale),
+                                    2,
+                                    '.',
+                                    ''
+                                ),
+                                'curSaleTotal'            => number_format($curSaleTotal, 2),
                                 'curProfit'               => number_format($curProfit, 2),
                                 'percProfit'              => number_format($percProfit, 2),
                                 'orderLineProfitClass'    => ($curProfit < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,

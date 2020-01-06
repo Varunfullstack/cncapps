@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [3.9.5] - 2020-01-06
+### Fixed
+- Fixed issue with sales value in sales orders having a comma on thousands multiples. 
+
 ## [3.9.4] - 2020-01-03
 ### Fixed
 - Fixed issue with decimals
