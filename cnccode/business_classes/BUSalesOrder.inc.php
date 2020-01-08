@@ -2470,18 +2470,14 @@ WHERE odl_ordno = $ordheadID
         );
         $buPDF->CR();
         $buPDF->CR();
-        $buPDF->printString('This order is subject to our terms and conditions which are ');
-        $buPDF->CR();
-        $buPDF->printString('available ');
-        $buPDF->printString('here', "https://www.cnc-ltd.co.uk/terms-and-conditions");
-        $buPDF->printString(' and by ticking this box you have read and agreed');
+        $buPDF->printStringRJAt(
+            UNIT_LEFT - 2,
+            'By ticking this box you have read and agree our terms and conditions: '
+        );
         $buPDF->printStringAt(
             UNIT_LEFT,
             "{check:signer1:accept}"
         );
-        $buPDF->CR();
-        $buPDF->printString('to them.');
-
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->setBoldOn();

@@ -187,7 +187,7 @@ $app->group(
                 $response->getBody()->write(
                     $twig->render(
                         'acceptQuotation.html.twig',
-                        ["message" => "You will now receive an email from Signable with details on how to confirm your order."]
+                        ["message" => "You will now receive an email from Signable with details on how to confirm your order. This quotation is subject to our terms and conditions which are available <a href='https://www.cnc-ltd.co.uk/terms-and-conditions'>here</a>"]
                     )
                 );
                 return $response;
