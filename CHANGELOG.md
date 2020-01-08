@@ -1,10 +1,14 @@
 # Changelog
 This project changes will be shown here.
-## [3.9.5] - 2020-01-06
+## [3.9.6] - 2020-01-06
 ### Fixed
 - Fixed issue with Projects team graphs not showing for people on the Projects Team
 ### Changed
 - Changed permissions to make sure expense dashboard shows to the appropriate users.
+- Show Quick Quote Parameters in sales orders when Initial
+- Fix issue with manually assigned time not going to the right team
+- Fix issue with Activity column not showing the right numbers
+- Fix issue with SLA values in customer page not showing as floats.
 
 ## [3.9.5] - 2020-01-06
 ### Fixed
