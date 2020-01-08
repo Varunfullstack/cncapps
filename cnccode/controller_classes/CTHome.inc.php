@@ -116,7 +116,7 @@ class CTHome extends CTCNC
     {
         $isStandardUser = false;
         if (!$this->buUser->isSdManager($this->userID)) {
-            if ($this->buUser->getLevelByUserID($this->userID) <= 3) {
+            if ($this->buUser->getLevelByUserID($this->userID) <= 5) {
                 $team = $this->buUser->getLevelByUserID($this->userID);
                 $isStandardUser = true;
             } else {

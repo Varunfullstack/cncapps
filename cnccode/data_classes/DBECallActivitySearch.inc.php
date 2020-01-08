@@ -256,7 +256,7 @@ class DBECallActivitySearch extends DBEntity
         );
         $this->addColumn(
             self::respondedHours,
-            DA_INTEGER,
+            DA_FLOAT,
             DA_ALLOW_NULL,
             "pro_responded_hours"
         );
@@ -268,7 +268,7 @@ class DBECallActivitySearch extends DBEntity
         );
         $this->addColumn(
             self::activityDurationHours,
-            DA_INTEGER,
+            DA_FLOAT,
             DA_ALLOW_NULL,
             "pro_total_activity_duration_hours"
         );

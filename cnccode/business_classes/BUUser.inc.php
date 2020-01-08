@@ -263,7 +263,7 @@ class BUUser extends Business
                         ON user_time_log.`loggedDate` = limited.loggedDate 
                       LEFT JOIN `consultant` 
                         ON userID = consultant.`cns_consno` 
-                    WHERE teamLevel = $teamLevel 
+                    WHERE teamLevel = ?
                       ";
 
         if ($hideExcluded) {
@@ -272,12 +272,11 @@ class BUUser extends Business
 
         $query .= " ORDER BY userID,
                       user_time_log.loggedDate ASC";
-        $db->query($query);
+        $statement = $db->preparedQuery($query, [["type" => "i", "value" => $teamLevel]]);
         $rows = [];
-        while ($db->next_record(1)) {
-            $rows[] = $db->Record;
+        while ($row = $statement->fetch_assoc()) {
+            $rows[] = $row;
         }
-
         return $rows;
     }
 
