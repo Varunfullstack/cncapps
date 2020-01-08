@@ -2042,7 +2042,7 @@ class CTSalesOrder extends CTCNC
             );
             // if this is a quote with item lines then display upload and "generate quick-quote" forms
             if (
-                ($orderType == 'Q') &&
+                ($orderType == 'Q' || $orderType == 'I') &&
                 ($dsOrdline->rowCount() > 0)
             ) {
                 if ((!$this->getSalutation()) && (!$this->getFormError())) {

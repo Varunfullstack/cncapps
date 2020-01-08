@@ -50,7 +50,7 @@
     var userLevel = {userLevel};
     var userID = {userID};
     var isManager = {isManager};
-    var defaultTeam = userLevel <= 3 ? userLevel : 1;
+    var defaultTeam = userLevel <= 5 ? userLevel : 1;
 
 
     $(function () {
@@ -66,9 +66,9 @@
         var teamSelector = $('#teamSelector');
 
 
+        teamSelector.val(defaultTeam);
         if (isManager) {
             teamSelector.show();
-            teamSelector.val(userLevel <= 3 ? userLevel : 1);
         }
 
 

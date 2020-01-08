@@ -254,31 +254,31 @@ class DBECustomer extends DBCNCEntity
         );
         $this->addColumn(
             self::slaP1,
-            DA_INTEGER,
+            DA_FLOAT,
             DA_NOT_NULL,
             "cus_sla_p1"
         );
         $this->addColumn(
             self::slaP2,
-            DA_INTEGER,
+            DA_FLOAT,
             DA_NOT_NULL,
             "cus_sla_p2"
         );
         $this->addColumn(
             self::slaP3,
-            DA_INTEGER,
+            DA_FLOAT,
             DA_NOT_NULL,
             "cus_sla_p3"
         );
         $this->addColumn(
             self::slaP4,
-            DA_INTEGER,
+            DA_FLOAT,
             DA_NOT_NULL,
             "cus_sla_p4"
         );
         $this->addColumn(
             self::slaP5,
-            DA_INTEGER,
+            DA_FLOAT,
             DA_NOT_NULL,
             "cus_sla_p5"
         );

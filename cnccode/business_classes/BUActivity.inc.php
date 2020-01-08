@@ -3259,13 +3259,14 @@ class BUActivity extends Business
 
         $reviewingUser = new DBEUser($this);
         $reviewingUser->getRow($userID);
+        $BUUser = new BUUser($this);
+        $teamLevel = $BUUser->getLevelByUserID($requestingUserID);
 
-        $teamID = $requestingUser->getValue(DBEUser::teamID);
         switch ($response) {
             case 'A':
                 $this->allocateAdditionalTime(
                     $dsCallActivity->getValue(DBECallActivity::problemID),
-                    $teamID,
+                    $teamLevel,
                     $minutes,
                     $comments
                 );
