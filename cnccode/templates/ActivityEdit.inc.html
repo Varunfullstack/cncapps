@@ -2,18 +2,17 @@
 <script language='JavaScript'
         src="CommonJS.js"
 ></script>
-<script type="text/javascript"
-        src="ckeditor/ckeditor.js"
-></script>
-<script type="application/javascript"
-        src=".javascript/salesRequest.js"
-></script>
+
 <script language='JavaScript'>
     window.callActivityID = "{callActivityID}";
     window.problemID = "{problemID}";
 
     function showSalesRequestDialog() {
         startSalesRequest(problemID);
+    }
+
+    function showSalesRequestDialog() {
+        startChangeRequest(problemID);
     }
 
     var authorisedByName = "{authorisedByName}";
