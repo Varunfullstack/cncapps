@@ -35,30 +35,29 @@
             >This is the upload section!
                 <div id="drop-area">
                     <form class="my-form"><p>Upload multiple files with the file dialog or by dragging and dropping
-                        images onto the dashed region</p>    <input type="file"
-                                                                    id="fileElem"
-                                                                    multiple
-                                                                    onchange="handleFiles(this.files)"
-                    > <label class="button"
-                             for="fileElem"
-                    >Select some files</label></form>
+                        images onto the dashed region</p>
+                        <input type="file"
+                               id="fileElem"
+                               multiple
+                        > <label class="button"
+                                 for="fileElem"
+                        >Select some files</label></form>
                 </div>
                 <div id="gallery"></div>
             </div>
             <div>
                 <button disabled
                         id="sendSalesRequestBtn"
-                        onclick="sendSalesRequest()"
                 >Send
                 </button>
-                <button onclick="cancelSalesRequest()">Cancel</button>
+                <button id="salesRequestCancelBtn">Cancel</button>
             </div>
         </div>`;
 
     const fileItem =
         `<div class="item">
      <div class="fileName">{% name %}</div>
-     <button onclick="deleteFile({% id %})">X</button>    
+     <button data-file-id="{% id %}" class="deleteFileItemBtn">X</button>    
     </div>
    `;
 
@@ -78,7 +77,7 @@
         CKEDITOR.instances.salesRequestText.setData(html);
     }
 
-    function startCreateSalesRequest(customerID, domElement) {
+    window.startCreateSalesRequest = function (customerID, domElement) {
         initializeSalesRequest();
         appendScript('.javascript/mustache.min.js');
         appendScript('.javascript/mustache-wax.min.js');
@@ -90,11 +89,19 @@
 
         initializeUploads();
         populateOptions();
-    }
+    };
 
     function hookListeners() {
         window.document.getElementById('templateSelector').addEventListener('change', changeTemplate);
-
+        window.document.getElementById('salesRequestCancelBtn').addEventListener('click', cancelSalesRequest);
+        window.document.getElementById('sendSalesRequestBtn').addEventListener('click', sendSalesRequest);
+        const fileElement = window.document.getElementById('fileElem');
+        fileElement.addEventListener('change', () => handleFiles(fileElement.files));
+        window.document.getElementById('gallery').addEventListener('click', (mouseEvent) => {
+            if (mouseEvent.target.classList.contains('deleteFileItemBtn')) {
+                deleteFile(+mouseEvent.target.dataset.fileId);
+            }
+        });
     }
 
     function initializeUploads() {
@@ -118,11 +125,11 @@
                 dropArea.addEventListener(eventName, unhighlight, false)
             });
 
-            function highlight(e) {
+            function highlight() {
                 dropArea.classList.add('highlight')
             }
 
-            function unhighlight(e) {
+            function unhighlight() {
                 dropArea.classList.remove('highlight')
             }
 
@@ -177,7 +184,7 @@
             processData: false,
             data: fd
         }).then(function (result) {
-            if (result.status == 'error') {
+            if (result.status === 'error') {
                 throw 'Failed to send message';
             } else {
                 cancelSalesRequest();
@@ -219,7 +226,7 @@
             $('#templateSelector').html(
                 "<option value>-- Pick an option --</option>" +
                 result.reduce((acc, item) => {
-                    acc += "<option value='" + item.id + "' data-template='" + item.template + "' >" + item.name + "</option>"
+                    acc += "<option value='" + item.id + "' data-template='" + item.template + "' >" + item.name + "</option>";
                     return acc;
                 }, '')
             )

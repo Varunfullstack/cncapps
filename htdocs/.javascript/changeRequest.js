@@ -9,36 +9,35 @@
         $('head').append(ele);
     }
 
-    const changeRequestDialogTemplate = "<div id=\"changeRequestDialog\"\n" +
-        "     title=\"change Request\"\n" +
-        ">\n" +
-        "    <label for=\"templateSelector\"></label>\n" +
-        "    <select name=\"templateSelector\"\n" +
-        "            id=\"templateSelector\"\n" +
-        "            onchange=\"changeTemplate()\"\n" +
-        "    >\n" +
-        "        <option value=\"\">\n" +
-        "            Pick a template\n" +
-        "        </option>\n" +
-        "    </select>\n" +
-        "    <br>\n" +
-        "    <br>\n" +
-        "    <textarea id=\"changeRequestText\"\n" +
-        "              cols=\"30\"\n" +
-        "              rows=\"10\"\n" +
-        "    ></textarea>\n" +
-        "    <br>\n" +
-        "    <br>" +
-        "</div>" +
-        "    <div>\n" +
-        "        <button disabled\n" +
-        "                id=\"sendChangeRequestBtn\"\n" +
-        "                onclick=\"sendChangeRequest()\"\n" +
-        "        >Send\n" +
-        "        </button>\n" +
-        "        <button id='cancelBtn'>Cancel</button>\n" +
-        "    </div>\n" +
-        "</div>";
+    const changeRequestDialogTemplate = `
+<div id="changeRequestDialog"    title="change Request">
+<div>
+    <label for="templateSelector"></label>
+    <select name="templateSelector"
+            id="templateSelector"
+    >
+        <option value="">
+            Pick a template
+        </option>
+    </select>
+    <br>
+    <br>
+    <textarea id="changeRequestText"
+              cols="30"
+              rows="10"
+    ></textarea>
+    <br>
+    <br>
+   </div>
+  <div>
+        <button disabled
+                id="sendChangeRequestBtn"
+        >Send
+        </button>
+        <button id='cancelBtn'>Cancel</button>
+    </div>
+    </div>
+`;
 
     function changeTemplate() {
         var html = "";
@@ -51,41 +50,23 @@
         CKEDITOR.instances.changeRequestText.setData(html);
     }
 
-    function startCreateChangeRequest(customerID, domElement) {
-        initializeChangeRequest();
-        appendScript('.javascript/mustache.min.js');
-        appendScript('.javascript/mustache-wax.min.js');
-        Mustache.tags = ['{%', '%}'];
-        changeRequest.customerID = customerID;
-        domElement.innerHTML = changeRequestDialogTemplate;
-        hookListeners();
-        hookCKEditor();
-        initializeUploads();
-        populateOptions();
-    }
-
     function hookListeners() {
         window.document.getElementById('cancelBtn').addEventListener('click', cancelChangeRequest);
         window.document.getElementById('sendChangeRequestBtn').addEventListener('click', sendChangeRequest)
+        window.document.getElementById('templateSelector').addEventListener('change', changeTemplate);
     }
 
     function sendChangeRequest() {
-
         const fd = new FormData();
         if (window.changeRequest.files) {
             window.changeRequest.files.forEach(file => {
                 fd.append("file[]", file);
             });
         }
-
         fd.append('message', CKEDITOR.instances.changeRequestText.getData());
         fd.append('type', $('#templateSelector').val());
 
         let URL = 'Activity.php?action=sendChangeRequest&problemID=' + window.changeRequest.problemID;
-        if (window.changeRequest.customerID) {
-            URL = 'CreateChangeRequest.php?action=createChangeRequest&customerID=' + window.changeRequest.customerID;
-        }
-
         $.ajax({
             url: URL,
             method: 'POST',
@@ -110,7 +91,6 @@
         $('#templateSelector').val("");
         CKEDITOR.instances.changeRequestText.setData("");
         window.changeRequest.files = [];
-        drawFiles();
         if (window.changeRequest.dialogTemplate) {
             window.changeRequest.dialogTemplate.dialog('close');
         }
@@ -156,6 +136,7 @@
         if (!window.changeRequest.dialogTemplate) {
             window.changeRequest.dialogTemplate = $(changeRequestDialogTemplate).dialog({autoOpen: true, width: 910});
             hookCKEditor();
+            hookListeners();
         } else {
             window.changeRequest.dialogTemplate.dialog('open');
         }

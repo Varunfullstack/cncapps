@@ -47,7 +47,7 @@
         var customConfig = Object.assign({}, config);
         if (selectedOptions.length) {
             var option = selectedOptions[0];
-            if (!updateType(option.value)) {
+            if (!updateType(+option.value)) {
                 return;
             }
             var tags = option.getAttribute('data-tags');
@@ -60,13 +60,16 @@
         recreateEditor(customConfig);
     }
 
+    const salesRequestTypeID = 7;
+    const salesQuotationTypeID = 8;
+
     function updateType(type) {
-        if (type == '{salesQuotationTypeID}') {
+        if (type === salesQuotationTypeID) {
             destroyEditorInstance();
             return false
         }
 
-        if (type == '{salesRequestTypeID}') {
+        if (type === salesRequestTypeID) {
             $('#salesRequestEmailRow').show();
             $('#salesRequestUnassignFlagRow').show();
             $('#salesRequestEmailRow input').attr('required', true);

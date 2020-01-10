@@ -1885,16 +1885,6 @@ class BUActivity extends Business
             }
         }
 
-        /*
-    If this is a change request activity then send request email
-    */
-        if (
-            $dbeCallActivity->getValue(DBEJCallActivity::callActTypeID) == CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID
-        ) {
-            $this->sendChangeRequestEmail($dbeCallActivity);
-        }
-
-
         if ($dbeCallActivity->getValue(DBEJCallActivity::userID) != USER_SYSTEM) {
             $this->updateTotalUserLoggedHours(
                 $dbeCallActivity->getValue(DBEJCallActivity::userID),
@@ -2580,114 +2570,6 @@ class BUActivity extends Business
         );
     } // end sendChangeRequestEmail
 
-    /**
-     * @param DBECallActivity $dbeCallActivity
-     */
-    private function sendChangeRequestEmail($dbeCallActivity)
-    {
-        $buMail = new BUMail($this);
-
-        $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
-
-        $dsInitialCallActivity = $this->getFirstActivityInProblem($problemID);
-
-
-        $this->dbeUser->getRow($dbeCallActivity->getValue(DBEJCallActivity::userID));
-
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-        $template = new Template(
-            EMAIL_TEMPLATE_DIR,
-            "remove"
-        );
-
-        $template->set_file(
-            'page',
-            'ChangeRequestEmail.inc.html'
-        );
-
-        $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
-
-        $urlChangeControlRequest = SITE_URL . '/Activity.php?action=changeRequestReview&callActivityID=' . $dbeCallActivity->getValue(
-                DBEJCallActivity::callActivityID
-            ) . '&fromEmail=true';
-
-        $urlLastActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
-                DBEJCallActivity::callActivityID
-            );
-
-        $template->setVar(
-            array(
-                'problemID' => $problemID,
-
-                'userName' => $userName,
-
-                'urlChangeControlRequest' => $urlChangeControlRequest,
-
-                'urlLastActivity' => $urlLastActivity,
-
-                'initialReason' => $dsInitialCallActivity->getValue(DBEJCallActivity::reason),
-
-                'requestReason' => $dbeCallActivity->getValue(DBEJCallActivity::reason)
-
-            )
-        );
-
-        $template->parse(
-            'output',
-            'page',
-            true
-        );
-
-        $body = $template->get_var('output');
-        $toEmail = 'changerequest@' . CONFIG_PUBLIC_DOMAIN;
-
-        $emailsByTeam = [
-            1 => "changerequestshelpdesk@cnc-ltd.co.uk",
-            2 => "changerequestsEscalations@cnc-ltd.co.uk",
-            4 => "changerequestssmallprojects@cnc-ltd.co.uk",
-            5 => "changerequestsprojects@cnc-ltd.co.uk",
-        ];
-
-        if (isset($emailsByTeam[$this->dbeUser->getValue(DBEUser::teamID)])) {
-            $toEmail = $emailsByTeam[$this->dbeUser->getValue(DBEUser::teamID)];
-        }
-
-
-        $subject = 'Change Request for ' . $dsInitialCallActivity->getValue(
-                DBEJCallActivity::customerName
-            ) . ' by ' . $userName . ' for SR' . $problemID;
-
-
-        $hdrs = array(
-            'From'         => $senderEmail,
-            'To'           => $toEmail,
-            'Subject'      => $subject,
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
-
-        $buMail->mime->setHTMLBody($body);
-
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-
-        $body = $buMail->mime->get($mime_params);
-
-        $hdrs = $buMail->mime->headers($hdrs);
-
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body
-        );
-    }
-
     function updateTotalUserLoggedHours($userID,
                                         $date
     )
@@ -2743,11 +2625,6 @@ class BUActivity extends Business
 
         return $this->db->affected_rows;
     }
-
-
-    /*
-  Update total hours worked by activity user today
-  */
 
     function computeDiff($from,
                          $to
@@ -2810,6 +2687,11 @@ class BUActivity extends Business
 
         return array('values' => $diffValues, 'mask' => $diffMask);
     }
+
+
+    /*
+  Update total hours worked by activity user today
+  */
 
     /**
      * @param $callActivityID
@@ -3301,11 +3183,6 @@ class BUActivity extends Business
         $dbeCallActivity->post();
     }
 
-    /*
-  Check to se whether this site record requires travel hours added to the site record.
-  i.e. is this a chargeable activity and does this site have zero travel hours.
-  */
-
     /**
      * Allocate additional hours to SR
      *
@@ -3370,6 +3247,11 @@ class BUActivity extends Business
             $comments
         );
     }
+
+    /*
+  Check to se whether this site record requires travel hours added to the site record.
+  i.e. is this a chargeable activity and does this site have zero travel hours.
+  */
 
     private function sendTimeAllocatedEmail($minutes,
                                             $comments
@@ -3569,7 +3451,7 @@ class BUActivity extends Business
             $dsCallActivity
         );
         $requestingUserID = $dsCallActivity->getValue(DBEJCallActivity::userID);
-
+        $changeRequestType = $dsCallActivity->getValue(DBEJCallActivity::requestType);
         $this->dbeUser->getRow($userID);
 
         $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
@@ -3620,19 +3502,15 @@ class BUActivity extends Business
 
         $this->resetProblemAlarm($dsCallActivity->getValue(DBEJCallActivity::problemID));
 
-        $newCallActivityID = $this->createChangeRequestActivity(
-            $callActivityID,
+        $newCallActivity = $this->createChangeRequestActivity(
+            $dsCallActivity->getValue(DBEJCallActivity::problemID),
             $reason,
-            $userID
+            'C',
+            $changeRequestType
         );
 
-        $this->getActivityByID(
-            $newCallActivityID,
-            $dsCallActivity
-        );    // get activity just created
-
         $this->sendChangeRequestReplyEmail(
-            $dsCallActivity,
+            $newCallActivity,
             $subject,
             $requestingUserID
         );
@@ -3653,17 +3531,24 @@ class BUActivity extends Business
         return ($dbeProblem->updateRow());
     }
 
-    function createChangeRequestActivity($callActivityID,
-                                         $reason,
-                                         $userID
+    /**
+     * @param $problemID
+     * @param $message
+     * @param string $status
+     * @param null $standardTextId
+     * @return DataAccess|DBECallActivity
+     */
+    function createChangeRequestActivity(
+        $problemID,
+        $message,
+        $status = "C",
+        $standardTextId = null
     )
     {
 
-        $dbeCallActivity = new DBECallActivity($this);
-        $dbeCallActivity->getRow($callActivityID);
-
-        $dbeNewActivity = $dbeCallActivity;
-
+        $lastActivity = $this->getLastActivityInProblem($problemID);
+        $dbeNewActivity = new DBECallActivity($this);
+        $dbeNewActivity->getRow($lastActivity->getValue(DBEJCallActivity::callActivityID));
         $dbeNewActivity->setPKValue(null);
 
         $dbeNewActivity->setValue(
@@ -3680,7 +3565,7 @@ class BUActivity extends Business
         );
         $dbeNewActivity->setValue(
             DBEJCallActivity::userID,
-            $userID
+            $this->loggedInUserID
         );
         $dbeNewActivity->setValue(
             DBEJCallActivity::callActTypeID,
@@ -3688,16 +3573,18 @@ class BUActivity extends Business
         );
         $dbeNewActivity->setValue(
             DBEJCallActivity::status,
-            'C'
+            $status
         );
         $dbeNewActivity->setValue(
             DBEJCallActivity::reason,
-            $reason
+            $message
         );
-
+        $dbeNewActivity->setValue(DBECallActivity::requestType, $standardTextId);
         $dbeNewActivity->insertRow();
+        $DBEJCallActivity = new DBEJCallActivity($this);
+        $DBEJCallActivity->getRow($dbeNewActivity->getPKValue());
 
-        return $dbeNewActivity->getPKValue();
+        return $DBEJCallActivity;
     }
 
     /**
@@ -3805,6 +3692,144 @@ class BUActivity extends Business
 
         $hdrs = $buMail->mime->headers($hdrs);
 
+
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
+    }
+
+    /**
+     * @param $problemID
+     * @param $message
+     * @param $type
+     * @throws Exception
+     */
+    public function sendChangeRequest($problemID,
+                                      $message,
+                                      $type
+    )
+    {
+        $buStandardText = new BUStandardText($this);
+
+        $dbeStandardText = new DataSet($this);
+        $buStandardText->getStandardTextByID(
+            $type,
+            $dbeStandardText
+        );
+
+        // we have to create an open "sales activity"
+        $salesRequestActivity = $this->createChangeRequestActivity(
+            $problemID,
+            $message,
+            "O",
+            $dbeStandardText->getValue(DBEStandardText::stt_standardtextno)
+        );
+
+        $this->sendChangeRequestEmail($salesRequestActivity);
+    }
+
+    /**
+     * @param DBECallActivity $dbeCallActivity
+     */
+    private function sendChangeRequestEmail($dbeCallActivity)
+    {
+        $buMail = new BUMail($this);
+
+        $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
+
+        $dsInitialCallActivity = $this->getFirstActivityInProblem($problemID);
+
+
+        $this->dbeUser->getRow($dbeCallActivity->getValue(DBEJCallActivity::userID));
+
+        $senderEmail = CONFIG_SUPPORT_EMAIL;
+
+        $template = new Template(
+            EMAIL_TEMPLATE_DIR,
+            "remove"
+        );
+
+        $template->set_file(
+            'page',
+            'ChangeRequestEmail.inc.html'
+        );
+
+        $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
+
+        $urlChangeControlRequest = SITE_URL . '/Activity.php?action=changeRequestReview&callActivityID=' . $dbeCallActivity->getValue(
+                DBEJCallActivity::callActivityID
+            ) . '&fromEmail=true';
+
+        $urlLastActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
+                DBEJCallActivity::callActivityID
+            );
+
+        $template->setVar(
+            array(
+                'problemID' => $problemID,
+
+                'userName' => $userName,
+
+                'urlChangeControlRequest' => $urlChangeControlRequest,
+
+                'urlLastActivity' => $urlLastActivity,
+
+                'initialReason' => $dsInitialCallActivity->getValue(DBEJCallActivity::reason),
+
+                'requestReason' => $dbeCallActivity->getValue(DBEJCallActivity::reason)
+
+            )
+        );
+
+        $template->parse(
+            'output',
+            'page',
+            true
+        );
+
+        $body = $template->get_var('output');
+        $toEmail = 'changerequest@' . CONFIG_PUBLIC_DOMAIN;
+
+        $emailsByTeam = [
+            1 => "changerequestshelpdesk@cnc-ltd.co.uk",
+            2 => "changerequestsEscalations@cnc-ltd.co.uk",
+            4 => "changerequestssmallprojects@cnc-ltd.co.uk",
+            5 => "changerequestsprojects@cnc-ltd.co.uk",
+        ];
+
+        if (isset($emailsByTeam[$this->dbeUser->getValue(DBEUser::teamID)])) {
+            $toEmail = $emailsByTeam[$this->dbeUser->getValue(DBEUser::teamID)];
+        }
+
+
+        $subject = 'Change Request for ' . $dsInitialCallActivity->getValue(
+                DBEJCallActivity::customerName
+            ) . ' by ' . $userName . ' for SR' . $problemID;
+
+
+        $hdrs = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $buMail->mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
+
+        $hdrs = $buMail->mime->headers($hdrs);
 
         $buMail->putInQueue(
             $senderEmail,

@@ -11,7 +11,7 @@
         startSalesRequest(problemID);
     }
 
-    function showSalesRequestDialog() {
+    function showChangeRequestDialog() {
         startChangeRequest(problemID);
     }
 
@@ -271,7 +271,7 @@
            border="0"
     >
         <tr>
-            <td colspan="5">
+            <td colspan="7">
                 <div align="left">
                     <input type="submit"
                            name="Fixed"
@@ -341,6 +341,10 @@
                     <input type="button"
                            onclick="showSalesRequestDialog()"
                            value="Sales Request"
+                    >
+                    <input type="button"
+                           onclick="showChangeRequestDialog()"
+                           value="Change Request"
                     >
                 </div>
             </td>
@@ -761,6 +765,10 @@
                     <input type="button"
                            onclick="showSalesRequestDialog()"
                            value="Sales Request"
+                    >
+                    <input type="button"
+                           onclick="showChangeRequestDialog()"
+                           value="Change Request"
                     >
                 </div>
             </td>
