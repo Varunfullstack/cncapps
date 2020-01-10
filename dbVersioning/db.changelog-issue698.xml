@@ -1,0 +1,32 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue698-0">
+        <tagDatabase tag="issue698"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue698-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="customerOffice365StorageStats"/>
+            </not>
+        </preConditions>
+        <createTable tableName="customerOffice365StorageStats">
+            <column type="int(11)" name="customerId">
+                <constraints nullable="false" foreignKeyName="fk_co3ss_customerid" referencedColumnNames="cus_custno"
+                             referencedTableName="customer"/>
+            </column>
+            <column type="date" name="date">
+                <constraints nullable="false"/>
+            </column>
+            <column type="decimal(12,2)" name="totalOneDriveStorageUsed">
+                <constraints nullable="false"/>
+            </column>
+            <column type="decimal(12,2)" name="totalEmailStorageUsed">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="customerOffice365StorageStats" columnNames="customerId,date"
+                       constraintName="PRIMARY"/>
+    </changeSet>
+</databaseChangeLog>

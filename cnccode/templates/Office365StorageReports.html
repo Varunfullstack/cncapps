@@ -1,0 +1,131 @@
+<script type="text/javascript"
+        src="https://www.gstatic.com/charts/loader.js"
+></script>
+<script type="application/javascript">
+
+    let customerID = null;
+    let startDate = null;
+    let endDate = null;
+
+    chartsLoaded = new Promise((resolve, reject) => {
+        google.charts.load('current', {'packages': ['corechart']});
+        google.charts.setOnLoadCallback(resolve);
+    });
+
+
+    function drawCharts() {
+        graphData['renderServerCare'] ? drawChart('serverCareIncidents') : '';
+        drawChart('serviceDesk');
+        drawChart('otherContracts');
+        drawChart('totalSR');
+    }
+
+    function drawChart(chartName) {
+
+        const url = new URL(window.location.href);
+        url.searchParams.append('action', 'getData');
+        url.searchParams.append('customerId', customerID);
+        url.searchParams.append('startDate', moment(startDate, 'DD/MM/YYYY').format('YYYY-MM-DD'));
+        url.searchParams.append('endDate', moment(endDate, 'DD/MM/YYYY').format('YYYY-MM-DD'));
+
+        return chartsLoaded
+            .then(() => {
+                return fetch(url);
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(serverData => {
+                const data = new google.visualization.DataTable();
+                data.addColumn('date', 'date');
+                data.addColumn('number', 'One Drive Storage Used(MB)');
+                data.addColumn('number', 'Email Storage Used(MB)');
+                const rows = serverData.map(d => {
+                    d.date = moment(d.date, 'YYYY-MM-DD').toDate();
+                    return Object.values(d);
+                });
+                data.addRows(rows);
+
+
+                var options = {
+                    title: 'One Drive and Email storage used',
+                    legend: {position: 'bottom'},
+                    height: 800,
+                    width: 1000
+                };
+
+                var chart = new google.visualization.LineChart(document.getElementById('chartContainer'));
+
+                chart.draw(data, options);
+            })
+
+
+    }
+
+    function customerIDChanged(value) {
+        customerID = value;
+        checkCreateChart();
+    }
+
+    function startDateChanged(value) {
+        startDate = value;
+        checkCreateChart();
+    }
+
+    function endDateChanged(value) {
+        endDate = value;
+        checkCreateChart();
+    }
+
+
+    function checkCreateChart() {
+        document.getElementById('loadChartBtn').disabled = (!customerID || !startDate || !endDate)
+    }
+
+</script>
+
+<div>
+    <div style="width: 100px; display: inline-block">
+        Customer
+    </div>
+    <input id="customerString"
+           customer-picker="customerID"
+    >
+    <input type="hidden"
+           id="customerID"
+           onchange="customerIDChanged(this.value)"
+    >
+</div>
+<div>
+    <div style="width: 100px; display: inline-block">
+        Start Date
+    </div>
+    <input type="text"
+           id="startDateInput"
+           autocomplete="off"
+           class="jQueryCalendar"
+           onchange="startDateChanged(this.value)"
+    >
+</div>
+<div>
+    <div style="width: 100px; display: inline-block">
+        End Date
+    </div>
+    <input type="text"
+           id="endDateInput"
+           autocomplete="off"
+           class="jQueryCalendar"
+           onchange="endDateChanged(this.value)"
+    >
+</div>
+
+<div>
+    <button id="loadChartBtn"
+            disabled
+            onclick="drawChart()"
+    >Go
+    </button>
+</div>
+<div id="chartContainer">
+
+</div>

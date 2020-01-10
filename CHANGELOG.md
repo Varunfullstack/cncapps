@@ -1,5 +1,10 @@
 # Changelog
 This project changes will be shown here.
+
+## [unreleased]
+### Changed
+- Issue 698 - Office 365 exports - include OneDrive storage
+
 ## [3.9.6] - 2020-01-08
 ### Fixed
 - Fixed issue with Projects team graphs not showing for people on the Projects Team
