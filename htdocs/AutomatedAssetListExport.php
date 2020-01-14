@@ -145,7 +145,7 @@ while ($dbeCustomer->fetchNext()) {
     - 1
   ) AS "Operating System",
   computers.version AS "Version",
-       (select endOfSupportDate from ($fakeTable) f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `OS End of Support Date`,
+       (select endOfSupportDate from ('.$fakeTable.') f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `OS End of Support Date`,
   computers.domain AS \'Domain\',
   SUBSTRING_INDEX(
     software.name,
