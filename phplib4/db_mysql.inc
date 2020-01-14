@@ -40,6 +40,9 @@ class DB_Sql
     var $Error = "";
     var $type = "mysql";
     var $revision = "1.2";
+    /**
+     * @var boolean|mysqli_result
+     */
     var $Query_ID = null;
 
     var $locked = false;      ## set to true while we have a lock

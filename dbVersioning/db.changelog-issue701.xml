@@ -24,7 +24,9 @@
                                    when passwordServiceID = 26 then 5
                                    else 1 end
         </sql>
-        <rollback/>
+        <rollback>
+            <dropColumn tableName="passwordService" columnName="defaultLevel"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>
