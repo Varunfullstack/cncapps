@@ -15,6 +15,7 @@ class DBEPasswordService extends DBEntity
     const description = "description";
     const onePerCustomer = "onePerCustomer";
     const sortOrder = "sortOrder";
+    const defaultLevel = "defaultLevel";
 
     /**
      * calls constructor()
@@ -46,6 +47,12 @@ class DBEPasswordService extends DBEntity
             self::sortOrder,
             DA_INTEGER,
             DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::defaultLevel,
+            DA_INTEGER,
+            DA_NOT_NULL
         );
 
         $this->setPK(0);
