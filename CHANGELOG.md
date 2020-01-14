@@ -1,5 +1,10 @@
 # Changelog
 This project changes will be shown here.
+
+## [3.9.7] - 2020-01-14
+### Fixed
+- Fixed issue with AutomatedAssetListExport.php
+
 ## [3.9.6] - 2020-01-08
 ### Fixed
 - Fixed issue with Projects team graphs not showing for people on the Projects Team
