@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 738 - Overtime & Expenses visual change
+
 ## [3.9.7] - 2020-01-14
 ### Fixed
 - Fixed issue with AutomatedAssetListExport.php
