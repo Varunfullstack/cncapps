@@ -2472,7 +2472,7 @@ WHERE odl_ordno = $ordheadID
         $buPDF->CR();
         $buPDF->printStringRJAt(
             UNIT_LEFT - 2,
-            'By ticking this box you have read and agree our terms and conditions: '
+            'By ticking this box you have read and agree to our terms and conditions: '
         );
         $buPDF->printStringAt(
             UNIT_LEFT,
