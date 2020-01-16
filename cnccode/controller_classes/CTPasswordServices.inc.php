@@ -91,7 +91,7 @@ class CTPasswordServices extends CTCNC
         }
     }
 
-/**
+    /**
      * Edit/Add Further Action
      * @access private
      * @throws Exception
@@ -253,7 +253,7 @@ class CTPasswordServices extends CTCNC
         }
     }
 
-        /**
+    /**
      * Update call Further Action details
      * @access private
      * @throws Exception
@@ -405,6 +405,7 @@ class CTPasswordServices extends CTCNC
                     'onePerCustomer'    => Controller::htmlDisplayText(
                         $dbePasswordService->getValue(DBEPasswordService::onePerCustomer) ? 'Yes' : 'No'
                     ),
+                    'defaultLevel'      => $dbePasswordService->getValue(DBEPasswordService::defaultLevel),
                     'urlEdit'           => $urlEdit,
                     'urlDelete'         => $urlDelete,
                     'txtEdit'           => $txtEdit,
