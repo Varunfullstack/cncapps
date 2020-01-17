@@ -205,7 +205,6 @@ class BUUser extends Business
         }
 
 
-
         /** @var Environment */
         global $twig;
 
@@ -218,9 +217,11 @@ class BUUser extends Business
             [
                 "staffName"      => $dbeUser->getValue(DBEUser::name),
                 "reporterName"   => $reporter->getValue(DBEUser::name),
-                "sickStartDate"  => DateTime::createFromFormat(DATE_MYSQL_DATE, $startDate)->format(FORMAT_MYSQL_UK_DATE),
+                "sickStartDate"  => DateTime::createFromFormat(DATE_MYSQL_DATE, $startDate)->format('d-m-Y'),
                 "days"           => $days,
-                "moreThanOneDay" => $days > 1
+                "moreThanOneDay" => $days > 1,
+                "isHalfDay"      => $sickTime !== 'F',
+                "sickTime"       => $sickTime == 'A' ? 'Morning' : 'Afternoon'
             ]
         );
 
