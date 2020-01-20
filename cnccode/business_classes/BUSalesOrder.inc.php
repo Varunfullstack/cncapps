@@ -5,6 +5,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJOrdhead.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJOrdline.inc.php");
@@ -2466,6 +2467,16 @@ WHERE odl_ordno = $ordheadID
         $buPDF->printStringAt(
             UNIT_LEFT,
             "{signature:signer1:Please+Sign+Here}"
+        );
+        $buPDF->CR();
+        $buPDF->CR();
+        $buPDF->printStringRJAt(
+            UNIT_LEFT - 2,
+            'By ticking this box you have read and agree to our terms and conditions: '
+        );
+        $buPDF->printStringAt(
+            UNIT_LEFT,
+            "{check:signer1:accept}"
         );
         $buPDF->CR();
         $buPDF->CR();

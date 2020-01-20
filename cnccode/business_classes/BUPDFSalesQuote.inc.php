@@ -1,4 +1,5 @@
 <?php
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUPDF.inc.php");
 require_once($cfg["path_bu"] . "/BUItem.inc.php");
@@ -396,6 +397,10 @@ class BUPDFSalesQuote extends Business
         $buPDF->setFont();
         $buPDF->CR();
         $buPDF->CR();
+        $buPDF->printString('This quotation is subject to our terms and conditions which are available ');
+        $buPDF->printString('here', "https://www.cnc-ltd.co.uk/terms-and-conditions");
+        $buPDF->CR();
+        $buPDF->CR();
         $buPDF->printString('If you would like to proceed with this quote, then please click on ');
         $buPDF->printString('this link', API_URL . "/acceptQuotation?code=$confirmationCode");
         $buPDF->printString(' which will automatically email you an e-signable order form document to sign.');
@@ -404,8 +409,13 @@ class BUPDFSalesQuote extends Business
         $buPDF->printString('Once this is received by us we will be able to process your order.');
         $buPDF->CR();
         $buPDF->CR();
+        $buPDF->printString('If you need to vary the quote in any way, please email the changes to ');
         $buPDF->printString(
-            'If you need to vary the quote in any way, please email the changes to sales@cnc-ltd.co.uk, quoting ' . $ordheadID . '/' . $versionNo . ' and we will send a revised order form to you.'
+            'sales@cnc-ltd.co.uk',
+            'mailto:sales@cnc-ltd.co.uk?Subject=Quote%20' . $ordheadID . '/' . $versionNo
+        );
+        $buPDF->printString(
+            ', quoting ' . $ordheadID . '/' . $versionNo . ' and we will send a revised order form to you.'
         );
         $buPDF->CR();
         $buPDF->CR();
