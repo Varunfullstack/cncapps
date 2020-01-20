@@ -6833,6 +6833,11 @@ is currently a balance of ';
             DBEJProblem::contactID,
             $dsOrdhead->getValue(DBEOrdhead::delContactID)
         );
+
+        if($dsInput->getValue(BURenContract::serviceRequestCustomerItemID) == -1){
+            $dsInput->setValue(BURenContract::serviceRequestCustomerItemID, null);
+        }
+
         $dbeProblem->setValue(
             DBEJProblem::contractCustomerItemID,
             $dsInput->getValue(BURenContract::serviceRequestCustomerItemID)

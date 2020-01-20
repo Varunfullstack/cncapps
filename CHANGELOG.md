@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 698 - Office 365 exports - include OneDrive storage
 - Issue 732 - Notify on Sickness & allow half days
+- Issue 737 - Create SR from SO, make fields required
 
 ## [3.9.7] - 2020-01-14
 ### Fixed
