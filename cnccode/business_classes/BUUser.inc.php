@@ -221,7 +221,7 @@ class BUUser extends Business
                 "days"           => $days,
                 "moreThanOneDay" => $days > 1,
                 "isHalfDay"      => $sickTime !== 'F',
-                "sickTime"       => $sickTime == 'A' ? 'Morning' : 'Afternoon'
+                "sickTime"       => $sickTime == 'A' ? 'morning' : 'afternoon'
             ]
         );
 
