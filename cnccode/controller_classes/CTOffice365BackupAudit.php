@@ -48,6 +48,9 @@ class CTOffice365BackupAudit extends CTCNC
             case 'getData':
                 return $this->getData();
                 break;
+            case 'runCheck':
+                return $this->runCheck();
+                break;
             default:
                 $this->displaySearchForm();
         }
@@ -126,6 +129,9 @@ from contractUsersLog left join custItem ON contractId = custItem.cui_cuino LEFT
             $parameters[] = ["type" => "s", "value" => $endDate];
         }
 
+        if (!$startDate && !$endDate) {
+            $defaultQuery .= "and createdAt >= (select max(internal.createdAt) from contractUsersLog internal)";
+        }
 
         $orderBy = [];
         if (count($order)) {
@@ -179,6 +185,17 @@ from contractUsersLog left join custItem ON contractId = custItem.cui_cuino LEFT
         );
     }
 
+    function runCheck()
+    {
+        $cmd = 'php ' . BASE_DRIVE . '\\tasks\\Office365BackupChecks.php';
+        shell_exec($cmd);
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            []
+        );
+        header('Location: ' . $urlNext);
+    }
+
     /**
      * Display the initial form that prompts the employee for details
      * @access private
@@ -194,12 +211,40 @@ from contractUsersLog left join custItem ON contractId = custItem.cui_cuino LEFT
             'Office365BackupAudit'
         );
 // Parameters
-        $this->setPageTitle("Office 365 Backup Audit");
+        $count = $this->getCount();
+        $this->setPageTitle(
+            "Office 365 Backup Audit (Backup Users: $count[office365BackupUsers], Contract Users: $count[contractUsers])"
+        );
         $this->template->parse(
             'CONTENTS',
             'CustomerSearch',
             true
         );
         $this->parsePage();
+    }
+
+    function getCount()
+    {
+        global $db;
+
+        $query = "SELECT
+  SUM(users) AS office365BackupUsers,
+  SUM(currentUsers) AS contractUsers
+FROM
+  contractUsersLog
+  LEFT JOIN custItem
+    ON contractId = custItem.cui_cuino
+  LEFT JOIN customer
+    ON custitem.`cui_custno` = customer.`cus_custno`
+WHERE createdAt >=
+  (SELECT
+    MAX(internal.createdAt)
+  FROM
+    contractUsersLog internal) ";
+
+        $db->query($query);
+        $db->next_record(MYSQLI_ASSOC);
+
+        return $db->Record;
     }
 }

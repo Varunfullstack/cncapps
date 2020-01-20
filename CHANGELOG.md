@@ -13,6 +13,7 @@ This project changes will be shown here.
 - Issue 740 - Change 'Open Consultants' Actitivies' to alert Team Lead
 - Issue 720 - SR Statistics enhancement
 - Issue 719 - Change Request changes
+- Issue 731 - O365 Backup Audit Log v2
 ### Fixed
 - Issue 741 - Part numbers only showing a single digit on Goods in
 
