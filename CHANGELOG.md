@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 698 - Office 365 exports - include OneDrive storage
 - Issue 732 - Notify on Sickness & allow half days
 - Issue 737 - Create SR from SO, make fields required
+- Issue 701 - Password Service - default access level
 ### Fixed
 - Issue 741 - Part numbers only showing a single digit on Goods in
 
