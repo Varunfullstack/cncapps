@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### 
+
 ## [3.9.7] - 2020-01-14
 ### Fixed
 - Fixed issue with AutomatedAssetListExport.php

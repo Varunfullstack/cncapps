@@ -97,6 +97,12 @@
             buttons: [
                 {
                     extend: 'excel'
+                },
+                {
+                    text: 'Check Now',
+                    action: () => {
+                        window.location = window.location.href + "?action=runCheck"
+                    }
                 }
             ],
             orderCellsTop: true,
