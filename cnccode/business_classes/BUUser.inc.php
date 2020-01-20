@@ -4,7 +4,12 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use Twig\Environment;
+
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
+require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_dbe"] . "/DBEUser.inc.php");
 require_once($cfg["path_dbe"] . "/DBETeam.inc.php");
 require_once($cfg["path_func"] . "/Common.inc.php");
@@ -110,13 +115,23 @@ class BUUser extends Business
         return ($this->dbeUser->getValue(DBEUser::receiveSdManagerEmailFlag) == 'Y');
     }
 
-    /*
-    Create a record on user_time_log which indicates the user has not
-    logged any time today
-    */
+    /**
+     * Create a record on user_time_log which indicates the user has not logged any time today
+     *
+     * @param $userID
+     * @param $startDate
+     * @param $days
+     * @param string $sickTime
+     * @param DBEUser|DataSet $reporter
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
     function setUserAbsent($userID,
                            $startDate,
-                           $days
+                           $days,
+                           $sickTime,
+                           $reporter
     )
     {
         global $db;
@@ -138,6 +153,10 @@ class BUUser extends Business
 
         $thisYearBh = common_getUKBankHolidays(date('Y'));
         $nextYearBh = common_getUKBankHolidays(date('Y') + 1);
+
+        if ($sickTime != 'F') {
+            $days = 1;
+        }
 
         $bankHolidays =
             array_merge(
@@ -178,18 +197,74 @@ class BUUser extends Business
                     $userID,
                     $teamLevel,
                     $standardDayHours,
-                    $dateToTry
+                    $dateToTry,
+                    $sickTime
                 );
             }
             $dayCount++;
         }
 
+
+        /** @var Environment */
+        global $twig;
+
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRow($userID);
+
+        $subject = 'Staff Member ' . $dbeUser->getValue(DBEUser::name) . ' has been reported as sick';
+        $body = $twig->render(
+            'userReportedSickEmail.html.twig',
+            [
+                "staffName"      => $dbeUser->getValue(DBEUser::name),
+                "reporterName"   => $reporter->getValue(DBEUser::name),
+                "sickStartDate"  => DateTime::createFromFormat(DATE_MYSQL_DATE, $startDate)->format('d-m-Y'),
+                "days"           => $days,
+                "moreThanOneDay" => $days > 1,
+                "isHalfDay"      => $sickTime !== 'F',
+                "sickTime"       => $sickTime == 'A' ? 'morning' : 'afternoon'
+            ]
+        );
+
+        $emailTo = "sicknessalert@cnc-ltd.co.uk";
+
+        $hdrs = array(
+            'From'         => CONFIG_SUPPORT_EMAIL,
+            'To'           => $emailTo,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $mime = new Mail_mime();
+
+        $mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+
+        $body = $mime->get($mime_params);
+
+        $hdrs = $mime->headers($hdrs);
+
+        $buMail = new BUMail($this);
+
+        $buMail->putInQueue(
+            CONFIG_SUPPORT_EMAIL,
+            $emailTo,
+            $hdrs,
+            $body
+        );
     }
 
     function logAbsentDate($userID,
                            $teamLevel,
                            $standardDayHours,
-                           $date
+                           $date,
+                           $sickTime
     )
     {
         global $db;
@@ -202,18 +277,24 @@ class BUUser extends Business
         `loggedDate`,
         `loggedHours`,
         `dayHours`,
-        `startedTime` 
+        `startedTime`,
+         sickTime
         ) 
       VALUES 
         (
-          " . $userID . ",
-          " . $teamLevel . ",
-          '" . $date . "',
-          0,
-          " . $standardDayHours . ",
-          '00:00:00'
+          ?,?,?,0,?,'00:00:00',?
         )";
-        $db->query($sql);
+
+        return $db->preparedQuery(
+            $sql,
+            [
+                ["value" => $userID, "type" => "i"],
+                ["value" => $teamLevel, "type" => "i"],
+                ["value" => $date, "type" => "s"],
+                ["value" => $standardDayHours, "type" => "d"],
+                ["value" => $sickTime, "type" => "s"],
+            ]
+        );
     }
 
     function userTimeHasBeenLogged($ID)

@@ -60,6 +60,7 @@ class CTUser extends CTCNC
     const absenceFormUserID = "userID";
     const absenceFormStartDate = "startDate";
     const absenceFormDays = "days";
+    const sickTime = 'sickTime';
 
 
     const DECRYPT = 'decrypt';
@@ -175,6 +176,11 @@ class CTUser extends CTCNC
         $this->dsAbsence->addColumn(
             self::absenceFormDays,
             DA_INTEGER,
+            DA_NOT_NULL
+        );
+        $this->dsAbsence->addColumn(
+            self::sickTime,
+            DA_TEXT,
             DA_NOT_NULL
         );
     }
@@ -540,10 +546,10 @@ class CTUser extends CTCNC
                 'helpdeskFlagChecked'                        => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::helpdeskFlag)
                 ),
-                'createRenewalSalesOrdersFlagChecked' => Controller::htmlChecked(
+                'createRenewalSalesOrdersFlagChecked'        => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::createRenewalSalesOrdersFlag)
                 ),
-                'salesChecked'                        => (strpos(
+                'salesChecked'                               => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
                         PHPLIB_PERM_SALES
                     ) !== FALSE) ? CT_CHECKED : null,
@@ -846,11 +852,12 @@ class CTUser extends CTCNC
 
             if (!$this->formError = (!$this->dsAbsence->populateFromArray($this->getParam('absence')))) {
 
-
                 $this->buUser->setUserAbsent(
                     $this->dsAbsence->getValue(self::absenceFormUserID),
                     $this->dsAbsence->getValue(self::absenceFormStartDate),
-                    $this->dsAbsence->getValue(self::absenceFormDays)
+                    $this->dsAbsence->getValue(self::absenceFormDays),
+                    $this->dsAbsence->getValue(self::sickTime),
+                    $this->dbeUser
                 );
 
                 $urlNext = Controller::buildLink(

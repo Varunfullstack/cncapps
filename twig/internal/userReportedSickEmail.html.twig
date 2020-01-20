@@ -1,0 +1,12 @@
+{% extends "wrapper.html.twig" %}
+{% block content %}
+    <p>
+        Staff Member {{ staffName }} has been reported as sick by {{ reporterName }} starting from {{ sickStartDate }}
+        and for
+        {% if isHalfDay %}
+            the {{ sickTime }}
+        {% else %}
+            {{ days }} day{{ moreThanOneDay ? 's' }}
+        {% endif %}
+    </p>
+{% endblock %}
