@@ -44,10 +44,15 @@ try
     {
         $DisplayName = $mailbox.DisplayName
         $UserPrincipalName = $mailbox.UserPrincipalName
-        $storageItem = $storageData | Where-Object { $_.Owner -eq $UserPrincipalName }
+        $storageItem = $storageData |Sort-Object -Property LastContentModifiedDate -Descending|  Where-Object { $_.Owner -eq $UserPrincipalName }
         $oneDriveStorageUsage = 0
         if ($null -ne $storageItem)
         {
+            if ($storageItem -is [array])
+            {
+                $storageItem = $storageItem[0]
+            }
+
             $oneDriveStorageUsage = $storageItem.StorageUsageCurrent
             $totalOneDriveStorageUsed = $totalOneDriveStorageUsed + $oneDriveStorageUsage
         }
@@ -55,6 +60,7 @@ try
         $MailboxStat = Get-MailboxStatistics $UserPrincipalName -WarningAction SilentlyContinue
         $TotalItemSize = $MailboxStat | Select-Object @{ name = "TotalItemSize"; expression = { [math]::Round(($_.TotalItemSize.ToString().Split("(")[1].Split(" ")[0].Replace(",", "")/1MB), 2) } }
         $TotalItemSize = $TotalItemSize.TotalItemSize
+
         $totalEmailStorageUsed = $totalEmailStorageUsed + $TotalItemSize
         $RecipientTypeDetails = $mailbox.RecipientTypeDetails
         $MSOLUSER = Get-MsolUser -UserPrincipalName $UserPrincipalName

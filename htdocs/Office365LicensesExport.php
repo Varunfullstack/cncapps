@@ -131,7 +131,7 @@ do {
         continue;
     }
     if (isset($data['error'])) {
-        $logger->error('Failed to pull data for customer: ' . $data['errorMessage']);
+        $logger->error('Failed to pull data for customer: ' . $data['errorMessage'] . ' ' . $data['stackTrace']);
         createFailedSR($dbeCustomer, $data['errorMessage'], $data['stackTrace'], $data['position']);
         continue;
     }
