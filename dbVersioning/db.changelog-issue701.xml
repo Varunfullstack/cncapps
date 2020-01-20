@@ -1,0 +1,32 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue701-0">
+        <tagDatabase tag="issue701"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue701-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="passwordService" columnName="defaultLevel"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="passwordService">
+            <column name="defaultLevel" type="int(1)" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            update passwordService
+            set defaultLevel = case
+                                   when passwordServiceID in (1, 2, 10) then 3
+                                   when passwordServiceID in (4, 17, 18, 27, 28) then 2
+                                   when passwordServiceID = 26 then 5
+                                   else 1 end
+        </sql>
+        <rollback>
+            <dropColumn tableName="passwordService" columnName="defaultLevel"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

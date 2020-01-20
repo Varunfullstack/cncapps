@@ -91,6 +91,202 @@ class CTPasswordServices extends CTCNC
         }
     }
 
+    /**
+     * Edit/Add Further Action
+     * @access private
+     * @throws Exception
+     */
+    function edit()
+    {
+        $this->setMethodName('edit');
+        $dsPasswordService = &$this->dsPasswordService; // ref to class var
+
+        if (!$this->getFormError()) {
+
+            if ($this->getAction() == CTPasswordService_ACT_EDIT) {
+                $this->buPasswordService->getPasswordServiceByID(
+                    $this->getParam('passwordServiceID'),
+                    $dsPasswordService
+                );
+                $passwordServiceID = $this->getParam('passwordServiceID');
+            } else {                                                                    // creating new
+                $dsPasswordService->initialise();
+                $dsPasswordService->setValue(
+                    DBEPasswordService::passwordServiceID,
+                    0
+                );
+                $dbePasswordService = new DBEPasswordService($this);
+                $dsPasswordService->setValue(
+                    DBEPasswordService::sortOrder,
+                    $dbePasswordService->getNextSortOrder()
+                );
+                $passwordServiceID = 0;
+            }
+        } else {                                                                        // form validation error
+            $dsPasswordService->initialise();
+            $dsPasswordService->fetchNext();
+            $passwordServiceID = $dsPasswordService->getValue(DBEPasswordService::passwordServiceID);
+        }
+        $urlDelete = null;
+        $txtDelete = null;
+        if ($this->getAction() != CTPasswordService_ACT_EDIT) {
+        } else {
+            $urlDelete =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'            => CTPasswordService_ACT_DELETE,
+                        'passwordServiceID' => $passwordServiceID
+                    )
+                );
+            $txtDelete = 'Delete';
+        }
+        $urlUpdate =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'            => CTPasswordService_ACT_UPDATE,
+                    'passwordServiceID' => $passwordServiceID
+                )
+            );
+        $urlDisplayList =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTPASSWORDSERVICE_ACT_DISPLAY_LIST
+                )
+            );
+        $title = 'Edit Password Service';
+        if (!$passwordServiceID) {
+            $title = "Create Password Service";
+        }
+        $this->setPageTitle($title);
+        $this->setTemplateFiles(
+            array('PasswordServiceEdit' => 'PasswordServiceEdit.inc')
+        );
+
+
+        $this->template->set_block(
+            'PasswordServiceEdit',
+            'passwordLevelBlock',
+            'passwordLevels'
+        );
+        foreach ([1, 2, 3, 4, 5] as $value) {
+
+            $levelSelected = ($dsPasswordService->getValue(
+                    DBEPasswordService::defaultLevel
+                ) == $value) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    'selected'    => $levelSelected,
+                    'value'       => $value,
+                    'description' => $value
+                )
+            );
+            $this->template->parse(
+                'passwordLevels',
+                'passwordLevelBlock',
+                true
+            );
+        }
+
+        $this->template->set_var(
+            array(
+                'passwordServiceID'     => $passwordServiceID,
+                'sortOrder'             => Controller::htmlInputText(
+                    $dsPasswordService->getValue(DBEPasswordService::sortOrder)
+                ),
+                'sortOrderMessage'      => Controller::htmlDisplayText(
+                    $dsPasswordService->getMessage(DBEPasswordService::sortOrder)
+                ),
+                'description'           => Controller::htmlInputText(
+                    $dsPasswordService->getValue(DBEPasswordService::description)
+                ),
+                'descriptionMessage'    => Controller::htmlDisplayText(
+                    $dsPasswordService->getMessage(DBEPasswordService::description)
+                ),
+                'onePerCustomerChecked' => $dsPasswordService->getValue(
+                    DBEPasswordService::onePerCustomer
+                ) ? 'checked' : null,
+                'onePerCustomerMessage' => Controller::htmlDisplayText(
+                    $dsPasswordService->getMessage(DBEPasswordService::onePerCustomer)
+                ),
+                'updateOrCreate'        => !$passwordServiceID ? 'Create' : 'Update',
+                'urlUpdate'             => $urlUpdate,
+                'urlDelete'             => $urlDelete,
+                'txtDelete'             => $txtDelete,
+                'urlDisplayList'        => $urlDisplayList
+            )
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'PasswordServiceEdit',
+            true
+        );
+        $this->parsePage();
+    }
+
+    /**
+     * Delete Further Action
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     */
+    function delete()
+    {
+        $this->setMethodName('delete');
+        try {
+            $this->buPasswordService->deletePasswordService($this->getParam('passwordServiceID'));
+            $urlNext =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => CTPASSWORDSERVICE_ACT_DISPLAY_LIST
+                    )
+                );
+            header('Location: ' . $urlNext);
+            exit;
+        } catch (Exception $exception) {
+            $this->displayFatalError('Cannot delete this row');
+            exit;
+        }
+    }
+
+    /**
+     * Update call Further Action details
+     * @access private
+     * @throws Exception
+     */
+    function update()
+    {
+        $this->setMethodName('update');
+        $this->formError = (!$this->dsPasswordService->populateFromArray($this->getParam('passwordService')));
+
+        if ($this->formError) {
+            if (!$this->dsPasswordService->getValue(
+                DBEPasswordService::passwordServiceID
+            )) {                    // attempt to insert
+                $this->setAction(CTPasswordService_ACT_EDIT);
+            } else {
+                $this->setAction(CTPasswordService_ACT_CREATE);
+            }
+            $this->edit();
+            exit;
+        }
+
+        $this->buPasswordService->updatePasswordService($this->dsPasswordService);
+
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'passwordServiceID' => $this->dsPasswordService->getValue(DBEPasswordService::passwordServiceID),
+                    'action'            => CTCNC_ACT_VIEW
+                )
+            );
+        header('Location: ' . $urlNext);
+    }// end function editFurther Action()
 
     function changeOrder()
     {
@@ -209,6 +405,7 @@ class CTPasswordServices extends CTCNC
                     'onePerCustomer'    => Controller::htmlDisplayText(
                         $dbePasswordService->getValue(DBEPasswordService::onePerCustomer) ? 'Yes' : 'No'
                     ),
+                    'defaultLevel'      => $dbePasswordService->getValue(DBEPasswordService::defaultLevel),
                     'urlEdit'           => $urlEdit,
                     'urlDelete'         => $urlDelete,
                     'txtEdit'           => $txtEdit,
@@ -231,176 +428,5 @@ class CTPasswordServices extends CTCNC
             true
         );
         $this->parsePage();
-    }
-
-    /**
-     * Edit/Add Further Action
-     * @access private
-     * @throws Exception
-     */
-    function edit()
-    {
-        $this->setMethodName('edit');
-        $dsPasswordService = &$this->dsPasswordService; // ref to class var
-
-        if (!$this->getFormError()) {
-
-            if ($this->getAction() == CTPasswordService_ACT_EDIT) {
-                $this->buPasswordService->getPasswordServiceByID(
-                    $this->getParam('passwordServiceID'),
-                    $dsPasswordService
-                );
-                $passwordServiceID = $this->getParam('passwordServiceID');
-            } else {                                                                    // creating new
-                $dsPasswordService->initialise();
-                $dsPasswordService->setValue(
-                    DBEPasswordService::passwordServiceID,
-                    0
-                );
-                $dbePasswordService = new DBEPasswordService($this);
-                $dsPasswordService->setValue(
-                    DBEPasswordService::sortOrder,
-                    $dbePasswordService->getNextSortOrder()
-                );
-                $passwordServiceID = 0;
-            }
-        } else {                                                                        // form validation error
-            $dsPasswordService->initialise();
-            $dsPasswordService->fetchNext();
-            $passwordServiceID = $dsPasswordService->getValue(DBEPasswordService::passwordServiceID);
-        }
-        $urlDelete = null;
-        $txtDelete = null;
-        if ($this->getAction() != CTPasswordService_ACT_EDIT) {
-        } else {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'            => CTPasswordService_ACT_DELETE,
-                        'passwordServiceID' => $passwordServiceID
-                    )
-                );
-            $txtDelete = 'Delete';
-        }
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'            => CTPasswordService_ACT_UPDATE,
-                    'passwordServiceID' => $passwordServiceID
-                )
-            );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTPASSWORDSERVICE_ACT_DISPLAY_LIST
-                )
-            );
-        $title = 'Edit Password Service';
-        if (!$passwordServiceID) {
-            $title = "Create Password Service";
-        }
-        $this->setPageTitle($title);
-        $this->setTemplateFiles(
-            array('PasswordServiceEdit' => 'PasswordServiceEdit.inc')
-        );
-        $this->template->set_var(
-            array(
-                'passwordServiceID'     => $passwordServiceID,
-                'sortOrder'             => Controller::htmlInputText(
-                    $dsPasswordService->getValue(DBEPasswordService::sortOrder)
-                ),
-                'sortOrderMessage'      => Controller::htmlDisplayText(
-                    $dsPasswordService->getMessage(DBEPasswordService::sortOrder)
-                ),
-                'description'           => Controller::htmlInputText(
-                    $dsPasswordService->getValue(DBEPasswordService::description)
-                ),
-                'descriptionMessage'    => Controller::htmlDisplayText(
-                    $dsPasswordService->getMessage(DBEPasswordService::description)
-                ),
-                'onePerCustomerChecked' => $dsPasswordService->getValue(
-                    DBEPasswordService::onePerCustomer
-                ) ? 'checked' : null,
-                'onePerCustomerMessage' => Controller::htmlDisplayText(
-                    $dsPasswordService->getMessage(DBEPasswordService::onePerCustomer)
-                ),
-                'updateOrCreate'        => !$passwordServiceID ? 'Create' : 'Update',
-                'urlUpdate'             => $urlUpdate,
-                'urlDelete'             => $urlDelete,
-                'txtDelete'             => $txtDelete,
-                'urlDisplayList'        => $urlDisplayList
-            )
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'PasswordServiceEdit',
-            true
-        );
-        $this->parsePage();
-    }// end function editFurther Action()
-
-    /**
-     * Update call Further Action details
-     * @access private
-     * @throws Exception
-     */
-    function update()
-    {
-        $this->setMethodName('update');
-        $this->formError = (!$this->dsPasswordService->populateFromArray($this->getParam('passwordService')));
-
-        if ($this->formError) {
-            if (!$this->dsPasswordService->getValue(
-                DBEPasswordService::passwordServiceID
-            )) {                    // attempt to insert
-                $this->setAction(CTPasswordService_ACT_EDIT);
-            } else {
-                $this->setAction(CTPasswordService_ACT_CREATE);
-            }
-            $this->edit();
-            exit;
-        }
-
-        $this->buPasswordService->updatePasswordService($this->dsPasswordService);
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'passwordServiceID' => $this->dsPasswordService->getValue(DBEPasswordService::passwordServiceID),
-                    'action'            => CTCNC_ACT_VIEW
-                )
-            );
-        header('Location: ' . $urlNext);
-    }
-
-    /**
-     * Delete Further Action
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     */
-    function delete()
-    {
-        $this->setMethodName('delete');
-        try {
-            $this->buPasswordService->deletePasswordService($this->getParam('passwordServiceID'));
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTPASSWORDSERVICE_ACT_DISPLAY_LIST
-                    )
-                );
-            header('Location: ' . $urlNext);
-            exit;
-        } catch (Exception $exception) {
-            $this->displayFatalError('Cannot delete this row');
-            exit;
-        }
     }
 }
