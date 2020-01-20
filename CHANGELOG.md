@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 737 - Create SR from SO, make fields required
 - Issue 701 - Password Service - default access level
 - Issue 730 - Project Update Status - flag when no update
+- Issue 742 - Team Performance - update for Small Projects
 ### Fixed
 - Issue 741 - Part numbers only showing a single digit on Goods in
 
