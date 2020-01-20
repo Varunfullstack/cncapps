@@ -12,6 +12,7 @@ This project changes will be shown here.
 - Issue 695 - Online order signing improvements.
 - Issue 740 - Change 'Open Consultants' Actitivies' to alert Team Lead
 - Issue 720 - SR Statistics enhancement
+- Issue 719 - Change Request changes
 ### Fixed
 - Issue 741 - Part numbers only showing a single digit on Goods in
 
