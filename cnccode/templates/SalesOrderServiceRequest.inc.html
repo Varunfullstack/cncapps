@@ -35,7 +35,8 @@
         <tr>
             <td>ETA</td>
             <td>
-                <input type="text"
+                <input required
+                       type="text"
                        name="inputForm[1][etaDate]"
                        id="etaDate"
                        value="{etaDate}"
@@ -47,36 +48,38 @@
         </tr>
         <tr>
             <td>Contract</td>
-            <td colspan="2"><select
-                    id="serviceRequestCustomerItemID"
-                    name="inputForm[1][serviceRequestCustomerItemID]"
-            >
-                <option value="99">Please select</option>
-                <option value="">T &amp; M</option>
-                <!-- BEGIN contractBlock -->
-                <option {contractSelected}
-                        value="{serviceRequestCustomerItemID}"
-                >{contractDescription}
-                </option>
-                <!-- END contractBlock -->
-            </select>
+            <td colspan="2">
+                <select required
+                        id="serviceRequestCustomerItemID"
+                        name="inputForm[1][serviceRequestCustomerItemID]"
+                >
+                    <option value="">Please select</option>
+                    <option value="-1">T &amp; M</option>
+                    <!-- BEGIN contractBlock -->
+                    <option {contractSelected}
+                            value="{serviceRequestCustomerItemID}"
+                    >{contractDescription}
+                    </option>
+                    <!-- END contractBlock -->
+                </select>
                 <span class="formErrorMessage">{contractCustomerItemIDMessage}</span>
             </td>
         </tr>
         <tr>
             <td>Priority</td>
-            <td colspan="2"><select
-                    id="serviceRequestPriority"
-                    name="inputForm[1][serviceRequestPriority]"
-            >
-                <option value="">Please select</option>
-                <!-- BEGIN priorityBlock -->
-                <option {prioritySelected}
-                        value="{priority}"
-                >{priorityDescription}
-                </option>
-                <!-- END priorityBlock -->
-            </select>
+            <td colspan="2">
+                <select required
+                        id="serviceRequestPriority"
+                        name="inputForm[1][serviceRequestPriority]"
+                >
+                    <option value="">Please select</option>
+                    <!-- BEGIN priorityBlock -->
+                    <option {prioritySelected}
+                            value="{priority}"
+                    >{priorityDescription}
+                    </option>
+                    <!-- END priorityBlock -->
+                </select>
                 <span class="formErrorMessage">{priorityMessage}</span>
             </td>
         </tr>
