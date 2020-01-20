@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 730 - Project Update Status - flag when no update
 - Issue 742 - Team Performance - update for Small Projects
 - Issue 695 - Online order signing improvements.
+- Issue 740 - Change 'Open Consultants' Actitivies' to alert Team Lead
 ### Fixed
 - Issue 741 - Part numbers only showing a single digit on Goods in
 
