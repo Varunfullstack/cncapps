@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_bu'] . '/BUPurchaseOrder.inc.php');
 require_once($cfg['path_bu'] . '/BUGoodsIn.inc.php');
 require_once($cfg['path_bu'] . '/BUPDFPurchaseOrder.inc.php');
@@ -59,12 +60,12 @@ class CTGoodsIn extends CTCNC
         "C" => "Completed",
         "A" => "Authorised"
     );
-    /** @var DataSet $dsGoodsIn ReceiveDataSet */
-    private $dsGoodsIn;
     /**
      * @var DSForm
      */
     public $dsPorline;
+    /** @var DataSet $dsGoodsIn ReceiveDataSet */
+    private $dsGoodsIn;
 
     /**
      * Dataset for Purchase Order record storage.
