@@ -213,7 +213,7 @@ from contractUsersLog left join custItem ON contractId = custItem.cui_cuino LEFT
 // Parameters
         $count = $this->getCount();
         $this->setPageTitle(
-            "Office 365 Backup Audit (Backup Users: $count[office365BackupUsers], Contract Users: $count[contractUsers]"
+            "Office 365 Backup Audit (Backup Users: $count[office365BackupUsers], Contract Users: $count[contractUsers])"
         );
         $this->template->parse(
             'CONTENTS',
