@@ -921,14 +921,27 @@ class CTCurrentActivityReport extends CTCNC
 
         $queueOptions = [
             '<option>-</option>',
-            '<option value="1">H</option>',
-            '<option value="2">E</option>',
-            '<option value="3">SP</option>',
-            '<option value="5">P</option>',
-            '<option value="4">S</option>',
         ];
 
-        unset($queueOptions[$queueNo]);
+        if ($queueNo != 1) {
+            $queueOptions[] = '<option value="1">H</option>';
+        }
+
+        if ($queueNo != 2) {
+            $queueOptions[] = '<option value="2">E</option>';
+        }
+
+        if ($queueNo != 3) {
+            $queueOptions[] = '<option value="3">SP</option>';
+        }
+
+        if ($queueNo != 5) {
+            $queueOptions[] = '<option value="5">P</option>';
+        }
+
+        if ($queueNo != 4) {
+            $queueOptions[] = '<option value="4">S</option>';
+        }
 
         $blockName = 'queue' . $queueNo . 'Block';
 

@@ -17,6 +17,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 741 - Part numbers only showing a single digit on Goods in
 - Issue 743 - Some Direct Debit Items not showing as DD in Renewal Report
+- Issue 744 - Moving SRs from Sales to Projects isn't possible
 
 ## [3.9.7] - 2020-01-14
 ### Fixed
