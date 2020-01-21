@@ -16,6 +16,7 @@ This project changes will be shown here.
 - Issue 731 - O365 Backup Audit Log v2
 ### Fixed
 - Issue 741 - Part numbers only showing a single digit on Goods in
+- Issue 743 - Some Direct Debit Items not showing as DD in Renewal Report
 
 ## [3.9.7] - 2020-01-14
 ### Fixed
