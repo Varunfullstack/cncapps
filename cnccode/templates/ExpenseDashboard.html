@@ -96,6 +96,10 @@
                     }
                 },
                 {
+                    data: 'customerName',
+                    name: 'customerName'
+                },
+                {
                     data: "dateSubmitted", name: "dateSubmitted", render: (data) => {
                         if (!data) {
                             return null;
@@ -154,9 +158,28 @@
             ],
             order: [[8, "desc"], [2, "asc"]],
             serverSide: true,
-            ajax: {
-                url: "?action=getExpensesData",
-                type: "GET"
+            ajax: (data, callback, settings) => {
+                const test = new URL(window.location.href);
+                test.searchParams.append('action', 'getExpensesData');
+                fetch(test, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                }).then(result => result.json()).then(serverData => {
+                    callback(serverData);
+                    const expensesSummaryElement = document.getElementById('expensesSummary');
+                    const summary = serverData.data.reduce((acc, expense) => {
+                        if (expense.isSelf) {
+                            if (expense.status == 'Pending') {
+                                acc.pending += expense.value;
+                            }
+                            if (expense.status == 'Approved') {
+                                acc.approved += expense.value;
+                            }
+                        }
+                        return acc;
+                    }, {approved: 0, pending: 0});
+                    expensesSummaryElement.innerHTML = " Approved: &pound;" + (summary.approved.toFixed(2)) + " Pending: &pound;" + summary.pending.toFixed(2);
+                });
             },
             createdRow: (row, data, index) => {
                 if (data.status === 'Pending') {
@@ -168,12 +191,17 @@
         overtimeTable = $('#overtimeTable').DataTable({
             dom: 'lfrtip',
             stateSave: true,
+            searchDelay: 1000,
             columns: [
                 {data: "staffName", name: 'staffName'},
                 {
                     data: "serviceRequestId", name: "serviceRequestId", render: (data, type, row, meta) => {
                         return '<a href="Activity.php?action=displayActivity&callActivityID=' + row.activityId + '" target="_blank">' + data + '</a>';
                     }
+                },
+                {
+                    data: 'customerName',
+                    name: 'customerName'
                 },
                 {
                     data: "dateSubmitted", name: "dateSubmitted", render: (data) => {
@@ -220,9 +248,28 @@
             ],
             order: [[7, "desc"], [2, "asc"]],
             serverSide: true,
-            ajax: {
-                url: "?action=getOvertimeData",
-                type: "GET"
+            ajax: (data, callback, settings) => {
+                const test = new URL(window.location.href);
+                test.searchParams.append('action', 'getOvertimeData');
+                fetch(test, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                }).then(result => result.json()).then(serverData => {
+                    callback(serverData);
+                    const overtimeSummaryElement = document.getElementById('overtimeSummary');
+                    const summary = serverData.data.reduce((acc, expense) => {
+                        if (expense.isSelf) {
+                            if (expense.status == 'Pending') {
+                                acc.pending += expense.overtimeDuration;
+                            }
+                            if (expense.status == 'Approved') {
+                                acc.approved += expense.overtimeDuration;
+                            }
+                        }
+                        return acc;
+                    }, {approved: 0, pending: 0});
+                    overtimeSummaryElement.innerHTML = " Approved: " + (summary.approved.toFixed(2)) + " Pending: " + summary.pending.toFixed(2);
+                });
             },
             processing: true,
             language: {
@@ -237,7 +284,7 @@
         })
     })
 </script>
-<h1>Expenses</h1>
+<h1>Expenses<span id="expensesSummary"></span></h1>
 <table id="expensesTable">
     <thead>
     <tr>
@@ -246,6 +293,9 @@
         </th>
         <th>
             SR Number
+        </th>
+        <th>
+            Customer
         </th>
         <th>
             Date of expense
@@ -276,7 +326,7 @@
 </table>
 <br>
 <br>
-<h1>Overtime</h1>
+<h1>Overtime<span id="overtimeSummary"></span></h1>
 <table id="overtimeTable">
     <thead>
     <tr>
@@ -285,6 +335,9 @@
         </th>
         <th>
             SR Number
+        </th>
+        <th>
+            Customer
         </th>
         <th>
             Date of overtime

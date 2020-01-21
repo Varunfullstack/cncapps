@@ -57,6 +57,7 @@ class CTExpenseDashboard extends CTCNC
     " ",
     consultant.`lastName`
   ) AS staffName,
+       
   consultant.`cns_consno` AS userId,
   exp_callactivityno AS activityId,
   callactivity.`caa_problemno` AS serviceRequestId,
@@ -67,6 +68,7 @@ class CTExpenseDashboard extends CTCNC
   project.`description` AS projectDescription,
   project.`projectID` AS projectId,
   expense.approvedDate,
+       customer.cus_name as customerName,
   CONCAT(
     approver.`firstName`,
     " ",
@@ -101,10 +103,11 @@ FROM
     ON `expensetype`.`ext_expensetypeno` = expense.`exp_expensetypeno`
   LEFT JOIN problem
     ON problem.`pro_problemno` = callactivity.`caa_problemno`
-  LEFT JOIN project
-    ON project.`projectID` = problem.`pro_projectno`
+  left join ordhead on pro_linked_ordno = ordhead.odh_ordno
+      left join project on project.ordHeadID = ordhead.odh_ordno
   LEFT JOIN consultant approver
     ON approver.`cns_consno` = expense.`approvedBy`
+   left join customer on pro_custno = customer.cus_custno
 WHERE 
       caa_endtime and caa_endtime is not null and
       (
@@ -114,8 +117,10 @@ WHERE
   )
   AND exp_exported_flag <> "Y" ';
 
-                $offset = $_REQUEST['start'];
-                $limit = $_REQUEST['length'];
+                $json = file_get_contents('php://input');
+                $postData = json_decode($json, true);
+                $offset = $postData['start'];
+                $limit = $postData['length'];
 
                 $parameters = [
                     ["type" => "i", "value" => $this->userID],
@@ -133,14 +138,15 @@ WHERE
                 );
                 $totalCount = $countResult->num_rows;
 
-                $search = $_REQUEST['search']['value'];
+                $search = $postData['search']['value'];
                 $filteredCount = $totalCount;
                 if ($search) {
                     $queryString .= " and (CONCAT(
     consultant.`firstName`,
     \" \",
     consultant.`lastName`
-  )  like ? or problem.`pro_problemno` like ? or expensetype.`ext_desc` like ? or project.`description` like ?) ";
+  )  like ? or problem.`pro_problemno` like ? or expensetype.`ext_desc` like ? or project.`description` like ? or cus_name like ?) ";
+                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
                     $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
                     $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
                     $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
@@ -153,8 +159,8 @@ WHERE
 
                 }
 
-                $columns = $_REQUEST['columns'];
-                $order = $_REQUEST['order'];
+                $columns = $postData['columns'];
+                $order = $postData['order'];
                 $orderItems = [];
                 foreach ($order as $orderItem) {
                     $orderItems[] = mysqli_real_escape_string(
@@ -165,8 +171,7 @@ WHERE
                 if (count($orderItems)) {
                     $queryString .= " order by " . implode(', ', $orderItems);
                 }
-//                echo json_encode($_REQUEST, JSON_NUMERIC_CHECK);
-//                exit;
+
                 $queryString .= " limit ?, ?";
                 $parameters[] = ["type" => "i", "value" => $offset];
                 $parameters[] = ["type" => "i", "value" => $limit];
@@ -177,7 +182,7 @@ WHERE
                 $data = $result->fetch_all(MYSQLI_ASSOC);
                 echo json_encode(
                     [
-                        "draw"            => $_REQUEST['draw'],
+                        "draw"            => $postData['draw'],
                         "recordsTotal"    => $totalCount,
                         "recordsFiltered" => $filteredCount,
                         "data"            => $data
@@ -198,6 +203,7 @@ WHERE
   project.`projectID` AS projectId,
   approver.cns_name as approverName,
        getOvertime(caa_callactivityno) as overtimeDuration,
+       customer.cus_name as customerName,
   IF(
     callactivity.`overtimeApprovedBy` is not null,
     "Approved",
@@ -225,12 +231,12 @@ FROM
     ON pro_custno = cus_custno
   JOIN consultant
     ON caa_consno = cns_consno
+      left join ordhead on pro_linked_ordno = ordhead.odh_ordno
+      left join project on project.ordHeadID = ordhead.odh_ordno
   left join consultant approver
     ON approver.`cns_consno` = callactivity.`overtimeApprovedBy`
   join headert
     on headert.`headerID` = 1
-  left join project
-    on project.`projectID` = problem.`pro_projectno`
 WHERE 
       caa_endtime and caa_endtime is not null and
       (caa_status = \'C\'
@@ -265,9 +271,11 @@ WHERE
     )
   )
 ';
+                $json = file_get_contents('php://input');
+                $postData = json_decode($json, true);
 
-                $offset = $_REQUEST['start'];
-                $limit = $_REQUEST['length'];
+                $offset = $postData['start'];
+                $limit = $postData['length'];
 
                 $parameters = [
                     ["type" => "i", "value" => $this->userID],
@@ -285,10 +293,11 @@ WHERE
                 );
                 $totalCount = $countResult->num_rows;
 
-                $search = $_REQUEST['search']['value'];
+                $search = $postData['search']['value'];
                 $filteredCount = $totalCount;
                 if ($search) {
-                    $queryString .= " and (consultant.cns_name like ? or problem.`pro_problemno` like ? or  project.`description` like ?) ";
+                    $queryString .= " and (consultant.cns_name like ? or problem.`pro_problemno` like ? or  project.`description` like ? or cus_name like ?) ";
+                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
                     $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
                     $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
                     $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
@@ -299,8 +308,8 @@ WHERE
                     $filteredCount = $countResult->num_rows;
                 }
 
-                $columns = $_REQUEST['columns'];
-                $order = $_REQUEST['order'];
+                $columns = $postData['columns'];
+                $order = $postData['order'];
                 $orderItems = [];
                 foreach ($order as $orderItem) {
                     $orderItems[] = mysqli_real_escape_string(
@@ -324,7 +333,7 @@ WHERE
 
                 echo json_encode(
                     [
-                        "draw"            => $_REQUEST['draw'],
+                        "draw"            => $postData['draw'],
                         "recordsTotal"    => $totalCount,
                         "recordsFiltered" => $filteredCount,
                         "data"            => $data
