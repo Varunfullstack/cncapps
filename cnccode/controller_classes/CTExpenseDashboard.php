@@ -197,6 +197,7 @@ WHERE
   project.`description` AS projectDescription,
   project.`projectID` AS projectId,
   approver.cns_name as approverName,
+       getOvertime(caa_callactivityno) as overtimeDuration,
   IF(
     callactivity.`overtimeApprovedBy` is not null,
     "Approved",

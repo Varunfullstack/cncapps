@@ -3,28 +3,28 @@ DROP FUNCTION IF EXISTS `getOvertime`#
 CREATE DEFINER=`root`@`127.0.0.1` FUNCTION `getOvertime`(callactivityId BIGINT) RETURNS DECIMAL(5,2)
     READS SQL DATA
 BEGIN
-    DECLARE projectStartTime DECIMAL(10, 1);
-    DECLARE projectEndTime DECIMAL(10, 1);
-    DECLARE helpdeskStartTime DECIMAL(10, 1);
-    DECLARE helpdeskEndTime DECIMAL(10, 1);
-    DECLARE shiftStartTime DECIMAL(10, 1);
-    DECLARE shiftEndTime DECIMAL(10, 1);
+    DECLARE projectStartTime DECIMAL(10, 2);
+    DECLARE projectEndTime DECIMAL(10, 2);
+    DECLARE helpdeskStartTime DECIMAL(10, 2);
+    DECLARE helpdeskEndTime DECIMAL(10, 2);
+    DECLARE shiftStartTime DECIMAL(10, 2);
+    DECLARE shiftEndTime DECIMAL(10, 2);
     DECLARE isHelpdeskUser BOOLEAN;
     DECLARE isWeekOvertimeAllowed BOOLEAN;
     DECLARE activityWeekday INT;
     DECLARE activityEngineerOvertimeAllowed BOOLEAN;
-    DECLARE overtime DECIMAL(10, 1);
-    DECLARE officeStartTime DECIMAL(10, 1);
-    DECLARE officeEndTime DECIMAL(10, 1);
+    DECLARE overtime DECIMAL(10, 2);
+    DECLARE officeStartTime DECIMAL(10, 2);
+    DECLARE officeEndTime DECIMAL(10, 2);
     SELECT weekdayOvertimeFlag = 'Y',
            cns_helpdesk_flag = 'Y',
            WEEKDAY(caa_date),
            engineerOvertimeFlag = 'Y',
            CAST(
-                       TIME_TO_SEC(caa_starttime) / (60 * 60) AS DECIMAL(10, 1)
+                       TIME_TO_SEC(caa_starttime) / (60 * 60) AS DECIMAL(10, 2)
                ),
            CAST(
-                       TIME_TO_SEC(caa_endtime) / (60 * 60) AS DECIMAL(10, 1)
+                       TIME_TO_SEC(caa_endtime) / (60 * 60) AS DECIMAL(10, 2)
                )
     INTO isWeekOvertimeAllowed,
         isHelpdeskUser,
@@ -46,16 +46,16 @@ BEGIN
         RETURN shiftEndTime - shiftStartTime;
     END IF;
     SELECT CAST(
-                       TIME_TO_SEC(hed_hd_starttime) / (60 * 60) AS DECIMAL(10, 1)
+                       TIME_TO_SEC(hed_hd_starttime) / (60 * 60) AS DECIMAL(10, 2)
                ),
            CAST(
-                       TIME_TO_SEC(hed_hd_endtime) / (60 * 60) AS DECIMAL(10, 1)
+                       TIME_TO_SEC(hed_hd_endtime) / (60 * 60) AS DECIMAL(10, 2)
                ),
            CAST(
-                       TIME_TO_SEC(hed_pro_starttime) / (60 * 60) AS DECIMAL(10, 1)
+                       TIME_TO_SEC(hed_pro_starttime) / (60 * 60) AS DECIMAL(10, 2)
                ),
            CAST(
-                       TIME_TO_SEC(hed_pro_endtime) / (60 * 60) AS DECIMAL(10, 1)
+                       TIME_TO_SEC(hed_pro_endtime) / (60 * 60) AS DECIMAL(10, 2)
                )
     INTO helpdeskStartTime,
         helpdeskEndTime,
