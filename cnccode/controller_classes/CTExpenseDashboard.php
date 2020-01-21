@@ -244,11 +244,11 @@ WHERE
   AND (
     caa_endtime > hed_pro_endtime
    OR caa_starttime < hed_pro_starttime
-   OR caa_endtime > `hed_hd_endtime`
-   OR caa_starttime < hed_hd_starttime
+   OR (consultant.`cns_helpdesk_flag` = \'Y\' AND  (caa_endtime > `hed_hd_endtime` OR caa_starttime < hed_hd_starttime))
    OR 
     DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
   )
+  AND getOvertime(caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
   AND (caa_endtime <> caa_starttime)
   
   AND (
@@ -320,28 +320,6 @@ WHERE
                     $parameters
                 );
                 $data = $result->fetch_all(MYSQLI_ASSOC);
-                $buExpense = new BUExpense($this);
-                $buHeader = new BUHeader($this);
-                $dbeHeader = new DataSet($this);
-                $buHeader->getHeader($dbeHeader);
-                $overtimeMinutes = $dbeHeader->getValue(DBEHeader::minimumOvertimeMinutesRequired);
-                foreach ($data as $key => $datum) {
-                    $data[$key]['overtimeDuration'] = $buExpense->calculateOvertime($datum['activityId']);
-                    $data[$key]['minOvertimeMinutes'] = $overtimeMinutes;
-                }
-                $data = array_values(
-                    array_filter(
-                        $data,
-                        function ($datum) use ($overtimeMinutes, &$totalCount, &$filteredCount) {
-                            if (($datum['overtimeDuration'] * 60) < $overtimeMinutes) {
-                                $totalCount--;
-                                $filteredCount--;
-                                return false;
-                            }
-                            return true;
-                        }
-                    )
-                );
 
                 echo json_encode(
                     [
