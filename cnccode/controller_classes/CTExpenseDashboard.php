@@ -57,6 +57,7 @@ class CTExpenseDashboard extends CTCNC
     " ",
     consultant.`lastName`
   ) AS staffName,
+       
   consultant.`cns_consno` AS userId,
   exp_callactivityno AS activityId,
   callactivity.`caa_problemno` AS serviceRequestId,
@@ -67,6 +68,7 @@ class CTExpenseDashboard extends CTCNC
   project.`description` AS projectDescription,
   project.`projectID` AS projectId,
   expense.approvedDate,
+       customer.cus_name as customerName,
   CONCAT(
     approver.`firstName`,
     " ",
@@ -101,10 +103,11 @@ FROM
     ON `expensetype`.`ext_expensetypeno` = expense.`exp_expensetypeno`
   LEFT JOIN problem
     ON problem.`pro_problemno` = callactivity.`caa_problemno`
-  LEFT JOIN project
-    ON project.`projectID` = problem.`pro_projectno`
+  left join ordhead on pro_linked_ordno = ordhead.odh_ordno
+      left join project on project.ordHeadID = ordhead.odh_ordno
   LEFT JOIN consultant approver
     ON approver.`cns_consno` = expense.`approvedBy`
+   left join customer on pro_custno = customer.cus_custno
 WHERE 
       caa_endtime and caa_endtime is not null and
       (
@@ -140,7 +143,8 @@ WHERE
     consultant.`firstName`,
     \" \",
     consultant.`lastName`
-  )  like ? or problem.`pro_problemno` like ? or expensetype.`ext_desc` like ? or project.`description` like ?) ";
+  )  like ? or problem.`pro_problemno` like ? or expensetype.`ext_desc` like ? or project.`description` like ? or cus_name like ?) ";
+                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
                     $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
                     $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
                     $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
@@ -197,6 +201,8 @@ WHERE
   project.`description` AS projectDescription,
   project.`projectID` AS projectId,
   approver.cns_name as approverName,
+       getOvertime(caa_callactivityno) as overtimeDuration,
+       customer.cus_name as customerName,
   IF(
     callactivity.`overtimeApprovedBy` is not null,
     "Approved",
@@ -224,12 +230,12 @@ FROM
     ON pro_custno = cus_custno
   JOIN consultant
     ON caa_consno = cns_consno
+      left join ordhead on pro_linked_ordno = ordhead.odh_ordno
+      left join project on project.ordHeadID = ordhead.odh_ordno
   left join consultant approver
     ON approver.`cns_consno` = callactivity.`overtimeApprovedBy`
   join headert
     on headert.`headerID` = 1
-  left join project
-    on project.`projectID` = problem.`pro_projectno`
 WHERE 
       caa_endtime and caa_endtime is not null and
       (caa_status = \'C\'
@@ -244,11 +250,11 @@ WHERE
   AND (
     caa_endtime > hed_pro_endtime
    OR caa_starttime < hed_pro_starttime
-   OR caa_endtime > `hed_hd_endtime`
-   OR caa_starttime < hed_hd_starttime
+   OR (consultant.`cns_helpdesk_flag` = \'Y\' AND  (caa_endtime > `hed_hd_endtime` OR caa_starttime < hed_hd_starttime))
    OR 
     DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
   )
+  AND getOvertime(caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
   AND (caa_endtime <> caa_starttime)
   
   AND (
@@ -287,7 +293,8 @@ WHERE
                 $search = $_REQUEST['search']['value'];
                 $filteredCount = $totalCount;
                 if ($search) {
-                    $queryString .= " and (consultant.cns_name like ? or problem.`pro_problemno` like ? or  project.`description` like ?) ";
+                    $queryString .= " and (consultant.cns_name like ? or problem.`pro_problemno` like ? or  project.`description` like ? or cus_name like ?) ";
+                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
                     $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
                     $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
                     $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
@@ -320,28 +327,6 @@ WHERE
                     $parameters
                 );
                 $data = $result->fetch_all(MYSQLI_ASSOC);
-                $buExpense = new BUExpense($this);
-                $buHeader = new BUHeader($this);
-                $dbeHeader = new DataSet($this);
-                $buHeader->getHeader($dbeHeader);
-                $overtimeMinutes = $dbeHeader->getValue(DBEHeader::minimumOvertimeMinutesRequired);
-                foreach ($data as $key => $datum) {
-                    $data[$key]['overtimeDuration'] = $buExpense->calculateOvertime($datum['activityId']);
-                    $data[$key]['minOvertimeMinutes'] = $overtimeMinutes;
-                }
-                $data = array_values(
-                    array_filter(
-                        $data,
-                        function ($datum) use ($overtimeMinutes, &$totalCount, &$filteredCount) {
-                            if (($datum['overtimeDuration'] * 60) < $overtimeMinutes) {
-                                $totalCount--;
-                                $filteredCount--;
-                                return false;
-                            }
-                            return true;
-                        }
-                    )
-                );
 
                 echo json_encode(
                     [
@@ -704,6 +689,70 @@ WHERE
         );
 
         $this->setPageTitle('Expenses/Overtime Dashboard');
+        /** @var dbSweetcode */
+        global $db;
+
+        $userExpensesQuery = 'SELECT
+  sum(if(expense.approvedBy is not null, expense.exp_value, 0)) as approved,
+       sum(if(expense.approvedBy is null and expense.deniedReason is null, expense.exp_value, 0)) as pending
+FROM
+  expense
+  LEFT JOIN `callactivity`
+    ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
+WHERE 
+      caa_endtime and caa_endtime is not null and
+          callactivity.`caa_consno` = ?
+  AND exp_exported_flag <> "Y"';
+
+        $statement = $db->preparedQuery($userExpensesQuery, [["type" => "i", "value" => $this->userID]]);
+        $expenseSummary = $statement->fetch_assoc();
+
+
+        $useOvertimeQuery = 'SELECT sum(if(callactivity.overtimeApprovedBy is not null, getOvertime(caa_callactivityno), 0)) as approved,
+       sum(if(callactivity.overtimeApprovedBy is null and callactivity.overtimeDeniedReason is null,
+              getOvertime(caa_callactivityno), 0))                                              as pending
+FROM callactivity
+         JOIN callacttype
+              ON caa_callacttypeno = cat_callacttypeno AND callacttype.engineerOvertimeFlag = \'Y\'
+         JOIN consultant
+              ON caa_consno = cns_consno
+         join headert
+              on headert.`headerID` = 1
+WHERE caa_endtime
+  and caa_endtime is not null
+  and (caa_status = \'C\'
+    OR caa_status = \'A\')
+  AND caa_ot_exp_flag = \'N\'
+  AND (
+        DATE_FORMAT(caa_date, \'%w\') IN (0, 6) or (
+            consultant.weekdayOvertimeFlag = \'Y\'
+            AND DATE_FORMAT(caa_date, \'%w\') IN (1, 2, 3, 4, 5)
+        )
+    )
+  AND (
+        caa_endtime > hed_pro_endtime
+        OR caa_starttime < hed_pro_starttime
+        OR
+        (consultant.`cns_helpdesk_flag` = \'Y\' AND
+         (caa_endtime > `hed_hd_endtime` OR caa_starttime < hed_hd_starttime))
+        OR
+        DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
+    )
+  AND getOvertime(caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
+  AND caa_endtime <> caa_starttime
+  AND callactivity.`caa_consno` = ?';
+
+        $statement = $db->preparedQuery($useOvertimeQuery, [["type" => "i", "value" => $this->userID]]);
+        $overtimeSummary = $statement->fetch_assoc();
+
+        $this->template->setVar(
+            [
+                'approvedExpenseValue'  => $expenseSummary['approved'],
+                'pendingExpenseValue'   => $expenseSummary['pending'],
+                'approvedOvertimeValue' => $overtimeSummary['approved'],
+                'pendingOvertimeValue'  => $overtimeSummary['pending'],
+            ]
+        );
 
         $this->template->parse(
             'CONTENTS',

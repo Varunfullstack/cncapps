@@ -21,7 +21,6 @@ class CustomerFormSignableProcess implements SignableProcess
             case 'cancelled-envelope':
                 break;
             case 'bounced-envelope':
-
                 break;
 
         }

@@ -437,6 +437,9 @@ class CTActivity extends CTCNC
             case 'sendSalesRequest':
                 echo json_encode($this->sendSalesRequest());
                 break;
+            case 'sendChangeRequest':
+                echo json_encode($this->sendChangeRequest());
+                break;
             case 'salesRequestReview':
                 $this->salesRequestReview();
                 break;
@@ -1799,21 +1802,6 @@ class CTActivity extends CTCNC
             }
         }
 
-        $urlChangeRequest = null;
-        $txtChangeRequest = null;
-        if ($dbeJProblem->getValue(DBEJProblem::status) == 'P') {
-
-            $urlChangeRequest =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'             => 'createFollowOnActivity',
-                        'callActivityID'     => $callActivityID,
-                        'callActivityTypeID' => CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID
-                    )
-                );
-            $txtChangeRequest = 'Change Request';
-        }
 
         $urlSetProblemFixed = null;
         $txtSetProblemFixed = null;
@@ -2257,8 +2245,9 @@ class CTActivity extends CTCNC
                 ),
                 'urlAddToCalendar'                   => $urlAddToCalendar,
                 'txtAddToCalendar'                   => $txtAddToCalendar,
-                'urlChangeRequest'                   => $urlChangeRequest,
-                'txtChangeRequest'                   => $txtChangeRequest,
+                'disabledChangeRequest'              => $dbeJProblem->getValue(
+                    DBEJProblem::status
+                ) == 'P' ? '' : 'disabled',
                 'urlSendVisitEmail'                  => $urlSendVisitEmail,
                 'txtSendVisitEmail'                  => $txtSendVisitEmail,
                 'linkNextActivity'                   => $linkNextActivity,
@@ -6996,6 +6985,26 @@ class CTActivity extends CTCNC
         try {
 
             $this->buActivity->sendSalesRequest(
+                $problemID,
+                $message,
+                $type
+            );
+        } catch (Exception $exception) {
+            return ["status" => "error", "message" => $exception->getMessage()];
+        }
+        return ["status" => "ok"];
+    }
+
+    function sendChangeRequest()
+    {
+        $this->setMethodName('sendChangeRequest');
+
+        $message = $this->getParam('message');
+        $problemID = $this->getParam('problemID');
+        $type = $this->getParam('type');
+
+        try {
+            $this->buActivity->sendChangeRequest(
                 $problemID,
                 $message,
                 $type

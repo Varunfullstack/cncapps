@@ -82,8 +82,22 @@ class CTStandardText extends CTCNC
                 break;
             case "getSalesRequestOptions":
                 try {
+                    $data = $this->getStandardTextOptionsForType('Sales Request');
+                } catch (Exception $exception) {
+                    $data = [
+                        "error" => $exception->getMessage()
+                    ];
+                }
 
-                    $data = $this->getStandardTextOptions();
+                echo json_encode(
+                    $data,
+                    JSON_NUMERIC_CHECK
+                );
+
+                break;
+            case "getChangeRequestOptions" :
+                try {
+                    $data = $this->getStandardTextOptionsForType("Change Request");
                 } catch (Exception $exception) {
                     $data = [
                         "error" => $exception->getMessage()
@@ -179,20 +193,10 @@ class CTStandardText extends CTCNC
         $dbeStandardTextType = new DBEStandardTextType($this);
 
         $dbeStandardTextType->getRows('description');
-
-        $salesRequestTypeID = null;
-        $salesQuotationTypeID = null;
         while ($dbeStandardTextType->fetchNext()) {
             $selected = ($dsStandardText->getValue(
                     DBEStandardText::stt_standardtexttypeno
                 ) == $dbeStandardTextType->getPKValue()) ? CT_SELECTED : null;
-            if ($dbeStandardTextType->getValue(DBEStandardTextType::description) == 'Sales Request') {
-                $salesRequestTypeID = $dbeStandardTextType->getValue(DBEStandardTextType::standardTextTypeID);
-            }
-
-            if ($dbeStandardTextType->getValue(DBEStandardTextType::description) == 'Sales Quotation Text') {
-                $salesQuotationTypeID = $dbeStandardTextType->getValue(DBEStandardTextType::standardTextTypeID);
-            }
 
             $this->template->set_var(
                 array(
@@ -228,8 +232,6 @@ class CTStandardText extends CTCNC
                 'urlDelete'                       => $urlDelete,
                 'txtDelete'                       => $txtDelete,
                 'urlDisplayList'                  => $urlDisplayList,
-                'salesRequestTypeID'              => $salesRequestTypeID,
-                'salesQuotationTypeID'            => $salesQuotationTypeID,
                 'salesRequestEmail'               => $dsStandardText->getValue(DBEStandardText::salesRequestEmail),
                 'salesRequestUnassignFlagChecked' => $this->getChecked(
                     $dsStandardText->getValue(DBEStandardText::salesRequestUnassignFlag)
@@ -307,12 +309,16 @@ class CTStandardText extends CTCNC
         header('Location: ' . $urlNext);
     }
 
-    private function getStandardTextOptions()
+    /**
+     * @param string $standardTextType
+     * @return array
+     */
+    private function getStandardTextOptionsForType($standardTextType)
     {
         $DBEStandardTextType = new DBEStandardTextType($this);
         $DBEStandardTextType->setValue(
             DBEStandardTextType::description,
-            'Sales Request'
+            $standardTextType
         );
         $DBEStandardTextType->getRowsByColumn(DBEStandardTextType::description);
         $DBEStandardTextType->fetchNext();

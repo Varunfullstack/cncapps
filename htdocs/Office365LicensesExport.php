@@ -11,6 +11,7 @@ use CNCLTD\LoggerCLI;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 require_once("config.inc.php");
 global $cfg;
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
@@ -130,7 +131,7 @@ do {
         continue;
     }
     if (isset($data['error'])) {
-        $logger->error('Failed to pull data for customer: ' . $data['errorMessage']);
+        $logger->error('Failed to pull data for customer: ' . $data['errorMessage'] . ' ' . $data['stackTrace']);
         createFailedSR($dbeCustomer, $data['errorMessage'], $data['stackTrace'], $data['position']);
         continue;
     }
@@ -177,6 +178,37 @@ do {
         $logger->warning('This customer does not have a licences nor mailboxes');
         continue;
     }
+    global $db;
+
+    $statement = $db->preparedQuery(
+        "insert into customerOffice365StorageStats values (?,?,?,?) on duplicate key update totalOneDriveStorageUsed = ?, totalEmailStorageUsed = ?",
+        [
+            [
+                "type"  => 'i',
+                "value" => $customerID
+            ],
+            [
+                "type"  => 's',
+                "value" => (new DateTime())->format(DATE_MYSQL_DATE)
+            ],
+            [
+                "type"  => 'd',
+                "value" => $data['totalOneDriveStorageUsed']
+            ],
+            [
+                "type"  => 'd',
+                "value" => $data['totalEmailStorageUsed']
+            ],
+            [
+                "type"  => 'd',
+                "value" => $data['totalOneDriveStorageUsed']
+            ],
+            [
+                "type"  => 'd',
+                "value" => $data['totalEmailStorageUsed']
+            ]
+        ]
+    );
 
     $spreadsheet->removeSheetByIndex(0);
     $writer = new Xlsx($spreadsheet);
@@ -279,7 +311,11 @@ function processMailboxes(Spreadsheet $spreadSheet,
         "Total"         => "Total",
         "TotalMailBox"  => 0,
         "Empty"         => null,
-        "LicensedUsers" => 0
+        "LicensedUsers" => 0,
+        1               => null,
+        2               => null,
+        3               => "Total",
+        "TotalOneDrive" => 0
     ];
 
     foreach ($mailboxes as $key => $datum) {
@@ -340,6 +376,7 @@ function processMailboxes(Spreadsheet $spreadSheet,
         $totalizationRow['TotalMailBox'] += $datum['TotalItemSize'];
         $mailboxes[$key]['TotalItemSize'] = $datum['TotalItemSize'];
         $totalizationRow['LicensedUsers'] += $datum['IsLicensed'];
+        $totalizationRow['TotalOneDrive'] += $datum['OneDriveStorageUsed'];
         if ($debugMode) {
             $mailboxes[$key][] = $mailboxLimit;
         }
@@ -356,7 +393,8 @@ function processMailboxes(Spreadsheet $spreadSheet,
             "Is Licensed",
             "Licenses",
             "Webmail Enabled",
-            "MFA Enabled"
+            "MFA Enabled",
+            "OneDrive Size(MB)"
         ],
         null,
         'A1'
@@ -391,11 +429,11 @@ function processMailboxes(Spreadsheet $spreadSheet,
         'A' . ($highestRow + 2)
     );
 
-    $mailboxesSheet->getStyle("A$highestRow:G$highestRow")->getFont()->setBold(true);
+    $mailboxesSheet->getStyle("A$highestRow:H$highestRow")->getFont()->setBold(true);
 
-    $mailboxesSheet->getStyle("A1:G1")->getFont()->setBold(true);
+    $mailboxesSheet->getStyle("A1:H1")->getFont()->setBold(true);
 
-    $mailboxesSheet->getStyle("A1:G$highestRow")->getAlignment()->setHorizontal('center');
+    $mailboxesSheet->getStyle("A1:H$highestRow")->getAlignment()->setHorizontal('center');
 
     for ($i = 0; $i < count($mailboxes); $i++) {
         $currentRow = 2 + $i;
@@ -424,6 +462,10 @@ function processMailboxes(Spreadsheet $spreadSheet,
     $mailboxColumn = $mailboxesSheet->getStyle("B2:B$highestRow");
     $mailboxColumn->getNumberFormat()->setFormatCode("#,##0");
     $mailboxColumn->getAlignment()->setHorizontal('right');
+
+    $oneDriveSizeColumn = $mailboxesSheet->getStyle("H2:H$highestRow");
+    $oneDriveSizeColumn->getNumberFormat()->setFormatCode("#,##0");
+    $oneDriveSizeColumn->getAlignment()->setHorizontal('right');
 
 
     foreach (range('A', $mailboxesSheet->getHighestDataColumn()) as $col) {

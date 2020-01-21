@@ -67,7 +67,7 @@ $query =
   cns_logname as engineerLogName,
   cns_consno as engineerId,
   caa_date as activityDate,
-  cns_manager as engineerManagerId
+  team.leaderId AS engineerManagerId
 FROM 
   callactivity 
   JOIN problem
@@ -76,6 +76,7 @@ FROM
     ON cat_callacttypeno = caa_callacttypeno
   JOIN consultant
     ON caa_consno = cns_consno
+    JOIN team ON consultant.`teamID` = team.`teamID`
   JOIN customer
     ON pro_custno = cus_custno
 WHERE caa_date <= NOW()

@@ -4,6 +4,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BURenBroadband.inc.php");
 require_once($cfg["path_bu"] . "/BURenContract.inc.php");
@@ -384,6 +385,8 @@ class BURenewal extends Business
             $row['salePrice'] = null;
             $row['costPrice'] = null;
             $row['units'] = $dbeJRenContract->getValue(DBEJRenContract::users);
+
+
             $row['directDebit'] = $dbeJRenContract->getValue(DBEJRenContract::directDebitFlag) == 'Y';
             if ($displayAccountsInfo) {
                 $row['salePrice'] = $dbeJRenContract->getValue(DBEJRenContract::curUnitSale);
@@ -458,8 +461,8 @@ class BURenewal extends Business
                 );
             $row['salePrice'] = null;
             $row['costPrice'] = null;
-            $row['units'] = $dbeJRenContract->getValue(DBEJRenContract::users);
-            $row['directDebit'] = $dbeJRenContract->getValue(DBEJRenContract::directDebitFlag) == 'Y';
+            $row['units'] = $dbeJRenDomain->getValue(DBEJRenContract::users);
+            $row['directDebit'] = $dbeJRenDomain->getValue(DBEJRenContract::directDebitFlag) == 'Y';
             if ($displayAccountsInfo) {
                 $row['salePrice'] = $dbeJRenDomain->getValue(DBEJRenDomain::salePrice);
                 $row['costPrice'] = $dbeJRenDomain->getValue(DBEJRenDomain::costPrice);
@@ -515,8 +518,8 @@ class BURenewal extends Business
                 $row['salePrice'] = $dbeJRenBroadband->getValue(DBEJRenBroadband::salePricePerMonth) * 12;
                 $row['costPrice'] = $dbeJRenBroadband->getValue(DBEJRenBroadband::costPricePerMonth) * 12;
             }
-            $row['units'] = $dbeJRenContract->getValue(DBEJRenContract::users);
-            $row['directDebit'] = $dbeJRenContract->getValue(DBEJRenContract::directDebitFlag) == 'Y';
+            $row['units'] = $dbeJRenBroadband->getValue(DBEJRenContract::users);
+            $row['directDebit'] = $dbeJRenBroadband->getValue(DBEJRenContract::directDebitFlag) == 'Y';
             $row['description'] = $dbeJRenBroadband->getValue(DBEJRenBroadband::itemDescription);
             $row['customerItemID'] = $dbeJRenBroadband->getValue(DBEJRenBroadband::customerItemID);
             $row['itemTypeDescription'] = $dbeJRenBroadband->getValue(DBEJRenBroadband::itemTypeDescription);
@@ -565,8 +568,8 @@ class BURenewal extends Business
                 $row['salePrice'] = $dbeJRenHosting->getValue(DBEJRenHosting::curUnitSale);
                 $row['costPrice'] = $dbeJRenHosting->getValue(DBEJRenHosting::curUnitCost);
             }
-            $row['units'] = $dbeJRenContract->getValue(DBEJRenContract::users);
-            $row['directDebit'] = $dbeJRenContract->getValue(DBEJRenContract::directDebitFlag) == 'Y';
+            $row['units'] = $dbeJRenHosting->getValue(DBEJRenContract::users);
+            $row['directDebit'] = $dbeJRenHosting->getValue(DBEJRenContract::directDebitFlag) == 'Y';
             $row['description'] = $dbeJRenHosting->getValue(DBEJRenHosting::itemDescription);
             $row['customerItemID'] = $dbeJRenHosting->getValue(DBEJRenHosting::customerItemID);
             $row['itemTypeDescription'] = $dbeJRenHosting->getValue(DBEJRenHosting::itemTypeDescription);
@@ -626,8 +629,8 @@ class BURenewal extends Business
             $row['itemTypeDescription'] = $dbeJRenQuotation->getValue(DBEJRenQuotation::itemTypeDescription);
             $row['notes'] = $dbeJRenQuotation->getValue(DBEJRenQuotation::notes);
             $row['expiryDate'] = $dbeJRenQuotation->getValue(DBEJRenQuotation::nextPeriodStartDate);
-            $row['units'] = $dbeJRenContract->getValue(DBEJRenContract::users);
-            $row['directDebit'] = $dbeJRenContract->getValue(DBEJRenContract::directDebitFlag) == 'Y';
+            $row['units'] = $dbeJRenQuotation->getValue(DBEJRenContract::users);
+            $row['directDebit'] = $dbeJRenQuotation->getValue(DBEJRenContract::directDebitFlag) == 'Y';
             $row['renewalTypeID'] = 3;
             $row['coveredItems'] = [];
             $row['calculatedExpiryDate'] = (

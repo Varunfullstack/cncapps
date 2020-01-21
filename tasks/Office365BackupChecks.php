@@ -90,11 +90,11 @@ try {
                 $updateCustomerItem->updateRow();
             }
             $db->preparedQuery(
-                "insert into contractUsersLog(contractId,users, currentUsers) values (?,?,?)",
+                "insert into contractUsersLog(contractId,users, currentUsers) values (?,?,?) ",
                 [
                     ["type" => "i", "value" => $accountInfo->contractId],
                     ["type" => "i", "value" => $accountInfo->protectedUsers],
-                    ["type" => "i", "value" => $customerItem->getValue(DBECustomerItem::users)]
+                    ["type" => "i", "value" => $customerItem->getValue(DBECustomerItem::users)],
                 ]
             );
         }

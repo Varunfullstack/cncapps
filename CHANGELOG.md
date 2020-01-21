@@ -1,11 +1,30 @@
 # Changelog
 This project changes will be shown here.
 
-## [3.9.7] - 2020-01-14
+## [v3.9.10] - 2020-01-21
+### Changed
+- Issue 698 - Office 365 exports - include OneDrive storage
+- Issue 732 - Notify on Sickness & allow half days
+- Issue 737 - Create SR from SO, make fields required
+- Issue 701 - Password Service - default access level
+- Issue 730 - Project Update Status - flag when no update
+- Issue 742 - Team Performance - update for Small Projects
+- Issue 695 - Online order signing improvements.
+- Issue 740 - Change 'Open Consultants' Actitivies' to alert Team Lead
+- Issue 720 - SR Statistics enhancement
+- Issue 719 - Change Request changes
+- Issue 731 - O365 Backup Audit Log v2
+- Issue 738 - Overtime & Expenses visual change
+### Fixed
+- Issue 741 - Part numbers only showing a single digit on Goods in
+- Issue 743 - Some Direct Debit Items not showing as DD in Renewal Report
+- Issue 744 - Moving SRs from Sales to Projects isn't possible
+
+## [v3.9.7] - 2020-01-14
 ### Fixed
 - Fixed issue with AutomatedAssetListExport.php
 
-## [3.9.6] - 2020-01-08
+## [v3.9.6] - 2020-01-08
 ### Fixed
 - Fixed issue with Projects team graphs not showing for people on the Projects Team
 ### Changed
@@ -15,15 +34,15 @@ This project changes will be shown here.
 - Fix issue with Activity column not showing the right numbers
 - Fix issue with SLA values in customer page not showing as floats.
 
-## [3.9.5] - 2020-01-06
+## [v3.9.5] - 2020-01-06
 ### Fixed
 - Fixed issue with sales value in sales orders having a comma on thousands multiples. 
 
-## [3.9.4] - 2020-01-03
+## [v3.9.4] - 2020-01-03
 ### Fixed
 - Fixed issue with decimals
 
-## [3.9.3] - 2020-01-03
+## [v3.9.3] - 2020-01-03
 ### Added
 - Added Type of sales request to the dashboard
 - Added the ability to create signable quotes for all the sales orders except completed
@@ -38,7 +57,7 @@ This project changes will be shown here.
 - Fixed issue with column names while running TeamPerformanceUpdate
 - Fixed issue with manual time allocation going to the wrong team
 
-## [3.9.2] - 2020-01-02
+## [v3.9.2] - 2020-01-02
 ### Fixed
 - Fixed issue with time being allocated to the wrong team, when the team of the requestor is Small Projects.
 - Fixed issue with despatching.

@@ -7,7 +7,11 @@
 <script type="text/javascript">
     if ((opener) && (!opener.closed)) {
         if (opener.document.getElementById("{parentIDField}")) {
-            opener.document.getElementById("{parentIDField}").value = '';
+            const parentIDField = opener.document.getElementById("{parentIDField}");
+            parentIDField.value = '';
+            const evt = document.createEvent('HTMLEvents');
+            evt.initEvent('change', false, true);
+            parentIDField.dispatchEvent(evt);
         }
         if (opener.document.getElementById("{parentDescField}")) {
             opener.document.getElementById("{parentDescField}").value = '';

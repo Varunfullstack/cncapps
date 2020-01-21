@@ -1,7 +1,4 @@
 <!-- Template: ActivityDisplay.inc.html -->
-<script type="application/javascript"
-        src=".javascript/salesRequest.js"
-></script>
 <style>
 
     a.button {
@@ -16,9 +13,7 @@
 <script language='JavaScript'
         src="CommonJS.js"
 ></script>
-<script language='JavaScript'
-        src='popcalendar/popcalendar.js'
-></script>
+
 
 <script type="text/JavaScript">
     window.callActivityID = "{callActivityID}";
@@ -257,14 +252,6 @@
             <a href="#"
                onclick="managerCommentPopup()"
             >{txtManagerComment}</a>
-        </TD>
-        <TD width="90"
-            class="navigateLink"
-            valign="top"
-        >
-            <A href="{urlChangeRequest}"
-               title="Change Request"
-            >{txtChangeRequest}</A>
         </TD>
 </table>
 <table class="singleBorder"
@@ -515,6 +502,11 @@
     function showSalesRequestDialog() {
         startSalesRequest({problemID});
     }
+
+    function showChangeRequestDialog() {
+        startChangeRequest({problemID});
+    }
+
 </script>
 <table>
     <tr>
@@ -529,6 +521,10 @@
             valign="top"
         >
             <button onclick="showSalesRequestDialog()">Sales Request</button>
+            <button onclick="showChangeRequestDialog()"
+                    {disabledChangeRequest}
+            >Change Request
+            </button>
         </td>
     </tr>
 </table>

@@ -5,6 +5,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUSalesOrder.inc.php");
 require_once($cfg["path_bu"] . "/BUPurchaseOrder.inc.php");
@@ -324,7 +325,7 @@ class BUGoodsIn extends Business
         );
         $dsReceive->addColumn(
             self::receiveDataSetPartNo,
-            DA_INTEGER,
+            DA_STRING,
             DA_ALLOW_NULL
         );
         $dsReceive->addColumn(
@@ -567,7 +568,7 @@ class BUGoodsIn extends Business
         return TRUE;
     }
 
-    function getAllWarranties(& $dsWarranty)
+    function getAllWarranties(&$dsWarranty)
     {
         $this->setMethodName('getAllWarranties');
         $dbeWarranty = new DBEWarranty($this);

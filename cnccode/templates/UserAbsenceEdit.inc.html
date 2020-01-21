@@ -1,12 +1,27 @@
 <!-- Template: UserAbsenceEdit.inc.html -->
 <h2>{userName}</h2>
-<script language='JavaScript'
-        src='popcalendar/popcalendar.js'
-></script>
 <script type="application/javascript">
-    $(function () {
-        window.startDate = $('#startDate').get(0);
-    });
+
+    changeSickTime = function () {
+        const sickTimeElement = document.getElementById('sickTime');
+        const daySelectorElement = document.getElementById('daySelector');
+        const hiddenDayContainerElement = document.getElementById('hiddenDayContainer');
+
+        if (sickTimeElement.selectedIndex) {
+            // element selected is either 1(am) or 2(pm)
+            daySelectorElement.selectedIndex = 0;
+            daySelectorElement.disabled = true;
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'absence[1][days]';
+            hiddenInput.value = '1';
+            hiddenDayContainerElement.append(hiddenInput);
+        } else {
+            daySelectorElement.disabled = false;
+            hiddenDayContainerElement.innerHTML = '';
+        }
+    }
+
 </script>
 
 <TABLE width="200px"
@@ -20,6 +35,10 @@
           name="absence-form"
           AUTOCOMPLETE="OFF"
     >
+        <div id="hiddenDayContainer">
+
+        </div>
+
         <table width="700px"
                border="0"
         >
@@ -43,11 +62,31 @@
                     <span class="formErrorMessage">{startDateMessage}</span>
                 </td>
             </tr>
+            <tr>
+                <td class="promptText">Half/Full Day</td>
+                <td class="fieldText">
+                    <select name="absence[1][sickTime]"
+                            id="sickTime"
+                            required
+                            onchange="changeSickTime()"
+                    >
+                        <option value="F"
+                                selected
+                        >Full Day
+                        </option>
+                        <option value="A">Sick AM</option>
+                        <option value="P">Sick PM</option>
+                    </select>
+
+                </td>
+            </tr>
 
             <tr>
                 <td class="promptText">Absence Days(exclude holidays and weekends)</td>
                 <td class="fieldText">
-                    <select name="absence[1][days]">
+                    <select name="absence[1][days]"
+                            id="daySelector"
+                    >
                         <!-- BEGIN daysBlock -->
                         <option value="{days}"
                                 {daySelected}
@@ -68,3 +107,4 @@
         </table>
     </form>
     <!-- End Template: UserEdit.inc.html -->
+</TABLE>

@@ -93,6 +93,10 @@ $app->group(
             ELSE 0
         END,
         NULL)) AS slaMet,
+       customer.`cus_sla_p1` as slaP1,
+       customer.`cus_sla_p2` as slaP2,
+       customer.`cus_sla_p3` as slaP3,
+       customer.`cus_sla_p4` as slaP4,
     AVG(IF(pro_status IN ('F' , 'C'),
         openHours < 8,
         NULL)) AS closedWithin8Hours,
@@ -136,6 +140,10 @@ WHERE
             ELSE 0
         END,
         NULL)) AS slaMet,
+       customer.`cus_sla_p1` as slaP1,
+       customer.`cus_sla_p2` as slaP2,
+       customer.`cus_sla_p3` as slaP3,
+       customer.`cus_sla_p4` as slaP4,
     AVG(IF(pro_status IN ('F' , 'C'),
         openHours < 8,
         NULL)) AS closedWithin8Hours,
@@ -455,7 +463,7 @@ $app->group(
                 $response->getBody()->write(
                     $twig->render(
                         'acceptQuotation.html.twig',
-                        ["message" => "You will now receive an email from Signable with details on how to confirm your order."]
+                        ["message" => "You will now receive an email from Signable with details on how to confirm your order. This quotation is subject to our terms and conditions which are available <a href='https://www.cnc-ltd.co.uk/terms-and-conditions'>here</a>"]
                     )
                 );
                 return $response;
