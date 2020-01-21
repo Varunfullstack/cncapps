@@ -117,10 +117,8 @@ WHERE
   )
   AND exp_exported_flag <> "Y" ';
 
-                $json = file_get_contents('php://input');
-                $postData = json_decode($json, true);
-                $offset = $postData['start'];
-                $limit = $postData['length'];
+                $offset = $_REQUEST['start'];
+                $limit = $_REQUEST['length'];
 
                 $parameters = [
                     ["type" => "i", "value" => $this->userID],
@@ -138,7 +136,7 @@ WHERE
                 );
                 $totalCount = $countResult->num_rows;
 
-                $search = $postData['search']['value'];
+                $search = $_REQUEST['search']['value'];
                 $filteredCount = $totalCount;
                 if ($search) {
                     $queryString .= " and (CONCAT(
@@ -159,8 +157,8 @@ WHERE
 
                 }
 
-                $columns = $postData['columns'];
-                $order = $postData['order'];
+                $columns = $_REQUEST['columns'];
+                $order = $_REQUEST['order'];
                 $orderItems = [];
                 foreach ($order as $orderItem) {
                     $orderItems[] = mysqli_real_escape_string(
@@ -171,7 +169,8 @@ WHERE
                 if (count($orderItems)) {
                     $queryString .= " order by " . implode(', ', $orderItems);
                 }
-
+//                echo json_encode($_REQUEST, JSON_NUMERIC_CHECK);
+//                exit;
                 $queryString .= " limit ?, ?";
                 $parameters[] = ["type" => "i", "value" => $offset];
                 $parameters[] = ["type" => "i", "value" => $limit];
@@ -182,7 +181,7 @@ WHERE
                 $data = $result->fetch_all(MYSQLI_ASSOC);
                 echo json_encode(
                     [
-                        "draw"            => $postData['draw'],
+                        "draw"            => $_REQUEST['draw'],
                         "recordsTotal"    => $totalCount,
                         "recordsFiltered" => $filteredCount,
                         "data"            => $data
@@ -271,11 +270,9 @@ WHERE
     )
   )
 ';
-                $json = file_get_contents('php://input');
-                $postData = json_decode($json, true);
 
-                $offset = $postData['start'];
-                $limit = $postData['length'];
+                $offset = $_REQUEST['start'];
+                $limit = $_REQUEST['length'];
 
                 $parameters = [
                     ["type" => "i", "value" => $this->userID],
@@ -293,7 +290,7 @@ WHERE
                 );
                 $totalCount = $countResult->num_rows;
 
-                $search = $postData['search']['value'];
+                $search = $_REQUEST['search']['value'];
                 $filteredCount = $totalCount;
                 if ($search) {
                     $queryString .= " and (consultant.cns_name like ? or problem.`pro_problemno` like ? or  project.`description` like ? or cus_name like ?) ";
@@ -308,8 +305,8 @@ WHERE
                     $filteredCount = $countResult->num_rows;
                 }
 
-                $columns = $postData['columns'];
-                $order = $postData['order'];
+                $columns = $_REQUEST['columns'];
+                $order = $_REQUEST['order'];
                 $orderItems = [];
                 foreach ($order as $orderItem) {
                     $orderItems[] = mysqli_real_escape_string(
@@ -333,7 +330,7 @@ WHERE
 
                 echo json_encode(
                     [
-                        "draw"            => $postData['draw'],
+                        "draw"            => $_REQUEST['draw'],
                         "recordsTotal"    => $totalCount,
                         "recordsFiltered" => $filteredCount,
                         "data"            => $data
@@ -692,6 +689,70 @@ WHERE
         );
 
         $this->setPageTitle('Expenses/Overtime Dashboard');
+        /** @var dbSweetcode */
+        global $db;
+
+        $userExpensesQuery = 'SELECT
+  sum(if(expense.approvedBy is not null, expense.exp_value, 0)) as approved,
+       sum(if(expense.approvedBy is null and expense.deniedReason is null, expense.exp_value, 0)) as pending
+FROM
+  expense
+  LEFT JOIN `callactivity`
+    ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
+WHERE 
+      caa_endtime and caa_endtime is not null and
+          callactivity.`caa_consno` = ?
+  AND exp_exported_flag <> "Y"';
+
+        $statement = $db->preparedQuery($userExpensesQuery, [["type" => "i", "value" => $this->userID]]);
+        $expenseSummary = $statement->fetch_assoc();
+
+
+        $useOvertimeQuery = 'SELECT sum(if(callactivity.overtimeApprovedBy is not null, getOvertime(caa_callactivityno), 0)) as approved,
+       sum(if(callactivity.overtimeApprovedBy is null and callactivity.overtimeDeniedReason is null,
+              getOvertime(caa_callactivityno), 0))                                              as pending
+FROM callactivity
+         JOIN callacttype
+              ON caa_callacttypeno = cat_callacttypeno AND callacttype.engineerOvertimeFlag = \'Y\'
+         JOIN consultant
+              ON caa_consno = cns_consno
+         join headert
+              on headert.`headerID` = 1
+WHERE caa_endtime
+  and caa_endtime is not null
+  and (caa_status = \'C\'
+    OR caa_status = \'A\')
+  AND caa_ot_exp_flag = \'N\'
+  AND (
+        DATE_FORMAT(caa_date, \'%w\') IN (0, 6) or (
+            consultant.weekdayOvertimeFlag = \'Y\'
+            AND DATE_FORMAT(caa_date, \'%w\') IN (1, 2, 3, 4, 5)
+        )
+    )
+  AND (
+        caa_endtime > hed_pro_endtime
+        OR caa_starttime < hed_pro_starttime
+        OR
+        (consultant.`cns_helpdesk_flag` = \'Y\' AND
+         (caa_endtime > `hed_hd_endtime` OR caa_starttime < hed_hd_starttime))
+        OR
+        DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
+    )
+  AND getOvertime(caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
+  AND caa_endtime <> caa_starttime
+  AND callactivity.`caa_consno` = ?';
+
+        $statement = $db->preparedQuery($useOvertimeQuery, [["type" => "i", "value" => $this->userID]]);
+        $overtimeSummary = $statement->fetch_assoc();
+
+        $this->template->setVar(
+            [
+                'approvedExpenseValue'  => $expenseSummary['approved'],
+                'pendingExpenseValue'   => $expenseSummary['pending'],
+                'approvedOvertimeValue' => $overtimeSummary['approved'],
+                'pendingOvertimeValue'  => $overtimeSummary['pending'],
+            ]
+        );
 
         $this->template->parse(
             'CONTENTS',

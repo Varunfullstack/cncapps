@@ -158,28 +158,9 @@
             ],
             order: [[8, "desc"], [2, "asc"]],
             serverSide: true,
-            ajax: (data, callback, settings) => {
-                const test = new URL(window.location.href);
-                test.searchParams.append('action', 'getExpensesData');
-                fetch(test, {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                }).then(result => result.json()).then(serverData => {
-                    callback(serverData);
-                    const expensesSummaryElement = document.getElementById('expensesSummary');
-                    const summary = serverData.data.reduce((acc, expense) => {
-                        if (expense.isSelf) {
-                            if (expense.status == 'Pending') {
-                                acc.pending += expense.value;
-                            }
-                            if (expense.status == 'Approved') {
-                                acc.approved += expense.value;
-                            }
-                        }
-                        return acc;
-                    }, {approved: 0, pending: 0});
-                    expensesSummaryElement.innerHTML = " Approved: &pound;" + (summary.approved.toFixed(2)) + " Pending: &pound;" + summary.pending.toFixed(2);
-                });
+            ajax: {
+                url: "?action=getExpensesData",
+                type: "GET"
             },
             createdRow: (row, data, index) => {
                 if (data.status === 'Pending') {
@@ -248,28 +229,9 @@
             ],
             order: [[7, "desc"], [2, "asc"]],
             serverSide: true,
-            ajax: (data, callback, settings) => {
-                const test = new URL(window.location.href);
-                test.searchParams.append('action', 'getOvertimeData');
-                fetch(test, {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                }).then(result => result.json()).then(serverData => {
-                    callback(serverData);
-                    const overtimeSummaryElement = document.getElementById('overtimeSummary');
-                    const summary = serverData.data.reduce((acc, expense) => {
-                        if (expense.isSelf) {
-                            if (expense.status == 'Pending') {
-                                acc.pending += expense.overtimeDuration;
-                            }
-                            if (expense.status == 'Approved') {
-                                acc.approved += expense.overtimeDuration;
-                            }
-                        }
-                        return acc;
-                    }, {approved: 0, pending: 0});
-                    overtimeSummaryElement.innerHTML = " Approved: " + (summary.approved.toFixed(2)) + " Pending: " + summary.pending.toFixed(2);
-                });
+            ajax: {
+                url: "?action=getOvertimeData",
+                type: "GET"
             },
             processing: true,
             language: {
@@ -284,7 +246,7 @@
         })
     })
 </script>
-<h1>Expenses<span id="expensesSummary"></span></h1>
+<h1>Expenses Approved: &pound;{approvedExpenseValue}/Pending: &pound;{pendingExpenseValue}</h1>
 <table id="expensesTable">
     <thead>
     <tr>
@@ -326,7 +288,7 @@
 </table>
 <br>
 <br>
-<h1>Overtime<span id="overtimeSummary"></span></h1>
+<h1>Overtime Approved: {approvedOvertimeValue}/Pending:{pendingOvertimeValue}</h1>
 <table id="overtimeTable">
     <thead>
     <tr>
