@@ -232,7 +232,6 @@ class CTCNC extends Controller
 
         if (!$this->isRunningFromCommandLine() && isset($GLOBALS ['auth'])) {
             $this->userID = $GLOBALS ['auth']->is_authenticated();
-            $this->userID = 124;
         } else {
             $this->userID = CONFIG_SCHEDULED_TASK_USER_ID;
         }
