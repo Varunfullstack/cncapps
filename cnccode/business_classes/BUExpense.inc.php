@@ -654,6 +654,7 @@ ORDER BY cns_name,
                 $overtime += $shiftEndTime - $officeEndTime;
             }
         }
+
         return $overtime;
     }
 

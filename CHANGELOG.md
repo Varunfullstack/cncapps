@@ -14,6 +14,7 @@ This project changes will be shown here.
 - Issue 720 - SR Statistics enhancement
 - Issue 719 - Change Request changes
 - Issue 731 - O365 Backup Audit Log v2
+- Issue 738 - Overtime & Expenses visual change
 ### Fixed
 - Issue 741 - Part numbers only showing a single digit on Goods in
 - Issue 743 - Some Direct Debit Items not showing as DD in Renewal Report

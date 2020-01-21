@@ -96,6 +96,10 @@
                     }
                 },
                 {
+                    data: 'customerName',
+                    name: 'customerName'
+                },
+                {
                     data: "dateSubmitted", name: "dateSubmitted", render: (data) => {
                         if (!data) {
                             return null;
@@ -168,12 +172,17 @@
         overtimeTable = $('#overtimeTable').DataTable({
             dom: 'lfrtip',
             stateSave: true,
+            searchDelay: 1000,
             columns: [
                 {data: "staffName", name: 'staffName'},
                 {
                     data: "serviceRequestId", name: "serviceRequestId", render: (data, type, row, meta) => {
                         return '<a href="Activity.php?action=displayActivity&callActivityID=' + row.activityId + '" target="_blank">' + data + '</a>';
                     }
+                },
+                {
+                    data: 'customerName',
+                    name: 'customerName'
                 },
                 {
                     data: "dateSubmitted", name: "dateSubmitted", render: (data) => {
@@ -237,7 +246,7 @@
         })
     })
 </script>
-<h1>Expenses</h1>
+<h1>Expenses Approved: &pound;{approvedExpenseValue}/Pending: &pound;{pendingExpenseValue}</h1>
 <table id="expensesTable">
     <thead>
     <tr>
@@ -246,6 +255,9 @@
         </th>
         <th>
             SR Number
+        </th>
+        <th>
+            Customer
         </th>
         <th>
             Date of expense
@@ -276,7 +288,7 @@
 </table>
 <br>
 <br>
-<h1>Overtime</h1>
+<h1>Overtime Approved: {approvedOvertimeValue}/Pending:{pendingOvertimeValue}</h1>
 <table id="overtimeTable">
     <thead>
     <tr>
@@ -285,6 +297,9 @@
         </th>
         <th>
             SR Number
+        </th>
+        <th>
+            Customer
         </th>
         <th>
             Date of overtime
