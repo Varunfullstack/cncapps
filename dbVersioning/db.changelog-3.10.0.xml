@@ -5,12 +5,9 @@
     <changeSet author="pavwebdev" id="release-v3.10.0-0">
         <tagDatabase tag="release-3.10.0"/>
     </changeSet>
-    <changeSet author="pavwebdev" id="release-v3.10.0-1">
-        <sqlFile endDelimiter="#" path="/getOvertimeFunction.sql" stripComments="true"/>
-        <rollback>
-            <sql>
-                drop function if exists getOvertime;
-            </sql>
-        </rollback>
-    </changeSet>
+    <include file="db.changelog-issue698.xml"/>
+    <include file="db.changelog-issue732.xml"/>
+    <include file="db.changelog-issue701.xml"/>
+    <include file="db.changelog-issue719.xml"/>
+    <include file="db.changelog-issue738.xml"/>
 </databaseChangeLog>
