@@ -99,7 +99,7 @@ BEGIN
         IF (shiftStartTime > officeEndTime) THEN
             SET overtime = overtime + (shiftEndTime - shiftStartTime);
         ELSE
-            SET overtime = overtime + (shiftEndTime - officeStartTime);
+            SET overtime = overtime + (shiftEndTime - officeEndTime);
         END IF;
     END IF;
     RETURN overtime;
