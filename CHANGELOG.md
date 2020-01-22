@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v3.9.10] - 2020-01-21
+## [v3.10.0] - 2020-01-21
 ### Changed
 - Issue 698 - Office 365 exports - include OneDrive storage
 - Issue 732 - Notify on Sickness & allow half days
