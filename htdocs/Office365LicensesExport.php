@@ -130,11 +130,19 @@ do {
         createFailedSR($dbeCustomer, "Could not parse Powershell response: $output");
         continue;
     }
+
     if (isset($data['error'])) {
         $logger->error('Failed to pull data for customer: ' . $data['errorMessage'] . ' ' . $data['stackTrace']);
         createFailedSR($dbeCustomer, $data['errorMessage'], $data['stackTrace'], $data['position']);
         continue;
     }
+
+    if ( count($data['errors'])) {
+        foreach ($data['errors'] as $error) {
+            $logger->warning("Error received from powershell output, but the execution was not stopped:  " . $error);
+        }
+    }
+
 
     $mailboxes = $data['mailboxes'];
     $licenses = $data['licenses'];

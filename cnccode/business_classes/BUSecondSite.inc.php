@@ -139,6 +139,15 @@ class BUSecondsite extends Business
                             $server['server_cuino'],
                             self::STATUS_BAD_CONFIG
                         );
+                        if (!$customerItemID && !$testRun) {
+                            $this->getActivityModel()->raiseSecondSiteLocationNotFoundRequest(
+                                $server['custno'],
+                                $server['serverName'],
+                                $server['server_cuino'],
+                                $server['cui_cuino'],
+                                $networkPath
+                            );
+                        }
                     }
 
                 } else {
