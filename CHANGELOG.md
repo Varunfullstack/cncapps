@@ -1,6 +1,15 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.10.2] - 2020-01-23
+### Changed
+- Improved error handling of Office365LicensesExport.
+- Allow people to create passwords with a level higher than the one they have.
+- Show SLA values for customer table in TeamPerformanceReport
+- Raise SR's for failed backup checks with "Path error or No Images"
+### Fix
+- Fix issue trying to upload files with filenames larger than 100 characters
+
 ## [v3.10.1] - 2020-01-22
 ### Fixed
 - Fixed issue with getOvertime db function 
