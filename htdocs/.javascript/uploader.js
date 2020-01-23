@@ -1,6 +1,7 @@
 window.dragUploaderConfig = {
     maxUploadedFiles: 10,
     maxFileSizeMB: 10,
+    maxFilenameSize: 100
 };
 $(function () {
     function clearInput(input) {
@@ -22,9 +23,16 @@ $(function () {
                 alert(`You cannot upload files larger than ${window.dragUploaderConfig.maxFileSizeMB}MB:  ${file.name}`);
                 return;
             }
+
+            if (file.name.length > window.dragUploaderConfig.maxFilenameSize) {
+                clearInput(e.target);
+                alert(`You cannot upload files with a name larger than ${window.dragUploaderConfig.maxFilenameSize} characters, including extension:  ${file.name}`);
+                return;
+            }
+
         }
         if (destination) {
-            $('input[name="' + destination + '"]').val(e.target.files[0].name);
+            $('input[name="' + destination + '"]').val(e.target.files[0].name.substring(0, 75));
         }
     })
 });

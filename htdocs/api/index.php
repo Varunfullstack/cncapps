@@ -84,6 +84,7 @@ $app->group(
                 $query = "select SUM(1) AS raised,
     SUM(pro_status IN ('F' , 'C')) AS `fixed`,
     AVG(problem.`pro_responded_hours`) AS responseTime,
+       null as sla,
     AVG(IF(pro_status IN ('F' , 'C'),
         problem.`pro_responded_hours` < CASE problem.`pro_priority`
             WHEN 1 THEN customer.`cus_sla_p1`
@@ -93,7 +94,7 @@ $app->group(
             ELSE 0
         END,
         NULL)) AS slaMet,
-       null as sla,
+       
     AVG(IF(pro_status IN ('F' , 'C'),
         openHours < 8,
         NULL)) AS closedWithin8Hours,
@@ -128,7 +129,14 @@ WHERE
     SUM(1) AS raised,
     SUM(pro_status IN ('F' , 'C')) AS `fixed`,
     AVG(problem.`pro_responded_hours`) AS responseTime,
-    AVG(IF(pro_status IN ('F' , 'C'),
+    
+       CASE problem.`pro_priority`
+            WHEN 1 THEN customer.`cus_sla_p1`
+            WHEN 2 THEN customer.`cus_sla_p2`
+            WHEN 3 THEN customer.`cus_sla_p3`
+            WHEN 4 THEN customer.`cus_sla_p4`
+            ELSE 0 end as sla,
+       AVG(IF(pro_status IN ('F' , 'C'),
         problem.`pro_responded_hours` < CASE problem.`pro_priority`
             WHEN 1 THEN customer.`cus_sla_p1`
             WHEN 2 THEN customer.`cus_sla_p2`
@@ -137,12 +145,7 @@ WHERE
             ELSE 0
         END,
         NULL)) AS slaMet,
-       CASE problem.`pro_priority`
-            WHEN 1 THEN customer.`cus_sla_p1`
-            WHEN 2 THEN customer.`cus_sla_p2`
-            WHEN 3 THEN customer.`cus_sla_p3`
-            WHEN 4 THEN customer.`cus_sla_p4`
-            ELSE 0 end as sla,
+       
     AVG(IF(pro_status IN ('F' , 'C'),
         openHours < 8,
         NULL)) AS closedWithin8Hours,
