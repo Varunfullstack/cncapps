@@ -348,37 +348,50 @@
                         "raised": {
                             label: "Total SRs Raised",
                             format: x => x,
-                            assignClass: noColour
+                            assignClass: noColour,
+                            showInSummary: true
                         },
                         "fixed": {
                             label: "Total SRs fixed",
                             format: x => x,
-                            assignClass: noColour
+                            assignClass: noColour,
+                            showInSummary: true
                         },
                         "responseTime": {
                             label: "Average Response Time",
                             format: x => x.toFixed(2),
-                            assignClass: lowerIsBetter
+                            assignClass: lowerIsBetter,
+                            showInSummary: true
+                        },
+                        "sla": {
+                            label: 'Customer SLA',
+                            format: x => x,
+                            assignClass: x => null,
+                            showInSummary: false
                         },
                         "slaMet": {
                             label: "% of SLAs Met",
                             format: x => (x * 100).toFixed(2),
-                            assignClass: higherIsBetter
+                            assignClass: higherIsBetter,
+                            showInSummary: true
                         },
                         "closedWithin8Hours": {
                             label: "% Closed within 8 hours of being raised",
                             format: x => (x * 100).toFixed(2),
-                            assignClass: higherIsBetter
+                            assignClass: higherIsBetter,
+                            showInSummary: true
                         },
                         "reopened": {
                             label: "% Reopened SRs",
                             format: x => (x * 100).toFixed(2),
-                            assignClass: lowerIsBetter
+                            assignClass: lowerIsBetter,
+                            showInSummary: true
                         },
                         "avgChargeableTime": {
                             label: "Average Time of work carried out",
                             format: x => x.toFixed(2),
-                            assignClass: lowerIsBetter
+                            assignClass: lowerIsBetter,
+                            showInSummary: true,
                         },
                         "avgTimeAwaitingCNC": {
                             label: "Average Time Awaiting CNC",
@@ -388,7 +401,8 @@
                         "avgTimeFromRaiseToFixHours": {
                             label: "Average Time from initial to Fixed",
                             format: x => x.toFixed(2),
-                            assignClass: lowerIsBetter
+                            assignClass: lowerIsBetter,
+                            showInSummary: true,
                         },
                     };
                     const customersData = [];
@@ -397,10 +411,11 @@
                         {name: 'Customer', data: customersData},
                         {name: 'All Customers', data: allData}
                     ];
-                    Object.keys(summarised).forEach(key => {
+                    Object.keys(customerSummarised).forEach(key => {
                         if (!labels[key]) {
                             return;
                         }
+
                         const allP1 = breakDown.find(x => x.priority === 1);
                         const allP2 = breakDown.find(x => x.priority === 2);
                         const allP3 = breakDown.find(x => x.priority === 3);
@@ -424,6 +439,9 @@
                                 "allClass": labels[key].assignClass(customerSummarised[key], summarised[key])
                             }
                         );
+                        if (!labels[key].showInSummary) {
+                            return;
+                        }
                         allData.push(
                             {
                                 "description": labels[key].label,

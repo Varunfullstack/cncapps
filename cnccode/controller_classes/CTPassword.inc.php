@@ -195,13 +195,14 @@ class CTPassword extends CTCNC
         );
 
         $minLevel = 1;
-        $maxLevel = $this->dbeUser->getValue(DBEUser::passwordLevel);
+        $userLevel = $this->dbeUser->getValue(DBEUser::passwordLevel);
 
-        if (!$maxLevel) {
+        if (!$userLevel) {
             echo 'You cannot edit this password';
             exit;
         }
-        for ($level = $minLevel; $level <= $maxLevel; $level++) {
+
+        for ($level = $minLevel; $level <= count(self::$passwordLevels) - 1; $level++) {
 
             $this->template->set_var(
                 array(

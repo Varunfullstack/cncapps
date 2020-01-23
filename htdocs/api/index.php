@@ -93,10 +93,7 @@ $app->group(
             ELSE 0
         END,
         NULL)) AS slaMet,
-       customer.`cus_sla_p1` as slaP1,
-       customer.`cus_sla_p2` as slaP2,
-       customer.`cus_sla_p3` as slaP3,
-       customer.`cus_sla_p4` as slaP4,
+       null as sla,
     AVG(IF(pro_status IN ('F' , 'C'),
         openHours < 8,
         NULL)) AS closedWithin8Hours,
@@ -140,10 +137,12 @@ WHERE
             ELSE 0
         END,
         NULL)) AS slaMet,
-       customer.`cus_sla_p1` as slaP1,
-       customer.`cus_sla_p2` as slaP2,
-       customer.`cus_sla_p3` as slaP3,
-       customer.`cus_sla_p4` as slaP4,
+       CASE problem.`pro_priority`
+            WHEN 1 THEN customer.`cus_sla_p1`
+            WHEN 2 THEN customer.`cus_sla_p2`
+            WHEN 3 THEN customer.`cus_sla_p3`
+            WHEN 4 THEN customer.`cus_sla_p4`
+            ELSE 0 end as sla,
     AVG(IF(pro_status IN ('F' , 'C'),
         openHours < 8,
         NULL)) AS closedWithin8Hours,

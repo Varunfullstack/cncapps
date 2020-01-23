@@ -35,9 +35,17 @@ try
     $TenantDomainName = (Get-AcceptedDomain | Where-Object { $_.DomainName -like "*onmicrosoft.com" -and $_.DomainName -notlike "*mail.onmicrosoft.com" }).DomainName
     $SharePointName = $TenantDomainName.split('.')[0]
     $SharePointAdmin = "-admin.sharepoint.com"
-
-    Connect-SPOService -Url "https://$SharePointname$SharePointAdmin" -Credential $Credentials
-    $storageData = Get-SPOSite -IncludePersonalSite $True -Limit All -Filter "Url -like '-my.sharepoint.com/personal/'"
+    $URL = "https://$SharePointname$SharePointAdmin"
+    $errors = @()
+    try
+    {
+        Connect-SPOService -Url $URL  -Credential $Credentials
+        $storageData = Get-SPOSite -IncludePersonalSite $True -Limit All -Filter "Url -like '-my.sharepoint.com/personal/'"
+    }
+    catch
+    {
+        $errors += [String]::Concat("", $PSItem)
+    }
     $totalOneDriveStorageUsed = 0
     $totalEmailStorageUsed = 0
     foreach ($mailbox in $Mailboxes)
@@ -63,29 +71,37 @@ try
 
         $totalEmailStorageUsed = $totalEmailStorageUsed + $TotalItemSize
         $RecipientTypeDetails = $mailbox.RecipientTypeDetails
-        $MSOLUSER = Get-MsolUser -UserPrincipalName $UserPrincipalName
-        if ((Get-CASMailbox -Identity $UserPrincipalName).OWAEnabled)
+        try
         {
-            $OWA = 'Yes'
+            $MSOLUSER = Get-MsolUser -UserPrincipalName $UserPrincipalName -ErrorAction Stop
+            $CASMailBox = Get-CASMailbox -Identity $UserPrincipalName -ErrorAction Stop
+            if ($CASMailBox.OWAEnabled)
+            {
+                $OWA = 'Yes'
+            }
+            else
+            {
+                $OWA = 'No'
+            }
+            $2FA = if ($MSOLUSER.StrongAuthenticationRequirements.Count)
+            {
+                'Yes'
+            }
+            else
+            {
+                'No'
+            }
+            if ($UserDomain -eq $MSOLDomain.name)
+            {
+                $DaysToExpiry = $MSOLUSER |  Select-Object @{ Name = "DaysToExpiry"; Expression = { (New-TimeSpan -start (get-date) -end ($_.LastPasswordChangeTimestamp + $MSOLPasswordPolicy)).Days } }; $DaysToExpiry = $DaysToExpiry.DaysToExpiry
+            }
+            $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { [array]$_.Licenses.AccountSkuId } }, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }, @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } }
+            $MailboxesReport += $Information
         }
-        else
+        catch
         {
-            $OWA = 'No'
+            $errors += [String]::Concat("", $PSItem)
         }
-        $2FA = if ((Get-MsolUser -UserPrincipalName $UserPrincipalName).StrongAuthenticationRequirements.Count)
-        {
-            'Yes'
-        }
-        else
-        {
-            'No'
-        }
-        if ($UserDomain -eq $MSOLDomain.name)
-        {
-            $DaysToExpiry = $MSOLUSER |  Select-Object @{ Name = "DaysToExpiry"; Expression = { (New-TimeSpan -start (get-date) -end ($_.LastPasswordChangeTimestamp + $MSOLPasswordPolicy)).Days } }; $DaysToExpiry = $DaysToExpiry.DaysToExpiry
-        }
-        $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { [array]$_.Licenses.AccountSkuId } }, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }, @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } }
-        $MailboxesReport += $Information
     }
     [array]$MailboxesReport = $MailboxesReport | Sort-Object TotalItemSize -Descending
     $Report = @{
@@ -93,6 +109,7 @@ try
         licenses = $LicensesData
         totalOneDriveStorageUsed = $totalOneDriveStorageUsed
         totalEmailStorageUsed = $totalEmailStorageUsed
+        errors = [array]$errors
     }
     Get-PSSession | Remove-PSSession
     Remove-TypeData System.Array
