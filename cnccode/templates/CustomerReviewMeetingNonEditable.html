@@ -13,6 +13,7 @@
         drawChart('serviceDesk');
         drawChart('otherContracts');
         drawChart('totalSR');
+        drawChart('historicTotalSR');
     }
 
     function drawChart(chartName) {
@@ -61,7 +62,23 @@
         </tr>
     </table>
 </div>
-
+<div class="reportSection"
+     style="margin-bottom:30px"
+>
+    <h2>Customer Summary</h2>
+    <div>
+        Became Customer: {becameCustomerDate}({becameCustomerYears} years)
+    </div>
+    <div>
+        CNC Account Manager: {accountManagerName}
+    </div>
+    <div>
+        Key Customer Contact: {keyCustomerContactName}
+    </div>
+    <div {lastReviewMeetingClass}>
+        Last Review Meeting : {lastReviewMeetingDate} - {reviewMeetingFrequency}
+    </div>
+</div>
 <div class="reportSection"
      style="margin-bottom:30px"
 >
@@ -104,6 +121,10 @@
 
 <div class="reportSection">
     <div id="totalSR"></div>
+</div>
+
+<div class="reportSection">
+    <div id="historicTotalSR"></div>
 </div>
 
 <div class="reportSection">

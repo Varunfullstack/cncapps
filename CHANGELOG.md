@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 667 - Review Meeting Agenda Enhancements
+
 ## [v3.10.2] - 2020-01-23
 ### Changed
 - Improved error handling of Office365LicensesExport.

@@ -715,6 +715,10 @@
 </script>
 <script type="text/JavaScript">
 
+    function clearReviewMeetingBooked() {
+        document.getElementById('reviewMeetingBooked').checked = false;
+    }
+
     function setContactsToNoneAndReferCustomer() {
         if (!confirm('This is will change all contacts to the support level of None & refer the customer. Please confirm that you want to continue.')) {
             return;
@@ -1743,7 +1747,15 @@
                                maxlength="10"
                                autocomplete="off"
                                class="jQueryCalendar"
+                               onchange="clearReviewMeetingBooked()"
                         >
+                        Booked <input {disabled}
+                                      type="checkbox"
+                                      name="form[customer][{customerID}][reviewMeetingBooked]"
+                                      id="reviewMeetingBooked"
+                                      {reviewMeetingBookedChecked}
+                                      value="1"
+                    >
                         Frequency
                         <select {disabled}
                                 name="form[customer][{customerID}][reviewMeetingFrequencyMonths]"

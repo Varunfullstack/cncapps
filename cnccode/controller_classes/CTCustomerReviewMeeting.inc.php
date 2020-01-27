@@ -207,27 +207,80 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $textTemplate->setVar('reportDate', $reportRangeDate);
 
+                $becameCustomerDateString = $dsCustomer->getValue(DBECustomer::becameCustomerDate);
+                $becameCustomerDateFormatted = null;
+                $years = null;
+                if ($becameCustomerDateString) {
+                    $becameCustomerDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $becameCustomerDateString);
+                    $becameCustomerDateFormatted = $becameCustomerDate->format('d/m/Y');
+                    $today = new DateTime();
+                    $years = $today->diff($becameCustomerDate)->y;
+                }
+
+                $accountManagerDS = new DBEUser($tthis);
+                $accountManagerDS->getRow($dsCustomer->getValue(DBECustomer::accountManagerUserID));
+
+                $primaryContact = $buCustomer->getPrimaryContact($customerId);
+
+                $primaryContactName = null;
+                if ($primaryContact) {
+                    $primaryContactName = $primaryContact->getValue(
+                            DBEContact::firstName
+                        ) . " " . $primaryContact->getValue(DBEContact::lastName);
+                }
+
+                $lastReviewMeetingDateFormatted = null;
+                if ($dsCustomer->getValue(DBECustomer::lastReviewMeetingDate)) {
+                    $lastReviewMeetingDate = DateTime::createFromFormat(
+                        DATE_MYSQL_DATE,
+                        $dsCustomer->getValue(
+                            DBECustomer::lastReviewMeetingDate
+                        )
+                    );
+                    $lastReviewMeetingDateFormatted = $lastReviewMeetingDate->format('d/m/Y');
+                }
+
+
                 $nonEditableTemplate->set_var(
                     array(
-                        'customerName' => $dsCustomer->getValue(DBECustomer::name),
-                        'siteURL'      => SITE_URL,
-                        'meetingDate'  => self::dateYMDtoDMY(
+                        'customerName'           => $dsCustomer->getValue(DBECustomer::name),
+                        'becameCustomerDate'     => $becameCustomerDateFormatted,
+                        'becameCustomerYears'    => $years,
+                        'accountManagerName'     => $accountManagerDS->getValue(DBEUser::name),
+                        'keyCustomerContactName' => $primaryContactName,
+                        'lastReviewMeetingDate'  => $lastReviewMeetingDateFormatted,
+                        'lastReviewMeetingClass' => $dsCustomer->getValue(
+                            DBECustomer::reviewMeetingBooked
+                        ) ? 'class="performance-green"' : null,
+                        'reviewMeetingFrequency' => $this->getReviewMeetingFrequencyValue($dsCustomer),
+                        'siteURL'                => SITE_URL,
+                        'meetingDate'            => self::dateYMDtoDMY(
                             $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormMeetingDate)
                         ),
-                        'slaP1'        => $dsCustomer->getValue(DBECustomer::slaP1),
-                        'slaP2'        => $dsCustomer->getValue(DBECustomer::slaP2),
-                        'slaP3'        => $dsCustomer->getValue(DBECustomer::slaP3),
-                        'slaP4'        => $dsCustomer->getValue(DBECustomer::slaP4),
-                        'slaP5'        => $dsCustomer->getValue(DBECustomer::slaP5),
-                        "waterMarkURL" => SITE_URL . '/images/CNC_watermarkActualSize.png',
-                        'reportDate'   => $reportRangeDate
+                        'slaP1'                  => $dsCustomer->getValue(DBECustomer::slaP1),
+                        'slaP2'                  => $dsCustomer->getValue(DBECustomer::slaP2),
+                        'slaP3'                  => $dsCustomer->getValue(DBECustomer::slaP3),
+                        'slaP4'                  => $dsCustomer->getValue(DBECustomer::slaP4),
+                        'slaP5'                  => $dsCustomer->getValue(DBECustomer::slaP5),
+                        "waterMarkURL"           => SITE_URL . '/images/CNC_watermarkActualSize.png',
+                        'reportDate'             => $reportRangeDate
                     )
                 );
 
                 $results = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
-                    $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID),
+                    $customerId,
                     $startDate,
                     $endDate
+                );
+                $historicEndDate = new DateTime();
+                $historicStartDate = (clone $historicEndDate)->sub(new DateInterval('P3Y'));
+                if (isset($becameCustomerDate) && $becameCustomerDate > $historicStartDate) {
+                    $historicStartDate = $becameCustomerDate;
+                }
+                $historicData = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
+                    $customerId,
+                    $historicStartDate,
+                    $historicEndDate
                 );
 
                 $supportedUsersData = $this->getSupportedUsersData(
@@ -442,7 +495,8 @@ class CTCustomerReviewMeeting extends CTCNC
                 $nonEditableText = $nonEditableTemplate->get_var('output');
                 $graphData = $this->generateCharts(
                     $results,
-                    $customerId
+                    $customerId,
+                    $historicData
                 );
 
             }
@@ -535,6 +589,32 @@ class CTCustomerReviewMeeting extends CTCNC
             true
         );
         $this->parsePage();
+    }
+
+    private function getReviewMeetingFrequencyValue($dsCustomer)
+    {
+        $value = $dsCustomer->getValue(DBECustomer::reviewMeetingFrequencyMonths);
+        switch ($value) {
+            case 1:
+                $frequency = 'Monthly';
+                break;
+            case 2:
+                $frequency = 'Two-monthly';
+                break;
+            case 3:
+                $frequency = 'Quarterly';
+                break;
+            case 6:
+                $frequency = 'Six-monthly';
+                break;
+            case 12:
+                $frequency = 'Annually';
+                break;
+
+            default:
+                $frequency = 'N/A';
+        }
+        return $frequency;
     }
 
     private function getSupportedUsersData(BUContact $buContact,
@@ -1023,29 +1103,7 @@ class CTCustomerReviewMeeting extends CTCNC
      */
     private function getReviewMeetingFrequencyBody($dsCustomer)
     {
-        $value = $dsCustomer->getValue(DBECustomer::reviewMeetingFrequencyMonths);
-
-        switch ($value) {
-            case 1:
-                $frequency = 'Monthly';
-                break;
-            case 2:
-                $frequency = 'Two-monthly';
-                break;
-            case 3:
-                $frequency = 'Quarterly';
-                break;
-            case 6:
-                $frequency = 'Six-monthly';
-                break;
-            case 12:
-                $frequency = 'Annually';
-                break;
-
-            default:
-                $frequency = 'N/A';
-        }
-
+        $frequency = $this->getReviewMeetingFrequencyValue($dsCustomer);
         return "<h2>Review Meeting Frequency - " . $frequency . "</h2>";
     }
 
@@ -1205,7 +1263,8 @@ class CTCustomerReviewMeeting extends CTCNC
     }
 
     private function generateCharts($data,
-                                    $customerId
+                                    $customerId,
+                                    $historicData
     )
     {
 
@@ -1228,10 +1287,30 @@ class CTCustomerReviewMeeting extends CTCNC
         ];
 
         $totalSR = [
-            "title"   => "Total SR's",
+            "title"   => "Total SRs",
             "columns" => ["Dates", "P1-3", "P4",],
             "data"    => []
         ];
+
+        $historicTotalSR = [
+            "title"   => "Historic Total SRs",
+            "columns" => ["Dates", "P1-3", "P4"],
+            "data"    => []
+        ];
+
+        foreach ($historicData as $datum) {
+            $row = [
+                substr(
+                    $datum['monthName'],
+                    0,
+                    3
+                ) . "-" . $datum['year'],
+                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'],
+                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'],
+            ];
+
+            $historicTotalSR['data'][] = $row;
+        }
 
 
         foreach ($data as $datum) {
@@ -1310,6 +1389,7 @@ class CTCustomerReviewMeeting extends CTCNC
             "serviceDesk"         => $serviceDesk,
             "otherContracts"      => $otherContracts,
             "totalSR"             => $totalSR,
+            'historicTotalSR'     => $historicTotalSR,
             "renderServerCare"    => !!$datasetContracts->rowCount()
         ];
     }
