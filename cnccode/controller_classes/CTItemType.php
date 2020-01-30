@@ -92,6 +92,10 @@ class CTItemType extends CTCNC
                 );
                 $DBEItemType->setValue(DBEItemType::active, !!json_decode($this->getParam('active')));
                 $DBEItemType->setValue(DBEItemType::reoccurring, !!json_decode($this->getParam('reoccurring')));
+                $DBEItemType->setValue(
+                    DBEItemType::showInCustomerReview,
+                    !!json_decode($this->getParam('showInCustomerReview'))
+                );
                 $DBEItemType->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
@@ -109,15 +113,20 @@ class CTItemType extends CTCNC
 
                 $DBEItemType->setValue(DBEItemType::active, !!$this->getParam('active'));
                 $DBEItemType->setValue(DBEItemType::reoccurring, !!$this->getParam('reoccurring'));
+                $DBEItemType->setValue(
+                    DBEItemType::showInCustomerReview,
+                    !!json_decode($this->getParam('showInCustomerReview'))
+                );
                 $DBEItemType->insertRow();
 
                 echo json_encode(
                     [
-                        "id"          => $DBEItemType->getValue(DBEItemType::itemTypeID),
-                        "description" => $DBEItemType->getValue(DBEItemType::description),
-                        "active"      => $DBEItemType->getValue(DBEItemType::active),
-                        "reoccurring" => $DBEItemType->getValue(DBEItemType::reoccurring),
-                        "stockcat"    => $DBEItemType->getValue(DBEItemType::stockcat),
+                        "id"                   => $DBEItemType->getValue(DBEItemType::itemTypeID),
+                        "description"          => $DBEItemType->getValue(DBEItemType::description),
+                        "active"               => $DBEItemType->getValue(DBEItemType::active),
+                        "reoccurring"          => $DBEItemType->getValue(DBEItemType::reoccurring),
+                        "stockcat"             => $DBEItemType->getValue(DBEItemType::stockcat),
+                        "showInCustomerReview" => $DBEItemType->getValue(DBEItemType::showInCustomerReview),
                     ],
                     JSON_NUMERIC_CHECK
                 );
@@ -151,11 +160,12 @@ class CTItemType extends CTCNC
                 $data = [];
                 while ($DBEItemTypes->fetchNext()) {
                     $data[] = [
-                        "id"          => $DBEItemTypes->getValue(DBEItemType::itemTypeID),
-                        "description" => $DBEItemTypes->getValue(DBEItemType::description),
-                        "active"      => $DBEItemTypes->getValue(DBEItemType::active),
-                        "reoccurring" => $DBEItemTypes->getValue(DBEItemType::reoccurring),
-                        "stockcat"    => $DBEItemTypes->getValue(DBEItemType::stockcat),
+                        "id"                   => $DBEItemTypes->getValue(DBEItemType::itemTypeID),
+                        "description"          => $DBEItemTypes->getValue(DBEItemType::description),
+                        "active"               => $DBEItemTypes->getValue(DBEItemType::active),
+                        "reoccurring"          => $DBEItemTypes->getValue(DBEItemType::reoccurring),
+                        "stockcat"             => $DBEItemTypes->getValue(DBEItemType::stockcat),
+                        "showInCustomerReview" => $DBEItemTypes->getValue(DBEItemType::showInCustomerReview),
                     ];
                 }
                 echo json_encode($data, JSON_NUMERIC_CHECK);

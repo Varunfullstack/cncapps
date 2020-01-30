@@ -18,6 +18,7 @@
             <th>Stockcat</th>
             <th>Reoccurring</th>
             <th>Active</th>
+            <th>Show In Customer Review</th>
             <th></th>
         </tr>
         </thead>
@@ -47,6 +48,14 @@
                 <i class='fa fa-times'></i>
                 {% /active %}
             </td>
+            <td>
+                {% #showInCustomerReview %}
+                <i class='fa fa-check'></i>
+                {% /showInCustomerReview %}
+                {% ^showInCustomerReview %}
+                <i class='fa fa-times'></i>
+                {% /showInCustomerReview %}
+            </td>
             <td class="buttons">
                 <button class="editButton">Edit</button>
             </td>
@@ -72,7 +81,7 @@
     let rules = [];
 
     function newRule() {
-        return {id: null, description: "", active: null, reoccurring: null, stockcat: null};
+        return {id: null, description: "", active: null, reoccurring: null, stockcat: null, showInCustomerReview: null};
     }
 
     $.ajax({
@@ -215,6 +224,7 @@
         $('#descriptionInput').val(rule.description);
         $('#licenseInput').val(rule.license);
         $('#reoccurringInput')[0].checked = rule.reoccurring;
+        $('#showInCustomerReviewInput')[0].checked = rule.showInCustomerReview;
         renderStockCat(rule);
     }
 
@@ -243,6 +253,10 @@
 
     function updatereoccurring() {
         currentRule.reoccurring = $('#reoccurringInput').is(':checked');
+    }
+
+    function updateShowInCustomerReview() {
+        currentRule.showInCustomerReview = $('#showInCustomerReviewInput').is(':checked');
     }
 
     function updateStockcat() {
@@ -295,6 +309,17 @@
                name="reoccurring"
                onchange="updatereoccurring()"
                id="reoccurringInput"
+        >
+    </div>
+    <div>
+        <div style="width: 100px; display: inline-block">
+            Show In Customer Review
+        </div>
+        <input type="checkbox"
+               value="true"
+               name="showInCustomerReview"
+               onchange="updateShowInCustomerReview()"
+               id="showInCustomerReviewInput"
         >
     </div>
     <div>

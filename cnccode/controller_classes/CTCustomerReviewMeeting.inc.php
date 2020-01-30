@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerReviewMeeting.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
@@ -14,6 +15,7 @@ require_once($cfg ['path_bu'] . '/BUServiceDeskReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerSrAnalysisReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerItem.inc.php');
 require_once($cfg ['path_bu'] . '/BUActivity.inc.php');
+require_once($cfg ['path_bu'] . '/BURenewal.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTCustomerReviewMeeting extends CTCNC
@@ -288,6 +290,135 @@ class CTCustomerReviewMeeting extends CTCNC
                     $customerId,
                     $dsCustomer->getValue(DBECustomer::name)
                 );
+                $buRenewal = new BURenewal($this);
+                $items = $buRenewal->getRenewalsAndExternalItemsByCustomer(
+                    $customerId,
+                    $this,
+                    true
+                );
+
+                usort(
+                    $items,
+                    function ($a,
+                              $b
+                    ) {
+                        return $a['itemTypeDescription'] <=> $b['itemTypeDescription'];
+                    }
+                );
+
+                $lastItemTypeDescription = false;
+
+                $nonEditableTemplate->set_block(
+                    'page',
+                    'itemBlock',
+                    'items'
+                );
+
+                $totalCostPrice = 0;
+                $totalSalePrice = 0;
+                $dbeItemType = new DBEItemType($this);
+                $dbeItemType->getCustomerReviewRows();
+
+                $itemTypes = [];
+
+                while ($dbeItemType->fetchNext()) {
+                    $itemTypes[$dbeItemType->getValue(DBEItemType::description)] = [];
+                    $itemsCopy = $items;
+                    foreach ($itemsCopy as $index => $item) {
+                        if ($item['itemTypeDescription'] != $dbeItemType->getValue(DBEItemType::description)) {
+                            continue;
+                        }
+                        $itemTypes[$dbeItemType->getValue(DBEItemType::description)][] = $item;
+                        unset ($items[$index]);
+                    }
+
+                }
+
+
+                foreach ($itemTypes as $typeName => $itemTypeContainer) {
+
+                    $itemTypeHeader = '<tr><td colspan="3"><h3>' . $typeName . '</h3></td></tr>';
+
+                    $nonEditableTemplate->set_var(
+                        array(
+                            'itemTypeHeader' => $itemTypeHeader
+                        )
+                    );
+
+                    if (!count($itemTypeContainer)) {
+                        $nonEditableTemplate->set_var(
+                            array(
+                                'description'        => "No Services provided",
+                                'notes'              => null,
+                                'salePrice'          => null,
+                                'coveredItemsString' => null,
+                                'itemClass'          => null,
+                                'customerID'         => null,
+                            )
+                        );
+                        $nonEditableTemplate->parse(
+                            'items',
+                            'itemBlock',
+                            true
+                        );
+                    } else {
+                        $removeHeader = false;
+                        foreach ($itemTypeContainer as $item) {
+                            if($item['description'] == 'Customer Account Management'){
+                                continue;
+                            }
+                            $coveredItemsString = null;
+
+                            if ($removeHeader) {
+                                $nonEditableTemplate->set_var(
+                                    array(
+                                        'itemTypeHeader' => ''
+                                    )
+                                );
+                            }
+
+                            if (count($item['coveredItems']) > 0) {
+                                foreach ($item['coveredItems'] as $coveredItem) {
+                                    $coveredItemsString .= '<br/>' . $coveredItem;
+                                    $nonEditableTemplate->set_var(
+                                        array(
+                                            'coveredItemsString' => $coveredItemsString
+                                        )
+                                    );
+                                }
+                            }
+                            $itemClass = 'externalItem';
+                            $salePrice = null;
+                            if (!is_null($item['customerItemID'])) {
+                                $itemClass = null;
+                                $salePrice = Controller::formatNumber($item['salePrice']);
+                                $totalSalePrice += $item['salePrice'];
+                            }
+
+                            $nonEditableTemplate->set_var(
+                                array(
+                                    'notes'              => $item['notes'],
+                                    'description'        => Controller::htmlDisplayText($item['description']),
+                                    'salePrice'          => $salePrice,
+                                    'coveredItemsString' => $coveredItemsString,
+                                    'itemClass'          => $itemClass,
+                                    'customerID'         => $customerId,
+                                )
+                            );
+                            $nonEditableTemplate->parse(
+                                'items',
+                                'itemBlock',
+                                true
+                            );
+                            if (!$removeHeader) {
+                                $removeHeader = true;
+                            }
+                        }
+
+                    }
+
+                }
+
 
                 $nonEditableTemplate->set_var(
                     [
@@ -562,6 +693,18 @@ class CTCustomerReviewMeeting extends CTCNC
                 JSON_NUMERIC_CHECK
             ) . "</script>";
 
+        $appendixText = null;
+        $dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
+        $options = [
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
+        ];
+        $labtechDB = new PDO(
+            $dsn,
+            LABTECH_DB_USERNAME,
+            LABTECH_DB_PASSWORD,
+            $options
+        );
+
         $this->template->set_var(
             array(
                 'customerID'            => $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID),
@@ -578,6 +721,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 'urlCustomerPopup'      => $urlCustomerPopup,
                 'editableText'          => $editableText,
                 'nonEditableText'       => $nonEditableText,
+                'appendixText' => $appendixText,
                 'urlSubmit'             => $urlSubmit,
                 'urlGeneratePdf'        => $urlGeneratePdf,
             )

@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBEItemType extends DBCNCEntity
@@ -13,6 +14,7 @@ class DBEItemType extends DBCNCEntity
     const stockcat = "stockcat";
     const reoccurring = "reoccurring";
     const active = "active";
+    const showInCustomerReview = "showInCustomerReview";
 
 
     /**
@@ -58,9 +60,29 @@ class DBEItemType extends DBCNCEntity
             null,
             true
         );
+        $this->addColumn(
+            self::showInCustomerReview,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            true
+        );
 
         $this->setPK(0);
         $this->setAddColumnsOff();
+    }
+
+    function getCustomerReviewRows()
+    {
+        $statement =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() . " where " . $this->getDBColumnName(
+                self::active
+            ) . " and " . $this->getDBColumnName(self::showInCustomerReview) . " order by " . $this->getDBColumnName(
+                self::description
+            );
+        $this->setQueryString($statement);
+        $ret = (parent::getRows());
     }
 }
 

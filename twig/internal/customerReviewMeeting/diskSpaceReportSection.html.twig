@@ -1,0 +1,25 @@
+<div class="reportSection">
+    <h2>Disk Space</h2>
+    <table class="collapse">
+        <thead>
+        <tr>
+            <th>Agent Name</th>
+            <th>Drive Letter</th>
+            <th>Drive Size</th>
+            <th>Drive Free Space</th>
+            <th>Drive Free Percent</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in driveSpaceItems %}
+            <tr>
+                <td>{{ item.agentName }}</td>
+                <td>{{ item.driveLetter }}</td>
+                <td>{{ item.driveSize }}</td>
+                <td>{{ item.driveFreeSpace }}</td>
+                <td>{{ item.freePercent }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
