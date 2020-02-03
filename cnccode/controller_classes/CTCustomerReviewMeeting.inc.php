@@ -151,6 +151,7 @@ class CTCustomerReviewMeeting extends CTCNC
         $graphData = null;
         $editableText = null;
         $nonEditableText = null;
+        $appendixText = null;
         if (isset($_REQUEST ['searchForm'])) {
 
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
@@ -364,7 +365,7 @@ class CTCustomerReviewMeeting extends CTCNC
                     } else {
                         $removeHeader = false;
                         foreach ($itemTypeContainer as $item) {
-                            if($item['description'] == 'Customer Account Management'){
+                            if ($item['description'] == 'Customer Account Management') {
                                 continue;
                             }
                             $coveredItemsString = null;
@@ -630,6 +631,35 @@ class CTCustomerReviewMeeting extends CTCNC
                     $historicData
                 );
 
+
+                $dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
+                $options = [
+                    PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
+                ];
+                $labtechDB = new PDO(
+                    $dsn,
+                    LABTECH_DB_USERNAME,
+                    LABTECH_DB_PASSWORD,
+                    $options
+                );
+
+                $statement = $labtechDB->prepare(
+                    'SELECT computers.name as agentName,letter as driveLetter,size as driveSize, free as driveFreeSpace, free/size  as freePercent FROM  drives 
+JOIN computers ON computers.`ComputerID` = drives.`ComputerID`
+JOIN clients ON computers.`ClientID` = clients.`ClientID`
+WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalID` = ?'
+                );
+                $statement->execute([$customerId]);
+
+                $results = $statement->fetchAll(PDO::FETCH_ASSOC);
+                /** @var $twig \Twig\Environment */
+                global $twig;
+                if (count($results)) {
+                    $appendixText = $twig->render(
+                        'customerReviewMeeting/diskSpaceReportSection.html.twig',
+                        ["driveSpaceItems" => $results]
+                    );
+                }
             }
 
         } else {
@@ -693,17 +723,6 @@ class CTCustomerReviewMeeting extends CTCNC
                 JSON_NUMERIC_CHECK
             ) . "</script>";
 
-        $appendixText = null;
-        $dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
-        $options = [
-            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
-        ];
-        $labtechDB = new PDO(
-            $dsn,
-            LABTECH_DB_USERNAME,
-            LABTECH_DB_PASSWORD,
-            $options
-        );
 
         $this->template->set_var(
             array(
@@ -721,7 +740,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 'urlCustomerPopup'      => $urlCustomerPopup,
                 'editableText'          => $editableText,
                 'nonEditableText'       => $nonEditableText,
-                'appendixText' => $appendixText,
+                'appendixText'          => $appendixText,
                 'urlSubmit'             => $urlSubmit,
                 'urlGeneratePdf'        => $urlGeneratePdf,
             )
