@@ -17,4 +17,28 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue667-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="cDriveFreeSpaceWarningPercentageThreshold"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="cDriveFreeSpaceWarningPercentageThreshold" type="int(3)" defaultValue="10">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue667-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="otherDriveFreeSpaceWarningPercentageThreshold"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="otherDriveFreeSpaceWarningPercentageThreshold" type="int(3)" defaultValue="6">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

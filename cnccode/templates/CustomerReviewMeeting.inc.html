@@ -115,13 +115,17 @@
         });
     }
 
+    function handleAppendix() {
+        $('#reportContent').append($('#reportAppendix').html());
+    }
+
     $(function () {
         $('#create-pdf').click(function () {
             $(this).attr('disabled', true);
             //loop through sections looking for large tables
             updateTables();
             handleEditableText();
-
+            handleAppendix();
             var sections = 1;
             $('h2').each(function () {
                 $(this).prepend(sections + '. ');

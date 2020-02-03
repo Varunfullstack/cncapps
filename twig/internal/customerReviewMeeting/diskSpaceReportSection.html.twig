@@ -15,9 +15,9 @@
             <tr>
                 <td>{{ item.agentName }}</td>
                 <td>{{ item.driveLetter }}</td>
-                <td>{{ item.driveSize }}</td>
-                <td>{{ item.driveFreeSpace }}</td>
-                <td>{{ item.freePercent }}</td>
+                <td>{{ item.driveSize|MB2GB }}</td>
+                <td>{{ item.driveFreeSpace|MB2GB }}</td>
+                <td {{ getFreeSpaceClass(item) }}>{{ item.freePercent| freePercentage }}</td>
             </tr>
         {% endfor %}
         </tbody>

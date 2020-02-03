@@ -654,6 +654,44 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
                 $results = $statement->fetchAll(PDO::FETCH_ASSOC);
                 /** @var $twig \Twig\Environment */
                 global $twig;
+                $twig->addFilter(
+                    new \Twig\TwigFilter(
+                        'freePercentage',
+                        function ($string) use ($dsHeader) {
+                            $pctValue = $string * 100;
+                            return number_format($pctValue) . "%";
+                        }
+                    )
+                );
+                $twig->addFilter(
+                    new \Twig\TwigFilter(
+                        'MB2GB',
+                        function ($string) {
+                            if (!$string) {
+                                return null;
+                            }
+                            return number_format($string / 1024, 0, '', '') . 'GB';
+                        }
+                    )
+                );
+                $twig->addFunction(
+                    new \Twig\TwigFunction(
+                        'getFreeSpaceClass',
+                        function ($item) use ($dsHeader) {
+                            $threshold = $dsHeader->getValue(DBEHeader::otherDriveFreeSpaceWarningPercentageThreshold);
+                            if ($item['driveLetter'] === 'C') {
+                                $threshold = $dsHeader->getValue(DBEHeader::cDriveFreeSpaceWarningPercentageThreshold);
+                            }
+                            $pctValue = $item['freePercent'] * 100;
+                            $colorStyle = null;
+                            if ($pctValue <= $threshold) {
+                                $colorStyle = 'style="color: red "';
+                            }
+                            return "$colorStyle";
+                        },
+                        ['is_safe' => ['all', "html"], 'pre_escaped' => 'html']
+                    )
+                );
                 if (count($results)) {
                     $appendixText = $twig->render(
                         'customerReviewMeeting/diskSpaceReportSection.html.twig',
