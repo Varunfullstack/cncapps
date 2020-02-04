@@ -1,7 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=UTF-8"
+    >
     <title></title>
     <style type="text/css">
         BODY, P, TD, TH {
@@ -49,6 +51,13 @@
 <img src="http://chart.apis.google.com/chart?cht=p3&chd=t:{yesPercent},{noPercent}&chdl=Yes|No&chs=400x200&chco=FFFF10,FF0000"/>
 <hr/>
 <!-- END yesNoBlock -->
+<BR/>
+<!-- BEGIN multiChoiceBlock -->
+<p><strong>{questionDescription} ({multiChoiceTotal} responses)</strong>
+<p/>
+<img src="http://chart.apis.google.com/chart?cht=p3&chd=t:{multiChoiceValues}&chdl={multiChoiceLabels}&chs=400x200&chco=FFFF10,FF0000"/>
+<hr/>
+<!-- END multiChoiceBlock -->
 <BR/>
 <table width="100%">
     <tr>

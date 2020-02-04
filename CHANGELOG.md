@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.10.3] - 2020-02-03
+### Added 
+- Add multiple choice questionnaire question
+
 ## [v3.10.2] - 2020-01-23
 ### Changed
 - Improved error handling of Office365LicensesExport.

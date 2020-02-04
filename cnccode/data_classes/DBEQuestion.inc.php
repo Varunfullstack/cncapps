@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEQuestion extends DBEntity
@@ -14,6 +15,8 @@ class DBEQuestion extends DBEntity
     const activeFlag = "activeFlag";
     const requiredFlag = "requiredFlag";
     const weight = "weight";
+    const multiOptions = "multiOptions";
+    const multiChoice = "multiChoice";
 
     /**
      * calls constructor()
@@ -33,6 +36,8 @@ class DBEQuestion extends DBEntity
         $this->addColumn(self::activeFlag, DA_YN, DA_NOT_NULL, "que_active_flag");
         $this->addColumn(self::requiredFlag, DA_YN, DA_NOT_NULL, "que_required_flag");
         $this->addColumn(self::weight, DA_INTEGER, DA_NOT_NULL, "que_weight");
+        $this->addColumn(self::multiOptions, DA_JSON_ARRAY, DA_ALLOW_NULL);
+        $this->addColumn(self::multiChoice, DA_BOOLEAN, DA_NOT_NULL, null, 0);
         $this->setAddColumnsOff();
         $this->setPK(0);
     }

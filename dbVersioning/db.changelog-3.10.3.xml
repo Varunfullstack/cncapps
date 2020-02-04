@@ -1,0 +1,50 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="hotfix-v3.10.3-0">
+        <tagDatabase tag="hotfix-v3.10.3"/>
+    </changeSet>
+    <changeSet id="hotfix-v3.10.3-1" author="pavilionweb">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="question" columnName="multiOptions"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="question">
+            <column name="multiOptions" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="hotfix-v3.10.3-2" author="pavilionweb">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select count(*) from answertype where ant_answertypeno = 7
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            insert into answertype
+            values (7, 'Multichoice', null, 1);
+        </sql>
+        <rollback>
+            <sql>
+                delete
+                from answertype
+                where ant_answertypeno = 7;
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet id="hotfix-v3.10.3-3" author="pavilionweb">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="question" columnName="multiChoice"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="question">
+            <column name="multiChoice" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

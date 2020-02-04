@@ -1120,6 +1120,9 @@ class DataAccess extends BaseObject
         }
 
         if ($type == DA_JSON_ARRAY) {
+            if (is_array($this->row[$ixColumnNumber])) {
+                return $this->row[$ixColumnNumber];
+            }
             return json_decode($this->row[$ixColumnNumber]);
         }
 

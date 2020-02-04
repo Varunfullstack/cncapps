@@ -5,6 +5,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_gc"] . "/Controller.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
@@ -42,24 +43,6 @@ class BUQuestionnaireReport extends Business
         parent::__construct($owner);
     }
 
-    function setPeriod($period)
-    {
-        $this->year = substr($period, 0, 4);
-        $this->month = substr($period, 5, 2);
-        $this->period = $period;
-
-        $endDateUnix = strtotime($period . 'last day next month');
-        $startDateUnix = strtotime($period);
-
-        $this->startDate = date('Y-m-d', $startDateUnix);
-
-        $this->endDate = date('Y-m-d', $endDateUnix);
-
-        $this->startDateOneYearAgo = date('Y-m-d', strtotime('-1 year', $startDateUnix));
-
-
-    }
-
     function setQuestionnaireID($ID)
     {
         $this->questionnaireID = $ID;
@@ -74,144 +57,6 @@ class BUQuestionnaireReport extends Business
     function getYear()
     {
         return $this->year;
-    }
-
-    function getQuestions($answerTypeID = 1)
-    {
-        $sql =
-            "SELECT
-          que_questionno, que_desc
-
-          FROM
-           question
-          WHERE
-           que_questionnaireno = $this->questionnaireID
-           AND que_active_flag = 'Y'
-           AND que_answertypeno = $answerTypeID
-          ORDER BY
-           que_weight";
-
-        $results = $this->db->query($sql);
-
-        $questions = [];
-        while ($row = $results->fetch_assoc()) {
-            $questions[] = $row;
-        }
-        return $questions;
-    }
-
-    function getRatingPercentage($questionID, $rating, $total)
-    {
-        $sql =
-            "SELECT
-          count(*) as count
-
-          FROM
-           answer
-          WHERE
-           ans_questionno = $questionID
-           AND ans_date BETWEEN '$this->startDate' AND '$this->endDate'
-           AND ans_answer = '$rating'";
-
-        $count = $this->db->query($sql)->fetch_object()->count;
-
-
-        if ($total != 0) {
-            return ($count / $total) * 100;
-        } else {
-            return 0;
-        }
-
-    }
-
-    function getTotal($questionID)
-    {
-        $sql =
-            "SELECT
-          count(*) as total
-
-          FROM
-           answer
-          WHERE
-           ans_questionno = $questionID
-           AND ans_date BETWEEN '$this->startDate' AND '$this->endDate'";
-
-        $sql .=
-            " AND ans_answer <> 'X'";          // exclude N/A
-
-        return $this->db->query($sql)->fetch_object()->total;
-    }
-
-    function getAnswers()
-    {
-        $sql =
-            "SELECT
-          que_desc,
-          ans_answer,
-          ans_name,
-          cus_name,
-          date_format(ans_date, '%d/%m/%y') as answerDate
-         FROM
-           answer
-           JOIN question ON que_questionno = ans_questionno
-           LEFT JOIN problem ON pro_problemno = ans_problemno
-           LEFT JOIN customer ON cus_custno = pro_custno
-         WHERE
-           que_questionnaireno = $this->questionnaireID
-           AND ans_date BETWEEN '$this->startDate' AND '$this->endDate'
-           AND ans_answer <> ''";
-
-        return $this->db->query($sql);
-    }
-
-
-    function getQuestionnaire($questionnaireID)
-    {
-        $sql =
-            "SELECT
-          qur_desc,
-          qur_rating_1_desc,
-          qur_rating_5_desc
-
-          FROM
-           questionnaire
-          WHERE
-           qur_questionnaireno = $questionnaireID";
-
-        return $this->db->query($sql)->fetch_object();
-    }
-
-    function getRespondantsUniqueSurveyContact()
-    {
-        $sql =
-            "SELECT
-          ans_name AS surveyContact,
-          pro_contno AS contactID,
-          CONCAT( con_first_name, ' ', con_last_name ) AS requestContact,
-          cus_name AS customer,
-          GROUP_CONCAT( DISTINCT pro_problemno ORDER BY pro_problemno SEPARATOR ' ' ) AS srNumbers
-         
-         FROM
-           answer
-           JOIN question ON ans_questionno = que_questionno
-           JOIN problem ON ans_problemno = pro_problemno
-           JOIN contact ON pro_contno = con_contno
-           JOIN customer ON cus_custno = pro_custno
-           
-          WHERE
-           ans_date BETWEEN '$this->startDate' AND '$this->endDate'
-           AND que_questionnaireno = $this->questionnaireID
-           AND cus_mailshot = 'Y'
-          GROUP BY
-            ans_name           ";
-
-        return $this->db->query($sql);
-
-    }
-
-    function getPeriod()
-    {
-        return date('d/m/Y', strtotime($this->startDate)) . ' to ' . date('d/m/Y', strtotime($this->endDate));
     }
 
     function getReport($csv = false)
@@ -323,6 +168,40 @@ class BUQuestionnaireReport extends Business
 
         }
 
+        $questionType = 7; // MultiChoice
+
+        $questions = $this->getQuestions($questionType);
+        $template->set_block('page', 'multiChoiceBlock', 'multiChoice');
+
+        foreach ($questions as $key => $value) {
+
+            $total = $this->getTotal($value['que_questionno']);
+
+            $valuesAndLabels = $this->getMultiChoiceValuesAndLabels($value['que_questionno']);
+            $values = [];
+            $labels = [];
+            foreach ($valuesAndLabels as $label => $amount) {
+                $labels[] = $label;
+                $values[] = $amount;
+            }
+
+            $template->set_var(
+                array(
+                    'multiChoiceTotal'     => $total,
+                    'questionDescription'  => $value['que_desc'],
+                    'multiChoiceValues'    => implode(',', $values),
+                    'multiChoiceLabels'    => implode('|', $labels),
+                    'multiChoiceLabelsCSV' => implode(
+                        ',',
+                        array_map(function ($label) { return "\"$label\""; }, $labels)
+                    )
+                )
+            );
+
+            $template->parse('multiChoice', 'multiChoiceBlock', true);
+
+        }
+
         $freeText = $this->getAnswers();
 
         $template->set_block('page', 'textBlock', 'text');
@@ -359,6 +238,164 @@ class BUQuestionnaireReport extends Business
 
     }
 
+    function getQuestionnaire($questionnaireID)
+    {
+        $sql =
+            "SELECT
+          qur_desc,
+          qur_rating_1_desc,
+          qur_rating_5_desc
+
+          FROM
+           questionnaire
+          WHERE
+           qur_questionnaireno = $questionnaireID";
+
+        return $this->db->query($sql)->fetch_object();
+    }
+
+    function getQuestions($answerTypeID = 1)
+    {
+        $sql =
+            "SELECT
+          que_questionno, que_desc
+
+          FROM
+           question
+          WHERE
+           que_questionnaireno = $this->questionnaireID
+           AND que_active_flag = 'Y'
+           AND que_answertypeno = $answerTypeID
+          ORDER BY
+           que_weight";
+
+        $results = $this->db->query($sql);
+
+        $questions = [];
+        while ($row = $results->fetch_assoc()) {
+            $questions[] = $row;
+        }
+        return $questions;
+    }
+
+    function getTotal($questionID)
+    {
+        $sql =
+            "SELECT
+          count(*) as total
+
+          FROM
+           answer
+          WHERE
+           ans_questionno = $questionID
+           AND ans_date BETWEEN '$this->startDate' AND '$this->endDate'";
+
+        $sql .=
+            " AND ans_answer <> 'X'";          // exclude N/A
+
+        return $this->db->query($sql)->fetch_object()->total;
+    }
+
+    function getRatingPercentage($questionID, $rating, $total)
+    {
+        $sql =
+            "SELECT
+          count(*) as count
+
+          FROM
+           answer
+          WHERE
+           ans_questionno = $questionID
+           AND ans_date BETWEEN '$this->startDate' AND '$this->endDate'
+           AND ans_answer = '$rating'";
+
+        $count = $this->db->query($sql)->fetch_object()->count;
+
+
+        if ($total != 0) {
+            return ($count / $total) * 100;
+        } else {
+            return 0;
+        }
+
+    }
+
+    private function getMultiChoiceValuesAndLabels($que_questionno)
+    {
+        // get all the answers;
+        $sql =
+            "SELECT
+*        
+         FROM
+           answer           
+          WHERE
+           ans_date BETWEEN '$this->startDate' AND '$this->endDate'
+           AND ans_questionno = $que_questionno
+       ";
+
+        $mysqliResult = $this->db->query($sql);
+        $labels = [];
+        while ($answer = $mysqliResult->fetch_assoc()) {
+            if (!$answer['ans_answer']) {
+                continue;
+            }
+
+            $answerArray = json_decode($answer['ans_answer']);
+            foreach ($answerArray as $answerLabel) {
+                if (!isset($labels[$answerLabel])) {
+                    $labels[$answerLabel] = 0;
+                }
+                $labels[$answerLabel]++;
+            }
+        }
+        return $labels;
+    }
+
+    function getAnswers()
+    {
+        $sql =
+            "SELECT
+          que_desc,
+          ans_answer,
+          ans_name,
+          cus_name,
+          date_format(ans_date, '%d/%m/%y') as answerDate
+         FROM
+           answer
+           JOIN question ON que_questionno = ans_questionno
+           LEFT JOIN problem ON pro_problemno = ans_problemno
+           LEFT JOIN customer ON cus_custno = pro_custno
+         WHERE
+           que_questionnaireno = $this->questionnaireID
+           AND ans_date BETWEEN '$this->startDate' AND '$this->endDate'
+           AND ans_answer <> ''";
+
+        return $this->db->query($sql);
+    }
+
+    function getPeriod()
+    {
+        return date('d/m/Y', strtotime($this->startDate)) . ' to ' . date('d/m/Y', strtotime($this->endDate));
+    }
+
+    function setPeriod($period)
+    {
+        $this->year = substr($period, 0, 4);
+        $this->month = substr($period, 5, 2);
+        $this->period = $period;
+
+        $endDateUnix = strtotime($period . 'last day next month');
+        $startDateUnix = strtotime($period);
+
+        $this->startDate = date('Y-m-d', $startDateUnix);
+
+        $this->endDate = date('Y-m-d', $endDateUnix);
+
+        $this->startDateOneYearAgo = date('Y-m-d', strtotime('-1 year', $startDateUnix));
+
+
+    }
+
     function getRespondantsCsv()
     {
         global $cfg;
@@ -388,6 +425,34 @@ class BUQuestionnaireReport extends Business
         $template->parse('output', 'page', true);
 
         return $template->get_var('output');
+    }
+
+    function getRespondantsUniqueSurveyContact()
+    {
+        $sql =
+            "SELECT
+          ans_name AS surveyContact,
+          pro_contno AS contactID,
+          CONCAT( con_first_name, ' ', con_last_name ) AS requestContact,
+          cus_name AS customer,
+          GROUP_CONCAT( DISTINCT pro_problemno ORDER BY pro_problemno SEPARATOR ' ' ) AS srNumbers
+         
+         FROM
+           answer
+           JOIN question ON ans_questionno = que_questionno
+           JOIN problem ON ans_problemno = pro_problemno
+           JOIN contact ON pro_contno = con_contno
+           JOIN customer ON cus_custno = pro_custno
+           
+          WHERE
+           ans_date BETWEEN '$this->startDate' AND '$this->endDate'
+           AND que_questionnaireno = $this->questionnaireID
+           AND cus_mailshot = 'Y'
+          GROUP BY
+            ans_name           ";
+
+        return $this->db->query($sql);
+
     }
 
     function getQuestionnaireDescription()

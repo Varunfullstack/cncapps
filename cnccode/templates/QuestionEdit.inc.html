@@ -1,4 +1,167 @@
 <!-- Template: questionEdit.inc.html -->
+<script>
+    let multiChoice = [];
+    let multiOptionsRow = null;
+    let multiChoiceContainer = null;
+    let multiChoiceRow = null;
+    $(function () {
+        const multiChoiceString = $('input[name="question[1][multiOptions]"]').val();
+        if (multiChoiceString) {
+            multiChoice = JSON.parse(multiChoiceString);
+        }
+        Mustache.tags = ['{%', '%}'];
+        multiOptionsRow = $('.multiOptionsRow');
+        multiChoiceContainer = $('.multiOptionsRow td');
+        multiChoiceRow = $('.multiChoiceRow');
+        changeQuestionType();
+
+    });
+
+    function updateMultiChoiceInput(options) {
+
+        $('input[name="question[1][multiOptions]"]').val(JSON.stringify(options));
+    }
+
+    function changeQuestionType() {
+        if (+$('select[name="question[1][answerTypeID]"]').val() !== 7) {
+            multiOptionsRow.hide();
+            multiChoiceRow.hide();
+            updateMultiChoiceInput([]);
+            return;
+        }
+        multiOptionsRow.show();
+        multiChoiceRow.show();
+        renderMultiChoice(multiChoice);
+    }
+
+    function addOption() {
+        const description = $('input[name="multiChoiceItemDescription"]').val();
+        if (!description) {
+            return;
+        }
+        multiChoice.push(description);
+        renderMultiChoice(multiChoice);
+        updateMultiChoiceInput(multiChoice);
+    }
+
+    function editOption(idx) {
+        renderMultiChoice(multiChoice, multiChoice[idx]);
+        $('button.addButton').hide();
+        $('button.saveButton').show();
+        $('button.cancelButton').show();
+        window.editingOption = idx;
+    }
+
+    function saveOption() {
+        const description = $('input[name="multiChoiceItemDescription"]').val();
+        if (!description) {
+            return;
+        }
+        multiChoice.splice(window.editingOption, 1, description);
+        cancelOption();
+        updateMultiChoiceInput(multiChoice);
+    }
+
+    function cancelOption() {
+        renderMultiChoice(multiChoice);
+        $('button.addButton').show();
+        $('button.saveButton').hide();
+        $('button.cancelButton').hide();
+        window.editingOption = null;
+    }
+
+    function deleteOption(idx) {
+        multiChoice.splice(idx, 1);
+        renderMultiChoice(multiChoice);
+        updateMultiChoiceInput(multiChoice);
+    }
+
+    function renderMultiChoice(options, description = null) {
+        const source = document.getElementById("multi-choice-items-template").innerHTML;
+
+        const context = {
+            description,
+            options: options.map(x => {
+                return {text: x}
+            }),
+            setUpIndex: function () {
+                if (window['INDEX'] == null) {
+                    window['INDEX'] = 0;
+                    return;
+                }
+                ++window['INDEX'];
+            },
+            getIndex: function () {
+                return window['INDEX'];
+            },
+            resetIndex: function () {
+                window['INDEX'] = null;
+            }
+        };
+        const html = Mustache.to_html(source, context);
+        multiChoiceContainer.html(html);
+    }
+
+</script>
+<script id="multi-choice-items-template"
+        type="text/template"
+>
+    <div>
+        <label>
+            Description
+        </label>
+        <input type="text"
+               name="multiChoiceItemDescription"
+               value="{% description %}"
+        >
+        <button type="button"
+                class="addButton"
+                onclick="addOption()"
+        >Add
+        </button>
+        <button type="button"
+                class="saveButton"
+                onclick="saveOption()"
+                style="display: none"
+        >Save
+        </button>
+        <button type="button"
+                class="cancelButton"
+                onclick="cancelOption()"
+                style="display: none"
+        >Cancel
+        </button>
+    </div>
+    <div class="optionsContainer"
+         style="display: flex; flex-direction: row;width: 500px; overflow-x: auto"
+    >
+        {% resetIndex %}
+        {% #options %}
+        {% setUpIndex %}
+        <div data-id="{% getIndex %}"
+             class="optionItem"
+        >
+            <div>{% text %}</div>
+            <div class="buttons">
+                <button type="button"
+                        class="editButton"
+                        onclick="editOption({% getIndex %})"
+                >
+                    <i class="fa fa-pencil"></i>
+                </button>
+                <button type="button"
+                        class="deleteButton"
+                        onclick="deleteOption({% getIndex %})"
+                >
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+        </div>
+        {% /options %}
+    </div>
+
+
+</script>
 <TABLE width="200px"
        border="0"
        cellpadding="2"
@@ -33,6 +196,10 @@
                 name="question[1][questionnaireID]"
                 value="{questionnaireID}"
         >
+        <input type="hidden"
+               name="question[1][multiOptions]"
+               value='{multiOptions}'
+        />
         <tr>
             <td width="115"
                 class="promptText"
@@ -60,8 +227,8 @@
             <td width="575"
                 class="fieldText"
             >
-                <select
-                        name="question[1][answerTypeID]"
+                <select name="question[1][answerTypeID]"
+                        onchange="changeQuestionType()"
                 >
                     <option value="">Please Select</option>
                     <!-- BEGIN answerTypeBlock -->
@@ -73,6 +240,23 @@
                 </select>
 
                 <span class="formErrorMessage">{answerTypeMessage}</span>
+            </td>
+        </tr>
+        <tr class="multiChoiceRow">
+            <td class="promptText">
+                MultiChoice?
+            </td>
+            <td>
+                <input type="checkbox"
+                       value="1"
+                       {multiChoiceChecked}
+                       name="question[1][multiChoice]"
+                >
+            </td>
+        </tr>
+        <tr class="multiOptionsRow">
+            <td colspan="2">
+
             </td>
         </tr>
         <tr>

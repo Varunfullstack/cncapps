@@ -5,6 +5,10 @@
 "Question","NumberOfResponses","Yes","No"<!-- BEGIN yesNoBlock -->
 "{questionDescription}",{ynTotal},{yesPercent},{noPercent}
 <!-- END yesNoBlock -->
+<!-- BEGIN multiChoiceBlock -->
+"Question","NumberOfResponses",{multiChoiceLabelsCSV}
+"{questionDescription}",{multiChoiceTotal},{multiChoiceValues}
+<!-- END multiChoiceBlock -->
 
 "Question","Contact","Date","Answer"<!-- BEGIN textBlock -->
 "{freeTextQuestion}","{freeTextName} {freeTextCustomer}","{freeTextDate}","{freeTextAnswer}"
