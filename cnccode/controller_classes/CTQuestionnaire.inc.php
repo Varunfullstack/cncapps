@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUQuestionnaire.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -84,97 +85,228 @@ class CTQuestionnaire extends CTCNC
     }
 
     /**
-     * Display list of questionnaires
+     * Edit/Add Further Action
      * @access private
      * @throws Exception
      */
-    function displayList()
+    function editQuestion()
     {
-        $this->setMethodName('displayList');
-        $this->setPageTitle('Questionnaires');
-        $this->setTemplateFiles(
-            array('QuestionnaireList' => 'QuestionnaireList.inc')
-        );
-        $dsQuestionnaire = new DataSet($this);
-        $this->buQuestionnaire->getAll($dsQuestionnaire);
+        $this->setMethodName('editQuestion');
+        $dsQuestion = &$this->dsQuestion; // ref to class var
 
-        $urlCreate =
+        if (!$this->getFormError()) {
+            if ($this->getAction() == 'editQuestion') {
+                $this->buQuestionnaire->getQuestionByID(
+                    $this->getParam('questionID'),
+                    $dsQuestion
+                );
+                $questionID = $this->getParam('questionID');
+            } else {                                  // creating new
+                $dsQuestion->initialise();
+                $dsQuestion->setValue(
+                    DBEQuestion::questionID,
+                    '0'
+                );
+                $dsQuestion->setValue(
+                    DBEQuestion::questionnaireID,
+                    $this->getParam('questionnaireID')
+                );
+                $questionID = '0';
+            }
+        } else {                                    // form validation error
+            $dsQuestion->initialise();
+            $dsQuestion->fetchNext();
+            $questionID = $dsQuestion->getValue(DBEQuestion::questionID);
+        }
+        $urlDelete = null;
+        $txtDelete = null;
+        if (
+            $this->getAction() == 'editQuestion' && $this->buQuestionnaire->canDelete($this->getParam('questionID'))
+        ) {
+            $urlDelete =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'     => 'deleteQuestion',
+                        'questionID' => $questionID
+                    )
+                );
+            $txtDelete = 'Delete';
+        }
+        $urlUpdate =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action' => 'create'
+                    'action'     => 'updateQuestion',
+                    'questionID' => $questionID
                 )
             );
-
-        $this->template->set_var(
-            array('urlCreate' => $urlCreate)
-        );
-
-        if ($dsQuestionnaire->rowCount() > 0) {
-
-            $this->template->set_block(
-                'QuestionnaireList',
-                'QuestionnaireBlock',
-                'rows'
+        $urlDisplayList =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'          => 'displayQuestionList',
+                    'questionnaireID' => $dsQuestion->getValue(DBEQuestion::questionnaireID)
+                )
             );
+        $this->setPageTitle('Edit Question');
+        $this->setTemplateFiles(
+            array('QuestionEdit' => 'QuestionEdit.inc')
+        );
+        $this->template->set_var(
+            array(
+                'questionID'      => $questionID,
+                'questionnaireID' => $dsQuestion->getValue(DBEQuestion::questionnaireID),
 
-            while ($dsQuestionnaire->fetchNext()) {
+                'description'         => Controller::htmlInputText($dsQuestion->getValue(DBEQuestion::description)),
+                'descriptionMessage'  => Controller::htmlDisplayText($dsQuestion->getMessage(DBEQuestion::description)),
+                'activeFlagChecked'   => $dsQuestion->getValue(DBEQuestion::activeFlag) == 'Y' ? 'CHECKED' : null,
+                'activeFlagMessage'   => Controller::htmlDisplayText($dsQuestion->getMessage(DBEQuestion::activeFlag)),
+                'requiredFlagChecked' => $dsQuestion->getValue(DBEQuestion::requiredFlag) == 'Y' ? 'CHECKED' : null,
+                'requiredFlagMessage' => Controller::htmlDisplayText(
+                    $dsQuestion->getMessage(DBEQuestion::requiredFlag)
+                ),
+                'weight'              => Controller::htmlInputText($dsQuestion->getValue(DBEQuestion::weight)),
+                'weightMessage'       => Controller::htmlDisplayText($dsQuestion->getMessage(DBEQuestion::weight)),
+                'multiOptions'        => json_encode($dsQuestion->getValue(DBEQuestion::multiOptions)),
+                'multiChoiceChecked'  => $dsQuestion->getValue(DBEQuestion::multiChoice) ? 'checked' : null,
+                'urlUpdate'           => $urlUpdate,
+                'urlDelete'           => $urlDelete,
+                'txtDelete'           => $txtDelete,
+                'urlDisplayList'      => $urlDisplayList
+            )
+        );
+        /*
+        Answer types
+        */
+        $this->answerTypeDropdown($dsQuestion->getValue(DBEQuestion::answerTypeID));
 
-                $questionnaireID = $dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID);
-
-                $urlDisplayQuestionList =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'          => 'displayQuestionList',
-                            'questionnaireID' => $questionnaireID
-                        )
-                    );
-                $urlView =
-                    Controller::buildLink(
-                        'https://cnc-ltd.co.uk/questionnaire/index.php',
-                        array(
-                            'questionnaireno' => $questionnaireID
-                        )
-                    );
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'          => 'edit',
-                            'questionnaireID' => $questionnaireID
-                        )
-                    );
-                $txtEdit = '[edit]';
-
-                $this->template->set_var(
-                    array(
-                        'questionnaireID'        => $questionnaireID,
-                        'description'            => Controller::htmlDisplayText(
-                            $dsQuestionnaire->getValue(DBEQuestionnaire::description)
-                        ),
-                        'urlEdit'                => $urlEdit,
-                        'urlDisplayQuestionList' => $urlDisplayQuestionList,
-                        'txtEdit'                => $txtEdit,
-                        'urlView'                => $urlView
-                    )
-                );
-
-                $this->template->parse(
-                    'rows',
-                    'QuestionnaireBlock',
-                    true
-                );
-
-            }//while $dsQuestionnaire->fetchNext()
-        }
         $this->template->parse(
             'CONTENTS',
-            'QuestionnaireList',
+            'QuestionEdit',
             true
         );
         $this->parsePage();
+    }
+
+    function answerTypeDropdown(
+        $answerTypeID,
+        $templateName = 'QuestionEdit',
+        $blockName = 'answerTypeBlock'
+    )
+    {
+        // Display list of answerTypes that are current at given activity date
+        $this->buQuestionnaire->dbeAnswerType->getRows();
+
+        $this->template->set_block(
+            $templateName,
+            $blockName,
+            'answerTypes'
+        );
+
+        while ($this->buQuestionnaire->dbeAnswerType->fetchNext()) {
+
+            $answerTypeSelected = ($this->buQuestionnaire->dbeAnswerType->getValue(
+                    DBEAnswerType::answerTypeID
+                ) == $answerTypeID) ? CT_SELECTED : null;
+
+            $this->template->set_var(
+                array(
+                    'answerTypeID'          => $this->buQuestionnaire->dbeAnswerType->getValue(
+                        DBEAnswerType::answerTypeID
+                    ),
+                    'answerTypeDescription' => $this->buQuestionnaire->dbeAnswerType->getValue(
+                        DBEAnswerType::description
+                    ),
+                    'answerTypeSelected'    => $answerTypeSelected
+                )
+            );
+
+            $this->template->parse(
+                'answerTypes',
+                $blockName,
+                true
+            );
+
+
+        }
+
+    }// end function editFurther Action()
+
+    /**
+     * Delete Question
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function deleteQuestion()
+    {
+        $this->setMethodName('deleteQuestion');
+        // we have to know from what questionnaire we have to delete the question so we can redirect the user back to
+        // the correct list of questions
+
+        $questionID = $this->getParam('questionID');
+
+        if (!$questionID) {
+            return $this->displayFatalError('Question ID not given');
+        }
+        $dsQuestion = new DataSet($this);
+        $this->buQuestionnaire->getQuestionByID($questionID, $dsQuestion);
+
+        $questionnaireID = $dsQuestion->getValue(DBEQuestion::questionnaireID);
+
+        if (!$this->buQuestionnaire->deleteQuestion($questionID)) {
+            $this->displayFatalError('Cannot delete this question, it has already been answered at least once');
+            exit;
+        }
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'          => 'displayQuestionList',
+                    'questionnaireID' => $questionnaireID
+                )
+            );
+        header('Location: ' . $urlNext);
+        exit;
+    }
+
+    /**
+     * Update details
+     * @access private
+     * @throws Exception
+     */
+    function updateQuestion()
+    {
+        $this->setMethodName('updateQuestion');
+
+        $questionArray = $this->getParam('question');
+        if (isset($questionArray[1]['multiOptions'])) {
+            $questionArray[1]['multiOptions'] = json_decode($questionArray[1]['multiOptions']);
+        }
+        $this->formError = (!$this->dsQuestion->populateFromArray($this->getParam('question')));
+        if ($this->formError) {
+            if ($this->dsQuestion->getValue(DBEQuestion::questionID)) {          // attempt to insert
+                $this->setAction('editQuestion');
+            } else {
+                $this->setAction('createQuestion');
+            }
+            $this->edit();
+            exit;
+        }
+
+        $this->buQuestionnaire->updateQuestion($this->dsQuestion);
+
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'questionnaireID' => $this->dsQuestion->getValue(DBEQuestion::questionnaireID),
+                    'action'          => 'displayQuestionList'
+                )
+            );
+        header('Location: ' . $urlNext);
     }
 
     /**
@@ -274,37 +406,7 @@ class CTQuestionnaire extends CTCNC
             true
         );
         $this->parsePage();
-    }// end function editFurther Action()
-
-    /**
-     * Update call Further Action details
-     * @access private
-     * @throws Exception
-     */
-    function update()
-    {
-        $this->setMethodName('update');
-        $this->formError = (!$this->dsQuestionnaire->populateFromArray($this->getParam('questionnaire')));
-        if ($this->formError) {
-            $this->setAction('create');
-            if ($this->dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID)) {
-                $this->setAction('edit');
-            }
-            $this->edit();
-            exit;
-        }
-        $this->buQuestionnaire->updateQuestionnaire($this->dsQuestionnaire);
-
-
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'questionnaireID' => $this->dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID),
-                'action'          => 'view'
-            )
-        );
-        header('Location: ' . $urlNext);
-    }
+    }// end function editQuestion Action()
 
     /**
      * Display list of questions
@@ -419,223 +521,129 @@ class CTQuestionnaire extends CTCNC
             true
         );
         $this->parsePage();
-    }
-
-    /**
-     * Edit/Add Further Action
-     * @access private
-     * @throws Exception
-     */
-    function editQuestion()
-    {
-        $this->setMethodName('editQuestion');
-        $dsQuestion = &$this->dsQuestion; // ref to class var
-
-        if (!$this->getFormError()) {
-            if ($this->getAction() == 'editQuestion') {
-                $this->buQuestionnaire->getQuestionByID(
-                    $this->getParam('questionID'),
-                    $dsQuestion
-                );
-                $questionID = $this->getParam('questionID');
-            } else {                                  // creating new
-                $dsQuestion->initialise();
-                $dsQuestion->setValue(
-                    DBEQuestion::questionID,
-                    '0'
-                );
-                $dsQuestion->setValue(
-                    DBEQuestion::questionnaireID,
-                    $this->getParam('questionnaireID')
-                );
-                $questionID = '0';
-            }
-        } else {                                    // form validation error
-            $dsQuestion->initialise();
-            $dsQuestion->fetchNext();
-            $questionID = $dsQuestion->getValue(DBEQuestion::questionID);
-        }
-        $urlDelete = null;
-        $txtDelete = null;
-        if (
-            $this->getAction() == 'editQuestion' && $this->buQuestionnaire->canDelete($this->getParam('questionID'))
-        ) {
-            $urlDelete =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'     => 'deleteQuestion',
-                        'questionID' => $questionID
-                    )
-                );
-            $txtDelete = 'Delete';
-        }
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => 'updateQuestion',
-                    'questionID' => $questionID
-                )
-            );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'          => 'displayQuestionList',
-                    'questionnaireID' => $dsQuestion->getValue(DBEQuestion::questionnaireID)
-                )
-            );
-        $this->setPageTitle('Edit Question');
-        $this->setTemplateFiles(
-            array('QuestionEdit' => 'QuestionEdit.inc')
-        );
-        $this->template->set_var(
-            array(
-                'questionID'      => $questionID,
-                'questionnaireID' => $dsQuestion->getValue(DBEQuestion::questionnaireID),
-
-                'description'         => Controller::htmlInputText($dsQuestion->getValue(DBEQuestion::description)),
-                'descriptionMessage'  => Controller::htmlDisplayText($dsQuestion->getMessage(DBEQuestion::description)),
-                'activeFlagChecked'   => $dsQuestion->getValue(DBEQuestion::activeFlag) == 'Y' ? 'CHECKED' : null,
-                'activeFlagMessage'   => Controller::htmlDisplayText($dsQuestion->getMessage(DBEQuestion::activeFlag)),
-                'requiredFlagChecked' => $dsQuestion->getValue(DBEQuestion::requiredFlag) == 'Y' ? 'CHECKED' : null,
-                'requiredFlagMessage' => Controller::htmlDisplayText(
-                    $dsQuestion->getMessage(DBEQuestion::requiredFlag)
-                ),
-                'weight'              => Controller::htmlInputText($dsQuestion->getValue(DBEQuestion::weight)),
-                'weightMessage'       => Controller::htmlDisplayText($dsQuestion->getMessage(DBEQuestion::weight)),
-                'urlUpdate'           => $urlUpdate,
-                'urlDelete'           => $urlDelete,
-                'txtDelete'           => $txtDelete,
-                'urlDisplayList'      => $urlDisplayList
-            )
-        );
-        /*
-        Answer types
-        */
-        $this->answerTypeDropdown($dsQuestion->getValue(DBEQuestion::answerTypeID));
-
-        $this->template->parse(
-            'CONTENTS',
-            'QuestionEdit',
-            true
-        );
-        $this->parsePage();
-    }// end function editQuestion Action()
-
-    function answerTypeDropdown(
-        $answerTypeID,
-        $templateName = 'QuestionEdit',
-        $blockName = 'answerTypeBlock'
-    )
-    {
-        // Display list of answerTypes that are current at given activity date
-        $this->buQuestionnaire->dbeAnswerType->getRows();
-
-        $this->template->set_block(
-            $templateName,
-            $blockName,
-            'answerTypes'
-        );
-
-        while ($this->buQuestionnaire->dbeAnswerType->fetchNext()) {
-
-            $answerTypeSelected = ($this->buQuestionnaire->dbeAnswerType->getValue(
-                    DBEAnswerType::answerTypeID
-                ) == $answerTypeID) ? CT_SELECTED : null;
-
-            $this->template->set_var(
-                array(
-                    'answerTypeID'          => $this->buQuestionnaire->dbeAnswerType->getValue(
-                        DBEAnswerType::answerTypeID
-                    ),
-                    'answerTypeDescription' => $this->buQuestionnaire->dbeAnswerType->getValue(
-                        DBEAnswerType::description
-                    ),
-                    'answerTypeSelected'    => $answerTypeSelected
-                )
-            );
-
-            $this->template->parse(
-                'answerTypes',
-                $blockName,
-                true
-            );
-
-
-        }
-
     }// end questionTypeDropdown
 
     /**
-     * Update details
+     * Update call Further Action details
      * @access private
      * @throws Exception
      */
-    function updateQuestion()
+    function update()
     {
-        $this->setMethodName('updateQuestion');
-        $this->formError = (!$this->dsQuestion->populateFromArray($this->getParam('question')));
+        $this->setMethodName('update');
+        $this->formError = (!$this->dsQuestionnaire->populateFromArray($this->getParam('questionnaire')));
         if ($this->formError) {
-            if ($this->dsQuestion->getValue(DBEQuestion::questionID)) {          // attempt to insert
-                $this->setAction('editQuestion');
-            } else {
-                $this->setAction('createQuestion');
+            $this->setAction('create');
+            if ($this->dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID)) {
+                $this->setAction('edit');
             }
             $this->edit();
             exit;
         }
+        $this->buQuestionnaire->updateQuestionnaire($this->dsQuestionnaire);
 
-        $this->buQuestionnaire->updateQuestion($this->dsQuestion);
 
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'questionnaireID' => $this->dsQuestion->getValue(DBEQuestion::questionnaireID),
-                    'action'          => 'displayQuestionList'
-                )
-            );
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'questionnaireID' => $this->dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID),
+                'action'          => 'view'
+            )
+        );
         header('Location: ' . $urlNext);
     }
 
     /**
-     * Delete Question
-     *
+     * Display list of questionnaires
      * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
      * @throws Exception
      */
-    function deleteQuestion()
+    function displayList()
     {
-        $this->setMethodName('deleteQuestion');
-        // we have to know from what questionnaire we have to delete the question so we can redirect the user back to
-        // the correct list of questions
+        $this->setMethodName('displayList');
+        $this->setPageTitle('Questionnaires');
+        $this->setTemplateFiles(
+            array('QuestionnaireList' => 'QuestionnaireList.inc')
+        );
+        $dsQuestionnaire = new DataSet($this);
+        $this->buQuestionnaire->getAll($dsQuestionnaire);
 
-        $questionID = $this->getParam('questionID');
-
-        if (!$questionID) {
-            return $this->displayFatalError('Question ID not given');
-        }
-        $dsQuestion = new DataSet($this);
-        $this->buQuestionnaire->getQuestionByID($questionID, $dsQuestion);
-
-        $questionnaireID = $dsQuestion->getValue(DBEQuestion::questionnaireID);
-
-        if (!$this->buQuestionnaire->deleteQuestion($questionID)) {
-            $this->displayFatalError('Cannot delete this question, it has already been answered at least once');
-            exit;
-        }
-        $urlNext =
+        $urlCreate =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
-                    'action'          => 'displayQuestionList',
-                    'questionnaireID' => $questionnaireID
+                    'action' => 'create'
                 )
             );
-        header('Location: ' . $urlNext);
-        exit;
+
+        $this->template->set_var(
+            array('urlCreate' => $urlCreate)
+        );
+
+        if ($dsQuestionnaire->rowCount() > 0) {
+
+            $this->template->set_block(
+                'QuestionnaireList',
+                'QuestionnaireBlock',
+                'rows'
+            );
+
+            while ($dsQuestionnaire->fetchNext()) {
+
+                $questionnaireID = $dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID);
+
+                $urlDisplayQuestionList =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'          => 'displayQuestionList',
+                            'questionnaireID' => $questionnaireID
+                        )
+                    );
+                $urlView =
+                    Controller::buildLink(
+                        'https://cnc-ltd.co.uk/questionnaire/index.php',
+                        array(
+                            'questionnaireno' => $questionnaireID
+                        )
+                    );
+
+                $urlEdit =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'          => 'edit',
+                            'questionnaireID' => $questionnaireID
+                        )
+                    );
+                $txtEdit = '[edit]';
+
+                $this->template->set_var(
+                    array(
+                        'questionnaireID'        => $questionnaireID,
+                        'description'            => Controller::htmlDisplayText(
+                            $dsQuestionnaire->getValue(DBEQuestionnaire::description)
+                        ),
+                        'urlEdit'                => $urlEdit,
+                        'urlDisplayQuestionList' => $urlDisplayQuestionList,
+                        'txtEdit'                => $txtEdit,
+                        'urlView'                => $urlView
+                    )
+                );
+
+                $this->template->parse(
+                    'rows',
+                    'QuestionnaireBlock',
+                    true
+                );
+
+            }//while $dsQuestionnaire->fetchNext()
+        }
+        $this->template->parse(
+            'CONTENTS',
+            'QuestionnaireList',
+            true
+        );
+        $this->parsePage();
     }
 }
