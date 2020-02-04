@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v3.10.3] - 2020-02-03
+## [v3.10.3] - 2020-02-04
 ### Added 
 - Add multiple choice questionnaire question
 
