@@ -535,12 +535,11 @@ WHERE caa_endtime
                     "expenses"  => $expenses,
                     "overtimes" => $overtimes
                 ];
-
                 $this->template->setVar(
                     'CONTENTS',
                     $twig->render('expenseDashboard/runningTotals.html.twig', $context)
                 );
-
+                $this->parsePage();
                 break;
             default:
                 $this->displayReport();
@@ -902,13 +901,18 @@ WHERE caa_endtime
         $statement = $db->preparedQuery($useOvertimeQuery, [["type" => "i", "value" => $this->userID]]);
         $overtimeSummary = $statement->fetch_assoc();
 
+        $isApprover = $this->dbeUser->getValue(DBEUser::isExpenseApprover) || $this->dbeUser->getValue(
+                DBEUser::globalExpenseApprover
+            );
+
         $this->template->setVar(
             [
                 'approvedExpenseValue'  => $expenseSummary['approved'],
                 'pendingExpenseValue'   => $expenseSummary['pending'],
                 'approvedOvertimeValue' => $overtimeSummary['approved'],
                 'pendingOvertimeValue'  => $overtimeSummary['pending'],
-            ]
+                'runningTotalsLink'     => $isApprover ? '<a href="?action=runningTotals" target="_blank">Running Totals</a>' : null,
+                ]
         );
 
         $this->template->parse(

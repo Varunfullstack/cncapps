@@ -681,7 +681,12 @@ ORDER BY cns_name,
     {
         /** @var \Twig\Environment $twig */
         global $twig;
-        $body = $twig->render('expensesOvertimeIndividualEmail.html.twig', $engineersDatum);
+        $body = $twig->render('expensesOvertimeIndividualEmail.html.twig',
+                              [
+                                  "expenses"           => $engineersDatum['expenses'],
+                                  "overtimeActivities" => $engineersDatum['overtimeActivities']
+                              ]
+        );
 
         $buMail = new BUMail($this);
         $fromEmail = CONFIG_SALES_EMAIL;

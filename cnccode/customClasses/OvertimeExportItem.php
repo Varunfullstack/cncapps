@@ -17,4 +17,6 @@ class OvertimeExportItem
     public $activityDate;
     public $allowWeekDayOvertime;
     public $weekendOvertime;
+    public $activityStartTime;
+    public $activityEndTime;
 }

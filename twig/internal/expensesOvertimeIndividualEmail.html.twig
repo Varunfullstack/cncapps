@@ -51,7 +51,7 @@
         <br>
         <br>
     {% endif %}
-    {% if overtimes|length > 0 %}
+    {% if overtimeActivities|length > 0 %}
         <table>
             <thead>
             <tr>
@@ -74,7 +74,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for overtime in overtimes %}
+            {% for overtime in overtimeActivities %}
                 <tr>
                     <td>{{ overtime.activityDate }}</td>
                     <td>{{ overtime.activityStartTime }}</td>
