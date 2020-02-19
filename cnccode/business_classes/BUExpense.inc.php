@@ -259,6 +259,8 @@ class BUExpense extends Business
                     "expenseVATTotal"    => 0,
                     "expenseGrossTotal"  => 0,
                     "overtimeActivities" => [],
+                    "summaryGrossTotal"  => 0,
+                    "payeTotal"          => 0,
                     'overtimeTotal'      => 0,
                     'employeeNumber'     => null,
                     'userName'           => null,
@@ -275,6 +277,11 @@ class BUExpense extends Business
             $engineersData[$expenseExportItem->engineerName]['expenseNetTotal'] += $expenseExportItem->netValue;
             $engineersData[$expenseExportItem->engineerName]['expenseVATTotal'] += $expenseExportItem->VATValue;
             $engineersData[$expenseExportItem->engineerName]['expenseGrossTotal'] += $expenseExportItem->grossValue;
+            if ($expenseExportItem->payeTaxable) {
+                $engineersData[$expenseExportItem->engineerName]['payeTotal'] += $expenseExportItem->grossValue;
+            } else {
+                $engineersData[$expenseExportItem->engineerName]['summaryGrossTotal'] += $expenseExportItem->grossValue;
+            }
             $engineersData[$expenseExportItem->engineerName]['employeeNumber'] = $expenseExportItem->employeeNumber;
         }
         $overtimeWeekdayActivities = [];
@@ -301,6 +308,8 @@ class BUExpense extends Business
                     "expenseNetTotal"    => 0,
                     "expenseVATTotal"    => 0,
                     "expenseGrossTotal"  => 0,
+                    "summaryGrossTotal"  => 0,
+                    "payeTotal"          => 0,
                     "overtimeActivities" => [],
                     'overtimeTotal'      => 0,
                     'employeeNumber'     => null,
@@ -417,9 +426,9 @@ class BUExpense extends Business
                 $engineersDatum['employeeNumber'],
                 $engineersDatum['firstName'],
                 $engineersDatum['lastName'],
-                $engineersDatum['expenseGrossTotal'],
+                $engineersDatum['summaryGrossTotal'],
                 $engineersDatum['overtimeTotal'],
-                ''
+                $engineersDatum['payeTotal'],
             ];
         }
 
@@ -472,6 +481,7 @@ class BUExpense extends Business
   expense.exp_vat_flag = 'Y' as VATIncluded,
   consultant.cns_name as engineerName,
   consultant.cns_logname as engineerUserName,
+               expensetype.taxable as payeTaxable,
   `cns_employee_no` as employeeNumber,
                consultant.firstName as engineerFirstName,
                consultant.lastName as engineerLastName,

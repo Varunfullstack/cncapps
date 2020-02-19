@@ -85,6 +85,22 @@
             })
     }
 
+    function deleteOvertime(expenseId) {
+        if (!confirm('Are you sure you want to delete this overtime?')) {
+            return;
+        }
+        fetch("?action=deleteOvertime&id=" + expenseId)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    return alert(data.error);
+                }
+                overtimeTable.ajax.reload();
+            })
+    }
+
     $(function () {
         expensesTable = $('#expensesTable').DataTable({
             dom: 'lfrtip',
@@ -200,6 +216,9 @@
                         return data.toFixed(2);
                     }
                 },
+                {data: 'startTime', name: 'startTime'},
+                {data: 'endTime', name: 'endTime'},
+                {data: 'activityType', name: 'activityType'},
                 {data: "projectDescription", name: "projectDescription"},
                 {
                     data: "approvedDate", name: "approvedDate", render: (data) => {
@@ -221,7 +240,7 @@
                         }
 
                         if (row.status === 'Pending') {
-                            return '<button onclick="approveOvertime(' + row.activityId + ')" data-expense-id="row.id">Approve</button><button onclick="denyOvertime(' + row.activityId + ')">Deny</button>';
+                            return '<button onclick="approveOvertime(' + row.activityId + ')" data-expense-id="row.id">Approve</button><button onclick="denyOvertime(' + row.activityId + ')">Deny</button><button onclick="deleteOvertime(' + row.activityId + ')">Delete</button>';
                         }
                         return "";
                     }
@@ -307,6 +326,11 @@
         <th>
             Overtime Duration
         </th>
+        <th>
+            Start Time
+        </th>
+        <th>End Time</th>
+        <th>Activity Type</th>
         <th>
             Project
         </th>

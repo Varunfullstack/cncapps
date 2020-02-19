@@ -1,0 +1,51 @@
+<h1>Expenses</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Approved</th>
+        <th>Pending</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for expense in expenses %}
+        <tr>
+            <td>
+                {{ expense.staffName }}
+            </td>
+            <td>
+                {{ expense.approvedValue }}
+            </td>
+            <td>
+                {{ expense.pendingValue }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<br>
+<h1>Overtime</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Approved</th>
+        <th>Pending</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for overtime in overtimes %}
+        <tr>
+            <td>
+                {{ overtime.staffName }}
+            </td>
+            <td>
+                {{ overtime.approvedValue }}
+            </td>
+            <td>
+                {{ overtime.pendingValue }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

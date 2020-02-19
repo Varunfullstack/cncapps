@@ -22,4 +22,5 @@ class ExpenseExportItem
     public $employeeNumber;
     public $engineerFirstName;
     public $engineerLastName;
+    public $payeTaxable;
 }
