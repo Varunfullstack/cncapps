@@ -41,4 +41,23 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue667-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="itemtype" columnName="showInCustomerReview"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="itemtype">
+            <column name="showInCustomerReview" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue667-5">
+        <sql>
+            update itemtype
+            set showInCustomerReview = 1
+            where ity_itemtypeno not in (29, 38, 23, 8, 10, 34, 39, 27, 9) and active = 1
+        </sql>
+    </changeSet>
 </databaseChangeLog>

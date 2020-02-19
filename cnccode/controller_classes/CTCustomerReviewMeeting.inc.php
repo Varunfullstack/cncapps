@@ -391,8 +391,9 @@ class CTCustomerReviewMeeting extends CTCNC
                             $itemClass = 'externalItem';
                             $salePrice = null;
                             if (!is_null($item['customerItemID'])) {
+                                $formatter = new NumberFormatter('en_GB', NumberFormatter::CURRENCY);
                                 $itemClass = null;
-                                $salePrice = Controller::formatNumber($item['salePrice']);
+                                $salePrice = $formatter->formatCurrency($item['salePrice'], 'GBP');
                                 $totalSalePrice += $item['salePrice'];
                             }
 

@@ -63,6 +63,10 @@
         $('.reportSection table').each(function () {
             var rowCount = $('tbody tr', $(this)).length;
 
+            if (this.id === 'servicesTable') {
+                return;
+            }
+
             const createdElements = [];
 
             if (rowCount > 50) {
