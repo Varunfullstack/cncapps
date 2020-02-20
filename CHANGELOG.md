@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 755 - Sickness total notification
+
 ## [v3.10.3] - 2020-02-04
 ### Added 
 - Add multiple choice questionnaire question

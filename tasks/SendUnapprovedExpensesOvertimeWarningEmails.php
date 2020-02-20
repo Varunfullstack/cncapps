@@ -136,6 +136,14 @@ foreach ($approvers as $approver) {
 
 }
 
+// SICKNESS...
+$dbeUser = new DBEUser($thing);
+$dbeUser->getSickReportUsers();
+while ($dbeUser->fetchNext()){
+
+}
+
+
 
 function getPendingToApproveExpenseItems()
 {
