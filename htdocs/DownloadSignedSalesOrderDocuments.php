@@ -2,6 +2,7 @@
 
 
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBEOrdhead.inc.php");
 require_once($cfg["path_dbe"] . "/DBEQuotation.inc.php");
 require_once($cfg["path_dbe"] . "/DBESignableEnvelope.inc.php");
@@ -32,7 +33,10 @@ while ($dbeOrdHead->fetchNext()) {
         $logger->info('Processing quote ' . $dbeQuote->getValue(DBEQuotation::quotationID));
         $dbeSignableEnvelope = new DBESignableEnvelope($thing);
         $dbeSignableEnvelope->getRow($dbeQuote->getValue(DBEQuotation::signableEnvelopeID));
-        if ($dbeSignableEnvelope->getValue(DBESignableEnvelope::status) === "signed-envelope") {
+        if (in_array(
+            $dbeSignableEnvelope->getValue(DBESignableEnvelope::status),
+            ["signed-envelope", "signed-envelope-complete"]
+        )) {
             // we have a signed document, so we need to download it
             $logger->info('Processing envelope ' . $dbeSignableEnvelope->getValue(DBESignableEnvelope::id));
             $pdfData = \CNCLTD\Utilities::getRemoteData(
@@ -58,6 +62,55 @@ while ($dbeOrdHead->fetchNext()) {
             );
 
             $dbeSalesDocument->insertRow();
+
+            //we have to send a notification to the contact that created the document
+            $userToNotify = $dbeQuote->getValue(DBEQuotation::userID);
+            $dbeUser = new DBEUser($thing);
+            $dbeUser->getRow($userToNotify);
+            $buMail = new BUMail($thing);
+            $toEmail = $dbeUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
+
+            $customerID = $dbeOrdHead->getValue(DBEOrdhead::customerID);
+            $dbeCustomer = new DBECustomer($thing);
+            $dbeCustomer->getRow($customerID);
+            $subject = "Quote {$dbeQuote->getValue(DBEQuotation::ordheadID)} for {$dbeCustomer->getValue(DBECustomer::name)} has been signed";
+
+            $hdrs = array(
+                'From'         => CONFIG_SUPPORT_EMAIL,
+                'To'           => $toEmail,
+                'Subject'      => $subject,
+                'Date'         => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            global $twig;
+            $body = $twig->render(
+                'quotationSignedEmail.html.twig',
+                [
+                    "url"     => SITE_URL . "/SalesOrder.php?action=displaySalesOrder&ordheadID={$dbeQuote->getValue(DBEQuotation::ordheadID)}",
+                    "orderId" => $dbeQuote->getValue(DBEQuotation::ordheadID)
+                ]
+            );
+            $buMail->mime->setHTMLBody($body);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
+            );
+
+            $thisBody = $buMail->mime->get($mime_params);
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->putInQueue(
+                $senderEmail,
+                $toEmail,
+                $hdrs,
+                $thisBody
+            );
+
             $counter++;
         }
 
