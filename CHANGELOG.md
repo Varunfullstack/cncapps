@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 753 - Project team logging target not showing on user graph
+
 ## [v3.10.3] - 2020-02-04
 ### Added 
 - Add multiple choice questionnaire question
