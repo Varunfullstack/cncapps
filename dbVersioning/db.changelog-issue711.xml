@@ -12,6 +12,9 @@
             </not>
         </preConditions>
         <createTable tableName="callJournal">
+            <column name="id" type="bigint(11)" autoIncrement="true" >
+                <constraints primaryKey="true" primaryKeyName="PRIMARY" nullable="false"/>
+            </column>
             <column name="callType" type="varchar(12)">
                 <constraints nullable="false"/>
             </column>
