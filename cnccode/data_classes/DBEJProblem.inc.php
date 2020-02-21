@@ -705,6 +705,9 @@ class DBEJProblem extends DBEProblem
             case 'critical':
                 $sql .= " and  " . $this->getDBColumnName(self::criticalFlag) . " = 'Y' order by hoursRemaining desc ";
                 break;
+            case 'currentOpenSRs':
+                $sql .= " and last.caa_callacttypeno is null order by hoursRemaining desc";
+                break;
         }
 
         $sql .= ' limit ' . $limit;
