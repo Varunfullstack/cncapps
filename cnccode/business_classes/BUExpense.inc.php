@@ -17,8 +17,11 @@ require_once($cfg["path_dbe"] . "/DBECallActivity.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg["path_dbe"] . "/DBEExpenseType.inc.php");
 require_once($cfg["path_dbe"] . "/DBEUser.inc.php");
+require_once($cfg["path_dbe"] . "/DBECallActType.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg["path_func"] . "/activity.inc.php");
+
+
 
 class BUExpense extends Business
 {
