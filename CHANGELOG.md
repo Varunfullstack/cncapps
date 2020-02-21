@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 758 - Customer Renewal Report Total fields formatting issue
+
 ## [v3.10.3] - 2020-02-04
 ### Added 
 - Add multiple choice questionnaire question
