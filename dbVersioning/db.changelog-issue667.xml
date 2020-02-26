@@ -57,7 +57,9 @@
         <sql>
             update itemtype
             set showInCustomerReview = 1
-            where ity_itemtypeno not in (29, 38, 23, 8, 10, 34, 39, 27, 9) and active = 1
+            where ity_itemtypeno not in
+                  (2, 4, 5, 7, 8, 9, 10, 12, 16, 23, 24, 25, 26, 27, 29, 34, 35, 37, 38, 39, 41, 42, 43)
+              and active = 1;
         </sql>
     </changeSet>
 </databaseChangeLog>
