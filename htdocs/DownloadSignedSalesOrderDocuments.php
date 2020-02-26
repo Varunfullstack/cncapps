@@ -7,6 +7,9 @@ require_once($cfg["path_dbe"] . "/DBEOrdhead.inc.php");
 require_once($cfg["path_dbe"] . "/DBEQuotation.inc.php");
 require_once($cfg["path_dbe"] . "/DBESignableEnvelope.inc.php");
 require_once($cfg["path_dbe"] . "/DBESalesOrderDocument.inc.php");
+require_once($cfg['path_dbe'] . '/DBEUser.inc.php');
+require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
+require_once($cfg['path_bu'] . '/BUMail.inc.php');
 $logName = 'DownloadSignedSalesOrderDocuments';
 $logger = new \CNCLTD\LoggerCLI($logName);
 global $db;
@@ -23,6 +26,7 @@ $dbeOrdHead = new DBEOrdhead($thing);
 $dbeOrdHead->getSignableNotProcessedOrders();
 
 while ($dbeOrdHead->fetchNext()) {
+    echo 'here';
     // we have to check if there are any quotations where there's a signed document
     $logger->info('Processing order ' . $dbeOrdHead->getValue(DBEOrdhead::ordheadID));
 
@@ -64,6 +68,7 @@ while ($dbeOrdHead->fetchNext()) {
             $dbeSalesDocument->insertRow();
 
             //we have to send a notification to the contact that created the document
+            $senderEmail = CONFIG_SUPPORT_EMAIL;
             $userToNotify = $dbeQuote->getValue(DBEQuotation::userID);
             $dbeUser = new DBEUser($thing);
             $dbeUser->getRow($userToNotify);
@@ -76,7 +81,7 @@ while ($dbeOrdHead->fetchNext()) {
             $subject = "Quote {$dbeQuote->getValue(DBEQuotation::ordheadID)} for {$dbeCustomer->getValue(DBECustomer::name)} has been signed";
 
             $hdrs = array(
-                'From'         => CONFIG_SUPPORT_EMAIL,
+                'From'         => $senderEmail,
                 'To'           => $toEmail,
                 'Subject'      => $subject,
                 'Date'         => date("r"),
