@@ -251,9 +251,8 @@ WHERE
     )
   )
   AND (
-    caa_endtime > hed_pro_endtime
-   OR caa_starttime < hed_pro_starttime
-   OR (consultant.`cns_helpdesk_flag` = \'Y\' AND  (caa_endtime > `hed_hd_endtime` OR caa_starttime < hed_hd_starttime))
+    caa_endtime > overtimeEndTime
+   OR caa_starttime < overtimeStartTime
    OR 
     DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
   )
@@ -455,15 +454,8 @@ WHERE caa_endtime
     )
   )
   AND (
-    caa_endtime > hed_pro_endtime
-    OR caa_starttime < hed_pro_starttime
-    OR (
-      consultant.`cns_helpdesk_flag` = 'Y'
-      AND (
-        caa_endtime > `hed_hd_endtime`
-        OR caa_starttime < hed_hd_starttime
-      )
-    )
+    caa_endtime > overtimeEndTime
+    OR caa_starttime < overtimeStartTime
     OR DATE_FORMAT(caa_date, '%w') IN (0, 6)
   )
   AND getOvertime (caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
@@ -886,13 +878,9 @@ WHERE caa_endtime
         )
     )
   AND (
-        caa_endtime > hed_pro_endtime
-        OR caa_starttime < hed_pro_starttime
-        OR
-        (consultant.`cns_helpdesk_flag` = \'Y\' AND
-         (caa_endtime > `hed_hd_endtime` OR caa_starttime < hed_hd_starttime))
-        OR
-        DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
+        caa_endtime > overtimeEndTime
+        OR caa_starttime < overtimeStartTime
+        OR DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
     )
   AND getOvertime(caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
   AND caa_endtime <> caa_starttime

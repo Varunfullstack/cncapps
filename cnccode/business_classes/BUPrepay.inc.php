@@ -991,10 +991,8 @@ is currently a balance of ';
   time_to_sec(caa_endtime) as activityEndTimeSeconds,
   consultant.cns_name as staffName,
   consultant.cns_helpdesk_flag = 'Y' as helpdeskUser,
-  time_to_sec(hed_hd_starttime) as helpdeskStartTimeSeconds,
-  time_to_sec(hed_hd_endtime) as helpdeskEndTimeSeconds,
-  time_to_sec(hed_pro_starttime) as projectStartTimeSeconds,
-  time_to_sec(hed_pro_endtime) as projectEndTimeSeconds,
+  time_to_sec(overtimeStartTime) as overtimeStartSeconds,
+  time_to_sec(overtimeStartTime) as overtimeEndSeconds,
   consultant.`cns_consno` AS userId,
   project.`description` AS projectDescription,
   project.`projectID` AS projectId,
@@ -1048,10 +1046,8 @@ WHERE
     )
   )
   AND (
-    caa_endtime > hed_pro_endtime
-   OR caa_starttime < hed_pro_starttime
-   OR caa_endtime > `hed_hd_endtime`
-   OR caa_starttime < hed_hd_starttime
+    caa_endtime > overtimeEndTime
+   OR caa_starttime < overtimeStartTime
    OR 
     DATE_FORMAT(caa_date, '%w') IN (0, 6)
   )

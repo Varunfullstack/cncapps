@@ -564,8 +564,7 @@ ORDER BY cns_name,
     AND caa_ot_exp_flag = 'N'
     AND (
         DATE_FORMAT(caa_date, '%w')IN(0,6) or
-    caa_endtime > hed_pro_endtime  OR TIME(caa_starttime) < hed_pro_starttime
-    OR caa_endtime > hed_hd_endtime OR TIME(caa_starttime) < hed_hd_starttime 
+    caa_endtime > overtimeEndTime or caa_starttime < overtimeStartTime 
         )
     AND  caa_endtime <> caa_starttime
     AND callacttype.engineerOvertimeFlag = 'Y'
@@ -592,15 +591,12 @@ ORDER BY cns_name,
         $dsHeader = new DataSet($this);
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
-        $projectStartTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::projectStartTime));
-        $projectEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::projectEndTime));
-        $helpdeskStartTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::helpdeskStartTime));
-        $helpdeskEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::helpdeskEndTime));
+        $officeStartTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::overtimeStartTime));
+        $officeEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::overtimeEndTime));
         $shiftStartTime = common_convertHHMMToDecimal($dbejCallactivity->getValue(DBEJCallActivity::startTime));
         $shiftEndTime = common_convertHHMMToDecimal($dbejCallactivity->getValue(DBEJCallActivity::endTime));
         $affectedUser = new DBEUser($this);
         $affectedUser->getRow($dbejCallactivity->getValue(DBEJCallActivity::userID));
-        $isHelpdeskUser = $affectedUser->getValue(DBEUser::helpdeskFlag) == 'Y';
         $isWeekOvertimeAllowed = $affectedUser->getValue(DBEUser::weekdayOvertimeFlag) == 'Y';
         $weekDay = date('w', strtotime($dbejCallactivity->getValue(DBEJCallActivity::date)));
 
@@ -622,33 +618,6 @@ ORDER BY cns_name,
             return 0;
         }
 
-        /*
-        If this is a helpdesk staff then evening overtime is only allowed on activities that start after office end time
-        */
-        // overtime is hours before and after this engineer's office hours
-        if ($isHelpdeskUser) {
-            $officeStartTime = $helpdeskStartTime;
-            $officeEndTime = $helpdeskEndTime;
-            $overtime = 0;
-            if ($shiftStartTime < $officeStartTime) {
-                if ($shiftEndTime < $officeStartTime) {
-                    $overtime = $shiftEndTime - $shiftStartTime;
-                } else {
-                    $overtime = $officeStartTime - $shiftStartTime;
-                }
-            }
-            if ($shiftEndTime > $officeEndTime) {
-                if ($shiftStartTime >= $officeEndTime) {
-                    $overtime += $shiftEndTime - $shiftStartTime;
-                }
-            }
-            return $overtime;
-        }
-        /*
-        non-helpdesk engineers get any time spent after office end hours irrespective of start time
-        */
-        $officeStartTime = $projectStartTime;
-        $officeEndTime = $projectEndTime;
         $overtime = 0;
         if ($shiftStartTime < $officeStartTime) {
             if ($shiftEndTime < $officeStartTime) {

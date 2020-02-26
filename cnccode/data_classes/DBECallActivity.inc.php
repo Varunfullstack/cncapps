@@ -411,10 +411,8 @@ FROM
     )
   )
   AND (
-    caa_endtime > hed_pro_endtime
-    OR caa_starttime < hed_pro_starttime
-    OR caa_endtime > `hed_hd_endtime`
-    OR caa_starttime < hed_hd_starttime
+    caa_endtime > overtimeEndTime
+    OR caa_starttime < overtimeStartTime
     OR DATE_FORMAT(caa_date, '%w') IN (0, 6)
   )
   AND (caa_endtime <> caa_starttime)
