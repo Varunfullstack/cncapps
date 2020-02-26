@@ -119,17 +119,12 @@
         });
     }
 
-    function handleAppendix() {
-        $('#reportContent').append($('#reportAppendix').html());
-    }
-
     $(function () {
         $('#create-pdf').click(function () {
             $(this).attr('disabled', true);
             //loop through sections looking for large tables
             updateTables();
             handleEditableText();
-            handleAppendix();
             var sections = 1;
             $('h2').each(function () {
                 $(this).prepend(sections + '. ');
@@ -138,7 +133,7 @@
 
             var height = 0;
             //1305 px is page height including margins
-            $('.reportSection').each(function () {
+            $('.reportSection').not('.noNewPage').each(function () {
                 if ((height + $(this).outerHeight()) > 1290) {
                     //if adding the next section would cause it to spill onto a new page add in a page break and reset the height count
                     $(this).addClass('newPage');
@@ -423,7 +418,6 @@
     <textarea id="editableText"
               name="editableText"
     >{editableText}</textarea>
-    <div id="reportAppendix">{appendixText}</div>
     <input type="button"
            name="create-pdf"
            id="create-pdf"

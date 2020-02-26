@@ -6,6 +6,11 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use Twig\Environment;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
+
 global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerReviewMeeting.inc.php');
@@ -151,7 +156,7 @@ class CTCustomerReviewMeeting extends CTCNC
         $graphData = null;
         $editableText = null;
         $nonEditableText = null;
-        $appendixText = null;
+        $diskSpaceReport = null;
         if (isset($_REQUEST ['searchForm'])) {
 
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
@@ -270,11 +275,6 @@ class CTCustomerReviewMeeting extends CTCNC
                     )
                 );
 
-                $results = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
-                    $customerId,
-                    $startDate,
-                    $endDate
-                );
                 $historicEndDate = new DateTime();
                 $historicStartDate = (clone $historicEndDate)->sub(new DateInterval('P3Y'));
                 if (isset($becameCustomerDate) && $becameCustomerDate > $historicStartDate) {
@@ -307,15 +307,12 @@ class CTCustomerReviewMeeting extends CTCNC
                     }
                 );
 
-                $lastItemTypeDescription = false;
-
                 $nonEditableTemplate->set_block(
                     'page',
                     'itemBlock',
                     'items'
                 );
 
-                $totalCostPrice = 0;
                 $totalSalePrice = 0;
                 $dbeItemType = new DBEItemType($this);
                 $dbeItemType->getCustomerReviewRows();
@@ -587,51 +584,11 @@ class CTCustomerReviewMeeting extends CTCNC
                         'rootCauseBlock',
                         true
                     );
-
                 }
-
-
-                $supportedUsersData = $this->getSupportedUsersLevelsCount(
-                    $buContact,
-                    $customerId,
-                    $dsCustomer->getValue(DBECustomer::name)
-                );
-
-
-                $textTemplate->set_var(
-                    'mainContacts',
-                    $supportedUsersData['data']
-                );
 
                 $buHeader = new BUHeader($this);
                 $dsHeader = new DataSet($this);
                 $buHeader->getHeader($dsHeader);
-                $textTemplate->set_var(
-                    'customerReviewMeetingText',
-                    $dsHeader->getValue(DBEHeader::customerReviewMeetingText)
-                );
-
-                $textTemplate->parse(
-                    'output',
-                    'page',
-                    true
-                );
-
-                $nonEditableTemplate->parse(
-                    'output',
-                    'page',
-                    true
-                );
-
-                $editableText = $textTemplate->get_var('output');
-
-                $nonEditableText = $nonEditableTemplate->get_var('output');
-                $graphData = $this->generateCharts(
-                    $results,
-                    $customerId,
-                    $historicData
-                );
-
 
                 $dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
                 $options = [
@@ -652,11 +609,11 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
                 );
                 $statement->execute([$customerId]);
 
-                $results = $statement->fetchAll(PDO::FETCH_ASSOC);
-                /** @var $twig \Twig\Environment */
+                $diskSpaceData = $statement->fetchAll(PDO::FETCH_ASSOC);
+                /** @var $twig Environment */
                 global $twig;
                 $twig->addFilter(
-                    new \Twig\TwigFilter(
+                    new TwigFilter(
                         'freePercentage',
                         function ($string) use ($dsHeader) {
                             $pctValue = $string * 100;
@@ -665,7 +622,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
                     )
                 );
                 $twig->addFilter(
-                    new \Twig\TwigFilter(
+                    new TwigFilter(
                         'MB2GB',
                         function ($string) {
                             if (!$string) {
@@ -676,7 +633,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
                     )
                 );
                 $twig->addFunction(
-                    new \Twig\TwigFunction(
+                    new TwigFunction(
                         'getFreeSpaceClass',
                         function ($item) use ($dsHeader) {
                             $threshold = $dsHeader->getValue(DBEHeader::otherDriveFreeSpaceWarningPercentageThreshold);
@@ -693,12 +650,57 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
                         ['is_safe' => ['all', "html"], 'pre_escaped' => 'html']
                     )
                 );
-                if (count($results)) {
-                    $appendixText = $twig->render(
+                $diskSpaceReport = '';
+                if (count($diskSpaceData)) {
+                    $diskSpaceReport = $twig->render(
                         'customerReviewMeeting/diskSpaceReportSection.html.twig',
-                        ["driveSpaceItems" => $results]
+                        ["driveSpaceItems" => $diskSpaceData]
                     );
                 }
+
+                $nonEditableTemplate->setVar('diskSpaceSection', $diskSpaceReport);
+
+                $nonEditableTemplate->parse(
+                    'output',
+                    'page',
+                    true
+                );
+
+                $nonEditableText = $nonEditableTemplate->get_var('output');
+                $results = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
+                    $customerId,
+                    $startDate,
+                    $endDate
+                );
+                $graphData = $this->generateCharts(
+                    $results,
+                    $customerId,
+                    $historicData
+                );
+
+                $supportedUsersData = $this->getSupportedUsersLevelsCount(
+                    $buContact,
+                    $customerId,
+                    $dsCustomer->getValue(DBECustomer::name)
+                );
+
+
+                $textTemplate->set_var(
+                    'mainContacts',
+                    $supportedUsersData['data']
+                );
+
+                $textTemplate->set_var(
+                    'customerReviewMeetingText',
+                    $dsHeader->getValue(DBEHeader::customerReviewMeetingText)
+                );
+
+                $textTemplate->parse(
+                    'output',
+                    'page',
+                    true
+                );
+                $editableText = $textTemplate->get_var('output');
             }
 
         } else {
@@ -779,7 +781,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
                 'urlCustomerPopup'      => $urlCustomerPopup,
                 'editableText'          => $editableText,
                 'nonEditableText'       => $nonEditableText,
-                'appendixText'          => $appendixText,
+                'diskSpaceReport'       => $diskSpaceReport,
                 'urlSubmit'             => $urlSubmit,
                 'urlGeneratePdf'        => $urlGeneratePdf,
             )
@@ -793,6 +795,10 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
         $this->parsePage();
     }
 
+    /**
+     * @param DBECustomer|DataSet $dsCustomer
+     * @return string
+     */
     private function getReviewMeetingFrequencyValue($dsCustomer)
     {
         $value = $dsCustomer->getValue(DBECustomer::reviewMeetingFrequencyMonths);
@@ -879,11 +885,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
         if (count($duplicates)) {
             // send email to sales@cnc-ltd.co.uk with the list of duplicates
             $buMail = new BUMail($this);
-
             $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-            $senderName = 'CNC Support Department';
-
             $toEmail = 'sales@cnc-ltd.co.uk';
 
             $template = new Template(
@@ -958,8 +960,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
                 $senderEmail,
                 $toEmail,
                 $hdrs,
-                $body,
-                true
+                $body
             );
 
         }
@@ -1309,6 +1310,138 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
         return "<h2>Review Meeting Frequency - " . $frequency . "</h2>";
     }
 
+    private function generateCharts($data,
+                                    $customerId,
+                                    $historicData
+    )
+    {
+
+        $serverCareIncidents = [
+            "title"   => "ServerCare Incidents",
+            "columns" => ["Dates", "ServerSR", "AvgResponse", "Changes"],
+            "data"    => []
+        ];
+
+        $serviceDesk = [
+            "title"   => "ServiceDesk/Pre-Pay Incidents",
+            "columns" => ["Dates", "UserSR", "AvgResponse", "Changes",],
+            "data"    => []
+        ];
+
+        $otherContracts = [
+            "title"   => "Other Contract Incidents",
+            "columns" => ["Dates", "OtherSR", "AvgResponse", "Changes",],
+            "data"    => []
+        ];
+
+        $totalSR = [
+            "title"   => "Total SRs",
+            "columns" => ["Dates", "P1-3", "P4",],
+            "data"    => []
+        ];
+
+        $historicTotalSR = [
+            "title"   => "Historic Total SRs",
+            "columns" => ["Dates", "P1-3", "P4"],
+            "data"    => []
+        ];
+
+        foreach ($historicData as $datum) {
+            $row = [
+                substr(
+                    $datum['monthName'],
+                    0,
+                    3
+                ) . "-" . $datum['year'],
+                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'],
+                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'],
+            ];
+
+            $historicTotalSR['data'][] = $row;
+        }
+
+
+        foreach ($data as $datum) {
+
+
+            $row = [
+                substr(
+                    $datum['monthName'],
+                    0,
+                    3
+                ) . "-" . $datum['year'],
+                $datum['serverCareCount1And3'],
+                number_format(
+                    $datum['serverCareHoursResponded'],
+                    1
+                ),
+                $datum['serverCareCount4']
+            ];
+
+            $serverCareIncidents['data'][] = $row;
+
+            $row = [
+                substr(
+                    $datum['monthName'],
+                    0,
+                    3
+                ) . "-" . $datum['year'],
+                $datum['serviceDeskCount1And3'] + $datum['prepayCount1And3'],
+                number_format(
+                    $datum['serviceDeskHoursResponded'] + $datum['prepayHoursResponded'],
+                    1
+                ),
+                $datum['serviceDeskCount4'] + $datum['prepayCount4'],
+            ];
+
+            $serviceDesk['data'][] = $row;
+
+            $row = [
+                substr(
+                    $datum['monthName'],
+                    0,
+                    3
+                ) . "-" . $datum['year'],
+                $datum['otherCount1And3'],
+                number_format(
+                    $datum['otherHoursResponded'],
+                    1
+                ),
+                $datum['otherCount4'],
+            ];
+
+            $otherContracts['data'][] = $row;
+
+            $row = [
+                substr(
+                    $datum['monthName'],
+                    0,
+                    3
+                ) . "-" . $datum['year'],
+                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'],
+                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'],
+            ];
+
+            $totalSR['data'][] = $row;
+        }
+        $BUCustomerItem = new BUCustomerItem($this);
+        /** @var DataSet $datasetContracts */
+        $datasetContracts = null;
+        $BUCustomerItem->getServerCareValidContractsByCustomerID(
+            $customerId,
+            $datasetContracts
+        );
+
+        return [
+            "serverCareIncidents" => $serverCareIncidents,
+            "serviceDesk"         => $serviceDesk,
+            "otherContracts"      => $otherContracts,
+            "totalSR"             => $totalSR,
+            'historicTotalSR'     => $historicTotalSR,
+            "renderServerCare"    => !!$datasetContracts->rowCount()
+        ];
+    }
+
     private function getSupportedUsersLevelsCount(BUContact $buContact,
                                                   $customerId,
                                                   $customerName
@@ -1461,138 +1594,6 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
         return [
             "data"  => $supportContactInfo,
             "count" => $supportContactsCounts['total']
-        ];
-    }
-
-    private function generateCharts($data,
-                                    $customerId,
-                                    $historicData
-    )
-    {
-
-        $serverCareIncidents = [
-            "title"   => "ServerCare Incidents",
-            "columns" => ["Dates", "ServerSR", "AvgResponse", "Changes"],
-            "data"    => []
-        ];
-
-        $serviceDesk = [
-            "title"   => "ServiceDesk/Pre-Pay Incidents",
-            "columns" => ["Dates", "UserSR", "AvgResponse", "Changes",],
-            "data"    => []
-        ];
-
-        $otherContracts = [
-            "title"   => "Other Contract Incidents",
-            "columns" => ["Dates", "OtherSR", "AvgResponse", "Changes",],
-            "data"    => []
-        ];
-
-        $totalSR = [
-            "title"   => "Total SRs",
-            "columns" => ["Dates", "P1-3", "P4",],
-            "data"    => []
-        ];
-
-        $historicTotalSR = [
-            "title"   => "Historic Total SRs",
-            "columns" => ["Dates", "P1-3", "P4"],
-            "data"    => []
-        ];
-
-        foreach ($historicData as $datum) {
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'],
-                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'],
-            ];
-
-            $historicTotalSR['data'][] = $row;
-        }
-
-
-        foreach ($data as $datum) {
-
-
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['serverCareCount1And3'],
-                number_format(
-                    $datum['serverCareHoursResponded'],
-                    1
-                ),
-                $datum['serverCareCount4']
-            ];
-
-            $serverCareIncidents['data'][] = $row;
-
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['serviceDeskCount1And3'] + $datum['prepayCount1And3'],
-                number_format(
-                    $datum['serviceDeskHoursResponded'] + $datum['prepayHoursResponded'],
-                    1
-                ),
-                $datum['serviceDeskCount4'] + $datum['prepayCount4'],
-            ];
-
-            $serviceDesk['data'][] = $row;
-
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['otherCount1And3'],
-                number_format(
-                    $datum['otherHoursResponded'],
-                    1
-                ),
-                $datum['otherCount4'],
-            ];
-
-            $otherContracts['data'][] = $row;
-
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'],
-                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'],
-            ];
-
-            $totalSR['data'][] = $row;
-        }
-        $BUCustomerItem = new BUCustomerItem($this);
-        /** @var DataSet $datasetContracts */
-        $datasetContracts = null;
-        $BUCustomerItem->getServerCareValidContractsByCustomerID(
-            $customerId,
-            $datasetContracts
-        );
-
-        return [
-            "serverCareIncidents" => $serverCareIncidents,
-            "serviceDesk"         => $serviceDesk,
-            "otherContracts"      => $otherContracts,
-            "totalSR"             => $totalSR,
-            'historicTotalSR'     => $historicTotalSR,
-            "renderServerCare"    => !!$datasetContracts->rowCount()
         ];
     }
 }
