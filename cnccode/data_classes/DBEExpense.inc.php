@@ -118,7 +118,7 @@ FROM
             ) . " is null and " . $this->getDBColumnName(self::deniedReason) . " is null AND " . $this->getDBColumnName(
                 self::exportedFlag
             ) . " <> 'Y'  
-            and ((exp_value <= maximumAutoApprovalAmount and (not expensetype.receiptRequired or (receipt.receiptId is not null))  or consultant.autoApproveExpenses)
+            and ((exp_value <= maximumAutoApprovalAmount and (not expensetype.receiptRequired or receipt.id is not null))  or consultant.autoApproveExpenses)
             ";
         return $this->getRows();
     }
