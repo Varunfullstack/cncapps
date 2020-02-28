@@ -4502,6 +4502,9 @@ class CTActivity extends CTCNC
                 ),
                 'hideFromCustomerFlagChecked'    => Controller::htmlChecked($hideFromCustomerFlag),
                 'hideFromCustomerDisabled'       => $hideFromCustomerDisabled,
+                'submitAsOvertimeChecked'        => $dsCallActivity->getValue(
+                    DBECallActivity::submitAsOvertime
+                ) ? 'checked' : null,
                 'hdRemainMinutes'                => $hdAssignedMinutes - $hdUsedMinutes,
                 'esRemainMinutes'                => $esAssignedMinutes - $esUsedMinutes,
                 'imRemainMinutes'                => $imAssignedMinutes - $imUsedMinutes,
