@@ -4670,7 +4670,10 @@ class CTActivity extends CTCNC
                 array(
                     'activityTypeSelected' => $activityTypeSelected,
                     'callActTypeID'        => $dbeJCallActType->getValue(DBEJCallActType::callActTypeID),
-                    'activityTypeDesc'     => $dbeJCallActType->getValue(DBEJCallActType::description)
+                    'activityTypeDesc'     => $dbeJCallActType->getValue(DBEJCallActType::description),
+                    'allowOvertime'        => $dbeJCallActType->getValue(
+                        DBEJCallActType::engineerOvertimeFlag
+                    ) == 'Y' ? 1 : 0,
                 )
             );
 
