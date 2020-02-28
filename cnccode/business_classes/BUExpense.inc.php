@@ -567,6 +567,7 @@ ORDER BY cns_name,
     AND (
         DATE_FORMAT(caa_date, '%w')IN(0,6) or
     caa_endtime > overtimeEndTime or caa_starttime < overtimeStartTime 
+        or submitAsOvertime
         )
     AND  caa_endtime <> caa_starttime
     AND callacttype.engineerOvertimeFlag = 'Y'
@@ -726,7 +727,7 @@ ORDER BY cns_name,
                if this is a weekend day then the whole lot is overtime else work out how many hours
                are out of office hours
                */
-        if ($weekDay == 0 OR $weekDay == 6) {
+        if ($weekDay == 0 OR $weekDay == 6 || $dbejCallactivity->getValue(DBECallActivity::submitAsOvertime)) {
             return $shiftEndTime - $shiftStartTime;
         }
 

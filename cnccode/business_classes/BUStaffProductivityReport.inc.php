@@ -269,7 +269,6 @@ class BUStaffProductivityReport extends Business
         $results = $this->db->query($query);
         $overtimeCost = 0;
         $normalTimeCost = 0;
-        $buExpense = new BUExpense($this);
         while ($row = $results->fetch_object()) {
             $startTime = common_convertHHMMToDecimal($row->startTime);
             $endTime = common_convertHHMMToDecimal($row->endTime);

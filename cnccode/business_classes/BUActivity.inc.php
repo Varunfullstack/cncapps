@@ -8370,7 +8370,9 @@ is currently a balance of ';
             );
             $dbeProblem->updateRow();
 
-        }// if( !$isTravel )
+        } else {
+            $dbeCallActivity->setValue(DBECallActivity::submitAsOvertime, 1);
+        }
 
         if ($setEndTimeToNow) {
 
