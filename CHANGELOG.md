@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 755 - Sickness total notification
 ### Fixed
 - Issue 758 - Customer Renewal Report Total fields formatting issue
+- Issue 753 - Project team logging target not showing on user graph
 
 ## [v3.10.3] - 2020-02-04
 ### Added 
