@@ -6,9 +6,11 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUStaffProductivityReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
+require_once($cfg ['path_bu'] . '/BUExpense.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTStaffProductivityReport extends CTCNC
@@ -127,15 +129,15 @@ class CTStaffProductivityReport extends CTCNC
 
         $this->template->set_var(
             array(
-                'formError' => $this->formError,
-                'startDate' => Controller::dateYMDtoDMY(
+                'formError'        => $this->formError,
+                'startDate'        => Controller::dateYMDtoDMY(
                     $dsSearchForm->getValue(BUStaffProductivityReport::searchFormStartDate)
                 ),
                 'startDateMessage' => $dsSearchForm->getMessage(BUStaffProductivityReport::searchFormStartDate),
-                'endDate' => Controller::dateYMDtoDMY(
+                'endDate'          => Controller::dateYMDtoDMY(
                     $dsSearchForm->getValue(BUStaffProductivityReport::searchFormEndDate)
                 ),
-                'endDateMessage' => $dsSearchForm->getMessage(BUStaffProductivityReport::searchFormEndDate)
+                'endDateMessage'   => $dsSearchForm->getMessage(BUStaffProductivityReport::searchFormEndDate)
             )
         );
 

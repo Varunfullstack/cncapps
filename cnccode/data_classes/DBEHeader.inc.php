@@ -22,8 +22,8 @@ class DBEHeader extends DBEntity
     const stdVATCode = "stdVATCode";
     const billingStartTime = "billingStartTime";
     const billingEndTime = "billingEndTime";
-    const overtimeStartTime = "helpdeskStartTime";
-    const overtimeEndTime = "helpdeskEndTime";
+    const overtimeStartTime = "overtimeStartTime";
+    const overtimeEndTime = "overtimeEndTime";
     const gscItemID = "gscItemID";
     const portalPin = "portalPin";
     const portal24HourPin = "portal24HourPin";

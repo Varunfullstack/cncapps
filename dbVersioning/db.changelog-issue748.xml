@@ -9,13 +9,15 @@
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="headert" columnName="hed_hd_starttime"/>
         </preConditions>
-        <renameColumn tableName="headert" oldColumnName="hed_hd_starttime" newColumnName="overtimeStartTime"/>
+        <renameColumn tableName="headert" oldColumnName="hed_hd_starttime" newColumnName="overtimeStartTime"
+                      columnDataType="char(5)"/>
         <sql>
             update headert
             set overtimeStartTime = '08:00';
         </sql>
         <rollback>
-            <renameColumn tableName="headert" oldColumnName="overtimeStartTime" newColumnName="hed_hd_starttime"/>
+            <renameColumn tableName="headert" oldColumnName="overtimeStartTime" newColumnName="hed_hd_starttime"
+                          columnDataType="char(5)"/>
             <sql>
                 update headert
                 set hed_hd_starttime = '07:30';
@@ -26,7 +28,8 @@
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="headert" columnName="hed_hd_endtime"/>
         </preConditions>
-        <renameColumn tableName="headert" oldColumnName="hed_hd_endtime" newColumnName="overtimeEndTime"/>
+        <renameColumn tableName="headert" oldColumnName="hed_hd_endtime" newColumnName="overtimeEndTime"
+                      columnDataType="char(5)"/>
     </changeSet>
     <changeSet author="pavwebdev" id="issue748-3">
         <preConditions onFail="MARK_RAN">
@@ -47,5 +50,17 @@
                 drop function if exists getOvertime;
             </sql>
         </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue748-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callactivity" columnName="submitAsOvertime"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callactivity">
+            <column name="submitAsOvertime" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>

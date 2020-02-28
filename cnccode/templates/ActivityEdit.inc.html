@@ -678,6 +678,17 @@
                         title="Hide this SR from customer"
                 >
             </td>
+            <td class="promptText">Submit as Overtime</td>
+            <td>
+                <input
+                        {submitAsOvertimeDisabled}
+                        type="checkbox"
+                        name="callActivity[1][submitAsOvertime]"
+                        value="1"
+                        {submitAsOvertimeChecked}
+                        title="Submit as Overtime"
+                >
+            </td>
         </tr>
         <tr>
             <td colspan="6"><H2>{customerDetails}</H2></td>

@@ -233,9 +233,9 @@ class BUStaffProductivityReport extends Business
         $query = "
       SELECT
         caa_callactivityno as activityId,
-        DATE_FORMAT(caa_date, '%w') AS 'weekday',
         caa_starttime AS startTime,
-        caa_endtime AS endTime
+        caa_endtime AS endTime,
+             getOvertime(caa_callactivityno) as overtime
       FROM
         callactivity";
 
@@ -273,7 +273,7 @@ class BUStaffProductivityReport extends Business
         while ($row = $results->fetch_object()) {
             $startTime = common_convertHHMMToDecimal($row->startTime);
             $endTime = common_convertHHMMToDecimal($row->endTime);
-            $overtime = $buExpense->calculateOvertime($row->activityId);
+            $overtime = $row->overtime;
             $totalTime = $endTime - $startTime;
             $normalTime = $totalTime - $overtime;
             $thisOvertimeCost = $overtime * ($hourlyPayRate * 1.5);

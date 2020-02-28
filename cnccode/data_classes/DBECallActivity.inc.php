@@ -44,6 +44,7 @@ class DBECallActivity extends DBEntity
     const overtimeExportedFlag = 'overtimeExportedFlag';
     const isSalesRequestSR = 'isSalesRequestSR';
     const requestType = 'requestType';
+    const submitAsOvertime = "submitAsOvertime";
 
     /**
      * calls constructor()
@@ -250,6 +251,13 @@ class DBECallActivity extends DBEntity
             DA_ALLOW_NULL
         );
 
+        $this->addColumn(
+            self::submitAsOvertime,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
         $this->db->connect();

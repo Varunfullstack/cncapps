@@ -19,4 +19,5 @@ class OvertimeExportItem
     public $weekendOvertime;
     public $activityStartTime;
     public $activityEndTime;
+    public $belowThreshold;
 }

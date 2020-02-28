@@ -96,6 +96,7 @@ class BUPrepay extends Business
      * @param $dsData
      * @param bool $updateFlag
      * @return bool|DataSet
+     * @throws Exception
      */
     function exportPrePayActivities($dsData, $updateFlag = false)
     {

@@ -2,21 +2,58 @@
     .pending td {
         color: red;
     }
+
+    table.dataTable tr th.select-checkbox.selected::after {
+        content: "✔";
+        margin-top: -11px;
+        margin-left: -4px;
+        text-align: center;
+        text-shadow: rgb(176, 190, 217) 1px 1px, rgb(176, 190, 217) -1px -1px, rgb(176, 190, 217) 1px -1px, rgb(176, 190, 217) -1px 1px;
+    }
+
 </style>
 <script>
     let expensesTable = null;
     let overtimeTable = null;
 
-    function approveExpense(expenseId) {
-        fetch("?action=approveExpense&id=" + expenseId)
+    function approveExpenseRequest(expenseId) {
+        return fetch("?action=approveExpense&id=" + expenseId)
             .then(response => {
                 return response.json();
             })
-            .then(data => {
+    }
+
+    function approveExpense(expenseId) {
+
+        const rowsSelected = expensesTable.column(0).checkboxes.selected();
+        if (!rowsSelected.length) {
+            return approveExpenseRequest(expenseId).then(data => {
                 if (data.error) {
                     return alert(data.error);
                 }
                 expensesTable.ajax.reload();
+            })
+        }
+
+        Promise.all(rowsSelected.toArray().map(expenseId => {
+            return approveExpenseRequest(expenseId).then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+            })
+        }))
+            .catch(error => {
+                alert(error);
+            })
+            .then(() => {
+                expensesTable.ajax.reload();
+            })
+    }
+
+    function denyExpenseRequest(expenseId, reason) {
+        return fetch("?action=denyExpense&id=" + expenseId + "&denyReason=" + reason)
+            .then(response => {
+                return response.json();
             })
     }
 
@@ -25,86 +62,182 @@
         if (!reason) {
             return alert('Reason cannot be empty');
         }
-        fetch("?action=denyExpense&id=" + expenseId + "&denyReason=" + reason)
-            .then(response => {
-                return response.json();
-            })
-            .then(data => {
+
+        const rowsSelected = expensesTable.column(0).checkboxes.selected();
+        if (!rowsSelected.length) {
+            return denyExpenseRequest(expenseId, reason).then(data => {
                 if (data.error) {
                     return alert(data.error);
                 }
                 expensesTable.ajax.reload();
             })
+        }
 
+        Promise.all(rowsSelected.toArray().map(expenseId => {
+            return denyExpenseRequest(expenseId, reason).then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+            })
+        })).catch(error => {
+            alert(error);
+        }).then(() => {
+            expensesTable.ajax.reload();
+        });
+    }
+
+    function deleteExpenseRequest(expenseId) {
+        return fetch("?action=deleteExpense&id=" + expenseId)
+            .then(response => {
+                return response.json();
+            });
     }
 
     function deleteExpense(expenseId) {
-        if (!confirm('Are you sure you want to delete this expense?')) {
-            return;
-        }
 
-        fetch("?action=deleteExpense&id=" + expenseId)
-            .then(response => {
-                return response.json();
-            })
-            .then(data => {
+        const rowsSelected = expensesTable.column(0).checkboxes.selected();
+        if (!rowsSelected.length) {
+            if (!confirm('Are you sure you want to delete this expense?')) {
+                return;
+            }
+            return deleteExpenseRequest(expenseId).then(data => {
                 if (data.error) {
                     return alert(data.error);
                 }
                 expensesTable.ajax.reload();
             })
+        }
+        if (!confirm('Are you sure you want to delete the selected expenses?')) {
+            return;
+        }
+        Promise.all(rowsSelected.toArray().map(expenseId => {
+            return deleteExpenseRequest(expenseId).then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+            })
+        })).catch(error => {
+            alert(error);
+        }).then(() => {
+            expensesTable.ajax.reload();
+        });
     }
 
-    function approveOvertime(expenseId) {
-        fetch("?action=approveOvertime&id=" + expenseId)
+    function approveOvertimeRequest(activityId) {
+        fetch("?action=approveOvertime&id=" + activityId)
             .then(response => {
                 return response.json();
             })
-            .then(data => {
+    }
+
+    function approveOvertime(activityId) {
+        const rowsSelected = overtimeTable.column(0).checkboxes.selected();
+        if (!rowsSelected.length) {
+            return approveOvertimeRequest(activityId).then(data => {
                 if (data.error) {
                     return alert(data.error);
                 }
                 overtimeTable.ajax.reload();
             })
+        }
+
+        Promise.all(rowsSelected.toArray().map(activityId => {
+            return approveOvertimeRequest(activityId).then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+            })
+        })).catch(error => {
+            alert(error);
+        }).then(() => {
+            overtimeTable.ajax.reload();
+        });
     }
 
-    function denyOvertime(expenseId) {
+    function denyOvertimeRequest(activityId, reason) {
+        return fetch("?action=denyOvertime&id=" + activityId + "&denyReason=" + reason)
+            .then(response => {
+                return response.json();
+            })
+
+    }
+
+    function denyOvertime(activityId) {
         const reason = prompt("Please provide a reason for denying this overtime");
         if (!reason) {
             return alert('Reason cannot be empty');
         }
-        fetch("?action=denyOvertime&id=" + expenseId + "&denyReason=" + reason)
-            .then(response => {
-                return response.json();
-            })
-            .then(data => {
+        const rowsSelected = overtimeTable.column(0).checkboxes.selected();
+        if (!rowsSelected.length) {
+            return denyOvertimeRequest(activityId, reason).then(data => {
                 if (data.error) {
                     return alert(data.error);
                 }
                 overtimeTable.ajax.reload();
             })
+        }
+
+        Promise.all(rowsSelected.toArray().map(expenseId => {
+            return denyOvertimeRequest(expenseId, reason).then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+            })
+        })).catch(error => {
+            alert(error);
+        }).then(() => {
+            overtimeTable.ajax.reload();
+        })
     }
 
-    function deleteOvertime(expenseId) {
-        if (!confirm('Are you sure you want to delete this overtime?')) {
-            return;
-        }
-        fetch("?action=deleteOvertime&id=" + expenseId)
+    function deleteOvertimeRequest(activityId) {
+        return fetch("?action=deleteOvertime&id=" + activityId)
             .then(response => {
                 return response.json();
-            })
-            .then(data => {
+            });
+    }
+
+    function deleteOvertime(activityId) {
+        const rowsSelected = overtimeTable.column(0).checkboxes.selected();
+        if (!rowsSelected.length) {
+            if (!confirm('Are you sure you want to delete this expense?')) {
+                return;
+            }
+            return deleteOvertimeRequest(activityId).then(data => {
                 if (data.error) {
                     return alert(data.error);
                 }
                 overtimeTable.ajax.reload();
             })
+        }
+        if (!confirm('Are you sure you want to delete the selected expenses?')) {
+            return;
+        }
+        Promise.all(rowsSelected.toArray().map(activityId => {
+            return deleteOvertimeRequest(activityId).then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+            })
+        }).catch(error => {
+            alert(error);
+        })).then(() => {
+            overtimeTable.ajax.reload();
+        });
     }
 
     $(function () {
         expensesTable = $('#expensesTable').DataTable({
             dom: 'lfrtip',
+            columnDefs: [
+                {checkboxes: {selectRow: true}, targets: 0}
+            ],
+            select: {
+                style: 'multi',
+                selector: 'tr:not(.no-select) td:first-child '
+            },
             columns: [
+                {data: "id", name: null},
                 {data: "staffName", name: 'staffName'},
                 {
                     data: "serviceRequestId", name: "serviceRequestId", render: (data, type, row, meta) => {
@@ -162,6 +295,7 @@
                     searchable: false,
                     render: (data, type, row, meta) => {
                         if (row.isSelf && !row.isApprover) {
+
                             return "";
                         }
 
@@ -178,6 +312,14 @@
                 url: "?action=getExpensesData",
                 type: "GET"
             },
+            rowCallback(row, data, displayNum, displayIndex, dataIndex) {
+                if (data.status === 'Pending') {
+                    $(row).removeClass('no-select');
+                } else {
+                    $('td:eq(0)', row).html('');
+                    $(row).addClass('no-select');
+                }
+            },
             createdRow: (row, data, index) => {
                 if (data.status === 'Pending') {
                     $(row).addClass('pending');
@@ -185,11 +327,32 @@
             },
             stateSave: true,
         });
+
+        expensesTable.on('select.dt', function (e, dt, type, indexes) {
+            expensesTable.cells('tr.no-select', 0).checkboxes.deselect();
+        });
+
         overtimeTable = $('#overtimeTable').DataTable({
             dom: 'lfrtip',
             stateSave: true,
             searchDelay: 1000,
+            columnDefs: [
+                {checkboxes: {selectRow: true}, targets: 0}
+            ],
+            select: {
+                style: 'multi',
+                selector: 'tr:not(.no-select) td:first-child '
+            },
+            rowCallback(row, data, displayNum, displayIndex, dataIndex) {
+                if (data.status === 'Pending') {
+                    $(row).removeClass('no-select');
+                } else {
+                    $('td:eq(0)', row).html('');
+                    $(row).addClass('no-select');
+                }
+            },
             columns: [
+                {data: "activityId", name: null},
                 {data: "staffName", name: 'staffName'},
                 {
                     data: "serviceRequestId", name: "serviceRequestId", render: (data, type, row, meta) => {
@@ -262,7 +425,11 @@
                     $(row).addClass('pending');
                 }
             }
-        })
+        });
+
+        overtimeTable.on('select.dt', function (e, dt, type, indexes) {
+            overtimeTable.cells('tr.no-select', 0).checkboxes.deselect();
+        });
     })
 </script>
 {runningTotalsLink}
@@ -270,6 +437,7 @@
 <table id="expensesTable">
     <thead>
     <tr>
+        <th></th>
         <th>
             Staff Name
         </th>
@@ -312,6 +480,7 @@
 <table id="overtimeTable">
     <thead>
     <tr>
+        <th></th>
         <th>
             Staff Name
         </th>

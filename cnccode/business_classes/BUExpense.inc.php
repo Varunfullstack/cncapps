@@ -15,6 +15,7 @@ require_once($cfg["path_dbe"] . "/DBEJExpense.inc.php");
 require_once($cfg["path_dbe"] . "/DBEVat.inc.php");
 require_once($cfg["path_dbe"] . "/DBECallActivity.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJCallActivity.php");
+require_once($cfg["path_dbe"] . "/DBECallActType.inc.php");
 require_once($cfg["path_dbe"] . "/DBEExpenseType.inc.php");
 require_once($cfg["path_dbe"] . "/DBEUser.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
@@ -296,8 +297,7 @@ class BUExpense extends Business
                 continue;
             }
 
-            $overtimeExportItem->overtimeValue = $this->calculateOvertime($overtimeExportItem->activityId);
-            if (($overtimeExportItem->overtimeValue * 60) < $overtimeMinutes) {
+            if ($overtimeExportItem->belowThreshold) {
                 $overtimeWeekdayActivities[] = $overtimeExportItem;
                 continue;
             }
@@ -552,7 +552,9 @@ ORDER BY cns_name,
                consultant.lastName as engineerLastName,
     `cns_employee_no` as employeeNumber,
            weekdayOvertimeFlag = 'Y' as allowWeekDayOvertime,
-           DATE_FORMAT(caa_date, '%w')IN(0,6) as weekendOvertime
+           DATE_FORMAT(caa_date, '%w')IN(0,6) as weekendOvertime,
+           getOvertime(callactivity.`caa_callactivityno`) AS overtimeValue,
+  getOvertime(callactivity.`caa_callactivityno`) * 60 < minimumOvertimeMinutesRequired AS belowThreshold
     FROM callactivity
     JOIN problem ON pro_problemno = caa_problemno
     JOIN callacttype ON caa_callacttypeno = cat_callacttypeno
@@ -580,81 +582,16 @@ ORDER BY cns_name,
         return $toReturn;
     }
 
-    /**
-     * @param $activityId
-     * @return float|int The overtime calculated in decimal hours
-     */
-    function calculateOvertime($activityId)
-    {
-        $dbejCallactivity = new DBEJCallActivity($this);
-        $dbejCallactivity->getRow($activityId);
-        $dsHeader = new DataSet($this);
-        $buHeader = new BUHeader($this);
-        $buHeader->getHeader($dsHeader);
-        $officeStartTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::overtimeStartTime));
-        $officeEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::overtimeEndTime));
-        $shiftStartTime = common_convertHHMMToDecimal($dbejCallactivity->getValue(DBEJCallActivity::startTime));
-        $shiftEndTime = common_convertHHMMToDecimal($dbejCallactivity->getValue(DBEJCallActivity::endTime));
-        $affectedUser = new DBEUser($this);
-        $affectedUser->getRow($dbejCallactivity->getValue(DBEJCallActivity::userID));
-        $isWeekOvertimeAllowed = $affectedUser->getValue(DBEUser::weekdayOvertimeFlag) == 'Y';
-        $weekDay = date('w', strtotime($dbejCallactivity->getValue(DBEJCallActivity::date)));
-
-        $activityType = new DBECallActType($this);
-        $activityType->getRow($dbejCallactivity->getValue(DBEJCallActivity::callActTypeID));
-
-        if (!$activityType->getValue(DBECallActType::engineerOvertimeFlag) == 'Y') {
-            return 0;
-        }
-        /*
-               if this is a weekend day then the whole lot is overtime else work out how many hours
-               are out of office hours
-               */
-        if ($weekDay == 0 OR $weekDay == 6) {
-            return $shiftEndTime - $shiftStartTime;
-        }
-
-        if (!$isWeekOvertimeAllowed) {
-            return 0;
-        }
-
-        $overtime = 0;
-        if ($shiftStartTime < $officeStartTime) {
-            if ($shiftEndTime < $officeStartTime) {
-                $overtime = $shiftEndTime - $shiftStartTime;
-            } else {
-                $overtime = $officeStartTime - $shiftStartTime;
-            }
-        }
-        if ($shiftEndTime > $officeEndTime) {
-            if ($shiftStartTime > $officeEndTime) {
-                $overtime += $shiftEndTime - $shiftStartTime;
-            } else {
-                $overtime += $shiftEndTime - $officeEndTime;
-            }
-        }
-
-        return $overtime;
-    }
-
-    /*
-    * Export engineer overtime to file
-    *
-    * $runType controls whether this is a trial only. If runType = CTEXPENSE_ACT_EXPORT_GENERATE then
-    * we send out individual emails to each engineer and update the exported flag.
-    *
-    * if $runType = CTEXPENSE_ACT_EXPORT_TRIAL then we only send the summary email and don't update exported flags 
-    */
-
     private function sendEngineerOvertimeExpenseSummaryEmail($engineersDatum)
     {
         /** @var \Twig\Environment $twig */
         global $twig;
-        $body = $twig->render('expensesOvertimeIndividualEmail.html.twig',
-                              [
-                                  "expenses"           => $engineersDatum['expenses'],
-                                  "overtimeActivities" => $engineersDatum['overtimeActivities']
-                              ]
+        $body = $twig->render(
+            'expensesOvertimeIndividualEmail.html.twig',
+            [
+                "expenses"           => $engineersDatum['expenses'],
+                "overtimeActivities" => $engineersDatum['overtimeActivities']
+            ]
         );
 
         $buMail = new BUMail($this);
@@ -689,6 +626,15 @@ ORDER BY cns_name,
         );
 
     }
+
+    /*
+    * Export engineer overtime to file
+    *
+    * $runType controls whether this is a trial only. If runType = CTEXPENSE_ACT_EXPORT_GENERATE then
+    * we send out individual emails to each engineer and update the exported flag.
+    *
+    * if $runType = CTEXPENSE_ACT_EXPORT_TRIAL then we only send the summary email and don't update exported flags 
+    */
 
     private function array2csv($data, $delimiter = ",", $enclosure = '"', $escape_char = "\\")
     {
@@ -748,6 +694,63 @@ ORDER BY cns_name,
             $hdrs,
             $body
         );
+    }
+
+    /**
+     * @param $activityId
+     * @return float|int The overtime calculated in decimal hours
+     */
+    function calculateOvertime($activityId)
+    {
+        $dbejCallactivity = new DBEJCallActivity($this);
+        $dbejCallactivity->getRow($activityId);
+        $dsHeader = new DataSet($this);
+        $buHeader = new BUHeader($this);
+        $buHeader->getHeader($dsHeader);
+        $officeStartTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::overtimeStartTime));
+        $officeEndTime = common_convertHHMMToDecimal($dsHeader->getValue(DBEHeader::overtimeEndTime));
+        $shiftStartTime = common_convertHHMMToDecimal($dbejCallactivity->getValue(DBEJCallActivity::startTime));
+        $shiftEndTime = common_convertHHMMToDecimal($dbejCallactivity->getValue(DBEJCallActivity::endTime));
+        $affectedUser = new DBEUser($this);
+        $affectedUser->getRow($dbejCallactivity->getValue(DBEJCallActivity::userID));
+        $isWeekOvertimeAllowed = $affectedUser->getValue(DBEUser::weekdayOvertimeFlag) == 'Y';
+        $weekDay = date('w', strtotime($dbejCallactivity->getValue(DBEJCallActivity::date)));
+
+        $activityType = new DBECallActType($this);
+        $activityType->getRow($dbejCallactivity->getValue(DBEJCallActivity::callActTypeID));
+
+        if (!$activityType->getValue(DBECallActType::engineerOvertimeFlag) == 'Y') {
+            return 0;
+        }
+        /*
+               if this is a weekend day then the whole lot is overtime else work out how many hours
+               are out of office hours
+               */
+        if ($weekDay == 0 OR $weekDay == 6) {
+            return $shiftEndTime - $shiftStartTime;
+        }
+
+        if (!$isWeekOvertimeAllowed) {
+            return 0;
+        }
+
+        $overtime = 0;
+        if ($shiftStartTime < $officeStartTime) {
+            if ($shiftEndTime < $officeStartTime) {
+                $overtime = $shiftEndTime - $shiftStartTime;
+            } else {
+                $overtime = $officeStartTime - $shiftStartTime;
+            }
+        }
+        if ($shiftEndTime > $officeEndTime) {
+            if ($shiftStartTime > $officeEndTime) {
+                $overtime += $shiftEndTime - $shiftStartTime;
+            } else {
+                $overtime += $shiftEndTime - $officeEndTime;
+            }
+        }
+
+        return $overtime;
     }
 
     public function getTotalExpensesForSalesOrder($salesOrderID)
