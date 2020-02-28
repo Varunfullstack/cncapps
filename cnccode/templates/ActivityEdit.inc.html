@@ -486,31 +486,32 @@
             <td></td>
             <td></td>
             <td class="promptText">Time from</td>
-            <td class="fieldText"><input
-                    type="text"
-                    {DISABLED}
-                    {INITIAL_DATE_DISABLED}
-                    name="callActivity[1][startTime]"
-                    value="{startTime}"
-                    size="5"
-                    maxlength="8"
-                    placeholder="HH:MM"
-                    onchange="setFormChanged();"
-                    id="startTime"
-            />
-                <span class="formErrorMessage">{startTimeMessage}</span>
-                to <input
+            <td class="fieldText">
+                <input
+                        type="text"
                         {DISABLED}
                         {INITIAL_DATE_DISABLED}
-                        type="text"
-                        name="callActivity[1][endTime]"
-                        id="endTime"
-                        value="{endTime}"
+                        name="callActivity[1][startTime]"
+                        value="{startTime}"
                         size="5"
-                        placeholder="HH:MM"
                         maxlength="8"
+                        placeholder="HH:MM"
                         onchange="setFormChanged();"
+                        id="startTime"
                 />
+                <span class="formErrorMessage">{startTimeMessage}</span>
+                to <input
+                    {DISABLED}
+                    {INITIAL_DATE_DISABLED}
+                    type="text"
+                    name="callActivity[1][endTime]"
+                    id="endTime"
+                    value="{endTime}"
+                    size="5"
+                    placeholder="HH:MM"
+                    maxlength="8"
+                    onchange="setFormChanged();"
+            />
                 {setTimeNowLink}<span class="formErrorMessage">{endTimeMessage}</span>
             </td>
         </tr>
@@ -677,9 +678,7 @@
                         {hideFromCustomerFlagChecked}
                         title="Hide this SR from customer"
                 >
-            </td>
-            <td class="promptText">Submit as Overtime</td>
-            <td>
+                <span>Submit as Overtime</span>
                 <input
                         {submitAsOvertimeDisabled}
                         type="checkbox"
