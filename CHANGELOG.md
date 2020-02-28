@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 757 - Notify when quote is signed within Signable
+### Fixed
+- Issue 758 - Customer Renewal Report Total fields formatting issue
 
 ## [v3.10.3] - 2020-02-04
 ### Added 
