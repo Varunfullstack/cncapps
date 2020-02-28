@@ -6,6 +6,7 @@
 <script language='JavaScript'>
     window.callActivityID = "{callActivityID}";
     window.problemID = "{problemID}";
+    let submitAsOvertimeCheckbox;
 
     function showSalesRequestDialog() {
         startSalesRequest(problemID);
@@ -15,14 +16,30 @@
         startChangeRequest(problemID);
     }
 
+    function enableOvertime() {
+        submitAsOvertimeCheckbox.enable();
+    }
+
+    function disableOvertime() {
+        submitAsOvertimeCheckbox.disable();
+        submitAsOvertimeCheckbox[0].checked = false;
+    }
+
     var authorisedByName = "{authorisedByName}";
     $(function () {
+        submitAsOvertimeCheckbox = $('select[name="callActivity[1][submitAsOvertime]"]');
         window.alarmDate = $('#alarmDate').get(0);
 
         var activityTypeSelector = $('select[name="callActivity[1][callActTypeID]"]');
 
         if (activityTypeSelector.val() == 59) {
             hideChangeRequestButtons();
+        }
+
+        if (activityTypeSelector[0].selectedOptions[0].dataset.allowOvertime) {
+            enableOvertime()
+        } else {
+            disableOvertime();
         }
 
         activityTypeSelector.change(function () {
@@ -33,7 +50,11 @@
                 showChangeRequestButtons();
             }
 
-            debugger;
+            if (activityTypeSelector[0].selectedOptions[0].dataset.allowOvertime) {
+                enableOvertime()
+            } else {
+                disableOvertime();
+            }
 
         });
 
