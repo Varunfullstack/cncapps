@@ -124,7 +124,7 @@
     }
 
     function approveOvertimeRequest(activityId) {
-        fetch("?action=approveOvertime&id=" + activityId)
+        return fetch("?action=approveOvertime&id=" + activityId)
             .then(response => {
                 return response.json();
             })
