@@ -504,12 +504,11 @@ class DBEOrdhead extends DBEntity
 
     public function getSignableNotProcessedOrders()
     {
-        $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() .
+        $sql = "SELECT " . $this->getDBColumnNamesAsString() . " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(self::signableProcessed) . "=  0 and " . $this->getDBColumnName(
                 self::type
-            ) . " <> 'Q' "
-        );
+            ) . " <> 'Q' ";
+        $this->setQueryString($sql        );
         parent::getRows();
         return false;
     }
