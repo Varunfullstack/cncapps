@@ -17,11 +17,11 @@
     }
 
     function enableOvertime() {
-        submitAsOvertimeCheckbox.enable();
+        submitAsOvertimeCheckbox.removeAttr("disabled");
     }
 
     function disableOvertime() {
-        submitAsOvertimeCheckbox.disable();
+        submitAsOvertimeCheckbox.attr("disabled", true);
         submitAsOvertimeCheckbox[0].checked = false;
     }
 
@@ -30,7 +30,7 @@
         submitAsOvertimeCheckbox = $('select[name="callActivity[1][submitAsOvertime]"]');
         window.alarmDate = $('#alarmDate').get(0);
 
-        var activityTypeSelector = $('select[name="callActivity[1][callActTypeID]"]');
+        var activityTypeSelector = $('input[name="callActivity[1][callActTypeID]"]');
 
         if (activityTypeSelector.val() == 59) {
             hideChangeRequestButtons();
