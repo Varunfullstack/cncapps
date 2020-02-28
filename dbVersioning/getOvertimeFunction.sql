@@ -11,6 +11,7 @@ BEGIN
     DECLARE overtime DECIMAL(10, 2);
     DECLARE officeStartTime DECIMAL(10, 2);
     DECLARE officeEndTime DECIMAL(10, 2);
+    declare override boolean;
     SELECT weekdayOvertimeFlag = 'Y',
            WEEKDAY(caa_date),
            engineerOvertimeFlag = 'Y',
@@ -19,21 +20,27 @@ BEGIN
                ),
            CAST(
                        TIME_TO_SEC(caa_endtime) / (60 * 60) AS DECIMAL(10, 2)
-               )
+               ),
+           submitAsOvertime
     INTO isWeekOvertimeAllowed,
         activityWeekday,
         activityEngineerOvertimeAllowed,
         shiftStartTime,
-        shiftEndTime
+        shiftEndTime,
+        override
     FROM callactivity
              LEFT JOIN consultant
                        ON caa_consno = consultant.`cns_consno`
              LEFT JOIN callacttype
                        ON caa_callacttypeno = callacttype.`cat_callacttypeno`
     WHERE caa_callactivityno = callactivityId;
+
+
+
     IF (
                 activityWeekday = 5
             OR activityWeekday = 6
+            or override
         )
     THEN
         RETURN shiftEndTime - shiftStartTime;

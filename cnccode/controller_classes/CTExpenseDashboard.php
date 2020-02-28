@@ -8,6 +8,7 @@
 
 use Twig\Environment;
 
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUExpense.inc.php');
@@ -206,6 +207,7 @@ WHERE
   approver.cns_name as approverName,
        getOvertime(caa_callactivityno) as overtimeDuration,
        customer.cus_name as customerName,
+       submitAsOvertime,
   IF(
     callactivity.`overtimeApprovedBy` is not null,
     "Approved",
@@ -244,21 +246,16 @@ WHERE
       (caa_status = \'C\'
     OR caa_status = \'A\')
   AND caa_ot_exp_flag = \'N\'
-  AND (
-     DATE_FORMAT(caa_date, \'%w\') IN (0, 6) or (
-      consultant.weekdayOvertimeFlag = \'Y\'
-      AND DATE_FORMAT(caa_date, \'%w\') IN (1, 2, 3, 4, 5)
+  and (
+        DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
+        or (
+                consultant.weekdayOvertimeFlag = \'Y\' and DATE_FORMAT(caa_date, \'%w\') IN (1, 2, 3, 4, 5) and
+                (caa_endtime > overtimeEndTime or caa_starttime < overtimeStartTime)
+            )
+        or submitAsOvertime
     )
-  )
-  AND (
-    caa_endtime > overtimeEndTime
-   OR caa_starttime < overtimeStartTime
-   OR 
-    DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
-  )
   AND getOvertime(caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
   AND (caa_endtime <> caa_starttime)
-  
   AND (
     callactivity.`caa_consno` = ?
     OR consultant.`expenseApproverID` = ?
@@ -871,16 +868,13 @@ WHERE caa_endtime
   and (caa_status = \'C\'
     OR caa_status = \'A\')
   AND caa_ot_exp_flag = \'N\'
-  AND (
-        DATE_FORMAT(caa_date, \'%w\') IN (0, 6) or (
-            consultant.weekdayOvertimeFlag = \'Y\'
-            AND DATE_FORMAT(caa_date, \'%w\') IN (1, 2, 3, 4, 5)
-        )
-    )
-  AND (
-        caa_endtime > overtimeEndTime
-        OR caa_starttime < overtimeStartTime
-        OR DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
+  and (
+        DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
+        or (
+                consultant.weekdayOvertimeFlag = \'Y\' and DATE_FORMAT(caa_date, \'%w\') IN (1, 2, 3, 4, 5) and
+                (caa_endtime > overtimeEndTime or caa_starttime < overtimeStartTime)
+            )
+        or submitAsOvertime
     )
   AND getOvertime(caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
   AND caa_endtime <> caa_starttime
@@ -900,7 +894,7 @@ WHERE caa_endtime
                 'approvedOvertimeValue' => $overtimeSummary['approved'],
                 'pendingOvertimeValue'  => $overtimeSummary['pending'],
                 'runningTotalsLink'     => $isApprover ? '<a href="?action=runningTotals" target="_blank">Running Totals</a>' : null,
-                ]
+            ]
         );
 
         $this->template->parse(
