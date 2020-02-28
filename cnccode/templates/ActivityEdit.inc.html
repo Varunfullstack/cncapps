@@ -26,11 +26,15 @@
         }
 
         activityTypeSelector.change(function () {
+            setFormChanged();
             if (activityTypeSelector.val() == 59) {
                 hideChangeRequestButtons();
             } else {
                 showChangeRequestButtons();
             }
+
+            debugger;
+
         });
 
 
@@ -59,7 +63,6 @@
             return true;
         }
     }
-
 
     function setFormChanged() {
         formChanged = true;
@@ -368,14 +371,14 @@
             <td class="fieldText">
                 <select {INITIAL_DISABLED}
                         {typeDisabled}
-                        onchange="setFormChanged();"
-                        id="{contractID}"
+                        id="activityTypeSelector"
                         name="callActivity[1][callActTypeID]"
                 >
                     <option value="">Please Select</option>
                     <!-- BEGIN activityTypeBlock -->
                     <option {activityTypeSelected}
                             value="{callActTypeID}"
+                            data-allowOvertime="{allowOvertime}"
                     >{activityTypeDesc}
                     </option>
                     <!-- END activityTypeBlock -->

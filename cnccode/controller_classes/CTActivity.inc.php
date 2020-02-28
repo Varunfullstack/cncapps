@@ -843,7 +843,10 @@ class CTActivity extends CTCNC
                 array(
                     'activityTypeSelected'    => $activityTypeSelected,
                     'callActTypeID'           => $dbeCallActType->getValue(DBECallActType::callActTypeID),
-                    'activityTypeDescription' => $dbeCallActType->getValue(DBECallActType::description)
+                    'activityTypeDescription' => $dbeCallActType->getValue(DBECallActType::description),
+                    'allowOvertime'           => $dbeCallActType->getValue(
+                        DBECallActType::engineerOvertimeFlag
+                    ) == 'Y' ? 1 : 0
                 )
             );
             $this->template->parse(
