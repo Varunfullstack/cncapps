@@ -411,63 +411,81 @@ WHERE
                 global $db;
 
                 $overtimeQuery = "SELECT
-  consultant.cns_name AS staffName,
-  SUM(
-    IF(
-      callactivity.`overtimeApprovedBy` IS NOT NULL,
-      getOvertime (caa_callactivityno),
-      0
-    )
-  ) AS approvedValue,
-  SUM(
-    IF(
-      callactivity.`overtimeDeniedReason` IS NULL
-      AND callactivity.`overtimeApprovedBy` IS NULL,
-      getOvertime (caa_callactivityno),
-      0
-    )
-  ) AS pendingValue
+  runningTotals.staffName,
+  runningTotals.approvedValue,
+  runningTotals.pendingValue,
+  (SELECT
+    SUM(getOvertime (caa_callactivityno))
+  FROM
+    callactivity
+  WHERE caa_date BETWEEN DATE_FORMAT(NOW(), '%Y')
+    AND NOW()
+    AND callactivity.`overtimeApprovedBy` IS NOT NULL
+    AND (caa_status = 'C'
+      OR caa_status = 'A')
+    AND caa_ot_exp_flag = 'Y'
+    AND callactivity.`caa_consno` = runningTotals.staffId) AS YTD
 FROM
-  callactivity
-  JOIN problem
-    ON pro_problemno = caa_problemno
-  JOIN callacttype
-    ON caa_callacttypeno = cat_callacttypeno
-    AND callacttype.engineerOvertimeFlag = 'Y'
-  JOIN consultant
-    ON caa_consno = cns_consno
-  JOIN headert
-    ON headert.`headerID` = 1
-WHERE caa_endtime
-  AND caa_endtime IS NOT NULL
-  AND (caa_status = 'C'
-    OR caa_status = 'A')
-  AND caa_ot_exp_flag = 'N'
-  AND (
-    DATE_FORMAT(caa_date, '%w') IN (0, 6)
-    OR (
-      consultant.weekdayOvertimeFlag = 'Y'
-      AND DATE_FORMAT(caa_date, '%w') IN (1, 2, 3, 4, 5)
+  (SELECT
+    consultant.cns_name AS staffName,
+    consultant.`cns_consno` AS staffId,
+    SUM(
+      IF(
+        callactivity.`overtimeApprovedBy` IS NOT NULL,
+        getOvertime (caa_callactivityno),
+        0
+      )
+    ) AS approvedValue,
+    SUM(
+      IF(
+        callactivity.`overtimeDeniedReason` IS NULL
+        AND callactivity.`overtimeApprovedBy` IS NULL,
+        getOvertime (caa_callactivityno),
+        0
+      )
+    ) AS pendingValue
+  FROM
+    callactivity
+    JOIN problem
+      ON pro_problemno = caa_problemno
+    JOIN callacttype
+      ON caa_callacttypeno = cat_callacttypeno
+      AND callacttype.engineerOvertimeFlag = 'Y'
+    JOIN consultant
+      ON caa_consno = cns_consno
+    JOIN headert
+      ON headert.`headerID` = 1
+  WHERE caa_endtime
+    AND caa_endtime IS NOT NULL
+    AND (caa_status = 'C'
+      OR caa_status = 'A')
+    AND caa_ot_exp_flag = 'N'
+    AND (
+      DATE_FORMAT(caa_date, '%w') IN (0, 6)
+      OR (
+        consultant.weekdayOvertimeFlag = 'Y'
+        AND DATE_FORMAT(caa_date, '%w') IN (1, 2, 3, 4, 5)
+      )
     )
-  )
-  AND (
-    caa_endtime > overtimeEndTime
-    OR caa_starttime < overtimeStartTime
-    OR DATE_FORMAT(caa_date, '%w') IN (0, 6)
-  )
-  AND getOvertime (caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
-  AND (caa_endtime <> caa_starttime)
-  AND (
-    consultant.`expenseApproverID` = ?
-    OR
-    (SELECT
-      1
-    FROM
-      consultant globalApprovers
-    WHERE globalApprovers.globalExpenseApprover
-      AND globalApprovers.cns_consno = ?) = 1
-  )
-GROUP BY consultant.`cns_consno` ORDER BY staffName";
+    AND (
+      caa_endtime > overtimeEndTime
+      OR caa_starttime < overtimeStartTime
+      OR DATE_FORMAT(caa_date, '%w') IN (0, 6)
+    )
+    AND getOvertime (caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
+    AND (caa_endtime <> caa_starttime)
+    AND (
+      consultant.`expenseApproverID` = ?
+      OR
+      (SELECT
+        1
+      FROM
+        consultant globalApprovers
+      WHERE globalApprovers.globalExpenseApprover
+        AND globalApprovers.cns_consno = ?) = 1
+    )
+  GROUP BY consultant.`cns_consno`
+  ORDER BY staffName) runningTotals";
                 $result = $db->preparedQuery(
                     $overtimeQuery,
                     [["type" => "i", "value" => $this->userID], ["type" => "i", "value" => $this->userID]]
@@ -475,44 +493,62 @@ GROUP BY consultant.`cns_consno` ORDER BY staffName";
                 $overtimes = $result->fetch_all(MYSQLI_ASSOC);
 
                 $expenseQuery = "SELECT
-  consultant.cns_name AS staffName,
-  SUM(
-    IF(
-      expense.`approvedBy` IS NOT NULL,
-      expense.`exp_value`,
-      0
-    )
-  ) AS approvedValue,
-  SUM(
-    IF(
-      expense.`approvedBy` IS NULL
-      AND expense.`deniedReason` IS NULL,
-      expense.`exp_value`,
-      0
-    )
-  ) AS pendingValue
+  runningTotals.staffName,
+  runningTotals.approvedValue,
+  runningTotals.pendingValue,
+  (SELECT
+    SUM(exp_value)
+  FROM
+    expense
+    LEFT JOIN callactivity
+      ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
+  WHERE callactivity.`caa_consno` = runningTotals.staffId
+    AND expense.`dateSubmitted` BETWEEN DATE_FORMAT(NOW(), '%Y')
+    AND NOW()
+    AND exp_exported_flag <> \"N\"
+    AND expense.`approvedBy` IS NOT NULL) AS YTD
 FROM
-  expense
-  LEFT JOIN `callactivity`
-    ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
-  LEFT JOIN consultant
-    ON callactivity.`caa_consno` = consultant.`cns_consno`
-WHERE caa_endtime
-  AND caa_endtime IS NOT NULL
-  AND (
-    consultant.`expenseApproverID` = ?
-    OR (
-      (SELECT
-        1
-      FROM
-        consultant globalApprovers
-      WHERE globalApprovers.globalExpenseApprover
-        AND globalApprovers.cns_consno = ?) = 1
-      AND consultant.`activeFlag` = \"Y\"
+  (SELECT
+    consultant.cns_name AS staffName,
+    consultant.cns_consno AS staffId,
+    SUM(
+      IF(
+        expense.`approvedBy` IS NOT NULL,
+        expense.`exp_value`,
+        0
+      )
+    ) AS approvedValue,
+    SUM(
+      IF(
+        expense.`approvedBy` IS NULL
+        AND expense.`deniedReason` IS NULL,
+        expense.`exp_value`,
+        0
+      )
+    ) AS pendingValue
+  FROM
+    expense
+    LEFT JOIN `callactivity`
+      ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
+    LEFT JOIN consultant
+      ON callactivity.`caa_consno` = consultant.`cns_consno`
+  WHERE caa_endtime
+    AND caa_endtime IS NOT NULL
+    AND (
+      consultant.`expenseApproverID` = ?
+      OR (
+        (SELECT
+          1
+        FROM
+          consultant globalApprovers
+        WHERE globalApprovers.globalExpenseApprover
+          AND globalApprovers.cns_consno = ?) = 1
+        AND consultant.`activeFlag` = \"Y\"
+      )
     )
-  )
-  AND exp_exported_flag <> \"Y\"
-  GROUP BY consultant.`cns_consno` ORDER BY staffName";
+    AND exp_exported_flag <> \"Y\"
+  GROUP BY consultant.`cns_consno`
+  ORDER BY staffName) runningTotals";
 
                 $result = $db->preparedQuery(
                     $expenseQuery,
@@ -524,6 +560,7 @@ WHERE caa_endtime
                     "expenses"  => $expenses,
                     "overtimes" => $overtimes
                 ];
+
                 $this->template->setVar(
                     'CONTENTS',
                     $twig->render('expenseDashboard/runningTotals.html.twig', $context)
