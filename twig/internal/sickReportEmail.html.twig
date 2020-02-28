@@ -1,0 +1,36 @@
+{% extends "wrapper.html.twig" %}
+{% block styles %}
+    table th, table td {
+    padding-left: 10px;
+    padding-right: 10px;
+    }
+{% endblock %}
+{% block content %}
+    <p>
+        These people have had sickness in the last month and are over the limit of {{ yearlySicknessThresholdWarning }} days per year
+    </p>
+    <table>
+        <thead>
+        <tr>
+            <th>Staff Member</th>
+            <th>Total Sick In Last 30 Days</th>
+            <th>Total Sick Days This Year</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for sickPerson in sickPeople %}
+        <tr>
+            <td>
+                {{ sickPerson.staffName }}
+            </td>
+            <td>
+                {{ sickPerson.sickDaysLast30Days }}
+            </td>
+            <td>
+                {{ sickPerson.sickDaysThisYear }}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

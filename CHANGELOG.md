@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Added
 - Issue 757 - Notify when quote is signed within Signable
 - Issue 756 - SD Dashboard to show active SRs
+- Issue 755 - Sickness total notification
 ### Fixed
 - Issue 758 - Customer Renewal Report Total fields formatting issue
 

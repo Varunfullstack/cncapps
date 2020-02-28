@@ -503,6 +503,17 @@ class DBEUser extends DBEntity
         $this->setQueryString($query);
         return parent::getRows();
     }
+
+    public function getSickReportUsers()
+    {
+        $query = "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName().
+            " WHERE " . $this->getDBColumnName(
+                self::activeFlag
+            ) . " = 'Y' and  ";
+        $this->setQueryString($query);
+        return parent::getRows();
+    }
 }
 
 ?>

@@ -14,11 +14,14 @@ use CNCLTD\PendingOvertime;
 use Twig\Environment;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUExpense.inc.php');
 require_once($cfg['path_bu'] . '/BUMail.inc.php');
 global $db;
+/** @var $twig Environment */
+global $twig;
 $logName = 'SendUnapprovedExpenseOvertimeWarningEmails';
 $logger = new LoggerCLI($logName);
 
@@ -64,8 +67,6 @@ if ($today < $expensesNextProcessingDateStart) {
     exit;
 }
 
-/** @var $twig Environment */
-global $twig;
 
 $approvers = [];
 $buExpense = new BUExpense($thing);
@@ -106,8 +107,6 @@ foreach (getPendingToApproveExpenseItems() as $pendingToApproveExpenseItem) {
 }
 
 $buMail = new BUMail($thing);
-/** @var \Twig\Environment $twig */
-global $twig;
 foreach ($approvers as $approver) {
     $body = $twig->render('unapprovedExpenseOvertimeWarningEmail.html.twig', $approver);
     $fromEmail = CONFIG_SALES_EMAIL;
@@ -133,9 +132,75 @@ foreach ($approvers as $approver) {
         $hdrs,
         $body
     );
-
 }
 
+// SICKNESS...
+
+$db->query(
+    "SELECT
+  sicknessTest.*,
+  consultant.`cns_name` AS staffName
+FROM
+  (SELECT
+    userID,
+    SUM(IF(sickTime = 'F', 1, 0.5)) AS sickDaysThisYear,
+    (SELECT
+      SUM(IF(sickTime = 'F', 1, 0.5))
+    FROM
+      user_time_log b
+    WHERE b.`userID` = a.`userID`
+      AND b.`loggedDate` BETWEEN CURDATE() - INTERVAL 30 DAY
+      AND CURDATE() AND sickTime IS NOT NULL) AS sickDaysLast30Days,
+      
+    yearlySicknessThresholdWarning
+  FROM
+    user_time_log a 
+    JOIN headert
+  WHERE a.`loggedDate` >= DATE_FORMAT(NOW(), '%Y-01-01')
+    AND sickTime IS NOT NULL
+    AND
+    (SELECT
+      COUNT(*)
+    FROM
+      user_time_log b
+    WHERE b.`userID` = a.`userID`
+      AND b.`loggedDate` BETWEEN CURDATE() - INTERVAL 30 DAY
+      AND CURDATE() AND sickTime IS NOT NULL)
+  GROUP BY userID) sicknessTest
+  LEFT JOIN consultant ON sicknessTest.userID = consultant.`cns_consno`
+WHERE sickDaysThisYear >= yearlySicknessThresholdWarning"
+);
+$sickPeople = $db->fetchAll(MYSQLI_ASSOC);
+$body = $twig->render(
+    'sickReportEmail.html.twig',
+    [
+        "sickPeople"             => $sickPeople,
+        "yearlySicknessThresholdWarning" => @$sickPeople[0]['yearlySicknessThresholdWarning']
+    ]
+);
+$fromEmail = CONFIG_SUPPORT_EMAIL;
+$toEmail = "payroll@cnc-ltd.co.uk";
+$subject = "Staff Sickness Report For Payroll";
+$hdrs = array(
+    'From'    => $fromEmail,
+    'To'      => $toEmail,
+    'Subject' => $subject
+);
+$mime = new Mail_mime();
+$mime->setHTMLBody($body);
+$mime_params = array(
+    'text_encoding' => '7bit',
+    'text_charset'  => 'UTF-8',
+    'html_charset'  => 'UTF-8',
+    'head_charset'  => 'UTF-8'
+);
+$body = $mime->get($mime_params);
+$hdrs = $mime->headers($hdrs);
+$buMail->send(
+    $toEmail,
+    $hdrs,
+    $body
+);
 
 function getPendingToApproveExpenseItems()
 {
