@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 757 - Notify when quote is signed within Signable
+- Issue 756 - SD Dashboard to show active SRs
 ### Fixed
 - Issue 758 - Customer Renewal Report Total fields formatting issue
 
