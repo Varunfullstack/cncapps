@@ -25,12 +25,12 @@
         submitAsOvertimeCheckbox[0].checked = false;
     }
 
-    var authorisedByName = "{authorisedByName}";
+    const authorisedByName = "{authorisedByName}";
     $(function () {
-        submitAsOvertimeCheckbox = $('select[name="callActivity[1][submitAsOvertime]"]');
+        submitAsOvertimeCheckbox = $('input[name="callActivity[1][submitAsOvertime]"]');
         window.alarmDate = $('#alarmDate').get(0);
 
-        var activityTypeSelector = $('input[name="callActivity[1][callActTypeID]"]');
+        const activityTypeSelector = $('select[name="callActivity[1][callActTypeID]"]');
 
         if (activityTypeSelector.val() == 59) {
             hideChangeRequestButtons();
