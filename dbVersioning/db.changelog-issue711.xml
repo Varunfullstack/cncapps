@@ -55,4 +55,13 @@
             Grant insert on callJournal to '3cxUser'@'192.168.33.62';
         </sql>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue711-4">
+        <preConditions onFail="MARK_RAN">
+            <tableIsEmpty tableName="callJournal"/>
+        </preConditions>
+        <sql>
+            insert into callJournal select * from cncappsdev.callJournal;
+        </sql>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>
