@@ -300,7 +300,7 @@
                         }
 
                         if (row.status === 'Pending') {
-                            return '<button onclick="approveExpense(' + row.id + ')" data-expense-id="row.id">Approve</button><button onclick="denyExpense(' + row.id + ')">Deny</button><button onclick="deleteExpense(' + row.id + ')">Delete</button> ';
+                            return '<button onclick="approveExpense(' + row.id + ')" data-expense-id="row.id"><i class="fa fa-check"></i></button><button onclick="denyExpense(' + row.id + ')"><i class="fa fa-times"></i></button><button onclick="deleteExpense(' + row.id + ')"><i class="fa fa-trash"></i></button> ';
                         }
                         return "";
                     }
@@ -376,12 +376,7 @@
                         if (!data) {
                             return '';
                         }
-                        let toReturn = data.toFixed(2);
-                        if (row.submitAsOvertime) {
-                            toReturn += '<img src="/images/clock.png" width="20px" alt="time">';
-                        }
-
-                        return toReturn;
+                        return data.toFixed(2);
                     }
                 },
                 {data: 'startTime', name: 'startTime'},
@@ -408,7 +403,7 @@
                         }
 
                         if (row.status === 'Pending') {
-                            return '<button onclick="approveOvertime(' + row.activityId + ')" data-expense-id="row.id">Approve</button><button onclick="denyOvertime(' + row.activityId + ')">Deny</button><button onclick="deleteOvertime(' + row.activityId + ')">Delete</button>';
+                            return '<button onclick="approveOvertime(' + row.activityId + ')" data-expense-id="row.id"><i class="fa fa-check"></i></button><button onclick="denyOvertime(' + row.activityId + ')"><i class="fa fa-times"></i></button><button onclick="deleteOvertime(' + row.activityId + ')"><i class="fa fa-trash"></i></button>';
                         }
                         return "";
                     }

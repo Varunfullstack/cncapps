@@ -426,6 +426,7 @@ and submitAsOvertime
     AND (caa_status = 'C'
       OR caa_status = 'A')
     AND caa_ot_exp_flag = 'Y'
+    and submitAsOvertime
     AND callactivity.`caa_consno` = runningTotals.staffId) AS YTD
 FROM
   (SELECT
@@ -506,7 +507,6 @@ FROM
     AND expense.`dateSubmitted` BETWEEN DATE_FORMAT(NOW(), '%Y')
     AND NOW()
     AND exp_exported_flag <> \"N\"
-    and submitAsOvertime
     AND expense.`approvedBy` IS NOT NULL) AS YTD
 FROM
   (SELECT
