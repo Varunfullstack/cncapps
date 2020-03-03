@@ -221,21 +221,16 @@ WHERE caa_endtime
   AND caa_ot_exp_flag = 'N'
   and callactivity.`overtimeApprovedBy` is null
   and callactivity.overtimeDeniedReason is null
+ and submitAsOvertime
   AND (
-        (
-                consultant.weekdayOvertimeFlag = 'Y'
-                AND DATE_FORMAT(caa_date, '%w') IN (0, 1, 2, 3, 4, 5, 6)
-            )
-        OR (
-                consultant.weekdayOvertimeFlag = 'N'
-                AND DATE_FORMAT(caa_date, '%w') IN (0, 6)
-            )
+    (
+      caa_callacttypeno = 22 and
+      DATE_FORMAT(caa_date, '%w') IN (0, 1, 2, 3, 4, 5, 6)
+      and (caa_endtime > overtimeEndTime
+    OR caa_starttime < overtimeStartTime)
     )
-  AND (
-        caa_endtime > overtimeEndTime
-        OR caa_starttime < overtimeStartTime
-        OR DATE_FORMAT(caa_date, '%w') IN (0, 6)
-    )
+    OR caa_callacttypeno <> 22
+  )
   AND (caa_endtime <> caa_starttime)
   AND callacttype.engineerOvertimeFlag = 'Y'";
     $result = $db->preparedQuery($pendingToApproveOvertimeQuery, []);

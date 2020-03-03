@@ -220,8 +220,7 @@ class BUStaffProductivityReport extends Business
         $query = "
       SELECT
         cns_helpdesk_flag as helpdeskFlag,
-        cns_hourly_pay_rate as hourlyPayRate,
-        weekdayOvertimeFlag
+        cns_hourly_pay_rate as hourlyPayRate
       FROM
         consultant
       WHERE

@@ -1036,21 +1036,15 @@ WHERE
       (caa_status = 'C'
     OR caa_status = 'A')
   AND caa_ot_exp_flag = 'N'
+  and submitAsOvertime
   AND (
     (
-      consultant.weekdayOvertimeFlag = 'Y'
-      AND DATE_FORMAT(caa_date, '%w') IN (0, 1, 2, 3, 4, 5, 6)
+      caa_callacttypeno = 22 and
+      DATE_FORMAT(caa_date, '%w') IN (0, 1, 2, 3, 4, 5, 6)
+      and (caa_endtime > overtimeEndTime
+    OR caa_starttime < overtimeStartTime)
     )
-    OR (
-      consultant.weekdayOvertimeFlag = 'N'
-      AND DATE_FORMAT(caa_date, '%w') IN (0, 6)
-    )
-  )
-  AND (
-    caa_endtime > overtimeEndTime
-   OR caa_starttime < overtimeStartTime
-   OR 
-    DATE_FORMAT(caa_date, '%w') IN (0, 6)
+    OR caa_callacttypeno <> 22
   )
   AND (caa_endtime <> caa_starttime)
   AND callacttype.engineerOvertimeFlag = 'Y'
