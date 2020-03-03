@@ -76,5 +76,10 @@
             <columnExists tableName="consultant" columnName="weekdayOvertimeFlag"/>
         </preConditions>
         <dropColumn tableName="consultant" columnName="weekdayOvertimeFlag"/>
+        <rollback>
+            <addColumn tableName="consultant">
+                <column name="weekdayOvertimeFlag" remarks="Gets overtime during week days?" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
     </changeSet>
 </databaseChangeLog>
