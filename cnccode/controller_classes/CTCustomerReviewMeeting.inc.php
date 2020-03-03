@@ -255,6 +255,9 @@ class CTCustomerReviewMeeting extends CTCNC
                         'becameCustomerDate'     => $becameCustomerDateFormatted,
                         'becameCustomerYears'    => $years,
                         'accountManagerName'     => $accountManagerDS->getValue(DBEUser::name),
+                        'directDebitSetup'       => $dsCustomer->getValue(
+                            DBECustomer::accountNumber
+                        ) && $dsCustomer->getValue(DBECustomer::sortCode) ? 'Yes' : 'No',
                         'keyCustomerContactName' => $primaryContactName,
                         'lastReviewMeetingDate'  => $lastReviewMeetingDateFormatted,
                         'lastReviewMeetingClass' => $dsCustomer->getValue(
