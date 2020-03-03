@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v3.10.4] - 2020-03-03
 ### Added
 - Issue 711 - API for 3CX phone system
 
