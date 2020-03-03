@@ -65,7 +65,7 @@
         <sql>
             update callactivity
             set submitAsOvertime = 1
-            where caa_ot_exp_flag
+            where caa_ot_exp_flag = 'Y'
         </sql>
         <rollback>
             <dropColumn tableName="callactivity" columnName="submitAsOvertime"/>

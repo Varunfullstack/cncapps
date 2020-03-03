@@ -289,13 +289,7 @@ class BUExpense extends Business
         $buHeader = new BUHeader($this);
         $dbeHeader = new DataSet($this);
         $buHeader->getHeader($dbeHeader);
-        $overtimeMinutes = $dbeHeader->getValue(DBEHeader::minimumOvertimeMinutesRequired);
         foreach ($overtimeActivities as $overtimeExportItem) {
-
-            if (!$overtimeExportItem->weekendOvertime && !$overtimeExportItem->allowWeekDayOvertime) {
-                $overtimeWeekdayActivities[] = $overtimeExportItem;
-                continue;
-            }
 
             if ($overtimeExportItem->belowThreshold) {
                 $overtimeWeekdayActivities[] = $overtimeExportItem;
@@ -335,15 +329,15 @@ class BUExpense extends Business
 
         $expenseJournalCSVData = [];
         $summaryReportCSVData = [];
-        /** @var OvertimeExportItem $overtimeWeekdayActivity */
         if ($runType == 'Export') {
 
-            foreach ($overtimeWeekdayActivities as $overtimeWeekdayActivity) {
+            /** @var OvertimeExportItem $toIgnoreOvertimeActivities */
+            foreach ($overtimeWeekdayActivities as $toIgnoreOvertimeActivities) {
                 $queryString =
                     "UPDATE callactivity SET caa_ot_exp_flag = 'Y'
                     WHERE caa_callactivityno = ?";
 
-                $db->preparedQuery($queryString, [["type" => "i", "value" => $overtimeWeekdayActivity->activityId]]);
+                $db->preparedQuery($queryString, [["type" => "i", "value" => $toIgnoreOvertimeActivities->activityId]]);
             }
         }
         foreach ($engineersData as $engineerName => $engineersDatum) {
@@ -551,7 +545,6 @@ ORDER BY cns_name,
            consultant.firstName as engineerFirstName,
                consultant.lastName as engineerLastName,
     `cns_employee_no` as employeeNumber,
-           weekdayOvertimeFlag = 'Y' as allowWeekDayOvertime,
            DATE_FORMAT(caa_date, '%w')IN(0,6) as weekendOvertime,
            getOvertime(callactivity.`caa_callactivityno`) AS overtimeValue,
   getOvertime(callactivity.`caa_callactivityno`) * 60 < minimumOvertimeMinutesRequired AS belowThreshold
@@ -562,13 +555,9 @@ ORDER BY cns_name,
     JOIN consultant ON caa_consno = cns_consno
     left join headert on (headerID = 1)
     WHERE caa_date <= ? AND caa_date >= '2008-01-15'
+      and submitAsOvertime
     AND (caa_status = 'C' OR caa_status = 'A' )
     AND caa_ot_exp_flag = 'N'
-    AND (
-        DATE_FORMAT(caa_date, '%w')IN(0,6) or
-    caa_endtime > overtimeEndTime or caa_starttime < overtimeStartTime 
-        or submitAsOvertime
-        )
     AND  caa_endtime <> caa_starttime
     AND callacttype.engineerOvertimeFlag = 'Y'
     and overtimeApprovedBy is not null
@@ -718,11 +707,13 @@ ORDER BY cns_name,
         $activityType = new DBECallActType($this);
         $activityType->getRow($dbejCallactivity->getValue(DBEJCallActivity::callActTypeID));
 
-        if (!$activityType->getValue(DBECallActType::engineerOvertimeFlag) == 'Y' || !$dbejCallactivity->getValue(DBECallActivity::submitAsOvertime)) {
+        if (!$activityType->getValue(DBECallActType::engineerOvertimeFlag) == 'Y' || !$dbejCallactivity->getValue(
+                DBECallActivity::submitAsOvertime
+            )) {
             return 0;
         }
 
-        if($activityType->getValue(DBECallActType::callActTypeID) != 22){
+        if ($activityType->getValue(DBECallActType::callActTypeID) != 22) {
             return $shiftEndTime - $shiftStartTime;
         }
 
