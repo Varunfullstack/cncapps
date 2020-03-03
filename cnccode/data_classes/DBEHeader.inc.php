@@ -105,6 +105,8 @@ class DBEHeader extends DBEntity
     const projectTeamTargetFixHours = "projectTeamTargetFixHours";
     const projectTeamTargetFixQtyPerMonth = 'projectTeamTargetFixQtyPerMonth';
     const yearlySicknessThresholdWarning = 'yearlySicknessThresholdWarning';
+    const cDriveFreeSpaceWarningPercentageThreshold = 'cDriveFreeSpaceWarningPercentageThreshold';
+    const otherDriveFreeSpaceWarningPercentageThreshold = 'otherDriveFreeSpaceWarningPercentageThreshold';
 
     /**
      * calls constructor()
@@ -618,6 +620,8 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::solarwindsPassword, DA_TEXT, DA_NOT_NULL);
         $this->addColumn(self::pendingTimeLimitActionThresholdMinutes, DA_INTEGER, DA_NOT_NULL);
         $this->addColumn(self::yearlySicknessThresholdWarning, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::cDriveFreeSpaceWarningPercentageThreshold, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::otherDriveFreeSpaceWarningPercentageThreshold, DA_INTEGER, DA_NOT_NULL);
 
         $this->setPK(0);
         $this->setAddColumnsOff();

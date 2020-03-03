@@ -457,10 +457,10 @@ class CTHeader extends CTCNC
                 'smallProjectsTeamTargetFixQtyPerMonthMessage'                       => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::smallProjectsTeamTargetFixQtyPerMonth)
                 ),
-                'projectTeamTargetFixQtyPerMonth'                              => Controller::htmlInputText(
+                'projectTeamTargetFixQtyPerMonth'                                    => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::projectTeamTargetFixQtyPerMonth)
                 ),
-                'projectTeamTargetFixQtyPerMonthMessage'                       => Controller::htmlDisplayText(
+                'projectTeamTargetFixQtyPerMonthMessage'                             => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::projectTeamTargetFixQtyPerMonth)
                 ),
                 'srAutocompleteThresholdHours'                                       => Controller::htmlInputText(
@@ -627,6 +627,12 @@ class CTHeader extends CTCNC
                 ),
                 DBEHeader::solarwindsPassword . 'Message'                            => $dsHeader->getMessage(
                     DBEHeader::solarwindsPassword
+                ),
+                DBEHeader::cDriveFreeSpaceWarningPercentageThreshold                 => $dsHeader->getValue(
+                    DBEHeader::cDriveFreeSpaceWarningPercentageThreshold
+                ),
+                DBEHeader::otherDriveFreeSpaceWarningPercentageThreshold             => $dsHeader->getValue(
+                    DBEHeader::otherDriveFreeSpaceWarningPercentageThreshold
                 ),
                 'urlItemPopup'                                                       => $urlItemPopup,
                 'urlUpdate'                                                          => $urlUpdate

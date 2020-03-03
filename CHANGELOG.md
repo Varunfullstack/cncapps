@@ -6,6 +6,8 @@ This project changes will be shown here.
 - Issue 757 - Notify when quote is signed within Signable
 - Issue 756 - SD Dashboard to show active SRs
 - Issue 755 - Sickness total notification
+### Changed
+- Issue 667 - Review Meeting Agenda Enhancements
 ### Fixed
 - Issue 758 - Customer Renewal Report Total fields formatting issue
 - Issue 753 - Project team logging target not showing on user graph

@@ -6,6 +6,12 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use Twig\Environment;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
+
+global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerReviewMeeting.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
@@ -14,6 +20,7 @@ require_once($cfg ['path_bu'] . '/BUServiceDeskReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerSrAnalysisReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerItem.inc.php');
 require_once($cfg ['path_bu'] . '/BUActivity.inc.php');
+require_once($cfg ['path_bu'] . '/BURenewal.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
 class CTCustomerReviewMeeting extends CTCNC
@@ -149,6 +156,7 @@ class CTCustomerReviewMeeting extends CTCNC
         $graphData = null;
         $editableText = null;
         $nonEditableText = null;
+        $diskSpaceReport = null;
         if (isset($_REQUEST ['searchForm'])) {
 
             if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
@@ -207,27 +215,78 @@ class CTCustomerReviewMeeting extends CTCNC
 
                 $textTemplate->setVar('reportDate', $reportRangeDate);
 
+                $becameCustomerDateString = $dsCustomer->getValue(DBECustomer::becameCustomerDate);
+                $becameCustomerDateFormatted = null;
+                $years = null;
+                if ($becameCustomerDateString) {
+                    $becameCustomerDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $becameCustomerDateString);
+                    $becameCustomerDateFormatted = $becameCustomerDate->format('d/m/Y');
+                    $today = new DateTime();
+                    $years = $today->diff($becameCustomerDate)->y;
+                }
+
+                $accountManagerDS = new DBEUser($tthis);
+                $accountManagerDS->getRow($dsCustomer->getValue(DBECustomer::accountManagerUserID));
+
+                $primaryContact = $buCustomer->getPrimaryContact($customerId);
+
+                $primaryContactName = null;
+                if ($primaryContact) {
+                    $primaryContactName = $primaryContact->getValue(
+                            DBEContact::firstName
+                        ) . " " . $primaryContact->getValue(DBEContact::lastName);
+                }
+
+                $lastReviewMeetingDateFormatted = null;
+                if ($dsCustomer->getValue(DBECustomer::lastReviewMeetingDate)) {
+                    $lastReviewMeetingDate = DateTime::createFromFormat(
+                        DATE_MYSQL_DATE,
+                        $dsCustomer->getValue(
+                            DBECustomer::lastReviewMeetingDate
+                        )
+                    );
+                    $lastReviewMeetingDateFormatted = $lastReviewMeetingDate->format('d/m/Y');
+                }
+
+
                 $nonEditableTemplate->set_var(
                     array(
-                        'customerName' => $dsCustomer->getValue(DBECustomer::name),
-                        'siteURL'      => SITE_URL,
-                        'meetingDate'  => self::dateYMDtoDMY(
+                        'customerName'           => $dsCustomer->getValue(DBECustomer::name),
+                        'becameCustomerDate'     => $becameCustomerDateFormatted,
+                        'becameCustomerYears'    => $years,
+                        'accountManagerName'     => $accountManagerDS->getValue(DBEUser::name),
+                        'directDebitSetup'       => $dsCustomer->getValue(
+                            DBECustomer::accountNumber
+                        ) && $dsCustomer->getValue(DBECustomer::sortCode) ? 'Yes' : 'No',
+                        'keyCustomerContactName' => $primaryContactName,
+                        'lastReviewMeetingDate'  => $lastReviewMeetingDateFormatted,
+                        'lastReviewMeetingClass' => $dsCustomer->getValue(
+                            DBECustomer::reviewMeetingBooked
+                        ) ? 'class="performance-green"' : null,
+                        'reviewMeetingFrequency' => $this->getReviewMeetingFrequencyValue($dsCustomer),
+                        'siteURL'                => SITE_URL,
+                        'meetingDate'            => self::dateYMDtoDMY(
                             $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormMeetingDate)
                         ),
-                        'slaP1'        => $dsCustomer->getValue(DBECustomer::slaP1),
-                        'slaP2'        => $dsCustomer->getValue(DBECustomer::slaP2),
-                        'slaP3'        => $dsCustomer->getValue(DBECustomer::slaP3),
-                        'slaP4'        => $dsCustomer->getValue(DBECustomer::slaP4),
-                        'slaP5'        => $dsCustomer->getValue(DBECustomer::slaP5),
-                        "waterMarkURL" => SITE_URL . '/images/CNC_watermarkActualSize.png',
-                        'reportDate'   => $reportRangeDate
+                        'slaP1'                  => $dsCustomer->getValue(DBECustomer::slaP1),
+                        'slaP2'                  => $dsCustomer->getValue(DBECustomer::slaP2),
+                        'slaP3'                  => $dsCustomer->getValue(DBECustomer::slaP3),
+                        'slaP4'                  => $dsCustomer->getValue(DBECustomer::slaP4),
+                        'slaP5'                  => $dsCustomer->getValue(DBECustomer::slaP5),
+                        "waterMarkURL"           => SITE_URL . '/images/CNC_watermarkActualSize.png',
+                        'reportDate'             => $reportRangeDate
                     )
                 );
 
-                $results = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
-                    $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID),
-                    $startDate,
-                    $endDate
+                $historicEndDate = new DateTime();
+                $historicStartDate = (clone $historicEndDate)->sub(new DateInterval('P3Y'));
+                if (isset($becameCustomerDate) && $becameCustomerDate > $historicStartDate) {
+                    $historicStartDate = $becameCustomerDate;
+                }
+                $historicData = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
+                    $customerId,
+                    $historicStartDate,
+                    $historicEndDate
                 );
 
                 $supportedUsersData = $this->getSupportedUsersData(
@@ -235,6 +294,133 @@ class CTCustomerReviewMeeting extends CTCNC
                     $customerId,
                     $dsCustomer->getValue(DBECustomer::name)
                 );
+                $buRenewal = new BURenewal($this);
+                $items = $buRenewal->getRenewalsAndExternalItemsByCustomer(
+                    $customerId,
+                    $this,
+                    true
+                );
+
+                usort(
+                    $items,
+                    function ($a,
+                              $b
+                    ) {
+                        return $a['itemTypeDescription'] <=> $b['itemTypeDescription'];
+                    }
+                );
+
+                $nonEditableTemplate->set_block(
+                    'page',
+                    'itemBlock',
+                    'items'
+                );
+
+                $totalSalePrice = 0;
+                $dbeItemType = new DBEItemType($this);
+                $dbeItemType->getCustomerReviewRows();
+
+                $itemTypes = [];
+
+                while ($dbeItemType->fetchNext()) {
+                    $itemTypes[$dbeItemType->getValue(DBEItemType::description)] = [];
+                    $itemsCopy = $items;
+                    foreach ($itemsCopy as $index => $item) {
+                        if ($item['itemTypeDescription'] != $dbeItemType->getValue(DBEItemType::description)) {
+                            continue;
+                        }
+                        $itemTypes[$dbeItemType->getValue(DBEItemType::description)][] = $item;
+                        unset ($items[$index]);
+                    }
+
+                }
+
+
+                foreach ($itemTypes as $typeName => $itemTypeContainer) {
+
+                    $itemTypeHeader = '<tr><td colspan="3"><h3>' . $typeName . '</h3></td></tr>';
+
+                    $nonEditableTemplate->set_var(
+                        array(
+                            'itemTypeHeader' => $itemTypeHeader
+                        )
+                    );
+
+                    if (!count($itemTypeContainer)) {
+                        $nonEditableTemplate->set_var(
+                            array(
+                                'description'        => "No Services provided",
+                                'notes'              => null,
+                                'salePrice'          => null,
+                                'coveredItemsString' => null,
+                                'itemClass'          => null,
+                                'customerID'         => null,
+                            )
+                        );
+                        $nonEditableTemplate->parse(
+                            'items',
+                            'itemBlock',
+                            true
+                        );
+                    } else {
+                        $removeHeader = false;
+                        foreach ($itemTypeContainer as $item) {
+                            if ($item['description'] == 'Customer Account Management') {
+                                continue;
+                            }
+                            $coveredItemsString = null;
+
+                            if ($removeHeader) {
+                                $nonEditableTemplate->set_var(
+                                    array(
+                                        'itemTypeHeader' => ''
+                                    )
+                                );
+                            }
+
+                            if (count($item['coveredItems']) > 0) {
+                                foreach ($item['coveredItems'] as $coveredItem) {
+                                    $coveredItemsString .= '<br/>' . $coveredItem;
+                                    $nonEditableTemplate->set_var(
+                                        array(
+                                            'coveredItemsString' => $coveredItemsString
+                                        )
+                                    );
+                                }
+                            }
+                            $itemClass = 'externalItem';
+                            $salePrice = null;
+                            if (!is_null($item['customerItemID'])) {
+                                $formatter = new NumberFormatter('en_GB', NumberFormatter::CURRENCY);
+                                $itemClass = null;
+                                $salePrice = $formatter->formatCurrency($item['salePrice'], 'GBP');
+                                $totalSalePrice += $item['salePrice'];
+                            }
+
+                            $nonEditableTemplate->set_var(
+                                array(
+                                    'notes'              => $item['notes'],
+                                    'description'        => Controller::htmlDisplayText($item['description']),
+                                    'salePrice'          => $salePrice,
+                                    'coveredItemsString' => $coveredItemsString,
+                                    'itemClass'          => $itemClass,
+                                    'customerID'         => $customerId,
+                                )
+                            );
+                            $nonEditableTemplate->parse(
+                                'items',
+                                'itemBlock',
+                                true
+                            );
+                            if (!$removeHeader) {
+                                $removeHeader = true;
+                            }
+                        }
+
+                    }
+
+                }
+
 
                 $nonEditableTemplate->set_var(
                     [
@@ -401,9 +587,99 @@ class CTCustomerReviewMeeting extends CTCNC
                         'rootCauseBlock',
                         true
                     );
-
                 }
 
+                $buHeader = new BUHeader($this);
+                $dsHeader = new DataSet($this);
+                $buHeader->getHeader($dsHeader);
+
+                $dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
+                $options = [
+                    PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
+                ];
+                $labtechDB = new PDO(
+                    $dsn,
+                    LABTECH_DB_USERNAME,
+                    LABTECH_DB_PASSWORD,
+                    $options
+                );
+
+                $statement = $labtechDB->prepare(
+                    'SELECT computers.name as agentName,letter as driveLetter,size as driveSize, free as driveFreeSpace, free/size  as freePercent FROM  drives 
+JOIN computers ON computers.`ComputerID` = drives.`ComputerID`
+JOIN clients ON computers.`ClientID` = clients.`ClientID`
+WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalID` = ?'
+                );
+                $statement->execute([$customerId]);
+
+                $diskSpaceData = $statement->fetchAll(PDO::FETCH_ASSOC);
+                /** @var $twig Environment */
+                global $twig;
+                $twig->addFilter(
+                    new TwigFilter(
+                        'freePercentage',
+                        function ($string) use ($dsHeader) {
+                            $pctValue = $string * 100;
+                            return number_format($pctValue) . "%";
+                        }
+                    )
+                );
+                $twig->addFilter(
+                    new TwigFilter(
+                        'MB2GB',
+                        function ($string) {
+                            if (!$string) {
+                                return null;
+                            }
+                            return number_format($string / 1024, 0, '', '') . 'GB';
+                        }
+                    )
+                );
+                $twig->addFunction(
+                    new TwigFunction(
+                        'getFreeSpaceClass',
+                        function ($item) use ($dsHeader) {
+                            $threshold = $dsHeader->getValue(DBEHeader::otherDriveFreeSpaceWarningPercentageThreshold);
+                            if ($item['driveLetter'] === 'C') {
+                                $threshold = $dsHeader->getValue(DBEHeader::cDriveFreeSpaceWarningPercentageThreshold);
+                            }
+                            $pctValue = $item['freePercent'] * 100;
+                            $colorStyle = null;
+                            if ($pctValue <= $threshold) {
+                                $colorStyle = 'style="color: red "';
+                            }
+                            return "$colorStyle";
+                        },
+                        ['is_safe' => ['all', "html"], 'pre_escaped' => 'html']
+                    )
+                );
+                $diskSpaceReport = '';
+                if (count($diskSpaceData)) {
+                    $diskSpaceReport = $twig->render(
+                        'customerReviewMeeting/diskSpaceReportSection.html.twig',
+                        ["driveSpaceItems" => $diskSpaceData]
+                    );
+                }
+
+                $nonEditableTemplate->setVar('diskSpaceSection', $diskSpaceReport);
+
+                $nonEditableTemplate->parse(
+                    'output',
+                    'page',
+                    true
+                );
+
+                $nonEditableText = $nonEditableTemplate->get_var('output');
+                $results = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
+                    $customerId,
+                    $startDate,
+                    $endDate
+                );
+                $graphData = $this->generateCharts(
+                    $results,
+                    $customerId,
+                    $historicData
+                );
 
                 $supportedUsersData = $this->getSupportedUsersLevelsCount(
                     $buContact,
@@ -417,9 +693,6 @@ class CTCustomerReviewMeeting extends CTCNC
                     $supportedUsersData['data']
                 );
 
-                $buHeader = new BUHeader($this);
-                $dsHeader = new DataSet($this);
-                $buHeader->getHeader($dsHeader);
                 $textTemplate->set_var(
                     'customerReviewMeetingText',
                     $dsHeader->getValue(DBEHeader::customerReviewMeetingText)
@@ -430,21 +703,7 @@ class CTCustomerReviewMeeting extends CTCNC
                     'page',
                     true
                 );
-
-                $nonEditableTemplate->parse(
-                    'output',
-                    'page',
-                    true
-                );
-
                 $editableText = $textTemplate->get_var('output');
-
-                $nonEditableText = $nonEditableTemplate->get_var('output');
-                $graphData = $this->generateCharts(
-                    $results,
-                    $customerId
-                );
-
             }
 
         } else {
@@ -508,6 +767,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 JSON_NUMERIC_CHECK
             ) . "</script>";
 
+
         $this->template->set_var(
             array(
                 'customerID'            => $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID),
@@ -524,6 +784,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 'urlCustomerPopup'      => $urlCustomerPopup,
                 'editableText'          => $editableText,
                 'nonEditableText'       => $nonEditableText,
+                'diskSpaceReport'       => $diskSpaceReport,
                 'urlSubmit'             => $urlSubmit,
                 'urlGeneratePdf'        => $urlGeneratePdf,
             )
@@ -535,6 +796,36 @@ class CTCustomerReviewMeeting extends CTCNC
             true
         );
         $this->parsePage();
+    }
+
+    /**
+     * @param DBECustomer|DataSet $dsCustomer
+     * @return string
+     */
+    private function getReviewMeetingFrequencyValue($dsCustomer)
+    {
+        $value = $dsCustomer->getValue(DBECustomer::reviewMeetingFrequencyMonths);
+        switch ($value) {
+            case 1:
+                $frequency = 'Monthly';
+                break;
+            case 2:
+                $frequency = 'Two-monthly';
+                break;
+            case 3:
+                $frequency = 'Quarterly';
+                break;
+            case 6:
+                $frequency = 'Six-monthly';
+                break;
+            case 12:
+                $frequency = 'Annually';
+                break;
+
+            default:
+                $frequency = 'N/A';
+        }
+        return $frequency;
     }
 
     private function getSupportedUsersData(BUContact $buContact,
@@ -597,11 +888,7 @@ class CTCustomerReviewMeeting extends CTCNC
         if (count($duplicates)) {
             // send email to sales@cnc-ltd.co.uk with the list of duplicates
             $buMail = new BUMail($this);
-
             $senderEmail = CONFIG_SUPPORT_EMAIL;
-
-            $senderName = 'CNC Support Department';
-
             $toEmail = 'sales@cnc-ltd.co.uk';
 
             $template = new Template(
@@ -676,8 +963,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 $senderEmail,
                 $toEmail,
                 $hdrs,
-                $body,
-                true
+                $body
             );
 
         }
@@ -1023,30 +1309,140 @@ class CTCustomerReviewMeeting extends CTCNC
      */
     private function getReviewMeetingFrequencyBody($dsCustomer)
     {
-        $value = $dsCustomer->getValue(DBECustomer::reviewMeetingFrequencyMonths);
+        $frequency = $this->getReviewMeetingFrequencyValue($dsCustomer);
+        return "<h2>Review Meeting Frequency - " . $frequency . "</h2>";
+    }
 
-        switch ($value) {
-            case 1:
-                $frequency = 'Monthly';
-                break;
-            case 2:
-                $frequency = 'Two-monthly';
-                break;
-            case 3:
-                $frequency = 'Quarterly';
-                break;
-            case 6:
-                $frequency = 'Six-monthly';
-                break;
-            case 12:
-                $frequency = 'Annually';
-                break;
+    private function generateCharts($data,
+                                    $customerId,
+                                    $historicData
+    )
+    {
 
-            default:
-                $frequency = 'N/A';
+        $serverCareIncidents = [
+            "title"   => "ServerCare Incidents",
+            "columns" => ["Dates", "ServerSR", "AvgResponse", "Changes"],
+            "data"    => []
+        ];
+
+        $serviceDesk = [
+            "title"   => "ServiceDesk/Pre-Pay Incidents",
+            "columns" => ["Dates", "UserSR", "AvgResponse", "Changes",],
+            "data"    => []
+        ];
+
+        $otherContracts = [
+            "title"   => "Other Contract Incidents",
+            "columns" => ["Dates", "OtherSR", "AvgResponse", "Changes",],
+            "data"    => []
+        ];
+
+        $totalSR = [
+            "title"   => "Total SRs",
+            "columns" => ["Dates", "P1-3", "P4",],
+            "data"    => []
+        ];
+
+        $historicTotalSR = [
+            "title"   => "Historic Total SRs",
+            "columns" => ["Dates", "P1-3", "P4"],
+            "data"    => []
+        ];
+
+        foreach ($historicData as $datum) {
+            $row = [
+                substr(
+                    $datum['monthName'],
+                    0,
+                    3
+                ) . "-" . $datum['year'],
+                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'],
+                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'],
+            ];
+
+            $historicTotalSR['data'][] = $row;
         }
 
-        return "<h2>Review Meeting Frequency - " . $frequency . "</h2>";
+
+        foreach ($data as $datum) {
+
+
+            $row = [
+                substr(
+                    $datum['monthName'],
+                    0,
+                    3
+                ) . "-" . $datum['year'],
+                $datum['serverCareCount1And3'],
+                number_format(
+                    $datum['serverCareHoursResponded'],
+                    1
+                ),
+                $datum['serverCareCount4']
+            ];
+
+            $serverCareIncidents['data'][] = $row;
+
+            $row = [
+                substr(
+                    $datum['monthName'],
+                    0,
+                    3
+                ) . "-" . $datum['year'],
+                $datum['serviceDeskCount1And3'] + $datum['prepayCount1And3'],
+                number_format(
+                    $datum['serviceDeskHoursResponded'] + $datum['prepayHoursResponded'],
+                    1
+                ),
+                $datum['serviceDeskCount4'] + $datum['prepayCount4'],
+            ];
+
+            $serviceDesk['data'][] = $row;
+
+            $row = [
+                substr(
+                    $datum['monthName'],
+                    0,
+                    3
+                ) . "-" . $datum['year'],
+                $datum['otherCount1And3'],
+                number_format(
+                    $datum['otherHoursResponded'],
+                    1
+                ),
+                $datum['otherCount4'],
+            ];
+
+            $otherContracts['data'][] = $row;
+
+            $row = [
+                substr(
+                    $datum['monthName'],
+                    0,
+                    3
+                ) . "-" . $datum['year'],
+                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'],
+                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'],
+            ];
+
+            $totalSR['data'][] = $row;
+        }
+        $BUCustomerItem = new BUCustomerItem($this);
+        /** @var DataSet $datasetContracts */
+        $datasetContracts = null;
+        $BUCustomerItem->getServerCareValidContractsByCustomerID(
+            $customerId,
+            $datasetContracts
+        );
+
+        return [
+            "serverCareIncidents" => $serverCareIncidents,
+            "serviceDesk"         => $serviceDesk,
+            "otherContracts"      => $otherContracts,
+            "totalSR"             => $totalSR,
+            'historicTotalSR'     => $historicTotalSR,
+            "renderServerCare"    => !!$datasetContracts->rowCount()
+        ];
     }
 
     private function getSupportedUsersLevelsCount(BUContact $buContact,
@@ -1201,116 +1597,6 @@ class CTCustomerReviewMeeting extends CTCNC
         return [
             "data"  => $supportContactInfo,
             "count" => $supportContactsCounts['total']
-        ];
-    }
-
-    private function generateCharts($data,
-                                    $customerId
-    )
-    {
-
-        $serverCareIncidents = [
-            "title"   => "ServerCare Incidents",
-            "columns" => ["Dates", "ServerSR", "AvgResponse", "Changes"],
-            "data"    => []
-        ];
-
-        $serviceDesk = [
-            "title"   => "ServiceDesk/Pre-Pay Incidents",
-            "columns" => ["Dates", "UserSR", "AvgResponse", "Changes",],
-            "data"    => []
-        ];
-
-        $otherContracts = [
-            "title"   => "Other Contract Incidents",
-            "columns" => ["Dates", "OtherSR", "AvgResponse", "Changes",],
-            "data"    => []
-        ];
-
-        $totalSR = [
-            "title"   => "Total SR's",
-            "columns" => ["Dates", "P1-3", "P4",],
-            "data"    => []
-        ];
-
-
-        foreach ($data as $datum) {
-
-
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['serverCareCount1And3'],
-                number_format(
-                    $datum['serverCareHoursResponded'],
-                    1
-                ),
-                $datum['serverCareCount4']
-            ];
-
-            $serverCareIncidents['data'][] = $row;
-
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['serviceDeskCount1And3'] + $datum['prepayCount1And3'],
-                number_format(
-                    $datum['serviceDeskHoursResponded'] + $datum['prepayHoursResponded'],
-                    1
-                ),
-                $datum['serviceDeskCount4'] + $datum['prepayCount4'],
-            ];
-
-            $serviceDesk['data'][] = $row;
-
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['otherCount1And3'],
-                number_format(
-                    $datum['otherHoursResponded'],
-                    1
-                ),
-                $datum['otherCount4'],
-            ];
-
-            $otherContracts['data'][] = $row;
-
-            $row = [
-                substr(
-                    $datum['monthName'],
-                    0,
-                    3
-                ) . "-" . $datum['year'],
-                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'],
-                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'],
-            ];
-
-            $totalSR['data'][] = $row;
-        }
-        $BUCustomerItem = new BUCustomerItem($this);
-        /** @var DataSet $datasetContracts */
-        $datasetContracts = null;
-        $BUCustomerItem->getServerCareValidContractsByCustomerID(
-            $customerId,
-            $datasetContracts
-        );
-
-        return [
-            "serverCareIncidents" => $serverCareIncidents,
-            "serviceDesk"         => $serviceDesk,
-            "otherContracts"      => $otherContracts,
-            "totalSR"             => $totalSR,
-            "renderServerCare"    => !!$datasetContracts->rowCount()
         ];
     }
 }
