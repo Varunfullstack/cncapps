@@ -714,25 +714,16 @@ ORDER BY cns_name,
         $shiftEndTime = common_convertHHMMToDecimal($dbejCallactivity->getValue(DBEJCallActivity::endTime));
         $affectedUser = new DBEUser($this);
         $affectedUser->getRow($dbejCallactivity->getValue(DBEJCallActivity::userID));
-        $isWeekOvertimeAllowed = $affectedUser->getValue(DBEUser::weekdayOvertimeFlag) == 'Y';
-        $weekDay = date('w', strtotime($dbejCallactivity->getValue(DBEJCallActivity::date)));
 
         $activityType = new DBECallActType($this);
         $activityType->getRow($dbejCallactivity->getValue(DBEJCallActivity::callActTypeID));
 
-        if (!$activityType->getValue(DBECallActType::engineerOvertimeFlag) == 'Y') {
+        if (!$activityType->getValue(DBECallActType::engineerOvertimeFlag) == 'Y' || !$dbejCallactivity->getValue(DBECallActivity::submitAsOvertime)) {
             return 0;
-        }
-        /*
-               if this is a weekend day then the whole lot is overtime else work out how many hours
-               are out of office hours
-               */
-        if ($weekDay == 0 OR $weekDay == 6 || $dbejCallactivity->getValue(DBECallActivity::submitAsOvertime)) {
-            return $shiftEndTime - $shiftStartTime;
         }
 
-        if (!$isWeekOvertimeAllowed) {
-            return 0;
+        if($activityType->getValue(DBECallActType::callActTypeID) != 22){
+            return $shiftEndTime - $shiftStartTime;
         }
 
         $overtime = 0;

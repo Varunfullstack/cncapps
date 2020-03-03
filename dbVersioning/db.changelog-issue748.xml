@@ -62,5 +62,19 @@
                 <constraints nullable="false"/>
             </column>
         </addColumn>
+        <sql>
+            update callactivity
+            set submitAsOvertime = 1
+            where caa_ot_exp_flag
+        </sql>
+        <rollback>
+            <dropColumn tableName="callactivity" columnName="submitAsOvertime"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue748-7">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="consultant" columnName="weekdayOvertimeFlag"/>
+        </preConditions>
+        <dropColumn tableName="consultant" columnName="weekdayOvertimeFlag"/>
     </changeSet>
 </databaseChangeLog>
