@@ -28,7 +28,6 @@ class DBEUser extends DBEntity
     CONST firstName = "firstName";
     CONST lastName = "lastName";
     CONST activeFlag = "activeFlag";
-    CONST weekdayOvertimeFlag = "weekdayOvertimeFlag";
     CONST helpdeskFlag = "helpdeskFlag";
     CONST customerID = "customerID";
     CONST hourlyPayRate = "hourlyPayRate";
@@ -192,11 +191,6 @@ class DBEUser extends DBEntity
             DA_NOT_NULL,
             'consultant.activeFlag'
         );
-        $this->addColumn(
-            self::weekdayOvertimeFlag,
-            DA_YN,
-            DA_NOT_NULL
-        ); // does user get overtime in weekdays
         $this->addColumn(
             self::helpdeskFlag,
             DA_YN,
