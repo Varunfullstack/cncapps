@@ -184,13 +184,13 @@ class BUQuestionnaireReport extends Business
                 $labels[] = $label;
                 $values[] = $amount;
             }
-
             $template->set_var(
                 array(
                     'multiChoiceTotal'     => $total,
                     'questionDescription'  => $value['que_desc'],
                     'multiChoiceValues'    => implode(',', $values),
                     'multiChoiceLabels'    => implode('|', $labels),
+                    'multiChoiceLegends'   => implode('|', $values),
                     'multiChoiceLabelsCSV' => implode(
                         ',',
                         array_map(function ($label) { return "\"$label\""; }, $labels)
