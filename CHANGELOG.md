@@ -8,9 +8,14 @@ This project changes will be shown here.
 - Issue 755 - Sickness total notification
 ### Changed
 - Issue 667 - Review Meeting Agenda Enhancements
+- Issue 764 - Add numbers to questionnaire graphs
 ### Fixed
 - Issue 758 - Customer Renewal Report Total fields formatting issue
 - Issue 753 - Project team logging target not showing on user graph
+
+## [v3.10.4] - 2020-03-03
+### Added
+- Issue 711 - API for 3CX phone system
 
 ## [v3.10.3] - 2020-02-04
 ### Added 
