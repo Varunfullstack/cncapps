@@ -20,6 +20,14 @@
     function strpad(val) {
         return (!isNaN(val) && val.toString().length == 1) ? "0" + val : val;
     }
+
+    function checkCharCount() {
+        if (CKEDITOR.instances.resolutionSummary.wordCount.charCount < 200) {
+            alert('The resolution summary must have at least 200 characters');
+            return false;
+        }
+        return true;
+    }
 </script>
 
 <table width="100%">
@@ -36,6 +44,7 @@
       action="{urlUpdateActivity}"
       name="callActivity"
       AUTOCOMPLETE="off"
+      onsubmit="return checkCharCount();"
 >
     <input type="hidden"
            name="problemID"
@@ -94,6 +103,9 @@
             <td colspan="2"><textarea name="resolutionSummary">{resolutionSummary}</textarea>
                 <script type="text/javascript">
                     reason = CKEDITOR.replace('resolutionSummary', {customConfig: '/ckeditor_config.js'});
+                    CKEDITOR.instances.resolutionSummary.on('paste', function(evt) {
+                        evt.cancel();
+                    });
                     reason.addCss('body { font-size: 10pt; }');
                 </script>
             </td>
@@ -103,6 +115,7 @@
                 <input type="submit"
                        name="Submit"
                        value="Save"
+
                 >
             </td>
         </tr>
