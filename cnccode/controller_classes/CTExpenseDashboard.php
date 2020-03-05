@@ -375,8 +375,9 @@ and submitAsOvertime
                 break;
             case "approveOvertime":
                 $activityId = @$_REQUEST['id'];
+                $overtimeDurationApproved = @$_REQUEST['overtimeDurationApproved'];
                 try {
-                    $this->processOvertime($activityId);
+                    $this->processOvertime($activityId, false, null, false, $overtimeDurationApproved);
                     $response = ["status" => 'ok'];
                 } catch (Exception $exception) {
                     http_response_code(400);
@@ -718,7 +719,12 @@ FROM
      * @throws \Twig\Error\SyntaxError
      * @throws Exception
      */
-    private function processOvertime($activityId, $deny = false, $denyReason = null, $isDeleted = false)
+    private function processOvertime($activityId,
+                                     $deny = false,
+                                     $denyReason = null,
+                                     $isDeleted = false,
+                                     $overtimeDurationApproved = null
+    )
     {
         $dbeCallActivity = $this->checkProcessOvertime($activityId);
         if ($deny || $isDeleted) {
@@ -738,6 +744,15 @@ FROM
             $dbeCallActivity->setValue(
                 DBECallActivity::overtimeApprovedDate,
                 (new DateTime())->format(DATE_MYSQL_DATETIME)
+            );
+            $overtimeApprovedValue = $overtimeDurationApproved;
+            if (!$overtimeApprovedValue) {
+                $buExpense = new BUExpense($this);
+                $overtimeApprovedValue = number_format($buExpense->calculateOvertime($activityId), 2, '.', '');
+            }
+            $dbeCallActivity->setValue(
+                DBECallActivity::overtimeDurationApproved,
+                $overtimeApprovedValue
             );
         }
         $dbeCallActivity->updateRow();

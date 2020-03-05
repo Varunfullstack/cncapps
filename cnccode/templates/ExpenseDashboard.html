@@ -123,17 +123,22 @@
         });
     }
 
-    function approveOvertimeRequest(activityId) {
-        return fetch("?action=approveOvertime&id=" + activityId)
+    function approveOvertimeRequest(activityId, overtimeDurationApproved = null) {
+        let query = "?action=approveOvertime&id=" + activityId;
+        if (overtimeDurationApproved) {
+            query += '&overtimeDurationApproved=' + overtimeDurationApproved;
+        }
+        return fetch(query)
             .then(response => {
                 return response.json();
             })
     }
 
-    function approveOvertime(activityId) {
+    function approveOvertime(activityId, duration) {
         const rowsSelected = overtimeTable.column(0).checkboxes.selected();
         if (!rowsSelected.length) {
-            return approveOvertimeRequest(activityId).then(data => {
+            const overtimeDurationApproved = prompt('Please, provide the amount of overtime to be approved', duration.toFixed(2));
+            return approveOvertimeRequest(activityId, overtimeDurationApproved).then(data => {
                 if (data.error) {
                     return alert(data.error);
                 }
@@ -230,19 +235,21 @@
         expensesTable = $('#expensesTable').DataTable({
             dom: 'lfrtip',
             columnDefs: [
-                {checkboxes: {selectRow: true}, targets: 0}
+                {checkboxes: {selectRow: true}, targets: 0},
+                // {width: "50%", targets: 11}
             ],
             select: {
                 style: 'multi',
                 selector: 'tr:not(.no-select) td:first-child '
             },
             columns: [
-                {data: "id", name: null},
+                {data: "id", name: null, width: '2%'},
                 {data: "staffName", name: 'staffName'},
                 {
                     data: "serviceRequestId", name: "serviceRequestId", render: (data, type, row, meta) => {
                         return '<a href="Activity.php?action=displayActivity&callActivityID=' + row.activityId + '" target="_blank">' + data + '</a>';
-                    }
+                    },
+                    width: '7%'
                 },
                 {
                     data: 'customerName',
@@ -254,7 +261,8 @@
                             return null;
                         }
                         return moment(data, "YYYY-MM-DD HH:mm:ss").format('DD/MM/YYYY');
-                    }
+                    },
+                    width: '7%'
                 },
                 {
                     data: "expenseTypeDescription", name: "expenseTypeDescription", render: (data, type, row) => {
@@ -276,7 +284,8 @@
                             return null;
                         }
                         return "&pound;" + data.toFixed(2);
-                    }
+                    },
+                    width: '7%'
                 },
                 {data: "projectDescription", name: "projectDescription"},
                 {
@@ -288,11 +297,12 @@
                     }
                 },
                 {data: "approverName", name: "approverName"},
-                {data: 'status', name: 'status'},
+                {data: 'status', name: 'status', width: '7%'},
                 {
                     data: 'status',
                     sortable: false,
                     searchable: false,
+                    width: '8%',
                     render: (data, type, row, meta) => {
                         if (row.isSelf && !row.isApprover) {
 
@@ -369,7 +379,8 @@
                             return null;
                         }
                         return moment(data, "YYYY-MM-DD HH:mm:ss").format('DD/MM/YYYY');
-                    }
+                    },
+                    width: '7%'
                 },
                 {
                     data: "overtimeDuration", name: "overtimeDuration", sortable: false, render: (data, type, row) => {
@@ -377,7 +388,8 @@
                             return '';
                         }
                         return data.toFixed(2);
-                    }
+                    },
+                    width: '7%'
                 },
                 {data: 'startTime', name: 'startTime'},
                 {data: 'endTime', name: 'endTime'},
@@ -392,7 +404,7 @@
                     }
                 },
                 {data: "approverName", name: "approverName"},
-                {data: 'status', name: 'status'},
+                {data: 'status', name: 'status', width: '7%'},
                 {
                     data: 'status',
                     sortable: false,
@@ -403,10 +415,11 @@
                         }
 
                         if (row.status === 'Pending') {
-                            return '<button onclick="approveOvertime(' + row.activityId + ')" data-expense-id="row.id"><i class="fa fa-check"></i></button><button onclick="denyOvertime(' + row.activityId + ')"><i class="fa fa-times"></i></button><button onclick="deleteOvertime(' + row.activityId + ')"><i class="fa fa-trash"></i></button>';
+                            return '<button onclick="approveOvertime(' + row.activityId + ',' + row.overtimeDuration + ')" data-expense-id="row.id"><i class="fa fa-check"></i></button><button onclick="denyOvertime(' + row.activityId + ')"><i class="fa fa-times"></i></button><button onclick="deleteOvertime(' + row.activityId + ')"><i class="fa fa-trash"></i></button>';
                         }
                         return "";
-                    }
+                    },
+                    width: '8%'
                 }
             ],
             order: [[7, "desc"], [2, "asc"]],

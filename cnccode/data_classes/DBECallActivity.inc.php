@@ -45,6 +45,7 @@ class DBECallActivity extends DBEntity
     const isSalesRequestSR = 'isSalesRequestSR';
     const requestType = 'requestType';
     const submitAsOvertime = "submitAsOvertime";
+    const overtimeDurationApproved = "overtimeDurationApproved";
 
     /**
      * calls constructor()
@@ -258,6 +259,13 @@ class DBECallActivity extends DBEntity
             null,
             0
         );
+
+        $this->addColumn(
+            self::overtimeDurationApproved,
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
         $this->db->connect();

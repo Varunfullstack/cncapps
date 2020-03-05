@@ -546,8 +546,8 @@ ORDER BY cns_name,
                consultant.lastName as engineerLastName,
     `cns_employee_no` as employeeNumber,
            DATE_FORMAT(caa_date, '%w')IN(0,6) as weekendOvertime,
-           getOvertime(callactivity.`caa_callactivityno`) AS overtimeValue,
-  getOvertime(callactivity.`caa_callactivityno`) * 60 < minimumOvertimeMinutesRequired AS belowThreshold
+           overtimeDurationApproved AS overtimeValue,
+  overtimeDurationApproved * 60 < minimumOvertimeMinutesRequired AS belowThreshold
     FROM callactivity
     JOIN problem ON pro_problemno = caa_problemno
     JOIN callacttype ON caa_callacttypeno = cat_callacttypeno
@@ -706,6 +706,10 @@ ORDER BY cns_name,
 
         $activityType = new DBECallActType($this);
         $activityType->getRow($dbejCallactivity->getValue(DBEJCallActivity::callActTypeID));
+
+        if ($dbejCallactivity->getValue(DBECallActivity::overtimeDurationApproved)) {
+            return $dbejCallactivity->getValue(DBECallActivity::overtimeDurationApproved);
+        }
 
         if (!$activityType->getValue(DBECallActType::engineerOvertimeFlag) == 'Y' || !$dbejCallactivity->getValue(
                 DBECallActivity::submitAsOvertime

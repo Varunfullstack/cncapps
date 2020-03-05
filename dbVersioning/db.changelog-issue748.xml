@@ -65,7 +65,9 @@
         <sql>
             update callactivity
             set submitAsOvertime = 1
-            where caa_ot_exp_flag = 'Y' or overtimeApprovedBy is not null or overtimeDeniedReason is not null
+            where caa_ot_exp_flag = 'Y'
+               or overtimeApprovedBy is not null
+               or overtimeDeniedReason is not null
         </sql>
         <rollback>
             <dropColumn tableName="callactivity" columnName="submitAsOvertime"/>
@@ -81,5 +83,17 @@
                 <column name="weekdayOvertimeFlag" remarks="Gets overtime during week days?" type="CHAR(1)"/>
             </addColumn>
         </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue748-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callactivity" columnName="overtimeDurationApproved"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callactivity">
+            <column name="overtimeDurationApproved" type="decimal(10,2)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>
