@@ -224,7 +224,9 @@ WHERE
       FROM
         consultant globalApprovers
       WHERE globalApprovers.globalExpenseApprover
-        AND globalApprovers.cns_consno = ?) = 1 or consultant.`expenseApproverID` = ?) as isApprover
+        AND globalApprovers.cns_consno = ?) = 1 or consultant.`expenseApproverID` = ?) as isApprover,
+       overtimeDurationApproved,
+       ((caa_endtime > overtimeStartTime and caa_endtime <= overtimeEndTime ) OR (caa_starttime >= overtimeStartTime and caa_starttime < overtimeEndTime) ) as inHours
 FROM
   callactivity
   JOIN problem
@@ -418,7 +420,7 @@ and submitAsOvertime
   runningTotals.approvedValue,
   runningTotals.pendingValue,
   (SELECT
-    SUM(getOvertime (caa_callactivityno))
+    SUM(overtimeDurationApproved)
   FROM
     callactivity
   WHERE caa_date BETWEEN DATE_FORMAT(NOW(), '%Y')
@@ -436,7 +438,7 @@ FROM
     SUM(
       IF(
         callactivity.`overtimeApprovedBy` IS NOT NULL,
-        getOvertime (caa_callactivityno),
+        overtimeDurationApproved,
         0
       )
     ) AS approvedValue,
@@ -906,7 +908,7 @@ WHERE
         $expenseSummary = $statement->fetch_assoc();
 
 
-        $useOvertimeQuery = 'SELECT sum(if(callactivity.overtimeApprovedBy is not null, getOvertime(caa_callactivityno), 0)) as approved,
+        $useOvertimeQuery = 'SELECT sum(if(callactivity.overtimeApprovedBy is not null, overtimeDurationApproved, 0)) as approved,
        sum(if(callactivity.overtimeApprovedBy is null and callactivity.overtimeDeniedReason is null,
               getOvertime(caa_callactivityno), 0))                                              as pending
 FROM callactivity

@@ -387,7 +387,12 @@
                         if (!data) {
                             return '';
                         }
-                        return data.toFixed(2);
+                        let toReturn = data.toFixed(2);
+                        if (row.inHours) {
+                            toReturn += '<img src="/images/clock.png" width="20px" alt="time">';
+                        }
+
+                        return toReturn;
                     },
                     width: '7%'
                 },
@@ -404,6 +409,16 @@
                     }
                 },
                 {data: "approverName", name: "approverName"},
+                {
+                    data: 'overtimeDurationApproved',
+                    name: 'overtimeDurationApproved',
+                    render: (data, type, row, meta) => {
+                        if (!data) {
+                            return '';
+                        }
+                        return data.toFixed(2);
+                    }
+                },
                 {data: 'status', name: 'status', width: '7%'},
                 {
                     data: 'status',
@@ -526,9 +541,8 @@
         <th>
             Approved Status
         </th>
-        <th>
-
-        </th>
+        <th>Approved Overtime</th>
+        <th></th>
     </tr>
     </thead>
     <tbody>
