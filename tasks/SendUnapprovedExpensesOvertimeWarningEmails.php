@@ -82,11 +82,6 @@ foreach (getPendingToApproveOvertimeItems() as $pendingToApproveItem) {
             "serverURL"          => SITE_URL
         ];
     }
-
-    $pendingToApproveItem->overtimeValue = number_format(
-        $buExpense->calculateOvertime($pendingToApproveItem->activityId),
-        2
-    );
     $approvers[$pendingToApproveItem->approverId]['overtimeActivities'][] = $pendingToApproveItem;
 };
 
@@ -108,7 +103,7 @@ foreach (getPendingToApproveExpenseItems() as $pendingToApproveExpenseItem) {
 
 $buMail = new BUMail($thing);
 foreach ($approvers as $approver) {
-    $body = $twig->render('unapprovedExpenseOvertimeWarningEmail.html.twig', $approver);
+    $body = $twig->render('internal/unapprovedExpenseOvertimeWarningEmail.html.twig', $approver);
     $fromEmail = CONFIG_SALES_EMAIL;
     $toEmail = $approver['approverUserName'] . '@' . CONFIG_PUBLIC_DOMAIN;
     $subject = "You have overtime or expenses requests that are waiting to be approved.";
@@ -257,64 +252,49 @@ function getPendingToApproveOvertimeItems()
 {
     /** @var $db dbSweetcode */
     global $db;
-    $pendingToApproveOvertimeQuery = "SELECT
-  caa_date as dateSubmitted,
-  DATE_FORMAT(caa_date, '%w') AS `weekday`,
-  caa_callactivityno as activityId,
-  caa_problemno as serviceRequestId,
-  time_to_sec(caa_starttime) as activityStartTimeSeconds,
-  time_to_sec(caa_endtime) as activityEndTimeSeconds,
-  consultant.cns_name as staffName,
-  consultant.cns_helpdesk_flag = 'Y' as helpdeskUser,
-  time_to_sec(hed_hd_starttime) as helpdeskStartTimeSeconds,
-  time_to_sec(hed_hd_endtime) as helpdeskEndTimeSeconds,
-  time_to_sec(hed_pro_starttime) as projectStartTimeSeconds,
-  time_to_sec(hed_pro_endtime) as projectEndTimeSeconds,
-  consultant.`cns_consno` AS userId,
-  project.`description` AS projectDescription,
-  project.`projectID` AS projectId,
-  approver.cns_name as approverName,
-  approver.cns_consno as approverId,
-       approver.cns_logname as approverUserName
-FROM
-  callactivity
-  JOIN problem
-    ON pro_problemno = caa_problemno
-  JOIN callacttype
-    ON caa_callacttypeno = cat_callacttypeno
-  JOIN customer
-    ON pro_custno = cus_custno
-  JOIN consultant
-    ON caa_consno = cns_consno
-   join consultant approver 
-      on approver.cns_consno = consultant.expenseApproverID
-  join headert
-    on headert.`headerID` = 1
-  left join project
-    on project.`projectID` = problem.`pro_projectno`
-WHERE 
-      caa_endtime and caa_endtime is not null and
-      (caa_status = 'C'
+    $pendingToApproveOvertimeQuery =
+        "SELECT caa_date               as dateSubmitted,
+       caa_callactivityno              as activityId,
+       caa_problemno                   as serviceRequestId,
+       consultant.cns_name             as staffName,
+       consultant.`cns_consno`         AS userId,
+       project.`description`           AS projectDescription,
+       project.`projectID`             AS projectId,
+       approver.cns_name               as approverName,
+       approver.cns_consno             as approverId,
+       approver.cns_logname            as approverUserName,
+       getOvertime(caa_callactivityno) as overtimeValue
+FROM callactivity
+         JOIN problem
+              ON pro_problemno = caa_problemno
+         JOIN callacttype
+              ON caa_callacttypeno = cat_callacttypeno
+         JOIN customer
+              ON pro_custno = cus_custno
+         JOIN consultant
+              ON caa_consno = cns_consno
+         join consultant approver
+              on approver.cns_consno = consultant.expenseApproverID
+         join headert
+              on headert.`headerID` = 1
+         left join project
+                   on project.`projectID` = problem.`pro_projectno`
+WHERE caa_endtime
+  and caa_endtime is not null
+  and (caa_status = 'C'
     OR caa_status = 'A')
   AND caa_ot_exp_flag = 'N'
   and callactivity.`overtimeApprovedBy` is null
   and callactivity.overtimeDeniedReason is null
+ and submitAsOvertime
   AND (
     (
-      consultant.weekdayOvertimeFlag = 'Y'
-      AND DATE_FORMAT(caa_date, '%w') IN (0, 1, 2, 3, 4, 5, 6)
+      caa_callacttypeno = 22 and
+      DATE_FORMAT(caa_date, '%w') IN (0, 1, 2, 3, 4, 5, 6)
+      and (caa_endtime > overtimeEndTime
+    OR caa_starttime < overtimeStartTime)
     )
-    OR (
-      consultant.weekdayOvertimeFlag = 'N'
-      AND DATE_FORMAT(caa_date, '%w') IN (0, 6)
-    )
-  )
-  AND (
-    caa_endtime > hed_pro_endtime
-    OR caa_starttime < hed_pro_starttime
-    OR caa_endtime > `hed_hd_endtime`
-    OR caa_starttime < hed_hd_starttime
-    OR DATE_FORMAT(caa_date, '%w') IN (0, 6)
+    OR caa_callacttypeno <> 22
   )
   AND (caa_endtime <> caa_starttime)
   AND callacttype.engineerOvertimeFlag = 'Y'";

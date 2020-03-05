@@ -112,12 +112,13 @@ FROM
     LEFT JOIN consultant
     ON callactivity.`caa_consno` = consultant.`cns_consno`
     left join expensetype on expensetype.ext_expensetypeno = expense.exp_expensetypeno
+     left join receipt on receipt.expenseId = " . $this->getDBColumnName(self::expenseID) . " 
    where " . $this->getDBColumnName(
                 self::approvedDate
             ) . " is null and " . $this->getDBColumnName(self::deniedReason) . " is null AND " . $this->getDBColumnName(
                 self::exportedFlag
             ) . " <> 'Y'  
-            and (exp_value <= maximumAutoApprovalAmount or consultant.autoApproveExpenses)
+            and ((exp_value <= maximumAutoApprovalAmount and (not expensetype.receiptRequired or receipt.id is not null))  or consultant.autoApproveExpenses)
             ";
         return $this->getRows();
     }

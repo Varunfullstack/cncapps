@@ -44,6 +44,8 @@ class DBECallActivity extends DBEntity
     const overtimeExportedFlag = 'overtimeExportedFlag';
     const isSalesRequestSR = 'isSalesRequestSR';
     const requestType = 'requestType';
+    const submitAsOvertime = "submitAsOvertime";
+    const overtimeDurationApproved = "overtimeDurationApproved";
 
     /**
      * calls constructor()
@@ -250,6 +252,20 @@ class DBECallActivity extends DBEntity
             DA_ALLOW_NULL
         );
 
+        $this->addColumn(
+            self::submitAsOvertime,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+
+        $this->addColumn(
+            self::overtimeDurationApproved,
+            DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
         $this->db->connect();
@@ -400,26 +416,18 @@ FROM
       (caa_status = 'C'
     OR caa_status = 'A')
   AND caa_ot_exp_flag = 'N'
+  and submitAsOvertime
   AND (
     (
-      consultant.weekdayOvertimeFlag = 'Y'
-      AND DATE_FORMAT(caa_date, '%w') IN (0, 1, 2, 3, 4, 5, 6)
+      caa_callacttypeno = 22 and
+      DATE_FORMAT(caa_date, '%w') IN (0, 1, 2, 3, 4, 5, 6)
+      and (caa_endtime > overtimeEndTime
+    OR caa_starttime < overtimeStartTime)
     )
-    OR (
-      consultant.weekdayOvertimeFlag = 'N'
-      AND DATE_FORMAT(caa_date, '%w') IN (0, 6)
-    )
-  )
-  AND (
-    caa_endtime > hed_pro_endtime
-    OR caa_starttime < hed_pro_starttime
-    OR caa_endtime > `hed_hd_endtime`
-    OR caa_starttime < hed_hd_starttime
-    OR DATE_FORMAT(caa_date, '%w') IN (0, 6)
+    OR caa_callacttypeno <> 22
   )
   AND (caa_endtime <> caa_starttime)
-  AND callacttype.engineerOvertimeFlag = 'Y' 
-            ";
+  AND callacttype.engineerOvertimeFlag = 'Y'";
         return $this->getRows();
     }
 }

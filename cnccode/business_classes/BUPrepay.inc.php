@@ -96,6 +96,7 @@ class BUPrepay extends Business
      * @param $dsData
      * @param bool $updateFlag
      * @return bool|DataSet
+     * @throws Exception
      */
     function exportPrePayActivities($dsData, $updateFlag = false)
     {
@@ -991,10 +992,8 @@ is currently a balance of ';
   time_to_sec(caa_endtime) as activityEndTimeSeconds,
   consultant.cns_name as staffName,
   consultant.cns_helpdesk_flag = 'Y' as helpdeskUser,
-  time_to_sec(hed_hd_starttime) as helpdeskStartTimeSeconds,
-  time_to_sec(hed_hd_endtime) as helpdeskEndTimeSeconds,
-  time_to_sec(hed_pro_starttime) as projectStartTimeSeconds,
-  time_to_sec(hed_pro_endtime) as projectEndTimeSeconds,
+  time_to_sec(overtimeStartTime) as overtimeStartSeconds,
+  time_to_sec(overtimeStartTime) as overtimeEndSeconds,
   consultant.`cns_consno` AS userId,
   project.`description` AS projectDescription,
   project.`projectID` AS projectId,
@@ -1037,23 +1036,15 @@ WHERE
       (caa_status = 'C'
     OR caa_status = 'A')
   AND caa_ot_exp_flag = 'N'
+  and submitAsOvertime
   AND (
     (
-      consultant.weekdayOvertimeFlag = 'Y'
-      AND DATE_FORMAT(caa_date, '%w') IN (0, 1, 2, 3, 4, 5, 6)
+      caa_callacttypeno = 22 and
+      DATE_FORMAT(caa_date, '%w') IN (0, 1, 2, 3, 4, 5, 6)
+      and (caa_endtime > overtimeEndTime
+    OR caa_starttime < overtimeStartTime)
     )
-    OR (
-      consultant.weekdayOvertimeFlag = 'N'
-      AND DATE_FORMAT(caa_date, '%w') IN (0, 6)
-    )
-  )
-  AND (
-    caa_endtime > hed_pro_endtime
-   OR caa_starttime < hed_pro_starttime
-   OR caa_endtime > `hed_hd_endtime`
-   OR caa_starttime < hed_hd_starttime
-   OR 
-    DATE_FORMAT(caa_date, '%w') IN (0, 6)
+    OR caa_callacttypeno <> 22
   )
   AND (caa_endtime <> caa_starttime)
   AND callacttype.engineerOvertimeFlag = 'Y'

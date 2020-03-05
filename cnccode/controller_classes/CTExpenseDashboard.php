@@ -8,6 +8,7 @@
 
 use Twig\Environment;
 
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUExpense.inc.php');
@@ -178,13 +179,13 @@ WHERE
                     $queryString,
                     $parameters
                 );
-                $data = $result->fetch_all(MYSQLI_ASSOC);
+                $overtimes = $result->fetch_all(MYSQLI_ASSOC);
                 echo json_encode(
                     [
                         "draw"            => $_REQUEST['draw'],
                         "recordsTotal"    => $totalCount,
                         "recordsFiltered" => $filteredCount,
-                        "data"            => $data
+                        "data"            => $overtimes
                     ],
                     JSON_NUMERIC_CHECK
                 );
@@ -195,6 +196,9 @@ WHERE
                 $queryString = 'SELECT
   caa_date as dateSubmitted,
   caa_callactivityno as activityId,
+       caa_starttime as startTime,
+       caa_endtime as endTime,
+       callacttype.cat_desc as activityType,
   caa_problemno as serviceRequestId,
   consultant.cns_name as staffName,
   consultant.`cns_consno` AS userId,
@@ -203,6 +207,7 @@ WHERE
   approver.cns_name as approverName,
        getOvertime(caa_callactivityno) as overtimeDuration,
        customer.cus_name as customerName,
+       submitAsOvertime,
   IF(
     callactivity.`overtimeApprovedBy` is not null,
     "Approved",
@@ -219,7 +224,9 @@ WHERE
       FROM
         consultant globalApprovers
       WHERE globalApprovers.globalExpenseApprover
-        AND globalApprovers.cns_consno = ?) = 1 or consultant.`expenseApproverID` = ?) as isApprover
+        AND globalApprovers.cns_consno = ?) = 1 or consultant.`expenseApproverID` = ?) as isApprover,
+       overtimeDurationApproved,
+       ((caa_endtime > overtimeStartTime and caa_endtime <= overtimeEndTime ) OR (caa_starttime >= overtimeStartTime and caa_starttime < overtimeEndTime) ) as inHours
 FROM
   callactivity
   JOIN problem
@@ -241,22 +248,18 @@ WHERE
       (caa_status = \'C\'
     OR caa_status = \'A\')
   AND caa_ot_exp_flag = \'N\'
+and submitAsOvertime
   AND (
-     DATE_FORMAT(caa_date, \'%w\') IN (0, 6) or (
-      consultant.weekdayOvertimeFlag = \'Y\'
-      AND DATE_FORMAT(caa_date, \'%w\') IN (1, 2, 3, 4, 5)
+    (
+      caa_callacttypeno = 22 and
+      DATE_FORMAT(caa_date, \'%w\') IN (0, 1, 2, 3, 4, 5, 6)
+      and (caa_endtime > overtimeEndTime
+    OR caa_starttime < overtimeStartTime)
     )
-  )
-  AND (
-    caa_endtime > hed_pro_endtime
-   OR caa_starttime < hed_pro_starttime
-   OR (consultant.`cns_helpdesk_flag` = \'Y\' AND  (caa_endtime > `hed_hd_endtime` OR caa_starttime < hed_hd_starttime))
-   OR 
-    DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
+    OR caa_callacttypeno <> 22
   )
   AND getOvertime(caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
   AND (caa_endtime <> caa_starttime)
-  
   AND (
     callactivity.`caa_consno` = ?
     OR consultant.`expenseApproverID` = ?
@@ -326,14 +329,14 @@ WHERE
                     $queryString,
                     $parameters
                 );
-                $data = $result->fetch_all(MYSQLI_ASSOC);
+                $overtimes = $result->fetch_all(MYSQLI_ASSOC);
 
                 echo json_encode(
                     [
                         "draw"            => $_REQUEST['draw'],
                         "recordsTotal"    => $totalCount,
                         "recordsFiltered" => $filteredCount,
-                        "data"            => $data
+                        "data"            => $overtimes
                     ],
                     JSON_NUMERIC_CHECK
                 );
@@ -374,8 +377,9 @@ WHERE
                 break;
             case "approveOvertime":
                 $activityId = @$_REQUEST['id'];
+                $overtimeDurationApproved = @$_REQUEST['overtimeDurationApproved'];
                 try {
-                    $this->processOvertime($activityId);
+                    $this->processOvertime($activityId, false, null, false, $overtimeDurationApproved);
                     $response = ["status" => 'ok'];
                 } catch (Exception $exception) {
                     http_response_code(400);
@@ -394,6 +398,178 @@ WHERE
                     $response = ["error" => $exception->getMessage()];
                 }
                 echo json_encode($response, JSON_NUMERIC_CHECK);
+                break;
+            case "deleteOvertime":
+                $activityId = @$_REQUEST['id'];
+                try {
+                    $this->processOvertime($activityId, false, null, true);
+                    $response = ["status" => 'ok'];
+                } catch (Exception $exception) {
+                    http_response_code(400);
+                    $response = ["error" => $exception->getMessage()];
+                }
+                echo json_encode($response, JSON_NUMERIC_CHECK);
+                break;
+            case 'runningTotals':
+                global $twig;
+                /** @var dbSweetcode $db */
+                global $db;
+
+                $overtimeQuery = "SELECT
+  runningTotals.staffName,
+  runningTotals.approvedValue,
+  runningTotals.pendingValue,
+  (SELECT
+    SUM(overtimeDurationApproved)
+  FROM
+    callactivity
+  WHERE caa_date BETWEEN DATE_FORMAT(NOW(), '%Y')
+    AND NOW()
+    AND callactivity.`overtimeApprovedBy` IS NOT NULL
+    AND (caa_status = 'C'
+      OR caa_status = 'A')
+    AND caa_ot_exp_flag = 'Y'
+    and submitAsOvertime
+    AND callactivity.`caa_consno` = runningTotals.staffId) AS YTD
+FROM
+  (SELECT
+    consultant.cns_name AS staffName,
+    consultant.`cns_consno` AS staffId,
+    SUM(
+      IF(
+        callactivity.`overtimeApprovedBy` IS NOT NULL,
+        overtimeDurationApproved,
+        0
+      )
+    ) AS approvedValue,
+    SUM(
+      IF(
+        callactivity.`overtimeDeniedReason` IS NULL
+        AND callactivity.`overtimeApprovedBy` IS NULL,
+        getOvertime (caa_callactivityno),
+        0
+      )
+    ) AS pendingValue
+  FROM
+    callactivity
+    JOIN problem
+      ON pro_problemno = caa_problemno
+    JOIN callacttype
+      ON caa_callacttypeno = cat_callacttypeno
+      AND callacttype.engineerOvertimeFlag = 'Y'
+    JOIN consultant
+      ON caa_consno = cns_consno
+    JOIN headert
+      ON headert.`headerID` = 1
+  WHERE caa_endtime
+    AND caa_endtime IS NOT NULL
+    AND (caa_status = 'C'
+      OR caa_status = 'A')
+    AND caa_ot_exp_flag = 'N'
+    and submitAsOvertime
+  AND (
+    (
+      caa_callacttypeno = 22 and
+      DATE_FORMAT(caa_date, '%w') IN (0, 1, 2, 3, 4, 5, 6)
+      and (caa_endtime > overtimeEndTime
+    OR caa_starttime < overtimeStartTime)
+    )
+    OR caa_callacttypeno <> 22
+  )
+    AND getOvertime (caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
+    AND (caa_endtime <> caa_starttime)
+    AND (
+      consultant.`expenseApproverID` = ?
+      OR
+      (SELECT
+        1
+      FROM
+        consultant globalApprovers
+      WHERE globalApprovers.globalExpenseApprover
+        AND globalApprovers.cns_consno = ?) = 1
+    )
+  GROUP BY consultant.`cns_consno`
+  ORDER BY staffName) runningTotals";
+                $result = $db->preparedQuery(
+                    $overtimeQuery,
+                    [["type" => "i", "value" => $this->userID], ["type" => "i", "value" => $this->userID]]
+                );
+                $overtimes = $result->fetch_all(MYSQLI_ASSOC);
+
+                $expenseQuery = "SELECT
+  runningTotals.staffName,
+  runningTotals.approvedValue,
+  runningTotals.pendingValue,
+  (SELECT
+    SUM(exp_value)
+  FROM
+    expense
+    LEFT JOIN callactivity
+      ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
+  WHERE callactivity.`caa_consno` = runningTotals.staffId
+    AND expense.`dateSubmitted` BETWEEN DATE_FORMAT(NOW(), '%Y')
+    AND NOW()
+    AND exp_exported_flag <> \"N\"
+    AND expense.`approvedBy` IS NOT NULL) AS YTD
+FROM
+  (SELECT
+    consultant.cns_name AS staffName,
+    consultant.cns_consno AS staffId,
+    SUM(
+      IF(
+        expense.`approvedBy` IS NOT NULL,
+        expense.`exp_value`,
+        0
+      )
+    ) AS approvedValue,
+    SUM(
+      IF(
+        expense.`approvedBy` IS NULL
+        AND expense.`deniedReason` IS NULL,
+        expense.`exp_value`,
+        0
+      )
+    ) AS pendingValue
+  FROM
+    expense
+    LEFT JOIN `callactivity`
+      ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
+    LEFT JOIN consultant
+      ON callactivity.`caa_consno` = consultant.`cns_consno`
+  WHERE caa_endtime
+    AND caa_endtime IS NOT NULL
+    AND (
+      consultant.`expenseApproverID` = ?
+      OR (
+        (SELECT
+          1
+        FROM
+          consultant globalApprovers
+        WHERE globalApprovers.globalExpenseApprover
+          AND globalApprovers.cns_consno = ?) = 1
+        AND consultant.`activeFlag` = \"Y\"
+      )
+    )
+    AND exp_exported_flag <> \"Y\"
+  GROUP BY consultant.`cns_consno`
+  ORDER BY staffName) runningTotals";
+
+                $result = $db->preparedQuery(
+                    $expenseQuery,
+                    [["type" => "i", "value" => $this->userID], ["type" => "i", "value" => $this->userID]]
+                );
+                $expenses = $result->fetch_all(MYSQLI_ASSOC);
+
+                $context = [
+                    "expenses"  => $expenses,
+                    "overtimes" => $overtimes
+                ];
+
+                $this->template->setVar(
+                    'CONTENTS',
+                    $twig->render('expenseDashboard/runningTotals.html.twig', $context)
+                );
+                $this->parsePage();
                 break;
             default:
                 $this->displayReport();
@@ -539,22 +715,46 @@ WHERE
      * @param $activityId
      * @param bool $deny
      * @param null $denyReason
+     * @param bool $isDeleted
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      * @throws Exception
      */
-    private function processOvertime($activityId, $deny = false, $denyReason = null)
+    private function processOvertime($activityId,
+                                     $deny = false,
+                                     $denyReason = null,
+                                     $isDeleted = false,
+                                     $overtimeDurationApproved = null
+    )
     {
         $dbeCallActivity = $this->checkProcessOvertime($activityId);
-        if ($deny) {
+        if ($deny || $isDeleted) {
+            if ($isDeleted) {
+                $denyReason = 'DELETED';
+                $dbeCallActivity->setValue(DBECallActivity::overtimeExportedFlag, 'Y');
+            }
             if (!$denyReason) {
                 throw new Exception('Please provide a deny reason');
             }
             $dbeCallActivity->setValue(DBECallActivity::overtimeDeniedReason, $denyReason);
-            $this->sendDeniedOvertimeEmail($dbeCallActivity);
+            if (!$isDeleted) {
+                $this->sendDeniedOvertimeEmail($dbeCallActivity);
+            }
         } else {
             $dbeCallActivity->setValue(DBECallActivity::overtimeApprovedBy, $this->userID);
             $dbeCallActivity->setValue(
                 DBECallActivity::overtimeApprovedDate,
                 (new DateTime())->format(DATE_MYSQL_DATETIME)
+            );
+            $overtimeApprovedValue = $overtimeDurationApproved;
+            if (!$overtimeApprovedValue) {
+                $buExpense = new BUExpense($this);
+                $overtimeApprovedValue = number_format($buExpense->calculateOvertime($activityId), 2, '.', '');
+            }
+            $dbeCallActivity->setValue(
+                DBECallActivity::overtimeDurationApproved,
+                $overtimeApprovedValue
             );
         }
         $dbeCallActivity->updateRow();
@@ -708,7 +908,7 @@ WHERE
         $expenseSummary = $statement->fetch_assoc();
 
 
-        $useOvertimeQuery = 'SELECT sum(if(callactivity.overtimeApprovedBy is not null, getOvertime(caa_callactivityno), 0)) as approved,
+        $useOvertimeQuery = 'SELECT sum(if(callactivity.overtimeApprovedBy is not null, overtimeDurationApproved, 0)) as approved,
        sum(if(callactivity.overtimeApprovedBy is null and callactivity.overtimeDeniedReason is null,
               getOvertime(caa_callactivityno), 0))                                              as pending
 FROM callactivity
@@ -723,21 +923,16 @@ WHERE caa_endtime
   and (caa_status = \'C\'
     OR caa_status = \'A\')
   AND caa_ot_exp_flag = \'N\'
+  and submitAsOvertime
   AND (
-        DATE_FORMAT(caa_date, \'%w\') IN (0, 6) or (
-            consultant.weekdayOvertimeFlag = \'Y\'
-            AND DATE_FORMAT(caa_date, \'%w\') IN (1, 2, 3, 4, 5)
-        )
+    (
+      caa_callacttypeno = 22 and
+      DATE_FORMAT(caa_date, \'%w\') IN (0, 1, 2, 3, 4, 5, 6)
+      and (caa_endtime > overtimeEndTime
+    OR caa_starttime < overtimeStartTime)
     )
-  AND (
-        caa_endtime > hed_pro_endtime
-        OR caa_starttime < hed_pro_starttime
-        OR
-        (consultant.`cns_helpdesk_flag` = \'Y\' AND
-         (caa_endtime > `hed_hd_endtime` OR caa_starttime < hed_hd_starttime))
-        OR
-        DATE_FORMAT(caa_date, \'%w\') IN (0, 6)
-    )
+    OR caa_callacttypeno <> 22
+  )
   AND getOvertime(caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
   AND caa_endtime <> caa_starttime
   AND callactivity.`caa_consno` = ?';
@@ -745,12 +940,17 @@ WHERE caa_endtime
         $statement = $db->preparedQuery($useOvertimeQuery, [["type" => "i", "value" => $this->userID]]);
         $overtimeSummary = $statement->fetch_assoc();
 
+        $isApprover = $this->dbeUser->getValue(DBEUser::isExpenseApprover) || $this->dbeUser->getValue(
+                DBEUser::globalExpenseApprover
+            );
+
         $this->template->setVar(
             [
                 'approvedExpenseValue'  => $expenseSummary['approved'],
                 'pendingExpenseValue'   => $expenseSummary['pending'],
                 'approvedOvertimeValue' => $overtimeSummary['approved'],
                 'pendingOvertimeValue'  => $overtimeSummary['pending'],
+                'runningTotalsLink'     => $isApprover ? '<a href="?action=runningTotals" target="_blank">Running Totals</a>' : null,
             ]
         );
 

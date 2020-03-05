@@ -22,10 +22,8 @@ class DBEHeader extends DBEntity
     const stdVATCode = "stdVATCode";
     const billingStartTime = "billingStartTime";
     const billingEndTime = "billingEndTime";
-    const helpdeskStartTime = "helpdeskStartTime";
-    const helpdeskEndTime = "helpdeskEndTime";
-    const projectStartTime = "projectStartTime";
-    const projectEndTime = "projectEndTime";
+    const overtimeStartTime = "overtimeStartTime";
+    const overtimeEndTime = "overtimeEndTime";
     const gscItemID = "gscItemID";
     const portalPin = "portalPin";
     const portal24HourPin = "portal24HourPin";
@@ -203,28 +201,16 @@ class DBEHeader extends DBEntity
             "hed_bill_endtime"
         );
         $this->addColumn(
-            self::helpdeskStartTime,
+            self::overtimeStartTime,
             DA_TIME,
             DA_NOT_NULL,
-            "hed_hd_starttime"
+            "overtimeStartTime"
         );
         $this->addColumn(
-            self::helpdeskEndTime,
+            self::overtimeEndTime,
             DA_TIME,
             DA_NOT_NULL,
-            "hed_hd_endtime"
-        );
-        $this->addColumn(
-            self::projectStartTime,
-            DA_TIME,
-            DA_NOT_NULL,
-            "hed_pro_starttime"
-        );
-        $this->addColumn(
-            self::projectEndTime,
-            DA_TIME,
-            DA_NOT_NULL,
-            "hed_pro_endtime"
+            "overtimeEndTime"
         );
         $this->addColumn(
             self::gscItemID,

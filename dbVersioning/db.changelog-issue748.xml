@@ -1,0 +1,99 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue748-0">
+        <tagDatabase tag="issue748"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue748-1">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_hd_starttime"/>
+        </preConditions>
+        <renameColumn tableName="headert" oldColumnName="hed_hd_starttime" newColumnName="overtimeStartTime"
+                      columnDataType="char(5)"/>
+        <sql>
+            update headert
+            set overtimeStartTime = '08:00';
+        </sql>
+        <rollback>
+            <renameColumn tableName="headert" oldColumnName="overtimeStartTime" newColumnName="hed_hd_starttime"
+                          columnDataType="char(5)"/>
+            <sql>
+                update headert
+                set hed_hd_starttime = '07:30';
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue748-2">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_hd_endtime"/>
+        </preConditions>
+        <renameColumn tableName="headert" oldColumnName="hed_hd_endtime" newColumnName="overtimeEndTime"
+                      columnDataType="char(5)"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue748-3">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_pro_starttime"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_pro_starttime"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue748-4">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="headert" columnName="hed_pro_endtime"/>
+        </preConditions>
+        <dropColumn tableName="headert" columnName="hed_pro_endtime"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue748-5">
+        <sqlFile endDelimiter="#" path="/getOvertimeFunction.sql" stripComments="true"/>
+        <rollback>
+            <sql>
+                drop function if exists getOvertime;
+            </sql>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue748-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callactivity" columnName="submitAsOvertime"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callactivity">
+            <column name="submitAsOvertime" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            update callactivity
+            set submitAsOvertime = 1
+            where caa_ot_exp_flag = 'Y'
+               or overtimeApprovedBy is not null
+               or overtimeDeniedReason is not null
+        </sql>
+        <rollback>
+            <dropColumn tableName="callactivity" columnName="submitAsOvertime"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue748-7">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="consultant" columnName="weekdayOvertimeFlag"/>
+        </preConditions>
+        <dropColumn tableName="consultant" columnName="weekdayOvertimeFlag"/>
+        <rollback>
+            <addColumn tableName="consultant">
+                <column name="weekdayOvertimeFlag" remarks="Gets overtime during week days?" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue748-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callactivity" columnName="overtimeDurationApproved"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callactivity">
+            <column name="overtimeDurationApproved" type="decimal(10,2)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

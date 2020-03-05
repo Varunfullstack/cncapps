@@ -218,29 +218,17 @@ class CTHeader extends CTCNC
                 'billingEndTimeMessage'                  => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::billingEndTime)
                 ),
-                'projectStartTime'                       => Controller::htmlInputText(
-                    $dsHeader->getValue(DBEJHeader::projectStartTime)
+                'overtimeStartTime'                      => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::overtimeStartTime)
                 ),
-                'projectStartTimeMessage'                => Controller::htmlDisplayText(
-                    $dsHeader->getMessage(DBEJHeader::projectStartTime)
+                'overtimeStartTimeMessage'               => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::overtimeStartTime)
                 ),
-                'projectEndTime'                         => Controller::htmlInputText(
-                    $dsHeader->getValue(DBEJHeader::projectEndTime)
+                'overtimeEndTime'                        => Controller::htmlInputText(
+                    $dsHeader->getValue(DBEJHeader::overtimeEndTime)
                 ),
-                'projectEndTimeMessage'                  => Controller::htmlDisplayText(
-                    $dsHeader->getMessage(DBEJHeader::projectEndTime)
-                ),
-                'helpdeskStartTime'                      => Controller::htmlInputText(
-                    $dsHeader->getValue(DBEJHeader::helpdeskStartTime)
-                ),
-                'helpdeskStartTimeMessage'               => Controller::htmlDisplayText(
-                    $dsHeader->getMessage(DBEJHeader::helpdeskStartTime)
-                ),
-                'helpdeskEndTime'                        => Controller::htmlInputText(
-                    $dsHeader->getValue(DBEJHeader::helpdeskEndTime)
-                ),
-                'helpdeskEndTimeMessage'                 => Controller::htmlDisplayText(
-                    $dsHeader->getMessage(DBEJHeader::helpdeskEndTime)
+                'overtimeEndTimeMessage'                 => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEJHeader::overtimeEndTime)
                 ),
                 'hourlyLabourCost'                       => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::hourlyLabourCost)

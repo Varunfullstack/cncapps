@@ -222,7 +222,7 @@ class CTExpense extends CTCNC
                                 DBEReceipt::id
                             ) . "' target='_blank'>See Receipt</a>";
                     } else {
-                        $uploadReceipt = 'Upload Required <input type="file" accept="image/jpeg,application/pdf" onchange="uploadReceipt(' . $expenseID . ')" >';
+                        $uploadReceipt = 'Upload Required <input type="file" accept="image/jpeg,application/pdf,image/png" onchange="uploadReceipt(' . $expenseID . ')" >';
                     }
 
 

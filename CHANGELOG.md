@@ -9,6 +9,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 667 - Review Meeting Agenda Enhancements
 - Issue 764 - Add numbers to questionnaire graphs
+- Issue 748 - Overtime questions
 ### Fixed
 - Issue 758 - Customer Renewal Report Total fields formatting issue
 - Issue 753 - Project team logging target not showing on user graph

@@ -540,9 +540,6 @@ class CTUser extends CTCNC
                         DBEJUser::changePriorityFlag
                     )
                 ),
-                'weekdayOvertimeFlagChecked'                 => Controller::htmlChecked(
-                    $dsUser->getValue(DBEJUser::weekdayOvertimeFlag)
-                ),
                 'helpdeskFlagChecked'                        => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::helpdeskFlag)
                 ),
