@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v3.11.0]
+## [v3.11.0] - 2020-03-06
 ### Added
 - Issue 757 - Notify when quote is signed within Signable
 - Issue 756 - SD Dashboard to show active SRs
