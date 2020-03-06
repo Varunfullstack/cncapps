@@ -1,0 +1,66 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue667-0">
+        <tagDatabase tag="issue667"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue667-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="reviewMeetingBooked"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="reviewMeetingBooked" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue667-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="cDriveFreeSpaceWarningPercentageThreshold"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="cDriveFreeSpaceWarningPercentageThreshold" type="int(3)" defaultValue="10">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue667-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="otherDriveFreeSpaceWarningPercentageThreshold"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="otherDriveFreeSpaceWarningPercentageThreshold" type="int(3)" defaultValue="6">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue667-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="itemtype" columnName="showInCustomerReview"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="itemtype">
+            <column name="showInCustomerReview" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue667-5">
+        <sql>
+            update itemtype
+            set showInCustomerReview = 1
+            where ity_itemtypeno not in
+                  (2, 4, 5, 7, 8, 9, 10, 12, 16, 23, 24, 25, 26, 27, 29, 34, 35, 37, 38, 39, 41, 42, 43)
+              and active = 1;
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

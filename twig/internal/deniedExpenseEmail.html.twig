@@ -1,4 +1,4 @@
-{% extends "wrapper.html.twig" %}
+{% extends "@internal/wrapper.html.twig" %}
 {% block content %}
     Your expense for {{ expense.type }} for  {{ 'GBP'|currency_symbol }}{{ expense.value }} has been denied because of the following reason:
     <p>

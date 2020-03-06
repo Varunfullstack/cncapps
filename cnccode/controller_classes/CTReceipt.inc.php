@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUExpense.inc.php');
 require_once($cfg['path_bu'] . '/BUExpenseType.inc.php');
@@ -148,8 +149,8 @@ class CTReceipt extends CTCNC
 
         $filePath = RECEIPT_PATH . uniqid('receipt') . "." . $ext;
         if ($ext === "pdf") {
-            if (filesize($fileUploaded) > 500000) {
-                throw new RuntimeException('The file is too big, max 500KB');
+            if (filesize($fileUploaded) > 1024 * 1024) {
+                throw new RuntimeException('The file is too big, max 1MB');
             }
             rename($fileUploaded, $filePath);
         }

@@ -114,7 +114,8 @@ class BUCustomerAnalysisReport extends Business
                     'profit'        => $profit,
                     'profitPercent' => $profitPercent,
                     'labourCost'    => $labourCost,
-                    'labourHours'   => $labourHoursRow[0]
+                    'labourHours'   => $labourHoursRow[0],
+                    'directDebit'   => $item['directDebit']
                 );
         }
 
@@ -147,7 +148,8 @@ class BUCustomerAnalysisReport extends Business
                 'profit'        => $profit,
                 'profitPercent' => $profitPercent,
                 'labourCost'    => $labourCost,
-                'labourHours'   => $otherSalesHoursRow['hours']
+                'labourHours'   => $otherSalesHoursRow['hours'],
+                'directDebit'   => 0
             );
 
         return $results;
@@ -165,8 +167,8 @@ class BUCustomerAnalysisReport extends Business
             "
         SELECT
           itm_itemno AS `ID`,
-          itm_desc AS `Contract`
-          
+          itm_desc AS `Contract`,
+          directDebitFlag = 'Y' AS directDebit
         FROM
           custitem
           JOIN item ON itm_itemno = cui_itemno

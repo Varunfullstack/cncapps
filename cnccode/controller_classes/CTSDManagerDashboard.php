@@ -132,6 +132,21 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         $buProblem->getSDDashBoardData(
             $problems,
             $limit,
+            'currentOpenSRs',
+            $isP5,
+            $showHelpDesk,
+            $showEscalation,
+            $showSmallProjects,
+            $showProjects
+        );
+        $currentOpenSRs = $this->renderQueue(
+            $problems,
+            'Current_Open_SRs'
+        );
+
+        $buProblem->getSDDashBoardData(
+            $problems,
+            $limit,
             'critical',
             $isP5,
             $showHelpDesk,
@@ -250,6 +265,7 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
                 "smallProjectsChecked"             => $showSmallProjects ? "checked" : null,
                 "projectsChecked"                  => $showProjects ? "checked" : null,
                 "shortestSLARemaining"             => $shortestSLARemaining,
+                "currentOpenSRs"                   => $currentOpenSRs,
                 "currentOpenP1Requests"            => $currentOpenP1Requests,
                 "oldestUpdatedSR"                  => $oldestUpdatedSR,
                 "longestOpenSR"                    => $longestOpenSR,
@@ -287,12 +303,12 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
         if (!$title) {
             $title = $this->humanize($name);
         }
-
         $templateName = 'SDManager' . str_replace(
                 '_',
                 '',
                 $name
             ) . 'Section.html';
+
         $template = new Template (
             $cfg["path_templates"],
             "remove"

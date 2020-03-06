@@ -19,7 +19,12 @@ $(function () {
                     firstDay: 1,
                     beforeShowDay: window[beforeShowDayFunction],
                     showOtherMonths: true,
-                    selectOtherMonths: true
+                    selectOtherMonths: true,
+                    onSelect: function (d, i) {
+                        if (d !== i.lastVal) {
+                            $(this).change();
+                        }
+                    }
                 }
             );
         })

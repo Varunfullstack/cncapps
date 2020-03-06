@@ -65,6 +65,7 @@ class DBECustomer extends DBCNCEntity
     const accountName = 'accountName';
     const accountNumber = 'accountNumber';
     const activeDirectoryName = "activeDirectoryName";
+    const reviewMeetingBooked = 'reviewMeetingBooked';
 
     /**
      * calls constructor()
@@ -421,6 +422,14 @@ class DBECustomer extends DBCNCEntity
             self::activeDirectoryName,
             DA_STRING,
             DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::reviewMeetingBooked,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
         );
 
         $this->setPK(0);

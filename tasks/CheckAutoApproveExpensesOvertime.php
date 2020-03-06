@@ -10,6 +10,7 @@
 
 use CNCLTD\LoggerCLI;
 
+global $cfg;
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg["path_dbe"] . "/DBEExpense.inc.php");
@@ -69,6 +70,13 @@ while ($callactivity->nextRecord()) {
     $activity->getRow($callactivity->getValue(DBECallActivity::callActivityID));
     $activity->setValue(DBECallActivity::overtimeApprovedBy, USER_SYSTEM);
     $activity->setValue(DBECallActivity::overtimeApprovedDate, date(DATE_MYSQL_DATETIME));
+    $buExpense = new BUExpense($thing);
+    $activity->setValue(
+        DBECallActivity::overtimeDurationApproved,
+        $buExpense->calculateOvertime(
+            number_format($callactivity->getValue(DBECallActivity::callActivityID), 2, '.', '')
+        )
+    );
     $activity->updateRow();
 }
 

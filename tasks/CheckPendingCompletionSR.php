@@ -127,7 +127,7 @@ while ($db->next_record(MYSQLI_ASSOC)) {
 }
 sendEmail($twig, $items, $lastManager);
 
-function sendEmail($twig, $items, $managerName)
+function sendEmail(Environment $twig , $items, $managerName)
 {
     if (!count($items)) {
         return;
@@ -137,7 +137,7 @@ function sendEmail($twig, $items, $managerName)
     $senderEmail = CONFIG_SUPPORT_EMAIL;
     $searchLink = SITE_URL . "/Activity.php?action=search&activity%5B1%5D%5BcustomerID%5D=&customerString=&activity%5B1%5D%5BcallActivityID%5D=&activity%5B1%5D%5BproblemID%5D=&activity%5B1%5D%5BcallActTypeID%5D=&activity%5B1%5D%5BcontractCustomerItemID%5D=99&activity%5B1%5D%5Bstatus%5D=CHECKED_NON_T_AND_M&activity%5B1%5D%5Bpriority%5D=&activity%5B1%5D%5BbreachedSlaOption%5D=&activity%5B1%5D%5BrootCauseID%5D=&activity%5B1%5D%5BuserID%5D=&activity%5B1%5D%5BindividualActivitySpentTime%5D=&activity%5B1%5D%5BserviceRequestSpentTime%5D=&activity%5B1%5D%5BactivityText%5D=&activity%5B1%5D%5BfromDate%5D=&activity%5B1%5D%5BtoDate%5D=&Search=Search";
     // we have a different manager so we have to start a new email, and send the previous one
-    $body = $twig->render('pendingCompletion.html.twig', ["searchLink" => $searchLink, "items" => $items]);
+    $body = $twig->render('@internal/pendingCompletion.html.twig', ["searchLink" => $searchLink, "items" => $items]);
     $toEmail = $managerName . '@' . CONFIG_PUBLIC_DOMAIN;
     $subject = "You have " . count($items) . " service requests to manually complete";
     $hdrs = array(

@@ -328,7 +328,7 @@ class BUCustomerReviewMeeting extends Business
         if ($_error) {
             throw new Exception(json_encode($_error));
         } else {
-            unlink($tempFilePath);
+//            unlink($tempFilePath);
             return true;
         }
     }
@@ -429,7 +429,8 @@ class BUCustomerReviewMeeting extends Business
                     ),
                     'profitPercent'    => $row['profitPercent'],
                     'labourHours'      => $row['labourHours'],
-                    'profitAlertClass' => $profitAlertClass
+                    'profitAlertClass' => $profitAlertClass,
+                    'directDebit'      => $row['directDebit'] ? 'yes' : 'no'
                 )
             );
             $template->parse(
@@ -515,7 +516,7 @@ class BUCustomerReviewMeeting extends Business
         foreach ($items as $item) {
 
             if ($item['itemTypeDescription'] != $lastItemTypeDescription) {
-                $itemTypeHeader = '<tr><td colspan="7"><h3>' . $item['itemTypeDescription'] . '</h3></td></tr>';
+                $itemTypeHeader = '<tr><td colspan="8"><h3>' . $item['itemTypeDescription'] . '</h3></td></tr>';
             } else {
                 $itemTypeHeader = '';
             }
@@ -570,7 +571,8 @@ class BUCustomerReviewMeeting extends Business
                     'costPrice'           => $costPrice,
                     'customerItemID'      => $item['customerItemID'],
                     'coveredItemsString'  => $coveredItemsString,
-                    'itemClass'           => $itemClass
+                    'itemClass'           => $itemClass,
+                    'directDebit'         => $item['directDebit'] ? 'yes' : 'no'
                 )
             );
 

@@ -63,6 +63,10 @@
         $('.reportSection table').each(function () {
             var rowCount = $('tbody tr', $(this)).length;
 
+            if (this.id === 'servicesTable') {
+                return;
+            }
+
             const createdElements = [];
 
             if (rowCount > 50) {
@@ -121,7 +125,6 @@
             //loop through sections looking for large tables
             updateTables();
             handleEditableText();
-
             var sections = 1;
             $('h2').each(function () {
                 $(this).prepend(sections + '. ');
@@ -130,7 +133,7 @@
 
             var height = 0;
             //1305 px is page height including margins
-            $('.reportSection').each(function () {
+            $('.reportSection').not('.noNewPage').each(function () {
                 if ((height + $(this).outerHeight()) > 1290) {
                     //if adding the next section would cause it to spill onto a new page add in a page break and reset the height count
                     $(this).addClass('newPage');
@@ -207,6 +210,9 @@
         letter-spacing: 0px;
     }
 
+    #reportContent .diskSpaceReportSection .thirdTable td {
+        font-size: 0.95em;
+    }
 
     .pageBreak {
         page-break-after: always;
@@ -296,7 +302,7 @@
     }
 
     .thirdTable {
-        width: 31%;
+        width: 30%;
         display: inline-block;
         vertical-align: top;
     }

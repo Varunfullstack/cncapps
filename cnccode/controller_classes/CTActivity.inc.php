@@ -843,7 +843,10 @@ class CTActivity extends CTCNC
                 array(
                     'activityTypeSelected'    => $activityTypeSelected,
                     'callActTypeID'           => $dbeCallActType->getValue(DBECallActType::callActTypeID),
-                    'activityTypeDescription' => $dbeCallActType->getValue(DBECallActType::description)
+                    'activityTypeDescription' => $dbeCallActType->getValue(DBECallActType::description),
+                    'allowOvertime'           => $dbeCallActType->getValue(
+                        DBECallActType::engineerOvertimeFlag
+                    ) == 'Y' ? 1 : 0
                 )
             );
             $this->template->parse(
@@ -4502,6 +4505,9 @@ class CTActivity extends CTCNC
                 ),
                 'hideFromCustomerFlagChecked'    => Controller::htmlChecked($hideFromCustomerFlag),
                 'hideFromCustomerDisabled'       => $hideFromCustomerDisabled,
+                'submitAsOvertimeChecked'        => $dsCallActivity->getValue(
+                    DBECallActivity::submitAsOvertime
+                ) ? 'checked' : null,
                 'hdRemainMinutes'                => $hdAssignedMinutes - $hdUsedMinutes,
                 'esRemainMinutes'                => $esAssignedMinutes - $esUsedMinutes,
                 'imRemainMinutes'                => $imAssignedMinutes - $imUsedMinutes,
@@ -4664,7 +4670,10 @@ class CTActivity extends CTCNC
                 array(
                     'activityTypeSelected' => $activityTypeSelected,
                     'callActTypeID'        => $dbeJCallActType->getValue(DBEJCallActType::callActTypeID),
-                    'activityTypeDesc'     => $dbeJCallActType->getValue(DBEJCallActType::description)
+                    'activityTypeDesc'     => $dbeJCallActType->getValue(DBEJCallActType::description),
+                    'allowOvertime'        => $dbeJCallActType->getValue(
+                        DBEJCallActType::engineerOvertimeFlag
+                    ) == 'Y' ? 1 : 0,
                 )
             );
 

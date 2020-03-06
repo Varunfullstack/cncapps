@@ -13,6 +13,7 @@
         drawChart('serviceDesk');
         drawChart('otherContracts');
         drawChart('totalSR');
+        drawChart('historicTotalSR');
     }
 
     function drawChart(chartName) {
@@ -61,7 +62,93 @@
         </tr>
     </table>
 </div>
+<div class="reportSection"
+     style="margin-bottom:30px"
+>
+    <h2>Customer Summary</h2>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                Became Customer:
+            </td>
+            <td colspan="2">
+                {becameCustomerDate} ({becameCustomerYears} years)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                CNC Account Manager:
+            </td>
+            <td colspan="2">
+                {accountManagerName}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Key Customer Contact:
+            </td>
+            <td colspan="2">
+                {keyCustomerContactName}
+            </td>
+        </tr>
+        <tr {lastReviewMeetingClass}>
+            <td>
+                Last Review Meeting:
+            </td>
+            <td>
+                {lastReviewMeetingDate}
+            </td>
+            <td>
+                {reviewMeetingFrequency}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Direct Debit Set Up
+            </td>
+            <td colspan="2">
+                {directDebitSetup}
+            </td>
+        </tr>
 
+        </tbody>
+    </table>
+</div>
+<div class="reportSection noNewPage"
+     style="margin-bottom:30px"
+>
+    <h2>Summary of CNC Services</h2>
+    <table class="content"
+           border="0"
+           cellpadding="2"
+           cellspacing="1"
+           width="100%"
+           id="servicesTable"
+    >
+        <thead>
+        <tr>
+            <th colspan="2">&nbsp;</th>
+            <th>Annual Fee(&pound;)</th>
+        </tr>
+
+        </thead>
+        <tbody>
+
+
+        <!-- BEGIN itemBlock -->
+        {itemTypeHeader}
+        <tr class="{itemClass}">
+            <td class="content">
+                {description}
+            </td>
+            <td class="content">{notes}{coveredItemsString}</td>
+            <td class="contentRightAlign" align="right">{salePrice}</td>
+        </tr>
+        <!-- END itemBlock -->
+        </tbody>
+    </table>
+</div>
 <div class="reportSection"
      style="margin-bottom:30px"
 >
@@ -104,6 +191,10 @@
 
 <div class="reportSection">
     <div id="totalSR"></div>
+</div>
+
+<div class="reportSection">
+    <div id="historicTotalSR"></div>
 </div>
 
 <div class="reportSection">
@@ -158,4 +249,8 @@
         <!-- END userBlock -->
         </tbody>
     </table>
+</div>
+
+<div class="reportSection diskSpaceReportSection" >
+    {diskSpaceSection}
 </div>

@@ -213,7 +213,7 @@ class BUUser extends Business
 
         $subject = 'Staff Member ' . $dbeUser->getValue(DBEUser::name) . ' has been reported as sick';
         $body = $twig->render(
-            'userReportedSickEmail.html.twig',
+            '@internal/userReportedSickEmail.html.twig',
             [
                 "staffName"      => $dbeUser->getValue(DBEUser::name),
                 "reporterName"   => $reporter->getValue(DBEUser::name),
@@ -433,6 +433,7 @@ class BUUser extends Business
     FROM
       headert 
     LIMIT 1) 
+      when 5 then (select projectTeamTargetLogPercentage from headert)
     ELSE 0 
   END AS target 
 FROM

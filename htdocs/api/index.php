@@ -22,7 +22,8 @@ $app->addErrorMiddleware(true, true, true);
 $container->set(
     'twig',
     function () {
-        $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../../twig');
+        $loader = new \Twig\Loader\FilesystemLoader('', __DIR__ . '/../../twig');
+        $loader->addPath('api', 'api');
         return new Environment($loader, ["cache" => __DIR__ . '/../../cache']);
     }
 );
@@ -330,9 +331,10 @@ $app->group(
         $group->get(
             '/signedConfirmation',
             function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response) {
+                /** @var Environment $twig */
                 $twig = $this->get('twig');
                 $response->getBody()->write(
-                    $twig->render('signedConfirmation.html.twig', ["message" => "Code not provided"])
+                    $twig->render('@api/signedConfirmation.html.twig', ["message" => "Code not provided"])
                 );
                 return $response;
             }
@@ -348,7 +350,7 @@ $app->group(
 
                 if (!$code) {
                     $response->getBody()->write(
-                        $twig->render('acceptQuotation.html.twig', ["message" => "Code not provided"])
+                        $twig->render('@api/acceptQuotation.html.twig', ["message" => "Code not provided"])
                     );
                     return $response->withStatus(400);
                 }
@@ -359,7 +361,7 @@ $app->group(
                 if (!$dbeQuotation->getRowByColumn(DBEQuotation::confirmCode)) {
                     $response->getBody()->write(
                         $twig->render(
-                            'acceptQuotation.html.twig',
+                            '@api/acceptQuotation.html.twig',
                             ["message" => "The Quote to be signed was not found"]
                         )
                     );
@@ -370,7 +372,7 @@ $app->group(
                 if ($dbeQuotation->getValue(DBEQuotation::signableEnvelopeID)) {
                     $response->getBody()->write(
                         $twig->render(
-                            'acceptQuotation.html.twig',
+                            '@api/acceptQuotation.html.twig',
                             ["message" => "The Quote is already being processed in Signable"]
                         )
                     );
@@ -456,7 +458,7 @@ $app->group(
                     echo 'catch';
                     $response->getBody()->write(
                         $twig->render(
-                            'acceptQuotation.html.twig',
+                            '@api/acceptQuotation.html.twig',
                             ["message" => "Failed to generate PDF file to be sent to Signable, please contact us."]
                         )
                     );
@@ -464,7 +466,7 @@ $app->group(
                 }
                 $response->getBody()->write(
                     $twig->render(
-                        'acceptQuotation.html.twig',
+                        '@api/acceptQuotation.html.twig',
                         ["message" => "You will now receive an email from Signable with details on how to confirm your order. This quotation is subject to our terms and conditions which are available <a href='https://www.cnc-ltd.co.uk/terms-and-conditions'>here</a>"]
                     )
                 );

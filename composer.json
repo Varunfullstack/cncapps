@@ -26,7 +26,8 @@
         "ext-bcmath": "*",
         "ext-calendar": "*",
         "intervention/image": "^2.5",
-        "twig/intl-extra": "^3.0"
+        "twig/intl-extra": "^3.0",
+        "ext-intl": "*"
     },
     "autoload": {
         "psr-4": {

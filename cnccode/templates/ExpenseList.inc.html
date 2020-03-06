@@ -7,7 +7,7 @@
         const file = event.target.files[0];
 
         // Allowed types
-        var mime_types = ['image/jpeg', 'application/pdf'];
+        var mime_types = ['image/jpeg', 'application/pdf', 'image/png'];
 
         // Validate MIME type
         if (mime_types.indexOf(file.type) === -1) {
@@ -16,8 +16,8 @@
         }
 
         // Max 2 Mb allowed
-        if (file.type === 'application/pdf' && file.size > 500 * 1024) {
-            alert('Error : Exceeded PDF size 500KB');
+        if (file.type === 'application/pdf' && file.size > 1024 * 1024) {
+            alert('Error : Exceeded PDF size 1MB');
             return;
         }
 

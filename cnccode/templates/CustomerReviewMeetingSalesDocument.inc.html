@@ -94,6 +94,7 @@
             <th>Profit(&pound;)</th>
             <th>Profit(%)</th>
             <th>Labour(Hours)</th>
+            <th>DD</th>
         </tr>
         </thead>
         <tbody>
@@ -106,10 +107,11 @@
             <td align="right">{profit}</td>
             <td align="right">{profitPercent}</td>
             <td align="right">{labourHours}</td>
+            <td align="right">{directDebit}</td>
         </tr>
         <!-- END contractsBlock -->
         <tr>
-            <td colspan="6">&nbsp;</td>
+            <td colspan="8">&nbsp;</td>
         </tr>
         <tr>
             <td>TOTALS</td>
@@ -119,6 +121,7 @@
             <td align="right">{totalProfit}</td>
             <td align="right">{totalProfitPercent}</td>
             <td align="right">{totalLabourHours}</td>
+            <td></td>
         </tr>
         </tbody>
     </table>
@@ -133,6 +136,7 @@
             <th>Quantity</th>
             <th>Cost(&pound;)</th>
             <th>Sale(&pound;)</th>
+            <th>DD</th>
         </tr>
         </thead>
         <tbody>
@@ -148,10 +152,11 @@
             <td class="contentRightAlign">1</td>
             <td class="contentRightAlign">{costPrice}</td>
             <td class="contentRightAlign">{salePrice}</td>
+            <td class="contentRightAlign">{directDebit}</td>
         </tr>
         <!-- END itemBlock -->
         <tr>
-            <td colspan="7">Total</td>
+            <td colspan="8">Total</td>
         </tr>
         <tr>
             <td colspan="5"
@@ -160,6 +165,7 @@
             </td>
             <td class="contentRightAlign">{totalCostPrice}</td>
             <td class="contentRightAlign">{totalSalePrice}</td>
+            <td></td>
         </tr>
         </tbody>
     </table>

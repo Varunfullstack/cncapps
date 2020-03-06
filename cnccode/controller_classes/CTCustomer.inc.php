@@ -710,6 +710,10 @@ class CTCustomer extends CTCNC
                 );
             }
             $this->dsCustomer->setValue(
+                DBECustomer::reviewMeetingBooked,
+                !!@$value['reviewMeetingBooked']
+            );
+            $this->dsCustomer->setValue(
                 DBECustomer::regNo,
                 @$value['regNo']
             );
@@ -1780,6 +1784,9 @@ class CTCustomer extends CTCNC
                 'lastReviewMeetingDateMessage'   => $this->dsCustomer->getValue(
                     self::customerFormSpecialAttentionEndDateMessage
                 ),
+                'reviewMeetingBookedChecked'     => $this->dsCustomer->getValue(
+                    DBECustomer::reviewMeetingBooked
+                ) ? 'checked' : null,
                 'support24HourFlagChecked'       => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::support24HourFlag)
                 ),
@@ -3911,8 +3918,6 @@ ORDER BY cus_name ASC   ";
     {
         $this->setMethodName('update');
         $this->setCustomerID($this->dsCustomer->getValue(DBECustomer::customerID));
-
-
         if (!$this->formError) {
             // Update the database
             if ($this->getCustomerID() == 0) {      // New customer

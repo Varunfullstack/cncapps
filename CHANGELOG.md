@@ -1,6 +1,20 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.11.0] - 2020-03-06
+### Added
+- Issue 757 - Notify when quote is signed within Signable
+- Issue 756 - SD Dashboard to show active SRs
+- Issue 755 - Sickness total notification
+### Changed
+- Issue 667 - Review Meeting Agenda Enhancements
+- Issue 764 - Add numbers to questionnaire graphs
+- Issue 748 - Overtime questions
+- Issue 763 - Fixed Explanation Rules
+### Fixed
+- Issue 758 - Customer Renewal Report Total fields formatting issue
+- Issue 753 - Project team logging target not showing on user graph
+
 ## [v3.10.4] - 2020-03-03
 ### Added
 - Issue 711 - API for 3CX phone system

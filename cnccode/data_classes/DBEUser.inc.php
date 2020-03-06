@@ -28,7 +28,6 @@ class DBEUser extends DBEntity
     CONST firstName = "firstName";
     CONST lastName = "lastName";
     CONST activeFlag = "activeFlag";
-    CONST weekdayOvertimeFlag = "weekdayOvertimeFlag";
     CONST helpdeskFlag = "helpdeskFlag";
     CONST customerID = "customerID";
     CONST hourlyPayRate = "hourlyPayRate";
@@ -192,11 +191,6 @@ class DBEUser extends DBEntity
             DA_NOT_NULL,
             'consultant.activeFlag'
         );
-        $this->addColumn(
-            self::weekdayOvertimeFlag,
-            DA_YN,
-            DA_NOT_NULL
-        ); // does user get overtime in weekdays
         $this->addColumn(
             self::helpdeskFlag,
             DA_YN,
@@ -500,6 +494,17 @@ class DBEUser extends DBEntity
             " WHERE " . $this->getDBColumnName(
                 self::isExpenseApprover
             ) . " = 1  and " . $this->getDBColumnName(self::activeFlag) . " = 'Y'";
+        $this->setQueryString($query);
+        return parent::getRows();
+    }
+
+    public function getSickReportUsers()
+    {
+        $query = "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName().
+            " WHERE " . $this->getDBColumnName(
+                self::activeFlag
+            ) . " = 'Y' and  ";
         $this->setQueryString($query);
         return parent::getRows();
     }
