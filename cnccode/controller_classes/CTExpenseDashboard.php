@@ -567,7 +567,7 @@ FROM
 
                 $this->template->setVar(
                     'CONTENTS',
-                    $twig->render('expenseDashboard/runningTotals.html.twig', $context)
+                    $twig->render('@internal/expenseDashboard/runningTotals.html.twig', $context)
                 );
                 $this->parsePage();
                 break;
@@ -660,7 +660,7 @@ FROM
         $buMail = new BUMail($this);
 
         $body = $twig->render(
-            'deniedExpenseEmail.html.twig',
+            '@internal/deniedExpenseEmail.html.twig',
             [
                 "expense" => [
                     "type"         => $dbeExpenseType->getValue(DBEExpenseType::description),
@@ -826,7 +826,7 @@ FROM
 
 
         $body = $twig->render(
-            'deniedOvertimeEmail.html.twig',
+            '@internal/deniedExpenseEmail.html.twig',
             [
                 "overtime" => [
                     "customerName" => $dbeJCallactivity->getValue(DBEJCallActivity::customerName),

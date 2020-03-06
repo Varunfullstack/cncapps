@@ -727,7 +727,7 @@ switch ($server_type) {
         );
         define(
             'CONFIG_CATCHALL_EMAIL',
-            'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN
+            'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', xavi@pavilionweb.co.uk'
         );
 //            error_reporting(E_ALL & ~E_STRICT)
         error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
@@ -1065,11 +1065,13 @@ $GLOBALS['db_options'] =
 
 require BASE_DRIVE . '/vendor/autoload.php';
 
-$loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../twig/internal');
+$loader = new \Twig\Loader\FilesystemLoader('', __DIR__ . '/../twig');
+$loader->addPath('internal', 'internal');
 $twig = new Environment(
     $loader,
-    ["cache"         => __DIR__ . '/../cache',
-     "debug"         => $server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE,
+    [
+        "cache" => __DIR__ . '/../cache',
+        "debug" => $server_type !== MAIN_CONFIG_SERVER_TYPE_LIVE,
     ]
 );
 $twig->addExtension(new \Twig\Extra\Intl\IntlExtension());

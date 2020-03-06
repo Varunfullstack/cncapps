@@ -90,7 +90,7 @@ while ($dbeOrdHead->fetchNext()) {
 
             global $twig;
             $body = $twig->render(
-                'quotationSignedEmail.html.twig',
+                '@internal/quotationSignedEmail.html.twig',
                 [
                     "url"     => SITE_URL . "/SalesOrder.php?action=displaySalesOrder&ordheadID={$dbeQuote->getValue(DBEQuotation::ordheadID)}",
                     "orderId" => $dbeQuote->getValue(DBEQuotation::ordheadID)

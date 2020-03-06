@@ -18,4 +18,6 @@ class OvertimeExportItem
     public $activityStartTime;
     public $activityEndTime;
     public $belowThreshold;
+    public $isDenied;
+    public $isApproved;
 }

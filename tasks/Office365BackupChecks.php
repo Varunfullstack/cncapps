@@ -134,7 +134,7 @@ function sendNoContractIdWarningEmail(array $accountItems)
     );
 
     global $twig;
-    $html = $twig->render('office365BackupPortalNoContractIdWarningEmail.html.twig', ["items" => $accountItems]);
+    $html = $twig->render('@internal/office365BackupPortalNoContractIdWarningEmail.html.twig', ["items" => $accountItems]);
     $buMail->mime->setHTMLBody($html);
 
     $mime_params = array(

@@ -23,7 +23,6 @@ require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg["path_func"] . "/activity.inc.php");
 
 
-
 class BUExpense extends Business
 {
     const exportDataSetEndDate = 'endDate';
@@ -254,95 +253,86 @@ class BUExpense extends Business
                 4
             );
 
+        $overtimeToFlagAsExported = [];
+        $expensesToFlagAsExported = [];
         foreach ($expenses as $expenseExportItem) {
 
-            if (!isset($engineersData[$expenseExportItem->engineerName])) {
-                $engineersData[$expenseExportItem->engineerName] = [
-                    "expenses"           => [],
-                    "expenseNetTotal"    => 0,
-                    "expenseVATTotal"    => 0,
-                    "expenseGrossTotal"  => 0,
-                    "overtimeActivities" => [],
-                    "summaryGrossTotal"  => 0,
-                    "payeTotal"          => 0,
-                    'overtimeTotal'      => 0,
-                    'employeeNumber'     => null,
-                    'userName'           => null,
-                    'firstName'          => null,
-                    'lastName'           => null,
-                    'monthYear'          => $monthYear
-                ];
+            if ($expenseExportItem->isDenied) {
+                $expensesToFlagAsExported[] = $expenseExportItem;
+                continue;
             }
 
-            $engineersData[$expenseExportItem->engineerName]['expenses'][] = $expenseExportItem;
-            $engineersData[$expenseExportItem->engineerName]['userName'] = $expenseExportItem->engineerUserName;
-            $engineersData[$expenseExportItem->engineerName]['firstName'] = $expenseExportItem->engineerFirstName;
-            $engineersData[$expenseExportItem->engineerName]['lastName'] = $expenseExportItem->engineerLastName;
-            $engineersData[$expenseExportItem->engineerName]['expenseNetTotal'] += $expenseExportItem->netValue;
-            $engineersData[$expenseExportItem->engineerName]['expenseVATTotal'] += $expenseExportItem->VATValue;
-            $engineersData[$expenseExportItem->engineerName]['expenseGrossTotal'] += $expenseExportItem->grossValue;
-            if ($expenseExportItem->payeTaxable) {
-                $engineersData[$expenseExportItem->engineerName]['payeTotal'] += $expenseExportItem->grossValue;
-            } else {
-                $engineersData[$expenseExportItem->engineerName]['summaryGrossTotal'] += $expenseExportItem->grossValue;
+            if (!isset($engineersData[$expenseExportItem->engineerName])) {
+                $engineersData[$expenseExportItem->engineerName] = new \CNCLTD\ExpenseOvertimeEngineerExport(
+                    $monthYear
+                );
             }
-            $engineersData[$expenseExportItem->engineerName]['employeeNumber'] = $expenseExportItem->employeeNumber;
+            $engineersData[$expenseExportItem->engineerName]->expenses[] = $expenseExportItem;
+            $engineersData[$expenseExportItem->engineerName]->userName = $expenseExportItem->engineerUserName;
+            $engineersData[$expenseExportItem->engineerName]->firstName = $expenseExportItem->engineerFirstName;
+            $engineersData[$expenseExportItem->engineerName]->lastName = $expenseExportItem->engineerLastName;
+            $engineersData[$expenseExportItem->engineerName]->expenseNetTotal += $expenseExportItem->netValue;
+            $engineersData[$expenseExportItem->engineerName]->expenseVATTotal += $expenseExportItem->VATValue;
+            $engineersData[$expenseExportItem->engineerName]->expenseGrossTotal += $expenseExportItem->grossValue;
+            if ($expenseExportItem->payeTaxable) {
+                $engineersData[$expenseExportItem->engineerName]->payeTotal += $expenseExportItem->grossValue;
+            } else {
+                $engineersData[$expenseExportItem->engineerName]->summaryGrossTotal += $expenseExportItem->grossValue;
+            }
+            $engineersData[$expenseExportItem->engineerName]->employeeNumber = $expenseExportItem->employeeNumber;
         }
-        $overtimeWeekdayActivities = [];
         $buHeader = new BUHeader($this);
         $dbeHeader = new DataSet($this);
         $buHeader->getHeader($dbeHeader);
         foreach ($overtimeActivities as $overtimeExportItem) {
 
-            if ($overtimeExportItem->belowThreshold) {
-                $overtimeWeekdayActivities[] = $overtimeExportItem;
+            if ($overtimeExportItem->belowThreshold || $overtimeExportItem->isDenied) {
+                $overtimeToFlagAsExported[] = $overtimeExportItem;
                 continue;
             }
 
             if (!isset($engineersData[$overtimeExportItem->engineerName])) {
-                $engineersData[$overtimeExportItem->engineerName] = [
-                    "expenses"           => [],
-                    "expenseNetTotal"    => 0,
-                    "expenseVATTotal"    => 0,
-                    "expenseGrossTotal"  => 0,
-                    "summaryGrossTotal"  => 0,
-                    "payeTotal"          => 0,
-                    "overtimeActivities" => [],
-                    'overtimeTotal'      => 0,
-                    'employeeNumber'     => null,
-                    'userName'           => null,
-                    'firstName'          => null,
-                    'lastName'           => null,
-                    'monthYear'          => $monthYear
-                ];
+                $engineersData[$overtimeExportItem->engineerName] = new \CNCLTD\ExpenseOvertimeEngineerExport(
+                    $monthYear
+                );
             }
+            $engineersData[$overtimeExportItem->engineerName]->overtimeActivities[] = $overtimeExportItem;
+            $engineersData[$overtimeExportItem->engineerName]->userName = $overtimeExportItem->engineerUserName;
+            $engineersData[$overtimeExportItem->engineerName]->firstName = $overtimeExportItem->engineerFirstName;
+            $engineersData[$overtimeExportItem->engineerName]->lastName = $overtimeExportItem->engineerLastName;
+            $engineersData[$overtimeExportItem->engineerName]->employeeNumber = $overtimeExportItem->employeeNumber;
+            $engineersData[$overtimeExportItem->engineerName]->overtimeTotal += $overtimeExportItem->overtimeValue;
 
-            $engineersData[$overtimeExportItem->engineerName]['overtimeActivities'][] = $overtimeExportItem;
-            $engineersData[$overtimeExportItem->engineerName]['userName'] = $overtimeExportItem->engineerUserName;
-            $engineersData[$overtimeExportItem->engineerName]['firstName'] = $overtimeExportItem->engineerFirstName;
-            $engineersData[$overtimeExportItem->engineerName]['lastName'] = $overtimeExportItem->engineerLastName;
-            $engineersData[$overtimeExportItem->engineerName]['employeeNumber'] = $overtimeExportItem->employeeNumber;
-            $engineersData[$overtimeExportItem->engineerName]['overtimeTotal'] += $overtimeExportItem->overtimeValue;
-
-        }
-
-        if (!count($engineersData)) {
-            return false;
         }
 
         $expenseJournalCSVData = [];
         $summaryReportCSVData = [];
         if ($runType == 'Export') {
 
-            /** @var OvertimeExportItem $toIgnoreOvertimeActivities */
-            foreach ($overtimeWeekdayActivities as $toIgnoreOvertimeActivities) {
+            /** @var OvertimeExportItem $toIgnoreOvertimeActivity */
+            foreach ($overtimeToFlagAsExported as $toIgnoreOvertimeActivity) {
                 $queryString =
                     "UPDATE callactivity SET caa_ot_exp_flag = 'Y'
                     WHERE caa_callactivityno = ?";
-
-                $db->preparedQuery($queryString, [["type" => "i", "value" => $toIgnoreOvertimeActivities->activityId]]);
+                $db->preparedQuery($queryString, [["type" => "i", "value" => $toIgnoreOvertimeActivity->activityId]]);
+            }
+            /** @var ExpenseExportItem $toIgnoreExpense */
+            foreach ($expensesToFlagAsExported as $toIgnoreExpense) {
+                $queryString =
+                    "UPDATE expense SET exp_exported_flag = 'Y'
+                    WHERE exp_expenseno = ?";
+                $db->preparedQuery($queryString, [["type" => "i", "value" => $toIgnoreExpense->expenseId]]);
             }
         }
+
+        if (!count($engineersData)) {
+            return false;
+        }
+
+        /**
+         * @var string $engineerName
+         * @var \CNCLTD\ExpenseOvertimeEngineerExport $engineersDatum
+         */
         foreach ($engineersData as $engineerName => $engineersDatum) {
             if ($runType == 'Export') {
                 $this->sendEngineerOvertimeExpenseSummaryEmail($engineersDatum);
@@ -356,7 +346,7 @@ class BUExpense extends Business
                     [["type" => "s", "value" => $nextProcessingDate->format(DATE_MYSQL_DATE)]]
                 );
 
-                foreach ($engineersDatum['expenses'] as $expenseExportItem) {
+                foreach ($engineersDatum->expenses as $expenseExportItem) {
                     // update exported flag
                     $queryString =
                         "UPDATE expense SET exp_exported_flag = 'Y'
@@ -365,7 +355,7 @@ class BUExpense extends Business
                 }
 
                 /** @var OvertimeExportItem $overtimeActivity */
-                foreach ($engineersDatum['overtimeActivities'] as $overtimeActivity) {
+                foreach ($engineersDatum->overtimeActivities as $overtimeActivity) {
                     $queryString =
                         "UPDATE callactivity SET caa_ot_exp_flag = 'Y'
                     WHERE caa_callactivityno = ?";
@@ -374,7 +364,7 @@ class BUExpense extends Business
                 }
             }
 
-            if ($engineersDatum['expenseGrossTotal']) {
+            if ($engineersDatum->expenseGrossTotal) {
                 // from the total for each engineer we have to generate the expenses journal data
                 $expenseJournalCSVData[] = [
                     'JC',
@@ -384,7 +374,7 @@ class BUExpense extends Business
                     $date->format('t/m/Y'),
                     'Expenses',
                     $engineerName,
-                    number_format($engineersDatum['expenseGrossTotal'], 2),
+                    number_format($engineersDatum->expenseGrossTotal, 2),
                     'T9',
                     0
                 ];
@@ -397,13 +387,13 @@ class BUExpense extends Business
                     $date->format('t/m/Y'),
                     'Expenses',
                     $engineerName,
-                    number_format($engineersDatum['expenseNetTotal'], 2),
+                    number_format($engineersDatum->expenseNetTotal, 2),
                     'T0',
                     0
                 ];
             }
 
-            if ($engineersDatum['expenseVATTotal']) {
+            if ($engineersDatum->expenseVATTotal) {
                 $expenseJournalCSVData[] = [
                     'JD',
                     '',
@@ -412,7 +402,7 @@ class BUExpense extends Business
                     $date->format('t/m/Y'),
                     'Expenses',
                     $engineerName,
-                    number_format($engineersDatum['expenseVATTotal'], 2),
+                    number_format($engineersDatum->expenseVATTotal, 2),
                     'T1',
                     0
                 ];
@@ -420,12 +410,12 @@ class BUExpense extends Business
 
 
             $summaryReportCSVData[] = [
-                $engineersDatum['employeeNumber'],
-                $engineersDatum['firstName'],
-                $engineersDatum['lastName'],
-                $engineersDatum['summaryGrossTotal'],
-                $engineersDatum['overtimeTotal'],
-                $engineersDatum['payeTotal'],
+                $engineersDatum->employeeNumber,
+                $engineersDatum->firstName,
+                $engineersDatum->lastName,
+                $engineersDatum->summaryGrossTotal,
+                $engineersDatum->overtimeTotal,
+                $engineersDatum->payeTotal,
             ];
         }
 
@@ -495,7 +485,9 @@ class BUExpense extends Business
       expense.`exp_value` / (1 + getCurrentVatRate ())
     ),
     expense.`exp_value`
-  ) AS netValue
+  ) AS netValue,
+        expense.approvedBy IS NOT NULL as isApproved,
+        expense.deniedReason is not null as isDenied
 FROM
   expense
   INNER JOIN callactivity
@@ -511,7 +503,7 @@ FROM
 WHERE expense.exp_exported_flag <> 'Y'
   AND callactivity.caa_date <= ?
   AND callactivity.caa_status IN ('C', 'A')
-  AND expense.approvedBy IS NOT NULL
+  and (expense.approvedBy is not null or expense.deniedReason is not null)
 ORDER BY cns_name,
   caa_date,
   caa_starttime";
@@ -550,7 +542,9 @@ ORDER BY cns_name,
     `cns_employee_no` as employeeNumber,
            DATE_FORMAT(caa_date, '%w')IN(0,6) as weekendOvertime,
            overtimeDurationApproved AS overtimeValue,
-  overtimeDurationApproved * 60 < minimumOvertimeMinutesRequired AS belowThreshold
+  overtimeDurationApproved * 60 < minimumOvertimeMinutesRequired AS belowThreshold,
+           overtimeDeniedReason is not null as isDenied, 
+           overtimeApprovedBy is not null as isApproved
     FROM callactivity
     JOIN problem ON pro_problemno = caa_problemno
     JOIN callacttype ON caa_callacttypeno = cat_callacttypeno
@@ -563,7 +557,6 @@ ORDER BY cns_name,
     AND caa_ot_exp_flag = 'N'
     AND  caa_endtime <> caa_starttime
     AND callacttype.engineerOvertimeFlag = 'Y'
-    and overtimeApprovedBy is not null
     ORDER BY cns_name, caa_date";
 
 
@@ -575,22 +568,21 @@ ORDER BY cns_name,
         return $toReturn;
     }
 
-    private function sendEngineerOvertimeExpenseSummaryEmail($engineersDatum)
+    private function sendEngineerOvertimeExpenseSummaryEmail(\CNCLTD\ExpenseOvertimeEngineerExport $engineersDatum)
     {
         /** @var \Twig\Environment $twig */
         global $twig;
         $body = $twig->render(
-            'expensesOvertimeIndividualEmail.html.twig',
+            '@internal/expensesOvertimeIndividualEmail.html.twig',
             [
-                "expenses"           => $engineersDatum['expenses'],
-                "overtimeActivities" => $engineersDatum['overtimeActivities']
+                "data" => $engineersDatum,
             ]
         );
 
         $buMail = new BUMail($this);
         $fromEmail = CONFIG_SALES_EMAIL;
-        $toEmail = $engineersDatum['userName'] . '@' . CONFIG_PUBLIC_DOMAIN;
-        $subject = "Overtime/Expenses for " . $engineersDatum['monthYear'];
+        $toEmail = $engineersDatum->userName . '@' . CONFIG_PUBLIC_DOMAIN;
+        $subject = "Overtime/Expenses for " . $engineersDatum->monthYear;
         $hdrs = array(
             'From'    => $fromEmail,
             'To'      => $toEmail,

@@ -23,4 +23,6 @@ class ExpenseExportItem
     public $engineerFirstName;
     public $engineerLastName;
     public $payeTaxable;
+    public $isDenied;
+    public $isApproved;
 }

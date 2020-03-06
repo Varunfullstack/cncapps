@@ -103,7 +103,7 @@ foreach (getPendingToApproveExpenseItems() as $pendingToApproveExpenseItem) {
 
 $buMail = new BUMail($thing);
 foreach ($approvers as $approver) {
-    $body = $twig->render('internal/unapprovedExpenseOvertimeWarningEmail.html.twig', $approver);
+    $body = $twig->render('@internal/unapprovedExpenseOvertimeWarningEmail.html.twig', $approver);
     $fromEmail = CONFIG_SALES_EMAIL;
     $toEmail = $approver['approverUserName'] . '@' . CONFIG_PUBLIC_DOMAIN;
     $subject = "You have overtime or expenses requests that are waiting to be approved.";
@@ -167,7 +167,7 @@ WHERE sickDaysThisYear >= yearlySicknessThresholdWarning"
 );
 $sickPeople = $db->fetchAll(MYSQLI_ASSOC);
 $body = $twig->render(
-    'sickReportEmail.html.twig',
+    '@internal/sickReportEmail.html.twig',
     [
         "sickPeople"             => $sickPeople,
         "yearlySicknessThresholdWarning" => @$sickPeople[0]['yearlySicknessThresholdWarning']

@@ -24,7 +24,7 @@ CKEDITOR.editorConfig = function (config) {
     config.wordcount = {
         showParagraphs: false,
         showCharCount: true,
-        minCharCount: 200
+        minCharCount: 160
     };
     CKEDITOR.config.width = '870';
     CKEDITOR.config.height = '220';

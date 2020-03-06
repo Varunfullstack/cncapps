@@ -656,7 +656,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
                 $diskSpaceReport = '';
                 if (count($diskSpaceData)) {
                     $diskSpaceReport = $twig->render(
-                        'customerReviewMeeting/diskSpaceReportSection.html.twig',
+                        '@internal/customerReviewMeeting/diskSpaceReportSection.html.twig',
                         ["driveSpaceItems" => $diskSpaceData]
                     );
                 }
