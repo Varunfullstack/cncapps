@@ -16,8 +16,8 @@
         }
 
         // Max 2 Mb allowed
-        if (file.type === 'application/pdf' && file.size > 500 * 1024) {
-            alert('Error : Exceeded PDF size 500KB');
+        if (file.type === 'application/pdf' && file.size > 1024 * 1024) {
+            alert('Error : Exceeded PDF size 1MB');
             return;
         }
 
