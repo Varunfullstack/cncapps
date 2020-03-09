@@ -1,6 +1,14 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.11.2] - 2020-03-09
+### Added 
+- SRCountByPerson internal api endpoint
+- SRCountByRootCause internal api endpoint
+- SRCountByLocation internal api endpoint
+### Fixed
+- Fix issue with yearlySicknessThresholdWarning input not showing in the header edit page, preventing it from saving
+
 ## [v3.11.1] - 2020-03-09 
 ### Changed
 - Remove explanation min chars if SR is hidden from customer.
