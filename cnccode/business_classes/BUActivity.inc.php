@@ -751,7 +751,7 @@ class BUActivity extends Business
         );
     }
 
-    function getFirstActivityInProblem($problemID)
+    function getFirstActivityInProblem($problemID, $typeID = null)
     {
 
         $dbeCallActivity = new DBEJCallActivity($this);
@@ -761,16 +761,17 @@ class BUActivity extends Business
             false
         );
 
-        if ($dbeCallActivity->fetchNext()) {
+        while ($dbeCallActivity->fetchNext()) {
+            if (!$typeID) {
+                return $dbeCallActivity;
+            }
 
-            return $dbeCallActivity;
-
-        } else {
-
-            return false;
-
+            if ($dbeCallActivity->getValue(DBEJCallActivity::callActTypeID) == $typeID) {
+                return $dbeCallActivity;
+            }
         }
-    } // end sendFutureVisitEmail
+        return false;
+    }
 
     function escalateProblemByCallActivityID($callActivityID)
     {
@@ -1085,7 +1086,7 @@ class BUActivity extends Business
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
 
-        $dbeFirstActivity = $this->getFirstActivityInProblem($problemID);
+        $dbeFirstActivity = $this->getFirstActivityInProblem($problemID, CONFIG_INITIAL_ACTIVITY_TYPE_ID);
         $dbeLastActivity = $this->getLastActivityInProblem($problemID);
 
         $dbeCallActType = new DBECallActType($this);
@@ -6859,7 +6860,7 @@ is currently a balance of ';
             $dsOrdhead->getValue(DBEOrdhead::delContactID)
         );
 
-        if($dsInput->getValue(BURenContract::serviceRequestCustomerItemID) == -1){
+        if ($dsInput->getValue(BURenContract::serviceRequestCustomerItemID) == -1) {
             $dsInput->setValue(BURenContract::serviceRequestCustomerItemID, null);
         }
 
