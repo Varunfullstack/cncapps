@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v3.11.1] 
+## [v3.11.1] - 2020-03-09 
 ### Changed
 - Remove explanation min chars if SR is hidden from customer.
 - Add "Default Fixed Explanation" for Root Causes.
