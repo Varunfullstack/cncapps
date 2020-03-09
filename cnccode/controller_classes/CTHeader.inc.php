@@ -622,6 +622,9 @@ class CTHeader extends CTCNC
                 DBEHeader::otherDriveFreeSpaceWarningPercentageThreshold             => $dsHeader->getValue(
                     DBEHeader::otherDriveFreeSpaceWarningPercentageThreshold
                 ),
+                DBEHeader::yearlySicknessThresholdWarning                            => $dsHeader->getValue(
+                    DBEHeader::yearlySicknessThresholdWarning
+                ),
                 'urlItemPopup'                                                       => $urlItemPopup,
                 'urlUpdate'                                                          => $urlUpdate
             ]
