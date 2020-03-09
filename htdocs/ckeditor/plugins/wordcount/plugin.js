@@ -17,6 +17,7 @@ CKEDITOR.plugins.add("wordcount",
                 lastWordCount = -1,
                 lastCharCount = -1,
                 lastParagraphs = -1,
+
                 limitReachedNotified = false,
                 limitRestoredNotified = false,
                 timeoutId = 0,

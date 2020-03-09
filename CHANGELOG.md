@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.11.1] - 2020-03-09 
+### Changed
+- Remove explanation min chars if SR is hidden from customer.
+- Add "Default Fixed Explanation" for Root Causes.
+
 ## [v3.11.0] - 2020-03-06
 ### Added
 - Issue 757 - Notify when quote is signed within Signable

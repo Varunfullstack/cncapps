@@ -140,7 +140,8 @@ class CTReceipt extends CTCNC
                 $mimeType,
                 array(
                     'jpg' => 'image/jpeg',
-                    'pdf' => 'application/pdf'
+                    'pdf' => 'application/pdf',
+                    'png' => 'image/png'
                 ),
                 true
             )) {
@@ -154,7 +155,7 @@ class CTReceipt extends CTCNC
             }
             rename($fileUploaded, $filePath);
         }
-        if ($ext === 'jpg') {
+        if ($ext === 'jpg' || $ext == 'png') {
             $image = \Intervention\Image\ImageManagerStatic::make($fileUploaded);
             $image->resize(800, 800);
             $image->save($filePath);

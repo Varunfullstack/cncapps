@@ -3,6 +3,7 @@
 <!--<script src="ckfinder/ckfinder.js"></script>-->
 
 <script>
+    const minCharCount = 160;
     var formChanged = false;
 
     function proceedWithCancel(form) {
@@ -22,11 +23,18 @@
     }
 
     function checkCharCount() {
-        if (CKEDITOR.instances.resolutionSummary.wordCount.charCount < 160) {
-            alert('The resolution summary must have at least 160 characters');
+        if (!isHidden && CKEDITOR.instances.resolutionSummary.wordCount.charCount < minCharCount) {
+            alert('The resolution summary must have at least ' + minCharCount + ' characters');
             return false;
         }
         return true;
+    }
+
+    function changeRootCause() {
+        const text = $('#rootCauseSelector')[0].selectedOptions[0].dataset.fixedText;
+        if (text) {
+            CKEDITOR.instances.resolutionSummary.insertHtml(atob(text));
+        }
     }
 </script>
 
@@ -74,13 +82,15 @@
         <tr>
             <td class="promptText">Root Cause</td>
             <td>
-                <select
-                        name="rootCauseID"
+                <select name="rootCauseID"
+                        onchange="changeRootCause()"
+                        id="rootCauseSelector"
                 >
                     <option value="">Not known</option>
                     <!-- BEGIN rootCauseBlock -->
                     <option {rootCauseSelected}
                             value="{rootCauseID}"
+                            data-fixed-text="{rootCauseFixedText}"
                     >{rootCauseDescription}
                     </option>
                     <!-- END rootCauseBlock -->
@@ -102,8 +112,37 @@
             <span class="formErrorMessage">{resolutionSummaryMessage}</span>
             <td colspan="2"><textarea name="resolutionSummary">{resolutionSummary}</textarea>
                 <script type="text/javascript">
-                    reason = CKEDITOR.replace('resolutionSummary', {customConfig: '/ckeditor_config.js'});
-                    CKEDITOR.instances.resolutionSummary.on('paste', function(evt) {
+                    const isHidden = {hiddenSR};
+                    CKEDITOR.config.width = '870';
+                    CKEDITOR.config.height = '220';
+                    CKEDITOR.config.resize_minWidth = '760';
+                    CKEDITOR.config.disableNativeSpellChecker = false;
+                    CKEDITOR.config.removePlugins = 'liststyle,tabletools,scayt,menubutton,contextmenu,language,tableselection';
+
+                    reason = CKEDITOR.replace('resolutionSummary', {
+                            contentsCss: '/screen.css',
+                            toolbarStartupExpanded: false,
+                            disableNativeSpellChecker: false,
+                            toolbar: 'CNCToolbar',
+                            toolbar_CNCToolbar:
+                                [
+                                    ['Source', '-', '-', 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor'],
+                                    ['NumberedList', 'BulletedList'],
+                                    ['Table'],
+                                    ['Format', 'Font', 'FontSize'],
+                                    ['Anchor', 'Link'],
+                                    ['Undo', 'Redo']
+                                ],
+                            extraPlugins: 'font,wordcount',
+                            fontSize_sizes: '8/8pt;9/9pt;10/10pt;11/11pt;12/12pt;14/14pt;16/16pt;18/18pt;20/20pt;22/22pt;24/24pt;26/26pt;28/28pt;36/36pt;48/48pt;72/72pt',
+                            wordcount: {
+                                showParagraphs: false,
+                                showCharCount: true,
+                                minCharCount: isHidden ? -1 : minCharCount
+                            },
+                        }
+                    );
+                    CKEDITOR.instances.resolutionSummary.on('paste', function (evt) {
                         evt.cancel();
                     });
                     reason.addCss('body { font-size: 10pt; }');
@@ -115,7 +154,6 @@
                 <input type="submit"
                        name="Submit"
                        value="Save"
-
                 >
             </td>
         </tr>

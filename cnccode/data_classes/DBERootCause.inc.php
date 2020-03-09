@@ -10,12 +10,13 @@ class DBERootCause extends DBEntity
     const rootCauseID = "rootCauseID";
     const description = "description";
     const longDescription = "longDescription";
+    const fixedExplanation = "fixedExplanation";
 
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)
@@ -39,6 +40,11 @@ class DBERootCause extends DBEntity
             DA_STRING,
             DA_NOT_NULL,
             "rtc_long_desc"
+        );
+        $this->addColumn(
+            self::fixedExplanation,
+            DA_STRING,
+            DA_ALLOW_NULL
         );
         $this->setAddColumnsOff();
         $this->setPK(0);
