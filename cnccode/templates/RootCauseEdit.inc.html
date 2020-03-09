@@ -1,39 +1,90 @@
 <!-- Template: RootCauseEdit.inc.html -->
-<TABLE width="200px" border="0" cellpadding="2" cellspacing="1">
-	<TR> 
-		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDisplayList}">Back to list</a></TD>
-		<TD width="100px" class="navigateLink" valign="top"><a href="{urlDelete}">{txtDelete}</a></TD>
-	</TR>
+<TABLE width="200px"
+       border="0"
+       cellpadding="2"
+       cellspacing="1"
+>
+    <TR>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlDisplayList}">Back to list</a></TD>
+        <TD width="100px"
+            class="navigateLink"
+            valign="top"
+        ><a href="{urlDelete}">{txtDelete}</a></TD>
+    </TR>
 </table>
-<FORM  method="post" action="{urlUpdate}" name="rootCause" AUTOCOMPLETE="OFF">
-	<table width="700px" border="0">
-		<input
-			type="hidden"
-			name="rootCause[1][rootCauseID]"
-			value="{rootCauseID}"
-		>
-		<tr> 
-			<td width="115" class="promptText">Short Description</td>
-			<td width="575" class="fieldText"> <input
-					name="rootCause[1][description]"
-					type="text" value="{description}"
-					size="50"
-					maxlength="50"
-				> <span class="formErrorMessage">{descriptionMessage}</span> </td>
-		</tr>
-    <tr> 
-      <td width="115" class="promptText">Long Description</td>
-      <td width="575" class="fieldText"> <input
-          name="rootCause[1][longDescription]"
-          type="text" value="{longDescription}"
-          size="100"
-          maxlength="100"
-        > <span class="formErrorMessage">{longDescriptionMessage}</span> </td>
-    </tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td class="formErrorMessage"><input type="submit" name="Submit" value="Update"></td>
-		</tr>
-	</table>
+<FORM method="post"
+      action="{urlUpdate}"
+      name="rootCause"
+      AUTOCOMPLETE="OFF"
+>
+    <table width="700px"
+           border="0"
+    >
+        <input
+                type="hidden"
+                name="rootCause[1][rootCauseID]"
+                value="{rootCauseID}"
+        >
+        <tr>
+            <td width="115"
+                class="promptText"
+            >Short Description
+            </td>
+            <td width="575"
+                class="fieldText"
+            ><input
+                    name="rootCause[1][description]"
+                    type="text"
+                    value="{description}"
+                    size="50"
+                    maxlength="50"
+            > <span class="formErrorMessage">{descriptionMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td width="115"
+                class="promptText"
+            >Long Description
+            </td>
+            <td width="575"
+                class="fieldText"
+            ><input
+                    name="rootCause[1][longDescription]"
+                    type="text"
+                    value="{longDescription}"
+                    size="100"
+                    maxlength="100"
+            > <span class="formErrorMessage">{longDescriptionMessage}</span>
+            </td>
+        </tr>
+        <tr>
+            <td width="115"
+                class="promptText"
+            >Default Fixed Explanation
+            </td>
+            <td width="575"
+                class="fieldText"
+            >
+                <textarea name="rootCause[1][fixedExplanation]"
+                          id="fixedExplanation"
+                >
+					{fixedExplanation}
+				</textarea>
+                <script>
+                    CKEDITOR.replace('fixedExplanation', {customConfig: '/ckeditor_config.js'});
+                </script>
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="formErrorMessage"><input type="submit"
+                                                name="Submit"
+                                                value="Update"
+            ></td>
+        </tr>
+    </table>
 </form>
 <!-- End Template: rootCauseEdit.inc.html -->

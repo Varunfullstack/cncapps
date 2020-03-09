@@ -1082,7 +1082,12 @@ class CTActivity extends CTCNC
                             DBERootCause::description
                         ) . " (" . $dsRootCause->getValue(
                             DBERootCause::longDescription
-                        ) . ")"
+                        ) . ")",
+                    'rootCauseFixedText'   => base64_encode(
+                        $dsRootCause->getValue(
+                            DBERootCause::fixedExplanation
+                        )
+                    )
                 )
 
             );
@@ -6059,6 +6064,9 @@ class CTActivity extends CTCNC
                 'callActivityID'                => $this->getParam('callActivityID'),
                 'customerID'                    => $dsCallActivity->getValue(DBEJCallActivity::customerID),
                 'customerName'                  => $dsCallActivity->getValue(DBEJCallActivity::customerName),
+                'hiddenSR'                      => $dsCallActivity->getValue(
+                    DBEJCallActivity::problemHideFromCustomerFlag
+                ) == 'Y' ? 'true' : 'false',
                 'resolutionSummary'             => $this->getParam('resolutionSummary'),
                 'resolutionSummaryMessage'      => @$error['resolutionSummary'],
                 'rootCauseIDMessage'            => @$error['rootCauseID'],
