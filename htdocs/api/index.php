@@ -95,13 +95,24 @@ $app->group(
             ELSE 0
         END,
         NULL)) AS slaMet,
-       
+       sum(IF(pro_status IN ('F' , 'C'),
+        problem.`pro_responded_hours` < CASE problem.`pro_priority`
+            WHEN 1 THEN customer.`cus_sla_p1`
+            WHEN 2 THEN customer.`cus_sla_p2`
+            WHEN 3 THEN customer.`cus_sla_p3`
+            WHEN 4 THEN customer.`cus_sla_p4`
+            ELSE 0
+        END,
+        NULL)) AS slaMetRaw,
     AVG(IF(pro_status IN ('F' , 'C'),
         openHours < 8,
         NULL)) AS closedWithin8Hours,
     AVG(IF(pro_status = 'C',
         problem.`pro_reopened_date` IS NOT NULL,
         NULL)) AS reopened,
+       sum(IF(pro_status = 'C',
+        problem.`pro_reopened_date` IS NOT NULL,
+        NULL)) AS reopenedCount,
     AVG(IF(pro_status IN ('F' , 'C'),
         problem.`pro_chargeable_activity_duration_hours`,
         NULL)) AS avgChargeableTime,
@@ -130,7 +141,6 @@ WHERE
     SUM(1) AS raised,
     SUM(pro_status IN ('F' , 'C')) AS `fixed`,
     AVG(problem.`pro_responded_hours`) AS responseTime,
-    
        CASE problem.`pro_priority`
             WHEN 1 THEN customer.`cus_sla_p1`
             WHEN 2 THEN customer.`cus_sla_p2`
@@ -146,15 +156,26 @@ WHERE
             ELSE 0
         END,
         NULL)) AS slaMet,
-       
+       sum(IF(pro_status IN ('F' , 'C'),
+        problem.`pro_responded_hours` < CASE problem.`pro_priority`
+            WHEN 1 THEN customer.`cus_sla_p1`
+            WHEN 2 THEN customer.`cus_sla_p2`
+            WHEN 3 THEN customer.`cus_sla_p3`
+            WHEN 4 THEN customer.`cus_sla_p4`
+            ELSE 0
+        END,
+        NULL)) AS slaMetRaw,
     AVG(IF(pro_status IN ('F' , 'C'),
         openHours < 8,
         NULL)) AS closedWithin8Hours,
     AVG(IF(pro_status = 'C',
         problem.`pro_reopened_date` IS NOT NULL,
         NULL)) AS reopened,
+       sum(IF(pro_status = 'C',
+        problem.`pro_reopened_date` IS NOT NULL,
+        NULL)) AS reopenedCount,
     AVG(IF(pro_status IN ('F' , 'C'),
-        problem.`pro_chargeable_activity_duration_hours`,
+        problem.`pro_chargeable_activity_duration_hours`, 
         NULL)) AS avgChargeableTime,
     AVG(IF(pro_status IN ('F' , 'C'),
         problem.pro_working_hours,
@@ -187,6 +208,187 @@ WHERE
                 } else {
                     $data = $statement->fetch_assoc();
                 }
+                $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
+                return $response;
+            }
+        );
+        $group->get(
+            '/SRCountByPerson/{customerId}',
+            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+                $queryParams = $request->getQueryParams();
+                $endDate = new DateTime();
+                $startDate = (clone $endDate)->sub(new DateInterval('P365D'));
+                if (isset($queryParams['startDate'])) {
+                    $startDateString = $queryParams['startDate'];
+                    $startDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
+                    if (!$startDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The start date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+
+                if (isset($queryParams['endDate'])) {
+                    $endDateString = $queryParams['endDate'];
+                    $endDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
+                    if (!$endDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The end date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+
+                $params = [
+                    ["type" => "i", "value" => $args['customerId']],
+                    ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
+                    ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
+                ];
+
+                $query =
+                    "SELECT
+          CONCAT(con_first_name, ' ' , con_last_name) AS name,
+             SUM(
+    problem.pro_hide_from_customer_flag <> 'Y'
+  ) AS raisedManually,
+  SUM(
+    problem.pro_hide_from_customer_flag = 'Y'
+  ) AS proactiveWork
+        FROM
+          problem
+          JOIN contact ON con_contno = pro_contno  WHERE pro_custno = ? and DATE(pro_date_raised) BETWEEN ? AND ? and con_contno <> 0 AND pro_status =  'C'  GROUP BY
+          pro_contno
+        ORDER BY
+          raisedManually DESC";
+
+
+                /** @var $db dbSweetcode */
+                global $db;
+                $statement = $db->preparedQuery($query, $params);
+                $data = $statement->fetch_all(MYSQLI_ASSOC);
+                $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
+                return $response;
+            }
+        );
+        $group->get(
+            '/SRCountByRootCause/{customerId}',
+            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+                $queryParams = $request->getQueryParams();
+                $endDate = new DateTime();
+                $startDate = (clone $endDate)->sub(new DateInterval('P365D'));
+                if (isset($queryParams['startDate'])) {
+                    $startDateString = $queryParams['startDate'];
+                    $startDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
+                    if (!$startDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The start date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+
+                if (isset($queryParams['endDate'])) {
+                    $endDateString = $queryParams['endDate'];
+                    $endDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
+                    if (!$endDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The end date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+
+                $params = [
+                    ["type" => "i", "value" => $args['customerId']],
+                    ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
+                    ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
+                ];
+
+                $query =
+                    "SELECT
+          rtc_desc AS rootCauseDescription,
+          COUNT(*) AS count
+        FROM
+          problem
+          JOIN rootcause ON rootcause.rtc_rootcauseno = problem.pro_rootcauseno  WHERE pro_custno = ?  and pro_hide_from_customer_flag <> 'Y' and
+          DATE(pro_date_raised) BETWEEN ? AND ?   AND pro_status =  'C' GROUP BY
+          problem.pro_rootcauseno
+        ORDER BY
+          count DESC";
+
+
+                /** @var $db dbSweetcode */
+                global $db;
+                $statement = $db->preparedQuery($query, $params);
+                $data = $statement->fetch_all(MYSQLI_ASSOC);
+                $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
+                return $response;
+            }
+        );
+        $group->get(
+            '/SRCountByLocation/{customerId}',
+            function (\Slim\Psr7\Request $request, \Slim\Psr7\Response $response, $args) {
+                $queryParams = $request->getQueryParams();
+                $endDate = new DateTime();
+                $startDate = (clone $endDate)->sub(new DateInterval('P365D'));
+                if (isset($queryParams['startDate'])) {
+                    $startDateString = $queryParams['startDate'];
+                    $startDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $startDateString);
+                    if (!$startDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The start date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+
+                if (isset($queryParams['endDate'])) {
+                    $endDateString = $queryParams['endDate'];
+                    $endDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $endDateString);
+                    if (!$endDate) {
+                        $response->getBody()->write(
+                            json_encode(["error" => "The end date parameter format is not valid: YYYY-MM-DD"])
+                        );
+                        return $response->withStatus(400);
+                    }
+                }
+
+                $params = [
+                    ["type" => "i", "value" => $args['customerId']],
+                    ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)],
+                    ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)],
+                ];
+
+                $query =
+                    "SELECT
+  address.`add_postcode`,
+  address.`add_town`,
+  COUNT(*) AS COUNT
+FROM
+  problem
+  JOIN callactivity
+    ON `callactivity`.`caa_problemno` = problem.`pro_problemno`
+    AND callactivity.`caa_callacttypeno` = 51
+  JOIN contact
+    ON callactivity.`caa_contno` = contact.`con_contno`
+  JOIN address
+    ON address.`add_custno` = pro_custno
+    AND contact.`con_siteno` = address.`add_siteno`
+WHERE pro_custno = ?
+  AND pro_hide_from_customer_flag <> 'Y'
+  AND DATE(pro_date_raised) BETWEEN ?
+  AND ?
+  AND address.`add_active_flag` <> 'N'
+  AND pro_status = 'C'
+GROUP BY address.`add_siteno`
+ORDER BY COUNT DESC";
+
+
+                /** @var $db dbSweetcode */
+                global $db;
+                $statement = $db->preparedQuery($query, $params);
+                $data = $statement->fetch_all(MYSQLI_ASSOC);
                 $response->getBody()->write(json_encode($data, JSON_NUMERIC_CHECK));
                 return $response;
             }
