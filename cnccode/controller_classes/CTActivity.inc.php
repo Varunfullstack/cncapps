@@ -1077,7 +1077,7 @@ class CTActivity extends CTCNC
 
                 array(
                     'rootCauseSelected'    => $rootCauseSelected,
-                    'rootCauseID'          => $dsRootCause->getValue(DBERootCause::rootCauseID),
+                    'itemRootCauseID'      => $dsRootCause->getValue(DBERootCause::rootCauseID),
                     'rootCauseDescription' => $dsRootCause->getValue(
                             DBERootCause::description
                         ) . " (" . $dsRootCause->getValue(
@@ -4408,6 +4408,7 @@ class CTActivity extends CTCNC
                 'reason'                         => $dsCallActivity->getValue(DBEJCallActivity::reason),
                 'reasonMessage'                  => $dsCallActivity->getMessage(DBEJCallActivity::reason),
                 'internalNotes'                  => $dsCallActivity->getValue(DBEJCallActivity::internalNotes),
+                'rootCauseID'                    => $dsCallActivity->getValue(DBEJCallActivity::rootCauseID),
                 'callActivityID'                 => $callActivityID,
                 'problemStatus'                  => $dsCallActivity->getValue(DBEJCallActivity::problemStatus),
                 'problemStatusMessage'           => $dsCallActivity->getMessage(DBEJCallActivity::problemStatus),
@@ -4870,7 +4871,6 @@ class CTActivity extends CTCNC
         $this->formError = (!$this->dsCallActivity->populateFromArray($this->getParam('callActivity')));
 
         $callActivityID = $dsCallActivity->getValue(DBEJCallActivity::callActivityID);
-
         // these names must not be part of an html array as the fckeditor does not work
         $dsCallActivity->setUpdateModeUpdate();
         $dsCallActivity->setValue(
@@ -5940,6 +5940,7 @@ class CTActivity extends CTCNC
             $dsCallActivity
         );
         $error = [];
+
         /* validate if this is a POST request */
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -5997,6 +5998,7 @@ class CTActivity extends CTCNC
         else {
             $this->setParam('contractCustomerItemID', 99); // prompts for Please select
         }
+
         $errorFile = null;
         if (@$_FILES['userfile']['name'] && !$this->getParam('uploadDescription')) {
             $errorFile = 'Description Required';
@@ -6069,6 +6071,7 @@ class CTActivity extends CTCNC
                 ) == 'Y' ? 'true' : 'false',
                 'resolutionSummary'             => $this->getParam('resolutionSummary'),
                 'resolutionSummaryMessage'      => @$error['resolutionSummary'],
+                'rootCauseID'                   => $dsCallActivity->getValue(DBEJCallActivity::rootCauseID),
                 'rootCauseIDMessage'            => @$error['rootCauseID'],
                 'contractCustomerItemIDMessage' => @$error['contractCustomerItemID'],
                 'submitURL'                     => $submitURL,
@@ -6091,7 +6094,7 @@ class CTActivity extends CTCNC
         $buHeader->getHeader($dsHeader);
 
         $this->rootCauseDropdown(
-            $this->getParam('rootCauseID'),
+            $dsCallActivity->getValue(DBEJCallActivity::rootCauseID),
             'ServiceRequestFixedEdit',
             'rootCauseBlock'
         );

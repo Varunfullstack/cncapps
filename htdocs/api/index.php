@@ -652,6 +652,10 @@ $app->group(
                         DBESignableEnvelope::updatedAt,
                         (new DateTimeImmutable())->format(DATE_MYSQL_DATETIME)
                     );
+                    $dbeSignableEnvelope->setValue(
+                        DBESignableEnvelope::processingClass,
+                        '\CNCLTD\SignableSignedQuoteDownload'
+                    );
                     $dbeSignableEnvelope->insertRow();
                     $dbeQuotation->setValue(DBEQuotation::signableEnvelopeID, $signableResponse->envelope_fingerprint);
                     $dbeQuotation->updateRow();
@@ -756,11 +760,15 @@ $app->group(
                         $r = new ReflectionClass($dbeSignableEnvelope->getValue(DBESignableEnvelope::processingClass));
                         $jsonArguments = $dbeSignableEnvelope->getValue(DBESignableEnvelope::processingArguments);
                         $associativeArguments = json_decode($jsonArguments);
+                        $arguments = [];
+                        if ($associativeArguments) {
+                            $arguments = array_values($associativeArguments);
+                        }
                         /** @var \CNCLTD\SignableProcess $objectInstance */
-                        $objectInstance = $r->newInstanceArgs(array_values($associativeArguments));
+                        $objectInstance = $r->newInstanceArgs($arguments);
 
                         try {
-                            $objectInstance->process($signableRequest);
+                            $objectInstance->process($signableRequest, $logger);
                         } catch (Exception $exception) {
                             $logger->error('Failed to process envelope', ["exception" => $exception]);
                         }

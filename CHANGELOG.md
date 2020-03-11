@@ -1,6 +1,15 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.11.3] - 2020-03-11
+### Changed 
+- Reset root cause when SR is reopened
+- Change end date of Historic Total SRs chart in Customer Agenda Meeting to match the selected end date
+- Change DownloadSignedSalesOrderDocuments task to now be part of the signable hook
+- Change how overtime gets presented in the dashboard and how the approved amount is entered
+### Fixed
+- Fix an issue when cancelling overtime approved prompt it was approving it anyways.
+
 ## [v3.11.2] - 2020-03-09
 ### Added 
 - SRCountByPerson internal api endpoint

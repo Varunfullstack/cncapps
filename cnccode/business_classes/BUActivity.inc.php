@@ -1052,7 +1052,6 @@ class BUActivity extends Business
 
         }
 
-
         $dbeProblem->updateRow();
 
         $this->sendEmailToCustomer(
