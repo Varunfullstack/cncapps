@@ -134,16 +134,40 @@
             })
     }
 
+    function decimalToStringTime(number) {
+        const hours = Math.floor(number);
+        const minutes = ((number - hours) * 60).toFixed(0);
+        return hours + 'h' + minutes + 'm';
+    }
+
+    function stringTimeToDecimal(string) {
+        const match = string.match(/(\d+)h(\d+)m/);
+        if (!match) {
+            throw 'provide a duration in a format similar to : 1h2m';
+        }
+
+        return +match[1] + match[2] / 60
+    }
+
     function approveOvertime(activityId, duration) {
         const rowsSelected = overtimeTable.column(0).checkboxes.selected();
         if (!rowsSelected.length) {
-            const overtimeDurationApproved = prompt('Please, provide the amount of overtime to be approved', duration.toFixed(2));
-            return approveOvertimeRequest(activityId, overtimeDurationApproved).then(data => {
-                if (data.error) {
-                    return alert(data.error);
-                }
-                overtimeTable.ajax.reload();
-            })
+            const overtimeDurationApproved = prompt('Please, provide the amount of overtime to be approved', decimalToStringTime(duration));
+            if (!overtimeDurationApproved) {
+                return;
+            }
+            try {
+                const overtimeDuration = stringTimeToDecimal(overtimeDurationApproved);
+                return approveOvertimeRequest(activityId, +overtimeDuration)
+                    .then(data => {
+                        if (data.error) {
+                            return alert(data.error);
+                        }
+                        overtimeTable.ajax.reload();
+                    })
+            } catch (e) {
+                return alert(e);
+            }
         }
 
         Promise.all(rowsSelected.toArray().map(activityId => {
@@ -387,7 +411,7 @@
                         if (!data) {
                             return '';
                         }
-                        let toReturn = data.toFixed(2);
+                        let toReturn = decimalToStringTime(data);
                         if (row.inHours) {
                             toReturn += '<img src="/images/clock.png" width="20px" alt="time">';
                         }

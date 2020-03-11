@@ -278,15 +278,14 @@ class CTCustomerReviewMeeting extends CTCNC
                     )
                 );
 
-                $historicEndDate = new DateTime();
-                $historicStartDate = (clone $historicEndDate)->sub(new DateInterval('P3Y'));
+                $historicStartDate = (clone $endDate)->sub(new DateInterval('P3Y'));
                 if (isset($becameCustomerDate) && $becameCustomerDate > $historicStartDate) {
                     $historicStartDate = $becameCustomerDate;
                 }
                 $historicData = $buCustomerSrAnalysisReport->getResultsByPeriodRange(
                     $customerId,
                     $historicStartDate,
-                    $historicEndDate
+                    $endDate
                 );
 
                 $supportedUsersData = $this->getSupportedUsersData(
