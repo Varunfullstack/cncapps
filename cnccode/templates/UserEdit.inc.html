@@ -37,7 +37,9 @@
             if (response.ok) {
                 return response.json()
             }
-            return null;
+            return response.json().then(e => {
+                throw e;
+            })
         }).then(json => {
             if (json) {
                 return json;
@@ -46,6 +48,8 @@
             }
         }).then(serverData => {
             return generateInput(data.name, parent, serverData, data.extraData, data.customClass, data.customFunction, data.additionalAttributes);
+        }).catch(e => {
+            alert(e.error);
         })
     }
 
