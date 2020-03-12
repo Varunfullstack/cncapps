@@ -1,0 +1,83 @@
+<script>
+
+    let startDateInput;
+    let endDateInput;
+    $(() => {
+        startDateInput = $('input[name="startDate"]');
+        startDateInput.val(moment().subtract(7, 'days').format('DD/MM/YYYY'));
+        endDateInput = $('input[name="endDate"]');
+        endDateInput.val(moment().format('DD/MM/YYYY'));
+        const datatable = $('#dataTable').DataTable({
+            dom: 'lfrtip',
+            columns: [
+                {data: "customerName", name: 'customerName', width: '2%'},
+                {data: "callsIn", name: 'callsIn'},
+                {data: "callsOut", name: "callsOut", width: '7%'},
+                {data: 'totalSRsRaised', name: 'totalSRsRaised'},
+                {data: "standardSRs", name: "standardSRs", width: '7%'},
+                {data: "proactiveSRs", name: "proactiveSRs"},
+                {data: "activitiesRaised", name: "activitiesRaised", width: '7%'},
+            ],
+            order: [],
+            serverSide: true,
+            ajax: {
+                url: "?action=getData",
+                type: "GET",
+                data: (data, settings) => {
+                    data.startDate = startDateInput.val();
+                    data.endDate = endDateInput.val();
+                }
+            },
+        });
+        startDateInput.on('change', null, evt => {
+            datatable.ajax.reload();
+        });
+        endDateInput.on('change', null, evt => {
+            datatable.ajax.reload();
+        });
+    });
+</script>
+
+<table>
+    <tbody>
+    <tr>
+        <td>Start Date</td>
+        <td><input name="startDate"
+                   class="jqueryCalendar"
+        ></td>
+        <td>End Date</td>
+        <td><input name="endDate"
+                   class="jqueryCalendar"
+        ></td>
+    </tr>
+    </tbody>
+</table>
+<br>
+<br>
+<table id="dataTable">
+    <thead>
+    <tr>
+        <th>
+            Customer Name
+        </th>
+        <th>
+            Calls In
+        </th>
+        <th>
+            Calls Out
+        </th>
+        <th>
+            Total SRs Raised
+        </th>
+        <th>
+            Standard SRs
+        </th>
+        <th>
+            Proactive SRs
+        </th>
+        <th>
+            Activities Raised
+        </th>
+    </tr>
+    </thead>
+</table>

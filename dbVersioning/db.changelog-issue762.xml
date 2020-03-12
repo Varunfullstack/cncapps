@@ -1,0 +1,51 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue762-0">
+        <tagDatabase tag="issue762"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue762-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="callJournal" columnName="customerId"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="callJournal">
+            <column name="customerId" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue762-2">
+        <sql>
+            UPDATE calljournal
+            SET number = CONCAT(0, number)
+            WHERE number REGEXP '^[123456789]';
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue762-3">
+        <sql>
+            UPDATE
+                callJournal
+            SET
+                customerId = COALESCE (
+                        (SELECT
+                             address.`add_custno`
+                         FROM
+                             address
+                         WHERE address.`add_phone` = number
+                         LIMIT 1),
+                        (SELECT
+                             contact.`con_custno`
+                         FROM
+                             contact
+                         WHERE contact.`con_phone` = number
+                         LIMIT 1)
+                    )
+            WHERE customerId IS NULL;
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>
