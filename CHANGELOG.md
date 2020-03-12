@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 762 - 3CX Call Reporting
 ### Changed
 - Issue 750 - Set SR to awaiting CNC when Future date has been reached
 ### Fixed
