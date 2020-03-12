@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 762 - 3CX Call Reporting 
+
 ## [v3.11.3] - 2020-03-11
 ### Changed 
 - Reset root cause when SR is reopened
