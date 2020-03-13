@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.11.4] - 2020-03-13
+### Changed
+- Solarwinds reporting tweaks
+
 ## [v3.11.3] - 2020-03-11
 ### Changed 
 - Reset root cause when SR is reopened

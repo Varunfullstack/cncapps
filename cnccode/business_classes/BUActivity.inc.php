@@ -9884,8 +9884,12 @@ is currently a balance of ';
                 $this->dsHeader->getValue(DBEHeader::esTeamLimitMinutes)
             );
             $dbeProblem->setValue(
-                DBEProblem::imLimitMinutes,
-                $this->dsHeader->getValue(DBEHeader::imTeamLimitMinutes)
+                DBEProblem::smallProjectsTeamLimitMinutes,
+                $this->dsHeader->getValue(DBEHeader::smallProjectsTeamLimitMinutes)
+            );
+            $dbeProblem->setValue(
+                DBEProblem::projectTeamLimitMinutes,
+                $this->dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
             );
             $dbeProblem->setValue(
                 DBEProblem::userID,
