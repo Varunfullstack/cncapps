@@ -144,14 +144,23 @@
     <thead>
     <tr valign="top">
         <th class="listHeadText"
-            colspan="4"
         >
-            <div align="left">Pending Reopened ({cpCount})</div>
+            <div align="left">Pending Reopened ({pendingReopenedCount})</div>
         </th>
         <th class="listHeadText"
             width="5"
             nowrap
         >SR
+        </th>
+        <th class="listHeadText"
+            width="5"
+            nowrap
+        >Customer
+        </th>
+        <th class="listHeadText"
+            width="5"
+            nowrap
+        >Summary
         </th>
         <th class="listHeadText"
             width="5"
@@ -162,42 +171,51 @@
     </tr>
     </thead>
     <tbody>
-    <!-- BEGIN customerRequestsBlock -->
-    <form name="userForm">
-        <tr valign="center">
-            <td bgcolor="{cpBgColor}"><input type="button"
-                                             name="delete"
-                                             title="Delete"
-                                             value="D"
-                                             onClick="if(confirm('Are you sure you want to remove this request?')) document.location='{urlDeleteCustomerRequest}'"
-            >{cpNewButton}
-            </td>
-            <td bgcolor="{cpBgColor}"><A href={cpUrlCustomer}
-                                         target="_blank"
-            >{cpCustomerName}</a></td>
-            <td bgcolor="{cpBgColor}">
-                <A
-                        href="#"
-                        onClick="window.open(
-            '{urlDetailsPopup}',
-            'customer_problem',
-            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false"
-                >{cpTruncatedReason}
-                </A>
-            </td>
-            <td bgcolor="{cpBgColor}"
-                nowrap="nowrap"
-            >{cpDate} {cpTime}
-            </td>
-            <td bgcolor="{cpBgColor}"><A href={cpUrlServiceRequest}
-                                         target="_blank"
-            >{cpServiceRequestID}</a></td>
-            <td bgcolor="{cpBgColor}">
-                <div align="center">{cpPriority}</div>
-            </td>
-        </tr>
-    </form>
-    <!-- END customerRequestsBlock -->
+    <!-- BEGIN pendingReopenedBlock -->
+
+    <tr valign="center">
+        <td>
+            <form>
+                <input type="hidden"
+                       name="action"
+                       value="processPendingReopened"
+                >
+                <input type="hidden"
+                       name="pendingReopenedID"
+                       value="{pendingReopenedID}"
+                >
+                <input type="submit"
+                       name="result"
+                       title="Reopen"
+                       value="R"
+                       onClick="if(!confirm('Are you sure you want to reopen?')){ window.event.preventDefault()}"
+                >
+                <input type="submit"
+                       name="result"
+                       title="Delete"
+                       value="D"
+                       onClick="if(!confirm('Are you sure you want to delete?')){ window.event.preventDefault()}"
+                >
+            </form>
+        </td>
+        <td>
+            <A href={pendingReopenSRURL}
+               target="_blank"
+            >{pendingReopenSR}</a>
+        </td>
+        <td>
+            {pendingReopenCustomerName}
+        </td>
+        <td>
+            <a href="{pendingReopenDescriptionURL}">
+                {pendingReopenDescriptionSummary}
+            </a>
+        </td>
+        <td>
+            <div align="center">{pendingReopenPriority}</div>
+        </td>
+    </tr>
+    <!-- END pendingReopenedBlock -->
     </tbody>
 </table>
 

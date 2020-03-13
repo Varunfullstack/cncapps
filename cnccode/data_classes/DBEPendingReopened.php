@@ -8,10 +8,11 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEPendingReopened extends DBEntity
 {
-    const id = "";
+    const id = "id";
     const problemID = "problemID";
     const contactID = "contactID";
     const reason = "reason";
+
     /**
      * calls constructor()
      * @access public
@@ -45,6 +46,12 @@ class DBEPendingReopened extends DBEntity
         );
         $this->setAddColumnsOff();
         $this->setPK(0);
+    }
+
+    public function getRowsForSR($problemID)
+    {
+        $this->queryString = "select {$this->getDBColumnNamesAsString()} from {$this->tableName} where {$this->getDBColumnName(self::problemID)} = $problemID";
+        return $this->getRows();
     }
 }
 

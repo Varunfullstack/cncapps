@@ -9,6 +9,7 @@
  */
 
 use CNCLTD\AutomatedRequest;
+use CNCLTD\SolarwindsAccountItem;
 
 global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
@@ -978,6 +979,93 @@ class BUActivity extends Business
             return false;
         }
     } // end sendNotifyEscalatorUserEmail
+
+    /**
+     * reopen problem that has previously been fixed
+     *
+     * @param mixed problemID
+     * @throws Exception
+     */
+    function reopenProblem($problemID)
+    {
+
+        $dbeProblem = new DBEProblem(
+            $this,
+            $problemID
+        );
+
+        $dbeProblem->setValue(
+            DBEJProblem::status,
+            'P'
+        );                                     // in progress
+        if ($dbeProblem->getValue(DBEJProblem::fixedUserID) != USER_SYSTEM) {
+            $dbeProblem->setValue(
+                DBEJProblem::userID,
+                $dbeProblem->getValue(DBEJProblem::fixedUserID)
+            ); // reallocate
+
+
+            $dbeUser = new DBEJUser($this);
+            $dbeUser->setValue(
+                DBEJUser::userID,
+                $dbeProblem->getValue(DBEJProblem::fixedUserID)
+            );
+            $dbeUser->getRow();
+
+            $teamID = $dbeUser->getValue(DBEJUser::teamID);
+
+            switch ($teamID) {
+                case 1:
+
+                    if ($dbeProblem->getValue(DBEProblem::hdLimitMinutes) <= 0) {
+                        $dbeProblem->setValue(
+                            DBEProblem::hdLimitMinutes,
+                            5
+                        );
+                    }
+
+                    break;
+                case 2:
+                    if ($dbeProblem->getValue(DBEProblem::esLimitMinutes) <= 0) {
+                        $dbeProblem->setValue(
+                            DBEProblem::esLimitMinutes,
+                            5
+                        );
+                    }
+                    break;
+                case 4:
+                    if ($dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes) <= 0) {
+                        $dbeProblem->setValue(
+                            DBEProblem::smallProjectsTeamLimitMinutes,
+                            5
+                        );
+                    }
+                    break;
+                case 5:
+                    if ($dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes) <= 0) {
+                        $dbeProblem->setValue(
+                            DBEProblem::projectTeamLimitMinutes,
+                            5
+                        );
+                    }
+                    break;
+            }
+
+        }
+
+        $dbeProblem->updateRow();
+
+        $this->sendEmailToCustomer(
+            $problemID,
+            self::FixedCustomerEmailCategory
+        );
+
+        $this->logOperationalActivity(
+            $problemID,
+            'Reopened'
+        );
+
+    }
 
     /**
      * Sends email to client when a service request it's priority changed
@@ -7123,6 +7211,31 @@ is currently a balance of ';
 
     }
 
+    /**
+     * @return mixed
+     */
+    function getPendingReopenedRequests()
+    {
+        $db = new dbSweetcode(); // database connection for query
+
+        $queryString = "
+      SELECT
+             pendingReopened.id,
+  problemID,
+  contactID,
+  reason,
+  customer.`cus_name` AS customerName,
+  problem.`pro_priority` AS priority
+FROM
+  pendingReopened
+  LEFT JOIN contact ON pendingReopened.contactID = contact.`con_contno`
+  LEFT JOIN customer ON contact.`con_custno` = customer.`cus_custno`
+  LEFT JOIN problem ON pendingReopened.problemID = problem.`pro_problemno`
+  ";
+        $result = $db->query($queryString);
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
     function getCustomerRaisedRequests()
     {
         $db = new dbSweetcode(); // database connection for query
@@ -8118,7 +8231,8 @@ is currently a balance of ';
         $userID = USER_SYSTEM,
         $moveToUsersQueue = false,
         $resetAwaitingCustomerResponse = false,
-        $comesFromAutomatedRequest = false
+        $comesFromAutomatedRequest = false,
+        $comesFromPendingReopened = false
     )
     {
         $dbeCallActivity = new DBECallActivity($this);
@@ -8235,8 +8349,9 @@ is currently a balance of ';
                         $passedReason
                     );
                 }
-
-                $isReopen = true;
+                if (!$comesFromPendingReopened) {
+                    $isReopen = true;
+                }
                 $dbeProblem->setValue(
                     DBEJProblem::status,
                     'P'
@@ -8432,11 +8547,15 @@ is currently a balance of ';
     }
 
     private function createPendingReopened($problemId,
-                                            $contactID,
+                                           $contactID,
                                            $passedReason
     )
     {
-
+        $dbePendingReopened = new DBEPendingReopened($this);
+        $dbePendingReopened->setValue(DBEPendingReopened::problemID, $problemId);
+        $dbePendingReopened->setValue(DBEPendingReopened::contactID, $contactID);
+        $dbePendingReopened->setValue(DBEPendingReopened::reason, $passedReason);
+        $dbePendingReopened->insertRow();
     }
 
     function sendPriorityOneReopenedEmail($problemID)
@@ -8519,6 +8638,44 @@ is currently a balance of ';
             $hdrs,
             $body
         );
+    }
+
+    /**
+     * @param $problemID
+     * @throws Exception
+     */
+    private function automaticallyApprovePendingReopenedForSR($problemID)
+    {
+        //find all the approved pending reopened requests and auto "approve" them
+        $dbePendingReopened = new DBEPendingReopened($this);
+        $dbePendingReopened->getRowsForSR($problemID);
+        while ($dbePendingReopened->fetchNext()) {
+            $this->approvePendingReopened($dbePendingReopened);
+        }
+    }
+
+    /**
+     * @param DBEPendingReopened|DataSet $dbePendingReopened
+     * @throws Exception
+     */
+    public function approvePendingReopened($dbePendingReopened)
+    {
+        $dbeActivity = $this->getLastActivityInProblem($dbePendingReopened->getValue(DBEPendingReopened::problemID));
+        $this->createFollowOnActivity(
+            $dbeActivity->getValue(DBEJCallActivity::callActivityID),
+            CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID,
+            $dbePendingReopened->getValue(DBEPendingReopened::contactID),
+            $dbePendingReopened->getValue(DBEPendingReopened::reason),
+            false,
+            true,
+            USER_SYSTEM,
+            false,
+            true,
+            false,
+            true
+        );
+        $dbePendingReopenedDelete = new DBEPendingReopened($this);
+        $dbePendingReopenedDelete->deleteRow($dbePendingReopened->getValue(DBEPendingReopened::id));
     }
 
     /**
@@ -8706,84 +8863,13 @@ is currently a balance of ';
         return $result->fetch_array();
     }
 
-//    function processIsSenderAuthorised($details,
-//                                       $contact,
-//                                       $record,
-//                                       &$errorString
-//    )
-//    {
-//
-//
-//        if ($contact && $contact['supportLevel']) {
-//
-//            $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
-//            $details .= 'New request from email received from ' . $record['senderEmailAddress'] . ' on ' . date(
-//                    CONFIG_MYSQL_DATETIME
-//                );
-//
-//            $this->raiseNewRequestFromImport(
-//                $record,
-//                $details,
-//                $contact
-//            );
-//
-//            return true;
-//        }
-//
-//        if ($contact) {
-//            if ($contact['isMainContact']) {
-//                $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
-//                $details .= 'This email is from an unauthorised contact and needs to be confirmed' . "\n\n";
-//                $details .= 'New request from ' . $record['senderEmailAddress'] . ' on ' . date(CONFIG_MYSQL_DATETIME);
-//
-//                $this->raiseNewRequestFromImport(
-//                    $record,
-//                    $details,
-//                    $contact
-//                );
-//                return true;
-//            } else {
-//                $errorString = 'Domain for ' . $record['senderEmailAddress'] . ' matches customer ' . $contact['customerID'] . ' but no main contact assigned for customer<br/>';
-//
-//                echo $errorString;
-//
-//                $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
-//                $details .= 'Email received from ' . $record['senderEmailAddress'] . ' on ' . date(
-//                        CONFIG_MYSQL_DATETIME
-//                    );
-//
-//                $this->addCustomerRaisedRequest(
-//                    $record,
-//                    $contact,
-//                    false,
-//                    $details,
-//                    'C'
-//                );
-//                return false;
-//            }
-//        } else {
-//            /* unknown domain */
-//            $details = $record['subjectLine'] . "\n\n" . $details . "\n\n";
-//            $details .= 'Email received from ' . $record['senderEmailAddress'] . ' on ' . date(CONFIG_MYSQL_DATETIME);
-//
-//            $this->addCustomerRaisedRequest(
-//                $record,
-//                $contact,
-//                false,
-//                $details,
-//                'C'
-//            );
-//            return true;
-//        }
-//    }
-
     function countEngineerActivitiesInProblem($problemID)
     {
 
         $dbeCallActivity = new DBECallActivity($this);
 
         return $dbeCallActivity->countEngineerRowsByProblem($problemID);
-    } // end clearSystemSRQueue
+    }
 
     /**
      * sets problem out of pause mode by un-setting flag on activity
@@ -9077,7 +9163,7 @@ is currently a balance of ';
 
         return $this->dbeJCallActivity;
 
-    }
+    } // end sendPriorityOneReopenedEmail
 
     /**
      * Sends email to the technician that escalated request to let them know request is fixed
@@ -9172,8 +9258,46 @@ is currently a balance of ';
             $hdrs,
             $body
         );
-    } // end sendPriorityOneReopenedEmail
+    }
 
+    function getAlertContact($customerID,
+                             $postcode
+    )
+    {
+        $db = new dbSweetcode(); // database connection for query
+        /* get siteno from postcode */
+        $queryString = "
+      SELECT
+        add_siteno
+      FROM
+        address
+      WHERE
+        add_postcode = '" . $postcode . "' and add_custno ='" . $customerID . "' ";
+        $db->query($queryString);
+        $db->next_record();
+        $ret['siteNo'] = $db->Record[0];
+
+        if (!$ret['siteNo']) {
+            $ret['siteNo'] = 0;
+        }
+        /* use main support contact */
+        $queryString = "
+      SELECT
+        primaryMainContactID
+      FROM
+        customer    
+      WHERE
+          cus_custno = $customerID";
+
+        $db->query($queryString);
+        $db->next_record();
+
+        $ret['contactID'] = $db->Record[0];
+
+        $ret['customerID'] = $customerID;
+        return $ret;
+
+    } // end sendServiceReallocatedEmail
 
     /**
      * @param $problemID
@@ -9249,7 +9373,145 @@ is currently a balance of ';
             $dbeProblem,
             $dbeCallActivity
         );
-    } // end sendServiceReallocatedEmail
+    }
+
+    /*
+  Send email to SD Managers requesting more time to be allocated to SR
+  */
+
+    function getContactInfo($record)
+    {
+        global $db;
+        $sql = "select con_contno, con_custno, con_siteno, supportLevel, (SELECT customer.primaryMainContactID FROM customer WHERE customer.`cus_custno` = con_custno) = con_contno AS isPrimaryMain from contact where con_email = $record[senderEmailAddress] and con_custno <> 0";
+
+
+        $db->query($sql);
+
+        if ($db->next_record()) {
+            return [
+                "contactID"     => $db->Record[0],
+                "customerID"    => $db->Record[1],
+                "siteNo"        => $db->Record[2],
+                "supportLevel"  => $db->Record[3],
+                "isPrimaryMain" => $db->Record[4]
+            ];
+        }
+
+        //we haven't found a guy we need to extract the domain from email and try to find a matching customer
+
+        $sender = trim(
+            strtolower(
+                preg_replace(
+                    "/([\w\s]+)<([\S@._-]*)>/",
+                    " $2",
+                    $record['senderEmailAddress']
+                )
+            )
+        );
+
+        $pieces = explode(
+            '@',
+            $sender
+        );
+        $emailDomain = strtolower(trim($pieces[1]));
+
+
+        //try to find a specific contact by email
+        $sql = "
+            SELECT
+              con_contno,
+              con_custno,
+              con_siteno
+            FROM
+              contact
+            WHERE
+              con_email = '" . mysqli_real_escape_string(
+                $db->link_id(),
+                $record['senderEmailAddress']
+            ) . "'
+              AND con_custno <> 0 
+              AND (supportLevel = 'main' or supportLevel = 'support' or supportLevel = 'delegate')";
+
+        $db->query($sql);
+        if ($db->next_record()) {
+            $ret['isSupportContact'] = true;
+            $ret['isMainContact'] = false;
+            $ret['contactID'] = $db->Record[0];
+            $ret['customerID'] = $db->Record[1];
+            $ret['siteNo'] = $db->Record[2];
+        } /*
+
+
+        /*
+    Try to match email domain against any customer
+    */
+        $sql = "
+          SELECT 
+            con_contno,
+            con_custno,
+            con_siteno,
+            supportLevel,
+            (SELECT 
+              customer.primaryMainContactID 
+            FROM
+              customer 
+            WHERE customer.`cus_custno` = con_custno) = con_contno AS isPrimaryMain 
+          FROM
+            contact 
+            LEFT JOIN customer ON customer.primaryMainContactID = con_contno
+          WHERE con_email LIKE '%$emailDomain%' 
+            AND con_custno <> 0
+            AND (SELECT 
+              customer.primaryMainContactID 
+            FROM
+              contact
+            WHERE
+              con_email = '" . mysqli_real_escape_string(
+                $db->link_id(),
+                $record['senderEmailAddress']
+            ) . "'
+              AND con_custno <> 0 
+              AND (supportLevel = 'main' or supportLevel = 'support')";
+
+        $db->query($sql);
+
+        if ($db->next_record()) {
+            return [
+                "contactID"     => $db->Record[0],
+                "customerID"    => $db->Record[1],
+                "siteNo"        => $db->Record[2],
+                "supportLevel"  => $db->Record[3],
+                "isPrimaryMain" => $db->Record[4]
+            ];
+        }
+
+
+        //we could not identify a specific contact but we might be able to identify the customer
+
+        $sql = "
+          SELECT 
+            con_custno,
+            con_siteno
+          FROM
+            contact 
+          WHERE con_email LIKE '%$emailDomain%' 
+            AND con_custno <> 0";
+
+        $db->query($sql);
+
+        if ($db->next_record()) {
+            return [
+                "contactID"     => null,
+                "customerID"    => $db->Record[0],
+                "siteNo"        => $db->Record[1],
+                "supportLevel"  => null,
+                "isPrimaryMain" => null
+            ];
+        }
+
+
+        return null;
+    }
 
     function getManagerComment($problemID)
     {
@@ -9268,10 +9530,6 @@ is currently a balance of ';
         $db->next_record();
         return $db->Record[0];
     }
-
-    /*
-  Send email to SD Managers requesting more time to be allocated to SR
-  */
 
     function updateManagerComment($problemID,
                                   $details
@@ -9556,7 +9814,7 @@ is currently a balance of ';
 
     }
 
-    function raiseSolarwindsFailedBackupRequest(\CNCLTD\SolarwindsAccountItem $accountItem)
+    function raiseSolarwindsFailedBackupRequest(SolarwindsAccountItem $accountItem)
     {
         $dbeCustomerItem = new DBEJRenContract($this);
         $dbeCustomerItem->setValue(DBEJRenContract::customerItemID, $accountItem->contractId);

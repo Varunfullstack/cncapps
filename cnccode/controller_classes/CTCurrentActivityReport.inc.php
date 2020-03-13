@@ -12,6 +12,7 @@ require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
+require_once($cfg['path_dbe'] . '/DBEPendingReopened.php');
 
 // Actions
 class CTCurrentActivityReport extends CTCNC
@@ -207,6 +208,12 @@ class CTCurrentActivityReport extends CTCNC
                 $this->checkPermissions(PHPLIB_PERM_TECHNICAL);
                 $this->deleteCustomerRequest();
                 break;
+            case 'pendingReopenedPopup':
+                $this->pendingReopenedDescriptionPopUp();
+                break;
+            /** @noinspection PhpMissingBreakStatementInspection */
+            case 'processPendingReopened':
+                $this->processPendingReopened($_REQUEST['pendingReopenedID'], $_REQUEST['result']);
             default:
                 $this->displayReport();
                 break;
@@ -384,6 +391,66 @@ class CTCurrentActivityReport extends CTCNC
     }
 
     /**
+     * @throws Exception
+     */
+    function pendingReopenedDescriptionPopUp()
+    {
+        $this->setTemplateFiles(
+            'ActivityCustomerProblemPopup',
+            'ActivityCustomerProblemPopup.inc'
+        );
+
+        $this->setPageTitle('Pending Reopened Description');
+
+        $this->template->set_var(
+            array(
+                'details' => str_replace(
+                    "\n",
+                    "<br/>",
+                    $_REQUEST['reason']
+                )
+            )
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'ActivityCustomerProblemPopup',
+            true
+        );
+
+        $this->parsePage();
+        exit;
+    }  // end finaliseProblem
+
+    /**
+     * @param $pendingReopenedID
+     * @param $result
+     * @throws Exception
+     */
+    private function processPendingReopened($pendingReopenedID, $result)
+    {
+        $dbePendingReopened = new DBEPendingReopened($this);
+        switch ($result) {
+            case 'R':
+            {
+                $dbePendingReopened->getRow($pendingReopenedID);
+                $this->buActivity->approvePendingReopened($dbePendingReopened);
+                break;
+            }
+            case 'D':
+            {
+                $dbePendingReopened->deleteRow($pendingReopenedID);
+                break;
+            }
+        }
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            []
+        );
+        header('Location: ' . $urlNext);
+    }
+
+    /**
      * Display search form
      * @access private
      * @throws Exception
@@ -432,6 +499,62 @@ class CTCurrentActivityReport extends CTCNC
             );
 
         }
+
+        $pendingReopenedRequests = $this->buActivity->getPendingReopenedRequests();
+        if ($pendingReopenedRequests && count($pendingReopenedRequests)) {
+            $this->template->set_block(
+                'CurrentActivityReport',
+                'pendingReopenedBlock',
+                'pendingReopenedRequests'
+            );
+
+            foreach ($pendingReopenedRequests as $pendingReopenedRequest) {
+                $pendingReopenSRURL = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'    => 'displayLastActivity',
+                        'problemID' => $pendingReopenedRequest['problemID']
+                    )
+                );
+                $pendingReopenSR = $pendingReopenedRequest['problemID'];
+                $pendingReopenCustomerName = $pendingReopenedRequest['customerName'];
+                $pendingReopenedPriority = $pendingReopenedRequest['priority'];
+                $truncatedReason = CTCurrentActivityReport::truncate(
+                    $pendingReopenedRequest['reason'],
+                    150
+                );
+                $pendingReopenDescriptionSummary = $truncatedReason;
+                $pendingReopenDescriptionURL =
+                    Controller::buildLink(
+                        'Activity.php',
+                        array(
+                            'action'  => 'pendingReopenedPopup',
+                            'reason'  => $pendingReopenedRequest['reason'],
+                            'htmlFmt' => CT_HTML_FMT_POPUP
+                        )
+                    );
+                $this->template->set_var(
+                    [
+                        "pendingReopenSRURL"              => $pendingReopenSRURL,
+                        "pendingReopenSR"                 => $pendingReopenSR,
+                        "pendingReopenCustomerName"       => $pendingReopenCustomerName,
+                        "pendingReopenPriority"           => $pendingReopenedPriority,
+                        "pendingReopenDescriptionURL"     => $pendingReopenDescriptionURL,
+                        "pendingReopenDescriptionSummary" => $pendingReopenDescriptionSummary,
+                        "pendingReopenedID"               => $pendingReopenedRequest['id']
+
+                    ]
+                );
+
+                $this->template->parse(
+                    'pendingReopenedRequests',
+                    'pendingReopenedBlock',
+                    true
+                );
+                $this->template->setVar('pendingReopenedCount', count($pendingReopenedRequests));
+            }
+        }
+
 
         $customerRaisedRequests = $this->buActivity->getCustomerRaisedRequests();
         /*
@@ -1224,7 +1347,7 @@ class CTCurrentActivityReport extends CTCNC
         } else {
             return 'green';
         }
-    }
+    } // end function displayReport
 
     /**
      * @param $problemID
@@ -1242,7 +1365,7 @@ class CTCurrentActivityReport extends CTCNC
             )
         );
 
-    } // end function displayReport
+    }
 
     /**
      * return list of user options for dropdown
