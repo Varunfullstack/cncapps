@@ -134,7 +134,10 @@ function sendNoContractIdWarningEmail(array $accountItems)
     );
 
     global $twig;
-    $html = $twig->render('@internal/office365BackupPortalNoContractIdWarningEmail.html.twig', ["items" => $accountItems]);
+    $html = $twig->render(
+        '@internal/office365BackupPortalNoContractIdWarningEmail.html.twig',
+        ["items" => $accountItems]
+    );
     $buMail->mime->setHTMLBody($html);
 
     $mime_params = array(
@@ -158,5 +161,6 @@ function sendNoContractIdWarningEmail(array $accountItems)
 
 function createFailedBackupSR(\CNCLTD\SolarwindsAccountItem $accountItem)
 {
-
+    $buActivity = new BUActivity($thing);
+    $buActivity->raiseSolarwindsFailedBackupRequest($accountItem);
 }
