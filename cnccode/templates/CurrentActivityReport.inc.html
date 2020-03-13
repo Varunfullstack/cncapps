@@ -144,6 +144,71 @@
     <thead>
     <tr valign="top">
         <th class="listHeadText"
+            colspan="4"
+        >
+            <div align="left">Pending Reopened ({cpCount})</div>
+        </th>
+        <th class="listHeadText"
+            width="5"
+            nowrap
+        >SR
+        </th>
+        <th class="listHeadText"
+            width="5"
+            nowrap
+        >
+            <div>Priority</div>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN customerRequestsBlock -->
+    <form name="userForm">
+        <tr valign="center">
+            <td bgcolor="{cpBgColor}">
+                <input type="button"
+                       name="delete"
+                       title="Delete"
+                       value="D"
+                       onClick="if(confirm('Are you sure you want to remove this request?')) document.location='{urlDeleteCustomerRequest}'"
+                >{cpNewButton}
+            </td>
+            <td bgcolor="{cpBgColor}"><A href={cpUrlCustomer}
+                                         target="_blank"
+            >{cpCustomerName}</a></td>
+            <td bgcolor="{cpBgColor}">
+                <A
+                        href="#"
+                        onClick="window.open(
+            '{urlDetailsPopup}',
+            'customer_problem',
+            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false"
+                >{cpTruncatedReason}
+                </A>
+            </td>
+            <td bgcolor="{cpBgColor}"
+                nowrap="nowrap"
+            >{cpDate} {cpTime}
+            </td>
+            <td bgcolor="{cpBgColor}"><A href={cpUrlServiceRequest}
+                                         target="_blank"
+            >{cpServiceRequestID}</a></td>
+            <td bgcolor="{cpBgColor}">
+                <div align="center">{cpPriority}</div>
+            </td>
+        </tr>
+    </form>
+    <!-- END customerRequestsBlock -->
+    </tbody>
+</table>
+<br>
+<table id="pendingReopened"
+       width="100%"
+       style="display: none"
+>
+    <thead>
+    <tr valign="top">
+        <th class="listHeadText"
         >
             <div align="left">Pending Reopened ({pendingReopenedCount})</div>
         </th>

@@ -981,93 +981,6 @@ class BUActivity extends Business
     } // end sendNotifyEscalatorUserEmail
 
     /**
-     * reopen problem that has previously been fixed
-     *
-     * @param mixed problemID
-     * @throws Exception
-     */
-    function reopenProblem($problemID)
-    {
-
-        $dbeProblem = new DBEProblem(
-            $this,
-            $problemID
-        );
-
-        $dbeProblem->setValue(
-            DBEJProblem::status,
-            'P'
-        );                                     // in progress
-        if ($dbeProblem->getValue(DBEJProblem::fixedUserID) != USER_SYSTEM) {
-            $dbeProblem->setValue(
-                DBEJProblem::userID,
-                $dbeProblem->getValue(DBEJProblem::fixedUserID)
-            ); // reallocate
-
-
-            $dbeUser = new DBEJUser($this);
-            $dbeUser->setValue(
-                DBEJUser::userID,
-                $dbeProblem->getValue(DBEJProblem::fixedUserID)
-            );
-            $dbeUser->getRow();
-
-            $teamID = $dbeUser->getValue(DBEJUser::teamID);
-
-            switch ($teamID) {
-                case 1:
-
-                    if ($dbeProblem->getValue(DBEProblem::hdLimitMinutes) <= 0) {
-                        $dbeProblem->setValue(
-                            DBEProblem::hdLimitMinutes,
-                            5
-                        );
-                    }
-
-                    break;
-                case 2:
-                    if ($dbeProblem->getValue(DBEProblem::esLimitMinutes) <= 0) {
-                        $dbeProblem->setValue(
-                            DBEProblem::esLimitMinutes,
-                            5
-                        );
-                    }
-                    break;
-                case 4:
-                    if ($dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes) <= 0) {
-                        $dbeProblem->setValue(
-                            DBEProblem::smallProjectsTeamLimitMinutes,
-                            5
-                        );
-                    }
-                    break;
-                case 5:
-                    if ($dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes) <= 0) {
-                        $dbeProblem->setValue(
-                            DBEProblem::projectTeamLimitMinutes,
-                            5
-                        );
-                    }
-                    break;
-            }
-
-        }
-
-        $dbeProblem->updateRow();
-
-        $this->sendEmailToCustomer(
-            $problemID,
-            self::FixedCustomerEmailCategory
-        );
-
-        $this->logOperationalActivity(
-            $problemID,
-            'Reopened'
-        );
-
-    }
-
-    /**
      * Sends email to client when a service request it's priority changed
      *
      * @param $problemID
@@ -9258,46 +9171,8 @@ FROM
             $hdrs,
             $body
         );
-    }
-
-    function getAlertContact($customerID,
-                             $postcode
-    )
-    {
-        $db = new dbSweetcode(); // database connection for query
-        /* get siteno from postcode */
-        $queryString = "
-      SELECT
-        add_siteno
-      FROM
-        address
-      WHERE
-        add_postcode = '" . $postcode . "' and add_custno ='" . $customerID . "' ";
-        $db->query($queryString);
-        $db->next_record();
-        $ret['siteNo'] = $db->Record[0];
-
-        if (!$ret['siteNo']) {
-            $ret['siteNo'] = 0;
-        }
-        /* use main support contact */
-        $queryString = "
-      SELECT
-        primaryMainContactID
-      FROM
-        customer    
-      WHERE
-          cus_custno = $customerID";
-
-        $db->query($queryString);
-        $db->next_record();
-
-        $ret['contactID'] = $db->Record[0];
-
-        $ret['customerID'] = $customerID;
-        return $ret;
-
     } // end sendServiceReallocatedEmail
+
 
     /**
      * @param $problemID
@@ -9530,6 +9405,10 @@ FROM
         $db->next_record();
         return $db->Record[0];
     }
+
+    /*
+  Send email to SD Managers requesting more time to be allocated to SR
+  */
 
     function updateManagerComment($problemID,
                                   $details
