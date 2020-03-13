@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Change
+- Issue 768 - Approval required for reopening of SRs by customer
+
 ## [v3.11.4] - 2020-03-13
 ### Changed
 - Solarwinds reporting tweaks
