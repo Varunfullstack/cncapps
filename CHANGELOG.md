@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Change
+- Issue 768 - Approval required for reopening of SRs by customer
+
 ## [v3.11.3] - 2020-03-11
 ### Changed 
 - Reset root cause when SR is reopened

@@ -980,93 +980,6 @@ class BUActivity extends Business
     } // end sendNotifyEscalatorUserEmail
 
     /**
-     * reopen problem that has previously been fixed
-     *
-     * @param mixed problemID
-     * @throws Exception
-     */
-    function reopenProblem($problemID)
-    {
-
-        $dbeProblem = new DBEProblem(
-            $this,
-            $problemID
-        );
-
-        $dbeProblem->setValue(
-            DBEJProblem::status,
-            'P'
-        );                                     // in progress
-        if ($dbeProblem->getValue(DBEJProblem::fixedUserID) != USER_SYSTEM) {
-            $dbeProblem->setValue(
-                DBEJProblem::userID,
-                $dbeProblem->getValue(DBEJProblem::fixedUserID)
-            ); // reallocate
-
-
-            $dbeUser = new DBEJUser($this);
-            $dbeUser->setValue(
-                DBEJUser::userID,
-                $dbeProblem->getValue(DBEJProblem::fixedUserID)
-            );
-            $dbeUser->getRow();
-
-            $teamID = $dbeUser->getValue(DBEJUser::teamID);
-
-            switch ($teamID) {
-                case 1:
-
-                    if ($dbeProblem->getValue(DBEProblem::hdLimitMinutes) <= 0) {
-                        $dbeProblem->setValue(
-                            DBEProblem::hdLimitMinutes,
-                            5
-                        );
-                    }
-
-                    break;
-                case 2:
-                    if ($dbeProblem->getValue(DBEProblem::esLimitMinutes) <= 0) {
-                        $dbeProblem->setValue(
-                            DBEProblem::esLimitMinutes,
-                            5
-                        );
-                    }
-                    break;
-                case 4:
-                    if ($dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes) <= 0) {
-                        $dbeProblem->setValue(
-                            DBEProblem::smallProjectsTeamLimitMinutes,
-                            5
-                        );
-                    }
-                    break;
-                case 5:
-                    if ($dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes) <= 0) {
-                        $dbeProblem->setValue(
-                            DBEProblem::projectTeamLimitMinutes,
-                            5
-                        );
-                    }
-                    break;
-            }
-
-        }
-
-        $dbeProblem->updateRow();
-
-        $this->sendEmailToCustomer(
-            $problemID,
-            self::FixedCustomerEmailCategory
-        );
-
-        $this->logOperationalActivity(
-            $problemID,
-            'Reopened'
-        );
-
-    }
-
-    /**
      * Sends email to client when a service request it's priority changed
      *
      * @param $problemID
@@ -4047,9 +3960,7 @@ class BUActivity extends Business
             $problemID
         );
 
-        $count = $dbeCallActivity->countRowsByColumn(DBEJCallActivity::problemID);
-
-        return $count;
+        return $dbeCallActivity->countRowsByColumn(DBEJCallActivity::problemID);
 
     }
 
@@ -5471,9 +5382,7 @@ is currently a balance of ';
 
         $dbeCallActivity->insertRow();
 
-        $callActivityID = $dbeCallActivity->getPKValue();
-
-        return $callActivityID;
+        return $dbeCallActivity->getPKValue();
     }
 
     /**
@@ -8195,6 +8104,7 @@ is currently a balance of ';
      * @param int $userID
      * @param bool $moveToUsersQueue
      * @param bool $resetAwaitingCustomerResponse
+     * @param bool $comesFromAutomatedRequest
      * @return string
      * @throws Exception
      */
@@ -8207,7 +8117,8 @@ is currently a balance of ';
         $setEndTimeToNow = false,
         $userID = USER_SYSTEM,
         $moveToUsersQueue = false,
-        $resetAwaitingCustomerResponse = false
+        $resetAwaitingCustomerResponse = false,
+        $comesFromAutomatedRequest = false
     )
     {
         $dbeCallActivity = new DBECallActivity($this);
@@ -8224,7 +8135,7 @@ is currently a balance of ';
             $dbeCallActType->getRow($callActivityTypeID);
             if ($dbeCallActType->getValue(DBECallActType::travelFlag) == 'Y') {
                 $isTravel = true;
-            };
+            }
 
             if ($callActivityTypeID == CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID) {
 
@@ -8237,10 +8148,6 @@ is currently a balance of ';
 <table border='1' style='border: solid black 1px'><thead><tr><td></td><td>Details</td></tr></thead><tbody><tr><td>System:</td><td></td></tr><tr><td>Summary of problem:</td><td></td></tr><tr><td>Change Requested:</td><td></td></tr><tr><td>Method to test change if successful:</td><td></td></tr><tr><td>Reversion plan if unsuccessful:</td><td></td></tr></tbody></table>";
             }
         }
-
-//        if (!$serverGuard) {
-//            $serverGuard = $dbeCallActivity->getValue(DBEJCallActivity::serverGuard);
-//        }
 
         $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
 
@@ -8284,9 +8191,12 @@ is currently a balance of ';
     When SR is currently at Initial status and a user other than System is logging
     an activity other than travel, record the Responded hours and set to In Progress status.
     */
+
+        $isReopen = false;
+
         if (!$isTravel) {
 
-            if ($dbeProblem->getValue(DBEJProblem::status) == 'I' & $userID != USER_SYSTEM) {
+            if ($dbeProblem->getValue(DBEJProblem::status) == 'I' && $userID != USER_SYSTEM) {
 
                 $respondedHours = $dbeProblem->getValue(DBEJProblem::workingHours);
 
@@ -8316,9 +8226,17 @@ is currently a balance of ';
                     );
                 }
             } elseif ($dbeProblem->getValue(DBEJProblem::status) == 'F') {
-                /*
-        Reopen
-        */
+                //Reopen
+
+                if ($comesFromAutomatedRequest) {
+                    return $this->createPendingReopened(
+                        $problemID,
+                        $contactID,
+                        $passedReason
+                    );
+                }
+
+                $isReopen = true;
                 $dbeProblem->setValue(
                     DBEJProblem::status,
                     'P'
@@ -8486,6 +8404,10 @@ is currently a balance of ';
             );
         }
 
+        if ($isReopen) {
+            $this->automaticallyApprovePendingReopenedForSR($dbeProblem->getValue(DBEProblem::problemID));
+        }
+
         return $ret;
     }
 
@@ -8507,6 +8429,14 @@ is currently a balance of ';
             $ret = 0;
         }
         return $ret;
+    }
+
+    private function createPendingReopened($problemId,
+                                            $contactID,
+                                           $passedReason
+    )
+    {
+
     }
 
     function sendPriorityOneReopenedEmail($problemID)
@@ -8776,14 +8706,6 @@ is currently a balance of ';
         return $result->fetch_array();
     }
 
-    function countEngineerActivitiesInProblem($problemID)
-    {
-
-        $dbeCallActivity = new DBECallActivity($this);
-
-        return $dbeCallActivity->countEngineerRowsByProblem($problemID);
-    }
-
 //    function processIsSenderAuthorised($details,
 //                                       $contact,
 //                                       $record,
@@ -8855,6 +8777,14 @@ is currently a balance of ';
 //        }
 //    }
 
+    function countEngineerActivitiesInProblem($problemID)
+    {
+
+        $dbeCallActivity = new DBECallActivity($this);
+
+        return $dbeCallActivity->countEngineerRowsByProblem($problemID);
+    } // end clearSystemSRQueue
+
     /**
      * sets problem out of pause mode by un-setting flag on activity
      *
@@ -8894,7 +8824,7 @@ is currently a balance of ';
             );
         }
         return true;
-    } // end clearSystemSRQueue
+    }
 
     /**
      * Set the problem to fixed
@@ -9116,8 +9046,7 @@ is currently a balance of ';
         if (!$result) {
             throw new Exception('Failed to retrieve data:' . $this->db->error);
         }
-        $count = +$result->fetch_assoc()['openActivityCount'];
-        return $count;
+        return +$result->fetch_assoc()['openActivityCount'];
 
     }
 
@@ -9243,46 +9172,8 @@ is currently a balance of ';
             $hdrs,
             $body
         );
-    }
-
-    function getAlertContact($customerID,
-                             $postcode
-    )
-    {
-        $db = new dbSweetcode(); // database connection for query
-        /* get siteno from postcode */
-        $queryString = "
-      SELECT
-        add_siteno
-      FROM
-        address
-      WHERE
-        add_postcode = '" . $postcode . "' and add_custno ='" . $customerID . "' ";
-        $db->query($queryString);
-        $db->next_record();
-        $ret['siteNo'] = $db->Record[0];
-
-        if (!$ret['siteNo']) {
-            $ret['siteNo'] = 0;
-        }
-        /* use main support contact */
-        $queryString = "
-      SELECT
-        primaryMainContactID
-      FROM
-        customer    
-      WHERE
-          cus_custno = $customerID";
-
-        $db->query($queryString);
-        $db->next_record();
-
-        $ret['contactID'] = $db->Record[0];
-
-        $ret['customerID'] = $customerID;
-        return $ret;
-
     } // end sendPriorityOneReopenedEmail
+
 
     /**
      * @param $problemID
@@ -9358,140 +9249,6 @@ is currently a balance of ';
             $dbeProblem,
             $dbeCallActivity
         );
-    }
-
-    function getContactInfo($record)
-    {
-        global $db;
-        $sql = "select con_contno, con_custno, con_siteno, supportLevel, (SELECT customer.primaryMainContactID FROM customer WHERE customer.`cus_custno` = con_custno) = con_contno AS isPrimaryMain from contact where con_email = $record[senderEmailAddress] and con_custno <> 0";
-
-
-        $db->query($sql);
-
-        if ($db->next_record()) {
-            return [
-                "contactID"     => $db->Record[0],
-                "customerID"    => $db->Record[1],
-                "siteNo"        => $db->Record[2],
-                "supportLevel"  => $db->Record[3],
-                "isPrimaryMain" => $db->Record[4]
-            ];
-        }
-
-        //we haven't found a guy we need to extract the domain from email and try to find a matching customer
-
-        $sender = trim(
-            strtolower(
-                preg_replace(
-                    "/([\w\s]+)<([\S@._-]*)>/",
-                    " $2",
-                    $record['senderEmailAddress']
-                )
-            )
-        );
-
-        $pieces = explode(
-            '@',
-            $sender
-        );
-        $emailDomain = strtolower(trim($pieces[1]));
-
-
-        //try to find a specific contact by email
-        $sql = "
-            SELECT
-              con_contno,
-              con_custno,
-              con_siteno
-            FROM
-              contact
-            WHERE
-              con_email = '" . mysqli_real_escape_string(
-                $db->link_id(),
-                $record['senderEmailAddress']
-            ) . "'
-              AND con_custno <> 0 
-              AND (supportLevel = 'main' or supportLevel = 'support' or supportLevel = 'delegate')";
-
-        $db->query($sql);
-        if ($db->next_record()) {
-            $ret['isSupportContact'] = true;
-            $ret['isMainContact'] = false;
-            $ret['contactID'] = $db->Record[0];
-            $ret['customerID'] = $db->Record[1];
-            $ret['siteNo'] = $db->Record[2];
-        } /*
-
-
-        /*
-    Try to match email domain against any customer
-    */
-        $sql = "
-          SELECT 
-            con_contno,
-            con_custno,
-            con_siteno,
-            supportLevel,
-            (SELECT 
-              customer.primaryMainContactID 
-            FROM
-              customer 
-            WHERE customer.`cus_custno` = con_custno) = con_contno AS isPrimaryMain 
-          FROM
-            contact 
-            LEFT JOIN customer ON customer.primaryMainContactID = con_contno
-          WHERE con_email LIKE '%$emailDomain%' 
-            AND con_custno <> 0
-            AND (SELECT 
-              customer.primaryMainContactID 
-            FROM
-              contact
-            WHERE
-              con_email = '" . mysqli_real_escape_string(
-                $db->link_id(),
-                $record['senderEmailAddress']
-            ) . "'
-              AND con_custno <> 0 
-              AND (supportLevel = 'main' or supportLevel = 'support')";
-
-        $db->query($sql);
-
-        if ($db->next_record()) {
-            return [
-                "contactID"     => $db->Record[0],
-                "customerID"    => $db->Record[1],
-                "siteNo"        => $db->Record[2],
-                "supportLevel"  => $db->Record[3],
-                "isPrimaryMain" => $db->Record[4]
-            ];
-        }
-
-
-        //we could not identify a specific contact but we might be able to identify the customer
-
-        $sql = "
-          SELECT 
-            con_custno,
-            con_siteno
-          FROM
-            contact 
-          WHERE con_email LIKE '%$emailDomain%' 
-            AND con_custno <> 0";
-
-        $db->query($sql);
-
-        if ($db->next_record()) {
-            return [
-                "contactID"     => null,
-                "customerID"    => $db->Record[0],
-                "siteNo"        => $db->Record[1],
-                "supportLevel"  => null,
-                "isPrimaryMain" => null
-            ];
-        }
-
-
-        return null;
     } // end sendServiceReallocatedEmail
 
     function getManagerComment($problemID)
@@ -9511,6 +9268,10 @@ is currently a balance of ';
         $db->next_record();
         return $db->Record[0];
     }
+
+    /*
+  Send email to SD Managers requesting more time to be allocated to SR
+  */
 
     function updateManagerComment($problemID,
                                   $details
@@ -9543,10 +9304,6 @@ is currently a balance of ';
             $parameters
         );
     }
-
-    /*
-  Send email to SD Managers requesting more time to be allocated to SR
-  */
 
     /**
      * @param DataSet $dbeProblem
