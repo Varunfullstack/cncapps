@@ -986,26 +986,18 @@ class CTCustomer extends CTCNC
             case CTCUSTOMER_ACT_SEARCH:
                 $this->search();
                 break;
-            case CTCNC_ACT_DISP_EDIT:
-                $this->displayEditForm();
-                break;
-            case CTCUSTOMER_ACT_DISP_SUCCESS:
-                $this->displayEditForm();
-                break;
+            case CTCUSTOMER_ACT_ADDCUSTOMER:
+            case CTCUSTOMER_ACT_ADDSITE:
             case CTCUSTOMER_ACT_ADDCONTACT:
+            case CTCUSTOMER_ACT_DISP_SUCCESS:
+            case CTCNC_ACT_DISP_EDIT:
                 $this->displayEditForm();
                 break;
             case CTCUSTOMER_ACT_DELETECONTACT:
                 $this->deleteContact();
                 break;
-            case CTCUSTOMER_ACT_ADDSITE:
-                $this->displayEditForm();
-                break;
             case CTCUSTOMER_ACT_DELETESITE:
                 $this->deleteSite();
-                break;
-            case CTCUSTOMER_ACT_ADDCUSTOMER:
-                $this->displayEditForm();
                 break;
             case CTCUSTOMER_ACT_DELETECUSTOMER:
                 $this->deleteCustomer();
@@ -1112,7 +1104,11 @@ class CTCustomer extends CTCNC
                 $customers = [];
                 while ($dsResult->fetchNext()) {
                     if (preg_match('/.*' . $term . '.*/i', $dsResult->getValue(DBECustomer::name))) {
-                        $customers[] = $dsResult->getValue(DBECustomer::name);
+                        $customers[] = [
+                            "id"   => $dsResult->getValue(DBECustomer::customerID),
+                            "label" => $dsResult->getValue(DBECustomer::name),
+                            "value" => $dsResult->getValue(DBECustomer::name),
+                        ];
                     }
                 }
                 echo json_encode($customers);

@@ -85,7 +85,7 @@ $(function () {
                     'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
             }
         } else {
-            document.searchForm.customerID.value = "";
+            $(this).value = "";
         }
     }
 

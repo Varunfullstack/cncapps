@@ -24,10 +24,10 @@ define('CTSITE_TXT_UPDATE_SITE', 'Update Site');
 
 class CTSite extends CTCNC
 {
-    /** @var BUSite */
-    private $buSite;
     /** @var DSForm */
     public $dsSite;
+    /** @var BUSite */
+    private $buSite;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
@@ -60,6 +60,38 @@ class CTSite extends CTCNC
             case CTSITE_ACT_SITE_UPDATE:
                 $this->siteUpdate();
                 break;
+            case 'search':
+                $itemsPerPage = 20;
+                $page = 1;
+                $term = '';
+                if (isset($_REQUEST['term'])) {
+                    $term = $_REQUEST['term'];
+                }
+
+                if (!isset($_REQUEST['customerId'])) {
+                    throw new Exception('Customer ID is required');
+                }
+
+                $customerId = $_REQUEST['customerId'];
+
+                $dsResult = new DataSet($this);
+                $this->buSite->getSitesByDescMatch($customerId, $term, $dsResult);
+                $sites = [];
+                while ($dsResult->fetchNext()) {
+
+                    $sites[] = [
+                        "id"    => $dsResult->getValue(DBESite::siteNo),
+                        "label" => $dsResult->getValue(DBESite::add1) . ' ' . $dsResult->getValue(
+                                DBESite::town
+                            ) . ' ' . $dsResult->getValue(DBESite::postcode),
+                        "value" =>$dsResult->getValue(DBESite::add1) . ' ' . $dsResult->getValue(
+                                DBESite::town
+                            ) . ' ' . $dsResult->getValue(DBESite::postcode),
+                    ];
+
+                }
+                echo json_encode($sites);
+                break;
             case CTCNC_ACT_SITE_POPUP:
                 $this->displaySiteSelectPopup();
                 break;
@@ -80,69 +112,6 @@ class CTSite extends CTCNC
         if ($this->getParam('parentDescField')) {
             $this->setSessionParam('siteParentDescField', $this->getParam('parentDescField'));
         }
-    }
-
-    /**
-     * Display the popup selector form
-     * @access private
-     * @throws Exception
-     */
-    function displaySiteSelectPopup()
-    {
-        $this->setMethodName('displaySiteSelectPopup');
-        if (!$this->getParam('customerID')) {
-            $this->raiseError('customerID not passed');
-        }
-        $urlCreate = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action'     => CTCNC_ACT_SITE_ADD,
-                'customerID' => $this->getParam('customerID'),
-                'htmlFmt'    => CT_HTML_FMT_POPUP
-            )
-        );
-        if ($this->getParam('siteDesc'){0} == '/') {
-            header('Location: ' . $urlCreate);
-            exit;
-        }
-        $this->buSite->getSitesByDescMatch($this->getParam('customerID'), $this->getParam('siteDesc'), $this->dsSite);
-        if ($this->dsSite->rowCount() == 1) {
-            $this->setTemplateFiles('SiteSelect', 'SiteSelectOne.inc');
-        }
-        if ($this->dsSite->rowCount() == 0) {
-            $this->template->set_var('siteDesc', $this->getParam('siteDesc'));
-            $this->setTemplateFiles('SiteSelect', 'SiteSelectNone.inc');
-        }
-        if ($this->dsSite->rowCount() > 1) {
-            $this->setTemplateFiles('SiteSelect', 'SiteSelectPopup.inc');
-        }
-        $this->template->set_var(
-            array(
-                'urlSiteCreate' => $urlCreate
-            )
-        );
-// Parameters
-        $this->setPageTitle('Site Selection');
-        if ($this->dsSite->rowCount() > 0) {
-            $this->template->set_block('SiteSelect', 'siteBlock', 'sites');
-            while ($this->dsSite->fetchNext()) {
-                $siteDesc = $this->dsSite->getValue(DBESite::add1) . ' ' .
-                    $this->dsSite->getValue(DBESite::town) . ' ' . $this->dsSite->getValue(DBESite::postcode);
-                $this->template->set_var(
-                    array(
-                        'siteDesc'        => Controller::htmlDisplayText(($siteDesc)),
-                        'submitName'      => addslashes($siteDesc), //so double quotes don't mess javascript up
-                        'siteNo'          => $this->dsSite->getValue(DBESite::siteNo),
-                        // this is so the popup knows which field on the parent to update
-                        'parentIDField'   => $_SESSION['siteParentIDField'],
-                        'parentDescField' => $_SESSION['siteParentDescField']
-                    )
-                );
-                $this->template->parse('sites', 'siteBlock', true);
-            }
-        }
-        $this->template->parse('CONTENTS', 'SiteSelect', true);
-        $this->parsePage();
     }
 
     /**
@@ -324,5 +293,68 @@ class CTSite extends CTCNC
             $this->setParam('siteDesc', $this->dsSite->getValue(DBESite::siteNo));
             $this->displaySiteSelectPopup();
         }
+    }
+
+    /**
+     * Display the popup selector form
+     * @access private
+     * @throws Exception
+     */
+    function displaySiteSelectPopup()
+    {
+        $this->setMethodName('displaySiteSelectPopup');
+        if (!$this->getParam('customerID')) {
+            $this->raiseError('customerID not passed');
+        }
+        $urlCreate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'     => CTCNC_ACT_SITE_ADD,
+                'customerID' => $this->getParam('customerID'),
+                'htmlFmt'    => CT_HTML_FMT_POPUP
+            )
+        );
+        if ($this->getParam('siteDesc'){0} == '/') {
+            header('Location: ' . $urlCreate);
+            exit;
+        }
+        $this->buSite->getSitesByDescMatch($this->getParam('customerID'), $this->getParam('siteDesc'), $this->dsSite);
+        if ($this->dsSite->rowCount() == 1) {
+            $this->setTemplateFiles('SiteSelect', 'SiteSelectOne.inc');
+        }
+        if ($this->dsSite->rowCount() == 0) {
+            $this->template->set_var('siteDesc', $this->getParam('siteDesc'));
+            $this->setTemplateFiles('SiteSelect', 'SiteSelectNone.inc');
+        }
+        if ($this->dsSite->rowCount() > 1) {
+            $this->setTemplateFiles('SiteSelect', 'SiteSelectPopup.inc');
+        }
+        $this->template->set_var(
+            array(
+                'urlSiteCreate' => $urlCreate
+            )
+        );
+// Parameters
+        $this->setPageTitle('Site Selection');
+        if ($this->dsSite->rowCount() > 0) {
+            $this->template->set_block('SiteSelect', 'siteBlock', 'sites');
+            while ($this->dsSite->fetchNext()) {
+                $siteDesc = $this->dsSite->getValue(DBESite::add1) . ' ' .
+                    $this->dsSite->getValue(DBESite::town) . ' ' . $this->dsSite->getValue(DBESite::postcode);
+                $this->template->set_var(
+                    array(
+                        'siteDesc'        => Controller::htmlDisplayText(($siteDesc)),
+                        'submitName'      => addslashes($siteDesc), //so double quotes don't mess javascript up
+                        'siteNo'          => $this->dsSite->getValue(DBESite::siteNo),
+                        // this is so the popup knows which field on the parent to update
+                        'parentIDField'   => $_SESSION['siteParentIDField'],
+                        'parentDescField' => $_SESSION['siteParentDescField']
+                    )
+                );
+                $this->template->parse('sites', 'siteBlock', true);
+            }
+        }
+        $this->template->parse('CONTENTS', 'SiteSelect', true);
+        $this->parsePage();
     }
 }

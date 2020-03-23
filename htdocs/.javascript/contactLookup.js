@@ -1,6 +1,6 @@
 $(function () {
     let contactPopupURL = null;
-    $(document).on('change', '.contactLookup', null, () => {
+    $(document).on('change', 'input[contact-lookup]', null, () => {
         const value = event.target.value;
         if (!value || !value.trim()) {
             return;
@@ -19,19 +19,19 @@ $(function () {
         contactPopupURL.searchParams.append('parentIDField', data.result);
         contactPopupURL.searchParams.append('parentDescField', event.target.id);
 
-        if (data.contactID) {
-            contactPopupURL.searchParams.append('contactID', data.contactID);
+        if (data.contactId) {
+            contactPopupURL.searchParams.append('contactID', data.contactId);
         }
 
-        if (!data.supplierID && !data.customerID) {
+        if (!data.supplierId && !data.customerId) {
             throw new Error('Customer ID or Supplier ID must be provided');
         }
-        if (data.customerID) {
-            contactPopupURL.searchParams.append('customerID', data.customerID);
+        if (data.customerId) {
+            contactPopupURL.searchParams.append('customerID', data.customerId);
         }
 
-        if (data.supplierID) {
-            contactPopupURL.searchParams.append('supplierID', data.supplierID);
+        if (data.supplierId) {
+            contactPopupURL.searchParams.append('supplierID', data.supplierId);
         }
 
         if (data.siteNo) {

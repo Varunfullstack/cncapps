@@ -4,6 +4,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 require_once($cfg["path_dbe"] . "/DBEContact.inc.php");
@@ -59,7 +60,6 @@ class BUContact extends Business
             ["value" => DBEContact::supportLevelSupervisor, "description" => "Supervisor"],
             ["value" => DBEContact::supportLevelSupport, "description" => "Support"],
             ["value" => DBEContact::supportLevelDelegate, "description" => "Delegate"],
-            ["value" => DBEContact::supportLevelFurlough, 'description' => 'Furlough']
         ];
         foreach ($supportLevels as $supportLevel) {
             $supportLevelSelected = ($supportLevelValue == $supportLevel['value']) ? CT_SELECTED : null;
@@ -218,9 +218,6 @@ class BUContact extends Business
     )
     {
         $this->setMethodName('getCustomerContactsByNameMatch');
-        if (!$matchString) {
-            $this->raiseError(BUCONTACT_MATCH_STR_NT_PASD);
-        }
         if (!$customerID) {
             $this->raiseError('customerID not passed');
         }
@@ -239,7 +236,7 @@ class BUContact extends Business
         }
         if (!$ret) {
 
-            if ($matchString{0} == '?') {  // get all contacts for customer/site
+            if (isset($matchString[0]) && $matchString{0} == '?') {  // get all contacts for customer/site
                 if ($siteNo == '') {
                     $this->dbeContact->getRowsByCustomerID($customerID);
                 } else {
