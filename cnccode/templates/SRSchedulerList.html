@@ -177,6 +177,9 @@
     let priorityInput = null;
     let hideFromCustomerInput = null;
     let teamSelectInput = null;
+    let untilRow = null;
+    let countRow = null;
+    let monthdayRow = null;
 
 
     let srSchedulerList = [];
@@ -231,6 +234,14 @@
         priorityInput = $('#priority');
         hideFromCustomerInput = $('#hideFromCustomer');
         teamSelectInput = $('#team');
+        untilRow = $('.untilRow');
+        countRow = $('.countRow');
+        monthdayRow = $('.monthdayRow');
+
+        untilRow.hide();
+        countRow.hide();
+        monthdayRow.hide();
+
         detailsEditor = CKEDITOR.replace('details', {customConfig: '/ckeditor_config.js'});
 
         CKEDITOR.instances.details.on('change', function () {
@@ -273,7 +284,6 @@
                         }
                     });
                     currentRRule[this.name] = result;
-                    currentRRule.byweekday = result;
                     break;
                 case 'bysetpos':
                 case 'bymonthday':
@@ -287,6 +297,7 @@
                     break;
             }
             recalculateRule();
+            setSRScheduler(currentSRScheduler);
         });
 
         detail = $('.detail');
@@ -498,14 +509,43 @@
         if (srScheduler.rruleString) {
             rruleObject = rrule.rrulestr(srScheduler.rruleString);
         }
+        rruleObject.options.byminute = null;
+        rruleObject.options.byhour = null;
+        rruleObject.options.bysecond = null;
         document.querySelectorAll('input[name="freq"]')
             .forEach(x => {
                 x.checked = +x.value === rruleObject.options.freq;
+                if (x.checked) {
+                    if (+x.value === rrule.Frequency.WEEKLY) {
+                        rruleObject.options.bymonthday = null;
+                        monthdayRow.hide();
+                    } else {
+                        monthdayRow.show();
+                    }
+                }
             });
         document.querySelector('input[name="dtstart"]').value = moment(rruleObject.options.dtstart).format('YYYY-MM-DD');
-        document.querySelector('input[name="until"]').value = rruleObject.options.until ? moment(rruleObject.options.until).format('YYYY-MM-DD') : null;
-        document.querySelector('input[name="interval"]').value = rruleObject.options.interval;
+        let selectedUntilOrCount = null;
+        if (rruleObject.options.until) {
+            untilRow.show();
+            countRow.hide();
+            selectedUntilOrCount = 'until';
+            rruleObject.options.count = null;
+        } else {
+            countRow.show();
+            untilRow.hide();
+            selectedUntilOrCount = 'count';
+            rruleObject.options.until = null;
+        }
+
+        document.querySelectorAll('input[name="untilOrCount"]').forEach(x => {
+            x.checked = x.value === selectedUntilOrCount;
+        });
+
         document.querySelector('input[name="count"]').value = rruleObject.options.count;
+        document.querySelector('input[name="until"]').value = rruleObject.options.until ? moment(rruleObject.options.until).format('YYYY-MM-DD') : null;
+
+        document.querySelector('input[name="interval"]').value = rruleObject.options.interval;
         document.querySelectorAll('input[name="byweekday"]').forEach(x => {
             x.checked = rruleObject.options.byweekday && rruleObject.options.byweekday.indexOf(+x.value) > -1;
         });
@@ -543,6 +583,21 @@
         customerSiteDescInput[0].dataset.customerId = currentSRScheduler.customerId;
         contactNameInput.attr('disabled', false);
         contactNameInput[0].dataset.customerId = currentSRScheduler.customerId;
+    }
+
+    function changeUntilOrCount(value) {
+        if (value === 'until') {
+            untilRow.show();
+            countRow.hide();
+            currentRRule.count = null;
+        } else {
+            countRow.show();
+            untilRow.hide();
+            currentRRule.until = null;
+        }
+        document.querySelector('input[name="until"]').value = currentRRule.until ? moment(currentRRule.until).format('YYYY-MM-DD') : null;
+        document.querySelector('input[name="count"]').value = currentRRule.count;
+        recalculateRule();
     }
 
     function updateTeamId() {
@@ -729,27 +784,6 @@
             <tr>
                 <th>
                     <div class="option-name">
-                        <code>until</code>
-
-                        <div class="help">If given, this must be a
-                            <code>Date</code>
-                            instance, that will specify the limit of the recurrence. If a recurrence instance happens to
-                            be the same as the
-                            <code>Date</code> instance given in the
-                            <code>until</code>
-                            argument, this will be the last occurrence.
-                        </div>
-                    </div>
-                </th>
-                <td>
-                    <input type="date"
-                           name="until"
-                    />
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    <div class="option-name">
                         <code>interval</code>
 
                         <div class="help">The interval between each freq iteration. For example, when using
@@ -769,6 +803,41 @@
                 </td>
             </tr>
             <tr>
+                <td colspan="2">
+                    <input name="untilOrCount"
+                           type="radio"
+                           value="until"
+                           onclick="changeUntilOrCount('until')"
+                    />Until
+                    <input name="untilOrCount"
+                           type="radio"
+                           value="count"
+                           onclick="changeUntilOrCount('count')"
+                    />Count
+                </td>
+            </tr>
+            <tr class="untilRow">
+                <th>
+                    <div class="option-name">
+                        <code>until</code>
+
+                        <div class="help">If given, this must be a
+                            <code>Date</code>
+                            instance, that will specify the limit of the recurrence. If a recurrence instance happens to
+                            be the same as the
+                            <code>Date</code> instance given in the
+                            <code>until</code>
+                            argument, this will be the last occurrence.
+                        </div>
+                    </div>
+                </th>
+                <td>
+                    <input type="date"
+                           name="until"
+                    />
+                </td>
+            </tr>
+            <tr class="countRow">
                 <th>
                     <div class="option-name">
                         <code>Count</code>
@@ -946,7 +1015,7 @@
                     <input name="bysetpos"/>
                 </td>
             </tr>
-            <tr>
+            <tr class="monthdayRow">
                 <th>
                     <div class="option-name">
                         <code>By day of the month</code>
