@@ -1,37 +1,58 @@
 <html>
 <head>
-<script type="text/javascript">
-function submitItem(siteNo, siteDesc) {
-	if ((opener) && (!opener.closed)) {
-		opener.document.getElementById("{parentIDField}").value=siteNo;
-		opener.document.getElementById("{parentDescField}").value=siteDesc;
-		window.close();
-	}
-}
-</script>
+    <script type="text/javascript">
+        function submitItem(siteNo, siteDesc) {
+            if ((opener) && (!opener.closed)) {
+                const parentIDField = opener.document.getElementById("{parentIDField}");
+                if (parentIDField) {
+                    parentIDField.value = siteNo;
+                    const evt = document.createEvent('HTMLEvents');
+                    evt.initEvent('change', false, true);
+                    parentIDField.dispatchEvent(evt);
+                }
+                const parentDescField = opener.document.getElementById("{parentDescField}");
+                if (parentDescField) {
+                    parentDescField.value = siteDesc;
+                    const evt = document.createEvent('HTMLEvents');
+                    evt.initEvent('change', false, true);
+                    parentDescField.dispatchEvent(evt);
+                }
+
+                window.close();
+            }
+        }
+    </script>
 </head>
 <body>
 <table>
-	<TR>
-		<TD>
-			<INPUT type="button" name="create" value="Create New" onclick="document.location='{urlSiteCreate}';">
-		</TD>
-		<TD>
-			<INPUT type="button" name="close" value="Close" onclick="window.close();">
-		</TD>
-	<TR/>
+    <TR>
+        <TD>
+            <INPUT type="button"
+                   name="create"
+                   value="Create New"
+                   onclick="document.location='{urlSiteCreate}';"
+            >
+        </TD>
+        <TD>
+            <INPUT type="button"
+                   name="close"
+                   value="Close"
+                   onclick="window.close();"
+            >
+        </TD>
+    <TR/>
 </table>
 <table>
-<!-- BEGIN siteBlock -->
-<tr>
-<td class="listItemText">
-	<a href="javascript:submitItem({siteNo}, '{siteDesc}')">{siteDesc}</a>
-</td>
-<td class="listItemText">
-	{partNo}
-</td>
-</tr>
-<!-- END siteBlock -->
+    <!-- BEGIN siteBlock -->
+    <tr>
+        <td class="listItemText">
+            <a href="javascript:submitItem({siteNo}, '{siteDesc}')">{siteDesc}</a>
+        </td>
+        <td class="listItemText">
+            {partNo}
+        </td>
+    </tr>
+    <!-- END siteBlock -->
 </table>
 </body>
 </html>

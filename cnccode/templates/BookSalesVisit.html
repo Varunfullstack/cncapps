@@ -59,7 +59,7 @@
     function checkContactID() {
 
         if (customerIDElm.value) {
-            $(contactStringElm).data().customerID = customerIDElm.value;
+            $(contactStringElm).data().customerId = customerIDElm.value;
             $(contactStringElm).attr('disabled', false);
         } else {
             $(contactStringElm).attr('disabled', true);
@@ -182,7 +182,7 @@
                        value="{contactID}"
                 >
                 <input type="text"
-                       class="contactLookup"
+                       contact-lookup
                        data-result="contactID"
                        id="contactString"
                        name="contactString"

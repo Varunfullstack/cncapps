@@ -27,7 +27,8 @@
         "ext-calendar": "*",
         "intervention/image": "^2.5",
         "twig/intl-extra": "^3.0",
-        "ext-intl": "*"
+        "ext-intl": "*",
+        "rlanvin/php-rrule": "^2.2"
     },
     "autoload": {
         "psr-4": {

@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 749 - Ability to create scheduled and regular SRs
+
 ## [v3.11.4] - 2020-03-13
 ### Changed
 - Solarwinds reporting tweaks

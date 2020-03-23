@@ -567,9 +567,6 @@ class DBEContact extends DBCNCEntity
             self::customerID,
             $customerId
         );
-        if ($match == '') {
-            $this->raiseError('$match not set');
-        }
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .

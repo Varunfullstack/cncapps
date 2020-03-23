@@ -130,7 +130,7 @@ from contractUsersLog left join custItem ON contractId = custItem.cui_cuino LEFT
         }
 
         if (!$startDate && !$endDate) {
-            $defaultQuery .= "and createdAt >= (select max(internal.createdAt) from contractUsersLog internal)";
+            $defaultQuery .= " and createdAt >= (select max(internal.createdAt) from contractUsersLog internal)";
         }
 
         $orderBy = [];

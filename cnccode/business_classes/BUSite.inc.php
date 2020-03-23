@@ -41,9 +41,6 @@ class BUSite extends Business
     function getSitesByDescMatch($customerID, $matchString, &$dsResults)
     {
         $this->setMethodName('getSitesByDescMatch');
-        if (!$matchString) {
-            $this->raiseError(BUSITE_MATCH_STR_NT_PASD);
-        }
         $ret = FALSE;
         $matchString = trim($matchString);
         if (is_numeric($matchString)) {
@@ -51,7 +48,7 @@ class BUSite extends Business
         }
         if (!$ret) {
             $this->dbeJSite->setValue(DBESite::customerID, $customerID);
-            if ($matchString{0} == '?') {  // get all contacts for supplier
+            if (isset($matchString[0]) && $matchString{0} == '?') {  // get all contacts for supplier
                 $this->dbeJSite->getRowsByColumn(DBESite::customerID);
             } else {                                                // try to match
                 $this->dbeJSite->getRowsByDescMatch($matchString);
