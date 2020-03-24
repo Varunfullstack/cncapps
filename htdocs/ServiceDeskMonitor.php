@@ -28,7 +28,7 @@ if (isset($_REQUEST['debug'])) {
 }
 
 $buProblemSLA = new BUProblemSLA($thing);
-//$buProblemSLA->monitor($dryRun, $problemID, $debug);
+$buProblemSLA->monitor($dryRun, $problemID, $debug);
 echo "Service Desk Monitor Routine Finished";
 
 echo 'Start processing future SR\n';
