@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 750 - Set SR to awaiting CNC when Future date has been reached
+
 ## [v3.11.4] - 2020-03-13
 ### Changed
 - Solarwinds reporting tweaks

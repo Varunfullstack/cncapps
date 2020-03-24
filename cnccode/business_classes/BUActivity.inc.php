@@ -6635,6 +6635,21 @@ is currently a balance of ';
     }
 
     /**
+     * @return DataSet|DBEJProblem
+     */
+    function getAlarmReachedProblems()
+    {
+        $dbeJProblem = new DBEJProblem($this);
+        $dbeJProblem->getAlarmReachedRows();
+        $dsResults = new DataSet($this);
+        $this->getData(
+            $dbeJProblem,
+            $dsResults
+        );
+        return $dsResults;
+    }
+
+    /**
      * Get future dated SRs
      *
      * @param mixed $dsResults
