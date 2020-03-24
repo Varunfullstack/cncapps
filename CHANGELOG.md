@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Changed
+- Issue 750 - Set SR to awaiting CNC when Future date has been reached
 ### Fixed
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
 
