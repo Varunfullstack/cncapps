@@ -207,7 +207,7 @@ function getPendingToApproveExpenseItems()
   consultant.`cns_consno` AS userId,
   exp_callactivityno AS activityId,
   callactivity.`caa_problemno` AS serviceRequestId,
-  expense.`dateSubmitted`,
+  caa_date as `dateSubmitted`,
   expensetype.`ext_desc` AS expenseTypeDescription,
   expense.`exp_expensetypeno` AS expenseTypeId,
   expense.`exp_value` AS `value`,
