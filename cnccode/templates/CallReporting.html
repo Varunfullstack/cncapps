@@ -1,22 +1,22 @@
 <script>
-
+    let dataTable;
     let startDateInput;
     let endDateInput;
     $(() => {
         startDateInput = $('input[name="startDate"]');
-        startDateInput.val(moment().subtract(7, 'days').format('DD/MM/YYYY'));
+        setStartDate(moment());
         endDateInput = $('input[name="endDate"]');
-        endDateInput.val(moment().format('DD/MM/YYYY'));
-        const datatable = $('#dataTable').DataTable({
+        setEndDate(moment());
+        dataTable = $('#dataTable').DataTable({
             dom: 'lfrtip',
             columns: [
-                {data: "customerName", name: 'customerName', width: '2%'},
+                {data: "customerName", name: 'customerName'},
                 {data: "callsIn", name: 'callsIn'},
-                {data: "callsOut", name: "callsOut", width: '7%'},
+                {data: "callsOut", name: "callsOut"},
                 {data: 'totalSRsRaised', name: 'totalSRsRaised'},
-                {data: "standardSRs", name: "standardSRs", width: '7%'},
+                {data: "standardSRs", name: "standardSRs"},
                 {data: "proactiveSRs", name: "proactiveSRs"},
-                {data: "activitiesRaised", name: "activitiesRaised", width: '7%'},
+                {data: "activitiesRaised", name: "activitiesRaised"},
             ],
             order: [],
             serverSide: true,
@@ -30,12 +30,43 @@
             },
         });
         startDateInput.on('change', null, evt => {
-            datatable.ajax.reload();
+            dataTable.ajax.reload();
         });
         endDateInput.on('change', null, evt => {
-            datatable.ajax.reload();
+            dataTable.ajax.reload();
         });
     });
+
+    function setStartDate(momentDate) {
+        startDateInput.val(momentDate.format('DD/MM/YYYY'));
+    }
+
+    function setEndDate(momentDate) {
+        endDateInput.val(momentDate.format('DD/MM/YYYY'));
+    }
+
+    function forcedSearch(option) {
+        const today = moment();
+        let fromDate = today;
+        let toDate = today.clone();
+        switch (option) {
+            case 1: // this week
+                fromDate = today.clone().startOf('isoWeek');
+                break;
+            case 2: // yesterday
+                fromDate = today.clone().subtract(1, 'days');
+                toDate = fromDate;
+                break;
+            case 3: // last Week
+                const lastWeek = today.clone().subtract(1, 'weeks');
+                fromDate = lastWeek.clone().startOf('isoWeek');
+                toDate = lastWeek.clone().endOf('isoWeek');
+                break;
+        }
+        setStartDate(fromDate);
+        setEndDate(toDate);
+        dataTable.ajax.reload();
+    }
 </script>
 
 <table>
@@ -49,6 +80,11 @@
         <td><input name="endDate"
                    class="jqueryCalendar"
         ></td>
+        <td>
+            <button onclick="forcedSearch(1)">This Week</button>
+            <button onclick="forcedSearch(2)">Yesterday</button>
+            <button onclick="forcedSearch(3)">Last Week</button>
+        </td>
     </tr>
     </tbody>
 </table>

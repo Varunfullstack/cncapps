@@ -25,7 +25,6 @@ class CTCallReporting extends CTCNC
         switch ($this->action) {
             case 'getData':
                 $startDateObj = new DateTime();
-                $startDateObj->sub(new DateInterval('P7D'));
                 $startDate = $startDateObj->format(DATE_MYSQL_DATE);
                 if (@$_REQUEST['startDate']) {
                     $startDateObj = DateTime::createFromFormat('d/m/Y', @$_REQUEST['startDate']);
