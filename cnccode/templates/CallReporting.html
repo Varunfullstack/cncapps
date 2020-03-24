@@ -60,7 +60,7 @@
             case 3: // last Week
                 const lastWeek = today.clone().subtract(1, 'weeks');
                 fromDate = lastWeek.clone().startOf('isoWeek');
-                toDate = lastWeek.clone().endOf('isoWeek');
+                toDate = lastWeek.clone().day(5);
                 break;
         }
         setStartDate(fromDate);
