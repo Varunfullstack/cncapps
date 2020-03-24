@@ -6,7 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
-
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 
 class CTCallReporting extends CTCNC
