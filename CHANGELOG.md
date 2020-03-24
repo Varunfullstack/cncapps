@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 772 - Date of Expense Tweak
+
 ## [v3.11.4] - 2020-03-13
 ### Changed
 - Solarwinds reporting tweaks
