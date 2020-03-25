@@ -244,20 +244,13 @@ FROM
   join headert
     on headert.`headerID` = 1
 WHERE 
-      caa_endtime and caa_endtime is not null and
+      caa_endtime 
+  and caa_endtime is not null and
       (caa_status = \'C\'
-    OR caa_status = \'A\')
+    OR caa_status = \'A\'
+          )
   AND caa_ot_exp_flag = \'N\'
-and submitAsOvertime
-  AND (
-    (
-      caa_callacttypeno = 22 and
-      DATE_FORMAT(caa_date, \'%w\') IN (0, 1, 2, 3, 4, 5, 6)
-      and (caa_endtime > overtimeEndTime
-    OR caa_starttime < overtimeStartTime)
-    )
-    OR caa_callacttypeno <> 22
-  )
+  and submitAsOvertime
   AND getOvertime(caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
   AND (caa_endtime <> caa_starttime)
   AND (
