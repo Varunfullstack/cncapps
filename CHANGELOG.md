@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 762 - 3CX Call Reporting
+- Issue 754 - Allow manual running of O365 mailbox report
 ### Changed
 - Issue 750 - Set SR to awaiting CNC when Future date has been reached
 - Issue 772 - Date of Expense Tweak

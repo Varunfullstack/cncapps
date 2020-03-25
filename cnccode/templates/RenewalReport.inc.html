@@ -55,11 +55,25 @@
 <H2>{customerName}</H2>
 <script>
 
+    const showOfficeButton = {showOfficeButton};
+
     function changedSignableTemplate() {
         checkSendSignable();
     }
 
+    function runOfficeReport(customerID) {
+        fetch('?action=runOfficeReport&customerID=' + customerID).then(() => {
+            alert('This process can take up to 30 minutes to complete, depending on the customer size, please check customer Review Folder later.');
+        }, error => {
+            alert('Failed: '.error.message);
+        })
+    }
+
     $(function () {
+
+        if (showOfficeButton) {
+            $('.officeReport.hidden').removeClass('hidden');
+        }
 
         $('#selectAll').change(function () {
             if ($(this).prop('checked')) {
@@ -204,6 +218,7 @@
 
         <!-- BEGIN itemBlock -->
         {itemTypeHeader}
+        {runOffice365Thingy}
         <tr class="{itemClass}">
             <td style="vertical-align: baseline">
                 {checkbox}
