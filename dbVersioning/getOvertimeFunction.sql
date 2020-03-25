@@ -44,8 +44,8 @@ BEGIN
     if(not isEngineerTravel) then
                 RETURN shiftEndTime - shiftStartTime;
         end if;
-    IF (not (activityWeekday = 5
-            OR activityWeekday = 6)
+    IF (activityWeekday = 5
+            OR activityWeekday = 6
         )
     THEN
         RETURN shiftEndTime - shiftStartTime;
