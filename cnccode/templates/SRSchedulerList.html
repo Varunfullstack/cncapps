@@ -419,7 +419,7 @@
 
             let text = rule.toText();
             if (currentRRule.dtstart) {
-                text = " from " + moment(currentRRule.dtstart).format('MMM DD, YYYY') + " " + text;
+                text = " From " + moment(currentRRule.dtstart).format('MMM DD, YYYY') + " " + text;
             }
             $('#ruleText').html(text).removeClass('invalid');
         } catch (e) {
@@ -526,16 +526,16 @@
             });
         document.querySelector('input[name="dtstart"]').value = moment(rruleObject.options.dtstart).format('YYYY-MM-DD');
         let selectedUntilOrCount = null;
-        if (rruleObject.options.until) {
-            untilRow.show();
-            countRow.hide();
-            selectedUntilOrCount = 'until';
-            rruleObject.options.count = null;
-        } else {
+        if (rruleObject.options.count) {
             countRow.show();
             untilRow.hide();
             selectedUntilOrCount = 'count';
             rruleObject.options.until = null;
+        } else {
+            untilRow.show();
+            countRow.hide();
+            selectedUntilOrCount = 'until';
+            rruleObject.options.count = null;
         }
 
         document.querySelectorAll('input[name="untilOrCount"]').forEach(x => {
@@ -594,6 +594,7 @@
             countRow.show();
             untilRow.hide();
             currentRRule.until = null;
+            currentRRule.count = 1;
         }
         document.querySelector('input[name="until"]').value = currentRRule.until ? moment(currentRRule.until).format('YYYY-MM-DD') : null;
         document.querySelector('input[name="count"]').value = currentRRule.count;
