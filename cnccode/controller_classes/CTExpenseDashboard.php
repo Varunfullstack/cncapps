@@ -226,7 +226,7 @@ WHERE
       WHERE globalApprovers.globalExpenseApprover
         AND globalApprovers.cns_consno = ?) = 1 or consultant.`expenseApproverID` = ?) as isApprover,
        overtimeDurationApproved,
-       ((caa_endtime > overtimeStartTime and caa_endtime <= overtimeEndTime ) OR (caa_starttime >= overtimeStartTime and caa_starttime < overtimeEndTime) ) as inHours
+       ((caa_endtime > overtimeStartTime and caa_endtime <= overtimeEndTime ) OR (caa_starttime >= overtimeStartTime and caa_starttime < overtimeEndTime) ) and not isBankHoliday(callactivity.caa_date) as inHours
 FROM
   callactivity
   JOIN problem
@@ -235,7 +235,7 @@ FROM
     ON caa_callacttypeno = cat_callacttypeno AND callacttype.engineerOvertimeFlag = \'Y\'
   JOIN customer
     ON pro_custno = cus_custno
-  JOIN consultant
+  JOIN consultant 
     ON caa_consno = cns_consno
       left join ordhead on pro_linked_ordno = ordhead.odh_ordno
       left join project on project.ordHeadID = ordhead.odh_ordno

@@ -1,6 +1,15 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.11.5] - 2020-03-25
+### Added
+- Option to cancel & delete expenses when creating.
+### Changed
+- Factor in weekends as not in office time.
+### Fixed
+- Expenses and Overtime visual / auto processing tweaks.
+
+
 ## [v3.11.4] - 2020-03-13
 ### Changed
 - Solarwinds reporting tweaks
