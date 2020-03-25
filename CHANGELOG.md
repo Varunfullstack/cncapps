@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 775 - SR Fixed Yesterday Total Value Tweak
+
 ## [v3.11.9] - 2020-03-30
 ### Added
 - Issue 786 - Create new Furlough Contact Support Level
