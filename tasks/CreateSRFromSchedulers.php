@@ -28,13 +28,25 @@ if (!is_cli()) {
 }
 
 // Script example.php
-$shortopts = "d";
+$shortopts = "dt:";
 $longopts = [];
 $options = getopt($shortopts, $longopts);
 $debugMode = false;
 if (isset($options['d'])) {
     $debugMode = true;
 }
+
+$startDate = new DateTime();
+if (isset($options['t'])) {
+    $date = DateTime::createFromFormat('d-m-Y', $options['t']);
+    if (!$date) {
+        echo 'The date must have the following format `DD-MM-YYYY`';
+        exit;
+    }
+    $startDate = $date;
+}
+
+$startDate->setTime(0, 0, 0, 0);
 $thing = null;
 
 $dbeSrScheduler = new DBESRScheduler($thing);
@@ -43,11 +55,19 @@ while ($dbeSrScheduler->fetchNext()) {
     $schedulerString = $dbeSrScheduler->getValue(DBESRScheduler::rruleString);
     $logger->info('Checking scheduler: ' . $schedulerString);
     $rrule = new \RRule\RRule($schedulerString);
-    $dates = $rrule->getOccurrencesBetween(new DateTime('yesterday'), new DateTime(), 1);
+    $dates = $rrule->getOccurrencesAfter($startDate, true, 1);
     if (!$dates || !count($dates)) {
-        $logger->info('No instances for today, skip');
+        $logger->notice('No more instances to run for this scheduler, deleting it');
+        $dbeSrSchedulerDelete = new DBESRScheduler($thing);
+        $dbeSrSchedulerDelete->deleteRow($dbeSrScheduler->getValue(DBESRScheduler::id));
         continue;
     }
+
+    if ($dates[0]->format('Y-m-d') > $startDate->format('Y-m-d')) {
+        $logger->notice('Next instance should run in the future, ignoring...');
+        continue;
+    }
+
     $customerId = $dbeSrScheduler->getValue(DBESRScheduler::customerId);
     $logger->info('Creating SR for customer ' . $customerId);
     $dbeProblem = new DBEProblem($thing);
