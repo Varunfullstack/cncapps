@@ -16,6 +16,7 @@ require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg["path_dbe"] . "/DBEExpense.inc.php");
 require_once($cfg["path_dbe"] . "/DBECallActivity.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
+require_once($cfg['path_bu'] . '/BUExpense.inc.php');
 global $db;
 $logName = 'CheckAutoApproveExpensesOvertime';
 $logger = new LoggerCLI($logName);

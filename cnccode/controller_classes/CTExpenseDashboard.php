@@ -716,6 +716,7 @@ FROM
      * @param bool $deny
      * @param null $denyReason
      * @param bool $isDeleted
+     * @param null $overtimeDurationApproved
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
