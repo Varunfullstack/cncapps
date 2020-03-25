@@ -293,7 +293,7 @@ class CTExpense extends CTCNC
         $this->parsePage();
     }
 
-/**
+    /**
      * Edit/Add Expense
      * @access private
      * @throws Exception
@@ -473,7 +473,12 @@ class CTExpense extends CTCNC
             exit;
         }
 
-        $this->buExpense->updateExpense($this->dsExpense);
+        if ($this->getParam('submit') === 'Delete') {
+            $this->buExpense->deleteExpense($this->dsExpense->getValue(DBEExpense::expenseID));
+        } else {
+            $this->buExpense->updateExpense($this->dsExpense);
+        }
+
 
         $urlNext =
             Controller::buildLink(
