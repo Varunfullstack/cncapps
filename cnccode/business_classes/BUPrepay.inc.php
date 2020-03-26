@@ -1032,24 +1032,10 @@ FROM
   left join project
     on project.`projectID` = problem.`pro_projectno`
 WHERE 
-      caa_endtime and caa_endtime is not null and
       (caa_status = 'C'
     OR caa_status = 'A')
   AND caa_ot_exp_flag = 'N'
   and submitAsOvertime
-  AND (
-    (
-      caa_callacttypeno = 22
-      AND (
-        isBankHoliday (caa_date)
-        OR (
-          overtimeStartTime < caa_endtime
-          AND `caa_starttime` < `overtimeEndTime`
-        )
-      )
-    )
-    OR caa_callacttypeno <> 22
-  )
   AND (caa_endtime <> caa_starttime)
   AND callacttype.engineerOvertimeFlag = 'Y'
   AND (

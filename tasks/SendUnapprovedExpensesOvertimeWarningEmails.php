@@ -287,20 +287,7 @@ WHERE caa_endtime
   and callactivity.`overtimeApprovedBy` is null
   and callactivity.overtimeDeniedReason is null
   AND getOvertime(caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
- and submitAsOvertime
-  AND (
-    (
-      caa_callacttypeno = 22
-      AND (
-        isBankHoliday (caa_date)
-        OR (
-          overtimeStartTime < caa_endtime
-          AND `caa_starttime` < `overtimeEndTime`
-        )
-      )
-    )
-    OR caa_callacttypeno <> 22
-  )
+  and submitAsOvertime
   AND (caa_endtime <> caa_starttime)
   AND callacttype.engineerOvertimeFlag = 'Y'";
     $result = $db->preparedQuery($pendingToApproveOvertimeQuery, []);
