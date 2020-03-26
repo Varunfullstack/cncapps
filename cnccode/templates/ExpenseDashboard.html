@@ -495,6 +495,10 @@
         overtimeTable.on('select.dt', function (e, dt, type, indexes) {
             overtimeTable.cells('tr.no-select', 0).checkboxes.deselect();
         });
+
+        overtimeTable.column(0).checkboxes.deselectAll();
+        expensesTable.column(0).checkboxes.deselectAll();
+
     })
 </script>
 {runningTotalsLink}
