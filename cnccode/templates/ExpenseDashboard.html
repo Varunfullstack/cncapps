@@ -443,7 +443,6 @@
                         return data.toFixed(2);
                     }
                 },
-                {data: 'status', name: 'status', width: '7%'},
                 {
                     data: 'status',
                     sortable: false,
@@ -459,7 +458,8 @@
                         return "";
                     },
                     width: '8%'
-                }
+                },
+                {data: 'status', name: 'status', width: '7%'},
             ],
             order: [[7, "desc"], [2, "asc"]],
             serverSide: true,
