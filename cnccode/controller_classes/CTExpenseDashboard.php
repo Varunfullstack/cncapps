@@ -462,10 +462,14 @@ FROM
     and submitAsOvertime
   AND (
     (
-      caa_callacttypeno = 22 and
-      DATE_FORMAT(caa_date, '%w') IN (0, 1, 2, 3, 4, 5, 6)
-      and (caa_endtime > overtimeEndTime
-    OR caa_starttime < overtimeStartTime)
+      caa_callacttypeno = 22
+      AND (
+        isBankHoliday (caa_date)
+        OR (
+          overtimeStartTime < caa_endtime
+          AND `caa_starttime` < `overtimeEndTime`
+        )
+      )
     )
     OR caa_callacttypeno <> 22
   )
@@ -920,10 +924,14 @@ WHERE caa_endtime
   and submitAsOvertime
   AND (
     (
-      caa_callacttypeno = 22 and
-      DATE_FORMAT(caa_date, \'%w\') IN (0, 1, 2, 3, 4, 5, 6)
-      and (caa_endtime > overtimeEndTime
-    OR caa_starttime < overtimeStartTime)
+      caa_callacttypeno = 22
+      AND (
+        isBankHoliday (caa_date)
+        OR (
+          overtimeStartTime < caa_endtime
+          AND `caa_starttime` < `overtimeEndTime`
+        )
+      )
     )
     OR caa_callacttypeno <> 22
   )
