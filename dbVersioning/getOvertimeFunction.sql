@@ -45,7 +45,7 @@ BEGIN
                 RETURN shiftEndTime - shiftStartTime;
         end if;
     IF (weekday(activityDate) in (5,6)
-        or isBankHolida(activityDate)
+        or isBankHoliday(activityDate)
         )
     THEN
         RETURN shiftEndTime - shiftStartTime;
