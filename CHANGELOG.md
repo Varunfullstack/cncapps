@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.11.7] - 2020-03-26
+### Fixed
+- Expenses/Overtime pending approval list
+
 ## [v3.11.6] - 2020-03-25
 ### Fixed
 - Fixed issue with getOvertime DB function failing to handle weekends for engineer travel

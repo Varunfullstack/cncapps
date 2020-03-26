@@ -6,14 +6,14 @@ BEGIN
     DECLARE shiftStartTime DECIMAL(10, 2);
     DECLARE shiftEndTime DECIMAL(10, 2);
     DECLARE isWeekOvertimeAllowed BOOLEAN;
-    DECLARE activityWeekday INT;
+    DECLARE activityDate DATE;
     DECLARE activityEngineerOvertimeAllowed BOOLEAN;
     DECLARE overtime DECIMAL(10, 2);
     DECLARE officeStartTime DECIMAL(10, 2);
     DECLARE officeEndTime DECIMAL(10, 2);
     declare submitAsOvertime boolean;
     declare isEngineerTravel boolean;
-    SELECT WEEKDAY(caa_date),
+    SELECT caa_date,
            engineerOvertimeFlag = 'Y',
            CAST(
                        TIME_TO_SEC(caa_starttime) / (60 * 60) AS DECIMAL(10, 2)
@@ -21,10 +21,10 @@ BEGIN
            CAST(
                        TIME_TO_SEC(caa_endtime) / (60 * 60) AS DECIMAL(10, 2)
                ),
-           submitAsOvertime,
+           callactivity.submitAsOvertime,
            caa_callacttypeno = 22
     INTO
-        activityWeekday,
+        activityDate,
         activityEngineerOvertimeAllowed,
         shiftStartTime,
         shiftEndTime,
@@ -44,8 +44,8 @@ BEGIN
     if(not isEngineerTravel) then
                 RETURN shiftEndTime - shiftStartTime;
         end if;
-    IF (activityWeekday = 5
-            OR activityWeekday = 6
+    IF (weekday(activityDate) in (5,6)
+        or isBankHolida(activityDate)
         )
     THEN
         RETURN shiftEndTime - shiftStartTime;
