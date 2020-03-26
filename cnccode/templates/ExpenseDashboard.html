@@ -229,7 +229,7 @@
     function deleteOvertime(activityId) {
         const rowsSelected = overtimeTable.column(0).checkboxes.selected();
         if (!rowsSelected.length) {
-            if (!confirm('Are you sure you want to delete this expense?')) {
+            if (!confirm('Are you sure you want to delete this overtime?')) {
                 return;
             }
             return deleteOvertimeRequest(activityId).then(data => {
