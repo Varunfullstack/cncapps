@@ -443,6 +443,7 @@
                         return data.toFixed(2);
                     }
                 },
+                {data: 'status', name: 'status', width: '7%'},
                 {
                     data: 'status',
                     sortable: false,
@@ -459,7 +460,7 @@
                     },
                     width: '8%'
                 },
-                {data: 'status', name: 'status', width: '7%'},
+
             ],
             order: [[7, "desc"], [2, "asc"]],
             serverSide: true,
@@ -562,10 +563,10 @@
         <th>
             Approved By
         </th>
+        <th>Approved Overtime</th>
         <th>
             Approved Status
         </th>
-        <th>Approved Overtime</th>
         <th></th>
     </tr>
     </thead>
