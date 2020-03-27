@@ -3456,8 +3456,7 @@ class CTActivity extends CTCNC
                             array(
                                 'action'           => 'createFollowOnActivity',
                                 'callActivityID'   => $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
-                                'moveToUsersQueue' => 1,
-                                'continueEndTime'  => 1
+                                'moveToUsersQueue' => 1
                             )
                         );
 
@@ -5364,9 +5363,7 @@ class CTActivity extends CTCNC
             true,
             false,
             $GLOBALS['auth']->is_authenticated(),
-            $this->getParam('moveToUsersQueue'),
-            false,
-            $this->getParam('continueEndTime')
+            $this->getParam('moveToUsersQueue')
         );
 
         $urlNext =
