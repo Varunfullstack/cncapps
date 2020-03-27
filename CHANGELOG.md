@@ -1,6 +1,8 @@
 # Changelog
 This project changes will be shown here.
 ## [unreleased]
+### Changed
+- Issue 750 - Set SR to awaiting CNC when Future date has been reached
 ### Fixed
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
 
@@ -15,10 +17,6 @@ This project changes will be shown here.
 - Factor in weekends as not in office time.
 ### Fixed
 - Expenses and Overtime visual / auto processing tweaks.
-
-## [unreleased]
-### Changed
-- Issue 750 - Set SR to awaiting CNC when Future date has been reached
 
 ## [v3.11.4] - 2020-03-13
 ### Changed
