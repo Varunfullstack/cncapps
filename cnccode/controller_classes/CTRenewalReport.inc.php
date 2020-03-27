@@ -90,9 +90,20 @@ class CTRenewalReport extends CTCNC
         switch ($this->getAction()) {
 
             case 'runOfficeReport':
+
                 $customerID = @$_REQUEST['customerID'];
-                echo system(" php ".BASE_DRIVE."/htdocs/Office365LicensesExport.php -c {$customerID} > NUL");
+                ignore_user_abort(true);
+                session_write_close();
+                set_time_limit(0);
+                ob_start();
+// do initial processing here
                 echo json_encode(["status" => "ok"]);
+                header('Connection: close');
+                header('Content-Length: ' . ob_get_length());
+                ob_end_flush();
+                ob_flush();
+                flush();
+                system(" php " . BASE_DRIVE . "/htdocs/Office365LicensesExport.php -c {$customerID} > NUL");
                 break;
             case 'produceReport':
                 $this->page = $this->produceReport(
