@@ -62,10 +62,8 @@
     }
 
     function runOfficeReport(customerID) {
+        alert('This process can take up to 30 minutes to complete, depending on the customer size, please check customer Review Folder later.');
         fetch('?action=runOfficeReport&customerID=' + customerID).then(() => {
-            alert('This process can take up to 30 minutes to complete, depending on the customer size, please check customer Review Folder later.');
-        }, error => {
-            alert('Failed: '.error.message);
         })
     }
 
