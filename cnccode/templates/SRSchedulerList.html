@@ -473,16 +473,24 @@
             dataType: 'json',
             data: currentSRScheduler
         }).then(function (result) {
-            if (!currentSRScheduler.id) {
-                srSchedulerList.push(result);
-            } else {
-                const foundIndex = srSchedulerList.findIndex(srScheduler => currentSRScheduler.id === srScheduler.id);
-                srSchedulerList = arrayReplaceAt(srSchedulerList, foundIndex, currentSRScheduler);
+                if (!currentSRScheduler.id) {
+                    srSchedulerList.push(result);
+                } else {
+                    const foundIndex = srSchedulerList.findIndex(srScheduler => currentSRScheduler.id === srScheduler.id);
+                    srSchedulerList = arrayReplaceAt(srSchedulerList, foundIndex, currentSRScheduler);
+                }
+                srSchedulerList.sort((a, b) => a.customerName.localeCompare(b.customerName));
+                drawList();
+                cancelEdit();
+            },
+            error => {
+                let errorMessage = "Failed to process scheduler";
+                if (error.responseJSON) {
+                    errorMessage = error.responseJSON.error;
+                }
+                alert(errorMessage);
             }
-            srSchedulerList.sort((a, b) => a.customerName.localeCompare(b.customerName));
-            drawList();
-            cancelEdit();
-        })
+        )
     }
 
     function cancelEdit() {
@@ -849,6 +857,8 @@
                 <td>
                     <input name="count"
                            type="number"
+                           min="1"
+                           step="1"
                     />
                 </td>
             </tr>

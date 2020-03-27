@@ -245,11 +245,13 @@ class BUContact extends Business
                     );
                 }
             } else {                                                // try to match
-                $this->dbeContact->getCustomerRowsByNameMatch(
+
+                $this->dbeContact->getSupportContactRowsByNameMatch(
                     $customerID,
                     $matchString
                 );
             }
+
             $ret = ($this->getData(
                 $this->dbeContact,
                 $dsResults
