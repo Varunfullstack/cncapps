@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 776 - New SR Start Work Time adjustment tweak
+
 ## [v3.11.7] - 2020-03-26
 ### Fixed
 - Expenses/Overtime pending approval list
