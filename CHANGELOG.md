@@ -18,6 +18,10 @@ This project changes will be shown here.
 ### Fixed
 - Expenses and Overtime visual / auto processing tweaks.
 
+## [unreleased]
+### Fixed
+- Issue 773 - Office 365 Backup Licenses Not Updating Contracts
+
 ## [v3.11.4] - 2020-03-13
 ### Changed
 - Solarwinds reporting tweaks
