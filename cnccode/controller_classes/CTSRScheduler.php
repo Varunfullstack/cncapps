@@ -82,6 +82,16 @@ class CTSRScheduler extends CTCNC
                 $toUpdateItem->setValue(DBESRScheduler::updatedBy, $this->userID);
                 $toUpdateItem->setValue(DBESRScheduler::updatedAt, (new DateTime())->format(DATE_MYSQL_DATE));
 
+                // before we update we want to test the rule
+
+                try {
+                    $rrule = new \RRule\RRule($this->getParam('rruleString'));
+                } catch (\Exception $exception) {
+                    echo json_encode(["status" => "error", "error" => $exception->getMessage()]);
+                    http_response_code(400);
+                    exit;
+                }
+
                 $toUpdateItem->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
@@ -100,6 +110,14 @@ class CTSRScheduler extends CTCNC
                 $newItem->setValue(DBESRScheduler::updatedBy, $this->userID);
                 $newItem->setValue(DBESRScheduler::createdAt, (new DateTime())->format(DATE_MYSQL_DATETIME));
                 $newItem->setValue(DBESRScheduler::updatedAt, (new DateTime())->format(DATE_MYSQL_DATETIME));
+
+                try {
+                    $rrule = new \RRule\RRule($this->getParam('rruleString'));
+                } catch (\Exception $exception) {
+                    echo json_encode(["status" => "error", "error" => $exception->getMessage()]);
+                    http_response_code(400);
+                    exit;
+                }
 
                 $newItem->insertRow();
 
