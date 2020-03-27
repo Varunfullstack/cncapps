@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
+
 ## [unreleased]
+### Added
+- Issue 762 - 3CX Call Reporting 
 ### Changed
 - Issue 750 - Set SR to awaiting CNC when Future date has been reached
 ### Fixed
@@ -22,10 +25,6 @@ This project changes will be shown here.
 ## [v3.11.4] - 2020-03-13
 ### Changed
 - Solarwinds reporting tweaks
-
-## [unreleased]
-### Added
-- Issue 762 - 3CX Call Reporting 
 
 ## [v3.11.3] - 2020-03-11
 ### Changed 
