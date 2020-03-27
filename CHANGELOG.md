@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 762 - 3CX Call Reporting 
 ### Changed
 - Issue 750 - Set SR to awaiting CNC when Future date has been reached
+- Issue 772 - Date of Expense Tweak
 ### Fixed
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
 - Issue 773 - Office 365 Backup Licenses Not Updating Contracts

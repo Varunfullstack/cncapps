@@ -62,7 +62,7 @@ class CTExpenseDashboard extends CTCNC
   consultant.`cns_consno` AS userId,
   exp_callactivityno AS activityId,
   callactivity.`caa_problemno` AS serviceRequestId,
-  expense.`dateSubmitted`,
+  caa_date as `dateSubmitted`,
   expensetype.`ext_desc` AS expenseTypeDescription,
   expense.`exp_expensetypeno` AS expenseTypeId,
   expense.`exp_value` AS `value`,
@@ -500,7 +500,7 @@ FROM
     LEFT JOIN callactivity
       ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
   WHERE callactivity.`caa_consno` = runningTotals.staffId
-    AND expense.`dateSubmitted` BETWEEN DATE_FORMAT(NOW(), '%Y')
+    AND caa_date BETWEEN DATE_FORMAT(NOW(), '%Y')
     AND NOW()
     AND exp_exported_flag <> \"N\"
     AND expense.`approvedBy` IS NOT NULL) AS YTD
