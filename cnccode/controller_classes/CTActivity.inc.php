@@ -3450,14 +3450,14 @@ class CTActivity extends CTCNC
           Start work create follow-on
           */
                 if ($this->getParam('StartWork')) {
-
                     $nextURL =
                         Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'           => 'createFollowOnActivity',
                                 'callActivityID'   => $dsCallActivity->getValue(DBEJCallActivity::callActivityID),
-                                'moveToUsersQueue' => 1
+                                'moveToUsersQueue' => 1,
+                                'continueEndTime'  => 1
                             )
                         );
 
@@ -5356,7 +5356,6 @@ class CTActivity extends CTCNC
     {
 
         $this->setMethodName('createFollowOnActivity');
-
         $newActivityID = $this->buActivity->createFollowOnActivity(
             $this->getParam('callActivityID'),
             $this->getParam('callActivityTypeID'),
@@ -5365,7 +5364,9 @@ class CTActivity extends CTCNC
             true,
             false,
             $GLOBALS['auth']->is_authenticated(),
-            $this->getParam('moveToUsersQueue')
+            $this->getParam('moveToUsersQueue'),
+            false,
+            $this->getParam('continueEndTime')
         );
 
         $urlNext =

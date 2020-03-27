@@ -8210,6 +8210,7 @@ is currently a balance of ';
      * @param int $userID
      * @param bool $moveToUsersQueue
      * @param bool $resetAwaitingCustomerResponse
+     * @param bool $previousStartTime
      * @return string
      * @throws Exception
      */
@@ -8222,12 +8223,12 @@ is currently a balance of ';
         $setEndTimeToNow = false,
         $userID = USER_SYSTEM,
         $moveToUsersQueue = false,
-        $resetAwaitingCustomerResponse = false
+        $resetAwaitingCustomerResponse = false,
+        $previousStartTime = false
     )
     {
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
-
         $reason = $passedReason;
 
         $isTravel = false;
@@ -8423,6 +8424,10 @@ is currently a balance of ';
             );
         }
 
+        $startTime = date('H:i');
+        if ($previousStartTime) {
+            $startTime = $dbeCallActivity->getValue(DBECallActivity::endTime);
+        }
 
         $dbeCallActivity->setPKValue(null);
 
@@ -8442,7 +8447,7 @@ is currently a balance of ';
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::startTime,
-            date('H:i')
+            $startTime
         );
         $dbeCallActivity->setValue(
             DBEJCallActivity::userID,

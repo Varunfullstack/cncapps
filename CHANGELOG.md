@@ -11,6 +11,7 @@ This project changes will be shown here.
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
 - Issue 773 - Office 365 Backup Licenses Not Updating Contracts
 - Issue 760 - Feedback on incorrect staff encryption key
+- Issue 776 - New SR Start Work Time adjustment tweak
 
 ## [v3.11.9] - 2020-03-30
 ### Added
