@@ -1222,7 +1222,6 @@ class CTActivity extends CTCNC
                 ) . ' ' . $dsContract->getValue(DBEJContract::notes) . ' ' . $dsContract->getValue(
                     DBEJContract::postcode
                 );
-
             $this->template->set_var(
                 array(
                     'contractSelected'       => $contractSelected,
@@ -1231,7 +1230,8 @@ class CTActivity extends CTCNC
                     'optGroupOpen'           => $optGroupOpen,
                     'optGroupClose'          => $optGroupClose,
                     'optGroupCloseLast'      => $dsContract->rowCount() == $currentRow ? '</optgroup>' : 'null',
-                    'prepayContract'         => $dsContract->getValue(DBEJContract::itemTypeID) == 57
+                    'prepayContract'         => $dsContract->getValue(DBEJContract::itemTypeID) == 57,
+                    'isDisabled'             => $dsContract->getValue(DBEJContract::allowSRLog) ? null : 'disabled'
                 )
             );
             $this->template->parse(

@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 774 - SR Choice of contracts when closing
+
 ## [v3.11.7] - 2020-03-26
 ### Fixed
 - Expenses/Overtime pending approval list

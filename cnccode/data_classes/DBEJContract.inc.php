@@ -18,6 +18,7 @@ class DBEJContract extends DBECustomerItem
     const invoiceToDate = "invoiceToDate";
     const invoiceFromDateYMD = "invoiceFromDateYMD";
     const invoiceToDateYMD = "invoiceToDateYMD";
+    const allowSRLog = 'allowSRLog';
 
     /**
      * calls constructor()
@@ -36,6 +37,7 @@ class DBEJContract extends DBECustomerItem
         $this->addColumn(self::renewalType, DA_STRING, DA_ALLOW_NULL, "renewalType.description");
         $this->addColumn(self::postcode, DA_STRING, DA_ALLOW_NULL, "add_postcode");
         $this->addColumn(self::adslPhone, DA_STRING, DA_ALLOW_NULL);
+        $this->addColumn(self::allowSRLog, DA_BOOLEAN, DA_NOT_NULL);
         $this->addColumn(
             self::invoiceFromDate,
             DA_DATE,
@@ -81,7 +83,6 @@ class DBEJContract extends DBECustomerItem
             "  AND renewalType.allowSrLogging = 'Y'
          AND declinedFlag <> 'Y'
        ORDER BY renewalType.description, itm_desc";
-
         $this->setQueryString($queryString);
         return (parent::getRows());
     }
