@@ -10,6 +10,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
 - Issue 773 - Office 365 Backup Licenses Not Updating Contracts
+- Issue 760 - Feedback on incorrect staff encryption key
 
 ## [v3.11.6] - 2020-03-25
 ### Fixed
