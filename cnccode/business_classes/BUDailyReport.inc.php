@@ -8,6 +8,7 @@
  * NOTE: calls to BUMail::putInQueue with 5th parameter true sends email to users flagged SDManager
  */
 
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_gc"] . "/Controller.inc.php");
@@ -167,7 +168,7 @@ GROUP BY t.month;
 
             $template->setVar(
                 [
-                    'totalRequests' => $requests
+                    'totalRequests' => $requests - 1
                 ]
             );
             $template->parse(

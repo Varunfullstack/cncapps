@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased]
+### Fixed
+- Issue 775 - SR Fixed Yesterday Total Value Tweak
 
 ## [v3.11.6] - 2020-03-25
 ### Fixed
