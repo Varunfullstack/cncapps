@@ -5,6 +5,7 @@ This project changes will be shown here.
 - Issue 750 - Set SR to awaiting CNC when Future date has been reached
 ### Fixed
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
+- Issue 773 - Office 365 Backup Licenses Not Updating Contracts
 
 ## [v3.11.6] - 2020-03-25
 ### Fixed
@@ -17,10 +18,6 @@ This project changes will be shown here.
 - Factor in weekends as not in office time.
 ### Fixed
 - Expenses and Overtime visual / auto processing tweaks.
-
-## [unreleased]
-### Fixed
-- Issue 773 - Office 365 Backup Licenses Not Updating Contracts
 
 ## [v3.11.4] - 2020-03-13
 ### Changed
