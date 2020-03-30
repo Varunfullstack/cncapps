@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.11.8] - 2020-03-30
+### Changed
+- Show any user that has approved overtime/expenses, pending overtime/expenses and has any YTD overtime/expenses in
+the expenseDashboard running totals page.
+
+
 ## [v3.11.7] - 2020-03-26
 ### Fixed
 - Expenses/Overtime pending approval list
