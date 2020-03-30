@@ -17,7 +17,7 @@
             </column>
         </addColumn>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue774-1">
+    <changeSet author="pavwebdev" id="issue774-2">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="item" columnName="allowSRLog"/>
         </preConditions>
