@@ -191,6 +191,7 @@ WHERE
                 );
                 break;
             case "getOvertimeData" :
+                session_write_close();
                 // we have to retrieve the data for the user + if the user is someones approver
 
                 $queryString = 'SELECT
