@@ -17,4 +17,32 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue774-1">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="item" columnName="allowSRLog"/>
+        </preConditions>
+        <sql>
+            update item
+            set allowSRLog = 1
+            where itm_itemno in (
+                                 4111,
+                                 6915,
+                                 14535,
+                                 7222,
+                                 12728,
+                                 17839,
+                                 17931,
+                                 17954,
+                                 18070,
+                                 18071,
+                                 18072,
+                                 14734,
+                                 16340,
+                                 15861,
+                                 16638,
+                                 14735
+                )
+        </sql>
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>
