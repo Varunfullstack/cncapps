@@ -40,6 +40,7 @@ class DBEContact extends DBCNCEntity
     const supportLevelSupervisor = 'supervisor';
     const supportLevelSupport = 'support';
     const supportLevelDelegate = 'delegate';
+    const supportLevelFurlough = 'furlough';
 
     const initialLoggingEmailFlag = 'initialLoggingEmailFlag';
     const workStartedEmailFlag = "workStartedEmailFlag";
@@ -389,7 +390,7 @@ class DBEContact extends DBCNCEntity
                     self::supportLevel
                 ) . " is not null and " . $this->getDBColumnName(
                     self::supportLevel
-                ) . ' <> ""';
+                ) . ' <> "" and supportLevel <> "furlough"';
         }
         $query .= " ORDER BY con_siteno, orderSupport, con_first_name, con_last_name";
 

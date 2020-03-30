@@ -1291,7 +1291,7 @@ not a boolean, the given value is null, column given is not the PK, and there is
             case DA_JSON_ARRAY:
                 return json_encode($value, JSON_NUMERIC_CHECK);
             case DA_SUPPORT_LEVEL:
-                $validOptions = ['main', 'supervisor', 'support', 'delegate'];
+                $validOptions = ['main', 'supervisor', 'support', 'delegate', 'furlough'];
                 return in_array(
                     $value,
                     $validOptions
@@ -1822,7 +1822,7 @@ not a boolean, the given value is null, column given is not the PK, and there is
             case DA_FLOAT:
                 return is_numeric($value) ? true : DATASET_MSG_INVALID;
             case DA_SUPPORT_LEVEL:
-                $validOptions = ['main', 'supervisor', 'support', 'delegate'];
+                $validOptions = ['main', 'supervisor', 'support', 'delegate', 'furlough'];
                 return in_array(
                     $value,
                     $validOptions

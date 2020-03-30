@@ -2461,6 +2461,7 @@ class CTCustomer extends CTCNC
         $supervisorCount = 0;
         $supportCount = 0;
         $delegateCount = 0;
+        $furloughCount = 0;
         $totalCount = 0;
 
         while ($this->dsContact->fetchNext()) {
@@ -2502,6 +2503,9 @@ class CTCustomer extends CTCNC
                             break;
                         case 'delegate':
                             $delegateCount++;
+                            break;
+                        case 'furlough':
+                            $furloughCount++;
                             break;
                     }
                     $totalCount++;
@@ -2665,6 +2669,7 @@ class CTCustomer extends CTCNC
                     "supervisorCount" => $supervisorCount,
                     "supportCount"    => $supportCount,
                     "delegateCount"   => $delegateCount,
+                    "furloughCount"   => $furloughCount,
                     "totalCount"      => $totalCount,
                 ]
             );

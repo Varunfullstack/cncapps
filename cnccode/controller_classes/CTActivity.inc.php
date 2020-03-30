@@ -2889,7 +2889,7 @@ class CTActivity extends CTCNC
           
             JOIN contact ON con_custno = cus_custno
             JOIN address ON add_custno = cus_custno AND add_siteno = con_siteno
-          WHERE supportLevel is not null";
+          WHERE supportLevel is not null and supportLevel <> 'furlough'";
 
                 if ($this->getParam('customerString')) {
                     $query .= " AND ( cus_name LIKE '%" . $this->getParam(
