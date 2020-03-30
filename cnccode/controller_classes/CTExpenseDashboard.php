@@ -410,58 +410,61 @@ WHERE
                 global $db;
 
                 $overtimeQuery = "SELECT
-  runningTotals.staffName,
-  runningTotals.approvedValue,
-  runningTotals.pendingValue,
-  (SELECT
-    SUM(overtimeDurationApproved)
-  FROM
-    callactivity
-  WHERE caa_date BETWEEN DATE_FORMAT(NOW(), '%Y')
-    AND NOW()
-    AND callactivity.`overtimeApprovedBy` IS NOT NULL
-    AND (caa_status = 'C'
-      OR caa_status = 'A')
-    AND caa_ot_exp_flag = 'Y'
-    and submitAsOvertime
-    AND callactivity.`caa_consno` = runningTotals.staffId) AS YTD
+  *
 FROM
   (SELECT
-    consultant.cns_name AS staffName,
-    consultant.`cns_consno` AS staffId,
-    SUM(
-      IF(
-        callactivity.`overtimeApprovedBy` IS NOT NULL,
-        overtimeDurationApproved,
-        0
-      )
-    ) AS approvedValue,
-    SUM(
-      IF(
-        callactivity.`overtimeDeniedReason` IS NULL
-        AND callactivity.`overtimeApprovedBy` IS NULL,
-        getOvertime (caa_callactivityno),
-        0
-      )
-    ) AS pendingValue
+    consultant.`cns_name` AS staffName,
+    (SELECT
+      SUM(overtimeDurationApproved)
+    FROM
+      callactivity
+    WHERE caa_date BETWEEN DATE_FORMAT(NOW(), '%Y')
+      AND NOW()
+      AND callactivity.`overtimeApprovedBy` IS NOT NULL
+      AND (caa_status = 'C'
+        OR caa_status = 'A')
+      AND caa_ot_exp_flag = 'Y'
+      AND submitAsOvertime
+      AND callactivity.`caa_consno` = consultant.`cns_consno`) AS YTD,
+    b.*
   FROM
-    callactivity
-    JOIN problem
-      ON pro_problemno = caa_problemno
-    JOIN callacttype
-      ON caa_callacttypeno = cat_callacttypeno
-      AND callacttype.engineerOvertimeFlag = 'Y'
-    JOIN consultant
-      ON caa_consno = cns_consno
-    JOIN headert
-      ON headert.`headerID` = 1
-  WHERE caa_endtime
-    AND caa_endtime IS NOT NULL
-    AND (caa_status = 'C'
-      OR caa_status = 'A')
-    AND caa_ot_exp_flag = 'N'
-    AND getOvertime (caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
-    AND (
+    consultant
+    LEFT JOIN
+      (SELECT
+        callactivity.caa_consno AS staffId,
+        SUM(
+          IF(
+            callactivity.`overtimeApprovedBy` IS NOT NULL,
+            overtimeDurationApproved,
+            0
+          )
+        ) AS approvedValue,
+        SUM(
+          IF(
+            callactivity.`overtimeDeniedReason` IS NULL
+            AND callactivity.`overtimeApprovedBy` IS NULL,
+            getOvertime (caa_callactivityno),
+            0
+          )
+        ) AS pendingValue
+      FROM
+        callactivity
+        JOIN problem
+          ON pro_problemno = caa_problemno
+        JOIN callacttype
+          ON caa_callacttypeno = cat_callacttypeno
+          AND callacttype.engineerOvertimeFlag = 'Y'
+        JOIN headert
+          ON headert.`headerID` = 1
+      WHERE caa_endtime
+        AND caa_endtime IS NOT NULL
+        AND (caa_status = 'C'
+          OR caa_status = 'A')
+        AND caa_ot_exp_flag = 'N'
+        AND getOvertime (caa_callactivityno) * 60 >= `minimumOvertimeMinutesRequired`
+      GROUP BY staffId) b
+      ON b.staffId = consultant.`cns_consno`
+  WHERE (
       consultant.`expenseApproverID` = ?
       OR
       (SELECT
@@ -471,8 +474,11 @@ FROM
       WHERE globalApprovers.globalExpenseApprover
         AND globalApprovers.cns_consno = ?) = 1
     )
-  GROUP BY consultant.`cns_consno`
-  ORDER BY staffName) runningTotals";
+    AND consultant.`activeFlag` = \"Y\") a
+WHERE YTD IS NOT NULL
+  OR approvedValue IS NOT NULL
+  OR pendingValue IS NOT NULL
+ORDER BY staffName";
                 $result = $db->preparedQuery(
                     $overtimeQuery,
                     [["type" => "i", "value" => $this->userID], ["type" => "i", "value" => $this->userID]]
