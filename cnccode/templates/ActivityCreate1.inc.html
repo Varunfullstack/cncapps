@@ -77,6 +77,10 @@
 
         var data = rowElm$.data();
 
+        if (data.furloughDisabled) {
+            return;
+        }
+
         addInputs([
             {
                 name: 'action',
@@ -151,6 +155,7 @@
         data-customer-id="{customerID}"
         data-contact-id="{contactID}"
         data-form-action="{formAction}"
+        data-furlough-disabled="{furloughDisabled}"
     >
         <td nowrap="nowrap">
             <button type="button"

@@ -2889,7 +2889,7 @@ class CTActivity extends CTCNC
           
             JOIN contact ON con_custno = cus_custno
             JOIN address ON add_custno = cus_custno AND add_siteno = con_siteno
-          WHERE supportLevel is not null and supportLevel <> 'furlough'";
+          WHERE supportLevel is not null";
 
                 if ($this->getParam('customerString')) {
                     $query .= " AND ( cus_name LIKE '%" . $this->getParam(
@@ -3000,6 +3000,7 @@ class CTActivity extends CTCNC
                         'contact_supportLevel' => $row['supportLevel'],
                         'contract'             => $row['hasPrepay'] ? 'PrePay' : ($row['hasServiceDesk'] ? $row['hasServiceDesk'] : 'T&M Authorisation Required'),
                         'referredDisabled'     => $row['cus_referred'] == 'Y' ? "disabled" : null,
+                        'furloughDisabled'     => $row['supportLevel'] === DBEContact::supportLevelFurlough ? 'true' : 'false',
                     )
                 );
                 $this->template->parse(
@@ -3779,6 +3780,7 @@ class CTActivity extends CTCNC
         $dbeContact->getRowsByCustomerID(
             $customerID,
             false,
+            true,
             true
         );
 
