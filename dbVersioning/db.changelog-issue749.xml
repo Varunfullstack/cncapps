@@ -1,0 +1,79 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue749-0">
+        <tagDatabase tag="issue749"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue749-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="srScheduler"/>
+            </not>
+        </preConditions>
+        <createTable tableName="srScheduler">
+            <column name="id" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customerId" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rruleString" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="contactId" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="siteNo" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="priority" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hideFromCustomer" type="tinyint(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="teamId" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="details" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="internalNotes" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="createdBy" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updatedBy" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="createdAt" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updatedAt" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue749-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) = 1 FROM INFORMATION_SCHEMA.TRIGGERS WHERE trigger_schema = DATABASE() AND trigger_name
+                = 'update_srScheduler_trg'
+            </sqlCheck>
+        </preConditions>
+        <sql splitStatements="false">
+            CREATE TRIGGER update_srScheduler_trg
+                BEFORE UPDATE
+                ON srScheduler
+                FOR EACH ROW
+            BEGIN
+                SET NEW.updatedAt = NOW();
+            END
+        </sql>
+        <rollback>
+            drop trigger if exists update_srScheduler_trg
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
