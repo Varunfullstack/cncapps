@@ -3449,7 +3449,6 @@ class CTActivity extends CTCNC
           Start work create follow-on
           */
                 if ($this->getParam('StartWork')) {
-
                     $nextURL =
                         Controller::buildLink(
                             $_SERVER['PHP_SELF'],
@@ -5354,7 +5353,6 @@ class CTActivity extends CTCNC
     {
 
         $this->setMethodName('createFollowOnActivity');
-
         $newActivityID = $this->buActivity->createFollowOnActivity(
             $this->getParam('callActivityID'),
             $this->getParam('callActivityTypeID'),

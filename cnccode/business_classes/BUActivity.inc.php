@@ -8227,7 +8227,6 @@ is currently a balance of ';
     {
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
-
         $reason = $passedReason;
 
         $isTravel = false;
@@ -8422,8 +8421,6 @@ is currently a balance of ';
                 'O'
             );
         }
-
-
         $dbeCallActivity->setPKValue(null);
 
         $activityUserID = $userID;
