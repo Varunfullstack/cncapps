@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 786 - Create new Furlough Contact Support Level
+
 ## [v3.11.8] - 2020-03-30
 ### Changed
 - Show any user that has approved overtime/expenses, pending overtime/expenses and has any YTD overtime/expenses in

@@ -35,6 +35,50 @@ class BUContact extends Business
     }
 
     /**
+     * @param $supportLevelValue
+     * @param Template $template
+     * @param string $selected
+     * @param string $value
+     * @param string $description
+     * @param string $parent
+     * @param string $block
+     */
+    public static function supportLevelDropDown($supportLevelValue,
+                                                $template,
+                                                $selected = 'supportLevelSelected',
+                                                $value = 'supportLevelValue',
+                                                $description = 'supportLevelDescription',
+                                                $parent = 'selectSupportLevel',
+                                                $block = 'supportLevelBlock'
+    )
+    {
+        // Site selection
+        $supportLevels = [
+            ["value" => null, "description" => "None"],
+            ["value" => DBEContact::supportLevelMain, "description" => "Main"],
+            ["value" => DBEContact::supportLevelSupervisor, "description" => "Supervisor"],
+            ["value" => DBEContact::supportLevelSupport, "description" => "Support"],
+            ["value" => DBEContact::supportLevelDelegate, "description" => "Delegate"],
+            ["value" => DBEContact::supportLevelFurlough, 'description' => 'Furlough']
+        ];
+        foreach ($supportLevels as $supportLevel) {
+            $supportLevelSelected = ($supportLevelValue == $supportLevel['value']) ? CT_SELECTED : null;
+            $template->set_var(
+                [
+                    $selected    => $supportLevelSelected,
+                    $value       => $supportLevel['value'],
+                    $description => $supportLevel['description']
+                ]
+            );
+            $template->parse(
+                $parent,
+                $block,
+                true
+            );
+        }
+    }
+
+    /**
      * Get Contact rows whose names match the search string or, if the string is numeric, try to select by customerID
      * @parameter String $nameSearchString String to match against or numeric contactID
      * @parameter DataSet &$dsResults results
@@ -84,6 +128,27 @@ class BUContact extends Business
             );
         }
         return $ret;
+    }
+
+    /**
+     * Get general support contact statement row by customerID
+     * @parameter integer $contactID
+     * @parameter DataSet &$dsResults results
+     * @param $ID
+     * @param DataSet $dsResults
+     * @return bool : Success
+     * @access public
+     */
+    function getContactByID($ID,
+                            &$dsResults
+    )
+    {
+        $this->setMethodName('getContactByID');
+        return ($this->getDatasetByPK(
+            $ID,
+            $this->dbeContact,
+            $dsResults
+        ));
     }
 
     /**
@@ -216,27 +281,6 @@ class BUContact extends Business
             $this->dbeContact,
             $dsResults
         );
-    }
-
-    /**
-     * Get general support contact statement row by customerID
-     * @parameter integer $contactID
-     * @parameter DataSet &$dsResults results
-     * @param $ID
-     * @param DataSet $dsResults
-     * @return bool : Success
-     * @access public
-     */
-    function getContactByID($ID,
-                            &$dsResults
-    )
-    {
-        $this->setMethodName('getContactByID');
-        return ($this->getDatasetByPK(
-            $ID,
-            $this->dbeContact,
-            $dsResults
-        ));
     }
 
     /**
@@ -446,49 +490,6 @@ class BUContact extends Business
             $this->dbeContact,
             $dsResults
         );
-    }
-
-    /**
-     * @param $supportLevelValue
-     * @param Template $template
-     * @param string $selected
-     * @param string $value
-     * @param string $description
-     * @param string $parent
-     * @param string $block
-     */
-    public static function supportLevelDropDown($supportLevelValue,
-                                                $template,
-                                                $selected = 'supportLevelSelected',
-                                                $value = 'supportLevelValue',
-                                                $description = 'supportLevelDescription',
-                                                $parent = 'selectSupportLevel',
-                                                $block = 'supportLevelBlock'
-    )
-    {
-        // Site selection
-        $supportLevels = [
-            ["value" => null, "description" => "None"],
-            ["value" => DBEContact::supportLevelMain, "description" => "Main"],
-            ["value" => DBEContact::supportLevelSupervisor, "description" => "Supervisor"],
-            ["value" => DBEContact::supportLevelSupport, "description" => "Support"],
-            ["value" => DBEContact::supportLevelDelegate, "description" => "Delegate"],
-        ];
-        foreach ($supportLevels as $supportLevel) {
-            $supportLevelSelected = ($supportLevelValue == $supportLevel['value']) ? CT_SELECTED : null;
-            $template->set_var(
-                [
-                    $selected    => $supportLevelSelected,
-                    $value       => $supportLevel['value'],
-                    $description => $supportLevel['description']
-                ]
-            );
-            $template->parse(
-                $parent,
-                $block,
-                true
-            );
-        }
     }
 
     public function getSpecialAttentionContacts(&$dsResults)
