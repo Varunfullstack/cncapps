@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unrelased]
+### Changed
+- Issue 788 - Toggle higher level passwords
+
 ## [v3.11.10] - 2020-04-01
 ### Fixed
 - Fix issue with auto approve overtime

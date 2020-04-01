@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
@@ -115,8 +116,12 @@ class CTPassword extends CTCNC
             $passwordForm['encrypted'] = 1;
             $passwordID = $passwordForm['passwordID'];
 
+
             if ($passwordID) {
                 $dbePassword->getRow($passwordID);
+                if ($this->dbeUser->getValue(DBEUser::passwordLevel) < $dbePassword->getValue(DBEPassword::level)) {
+                    return;
+                }
                 if (!$this->dbeUser->getValue(DBEUser::salesPasswordAccess)) {
                     $passwordForm[DBEPassword::salesPassword] = $dbePassword->getValue(DBEPassword::salesPassword);
                 }
@@ -160,6 +165,9 @@ class CTPassword extends CTCNC
                     $this->getParam('passwordID'),
                     $dsPassword
                 );
+                if ($this->dbeUser->getValue(DBEUser::passwordLevel) < $dsPassword->getValue(DBEPassword::level)) {
+                    return;
+                }
                 $customerID = $dsPassword->getValue(DBEPassword::customerID);
             } else {                                               // create new record
                 $dsPassword->setValue(
@@ -264,7 +272,8 @@ class CTPassword extends CTCNC
                 'URL'                    => $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::URL)),
                 'hasSalesPasswordAccess' => $this->dbeUser->getValue(DBEUser::salesPasswordAccess) ? 1 : 0,
                 'salesPassword'          => $dsPassword->getValue(DBEPassword::salesPassword) ? 1 : 0,
-                'salesPasswordChecked'   => $dsPassword->getValue(DBEPassword::salesPassword) ? 'checked' : 0
+                'salesPasswordChecked'   => $dsPassword->getValue(DBEPassword::salesPassword) ? 'checked' : 0,
+                'error'                  => $this->getParam('error')
             )
         );
 
@@ -288,18 +297,24 @@ class CTPassword extends CTCNC
             $this->raiseError('PasswordID ' . $this->getParam('passwordID') . ' not found');
             exit;
         }
+        $urlArray = [
+            'action'     => 'list',
+            'customerID' => $dsPassword->getValue(DBEPassword::customerID),
+        ];
 
-        $this->buPassword->archive(
-            $this->getParam('passwordID'),
-            $this->dbeUser
-        );
+        if ($dsPassword->getValue(DBEPassword::level) > $this->getDbeUser()->getValue(DBEUser::passwordLevel)) {
+            $urlArray['error'] = "Not enough level";
+        } else {
+            $this->buPassword->archive(
+                $this->getParam('passwordID'),
+                $this->dbeUser
+            );
+        }
+
         $urlNext =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
-                array(
-                    'action'     => 'list',
-                    'customerID' => $dsPassword->getValue(DBEPassword::customerID)
-                )
+                $urlArray
             );
 
         header('Location: ' . $urlNext);
@@ -338,7 +353,7 @@ class CTPassword extends CTCNC
     {
         $dbeCustomer = new DBECustomer($this);
         $showArchived = $this->getParam('archived');
-
+        $showHigherLevel = $this->getParam('higherLevel');
         if (empty($customerID)) {
             $this->raiseError('Please search for a customer by typing and then pressing tab');
             exit;
@@ -365,9 +380,13 @@ class CTPassword extends CTCNC
         );
 
         $dsPassword = new DBEJPassword($this);
+        $passwordLevel = $this->dbeUser->getValue(DBEUser::passwordLevel);
+        if ($showHigherLevel) {
+            $passwordLevel = 5;
+        }
         $dsPassword->getRowsByCustomerIDAndPasswordLevel(
             $customerID,
-            $this->dbeUser->getValue(DBEUser::passwordLevel),
+            $passwordLevel,
             $showArchived,
             $this->dbeUser->getValue(DBEUser::salesPasswordAccess)
         );
@@ -392,8 +411,6 @@ class CTPassword extends CTCNC
                     'action' => 'displayList'
                 )
             );
-
-
         }
 
 
@@ -406,6 +423,8 @@ class CTPassword extends CTCNC
                 'formError'          => $this->getFormErrorMessage(),
                 'hideOnArchived'     => $showArchived ? "hidden" : '',
                 'showOnArchived'     => $showArchived ? '' : 'hidden',
+                'showOnHigherLevel'  => $showHigherLevel ? '' : 'hidden',
+                'hideOnHigherLevel'  => $showHigherLevel ? 'hidden' : '',
                 "weirdColumnHeaders" => $showArchived ? '<th>Archived By</th><th>Archived At</th>' : '<th colspan="2">&nbsp;</th>',
                 'archived'           => $showArchived ? '(Archived Passwords)' : ''
             )
@@ -438,6 +457,7 @@ class CTPassword extends CTCNC
             );
             $weirdFields = "<td class=\"contentLeftAlign\"><A href=\"$urlEdit\">edit</a></td>
         <td class=\"contentLeftAlign\"><A href=\"$urlArchive\" onClick=\"if(!confirm('Are you sure you want to archive this password?')) return(false)\">archive</a></td>";
+
             if ($showArchived) {
                 $weirdFields = "<td class=\"contentLeftAlign\">" . $dsPassword->getValue(DBEPassword::archivedBy) . "</td>
         <td class=\"contentLeftAlign\">" . $dsPassword->getValue(DBEPassword::archivedAt) . "</td>";
@@ -449,6 +469,18 @@ class CTPassword extends CTCNC
                 $decryptedURL
             ) ? '<a href="' . $decryptedURL . '" target="_blank">' . $decryptedURL . '</a>' : '';
 
+            $userName = $this->buPassword->decrypt(
+                $dsPassword->getValue(DBEPassword::username)
+            );
+            $password = $this->buPassword->decrypt(
+                $dsPassword->getValue(DBEPassword::password)
+            );
+
+            if ($dsPassword->getValue(DBEPassword::level) > $this->dbeUser->getValue(DBEUser::passwordLevel)) {
+                $userName = null;
+                $password = null;
+                $weirdFields = null;
+            }
 
             $passwords[] = [
                 "notes"               => $notes,
@@ -457,12 +489,8 @@ class CTPassword extends CTCNC
                 "serviceID"           => $dsPassword->getValue(DBEJPassword::serviceID),
                 'passwordID'          => $dsPassword->getValue(DBEPassword::passwordID),
                 'customerID'          => $dsPassword->getValue(DBEPassword::customerID),
-                DBEPassword::username => $this->buPassword->decrypt(
-                    $dsPassword->getValue(DBEPassword::username)
-                ),
-                'password'            => $this->buPassword->decrypt(
-                    $dsPassword->getValue(DBEPassword::password)
-                ),
+                DBEPassword::username => $userName,
+                'password'            => $password,
                 "weirdFields"         => $weirdFields,
                 'level'               => $dsPassword->getValue(DBEPassword::level),
             ];
