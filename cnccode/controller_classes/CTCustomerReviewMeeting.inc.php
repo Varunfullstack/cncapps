@@ -1355,8 +1355,8 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
                     0,
                     3
                 ) . "-" . $datum['year'],
-                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'],
-                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'],
+                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'] + $datum['prepayCount1And3'],
+                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'] + $datum['prepayCount4'],
             ];
 
             $historicTotalSR['data'][] = $row;
@@ -1420,8 +1420,8 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
                     0,
                     3
                 ) . "-" . $datum['year'],
-                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'],
-                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'],
+                $datum['otherCount1And3'] + $datum['serviceDeskCount1And3'] + $datum['serverCareCount1And3'] + $datum['prepayCount1And3'],
+                $datum['otherCount4'] + $datum['serviceDeskCount4'] + $datum['serverCareCount4'] + $datum['prepayCount4'],
             ];
 
             $totalSR['data'][] = $row;

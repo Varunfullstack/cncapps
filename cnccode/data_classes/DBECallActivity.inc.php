@@ -422,10 +422,11 @@ FROM
       caa_callacttypeno = 22
       AND (
         isBankHoliday (caa_date)
-        OR (
-          overtimeStartTime < caa_endtime
-          AND `caa_starttime` < `overtimeEndTime`
-        )
+        or
+        WEEKDAY(activityDate) IN (5,6)
+        OR
+        caa_starttime < overtimeStartTime 
+        OR `caa_endtime` > `overtimeEndTime`
       )
     )
     OR caa_callacttypeno <> 22

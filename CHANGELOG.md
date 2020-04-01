@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.11.10] - 2020-04-01
+### Fixed
+- Fix issue with auto approve overtime
+- Show prepay SR count in historic and total charts from customer review meeting
+
 ## [v3.11.9] - 2020-03-30
 ### Added
 - Issue 786 - Create new Furlough Contact Support Level
