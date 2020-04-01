@@ -11114,22 +11114,21 @@ is currently a balance of ';
         $urlSalesRequestReview = SITE_URL . '/Activity.php?action=salesRequestReview&callActivityID=' . $salesRequestActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&fromEmail=true';
-
+        $urlFirstActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
+                DBEJCallActivity::callActivityID
+            );
         $urlLastActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $lastActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
 
         $template->setVar(
             array(
-                'problemID' => $problemID,
-
-                'userName' => $userName,
-
+                'problemID'              => $problemID,
+                'userName'               => $userName,
                 'urlSalesRequestControl' => $urlSalesRequestReview,
-
-                'urlLastActivity' => $urlLastActivity,
-
-                'requestReason' => $salesRequestActivity->getValue(DBEJCallActivity::reason)
+                'urlLastActivity'        => $urlLastActivity,
+                'requestReason'          => $salesRequestActivity->getValue(DBEJCallActivity::reason),
+                'urlFirstActivity'       => $urlFirstActivity,
             )
         );
 

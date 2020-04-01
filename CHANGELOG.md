@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 801 - Sales Request submitted emails to include Initial Link
+
 ## [v3.11.10] - 2020-04-01
 ### Fixed
 - Fix issue with auto approve overtime
