@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unrelased]
+## [unreleased]
 ### Changed
 - Issue 788 - Toggle higher level passwords
 
