@@ -207,7 +207,12 @@
             {pendingReopenCustomerName}
         </td>
         <td>
-            <a href="{pendingReopenDescriptionURL}">
+            <a href="#"
+               onClick="window.open(
+            '{pendingReopenDescriptionURL}',
+            'customer_problem',
+            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false"
+            >
                 {pendingReopenDescriptionSummary}
             </a>
         </td>

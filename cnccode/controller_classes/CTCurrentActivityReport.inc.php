@@ -526,7 +526,7 @@ class CTCurrentActivityReport extends CTCNC
                 $pendingReopenDescriptionSummary = $truncatedReason;
                 $pendingReopenDescriptionURL =
                     Controller::buildLink(
-                        'Activity.php',
+                        $_SERVER['PHP_SELF'],
                         array(
                             'action'  => 'pendingReopenedPopup',
                             'reason'  => $pendingReopenedRequest['reason'],

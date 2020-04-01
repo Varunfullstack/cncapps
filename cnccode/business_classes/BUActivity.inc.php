@@ -981,7 +981,7 @@ class BUActivity extends Business
         }
     } // end sendNotifyEscalatorUserEmail
 
-function sendPriorityFiveFixedEmail($problemID)
+    function sendPriorityFiveFixedEmail($problemID)
     {
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
@@ -1061,7 +1061,7 @@ function sendPriorityFiveFixedEmail($problemID)
         );
     }
 
-        /**
+    /**
      * Create or update activity
      *
      * @param mixed $dsCallActivity
@@ -7432,6 +7432,7 @@ FROM
                 false,
                 true,
                 USER_SYSTEM,
+                false,
                 false,
                 true
             );
