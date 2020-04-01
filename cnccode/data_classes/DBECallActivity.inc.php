@@ -415,7 +415,6 @@ FROM
            and caa_endtime AND caa_endtime IS NOT NULL AND
       (caa_status = 'C'
     OR caa_status = 'A')
-  AND caa_ot_exp_flag = 'N'
   and submitAsOvertime
   AND (
     (
@@ -433,7 +432,6 @@ FROM
   )
   AND (caa_endtime <> caa_starttime)
   AND callacttype.engineerOvertimeFlag = 'Y'";
-        var_dump($this->queryString);
         return $this->getRows();
     }
 }
