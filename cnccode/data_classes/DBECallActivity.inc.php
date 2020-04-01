@@ -423,16 +423,17 @@ FROM
       AND (
         isBankHoliday (caa_date)
         or
-        WEEKDAY(activityDate) IN (5,6)
+        WEEKDAY(caa_date) IN (5,6)
         OR
         caa_starttime < overtimeStartTime 
         OR `caa_endtime` > `overtimeEndTime`
-      )
+        )
     )
     OR caa_callacttypeno <> 22
   )
   AND (caa_endtime <> caa_starttime)
   AND callacttype.engineerOvertimeFlag = 'Y'";
+        var_dump($this->queryString);
         return $this->getRows();
     }
 }

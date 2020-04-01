@@ -918,7 +918,7 @@ WHERE caa_endtime
       AND (
         isBankHoliday (caa_date)
         OR
-        WEEKDAY(activityDate) IN (5,6)
+        WEEKDAY(caa_date) IN (5,6)
         OR 
           caa_starttime < overtimeStartTime 
           OR `caa_endtime` > `overtimeEndTime`
