@@ -5,6 +5,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_gc"] . "/Controller.inc.php");
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
@@ -358,63 +359,6 @@ class BUCustomerSrAnalysisReport extends Business
                         $row['year'],
                         $row['month'],
                         CONFIG_PREPAY_ITEMTYPEID,
-                        $customerID
-                    );
-                $resultRow['prepayCount1And3'] =
-                    $this->getCount1to3(
-                        $row['year'],
-                        $row['month'],
-                        CONFIG_PREPAY_ITEMTYPEID,
-                        $customerID
-                    );
-                $resultRow['prepayHoursResponded'] =
-                    $this->getRespondedHours(
-                        $row['year'],
-                        $row['month'],
-                        CONFIG_PREPAY_ITEMTYPEID,
-                        $customerID
-                    );
-                $resultRow['prepayHoursFix'] =
-                    $this->getFixHours(
-                        $row['year'],
-                        $row['month'],
-                        CONFIG_PREPAY_ITEMTYPEID,
-                        $customerID
-                    );
-                $resultRow['prepayCount4'] =
-                    $this->getCount4(
-                        $row['year'],
-                        $row['month'],
-                        CONFIG_PREPAY_ITEMTYPEID,
-                        $customerID
-                    );
-
-                $resultRow['otherCount1And3'] =
-                    $this->getCount1to3(
-                        $row['year'],
-                        $row['month'],
-                        false,
-                        $customerID
-                    );
-                $resultRow['otherHoursResponded'] =
-                    $this->getRespondedHours(
-                        $row['year'],
-                        $row['month'],
-                        false,
-                        $customerID
-                    );
-                $resultRow['otherHoursFix'] =
-                    $this->getFixHours(
-                        $row['year'],
-                        $row['month'],
-                        false,
-                        $customerID
-                    );
-                $resultRow['otherCount4'] =
-                    $this->getCount4(
-                        $row['year'],
-                        $row['month'],
-                        false,
                         $customerID
                     );
                 $resultRow['otherCount1And3'] =

@@ -415,18 +415,18 @@ FROM
            and caa_endtime AND caa_endtime IS NOT NULL AND
       (caa_status = 'C'
     OR caa_status = 'A')
-  AND caa_ot_exp_flag = 'N'
   and submitAsOvertime
   AND (
     (
       caa_callacttypeno = 22
       AND (
         isBankHoliday (caa_date)
-        OR (
-          overtimeStartTime < caa_endtime
-          AND `caa_starttime` < `overtimeEndTime`
+        or
+        WEEKDAY(caa_date) IN (5,6)
+        OR
+        caa_starttime < overtimeStartTime 
+        OR `caa_endtime` > `overtimeEndTime`
         )
-      )
     )
     OR caa_callacttypeno <> 22
   )
