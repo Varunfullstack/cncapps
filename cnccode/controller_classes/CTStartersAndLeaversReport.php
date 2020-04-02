@@ -78,7 +78,8 @@ class CTStartersAndLeaversReport extends CTCNC
                                 "activity[1][rootCauseID]"            => $row['type'] == 'starters' ? 58 : 62,
                                 "activity[1][fromDate]"               => $_REQUEST['searchForm'][1]['startDate'],
                                 "activity[1][toDate]"                 => $_REQUEST['searchForm'][1]['endDate'],
-                                "Search"                              => "Search"
+                                "Search"                              => "Search",
+                                "activity[1][callActTypeID]"          => 51
                             ]
                         );
 
