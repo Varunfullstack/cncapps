@@ -2341,6 +2341,16 @@ class BUActivity extends Business
             )
         );
 
+        $userID = $dbeJCallActivity->getValue(DBEJCallActivity::userID);
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRow($userID);
+        $teamID = $dbeUser->getValue(DBEUser::teamID);
+        $team = new DBETeam($this);
+        $team->getRow($teamID);
+        $manager = new DBEUser($this);
+        $manager->getRow($team->getValue(DBETeam::leaderId));
+        $managerEmail = $manager->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
+
         $template->parse(
             'output',
             'page',
@@ -2349,7 +2359,7 @@ class BUActivity extends Business
 
         $body = $template->get_var('output');
 
-        $toEmail = 'srspecialattention@' . CONFIG_PUBLIC_DOMAIN;
+        $toEmail = 'srspecialattention@' . CONFIG_PUBLIC_DOMAIN . ";$managerEmail";
 
 
         $hdrs = array(
