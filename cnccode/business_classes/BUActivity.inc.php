@@ -7375,7 +7375,8 @@ FROM
                     true,
                     USER_SYSTEM,
                     false,
-                    true
+                    true,
+                        true
                 );
 
                 if ($automatedRequest->getAttachment() == 'Y') {
@@ -7403,7 +7404,8 @@ FROM
                     true,
                     USER_SYSTEM,
                     false,
-                    true
+                    true,
+                        true
                 );
 
                 if ($automatedRequest->getAttachment() == 'Y') {
@@ -8133,6 +8135,7 @@ FROM
      * @param bool $moveToUsersQueue
      * @param bool $resetAwaitingCustomerResponse
      * @param bool $comesFromAutomatedRequest
+     * @param bool $comesFromPendingReopened
      * @return string
      * @throws Exception
      */
