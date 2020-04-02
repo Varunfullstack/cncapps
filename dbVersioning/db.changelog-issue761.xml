@@ -17,4 +17,41 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue761-2">
+        <sql>
+            update OSSupportDates
+            set isServer = 1
+            where name like '%server%';
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue761-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="licensedOffice365Users"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="licensedOffice365Users" type="int(4)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue761-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT data_type = 'varchar' FROM information_schema.`COLUMNS` WHERE table_schema = DATABASE() AND
+                table_name = 'customer' AND column_name = 'noOfPCs'
+            </sqlCheck>
+        </preConditions>
+        <sql splitStatements="true">
+            ALTER TABLE `cncappsdev`.`customer`
+                CHANGE `noOfPCs` `noOfPCs` VARCHAR(10) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '0' NULL;
+            update customer
+            set noOfPCs = null;
+        </sql>
+        <modifyDataType tableName="customer" columnName="noOfPCs" newDataType="int(4)"/>
+        <rollback/>
+    </changeSet>
+
 </databaseChangeLog>

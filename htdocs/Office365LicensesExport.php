@@ -137,7 +137,7 @@ do {
         continue;
     }
 
-    if ( count($data['errors'])) {
+    if (count($data['errors'])) {
         foreach ($data['errors'] as $error) {
             $logger->warning("Error received from powershell output, but the execution was not stopped:  " . $error);
         }
@@ -415,6 +415,12 @@ function processMailboxes(Spreadsheet $spreadSheet,
     );
     $highestRow = count($mailboxes) + 2;
     $totalizationRow['LicensedUsers'] = "$totalizationRow[LicensedUsers] Licensed Users";
+    if ($totalizationRow['LicensedUsers']) {
+        $updateCustomer = new DBECustomer($thing);
+        $updateCustomer->getRow($dbeCustomer->getValue(DBECustomer::customerID));
+        $updateCustomer->setValue(DBECustomer::licensedOffice365Users, $totalizationRow['LicensedUsers']);
+        $updateCustomer->updateRow();
+    }
     $mailboxesSheet->fromArray(
         $totalizationRow,
         null,

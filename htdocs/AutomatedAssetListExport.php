@@ -53,11 +53,13 @@ while ($DBEOSSupportDates->fetchNext()) {
             DBEOSSupportDates::name
         ) . "' as osName,  '" . $DBEOSSupportDates->getValue(
             DBEOSSupportDates::version
-        ) . "' as version, '" . $date->format('d/m/Y') . "' as endOfSupportDate";
+        ) . "' as version, '" . $date->format('d/m/Y') . "' as endOfSupportDate, " . $DBEOSSupportDates->getValue(
+            DBEOSSupportDates::isServer
+        ) . " as isServer ";
 }
 
 if (!$fakeTable) {
-    $fakeTable = "select null as endOfSupportDate, null as osName, null as version";
+    $fakeTable = "select null as endOfSupportDate, null as osName, null as version, false as isServer";
 }
 
 $BUHeader = new BUHeader($thing);
@@ -145,7 +147,7 @@ while ($dbeCustomer->fetchNext()) {
     - 1
   ) AS "Operating System",
   computers.version AS "Version",
-       (select endOfSupportDate from ('.$fakeTable.') f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `OS End of Support Date`,
+       (select endOfSupportDate from (' . $fakeTable . ') f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `OS End of Support Date`,
   computers.domain AS \'Domain\',
   SUBSTRING_INDEX(
     software.name,
@@ -156,7 +158,8 @@ while ($dbeCustomer->fetchNext()) {
   DATE_FORMAT(
     STR_TO_DATE(computers.VirusDefs, \'%Y%m%d\'),
     \'%d/%m/%Y\'
-  ) AS "AV Definition" 
+  ) AS "AV Definition",
+(select isServer from (' . $fakeTable . ') f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `isServer`
 FROM
   computers 
   LEFT JOIN (clients) 
@@ -271,36 +274,16 @@ ORDER BY clients.name,
         $sheet = $spreadsheet->getActiveSheet();
         $keys = array_keys($data[0]);
         $sheet->fromArray($keys);
-        $sheet->fromArray(
-            $data,
-            null,
-            'A2'
-        );
-        if ($generateSummary) {
-            if (!$isHeaderSet) {
-                $summarySheet->fromArray(array_merge(["Customer Name"], $keys));
-                $currentSummaryRow = 2;
-                $summarySheet->getStyle("A1:U1")->getFont()->setBold(true);
-                $isHeaderSet = true;
-            }
 
-            $summaryData = array_map(
-                function ($originalData) use ($customerName) {
-                    return array_merge(["Customer Name" => $customerName], $originalData);
-                },
-                $data
-            );
-
-            $summarySheet->fromArray($summaryData, null, 'A' . $currentSummaryRow);
-        }
-
-        $sheet->getStyle("A1:T1")->getFont()->setBold(true);
-
-        $sheet->setAutoFilter(
-            $sheet->calculateWorksheetDimension()
-        );
-
+        $pcs = 0;
+        $servers = 0;
         for ($i = 0; $i < count($data); $i++) {
+            if (!$data[$i]['isServer']) {
+                $pcs++;
+            } else {
+                $servers++;
+            }
+            unset($data[$i]['isServer']);
             if (!$data[$i]['OS End of Support Date']) {
                 continue;
             }
@@ -336,8 +319,34 @@ ORDER BY clients.name,
                         ->setARGB($color);
                 }
             }
-
         }
+        $sheet->fromArray(
+            $data,
+            null,
+            'A2'
+        );
+        if ($generateSummary) {
+            if (!$isHeaderSet) {
+                $summarySheet->fromArray(array_merge(["Customer Name"], $keys));
+                $currentSummaryRow = 2;
+                $summarySheet->getStyle("A1:U1")->getFont()->setBold(true);
+                $isHeaderSet = true;
+            }
+
+            $summaryData = array_map(
+                function ($originalData) use ($customerName) {
+                    return array_merge(["Customer Name" => $customerName], $originalData);
+                },
+                $data
+            );
+
+            $summarySheet->fromArray($summaryData, null, 'A' . $currentSummaryRow);
+        }
+        $sheet->getStyle("A1:T1")->getFont()->setBold(true);
+
+        $sheet->setAutoFilter(
+            $sheet->calculateWorksheetDimension()
+        );
         $currentSummaryRow += count($data);
         foreach (range('A', $sheet->getHighestDataColumn()) as $col) {
             $sheet->getColumnDimension($col)
@@ -354,6 +363,7 @@ ORDER BY clients.name,
                 true
             );
         }
+
 
         $fileName = $folderName . "Current Asset List Extract.xlsx";
         try {
@@ -412,6 +422,12 @@ ORDER BY clients.name,
             } else {
                 $dbeCustomerDocument->updateRow();
             }
+
+            $updateCustomer = new DBECustomer($thing);
+            $updateCustomer->getRow($customerID);
+            $updateCustomer->setValue(DBECustomer::noOfPCs, $pcs);
+            $updateCustomer->setValue(DBECustomer::noOfServers, $servers);
+            $updateCustomer->updateRow();
 
             echo '<div>Data was found at labtech, creating file ' . $fileName . '</div>';
         } catch (\Exception $exception) {

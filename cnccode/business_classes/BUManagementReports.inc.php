@@ -69,6 +69,20 @@ class BUManagementReports extends Business
 
     }
 
+    function buildSpendByManufacturerSegment($month)
+    {
+        $return = "
+			,SUM(
+				if (
+					MONTH( poh_date ) = $month,
+					pol_qty_ord * pol_cost,
+					0
+				)
+			)as `month$month`";
+
+        return $return;
+    }
+
     function getSpendByCategory($year = false)
     {
         if (!$year) {
@@ -149,20 +163,6 @@ class BUManagementReports extends Business
 
     }
 
-    function buildSpendByManufacturerSegment($month)
-    {
-        $return = "
-			,SUM(
-				if (
-					MONTH( poh_date ) = $month,
-					pol_qty_ord * pol_cost,
-					0
-				)
-			)as `month$month`";
-
-        return $return;
-    }
-
     /**
      * @param null $customerID
      * @param null $year
@@ -170,7 +170,7 @@ class BUManagementReports extends Business
      * @param null $pcs
      * @return bool|int|mysqli_result|null
      */
-    function getSalesByCustomer($customerID = null, $year = null, $sectorId = null, $pcs = null)
+    function getSalesByCustomer($customerID = null, $year = null, $sectorId = null, $minPcs = null, $maxPCs = null)
     {
         if (!$year) {
             $year = date('Y');
@@ -218,8 +218,12 @@ class BUManagementReports extends Business
             $sql .= " and cus_sectorno = $sectorId";
         }
 
-        if ($pcs === "0" || $pcs) {
-            $sql .= " and noOfPCs = '$pcs'";
+        if ($minPcs !== null) {
+            $sql .= " and noOfPCs >= " . $minPcs;
+        }
+
+        if ($maxPCs !== null) {
+            $sql .= " and noOfPCs <= " . $maxPCs;
         }
 
         $sql .= "

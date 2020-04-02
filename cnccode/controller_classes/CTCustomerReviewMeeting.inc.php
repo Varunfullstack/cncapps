@@ -1030,9 +1030,14 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
                 DBEJCustomerItem::invoiceToDate
             )
         );
+        $dbeCustomer = new DBECustomer($this);
+        $dbeCustomer->getRow($customerId);
         $serverCareContractsTemplate->set_var(
-            'usersCount',
-            $supportContactsCount
+            [
+                'usersCount' => $supportContactsCount,
+                "mailboxes"  => $dbeCustomer->getValue(DBECustomer::licensedOffice365Users),
+                'pcs'        => $dbeCustomer->getValue(DBECustomer::noOfPCs)
+            ]
         );
 
         $serverCareContractsTemplate->set_block(

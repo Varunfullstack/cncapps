@@ -66,6 +66,7 @@ class DBECustomer extends DBCNCEntity
     const accountNumber = 'accountNumber';
     const activeDirectoryName = "activeDirectoryName";
     const reviewMeetingBooked = 'reviewMeetingBooked';
+    const licensedOffice365Users = 'licensedOffice365Users';
 
     /**
      * calls constructor()
@@ -427,6 +428,14 @@ class DBECustomer extends DBCNCEntity
         $this->addColumn(
             self::reviewMeetingBooked,
             DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+
+        $this->addColumn(
+            self::licensedOffice365Users,
+            DA_INTEGER,
             DA_NOT_NULL,
             null,
             0

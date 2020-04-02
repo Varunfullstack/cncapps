@@ -19,9 +19,8 @@ require_once("Mail/mime.php");
 
 class CTManagementReports extends CTCNC
 {
-    public $buManagementReports;
-
     const GetSalesByCustomerDataAction = "GetSalesByCustomerDataAction";
+    public $buManagementReports;
 
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
@@ -74,86 +73,156 @@ class CTManagementReports extends CTCNC
     /**
      * @throws Exception
      */
-    function spendByManufacturer()
+    function SalesByCustomer()
     {
-        $this->setMethodName('spendByManufacturer');
+        $this->setMethodName('SalesByCustomer');
 
-        $this->setTemplateFiles('ManagementReportsSpendManufacturer', 'ManagementReportsSpendManufacturer.inc');
+        $this->setTemplateFiles('ManagementReportsSalesCustomer', 'ManagementReportsSalesCustomer.inc');
 
-        $this->setPageTitle("Spend By Manufacturer");
+        $this->setPageTitle("Sales By Customer Profile");
 
         // year selector
-        $this->template->set_block('ManagementReportsSpendManufacturer', 'yearBlock', 'years');
+        $this->template->set_block('ManagementReportsSalesCustomer', 'yearBlock', 'years');
         $this->parseYearSelector($this->getParam('year'));
+        // sector selector
+        $this->template->set_block('ManagementReportsSalesCustomer', 'sectorBlock', 'sectors');
+        $this->parseSectorSelector($this->getParam('sectorID'));
 
-        $results =
-            $this->buManagementReports->getSpendByManufacturer(
-                $this->getParam('manufacturerName'),
-                $this->getParam('year')
-            );
+        // noOfPcs selector
 
-        $this->template->set_block('ManagementReportsSpendManufacturer', 'resultsBlock', 'results');
+        $this->parseNoOfPcs($this->template, $this->getParam('noOfPcs'));
 
-        $grandTotal = 0;
 
-        while ($row = $results->fetch_object()) {
-            $total =
-                $row->month1 +
-                $row->month2 +
-                $row->month3 +
-                $row->month4 +
-                $row->month5 +
-                $row->month6 +
-                $row->month7 +
-                $row->month8 +
-                $row->month9 +
-                $row->month10 +
-                $row->month11 +
-                $row->month12;
-
-            $grandTotal += $total;
-
-            $this->template->set_var(
-                array(
-                    'manufacturer' => Controller::htmlDisplayText($row->manufacturer),
-                    'month1'       => Controller::formatNumber($row->month1, 0),
-                    'month2'       => Controller::formatNumber($row->month2, 0),
-                    'month3'       => Controller::formatNumber($row->month3, 0),
-                    'month4'       => Controller::formatNumber($row->month4, 0),
-                    'month5'       => Controller::formatNumber($row->month5, 0),
-                    'month6'       => Controller::formatNumber($row->month6, 0),
-                    'month7'       => Controller::formatNumber($row->month7, 0),
-                    'month8'       => Controller::formatNumber($row->month8, 0),
-                    'month9'       => Controller::formatNumber($row->month9, 0),
-                    'month10'      => Controller::formatNumber($row->month10, 0),
-                    'month11'      => Controller::formatNumber($row->month11, 0),
-                    'month12'      => Controller::formatNumber($row->month12, 0),
-                    'total'        => Controller::formatNumber($total, 0)
-                )
-            );
-
-            $this->template->parse('results', 'resultsBlock', true);
-        }
-
-        $urlGenerateReport = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
+        $customerPopupURL = Controller::buildLink(
+            CTCNC_PAGE_CUSTOMER,
             array(
-                'action' => 'spendByManufacturer'
+                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                'htmlFmt' => CT_HTML_FMT_POPUP
             )
         );
+
+        $fetchDataUrl = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => self::GetSalesByCustomerDataAction
+            )
+        );
+        $customerName = null;
+        if ($this->getParam('customerID')) {
+            $dbeCustomer = new DBECustomer($this);
+            $dbeCustomer->getRow($this->getParam('customerID'));
+            $customerName = $dbeCustomer->getValue(DBECustomer::name);
+        }
 
         $this->template->set_var(
             array(
-                'urlGenerateReport' => $urlGenerateReport,
-                'manufacturerName'  => $this->getParam('manufacturerName'),
-                'grandTotal'        => Controller::formatNumber($grandTotal, 0)
+                'customerPopupURL' => $customerPopupURL,
+                'customerName'     => $customerName,
+                'customerID'       => $this->getParam('customerID'),
+                'sectorID'         => $this->getParam('sectorID'),
+                'noOfPcs'          => $this->getParam('noOfPcs'),
+                'fetchDataUrl'     => $fetchDataUrl
             )
         );
 
-        $this->template->parse("CONTENTS", "ManagementReportsSpendManufacturer");
+        $this->template->parse("CONTENTS", "ManagementReportsSalesCustomer");
 
         $this->parsePage();
 
+    }
+
+    /**
+     * Get and parse year drop-down selector
+     * @access private
+     * @param $selectedYear
+     */
+    function parseYearSelector($selectedYear)
+    {
+        $thisYear = date('Y');
+
+        for ($year = $thisYear; $year >= $thisYear - 3; $year--) {
+
+            $yearSelected = ($selectedYear == $year) ? CT_SELECTED : null;
+
+            $this->template->set_var(
+                array(
+                    'yearSelected' => $yearSelected,
+                    'year'         => $year
+                )
+            );
+
+            $this->template->parse('years', 'yearBlock', true);
+        }
+    } // end function spendBySupplier
+
+    private function parseSectorSelector($selectedSectorID)
+    {
+
+        $buSector = new BUSector($this);
+
+        $dsResults = new DataSet($this);
+        $buSector->getAll($dsResults);
+
+
+        $this->template->set_var(
+            array(
+                'selectedSector'    => $selectedSectorID ? CT_SELECTED : null,
+                'sectorID'          => null,
+                'sectorDescription' => "Search All"
+            )
+        );
+
+        $this->template->parse('sectors', 'sectorBlock', true);
+
+        while ($dsResults->fetchNext()) {
+
+            $sectorID = $dsResults->getValue(DBESector::sectorID);
+            $sectorDescription = $dsResults->getValue(DBESector::description);
+            $selectedSector = ($selectedSectorID == $sectorID) ? CT_SELECTED : null;
+
+            $this->template->set_var(
+                array(
+                    'selectedSector'    => $selectedSector,
+                    'sectorID'          => $sectorID,
+                    'sectorDescription' => $sectorDescription
+                )
+            );
+
+            $this->template->parse('sectors', 'sectorBlock', true);
+        }
+    }
+
+    private function parseNoOfPcs(Template $template, $selectedNoOfPcs)
+    {
+        $template->set_block('ManagementReportsSalesCustomer', 'noOfPcsBlock', 'noOfPcsSelector');
+        $options = [
+            "Search All",
+            "0",
+            "1-5",
+            "6-10",
+            "11-25",
+            "26-50",
+            "51-99",
+            "100+"
+        ];
+
+        foreach ($options as $option) {
+            $isSelected = $selectedNoOfPcs ? ($selectedNoOfPcs == $option ? CT_SELECTED : null) : ($option === "Search All" ? CT_SELECTED : null);
+            $value = $option;
+            if ($option === 'Search All') {
+                $value = null;
+            }
+
+            $this->template->set_var(
+                array(
+                    'noOfPcsSelected'    => $isSelected ? CT_SELECTED : null,
+                    'noOfPcsDescription' => $option,
+                    'noOfPcsValue'       => $value
+                )
+            );
+
+            $this->template->parse('noOfPcsSelector', 'noOfPcsBlock', true);
+        }
     }
 
     /**
@@ -179,7 +248,10 @@ class CTManagementReports extends CTCNC
             )
         );
 
-        $results = $this->buManagementReports->getSpendBySupplier($this->getParam('supplierID'), $this->getParam('year'));
+        $results = $this->buManagementReports->getSpendBySupplier(
+            $this->getParam('supplierID'),
+            $this->getParam('year')
+        );
         $supplierName = null;
         if ($this->getParam('supplierID')) {
             $dbeSupplier = new DBESupplier($this);
@@ -259,7 +331,7 @@ class CTManagementReports extends CTCNC
 
         $this->parsePage();
 
-    } // end function spendBySupplier
+    } // end function salesByCustomer
 
     /**
      * @throws Exception
@@ -370,7 +442,39 @@ class CTManagementReports extends CTCNC
         $pcs = null
     )
     {
-        $results = $this->buManagementReports->getSalesByCustomer($customerId, $year, $sector, $pcs);
+
+        $minPcs = null;
+        $maxPcs = null;
+        switch ($pcs) {
+            case '0':
+                $minPcs = 0;
+                $maxPcs = 0;
+                break;
+            case '1-5':
+                $minPcs = 1;
+                $maxPcs = 5;
+                break;
+            case '6-10';
+                $minPcs = 6;
+                $maxPcs = 10;
+                break;
+            case '11-25';
+                $minPcs = 11;
+                $maxPcs = 25;
+                break;
+            case '26-50';
+                $minPcs = 26;
+                $maxPcs = 50;
+                break;
+            case '51-99';
+                $minPcs = 51;
+                $maxPcs = 99;
+                break;
+            case '100+':
+                $minPcs = 100;
+        }
+
+        $results = $this->buManagementReports->getSalesByCustomer($customerId, $year, $sector, $minPcs, $maxPcs);
         $data = [];
         while ($row = $results->fetch_object()) {
 
@@ -413,155 +517,85 @@ class CTManagementReports extends CTCNC
     /**
      * @throws Exception
      */
-    function SalesByCustomer()
+    function spendByManufacturer()
     {
-        $this->setMethodName('SalesByCustomer');
+        $this->setMethodName('spendByManufacturer');
 
-        $this->setTemplateFiles('ManagementReportsSalesCustomer', 'ManagementReportsSalesCustomer.inc');
+        $this->setTemplateFiles('ManagementReportsSpendManufacturer', 'ManagementReportsSpendManufacturer.inc');
 
-        $this->setPageTitle("Sales By Customer Profile");
+        $this->setPageTitle("Spend By Manufacturer");
 
         // year selector
-        $this->template->set_block('ManagementReportsSalesCustomer', 'yearBlock', 'years');
+        $this->template->set_block('ManagementReportsSpendManufacturer', 'yearBlock', 'years');
         $this->parseYearSelector($this->getParam('year'));
-        // sector selector
-        $this->template->set_block('ManagementReportsSalesCustomer', 'sectorBlock', 'sectors');
-        $this->parseSectorSelector($this->getParam('sectorID'));
 
-        // noOfPcs selector
+        $results =
+            $this->buManagementReports->getSpendByManufacturer(
+                $this->getParam('manufacturerName'),
+                $this->getParam('year')
+            );
 
-        $this->parseNoOfPcs($this->template, $this->getParam('noOfPcs'));
+        $this->template->set_block('ManagementReportsSpendManufacturer', 'resultsBlock', 'results');
 
+        $grandTotal = 0;
 
-        $customerPopupURL = Controller::buildLink(
-            CTCNC_PAGE_CUSTOMER,
-            array(
-                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                'htmlFmt' => CT_HTML_FMT_POPUP
-            )
-        );
+        while ($row = $results->fetch_object()) {
+            $total =
+                $row->month1 +
+                $row->month2 +
+                $row->month3 +
+                $row->month4 +
+                $row->month5 +
+                $row->month6 +
+                $row->month7 +
+                $row->month8 +
+                $row->month9 +
+                $row->month10 +
+                $row->month11 +
+                $row->month12;
 
-        $fetchDataUrl = Controller::buildLink(
+            $grandTotal += $total;
+
+            $this->template->set_var(
+                array(
+                    'manufacturer' => Controller::htmlDisplayText($row->manufacturer),
+                    'month1'       => Controller::formatNumber($row->month1, 0),
+                    'month2'       => Controller::formatNumber($row->month2, 0),
+                    'month3'       => Controller::formatNumber($row->month3, 0),
+                    'month4'       => Controller::formatNumber($row->month4, 0),
+                    'month5'       => Controller::formatNumber($row->month5, 0),
+                    'month6'       => Controller::formatNumber($row->month6, 0),
+                    'month7'       => Controller::formatNumber($row->month7, 0),
+                    'month8'       => Controller::formatNumber($row->month8, 0),
+                    'month9'       => Controller::formatNumber($row->month9, 0),
+                    'month10'      => Controller::formatNumber($row->month10, 0),
+                    'month11'      => Controller::formatNumber($row->month11, 0),
+                    'month12'      => Controller::formatNumber($row->month12, 0),
+                    'total'        => Controller::formatNumber($total, 0)
+                )
+            );
+
+            $this->template->parse('results', 'resultsBlock', true);
+        }
+
+        $urlGenerateReport = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
-                'action' => self::GetSalesByCustomerDataAction
+                'action' => 'spendByManufacturer'
             )
         );
-        $customerName = null;
-        if ($this->getParam('customerID')) {
-            $dbeCustomer = new DBECustomer($this);
-            $dbeCustomer->getRow($this->getParam('customerID'));
-            $customerName = $dbeCustomer->getValue(DBECustomer::name);
-        }
 
         $this->template->set_var(
             array(
-                'customerPopupURL' => $customerPopupURL,
-                'customerName'     => $customerName,
-                'customerID'       => $this->getParam('customerID'),
-                'sectorID'         => $this->getParam('sectorID'),
-                'noOfPcs'          => $this->getParam('noOfPcs'),
-                'fetchDataUrl'     => $fetchDataUrl
+                'urlGenerateReport' => $urlGenerateReport,
+                'manufacturerName'  => $this->getParam('manufacturerName'),
+                'grandTotal'        => Controller::formatNumber($grandTotal, 0)
             )
         );
 
-        $this->template->parse("CONTENTS", "ManagementReportsSalesCustomer");
+        $this->template->parse("CONTENTS", "ManagementReportsSpendManufacturer");
 
         $this->parsePage();
 
-    } // end function salesByCustomer
-
-    /**
-     * Get and parse year drop-down selector
-     * @access private
-     * @param $selectedYear
-     */
-    function parseYearSelector($selectedYear)
-    {
-        $thisYear = date('Y');
-
-        for ($year = $thisYear; $year >= $thisYear - 3; $year--) {
-
-            $yearSelected = ($selectedYear == $year) ? CT_SELECTED : null;
-
-            $this->template->set_var(
-                array(
-                    'yearSelected' => $yearSelected,
-                    'year'         => $year
-                )
-            );
-
-            $this->template->parse('years', 'yearBlock', true);
-        }
-    }
-
-    private function parseNoOfPcs(Template $template, $selectedNoOfPcs)
-    {
-        $template->set_block('ManagementReportsSalesCustomer', 'noOfPcsBlock', 'noOfPcsSelector');
-        $options = [
-            "Search All",
-            "0",
-            "1-5",
-            "6-10",
-            "11-25",
-            "26-50",
-            "51-99",
-            "100+"
-        ];
-
-        foreach ($options as $option) {
-            $isSelected = $selectedNoOfPcs ? ($selectedNoOfPcs == $option ? CT_SELECTED : null) : ($option === "Search All" ? CT_SELECTED : null);
-            $value = $option;
-            if ($option === 'Search All') {
-                $value = null;
-            }
-
-            $this->template->set_var(
-                array(
-                    'noOfPcsSelected'    => $isSelected ? CT_SELECTED : null,
-                    'noOfPcsDescription' => $option,
-                    'noOfPcsValue'       => $value
-                )
-            );
-
-            $this->template->parse('noOfPcsSelector', 'noOfPcsBlock', true);
-        }
-    }
-
-    private function parseSectorSelector($selectedSectorID)
-    {
-
-        $buSector = new BUSector($this);
-
-        $dsResults = new DataSet($this);
-        $buSector->getAll($dsResults);
-
-
-        $this->template->set_var(
-            array(
-                'selectedSector'    => $selectedSectorID ? CT_SELECTED : null,
-                'sectorID'          => null,
-                'sectorDescription' => "Search All"
-            )
-        );
-
-        $this->template->parse('sectors', 'sectorBlock', true);
-
-        while ($dsResults->fetchNext()) {
-
-            $sectorID = $dsResults->getValue(DBESector::sectorID);
-            $sectorDescription = $dsResults->getValue(DBESector::description);
-            $selectedSector = ($selectedSectorID == $sectorID) ? CT_SELECTED : null;
-
-            $this->template->set_var(
-                array(
-                    'selectedSector'    => $selectedSector,
-                    'sectorID'          => $sectorID,
-                    'sectorDescription' => $sectorDescription
-                )
-            );
-
-            $this->template->parse('sectors', 'sectorBlock', true);
-        }
     }
 }
