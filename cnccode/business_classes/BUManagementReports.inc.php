@@ -5,6 +5,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
@@ -189,8 +190,7 @@ class BUManagementReports extends Business
         noOfPCs,
         noOfServers,
         noOfSites,
-        sec_desc AS sector
-        ";
+        sec_desc AS sector ";
 
         for ($month = 1; $month <= 12; $month++) {
 
