@@ -137,7 +137,7 @@ do {
         continue;
     }
 
-    if ( count($data['errors'])) {
+    if (count($data['errors'])) {
         foreach ($data['errors'] as $error) {
             $logger->warning("Error received from powershell output, but the execution was not stopped:  " . $error);
         }
@@ -146,6 +146,7 @@ do {
 
     $mailboxes = $data['mailboxes'];
     $licenses = $data['licenses'];
+    $devices = $data['devices'];
 
     $spreadsheet = new Spreadsheet();
     $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
@@ -182,8 +183,20 @@ do {
         }
     }
 
-    if (!count($mailboxes) && !count($licenses)) {
-        $logger->warning('This customer does not have a licences nor mailboxes');
+    if (count($devices)) {
+        try {
+            processDevices(
+                $spreadsheet,
+                $devices,
+                $logger
+            );
+        } catch (\Exception $exception) {
+            $logger->error('Failed to process devices for customer: ' . $exception->getMessage());
+        }
+    }
+
+    if (!count($mailboxes) && !count($licenses) && !count($devices)) {
+        $logger->warning('This customer does not have a licences nor mailboxes nor devices');
         continue;
     }
     global $db;
@@ -293,6 +306,43 @@ do {
         $logger->error('Failed to save file, possibly file open: ' . $exception->getMessage());
     }
 } while ($dbeCustomer->fetchNext());
+
+function processDevices(Spreadsheet $spreadsheet,
+                        $devices,
+                        LoggerCLI $logger
+)
+{
+    $devicesSheet = $spreadsheet->createSheet();
+    $devicesSheet->setTitle('Mobile Devices');
+    $devicesSheet->fromArray(
+        [
+            "Display Name",
+            "Email",
+            "Device Type",
+            "Device Model",
+            "Device Friendly Name",
+            "Device OS",
+            "First Sync",
+            "Most Recent Sync"
+        ],
+        null,
+        'A1'
+    );
+    $devicesSheet->fromArray(
+        $devices,
+        null,
+        'A2',
+        true
+    );
+    $highestRow = $devicesSheet->getHighestRow();
+    $highestColumn = $devicesSheet->getHighestColumn();
+    $devicesSheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
+    $devicesSheet->getStyle("A1:{$highestColumn}{$highestRow}")->getAlignment()->setHorizontal('center');
+    foreach (range('A', $highestColumn) as $col) {
+        $devicesSheet->getColumnDimension($col)
+            ->setAutoSize(true);
+    }
+}
 
 /**
  * @param Spreadsheet $spreadSheet

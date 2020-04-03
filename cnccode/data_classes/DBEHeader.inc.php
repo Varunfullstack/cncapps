@@ -105,6 +105,7 @@ class DBEHeader extends DBEntity
     const yearlySicknessThresholdWarning = 'yearlySicknessThresholdWarning';
     const cDriveFreeSpaceWarningPercentageThreshold = 'cDriveFreeSpaceWarningPercentageThreshold';
     const otherDriveFreeSpaceWarningPercentageThreshold = 'otherDriveFreeSpaceWarningPercentageThreshold';
+    const office365ActiveSyncWarnAfterXDays = "office365ActiveSyncWarnAfterXDays";
 
     /**
      * calls constructor()
@@ -608,6 +609,7 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::yearlySicknessThresholdWarning, DA_INTEGER, DA_NOT_NULL);
         $this->addColumn(self::cDriveFreeSpaceWarningPercentageThreshold, DA_INTEGER, DA_NOT_NULL);
         $this->addColumn(self::otherDriveFreeSpaceWarningPercentageThreshold, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::office365ActiveSyncWarnAfterXDays, DA_INTEGER, DA_NOT_NULL);
 
         $this->setPK(0);
         $this->setAddColumnsOff();

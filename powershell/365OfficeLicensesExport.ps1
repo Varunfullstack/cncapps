@@ -23,15 +23,10 @@ try
     Import-PSSession $Session -DisableNameChecking -AllowClobber | Out-Null
     Start-Sleep -s 5
     $MailboxesReport = @()
+    $DevicesReport = @()
     $Mailboxes = Get-Mailbox -ResultSize Unlimited | Where-Object { $_.RecipientTypeDetails -ne "DiscoveryMailbox" }
     $MSOLDomain = Get-MsolDomain | Where-Object { $_.Authentication -eq "Managed" -and $_.IsDefault -eq "True" }
-    [array]$LicensesData = Get-MsolAccountSku | Select-Object  AccountSkuId, ActiveUnits, @{ Name = 'Unallocated'; Expression = { $_.ActiveUnits - $_.ConsumedUnits } }, AccountObjectID
-
-    if ($LicensesData.Length)
-    {
-        $tenantID = $LicensesData[0].AccountObjectID
-    }
-
+    [array]$LicensesData = Get-MsolAccountSku | Select-Object  AccountSkuId, ActiveUnits, @{ Name = 'Unallocated'; Expression = { $_.ActiveUnits - $_.ConsumedUnits } }
     $TenantDomainName = (Get-AcceptedDomain | Where-Object { $_.DomainName -like "*onmicrosoft.com" -and $_.DomainName -notlike "*mail.onmicrosoft.com" }).DomainName
     $SharePointName = $TenantDomainName.split('.')[0]
     $SharePointAdmin = "-admin.sharepoint.com"
@@ -52,6 +47,16 @@ try
     {
         $DisplayName = $mailbox.DisplayName
         $UserPrincipalName = $mailbox.UserPrincipalName
+        $devices = Get-MobileDeviceStatistics -Mailbox $mailbox.samaccountname
+        if ($devices)
+        {
+            foreach ($device in $devices)
+            {
+                $DeviceInfo = $device | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'Email'; Expression = { $UserPrincipalName } }, DeviceType, DeviceModel, DeviceFriendlyName, DeviceOS, @{ Name = 'FirstSyncTime'; Expression = { "{0:dd-MM-yyyy HH.mm}" -f $_.FirstSyncTime } }, @{ Name = 'LastSuccessSync'; Expression = { "{0:dd-MM-yyyy HH.mm}" -f $_.LastSuccessSync } }
+            }
+            $DevicesReport += $DeviceInfo
+        }
+
         $storageItem = $storageData |Sort-Object -Property LastContentModifiedDate -Descending|  Where-Object { $_.Owner -eq $UserPrincipalName }
         $oneDriveStorageUsage = 0
         if ($null -ne $storageItem)
@@ -104,11 +109,13 @@ try
         }
     }
     [array]$MailboxesReport = $MailboxesReport | Sort-Object TotalItemSize -Descending
+    [array]$DevicesReport = $DevicesReport | Sort-Object DisplayName
     $Report = @{
         mailboxes = $MailboxesReport
         licenses = $LicensesData
         totalOneDriveStorageUsed = $totalOneDriveStorageUsed
         totalEmailStorageUsed = $totalEmailStorageUsed
+        devices = $DevicesReport
         errors = [array]$errors
     }
     Get-PSSession | Remove-PSSession
