@@ -16,7 +16,7 @@ require_once($cfg["path_dbe"] . "/DBEPassword.inc.php");
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
-require './../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 global $db;
 
 $dbeCustomer = new DBECustomer($thing);
@@ -123,19 +123,15 @@ while ($dbeCustomer->fetchNext()) {
   locations.name AS "Location",
   computers.name AS "Computer Name",
   SUBSTRING_INDEX(lastusername, \'\\\\\', - 1) AS "Last User",
-  computers.localaddress AS "IP Address",
    DATE_FORMAT(
     computers.lastContact,
     \'%d/%m/%Y %H:%i:%s\'
   ) AS "Last Contact",
   inv_chassis.productname AS "Model",
   if(inv_chassis.serialnumber like \'%VMware%\', null,inv_chassis.serialnumber )        AS "Serial No.",
-  DATE_FORMAT(
-    STR_TO_DATE(inv_bios.biosdate, \'%m/%d/%Y\'),
-    \'%d/%m/%Y\'
-  ) AS "BIOS Date",
+ if(inv_chassis.productname = "VMware Virtual Platform", "Not Applicable",coalesce((select PurchaseDate from plugin_warrantymaster_aux where ComputerID = computers.computerid ), "Unknown")) as PurchaseDate,
+  if(inv_chassis.productname = "VMware Virtual Platform", "Not Applicable",coalesce((select ExpiryDate from plugin_warrantymaster_aux where ComputerID = computers.computerid ), "Unknown")) as ExpiryDate,
   processor.name AS "CPU",
-  cim_processorfamily.value AS "CPU Type",
   computers.totalmemory AS "Memory",
   SUM(drives.Size) AS "Total Disk",
   if(exd.`Bitlocker Enabled` and exd.`Bitlocker Password/Key` regexp \'[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}\',\'Encrypted\',null) as \'Drive Encryption\',
@@ -145,7 +141,7 @@ while ($dbeCustomer->fetchNext()) {
     - 1
   ) AS "Operating System",
   computers.version AS "Version",
-       (select endOfSupportDate from ('.$fakeTable.') f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `OS End of Support Date`,
+       (select endOfSupportDate from (' . $fakeTable . ') f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `OS End of Support Date`,
   computers.domain AS \'Domain\',
   SUBSTRING_INDEX(
     software.name,
@@ -156,7 +152,7 @@ while ($dbeCustomer->fetchNext()) {
   DATE_FORMAT(
     STR_TO_DATE(computers.VirusDefs, \'%Y%m%d\'),
     \'%d/%m/%Y\'
-  ) AS "AV Definition" 
+  ) AS "AV Definition"
 FROM
   computers 
   LEFT JOIN (clients) 
@@ -175,8 +171,6 @@ inv_processor
 WHERE inv_processor.Enabled = 1
 GROUP BY inv_processor.computerid) processor
 ON computers.computerid = processor.computerid
-LEFT JOIN (cim_processorfamily)
-ON processor.family = cim_processorfamily.id
   LEFT JOIN (software) 
     ON (
       computers.computerid = software.computerid 
@@ -208,10 +202,6 @@ ON processor.family = cim_processorfamily.id
       AND software.name NOT LIKE "%media%" 
       AND software.name NOT LIKE "%ODF%" 
       AND software.name NOT LIKE "%SDK%"
-    ) 
-  LEFT JOIN (inv_bios) 
-    ON (
-      computers.computerid = inv_bios.computerid
     ) 
   LEFT JOIN (inv_chassis) 
     ON (
@@ -280,7 +270,7 @@ ORDER BY clients.name,
             if (!$isHeaderSet) {
                 $summarySheet->fromArray(array_merge(["Customer Name"], $keys));
                 $currentSummaryRow = 2;
-                $summarySheet->getStyle("A1:U1")->getFont()->setBold(true);
+                $summarySheet->getStyle("A1:{$summarySheet->getHighestColumn()}1")->getFont()->setBold(true);
                 $isHeaderSet = true;
             }
 
@@ -293,8 +283,9 @@ ORDER BY clients.name,
 
             $summarySheet->fromArray($summaryData, null, 'A' . $currentSummaryRow);
         }
-
-        $sheet->getStyle("A1:T1")->getFont()->setBold(true);
+        $highestColumn = $sheet->getHighestColumn();
+        $highestRow = $sheet->getHighestRow();
+        $sheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
 
         $sheet->setAutoFilter(
             $sheet->calculateWorksheetDimension()
@@ -321,7 +312,7 @@ ORDER BY clients.name,
             }
 
             if ($color) {
-                $sheet->getStyle("A$currentRow:T$currentRow")
+                $sheet->getStyle("A$currentRow:$highestColumn$currentRow")
                     ->getFill()
                     ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                     ->getStartColor()
@@ -329,7 +320,9 @@ ORDER BY clients.name,
 
                 if ($generateSummary) {
                     $currentSummaryStyleRow = $currentSummaryRow + $i;
-                    $summarySheet->getStyle("A$currentSummaryStyleRow:U$currentSummaryStyleRow")
+                    $summarySheet->getStyle(
+                        "A$currentSummaryStyleRow:{$summarySheet->getHighestColumn()}$currentSummaryStyleRow"
+                    )
                         ->getFill()
                         ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                         ->getStartColor()
@@ -339,7 +332,7 @@ ORDER BY clients.name,
 
         }
         $currentSummaryRow += count($data);
-        foreach (range('A', $sheet->getHighestDataColumn()) as $col) {
+        foreach (range('A', $highestColumn) as $col) {
             $sheet->getColumnDimension($col)
                 ->setAutoSize(true);
         }
