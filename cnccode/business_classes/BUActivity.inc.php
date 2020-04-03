@@ -2818,6 +2818,8 @@ class BUActivity extends Business
                 " by " . $userName;
             $this->createFixedActivity($dbeCallActivity->getValue(DBECallActivity::problemID), $resolutionSummary);
             $problem->setValue(DBEProblem::status, 'F');
+            $completeDate = (new DateTime())->add(new DateInterval('P2D'));
+            $problem->setValue(DBEProblem::completeDate, $completeDate->format(DATE_MYSQL_DATE));
             $problem->updateRow();
         }
 
