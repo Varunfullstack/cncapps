@@ -1829,6 +1829,7 @@ class CTCustomer extends CTCNC
                 'noOfServers'                    => $this->dsCustomer->getValue(DBECustomer::noOfServers),
                 'activeDirectoryName'            => $this->dsCustomer->getValue(DBECustomer::activeDirectoryName),
                 'noOfSites'                      => $this->dsCustomer->getValue(DBECustomer::noOfSites),
+                'noOfPCs'                        => $this->dsCustomer->getValue(DBECustomer::noOfPCs),
                 'modifyDate'                     => $this->dsCustomer->getValue(DBECustomer::modifyDate),
                 'reviewDate'                     => Controller::dateYMDtoDMY(
                     $this->dsCustomer->getValue(DBECustomer::reviewDate)
@@ -1873,37 +1874,6 @@ class CTCustomer extends CTCNC
                     'addSiteText' => CTCUSTOMER_TXT_ADD_SITE,
                     'addSiteURL'  => $addSiteURL
                 )
-            );
-        }
-        $noOfPCs =
-            array(
-                '0',
-                '1-5',
-                '6-10',
-                '11-25',
-                '26-50',
-                '51-99',
-                '100+'
-            );
-
-        $this->template->set_block(
-            'CustomerEdit',
-            'noOfPCsBlock',
-            'noOfPCs'
-        );
-        foreach ($noOfPCs as $index => $value) {
-            $this->template->set_var(
-                array(
-                    'noOfPCsValue'    => $value,
-                    'noOfPCsSelected' => $value == $this->dsCustomer->getValue(
-                        DBECustomer::noOfPCs
-                    ) ? CT_SELECTED : null
-                )
-            );
-            $this->template->parse(
-                'noOfPCs',
-                'noOfPCsBlock',
-                true
             );
         }
 
