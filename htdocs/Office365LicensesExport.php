@@ -414,11 +414,12 @@ function processMailboxes(Spreadsheet $spreadSheet,
         true
     );
     $highestRow = count($mailboxes) + 2;
+    $licensedUsersNumber = $totalizationRow['LicensedUsers'];
     $totalizationRow['LicensedUsers'] = "$totalizationRow[LicensedUsers] Licensed Users";
     if ($totalizationRow['LicensedUsers']) {
         $updateCustomer = new DBECustomer($thing);
         $updateCustomer->getRow($dbeCustomer->getValue(DBECustomer::customerID));
-        $updateCustomer->setValue(DBECustomer::licensedOffice365Users, $totalizationRow['LicensedUsers']);
+        $updateCustomer->setValue(DBECustomer::licensedOffice365Users, $licensedUsersNumber);
         $updateCustomer->updateRow();
     }
     $mailboxesSheet->fromArray(
