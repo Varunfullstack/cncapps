@@ -6764,7 +6764,7 @@ is currently a balance of ';
     /**
      * @param $ordheadID
      * @param DataSet $dsInput
-     * @param bool|int $selectedOrderLine
+     * @param bool|int|array $selectedOrderLine
      * @param int $queue
      * @return string
      * @throws Exception
@@ -6953,24 +6953,8 @@ is currently a balance of ';
 
         $dbeProblem->insertRow();
 
-        $reason = null;
+        $reason = "<p>An order has been received for the items below:</p>";
 
-        /* Use type of first SO line as first line of reason */
-        while ($dsOrdline->fetchNext()) {
-
-            if ($dsOrdline->getValue(DBEOrdline::itemID) &&
-                (!is_array($selectedOrderLine) ||
-                    in_array(
-                        $dsOrdline->getValue(DBEOrdline::sequenceNo),
-                        $selectedOrderLine
-                    )
-                )
-            ) {
-                $dbeItem->getRow($dsOrdline->getValue(DBEOrdline::itemID));
-                $dbeItemType->getRow($dbeItem->getValue(DBEItem::itemTypeID));
-                $reason = '<P>' . $dbeItemType->getValue(DBEItemType::description) . '</P><BR/>';
-            }
-        }
         // insert selected items
         $reason .= '<table>';
 
@@ -6980,10 +6964,7 @@ is currently a balance of ';
 
         while ($dsOrdline->fetchNext()) {
 
-            if (
-
-                !$selectedOrderLine OR
-
+            if (!$selectedOrderLine OR
                 ($selectedOrderLine &&
                     in_array(
                         $dsOrdline->getValue(DBEOrdline::sequenceNo),
