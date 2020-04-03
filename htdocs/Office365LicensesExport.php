@@ -368,6 +368,12 @@ function processDevices(Spreadsheet $spreadsheet,
                 ->setARGB($color);
         }
     }
+    $dateTime = new DateTime();
+    $devicesSheet->fromArray(
+        ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
+        null,
+        'A' . ($highestRow + 2)
+    );
 }
 
 /**
