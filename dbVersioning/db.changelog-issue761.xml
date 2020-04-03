@@ -45,7 +45,7 @@
             </sqlCheck>
         </preConditions>
         <sql splitStatements="true">
-            ALTER TABLE `cncappsdev`.`customer`
+            ALTER TABLE `customer`
                 CHANGE `noOfPCs` `noOfPCs` VARCHAR(10) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '0' NULL;
         </sql>
         <rollback/>
