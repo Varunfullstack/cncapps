@@ -188,7 +188,8 @@ do {
             processDevices(
                 $spreadsheet,
                 $devices,
-                $logger
+                $logger,
+                $dbeHeader
             );
         } catch (\Exception $exception) {
             $logger->error('Failed to process devices for customer: ' . $exception->getMessage());
@@ -309,7 +310,8 @@ do {
 
 function processDevices(Spreadsheet $spreadsheet,
                         $devices,
-                        LoggerCLI $logger
+                        LoggerCLI $logger,
+                        $dbeHeader
 )
 {
     $devicesSheet = $spreadsheet->createSheet();
@@ -341,6 +343,30 @@ function processDevices(Spreadsheet $spreadsheet,
     foreach (range('A', $highestColumn) as $col) {
         $devicesSheet->getColumnDimension($col)
             ->setAutoSize(true);
+    }
+    $thresholdDate = (new DateTime())->sub(
+        new DateInterval('P' . $dbeHeader->getValue(DBEHeader::office365ActiveSyncWarnAfterXDays) . 'D')
+    );
+    foreach ($devices as $row => $device) {
+        $currentRow = $row + 2;
+        $color = null;
+        if (!$device['LastSuccessSync']) {
+            $color = "FFFFC7CE";
+        } else {
+            $lastSyncDate = DateTime::createFromFormat('d-m-Y H.i', $device['LastSuccessSync']);
+            if ($lastSyncDate < $thresholdDate) {
+                $color = "FFFFC7CE";
+            }
+        }
+
+
+        if ($color) {
+            $devicesSheet->getStyle("A$currentRow:{$highestColumn}$currentRow")
+                ->getFill()
+                ->setFillType(Fill::FILL_SOLID)
+                ->getStartColor()
+                ->setARGB($color);
+        }
     }
 }
 

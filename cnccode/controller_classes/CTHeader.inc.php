@@ -571,6 +571,12 @@ class CTHeader extends CTCNC
                 DBEHeader::office365MailboxRedWarningThreshold . 'Message'           => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEHeader::office365MailboxRedWarningThreshold)
                 ),
+                DBEHeader::office365ActiveSyncWarnAfterXDays                         => $dsHeader->getValue(
+                    DBEHeader::office365ActiveSyncWarnAfterXDays
+                ),
+                DBEHeader::office365ActiveSyncWarnAfterXDays . 'Message'             => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEHeader::office365ActiveSyncWarnAfterXDays)
+                ),
                 DBEHeader::autoCriticalP1Hours                                       => $dsHeader->getValue(
                     DBEHeader::autoCriticalP1Hours
                 ),
