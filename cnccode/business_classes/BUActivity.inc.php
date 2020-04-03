@@ -110,6 +110,7 @@ class BUActivity extends Business
     const customerActivityFormCustomerName = 'customerName';
     const customerActivityFormFromDate = 'fromDate';
     const customerActivityFormToDate = 'toDate';
+    const SalesOrderCreatedRequest = 'SalesOrderCreatedRequest';
 
 
     /** @var Template */
@@ -1133,8 +1134,36 @@ class BUActivity extends Business
         }
         $selfFlagName = null;
         $othersFlagName = null;
+        $responseDetails = ", " . strtolower($this->getResponseDetails($dbeFirstActivity));
         switch ($category) {
-            case  self::InitialCustomerEmailCategory:
+            case self::SalesOrderCreatedRequest:
+                // the last activity should be an initial
+                if (
+                    $dbeFirstActivity->getValue(DBECallActivity::callActTypeID) !=
+                    $dbeLastActivity->getValue(
+                        DBECallActivity::callActTypeID
+                    )
+                ) {
+                    throw new Exception('Flagged as initial, but the last and first activities do not match');
+                }
+                $selfFlagName = DBEContact::initialLoggingEmailFlag;
+                $othersFlagName = DBEContact::othersInitialLoggingEmailFlag;
+                $responseDetails = null;
+
+                switch ($dbeJProblem->getValue(DBEProblem::queueNo)) {
+                    case 3:
+                        $fields['submittedTo'] = 'Small Projects';
+                        break;
+                    case 5:
+                        $fields['submittedTo'] = 'Projects';
+                        break;
+                }
+
+
+                $templateName = 'ServiceLoggedEmail';
+                $subjectSuffix = 'New Request Logged';
+                break;
+            case            self::InitialCustomerEmailCategory:
 
                 // the last activity should be an initial
                 if (
@@ -1313,9 +1342,7 @@ class BUActivity extends Business
                 'priority'              => $this->priorityArray[$dbeJProblem->getValue(DBEJProblem::priority)],
                 'reason'                => $dbeFirstActivity->getValue(DBEJCallActivity::reason),
                 'lastActivityReason'    => $activityReason,
-                'responseDetails'       => strtolower(
-                    $this->getResponseDetails($dbeFirstActivity)
-                ),
+                'responseDetails'       => $responseDetails,
                 'technicianResponsible' => $technicianResponsibleName
             )
         );
@@ -1371,29 +1398,6 @@ class BUActivity extends Business
         );
     }
 
-    function getFixedActivityInProblem($problemID)
-    {
-
-        $dbeCallActivity = new DBEJCallActivity($this);
-
-        $dbeCallActivity->getRowsByProblemID(
-            $problemID,
-            false,
-            false,
-            true,
-            null,
-            false,
-            57
-
-        );
-
-        if ($dbeCallActivity->fetchNext()) {
-            return $dbeCallActivity;
-        } else {
-            return false;
-        }
-    } // end sendUpdatedByAnotherUserEmail
-
     /**
      * @param DBEJCallActivity $dbeJCallActivity
      * @return string
@@ -1420,7 +1424,7 @@ class BUActivity extends Business
         }
 
         return $responseDetails;
-    }
+    } // end sendUpdatedByAnotherUserEmail
 
     function getSlaResponseHours($priority,
                                  $customerID,
@@ -1470,6 +1474,29 @@ class BUActivity extends Business
         }
 
         return $slaHours;
+    }
+
+    function getFixedActivityInProblem($problemID)
+    {
+
+        $dbeCallActivity = new DBEJCallActivity($this);
+
+        $dbeCallActivity->getRowsByProblemID(
+            $problemID,
+            false,
+            false,
+            true,
+            null,
+            false,
+            57
+
+        );
+
+        if ($dbeCallActivity->fetchNext()) {
+            return $dbeCallActivity;
+        } else {
+            return false;
+        }
     }
 
     function sendPriorityFiveFixedEmail($problemID)
@@ -6876,7 +6903,9 @@ is currently a balance of ';
             $ordheadID
         );
 
+        $informCustomer = false;
         if ($dsInput->getValue(BURenContract::serviceRequestPriority) == 5) {
+            $informCustomer = true;
             $buHeader = new BUHeader($this);
             $dsHeader = new DataSet($this);
             $buHeader->getHeader($dsHeader);
@@ -6923,6 +6952,7 @@ is currently a balance of ';
         }
 
         $dbeProblem->insertRow();
+
         $reason = null;
 
         /* Use type of first SO line as first line of reason */
@@ -7085,6 +7115,9 @@ is currently a balance of ';
     */
         $this->sendSalesRequestAlertEmail($ret);
 
+        if ($informCustomer) {
+            $this->sendEmailToCustomer($dbeProblem->getValue(DBEProblem::problemID), self::SalesOrderCreatedRequest);
+        }
         return $ret;
 
     }
