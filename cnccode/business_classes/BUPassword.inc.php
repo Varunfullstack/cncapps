@@ -7,6 +7,7 @@
 
 use CNCLTD\Encryption;
 
+global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_dbe"] . "/DBEPassword.inc.php");
 
@@ -64,12 +65,16 @@ class BUPassword extends Business
 //        ));
 //    }
 
+    /**
+     * @param $passwordID
+     * @param DBEUser $archivingUser
+     * @throws Exception
+     */
     function archive($passwordID,
                      DBEUser $archivingUser
     )
     {
         $passwordItem = new DBEPassword($this);
-
         $passwordItem->getRow($passwordID);
         $passwordItem->setValue(
             DBEPassword::archivedAt,

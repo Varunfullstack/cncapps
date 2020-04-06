@@ -16,6 +16,7 @@ This project changes will be shown here.
 - Issue 787 - History of SR Pop up
 - Issue 806 - Move Support Level column on customer page
 - Issue 768 - Approval required for reopening of SRs by customer
+- Issue 788 - Toggle higher level passwords
 ### Fixed
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
 - Issue 773 - Office 365 Backup Licenses Not Updating Contracts

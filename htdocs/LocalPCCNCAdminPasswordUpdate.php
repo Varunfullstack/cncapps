@@ -7,6 +7,7 @@
  */
 
 require_once("config.inc.php");
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
 require_once($cfg["path_dbe"] . "/DBEOSSupportDates.php");
 require_once($cfg["path_dbe"] . "/DBEUser.inc.php");
