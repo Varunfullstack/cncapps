@@ -21,10 +21,13 @@ global $db;
 
 $dbeCustomer = new DBECustomer($thing);
 
-$dbeCustomer->getActiveCustomers();
 $generateSummary = isset($_REQUEST['generateSummary']);
-$customerIDs = [];
-
+$customerID = isset($_REQUEST['customerID']) ? $_REQUEST['customerID'] : null;
+if ($customerID) {
+    $dbeCustomer->getRow($customerID);
+} else {
+    $dbeCustomer->getActiveCustomers();
+}
 //we are going to use this to add to the monitoring db
 $dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
 $options = [
@@ -84,7 +87,6 @@ if ($generateSummary) {
     $isHeaderSet = false;
 }
 
-
 function getUnrepeatedUsername($str)
 {
     $n = strlen($str);
@@ -128,9 +130,20 @@ while ($dbeCustomer->fetchNext()) {
     \'%d/%m/%Y %H:%i:%s\'
   ) AS "Last Contact",
   inv_chassis.productname AS "Model",
+ if(inv_chassis.productname like "%VMware%", "Not Applicable",coalesce((select DATE_FORMAT(PurchaseDate,"%d-%m-%Y") from plugin_warrantymaster_aux where ComputerID = computers.computerid ), "Unknown")) as "Warranty Start Date",
+  if(inv_chassis.productname like "%VMware%", "Not Applicable",coalesce((select DATE_FORMAT(ExpiryDate,"%d-%m-%Y") from plugin_warrantymaster_aux where ComputerID = computers.computerid ), "Unknown")) as "Warranty Expiry Date",
+IF(
+      (SELECT
+        ExpiryDate
+      FROM
+        plugin_warrantymaster_aux
+      WHERE ComputerID = computers.computerid) IS NOT NULL,
+      (SELECT round(TIMESTAMPDIFF(YEAR, PurchaseDate, CURDATE()) + TIMESTAMPDIFF(Month, PurchaseDate, CURDATE())/12,2)  FROM
+        plugin_warrantymaster_aux
+      WHERE ComputerID = computers.computerid),
+      NULL
+    ) AS "Age in Years",
   if(inv_chassis.serialnumber like \'%VMware%\', null,inv_chassis.serialnumber )        AS "Serial No.",
- if(inv_chassis.productname = "VMware Virtual Platform", "Not Applicable",coalesce((select PurchaseDate from plugin_warrantymaster_aux where ComputerID = computers.computerid ), "Unknown")) as PurchaseDate,
-  if(inv_chassis.productname = "VMware Virtual Platform", "Not Applicable",coalesce((select ExpiryDate from plugin_warrantymaster_aux where ComputerID = computers.computerid ), "Unknown")) as ExpiryDate,
   processor.name AS "CPU",
   computers.totalmemory AS "Memory",
   SUM(drives.Size) AS "Total Disk",
@@ -222,10 +235,7 @@ ON computers.computerid = processor.computerid
   on (exd.computerid = computers.computerid)
     where clients.externalID = ? 
 GROUP BY computers.computerid 
-ORDER BY clients.name,
-  computers.os,
-  computers.name,
-  software.name';
+ORDER BY Location, `Computer Name`';
 
     $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
     $customerName = $dbeCustomer->getValue(DBECustomer::name);
@@ -244,6 +254,7 @@ ORDER BY clients.name,
             );
         var_dump($query);
         echo ' </div>';
+        exit;
         continue;
     }
     $data = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -336,7 +347,7 @@ ORDER BY clients.name,
             $sheet->getColumnDimension($col)
                 ->setAutoSize(true);
         }
-
+        $sheet->getStyle($sheet->calculateWorksheetDimension())->getAlignment()->setHorizontal('center');
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $customerFolder = $buCustomer->getCustomerFolderPath($customerID);
         $folderName = $customerFolder . "\Review Meetings\\";
@@ -419,6 +430,7 @@ $tempFileName = null;
 if ($generateSummary) {
     echo '<h1>Generating Summary</h1>';
     $summarySheet->setAutoFilter($summarySheet->calculateWorksheetDimension());
+    $summarySheet->getStyle($summarySheet->calculateWorksheetDimension())->getAlignment()->setHorizontal('center');
     foreach (range('A', $summarySheet->getHighestDataColumn()) as $col) {
         $summarySheet->getColumnDimension($col)
             ->setAutoSize(true);
