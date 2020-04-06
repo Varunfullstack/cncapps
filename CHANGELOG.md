@@ -24,6 +24,7 @@ This project changes will be shown here.
 - Issue 795 - Show Special Attention when logging a new SR
 - Issue 761 - Report on CWA Agent and O365 licenses with Meeting Agenda
 - Issue 809 - Top align sales requests & change requests
+- Issue 979 - Order confirmation email to customer when creating P5
 ### Fixed
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
 - Issue 773 - Office 365 Backup Licenses Not Updating Contracts
