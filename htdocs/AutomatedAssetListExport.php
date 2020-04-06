@@ -133,16 +133,27 @@ while ($dbeCustomer->fetchNext()) {
  if(inv_chassis.productname like "%VMware%", "Not Applicable",coalesce((select DATE_FORMAT(PurchaseDate,"%d-%m-%Y") from plugin_warrantymaster_aux where ComputerID = computers.computerid ), "Unknown")) as "Warranty Start Date",
   if(inv_chassis.productname like "%VMware%", "Not Applicable",coalesce((select DATE_FORMAT(ExpiryDate,"%d-%m-%Y") from plugin_warrantymaster_aux where ComputerID = computers.computerid ), "Unknown")) as "Warranty Expiry Date",
 IF(
-      (SELECT
-        ExpiryDate
-      FROM
-        plugin_warrantymaster_aux
-      WHERE ComputerID = computers.computerid) IS NOT NULL,
-      (SELECT round(TIMESTAMPDIFF(YEAR, PurchaseDate, CURDATE()) + TIMESTAMPDIFF(Month, PurchaseDate, CURDATE())/12,2)  FROM
-        plugin_warrantymaster_aux
-      WHERE ComputerID = computers.computerid),
-      NULL
-    ) AS "Age in Years",
+    (SELECT
+      ExpiryDate
+    FROM
+      plugin_warrantymaster_aux
+    WHERE ComputerID = computers.computerid) IS NOT NULL,
+    (SELECT
+      ROUND(
+        TIMESTAMPDIFF(YEAR, PurchaseDate, CURDATE()) + (
+          (
+            TIMESTAMPDIFF(MONTH, PurchaseDate, CURDATE()) - (
+              TIMESTAMPDIFF(YEAR, PurchaseDate, CURDATE()) * 12
+            )
+          ) / 12
+        ),
+        2
+      )
+    FROM
+      plugin_warrantymaster_aux
+    WHERE ComputerID = computers.computerid),
+    NULL
+  ) AS "Age in Years",
   if(inv_chassis.serialnumber like \'%VMware%\', null,inv_chassis.serialnumber )        AS "Serial No.",
   processor.name AS "CPU",
   computers.totalmemory AS "Memory",
