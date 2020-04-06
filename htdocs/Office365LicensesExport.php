@@ -137,7 +137,7 @@ do {
         continue;
     }
 
-    if ( count($data['errors'])) {
+    if (count($data['errors'])) {
         foreach ($data['errors'] as $error) {
             $logger->warning("Error received from powershell output, but the execution was not stopped:  " . $error);
         }
@@ -146,6 +146,7 @@ do {
 
     $mailboxes = $data['mailboxes'];
     $licenses = $data['licenses'];
+
 
     $spreadsheet = new Spreadsheet();
     $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
@@ -508,6 +509,7 @@ function processLicenses(Spreadsheet $spreadSheet,
     $dateTime = new DateTime();
     $sparedLicenseErrors = [];
     foreach ($licenses as $key => $datum) {
+        $licenses[$key][array_key_last($licenses[$key])] = null;
         $dbeOffice365Licenses->getRowForLicense($datum['AccountSkuId']);
         if ($dbeOffice365Licenses->rowCount()) {
             $licenses[$key]['AccountSkuId'] = str_replace(
