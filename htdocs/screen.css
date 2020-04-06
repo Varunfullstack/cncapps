@@ -816,3 +816,7 @@ table.fixed_header {
 .greenPencil {
     color: green;
 }
+
+.topAlign > td {
+    vertical-align: top;
+}
