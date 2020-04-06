@@ -72,6 +72,8 @@ class CTTimeRequestDashboard extends CTCNC
         $buHeader = new BUHeader($this);
         $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
+        $isAdditionalTimeApprover = $this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover);
+
 
         while ($dbejCallActivity->fetchNext()) {
             $problemID = $dbejCallActivity->getValue(DBEJCallActivity::problemID);
@@ -94,7 +96,6 @@ class CTTimeRequestDashboard extends CTCNC
                 ]
             );
 
-            $processCRLink = "<a href='$processCRLink'>Process Time Request</a>";
 
             $requestingUserID = $dbejCallActivity->getValue(DBEJCallActivity::userID);
             $requestingUser = new DBEUser($this);
@@ -109,26 +110,41 @@ class CTTimeRequestDashboard extends CTCNC
             $dbeProblem = new DBEJProblem($this);
             $dbeProblem->getRow($problemID);
             $teamName = '';
+            $processCRLink = "<a href='$processCRLink'>Process Time Request</a>";
+            $isOverLimit = false;
             switch ($teamID) {
                 case 1:
                     $usedMinutes = $buActivity->getHDTeamUsedTime($problemID);
                     $assignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+                    $isOverLimit = $assignedMinutes >= $dsHeader->getValue(
+                            DBEHeader::hdTeamManagementTimeApprovalMinutes
+                        );
                     $teamName = 'Helpdesk';
                     break;
                 case 2:
                     $usedMinutes = $buActivity->getESTeamUsedTime($problemID);
                     $assignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+                    $isOverLimit = $assignedMinutes >= $dsHeader->getValue(
+                            DBEHeader::esTeamManagementTimeApprovalMinutes
+                        );
                     $teamName = 'Escalation';
                     break;
                 case 4:
                     $usedMinutes = $buActivity->getSPTeamUsedTime($problemID);
                     $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
+                    $isOverLimit = $assignedMinutes >= $dsHeader->getValue(
+                            DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
+                        );
                     $teamName = 'Small Projects';
                     break;
                 case 5:
                     $usedMinutes = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
                     $assignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
                     $teamName = 'Projects';
+            }
+
+            if ($isOverLimit && !$isAdditionalTimeApprover) {
+                $processCRLink = '';
             }
 
             $leftOnBudget = $assignedMinutes - $usedMinutes;

@@ -105,6 +105,9 @@ class DBEHeader extends DBEntity
     const yearlySicknessThresholdWarning = 'yearlySicknessThresholdWarning';
     const cDriveFreeSpaceWarningPercentageThreshold = 'cDriveFreeSpaceWarningPercentageThreshold';
     const otherDriveFreeSpaceWarningPercentageThreshold = 'otherDriveFreeSpaceWarningPercentageThreshold';
+    const hdTeamManagementTimeApprovalMinutes = "hdTeamManagementTimeApprovalMinutes";
+    const esTeamManagementTimeApprovalMinutes = "esTeamManagementTimeApprovalMinutes";
+    const smallProjectsTeamManagementTimeApprovalMinutes = "smallProjectsTeamManagementTimeApprovalMinutes";
 
     /**
      * calls constructor()
@@ -608,6 +611,9 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::yearlySicknessThresholdWarning, DA_INTEGER, DA_NOT_NULL);
         $this->addColumn(self::cDriveFreeSpaceWarningPercentageThreshold, DA_INTEGER, DA_NOT_NULL);
         $this->addColumn(self::otherDriveFreeSpaceWarningPercentageThreshold, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::hdTeamManagementTimeApprovalMinutes, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::esTeamManagementTimeApprovalMinutes, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::smallProjectsTeamManagementTimeApprovalMinutes, DA_INTEGER, DA_NOT_NULL);
 
         $this->setPK(0);
         $this->setAddColumnsOff();

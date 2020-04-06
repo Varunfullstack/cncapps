@@ -952,8 +952,32 @@ class CTCurrentActivityReport extends CTCNC
         );
 
         $rowCount = 0;
-
+        $buHeader = new BUHeader($this);
+        $buHeader->getHeader($dsHeader);
         while ($serviceRequests->fetchNext()) {
+            $totalActivityDurationHours = $serviceRequests->getValue(DBEJProblem::totalActivityDurationHours);
+            $totalActivityDurationMinutes = $totalActivityDurationHours * 60;
+            $timeSpentColorClass = null;
+            $compareMinutes = null;
+
+            if (in_array($queueNo, [1, 2, 3, 7])) {
+
+                switch ($serviceRequests->getValue(DBEJCallActivity::queueNo)) {
+                    case 1:
+                        $compareMinutes = $dsHeader->getValue(DBEHeader::hdTeamManagementTimeApprovalMinutes);
+                        break;
+                    case 2:
+                        $compareMinutes = $dsHeader->getValue(DBEHeader::esTeamManagementTimeApprovalMinutes);
+                        break;
+                    case 3:
+                        $compareMinutes = $dsHeader->getValue(
+                            DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
+                        );
+                }
+                $timeSpentColorClass = $totalActivityDurationMinutes >= $compareMinutes ? 'alert-field' : null;
+            }
+
+
             $linkAllocateAdditionalTime = null;
             $this->customerFilterList[$serviceRequests->getValue(DBEJProblem::customerID)] = $serviceRequests->getValue(
                 DBEJProblem::customerName
@@ -1143,7 +1167,6 @@ class CTCurrentActivityReport extends CTCNC
                 1
             );
 
-            $totalActivityDurationHours = $serviceRequests->getValue(DBEJProblem::totalActivityDurationHours);
 
             $dbeCustomer = new DBECustomer($this);
             $dbeCustomer->getRow($serviceRequests->getValue(DBEJProblem::customerID));
@@ -1159,6 +1182,7 @@ class CTCurrentActivityReport extends CTCNC
                     'priorityBgColor'            => $priorityBgColor,
                     'hoursRemainingBgColor'      => $hoursRemainingBgColor,
                     'totalActivityDurationHours' => $totalActivityDurationHours,
+                    'timeSpentColorClass'        => $timeSpentColorClass,
                     'hdRemaining'                => $hdRemaining,
                     'esRemaining'                => $esRemaining,
                     'smallProjectsTeamRemaining' => $smallProjectsTeamRemaining,

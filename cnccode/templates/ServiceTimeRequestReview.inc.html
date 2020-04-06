@@ -4,6 +4,66 @@
     function makeTimeNotRequired() {
         $('[name="allocatedTimeValue"]').attr('required', false);
     }
+
+    let timeSelectorElement = null;
+    let timeInputElement = null;
+    let allocationErrorElement = null;
+    let saveButtonElement = null;
+    const remainingLimitTime = {remainingLimitTime};
+    const isAdditionalTimeLimitApprover = {additionalTimeLimitApprover};
+    const minutesInADay = {minutesInADay};
+
+    $(function () {
+        timeSelectorElement = $('#allocatedTimeAmountSelector');
+        timeInputElement = $('input[name="allocatedTimeValue"]');
+        allocationErrorElement = $('#allocationError');
+        saveButtonElement = $('#saveButton');
+
+        checkRemainingTime();
+        timeSelectorElement.change(function () {
+            checkRemainingTime();
+        });
+        timeInputElement.change(function () {
+            checkRemainingTime();
+        })
+
+    });
+
+    function checkRemainingTime() {
+        if (!isAdditionalTimeLimitApprover) {
+            const timeSelectedOption = timeSelectorElement[0].selectedOptions[0];
+            const timeValue = +timeInputElement.val();
+            let totalMinutes = timeValue;
+            switch (timeSelectedOption.value) {
+                case 'hours':
+                    totalMinutes = timeValue * 60;
+                    break;
+                case 'days':
+                    totalMinutes = timeValue * minutesInADay;
+            }
+            if (remainingLimitTime < totalMinutes) {
+                disableSave('You are not allowed to add additional minutes to this SR for the selected team, please discuss this with management to proceed.');
+                return;
+            }
+        }
+        enableSave();
+        return;
+    }
+
+    function disableSave(allocationError = null) {
+        saveButtonElement.attr('disabled', 'disabled');
+        if (allocationError) {
+            allocationErrorElement.html(allocationError);
+        } else {
+            allocationErrorElement.html('');
+        }
+    }
+
+    function enableSave() {
+        saveButtonElement.removeAttr('disabled');
+        allocationErrorElement.html('');
+    }
+
 </script>
 <p><A
         href="#"
@@ -111,6 +171,9 @@
                     >Days
                     </option>
                 </select>
+                <span id="allocationError"
+                      class="redText"
+                ></span>
             </td>
         </tr>
         <tr>
@@ -133,6 +196,7 @@
                 <input type="submit"
                        name="Submit"
                        value="Approve"
+                       id="saveButton"
                 >
                 <input type="submit"
                        name="Submit"

@@ -6223,18 +6223,20 @@ class CTActivity extends CTCNC
     function allocateAdditionalTime()
     {
         $this->setMethodName('allocateAdditionalTime');
-
         $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem($this->getParam('problemID'));
-
         $this->setTemplateFiles(
             array(
                 'ServiceRequestAllocateAdditionalTime' => 'ServiceRequestAllocateAdditionalTime.inc'
             )
         );
+        $buHeader = new BUHeader($this);
+        /** @var $dsHeader DataSet */
+        $buHeader->getHeader($dsHeader);
 
         $this->setPageTitle("Allocate Additional Time To Service Request");
 
 
+        $minutesInADay = $dsHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay);
         /* validate if this is a POST request */
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $minutes = 0;
@@ -6246,11 +6248,6 @@ class CTActivity extends CTCNC
                     $minutes = $this->getParam('allocatedTimeValue') * 60;
                     break;
                 case 'days':
-                    $buHeader = new BUHeader($this);
-                    /** @var $dsHeader DataSet */
-                    $buHeader->getHeader($dsHeader);
-                    $minutesInADay = $dsHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay);
-
                     $minutes = $minutesInADay * $this->getParam('allocatedTimeValue');
             }
 
@@ -6320,18 +6317,37 @@ class CTActivity extends CTCNC
                 )
             );
 
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getRow($this->getParam('problemID'));
+        $helpdeskHardLimitRemainingMinutes = $dsHeader->getValue(
+                DBEHeader::hdTeamManagementTimeApprovalMinutes
+            ) - $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
+        $escalationsHardLimitRemainingMinutes = $dsHeader->getValue(
+                DBEHeader::esTeamManagementTimeApprovalMinutes
+            ) - $dbeProblem->getValue(DBEProblem::esLimitMinutes);
+        $smallProjectsHardLimitRemainingMinutes = $dsHeader->getValue(
+                DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
+            ) - $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
+
+        $isAdditionalTimeApprover = $this->dbeUser->getValue(DBEUser::additionalTimeLevelApprover);
+
         $this->template->set_var(
-            array(
-                'teamLevel1Selected'     => $teamLevel1Selected,
-                'teamLevel2Selected'     => $teamLevel2Selected,
-                'teamLevel3Selected'     => $teamLevel3Selected,
-                'teamLevel5Selected'     => $teamLevel5Selected,
-                'problemID'              => $this->getParam('problemID'),
-                'customerID'             => $dbeFirstActivity->getValue(DBEJCallActivity::customerID),
-                'customerName'           => $dbeFirstActivity->getValue(DBEJCallActivity::customerName),
-                'submitURL'              => $submitURL,
-                'urlProblemHistoryPopup' => $urlProblemHistoryPopup
-            )
+            [
+                'teamLevel1Selected'                     => $teamLevel1Selected,
+                'teamLevel2Selected'                     => $teamLevel2Selected,
+                'teamLevel3Selected'                     => $teamLevel3Selected,
+                'teamLevel5Selected'                     => $teamLevel5Selected,
+                'helpdeskHardLimitRemainingMinutes'      => $helpdeskHardLimitRemainingMinutes,
+                'escalationsHardLimitRemainingMinutes'   => $escalationsHardLimitRemainingMinutes,
+                'smallProjectsHardLimitRemainingMinutes' => $smallProjectsHardLimitRemainingMinutes,
+                'problemID'                              => $this->getParam('problemID'),
+                'customerID'                             => $dbeFirstActivity->getValue(DBEJCallActivity::customerID),
+                'customerName'                           => $dbeFirstActivity->getValue(DBEJCallActivity::customerName),
+                'submitURL'                              => $submitURL,
+                'urlProblemHistoryPopup'                 => $urlProblemHistoryPopup,
+                'additionalTimeLimitApprover'            => $isAdditionalTimeApprover ? 'true' : 'false',
+                'minutesInADay'                          => $minutesInADay
+            ]
         );
 
         $this->allocatedMinutesDropdown(
@@ -6526,7 +6542,8 @@ class CTActivity extends CTCNC
     {
 
         $this->setMethodName('timeRequestReview');
-
+        $buHeader = new BUHeader($this);
+        $buHeader->getHeader($dsHeader);
         $callActivityID = $this->getParam('callActivityID');
         $dsCallActivity = new DataSet($this);
         $this->buActivity->getActivityByID(
@@ -6553,26 +6570,37 @@ class CTActivity extends CTCNC
         $teamName = null;
         $usedMinutes = 0;
         $assignedMinutes = 0;
+        $remainingTimeLimit = null;
         switch ($teamID) {
             case 1:
                 $usedMinutes = $this->buActivity->getHDTeamUsedTime($problemID);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
                 $teamName = 'Help Desk';
+                $remainingTimeLimit = $dsHeader->getValue(
+                        DBEHeader::hdTeamManagementTimeApprovalMinutes
+                    ) - $assignedMinutes;
                 break;
             case 2:
                 $usedMinutes = $this->buActivity->getESTeamUsedTime($problemID);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
                 $teamName = 'Escalation';
+                $remainingTimeLimit = $dsHeader->getValue(
+                        DBEHeader::esTeamManagementTimeApprovalMinutes
+                    ) - $assignedMinutes;
                 break;
             case 4:
                 $usedMinutes = $this->buActivity->getSPTeamUsedTime($problemID);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
                 $teamName = 'Small Projects';
+                $remainingTimeLimit = $dsHeader->getValue(
+                        DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
+                    ) - $assignedMinutes;
                 break;
             case 5:
                 $usedMinutes = $this->buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::projectTeamLimitMinutes);
                 $teamName = 'Projects';
+                $remainingTimeLimit = 'Infinity';
         }
 
         $leftOnBudget = $assignedMinutes - $usedMinutes;
@@ -6658,20 +6686,25 @@ class CTActivity extends CTCNC
 
                 'customerID' => $dbeFirstActivity->getValue(DBEJCallActivity::customerID),
 
-                'customerName'           => $dbeFirstActivity->getValue(DBEJCallActivity::customerName),
-                'requestDetails'         => $dsCallActivity->getValue(DBEJCallActivity::reason),
-                'userName'               => $dsCallActivity->getValue(DBEJCallActivity::userName),
-                'submitUrl'              => $submitURL,
-                'urlProblemHistoryPopup' => $urlProblemHistoryPopup,
-                'requesterTeamName'      => $teamName,
-                'notes'                  => $dsCallActivity->getValue(DBEJCallActivity::reason),
-                'requestedDateTime'      => $dsCallActivity->getValue(
+                'customerName'                => $dbeFirstActivity->getValue(DBEJCallActivity::customerName),
+                'requestDetails'              => $dsCallActivity->getValue(DBEJCallActivity::reason),
+                'userName'                    => $dsCallActivity->getValue(DBEJCallActivity::userName),
+                'submitUrl'                   => $submitURL,
+                'urlProblemHistoryPopup'      => $urlProblemHistoryPopup,
+                'requesterTeamName'           => $teamName,
+                'notes'                       => $dsCallActivity->getValue(DBEJCallActivity::reason),
+                'requestedDateTime'           => $dsCallActivity->getValue(
                         DBEJCallActivity::date
                     ) . ' ' . $dsCallActivity->getValue(DBEJCallActivity::startTime),
-                'chargeableHours'        => $dbeProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
-                'timeSpentSoFar'         => $usedMinutes,
-                'timeLeftOnBudget'       => $leftOnBudget,
-                'requesterTeam'          => $teamName
+                'remainingLimitTime'          => $remainingTimeLimit,
+                'chargeableHours'             => $dbeProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
+                'timeSpentSoFar'              => $usedMinutes,
+                'timeLeftOnBudget'            => $leftOnBudget,
+                'requesterTeam'               => $teamName,
+                'additionalTimeLimitApprover' => $this->dbeUser->getValue(
+                    DBEUser::additionalTimeLevelApprover
+                ) ? 'true' : 'false',
+                'minutesInADay'               => $dsHeader->getValue(DBEHeader::smallProjectsTeamMinutesInADay)
             )
         );
 

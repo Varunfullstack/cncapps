@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue637-0">
+        <tagDatabase tag="issue637"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue637-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="hdTeamManagementTimeApprovalMinutes"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="hdTeamManagementTimeApprovalMinutes" type="int(5)" defaultValue="90">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue637-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="esTeamManagementTimeApprovalMinutes"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="esTeamManagementTimeApprovalMinutes" type="int(5)" defaultValue="180">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue637-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="smallProjectsTeamManagementTimeApprovalMinutes"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="smallProjectsTeamManagementTimeApprovalMinutes" type="int(5)" defaultValue="120">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue637-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="consultant" columnName="additionalTimeLevelApprover"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column name="additionalTimeLevelApprover" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue637-5">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="consultant" columnName="additionalTimeLevelApprover"/>
+        </preConditions>
+        <sql>
+            update consultant
+            set additionalTimeLevelApprover = 1
+            where cns_consno in (29, 47, 63);
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>
