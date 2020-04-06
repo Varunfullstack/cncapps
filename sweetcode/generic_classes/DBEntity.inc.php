@@ -831,10 +831,12 @@ class DBEntity extends DataAccess
                     }
                 }
             }
-            $this->setQueryString(
-                "DELETE FROM " . $this->getTableName() .
-                " WHERE " . $this->getPKWhere()
-            );
+            $query = "DELETE FROM " . $this->getTableName() .
+                " WHERE " . $this->getPKWhere();
+            if ($this->debug) {
+                var_dump($query);
+            }
+            $this->setQueryString($query);
         }
         $ret = $this->runQuery();
         $this->resetQueryString();

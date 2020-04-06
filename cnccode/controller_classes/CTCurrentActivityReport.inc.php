@@ -12,6 +12,7 @@ require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
+require_once($cfg['path_dbe'] . '/DBEPendingReopened.php');
 
 // Actions
 class CTCurrentActivityReport extends CTCNC
@@ -28,7 +29,6 @@ class CTCurrentActivityReport extends CTCNC
     var $filterUser = array();
     var $allocatedUser = array();
     var $priority = array();
-    var $prioritySelectArray = array();
     var $loggedInUserIsSdManager;
     var $customerFilterList;
     /**
@@ -160,35 +160,38 @@ class CTCurrentActivityReport extends CTCNC
                 break;
 
             case 'toggleDisplayToBeLoggedFlag':
-                $this->toggleDisplayToBeLoggedFlag();
+                $this->toggleDisplayFlag('displayToBeLoggedFlag');
+                break;
+            case 'toggleDisplayPendingReopenedFlag':
+                $this->toggleDisplayFlag('pendingReopened');
                 break;
 
             case 'toggleDisplayQueue1Flag':
-                $this->toggleDisplayQueue1Flag();
+                $this->toggleDisplayFlag('displayQueue1Flag');
                 break;
 
             case 'toggleDisplayQueue2Flag':
-                $this->toggleDisplayQueue2Flag();
+                $this->toggleDisplayFlag('displayQueue2Flag');
                 break;
 
             case 'toggleDisplayQueue3Flag':
-                $this->toggleDisplayQueue3Flag();
+                $this->toggleDisplayFlag('displayQueue3Flag');
                 break;
 
             case 'toggleDisplayQueue4Flag':
-                $this->toggleDisplayQueue4Flag();
+                $this->toggleDisplayFlag('displayQueue4Flag');
                 break;
 
             case 'toggleDisplayQueue5Flag':
-                $this->toggleDisplayQueue5Flag();
+                $this->toggleDisplayFlag('displayQueue5Flag');
                 break;
 
             case 'toggleDisplayQueue6Flag':
-                $this->toggleDisplayQueue6Flag();
+                $this->toggleDisplayFlag('displayQueue6Flag');
                 break;
 
             case 'toggleDisplayQueue7Flag':
-                $this->toggleDisplayQueue7Flag();
+                $this->toggleDisplayFlag('displayQueue7Flag');
                 break;
 
             case 'escalate':
@@ -205,6 +208,12 @@ class CTCurrentActivityReport extends CTCNC
                 $this->checkPermissions(PHPLIB_PERM_TECHNICAL);
                 $this->deleteCustomerRequest();
                 break;
+            case 'pendingReopenedPopup':
+                $this->pendingReopenedDescriptionPopUp();
+                break;
+            /** @noinspection PhpMissingBreakStatementInspection */
+            case 'processPendingReopened':
+                $this->processPendingReopened($_REQUEST['pendingReopenedID'], $_REQUEST['result']);
             default:
                 $this->displayReport();
                 break;
@@ -299,75 +308,12 @@ class CTCurrentActivityReport extends CTCNC
         exit;
     }
 
-    function toggleDisplayToBeLoggedFlag()
+    function toggleDisplayFlag($flag)
     {
-        if ($this->getSessionParam('displayToBeLoggedFlag')) {
-            $this->setSessionParam('displayToBeLoggedFlag', false);
+        if ($this->getSessionParam($flag)) {
+            $this->setSessionParam($flag, false);
         } else {
-            $this->setSessionParam('displayToBeLoggedFlag', true);
-        }
-    }
-
-    function toggleDisplayQueue1Flag()
-    {
-        if ($this->getSessionParam('displayQueue1Flag')) {
-            $this->setSessionParam('displayQueue1Flag', false);
-        } else {
-            $this->setSessionParam('displayQueue1Flag', true);
-        }
-    }
-
-    function toggleDisplayQueue2Flag()
-    {
-        if ($this->getSessionParam('displayQueue2Flag')) {
-            $this->setSessionParam('displayQueue2Flag', false);
-        } else {
-            $this->setSessionParam('displayQueue2Flag', true);
-        }
-    }
-
-    function toggleDisplayQueue3Flag()
-    {
-        if ($this->getSessionParam('displayQueue3Flag')) {
-            $this->setSessionParam('displayQueue3Flag', false);
-        } else {
-            $this->setSessionParam('displayQueue3Flag', true);
-        }
-    }
-
-    function toggleDisplayQueue4Flag()
-    {
-        if ($this->getSessionParam('displayQueue4Flag')) {
-            $this->setSessionParam('displayQueue4Flag', false);
-        } else {
-            $this->setSessionParam('displayQueue4Flag', true);
-        }
-    }
-
-    function toggleDisplayQueue5Flag()
-    {
-        if ($this->getSessionParam('displayQueue5Flag')) {
-            $this->setSessionParam('displayQueue5Flag', false);
-        } else {
-            $this->setSessionParam('displayQueue5Flag', true);
-        }
-    }
-
-    function toggleDisplayQueue6Flag()
-    {
-        if ($this->getSessionParam('displayQueue6Flag')) {
-            $this->setSessionParam('displayQueue6Flag', false);
-        } else {
-            $this->setSessionParam('displayQueue6Flag', true);
-        }
-    }
-
-    function toggleDisplayQueue7Flag()
-    {
-        if ($this->getSessionParam('displayQueue7Flag')) {
-            $this->setSessionParam('displayQueue7Flag', false);
-        } else {
-            $this->setSessionParam('displayQueue7Flag', true);
+            $this->setSessionParam($flag, true);
         }
     }
 
@@ -387,7 +333,7 @@ class CTCurrentActivityReport extends CTCNC
         );
         header('Location: ' . $urlNext);
         exit;
-    } // end function displayReport
+    }
 
     /**
      * @throws Exception
@@ -403,7 +349,7 @@ class CTCurrentActivityReport extends CTCNC
         );
         header('Location: ' . $urlNext);
         exit;
-    } // end render queue
+    }
 
     /**
      * @throws Exception
@@ -442,6 +388,66 @@ class CTCurrentActivityReport extends CTCNC
         header('Location: ' . $urlNext);
         exit;
 
+    }
+
+    /**
+     * @throws Exception
+     */
+    function pendingReopenedDescriptionPopUp()
+    {
+        $this->setTemplateFiles(
+            'ActivityCustomerProblemPopup',
+            'ActivityCustomerProblemPopup.inc'
+        );
+
+        $this->setPageTitle('Pending Reopened Description');
+
+        $this->template->set_var(
+            array(
+                'details' => str_replace(
+                    "\n",
+                    "<br/>",
+                    $_REQUEST['reason']
+                )
+            )
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'ActivityCustomerProblemPopup',
+            true
+        );
+
+        $this->parsePage();
+        exit;
+    }  // end finaliseProblem
+
+    /**
+     * @param $pendingReopenedID
+     * @param $result
+     * @throws Exception
+     */
+    private function processPendingReopened($pendingReopenedID, $result)
+    {
+        $dbePendingReopened = new DBEPendingReopened($this);
+        switch ($result) {
+            case 'R':
+            {
+                $dbePendingReopened->getRow($pendingReopenedID);
+                $this->buActivity->approvePendingReopened($dbePendingReopened);
+                break;
+            }
+            case 'D':
+            {
+                $dbePendingReopened->deleteRow($pendingReopenedID);
+                break;
+            }
+        }
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            []
+        );
+        header('Location: ' . $urlNext);
     }
 
     /**
@@ -493,6 +499,62 @@ class CTCurrentActivityReport extends CTCNC
             );
 
         }
+
+        $pendingReopenedRequests = $this->buActivity->getPendingReopenedRequests();
+        if ($pendingReopenedRequests && count($pendingReopenedRequests)) {
+            $this->template->set_block(
+                'CurrentActivityReport',
+                'pendingReopenedBlock',
+                'pendingReopenedRequests'
+            );
+
+            foreach ($pendingReopenedRequests as $pendingReopenedRequest) {
+                $pendingReopenSRURL = Controller::buildLink(
+                    'Activity.php',
+                    array(
+                        'action'    => 'displayLastActivity',
+                        'problemID' => $pendingReopenedRequest['problemID']
+                    )
+                );
+                $pendingReopenSR = $pendingReopenedRequest['problemID'];
+                $pendingReopenCustomerName = $pendingReopenedRequest['customerName'];
+                $pendingReopenedPriority = $pendingReopenedRequest['priority'];
+                $truncatedReason = CTCurrentActivityReport::truncate(
+                    $pendingReopenedRequest['reason'],
+                    150
+                );
+                $pendingReopenDescriptionSummary = $truncatedReason;
+                $pendingReopenDescriptionURL =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'  => 'pendingReopenedPopup',
+                            'reason'  => $pendingReopenedRequest['reason'],
+                            'htmlFmt' => CT_HTML_FMT_POPUP
+                        )
+                    );
+                $this->template->set_var(
+                    [
+                        "pendingReopenSRURL"              => $pendingReopenSRURL,
+                        "pendingReopenSR"                 => $pendingReopenSR,
+                        "pendingReopenCustomerName"       => $pendingReopenCustomerName,
+                        "pendingReopenPriority"           => $pendingReopenedPriority,
+                        "pendingReopenDescriptionURL"     => $pendingReopenDescriptionURL,
+                        "pendingReopenDescriptionSummary" => $pendingReopenDescriptionSummary,
+                        "pendingReopenedID"               => $pendingReopenedRequest['id']
+
+                    ]
+                );
+
+                $this->template->parse(
+                    'pendingReopenedRequests',
+                    'pendingReopenedBlock',
+                    true
+                );
+                $this->template->setVar('pendingReopenedCount', count($pendingReopenedRequests));
+            }
+        }
+
 
         $customerRaisedRequests = $this->buActivity->getCustomerRaisedRequests();
         /*
@@ -638,42 +700,8 @@ class CTCurrentActivityReport extends CTCNC
             $count
         );
 
-        $this->template->set_var(
-            'displayToBeLoggedFlag',
-            ($this->getSessionParam('displayToBeLoggedFlag') == 0) ? '0' : '1'
-        );
-        $this->template->set_var(
-            'displayQueue1Flag',
-            ($this->getSessionParam('displayQueue1Flag') == 0) ? '0' : '1'
-        );
-        $this->template->set_var(
-            'displayQueue2Flag',
-            ($this->getSessionParam('displayQueue2Flag') == 0) ? '0' : '1'
-        );
-        $this->template->set_var(
-            'displayQueue3Flag',
-            ($this->getSessionParam('displayQueue3Flag') == 0) ? '0' : '1'
-        );
-        $this->template->set_var(
-            'displayQueue4Flag',
-            ($this->getSessionParam('displayQueue4Flag') == 0) ? '0' : '1'
-        );
-        $this->template->set_var(
-            'displayQueue5Flag',
-            ($this->getSessionParam('displayQueue5Flag') == 0) ? '0' : '1'
-        );
-        $this->template->set_var(
-            'displayQueue6Flag',
-            ($this->getSessionParam('displayQueue6Flag') == 0) ? '0' : '1'
-        );
-        $this->template->set_var(
-            'displayQueue7Flag',
-            ($this->getSessionParam('displayQueue7Flag') == 0) ? '0' : '1'
-        );
-
-
+        $this->setTemplateFlags($this->template);
         $this->setPageTitle(CONFIG_SERVICE_REQUEST_DESC . 's');
-
 
         $this->renderQueue(1);  // Helpdesk
         $this->renderQueue(2);  // Escalations
@@ -890,6 +918,27 @@ class CTCurrentActivityReport extends CTCNC
 
         $this->parsePage();
 
+    }
+
+    private function setTemplateFlags(Template $template)
+    {
+        $flags = [
+            'displayToBeLoggedFlag',
+            'displayPendingReopenedFlag',
+            'displayQueue1Flag',
+            'displayQueue2Flag',
+            'displayQueue3Flag',
+            'displayQueue4Flag',
+            'displayQueue5Flag',
+            'displayQueue6Flag',
+            'displayQueue7Flag',
+        ];
+        foreach ($flags as $flag) {
+            $template->set_var(
+                $flag,
+                ($this->getSessionParam($flag) == 0) ? '0' : '1'
+            );
+        }
     }
 
     /**
@@ -1298,7 +1347,7 @@ class CTCurrentActivityReport extends CTCNC
         } else {
             return 'green';
         }
-    }
+    } // end function displayReport
 
     /**
      * @param $problemID
@@ -1307,7 +1356,7 @@ class CTCurrentActivityReport extends CTCNC
      */
     function getProblemHistoryLink($problemID)
     {
-        $url = Controller::buildLink(
+        return Controller::buildLink(
             'Activity.php',
             array(
                 'action'    => 'problemHistoryPopup',
@@ -1315,8 +1364,6 @@ class CTCurrentActivityReport extends CTCNC
                 'htmlFmt'   => CT_HTML_FMT_POPUP
             )
         );
-
-        return $url;
 
     }
 
@@ -1386,30 +1433,5 @@ class CTCurrentActivityReport extends CTCNC
         }
 
         return null;
-    }
-
-    function getAlarmColour($alarmDate,
-                            $alarmTime
-    )
-    {
-
-        if ($alarmDate) {
-            $dateNow = strtotime(date('Y-m-d H:i'));
-            $dateAlarm = strtotime($alarmDate . ' ' . $alarmTime);
-
-            if ($dateNow >= $dateAlarm) {
-
-                $bgColour = self::RED; // red = ready to start
-
-            } else {
-
-                $bgColour = self::AMBER; // amber = on hold
-
-            }
-        } else {
-            $bgColour = self::GREEN; /// green = active
-
-        }
-        return $bgColour;
     }
 }

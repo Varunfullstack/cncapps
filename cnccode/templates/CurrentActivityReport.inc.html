@@ -21,6 +21,7 @@
 
         if ({isSDManager}) {
             $('#SDManagerLinks').show();
+            $('#pendingReopened').show();
         }
         $('.requestAdditionalTime').click(function () {
 
@@ -99,12 +100,13 @@
     <!-- BEGIN customerRequestsBlock -->
     <form name="userForm">
         <tr valign="center">
-            <td bgcolor="{cpBgColor}"><input type="button"
-                                             name="delete"
-                                             title="Delete"
-                                             value="D"
-                                             onClick="if(confirm('Are you sure you want to remove this request?')) document.location='{urlDeleteCustomerRequest}'"
-            >{cpNewButton}
+            <td bgcolor="{cpBgColor}">
+                <input type="button"
+                       name="delete"
+                       title="Delete"
+                       value="D"
+                       onClick="if(confirm('Are you sure you want to remove this request?')) document.location='{urlDeleteCustomerRequest}'"
+                >{cpNewButton}
             </td>
             <td bgcolor="{cpBgColor}"><A href={cpUrlCustomer}
                                          target="_blank"
@@ -134,6 +136,94 @@
     <!-- END customerRequestsBlock -->
     </tbody>
 </table>
+<br>
+<table id="pendingReopened"
+       width="100%"
+       style="display: none"
+>
+    <thead>
+    <tr valign="top">
+        <th class="listHeadText"
+        >
+            <div align="left">Pending Reopened ({pendingReopenedCount})</div>
+        </th>
+        <th class="listHeadText"
+            width="5"
+            nowrap
+        >SR
+        </th>
+        <th class="listHeadText"
+            width="5"
+            nowrap
+        >Customer
+        </th>
+        <th class="listHeadText"
+            width="5"
+            nowrap
+        >Summary
+        </th>
+        <th class="listHeadText"
+            width="5"
+            nowrap
+        >
+            <div>Priority</div>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN pendingReopenedBlock -->
+
+    <tr valign="center">
+        <td>
+            <form>
+                <input type="hidden"
+                       name="action"
+                       value="processPendingReopened"
+                >
+                <input type="hidden"
+                       name="pendingReopenedID"
+                       value="{pendingReopenedID}"
+                >
+                <input type="submit"
+                       name="result"
+                       title="Reopen"
+                       value="R"
+                       onClick="if(!confirm('Are you sure you want to reopen?')){ window.event.preventDefault()}"
+                >
+                <input type="submit"
+                       name="result"
+                       title="Delete"
+                       value="D"
+                       onClick="if(!confirm('Are you sure you want to delete?')){ window.event.preventDefault()}"
+                >
+            </form>
+        </td>
+        <td>
+            <A href={pendingReopenSRURL}
+               target="_blank"
+            >{pendingReopenSR}</a>
+        </td>
+        <td>
+            {pendingReopenCustomerName}
+        </td>
+        <td>
+            <a href="#"
+               onClick="window.open(
+            '{pendingReopenDescriptionURL}',
+            'customer_problem',
+            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false"
+            >
+                {pendingReopenDescriptionSummary}
+            </a>
+        </td>
+        <td>
+            <div align="center">{pendingReopenPriority}</div>
+        </td>
+    </tr>
+    <!-- END pendingReopenedBlock -->
+    </tbody>
+</table>
+
 <br/>
 <form name="filterForm"
       method="post"
@@ -327,7 +417,7 @@
                     >
                 </span>
 
-           <span style="color: {hdColor}">H:{hdRemaining}</span>
+            <span style="color: {hdColor}">H:{hdRemaining}</span>
             <span style="color: {esColor}">E:{esRemaining}</span>
             <span style="color: {smallProjectsTeamColor}">SP:{smallProjectsTeamRemaining}</span>
             <span style="color: {projectTeamColor}">P:{projectTeamRemaining}</span>
@@ -470,7 +560,7 @@
                     >
                 </span>
 
-            <span style="color: {hdColor}">H:{hdRemaining}</span> 
+            <span style="color: {hdColor}">H:{hdRemaining}</span>
             <span style="color: {esColor}">E:{esRemaining}</span>
             <span style="color: {smallProjectsTeamColor}">SP:{smallProjectsTeamRemaining}</span>
             <span style="color: {projectTeamColor}">P:{projectTeamRemaining}</span>
@@ -615,7 +705,7 @@
                     >
                 </span>
 
-           <span style="color: {hdColor}">H:{hdRemaining}</span>
+            <span style="color: {hdColor}">H:{hdRemaining}</span>
             <span style="color: {esColor}">E:{esRemaining}</span>
             <span style="color: {smallProjectsTeamColor}">SP:{smallProjectsTeamRemaining}</span>
             <span style="color: {projectTeamColor}">P:{projectTeamRemaining}</span>
@@ -796,7 +886,6 @@
 </table>
 
 
-
 <table id="queue4"
        class="table-bordered oddRows"
        width="100%"
@@ -904,7 +993,7 @@
                     >
                 </span>
 
-           <span style="color: {hdColor}">H:{hdRemaining}</span>
+            <span style="color: {hdColor}">H:{hdRemaining}</span>
             <span style="color: {esColor}">E:{esRemaining}</span>
             <span style="color: {smallProjectsTeamColor}">SP:{smallProjectsTeamRemaining}</span>
             <span style="color: {projectTeamColor}">P:{projectTeamRemaining}</span>
@@ -1043,7 +1132,7 @@
                     >
                 </span>
 
-           <span style="color: {hdColor}">H:{hdRemaining}</span>
+            <span style="color: {hdColor}">H:{hdRemaining}</span>
             <span style="color: {esColor}">E:{esRemaining}</span>
             <span style="color: {smallProjectsTeamColor}">SP:{smallProjectsTeamRemaining}</span>
             <span style="color: {projectTeamColor}">P:{projectTeamRemaining}</span>
@@ -1182,7 +1271,17 @@
         if ({displayQueue7Flag} == 0) {
             $('table#queue7').children('tbody').toggle();
         }
+        if ({displayPendingReopenedFlag} == 0) {
+            $('table#pendingReopened').children('tbody').toggle();
+        }
+
     });
+
+    $('table#pendingReopened th').click(function () {
+            $(this).parents('table#pendingReopened').children('tbody').toggle();
+            loadXMLDoc("CurrentActivityReport.php?action=toggleDisplayPendingReopenedFlag");
+        }
+    );
 
     $('table#toBeLogged th').click(
         function () {

@@ -61,4 +61,5 @@
     <include file="db.changelog-issue762.xml"/>
     <include file="db.changelog-issue749.xml"/>
     <include file="db.changelog-issue774.xml"/>
+    <include file="db.changelog-issue768.xml"/>
 </databaseChangeLog>

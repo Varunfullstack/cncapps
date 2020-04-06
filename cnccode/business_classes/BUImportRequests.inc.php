@@ -5,10 +5,12 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_gc"] . "/Controller.inc.php");
 require_once($cfg ["path_bu"] . "/BUActivity.inc.php");
 require_once $cfg['path_dbe'] . '/DBEProblem.inc.php';
+require_once $cfg['path_dbe'] . '/DBEPendingReopened.php';
 
 class BUImportRequests extends Business
 {
