@@ -701,7 +701,6 @@ class DBEntity extends DataAccess
             if (!$this->db->Record) {
                 return null;
             }
-
             if (!key_exists($ixColumn, $this->db->Record)) {
                 return $this->getDefaultValue($ixColumn);
             }
@@ -735,9 +734,10 @@ class DBEntity extends DataAccess
         if ($type == DA_FLOAT) {
             return (float)$this->db->Record[$ixColumnNumber];
         }
-        if ($type == DA_JSON_ARRAY) {
+        if (in_array($type, [DA_JSON_ARRAY, DA_BOOLEAN])) {
             return json_decode($this->db->Record[$ixColumnNumber]);
         }
+
         return $this->db->Record[$ixColumnNumber];
     }
 
