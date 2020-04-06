@@ -5,6 +5,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 
@@ -67,6 +68,20 @@ class BUManagementReports extends Business
 
         return $this->db->query($sql);
 
+    }
+
+    function buildSpendByManufacturerSegment($month)
+    {
+        $return = "
+			,SUM(
+				if (
+					MONTH( poh_date ) = $month,
+					pol_qty_ord * pol_cost,
+					0
+				)
+			)as `month$month`";
+
+        return $return;
     }
 
     function getSpendByCategory($year = false)
@@ -149,20 +164,6 @@ class BUManagementReports extends Business
 
     }
 
-    function buildSpendByManufacturerSegment($month)
-    {
-        $return = "
-			,SUM(
-				if (
-					MONTH( poh_date ) = $month,
-					pol_qty_ord * pol_cost,
-					0
-				)
-			)as `month$month`";
-
-        return $return;
-    }
-
     /**
      * @param null $customerID
      * @param null $year
@@ -170,7 +171,7 @@ class BUManagementReports extends Business
      * @param null $pcs
      * @return bool|int|mysqli_result|null
      */
-    function getSalesByCustomer($customerID = null, $year = null, $sectorId = null, $pcs = null)
+    function getSalesByCustomer($customerID = null, $year = null, $sectorId = null, $minPcs = null, $maxPCs = null)
     {
         if (!$year) {
             $year = date('Y');
@@ -189,8 +190,7 @@ class BUManagementReports extends Business
         noOfPCs,
         noOfServers,
         noOfSites,
-        sec_desc AS sector
-        ";
+        sec_desc AS sector ";
 
         for ($month = 1; $month <= 12; $month++) {
 
@@ -218,8 +218,12 @@ class BUManagementReports extends Business
             $sql .= " and cus_sectorno = $sectorId";
         }
 
-        if ($pcs === "0" || $pcs) {
-            $sql .= " and noOfPCs = '$pcs'";
+        if ($minPcs !== null) {
+            $sql .= " and noOfPCs >= " . $minPcs;
+        }
+
+        if ($maxPCs !== null) {
+            $sql .= " and noOfPCs <= " . $maxPCs;
         }
 
         $sql .= "

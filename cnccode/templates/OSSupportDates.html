@@ -90,6 +90,13 @@
             >
         </div>
         <div>
+            <span>is Server OS?:</span>
+            <br>
+            <input type="checkbox"
+                   name="isServer"
+            >
+        </div>
+        <div>
             <button class="addButton"
                     type="button"
                     hidden
@@ -128,6 +135,7 @@
             form.elements['version'].value = data.version;
             form.elements['availabilityDate'].value = data.availabilityDate;
             form.elements['endOfLifeDate'].value = data.endOfLifeDate;
+            form.elements['isServer'].checked = data.isServer;
         }
 
         if (data && data.id) {
@@ -276,7 +284,15 @@
                 {data: "name"},
                 {data: "version"},
                 {data: "availabilityDate"},
-                {data: "endOfLifeDate"}
+                {data: "endOfLifeDate"},
+                {
+                    data: 'isServer', render: (data) => {
+                        if (data) {
+                            return "<i class='fa fa-check'></i>"
+                        }
+                        return "<i class='fa fa-times'></i>";
+                    }
+                }
             ],
             columnDefs: [
                 {type: "date-eu", targets: [2, 3]}
@@ -325,7 +341,13 @@
             }
 
             const data = Array.from(form.elements).reduce((acc, element) => {
-                if (element.name) acc[element.name] = element.value;
+
+                if (element.name) {
+                    if (element.type === 'checkbox' && !element.checked) {
+                        return acc;
+                    }
+                    acc[element.name] = element.value;
+                }
                 return acc
             }, {});
 
@@ -392,6 +414,7 @@
         <th>OS Version</th>
         <th>Availability Date</th>
         <th>EOL Date</th>
+        <th>Is Server</th>
     </tr>
     </thead>
     <tbody>

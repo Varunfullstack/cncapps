@@ -1841,24 +1841,22 @@
                 <tr>
                     <td class="content">PCs</td>
                     <td class="content">
-                        <select
-                                {disabled}
-                                name="form[customer][{customerID}][noOfPCs]"
+                        <input type="number"
+                               min="0"
+                               step="1"
+                               name="form[customer][{customerID}][noOfPCs]"
+                               {disabled}
+                               value="{noOfPCs}"
+                               size="10"
+                               maxlength="10"
                         >
-                            <!-- BEGIN noOfPCsBlock -->
-                            <option {noOfPCsSelected}
-                                    value="{noOfPCsValue}"
-                            >{noOfPCsValue}
-                            </option>
-                            <!-- END noOfPCsBlock -->
-                        </select>
                     </td>
                 </tr>
                 <tr>
                     <td class="content">Servers</td>
                     <td class="content">
                         <input name="form[customer][{customerID}][noOfServers]"
-                               type="text"
+                               type="number"
                                value="{noOfServers}"
                                size="10"
                                maxlength="10"
