@@ -147,7 +147,7 @@ IF(
             )
           ) / 12
         ),
-        2
+        1
       )
     FROM
       plugin_warrantymaster_aux
