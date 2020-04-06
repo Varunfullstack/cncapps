@@ -10,7 +10,7 @@
 
 use CNCLTD\LoggerCLI;
 
-require_once(__DIR__."/../htdocs/config.inc.php");
+require_once(__DIR__ . "/../htdocs/config.inc.php");
 require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 global $db;
@@ -49,9 +49,22 @@ $prioritiesHours = [
 while ($dbeProblem->fetchNext()) {
     $logger->info('Checking SR: ' . $dbeProblem->getValue(DBEProblem::problemID));
 
+    $flagAsCritical = false;
+
     if ($dbeProblem->getValue(DBEProblem::chargeableActivityDurationHours) >= $prioritiesHours[$dbeProblem->getValue(
             DBEProblem::priority
         )]) {
+        $logger->info('SR has more chargeable duration hours than the autocCritical hours for it\'s priority');
+        $flagAsCritical = true;
+    }
+    if ($dbeProblem->getValue(DBEProblem::hideFromCustomerFlag) != 'Y' && $dbeProblem->getValue(
+            DBEProblem::priority
+        ) == 1) {
+        $logger->info('SR is not hidden from customer, P1, flag it as critical');
+        $flagAsCritical = true;
+    }
+
+    if ($flagAsCritical) {
         $logger->info(
             'This SR is going to be flagged as critical - Priority: ' . $dbeProblem->getValue(
                 DBEProblem::priority
@@ -66,4 +79,5 @@ while ($dbeProblem->fetchNext()) {
         $updateProblem->setValue(DBEProblem::criticalFlag, 'Y');
         $updateProblem->updateRow();
     }
+
 }

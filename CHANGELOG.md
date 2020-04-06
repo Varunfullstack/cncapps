@@ -9,6 +9,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 750 - Set SR to awaiting CNC when Future date has been reached
 - Issue 772 - Date of Expense Tweak
+- Issue 805 - Automatically mark visible P1 SRs as critical
 ### Fixed
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
 - Issue 773 - Office 365 Backup Licenses Not Updating Contracts
