@@ -2907,11 +2907,9 @@ class BUActivity extends Business
     )
     {
         $buMail = new BUMail($this);
-
         $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
-
         $this->dbeUser->getRow($dbeCallActivity->getValue(DBEJCallActivity::userID));
-
+        $dsInitial = $this->getFirstActivityInProblem($problemID);
         $senderEmail = CONFIG_SUPPORT_EMAIL;
 
         $template = new Template(
@@ -2925,23 +2923,21 @@ class BUActivity extends Business
         );
 
         $userName = $this->dbeUser->getValue(DBEUser::firstName) . ' ' . $this->dbeUser->getValue(DBEUser::lastName);
-
+        $urlFirstActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitial->getValue(
+                DBEJCallActivity::callActivityID
+            );
         $urlLastActivity = 'http://' . $_SERVER ['HTTP_HOST'] . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
 
         $template->setVar(
             array(
-                'problemID' => $problemID,
-
-                'userName' => $userName,
-
-                'subject' => $subject,
-
-                'urlLastActivity' => $urlLastActivity,
-
-                'requestReason' => $dbeCallActivity->getValue(DBEJCallActivity::reason)
-
+                'problemID'        => $problemID,
+                'userName'         => $userName,
+                'subject'          => $subject,
+                'urlLastActivity'  => $urlLastActivity,
+                'requestReason'    => $dbeCallActivity->getValue(DBEJCallActivity::reason),
+                'urlFirstActivity' => $urlFirstActivity
             )
         );
 
@@ -3364,7 +3360,7 @@ class BUActivity extends Business
         $buMail = new BUMail($this);
 
         $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
-
+        $dsInitial = $this->getFirstActivityInProblem($problemID);
         $senderEmail = CONFIG_SUPPORT_EMAIL;
 
         $template = new Template(
@@ -3378,6 +3374,9 @@ class BUActivity extends Business
         );
 
         $userName = $requestingUser->getValue(DBEUser::firstName) . ' ' . $requestingUser->getValue(DBEUser::lastName);
+        $urlFirstActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitial->getValue(
+                DBEJCallActivity::callActivityID
+            );
 
         $urlLastActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
@@ -3385,10 +3384,11 @@ class BUActivity extends Business
 
         $template->setVar(
             array(
-                'problemID'       => $problemID,
-                'userName'        => $userName,
-                'urlLastActivity' => $urlLastActivity,
-                'requestReason'   => $reason
+                'problemID'        => $problemID,
+                'userName'         => $userName,
+                'urlLastActivity'  => $urlLastActivity,
+                'requestReason'    => $reason,
+                'urlFirstActivity' => $urlFirstActivity
             )
         );
 
@@ -3600,7 +3600,7 @@ class BUActivity extends Business
         $buMail = new BUMail($this);
 
         $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
-
+        $dsInitial = $this->getFirstActivityInProblem($problemID);
         $this->dbeUser->getRow($dbeCallActivity->getValue(DBEJCallActivity::userID));
 
         $senderEmail = CONFIG_SUPPORT_EMAIL;
@@ -3620,25 +3620,22 @@ class BUActivity extends Business
         $urlChangeControlRequest = SITE_URL . '/Activity.php?action=changeControlRequest&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
-
+        $urlFirstActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitial->getValue(
+                DBEJCallActivity::callActivityID
+            );
         $urlLastActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
 
         $template->setVar(
             array(
-                'problemID' => $problemID,
-
-                'userName' => $userName,
-
-                'subject' => $subject,
-
+                'problemID'               => $problemID,
+                'userName'                => $userName,
+                'subject'                 => $subject,
                 'urlChangeControlRequest' => $urlChangeControlRequest,
-
-                'urlLastActivity' => $urlLastActivity,
-
-                'requestReason' => $dbeCallActivity->getValue(DBEJCallActivity::reason)
-
+                'urlLastActivity'         => $urlLastActivity,
+                'requestReason'           => $dbeCallActivity->getValue(DBEJCallActivity::reason),
+                'urlFirstActivity'        => $urlFirstActivity
             )
         );
 
@@ -3763,24 +3760,22 @@ class BUActivity extends Business
                 DBEJCallActivity::callActivityID
             ) . '&fromEmail=true';
 
+        $urlFirstActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
+                DBEJCallActivity::callActivityID
+            );
         $urlLastActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeCallActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
 
         $template->setVar(
             array(
-                'problemID' => $problemID,
-
-                'userName' => $userName,
-
+                'problemID'               => $problemID,
+                'userName'                => $userName,
                 'urlChangeControlRequest' => $urlChangeControlRequest,
-
-                'urlLastActivity' => $urlLastActivity,
-
-                'initialReason' => $dsInitialCallActivity->getValue(DBEJCallActivity::reason),
-
-                'requestReason' => $dbeCallActivity->getValue(DBEJCallActivity::reason)
-
+                'urlLastActivity'         => $urlLastActivity,
+                'initialReason'           => $dsInitialCallActivity->getValue(DBEJCallActivity::reason),
+                'requestReason'           => $dbeCallActivity->getValue(DBEJCallActivity::reason),
+                'urlFirstActivity'        => $urlFirstActivity,
             )
         );
 
@@ -11126,22 +11121,21 @@ is currently a balance of ';
         $urlSalesRequestReview = SITE_URL . '/Activity.php?action=salesRequestReview&callActivityID=' . $salesRequestActivity->getValue(
                 DBEJCallActivity::callActivityID
             ) . '&fromEmail=true';
-
+        $urlFirstActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dsInitialCallActivity->getValue(
+                DBEJCallActivity::callActivityID
+            );
         $urlLastActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $lastActivity->getValue(
                 DBEJCallActivity::callActivityID
             );
 
         $template->setVar(
             array(
-                'problemID' => $problemID,
-
-                'userName' => $userName,
-
+                'problemID'              => $problemID,
+                'userName'               => $userName,
                 'urlSalesRequestControl' => $urlSalesRequestReview,
-
-                'urlLastActivity' => $urlLastActivity,
-
-                'requestReason' => $salesRequestActivity->getValue(DBEJCallActivity::reason)
+                'urlLastActivity'        => $urlLastActivity,
+                'requestReason'          => $salesRequestActivity->getValue(DBEJCallActivity::reason),
+                'urlFirstActivity'       => $urlFirstActivity,
             )
         );
 

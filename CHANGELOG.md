@@ -12,6 +12,7 @@ This project changes will be shown here.
 - Issue 805 - Automatically mark visible P1 SRs as critical
 - Issue 774 - SR Choice of contracts when closing
 - Issue 785 - Tidy Current Mailbox Extract Licenses page
+- Issue 801 - Sales Request submitted emails to include Initial Link
 ### Fixed
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
 - Issue 773 - Office 365 Backup Licenses Not Updating Contracts
