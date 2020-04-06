@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUStartersAndLeaversReport.php');
 require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
@@ -64,11 +65,32 @@ class CTStartersAndLeaversReport extends CTCNC
                     "rows"
                 );
                 foreach ($results as $row) {
+                    $quantityText = number_format($row['quantity']);
+                    if (in_array($row['type'], ['starters', 'leavers'])) {
+
+                        $url = Controller::buildLink(
+                            'activity.php',
+                            [
+                                "action"                              => 'search',
+                                "activity[1][customerID]"             => $_REQUEST['searchForm'][1]['customerID'],
+                                "customerString"                      => $this->getParam('customerString'),
+                                "activity[1][contractCustomerItemID]" => 99,
+                                "activity[1][rootCauseID]"            => $row['type'] == 'starters' ? 58 : 62,
+                                "activity[1][fromDate]"               => $_REQUEST['searchForm'][1]['startDate'],
+                                "activity[1][toDate]"                 => $_REQUEST['searchForm'][1]['endDate'],
+                                "Search"                              => "Search",
+                                "activity[1][callActTypeID]"          => 51
+                            ]
+                        );
+
+                        $quantityText = "<a href='$url' target='_blank'>$quantityText</a>";
+                    }
+
                     $this->template->set_var(
                         [
                             "customerName"       => $row['customerName'],
                             "type"               => $row['type'],
-                            "quantity"           => number_format($row['quantity']),
+                            "quantity"           => $quantityText,
                             "maxDuration"        => number_format($row['maxDuration'], 2),
                             "avgDuration"        => number_format($row['avgDuration'], 2),
                             "minDuration"        => number_format($row['minDuration'], 2),
