@@ -20,6 +20,7 @@ This project changes will be shown here.
 - Issue 768 - Approval required for reopening of SRs by customer
 - Issue 788 - Toggle higher level passwords
 - Issue 794 - Target Special Attention Emails
+- Issue 795 - Show Special Attention when logging a new SR
 ### Fixed
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
 - Issue 773 - Office 365 Backup Licenses Not Updating Contracts

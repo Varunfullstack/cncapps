@@ -2872,7 +2872,7 @@ class CTActivity extends CTCNC
             supportLevel,
             con_position,
             cus_referred,
-            specialAttentionContactFlag,
+            specialAttentionContactFlag = 'Y' as specialAttentionContact,
             (
               SELECT
                 COUNT(*)
@@ -2986,21 +2986,22 @@ class CTActivity extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'cus_name'             => $cus_name,
-                        'contact_name'         => $contact_name,
-                        'contact_position'     => $contact_position,
-                        'con_phone'            => $contact_phone,
-                        'add_phone'            => $site_phone,
-                        'site_name'            => $site_name,
-                        'supportClass'         => $supportClass,
-                        'formAction'           => $action,
-                        'customerID'           => $row['cus_custno'],
-                        'contactID'            => $row['con_contno'],
-                        'contact_notes'        => $row['con_notes'],
-                        'contact_supportLevel' => $row['supportLevel'],
-                        'contract'             => $row['hasPrepay'] ? 'PrePay' : ($row['hasServiceDesk'] ? $row['hasServiceDesk'] : 'T&M Authorisation Required'),
-                        'referredDisabled'     => $row['cus_referred'] == 'Y' ? "disabled" : null,
-                        'furloughDisabled'     => $row['supportLevel'] === DBEContact::supportLevelFurlough ? 'true' : 'false',
+                        'cus_name'                => $cus_name,
+                        'contact_name'            => $contact_name,
+                        'contact_position'        => $contact_position,
+                        'con_phone'               => $contact_phone,
+                        'add_phone'               => $site_phone,
+                        'site_name'               => $site_name,
+                        'supportClass'            => $supportClass,
+                        'formAction'              => $action,
+                        'customerID'              => $row['cus_custno'],
+                        'contactID'               => $row['con_contno'],
+                        'contact_notes'           => $row['con_notes'],
+                        'contact_supportLevel'    => $row['supportLevel'],
+                        'contract'                => $row['hasPrepay'] ? 'PrePay' : ($row['hasServiceDesk'] ? $row['hasServiceDesk'] : 'T&M Authorisation Required'),
+                        'referredDisabled'        => $row['cus_referred'] == 'Y' ? "disabled" : null,
+                        'furloughDisabled'        => $row['supportLevel'] === DBEContact::supportLevelFurlough ? 'true' : 'false',
+                        'specialAttentionContact' => $row['specialAttentionContact'] ? 'specialAttentionContact' : null
                     )
                 );
                 $this->template->parse(
@@ -3160,8 +3161,11 @@ class CTActivity extends CTCNC
             $this->getParam('customerID'),
             $dsCustomer
         );
-
-        $this->setPageTitle("Existing Service Requests for " . $dsCustomer->getValue(DBECustomer::name));
+        $title = "Existing Service Requests for " . $dsCustomer->getValue(DBECustomer::name);
+        if ($dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y') {
+            $title .= "<span style='color: red'> On Special Attention</span>";
+        }
+        $this->setPageTitle($title);
 
         $sessionValue = $this->getSessionParam($this->sessionKey);
         if (!$sessionValue) {
