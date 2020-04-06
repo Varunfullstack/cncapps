@@ -13,6 +13,7 @@ This project changes will be shown here.
 - Issue 774 - SR Choice of contracts when closing
 - Issue 785 - Tidy Current Mailbox Extract Licenses page
 - Issue 801 - Sales Request submitted emails to include Initial Link
+- Issue 787 - History of SR Pop up
 ### Fixed
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
 - Issue 773 - Office 365 Backup Licenses Not Updating Contracts

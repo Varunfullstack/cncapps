@@ -3972,23 +3972,25 @@ class CTActivity extends CTCNC
             'ActivityReasonPopup',
             'ActivityReasonPopup.inc'
         );
-
-        $activitiesByProblemID = $this->buActivity->getActivitiesByProblemID($this->getParam('problemID'));
+        $problemId = $this->getParam('problemID');
+        $activitiesByProblemID = $this->buActivity->getActivitiesByProblemID($problemId);
 
         $dbeProblem = new DBEJProblem($this);
-        $dbeProblem->getRow($this->getParam('problemID'));
+        $dbeProblem->getRow($problemId);
 
         $dbeJContract = new DBEJContract($this);
+        $title = $problemId . ' - ' . $dbeProblem->getValue(DBEJProblem::customerName);
 
-        $this->setPageTitle($this->getParam('problemID') . ' - ' . $dbeProblem->getValue(DBEJProblem::customerName));
 
         $this->template->set_block(
             'ActivityReasonPopup',
             'activityBlock',
             'rows'
         );
-
+        $foundFirst = false;
+        $lastActivityID = null;
         while ($activitiesByProblemID->fetchNext()) {
+
 
             $activityHiddenText = null;
             if ($activitiesByProblemID->getValue(DBEJCallActivity::hideFromCustomerFlag) == 'Y') {
@@ -4003,34 +4005,58 @@ class CTActivity extends CTCNC
             $dsSite = new DataSet($this);
             $buSite->getSiteByID($dbeProblem->getValue(DBEProblem::customerID), $siteNo, $dsSite);
 
+            $date = Controller::dateYMDtoDMY(
+                $activitiesByProblemID->getValue(DBEJCallActivity::date)
+            );
+            $startTime = $activitiesByProblemID->getValue(DBEJCallActivity::startTime);
+            $endTime = $activitiesByProblemID->getValue(DBEJCallActivity::endTime);
+            $duration = number_format($activitiesByProblemID->getValue(DBEJCallActivity::durationMinutes) / 60, 2);
+            $activityType = $activitiesByProblemID->getValue(DBEJCallActivity::activityType);
+            $contactName = $activitiesByProblemID->getValue(DBEJCallActivity::contactName);
+            $siteAddress = $dsSite->getValue(DBESite::add1);
+            $userName = $activitiesByProblemID->getValue(DBEJCallActivity::userName);
+            $reason = $activitiesByProblemID->getValue(DBEJCallActivity::reason);
+            $originalRequestHeader = null;
+            $colorClass = "boring-gray";
+            if (!$foundFirst) {
+                $originalRequestHeader = ' <tr>        <td class="redText">Original Request</td>    </tr>';
+                $colorClass = "performance-green";
+                $foundFirst = true;
+            }
             $this->template->set_var(
                 array(
-                    'reason'             => $activitiesByProblemID->getValue(DBEJCallActivity::reason),
-                    'date'               => Controller::dateYMDtoDMY(
-                        $activitiesByProblemID->getValue(DBEJCallActivity::date)
-                    ),
-                    'startTime'          => $activitiesByProblemID->getValue(DBEJCallActivity::startTime),
-                    'endTime'            => $activitiesByProblemID->getValue(DBEJCallActivity::endTime),
-                    'activityType'       => $activitiesByProblemID->getValue(DBEJCallActivity::activityType),
-                    'contactName'        => $activitiesByProblemID->getValue(DBEJCallActivity::contactName),
-                    'duration'           => number_format(
-                        $activitiesByProblemID->getValue(DBEJCallActivity::durationMinutes) / 60,
-                        2
-                    ),
-                    'userName'           => $activitiesByProblemID->getValue(DBEJCallActivity::userName),
-                    'activityHiddenText' => $activityHiddenText,
-                    'siteAddress'        => $dsSite->getValue(DBESite::add1)
+                    'reason'                => $reason,
+                    'date'                  => $date,
+                    'startTime'             => $startTime,
+                    'endTime'               => $endTime,
+                    'activityType'          => $activityType,
+                    'contactName'           => $contactName,
+                    'duration'              => $duration,
+                    'userName'              => $userName,
+                    'activityHiddenText'    => $activityHiddenText,
+                    'siteAddress'           => $siteAddress,
+                    'originalRequestHeader' => $originalRequestHeader,
+                    'colorClass'            => $colorClass
                 )
             );
-
+            $lastActivityID = $activitiesByProblemID->getValue(DBECallActivity::callActivityID);
+            $lastActivityText = "$date $startTime - $endTime ($duration) $activityType - $contactName - $siteAddress - $userName";
+            $lastActivityReason = $reason;
             $this->template->parse(
                 'rows',
                 'activityBlock',
                 true
             );
-
         }
-
+        $url = Controller::buildLink(
+            'Activity.php',
+            array(
+                'action'         => 'displayActivity',
+                'callActivityID' => $lastActivityID,
+            )
+        );
+        $link = "<a href='" . $url . "' target='_blank'>$title</a>";
+        $this->setPageTitle($link);
         if ($activitiesByProblemID->getValue(DBEJCallActivity::contractCustomerItemID)) {
             $dbeJContract->getRowByContractID(
                 $activitiesByProblemID->getValue(DBEJCallActivity::contractCustomerItemID)
@@ -4054,7 +4080,9 @@ class CTActivity extends CTCNC
             array(
                 'internalNotes'       => $dbeProblem->getValue(DBEJProblem::internalNotes),
                 'contractDescription' => $contractDescription,
-                'problemHiddenText'   => $problemHiddenText
+                'problemHiddenText'   => $problemHiddenText,
+                'lastActivityText'    => $lastActivityText,
+                'lastActivityReason'  => $lastActivityReason,
             )
         );
 
