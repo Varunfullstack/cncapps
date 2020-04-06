@@ -4969,7 +4969,8 @@ now that the notes are in a text field we need to split the lines up for the PDF
         $dsContract = new DataSet($this);
         $buCustomerItem->getContractsByCustomerID(
             $customerID,
-            $dsContract
+            $dsContract,
+            null
         );
 
         if ($serviceRequestCustomerItemID == '99') {
