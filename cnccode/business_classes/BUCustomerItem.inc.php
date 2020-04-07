@@ -678,7 +678,7 @@ class BUCustomerItem extends Business
     {
         $this->setMethodName('getContractsByCustomerID');
         $dbeJContract = new DBEJContract($this);
-        $dbeJContract->getRowsByCustomerID($customerID, null);
+        $dbeJContract->getRowsByCustomerID($customerID, $itemID);
         $this->getData(
             $dbeJContract,
             $dsResults
