@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 815 - Inactive Sites not showing
+
 ## [v3.11.10] - 2020-04-01
 ### Fixed
 - Fix issue with auto approve overtime

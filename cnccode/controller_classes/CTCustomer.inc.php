@@ -2153,11 +2153,8 @@ class CTCustomer extends CTCNC
                     'projectBlock',
                     true
                 );
-
             }
-
         }
-
 
         $this->template->set_block(
             'CustomerEdit',
@@ -2177,7 +2174,6 @@ class CTCustomer extends CTCNC
             'siteBlock',
             'sites'
         );
-
 
         if ((!$this->formError) & ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) & ($this->getAction(
                 ) != CTCUSTOMER_ACT_DISP_SUCCESS)) {
@@ -2673,7 +2669,6 @@ class CTCustomer extends CTCNC
                     "totalCount"      => $totalCount,
                 ]
             );
-
             $this->siteDropdown(
                 $this->dsContact->getValue(DBEContact::customerID),
                 $this->dsContact->getValue(DBEContact::siteNo)
