@@ -321,17 +321,16 @@
             <td class="promptText">
                 <div align="right">Search for</div>
             </td>
-            <td><input name="activity[1][activityText]"
+            <td>
+                <input name="activity[1][activityText]"
                        type="text"
                        value="{activityText}"
                        size="100"
                        maxlength="100"
-            ></td>
-        </tr>
-        <tr>
-            <td>&nbsp;</td>
-            <td class="info style2">+ stands for AND, - stands for NOT, [NO
-                OPERATOR] stands for OR. &quot;literal string&quot;
+                >
+                <button onclick="alert('+Office and +essentials – will search for any text that’s Office AND Essentials\n'+
+'“Office 365” and +premium – will search for any text that’s “Office 365” AND there’s also Premium\n'+
+'Office 365 premium – will search for any of those key words (i.e. its Office OR 365 OR Premium)')">Help</button>
             </td>
         </tr>
         <tr>

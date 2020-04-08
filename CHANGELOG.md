@@ -28,6 +28,7 @@ This project changes will be shown here.
 - Issue 979 - Order confirmation email to customer when creating P5
 - Issue 784 - Asset export information to include manufacturer warranty
 - Issue 811 - Sales Requests Need Complete Date on Approval or Denial
+- Issue 511 - Activity Search Examples
 ### Fixed
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
 - Issue 773 - Office 365 Backup Licenses Not Updating Contracts
