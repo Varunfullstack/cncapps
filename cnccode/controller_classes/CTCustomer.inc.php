@@ -1112,7 +1112,10 @@ class CTCustomer extends CTCNC
                 $customers = [];
                 while ($dsResult->fetchNext()) {
                     if (preg_match('/.*' . $term . '.*/i', $dsResult->getValue(DBECustomer::name))) {
-                        $customers[] = $dsResult->getValue(DBECustomer::name);
+                        $customers[] = [
+                            "name" => $dsResult->getValue(DBECustomer::name),
+                            "id"   => $dsResult->getValue(DBECustomer::customerID)
+                        ];
                     }
                 }
                 echo json_encode($customers);

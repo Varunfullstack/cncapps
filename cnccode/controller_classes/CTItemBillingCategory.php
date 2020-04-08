@@ -134,7 +134,10 @@ class CTItemBillingCategory extends CTCNC
                         '/.*' . $term . '.*/i',
                         $dbeItemBillingCategories->getValue(DBEItemBillingCategory::name)
                     )) {
-                        $data[] = $dbeItemBillingCategories->getValue(DBEItemBillingCategory::name);
+                        $data[] = [
+                            "name" => $dbeItemBillingCategories->getValue(DBEItemBillingCategory::name),
+                            "id"   => $dbeItemBillingCategories->getValue(DBEItemBillingCategory::id),
+                        ];
                     }
                 }
                 echo json_encode($data);

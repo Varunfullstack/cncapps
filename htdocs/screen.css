@@ -51,7 +51,7 @@ TD, INPUT, SELECT, TEXTAREA {
     color: red;
 }
 
-.fakeLink[disabled]{
+.fakeLink[disabled] {
     color: inherit;
     cursor: inherit;
 }
@@ -554,6 +554,7 @@ span#imRemainMinutes {
     font-size: large;
     font-weight: bold;
 }
+
 span#projectRemainMinutes {
     color: red;
     font-size: large;
@@ -810,4 +811,8 @@ table.fixed_header {
 
 .greenPencil {
     color: green;
+}
+
+table.cell-padding-1 th, table.cell-padding-1 td {
+    padding: 1px;
 }

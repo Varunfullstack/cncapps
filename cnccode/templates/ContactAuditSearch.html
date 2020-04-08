@@ -1,53 +1,8 @@
 <!-- Template: Customer.inc.html -->
-<script type='application/javascript'
-        src='CommonJS.js'
->
-</script>
-<script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.3/dist/loadingoverlay.min.js"></script>
-
 <script type="application/javascript">
-
-    var savedCustomerString;
-
-    function saveCustomerString() {
-        savedCustomerString = document.getElementById("customerString").value
-    }
-
-    function validateCustomerString() {
-        if (Trim(document.getElementById("customerString").value) != "") {
-            if (document.getElementById("customerString").value != savedCustomerString) {
-                window.open('{customerPopupURL}&customerString=' +
-                    escape(document.getElementById("customerString").value) +
-                    '&parentIDField=customerID' +
-                    '&parentDescField=customerString',
-                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
-            }
-        } else {
-            document.form.customerID.value = "";
-        }
-    }
-
-    function createQuote() {
-        if (document.searchForm.customerID.value != "") {
-            document.location = '{createQuoteURL}&customerID=' + escape(document.searchForm.customerID.value)
-        }
-    }
-
-    function createOrder() {
-        if (document.searchForm.customerID.value != "") {
-            document.location = '{createOrderURL}&customerID=' + escape(document.searchForm.customerID.value)
-        }
-    }
-
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
-        }
-    }
-
-    function validateCustomerStringOnReturn() {
-        if (event.keyCode == 13) {
-            validateCustomerString();
         }
     }
 
@@ -55,13 +10,6 @@
         dataTable = $('#myTable').DataTable({
             dom: 'Blfrtip',
             buttons: [
-                // {
-                //     extend: 'csv',
-                //     bom: true,
-                //     exportOptions: {
-                //         orthogonal: 'data'
-                //     }
-                // },
                 {
                     extend: 'excel'
                 }
@@ -107,6 +55,35 @@
                 {data: "pendingLeaverDate"}
             ]
         });
+
+        const autocompleteURL = "/Customer.php?action=searchName";
+
+        $('#customerString').autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response.map(item => ({label: item.name, value: item.id})));
+                })
+            },
+            select: function (event, ui) {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+                $('#customerID').val(ui.item.value);
+            },
+            delay: 200,
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
+
     });
 
     function searchContactAudit() {
@@ -170,9 +147,6 @@
                 >
                 <input type="text"
                        id="customerString"
-                       onFocus="javascript:saveCustomerString()"
-                       onBlur="javascript:validateCustomerString()"
-                       onKeypress="javascript:validateCustomerStringOnReturn()"
                 >
             </td>
         </tr>

@@ -1,15 +1,33 @@
 <!-- Template: DespatchSearch.inc.html -->
-<script language='JavaScript'>
-    var savedCustomerString;
-
-    function validateCustomerString() {
-        if (document.searchForm.customerString.value != "") {
-            window.open('{urlCustomerPopup}&customerString=' + escape(document.searchForm.customerString.value), 'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
-        }
-        else {
-            document.searchForm.customerID.value = "";
-        }
-    }
+<script>
+    const autocompleteURL = "/Customer.php?action=searchName";
+    $(function () {
+        $('#customerString').autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response.map(item => ({label: item.name, value: item.id})));
+                })
+            },
+            select: function (event, ui) {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+                $('[name="customerID"]').val(ui.item.value);
+            },
+            delay: 200,
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
+    });
 
     function submitOnReturn() {
         if (event.keyCode == 13) {
@@ -17,16 +35,20 @@
         }
     }
 
-    function validateCustomerStringOnReturn() {
-        if (event.keyCode == 13) {
-            validateCustomerString();
-        }
-    }
 </script>
-<form name="searchForm" method="post" action="{submitURL}">
-    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+<form name="searchForm"
+      method="post"
+      action="{submitURL}"
+>
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
         <tr>
-            <td width="100px" class="promptText">
+            <td width="100px"
+                class="promptText"
+            >
                 <div align="right">Customer</div>
             </td>
             <td><input
@@ -37,8 +59,7 @@
                     type="text"
                     name="customerString"
                     value="{customerString}"
-                    onChange="javascript:validateCustomerString()"
-                    onKeypress="javascript:validateCustomerStringOnReturn()"
+                    id="customerString"
                     size="50"
                     maxlength="50"
             > <font class="formErrorMessage"> {customerStringMessage} </font></td>
@@ -57,26 +78,70 @@
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="button" name="Search" value="Search" onClick="submit();">
-                <input type="button" name="Clear" value="Clear" onClick="document.location='{clearURL}'"></td>
+                <input type="button"
+                       name="Search"
+                       value="Search"
+                       onClick="submit();"
+                >
+                <input type="button"
+                       name="Clear"
+                       value="Clear"
+                       onClick="document.location='{clearURL}'"
+                ></td>
         </tr>
     </table>
 </form>
-<table class="singleBorder" width="700px" border="0" cellspacing="1" cellpadding="1">
+<table class="singleBorder"
+       width="700px"
+       border="0"
+       cellspacing="1"
+       cellpadding="1"
+>
     <tr>
-        <td width="245px" class="listHeadText">Customer</td>
-        <td width="50px" class="listHeadText">Order No</td>
-        <td width="50px" class="listHeadText">Type</td>
-        <td width="50px" class="listHeadText">Date</td>
-        <td width="250px" class="listHeadText">Cust PO Ref</td>
+        <td width="245px"
+            class="listHeadText"
+        >Customer
+        </td>
+        <td width="50px"
+            class="listHeadText"
+        >Order No
+        </td>
+        <td width="50px"
+            class="listHeadText"
+        >Type
+        </td>
+        <td width="50px"
+            class="listHeadText"
+        >Date
+        </td>
+        <td width="250px"
+            class="listHeadText"
+        >Cust PO Ref
+        </td>
     </tr>
     <!-- BEGIN orderBlock -->
-    <tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';">
-        <td width="250px" class="listItemText">{listCustomerName}</td>
-        <td width="50px" class="listItemText"><A HREF="{listOrderURL}">{listOrdheadID}</A></td>
-        <td width="50px" class="listItemText">{listOrderType}</td>
-        <td width="50px" class="listItemText">{listOrderDate}</td>
-        <td width="250px" class="listItemText">{listCustPORef}</td>
+    <tr onMouseOver="this.bgColor='#FFFFCC';"
+        onMouseOut="this.bgColor='';"
+    >
+        <td width="250px"
+            class="listItemText"
+        >{listCustomerName}
+        </td>
+        <td width="50px"
+            class="listItemText"
+        ><A HREF="{listOrderURL}">{listOrdheadID}</A></td>
+        <td width="50px"
+            class="listItemText"
+        >{listOrderType}
+        </td>
+        <td width="50px"
+            class="listItemText"
+        >{listOrderDate}
+        </td>
+        <td width="250px"
+            class="listItemText"
+        >{listCustPORef}
+        </td>
     </tr>
     <!-- END orderBlock -->
 </table>

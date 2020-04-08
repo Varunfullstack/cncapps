@@ -1,5 +1,6 @@
 /vendor
 /.idea
+/stencil/.idea
 
 sessions/*
 logs/*
