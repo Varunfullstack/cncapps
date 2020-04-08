@@ -820,3 +820,7 @@ table.fixed_header {
 .topAlign > td {
     vertical-align: top;
 }
+
+.alert-field {
+    background-color: rgb(248, 165, 182);
+}

@@ -106,6 +106,9 @@ class DBEHeader extends DBEntity
     const cDriveFreeSpaceWarningPercentageThreshold = 'cDriveFreeSpaceWarningPercentageThreshold';
     const otherDriveFreeSpaceWarningPercentageThreshold = 'otherDriveFreeSpaceWarningPercentageThreshold';
     const office365ActiveSyncWarnAfterXDays = "office365ActiveSyncWarnAfterXDays";
+    const hdTeamManagementTimeApprovalMinutes = "hdTeamManagementTimeApprovalMinutes";
+    const esTeamManagementTimeApprovalMinutes = "esTeamManagementTimeApprovalMinutes";
+    const smallProjectsTeamManagementTimeApprovalMinutes = "smallProjectsTeamManagementTimeApprovalMinutes";
 
     /**
      * calls constructor()
@@ -610,6 +613,9 @@ class DBEHeader extends DBEntity
         $this->addColumn(self::cDriveFreeSpaceWarningPercentageThreshold, DA_INTEGER, DA_NOT_NULL);
         $this->addColumn(self::otherDriveFreeSpaceWarningPercentageThreshold, DA_INTEGER, DA_NOT_NULL);
         $this->addColumn(self::office365ActiveSyncWarnAfterXDays, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::hdTeamManagementTimeApprovalMinutes, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::esTeamManagementTimeApprovalMinutes, DA_INTEGER, DA_NOT_NULL);
+        $this->addColumn(self::smallProjectsTeamManagementTimeApprovalMinutes, DA_INTEGER, DA_NOT_NULL);
 
         $this->setPK(0);
         $this->setAddColumnsOff();

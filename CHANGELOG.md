@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 793 - Add Flag as Sent on Sales Quotes generated as esignable
 - Issue 802 - Starters & Leavers Report with links
 - Issue 782 - O365 Mailbox script to include Active Sync details
+- Issue 637 - Double Hard Time Limits
 ### Changed
 - Issue 750 - Set SR to awaiting CNC when Future date has been reached
 - Issue 772 - Date of Expense Tweak

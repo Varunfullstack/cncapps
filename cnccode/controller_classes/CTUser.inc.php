@@ -596,6 +596,9 @@ class CTUser extends CTCNC
                 'offsiteBackupAdditionalPermissionsFlagChecked' => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::offsiteBackupAdditionalPermissionsFlag)
                 ),
+                'additionalTimeLevelApproverChecked'                 => $dsUser->getValue(
+                    DBEUser::additionalTimeLevelApprover
+                ) ? 'checked' : null,
                 'reportsChecked'                                => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
                         PHPLIB_PERM_REPORTS
