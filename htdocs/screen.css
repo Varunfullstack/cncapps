@@ -51,7 +51,7 @@ TD, INPUT, SELECT, TEXTAREA {
     color: red;
 }
 
-.fakeLink[disabled]{
+.fakeLink[disabled] {
     color: inherit;
     cursor: inherit;
 }
@@ -554,6 +554,7 @@ span#imRemainMinutes {
     font-size: large;
     font-weight: bold;
 }
+
 span#projectRemainMinutes {
     color: red;
     font-size: large;
@@ -810,4 +811,23 @@ table.fixed_header {
 
 .greenPencil {
     color: green;
+}
+
+input[type="button"], input[type="submit"], button, input[type="reset"] {
+
+    background-color: #C6C6C6;
+    color: black;
+    border: none;
+    padding: 4px 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 2px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+input[type="button"]:hover, input[type="submit"]:hover, button:hover, input[type="reset"]:hover {
+    background-color: #E6E6E6;
 }

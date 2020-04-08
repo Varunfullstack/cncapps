@@ -3,6 +3,15 @@
         src='CommonJS.js'
 ></script>
 <script src=".javascript/fromDateToDate.js"></script>
+<style>
+    .salesOrderForm input[type="text"], .salesOrderForm select {
+        width: 189px;
+    }
+
+    .salesOrderForm input[name="customerString"] {
+        width: 250px;
+    }
+</style>
 <script language='JavaScript'>
     var savedCustomerString;
 
@@ -61,6 +70,7 @@
            border="0"
            cellspacing="0"
            cellpadding="1"
+           class="salesOrderForm"
     >
         <tr>
             <td width="100px"
@@ -89,12 +99,13 @@
             <td class="promptText">
                 <div align="right">Order Number</div>
             </td>
-            <td><input
-                    type="text"
-                    onKeypress="javascript:submitOnReturn()"
-                    name="form[ordheadID]"
-                    value="{ordheadID}"
-            > <font class="formErrorMessage"> {ordheadIDMessage} </font></td>
+            <td>
+                <input type="text"
+
+                       onKeypress="javascript:submitOnReturn()"
+                       name="form[ordheadID]"
+                       value="{ordheadID}"
+                > <font class="formErrorMessage"> {ordheadIDMessage} </font></td>
         </tr>
         <tr>
             <td class="promptText">
@@ -119,15 +130,15 @@
             <td class="promptText">
                 <div align="right">Customer PO Ref</div>
             </td>
-            <td><input
-                    type="text"
-                    name="form[custPORef]"
-                    id="custPORef"
-                    value="{custPORef}"
-                    size="23"
-                    maxlength="23"
-                    onKeypress="javascript:submitOnReturn()"
-            ></td>
+            <td>
+                <input type="text"
+                       name="form[custPORef]"
+                       id="custPORef"
+                       value="{custPORef}"
+                       size="23"
+                       maxlength="23"
+                       onKeypress="javascript:submitOnReturn()"
+                ></td>
         </tr>
         <tr>
             <td class="promptText">
@@ -180,7 +191,6 @@
         <tr>
             <td>&nbsp;</td>
             <td>
-                <!--				<input type="submit" name="Search" value="Search"> -->
                 <input type="button"
                        name="Search"
                        value="Search"

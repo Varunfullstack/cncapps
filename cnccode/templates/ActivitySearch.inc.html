@@ -163,7 +163,9 @@
                 <div align="right">Activity Type</div>
             </td>
             <td>
-                <select name="activity[1][callActTypeID]">
+                <select name="activity[1][callActTypeID]"
+                        style="width: 220px"
+                >
                     <option value="">All</option>
                     <!-- BEGIN activityTypeBlock -->
                     <option {activityTypeSelected}
@@ -206,20 +208,24 @@
             <td class="promptText">
                 <div align="right">Activity Status</div>
             </td>
-            <td><select name="activity[1][status]">
-                <!-- BEGIN statusBlock -->
-                <option {statusSelected}
-                        value="{statusValue}"
-                >{statusDescription}
-                </option>
-                <!-- END statusBlock -->
-            </select></td>
+            <td>
+                <select name="activity[1][status]"
+                        style="width: 220px"
+                >
+                    <!-- BEGIN statusBlock -->
+                    <option {statusSelected}
+                            value="{statusValue}"
+                    >{statusDescription}
+                    </option>
+                    <!-- END statusBlock -->
+                </select>
+            </td>
         </tr>
         <tr>
             <td class="promptText">
                 <div align="right">Priority</div>
             </td>
-            <td><select name="activity[1][priority]">
+            <td><select name="activity[1][priority]" style="width: 220px">
                 <option value="">All</option>
                 <!-- BEGIN priorityBlock -->
                 <option {prioritySelected}
