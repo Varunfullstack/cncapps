@@ -1175,7 +1175,8 @@ class CTActivity extends CTCNC
         if ($customerID) {
             $buCustomerItem->getContractsByCustomerID(
                 $customerID,
-                $dsContract
+                $dsContract,
+                null
             );
         }
 
@@ -1305,7 +1306,8 @@ class CTActivity extends CTCNC
         $dsContract = new DataSet($this);
         $buCustomerItem->getContractsByCustomerID(
             $customerID,
-            $dsContract
+            $dsContract,
+            null
         );
 
         $data = [];
@@ -6788,7 +6790,8 @@ class CTActivity extends CTCNC
         $dsContract = new DataSet($this);
         $buCustomerItem->getContractsByCustomerID(
             $customerID,
-            $dsContract
+            $dsContract,
+            null
         );
 
         $itemTypes = [];

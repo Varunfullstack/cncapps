@@ -67,7 +67,7 @@ class DBEJContract extends DBECustomerItem
         $this->setAddColumnsOff();
     }
 
-    function getRowsByCustomerID($customerID)
+    function getRowsByCustomerID($customerID, int $itemID = null)
     {
         $this->setMethodName('getRowsByCustomerID');
         if ($customerID == '') {
@@ -81,8 +81,12 @@ class DBEJContract extends DBECustomerItem
             " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno " .
             " WHERE " . $this->getDBColumnName(self::customerID) . "=" . $customerID .
             "  AND renewalType.allowSrLogging = 'Y'
-         AND declinedFlag <> 'Y'
-       ORDER BY renewalType.description, itm_desc";
+         AND declinedFlag <> 'Y'";
+
+        if ($itemID) {
+            $queryString .= " and cui_itemno = " . $itemID;
+        }
+        $queryString .= " ORDER BY renewalType.description, itm_desc";
         $this->setQueryString($queryString);
         return (parent::getRows());
     }

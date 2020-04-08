@@ -145,7 +145,7 @@ class BURenewal extends Business
             'RenewalScheduleEmail.inc.html'
         );
 
-        $this->dbeJContract->getRowsByCustomerID($dsCustomer->getValue(DBECustomer::customerID));
+        $this->dbeJContract->getRowsByCustomerID($dsCustomer->getValue(DBECustomer::customerID), null);
         $dsRenewal = new DataSet($this);
         $this->getData(
             $this->dbeJContract,

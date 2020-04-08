@@ -2857,6 +2857,19 @@ class BUActivity extends Business
                 " by " . $userName;
             $this->createFixedActivity($dbeCallActivity->getValue(DBECallActivity::problemID), $resolutionSummary);
             $problem->setValue(DBEProblem::status, 'F');
+            $completeDate = (new DateTime())->add(new DateInterval('P2D'));
+            $buCustomerItem = new BUCustomerItem($this);
+            $dsResults = new DataSet($this);
+            $buCustomerItem->getContractsByCustomerID($problem->getValue(DBEProblem::customerID), $dsResults, 17839);
+            if ($dsResults->rowCount()) {
+                $dsResults->fetchNext();
+                $problem->setValue(
+                    DBEProblem::contractCustomerItemID,
+                    $dsResults->getValue(DBECustomerItem::customerItemID)
+                );
+            }
+
+            $problem->setValue(DBEProblem::completeDate, $completeDate->format(DATE_MYSQL_DATE));
             $problem->updateRow();
         }
 
