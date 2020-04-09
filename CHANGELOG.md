@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 816 - Service Requests linked to sales order can only be closed as T&M
+
 ## [v3.11.10] - 2020-04-01
 ### Fixed
 - Fix issue with auto approve overtime

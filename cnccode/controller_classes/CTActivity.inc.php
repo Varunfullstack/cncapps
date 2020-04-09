@@ -1167,7 +1167,8 @@ class CTActivity extends CTCNC
         $customerID,
         $contractCustomerItemID,
         $templateName = 'ActivityCreate6',
-        $blockName = 'contractBlock'
+        $blockName = 'contractBlock',
+        bool $linkedToSalesOrder = false
     )
     {
         $buCustomerItem = new BUCustomerItem($this);
@@ -1231,7 +1232,8 @@ class CTActivity extends CTCNC
                     'optGroupOpen'           => $optGroupOpen,
                     'optGroupClose'          => $optGroupClose,
                     'optGroupCloseLast'      => $dsContract->rowCount() == $currentRow ? '</optgroup>' : 'null',
-                    'prepayContract'         => $dsContract->getValue(DBEJContract::itemTypeID) == 57
+                    'prepayContract'         => $dsContract->getValue(DBEJContract::itemTypeID) == 57,
+                    'disabled'               => $linkedToSalesOrder ? 'disabled' : null
                 )
             );
             $this->template->parse(
@@ -6120,11 +6122,12 @@ class CTActivity extends CTCNC
                 ) < $dsHeader->getValue(DBEHeader::srPromptContractThresholdHours))
 
         ) {
-
             $this->contractDropdown(
                 $dsCallActivity->getValue(DBEJCallActivity::customerID),
                 $this->getParam('contractCustomerItemID'),
-                'ServiceRequestFixedEditContractDropdown'
+                'ServiceRequestFixedEditContractDropdown',
+                'contractBlock',
+                !!$dsCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID)
             );
 
             $this->template->parse(
