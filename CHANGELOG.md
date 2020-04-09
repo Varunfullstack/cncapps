@@ -34,6 +34,7 @@ This project changes will be shown here.
 - Issue 817 - Customer Contracts Listed in Portal Documents
 - Issue 812 - Customer search box improvements
 - Issue 771 - Allocation of SRs that get reopened
+- Issue 796 - Show 3 year contracts on Customer Profitability Report
 ### Fixed
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
 - Issue 773 - Office 365 Backup Licenses Not Updating Contracts
