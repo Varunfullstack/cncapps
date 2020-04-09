@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEPortalCustomerDocumentWithoutFile extends DBEntity
@@ -42,6 +43,15 @@ class DBEPortalCustomerDocumentWithoutFile extends DBEntity
         $this->addColumn(self::createdUserID, DA_ID, DA_ALLOW_NULL);
         $this->setPK(0);
         $this->setAddColumnsOff();
+    }
+
+    public function hasContractDocumentByCustomerId($customerID)
+    {
+        $queryString = 'select count(*) > 0 from ' . $this->getTableName() . " where " . $this->getDBColumnName(
+                self::customerContract
+            ) . " = 1 and " . $this->getDBColumnName(self::customerID) . " = $customerID";
+        $result = $this->db->query($queryString);
+        return $result->fetch(MYSQLI_NUM)[0];
     }
 
 

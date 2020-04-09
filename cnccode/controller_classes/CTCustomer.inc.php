@@ -3015,7 +3015,7 @@ class CTCustomer extends CTCNC
                         ),
                         'customerContract'    => $dsPortalCustomerDocument->getValue(
                             DBEPortalCustomerDocument::customerContract
-                        ),
+                        ) ? 'Y': 'N',
                         'mainContactOnlyFlag' => $dsPortalCustomerDocument->getValue(
                             DBEPortalCustomerDocument::mainContactOnlyFlag
                         ),
