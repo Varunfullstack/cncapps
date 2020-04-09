@@ -8340,24 +8340,16 @@ is currently a balance of ';
          reallocating.
          */
                     if ($dbeProblem->getValue(DBEJProblem::priority) == 1) {
-                        $dbeProblem->setValue(
-                            DBEJProblem::userID,
-                            null
-                        );              // ensure not assigned
+                        // ensure not assigned
                         $this->sendPriorityOneReopenedEmail($problemID);
-                    } /*
-         otherwise, reallocate to fixed user
-         */
-                    else {
-                        $dbeProblem->setValue(
-                            DBEJProblem::userID,
-                            $dbeProblem->getValue(DBEJProblem::fixedUserID)
-                        );
                     }
                 }
+                $dbeProblem->setValue(
+                    DBEJProblem::userID,
+                    null
+                );
 
                 $reason = '<P>Reopened</P>' . $reason;
-
             }
 
             $dbeProblem->setValue(
