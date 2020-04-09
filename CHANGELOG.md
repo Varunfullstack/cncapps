@@ -30,6 +30,7 @@ This project changes will be shown here.
 - Issue 811 - Sales Requests Need Complete Date on Approval or Denial
 - Issue 511 - Activity Search Examples
 - Issue 816 - Service Requests linked to sales order can only be closed as T&M
+- Issue 814 - Visual Changes
 ### Fixed
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
 - Issue 773 - Office 365 Backup Licenses Not Updating Contracts

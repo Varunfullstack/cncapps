@@ -1,31 +1,111 @@
 <!-- Template: RenBroadbandList.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
-<table class="singleBorder" width="417" border="0" cellspacing="1" cellpadding="2">
-	<tr> 
-		<td width="265" class="listHeadText"><a href="{urlList}&orderBy=cus_name">Customer</a></td>
-		<td width="265" class="listHeadText"><a href="{urlList}&orderBy=ispID">ISP</a></td>
-		<td width="265" class="listHeadText"><a href="{urlList}&orderBy=itm_desc">Type</a></td>
-		<td width="265" class="listHeadText">Phone</td>
-		<td width="265" class="listHeadText"><a href="{urlList}&orderBy=costPricePerMonth">Cost/Month</a></td>
-		<td width="265" class="listHeadText"><a href="{urlList}&orderBy=salePricePerMonth">Sale/Month</a></td>
-		<td width="265" class="listHeadText"><a href="{urlList}&orderBy=invoiceFromDateYMD">Invoice From</a></td>
-		<td width="265" class="listHeadText"><a href="{urlList}&orderBy=invoiceToDateYMD">To</a></td>
-		<td width="141" class="listHeadText">&nbsp;</td>
-	</tr>
-	<!-- BEGIN rowBlock -->
-	<tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';"> 
-		<td class="orderLineItem"><DIV align="left">{customerName}</div></td>
-		<td class="orderLineItem"><DIV align="left">{ispID}</div></td>
-		<td class="orderLineItem"><DIV align="left">{itemDescription}</div></td>
-		<td class="orderLineItem"><DIV align="left">{adslPhone}</div></td>
-		<td class="orderLineItem"><DIV align="left">{costPricePerMonth}</div></td>
-		<td class="orderLineItem"><DIV align="left">{salePricePerMonth}</div></td>
-		<td class="orderLineItem"><DIV align="left">{invoiceFromDate}</div></td>
-		<td class="orderLineItem"><DIV align="left">{invoiceToDate}</div></td>
-		<td class="orderLineItem"><DIV align="left"></div>
-			<DIV align="left"> <A href="{urlEdit}" title="Edit renewal details">{txtEdit}</a> 
-			</DIV></td>
-	</tr>
-	<!-- END rowBlock -->
+<script>
+    $(function () {
+        $('#theTable').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'csv',
+                    bom: true
+                }
+            ],
+            columnDefs: [
+                {type: "date-eu", targets: [3, 4]}
+            ],
+            paging: false,
+            order: [
+                [0, 'asc'],
+            ]
+        });
+    })
+</script>
+<table class="singleBorder"
+       width="417"
+       border="0"
+       cellspacing="1"
+       cellpadding="2"
+       id="theTable"
+>
+    <thead>
+
+    <tr>
+        <td width="265"
+            class="listHeadText"
+        >Customer
+        </td>
+        <td width="265"
+            class="listHeadText"
+        >ISP
+        </td>
+        <td width="265"
+            class="listHeadText"
+        >Type
+        </td>
+        <td width="265"
+            class="listHeadText"
+        >Phone
+        </td>
+        <td width="265"
+            class="listHeadText"
+        >Cost/Month
+        </td>
+        <td width="265"
+            class="listHeadText"
+        >Sale/Month
+        </td>
+        <td width="265"
+            class="listHeadText"
+        >Invoice From
+        </td>
+        <td width="265"
+            class="listHeadText"
+        >To
+        </td>
+        <td width="141"
+            class="listHeadText"
+        >&nbsp;
+        </td>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN rowBlock -->
+    <tr valign="top"
+        onMouseOver="this.bgColor='#ffffcc';"
+        onMouseOut="this.bgColor='';"
+    >
+        <td class="orderLineItem">
+            <DIV align="left">{customerName}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{ispID}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{itemDescription}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{adslPhone}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{costPricePerMonth}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{salePricePerMonth}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{invoiceFromDate}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left">{invoiceToDate}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left"></div>
+            <DIV align="left"><A href="{urlEdit}"
+                                 title="Edit renewal details"
+            >{txtEdit}</a>
+            </DIV>
+        </td>
+    </tr>
+    <!-- END rowBlock -->
+    </tbody>
 </table>
 <!-- End Template: ActivityTypeList.inc.html -->
