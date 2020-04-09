@@ -32,10 +32,35 @@ $dsCustomers = new DataSet($thing);
 $buCustomer = new BUCustomer($thing);
 $buCustomer->getActiveCustomers($dsCustomers);
 $failedCustomers = [];
+
+class PortalContractDocumentCustomer
+{
+    public $link;
+    public $name;
+
+    /**
+     * PortalContractDocumentCustomer constructor.
+     * @param $link
+     * @param $name
+     */
+    public function __construct($link, $name)
+    {
+        $this->link = $link;
+        $this->name = $name;
+    }
+
+}
+
 $buPortalDocument = new BUPortalCustomerDocument($thing);
 while ($dsCustomers->fetchNext()) {
     if (!$buPortalDocument->hasContractDocumentByCustomerId($dsCustomers->getValue(DBECustomer::customerID))) {
-        $failedCustomers[] = $dsCustomers->getValue(DBECustomer::name);
+        $link = SITE_URL . "/Customer.php?action=dispEdit&customerID=" . $dsCustomers->getValue(
+                DBECustomer::customerID
+            );
+        $failedCustomers[] = new PortalContractDocumentCustomer(
+            $link,
+            $dsCustomers->getValue(DBECustomer::name)
+        );
     }
 }
 
