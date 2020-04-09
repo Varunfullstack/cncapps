@@ -33,6 +33,7 @@ This project changes will be shown here.
 - Issue 814 - Visual Changes
 - Issue 817 - Customer Contracts Listed in Portal Documents
 - Issue 812 - Customer search box improvements
+- Issue 771 - Allocation of SRs that get reopened
 ### Fixed
 - Issue 775 - SR Fixed Yesterday Total Value Tweak
 - Issue 773 - Office 365 Backup Licenses Not Updating Contracts
