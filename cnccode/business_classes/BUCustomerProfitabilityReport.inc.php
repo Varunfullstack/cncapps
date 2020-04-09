@@ -63,16 +63,11 @@ class BUCustomerProfitabilityReport extends Business
   expiryDate,
   initialContractLength as term   
 FROM
-  customer
+  customer 
       left join 
   (SELECT
   cui_custno,
-  MIN(
-    DATE_ADD(
-      `installationDate`,
-      INTERVAL `totalInvoiceMonths` MONTH
-    )
-  ) AS expiryDate,
+  MIN(    getContractExpiryDate(installationDate, initialContractLength)  ) AS expiryDate,
   initialContractLength
 FROM
   custitem
