@@ -69,6 +69,15 @@ class BUPortalCustomerDocument extends Business
         return ($this->getData($this->dbePortalCustomerDocument, $dsResults));
     }
 
+    /**
+     * @param $customerID
+     * @return mixed
+     */
+    function hasContractDocumentByCustomerId($customerID)
+    {
+        return $this->dbePortalCustomerDocumentWithoutFile->hasContractDocumentByCustomerId($customerID);
+    }
+
     function deleteDocument($ID)
     {
         $this->setMethodName('deleteDocument');

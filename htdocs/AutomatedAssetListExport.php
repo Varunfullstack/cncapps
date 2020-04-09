@@ -445,14 +445,6 @@ ORDER BY Location, `Computer Name`';
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 );
                 $dbeCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::startersFormFlag,
-                    'N'
-                );
-                $dbeCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::leaversFormFlag,
-                    'N'
-                );
-                $dbeCustomerDocument->setValue(
                     DBEPortalCustomerDocument::mainContactOnlyFlag,
                     'Y'
                 );

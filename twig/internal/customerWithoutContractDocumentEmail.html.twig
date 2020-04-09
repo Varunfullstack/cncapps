@@ -1,0 +1,13 @@
+{% extends "@internal/wrapper.html.twig" %}
+{# @var customers \PortalContractDocumentCustomer[] #}
+{% block styles %}
+{% endblock %}
+{% block content %}
+    <p>
+    The following customers DO NOT have a signed copy of terms and conditions:
+    {% for customer in customers %}
+        <p>
+            <a href="{{ customer.link }}">{{ customer.name }}</a>
+        </p>
+    {% endfor %}
+{% endblock %}

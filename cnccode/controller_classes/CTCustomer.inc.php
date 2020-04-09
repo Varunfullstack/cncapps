@@ -2979,12 +2979,9 @@ class CTCustomer extends CTCNC
                         'filename'            => $dsPortalCustomerDocument->getValue(
                             DBEPortalCustomerDocument::filename
                         ),
-                        'startersFormFlag'    => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::startersFormFlag
-                        ),
-                        'leaversFormFlag'     => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::leaversFormFlag
-                        ),
+                        'customerContract'    => $dsPortalCustomerDocument->getValue(
+                            DBEPortalCustomerDocument::customerContract
+                        ) ? 'Y': 'N',
                         'mainContactOnlyFlag' => $dsPortalCustomerDocument->getValue(
                             DBEPortalCustomerDocument::mainContactOnlyFlag
                         ),
