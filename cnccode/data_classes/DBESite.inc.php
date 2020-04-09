@@ -213,6 +213,7 @@ class DBESite extends DBCNCEntity
      */
     function getRowsByCustomerID($activeFlag = true)
     {
+
         $this->setMethodName("getRowsByCustomerID");
         if ($this->getValue(self::customerID) == "") {
             $this->raiseError('CustomerID not set');
@@ -221,13 +222,11 @@ class DBESite extends DBCNCEntity
             'SELECT ' . $this->getDBColumnNamesAsString() .
             ' FROM ' . $this->getTableName() .
             ' WHERE ' . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID);
-
         if ($activeFlag) {
             $queryString .= ' AND add_active_flag = "Y"';
         }
 
         $queryString .= ' ORDER BY ' . $this->getDBColumnName(self::siteNo);
-
         $this->setQueryString($queryString);
         return (parent::getRows());
     }

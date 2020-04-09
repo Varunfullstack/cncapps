@@ -151,12 +151,7 @@ class BUCustomer extends Business
             DBESite::customerID,
             $customerID
         );
-        if ($showInactiveSites) {
-            $activeFlag = 'N';
-        } else {
-            $activeFlag = 'Y';
-        }
-        $this->dbeSite->getRowsByCustomerID($activeFlag);
+        $this->dbeSite->getRowsByCustomerID(!$showInactiveSites);
         return ($this->getData(
             $this->dbeSite,
             $dsResults

@@ -37,6 +37,7 @@ This project changes will be shown here.
 - Issue 773 - Office 365 Backup Licenses Not Updating Contracts
 - Issue 760 - Feedback on incorrect staff encryption key
 - Issue 776 - New SR Start Work Time adjustment tweak
+- Issue 815 - Inactive Sites not showing
 
 
 ## [v3.11.10] - 2020-04-01
