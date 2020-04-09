@@ -133,6 +133,7 @@
         list.html(html);
     }
 
+    const autocompleteURL = "/Customer.php?action=searchName";
     $(function () {
         customerSection = $('.customerSection');
         domainInput = $('[name="domain"]');
@@ -142,6 +143,33 @@
         list = $('.list');
         detail = $('.detail');
         drawList();
+
+        $('#customerString').autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response.map(item => ({label: item.name, value: item.id})));
+                })
+            },
+            select: function (event, ui) {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+                $('#customerID').val(ui.item.value);
+            },
+            delay: 200,
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
+
         list.on('click', '.editButton', function (thing) {
             $elm = $(this);
 
@@ -286,33 +314,6 @@
     }
 
 
-    var savedCustomerString;
-
-    function saveCustomerString() {
-        savedCustomerString = document.getElementById("customerString").value
-    }
-
-    function validateCustomerString() {
-        if (Trim(document.getElementById("customerString").value) != "") {
-            if (document.getElementById("customerString").value != savedCustomerString) {
-                window.open('Customer.php?action=dispCustPopup&htmlFmt=popup&customerString=' +
-                    escape(document.getElementById("customerString").value) +
-                    '&parentIDField=customerID' +
-                    '&parentDescField=customerString',
-                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
-            }
-        } else {
-            document.form.customerID.value = "";
-        }
-    }
-
-    function validateCustomerStringOnReturn() {
-        if (event.keyCode == 13) {
-            validateCustomerString();
-        }
-    }
-
-
 </script>
 <div class="list">
 </div>
@@ -357,9 +358,6 @@
                    name="form[customerString]"
                    value="{customerString}"
                    id="customerString"
-                   onFocus="javascript:saveCustomerString()"
-                   onBlur="javascript:validateCustomerString()"
-                   onKeypress="javascript:validateCustomerStringOnReturn()"
             >
         </div>
 

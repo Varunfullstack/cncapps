@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html dir="ltr"
+      lang="en"
+>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+  >
+  <title>Stencil Component Starter</title>
+
+  <script type="module"
+          src="/build/cncapps-components.esm.js"
+  ></script>
+  <script nomodule
+          src="/build/cncapps-components.js"
+  ></script>
+
+</head>
+<body>
+
+<autocomplete-dropdown placeholder="test"
+                       suggestionList="['the','test','is','this']"
+></autocomplete-dropdown>
+<script>
+  var testArr = ['the', 'valid', 'strings', 'for', 'search', 'auto', 'complete', 'foo', 'bar'];
+  document.querySelector('xeph-autocomplete').suggestionlist = testArr;
+</script>
+</body>
+</html>

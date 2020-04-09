@@ -1,4 +1,34 @@
 <!-- Template: ContractsAnalysisReport.inc.html -->
+<script>
+    const autocompleteURL = "/Customer.php?action=searchName";
+    $(function () {
+        $('#customerString').autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response.map(item => ({label: item.name, value: item.id})));
+                })
+            },
+            select: function (event, ui) {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+                $('#customerID').val(ui.item.value);
+            },
+            delay: 200,
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
+    });
+</script>
 <P class="formErrorMessage">{formError}</P>
 <form name="searchForm"
       method="get"
@@ -233,7 +263,6 @@
             >
             <input type="text"
                    id="customerString"
-                   customer-picker
             >
         </td>
     </tr>

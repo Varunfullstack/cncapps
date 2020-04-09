@@ -843,3 +843,7 @@ input[type="button"], input[type="submit"], button, input[type="reset"] {
 input[type="button"]:hover, input[type="submit"]:hover, button:hover, input[type="reset"]:hover {
     background-color: #E6E6E6;
 }
+
+table.cell-padding-1 th, table.cell-padding-1 td {
+    padding: 1px;
+}

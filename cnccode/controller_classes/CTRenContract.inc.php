@@ -149,8 +149,8 @@ class CTRenContract extends CTCNC
 
                 global $db;
                 $result = $db->preparedQuery(
-                    "select distinct(itm_desc) as contractDesc from custitem left join item ON itm_itemno = cui_itemno where declinedFlag = 'N' and directDebitFlag <> 'Y'
-        AND renewalTypeID = 2 and itm_desc like ? order by contractDesc",
+                    "SELECT itm_desc AS `name`, itm_itemno AS id  FROM custitem LEFT JOIN item ON itm_itemno = cui_itemno WHERE declinedFlag = 'N' AND directDebitFlag <> 'Y'
+        AND renewalTypeID = 2 AND itm_desc LIKE ? GROUP BY itm_itemno ORDER BY `name` ",
                     [
                         [
                             "type"  => "s",
@@ -162,8 +162,9 @@ class CTRenContract extends CTCNC
                     echo json_encode(["error" => $db->errorInfo()]);
                     http_response_code(400);
                 }
-                $data = $result->fetch_all(MYSQLI_NUM);
-                echo json_encode(array_column($data, 0));
+
+                $data = $result->fetch_all(MYSQLI_ASSOC);
+                echo json_encode($data);
                 break;
             case 'list':
             default:
