@@ -137,7 +137,7 @@ do {
         continue;
     }
 
-    if ( count($data['errors'])) {
+    if (count($data['errors'])) {
         foreach ($data['errors'] as $error) {
             $logger->warning("Error received from powershell output, but the execution was not stopped:  " . $error);
         }
@@ -269,14 +269,6 @@ do {
             $dbeCustomerDocument->setValue(
                 DBEPortalCustomerDocument::fileMimeType,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            );
-            $dbeCustomerDocument->setValue(
-                DBEPortalCustomerDocument::startersFormFlag,
-                'N'
-            );
-            $dbeCustomerDocument->setValue(
-                DBEPortalCustomerDocument::leaversFormFlag,
-                'N'
             );
             $dbeCustomerDocument->setValue(
                 DBEPortalCustomerDocument::mainContactOnlyFlag,

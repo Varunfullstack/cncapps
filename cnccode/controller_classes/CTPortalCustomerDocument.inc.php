@@ -160,17 +160,11 @@ class CTPortalCustomerDocument extends CTCNC
                 'descriptionMessage'         => Controller::htmlDisplayText(
                     $dsPortalCustomerDocument->getMessage(DBEPortalCustomerDocument::description)
                 ),
-                'leaversFormFlagChecked'     => Controller::htmlChecked(
-                    $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::leaversFormFlag)
-                ),
-                'leaversFormFlagMessage'     => Controller::htmlDisplayText(
-                    $dsPortalCustomerDocument->getMessage(DBEPortalCustomerDocument::leaversFormFlag)
-                ),
-                'startersFormFlagChecked'    => Controller::htmlChecked(
-                    $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::startersFormFlag)
-                ),
-                'startersFormFlagMessage'    => Controller::htmlDisplayText(
-                    $dsPortalCustomerDocument->getMessage(DBEPortalCustomerDocument::startersFormFlag)
+                'customerContractChecked'    => $dsPortalCustomerDocument->getValue(
+                    DBEPortalCustomerDocument::customerContract
+                ) ? 'checked' : null,
+                'customerContractMessage'    => Controller::htmlDisplayText(
+                    $dsPortalCustomerDocument->getMessage(DBEPortalCustomerDocument::customerContract)
                 ),
                 'mainContactOnlyFlagChecked' => Controller::htmlChecked(
                     $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::mainContactOnlyFlag)
@@ -189,53 +183,37 @@ class CTPortalCustomerDocument extends CTCNC
         $this->parsePage();
     }// end function editFurther Action()
 
-    function viewFile()
+    /**
+     * Delete Further Action
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function delete()
     {
-        // Validation and setting of variables
-        $this->setMethodName('viewFile');
+        $this->setMethodName('delete');
         $dsPortalCustomerDocument = new DataSet($this);
         $this->buPortalCustomerDocument->getDocumentByID(
             $this->getParam('portalCustomerDocumentID'),
             $dsPortalCustomerDocument
         );
 
-        header('Content-Type: ' . $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::fileMimeType));
-        header(
-            'Content-Disposition: inline; filename = "' . $dsPortalCustomerDocument->getValue(
-                DBEPortalCustomerDocument::filename
-            ) . '"'
-        );
-        header(
-            'custom: filename = "' . $dsPortalCustomerDocument->getValue(
-                DBEPortalCustomerDocument::filename
-            ) . '"'
-        );
-        print $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::file);
-        exit;
-    }
-
-    /**
-     * @param $val
-     * @return bool|int|string
-     */
-    private function return_bytes($val)
-    {
-        $val = trim($val);
-
-        $last = strtolower($val[strlen($val) - 1]);
-        $val = substr($val, 0, -1); // necessary since PHP 7.1; otherwise optional
-
-        switch ($last) {
-            // The 'G' modifier is available since PHP 5.1.0
-            case 'g':
-                $val *= 1024;
-            case 'm':
-                $val *= 1024;
-            case 'k':
-                $val *= 1024;
+        if (!$this->buPortalCustomerDocument->deleteDocument($this->getParam('portalCustomerDocumentID'))) {
+            $this->displayFatalError('Cannot delete this document');
+            exit;
+        } else {
+            $urlNext =
+                Controller::buildLink(
+                    'Customer.php',
+                    array(
+                        'customerID' => $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::customerID),
+                        'action'     => CTCNC_ACT_DISP_EDIT
+                    )
+                );
+            header('Location: ' . $urlNext);
+            exit;
         }
-
-        return $val;
     }
 
     /**
@@ -300,36 +278,52 @@ class CTPortalCustomerDocument extends CTCNC
     }
 
     /**
-     * Delete Further Action
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
+     * @param $val
+     * @return bool|int|string
      */
-    function delete()
+    private function return_bytes($val)
     {
-        $this->setMethodName('delete');
+        $val = trim($val);
+
+        $last = strtolower($val[strlen($val) - 1]);
+        $val = substr($val, 0, -1); // necessary since PHP 7.1; otherwise optional
+
+        switch ($last) {
+            // The 'G' modifier is available since PHP 5.1.0
+            case 'g':
+                $val *= 1024;
+            case 'm':
+                $val *= 1024;
+            case 'k':
+                $val *= 1024;
+        }
+
+        return $val;
+    }
+
+    function viewFile()
+    {
+        // Validation and setting of variables
+        $this->setMethodName('viewFile');
         $dsPortalCustomerDocument = new DataSet($this);
         $this->buPortalCustomerDocument->getDocumentByID(
             $this->getParam('portalCustomerDocumentID'),
             $dsPortalCustomerDocument
         );
 
-        if (!$this->buPortalCustomerDocument->deleteDocument($this->getParam('portalCustomerDocumentID'))) {
-            $this->displayFatalError('Cannot delete this document');
-            exit;
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    'Customer.php',
-                    array(
-                        'customerID' => $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::customerID),
-                        'action'     => CTCNC_ACT_DISP_EDIT
-                    )
-                );
-            header('Location: ' . $urlNext);
-            exit;
-        }
+        header('Content-Type: ' . $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::fileMimeType));
+        header(
+            'Content-Disposition: inline; filename = "' . $dsPortalCustomerDocument->getValue(
+                DBEPortalCustomerDocument::filename
+            ) . '"'
+        );
+        header(
+            'custom: filename = "' . $dsPortalCustomerDocument->getValue(
+                DBEPortalCustomerDocument::filename
+            ) . '"'
+        );
+        print $dsPortalCustomerDocument->getValue(DBEPortalCustomerDocument::file);
+        exit;
     }
 
 }
