@@ -51,10 +51,8 @@ class DBEPortalCustomerDocumentWithoutFile extends DBEntity
                 self::customerContract
             ) . " = 1 and " . $this->getDBColumnName(self::customerID) . " = $customerID";
         $result = $this->db->query($queryString);
-        return $result->fetch(MYSQLI_NUM)[0];
+        return +$result->fetch_row()[0];
     }
-
-
 }
 
 ?>
