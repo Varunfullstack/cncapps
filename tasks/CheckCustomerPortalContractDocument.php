@@ -28,7 +28,7 @@ if (isset($options['d'])) {
     $debugMode = true;
 }
 $thing = null;
-
+$dsCustomers = new DataSet($thing);
 $buCustomer = new BUCustomer($thing);
 $buCustomer->getActiveCustomers($dsCustomers);
 $failedCustomers = [];
