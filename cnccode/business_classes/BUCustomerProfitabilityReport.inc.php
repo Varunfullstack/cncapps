@@ -41,364 +41,146 @@ class BUCustomerProfitabilityReport extends Business
         $toDate = $dsSearchForm->getValue(self::searchFormToDate);
         $customerID = $dsSearchForm->getValue(self::searchFormCustomerID);
 
-        $buHeader = new BUHeader($this);
-        $dsHeader = new DataSet($this);
-        $buHeader->getHeader($dsHeader);
+        $sql = "SELECT
+  cus_custno,
+  customer.`cus_name` as customerName,
+  cus_create_date AS since,
+  cost,
+  sale,
+  profit,
+  hours,
+  hours * hed_hourly_labour_cost AS cncCost,
+  (sale - cost) - (hours * hed_hourly_labour_cost) AS bottomLineProfit,
+  otherTurnover,
+  maintenanceTurnover,
+  prePayTurnover,
+  internetTurnover,
+  tAndMTurnover,
+  serviceDeskTurnover,
+  serverCareTurnover,
+  managedTurnover
+FROM
+  customer
+  LEFT JOIN headert
+    ON 1
+  LEFT JOIN
+    (SELECT
+      SUM(inl_qty * inl_cost_price) AS cost,
+      SUM(inl_qty * inl_unit_price) AS sale,
+      SUM(inl_qty * inl_unit_price) - SUM(inl_qty * inl_cost_price) AS profit,
+      SUM(
+        IF(
+          itm_itemtypeno NOT IN (23, 57, 3, 11, 56, 55, 54)
+          OR itm_itemtypeno IS NULL,
+          inl_qty * inl_unit_price,
+          0
+        )
+      ) AS otherTurnover,
+      SUM(
+        IF(
+          itm_itemtypeno = 23,
+          inl_qty * inl_unit_price,
+          0
+        )
+      ) AS maintenanceTurnover,
+      SUM(
+        IF(
+          itm_itemtypeno = 57,
+          inl_qty * inl_unit_price,
+          0
+        )
+      ) AS prePayTurnover,
+      SUM(
+        IF(
+          itm_itemtypeno = 3,
+          inl_qty * inl_unit_price,
+          0
+        )
+      ) AS internetTurnover,
+      SUM(
+        IF(
+          itm_itemtypeno = 11,
+          inl_qty * inl_unit_price,
+          0
+        )
+      ) AS tAndMTurnover,
+      SUM(
+        IF(
+          itm_itemtypeno = 56,
+          inl_qty * inl_unit_price,
+          0
+        )
+      ) AS serviceDeskTurnover,
+      SUM(
+        IF(
+          itm_itemtypeno = 55,
+          inl_qty * inl_unit_price,
+          0
+        )
+      ) AS serverCareTurnover,
+      SUM(
+        IF(
+          itm_itemtypeno = 54,
+          inl_qty * inl_unit_price,
+          0
+        )
+      ) AS managedTurnover,
+      inh_custno
+    FROM
+      invline
+      JOIN invhead
+        ON inh_invno = inl_invno
+      LEFT JOIN item
+        ON item.itm_itemno = invline.inl_itemno
+      LEFT JOIN itemtype
+        ON item.itm_itemtypeno = itemtype.ity_itemtypeno
+    WHERE inh_date_printed BETWEEN ?
+      AND ?
+    GROUP BY inh_custno) turnOver
+    ON turnOver.inh_custno = cus_custno
+  LEFT JOIN
+    (SELECT
+      SUM(
+        TIME_TO_SEC(caa_endtime) - TIME_TO_SEC(caa_starttime)
+      ) / 3600 AS hours,
+      problem.`pro_custno`
+    FROM
+      callactivity
+      JOIN problem
+        ON pro_problemno = caa_problemno
+    WHERE caa_date BETWEEN ?
+      AND ?
+    GROUP BY problem.`pro_custno`) hoursData
+    ON hoursData.pro_custno = cus_custno
+WHERE cus_custno <> 282
+  AND cost IS NOT NULL";
 
-        $sql =
-            "
-      SELECT
-        custno,
-        customerName,
-        SUM(cost) AS cost,
-        SUM(sale) AS sale,
-        SUM(sale) - SUM( cost ) AS profit,
-        SUM(hours) AS hours,
-        SUM(hours) * " . $dsHeader->getValue(DBEHeader::hourlyLabourCost) . " AS cncCost,
-        ( SUM( sale ) - SUM( cost ) ) -  ( SUM( hours ) * " . $dsHeader->getValue(DBEHeader::hourlyLabourCost) . " ) AS bottomLineProfit,
-        SUM( otherTurnover ) AS otherTurnover,
-        SUM( maintenanceTurnover ) AS maintenanceTurnover,
-        SUM( prePayTurnover ) AS prePayTurnover,
-        SUM( internetTurnover ) AS internetTurnover,
-        SUM( tAndMTurnover ) AS tAndMTurnover,
-        SUM( serviceDeskTurnover ) AS serviceDeskTurnover,
-        SUM( serverCareTurnover ) AS serverCareTurnover,
-        SUM( managedTurnover ) AS managedTurnover
-        
-      FROM
-      (
-      SELECT
-        inh_custno AS custno,
-        cus_name AS customerName,
-        SUM(inl_qty * inl_cost_price) AS cost,
-        SUM(inl_qty * inl_unit_price) AS sale,
-        0 AS hours,
-        0 AS otherTurnover,
-        0 AS maintenanceTurnover,
-        0 AS prePayTurnover,
-        0 AS internetTurnover,
-        0 AS tAndMTurnover,
-        0 AS serviceDeskTurnover,
-        0 AS serverCareTurnover,
-        0 AS managedTurnover
-      FROM
-        invline
-        JOIN invhead ON inh_invno = inl_invno
-        JOIN customer ON cus_custno = inh_custno
-      WHERE
-        inh_date_printed BETWEEN '$fromDate' AND '$toDate'";
-
-        if ($customerID) {
-            $sql .= " AND inh_custno =  $customerID ";
-        }
-
-        $sql .= "
-      GROUP BY custno
-
-      UNION
-
-      SELECT
-        pro_custno AS custno,
-        cus_name AS customerName,
-        0,
-        0,
-        SUM( TIME_TO_SEC( caa_endtime ) - TIME_TO_SEC(caa_starttime ) ) / 3600 AS hours,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      FROM
-        callactivity
-        JOIN problem ON pro_problemno = caa_problemno
-        JOIN customer ON cus_custno = pro_custno
-      WHERE
-        caa_date BETWEEN '$fromDate' AND '$toDate'";
-
-
-        if ($customerID) {
-            $sql .= " AND pro_custno = " . $customerID;
-        }
-
-        $sql .= "
-      GROUP BY custno
-      UNION
-
-      SELECT
-        inh_custno AS custno,
-        cus_name AS customerName,
-        0,
-        0,
-        0,
-        SUM(inl_qty * inl_unit_price) AS otherTurnover,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      FROM
-        invline
-        JOIN invhead ON inh_invno = inl_invno
-        JOIN customer ON cus_custno = inh_custno
-        LEFT JOIN item ON item.itm_itemno = invline.inl_itemno
-        LEFT JOIN itemtype ON item.itm_itemtypeno = itemtype.ity_itemtypeno
-      WHERE
-        inh_date_printed BETWEEN '$fromDate' AND '$toDate'
-      AND ( itm_itemtypeno NOT IN(23, 57, 3, 11, 56, 55, 54) OR itm_itemtypeno IS NULL )";
-
-        if ($customerID) {
-            $sql .= " AND inh_custno = " . $customerID;
-        }
-
-        $sql .= "
-      GROUP BY custno
-
-      UNION
-
-      SELECT
-        inh_custno AS custno,
-        cus_name AS customerName,
-        0,
-        0,
-        0,
-        0,
-        SUM(inl_qty * inl_unit_price) AS maintenanceTurnover,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-        
-      FROM
-        invline
-        JOIN invhead ON inh_invno = inl_invno
-        JOIN customer ON cus_custno = inh_custno
-        JOIN item ON item.itm_itemno = invline.inl_itemno
-        JOIN itemtype ON item.itm_itemtypeno = itemtype.ity_itemtypeno
-      WHERE
-        inh_date_printed BETWEEN '$fromDate' AND '$toDate'
-        AND itm_itemtypeno = 23";
+        $paramTypes = "ssss";
+        $params = [
+            $fromDate,
+            $toDate,
+            $fromDate,
+            $toDate
+        ];
 
         if ($customerID) {
-            $sql .= " AND inh_custno = " . $customerID;
+            $sql .= " and cus_custno = ?";
+            $paramTypes .= "i";
+            $params[] = +$customerID;
         }
 
-        $sql .= "
-      GROUP BY custno
+        $params = array_merge(
+            [$paramTypes],
+            $params
+        );
+        $refArray = [];
+        foreach ($params as $key => $value) $refArray[$key] = &$params[$key];
 
-      UNION
-
-      SELECT
-        inh_custno AS custno,
-        cus_name AS customerName,
-        0,
-        0,
-        0,
-        0,
-        0,
-        SUM(inl_qty * inl_unit_price) AS prePayTurnover,
-        0,
-        0,
-        0,
-        0,
-        0
-        
-      FROM
-        invline
-        JOIN invhead ON inh_invno = inl_invno
-        JOIN customer ON cus_custno = inh_custno
-        JOIN item ON item.itm_itemno = invline.inl_itemno
-        JOIN itemtype ON item.itm_itemtypeno = itemtype.ity_itemtypeno
-      WHERE
-        inh_date_printed BETWEEN '$fromDate' AND '$toDate'
-        AND itm_itemtypeno = 57";
-
-        if ($customerID) {
-            $sql .= " AND inh_custno = " . $customerID;
-        }
-
-        $sql .= "
-      GROUP BY custno
-
-      UNION
-
-      SELECT
-        inh_custno AS custno,
-        cus_name AS customerName,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        SUM(inl_qty * inl_unit_price) AS internetTurnover,
-        0,
-        0,
-        0,
-        0
-        
-      FROM
-        invline
-        JOIN invhead ON inh_invno = inl_invno
-        JOIN customer ON cus_custno = inh_custno
-        JOIN item ON item.itm_itemno = invline.inl_itemno
-        JOIN itemtype ON item.itm_itemtypeno = itemtype.ity_itemtypeno
-      WHERE
-        inh_date_printed BETWEEN '$fromDate' AND '$toDate'
-        AND itm_itemtypeno = 3";
-
-        if ($customerID) {
-            $sql .= " AND inh_custno = " . $customerID;
-        }
-
-        $sql .= "
-    GROUP BY custno
-
-      UNION
-
-      SELECT
-        inh_custno AS custno,
-        cus_name AS customerName,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        SUM(inl_qty * inl_unit_price) AS tAndMTurnover,
-        0,
-        0,
-        0
-        
-      FROM
-        invline
-        JOIN invhead ON inh_invno = inl_invno
-        JOIN customer ON cus_custno = inh_custno
-        JOIN item ON item.itm_itemno = invline.inl_itemno
-        JOIN itemtype ON item.itm_itemtypeno = itemtype.ity_itemtypeno
-      WHERE
-        inh_date_printed BETWEEN '$fromDate' AND '$toDate'
-        AND itm_itemtypeno = 11";
-
-        if ($customerID) {
-            $sql .= " AND inh_custno = " . $customerID;
-        }
-
-        $sql .= "
-      GROUP BY custno
-
-      UNION
-      SELECT
-        inh_custno AS custno,
-        cus_name AS customerName,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        SUM(inl_qty * inl_unit_price) AS serviceDeskTurnover,
-        0,
-        0
-        
-      FROM
-        invline
-        JOIN invhead ON inh_invno = inl_invno
-        JOIN customer ON cus_custno = inh_custno
-        JOIN item ON item.itm_itemno = invline.inl_itemno
-        JOIN itemtype ON item.itm_itemtypeno = itemtype.ity_itemtypeno
-      WHERE
-        inh_date_printed BETWEEN '$fromDate' AND '$toDate'
-        AND itm_itemtypeno = 56";
-
-        if ($customerID) {
-            $sql .= " AND inh_custno = " . $customerID;
-        }
-
-        $sql .= "
-    GROUP BY custno
-
-      UNION
-
-      SELECT
-        inh_custno AS custno,
-        cus_name AS customerName,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        SUM(inl_qty * inl_unit_price) AS serverCareTurnover,
-        0
-        
-      FROM
-        invline
-        JOIN invhead ON inh_invno = inl_invno
-        JOIN customer ON cus_custno = inh_custno
-        JOIN item ON item.itm_itemno = invline.inl_itemno
-        JOIN itemtype ON item.itm_itemtypeno = itemtype.ity_itemtypeno
-      WHERE
-        inh_date_printed BETWEEN '$fromDate' AND '$toDate'
-        AND itm_itemtypeno = 55";
-
-        if ($customerID) {
-            $sql .= " AND inh_custno = " . $customerID;
-        }
-
-        $sql .= "
-      GROUP BY custno
-
-      UNION
-
-      SELECT
-        inh_custno AS custno,
-        cus_name AS customerName,
-        0,                            
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        SUM(inl_qty * inl_unit_price) AS managedTurnover
-        
-      FROM
-        invline
-        JOIN invhead ON inh_invno = inl_invno
-        JOIN customer ON cus_custno = inh_custno
-        JOIN item ON item.itm_itemno = invline.inl_itemno
-        JOIN itemtype ON item.itm_itemtypeno = itemtype.ity_itemtypeno
-      WHERE
-        inh_date_printed BETWEEN '$fromDate' AND '$toDate'
-        AND itm_itemtypeno = 54";
-
-        if ($customerID) {
-            $sql .= " AND inh_custno = " . $customerID;
-        }
-
-        $sql .= "
-      GROUP BY custno
-      )
-      AS temp
-      WHERE custno <> 282
-      GROUP BY custno";
-
-        return $this->db->query($sql);
+        $statement = $this->db->prepare($sql);
+        call_user_func_array(
+            [$statement, 'bind_param'],
+            $refArray
+        );
+        return $statement->execute() ? $statement->get_result() : false;
     }
 }
