@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerProfitabilityReport.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomer.inc.php');
@@ -154,7 +155,7 @@ class CTCustomerProfitabilityReport extends CTCNC
             while ($row = $this->results->fetch_object()) {
 
                 $this->template->set_var(
-                    array(
+                    [
                         'customerName'        => $row->customerName,
                         'sale'                => number_format($row->sale, 2),
                         'profit'              => number_format($row->profit, 2),
@@ -168,8 +169,21 @@ class CTCustomerProfitabilityReport extends CTCNC
                         'tAndMTurnover'       => number_format($row->tAndMTurnover, 2),
                         'serviceDeskTurnover' => number_format($row->serviceDeskTurnover, 2),
                         'serverCareTurnover'  => number_format($row->serverCareTurnover, 2),
-                        'managedTurnover'     => number_format($row->managedTurnover, 2)
-                    )
+                        'managedTurnover'     => number_format($row->managedTurnover, 2),
+                        'since'               => $row->since ? DateTime::createFromFormat(
+                            DATE_MYSQL_DATE,
+                            $row->since
+                        )->format(
+                            'm/Y'
+                        ) : null,
+                        'endDate'             => $row->expiryDate ? DateTime::createFromFormat(
+                            DATE_MYSQL_DATE,
+                            $row->expiryDate
+                        )->format(
+                            'd/m/Y'
+                        ) : null,
+                        'term'                => $row->term
+                    ]
                 );
 
                 $totalSale += $row->sale;

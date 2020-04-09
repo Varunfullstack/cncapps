@@ -5,6 +5,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
@@ -58,9 +59,28 @@ class BUCustomerProfitabilityReport extends Business
   tAndMTurnover,
   serviceDeskTurnover,
   serverCareTurnover,
-  managedTurnover
+  managedTurnover,
+  expiryDate,
+  initialContractLength as term   
 FROM
   customer
+      left join 
+  (SELECT
+  cui_custno,
+  MIN(
+    DATE_ADD(
+      `installationDate`,
+      INTERVAL `totalInvoiceMonths` MONTH
+    )
+  ) AS expiryDate,
+  initialContractLength
+FROM
+  custitem
+  LEFT JOIN item
+    ON custitem.`cui_itemno` = item.`itm_itemno`
+WHERE item.`itm_itemtypeno` IN (55, 56, 58)
+  AND declinedFlag <> 'Y'
+GROUP BY cui_custno) contractData on contractData.cui_custno = cus_custno
   LEFT JOIN headert
     ON 1
   LEFT JOIN
