@@ -1235,7 +1235,7 @@ class CTActivity extends CTCNC
                     'prepayContract'         => $dsContract->getValue(DBEJContract::itemTypeID) == 57,
                     'isDisabled'             => !$dsContract->getValue(
                         DBEJContract::allowSRLog
-                    ) || $linkedToSalesOrder ? 'disabled' : null,
+                    ) || $linkedToSalesOrder ? 'disabled' : null,l
                 )
             );
             $this->template->parse(
