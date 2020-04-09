@@ -1233,8 +1233,9 @@ class CTActivity extends CTCNC
                     'optGroupClose'          => $optGroupClose,
                     'optGroupCloseLast'      => $dsContract->rowCount() == $currentRow ? '</optgroup>' : 'null',
                     'prepayContract'         => $dsContract->getValue(DBEJContract::itemTypeID) == 57,
-                    'isDisabled'             => $dsContract->getValue(DBEJContract::allowSRLog) ? null : 'disabled',
-                    'disabled'               => $linkedToSalesOrder ? 'disabled' : null
+                    'isDisabled'             => !$dsContract->getValue(
+                        DBEJContract::allowSRLog
+                    ) || $linkedToSalesOrder ? 'disabled' : null,
                 )
             );
             $this->template->parse(
