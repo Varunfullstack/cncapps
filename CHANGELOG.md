@@ -39,6 +39,7 @@ This project changes will be shown here.
 - Issue 760 - Feedback on incorrect staff encryption key
 - Issue 776 - New SR Start Work Time adjustment tweak
 - Issue 815 - Inactive Sites not showing
+- Issue 813 - 3CX Call Reporting Number matching & validation
 
 
 ## [v3.11.10] - 2020-04-01
