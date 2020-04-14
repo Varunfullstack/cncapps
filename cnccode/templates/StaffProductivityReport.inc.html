@@ -20,7 +20,7 @@
                         data: data
                     }
                 ).then(response => {
-                    responseCB(response.map(item => ({label: item.name, value: item.id})));
+                    responseCB(response);
                 })
             },
             select: function (event, ui) {

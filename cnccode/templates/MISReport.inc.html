@@ -5,21 +5,21 @@
 	const autocompleteURL = "/Customer.php?action=searchName";
 	$(function () {
 		$('#customerString').autocomplete({
-			minLength: 0,
-			source: function (request, responseCB) {
-				const data = {};
-				data.term = request.term;
-				$.ajax(
-						autocompleteURL,
-						{
-							method: 'POST',
-							dataType: 'json',
-							data: data
-						}
-				).then(response => {
-					responseCB(response.map(item => ({label: item.name, value: item.id})));
-				})
-			},
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response);
+                })
+            },
 			select: function (event, ui) {
 				event.preventDefault();
 				event.target.value = ui.item.label;
