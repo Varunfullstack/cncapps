@@ -1,0 +1,1088 @@
+<script type="text/javascript"
+        src=".javascript/handlebars-v4.0.11.js"
+></script>
+<script type="text/javascript"
+        src=".javascript/mustache.min.js"
+></script>
+<script type="application/javascript"
+        src=".javascript/mustache-wax.min.js"
+></script>
+<style>
+    .option-name {
+        position: relative;
+        cursor: help;
+    }
+
+    .option-name .help {
+        border-radius: .3em;
+        font-weight: normal;
+        display: none;
+        position: absolute;
+        padding: 1em;
+        background: #333;
+        color: #fafafa;
+        border: 1px solid #000;
+        left: 110%;
+        right: -100%;
+        width: 350px;
+        text-align: left;
+        top: -1em;
+        box-shadow: 3px 3px 3px #888;
+        line-height: 1.6;
+        font-size: .9em;
+    }
+
+    .option-name .help code {
+        color: #fff;
+        background: #000;
+    }
+
+    .option-name:hover code:first-child {
+        background: #222;
+        color: #fafafa;
+    }
+
+    .option-name:hover .help {
+        display: block;
+    }
+</style>
+<script id="SRScheduler-items-template"
+        type="text/template"
+>
+    <table>
+        <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Contact</th>
+            <th>Site</th>
+            <th>Rule</th>
+            <th>Hide?</th>
+            <th>Priority</th>
+            <th>Created By</th>
+            <th>Created At</th>
+            <th>Updated By</th>
+            <th>Updated At</th>
+            <th>Details</th>
+            <th>Internal Notes</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% #items %}
+        <tr data-id="{% id %}"
+        >
+            <td>
+                {% customerName %}
+            </td>
+            <td>
+                {% contactName %}
+            </td>
+            <td>
+                {% siteDescription %}
+            </td>
+            <td>
+                {% rruleString %}
+            </td>
+            <td>
+                {% #hideFromCustomer %}
+                <i class='fa fa-check'></i>
+                {% /hideFromCustomer %}
+                {% ^hideFromCustomer %}
+                <i class='fa fa-times'></i>
+                {% /hideFromCustomer %}
+            </td>
+            <td>
+                {% priority %}
+            </td>
+            <td>
+                {% createdAt %}
+            </td>
+            <td>
+                {% createdByName %}
+            </td>
+            <td>
+                {% updatedAt %}
+            </td>
+            <td>
+                {% updatedByName %}
+            </td>
+            <td>
+                <button onclick="showInfo('{% details | base64Encode %}')">Details</button>
+            </td>
+            <td>
+                <button onclick="showInfo('{% internalNotes | base64Encode %}')">Internal Notes</button>
+            </td>
+            <td class="buttons">
+                <button class="editButton">Edit</button>
+                <button class="deleteButton">Delete</button>
+            </td>
+        </tr>
+        {% /items %}
+        </tbody>
+    </table>
+
+</script>
+<script type="application/javascript">
+
+    function showInfo(data) {
+        const newWindow = window.open("", "", "width=500,height=400");
+        newWindow.document.write(atob(data));
+    }
+
+    Mustache.Formatters = {
+        base64Encode: function (value) {
+            if (!value) {
+                return value;
+            }
+
+            return btoa(value);
+        }
+    };
+
+    let currentSRScheduler = {
+        id: null,
+        customerId: null,
+        rruleString: null,
+        contactId: null,
+        siteNo: null,
+        priority: null,
+        hideFromCustomer: null,
+        teamId: null,
+        details: null,
+        internalNotes: null
+    };
+    let currentRRule = {
+        freq: null,
+        dtstart: new Date(),
+        until: null,
+        interval: 1,
+        byweekday: null,
+        bymonth: null,
+        bysetpos: null,
+        bymonthday: null,
+        byyearday: null,
+        byweekno: null
+    };
+    let saveButton = null;
+    let addButton = null;
+    let cancelButton = null;
+    let list = null;
+    let detail = null;
+    let customerSiteDescInput = null;
+    let contactNameInput = null;
+    let detailsEditor = null;
+    let internalNotesEditor = null;
+    let customerIdInput = null;
+    let rruleTable = null;
+    let priorityInput = null;
+    let hideFromCustomerInput = null;
+    let teamSelectInput = null;
+    let untilRow = null;
+    let countRow = null;
+    let monthdayRow = null;
+
+
+    let srSchedulerList = [];
+
+    function newSRScheduler() {
+
+        return {
+            id: null,
+            customerId: null,
+            rruleString: (new rrule.RRule()).toString(),
+            contactId: null,
+            siteNo: null,
+            priority: null,
+            hideFromCustomer: null,
+            teamId: null,
+            details: null,
+            internalNotes: null
+        };
+    }
+
+    $.ajax({
+        url: '?action=getData',
+        method: 'GET',
+        dataType: 'JSON'
+    }).then(function (result) {
+        srSchedulerList = result;
+        drawList();
+    });
+
+    Mustache.tags = ['{%', '%}'];
+
+    let editingItem = null;
+
+    function drawList() {
+        const source = document.getElementById("SRScheduler-items-template").innerHTML;
+        const context = {items: srSchedulerList};
+        const html = Mustache.to_html(source, context);
+        list.html(html);
+    }
+
+    function jsonCopy(src) {
+        return JSON.parse(JSON.stringify(src));
+    }
+
+    $(function () {
+        addButton = $('.addButton');
+        saveButton = $('.saveButton');
+        cancelButton = $('.cancelButton');
+        customerIdInput = $('input[name="customerId"]');
+        customerSiteDescInput = $('#siteDescriptionInput');
+        contactNameInput = $('#contactNameInput');
+        priorityInput = $('#priority');
+        hideFromCustomerInput = $('#hideFromCustomer');
+        teamSelectInput = $('#team');
+        untilRow = $('.untilRow');
+        countRow = $('.countRow');
+        monthdayRow = $('.monthdayRow');
+
+        untilRow.hide();
+        countRow.hide();
+        monthdayRow.hide();
+
+        detailsEditor = CKEDITOR.replace('details', {customConfig: '/ckeditor_config.js'});
+
+        CKEDITOR.instances.details.on('change', function () {
+            currentSRScheduler.details = detailsEditor.getData();
+        });
+        rruleTable = $('#rruleTable');
+        $('input[name="dtstart"]').val(moment().format('YYYY-MM-DD'));
+        recalculateRule();
+        internalNotesEditor = CKEDITOR.replace('internalNotes', {customConfig: '/ckeditor_config.js'});
+        CKEDITOR.instances.internalNotes.on('change', function () {
+            currentSRScheduler.internalNotes = internalNotesEditor.getData();
+        });
+
+        rruleTable.on('change', 'input', function () {
+            let mDate = null;
+            switch (this.name) {
+                case 'freq':
+                case 'interval':
+                case 'count':
+                    currentRRule[this.name] = +this.value;
+                    break;
+                case 'dtstart':
+                case 'until':
+                    mDate = moment(this.value, 'YYYY-MM-DD');
+                    if (!mDate.isValid()) {
+
+                        currentRRule[this.name] = null;
+                        break;
+                    }
+                    currentRRule[this.name] = mDate.toDate();
+                    break;
+                case 'byweekday':
+                case 'bymonth':
+                    // gather all the  and generate an array
+                    const inputs = document.querySelectorAll('input[name="' + this.name + '"]');
+                    const result = [];
+                    inputs.forEach(node => {
+                        if (node.checked) {
+                            result.push(+node.value);
+                        }
+                    });
+                    currentRRule[this.name] = result;
+                    break;
+                case 'bysetpos':
+                case 'bymonthday':
+                case 'byyearday':
+                case 'byweekno':
+                    let treatedValue = this.value;
+                    if (this.value.indexOf(',') > -1) {
+                        treatedValue = this.value.split(',');
+                    }
+                    currentRRule[this.name] = treatedValue;
+                    break;
+            }
+            recalculateRule();
+            setSRScheduler(currentSRScheduler);
+        });
+
+        detail = $('.detail');
+        list = $('.list');
+        drawList();
+        cancelEdit();
+        list.on('click', '.editButton', function () {
+            $elm = $(this);
+
+            const data = $elm.closest('tr').data();
+            editingItem = srSchedulerList.find(e => e.id === data.id);
+            if (!editingItem) {
+                throw Error('Failed to find element to edit');
+            }
+            setSRScheduler(jsonCopy(editingItem));
+            cancelButton.show();
+            saveButton.show();
+            addButton.hide();
+        });
+
+        list.on('click', '.deleteButton', function () {
+
+            if (!confirm('are you sure you want to delete this entry?')) {
+                return;
+            }
+
+            $elm = $(this);
+
+            const data = $elm.closest('tr').data();
+            const foundIndex = srSchedulerList.findIndex(e => e.id === data.id);
+
+            if (foundIndex < 0) {
+                throw Error('Failed to find element to delete');
+            }
+            const urlDeleteItem = "?action=delete&id=";
+            const url = urlDeleteItem + data.id;
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+            }).then(function () {
+                srSchedulerList.splice(foundIndex, 1);
+                drawList();
+            })
+        });
+
+
+        cancelButton.click(function () {
+            cancelEdit();
+        });
+
+        customerSiteDescInput.autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                if (!currentSRScheduler.customerId) {
+                    return [];
+                }
+                const data = {
+                    term: request.term,
+                    customerId: currentSRScheduler.customerId
+                };
+                $.ajax(
+                    '/Site.php?action=search',
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response);
+                })
+
+            },
+            delay: 200,
+            select: function (event, ui) {
+                currentSRScheduler.siteNo = ui.item.id;
+            }
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
+        const autocompleteURL = "/Customer.php?action=searchName";
+        $('#customerString').autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response);
+                })
+
+            },
+            delay: 200,
+            select: (event, ui) => {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+                currentSRScheduler.customerId = ui.item.id;
+                currentSRScheduler.customerName = ui.item.label;
+                setSRScheduler(currentSRScheduler);
+            }
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
+
+
+        contactNameInput.autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                if (!currentSRScheduler.customerId) {
+                    return [];
+                }
+                const data = {
+                    term: request.term,
+                    customerId: currentSRScheduler.customerId
+                };
+                $.ajax(
+                    '/Contact.php?action=search',
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response);
+                })
+
+            },
+            delay: 200,
+            select: function (event, ui) {
+                currentSRScheduler.contactId = ui.item.id;
+            }
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
+
+        saveButton.click(addOrUpdateCurrentItemSRScheduler);
+        addButton.click(addOrUpdateCurrentItemSRScheduler)
+    });
+
+    function recalculateRule() {
+        try {
+            const rule = new rrule.RRule(currentRRule);
+            currentSRScheduler.rruleString = rule.toString();
+
+            let text = rule.toText();
+            if (currentRRule.dtstart) {
+                text = " From " + moment(currentRRule.dtstart).format('MMM DD, YYYY') + " " + text;
+            }
+            $('#ruleText').html(text).removeClass('invalid');
+        } catch (e) {
+            $('#ruleText').html('Rule not valid: ' + e.message).addClass('invalid');
+            currentSRScheduler.rruleString = null;
+        }
+    }
+
+    function isItemSRSchedulerValid() {
+        if (!detail[0].checkValidity()) {
+            detail.submit();
+            return false;
+        }
+        if (!currentSRScheduler.customerId || !currentSRScheduler.contactId || currentSRScheduler.siteNo === null) {
+            alert('Customer, contact and site are required');
+            return false;
+        }
+
+        if (!currentSRScheduler.details) {
+            alert('Please provide details');
+            return false;
+        }
+
+        if (!currentSRScheduler.rruleString) {
+            alert('Recurrence is required');
+            return false;
+        }
+
+        return true;
+    }
+
+    function arrayReplaceAt(array, index, value) {
+        const ret = array.slice(0);
+        ret[index] = value;
+        return ret;
+    }
+
+    function addOrUpdateCurrentItemSRScheduler() {
+        if (!isItemSRSchedulerValid()) {
+            return;
+        }
+
+        const addURL = '?action=create';
+        const updateURL = '?action=update';
+        const url = currentSRScheduler.id ? updateURL : addURL;
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: currentSRScheduler
+        }).then(function (result) {
+                if (!currentSRScheduler.id) {
+                    srSchedulerList.push(result);
+                } else {
+                    const foundIndex = srSchedulerList.findIndex(srScheduler => currentSRScheduler.id === srScheduler.id);
+                    srSchedulerList = arrayReplaceAt(srSchedulerList, foundIndex, currentSRScheduler);
+                }
+                srSchedulerList.sort((a, b) => a.customerName.localeCompare(b.customerName));
+                drawList();
+                cancelEdit();
+            },
+            error => {
+                let errorMessage = "Failed to process scheduler";
+                if (error.responseJSON) {
+                    errorMessage = error.responseJSON.error;
+                }
+                alert(errorMessage);
+            }
+        )
+    }
+
+    function cancelEdit() {
+        setSRScheduler(newSRScheduler());
+        cancelButton.hide();
+        saveButton.hide();
+        addButton.show();
+    }
+
+    function setSRScheduler(srScheduler) {
+
+        currentSRScheduler = srScheduler;
+        $('#customerString').val(srScheduler.customerName);
+        updateCustomerID(srScheduler.customerId);
+        customerSiteDescInput.val(srScheduler.siteDescription);
+        contactNameInput.val(srScheduler.contactName);
+        priorityInput.val(srScheduler.priority);
+        teamSelectInput.val(srScheduler.teamId);
+        detailsEditor.setData(srScheduler.details);
+        internalNotesEditor.setData(srScheduler.internalNotes);
+        hideFromCustomerInput[0].checked = srScheduler.hideFromCustomer;
+        let rruleObject = new rrule.RRule();
+        if (srScheduler.rruleString) {
+            rruleObject = rrule.rrulestr(srScheduler.rruleString);
+        }
+        rruleObject.options.byminute = null;
+        rruleObject.options.byhour = null;
+        rruleObject.options.bysecond = null;
+        document.querySelectorAll('input[name="freq"]')
+            .forEach(x => {
+                x.checked = +x.value === rruleObject.options.freq;
+                if (x.checked) {
+                    if (+x.value === rrule.Frequency.WEEKLY) {
+                        rruleObject.options.bymonthday = null;
+                        monthdayRow.hide();
+                    } else {
+                        monthdayRow.show();
+                    }
+                }
+            });
+        document.querySelector('input[name="dtstart"]').value = moment(rruleObject.options.dtstart).format('YYYY-MM-DD');
+        let selectedUntilOrCount = null;
+        if (rruleObject.options.count) {
+            countRow.show();
+            untilRow.hide();
+            selectedUntilOrCount = 'count';
+            rruleObject.options.until = null;
+        } else {
+            untilRow.show();
+            countRow.hide();
+            selectedUntilOrCount = 'until';
+            rruleObject.options.count = null;
+        }
+
+        document.querySelectorAll('input[name="untilOrCount"]').forEach(x => {
+            x.checked = x.value === selectedUntilOrCount;
+        });
+
+        document.querySelector('input[name="count"]').value = rruleObject.options.count;
+        document.querySelector('input[name="until"]').value = rruleObject.options.until ? moment(rruleObject.options.until).format('YYYY-MM-DD') : null;
+
+        document.querySelector('input[name="interval"]').value = rruleObject.options.interval;
+        document.querySelectorAll('input[name="byweekday"]').forEach(x => {
+            x.checked = rruleObject.options.byweekday && rruleObject.options.byweekday.indexOf(+x.value) > -1;
+        });
+        document.querySelectorAll('input[name="bymonth"]').forEach(x => {
+            x.checked = rruleObject.options.bymonth && rruleObject.options.bymonth.indexOf(+x.value) > -1;
+        });
+        document.querySelector('input[name="bysetpos"]').value = (rruleObject.options.bysetpos && rruleObject.options.bysetpos.join(',')) || null;
+        document.querySelector('input[name="bymonthday"]').value = (rruleObject.options.bymonthday && rruleObject.options.bymonthday.join(',')) || null;
+        currentRRule = rruleObject.options;
+        recalculateRule();
+    }
+
+    function updateCustomerName() {
+        currentSRScheduler.customerName = $('#customerString').val();
+    }
+
+    function updateCustomerID(customerId) {
+        $('input[name="customerId"]').val(customerId);
+        currentSRScheduler.customerId = customerId;
+        if (currentSRScheduler.customerId) {
+            onSetCustomerID();
+        } else {
+            onUnsetCustomerID();
+        }
+    }
+
+    function onSetCustomerID() {
+        //we want to enable the customer site input
+        customerSiteDescInput.attr('disabled', false);
+        customerSiteDescInput[0].dataset.customerId = currentSRScheduler.customerId;
+        contactNameInput.attr('disabled', false);
+        contactNameInput[0].dataset.customerId = currentSRScheduler.customerId;
+    }
+
+    function changeUntilOrCount(value) {
+        if (value === 'until') {
+            untilRow.show();
+            countRow.hide();
+            currentRRule.count = null;
+        } else {
+            countRow.show();
+            untilRow.hide();
+            currentRRule.until = null;
+            currentRRule.count = 1;
+        }
+        document.querySelector('input[name="until"]').value = currentRRule.until ? moment(currentRRule.until).format('YYYY-MM-DD') : null;
+        document.querySelector('input[name="count"]').value = currentRRule.count;
+        recalculateRule();
+    }
+
+    function updateTeamId() {
+        currentSRScheduler.teamId = +event.target.value;
+    }
+
+    function onUnsetCustomerID() {
+//we want to enable the customer site input
+        customerSiteDescInput.attr('disabled', true);
+        delete customerSiteDescInput[0].dataset['customerId'];
+        contactNameInput.attr('disabled', true);
+        delete contactNameInput[0].dataset['customerId'];
+    }
+
+    function updatePriority() {
+        currentSRScheduler.priority = priorityInput.val();
+    }
+
+    function updateHideFromCustomer() {
+        currentSRScheduler.hideFromCustomer = hideFromCustomerInput[0].checked;
+    }
+
+</script>
+<form class="detail"
+      onsubmit="return false;"
+>
+    <div>
+        <div style="width: 100px; display: inline-block">
+            Customer Name
+        </div>
+        <input type="text"
+               maxlength="50"
+               name="name"
+               id="customerString"
+        >
+        <input hidden
+               name="customerId"
+               id="customerID"
+        >
+    </div>
+    <div>
+        <div style="width: 100px; display: inline-block">
+            Customer Site
+        </div>
+        <input type="text"
+               maxlength="50"
+               name="name"
+               id="siteDescriptionInput"
+               disabled
+        >
+    </div>
+    <div>
+        <div style="width: 100px; display: inline-block">
+            Contact
+        </div>
+        <input type="text"
+               maxlength="50"
+               name="name"
+               id="contactNameInput"
+               disabled
+        >
+    </div>
+    <div>
+        <div style="width: 100px; display: inline-block">
+            Priority
+        </div>
+        <select id="priority"
+                name="priority"
+                onchange="updatePriority()"
+                required
+        >
+            <option value="">Please Select</option>
+            <option value="1">P1 - Critical Impact/System Down</option>
+            <option value="2">P2 - High Impact</option>
+            <option value="3">P3 - Standard Service Request</option>
+            <option value="4">P4 - Change Request</option>
+            <option value="5">P5 - Project Work</option>
+        </select>
+    </div>
+    <div>
+        <div style="width: 100px; display: inline-block">
+            Hide Entire SR from Customer
+        </div>
+        <input type="checkbox"
+               value="1"
+               name="hideFromCustomer"
+               id="hideFromCustomer"
+               onchange="updateHideFromCustomer()"
+        >
+    </div>
+    <div>
+        <div style="width: 100px; display: inline-block">
+            Team
+        </div>
+        <select id="team"
+                name="teamId"
+                onchange="updateTeamId()"
+                required
+        >
+            <option value="">Please Select</option>
+            <option value="1">Helpdesk</option>
+            <option value="2">Escalation</option>
+            <option value="3">Small Projects</option>
+            <option value="5">Projects</option>
+            <option value="4">Sales</option>
+        </select>
+    </div>
+    <div>
+        <div>
+            Details
+        </div>
+        <textarea id="details"
+                  required
+                  onchange="updateDetails()"
+        ></textarea>
+    </div>
+    <div>
+        <div>
+            Internal Notes
+        </div>
+        <textarea id="internalNotes"
+        ></textarea>
+    </div>
+    <div>
+        <table id="rruleTable">
+            <tbody>
+            <tr>
+                <th>
+                    <div class="option-name">
+                        <code>Freq</code>
+
+                        <div class="help">Frequency</div>
+                    </div>
+                </th>
+                <td>
+                    <label>
+                        <input name="freq"
+                               type="radio"
+                               value="0"
+                               checked
+                        />Yearly
+                    </label>
+                    <label>
+                        <input name="freq"
+                               type="radio"
+                               value="1"
+                        />Monthly
+                    </label>
+                    <label>
+                        <input name="freq"
+                               type="radio"
+                               value="2"
+                        />Weekly
+                    </label>
+                    <label>
+                        <input name="freq"
+                               type="radio"
+                               value="3"
+                        />Daily
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <div class="option-name">
+                        <code>Start Date</code>
+
+                        <div class="help">The recurrence start. Besides being the base for the recurrence, missing
+                            parameters in the final recurrence
+                            instances will also be extracted from this date. If not given,
+                            <code>new Date</code> will be used instead.
+                        </div>
+                    </div>
+                </th>
+                <td>
+                    <input name="dtstart"
+                           type="date"
+                    />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <div class="option-name">
+                        <code>Interval</code>
+
+                        <div class="help">The interval between each freq iteration. For example, when using
+                            <code>RRule.YEARLY</code>, an interval of
+                            <code>2</code> means once every two years, but with
+                            <code>RRule.HOURLY</code>, it means once every two hours. The default interval is
+                            <code>1</code>.
+                        </div>
+                    </div>
+                </th>
+                <td>
+                    <input type="number"
+                           value="1"
+                           min="1"
+                           name="interval"
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input name="untilOrCount"
+                           type="radio"
+                           value="until"
+                           onclick="changeUntilOrCount('until')"
+                    />Until
+                    <input name="untilOrCount"
+                           type="radio"
+                           value="count"
+                           onclick="changeUntilOrCount('count')"
+                    />Count
+                </td>
+            </tr>
+            <tr class="untilRow">
+                <th>
+                    <div class="option-name">
+                        <code>Until</code>
+
+                        <div class="help">If given, this must be a
+                            <code>Date</code>
+                            instance, that will specify the limit of the recurrence. If a recurrence instance happens to
+                            be the same as the
+                            <code>Date</code> instance given in the
+                            <code>until</code>
+                            argument, this will be the last occurrence.
+                        </div>
+                    </div>
+                </th>
+                <td>
+                    <input type="date"
+                           name="until"
+                    />
+                </td>
+            </tr>
+            <tr class="countRow">
+                <th>
+                    <div class="option-name">
+                        <code>Count</code>
+
+                        <div class="help">If given is the times the recurrence will take place</div>
+                    </div>
+                </th>
+                <td>
+                    <input name="count"
+                           type="number"
+                           min="1"
+                           step="1"
+                    />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <div class="option-name">
+                        <code>By Day of the week</code>
+
+                        <div class="help">If given, it must be either an integer (
+                            <code>0 == RRule.MO</code>), a sequence of integers, one of the weekday constants (
+                            <code>RRule.MO</code>,
+                            <code>RRule.TU</code>, etc), or a sequence of these constants. When given, these variables
+                            will define
+                            the weekdays where the recurrence will be applied. It's also possible to use an argument n
+                            for the
+                            weekday instances, which will mean the nth occurrence of this weekday in the period. For
+                            example,
+                            with
+                            <code>RRule.MONTHLY</code>, or with
+                            <code>RRule.YEARLY</code> and
+                            <code>BYMONTH</code>, using
+                            <code>RRule.FR.clone(+1)</code> in
+                            <code>byweekday</code> will specify the first friday of the month where the recurrence
+                            happens. Notice
+                            that the RFC documentation, this is specified as
+                            <code>BYDAY</code>, but was renamed to avoid the ambiguity of that argument.
+                        </div>
+                    </div>
+                </th>
+                <td>
+                    <label>
+                        <input type="checkbox"
+                               name="byweekday"
+                               value="0"
+                        >Monday</label>
+                    <label>
+                        <input type="checkbox"
+                               name="byweekday"
+                               value="1"
+                        >Tuesday</label>
+                    <label>
+                        <input type="checkbox"
+                               name="byweekday"
+                               value="2"
+                        >Wednesday</label>
+                    <label>
+                        <input type="checkbox"
+                               name="byweekday"
+                               value="3"
+                        >Thursday</label>
+                    <label>
+                        <input type="checkbox"
+                               name="byweekday"
+                               value="4"
+                        >Friday</label>
+                    <label>
+                        <input type="checkbox"
+                               name="byweekday"
+                               value="5"
+                        >Saturday</label>
+                    <label>
+                        <input type="checkbox"
+                               name="byweekday"
+                               value="6"
+                        >Sunday</label>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <div class="option-name">
+                        <code>By Month</code>
+
+                        <div class="help">If given, it must be either an integer, or a sequence of integers, meaning the
+                            months to apply the
+                            recurrence to.
+                        </div>
+                    </div>
+                </th>
+                <td>
+                    <label>
+                        <input name="bymonth"
+                               type="checkbox"
+                               value="1"
+                        /> Jan</label>
+                    <label>
+                        <input name="bymonth"
+                               type="checkbox"
+                               value="2"
+                        /> Feb</label>
+                    <label>
+                        <input name="bymonth"
+                               type="checkbox"
+                               value="3"
+                        /> Mar</label>
+                    <label>
+                        <input name="bymonth"
+                               type="checkbox"
+                               value="4"
+                        /> Apr</label>
+                    <label>
+                        <input name="bymonth"
+                               type="checkbox"
+                               value="5"
+                        /> May</label>
+                    <label>
+                        <input name="bymonth"
+                               type="checkbox"
+                               value="6"
+                        /> Jun</label>
+                    <label>
+                        <input name="bymonth"
+                               type="checkbox"
+                               value="7"
+                        /> Jul</label>
+                    <label>
+                        <input name="bymonth"
+                               type="checkbox"
+                               value="8"
+                        /> Aug</label>
+                    <label>
+                        <input name="bymonth"
+                               type="checkbox"
+                               value="9"
+                        /> Sep</label>
+                    <label>
+                        <input name="bymonth"
+                               type="checkbox"
+                               value="10"
+                        /> Oct</label>
+                    <label>
+                        <input name="bymonth"
+                               type="checkbox"
+                               value="11"
+                        /> Nov</label>
+                    <label>
+                        <input name="bymonth"
+                               type="checkbox"
+                               value="12"
+                        /> Dec</label>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <div class="option-name">
+                        <code>By Set Position</code>
+
+                        <div class="help">If given, it must be either an integer, or a sequence of integers, positive or
+                            negative. Each given
+                            integer will specify an occurrence number, corresponding to the nth occurrence of the rule
+                            inside
+                            the frequency period. For example, a
+                            <code>bysetpos</code> of
+                            <code>-1</code> if combined with a
+                            <code>RRule.MONTHLY</code>
+                            frequency, and a byweekday of (
+                            <code>RRule.MO</code>,
+                            <code>RRule.TU</code>,
+                            <code>RRule.WE</code>,
+                            <code>RRule.TH</code>,
+                            <code>RRule.FR</code>), will result in the last work day of every month.
+                        </div>
+                    </div>
+                </th>
+                <td>
+                    <input name="bysetpos"/>
+                </td>
+            </tr>
+            <tr class="monthdayRow">
+                <th>
+                    <div class="option-name">
+                        <code>By day of the month</code>
+
+                        <div class="help">If given, it must be either an integer, or a sequence of integers, meaning the
+                            month days to apply
+                            the recurrence to.
+                        </div>
+                    </div>
+                </th>
+                <td>
+                    <input name="bymonthday"/>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <br>
+        <h3 id="ruleText"></h3>
+    </div>
+    <div>
+        <button class="addButton"
+        >Add
+        </button>
+        <button class="saveButton"
+                type="button"
+                hidden
+        >Save
+        </button>
+        <button class="cancelButton"
+                hidden
+                type="button"
+        >Cancel
+        </button>
+    </div>
+</form>
+<div class="list">
+</div>

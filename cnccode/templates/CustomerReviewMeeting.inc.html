@@ -17,41 +17,89 @@
     }
 </style>
 {data}
-<script language='JavaScript'>
+<script>
+    const autocompleteURL = "/Customer.php?action=searchName";
     $(function () {
         window.meetingDate = $('#meetingDate').get(0);
+        $('#customerString').autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response);
+                })
+            },
+            select: function (event, ui) {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+                $('#customerID').val(ui.item.id);
+            },
+            delay: 200,
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
+        $('#create-pdf').click(function () {
+            $(this).attr('disabled', true);
+            //loop through sections looking for large tables
+            updateTables();
+            handleEditableText();
+            var sections = 1;
+            $('h2').each(function () {
+                $(this).prepend(sections + '. ');
+                sections++;
+            })
+
+            var height = 0;
+            //1305 px is page height including margins
+            $('.reportSection').not('.noNewPage').each(function () {
+                if ((height + $(this).outerHeight()) > 1290) {
+                    //if adding the next section would cause it to spill onto a new page add in a page break and reset the height count
+                    $(this).addClass('newPage');
+                    height = 0;
+                }
+                height += $(this).outerHeight();
+                console.log(height)
+            });
+
+            var result = $('#reportContent').html();
+
+            var data = {
+                html: result,
+                customerID: "{customerID}",
+                startYearMonth: "{startYearMonth}",
+                endYearMonth: "{endYearMonth}",
+                meetingDateYmd: "{meetingDateYmd}"
+            };
+
+            $.ajax({
+                url: '{urlGeneratePdf}',
+                method: 'POST',
+                type: 'post',
+                dataType: 'json',
+                data: data
+            }).then(function (result) {
+                if (result.status == 'error') {
+                    alert(result.description);
+                } else {
+                    alert('PDF created successfully');
+                }
+
+            })
+        })
     });
     var state = 'none'; // display status
-    var savedCustomerString;
-
-
-    function saveCustomerString() {
-        savedCustomerString = document.getElementById("customerString").value
-    }
-
-    function validateCustomerString() {
-        if (Trim(document.getElementById("customerString").value) != "") {
-            if (document.getElementById("customerString").value != savedCustomerString) {
-                window.open('{urlCustomerPopup}&customerString=' +
-                    escape(document.getElementById("customerString").value) +
-                    '&parentIDField=customerID' +
-                    '&parentDescField=customerString',
-                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
-            }
-        } else {
-            document.searchForm.customerID.value = "";
-        }
-    }
 
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
-        }
-    }
-
-    function validateCustomerStringOnReturn() {
-        if (event.keyCode == 13) {
-            validateCustomerString();
         }
     }
 
@@ -118,58 +166,6 @@
             $(this).nextUntil('h2').addBack().wrapAll("<div class='reportSection'></div>")
         });
     }
-
-    $(function () {
-        $('#create-pdf').click(function () {
-            $(this).attr('disabled', true);
-            //loop through sections looking for large tables
-            updateTables();
-            handleEditableText();
-            var sections = 1;
-            $('h2').each(function () {
-                $(this).prepend(sections + '. ');
-                sections++;
-            })
-
-            var height = 0;
-            //1305 px is page height including margins
-            $('.reportSection').not('.noNewPage').each(function () {
-                if ((height + $(this).outerHeight()) > 1290) {
-                    //if adding the next section would cause it to spill onto a new page add in a page break and reset the height count
-                    $(this).addClass('newPage');
-                    height = 0;
-                }
-                height += $(this).outerHeight();
-                console.log(height)
-            });
-
-            var result = $('#reportContent').html();
-
-            var data = {
-                html: result,
-                customerID: "{customerID}",
-                startYearMonth: "{startYearMonth}",
-                endYearMonth: "{endYearMonth}",
-                meetingDateYmd: "{meetingDateYmd}"
-            };
-
-            $.ajax({
-                url: '{urlGeneratePdf}',
-                method: 'POST',
-                type: 'post',
-                dataType: 'json',
-                data: data
-            }).then(function (result) {
-                if (result.status == 'error') {
-                    alert(result.description);
-                } else {
-                    alert('PDF created successfully');
-                }
-
-            })
-        })
-    })
-
 </script>
 
 <style>
@@ -345,9 +341,6 @@
                     id="customerString"
                     name="customerString"
                     value="{customerString}"
-                    onFocus="javascript:saveCustomerString()"
-                    onBlur="javascript:validateCustomerString()"
-                    onKeypress="javascript:validateCustomerStringOnReturn()"
                     size="50"
                     maxlength="50"
             > <font class="formErrorMessage"> {customerIDMessage} </font></td>

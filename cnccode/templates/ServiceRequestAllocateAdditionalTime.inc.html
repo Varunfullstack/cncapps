@@ -1,24 +1,80 @@
 <!-- Template: ServiceRequestFixedEdit.inc.html -->
 <script src="CommonJS.js"></script>
 <script>
+    let teamSelectorElement = null;
+    let timeSelectorElement = null;
+    let timeInputElement = null;
+    let allocationErrorElement = null;
+    let saveButtonElement = null;
+    const isAdditionalTimeLimitApprover = {additionalTimeLimitApprover};
+    const minutesInADay = {minutesInADay};
     $(function () {
-        var teamSelector = $('#teamSelector');
+        teamSelectorElement = $('#teamSelector');
+        timeSelectorElement = $('#allocatedTimeAmountSelector');
+        timeInputElement = $('input[name="allocatedTimeValue"]');
+        allocationErrorElement = $('#allocationError');
+        saveButtonElement = $('#saveButton');
 
-        if (teamSelector.val() == 3) {
+        if (teamSelectorElement.val() == 3) {
             $('#dayOption').show();
         } else {
             $('#dayOption').hide();
         }
-        teamSelector.change(function () {
-            var elm = $(this);
+        teamSelectorElement.change(function () {
+            const elm = $(this);
 
             if (elm.val() == 3) {
                 $('#dayOption').show();
             } else {
                 $('#dayOption').hide();
             }
+            checkRemainingTime();
+        });
+
+        timeSelectorElement.change(function () {
+            checkRemainingTime();
+        });
+        timeInputElement.change(function () {
+            checkRemainingTime();
         })
-    })
+
+    });
+
+    function checkRemainingTime() {
+        if (!isAdditionalTimeLimitApprover) {
+            const teamSelectedOption = teamSelectorElement[0].selectedOptions[0];
+            const timeSelectedOption = timeSelectorElement[0].selectedOptions[0];
+            const timeValue = +timeInputElement.val();
+            let totalMinutes = timeValue;
+            switch (timeSelectedOption.value) {
+                case 'hours':
+                    totalMinutes = timeValue * 60;
+                    break;
+                case 'days':
+                    totalMinutes = timeValue * minutesInADay;
+            }
+            if (teamSelectedOption.dataset.minutesToAllocate < totalMinutes) {
+                disableSave('You are not allowed to add additional minutes to this SR for the selected team, please discuss this with management to proceed.');
+                return;
+            }
+        }
+        enableSave();
+        return;
+    }
+
+    function disableSave(allocationError = null) {
+        saveButtonElement.attr('disabled', 'disabled');
+        if (allocationError) {
+            allocationErrorElement.html(allocationError);
+        } else {
+            allocationErrorElement.html('');
+        }
+    }
+
+    function enableSave() {
+        saveButtonElement.removeAttr('disabled');
+        allocationErrorElement.html('');
+    }
 
 </script>
 
@@ -62,14 +118,17 @@
                 >
                     <option {teamLevel1Selected}
                             value="1"
+                            data-minutes-to-allocate="{helpdeskHardLimitRemainingMinutes}"
                     >Helpdesk
                     </option>
                     <option {teamLevel2Selected}
                             value="2"
+                            data-minutes-to-allocate="{escalationsHardLimitRemainingMinutes}"
                     >Escalations
                     </option>
                     <option {teamLevel3Selected}
                             value="3"
+                            data-minutes-to-allocate="{smallProjectsHardLimitRemainingMinutes}"
                     >Small Projects
                     </option>
                     <option {teamLevel5Selected}
@@ -101,6 +160,9 @@
                     >Days
                     </option>
                 </select>
+                <span id="allocationError"
+                      class="redText"
+                ></span>
             </td>
         </tr>
 
@@ -123,6 +185,7 @@
                 <input type="submit"
                        name="Submit"
                        value="Save"
+                       id="saveButton"
                 >
             </td>
         </tr>

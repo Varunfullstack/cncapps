@@ -1,0 +1,52 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue813-0">
+        <tagDatabase tag="issue813"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue813-1">
+       <sql splitStatements="true">
+        update calljournal set number = replace(number,'+','00');
+        update calljournal set number =  CONCAT("0",number) where left(number,1) in (1,2,3,7,8) and char_length(number) = 10;
+        update calljournal set number = concat("00", number) where left(number,1) = 9 and char_length(number) = 12;
+        update calljournal set number = concat("00",number) where left(number,3) = "353" and char_length(number) = 11;
+        update calljournal set number = concat("00", number) where left(number,2) = 33 and char_length(number) = 11;
+        update calljournal set number = concat("00",number) where left(number, 2) = 97 and char_length(number) = 11;
+        update calljournal set number = concat("00",number) where left(number, 3) =  852 and char_length(number) = 11;
+        update calljournal set number = concat("0",number) where left(number, 3) =  800;
+        update calljournal set number = concat("00",number) where left(number, 2) =  65 and char_length(number) = 10;
+        update calljournal set number = concat("00",number) where left(number, 2) =  60 and char_length(number) = 11;
+        UPDATE calljournal SET number = CONCAT("00",number) WHERE LEFT(number, 2) =  49 AND CHAR_LENGTH(number) = 11;
+        UPDATE calljournal SET number = replace(number,'44','0') WHERE LEFT(number, 2) =  44 AND CHAR_LENGTH(number) in(11,12);
+        UPDATE calljournal SET number = concat("0", number) WHERE LEFT(number, 3) =  161 AND CHAR_LENGTH(number) = 11;
+        UPDATE calljournal SET number = replace(number,'44','0') WHERE LEFT(number, 2) =  44 AND CHAR_LENGTH(number) in(11,12);
+        update calljournal set number = "02035889700" where number = "1589701";
+        update calljournal set number = "01825768611" where number = "1451701";
+        update calljournal set number = "01273834716" WHERE number = "1509301";
+        update calljournal set number = "01580891521" WHERE number = "1541601";
+        update calljournal set number = "02074110337" where number = "1582701";
+        update calljournal set number = "01342330470" where number = "1544601";
+        update calljournal set number = "02072324550" where number = "1590501";
+        update calljournal set number = "01268490035" where number = "1617701";
+        update calljournal set number = "01273430977" where number = "1617001";
+        update calljournal set number = "02079290108" where number = "1647101";
+        update calljournal set number = "02088750984" where number = "1807301";
+        update calljournal set number = "01273648248" where number = "1852201";
+        update calljournal set number = "02089403305" where number = "1923101";
+        UPDATE calljournal SET number = concat("00", number) WHERE LEFT(number, 3) =  165 AND CHAR_LENGTH(number) = 11;
+        UPDATE calljournal SET number = concat("00", number) WHERE LEFT(number, 3) =  120 AND CHAR_LENGTH(number) = 11;
+        UPDATE calljournal SET number = CONCAT("00", number) WHERE LEFT(number, 3) =  125 AND CHAR_LENGTH(number) = 11;
+        UPDATE calljournal SET number = CONCAT("00", number) WHERE LEFT(number, 3) =  127 AND CHAR_LENGTH(number) = 11;
+        UPDATE calljournal SET number = CONCAT("00", number) WHERE LEFT(number, 3) =  121 AND CHAR_LENGTH(number) = 11;
+        UPDATE calljournal SET number = CONCAT("0", number) WHERE number= "1273648248";
+        UPDATE calljournal SET number = CONCAT("0", number) WHERE number= "13238741000";
+        UPDATE calljournal SET number = CONCAT("0", number) WHERE number= "1342330470";
+        UPDATE calljournal SET number = CONCAT("0", number) WHERE LEFT(number, 1) = 1 AND CHAR_LENGTH(number) = 9;
+        UPDATE calljournal SET number = CONCAT("0", number) WHERE number= "15204773198";
+        update calljournal set number = "01273832972" where number = "1731801";
+        UPDATE calljournal SET customerId = (SELECT contact.`con_custno` FROM contact WHERE contact.`con_phone` = number OR con_mobile_phone = number LIMIT 1) WHERE customerId IS NULL;
+       </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

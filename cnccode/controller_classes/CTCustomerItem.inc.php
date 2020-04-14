@@ -455,7 +455,8 @@ class CTCustomerItem extends CTCNC
         $dsContract = new DataSet($this);
         $this->buCustomerItem->getContractsByCustomerID(
             $customerID,
-            $dsContract
+            $dsContract,
+            null
         );
 
         $this->template->set_block(

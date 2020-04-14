@@ -114,6 +114,38 @@ class CTContact extends CTCNC
                 $this->checkPermissions(array(PHPLIB_PERM_MAINTENANCE, PHPLIB_PERM_SALES));
                 $this->contactUpdate();
                 break;
+            case 'search':
+                $itemsPerPage = 20;
+                $page = 1;
+                $term = '';
+                if (isset($_REQUEST['term'])) {
+                    $term = $_REQUEST['term'];
+                }
+
+                if (!isset($_REQUEST['customerId'])) {
+                    throw new Exception('Customer ID is required');
+                }
+
+                $customerId = $_REQUEST['customerId'];
+
+                $dsResult = new DataSet($this);
+                $this->buContact->getCustomerContactsByNameMatch($customerId, $term, $dsResult);
+                $sites = [];
+                while ($dsResult->fetchNext()) {
+
+                    $sites[] = [
+                        "id"    => $dsResult->getValue(DBEContact::contactID),
+                        "label" => $dsResult->getValue(DBEContact::firstName) . ' ' . $dsResult->getValue(
+                                DBEContact::lastName
+                            ),
+                        "value" => $dsResult->getValue(DBEContact::firstName) . ' ' . $dsResult->getValue(
+                                DBEContact::lastName
+                            ),
+                    ];
+
+                }
+                echo json_encode($sites);
+                break;
             case 'validation':
                 $this->validateContacts();
                 break;
@@ -136,112 +168,6 @@ class CTContact extends CTCNC
         if ($this->getParam('parentDescField')) {
             $this->setSessionParam('contactParentDescField', $this->getParam('parentDescField'));
         }
-    }
-
-    /**
-     * Display the popup selector form
-     * @access private
-     * @throws Exception
-     */
-    function displayContactSelectPopup()
-    {
-        $this->setMethodName('displayContactSelectPopup');
-        if (!$this->getParam('supplierID') && !$this->getParam('customerID')) {
-            $this->raiseError('supplierID or customerID not passed');
-        }
-        $urlCreate = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action'     => CTCNC_ACT_CONTACT_ADD,
-                'supplierID' => $this->getParam('supplierID'),
-                'customerID' => $this->getParam('customerID'),
-                'siteNo'     => $this->getParam('siteNo'),
-                'htmlFmt'    => CT_HTML_FMT_POPUP
-            )
-        );
-        if ($this->getParam('contactName'){0} == '/') {
-            header('Location: ' . $urlCreate);
-            exit;
-        }
-        if ($this->getParam('supplierID')) {
-            $this->buContact->getSupplierContactsByNameMatch(
-                $this->getParam('supplierID'),
-                $this->getParam('contactName'),
-                $this->dsContact
-            );
-        } else {
-            $this->buContact->getCustomerContactsByNameMatch(
-                $this->getParam('customerID'),
-                $this->getParam('contactName'),
-                $this->dsContact,
-                $this->getParam('siteNo')
-            );
-        }
-        if ($this->dsContact->rowCount() == 1) {
-            $this->setTemplateFiles(
-                'ContactSelect',
-                'ContactSelectOne.inc'
-            );
-        }
-        if ($this->dsContact->rowCount() == 0) {
-            $this->template->set_var(
-                'contactName',
-                $this->getParam('contactName')
-            );
-            $this->setTemplateFiles(
-                'ContactSelect',
-                'ContactSelectNone.inc'
-            );
-        }
-        if ($this->dsContact->rowCount() > 1) {
-            $this->setTemplateFiles(
-                'ContactSelect',
-                'ContactSelectPopup.inc'
-            );
-        }
-        $this->template->set_var(
-            array(
-                'urlContactCreate' => $urlCreate
-            )
-        );
-// Parameters
-        $this->setPageTitle('Contact Selection');
-        if ($this->dsContact->rowCount() > 0) {
-            $this->template->set_block(
-                'ContactSelect',
-                'contactBlock',
-                'contacts'
-            );
-            while ($this->dsContact->fetchNext()) {
-                $name = $this->dsContact->getValue(DBEContact::firstName) . ' ' . $this->dsContact->getValue(
-                        DBEContact::lastName
-                    );
-                $this->template->set_var(
-                    array(
-                        'contactName' => Controller::htmlDisplayText(($name)),
-                        'submitName'  => addslashes($name), //so double quotes don't mess javascript up
-                        'contactID'   => $this->dsContact->getValue(DBEContact::contactID)
-                    )
-                );
-                $this->template->parse(
-                    'contacts',
-                    'contactBlock',
-                    true
-                );
-            }
-        }
-        $this->template->set_var(
-            array(
-                'parentIDField'   => $_SESSION['contactParentIDField'],
-                'parentDescField' => $_SESSION['contactParentDescField']
-            )
-        );
-        $this->template->parse(
-            'CONTENTS',
-            'ContactSelect',
-            true
-        );
-        $this->parsePage();
     }
 
     /**
@@ -569,6 +495,112 @@ class CTContact extends CTCNC
             )
         );
         header('Location: ' . $urlNext);
+    }
+
+    /**
+     * Display the popup selector form
+     * @access private
+     * @throws Exception
+     */
+    function displayContactSelectPopup()
+    {
+        $this->setMethodName('displayContactSelectPopup');
+        if (!$this->getParam('supplierID') && !$this->getParam('customerID')) {
+            $this->raiseError('supplierID or customerID not passed');
+        }
+        $urlCreate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'     => CTCNC_ACT_CONTACT_ADD,
+                'supplierID' => $this->getParam('supplierID'),
+                'customerID' => $this->getParam('customerID'),
+                'siteNo'     => $this->getParam('siteNo'),
+                'htmlFmt'    => CT_HTML_FMT_POPUP
+            )
+        );
+        if ($this->getParam('contactName'){0} == '/') {
+            header('Location: ' . $urlCreate);
+            exit;
+        }
+        if ($this->getParam('supplierID')) {
+            $this->buContact->getSupplierContactsByNameMatch(
+                $this->getParam('supplierID'),
+                $this->getParam('contactName'),
+                $this->dsContact
+            );
+        } else {
+            $this->buContact->getCustomerContactsByNameMatch(
+                $this->getParam('customerID'),
+                $this->getParam('contactName'),
+                $this->dsContact,
+                $this->getParam('siteNo')
+            );
+        }
+        if ($this->dsContact->rowCount() == 1) {
+            $this->setTemplateFiles(
+                'ContactSelect',
+                'ContactSelectOne.inc'
+            );
+        }
+        if ($this->dsContact->rowCount() == 0) {
+            $this->template->set_var(
+                'contactName',
+                $this->getParam('contactName')
+            );
+            $this->setTemplateFiles(
+                'ContactSelect',
+                'ContactSelectNone.inc'
+            );
+        }
+        if ($this->dsContact->rowCount() > 1) {
+            $this->setTemplateFiles(
+                'ContactSelect',
+                'ContactSelectPopup.inc'
+            );
+        }
+        $this->template->set_var(
+            array(
+                'urlContactCreate' => $urlCreate
+            )
+        );
+// Parameters
+        $this->setPageTitle('Contact Selection');
+        if ($this->dsContact->rowCount() > 0) {
+            $this->template->set_block(
+                'ContactSelect',
+                'contactBlock',
+                'contacts'
+            );
+            while ($this->dsContact->fetchNext()) {
+                $name = $this->dsContact->getValue(DBEContact::firstName) . ' ' . $this->dsContact->getValue(
+                        DBEContact::lastName
+                    );
+                $this->template->set_var(
+                    array(
+                        'contactName' => Controller::htmlDisplayText(($name)),
+                        'submitName'  => addslashes($name), //so double quotes don't mess javascript up
+                        'contactID'   => $this->dsContact->getValue(DBEContact::contactID)
+                    )
+                );
+                $this->template->parse(
+                    'contacts',
+                    'contactBlock',
+                    true
+                );
+            }
+        }
+        $this->template->set_var(
+            array(
+                'parentIDField'   => $_SESSION['contactParentIDField'],
+                'parentDescField' => $_SESSION['contactParentDescField']
+            )
+        );
+        $this->template->parse(
+            'CONTENTS',
+            'ContactSelect',
+            true
+        );
+        $this->parsePage();
     }
 
 }

@@ -986,26 +986,18 @@ class CTCustomer extends CTCNC
             case CTCUSTOMER_ACT_SEARCH:
                 $this->search();
                 break;
-            case CTCNC_ACT_DISP_EDIT:
-                $this->displayEditForm();
-                break;
-            case CTCUSTOMER_ACT_DISP_SUCCESS:
-                $this->displayEditForm();
-                break;
+            case CTCUSTOMER_ACT_ADDCUSTOMER:
+            case CTCUSTOMER_ACT_ADDSITE:
             case CTCUSTOMER_ACT_ADDCONTACT:
+            case CTCUSTOMER_ACT_DISP_SUCCESS:
+            case CTCNC_ACT_DISP_EDIT:
                 $this->displayEditForm();
                 break;
             case CTCUSTOMER_ACT_DELETECONTACT:
                 $this->deleteContact();
                 break;
-            case CTCUSTOMER_ACT_ADDSITE:
-                $this->displayEditForm();
-                break;
             case CTCUSTOMER_ACT_DELETESITE:
                 $this->deleteSite();
-                break;
-            case CTCUSTOMER_ACT_ADDCUSTOMER:
-                $this->displayEditForm();
                 break;
             case CTCUSTOMER_ACT_DELETECUSTOMER:
                 $this->deleteCustomer();
@@ -1112,7 +1104,11 @@ class CTCustomer extends CTCNC
                 $customers = [];
                 while ($dsResult->fetchNext()) {
                     if (preg_match('/.*' . $term . '.*/i', $dsResult->getValue(DBECustomer::name))) {
-                        $customers[] = $dsResult->getValue(DBECustomer::name);
+                        $customers[] = [
+                            "id"   => $dsResult->getValue(DBECustomer::customerID),
+                            "label" => $dsResult->getValue(DBECustomer::name),
+                            "value" => $dsResult->getValue(DBECustomer::name),
+                        ];
                     }
                 }
                 echo json_encode($customers);
@@ -1829,6 +1825,7 @@ class CTCustomer extends CTCNC
                 'noOfServers'                    => $this->dsCustomer->getValue(DBECustomer::noOfServers),
                 'activeDirectoryName'            => $this->dsCustomer->getValue(DBECustomer::activeDirectoryName),
                 'noOfSites'                      => $this->dsCustomer->getValue(DBECustomer::noOfSites),
+                'noOfPCs'                        => $this->dsCustomer->getValue(DBECustomer::noOfPCs),
                 'modifyDate'                     => $this->dsCustomer->getValue(DBECustomer::modifyDate),
                 'reviewDate'                     => Controller::dateYMDtoDMY(
                     $this->dsCustomer->getValue(DBECustomer::reviewDate)
@@ -1873,37 +1870,6 @@ class CTCustomer extends CTCNC
                     'addSiteText' => CTCUSTOMER_TXT_ADD_SITE,
                     'addSiteURL'  => $addSiteURL
                 )
-            );
-        }
-        $noOfPCs =
-            array(
-                '0',
-                '1-5',
-                '6-10',
-                '11-25',
-                '26-50',
-                '51-99',
-                '100+'
-            );
-
-        $this->template->set_block(
-            'CustomerEdit',
-            'noOfPCsBlock',
-            'noOfPCs'
-        );
-        foreach ($noOfPCs as $index => $value) {
-            $this->template->set_var(
-                array(
-                    'noOfPCsValue'    => $value,
-                    'noOfPCsSelected' => $value == $this->dsCustomer->getValue(
-                        DBECustomer::noOfPCs
-                    ) ? CT_SELECTED : null
-                )
-            );
-            $this->template->parse(
-                'noOfPCs',
-                'noOfPCsBlock',
-                true
             );
         }
 
@@ -2153,11 +2119,8 @@ class CTCustomer extends CTCNC
                     'projectBlock',
                     true
                 );
-
             }
-
         }
-
 
         $this->template->set_block(
             'CustomerEdit',
@@ -2177,7 +2140,6 @@ class CTCustomer extends CTCNC
             'siteBlock',
             'sites'
         );
-
 
         if ((!$this->formError) & ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) & ($this->getAction(
                 ) != CTCUSTOMER_ACT_DISP_SUCCESS)) {
@@ -2673,7 +2635,6 @@ class CTCustomer extends CTCNC
                     "totalCount"      => $totalCount,
                 ]
             );
-
             $this->siteDropdown(
                 $this->dsContact->getValue(DBEContact::customerID),
                 $this->dsContact->getValue(DBEContact::siteNo)
@@ -3013,12 +2974,9 @@ class CTCustomer extends CTCNC
                         'filename'            => $dsPortalCustomerDocument->getValue(
                             DBEPortalCustomerDocument::filename
                         ),
-                        'startersFormFlag'    => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::startersFormFlag
-                        ),
-                        'leaversFormFlag'     => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::leaversFormFlag
-                        ),
+                        'customerContract'    => $dsPortalCustomerDocument->getValue(
+                            DBEPortalCustomerDocument::customerContract
+                        ) ? 'Y': 'N',
                         'mainContactOnlyFlag' => $dsPortalCustomerDocument->getValue(
                             DBEPortalCustomerDocument::mainContactOnlyFlag
                         ),

@@ -1,28 +1,34 @@
 <!-- Template: CustomerProfitabilityMonthsReport.inc.html -->
-<script language='JavaScript' src="CommonJS.js"></script>
-
-<script language='JavaScript'>
+<script>
     var state = 'none'; // display status
-    var savedCustomerString
-
-    function saveCustomerString() {
-        savedCustomerString = document.getElementById("customerString").value
-    }
-
-    function validateCustomerString() {
-        if (Trim(document.getElementById("customerString").value) != "") {
-            if (document.getElementById("customerString").value != savedCustomerString) {
-                window.open('{urlCustomerPopup}&customerString=' +
-                    escape(document.getElementById("customerString").value) +
-                    '&parentIDField=customerID' +
-                    '&parentDescField=customerString',
-                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
-            }
-        }
-        else {
-            document.searchForm.customerID.value = "";
-        }
-    }
+    const autocompleteURL = "/Customer.php?action=searchName";
+    $(function () {
+        $('#customerString').autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response);
+                })
+            },
+            select: function (event, ui) {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+                $('#customerID').val(ui.item.id);
+            },
+            delay: 200,
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
+    });
 
     function submitOnReturn() {
         if (event.keyCode == 13) {
@@ -30,17 +36,21 @@
         }
     }
 
-    function validateCustomerStringOnReturn() {
-        if (event.keyCode == 13) {
-            validateCustomerString();
-        }
-    }
 </script>
 <P class="formErrorMessage">{formError}</P>
-<form name="searchForm" method="get" action="{urlSubmit}">
-    <table width="500px" border="0" cellspacing="0" cellpadding="1">
+<form name="searchForm"
+      method="get"
+      action="{urlSubmit}"
+>
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
         <tr>
-            <td width="100" class="promptText">
+            <td width="100"
+                class="promptText"
+            >
                 <div align="right">Customer</div>
             </td>
             <td>
@@ -54,20 +64,19 @@
                         name="searchForm[1][customerID]"
                         id="customerID"
                         value="{customerID}"
-                > <input
-                    type="text"
-                    id="customerString"
-                    name="customerString"
-                    value="{customerString}"
-                    onFocus="javascript:saveCustomerString()"
-                    onBlur="javascript:validateCustomerString()"
-                    onKeypress="javascript:validateCustomerStringOnReturn()"
-                    size="50"
-                    maxlength="50"
-            > <font class="formErrorMessage"> {customerIDMessage} </font></td>
+                >
+                <input type="text"
+                       id="customerString"
+                       name="customerString"
+                       value="{customerString}"
+                       size="50"
+                       maxlength="50"
+                > <font class="formErrorMessage"> {customerIDMessage} </font></td>
         </tr>
         <tr>
-            <td width="100" class="promptText">
+            <td width="100"
+                class="promptText"
+            >
                 <div align="right">Start Month/Year</div>
             </td>
             <td>
@@ -81,7 +90,9 @@
                 > <font class="formErrorMessage"> {startYearMonthMessage} </font></td>
         </tr>
         <tr>
-            <td width="100" class="promptText">
+            <td width="100"
+                class="promptText"
+            >
                 <div align="right">End Month/Year</div>
             </td>
             <td>
@@ -97,8 +108,14 @@
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="submit" name="Search" value="Screen">
-                <input type="submit" name="Search" value="CSV">
+                <input type="submit"
+                       name="Search"
+                       value="Screen"
+                >
+                <input type="submit"
+                       name="Search"
+                       value="CSV"
+                >
         </tr>
     </table>
 </form>

@@ -1,7 +1,34 @@
 <!-- Template: ActivityCreate1.inc.html -->
-<style>
+<script>
+    const autocompleteURL = "/Customer.php?action=searchName";
+    $(function () {
+        $('[name="customerString"]').autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response);
+                })
 
-</style>
+            },
+            delay: 200,
+            select: (event, ui) => {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+            }
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
+    });
+</script>
 {reasonMarkup}
 <form name="form"
       method="post"
@@ -32,10 +59,12 @@
         </tr>
         <tr>
             <td class="promptText">Customer Name</td>
-            <td><input type="text"
+            <td>
+                <input type="text"
                        name="customerString"
                        value="{customerString}"
-            ></td>
+                >
+            </td>
         </tr>
         <tr>
             <td valign="top">&nbsp;</td>
@@ -156,6 +185,7 @@
         data-contact-id="{contactID}"
         data-form-action="{formAction}"
         data-furlough-disabled="{furloughDisabled}"
+        class="{specialAttentionContact}"
     >
         <td nowrap="nowrap">
             <button type="button"

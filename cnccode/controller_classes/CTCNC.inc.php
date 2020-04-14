@@ -7,6 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 
+global $cfg;
 require_once($cfg ['path_gc'] . '/DataSet.inc.php');
 require_once($cfg ['path_gc'] . '/Controller.inc.php');
 require_once($cfg ['path_dbe'] . '/DBEJUser.inc.php');
@@ -404,6 +405,8 @@ class CTCNC extends Controller
         if ($this->hasPermissions(PHPLIB_PERM_TECHNICAL)) {
             $this->setTemplateFiles(array('ScreenTechnical' => $screenTechnicalTemplate));
             if ($this->isUserSDManager()) {
+
+                $scheduleRequestText = 'Schedule';
                 $sdManagerTechnical = new Template (
                     $GLOBALS ["cfg"] ["path_templates"],
                     "remove"
@@ -419,8 +422,10 @@ class CTCNC extends Controller
                 $sdManagerTemplateText = $sdManagerTechnical->get('output');
 
                 $this->template->setVar(
-                    'technicalSD',
-                    $sdManagerTemplateText
+                    [
+                        'technicalSD'         => $sdManagerTemplateText,
+                        'scheduleRequestText' => $scheduleRequestText
+                    ]
                 );
             }
 

@@ -1,0 +1,120 @@
+<script>
+    let dataTable;
+    let startDateInput;
+    let endDateInput;
+    $(() => {
+        startDateInput = $('input[name="startDate"]');
+        setStartDate(moment());
+        endDateInput = $('input[name="endDate"]');
+        setEndDate(moment());
+        dataTable = $('#dataTable').DataTable({
+            dom: 'lfrtip',
+            columns: [
+                {data: "customerName", name: 'customerName'},
+                {data: "callsIn", name: 'callsIn'},
+                {data: "callsOut", name: "callsOut"},
+                {data: 'totalSRsRaised', name: 'totalSRsRaised'},
+                {data: "standardSRs", name: "standardSRs"},
+                {data: "proactiveSRs", name: "proactiveSRs"},
+                {data: "activitiesRaised", name: "activitiesRaised"},
+            ],
+            order: [[1, 'desc']],
+            pageLength: 25,
+            serverSide: true,
+            ajax: {
+                url: "?action=getData",
+                type: "GET",
+                data: (data, settings) => {
+                    data.startDate = startDateInput.val();
+                    data.endDate = endDateInput.val();
+                }
+            },
+        });
+        startDateInput.on('change', null, evt => {
+            dataTable.ajax.reload();
+        });
+        endDateInput.on('change', null, evt => {
+            dataTable.ajax.reload();
+        });
+    });
+
+    function setStartDate(momentDate) {
+        startDateInput.val(momentDate.format('DD/MM/YYYY'));
+    }
+
+    function setEndDate(momentDate) {
+        endDateInput.val(momentDate.format('DD/MM/YYYY'));
+    }
+
+    function forcedSearch(option) {
+        const today = moment();
+        let fromDate = today;
+        let toDate = today.clone();
+        switch (option) {
+            case 1: // this week
+                fromDate = today.clone().startOf('isoWeek');
+                break;
+            case 2: // yesterday
+                fromDate = today.clone().subtract(1, 'days');
+                toDate = fromDate;
+                break;
+            case 3: // last Week
+                const lastWeek = today.clone().subtract(1, 'weeks');
+                fromDate = lastWeek.clone().startOf('isoWeek');
+                toDate = lastWeek.clone().day(5);
+                break;
+        }
+        setStartDate(fromDate);
+        setEndDate(toDate);
+        dataTable.ajax.reload();
+    }
+</script>
+
+<table>
+    <tbody>
+    <tr>
+        <td>Start Date</td>
+        <td><input name="startDate"
+                   class="jqueryCalendar"
+        ></td>
+        <td>End Date</td>
+        <td><input name="endDate"
+                   class="jqueryCalendar"
+        ></td>
+        <td>
+            <button onclick="forcedSearch(1)">This Week</button>
+            <button onclick="forcedSearch(2)">Yesterday</button>
+            <button onclick="forcedSearch(3)">Last Week</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<br>
+<br>
+<table id="dataTable">
+    <thead>
+    <tr>
+        <th>
+            Customer Name
+        </th>
+        <th>
+            Calls In
+        </th>
+        <th>
+            Calls Out
+        </th>
+        <th>
+            Total SRs Raised
+        </th>
+        <th>
+            Standard SRs
+        </th>
+        <th>
+            Proactive SRs
+        </th>
+        <th>
+            Activities Raised
+        </th>
+    </tr>
+    </thead>
+</table>

@@ -137,7 +137,7 @@ do {
         continue;
     }
 
-    if ( count($data['errors'])) {
+    if (count($data['errors'])) {
         foreach ($data['errors'] as $error) {
             $logger->warning("Error received from powershell output, but the execution was not stopped:  " . $error);
         }
@@ -146,6 +146,8 @@ do {
 
     $mailboxes = $data['mailboxes'];
     $licenses = $data['licenses'];
+    $devices = $data['devices'];
+
 
     $spreadsheet = new Spreadsheet();
     $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
@@ -182,8 +184,21 @@ do {
         }
     }
 
-    if (!count($mailboxes) && !count($licenses)) {
-        $logger->warning('This customer does not have a licences nor mailboxes');
+    if (count($devices)) {
+        try {
+            processDevices(
+                $spreadsheet,
+                $devices,
+                $logger,
+                $dbeHeader
+            );
+        } catch (\Exception $exception) {
+            $logger->error('Failed to process devices for customer: ' . $exception->getMessage());
+        }
+    }
+
+    if (!count($mailboxes) && !count($licenses) && !count($devices)) {
+        $logger->warning('This customer does not have a licences nor mailboxes nor devices');
         continue;
     }
     global $db;
@@ -271,14 +286,6 @@ do {
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             );
             $dbeCustomerDocument->setValue(
-                DBEPortalCustomerDocument::startersFormFlag,
-                'N'
-            );
-            $dbeCustomerDocument->setValue(
-                DBEPortalCustomerDocument::leaversFormFlag,
-                'N'
-            );
-            $dbeCustomerDocument->setValue(
                 DBEPortalCustomerDocument::mainContactOnlyFlag,
                 'Y'
             );
@@ -293,6 +300,74 @@ do {
         $logger->error('Failed to save file, possibly file open: ' . $exception->getMessage());
     }
 } while ($dbeCustomer->fetchNext());
+
+function processDevices(Spreadsheet $spreadsheet,
+                        $devices,
+                        LoggerCLI $logger,
+                        $dbeHeader
+)
+{
+    $devicesSheet = $spreadsheet->createSheet();
+    $devicesSheet->setTitle('Mobile Devices');
+    $devicesSheet->fromArray(
+        [
+            "Display Name",
+            "Email",
+            "Device Type",
+            "Device Model",
+            "Device Friendly Name",
+            "Device OS",
+            "First Sync",
+            "Most Recent Sync"
+        ],
+        null,
+        'A1'
+    );
+    $devicesSheet->fromArray(
+        $devices,
+        null,
+        'A2',
+        true
+    );
+    $highestRow = $devicesSheet->getHighestRow();
+    $highestColumn = $devicesSheet->getHighestColumn();
+    $devicesSheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
+    $devicesSheet->getStyle("A1:{$highestColumn}{$highestRow}")->getAlignment()->setHorizontal('center');
+    foreach (range('A', $highestColumn) as $col) {
+        $devicesSheet->getColumnDimension($col)
+            ->setAutoSize(true);
+    }
+    $thresholdDate = (new DateTime())->sub(
+        new DateInterval('P' . $dbeHeader->getValue(DBEHeader::office365ActiveSyncWarnAfterXDays) . 'D')
+    );
+    foreach ($devices as $row => $device) {
+        $currentRow = $row + 2;
+        $color = null;
+        if (!$device['LastSuccessSync']) {
+            $color = "FFFFC7CE";
+        } else {
+            $lastSyncDate = DateTime::createFromFormat('d-m-Y H.i', $device['LastSuccessSync']);
+            if ($lastSyncDate < $thresholdDate) {
+                $color = "FFFFC7CE";
+            }
+        }
+
+
+        if ($color) {
+            $devicesSheet->getStyle("A$currentRow:{$highestColumn}$currentRow")
+                ->getFill()
+                ->setFillType(Fill::FILL_SOLID)
+                ->getStartColor()
+                ->setARGB($color);
+        }
+    }
+    $dateTime = new DateTime();
+    $devicesSheet->fromArray(
+        ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
+        null,
+        'A' . ($highestRow + 2)
+    );
+}
 
 /**
  * @param Spreadsheet $spreadSheet
@@ -414,7 +489,14 @@ function processMailboxes(Spreadsheet $spreadSheet,
         true
     );
     $highestRow = count($mailboxes) + 2;
+    $licensedUsersNumber = $totalizationRow['LicensedUsers'];
     $totalizationRow['LicensedUsers'] = "$totalizationRow[LicensedUsers] Licensed Users";
+    if ($totalizationRow['LicensedUsers']) {
+        $updateCustomer = new DBECustomer($thing);
+        $updateCustomer->getRow($dbeCustomer->getValue(DBECustomer::customerID));
+        $updateCustomer->setValue(DBECustomer::licensedOffice365Users, $licensedUsersNumber);
+        $updateCustomer->updateRow();
+    }
     $mailboxesSheet->fromArray(
         $totalizationRow,
         null,
@@ -508,6 +590,7 @@ function processLicenses(Spreadsheet $spreadSheet,
     $dateTime = new DateTime();
     $sparedLicenseErrors = [];
     foreach ($licenses as $key => $datum) {
+        $licenses[$key][array_key_last($licenses[$key])] = null;
         $dbeOffice365Licenses->getRowForLicense($datum['AccountSkuId']);
         if ($dbeOffice365Licenses->rowCount()) {
             $licenses[$key]['AccountSkuId'] = str_replace(

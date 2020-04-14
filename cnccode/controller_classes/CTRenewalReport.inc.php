@@ -89,6 +89,22 @@ class CTRenewalReport extends CTCNC
     {
         switch ($this->getAction()) {
 
+            case 'runOfficeReport':
+
+                $customerID = @$_REQUEST['customerID'];
+                ignore_user_abort(true);
+                session_write_close();
+                set_time_limit(0);
+                ob_start();
+// do initial processing here
+                echo json_encode(["status" => "ok"]);
+                header('Connection: close');
+                header('Content-Length: ' . ob_get_length());
+                ob_end_flush();
+                ob_flush();
+                flush();
+                system(" php " . BASE_DRIVE . "/htdocs/Office365LicensesExport.php -c {$customerID} > NUL");
+                break;
             case 'produceReport':
                 $this->page = $this->produceReport(
                     false,
@@ -202,22 +218,9 @@ class CTRenewalReport extends CTCNC
 
         $totalCostPrice = 0;
         $totalSalePrice = 0;
+        $addOfficeReportButton = false;
 
         foreach ($items as $item) {
-
-            $itemTypeHeader = null;
-            if ($item['itemTypeDescription'] != $lastItemTypeDescription) {
-                $itemTypeHeader = '<tr><td colspan="7"><h3>' . $item['itemTypeDescription'] . '</h3></td></tr>';
-            }
-
-            $this->template->set_var(
-                array(
-                    'itemTypeHeader' => $itemTypeHeader
-                )
-            );
-
-            $lastItemTypeDescription = $item['itemTypeDescription'];
-
             $coveredItemsString = null;
 
             if (count($item['coveredItems']) > 0) {
@@ -233,13 +236,40 @@ class CTRenewalReport extends CTCNC
             $itemClass = 'externalItem';
             $salePrice = null;
             $costPrice = null;
+
             if (!is_null($item['customerItemID'])) {
                 $itemClass = null;
                 $salePrice = Controller::formatNumber($item['salePrice']);
                 $costPrice = Controller::formatNumber($item['costPrice']);
                 $totalCostPrice += $item['costPrice'];
                 $totalSalePrice += $item['salePrice'];
+                if (trim($item['itemTypeDescription']) == 'Software') {
+                    $dbeItem = new DBEItem($this);
+                    $dbeItem->getRow($item['itemID']);
+                    if ($dbeItem->getValue(DBEItem::itemBillingCategoryID) === 4) {
+                        $addOfficeReportButton = true;
+                    }
+
+                }
             }
+
+            $itemTypeHeader = null;
+            if ($item['itemTypeDescription'] != $lastItemTypeDescription) {
+                $itemTypeHeader = '<tr><td colspan="7"><h3>' . $item['itemTypeDescription'] . '</h3></td></tr>';
+                if (trim($item['itemTypeDescription']) == 'Software') {
+                    $itemTypeHeader .= '<tr class="officeReport hidden" ><td colspan="7"><button  type="button" onclick="runOfficeReport(' . $customerID . ')">Run O365 Mailbox Report</button></td></tr>';
+                }
+            }
+
+
+            $this->template->set_var(
+                array(
+                    'itemTypeHeader' => $itemTypeHeader
+                )
+            );
+
+            $lastItemTypeDescription = $item['itemTypeDescription'];
+
             $buCustomer = new BUCustomer($this);
 
             $mainContacts = $buCustomer->getMainSupportContacts($customerID);
@@ -301,7 +331,7 @@ class CTRenewalReport extends CTCNC
                 array(
                     'linkURL'              => $item['linkURL'],
                     'notes'                => $item['notes'],
-                    'description'          => Controller::htmlDisplayText($item['description']),
+                    'description'          => $item['description'],
                     'itemTypeDescription'  => Controller::htmlDisplayText($item['itemTypeDescription']),
                     'expiryDate'           => Controller::htmlDisplayText($item['expiryDate']),
                     'salePrice'            => $salePrice,
@@ -314,6 +344,7 @@ class CTRenewalReport extends CTCNC
                     'calculatedExpiryDate' => $item['calculatedExpiryDate'],
                     'units'                => $item['units'],
                     'directDebit'          => $item['directDebit'] ? 'Yes' : null,
+                    "showOfficeButton"     => $addOfficeReportButton ? 1 : 0,
                 )
             );
 

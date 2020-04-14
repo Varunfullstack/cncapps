@@ -551,6 +551,36 @@ class DBEContact extends DBCNCEntity
         return $ret;
     }
 
+    function getSupportContactRowsByNameMatch($customerId, $match){
+        $this->setMethodName("getCustomerRowsByNameMatch");
+        $this->setValue(
+            self::customerID,
+            $customerId
+        );
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE (" . $this->getDBColumnName(self::lastName) . " LIKE '%" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $match
+            ) . "%'" .
+            " OR " . $this->getDBColumnName(self::firstName) . " LIKE '%" . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $match
+            ) . "%')" .
+            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
+            " AND " . $this->getDBColumnName(self::customerID) . " = " . $this->getFormattedValue(self::customerID);
+        $queryString .=
+            " AND supportLevel in('support' or 'main')
+        ";
+
+        $queryString .=
+            " ORDER BY " . $this->getDBColumnName(self::lastName) . "," . $this->getDBColumnName(self::firstName);
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+    }
+
     /**
      * Get customer/site rows by name match
      * Excludes discontinued rows
@@ -568,9 +598,6 @@ class DBEContact extends DBCNCEntity
             self::customerID,
             $customerId
         );
-        if ($match == '') {
-            $this->raiseError('$match not set');
-        }
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .

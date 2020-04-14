@@ -18,6 +18,7 @@ class DBEJContract extends DBECustomerItem
     const invoiceToDate = "invoiceToDate";
     const invoiceFromDateYMD = "invoiceFromDateYMD";
     const invoiceToDateYMD = "invoiceToDateYMD";
+    const allowSRLog = 'allowSRLog';
 
     /**
      * calls constructor()
@@ -36,6 +37,7 @@ class DBEJContract extends DBECustomerItem
         $this->addColumn(self::renewalType, DA_STRING, DA_ALLOW_NULL, "renewalType.description");
         $this->addColumn(self::postcode, DA_STRING, DA_ALLOW_NULL, "add_postcode");
         $this->addColumn(self::adslPhone, DA_STRING, DA_ALLOW_NULL);
+        $this->addColumn(self::allowSRLog, DA_BOOLEAN, DA_NOT_NULL);
         $this->addColumn(
             self::invoiceFromDate,
             DA_DATE,
@@ -65,7 +67,7 @@ class DBEJContract extends DBECustomerItem
         $this->setAddColumnsOff();
     }
 
-    function getRowsByCustomerID($customerID)
+    function getRowsByCustomerID($customerID, int $itemID = null)
     {
         $this->setMethodName('getRowsByCustomerID');
         if ($customerID == '') {
@@ -79,9 +81,12 @@ class DBEJContract extends DBECustomerItem
             " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno " .
             " WHERE " . $this->getDBColumnName(self::customerID) . "=" . $customerID .
             "  AND renewalType.allowSrLogging = 'Y'
-         AND declinedFlag <> 'Y'
-       ORDER BY renewalType.description, itm_desc";
+         AND declinedFlag <> 'Y'";
 
+        if ($itemID) {
+            $queryString .= " and cui_itemno = " . $itemID;
+        }
+        $queryString .= " ORDER BY renewalType.description, itm_desc";
         $this->setQueryString($queryString);
         return (parent::getRows());
     }

@@ -34,7 +34,7 @@ if ($_SERVER['HTTP_HOST'] == 'cncapp' OR $_SERVER['HTTP_HOST'] == 'cncapps') {
 if ($_SERVER['HTTP_HOST'] == 'devtest.pavilionweb.com') {
     $server_type = CONFIG_SERVER_TYPE_DEVELOPMENT;
 }
-if ($_SERVER['HTTP_HOST'] == 'cncdev7:85') {
+if ($_SERVER['HTTP_HOST'] == 'cncdev.cnc-ltd.co.uk') {
     $serverPhp7 = true;
 }
 

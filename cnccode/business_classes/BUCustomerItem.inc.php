@@ -652,7 +652,8 @@ class BUCustomerItem extends Business
         $dsContract = new DataSet($this);
         $this->getContractsByCustomerID(
             $customerID,
-            $dsContract
+            $dsContract,
+            null
         );
 
         while ($dsContract->fetchNext()) {
@@ -668,14 +669,16 @@ class BUCustomerItem extends Business
     /**
      * @param $customerID
      * @param $dsResults
+     * @param int|null $itemID
      */
     function getContractsByCustomerID($customerID,
-                                      &$dsResults
+                                      &$dsResults,
+                                      int $itemID = null
     )
     {
         $this->setMethodName('getContractsByCustomerID');
         $dbeJContract = new DBEJContract($this);
-        $dbeJContract->getRowsByCustomerID($customerID);
+        $dbeJContract->getRowsByCustomerID($customerID, $itemID);
         $this->getData(
             $dbeJContract,
             $dsResults

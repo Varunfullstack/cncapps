@@ -29,6 +29,7 @@ class DBEItem extends DBCNCEntity
     const allowDirectDebit = "allowDirectDebit";
     const excludeFromPOCompletion = "excludeFromPOCompletion";
     const itemBillingCategoryID = "itemBillingCategoryID";
+    const allowSRLog = "allowSRLog";
 
     /**
      * calls constructor()
@@ -163,6 +164,13 @@ class DBEItem extends DBCNCEntity
             self::itemBillingCategoryID,
             DA_ID,
             DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::allowSRLog,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
         );
         $this->setPK(0);
         $this->setAddColumnsOff();

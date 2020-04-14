@@ -2,7 +2,7 @@
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DBEOSSupportDates.php');
-require_once ($cfg['path_bu'] . '/BUHeader.inc.php');
+require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 
 class CTOSSupportDates extends CTCNC
 {
@@ -42,12 +42,6 @@ class CTOSSupportDates extends CTCNC
     {
         $this->defaultAction();
     }
-
-    function update()
-    {
-        $this->defaultAction();
-    }
-
 
     /**
      * Route to function based upon action passed
@@ -110,6 +104,7 @@ class CTOSSupportDates extends CTCNC
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::version, $_REQUEST['version']);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::availabilityDate, $availabilityDateString);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::endOfLifeDate, $endOfLifeDateString);
+                $DBEOSSupportDates->setValue(DBEOSSupportDates::isServer, $this->getParam('isServer') === 'on');
                 $DBEOSSupportDates->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
@@ -139,16 +134,18 @@ class CTOSSupportDates extends CTCNC
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::version, $_REQUEST['version']);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::availabilityDate, $availabilityDateString);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::endOfLifeDate, $endOfLifeDateString);
+                $DBEOSSupportDates->setValue(DBEOSSupportDates::isServer, $this->getParam('isServer') === 'on');
                 $DBEOSSupportDates->insertRow();
 
                 echo json_encode(
                     [
                         "id"               => $DBEOSSupportDates->getValue(DBEOSSupportDates::id),
-                        "name"             => $DBEOSSupportDates->getValue($DBEOSSupportDates::name),
-                        "version"          => $DBEOSSupportDates->getValue($DBEOSSupportDates::version),
-                        "availabilityDate" => $DBEOSSupportDates->getValue($DBEOSSupportDates::availabilityDate),
-                        "endOfLifeDate"    => $DBEOSSupportDates->getValue($DBEOSSupportDates::endOfLifeDate),
-                        "threshold"        => $this->dsSystemHeader->getValue(DBEHeader::OSSupportDatesThresholdDays)
+                        "name"             => $DBEOSSupportDates->getValue(DBEOSSupportDates::name),
+                        "version"          => $DBEOSSupportDates->getValue(DBEOSSupportDates::version),
+                        "availabilityDate" => $DBEOSSupportDates->getValue(DBEOSSupportDates::availabilityDate),
+                        "endOfLifeDate"    => $DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate),
+                        "threshold"        => $this->dsSystemHeader->getValue(DBEHeader::OSSupportDatesThresholdDays),
+                        "isServer"         => $DBEOSSupportDates->getValue(DBEOSSupportDates::isServer)
                     ],
                     JSON_NUMERIC_CHECK
                 );
@@ -187,7 +184,8 @@ class CTOSSupportDates extends CTCNC
                         "version"          => $DBEOSSupportDates->getValue(DBEOSSupportDates::version),
                         "availabilityDate" => $availabilityDateString,
                         "endOfLifeDate"    => $endOfLifeDateString,
-                        "threshold"        => $this->dsSystemHeader->getValue(DBEHeader::OSSupportDatesThresholdDays)
+                        "threshold"        => $this->dsSystemHeader->getValue(DBEHeader::OSSupportDatesThresholdDays),
+                        "isServer"         => $DBEOSSupportDates->getValue(DBEOSSupportDates::isServer)
                     ];
                 }
                 echo json_encode(
@@ -331,5 +329,10 @@ class CTOSSupportDates extends CTCNC
         );
 
         $this->parsePage();
+    }
+
+    function update()
+    {
+        $this->defaultAction();
     }
 }

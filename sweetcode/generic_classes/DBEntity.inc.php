@@ -701,7 +701,6 @@ class DBEntity extends DataAccess
             if (!$this->db->Record) {
                 return null;
             }
-
             if (!key_exists($ixColumn, $this->db->Record)) {
                 return $this->getDefaultValue($ixColumn);
             }
@@ -735,9 +734,10 @@ class DBEntity extends DataAccess
         if ($type == DA_FLOAT) {
             return (float)$this->db->Record[$ixColumnNumber];
         }
-        if ($type == DA_JSON_ARRAY) {
+        if (in_array($type, [DA_JSON_ARRAY, DA_BOOLEAN])) {
             return json_decode($this->db->Record[$ixColumnNumber]);
         }
+
         return $this->db->Record[$ixColumnNumber];
     }
 
@@ -831,10 +831,12 @@ class DBEntity extends DataAccess
                     }
                 }
             }
-            $this->setQueryString(
-                "DELETE FROM " . $this->getTableName() .
-                " WHERE " . $this->getPKWhere()
-            );
+            $query = "DELETE FROM " . $this->getTableName() .
+                " WHERE " . $this->getPKWhere();
+            if ($this->debug) {
+                var_dump($query);
+            }
+            $this->setQueryString($query);
         }
         $ret = $this->runQuery();
         $this->resetQueryString();

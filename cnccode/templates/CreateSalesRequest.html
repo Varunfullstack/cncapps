@@ -1,30 +1,34 @@
 <script>
+    const autocompleteURL = "/Customer.php?action=searchName";
     $(function () {
         const customerIDHiddenElement = document.getElementById('customerID');
         const customerStringElement = document.getElementById('customerString');
 
-        //property mutation for hidden input
-        Object.defineProperty(customerIDHiddenElement, "value", {
-            // Don't override the getter, but stub it in.
-            get: function () {
-                return this.getAttribute("value");
+        $('#customerString').autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response);
+                })
             },
-            // In the setter, we want to set the value
-            //  and also fire off the change event.
-            //  By doing this, the coder changing the
-            //  value never needs worry about it.
-            set: function (val) {
-                let evt;
-                console.log("set");
-
-                // handle value change here
-                this.setAttribute("value", val);
-
-                //fire the event
-                evt = document.createEvent("HTMLEvents");
-                evt.initEvent("change", false, true);
-                customerIDHiddenElement.dispatchEvent(evt);
-            }
+            select: function (event, ui) {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+                $('#customerID').val(ui.item.id);
+                changeCustomerID(ui.item.value);
+            },
+            delay: 200,
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
         });
 
         startCreateSalesRequest(1, $('#container')[0]);
@@ -34,11 +38,11 @@
         }
     });
 
-    function changeCustomerID() {
+    function changeCustomerID(customerID) {
         if (salesRequest) {
-            salesRequest.customerID = event.target.value;
+            salesRequest.customerID = customerID;
         } else {
-            startCreateSalesRequest(event.target.value, $('#container')[0])
+            startCreateSalesRequest(customerID, $('#container')[0])
         }
     }
 </script>
@@ -60,13 +64,11 @@
         <td>
             <input type="hidden"
                    id="customerID"
-                   onchange="changeCustomerID()"
             >
             <input type="text"
                    id="customerString"
                    name="customerString"
                    value=""
-                   customer-picker="customerID"
                    size="50"
                    maxlength="50"
                    style="margin-left: 0"

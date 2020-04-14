@@ -16,15 +16,18 @@ require_once($cfg["path_dbe"] . "/DBEPassword.inc.php");
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
-require './../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 global $db;
 
 $dbeCustomer = new DBECustomer($thing);
 
-$dbeCustomer->getActiveCustomers();
 $generateSummary = isset($_REQUEST['generateSummary']);
-$customerIDs = [];
-
+$customerID = isset($_REQUEST['customerID']) ? $_REQUEST['customerID'] : null;
+if ($customerID) {
+    $dbeCustomer->getRow($customerID);
+} else {
+    $dbeCustomer->getActiveCustomers();
+}
 //we are going to use this to add to the monitoring db
 $dsn = 'mysql:host=' . LABTECH_DB_HOST . ';dbname=' . LABTECH_DB_NAME;
 $options = [
@@ -53,11 +56,13 @@ while ($DBEOSSupportDates->fetchNext()) {
             DBEOSSupportDates::name
         ) . "' as osName,  '" . $DBEOSSupportDates->getValue(
             DBEOSSupportDates::version
-        ) . "' as version, '" . $date->format('d/m/Y') . "' as endOfSupportDate";
+        ) . "' as version, '" . $date->format('d/m/Y') . "' as endOfSupportDate, " . $DBEOSSupportDates->getValue(
+            DBEOSSupportDates::isServer
+        ) . " as isServer ";
 }
 
 if (!$fakeTable) {
-    $fakeTable = "select null as endOfSupportDate, null as osName, null as version";
+    $fakeTable = "select null as endOfSupportDate, null as osName, null as version, false as isServer";
 }
 
 $BUHeader = new BUHeader($thing);
@@ -83,7 +88,6 @@ if ($generateSummary) {
     $summarySheet = $summarySpreadSheet->getActiveSheet();
     $isHeaderSet = false;
 }
-
 
 function getUnrepeatedUsername($str)
 {
@@ -123,19 +127,37 @@ while ($dbeCustomer->fetchNext()) {
   locations.name AS "Location",
   computers.name AS "Computer Name",
   SUBSTRING_INDEX(lastusername, \'\\\\\', - 1) AS "Last User",
-  computers.localaddress AS "IP Address",
    DATE_FORMAT(
     computers.lastContact,
     \'%d/%m/%Y %H:%i:%s\'
   ) AS "Last Contact",
   inv_chassis.productname AS "Model",
+ if(inv_chassis.productname like "%VMware%", "Not Applicable",coalesce((select DATE_FORMAT(PurchaseDate,"%d/%m/%Y") from plugin_warrantymaster_aux where ComputerID = computers.computerid ), "Unknown")) as "Warranty Start Date",
+  if(inv_chassis.productname like "%VMware%", "Not Applicable",coalesce((select DATE_FORMAT(ExpiryDate,"%d/%m/%Y") from plugin_warrantymaster_aux where ComputerID = computers.computerid ), "Unknown")) as "Warranty Expiry Date",
+IF(
+    (SELECT
+      ExpiryDate
+    FROM
+      plugin_warrantymaster_aux
+    WHERE ComputerID = computers.computerid) IS NOT NULL,
+    (SELECT
+      ROUND(
+        TIMESTAMPDIFF(YEAR, PurchaseDate, CURDATE()) + (
+          (
+            TIMESTAMPDIFF(MONTH, PurchaseDate, CURDATE()) - (
+              TIMESTAMPDIFF(YEAR, PurchaseDate, CURDATE()) * 12
+            )
+          ) / 12
+        ),
+        1
+      )
+    FROM
+      plugin_warrantymaster_aux
+    WHERE ComputerID = computers.computerid),
+    NULL
+  ) AS "Age in Years",
   if(inv_chassis.serialnumber like \'%VMware%\', null,inv_chassis.serialnumber )        AS "Serial No.",
-  DATE_FORMAT(
-    STR_TO_DATE(inv_bios.biosdate, \'%m/%d/%Y\'),
-    \'%d/%m/%Y\'
-  ) AS "BIOS Date",
   processor.name AS "CPU",
-  cim_processorfamily.value AS "CPU Type",
   computers.totalmemory AS "Memory",
   SUM(drives.Size) AS "Total Disk",
   if(exd.`Bitlocker Enabled` and exd.`Bitlocker Password/Key` regexp \'[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}-[0-9]{6}\',\'Encrypted\',null) as \'Drive Encryption\',
@@ -145,7 +167,7 @@ while ($dbeCustomer->fetchNext()) {
     - 1
   ) AS "Operating System",
   computers.version AS "Version",
-       (select endOfSupportDate from ('.$fakeTable.') f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `OS End of Support Date`,
+       (select endOfSupportDate from (' . $fakeTable . ') f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `OS End of Support Date`,
   computers.domain AS \'Domain\',
   SUBSTRING_INDEX(
     software.name,
@@ -156,7 +178,8 @@ while ($dbeCustomer->fetchNext()) {
   DATE_FORMAT(
     STR_TO_DATE(computers.VirusDefs, \'%Y%m%d\'),
     \'%d/%m/%Y\'
-  ) AS "AV Definition" 
+  ) AS "AV Definition",
+(select isServer from (' . $fakeTable . ') f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `isServer`
 FROM
   computers 
   LEFT JOIN (clients) 
@@ -175,8 +198,6 @@ inv_processor
 WHERE inv_processor.Enabled = 1
 GROUP BY inv_processor.computerid) processor
 ON computers.computerid = processor.computerid
-LEFT JOIN (cim_processorfamily)
-ON processor.family = cim_processorfamily.id
   LEFT JOIN (software) 
     ON (
       computers.computerid = software.computerid 
@@ -209,10 +230,6 @@ ON processor.family = cim_processorfamily.id
       AND software.name NOT LIKE "%ODF%" 
       AND software.name NOT LIKE "%SDK%"
     ) 
-  LEFT JOIN (inv_bios) 
-    ON (
-      computers.computerid = inv_bios.computerid
-    ) 
   LEFT JOIN (inv_chassis) 
     ON (
       computers.computerid = inv_chassis.computerid
@@ -232,10 +249,7 @@ ON processor.family = cim_processorfamily.id
   on (exd.computerid = computers.computerid)
     where clients.externalID = ? 
 GROUP BY computers.computerid 
-ORDER BY clients.name,
-  computers.os,
-  computers.name,
-  software.name';
+ORDER BY Location, `Computer Name`';
 
     $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
     $customerName = $dbeCustomer->getValue(DBECustomer::name);
@@ -254,6 +268,7 @@ ORDER BY clients.name,
             );
         var_dump($query);
         echo ' </div>';
+        exit;
         continue;
     }
     $data = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -280,7 +295,7 @@ ORDER BY clients.name,
             if (!$isHeaderSet) {
                 $summarySheet->fromArray(array_merge(["Customer Name"], $keys));
                 $currentSummaryRow = 2;
-                $summarySheet->getStyle("A1:U1")->getFont()->setBold(true);
+                $summarySheet->getStyle("A1:{$summarySheet->getHighestColumn()}1")->getFont()->setBold(true);
                 $isHeaderSet = true;
             }
 
@@ -293,14 +308,19 @@ ORDER BY clients.name,
 
             $summarySheet->fromArray($summaryData, null, 'A' . $currentSummaryRow);
         }
+        $highestColumn = $sheet->getHighestColumn();
+        $highestRow = $sheet->getHighestRow();
+        $sheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
 
-        $sheet->getStyle("A1:T1")->getFont()->setBold(true);
-
-        $sheet->setAutoFilter(
-            $sheet->calculateWorksheetDimension()
-        );
-
+        $pcs = 0;
+        $servers = 0;
         for ($i = 0; $i < count($data); $i++) {
+            if (!$data[$i]['isServer']) {
+                $pcs++;
+            } else {
+                $servers++;
+            }
+            unset($data[$i]['isServer']);
             if (!$data[$i]['OS End of Support Date']) {
                 continue;
             }
@@ -321,7 +341,7 @@ ORDER BY clients.name,
             }
 
             if ($color) {
-                $sheet->getStyle("A$currentRow:T$currentRow")
+                $sheet->getStyle("A$currentRow:$highestColumn$currentRow")
                     ->getFill()
                     ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                     ->getStartColor()
@@ -329,21 +349,49 @@ ORDER BY clients.name,
 
                 if ($generateSummary) {
                     $currentSummaryStyleRow = $currentSummaryRow + $i;
-                    $summarySheet->getStyle("A$currentSummaryStyleRow:U$currentSummaryStyleRow")
+                    $summarySheet->getStyle(
+                        "A$currentSummaryStyleRow:{$summarySheet->getHighestColumn()}$currentSummaryStyleRow"
+                    )
                         ->getFill()
                         ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                         ->getStartColor()
                         ->setARGB($color);
                 }
             }
-
         }
+        $sheet->fromArray(
+            $data,
+            null,
+            'A2'
+        );
+        if ($generateSummary) {
+            if (!$isHeaderSet) {
+                $summarySheet->fromArray(array_merge(["Customer Name"], $keys));
+                $currentSummaryRow = 2;
+                $summarySheet->getStyle("A1:U1")->getFont()->setBold(true);
+                $isHeaderSet = true;
+            }
+
+            $summaryData = array_map(
+                function ($originalData) use ($customerName) {
+                    return array_merge(["Customer Name" => $customerName], $originalData);
+                },
+                $data
+            );
+
+            $summarySheet->fromArray($summaryData, null, 'A' . $currentSummaryRow);
+        }
+        $sheet->getStyle("A1:T1")->getFont()->setBold(true);
+
+        $sheet->setAutoFilter(
+            $sheet->calculateWorksheetDimension()
+        );
         $currentSummaryRow += count($data);
-        foreach (range('A', $sheet->getHighestDataColumn()) as $col) {
+        foreach (range('A', $highestColumn) as $col) {
             $sheet->getColumnDimension($col)
                 ->setAutoSize(true);
         }
-
+        $sheet->getStyle($sheet->calculateWorksheetDimension())->getAlignment()->setHorizontal('center');
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $customerFolder = $buCustomer->getCustomerFolderPath($customerID);
         $folderName = $customerFolder . "\Review Meetings\\";
@@ -354,6 +402,7 @@ ORDER BY clients.name,
                 true
             );
         }
+
 
         $fileName = $folderName . "Current Asset List Extract.xlsx";
         try {
@@ -396,14 +445,6 @@ ORDER BY clients.name,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 );
                 $dbeCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::startersFormFlag,
-                    'N'
-                );
-                $dbeCustomerDocument->setValue(
-                    DBEPortalCustomerDocument::leaversFormFlag,
-                    'N'
-                );
-                $dbeCustomerDocument->setValue(
                     DBEPortalCustomerDocument::mainContactOnlyFlag,
                     'Y'
                 );
@@ -412,6 +453,12 @@ ORDER BY clients.name,
             } else {
                 $dbeCustomerDocument->updateRow();
             }
+
+            $updateCustomer = new DBECustomer($thing);
+            $updateCustomer->getRow($customerID);
+            $updateCustomer->setValue(DBECustomer::noOfPCs, $pcs);
+            $updateCustomer->setValue(DBECustomer::noOfServers, $servers);
+            $updateCustomer->updateRow();
 
             echo '<div>Data was found at labtech, creating file ' . $fileName . '</div>';
         } catch (\Exception $exception) {
@@ -426,6 +473,7 @@ $tempFileName = null;
 if ($generateSummary) {
     echo '<h1>Generating Summary</h1>';
     $summarySheet->setAutoFilter($summarySheet->calculateWorksheetDimension());
+    $summarySheet->getStyle($summarySheet->calculateWorksheetDimension())->getAlignment()->setHorizontal('center');
     foreach (range('A', $summarySheet->getHighestDataColumn()) as $col) {
         $summarySheet->getColumnDimension($col)
             ->setAutoSize(true);

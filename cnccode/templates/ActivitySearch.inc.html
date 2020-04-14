@@ -1,9 +1,6 @@
 <!-- Template: ActivitySearch.inc.html -->
-<script language='JavaScript'
-        src="CommonJS.js"
-></script>
-<script src=".javascript/fromDateToDate.js"></script>
-<script language='JavaScript'>
+<script>
+    const autocompleteURL = "/Customer.php?action=searchName";
     var state = 'none'; // display status
     var savedCustomerString;
 
@@ -11,44 +8,61 @@
         savedCustomerString = document.getElementById("customerString").value
     }
 
-    function validateCustomerString() {
-        if (Trim(document.getElementById("customerString").value) != "") {
-            if (document.getElementById("customerString").value != savedCustomerString) {
-                var newWindow = window.open('{urlCustomerPopup}&customerString=' +
-                    escape(document.getElementById("customerString").value) +
-                    '&parentIDField=customerID' +
-                    '&parentDescField=customerString',
-                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0');
-                newWindow.doNotSubmit = true;
-                newWindow.onbeforeunload = function () {
-                    $('#contractSelector').html("<option value='99'>All</option><option value=''>T &amp; M</option>");
-                    if ($('#customerID').val()) {
-                        $.ajax({
-                            url: '{fetchContractsURL}',
-                            method: 'POST',
-                            type: 'post',
-                            dataType: 'json',
-                            data: {customerID: $('#customerID').val()}
-                        }).then(function (result) {
-                            console.log(result);
-                            var options = Object.keys(result).reduce(function (acc, key) {
-                                //for each key we create an optgroup
-                                acc += "<optgroup label='" + key + "'>";
-                                acc += result[key].reduce(function (subacc, item) {
-                                    subacc += "<option value='" + item.id + "' >" + item.description + "</option>";
-                                    return subacc;
-                                }, "");
-                                acc += "</optgroup>";
-                                return acc;
-                            }, '');
-                            $('#contractSelector').append(options);
-                        });
+    renderContracts();
+
+    $(function () {
+        $('#customerString').autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
                     }
-                }
-            }
-        } else {
-            document.searchForm.customerID.value = "";
-            $('#contractSelector').html("<option value='99'>All</option><option value=''>T &amp; M</option>");
+                ).then(response => {
+                    responseCB(response);
+                })
+            },
+            select: function (event, ui) {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+                $('#customerID').val(ui.item.id);
+                renderContracts();
+            },
+            delay: 200,
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
+    });
+
+
+    function renderContracts() {
+        $('#contractSelector').html("<option value='99'>All</option><option value=''>T &amp; M</option>");
+        if ($('#customerID').val()) {
+            $.ajax({
+                url: '{fetchContractsURL}',
+                method: 'POST',
+                type: 'post',
+                dataType: 'json',
+                data: {customerID: $('#customerID').val()}
+            }).then(function (result) {
+                console.log(result);
+                var options = Object.keys(result).reduce(function (acc, key) {
+                    //for each key we create an optgroup
+                    acc += "<optgroup label='" + key + "'>";
+                    acc += result[key].reduce(function (subacc, item) {
+                        subacc += "<option value='" + item.id + "' >" + item.description + "</option>";
+                        return subacc;
+                    }, "");
+                    acc += "</optgroup>";
+                    return acc;
+                }, '');
+                $('#contractSelector').append(options);
+            });
         }
     }
 
@@ -64,11 +78,6 @@
         }
     }
 
-    function validateCustomerStringOnReturn() {
-        if (event.keyCode == 13) {
-            validateCustomerString();
-        }
-    }
 
     function checkAll() {
         for (var i = 0; i < document.searchForm.elements.length; i++) {
@@ -128,9 +137,6 @@
                     id="customerString"
                     name="customerString"
                     value="{customerString}"
-                    onFocus="javascript:saveCustomerString()"
-                    onBlur="javascript:validateCustomerString()"
-                    onKeypress="javascript:validateCustomerStringOnReturn()"
                     size="50"
                     maxlength="50"
             >
@@ -163,7 +169,9 @@
                 <div align="right">Activity Type</div>
             </td>
             <td>
-                <select name="activity[1][callActTypeID]">
+                <select name="activity[1][callActTypeID]"
+                        style="width: 220px"
+                >
                     <option value="">All</option>
                     <!-- BEGIN activityTypeBlock -->
                     <option {activityTypeSelected}
@@ -206,20 +214,24 @@
             <td class="promptText">
                 <div align="right">Activity Status</div>
             </td>
-            <td><select name="activity[1][status]">
-                <!-- BEGIN statusBlock -->
-                <option {statusSelected}
-                        value="{statusValue}"
-                >{statusDescription}
-                </option>
-                <!-- END statusBlock -->
-            </select></td>
+            <td>
+                <select name="activity[1][status]"
+                        style="width: 220px"
+                >
+                    <!-- BEGIN statusBlock -->
+                    <option {statusSelected}
+                            value="{statusValue}"
+                    >{statusDescription}
+                    </option>
+                    <!-- END statusBlock -->
+                </select>
+            </td>
         </tr>
         <tr>
             <td class="promptText">
                 <div align="right">Priority</div>
             </td>
-            <td><select name="activity[1][priority]">
+            <td><select name="activity[1][priority]" style="width: 220px">
                 <option value="">All</option>
                 <!-- BEGIN priorityBlock -->
                 <option {prioritySelected}
@@ -321,17 +333,16 @@
             <td class="promptText">
                 <div align="right">Search for</div>
             </td>
-            <td><input name="activity[1][activityText]"
+            <td>
+                <input name="activity[1][activityText]"
                        type="text"
                        value="{activityText}"
                        size="100"
                        maxlength="100"
-            ></td>
-        </tr>
-        <tr>
-            <td>&nbsp;</td>
-            <td class="info style2">+ stands for AND, - stands for NOT, [NO
-                OPERATOR] stands for OR. &quot;literal string&quot;
+                >
+                <button onclick="alert('+Office and +essentials – will search for any text that’s Office AND Essentials\n'+
+'“Office 365” and +premium – will search for any text that’s “Office 365” AND there’s also Premium\n'+
+'Office 365 premium – will search for any of those key words (i.e. its Office OR 365 OR Premium)')">Help</button>
             </td>
         </tr>
         <tr>

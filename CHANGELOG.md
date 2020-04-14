@@ -1,6 +1,49 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.12.0] - 2020-04-14
+### Added
+- Issue 762 - 3CX Call Reporting
+- Issue 754 - Allow manual running of O365 mailbox report
+- Issue 749 - Ability to create scheduled and regular SRs
+- Issue 793 - Add Flag as Sent on Sales Quotes generated as esignable
+- Issue 802 - Starters & Leavers Report with links
+- Issue 782 - O365 Mailbox script to include Active Sync details
+- Issue 637 - Double Hard Time Limits
+### Changed
+- Issue 750 - Set SR to awaiting CNC when Future date has been reached
+- Issue 772 - Date of Expense Tweak
+- Issue 805 - Automatically mark visible P1 SRs as critical
+- Issue 774 - SR Choice of contracts when closing
+- Issue 785 - Tidy Current Mailbox Extract Licenses page
+- Issue 801 - Sales Request submitted emails to include Initial Link
+- Issue 787 - History of SR Pop up
+- Issue 806 - Move Support Level column on customer page
+- Issue 768 - Approval required for reopening of SRs by customer
+- Issue 788 - Toggle higher level passwords
+- Issue 794 - Target Special Attention Emails
+- Issue 795 - Show Special Attention when logging a new SR
+- Issue 761 - Report on CWA Agent and O365 licenses with Meeting Agenda
+- Issue 809 - Top align sales requests & change requests
+- Issue 979 - Order confirmation email to customer when creating P5
+- Issue 784 - Asset export information to include manufacturer warranty
+- Issue 811 - Sales Requests Need Complete Date on Approval or Denial
+- Issue 511 - Activity Search Examples
+- Issue 816 - Service Requests linked to sales order can only be closed as T&M
+- Issue 814 - Visual Changes
+- Issue 817 - Customer Contracts Listed in Portal Documents
+- Issue 812 - Customer search box improvements
+- Issue 771 - Allocation of SRs that get reopened
+- Issue 796 - Show 3 year contracts on Customer Profitability Report
+### Fixed
+- Issue 775 - SR Fixed Yesterday Total Value Tweak
+- Issue 773 - Office 365 Backup Licenses Not Updating Contracts
+- Issue 760 - Feedback on incorrect staff encryption key
+- Issue 776 - New SR Start Work Time adjustment tweak
+- Issue 815 - Inactive Sites not showing
+- Issue 813 - 3CX Call Reporting Number matching & validation
+
+
 ## [v3.11.10] - 2020-04-01
 ### Fixed
 - Fix issue with auto approve overtime

@@ -2124,12 +2124,14 @@ class CTSalesOrder extends CTCNC
                     $quoteSent = !!$this->dsQuotation->getValue(DBEQuotation::sentDateTime);
                     $fileExists = $this->checkQuoteDocFile($this->dsQuotation);
 
-                    $sendQuoteDocURL = null;
+                    $sendQuoteDocURLQuoteDocURL = null;
                     $deleteQuoteDocURL = null;
                     $txtDelete = null;
                     $txtSendQuote = null;
                     $txtReminder = null;
-
+                    $sendQuoteDocURL = null;
+                    $flagAsSentQuoteDocURL = null;
+                    $txtFlagAsSent = null;
                     if (!$fileExists) {
                         $deleteQuoteDocURL =
                             Controller::buildLink(
@@ -2150,6 +2152,15 @@ class CTSalesOrder extends CTCNC
                                         'quotationID' => $this->dsQuotation->getValue(DBEQuotation::quotationID)
                                     )
                                 );
+                            $flagAsSentQuoteDocURL =
+                                Controller::buildLink(
+                                    $_SERVER['PHP_SELF'],
+                                    array(
+                                        'action'      => CTSALESORDER_ACT_SEND_QUOTE_DOC,
+                                        'quotationID' => $this->dsQuotation->getValue(DBEQuotation::quotationID),
+                                        'flagAsSent'  => 1
+                                    )
+                                );
                             $deleteQuoteDocURL =
                                 Controller::buildLink(
                                     $_SERVER['PHP_SELF'],
@@ -2160,9 +2171,13 @@ class CTSalesOrder extends CTCNC
                                 );
                             $txtDelete = CTSALESORDER_TXT_DELETE;
                             $txtSendQuote = CTSALESORDER_TXT_SEND;
+                            $txtFlagAsSent = "Flag as sent";
                             if ($this->dsQuotation->getValue(DBEQuotation::documentType) == 'manualUpload') {
-                                $txtSendQuote = 'Flag as sent';
+                                $txtSendQuote = null;
+                            } elseif ($this->dsQuotation->getValue(DBEQuotation::documentType) != 'quotation') {
+                                $txtFlagAsSent = null;
                             }
+
 
                             $quoteSentDateTime = 'Not sent';
                         } else {
@@ -2203,20 +2218,25 @@ class CTSalesOrder extends CTCNC
 
                     }
 
+                    $separator = $txtFlagAsSent && $txtSendQuote ? ' - ' : null;
+
                     $this->template->set_var(
                         array(
-                            'displayQuoteDocURL' => $displayQuoteDocURL,
-                            'sendQuoteDocURL'    => $sendQuoteDocURL,
-                            'deleteQuoteDocURL'  => $deleteQuoteDocURL,
-                            'txtSendQuote'       => $txtSendQuote,
-                            'txtDelete'          => $txtDelete,
-                            'quoteVersionNo'     => $this->dsQuotation->getValue(DBEQuotation::versionNo),
-                            'quoteSentDateTime'  => $quoteSentDateTime,
-                            'quoteUserName'      => $this->dsQuotation->getValue(DBEJQuotation::userName),
-                            'documentType'       => $documentType,
-                            "signableStatus"     => $signableStatus,
-                            "txtReminder"        => $txtReminder,
-                            'quotationID'        => $this->dsQuotation->getValue(DBEQuotation::quotationID)
+                            'displayQuoteDocURL'    => $displayQuoteDocURL,
+                            'separator'             => $separator,
+                            'sendQuoteDocURL'       => $sendQuoteDocURL,
+                            'flagAsSentQuoteDocURL' => $flagAsSentQuoteDocURL,
+                            'txtFlagAsSent'         => $txtFlagAsSent,
+                            'deleteQuoteDocURL'     => $deleteQuoteDocURL,
+                            'txtSendQuote'          => $txtSendQuote,
+                            'txtDelete'             => $txtDelete,
+                            'quoteVersionNo'        => $this->dsQuotation->getValue(DBEQuotation::versionNo),
+                            'quoteSentDateTime'     => $quoteSentDateTime,
+                            'quoteUserName'         => $this->dsQuotation->getValue(DBEJQuotation::userName),
+                            'documentType'          => $documentType,
+                            "signableStatus"        => $signableStatus,
+                            "txtReminder"           => $txtReminder,
+                            'quotationID'           => $this->dsQuotation->getValue(DBEQuotation::quotationID)
                         )
                     );
                     $this->template->parse(
@@ -2880,10 +2900,11 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError(CTSALESORDER_MSG_QUOTE_NOT_FOUND);
             return;
         }
+        $flagAsSent = $this->getParam('flagAsSent');
         $this->dsQuotation->fetchNext();
         $updateDB = TRUE;
         // if this is a PDF file then send an email to the customer else simply st the sent date.
-        if ($this->dsQuotation->getValue(DBEQuotation::documentType) == 'quotation') {
+        if ($this->dsQuotation->getValue(DBEQuotation::documentType) == 'quotation' && !$flagAsSent) {
             $buPDFSalesQuote = new BUPDFSalesQuote($this);
             $updateDB = $buPDFSalesQuote->sendPDFEmailQuote($this->getQuotationID());
         }
@@ -4969,7 +4990,8 @@ now that the notes are in a text field we need to split the lines up for the PDF
         $dsContract = new DataSet($this);
         $buCustomerItem->getContractsByCustomerID(
             $customerID,
-            $dsContract
+            $dsContract,
+            null
         );
 
         if ($serviceRequestCustomerItemID == '99') {

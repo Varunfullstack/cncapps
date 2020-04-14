@@ -1,28 +1,43 @@
 <!-- Template: SalesOrderSearch.inc.html -->
-<script language='JavaScript'
-        src='CommonJS.js'
-></script>
-<script src=".javascript/fromDateToDate.js"></script>
-<script language='JavaScript'>
-    var savedCustomerString;
-
-    function saveCustomerString() {
-        savedCustomerString = document.getElementById("customerString").value
+<style>
+    .salesOrderForm input[type="text"], .salesOrderForm select {
+        width: 189px;
     }
 
-    function validateCustomerString() {
-        if (Trim(document.getElementById("customerString").value) != "") {
-            if (document.getElementById("customerString").value != savedCustomerString) {
-                window.open('{customerPopupURL}&customerString=' +
-                    escape(document.getElementById("customerString").value) +
-                    '&parentIDField=customerID' +
-                    '&parentDescField=customerString',
-                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
-            }
-        } else {
-            document.searchForm.customerID.value = "";
-        }
+    .salesOrderForm input[name="customerString"] {
+        width: 250px;
     }
+</style>
+<script>
+
+    const autocompleteURL = "/Customer.php?action=searchName";
+    $(function () {
+        $('#customerString').autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response);
+                })
+            },
+            select: function (event, ui) {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+                $('#customerID').val(ui.item.id);
+            },
+            delay: 200,
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
+    });
 
     function createQuote() {
         if (document.searchForm.customerID.value != "") {
@@ -46,11 +61,6 @@
         }
     }
 
-    function validateCustomerStringOnReturn() {
-        if (event.keyCode == 13) {
-            validateCustomerString();
-        }
-    }
 </script>
 <form name="searchForm"
       method="post"
@@ -61,6 +71,7 @@
            border="0"
            cellspacing="0"
            cellpadding="1"
+           class="salesOrderForm"
     >
         <tr>
             <td width="100px"
@@ -78,9 +89,6 @@
                     name="customerString"
                     id="customerString"
                     value="{customerString}"
-                    onFocus="javascript:saveCustomerString()"
-                    onBlur="javascript:validateCustomerString()"
-                    onKeypress="javascript:validateCustomerStringOnReturn()"
                     size="50"
                     maxlength="50"
             > <font class="formErrorMessage"> {customerStringMessage} </font></td>
@@ -89,12 +97,13 @@
             <td class="promptText">
                 <div align="right">Order Number</div>
             </td>
-            <td><input
-                    type="text"
-                    onKeypress="javascript:submitOnReturn()"
-                    name="form[ordheadID]"
-                    value="{ordheadID}"
-            > <font class="formErrorMessage"> {ordheadIDMessage} </font></td>
+            <td>
+                <input type="text"
+
+                       onKeypress="javascript:submitOnReturn()"
+                       name="form[ordheadID]"
+                       value="{ordheadID}"
+                > <font class="formErrorMessage"> {ordheadIDMessage} </font></td>
         </tr>
         <tr>
             <td class="promptText">
@@ -119,15 +128,15 @@
             <td class="promptText">
                 <div align="right">Customer PO Ref</div>
             </td>
-            <td><input
-                    type="text"
-                    name="form[custPORef]"
-                    id="custPORef"
-                    value="{custPORef}"
-                    size="23"
-                    maxlength="23"
-                    onKeypress="javascript:submitOnReturn()"
-            ></td>
+            <td>
+                <input type="text"
+                       name="form[custPORef]"
+                       id="custPORef"
+                       value="{custPORef}"
+                       size="23"
+                       maxlength="23"
+                       onKeypress="javascript:submitOnReturn()"
+                ></td>
         </tr>
         <tr>
             <td class="promptText">
@@ -180,7 +189,6 @@
         <tr>
             <td>&nbsp;</td>
             <td>
-                <!--				<input type="submit" name="Search" value="Search"> -->
                 <input type="button"
                        name="Search"
                        value="Search"

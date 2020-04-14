@@ -1,43 +1,41 @@
 <!-- Template: ServiceDeskReportCustomer.inc.html -->
-<script language='JavaScript'
-        src="CommonJS.js"
-></script>
-<script language='JavaScript'>
+<script>
+    const autocompleteURL = "/Customer.php?action=searchName";
     $(function () {
         window.fromDate = $('#fromDate').get(0);
         window.toDate = $('#toDate').get(0);
+
+        $('#customerString').autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response);
+                })
+            },
+            select: function (event, ui) {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+                $('#customerID').val(ui.item.id);
+            },
+            delay: 200,
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
     });
-    var state = 'none'; // display status
-    var savedCustomerString
 
-    function saveCustomerString() {
-        savedCustomerString = document.getElementById("customerString").value
-    }
-
-    function validateCustomerString() {
-        if (Trim(document.getElementById("customerString").value) != "") {
-            if (document.getElementById("customerString").value != savedCustomerString) {
-                window.open('{urlCustomerPopup}&customerString=' +
-                    escape(document.getElementById("customerString").value) +
-                    '&parentIDField=customerID' +
-                    '&parentDescField=customerString',
-                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
-            }
-        }
-        else {
-            document.searchForm.customerID.value = "";
-        }
-    }
 
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
-        }
-    }
-
-    function validateCustomerStringOnReturn() {
-        if (event.keyCode == 13) {
-            validateCustomerString();
         }
     }
 </script>
@@ -73,9 +71,6 @@
                     id="customerString"
                     name="customerString"
                     value="{customerString}"
-                    onFocus="javascript:saveCustomerString()"
-                    onBlur="javascript:validateCustomerString()"
-                    onKeypress="javascript:validateCustomerStringOnReturn()"
                     size="50"
                     maxlength="50"
             > <font class="formErrorMessage"> {customerStringMessage} </font></td>

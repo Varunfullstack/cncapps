@@ -51,7 +51,7 @@ TD, INPUT, SELECT, TEXTAREA {
     color: red;
 }
 
-.fakeLink[disabled]{
+.fakeLink[disabled] {
     color: inherit;
     cursor: inherit;
 }
@@ -554,6 +554,7 @@ span#imRemainMinutes {
     font-size: large;
     font-weight: bold;
 }
+
 span#projectRemainMinutes {
     color: red;
     font-size: large;
@@ -578,6 +579,10 @@ table#user-performance-escalations td, th {
 
 .performance-warn {
     background-color: #F5AEBD;
+}
+
+.boring-gray {
+    background-color: #cccccc;
 }
 
 table.second-site-image td, th {
@@ -810,4 +815,56 @@ table.fixed_header {
 
 .greenPencil {
     color: green;
+}
+
+.topAlign > td {
+    vertical-align: top;
+}
+
+.alert-field {
+    background-color: rgb(248, 165, 182);
+}
+
+.custom-file-upload {
+    position: relative;
+    overflow: hidden;
+}
+
+.custom-file-upload input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+input[type="button"], input[type="submit"], button, input[type="reset"], .custom-file-upload {
+
+    background-color: #C6C6C6;
+    color: black;
+    border: none;
+    padding: 3.5px 7px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 13px;
+    margin: 2px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+input[type="button"]:hover, input[type="submit"]:hover, button:hover, input[type="reset"]:hover, .custom-file-upload:hover {
+    background-color: #E6E6E6;
+}
+
+table.cell-padding-1 th, table.cell-padding-1 td {
+    padding: 1px;
 }

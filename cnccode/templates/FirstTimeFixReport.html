@@ -15,11 +15,36 @@
         font-size: 16px;
     }
 </style>
-<script language='JavaScript'
-        src="CommonJS.js"
-></script>
 <script>
-    var savedCustomerName;
+
+    const autocompleteURL = "/Customer.php?action=searchName";
+    $(function () {
+        $('#customerName').autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response.map(item => ({label: item.name, value: item.id})));
+                })
+            },
+            select: function (event, ui) {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+                $('#customerID').val(ui.item.id);
+            },
+            delay: 200,
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
+    });
 
     function doSearch() {
         var formData = new FormData(event.target);
@@ -84,20 +109,6 @@
         return false;
     }
 
-    function validateCustomerName() {
-        if (Trim(document.getElementById("customerName").value) != "") {
-            if (document.getElementById("customerName").value != savedCustomerName) {
-                window.open('{customerPopupURL}&customerString=' +
-                    escape(document.getElementById("customerName").value) +
-                    '&parentIDField=customerID' +
-                    '&parentDescField=customerName',
-                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
-            }
-        }
-        else {
-            document.report.customerID.value = "";
-        }
-    }
 </script>
 <form action=""
       onsubmit="return doSearch();"
@@ -109,7 +120,6 @@
             </label>
             <input type="text"
                    id="customerName"
-                   onchange="validateCustomerName()"
             >
             <input type="hidden"
                    id="customerID"

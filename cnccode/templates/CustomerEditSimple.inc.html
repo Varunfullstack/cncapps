@@ -1841,24 +1841,22 @@
                 <tr>
                     <td class="content">PCs</td>
                     <td class="content">
-                        <select
-                                {disabled}
-                                name="form[customer][{customerID}][noOfPCs]"
+                        <input type="number"
+                               min="0"
+                               step="1"
+                               name="form[customer][{customerID}][noOfPCs]"
+                               {disabled}
+                               value="{noOfPCs}"
+                               size="10"
+                               maxlength="10"
                         >
-                            <!-- BEGIN noOfPCsBlock -->
-                            <option {noOfPCsSelected}
-                                    value="{noOfPCsValue}"
-                            >{noOfPCsValue}
-                            </option>
-                            <!-- END noOfPCsBlock -->
-                        </select>
                     </td>
                 </tr>
                 <tr>
                     <td class="content">Servers</td>
                     <td class="content">
                         <input name="form[customer][{customerID}][noOfServers]"
-                               type="text"
+                               type="number"
                                value="{noOfServers}"
                                size="10"
                                maxlength="10"
@@ -2344,8 +2342,7 @@
             <tr>
                 <td class="listHeadText">Description</td>
                 <td class="listHeadText">File</td>
-                <td class="listHeadText">Starters Form</td>
-                <td class="listHeadText">Leavers Form</td>
+                <td class="listHeadText">Customer Contract</td>
                 <td class="listHeadText">Main Contact Only</td>
                 <td class="listHeadText"
                     colspan="2"
@@ -2373,11 +2370,7 @@
                 </td>
                 <td class="content"
                     nowrap="nowrap"
-                >{startersFormFlag}
-                </td>
-                <td class="content"
-                    nowrap="nowrap"
-                >{leaversFormFlag}
+                >{customerContract}
                 </td>
                 <td class="content"
                     nowrap="nowrap"
@@ -2429,9 +2422,10 @@
                     <tr>
                         <td class="headerDarkgrey"
                             colspan="2"
-                        >Site {siteNo}<a href="{deleteSiteURL}"
-                                         onClick="if(!confirm('Are you sure you want to delete this site?')) return(false)"
-                        >{deleteSiteText}</a>
+                        ><span style="color: black">Site {siteNo}</span>
+                            <a href="{deleteSiteURL}"
+                               onClick="if(!confirm('Are you sure you want to delete this site?')) return(false)"
+                            >{deleteSiteText}</a>
                         </td>
                     </tr>
                     <tr>
@@ -2721,6 +2715,11 @@
                         </div>
                     </td>
                     <td class="headerLightgrey">
+                        <div class="contactSupportLevel">
+                            Support Level
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
                         <div class="contactPassword">
                             Password
                         </div>
@@ -2815,11 +2814,7 @@
                             {mailshot4FlagDesc}
                         </div>
                     </td>
-                    <td class="headerLightgrey">
-                        <div class="contactSupportLevel">
-                            Support Level
-                        </div>
-                    </td>
+
                     <td class="headerLightgrey">
                         <div class="contactHR">
                             HR
@@ -3018,6 +3013,25 @@
                                    data-validation-url="/validateUniqueEmail.php"
                                    data-type="email"
                             >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactSupportLevel">
+
+                            <select name="form[contact][{contactID}][supportLevel]"
+                                    data-validation="atLeastOneMain"
+                                    data-type="mainSelector"
+                                    data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                            >
+                                <!-- BEGIN supportLevelBlock -->
+                                <option {supportLevelSelected}
+                                        data-test="{supportLevelSelected}"
+                                        value="{supportLevelValue}"
+                                >
+                                    {supportLevelDescription}
+                                </option>
+                                <!-- END supportLevelBlock -->
+                            </select>
                         </div>
                     </td>
                     <td class="center ">
@@ -3255,25 +3269,6 @@
                                    data-type="statement"
                                    data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
                             />
-                        </div>
-                    </td>
-                    <td>
-                        <div class="contactSupportLevel">
-
-                            <select name="form[contact][{contactID}][supportLevel]"
-                                    data-validation="atLeastOneMain"
-                                    data-type="mainSelector"
-                                    data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
-                            >
-                                <!-- BEGIN supportLevelBlock -->
-                                <option {supportLevelSelected}
-                                        data-test="{supportLevelSelected}"
-                                        value="{supportLevelValue}"
-                                >
-                                    {supportLevelDescription}
-                                </option>
-                                <!-- END supportLevelBlock -->
-                            </select>
                         </div>
                     </td>
                     <td>

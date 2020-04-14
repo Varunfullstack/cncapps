@@ -7,35 +7,9 @@
 
 <script type="application/javascript">
 
-    var savedCustomerString;
-
-    function saveCustomerString() {
-        savedCustomerString = document.getElementById("customerString").value
-    }
-
-    function validateCustomerString() {
-        if (Trim(document.getElementById("customerString").value) != "") {
-            if (document.getElementById("customerString").value != savedCustomerString) {
-                window.open('{customerPopupURL}&customerString=' +
-                    escape(document.getElementById("customerString").value) +
-                    '&parentIDField=customerID' +
-                    '&parentDescField=customerString',
-                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
-            }
-        } else {
-            document.form.customerID.value = "";
-        }
-    }
-
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
-        }
-    }
-
-    function validateCustomerStringOnReturn() {
-        if (event.keyCode == 13) {
-            validateCustomerString();
         }
     }
 
@@ -73,12 +47,14 @@
                             data: data
                         }
                     ).then(response => {
-                        responseCB(response);
+                        responseCB(response.map(item => ({label: item.name, value: item.id})));
                     })
 
                 },
                 delay: 200,
                 select: function (event, ui) {
+                    event.preventDefault();
+                    event.target.value = ui.item.label;
                     performSearch(ui.item.value, i);
                 }
             }).focus(function () {

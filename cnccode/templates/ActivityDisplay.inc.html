@@ -423,13 +423,17 @@
                 >
                     <tr>
                         <td>
-                            <input name="userfile[]"
-                                   type="file"
-                                   value="{userfile}"
-                                   size="30"
-                                   class="dragUploader"
-                                   multiple
-                            >
+                            <label class="custom-file-upload">
+                                <input name="userfile[]"
+                                       type="file"
+                                       value="{userfile}"
+                                       size="30"
+                                       multiple
+                                       class="dragUploader"
+                                >
+                                Choose Files
+                            </label>
+
                         </td>
                         <td colspan="2">
                             <input type="submit"

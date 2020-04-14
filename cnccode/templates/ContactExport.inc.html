@@ -7,86 +7,61 @@
         fetch('?action=3cxExport')
             .then(data => {
                 return data.json();
-            }).then(data => {
-            var link = document.createElement("a");
-            link.download = 'export.zip';
-            link.href = "data:application/x-zip-compressed;base64," + data.base64Data;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            delete link;
-        })
+            })
+            .then(data => {
+                let link = document.createElement("a");
+                link.download = 'export.zip';
+                link.href = "data:application/x-zip-compressed;base64," + data.base64Data;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            })
     }
 
-
+    const autocompleteURL = "/Customer.php?action=searchName";
     $(function () {
         window.newCustomerFromDate = $('#newCustomerFromDate').get(0);
         window.newCustomerToDate = $('#newCustomerToDate').get(0);
         window.droppedCustomerFromDate = $('#droppedCustomerFromDate').get(0);
         window.droppedCustomerToDate = $('#droppedCustomerToDate').get(0);
+
+        $('#customerString').autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response);
+                })
+            },
+            select: function (event, ui) {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+                $('#customerID').val(ui.item.id);
+            },
+            delay: 200,
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
     });
 
-    /**
-     * Inserts fields.
-     *
-     */
-    function insertValueQuery(myListBox, myQuery) {
-
-        listBox = document.getElementById(myListBox);
-
-        oEditor = eval('CKEDITOR.instances.' + myQuery);
-
-        if (listBox.options.length > 0) {
-            var chaineAj = "";
-            var NbSelect = 0;
-            for (var i = 0; i < listBox.options.length; i++) {
-                if (listBox.options[i].selected) {
-                    NbSelect++;
-                    if (NbSelect > 1)
-                        chaineAj += ", ";
-                    chaineAj += listBox.options[i].value;
-                }
-            }
-
-            oEditor.insertHtml(chaineAj);
-
-        }
-    }
-
     var state = 'none'; // display status
-    var savedCustomerString;
-
-    function saveCustomerString() {
-        savedCustomerString = document.getElementById("customerString").value
-    }
 
     function clearSupportLevelSelector() {
         $("#supportLevelSelector option:selected").prop("selected", false);
     }
 
-    function validateCustomerString() {
-        if (Trim(document.getElementById("customerString").value) != "") {
-            if (document.getElementById("customerString").value != savedCustomerString) {
-                window.open('{urlCustomerPopup}&customerString=' +
-                    escape(document.getElementById("customerString").value) +
-                    '&parentIDField=customerID' +
-                    '&parentDescField=customerString',
-                    'customers', 'scrollbars=yes,resizable=no,width=300,height=300,copyhistory=no, menubar=0')
-            }
-        } else {
-            document.searchForm.customerID.value = "";
-        }
-    }
 
     function submitOnReturn() {
         if (event.keyCode == 13) {
             document.searchForm.submit();
-        }
-    }
-
-    function validateCustomerStringOnReturn() {
-        if (event.keyCode == 13) {
-            validateCustomerString();
         }
     }
 </script>
@@ -131,9 +106,6 @@
                                 id="customerString"
                                 name="customerString"
                                 value="{customerString}"
-                                onFocus="javascript:saveCustomerString()"
-                                onBlur="javascript:validateCustomerString()"
-                                onKeypress="javascript:validateCustomerStringOnReturn()"
                                 size="50"
                                 maxlength="50"
                         > <font class="formErrorMessage"> {customerStringMessage} </font></td>

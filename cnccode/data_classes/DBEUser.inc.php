@@ -68,6 +68,7 @@ class DBEUser extends DBEntity
     const autoApproveExpenses = 'autoApproveExpenses';
     const isExpenseApprover = "isExpenseApprover";
     const globalExpenseApprover = "globalExpenseApprover";
+    const additionalTimeLevelApprover = "additionalTimeLevelApprover";
 
     /**
      * calls constructor()
@@ -396,13 +397,8 @@ class DBEUser extends DBEntity
             0
         );
 
-        $this->addColumn(
-            self::globalExpenseApprover,
-            DA_BOOLEAN,
-            DA_NOT_NULL,
-            null,
-            0
-        );
+        $this->addColumn(self::globalExpenseApprover, DA_BOOLEAN, DA_NOT_NULL, null, 0);
+        $this->addColumn(self::additionalTimeLevelApprover, DA_BOOLEAN, DA_NOT_NULL, null, 0);
 
         $this->setPK(0);
         $this->setAddColumnsOff();
@@ -501,7 +497,7 @@ class DBEUser extends DBEntity
     public function getSickReportUsers()
     {
         $query = "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName().
+            " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(
                 self::activeFlag
             ) . " = 'Y' and  ";
