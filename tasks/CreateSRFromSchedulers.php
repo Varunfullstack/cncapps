@@ -162,10 +162,6 @@ try {
 
         $dbeProblem->setValue(DBEProblem::internalNotes, $internalNotes);
 
-        $dbeProblem->setValue(
-            DBEProblem::userID,
-            $createdBy
-        );        // not allocated
         $dbeProblem->insertRow();
 
         $problemID = $dbeProblem->getPKValue();
