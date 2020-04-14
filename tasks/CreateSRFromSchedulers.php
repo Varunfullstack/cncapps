@@ -160,6 +160,8 @@ try {
             $dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
         );
 
+        $dbeProblem->setValue(DBEProblem::internalNotes, $internalNotes);
+
         $dbeProblem->setValue(
             DBEProblem::userID,
             $createdBy
@@ -169,56 +171,52 @@ try {
         $problemID = $dbeProblem->getPKValue();
 
         $dbeCallActivity->setValue(
-            DBEJCallActivity::callActivityID,
+            DBECallActivity::callActivityID,
             null
         );
         $dbeCallActivity->setValue(
-            DBEJCallActivity::siteNo,
+            DBECallActivity::siteNo,
             $hiddenFromCustomer
         ); // contact default siteno
         $dbeCallActivity->setValue(
-            DBEJCallActivity::contactID,
+            DBECallActivity::contactID,
             $dbeContact->getValue(DBEContact::contactID)
         );
         $dbeCallActivity->setValue(
-            DBEJCallActivity::callActTypeID,
+            DBECallActivity::callActTypeID,
             CONFIG_INITIAL_ACTIVITY_TYPE_ID
         );
         $dbeCallActivity->setValue(
-            DBEJCallActivity::date,
+            DBECallActivity::date,
             date(DATE_MYSQL_DATE)
         );
         $dbeCallActivity->setValue(
-            DBEJCallActivity::startTime,
+            DBECallActivity::startTime,
             date('H:i')
         );
         $dbeCallActivity->setValue(
-            DBEJCallActivity::endTime,
+            DBECallActivity::endTime,
             date('H:i')
         );
         $dbeCallActivity->setValue(
-            DBEJCallActivity::status,
+            DBECallActivity::status,
             'C'
         );
         $dbeCallActivity->setValue(
-            DBEJCallActivity::serverGuard,
+            DBECallActivity::serverGuard,
             'N'
         );
 
         $dbeCallActivity->setValue(
-            DBEJCallActivity::reason,
+            DBECallActivity::reason,
             $details
         );
         $dbeCallActivity->setValue(
-            DBEJCallActivity::problemID,
+            DBECallActivity::problemID,
             $problemID
         );
         $dbeCallActivity->setValue(
-            DBEJCallActivity::internalNotes,
-            $internalNotes
-        );
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::userID,
+            DBECallActivity::userID,
             USER_SYSTEM
         );
         $dbeCallActivity->insertRow();
@@ -295,20 +293,20 @@ try {
         $primaryContact->getValue(DBEContact::contactID)
     );
     $dbeProblem->setValue(
-        DBEJProblem::hideFromCustomerFlag,
+        DBEProblem::hideFromCustomerFlag,
         'N'
     );
     $dbeProblem->setValue(
-        DBEJProblem::queueNo,
+        DBEProblem::queueNo,
         1
     );
 
     $dbeProblem->setValue(
-        DBEJProblem::rootCauseID,
+        DBEProblem::rootCauseID,
         86
     );
     $dbeProblem->setValue(
-        DBEJProblem::userID,
+        DBEProblem::userID,
         null
     );        // not allocated
     $dbeProblem->insertRow();
@@ -316,56 +314,56 @@ try {
     $dbeCallActivity = new DBECallActivity($thing);
 
     $dbeCallActivity->setValue(
-        DBEJCallActivity::callActivityID,
+        DBECallActivity::callActivityID,
         null
     );
     $dbeCallActivity->setValue(
-        DBEJCallActivity::siteNo,
+        DBECallActivity::siteNo,
         $siteNo
     );
     $dbeCallActivity->setValue(
-        DBEJCallActivity::contactID,
+        DBECallActivity::contactID,
         $primaryContact->getValue(DBEContact::contactID)
     );
     $dbeCallActivity->setValue(
-        DBEJCallActivity::callActTypeID,
+        DBECallActivity::callActTypeID,
         CONFIG_INITIAL_ACTIVITY_TYPE_ID
     );
     $dbeCallActivity->setValue(
-        DBEJCallActivity::date,
+        DBECallActivity::date,
         date(DATE_MYSQL_DATE)
     );
     $startTime = date('H:i');
     $dbeCallActivity->setValue(
-        DBEJCallActivity::startTime,
+        DBECallActivity::startTime,
         $startTime
     );
 
     $dbeCallActivity->setValue(
-        DBEJCallActivity::endTime,
+        DBECallActivity::endTime,
         $startTime
     );
     $dbeCallActivity->setValue(
-        DBEJCallActivity::status,
+        DBECallActivity::status,
         'C'
     );
     $dbeCallActivity->setValue(
-        DBEJCallActivity::serverGuard,
+        DBECallActivity::serverGuard,
         'N'
     );
 
     $details = "CreateSRFromScheduler Failed: " . $exception->getMessage();
 
     $dbeCallActivity->setValue(
-        DBEJCallActivity::reason,
+        DBECallActivity::reason,
         $details
     );
     $dbeCallActivity->setValue(
-        DBEJCallActivity::problemID,
+        DBECallActivity::problemID,
         $dbeProblem->getPKValue()
     );
     $dbeCallActivity->setValue(
-        DBEJCallActivity::userID,
+        DBECallActivity::userID,
         USER_SYSTEM
     );
 

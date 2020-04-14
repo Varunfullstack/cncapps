@@ -825,7 +825,28 @@ table.fixed_header {
     background-color: rgb(248, 165, 182);
 }
 
-input[type="button"], input[type="submit"], button, input[type="reset"] {
+.custom-file-upload {
+    position: relative;
+    overflow: hidden;
+}
+
+.custom-file-upload input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+input[type="button"], input[type="submit"], button, input[type="reset"], .custom-file-upload {
 
     background-color: #C6C6C6;
     color: black;
@@ -840,7 +861,7 @@ input[type="button"], input[type="submit"], button, input[type="reset"] {
     cursor: pointer;
 }
 
-input[type="button"]:hover, input[type="submit"]:hover, button:hover, input[type="reset"]:hover {
+input[type="button"]:hover, input[type="submit"]:hover, button:hover, input[type="reset"]:hover, .custom-file-upload:hover {
     background-color: #E6E6E6;
 }
 

@@ -18,7 +18,8 @@
                 {data: "proactiveSRs", name: "proactiveSRs"},
                 {data: "activitiesRaised", name: "activitiesRaised"},
             ],
-            order: [],
+            order: [[1, 'desc']],
+            pageLength: 25,
             serverSide: true,
             ajax: {
                 url: "?action=getData",

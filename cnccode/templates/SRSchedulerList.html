@@ -107,10 +107,10 @@
                 {% updatedByName %}
             </td>
             <td>
-                <button onclick="showInfo('{% details | base64Encode %}')">details</button>
+                <button onclick="showInfo('{% details | base64Encode %}')">Details</button>
             </td>
             <td>
-                <button onclick="showInfo('{% internalNotes | base64Encode %}')">internal Notes</button>
+                <button onclick="showInfo('{% internalNotes | base64Encode %}')">Internal Notes</button>
             </td>
             <td class="buttons">
                 <button class="editButton">Edit</button>
@@ -378,6 +378,37 @@
         }).focus(function () {
             $(this).autocomplete("search", $(this).val());
         });
+        const autocompleteURL = "/Customer.php?action=searchName";
+        $('#customerString').autocomplete({
+            minLength: 0,
+            source: function (request, responseCB) {
+                const data = {};
+                data.term = request.term;
+                $.ajax(
+                    autocompleteURL,
+                    {
+                        method: 'POST',
+                        dataType: 'json',
+                        data: data
+                    }
+                ).then(response => {
+                    responseCB(response);
+                })
+
+            },
+            delay: 200,
+            select: (event, ui) => {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+                currentSRScheduler.customerId = ui.item.id;
+                currentSRScheduler.customerName = ui.item.label;
+                setSRScheduler(currentSRScheduler);
+            }
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
+
+
         contactNameInput.autocomplete({
             minLength: 0,
             source: function (request, responseCB) {
@@ -504,8 +535,7 @@
 
         currentSRScheduler = srScheduler;
         $('#customerString').val(srScheduler.customerName);
-        $('input[name="customerId"]').val(srScheduler.customerId);
-        updateCustomerID(false);
+        updateCustomerID(srScheduler.customerId);
         customerSiteDescInput.val(srScheduler.siteDescription);
         contactNameInput.val(srScheduler.contactName);
         priorityInput.val(srScheduler.priority);
@@ -570,18 +600,13 @@
         currentSRScheduler.customerName = $('#customerString').val();
     }
 
-    function updateCustomerID(clear = true) {
-        currentSRScheduler.customerId = $('input[name="customerId"]').val();
+    function updateCustomerID(customerId) {
+        $('input[name="customerId"]').val(customerId);
+        currentSRScheduler.customerId = customerId;
         if (currentSRScheduler.customerId) {
             onSetCustomerID();
         } else {
             onUnsetCustomerID();
-        }
-        if (clear) {
-            customerSiteDescInput.val('');
-            currentSRScheduler.siteNo = null;
-            contactNameInput.val('');
-            currentSRScheduler.contactId = null;
         }
     }
 
@@ -640,14 +665,11 @@
         <input type="text"
                maxlength="50"
                name="name"
-               onchange="updateCustomerName()"
                id="customerString"
-               customer-picker
         >
         <input hidden
                name="customerId"
                id="customerID"
-               onchange="updateCustomerID()"
         >
     </div>
     <div>
@@ -739,7 +761,7 @@
             <tr>
                 <th>
                     <div class="option-name">
-                        <code>freq</code>
+                        <code>Freq</code>
 
                         <div class="help">Frequency</div>
                     </div>
@@ -775,7 +797,7 @@
             <tr>
                 <th>
                     <div class="option-name">
-                        <code>start Date</code>
+                        <code>Start Date</code>
 
                         <div class="help">The recurrence start. Besides being the base for the recurrence, missing
                             parameters in the final recurrence
@@ -793,7 +815,7 @@
             <tr>
                 <th>
                     <div class="option-name">
-                        <code>interval</code>
+                        <code>Interval</code>
 
                         <div class="help">The interval between each freq iteration. For example, when using
                             <code>RRule.YEARLY</code>, an interval of
@@ -828,7 +850,7 @@
             <tr class="untilRow">
                 <th>
                     <div class="option-name">
-                        <code>until</code>
+                        <code>Until</code>
 
                         <div class="help">If given, this must be a
                             <code>Date</code>

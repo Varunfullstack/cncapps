@@ -30,7 +30,7 @@
             select: function (event, ui) {
                 event.preventDefault();
                 event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.value);
+                $('#customerID').val(ui.item.id);
                 renderContracts();
             },
             delay: 200,

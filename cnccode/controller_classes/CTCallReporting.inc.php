@@ -42,8 +42,8 @@ class CTCallReporting extends CTCNC
                     }
                 }
 
-
-                $queryString = "
+                $baseQuery =
+                    "
                 SELECT
   cus_name AS customerName,
   SUM(callType = 'Outbound') AS callsOut,
@@ -82,10 +82,11 @@ WHERE startDateTime BETWEEN ?
   AND ?
   AND callJournal.customerId <> 0
   AND callJournal.customerId IS NOT NULL
-GROUP BY callJournal.customerId
                 ";
                 $offset = $_REQUEST['start'];
                 $limit = $_REQUEST['length'];
+
+                $queryEnd = " GROUP BY callJournal.customerId";
 
                 $parameters = [
                     ["type" => "s", "value" => $startDate],
@@ -93,35 +94,30 @@ GROUP BY callJournal.customerId
                     ["type" => "s", "value" => $startDate],
                     ["type" => "s", "value" => $endDate],
                 ];
+
                 /** @var dbSweetcode $db */
                 global $db;
                 $countResult = $db->preparedQuery(
-                    $queryString,
+                    $baseQuery . $queryEnd,
                     $parameters
                 );
                 $totalCount = $countResult->num_rows;
 
-//                $search = $_REQUEST['search']['value'];
-//                $filteredCount = $totalCount;
-//                if ($search) {
-//                    $queryString .= " and (CONCAT(
-//    consultant.`firstName`,
-//    \" \",
-//    consultant.`lastName`
-//  )  like ? or problem.`pro_problemno` like ? or expensetype.`ext_desc` like ? or project.`description` like ? or cus_name like ?) ";
-//                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
-//                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
-//                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
-//                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
-//                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
-//                    $countResult = $db->preparedQuery(
-//                        $queryString,
-//                        $parameters
-//                    );
-//                    $filteredCount = $countResult->num_rows;
-//
-//                }
+                $search = $_REQUEST['search']['value'];
+                $filteredCount = $totalCount;
+                if ($search) {
+                    $baseQuery .= " and cus_name like ? ";
+                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
 
+                    $countResult = $db->preparedQuery(
+                        $baseQuery . $queryEnd,
+                        $parameters
+                    );
+                    $filteredCount = $countResult->num_rows;
+
+                }
+
+                $baseQuery .= $queryEnd;
                 $columns = $_REQUEST['columns'];
                 $order = @$_REQUEST['order'];
                 $orderItems = [];
@@ -132,13 +128,13 @@ GROUP BY callJournal.customerId
                     );
                 }
                 if (count($orderItems)) {
-                    $queryString .= " order by " . implode(', ', $orderItems);
+                    $baseQuery .= " order by " . implode(', ', $orderItems);
                 }
-                $queryString .= " limit ?, ?";
+                $baseQuery .= " limit ?, ?";
                 $parameters[] = ["type" => "i", "value" => $offset];
                 $parameters[] = ["type" => "i", "value" => $limit];
                 $result = $db->preparedQuery(
-                    $queryString,
+                    $baseQuery,
                     $parameters
                 );
                 $overtimes = $result->fetch_all(MYSQLI_ASSOC);
@@ -146,7 +142,7 @@ GROUP BY callJournal.customerId
                     [
                         "draw"            => $_REQUEST['draw'],
                         "recordsTotal"    => $totalCount,
-                        "recordsFiltered" => $totalCount,
+                        "recordsFiltered" => $filteredCount,
                         "data"            => $overtimes
                     ],
                     JSON_NUMERIC_CHECK

@@ -8,15 +8,10 @@
  */
 
 use CNCLTD\LoggerCLI;
-use Twig\Environment;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
 global $db;
-
-$loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../twig/internal');
-$twig = new Environment($loader, ["cache" => __DIR__ . '/../cache']);
-
 $logName = 'PasswordLevelCheck';
 $logger = new LoggerCLI($logName);
 

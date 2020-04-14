@@ -1235,7 +1235,8 @@ class CTActivity extends CTCNC
                     'prepayContract'         => $dsContract->getValue(DBEJContract::itemTypeID) == 57,
                     'isDisabled'             => !$dsContract->getValue(
                         DBEJContract::allowSRLog
-                    ) || $linkedToSalesOrder ? 'disabled' : null,l
+                    ) || $linkedToSalesOrder ? 'disabled' : null,
+                    l
                 )
             );
             $this->template->parse(
@@ -4065,7 +4066,7 @@ class CTActivity extends CTCNC
             )
         );
         $link = "<a href='" . $url . "' target='_blank'>$title</a>";
-        $this->setPageTitle($link);
+        $this->setPageTitle($title, $link);
         if ($activitiesByProblemID->getValue(DBEJCallActivity::contractCustomerItemID)) {
             $dbeJContract->getRowByContractID(
                 $activitiesByProblemID->getValue(DBEJCallActivity::contractCustomerItemID)
@@ -6901,7 +6902,7 @@ class CTActivity extends CTCNC
             'ManagerCommentPopup.inc'
         );
 
-        $this->pageTitle = 'Manager Comment';
+        $this->setPageTitle('Manager Comment');
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 

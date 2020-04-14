@@ -132,12 +132,13 @@ class Controller extends BaseObject
     var $cfg;                            // Configuration variables
     /** @var dbSweetcode $db */
     public $db;                                // PHPLib DB object
-    var $pageTitle = "";
     var $formError = FALSE;
     var $docType = CT_DOC_TYPE_HTML;
-    var $htmlFmt = CT_HTML_FMT_SCREEN;        // HTML formatting
-    var $formErrorMessage = "";
+    var $htmlFmt = CT_HTML_FMT_SCREEN;
+    var $formErrorMessage = "";        // HTML formatting
     var $action = "";
+    private $pageTitle = "";
+    private $pageHeader = "";
 
     function __construct(
         $requestMethod,
@@ -611,9 +612,12 @@ class Controller extends BaseObject
             "STYLESHEET",
             isset($this->cfg["stylesheet"]) ? $this->cfg["stylesheet"] : null
         );
+
         $this->template->set_var(
-            "pageTitle",
-            $this->getPageTitle()
+            [
+                "pageTitle"  => $this->getPageTitle(),
+                "pageHeader" => $this->pageHeader
+            ]
         );
         $this->template->set_var(
             'environmentClass',
@@ -661,9 +665,14 @@ class Controller extends BaseObject
         return $this->pageTitle;
     }
 
-    function setPageTitle($pageTitle)
+    function setPageTitle($pageTitle, string $pageHeader = null)
     {
         $this->pageTitle = $pageTitle;
+        $this->pageHeader = $pageTitle;
+        if ($pageHeader) {
+            $this->pageHeader = $pageHeader;
+        }
+
     }
 
     function getFormError()

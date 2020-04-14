@@ -17,6 +17,8 @@ global $server_type;
 require_once($cfg ['path_bu'] . '/BUMail.inc.php');
 /** @var $db dbSweetcode */
 global $db;
+/** @var $twig Environment */
+global $twig;
 $logName = 'CheckPendingCompletionSR';
 $logger = new LoggerCLI($logName);
 
@@ -27,9 +29,6 @@ if (!is_cli()) {
     echo 'This script can only be ran from command line';
     exit;
 }
-
-$loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../twig/internal/');
-$twig = new Environment($loader, ["cache" => __DIR__ . '/../cache', "debug" => $server_type != MAIN_CONFIG_SERVER_TYPE_LIVE]);
 
 // Script example.php
 $shortopts = "d";
@@ -127,7 +126,7 @@ while ($db->next_record(MYSQLI_ASSOC)) {
 }
 sendEmail($twig, $items, $lastManager);
 
-function sendEmail(Environment $twig , $items, $managerName)
+function sendEmail(Environment $twig, $items, $managerName)
 {
     if (!count($items)) {
         return;

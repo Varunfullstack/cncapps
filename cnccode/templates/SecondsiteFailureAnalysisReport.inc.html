@@ -24,7 +24,7 @@
             select: function (event, ui) {
                 event.preventDefault();
                 event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.value);
+                $('#customerID').val(ui.item.id);
             },
             delay: 200,
         }).focus(function () {
@@ -82,32 +82,32 @@
             <td width="100"
                 class="promptText"
             >
-                <div align="right">Start Year/Month</div>
+                <div align="right">Start Month/Year</div>
             </td>
             <td>
-                <input
-                        type="text"
-                        name="searchForm[1][startYearMonth]"
-                        value="{startYearMonth}"
-                        placeholder="YYYY-MM"
-                        size="10"
-                        maxlength="7"
+                <input type="text"
+                       name="searchForm[1][startYearMonth]"
+                       value="{startYearMonth}"
+                       placeholder="Month/Year"
+                       size="10"
+                       maxlength="7"
+                       pattern="^(0[1-9]|1[012])/\d{4}$"
                 > <font class="formErrorMessage"> {startYearMonthMesage} </font></td>
         </tr>
         <tr>
             <td width="100"
                 class="promptText"
             >
-                <div align="right">End Year/Month</div>
+                <div align="right">End Month/Year</div>
             </td>
             <td>
-                <input
-                        type="text"
-                        name="searchForm[1][endYearMonth]"
-                        value="{endYearMonth}"
-                        placeholder="YYYY-MM"
-                        size="10"
-                        maxlength="7"
+                <input type="text"
+                       name="searchForm[1][endYearMonth]"
+                       value="{endYearMonth}"
+                       placeholder="Month/Year"
+                       pattern="^(0[1-9]|1[012])-\d{4}$"
+                       size="10"
+                       maxlength="7"
                 > <span class="formErrorMessage"> {endYearMonthMessage} </span></td>
         </tr>
         <tr>

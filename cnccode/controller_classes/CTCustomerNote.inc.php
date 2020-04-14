@@ -88,26 +88,65 @@ class CTCustomerNote extends CTCNC
         }
     }
 
-    function deleteCustomerNote()
+    function getTextStringOfHistory($customerID)
     {
-
-        if (!$this->getParam('customerNoteID')) {
-            $this->raiseError('No customerNoteID Passed');
-        }
 
         $buCustomerNote = new BUCustomerNote($this);
 
-        if ($record = $buCustomerNote->deleteNote(
-            $this->getParam('customerNoteID')
-        )) {
+        if ($results = $buCustomerNote->getNotesByCustomerID($customerID)) {
 
-            $noteHistory = $this->getTextStringOfHistory($record->cno_custno);
+            $returnString = '';
 
-            echo $this->createReturnJavascriptString($record, $noteHistory);
+            while ($row = $results->fetch_object()) {
 
+                if ($returnString != '') {
+                    $returnString .= "\\n\\n";
+                }
+                if (substr($row->cno_modified, 0, 10) != '2010-09-28') {
+                    $returnString .=
+                        Controller::dateYMDtoDMY(
+                            $row->cno_modified
+                        ) . ' - ' . $row->cns_name . " ####################################################################\\n\\n";
+                }
+
+                $returnString .= $row->cno_details;
+
+            }
+
+            return $returnString;
         }
+
     }
 
+    function createReturnJavascriptString($record, $history)
+    {
+        $details = str_replace(array("\r", "\n"), array('\r', '\n'), $record->cno_details);
+        $details = addcslashes($details, "'\"");
+
+        $history = str_replace(array("\r", "\n"), array('\r', '\n'), $history);
+        $history = addcslashes($history, "'\"");
+
+        $javascript = '
+        var im = document.getElementById(\'customerNoteDetails\');
+        im.value = "' . $details . '";
+        var im = document.getElementById(\'customerNoteHistory\');
+        im.value = "' . $history . '";
+        var im = document.getElementById(\'customerNoteCreated\');
+        im.value = "' . $record->cno_created . '";
+        var im = document.getElementById(\'customerNoteModified\');
+        im.value = "' . $record->cno_modified . '";
+        var im = document.getElementById(\'customerNoteModifiedText\');
+        im.innerHTML = "' . Controller::dateYMDtoDMY($record->cno_modified) . ' by ' . $record->cns_logname . '";
+        var im = document.getElementById(\'customerNoteID\');
+        im.value = "' . $record->cno_customernoteno . '";
+        var im = document.getElementById(\'customerNoteOrdheadID\');
+        im.value = "' . $record->cno_ordno . '";';
+
+        /*
+              im.value = "' . $history . '";
+        */
+        return $javascript;
+    }
 
     function updateNote()
     {
@@ -142,7 +181,7 @@ class CTCustomerNote extends CTCNC
     {
         $this->setTemplateFiles('CustomerNotePopup', 'CustomerNotePopup.inc');
 
-        $this->pageTitle = 'Customer Note';
+        $this->setPageTitle('Customer Note');
 
         $buCustomerNote = new BUCustomerNote($this);
 
@@ -209,36 +248,6 @@ class CTCustomerNote extends CTCNC
 
     }
 
-    function createReturnJavascriptString($record, $history)
-    {
-        $details = str_replace(array("\r", "\n"), array('\r', '\n'), $record->cno_details);
-        $details = addcslashes($details, "'\"");
-
-        $history = str_replace(array("\r", "\n"), array('\r', '\n'), $history);
-        $history = addcslashes($history, "'\"");
-
-        $javascript = '
-        var im = document.getElementById(\'customerNoteDetails\');
-        im.value = "' . $details . '";
-        var im = document.getElementById(\'customerNoteHistory\');
-        im.value = "' . $history . '";
-        var im = document.getElementById(\'customerNoteCreated\');
-        im.value = "' . $record->cno_created . '";
-        var im = document.getElementById(\'customerNoteModified\');
-        im.value = "' . $record->cno_modified . '";
-        var im = document.getElementById(\'customerNoteModifiedText\');
-        im.innerHTML = "' . Controller::dateYMDtoDMY($record->cno_modified) . ' by ' . $record->cns_logname . '";
-        var im = document.getElementById(\'customerNoteID\');
-        im.value = "' . $record->cno_customernoteno . '";
-        var im = document.getElementById(\'customerNoteOrdheadID\');
-        im.value = "' . $record->cno_ordno . '";';
-
-        /*
-              im.value = "' . $history . '";
-        */
-        return $javascript;
-    }
-
     function customerNoteHistoryPopup()
     {
 
@@ -278,34 +287,24 @@ class CTCustomerNote extends CTCNC
         exit;
     }
 
-    function getTextStringOfHistory($customerID)
+    function deleteCustomerNote()
     {
+
+        if (!$this->getParam('customerNoteID')) {
+            $this->raiseError('No customerNoteID Passed');
+        }
 
         $buCustomerNote = new BUCustomerNote($this);
 
-        if ($results = $buCustomerNote->getNotesByCustomerID($customerID)) {
+        if ($record = $buCustomerNote->deleteNote(
+            $this->getParam('customerNoteID')
+        )) {
 
-            $returnString = '';
+            $noteHistory = $this->getTextStringOfHistory($record->cno_custno);
 
-            while ($row = $results->fetch_object()) {
+            echo $this->createReturnJavascriptString($record, $noteHistory);
 
-                if ($returnString != '') {
-                    $returnString .= "\\n\\n";
-                }
-                if (substr($row->cno_modified, 0, 10) != '2010-09-28') {
-                    $returnString .=
-                        Controller::dateYMDtoDMY(
-                            $row->cno_modified
-                        ) . ' - ' . $row->cns_name . " ####################################################################\\n\\n";
-                }
-
-                $returnString .= $row->cno_details;
-
-            }
-
-            return $returnString;
         }
-
     }
 
 }// end of class

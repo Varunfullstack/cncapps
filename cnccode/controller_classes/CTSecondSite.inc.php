@@ -337,9 +337,9 @@ class CTSecondSite extends CTCNC
                                 $this->setSessionParam('secondsiteSortDirection', SORT_DESC);
 
                             }
-
+                            $orderByKey = $this->getParam('orderBy');
                             array_multisort(
-                                $$this->getParam('orderBy'),
+                                $$orderByKey,
                                 $_SESSION['secondsiteSortDirection'],
                                 $results
                             );
@@ -390,7 +390,7 @@ class CTSecondSite extends CTCNC
             array('action' => 'failureAnalysis')
         );
 
-        $this->setPageTitle('Second Site Failure Analysis Report');
+        $this->setPageTitle('Offsite Backup Failure Analysis Report');
         $customerString = null;
         if ($dsSearchForm->getValue(BUSecondSite::searchFormCustomerID) != 0) {
             $buCustomer = new BUCustomer ($this);
