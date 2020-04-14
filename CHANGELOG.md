@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v3.12.0] 
+## [v3.12.0] - 2020-04-14
 ### Added
 - Issue 762 - 3CX Call Reporting
 - Issue 754 - Allow manual running of O365 mailbox report
