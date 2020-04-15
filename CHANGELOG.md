@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+### Changed
+
+
 ## [v3.12.1] - 2020-04-15
 ### Changed
 - When editing Activities, apply the same lockdown of contracts in the dropdown Contract box as we have on the Fixed SR page.
