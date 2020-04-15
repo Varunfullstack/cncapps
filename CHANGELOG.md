@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 799 - Customer Contract Take Up Matrix
+
 ## [v3.12.0] - 2020-04-14
 ### Added
 - Issue 762 - 3CX Call Reporting
