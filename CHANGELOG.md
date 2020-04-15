@@ -1,8 +1,8 @@
 # Changelog
 This project changes will be shown here.
-
+## [unreleased]
 ### Changed
-
+- Issue 620 - New side menu design in CNCAPPS
 
 ## [v3.12.1] - 2020-04-15
 ### Changed
