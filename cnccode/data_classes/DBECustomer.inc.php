@@ -165,7 +165,7 @@ class DBECustomer extends DBCNCEntity
         );
         $this->addColumn(
             self::noOfPCs,
-            DA_STRING,
+            DA_INTEGER,
             DA_ALLOW_NULL
         );
         $this->addColumn(

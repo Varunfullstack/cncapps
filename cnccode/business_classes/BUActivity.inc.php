@@ -2183,9 +2183,9 @@ class BUActivity extends Business
 
         $dbeJLastActivity = $this->getLastActivityInProblem($dbeProblem->getValue(DBEJProblem::problemID));
         if (
-            $dbeCallActivity->getValue(DBEJCallActivity::callActTypeID) != CONFIG_INITIAL_ACTIVITY_TYPE_ID AND
+            $dbeCallActivity->getValue(DBEJCallActivity::callActTypeID) != CONFIG_INITIAL_ACTIVITY_TYPE_ID and
             // Always include activity triggered by an email from the customer
-            $this->loggedInUserID == USER_SYSTEM AND $dbeCallActivity->getValue(DBEJCallActivity::serverGuard) == 'N' OR
+            $this->loggedInUserID == USER_SYSTEM and $dbeCallActivity->getValue(DBEJCallActivity::serverGuard) == 'N' or
             (
                 /*
         Don't send unwanted alerts
@@ -2384,7 +2384,7 @@ class BUActivity extends Business
 
         $body = $template->get_var('output');
 
-        $toEmail = 'srspecialattention@' . CONFIG_PUBLIC_DOMAIN . ";$managerEmail";
+        $toEmail = 'srspecialattention@' . CONFIG_PUBLIC_DOMAIN . ",$managerEmail";
 
 
         $hdrs = array(
@@ -4809,7 +4809,7 @@ class BUActivity extends Business
             /*
       Out of hours
       */
-            if ($beforeHours > 0 OR $afterHours > 0) {
+            if ($beforeHours > 0 or $afterHours > 0) {
                 $description = $consultantName . ' - Consultancy';
                 $sequenceNo++;
                 $dbeOrdline->setValue(
@@ -6995,7 +6995,7 @@ is currently a balance of ';
 
         while ($dsOrdline->fetchNext()) {
 
-            if (!$selectedOrderLine OR
+            if (!$selectedOrderLine or
                 ($selectedOrderLine &&
                     in_array(
                         $dsOrdline->getValue(DBEOrdline::sequenceNo),
@@ -8382,7 +8382,7 @@ FROM
         Send work started email except for Hide from Customer OR Sales Order related SRs
         */
                 if (
-                    $dbeProblem->getValue(DBEJProblem::hideFromCustomerFlag) == 'N' AND
+                    $dbeProblem->getValue(DBEJProblem::hideFromCustomerFlag) == 'N' and
                     !$dbeProblem->getValue(DBEJProblem::linkedSalesOrderID)
                 ) {
                     $this->sendEmailToCustomer(
@@ -9073,13 +9073,16 @@ FROM
             global $db;
             $statement = $db->preparedQuery(
                 'select getOpenHours(?)',
-                [["type" => "i", "value" => $dbeProblem->getValue(DBEProblem::problemID)]]
+                [["type" => "i", "value" => $problemID]]
             );
-            $statement->fetch_row();
-            $dbeProblem->setValue(
-                DBEProblem::openHours,
-                $db->Record[0]
-            );
+            if ($statement->fetch_row()) {
+                $dbeProblem->setValue(
+                    DBEProblem::openHours,
+                    $db->Record[0]
+                );
+            } else {
+                error_log("Trying to calculate open hours for $problemID didn't return any results?");
+            }
         }
 
         $dbeProblem->updateRow();
@@ -9119,11 +9122,14 @@ FROM
             'select getOpenHours(?)',
             [["type" => "i", "value" => $dbeProblem->getValue(DBEProblem::problemID)]]
         );
-        $db->next_record(MYSQLI_NUM);
-        $dbeProblem->setValue(
-            DBEProblem::openHours,
-            $db->Record[0]
-        );
+        if ($db->next_record(MYSQLI_NUM)) {
+            $dbeProblem->setValue(
+                DBEProblem::openHours,
+                $db->Record[0]
+            );
+        } else {
+            error_log("Trying to calculate open hours for $problemID didn't produce any results?");
+        }
         $dbeProblem->updateRow();
 
 

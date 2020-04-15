@@ -89,6 +89,8 @@ if ($generateSummary) {
     $isHeaderSet = false;
 }
 
+
+
 function getUnrepeatedUsername($str)
 {
     $n = strlen($str);
@@ -272,10 +274,16 @@ ORDER BY Location, `Computer Name`';
         continue;
     }
     $data = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $purgedData = [];
     foreach ($data as $key => $datum) {
         $text = $datum['Last User'];
         $text = str_replace('null', "", $text);
         $data[$key]['Last User'] = getUnrepeatedUsername($text);
+        $data[$key]['CPU'] =  preg_replace('/\s+/', ' ', $data[$key]['CPU']);
+        $data[$key]['Model'] = preg_replace('/\s+/', ' ', $data[$key]['Model']);
+        $purgedRow = $data[$key];
+        unset($purgedRow['isServer']);
+        $purgedData[] = $purgedRow;
     }
 
 
@@ -284,10 +292,11 @@ ORDER BY Location, `Computer Name`';
         $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
         $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
         $sheet = $spreadsheet->getActiveSheet();
-        $keys = array_keys($data[0]);
+
+        $keys = array_keys($purgedData[0]);
         $sheet->fromArray($keys);
         $sheet->fromArray(
-            $data,
+            $purgedData,
             null,
             'A2'
         );

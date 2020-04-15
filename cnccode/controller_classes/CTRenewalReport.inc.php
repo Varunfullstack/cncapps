@@ -735,8 +735,7 @@ class CTRenewalReport extends CTCNC
         $this->setMethodName('search');
         $report = null;
         if (isset ($_REQUEST ['searchForm']) == 'POST') {
-            if (!$this->dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
-            } else {
+            if ($this->dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
                 if (!$this->dsSearchForm->getValue(self::searchFormCustomerID)) {
                     $this->setFormErrorOn();
                 } else {
@@ -745,7 +744,6 @@ class CTRenewalReport extends CTCNC
                 }
 
             }
-
         }
 
         $this->setMethodName('displaySearchForm');

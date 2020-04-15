@@ -9,7 +9,11 @@
     }
 </style>
 <script>
-
+    function submitOnReturn() {
+        if (event.keyCode == 13) {
+            document.searchForm.submit();
+        }
+    }
     const autocompleteURL = "/Customer.php?action=searchName";
     $(function () {
         $('#customerString').autocomplete({

@@ -60,6 +60,7 @@ class BUContact extends Business
             ["value" => DBEContact::supportLevelSupervisor, "description" => "Supervisor"],
             ["value" => DBEContact::supportLevelSupport, "description" => "Support"],
             ["value" => DBEContact::supportLevelDelegate, "description" => "Delegate"],
+            ["value" => DBEContact::supportLevelFurlough, 'description' => 'Furlough']
         ];
         foreach ($supportLevels as $supportLevel) {
             $supportLevelSelected = ($supportLevelValue == $supportLevel['value']) ? CT_SELECTED : null;
