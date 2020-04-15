@@ -582,8 +582,8 @@ class CTActivity extends CTCNC
                 exit;
             }
 
-            if ($this->countParamsSet($this->getParam('activity')) < 2 AND
-                empty($this->dsSearchForm->getValue(BUActivity::searchFormCustomerID)) AND
+            if ($this->countParamsSet($this->getParam('activity')) < 2 and
+                empty($this->dsSearchForm->getValue(BUActivity::searchFormCustomerID)) and
                 $this->dsSearchForm->getValue(BUActivity::searchFormContractCustomerItemID) == '99' and
                 $this->dsSearchForm->getValue(BUActivity::searchFormStatus) !== 'CHECKED_NON_T_AND_M'
             ) {
@@ -1236,7 +1236,6 @@ class CTActivity extends CTCNC
                     'isDisabled'             => !$dsContract->getValue(
                         DBEJContract::allowSRLog
                     ) || $linkedToSalesOrder ? 'disabled' : null,
-                    l
                 )
             );
             $this->template->parse(
@@ -1807,8 +1806,8 @@ class CTActivity extends CTCNC
             $projectSCRText = null;
             $activitySCRText = 'Activity SCR';
             if (            // old call ref SCR
-                $dsCallActivity->getValue(DBEJCallActivity::projectID) != 0 AND
-                $dsCallActivity->getValue(DBEJCallActivity::projectID) > 5 AND
+                $dsCallActivity->getValue(DBEJCallActivity::projectID) != 0 and
+                $dsCallActivity->getValue(DBEJCallActivity::projectID) > 5 and
                 $dsCallActivity->getValue(DBEJCallActivity::projectID) < 21249
             ) {
                 $projectSCRText = 'Old Call SCR';
@@ -2836,7 +2835,7 @@ class CTActivity extends CTCNC
       i.e. called from createRequestFromCustomerRequest()
       */
         if (
-            $_SERVER['REQUEST_METHOD'] == 'POST' OR
+            $_SERVER['REQUEST_METHOD'] == 'POST' or
             $this->getParam('customerID')
         ) {
 
@@ -4640,13 +4639,13 @@ class CTActivity extends CTCNC
             'ActivityEdit',
             'siteBlock'
         );
-
         //Contract selection
         $this->contractDropdown(
             $dsCallActivity->getValue(DBEJCallActivity::customerID),
             $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID),
             'ActivityEdit',
-            'contractBlock'
+            'contractBlock',
+            !!$dsCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID)
         );
         /*
       Use initial activity date to determine list of projects
@@ -6140,18 +6139,18 @@ class CTActivity extends CTCNC
       Whether to allow selection of a contract (otherwise set to T&M)
       */
         if (
-            $dsCallActivity->getValue(DBEJCallActivity::priority) < 4 OR
+            $dsCallActivity->getValue(DBEJCallActivity::priority) < 4 or
             /*
         User in Accounts and priority > 3
         */
             ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS) && $dsCallActivity->getValue(
                     DBEJCallActivity::priority
-                ) > 3) OR
+                ) > 3) or
 
             /*
         priority > 3 and activity hours greater than system threshold
         */
-            ($dsCallActivity->getValue(DBEJCallActivity::priority) > 3 AND $dsCallActivity->getValue(
+            ($dsCallActivity->getValue(DBEJCallActivity::priority) > 3 and $dsCallActivity->getValue(
                     DBEJCallActivity::totalActivityDurationHours
                 ) < $dsHeader->getValue(DBEHeader::srPromptContractThresholdHours))
 

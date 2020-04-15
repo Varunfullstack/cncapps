@@ -1,6 +1,21 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.12.1]
+### Changed
+- When editing Activities, apply the same lockdown of contracts in the dropdown Contract box as we have on the Fixed SR page.
+- Automated Asset Export, remove any double spaces from the data. Example is customer 2955, some extra (hidden) spaces in these columns.
+### Fixed
+- RenewalReport.php typing in a customer name, click search, and you get an error.
+- Unable to save this page. https://cncapps.cnc-ltd.co.uk/Customer.php?action=dispEdit&customerID=5711
+- CustomerItem.php type in a customer name, Bennett Griffin for example, click search, it gives error.
+- CustomerItem.php Clear button does not work.
+- See https://cncapps.cnc-ltd.co.uk/sendmailqueue.php in live. Not sure why it's given that error, must relate to the Special Attention status of a customer.
+- We appear to have lost the Furlough option from the drop down list in Customer.php?action=dispEdit&customerID=2065
+- CurrentActivityReport.php clicking on the circled takes you to the first activity, but it used to take you to the last one. I didn't think we'd changed this? Can it go to last activity please.
+### Removed
+- Automated Asset Export, remove the isServer column.
+
 ## [v3.12.0] - 2020-04-14
 ### Added
 - Issue 762 - 3CX Call Reporting

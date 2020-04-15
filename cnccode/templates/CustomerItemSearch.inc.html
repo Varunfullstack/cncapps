@@ -1,8 +1,8 @@
 <!-- Template: CustomerItemSearch.inc.html -->
 <script>
-	const autocompleteURL = "/Customer.php?action=searchName";
-	$(function () {
-		$('#customerString').autocomplete({
+    const autocompleteURL = "/Customer.php?action=searchName";
+    $(function () {
+        $('#customerString').autocomplete({
             minLength: 0,
             source: function (request, responseCB) {
                 const data = {};
@@ -18,157 +18,240 @@
                     responseCB(response);
                 })
             },
-			select: function (event, ui) {
-				event.preventDefault();
-				event.target.value = ui.item.label;
-				$('#customerID').val(ui.item.value);
-			},
-			delay: 200,
-		}).focus(function () {
-			$(this).autocomplete("search", $(this).val());
-		});
-	});
-function submitOnReturn() {
-	if (event.keyCode == 13) {
-			document.searchForm.submit();
-   }
-}
-</script>
-<form name="searchForm" method="post" action="{urlSubmit}">
-  <table width="500px" border="0" cellspacing="0" cellpadding="1">
-		<tr> 
-			<td class="promptText"><div align="right">Customer Item No</div></td>
-			<td> <input
-				type="text"
-				name="customerItem[1][customerItemID]"
-				value="{customerItemID}"
-				size="10"
-				maxlength="10"
-				onKeypress="javascript:submitOnReturn()"
-			> </td>
-		</tr>
-		<tr> 
-			<td class="promptText"><div align="right">Item Text</div></td>
-			<td> <input
-				type="text"
-				name="customerItem[1][itemText]"
-				value="{itemText}"
-				size="50"
-				maxlength="50"
-				onKeypress="javascript:submitOnReturn()"
-			> </td>
-		</tr>
-		<tr> 
-			<td class="promptText"><div align="right">Serial No</div></td>
-			<td> <input
-				type="text"
-				name="customerItem[1][serialNo]"
-				value="{serialNo}"
-				size="50"
-				maxlength="50"
-				onKeypress="javascript:submitOnReturn()"
-			> </td>
-		</tr>
-		<tr> 
-			<td class="promptText"><div align="right">Customer</div></td>
-			<td><input
-					type="hidden"
-					name="customerItem[1][customerID]"
-					id="customerID"
-					value="{customerID}"
-				> <input
-					type="text"
-					name="customerString"
-					id="customerString"
-					value="{customerString}"
-					size="50"
-					maxlength="50"
-				></td>
-		</tr>
-		<tr> 
-			<td class="promptText"><div align="right">Sales Order No</div></td>
-			<td> <input
-					type="text"
-					name="customerItem[1][ordheadID]"
-					value="{ordheadID}"
-					size="10"
-					maxlength="10"
-					onKeypress="javascript:submitOnReturn()"
-				> <font class="formErrorMessage">{ordheadIDMessage}</font> </td>
-		</tr>
-<!--
-		<tr> 
-			<td class="promptText"><div align="right">Items On Contract ID</div></td>
-			<td> <input
-					type="text"
-					name="customerItem[1][contractID]"
-					value="{contractID}"
-					size="10"
-					maxlength="10"
-					onKeypress="javascript:submitOnReturn()"
-				>
-				<font class="formErrorMessage">{contractIDMessage}</font> </td>
-		</tr>
--->
-		<tr> 
-			<td class="promptText">&nbsp;</td>
-			<td>&nbsp;</td>
-		</tr>
-    <tr> 
-      <td class="promptText"><div align="right">Contract Text</div></td>
-      <td> <input
-        type="text"
-        name="customerItem[1][contractText]"
-        value="{contractText}"
-        size="50"
-        maxlength="50"
-        onKeypress="javascript:submitOnReturn()"
-      > </td>
-    </tr>
-		<tr> 
-			<td class="promptText"><div align="right">Renewal Status</div></td>
-			<td> <select name="customerItem[1][renewalStatus]">
-					<option value=""></option>
-					<!-- BEGIN renewalStatusBlock -->
-					<option {renewalStatusSelected} value="{renewalStatus}">{renewalStatusDescription}</option>
-					<!-- END renewalStatusBlock -->
-				</select> </td>
-		</tr>
-		<tr> 
-			<td>&nbsp;</td>
-			<td>
-        <input type="submit" name="Search" value="Search"> 
-				<input type="submit" name="CSV" value="CSV"> 
-				<input name="CreateItem" type="button" onClick="document.location='CustomerItem.php?action=addCI'" value="New Item">
-				<input type="reset" name="Clear" value="Clear">
-		</tr>
-	</table>
-<table class="singleBorder" width="100%" border="0" cellspacing="1" cellpadding="1">
-  <tr> 
-    <td colspan="3">&nbsp;</td>
-    <td colspan="3">{CustomerItemSearchContractSelector}</td>
-  </tr>
+            select: function (event, ui) {
+                event.preventDefault();
+                event.target.value = ui.item.label;
+                $('#customerID').val(ui.item.id);
+            },
+            delay: 200,
+        }).focus(function () {
+            $(this).autocomplete("search", $(this).val());
+        });
+    });
 
-	<tr> 
-		<td class="listHeadText" nowrap="nowrap">Customer</td>
-		<td class="listHeadText" nowrap="nowrap">Site</td>
-		<td class="listHeadText" nowrap="nowrap">Item</td>
-    <td class="listHeadText" nowrap="nowrap">Server Name</td>
-		<td class="listHeadText" nowrap="nowrap">Serial No</td>
-    <td class="listHeadText" nowrap="nowrap">Contract</td>
-    <td class="listHeadText" nowrap="nowrap">&nbsp;</td>
-	</tr>
-	<!-- BEGIN itemBlock -->
-	<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';"> 
-		<td class="listItemText" nowrap="nowrap">{listCustomerName}</td>
-		<td class="listItemText" nowrap="nowrap">{listSiteName}</td>
-		<td class="listItemText" nowrap="nowrap"><A HREF="{urlItem}">{listItemDescription}</A></td>
-    <td class="listItemText" nowrap="nowrap">{listServerName}</td>
-		<td class="listItemText" nowrap="nowrap">{listSerialNo}</td>
-    <td class="listItemText" nowrap="nowrap">{listContractDescription}</td>
-    <td nowrap="nowrap">{checkBox}&nbsp;</td>
-	</tr>
-	<!-- END itemBlock -->
-</table>
+    function submitOnReturn() {
+        if (event.keyCode == 13) {
+            document.searchForm.submit();
+        }
+    }
+</script>
+<form name="searchForm"
+      method="post"
+      action="{urlSubmit}"
+>
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
+        <tr>
+            <td class="promptText">
+                <div align="right">Customer Item No</div>
+            </td>
+            <td><input
+                    type="text"
+                    name="customerItem[1][customerItemID]"
+                    value="{customerItemID}"
+                    size="10"
+                    maxlength="10"
+                    onKeypress="javascript:submitOnReturn()"
+            ></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Item Text</div>
+            </td>
+            <td><input
+                    type="text"
+                    name="customerItem[1][itemText]"
+                    value="{itemText}"
+                    size="50"
+                    maxlength="50"
+                    onKeypress="javascript:submitOnReturn()"
+            ></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Serial No</div>
+            </td>
+            <td><input
+                    type="text"
+                    name="customerItem[1][serialNo]"
+                    value="{serialNo}"
+                    size="50"
+                    maxlength="50"
+                    onKeypress="javascript:submitOnReturn()"
+            ></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Customer</div>
+            </td>
+            <td><input
+                    type="hidden"
+                    name="customerItem[1][customerID]"
+                    id="customerID"
+                    value="{customerID}"
+            > <input
+                    type="text"
+                    name="customerString"
+                    id="customerString"
+                    value="{customerString}"
+                    size="50"
+                    maxlength="50"
+            ></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Sales Order No</div>
+            </td>
+            <td><input
+                    type="text"
+                    name="customerItem[1][ordheadID]"
+                    value="{ordheadID}"
+                    size="10"
+                    maxlength="10"
+                    onKeypress="javascript:submitOnReturn()"
+            > <font class="formErrorMessage">{ordheadIDMessage}</font></td>
+        </tr>
+        <!--
+                <tr>
+                    <td class="promptText"><div align="right">Items On Contract ID</div></td>
+                    <td> <input
+                            type="text"
+                            name="customerItem[1][contractID]"
+                            value="{contractID}"
+                            size="10"
+                            maxlength="10"
+                            onKeypress="javascript:submitOnReturn()"
+                        >
+                        <font class="formErrorMessage">{contractIDMessage}</font> </td>
+                </tr>
+        -->
+        <tr>
+            <td class="promptText">&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Contract Text</div>
+            </td>
+            <td><input
+                    type="text"
+                    name="customerItem[1][contractText]"
+                    value="{contractText}"
+                    size="50"
+                    maxlength="50"
+                    onKeypress="javascript:submitOnReturn()"
+            ></td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Renewal Status</div>
+            </td>
+            <td><select name="customerItem[1][renewalStatus]">
+                <option value=""></option>
+                <!-- BEGIN renewalStatusBlock -->
+                <option {renewalStatusSelected}
+                        value="{renewalStatus}"
+                >{renewalStatusDescription}
+                </option>
+                <!-- END renewalStatusBlock -->
+            </select></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <input type="submit"
+                       name="Search"
+                       value="Search"
+                >
+                <input type="submit"
+                       name="CSV"
+                       value="CSV"
+                >
+                <input name="CreateItem"
+                       type="button"
+                       onClick="document.location='CustomerItem.php?action=addCI'"
+                       value="New Item"
+                >
+                <button type="button"
+                        onclick="document.location = 'CustomerItem.php' "
+                >Clear
+                </button>
+        </tr>
+    </table>
+    <table class="singleBorder"
+           width="100%"
+           border="0"
+           cellspacing="1"
+           cellpadding="1"
+    >
+        <tr>
+            <td colspan="3">&nbsp;</td>
+            <td colspan="3">{CustomerItemSearchContractSelector}</td>
+        </tr>
+
+        <tr>
+            <td class="listHeadText"
+                nowrap="nowrap"
+            >Customer
+            </td>
+            <td class="listHeadText"
+                nowrap="nowrap"
+            >Site
+            </td>
+            <td class="listHeadText"
+                nowrap="nowrap"
+            >Item
+            </td>
+            <td class="listHeadText"
+                nowrap="nowrap"
+            >Server Name
+            </td>
+            <td class="listHeadText"
+                nowrap="nowrap"
+            >Serial No
+            </td>
+            <td class="listHeadText"
+                nowrap="nowrap"
+            >Contract
+            </td>
+            <td class="listHeadText"
+                nowrap="nowrap"
+            >&nbsp;
+            </td>
+        </tr>
+        <!-- BEGIN itemBlock -->
+        <tr onMouseOver="this.bgColor='#FFFFCC';"
+            onMouseOut="this.bgColor='';"
+        >
+            <td class="listItemText"
+                nowrap="nowrap"
+            >{listCustomerName}
+            </td>
+            <td class="listItemText"
+                nowrap="nowrap"
+            >{listSiteName}
+            </td>
+            <td class="listItemText"
+                nowrap="nowrap"
+            ><A HREF="{urlItem}">{listItemDescription}</A></td>
+            <td class="listItemText"
+                nowrap="nowrap"
+            >{listServerName}
+            </td>
+            <td class="listItemText"
+                nowrap="nowrap"
+            >{listSerialNo}
+            </td>
+            <td class="listItemText"
+                nowrap="nowrap"
+            >{listContractDescription}
+            </td>
+            <td nowrap="nowrap">{checkBox}&nbsp;</td>
+        </tr>
+        <!-- END itemBlock -->
+    </table>
 </form>
 <!-- End Template: CustomerItemSearch.inc.html -->
