@@ -1,185 +1,40 @@
 <!-- Begin template: ScreenSales.inc.html -->
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <STRONG>Sales</STRONG>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="SalesOrder.php">Sales Orders</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="PurchaseOrder.php">Purchase Orders</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="Customer.php">Customer Search</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="ReviewList.php"
-           title="Daily Call"
-        >My Daily Call List</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <A href="CustomerCRM.php"
-           title="Customer CRM"
-        >Customer CRM</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="ContractReport.php?filter[custitem.renewalStatus]=R"
-           title="Contract Report"
-        >Contracts</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="Invoice.php">Invoices</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="Supplier.php">Suppliers</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="BookSalesVisit.php">Book Sales Visit</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="CustomerReviewMeetingsReport.php">Customer Review Meetings</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="CustomerReviewMeeting.php">Customer Review Agenda</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="CustomerReviewMeetingDocuments.php">Cust Review Meeting Docs</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <A href="PrepayAdjustment.php"
-           title="Prepay Adjustment"
-        >Prepay Adjustment</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <A href="RenewalReport.php"
-           title="Renewal Report"
-        >Renewal Report</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <A href="LeadStatusReport.php"
-           title="Customer Lead Status Report"
-        >Lead Status</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="GoodsIn.php"
-           title="Books Goods In"
-        >Goods In</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="StockLevel.php">Stock Levels</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="POStatusReport.php">PO Status Report</a>
-    </TD>
-</TR>
-<TR>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="ContactAudit.php">Contact Audit Log</a>
-    </TD>
-</TR>
-{createRenewalSalesOrders}
-<tr>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="createSalesRequest.php">Create Sales Request</a>
-    </TD>
-</tr>
-<tr>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="SalesRequestDashboard.php">Sales Requests Dashboard</a>
-    </TD>
-</tr>
-<tr>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="RenewalsUpdate.php">Renewals Update</a>
-    </TD>
-</tr>
-<tr>
-    <TD align="left"
-        nowrap="nowrap"
-    >
-        <a href="Office365BackupAudit.php">Office 365 Backup Audit</a>
-    </TD>
-</tr>
+
+<li class="menu-item-has-children dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-tag"></i>Sales</a>
+    <ul class="sub-menu children dropdown-menu">
+        <li><a href="SalesOrder.php">Sales Orders</a></li>
+        <li><a href="PurchaseOrder.php">Purchase Orders</a></li>
+        <li><a href="Customer.php">Customer Search</a></li>
+        <li><a href="ReviewList.php"
+               title="Daily Call"
+        >My Daily Call List</a></li>
+        <li><a href="CustomerCRM.php"
+               title="Customer CRM"
+        >Customer CRM</a></li>
+        <li><a href="ContractReport.php?filter[custitem.renewalStatus]=R" title="Contract Report" >Contracts</a></li>
+        <li><a href="Invoice.php">Invoices</a></li>
+        <li><a href="Supplier.php">Suppliers</a></li>
+        <li><a href="BookSalesVisit.php">Book Sales Visit</a></li>
+        <li><a href="CustomerReviewMeetingsReport.php">Customer Review Meetings</a></li>
+        <li><a href="CustomerReviewMeeting.php">Customer Review Agenda</a></li>
+        <li><a href="CustomerReviewMeetingDocuments.php">Cust Review Meeting Docs</a></li>
+        <li><a href="PrepayAdjustment.php"
+               title="Prepay Adjustment"
+        >Prepay Adjustment</a></li>
+        <li><a href="RenewalReport.php"
+               title="Renewal Report"
+        >Renewal Report</a></li>
+        <li><a href="LeadStatusReport.php"
+               title="Customer Lead Status Report"
+        >Lead Status</a></li>
+        <li><a href="GoodsIn.php"
+               title="Books Goods In"
+        >Goods In</a></li>
+        <li><a href="StockLevel.php">Stock Levels</a></li>
+        <li><a href="POStatusReport.php">PO Status Report</a></li>
+        <li><a href="ContactAudit.php">Contact Audit Log</a></li>
+        <li><a href="SalesRequestDashboard.php">Sales Requests Dashboard</a></li>
+    </ul>
+</li>
 <!-- End template: ScreenSales.inc.html -->
