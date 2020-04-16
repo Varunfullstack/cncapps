@@ -6,10 +6,25 @@
         <tagDatabase tag="issue799"/>
     </changeSet>
     <changeSet author="pavwebdev" id="issue799-1">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="itemType" columnName="sortId"
+                <columnExists tableName="itemType" columnName="sortOrder"/>
             </not>
         </preConditions>
+        <addColumn tableName="itemType">
+            <column name="sortOrder" defaultValue="0" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue799-2">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="itemType" columnName="sortOrder"/>
+        </preConditions>
+        <sql splitStatements="true">
+            SET @tempVariable := 0;
+            UPDATE itemType           SET sortOrder = ( @tempVariable := @tempVariable + 1);
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
