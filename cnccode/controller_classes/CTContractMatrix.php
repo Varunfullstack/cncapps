@@ -5,12 +5,9 @@
  * Date: 25/07/2018
  * Time: 12:33
  */
-
-require_once($cfg['path_bu'] . '/BUContact.inc.php');
-require_once($cfg['path_bu'] . '/BUHeader.inc.php');
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-require_once($cfg['path_dbe'] . '/DSForm.inc.php');
-require_once $cfg['path_dbe'] . '/DBEJContactAudit.php';
+require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 
 class CTContractMatrix extends CTCNC
 {
@@ -31,15 +28,12 @@ class CTContractMatrix extends CTCNC
             $cfg
         );
         $roles = [
-            "sales",
+            "reports",
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
-        $this->buContact = new BUContact($this);
-        $this->dsContact = new DSForm($this);    // new specialised dataset with form message support
-        $this->dsContact->copyColumnsFrom($this->buContact->dbeContact);
     }
 
     /**
@@ -49,21 +43,45 @@ class CTContractMatrix extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
-            case 'doSearch':
+            case 'getData':
+
+                // we have to get a list of all active customers
+                $data = [];
+                $buCustomer = new BUCustomer($this);
+                $dsCustomers = new DataSet($this);
+                $buCustomer->getActiveCustomers($dsCustomers);
+                $buRenewal = new BURenewal($this);
+                $dbeItemType = new DBEItemType($this);
+                $dbeItemType->getCustomerReviewRows(true);
+                $itemTypes = [];
+                while ($dbeItemType->fetchNext()) {
+                    $itemTypes[] = $dbeItemType->getValue(DBEItemType::description);
+                }
+
+                while ($dsCustomers->fetchNext()) {
+                    $data[] = ["Customer Name" => $dsCustomers->getValue(DBECustomer::name)];
+                    $items = $buRenewal->getRenewalsAndExternalItemsByCustomer(
+                        $dsCustomers->getValue(DBECustomer::customerID),
+                        $this,
+                        true
+                    );
+                    foreach ($items as $item){
+                        if($item['itemTypeDescription'])
+                    }
+
+                }
+
+                $customerItem = new BUCustomerItem($this);
+
                 echo json_encode(
-                    $this->searchContactAudit(
-                        $this->getParam('customerId'),
-                        $this->getParam('startDate'),
-                        $this->getParam('endDate'),
-                        $this->getParam('firstName'),
-                        $this->getParam('lastName')
-                    )
+                    $data
                 );
                 break;
             default:
-                $this->displaySearchForm();
+                $this->showReport();
         }
     }
+
 
     /**
      * Display the initial form that prompts the employee for details
@@ -72,88 +90,20 @@ class CTContractMatrix extends CTCNC
      * @throws Exception
      * @throws Exception
      */
-    function displaySearchForm()
+    function showReport()
     {
-        $this->setMethodName('displaySearchForm');
         $this->setTemplateFiles(
-            'CustomerSearch',
-            'ContactAuditSearch'
+            'ContractMatrix',
+            'ContractMatrix'
         );
 // Parameters
-        $this->setPageTitle("Contact Audit Log");
-        $submitURL = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array('action' => 'search')
-        );
-        $customerPopupURL =
-            Controller::buildLink(
-                CTCNC_PAGE_CUSTOMER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-        $this->template->set_var(
-            array(
-                'contactString'           => "",
-                'phoneString'             => "",
-                'customerString'          => "",
-                'address'                 => "",
-                'customerStringMessage'   => "",
-                'newCustomerFromDate'     => "",
-                'newCustomerToDate'       => "",
-                'droppedCustomerFromDate' => "",
-                'droppedCustomerToDate'   => "",
-                'submitURL'               => $submitURL,
-                'customerPopupURL'        => $customerPopupURL,
-            )
-        );
+        $this->setPageTitle("Contract Matrix");
+
         $this->template->parse(
             'CONTENTS',
-            'CustomerSearch',
+            'ContractMatrix',
             true
         );
         $this->parsePage();
-    }
-
-
-    private function searchContactAudit($customerID = null,
-                                        $startDate = null,
-                                        $endDate = null,
-                                        $firstName = null,
-                                        $lastName = null
-    )
-    {
-        $test = new DBEJContactAudit($this);
-
-        if ($startDate) {
-            $startDate = DateTime::createFromFormat(
-                'd/m/Y',
-                $startDate
-            );
-        }
-
-        if ($endDate) {
-            $endDate = DateTime::createFromFormat(
-                'd/m/Y',
-                $endDate
-            );
-        }
-
-        $test->search(
-            $customerID,
-            $startDate,
-            $endDate,
-            $firstName,
-            $lastName
-        );
-
-        $result = [];
-
-        while ($test->fetchNext()) {
-            $result[] = $test->getRowAsAssocArray();
-        }
-
-        return $result;
     }
 }// end of class

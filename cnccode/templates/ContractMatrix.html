@@ -1,0 +1,51 @@
+<!-- Template: Customer.inc.html -->
+<script type="application/javascript">
+
+    $(function () {
+        $.ajax('?action=getData', {
+            dataType: 'json',
+        })
+            .then(data => {
+                let headers = false;
+                const dataTableConfig = {
+                    dom: 'Blrtip',
+                    buttons: [
+                        {
+                            extend: 'excel'
+                        }
+                    ],
+                    paging: false,
+                    columns: []
+                }
+                data.forEach(row => {
+                    if (!headers) {
+                        Object.keys(row).forEach(columnName => {
+                            $('#myTable>thead>tr').append('<th>' + columnName + '</th>');
+                            dataTableConfig.columns.push({data: columnName, sortable: false})
+                        })
+                        headers = true;
+                    }
+                })
+
+                dataTableConfig.data = data;
+                $('#myTable').dataTable(dataTableConfig);
+            })
+
+    })
+</script>
+
+
+<table width="100%"
+       border="0"
+       cellspacing="0"
+       cellpadding="1"
+       id="myTable"
+>
+    <thead>
+    <tr>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<!-- End Template: Customer.inc.html -->

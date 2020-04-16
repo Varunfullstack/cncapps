@@ -72,7 +72,7 @@ class DBEItemType extends DBCNCEntity
         $this->setAddColumnsOff();
     }
 
-    function getCustomerReviewRows()
+    function getCustomerReviewRows($arbitrarySort = false)
     {
         $statement =
             "SELECT " . $this->getDBColumnNamesAsString() .
@@ -81,6 +81,9 @@ class DBEItemType extends DBCNCEntity
             ) . " and " . $this->getDBColumnName(self::showInCustomerReview) . " order by " . $this->getDBColumnName(
                 self::description
             );
+        if ($arbitrarySort) {
+            $statement .= " order by sortId";
+        }
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }
