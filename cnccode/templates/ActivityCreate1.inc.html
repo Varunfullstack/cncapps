@@ -82,17 +82,6 @@
 </form>
 <P class="bigErrorMessage">{referred}</P>
 <script>
-
-    function addInputs(array, form) {
-        array.forEach((element) => {
-            var input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = element.name;
-            input.value = element.value;
-            form.appendChild(input);
-        })
-    }
-
     function submitThis() {
         var form = document.createElement("form"); // CREATE A NEW FORM TO DUMP ELEMENTS INTO FOR SUBMISSION
         form.method = "post"; // CHOOSE FORM SUBMISSION METHOD, "GET" OR "POST"

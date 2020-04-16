@@ -519,7 +519,6 @@ class CTDespatch extends CTCNC
 
         $this->setDeliveryMethodID($this->getParam('deliveryMethodID'));
         $buDespatch->initialiseDespatchDataset($dsDespatch);
-        var_dump($this->getParam('despatch'));
         if (!$dsDespatch->populateFromArray($this->getParam('despatch'))) {
             $this->setFormErrorMessage('Quantities entered must be numeric');
         }

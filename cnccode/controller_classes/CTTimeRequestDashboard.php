@@ -169,6 +169,7 @@ class CTTimeRequestDashboard extends CTCNC
                     'timeLeftOnBudget'  => $leftOnBudget,
                     'requesterTeam'     => $teamName,
                     'alertRow'          => $requestedDateTime < $alertTime ? 'warning' : null,
+                    'approvalLevel'     => $isOverLimit ? 'Mgmt' : 'Team Lead'
                 ]
             );
 

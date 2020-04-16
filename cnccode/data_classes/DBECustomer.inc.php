@@ -472,26 +472,26 @@ class DBECustomer extends DBCNCEntity
     {
 
         $this->setMethodName("getRowsByNameMatch");
-        if ($contact == '' & $phoneNo == '' & $name == '' & $address == '' & $newCustomerFromDate == '' & $newCustomerToDate == '' & $droppedCustomerFromDate == '' & $droppedCustomerToDate == '') {
+        if (!$contact && !$phoneNo && !$name && !$address && !$newCustomerFromDate && !$newCustomerToDate && !$droppedCustomerFromDate && !$droppedCustomerToDate) {
             $this->raiseError('Either contact, phone, customer name, address or dates must be set');
         }
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName();
 
-        if ($address != '' OR $phoneNo != '') {
+        if ($address || $phoneNo) {
             $queryString .=
                 " INNER JOIN address ON cus_custno = add_custno";
         }
 
-        if ($contact != '' OR $phoneNo != '') {
+        if ($contact or $phoneNo) {
             $queryString .=
                 " INNER JOIN contact ON cus_custno = con_custno";
         }
 
         $queryString .= " WHERE 1=1";
 
-        if ($address != '') {
+        if ($address) {
             $queryString .=
                 " AND (add_town LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
@@ -519,7 +519,7 @@ class DBECustomer extends DBCNCEntity
                 ) . "%')";
         }
 
-        if ($contact != '') {
+        if ($contact) {
             $queryString .=
                 " AND (con_first_name LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
@@ -531,7 +531,7 @@ class DBECustomer extends DBCNCEntity
                 ) . "%')";
         }
 
-        if ($phoneNo != '') {
+        if ($phoneNo) {
             $queryString .=
                 " AND (con_phone LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
@@ -547,14 +547,14 @@ class DBECustomer extends DBCNCEntity
                 ) . "%')";
         }
 
-        if ($newCustomerFromDate != '') {
+        if ($newCustomerFromDate) {
             $queryString .=
                 " AND " . $this->getDBColumnName(self::becameCustomerDate) . ">='" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $newCustomerFromDate
                 ) . "'";
         }
-        if ($newCustomerToDate != '') {
+        if ($newCustomerToDate) {
             $queryString .=
                 " AND " . $this->getDBColumnName(self::becameCustomerDate) . "<='" . mysqli_real_escape_string(
                     $this->db->link_id(),
@@ -562,14 +562,14 @@ class DBECustomer extends DBCNCEntity
                 ) . "'";
         }
 
-        if ($droppedCustomerFromDate != '') {
+        if ($droppedCustomerFromDate) {
             $queryString .=
                 " AND " . $this->getDBColumnName(self::droppedCustomerDate) . ">='" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $droppedCustomerFromDate
                 ) . "'";
         }
-        if ($droppedCustomerToDate != '') {
+        if ($droppedCustomerToDate) {
             $queryString .=
                 " AND " . $this->getDBColumnName(self::droppedCustomerDate) . "<='" . mysqli_real_escape_string(
                     $this->db->link_id(),
@@ -577,7 +577,7 @@ class DBECustomer extends DBCNCEntity
                 ) . "'";
         }
 
-        if ($name != '') {
+        if ($name) {
             $queryString .= " AND " . $this->getDBColumnName(self::name) . " LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $name
@@ -587,7 +587,6 @@ class DBECustomer extends DBCNCEntity
         $queryString .= " GROUP BY " . $this->getDBColumnName(self::customerID) . " ORDER BY " . $this->getDBColumnName(
                 self::name
             );
-
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;

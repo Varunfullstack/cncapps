@@ -541,7 +541,11 @@ class CTCurrentActivityReport extends CTCNC
                         "pendingReopenPriority"           => $pendingReopenedPriority,
                         "pendingReopenDescriptionURL"     => $pendingReopenDescriptionURL,
                         "pendingReopenDescriptionSummary" => $pendingReopenDescriptionSummary,
-                        "pendingReopenedID"               => $pendingReopenedRequest['id']
+                        "pendingReopenedID"               => $pendingReopenedRequest['id'],
+                        "receivedDate"                    => $pendingReopenedRequest['createdAt'],
+                        "pendingReopenedCustomerID"       => $pendingReopenedRequest['customerID'],
+                        "pendingReopenedContactID"        => $pendingReopenedRequest['contactID'],
+                        "base64Reason"                    => base64_encode($pendingReopenedRequest['reason']),
 
                     ]
                 );
@@ -1339,7 +1343,7 @@ class CTCurrentActivityReport extends CTCNC
 
                     $bgColour = self::GREEN; /// green
 
-                } elseif ($percentageSLA > 0.75 AND $percentageSLA < 1) {
+                } elseif ($percentageSLA > 0.75 and $percentageSLA < 1) {
 
                     $bgColour = self::AMBER; // amber
 

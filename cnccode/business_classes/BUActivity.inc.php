@@ -7268,12 +7268,14 @@ is currently a balance of ';
 
         $queryString = "
       SELECT
-             pendingReopened.id,
+  pendingReopened.id,
   problemID,
   contactID,
   reason,
   customer.`cus_name` AS customerName,
-  problem.`pro_priority` AS priority
+  customer.cus_custno as customerID,
+  problem.`pro_priority` AS priority,
+  createdAt
 FROM
   pendingReopened
   LEFT JOIN contact ON pendingReopened.contactID = contact.`con_contno`
@@ -8596,6 +8598,7 @@ FROM
         $dbePendingReopened->setValue(DBEPendingReopened::problemID, $problemId);
         $dbePendingReopened->setValue(DBEPendingReopened::contactID, $contactID);
         $dbePendingReopened->setValue(DBEPendingReopened::reason, $passedReason);
+        $dbePendingReopened->setValue(DBEPendingReopened::createdAt, (new DateTime())->format(DATE_MYSQL_DATETIME));
         $dbePendingReopened->insertRow();
     }
 

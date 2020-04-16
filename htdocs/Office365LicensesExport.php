@@ -362,11 +362,20 @@ function processDevices(Spreadsheet $spreadsheet,
         }
     }
     $dateTime = new DateTime();
+    $legendRowStart = $highestRow + 2;
     $devicesSheet->fromArray(
-        ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
+        [
+            ["User device has not connected for 60 days"],
+            ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
+        ],
         null,
-        'A' . ($highestRow + 2)
+        'A' . $legendRowStart
     );
+    $devicesSheet->getStyle("A{$legendRowStart}:A$legendRowStart")
+        ->getFill()
+        ->setFillType(Fill::FILL_SOLID)
+        ->getStartColor()
+        ->setARGB("FFFFC7CE");
 }
 
 /**
@@ -513,11 +522,27 @@ function processMailboxes(Spreadsheet $spreadSheet,
         '=countif(D2:D' . ($highestRow - 1) . ', "yes") & " Licensed Users"'
     );
 
+
+    $legendRowStart = $highestRow + 2;
     $mailboxesSheet->fromArray(
-        ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
+        [
+            ["User is at {$dbeHeader->getValue(DBEHeader::office365MailboxRedWarningThreshold)}% of mailbox size limit"],
+            ["User is at {$dbeHeader->getValue(DBEHeader::office365MailboxYellowWarningThreshold)}% of mailbox size limit"],
+            ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
+        ],
         null,
-        'A' . ($highestRow + 2)
+        'A' . $legendRowStart
     );
+    $mailboxesSheet->getStyle("A{$legendRowStart}:A$legendRowStart")
+        ->getFill()
+        ->setFillType(Fill::FILL_SOLID)
+        ->getStartColor()
+        ->setARGB("FFFFC7CE");
+    $mailboxesSheet->getStyle("A" . ($legendRowStart + 1) . ":A" . ($legendRowStart + 1))
+        ->getFill()
+        ->setFillType(Fill::FILL_SOLID)
+        ->getStartColor()
+        ->setARGB("FFFFEB9C");
 
     $mailboxesSheet->getStyle("A$highestRow:H$highestRow")->getFont()->setBold(true);
 

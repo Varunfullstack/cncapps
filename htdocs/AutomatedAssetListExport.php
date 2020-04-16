@@ -6,6 +6,8 @@
  * Time: 11:26
  */
 
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+
 require_once("config.inc.php");
 global $cfg;
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
@@ -88,7 +90,6 @@ if ($generateSummary) {
     $summarySheet = $summarySpreadSheet->getActiveSheet();
     $isHeaderSet = false;
 }
-
 
 
 function getUnrepeatedUsername($str)
@@ -279,7 +280,7 @@ ORDER BY Location, `Computer Name`';
         $text = $datum['Last User'];
         $text = str_replace('null', "", $text);
         $data[$key]['Last User'] = getUnrepeatedUsername($text);
-        $data[$key]['CPU'] =  preg_replace('/\s+/', ' ', $data[$key]['CPU']);
+        $data[$key]['CPU'] = preg_replace('/\s+/', ' ', $data[$key]['CPU']);
         $data[$key]['Model'] = preg_replace('/\s+/', ' ', $data[$key]['Model']);
         $purgedRow = $data[$key];
         unset($purgedRow['isServer']);
@@ -320,6 +321,30 @@ ORDER BY Location, `Computer Name`';
         $highestColumn = $sheet->getHighestColumn();
         $highestRow = $sheet->getHighestRow();
         $sheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
+
+
+        $dateTime = new DateTime();
+        $legendRowStart = $highestRow + 2;
+        $sheet->fromArray(
+            [
+                ["Operating System soon to be end of life"],
+                ["Operating system is end of life"],
+                ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
+            ],
+            null,
+            'A' . $legendRowStart
+        );
+        $sheet->getStyle("A{$legendRowStart}:A$legendRowStart")
+            ->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()
+            ->setARGB("FFFFC7CE");
+        $sheet->getStyle("A" . ($legendRowStart + 1) . ":A" . ($legendRowStart + 1))
+            ->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()
+            ->setARGB("FFFFEB9C");
+
 
         $pcs = 0;
         $servers = 0;

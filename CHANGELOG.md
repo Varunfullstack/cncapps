@@ -1,6 +1,22 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.12.2]
+### Fixed
+- PrepayAdjustment.php Customer Dropdown is numbers, not names.
+- Office365StorageReports.php Does not appear to show any results, but I can see data in the table.
+- CustomerReviewMeetingDocuments.php. No Review Meeting Users are being shown
+- createSalesRequest.php: Picking any customer / template, click send, and you get an error:
+### Changed
+- RenewalReport.php (and the other pages that have the customer page) we need to tweak the search so that if it doesn't find a match, it then goes back to the database and then searches for all customers, including the referred ones.
+- Pending reopen section: add time and date of the email like we have in To Be Logged
+- Pending reopen section: Could we have an option to create a new SR if they try, and reopen an SR with something not related.
+- Current Mailbox Extract add legend to explain the meaning of the colored rows
+- TimeRequestDashboard.php Add a new column to the left of Chargeable Hours called Approval Level
+### Removed
+- Remove debug info from Dispatch page
+
+
 ## [v3.12.1] - 2020-04-15
 ### Changed
 - When editing Activities, apply the same lockdown of contracts in the dropdown Contract box as we have on the Fixed SR page.
