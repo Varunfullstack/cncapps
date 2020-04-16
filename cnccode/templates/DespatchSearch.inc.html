@@ -21,7 +21,7 @@
             select: function (event, ui) {
                 event.preventDefault();
                 event.target.value = ui.item.label;
-                $('[name="customerID"]').val(ui.item.value);
+                $('[name="customerID"]').val(ui.item.id);
             },
             delay: 200,
         }).focus(function () {
