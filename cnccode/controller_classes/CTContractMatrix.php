@@ -66,7 +66,7 @@ class CTContractMatrix extends CTCNC
                         true
                     );
                     foreach ($items as $item){
-                        if($item['itemTypeDescription'])
+                        if($item['itemTypeDescription']){}
                     }
 
                 }
