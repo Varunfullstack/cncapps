@@ -2823,6 +2823,7 @@ class CTActivity extends CTCNC
                              $reason = false
     )
     {
+        $this->template->setVar("menuId", 101);
         $this->setMethodName('activityCreate1');
 
         if ($this->getParam('reason')) {
