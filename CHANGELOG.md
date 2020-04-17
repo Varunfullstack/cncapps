@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v3.12.2]
+## [v3.12.2] - 2020-04-17
 ### Fixed
 - PrepayAdjustment.php Customer Dropdown is numbers, not names.
 - Office365StorageReports.php Does not appear to show any results, but I can see data in the table.
