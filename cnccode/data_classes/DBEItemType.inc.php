@@ -97,11 +97,14 @@ class DBEItemType extends DBCNCEntity
 
     public function moveItemToTop($itemTypeId)
     {
+        if ($this->isFirst($itemTypeId)) {
+            return;
+        }
         $query = "update {$this->tableName} set {$this->getDBColumnName(
                 self::sortOrder
             )} = case {$this->getDBColumnName(
                 self::itemTypeID
-            )} when {$itemTypeId} then 0  else (
+            )} when {$itemTypeId} then 1  else (
       IF(
         {$this->getDBColumnName(self::sortOrder)} < 
         (SELECT 
@@ -117,8 +120,17 @@ class DBEItemType extends DBCNCEntity
         $this->runQuery();
     }
 
+    private function isFirst($itemTypeId)
+    {
+        $this->getRow($itemTypeId);
+        return $this->getValue(DBEItemType::sortOrder) <= 1;
+    }
+
     public function moveItemToBottom($itemTypeId)
     {
+        if ($this->isLast($itemTypeId)) {
+            return;
+        }
         $query = "update {$this->tableName} set {$this->getDBColumnName(self::sortOrder)} = case 
     {$this->getDBColumnName(self::itemTypeID)} when {$itemTypeId} then 
               (SELECT MAX({$this->getDBColumnName(self::sortOrder)}) FROM (SELECT * FROM {$this->tableName}) something)
@@ -134,13 +146,30 @@ class DBEItemType extends DBCNCEntity
         {$this->getDBColumnName(self::sortOrder)}
       )
     ) end";
-        var_dump($query);
         $this->setQueryString($query);
         $this->runQuery();
     }
 
+    private function isLast($itemTypeId)
+    {
+        $this->getRow($itemTypeId);
+        return $this->getValue(DBEItemType::sortOrder) >= $this->getMaxSortOrder();
+    }
+
+    public function getMaxSortOrder()
+    {
+        $query = "select max({$this->getDBColumnName(self::sortOrder)}) as maxSortOrder from {$this->tableName}";
+        $this->db->query($query);
+
+        $this->db->next_record(MYSQLI_ASSOC);
+        return $this->db->Record['maxSortOrder'];
+    }
+
     public function moveItemUp($itemTypeId)
     {
+        if ($this->isFirst($itemTypeId)) {
+            return;
+        }
         $query = "UPDATE
    {$this->tableName} test2
 SET
@@ -151,32 +180,26 @@ SET
     THEN {$this->getDBColumnName(self::sortOrder)} - 1
     ELSE (
       IF(
-        {$this->getDBColumnName(self::itemTypeID)} =
+        {$this->getDBColumnName(self::sortOrder)} = 
         (SELECT
-          {$this->getDBColumnName(self::itemTypeID)}
+          {$this->getDBColumnName(self::sortOrder)} - 1
         FROM
           (SELECT
             *
           FROM
              {$this->tableName}) a
-        WHERE {$this->getDBColumnName(self::sortOrder)} =
-          (SELECT
-            {$this->getDBColumnName(self::sortOrder)}
-          FROM
-            (SELECT
-              *
-            FROM
-               {$this->tableName}) b
-          WHERE {$this->getDBColumnName(self::itemTypeID)} = $itemTypeId)
-          AND {$this->getDBColumnName(self::itemTypeID)} <> $itemTypeId),
+        WHERE {$this->getDBColumnName(self::itemTypeID)} = $itemTypeId
+          )
+          ,
         (SELECT
-          {$this->getDBColumnName(self::sortOrder)} + 1
+          {$this->getDBColumnName(self::sortOrder)}
         FROM
           (SELECT
             *
           FROM
-             {$this->tableName}) c
-        WHERE {$this->getDBColumnName(self::itemTypeID)} = $itemTypeId),
+             {$this->tableName}) a
+        WHERE {$this->getDBColumnName(self::itemTypeID)} = $itemTypeId
+          ),
         {$this->getDBColumnName(self::sortOrder)}
       )
     )
@@ -185,44 +208,42 @@ SET
         $this->runQuery();
     }
 
-    public function moveItemDown($itemTypeID)
+    public function moveItemDown($itemTypeId)
     {
+        if ($this->isLast($itemTypeId)) {
+            return;
+        }
+
         $query = "UPDATE
    {$this->tableName} test2
 SET
   {$this->getDBColumnName(self::sortOrder)} =
   CASE
     {$this->getDBColumnName(self::itemTypeID)}
-    WHEN $itemTypeID
+    WHEN $itemTypeId
     THEN {$this->getDBColumnName(self::sortOrder)} + 1
     ELSE (
       IF(
-        {$this->getDBColumnName(self::itemTypeID)} =
+        {$this->getDBColumnName(self::sortOrder)} = 
         (SELECT
-          {$this->getDBColumnName(self::itemTypeID)}
+          {$this->getDBColumnName(self::sortOrder)} + 1
         FROM
           (SELECT
             *
           FROM
              {$this->tableName}) a
-        WHERE {$this->getDBColumnName(self::sortOrder)} =
-          (SELECT
-            {$this->getDBColumnName(self::sortOrder)}
-          FROM
-            (SELECT
-              *
-            FROM
-               {$this->tableName}) b
-          WHERE {$this->getDBColumnName(self::itemTypeID)} = $itemTypeID)
-          AND {$this->getDBColumnName(self::itemTypeID)} <> $itemTypeID),
+        WHERE {$this->getDBColumnName(self::itemTypeID)} = $itemTypeId
+          )
+          ,
         (SELECT
-          {$this->getDBColumnName(self::sortOrder)} - 1
+          {$this->getDBColumnName(self::sortOrder)}
         FROM
           (SELECT
             *
           FROM
-             {$this->tableName}) c
-        WHERE {$this->getDBColumnName(self::itemTypeID)} = $itemTypeID),
+             {$this->tableName}) a
+        WHERE {$this->getDBColumnName(self::itemTypeID)} = $itemTypeId
+          ),
         {$this->getDBColumnName(self::sortOrder)}
       )
     )
@@ -233,11 +254,7 @@ SET
 
     public function getNextSortOrder()
     {
-        $this->db->query(
-            "select max({$this->getDBColumnName(self::sortOrder)}) as maxSortOrder from {$this->tableName})"
-        );
-        $this->db->next_record(MYSQLI_ASSOC);
-        return $this->db->Record['maxSortOrder'] + 1;
+        return $this->getMaxSortOrder() + 1;
     }
 }
 
