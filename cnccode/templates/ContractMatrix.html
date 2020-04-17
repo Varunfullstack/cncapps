@@ -2,6 +2,8 @@
 <script type="application/javascript">
 
     $(function () {
+        $.LoadingOverlay("show", {text: 'Please wait while the data is loading...'});
+
         $.ajax('?action=getData', {
             dataType: 'json',
         })
@@ -15,13 +17,16 @@
                         }
                     ],
                     paging: false,
-                    columns: []
+                    columns: [],
+                    orderCellsTop: true,
+                    fixedHeader: true,
+                    order: [[0, 'asc']]
                 }
                 data.forEach(row => {
                     if (!headers) {
                         Object.keys(row).forEach(columnName => {
                             $('#myTable>thead>tr').append('<th>' + columnName + '</th>');
-                            dataTableConfig.columns.push({data: columnName, sortable: false})
+                            dataTableConfig.columns.push({data: columnName})
                         })
                         headers = true;
                     }
@@ -29,6 +34,7 @@
 
                 dataTableConfig.data = data;
                 $('#myTable').dataTable(dataTableConfig);
+                $.LoadingOverlay('hide');
             })
 
     })
@@ -40,6 +46,7 @@
        cellspacing="0"
        cellpadding="1"
        id="myTable"
+       class="oddRows"
 >
     <thead>
     <tr>

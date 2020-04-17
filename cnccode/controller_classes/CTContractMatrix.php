@@ -85,6 +85,9 @@ class CTContractMatrix extends CTCNC
                     $data[] = $row;
                 }
 
+
+
+
                 echo json_encode(
                     $data
                 );
