@@ -1,33 +1,6 @@
 <!-- Template: ActivityCreate1.inc.html -->
 <script>
-    const autocompleteURL = "/Customer.php?action=searchName";
-    $(function () {
-        $('[name="customerString"]').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
 
-            },
-            delay: 200,
-            select: (event, ui) => {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-            }
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
-        });
-    });
 </script>
 {reasonMarkup}
 <form name="form"
@@ -63,6 +36,7 @@
                 <input type="text"
                        name="customerString"
                        value="{customerString}"
+                       customer-search
                 >
             </td>
         </tr>
@@ -82,17 +56,6 @@
 </form>
 <P class="bigErrorMessage">{referred}</P>
 <script>
-
-    function addInputs(array, form) {
-        array.forEach((element) => {
-            var input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = element.name;
-            input.value = element.value;
-            form.appendChild(input);
-        })
-    }
-
     function submitThis() {
         var form = document.createElement("form"); // CREATE A NEW FORM TO DUMP ELEMENTS INTO FOR SUBMISSION
         form.method = "post"; // CHOOSE FORM SUBMISSION METHOD, "GET" OR "POST"

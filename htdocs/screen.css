@@ -23,6 +23,10 @@ body.environment-development {
     background-color: rgb(250, 250, 250);
 }
 
+option:disabled {
+    color: #c3c3c3
+}
+
 TD, INPUT, SELECT, TEXTAREA {
     font-family: Arial, Tahoma, Helvetica, sans-serif;
     font-size: 12px;

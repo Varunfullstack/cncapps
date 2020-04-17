@@ -12,6 +12,8 @@ class DBEPendingReopened extends DBEntity
     const problemID = "problemID";
     const contactID = "contactID";
     const reason = "reason";
+    const createdAt = "createdAt";
+
 
     /**
      * calls constructor()
@@ -43,6 +45,11 @@ class DBEPendingReopened extends DBEntity
             self::reason,
             DA_STRING,
             DA_ALLOW_NULL
+        );
+        $this->addColumn(
+            self::createdAt,
+            DA_DATETIME,
+            DA_NOT_NULL
         );
         $this->setAddColumnsOff();
         $this->setPK(0);

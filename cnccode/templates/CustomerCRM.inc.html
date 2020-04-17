@@ -149,6 +149,22 @@
                 >
             </div>
         </td>
+        <td>
+            <div class="contactSupportLevel">
+                <select name="form[contact][0][supportLevel]"
+                        data-validation="atLeastOneMain"
+                        data-type="mainSelector"
+                        data-except="$('#referred').prop('checked') || prospectFlag"
+                >
+                    <!-- BEGIN templateSupportLevelBlock -->
+                    <option value="{supportLevelValue}"
+                    >
+                        {supportLevelDescription}
+                    </option>
+                    <!-- END templateSupportLevelBlock -->
+                </select>
+            </div>
+        </td>
         <td class="center ">
             <div class="contactPassword">
             </div>
@@ -336,22 +352,7 @@
                 />
             </div>
         </td>
-        <td>
-            <div class="contactSupportLevel">
-                <select name="form[contact][0][supportLevel]"
-                        data-validation="atLeastOneMain"
-                        data-type="mainSelector"
-                        data-except="$('#referred').prop('checked') || prospectFlag"
-                >
-                    <!-- BEGIN templateSupportLevelBlock -->
-                    <option value="{supportLevelValue}"
-                    >
-                        {supportLevelDescription}
-                    </option>
-                    <!-- END templateSupportLevelBlock -->
-                </select>
-            </div>
-        </td>
+
         <td>
             <div class="contactHR">
                 <input type="checkbox"
@@ -1033,9 +1034,10 @@
             return false
         }
 
-        const value = $('#primaryMainContactID').val();
+        const value = +$('#primaryMainContactID').val();
 
         if (value && !prospectFlag) {
+            debugger;
             const mainContactsSelect = $('.contactSupportLevel select option:selected[value="main"]').parent('select');
 
             let foundMain = false;
@@ -1742,6 +1744,11 @@
                         </div>
                     </td>
                     <td class="headerLightgrey">
+                        <div class="contactSupportLevel">
+                            Support Level
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
                         <div class="contactPassword">
                             Password
                         </div>
@@ -1834,11 +1841,6 @@
                     <td class="headerLightgrey">
                         <div class="contactMailshot4Flag">
                             {mailshot4FlagDesc}
-                        </div>
-                    </td>
-                    <td class="headerLightgrey">
-                        <div class="contactSupportLevel">
-                            Support Level
                         </div>
                     </td>
                     <td class="headerLightgrey">
@@ -2026,6 +2028,25 @@
                                    data-validation="emailOrEmpty server"
                                    data-validation-url="/validateUniqueEmail.php"
                             >
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactSupportLevel">
+
+                            <select name="form[contact][{contactID}][supportLevel]"
+                                    data-validation="atLeastOneMain"
+                                    data-type="mainSelector"
+                                    data-except="$('#referred').prop('checked') || prospectFlag"
+                            >
+                                <!-- BEGIN supportLevelBlock -->
+                                <option {supportLevelSelected}
+                                        data-test="{supportLevelSelected}"
+                                        value="{supportLevelValue}"
+                                >
+                                    {supportLevelDescription}
+                                </option>
+                                <!-- END supportLevelBlock -->
+                            </select>
                         </div>
                     </td>
                     <td class="center ">
@@ -2265,25 +2286,7 @@
                             />
                         </div>
                     </td>
-                    <td>
-                        <div class="contactSupportLevel">
 
-                            <select name="form[contact][{contactID}][supportLevel]"
-                                    data-validation="atLeastOneMain"
-                                    data-type="mainSelector"
-                                    data-except="$('#referred').prop('checked') || prospectFlag"
-                            >
-                                <!-- BEGIN supportLevelBlock -->
-                                <option {supportLevelSelected}
-                                        data-test="{supportLevelSelected}"
-                                        value="{supportLevelValue}"
-                                >
-                                    {supportLevelDescription}
-                                </option>
-                                <!-- END supportLevelBlock -->
-                            </select>
-                        </div>
-                    </td>
                     <td>
                         <div class="contactHR">
 

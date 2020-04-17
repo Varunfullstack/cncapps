@@ -553,6 +553,11 @@ class CTCustomer extends CTCNC
                     ($this->dsContact->getValue(DBEContact::lastName))
                 ) {
                     $this->dsContact->post();
+                    if ($this->dsContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelMain) {
+                        $dbeCustomer = new DBECustomer($this);
+                        $dbeCustomer->getRow($this->dsContact->getValue(DBEContact::customerID));
+                        $dbeCustomer->setValue(DBECustomer::primaryMainContactID, $this->dsContact->getPKValue());
+                    }
                 }
             } else {
                 $this->dsContact->post();  // Existing contact
@@ -1102,15 +1107,14 @@ class CTCustomer extends CTCNC
                 $buCustomer = new BUCustomer($this);
                 $buCustomer->getActiveCustomers($dsResult);
                 $customers = [];
+                $buCustomer->getCustomersByNameMatch($dsResult, null, null, $term);
                 while ($dsResult->fetchNext()) {
-                    if (preg_match('/.*' . $term . '.*/i', $dsResult->getValue(DBECustomer::name))) {
-                        $customers[] = [
-                            "id"   => $dsResult->getValue(DBECustomer::customerID),
-                            "label" => $dsResult->getValue(DBECustomer::name),
-                            "value" => $dsResult->getValue(DBECustomer::name),
-                        ];
-                    }
+                    $customers[] = [
+                        "id"   => $dsResult->getValue(DBECustomer::customerID),
+                        "name" => $dsResult->getValue(DBECustomer::name),
+                    ];
                 }
+
                 echo json_encode($customers);
                 break;
             default:
@@ -2976,7 +2980,7 @@ class CTCustomer extends CTCNC
                         ),
                         'customerContract'    => $dsPortalCustomerDocument->getValue(
                             DBEPortalCustomerDocument::customerContract
-                        ) ? 'Y': 'N',
+                        ) ? 'Y' : 'N',
                         'mainContactOnlyFlag' => $dsPortalCustomerDocument->getValue(
                             DBEPortalCustomerDocument::mainContactOnlyFlag
                         ),

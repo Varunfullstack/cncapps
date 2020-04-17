@@ -401,13 +401,20 @@ class CTCurrentActivityReport extends CTCNC
         );
 
         $this->setPageTitle('Pending Reopened Description');
+        $pendingReopenedID = $this->getParam('pendingReopenedID');
+        if (!$pendingReopenedID) {
+            throw new Exception('Pending reopened ID is missing');
+        }
+
+        $dbePendingReopened = new DBEPendingReopened($this);
+        $dbePendingReopened->getRow($pendingReopenedID);
 
         $this->template->set_var(
             array(
                 'details' => str_replace(
                     "\n",
                     "<br/>",
-                    $_REQUEST['reason']
+                    $dbePendingReopened->getValue(DBEPendingReopened::reason)
                 )
             )
         );
@@ -528,9 +535,9 @@ class CTCurrentActivityReport extends CTCNC
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action'  => 'pendingReopenedPopup',
-                            'reason'  => $pendingReopenedRequest['reason'],
-                            'htmlFmt' => CT_HTML_FMT_POPUP
+                            'action'            => 'pendingReopenedPopup',
+                            'pendingReopenedID' => $pendingReopenedRequest['id'],
+                            'htmlFmt'           => CT_HTML_FMT_POPUP
                         )
                     );
                 $this->template->set_var(
@@ -541,7 +548,11 @@ class CTCurrentActivityReport extends CTCNC
                         "pendingReopenPriority"           => $pendingReopenedPriority,
                         "pendingReopenDescriptionURL"     => $pendingReopenDescriptionURL,
                         "pendingReopenDescriptionSummary" => $pendingReopenDescriptionSummary,
-                        "pendingReopenedID"               => $pendingReopenedRequest['id']
+                        "pendingReopenedID"               => $pendingReopenedRequest['id'],
+                        "receivedDate"                    => $pendingReopenedRequest['createdAt'],
+                        "pendingReopenedCustomerID"       => $pendingReopenedRequest['customerID'],
+                        "pendingReopenedContactID"        => $pendingReopenedRequest['contactID'],
+                        "base64Reason"                    => base64_encode($pendingReopenedRequest['reason']),
 
                     ]
                 );
@@ -1339,7 +1350,7 @@ class CTCurrentActivityReport extends CTCNC
 
                     $bgColour = self::GREEN; /// green
 
-                } elseif ($percentageSLA > 0.75 AND $percentageSLA < 1) {
+                } elseif ($percentageSLA > 0.75 and $percentageSLA < 1) {
 
                     $bgColour = self::AMBER; // amber
 

@@ -53,7 +53,11 @@ try
             foreach ($device in $devices)
             {
                 $DeviceInfo = $device | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'Email'; Expression = { $UserPrincipalName } }, DeviceType, DeviceModel, DeviceFriendlyName, DeviceOS, @{ Name = 'FirstSyncTime'; Expression = { "{0:dd-MM-yyyy HH.mm}" -f $_.FirstSyncTime } }, @{ Name = 'LastSuccessSync'; Expression = { "{0:dd-MM-yyyy HH.mm}" -f $_.LastSuccessSync } }
-                $DevicesReport += $DeviceInfo
+
+                if ($DeviceInfo.DeviceOs -Notlike '*Windows*')
+                {
+                    $DevicesReport += $DeviceInfo
+                }
             }
         }
 
