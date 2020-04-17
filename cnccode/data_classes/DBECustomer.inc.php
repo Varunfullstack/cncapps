@@ -472,9 +472,9 @@ class DBECustomer extends DBCNCEntity
     {
 
         $this->setMethodName("getRowsByNameMatch");
-        if (!$contact && !$phoneNo && !$name && !$address && !$newCustomerFromDate && !$newCustomerToDate && !$droppedCustomerFromDate && !$droppedCustomerToDate) {
-            $this->raiseError('Either contact, phone, customer name, address or dates must be set');
-        }
+//        if (!$contact && !$phoneNo && !$address && !$newCustomerFromDate && !$newCustomerToDate && !$droppedCustomerFromDate && !$droppedCustomerToDate) {
+//            $this->raiseError('Either contact, phone, customer name, address or dates must be set');
+//        }
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName();

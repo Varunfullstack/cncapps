@@ -420,6 +420,22 @@
                 >
             </div>
         </td>
+        <td>
+            <div class="contactSupportLevel">
+                <select name="form[contact][0][supportLevel]"
+                        data-validation="atLeastOneMain"
+                        data-type="mainSelector"
+                        data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                >
+                    <!-- BEGIN templateSupportLevelBlock -->
+                    <option value="{supportLevelValue}"
+                    >
+                        {supportLevelDescription}
+                    </option>
+                    <!-- END templateSupportLevelBlock -->
+                </select>
+            </div>
+        </td>
         <td class="center ">
             <div class="contactPassword">
             </div>
@@ -607,22 +623,7 @@
                 />
             </div>
         </td>
-        <td>
-            <div class="contactSupportLevel">
-                <select name="form[contact][0][supportLevel]"
-                        data-validation="atLeastOneMain"
-                        data-type="mainSelector"
-                        data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
-                >
-                    <!-- BEGIN templateSupportLevelBlock -->
-                    <option value="{supportLevelValue}"
-                    >
-                        {supportLevelDescription}
-                    </option>
-                    <!-- END templateSupportLevelBlock -->
-                </select>
-            </div>
-        </td>
+
         <td>
             <div class="contactHR">
                 <input type="checkbox"
@@ -710,6 +711,12 @@
                        autocomplete="off"
                 />
             </div>
+        </td>
+        <td class="contactSpecialAttention">
+            <input type="checkbox"
+                   name="form[contact][0][specialAttentionContactFlag]"
+                   value="Y"
+            >
         </td>
     </tr>
 </script>
@@ -1446,7 +1453,7 @@
 
         if ({customerID} && !document.getElementById('prospectFlag').checked) {
             const primaryMainContactSelector = $('#primaryMainContactSelector');
-            const value = $('#primaryMainContactSelector').val();
+            const value = +$('#primaryMainContactSelector').val();
 
             const mainContactsSelect = $('.contactSupportLevel select option:selected[value="main"]').parent('select');
             if (!value) {

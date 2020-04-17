@@ -1,31 +1,8 @@
 <!-- Template: DespatchSearch.inc.html -->
 <script>
-    const autocompleteURL = "/Customer.php?action=searchName";
     $(function () {
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('[name="customerID"]').val(ui.item.id);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
         });
     });
 
@@ -55,6 +32,7 @@
                     type="hidden"
                     name="customerID"
                     value="{customerID}"
+                    id="customerID"
             > <input
                     type="text"
                     name="customerString"
@@ -62,6 +40,7 @@
                     id="customerString"
                     size="50"
                     maxlength="50"
+                    customer-search
             > <font class="formErrorMessage"> {customerStringMessage} </font></td>
         </tr>
         <tr>

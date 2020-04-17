@@ -79,10 +79,14 @@
                             data: data
                         }
                     ).then(response => {
-                        if(response.length && response[0].label){
-                            return responseCB(response);
+                        if (response.length > 40) {
+                            response = response.slice(0, 40);
+                            response.unshift({
+                                id: -1,
+                                name: 'Keep typing to filter, there are more results not shown here'
+                            });
                         }
-                        responseCB(response.map(item => ({label: item.name, value: item.id})));
+                        responseCB(response.map(x => ({label: x.name, value: x.id})));
                     })
 
                 },
@@ -90,7 +94,7 @@
                 select: function (event, ui) {
                     event.preventDefault();
                     event.target.value = ui.item.label;
-                    performSearch(ui.item.value, i);
+                    performSearch(ui.item.label, i);
                 }
             }).focus(function () {
                 $(this).autocomplete("search", $(this).val());

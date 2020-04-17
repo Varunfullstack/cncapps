@@ -401,13 +401,20 @@ class CTCurrentActivityReport extends CTCNC
         );
 
         $this->setPageTitle('Pending Reopened Description');
+        $pendingReopenedID = $this->getParam('pendingReopenedID');
+        if (!$pendingReopenedID) {
+            throw new Exception('Pending reopened ID is missing');
+        }
+
+        $dbePendingReopened = new DBEPendingReopened($this);
+        $dbePendingReopened->getRow($dbePendingReopened);
 
         $this->template->set_var(
             array(
                 'details' => str_replace(
                     "\n",
                     "<br/>",
-                    $_REQUEST['reason']
+                    $dbePendingReopened->getValue(DBEPendingReopened::reason)
                 )
             )
         );
@@ -528,9 +535,9 @@ class CTCurrentActivityReport extends CTCNC
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action'  => 'pendingReopenedPopup',
-                            'reason'  => $pendingReopenedRequest['reason'],
-                            'htmlFmt' => CT_HTML_FMT_POPUP
+                            'action'            => 'pendingReopenedPopup',
+                            'pendingReopenedID' => $pendingReopenedRequest['id'],
+                            'htmlFmt'           => CT_HTML_FMT_POPUP
                         )
                     );
                 $this->template->set_var(

@@ -14,33 +14,11 @@
             document.searchForm.submit();
         }
     }
-    const autocompleteURL = "/Customer.php?action=searchName";
+
     $(function () {
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
-        });
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
+        })
     });
 
     function createQuote() {
@@ -83,19 +61,21 @@
             >
                 <div align="right">Customer</div>
             </td>
-            <td><input
-                    type="hidden"
-                    name="customerID"
-                    id="customerID"
-                    value="{customerID}"
-            > <input
-                    type="text"
-                    name="customerString"
-                    id="customerString"
-                    value="{customerString}"
-                    size="50"
-                    maxlength="50"
-            > <font class="formErrorMessage"> {customerStringMessage} </font></td>
+            <td>
+                <input
+                        type="hidden"
+                        name="customerID"
+                        id="customerID"
+                        value="{customerID}"
+                >
+                <input type="text"
+                       name="customerString"
+                       id="customerString"
+                       value="{customerString}"
+                       size="50"
+                       maxlength="50"
+                       customer-search
+                > <font class="formErrorMessage"> {customerStringMessage} </font></td>
         </tr>
         <tr>
             <td class="promptText">
