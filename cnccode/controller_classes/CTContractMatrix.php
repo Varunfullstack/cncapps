@@ -8,6 +8,7 @@
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
+require_once($cfg['path_bu'] . '/BURenewal.inc.php');
 
 class CTContractMatrix extends CTCNC
 {
@@ -59,19 +60,30 @@ class CTContractMatrix extends CTCNC
                 }
 
                 while ($dsCustomers->fetchNext()) {
-                    $data[] = ["Customer Name" => $dsCustomers->getValue(DBECustomer::name)];
+
+                    $urlEncodedCustomerName = urlencode($dsCustomers->getValue(DBECustomer::name));
+                    $customerId = $dsCustomers->getValue(DBECustomer::customerID);
+                    $customerRenewalReportURL = "RenewalReport.php?action=search&searchForm[1][customerID]=$customerId&customerString=$urlEncodedCustomerName&Search=Generate";
+                    $row = [
+                        "Customer Name" => "<a href='$customerRenewalReportURL' target='_blank'>{$dsCustomers->getValue(DBECustomer::name)}</a>"
+                    ];
+
+                    foreach ($itemTypes as $itemType) {
+                        $row[$itemType] = null;
+                    }
+
                     $items = $buRenewal->getRenewalsAndExternalItemsByCustomer(
                         $dsCustomers->getValue(DBECustomer::customerID),
                         $this,
                         true
                     );
-                    foreach ($items as $item){
-                        if($item['itemTypeDescription']){}
+                    foreach ($items as $item) {
+                        if (in_array($item['itemTypeDescription'], $itemTypes)) {
+                            $row[$item['itemTypeDescription']] = "<a href='{$item['linkURL']}' target='_blank' >Yes</a>";
+                        }
                     }
-
+                    $data[] = $row;
                 }
-
-                $customerItem = new BUCustomerItem($this);
 
                 echo json_encode(
                     $data
