@@ -62,7 +62,12 @@
                 select: function (event, ui) {
                     event.preventDefault();
                     event.target.value = ui.item.label;
-                    performSearch(ui.item.value, i);
+                    performSearch(ui.item.label, i);
+                },
+                focus: function (event, ui) {
+                    event.preventDefault();
+                    event.target.value = ui.item.label;
+                    return false;
                 }
             }).focus(function () {
                 $(this).autocomplete("search", $(this).val());
