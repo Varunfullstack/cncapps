@@ -407,7 +407,7 @@ class CTCurrentActivityReport extends CTCNC
         }
 
         $dbePendingReopened = new DBEPendingReopened($this);
-        $dbePendingReopened->getRow($dbePendingReopened);
+        $dbePendingReopened->getRow($pendingReopenedID);
 
         $this->template->set_var(
             array(
