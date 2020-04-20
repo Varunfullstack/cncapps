@@ -368,7 +368,7 @@ class CTCNC extends Controller
 
 
         if ($this->isUserSDManager()) {
-            $section = $menu->addSection("SDManagement", 'fa-laptop', "SD Management");
+            $section = $menu->addSection("SDManagement", 'fa-tasks', "SD Management");
             $section->addItemsFromArray($this->getDefaultSDManagerMenu());
         }
 

@@ -194,6 +194,8 @@ class CTCustomer extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+
+        $this->setMenuId(302);
         $this->buCustomer = new BUCustomer($this);
         $this->dsContact = new DataSet($this);
         $this->dsContact->copyColumnsFrom($this->buCustomer->dbeContact);
@@ -1105,7 +1107,7 @@ class CTCustomer extends CTCNC
                 while ($dsResult->fetchNext()) {
                     if (preg_match('/.*' . $term . '.*/i', $dsResult->getValue(DBECustomer::name))) {
                         $customers[] = [
-                            "id"   => $dsResult->getValue(DBECustomer::customerID),
+                            "id"    => $dsResult->getValue(DBECustomer::customerID),
                             "label" => $dsResult->getValue(DBECustomer::name),
                             "value" => $dsResult->getValue(DBECustomer::name),
                         ];
@@ -2976,7 +2978,7 @@ class CTCustomer extends CTCNC
                         ),
                         'customerContract'    => $dsPortalCustomerDocument->getValue(
                             DBEPortalCustomerDocument::customerContract
-                        ) ? 'Y': 'N',
+                        ) ? 'Y' : 'N',
                         'mainContactOnlyFlag' => $dsPortalCustomerDocument->getValue(
                             DBEPortalCustomerDocument::mainContactOnlyFlag
                         ),
