@@ -118,6 +118,7 @@ class CTProject extends CTCNC
         );
 
         $this->dsProject->setAddColumnsOff();
+        $this->setMenuId(107);
     }
 
     /**

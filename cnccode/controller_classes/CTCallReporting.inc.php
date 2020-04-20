@@ -14,6 +14,7 @@ class CTCallReporting extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $this->setMenuId(209);
     }
 
     /**

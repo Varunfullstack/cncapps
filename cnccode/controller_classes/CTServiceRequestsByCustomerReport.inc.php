@@ -44,6 +44,7 @@ class CTServiceRequestsByCustomerReport extends CTCNC
                 exit;
             }
         }
+        $this->setMenuId(213);
         $this->buActivity = new BUActivity($this);
     }
 

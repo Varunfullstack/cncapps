@@ -21,6 +21,7 @@ class CTSRScheduler extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
+        $this->setMenuId(205);
     }
 
     function delete()
@@ -214,7 +215,7 @@ class CTSRScheduler extends CTCNC
         return $row;
     }
 
-    private function getAssociatedObjectData($id, $collectionName, Callable $getDataFunction)
+    private function getAssociatedObjectData($id, $collectionName, callable $getDataFunction)
     {
         if (!isset($this->cache[$collectionName])) {
             $this->cache[$collectionName] = [];

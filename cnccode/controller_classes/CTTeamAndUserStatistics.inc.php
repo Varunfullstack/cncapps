@@ -44,6 +44,7 @@ class CTTeamAndUserStatistics extends CTCNC
                 exit;
             }
         }
+        $this->setMenuId(207);
         $this->buEscalationReport = new BUEscalationReport($this);
 
         $this->dsSearchForm = new DSForm ($this);

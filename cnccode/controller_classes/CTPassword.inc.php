@@ -50,7 +50,7 @@ class CTPassword extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
-        $this->template->setVar("menuId", 104);
+        $this->setMenuId(104);
         $this->buPassword = new BUPassword($this);
     }
 
@@ -682,4 +682,5 @@ class CTPassword extends CTCNC
         $this->parsePage();
 
     }
+
 }// end of class

@@ -47,6 +47,7 @@ class CTQuestionnaire extends CTCNC
         $this->dsQuestionnaire->copyColumnsFrom($this->buQuestionnaire->dbeQuestionnaire);
         $this->dsQuestion = new DSForm($this);
         $this->dsQuestion->copyColumnsFrom($this->buQuestionnaire->dbeQuestion);
+        $this->setMenuId(215);
     }
 
     /**

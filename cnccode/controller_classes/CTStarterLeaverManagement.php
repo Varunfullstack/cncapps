@@ -31,6 +31,7 @@ class CTStarterLeaverManagement extends CTCNC
         );
         $this->dsStandardText = new DSForm($this);
         $this->dsStandardText->copyColumnsFrom(new DBEStarterLeaverQuestion($this));
+        $this->setMenuId(114);
     }
 
     /**

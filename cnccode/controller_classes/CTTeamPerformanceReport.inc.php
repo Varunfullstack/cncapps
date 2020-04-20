@@ -41,6 +41,7 @@ class CTTeamPerformanceReport extends CTCNC
             }
         }
         $this->buTeamPerformance = new BUTeamPerformance ($this);
+        $this->setMenuId(208);
     }
 
     /**

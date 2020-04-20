@@ -38,6 +38,7 @@ class CTUtilityEmail extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(217);
         $this->buActivity = new BUActivity($this);
     }
 

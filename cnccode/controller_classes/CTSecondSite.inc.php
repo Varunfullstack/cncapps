@@ -38,6 +38,7 @@ class CTSecondSite extends CTCNC
         $this->buSecondsite = new BUSecondsite($this);
         $this->dsSecondsiteImage = new DSForm($this);
         $this->dsSecondsiteImage->copyColumnsFrom($this->buSecondsite->dbeSecondsiteImage);
+        $this->setMenuId(108);
     }
 
     /**
@@ -243,6 +244,7 @@ class CTSecondSite extends CTCNC
     function failureAnalysis()
     {
         global $cfg;
+        $this->setMenuId(210);
 
         if (!$this->isUserSDManager()) {
             $roles = [

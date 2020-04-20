@@ -45,6 +45,7 @@ class CTCustomerSrAnalysisReport extends CTCNC
                 exit;
             }
         }
+        $this->setMenuId(212);
         $this->buCustomerSrAnalysisReport = new BUCustomerSrAnalysisReport ($this);
     }
 

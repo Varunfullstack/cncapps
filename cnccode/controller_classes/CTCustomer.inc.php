@@ -3232,7 +3232,7 @@ class CTCustomer extends CTCNC
     function display24HourSupportCustomers()
     {
         $this->setMethodName('display24HourSupportCustomers');
-
+        $this->setMenuId(111);
         $this->setPageTitle("24 Hour Support Customers");
         $dsCustomer = new DataSet($this);
         if ($this->buCustomer->get24HourSupportCustomers($dsCustomer)) {
@@ -3306,7 +3306,7 @@ class CTCustomer extends CTCNC
     function displaySpecialAttentionCustomers()
     {
         $this->setMethodName('displaySpecialAttentionCustomers');
-
+        $this->setMenuId(112);
         $this->setPageTitle("Special Attention Customers");
         global $cfg;
         $customerTemplate = new Template (

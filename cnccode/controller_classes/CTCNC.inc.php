@@ -540,11 +540,6 @@ class CTCNC extends Controller
                 "href"  => "Customer.php?action=displaySpecialAttentionCustomers",
                 "label" => "Special Attention Customers",
             ],
-            [
-                "id"    => 113,
-                "href"  => "SalesOrder.php",
-                "label" => "Sales Orders",
-            ],
         ];
     }
 
@@ -610,7 +605,7 @@ class CTCNC extends Controller
             [
                 "id"    => 207,
                 "label" => "Team And User Statistics",
-                "href"  => "Escalation.php"
+                "href"  => "TeamAndUserStatistics.php"
 
             ],
             [
@@ -1125,5 +1120,10 @@ class CTCNC extends Controller
     protected function isSdManager()
     {
         return $this->dbeUser->getValue(DBEJUser::receiveSdManagerEmailFlag) == 'Y';
+    }
+
+    protected function setMenuId(int $int)
+    {
+        $this->template->setVar('menuId', $int);
     }
 }

@@ -412,6 +412,7 @@ class CTSalesOrder extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(301);
         $this->buCustomer = new BUCustomer($this);
         $this->buSalesOrder = new BUSalesOrder($this);
         $this->buItem = new BUItem($this);

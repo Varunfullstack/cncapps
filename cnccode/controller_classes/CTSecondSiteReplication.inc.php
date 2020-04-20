@@ -33,6 +33,7 @@ class CTSecondSiteReplication extends CTSecondSite
         }
         $this->buSecondsite = new BUSecondsiteReplication($this);
         $this->dsSecondsiteImage->copyColumnsFrom($this->buSecondsite->dbeSecondsiteImage);
+        $this->setMenuId(109);
     }
 
     /**

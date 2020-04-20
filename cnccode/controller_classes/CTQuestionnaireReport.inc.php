@@ -33,6 +33,8 @@ class CTQuestionnaireReport extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+
+        $this->setMenuId(216);
         $this->buQuestionnaireReport = new BUQuestionnaireReport($this);
 
         $this->dsSearchForm = new DSForm ($this);
