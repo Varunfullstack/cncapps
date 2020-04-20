@@ -550,13 +550,19 @@ class CTUser extends CTCNC
                         $dsUser->getValue(DBEJUser::perms),
                         PHPLIB_PERM_SALES
                     ) !== FALSE) ? CT_CHECKED : null,
-
-                'accountsChecked' => (strpos(
+                'accountManagementChecked'                   => (strpos(
+                        $dsUser->getValue(DBEJUser::perms),
+                        ACCOUNT_MANAGEMENT_PERMISSION
+                    ) !== FALSE) ? CT_CHECKED : null,
+                'seniorManagementChecked'                          => (strpos(
+                        $dsUser->getValue(DBEJUser::perms),
+                        SENIOR_MANAGEMENT_PERMISSION0
+                    ) !== FALSE) ? CT_CHECKED : null,
+                'accountsChecked'                            => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
                         PHPLIB_PERM_ACCOUNTS
                     ) !== FALSE) ? CT_CHECKED : null,
-
-                'technicalChecked' => (strpos(
+                'technicalChecked'                           => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
                         PHPLIB_PERM_TECHNICAL
                     ) !== FALSE) ? CT_CHECKED : null,
@@ -596,7 +602,7 @@ class CTUser extends CTCNC
                 'offsiteBackupAdditionalPermissionsFlagChecked' => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::offsiteBackupAdditionalPermissionsFlag)
                 ),
-                'additionalTimeLevelApproverChecked'                 => $dsUser->getValue(
+                'additionalTimeLevelApproverChecked'            => $dsUser->getValue(
                     DBEUser::additionalTimeLevelApprover
                 ) ? 'checked' : null,
                 'reportsChecked'                                => (strpos(

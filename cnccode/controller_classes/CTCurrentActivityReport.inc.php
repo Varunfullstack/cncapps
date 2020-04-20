@@ -459,7 +459,7 @@ class CTCurrentActivityReport extends CTCNC
     {
 
         $this->setMethodName('displayReport');
-
+        $this->template->setVar("menuId", 103);
         unset($this->customerFilterList);   // for the customer filter drop-down (limited to customers with SRs)
 
         $this->setTemplateFiles(

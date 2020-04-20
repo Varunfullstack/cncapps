@@ -331,6 +331,7 @@ class CTCNC extends Controller
     function parsePage()
     {
         global $userName;
+        $menu = new \CNCLTD\SideMenu();
 
 
         $urlLogout = Controller::buildLink(
@@ -348,165 +349,100 @@ class CTCNC extends Controller
             $userName = $dbeUser->getValue(DBEUser::name);
         }
 
-        $screenSalesTemplate = 'ScreenSales.inc';
-        $screenAccountsTemplate = 'ScreenAccounts.inc';
-        $screenTechnicalTemplate = 'ScreenTechnical.inc';
-        $screenRenewalsTemplate = 'ScreenRenewals.inc';
-        $screenMaintenanceTemplate = 'ScreenMaintenance.inc';
-        $screenReportsTemplate = 'ScreenReports.inc';
-        $screenCustomerTemplate = 'ScreenCustomer.inc';
-
-
-        if ($this->getParam('oldMenu')) {
-            $screenSalesTemplate = 'ScreenSalesOld.inc';
-            $screenAccountsTemplate = 'ScreenAccountsOld.inc';
-            $screenTechnicalTemplate = 'ScreenTechnicalOld.inc';
-            $screenRenewalsTemplate = 'ScreenRenewalsOld.inc';
-            $screenMaintenanceTemplate = 'ScreenMaintenanceOld.inc';
-            $screenReportsTemplate = 'ScreenReportsOld.inc';
-            $screenCustomerTemplate = 'ScreenCustomerOld.inc';
-        }
-
         $this->template->set_var(array('userName' => $userName, 'fromDate' => null, 'urlLogout' => $urlLogout));
-        // display correct menus depending upon permission levels for this user
-        if ($this->hasPermissions(PHPLIB_PERM_SALES)) {
 
-            $this->setTemplateFiles(array('ScreenSales' => $screenSalesTemplate));
-
-            if ($dbeUser->getValue(DBEUser::createRenewalSalesOrdersFlag) == 'Y') {
-                $this->template->setVar(
-                    [
-                        "createRenewalSalesOrders" =>
-                            "<TR>
-    <TD align=\"left\"
-        nowrap=\"nowrap\"
-    >
-        <a href=\"CreateRenewalSalesOrdersManager.php\">Create Renewal Sales Orders</a>
-    </TD>
-</TR>"
-                    ]
-                );
-            }
-
-            $this->template->parse(
-                'screenSales',
-                'ScreenSales',
-                true
-            );
-        }
-        if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
-            $this->setTemplateFiles(array('ScreenAccounts' => $screenAccountsTemplate));
-            $this->template->parse(
-                'screenAccounts',
-                'ScreenAccounts',
-                true
-            );
-        }
         if ($this->hasPermissions(PHPLIB_PERM_TECHNICAL)) {
-            $this->setTemplateFiles(array('ScreenTechnical' => $screenTechnicalTemplate));
-            if ($this->isUserSDManager()) {
-
-                $scheduleRequestText = 'Schedule';
-                $sdManagerTechnical = new Template (
-                    $GLOBALS ["cfg"] ["path_templates"],
-                    "remove"
-                );
-                $sdManagerTechnical->set_file(
-                    'sdManagerTemplate',
-                    'ScreenTechnicalSD.inc.html'
-                );
-                $sdManagerTechnical->parse(
-                    'output',
-                    'sdManagerTemplate'
-                );
-                $sdManagerTemplateText = $sdManagerTechnical->get('output');
-
-                $this->template->setVar(
-                    [
-                        'technicalSD'         => $sdManagerTemplateText,
-                        'scheduleRequestText' => $scheduleRequestText
-                    ]
-                );
-            }
-
-            if ($this->dbeUser->getValue(DBEUser::starterLeaverQuestionManagementFlag) == 'Y') {
-
-                $this->template->setVar(
-                    'starterLeaverMenu',
-                    '<TR>
-    <TD style="text-align: left"
-        nowrap="nowrap"
-    >
-        <A href="StarterLeaverManagement.php"
-        >Starter Leaver Management</a>
-    </TD>
-</TR>'
-                );
-            }
-
-            $this->template->parse(
-                'screenTechnical',
-                'ScreenTechnical',
-                true
-            );
-
+            $section = $menu->addSection("Technical", 'fa-laptop');
+            $section->addItemsFromArray($this->getDefaultTechnicalMenu());
         }
-        if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
-            $this->setTemplateFiles(array('ScreenRenewals' => $screenRenewalsTemplate));
-            $this->template->parse(
-                'screenRenewals',
-                'ScreenRenewals',
-                true
-            );
+
+        $this->addConditionalMenu(
+            $menu,
+            'fa-laptop',
+            "Technical",
+            $this->dbeUser->getValue(DBEUser::starterLeaverQuestionManagementFlag) == 'Y',
+            114,
+            "Starter Leaver Management",
+            "StarterLeaverManagement.php"
+        );
+
+
+        if ($this->isUserSDManager()) {
+            $section = $menu->addSection("SDManagement", 'fa-laptop', "SD Management");
+            $section->addItemsFromArray($this->getDefaultSDManagerMenu());
         }
-        if ($this->hasPermissions(PHPLIB_PERM_MAINTENANCE)) {
-            $this->setTemplateFiles(array('ScreenMaintenance' => $screenMaintenanceTemplate));
-            if ($this->isAppraiser()) {
 
-                $sdManagerTechnical = new Template (
-                    $GLOBALS ["cfg"] ["path_templates"],
-                    "remove"
-                );
-                $sdManagerTechnical->set_file(
-                    'appraisalScreen',
-                    'ScreenMaintenanceAppraiser.inc.html'
-                );
-                $sdManagerTechnical->parse(
-                    'output',
-                    'appraisalScreen'
-                );
-                $sdManagerTemplateText = $sdManagerTechnical->get('output');
+        $this->addConditionalMenu(
+            $menu,
+            'fa-tag',
+            "SDManagement",
+            $this->dbeUser->getValue(DBEUser::staffAppraiserFlag),
+            223,
+            "Staff Appraisals",
+            "StaffAppraisalQuestionnaire.php",
+            "SD Management"
+        );
 
-                $this->template->setVar(
-                    'appraiserScreen',
-                    $sdManagerTemplateText
-                );
 
-            }
-            $this->template->parse(
-                'screenMaintenance',
-                'ScreenMaintenance',
-                true
-            );
-
+        if ($this->hasPermissions(PHPLIB_PERM_SALES)) {
+            $section = $menu->addSection("Sales", 'fa-tag');
+            $section->addItemsFromArray($this->getDefaultSalesMenu());
         }
+
+        $this->addConditionalMenu(
+            $menu,
+            'fa-tag',
+            "Sales",
+            $this->dbeUser->getValue(DBEUser::createRenewalSalesOrdersFlag) == 'Y',
+            223,
+            "Create Renewals Sales Orders",
+            "CreateRenewalSalesOrdersManager.php"
+        );
+
+        if ($this->hasPermissions(ACCOUNT_MANAGEMENT_PERMISSION)) {
+            $section = $menu->addSection('AccountManagement', 'fa-th', "Account Management");
+            $section->addItemsFromArray($this->getDefaultAccountManagementMenu());
+        }
+
         if ($this->hasPermissions(PHPLIB_PERM_REPORTS)) {
-            $this->setTemplateFiles(array('ScreenReports' => $screenReportsTemplate));
-            $this->template->parse(
-                'screenReports',
-                'ScreenReports',
-                true
-            );
-        }
-        if ($this->hasPermissions(PHPLIB_PERM_CUSTOMER)) {
-            $this->setTemplateFiles(array('ScreenCustomer' => $screenCustomerTemplate));
-            $this->template->parse(
-                'screenCustomer',
-                'ScreenCustomer',
-                true
-            );
+            $section = $menu->addSection('Reports', "fa-file");
+            $section->addItemsFromArray($this->getDefaultReportsMenu());
         }
 
+        if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
+            $section = $menu->addSection('ServiceRenewals', 'fa-th', "Service Renewals");
+            $section->addItemsFromArray($this->getDefaultServiceRenewalsMenu());
+        }
+
+        if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
+            $section = $menu->addSection('Accounts', 'fa-calculator');
+            $section->addItemsFromArray($this->getDefaultAccountsMenu());
+        }
+
+        if ($this->hasPermissions(PHPLIB_PERM_MAINTENANCE)) {
+            $section = $menu->addSection("Maintenance", 'fa-wrench');
+            $section->addItemsFromArray($this->getDefaultMaintenanceMenu());
+        }
+
+        if ($this->hasPermissions(SENIOR_MANAGEMENT_PERMISSION0)) {
+            $section = $menu->addSection("Management", 'fa-wrench');
+            $section->addItemsFromArray($this->getDefaultManagementMenu());
+        }
+
+
+        $this->addConditionalMenu(
+            $menu,
+            'fa-wrench',
+            "Management",
+            $this->dbeUser->getValue(DBEUser::isExpenseApprover) || $dbeUser->getValue(DBEUser::globalExpenseApprover),
+            906,
+            "Expenses/Overtime",
+            "ExpenseDashboard.php"
+        );
+
+        global $twig;
+        $sideMenu = $twig->render('@internal/sideMenu/sideMenuItems.html.twig', ["sideMenu" => $menu]);
+        $this->template->setVar("sideMenu", $sideMenu);
         parent::parsePage();
     }
 
@@ -538,15 +474,561 @@ class CTCNC extends Controller
         return true;
     }
 
+    private function getDefaultTechnicalMenu()
+    {
+        return [
+            [
+                "id"    => 101,
+                "href"  => "Activity.php?action=activityCreate1",
+                "label" => "Log Request",
+            ],
+            [
+                "id"    => 102,
+                "href"  => "Activity.php",
+                "label" => "Search Service Requests",
+            ],
+            [
+                "id"    => 103,
+                "href"  => "CurrentActivityReport.php?action=setFilter&selectedCustomerID=",
+                "label" => "Current Service Requests",
+            ],
+            [
+                "id"    => 104,
+                "href"  => "Password.php",
+                "label" => "Passwords",
+            ],
+            [
+                "id"         => 105,
+                "href"       => "#",
+                "label"      => "Generate Password",
+                "attributes" => [
+                    "onclick" => "window.open('Password.php?action=generate&htmlFmt=popup','reason','scrollbars=yes,resizable=yes,height=524,width=855,copyhistory=no, menubar=0' )",
+                ],
+            ],
+            [
+                "id"    => 106,
+                "href"  => "CustomerItem.php",
+                "label" => "Customer Items",
+            ],
+            [
+                "id"    => 107,
+                "href"  => "Project.php",
+                "label" => "Projects",
+            ],
+            [
+                "id"    => 108,
+                "href"  => "OffsiteBackupStatus.php",
+                "label" => "Offsite Backup Status",
+            ],
+            [
+                "id"    => 109,
+                "href"  => "OffsiteBackupReplicationStatus.php",
+                "label" => "Offsite Backup Replication Status",
+            ],
+            [
+                "id"    => 110,
+                "href"  => "DailyReport.php?action=outstandingIncidents&onScreen=true&dashboard=true&daysAgo=7",
+                "label" => "7 Dayers",
+            ],
+            [
+                "id"    => 111,
+                "href"  => "Customer.php?action=display24HourSupportCustomers",
+                "label" => "24 Hour Support Customers",
+            ],
+            [
+                "id"    => 112,
+                "href"  => "Customer.php?action=displaySpecialAttentionCustomers",
+                "label" => "Special Attention Customers",
+            ],
+            [
+                "id"    => 113,
+                "href"  => "SalesOrder.php",
+                "label" => "Sales Orders",
+            ],
+        ];
+    }
+
+    private function addConditionalMenu(\CNCLTD\SideMenu $menu,
+                                        $icon,
+                                        $menuKey,
+                                        $condition,
+                                        $id,
+                                        $label,
+                                        $href,
+                                        $menuName = null
+    )
+    {
+        if (!$condition) {
+            return;
+        }
+        $section = $menu->getSection($menuKey);
+        if (!$section) {
+            $section = $menu->addSection($menuKey, $icon, $menuName);
+        }
+        $section->addItem(new \CNCLTD\MenuItem($id, $label, $href));
+    }
+
     function isUserSDManager()
     {
         return self::getDbeUser()->getValue(DBEUser::receiveSdManagerEmailFlag) == 'Y';
     }
 
-    protected
-    function isAppraiser()
+    private function getDefaultSDManagerMenu()
     {
-        return $this->dbeUser->getValue(DBEUser::staffAppraiserFlag) == 'Y';
+        return [
+            [
+                "id"    => 201,
+                "label" => "SD Manager Dashboard P5",
+                "href"  => "SDManagerDashboard.php?showP5=true&SP"
+            ],
+            [
+                "id"    => 202,
+                "label" => "Time Requests",
+                "href"  => "TimeRequestDashboard.php"
+
+            ],
+            [
+                "id"    => 203,
+                "label" => "Change Requests",
+                "href"  => "ChangeRequestDashboard.php"
+            ],
+            [
+                "id"    => 204,
+                "label" => "Sales Requests",
+                "href"  => "SalesRequestDashboard.php"
+            ],
+            [
+                "id"    => 205,
+                "label" => "Schedule Service Request",
+                "href"  => "SRScheduler.php"
+            ],
+            [
+                "id"    => 206,
+                "label" => "First Time Fix Report",
+                "href"  => "FirstTimeFixReport.php"
+            ],
+            [
+                "id"    => 207,
+                "label" => "Team And User Statistics",
+                "href"  => "Escalation.php"
+
+            ],
+            [
+                "id"    => 208,
+                "label" => "Team Performance",
+                "href"  => "TeamPerformanceReport.php"
+            ],
+            [
+                "id"    => 209,
+                "label" => "3CX Call Reporting",
+                "href"  => "CallReporting.php"
+            ],
+            [
+                "id"    => 210,
+                "label" => "Offsite Backup Failure Analysis",
+                "href"  => "OffsiteBackupStatus.php?action=failureAnalysis"
+            ],
+            [
+                "id"    => 211,
+                "label" => "Service Request Report",
+                "href"  => "ServiceRequestReport.php"
+            ],
+            [
+                "id"    => 212,
+                "label" => "Customer SR Analysis",
+                "href"  => "CustomerSrAnalysisReport.php"
+            ],
+            [
+                "id"    => 213,
+                "label" => "SRs by Customer",
+                "href"  => "ServiceRequestsByCustomerReport.php"
+            ],
+            [
+                "id"    => 214,
+                "label" => "Starters And Leavers Report",
+                "href"  => "StartersAndLeaversReport.php"
+            ],
+            [
+                "id"    => 215,
+                "label" => "Questionnaires",
+                "href"  => "Questionnaire.php"
+            ],
+            [
+                "id"    => 216,
+                "label" => "Questionnaire Report",
+                "href"  => "QuestionnaireReport.php"
+            ],
+            [
+                "id"    => 217,
+                "label" => "Utility Emails",
+                "href"  => "UtilityEmails.php"
+            ],
+            [
+                "id"    => 218,
+                "label" => "Ignored AD Domains",
+                "href"  => "IgnoredADDomains.php"
+            ],
+            [
+                "id"    => 219,
+                "label" => "OS Support Dates",
+                "href"  => "OSSupportDates.php"
+            ],
+            [
+                "id"    => 220,
+                "label" => "Office 365 Licenses",
+                "href"  => "Office365Licenses.php"
+            ],
+            [
+                "id"    => 221,
+                "label" => "Password Services",
+                "href"  => "PasswordServices.php"
+            ],
+        ];
+    }
+
+    private function getDefaultSalesMenu()
+    {
+        return [
+            [
+                "id"    => 301,
+                "label" => "Sales Orders",
+                "href"  => "SalesOrder.php",
+            ],
+            [
+                "id"    => 302,
+                "label" => "Purchase Orders",
+                "href"  => "PurchaseOrder.php",
+            ],
+            [
+                "id"    => 303,
+                "label" => "Customer Search",
+                "href"  => "Customer.php",
+            ],
+            [
+                "id"    => 304,
+                "label" => "Create Sales Request",
+                "href"  => "createSalesRequest.php",
+            ],
+            [
+                "id"    => 305,
+                "label" => "Contracts",
+                "href"  => "ContractReport.php?filter[custitem.renewalStatus]=R",
+            ],
+            [
+                "id"    => 306,
+                "label" => "Renewal Report",
+                "href"  => "RenewalReport.php",
+            ],
+            [
+                "id"    => 307,
+                "label" => "Goods In",
+                "href"  => "GoodsIn.php",
+            ],
+            [
+                "id"    => 308,
+                "label" => "Stock Levels",
+                "href"  => "StockLevel.php",
+            ],
+            [
+                "id"    => 309,
+                "label" => "PO Status Report",
+                "href"  => "POStatusReport.php",
+            ],
+            [
+                "id"    => 310,
+                "label" => "Renewals Update",
+                "href"  => "RenewalsUpdate.php",
+            ],
+            [
+                "id"    => 311,
+                "label" => "Quote Templates",
+                "href"  => "QuoteTemplates.php",
+            ],
+        ];
+    }
+
+    private function getDefaultAccountManagementMenu()
+    {
+        return [
+            [
+                "id"    => 401,
+                "label" => "My Daily Call List",
+                "href"  => "ReviewList.php",
+            ],
+            [
+                "id"    => 402,
+                "label" => "Lead Status",
+                "href"  => "LeadStatusReport.php",
+            ],
+            [
+                "id"    => 403,
+                "label" => "Customer CRM",
+                "href"  => "CustomerCRM.php",
+            ],
+            [
+                "id"    => 404,
+                "label" => "Customer Review Meetings",
+                "href"  => "CustomerReviewMeetingsReport.php",
+            ],
+            [
+                "id"    => 405,
+                "label" => "Customer Review Agenda",
+                "href"  => "CustomerReviewMeeting.php",
+            ],
+            [
+                "id"    => 406,
+                "label" => "Cust Review Meeting Docs",
+                "href"  => "CustomerReviewMeetingDocuments.php",
+            ],
+            [
+                "id"    => 407,
+                "label" => "Book Sales Visit",
+                "href"  => "BookSalesVisit.php",
+            ],
+
+        ];
+    }
+
+    private function getDefaultReportsMenu()
+    {
+        return [
+            [
+                "id"    => 501,
+                "label" => "Contact Audit Log",
+                "href"  => "ContactAudit.php",
+            ],
+            [
+                "id"    => 502,
+                "label" => "Office 365 Backup Audit",
+                "href"  => "Office365BackupAudit.php",
+            ],
+            [
+                "id"    => 503,
+                "label" => "Office 365 Storage Reports",
+                "href"  => "Office365StorageReports.php",
+            ],
+            [
+                "id"    => 504,
+                "label" => "Service Contracts Ratio",
+                "href"  => "Customer.php?action=displayContractAndNumbersReport",
+            ],
+            [
+                "id"    => 505,
+                "label" => "Sales/Customer",
+                "href"  => "ManagementReports.php?action=SalesByCustomer",
+            ],
+            [
+                "id"    => 506,
+                "label" => "Spend/Supplier",
+                "href"  => "ManagementReports.php?action=SpendBySupplier",
+            ],
+            [
+                "id"    => 507,
+                "label" => "Spend/Manufacturer",
+                "href"  => "ManagementReports.php?action=SpendByManufacturer",
+            ],
+            [
+                "id"    => 508,
+                "label" => "Quotation Conversion",
+                "href"  => "QuotationConversionReport.php",
+            ],
+            [
+                "id"    => 509,
+                "label" => "Customer Profitability Report",
+                "href"  => "CustomerProfitabilityReport.php",
+            ],
+            [
+                "id"    => 510,
+                "label" => "Customer Analysis Report",
+                "href"  => "CustomerAnalysisReport.php",
+            ],
+            [
+                "id"    => 511,
+                "label" => "Contract Analysis Report",
+                "href"  => "ContractAnalysisReport.php",
+            ],
+            [
+                "id"    => 512,
+                "label" => "Customer Profitability Export",
+                "href"  => "CustomerProfitabilityMonthsReport.php",
+            ],
+
+        ];
+    }
+
+    private function getDefaultServiceRenewalsMenu()
+    {
+        return [
+            [
+                "id"    => 601,
+                "label" => "Renewal",
+                "href"  => "RenQuotation.php?action=list&orderBy=customerName&orderDirection=asc",
+            ],
+            [
+                "id"    => 602,
+                "label" => "Contract",
+                "href"  => "RenContract.php",
+            ],
+            [
+                "id"    => 603,
+                "label" => "Internet",
+                "href"  => "RenBroadband.php",
+            ],
+            [
+                "id"    => 604,
+                "label" => "Domain",
+                "href"  => "RenDomain.php",
+            ],
+            [
+                "id"    => 605,
+                "label" => "Hosting",
+                "href"  => "RenHosting.php",
+            ],
+
+        ];
+    }
+
+    private function getDefaultAccountsMenu()
+    {
+        return [
+            [
+                "id"    => 701,
+                "label" => "Invoices",
+                "href"  => "Invoice.php",
+            ],
+            [
+                "id"    => 702,
+                "label" => "Purchase Invoice Auth",
+                "href"  => "PurchaseInv.php",
+            ],
+            [
+                "id"    => 703,
+                "label" => "Unprinted Invoices",
+                "href"  => "Invoice.php?action=invUnprinted",
+            ],
+            [
+                "id"    => 704,
+                "label" => "Reprint Invoices",
+                "href"  => "Invoice.php?action=invoiceReprint",
+            ],
+            [
+                "id"    => 705,
+                "label" => "Sage Export",
+                "href"  => "SageExport.php",
+            ],
+            [
+                "id"    => 706,
+                "label" => "PrePay Export",
+                "href"  => "PrePay.php",
+            ],
+            [
+                "id"    => 707,
+                "label" => "Prepay Adjustment",
+                "href"  => "PrepayAdjustment.php",
+            ],
+            [
+                "id"    => 708,
+                "label" => "Expenses & OT Export",
+                "href"  => "Expense.php?action=exportForm",
+            ],
+            [
+                "id"    => 709,
+                "label" => "Excel Sales Report",
+                "href"  => "ExcelExport.php",
+            ],
+            [
+                "id"    => 710,
+                "label" => "Payment Terms",
+                "href"  => "PaymentTerms.php",
+            ],
+        ];
+    }
+
+    private function getDefaultMaintenanceMenu()
+    {
+        return [
+            [
+                "id"    => 801,
+                "label" => "Activity Types",
+                "href"  => "ActivityType.php",
+            ],
+            [
+                "id"    => 802,
+                "label" => "Root Causes",
+                "href"  => "RootCause.php",
+            ],
+            [
+                "id"    => 803,
+                "label" => "Manufacturers",
+                "href"  => "Manufacturer.php",
+            ],
+            [
+                "id"    => 804,
+                "label" => "Expense Types",
+                "href"  => "ExpenseType.php",
+            ],
+            [
+                "id"    => 805,
+                "label" => "Item Types",
+                "href"  => "ItemType.php",
+            ],
+            [
+                "id"    => 806,
+                "label" => "Standard Text",
+                "href"  => "StandardText.php",
+            ],
+            [
+                "id"    => 807,
+                "label" => "Item Billing Category",
+                "href"  => "ItemBillingCategory.php",
+            ],
+            [
+                "id"    => 808,
+                "label" => "Business Sectors",
+                "href"  => "Sector.php",
+            ],
+            [
+                "id"    => 809,
+                "label" => "Referral Types",
+                "href"  => "CustomerType.php",
+            ],
+            [
+                "id"    => 810,
+                "label" => "Suppliers",
+                "href"  => "Supplier.php",
+            ],
+        ];
+    }
+
+    private function getDefaultManagementMenu()
+    {
+        return [
+            [
+                "id"    => 901,
+                "label" => "System Header",
+                "href"  => "Header.php",
+            ],
+            [
+                "id"    => 902,
+                "label" => "Teams",
+                "href"  => "Team.php",
+            ],
+            [
+                "id"    => 903,
+                "label" => "Users",
+                "href"  => "User.php",
+            ],
+            [
+                "id"    => 904,
+                "label" => "Contact Extraction",
+                "href"  => "ContactExport.php",
+            ],
+            [
+                "id"    => 905,
+                "label" => "Staff Productivity Report",
+                "href"  => "StaffProductivityReport.php",
+            ],
+        ];
     }
 
     function initialProcesses()
@@ -632,6 +1114,12 @@ class CTCNC extends Controller
     function getChecked($flag)
     {
         return ($flag == 'N' ? null : CT_CHECKED);
+    }
+
+    protected
+    function isAppraiser()
+    {
+        return $this->dbeUser->getValue(DBEUser::staffAppraiserFlag) == 'Y';
     }
 
     protected function isSdManager()

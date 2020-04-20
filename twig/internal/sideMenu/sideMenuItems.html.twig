@@ -1,0 +1,28 @@
+{# @var sideMenu \CNCLTD\SideMenu #}
+{# @var section \CNCLTD\MenuSection #}
+{% for section in sideMenu.sections %}
+    <li class="menu-item-has-children active dropdown">
+        <a href="#"
+           class="dropdown-toggle"
+           data-toggle="dropdown"
+           aria-haspopup="true"
+           aria-expanded="false"
+        >
+            <i class="menu-icon fa {{ section.icon }}"></i>{{ section.name }}
+        </a>
+        <ul class="sub-menu children dropdown-menu">
+            {# @var item \CNCLTD\MenuItem #}
+            {% for item in section.items %}
+
+                <li data-menu-id="{{ item.id }}"><a href="{{ item.href }}"
+                    {% for attrName, attrValue in item.attributes %}
+                        {{ attrName }}="{{ attrValue }}"
+                    {% endfor %}
+                    >
+                    {{ item.label }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </li>
+{% endfor %}

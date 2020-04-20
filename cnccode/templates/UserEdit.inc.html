@@ -869,7 +869,7 @@
 
         <tr>
             <td class="promptText"
-                title="Purchase Orders, Sales Orders, Sales Invoices, Customer Maintenence"
+                title="Purchase Orders, Sales Orders, Sales Invoices, Customer Maintenance"
             >Sales
             </td>
             <td class="fieldText">
@@ -884,7 +884,35 @@
         </tr>
         <tr>
             <td class="promptText"
-                title="Purchase Invoices, Pre-pay Export, Expenses and Overtime, Sage Export, User Maintenence, Amendment of Completed Sales Orders"
+                title="Account Management"
+            >Account Management
+            </td>
+            <td class="fieldText">
+                <INPUT name="perms[]"
+                       {DISABLED}
+                       type="checkbox"
+                       value="accountManagement"
+                       {accountManagementChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText"
+                title="Senior Management"
+            >Senior Management
+            </td>
+            <td class="fieldText">
+                <INPUT name="perms[]"
+                       {DISABLED}
+                       type="checkbox"
+                       value="seniorManagement"
+                       {seniorManagementChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText"
+                title="Purchase Invoices, Pre-pay Export, Expenses and Overtime, Sage Export, User Maintenance, Amendment of Completed Sales Orders"
             >
                 Accounts
             </td>

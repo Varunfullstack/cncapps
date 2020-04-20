@@ -84,12 +84,20 @@ define(
     'accounts'
 );
 define(
+    'ACCOUNT_MANAGEMENT_PERMISSION',
+    'accountManagement'
+);
+define(
     'PHPLIB_PERM_TECHNICAL',
     'technical'
 );
 define(
     'PHPLIB_PERM_MAINTENANCE',
     'maintenance'
+);
+define(
+    'SENIOR_MANAGEMENT_PERMISSION0',
+    'seniorManagement'
 );
 define(
     'PHPLIB_PERM_REPORTS',
@@ -166,71 +174,6 @@ class auSweetcode extends Auth
         include(PHPLIB_PAGE_LOGIN);
     }
 
-
-    function serviceping($host, $port = 389, $timeout = 1)
-    {
-        $op = fsockopen($host, $port, $errno, $errstr, $timeout);
-        if (!$op) return 0; //DC is N/A
-        else {
-            fclose($op); //explicitly close open socket connection
-            return 1; //DC is up & running, we can safely connect with ldap_connect
-        }
-    }
-
-    function authenticate_on_ldap($username,
-                                  $password
-    )
-    {
-        if (!$password) {
-            return false;
-        }
-
-        $domain = CONFIG_LDAP_DOMAIN;
-
-// ##### STATIC DC LIST, if your DNS round robin is not setup
-//$dclist = array('10.111.222.111', '10.111.222.100', '10.111.222.200');
-
-// ##### DYNAMIC DC LIST, reverse DNS lookup sorted by round-robin result
-        $dclist = gethostbynamel("$domain.local");
-        $dc = null;
-        foreach ($dclist as $k => $dc) if ($this->serviceping($dc) == true) break; else $dc = 0;
-//after this loop, either there will be at least one DC which is available at present, or $dc would return bool false while the next line stops program from further execution
-
-        if (!$dc) exit("NO DOMAIN CONTROLLERS AVAILABLE AT PRESENT, PLEASE TRY AGAIN LATER!"); //user being notified
-
-//        $domaincontroller = CONFIG_LDAP_DOMAINCONTROLLER;
-//
-//        $adServer = "ldap://" . $domaincontroller . "." . $domain . ".local";
-
-        $ldap = ldap_connect($dc) or die("DC N/A, PLEASE TRY AGAIN LATER.");
-
-        $ldaprdn = $domain . "\\" . $username;
-
-        ldap_set_option(
-            $ldap,
-            LDAP_OPT_PROTOCOL_VERSION,
-            3
-        );
-        ldap_set_option(
-            $ldap,
-            LDAP_OPT_REFERRALS,
-            0
-        );
-
-        $bind = ldap_bind(
-            $ldap,
-            $ldaprdn,
-            $password
-        );
-
-        if ($bind) {
-            $ret = true;
-        } else {
-            $ret = false;
-        }
-        return $ret;
-    }
-
     function auth_validatelogin()
     {
 
@@ -302,7 +245,6 @@ class auSweetcode extends Auth
         return $uid;
     }
 
-
     function get_allowed_ip_pattern()
     {
         $ret = false;
@@ -318,6 +260,70 @@ class auSweetcode extends Auth
             $ret = $this->db->f('hed_allowed_client_ip_pattern');
         }
         return $ret;
+    }
+
+    function authenticate_on_ldap($username,
+                                  $password
+    )
+    {
+        if (!$password) {
+            return false;
+        }
+
+        $domain = CONFIG_LDAP_DOMAIN;
+
+// ##### STATIC DC LIST, if your DNS round robin is not setup
+//$dclist = array('10.111.222.111', '10.111.222.100', '10.111.222.200');
+
+// ##### DYNAMIC DC LIST, reverse DNS lookup sorted by round-robin result
+        $dclist = gethostbynamel("$domain.local");
+        $dc = null;
+        foreach ($dclist as $k => $dc) if ($this->serviceping($dc) == true) break; else $dc = 0;
+//after this loop, either there will be at least one DC which is available at present, or $dc would return bool false while the next line stops program from further execution
+
+        if (!$dc) exit("NO DOMAIN CONTROLLERS AVAILABLE AT PRESENT, PLEASE TRY AGAIN LATER!"); //user being notified
+
+//        $domaincontroller = CONFIG_LDAP_DOMAINCONTROLLER;
+//
+//        $adServer = "ldap://" . $domaincontroller . "." . $domain . ".local";
+
+        $ldap = ldap_connect($dc) or die("DC N/A, PLEASE TRY AGAIN LATER.");
+
+        $ldaprdn = $domain . "\\" . $username;
+
+        ldap_set_option(
+            $ldap,
+            LDAP_OPT_PROTOCOL_VERSION,
+            3
+        );
+        ldap_set_option(
+            $ldap,
+            LDAP_OPT_REFERRALS,
+            0
+        );
+
+        $bind = ldap_bind(
+            $ldap,
+            $ldaprdn,
+            $password
+        );
+
+        if ($bind) {
+            $ret = true;
+        } else {
+            $ret = false;
+        }
+        return $ret;
+    }
+
+    function serviceping($host, $port = 389, $timeout = 1)
+    {
+        $op = fsockopen($host, $port, $errno, $errstr, $timeout);
+        if (!$op) return 0; //DC is N/A
+        else {
+            fclose($op); //explicitly close open socket connection
+            return 1; //DC is up & running, we can safely connect with ldap_connect
+        }
     }
 
     function record_session_start(
@@ -358,9 +364,9 @@ class auSweetcode extends Auth
             in_array(
                 date('Y-m-d'),
                 $bankHolidays
-            ) OR // holiday
-            date('g') < 6 OR // before 6am
-            date('g') > 18 OR // after 6pm
+            ) or // holiday
+            date('g') < 6 or // before 6am
+            date('g') > 18 or // after 6pm
             date('N') > 5                                   // Sat or Sun
         ) {
             return;

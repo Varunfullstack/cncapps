@@ -649,6 +649,7 @@ class CTActivity extends CTCNC
     {
         $dsSearchForm = &$this->dsSearchForm; // ref to global
         $dsSearchResults = &$this->dsSearchResults; // ref to global
+        $this->template->setVar("menuId", 102);
         $this->setMethodName('displaySearchForm');
         $urlCreateActivity = null;
         $urlCustomerPopup = null;

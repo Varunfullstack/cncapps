@@ -119,6 +119,7 @@ class CTCustomerItem extends CTCNC
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsSearchForm = new DSForm($this);
         $this->dsCustomerItem = new DSForm($this);
+        $this->template->setVar("menuId", 106);
     }
 
     /**
