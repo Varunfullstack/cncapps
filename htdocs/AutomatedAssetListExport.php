@@ -328,7 +328,7 @@ ORDER BY Location, `Computer Name`';
         $sheet->fromArray(
             [
                 ["Operating System soon to be end of life"],
-                ["Operating system is end of life"],
+                ["Operating System is end of life"],
                 ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
             ],
             null,
@@ -338,12 +338,12 @@ ORDER BY Location, `Computer Name`';
             ->getFill()
             ->setFillType(Fill::FILL_SOLID)
             ->getStartColor()
-            ->setARGB("FFFFC7CE");
+            ->setARGB("FFFFEB9C");
         $sheet->getStyle("A" . ($legendRowStart + 1) . ":A" . ($legendRowStart + 1))
             ->getFill()
             ->setFillType(Fill::FILL_SOLID)
             ->getStartColor()
-            ->setARGB("FFFFEB9C");
+            ->setARGB("FFFFC7CE");
 
 
         $pcs = 0;
