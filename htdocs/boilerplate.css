@@ -16,7 +16,6 @@
 * Tags: html, themplate, Sufee-Admin
 --------------------------------------------------------- */
 /* Bootstrap */
-/*@import url(../../vendors/animate.css/animate.min.css);*/
 
 .gaugejs-wrap {
     position: relative;
@@ -195,7 +194,7 @@ aside.left-panel {
     display: table-cell;
     height: 100vh;
     min-height: 100%;
-    padding: 0 15px;
+    padding: 0 10px;
     vertical-align: top;
     width: 200px;
     -webkit-transition: width 0.3s ease;
@@ -292,7 +291,7 @@ aside.left-panel {
     color: #c8c9ce !important;
     display: inline-block;
     font-family: Arial, Tahoma, Helvetica, sans-serif;
-    font-size: 14px;
+    font-size: 11px;
     line-height: 30px;
     padding: 10px 0;
     position: relative;
@@ -308,7 +307,7 @@ aside.left-panel {
     color: #8b939b;
     float: left;
     margin-top: 8px;
-    width: 35px;
+    width: 25px;
     text-align: left;
     z-index: 9;
 }
@@ -331,13 +330,13 @@ aside.left-panel {
 }
 
 .navbar .navbar-nav li.menu-item-has-children a {
-    line-height: 30px;
+    line-height: 20px;
 }
 
 .navbar .navbar-nav li.menu-item-has-children a:before {
     content: "\f105";
     color: #c8c9ce;
-    font-family: 'Fontawesome';
+    font-family: 'Font Awesome 5 Free';
     font-size: 16px;
     position: absolute;
     top: 10px;
@@ -345,6 +344,7 @@ aside.left-panel {
     text-align: right;
     -webkit-transition: all 0.25s ease;
     transition: all 0.25s ease;
+    font-weight: 900;
 }
 
 .navbar .navbar-nav li.menu-item-has-children a:hover:before {
@@ -357,7 +357,7 @@ aside.left-panel {
     -webkit-box-shadow: none;
     box-shadow: none;
     overflow-y: hidden;
-    padding: 0 0 0 35px;
+    padding: 0 0 0 6px;
 }
 
 .navbar .navbar-nav li.menu-item-has-children .sub-menu li {
@@ -492,7 +492,7 @@ body.open .navbar .navbar-brand.hidden {
 
 .open aside.left-panel .navbar .navbar-nav li > a {
     max-width: 60px;
-    padding-left: 0;
+    padding-left: 15px;
 }
 
 .open aside.left-panel .navbar .navbar-nav li.menu-item-has-children {
@@ -624,23 +624,25 @@ header.fixed-top {
 }
 
 .menutoggle {
-    background: #009fe3;
+    background: #00b1eb;
     border-radius: 50%;
     color: #fff !important;
     cursor: pointer;
-    font-size: 18px;
-    height: 43px;
-    line-height: 44px;
-    margin: -2px 20px 0 -57px;
+    font-size: 14px;
+    height: 30px;
+    line-height: 30px;
+    margin: -2px 20px 0 -50px;
     text-align: center;
-    width: 43px;
+    width: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    z-index: 100;
 }
 
 .open .menutoggle i:before {
-    content: "\f0ae";
+    content: "\f105";
 }
 
 .search-trigger {
@@ -888,7 +890,6 @@ header .form-inline .search-form.close {
 .user-area .dropdown-toggle:after {
     display: none;
 }
-
 .form-control {
     font-size: 0.8rem;
 }
@@ -974,7 +975,7 @@ header .form-inline .search-form.close {
     float: left;
     width: 50px;
     padding: 0.75rem 0;
-    margin: 0 !important !important;
+    margin: 0 !important;
     color: #fff;
     outline: 0;
     text-align: center;
@@ -1209,11 +1210,11 @@ header .form-inline .search-form.close {
     margin-left: 45px;
 }
 
-.fontawesome-icon-list .page-header {
-    border-bottom: 1px solid #C9CDD7;
-    padding-bottom: 9px;
-    margin: 30px 0 27px;
-}
+.Fontawesome 5-icon-list .page-header {
+                  border-bottom: 1px solid #C9CDD7;
+                  padding-bottom: 9px;
+                  margin: 30px 0 27px;
+              }
 
 .fontawesome-icon-list h2 {
     margin-top: 0;
@@ -1909,28 +1910,22 @@ header .form-inline .search-form.close {
     .content {
         padding: 0 15px;
     }
-
     .twt-category {
         margin-bottom: 0;
     }
-
     .twt-feed {
         max-height: 155px;
     }
-
     .twt-feed img {
         height: 75px;
         width: 75px;
     }
-
     .stat-widget-one .stat-content {
         margin-left: 15px;
     }
-
     .card-body {
         padding: 15px;
     }
-
     .badges button {
         margin: 2px 0;
     }
@@ -1941,31 +1936,24 @@ header .form-inline .search-form.close {
         padding: 0 10px;
         width: 200px;
     }
-
     .navbar .navbar-nav li > a .menu-icon {
         width: 30px;
     }
-
     .navbar .navbar-nav li.menu-item-has-children .sub-menu {
         padding: 0 0 0 30px;
     }
-
     .navbar .navbar-nav li.menu-item-has-children .sub-menu a {
         padding: 2px 0 2px 25px;
     }
-
     .card .card-header {
         position: relative;
     }
-
     .card .card-header strong {
         display: block;
     }
-
     .card .card-header small {
         float: left;
     }
-
     .card .card-header .card-actions {
         right: 0;
         top: 0.75rem;
@@ -1985,7 +1973,6 @@ header .form-inline .search-form.close {
     body {
         display: block;
     }
-
     aside.left-panel {
         display: block;
         height: auto;
@@ -1993,15 +1980,12 @@ header .form-inline .search-form.close {
         padding: 0 15px;
         width: 100%;
     }
-
     aside.left-panel .navbar {
         margin-bottom: 0;
     }
-
     aside.left-panel .navbar .navbar-header {
         height: 50px;
     }
-
     aside.left-panel .navbar .navbar-brand {
         border-bottom: none;
         display: inline-block;
@@ -2010,97 +1994,75 @@ header .form-inline .search-form.close {
         margin-top: 11px;
         min-height: inherit;
     }
-
     aside.left-panel .navbar .navbar-brand.hidden {
         display: none;
     }
-
     aside.left-panel .navbar .navbar-toggler {
         float: right;
         margin-top: 8px;
     }
-
     aside.left-panel .navbar .navbar-nav li > a {
         padding: 5px 0;
     }
-
     aside.left-panel .navbar .navbar-nav li.menu-item-has-children a:before {
         top: 5px;
     }
-
     aside.left-panel .navbar .menu-title {
         line-height: 30px;
         padding: 0;
     }
-
     .menutoggle {
         display: none;
     }
-
     .right-panel {
         display: block;
     }
-
     .right-panel header.header {
         padding: 5px 10px 1px 5px;
     }
-
     .right-panel header.header div[class*="col"] {
         padding: 0;
         width: initial;
     }
-
     .right-panel header.header .col-sm-7 {
         float: left;
     }
-
     .right-panel header.header .col-sm-5 {
         float: right;
     }
-
     .right-panel .breadcrumbs {
         padding: 10px 15px;
     }
-
     .right-panel .breadcrumbs div[class*="col"] {
         padding: 0;
     }
-
     .right-panel .breadcrumbs .page-header {
         min-height: inherit;
         padding: 0;
     }
-
     .right-panel .breadcrumbs .page-header h1 {
         padding: 5px 0;
     }
-
     .right-panel .breadcrumbs .page-header.float-right {
         float: left;
         text-align: left;
         width: 100%;
     }
-
     .right-panel .breadcrumbs .page-header.float-right .breadcrumb {
         padding: 0;
     }
-
     .right-panel .content {
         padding: 0 10px;
     }
-
     .right-panel .content .card .card-title {
         margin-bottom: 0;
     }
-
     .right-panel .content .card .card-footer {
         padding: 15px 5px;
     }
-
     .right-panel .content .card .card-footer ul {
         margin: 0;
     }
-
     .right-panel .content .card .card-footer ul li {
         float: left;
         margin: 5px 0;
@@ -2108,35 +2070,36 @@ header .form-inline .search-form.close {
         width: 33.33%;
 
     }
-
     .right-panel .content div[class*="col"] {
         padding: 0;
     }
-
     .right-panel .content .row div[class*="col"] {
         padding: 0 10px;
     }
-
     .right-panel .content .nav-pills .nav-link,
     .right-panel .content .nav-tabs .nav-link {
         padding: 0.5rem;
     }
-
     .right-panel .content .tab-content.pl-3 {
         padding-left: 0 !important;
     }
-
     .right-panel .content #bootstrap-data-table_wrapper {
         font-size: 14px;
         padding: 0;
     }
-
     .right-panel .content #bootstrap-data-table_wrapper div[class*="col"] {
         padding: 0;
     }
-
     .right-panel .content #bootstrap-data-table_wrapper .table td,
     .right-panel .content #bootstrap-data-table_wrapper .table th {
         padding: 5px;
     }
+
+
+}
+
+.tooltip > .tooltip-inner {
+}
+
+.tooltip .tooltip.right > .tooltip-arrow {
 }
