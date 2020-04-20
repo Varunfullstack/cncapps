@@ -328,7 +328,7 @@ ORDER BY Location, `Computer Name`';
         $sheet->fromArray(
             [
                 ["Operating System soon to be end of life"],
-                ["Operating system is end of life"],
+                ["Operating System is end of life"],
                 ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
             ],
             null,
