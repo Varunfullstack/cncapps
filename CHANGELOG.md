@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.12.3] - 2020-04-20
+### Fixed
+- Fix typo in the Current Asset List Extract
+
 ## [v3.12.2] - 2020-04-17
 ### Fixed
 - PrepayAdjustment.php Customer Dropdown is numbers, not names.

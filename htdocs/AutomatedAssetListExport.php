@@ -338,12 +338,12 @@ ORDER BY Location, `Computer Name`';
             ->getFill()
             ->setFillType(Fill::FILL_SOLID)
             ->getStartColor()
-            ->setARGB("FFFFC7CE");
+            ->setARGB("FFFFEB9C");
         $sheet->getStyle("A" . ($legendRowStart + 1) . ":A" . ($legendRowStart + 1))
             ->getFill()
             ->setFillType(Fill::FILL_SOLID)
             ->getStartColor()
-            ->setARGB("FFFFEB9C");
+            ->setARGB("FFFFC7CE");
 
 
         $pcs = 0;
