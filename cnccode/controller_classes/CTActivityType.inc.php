@@ -33,6 +33,7 @@ class CTActivityType extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(801);
         $this->buActivityType = new BUActivityType($this);
         $this->dsCallActType = new DSForm($this);
         $this->dsCallActType->copyColumnsFrom($this->buActivityType->dbeCallActType);

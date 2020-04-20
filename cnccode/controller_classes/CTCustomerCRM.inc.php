@@ -39,6 +39,7 @@ class CTCustomerCRM extends CTCustomer
             $cookieVars,
             $cfg
         );
+        $this->setMenuId(403);
     }
 
     function search()

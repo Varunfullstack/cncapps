@@ -54,6 +54,7 @@ class CTPurchaseInv extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(702);
         $this->buPurchaseInv = new BUPurchaseInv($this);
         $this->buPurchaseOrder = new BUPurchaseOrder($this);
         $this->dsPorhead = new DSForm($this);

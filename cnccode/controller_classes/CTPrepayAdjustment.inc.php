@@ -30,6 +30,7 @@ class CTPrepayAdjustment extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(707);
         $this->buActivity = new BUActivity($this);
         $this->dsCallActivity = new DSForm($this);
         $this->dsCallActivity->copyColumnsFrom($this->buActivity->dbeJCallActivity);

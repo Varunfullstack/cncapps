@@ -43,6 +43,7 @@ class CTRenQuotation extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(601);
         $this->buRenQuotation = new BURenQuotation($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenQuotation = new DSForm($this);

@@ -38,6 +38,7 @@ class CTItemsNotYetReceived extends CTCNC
             "sales",
             "technical"
         ];
+        $this->setMenuId(309);
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;

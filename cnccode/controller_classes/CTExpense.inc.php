@@ -83,6 +83,7 @@ class CTExpense extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(708);
         $this->buExpense = new BUExpense($this);
         $this->dsSearchForm = new DSForm($this);
         $this->dsSearchResults = new DSForm($this);

@@ -60,6 +60,7 @@ class CTSector extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(808);
         $this->buSector = new BUSector($this);
         $this->dsSector = new DSForm($this);
         $this->dsSector->copyColumnsFrom($this->buSector->dbeSector);

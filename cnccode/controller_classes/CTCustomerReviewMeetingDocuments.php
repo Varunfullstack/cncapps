@@ -5,7 +5,7 @@
  * Date: 24/09/2018
  * Time: 11:57
  */
-
+global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_ct'] . '/CTCustomer.inc.php');
 require_once($cfg ['path_bu'] . '/BUCustomerReviewMeetingDocuments.php');
@@ -45,13 +45,16 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             $cookieVars,
             $cfg
         );
+
         $roles = [
             "sales",
         ];
+
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(406);
         $this->buCustomerReviewMeetingDocuments = new BUCustomerReviewMeetingDocuments ($this);
 
     }
@@ -330,11 +333,10 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
     private function displaySearchForm()
     {
         $this->setPageTitle('Customer Review Meeting Documents');
-        $this->template->setFile(
+        $this->setTemplateFiles(
             'customerReviewMeetingDocument',
-            'CustomerReviewMeetingDocuments.html'
+            'CustomerReviewMeetingDocuments'
         );
-
         $urlCustomerPopup = Controller::buildLink(
             CTCNC_PAGE_CUSTOMER,
             array(
@@ -441,6 +443,5 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             true
         );
         $this->parsePage();
-
     }
 }

@@ -68,6 +68,7 @@ class CTRenewalReport extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(306);
         $this->dsSearchForm = new DSForm ($this);
         $this->dsSearchForm->addColumn(
             self::searchFormCustomerID,

@@ -49,6 +49,7 @@ class CTHeader extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(901);
         $this->buHeader = new BUHeader($this);
         $this->dsHeader = new DSForm($this);
         $this->dsHeader->copyColumnsFrom($this->buHeader->dbeJHeader);

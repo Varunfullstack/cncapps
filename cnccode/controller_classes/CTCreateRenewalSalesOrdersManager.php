@@ -33,6 +33,7 @@ class CTCreateRenewalSalesOrdersManager extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(312);
 
     }
 

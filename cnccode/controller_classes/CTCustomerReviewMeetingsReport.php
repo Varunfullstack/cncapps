@@ -44,6 +44,7 @@ class CTCustomerReviewMeetingsReport extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(404);
         $this->buCustomerReviewMeetings = new BUCustomerReviewMeeting($this);
     }
 
@@ -68,7 +69,6 @@ class CTCustomerReviewMeetingsReport extends CTCNC
     {
 
         $this->setPageTitle("Customer Review Meetings");
-
         $this->setTemplateFiles(
             'CustomerReviewMeetings',
             'CustomerReviewMeetingsReport'

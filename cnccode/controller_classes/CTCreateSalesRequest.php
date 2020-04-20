@@ -28,6 +28,7 @@ class CTCreateSalesRequest extends CTCNC
         $roles = [
             "sales",
         ];
+        $this->setMenuId(304);
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;

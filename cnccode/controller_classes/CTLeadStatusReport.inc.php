@@ -29,6 +29,7 @@ class CTLeadStatusReport extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(402);
         $this->buLeadStatus = new BULeadStatus($this);
     }
 
@@ -78,7 +79,7 @@ class CTLeadStatusReport extends CTCNC
 
         $this->template->set_block('LeadStatusReport', 'countBlock', 'counts');
 
-        foreach ($becameCustomerArray AS $year => $becameCount) {
+        foreach ($becameCustomerArray as $year => $becameCount) {
 
             $droppedCount = $droppedCustomerArray[$year];
 

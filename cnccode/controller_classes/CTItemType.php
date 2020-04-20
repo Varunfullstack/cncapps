@@ -35,6 +35,7 @@ class CTItemType extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(805);
     }
 
     function delete()

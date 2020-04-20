@@ -46,6 +46,7 @@ class CTRenBroadband extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(603);
         $this->buRenBroadband = new BURenBroadband($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenBroadband = new DSForm($this);

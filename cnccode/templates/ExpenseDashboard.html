@@ -494,9 +494,12 @@
         overtimeTable.on('select.dt', function (e, dt, type, indexes) {
             overtimeTable.cells('tr.no-select', 0).checkboxes.deselect();
         });
-
-        overtimeTable.column(0).checkboxes.deselectAll();
-        expensesTable.column(0).checkboxes.deselectAll();
+        if (overtimeTable.column(0).checkboxes) {
+            overtimeTable.column(0).checkboxes.deselectAll();
+        }
+        if (expensesTable.column(0).checkboxes) {
+            expensesTable.column(0).checkboxes.deselectAll();
+        }
 
     })
 </script>

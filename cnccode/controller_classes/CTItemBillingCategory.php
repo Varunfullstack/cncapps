@@ -27,6 +27,7 @@ class CTItemBillingCategory extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(807);
     }
 
     function delete()

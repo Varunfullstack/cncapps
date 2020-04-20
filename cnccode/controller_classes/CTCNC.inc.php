@@ -330,6 +330,7 @@ class CTCNC extends Controller
      */
     function parsePage()
     {
+        echo 'here parse page';
         global $userName;
         $menu = new \CNCLTD\SideMenu();
 
@@ -394,7 +395,7 @@ class CTCNC extends Controller
             'fa-tag',
             "Sales",
             $this->dbeUser->getValue(DBEUser::createRenewalSalesOrdersFlag) == 'Y',
-            223,
+            312,
             "Create Renewals Sales Orders",
             "CreateRenewalSalesOrdersManager.php"
         );

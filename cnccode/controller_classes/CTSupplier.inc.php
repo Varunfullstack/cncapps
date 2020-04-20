@@ -80,6 +80,7 @@ class CTSupplier extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(810);
         $this->buSupplier = new BUSupplier($this);
         $this->dsSupplier = new DSForm($this);    // new specialised dataset with form message support
         $this->dsSupplier->copyColumnsFrom($this->buSupplier->dbeJSupplier);

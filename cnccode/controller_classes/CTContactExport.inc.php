@@ -77,6 +77,7 @@ class CTContactExport extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(904);
         $this->buContactExport = new BUContactExport($this);
     }
 

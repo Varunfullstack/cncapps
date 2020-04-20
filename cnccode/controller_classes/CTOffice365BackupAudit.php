@@ -36,6 +36,7 @@ class CTOffice365BackupAudit extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(502);
     }
 
     /**

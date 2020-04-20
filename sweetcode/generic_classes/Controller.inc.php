@@ -301,7 +301,7 @@ class Controller extends BaseObject
 
     public static function htmlChecked($flag)
     {
-        if ($flag == 'N' OR $flag == '') {
+        if ($flag == 'N' or $flag == '') {
             $ret = '';
         } else {
             $ret = CT_CHECKED;
@@ -419,7 +419,7 @@ class Controller extends BaseObject
                                         $separator = '/'
     )
     {
-        if (($dateYMD == '') OR ($dateYMD == '0000-00-00')) {
+        if (($dateYMD == '') or ($dateYMD == '0000-00-00')) {
             return null;
         } else {
             if (preg_match_all(
@@ -514,8 +514,6 @@ class Controller extends BaseObject
     )
     {
 
-
-        // We always include the page or report template
         switch ($this->getHTMLFmt()) {
             case CT_HTML_FMT_PRINTER:
                 $file = array("page" => "printer.inc." . $this->getDocType());

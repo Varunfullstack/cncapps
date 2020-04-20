@@ -33,6 +33,7 @@ class CTOffice365StorageReports extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(503);
     }
 
     function delete()

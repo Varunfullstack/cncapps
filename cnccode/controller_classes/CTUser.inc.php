@@ -93,6 +93,7 @@ class CTUser extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(903);
         $this->buUser = new BUUser($this);
         $this->dsUser = new DSForm($this);
         $this->dsUser->copyColumnsFrom($this->buUser->dbeUser);

@@ -33,6 +33,7 @@ class CTRootCause extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(802);
         $this->buRootCause = new BURootCause($this);
         $this->dsRootCause = new DSForm($this);
         $this->dsRootCause->copyColumnsFrom($this->buRootCause->dbeRootCause);

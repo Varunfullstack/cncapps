@@ -34,6 +34,7 @@ class CTTeam extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(902);
         $this->buTeam = new BUTeam($this);
         $this->dsTeam = new DSForm($this);
         $this->dsTeam->copyColumnsFrom($this->buTeam->dbeTeam);

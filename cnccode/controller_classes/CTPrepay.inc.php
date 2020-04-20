@@ -30,6 +30,7 @@ class CTPrepay extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(706);
         $this->buPrepay = new BUPrepay ($this);
     }
 

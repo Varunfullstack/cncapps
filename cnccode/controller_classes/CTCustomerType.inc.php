@@ -33,6 +33,7 @@ class CTCustomerType extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(809);
         $this->buCustomerType = new BUCustomerType($this);
         $this->dsCustomerType = new DSForm($this);
         $this->dsCustomerType->copyColumnsFrom($this->buCustomerType->dbeCustomerType);

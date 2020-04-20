@@ -32,6 +32,7 @@ class CTQuotationConversionReport extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(508);
         $this->buQuotationConversionReport = new BUQuotationConversionReport($this);
         $this->dsSearchForm = new DSForm($this);
         $this->buQuotationConversionReport->initialiseSearchForm($this->dsSearchForm);

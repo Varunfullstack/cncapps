@@ -195,7 +195,7 @@ class CTCustomer extends CTCNC
             exit;
         }
 
-        $this->setMenuId(302);
+        $this->setMenuId(303);
         $this->buCustomer = new BUCustomer($this);
         $this->dsContact = new DataSet($this);
         $this->dsContact->copyColumnsFrom($this->buCustomer->dbeContact);
@@ -3482,7 +3482,7 @@ class CTCustomer extends CTCNC
      */
     function displayContractAndNumbersReport()
     {
-
+        $this->setMenuId(504);
         $this->setPageTitle("Service Contracts Ratio");
 
         $this->setTemplateFiles(

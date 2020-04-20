@@ -44,6 +44,7 @@ class CTContractAnalysisReport extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(511);
         $this->buContractAnalysisReport = new BUContractAnalysisReport ($this);
     }
 

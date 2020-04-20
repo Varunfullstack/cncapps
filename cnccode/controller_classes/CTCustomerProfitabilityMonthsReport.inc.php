@@ -30,6 +30,7 @@ class CTCustomerProfitabilityMonthsReport extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(512);
         $this->buCustomerProfitabilityMonthsReport = new BUCustomerProfitabilityMonthsReport ($this);
     }
 

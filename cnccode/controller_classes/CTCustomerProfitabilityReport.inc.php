@@ -39,6 +39,7 @@ class CTCustomerProfitabilityReport extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(509);
         $this->buActivityProfitabilityReport = new BUCustomerProfitabilityReport ($this);
         $this->dsSearchForm = new DSForm ($this);
         $this->dsResults = new DataSet ($this);

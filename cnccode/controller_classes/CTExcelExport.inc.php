@@ -33,6 +33,7 @@ class CTExcelExport extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(709);
         $this->buExcelExport = new BUExcelExport($this);
     }
 
@@ -53,35 +54,6 @@ class CTExcelExport extends CTCNC
                 $this->select();
                 break;
         }
-    }
-
-    /**
-     * Display search form
-     * @access private
-     * @throws Exception
-     * @throws Exception
-     */
-    function select()
-    {
-        $this->setMethodName('select');
-        $urlSubmit = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTEXCEL_EXPORT_ACT_GENERATE
-            )
-        );
-        $this->setPageTitle('Excel Sales Export');
-        $this->setTemplateFiles('ExcelExport', 'ExcelExport.inc');
-        $this->template->set_var(
-            array(
-                'month'     => Controller::htmlInputText($this->getParam('month')),
-                'year'      => Controller::htmlInputText($this->getParam('year')),
-                'urlSubmit' => $urlSubmit
-            )
-        );
-        // display results
-        $this->template->parse('CONTENTS', 'ExcelExport', true);
-        $this->parsePage();
     }
 
     /**
@@ -126,5 +98,34 @@ class CTExcelExport extends CTCNC
             $this->select();
         }
         exit();
+    }
+
+    /**
+     * Display search form
+     * @access private
+     * @throws Exception
+     * @throws Exception
+     */
+    function select()
+    {
+        $this->setMethodName('select');
+        $urlSubmit = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTEXCEL_EXPORT_ACT_GENERATE
+            )
+        );
+        $this->setPageTitle('Excel Sales Export');
+        $this->setTemplateFiles('ExcelExport', 'ExcelExport.inc');
+        $this->template->set_var(
+            array(
+                'month'     => Controller::htmlInputText($this->getParam('month')),
+                'year'      => Controller::htmlInputText($this->getParam('year')),
+                'urlSubmit' => $urlSubmit
+            )
+        );
+        // display results
+        $this->template->parse('CONTENTS', 'ExcelExport', true);
+        $this->parsePage();
     }
 }// end of class

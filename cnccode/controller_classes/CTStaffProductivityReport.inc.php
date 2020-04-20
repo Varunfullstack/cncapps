@@ -41,6 +41,7 @@ class CTStaffProductivityReport extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(905);
         $this->BUStaffProductivityReport = new BUStaffProductivityReport ($this);
     }
 

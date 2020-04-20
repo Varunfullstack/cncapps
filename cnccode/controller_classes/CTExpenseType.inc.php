@@ -34,6 +34,7 @@ class CTExpenseType extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(804);
         $this->buExpenseType = new BUExpenseType($this);
         $this->dsExpenseType = new DSForm($this);
         $this->dsExpenseType->copyColumnsFrom($this->buExpenseType->dbeExpenseType);

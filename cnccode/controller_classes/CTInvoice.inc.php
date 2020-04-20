@@ -179,6 +179,7 @@ class CTInvoice extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(701);
         $this->buInvoice = new BUInvoice($this);
         $this->dsInvline = new DSForm($this);
         $this->dsInvline->copyColumnsFrom($this->buInvoice->dbeJInvline);
@@ -457,7 +458,7 @@ class CTInvoice extends CTCNC
     function printUnprinted()
     {
         $this->setMethodName('printUnprinted');
-
+        $this->setMenuId(703);
 
         $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
@@ -710,6 +711,7 @@ class CTInvoice extends CTCNC
      */
     function invoiceReprint()
     {
+        $this->setMenuId(704);
         $this->setMethodName('invoiceReprint');
         $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],

@@ -56,6 +56,7 @@ class CTQuoteTemplates extends CTCNC
             $cookieVars,
             $cfg
         );
+        $this->setMenuId(311);
         $this->buQuotationTemplate = new BUQuotationTemplate($this);
         $this->dsQuotationTemplate = new DSForm($this);
         $this->dsQuotationTemplate->copyColumnsFrom($this->buQuotationTemplate->dbeQuotationTemplate);

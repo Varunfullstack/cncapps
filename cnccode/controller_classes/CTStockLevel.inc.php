@@ -30,6 +30,7 @@ class CTStockLevel extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(308);
         $this->BUItem = new BUItem($this);
     }
 

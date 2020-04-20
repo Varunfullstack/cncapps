@@ -62,6 +62,7 @@ class CTRenContract extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(602);
         $this->buRenContract = new BURenContract($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenContract = new DSForm($this);

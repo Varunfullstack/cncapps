@@ -47,6 +47,7 @@ class CTContactAudit extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(501);
         $this->buContact = new BUContact($this);
         $this->dsContact = new DSForm($this);    // new specialised dataset with form message support
         $this->dsContact->copyColumnsFrom($this->buContact->dbeContact);
@@ -73,6 +74,46 @@ class CTContactAudit extends CTCNC
             default:
                 $this->displaySearchForm();
         }
+    }
+
+    private function searchContactAudit($customerID = null,
+                                        $startDate = null,
+                                        $endDate = null,
+                                        $firstName = null,
+                                        $lastName = null
+    )
+    {
+        $test = new DBEJContactAudit($this);
+
+        if ($startDate) {
+            $startDate = DateTime::createFromFormat(
+                'd/m/Y',
+                $startDate
+            );
+        }
+
+        if ($endDate) {
+            $endDate = DateTime::createFromFormat(
+                'd/m/Y',
+                $endDate
+            );
+        }
+
+        $test->search(
+            $customerID,
+            $startDate,
+            $endDate,
+            $firstName,
+            $lastName
+        );
+
+        $result = [];
+
+        while ($test->fetchNext()) {
+            $result[] = $test->getRowAsAssocArray();
+        }
+
+        return $result;
     }
 
     /**
@@ -124,46 +165,5 @@ class CTContactAudit extends CTCNC
             true
         );
         $this->parsePage();
-    }
-
-
-    private function searchContactAudit($customerID = null,
-                                        $startDate = null,
-                                        $endDate = null,
-                                        $firstName = null,
-                                        $lastName = null
-    )
-    {
-        $test = new DBEJContactAudit($this);
-
-        if ($startDate) {
-            $startDate = DateTime::createFromFormat(
-                'd/m/Y',
-                $startDate
-            );
-        }
-
-        if ($endDate) {
-            $endDate = DateTime::createFromFormat(
-                'd/m/Y',
-                $endDate
-            );
-        }
-
-        $test->search(
-            $customerID,
-            $startDate,
-            $endDate,
-            $firstName,
-            $lastName
-        );
-
-        $result = [];
-
-        while ($test->fetchNext()) {
-            $result[] = $test->getRowAsAssocArray();
-        }
-
-        return $result;
     }
 }// end of class

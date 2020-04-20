@@ -43,6 +43,7 @@ class CTManufacturer extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(803);
         $this->buManufacturer = new BUManufacturer($this);
         $this->dsManufacturer = new DSForm($this);
         $this->dsManufacturer->copyColumnsFrom($this->buManufacturer->dbeManufacturer);

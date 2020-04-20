@@ -38,6 +38,7 @@ class CTExpenseDashboard extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(906);
     }
 
     /**

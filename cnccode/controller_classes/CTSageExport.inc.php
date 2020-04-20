@@ -31,6 +31,7 @@ class CTSageExport extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(705);
         $this->buSageExport = new BUSageExport($this);
     }
 

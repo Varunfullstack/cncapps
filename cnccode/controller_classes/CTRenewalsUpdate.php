@@ -32,7 +32,7 @@ class CTRenewalsUpdate extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
-
+        $this->setMenuId(310);
     }
 
     /**

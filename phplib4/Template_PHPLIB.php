@@ -123,6 +123,41 @@ class Template_PHPLIB
     }
 
     /**
+     * Error function. Halt template system with message to show
+     *
+     * @access public
+     * @param string message to show
+     * @return bool
+     */
+    function halt($msg)
+    {
+        $this->_lastError = $msg;
+
+        if ($this->haltOnError != "no") {
+            return $this->haltMsg($msg);
+        }
+
+        return false;
+    }
+
+    /**
+     * printf error message to show
+     *
+     * @access public
+     * @param string message to show
+     * @return object PEAR error object
+     */
+    function haltMsg($msg)
+    {
+        PEAR::raiseError(
+            sprintf(
+                "<b>Template Error:</b> %s<br>\n",
+                $msg
+            )
+        );
+    }
+
+    /**
      * What to do with unknown variables
      *
      * three possible values:
@@ -172,6 +207,55 @@ class Template_PHPLIB
             }
         }
         return true;
+    }
+
+    /**
+     * Complete filename
+     *
+     * Complete filename, i.e. testing it for slashes
+     *
+     * @access private
+     * @param string filename to be completed
+     * @return string completed filename
+     */
+    function _filename($filename)
+    {
+        if (substr(
+                $filename,
+                0,
+                1
+            ) != "/") {
+            $filename = $this->root . "/" . $filename;
+        }
+
+        if (file_exists($filename)) return $filename;
+        if (is_array($this->file_fallbacks) && count($this->file_fallbacks) > 0) {
+            reset($this->file_fallbacks);
+            while (list(, $v) = each($this->file_fallbacks)) {
+                if (file_exists($v . basename($filename))) return $v . basename($filename);
+            }
+            $this->halt(
+                sprintf(
+                    "filename: file %s does not exist in the fallback paths %s.",
+                    $filename,
+                    implode(
+                        ",",
+                        $this->file_fallbacks
+                    )
+                )
+            );
+            return false;
+        } else {
+            $this->halt(
+                sprintf(
+                    "filename: file %s does not exist.",
+                    $filename
+                )
+            );
+            return false;
+        }
+
+        return $filename;
     }
 
     /**
@@ -233,348 +317,6 @@ class Template_PHPLIB
     }
 
     /**
-     * Set corresponding substitutions for placeholders
-     *
-     * @access public
-     * @param string name of a variable that is to be defined or an array of variables with value substitution as key/value pairs
-     * @param string value of that variable
-     * @param boolean if true, the value is appended to the variable's existing value
-     */
-    function setVar($varname,
-                    $value = "",
-                    $append = false
-    )
-    {
-        if (!is_array($varname)) {
-
-            if (!empty($varname))
-                if ($this->debug) print "scalar: set *$varname* to *$value*<br>\n";
-            if ($this->debug && $varname == 'status') {
-                echo 'varname is ' . $varname;
-                echo '<br>';
-                echo 'value is ' . $value;
-                echo '<br>';
-                echo 'current value is ' . @$this->_varVals[$varname];
-            }
-            $this->_varKeys[$varname] = $this->_varname($varname);
-            ($append && isset($this->_varVals[$varname])) ? $this->_varVals[$varname] .= $value : $this->_varVals[$varname] = $value;
-            if ($this->debug && $varname == 'status') {
-                echo '<br>The new value is ' . $this->_varVals[$varname];
-            }
-        } else {
-            foreach ($varname as $k => $v) {
-                if (!empty($k))
-                    if ($this->debug) print "array: set *$k* to *$v*<br>\n";
-
-                $this->_varKeys[$k] = $this->_varname($k);
-                ($append) ? $this->_varVals[$k] .= $v : $this->_varVals[$k] = $v;
-            }
-        }
-    }
-
-    /**
-     * Substitute variables in handle $handle
-     *
-     * @access public
-     * @param string name of handle
-     * @return mixed string substituted content of handle
-     */
-    function subst($handle)
-    {
-        if ($this->debug) {
-            var_debug($this->_varKeys);
-            var_debug($this->_varVals);
-            var_dump($this->getVar($handle));
-        }
-        if (!$this->_loadFile($handle)) {
-            $this->halt("subst: unable to load $handle.");
-            return false;
-        }
-
-        return @str_replace(
-            $this->_varKeys,
-            $this->_varVals,
-            $this->getVar($handle)
-        );
-    }
-
-    /**
-     * Same as subst but printing the result
-     *
-     * @access  public
-     * @brother subst
-     * @param string handle of template
-     * @return  bool always false
-     */
-    function pSubst($handle)
-    {
-        print $this->subst($handle);
-        return false;
-    }
-
-    /**
-     * Parse handle into target
-     *
-     * Parses handle $handle into $target, eventually
-     * appending handle at $target if $append is defined
-     * as TRUE.
-     *
-     * @access public
-     * @param string target handle to parse into
-     * @param string which handle should be parsed
-     * @param boolean append it to $target or not?
-     * @return string parsed handle
-     */
-    function parse($target,
-                   $handle,
-                   $append = false
-    )
-    {
-        if (!is_array($handle)) {
-            $str = $this->subst($handle);
-            if ($this->debug) {
-                var_dump($str);
-            }
-            $this->setVar($target, $str, $append);
-        } else {
-            reset($handle);
-
-            while (list(, $h) = each($handle)) {
-                $str = $this->subst($h);
-                $this->setVar(
-                    $target,
-                    $str
-                );
-            }
-        }
-
-        return $str;
-    }
-
-    /**
-     * Same as parse, but printing it.
-     *
-     * @access  public
-     * @brother parse
-     * @param string target to parse into
-     * @param string handle which should be parsed
-     * @param should $handle be appended to $target?
-     * @return  bool
-     */
-    function pParse($target,
-                    $handle,
-                    $append = false
-    )
-    {
-        print $this->finish(
-            $this->parse(
-                $target,
-                $handle,
-                $append
-            )
-        );
-        return false;
-    }
-
-    /**
-     * Return all defined variables and their values
-     *
-     * @access public
-     * @return array with all defined variables and their values
-     */
-    function getVars()
-    {
-        reset($this->_varKeys);
-
-        while (list($k,) = each($this->_varKeys)) {
-            $result[$k] = $this->getVar($k);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Return one or more specific variable(s) with their values.
-     *
-     * @access public
-     * @param mixed array with variable names or one variable name as a string
-     * @return mixed array of variable names with their values or value of one specific variable
-     */
-    function getVar($varname)
-    {
-        if (!is_array($varname)) {
-            if ($this->debug) {
-                var_dump($this->_varVals[$varname]);
-            }
-            if (isset($this->_varVals[$varname])) {
-                return $this->_varVals[$varname];
-            } else {
-                return "";
-            }
-        } else {
-            reset($varname);
-
-            while (list($k,) = each($varname)) {
-                $result[$k] = (isset($this->_varVals[$k])) ? $this->_varVals[$k] : "";
-            }
-
-            return $result;
-        }
-    }
-
-    /**
-     * Get undefined values of a handle
-     *
-     * @access public
-     * @param string handle name
-     * @return mixed  false if an error occured or the undefined values
-     */
-    function getUndefined($handle)
-    {
-        if (!$this->_loadFile($handle)) {
-            $this->halt("getUndefined: unable to load $handle.");
-            return false;
-        }
-
-        preg_match_all(
-            "/{([^ \t\r\n}]+)}/",
-            $this->getVar($handle),
-            $m
-        );
-        $m = $m[1];
-        if (!is_array($m)) {
-            return false;
-        }
-
-        reset($m);
-        while (list(, $v) = each($m)) {
-            if (!isset($this->_varKeys[$v])) {
-                $result[$v] = $v;
-            }
-        }
-
-        if (isset($result) && count($result)) {
-            return $result;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Finish string
-     *
-     * @access public
-     * @param string string to finish
-     * @return finished, i.e. substituted string
-     */
-    function finish($str)
-    {
-        switch ($this->unknowns) {
-            case "remove":
-                $str = preg_replace(
-                    '/{[^ \t\r\n}]+}/',
-                    "",
-                    $str
-                );
-                break;
-
-            case "comment":
-                $str = preg_replace(
-                    '/{([^ \t\r\n}]+)}/',
-                    "<!-- Template $handle: Variable \\1 undefined -->",
-                    $str
-                );
-                break;
-        }
-
-        return $str;
-    }
-
-    /**
-     * Print variable to the browser
-     *
-     * @access public
-     * @param string name of variable to print
-     */
-    function p($varname)
-    {
-        print $this->finish($this->getVar($varname));
-    }
-
-    /**
-     * Get finished variable
-     *
-     * @access public public
-     * @param string variable to get
-     * @return string string with finished variable
-     */
-    function get($varname)
-    {
-        return $this->finish($this->getVar($varname));
-    }
-
-    /**
-     * Complete filename
-     *
-     * Complete filename, i.e. testing it for slashes
-     *
-     * @access private
-     * @param string filename to be completed
-     * @return string completed filename
-     */
-    function _filename($filename)
-    {
-        if (substr(
-                $filename,
-                0,
-                1
-            ) != "/") {
-            $filename = $this->root . "/" . $filename;
-        }
-
-        if (file_exists($filename)) return $filename;
-        if (is_array($this->file_fallbacks) && count($this->file_fallbacks) > 0) {
-            reset($this->file_fallbacks);
-            while (list(, $v) = each($this->file_fallbacks)) {
-                if (file_exists($v . basename($filename))) return $v . basename($filename);
-            }
-            $this->halt(
-                sprintf(
-                    "filename: file %s does not exist in the fallback paths %s.",
-                    $filename,
-                    implode(
-                        ",",
-                        $this->file_fallbacks
-                    )
-                )
-            );
-            return false;
-        } else {
-            $this->halt(
-                sprintf(
-                    "filename: file %s does not exist.",
-                    $filename
-                )
-            );
-            return false;
-        }
-
-        return $filename;
-    }
-
-    /**
-     * Protect a replacement variable
-     *
-     * @access private
-     * @param string name of replacement variable
-     * @return string replaced variable
-     */
-    function _varname($varname)
-    {
-        return "{" . $varname . "}";
-    }
-
-    /**
      * load file defined by handle if it is not loaded yet
      *
      * @access private
@@ -625,38 +367,296 @@ class Template_PHPLIB
     }
 
     /**
-     * Error function. Halt template system with message to show
+     * Set corresponding substitutions for placeholders
      *
      * @access public
-     * @param string message to show
-     * @return bool
+     * @param string name of a variable that is to be defined or an array of variables with value substitution as key/value pairs
+     * @param string value of that variable
+     * @param boolean if true, the value is appended to the variable's existing value
      */
-    function halt($msg)
+    function setVar($varname,
+                    $value = "",
+                    $append = false
+    )
     {
-        $this->_lastError = $msg;
+        if (!is_array($varname)) {
 
-        if ($this->haltOnError != "no") {
-            return $this->haltMsg($msg);
+            if (!empty($varname))
+                if ($this->debug) print "scalar: set *$varname* to *$value*<br>\n";
+            if ($this->debug && $varname == 'status') {
+                echo 'varname is ' . $varname;
+                echo '<br>';
+                echo 'value is ' . $value;
+                echo '<br>';
+                echo 'current value is ' . @$this->_varVals[$varname];
+            }
+            $this->_varKeys[$varname] = $this->_varname($varname);
+            ($append && isset($this->_varVals[$varname])) ? $this->_varVals[$varname] .= $value : $this->_varVals[$varname] = $value;
+            if ($this->debug && $varname == 'status') {
+                echo '<br>The new value is ' . $this->_varVals[$varname];
+            }
+        } else {
+            foreach ($varname as $k => $v) {
+                if (!empty($k))
+                    if ($this->debug) print "array: set *$k* to *$v*<br>\n";
+
+                $this->_varKeys[$k] = $this->_varname($k);
+                ($append) ? $this->_varVals[$k] .= $v : $this->_varVals[$k] = $v;
+            }
         }
+    }
 
+    /**
+     * Protect a replacement variable
+     *
+     * @access private
+     * @param string name of replacement variable
+     * @return string replaced variable
+     */
+    function _varname($varname)
+    {
+        return "{" . $varname . "}";
+    }
+
+    /**
+     * Return one or more specific variable(s) with their values.
+     *
+     * @access public
+     * @param mixed array with variable names or one variable name as a string
+     * @return mixed array of variable names with their values or value of one specific variable
+     */
+    function getVar($varname)
+    {
+        if (!is_array($varname)) {
+            if ($this->debug) {
+                var_debug($this->_varVals[$varname]);
+            }
+            if (isset($this->_varVals[$varname])) {
+                return $this->_varVals[$varname];
+            } else {
+                return "";
+            }
+        } else {
+            reset($varname);
+
+            while (list($k,) = each($varname)) {
+                $result[$k] = (isset($this->_varVals[$k])) ? $this->_varVals[$k] : "";
+            }
+
+            return $result;
+        }
+    }
+
+    /**
+     * Same as subst but printing the result
+     *
+     * @access  public
+     * @brother subst
+     * @param string handle of template
+     * @return  bool always false
+     */
+    function pSubst($handle)
+    {
+        print $this->subst($handle);
         return false;
     }
 
     /**
-     * printf error message to show
+     * Substitute variables in handle $handle
      *
      * @access public
-     * @param string message to show
-     * @return object PEAR error object
+     * @param string name of handle
+     * @return mixed string substituted content of handle
      */
-    function haltMsg($msg)
+    function subst($handle)
     {
-        PEAR::raiseError(
-            sprintf(
-                "<b>Template Error:</b> %s<br>\n",
-                $msg
+        if ($this->debug) {
+            var_debug($this->_varKeys);
+            var_debug($this->_varVals);
+            var_dump($this->getVar($handle));
+        }
+        if (!$this->_loadFile($handle)) {
+            $this->halt("subst: unable to load $handle.");
+            return false;
+        }
+
+        return @str_replace(
+            $this->_varKeys,
+            $this->_varVals,
+            $this->getVar($handle)
+        );
+    }
+
+    /**
+     * Same as parse, but printing it.
+     *
+     * @access  public
+     * @brother parse
+     * @param string target to parse into
+     * @param string handle which should be parsed
+     * @param should $handle be appended to $target?
+     * @return  bool
+     */
+    function pParse($target,
+                    $handle,
+                    $append = false
+    )
+    {
+        print $this->finish(
+            $this->parse(
+                $target,
+                $handle,
+                $append
             )
         );
+        return false;
+    }
+
+    /**
+     * Finish string
+     *
+     * @access public
+     * @param string string to finish
+     * @return finished, i.e. substituted string
+     */
+    function finish($str)
+    {
+        switch ($this->unknowns) {
+            case "remove":
+                $str = preg_replace(
+                    '/{[^ \t\r\n}]+}/',
+                    "",
+                    $str
+                );
+                break;
+
+            case "comment":
+                $str = preg_replace(
+                    '/{([^ \t\r\n}]+)}/',
+                    "<!-- Template $handle: Variable \\1 undefined -->",
+                    $str
+                );
+                break;
+        }
+
+        return $str;
+    }
+
+    /**
+     * Parse handle into target
+     *
+     * Parses handle $handle into $target, eventually
+     * appending handle at $target if $append is defined
+     * as TRUE.
+     *
+     * @access public
+     * @param string target handle to parse into
+     * @param string which handle should be parsed
+     * @param boolean append it to $target or not?
+     * @return string parsed handle
+     */
+    function parse($target,
+                   $handle,
+                   $append = false
+    )
+    {
+        if (!is_array($handle)) {
+            $str = $this->subst($handle);
+            if ($this->debug) {
+                var_dump($str);
+            }
+            $this->setVar($target, $str, $append);
+        } else {
+            reset($handle);
+
+            while (list(, $h) = each($handle)) {
+                $str = $this->subst($h);
+                $this->setVar(
+                    $target,
+                    $str
+                );
+            }
+        }
+
+        return $str;
+    }
+
+    /**
+     * Return all defined variables and their values
+     *
+     * @access public
+     * @return array with all defined variables and their values
+     */
+    function getVars()
+    {
+        reset($this->_varKeys);
+
+        while (list($k,) = each($this->_varKeys)) {
+            $result[$k] = $this->getVar($k);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get undefined values of a handle
+     *
+     * @access public
+     * @param string handle name
+     * @return mixed  false if an error occured or the undefined values
+     */
+    function getUndefined($handle)
+    {
+        if (!$this->_loadFile($handle)) {
+            $this->halt("getUndefined: unable to load $handle.");
+            return false;
+        }
+
+        preg_match_all(
+            "/{([^ \t\r\n}]+)}/",
+            $this->getVar($handle),
+            $m
+        );
+        $m = $m[1];
+        if (!is_array($m)) {
+            return false;
+        }
+
+        reset($m);
+        while (list(, $v) = each($m)) {
+            if (!isset($this->_varKeys[$v])) {
+                $result[$v] = $v;
+            }
+        }
+
+        if (isset($result) && count($result)) {
+            return $result;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Print variable to the browser
+     *
+     * @access public
+     * @param string name of variable to print
+     */
+    function p($varname)
+    {
+        print $this->finish($this->getVar($varname));
+    }
+
+    /**
+     * Get finished variable
+     *
+     * @access public public
+     * @param string variable to get
+     * @return string string with finished variable
+     */
+    function get($varname)
+    {
+        return $this->finish($this->getVar($varname));
     }
 }
 

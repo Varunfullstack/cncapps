@@ -51,6 +51,7 @@ class CTCustomerReviewMeeting extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(405);
         $this->buCustomerReviewMeeting = new BUCustomerReviewMeeting ($this);
     }
 

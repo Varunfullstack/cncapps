@@ -53,6 +53,7 @@ class CTStandardText extends CTCNC
             $cookieVars,
             $cfg
         );
+        $this->setMenuId(806);
         $this->buStandardText = new BUStandardText($this);
         $this->dsStandardText = new DSForm($this);
         $this->dsStandardText->copyColumnsFrom($this->buStandardText->dbeStandardText);
