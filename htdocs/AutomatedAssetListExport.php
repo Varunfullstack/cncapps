@@ -73,7 +73,7 @@ $BUHeader->getHeader($dbeHeader);
 $thresholdDays = $dbeHeader->getValue(DBEHeader::OSSupportDatesThresholdDays);
 
 if (!$thresholdDays) {
-    throw new Exception('OS Support Dates Threshold days is empty');
+    throw new UnexpectedValueException('OS Support Dates Threshold days is empty');
 }
 
 $buCustomer = new BUCustomer($thing);
@@ -502,7 +502,7 @@ ORDER BY Location, `Computer Name`) a where `Total Disk` > ""';
     } else {
         echo '<div>No Data was found</div>';
     }
-};
+}
 $tempFileName = null;
 if ($generateSummary) {
     echo '<h1>Generating Summary</h1>';
