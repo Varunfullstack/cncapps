@@ -20,13 +20,23 @@
                     columns: [],
                     orderCellsTop: true,
                     fixedHeader: true,
-                    order: [[0, 'asc']]
+                    order: [[0, 'asc']],
+                    columnDefs: [
+                        {className: "dt-center", targets: "_all"}
+                    ],
                 }
                 data.forEach(row => {
                     if (!headers) {
                         Object.keys(row).forEach(columnName => {
                             $('#myTable>thead>tr').append('<th>' + columnName + '</th>');
-                            dataTableConfig.columns.push({data: columnName})
+                            dataTableConfig.columns.push({
+                                data: columnName, render: function (value) {
+                                    if (columnName !== "Customer Name" && (!value || value.indexOf('Yes') === -1)) {
+                                        return '<i class="fa fa-times" style="color: red"></i>'
+                                    }
+                                    return value;
+                                }
+                            })
                         })
                         headers = true;
                     }
