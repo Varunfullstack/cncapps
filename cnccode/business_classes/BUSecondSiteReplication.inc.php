@@ -30,7 +30,6 @@ class BUSecondsiteReplication extends BUSecondsite
         $this->log = array();
 
         $servers = $this->getServers($customerItemID);
-
         $this->serverCount = count($servers);
 
         foreach ($servers as $server) {
@@ -73,7 +72,7 @@ class BUSecondsiteReplication extends BUSecondsite
                 $images = $this->getImagesByServer($server['server_cuino']);
 
                 if (
-                    !$server['secondSiteReplicationPath'] OR
+                    !$server['secondSiteReplicationPath'] or
                     count($images) == 0
                 ) {
                     $error = 'Offsite Backup Replication Path Error Or No Images';
@@ -327,7 +326,6 @@ class BUSecondsiteReplication extends BUSecondsite
             } // if not error
 
         } // end foreach contracts
-
         if (!$customerItemID && !$testRun) {
             /** @var dbSweetcode $db */
             $db = $GLOBALS['db'];
@@ -355,65 +353,51 @@ class BUSecondsiteReplication extends BUSecondsite
                       suspended_servers,
                       passes,
                       success_rate,
-                      isReplication
+                      isReplication,
+                      target
                     ) VALUES (now(), ?, ?, ?, ?, ?, ?, ?, 1, ?)";
-            $db->preparedQuery(
-                $query,
-                [
+            try {
+                $db->preparedQuery(
+                    $query,
                     [
-                        "type"  => "i",
-                        "value" => $this->serverCount
-                    ],
-                    [
-                        "type"  => "i",
-                        "value" => $this->imageCount
-                    ],
-                    [
-                        "type"  => "i",
-                        "value" => $this->serverErrorCount,
-                    ],
-                    [
-                        "type"  => "i",
-                        "value" => $this->imageErrorCount,
-                    ],
-                    [
-                        "type"  => "i",
-                        "value" => $this->suspendedServerCount,
-                    ],
-                    [
-                        "type"  => "i",
-                        "value" => $this->imagePassesCount,
-                    ],
-                    [
-                        "type"  => "d",
-                        "value" => $this->imageCount ? ($this->imagePassesCount / $this->imageCount) * 100 : 0
-                    ],
-                    [
-                        "type"  => "d",
-                        "value" => $dsHeader->getValue(DBEHeader::backupReplicationTargetSuccessRate)
+                        [
+                            "type"  => "i",
+                            "value" => $this->serverCount
+                        ],
+                        [
+                            "type"  => "i",
+                            "value" => $this->imageCount
+                        ],
+                        [
+                            "type"  => "i",
+                            "value" => $this->serverErrorCount,
+                        ],
+                        [
+                            "type"  => "i",
+                            "value" => $this->imageErrorCount,
+                        ],
+                        [
+                            "type"  => "i",
+                            "value" => $this->suspendedServerCount,
+                        ],
+                        [
+                            "type"  => "i",
+                            "value" => $this->imagePassesCount,
+                        ],
+                        [
+                            "type"  => "d",
+                            "value" => $this->imageCount ? ($this->imagePassesCount / $this->imageCount) * 100 : 0
+                        ],
+                        [
+                            "type"  => "d",
+                            "value" => $dsHeader->getValue(DBEHeader::backupReplicationTargetSuccessRate)
+                        ]
                     ]
-                ]
-            );
-
+                );
+            } catch (Exception $exception) {
+                throw new Exception('Failed to run query: ' . $this->db->error);
+            }
         }
-
-    }
-
-    function resetSuspendedUntilDate($cuino)
-    {
-        $queryString =
-            "UPDATE
-    custitem 
-    SET
-    offsiteReplicationValidationSuspendedUntilDate = NULL,
-        offsiteReplicationSuspendedByUserID = null,
-        offsiteReplicationSuspendedDate = null
-    WHERE
-    cui_cuino = $cuino";
-
-        $db = $GLOBALS['db'];
-
-        $db->query($queryString);
 
     }
 
@@ -464,6 +448,24 @@ class BUSecondsiteReplication extends BUSecondsite
         }
 
         return $servers;
+    }
+
+    function resetSuspendedUntilDate($cuino)
+    {
+        $queryString =
+            "UPDATE
+    custitem 
+    SET
+    offsiteReplicationValidationSuspendedUntilDate = NULL,
+        offsiteReplicationSuspendedByUserID = null,
+        offsiteReplicationSuspendedDate = null
+    WHERE
+    cui_cuino = $cuino";
+
+        $db = $GLOBALS['db'];
+
+        $db->query($queryString);
+
     }
 
     public function getImagesByServer($customerItemID)

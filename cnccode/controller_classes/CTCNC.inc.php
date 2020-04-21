@@ -331,8 +331,6 @@ class CTCNC extends Controller
     function parsePage()
     {
         global $userName;
-
-
         $urlLogout = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
             array('action' => CTCNC_ACT_LOGOUT)
