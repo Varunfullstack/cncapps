@@ -12,6 +12,7 @@ global $cfg;
 require_once($cfg['path_dbe'] . '/DBECallActivity.inc.php');
 require_once($cfg["path_dbe"] . "/DBEJCallActivity.php");
 require_once($cfg["path_bu"] . "/BUActivity.inc.php");
+require_once($cfg["path_bu"] . "/BUHeader.inc.php");
 
 
 global $cfg;
@@ -103,7 +104,9 @@ function processTimeRequestsEmails()
     $pendingIMRequests = [];
     $pendingProjectRequests = [];
     $buActivity = new BUActivity($thing);
-
+    $buHeader = new BUHeader($thing);
+    $dsHeader = new DataSet($thing);
+    $buHeader->getHeader($dsHeader);
     while ($dbejCallActivity->fetchNext()) {
 
         $row = [];
@@ -136,24 +139,34 @@ function processTimeRequestsEmails()
         $dbeProblem = new DBEJProblem($thing);
         $dbeProblem->getRow($problemID);
         $teamName = '';
+        $isOverLimit = false;
         switch ($teamID) {
             case 1:
                 $usedMinutes = $buActivity->getHDTeamUsedTime($problemID);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::hdLimitMinutes);
                 $teamName = 'Help Desk';
                 $storeArray = &$pendingHDRequests;
+                $isOverLimit = $assignedMinutes >= $dsHeader->getValue(
+                        DBEHeader::hdTeamManagementTimeApprovalMinutes
+                    );
                 break;
             case 2:
                 $usedMinutes = $buActivity->getESTeamUsedTime($problemID);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::esLimitMinutes);
                 $teamName = 'Escalation';
                 $storeArray = &$pendingESRequests;
+                $isOverLimit = $assignedMinutes >= $dsHeader->getValue(
+                        DBEHeader::esTeamManagementTimeApprovalMinutes
+                    );
                 break;
             case 4:
                 $usedMinutes = $buActivity->getSPTeamUsedTime($problemID);
                 $assignedMinutes = $dbeProblem->getValue(DBEProblem::smallProjectsTeamLimitMinutes);
                 $teamName = 'Small Projects';
                 $storeArray = &$pendingIMRequests;
+                $isOverLimit = $assignedMinutes >= $dsHeader->getValue(
+                        DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
+                    );
                 break;
             case 5:
                 $usedMinutes = $buActivity->getUsedTimeForProblemAndTeam($problemID, 5);
@@ -177,6 +190,7 @@ function processTimeRequestsEmails()
             'timeSpentSoFar'    => $usedMinutes,
             'timeLeftOnBudget'  => $leftOnBudget,
             'requesterTeam'     => $teamName,
+            'approvalLevel'     => $isOverLimit ? 'Mgmt' : 'Team Lead',
         ];
 
     }
