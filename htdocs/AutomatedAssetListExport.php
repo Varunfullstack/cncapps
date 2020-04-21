@@ -126,7 +126,7 @@ function getUnrepeatedUsername($str)
 while ($dbeCustomer->fetchNext()) {
 
     $query = /** @lang MySQL */
-        'SELECT 
+        'select * from (SELECT 
   locations.name AS "Location",
   computers.name AS "Computer Name",
   SUBSTRING_INDEX(lastusername, \'\\\\\', - 1) AS "Last User",
@@ -250,9 +250,9 @@ ON computers.computerid = processor.computerid
     )
   left join v_extradatacomputers exd
   on (exd.computerid = computers.computerid)
-    where clients.externalID = ? 
+    where clients.externalID = ? and  SUBSTRING_INDEX(lastusername, \'\\\\\', - 1) > "" and inv_chassis.productname > "" and processor.name > "" AND computers.totalmemory > "" and computers.domain > ""
 GROUP BY computers.computerid 
-ORDER BY Location, `Computer Name`';
+ORDER BY Location, `Computer Name`) a where `Total Disk` > ""';
 
     $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
     $customerName = $dbeCustomer->getValue(DBECustomer::name);

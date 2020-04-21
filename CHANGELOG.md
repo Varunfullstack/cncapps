@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 827 - Automated Asset Export validation of machines not fully checked in
+
 ## [v3.12.3] - 2020-04-20
 ### Fixed
 - Fix typo in the Current Asset List Extract
