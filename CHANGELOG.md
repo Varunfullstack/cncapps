@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 799 - Customer Contract Take Up Matrix
 ### Fixed
 - Issue 828 - Pending Time Request emails to include approval level
 
