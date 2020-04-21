@@ -77,6 +77,23 @@
     })
     var formChanged = false;
 
+    function checkCustomerAction() {
+        debugger;
+        const alarmDate = $('#alarmDate');
+        const alarmTime = $('#alarmTime');
+        let time = moment().format('HH:mm');
+        if (alarmTime.val()) {
+            time = alarmTime.val();
+        }
+        let dateMoment = moment(alarmDate.val() + " " + time, 'DD/MM/YYYY HH:mm');
+        if (!dateMoment.isValid() || dateMoment.isSameOrBefore(moment(), 'minute')
+        ) {
+            alert('Please provide a future date and time, or just a future date');
+            return false;
+        }
+        return true;
+    }
+
     function proceedWithCancel(form) {
         if (formChanged == true) {
             return confirm('Are you sure that you want to cancel without saving your changes?');
@@ -307,6 +324,7 @@
                            name="CustomerAction"
                            value="Customer Action"
                            id="customerActionBtn"
+                           onclick="return checkCustomerAction();"
                     >
                     <input type="submit"
                            name="CncAction"

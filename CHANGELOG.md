@@ -1,6 +1,17 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.13.0] - 2020-04-21
+### Added
+- Issue 799 - Customer Contract Take Up Matrix
+### Changed
+- Issue 826 - Force future date when setting SR to Awaiting Customer
+- Issue 827 - Automated Asset Export validation of machines not fully checked in
+### Fixed
+- Issue 828 - Pending Time Request emails to include approval level
+- Issue 829 - Offsite Backup Replication Status missing 2020
+- Issue 830 - Awaiting CNC status not being reset correctly
+
 ## [v3.12.3] - 2020-04-20
 ### Fixed
 - Fix typo in the Current Asset List Extract

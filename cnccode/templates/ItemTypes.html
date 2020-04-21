@@ -49,6 +49,34 @@
             <td class="buttons">
                 <button class="editButton">Edit</button>
             </td>
+            <td>
+                <div class="containerColumn">
+                    <div>
+                        <button class="sortOrderActionButton"
+                                onclick="moveUp()"
+                        >
+                            <i class='fa fa-angle-up'></i>
+                        </button>
+                        <button class="sortOrderActionButton"
+                                onclick="moveTop()"
+                        >
+                            <i class='fa fa-angle-double-up'></i>
+                        </button>
+                    </div>
+                    <div>
+                        <button class="sortOrderActionButton"
+                                onclick="moveDown()"
+                        >
+                            <i class='fa fa-angle-down'></i>
+                        </button>
+                        <button class="sortOrderActionButton"
+                                onclick="moveBottom()"
+                        >
+                            <i class='fa fa-angle-double-down'></i>
+                        </button>
+                    </div>
+                </div>
+            </td>
         </tr>
         {% /rules %}
         </tbody>
@@ -74,15 +102,19 @@
         return {id: null, description: "", active: null, reoccurring: null, stockcat: null, showInCustomerReview: null};
     }
 
-    $.ajax({
-        url: '{URLGetData}',
-        method: 'GET',
-        dataType: 'JSON'
-    })
-        .then(function (items) {
-            rules = items;
-            drawList();
-        });
+    function fetchData() {
+        $.ajax({
+            url: '{URLGetData}',
+            method: 'GET',
+            dataType: 'JSON'
+        })
+            .then(function (items) {
+                rules = items;
+                drawList();
+            });
+    }
+
+    fetchData();
 
     Mustache.tags = ['{%', '%}'];
 
@@ -97,6 +129,35 @@
 
     function jsonCopy(src) {
         return JSON.parse(JSON.stringify(src));
+    }
+
+    function moveUp() {
+        const $elm = $(event.target);
+        changeOrder($elm.closest('tr').data().id, 'up');
+    }
+
+    function moveTop() {
+        const $elm = $(event.target);
+        changeOrder($elm.closest('tr').data().id, 'top');
+    }
+
+    function moveDown() {
+        const $elm = $(event.target);
+        changeOrder($elm.closest('tr').data().id, 'down');
+    }
+
+    function moveBottom() {
+        const $elm = $(event.target);
+        changeOrder($elm.closest('tr').data().id, 'bottom');
+    }
+
+    function changeOrder(id, direction) {
+        $.ajax({
+            url: '?action=' + direction + "&itemTypeID=" + id,
+            method: 'GET',
+        }).then(function () {
+            fetchData();
+        })
     }
 
     $(function () {
@@ -195,7 +256,7 @@
                 const foundIndex = rules.findIndex(rule => currentRule.id === rule.id);
                 rules = arrayReplaceAt(rules, foundIndex, currentRule);
             }
-            rules.sort((a, b) => a.description.localeCompare(b.description));
+            rules.sort((a, b) => a.sortOrder.localeCompare(b.sortOrder));
             drawList();
             cancelEdit();
         })

@@ -73,7 +73,7 @@ $BUHeader->getHeader($dbeHeader);
 $thresholdDays = $dbeHeader->getValue(DBEHeader::OSSupportDatesThresholdDays);
 
 if (!$thresholdDays) {
-    throw new Exception('OS Support Dates Threshold days is empty');
+    throw new UnexpectedValueException('OS Support Dates Threshold days is empty');
 }
 
 $buCustomer = new BUCustomer($thing);
@@ -250,7 +250,7 @@ ON computers.computerid = processor.computerid
     )
   left join v_extradatacomputers exd
   on (exd.computerid = computers.computerid)
-    where clients.externalID = ? 
+    where clients.externalID = ? and  ServiceVersion
 GROUP BY computers.computerid 
 ORDER BY Location, `Computer Name`';
 
@@ -502,7 +502,7 @@ ORDER BY Location, `Computer Name`';
     } else {
         echo '<div>No Data was found</div>';
     }
-};
+}
 $tempFileName = null;
 if ($generateSummary) {
     echo '<h1>Generating Summary</h1>';

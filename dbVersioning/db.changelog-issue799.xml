@@ -1,0 +1,30 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue799-0">
+        <tagDatabase tag="issue799"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue799-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="itemType" columnName="sortOrder"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="itemType">
+            <column name="sortOrder" defaultValue="0" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue799-2">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="itemType" columnName="sortOrder"/>
+        </preConditions>
+        <sql splitStatements="true">
+            SET @tempVariable := 0;
+            UPDATE itemType           SET sortOrder = ( @tempVariable := @tempVariable + 1);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
