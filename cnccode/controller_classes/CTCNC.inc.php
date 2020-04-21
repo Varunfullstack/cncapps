@@ -330,7 +330,6 @@ class CTCNC extends Controller
      */
     function parsePage()
     {
-        echo 'here parse page';
         global $userName;
         $menu = new \CNCLTD\SideMenu();
 
