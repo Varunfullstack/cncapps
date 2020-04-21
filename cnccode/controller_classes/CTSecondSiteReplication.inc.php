@@ -174,7 +174,7 @@ class CTSecondSiteReplication extends CTSecondSite
                 'availableYearsBlock',
                 true
             );
-        };
+        }
 
 
         $this->template->setBlock(
@@ -455,7 +455,7 @@ class CTSecondSiteReplication extends CTSecondSite
     function run()
     {
         $this->buSecondsite->validateBackups($this->getParam('customerItemID'));
-
+        exit;
         $urlNext =
             Controller::buildLink(
                 'OffsiteBackupReplicationStatus.php',

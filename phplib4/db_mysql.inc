@@ -270,8 +270,9 @@ class DB_Sql
             $a_params
         );
 
-        mysqli_stmt_execute($statement);
-
+        if (!mysqli_stmt_execute($statement)) {
+            throw new Exception('Failed to execute prepared query');
+        }
         $result = mysqli_stmt_get_result($statement);
 
         $this->Row = 0;
