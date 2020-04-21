@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 829 - Offsite Backup Replication Status missing 2020
+
 ## [v3.12.3] - 2020-04-20
 ### Fixed
 - Fix typo in the Current Asset List Extract
