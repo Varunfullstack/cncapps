@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 799 - Customer Contract Take Up Matrix
+### Changed
+- Issue 826 - Force future date when setting SR to Awaiting Customer
 ### Fixed
 - Issue 828 - Pending Time Request emails to include approval level
 - Issue 829 - Offsite Backup Replication Status missing 2020
