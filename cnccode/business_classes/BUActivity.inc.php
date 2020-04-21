@@ -7571,7 +7571,7 @@ FROM
                 true,
                 USER_SYSTEM,
                 false,
-                false,
+                true,
                 true
             );
 
@@ -8392,7 +8392,8 @@ FROM
                         self::WorkStartedCustomerEmailCategory
                     );
                 }
-            } elseif ($dbeProblem->getValue(DBEJProblem::status) == 'F') {
+            }
+            elseif ($dbeProblem->getValue(DBEJProblem::status) == 'F') {
                 //Reopen
 
                 if ($comesFromAutomatedRequest) {

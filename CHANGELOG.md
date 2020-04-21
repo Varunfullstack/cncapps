@@ -10,6 +10,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 828 - Pending Time Request emails to include approval level
 - Issue 829 - Offsite Backup Replication Status missing 2020
+- Issue 830 - Awaiting CNC status not being reset correctly
 
 ## [v3.12.3] - 2020-04-20
 ### Fixed
