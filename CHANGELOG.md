@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 826 - Force future date when setting SR to Awaiting Customer
+
 ## [v3.12.3] - 2020-04-20
 ### Fixed
 - Fix typo in the Current Asset List Extract
