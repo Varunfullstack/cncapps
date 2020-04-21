@@ -187,8 +187,8 @@ function processTimeRequestsEmails()
                 ) . ' ' . $dbejCallActivity->getValue(DBEJCallActivity::startTime),
             'processCRLink'     => $processCRLink,
             'chargeableHours'   => $dbeProblem->getValue(DBEJProblem::chargeableActivityDurationHours),
-            'timeSpentSoFar'    => $usedMinutes,
-            'timeLeftOnBudget'  => $leftOnBudget,
+            'timeSpentSoFar'    => round($usedMinutes, 2),
+            'timeLeftOnBudget'  => round($leftOnBudget, 2),
             'requesterTeam'     => $teamName,
             'approvalLevel'     => $isOverLimit ? 'Mgmt' : 'Team Lead',
         ];
