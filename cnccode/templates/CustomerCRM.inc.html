@@ -154,7 +154,7 @@
                 <select name="form[contact][0][supportLevel]"
                         data-validation="atLeastOneMain"
                         data-type="mainSelector"
-                        data-except="$('#referred').prop('checked') || prospectFlag"
+                        data-except="$('#referred').prop('checked') || isProspect()"
                 >
                     <!-- BEGIN templateSupportLevelBlock -->
                     <option value="{supportLevelValue}"
@@ -317,7 +317,7 @@
                        value="Y"
                        data-validation="atLeastOne"
                        data-type="accounts"
-                       data-except="$('#referred').prop('checked') || prospectFlag"
+                       data-except="$('#referred').prop('checked') || isProspect()"
                 />
             </div>
         </td>
@@ -328,7 +328,7 @@
                        value="Y"
                        data-validation="atLeastOne"
                        data-type="invoice"
-                       data-except="$('#referred').prop('checked') || prospectFlag"
+                       data-except="$('#referred').prop('checked') || isProspect()"
                 />
             </div>
         </td>
@@ -348,7 +348,7 @@
                        class="stmCheckBox"
                        data-validation="atLeastOneAtMostOne"
                        data-type="statement"
-                       data-except="$('#referred').prop('checked') || prospectFlag"
+                       data-except="$('#referred').prop('checked') || isProspect()"
                 />
             </div>
         </td>
@@ -369,7 +369,7 @@
                        value="Y"
                        data-validation="atLeastOne"
                        data-type="review"
-                       data-except="$('#referred').prop('checked') || prospectFlag"
+                       data-except="$('#referred').prop('checked') || isProspect()"
                 />
             </div>
         </td>
@@ -380,7 +380,7 @@
                        value="Y"
                        data-type="topUp"
                        {topUpValidation}
-                       data-except="$('#referred').prop('checked') || prospectFlag"
+                       data-except="$('#referred').prop('checked') || isProspect()"
                 />
             </div>
         </td>
@@ -399,7 +399,7 @@
                        value="Y"
                        data-validation="atLeastOne"
                        data-type="reports"
-                       data-except="$('#referred').prop('checked') || prospectFlag"
+                       data-except="$('#referred').prop('checked') || isProspect()"
                 />
             </div>
         </td>
@@ -960,7 +960,11 @@
 
     }
 
-    prospectFlag = {prospectFlag};
+    function isProspect() {
+        return "{becameCustomerDate}" && !"{droppedCustomerDate}";
+    }
+
+
 
     function saveNote() {
 
@@ -1036,7 +1040,7 @@
 
         const value = +$('#primaryMainContactID').val();
 
-        if (value && !prospectFlag) {
+        if (value && !isProspect()) {
             debugger;
             const mainContactsSelect = $('.contactSupportLevel select option:selected[value="main"]').parent('select');
 
@@ -1059,8 +1063,6 @@
     }
 
     $(function () {
-
-
         loadNote('first');
     })
     //-->
@@ -2036,7 +2038,7 @@
                             <select name="form[contact][{contactID}][supportLevel]"
                                     data-validation="atLeastOneMain"
                                     data-type="mainSelector"
-                                    data-except="$('#referred').prop('checked') || prospectFlag"
+                                    data-except="$('#referred').prop('checked') || isProspect()"
                             >
                                 <!-- BEGIN supportLevelBlock -->
                                 <option {supportLevelSelected}
@@ -2242,7 +2244,7 @@
                                    {accountsFlagChecked}
                                    data-validation="atLeastOne"
                                    data-type="accounts"
-                                   data-except="$('#referred').prop('checked') || prospectFlag "
+                                   data-except="$('#referred').prop('checked') || isProspect() "
                             />
                         </div>
                     </td>
@@ -2256,7 +2258,7 @@
                                    {mailshot2FlagChecked}
                                    data-validation="atLeastOne"
                                    data-type="invoice"
-                                   data-except="$('#referred').prop('checked') || prospectFlag"
+                                   data-except="$('#referred').prop('checked') || isProspect()"
                             />
                         </div>
                     </td>
@@ -2282,7 +2284,7 @@
                                    class="stmCheckBox"
                                    data-validation="atLeastOneAtMostOne"
                                    data-type="statement"
-                                   data-except="$('#referred').prop('checked') || prospectFlag"
+                                   data-except="$('#referred').prop('checked') || isProspect()"
                             />
                         </div>
                     </td>
@@ -2309,7 +2311,7 @@
                                    {reviewUserFlagChecked}
                                    data-validation="atLeastOne"
                                    data-type="review"
-                                   data-except="$('#referred').prop('checked') || prospectFlag"
+                                   data-except="$('#referred').prop('checked') || isProspect()"
                             />
                         </div>
                     </td>
@@ -2323,7 +2325,7 @@
                                    {mailshot8FlagChecked}
                                    data-type="topUp"
                                    {topUpValidation}
-                                   data-except="$('#referred').prop('checked') || prospectFlag"
+                                   data-except="$('#referred').prop('checked') || isProspect()"
                             />
                         </div>
                     </td>
@@ -2348,7 +2350,7 @@
                                    {mailshot9FlagChecked}
                                    data-validation="atLeastOne"
                                    data-type="reports"
-                                   data-except="$('#referred').prop('checked') || prospectFlag"
+                                   data-except="$('#referred').prop('checked') || isProspect()"
                             />
                         </div>
                     </td>

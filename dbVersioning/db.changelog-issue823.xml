@@ -1,0 +1,76 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue823-0">
+        <tagDatabase tag="issue823"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue823-1">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="customer" columnName="cus_prospect"/>
+        </preConditions>
+        <dropColumn tableName="customer" columnName="cus_prospect"/>
+        <rollback>
+            <addColumn tableName="customer">
+                <column name="cus_prospect" remarks="Is this a prospect?" type="CHAR(1)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue823-2">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="leadstatus"/>
+        </preConditions>
+        <dropTable tableName="leadstatus"/>
+        <rollback>
+            <createTable tableName="leadstatus">
+                <column name="lst_leadstatusno" type="INT UNSIGNED">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="lst_desc" type="CHAR(50)"/>
+            </createTable>
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue823-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customerLeadStatus" columnName="show"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customerLeadStatus">
+            <column name="show" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue823-3">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="customer" columnName="cus_leadstatusno"/>
+        </preConditions>
+        <dropColumn tableName="customer" columnName="cus_leadstatusno"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue823-4">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="customer" columnName="customer_lead_status_id"/>
+        </preConditions>
+        <renameColumn tableName="customer" oldColumnName="customer_lead_status_id" newColumnName="leadStatusId"
+                      columnDataType="int(11)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue823-5">
+        <sql splitStatements="false">
+            truncate customerLeadStatus;
+            insert into customerLeadStatus
+            values (1, "Lead", 1),
+                   (2, "Meeting", 1),
+                   (3, "Audit", 1),
+                   (4, "Proposal", 1),
+                   (5, "Customer", 1),
+                   (6, "Dead", 1),
+                   (7, "Misc", 1);
+            update customer
+            set leadStatusId = if(cus_became_customer_date is not null and cu_dropped_customer_date is null, 5, 1);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
