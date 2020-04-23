@@ -18,7 +18,6 @@ class DBECustomer extends DBCNCEntity
     const referredFlag = "referredFlag";
     const pcxFlag = "pcxFlag";
     const customerTypeID = "customerTypeID";
-    const prospectFlag = "prospectFlag";
     const gscTopUpAmount = "gscTopUpAmount";
     const modifyDate = "modifyDate";
     const modifyUserID = "modifyUserID";
@@ -139,12 +138,6 @@ class DBECustomer extends DBCNCEntity
             DA_ID,
             DA_NOT_NULL,
             "cus_ctypeno"
-        );
-        $this->addColumn(
-            self::prospectFlag,
-            DA_YN_FLAG,
-            DA_NOT_NULL,
-            "cus_prospect"
         );
         $this->addColumn(
             self::gscTopUpAmount,
@@ -709,14 +702,12 @@ class DBECustomer extends DBCNCEntity
     {
         $this->setMethodName("getSpecialAttentionCustomers");
         $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " where " . $this->getDBColumnName(DBECustomer::referredFlag) . " <> 'Y'";
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} where {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y'";
 
         if ($ignoreProspects) {
-            $queryString .= " and " . $this->getDBColumnName(DBECustomer::prospectFlag) . " <> 'Y' ";
+            $queryString .= " and {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null ";
         }
-        $queryString .= " order by cus_name ";
+        $queryString .= " order by {$this->getDBColumnName(DBECustomer::name)} ";
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;

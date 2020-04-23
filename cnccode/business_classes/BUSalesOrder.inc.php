@@ -403,7 +403,7 @@ class BUSalesOrder extends Business
             $transactionType
         );
         $buCustomer = new BUCustomer($this);
-        $buCustomer->setProspectFlagOff($dsOrdhead->getValue(DBEOrdhead::customerID));
+        $buCustomer->ensureBecameCustomer($dsOrdhead->getValue(DBEOrdhead::customerID));
     }
 
     /**
@@ -1385,7 +1385,7 @@ class BUSalesOrder extends Business
             $ret = $newOrdheadID;
         }
         $buCustomer = new BUCustomer($this);
-        $buCustomer->setProspectFlagOff($dsOrdhead->getValue(DBEOrdhead::customerID));
+        $buCustomer->ensureBecameCustomer($dsOrdhead->getValue(DBEOrdhead::customerID));
 
         /*
          * Now we need to go through the lines looking for any quotation or domain renewals

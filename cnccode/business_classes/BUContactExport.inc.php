@@ -4,6 +4,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/CNCMysqli.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
@@ -38,75 +39,92 @@ class BUContactExport extends Business
         $buHeader = new BUHeader($this);
         $dsHeader = new DataSet($this);
         $buHeader->getHeader($dsHeader);
-
+        $dbeCustomer = new DBECustomer($this);
+        $DBEContact = new DBEContact($this);
+        $dbeCustItem = new DBECustomerItem($this);
+        $dbeSite = new DBESite($this);
         $query =
             "SELECT DISTINCT";
 
         if ($dsSearchForm->getValue(CTContactExport::searchFormExportEmailOnlyFlag) == 'Y') {
-            $query .= " con_email AS EmailAddress";
+            $query .= " {$DBEContact->getDBColumnName(DBEContact::email)} AS EmailAddress";
         } else {
             $query .=
-                " con_custno as CustomerID,
-        con_title AS Title,
-        con_last_name AS LastName,
-        con_first_name AS FirstName,
-        con_position AS Position,
-        supportLevel as SupportLevel,
-        cus_name AS Company,
-        add_add1 AS BusinessStreet,
-        add_add2 AS BusinessStreet2,
-        add_add3  AS BusinessStreet3,
-        add_town AS BusinessCity,
-        add_county AS BusinessState,
-        add_postcode AS BusinessPostalCode,
-        if(add_phone, concat(\"'\",add_phone),null) AS BusinessPhone,
-        if(con_phone, concat(\"'\",con_phone),null)  AS BusinessPhone2,
-        if(con_mobile_phone, concat(\"'\",con_mobile_phone), null) AS Mobile,
-        con_email AS EmailAddress,
-        CONCAT(con_first_name,' ',con_last_name) AS DisplayName,
-        cus_prospect AS Prospect";
+                " 
+                {$DBEContact->getDBColumnName($DBEContact::customerID)} as CustomerID,
+        {$DBEContact->getDBColumnName($DBEContact::title)} AS Title,
+        {$DBEContact->getDBColumnName($DBEContact::lastName)} AS LastName,
+        {$DBEContact->getDBColumnName($DBEContact::firstName)}AS FirstName,
+        {$DBEContact->getDBColumnName($DBEContact::position)}AS Position,
+        {$DBEContact->getDBColumnName($DBEContact::supportLevel)} as SupportLevel,
+        {$dbeCustomer->getDBColumnName(DBECustomer::name)} AS Company,
+        {$dbeSite->getDBColumnName(DBESite::add1)} AS BusinessStreet,
+        {$dbeSite->getDBColumnName(DBESite::add2)} AS BusinessStreet2,
+        {$dbeSite->getDBColumnName(DBESite::add3)}  AS BusinessStreet3,
+        {$dbeSite->getDBColumnName(DBESite::town)} AS BusinessCity,
+        {$dbeSite->getDBColumnName(DBESite::county)} AS BusinessState,
+        {$dbeSite->getDBColumnName(DBESite::postcode)}AS BusinessPostalCode,
+        if({$dbeSite->getDBColumnName(DBESite::phone)}, concat(\"'\",{$dbeSite->getDBColumnName(DBESite::phone)}),null) AS BusinessPhone,
+        if({$DBEContact->getDBColumnName($DBEContact::phone)}, concat(\"'\",{$DBEContact->getDBColumnName($DBEContact::phone)}),null)  AS BusinessPhone2,
+        if({$DBEContact->getDBColumnName($DBEContact::mobilePhone)}, concat(\"'\",{$DBEContact->getDBColumnName($DBEContact::mobilePhone)}), null) AS Mobile,
+        {$DBEContact->getDBColumnName($DBEContact::email)} AS EmailAddress,
+        CONCAT({$DBEContact->getDBColumnName($DBEContact::firstName)},' ',{$DBEContact->getDBColumnName($DBEContact::lastName)}) AS DisplayName,
+        {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null AS Prospect";
 
 
             if ($dsSearchForm->getValue(CTContactExport::searchFormSendMailshotFlag)) {
-                $query .= ", cus_mailshot AS `Mailshot`";
+                $query .= ", {$dbeCustomer->getDBColumnName(DBECustomer::mailshotFlag)} AS `Mailshot`";
             }
             if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot2Flag)) {
-                $query .= ", con_mailflag2 AS `" . $dsHeader->getValue(DBEHeader::mailshot2FlagDesc) . "`";
+                $query .= ", {$DBEContact->getDBColumnName($DBEContact::mailshot2Flag)} AS `" . $dsHeader->getValue(
+                        DBEHeader::mailshot2FlagDesc
+                    ) . "`";
             }
             if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot3Flag)) {
-                $query .= ", con_mailflag3 AS `" . $dsHeader->getValue(DBEHeader::mailshot3FlagDesc) . "`";
+                $query .= ", {$DBEContact->getDBColumnName($DBEContact::mailshot3Flag)} AS `" . $dsHeader->getValue(
+                        DBEHeader::mailshot3FlagDesc
+                    ) . "`";
             }
             if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot4Flag)) {
-                $query .= ", con_mailflag4 AS `" . $dsHeader->getValue(DBEHeader::mailshot4FlagDesc) . "`";
+                $query .= ", {$DBEContact->getDBColumnName($DBEContact::mailshot4Flag)} AS `" . $dsHeader->getValue(
+                        DBEHeader::mailshot4FlagDesc
+                    ) . "`";
             }
             if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot8Flag)) {
-                $query .= ", con_mailflag8 AS `" . $dsHeader->getValue(DBEHeader::mailshot8FlagDesc) . "`";
+                $query .= ", {$DBEContact->getDBColumnName($DBEContact::mailshot8Flag)} AS `" . $dsHeader->getValue(
+                        DBEHeader::mailshot8FlagDesc
+                    ) . "`";
             }
             if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot9Flag)) {
-                $query .= ", con_mailflag9 AS `" . $dsHeader->getValue(DBEHeader::mailshot9FlagDesc) . "`";
+                $query .= ", {$DBEContact->getDBColumnName($DBEContact::mailshot9Flag)} AS `" . $dsHeader->getValue(
+                        DBEHeader::mailshot9FlagDesc
+                    ) . "`";
             }
             if ($dsSearchForm->getValue(CTContactExport::searchFormMailshot11Flag)) {
-                $query .= ", con_mailflag11 AS `" . $dsHeader->getValue(DBEHeader::mailshot11FlagDesc) . "`";
+                $query .= ", {$DBEContact->getDBColumnName($DBEContact::mailshot11Flag)} AS `" . $dsHeader->getValue(
+                        DBEHeader::mailshot11FlagDesc
+                    ) . "`";
             }
             if ($dsSearchForm->getValue(DBEContact::hrUser)) {
-                $query .= ", hrUser as HR";
+                $query .= ", {$DBEContact->getDBColumnName($DBEContact::hrUser)} as HR";
             }
 
             if ($dsSearchForm->getValue(DBEContact::reviewUser)) {
-                $query .= ", reviewUser as review";
+                $query .= ", {$DBEContact->getDBColumnName($DBEContact::reviewUser)} as review";
             }
         }// end
 
         $query .= "
-      FROM contact
-      JOIN address ON
-        (con_siteno = add_siteno  AND con_custno = add_custno)
-      JOIN customer ON
-        con_custno = cus_custno";
+      FROM {$DBEContact->getTableName()}
+      JOIN {$dbeSite->getTableName()} ON
+        ({$DBEContact->getDBColumnName($DBEContact::siteNo)} = {$dbeSite->getDBColumnName(DBESite::siteNo)}  AND {$DBEContact->getDBColumnName($DBEContact::customerID)} = {$dbeSite->getDBColumnName(DBESite::siteNo)})
+      JOIN {$dbeCustomer->getTableName()} ON
+        {$DBEContact->getDBColumnName($DBEContact::customerID)} = {$dbeCustomer->getDBColumnName(DBECustomer::customerID)}";
 
         if ($contractItemIDs) {
+
             $query .=
-                " JOIN custitem cc ON cc.cui_custno = cus_custno";
+                " JOIN {$dbeCustItem->getTableName()} cc ON cc.{$dbeCustItem->getDBColumnName(DBECustomerItem::customerID)} = {$dbeCustomer->getDBColumnName(DBECustomer::customerID)}";
         }
 
         $query .= " WHERE 1 = 1 ";
@@ -129,15 +147,15 @@ class BUContactExport extends Business
 
                 if ($hasNone) {
                     if (count($selectedOptions)) {
-                        $query .= " and ( supportLevel is null or supportLevel = '' or supportLevel in (" . implode(
+                        $query .= " and ( {$DBEContact->getDBColumnName($DBEContact::supportLevel)} is null or {$DBEContact->getDBColumnName($DBEContact::supportLevel)} = '' or {$DBEContact->getDBColumnName($DBEContact::supportLevel)} in (" . implode(
                                 ",",
                                 $selectedOptions
                             ) . ")) ";
                     } else {
-                        $query .= " and supportLevel is null";
+                        $query .= " and {$DBEContact->getDBColumnName($DBEContact::supportLevel)} is null";
                     }
                 } else {
-                    $query .= " and supportLevel in (" . implode(
+                    $query .= " and {$DBEContact->getDBColumnName($DBEContact::supportLevel)} in (" . implode(
                             ",",
                             array_map(
                                 function ($str) {
@@ -156,9 +174,9 @@ class BUContactExport extends Business
         $searchCriteria = $dsSearchForm->getValue(CTContactExport::searchCriteria);
         if ($contractItemIDs) {
             $query .=
-                " AND  ( declinedFlag = 'N' ";
+                " AND  ( {$dbeCustItem->getDBColumnName(DBECustomerItem::declinedFlag)} = 'N' ";
             if ($searchCriteria === 'AND') {
-                $query .= "AND cui_itemno IN(
+                $query .= "AND {$dbeCustItem->getDBColumnName(DBECustomerItem::itemID)} IN(
                     " . implode(
                         ',',
                         $contractItemIDs
@@ -169,7 +187,7 @@ class BUContactExport extends Business
                         ' or ',
                         array_map(
                             function ($contractItemID) {
-                                return " cui_itemno = $contractItemID ";
+                                return " {$dbeCustItem->getDBColumnName(DBECustomerItem::itemID)} = $contractItemID ";
                             },
                             $contractItemIDs
                         )
@@ -178,7 +196,7 @@ class BUContactExport extends Business
         }
 
         if ($dsSearchForm->getValue(CTContactExport::searchFormExportEmailOnlyFlag)) {
-            $query .= " AND con_email <> '' and con_email is not null ";
+            $query .= " AND {$DBEContact->getDBColumnName($DBEContact::email)} <> '' and {$DBEContact->getDBColumnName($DBEContact::email)} is not null ";
         }
 
         $possibleOrQueries = "";
@@ -187,72 +205,78 @@ class BUContactExport extends Business
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
-            $possibleOrQueries .= " cus_custno =  " . $dsSearchForm->getValue(DBEContact::customerID) . " ";
+            $possibleOrQueries .= " {$dbeCustomer->getDBColumnName(DBECustomer::customerID)}=  {$dsSearchForm->getValue(DBEContact::customerID)} ";
         }
-        if ($dsSearchForm->getValue(DBECustomer::prospectFlag)) {
+        if ($dsSearchForm->getValue(CTContactExport::searchFormProspectFlag)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
-            $possibleOrQueries .= "  cus_prospect =  '" . $dsSearchForm->getValue(
-                    DBECustomer::prospectFlag
-                ) . "' ";
+            $dbeCustomer = new DBECustomer($this);
+            $condition = "  ( {$dbeCustomer->getDBColumnName(
+                    DBECustomer::becameCustomerDate
+                )} is null or {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is not null) ";
+
+            if ($dsSearchForm->getValue(CTContactExport::searchFormProspectFlag) != 'Y') {
+                $possibleOrQueries .= "  not {$condition}";
+            }
+            $possibleOrQueries .= $condition;
         }
 
         if ($dsSearchForm->getValue(DBEContact::sendMailshotFlag)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
-            $possibleOrQueries .= "  cus_mailshot =  'Y' ";
+            $possibleOrQueries .= "  {$dbeCustomer->getDBColumnName(DBECustomer::mailshotFlag)} =  'Y' ";
         }
         if ($dsSearchForm->getValue(DBEContact::mailshot2Flag)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
-            $possibleOrQueries .= "  con_mailflag2 =  'Y' ";
+            $possibleOrQueries .= "  {$DBEContact->getDBColumnName($DBEContact::mailshot2Flag)} =  'Y' ";
         }
         if ($dsSearchForm->getValue(DBEContact::mailshot3Flag)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
-            $possibleOrQueries .= "  con_mailflag3 =  'Y' ";
+            $possibleOrQueries .= "  {$DBEContact->getDBColumnName($DBEContact::mailshot3Flag)} =  'Y' ";
         }
         if ($dsSearchForm->getValue(DBEContact::mailshot4Flag)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
-            $possibleOrQueries .= "  con_mailflag4 =  'Y' ";
+            $possibleOrQueries .= "  {$DBEContact->getDBColumnName($DBEContact::mailshot4Flag)} =  'Y' ";
         }
         if ($dsSearchForm->getValue(DBEContact::mailshot8Flag)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
-            $possibleOrQueries .= "  con_mailflag8 =  'Y' ";
+            $possibleOrQueries .= "  {$DBEContact->getDBColumnName($DBEContact::mailshot8Flag)} =  'Y' ";
         }
         if ($dsSearchForm->getValue(DBEContact::mailshot9Flag)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
-            $possibleOrQueries .= "  con_mailflag9 =  'Y' ";
+            $possibleOrQueries .= "  {$DBEContact->getDBColumnName($DBEContact::mailshot9Flag)} =  'Y' ";
         }
         if ($dsSearchForm->getValue(DBEContact::mailshot11Flag)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
-            $possibleOrQueries .= "  con_mailflag11 =  'Y' ";
+            $possibleOrQueries .= "  {$DBEContact->getDBColumnName($DBEContact::mailshot11Flag)} =  'Y' ";
         }
 
         if ($dsSearchForm->getValue(DBEContact::hrUser)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
-            $possibleOrQueries .= "  " . DBEContact::hrUser . " = 'Y' ";
+            $possibleOrQueries .= " {$DBEContact->getDBColumnName($DBEContact::hrUser)}  = 'Y' ";
         }
 
         if ($dsSearchForm->getValue(DBEContact::reviewUser)) {
             if (strlen($possibleOrQueries)) {
                 $possibleOrQueries .= $searchCriteria;
             }
-            $possibleOrQueries .= " " . DBEContact::reviewUser . " = 'Y' ";
+            $possibleOrQueries .= " {$DBEContact->getDBColumnName($DBEContact::reviewUser)} = 'Y' ";
         }
 
         if (strlen($possibleOrQueries)) {

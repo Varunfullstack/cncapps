@@ -551,7 +551,8 @@ class DBEContact extends DBCNCEntity
         return $ret;
     }
 
-    function getSupportContactRowsByNameMatch($customerId, $match){
+    function getSupportContactRowsByNameMatch($customerId, $match)
+    {
         $this->setMethodName("getCustomerRowsByNameMatch");
         $this->setValue(
             self::customerID,
@@ -708,14 +709,17 @@ class DBEContact extends DBCNCEntity
 
     function getSupportRows($customerID = false)
     {
-        $sql = "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::supportLevel) .
-            " is not null  and " . $this->getDBColumnName(self::supportLevel) . " <> ''      
-            AND (SELECT cus_prospect = 'N' FROM customer WHERE con_custno = cus_custno )";
+        $dbeCustomer = new DBECustomer($this);
+        $sql = "SELECT {$this->getDBColumnNamesAsString()}
+FROM {$this->getTableName()}
+         left join {$dbeCustomer->getTableName()} on {$this->getDBColumnName(DBEContact::customerID)} = {$dbeCustomer->getDBColumnName(DBECustomer::customerID)}
+WHERE {$this->getDBColumnName(self::supportLevel)} is not null
+  and {$this->getDBColumnName(self::supportLevel)} <> ''
+  AND {$dbeCustomer->getDBColumnName(DBECustomer::becameCustomerDate)} is not null
+  and {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is null;";
 
         if ($customerID) {
-            $sql .= " AND con_custno = " . $customerID;
+            $sql .= " AND {$this->getDBColumnName(self::customerID)} = " . $customerID;
         }
         $this->setQueryString($sql);
 

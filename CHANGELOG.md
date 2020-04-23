@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 823 - Customer CRM Page improvements
+
 ## [v3.13.4] - 2020-05-01
 ### Fixed
 - Fixed issue with saving new contact

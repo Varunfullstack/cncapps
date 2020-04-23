@@ -813,9 +813,6 @@ class CTCustomerCRM extends CTCustomer
                 'referredFlagChecked'                => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::referredFlag)
                 ),
-                'prospectFlag'                       => $this->dsCustomer->getValue(
-                    DBECustomer::prospectFlag
-                ) == 'Y' ? 1 : 0,
                 'specialAttentionFlagChecked'        => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag)
                 ),
@@ -846,10 +843,6 @@ class CTCustomerCRM extends CTCustomer
                 ),
                 DBECustomer::opportunityDeal         => $this->dsCustomer->getValue(DBECustomer::opportunityDeal),
                 DBECustomer::rating                  => $this->dsCustomer->getValue(DBECustomer::rating),
-
-                'prospectFlagChecked' => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::prospectFlag)
-                ),
                 'pcxFlagChecked'      => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::pcxFlag)
                 ),

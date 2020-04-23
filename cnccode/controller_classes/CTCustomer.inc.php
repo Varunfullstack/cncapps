@@ -786,10 +786,6 @@ class CTCustomer extends CTCNC
                 DBECustomer::leadStatusID,
                 @$value['leadStatusID']
             );
-            $this->dsCustomer->setValue(
-                DBECustomer::prospectFlag,
-                $this->getYN(@$value['prospectFlag'])
-            );
 
             $this->dsCustomer->setValue(
                 DBECustomer::createDate,
@@ -1784,9 +1780,6 @@ class CTCustomer extends CTCNC
                 ) ? 'checked' : null,
                 'support24HourFlagChecked'       => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::support24HourFlag)
-                ),
-                'prospectFlagChecked'            => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::prospectFlag)
                 ),
                 'pcxFlagChecked'                 => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::pcxFlag)
