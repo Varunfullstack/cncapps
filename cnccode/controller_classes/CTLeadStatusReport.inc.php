@@ -9,6 +9,7 @@
  */
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BULeadStatus.inc.php');
+require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
 
 // Actions
 class CTLeadStatusReport extends CTCNC
@@ -38,7 +39,16 @@ class CTLeadStatusReport extends CTCNC
      */
     function defaultAction()
     {
+        if ($this->action == 'getLeadData') {
+            echo json_encode($this->getLeadData());
+        }
         $this->displayReport();
+    }
+
+    private function getLeadData()
+    {
+        global $db;
+
     }
 
     /**
@@ -78,7 +88,7 @@ class CTLeadStatusReport extends CTCNC
 
         $this->template->set_block('LeadStatusReport', 'countBlock', 'counts');
 
-        foreach ($becameCustomerArray AS $year => $becameCount) {
+        foreach ($becameCustomerArray as $year => $becameCount) {
 
             $droppedCount = $droppedCustomerArray[$year];
 
@@ -96,135 +106,8 @@ class CTLeadStatusReport extends CTCNC
             $this->template->parse('counts', 'countBlock', true);
 
         }
-        /*
-        Hot leads
-        */
-        $hotLeads = $this->buLeadStatus->getLeadsByStatus(1, $this->getSessionParam('orderHotAlpha'));
-
-        $this->template->set_block('LeadStatusReport', 'hotBlock', 'hots');
-
-        while ($row = $hotLeads->fetch_array()) {
-
-            $urlHot =
-
-                Controller::buildLink(
-                    'Customer.php',
-                    array(
-                        'action'     => 'dispEdit',
-                        'customerID' => $row['customerID']
-                    )
-                );
-
-            $this->template->set_var(
-
-                array(
-                    'hotName' => $row['customerName'],
-                    'urlHot'  => $urlHot
-                )
-
-            );
-
-            $this->template->parse('hots', 'hotBlock', true);
-
-        }
-        /*
-        Warm leads
-        */
-        $warmLeads = $this->buLeadStatus->getLeadsByStatus(2, $this->getSessionParam('orderWarmAlpha'));
-
-        $this->template->set_block('LeadStatusReport', 'warmBlock', 'warms');
-
-        while ($row = $warmLeads->fetch_array()) {
-
-            $urlWarm =
-
-                Controller::buildLink(
-                    'Customer.php',
-                    array(
-                        'action'     => 'dispEdit',
-                        'customerID' => $row['customerID']
-                    )
-                );
-
-            $this->template->set_var(
-
-                array(
-                    'warmName' => $row['customerName'],
-                    'urlWarm'  => $urlWarm
-                )
-
-            );
-
-            $this->template->parse('warms', 'warmBlock', true);
-
-        }
-        /*
-        Cold leads
-        */
-        $coldLeads = $this->buLeadStatus->getLeadsByStatus(3, $this->getSessionParam('orderColdAlpha'));
-
-        $this->template->set_block('LeadStatusReport', 'coldBlock', 'colds');
-
-        while ($row = $coldLeads->fetch_array()) {
-
-            $urlCold =
-
-                Controller::buildLink(
-                    'Customer.php',
-                    array(
-                        'action'     => 'dispEdit',
-                        'customerID' => $row['customerID']
-                    )
-                );
-
-            $this->template->set_var(
-
-                array(
-                    'coldName' => $row['customerName'],
-                    'urlCold'  => $urlCold
-                )
-
-            );
-
-            $this->template->parse('colds', 'coldBlock', true);
-
-        }
-
-
-        /*
-        Dead leads
-        */
-        $deadLeads = $this->buLeadStatus->getLeadsByStatus(4, $this->getSessionParam('orderDeadAlpha'));
-
-        $this->template->set_block('LeadStatusReport', 'deadBlock', 'deads');
-
-        while ($row = $deadLeads->fetch_array()) {
-
-            $urlDead =
-
-                Controller::buildLink(
-                    'Customer.php',
-                    array(
-                        'action'     => 'dispEdit',
-                        'customerID' => $row['customerID']
-                    )
-                );
-
-            $this->template->set_var(
-
-                array(
-                    'deadName' => $row['customerName'],
-                    'urlDead'  => $urlDead
-                )
-
-            );
-
-            $this->template->parse('deads', 'deadBlock', true);
-
-        }
 
         $this->template->parse('CONTENTS', 'LeadStatusReport', true);
         $this->parsePage();
-
     }
 }// end of class

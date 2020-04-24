@@ -10,7 +10,6 @@ require_once($cfg["path_dbe"] . "/DBESite.inc.php");
 require_once($cfg["path_dbe"] . "/DBEContact.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerType.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerLeadStatus.php");
-require_once($cfg["path_dbe"] . "/DBELeadStatus.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJContract.inc.php');
 require_once($cfg['path_dbe'] . '/DBEOrdhead.inc.php');
@@ -359,7 +358,7 @@ class BUCustomer extends Business
     function getLeadStatus(&$dsResults)
     {
         $this->setMethodName('getLeadStatus');
-        $dbeLeadStatus = new DBELeadStatus($this);
+        $dbeLeadStatus = new DBECustomerLeadStatus($this);
         $dbeLeadStatus->getRows();
         return ($this->getData(
             $dbeLeadStatus,
@@ -375,7 +374,9 @@ class BUCustomer extends Business
         $customerID = $newRow->getPkValue();
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerID);
-
+        echo '<pre>';
+        var_dump($newRow);
+        exit;
         $newRow->setValue(
             DBECustomer::modifyDate,
             date('d/m/Y H:i:s')

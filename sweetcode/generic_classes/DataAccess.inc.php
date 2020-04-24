@@ -80,6 +80,11 @@ define(
 );
 
 define(
+    "DA_PHONE",
+    "phone"
+);
+
+define(
     'DA_SUPPORT_LEVEL',
     'supportLevel'
 );
@@ -1286,6 +1291,8 @@ not a boolean, the given value is null, column given is not the PK, and there is
                 return $this->tryCreateDateTime($value);
             case DA_DATE:
                 return $this->tryCreateDate($value);
+            case DA_PHONE:
+                return $value ? $value : null;
             case DA_YN:
                 return $value == 'Y' ? 'Y' : 'N';
             case DA_JSON_ARRAY:

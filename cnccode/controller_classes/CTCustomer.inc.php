@@ -783,7 +783,7 @@ class CTCustomer extends CTCNC
                 @$value['sectorID']
             );
             $this->dsCustomer->setValue(
-                DBECustomer::leadStatusID,
+                DBECustomer::leadStatusId,
                 @$value['leadStatusID']
             );
 
@@ -1944,15 +1944,14 @@ class CTCustomer extends CTCNC
         $dsLeadStatus = new DataSet($this);
         $this->buCustomer->getLeadStatus($dsLeadStatus);
         while ($dsLeadStatus->fetchNext()) {
-
             $this->template->set_var(
                 array(
-                    'leadStatusID'          => $dsLeadStatus->getValue(DBELeadStatus::leadStatusID),
-                    'leadStatusDescription' => $dsLeadStatus->getValue(DBELeadStatus::description),
+                    'leadStatusID'          => $dsLeadStatus->getValue(DBECustomerLeadStatus::id),
+                    'leadStatusDescription' => $dsLeadStatus->getValue(DBECustomerLeadStatus::name),
                     'leadStatusSelected'    => ($dsLeadStatus->getValue(
-                            DBELeadStatus::leadStatusID
+                            DBECustomerLeadStatus::id
                         ) == $this->dsCustomer->getValue(
-                            DBECustomer::leadStatusID
+                            DBECustomer::leadStatusId
                         )) ? CT_SELECTED : null
                 )
             );

@@ -538,7 +538,6 @@ class DBEntity extends DataAccess
     {
         $colType = $this->colType[$colIdx];
         $value = $this->getSQLValue($colIdx);
-
         if ($value === null) {
             return 'null';
         }
@@ -560,6 +559,10 @@ class DBEntity extends DataAccess
                 }
             case DA_DATE:
                 if ($value == '0000-00-00') {
+                    return 'null';
+                }
+            case DA_PHONE:
+                if ($value === '') {
                     return 'null';
                 }
             default:

@@ -127,7 +127,7 @@ class DBEContact extends DBCNCEntity
         );
         $this->addColumn(
             self::phone,
-            DA_STRING,
+            DA_PHONE,
             DA_ALLOW_NULL,
             "con_phone"
         );

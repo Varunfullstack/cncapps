@@ -30,26 +30,26 @@
             </createTable>
         </rollback>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue823-2">
+    <changeSet author="pavwebdev" id="issue823-3">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="customerLeadStatus" columnName="show"/>
+                <columnExists tableName="customerLeadStatus" columnName="appearOnScreen"/>
             </not>
         </preConditions>
         <addColumn tableName="customerLeadStatus">
-            <column name="show" type="tinyint(1)" defaultValue="0">
+            <column name="appearOnScreen" type="tinyint(1)" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue823-3">
+    <changeSet author="pavwebdev" id="issue823-4">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="customer" columnName="cus_leadstatusno"/>
         </preConditions>
         <dropColumn tableName="customer" columnName="cus_leadstatusno"/>
         <rollback/>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue823-4">
+    <changeSet author="pavwebdev" id="issue823-5">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="customer" columnName="customer_lead_status_id"/>
         </preConditions>
@@ -57,8 +57,8 @@
                       columnDataType="int(11)"/>
         <rollback/>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue823-5">
-        <sql splitStatements="false">
+    <changeSet author="pavwebdev" id="issue823-6">
+        <sql splitStatements="true">
             truncate customerLeadStatus;
             insert into customerLeadStatus
             values (1, "Lead", 1),
@@ -69,8 +69,42 @@
                    (6, "Dead", 1),
                    (7, "Misc", 1);
             update customer
-            set leadStatusId = if(cus_became_customer_date is not null and cu_dropped_customer_date is null, 5, 1);
+            set leadStatusId = if(cus_became_customer_date is not null and cus_dropped_customer_date is null, 5, 1);
         </sql>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue823-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="customer" foreignKeyName="fk_customer_lead_status_id"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="leadStatusId"
+                                 baseTableName="customer"
+                                 constraintName="fk_customer_lead_status_id"
+                                 onDelete="SET NULL"
+                                 onUpdate="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="customerLeadStatus"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue823-8">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select DATA_TYPE = 'time'
+                from information_schema.COLUMNS
+                where columns.TABLE_SCHEMA = DATABASE()
+                and TABLE_NAME = 'customer'
+                and COLUMN_NAME = 'reviewTime'
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            update customer
+            set reviewTime = null;
+        </sql>
+        <modifyDataType tableName="customer" columnName="reviewTime" newDataType="time"/>
+        <rollback>
+            <modifyDataType tableName="customer" columnName="reviewTime" newDataType="char(5)"/>
+        </rollback>
+    </changeSet>
+
 
 </databaseChangeLog>

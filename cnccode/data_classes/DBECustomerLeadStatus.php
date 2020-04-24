@@ -8,8 +8,9 @@
 
 class DBECustomerLeadStatus extends DBEntity
 {
-    const customerLeadStatusID = "customerLeadStatusID";
+    const id = "id";
     const name = "name";
+    const appearOnScreen = "appearOnScreen";
 
     /**
      * calls constructor()
@@ -22,8 +23,9 @@ class DBECustomerLeadStatus extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("customerleadstatus");
-        $this->addColumn(self::customerLeadStatusID, DA_ID, DA_NOT_NULL, "id");
+        $this->addColumn(self::id, DA_ID, DA_NOT_NULL, "id");
         $this->addColumn(self::name, DA_STRING, DA_NOT_NULL, "name");
+        $this->addColumn(self::appearOnScreen, DA_BOOLEAN, DA_NOT_NULL, null, 0);
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

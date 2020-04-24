@@ -32,7 +32,7 @@ class DBECustomer extends DBCNCEntity
     const sectorID = "sectorID";
     const becameCustomerDate = "becameCustomerDate";
     const droppedCustomerDate = "droppedCustomerDate";
-    const leadStatusID = "leadStatusID";
+    const leadStatusId = "leadStatusId";
     const techNotes = "techNotes";
     const specialAttentionFlag = "specialAttentionFlag";
     const specialAttentionEndDate = "specialAttentionEndDate";
@@ -219,10 +219,9 @@ class DBECustomer extends DBCNCEntity
             'cus_dropped_customer_date'
         );
         $this->addColumn(
-            self::leadStatusID,
+            self::leadStatusId,
             DA_ID,
-            DA_ALLOW_NULL,
-            'cus_leadstatusno'
+            DA_ALLOW_NULL
         );
         $this->addColumn(
             self::techNotes,
@@ -318,7 +317,7 @@ class DBECustomer extends DBCNCEntity
             self::customerLeadStatusID,
             DA_ID,
             DA_ALLOW_NULL,
-            "customer_lead_status_id"
+            "leadStatusId"
         );
         $this->addColumn(
             self::dateMeetingConfirmed,
