@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 834 - Show SR number on Fixed Page
+
 ## [v3.13.0] - 2020-04-21
 ### Added
 - Issue 799 - Customer Contract Take Up Matrix

@@ -5970,7 +5970,7 @@ class CTActivity extends CTCNC
             )
         );
 
-        $this->setPageTitle("Service Request Fix Summary");
+        $this->setPageTitle("Service Request Fix Summary ");
         $dsCallActivity = new DataSet($this);
         $this->buActivity->getActivityByID(
             $this->getParam('callActivityID'),
@@ -6036,6 +6036,7 @@ class CTActivity extends CTCNC
             $this->setParam('contractCustomerItemID', 99); // prompts for Please select
         }
 
+        $this->setPageTitle("Service Request Fix Summary " . $dsCallActivity->getValue(DBEJCallActivity::problemID));
         $errorFile = null;
         if (@$_FILES['userfile']['name'] && !$this->getParam('uploadDescription')) {
             $errorFile = 'Description Required';
