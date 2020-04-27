@@ -33,7 +33,7 @@
                     //for each key we create an optgroup
                     acc += "<optgroup label='" + key + "'>";
                     acc += result[key].reduce(function (subacc, item) {
-                        subacc += "<option value='" + item.id + "' >" + item.description + "</option>";
+                        subacc += "<option value='" + item.id + "' " + (item.disabled ? 'disabled' : null) + " >" + item.description + "</option>";
                         return subacc;
                     }, "");
                     acc += "</optgroup>";

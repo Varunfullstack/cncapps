@@ -1326,8 +1326,8 @@ class CTActivity extends CTCNC
                     ) . ' ' . $dsContract->getValue(DBEJContract::notes) . ' ' . $dsContract->getValue(
                         DBEJContract::postcode
                     ),
-                "id"          => $dsContract->getValue(DBEJContract::customerItemID)
-
+                "id"          => $dsContract->getValue(DBEJContract::customerItemID),
+                "disabled"    => !$dsContract->getValue(DBEJContract::allowSRLog)
             ];
 
         }
