@@ -4048,8 +4048,10 @@ class CTActivity extends CTCNC
                     'colorClass'            => $colorClass
                 )
             );
-            $lastActivityID = $activitiesByProblemID->getValue(DBECallActivity::callActivityID);
-            $lastActivityText = "$date $startTime - $endTime ($duration) $activityType - $contactName - $siteAddress - $userName";
+            if ($activitiesByProblemID->getValue(DBECallActivity::callActTypeID) != 60) {
+                $lastActivityID = $activitiesByProblemID->getValue(DBECallActivity::callActivityID);
+                $lastActivityText = "$date $startTime - $endTime ($duration) $activityType - $contactName - $siteAddress - $userName";
+            }
             $lastActivityReason = $reason;
             $this->template->parse(
                 'rows',
