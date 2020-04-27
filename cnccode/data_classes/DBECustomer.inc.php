@@ -48,7 +48,6 @@ class DBECustomer extends DBCNCEntity
     const reviewMeetingFrequencyMonths = "reviewMeetingFrequencyMonths";
     const accountManagerUserID = "accountManagerUserID";
     const reviewMeetingEmailSentFlag = "reviewMeetingEmailSentFlag";
-    const customerLeadStatusID = "customerLeadStatusID";
     const dateMeetingConfirmed = 'dateMeetingConfirmed';
     const meetingDateTime = 'meetingDateTime';
     const inviteSent = 'inviteSent';
@@ -312,12 +311,6 @@ class DBECustomer extends DBCNCEntity
             DA_ID,
             DA_ALLOW_NULL,
             "cus_account_manager_consno"
-        );
-        $this->addColumn(
-            self::customerLeadStatusID,
-            DA_ID,
-            DA_ALLOW_NULL,
-            "leadStatusId"
         );
         $this->addColumn(
             self::dateMeetingConfirmed,

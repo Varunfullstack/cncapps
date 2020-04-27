@@ -40,7 +40,8 @@ class CTLeadStatusReport extends CTCNC
     function defaultAction()
     {
         if ($this->action == 'getLeadData') {
-            echo json_encode($this->getLeadData());
+            echo json_encode($this->getLeadData(), JSON_NUMERIC_CHECK);
+            return;
         }
         $this->displayReport();
     }
@@ -48,7 +49,12 @@ class CTLeadStatusReport extends CTCNC
     private function getLeadData()
     {
         global $db;
-
+        $query = "select leadStatusId, name as leadStatusName, cus_name as customerName, cus_custno as customerId
+from customerleadstatus 
+         left join customer  on leadStatusId = customerLeadStatus.id where appearOnScreen order by leadStatusId, customerName";
+        /** @var mysqli_result $result */
+        $result = $db->query($query);
+        return $result->fetch_all(MYSQLI_ASSOC);
     }
 
     /**

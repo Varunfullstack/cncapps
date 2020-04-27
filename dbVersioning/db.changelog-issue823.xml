@@ -58,21 +58,34 @@
         <rollback/>
     </changeSet>
     <changeSet author="pavwebdev" id="issue823-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customerLeadStatus" columnName="sortOrder"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customerLeadStatus">
+            <column name="sortOrder" defaultValue="0" type="smallInt(5)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue823-7">
         <sql splitStatements="true">
             truncate customerLeadStatus;
             insert into customerLeadStatus
-            values (1, "Lead", 1),
-                   (2, "Meeting", 1),
-                   (3, "Audit", 1),
-                   (4, "Proposal", 1),
-                   (5, "Customer", 1),
-                   (6, "Dead", 1),
-                   (7, "Misc", 1);
+            values (1, "Lead", 1, 1),
+                   (2, "Meeting", 1, 2),
+                   (3, "Audit", 1, 3),
+                   (4, "Proposal", 1, 4),
+                   (5, "Customer", 0, 5),
+                   (6, "Dead", 0, 6),
+                   (7, "Misc", 0, 7);
             update customer
             set leadStatusId = if(cus_became_customer_date is not null and cus_dropped_customer_date is null, 5, 1);
         </sql>
+        <rollback/>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue823-7">
+    <changeSet author="pavwebdev" id="issue823-8">
         <preConditions onFail="MARK_RAN">
             <not>
                 <foreignKeyConstraintExists foreignKeyTableName="customer" foreignKeyName="fk_customer_lead_status_id"/>
@@ -86,7 +99,7 @@
                                  referencedColumnNames="id"
                                  referencedTableName="customerLeadStatus"/>
     </changeSet>
-    <changeSet author="pavwebdev" id="issue823-8">
+    <changeSet author="pavwebdev" id="issue823-9">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 select DATA_TYPE = 'time'
@@ -105,6 +118,4 @@
             <modifyDataType tableName="customer" columnName="reviewTime" newDataType="char(5)"/>
         </rollback>
     </changeSet>
-
-
 </databaseChangeLog>

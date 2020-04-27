@@ -4,6 +4,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
 require_once($cfg["path_dbe"] . "/DBESite.inc.php");
@@ -369,14 +370,11 @@ class BUCustomer extends Business
     /**
      * @param DataSet $newRow
      */
-    function beforeUpdateCustomer(&$newRow)
+    function beforeUpdateCustomer($newRow)
     {
         $customerID = $newRow->getPkValue();
-        $dbeCustomer = new DBECustomer($this);
-        $dbeCustomer->getRow($customerID);
-        echo '<pre>';
-        var_dump($newRow);
-        exit;
+        $currentCustomer = new DBECustomer($this);
+        $currentCustomer->getRow($customerID);
         $newRow->setValue(
             DBECustomer::modifyDate,
             date('d/m/Y H:i:s')
@@ -386,7 +384,7 @@ class BUCustomer extends Business
             $GLOBALS ['auth']->is_authenticated()
         );
 
-        if ($dbeCustomer->getValue(DBECustomer::lastReviewMeetingDate) != $newRow->getValue(
+        if ($currentCustomer->getValue(DBECustomer::lastReviewMeetingDate) != $newRow->getValue(
                 DBECustomer::lastReviewMeetingDate
             )) {
             $newRow->setValue(
@@ -539,30 +537,7 @@ class BUCustomer extends Business
         ));
 
         $this->dbeSite->resetCallbackMethod(DA_AFTER_COLUMNS_CREATED);
-        $this->updateModify($dsData->getValue(DBESite::customerID));
         return $ret;
-    }
-
-    function updateModify($customerID)
-    {
-        if (!$customerID) {
-            $this->raiseError('customerID not set');
-        }
-        $this->setMethodName('updateModify');
-        $this->dbeCustomer->getRow($customerID);
-        if (!$this->dbeCustomer->getValue(DBECustomer::name)) {
-            $this->raiseError('Customer Name is empty for customer ' . $customerID);
-            exit;
-        }
-        $this->dbeCustomer->setValue(
-            DBECustomer::modifyDate,
-            date('Y-m-d H:i:s')
-        );
-        $this->dbeCustomer->setValue(
-            DBECustomer::modifyUserID,
-            $GLOBALS ['auth']->is_authenticated()
-        );
-        $this->dbeCustomer->updateRow();
     }
 
     /**
@@ -693,7 +668,6 @@ class BUCustomer extends Business
         );
 
         $dsContact->post();
-        $this->updateModify($dsContact->getValue(DBEContact::customerID));
         return TRUE;
     }
 
@@ -710,7 +684,6 @@ class BUCustomer extends Business
             $dsData,
             $this->dbeContact
         );
-        $this->updateModify($dsData->getValue(DBEContact::customerID));
         return $ret;
 
     }
@@ -1385,7 +1358,6 @@ class BUCustomer extends Business
             $siteNo
         );
         $this->dbeSite->deleteRow();
-        $this->updateModify($customerID);
     }
 
     /**

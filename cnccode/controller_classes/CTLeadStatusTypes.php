@@ -41,6 +41,13 @@ class CTLeadStatusTypes extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
+            case 'top':
+            case 'bottom':
+            case 'down':
+            case 'up':
+                $this->changeOrder();
+                echo json_encode(["status" => "ok"]);
+                break;
             case 'delete':
                 if (!$this->getParam('id')) {
                     http_response_code(400);
@@ -79,29 +86,32 @@ class CTLeadStatusTypes extends CTCNC
                 );
                 $dBECustomerLeadStatus->setValue(
                     DBECustomerLeadStatus::appearOnScreen,
-                    json_decode($this->getParam('show'))
+                    json_decode($this->getParam('appearOnScreen'))
                 );
                 $dBECustomerLeadStatus->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
             case 'create':
                 $dBECustomerLeadStatus = new DBECustomerLeadStatus($this);
-
                 $dBECustomerLeadStatus->setValue(
                     DBECustomerLeadStatus::name,
                     $this->getParam('name')
                 );
                 $dBECustomerLeadStatus->setValue(
                     DBECustomerLeadStatus::appearOnScreen,
-                    json_decode($this->getParam('show'))
+                    json_decode($this->getParam('appearOnScreen'))
+                );
+                $dBECustomerLeadStatus->setValue(
+                    DBECustomerLeadStatus::sortOrder,
+                    $dBECustomerLeadStatus->getNextSortOrder()
                 );
                 $dBECustomerLeadStatus->insertRow();
-
                 echo json_encode(
                     [
-                        "id"   => $dBECustomerLeadStatus->getValue(DBECustomerLeadStatus::id),
-                        "name" => $dBECustomerLeadStatus->getValue(DBECustomerLeadStatus::name),
-                        "show" => $dBECustomerLeadStatus->getValue(DBECustomerLeadStatus::appearOnScreen)
+                        "id"             => $dBECustomerLeadStatus->getValue(DBECustomerLeadStatus::id),
+                        "name"           => $dBECustomerLeadStatus->getValue(DBECustomerLeadStatus::name),
+                        "appearOnScreen" => $dBECustomerLeadStatus->getValue(DBECustomerLeadStatus::appearOnScreen),
+                        "sortOrder"      => $dBECustomerLeadStatus->getValue(DBECustomerLeadStatus::sortOrder)
                     ],
                     JSON_NUMERIC_CHECK
                 );
@@ -109,13 +119,14 @@ class CTLeadStatusTypes extends CTCNC
                 break;
             case 'getData':
                 $dbeCustomerLeadStatus = new DBECustomerLeadStatus($this);
-                $dbeCustomerLeadStatus->getRows(DBECustomerLeadStatus::name);
+                $dbeCustomerLeadStatus->getRows(DBECustomerLeadStatus::sortOrder);
                 $data = [];
                 while ($dbeCustomerLeadStatus->fetchNext()) {
                     $data[] = [
                         "id"             => $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::id),
                         "name"           => $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::name),
-                        "appearOnScreen" => $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::appearOnScreen)
+                        "appearOnScreen" => $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::appearOnScreen),
+                        "sortOrder"      => $dbeCustomerLeadStatus->getValue(DBECustomerLeadStatus::sortOrder)
                     ];
                 }
                 echo json_encode($data, JSON_NUMERIC_CHECK);
@@ -145,6 +156,31 @@ class CTLeadStatusTypes extends CTCNC
             default:
                 $this->displayForm();
                 break;
+        }
+    }
+
+    private function changeOrder()
+    {
+        $itemId = $this->getParam('itemID');
+        if (!$itemId) {
+            return;
+        }
+        $dbeItemType = new DBECustomerLeadStatus($this);
+        switch ($this->action) {
+            case 'top':
+                $dbeItemType->moveItemToTop($itemId);
+                break;
+            case 'bottom':
+                $dbeItemType->moveItemToBottom($itemId);
+                break;
+            case 'down':
+                $dbeItemType->moveItemDown($itemId);
+                break;
+            case 'up':
+                $dbeItemType->moveItemUp($itemId);
+                break;
+            default:
+                throw new UnexpectedValueException('value not expected');
         }
     }
 

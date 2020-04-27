@@ -38,6 +38,34 @@
                 <button class="editButton">Edit</button>
                 <button class="deleteButton">Delete</button>
             </td>
+            <td>
+                <div class="containerColumn">
+                    <div>
+                        <button class="sortOrderActionButton"
+                                onclick="moveUp()"
+                        >
+                            <i class='fa fa-angle-up'></i>
+                        </button>
+                        <button class="sortOrderActionButton"
+                                onclick="moveTop()"
+                        >
+                            <i class='fa fa-angle-double-up'></i>
+                        </button>
+                    </div>
+                    <div>
+                        <button class="sortOrderActionButton"
+                                onclick="moveDown()"
+                        >
+                            <i class='fa fa-angle-down'></i>
+                        </button>
+                        <button class="sortOrderActionButton"
+                                onclick="moveBottom()"
+                        >
+                            <i class='fa fa-angle-double-down'></i>
+                        </button>
+                    </div>
+                </div>
+            </td>
         </tr>
         {% /leadStatusTypes %}
         </tbody>
@@ -54,19 +82,51 @@
 
     let leadStatusTypes = [];
 
-    function newLeadStatusTypes() {
-        return {id: null, name: null, appearOnScreen: false};
+    function moveUp() {
+        const $elm = $(event.target);
+        changeOrder($elm.closest('tr').data().id, 'up');
     }
 
-    $.ajax({
-        url: '{URLGetData}',
-        method: 'GET',
-        dataType: 'JSON'
-    }).then(function (result) {
-        leadStatusTypes = result;
-        drawList();
-    });
+    function moveTop() {
+        const $elm = $(event.target);
+        changeOrder($elm.closest('tr').data().id, 'top');
+    }
 
+    function moveDown() {
+        const $elm = $(event.target);
+        changeOrder($elm.closest('tr').data().id, 'down');
+    }
+
+    function moveBottom() {
+        const $elm = $(event.target);
+        changeOrder($elm.closest('tr').data().id, 'bottom');
+    }
+
+    function changeOrder(id, direction) {
+        $.ajax({
+            url: '?action=' + direction + "&itemID=" + id,
+            method: 'GET',
+        }).then(function () {
+            fetchData();
+        })
+    }
+
+    function newLeadStatusTypes() {
+        return {id: null, name: null, appearOnScreen: false, sortOrder: null};
+    }
+
+    function fetchData() {
+        $.ajax({
+            url: '{URLGetData}',
+            method: 'GET',
+            dataType: 'JSON'
+        }).then(function (result) {
+            leadStatusTypes = result;
+            drawList();
+        });
+    }
+
+    fetchData();
     Mustache.tags = ['{%', '%}'];
 
     let editingItem = null;
@@ -177,7 +237,7 @@
                 const foundIndex = leadStatusTypes.findIndex(leadStatusTypes => currentLeadStatusTypes.id === leadStatusTypes.id);
                 leadStatusTypes = arrayReplaceAt(leadStatusTypes, foundIndex, currentLeadStatusTypes);
             }
-            leadStatusTypes.sort((a, b) => a.name.localeCompare(b.name));
+            leadStatusTypes.sort((a, b) => a.sortOrder - b.sortOrder);
             drawList();
             cancelEdit();
         })

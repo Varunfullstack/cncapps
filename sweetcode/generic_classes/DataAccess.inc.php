@@ -686,7 +686,7 @@ class DataAccess extends BaseObject
                 return DA_OUT_OF_RANGE;
             }
             if ($this->debug) {
-                echo '<div>ColumnExists: The given ' . $ixColumn . ' does exist</div>';
+                echo '<div>ColumnExists: The given column index:  ' . $ixColumn . ' does exist</div>';
             }
             return $ixColumn;
         }
@@ -699,7 +699,7 @@ class DataAccess extends BaseObject
         }
 
         if ($this->debug) {
-            echo '<div>ColumnExists: The given ' . $ixColumn . ' does exist</div>';
+            echo '<div>ColumnExists: The given column index: ' . $ixColumn . ' does exist</div>';
         }
 
         return $this->colNameInverse[$ixColumn];

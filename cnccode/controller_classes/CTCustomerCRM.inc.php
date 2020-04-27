@@ -163,8 +163,8 @@ class CTCustomerCRM extends CTCustomer
                 $this->getYN(@$value['mailshotFlag'])
             );
             $this->dsCustomer->setValue(
-                DBECustomer::customerLeadStatusID,
-                @$value['customerLeadStatusID']
+                DBECustomer::leadStatusId,
+                @$value['leadStatusId']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::dateMeetingConfirmed,
@@ -447,13 +447,13 @@ class CTCustomerCRM extends CTCustomer
             while ($dsCustomerLeadStatuses->fetchNext()) {
                 $this->template->set_var(
                     array(
-                        'customerLeadStatusID'       => $dsCustomerLeadStatuses->getValue(
+                        'customerLeadStatusId'       => $dsCustomerLeadStatuses->getValue(
                             DBECustomerLeadStatus::id
                         ),
                         'customerLeadStatusName'     => $dsCustomerLeadStatuses->getValue(DBECustomerLeadStatus::name),
                         'customerLeadStatusSelected' => ($dsCustomerLeadStatuses->getValue(
                                 DBECustomerLeadStatus::id
-                            ) == $this->dsCustomer->getValue(DBECustomer::customerLeadStatusID)) ? CT_SELECTED : null
+                            ) == $this->dsCustomer->getValue(DBECustomer::leadStatusId)) ? CT_SELECTED : null
                     )
                 );
                 $this->template->parse(
@@ -549,7 +549,7 @@ class CTCustomerCRM extends CTCustomer
                     "customerName"        => $dbeCustomer->getValue(DBECustomer::name),
                     "customerLink"        => $link,
                     "customerReviewDate"  => $dbeCustomer->getValue(DBECustomer::reviewDate),
-                    "bluestoneLeadStatus" => $leadStatuses[+$dbeCustomer->getValue(DBECustomer::customerLeadStatusID)]
+                    "bluestoneLeadStatus" => $leadStatuses[+$dbeCustomer->getValue(DBECustomer::leadStatusId)]
                 ];
 
             }
@@ -993,6 +993,61 @@ class CTCustomerCRM extends CTCustomer
 
         $this->template->set_block(
             'CustomerEdit',
+            'templateSupportLevelBlock',
+            'templateSelectSupportLevel'
+        );
+
+        $this->template->set_block(
+            'CustomerEdit',
+            'templateCustomLetterBlock',
+            'templateCustomLetters'
+        );
+
+        /*
+       Display all the custom letters
+       */
+        foreach ($customLetterTemplates as $index => $filename) {
+
+            $customLetterURL =
+                Controller::buildLink(
+                    'LetterForm.php',
+                    array(
+                        'contactID'      => $this->dsContact->getValue(DBEContact::contactID),
+                        'letterTemplate' => $filename
+                    )
+                );
+
+
+            $this->template->set_var(
+
+                array(
+                    'customLetterURL'  => $customLetterURL,
+                    'customLetterName' => $filename
+
+                )
+            );
+
+            $this->template->parse(
+                'templateCustomLetters',
+                'templateCustomLetterBlock',
+                true
+            );
+
+        } // end foreach
+
+        $buContact = new BUContact($this);
+        $buContact->supportLevelDropDown(
+            null,
+            $this->template,
+            'supportLevelSelected',
+            'supportLevelValue',
+            'supportLevelDescription',
+            'templateSelectSupportLevel',
+            'templateSupportLevelBlock'
+        );
+
+        $this->template->set_block(
+            'CustomerEdit',
             'customerLeadStatusBlock',
             'customerleadstatuses'
         );
@@ -1005,13 +1060,13 @@ class CTCustomerCRM extends CTCustomer
 
             $this->template->set_var(
                 array(
-                    'customerLeadStatusID'       => $dsCustomerLeadStatuses->getValue(
+                    'customerLeadStatusId'       => $dsCustomerLeadStatuses->getValue(
                         DBECustomerLeadStatus::id
                     ),
                     'customerLeadStatusName'     => $dsCustomerLeadStatuses->getValue(DBECustomerLeadStatus::name),
                     'customerLeadStatusSelected' => ($dsCustomerLeadStatuses->getValue(
                             DBECustomerLeadStatus::id
-                        ) == $this->dsCustomer->getValue(DBECustomer::customerLeadStatusID)) ? CT_SELECTED : null
+                        ) == $this->dsCustomer->getValue(DBECustomer::leadStatusId)) ? CT_SELECTED : null
                 )
             );
             $this->template->parse(

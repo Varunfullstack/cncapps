@@ -154,7 +154,7 @@ class BUCustomerNote extends Business
       WHERE
         cno_custno = $customerID
       ORDER BY
-        cno_created";
+        cno_created desc";
 
         $ret = $this->db->query($sql);
 

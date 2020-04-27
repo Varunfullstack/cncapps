@@ -8,9 +8,12 @@
 
 class DBECustomerLeadStatus extends DBEntity
 {
+    use \CNCLTD\SortableDBE;
+
     const id = "id";
     const name = "name";
     const appearOnScreen = "appearOnScreen";
+    const sortOrder = "sortOrder";
 
     /**
      * calls constructor()
@@ -23,10 +26,28 @@ class DBECustomerLeadStatus extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("customerleadstatus");
-        $this->addColumn(self::id, DA_ID, DA_NOT_NULL, "id");
-        $this->addColumn(self::name, DA_STRING, DA_NOT_NULL, "name");
+        $this->addColumn(self::id, DA_ID, DA_NOT_NULL);
+        $this->addColumn(self::name, DA_STRING, DA_NOT_NULL);
         $this->addColumn(self::appearOnScreen, DA_BOOLEAN, DA_NOT_NULL, null, 0);
+        $this->addColumn(self::sortOrder, DA_INTEGER, DA_NOT_NULL);
         $this->setPK(0);
         $this->setAddColumnsOff();
+    }
+
+    protected function getSortOrderForItem($id)
+    {
+        $this->getRow($id);
+        return $this->getValue(self::sortOrder);
+    }
+
+    protected function getSortOrderColumnName()
+    {
+        return $this->getDBColumnName(self::sortOrder);
+    }
+
+    protected function getDB()
+    {
+        global $db;
+        return $db;
     }
 }
