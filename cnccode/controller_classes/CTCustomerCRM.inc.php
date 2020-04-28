@@ -865,6 +865,9 @@ class CTCustomerCRM extends CTCustomer
                 'reviewTime'                         => Controller::dateYMDtoDMY(
                     $this->dsCustomer->getValue(DBECustomer::reviewTime)
                 ),
+                'referred'                           => $this->dsCustomer->getValue(
+                    DBECustomer::referredFlag
+                ) == 'Y' ? 'true' : 'false',
                 'becameCustomerDate'                 => Controller::dateYMDtoDMY(
                     $this->dsCustomer->getValue(DBECustomer::becameCustomerDate)
                 ),

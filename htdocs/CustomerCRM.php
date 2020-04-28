@@ -7,8 +7,8 @@
  */
 
 require_once("config.inc.php");
-require_once($cfg["path_ct"]."/CTCustomerCRM.inc.php");
-session_start();
+global $cfg;
+require_once($cfg["path_ct"] . "/CTCustomerCRM.inc.php");
 page_open(
     array(
         'sess' => PHPLIB_CLASSNAME_SESSION,
@@ -17,9 +17,9 @@ page_open(
         ''
     )
 );
-GLOBAL $cfg;
+global $cfg;
 header("Cache-control: private");
-$ctCustomer= new CTCustomerCRM(
+$ctCustomer = new CTCustomerCRM(
     $_SERVER['REQUEST_METHOD'],
     $_POST,
     $_GET,

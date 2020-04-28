@@ -9,6 +9,16 @@
             $('#customerID').val($event.detail.item.value);
         });
     });
+
+    function checkCustomerId() {
+        debugger;
+        if (!$('#customerID').val()) {
+            alert('Please select a specific customer');
+            return false;
+        }
+        return true;
+    }
+
 </script>
 <style>
     input[type=text], select {
@@ -33,6 +43,7 @@
       id="search"
       method="post"
       action="{urlSubmit}"
+      onsubmit="return checkCustomerId();"
 >
     <input type="hidden"
            name="action"
@@ -98,7 +109,7 @@
                 <option value="">-- Search All --</option>
                 <!-- BEGIN customerLeadStatusBlock -->
                 <option {customerLeadStatusSelected}
-                        value="{customerLeadStatusID}"
+                        value="{customerLeadStatusId}"
                 >
                     {customerLeadStatusName}
                 </option>
@@ -143,6 +154,7 @@
     var dataTable = null;
 
     function searchCustomers() {
+        $.LoadingOverlay("show", {text: 'Running your search, please wait'});
         $.ajax({
             url: '{ajaxURL}',
             data: {customerLeadID: $('#customerLeadSelector').val()},
@@ -159,6 +171,10 @@
                 dataTable.draw();
             }
 
+        }, error => {
+
+        }).then(() => {
+            $.LoadingOverlay("hide");
         })
     }
 </script>

@@ -768,9 +768,9 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
             " left join customer on con_custno = cus_custno ";
 
         if ($leadStatusID) {
-            $sqlQuery .= " WHERE  customer_lead_status_id = $leadStatusID";
+            $sqlQuery .= " WHERE  leadStatusId = $leadStatusID";
         } else {
-            $sqlQuery .= " WHERE  customer_lead_status_id is not null and customer_lead_status_id <> 0";
+            $sqlQuery .= " WHERE  leadStatusId is not null and leadStatusId <> 0";
         }
         $this->setQueryString($sqlQuery);
 
