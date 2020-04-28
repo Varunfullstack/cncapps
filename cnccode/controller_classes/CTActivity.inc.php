@@ -4447,6 +4447,9 @@ class CTActivity extends CTCNC
                 'reasonMessage'                  => $dsCallActivity->getMessage(DBEJCallActivity::reason),
                 'internalNotes'                  => $dsCallActivity->getValue(DBEJCallActivity::internalNotes),
                 'rootCauseID'                    => $dsCallActivity->getValue(DBEJCallActivity::rootCauseID),
+                'awaitingCustomerResponseFlag'   => $dsCallActivity->getValue(
+                    DBECallActivity::awaitingCustomerResponseFlag
+                ),
                 'callActivityID'                 => $callActivityID,
                 'problemStatus'                  => $dsCallActivity->getValue(DBEJCallActivity::problemStatus),
                 'problemStatusMessage'           => $dsCallActivity->getMessage(DBEJCallActivity::problemStatus),
@@ -5257,6 +5260,7 @@ class CTActivity extends CTCNC
         /*
       Record action button selected
       */
+        $updateAwaitingCustomer = false;
         if ($this->getParam('Fixed')) {
             $nextStatus = 'Fixed';
         } elseif ($this->getParam('CustomerAction')) {
@@ -5265,6 +5269,7 @@ class CTActivity extends CTCNC
                 DBEJCallActivity::awaitingCustomerResponseFlag,
                 'Y'
             );
+            $updateAwaitingCustomer = true;
             $dsCallActivity->post();
             $nextStatus = 'CustomerAction';
         } elseif ($this->getParam('CncAction')) {
@@ -5273,6 +5278,8 @@ class CTActivity extends CTCNC
                 DBEJCallActivity::awaitingCustomerResponseFlag,
                 'N'
             );
+            $updateAwaitingCustomer = true;
+
             $dsCallActivity->post();
             $nextStatus = 'CncAction';
         } elseif ($this->getParam('Escalate')) {
@@ -5280,6 +5287,16 @@ class CTActivity extends CTCNC
             $this->buActivity->escalateProblemByCallActivityID($callActivityID);
         } else {
             $nextStatus = false;
+        }
+
+
+        if ($updateAwaitingCustomer) {
+            $toUpdateProblem = new DBEProblem($this);
+            $toUpdateProblem->getRow($dsCallActivity->getValue(DBECallActivity::problemID));
+            $toUpdateProblem->setValue(
+                DBEProblem::awaitingCustomerResponseFlag,
+                $dsCallActivity->getValue(DBECallActivity::awaitingCustomerResponseFlag)
+            );
         }
         $enteredEndTime = $this->buActivity->updateCallActivity(
             $this->dsCallActivity

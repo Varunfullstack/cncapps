@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.13.1] 
+### Fixed
+- Fix issue with trying to set open hours not working as expected
+
 ## [v3.13.0] - 2020-04-21
 ### Added
 - Issue 799 - Customer Contract Take Up Matrix

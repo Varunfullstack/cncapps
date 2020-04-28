@@ -1584,13 +1584,14 @@ class BUActivity extends Business
     /**
      * Create or update activity
      *
-     * @param mixed $dsCallActivity
+     * @param DataSet|DBECallActivity $dsCallActivity
      * @return bool
      * @throws Exception
      */
-    function updateCallActivity(&$dsCallActivity
+    function updateCallActivity($dsCallActivity
     )
     {
+
         $this->setMethodName('updateCallActivity');
         $dbeCallActivity = new DBECallActivity($this);
         $oldEndTime = null; // new activity
@@ -1620,7 +1621,6 @@ class BUActivity extends Business
         } else {
             $enteredEndTime = false;
         }
-
         $this->updateDataAccessObject(
             $dsCallActivity,
             $dbeCallActivity
@@ -1669,91 +1669,84 @@ class BUActivity extends Business
 
         $result = $this->db->query($sql);
         $chargeableHours = $result->fetch_object()->chargeableHours;
+        $problem = new DBEProblem($this);
 
-        $dbeProblem = new DBEProblem($this);
-
-        $dbeProblem->getRow($dsCallActivity->getValue(DBEJCallActivity::problemID));
-
-        $oldPriority = $dbeProblem->getValue(DBEJProblem::priority);
-
-        $dbeProblem->setValue(
-            DBEJProblem::awaitingCustomerResponseFlag,
-            $dsCallActivity->getValue(DBEJCallActivity::awaitingCustomerResponseFlag)
-        );
-        $dbeProblem->setValue(
+        $problem->getRow($dsCallActivity->getValue(DBEJCallActivity::problemID));
+        $oldPriority = $problem->getValue(DBEJProblem::priority);
+        $problem->setValue(
             DBEJProblem::contractCustomerItemID,
             $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID)
         );
 
-        $dbeProblem->setValue(
+        $problem->setValue(
             DBEJProblem::internalNotes,
             $dsCallActivity->getValue(DBEJCallActivity::internalNotes)
         );
-        $dbeProblem->setValue(
+        $problem->setValue(
             DBEJProblem::completeDate,
             $dsCallActivity->getValue(DBEJCallActivity::completeDate)
         );
-        $dbeProblem->setValue(
+        $problem->setValue(
             DBEJProblem::alarmDate,
             $dsCallActivity->getValue(DBEJCallActivity::alarmDate)
         );
-        $dbeProblem->setValue(
+        $problem->setValue(
             DBEJProblem::alarmTime,
             $dsCallActivity->getValue(DBEJCallActivity::alarmTime)
         );
 
-        $dbeProblem->setValue(
+        $problem->setValue(
             DBEJProblem::priority,
             $dsCallActivity->getValue(DBEJCallActivity::priority)
         );
 
-        $dbeProblem->setValue(
+        $problem->setValue(
             DBEJProblem::projectID,
             $dsCallActivity->getValue(DBEJCallActivity::projectID)
         );
 
-        $dbeProblem->setValue(
+        $problem->setValue(
             DBEJProblem::rootCauseID,
             $dsCallActivity->getValue(DBEJCallActivity::rootCauseID)
         );
 
-        $dbeProblem->setValue(
+        $problem->setValue(
             DBEJProblem::totalActivityDurationHours,
             $totalHours
         );
 
-        $dbeProblem->setValue(
+        $problem->setValue(
             DBEJProblem::totalTravelActivityDurationHours,
             $totalTravelHours
         );
 
-        if (in_array($dbeProblem->getValue(DBEProblem::status), ["F", "C"])) {
+        if (in_array($problem->getValue(DBEProblem::status), ["F", "C"])) {
             /** @var $db dbSweetcode */
             global $db;
             $db->preparedQuery(
                 'select getOpenHours(?)',
-                [["type" => "i", "value" => $dbeProblem->getValue(DBEProblem::problemID)]]
+                [["type" => "i", "value" => $problem->getValue(DBEProblem::problemID)]]
             );
             $db->next_record(MYSQLI_NUM);
-            $dbeProblem->setValue(
+            $problem->setValue(
                 DBEProblem::openHours,
                 $db->Record[0]
             );
         }
 
-        $dbeProblem->setValue(
+        $problem->setValue(
             DBEJProblem::chargeableActivityDurationHours,
             $chargeableHours
         );
 
-        $dbeProblem->setValue(
+        $problem->setValue(
             DBEJProblem::workingHoursCalculatedToTime,
             null
         );
 
         // if amended initial call activity date/time then set the problem date raised field to match
         if ($dsCallActivity->getValue(DBEJCallActivity::callActTypeID) == CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
-            $dbeProblem->setValue(
+            $problem->setValue(
                 DBEJProblem::dateRaised,
                 $dsCallActivity->getValue(DBEJCallActivity::date) . ' ' . $dsCallActivity->getValue(
                     DBEJCallActivity::startTime
@@ -1761,13 +1754,12 @@ class BUActivity extends Business
             );
         }
 
-        $dbeProblem->updateRow();
+        $problem->updateRow();
+
         /*
-
-
-    Have the contact notes been changed?
-    If so then update contact table with new notes
-    */
+         * Have the contact notes been changed?
+         * If so then update contact table with new notes
+         */
         if ($dsCallActivity->getValue(DBEJCallActivity::contactNotes) && $dsCallActivity->getValue(
                 DBEJCallActivity::contactID
             )) {
@@ -1814,20 +1806,20 @@ class BUActivity extends Business
             }
         }
         if (
-            $oldPriority != $dbeProblem->getValue(DBEJProblem::priority)
+            $oldPriority != $problem->getValue(DBEJProblem::priority)
         ) {
             $slaResponseHours =
                 $this->getSlaResponseHours(
-                    $dbeProblem->getValue(DBEJProblem::priority),
-                    $dbeProblem->getValue(DBEJProblem::customerID),
+                    $problem->getValue(DBEJProblem::priority),
+                    $problem->getValue(DBEJProblem::customerID),
                     $dbeCallActivity->getValue(DBECallActivity::contactID)
                 );
 
-            $dbeProblem->setValue(
+            $problem->setValue(
                 DBEJProblem::slaResponseHours,
                 $slaResponseHours
             );
-            $dbeProblem->updateRow();
+            $problem->updateRow();
 
             $this->sendEmailToCustomer(
                 $dsCallActivity->getValue(DBEJProblem::problemID),
@@ -1837,7 +1829,7 @@ class BUActivity extends Business
 
             $this->logOperationalActivity(
                 $dsCallActivity->getValue(DBEJCallActivity::problemID),
-                'Priority Changed from ' . $oldPriority . ' to ' . $dbeProblem->getValue(DBEJProblem::priority)
+                'Priority Changed from ' . $oldPriority . ' to ' . $problem->getValue(DBEJProblem::priority)
             );
         } else {
             if ((!isset($oldReason) || (isset($oldReason) && $oldReason != $newReason)) && $dsCallActivity->getValue(
@@ -1868,17 +1860,17 @@ class BUActivity extends Business
         )
         ) {
 
-            $this->highActivityAlertCheck($dbeProblem->getValue(DBEJProblem::problemID));
+            $this->highActivityAlertCheck($problem->getValue(DBEJProblem::problemID));
 
             $this->updatedByAnotherUser(
-                $dbeProblem,
+                $problem,
                 $dbeCallActivity
             );
 
             $buCustomer = new BUCustomer($this);
             $dsCustomer = new DataSet($this);
             $buCustomer->getCustomerByID(
-                $dbeProblem->getValue(DBEJProblem::customerID),
+                $problem->getValue(DBEJProblem::customerID),
                 $dsCustomer
             );
             $dbeContact = null;
@@ -1898,7 +1890,7 @@ class BUActivity extends Business
                 $this->sendSpecialAttentionEmail($dbeCallActivity->getPKValue());
             }
 
-            if ($dbeProblem->getValue(DBEJProblem::criticalFlag) == 'Y') {
+            if ($problem->getValue(DBEJProblem::criticalFlag) == 'Y') {
                 $this->sendCriticalEmail($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
             }
 
@@ -8392,8 +8384,7 @@ FROM
                         self::WorkStartedCustomerEmailCategory
                     );
                 }
-            }
-            elseif ($dbeProblem->getValue(DBEJProblem::status) == 'F') {
+            } elseif ($dbeProblem->getValue(DBEJProblem::status) == 'F') {
                 //Reopen
 
                 if ($comesFromAutomatedRequest) {
@@ -9072,22 +9063,6 @@ FROM
             $buProblemSLA->getCompleteDate()
         );
 
-        if (in_array($dbeProblem->getValue(DBEProblem::status), ["F", "C"])) {
-            /** @var $db dbSweetcode */
-            global $db;
-            $statement = $db->preparedQuery(
-                'select getOpenHours(?)',
-                [["type" => "i", "value" => $problemID]]
-            );
-            if ($statement->fetch_row()) {
-                $dbeProblem->setValue(
-                    DBEProblem::openHours,
-                    $db->Record[0]
-                );
-            } else {
-                error_log("Trying to calculate open hours for $problemID didn't return any results?");
-            }
-        }
 
         $dbeProblem->updateRow();
 
@@ -9118,7 +9093,6 @@ FROM
             $resolutionSummary,
             $fixedUserID == USER_SYSTEM
         );
-
 
         /** @var $db dbSweetcode */
         global $db;
