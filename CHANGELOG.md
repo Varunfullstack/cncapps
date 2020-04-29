@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 849 - You have open requests emails sometimes listing wrong To: field
+
 ## [v3.13.1] - 2020-04-29
 ### Fixed
 - Fixed issue with trying to set open hours not working as expected
