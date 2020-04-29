@@ -1,7 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
- 
+## [unreleased]
+### Changed
+- Issue 843 - Include Manager Name on Time, Change & Sales requests feedback
 
 ## [v3.13.1] - 2020-04-29
 ### Fixed
