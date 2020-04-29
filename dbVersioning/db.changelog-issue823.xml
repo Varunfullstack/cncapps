@@ -55,7 +55,10 @@
         </preConditions>
         <renameColumn tableName="customer" oldColumnName="customer_lead_status_id" newColumnName="leadStatusId"
                       columnDataType="int(11)"/>
-        <rollback/>
+        <rollback>
+            <renameColumn tableName="customer" newColumnName="customer_lead_status_id" oldColumnName="leadStatusId"
+                          columnDataType="int(11)"/>
+        </rollback>
     </changeSet>
     <changeSet author="pavwebdev" id="issue823-6">
         <preConditions onFail="MARK_RAN">
