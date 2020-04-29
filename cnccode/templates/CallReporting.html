@@ -23,40 +23,25 @@
             serverSide: false,
             footerCallback: function (row, data, start, end, display) {
                 const api = this.api();
-
-                // Remove the formatting to get integer data for summation
-                const intVal = function (i) {
-                    return typeof i === 'string' ?
-                        i.replace(/[\$,]/g, '') * 1 :
-                        typeof i === 'number' ?
-                            i : 0;
-                };
-
-                // Total over all pages
-                const total = api
-                    .column(4)
-                    .data()
-                    .reduce(function (a, b, c) {
-                        debugger;
-                        return a + b;
-                    }, 0);
-
-                // Total over this page
-                const pageTotal = api
-                    .column(4, {page: 'current'})
-                    .data()
-                    .reduce(function (a, b) {
-                        return a + b;
-                    }, 0);
-
-                // Update footer
-                $(api.column(4).footer()).html(
-                    '$' + pageTotal + ' ( $' + total + ' total)'
-                );
+                api.columns().toArray()[0].forEach(index => {
+                    let html;
+                    if (index === 0) {
+                        html = "Total:";
+                    } else {
+                        html = api
+                            .column(index)
+                            .data()
+                            .reduce(function (a, b, c) {
+                                return a + b;
+                            }, 0);
+                    }
+                    $(api.column(index).footer()).html(html);
+                });
             },
             ajax: {
                 url: "?action=getData",
                 type: "GET",
+                dataSrc: '',
                 data: (data, settings) => {
                     data.startDate = startDateInput.val();
                     data.endDate = endDateInput.val();
@@ -152,10 +137,12 @@
     </thead>
     <tfoot>
     <tr>
-        <th colspan="4"
-            style="text-align:right"
-        >Total:
-        </th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
         <th></th>
     </tr>
     </tfoot>
