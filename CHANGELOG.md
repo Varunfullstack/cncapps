@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 832 - Review Meeting Booked Meetings not showing as booked
+
 ## [v3.13.1] - 2020-04-29
 ### Fixed
 - Fixed issue with trying to set open hours not working as expected
