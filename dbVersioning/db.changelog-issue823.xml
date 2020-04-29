@@ -115,6 +115,10 @@
         </sql>
         <modifyDataType tableName="customer" columnName="reviewTime" newDataType="time"/>
         <rollback>
+            <sql>
+                update customer
+                set reviewTime = null;
+            </sql>
             <modifyDataType tableName="customer" columnName="reviewTime" newDataType="char(5)"/>
         </rollback>
     </changeSet>
