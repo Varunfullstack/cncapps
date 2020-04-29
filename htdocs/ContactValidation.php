@@ -126,8 +126,8 @@ while ($dsCustomers->fetchNext()) {
     $dbeSite = new DBESite($thing);
     $dbeSite->setValue(DBESite::customerID, $customerID);
     $dbeSite->getRowsByCustomerID();
-    $siteErrors = [];
     while ($dbeSite->fetchNext()) {
+        $siteErrors = [];
         if (!$dbeSite->getValue(DBESite::maxTravelHours)) {
             $siteErrors[] = "Max Travel hours must be greater than 0";
         }
