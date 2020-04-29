@@ -47,7 +47,13 @@
             <columnExists tableName="customer" columnName="cus_leadstatusno"/>
         </preConditions>
         <dropColumn tableName="customer" columnName="cus_leadstatusno"/>
-        <rollback/>
+        <rollback>
+            <addColumn tableName="customer">
+                <column name="cus_leadstatusno" type="int(11)">
+                    <constraints nullable="true"/>
+                </column>
+            </addColumn>
+        </rollback>
     </changeSet>
     <changeSet author="pavwebdev" id="issue823-5">
         <preConditions onFail="MARK_RAN">
