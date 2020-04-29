@@ -1,6 +1,8 @@
 # Changelog
 This project changes will be shown here.
 
+ 
+
 ## [v3.13.1] - 2020-04-29
 ### Fixed
 - Fixed issue with trying to set open hours not working as expected
