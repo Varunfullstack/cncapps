@@ -5,9 +5,10 @@ This project changes will be shown here.
 ### Changed
 - Issue 839 - 3CX Call Reporting Enhancements
 
-## [v3.13.1] 
+## [v3.13.1] - 2020-04-29
 ### Fixed
-- Fix issue with trying to set open hours not working as expected
+- Fixed issue with trying to set open hours not working as expected
+- Fixed issue with resetting awatingCustomer flag
 
 ## [v3.13.0] - 2020-04-21
 ### Added
