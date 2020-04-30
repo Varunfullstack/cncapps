@@ -84,65 +84,18 @@ $buCustomer = new BUCustomer($thing);
 $buPassword = new BUPassword($thing);
 $dbeOffice365Licenses = new DBEOffice365License($thing);
 do {
-
-    $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
-    $customerName = $dbeCustomer->getValue(DBECustomer::name);
-
-    $logger->info('Getting Office 365 Data for Customer: ' . $customerID . ' - ' . $customerName);
-    // we have to pull from passwords.. the service 10
-    $dbePassword = $buCustomer->getOffice365PasswordItem($customerID);
-
-    if (!$dbePassword->rowCount) {
-        $logger->warning('This customer does not have a Office 365 Admin Portal service password');
+    try {
+        $commandRunner = new \CNCLTD\Office365LicensesExportPowerShellCommand($dbeCustomer, $logger);
+    } catch (\Exception $exception) {
         continue;
     }
 
-    $userName = $buPassword->decrypt($dbePassword->getValue(DBEPassword::username));
-    $password = $buPassword->decrypt($dbePassword->getValue(DBEPassword::password));
-    $path = POWERSHELL_DIR . "/365OfficeLicensesExport.ps1";
-    $cmdParts = [
-        "powershell.exe",
-        "-executionpolicy",
-        "bypass",
-        "-NoProfile",
-        "-command",
-        $path,
-        "-User",
-        base64_encode($userName),
-        "-Password",
-        base64_encode($password)
-    ];
-    $escaped = implode(' ', array_map('escape_win32_argv', $cmdParts));
-    /* In almost all cases, escape for cmd.exe as well - the only exception is
-       when using proc_open() with the bypass_shell option. cmd doesn't handle
-       arguments individually, so the entire command line string can be escaped,
-       no need to process arguments individually */
-    $cmd = escape_win32_cmd($escaped);
-
-    if ($debugMode) {
-        $logger->notice('The powershell line to execute is :' . $cmd);
-    }
-    $output = noshell_exec($cmd);
-    $data = json_decode($output, true, 512);
-
-    if (!isset($data)) {
-        $logger->error('Failed to parse for customer: ' . $output);
-        createFailedSR($dbeCustomer, "Could not parse Powershell response: $output");
+    $commandRunner->enableDebugMode();
+    try {
+        $data = $commandRunner->run();
+    } catch (\Exception $exception) {
         continue;
     }
-
-    if (isset($data['error'])) {
-        $logger->error('Failed to pull data for customer: ' . $data['errorMessage'] . ' ' . $data['stackTrace']);
-        createFailedSR($dbeCustomer, $data['errorMessage'], $data['stackTrace'], $data['position']);
-        continue;
-    }
-
-    if (count($data['errors'])) {
-        foreach ($data['errors'] as $error) {
-            $logger->warning("Error received from powershell output, but the execution was not stopped:  " . $error);
-        }
-    }
-
 
     $mailboxes = $data['mailboxes'];
     $licenses = $data['licenses'];

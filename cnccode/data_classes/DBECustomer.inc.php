@@ -718,8 +718,7 @@ class DBECustomer extends DBCNCEntity
         }
         $queryString .= " order by cus_name ";
         $this->setQueryString($queryString);
-        $ret = (parent::getRows());
-        return $ret;
+        return $this->getRows();
     }
 
     function getReviewList($userID,
