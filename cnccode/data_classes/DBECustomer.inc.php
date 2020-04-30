@@ -66,6 +66,7 @@ class DBECustomer extends DBCNCEntity
     const activeDirectoryName = "activeDirectoryName";
     const reviewMeetingBooked = 'reviewMeetingBooked';
     const licensedOffice365Users = 'licensedOffice365Users';
+    const websiteURL = "websiteURL";
 
     /**
      * calls constructor()
@@ -425,6 +426,11 @@ class DBECustomer extends DBCNCEntity
             DA_NOT_NULL,
             null,
             0
+        );
+        $this->addColumn(
+            self::websiteURL,
+            DA_TEXT,
+            DA_ALLOW_NULL
         );
 
         $this->setPK(0);

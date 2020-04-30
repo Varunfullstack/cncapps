@@ -127,4 +127,16 @@
             <modifyDataType tableName="customer" columnName="reviewTime" newDataType="char(5)"/>
         </rollback>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue823-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="websiteURL"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="websiteURL" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

@@ -46,9 +46,8 @@ class CTReviewList extends CTCNC
     private function getData()
     {
         $baseQuery =
-            "
-select cus_name                                      as customerName,
-       reviewAction                   as reviewAction,
+            "select cus_name                                      as customerName,
+       reviewAction                                  as reviewAction,
        reviewDate,
        reviewTime,
        reviewUserID,
@@ -61,7 +60,12 @@ select cus_name                                      as customerName,
                if(con_mobile_phone, con_mobile_phone, null),
                if(add_phone, add_phone, null)
            )                                         as contactPhone,
-       c.name                                        as leadStatus
+       c.name                                        as leadStatus,
+       (select cno_details
+        from customernote
+        where cno_custno = customer.cus_custno
+        order by cno_created desc
+        limit 1)                                     as latestUpdate
 from customer
          left join consultant on reviewUserID = consultant.cns_consno
          left join contact on cus_custno = contact.con_custno and con_contno =

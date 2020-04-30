@@ -147,7 +147,7 @@
                        name="form[contact][0][email]"
                        value=""
                        size="25"
-                       maxlength="50"
+                       maxlength="60"
                        data-validation="emailOrEmpty server"
                        data-validation-url="/validateUniqueEmail.php"
                 >
@@ -456,6 +456,16 @@
 <script type="text/JavaScript">
 
     var isShowingInactive = false;
+
+    function checkWebsite() {
+        let URL = $('#websiteURL').val();
+        if (!URL) {
+            URL = prompt("Please provide a Website URL for the customer");
+            $('#websiteURL').val(URL);
+        }
+
+        window.open(URL, '_blank');
+    }
 
     function clearRow(contactID) {
 
@@ -1504,6 +1514,11 @@
            name="form[customer][{customerID}][name]"
            value="{customerName}"
     >
+    <input type="hidden"
+           id="websiteURL"
+           name="form[customer][{customerID}][websiteURL]"
+           value="{websiteURL}"
+    >
     <input name="form[customer][{customerID}][gscTopUpAmount]"
            type="hidden"
            value="{gscTopUpAmount}"
@@ -1539,26 +1554,13 @@
            value="{primaryMainContactID}"
     >
 
-    <button {disabled}
-            name="Go"
-    ><i class="fa fa-floppy-o"
-        aria-hidden="true"
-    ></i> Save
-    </button>
-    <button {disabled}
-            name="Button"
-            onClick="document.location='{cancelURL}';"
-    ><i class="fa fa-ban"
-        aria-hidden="true"
-    ></i> Cancel
-    </button>
-
     <BR/>
     <BR/>
     <div style="display: flex;flex-direction: row;justify-content: space-between; width: 1237px">
         <div>
-            <div class="content label">Site Information</div>
+            <h3 style="clear: both;">Site Information</h3>
             <DIV class="site">
+
                 <input type="hidden"
                        name="form[site][{customerID}{siteNo}][sageRef]"
                        value="{sageRef}"
@@ -1696,7 +1698,7 @@
             </div> <!-- site -->
         </div>
         <div>
-            <div class="content label">Lead Information</div>
+            <h3 style="clear: both;">Lead Information</h3>
             <table class="content"
                    style="width: 346px"
             >
@@ -1799,14 +1801,12 @@
             </table>
         </div>
         <div>
-            <div class="content label">
-                Opportunity Deal
-            </div>
+            <h3 style="clear: both;">Opportunity Deal</h3>
             <textarea name="form[customer][{customerID}][opportunityDeal]"
                       id="OpportunityDeal"
             >{opportunityDeal}</textarea>
             <script type="text/javascript">
-                reason = CKEDITOR.replace('OpportunityDeal',  {
+                reason = CKEDITOR.replace('OpportunityDeal', {
                         contentsCss: '/screen.css',
                         toolbarStartupExpanded: false,
                         disableNativeSpellChecker: false,
@@ -2712,17 +2712,24 @@
                 <!-- END reviewUserBlock -->
             </select>
         </div> <!-- customerReviewTime -->
-
-        <div class="customerReviewAction">
-                <textarea title="Action to be taken"
-                          {disabled}
-                          cols="120"
-                          rows="3"
-                          name="form[customer][{customerID}][reviewAction]"
-                >{reviewAction}</textarea>
-        </div>
+        <input type="hidden"
+               value="{reviewAction}"
+               name="form[customer][{customerID}][reviewAction]"
+        />
 
     </div> <!-- customerEditMainRightColumn -->
-
+    <button {disabled}
+            name="Go"
+    ><i class="fa fa-floppy-o"
+        aria-hidden="true"
+    ></i> Save
+    </button>
+    <button {disabled}
+            name="Button"
+            onClick="document.location='{cancelURL}';"
+    ><i class="fa fa-ban"
+        aria-hidden="true"
+    ></i> Cancel
+    </button>
 </form>
 

@@ -684,8 +684,16 @@ class CTCustomerCRM extends CTCustomer
                 CTCUSTOMER_CLS_TABLE_EDIT_HEADER
             );
         }
+        $title = "Customer - " . $this->dsCustomer->getValue(DBECustomer::name);
+        $color = "red";
+        if ($this->dsCustomer->getValue(DBECustomer::websiteURL)) {
+            $color = "green";
+        }
 
-        $this->setPageTitle("Customer - " . $this->dsCustomer->getValue(DBECustomer::name));
+        $this->setPageTitle(
+            $title,
+            $title . ' <i class="fas fa-globe" onclick="checkWebsite()" style="color:' . $color . '"></i>'
+        );
         /*
         Get the list of custom letter template file names from the custom letter directory
         */
@@ -788,6 +796,7 @@ class CTCustomerCRM extends CTCustomer
                 //                'customerNameClass'                  => $this->dsCustomer->getValue(DBECustomer::NameClass),
                 //                'SectorMessage'                      => $this->dsCustomer->getValue(DBECustomer::SectorMessage),
                 'regNo'                              => $this->dsCustomer->getValue(DBECustomer::regNo),
+                'websiteURL'                         => $this->dsCustomer->getValue(DBECustomer::websiteURL),
                 'mailshotFlagChecked'                => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::mailshotFlag)
                 ),
