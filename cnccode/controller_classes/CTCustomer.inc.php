@@ -553,11 +553,6 @@ class CTCustomer extends CTCNC
                     ($this->dsContact->getValue(DBEContact::lastName))
                 ) {
                     $this->dsContact->post();
-                    if ($this->dsContact->getValue(DBEContact::supportLevel) == DBEContact::supportLevelMain) {
-                        $dbeCustomer = new DBECustomer($this);
-                        $dbeCustomer->getRow($this->dsContact->getValue(DBEContact::customerID));
-                        $dbeCustomer->setValue(DBECustomer::primaryMainContactID, $this->dsContact->getPKValue());
-                    }
                 }
             } else {
                 $this->dsContact->post();  // Existing contact
