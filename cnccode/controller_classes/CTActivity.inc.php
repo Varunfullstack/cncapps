@@ -5297,6 +5297,7 @@ class CTActivity extends CTCNC
                 DBEProblem::awaitingCustomerResponseFlag,
                 $dsCallActivity->getValue(DBECallActivity::awaitingCustomerResponseFlag)
             );
+            $toUpdateProblem->updateRow();
         }
         $enteredEndTime = $this->buActivity->updateCallActivity(
             $this->dsCallActivity
