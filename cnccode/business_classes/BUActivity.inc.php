@@ -9096,14 +9096,15 @@ FROM
 
         /** @var $db dbSweetcode */
         global $db;
-        $db->preparedQuery(
+        $statement = $db->preparedQuery(
             'select getOpenHours(?)',
             [["type" => "i", "value" => $dbeProblem->getValue(DBEProblem::problemID)]]
         );
-        if ($db->next_record(MYSQLI_NUM)) {
+        if ($statement->num_rows) {
+            $row = $statement->fetch_row();
             $dbeProblem->setValue(
                 DBEProblem::openHours,
-                $db->Record[0]
+                $row[0]
             );
         } else {
             error_log("Trying to calculate open hours for $problemID didn't produce any results?");
