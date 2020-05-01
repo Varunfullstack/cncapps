@@ -122,11 +122,10 @@ class CTCustomerReviewMeetingsReport extends CTCNC
             );
 
             $now = new DateTime();
-            $dateDiff = $nextReviewMeetingDate->diff(new DateTime());
             $style = null;
             if ($dbeCustomer->getValue(
                     DBECustomer::reviewMeetingBooked
-                ) || ($nextReviewMeetingDate > $now && $dateDiff->days <= (7 * 6))) {
+                )) {
                 $style = 'style="background-color: #B2FFB2"';
             } elseif ($nextReviewMeetingDate < $now) {
                 $style = 'style="background-color: #F5AEBD"';
