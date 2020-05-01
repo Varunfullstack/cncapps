@@ -68,6 +68,10 @@ if (isset($customerID)) {
     }
 } else {
     $dbeCustomer->getActiveCustomers(true);
+    if (!$dbeCustomer->getNumRows()) {
+        $logger->warning('There are no active customers');
+        exit;
+    }
     $dbeCustomer->fetchNext();
 }
 $BUHeader = new BUHeader($thing);
