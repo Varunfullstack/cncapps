@@ -64,6 +64,7 @@ try
 
         $storageItem = $storageData |Sort-Object -Property LastContentModifiedDate -Descending|  Where-Object { $_.Owner -eq $UserPrincipalName }
         $oneDriveStorageUsage = 0
+
         if ($null -ne $storageItem)
         {
             if ($storageItem -is [array])
@@ -76,9 +77,7 @@ try
         }
         $UserDomain = $UserPrincipalName.Split('@')[1]
         $MailboxStat = Get-EXOMailboxStatistics -UserPrincipalName $UserPrincipalName -WarningAction SilentlyContinue
-        $TotalItemSize = $MailboxStat | Select-Object @{ name = "TotalItemSize"; expression = { [math]::Round(($_.TotalItemSize.ToString().Split("(")[1].Split(" ")[0].Replace(",", "")/1MB), 2) } }
-        $TotalItemSize = $TotalItemSize.TotalItemSize
-
+        $TotalItemSize = $MailboxStat.TotalItemSize.ToString().Split("(")[1].Split(" ")[0].Replace(",", "")/1MB
         $totalEmailStorageUsed = $totalEmailStorageUsed + $TotalItemSize
         $RecipientTypeDetails = $mailbox.RecipientTypeDetails
         try
@@ -106,7 +105,7 @@ try
             {
                 $licenses += $license.AccountSkuId
             }
-            $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression =  {$licenses.SyncRoot }  }, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }, @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } }
+            $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { $licenses.SyncRoot } }, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }, @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } }
             $MailboxesReport += $Information
         }
         catch

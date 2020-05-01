@@ -548,7 +548,7 @@ function processMailboxes(Spreadsheet $spreadSheet,
             }
 
             if ($color) {
-                $mailboxesSheet->getStyle("A$currentRow:E$currentRow")
+                $mailboxesSheet->getStyle("A$currentRow:".$mailboxesSheet->getHighestDataColumn()."$currentRow")
                     ->getFill()
                     ->setFillType(Fill::FILL_SOLID)
                     ->getStartColor()
