@@ -199,6 +199,7 @@
                        name="form[contact][0][initialLoggingEmailFlag]"
                        value="Y"
                        class="checkboxAlign"
+                       checked
                 >
             </div>
         </td>
@@ -209,6 +210,7 @@
                        name="form[contact][0][workStartedEmailFlag]"
                        value="Y"
                        class="checkboxAlign"
+                       checked
                 >
             </div>
         </td>
@@ -219,6 +221,7 @@
                        name="form[contact][0][workUpdatesEmailFlag]"
                        value="Y"
                        class="checkboxAlign"
+                       checked
                 >
             </div>
         </td>
@@ -229,6 +232,7 @@
                        name="form[contact][0][fixedEmailFlag]"
                        value="Y"
                        class="checkboxAlign"
+                       checked
                 >
             </div>
         </td>
@@ -239,6 +243,7 @@
                        name="form[contact][0][pendingClosureEmailFlag]"
                        value="Y"
                        class="checkboxAlign"
+                       checked
                 >
             </div>
         </td>
@@ -249,6 +254,7 @@
                        name="form[contact][0][closureEmailFlag]"
                        value="Y"
                        class="checkboxAlign"
+                       checked
                 >
             </div>
         </td>
@@ -341,6 +347,7 @@
                 <input type="checkbox"
                        name="form[contact][0][mailshot3Flag]"
                        value="Y"
+                       checked
                 />
             </div>
         </td>
@@ -393,6 +400,7 @@
                 <input type="checkbox"
                        name="form[contact][0][mailshot11Flag]"
                        value="Y"
+                       checked
                 />
             </div>
         </td>
@@ -412,6 +420,7 @@
                 <input type="checkbox"
                        name="form[contact][0][sendMailshotFlag]"
                        value="Y"
+                       checked
                 />
             </div>
         </td>
@@ -470,7 +479,7 @@
 
     function checkLink() {
         const iconElement = event.target;
-        const input = iconElement.nextSibling;
+        const input = iconElement.nextElementSibling;
         let URL = input.value;
         if (!URL) {
             URL = prompt("Please provide a LinkedIn URL for the contact");
@@ -2066,6 +2075,7 @@
                         </div>
                     </td>
                     <td class="headerLightgrey">Special Attention</td>
+                    <td class="headerLightgrey"></td>
                 </tr>
                 </thead>
                 <tbody>
@@ -2586,6 +2596,10 @@
                            style="color: {linkedInColor}"
                            onclick="checkLink()"
                         ></i>
+                        <input type="hidden"
+                               name="form[contact][{contactID}][linkedInURL]"
+                               value="{linkedInURL}"
+                        >
                     </td>
                 </tr>
 

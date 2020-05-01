@@ -174,6 +174,7 @@ class CTCustomerCRM extends CTCustomer
                 DBECustomer::websiteURL,
                 @$value['websiteURL']
             );
+
             $this->dsCustomer->setValue(
                 DBECustomer::meetingDateTime,
                 @$value['meetingDateTime']
@@ -1665,7 +1666,11 @@ class CTCustomerCRM extends CTCustomer
                     'dearJohnURL'                          => $dearJohnURL,
                     'dmLetterURL'                          => $dmLetterURL,
                     'customLetter1URL'                     => $customLetter1URL,
-                    'deleteContactLink'                    => $deleteContactLink
+                    'deleteContactLink'                    => $deleteContactLink,
+                    'linkedInURL'                          => $this->dsContact->getValue(DBEContact::linkedInURL),
+                    'linkedInColor'                        => $this->dsContact->getValue(
+                        DBEContact::linkedInURL
+                    ) ? 'green' : 'red'
                 )
             );
 

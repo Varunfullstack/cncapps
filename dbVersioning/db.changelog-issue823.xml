@@ -139,4 +139,16 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue823-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="linkedInURL"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="linkedInURL" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

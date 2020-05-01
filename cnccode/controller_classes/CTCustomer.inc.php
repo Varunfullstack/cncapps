@@ -323,6 +323,11 @@ class CTCustomer extends CTCNC
             );
 
             $this->dsContact->setValue(
+                DBEContact::linkedInURL,
+                @$value['linkedInURL']
+            );
+
+            $this->dsContact->setValue(
                 DBEContact::title,
                 @$value['title']
             );
@@ -720,6 +725,10 @@ class CTCustomer extends CTCNC
             $this->dsCustomer->setValue(
                 DBECustomer::invoiceSiteNo,
                 @$value['invoiceSiteNo']
+            );
+            $this->dsCustomer->setValue(
+                DBECustomer::websiteURL,
+                @$value['websiteURL']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::deliverSiteNo,
@@ -1550,7 +1559,16 @@ class CTCustomer extends CTCNC
 
 
 // Parameters
-        $this->setPageTitle("Customer");
+        $title = "Customer - " . $this->dsCustomer->getValue(DBECustomer::name);
+        $color = "red";
+        if ($this->dsCustomer->getValue(DBECustomer::websiteURL)) {
+            $color = "green";
+        }
+
+        $this->setPageTitle(
+            $title,
+            $title . ' <i class="fas fa-globe" onclick="checkWebsite()" style="color:' . $color . '"></i>'
+        );
         if ($this->getParam('save_page')) {
             $this->setSessionParam('save_page', $this->getParam('save_page'));
         } else {
@@ -1750,6 +1768,7 @@ class CTCustomer extends CTCNC
                 'customerName'                   => $this->dsCustomer->getValue(DBECustomer::name),
                 'reviewCount'                    => $this->buCustomer->getReviewCount(),
                 'customerFolderLink'             => $customerFolderLink,
+                'websiteURL'                     => $this->dsCustomer->getValue(DBECustomer::websiteURL),
                 'customerNameClass'              => $this->dsCustomer->getValue(self::customerFormNameClass),
                 'SectorMessage'                  => $this->dsCustomer->getValue(self::customerFormSectorMessage),
                 'regNo'                          => $this->dsCustomer->getValue(DBECustomer::regNo),
@@ -2611,7 +2630,11 @@ class CTCustomer extends CTCNC
                     ) ? 'data-validation="atLeastOne"' : null,
                     'dearJohnURL'                          => $dearJohnURL,
                     'dmLetterURL'                          => $dmLetterURL,
-                    'deleteContactLink'                    => $deleteContactLink
+                    'deleteContactLink'                    => $deleteContactLink,
+                    'linkedInURL'                          => $this->dsContact->getValue(DBEContact::linkedInURL),
+                    'linkedInColor'                        => $this->dsContact->getValue(
+                        DBEContact::linkedInURL
+                    ) ? 'green' : 'red'
                 )
             );
 

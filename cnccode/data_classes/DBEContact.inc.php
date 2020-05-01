@@ -59,6 +59,7 @@ class DBEContact extends DBCNCEntity
     const pendingLeaverFlag = 'pendingLeaverFlag';
     const pendingLeaverDate = 'pendingLeaverDate';
     const specialAttentionContactFlag = "specialAttentionContactFlag";
+    const linkedInURL = "linkedInURL";
 
     /**
      * calls constructor()
@@ -324,6 +325,11 @@ class DBEContact extends DBCNCEntity
             self::specialAttentionContactFlag,
             DA_YN_FLAG,
             DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::linkedInURL,
+            DA_TEXT,
+            DA_ALLOW_NULL
         );
 
         $this->setPK(0);

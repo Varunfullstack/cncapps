@@ -781,7 +781,7 @@ class BUCustomer extends Business
         );
         $dsCustomer->setValue(
             DBECustomer::referredFlag,
-            'N'
+            'Y'
         );
         $dsCustomer->setValue(
             DBECustomer::createDate,
