@@ -4024,6 +4024,7 @@ class CTActivity extends CTCNC
             $contactName = $activitiesByProblemID->getValue(DBEJCallActivity::contactName);
             $siteAddress = $dsSite->getValue(DBESite::add1);
             $userName = $activitiesByProblemID->getValue(DBEJCallActivity::userName);
+
             $reason = $activitiesByProblemID->getValue(DBEJCallActivity::reason);
             $originalRequestHeader = null;
             $colorClass = "boring-gray";
@@ -4048,11 +4049,12 @@ class CTActivity extends CTCNC
                     'colorClass'            => $colorClass
                 )
             );
-            if ($activitiesByProblemID->getValue(DBECallActivity::callActTypeID) != 60) {
+            if (!in_array($activitiesByProblemID->getValue(DBECallActivity::callActTypeID), [60, 61])) {
                 $lastActivityID = $activitiesByProblemID->getValue(DBECallActivity::callActivityID);
                 $lastActivityText = "$date $startTime - $endTime ($duration) $activityType - $contactName - $siteAddress - $userName";
+
+                $lastActivityReason = $reason;
             }
-            $lastActivityReason = $reason;
             $this->template->parse(
                 'rows',
                 'activityBlock',
