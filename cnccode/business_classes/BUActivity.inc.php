@@ -3207,7 +3207,7 @@ class BUActivity extends Business
                     $dsCallActivity,
                     $requestingUser,
                     $comments,
-                    null
+                    $reviewingUser
                 );
                 break;
             case 'DEL':
@@ -3437,11 +3437,11 @@ class BUActivity extends Business
 
         $template->setVar(
             array(
-                'problemID'        => $problemID,
-                'userName'         => $userName,
-                'urlLastActivity'  => $urlLastActivity,
-                'requestReason'    => $reason,
-                'urlFirstActivity' => $urlFirstActivity,
+                'problemID'         => $problemID,
+                'userName'          => $userName,
+                'urlLastActivity'   => $urlLastActivity,
+                'requestReason'     => $reason,
+                'urlFirstActivity'  => $urlFirstActivity,
                 'reviewingUserName' => $reviewingUser->getValue(DBEUser::name)
             )
         );
