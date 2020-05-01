@@ -93,8 +93,9 @@ do {
     } catch (\Exception $exception) {
         continue;
     }
-
-    $commandRunner->enableDebugMode();
+    if ($debugMode) {
+        $commandRunner->enableDebugMode();
+    }
     try {
         $data = $commandRunner->run();
     } catch (\Exception $exception) {
@@ -204,6 +205,12 @@ do {
     $fileName = "Current Mailbox Extract.xlsx";
     $filePath = $folderName . $fileName;
     try {
+
+        \PhpOffice\PhpSpreadsheet\Calculation\Calculation::getInstance(
+            $spreadsheet
+        )->getDebugLog()
+            ->setWriteDebugLog(true);
+
         $writer->save(
             $filePath
         );
@@ -254,6 +261,13 @@ do {
 
         $logger->info('All good!!. Creating file ' . $fileName);
     } catch (Exception $exception) {
+        print_r(
+            \PhpOffice\PhpSpreadsheet\Calculation\Calculation::getInstance(
+                $spreadsheet
+            )->getDebugLog()
+                ->getLog()
+        );
+        var_dump($exception->getTraceAsString());
         $logger->error('Failed to save file, possibly file open: ' . $exception->getMessage());
     }
 } while ($dbeCustomer->fetchNext());
@@ -356,6 +370,8 @@ function processMailboxes(Spreadsheet $spreadSheet,
 {
     $dateTime = new DateTime();
     $mailboxLimits = [];
+    $licensedUsers = 0;
+    $otherLicenses = 0;
     $totalizationRow = [
         "Total"         => "Total",
         "TotalMailBox"  => 0,
@@ -408,23 +424,34 @@ function processMailboxes(Spreadsheet $spreadSheet,
         switch ($mailboxes[$key]['RecipientTypeDetails']) {
             case "SharedMailbox":
                 $mailboxes[$key]['RecipientTypeDetails'] = "Shared";
+                $otherLicenses++;
                 break;
             case "UserMailbox":
                 $mailboxes[$key]['RecipientTypeDetails'] = "User";
+                $licensedUsers++;
                 break;
             case 'RoomMailbox':
                 $mailboxes[$key]['RecipientTypeDetails'] = "Room";
+                $otherLicenses++;
                 break;
             case 'EquipmentMailbox':
                 $mailboxes[$key]['RecipientTypeDetails'] = "Equipment";
+                $otherLicenses++;
                 break;
+        }
+
+        if ($mailboxes[$key]['IsLicensed']) {
+            if ($mailboxes[$key]['RecipientTypeDetails'] == "User") {
+                $licensedUsers++;
+            } elseif ($mailboxes[$key]['RecipientTypeDetails'] == "Shared") {
+                $otherLicenses++;
+            }
         }
 
         $mailboxes[$key]['Licenses'] = $licenseValue;
         $mailboxes[$key]['IsLicensed'] = $mailboxes[$key]['IsLicensed'] ? 'Yes' : 'No';
         $totalizationRow['TotalMailBox'] += $datum['TotalItemSize'];
         $mailboxes[$key]['TotalItemSize'] = $datum['TotalItemSize'];
-        $totalizationRow['LicensedUsers'] += $datum['IsLicensed'];
         $totalizationRow['TotalOneDrive'] += $datum['OneDriveStorageUsed'];
         if ($debugMode) {
             $mailboxes[$key][] = $mailboxLimit;
@@ -455,12 +482,10 @@ function processMailboxes(Spreadsheet $spreadSheet,
         true
     );
     $highestRow = count($mailboxes) + 2;
-    $licensedUsersNumber = $totalizationRow['LicensedUsers'];
-    $totalizationRow['LicensedUsers'] = "$totalizationRow[LicensedUsers] Licensed Users";
-    if ($totalizationRow['LicensedUsers']) {
+    if ($licensedUsers + $otherLicenses) {
         $updateCustomer = new DBECustomer($thing);
         $updateCustomer->getRow($dbeCustomer->getValue(DBECustomer::customerID));
-        $updateCustomer->setValue(DBECustomer::licensedOffice365Users, $licensedUsersNumber);
+        $updateCustomer->setValue(DBECustomer::licensedOffice365Users, $licensedUsers + $otherLicenses);
         $updateCustomer->updateRow();
     }
     $mailboxesSheet->fromArray(
@@ -474,9 +499,10 @@ function processMailboxes(Spreadsheet $spreadSheet,
         "B$highestRow",
         '=sum(B2:B' . ($highestRow - 1) . ')'
     );
+    $formula = '=countifs(D2:D' . ($highestRow - 1) . ', "yes",C2:C' . ($highestRow - 1) . ',"User" ) & " Licensed Users | " & countifs(D2:D' . ($highestRow - 1) . ', "yes",C2:C' . ($highestRow - 1) . ',"Shared" ) & " Other Licenses"';
     $mailboxesSheet->setCellValue(
         "D$highestRow",
-        '=countif(D2:D' . ($highestRow - 1) . ', "yes") & " Licensed Users"'
+        $formula
     );
 
 

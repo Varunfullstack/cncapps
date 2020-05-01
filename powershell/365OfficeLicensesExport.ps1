@@ -43,6 +43,7 @@ try
     $totalEmailStorageUsed = 0
     $mailboxesCount = ($Mailboxes).count
     $mailboxIndex = 0
+    Remove-TypeData System.Array
     foreach ($mailbox in $Mailboxes)
     {
         $DisplayName = $mailbox.DisplayName
@@ -101,11 +102,11 @@ try
                 'No'
             }
             [array]$licenses = @()
-            foreach($license in $MSOLUSER.licenses){
-                $licenses+= $license.AccountSkuId
+            foreach ($license in $MSOLUSER.licenses)
+            {
+                $licenses += $license.AccountSkuId
             }
-            $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }, @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } }
-            $Information | Add-Member  -NotePropertyName Licenses -NotePropertyValue $licenses
+            $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression =  {$licenses.SyncRoot }  }, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }, @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } }
             $MailboxesReport += $Information
         }
         catch
@@ -131,7 +132,7 @@ try
         $Report = @{ }
     }
     $JSOn = ConvertTo-Json $Report
-    [IO.File]::WriteAllLines($OutputPath, $JSOn )
+    [IO.File]::WriteAllLines($OutputPath, $JSOn)
 }
 catch
 {
@@ -144,5 +145,5 @@ catch
         position = $positionMessage
     }
     $erroJSON = ConvertTo-Json $object
-    [IO.File]::WriteAllLines($OutputPath, $erroJSON )
+    [IO.File]::WriteAllLines($OutputPath, $erroJSON)
 }
