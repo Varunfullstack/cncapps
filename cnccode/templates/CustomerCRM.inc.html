@@ -460,7 +460,7 @@
                    value="Y"
             >
         </td>
-        <td>
+        <td class="contactPendingLeaver">
             <div class="content">
                 <i class="fab fa-linkedin-in"
                    style="color: red"
@@ -483,6 +483,12 @@
         let URL = input.value;
         if (!URL) {
             URL = prompt("Please provide a LinkedIn URL for the contact");
+            if (URL && !URL.match(/^https?:\/\/.*/)) {
+                URL = "http://" + URL;
+            }
+            if (!URL) {
+                return;
+            }
             input.value = URL;
             iconElement.style.color = 'green';
             return;
@@ -495,6 +501,12 @@
         let URL = $('#websiteURL').val();
         if (!URL) {
             URL = prompt("Please provide a Website URL for the customer");
+            if (URL && !URL.match(/^https?:\/\/.*/)) {
+                URL = "http://" + URL;
+            }
+            if (!URL) {
+                return;
+            }
             $('#websiteURL').val(URL);
             debugger;
             $('.fas.fa-globe')[0].style.color = 'green';
@@ -2074,8 +2086,16 @@
                             Pending Leaver Date
                         </div>
                     </td>
-                    <td class="headerLightgrey">Special Attention</td>
-                    <td class="headerLightgrey"></td>
+                    <td class="headerLightgrey">
+                        <div class="contactPendingLeaver">
+                            Special Attention
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
+                        <div class="contactPendingLeaver">
+                            LinkedIn
+                        </div>
+                    </td>
                 </tr>
                 </thead>
                 <tbody>
@@ -2583,23 +2603,27 @@
                             />
                         </div>
                     </td>
-                    <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][specialAttentionContactFlag]"
-                               value="Y"
-                               {specialAttentionContactFlagChecked}
-                        >
+                    <td>
+                        <div class="contactPendingLeaver">
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][specialAttentionContactFlag]"
+                                   value="Y"
+                                   {specialAttentionContactFlagChecked}
+                            >
+                        </div>
                     </td>
-                    <td class="content">
-                        <i class="fab fa-linkedin-in"
-                           style="color: {linkedInColor}"
-                           onclick="checkLink()"
-                        ></i>
-                        <input type="hidden"
-                               name="form[contact][{contactID}][linkedInURL]"
-                               value="{linkedInURL}"
-                        >
+                    <td>
+                        <div class="contactPendingLeaver">
+                            <i class="fab fa-linkedin-in"
+                               style="color: {linkedInColor}"
+                               onclick="checkLink()"
+                            ></i>
+                            <input type="hidden"
+                                   name="form[contact][{contactID}][linkedInURL]"
+                                   value="{linkedInURL}"
+                            >
+                        </div>
                     </td>
                 </tr>
 

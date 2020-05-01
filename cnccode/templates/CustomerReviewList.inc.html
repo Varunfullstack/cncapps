@@ -95,7 +95,15 @@
             serverSide: true,
             ajax: {
                 url: "?action=getData",
-                type: "GET"
+                type: "GET",
+                dataSrc: (response) => {
+                    $.LoadingOverlay('hide');
+                    return response.data;
+                },
+                data: (data) => {
+                    $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+                    return data;
+                }
             },
         });
     })

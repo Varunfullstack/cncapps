@@ -777,7 +777,6 @@ div.reportDescription {
 .makeItColor td:nth-child(3n+3) {
     background: yellow;
 }
-
 table.fixed_header {
     table-layout: fixed;
 }
@@ -789,7 +788,7 @@ table.fixed_header {
 .fixed_header tbody {
     overflow-y: scroll;
     max-height: 851px;
-    direction: rtl;
+    direction: ltr;
     /*width: 100%;*/
 }
 
@@ -807,10 +806,6 @@ table.fixed_header {
 
 .fixed_header thead tr, .fixed_header tbody tr {
     display: block;
-}
-
-.fixed_header thead {
-    margin-right: 12px;
 }
 
 .redPencil {

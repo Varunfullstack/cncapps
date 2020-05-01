@@ -151,4 +151,26 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="pavwebdev" id="issue823-12">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="customerNote"
+                                            foreignKeyName="customernote_customer_cus_custno_fk"/>
+            </not>
+        </preConditions>
+        <sql>
+            delete customernote
+            from customernote
+                     left join customer on cno_custno = cus_custno
+            where cus_custno is null;
+        </sql>
+        <rollback/>
+        <addForeignKeyConstraint baseTableName="customerNote" baseColumnNames="cno_custno"
+                                 constraintName="customernote_customer_cus_custno_fk"
+                                 referencedTableName="customer"
+                                 referencedColumnNames="cus_custno"
+                                 onUpdate="CASCADE"
+                                 onDelete="CASCADE"
+        />
+    </changeSet>
 </databaseChangeLog>
