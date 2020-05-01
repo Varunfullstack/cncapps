@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.13.4] - 2020-05-01
+### Fixed
+- Fixed issue with saving new contact
+
 ## [v3.13.3] - 2020-04-30
 ### Fixed
 - Fixed issue when setting problems to fixed.
