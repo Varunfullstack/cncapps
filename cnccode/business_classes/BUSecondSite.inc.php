@@ -912,7 +912,13 @@ class BUSecondsite extends Business
         $endYearMonth = $searchForm->getValue(self::searchFormEndYearMonth);
 
         $start = DateTime::createFromFormat('m/Y', $startYearMonth)->modify('first day of this month');
-        $end = DateTime::createFromFormat('m/Y', $endYearMonth)->modify('last day of this month');
+        $dateCondition = " > '{$start->format(DATE_MYSQL_DATE)}'";
+
+        if ($endYearMonth) {
+            $end = DateTime::createFromFormat('m/Y', $endYearMonth)->modify('last day of this month');
+            $dateCondition = "BETWEEN '{$start->format(DATE_MYSQL_DATE)}' AND '{$end->format(DATE_MYSQL_DATE)}'";
+        }
+
 
         $sql =
             "SELECT 
@@ -926,8 +932,8 @@ class BUSecondsite extends Business
           JOIN problem ON pro_problemno = caa_problemno
           JOIN customer ON cus_custno = pro_custno
           JOIN custitem ON caa_secondsite_error_cuino = custitem.cui_cuino
-        WHERE
-          caa_date BETWEEN '{$start->format(DATE_MYSQL_DATE)}' AND '{$end->format(DATE_MYSQL_DATE)}'
+        WHERE 
+          caa_date $dateCondition 
           AND caa_secondsite_error_cuino <> 0";
 
         if ($customerID) {
