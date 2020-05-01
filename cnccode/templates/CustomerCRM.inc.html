@@ -451,17 +451,44 @@
                    value="Y"
             >
         </td>
+        <td>
+            <div class="content">
+                <i class="fab fa-linkedin-in"
+                   style="color: red"
+                   onclick="checkLink()"
+                ></i>
+                <input type="hidden"
+                       name="form[contact][0][linkedInURL]"
+                >
+            </div>
+        </td>
     </tr>
 </script>
 <script type="text/JavaScript">
 
     var isShowingInactive = false;
 
+    function checkLink() {
+        const iconElement = event.target;
+        const input = iconElement.nextSibling;
+        let URL = input.value;
+        if (!URL) {
+            URL = prompt("Please provide a LinkedIn URL for the contact");
+            input.value = URL;
+            iconElement.style.color = 'green';
+            return;
+        }
+
+        window.open(URL, '_blank');
+    }
+
     function checkWebsite() {
         let URL = $('#websiteURL').val();
         if (!URL) {
             URL = prompt("Please provide a Website URL for the customer");
             $('#websiteURL').val(URL);
+            debugger;
+            $('.fas.fa-globe')[0].style.color = 'green';
         }
 
         window.open(URL, '_blank');
@@ -2063,11 +2090,6 @@
                        name="form[contact][{contactID}][discontinuedFlag]"
                        value="{discontinuedFlag}"
                 >
-                <input type="hidden"
-                       name="form[contact][{contactID}][mobilePhone]"
-                       value="{mobilePhone}"
-                >
-
                 <tr>
                     <td>
                         <div class="contactClear">
@@ -2558,6 +2580,12 @@
                                value="Y"
                                {specialAttentionContactFlagChecked}
                         >
+                    </td>
+                    <td class="content">
+                        <i class="fab fa-linkedin-in"
+                           style="color: {linkedInColor}"
+                           onclick="checkLink()"
+                        ></i>
                     </td>
                 </tr>
 

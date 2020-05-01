@@ -171,6 +171,10 @@ class CTCustomerCRM extends CTCustomer
                 @$value['dateMeetingConfirmedDate']
             );
             $this->dsCustomer->setValue(
+                DBECustomer::websiteURL,
+                @$value['websiteURL']
+            );
+            $this->dsCustomer->setValue(
                 DBECustomer::meetingDateTime,
                 @$value['meetingDateTime']
             );
