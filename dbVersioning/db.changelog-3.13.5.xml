@@ -7,7 +7,7 @@
     </changeSet>
     <changeSet author="pavwebdev" id="hotfix-v3.13.5-1">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
+            <sqlCheck expectedResult="1">
                 SELECT COUNT(routine_name) > 0
                 FROM INFORMATION_SCHEMA.ROUTINES
                 WHERE
