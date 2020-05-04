@@ -93,6 +93,8 @@ do {
     } catch (\Exception $exception) {
         continue;
     }
+
+    $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
     if ($debugMode) {
         $commandRunner->enableDebugMode();
     }
