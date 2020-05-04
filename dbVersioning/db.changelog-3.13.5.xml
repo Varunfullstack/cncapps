@@ -16,7 +16,9 @@
                 AND ROUTINE_NAME = 'isBankHoliday';
             </sqlCheck>
         </preConditions>
-        <dropProcedure procedureName="isBankHoliday"/>
+        <sql>
+            DROP FUNCTION IF EXISTS isBankHoliday
+        </sql>
         <createProcedure procedureName="isBankHoliday">
             create
             function isBankHoliday(X date) returns tinyint(1)
@@ -116,5 +118,6 @@
 
 
         </createProcedure>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>
