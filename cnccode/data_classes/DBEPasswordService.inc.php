@@ -40,8 +40,10 @@ class DBEPasswordService extends DBEntity
         );
         $this->addColumn(
             self::onePerCustomer,
-            DA_INTEGER,
-            DA_NOT_NULL
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
         );
         $this->addColumn(
             self::sortOrder,
@@ -185,7 +187,7 @@ SET sortOrder =
             " FROM " . $this->getTableName(
             ) . " LEFT JOIN PASSWORD ON passwordservice.passwordServiceID = password.`serviceID` AND password.`pas_custno` = $customerID " . ($excludedPasswordID ? " and password.pas_passwordno <> $excludedPasswordID" : '') .
             "  AND(password.archivedBy = '' OR password.archivedBy IS NULL) WHERE(passwordService . onePerCustomer = 0 OR password . `pas_passwordno` IS NULL) 
- GROUP BY passwordServiceID
+ GROUP BY passwordServiceID order by description asc
 ";
         $this->setQueryString($queryString);
         return $this->getRows();

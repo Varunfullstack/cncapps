@@ -266,7 +266,7 @@ class CTPassword extends CTCNC
                 'usernameMessage'        => $dsPassword->getMessage(DBEPassword::username),
                 'password'               => $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::password)),
                 'passwordMessage'        => $dsPassword->getMessage(DBEPassword::password),
-                DBEPassword::notes       => $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::notes)),
+                DBEPassword::notes       => htmlentities($this->buPassword->decrypt($dsPassword->getValue(DBEPassword::notes))),
                 'notesMessage'           => $dsPassword->getMessage(DBEPassword::notes),
                 'urlEdit'                => $urlEdit,
                 'URL'                    => $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::URL)),
