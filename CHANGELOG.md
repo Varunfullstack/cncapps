@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 856 - Password Services - One Per Customer not setting zero in database
+
 ## [v3.13.4] - 2020-05-01
 ### Fixed
 - Fixed issue with saving new contact
