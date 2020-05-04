@@ -776,7 +776,7 @@ class BUActivity extends Business
         return false;
     }
 
-    function escalateProblemByCallActivityID($callActivityID)
+    function escalateProblemByCallActivityID($callActivityID, $reason)
     {
         $dsCallActivity = new DataSet($this);
         $this->getActivityByID(
@@ -784,7 +784,7 @@ class BUActivity extends Business
             $dsCallActivity
         );
 
-        $this->escalateProblemByProblemID($dsCallActivity->getValue(DBEJCallActivity::problemID));
+        $this->escalateProblemByProblemID($dsCallActivity->getValue(DBEJCallActivity::problemID), $reason);
     }
 
     /**
@@ -806,6 +806,7 @@ class BUActivity extends Business
     }
 
     function escalateProblemByProblemID($problemID,
+                                        $reason,
                                         $newQueueNo = null
     )
     {
@@ -824,6 +825,7 @@ class BUActivity extends Business
         if ($newQueueNo < $oldQueueNo) {
             return $this->deEscalateProblemByProblemID(
                 $problemID,
+                $reason,
                 $newQueueNo
             );
         }
@@ -855,13 +857,14 @@ class BUActivity extends Business
 
             $this->logOperationalActivity(
                 $problemID,
-                'Escalated from ' . $this->workQueueDescriptionArray[$oldQueueNo] . ' to ' . $this->workQueueDescriptionArray[$newQueueNo]
+                'Escalated from ' . $this->workQueueDescriptionArray[$oldQueueNo] . ' to ' . $this->workQueueDescriptionArray[$newQueueNo] . " because of " . $reason
             );
         }
         return true;
     }
 
     function deEscalateProblemByProblemID($problemID,
+                                          $reason,
                                           $newQueueNo = null
     )
     {
@@ -880,6 +883,7 @@ class BUActivity extends Business
         if ($newQueueNo > $oldQueueNo) {
             return $this->escalateProblemByProblemID(
                 $problemID,
+                $reason,
                 $newQueueNo
             );
         }
@@ -905,7 +909,7 @@ class BUActivity extends Business
 
             $this->logOperationalActivity(
                 $problemID,
-                'Deescalated from ' . $this->workQueueDescriptionArray[$oldQueueNo] . ' to ' . $this->workQueueDescriptionArray[$newQueueNo]
+                "Deescalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]} because of {$reason}"
             );
 
         }

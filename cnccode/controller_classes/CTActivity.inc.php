@@ -3862,45 +3862,6 @@ class CTActivity extends CTCNC
 
     }
 
-    /**
-     * @throws Exception
-     */
-    function createTravel()
-    {
-        $dsActivity = new DataSet($this);
-        $this->buActivity->getActivityByID(
-            $this->getParam('callActivityID'),
-            $dsActivity
-        );
-
-        $this->buActivity->createTravelActivity($this->getParam('callActivityID'));
-
-        if ($this->getParam('nextStatus') == 'Fixed') {
-
-            /* Gather fixed info */
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'         => 'gatherFixedInformation',
-                        'callActivityID' => $this->getParam('callActivityID')
-                    )
-                );
-
-            header('Location: ' . $urlNext);
-            exit;
-
-        }
-
-        if ($this->getParam('nextStatus') == 'Escalate') {
-
-            $this->buActivity->escalateProblemByCallActivityID($this->getParam('callActivityID'));
-        }
-
-
-        $this->redirectToDisplay($this->getParam('callActivityID'));
-        exit;
-    }// end changeRequestApproval
 
     /**
      * @throws Exception
@@ -5283,8 +5244,20 @@ class CTActivity extends CTCNC
             $dsCallActivity->post();
             $nextStatus = 'CncAction';
         } elseif ($this->getParam('Escalate')) {
+            if (!$this->getParam('escalationReason')) {
+                $this->formError = true;
+                $this->formErrorMessage = 'Please provide an escalate reason';
+                if ($this->getAction() == CTACTIVITY_ACT_INSERT_ACTIVITY) {
+                    $this->setParam('callActivityID', $callActivityID);
+                    $this->setAction(CTACTIVITY_ACT_CREATE_ACTIVITY);
+                } else {
+                    $this->setAction(CTACTIVITY_ACT_EDIT_ACTIVITY);
+                }
+                $this->editActivity();
+                exit;
+            }
             $nextStatus = 'Escalate';
-            $this->buActivity->escalateProblemByCallActivityID($callActivityID);
+            $this->buActivity->escalateProblemByCallActivityID($callActivityID, $this->getParam('escalationReason'));
         } else {
             $nextStatus = false;
         }
@@ -7423,66 +7396,4 @@ WHERE caa_problemno = ?
         }
 
     }
-
-    /**
-     * @throws Exception
-     */
-    function promptCreateTravel()
-    {
-
-        if (!$this->getParam('callActivityID')) {
-            $this->raiseError('callActivityID not passed');
-        }
-
-        $urlCreateTravel =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'callActivityID' => $this->getParam('callActivityID'),
-                    'action'         => 'createTravel',
-                    'nextStatus'     => $this->getParam('nextStatus')
-                )
-            );
-
-        if ($this->getParam('nextStatus') == 'Fixed') {
-
-            $urlSkipTravel =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'callActivityID' => $this->getParam('callActivityID'),
-                        'action'         => 'gatherFixedInformation'
-                    )
-                );
-        } else {
-            $urlSkipTravel =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'callActivityID' => $this->getParam('callActivityID'),
-                        'action'         => 'displayActivity'
-                    )
-                );
-        }
-
-        $this->template->set_var(
-            array(
-                'urlCreateTravel' => $urlCreateTravel,
-                'urlSkipTravel'   => $urlSkipTravel
-            )
-        );
-
-        $this->setTemplateFiles(
-            array('ActivityCreateTravel' => 'ActivityCreateTravel.inc')
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'ActivityCreateTravel',
-            true
-        );
-        $this->parsePage();
-
-    }
-
 }

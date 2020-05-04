@@ -50,15 +50,15 @@
         })
         $('.queueSelector').change(function (event) {
             console.log(this.value);
-            var problemID = ($(this).data()).problemid;
+            const problemID = ($(this).data()).problemid;
 
-            var answer = confirm('Are you sure you want to change this Service Request queue?');
+            const answer = prompt('Please provide a reason for moving this SR into a different queue');
 
             if (!answer) {
                 return;
             }
 
-            window.location = '/CurrentActivityReport.php?action=changeQueue&problemID=' + problemID + '&queue=' + this.value
+            window.location = '/CurrentActivityReport.php?action=changeQueue&problemID=' + problemID + '&queue=' + this.value + "&reason=" + answer
         })
 
     })

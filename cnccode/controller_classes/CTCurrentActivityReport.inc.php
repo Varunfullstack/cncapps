@@ -193,14 +193,6 @@ class CTCurrentActivityReport extends CTCNC
             case 'toggleDisplayQueue7Flag':
                 $this->toggleDisplayFlag('displayQueue7Flag');
                 break;
-
-            case 'escalate':
-                $this->escalate();
-                break;
-
-            case 'deescalate':
-                $this->deescalate();
-                break;
             case 'changeQueue':
                 $this->changeQueue();
                 break;
@@ -320,47 +312,18 @@ class CTCurrentActivityReport extends CTCNC
     /**
      * @throws Exception
      */
-    function escalate()
-    {
-
-        $problemID = $this->getParam('problemID');
-
-        $this->buActivity->escalateProblemByProblemID($problemID);
-
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array()
-        );
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    /**
-     * @throws Exception
-     */
-    function deescalate()
-    {
-        $problemID = $this->getParam('problemID');
-        $this->buActivity->deEscalateProblemByProblemID($problemID);
-
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array()
-        );
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    /**
-     * @throws Exception
-     */
     function changeQueue()
     {
         $problemID = $this->getParam('problemID');
         $newQueue = $this->getParam('queue');
+        $reason = $this->getParam('reason');
+        if (!$reason) {
+            throw new Exception('No reason given');
+        }
 
         $this->buActivity->escalateProblemByProblemID(
             $problemID,
+            $reason,
             $newQueue
         );
 
