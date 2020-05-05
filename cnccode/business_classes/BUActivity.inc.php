@@ -806,7 +806,7 @@ class BUActivity extends Business
     }
 
     function escalateProblemByProblemID($problemID,
-                                        $reason,
+                                        $reason = null,
                                         $newQueueNo = null
     )
     {
@@ -864,7 +864,7 @@ class BUActivity extends Business
     }
 
     function deEscalateProblemByProblemID($problemID,
-                                          $reason,
+                                          $reason = null,
                                           $newQueueNo = null
     )
     {

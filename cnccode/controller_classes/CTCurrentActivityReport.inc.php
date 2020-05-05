@@ -317,9 +317,6 @@ class CTCurrentActivityReport extends CTCNC
         $problemID = $this->getParam('problemID');
         $newQueue = $this->getParam('queue');
         $reason = $this->getParam('reason');
-        if (!$reason) {
-            throw new Exception('No reason given');
-        }
 
         $this->buActivity->escalateProblemByProblemID(
             $problemID,
@@ -1220,6 +1217,7 @@ class CTCurrentActivityReport extends CTCNC
                         $serviceRequests->getValue(DBEJProblem::lastDate)
                     ),
                     'problemID'                  => $serviceRequests->getValue(DBEJProblem::problemID),
+                    'problemStatus'              => $serviceRequests->getValue(DBEJProblem::status),
                     'reason'                     => CTCurrentActivityReport::truncate(
                         $serviceRequests->getValue(DBEJProblem::reason),
                         150

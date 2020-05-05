@@ -5244,7 +5244,15 @@ class CTActivity extends CTCNC
             $dsCallActivity->post();
             $nextStatus = 'CncAction';
         } elseif ($this->getParam('Escalate')) {
-            if (!$this->getParam('escalationReason')) {
+            $dbeProblem = new DBEProblem($this);
+            $dbeProblem->setValue(
+                DBEProblem::problemID,
+                $dsCallActivity->getValue(DBECallActivity::problemID)
+            );
+            $dbeProblem->getRow();
+            if (!in_array($dbeProblem->getValue(DBEProblem::status), ["I", "F", "C"]) && !$this->getParam(
+                    'escalationReason'
+                )) {
                 $this->formError = true;
                 $this->formErrorMessage = 'Please provide an escalate reason';
                 if ($this->getAction() == CTACTIVITY_ACT_INSERT_ACTIVITY) {

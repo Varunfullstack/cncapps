@@ -9,15 +9,22 @@
     let submitAsOvertimeCheckbox;
 
     function gatherEscalationReason() {
-        const escalationReason = prompt('Please provide your reason for escalating this SR(Required)');
-        if (!escalationReason) {
-            return false;
+
+        const statusElement = document.querySelector("[name='callActivity[1][problemStatus]']");
+
+        if(statusElement.value === "P") {
+            // this is non-exempt status
+            const escalationReason = prompt('Please provide your reason for escalating this SR(Required)');
+            if (!escalationReason) {
+                return false;
+            }
+            const form = document.querySelector('form[name="callActivity"]');
+            const input = document.createElement('input');
+            input.name = 'escalationReason';
+            input.value = escalationReason;
+            form.append(input);
         }
-        const form = document.querySelector('form[name="callActivity"]');
-        const input = document.createElement('input');
-        input.name = 'escalationReason';
-        input.value = escalationReason;
-        form.append(input);
+
         return true;
 
     }
