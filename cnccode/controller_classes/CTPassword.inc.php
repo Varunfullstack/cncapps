@@ -266,9 +266,7 @@ class CTPassword extends CTCNC
                 'usernameMessage'        => $dsPassword->getMessage(DBEPassword::username),
                 'password'               => $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::password)),
                 'passwordMessage'        => $dsPassword->getMessage(DBEPassword::password),
-                DBEPassword::notes       => htmlentities(
-                    $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::notes))
-                ),
+                DBEPassword::notes       => $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::notes)),
                 'notesMessage'           => $dsPassword->getMessage(DBEPassword::notes),
                 'urlEdit'                => $urlEdit,
                 'URL'                    => $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::URL)),
@@ -440,6 +438,7 @@ class CTPassword extends CTCNC
         $passwords = [];
 
         while ($dsPassword->fetchNext()) {
+
             $urlArchive = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
@@ -494,8 +493,35 @@ class CTPassword extends CTCNC
                 'password'            => $password,
                 "weirdFields"         => $weirdFields,
                 'level'               => $dsPassword->getValue(DBEPassword::level),
+                'sortOrder'           => $dsPassword->getValue(DBEJPassword::sortOrder)
             ];
         }
+
+
+        usort(
+            $passwords,
+            function ($a,
+                      $b
+            ) {
+
+                if (!$a[DBEJPassword::serviceID] && $b[DBEJPassword::serviceID]) {
+                    return 1;
+                }
+
+                if (!$b[DBEJPassword::serviceID] && $a[DBEJPassword::serviceID]) {
+                    return -1;
+                }
+
+                if ($a[DBEJPassword::sortOrder] != $b[DBEJPassword::sortOrder]) {
+                    return $a[DBEJPassword::sortOrder] - $b[DBEJPassword::sortOrder];
+                }
+
+                return strcmp(
+                    $a[DBEJPassword::notes],
+                    $b[DBEJPassword::notes]
+                );
+            }
+        );
 
         foreach ($passwords as $password) {
             $this->template->set_var(

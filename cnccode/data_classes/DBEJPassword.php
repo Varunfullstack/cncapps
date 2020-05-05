@@ -12,6 +12,7 @@ class DBEJPassword extends DBEPassword
 {
     const customerName = "customerName";
     const serviceName = "serviceName";
+    const sortOrder = "sortOrder";
 
     /**
      * calls constructor()
@@ -36,6 +37,12 @@ class DBEJPassword extends DBEPassword
             DA_ALLOW_NULL,
             'passwordService.description'
         );
+        $this->addColumn(
+            self::sortOrder,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "passwordService.sortOrder"
+        );
         $this->setAddColumnsOff();
     }
 
@@ -45,8 +52,7 @@ class DBEJPassword extends DBEPassword
      * @param null $sortColumn
      * @return bool Success
      */
-    function getRows($sortColumn = null
-    )
+    function getRows($sortColumn = null)
     {
         $this->setMethodName("getRows");
         $query = $this->getBasicQuery();
@@ -112,8 +118,7 @@ class DBEJPassword extends DBEPassword
             $query .= " and salesPassword = 0 ";
         }
 
-        $query .= " order by passwordService.passwordServiceID IS NULL, passwordService.sortOrder asc,  passwordService.onePerCustomer DESC,
-  passwordService.description ";
+        $query .= " order by passwordService.passwordServiceID IS NULL, passwordService.sortOrder asc,  passwordService.onePerCustomer DESC ";
         $this->setQueryString($query);
         parent::getRows();
     }
