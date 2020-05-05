@@ -228,7 +228,8 @@ class CTItem extends CTCNC
                 ),
                 'excludeFromPOCompletionChecked' => Controller::htmlChecked(
                     $this->dsItem->getValue(DBEItem::excludeFromPOCompletion)
-                )
+                ),
+                'allowSRLog'                     => $this->dsItem->getValue(DBEItem::allowSRLog) ? "checked" : null
             )
         );
         $this->parseItemTypeSelector($this->dsItem->getValue(DBEItem::itemTypeID));
