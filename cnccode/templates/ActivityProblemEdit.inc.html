@@ -63,17 +63,16 @@
         </tr>
         <tr class="singleBorder">
             <td class="promptText">Date</td>
-            <td class="fieldText"><input
-                    type="text"
-                    name="date"
-                    id="date"
-                    value="{date}"
-                    size="10"
-                    maxlength="10"
-                    onchange="setFormChanged();"
-                    class="jqueryCalendar"
-                    autocomplete="off"
-            />
+            <td class="fieldText">
+                <input type="date"
+                       name="date"
+                       id="date"
+                       value="{date}"
+                       size="10"
+                       maxlength="10"
+                       onchange="setFormChanged();"
+                       autocomplete="off"
+                />
                 <span class="formErrorMessage">{dateMessage}</span>
             </td>
         </tr>

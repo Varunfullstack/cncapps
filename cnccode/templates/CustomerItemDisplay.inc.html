@@ -267,7 +267,7 @@
                 <input
                         name="customerItem[1][secondsiteValidationSuspendUntilDate]"
                         id="secondsiteValidationSuspendUntilDate"
-                        type="text"
+                        type="date"
                         placeholder="d/m/y"
                         title="Validation is suspended until this date. Leave blank if active"
                         {secondsiteReadonly}
@@ -276,7 +276,6 @@
                         size="10"
                         maxlength="10"
                         autocomplete="off"
-                        class="jQueryCalendar"
                 >
                 <font class="formErrorMessage">{secondsiteValidationSuspendUntilDateMessage}</font>
                 {offsiteBackupSuspendedByText}
@@ -285,19 +284,17 @@
         <tr>
             <td class="promptText">Offsite Replication Checks Suspended Until</td>
             <td colspan="2">
-                <input
-                        name="customerItem[1][offsiteReplicationValidationSuspendedUntilDate]"
-                        id="offsiteReplicationValidationSuspendedUntilDate"
-                        type="text"
-                        placeholder="d/m/y"
-                        title="Replication validation is suspended until this date. Leave blank if active"
-                        {secondsiteReadonly}
-                        {readonly}
-                        value="{offsiteReplicationValidationSuspendedUntilDate}"
-                        size="10"
-                        maxlength="10"
-                        autocomplete="off"
-                        class="jQueryCalendar"
+                <input name="customerItem[1][offsiteReplicationValidationSuspendedUntilDate]"
+                       id="offsiteReplicationValidationSuspendedUntilDate"
+                       type="date"
+                       placeholder="d/m/y"
+                       title="Replication validation is suspended until this date. Leave blank if active"
+                       {secondsiteReadonly}
+                       {readonly}
+                       value="{offsiteReplicationValidationSuspendedUntilDate}"
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
                 >
                 <font class="formErrorMessage">{offsiteReplicationValidationSuspendedUntilDateMessage}</font>
                 {offsiteReplicationSuspendedByText}
@@ -409,14 +406,13 @@
             <TD class="promptText">SO Date</TD>
             <TD class="field">
                 <input {readonly}
-                       type="text"
+                       type="date"
                        id="sOrderDate"
                        name="customerItem[1][sOrderDate]"
                        value="{sOrderDate}"
                        size="10"
                        maxlength="10"
                        autocomplete="off"
-                       class="jQueryCalendar"
                 >
                 <font class="formErrorMessage">{sOrderDateMessage}</font>
             </TD>

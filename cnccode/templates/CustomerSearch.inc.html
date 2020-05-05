@@ -76,28 +76,24 @@
                 <div align="right">New Between</div>
             </td>
             <td>
-                <input
-                        type="text"
-                        name="form[newCustomerFromDate]"
-                        id="newCustomerFromDate"
-                        value="{newCustomerFromDate}"
-                        size="10"
-                        maxlength="10"
-                        onKeypress="javascript:submitOnReturn()"
-                        class="jqueryCalendar"
-                        autocomplete="off"
+                <input type="date"
+                       name="form[newCustomerFromDate]"
+                       id="newCustomerFromDate"
+                       value="{newCustomerFromDate}"
+                       size="10"
+                       maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
                 >
                 <font class="formErrorMessage">{newCustomerFromDateMessage}</font>
-                and <input
-                    type="text"
-                    name="form[newCustomerToDate]"
-                    id="newCustomerToDate"
-                    value="{newCustomerToDate}"
-                    size="10"
-                    maxlength="10"
-                    onKeypress="javascript:submitOnReturn()"
-                    class="jqueryCalendar"
-                    autocomplete="off"
+                and <input type="date"
+                           name="form[newCustomerToDate]"
+                           id="newCustomerToDate"
+                           value="{newCustomerToDate}"
+                           size="10"
+                           maxlength="10"
+                           onKeypress="javascript:submitOnReturn()"
+                           autocomplete="off"
             >
                 <font class="formErrorMessage">{newCustomerToDateMessage}</font></td>
         </tr>
@@ -105,29 +101,27 @@
             <td class="promptText">
                 <div align="right">Lost Between</div>
             </td>
-            <td><input
-                    type="text"
-                    name="form[droppedCustomerFromDate]"
-                    id="droppedCustomerFromDate"
-                    value="{droppedCustomerFromDate}"
+            <td>
+                <input type="date"
+                       name="form[droppedCustomerFromDate]"
+                       id="droppedCustomerFromDate"
+                       value="{droppedCustomerFromDate}"
+                       size="10"
+                       maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
+                >
+                <font class="formErrorMessage">{droppedCustomerFromDateMessage}</font>
+                and <input
+                    type="date"
+                    name="form[droppedCustomerToDate]"
+                    id="droppedCustomerToDate"
+                    value="{droppedCustomerToDate}"
                     size="10"
                     maxlength="10"
                     onKeypress="javascript:submitOnReturn()"
-                    class="jqueryCalendar"
                     autocomplete="off"
             >
-                <font class="formErrorMessage">{droppedCustomerFromDateMessage}</font>
-                and <input
-                        type="text"
-                        name="form[droppedCustomerToDate]"
-                        id="droppedCustomerToDate"
-                        value="{droppedCustomerToDate}"
-                        size="10"
-                        maxlength="10"
-                        onKeypress="javascript:submitOnReturn()"
-                        class="jqueryCalendar"
-                        autocomplete="off"
-                >
                 <font class="formErrorMessage">{droppedCustomerToDateMessage}</font></td>
         </tr>
         <tr>

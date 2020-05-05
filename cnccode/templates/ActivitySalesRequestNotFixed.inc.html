@@ -65,26 +65,23 @@
                 <span class="message">{serviceStatusMessage}</span>
             </td>
             <td class="content">on
-                <input
-                        type="text"
-                        name="input[1][alarmDate]"
-                        id="alarmDate"
-                        value="{alarmDate}"
-                        {DISABLED}
-                        size="10"
-                        maxlength="10"
-                        autocomplete="off"
-                        class="jQueryCalendar"
+                <input type="date"
+                       name="input[1][alarmDate]"
+                       id="alarmDate"
+                       value="{alarmDate}"
+                       {DISABLED}
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
                 />
                 at
-                <input
-                        type="text"
-                        {DISABLED}
-                        name="input[1][alarmTime]"
-                        value="{alarmTime}"
-                        size="5"
-                        maxlength="5"
-                        onchange="setFormChanged();"
+                <input type="text"
+                       {DISABLED}
+                       name="input[1][alarmTime]"
+                       value="{alarmTime}"
+                       size="5"
+                       maxlength="5"
+                       onchange="setFormChanged();"
                 />
                 <span class="formErrorMessage">{alarmDateMessage}</span>
                 <span class="formErrorMessage">{alarmTimeMessage}</span>

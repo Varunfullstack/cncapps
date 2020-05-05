@@ -192,6 +192,17 @@
                 />
             </div>
         </td>
+        <td class="contactPendingLeaver">
+            <div class="content">
+                <i class="fab fa-linkedin-in"
+                   style="color: red"
+                   onclick="checkLink()"
+                ></i>
+                <input type="hidden"
+                       name="form[contact][0][linkedInURL]"
+                >
+            </div>
+        </td>
         <td>
             <div class="contactInitialLogging">
 
@@ -446,10 +457,9 @@
         </td>
         <td>
             <div class="contactPendingLeaverDate">
-                <input type="text"
+                <input type="date"
                        name="form[contact][0][pendingLeaverDate]"
                        value="{pendingLeaverDate}"
-                       class="jQueryCalendar"
                        autocomplete="off"
                 />
             </div>
@@ -459,17 +469,6 @@
                    name="form[contact][0][specialAttentionContactFlag]"
                    value="Y"
             >
-        </td>
-        <td class="contactPendingLeaver">
-            <div class="content">
-                <i class="fab fa-linkedin-in"
-                   style="color: red"
-                   onclick="checkLink()"
-                ></i>
-                <input type="hidden"
-                       name="form[contact][0][linkedInURL]"
-                >
-            </div>
         </td>
     </tr>
 </script>
@@ -1543,6 +1542,19 @@
       AUTOCOMPLETE="off"
       onsubmit="return checkMailShotOptions();"
 >
+    <button {disabled}
+            name="Go"
+    ><i class="fa fa-floppy-o"
+        aria-hidden="true"
+    ></i> Save
+    </button>
+    <button {disabled}
+            name="Button"
+            onClick="document.location='{cancelURL}';"
+    ><i class="fa fa-ban"
+        aria-hidden="true"
+    ></i> Cancel
+    </button>
     <input type="hidden"
            id="customerID"
            name="form[customer][{customerID}][customerID]"
@@ -1962,6 +1974,11 @@
                         </div>
                     </td>
                     <td class="headerLightgrey">
+                        <div class="contactPendingLeaver">
+                            LinkedIn
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
                         <div class="contactInitialLogging">
                             Initial Logging?
                         </div>
@@ -2089,11 +2106,6 @@
                     <td class="headerLightgrey">
                         <div class="contactPendingLeaver">
                             Special Attention
-                        </div>
-                    </td>
-                    <td class="headerLightgrey">
-                        <div class="contactPendingLeaver">
-                            LinkedIn
                         </div>
                     </td>
                 </tr>
@@ -2282,6 +2294,18 @@
                                    maxlength="200"
                                    value="{notes}"
                             />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactPendingLeaver">
+                            <i class="fab fa-linkedin-in"
+                               style="color: {linkedInColor}"
+                               onclick="checkLink()"
+                            ></i>
+                            <input type="hidden"
+                                   name="form[contact][{contactID}][linkedInURL]"
+                                   value="{linkedInURL}"
+                            >
                         </div>
                     </td>
                     <td>
@@ -2595,10 +2619,9 @@
                         <div class="contactPendingLeaverDate">
 
                             <input {disabled}
-                                   type="text"
+                                   type="date"
                                    name="form[contact][{contactID}][pendingLeaverDate]"
                                    value="{pendingLeaverDate}"
-                                   class="jQueryCalendar"
                                    autocomplete="off"
                             />
                         </div>
@@ -2613,18 +2636,6 @@
                             >
                         </div>
                     </td>
-                    <td>
-                        <div class="contactPendingLeaver">
-                            <i class="fab fa-linkedin-in"
-                               style="color: {linkedInColor}"
-                               onclick="checkLink()"
-                            ></i>
-                            <input type="hidden"
-                                   name="form[contact][{contactID}][linkedInURL]"
-                                   value="{linkedInURL}"
-                            >
-                        </div>
-                    </td>
                 </tr>
 
                 <!-- END contactBlock -->
@@ -2632,42 +2643,19 @@
             </table>
         </div>
     </div>
-
-    <button {disabled}
-            name="Go"
-            style="padding: 5px 10px; font-size: 16px;"
-    ><i
-            class="fa fa-floppy-o"
-            aria-hidden="true"
-    ></i> Save Changes
-    </button>
     <div class="customerEditMainRightColumn">
-
-        <div class="customerNoteHistory">
-        <textarea
-                cols="120"
-                rows="18"
-                readonly="readonly"
-                {disabled}
-                id="customerNoteHistory"
-        ></textarea>
-        </div>
-
         <div id="customerNoteModifiedText">
         </div>
         <div class="customerNoteDetails">
-        <textarea
-                {disabled}
-                name="customerNoteDetails"
-                id="customerNoteDetails"
-                cols="120"
-                onchange="setCustomerNotesChanged()"
-                rows="12"
-        >{customerNoteDetails}
-        </textarea>
-        </div>
-        <div>
-            {lastContractSent}
+            <textarea
+                    {disabled}
+                    name="customerNoteDetails"
+                    id="customerNoteDetails"
+                    cols="120"
+                    onchange="setCustomerNotesChanged()"
+                    rows="12"
+            >{customerNoteDetails}
+            </textarea>
         </div>
         <div class="customerNoteNav">
             <button {disabled}
@@ -2747,14 +2735,13 @@
         <div class="customerReviewTime">
             To be reviewed on
             <input {disabled}
-                   type="text"
+                   type="date"
                    name="form[customer][{customerID}][reviewDate]"
                    id="reviewDate"
                    value="{reviewDate}"
                    size="10"
                    maxlength="10"
                    autocomplete="off"
-                   class="jQueryCalendar"
             >
             Time
             <input {disabled}
@@ -2778,24 +2765,38 @@
                 <!-- END reviewUserBlock -->
             </select>
         </div> <!-- customerReviewTime -->
+        <button {disabled}
+                name="Go"
+        ><i class="fa fa-floppy-o"
+            aria-hidden="true"
+        ></i> Save
+        </button>
+        <button {disabled}
+                name="Button"
+                onClick="document.location='{cancelURL}';"
+        ><i class="fa fa-ban"
+            aria-hidden="true"
+        ></i> Cancel
+        </button>
+        <div class="customerNoteHistory">
+        <textarea
+                cols="120"
+                rows="18"
+                readonly="readonly"
+                {disabled}
+                id="customerNoteHistory"
+        ></textarea>
+        </div>
+        <div>
+            {lastContractSent}
+        </div>
+
+
         <input type="hidden"
                value="{reviewAction}"
                name="form[customer][{customerID}][reviewAction]"
         />
 
     </div> <!-- customerEditMainRightColumn -->
-    <button {disabled}
-            name="Go"
-    ><i class="fa fa-floppy-o"
-        aria-hidden="true"
-    ></i> Save
-    </button>
-    <button {disabled}
-            name="Button"
-            onClick="document.location='{cancelURL}';"
-    ><i class="fa fa-ban"
-        aria-hidden="true"
-    ></i> Cancel
-    </button>
 </form>
 

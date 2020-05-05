@@ -363,16 +363,14 @@
                 <div align="right">Review Meeting Date</div>
             </td>
             <td>
-                <input
-                        type="text"
-                        name="searchForm[1][meetingDate]"
-                        value="{meetingDate}"
-                        id="meetingDate"
-                        placeholder="d/m/y"
-                        size="10"
-                        maxlength="10"
-                        class="jqueryCalendar"
-                        autocomplete="off"
+                <input type="date"
+                       name="searchForm[1][meetingDate]"
+                       value="{meetingDate}"
+                       id="meetingDate"
+                       placeholder="d/m/y"
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
                 >
                 <font class="formErrorMessage"> {meetingDateMessage} </font></td>
         </tr>

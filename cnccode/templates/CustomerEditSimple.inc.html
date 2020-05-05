@@ -72,7 +72,6 @@
     }
 
 
-
     .highlight {
         background-color: lightgreen;
     }
@@ -436,6 +435,17 @@
                 />
             </div>
         </td>
+        <td class="contactPendingLeaver">
+            <div class="content">
+                <i class="fab fa-linkedin-in"
+                   style="color: red"
+                   onclick="checkLink()"
+                ></i>
+                <input type="hidden"
+                       name="form[contact][0][linkedInURL]"
+                >
+            </div>
+        </td>
         <td>
             <div class="contactInitialLogging">
 
@@ -690,10 +700,9 @@
         </td>
         <td>
             <div class="contactPendingLeaverDate">
-                <input type="text"
+                <input type="date"
                        name="form[contact][0][pendingLeaverDate]"
                        value="{pendingLeaverDate}"
-                       class="jQueryCalendar"
                        autocomplete="off"
                 />
             </div>
@@ -703,17 +712,6 @@
                    name="form[contact][0][specialAttentionContactFlag]"
                    value="Y"
             >
-        </td>
-        <td class="contactPendingLeaver">
-            <div class="content">
-                <i class="fab fa-linkedin-in"
-                   style="color: red"
-                   onclick="checkLink()"
-                ></i>
-                <input type="hidden"
-                       name="form[contact][0][linkedInURL]"
-                >
-            </div>
         </td>
     </tr>
 </script>
@@ -1772,14 +1770,13 @@
                         />
                         until
                         <input {disabled}
-                               type="text"
+                               type="date"
                                name="form[customer][{customerID}][specialAttentionEndDate]"
                                id="specialAttentionEndDate"
                                value="{specialAttentionEndDate}"
                                size="10"
                                maxlength="10"
                                autocomplete="off"
-                               class="jQueryCalendar"
                         >
                         <span class="formErrorMessage">{specialAttentionEndDateMessage}</span>
                     </td>
@@ -1788,14 +1785,13 @@
                     <td class="content">Last Review Meeting</td>
                     <td class="content">
                         <input {disabled}
-                               type="text"
+                               type="date"
                                name="form[customer][{customerID}][lastReviewMeetingDate]"
                                id="lastReviewMeetingDate"
                                value="{lastReviewMeetingDate}"
                                size="10"
                                maxlength="10"
                                autocomplete="off"
-                               class="jQueryCalendar"
                                onchange="clearReviewMeetingBooked()"
                         >
                         Booked <input {disabled}
@@ -1946,12 +1942,11 @@
                     <td class='content'>
                         <input name="form[customer][{customerID}][becameCustomerDate]"
                                id="becameCustomerDate"
-                               type="text"
+                               type="date"
                                value="{becameCustomerDate}"
                                size="10"
                                maxlength="10"
                                {disabled}
-                               class="jQueryCalendar"
                                onchange="checkIsProspect()"
                         >
                     </td>
@@ -1961,11 +1956,10 @@
                     <td class='content'>
                         <input name="form[customer][{customerID}][droppedCustomerDate]"
                                id="droppedCustomerDate"
-                               type="text"
+                               type="date"
                                value="{droppedCustomerDate}"
                                size="10"
                                maxlength="10"
-                               class="jQueryCalendar"
                                {disabled}
                                onchange="checkIsProspect()"
                         >
@@ -2194,14 +2188,13 @@
             <div class="customerReviewTime">
                 To be reviewed on
                 <input {disabled}
-                       type="text"
+                       type="date"
                        name="form[customer][{customerID}][reviewDate]"
                        id="reviewDate"
                        value="{reviewDate}"
                        size="10"
                        maxlength="10"
                        autocomplete="off"
-                       class="jQueryCalendar"
                 >
                 Time
                 <input {disabled}
@@ -2782,6 +2775,11 @@
                         </div>
                     </td>
                     <td class="headerLightgrey">
+                        <div class="contactPendingLeaver">
+                            LinkedIn
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
                         <div class="contactInitialLogging">
                             Initial Logging?
                         </div>
@@ -2910,11 +2908,6 @@
                     <td class="headerLightgrey">
                         <div class="contactPendingLeaver">
                             Special Attention
-                        </div>
-                    </td>
-                    <td class="headerLightgrey">
-                        <div class="contactPendingLeaver">
-                            LinkedIn
                         </div>
                     </td>
                 </tr>
@@ -3116,6 +3109,18 @@
                                    maxlength="200"
                                    value="{notes}"
                             />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactPendingLeaver">
+                            <i class="fab fa-linkedin-in"
+                               style="color: {linkedInColor}"
+                               onclick="checkLink()"
+                            ></i>
+                            <input type="hidden"
+                                   name="form[contact][{contactID}][linkedInURL]"
+                                   value="{linkedInURL}"
+                            >
                         </div>
                     </td>
                     <td>
@@ -3428,10 +3433,9 @@
                         <div class="contactPendingLeaverDate">
 
                             <input {disabled}
-                                   type="text"
+                                   type="date"
                                    name="form[contact][{contactID}][pendingLeaverDate]"
                                    value="{pendingLeaverDate}"
-                                   class="jQueryCalendar"
                                    autocomplete="off"
                             />
                         </div>
@@ -3443,18 +3447,6 @@
                                    name="form[contact][{contactID}][specialAttentionContactFlag]"
                                    value="Y"
                                    {specialAttentionContactFlagChecked}
-                            >
-                        </div>
-                    </td>
-                    <td>
-                        <div class="contactPendingLeaver">
-                            <i class="fab fa-linkedin-in"
-                               style="color: {linkedInColor}"
-                               onclick="checkLink()"
-                            ></i>
-                            <input type="hidden"
-                                   name="form[contact][{contactID}][linkedInURL]"
-                                   value="{linkedInURL}"
                             >
                         </div>
                     </td>

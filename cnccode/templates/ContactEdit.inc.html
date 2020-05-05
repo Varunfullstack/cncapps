@@ -187,6 +187,7 @@
                 return null
             }
         }
+
         var assignClass = function () {
             var elem = $(this);
             if (elem[0].value === 'main') {
@@ -663,10 +664,9 @@
             <td class="promptText">Pending Leaver Date</td>
             <td class="field">
                 <input {disabled}
-                       type="text"
+                       type="date"
                        name="form[contact][{contactID}][pendingLeaverDate]"
                        value="{pendingLeaverDate}"
-                       class="jQueryCalendar"
                        autocomplete="off"
                 />
         </tr>
