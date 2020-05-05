@@ -907,9 +907,14 @@ class BUActivity extends Business
 
             $dbeProblem->updateRow();
 
+            $description = "Deescalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
+
+            if ($reason) {
+                $description .= " because of {$reason}";
+            }
             $this->logOperationalActivity(
                 $problemID,
-                "Deescalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]} because of {$reason}"
+                $description
             );
 
         }
