@@ -61,7 +61,7 @@
             const problemStatus = dataSet.problemStatus;
             let answer = null;
             if (problemStatus === "P") {
-                const answer = prompt('Please provide a reason for moving this SR into a different queue');
+                answer = prompt('Please provide a reason for moving this SR into a different queue');
 
                 if (!answer) {
                     $(this).val(queuePreviousValue);
