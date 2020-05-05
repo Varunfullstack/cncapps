@@ -113,7 +113,10 @@ try
             $errors += [String]::Concat("", $PSItem)
         }
         $mailboxIndex++
-        $progressPCT = ($mailboxIndex /$mailboxesCount) * 100
+        $progressPCT = 0
+        if($mailboxesCount -gt 0 ){
+            $progressPCT = ($mailboxIndex /$mailboxesCount) * 100
+        }
         Write-Progress -Activity "Procesing Mailboxes" -Status "$progressPCT% Complete:" -PercentComplete $progressPCT
     }
     [array]$MailboxesReport = $MailboxesReport | Sort-Object TotalItemSize -Descending
@@ -126,7 +129,7 @@ try
         devices = $DevicesReport
         errors = [array]$errors
     }
-    if (-Not$Report)
+    if (-Not $Report)
     {
         $Report = @{ }
     }
