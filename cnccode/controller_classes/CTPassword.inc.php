@@ -266,7 +266,9 @@ class CTPassword extends CTCNC
                 'usernameMessage'        => $dsPassword->getMessage(DBEPassword::username),
                 'password'               => $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::password)),
                 'passwordMessage'        => $dsPassword->getMessage(DBEPassword::password),
-                DBEPassword::notes       => htmlentities($this->buPassword->decrypt($dsPassword->getValue(DBEPassword::notes))),
+                DBEPassword::notes       => htmlentities(
+                    $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::notes))
+                ),
                 'notesMessage'           => $dsPassword->getMessage(DBEPassword::notes),
                 'urlEdit'                => $urlEdit,
                 'URL'                    => $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::URL)),
@@ -438,7 +440,6 @@ class CTPassword extends CTCNC
         $passwords = [];
 
         while ($dsPassword->fetchNext()) {
-
             $urlArchive = Controller::buildLink(
                 $_SERVER['PHP_SELF'],
                 array(
@@ -496,34 +497,6 @@ class CTPassword extends CTCNC
             ];
         }
 
-
-        usort(
-            $passwords,
-            function ($a,
-                      $b
-            ) {
-                if (!$a[DBEJPassword::serviceID] && $b[DBEJPassword::serviceID]) {
-                    return 1;
-                }
-
-                if (!$b[DBEJPassword::serviceID] && $a[DBEJPassword::serviceID]) {
-                    return -1;
-                }
-
-                if ($comparison = $this->weirdStringComparison(
-                    $a[DBEJPassword::serviceName],
-                    $b[DBEJPassword::serviceName]
-                )) {
-                    return $comparison;
-                }
-
-                return $this->weirdStringComparison(
-                    $a[DBEJPassword::notes],
-                    $b[DBEJPassword::notes]
-                );
-            }
-        );
-
         foreach ($passwords as $password) {
             $this->template->set_var(
                 $password
@@ -541,70 +514,6 @@ class CTPassword extends CTCNC
             true
         );
         $this->parsePage();
-    }
-
-    /**
-     * @param $a
-     * @param $b
-     * @return int|lt
-     */
-    function weirdStringComparison($a,
-                                   $b
-    )
-    {
-        $lenA = strlen($a);
-        $lenB = strlen($b);
-
-        if (!$lenA && $lenB) {
-            return -1;
-        }
-
-        if ($lenA && !$lenB) {
-            return 1;
-        }
-
-        if (!$lenA && !$lenB) {
-            return 0;
-        }
-
-        $len = $lenA > $lenB ? $lenA : $lenB;
-        $currentIdx = 0;
-        while ($currentIdx < $len) {
-
-            if (!isset($a[$currentIdx])) {
-                return -1;
-            }
-
-            if (!isset($b[$currentIdx])) {
-                return 1;
-            }
-
-            if ($comparison = $this->compareCharacter(
-                $a[$currentIdx],
-                $b[$currentIdx]
-            )) {
-                return $comparison;
-            };
-            $currentIdx++;
-        }
-        return 0;
-    }
-
-    function compareCharacter($ch1,
-                              $ch2
-    )
-    {
-        if (ctype_lower($ch1) && !ctype_lower($ch2)) {
-            return -1;
-        }
-
-        if (!ctype_lower($ch1) && ctype_lower($ch2)) {
-            return 1;
-        }
-        return strcmp(
-            $ch1,
-            $ch2
-        );
     }
 
     function search()
@@ -680,5 +589,69 @@ class CTPassword extends CTCNC
 
         $this->parsePage();
 
+    }
+
+    /**
+     * @param $a
+     * @param $b
+     * @return int|lt
+     */
+    function weirdStringComparison($a,
+                                   $b
+    )
+    {
+        $lenA = strlen($a);
+        $lenB = strlen($b);
+
+        if (!$lenA && $lenB) {
+            return -1;
+        }
+
+        if ($lenA && !$lenB) {
+            return 1;
+        }
+
+        if (!$lenA && !$lenB) {
+            return 0;
+        }
+
+        $len = $lenA > $lenB ? $lenA : $lenB;
+        $currentIdx = 0;
+        while ($currentIdx < $len) {
+
+            if (!isset($a[$currentIdx])) {
+                return -1;
+            }
+
+            if (!isset($b[$currentIdx])) {
+                return 1;
+            }
+
+            if ($comparison = $this->compareCharacter(
+                $a[$currentIdx],
+                $b[$currentIdx]
+            )) {
+                return $comparison;
+            };
+            $currentIdx++;
+        }
+        return 0;
+    }
+
+    function compareCharacter($ch1,
+                              $ch2
+    )
+    {
+        if (ctype_lower($ch1) && !ctype_lower($ch2)) {
+            return -1;
+        }
+
+        if (!ctype_lower($ch1) && ctype_lower($ch2)) {
+            return 1;
+        }
+        return strcmp(
+            $ch1,
+            $ch2
+        );
     }
 }// end of class

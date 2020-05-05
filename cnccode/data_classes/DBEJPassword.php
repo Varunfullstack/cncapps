@@ -112,7 +112,7 @@ class DBEJPassword extends DBEPassword
             $query .= " and salesPassword = 0 ";
         }
 
-        $query .= " order by passwordService.passwordServiceID IS NULL, passwordService.onePerCustomer DESC,
+        $query .= " order by passwordService.passwordServiceID IS NULL, passwordService.sortOrder asc,  passwordService.onePerCustomer DESC,
   passwordService.description ";
         $this->setQueryString($query);
         parent::getRows();
