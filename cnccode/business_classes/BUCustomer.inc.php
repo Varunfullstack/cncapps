@@ -1080,7 +1080,7 @@ class BUCustomer extends Business
             // exclude excluded or duplicated emails
             if (
                 ($this->dbeContact->getValue(DBEContact::email) != $excludeEmail)
-                AND
+                and
                 (strpos(
                         $this->dbeContact->getValue(DBEContact::email),
                         $emailList
@@ -1701,8 +1701,14 @@ class BUCustomer extends Business
     public function getOffice365PasswordItem(int $customerID)
     {
         $dbePassword = new DBEPassword($this);
-
         $dbePassword->getOffice365PasswordByCustomerID($customerID);
+        return $dbePassword;
+    }
+
+    public function getPasswordItemByPasswordServiceId(int $customerId, $passwordServiceId)
+    {
+        $dbePassword = new DBEPassword($this);
+        $dbePassword->getPasswordItemByCustomerIdAndServiceId($customerId, $passwordServiceId);
         return $dbePassword;
     }
 
