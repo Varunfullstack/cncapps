@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 834 - Show SR number on Fixed Page
 ### Fixed
 - Issue 832 - Review Meeting Booked Meetings not showing as booked
+- Issue 835 - Customer Item Renewal Status does not work
 
 ## [v3.13.6] - 2020-05-05
 ### Fixed
