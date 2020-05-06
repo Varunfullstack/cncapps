@@ -8,6 +8,27 @@
     window.problemID = "{problemID}";
     let submitAsOvertimeCheckbox;
 
+    function gatherEscalationReason() {
+
+        const statusElement = document.querySelector("[name='callActivity[1][problemStatus]']");
+
+        if(statusElement.value === "P") {
+            // this is non-exempt status
+            const escalationReason = prompt('Please provide your reason for escalating this SR(Required)');
+            if (!escalationReason) {
+                return false;
+            }
+            const form = document.querySelector('form[name="callActivity"]');
+            const input = document.createElement('input');
+            input.name = 'escalationReason';
+            input.value = escalationReason;
+            form.append(input);
+        }
+
+        return true;
+
+    }
+
     function showSalesRequestDialog() {
         startSalesRequest(problemID);
     }
@@ -366,7 +387,7 @@
                     <input type="submit"
                            name="Escalate"
                            value="Escalate"
-                           onClick="return (confirm('Are you sure you want to escalate this SR?') )"
+                           onClick="return gatherEscalationReason()"
                            id="escalateBtn"
                     >
 

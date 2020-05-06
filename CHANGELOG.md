@@ -9,6 +9,7 @@ This project changes will be shown here.
 - Issue 839 - 3CX Call Reporting Enhancements
 - Issue 841 - OBRS comestics
 - Issue 843 - Include Manager Name on Time, Change & Sales requests feedback
+- Issue 847 - Moving SRs between teams requires reason
 ### Fixed
 - Issue 832 - Review Meeting Booked Meetings not showing as booked
 - Issue 835 - Customer Item Renewal Status does not work

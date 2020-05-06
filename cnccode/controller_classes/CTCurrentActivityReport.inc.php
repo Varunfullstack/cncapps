@@ -193,14 +193,6 @@ class CTCurrentActivityReport extends CTCNC
             case 'toggleDisplayQueue7Flag':
                 $this->toggleDisplayFlag('displayQueue7Flag');
                 break;
-
-            case 'escalate':
-                $this->escalate();
-                break;
-
-            case 'deescalate':
-                $this->deescalate();
-                break;
             case 'changeQueue':
                 $this->changeQueue();
                 break;
@@ -320,47 +312,15 @@ class CTCurrentActivityReport extends CTCNC
     /**
      * @throws Exception
      */
-    function escalate()
-    {
-
-        $problemID = $this->getParam('problemID');
-
-        $this->buActivity->escalateProblemByProblemID($problemID);
-
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array()
-        );
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    /**
-     * @throws Exception
-     */
-    function deescalate()
-    {
-        $problemID = $this->getParam('problemID');
-        $this->buActivity->deEscalateProblemByProblemID($problemID);
-
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array()
-        );
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    /**
-     * @throws Exception
-     */
     function changeQueue()
     {
         $problemID = $this->getParam('problemID');
         $newQueue = $this->getParam('queue');
+        $reason = $this->getParam('reason');
 
         $this->buActivity->escalateProblemByProblemID(
             $problemID,
+            $reason,
             $newQueue
         );
 
@@ -1257,6 +1217,7 @@ class CTCurrentActivityReport extends CTCNC
                         $serviceRequests->getValue(DBEJProblem::lastDate)
                     ),
                     'problemID'                  => $serviceRequests->getValue(DBEJProblem::problemID),
+                    'problemStatus'              => $serviceRequests->getValue(DBEJProblem::status),
                     'reason'                     => CTCurrentActivityReport::truncate(
                         $serviceRequests->getValue(DBEJProblem::reason),
                         150
