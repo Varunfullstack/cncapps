@@ -74,17 +74,15 @@ FROM
       callactivity
       LEFT JOIN problem
         ON callactivity.`caa_problemno` = problem.`pro_problemno`
-    WHERE callactivity.`caa_date` BETWEEN ?
+    WHERE date(callactivity.`caa_date`) BETWEEN ?
       AND ?
     GROUP BY problem.`pro_custno`) b
     ON b.customerId = callJournal.`customerId`
-WHERE startDateTime BETWEEN ?
+WHERE date(startDateTime) BETWEEN ?
   AND ?
   AND callJournal.customerId <> 0
   AND callJournal.customerId IS NOT NULL
                 ";
-                $offset = $_REQUEST['start'];
-                $limit = $_REQUEST['length'];
 
                 $queryEnd = " GROUP BY callJournal.customerId";
 
@@ -103,48 +101,17 @@ WHERE startDateTime BETWEEN ?
                 );
                 $totalCount = $countResult->num_rows;
 
-                $search = $_REQUEST['search']['value'];
-                $filteredCount = $totalCount;
-                if ($search) {
-                    $baseQuery .= " and cus_name like ? ";
-                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
-
-                    $countResult = $db->preparedQuery(
-                        $baseQuery . $queryEnd,
-                        $parameters
-                    );
-                    $filteredCount = $countResult->num_rows;
-
-                }
 
                 $baseQuery .= $queryEnd;
-                $columns = $_REQUEST['columns'];
-                $order = @$_REQUEST['order'];
-                $orderItems = [];
-                foreach ($order as $orderItem) {
-                    $orderItems[] = mysqli_real_escape_string(
-                        $db->link_id(),
-                        "{$columns[$orderItem['column']]['name']} {$orderItem['dir']}"
-                    );
-                }
-                if (count($orderItems)) {
-                    $baseQuery .= " order by " . implode(', ', $orderItems);
-                }
-                $baseQuery .= " limit ?, ?";
-                $parameters[] = ["type" => "i", "value" => $offset];
-                $parameters[] = ["type" => "i", "value" => $limit];
+
+
                 $result = $db->preparedQuery(
                     $baseQuery,
                     $parameters
                 );
                 $overtimes = $result->fetch_all(MYSQLI_ASSOC);
                 echo json_encode(
-                    [
-                        "draw"            => $_REQUEST['draw'],
-                        "recordsTotal"    => $totalCount,
-                        "recordsFiltered" => $filteredCount,
-                        "data"            => $overtimes
-                    ],
+                    $overtimes,
                     JSON_NUMERIC_CHECK
                 );
                 return;

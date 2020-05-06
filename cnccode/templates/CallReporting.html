@@ -20,10 +20,28 @@
             ],
             order: [[1, 'desc']],
             pageLength: 25,
-            serverSide: true,
+            serverSide: false,
+            footerCallback: function (row, data, start, end, display) {
+                const api = this.api();
+                api.columns().toArray()[0].forEach(index => {
+                    let html;
+                    if (index === 0) {
+                        html = "Total:";
+                    } else {
+                        html = api
+                            .column(index)
+                            .data()
+                            .reduce(function (a, b, c) {
+                                return a + b;
+                            }, 0);
+                    }
+                    $(api.column(index).footer()).html(html);
+                });
+            },
             ajax: {
                 url: "?action=getData",
                 type: "GET",
+                dataSrc: '',
                 data: (data, settings) => {
                     data.startDate = startDateInput.val();
                     data.endDate = endDateInput.val();
@@ -117,4 +135,15 @@
         </th>
     </tr>
     </thead>
+    <tfoot>
+    <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+    </tr>
+    </tfoot>
 </table>
