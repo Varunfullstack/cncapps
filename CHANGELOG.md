@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 833 - Additional pages to lock out contract choices
+- Issue 834 - Show SR number on Fixed Page
 ### Fixed
 - Issue 832 - Review Meeting Booked Meetings not showing as booked
 
