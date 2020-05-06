@@ -69,6 +69,7 @@
                        placeholder="Month/Year"
                        size="10"
                        maxlength="7"
+                       required
 
                 > <font class="formErrorMessage"> {startYearMonthMessage} </font></td>
         </tr>
@@ -97,16 +98,15 @@
                 <input type="submit"
                        name="Search"
                        value="Screen Report"
-                       onClick="submit();"
                 >
                 <input type="submit"
                        name="Search"
                        value="Generate CSV"
-                       onClick="submit();"
                 >
-                <input type="reset"
+                <input type="button"
                        name="Clear"
                        value="Clear"
+                       onclick="window.location ='?action=failureAnalysis' "
                 ></td>
         </tr>
     </table>

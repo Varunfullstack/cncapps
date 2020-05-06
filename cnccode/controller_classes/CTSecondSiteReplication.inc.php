@@ -455,7 +455,6 @@ class CTSecondSiteReplication extends CTSecondSite
     function run()
     {
         $this->buSecondsite->validateBackups($this->getParam('customerItemID'));
-        exit;
         $urlNext =
             Controller::buildLink(
                 'OffsiteBackupReplicationStatus.php',

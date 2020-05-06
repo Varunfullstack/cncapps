@@ -122,7 +122,7 @@ class BUSecondsite extends Business
                 $images = $this->getImagesByServer($server['server_cuino']);
 
                 if (
-                    !$server['secondsiteLocationPath'] OR
+                    !$server['secondsiteLocationPath'] or
                     count($images) == 0
                 ) {
                     $error = 'Offsite Backup Path Error Or No Images';
@@ -702,7 +702,7 @@ class BUSecondsite extends Business
         //get a directory handle
 
         //initialise the output array
-        $ret = Array();
+        $ret = array();
 
         if ($d = dir($path)) {
             //loop, reading until there's no more to read
@@ -911,6 +911,15 @@ class BUSecondsite extends Business
         $startYearMonth = $searchForm->getValue(self::searchFormStartYearMonth);
         $endYearMonth = $searchForm->getValue(self::searchFormEndYearMonth);
 
+        $start = DateTime::createFromFormat('m/Y', $startYearMonth)->modify('first day of this month');
+        $dateCondition = " > '{$start->format(DATE_MYSQL_DATE)}'";
+
+        if ($endYearMonth) {
+            $end = DateTime::createFromFormat('m/Y', $endYearMonth)->modify('last day of this month');
+            $dateCondition = "BETWEEN '{$start->format(DATE_MYSQL_DATE)}' AND '{$end->format(DATE_MYSQL_DATE)}'";
+        }
+
+
         $sql =
             "SELECT 
           pro_custno,
@@ -923,8 +932,8 @@ class BUSecondsite extends Business
           JOIN problem ON pro_problemno = caa_problemno
           JOIN customer ON cus_custno = pro_custno
           JOIN custitem ON caa_secondsite_error_cuino = custitem.cui_cuino
-        WHERE
-          caa_date BETWEEN '$startYearMonth-01' AND '$endYearMonth-31'
+        WHERE 
+          caa_date $dateCondition 
           AND caa_secondsite_error_cuino <> 0";
 
         if ($customerID) {
@@ -969,7 +978,7 @@ class BUSecondsite extends Business
 
         $result = $this->db->query($query);
 
-        $data = [        ];
+        $data = [];
 
         while ($row = $result->fetch_assoc()) {
             $data[$row['MONTH']] = $row;
