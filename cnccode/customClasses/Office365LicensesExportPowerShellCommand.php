@@ -509,6 +509,9 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             switch ($mailboxes[$key]['RecipientTypeDetails']) {
                 case "SharedMailbox":
                     $mailboxes[$key]['RecipientTypeDetails'] = "Shared";
+                    if(!$mailboxes[$key]['IsLicensed']){
+                        $mailboxLimit = 51200;
+                    }
                     $otherLicenses++;
                     break;
                 case "UserMailbox":
