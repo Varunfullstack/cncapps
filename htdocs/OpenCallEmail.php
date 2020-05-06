@@ -96,7 +96,6 @@ Send each engineer an email
 */
 /** @var EngineerActivity[] $activities */
 $activities = $pdoStatement->fetchAll(PDO::FETCH_CLASS, EngineerActivity::class);
-$buMail = new BUMail($thing);
 $engineers = array_reduce(
     $activities,
     function ($acc, EngineerActivity $engineerActivity) {
@@ -192,7 +191,7 @@ foreach ($engineers as $engineerId => $engineerActivities) {
         $body = ob_get_contents();
         ob_end_clean();
 
-
+        $buMail = new BUMail($thing);
         $emailSubject = "You have open requests";
 
         $buMail->mime->setHTMLBody($body);
@@ -222,10 +221,10 @@ foreach ($engineers as $engineerId => $engineerActivities) {
         );
 
         if ($sent) {
-            echo 'email sent to ' . $engineerName . ' email: ' . $sendTo;
+            echo "email sent to {$engineerName} email: {$sendTo}";
             echo '<br>';
         } else {
-            echo 'failed to send email to ' . $engineerName . ' email: ' . $sendTo;
+            echo "failed to send email to {$engineerName} email: {$sendTo}";
             echo '<br>';
         }
     }
@@ -315,7 +314,7 @@ foreach ($managers as $managerId => $manager) {
 
         $emailSubject = "Your managed engineers have open requests";
 
-
+        $buMail = new BUMail($thing);
         $buMail->mime->setHTMLBody($body);
 
         $mime_params = array(
