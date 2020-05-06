@@ -6315,7 +6315,8 @@ class CTActivity extends CTCNC
                 $this->getParam('problemID'),
                 $this->getParam('teamLevel'),
                 $minutes,
-                $this->getParam('comments')
+                $this->getParam('comments'),
+                $this->dbeUser
             );
 
             $this->buActivity->logOperationalActivity(

@@ -3190,7 +3190,8 @@ class BUActivity extends Business
                     $dsCallActivity->getValue(DBECallActivity::problemID),
                     $teamLevel,
                     $minutes,
-                    $comments
+                    $comments,
+                    $reviewingUser
                 );
                 $this->logOperationalActivity(
                     $dsCallActivity->getValue(DBECallActivity::problemID),
@@ -3205,7 +3206,8 @@ class BUActivity extends Business
                 $this->sendTimeRequestDeniedEmail(
                     $dsCallActivity,
                     $requestingUser,
-                    $comments
+                    $comments,
+                    $reviewingUser
                 );
                 break;
             case 'DEL':
@@ -3232,11 +3234,13 @@ class BUActivity extends Business
      * @param $teamLevel
      * @param $minutes
      * @param $comments
+     * @param DataSet|DBEUser $reviewingUser
      */
     public function allocateAdditionalTime($problemID,
                                            $teamLevel,
                                            $minutes,
-                                           $comments
+                                           $comments,
+                                           $reviewingUser
     )
     {
         $this->dbeProblem = new DBEProblem($this);
@@ -3284,7 +3288,8 @@ class BUActivity extends Business
 
         $this->sendTimeAllocatedEmail(
             $minutes,
-            $comments
+            $comments,
+            $reviewingUser->getValue(DBEUser::name)
         );
     }
 
@@ -3294,7 +3299,8 @@ class BUActivity extends Business
   */
 
     private function sendTimeAllocatedEmail($minutes,
-                                            $comments
+                                            $comments,
+                                            string $managerName
     )
     {
         $buMail = new BUMail($this);
@@ -3345,7 +3351,8 @@ class BUActivity extends Business
                 ),
                 'comments'           => $comments,
                 'urlDisplayActivity' => $urlDisplayActivity,
-                'internalNotes'      => $this->dbeProblem->getValue(DBEJCallActivity::internalNotes)
+                'internalNotes'      => $this->dbeProblem->getValue(DBEJCallActivity::internalNotes),
+                'managerName'        => $managerName
             )
         );
 
@@ -3395,10 +3402,12 @@ class BUActivity extends Business
      * @param DataAccess $dbeCallActivity
      * @param DBEUser $requestingUser
      * @param $reason
+     * @param DBEUser $reviewingUser
      */
     private function sendTimeRequestDeniedEmail($dbeCallActivity,
                                                 $requestingUser,
-                                                $reason
+                                                $reason,
+                                                $reviewingUser
     )
     {
         $buMail = new BUMail($this);
@@ -3428,11 +3437,12 @@ class BUActivity extends Business
 
         $template->setVar(
             array(
-                'problemID'        => $problemID,
-                'userName'         => $userName,
-                'urlLastActivity'  => $urlLastActivity,
-                'requestReason'    => $reason,
-                'urlFirstActivity' => $urlFirstActivity
+                'problemID'         => $problemID,
+                'userName'          => $userName,
+                'urlLastActivity'   => $urlLastActivity,
+                'requestReason'     => $reason,
+                'urlFirstActivity'  => $urlFirstActivity,
+                'reviewingUserName' => $reviewingUser->getValue(DBEUser::name)
             )
         );
 
