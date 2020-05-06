@@ -585,6 +585,8 @@ table#user-performance-escalations td, th {
     background-color: #F5AEBD;
 }
 
+
+
 .boring-gray {
     background-color: #cccccc;
 }
@@ -598,7 +600,7 @@ table.second-site-image th {
 }
 
 table#passed {
-    background-color: #BCF7DD;
+    background-color: #bcf7dd;
 }
 
 table#bad-config, table#image-not-found, table#server-not-found, table#out-of-date {
