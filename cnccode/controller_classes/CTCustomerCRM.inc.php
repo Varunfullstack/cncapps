@@ -811,13 +811,10 @@ class CTCustomerCRM extends CTCustomer
                 'specialAttentionFlagChecked'        => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag)
                 ),
-                'specialAttentionEndDate'            => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)
+                'specialAttentionEndDate'            => $this->dsCustomer->getValue(
+                    DBECustomer::specialAttentionEndDate
                 ),
-                //                'specialAttentionEndDateMessage'     => $this->dsCustomer->getValue(DBECustomer::SpecialAttentionEndDateMessage),
-                'lastReviewMeetingDate'              => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::lastReviewMeetingDate)
-                ),
+                'lastReviewMeetingDate'              => $this->dsCustomer->getValue(DBECustomer::lastReviewMeetingDate),
                 'dateMeetingConfirmedDate'           => $this->dsCustomer->getValue(DBECustomer::dateMeetingConfirmed),
                 'meetingDateTime'                    => Controller::dateToISO(
                     $this->dsCustomer->getValue(DBECustomer::meetingDateTime)
@@ -873,21 +870,13 @@ class CTCustomerCRM extends CTCustomer
                 'noOfServers'                        => $this->dsCustomer->getValue(DBECustomer::noOfServers),
                 'noOfSites'                          => $this->dsCustomer->getValue(DBECustomer::noOfSites),
                 'modifyDate'                         => $this->dsCustomer->getValue(DBECustomer::modifyDate),
-                'reviewDate'                         => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::reviewDate)
-                ),
-                'reviewTime'                         => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::reviewTime)
-                ),
+                'reviewDate'                         => $this->dsCustomer->getValue(DBECustomer::reviewDate),
+                'reviewTime'                         => $this->dsCustomer->getValue(DBECustomer::reviewTime),
                 'referred'                           => $this->dsCustomer->getValue(
                     DBECustomer::referredFlag
                 ) == 'Y' ? 'true' : 'false',
-                'becameCustomerDate'                 => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::becameCustomerDate)
-                ),
-                'droppedCustomerDate'                => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::droppedCustomerDate)
-                ),
+                'becameCustomerDate'                 => $this->dsCustomer->getValue(DBECustomer::becameCustomerDate),
+                'droppedCustomerDate'                => $this->dsCustomer->getValue(DBECustomer::droppedCustomerDate),
                 'reviewAction'                       => $this->dsCustomer->getValue(DBECustomer::reviewAction),
                 'comments'                           => $this->dsCustomer->getValue(DBECustomer::comments),
                 'techNotes'                          => $this->dsCustomer->getValue(DBECustomer::techNotes),
@@ -1572,9 +1561,7 @@ class CTCustomerCRM extends CTCustomer
                     'pendingLeaverFlagChecked'             => ($this->dsContact->getValue(
                             DBEContact::pendingLeaverFlag
                         ) == 'Y') ? CT_CHECKED : null,
-                    'pendingLeaverDate'                    => Controller::dateYMDtoDMY(
-                        $this->dsContact->getValue(DBEContact::pendingLeaverDate)
-                    ),
+                    'pendingLeaverDate'                    => $this->dsContact->getValue(DBEContact::pendingLeaverDate),
                     'failedLoginCount'                     => $this->dsContact->getValue(DBEContact::failedLoginCount),
                     'email'                                => $this->dsContact->getValue(DBEContact::email),
                     'emailClass'                           => $this->dsContact->getValue(self::contactFormEmailClass),

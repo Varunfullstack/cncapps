@@ -547,7 +547,7 @@ class CTCustomer extends CTCNC
 
             $this->dsContact->setValue(
                 DBEContact::pendingLeaverDate,
-                common_convertDateDMYToYMD(@$value[DBEContact::pendingLeaverDate])
+                @$value[DBEContact::pendingLeaverDate]
             );
 
             // Determine whether a new contact is to be added
@@ -748,7 +748,7 @@ class CTCustomer extends CTCNC
             );
             $this->dsCustomer->setValue(
                 DBECustomer::specialAttentionEndDate,
-                $this->convertDateYMD(@$value['specialAttentionEndDate'])
+                @$value['specialAttentionEndDate']
             );
 
             if (
@@ -806,15 +806,15 @@ class CTCustomer extends CTCNC
             );
             $this->dsCustomer->setValue(
                 DBECustomer::becameCustomerDate,
-                $this->convertDateYMD(@$value['becameCustomerDate'])
+                @$value['becameCustomerDate']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::droppedCustomerDate,
-                $this->convertDateYMD(@$value['droppedCustomerDate'])
+                @$value['droppedCustomerDate']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::lastReviewMeetingDate,
-                $this->convertDateYMD(@$value['lastReviewMeetingDate'])
+                @$value['lastReviewMeetingDate']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reviewMeetingFrequencyMonths,
@@ -822,7 +822,7 @@ class CTCustomer extends CTCNC
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reviewDate,
-                $this->convertDateYMD(@$value['reviewDate'])
+                @$value['reviewDate']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reviewMeetingEmailSentFlag,
@@ -943,29 +943,6 @@ class CTCustomer extends CTCNC
                 );
             }
             $this->dsCustomer->post();
-        }
-    }
-
-    function convertDateYMD($dateDMY)
-    {
-        if ($dateDMY) {
-            $dateArray = explode(
-                '/',
-                $dateDMY
-            );
-            return ($dateArray[2] . '-' . str_pad(
-                    $dateArray[1],
-                    2,
-                    '0',
-                    STR_PAD_LEFT
-                ) . '-' . str_pad(
-                    $dateArray[0],
-                    2,
-                    '0',
-                    STR_PAD_LEFT
-                ));
-        } else {
-            return null;
         }
     }
 
@@ -1308,10 +1285,10 @@ class CTCustomer extends CTCNC
             $this->getPhoneString(),
             $this->getCustomerString(),
             $this->getAddress(),
-            $this->convertDateYMD($this->getNewCustomerFromDate()),
-            $this->convertDateYMD($this->getNewCustomerToDate()),
-            $this->convertDateYMD($this->getDroppedCustomerFromDate()),
-            $this->convertDateYMD($this->getDroppedCustomerToDate())
+            $this->getNewCustomerFromDate(),
+            $this->getNewCustomerToDate(),
+            $this->getDroppedCustomerFromDate(),
+            $this->getDroppedCustomerToDate()
         )
         ) {
             $this->setCustomerStringMessage(CTCUSTOMER_MSG_NONE_FND);
@@ -1781,15 +1758,11 @@ class CTCustomer extends CTCNC
                 'specialAttentionFlagChecked'    => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag)
                 ),
-                'specialAttentionEndDate'        => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)
-                ),
+                'specialAttentionEndDate'        => $this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate),
                 'specialAttentionEndDateMessage' => $this->dsCustomer->getValue(
                     self::customerFormSpecialAttentionEndDateMessage
                 ),
-                'lastReviewMeetingDate'          => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::lastReviewMeetingDate)
-                ),
+                'lastReviewMeetingDate'          => $this->dsCustomer->getValue(DBECustomer::lastReviewMeetingDate),
                 'lastReviewMeetingDateMessage'   => $this->dsCustomer->getValue(
                     self::customerFormSpecialAttentionEndDateMessage
                 ),
@@ -1837,18 +1810,10 @@ class CTCustomer extends CTCNC
                 'noOfSites'                      => $this->dsCustomer->getValue(DBECustomer::noOfSites),
                 'noOfPCs'                        => $this->dsCustomer->getValue(DBECustomer::noOfPCs),
                 'modifyDate'                     => $this->dsCustomer->getValue(DBECustomer::modifyDate),
-                'reviewDate'                     => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::reviewDate)
-                ),
-                'reviewTime'                     => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::reviewTime)
-                ),
-                'becameCustomerDate'             => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::becameCustomerDate)
-                ),
-                'droppedCustomerDate'            => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::droppedCustomerDate)
-                ),
+                'reviewDate'                     => $this->dsCustomer->getValue(DBECustomer::reviewDate),
+                'reviewTime'                     => $this->dsCustomer->getValue(DBECustomer::reviewTime),
+                'becameCustomerDate'             => $this->dsCustomer->getValue(DBECustomer::becameCustomerDate),
+                'droppedCustomerDate'            => $this->dsCustomer->getValue(DBECustomer::droppedCustomerDate),
                 'reviewAction'                   => $this->dsCustomer->getValue(DBECustomer::reviewAction),
                 'comments'                       => $this->dsCustomer->getValue(DBECustomer::comments),
                 'techNotes'                      => $this->dsCustomer->getValue(DBECustomer::techNotes),
@@ -2536,9 +2501,7 @@ class CTCustomer extends CTCNC
                     'pendingLeaverFlagChecked'             => ($this->dsContact->getValue(
                             DBEContact::pendingLeaverFlag
                         ) == 'Y') ? CT_CHECKED : null,
-                    'pendingLeaverDate'                    => Controller::dateYMDtoDMY(
-                        $this->dsContact->getValue(DBEContact::pendingLeaverDate)
-                    ),
+                    'pendingLeaverDate'                    => $this->dsContact->getValue(DBEContact::pendingLeaverDate),
                     'failedLoginCount'                     => $this->dsContact->getValue(DBEContact::failedLoginCount),
                     'email'                                => $this->dsContact->getValue(DBEContact::email),
                     'emailClass'                           => $this->dsContact->getValue(self::contactFormEmailClass),

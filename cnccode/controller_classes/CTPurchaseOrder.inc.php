@@ -212,7 +212,7 @@ class CTPurchaseOrder extends CTCNC
         $requiredByDate = null;
         if ($this->getParam('requiredByDate')) {
             $requiredByDate = DateTime::createFromFormat(
-                'd/m/Y',
+                'Y-m-d',
                 $this->getParam('requiredByDate')
             );
         }
@@ -227,54 +227,6 @@ class CTPurchaseOrder extends CTCNC
             array(
                 'action'    => CTCNC_ACT_SEARCH,
                 'ordheadID' => $this->getParam('ordheadID')
-            )
-        );
-        header("Location: " . $urlNext);
-        exit;
-    }
-
-    /**
-     * Creates new PO from passed sales order no and supplierID
-     * @access private
-     * @throws Exception
-     */
-    function createPO()
-    {
-        $this->setMethodName('createPO');
-        if (!is_numeric($this->getParam('supplierID'))) {
-            $this->setFormErrorMessage('Supplier No must be numeric');;
-        }
-        if (!is_numeric($this->getParam('ordheadID'))) {
-            $this->setFormErrorMessage('Sales order no must be numeric');;
-        } else {
-            $buSalesOrder = new BUSalesOrder($this);
-            $dsOrdhead = new DataSet($this);
-            if (!$buSalesOrder->getOrdheadByID(
-                $this->getParam('ordheadID'),
-                $dsOrdhead
-            )) {
-                $this->setFormErrorMessage('sales order not found');
-            } else {
-                if ($dsOrdhead->getValue(DBEJOrdhead::type) != 'I' & $dsOrdhead->getValue(DBEJOrdhead::type) != 'P') {
-                    $this->setFormErrorMessage('sales order is not initial or part-despatched status');
-                }
-            }
-        }
-        if ($this->getFormError()) {
-            $this->displaySearchForm();
-            exit;
-        }
-
-        $porheadID = $this->buPurchaseOrder->createNewPO(
-            $this->getParam('ordheadID'),
-            $this->getParam('supplierID'),
-            $this->userID
-        );
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action'    => CTCNC_ACT_DISPLAY_PO,
-                'porheadID' => $porheadID
             )
         );
         header("Location: " . $urlNext);
@@ -322,8 +274,8 @@ class CTPurchaseOrder extends CTCNC
                 $this->getParam('orderType'),
                 $this->getParam('lineText'),
                 $this->getParam('partNo'),
-                common_convertDateDMYToYMD($this->getParam('fromDate')),
-                common_convertDateDMYToYMD($this->getParam('toDate')),
+                $this->getParam('fromDate'),
+                $this->getParam('toDate'),
                 $this->dsPorhead
             );
         }
@@ -504,6 +456,27 @@ class CTPurchaseOrder extends CTCNC
             true
         );
         $this->parsePage();
+    }
+
+    function parsePage()
+    {
+        $urlLogo = null;
+        if ($this->getAction() != CTPURCHASEORDER_ACT_DISP_SEARCH) {
+            $urlLogo =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => CTPURCHASEORDER_ACT_DISP_SEARCH
+                    )
+                );
+        }
+        $this->template->set_var(
+            array(
+                'urlLogo' => $urlLogo,
+                'txtHome' => 'Home'
+            )
+        );
+        parent::parsePage();
     }
 
     /**
@@ -782,12 +755,8 @@ class CTPurchaseOrder extends CTCNC
                 'orderedByName'                => Controller::htmlDisplayText(
                     $dsPorhead->getValue(DBEJPorhead::orderedByName)
                 ),
-                'orderRequiredBy'              => Controller::dateYMDtoDMY(
-                    $dsPorhead->getValue(DBEPorhead::requiredBy)
-                ),
-                'orderDate'                    => Controller::dateYMDtoDMY(
-                    $dsPorhead->getValue(DBEJPorhead::orderDate)
-                ),
+                'orderRequiredBy'              => $dsPorhead->getValue(DBEPorhead::requiredBy),
+                'orderDate'                    => $dsPorhead->getValue(DBEJPorhead::orderDate),
                 'supplierName'                 => Controller::htmlInputText(
                     $dsPorhead->getValue(DBEJPorhead::supplierName)
                 ),
@@ -889,7 +858,11 @@ class CTPurchaseOrder extends CTCNC
                     ) && (float)$dsPorline->getValue(
                         DBEPorline::curUnitCost
                     ) && $dsPorline->getValue(DBEPorline::itemID) != 1491) {
-                    $expectedDate = Controller::dateYMDtoDMY($dsPorline->getValue(DBEJPorline::expectedDate));
+                    $expectedDate = DateTime::createFromFormat(
+                        $dsPorline->getValue(DBEJPorline::expectedDate),
+                        DATE_MYSQL_DATE
+                    )
+                        ->format('d/m/Y');
                 } else {
                     $expectedDate = null;
                 }
@@ -1045,6 +1018,54 @@ class CTPurchaseOrder extends CTCNC
     }
 
     /**
+     * Creates new PO from passed sales order no and supplierID
+     * @access private
+     * @throws Exception
+     */
+    function createPO()
+    {
+        $this->setMethodName('createPO');
+        if (!is_numeric($this->getParam('supplierID'))) {
+            $this->setFormErrorMessage('Supplier No must be numeric');;
+        }
+        if (!is_numeric($this->getParam('ordheadID'))) {
+            $this->setFormErrorMessage('Sales order no must be numeric');;
+        } else {
+            $buSalesOrder = new BUSalesOrder($this);
+            $dsOrdhead = new DataSet($this);
+            if (!$buSalesOrder->getOrdheadByID(
+                $this->getParam('ordheadID'),
+                $dsOrdhead
+            )) {
+                $this->setFormErrorMessage('sales order not found');
+            } else {
+                if ($dsOrdhead->getValue(DBEJOrdhead::type) != 'I' & $dsOrdhead->getValue(DBEJOrdhead::type) != 'P') {
+                    $this->setFormErrorMessage('sales order is not initial or part-despatched status');
+                }
+            }
+        }
+        if ($this->getFormError()) {
+            $this->displaySearchForm();
+            exit;
+        }
+
+        $porheadID = $this->buPurchaseOrder->createNewPO(
+            $this->getParam('ordheadID'),
+            $this->getParam('supplierID'),
+            $this->userID
+        );
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action'    => CTCNC_ACT_DISPLAY_PO,
+                'porheadID' => $porheadID
+            )
+        );
+        header("Location: " . $urlNext);
+        exit;
+    }
+
+    /**
      * Edit/Add Order Line
      * @access private
      * @throws Exception
@@ -1114,7 +1135,7 @@ class CTPurchaseOrder extends CTCNC
             true
         );
         $this->parsePage();
-    }
+    }// end function orderLineForm()
 
     /**
      * @throws Exception
@@ -1135,9 +1156,7 @@ class CTPurchaseOrder extends CTCNC
                 'qtyInvoiced'            => $this->dsPorline->getValue(DBEJPorline::qtyInvoiced),
                 'curUnitCost'            => $this->dsPorline->getValue(DBEJPorline::curUnitCost),
                 'curUnitCostMessage'     => $this->dsPorline->getMessage(DBEJPorline::curUnitCost),
-                'expectedDate'           => Controller::dateYMDtoDMY(
-                    $this->dsPorline->getValue(DBEJPorline::expectedDate)
-                ),
+                'expectedDate'           => $this->dsPorline->getValue(DBEJPorline::expectedDate),
                 'expectedDateMessage'    => $this->dsPorline->getMessage(DBEJPorline::expectedDate)
             )
         );
@@ -1192,7 +1211,7 @@ class CTPurchaseOrder extends CTCNC
                 'urlCancel'    => $urlCancel
             )
         );
-    }// end function orderLineForm()
+    }
 
     /**
      * Update/Insert order line
@@ -1311,56 +1330,6 @@ class CTPurchaseOrder extends CTCNC
     }
 
     /**
-     * Delete order
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function deleteOrder()
-    {
-        $this->setMethodName('deleteOrder');
-        if (!$this->getParam('porheadID')) {
-            $this->displayFatalError('Purchase order ID not provided');
-            return;
-        }
-        if (!$this->buPurchaseOrder->getOrderHeaderByID(
-            $this->getParam('porheadID'),
-            $this->dsPorhead
-        )) {
-            $this->displayFatalError(CTPURCHASEORDER_MSG_PURCHASEORDER_NOT_FND);
-            return;
-        }
-        $this->buPurchaseOrder->deleteOrder($this->getParam('porheadID'));
-        $urlNext =                        // default action
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'    => CTCNC_ACT_SEARCH,
-                    'ordheadID' => $this->dsPorhead->getValue(DBEJPorhead::ordheadID) // if this is set then will show
-                )                                                                                                                    // remaining POs for SO
-            );
-        if ($this->dsPorhead->getValue(DBEJPorhead::ordheadID)) {
-            $buSalesOrder = new BUSalesOrder($this);
-            $purchaseOrderCount = $buSalesOrder->countPurchaseOrders(
-                $this->dsPorhead->getValue(DBEJPorhead::ordheadID)
-            );
-            if ($purchaseOrderCount == 0) {
-                $urlNext =
-                    Controller::buildLink(
-                        CTCNC_PAGE_SALESORDER,
-                        array(
-                            'action'    => CTCNC_ACT_DISP_SALESORDER,
-                            'ordheadID' => $this->dsPorhead->getValue(DBEJPorhead::ordheadID)
-                            // if this is set then will show
-                        )                                                                                                                    // remaining POs for SO
-                    );
-            }
-        }
-        header('Location: ' . $urlNext);
-    }
-
-    /**
      * Update order header details
      * @access private
      * @throws Exception
@@ -1417,6 +1386,56 @@ class CTPurchaseOrder extends CTCNC
         }
     }
 
+    /**
+     * Delete order
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function deleteOrder()
+    {
+        $this->setMethodName('deleteOrder');
+        if (!$this->getParam('porheadID')) {
+            $this->displayFatalError('Purchase order ID not provided');
+            return;
+        }
+        if (!$this->buPurchaseOrder->getOrderHeaderByID(
+            $this->getParam('porheadID'),
+            $this->dsPorhead
+        )) {
+            $this->displayFatalError(CTPURCHASEORDER_MSG_PURCHASEORDER_NOT_FND);
+            return;
+        }
+        $this->buPurchaseOrder->deleteOrder($this->getParam('porheadID'));
+        $urlNext =                        // default action
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'    => CTCNC_ACT_SEARCH,
+                    'ordheadID' => $this->dsPorhead->getValue(DBEJPorhead::ordheadID) // if this is set then will show
+                )                                                                                                                    // remaining POs for SO
+            );
+        if ($this->dsPorhead->getValue(DBEJPorhead::ordheadID)) {
+            $buSalesOrder = new BUSalesOrder($this);
+            $purchaseOrderCount = $buSalesOrder->countPurchaseOrders(
+                $this->dsPorhead->getValue(DBEJPorhead::ordheadID)
+            );
+            if ($purchaseOrderCount == 0) {
+                $urlNext =
+                    Controller::buildLink(
+                        CTCNC_PAGE_SALESORDER,
+                        array(
+                            'action'    => CTCNC_ACT_DISP_SALESORDER,
+                            'ordheadID' => $this->dsPorhead->getValue(DBEJPorhead::ordheadID)
+                            // if this is set then will show
+                        )                                                                                                                    // remaining POs for SO
+                    );
+            }
+        }
+        header('Location: ' . $urlNext);
+    }
+
     function generatePDF()
     {
         // generate PDF purchase order:
@@ -1441,26 +1460,5 @@ class CTPurchaseOrder extends CTCNC
             );
             exit();
         }
-    }
-
-    function parsePage()
-    {
-        $urlLogo = null;
-        if ($this->getAction() != CTPURCHASEORDER_ACT_DISP_SEARCH) {
-            $urlLogo =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => CTPURCHASEORDER_ACT_DISP_SEARCH
-                    )
-                );
-        }
-        $this->template->set_var(
-            array(
-                'urlLogo' => $urlLogo,
-                'txtHome' => 'Home'
-            )
-        );
-        parent::parsePage();
     }
 }

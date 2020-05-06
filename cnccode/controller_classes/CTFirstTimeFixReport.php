@@ -47,7 +47,7 @@ class CTFirstTimeFixReport extends CTCNC
                 $startDate = null;
                 if (@$this->getParam('startDate')) {
                     $startDate = DateTime::createFromFormat(
-                        'd/m/Y',
+                        DATE_MYSQL_DATE,
                         $this->getParam('startDate')
                     );
                 }
@@ -55,7 +55,7 @@ class CTFirstTimeFixReport extends CTCNC
                 $endDate = null;
                 if (@$this->getParam('endDate')) {
                     $endDate = DateTime::createFromFormat(
-                        'd/m/Y',
+                        DATE_MYSQL_DATE,
                         $this->getParam('endDate')
                     );
                 }

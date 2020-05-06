@@ -99,10 +99,10 @@
                     const startDate = $('#startDate').val();
                     const endDate = $('#endDate').val();
                     if (startDate) {
-                        data.startDate = moment(startDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                        data.startDate = startDate
                     }
                     if (endDate) {
-                        data.endDate = moment(endDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                        data.endDate = endDate
                     }
                 }
             },

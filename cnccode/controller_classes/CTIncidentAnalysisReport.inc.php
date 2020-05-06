@@ -119,13 +119,9 @@ class CTIncidentAnalysisReport extends CTCNC
         $this->template->set_var(
             array(
                 'formError'       => $this->formError,
-                'fromDate'        => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUIncidentAnalysisReport::searchFormFromDate)
-                ),
+                'fromDate'        => $dsSearchForm->getValue(BUIncidentAnalysisReport::searchFormFromDate),
                 'fromDateMessage' => $dsSearchForm->getMessage(BUIncidentAnalysisReport::searchFormFromDate),
-                'toDate'          => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUIncidentAnalysisReport::searchFormToDate)
-                ),
+                'toDate'          => $dsSearchForm->getValue(BUIncidentAnalysisReport::searchFormToDate),
                 'toDateMessage'   => $dsSearchForm->getMessage(BUIncidentAnalysisReport::searchFormToDate),
                 'urlSubmit'       => $urlSubmit,
             )

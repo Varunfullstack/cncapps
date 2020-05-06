@@ -119,13 +119,9 @@ class CTQuotationConversionReport extends CTCNC
                 'customerID'        => $dsSearchForm->getValue(BUQuotationConversionReport::searchFormCustomerID),
                 'customerIDMessage' => $dsSearchForm->getMessage(BUQuotationConversionReport::searchFormCustomerID),
                 'customerString'    => $customerString,
-                'fromDate'          => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUQuotationConversionReport::searchFormFromDate)
-                ),
+                'fromDate'          => $dsSearchForm->getValue(BUQuotationConversionReport::searchFormFromDate),
                 'fromDateMessage'   => $dsSearchForm->getMessage(BUQuotationConversionReport::searchFormFromDate),
-                'toDate'            => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUQuotationConversionReport::searchFormToDate)
-                ),
+                'toDate'            => $dsSearchForm->getValue(BUQuotationConversionReport::searchFormToDate),
                 'toDateMessage'     => $dsSearchForm->getMessage(BUQuotationConversionReport::searchFormToDate),
                 'urlCustomerPopup'  => $urlCustomerPopup,
                 'urlSubmit'         => $urlSubmit

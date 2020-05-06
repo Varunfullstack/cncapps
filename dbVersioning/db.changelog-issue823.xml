@@ -173,4 +173,16 @@
                                  onDelete="CASCADE"
         />
     </changeSet>
+    <changeSet author="pavwebdev" id="issue823-13">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="linkedInURL"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="linkedInURL" type="text">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

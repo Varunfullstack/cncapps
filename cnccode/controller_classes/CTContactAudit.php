@@ -138,14 +138,14 @@ class CTContactAudit extends CTCNC
 
         if ($startDate) {
             $startDate = DateTime::createFromFormat(
-                'd/m/Y',
+                DATE_MYSQL_DATE,
                 $startDate
             );
         }
 
         if ($endDate) {
             $endDate = DateTime::createFromFormat(
-                'd/m/Y',
+                DATE_MYSQL_DATE,
                 $endDate
             );
         }

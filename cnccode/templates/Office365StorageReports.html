@@ -31,8 +31,8 @@
         const url = new URL(window.location.href);
         url.searchParams.append('action', 'getData');
         url.searchParams.append('customerId', customerID);
-        url.searchParams.append('startDate', moment(startDate, 'DD/MM/YYYY').format('YYYY-MM-DD'));
-        url.searchParams.append('endDate', moment(endDate, 'DD/MM/YYYY').format('YYYY-MM-DD'));
+        url.searchParams.append('startDate', startDate);
+        url.searchParams.append('endDate', endDate);
 
         return chartsLoaded
             .then(() => {

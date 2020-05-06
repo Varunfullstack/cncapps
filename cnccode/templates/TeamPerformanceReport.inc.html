@@ -295,11 +295,11 @@
                     const commonParams = {};
 
                     if (startDateString) {
-                        commonParams.startDate = moment(startDateString, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                        commonParams.startDate = startDateString
                     }
 
                     if (endDateString) {
-                        commonParams.endDate = moment(endDateString, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                        commonParams.endDate = endDateString
                     }
                     const getUrl = window.location;
                     const baseUrl = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];

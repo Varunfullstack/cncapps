@@ -722,7 +722,7 @@ FROM {$this->getTableName()}
 WHERE {$this->getDBColumnName(self::supportLevel)} is not null
   and {$this->getDBColumnName(self::supportLevel)} <> ''
   AND {$dbeCustomer->getDBColumnName(DBECustomer::becameCustomerDate)} is not null
-  and {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is null;";
+  and {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is null ";
 
         if ($customerID) {
             $sql .= " AND {$this->getDBColumnName(self::customerID)} = " . $customerID;
