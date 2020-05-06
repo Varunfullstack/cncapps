@@ -271,7 +271,8 @@ class DB_Sql
         );
 
         if (!mysqli_stmt_execute($statement)) {
-            throw new Exception('Failed to execute prepared query');
+            $jsonParams = json_encode($parameters);
+            throw new Exception("Failed to execute prepared query : $queryString, {$jsonParams}");
         }
         $result = mysqli_stmt_get_result($statement);
 

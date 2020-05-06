@@ -1001,7 +1001,7 @@ define(
 
 define(
     "POWERSHELL_DIR",
-    BASE_DRIVE . "/powershell"
+    BASE_DRIVE . "\powershell"
 );
 
 define(
