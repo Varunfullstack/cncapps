@@ -15,6 +15,7 @@ This project changes will be shown here.
 - Issue 835 - Customer Item Renewal Status does not work
 - Issue 848 - Contact Validation for site phone number reporting incorrect sites
 - Issue 849 - You have open requests emails sometimes listing wrong To: field
+- Issue 853 - Overtime & Expenses Tweaks
 
 ## [v3.13.6] - 2020-05-05
 ### Fixed

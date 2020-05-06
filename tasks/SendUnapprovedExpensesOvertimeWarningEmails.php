@@ -83,7 +83,7 @@ foreach (getPendingToApproveOvertimeItems() as $pendingToApproveItem) {
         ];
     }
     $approvers[$pendingToApproveItem->approverId]['overtimeActivities'][] = $pendingToApproveItem;
-};
+}
 
 $buExpense = new BUExpense($thing);
 foreach (getPendingToApproveExpenseItems() as $pendingToApproveExpenseItem) {
@@ -169,7 +169,7 @@ $sickPeople = $db->fetchAll(MYSQLI_ASSOC);
 $body = $twig->render(
     '@internal/sickReportEmail.html.twig',
     [
-        "sickPeople"             => $sickPeople,
+        "sickPeople"                     => $sickPeople,
         "yearlySicknessThresholdWarning" => @$sickPeople[0]['yearlySicknessThresholdWarning']
     ]
 );
