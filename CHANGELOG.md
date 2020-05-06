@@ -13,6 +13,7 @@ This project changes will be shown here.
 ### Fixed
 - Issue 832 - Review Meeting Booked Meetings not showing as booked
 - Issue 835 - Customer Item Renewal Status does not work
+- Issue 848 - Contact Validation for site phone number reporting incorrect sites
 
 ## [v3.13.6] - 2020-05-05
 ### Fixed

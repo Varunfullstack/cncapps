@@ -1075,6 +1075,7 @@ $twig = new Environment(
     ]
 );
 $twig->addExtension(new \Twig\Extra\Intl\IntlExtension());
+$twig->addExtension(new \Twig\Extension\DebugExtension());
 
 define(
     'DOMPDF_ENABLE_AUTOLOAD',
