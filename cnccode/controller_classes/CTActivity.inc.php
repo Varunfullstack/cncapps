@@ -994,7 +994,8 @@ class CTActivity extends CTCNC
 
                         foreach ($contractItems as $contractItem) {
                             $selected = $contractCustomerItemID == $contractItem['id'];
-                            $contractField .= "<option value='" . $contractItem['id'] . "' " . ($selected ? 'selected' : null) . ">" . $contractItem['description'] . " </option>";
+                            $disabled = $contractItem['disabled'] ? 'disabled' : null;
+                            $contractField .= "<option {$disabled} value='" . $contractItem['id'] . "' " . ($selected ? 'selected' : null) . ">" . $contractItem['description'] . " </option>";
                         }
                         $contractField .= "</optgroup>";
                     }
@@ -1326,8 +1327,8 @@ class CTActivity extends CTCNC
                     ) . ' ' . $dsContract->getValue(DBEJContract::notes) . ' ' . $dsContract->getValue(
                         DBEJContract::postcode
                     ),
-                "id"          => $dsContract->getValue(DBEJContract::customerItemID)
-
+                "id"          => $dsContract->getValue(DBEJContract::customerItemID),
+                "disabled"    => !$dsContract->getValue(DBEJContract::allowSRLog)
             ];
 
         }

@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Changed
+- Issue 833 - Additional pages to lock out contract choices
 ### Fixed
 - Issue 832 - Review Meeting Booked Meetings not showing as booked
 
