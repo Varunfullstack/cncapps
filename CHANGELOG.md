@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Fixed activity hidden when final activity hidden
+
 ## [v3.13.6] - 2020-05-05
 ### Fixed
 - Fixed issue with "Allow SRs to be logged against this contract" checkbox not working properly
