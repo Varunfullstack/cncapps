@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 840 - PO Status v10
+
 ## [v4.0.1] - 2020-05-26
 ### Fixed
 - Current Activity Report bigger headings
