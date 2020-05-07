@@ -3076,13 +3076,18 @@ class BUActivity extends Business
             DBEJCallActivity::startTime,
             date('H:i')
         );
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getRow($problemID);
+        if ($dbeProblem->getValue(DBEProblem::hideFromCustomerFlag) == 'N') {
+            $dbeCallActivity->setValue(DBECallActivity::hideFromCustomerFlag, 'N');
+        }
+
 
         $endTime = $dbeCallActivity->getValue(DBEJCallActivity::startTime);
 
         if (!$zeroTime) {
             $endTime = $this->getEndtime(CONFIG_FIXED_ACTIVITY_TYPE_ID);
-            $dbeProblem = new DBEProblem($this);
-            $dbeProblem->getRow($problemID);
+
             $dbeProblem->setValue(
                 DBEProblem::esLimitMinutes,
                 $dbeProblem->getValue(DBEProblem::esLimitMinutes) + 3
