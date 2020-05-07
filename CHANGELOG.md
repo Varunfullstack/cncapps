@@ -11,6 +11,7 @@ This project changes will be shown here.
 - Issue 843 - Include Manager Name on Time, Change & Sales requests feedback
 - Issue 847 - Moving SRs between teams requires reason
 - Issue 845 - O365 Mailbox Export Authentication & Formatting Improvements
+- Issue 823 - Customer CRM Page improvements
 ### Fixed
 - Issue 832 - Review Meeting Booked Meetings not showing as booked
 - Issue 835 - Customer Item Renewal Status does not work

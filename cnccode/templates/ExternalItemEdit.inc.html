@@ -79,16 +79,15 @@
 
         <TR>
             <TD class="promptText">Licence Expiry Date</TD>
-            <TD class="field"><input
-                    type="text"
-                    id="licenceRenewalDate"
-                    name="externalItem[1][licenceRenewalDate]"
-                    value="{licenceRenewalDate}"
-                    size="10"
-                    maxlength="10"
-                    autocomplete="off"
-                    class="jQueryCalendar"
-            >
+            <TD class="field">
+                <input type="date"
+                       id="licenceRenewalDate"
+                       name="externalItem[1][licenceRenewalDate]"
+                       value="{licenceRenewalDate}"
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
+                >
                 <font class="formErrorMessage">{licenceRenewalDateMessage}</font>
             </TD>
         </TR>

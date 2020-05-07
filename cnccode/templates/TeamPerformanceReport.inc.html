@@ -249,21 +249,19 @@
             <div align="right">Between</div>
         </td>
         <td>
-            <input type="text"
+            <input type="date"
                    id="startDate"
                    size="10"
                    maxlength="10"
-                   class="jqueryCalendar"
                    autocomplete="off"
             >
-            and <input
-                type="text"
-                id="endDate"
-                size="10"
-                maxlength="10"
-                class="jqueryCalendar"
-                autocomplete="off"
-        >
+            and
+            <input type="date"
+                   id="endDate"
+                   size="10"
+                   maxlength="10"
+                   autocomplete="off"
+            >
         </td>
     </tr>
     <tr>
@@ -297,11 +295,11 @@
                     const commonParams = {};
 
                     if (startDateString) {
-                        commonParams.startDate = moment(startDateString, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                        commonParams.startDate = startDateString
                     }
 
                     if (endDateString) {
-                        commonParams.endDate = moment(endDateString, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                        commonParams.endDate = endDateString
                     }
                     const getUrl = window.location;
                     const baseUrl = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];

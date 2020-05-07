@@ -27,7 +27,7 @@ class CTCallReporting extends CTCNC
                 $startDateObj = new DateTime();
                 $startDate = $startDateObj->format(DATE_MYSQL_DATE);
                 if (@$_REQUEST['startDate']) {
-                    $startDateObj = DateTime::createFromFormat('d/m/Y', @$_REQUEST['startDate']);
+                    $startDateObj = DateTime::createFromFormat(DATE_MYSQL_DATE, @$_REQUEST['startDate']);
                     if ($startDateObj) {
                         $startDate = $startDateObj->format(DATE_MYSQL_DATE);
                     }
@@ -36,7 +36,7 @@ class CTCallReporting extends CTCNC
                 $endDateObj = new DateTime();
                 $endDate = $endDateObj->format(DATE_MYSQL_DATE);
                 if (@$_REQUEST['endDate']) {
-                    $endDateObj = DateTime::createFromFormat('d/m/Y', @$_REQUEST['endDate']);
+                    $endDateObj = DateTime::createFromFormat(DATE_MYSQL_DATE, @$_REQUEST['endDate']);
                     if ($endDateObj) {
                         $endDate = $endDateObj->format(DATE_MYSQL_DATE);
                     }

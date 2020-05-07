@@ -18,7 +18,6 @@ class DBECustomer extends DBCNCEntity
     const referredFlag = "referredFlag";
     const pcxFlag = "pcxFlag";
     const customerTypeID = "customerTypeID";
-    const prospectFlag = "prospectFlag";
     const gscTopUpAmount = "gscTopUpAmount";
     const modifyDate = "modifyDate";
     const modifyUserID = "modifyUserID";
@@ -33,7 +32,7 @@ class DBECustomer extends DBCNCEntity
     const sectorID = "sectorID";
     const becameCustomerDate = "becameCustomerDate";
     const droppedCustomerDate = "droppedCustomerDate";
-    const leadStatusID = "leadStatusID";
+    const leadStatusId = "leadStatusId";
     const techNotes = "techNotes";
     const specialAttentionFlag = "specialAttentionFlag";
     const specialAttentionEndDate = "specialAttentionEndDate";
@@ -49,7 +48,6 @@ class DBECustomer extends DBCNCEntity
     const reviewMeetingFrequencyMonths = "reviewMeetingFrequencyMonths";
     const accountManagerUserID = "accountManagerUserID";
     const reviewMeetingEmailSentFlag = "reviewMeetingEmailSentFlag";
-    const customerLeadStatusID = "customerLeadStatusID";
     const dateMeetingConfirmed = 'dateMeetingConfirmed';
     const meetingDateTime = 'meetingDateTime';
     const inviteSent = 'inviteSent';
@@ -68,6 +66,7 @@ class DBECustomer extends DBCNCEntity
     const activeDirectoryName = "activeDirectoryName";
     const reviewMeetingBooked = 'reviewMeetingBooked';
     const licensedOffice365Users = 'licensedOffice365Users';
+    const websiteURL = "websiteURL";
 
     /**
      * calls constructor()
@@ -139,12 +138,6 @@ class DBECustomer extends DBCNCEntity
             DA_ID,
             DA_NOT_NULL,
             "cus_ctypeno"
-        );
-        $this->addColumn(
-            self::prospectFlag,
-            DA_YN_FLAG,
-            DA_NOT_NULL,
-            "cus_prospect"
         );
         $this->addColumn(
             self::gscTopUpAmount,
@@ -226,10 +219,9 @@ class DBECustomer extends DBCNCEntity
             'cus_dropped_customer_date'
         );
         $this->addColumn(
-            self::leadStatusID,
+            self::leadStatusId,
             DA_ID,
-            DA_ALLOW_NULL,
-            'cus_leadstatusno'
+            DA_ALLOW_NULL
         );
         $this->addColumn(
             self::techNotes,
@@ -320,12 +312,6 @@ class DBECustomer extends DBCNCEntity
             DA_ID,
             DA_ALLOW_NULL,
             "cus_account_manager_consno"
-        );
-        $this->addColumn(
-            self::customerLeadStatusID,
-            DA_ID,
-            DA_ALLOW_NULL,
-            "customer_lead_status_id"
         );
         $this->addColumn(
             self::dateMeetingConfirmed,
@@ -440,6 +426,11 @@ class DBECustomer extends DBCNCEntity
             DA_NOT_NULL,
             null,
             0
+        );
+        $this->addColumn(
+            self::websiteURL,
+            DA_TEXT,
+            DA_ALLOW_NULL
         );
 
         $this->setPK(0);
@@ -709,14 +700,12 @@ class DBECustomer extends DBCNCEntity
     {
         $this->setMethodName("getSpecialAttentionCustomers");
         $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " where " . $this->getDBColumnName(DBECustomer::referredFlag) . " <> 'Y'";
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} where {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y'";
 
         if ($ignoreProspects) {
-            $queryString .= " and " . $this->getDBColumnName(DBECustomer::prospectFlag) . " <> 'Y' ";
+            $queryString .= " and {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null ";
         }
-        $queryString .= " order by cus_name ";
+        $queryString .= " order by {$this->getDBColumnName(DBECustomer::name)} ";
         $this->setQueryString($queryString);
         return $this->getRows();
     }

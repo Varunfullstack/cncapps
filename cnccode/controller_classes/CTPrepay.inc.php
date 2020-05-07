@@ -107,12 +107,8 @@ class CTPrepay extends CTCNC
         }
         $this->template->set_var(
             array(
-                'endDate'        => Controller::dateYMDtoDMY(
-                    $this->dsPrepayExport->getValue(BUPrepay::exportDataSetEndDate)
-                ),
-                'endDateMessage' => Controller::dateYMDtoDMY(
-                    $this->dsPrepayExport->getMessage(BUPrepay::exportDataSetEndDate)
-                ),
+                'endDate'        => $this->dsPrepayExport->getValue(BUPrepay::exportDataSetEndDate),
+                'endDateMessage' => $this->dsPrepayExport->getMessage(BUPrepay::exportDataSetEndDate),
                 'urlPreview'     => $urlPreview,
                 'urlExport'      => $urlExport
             )

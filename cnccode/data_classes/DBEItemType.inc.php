@@ -4,10 +4,15 @@
 * @access public
 */
 global $cfg;
+
+use CNCLTD\SortableDBE;
+
 require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBEItemType extends DBCNCEntity
 {
+
+    use SortableDBE;
 
     const itemTypeID = "itemTypeID";
     const description = "description";
@@ -95,91 +100,21 @@ class DBEItemType extends DBCNCEntity
         $ret = (parent::getRows());
     }
 
-    public function moveItemToTop($itemTypeId)
+    protected function getSortOrderForItem($id)
     {
-        if ($this->isFirst($itemTypeId)) {
-            return;
-        }
-        $this->getRow($itemTypeId);
-        $this->swapPlaces($this->getValue(DBEItemType::sortOrder), 1);
+        $this->getRow($id);
+        return $this->getValue(DBEItemType::sortOrder);
     }
 
-    private function isFirst($itemTypeId)
+    protected function getSortOrderColumnName()
     {
-        $this->getRow($itemTypeId);
-        return $this->getValue(DBEItemType::sortOrder) <= 1;
+        return $this->getDBColumnName(DBEItemType::sortOrder);
     }
 
-    private function swapPlaces($oldOrderId, $newOrderId)
+    protected function getDB()
     {
-        $query = "UPDATE
-  {$this->tableName}
-SET
-  {$this->getDBColumnName(self::sortOrder)} =
-  CASE
-    WHEN {$this->getDBColumnName(self::sortOrder)} = $oldOrderId
-    THEN $newOrderId
-    WHEN $newOrderId < $oldOrderId
-    AND {$this->getDBColumnName(self::sortOrder)} < $oldOrderId
-    THEN {$this->getDBColumnName(self::sortOrder)} + 1
-    WHEN $newOrderId > $oldOrderId
-    AND {$this->getDBColumnName(self::sortOrder)} > $oldOrderId
-    THEN {$this->getDBColumnName(self::sortOrder)} - 1
-    ELSE {$this->getDBColumnName(self::sortOrder)}
-  END
-WHERE {$this->getDBColumnName(self::sortOrder)} BETWEEN LEAST($newOrderId, $oldOrderId)
-    AND GREATEST($newOrderId, $oldOrderId)";
-
-        $this->setQueryString($query);
-        $this->runQuery();
-
-    }
-
-    public function moveItemToBottom($itemTypeId)
-    {
-        if ($this->isLast($itemTypeId)) {
-            return;
-        }
-        $this->getRow($itemTypeId);
-        $this->swapPlaces($this->getValue(DBEItemType::sortOrder), $this->getMaxSortOrder());
-    }
-
-    private function isLast($itemTypeId)
-    {
-        $this->getRow($itemTypeId);
-        return $this->getValue(DBEItemType::sortOrder) >= $this->getMaxSortOrder();
-    }
-
-    public function getMaxSortOrder()
-    {
-        $query = "select max({$this->getDBColumnName(self::sortOrder)}) as maxSortOrder from {$this->tableName}";
-        $this->db->query($query);
-
-        $this->db->next_record(MYSQLI_ASSOC);
-        return $this->db->Record['maxSortOrder'];
-    }
-
-    public function moveItemUp($itemTypeId)
-    {
-        if ($this->isFirst($itemTypeId)) {
-            return;
-        }
-        $this->getRow($itemTypeId);
-        $this->swapPlaces($this->getValue(DBEItemType::sortOrder), $this->getValue(DBEItemType::sortOrder) - 1);
-    }
-
-    public function moveItemDown($itemTypeId)
-    {
-        if ($this->isLast($itemTypeId)) {
-            return;
-        }
-        $this->getRow($itemTypeId);
-        $this->swapPlaces($this->getValue(DBEItemType::sortOrder), $this->getValue(DBEItemType::sortOrder) + 1);
-    }
-
-    public function getNextSortOrder()
-    {
-        return $this->getMaxSortOrder() + 1;
+        global $db;
+        return $db;
     }
 }
 

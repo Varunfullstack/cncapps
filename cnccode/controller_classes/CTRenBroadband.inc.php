@@ -86,7 +86,7 @@ class CTRenBroadband extends CTCNC
         }
     }
 
-/**
+    /**
      * Edit/Add Activity
      * @access private
      * @throws Exception
@@ -355,12 +355,8 @@ class CTRenBroadband extends CTCNC
                 'password'                             => Controller::htmlInputText(
                     $dsRenBroadband->getValue(DBEJRenBroadband::password)
                 ),
-                'etaDate'                              => Controller::dateYMDtoDMY(
-                    $dsRenBroadband->getValue(DBEJRenBroadband::etaDate)
-                ),
-                'installationDate'                     => Controller::dateYMDtoDMY(
-                    $dsRenBroadband->getValue(DBEJRenBroadband::installationDate)
-                ),
+                'etaDate'                              => $dsRenBroadband->getValue(DBEJRenBroadband::etaDate),
+                'installationDate'                     => $dsRenBroadband->getValue(DBEJRenBroadband::installationDate),
                 'ispID'                                => Controller::htmlInputText(
                     $dsRenBroadband->getValue(DBEJRenBroadband::ispID)
                 ),
@@ -557,7 +553,7 @@ class CTRenBroadband extends CTCNC
         }
     }
 
-        /**
+    /**
      * Called from sales order line to edit a renewal.
      * The page passes
      * ordheadID

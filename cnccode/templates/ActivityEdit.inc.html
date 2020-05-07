@@ -357,18 +357,16 @@
                            id="cncActionBtn"
                     >
                     Future Action
-                    <input
-                            type="text"
-                            name="callActivity[1][alarmDate]"
-                            id="alarmDate"
-                            title="Date when this request needs to be re-activated"
-                            value="{alarmDate}"
-                            placeholder="dd/mm/yyyy"
-                            size="10"
-                            maxlength="10"
-                            onchange="setFormChanged();"
-                            class="jqueryCalendar"
-                            autocomplete="off"
+                    <input type="date"
+                           name="callActivity[1][alarmDate]"
+                           id="alarmDate"
+                           title="Date when this request needs to be re-activated"
+                           value="{alarmDate}"
+                           placeholder="dd/mm/yyyy"
+                           size="10"
+                           maxlength="10"
+                           onchange="setFormChanged();"
+                           autocomplete="off"
                     />
                     <span class="formErrorMessage">{alarmDateMessage}</span>
                     <input
@@ -514,7 +512,7 @@
                 <DIV>
                     {DISABLED}
                 </DIV>
-                <input type="text"
+                <input type="date"
                        name="callActivity[1][date]"
                        id="date"
                        value="{date}"
@@ -523,7 +521,6 @@
                        size="10"
                        maxlength="10"
                        onchange="setFormChanged();"
-                       class="jqueryCalendar"
                        autocomplete="off"
                 />
                 {calendarLinkDate}<span class="formErrorMessage">{dateMessage}</span>
@@ -701,7 +698,7 @@
 
             <td class="promptText">Complete On</td>
             <td class="fieldText">
-                <input type="text"
+                <input type="date"
                        title="Date when this request should be set to completed"
                        name="callActivity[1][completeDate]"
                        id="completeDate"
@@ -712,7 +709,6 @@
                        maxlength="10"
                        onchange="setFormChanged();"
                        autocomplete="off"
-                       class="jQueryCalendar"
                 />
                 <span class="formErrorMessage">{completeDateMessage}</span>
             </td>

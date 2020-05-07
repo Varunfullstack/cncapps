@@ -225,6 +225,7 @@ class CTContact extends CTCNC
                 'firstName'                            => Controller::htmlInputText(
                     $this->dsContact->getValue(DBEContact::firstName)
                 ),
+                'linkedInURL'                          => $this->dsContact->getValue(DBEContact::linkedInURL),
                 'firstNameMessage'                     => Controller::htmlDisplayText(
                     $this->dsContact->getMessage(DBEContact::firstName)
                 ),
@@ -372,9 +373,7 @@ class CTContact extends CTCNC
                 'pendingLeaverFlagChecked'             => ($this->dsContact->getValue(
                         DBEContact::pendingLeaverFlag
                     ) == 'Y') ? CT_CHECKED : null,
-                'pendingLeaverDate'                    => Controller::dateYMDtoDMY(
-                    $this->dsContact->getValue(DBEContact::pendingLeaverDate)
-                ),
+                'pendingLeaverDate'                    => $this->dsContact->getValue(DBEContact::pendingLeaverDate),
                 'urlSubmit'                            => $urlSubmit,
                 //				'urlCancel' => $urlCancel
             )

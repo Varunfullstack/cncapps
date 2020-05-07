@@ -99,10 +99,10 @@
                     const startDate = $('#startDate').val();
                     const endDate = $('#endDate').val();
                     if (startDate) {
-                        data.startDate = moment(startDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                        data.startDate = startDate
                     }
                     if (endDate) {
-                        data.endDate = moment(endDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                        data.endDate = endDate
                     }
                 }
             },
@@ -144,24 +144,21 @@
                 <div align="right">Created Between</div>
             </td>
             <td>
-                <input
-                        type="text"
-                        id="startDate"
-                        size="10"
-                        maxlength="10"
-                        onKeypress="javascript:submitOnReturn()"
-                        class="jqueryCalendar"
-                        autocomplete="off"
+                <input type="date"
+                       id="startDate"
+                       size="10"
+                       maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
                 >
-                and <input
-                    type="text"
-                    id="endDate"
-                    size="10"
-                    maxlength="10"
-                    onKeypress="javascript:submitOnReturn()"
-                    class="jqueryCalendar"
-                    autocomplete="off"
-            >
+                and
+                <input type="date"
+                       id="endDate"
+                       size="10"
+                       maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
+                >
             </td>
         </tr>
         <tr>

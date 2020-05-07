@@ -107,14 +107,7 @@ define(
     'CTACTIVITY_ACT_SKIP_SALES_ORDER',
     'skipSalesOrder'
 );
-define(
-    'CTACTIVITY_ACT_EXPORT_GENERATE',
-    'gscExportGenerate'
-);
-define(
-    'CTACTIVITY_ACT_EXPORT_FORM',
-    'gscExportForm'
-);
+
 define(
     'CTACTIVITY_ACT_SEND_VISIT_EMAIL',
     'sendVisitEmail'
@@ -742,13 +735,9 @@ class CTActivity extends CTCNC
                 'activityText'                => Controller::htmlDisplayText(
                     $dsSearchForm->getValue(BUActivity::searchFormActivityText)
                 ),
-                'fromDate'                    => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUActivity::searchFormFromDate)
-                ),
+                'fromDate'                    => $dsSearchForm->getValue(BUActivity::searchFormFromDate),
                 'fromDateMessage'             => $dsSearchForm->getMessage(BUActivity::searchFormFromDate),
-                'toDate'                      => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUActivity::searchFormToDate)
-                ),
+                'toDate'                      => $dsSearchForm->getValue(BUActivity::searchFormToDate),
                 'toDateMessage'               => $dsSearchForm->getMessage(BUActivity::searchFormToDate),
                 'rowsFound'                   => $dsSearchResults->rowCount(),
                 'urlCreateActivity'           => $urlCreateActivity,
@@ -2193,9 +2182,7 @@ class CTActivity extends CTCNC
                     $dsCallActivity->getValue(DBEJCallActivity::customerID)
                 ),
                 'urlMessageToSales'                  => $urlMessageToSales,
-                'callDate'                           => Controller::dateYMDtoDMY(
-                    $dsCallActivity->getValue(DBEJCallActivity::date)
-                ),
+                'callDate'                           => $dsCallActivity->getValue(DBEJCallActivity::date),
                 'customerItemID'                     => $dsCallActivity->getValue(DBEJCallActivity::customerItemID),
                 'contractDescription'                => $contractDescription,
                 'projectDescription'                 => Controller::htmlDisplayText(
@@ -3976,9 +3963,7 @@ class CTActivity extends CTCNC
             $dsSite = new DataSet($this);
             $buSite->getSiteByID($dbeProblem->getValue(DBEProblem::customerID), $siteNo, $dsSite);
 
-            $date = Controller::dateYMDtoDMY(
-                $activitiesByProblemID->getValue(DBEJCallActivity::date)
-            );
+            $date = $activitiesByProblemID->getValue(DBEJCallActivity::date);
             $startTime = $activitiesByProblemID->getValue(DBEJCallActivity::startTime);
             $endTime = $activitiesByProblemID->getValue(DBEJCallActivity::endTime);
             $duration = number_format($activitiesByProblemID->getValue(DBEJCallActivity::durationMinutes) / 60, 2);
@@ -4437,9 +4422,7 @@ class CTActivity extends CTCNC
                 'urlCustomer'                    => $this->getCustomerUrl(
                     $dsCallActivity->getValue(DBEJCallActivity::customerID)
                 ),
-                'date'                           => Controller::dateYMDtoDMY(
-                    $dsCallActivity->getValue(DBEJCallActivity::date)
-                ),
+                'date'                           => $dsCallActivity->getValue(DBEJCallActivity::date),
                 'dateMessage'                    => $dsCallActivity->getMessage(DBEJCallActivity::date),
                 'curValue'                       => $dsCallActivity->getValue(DBEJCallActivity::curValue),
                 'startTime'                      => $dsCallActivity->getValue(DBEJCallActivity::startTime),
@@ -4498,9 +4481,7 @@ class CTActivity extends CTCNC
                 'CONTRACT_DISABLED'              => $contract_disabled,
                 'setTimeNowLink'                 => $setTimeNowLink,
                 'calendarLinkDate'               => $calendarLinkDate,
-                'completeDate'                   => Controller::dateYMDtoDMY(
-                    $dsCallActivity->getValue(DBEJCallActivity::completeDate)
-                ),
+                'completeDate'                   => $dsCallActivity->getValue(DBEJCallActivity::completeDate),
                 'contactIDMessage'               => Controller::htmlDisplayText(
                     $dsCallActivity->getMessage(DBEJCallActivity::contactID)
                 ),
@@ -7305,110 +7286,5 @@ WHERE caa_problemno = ?
         $test = $result->fetch_assoc();
 
         return !!$test['hiddenChargeableActivities'];
-    }
-
-    function secsToText($time)
-    {
-        return str_pad(
-                (int)floor($time / 3600),
-                2,
-                0,
-                STR_PAD_LEFT
-            ) . ':' . str_pad(
-                (int)floor($time / 60) % 60,
-                2,
-                0,
-                STR_PAD_LEFT
-            );
-    }
-
-    function parseWarrantySelector($warrantyID)
-    {
-        // Manufacturer selector
-        $dbeWarranty = new DBEWarranty($this);
-        $dbeWarranty->getRows();
-        $this->template->set_block(
-            'CallDisplay',
-            'warrantyBlock',
-            'warranties'
-        );
-        while ($dbeWarranty->fetchNext()) {
-            $this->template->set_var(
-                array(
-                    'warrantyDescription' => $dbeWarranty->getValue(DBEWarranty::description),
-                    'warrantyID'          => $dbeWarranty->getValue(DBEWarranty::warrantyID),
-                    'warrantySelected'    => ($warrantyID == $dbeWarranty->getValue(
-                            DBEWarranty::warrantyID
-                        )) ? CT_SELECTED : null
-                )
-            );
-            $this->template->parse(
-                'warranties',
-                'warrantyBlock',
-                true
-            );
-        } // while ($dbeWarranty->fetchNext()
-    }
-
-    function awaitingCustomerDropdown(
-        $awaitingCustomerResponseFlag,
-        $template = 'ActivityCreate6',
-        $block = 'awaitingCustomerBlock'
-    )
-    {
-        $this->template->set_block(
-            $template,
-            $block,
-            'awaitingCustomer'
-        );
-
-        foreach ($this->buActivity->awaitingCustomerArray as $key => $value) {
-
-            $awaitingCustomerResponseFlagSelected = ($awaitingCustomerResponseFlag == $key) ? CT_SELECTED : null;
-
-            $this->template->set_var(
-                array(
-                    'awaitingCustomerResponseFlagSelected' => $awaitingCustomerResponseFlagSelected,
-                    'awaitingCustomerResponseFlag'         => $key,
-                    'awaitingCustomerDesc'                 => $value
-                )
-            );
-            $this->template->parse(
-                'awaitingCustomer',
-                $block,
-                true
-            );
-        }
-    }
-
-    function serverGuardDropdown(
-        $selectedID,
-        $template = 'ActivityCreate9',
-        $block = 'serverGuardBlock'
-    )
-    {
-
-        $this->template->set_block(
-            $template,
-            $block,
-            'serverGuards'
-        );
-
-        foreach ($this->serverGuardArray as $key => $value) {
-            $serverGuardSelected = ($selectedID == $key) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    'serverGuardSelected'    => $serverGuardSelected,
-                    'serverGuardValue'       => $key,
-                    'serverGuardDescription' => $value
-                )
-            );
-            $this->template->parse(
-                'serverGuards',
-                $block,
-                true
-            );
-        }
-
     }
 }

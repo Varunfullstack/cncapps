@@ -373,14 +373,12 @@ class CTUser extends CTCNC
                     DBEUser::encryptedDateOfBirth
                 ) ? 'greenPencil' : 'redPencil',
                 "encryptedDateOfBirth"                       => $this->dsUser->getValue(DBEUser::encryptedDateOfBirth),
-                "startDate"                                  => Controller::dateYMDtoDMY(
-                    $this->dsUser->getValue(DBEUser::startDate)
+                "startDate"                                  => $this->dsUser->getValue(DBEUser::startDate),
+                "companyHealthcareStartDate"                 => $this->dsUser->getValue(
+                    DBEUser::companyHealthcareStartDate
                 ),
-                "companyHealthcareStartDate"                 => Controller::dateYMDtoDMY(
-                    $this->dsUser->getValue(DBEUser::companyHealthcareStartDate)
-                ),
-                "enhancedCNC2YearPensionStartDate"           => Controller::dateYMDtoDMY(
-                    $this->dsUser->getValue(DBEUser::enhancedCNC2YearPensionStartDate)
+                "enhancedCNC2YearPensionStartDate"           => $this->dsUser->getValue(
+                    DBEUser::enhancedCNC2YearPensionStartDate
                 ),
                 "pensionAdditionalPaymentsPencilColor"       => $this->dsUser->getValue(
                     DBEUser::encryptedPensionAdditionalPayments
@@ -596,7 +594,7 @@ class CTUser extends CTCNC
                 'offsiteBackupAdditionalPermissionsFlagChecked' => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::offsiteBackupAdditionalPermissionsFlag)
                 ),
-                'additionalTimeLevelApproverChecked'                 => $dsUser->getValue(
+                'additionalTimeLevelApproverChecked'            => $dsUser->getValue(
                     DBEUser::additionalTimeLevelApprover
                 ) ? 'checked' : null,
                 'reportsChecked'                                => (strpos(

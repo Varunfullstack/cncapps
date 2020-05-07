@@ -57,11 +57,11 @@
     });
 
     function setStartDate(momentDate) {
-        startDateInput.val(momentDate.format('DD/MM/YYYY'));
+        startDateInput.val(momentDate.format('YYYY-MM-DD'));
     }
 
     function setEndDate(momentDate) {
-        endDateInput.val(momentDate.format('DD/MM/YYYY'));
+        endDateInput.val(momentDate.format('YYYY-MM-DD'));
     }
 
     function forcedSearch(option) {
@@ -92,13 +92,17 @@
     <tbody>
     <tr>
         <td>Start Date</td>
-        <td><input name="startDate"
-                   class="jqueryCalendar"
-        ></td>
+        <td>
+            <input name="startDate"
+                   type="date"
+            >
+        </td>
         <td>End Date</td>
-        <td><input name="endDate"
-                   class="jqueryCalendar"
-        ></td>
+        <td>
+            <input name="endDate"
+                   type="date"
+            >
+        </td>
         <td>
             <button onclick="forcedSearch(1)">This Week</button>
             <button onclick="forcedSearch(2)">Yesterday</button>

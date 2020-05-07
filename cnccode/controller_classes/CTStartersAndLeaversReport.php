@@ -135,12 +135,8 @@ class CTStartersAndLeaversReport extends CTCNC
                 'formError'        => $this->formError,
                 'customerID'       => $dsSearchForm->getValue(BUStartersAndLeaversReport::searchFormCustomerID),
                 'customerString'   => $customerString,
-                'startDate'        => self::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUStartersAndLeaversReport::searchFormStartDate)
-                ),
-                'endDate'          => self::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUStartersAndLeaversReport::searchFormEndDate)
-                ),
+                'startDate'        => $dsSearchForm->getValue(BUStartersAndLeaversReport::searchFormStartDate),
+                'endDate'          => $dsSearchForm->getValue(BUStartersAndLeaversReport::searchFormEndDate),
                 'urlCustomerPopup' => $urlCustomerPopup,
                 'urlSubmit'        => $urlSubmit,
             )

@@ -333,32 +333,32 @@
             <td class="promptText">
                 <div align="right">Raised from</div>
             </td>
-            <td><input type="text"
+            <td>
+                <input type="date"
                        name="activity[1][fromDate]"
                        id="fromDate"
                        value="{fromDate}"
                        size="10"
                        maxlength="10"
                        onKeypress="javascript:submitOnReturn()"
-                       class="jqueryCalendar"
                        autocomplete="off"
-            > <span
+                > <span
                     class="formErrorMessage"
-            >{fromDateMessage}</span></td>
+            >{fromDateMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText">
                 <div align="right">to</div>
             </td>
             <td>
-                <input type="text"
+                <input type="date"
                        name="activity[1][toDate]"
                        id="toDate"
                        value="{toDate}"
                        size="10"
                        maxlength="10"
                        onKeypress="javascript:submitOnReturn()"
-                       class="jqueryCalendar"
                        autocomplete="off"
                 >
                 <span class="formErrorMessage">{toDateMessage}</span>

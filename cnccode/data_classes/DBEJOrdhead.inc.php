@@ -156,7 +156,6 @@ class DBEJOrdhead extends DBEOrdhead
         }
         $statement = $statement . " ORDER BY " . $this->getDBColumnName(self::date) . " DESC";
         $statement = $statement . " LIMIT 0,200";
-
         $this->setQueryString($statement);
         $ret = (parent::getRows());
         return $ret;
