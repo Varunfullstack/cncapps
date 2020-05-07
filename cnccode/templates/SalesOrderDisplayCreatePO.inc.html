@@ -7,8 +7,14 @@
 
         const requiredByDate = $('#requiredByDate').val();
 
+        const tbcInput = document.getElementById('tbc');
+
         if (requiredByDate) {
             url += ("&requiredByDate=" + requiredByDate);
+        } else {
+            if (!tbcInput.checked) {
+                return alert("Provide a date, or check the TBC checkbox!");
+            }
         }
         document.location = url;
     }
@@ -24,6 +30,10 @@
            name="requiredByDate"
            id="requiredByDate"
            value="{requiredByDateValue}"
+    >
+    Date TBC
+    <input type="checkbox"
+           id="tbc"
     >
 </label>
 <!-- End Template: SalesOrderDisplayCreatePO.inc.html -->
