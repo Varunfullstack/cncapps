@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 864 - Contract Expiry Date in Customer Profitability Report Tweak
+
 ## [v3.13.6] - 2020-05-05
 ### Fixed
 - Fixed issue with "Allow SRs to be logged against this contract" checkbox not working properly

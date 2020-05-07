@@ -12,7 +12,6 @@ BEGIN
     DECLARE nextExpiryDate DATE;
     DECLARE monthDifference INT;
     DECLARE yearDifference INT;
-    DECLARE dayDifference INT;
     DECLARE expiryDate DATE;
 
     SET initialContractLength = IFNULL(initialContractLength, 12);
@@ -35,13 +34,8 @@ BEGIN
         SET nextExpiryDate = firstExpiryDate;
     END IF;
 
-
-    SET monthDifference = TIMESTAMPDIFF(MONTH, nextExpiryDate, CURRENT_DATE);
-
-    SET yearDifference = TIMESTAMPDIFF(YEAR, nextExpiryDate, CURRENT_DATE);
-
-    SET dayDifference = TIMESTAMPDIFF(DAY, nextExpiryDate, CURRENT_DATE);
-
+    SET monthDifference = TIMESTAMPDIFF(MONTH, CURRENT_DATE, nextExpiryDate);
+    SET yearDifference = TIMESTAMPDIFF(YEAR, CURRENT_DATE, nextExpiryDate);
     SET expiryDate = nextExpiryDate;
 
     IF NOT yearDifference AND monthDifference < 3 THEN
