@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 840 - PO Status v10
+
 ## [v3.14.1] - 2020-05-11
 ### Fixed
 - Fixed issue with searching in CustomerItem.php
