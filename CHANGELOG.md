@@ -20,6 +20,7 @@ This project changes will be shown here.
 - Issue 849 - You have open requests emails sometimes listing wrong To: field
 - Issue 853 - Overtime & Expenses Tweaks
 - Issue 856 - Password Services - One Per Customer not setting zero in database
+- Issue 864 - Contract Expiry Date in Customer Profitability Report Tweak
 
 ## [v3.13.6] - 2020-05-05
 ### Fixed
