@@ -853,8 +853,9 @@ class BUActivity extends Business
                 'N'
             );
 
+
             $dbeProblem->updateRow();
-            $message = "Escalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
+            $message = "{$this->dbeUser->getValue(DBEUser::name)} Escalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
             if ($dbeProblem->getValue(DBEProblem::status) == 'P') {
                 $message .= " because of {$reason}";
             }
@@ -910,7 +911,7 @@ class BUActivity extends Business
             );
 
             $dbeProblem->updateRow();
-            $message = "Deescalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
+            $message = "{$this->dbeUser->getValue(DBEUser::name)} Deescalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
             if ($dbeProblem->getValue(DBEProblem::status) == 'P') {
                 $message .= " because of {$reason}";
             }
