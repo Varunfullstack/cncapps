@@ -1,18 +1,14 @@
 {# @var sideMenu \CNCLTD\SideMenu #}
 {# @var section \CNCLTD\MenuSection #}
 {% for section in sideMenu.sections %}
-    <li class="menu-item-has-children active dropdown">
-        <a href="#"
-           class="dropdown-toggle"
-           data-toggle="dropdown"
-           aria-haspopup="true"
-           aria-expanded="false"
-           data-placement="right" title="{{ section.name }}"
-        >
-            <i class="menu-icon fa {{ section.icon }}"></i>{{ section.name }}
+    <li class="sub-menu">
+        <a href="javascript:void(0);"><i class="fa {{ section.icon }}" data-placement="right" title="{{ section.name }}">
+
+            </i><span>{{ section.name }}</span>
+            <i class="arrow fa fa-angle-right pull-right"></i>
         </a>
-        <ul class="sub-menu children dropdown-menu">
-            {# @var item \CNCLTD\MenuItem #}
+        <ul class="children">
+
             {% for item in section.items %}
 
                 <li data-menu-id="{{ item.id }}"><a href="{{ item.href }}"

@@ -38,9 +38,8 @@
           href="https://cdn.datatables.net/fixedheader/3.1.6/css/fixedHeader.dataTables.min.css"
     >
     <link rel="stylesheet"
-          href="boilerplate.css"
+          href="css/boilerplate.min.css"
     >
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <!--<script type="text/javascript">-->
     <!--var owa_baseUrl = 'http://webanalytics:89/';-->
     <!--var owa_cmds = owa_cmds || [];-->
@@ -613,80 +612,84 @@
 </head>
 <body
 >
-<aside id="left-panel"
-       class="left-panel"
->
-    <nav class="navbar navbar-expand-sm navbar-default">
 
-        <div class="navbar-header">
-            <button class="navbar-toggler"
-                    type="button"
-                    data-toggle="collapse"
-                    data-target="#main-menu"
-                    aria-controls="main-menu"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation"
-            >
-                <i class="fa fa-bars"></i>
-            </button>
-            <a class="navbar-brand pt-3 pb-3"
-               href="./"
-            ><img src="images/cnc-logo-white.png"
-                  alt="Logo"
-                  height="75"
-            ></a>
-            <a class="navbar-brand hidden pt-3 pb-3"
-               href="./"
-            ><img src="images/cnc-small-logo-30-30.png"
-                  alt="Logo"
-                  height="25"
-            ></a>
+<aside class="sidebar">
+    <div id="leftside-navigation" class="nano">
+        <div class="header-logo text-align-center">
+            <a href="index.html">
+                <img id="cnc-logo" src="images/cnc-logo-white.png" data-swap="images/cnc-small-logo.png" alt="">
+            </a>
         </div>
 
-        <div id="main-menu"
-             class="main-menu collapse navbar-collapse"
-        >
-            <ul class="nav navbar-nav">
-                {sideMenu}
-                <li id="aboutLink">
-                    <a href="About.php"> <i class="menu-icon fa fa-info-circle"></i>About</a>
-                </li>
-                <li class="menu-item-has-children dropdown">
-                    <a href="#"
-                       class="dropdown-toggle"
-                       data-toggle="dropdown"
-                       aria-haspopup="true"
-                       aria-expanded="false"
-                    > <i class="menu-icon fa fa-user-circle"></i>{userName}</a>
-                    <ul class="sub-menu children dropdown-menu">
-                        <li><i class="fa fa-sign-out"></i><a href="index.php?action=logout">Logout</a></li>
+        <ul class="nano-content">
+            {sideMenu}
+        </ul>
+        <div class="text-align-center sidebarToggle">
+            <button id="sidebarToggle"> <i class="fa fa-angle-left"></i></button>
+        </div>
+    </div>
+</aside>
+<!--<aside id="left-panel"-->
+       <!--class="left-panel"-->
+<!--&gt;-->
+    <!--<nav class="navbar navbar-expand-sm navbar-default">-->
 
-                    </ul>
-                </li>
+        <!--<div class="navbar-header">-->
+            <!--<button class="navbar-toggler"-->
+                    <!--type="button"-->
+                    <!--data-toggle="collapse"-->
+                    <!--data-target="#main-menu"-->
+                    <!--aria-controls="main-menu"-->
+                    <!--aria-expanded="false"-->
+                    <!--aria-label="Toggle navigation"-->
+            <!--&gt;-->
+                <!--<i class="fa fa-bars"></i>-->
+            <!--</button>-->
+            <!--<a class="navbar-brand pt-3 pb-3"-->
+               <!--href="./"-->
+            <!--&gt;<img src="images/cnc-logo-white.png"-->
+                  <!--alt="Logo"-->
+                  <!--height="75"-->
+            <!--&gt;</a>-->
+            <!--<a class="navbar-brand hidden pt-3 pb-3"-->
+               <!--href="./"-->
+            <!--&gt;<img src="images/cnc-small-logo-30-30.png"-->
+                  <!--alt="Logo"-->
+                  <!--height="25"-->
+            <!--&gt;</a>-->
+        <!--</div>-->
+
+        <!--<div id="main-menu"-->
+             <!--class="main-menu collapse navbar-collapse"-->
+        <!--&gt;-->
+            <!--<ul class="nav navbar-nav">-->
+                <!--{sideMenu}-->
+                <!--<li id="aboutLink">-->
+                    <!--<a href="About.php"> <i class="menu-icon fa fa-info-circle"></i>About</a>-->
+                <!--</li>-->
+                <!--<li class="menu-item-has-children dropdown">-->
+                    <!--<a href="#"-->
+                       <!--class="dropdown-toggle"-->
+                       <!--data-toggle="dropdown"-->
+                       <!--aria-haspopup="true"-->
+                       <!--aria-expanded="false"-->
+                    <!--&gt; <i class="menu-icon fa fa-user-circle"></i>{userName}</a>-->
+                    <!--<ul class="sub-menu children dropdown-menu">-->
+                        <!--<li><i class="fa fa-sign-out"></i><a href="index.php?action=logout">Logout</a></li>-->
+
+                    <!--</ul>-->
+                <!--</li>-->
 
 
-            </ul>
-        </div><!-- /.navbar-collapse -->
-    </nav>
-</aside><!-- /#left-panel -->
+            <!--</ul>-->
+        <!--</div>&lt;!&ndash; /.navbar-collapse &ndash;&gt;-->
+    <!--</nav>-->
+<!--</aside>&lt;!&ndash; /#left-panel &ndash;&gt;-->
 
-<div id="right-panel"
+<div id="main"
      class="right-panel"
+
 >
-    <!-- Header-->
-    <header id="header"
-            class="header"
-    >
-
-        <div class="header-menu">
-
-            <div class="col-sm-7">
-                <a id="menuToggle" class="menutoggle pull-left"><i class="fa fa fa-chevron-left"></i></a>
-            </div>
-        </div>
-
-    </header><!-- /header -->
-    <!-- Header-->
 
     <table width="100%"
            border="0"
@@ -702,18 +705,72 @@
     </table>
     {changeLogStuff}
 </div><!-- /#right-panel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+<!--<script src="./script.js"></script>-->
 
 
 <script type="application/javascript">
     const menuId = "{menuId}";
     $(document).ready(function () {
-        if (menuId) {
-            let selector = $('li[data-menu-id="' + menuId + '"] a');
-            $(selector).closest('.dropdown').addClass('show');
-            $(selector).closest('.dropdown-menu').addClass('show');
-            $(selector)[0].style.setProperty("color", "#fff", "important");
-        }
+        console.log('jquery ready');
+
+        /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+        var sidebar = $(".sidebar");
+        var mainContent = $("#main");
+
+        var sidebarTitles = $(".sidebar span");
+        var sidebarArrows = $(".sidebar i.arrow");
+
+        $("#leftside-navigation .sub-menu > a").click(function (e) {
+
+            $("#leftside-navigation ul ul").slideUp();
+            $(this).next().is(":visible") || $(this).next().slideDown();
+
+            e.stopPropagation()
+        });
+
+        $("#sidebarToggle").click(function (e) {
+            $(this).find('i').toggleClass('fa-angle-right fa-angle-left')
+            var image = $("#cnc-logo");
+            var current = image.attr("src");
+            var swap = image.attr("data-swap");
+            image.attr('src', swap).attr("data-swap",current);
+
+            sidebar.toggleClass( 'collapsed', 'addOrRemove' );
+            mainContent.toggleClass( 'expanded', 'addOrRemove' );
+            if (sidebar.is('.collapsed')) {
+                sidebarTitles.css("display", "none");
+                sidebarTitles.css("opacity", "0");
+                sidebarArrows.css("display", "none");
+                image.width('25');
+                image.width('25');
+
+            } else {
+                sidebarTitles.css("display", "inline-block");
+                sidebarTitles.css("opacity", "1");
+                sidebarArrows.css("display", "inline-block");
+                image.width('');
+                image.width('');
+            }
+
+
+        });
+
     });
+
+
+    function openNav() {
+        document.getElementsByClassName("sidebar").style.width = "170px";
+        document.getElementById("main").style.marginLeft = "170px";
+    }
+
+    function closeNav() {
+        document.getElementsByClassName("sidebar").style.width = "0px";
+        document.getElementById("main").style.marginLeft= "0px";
+    }
+
+
     jQuery(document).ready(function ($) {
         "use strict";
         [].slice.call(document.querySelectorAll('select.cs-select')).forEach(function (el) {
@@ -721,7 +778,13 @@
         });
 
         jQuery('.selectpicker').selectpicker;
-
+        if (menuId) {
+            let selector = $('li[data-menu-id="' + menuId + '"]');
+            ///// DO NOT TOUCH!
+            selector.closest('.sub-menu').find('a').click();
+            /////// OOFFFFFFFLIMITISSS
+            $(selector)[0].classList.add('active');
+        }
 
         $('#menuToggle').on('click', function (event) {
             $('body').toggleClass('open');
@@ -758,10 +821,7 @@
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
         crossorigin="anonymous"
 ></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"
-></script>
+
 </body>
 </html>
 <!-- End template: screen.inc.html -->
