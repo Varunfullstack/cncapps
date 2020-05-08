@@ -12,7 +12,7 @@
 
         const statusElement = document.querySelector("[name='callActivity[1][problemStatus]']");
 
-        if(statusElement.value === "P") {
+        if (statusElement.value === "P") {
             // this is non-exempt status
             const escalationReason = prompt('Please provide your reason for escalating this SR(Required)');
             if (!escalationReason) {
@@ -27,6 +27,15 @@
 
         return true;
 
+    }
+
+    function checkUpload() {
+        const uploadInput = document.querySelector('input[name="userfile[]"]');
+        if (!uploadInput.files.length) {
+            alert('Please select the files to upload first');
+            return false;
+        }
+        return true;
     }
 
     function showSalesRequestDialog() {
@@ -99,14 +108,13 @@
     var formChanged = false;
 
     function checkCustomerAction() {
-        debugger;
         const alarmDate = $('#alarmDate');
         const alarmTime = $('#alarmTime');
         let time = moment().format('HH:mm');
         if (alarmTime.val()) {
             time = alarmTime.val();
         }
-        let dateMoment = moment(alarmDate.val() + " " + time, 'DD/MM/YYYY HH:mm');
+        let dateMoment = moment(alarmDate.val() + " " + time, 'YYYY-MM-DD HH:mm');
         if (!dateMoment.isValid() || dateMoment.isSameOrBefore(moment(), 'minute')
         ) {
             alert('Please provide a future date and time, or just a future date');
@@ -913,6 +921,8 @@
                         <form action="{urlUploadFile}"
                               method="post"
                               enctype="multipart/form-data"
+                              onsubmit="return checkUpload();"
+
                         >
                             <input type="hidden"
                                    name="edit"

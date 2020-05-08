@@ -1,0 +1,7 @@
+{% extends "@internal/wrapper.html.twig" %}
+{% block content %}
+    <p>
+        SR <a href="{{ serviceRequestLink }}">{{ serviceRequestId }}</a> does not have a fixed activity and therefore
+        can't be closed, please review and correct.
+    </p>
+{% endblock %}

@@ -12,7 +12,7 @@ This project changes will be shown here.
 - Issue 847 - Moving SRs between teams requires reason
 - Issue 845 - O365 Mailbox Export Authentication & Formatting Improvements
 - Issue 823 - Customer CRM Page improvements
-- Fixed activity hidden when final activity hidden
+- Issue 863 - Fixed activity hidden when final activity hidden
 ### Fixed
 - Issue 832 - Review Meeting Booked Meetings not showing as booked
 - Issue 835 - Customer Item Renewal Status does not work

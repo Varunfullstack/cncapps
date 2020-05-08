@@ -4485,9 +4485,7 @@ class CTActivity extends CTCNC
                 'contactIDMessage'               => Controller::htmlDisplayText(
                     $dsCallActivity->getMessage(DBEJCallActivity::contactID)
                 ),
-                'alarmDate'                      => Controller::dateYMDtoDMY(
-                    $dsCallActivity->getValue(DBEJCallActivity::alarmDate)
-                ),
+                'alarmDate'                      => $dsCallActivity->getValue(DBEJCallActivity::alarmDate),
                 'alarmTime'                      => $dsCallActivity->getValue(
                     DBEJCallActivity::alarmTime
                 ) != '00:00:00' ? $dsCallActivity->getValue(DBEJCallActivity::alarmTime) : null,

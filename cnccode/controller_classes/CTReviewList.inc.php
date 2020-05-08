@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
@@ -59,7 +60,7 @@ class CTReviewList extends CTCNC
                if(con_phone, con_phone, null),
                if(con_mobile_phone, con_mobile_phone, null),
                if(add_phone, add_phone, null)
-           )                                         as contactPhone,
+           ) as contactPhone,
        c.name                                        as leadStatus,
        (select cno_details
         from customernote
@@ -134,8 +135,7 @@ where reviewDate IS NOT NULL
                 "recordsTotal"    => $totalCount,
                 "recordsFiltered" => $filteredCount,
                 "data"            => $overtimes
-            ],
-            JSON_NUMERIC_CHECK
+            ]
         );
 
 

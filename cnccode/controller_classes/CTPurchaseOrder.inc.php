@@ -859,8 +859,8 @@ class CTPurchaseOrder extends CTCNC
                         DBEPorline::curUnitCost
                     ) && $dsPorline->getValue(DBEPorline::itemID) != 1491) {
                     $expectedDate = DateTime::createFromFormat(
-                        $dsPorline->getValue(DBEJPorline::expectedDate),
-                        DATE_MYSQL_DATE
+                        DATE_MYSQL_DATE,
+                        $dsPorline->getValue(DBEJPorline::expectedDate)
                     )
                         ->format('d/m/Y');
                 } else {

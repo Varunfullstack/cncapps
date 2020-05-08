@@ -631,7 +631,7 @@ class CTSalesOrder extends CTCNC
             return;
         }
 
-        if ($this->getToDate() < $this->getFromDate()) {
+        if ($this->getToDate() && $this->getFromDate() && $this->getToDate() < $this->getFromDate()) {
             $this->setToDateMessage(CTSALESORDER_TO_DATE_SMALLER);
         }
 

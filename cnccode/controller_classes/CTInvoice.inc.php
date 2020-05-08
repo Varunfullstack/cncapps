@@ -1547,9 +1547,7 @@ class CTInvoice extends CTCNC
                 'creditCost'              => Controller::htmlDisplayText(
                     $dsCreditValues->getValue(DBEInvoiceTotals::costValue)
                 ),
-                'startDate'               => Controller::dateYMDtoDMY(
-                    $this->dsPrintRange->getValue(BUInvoice::searchFormStartDate)
-                ),
+                'startDate'               => $this->dsPrintRange->getValue(BUInvoice::searchFormStartDate),
                 'startDateMessage'        => Controller::htmlDisplayText(
                     $this->dsPrintRange->getMessage(BUInvoice::searchFormStartDate)
                 ),

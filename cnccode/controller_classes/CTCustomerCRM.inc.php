@@ -218,7 +218,7 @@ class CTCustomerCRM extends CTCustomer
                 @$value[DBECustomer::rating]
             );
             $reviewDate = DateTime::createFromFormat(
-                'd/m/Y',
+                'Y-m-d',
                 @$value[DBECustomer::reviewDate]
             );
 

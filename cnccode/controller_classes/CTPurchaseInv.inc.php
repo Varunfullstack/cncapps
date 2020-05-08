@@ -278,7 +278,7 @@ class CTPurchaseInv extends CTCNC
                 'porheadID'           => $porheadID,
                 'supplierName'        => Controller::htmlDisplayText($dsPorhead->getValue(DBEJPorhead::supplierName)),
                 'vatRate'             => $dsPorhead->getValue(DBEJPorhead::vatRate),
-                'purchaseInvoiceDate' => Controller::dateYMDtoDMY(($this->getParam('purchaseInvoiceDate'))),
+                'purchaseInvoiceDate' => $this->getParam('purchaseInvoiceDate'),
                 'purchaseInvoiceNo'   => Controller::htmlDisplayText($this->getParam('purchaseInvoiceNo')),
                 'urlUpdate'           => $urlUpdate,
                 'urlPurchaseOrder'    => $urlPurchaseOrder,

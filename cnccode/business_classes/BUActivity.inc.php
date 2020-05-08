@@ -854,10 +854,14 @@ class BUActivity extends Business
             );
 
             $dbeProblem->updateRow();
-
+            $message = "Escalated from {$this->workQueueDescriptionArray[$oldQueueNo]} to {$this->workQueueDescriptionArray[$newQueueNo]}";
+            if ($dbeProblem->getValue(DBEProblem::status) == 'P') {
+                $message .= " because of {$reason}";
+            }
+            $message .= ".";
             $this->logOperationalActivity(
                 $problemID,
-                'Escalated from ' . $this->workQueueDescriptionArray[$oldQueueNo] . ' to ' . $this->workQueueDescriptionArray[$newQueueNo] . " because of " . $reason
+                $message
             );
         }
         return true;
