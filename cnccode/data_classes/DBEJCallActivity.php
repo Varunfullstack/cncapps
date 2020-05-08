@@ -474,7 +474,7 @@ class DBEJCallActivity extends DBECallActivity
                 $this->db->link_id(),
                 $problemId
             ) . " and caa_callacttypeno not in (59,60,61)";
-        $query .= " ORDER BY caa_date, caa_starttime limit 1";
+        $query .= " ORDER BY caa_date desc, caa_starttime desc limit 1";
         $this->setQueryString($query);
 
         if (!$this->getRows()) {

@@ -666,10 +666,18 @@ class BUProblemSLA extends Business
             $dbeCallActivity = $this->buActivity->getLastActivityInProblem($problemID);
             if ($dbeCallActivity) {
 
-
+                ?>
+                <div>
+                Problem: <?= $problemID ?>
+                <?php
                 $buActivity = new BUActivity($this);
                 $fixedActivity = $buActivity->getFixedActivityInProblem($problemID);
                 if (!$fixedActivity) {
+                    ?>
+                    <h2>This SR doesn't have a fixed activity!!</h2>
+                    </div>
+                    <?php
+
                     $this->sendNoFixedActivityAlert($problemID);
                     continue;
                 }
@@ -683,7 +691,9 @@ class BUProblemSLA extends Business
                         date('U'),
                         // from now
                         strtotime(
-                            $this->dbeProblem->getValue(DBEProblem::completeDate) . ' ' . $dbeCallActivity->getValue(
+                            $this->dbeProblem->getValue(
+                                DBEProblem::completeDate
+                            ) . ' ' . $dbeCallActivity->getValue(
                                 DBEJCallActivity::endTime
                             )
                         )
@@ -711,36 +721,35 @@ class BUProblemSLA extends Business
                 );
 
                 ?>
+
                 <div>
-                    Problem: <?= $problemID ?>
-                    <div>
-                        Rootcause id = <?= $this->dbeProblem->getValue(DBEProblem::rootCauseID) ?>
-                    </div>
-                    <div>
-                        Server Care Contract id = <?= $serverCareContractID ?>
-                    </div>
-                    <div>
-                        Fixed Date = <?= $fixedDate ?>
-                    </div>
-                    <div>
-                        Total Activity Duration Hours = <?= $this->dbeProblem->getValue(
-                            DBEProblem::totalActivityDurationHours
-                        ) ?>
-                    </div>
-                    <ul>
-                        <li>
-                            Server Care Check: <?= $serverCareContractID ? 'true' : 'false' ?>
-                        </li>
-                        <li>
-                            $thresholdCheck: <?= $thresholdCheck ? 'true' : 'false' ?>
-                        </li>
-                        <li>
-                            $fixedDateCheck: <?= $fixedDateCheck ? 'true' : 'false' ?>
-                        </li>
-                        <li>
-                            $reasonCheck: <?= $reasonCheck ? 'true' : 'false' ?>
-                        </li>
-                    </ul>
+                    Rootcause id = <?= $this->dbeProblem->getValue(DBEProblem::rootCauseID) ?>
+                </div>
+                <div>
+                    Server Care Contract id = <?= $serverCareContractID ?>
+                </div>
+                <div>
+                    Fixed Date = <?= $fixedDate ?>
+                </div>
+                <div>
+                    Total Activity Duration Hours = <?= $this->dbeProblem->getValue(
+                        DBEProblem::totalActivityDurationHours
+                    ) ?>
+                </div>
+                <ul>
+                    <li>
+                        Server Care Check: <?= $serverCareContractID ? 'true' : 'false' ?>
+                    </li>
+                    <li>
+                        $thresholdCheck: <?= $thresholdCheck ? 'true' : 'false' ?>
+                    </li>
+                    <li>
+                        $fixedDateCheck: <?= $fixedDateCheck ? 'true' : 'false' ?>
+                    </li>
+                    <li>
+                        $reasonCheck: <?= $reasonCheck ? 'true' : 'false' ?>
+                    </li>
+                </ul>
                 </div>
                 <?php
 
@@ -811,7 +820,6 @@ class BUProblemSLA extends Business
         $manager = new DBEUser($this);
         $manager->getRow($managerId);
 
-
         $activityURL = SITE_URL . Controller::formatForHTML(
                 '/Activity.php?action=displayLastActivity&problemID=' . $serviceRequestId,
                 1
@@ -822,14 +830,12 @@ class BUProblemSLA extends Business
         global $twig;
 
         $body = $twig->render(
-            '@internal/wrapper.html.twig',
+            '@internal/toBeClosedSRMissingFixedEmail.html.twig',
             [
                 "serviceRequestLink" => $activityURL,
                 "serviceRequestId"   => $serviceRequestId
             ]
         );
-
-
         $emailTo = $manager->getEmail();
 
         $hdrs = array(
