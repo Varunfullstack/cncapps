@@ -456,18 +456,19 @@ class CTPurchaseInv extends CTCNC
             $this->display();
             exit;
         }
-        $dateArray = explode('/', $this->getParam('purchaseInvoiceDate'));
-        if (!checkdate($dateArray[1], $dateArray[0], $dateArray[2])) {
+        $dateString = $this->getParam('purchaseInvoiceDate');
+
+        $date = DateTime::createFromFormat(DATE_MYSQL_DATE, $dateString);
+        if (!$date) {
             $this->setFormErrorMessage('Please enter a valid purchase invoice date');
             $this->display();
             exit;
-        } else {
-            $invoiceDateYMD = $dateArray[2] . '-' . $dateArray[1] . '-' . $dateArray[0];
         }
+
         $this->buPurchaseInv->update(
             $this->getParam('porheadID'),
             $this->getParam('purchaseInvoiceNo'),
-            $invoiceDateYMD,
+            $date->format(DATE_MYSQL_DATE),
             $dsPurchaseInv,
             $this->userID
         );
