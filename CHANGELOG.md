@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v3.14.0]
+## [v3.14.0] - 2020-05-08
 ### Changed
 - Issue 833 - Additional pages to lock out contract choices
 - Issue 834 - Show SR number on Fixed Page
