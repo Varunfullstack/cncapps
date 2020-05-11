@@ -857,9 +857,7 @@ class CTPurchaseOrder extends CTCNC
             while ($dsPorline->fetchNext()) {
                 $sequenceNo = $dsPorline->getValue(DBEJPorline::sequenceNo);
                 $itemDescription = $dsPorline->getValue(DBEJPorline::itemDescription);
-                if ($dsPorhead->getValue(DBEJPorhead::orderedByName) && $dsPorline->getValue(
-                        DBEPorline::expectedDate
-                    ) && (float)$dsPorline->getValue(
+                if ((float)$dsPorline->getValue(
                         DBEPorline::curUnitCost
                     ) && $dsPorline->getValue(DBEPorline::itemID) != 1491) {
                     $checkedAttribute = $dsPorline->getValue(DBEPorline::expectedTBC) ? 'checked' : null;
