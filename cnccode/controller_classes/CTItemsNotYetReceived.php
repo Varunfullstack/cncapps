@@ -146,6 +146,18 @@ class CTItemsNotYetReceived extends CTCNC
                     $purchaseOrderLineLink = "<a href='" . $purchaseOrderLineURL . "' target='_blank'>" . $expectedDate . "</a>";
                 }
             }
+            $expectedColor = null;
+            if ($expectedDate) {
+                $expectedDateDateTime = DateTime::createFromFormat(DATE_MYSQL_DATE, $expectedDate);
+
+                if ($expectedDateDateTime <= new DateTime()) {
+                    $expectedColor = "#F8A5B6";
+                }
+
+            } elseif ($item->getExpectedTBC()) {
+                $expectedDate = "TBC";
+                $expectedColor = "#FFEB9C";
+            }
 
 
             $this->template->set_var(
@@ -175,6 +187,7 @@ class CTItemsNotYetReceived extends CTCNC
                     )->format(DATE_MYSQL_DATE) : null,
                     "supplierRef"           => $item->getSupplierRef(),
                     "color"                 => $item->color(),
+                    "expectedColor"         => $expectedColor ? "style='background-color:$expectedColor'" : null,
                     "projectLink"           => $projectLink,
                     "salesOrderLink"        => $salesOrderLink,
                     "SRLink"                => $serviceRequestLink
