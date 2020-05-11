@@ -37,6 +37,7 @@ class ItemNotYetReceived
     protected $cost;
     protected $itemId;
     protected $lineSequenceNumber;
+    protected $expectedTBC;
 
     /**
      * @return array
@@ -264,6 +265,14 @@ class ItemNotYetReceived
             $this->purchaseOrderType,
             $greenForTypes
         );
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExpectedTBC()
+    {
+        return $this->expectedTBC;
     }
 
     public function color()
