@@ -887,8 +887,8 @@ class CTPurchaseOrder extends CTCNC
                         DBEPorline::curUnitCost
                     ) && $dsPorline->getValue(DBEPorline::itemID) != 1491) {
                     $checkedAttribute = $dsPorline->getValue(DBEPorline::expectedTBC) ? 'checked' : null;
-                    $expectedDateInput = "<input type='date'  onchange='expectedChanged()' value='{$dsPorline->getValue(DBEPorline::expectedDate)}'>";
-                    $TBCInput = "<input type='checkbox' onchange='tbcChanged()' {$checkedAttribute}>";
+                    $expectedDateInput = "<div data-seq-no='{$sequenceNo}'><input type='date'  onchange='expectedChanged()' value='{$dsPorline->getValue(DBEPorline::expectedDate)}'>";
+                    $TBCInput = "<input type='checkbox' onchange='tbcChanged()' {$checkedAttribute}></div>";
                 }
 
                 $curTotalCost = $dsPorline->getValue(DBEJPorline::curUnitCost) * $dsPorline->getValue(
@@ -1468,55 +1468,6 @@ class CTPurchaseOrder extends CTCNC
         header('Location: ' . $urlNext);
     }
 
-    /**
-     * Delete order
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function deleteOrder()
-    {
-        $this->setMethodName('deleteOrder');
-        if (!$this->getParam('porheadID')) {
-            $this->displayFatalError('Purchase order ID not provided');
-            return;
-        }
-        if (!$this->buPurchaseOrder->getOrderHeaderByID(
-            $this->getParam('porheadID'),
-            $this->dsPorhead
-        )) {
-            $this->displayFatalError(CTPURCHASEORDER_MSG_PURCHASEORDER_NOT_FND);
-            return;
-        }
-        $this->buPurchaseOrder->deleteOrder($this->getParam('porheadID'));
-        $urlNext =                        // default action
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'    => CTCNC_ACT_SEARCH,
-                    'ordheadID' => $this->dsPorhead->getValue(DBEJPorhead::ordheadID) // if this is set then will show
-                )                                                                                                                    // remaining POs for SO
-            );
-        if ($this->dsPorhead->getValue(DBEJPorhead::ordheadID)) {
-            $buSalesOrder = new BUSalesOrder($this);
-            $purchaseOrderCount = $buSalesOrder->countPurchaseOrders(
-                $this->dsPorhead->getValue(DBEJPorhead::ordheadID)
-            );
-            if ($purchaseOrderCount == 0) {
-                $urlNext =
-                    Controller::buildLink(
-                        CTCNC_PAGE_SALESORDER,
-                        array(
-                            'action'    => CTCNC_ACT_DISP_SALESORDER,
-                            'ordheadID' => $this->dsPorhead->getValue(DBEJPorhead::ordheadID)
-                            // if this is set then will show
-                        )                                                                                                                    // remaining POs for SO
-                    );
-            }
-        }
-        header('Location: ' . $urlNext);
-    }
 
     function generatePDF()
     {

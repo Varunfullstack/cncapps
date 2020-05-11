@@ -222,6 +222,14 @@ class ItemNotYetReceived implements JsonSerializable
         );
     }
 
+    /**
+     * @return mixed
+     */
+    public function getExpectedTBC()
+    {
+        return $this->expectedTBC;
+    }
+
     public function getPurchaseOrderURL()
     {
         return SITE_URL . "/PurchaseOrder.php?action=display&porheadID=" . $this->getPurchaseOrderId();
