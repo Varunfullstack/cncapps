@@ -127,7 +127,7 @@ class DBEJCustomerItem extends DBECustomerItem
             " FROM " . $this->getTableName() .
             " JOIN item AS citem ON cui_itemno = itm_itemno" .
             " JOIN customer ON cui_custno = cus_custno" .
-            " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno";
+            " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno ";
 
 
         $filters = [];
@@ -159,7 +159,7 @@ class DBEJCustomerItem extends DBECustomerItem
         }
 
         if ($itemText != '') {
-            $filters[] = " AND citem.itm_desc LIKE '%" . mysqli_real_escape_string(
+            $filters[] = " citem.itm_desc LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $itemText
                 ) . "%'";
@@ -179,13 +179,13 @@ class DBEJCustomerItem extends DBECustomerItem
 
             if ($renewalStatus) {
 
-                $filters[] = "contractCustomerItem.renewalStatus ='" . mysqli_real_escape_string(
+                $filters[] = " contractCustomerItem.renewalStatus ='" . mysqli_real_escape_string(
                         $this->db->link_id(),
                         $renewalStatus
                     ) . "'";
             }
             if ($contractText) {
-                $filters[] = "contractItem.itm_desc like '%" . mysqli_real_escape_string(
+                $filters[] = " contractItem.itm_desc like '%" . mysqli_real_escape_string(
                         $this->db->link_id(),
                         $contractText
                     ) . "%'";
@@ -193,12 +193,13 @@ class DBEJCustomerItem extends DBECustomerItem
         }
 
         if (count($filters)) {
-            $baseQuery .= "where " . implode(" and ", $filters);
+            $baseQuery .= " where " . implode(" and ", $filters);
         }
 
         if ($row_limit) {
             $baseQuery .= " LIMIT 0," . $row_limit;
         }
+
         $this->setQueryString($baseQuery);
 
         return (parent::getRows());

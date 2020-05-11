@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.14.1] - 2020-05-11
+### Fixed
+- Fixed issue with searching in CustomerItem.php
+
 ## [v3.14.0] - 2020-05-08
 ### Changed
 - Issue 833 - Additional pages to lock out contract choices
