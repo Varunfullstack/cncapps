@@ -1,6 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.14.2] - 2020-05-11
+### Fixed
+- Fixed issue with RenContract installation date input having readonly attribute
+- Fixed Customer Review Meeting Documents upload not working
+- Fixed issue with customerProblem reason field being smaller than automated_request reason field
+
 ## [v3.14.1] - 2020-05-11
 ### Fixed
 - Fixed issue with searching in CustomerItem.php

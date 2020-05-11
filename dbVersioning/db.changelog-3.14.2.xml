@@ -1,0 +1,21 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="hotfix-v3.14.2-0">
+        <tagDatabase tag="hotfix-v3.14.2"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="hotfix-v3.14.2-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                select information_schema.columns.DATA_TYPE = 'text'
+                from information_schema.COLUMNS
+                where TABLE_SCHEMA = database()
+                and TABLE_NAME = 'customerProblem'
+                and COLUMN_NAME = 'cpr_reason'
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="customerProblem" columnName="cpr_reason" newDataType="longtext"/>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>
