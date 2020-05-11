@@ -196,7 +196,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             );
             $dbeDocuments->setValue(
                 DBECustomerReviewMeetingDocument::meetingDate,
-                common_convertDateDMYToYMD($this->getParam('reviewMeetingDate'))
+                $this->getParam('reviewMeetingDate')
             );
             $dbeDocuments->setValue(
                 DBECustomerReviewMeetingDocument::file,
