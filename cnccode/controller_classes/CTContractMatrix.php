@@ -31,6 +31,7 @@ class CTContractMatrix extends CTCNC
         $roles = [
             "reports",
         ];
+        $this->setMenuId(606);
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -84,8 +85,6 @@ class CTContractMatrix extends CTCNC
                     }
                     $data[] = $row;
                 }
-
-
 
 
                 echo json_encode(

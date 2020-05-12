@@ -872,7 +872,11 @@ class CTCNC extends Controller
                 "label" => "Hosting",
                 "href"  => "RenHosting.php",
             ],
-
+            [
+                "id"    => 606,
+                "label" => "Contract Matrix",
+                "href"  => "ContractMatrix.php",
+            ],
         ];
     }
 
@@ -984,6 +988,11 @@ class CTCNC extends Controller
                 "id"    => 810,
                 "label" => "Suppliers",
                 "href"  => "Supplier.php",
+            ],
+            [
+                "id"    => 811,
+                "label" => "Lead Status Types",
+                "href"  => "LeadStatusTypes.php",
             ],
         ];
     }

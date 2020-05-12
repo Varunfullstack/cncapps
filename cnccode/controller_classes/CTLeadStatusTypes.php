@@ -22,6 +22,7 @@ class CTLeadStatusTypes extends CTCNC
         $roles = [
             "maintenance",
         ];
+        $this->setMenuId(811);
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
