@@ -127,39 +127,39 @@ class CTItemsNotYetReceived extends CTCNC
 
             $expectedDate = $this->getDateOrNA($item->getExpectedOn());
             $purchaseOrderLineLink = null;
+            $purchaseOrderLineLink = 'N/A';
+            $purchaseOrderLineURL =
+                Controller::buildLink(
+                    "PurchaseOrder.php",
+                    [
+                        "porheadID"  => $item->getPurchaseOrderId(),
+                        "action"     => "editOrdline",
+                        "sequenceNo" => $item->getLineSequenceNumber()
+                    ]
+
+                );
             if ($item->color() == 'green') {
                 $purchaseOrderLineLink = 'Received';
             } else {
-
-                if ($expectedDate && $item->color() != 'red') {
-                    $purchaseOrderLineURL =
-                        Controller::buildLink(
-                            "PurchaseOrder.php",
-                            [
-                                "porheadID"  => $item->getPurchaseOrderId(),
-                                "action"     => "editOrdline",
-                                "sequenceNo" => $item->getLineSequenceNumber()
-                            ]
-
-                        );
-
-                    $purchaseOrderLineLink = "<a href='" . $purchaseOrderLineURL . "' target='_blank'>" . $expectedDate . "</a>";
+                if ($item->getExpectedOn()) {
+                    $purchaseOrderLineLink = $expectedDate;
                 }
             }
-            $expectedColor = null;
-            if ($expectedDate) {
-                $expectedDateDateTime = DateTime::createFromFormat(DATE_MYSQL_DATE, $expectedDate);
-
-                if ($expectedDateDateTime <= new DateTime()) {
-                    $expectedColor = "#F8A5B6";
+            $requiredByColorClass = 'amberBackground';
+            if ($item->getPurchaseOrderRequiredBy()) {
+                $requiredByColorClass = null;
+            }
+            $expectedColorClass = null;
+            if ($item->getExpectedOn()) {
+                if ($item->getExpectedOn()->format(DATE_MYSQL_DATE) < (new DateTime())->format(DATE_MYSQL_DATE)) {
+                    $expectedColorClass = "redBackground";
                 }
 
             } elseif ($item->getExpectedTBC()) {
-                $expectedDate = "TBC";
-                $expectedColor = "#FFEB9C";
+                $purchaseOrderLineLink = "TBC";
+                $expectedColorClass = "amberBackground";
             }
-
-
+            $purchaseOrderLineLink = "<a href='" . $purchaseOrderLineURL . "' target='_blank'>" . $purchaseOrderLineLink . "</a>";
             $this->template->set_var(
                 [
                     "style"                 => $style,
@@ -185,9 +185,10 @@ class CTItemsNotYetReceived extends CTCNC
                     "requiredByDate"        => $this->getDateOrNA($item->getPurchaseOrderRequiredBy()),
                     "requiredByDateSort"    => $item->getPurchaseOrderRequiredBy() ? $item->getPurchaseOrderRequiredBy(
                     )->format(DATE_MYSQL_DATE) : null,
+                    "requiredByColor"       => $requiredByColorClass ? "class='$requiredByColorClass'" : null,
                     "supplierRef"           => $item->getSupplierRef(),
                     "color"                 => $item->color(),
-                    "expectedColor"         => $expectedColor ? "style='background-color:$expectedColor'" : null,
+                    "expectedColor"         => $expectedColorClass ? "class='$expectedColorClass'" : null,
                     "projectLink"           => $projectLink,
                     "salesOrderLink"        => $salesOrderLink,
                     "SRLink"                => $serviceRequestLink
