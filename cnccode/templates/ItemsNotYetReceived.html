@@ -84,6 +84,14 @@
     .black {
         color: black;
     }
+
+    td.amberBackground {
+        background-color: #FFEB9C;
+    }
+
+    td.redBackground {
+        background-color: #F8A5B6;
+    }
 </style>
 <P>
     <span style="color:red;background-color: red">R</span>
@@ -197,13 +205,15 @@
         <td data-sort="{purchaseOrderDateSort}">
             {purchaseOrderDate}
         </td>
-        <td data-sort="{expectedOnSort}">
+        <td data-sort="{expectedOnSort}"
+            {expectedColor}
+        >
             {expectedOn}
         </td>
         <td data-sort="{futureDateSort}">
             {futureDate}
         </td>
-        <td data-sort="{requiredByDateSort}">
+        <td data-sort="{requiredByDateSort}" {requiredByColor}>
             {requiredByDate}
         </td>
         <td>

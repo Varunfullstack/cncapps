@@ -206,6 +206,30 @@ class CTPurchaseOrder extends CTCNC
         }
     }
 
+    private function saveLine()
+    {
+        $contents = json_decode(file_get_contents('php://input'), true);
+        if (!isset($contents['purchaseOrderId'])) {
+            throw new Exception('Purchase Order Id is required');
+        }
+        if (!isset($contents['line'])) {
+            throw new Exception('Line is required');
+        }
+        $purchaseOrderLine = new DBEPorline($this);
+        $purchaseOrderLine->setValue(
+            DBEPorline::porheadID,
+            $contents['purchaseOrderId']
+        );
+        $purchaseOrderLine->setValue(
+            DBEPorline::sequenceNo,
+            $contents['line']['seqNo']
+        );
+        $purchaseOrderLine->getRow();
+        $purchaseOrderLine->setValue(DBEPorline::expectedDate, $contents['line']['expectedDate']);
+        $purchaseOrderLine->setValue(DBEPorline::expectedTBC, $contents['line']['TBC']);
+        $purchaseOrderLine->updateRow();
+    }
+
     /**
      * Display form to allow selection of date range for which to produce invoices
      * @access private
@@ -858,14 +882,15 @@ class CTPurchaseOrder extends CTCNC
             while ($dsPorline->fetchNext()) {
                 $sequenceNo = $dsPorline->getValue(DBEJPorline::sequenceNo);
                 $itemDescription = $dsPorline->getValue(DBEJPorline::itemDescription);
+                $expectedDateInput = $TBCInput = null;
                 if ((float)$dsPorline->getValue(
                         DBEPorline::curUnitCost
                     ) && $dsPorline->getValue(DBEPorline::itemID) != 1491) {
                     $checkedAttribute = $dsPorline->getValue(DBEPorline::expectedTBC) ? 'checked' : null;
-                    $expectedDateInputs = "<div data-seq-no='{$sequenceNo}'><input type='date'  onchange='expectedChanged()' value='{$dsPorline->getValue(DBEPorline::expectedDate)}'> Date TBC <input type='checkbox' onchange='tbcChanged()' {$checkedAttribute}></div>";
-                } else {
-                    $expectedDateInputs = null;
+                    $expectedDateInput = "<input type='date'  onchange='expectedChanged()' value='{$dsPorline->getValue(DBEPorline::expectedDate)}'>";
+                    $TBCInput = "<input type='checkbox' onchange='tbcChanged()' {$checkedAttribute}>";
                 }
+
                 $curTotalCost = $dsPorline->getValue(DBEJPorline::curUnitCost) * $dsPorline->getValue(
                         DBEJPorline::qtyOrdered
                     );
@@ -898,7 +923,9 @@ class CTPurchaseOrder extends CTCNC
                             '.',
                             ''
                         ),
-                        'expectedDate' => $expectedDateInputs
+                        'expectedDate' => $expectedDateInput,
+                        'TBCInput'     => $TBCInput,
+                        'seqNo'        => $dsPorline->getValue(DBEJPorline::sequenceNo)
                     )
                 );
                 if ($disabled != CTCNC_HTML_DISABLED) {        // enabled so allow/show editing options
@@ -1063,7 +1090,7 @@ class CTPurchaseOrder extends CTCNC
         );
         header("Location: " . $urlNext);
         exit;
-    }
+    }// end function orderLineForm()
 
     /**
      * Edit/Add Order Line
@@ -1135,7 +1162,7 @@ class CTPurchaseOrder extends CTCNC
             true
         );
         $this->parsePage();
-    }// end function orderLineForm()
+    }
 
     /**
      * @throws Exception
@@ -1157,7 +1184,8 @@ class CTPurchaseOrder extends CTCNC
                 'curUnitCost'            => $this->dsPorline->getValue(DBEJPorline::curUnitCost),
                 'curUnitCostMessage'     => $this->dsPorline->getMessage(DBEJPorline::curUnitCost),
                 'expectedDate'           => $this->dsPorline->getValue(DBEJPorline::expectedDate),
-                'expectedDateMessage'    => $this->dsPorline->getMessage(DBEJPorline::expectedDate)
+                'expectedDateMessage'    => $this->dsPorline->getMessage(DBEJPorline::expectedDate),
+                'expectedTBCChecked'     => $this->dsPorline->getValue(DBEPorline::expectedTBC) ? "checked" : null
             )
         );
         if ($this->getAction() == CTPURCHASEORDER_ACT_EDIT_ORDLINE) {
@@ -1435,7 +1463,6 @@ class CTPurchaseOrder extends CTCNC
         }
         header('Location: ' . $urlNext);
     }
-
 
     function generatePDF()
     {
