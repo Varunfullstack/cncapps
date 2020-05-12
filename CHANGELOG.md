@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.14.3] - 2020-05-12
+### Fixed
+- Fixed issue when trying to send Sales Order reminder
+- Fixed issue with Office 365 license matching, changed it to be exact match
+
 ## [v3.14.2] - 2020-05-11
 ### Fixed
 - Fixed issue with RenContract installation date input having readonly attribute

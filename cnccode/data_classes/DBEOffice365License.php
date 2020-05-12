@@ -60,7 +60,7 @@ class DBEOffice365License extends DBEntity
         if (!preg_match('/:(.*)/', $license, $matches)) {
             return;
         }
-        $licenseWhere = $this->getDBColumnName(self::license) . " like  '%$matches[1]%' ";
+        $licenseWhere = $this->getDBColumnName(self::license) . " =  '$matches[1]' ";
 
         $this->setQueryString(
             "SELECT " . $this->getDBColumnNamesAsString() .
