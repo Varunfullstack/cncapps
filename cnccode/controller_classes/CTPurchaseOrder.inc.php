@@ -1468,7 +1468,6 @@ class CTPurchaseOrder extends CTCNC
         header('Location: ' . $urlNext);
     }
 
-
     function generatePDF()
     {
         // generate PDF purchase order:
