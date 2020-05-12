@@ -1,7 +1,13 @@
 <!-- Template: PurchaseOrderDisplay.inc.html -->
-<script language='JavaScript'
-        src="CommonJS.js"
-></script>
+<style>
+    tr.highlightRow:hover {
+        background-color: #FFFFCC;
+    }
+
+    td.failed {
+        background-color: red;
+    }
+</style>
 {PurchaseOrderLineEditJS}
 <script language='JavaScript'>
     function checkFunctionKey(field) {
@@ -62,14 +68,14 @@
             const lineElm = document.querySelector('[data-seq-no="' + seqNo + '"]');
             const dateElement = lineElm.querySelector('input[type="date"]');
             const checkboxElement = lineElm.querySelector('input[type="checkbox"]');
-            lines[seqNo] = {expectedDate: dateElement.value, TBC: checkboxElement.checked};
+            lines[seqNo] = {expectedDate: dateElement.value, TBC: checkboxElement.checked, seqNo};
         }
         return lines[seqNo];
     }
 
     function expectedChanged() {
         const target = event.target;
-        const seqNo = target.parentElement.dataset.seqNo;
+        const seqNo = target.closest('tr').dataset.seqNo;
         const line = getLine(seqNo);
         line.expectedDate = target.value;
         saveLine(line);
@@ -77,19 +83,103 @@
 
     function tbcChanged() {
         const target = event.target;
-        const seqNo = target.parentElement.dataset.seqNo;
+        const seqNo = target.closest('tr').dataset.seqNo;
         const line = getLine(seqNo);
         line.TBC = target.checked;
         saveLine(line);
     }
 
     function saveLine(line) {
+        if (!checkLineValidity(line)) {
+            return;
+        }
+
+        const rowOverlay = document.createElement('div');
+        const td = line.expectedDateInput.parentElement;
+        const tr = td.parentElement;
+        const trPosition = tr.getBoundingClientRect();
+        rowOverlay.style.height = String(trPosition.height);
+        rowOverlay.style.width = String(trPosition.width);
+        rowOverlay.style.left = String(trPosition.left);
+        rowOverlay.style.top = String(trPosition.top);
+        rowOverlay.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
+        rowOverlay.style.position = 'absolute';
+        const indicatorHolder = document.createElement('div');
+        indicatorHolder.style.position = 'relative';
+
+        const indicator = document.createElement('div');
+        indicator.className = "loading";
+        indicator.style.top = String(trPosition.height);
+        indicatorHolder.append(indicator);
+        rowOverlay.append(indicatorHolder);
+        document.body.append(rowOverlay);
+
         fetch('?action=saveLine', {
             method: 'POST',
-            body: {purchaseOrderId: getPurchaseOrderId(), line}
+            body: JSON.stringify({purchaseOrderId: getPurchaseOrderId(), line})
         }).then(response => {
-            console.log('saved correctly');
+            rowOverlay.parentNode.removeChild(rowOverlay);
         })
+    }
+
+    let linesTable = null;
+
+    function checkForPrint() {
+        if (!checkValidity()) {
+            alert("Please set an expected date or TBC (not both) for lines marked with red");
+            return false;
+        }
+        return true;
+    }
+
+    function checkLineValidity(line) {
+        let assignFailedClass = false;
+        if (line.expectedDate && line.TBC || !line.expectedDate && !line.TBC) {
+            // we have to put some color in the TD where the field exists
+            assignFailedClass = true;
+        }
+        handleFailureClass(line.expectedDateInput.parentElement, assignFailedClass);
+        handleFailureClass(line.TBCInput.parentElement, assignFailedClass);
+        return !assignFailedClass;
+    }
+
+    function checkValidity() {
+        const lines = getLines();
+        let isValid = true;
+        Object.keys(lines).forEach(key => {
+            isValid &= checkLineValidity(lines[key]);
+        })
+        return isValid;
+    }
+
+    function handleFailureClass(element, assign) {
+        if (assign) {
+            return element.classList.add('failed');
+        }
+        element.classList.remove('failed');
+    }
+
+    function getLines() {
+        if (!linesTable) {
+            linesTable = document.getElementById('linesTable');
+            for (let line of linesTable.children) {
+                const data = line.dataset;
+                const expectedDateInput = line.querySelector('input[type="date"]');
+                if (!expectedDateInput) {
+                    continue;
+                }
+                const TBCInput = line.querySelector('input[type="checkbox"]');
+                lines[data.seqNo] = {
+                    expectedDate: expectedDateInput.value,
+                    TBC: TBCInput.checked,
+                    seqNo: data.seqNo,
+                    expectedDateInput,
+                    TBCInput
+                };
+            }
+        }
+
+        return lines;
     }
 
     function ToggleSelectedLines(checkedOn) {
@@ -104,6 +194,10 @@
                 e.checked = false;
         }
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        checkValidity();
+    });
 </SCRIPT>
 <TABLE width="400px"
        border="0"
@@ -124,7 +218,9 @@
         <TD width="100px"
             class="navigateLink"
             valign="top"
-        ><a href="{urlGeneratePDF}">{txtGeneratePDF}</a></TD>
+        ><a href="{urlGeneratePDF}"
+            onclick="return checkForPrint();"
+        >{txtGeneratePDF}</a></TD>
         <TD width="100px"
             class="navigateLink"
             valign="top"
@@ -139,7 +235,9 @@
        border="0"
        cellspacing="1"
        cellpadding="1"
+
 >
+    <thead>
     <tr>
         <td width="260px"
             class="listHeadText"
@@ -169,14 +267,21 @@
             class="listHeadText"
         >Expected
         </td>
+        <td width="60px"
+            class="listHeadText"
+        >TBC
+        </td>
         <td width="100px"
             class="listHeadText"
         >&nbsp;
         </td>
     </tr>
+    </thead>
+    <tbody id="linesTable">
     <!-- BEGIN orderLineBlock -->
-    <tr onMouseOver="this.bgColor='#FFFFCC';"
-        onMouseOut="this.bgColor='';"
+    <tr class="highlightRow"
+        data-seq-no='{seqNo}'
+        data-item-id="{itemID}"
     >
         <td class="{orderLineClass}">{lineDescription}</td>
         <td class="{orderLineClass}">{partNo}</td>
@@ -193,11 +298,14 @@
             <DIV align="right">{curTotalCost}</DIV>
         </td>
         <td class="{orderLineClass}">{expectedDate}</td>
+        <td class="{orderLineClass}">{TBCInput}</td>
         <td class="{orderLineClass}">
             <DIV align="left">{salesOrderLineIcons}</DIV>
         </td>
     </tr>
     <!-- END orderLineBlock -->
+    </tbody>
+    <tfoot>
     <tr>
         <td class="orderTotalItem">&nbsp;</td>
         <td class="orderTotalItem">&nbsp;</td>
@@ -209,6 +317,8 @@
         </td>
         <td class="orderTotalItem">&nbsp;</td>
         <td class="orderTotalItem">&nbsp;</td>
+        <td class="orderTotalItem">&nbsp;</td>
     </tr>
+    </tfoot>
 </table>
 <!-- End Template: PurchaseOrderDisplay.inc.html -->
