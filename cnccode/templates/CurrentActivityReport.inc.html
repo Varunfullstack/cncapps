@@ -41,17 +41,28 @@
         $('.userAllocation').change(function () {
             window.location = this.value;
         })
+
+        let queuePreviousValue = null;
+
+        $('.queueSelector').click(function (event) {
+            queuePreviousValue = $(this).val();
+        })
         $('.queueSelector').change(function (event) {
-            console.log(this.value);
-            var problemID = ($(this).data()).problemid;
+            debugger;
+            const dataSet = $(this).data();
+            const problemID = dataSet.problemid;
+            const problemStatus = dataSet.problemStatus;
+            let answer = null;
+            if (problemStatus === "P") {
+                answer = prompt('Please provide a reason for moving this SR into a different queue');
 
-            var answer = confirm('Are you sure you want to change this Service Request queue?');
-
-            if (!answer) {
-                return;
+                if (!answer) {
+                    $(this).val(queuePreviousValue);
+                    return;
+                }
             }
 
-            window.location = '/CurrentActivityReport.php?action=changeQueue&problemID=' + problemID + '&queue=' + this.value
+            window.location = '/CurrentActivityReport.php?action=changeQueue&problemID=' + problemID + '&queue=' + this.value + "&reason=" + answer
         })
 
     })
@@ -140,8 +151,11 @@
         >
             <div align="left">Pending Reopened ({pendingReopenedCount})</div>
         </th>
+        <th class="listHeadText">
+            Received
+        </th>
         <th class="listHeadText"
-            width="5"
+            width="4"
             nowrap
         >SR
         </th>
@@ -183,13 +197,52 @@
                        value="R"
                        onClick="if(!confirm('Are you sure you want to reopen?')){ window.event.preventDefault()}"
                 >
+
                 <input type="submit"
                        name="result"
                        title="Delete"
                        value="D"
                        onClick="if(!confirm('Are you sure you want to delete?')){ window.event.preventDefault()}"
                 >
+                <script>
+                    function submitNew() {
+                        const form = document.createElement("form");
+                        form.method = "post";
+                        form.action = "/Activity.php";
+                        addInputs([
+                            {
+                                name: 'action',
+                                value: 'editServiceRequestHeader'
+                            },
+                            {
+                                name: 'contactID',
+                                value: event.target.dataset.contactId
+                            },
+                            {
+                                name: 'customerID',
+                                value: event.target.dataset.customerId,
+                            },
+                            {
+                                name: 'reason',
+                                value: atob(event.target.dataset.reason),
+                            }
+                        ], form);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                </script>
+                <button type="button"
+                        onclick="submitNew()"
+                        title="Submit new SR, unrelated message"
+                        data-contact-id="{pendingReopenedContactID}"
+                        data-customer-id="{pendingReopenedCustomerID}"
+                        data-reason="{base64Reason}"
+                >N
+                </button>
             </form>
+        </td>
+        <td>
+            {receivedDate}
         </td>
         <td>
             <A href={pendingReopenSRURL}
@@ -356,6 +409,7 @@
         <td width="3%">
             <select class="queueSelector"
                     data-problemId="{problemID}"
+                    data-problem-status="{problemStatus}"
             >
                 {queueOptions}
             </select></td>
@@ -501,6 +555,7 @@
         <td width="3%">
             <select class="queueSelector"
                     data-problemId="{problemID}"
+                    data-problem-status="{problemStatus}"
             >
                 {queueOptions}
             </select></td>
@@ -646,6 +701,7 @@
         <td width="3%">
             <select class="queueSelector"
                     data-problemId="{problemID}"
+                    data-problem-status="{problemStatus}"
             >
                 {queueOptions}
             </select></td>
@@ -789,6 +845,7 @@
         <td width="3%">
             <select class="queueSelector"
                     data-problemId="{problemID}"
+                    data-problem-status="{problemStatus}"
             >
                 {queueOptions}
             </select></td>
@@ -935,6 +992,7 @@
         <td width="3%">
             <select class="queueSelector"
                     data-problemId="{problemID}"
+                    data-problem-status="{problemStatus}"
             >
                 {queueOptions}
             </select></td>

@@ -16,30 +16,8 @@
                 [0, 'asc'],
             ]
         });
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
         });
     });
 
@@ -99,6 +77,7 @@
                        value="{customerString}"
                        size="50"
                        maxlength="50"
+                       customer-search
                 > <font class="formErrorMessage"> {customerStringMessage} </font>
             </td>
         </tr>
@@ -109,10 +88,10 @@
                 <div align="right">Start Date</div>
             </td>
             <td>
-                <input name="searchForm[1][startDate]"
+                <input type="date"
+                       name="searchForm[1][startDate]"
                        value="{startDate}"
                        size="10"
-                       class="jqueryCalendar"
                        required
                        placeholder="DD/MM/YYYY"
                        autocomplete="off"
@@ -126,10 +105,10 @@
                 <div align="right">End Date</div>
             </td>
             <td>
-                <input name="searchForm[1][endDate]"
+                <input type="date"
+                       name="searchForm[1][endDate]"
                        value="{endDate}"
                        size="10"
-                       class="jqueryCalendar"
                        required
                        placeholder="DD/MM/YYYY"
                        autocomplete="off"

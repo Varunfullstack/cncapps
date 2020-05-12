@@ -68,64 +68,78 @@ class CTServiceRequestsByCustomerReport extends CTCNC
         }
     }
 
-    /**
-     * @throws Exception
-     */
-    function search()
+function email()
     {
-        $this->setMethodName('search');
+        $this->setMethodName('email');
         $dsSearchForm = $this->initialiseSearchForm();
-        $this->setTemplateFiles(array('ServiceRequestsByCustomerReport' => 'ServiceRequestsByCustomerReport.inc'));
-        if (isset($_REQUEST ['searchForm'])) {
+        $days = $this->getParam('days');
+        $dsSearchForm->setValue(
+            self::searchFormDays,
+            $days
+        );
 
-            if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
-                $this->setFormErrorOn();
-            } else {
-                $results = $this->buActivity->getSrPercentages(
-                    $dsSearchForm->getValue(self::searchFormDays),
-                    $dsSearchForm->getValue(self::searchFormFromDate),
-                    $dsSearchForm->getValue(self::searchFormToDate)
-                );
+        $results = $this->buActivity->getSrPercentages($days);
 
-                if ($results) {
+        if ($results) {
+            $buMail = new BUMail($this);
+            $senderEmail = CONFIG_SUPPORT_EMAIL;
+            $toEmail = 'monthlysdreport@cnc-ltd.co.uk';
 
-                    $this->renderReport(
-                        'ServiceRequestsByCustomerReport',
-                        $results,
-                        $dsSearchForm
-                    );
+            $this->template = new Template(
+                EMAIL_TEMPLATE_DIR,
+                "remove"
+            );
+            $this->template->set_file(
+                'page',
+                'ServiceRequestsByCustomerReportEmail.inc.html'
+            );
 
-                }//end if $results
+            $this->renderReport(
+                'page',
+                $results,
+                $dsSearchForm
+            );
 
-            }
+            $this->template->parse(
+                'output',
+                'page',
+                true
+            );
+
+            $body = $this->template->get_var('output');
+
+            $subject = 'Service Requests By Customer - Days: ' . $days;
+
+            $hdrs = array(
+                'From'         => $senderEmail,
+                'To'           => $toEmail,
+                'Subject'      => $subject,
+                'Date'         => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            $buMail->mime->setHTMLBody($body);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
+            );
+            $body = $buMail->mime->get($mime_params);
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->putInQueue(
+                $senderEmail,
+                $toEmail,
+                $hdrs,
+                $body
+            );
+
+            echo 'email queued to be sent';
         }
 
-        $urlSubmit = Controller::buildLink(
-            $_SERVER ['PHP_SELF'],
-            array('action' => CTCNC_ACT_SEARCH)
-        );
-
-        $this->setPageTitle('Service Requests By Customer Report');
-
-        $this->template->set_var(
-            array(
-                'formError'       => $this->formError,
-                'days'            => $dsSearchForm->getValue(self::searchFormDays),
-                'daysMessage'     => $dsSearchForm->getMessage(self::searchFormDays),
-                'fromDate'        => Controller::dateYMDtoDMY($dsSearchForm->getValue(self::searchFormFromDate)),
-                'fromDateMessage' => $dsSearchForm->getMessage(self::searchFormFromDate),
-                'toDate'          => Controller::dateYMDtoDMY($dsSearchForm->getValue(self::searchFormToDate)),
-                'toDateMessage'   => $dsSearchForm->getMessage(self::searchFormToDate),
-                'urlSubmit'       => $urlSubmit
-            )
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'ServiceRequestsByCustomerReport',
-            true
-        );
-        $this->parsePage();
     }
 
     function initialiseSearchForm()
@@ -223,78 +237,65 @@ class CTServiceRequestsByCustomerReport extends CTCNC
     /*
     Send email report for past $days
     */
-    function email()
+
+    /**
+     * @throws Exception
+     */
+    function search()
     {
-        $this->setMethodName('email');
+        $this->setMethodName('search');
         $dsSearchForm = $this->initialiseSearchForm();
-        $days = $this->getParam('days');
-        $dsSearchForm->setValue(
-            self::searchFormDays,
-            $days
-        );
+        $this->setTemplateFiles(array('ServiceRequestsByCustomerReport' => 'ServiceRequestsByCustomerReport.inc'));
+        if (isset($_REQUEST ['searchForm'])) {
 
-        $results = $this->buActivity->getSrPercentages($days);
+            if (!$dsSearchForm->populateFromArray($_REQUEST ['searchForm'])) {
+                $this->setFormErrorOn();
+            } else {
+                $results = $this->buActivity->getSrPercentages(
+                    $dsSearchForm->getValue(self::searchFormDays),
+                    $dsSearchForm->getValue(self::searchFormFromDate),
+                    $dsSearchForm->getValue(self::searchFormToDate)
+                );
 
-        if ($results) {
-            $buMail = new BUMail($this);
-            $senderEmail = CONFIG_SUPPORT_EMAIL;
-            $toEmail = 'monthlysdreport@cnc-ltd.co.uk';
+                if ($results) {
 
-            $this->template = new Template(
-                EMAIL_TEMPLATE_DIR,
-                "remove"
-            );
-            $this->template->set_file(
-                'page',
-                'ServiceRequestsByCustomerReportEmail.inc.html'
-            );
+                    $this->renderReport(
+                        'ServiceRequestsByCustomerReport',
+                        $results,
+                        $dsSearchForm
+                    );
 
-            $this->renderReport(
-                'page',
-                $results,
-                $dsSearchForm
-            );
+                }//end if $results
 
-            $this->template->parse(
-                'output',
-                'page',
-                true
-            );
-
-            $body = $this->template->get_var('output');
-
-            $subject = 'Service Requests By Customer - Days: ' . $days;
-
-            $hdrs = array(
-                'From'         => $senderEmail,
-                'To'           => $toEmail,
-                'Subject'      => $subject,
-                'Date'         => date("r"),
-                'Content-Type' => 'text/html; charset=UTF-8'
-            );
-
-            $buMail->mime->setHTMLBody($body);
-
-            $mime_params = array(
-                'text_encoding' => '7bit',
-                'text_charset'  => 'UTF-8',
-                'html_charset'  => 'UTF-8',
-                'head_charset'  => 'UTF-8'
-            );
-            $body = $buMail->mime->get($mime_params);
-
-            $hdrs = $buMail->mime->headers($hdrs);
-
-            $buMail->putInQueue(
-                $senderEmail,
-                $toEmail,
-                $hdrs,
-                $body
-            );
-
-            echo 'email queued to be sent';
+            }
         }
 
+        $urlSubmit = Controller::buildLink(
+            $_SERVER ['PHP_SELF'],
+            array('action' => CTCNC_ACT_SEARCH)
+        );
+
+        $this->setPageTitle('Service Requests By Customer Report');
+
+        $this->template->set_var(
+            array(
+                'formError'       => $this->formError,
+                'days'            => $dsSearchForm->getValue(self::searchFormDays),
+                'daysMessage'     => $dsSearchForm->getMessage(self::searchFormDays),
+                'fromDate'        => $dsSearchForm->getValue(self::searchFormFromDate),
+                'fromDateMessage' => $dsSearchForm->getMessage(self::searchFormFromDate),
+                'toDate'          => $dsSearchForm->getValue(self::searchFormToDate),
+                'toDateMessage'   => $dsSearchForm->getMessage(self::searchFormToDate),
+                'urlSubmit'       => $urlSubmit
+            )
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'ServiceRequestsByCustomerReport',
+            true
+        );
+        $this->parsePage();
     } // end email
 
 }

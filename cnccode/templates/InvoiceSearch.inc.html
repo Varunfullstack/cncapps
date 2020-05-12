@@ -3,35 +3,12 @@
         src="CommonJS.js"
 ></script>
 <script language='JavaScript'>
-    const autocompleteURL = "/Customer.php?action=searchName";
     $(function () {
         window.startDate = $('#startDate').get(0);
         window.endDate = $('#endDate').get(0);
 
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
         });
     });
 
@@ -82,6 +59,7 @@
                     value="{customerString}"
                     size="50"
                     maxlength="50"
+                    customer-search
             > <font class="formErrorMessage"> {customerStringMessage} </font></td>
         </tr>
         <tr>
@@ -135,33 +113,31 @@
             <td class="promptText">
                 <div align="right">Start Date</div>
             </td>
-            <td><input
-                    type="text"
-                    name="invoice[1][startDate]"
-                    id="startDate"
-                    value="{startDate}"
-                    size="10"
-                    maxlength="10"
-                    onKeypress="javascript:submitOnReturn()"
-                    class="jqueryCalendar"
-                    autocomplete="off"
-            ><font class="formErrorMessage">{startDateMessage}</font></td>
+            <td>
+                <input type="date"
+                       name="invoice[1][startDate]"
+                       id="startDate"
+                       value="{startDate}"
+                       size="10"
+                       maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
+                ><font class="formErrorMessage">{startDateMessage}</font></td>
         </tr>
         <tr>
             <td class="promptText">
                 <div align="right">End Date</div>
             </td>
-            <td><input
-                    type="text"
-                    name="invoice[1][endDate]"
-                    id="endDate"
-                    value="{endDate}"
-                    size="10"
-                    maxlength="10"
-                    onKeypress="javascript:submitOnReturn()"
-                    class="jqueryCalendar"
-                    autocomplete="off"
-            >
+            <td>
+                <input type="date"
+                       name="invoice[1][endDate]"
+                       id="endDate"
+                       value="{endDate}"
+                       size="10"
+                       maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
+                >
                 <font class="formErrorMessage">{endDateMessage}</font></td>
         </tr>
         <tr>

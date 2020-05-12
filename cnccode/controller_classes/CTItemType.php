@@ -51,6 +51,13 @@ class CTItemType extends CTCNC
     function defaultAction()
     {
         switch ($this->getAction()) {
+            case 'top':
+            case 'bottom':
+            case 'down':
+            case 'up':
+                $this->changeOrder();
+                echo json_encode(["status" => "ok"]);
+                break;
             case 'delete':
                 if (!$this->getParam('id')) {
                     http_response_code(400);
@@ -118,6 +125,7 @@ class CTItemType extends CTCNC
                     DBEItemType::showInCustomerReview,
                     !!json_decode($this->getParam('showInCustomerReview'))
                 );
+                $DBEItemType->setValue($DBEItemType::sortOrder, $DBEItemType->getNextSortOrder());
                 $DBEItemType->insertRow();
 
                 echo json_encode(
@@ -157,7 +165,7 @@ class CTItemType extends CTCNC
             case 'getData':
                 $DBEItemTypes = new DBEItemType($this);
 
-                $DBEItemTypes->getRows(DBEItemType::description);
+                $DBEItemTypes->getRows(DBEItemType::sortOrder);
                 $data = [];
                 while ($DBEItemTypes->fetchNext()) {
                     $data[] = [
@@ -167,6 +175,7 @@ class CTItemType extends CTCNC
                         "reoccurring"          => $DBEItemTypes->getValue(DBEItemType::reoccurring),
                         "stockcat"             => $DBEItemTypes->getValue(DBEItemType::stockcat),
                         "showInCustomerReview" => $DBEItemTypes->getValue(DBEItemType::showInCustomerReview),
+                        "sortOrder"            => $DBEItemTypes->getValue(DBEItemType::sortOrder)
                     ];
                 }
                 echo json_encode($data, JSON_NUMERIC_CHECK);
@@ -176,6 +185,29 @@ class CTItemType extends CTCNC
                 $this->displayForm();
                 break;
         }
+    }
+
+    function changeOrder()
+    {
+        if (!$this->getParam('itemTypeID')) {
+            return;
+        }
+        $dbeItemType = new DBEItemType($this);
+        switch ($this->action) {
+            case 'top':
+                $dbeItemType->moveItemToTop($this->getParam('itemTypeID'));
+                break;
+            case 'bottom':
+                $dbeItemType->moveItemToBottom($this->getParam('itemTypeID'));
+                break;
+            case 'down':
+                $dbeItemType->moveItemDown($this->getParam('itemTypeID'));
+                break;
+            case 'up':
+                $dbeItemType->moveItemUp($this->getParam('itemTypeID'));
+                break;
+        }
+
     }
 
     /**
@@ -245,16 +277,4 @@ class CTItemType extends CTCNC
     {
         $this->defaultAction();
     }
-
-//    function parsePage()
-//    {
-//        $urlLogo = '';
-//        $this->template->set_var(
-//            array(
-//                'urlLogo' => $urlLogo,
-//                'txtHome' => 'Home'
-//            )
-//        );
-//        parent::parsePage();
-//    }
 }// end of class

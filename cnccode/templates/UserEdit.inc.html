@@ -90,22 +90,18 @@
     });
 
     function updateLengthOfService() {
-
         let newValue = null;
         const dateValue = $('#startDate').val();
         try {
-            const date = luxon.DateTime.fromFormat(dateValue, 'dd/MM/yyyy');
+            const date = moment(dateValue, 'YYYY-MM-DD');
             if (date.isValid) {
-                const today = luxon.DateTime.local();
-
-                const difference = today.diff(date, ['years', 'months'], {conversionAccuracy: 'longterm'});
-
-                newValue = (difference.years + difference.months / 12).toFixed(1);
-
+                const today = moment();
+                const differenceYears = today.diff(date, 'years');
+                const differenceMonths = today.diff(date, 'months');
+                newValue = (differenceYears + differenceMonths / 12).toFixed(1);
             }
-
-
         } catch (e) {
+
         }
         let message = "Not Valid Start Date";
         if (newValue) {
@@ -373,9 +369,9 @@
         <tr>
             <td class="promptText">Start Date</td>
             <td class="field">
-                <input name="user[1][startDate]"
+                <input type="date"
+                       name="user[1][startDate]"
                        value="{startDate}"
-                       class="jqueryCalendar"
                        onchange="updateLengthOfService()"
                        id="startDate"
                 >
@@ -395,8 +391,7 @@
                        class="encrypted"
                        data-name="dateOfBirth"
                        data-extra-data="age"
-                       data-custom-class="jqueryCalendar"
-                       data-custom-function="reAttachCalendars"
+                       data-additional-attributes='{"type": "date", "required": true}'
                 >
             </td>
         </tr>
@@ -510,12 +505,11 @@
             <td class="promptText">Company Healthcare Start Date</td>
             <td class="field">
                 <input {DISABLED}
-                       type="text"
+                       type="date"
                        name="user[1][companyHealthcareStartDate]"
                        value="{companyHealthcareStartDate}"
                        size="10"
                        maxlength="10"
-                       class="jqueryCalendar"
                 > <span class="formErrorMessage">{companyHealthcareStartDateMessage}</span>
             </td>
         </tr>
@@ -523,12 +517,11 @@
             <td class="promptText">Enhanced CNC 2 year pension Start Date</td>
             <td class="field">
                 <input {DISABLED}
-                       type="text"
+                       type="date"
                        name="user[1][enhancedCNC2YearPensionStartDate]"
                        value="{enhancedCNC2YearPensionStartDate}"
                        size="10"
                        maxlength="10"
-                       class="jqueryCalendar"
                 > <span class="formErrorMessage">{enhancedCNC2YearPensionStartDateMessage}</span>
             </td>
         </tr>

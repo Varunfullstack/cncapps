@@ -279,7 +279,7 @@ class CTPurchaseInv extends CTCNC
                 'porheadID'           => $porheadID,
                 'supplierName'        => Controller::htmlDisplayText($dsPorhead->getValue(DBEJPorhead::supplierName)),
                 'vatRate'             => $dsPorhead->getValue(DBEJPorhead::vatRate),
-                'purchaseInvoiceDate' => Controller::dateYMDtoDMY(($this->getParam('purchaseInvoiceDate'))),
+                'purchaseInvoiceDate' => $this->getParam('purchaseInvoiceDate'),
                 'purchaseInvoiceNo'   => Controller::htmlDisplayText($this->getParam('purchaseInvoiceNo')),
                 'urlUpdate'           => $urlUpdate,
                 'urlPurchaseOrder'    => $urlPurchaseOrder,
@@ -457,18 +457,19 @@ class CTPurchaseInv extends CTCNC
             $this->display();
             exit;
         }
-        $dateArray = explode('/', $this->getParam('purchaseInvoiceDate'));
-        if (!checkdate($dateArray[1], $dateArray[0], $dateArray[2])) {
+        $dateString = $this->getParam('purchaseInvoiceDate');
+
+        $date = DateTime::createFromFormat(DATE_MYSQL_DATE, $dateString);
+        if (!$date) {
             $this->setFormErrorMessage('Please enter a valid purchase invoice date');
             $this->display();
             exit;
-        } else {
-            $invoiceDateYMD = $dateArray[2] . '-' . $dateArray[1] . '-' . $dateArray[0];
         }
+
         $this->buPurchaseInv->update(
             $this->getParam('porheadID'),
             $this->getParam('purchaseInvoiceNo'),
-            $invoiceDateYMD,
+            $date->format(DATE_MYSQL_DATE),
             $dsPurchaseInv,
             $this->userID
         );

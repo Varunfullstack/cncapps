@@ -131,13 +131,9 @@ class CTStaffProductivityReport extends CTCNC
         $this->template->set_var(
             array(
                 'formError'        => $this->formError,
-                'startDate'        => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUStaffProductivityReport::searchFormStartDate)
-                ),
+                'startDate'        => $dsSearchForm->getValue(BUStaffProductivityReport::searchFormStartDate),
                 'startDateMessage' => $dsSearchForm->getMessage(BUStaffProductivityReport::searchFormStartDate),
-                'endDate'          => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUStaffProductivityReport::searchFormEndDate)
-                ),
+                'endDate'          => $dsSearchForm->getValue(BUStaffProductivityReport::searchFormEndDate),
                 'endDateMessage'   => $dsSearchForm->getMessage(BUStaffProductivityReport::searchFormEndDate)
             )
         );

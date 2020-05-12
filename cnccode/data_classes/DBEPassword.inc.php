@@ -175,17 +175,26 @@ class DBEPassword extends DBEntity
 
     public function getOffice365PasswordByCustomerID(int $customerID)
     {
-        $this->setMethodName('getOffice365PasswordByCustomerID');
-        if (!$customerID) {
-            throw new Exception("Customer ID Required");
+        $this->getPasswordItemByCustomerIdAndServiceId($customerID, 10);
+    }
+
+    public function getPasswordItemByCustomerIdAndServiceId(int $customerId, int $passwordServiceId)
+    {
+        $this->setMethodName(__FUNCTION__);
+        if (!$customerId) {
+            throw new UnexpectedValueException("Customer ID Required");
         }
+
+        if (!$passwordServiceId) {
+            throw new UnexpectedValueException("Password Service ID must be provided");
+        }
+
         $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::customerID) . " = " . $customerID .
-            " and " . $this->getDBColumnName(self::serviceID) . ' = 10  and ' . $this->getDBColumnName(
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE 
+                              {$this->getDBColumnName(self::customerID)} = {$customerId} and 
+                              {$this->getDBColumnName(self::serviceID)} = {$passwordServiceId}  and {$this->getDBColumnName(
                 self::archivedBy
-            ) . ' is null'
+            )} is null"
         );
         $this->getRows();
         $this->fetchFirst();

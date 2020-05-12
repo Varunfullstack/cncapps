@@ -8,6 +8,36 @@
     window.problemID = "{problemID}";
     let submitAsOvertimeCheckbox;
 
+    function gatherEscalationReason() {
+
+        const statusElement = document.querySelector("[name='callActivity[1][problemStatus]']");
+
+        if (statusElement.value === "P") {
+            // this is non-exempt status
+            const escalationReason = prompt('Please provide your reason for escalating this SR(Required)');
+            if (!escalationReason) {
+                return false;
+            }
+            const form = document.querySelector('form[name="callActivity"]');
+            const input = document.createElement('input');
+            input.name = 'escalationReason';
+            input.value = escalationReason;
+            form.append(input);
+        }
+
+        return true;
+
+    }
+
+    function checkUpload() {
+        const uploadInput = document.querySelector('input[name="userfile[]"]');
+        if (!uploadInput.files.length) {
+            alert('Please select the files to upload first');
+            return false;
+        }
+        return true;
+    }
+
     function showSalesRequestDialog() {
         startSalesRequest(problemID);
     }
@@ -76,6 +106,22 @@
 
     })
     var formChanged = false;
+
+    function checkCustomerAction() {
+        const alarmDate = $('#alarmDate');
+        const alarmTime = $('#alarmTime');
+        let time = moment().format('HH:mm');
+        if (alarmTime.val()) {
+            time = alarmTime.val();
+        }
+        let dateMoment = moment(alarmDate.val() + " " + time, 'YYYY-MM-DD HH:mm');
+        if (!dateMoment.isValid() || dateMoment.isSameOrBefore(moment(), 'minute')
+        ) {
+            alert('Please provide a future date and time, or just a future date');
+            return false;
+        }
+        return true;
+    }
 
     function proceedWithCancel(form) {
         if (formChanged == true) {
@@ -219,6 +265,10 @@
            value="{callActivityID}"
     >
     <input type="hidden"
+           name="callActivity[1][awaitingCustomerResponseFlag]"
+           value="{awaitingCustomerResponseFlag}"
+    >
+    <input type="hidden"
            name="callActivity[1][customerID]"
            value="{customerID}"
     >
@@ -307,6 +357,7 @@
                            name="CustomerAction"
                            value="Customer Action"
                            id="customerActionBtn"
+                           onclick="return checkCustomerAction();"
                     >
                     <input type="submit"
                            name="CncAction"
@@ -314,18 +365,16 @@
                            id="cncActionBtn"
                     >
                     Future Action
-                    <input
-                            type="text"
-                            name="callActivity[1][alarmDate]"
-                            id="alarmDate"
-                            title="Date when this request needs to be re-activated"
-                            value="{alarmDate}"
-                            placeholder="dd/mm/yyyy"
-                            size="10"
-                            maxlength="10"
-                            onchange="setFormChanged();"
-                            class="jqueryCalendar"
-                            autocomplete="off"
+                    <input type="date"
+                           name="callActivity[1][alarmDate]"
+                           id="alarmDate"
+                           title="Date when this request needs to be re-activated"
+                           value="{alarmDate}"
+                           placeholder="dd/mm/yyyy"
+                           size="10"
+                           maxlength="10"
+                           onchange="setFormChanged();"
+                           autocomplete="off"
                     />
                     <span class="formErrorMessage">{alarmDateMessage}</span>
                     <input
@@ -344,7 +393,7 @@
                     <input type="submit"
                            name="Escalate"
                            value="Escalate"
-                           onClick="return (confirm('Are you sure you want to escalate this SR?') )"
+                           onClick="return gatherEscalationReason()"
                            id="escalateBtn"
                     >
 
@@ -471,7 +520,7 @@
                 <DIV>
                     {DISABLED}
                 </DIV>
-                <input type="text"
+                <input type="date"
                        name="callActivity[1][date]"
                        id="date"
                        value="{date}"
@@ -480,7 +529,6 @@
                        size="10"
                        maxlength="10"
                        onchange="setFormChanged();"
-                       class="jqueryCalendar"
                        autocomplete="off"
                 />
                 {calendarLinkDate}<span class="formErrorMessage">{dateMessage}</span>
@@ -658,7 +706,7 @@
 
             <td class="promptText">Complete On</td>
             <td class="fieldText">
-                <input type="text"
+                <input type="date"
                        title="Date when this request should be set to completed"
                        name="callActivity[1][completeDate]"
                        id="completeDate"
@@ -669,7 +717,6 @@
                        maxlength="10"
                        onchange="setFormChanged();"
                        autocomplete="off"
-                       class="jQueryCalendar"
                 />
                 <span class="formErrorMessage">{completeDateMessage}</span>
             </td>
@@ -874,6 +921,8 @@
                         <form action="{urlUploadFile}"
                               method="post"
                               enctype="multipart/form-data"
+                              onsubmit="return checkUpload();"
+
                         >
                             <input type="hidden"
                                    name="edit"

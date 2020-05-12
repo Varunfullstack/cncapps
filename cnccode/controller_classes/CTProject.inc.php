@@ -433,17 +433,15 @@ class CTProject extends CTCNC
                 ),
                 'notes'                   => Controller::htmlInputText($dsProject->getValue(DBEProject::notes)),
                 'notesMessage'            => Controller::htmlDisplayText($dsProject->getMessage(DBEProject::notes)),
-                'startDate'               => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::openedDate)),
+                'startDate'               => $dsProject->getValue(DBEProject::openedDate),
                 'startDateMessage'        => Controller::htmlDisplayText(
                     $dsProject->getMessage(DBEProject::openedDate)
                 ),
-                'expiryDate'              => Controller::dateYMDtoDMY(
-                    $dsProject->getValue(DBEProject::completedDate)
-                ),
+                'expiryDate'              => $dsProject->getValue(DBEProject::completedDate),
                 'expiryDateMessage'       => Controller::htmlDisplayText(
                     $dsProject->getMessage(DBEProject::completedDate)
                 ),
-                'commenceDate'            => Controller::dateYMDtoDMY($dsProject->getValue(DBEProject::commenceDate)),
+                'commenceDate'            => $dsProject->getValue(DBEProject::commenceDate),
                 'commenceDateMessage'     => Controller::htmlDisplayText(
                     $dsProject->getMessage(DBEProject::commenceDate)
                 ),

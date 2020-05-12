@@ -413,6 +413,7 @@ class CTSecondSite extends CTCNC
                 'endYearMonth'     => $dsSearchForm->getValue(BUSecondSite::searchFormEndYearMonth),
                 'urlCustomerPopup' => $urlCustomerPopup,
                 'urlSubmit'        => $urlSubmit,
+                'pattern'          => "^(0[1-9]|1[012])/\d{4{{}}}$"
             )
         );
 

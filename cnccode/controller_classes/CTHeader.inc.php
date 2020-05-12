@@ -115,9 +115,7 @@ class CTHeader extends CTCNC
             $this->buHeader->getHeader($dsHeader);
         } else {                                                                        // form validation error
             $dsHeader->initialise();
-            $dsHeader->debug = true;
             $dsHeader->fetchNext();
-            $dsHeader->debug = false;
         }
         $urlUpdate =
             Controller::buildLink(

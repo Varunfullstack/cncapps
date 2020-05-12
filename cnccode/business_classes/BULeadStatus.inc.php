@@ -26,7 +26,8 @@ class BULeadStatus extends Business
 
         $valueArray = array();
 
-        $stmt = $this->db->prepare("
+        $stmt = $this->db->prepare(
+            "
       SELECT
         count(*)
         FROM customer
@@ -61,7 +62,8 @@ class BULeadStatus extends Business
 
         $valueArray = array();
 
-        $stmt = $this->db->prepare("
+        $stmt = $this->db->prepare(
+            "
       SELECT
         count(*)
         FROM customer
@@ -93,19 +95,21 @@ class BULeadStatus extends Business
 
     function getLeadsByStatus($leadStatusID, $orderAlpha = false)
     {
+        $dbeCustomer = new DBECustomer($this);
         if (!$orderAlpha) {
-            $orderByColumn = 'cus_became_customer_date';
+            $orderByColumn = $dbeCustomer->getDBColumnName(DBECustomer::becameCustomerDate);
         } else {
-            $orderByColumn = 'cus_name';
+            $orderByColumn = $dbeCustomer->getDBColumnName(DBECustomer::name);
         }
+
 
         $sql = "
       select
-        cus_custno as customerID,
-        cus_name  as customerName
-        from customer
-        where cus_leadstatusno = $leadStatusID
-      ORDER BY $orderByColumn";
+        {$dbeCustomer->getDBColumnName(DBECustomer::customerID)} as customerID,
+        {$dbeCustomer->getDBColumnName(DBECustomer::name)}  as customerName
+        from {$dbeCustomer->getTableName()}
+        where {$dbeCustomer->getDBColumnName(DBECustomer::leadStatusId)} = {$leadStatusID}
+      ORDER BY {$orderByColumn}";
 
         return $this->db->query($sql);
 

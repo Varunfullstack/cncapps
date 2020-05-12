@@ -5,6 +5,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg ["path_gc"] . "/Business.inc.php");
 require_once($cfg ["path_gc"] . "/Controller.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
@@ -663,10 +664,25 @@ class BUProblemSLA extends Business
             $problemID = $dsProblems->getValue(DBEProblem::problemID);
 
             $dbeCallActivity = $this->buActivity->getLastActivityInProblem($problemID);
-
             if ($dbeCallActivity) {
 
-                $this->dbeProblem->getRow($dsProblems->getValue(DBEProblem::problemID));
+                ?>
+                <div>
+                Problem: <?= $problemID ?>
+                <?php
+                $buActivity = new BUActivity($this);
+                $fixedActivity = $buActivity->getFixedActivityInProblem($problemID);
+                if (!$fixedActivity) {
+                    ?>
+                    <h2>This SR doesn't have a fixed activity!!</h2>
+                    </div>
+                    <?php
+
+                    $this->sendNoFixedActivityAlert($problemID);
+                    continue;
+                }
+
+                $this->dbeProblem->getRow($problemID);
 
                 $fixedDate = strtotime($this->dbeProblem->getValue(DBEProblem::completeDate));
 
@@ -675,7 +691,9 @@ class BUProblemSLA extends Business
                         date('U'),
                         // from now
                         strtotime(
-                            $this->dbeProblem->getValue(DBEProblem::completeDate) . ' ' . $dbeCallActivity->getValue(
+                            $this->dbeProblem->getValue(
+                                DBEProblem::completeDate
+                            ) . ' ' . $dbeCallActivity->getValue(
                                 DBEJCallActivity::endTime
                             )
                         )
@@ -703,36 +721,35 @@ class BUProblemSLA extends Business
                 );
 
                 ?>
+
                 <div>
-                    Problem: <?= $problemID ?>
-                    <div>
-                        Rootcause id = <?= $this->dbeProblem->getValue(DBEProblem::rootCauseID) ?>
-                    </div>
-                    <div>
-                        Server Care Contract id = <?= $serverCareContractID ?>
-                    </div>
-                    <div>
-                        Fixed Date = <?= $fixedDate ?>
-                    </div>
-                    <div>
-                        Total Activity Duration Hours = <?= $this->dbeProblem->getValue(
-                            DBEProblem::totalActivityDurationHours
-                        ) ?>
-                    </div>
-                    <ul>
-                        <li>
-                            Server Care Check: <?= $serverCareContractID ? 'true' : 'false' ?>
-                        </li>
-                        <li>
-                            $thresholdCheck: <?= $thresholdCheck ? 'true' : 'false' ?>
-                        </li>
-                        <li>
-                            $fixedDateCheck: <?= $fixedDateCheck ? 'true' : 'false' ?>
-                        </li>
-                        <li>
-                            $reasonCheck: <?= $reasonCheck ? 'true' : 'false' ?>
-                        </li>
-                    </ul>
+                    Rootcause id = <?= $this->dbeProblem->getValue(DBEProblem::rootCauseID) ?>
+                </div>
+                <div>
+                    Server Care Contract id = <?= $serverCareContractID ?>
+                </div>
+                <div>
+                    Fixed Date = <?= $fixedDate ?>
+                </div>
+                <div>
+                    Total Activity Duration Hours = <?= $this->dbeProblem->getValue(
+                        DBEProblem::totalActivityDurationHours
+                    ) ?>
+                </div>
+                <ul>
+                    <li>
+                        Server Care Check: <?= $serverCareContractID ? 'true' : 'false' ?>
+                    </li>
+                    <li>
+                        $thresholdCheck: <?= $thresholdCheck ? 'true' : 'false' ?>
+                    </li>
+                    <li>
+                        $fixedDateCheck: <?= $fixedDateCheck ? 'true' : 'false' ?>
+                    </li>
+                    <li>
+                        $reasonCheck: <?= $reasonCheck ? 'true' : 'false' ?>
+                    </li>
+                </ul>
                 </div>
                 <?php
 
@@ -781,6 +798,77 @@ class BUProblemSLA extends Business
             } // end older than 4 weeks check
 
         }    // end while fetch next
+
+    }
+
+    private function sendNoFixedActivityAlert($serviceRequestId)
+    {
+        $dbeActivity = new DBEJCallActivity($this);
+        $dbeActivity = $dbeActivity->getLastActionableActivityByProblemID($serviceRequestId);
+        if (!$dbeActivity) {
+            throw new UnexpectedValueException("No last activity was found for this SR: " . $serviceRequestId);
+        }
+
+        $createdByUserID = $dbeActivity->getValue(DBECallActivity::userID);
+
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRow($createdByUserID);
+        $teamId = $dbeUser->getValue(DBEUser::teamID);
+        $dbeTeam = new DBETeam($this);
+        $dbeTeam->getRow($teamId);
+        $managerId = $dbeTeam->getValue(DBETeam::leaderId);
+        $manager = new DBEUser($this);
+        $manager->getRow($managerId);
+
+        $activityURL = SITE_URL . Controller::formatForHTML(
+                '/Activity.php?action=displayLastActivity&problemID=' . $serviceRequestId,
+                1
+            );
+
+        $subject = "To be Closed service request missing fixed activity";
+
+        global $twig;
+
+        $body = $twig->render(
+            '@internal/toBeClosedSRMissingFixedEmail.html.twig',
+            [
+                "serviceRequestLink" => $activityURL,
+                "serviceRequestId"   => $serviceRequestId
+            ]
+        );
+        $emailTo = $manager->getEmail();
+
+        $hdrs = array(
+            'From'         => CONFIG_SUPPORT_EMAIL,
+            'To'           => $emailTo,
+            'Subject'      => $subject,
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $mime = new Mail_mime();
+
+        $mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+
+        $body = $mime->get($mime_params);
+
+        $hdrs = $mime->headers($hdrs);
+
+        $buMail = new BUMail($this);
+
+        $buMail->putInQueue(
+            CONFIG_SUPPORT_EMAIL,
+            $emailTo,
+            $hdrs,
+            $body
+        );
 
     }
 

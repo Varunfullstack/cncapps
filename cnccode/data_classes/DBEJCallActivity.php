@@ -464,6 +464,28 @@ class DBEJCallActivity extends DBECallActivity
         return (parent::getRows());
     }
 
+    function getLastActionableActivityByProblemID($problemId)
+    {
+        $query =
+            "SELECT " .
+            $this->getDBColumnNamesAsString() .
+            " FROM " . $this->fromString .
+            " WHERE callactivity.caa_problemno = " . mysqli_real_escape_string(
+                $this->db->link_id(),
+                $problemId
+            ) . " and caa_callacttypeno not in (59,60,61)";
+        $query .= " ORDER BY caa_date desc, caa_starttime desc limit 1";
+        $this->setQueryString($query);
+
+        if (!$this->getRows()) {
+            return false;
+        }
+        if (!$this->fetchNext()) {
+            return false;
+        }
+        return $this;
+    }
+
     /**
      * @param $problemID
      * @param bool $includeTravel

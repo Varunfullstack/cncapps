@@ -9,34 +9,34 @@ require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEUser extends DBEntity
 {
-    CONST userID = "userID";
-    CONST managerID = "managerID";
-    CONST name = "name";
-    CONST salutation = "salutation";
-    CONST add1 = "add1";
-    CONST add2 = "add2";
-    CONST add3 = "add3";
-    CONST town = "town";
-    CONST county = "county";
-    CONST postcode = "postcode";
-    CONST username = "username";
-    CONST employeeNo = "employeeNo";
-    CONST petrolRate = "petrolRate";
-    CONST perms = "perms";
-    CONST signatureFilename = "signatureFilename";
-    CONST jobTitle = "jobTitle";
-    CONST firstName = "firstName";
-    CONST lastName = "lastName";
-    CONST activeFlag = "activeFlag";
-    CONST helpdeskFlag = "helpdeskFlag";
-    CONST customerID = "customerID";
-    CONST hourlyPayRate = "hourlyPayRate";
-    CONST teamID = "teamID";
-    CONST receiveSdManagerEmailFlag = "receiveSdManagerEmailFlag";
-    CONST changePriorityFlag = "changePriorityFlag";
-    CONST appearInQueueFlag = "appearInQueueFlag";
-    CONST standardDayHours = "standardDayHours";
-    CONST changeApproverFlag = "changeApproverFlag";
+    const userID = "userID";
+    const managerID = "managerID";
+    const name = "name";
+    const salutation = "salutation";
+    const add1 = "add1";
+    const add2 = "add2";
+    const add3 = "add3";
+    const town = "town";
+    const county = "county";
+    const postcode = "postcode";
+    const username = "username";
+    const employeeNo = "employeeNo";
+    const petrolRate = "petrolRate";
+    const perms = "perms";
+    const signatureFilename = "signatureFilename";
+    const jobTitle = "jobTitle";
+    const firstName = "firstName";
+    const lastName = "lastName";
+    const activeFlag = "activeFlag";
+    const helpdeskFlag = "helpdeskFlag";
+    const customerID = "customerID";
+    const hourlyPayRate = "hourlyPayRate";
+    const teamID = "teamID";
+    const receiveSdManagerEmailFlag = "receiveSdManagerEmailFlag";
+    const changePriorityFlag = "changePriorityFlag";
+    const appearInQueueFlag = "appearInQueueFlag";
+    const standardDayHours = "standardDayHours";
+    const changeApproverFlag = "changeApproverFlag";
     const admin = 'admin';
     const excludeFromStatsFlag = "excludeFromStatsFlag";
     const changeInitialDateAndTimeFlag = 'changeInitialDateAndTimeFlag';
@@ -402,6 +402,11 @@ class DBEUser extends DBEntity
 
         $this->setPK(0);
         $this->setAddColumnsOff();
+    }
+
+    function getEmail()
+    {
+        return $this->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
     }
 
     function getRows($activeOnly = true)

@@ -153,13 +153,9 @@ class CTQuestionnaireReport extends CTCNC
                 array(
                     'formError'              => $this->formError,
                     'questionnaireIDMessage' => $this->dsSearchForm->getMessage(self::searchFormQuestionnaireID),
-                    'fromDate'               => Controller::dateYMDtoDMY(
-                        $this->dsSearchForm->getValue(self::searchFormFromDate)
-                    ),
+                    'fromDate'               => $this->dsSearchForm->getValue(self::searchFormFromDate),
                     'fromDateMessage'        => $this->dsSearchForm->getMessage(self::searchFormFromDate),
-                    'toDate'                 => Controller::dateYMDtoDMY(
-                        $this->dsSearchForm->getValue(self::searchFormToDate)
-                    ),
+                    'toDate'                 => $this->dsSearchForm->getValue(self::searchFormToDate),
                     'toDateMessage'          => $this->dsSearchForm->getMessage(self::searchFormToDate),
                     'urlSubmit'              => $urlSubmit,
                     'report'                 => $report

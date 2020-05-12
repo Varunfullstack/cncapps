@@ -199,7 +199,7 @@ function common_inRange($value,
                         $endRange
 )
 {
-    if (($value > $endRange) OR ($value < $startRange)) {
+    if (($value > $endRange) or ($value < $startRange)) {
         return FALSE;
     } else {
         return TRUE;
@@ -584,11 +584,15 @@ function common_getUKBankHolidays($year)
             $utEasterSunday
         )
     );
-    $holidays[] = date(
+    $firstMondayOfMay = date(
         'Y-m-d',
         strtotime('first monday of may ' . $year)
     );
 
+    if ($year == 2020) {
+        $firstMondayOfMay = "2020-05-08";
+    }
+    $holidays[] = $firstMondayOfMay;
     /*
     Example of adhock holiday adding
     */

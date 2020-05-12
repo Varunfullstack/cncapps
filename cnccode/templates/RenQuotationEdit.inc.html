@@ -131,16 +131,15 @@
         </tr>
         <tr>
             <td class="promptText">Start Date</td>
-            <td class="fieldText"><input
-                    name="renQuotation[1][startDate]"
-                    type="text"
-                    value="{startDate}"
-                    {readonly}
-                    size="10"
-                    maxlength="10"
-                    autocomplete="off"
-                    class="jQueryCalendar"
-            >
+            <td class="fieldText">
+                <input name="renQuotation[1][startDate]"
+                       type="date"
+                       value="{startDate}"
+                       {readonly}
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
+                >
 
                 <span class="formErrorMessage">{startDateMessage}</span></td>
         </tr>
@@ -268,14 +267,13 @@
         <tr>
             <td class="promptText">Date Generated</td>
             <td class="fieldText">
-                <input type="text"
+                <input type="date"
                        name="renQuotation[1][dateGenerated]"
                        value="{dateGenerated}"
                        {readonly}
                        size="10"
                        maxlength="10"
                        autocomplete="off"
-                       class="jQueryCalendar"
                 >
                 <span class="formErrorMessage">{dateGeneratedMessage}</span>
             </td>

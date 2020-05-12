@@ -213,15 +213,13 @@ class CTCustomerProfitabilityReport extends CTCNC
                     BUCustomerProfitabilityReport::searchFormCustomerID
                 ),
                 'customerString'           => $customerString,
-                'fromDate'                 => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUCustomerProfitabilityReport::searchFormFromDate)
+                'fromDate'                 => $dsSearchForm->getValue(
+                    BUCustomerProfitabilityReport::searchFormFromDate
                 ),
                 'fromDateMessage'          => $dsSearchForm->getMessage(
                     BUCustomerProfitabilityReport::searchFormFromDate
                 ),
-                'toDate'                   => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUCustomerProfitabilityReport::searchFormToDate)
-                ),
+                'toDate'                   => $dsSearchForm->getValue(BUCustomerProfitabilityReport::searchFormToDate),
                 'toDateMessage'            => $dsSearchForm->getMessage(
                     BUCustomerProfitabilityReport::searchFormToDate
                 ),

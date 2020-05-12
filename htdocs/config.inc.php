@@ -1001,7 +1001,7 @@ define(
 
 define(
     "POWERSHELL_DIR",
-    BASE_DRIVE . "/powershell"
+    BASE_DRIVE . "\powershell"
 );
 
 define(
@@ -1075,6 +1075,7 @@ $twig = new Environment(
     ]
 );
 $twig->addExtension(new \Twig\Extra\Intl\IntlExtension());
+$twig->addExtension(new \Twig\Extension\DebugExtension());
 
 define(
     'DOMPDF_ENABLE_AUTOLOAD',

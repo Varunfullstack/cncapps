@@ -540,12 +540,8 @@ class CTExpense extends CTCNC
         }
         $this->template->set_var(
             array(
-                'endDate'        => Controller::dateYMDtoDMY(
-                    $this->dsExpenseExport->getValue(BUExpense::exportDataSetEndDate)
-                ),
-                'endDateMessage' => Controller::dateYMDtoDMY(
-                    $this->dsExpenseExport->getMessage(BUExpense::exportDataSetEndDate)
-                ),
+                'endDate'        => $this->dsExpenseExport->getValue(BUExpense::exportDataSetEndDate),
+                'endDateMessage' => $this->dsExpenseExport->getMessage(BUExpense::exportDataSetEndDate),
                 'urlSubmit'      => $urlSubmit
             )
         );

@@ -494,6 +494,7 @@ class CTPassword extends CTCNC
                 'password'            => $password,
                 "weirdFields"         => $weirdFields,
                 'level'               => $dsPassword->getValue(DBEPassword::level),
+                'sortOrder'           => $dsPassword->getValue(DBEJPassword::sortOrder)
             ];
         }
 
@@ -503,6 +504,7 @@ class CTPassword extends CTCNC
             function ($a,
                       $b
             ) {
+
                 if (!$a[DBEJPassword::serviceID] && $b[DBEJPassword::serviceID]) {
                     return 1;
                 }
@@ -511,14 +513,11 @@ class CTPassword extends CTCNC
                     return -1;
                 }
 
-                if ($comparison = $this->weirdStringComparison(
-                    $a[DBEJPassword::serviceName],
-                    $b[DBEJPassword::serviceName]
-                )) {
-                    return $comparison;
+                if ($a[DBEJPassword::sortOrder] != $b[DBEJPassword::sortOrder]) {
+                    return $a[DBEJPassword::sortOrder] - $b[DBEJPassword::sortOrder];
                 }
 
-                return $this->weirdStringComparison(
+                return strcmp(
                     $a[DBEJPassword::notes],
                     $b[DBEJPassword::notes]
                 );
@@ -542,70 +541,6 @@ class CTPassword extends CTCNC
             true
         );
         $this->parsePage();
-    }
-
-    /**
-     * @param $a
-     * @param $b
-     * @return int|lt
-     */
-    function weirdStringComparison($a,
-                                   $b
-    )
-    {
-        $lenA = strlen($a);
-        $lenB = strlen($b);
-
-        if (!$lenA && $lenB) {
-            return -1;
-        }
-
-        if ($lenA && !$lenB) {
-            return 1;
-        }
-
-        if (!$lenA && !$lenB) {
-            return 0;
-        }
-
-        $len = $lenA > $lenB ? $lenA : $lenB;
-        $currentIdx = 0;
-        while ($currentIdx < $len) {
-
-            if (!isset($a[$currentIdx])) {
-                return -1;
-            }
-
-            if (!isset($b[$currentIdx])) {
-                return 1;
-            }
-
-            if ($comparison = $this->compareCharacter(
-                $a[$currentIdx],
-                $b[$currentIdx]
-            )) {
-                return $comparison;
-            };
-            $currentIdx++;
-        }
-        return 0;
-    }
-
-    function compareCharacter($ch1,
-                              $ch2
-    )
-    {
-        if (ctype_lower($ch1) && !ctype_lower($ch2)) {
-            return -1;
-        }
-
-        if (!ctype_lower($ch1) && ctype_lower($ch2)) {
-            return 1;
-        }
-        return strcmp(
-            $ch1,
-            $ch2
-        );
     }
 
     function search()
@@ -681,6 +616,70 @@ class CTPassword extends CTCNC
 
         $this->parsePage();
 
+    }
+
+    /**
+     * @param $a
+     * @param $b
+     * @return int|lt
+     */
+    function weirdStringComparison($a,
+                                   $b
+    )
+    {
+        $lenA = strlen($a);
+        $lenB = strlen($b);
+
+        if (!$lenA && $lenB) {
+            return -1;
+        }
+
+        if ($lenA && !$lenB) {
+            return 1;
+        }
+
+        if (!$lenA && !$lenB) {
+            return 0;
+        }
+
+        $len = $lenA > $lenB ? $lenA : $lenB;
+        $currentIdx = 0;
+        while ($currentIdx < $len) {
+
+            if (!isset($a[$currentIdx])) {
+                return -1;
+            }
+
+            if (!isset($b[$currentIdx])) {
+                return 1;
+            }
+
+            if ($comparison = $this->compareCharacter(
+                $a[$currentIdx],
+                $b[$currentIdx]
+            )) {
+                return $comparison;
+            };
+            $currentIdx++;
+        }
+        return 0;
+    }
+
+    function compareCharacter($ch1,
+                              $ch2
+    )
+    {
+        if (ctype_lower($ch1) && !ctype_lower($ch2)) {
+            return -1;
+        }
+
+        if (!ctype_lower($ch1) && ctype_lower($ch2)) {
+            return 1;
+        }
+        return strcmp(
+            $ch1,
+            $ch2
+        );
     }
 
 }// end of class

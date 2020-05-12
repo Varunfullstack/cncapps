@@ -166,4 +166,45 @@ class CTContactAudit extends CTCNC
         );
         $this->parsePage();
     }
+
+
+    private function searchContactAudit($customerID = null,
+                                        $startDate = null,
+                                        $endDate = null,
+                                        $firstName = null,
+                                        $lastName = null
+    )
+    {
+        $test = new DBEJContactAudit($this);
+
+        if ($startDate) {
+            $startDate = DateTime::createFromFormat(
+                DATE_MYSQL_DATE,
+                $startDate
+            );
+        }
+
+        if ($endDate) {
+            $endDate = DateTime::createFromFormat(
+                DATE_MYSQL_DATE,
+                $endDate
+            );
+        }
+
+        $test->search(
+            $customerID,
+            $startDate,
+            $endDate,
+            $firstName,
+            $lastName
+        );
+
+        $result = [];
+
+        while ($test->fetchNext()) {
+            $result[] = $test->getRowAsAssocArray();
+        }
+
+        return $result;
+    }
 }// end of class

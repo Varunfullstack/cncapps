@@ -1,0 +1,123 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="hotfix-v3.13.5-0">
+        <tagDatabase tag="hotfix-v3.13.5"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="hotfix-v3.13.5-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(routine_name) > 0
+                FROM INFORMATION_SCHEMA.ROUTINES
+                WHERE
+                ROUTINE_TYPE="FUNCTION"
+                AND ROUTINE_SCHEMA=DATABASE()
+                AND ROUTINE_NAME = 'isBankHoliday';
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            DROP FUNCTION IF EXISTS isBankHoliday
+        </sql>
+        <createProcedure procedureName="isBankHoliday">
+            create
+            function isBankHoliday(X date) returns tinyint(1)
+            deterministic
+            BEGIN
+            DECLARE m INTEGER;
+            DECLARE Y INTEGER;
+            DECLARE d INTEGER;
+            DECLARE wd INTEGER;
+            DECLARE easter DATE;
+            DECLARE nextEasterMonday DATE;
+            DECLARE lastEasterFriday DATE;
+            DECLARE firstOfMay DATE;
+            DECLARE firstMondayOfMay DATE;
+            DECLARE lastMondayOfMay DATE;
+            DECLARE firstOfAugust DATE;
+            DECLARE lastMondayOfAugust DATE;
+            DECLARE xMasDay DATE;
+            DECLARE xMasWeekDay INTEGER;
+            DECLARE nextXMasMonday DATE;
+            DECLARE nextXMasTuesday DATE;
+            DECLARE nextXMasDay DATE;
+
+            SET m = MONTH(X);
+            SET Y = YEAR(X);
+            SET d = DAY(X);
+            SET wd = DAYOFWEEK(X);
+            IF (wd = 1 OR wd = 7) THEN
+            RETURN TRUE ;
+            END IF;
+
+            IF (m = 1 AND d = 1) THEN
+            RETURN TRUE ;
+            END IF;
+
+            SET easter = getEasterDate(Y);
+            SET nextEasterMonday = getNextWeekDay(easter, 2);
+            IF (X = nextEasterMonday) THEN
+            RETURN TRUE;
+            END IF;
+
+            SET lastEasterFriday = getNextWeekDay(DATE_SUB(easter, INTERVAL 7 DAY), 6);
+            IF (X = lastEasterFriday) THEN
+            RETURN TRUE;
+            END IF;
+
+            IF m = 5 THEN
+            if (Y = 2020 and d = 4) then return false; end if;
+            if (Y = 2020 and d = 8) then return true; end if;
+            SET firstOfMay = CONCAT(Y, '-05-01');
+            SET firstMondayOfMay = DATE_ADD(firstOfMay, INTERVAL MOD(9 - DAYOFWEEK(firstOfMay), 7) DAY);
+            IF (firstMondayOfMay = X) THEN RETURN TRUE; END IF;
+
+            SET lastMondayOfMay = getNextWeekDay(DATE_SUB(LAST_DAY(firstOfMay), INTERVAL 7 DAY), 2);
+
+            IF (lastMondayOfMay = X) THEN RETURN TRUE; END IF;
+
+            END IF;
+
+            IF (m = 8) THEN
+            SET firstOfAugust = CONCAT(Y, '-08-01');
+            SET lastMondayOfAugust = getNextWeekDay(DATE_SUB(LAST_DAY(firstOfAugust), INTERVAL 7 DAY), 2);
+
+            IF (lastMondayOfAugust = X) THEN RETURN TRUE; END IF;
+            END IF;
+
+            SET xMasDay = CONCAT(Y, '-12-25');
+
+            IF (X = xMasDay) THEN RETURN TRUE; END IF;
+
+            SET xMasWeekDay = DAYOFWEEK(xMasDay);
+
+            IF xMasWeekDay = 6 THEN
+            SET nextXMasMonday = getNextWeekDay(xMasDay, 2);
+
+            IF X = nextXMasMonday THEN
+            RETURN TRUE;
+            END IF;
+            ELSEIF xMasWeekDay = 7 OR xMasWeekDay = 1 THEN
+
+            SET nextXMasMonday = getNextWeekDay(xMasDay, 2);
+            SET nextXMasTuesday = getNextWeekDay(xMasDay, 3);
+
+            IF X = nextXMasMonday OR X = nextXMasTuesday THEN
+            RETURN TRUE;
+            END IF;
+            ELSE
+            SET nextXMasDay = DATE_ADD(xMasDay, INTERVAL 1 DAY);
+            IF X = nextXMasDay THEN
+            RETURN TRUE;
+            END IF;
+
+            END IF;
+
+            RETURN FALSE;
+            END;
+
+
+        </createProcedure>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

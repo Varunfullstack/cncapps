@@ -86,7 +86,6 @@ class BUQuotationConversionReport extends Business
       ) AS totals 
       GROUP BY
         YEAR, MONTH";
-
         $db->query($sql);
 
         $ret = array();

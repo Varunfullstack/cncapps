@@ -314,9 +314,7 @@ class CTRenHosting extends CTCNC
                     $dsRenHosting->getValue(DBEJRenHosting::itemDescription)
                 ),
                 'invoiceFromDate'                    => $dsRenHosting->getValue(DBEJRenHosting::invoiceFromDate),
-                'installationDate'                   => Controller::dateYMDtoDMY(
-                    $dsRenHosting->getValue(DBEJRenHosting::installationDate)
-                ),
+                'installationDate'                   => $dsRenHosting->getValue(DBEJRenHosting::installationDate),
                 'invoiceToDate'                      => $dsRenHosting->getValue(DBEJRenHosting::invoiceToDate),
                 'invoicePeriodMonths'                => Controller::htmlInputText(
                     $dsRenHosting->getValue(DBEJRenHosting::invoicePeriodMonths)

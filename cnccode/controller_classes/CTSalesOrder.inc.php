@@ -631,11 +631,11 @@ class CTSalesOrder extends CTCNC
             $this->displaySearchForm();
             return;
         }
-        if (($this->getToDateYMD()) && ($this->getFromDateYMD())) {
-            if ($this->getToDateYMD() < $this->getFromDateYMD()) {
-                $this->setToDateMessage(CTSALESORDER_TO_DATE_SMALLER);
-            }
+
+        if ($this->getToDate() && $this->getFromDate() && $this->getToDate() < $this->getFromDate()) {
+            $this->setToDateMessage(CTSALESORDER_TO_DATE_SMALLER);
         }
+
         if ($this->getFormError()) {
             $this->displaySearchForm();
             return;
@@ -647,8 +647,8 @@ class CTSalesOrder extends CTCNC
             $this->getOrderType(),
             $this->getCustPORef(),
             $this->getLineText(),
-            $this->getFromDateYMD(),
-            $this->getToDateYMD(),
+            $this->getFromDate(),
+            $this->getToDate(),
             $this->getQuotationUserID(),
             $this->dsOrdhead
         );
@@ -1054,47 +1054,6 @@ class CTSalesOrder extends CTCNC
         return $this->custPORef;
     }
 
-    function setCustPORef($ref)
-    {
-        $this->custPORef = $ref;
-    }
-
-    function getToDateYMD()
-    {
-        return $this->convertDateYMD($this->getToDate());
-    }
-
-    /**
-     * @param $dateDMY
-     * @return string
-     */
-    function convertDateYMD($dateDMY)
-    {
-        if (!$dateDMY) {
-            return null;
-        }
-        $dateArray = explode(
-            '/',
-            $dateDMY
-        );
-        return ($dateArray[2] . '-' . str_pad(
-                $dateArray[1],
-                2,
-                '0',
-                STR_PAD_LEFT
-            ) . '-' . str_pad(
-                $dateArray[0],
-                2,
-                '0',
-                STR_PAD_LEFT
-            ));
-    }
-
-    function getFromDateYMD()
-    {
-        return $this->convertDateYMD($this->getFromDate());
-    }
-
     /**
      * Display one order
      * @access private
@@ -1126,7 +1085,7 @@ class CTSalesOrder extends CTCNC
         $urlCustomerNote = null;
 
 
-        if ($this->getAction() != CTSALESORDER_ACT_CREATE_QUOTE AND $this->getAction(
+        if ($this->getAction() != CTSALESORDER_ACT_CREATE_QUOTE and $this->getAction(
             ) != CTSALESORDER_ACT_CREATE_ORDER) {
 
             if (!$this->getOrdheadID()) {
@@ -1214,7 +1173,7 @@ class CTSalesOrder extends CTCNC
                 $actions[CTSALESORDER_ACT_COPY_TO_ORDER] = 'copy to order';
                 $actions[CTSALESORDER_ACT_CONVERT_TO_ORDER] = 'convert to order';
             }
-            if ($orderType == 'Q' OR $orderType == 'I') {
+            if ($orderType == 'Q' or $orderType == 'I') {
                 $actions[CTSALESORDER_ACT_DELETE_LINES] = 'delete lines';
                 $actions[CTSALESORDER_ACT_UPDATE_LINES] = 'update values';
                 $actions[CTSALESORDER_ACT_INSERT_FROM_ORDER] = 'insert lines from order';
@@ -1291,7 +1250,7 @@ class CTSalesOrder extends CTCNC
             /*
       Inside sales group, decide which items are readonly
       */
-            if ($orderType == 'Q' OR $orderType == 'I') {
+            if ($orderType == 'Q' or $orderType == 'I') {
                 /*
         Quotes or initial orders allow all
         */
@@ -1303,7 +1262,7 @@ class CTSalesOrder extends CTCNC
                 $valuesDisabled = CTCNC_HTML_DISABLED;
             }
 
-            if ($orderType == 'C' AND !$this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
+            if ($orderType == 'C' and !$this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
                 $valuesDisabled = null;
             }
 
@@ -1577,7 +1536,7 @@ class CTSalesOrder extends CTCNC
             }
 
             // Show navigate link to invoices if order is part or completed and they exist
-            if (($orderType == 'P') OR ($orderType == 'C')) {
+            if (($orderType == 'P') or ($orderType == 'C')) {
                 $buInvoice = new BUInvoice($this);
                 $invoiceCount = $buInvoice->countInvoicesByOrdheadID($dsOrdhead->getValue(DBEOrdhead::ordheadID));
                 if ($invoiceCount > 0) {
@@ -1600,7 +1559,7 @@ class CTSalesOrder extends CTCNC
             }
             // Show despatch link if order type is part-despatched or initial and there are lines
             if (
-                (($orderType == 'P') OR ($orderType == 'I')) and
+                (($orderType == 'P') or ($orderType == 'I')) and
                 ($dsOrdline->rowCount() > 0) and
                 (!common_isAnInternalStockLocation($dsOrdhead->getValue(DBEOrdhead::customerID)))
             ) {
@@ -2285,7 +2244,7 @@ class CTSalesOrder extends CTCNC
                 $project->getRowsByColumn(DBEProject::ordHeadID);
                 $requiredByDateValue = null;
                 if ($project->fetchNext() && $project->getValue(DBEProject::commenceDate)) {
-                    $requiredByDateValue = Controller::dateYMDtoDMY($project->getValue(DBEProject::commenceDate));
+                    $requiredByDateValue = $project->getValue(DBEProject::commenceDate);
                 }
 
                 $this->template->set_var(
@@ -2366,7 +2325,7 @@ class CTSalesOrder extends CTCNC
 
 
         // if part despatched or complete show any delivery notes
-        if (($orderType == 'P') OR ($orderType == 'C')) {
+        if (($orderType == 'P') or ($orderType == 'C')) {
             $buDespatch = new BUDespatch($this);
             $ctDeliveryNotes = new CTDeliveryNotes(
                 $this,
@@ -4939,7 +4898,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
 
         $this->template->set_var(
             array(
-                'etaDate'        => Controller::dateYMDtoDMY($dsInput->getValue(self::etaDate)),
+                'etaDate'        => $dsInput->getValue(self::etaDate),
                 'etaDateMessage' => $dsInput->getMessage(self::etaDate),
 
                 'serviceRequestText'                  => $dsInput->getValue(DBEOrdhead::serviceRequestText),
@@ -4952,16 +4911,12 @@ now that the notes are in a text field we need to split the lines up for the PDF
 
         $this->contractDropdown(
             $dsOrdhead->getValue(DBEOrdhead::customerID),
-            $dsInput->getValue(DBEOrdhead::serviceRequestCustomerItemID),
-            'SalesOrderServiceRequest',
-            'contractBlock'
+            $dsInput->getValue(DBEOrdhead::serviceRequestCustomerItemID)
         );
 
         $this->priorityDropdown(
             $dsInput->getValue(DBEOrdhead::serviceRequestPriority),
-            $buActivity,
-            'SalesOrderServiceRequest',
-            'priorityBlock'
+            $buActivity
         );
 
         $this->standardTextList(
@@ -4983,7 +4938,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
     function contractDropdown(
         $customerID,
         $serviceRequestCustomerItemID,
-        $templateName = 'SalesOrderVisitRequest',
+        $templateName = 'SalesOrderServiceRequest',
         $blockName = 'contractBlock'
     )
     {
@@ -5040,7 +4995,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
     function priorityDropdown(
         $serviceRequestPriority,
         $buActivity,
-        $templateName = 'SalesOrderVisitRequest',
+        $templateName = 'SalesOrderServiceRequest',
         $blockName = 'priorityBlock'
     )
     {

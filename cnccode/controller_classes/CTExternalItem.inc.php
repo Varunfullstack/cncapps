@@ -173,9 +173,7 @@ class CTExternalItem extends CTCNC
                 'notesMessage'              => Controller::htmlDisplayText(
                     $dsExternalItem->getMessage(DBEExternalItem::notes)
                 ),
-                'licenceRenewalDate'        => Controller::dateYMDtoDMY(
-                    $dsExternalItem->getValue(DBEExternalItem::licenceRenewalDate)
-                ),
+                'licenceRenewalDate'        => $dsExternalItem->getValue(DBEExternalItem::licenceRenewalDate),
                 'licenceRenewalDateMessage' => Controller::htmlDisplayText(
                     $dsExternalItem->getMessage(DBEExternalItem::licenceRenewalDate)
                 ),
@@ -198,37 +196,35 @@ class CTExternalItem extends CTCNC
         $this->parsePage();
     }// end function editFurther Action()
 
-    /**
-     * Update call Further Action details
-     * @access private
-     * @throws Exception
-     */
-    function update()
+    function itemTypeDropdown($templateName,
+                              $itemTypeID
+    )
     {
-        $this->setMethodName('update');
-        $this->formError = (!$this->dsExternalItem->populateFromArray($this->getParam('externalItem')));
-        if ($this->formError) {
-            $this->setAction(CREXTERNALITEM_ACT_ACT);
-            if (!$this->dsExternalItem->getValue(
-                DBEExternalItem::externalItemID
-            )) {                    // attempt to insert
-                $this->setAction(CREXTERNALITEM_ACT_EDIT);
-            }
-            $this->edit();
-            exit;
-        }
+        $dbeItemType = new DBEItemType($this);
 
-        $this->buExternalItem->updateExternalItem($this->dsExternalItem);
+        $dbeItemType->getRows();
+        $this->template->set_block(
+            $templateName,
+            'itemTypeBlock',
+            'itemTypes'
+        );
 
-        $urlNext =
-            Controller::buildLink(
-                'RenewalReport.php',
+        while ($dbeItemType->fetchNext()) {
+            $selected = ($itemTypeID == $dbeItemType->getValue(DBEItemType::itemTypeID)) ? CT_SELECTED : null;
+
+            $this->template->set_var(
                 array(
-                    'customerID' => $this->dsExternalItem->getValue(DBEExternalItem::customerID),
-                    'action'     => 'produceReport'
+                    'itemTypeSelected'    => $selected,
+                    'itemTypeID'          => $dbeItemType->getValue(DBEItemType::itemTypeID),
+                    'itemTypeDescription' => $dbeItemType->getValue(DBEItemType::description)
                 )
             );
-        header('Location: ' . $urlNext);
+            $this->template->parse(
+                'itemTypes',
+                'itemTypeBlock',
+                true
+            );
+        }
     }
 
     /**
@@ -261,37 +257,6 @@ class CTExternalItem extends CTCNC
                 );
             header('Location: ' . $urlNext);
             exit;
-        }
-    }
-
-    function itemTypeDropdown($templateName,
-                              $itemTypeID
-    )
-    {
-        $dbeItemType = new DBEItemType($this);
-
-        $dbeItemType->getRows();
-        $this->template->set_block(
-            $templateName,
-            'itemTypeBlock',
-            'itemTypes'
-        );
-
-        while ($dbeItemType->fetchNext()) {
-            $selected = ($itemTypeID == $dbeItemType->getValue(DBEItemType::itemTypeID)) ? CT_SELECTED : null;
-
-            $this->template->set_var(
-                array(
-                    'itemTypeSelected'    => $selected,
-                    'itemTypeID'          => $dbeItemType->getValue(DBEItemType::itemTypeID),
-                    'itemTypeDescription' => $dbeItemType->getValue(DBEItemType::description)
-                )
-            );
-            $this->template->parse(
-                'itemTypes',
-                'itemTypeBlock',
-                true
-            );
         }
     }
 
@@ -329,5 +294,38 @@ class CTExternalItem extends CTCNC
         );
         $this->parsePage();
 
+    }
+
+    /**
+     * Update call Further Action details
+     * @access private
+     * @throws Exception
+     */
+    function update()
+    {
+        $this->setMethodName('update');
+        $this->formError = (!$this->dsExternalItem->populateFromArray($this->getParam('externalItem')));
+        if ($this->formError) {
+            $this->setAction(CREXTERNALITEM_ACT_ACT);
+            if (!$this->dsExternalItem->getValue(
+                DBEExternalItem::externalItemID
+            )) {                    // attempt to insert
+                $this->setAction(CREXTERNALITEM_ACT_EDIT);
+            }
+            $this->edit();
+            exit;
+        }
+
+        $this->buExternalItem->updateExternalItem($this->dsExternalItem);
+
+        $urlNext =
+            Controller::buildLink(
+                'RenewalReport.php',
+                array(
+                    'customerID' => $this->dsExternalItem->getValue(DBEExternalItem::customerID),
+                    'action'     => 'produceReport'
+                )
+            );
+        header('Location: ' . $urlNext);
     }
 }

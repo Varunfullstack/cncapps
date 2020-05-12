@@ -86,11 +86,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
                         "documentID"        => $dbeDocuments->getValue(
                             DBECustomerReviewMeetingDocument::customerReviewMeetingDocumentID
                         ),
-                        "reviewMeetingDate" => self::dateYMDtoDMY(
-                            $dbeDocuments->getValue(
-                                DBECustomerReviewMeetingDocument::meetingDate
-                            )
-                        ),
+                        "reviewMeetingDate" => $dbeDocuments->getValue(DBECustomerReviewMeetingDocument::meetingDate),
                         "fileName"          => $dbeDocuments->getValue(
                             DBECustomerReviewMeetingDocument::fileName
                         ),
@@ -203,7 +199,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             );
             $dbeDocuments->setValue(
                 DBECustomerReviewMeetingDocument::meetingDate,
-                common_convertDateDMYToYMD($this->getParam('reviewMeetingDate'))
+                $this->getParam('reviewMeetingDate')
             );
             $dbeDocuments->setValue(
                 DBECustomerReviewMeetingDocument::file,

@@ -193,14 +193,6 @@ class CTCurrentActivityReport extends CTCNC
             case 'toggleDisplayQueue7Flag':
                 $this->toggleDisplayFlag('displayQueue7Flag');
                 break;
-
-            case 'escalate':
-                $this->escalate();
-                break;
-
-            case 'deescalate':
-                $this->deescalate();
-                break;
             case 'changeQueue':
                 $this->changeQueue();
                 break;
@@ -320,47 +312,15 @@ class CTCurrentActivityReport extends CTCNC
     /**
      * @throws Exception
      */
-    function escalate()
-    {
-
-        $problemID = $this->getParam('problemID');
-
-        $this->buActivity->escalateProblemByProblemID($problemID);
-
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array()
-        );
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    /**
-     * @throws Exception
-     */
-    function deescalate()
-    {
-        $problemID = $this->getParam('problemID');
-        $this->buActivity->deEscalateProblemByProblemID($problemID);
-
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array()
-        );
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    /**
-     * @throws Exception
-     */
     function changeQueue()
     {
         $problemID = $this->getParam('problemID');
         $newQueue = $this->getParam('queue');
+        $reason = $this->getParam('reason');
 
         $this->buActivity->escalateProblemByProblemID(
             $problemID,
+            $reason,
             $newQueue
         );
 
@@ -401,13 +361,20 @@ class CTCurrentActivityReport extends CTCNC
         );
 
         $this->setPageTitle('Pending Reopened Description');
+        $pendingReopenedID = $this->getParam('pendingReopenedID');
+        if (!$pendingReopenedID) {
+            throw new Exception('Pending reopened ID is missing');
+        }
+
+        $dbePendingReopened = new DBEPendingReopened($this);
+        $dbePendingReopened->getRow($pendingReopenedID);
 
         $this->template->set_var(
             array(
                 'details' => str_replace(
                     "\n",
                     "<br/>",
-                    $_REQUEST['reason']
+                    $dbePendingReopened->getValue(DBEPendingReopened::reason)
                 )
             )
         );
@@ -528,9 +495,9 @@ class CTCurrentActivityReport extends CTCNC
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
-                            'action'  => 'pendingReopenedPopup',
-                            'reason'  => $pendingReopenedRequest['reason'],
-                            'htmlFmt' => CT_HTML_FMT_POPUP
+                            'action'            => 'pendingReopenedPopup',
+                            'pendingReopenedID' => $pendingReopenedRequest['id'],
+                            'htmlFmt'           => CT_HTML_FMT_POPUP
                         )
                     );
                 $this->template->set_var(
@@ -541,7 +508,11 @@ class CTCurrentActivityReport extends CTCNC
                         "pendingReopenPriority"           => $pendingReopenedPriority,
                         "pendingReopenDescriptionURL"     => $pendingReopenDescriptionURL,
                         "pendingReopenDescriptionSummary" => $pendingReopenDescriptionSummary,
-                        "pendingReopenedID"               => $pendingReopenedRequest['id']
+                        "pendingReopenedID"               => $pendingReopenedRequest['id'],
+                        "receivedDate"                    => $pendingReopenedRequest['createdAt'],
+                        "pendingReopenedCustomerID"       => $pendingReopenedRequest['customerID'],
+                        "pendingReopenedContactID"        => $pendingReopenedRequest['contactID'],
+                        "base64Reason"                    => base64_encode($pendingReopenedRequest['reason']),
 
                     ]
                 );
@@ -1246,6 +1217,7 @@ class CTCurrentActivityReport extends CTCNC
                         $serviceRequests->getValue(DBEJProblem::lastDate)
                     ),
                     'problemID'                  => $serviceRequests->getValue(DBEJProblem::problemID),
+                    'problemStatus'              => $serviceRequests->getValue(DBEJProblem::status),
                     'reason'                     => CTCurrentActivityReport::truncate(
                         $serviceRequests->getValue(DBEJProblem::reason),
                         150
@@ -1339,7 +1311,7 @@ class CTCurrentActivityReport extends CTCNC
 
                     $bgColour = self::GREEN; /// green
 
-                } elseif ($percentageSLA > 0.75 AND $percentageSLA < 1) {
+                } elseif ($percentageSLA > 0.75 and $percentageSLA < 1) {
 
                     $bgColour = self::AMBER; // amber
 

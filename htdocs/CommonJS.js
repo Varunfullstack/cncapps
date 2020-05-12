@@ -1,7 +1,15 @@
 function getFormDataAsJSON(form) {
 
 }
-
+function addInputs(array, form) {
+    array.forEach((element) => {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = element.name;
+        input.value = element.value;
+        form.appendChild(input);
+    })
+}
 /*
  Common Javascript functions
 

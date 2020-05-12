@@ -575,7 +575,6 @@ class BUPDFSalesQuote extends Business
         );
 
         $DBEJRenQuotation = new DBEJRenQuotation($this);
-        $DBEJRenQuotation->setShowSQLOn();
         $DBEJRenQuotation->getRowsBySalesOrderID($dsOrdhead->getValue(DBEOrdhead::ordheadID));
 
         if (!$DBEJRenQuotation->rowCount()) {

@@ -925,14 +925,14 @@ class CTCustomerItem extends CTCNC
                 'curUnitCostMessage'                                    => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::curUnitCost)
                 ),
-                'sOrderDate'                                            => Controller::dateYMDtoDMY(
-                    $dsCustomerItem->getValue(DBEJCustomerItem::sOrderDate)
+                'sOrderDate'                                            => $dsCustomerItem->getValue(
+                    DBEJCustomerItem::sOrderDate
                 ),
                 'sOrderDateMessage'                                     => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::sOrderDate)
                 ),
-                'expiryDate'                                            => Controller::dateYMDtoDMY(
-                    $dsCustomerItem->getValue(DBEJCustomerItem::expiryDate)
+                'expiryDate'                                            => $dsCustomerItem->getValue(
+                    DBEJCustomerItem::expiryDate
                 ),
                 'expiryDateMessage'                                     => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::expiryDate)
@@ -952,8 +952,8 @@ class CTCustomerItem extends CTCNC
                 'slaResponseHours'                                      => $dsCustomerItem->getValue(
                     DBEJCustomerItem::slaResponseHours
                 ),
-                'despatchDate'                                          => Controller::dateYMDtoDMY(
-                    $dsCustomerItem->getValue(DBEJCustomerItem::despatchDate)
+                'despatchDate'                                          => $dsCustomerItem->getValue(
+                    DBEJCustomerItem::despatchDate
                 ),
                 'despatchDateMessage'                                   => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::despatchDate)
@@ -970,14 +970,14 @@ class CTCustomerItem extends CTCNC
                 'secondSiteReplicationPathMessage'                      => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::secondSiteReplicationPath)
                 ),
-                'secondsiteValidationSuspendUntilDate'                  => Controller::dateYMDtoDMY(
-                    $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteValidationSuspendUntilDate)
+                'secondsiteValidationSuspendUntilDate'                  => $dsCustomerItem->getValue(
+                    DBEJCustomerItem::secondsiteValidationSuspendUntilDate
                 ),
                 'secondsiteValidationSuspendUntilDateMessage'           => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::secondsiteValidationSuspendUntilDate)
                 ),
-                'offsiteReplicationValidationSuspendedUntilDate'        => Controller::dateYMDtoDMY(
-                    $dsCustomerItem->getValue(DBEJCustomerItem::offsiteReplicationValidationSuspendedUntilDate)
+                'offsiteReplicationValidationSuspendedUntilDate'        => $dsCustomerItem->getValue(
+                    DBEJCustomerItem::offsiteReplicationValidationSuspendedUntilDate
                 ),
                 'offsiteReplicationValidationSuspendedUntilDateMessage' => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::offsiteReplicationValidationSuspendedUntilDate)

@@ -200,18 +200,18 @@
         {pricePerMonth}
         <tr>
             <td class="promptText">Installation Date</td>
-            <td class="fieldText"><input name="renBroadband[1][installationDate]"
-                                         type="text"
-                                         value="{installationDate}"
-                                         {readonly}
-                                         size="50"
-                                         maxlength="50"
-                                         class="jqueryCalendar"
-                                         data-jqueryCalendarBeforeShowDay="beforeShowDay"
-                                         required
-                                         readonly="readonly"
-                                         id="installationDate"
-            >
+            <td class="fieldText">
+                <input name="renBroadband[1][installationDate]"
+                       type="date"
+                       value="{installationDate}"
+                       {readonly}
+                       size="50"
+                       maxlength="50"
+                       data-jqueryCalendarBeforeShowDay="beforeShowDay"
+                       required
+                       readonly="readonly"
+                       id="installationDate"
+                >
                 <span class="formErrorMessage">{installationDateMessage}</span>
             </td>
             <td class="promptText">
@@ -366,12 +366,13 @@
         </tr>
         <tr>
             <td class="promptText">eta Date</td>
-            <td class="fieldText"><input name="renBroadband[1][etaDate]"
-                                         type="text"
-                                         value="{etaDate}"
-                                         size="50"
-                                         maxlength="50"
-            >
+            <td class="fieldText">
+                <input name="renBroadband[1][etaDate]"
+                       type="date"
+                       value="{etaDate}"
+                       size="50"
+                       maxlength="50"
+                >
                 <span class="formErrorMessage">{etaDateMessage}</span></td>
         </tr>
         <tr>

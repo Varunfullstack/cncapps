@@ -88,9 +88,9 @@ class CTCustomerReviewMeetingsReport extends CTCNC
         while ($dbeCustomer->fetchNext()) {
 
             $BUSite = new BUSite($this);
-            $dsResults = new DataSet($this);
-            $BUSite->getActiveSitesByCustomer($dbeCustomer->getValue(DBECustomer::customerID), $dsResults);
-            $dsResults->fetchNext();
+            $activeCustomerSites = new DataSet($this);
+            $BUSite->getActiveSitesByCustomer($dbeCustomer->getValue(DBECustomer::customerID), $activeCustomerSites);
+            $activeCustomerSites->fetchNext();
 
 
             $lastReviewMeetingDate = DateTime::createFromFormat(
@@ -122,15 +122,18 @@ class CTCustomerReviewMeetingsReport extends CTCNC
             );
 
             $now = new DateTime();
-
-            if ($nextReviewMeetingDate < $now) {
-                $style = 'style="background-color: #ffb3b3"';
-            } else {
-                $dateDiff = $nextReviewMeetingDate->diff(new DateTime());
-                $style = $dateDiff->days <= (7 * 6) ? 'style="background-color: #ffb3b3"' : '';
+            $style = null;
+            if ($dbeCustomer->getValue(
+                    DBECustomer::reviewMeetingBooked
+                )) {
+                $style = 'style="background-color: #B2FFB2"';
+            } elseif ($nextReviewMeetingDate < $now) {
+                $style = 'style="background-color: #F5AEBD"';
             }
 
-            $locationString = $dsResults->getValue(DBESite::town) . ', ' . $dsResults->getValue(DBESite::postcode);
+            $locationString = $activeCustomerSites->getValue(DBESite::town) . ', ' . $activeCustomerSites->getValue(
+                    DBESite::postcode
+                );
 
             $customerURL = Controller::buildLink(
                 'Customer.php',
@@ -145,7 +148,7 @@ class CTCustomerReviewMeetingsReport extends CTCNC
                 ) . "</a>";
 
             $customerReviewMeetings[] = [
-                "style"             => $style,
+                "class"             => $style,
                 "customerLink"      => $customerLink,
                 "mainLocation"      => $locationString,
                 "lastReviewMeeting" => $lastReviewMeetingDate->format('d/m/Y'),

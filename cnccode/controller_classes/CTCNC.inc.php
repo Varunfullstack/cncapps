@@ -307,22 +307,15 @@ class CTCNC extends Controller
     }
 
     /**
-     * Check a date in dd/mm/yyyy format
+     * Check a date in yyyy/mm/dd format
      * @access private
-     * @param $dateDMY
+     * @param $dateString
      * @return bool
      */
-    function isValidDate($dateDMY)
+    function isValidDate($dateString)
     {
-        $dateArray = explode(
-            '/',
-            $dateDMY
-        );
-        return @checkdate(
-            $dateArray [1],
-            $dateArray [0],
-            $dateArray [2]
-        );
+        $date = DateTime::createFromFormat('Y-m-d', $dateString);
+        return !!$date;
     }
 
     /**

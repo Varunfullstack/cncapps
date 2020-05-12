@@ -4,13 +4,13 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
 require_once($cfg["path_dbe"] . "/DBESite.inc.php");
 require_once($cfg["path_dbe"] . "/DBEContact.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerType.inc.php");
 require_once($cfg["path_dbe"] . "/DBECustomerLeadStatus.php");
-require_once($cfg["path_dbe"] . "/DBELeadStatus.inc.php");
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJContract.inc.php');
 require_once($cfg['path_dbe'] . '/DBEOrdhead.inc.php');
@@ -359,7 +359,7 @@ class BUCustomer extends Business
     function getLeadStatus(&$dsResults)
     {
         $this->setMethodName('getLeadStatus');
-        $dbeLeadStatus = new DBELeadStatus($this);
+        $dbeLeadStatus = new DBECustomerLeadStatus($this);
         $dbeLeadStatus->getRows();
         return ($this->getData(
             $dbeLeadStatus,
@@ -370,12 +370,11 @@ class BUCustomer extends Business
     /**
      * @param DataSet $newRow
      */
-    function beforeUpdateCustomer(&$newRow)
+    function beforeUpdateCustomer($newRow)
     {
         $customerID = $newRow->getPkValue();
-        $dbeCustomer = new DBECustomer($this);
-        $dbeCustomer->getRow($customerID);
-
+        $currentCustomer = new DBECustomer($this);
+        $currentCustomer->getRow($customerID);
         $newRow->setValue(
             DBECustomer::modifyDate,
             date('d/m/Y H:i:s')
@@ -385,7 +384,7 @@ class BUCustomer extends Business
             $GLOBALS ['auth']->is_authenticated()
         );
 
-        if ($dbeCustomer->getValue(DBECustomer::lastReviewMeetingDate) != $newRow->getValue(
+        if ($currentCustomer->getValue(DBECustomer::lastReviewMeetingDate) != $newRow->getValue(
                 DBECustomer::lastReviewMeetingDate
             )) {
             $newRow->setValue(
@@ -538,30 +537,7 @@ class BUCustomer extends Business
         ));
 
         $this->dbeSite->resetCallbackMethod(DA_AFTER_COLUMNS_CREATED);
-        $this->updateModify($dsData->getValue(DBESite::customerID));
         return $ret;
-    }
-
-    function updateModify($customerID)
-    {
-        if (!$customerID) {
-            $this->raiseError('customerID not set');
-        }
-        $this->setMethodName('updateModify');
-        $this->dbeCustomer->getRow($customerID);
-        if (!$this->dbeCustomer->getValue(DBECustomer::name)) {
-            $this->raiseError('Customer Name is empty for customer ' . $customerID);
-            exit;
-        }
-        $this->dbeCustomer->setValue(
-            DBECustomer::modifyDate,
-            date('Y-m-d H:i:s')
-        );
-        $this->dbeCustomer->setValue(
-            DBECustomer::modifyUserID,
-            $GLOBALS ['auth']->is_authenticated()
-        );
-        $this->dbeCustomer->updateRow();
     }
 
     /**
@@ -692,7 +668,6 @@ class BUCustomer extends Business
         );
 
         $dsContact->post();
-        $this->updateModify($dsContact->getValue(DBEContact::customerID));
         return TRUE;
     }
 
@@ -709,7 +684,6 @@ class BUCustomer extends Business
             $dsData,
             $this->dbeContact
         );
-        $this->updateModify($dsData->getValue(DBEContact::customerID));
         return $ret;
 
     }
@@ -807,10 +781,6 @@ class BUCustomer extends Business
         );
         $dsCustomer->setValue(
             DBECustomer::referredFlag,
-            'N'
-        );
-        $dsCustomer->setValue(
-            DBECustomer::prospectFlag,
             'Y'
         );
         $dsCustomer->setValue(
@@ -901,13 +871,12 @@ class BUCustomer extends Business
         return !empty($this->dbeContact->getValue(DBEContact::supportLevel));
     }
 
-    function setProspectFlagOff($customerID)
+    function ensureBecameCustomer($customerID)
     {
         $this->dbeCustomer->getRow($customerID);
-        $this->dbeCustomer->setValue(
-            DBECustomer::prospectFlag,
-            'N'
-        );
+        if (!$this->dbeCustomer->getValue(DBECustomer::becameCustomerDate)) {
+            $this->dbeCustomer->setValue(DBECustomer::becameCustomerDate, (new DateTime())->format(DATE_MYSQL_DATE));
+        }
         $this->dbeCustomer->setValue(
             DBECustomer::modifyDate,
             date('Y-m-d H:i:s')
@@ -1080,7 +1049,7 @@ class BUCustomer extends Business
             // exclude excluded or duplicated emails
             if (
                 ($this->dbeContact->getValue(DBEContact::email) != $excludeEmail)
-                AND
+                and
                 (strpos(
                         $this->dbeContact->getValue(DBEContact::email),
                         $emailList
@@ -1389,7 +1358,6 @@ class BUCustomer extends Business
             $siteNo
         );
         $this->dbeSite->deleteRow();
-        $this->updateModify($customerID);
     }
 
     /**
@@ -1624,16 +1592,17 @@ class BUCustomer extends Business
     function hasDefaultInvoiceContactsAtAllSites($customerID)
     {
         $db = new dbSweetcode (); // database connection for query
-
+        $dbeCustomer = new DBECustomer($this);
+        $dbeSite = new DBESite($this);
         $sql =
             "SELECT COUNT(*) AS recCount
-			FROM customer
-				JOIN address ON cus_custno = add_custno AND cus_inv_siteno = add_siteno
+			FROM {$dbeCustomer->getTableName()}
+				JOIN {$dbeSite->getTableName()} ON {$dbeCustomer->getDBColumnName(DBECustomer::customerID)} = {$dbeSite->getDBColumnName(DBESite::customerID)} AND {$dbeCustomer->getDBColumnName(DBECustomer::invoiceSiteNo)} = {$dbeSite->getDBColumnName(DBESite::siteNo)}
 			WHERE
-				add_inv_contno = 0
-				AND cus_prospect = 'N'
-				AND cus_mailshot = 'Y'
-				AND cus_custno = " . $customerID;
+				{$dbeSite->getDBColumnName(DBESite::invoiceContactID)} = 0
+				AND {$dbeCustomer->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is null
+				AND {$dbeCustomer->getDBColumnName(DBECustomer::mailshotFlag)} = 'Y'
+				AND {$dbeCustomer->getDBColumnName(DBECustomer::customerID)} = " . $customerID;
 
         $db->query($sql);
         $db->next_record();
@@ -1701,8 +1670,14 @@ class BUCustomer extends Business
     public function getOffice365PasswordItem(int $customerID)
     {
         $dbePassword = new DBEPassword($this);
-
         $dbePassword->getOffice365PasswordByCustomerID($customerID);
+        return $dbePassword;
+    }
+
+    public function getPasswordItemByPasswordServiceId(int $customerId, $passwordServiceId)
+    {
+        $dbePassword = new DBEPassword($this);
+        $dbePassword->getPasswordItemByCustomerIdAndServiceId($customerId, $passwordServiceId);
         return $dbePassword;
     }
 

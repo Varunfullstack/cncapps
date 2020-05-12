@@ -250,15 +250,13 @@
             <td class="promptText">Installation Date</td>
             <td class="fieldText">
                 <input name="renContract[1][installationDate]"
-                       type="text"
+                       type="date"
                        value="{installationDate}"
                        {readonly}
                        size="10"
                        maxlength="10"
-                       class="jqueryCalendar"
                        data-jqueryCalendarBeforeShowDay="beforeShowDay"
                        required
-                       readonly="readonly"
                        id="installationDate"
                 >
                 <span class="formErrorMessage">{installationDateMessage}</span>
@@ -348,7 +346,7 @@
         <TR>
             <TD class="promptText">Printed Contract Start Date</TD>
             <TD class="field">
-                <input type="text"
+                <input type="date"
                        id="despatchDate"
                        name="renContract[1][despatchDate]"
                        size="10"
@@ -356,7 +354,6 @@
                        {readonly}
                        value="{despatchDate}"
                        autocomplete="off"
-                       class="jQueryCalendar"
                 >
                 <font class="formErrorMessage">{despatchDateMessage}</font>
             </TD>
@@ -365,7 +362,7 @@
         <TR>
             <TD class="promptText">Billing End Date</TD>
             <TD class="field">
-                <input type="text"
+                <input type="date"
                        id="expiryDate"
                        {readonly}
                        name="renContract[1][expiryDate]"
@@ -373,7 +370,6 @@
                        maxlength="10"
                        value="{expiryDate}"
                        autocomplete="off"
-                       class="jQueryCalendar"
                 >
                 <font class="formErrorMessage">{expiryDateMessage}</font>
             </TD>
