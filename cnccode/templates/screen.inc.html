@@ -624,12 +624,17 @@
 </head>
 <body
 >
+<div class="content">
 
+</div>
 <aside class="sidebar">
     <div id="leftside-navigation" class="nano">
         <div class="header-logo text-align-center">
             <a href="index.html">
-                <img id="cnc-logo" src="images/cnc-logo-white.png" data-swap="images/cnc-small-logo.png" alt="">
+                <div class="cnc-logo">
+                    <div class="full"></div>
+                    <div class="small"></div>
+                </div>
             </a>
         </div>
 
@@ -641,62 +646,6 @@
         </div>
     </div>
 </aside>
-<!--<aside id="left-panel"-->
-       <!--class="left-panel"-->
-<!--&gt;-->
-    <!--<nav class="navbar navbar-expand-sm navbar-default">-->
-
-        <!--<div class="navbar-header">-->
-            <!--<button class="navbar-toggler"-->
-                    <!--type="button"-->
-                    <!--data-toggle="collapse"-->
-                    <!--data-target="#main-menu"-->
-                    <!--aria-controls="main-menu"-->
-                    <!--aria-expanded="false"-->
-                    <!--aria-label="Toggle navigation"-->
-            <!--&gt;-->
-                <!--<i class="fa fa-bars"></i>-->
-            <!--</button>-->
-            <!--<a class="navbar-brand pt-3 pb-3"-->
-               <!--href="./"-->
-            <!--&gt;<img src="images/cnc-logo-white.png"-->
-                  <!--alt="Logo"-->
-                  <!--height="75"-->
-            <!--&gt;</a>-->
-            <!--<a class="navbar-brand hidden pt-3 pb-3"-->
-               <!--href="./"-->
-            <!--&gt;<img src="images/cnc-small-logo-30-30.png"-->
-                  <!--alt="Logo"-->
-                  <!--height="25"-->
-            <!--&gt;</a>-->
-        <!--</div>-->
-
-        <!--<div id="main-menu"-->
-             <!--class="main-menu collapse navbar-collapse"-->
-        <!--&gt;-->
-            <!--<ul class="nav navbar-nav">-->
-                <!--{sideMenu}-->
-                <!--<li id="aboutLink">-->
-                    <!--<a href="About.php"> <i class="menu-icon fa fa-info-circle"></i>About</a>-->
-                <!--</li>-->
-                <!--<li class="menu-item-has-children dropdown">-->
-                    <!--<a href="#"-->
-                       <!--class="dropdown-toggle"-->
-                       <!--data-toggle="dropdown"-->
-                       <!--aria-haspopup="true"-->
-                       <!--aria-expanded="false"-->
-                    <!--&gt; <i class="menu-icon fa fa-user-circle"></i>{userName}</a>-->
-                    <!--<ul class="sub-menu children dropdown-menu">-->
-                        <!--<li><i class="fa fa-sign-out"></i><a href="index.php?action=logout">Logout</a></li>-->
-
-                    <!--</ul>-->
-                <!--</li>-->
-
-
-            <!--</ul>-->
-        <!--</div>&lt;!&ndash; /.navbar-collapse &ndash;&gt;-->
-    <!--</nav>-->
-<!--</aside>&lt;!&ndash; /#left-panel &ndash;&gt;-->
 
 <div id="main"
      class="right-panel"
@@ -751,37 +700,9 @@
 
             sidebar.toggleClass( 'collapsed', 'addOrRemove' );
             mainContent.toggleClass( 'expanded', 'addOrRemove' );
-            if (sidebar.is('.collapsed')) {
-                sidebarTitles.css("display", "none");
-                sidebarTitles.css("opacity", "0");
-                sidebarArrows.css("display", "none");
-                image.width('25');
-                image.width('25');
-
-            } else {
-                sidebarTitles.css("display", "inline-block");
-                sidebarTitles.css("opacity", "1");
-                sidebarArrows.css("display", "inline-block");
-                image.width('');
-                image.width('');
-            }
-
-
         });
 
     });
-
-
-    function openNav() {
-        document.getElementsByClassName("sidebar").style.width = "170px";
-        document.getElementById("main").style.marginLeft = "170px";
-    }
-
-    function closeNav() {
-        document.getElementsByClassName("sidebar").style.width = "0px";
-        document.getElementById("main").style.marginLeft= "0px";
-    }
-
 
     jQuery(document).ready(function ($) {
         "use strict";

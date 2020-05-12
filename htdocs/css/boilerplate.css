@@ -39,9 +39,9 @@ body {
 
 .sidebar {
   width: 178px;
-  height: 100%;
+  min-height: 100%;
   background: #3c3c3c;
-  position: absolute;
+  position: fixed;
   -webkit-transition: all 0.3s ease-in-out;
   -moz-transition: all 0.3s ease-in-out;
   -o-transition: all 0.3s ease-in-out;
@@ -49,8 +49,43 @@ body {
   transition: all 0.3s ease-in-out;
   z-index: 100;
 }
+.sidebar .cnc-logo {
+  transition: all 0.3s ease-in-out;
+}
+.sidebar .cnc-logo .full {
+  height: 78px;
+  width: auto;
+  opacity: 1;
+  display: block;
+  background: url("../images/cnc-logo-white.png") no-repeat center center;
+  transition: opacity 0.5s;
+}
+.sidebar .cnc-logo .small {
+  opacity: 0;
+  display: none;
+  background: url("../images/cnc-small-logo.png") no-repeat;
+  background-size: contain;
+  margin: 0 0 0 4px;
+  height: 25px;
+  width: 25px;
+  transition: opacity 0.5s;
+}
 .sidebar.collapsed {
   width: 45px;
+}
+.sidebar.collapsed .sub-menu span {
+  display: none;
+}
+.sidebar.collapsed .sub-menu i {
+  display: none;
+}
+.sidebar.collapsed .cnc-logo .full {
+  opacity: 0;
+  display: none;
+}
+.sidebar.collapsed .cnc-logo .small {
+  opacity: 1;
+  display: block;
 }
 .sidebar.collapsed .children {
   background-color: #3c3c3c !important;
@@ -68,9 +103,9 @@ body {
   width: 1.75rem;
   margin-bottom: 1rem;
   cursor: pointer;
-  background-color: tint(#3c3c3c, 15%);
+  background-color: #595959;
   border: none;
-  color: #aeb2b7;
+  color: #e6e6e6;
   border-radius: 100%;
 }
 .sidebar .sidebarToggle button:focus {
@@ -81,6 +116,13 @@ body {
 }
 .sidebar .sub-menu i.arrow {
   float: right;
+  display: inline-block;
+}
+.sidebar .sub-menu span {
+  display: block;
+}
+.sidebar #leftside-navigation {
+  background: #3c3c3c;
 }
 .sidebar #leftside-navigation ul, .sidebar ul ul {
   margin: -2px 0 0;
@@ -90,7 +132,7 @@ body {
   display: none;
 }
 .sidebar #leftside-navigation ul ul li {
-  background: shade(#3c3c3c, 15%);
+  background: #333333;
   margin-bottom: 0;
   margin-left: 0;
   margin-right: 0;
@@ -100,7 +142,7 @@ body {
   font-size: 11px;
   padding-top: 6.5px;
   padding-bottom: 6.5px;
-  color: #aeb2b7;
+  color: #e6e6e6;
   text-indent: -0.5em;
 }
 .sidebar #leftside-navigation ul li {
@@ -108,7 +150,7 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 .sidebar #leftside-navigation ul li a {
-  color: #aeb2b7;
+  color: #e6e6e6;
   text-decoration: none;
   display: block;
   padding: 1rem 0 1rem 1rem;

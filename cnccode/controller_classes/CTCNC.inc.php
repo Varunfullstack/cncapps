@@ -361,13 +361,13 @@ class CTCNC extends Controller
 
 
         if ($this->isUserSDManager()) {
-            $section = $menu->addSection("SDManagement", 'fa-tasks', "SD Management");
+            $section = $menu->addSection("SDManagement", 'fa-chalkboard-teacher', "SD Management");
             $section->addItemsFromArray($this->getDefaultSDManagerMenu());
         }
 
         $this->addConditionalMenu(
             $menu,
-            'fa-tag',
+            'fa-chalkboard-teacher',
             "SDManagement",
             $this->dbeUser->getValue(DBEUser::staffAppraiserFlag),
             223,
@@ -393,7 +393,7 @@ class CTCNC extends Controller
         );
 
         if ($this->hasPermissions(ACCOUNT_MANAGEMENT_PERMISSION)) {
-            $section = $menu->addSection('AccountManagement', 'fa-th', "Account Management");
+            $section = $menu->addSection('AccountManagement', 'fa-user-cog', "Account Management");
             $section->addItemsFromArray($this->getDefaultAccountManagementMenu());
         }
 
@@ -403,7 +403,7 @@ class CTCNC extends Controller
         }
 
         if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
-            $section = $menu->addSection('ServiceRenewals', 'fa-th', "Service Renewals");
+            $section = $menu->addSection('ServiceRenewals', 'fa-tasks', "Service Renewals");
             $section->addItemsFromArray($this->getDefaultServiceRenewalsMenu());
         }
 
@@ -418,14 +418,14 @@ class CTCNC extends Controller
         }
 
         if ($this->hasPermissions(SENIOR_MANAGEMENT_PERMISSION0)) {
-            $section = $menu->addSection("Management", 'fa-wrench');
+            $section = $menu->addSection("Management", 'fa-project-diagram');
             $section->addItemsFromArray($this->getDefaultManagementMenu());
         }
 
 
         $this->addConditionalMenu(
             $menu,
-            'fa-wrench',
+            'fa-project-diagram',
             "Management",
             $this->dbeUser->getValue(DBEUser::isExpenseApprover) || $dbeUser->getValue(DBEUser::globalExpenseApprover),
             906,
