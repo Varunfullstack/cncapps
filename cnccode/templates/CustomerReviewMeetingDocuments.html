@@ -64,7 +64,7 @@
         const files = document.querySelector('[type=file]').files;
         const reviewMeetingDate = $('#reviewMeetingDate').val();
 
-        const isValidDate = moment(reviewMeetingDate, "DD/MM/YYYY", true).isValid();
+        const isValidDate = moment(reviewMeetingDate, "YYYY-MM-DD", true).isValid();
 
         if (files.length && isValidDate) {
             $('#uploadFilesBtn').attr('disabled', false);

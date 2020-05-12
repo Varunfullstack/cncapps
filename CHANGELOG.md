@@ -5,6 +5,17 @@ This project changes will be shown here.
 ### Changed
 - Issue 840 - PO Status v10
 
+## [v3.14.3] - 2020-05-12
+### Fixed
+- Fixed issue when trying to send Sales Order reminder
+- Fixed issue with Office 365 license matching, changed it to be exact match
+
+## [v3.14.2] - 2020-05-11
+### Fixed
+- Fixed issue with RenContract installation date input having readonly attribute
+- Fixed Customer Review Meeting Documents upload not working
+- Fixed issue with customerProblem reason field being smaller than automated_request reason field
+
 ## [v3.14.1] - 2020-05-11
 ### Fixed
 - Fixed issue with searching in CustomerItem.php
