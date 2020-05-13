@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.14.4] - 2020-05-13
+### Fixed
+- Fixed issue with awaiting CNC not being set correctly 
+
 ## [v3.14.3] - 2020-05-12
 ### Fixed
 - Fixed issue when trying to send Sales Order reminder

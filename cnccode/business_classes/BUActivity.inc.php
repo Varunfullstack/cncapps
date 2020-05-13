@@ -930,9 +930,11 @@ class BUActivity extends Business
      *
      * @param $problemID
      * @param mixed $description
+     * @param bool $resetAwaitingCustomer
      */
     function logOperationalActivity($problemID,
-                                    $description
+                                    $description,
+                                    $resetAwaitingCustomer = false
     )
     {
         $lastActivity = $this->getLastActivityInProblem($problemID);
@@ -940,6 +942,9 @@ class BUActivity extends Business
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->getRow($lastActivity->getValue(DBEJCallActivity::callActivityID));
         $dbeCallActivity->setPKValue(null);
+        if ($resetAwaitingCustomer) {
+            $dbeCallActivity->setValue(DBECallActivity::awaitingCustomerResponseFlag, 'N');
+        }
         $dbeCallActivity->setValue(
             DBEJCallActivity::date,
             date(DATE_MYSQL_DATE)
