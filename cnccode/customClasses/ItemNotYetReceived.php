@@ -50,54 +50,6 @@ class ItemNotYetReceived
     /**
      * @return mixed
      */
-    public function getLineSequenceNumber()
-    {
-        return $this->lineSequenceNumber;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getExpectedOn()
-    {
-        if (!$this->cost || $this->isCarriage()) {
-            return null;
-        }
-        return $this->returnDateIfValue($this->expectedOn);
-    }
-
-    private function isCarriage()
-    {
-        return $this->itemId == 1491;
-    }
-
-    /**
-     * @param $value
-     * @param string $format
-     * @return \DateTime|null
-     */
-    private function returnDateIfValue($value,
-                                       $format = 'Y-m-d'
-    )
-    {
-        if (!$value) {
-            return null;
-        }
-        $dateTime = \DateTime::createFromFormat(
-            $format,
-            $value
-        );
-
-        if (!$dateTime) {
-            return null;
-        }
-
-        return $dateTime;
-    }
-
-    /**
-     * @return mixed
-     */
     public function isDeliveryConfirmed()
     {
         return $this->deliveryConfirmedFlag == 'Y';
@@ -106,25 +58,9 @@ class ItemNotYetReceived
     /**
      * @return mixed
      */
-    public function getServiceRequestID()
-    {
-        return $this->serviceRequestID;
-    }
-
-    /**
-     * @return mixed
-     */
     public function isRequiredAtLeastAWeekAgo()
     {
         return (int)$this->isRequiredAtLeastAWeekAgo;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getProjectID()
-    {
-        return $this->projectID;
     }
 
     /**
@@ -211,19 +147,35 @@ class ItemNotYetReceived
     }
 
     /**
-     * @return mixed
+     * @param $value
+     * @param string $format
+     * @return \DateTime|null
      */
-    public function getFutureDate()
+    private function returnDateIfValue($value,
+                                       $format = 'Y-m-d'
+    )
     {
-        return $this->returnDateIfValue($this->futureDate);
+        if (!$value) {
+            return null;
+        }
+        $dateTime = \DateTime::createFromFormat(
+            $format,
+            $value
+        );
+
+        if (!$dateTime) {
+            return null;
+        }
+
+        return $dateTime;
     }
 
     /**
      * @return mixed
      */
-    public function getPurchaseOrderRequiredBy()
+    public function getFutureDate()
     {
-        return $this->returnDateIfValue($this->purchaseOrderRequiredBy);
+        return $this->returnDateIfValue($this->futureDate);
     }
 
     /**
@@ -267,20 +219,9 @@ class ItemNotYetReceived
         );
     }
 
-    /**
-     * @return mixed
-     */
-    public function getExpectedTBC()
+    public function getPurchaseOrderURL()
     {
-        return $this->expectedTBC;
-    }
-
-    public function color()
-    {
-        if (!isset(self::$items[$this->getPurchaseOrderId()]) || !self::$items[$this->getPurchaseOrderId()]) {
-            return !$this->hasBeenOrdered ? 'red' : ($this->hasNotBeenReceivedYet ? 'orange' : "black");
-        }
-        return 'green';
+        return SITE_URL . "/PurchaseOrder.php?action=display&porheadID=" . $this->getPurchaseOrderId();
     }
 
     /**
@@ -291,9 +232,132 @@ class ItemNotYetReceived
         return $this->purchaseOrderId;
     }
 
+    public function getSalesOrderURL()
+    {
+        return SITE_URL . "/SalesOrder.php?action=displaySalesOrder&ordheadID=" . $this->getSalesOrderId();
+    }
+
     public function getSalesOrderId()
     {
         return $this->salesOrderID;
     }
 
+    public function getProjectURL()
+    {
+        return SITE_URL . "/Project.php?projectID=" . $this->getProjectID() . "&action=edit";
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getProjectID()
+    {
+        return $this->projectID;
+    }
+
+    public function getServiceRequestURL()
+    {
+        return SITE_URL . "/Activity.php?problemID=" . $this->getServiceRequestID() . "&action=displayLastActivity";
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getServiceRequestID()
+    {
+        return $this->serviceRequestID;
+    }
+
+    function getExpectedColorClass()
+    {
+        $expectedColorClass = null;
+        if ($this->getExpectedOn()) {
+            if ($this->getExpectedOn()->format(DATE_MYSQL_DATE) < (new \DateTime())->format(DATE_MYSQL_DATE)) {
+                $expectedColorClass = "redBackground";
+            }
+
+        } elseif ($this->getExpectedTBC()) {
+            $expectedColorClass = "amberBackground";
+        }
+
+        return $expectedColorClass;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getExpectedOn()
+    {
+        if (!$this->cost || $this->isCarriage()) {
+            return null;
+        }
+        return $this->returnDateIfValue($this->expectedOn);
+    }
+
+    private function isCarriage()
+    {
+        return $this->itemId == 1491;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExpectedTBC()
+    {
+        return $this->expectedTBC;
+    }
+
+    function getRequiredByColorClass()
+    {
+        $requiredByColorClass = 'amberBackground';
+        if ($this->getPurchaseOrderRequiredBy()) {
+            $requiredByColorClass = null;
+        }
+        return $requiredByColorClass;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPurchaseOrderRequiredBy()
+    {
+        return $this->returnDateIfValue($this->purchaseOrderRequiredBy);
+    }
+
+    public function getExpectedDateLinkURL()
+    {
+        return SITE_URL . "/PurchaseOrder.php?porheadID={$this->getPurchaseOrderId()}&action=editOrdline&sequenceNo={$this->getLineSequenceNumber()}";
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLineSequenceNumber()
+    {
+        return $this->lineSequenceNumber;
+    }
+
+    public function getExpectedDateLinkText()
+    {
+        $text = 'N/A';
+
+        if ($this->color() == 'green') {
+            $text = 'Received';
+        } else {
+            if ($this->getExpectedOn()) {
+                $text = $this->getExpectedOn()->format('d/m/Y');
+            } else if ($this->getExpectedTBC()) {
+                $text = "TBC";
+            }
+        }
+        return $text;
+    }
+
+    public function color()
+    {
+        if (!isset(self::$items[$this->getPurchaseOrderId()]) || !self::$items[$this->getPurchaseOrderId()]) {
+            return !$this->hasBeenOrdered ? 'red' : ($this->hasNotBeenReceivedYet ? 'orange' : "black");
+        }
+        return 'green';
+    }
 }
