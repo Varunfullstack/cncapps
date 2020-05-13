@@ -1,0 +1,147 @@
+{% extends "@internal/wrapper.html.twig" %}
+{# @var itemsNotYetReceived [] #}
+{% block styles %}
+    td.amberBackground {
+    background-color: #FFEB9C;
+    color: black;
+    }
+
+    td.redBackground {
+    background-color: #F8A5B6;
+    }
+{% endblock %}
+{% block content %}
+    <P>
+        <span style="color:red;background-color: red">R</span> Not ordered yet.
+        <span style="color: orange;background-color: orange">A</span> Ordered but not
+        received. <span style="color: black;background-color: black">B</span> Ordered and
+        received. <span style="color: green;background-color: green">G</span> Entire purchase order received.
+    </P>
+    <TABLE>
+        <thead>
+        <TR>
+            <th>
+                PO
+            </th>
+            <th>
+                SO
+            </th>
+            <th>
+                SR
+            </th>
+            <th>
+                Customer Name
+            </th>
+            <th>
+                Qty
+            </th>
+            <th>
+                Description
+            </th>
+            <th>
+                Supplier
+            </th>
+            <th>
+                Delivered To
+            </th>
+            <th>
+                Ordered On
+            </th>
+            <th>
+                Expected On
+            </th>
+            <th>
+                Visit Booked For
+            </th>
+            <th>
+                Required By
+            </th>
+            <th>
+                Supplier Ref
+            </th>
+            <th>
+                Project Name
+            </th>
+        </TR>
+        </thead>
+        <tbody>
+        {% for itemNotYetReceived in itemsNotYetReceived %}
+            {# @var itemNotYetReceived \CNCLTD\ItemNotYetReceived #}
+            <tr style='color:{{ itemNotYetReceived.color }}'>
+                <td>
+                    <a href='{{ itemNotYetReceived.purchaseOrderURL }}'> {{ itemNotYetReceived.purchaseOrderId }}</a>
+                </td>
+                <td>
+                    <a href='{{ itemNotYetReceived.salesOrderURL }}'>{{ itemNotYetReceived.salesOrderId }}</a>
+                </td>
+
+                <td>
+                    {% if itemNotYetReceived.serviceRequestID %}
+                        <a href='{{ itemNotYetReceived.serviceRequestURL }}'>{{ itemNotYetReceived.serviceRequestID }}</a>
+                    {% endif %}
+                </td>
+                <td>
+                    {{ itemNotYetReceived.customerName }}
+                </td>
+                <td>
+                    {{ itemNotYetReceived.orderedQuantity }}
+                </td>
+                <td>
+                    {{ itemNotYetReceived.itemDescription }}
+                </td>
+                <td>
+                    {{ itemNotYetReceived.supplierName }}
+                </td>
+                <td>
+                    {{ itemNotYetReceived.direct }}
+                </td>
+                <td>
+                    {% if itemNotYetReceived.purchaseOrderDate %}
+                        {{ itemNotYetReceived.purchaseOrderDate |date("d/m/Y") }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td
+                        {% if itemNotYetReceived.expectedColorClass %}
+                            class="{{ itemNotYetReceived.expectedColorClass }}"
+                        {% endif %}
+                >
+                    <a href='{{ itemNotYetReceived.expectedDateLinkURL }}'
+                       target='_blank'
+                    >{{ itemNotYetReceived.expectedDateLinkText }}</a>
+                </td>
+                <td>
+                    {% if itemNotYetReceived.futureDate %}
+                        {{ itemNotYetReceived.futureDate |date("d/m/Y") }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td class="{{ itemNotYetReceived.requiredByColorClass }}">
+                    {% if itemNotYetReceived.purchaseOrderRequiredBy %}
+                        {{ itemNotYetReceived.purchaseOrderRequiredBy |date("d/m/Y") }}
+                    {% else %}
+                        TBC
+                    {% endif %}
+                </td>
+                <td>
+                    {{ itemNotYetReceived.supplierRef }}
+                </td>
+                <td>
+                    {% if itemNotYetReceived.projectID %}
+                        <a href='{{ itemNotYetReceived.projectURL }}'
+                           target='_blank'
+                        >{{ itemNotYetReceived.projectName }}</a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if itemNotYetReceived.projectID %}
+                        <a href='{{ itemNotYetReceived.projectURL }}'>{{ itemNotYetReceived.projectName }}</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </TABLE>
+{% endblock %}

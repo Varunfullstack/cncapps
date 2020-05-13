@@ -16,5 +16,13 @@
                 <constraints nullable="false"/>
             </column>
         </addColumn>
+        <sql>
+            update porline
+            set expectedTBC = 1
+            where pol_exp_date is null
+        </sql>
+        <rollback>
+            <dropColumn tableName="porline" columnName="expectedTBC"/>
+        </rollback>
     </changeSet>
 </databaseChangeLog>

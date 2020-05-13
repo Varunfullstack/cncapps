@@ -67,8 +67,8 @@ FROM porline
                    on minServiceRequest.pro_linked_ordno = porhead.poh_ordno
          left join project
                    on project.ordHeadID = ordhead.odh_ordno
-WHERE poh_required_by is not null
-  and item.excludeFromPOCompletion = 'N'
+WHERE 
+  item.excludeFromPOCompletion = 'N'
   AND customer.cus_name <> 'CNC Operating Stock'
   and (porline.pol_cost > 0 or porline.pol_cost < 0)
   and odh_type <> 'C'
