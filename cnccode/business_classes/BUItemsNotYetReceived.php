@@ -70,7 +70,8 @@ FROM porline
                    on minServiceRequest.pro_linked_ordno = porhead.poh_ordno
          left join project
                    on project.ordHeadID = ordhead.odh_ordno
-WHERE  item.excludeFromPOCompletion = 'N'
+WHERE 
+  item.excludeFromPOCompletion = 'N'
   AND customer.cus_name <> 'CNC Operating Stock'
   and (porline.pol_cost > 0 or porline.pol_cost < 0)and odh_type <> 'C'
   and poh_required_by > (now() - INTERVAL ? day)
