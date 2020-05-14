@@ -473,7 +473,7 @@ class CTCNC extends Controller
             [
                 "id"    => 101,
                 "href"  => "Activity.php?action=activityCreate1",
-                "label" => "Log Request",
+                "label" => "Log Service Request",
             ],
             [
                 "id"    => 102,
@@ -511,12 +511,12 @@ class CTCNC extends Controller
             [
                 "id"    => 108,
                 "href"  => "OffsiteBackupStatus.php",
-                "label" => "Offsite Backup Status",
+                "label" => "OBRS Backup Status",
             ],
             [
                 "id"    => 109,
                 "href"  => "OffsiteBackupReplicationStatus.php",
-                "label" => "Offsite Backup Replication Status",
+                "label" => "OBRS Replication Status",
             ],
             [
                 "id"    => 110,
@@ -587,23 +587,23 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 205,
-                "label" => "Schedule Service Request",
+                "label" => "Schedule SR",
                 "href"  => "SRScheduler.php"
             ],
             [
                 "id"    => 206,
-                "label" => "First Time Fix Report",
+                "label" => "First Time Fixes",
                 "href"  => "FirstTimeFixReport.php"
             ],
             [
                 "id"    => 207,
-                "label" => "Team And User Statistics",
+                "label" => "Team & User Statistics",
                 "href"  => "TeamAndUserStatistics.php"
 
             ],
             [
                 "id"    => 208,
-                "label" => "Team Performance",
+                "label" => "SLA Performance",
                 "href"  => "TeamPerformanceReport.php"
             ],
             [
@@ -613,12 +613,12 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 210,
-                "label" => "Offsite Backup Failure Analysis",
+                "label" => "OBRS Failure Analysis",
                 "href"  => "OffsiteBackupStatus.php?action=failureAnalysis"
             ],
             [
                 "id"    => 211,
-                "label" => "Service Request Report",
+                "label" => "SR Report",
                 "href"  => "ServiceRequestReport.php"
             ],
             [
@@ -633,7 +633,7 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 214,
-                "label" => "Starters And Leavers Report",
+                "label" => "Starters & Leavers Report",
                 "href"  => "StartersAndLeaversReport.php"
             ],
             [
@@ -648,7 +648,7 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 217,
-                "label" => "Utility Emails",
+                "label" => "Utility Email Addresses",
                 "href"  => "UtilityEmails.php"
             ],
             [
@@ -765,7 +765,7 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 406,
-                "label" => "Cust Review Meeting Docs",
+                "label" => "Review Meeting Docs",
                 "href"  => "CustomerReviewMeetingDocuments.php",
             ],
             [
@@ -822,17 +822,17 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 509,
-                "label" => "Customer Profitability Report",
+                "label" => "Customer Profitability",
                 "href"  => "CustomerProfitabilityReport.php",
             ],
             [
                 "id"    => 510,
-                "label" => "Customer Analysis Report",
+                "label" => "Customer Analysis",
                 "href"  => "CustomerAnalysisReport.php",
             ],
             [
                 "id"    => 511,
-                "label" => "Contract Analysis Report",
+                "label" => "Contract Analysis",
                 "href"  => "ContractAnalysisReport.php",
             ],
             [
