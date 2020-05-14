@@ -645,6 +645,25 @@
             </li>
             {sideMenu}
 
+            <li class="sub-menu" id="aboutLink" data-placement="right" title="About">
+                <a href="About.php"> <i class="menu-icon fa fa-info-circle"></i><span>About</span></a>
+            </li>
+
+            <li class="sub-menu">
+                <a href="javascript:void(0);"><i class="fa fa-user-circle" data-placement="right" title="{userName}">
+
+                </i><span>{userName}</span>
+                    <i class="arrow fa fa-angle-right pull-right"></i>
+                </a>
+                <ul class="children">
+                    <li><a href="index.php?action=logout">
+                        <i class="fa fa-door-open"></i>
+                        Logout
+                    </a>
+                    </li>
+                </ul>
+            </li>
+
         </ul>
         <div class="text-align-center sidebarToggle">
             <button id="sidebarToggle"> <i class="fa fa-angle-left"></i></button>
