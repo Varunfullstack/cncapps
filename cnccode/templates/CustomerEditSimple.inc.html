@@ -238,6 +238,7 @@
 ></script>
 <div id="newPasswordDialog"
      title="New Password"
+     style="display: none"
 >
     <fieldset id="register">
         <legend></legend>
@@ -894,11 +895,7 @@
         });
     }
 
-    $('#newPasswordDialog').dialog({
-        autoOpen: false, width: 500, close: function () {
-            resetPasswordFields();
-        }
-    });
+
 
 
     function askNewPassword() {
@@ -918,6 +915,12 @@
     let validatingContactsModal;
 
     window.addEventListener('DOMContentLoaded', function () {
+
+        $('#newPasswordDialog').dialog({
+            autoOpen: false, width: 500, close: function () {
+                resetPasswordFields();
+            }
+        });
 
         validatingContactsModal = $('#validatingContactsModal').dialog({
             autoOpen: false, width: 500, modal: true, dialogClass: 'no-close', position: {my: 'top', at: 'top'}
