@@ -25,7 +25,11 @@ class CTSDManagerDashboard extends CTCurrentActivityReport
             Header("Location: /NotAllowed.php");
             exit;
         }
-        $this->setMenuId(201);
+        if ($this->getParam('showP5')) {
+            $this->setMenuId(201);
+        } else {
+            $this->setMenuId(222);
+        }
     }
 
     /**

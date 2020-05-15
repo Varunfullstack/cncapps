@@ -4,7 +4,7 @@
     let multiOptionsRow = null;
     let multiChoiceContainer = null;
     let multiChoiceRow = null;
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         const multiChoiceString = $('input[name="question[1][multiOptions]"]').val();
         if (multiChoiceString) {
             multiChoice = JSON.parse(multiChoiceString);

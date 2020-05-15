@@ -1,0 +1,19 @@
+"Question","NumberOfResponses","1 ({{ rating1Description }})","2","3","4","5 ({{rating5Description}})"
+{% for rating in ratings %}
+"{{rating.questionDescription}}",{{rating.ratingTotal}},{{rating.rating1Percent}},{{rating.rating1Percent}},{{rating.rating2Percent}},{{rating.rating3Percent}},{{rating.rating4Percent}},{{rating.rating5Percent}}
+{% endfor %}
+
+"Question","NumberOfResponses","Yes","No"
+{% for yesNoQuestion in yesNoQuestions %}
+"{{ yesNoQuestion.questionDescription}}",{{yesNoQuestion.ynTotal}},{{yesNoQuestion.yesPercent}},{{yesNoQuestionnoPercent}}
+{% endfor %}
+
+{% for multiChoiceQuestion in multiChoiceQuestions %}
+"Question","NumberOfResponses",{{multiChoiceQuestion.multiChoiceLabelsCSV}}
+"{{multiChoiceQuestion.questionDescription}}",{{multiChoiceQuestion.multiChoiceTotal}},{{multiChoiceQuestion.multiChoiceValues}}
+{% endfor %}
+
+"Question","Contact","Date","Answer"
+{% for textBlockQuestion in textQuestions %}
+"{freeTextQuestion}","{freeTextName} {freeTextCustomer}","{freeTextDate}","{freeTextAnswer}"
+{% endfor %}

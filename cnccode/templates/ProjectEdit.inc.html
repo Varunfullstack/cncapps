@@ -233,7 +233,7 @@
             'Updates History', 'scrollbars=yes,resizable=no,width=980,height=300,copyhistory=no, menubar=0')
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         window.startDate = $('#startDate').get(0);
         window.expiryDate = $('#expiryDate').get(0);
     });

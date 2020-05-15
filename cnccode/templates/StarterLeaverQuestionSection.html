@@ -19,7 +19,7 @@
 
         let optionElm, optionsStringElm, optionsHolder, multipleChoice, questionOptions, addButton,
             questionTypeSelector;
-        $(function () {
+        window.addEventListener('DOMContentLoaded', function () {
             const mainElement = document.getElementById({questionID});
 
             $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {

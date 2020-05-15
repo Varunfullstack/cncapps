@@ -10,6 +10,7 @@ class MenuItem
     private $label;
     private $href;
     private $attributes;
+    private $isFavourite = false;
 
     /**
      * MenuItem constructor.
@@ -24,6 +25,19 @@ class MenuItem
         $this->label = $label;
         $this->href = $href;
         $this->attributes = $attributes;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFavourite(): bool
+    {
+        return $this->isFavourite;
+    }
+
+    public function makeFavourite()
+    {
+        $this->isFavourite = true;
     }
 
     /**

@@ -1,20 +1,21 @@
 <?php
+global $cfg;
 require_once("config.inc.php");
-require_once($cfg["path_bu"] . "/BUQuestionnaireReport.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
 $thing = null;
-$buQuestionnaireReport = new BUQuestionnaireReport($thing);
+
 
 $period = isset($_REQUEST['period']) ? $_REQUEST['period'] : date(
     'Y-m',
     strtotime('last month')
 );
-$buQuestionnaireReport->setPeriod($period);
-$buQuestionnaireReport->setQuestionnaireID(1); // CNC support
+
+
+$questionnaireReport = new \CNCLTD\QuestionnaireReportGenerator(1);
+$questionnaireReport->setPeriod($period);
 
 $report = null;
-
-$report .= $buQuestionnaireReport->getReport();
+$report .= $questionnaireReport->getReport();
 
 $buMail = new BUMail($thing);
 
@@ -26,8 +27,8 @@ $toEmail = CONFIG_SALES_EMAIL;
 $hdrs = array(
     'From'         => $senderEmail,
     'To'           => $toEmail,
-    'Subject'      => 'Monthly Support Questionnaire Report - ' . $buQuestionnaireReport->getMonthName(
-        ) . ' ' . $buQuestionnaireReport->getYear(),
+    'Subject'      => 'Monthly Support Questionnaire Report - ' . $questionnaireReport->getMonthName(
+        ) . ' ' . $questionnaireReport->getYear(),
     'Date'         => date("r"),
     'Content-Type' => 'text/html; charset=UTF-8'
 );

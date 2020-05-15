@@ -1,7 +1,7 @@
 <!-- Template: Customer.inc.html -->
 <script type="application/javascript">
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         $.LoadingOverlay("show", {text: 'Please wait while the data is loading...'});
 
         $.ajax('?action=getData', {

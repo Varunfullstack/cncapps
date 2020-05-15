@@ -11,15 +11,23 @@ require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUQuestionnaire.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 
+
 // Actions
 class CTQuestionnaire extends CTCNC
 {
+    const QUESTIONNAIRE_ID = "questionnaireID";
+    const START_DATE = "startDate";
+    const END_DATE = "endDate";
     /** @var DSForm */
     public $dsQuestionnaire;
     /** @var BUQuestionnaire */
     public $buQuestionnaire;
     /** @var DSForm */
     private $dsQuestion;
+    /**
+     * @var DSForm
+     */
+    private $dsSearchForm;
 
     function __construct($requestMethod,
                          $postVars,
@@ -35,10 +43,7 @@ class CTQuestionnaire extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "maintenance",
-        ];
-        if (!self::hasPermissions($roles)) {
+        if (!$this->isUserSDManager()) {
             Header("Location: /NotAllowed.php");
             exit;
         }
@@ -47,6 +52,10 @@ class CTQuestionnaire extends CTCNC
         $this->dsQuestionnaire->copyColumnsFrom($this->buQuestionnaire->dbeQuestionnaire);
         $this->dsQuestion = new DSForm($this);
         $this->dsQuestion->copyColumnsFrom($this->buQuestionnaire->dbeQuestion);
+        $this->dsSearchForm = new DSForm ($this);
+        $this->dsSearchForm->addColumn(self::QUESTIONNAIRE_ID, DA_STRING, DA_NOT_NULL);
+        $this->dsSearchForm->addColumn(self::START_DATE, DA_DATE, DA_ALLOW_NULL);
+        $this->dsSearchForm->addColumn(self::END_DATE, DA_DATE, DA_ALLOW_NULL);
         $this->setMenuId(215);
     }
 
@@ -58,6 +67,9 @@ class CTQuestionnaire extends CTCNC
     {
         $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
         switch ($this->getAction()) {
+            case 'generateQuestionnaireReport':
+                $this->generateQuestionnaireReport();
+                break;
             case 'createQuestion':
             case 'editQuestion':
                 $this->editQuestion();
@@ -82,6 +94,93 @@ class CTQuestionnaire extends CTCNC
             default:
                 $this->displayList();
                 break;
+        }
+    }
+
+    function generateQuestionnaireReport()
+    {
+        $this->setPageTitle('Questionnaire Report');
+        $csv = false;
+        $report = null;
+
+        if ($this->getParam('csv')) {
+            $csv = true;
+        }
+
+        if (!$this->getParam(self::QUESTIONNAIRE_ID)) {
+            throw new UnexpectedValueException('Questionnaire ID is required');
+        }
+
+        $startDate = null;
+        $endDate = null;
+        if ($this->getParam(self::START_DATE)) {
+            $startDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $this->getParam(self::START_DATE));
+            if (!$startDate) {
+                throw new UnexpectedValueException('Start date must be in YYYY-MM-DD format');
+            }
+        }
+
+        if ($this->getParam(self::END_DATE)) {
+            $endDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $this->getParam(self::START_DATE));
+            if (!$endDate) {
+                throw new UnexpectedValueException('End date must be in YYYY-MM-DD format');
+            }
+        }
+
+        $questionnaireReportGenerator = new \CNCLTD\QuestionnaireReportGenerator(
+            $this->getParam(self::QUESTIONNAIRE_ID),
+            $startDate,
+            $endDate
+        );
+        $report = $questionnaireReportGenerator->getReport($csv);
+        /*
+        If this wasn't a CSV report then email the HTML report to the current user
+        */
+        if (!$csv) {
+            $buMail = new BUMail($this);
+
+            $senderEmail = CONFIG_SUPPORT_EMAIL;
+            $dbeUser = new DBEUser($this);
+            $loggedInUserID = $GLOBALS ['auth']->is_authenticated();
+            $dbeUser->getRow($loggedInUserID);
+            $toEmail = $dbeUser->getValue(DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
+
+            $hdrs = array(
+                'From'         => $senderEmail,
+                'To'           => $toEmail,
+                'Subject'      => 'Questionnaire Report ' . $questionnaireReportGenerator->getPeriod(
+                    ) . ' - ' . $questionnaireReportGenerator->getQuestionnaireDescription(),
+                'Date'         => date("r"),
+                'Content-Type' => 'text/html; charset=UTF-8'
+            );
+
+            $buMail->mime->setHTMLBody($report);
+
+            $mime_params = array(
+                'text_encoding' => '7bit',
+                'text_charset'  => 'UTF-8',
+                'html_charset'  => 'UTF-8',
+                'head_charset'  => 'UTF-8'
+            );
+            $body = $buMail->mime->get($mime_params);
+
+            $hdrs = $buMail->mime->headers($hdrs);
+
+            $buMail->putInQueue(
+                $senderEmail,
+                $toEmail,
+                $hdrs,
+                $body
+            );
+            echo $report;
+            exit;
+        } // if !$csv
+
+        if ($csv) {
+            Header('Content-type: text/plain');
+            Header('Content-Disposition: attachment; filename=questionnaire.csv');
+            echo $report;
+            exit;
         }
     }
 
@@ -566,8 +665,85 @@ class CTQuestionnaire extends CTCNC
         $this->setTemplateFiles(
             array('QuestionnaireList' => 'QuestionnaireList.inc')
         );
+
         $dsQuestionnaire = new DataSet($this);
         $this->buQuestionnaire->getAll($dsQuestionnaire);
+        $urlSubmit = Controller::buildLink($_SERVER ['PHP_SELF'], array('action' => CTCNC_ACT_SEARCH));
+        $this->template->set_var(
+            array(
+                'formError'              => $this->formError,
+                'questionnaireIDMessage' => $this->dsSearchForm->getMessage(self::QUESTIONNAIRE_ID),
+                'fromDate'               => $this->dsSearchForm->getValue(self::START_DATE),
+                'fromDateMessage'        => $this->dsSearchForm->getMessage(self::START_DATE),
+                'toDate'                 => $this->dsSearchForm->getValue(self::END_DATE),
+                'toDateMessage'          => $this->dsSearchForm->getMessage(self::END_DATE),
+                'urlSubmit'              => $urlSubmit
+            )
+        );
+        $this->template->set_block('QuestionnaireList', 'questionnaireBlock', 'questionnaires');
+        if ($dsQuestionnaire->rowCount() > 0) {
+            $this->template->set_block(
+                'QuestionnaireList',
+                'QuestionnaireBlock',
+                'rows'
+            );
+        }
+        while ($dsQuestionnaire->fetchNext()) {
+
+            $questionnaireID = $dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID);
+
+            $urlDisplayQuestionList =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'          => 'displayQuestionList',
+                        'questionnaireID' => $questionnaireID
+                    )
+                );
+            $urlView =
+                Controller::buildLink(
+                    'https://cnc-ltd.co.uk/questionnaire/index.php',
+                    array(
+                        'questionnaireno' => $questionnaireID
+                    )
+                );
+
+            $urlEdit =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'          => 'edit',
+                        'questionnaireID' => $questionnaireID
+                    )
+                );
+            $txtEdit = '[edit]';
+
+            $this->template->set_var(
+                array(
+                    'questionnaireID'        => $questionnaireID,
+                    'description'            => Controller::htmlDisplayText(
+                        $dsQuestionnaire->getValue(DBEQuestionnaire::description)
+                    ),
+                    'urlEdit'                => $urlEdit,
+                    'urlDisplayQuestionList' => $urlDisplayQuestionList,
+                    'txtEdit'                => $txtEdit,
+                    'urlView'                => $urlView
+                )
+            );
+
+            $this->template->parse('rows', 'QuestionnaireBlock', true);
+            $this->template->set_var(
+                array(
+                    'questionnaireDescription' => $dsQuestionnaire->getValue(DBEQuestionnaire::description),
+                    'questionnaireID'          => $dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID),
+                    'questionnaireSelected'    => ($this->dsSearchForm->getValue(
+                            self::QUESTIONNAIRE_ID
+                        ) == $dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID)) ? CT_SELECTED : null
+                )
+            );
+            $this->template->parse('questionnaires', 'questionnaireBlock', true);
+        }
+
 
         $urlCreate =
             Controller::buildLink(
@@ -581,65 +757,6 @@ class CTQuestionnaire extends CTCNC
             array('urlCreate' => $urlCreate)
         );
 
-        if ($dsQuestionnaire->rowCount() > 0) {
-
-            $this->template->set_block(
-                'QuestionnaireList',
-                'QuestionnaireBlock',
-                'rows'
-            );
-
-            while ($dsQuestionnaire->fetchNext()) {
-
-                $questionnaireID = $dsQuestionnaire->getValue(DBEQuestionnaire::questionnaireID);
-
-                $urlDisplayQuestionList =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'          => 'displayQuestionList',
-                            'questionnaireID' => $questionnaireID
-                        )
-                    );
-                $urlView =
-                    Controller::buildLink(
-                        'https://cnc-ltd.co.uk/questionnaire/index.php',
-                        array(
-                            'questionnaireno' => $questionnaireID
-                        )
-                    );
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'          => 'edit',
-                            'questionnaireID' => $questionnaireID
-                        )
-                    );
-                $txtEdit = '[edit]';
-
-                $this->template->set_var(
-                    array(
-                        'questionnaireID'        => $questionnaireID,
-                        'description'            => Controller::htmlDisplayText(
-                            $dsQuestionnaire->getValue(DBEQuestionnaire::description)
-                        ),
-                        'urlEdit'                => $urlEdit,
-                        'urlDisplayQuestionList' => $urlDisplayQuestionList,
-                        'txtEdit'                => $txtEdit,
-                        'urlView'                => $urlView
-                    )
-                );
-
-                $this->template->parse(
-                    'rows',
-                    'QuestionnaireBlock',
-                    true
-                );
-
-            }//while $dsQuestionnaire->fetchNext()
-        }
         $this->template->parse(
             'CONTENTS',
             'QuestionnaireList',

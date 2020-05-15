@@ -136,7 +136,7 @@
         }
 
         if (isDashboard) {
-            $(document).ready(function () {
+            window.addEventListener('DOMContentLoaded', function () {
                 $('#dashboard').show();
 
                 $('#selectDaysSelector').val(currentURL.searchParams.get('daysAgo'));

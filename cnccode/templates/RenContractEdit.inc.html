@@ -12,7 +12,7 @@
 </style>
 <script language='JavaScript'>
     const clientCheckDirectDebit = {clientCheckDirectDebit};
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         window.despatchDate = $('#despatchDate').get(0);
         window.expiryDate = $('#expiryDate').get(0);
         checkDirectDebit();

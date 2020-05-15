@@ -789,7 +789,7 @@
         }
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         checkIsProspect();
     })
 
@@ -917,7 +917,7 @@
 
     let validatingContactsModal;
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
 
         validatingContactsModal = $('#validatingContactsModal').dialog({
             autoOpen: false, width: 500, modal: true, dialogClass: 'no-close', position: {my: 'top', at: 'top'}
@@ -1580,7 +1580,7 @@
 
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         loadNote('first');
     })
     //-->

@@ -1,0 +1,13 @@
+{# @var favouriteItems \CNCLTD\MenuItem[] #}
+{% for favouriteItem in favouriteItems %}
+    <li>
+        <a href="#"
+           onclick="toggleFavourite({{ favouriteItem.id }}, true)"
+        >
+            Log Service Request
+            <a href=""
+               class="float-right favourited"
+            ><i class="fa fa-star"></i></a>
+        </a>
+    </li>
+{% endfor %}

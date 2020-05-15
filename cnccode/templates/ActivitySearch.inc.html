@@ -8,15 +8,15 @@
         savedCustomerString = document.getElementById("customerString").value
     }
 
-    renderContracts();
-
-    $(function () {
-        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
-            $('#customerID').val($event.detail.item.value);
-            renderContracts();
+    window.addEventListener('DOMContentLoaded', function () {
+        renderContracts();
+        window.addEventListener('DOMContentLoaded', function () {
+            $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+                $('#customerID').val($event.detail.item.value);
+                renderContracts();
+            });
         });
-    });
-
+    })
 
     function renderContracts() {
         $('#contractSelector').html("<option value='99'>All</option><option value=''>T &amp; M</option>");
@@ -55,7 +55,6 @@
             document.searchForm.submit();
         }
     }
-
 
     function checkAll() {
         for (var i = 0; i < document.searchForm.elements.length; i++) {

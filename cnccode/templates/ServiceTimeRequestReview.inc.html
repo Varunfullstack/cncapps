@@ -13,7 +13,7 @@
     const isAdditionalTimeLimitApprover = {additionalTimeLimitApprover};
     const minutesInADay = {minutesInADay};
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         timeSelectorElement = $('#allocatedTimeAmountSelector');
         timeInputElement = $('input[name="allocatedTimeValue"]');
         allocationErrorElement = $('#allocationError');

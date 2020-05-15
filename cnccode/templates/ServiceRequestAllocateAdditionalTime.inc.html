@@ -8,7 +8,7 @@
     let saveButtonElement = null;
     const isAdditionalTimeLimitApprover = {additionalTimeLimitApprover};
     const minutesInADay = {minutesInADay};
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         teamSelectorElement = $('#teamSelector');
         timeSelectorElement = $('#allocatedTimeAmountSelector');
         timeInputElement = $('input[name="allocatedTimeValue"]');

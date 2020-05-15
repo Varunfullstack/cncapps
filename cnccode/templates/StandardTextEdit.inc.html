@@ -35,7 +35,7 @@
     CKEDITOR.config.width = '870';
     CKEDITOR.config.resize_minWidth = '760';
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
 
 
         editor = CKEDITOR.replace('standardTextEditor', config);

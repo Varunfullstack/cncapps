@@ -114,6 +114,14 @@ define(
     'logout'
 );
 define(
+    'FLAG_AS_FAVOURITE',
+    'flagAsFavourite'
+);
+define(
+    'UNFLAG_AS_FAVOURITE',
+    'unflagAsFavourite'
+);
+define(
     'CTCNC_ACT_DISPLAY_DESPATCH',
     'displayDespatch'
 );
@@ -219,6 +227,10 @@ class CTCNC extends Controller
     public $dbeUser;
     var $dbeTeam;
     private $user;
+    /**
+     * @var \CNCLTD\FavouriteMenu
+     */
+    private $favouriteMenu;
 
     function __construct($requestMethod,
                          $postVars,
@@ -236,13 +248,13 @@ class CTCNC extends Controller
         } else {
             $this->userID = CONFIG_SCHEDULED_TASK_USER_ID;
         }
-
         $dbeUser = $this->getDbeUser();
         $dbeUser->setValue(
             DBEUser::userID,
             $this->userID
         );
         $dbeUser->getRow();
+        $this->favouriteMenu = new \CNCLTD\FavouriteMenu($this->userID);
 
         $this->user = new BUUser($this);
 
@@ -254,6 +266,7 @@ class CTCNC extends Controller
             $cfg
         );
     }
+
 
     /**
      * Is the request from the command line (or scheduled task)
@@ -324,7 +337,7 @@ class CTCNC extends Controller
     function parsePage()
     {
         global $userName;
-        $menu = new \CNCLTD\SideMenu();
+        $menu = new \CNCLTD\SideMenu($this->favouriteMenu);
 
 
         $urlLogout = Controller::buildLink(
@@ -345,8 +358,7 @@ class CTCNC extends Controller
         $this->template->set_var(array('userName' => $userName, 'fromDate' => null, 'urlLogout' => $urlLogout));
 
         if ($this->hasPermissions(PHPLIB_PERM_TECHNICAL)) {
-            $section = $menu->addSection("Technical", 'fa-laptop');
-            $section->addItemsFromArray($this->getDefaultTechnicalMenu());
+            $menu->addSection("Technical", 'fa-laptop', $this->getDefaultTechnicalMenu(), null);
         }
 
         $this->addConditionalMenu(
@@ -361,8 +373,12 @@ class CTCNC extends Controller
 
 
         if ($this->isUserSDManager()) {
-            $section = $menu->addSection("SDManagement", 'fa-chalkboard-teacher', "SD Management");
-            $section->addItemsFromArray($this->getDefaultSDManagerMenu());
+            $menu->addSection(
+                "SDManagement",
+                'fa-chalkboard-teacher',
+                $this->getDefaultSDManagerMenu(),
+                "SD Management"
+            );
         }
 
         $this->addConditionalMenu(
@@ -378,8 +394,7 @@ class CTCNC extends Controller
 
 
         if ($this->hasPermissions(PHPLIB_PERM_SALES)) {
-            $section = $menu->addSection("Sales", 'fa-tag');
-            $section->addItemsFromArray($this->getDefaultSalesMenu());
+            $menu->addSection("Sales", 'fa-tag', $this->getDefaultSalesMenu());
         }
 
         $this->addConditionalMenu(
@@ -393,33 +408,37 @@ class CTCNC extends Controller
         );
 
         if ($this->hasPermissions(ACCOUNT_MANAGEMENT_PERMISSION)) {
-            $section = $menu->addSection('AccountManagement', 'fa-user-cog', "Account Management");
-            $section->addItemsFromArray($this->getDefaultAccountManagementMenu());
+            $menu->addSection(
+                'AccountManagement',
+                'fa-user-cog',
+                $this->getDefaultAccountManagementMenu(),
+                "Account Management"
+            );
         }
 
         if ($this->hasPermissions(PHPLIB_PERM_REPORTS)) {
-            $section = $menu->addSection('Reports', "fa-file");
-            $section->addItemsFromArray($this->getDefaultReportsMenu());
+            $menu->addSection('Reports', "fa-file", $this->getDefaultReportsMenu());
         }
 
         if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
-            $section = $menu->addSection('ServiceRenewals', 'fa-tasks', "Service Renewals");
-            $section->addItemsFromArray($this->getDefaultServiceRenewalsMenu());
+            $menu->addSection(
+                'ServiceRenewals',
+                'fa-tasks',
+                $this->getDefaultServiceRenewalsMenu(),
+                "Service Renewals"
+            );
         }
 
         if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
-            $section = $menu->addSection('Accounts', 'fa-calculator');
-            $section->addItemsFromArray($this->getDefaultAccountsMenu());
+            $menu->addSection('Accounts', 'fa-calculator', $this->getDefaultAccountsMenu());
         }
 
         if ($this->hasPermissions(PHPLIB_PERM_MAINTENANCE)) {
-            $section = $menu->addSection("Maintenance", 'fa-wrench');
-            $section->addItemsFromArray($this->getDefaultMaintenanceMenu());
+            $menu->addSection("Maintenance", 'fa-wrench', $this->getDefaultMaintenanceMenu());
         }
 
         if ($this->hasPermissions(SENIOR_MANAGEMENT_PERMISSION0)) {
-            $section = $menu->addSection("Management", 'fa-project-diagram');
-            $section->addItemsFromArray($this->getDefaultManagementMenu());
+            $menu->addSection("Management", 'fa-project-diagram', $this->getDefaultManagementMenu());
         }
 
 
@@ -427,7 +446,9 @@ class CTCNC extends Controller
             $menu,
             'fa-project-diagram',
             "Management",
-            $this->dbeUser->getValue(DBEUser::isExpenseApprover) || $dbeUser->getValue(DBEUser::globalExpenseApprover),
+            $this->getDbeUser()->getValue(DBEUser::isExpenseApprover) || $this->getDbeUser()->getValue(
+                DBEUser::globalExpenseApprover
+            ),
             906,
             "Expenses/Overtime",
             "ExpenseDashboard.php"
@@ -436,6 +457,11 @@ class CTCNC extends Controller
         global $twig;
         $sideMenu = $twig->render('@internal/sideMenu/sideMenuItems.html.twig', ["sideMenu" => $menu]);
         $this->template->setVar("sideMenu", $sideMenu);
+        $favouriteItemsHTML = $twig->render(
+            '@internal/sideMenu/favouritesMenuItems.html.twig',
+            ["favouriteItems" => $menu->getFavouriteItems()]
+        );
+        $this->template->setVar('favouritesMenuItems', $favouriteItemsHTML);
         parent::parsePage();
     }
 
@@ -551,9 +577,9 @@ class CTCNC extends Controller
         }
         $section = $menu->getSection($menuKey);
         if (!$section) {
-            $section = $menu->addSection($menuKey, $icon, $menuName);
+            $menu->addSection($menuKey, $icon, [], $menuName);
         }
-        $section->addItem(new \CNCLTD\MenuItem($id, $label, $href));
+        $menu->addItemToSection($menuKey, new \CNCLTD\MenuItem($id, $label, $href));
     }
 
     function isUserSDManager()
@@ -566,8 +592,13 @@ class CTCNC extends Controller
         return [
             [
                 "id"    => 201,
-                "label" => "SD Manager Dashboard P5",
+                "label" => "Manager Dashboard P5",
                 "href"  => "SDManagerDashboard.php?showP5=true&SP"
+            ],
+            [
+                "id"    => 222,
+                "label" => "Manager Dashboard",
+                "href"  => "SDManagerDashboard.php?SP"
             ],
             [
                 "id"    => 202,
@@ -640,11 +671,6 @@ class CTCNC extends Controller
                 "id"    => 215,
                 "label" => "Questionnaires",
                 "href"  => "Questionnaire.php"
-            ],
-            [
-                "id"    => 216,
-                "label" => "Questionnaire Report",
-                "href"  => "QuestionnaireReport.php"
             ],
             [
                 "id"    => 217,
@@ -1040,6 +1066,14 @@ class CTCNC extends Controller
             case CTCNC_ACT_LOGOUT :
                 $this->logout();
                 break;
+            case FLAG_AS_FAVOURITE:
+                $this->favouriteMenu->addFavourite($this->getParam('menuItemId'));
+                echo json_encode(["status" => "ok"]);
+                exit;
+            case UNFLAG_AS_FAVOURITE:
+                $this->favouriteMenu->removeFavourite($this->getParam('menuItemId'));
+                echo json_encode(["status" => "ok"]);
+                exit;
         }
     }
 
@@ -1049,6 +1083,7 @@ class CTCNC extends Controller
         header("Location: index.php");
         exit;
     }
+
 
     function checkPermissions($levels)
     {

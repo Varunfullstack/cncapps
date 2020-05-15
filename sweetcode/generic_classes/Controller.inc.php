@@ -610,7 +610,6 @@ class Controller extends BaseObject
             "STYLESHEET",
             isset($this->cfg["stylesheet"]) ? $this->cfg["stylesheet"] : null
         );
-
         $this->template->set_var(
             [
                 "pageTitle"  => $this->getPageTitle(),

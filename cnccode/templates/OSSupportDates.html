@@ -161,7 +161,7 @@
         form.elements['endOfLifeDate'].value = null;
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         dialogElem = $("#dialog");
         form = $('.detail')[0];
         dialogElem.dialog({autoOpen: false, position: {my: 'center', at: "top"}, modal: true});

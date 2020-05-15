@@ -17,7 +17,7 @@
         return accounting.formatMoney(data, "£", ".", ',');
     }
 
-    $(document).ready(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         dataTable = $('#myTable').DataTable({
             dom: 'Blfrtip',
             buttons: [

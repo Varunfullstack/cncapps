@@ -22,7 +22,7 @@ class MenuSection
         $this->name = $name;
         if (!$name) {
             $this->name = $key;
-        };
+        }
         $this->icon = $icon;
     }
 
@@ -34,7 +34,6 @@ class MenuSection
         foreach ($items as $item) {
             $this->items[] = new MenuItem($item['id'], $item['label'], $item['href'], @$item['attributes']);
         }
-        $this->items = $items;
     }
 
     public function addItem($menuItem)
