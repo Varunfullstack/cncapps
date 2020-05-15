@@ -34,7 +34,6 @@ class SideMenu
         $section->addItemsFromArray($items);
         foreach ($section->getItems() as $item) {
             if ($this->favouriteMenu->isFavourite($item->getId())) {
-                var_dump($item->getLabel());
                 $item->makeFavourite();
                 $this->favouriteItems[] = $item;
             }
@@ -72,7 +71,6 @@ class SideMenu
                 return $aPos - $bPos;
             }
         );
-        var_dump($this->favouriteItems);
         return $this->favouriteItems;
     }
 

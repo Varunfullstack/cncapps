@@ -1,12 +1,12 @@
 {# @var favouriteItems \CNCLTD\MenuItem[] #}
 {% for favouriteItem in favouriteItems %}
     <li>
-        <a href="{{ item.href }}"
-        {% for attrName, attrValue in item.attributes %}
+        <a href="{{ favouriteItem.href }}"
+        {% for attrName, attrValue in favouriteItem.attributes %}
             {{ attrName }}="{{ attrValue }}"
         {% endfor %}
         >
-        {{ item.label }}
+        {{ favouriteItem.label }}
         </a>
         <a href="#"
            class="float-right favourited"
