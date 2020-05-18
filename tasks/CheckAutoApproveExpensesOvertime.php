@@ -72,16 +72,8 @@ while ($callactivity->nextRecord()) {
     $activity->setValue(DBECallActivity::overtimeApprovedBy, USER_SYSTEM);
     $activity->setValue(DBECallActivity::overtimeApprovedDate, date(DATE_MYSQL_DATETIME));
     $buExpense = new BUExpense($thing);
-//    $activity->setValue(
-//        DBECallActivity::overtimeDurationApproved,
-//        number_format(
-//            $buExpense->calculateOvertime($callactivity->getValue(DBECallActivity::callActivityID)),
-//            2,
-//            '.',
-//            ''
-//        )
-//    );
-    var_dump(
+    $activity->setValue(
+        DBECallActivity::overtimeDurationApproved,
         number_format(
             $buExpense->calculateOvertime($callactivity->getValue(DBECallActivity::callActivityID)),
             2,
@@ -89,6 +81,7 @@ while ($callactivity->nextRecord()) {
             ''
         )
     );
-//    $activity->updateRow();
+
+    $activity->updateRow();
 }
 
