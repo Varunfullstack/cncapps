@@ -269,6 +269,14 @@ class CTActivity extends CTCNC
                 $this->displayLastActivity();
                 break;
             case 'activityCreate1':
+                $roles = [
+                    "technical",
+                ];
+
+                if (!self::hasPermissions($roles)) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $this->activityCreate1();
                 break;
             case 'editValueOnlyServiceRequest':
