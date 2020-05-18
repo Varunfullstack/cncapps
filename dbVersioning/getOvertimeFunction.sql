@@ -61,21 +61,19 @@ BEGIN
     FROM headert;
 
     SET overtime = 0;
-    IF (shiftStartTime < officeStartTime) THEN
-        IF (shiftEndTime < officeStartTime) THEN
-            SET overtime = shiftEndTime - shiftStartTime;
-        ELSE
-            SET overtime = officeStartTime - shiftStartTime;
-        END IF;
 
-    END IF;
-    IF (shiftEndTime > officeEndTime) THEN
-        IF (shiftStartTime > officeEndTime) THEN
-            SET overtime = overtime + (shiftEndTime - shiftStartTime);
-        ELSE
-            SET overtime = overtime + (shiftEndTime - officeEndTime);
-        END IF;
-    END IF;
-    RETURN overtime;
+    if(shiftStartTime > officeEndTime OR shiftEndTime < officeStartTime) then
+        return 0;
+    end if;
+
+    if(shiftStartTime < officeStartTime  ) then
+        set shiftStartTime = officeStartTime;
+    end if;
+
+    if(shiftEndTime > officeEndTime) then
+        set shiftEndTime = officeEndTime;
+    end if;
+
+    return shiftEndTime - shiftStartTime;
 END #
 

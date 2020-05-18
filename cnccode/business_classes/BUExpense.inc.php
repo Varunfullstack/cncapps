@@ -232,7 +232,7 @@ class BUExpense extends Business
     )
     {
         /** @var dbSweetcode $db */
-        GLOBAL $db;
+        global $db;
         $this->setMethodName('exportEngineerExpenses');
         $date = DateTime::createFromFormat(DATE_MYSQL_DATE, $dsData->getValue(self::exportDataSetEndDate));
         $nextProcessingDate = DateTime::createFromFormat(
@@ -702,7 +702,6 @@ ORDER BY cns_name, caa_date";
 
         $activityType = new DBECallActType($this);
         $activityType->getRow($dbejCallactivity->getValue(DBEJCallActivity::callActTypeID));
-
         if ($dbejCallactivity->getValue(DBECallActivity::overtimeDurationApproved)) {
             return $dbejCallactivity->getValue(DBECallActivity::overtimeDurationApproved);
         }
@@ -717,23 +716,18 @@ ORDER BY cns_name, caa_date";
             return $shiftEndTime - $shiftStartTime;
         }
 
-        $overtime = 0;
-        if ($shiftStartTime < $officeStartTime) {
-            if ($shiftEndTime < $officeStartTime) {
-                $overtime = $shiftEndTime - $shiftStartTime;
-            } else {
-                $overtime = $officeStartTime - $shiftStartTime;
-            }
-        }
-        if ($shiftEndTime > $officeEndTime) {
-            if ($shiftStartTime > $officeEndTime) {
-                $overtime += $shiftEndTime - $shiftStartTime;
-            } else {
-                $overtime += $shiftEndTime - $officeEndTime;
-            }
+        if ($shiftStartTime > $officeEndTime || $shiftEndTime < $officeStartTime) {
+            return 0;
         }
 
-        return $overtime;
+        if ($shiftStartTime < $officeStartTime) {
+            $shiftStartTime = $officeStartTime;
+        }
+
+        if ($shiftEndTime > $officeEndTime) {
+            $shiftEndTime = $officeEndTime;
+        }
+        return $shiftEndTime - $shiftStartTime;
     }
 
     public function getTotalExpensesForSalesOrder($salesOrderID)
