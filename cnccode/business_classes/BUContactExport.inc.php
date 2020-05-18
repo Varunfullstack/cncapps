@@ -124,7 +124,7 @@ class BUContactExport extends Business
         if ($contractItemIDs) {
 
             $query .=
-                " JOIN {$dbeCustItem->getTableName()} cc ON cc.{$dbeCustItem->getDBColumnName(DBECustomerItem::customerID)} = {$dbeCustomer->getDBColumnName(DBECustomer::customerID)}";
+                " JOIN {$dbeCustItem->getTableName()}  ON {$dbeCustItem->getDBColumnName(DBECustomerItem::customerID)} = {$dbeCustomer->getDBColumnName(DBECustomer::customerID)}";
         }
 
         $query .= " WHERE 1 = 1 ";
