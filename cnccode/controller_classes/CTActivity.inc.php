@@ -457,6 +457,14 @@ class CTActivity extends CTCNC
                 break;
             case CTCNC_ACT_DISPLAY_SEARCH_FORM:
             default:
+                $roles = [
+                    "technical",
+                ];
+
+                if (!self::hasPermissions($roles)) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $this->displaySearchForm();
                 break;
 
