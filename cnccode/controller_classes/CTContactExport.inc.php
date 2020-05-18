@@ -646,6 +646,9 @@ WHERE customer.`cus_referred` <> 'Y'
      */
     function generateCSV($resultSet)
     {
+        if(!$resultSet){
+            return;
+        }
         $fileName = 'contacts.csv';
         Header('Content-type: text/plain');
         Header('Content-Disposition: attachment; filename=' . $fileName);

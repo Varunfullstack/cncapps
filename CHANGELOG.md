@@ -1,6 +1,13 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.14.5] - 2020-05-18
+### Fixed
+- Fixed issue with installation date readonly on RenHosting and RenBroadband
+- Fixed issue that prevents to set installation date when checking Direct Debit
+- Fixed issue trying to export contacts
+- Fixed issue with automatically approved overtime not getting an approved duration value
+
 ## [v3.14.4] - 2020-05-13
 ### Fixed
 - Fixed issue with awaiting CNC not being set correctly 

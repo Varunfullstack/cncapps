@@ -74,8 +74,11 @@ while ($callactivity->nextRecord()) {
     $buExpense = new BUExpense($thing);
     $activity->setValue(
         DBECallActivity::overtimeDurationApproved,
-        $buExpense->calculateOvertime(
-            number_format($callactivity->getValue(DBECallActivity::callActivityID), 2, '.', '')
+        number_format(
+            $buExpense->calculateOvertime($callactivity->getValue(DBECallActivity::callActivityID)),
+            2,
+            '.',
+            ''
         )
     );
     $activity->updateRow();
