@@ -80,8 +80,6 @@ class CTProject extends CTCNC
             $cfg
         );
         $roles = [
-            "reports",
-            "sales",
             "technical"
         ];
 

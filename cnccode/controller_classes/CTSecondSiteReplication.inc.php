@@ -24,7 +24,6 @@ class CTSecondSiteReplication extends CTSecondSite
         if (!$this->isUserSDManager()) {
             $roles = [
                 "technical",
-                "reports"
             ];
             if (!self::hasPermissions($roles)) {
                 Header("Location: /NotAllowed.php");

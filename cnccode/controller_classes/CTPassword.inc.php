@@ -43,7 +43,6 @@ class CTPassword extends CTCNC
             $cfg
         );
         $roles = [
-            "sales",
             "technical",
         ];
         if (!self::hasPermissions($roles)) {

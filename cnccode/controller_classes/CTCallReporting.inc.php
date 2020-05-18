@@ -15,6 +15,10 @@ class CTCallReporting extends CTCNC
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $this->setMenuId(209);
+        if (!self::isSdManager()) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
     }
 
     /**

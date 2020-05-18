@@ -29,6 +29,14 @@ class CTStarterLeaverManagement extends CTCNC
             $cookieVars,
             $cfg
         );
+        $roles = [
+            "technical"
+        ];
+
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->dsStandardText = new DSForm($this);
         $this->dsStandardText->copyColumnsFrom(new DBEStarterLeaverQuestion($this));
         $this->setMenuId(114);

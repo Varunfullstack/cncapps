@@ -36,13 +36,8 @@ class CTServiceRequestsByCustomerReport extends CTCNC
         );
 
         if (!$this->isUserSDManager()) {
-            $roles = [
-                "reports",
-            ];
-            if (!self::hasPermissions($roles)) {
-                Header("Location: /NotAllowed.php");
-                exit;
-            }
+            Header("Location: /NotAllowed.php");
+            exit;
         }
         $this->setMenuId(213);
         $this->buActivity = new BUActivity($this);
@@ -68,7 +63,7 @@ class CTServiceRequestsByCustomerReport extends CTCNC
         }
     }
 
-function email()
+    function email()
     {
         $this->setMethodName('email');
         $dsSearchForm = $this->initialiseSearchForm();

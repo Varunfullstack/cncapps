@@ -989,9 +989,25 @@ class CTCustomer extends CTCNC
                 $this->displayCustomerSelectPopup();
                 break;
             case 'display24HourSupportCustomers':
+                $roles = [
+                    "technical"
+                ];
+
+                if (!self::hasPermissions($roles)) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $this->display24HourSupportCustomers();
                 break;
             case 'displaySpecialAttentionCustomers':
+                $roles = [
+                    "technical"
+                ];
+
+                if (!self::hasPermissions($roles)) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $this->displaySpecialAttentionCustomers();
                 break;
             case 'displayContractAndNumbersReport':

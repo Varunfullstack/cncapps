@@ -28,7 +28,6 @@ class CTSecondSite extends CTCNC
         if (!$this->isUserSDManager()) {
             $roles = [
                 "technical",
-                "reports"
             ];
             if (!self::hasPermissions($roles)) {
                 Header("Location: /NotAllowed.php");
@@ -66,6 +65,10 @@ class CTSecondSite extends CTCNC
                 break;
 
             case 'failureAnalysis':
+                if (!self::isSdManager()) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $this->failureAnalysis();
                 break;
 

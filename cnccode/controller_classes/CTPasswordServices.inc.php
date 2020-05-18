@@ -57,6 +57,11 @@ class CTPasswordServices extends CTCNC
             $cookieVars,
             $cfg
         );
+        if (!self::isSdManager()) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
+        
         $this->buPasswordService = new BUPasswordService($this);
         $this->dsPasswordService = new DSForm($this);
         $this->dsPasswordService->copyColumnsFrom($this->buPasswordService->dbePasswordService);

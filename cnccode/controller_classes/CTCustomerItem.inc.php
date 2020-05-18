@@ -110,7 +110,6 @@ class CTCustomerItem extends CTCNC
         );
         $roles = [
             "technical",
-            "sales"
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
