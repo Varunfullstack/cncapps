@@ -26,7 +26,7 @@ class CTCreateSalesRequest extends CTCNC
             $cfg
         );
         $roles = [
-            "sales",
+            SALES_PERMISSION,
         ];
         $this->setMenuId(304);
         if (!self::hasPermissions($roles)) {

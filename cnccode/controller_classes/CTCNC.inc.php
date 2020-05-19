@@ -8,6 +8,12 @@
  */
 
 global $cfg;
+
+use CNCLTD\FavouriteMenu;
+use CNCLTD\MenuItem;
+use CNCLTD\SideMenu;
+
+
 require_once($cfg ['path_gc'] . '/DataSet.inc.php');
 require_once($cfg ['path_gc'] . '/Controller.inc.php');
 require_once($cfg ['path_dbe'] . '/DBEJUser.inc.php');
@@ -130,10 +136,6 @@ define(
     'displayNote'
 );
 define(
-    'CTCNC_ACT_INVOICE_REPRINT_GENERATE',
-    'invoiceReprintGenerate'
-);
-define(
     'CTCNC_ACT_INVOICE_PRINT_UNPRINTED',
     'invUnprinted'
 );
@@ -228,7 +230,7 @@ class CTCNC extends Controller
     var $dbeTeam;
     private $user;
     /**
-     * @var \CNCLTD\FavouriteMenu
+     * @var FavouriteMenu
      */
     private $favouriteMenu;
 
@@ -254,7 +256,7 @@ class CTCNC extends Controller
             $this->userID
         );
         $dbeUser->getRow();
-        $this->favouriteMenu = new \CNCLTD\FavouriteMenu($this->userID);
+        $this->favouriteMenu = new FavouriteMenu($this->userID);
 
         $this->user = new BUUser($this);
 
@@ -337,7 +339,7 @@ class CTCNC extends Controller
     function parsePage()
     {
         global $userName;
-        $menu = new \CNCLTD\SideMenu($this->favouriteMenu);
+        $menu = new SideMenu($this->favouriteMenu);
 
 
         $urlLogout = Controller::buildLink(
@@ -357,7 +359,7 @@ class CTCNC extends Controller
 
         $this->template->set_var(array('userName' => $userName, 'fromDate' => null, 'urlLogout' => $urlLogout));
 
-        if ($this->hasPermissions(PHPLIB_PERM_TECHNICAL)) {
+        if ($this->hasPermissions(TECHNICAL_PERMISSION)) {
             $menu->addSection("Technical", 'fa-laptop', $this->getDefaultTechnicalMenu(), null);
         }
 
@@ -365,7 +367,7 @@ class CTCNC extends Controller
             $menu,
             'fa-laptop',
             "Technical",
-            $this->dbeUser->getValue(DBEUser::starterLeaverQuestionManagementFlag) == 'Y',
+            $this->isStarterLeaverManger(),
             114,
             "Starter Leaver Management",
             "StarterLeaverManagement.php"
@@ -385,7 +387,7 @@ class CTCNC extends Controller
             $menu,
             'fa-chalkboard-teacher',
             "SDManagement",
-            $this->dbeUser->getValue(DBEUser::staffAppraiserFlag),
+            $this->isAppraiser(),
             223,
             "Staff Appraisals",
             "StaffAppraisalQuestionnaire.php",
@@ -393,7 +395,7 @@ class CTCNC extends Controller
         );
 
 
-        if ($this->hasPermissions(PHPLIB_PERM_SALES)) {
+        if ($this->hasPermissions(SALES_PERMISSION)) {
             $menu->addSection("Sales", 'fa-tag', $this->getDefaultSalesMenu());
         }
 
@@ -416,11 +418,11 @@ class CTCNC extends Controller
             );
         }
 
-        if ($this->hasPermissions(PHPLIB_PERM_REPORTS)) {
+        if ($this->hasPermissions(REPORTS_PERMISSION)) {
             $menu->addSection('Reports', "fa-file", $this->getDefaultReportsMenu());
         }
 
-        if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
+        if ($this->hasPermissions(RENEWALS_PERMISSION)) {
             $menu->addSection(
                 'ServiceRenewals',
                 'fa-tasks',
@@ -429,15 +431,15 @@ class CTCNC extends Controller
             );
         }
 
-        if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
+        if ($this->hasPermissions(ACCOUNTS_PERMISSION)) {
             $menu->addSection('Accounts', 'fa-calculator', $this->getDefaultAccountsMenu());
         }
 
-        if ($this->hasPermissions(PHPLIB_PERM_MAINTENANCE)) {
+        if ($this->hasPermissions(MAINTENANCE_PERMISSION)) {
             $menu->addSection("Maintenance", 'fa-wrench', $this->getDefaultMaintenanceMenu());
         }
 
-        if ($this->hasPermissions(SENIOR_MANAGEMENT_PERMISSION0)) {
+        if ($this->hasPermissions(SENIOR_MANAGEMENT_PERMISSION)) {
             $menu->addSection("Management", 'fa-project-diagram', $this->getDefaultManagementMenu());
         }
 
@@ -475,9 +477,7 @@ class CTCNC extends Controller
             ",",
             self::getDbeUser()->getValue(DBEUser::perms)
         );
-
         if (is_array($levels)) {
-
             return array_intersect(
                 $levels,
                 $permissions
@@ -551,18 +551,18 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 111,
-                "href"  => "Customer.php?action=display24HourSupportCustomers",
+                "href"  => "24HoursSupportCustomersReport.php",
                 "label" => "24 Hour Support Customers",
             ],
             [
                 "id"    => 112,
-                "href"  => "Customer.php?action=displaySpecialAttentionCustomers",
+                "href"  => "SpecialAttentionCustomersReport.php",
                 "label" => "Special Attention Customers",
             ],
         ];
     }
 
-    private function addConditionalMenu(\CNCLTD\SideMenu $menu,
+    private function addConditionalMenu(SideMenu $menu,
                                         $icon,
                                         $menuKey,
                                         $condition,
@@ -579,7 +579,12 @@ class CTCNC extends Controller
         if (!$section) {
             $menu->addSection($menuKey, $icon, [], $menuName);
         }
-        $menu->addItemToSection($menuKey, new \CNCLTD\MenuItem($id, $label, $href));
+        $menu->addItemToSection($menuKey, new MenuItem($id, $label, $href));
+    }
+
+    protected function isStarterLeaverManger()
+    {
+        return $this->dbeUser->getValue(DBEUser::starterLeaverQuestionManagementFlag) == 'Y';
     }
 
     function isUserSDManager()
@@ -591,14 +596,14 @@ class CTCNC extends Controller
     {
         return [
             [
-                "id"    => 201,
-                "label" => "Manager Dashboard P5",
-                "href"  => "SDManagerDashboard.php?showP5=true&SP"
-            ],
-            [
                 "id"    => 222,
                 "label" => "Manager Dashboard",
                 "href"  => "SDManagerDashboard.php?SP"
+            ],
+            [
+                "id"    => 201,
+                "label" => "Manager Dashboard P5",
+                "href"  => "SDManagerDashboard.php?showP5=true&SP"
             ],
             [
                 "id"    => 202,
@@ -698,6 +703,11 @@ class CTCNC extends Controller
                 "href"  => "PasswordServices.php"
             ],
         ];
+    }
+
+    protected function isAppraiser()
+    {
+        return $this->dbeUser->getValue(DBEUser::staffAppraiserFlag) == 'Y';
     }
 
     private function getDefaultSalesMenu()
@@ -824,7 +834,7 @@ class CTCNC extends Controller
             [
                 "id"    => 504,
                 "label" => "Service Contracts Ratio",
-                "href"  => "Customer.php?action=displayContractAndNumbersReport",
+                "href"  => "ContractAndNumbersReport.php",
             ],
             [
                 "id"    => 505,
@@ -1084,45 +1094,11 @@ class CTCNC extends Controller
         exit;
     }
 
-
     function checkPermissions($levels)
     {
         if (!$this->hasPermissions($levels)) {
             $this->displayFatalError('You do not have the permissions required for the requested operation');
         }
-    }
-
-    function teamLevelIs($level)
-    {
-        $dbeUser = $this->getDbeUser();
-        $dbeUser->setValue(
-            DBEUser::userID,
-            $this->userID
-        );
-        $dbeUser->getRow();
-
-        $dbeTeam = $this->getDbeTeam();
-        $dbeTeam->setValue(
-            DBETeam::teamID,
-            $dbeUser->getValue(DBEUser::teamID)
-        );
-        $dbeTeam->getRow();
-
-        if ($dbeTeam->getValue(DBETeam::level) >= $level) {
-            $ret = true;
-        } else {
-            $ret = false;
-        }
-
-        return $ret;
-    }
-
-    function getDbeTeam()
-    {
-        if (!$this->dbeTeam) {
-            $this->dbeTeam = new DBETeam ($this);
-        }
-        return $this->dbeTeam;
     }
 
     function canChangeSrPriority()
@@ -1148,10 +1124,9 @@ class CTCNC extends Controller
         return ($flag == 'N' ? null : CT_CHECKED);
     }
 
-    protected
-    function isAppraiser()
+    protected function isExpenseApprover()
     {
-        return $this->dbeUser->getValue(DBEUser::staffAppraiserFlag) == 'Y';
+        return $this->dbeUser->getValue(DBEUser::isExpenseApprover);
     }
 
     protected function isSdManager()
@@ -1162,5 +1137,10 @@ class CTCNC extends Controller
     protected function setMenuId(int $int)
     {
         $this->template->setVar('menuId', $int);
+    }
+
+    protected function isRenewalSalesOrderManager()
+    {
+        return $this->dbeUser->getValue(DBEUser::createRenewalSalesOrdersFlag) == 'Y';
     }
 }

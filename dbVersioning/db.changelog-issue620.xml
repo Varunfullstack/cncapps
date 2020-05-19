@@ -23,5 +23,17 @@
             </column>
         </createTable>
     </changeSet>
+    <changeSet id="issue620-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="consultant" columnName="customerID"/>
+        </preConditions>
+        <dropColumn tableName="consultant" columnName="customerID"/>
+        <rollback>
+            <addColumn tableName="consultant">
+                <column name="customerID" remarks="OBSOLETE" type="INT"/>
+            </addColumn>
+        </rollback>
+
+    </changeSet>
 
 </databaseChangeLog>

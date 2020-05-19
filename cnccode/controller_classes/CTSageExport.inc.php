@@ -24,9 +24,7 @@ class CTSageExport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            "accounts",
-        ];
+        $roles = ACCOUNTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -40,7 +38,7 @@ class CTSageExport extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
+        $this->checkPermissions(ACCOUNTS_PERMISSION);
         switch ($this->getAction()) {
             case CTSAGE_EXPORT_ACT_GENERATE:
                 $this->generate();

@@ -5,7 +5,7 @@
  * Date: 15/02/2019
  * Time: 10:37
  */
-
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -41,7 +41,12 @@ class CTBookSalesVisit extends CTCNC
             $cookieVars,
             $cfg
         );
-
+        $roles = ACCOUNT_MANAGEMENT_PERMISSION;
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
+        $this->setMenuId(407);
         $this->dsSearchForm = new DSForm($this);
         $this->dsSearchForm->addColumn(
             self::searchFormCustomerID,
@@ -75,15 +80,7 @@ class CTBookSalesVisit extends CTCNC
             DA_NOT_NULL
         );
 
-        $roles = [
-            "sales",
-        ];
 
-        if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
-            exit;
-        }
-        $this->setMenuId(407);
     }
 
     /**
@@ -402,17 +399,6 @@ class CTBookSalesVisit extends CTCNC
         if ($this->getParam('booked')) {
             $bookedActivity = $this->getParam('booked');
         }
-
-        if (!$this->hasPermissions(PHPLIB_PERM_CUSTOMER)) {
-            $urlCustomerPopup = Controller::buildLink(
-                CTCNC_PAGE_CUSTOMER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-        }
-
 
         $this->setTemplateFiles(
             'BookSalesVisit',

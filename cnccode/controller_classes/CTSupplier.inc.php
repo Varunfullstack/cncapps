@@ -73,13 +73,7 @@ class CTSupplier extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "sales",
-        ];
-        if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
-            exit;
-        }
+        $roles = MAINTENANCE_PERMISSION;
         $this->setMenuId(810);
         $this->buSupplier = new BUSupplier($this);
         $this->dsSupplier = new DSForm($this);    // new specialised dataset with form message support
@@ -96,15 +90,16 @@ class CTSupplier extends CTCNC
         switch ($this->getAction()) {
             case CTCNC_ACT_SUPPLIER_ADD:
             case CTCNC_ACT_SUPPLIER_EDIT:
-                $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
+                $this->checkPermissions(MAINTENANCE_PERMISSION);
                 $this->supplierForm();
                 break;
             case CTSUPPLIER_ACT_SUPPLIER_INSERT:
             case CTSUPPLIER_ACT_SUPPLIER_UPDATE:
-                $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
+                $this->checkPermissions(MAINTENANCE_PERMISSION);
                 $this->supplierUpdate();
                 break;
             case CTCNC_ACT_SEARCH:
+                $this->checkPermissions(MAINTENANCE_PERMISSION);
                 $this->search();
                 break;
             case CTCNC_ACT_DISP_SUPPLIER_POPUP:
@@ -112,6 +107,7 @@ class CTSupplier extends CTCNC
                 break;
             case CTSUPPLIER_ACT_SUPPLIER_SEARCH_FORM:
             default:
+                $this->checkPermissions(MAINTENANCE_PERMISSION);
                 $this->displaySearchForm();
                 break;
         }
@@ -132,222 +128,6 @@ class CTSupplier extends CTCNC
             $this->setSessionParam('supplierParentDescField', $this->getParam('parentDescField'));
         } else {
             unset($_SESSION['supplierParentDescField']);
-        }
-    }
-
-    /**
-     * Display the popup selector form
-     * @access private
-     * @throws Exception
-     */
-    function displaySupplierSelectPopup()
-    {
-        $this->setMethodName('displaySupplierSelectPopup');
-
-        // A single slash means create new supplier
-        $urlCreate = null;
-        if ($this->getParam('supplierName'){0} == '/') {
-            $urlCreate = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'  => CTCNC_ACT_SUPPLIER_ADD,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-            header('Location: ' . $urlCreate);
-            exit;
-        }
-
-        $this->buSupplier->getSuppliersByNameMatch(
-            $this->getParam('supplierName'),
-            $this->dsSupplier
-        );
-        if ($this->dsSupplier->rowCount() == 1) {
-            $this->setTemplateFiles(
-                'SupplierSelect',
-                'SupplierSelectOne.inc'
-            );
-            $this->template->set_var(
-                array(
-                    'submitName' => addslashes($this->dsSupplier->getValue(DBEJSupplier::name)),
-                    'supplierID' => $this->dsSupplier->getValue(DBEJSupplier::supplierID)
-                )
-            );
-        } else {
-            if ($this->dsSupplier->rowCount() == 0) {
-                $this->template->set_var(
-                    'supplierName',
-                    $this->getParam('supplierName')
-                );
-                $this->setTemplateFiles(
-                    'SupplierSelect',
-                    'SupplierSelectNone.inc'
-                );
-            }
-            if ($this->dsSupplier->rowCount() > 1) {
-                $this->setTemplateFiles(
-                    'SupplierSelect',
-                    'SupplierSelectPopup.inc'
-                );
-            }
-            $this->template->set_var(
-                array(
-                    'urlSupplierCreate' => $urlCreate
-                )
-            );
-            // Parameters
-            $this->setPageTitle('Supplier Selection');
-            if ($this->dsSupplier->rowCount() > 0) {
-                $this->template->set_block(
-                    'SupplierSelect',
-                    'supplierBlock',
-                    'suppliers'
-                );
-                while ($this->dsSupplier->fetchNext()) {
-                    $this->template->set_var(
-                        array(
-                            'supplierName' => Controller::htmlDisplayText(
-                                ($this->dsSupplier->getValue(DBEJSupplier::name))
-                            ),
-                            'submitName'   => Controller::htmlDisplayText(
-                                $this->dsSupplier->getValue(DBEJSupplier::name)
-                            ),
-                            'supplierID'   => $this->dsSupplier->getValue(DBEJSupplier::supplierID)
-                        )
-                    );
-                    $this->template->parse(
-                        'suppliers',
-                        'supplierBlock',
-                        true
-                    );
-                }
-            }
-        } // not ($dsSupplier->rowCount()==1)
-        $this->template->set_var(
-            array(
-                'parentIDField'   => $_SESSION['supplierParentIDField'],
-                'parentDescField' => $_SESSION['supplierParentDescField']
-            )
-        );
-        $this->template->parse(
-            'CONTENTS',
-            'SupplierSelect',
-            true
-        );
-        $this->parsePage();
-    }
-
-    /**
-     * Display the search form
-     * @access private
-     * @throws Exception
-     */
-    function displaySearchForm()
-    {
-        $this->setMethodName('displaySearchForm');
-        $this->setTemplateFiles(
-            'SupplierSearch',
-            'SupplierSearch.inc'
-        );
-        $this->setPageTitle("Supplier");
-        // clear these vars so that context of edit will NOT be assumed to be a pop-up
-        unset($_SESSION['supplierParentIDField']);
-        unset($_SESSION['supplierParentDescField']);
-        $submitURL = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array('action' => CTCNC_ACT_SEARCH)
-        );
-        $createURL = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array('action' => CTCNC_ACT_SUPPLIER_ADD)
-        );
-        $supplierPopup = Controller::buildLink(
-            CTCNC_PAGE_SUPPLIER,
-            array(
-                'action'  => CTCNC_ACT_DISP_SUPPLIER_POPUP,
-                'htmlFmt' => CT_HTML_FMT_POPUP
-            )
-        );
-        $this->template->set_var(
-            array(
-                'supplierString'        => $this->getParam('supplierString'),
-                'address'               => $this->getParam('address'),
-                'supplierStringMessage' => isset($GLOBALS['supplierStringMessage']) ? $GLOBALS['supplierStringMessage'] : null,
-                'submitURL'             => $submitURL,
-                'createURL'             => $createURL,
-                'urlSupplierPopup'      => $supplierPopup
-            )
-        );
-        if (is_object($this->dsSupplier)) {
-            $this->template->set_block(
-                'SupplierSearch',
-                'supplierBlock',
-                'suppliers'
-            );
-            while ($this->dsSupplier->fetchNext()) {
-                $supplierURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => CTCNC_ACT_SUPPLIER_EDIT,
-                            'supplierID' => $this->dsSupplier->getValue(DBEJSupplier::supplierID)
-                        )
-                    );
-
-                $this->template->set_var(
-                    array(
-                        'supplierName' => $this->dsSupplier->getValue(DBEJSupplier::name),
-                        'supplierURL'  => $supplierURL
-                    )
-                );
-                $this->template->parse(
-                    'suppliers',
-                    'supplierBlock',
-                    true
-                );
-            }
-        }
-        $this->template->parse(
-            'CONTENTS',
-            'SupplierSearch',
-            true
-        );
-        $this->parsePage();
-    }
-
-    /**
-     * Search for suppliers using supplierName
-     * @access private
-     * @throws Exception
-     */
-    function search()
-    {
-        $this->setMethodName('search');
-// Parameter validation
-        if (!$this->getParam('supplierString') && !$this->getParam('address')) {
-            $GLOBALS['supplierStringMessage'] = 'You must specify some parameters';
-            $this->displaySearchForm();
-            exit;
-        } else {
-            if (!$this->buSupplier->getSuppliersByNameMatch(
-                $this->getParam('supplierString'),
-                $this->dsSupplier,
-                $this->getParam('address')                        // on the end to ensure existing code works OK
-            )
-            ) {
-                $GLOBALS['supplierStringMessage'] = CTSUPPLIER_MSG_NONE_FND;
-            }
-
-        }
-
-        if ($this->dsSupplier->rowCount() == 1) {
-            $this->dsSupplier->fetchNext();
-            $this->setParam('supplierID', $this->dsSupplier->getValue(DBEJSupplier::supplierID));
-            $this->setAction(CTCNC_ACT_SUPPLIER_EDIT);
-            $this->supplierForm();
-        } else {
-            $this->displaySearchForm();
-
         }
     }
 
@@ -603,5 +383,221 @@ class CTSupplier extends CTCNC
             }
             header('Location: ' . $urlNext);
         }
+    }
+
+    /**
+     * Search for suppliers using supplierName
+     * @access private
+     * @throws Exception
+     */
+    function search()
+    {
+        $this->setMethodName('search');
+// Parameter validation
+        if (!$this->getParam('supplierString') && !$this->getParam('address')) {
+            $GLOBALS['supplierStringMessage'] = 'You must specify some parameters';
+            $this->displaySearchForm();
+            exit;
+        } else {
+            if (!$this->buSupplier->getSuppliersByNameMatch(
+                $this->getParam('supplierString'),
+                $this->dsSupplier,
+                $this->getParam('address')                        // on the end to ensure existing code works OK
+            )
+            ) {
+                $GLOBALS['supplierStringMessage'] = CTSUPPLIER_MSG_NONE_FND;
+            }
+
+        }
+
+        if ($this->dsSupplier->rowCount() == 1) {
+            $this->dsSupplier->fetchNext();
+            $this->setParam('supplierID', $this->dsSupplier->getValue(DBEJSupplier::supplierID));
+            $this->setAction(CTCNC_ACT_SUPPLIER_EDIT);
+            $this->supplierForm();
+        } else {
+            $this->displaySearchForm();
+
+        }
+    }
+
+    /**
+     * Display the search form
+     * @access private
+     * @throws Exception
+     */
+    function displaySearchForm()
+    {
+        $this->setMethodName('displaySearchForm');
+        $this->setTemplateFiles(
+            'SupplierSearch',
+            'SupplierSearch.inc'
+        );
+        $this->setPageTitle("Supplier");
+        // clear these vars so that context of edit will NOT be assumed to be a pop-up
+        unset($_SESSION['supplierParentIDField']);
+        unset($_SESSION['supplierParentDescField']);
+        $submitURL = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array('action' => CTCNC_ACT_SEARCH)
+        );
+        $createURL = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array('action' => CTCNC_ACT_SUPPLIER_ADD)
+        );
+        $supplierPopup = Controller::buildLink(
+            CTCNC_PAGE_SUPPLIER,
+            array(
+                'action'  => CTCNC_ACT_DISP_SUPPLIER_POPUP,
+                'htmlFmt' => CT_HTML_FMT_POPUP
+            )
+        );
+        $this->template->set_var(
+            array(
+                'supplierString'        => $this->getParam('supplierString'),
+                'address'               => $this->getParam('address'),
+                'supplierStringMessage' => isset($GLOBALS['supplierStringMessage']) ? $GLOBALS['supplierStringMessage'] : null,
+                'submitURL'             => $submitURL,
+                'createURL'             => $createURL,
+                'urlSupplierPopup'      => $supplierPopup
+            )
+        );
+        if (is_object($this->dsSupplier)) {
+            $this->template->set_block(
+                'SupplierSearch',
+                'supplierBlock',
+                'suppliers'
+            );
+            while ($this->dsSupplier->fetchNext()) {
+                $supplierURL =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'     => CTCNC_ACT_SUPPLIER_EDIT,
+                            'supplierID' => $this->dsSupplier->getValue(DBEJSupplier::supplierID)
+                        )
+                    );
+
+                $this->template->set_var(
+                    array(
+                        'supplierName' => $this->dsSupplier->getValue(DBEJSupplier::name),
+                        'supplierURL'  => $supplierURL
+                    )
+                );
+                $this->template->parse(
+                    'suppliers',
+                    'supplierBlock',
+                    true
+                );
+            }
+        }
+        $this->template->parse(
+            'CONTENTS',
+            'SupplierSearch',
+            true
+        );
+        $this->parsePage();
+    }
+
+    /**
+     * Display the popup selector form
+     * @access private
+     * @throws Exception
+     */
+    function displaySupplierSelectPopup()
+    {
+        $this->setMethodName('displaySupplierSelectPopup');
+
+        // A single slash means create new supplier
+        $urlCreate = null;
+        if ($this->getParam('supplierName'){0} == '/') {
+            $urlCreate = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'  => CTCNC_ACT_SUPPLIER_ADD,
+                    'htmlFmt' => CT_HTML_FMT_POPUP
+                )
+            );
+            header('Location: ' . $urlCreate);
+            exit;
+        }
+
+        $this->buSupplier->getSuppliersByNameMatch(
+            $this->getParam('supplierName'),
+            $this->dsSupplier
+        );
+        if ($this->dsSupplier->rowCount() == 1) {
+            $this->setTemplateFiles(
+                'SupplierSelect',
+                'SupplierSelectOne.inc'
+            );
+            $this->template->set_var(
+                array(
+                    'submitName' => addslashes($this->dsSupplier->getValue(DBEJSupplier::name)),
+                    'supplierID' => $this->dsSupplier->getValue(DBEJSupplier::supplierID)
+                )
+            );
+        } else {
+            if ($this->dsSupplier->rowCount() == 0) {
+                $this->template->set_var(
+                    'supplierName',
+                    $this->getParam('supplierName')
+                );
+                $this->setTemplateFiles(
+                    'SupplierSelect',
+                    'SupplierSelectNone.inc'
+                );
+            }
+            if ($this->dsSupplier->rowCount() > 1) {
+                $this->setTemplateFiles(
+                    'SupplierSelect',
+                    'SupplierSelectPopup.inc'
+                );
+            }
+            $this->template->set_var(
+                array(
+                    'urlSupplierCreate' => $urlCreate
+                )
+            );
+            // Parameters
+            $this->setPageTitle('Supplier Selection');
+            if ($this->dsSupplier->rowCount() > 0) {
+                $this->template->set_block(
+                    'SupplierSelect',
+                    'supplierBlock',
+                    'suppliers'
+                );
+                while ($this->dsSupplier->fetchNext()) {
+                    $this->template->set_var(
+                        array(
+                            'supplierName' => Controller::htmlDisplayText(
+                                ($this->dsSupplier->getValue(DBEJSupplier::name))
+                            ),
+                            'submitName'   => Controller::htmlDisplayText(
+                                $this->dsSupplier->getValue(DBEJSupplier::name)
+                            ),
+                            'supplierID'   => $this->dsSupplier->getValue(DBEJSupplier::supplierID)
+                        )
+                    );
+                    $this->template->parse(
+                        'suppliers',
+                        'supplierBlock',
+                        true
+                    );
+                }
+            }
+        } // not ($dsSupplier->rowCount()==1)
+        $this->template->set_var(
+            array(
+                'parentIDField'   => $_SESSION['supplierParentIDField'],
+                'parentDescField' => $_SESSION['supplierParentDescField']
+            )
+        );
+        $this->template->parse(
+            'CONTENTS',
+            'SupplierSelect',
+            true
+        );
+        $this->parsePage();
     }
 }

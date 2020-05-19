@@ -197,7 +197,7 @@ class CTCurrentActivityReport extends CTCNC
                 $this->changeQueue();
                 break;
             case 'deleteCustomerRequest':
-                $this->checkPermissions(PHPLIB_PERM_TECHNICAL);
+                $this->checkPermissions(TECHNICAL_PERMISSION);
                 $this->deleteCustomerRequest();
                 break;
             case 'pendingReopenedPopup':

@@ -26,9 +26,7 @@ class CTPaymentTerms extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            "accounts",
-        ];
+        $roles = ACCOUNTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -45,7 +43,7 @@ class CTPaymentTerms extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
+        $this->checkPermissions(MAINTENANCE_PERMISSION);
         switch ($this->getAction()) {
             case CTPAYMENTTERMS_ACT_EDIT:
             case CTPAYMENTTERMS_ACT_CREATE:

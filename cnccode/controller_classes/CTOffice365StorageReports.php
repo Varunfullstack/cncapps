@@ -26,9 +26,7 @@ class CTOffice365StorageReports extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "maintenance",
-        ];
+        $roles = REPORTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;

@@ -70,15 +70,15 @@ class CTStandardText extends CTCNC
         switch ($this->getAction()) {
             case CTSTANDARDTEXT_ACT_EDIT:
             case CTSTANDARDTEXT_ACT_CREATE:
-                $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
+                $this->checkPermissions(MAINTENANCE_PERMISSION);
                 $this->edit();
                 break;
             case CTSTANDARDTEXT_ACT_DELETE:
-                $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
+                $this->checkPermissions(MAINTENANCE_PERMISSION);
                 $this->delete();
                 break;
             case CTSTANDARDTEXT_ACT_UPDATE:
-                $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
+                $this->checkPermissions(MAINTENANCE_PERMISSION);
                 $this->update();
                 break;
             case "getSalesRequestOptions":
@@ -113,7 +113,7 @@ class CTStandardText extends CTCNC
                 break;
             case CTSTANDARDTEXT_ACT_DISPLAY_LIST:
             default:
-                $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
+                $this->checkPermissions(MAINTENANCE_PERMISSION);
                 $this->displayList();
                 break;
         }

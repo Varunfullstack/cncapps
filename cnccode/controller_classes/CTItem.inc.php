@@ -95,16 +95,16 @@ class CTItem extends CTCNC
         switch ($this->getAction()) {
             case CTCNC_ACT_ITEM_ADD:
             case CTCNC_ACT_ITEM_EDIT:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->itemForm();
                 break;
             case CTITEM_ACT_ITEM_INSERT:
             case CTITEM_ACT_ITEM_UPDATE:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->itemUpdate();
                 break;
             case 'discontinue':
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->discontinue();
                 break;
             case CTCNC_ACT_DISP_ITEM_POPUP:

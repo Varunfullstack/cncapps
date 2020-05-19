@@ -36,10 +36,7 @@ class CTCustomerReviewMeetingsReport extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "sales",
-            "technical"
-        ];
+        $roles = ACCOUNT_MANAGEMENT_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;

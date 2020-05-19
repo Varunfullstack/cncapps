@@ -153,7 +153,7 @@ class CTPurchaseOrder extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_SALES);
+        $this->checkPermissions(SALES_PERMISSION);
         switch ($this->getAction()) {
             case CTCNC_ACT_GENERATE_POS_FROM_SO:
                 $this->generateFromSO();

@@ -127,7 +127,7 @@ class CTCustomerItem extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_TECHNICAL);
+        $this->checkPermissions(TECHNICAL_PERMISSION);
         $this->setParentFormFields();
         switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:

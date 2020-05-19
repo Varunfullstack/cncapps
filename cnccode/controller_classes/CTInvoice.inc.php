@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_bu'] . '/BUInvoice.inc.php');
 require_once($cfg['path_bu'] . '/BUPDFInvoice.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -172,9 +173,7 @@ class CTInvoice extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "sales",
-        ];
+        $roles = ACCOUNTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -193,7 +192,7 @@ class CTInvoice extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_SALES);
+        $this->checkPermissions(SALES_PERMISSION);
         switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:
                 $this->search();
@@ -210,9 +209,6 @@ class CTInvoice extends CTCNC
                 break;
             case CTCNC_ACT_INVOICE_REPRINT:
                 $this->invoiceReprint();
-                break;
-            case CTCNC_ACT_INVOICE_REPRINT_GENERATE:
-                $this->invoiceReprintGenerate();
                 break;
             case CTINVOICE_ACT_DELETE_INVOICE:
                 $this->deleteInvoice();
@@ -515,182 +511,6 @@ class CTInvoice extends CTCNC
         }
         $this->redirectToDisplay($invheadID);
         exit;
-    }
-
-    /**
-     * Generate one invoice
-     * @access private
-     */
-    function printOneInvoice()
-    {
-        $dsInvhead = new DataSet($this);
-        $this->buInvoice->getInvoiceByID(
-            $this->getParam('invheadID'),
-            $dsInvhead,
-            $dsInvline
-        );
-
-        header('Pragma: public');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename=' . $this->getParam('invheadID') . '.pdf;');
-        header('Content-Transfer-Encoding: binary');
-        echo $dsInvhead->getValue(DBEInvhead::pdfFile);
-        exit();
-    }
-
-    /**
-     * ReGenerate pdf invoice
-     * @access private
-     */
-    function regeneratePdf()
-    {
-
-        $pdfFile = $this->buInvoice->regeneratePdfInvoice($this->getParam('invheadID'));
-
-        header('Pragma: public');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename=' . $this->getParam('invheadID') . '.pdf;');
-        header('Content-Transfer-Encoding: binary');
-        echo $pdfFile;
-        exit();
-    }
-
-    /**
-     * Display form to allow selection of date range for which to produce invoices
-     * @access private
-     * @throws Exception
-     */
-    function invoiceReprint()
-    {
-        $this->setMenuId(704);
-        $this->setMethodName('invoiceReprint');
-        $urlSubmit = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTCNC_ACT_INVOICE_REPRINT_GENERATE
-            )
-        );
-        $this->setPageTitle('Reprint Invoices');
-        $this->setTemplateFiles(
-            'InvoiceReprint',
-            'InvoiceReprint.inc'
-        );
-        if (!$this->getFormError()) {
-            $this->buInvoice->initialiseDataset($this->dsPrintRange);
-        }
-
-        $urlCustomerPopup = Controller::buildLink(
-            CTCNC_PAGE_CUSTOMER,
-            array(
-                'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                'htmlFmt' => CT_HTML_FMT_POPUP
-            )
-        );
-        $customerString = null;
-        if ($this->dsPrintRange->getValue(BUInvoice::searchFormCustomerID)) {
-            $buCustomer = new BUCustomer($this);
-            $dsCustomer = new DataSet($this);
-            $buCustomer->getCustomerByID(
-                $this->dsPrintRange->getValue(BUInvoice::searchFormCustomerID),
-                $dsCustomer
-            );
-            $customerString = $dsCustomer->getValue(DBECustomer::name);
-        }
-
-        $this->template->set_var(
-            array(
-                'customerID'            => $this->dsPrintRange->getValue(BUInvoice::searchFormCustomerID),
-                'customerString'        => $customerString,
-                'urlCustomerPopup'      => $urlCustomerPopup,
-                'startDate'             => Controller::dateYMDtoDMY(
-                    $this->dsPrintRange->getValue(BUInvoice::searchFormStartDate)
-                ),
-                'startDateMessage'      => Controller::htmlDisplayText(
-                    $this->dsPrintRange->getMessage(BUInvoice::searchFormStartDate)
-                ),
-                'endDate'               => Controller::dateYMDtoDMY(
-                    $this->dsPrintRange->getValue(BUInvoice::searchFormEndDate)
-                ),
-                'endDateMessage'        => Controller::htmlDisplayText(
-                    $this->dsPrintRange->getMessage(BUInvoice::searchFormEndDate)
-                ),
-                'startInvheadID'        => Controller::dateYMDtoDMY(
-                    $this->dsPrintRange->getValue(BUInvoice::searchFormStartInvheadID)
-                ),
-                'startInvheadIDMessage' => Controller::htmlDisplayText(
-                    $this->dsPrintRange->getMessage(BUInvoice::searchFormStartInvheadID)
-                ),
-                'endInvheadID'          => Controller::dateYMDtoDMY(
-                    $this->dsPrintRange->getValue(BUInvoice::searchFormEndInvheadID)
-                ),
-                'endInvheadIDMessage'   => Controller::htmlDisplayText(
-                    $this->dsPrintRange->getMessage(BUInvoice::searchFormEndInvheadID)
-                ),
-                'urlSubmit'             => $urlSubmit
-            )
-        );
-        $this->template->parse(
-            'CONTENTS',
-            'InvoiceReprint',
-            true
-        );
-        $this->parsePage();
-    }
-
-    /**
-     * @throws Exception
-     */
-    function invoiceReprintGenerate()
-    {
-        $this->setMethodName('invoiceReprintGenerate');
-        $this->buInvoice->initialiseDataset($this->dsPrintRange);
-        if (!$this->dsPrintRange->populateFromArray($this->getParam('invoice'))) {
-            $this->setFormErrorOn();
-            $this->invoiceReprint(); //redisplay with errors
-            exit;
-        }
-        if (!($this->dsPrintRange->getValue(BUInvoice::searchFormStartDate) .
-            $this->dsPrintRange->getValue(BUInvoice::searchFormEndDate) .
-            $this->dsPrintRange->getValue(BUInvoice::searchFormCustomerID) .
-            $this->dsPrintRange->getValue(BUInvoice::searchFormStartInvheadID) .
-            $this->dsPrintRange->getValue(BUInvoice::searchFormEndInvheadID))
-        ) {
-            $this->setFormErrorMessage('Please use parameters');
-            $this->invoiceReprint(); //redisplay with errors
-            exit;
-        }
-        // generate PDF invoices:
-        $buPDFInvoice = new BUPDFInvoice(
-            $this,
-            $this->buInvoice
-        );
-        $pdfFile =
-            $buPDFInvoice->reprintInvoicesByRange(
-                $this->dsPrintRange->getValue(BUInvoice::searchFormCustomerID),
-                $this->dsPrintRange->getValue(BUInvoice::searchFormStartDate),
-                $this->dsPrintRange->getValue(BUInvoice::searchFormEndDate),
-                $this->dsPrintRange->getValue(BUInvoice::searchFormStartInvheadID),
-                $this->dsPrintRange->getValue(BUInvoice::searchFormEndInvheadID)
-            );
-        if ($pdfFile != FALSE) {
-            header('Pragma: public');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-            header('Content-Type: application/pdf');
-            header('Content-Disposition: attachment; filename=invoices.pdf;');
-            header('Content-Transfer-Encoding: binary');
-            header('Content-Length: ' . filesize($pdfFile));
-            readfile($pdfFile);
-            unlink($pdfFile);
-            exit();
-        } else {
-            $this->setFormErrorMessage('No invoices found - try changing the search parameters');
-            $this->invoiceReprint(); //redisplay with errors
-        }
     }
 
     /**
@@ -1127,6 +947,7 @@ class CTInvoice extends CTCNC
      */
     function invoiceReprint()
     {
+        $this->setMenuId(704);
         $this->setMethodName('invoiceReprint');
         $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
@@ -1193,57 +1014,6 @@ class CTInvoice extends CTCNC
         $this->parsePage();
     }
 
-    /**
-     * @throws Exception
-     */
-    function invoiceReprintGenerate()
-    {
-        $this->setMethodName('invoiceReprintGenerate');
-        $this->buInvoice->initialiseDataset($this->dsPrintRange);
-        if (!$this->dsPrintRange->populateFromArray($this->getParam('invoice'))) {
-            $this->setFormErrorOn();
-            $this->invoiceReprint(); //redisplay with errors
-            exit;
-        }
-        if (!($this->dsPrintRange->getValue(BUInvoice::searchFormStartDate) .
-            $this->dsPrintRange->getValue(BUInvoice::searchFormEndDate) .
-            $this->dsPrintRange->getValue(BUInvoice::searchFormCustomerID) .
-            $this->dsPrintRange->getValue(BUInvoice::searchFormStartInvheadID) .
-            $this->dsPrintRange->getValue(BUInvoice::searchFormEndInvheadID))
-        ) {
-            $this->setFormErrorMessage('Please use parameters');
-            $this->invoiceReprint(); //redisplay with errors
-            exit;
-        }
-        // generate PDF invoices:
-        $buPDFInvoice = new BUPDFInvoice(
-            $this,
-            $this->buInvoice
-        );
-        $pdfFile =
-            $buPDFInvoice->reprintInvoicesByRange(
-                $this->dsPrintRange->getValue(BUInvoice::searchFormCustomerID),
-                $this->dsPrintRange->getValue(BUInvoice::searchFormStartDate),
-                $this->dsPrintRange->getValue(BUInvoice::searchFormEndDate),
-                $this->dsPrintRange->getValue(BUInvoice::searchFormStartInvheadID),
-                $this->dsPrintRange->getValue(BUInvoice::searchFormEndInvheadID)
-            );
-        if ($pdfFile != FALSE) {
-            header('Pragma: public');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-            header('Content-Type: application/pdf');
-            header('Content-Disposition: attachment; filename=invoices.pdf;');
-            header('Content-Transfer-Encoding: binary');
-            header('Content-Length: ' . filesize($pdfFile));
-            readfile($pdfFile);
-            unlink($pdfFile);
-            exit();
-        } else {
-            $this->setFormErrorMessage('No invoices found - try changing the search parameters');
-            $this->invoiceReprint(); //redisplay with errors
-        }
-    }
 
     /**
      * Delete Invoice
@@ -1255,20 +1025,19 @@ class CTInvoice extends CTCNC
     function deleteInvoice()
     {
         $this->setMethodName('deleteInvoice');
-        $dsInvhead = new DataSet($this);
         $this->buInvoice->getInvoiceHeaderByID(
             $this->getParam('invheadID'),
-            $dsInvhead
+            $this->dsInvhead
         );
         $this->buInvoice->deleteInvoice($this->getParam('invheadID'));
-        if ($dsInvhead->getValue(DBEInvhead::ordheadID)) {
-            if ($this->buInvoice->countInvoicesByOrdheadID($dsInvhead->getValue(DBEInvhead::ordheadID)) > 0) {
+        if ($this->dsInvhead->getValue(DBEInvhead::ordheadID)) {
+            if ($this->buInvoice->countInvoicesByOrdheadID($this->dsInvhead->getValue(DBEInvhead::ordheadID)) > 0) {
                 $urlNext =                        // there is still one or more invoices so display it/them
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'    => CTCNC_ACT_SEARCH,
-                            'ordheadID' => $dsInvhead->getValue(DBEInvhead::ordheadID)
+                            'ordheadID' => $this->dsInvhead->getValue(DBEInvhead::ordheadID)
                             // if this is set then will show
                         )                                                                                                                    // remaining invoices for SO
                     );
@@ -1278,7 +1047,7 @@ class CTInvoice extends CTCNC
                         CTCNC_PAGE_SALESORDER,
                         array(
                             'action'    => CTCNC_ACT_DISP_SALESORDER,
-                            'ordheadID' => $dsInvhead->getValue(DBEInvhead::ordheadID)
+                            'ordheadID' => $this->dsInvhead->getValue(DBEInvhead::ordheadID)
                         )
                     );
             }
@@ -1491,7 +1260,7 @@ class CTInvoice extends CTCNC
                 true
             );
         }
-    }// end function invoiceLineForm()
+    }
 
     /**
      * Update/Insert order line
@@ -1586,7 +1355,7 @@ class CTInvoice extends CTCNC
             $this->getParam('sequenceNo')
         );
         $this->redirectToDisplay($this->getParam('invheadID'));
-    }
+    }// end function invoiceLineForm()
 
     /**
      * Move order line down
@@ -1763,8 +1532,8 @@ class CTInvoice extends CTCNC
             $this->setFormErrorOn();
             $this->printUnprinted(); //redisplay with errors
         }
-
-        if ($list = $this->buInvoice->getCustomersWithoutInvoiceContact()) {
+        $list = $this->buInvoice->getCustomersWithoutInvoiceContact();
+        if (count($list)) {
 
             $this->setFormErrorMessage(
                 'These customers have no invoice contact set: ' . implode(

@@ -42,9 +42,7 @@ class CTHeader extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "accounts",
-        ];
+        $roles = SENIOR_MANAGEMENT_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -61,7 +59,7 @@ class CTHeader extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
+        $this->checkPermissions(MAINTENANCE_PERMISSION);
         switch ($this->getAction()) {
             case CTHEADER_ACT_UPDATE:
                 $this->update();

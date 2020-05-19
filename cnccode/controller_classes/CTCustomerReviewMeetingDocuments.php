@@ -46,10 +46,7 @@ class CTCustomerReviewMeetingDocuments extends CTCNC
             $cfg
         );
 
-        $roles = [
-            "sales",
-        ];
-
+        $roles = ACCOUNT_MANAGEMENT_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;

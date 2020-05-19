@@ -6225,14 +6225,10 @@ is currently a balance of ';
 
         $dbeCallActivity = new DBEJCallActivity($this);
         $dbeCallActivity->getRow($callActivityID);
-
-
         $problemID = $dbeCallActivity->getValue(DBEJCallActivity::problemID);
 
         if (!$problemID) {
-
             $this->raiseError('No problemID for activityID ' . $callActivityID);
-
         }
 
         $dbeCallActivity->getRowsByProblemID(
@@ -6261,44 +6257,27 @@ is currently a balance of ';
         $rowCount = 0;
         $thisID = null;
         while ($dsCallActivity->fetchNext()) {
-
             $rowCount++;
-
             $thisID = $dsCallActivity->getValue(DBEJCallActivity::callActivityID);
 
             if (!$lastID) { // first activity in set
-
-
                 $navigateLinksArray ['first'] = $thisID;
-
             }
 
             if ($followingIDIsNextID) { // next activity in set
-
-
                 $navigateLinksArray ['next'] = $thisID;
-
                 $followingIDIsNextID = false;
-
             }
 
             if ($thisID == $callActivityID) { // current in set is our activity
-
-
                 $navigateLinksArray ['thisRowNumber'] = $rowCount;
-
                 if ($lastID) {
-
                     $navigateLinksArray ['previous'] = $lastID;
-
                 }
-
                 $followingIDIsNextID = true;
-
             }
 
             $lastID = $dsCallActivity->getValue(DBEJCallActivity::callActivityID);
-
         }
 
         if (!@$navigateLinksArray ['next']) {
@@ -6310,21 +6289,15 @@ is currently a balance of ';
         }
 
         if ($callActivityID == @$navigateLinksArray ['first']) {
-
             $navigateLinksArray ['first'] = false;
-
         }
 
         if (@$navigateLinksArray ['next'] == @$navigateLinksArray ['last']) {
-
             $navigateLinksArray ['next'] = false;
-
         }
 
         if (@$navigateLinksArray ['first'] == @$navigateLinksArray ['previous']) {
-
             $navigateLinksArray ['previous'] = false;
-
         }
 
         if (!@$navigateLinksArray ['thisRowNumber']) {
@@ -6429,7 +6402,7 @@ is currently a balance of ';
                      $ctActivity
     )
     {
-        if ($ctActivity->hasPermissions(PHPLIB_PERM_SUPERVISOR)) {
+        if ($ctActivity->hasPermissions(SUPERVISOR_PERMISSION)) {
             return true;
         }
         // status is NOT Authorised AND NOT Checked

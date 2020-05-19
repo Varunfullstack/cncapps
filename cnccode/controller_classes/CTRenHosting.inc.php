@@ -48,10 +48,7 @@ class CTRenHosting extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "renewals",
-            "technical"
-        ];
+        $roles = RENEWALS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -189,7 +186,7 @@ class CTRenHosting extends CTCNC
         $readonly = null;
         $disabled = null;
 
-        if (!$this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
+        if (!$this->hasPermissions(RENEWALS_PERMISSION)) {
             $disabled = 'DISABLED';
             $readonly = 'READONLY';
         }

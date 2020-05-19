@@ -29,7 +29,6 @@ class DBEUser extends DBEntity
     const lastName = "lastName";
     const activeFlag = "activeFlag";
     const helpdeskFlag = "helpdeskFlag";
-    const customerID = "customerID";
     const hourlyPayRate = "hourlyPayRate";
     const teamID = "teamID";
     const receiveSdManagerEmailFlag = "receiveSdManagerEmailFlag";
@@ -198,11 +197,6 @@ class DBEUser extends DBEntity
             DA_NOT_NULL,
             'cns_helpdesk_flag'
         ); // does user get overtime in weekdays
-        $this->addColumn(
-            self::customerID,
-            DA_ID,
-            DA_ALLOW_NULL
-        );
         $this->addColumn(
             self::hourlyPayRate,
             DA_FLOAT,

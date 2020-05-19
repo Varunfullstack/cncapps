@@ -76,11 +76,11 @@ define(
     'Please check User Name and Password. If all are correct please contact Gary or Graham'
 );
 define(
-    'PHPLIB_PERM_SALES',
+    'SALES_PERMISSION',
     'sales'
 );
 define(
-    'PHPLIB_PERM_ACCOUNTS',
+    'ACCOUNTS_PERMISSION',
     'accounts'
 );
 define(
@@ -88,31 +88,27 @@ define(
     'accountManagement'
 );
 define(
-    'PHPLIB_PERM_TECHNICAL',
+    'TECHNICAL_PERMISSION',
     'technical'
 );
 define(
-    'PHPLIB_PERM_MAINTENANCE',
+    'MAINTENANCE_PERMISSION',
     'maintenance'
 );
 define(
-    'SENIOR_MANAGEMENT_PERMISSION0',
+    'SENIOR_MANAGEMENT_PERMISSION',
     'seniorManagement'
 );
 define(
-    'PHPLIB_PERM_REPORTS',
+    'REPORTS_PERMISSION',
     'reports'
 );
 define(
-    'PHPLIB_PERM_SUPERVISOR',
+    'SUPERVISOR_PERMISSION',
     'supervisor'
 );
 define(
-    'PHPLIB_PERM_CUSTOMER',
-    'customer'
-);
-define(
-    'PHPLIB_PERM_RENEWALS',
+    'RENEWALS_PERMISSION',
     'renewals'
 );
 
@@ -420,14 +416,13 @@ class pmSweetcode extends Perm
 {
     var $classname = PHPLIB_CLASSNAME_PERM;
     var $permissions = array(
-        PHPLIB_PERM_SALES       => 1,
-        PHPLIB_PERM_ACCOUNTS    => 2,
-        PHPLIB_PERM_TECHNICAL   => 4,
-        PHPLIB_PERM_MAINTENANCE => 8,
-        PHPLIB_PERM_CUSTOMER    => 16,
-        PHPLIB_PERM_REPORTS     => 32,
-        PHPLIB_PERM_SUPERVISOR  => 64,
-        PHPLIB_PERM_RENEWALS    => 128
+        SALES_PERMISSION       => 1,
+        ACCOUNTS_PERMISSION    => 2,
+        TECHNICAL_PERMISSION   => 4,
+        MAINTENANCE_PERMISSION => 8,
+        REPORTS_PERMISSION     => 32,
+        SUPERVISOR_PERMISSION  => 64,
+        RENEWALS_PERMISSION    => 128
     );
 
     function perm_invalid($does_have,

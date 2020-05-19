@@ -4,17 +4,12 @@
     var state = 'none'; // display status
     var savedCustomerString;
 
-    function saveCustomerString() {
-        savedCustomerString = document.getElementById("customerString").value
-    }
-
     window.addEventListener('DOMContentLoaded', function () {
         renderContracts();
-        window.addEventListener('DOMContentLoaded', function () {
-            $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
-                $('#customerID').val($event.detail.item.value);
-                renderContracts();
-            });
+        const customerIDInput = document.getElementById('customerID');
+        document.getElementById('customerString').addEventListener('autocompleteselect', function ($event) {
+            customerIDInput.value = $event.detail.item.value;
+            renderContracts();
         });
     })
 

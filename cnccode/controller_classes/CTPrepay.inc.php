@@ -23,9 +23,7 @@ class CTPrepay extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            "accounts",
-        ];
+        $roles = ACCOUNTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -43,13 +41,13 @@ class CTPrepay extends CTCNC
         switch ($this->getAction()) {
 
             case 'exportGenerate':
-                $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
+                $this->checkPermissions(ACCOUNTS_PERMISSION);
                 $this->exportGenerate();
                 break;
 
             case 'exportForm':
             default:
-                $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
+                $this->checkPermissions(ACCOUNTS_PERMISSION);
                 $this->exportForm();
                 break;
         }

@@ -30,11 +30,8 @@ class CTExpenseDashboard extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "technical",
-            "sales"
-        ];
-        if (!self::hasPermissions($roles)) {
+
+        if (!self::hasPermissions($this->isExpenseApprover())) {
             Header("Location: /NotAllowed.php");
             exit;
         }

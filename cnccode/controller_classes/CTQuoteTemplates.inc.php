@@ -56,6 +56,13 @@ class CTQuoteTemplates extends CTCNC
             $cookieVars,
             $cfg
         );
+        $roles = [
+            SALES_PERMISSION
+        ];
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
         $this->setMenuId(311);
         $this->buQuotationTemplate = new BUQuotationTemplate($this);
         $this->dsQuotationTemplate = new DSForm($this);
@@ -68,7 +75,7 @@ class CTQuoteTemplates extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
+        $this->checkPermissions(MAINTENANCE_PERMISSION);
         switch ($this->getAction()) {
             case ctQuotationTemplates_ACT_EDIT:
             case ctQuotationTemplates_ACT_CREATE:

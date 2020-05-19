@@ -28,14 +28,12 @@ class CTContractMatrix extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "reports",
-        ];
-        $this->setMenuId(606);
+        $roles = RENEWALS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(606);
     }
 
     /**

@@ -61,8 +61,7 @@ class CTRenewalReport extends CTCNC
             $cfg
         );
         $roles = [
-            "sales",
-            "technical"
+            SALES_PERMISSION
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
@@ -182,7 +181,7 @@ class CTRenewalReport extends CTCNC
             $this->setPageTitle("Renewal Report");
         }
 
-        $displayAccountsInfo = $this->hasPermissions(PHPLIB_PERM_RENEWALS);
+        $displayAccountsInfo = $this->hasPermissions(RENEWALS_PERMISSION);
 
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerID);

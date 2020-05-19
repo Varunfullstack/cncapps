@@ -35,8 +35,7 @@ class CTItemsNotYetReceived extends CTCNC
             $cfg
         );
         $roles = [
-            "sales",
-            "technical"
+            SALES_PERMISSION,
         ];
         $this->setMenuId(309);
         if (!self::hasPermissions($roles)) {
