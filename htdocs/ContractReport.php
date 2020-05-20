@@ -1,10 +1,7 @@
 <?php
 require_once("config.inc.php");
-require_once($cfg['path_ct'] . '/CTCNC.inc.php');
-
-require_once($_SERVER['DOCUMENT_ROOT'] . '/.config.php');
-require_once(CONFIG_PATH_CNC_CLASSES . 'contract_report.php');
-
+global $cfg;
+require_once($cfg["path_ct"] . "/CTContractReport.php");
 page_open(
     array(
         'sess' => PHPLIB_CLASSNAME_SESSION,
@@ -13,51 +10,14 @@ page_open(
         ''
     )
 );
-
+global $cfg;
 header("Cache-control: private");
-
-class CTContractReport extends CTCNC
-{
-    function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
-    {
-        parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $this->setMenuId(305);
-    }
-
-    function defaultAction()
-    {
-//		$this->checkPermissions(PHPLIB_PERM_TECHNICAL);
-        $business = new CNC_ContractReport();
-        $_REQUEST['show_edit'] = 0;
-        $_REQUEST['show_fields'] = 1;
-        $_REQUEST['show_filters'] = 1;
-        $_REQUEST['show_page_views'] = 1;
-        $_REQUEST['show_order_by'] = 1;
-        $_REQUEST['edit_url'] = 'CustomerItem.php?action=displayRenewalContract&customerItemID=';
-        $this->setMethodName('defaultAction');
-// Parameters
-        $this->setPageTitle("Contract Report");
-        ob_start();
-        require(CONFIG_PATH_SC_HTML . 'page_list.php');
-        $contents = ob_get_contents();
-
-        ob_end_clean();
-        $this->setTemplateFiles('');
-        $this->template->set_var('CONTENTS', $contents);
-        $this->parsePage();
-    }
-}
-
-GLOBAL $cfg;
-$ctContractReport = new CTContractReport(
+$ctStandardText = new CTContractReport(
     $_SERVER['REQUEST_METHOD'],
     $_POST,
     $_GET,
     $_COOKIE,
     $cfg
 );
-
-$ctContractReport->execute();
-
+$ctStandardText->execute();
 page_close();
-?>

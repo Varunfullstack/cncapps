@@ -1,4 +1,7 @@
 {% extends "@internal/wrapper.html.twig" %}
+{% block title %}
+    Questionnaire Report
+{% endblock %}
 {% block content %}
     <H3>
         <strong>Questionnaire Report {{ period }} - {{ questionnaireDescription }}</strong>
@@ -15,13 +18,13 @@
     {% endfor %}
     <BR>
     {% for yesNoQuestion in yesNoQuestions %}
-    <p>
-        <strong>{{ yesNoQuestion.questionDescription }} ({{ yesNoQuestion.ynTotal }} responses)</strong>
-    </p>
-    <img src="http://chart.apis.google.com/chart?cht=p3&chd=t:{{ yesNoQuestion.yesPercent }},{{ yesNoQuestion.noPercent }}&chdl=Yes|No&chs=550x200&chl={{ yesNoQuestion.yesPercent }}|{{ yesNoQuestion.noPercent }}&chco=FF9E59|E0C253|D2E67A|729E4C|3DBA7E|20C7C7|6B8FD6|4C3A91|7250F2|9E29C4|E872B9|A3020F|382F26"
-         alt="chart"
-    />
-    <hr/>
+        <p>
+            <strong>{{ yesNoQuestion.questionDescription }} ({{ yesNoQuestion.ynTotal }} responses)</strong>
+        </p>
+        <img src="http://chart.apis.google.com/chart?cht=p3&chd=t:{{ yesNoQuestion.yesPercent }},{{ yesNoQuestion.noPercent }}&chdl=Yes|No&chs=550x200&chl={{ yesNoQuestion.yesPercent }}|{{ yesNoQuestion.noPercent }}&chco=FF9E59|E0C253|D2E67A|729E4C|3DBA7E|20C7C7|6B8FD6|4C3A91|7250F2|9E29C4|E872B9|A3020F|382F26"
+             alt="chart"
+        />
+        <hr/>
     {% endfor %}
     <BR>
     {% for multiChoiceQuestion in multiChoiceQuestions %}

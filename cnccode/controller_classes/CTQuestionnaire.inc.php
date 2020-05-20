@@ -120,12 +120,11 @@ class CTQuestionnaire extends CTCNC
         }
 
         if ($this->getParam(self::END_DATE)) {
-            $endDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $this->getParam(self::START_DATE));
+            $endDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $this->getParam(self::END_DATE));
             if (!$endDate) {
                 throw new UnexpectedValueException('End date must be in YYYY-MM-DD format');
             }
         }
-
         $questionnaireReportGenerator = new \CNCLTD\QuestionnaireReportGenerator(
             $this->getParam(self::QUESTIONNAIRE_ID),
             $startDate,

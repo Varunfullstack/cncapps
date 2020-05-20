@@ -449,6 +449,18 @@ class DBEUser extends DBEntity
         return (parent::getRows());
     }
 
+    function getActiveWithPermission($permission)
+    {
+        $permission = mysqli_real_escape_string($this->db->link_id(), $permission);
+        $query = "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE activeFlag = 'Y' and cns_perms like '%$permission%' ORDER BY firstName, lastName";
+
+        $this->setQueryString($query);
+
+        return (parent::getRows());
+    }
+
     function getActiveUsers()
     {
         $this->setMethodName("getRowsInGroup");

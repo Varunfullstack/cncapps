@@ -69,7 +69,6 @@ class QuestionnaireReportGenerator
             $template = '@internal/questionnaireReport/csvReport.csv.twig';
         }
 
-
         $questionnaire = $this->getQuestionnaire();
 
         $questionType = 1; // ratings

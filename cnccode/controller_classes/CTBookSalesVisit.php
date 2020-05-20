@@ -471,7 +471,7 @@ class CTBookSalesVisit extends CTCNC
         );
 
         $dbeUser = new DBEUser($this);
-        $dbeUser->getActiveUsers();
+        $dbeUser->getActiveWithPermission(ACCOUNT_MANAGEMENT_PERMISSION);
 
         $selectedAttendees = [];
 

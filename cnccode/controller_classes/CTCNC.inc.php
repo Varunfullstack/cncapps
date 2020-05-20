@@ -736,7 +736,7 @@ class CTCNC extends Controller
             [
                 "id"    => 305,
                 "label" => "Contracts",
-                "href"  => "ContractReport.php?filter[custitem.renewalStatus]=R",
+                "href"  => "ContractReport.php",
             ],
             [
                 "id"    => 306,
@@ -776,7 +776,7 @@ class CTCNC extends Controller
         return [
             [
                 "id"    => 401,
-                "label" => "My Daily Call List",
+                "label" => "Daily Call List",
                 "href"  => "ReviewList.php",
             ],
             [

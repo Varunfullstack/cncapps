@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Activity Logged</title>
+    <title>
+        {% block title %}
+            CNC Apps
+        {% endblock %}
+    </title>
     <style type="text/css">
         <!--
         BODY, P, TD, TH {
@@ -38,7 +42,9 @@
     </style>
 </head>
 <body id="wrapper">
-<div id="content" class="content">
+<div id="content"
+     class="content"
+>
     <p>
         {% block content %}
         {% endblock %}
