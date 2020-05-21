@@ -1234,6 +1234,8 @@ class BUActivity extends Business
                 $completeDate = $dbeJProblem->getValue(DBEProblem::completeDate);
                 $fields['reason'] = $dbeFirstActivity->getValue(DBEJCallActivity::reason);
                 $fields['completeDate'] = Controller::dateYMDtoDMY($completeDate);
+                $fixedActivity = $this->getFixedActivityInProblem($problemID);
+                $fields['fixedActivityReason'] = $fixedActivity->getValue(DBEJCallActivity::reason);
                 $fields['resolvedEngineerName'] = $dbeFixedUser->getValue(
                         DBEUser::firstName
                     ) . ' ' . $dbeFixedUser->getValue(
@@ -1252,7 +1254,6 @@ class BUActivity extends Business
                 $fields['reason'] = $dbeFirstActivity->getValue(DBEJCallActivity::reason);
                 $fields['rootCause'] = $rootCause;
                 $fields['fixedActivityReason'] = $fixedActivity->getValue(DBEJCallActivity::reason);
-                $fields['urlQuestionnaire'] = 'https://www.cnc-ltd.co.uk/questionnaire/index.php?problemno=' . $problemID . '&questionnaireno=1';
                 break;
         }
 
@@ -1508,7 +1509,7 @@ class BUActivity extends Business
             true,
             null,
             false,
-            57
+            CONFIG_FIXED_ACTIVITY_TYPE_ID
 
         );
 
@@ -4377,6 +4378,7 @@ class BUActivity extends Business
         $dbeFirstCallActivity = $this->getFirstActivityInProblem($problemID);
 
         if ($dbeFirstCallActivity->getValue(DBEJCallActivity::problemStatus) == 'C') {
+            echo 'sorry the first activity is not of status C';
             return null;
         }
 
