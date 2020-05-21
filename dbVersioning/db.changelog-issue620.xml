@@ -60,6 +60,7 @@
             where cns_perms not like '%seniorManagement%'
               and cns_consno in (2, 3, 29, 47);
         </sql>
+        <rollback/>
     </changeSet>
 
 </databaseChangeLog>
