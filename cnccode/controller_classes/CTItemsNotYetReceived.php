@@ -5,6 +5,7 @@
  * Date: 05/12/2018
  * Time: 12:43
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUItemsNotYetReceived.php');
 
