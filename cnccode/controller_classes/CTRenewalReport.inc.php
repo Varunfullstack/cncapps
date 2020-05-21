@@ -60,13 +60,6 @@ class CTRenewalReport extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            SALES_PERMISSION
-        ];
-        if (!self::hasPermissions($roles)) {
-            Header("Location: /NotAllowed.php");
-            exit;
-        }
         $this->setMenuId(306);
         $this->dsSearchForm = new DSForm ($this);
         $this->dsSearchForm->addColumn(
@@ -90,7 +83,13 @@ class CTRenewalReport extends CTCNC
         switch ($this->getAction()) {
 
             case 'runOfficeReport':
-
+                $roles = [
+                    SALES_PERMISSION
+                ];
+                if (!self::hasPermissions($roles)) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $customerID = @$_REQUEST['customerID'];
                 ignore_user_abort(true);
                 session_write_close();
@@ -113,6 +112,13 @@ class CTRenewalReport extends CTCNC
                 break;
 
             case 'producePdfReport':
+                $roles = [
+                    SALES_PERMISSION
+                ];
+                if (!self::hasPermissions($roles)) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $this->page = $this->produceReport(
                     false,
                     true
@@ -120,7 +126,13 @@ class CTRenewalReport extends CTCNC
                 break;
             case 'previewPDF':
 
-
+                $roles = [
+                    SALES_PERMISSION
+                ];
+                if (!self::hasPermissions($roles)) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 echo json_encode(
                     [
                         'PDFPath' => $this->generatePDFContract(
@@ -131,7 +143,13 @@ class CTRenewalReport extends CTCNC
                 );
                 break;
             case 'sendPDF':
-
+                $roles = [
+                    SALES_PERMISSION
+                ];
+                if (!self::hasPermissions($roles)) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 echo json_encode(
                     [
                         'status' => $this->sendPDFContract(
@@ -145,6 +163,13 @@ class CTRenewalReport extends CTCNC
                 break;
             case 'Search':
             default:
+                $roles = [
+                    SALES_PERMISSION
+                ];
+                if (!self::hasPermissions($roles)) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $this->search();
                 break;
 
@@ -181,7 +206,7 @@ class CTRenewalReport extends CTCNC
             $this->setPageTitle("Renewal Report");
         }
 
-        $displayAccountsInfo = $this->hasPermissions(RENEWALS_PERMISSION);
+        $displayAccountsInfo = $this->hasPermissions(SALES_PERMISSION);
 
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($customerID);
@@ -345,6 +370,7 @@ class CTRenewalReport extends CTCNC
                     'units'                => $item['units'],
                     'directDebit'          => $item['directDebit'] ? 'Yes' : null,
                     "showOfficeButton"     => $addOfficeReportButton ? 1 : 0,
+                    "disabled"             => $displayAccountsInfo ? null : "disabled"
                 )
             );
 

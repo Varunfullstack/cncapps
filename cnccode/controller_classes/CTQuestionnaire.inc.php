@@ -64,7 +64,6 @@ class CTQuestionnaire extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(MAINTENANCE_PERMISSION);
         switch ($this->getAction()) {
             case 'generateQuestionnaireReport':
                 $this->generateQuestionnaireReport();

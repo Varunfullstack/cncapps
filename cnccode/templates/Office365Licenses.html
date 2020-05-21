@@ -75,7 +75,6 @@
         drawList();
     });
 
-    Mustache.tags = ['{%', '%}'];
 
     let editingItem = null;
 
@@ -91,6 +90,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', function () {
+        Mustache.tags = ['{%', '%}'];
         addButton = $('.addButton');
         saveButton = $('.saveButton');
         cancelButton = $('.cancelButton');

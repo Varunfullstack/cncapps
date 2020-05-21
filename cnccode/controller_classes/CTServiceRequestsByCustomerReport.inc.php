@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg ['path_bu'] . '/BUMail.inc.php');
@@ -34,7 +35,6 @@ class CTServiceRequestsByCustomerReport extends CTCNC
             $cookieVars,
             $cfg
         );
-
         if (!$this->isUserSDManager()) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -65,6 +65,8 @@ class CTServiceRequestsByCustomerReport extends CTCNC
 
     function email()
     {
+        var_dump('test');
+        exit;
         $this->setMethodName('email');
         $dsSearchForm = $this->initialiseSearchForm();
         $days = $this->getParam('days');

@@ -896,8 +896,6 @@
     }
 
 
-
-
     function askNewPassword() {
         const data = $(event.target).data();
         currentContactId = data.contactId;
@@ -1665,6 +1663,7 @@
            onClick="document.location='{cancelURL}';"
     >
     <button type="button"
+            {disabled}
             onclick="setContactsToNoneAndReferCustomer()"
     >
         Set all users to no support
@@ -2648,6 +2647,7 @@
                             class="content"
                         >
                             <button type="button"
+                                    {disabled}
                                     onclick="addContact({siteNo})"
                             >
                                 Add Contact
@@ -2947,6 +2947,7 @@
                         >
                         <div class="contactClear">
                             <button type="button"
+                                    {disabled}
                                     onclick="clearRow({contactID})"
                             >
                                 <i class="fa fa-trash-o"></i>
@@ -2959,6 +2960,7 @@
                             <select name="form[contact][{contactID}][siteNo]"
                                     data-validation="required"
                                     data-type="site"
+                                    {disabled}
                             >
                                 <!-- BEGIN selectSiteBlock -->
                                 <option {siteSelected}
@@ -3065,7 +3067,7 @@
                     <td>
                         <div class="contactSupportLevel">
 
-                            <select name="form[contact][{contactID}][supportLevel]"
+                            <select name="form[contact][{contactID}][supportLevel]" {disabled}
                                     data-validation="atLeastOneMain"
                                     data-type="mainSelector"
                                     data-except="$('#referred').prop('checked') || isProspect()"
@@ -3084,7 +3086,7 @@
                     <td class="center ">
                         <div class="contactPassword">
 
-                            <button onclick="askNewPassword()"
+                            <button onclick="askNewPassword()" {disabled}
                                     data-contact-id="{contactID}"
                                     type="button"
                                     class="{portalPasswordButtonClass}"
@@ -3467,9 +3469,11 @@
         <input name="Button"
                type="button"
                value="Cancel"
+               {disabled}
                onClick="document.location='{cancelURL}';"
         >
         <button type="button"
+                {disabled}
                 onclick="setContactsToNoneAndReferCustomer()"
         >
             Set all users to no support

@@ -213,12 +213,12 @@
             jQuery('.selectpicker').selectpicker;
             if (menuId) {
                 let selector = document.querySelector('li[data-menu-id="' + menuId + '"]');
-                ///// DO NOT TOUCH!
-                selector.closest('.sub-menu').getElementsByTagName('a')[0].click();
-                /////// OOFFFFFFFLIMITISSS
-                selector.classList.add('active');
-                const parent = $('li.active').parent('ul').parent('li');
-                parent.addClass('active');
+                if (selector) {
+                    selector.closest('.sub-menu').getElementsByTagName('a')[0].click();
+                    selector.classList.add('active');
+                    const parent = $('li.active').parent('ul').parent('li');
+                    parent.addClass('active');
+                }
             }
 
             $('#menuToggle').on('click', function (event) {
@@ -309,6 +309,7 @@
             fetch('index.php?menuItemId=' + itemId + "&action=" + action).then(response => {
                 window.location.reload();
             })
+            return false;
         }
 
         (function () {

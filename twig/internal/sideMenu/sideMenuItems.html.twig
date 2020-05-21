@@ -2,7 +2,7 @@
 {# @var section \CNCLTD\MenuSection #}
 {% for section in sideMenu.sections %}
     <li class="sub-menu">
-        <a href="#">
+        <a href="javascript:">
             <i class="fa {{ section.icon }}"
                data-placement="right"
                title="{{ section.name }}"
@@ -25,7 +25,7 @@
                     {#Toggle class far and fa to show outline and solide star icons#}
                     <a href="#"
                        class="float-right {{ item.favourite ? '' : 'favourited' }}"
-                       onclick="toggleFavourite({{ item.id }}, {{ item.favourite ? 'true' : 'false' }})"
+                       onclick="return toggleFavourite({{ item.id }}, {{ item.favourite ? 'true' : 'false' }})"
                     ><i class="{{ item.favourite ? 'fa' : '' }} far fa-star"></i>
                     </a>
                 </li>

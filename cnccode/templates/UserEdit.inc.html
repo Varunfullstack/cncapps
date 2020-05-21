@@ -374,7 +374,8 @@
                        value="{startDate}"
                        onchange="updateLengthOfService()"
                        id="startDate"
-            wren    >
+                       wren
+                >
                 <span id="lengthOfService"></span> <span class="formErrorMessage">{startDateMessage}</span>
             </td>
         </tr>
@@ -892,18 +893,6 @@
                        value="Y"
                        {changePriorityFlagChecked}
                 ></td>
-        </tr>
-        <tr>
-            <td class="promptText">Change Approver</td>
-            <td class="fieldText">
-                <input name="user[1][changeApproverFlag]"
-                       type="checkbox"
-                       id="user[1][changeApproverFlag]"
-                       value="Y"
-                       {DISABLED}
-                       {changeApproverFlagChecked}
-                />
-            </td>
         </tr>
         <tr>
             <td class="promptText">Change Initial Activity Date And Time</td>

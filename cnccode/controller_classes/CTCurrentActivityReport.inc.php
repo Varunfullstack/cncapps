@@ -1086,9 +1086,9 @@ class CTCurrentActivityReport extends CTCNC
             /* ------------------------------ */
 
             $urlCustomer = Controller::buildLink(
-                'SalesOrder.php',
+                'Customer.php',
                 array(
-                    'action'     => 'search',
+                    'action'     => 'dispEdit',
                     'customerID' => $serviceRequests->getValue(DBEJProblem::customerID)
                 )
             );

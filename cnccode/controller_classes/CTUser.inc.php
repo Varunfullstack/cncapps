@@ -575,9 +575,6 @@ class CTUser extends CTCNC
                         RENEWALS_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
 
-                'changeApproverFlagChecked'                     => Controller::htmlChecked(
-                    $dsUser->getValue(DBEJUser::changeApproverFlag)
-                ),
                 'changeInitialDateAndTimeFlagChecked'           => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::changeInitialDateAndTimeFlag)
                 ),
@@ -922,7 +919,7 @@ class CTUser extends CTCNC
         $txtCreate = null;
         $urlCreate = null;
 
-        if ($this->hasPermissions(ACCOUNTS_PERMISSION)) {
+        if ($this->hasPermissions(SENIOR_MANAGEMENT_PERMISSION)) {
             $urlCreate =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -951,7 +948,7 @@ class CTUser extends CTCNC
 
                 $urlEdit = null;
                 $txtEdit = null;
-                if ($this->hasPermissions(ACCOUNTS_PERMISSION)) {
+                if ($this->hasPermissions(SENIOR_MANAGEMENT_PERMISSION)) {
 
                     $urlEdit =
                         Controller::buildLink(

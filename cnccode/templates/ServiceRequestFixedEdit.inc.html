@@ -1,7 +1,4 @@
 <!-- Template: ServiceRequestFixedEdit.inc.html -->
-<script src="CommonJS.js"></script>
-<!--<script src="ckfinder/ckfinder.js"></script>-->
-
 <script>
     const minCharCount = 160;
     var formChanged = false;
@@ -36,6 +33,84 @@
             CKEDITOR.instances.resolutionSummary.insertHtml(atob(text));
         }
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const isHidden = {hiddenSR};
+        CKEDITOR.config.width = '870';
+        CKEDITOR.config.height = '220';
+        CKEDITOR.config.resize_minWidth = '760';
+        CKEDITOR.config.disableNativeSpellChecker = false;
+        CKEDITOR.config.removePlugins = 'liststyle,tabletools,scayt,menubutton,contextmenu,language,tableselection';
+
+        reason = CKEDITOR.replace('resolutionSummary', {
+                contentsCss: '/screen.css',
+                toolbarStartupExpanded: false,
+                disableNativeSpellChecker: false,
+                toolbar: 'CNCToolbar',
+                toolbar_CNCToolbar:
+                    [
+                        ['Source', '-', '-', 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor'],
+                        ['NumberedList', 'BulletedList'],
+                        ['Table'],
+                        ['Format', 'Font', 'FontSize'],
+                        ['Anchor', 'Link'],
+                        ['Undo', 'Redo']
+                    ],
+                extraPlugins: 'font,wordcount',
+                fontSize_sizes: '8/8pt;9/9pt;10/10pt;11/11pt;12/12pt;14/14pt;16/16pt;18/18pt;20/20pt;22/22pt;24/24pt;26/26pt;28/28pt;36/36pt;48/48pt;72/72pt',
+                wordcount: {
+                    showParagraphs: false,
+                    showCharCount: true,
+                    minCharCount: isHidden ? -1 : minCharCount
+                },
+            }
+        );
+        CKEDITOR.instances.resolutionSummary.on('paste', function (evt) {
+            evt.cancel();
+        });
+        $('#partsUsedDialog').dialog({autoOpen: false, width: 910});
+        CKEDITOR.replace('partsUsedText', {
+                customConfig: '/ckeditor_config.js'
+            }
+        );
+    })
+
+    function showPartsUsedDialog() {
+        $('#partsUsedDialog').dialog('open');
+    }
+
+    function showSalesRequestDialog() {
+        startSalesRequest({problemID});
+    }
+
+    function sendPartsUsedToSales() {
+        var object = {
+            message: CKEDITOR.instances.partsUsedText.getData(),
+            callActivityID: {callActivityID}
+        };
+
+        $.ajax({
+            url: '{urlMessageToSales}',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: object
+        }).then(function (result) {
+            if (result.status == 'error') {
+                throw 'Failed to send message';
+            } else {
+                $('#partsUsedDialog').dialog('close');
+                alert('Submitted OK');
+            }
+        }).catch(function () {
+            alert('Failed to send message');
+        });
+    }
+
+    function cancelPartsUsed() {
+        $('#partsUsedDialog').dialog('close');
+    }
+
 </script>
 
 <table width="100%">
@@ -109,44 +184,9 @@
             </td>
         </tr>
         <tr>
-            <span class="formErrorMessage">{resolutionSummaryMessage}</span>
-            <td colspan="2"><textarea name="resolutionSummary">{resolutionSummary}</textarea>
-                <script type="text/javascript">
-                    const isHidden = {hiddenSR};
-                    CKEDITOR.config.width = '870';
-                    CKEDITOR.config.height = '220';
-                    CKEDITOR.config.resize_minWidth = '760';
-                    CKEDITOR.config.disableNativeSpellChecker = false;
-                    CKEDITOR.config.removePlugins = 'liststyle,tabletools,scayt,menubutton,contextmenu,language,tableselection';
-
-                    reason = CKEDITOR.replace('resolutionSummary', {
-                            contentsCss: '/screen.css',
-                            toolbarStartupExpanded: false,
-                            disableNativeSpellChecker: false,
-                            toolbar: 'CNCToolbar',
-                            toolbar_CNCToolbar:
-                                [
-                                    ['Source', '-', '-', 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor'],
-                                    ['NumberedList', 'BulletedList'],
-                                    ['Table'],
-                                    ['Format', 'Font', 'FontSize'],
-                                    ['Anchor', 'Link'],
-                                    ['Undo', 'Redo']
-                                ],
-                            extraPlugins: 'font,wordcount',
-                            fontSize_sizes: '8/8pt;9/9pt;10/10pt;11/11pt;12/12pt;14/14pt;16/16pt;18/18pt;20/20pt;22/22pt;24/24pt;26/26pt;28/28pt;36/36pt;48/48pt;72/72pt',
-                            wordcount: {
-                                showParagraphs: false,
-                                showCharCount: true,
-                                minCharCount: isHidden ? -1 : minCharCount
-                            },
-                        }
-                    );
-                    CKEDITOR.instances.resolutionSummary.on('paste', function (evt) {
-                        evt.cancel();
-                    });
-                    reason.addCss('body { font-size: 10pt; }');
-                </script>
+            <td colspan="2">
+                <span class="formErrorMessage">{resolutionSummaryMessage}</span>
+                <textarea name="resolutionSummary">{resolutionSummary}</textarea>
             </td>
         </tr>
         <tr>
@@ -260,51 +300,6 @@
         <button onclick="cancelPartsUsed()">Cancel</button>
     </div>
 </div>
-<script>
-    $('#partsUsedDialog').dialog({autoOpen: false, width: 910});
-    CKEDITOR.replace('partsUsedText', {
-            customConfig: '/ckeditor_config.js'
-        }
-    );
-
-
-    function showPartsUsedDialog() {
-        $('#partsUsedDialog').dialog('open');
-    }
-
-    function showSalesRequestDialog() {
-        startSalesRequest({problemID});
-    }
-
-    function sendPartsUsedToSales() {
-        var object = {
-            message: CKEDITOR.instances.partsUsedText.getData(),
-            callActivityID: {callActivityID}
-        };
-
-        $.ajax({
-            url: '{urlMessageToSales}',
-            method: 'POST',
-            type: 'post',
-            dataType: 'json',
-            data: object
-        }).then(function (result) {
-            if (result.status == 'error') {
-                throw 'Failed to send message';
-            } else {
-                $('#partsUsedDialog').dialog('close');
-                alert('Submitted OK');
-            }
-        }).catch(function () {
-            alert('Failed to send message');
-        });
-    }
-
-    function cancelPartsUsed() {
-        $('#partsUsedDialog').dialog('close');
-    }
-
-</script>
 <table>
     <tr>
         <td colspan="4"

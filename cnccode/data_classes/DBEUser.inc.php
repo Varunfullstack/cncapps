@@ -35,7 +35,6 @@ class DBEUser extends DBEntity
     const changePriorityFlag = "changePriorityFlag";
     const appearInQueueFlag = "appearInQueueFlag";
     const standardDayHours = "standardDayHours";
-    const changeApproverFlag = "changeApproverFlag";
     const admin = 'admin';
     const excludeFromStatsFlag = "excludeFromStatsFlag";
     const changeInitialDateAndTimeFlag = 'changeInitialDateAndTimeFlag';
@@ -227,11 +226,6 @@ class DBEUser extends DBEntity
         $this->addColumn(
             self::standardDayHours,
             DA_FLOAT,
-            DA_NOT_NULL
-        );
-        $this->addColumn(
-            self::changeApproverFlag,
-            DA_YN,
             DA_NOT_NULL
         );
         $this->addColumn(

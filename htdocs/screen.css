@@ -586,7 +586,6 @@ table#user-performance-escalations td, th {
 }
 
 
-
 .boring-gray {
     background-color: #cccccc;
 }
@@ -779,6 +778,7 @@ div.reportDescription {
 .makeItColor td:nth-child(3n+3) {
     background: yellow;
 }
+
 table.fixed_header {
     table-layout: fixed;
 }
@@ -864,6 +864,12 @@ input[type="button"], input[type="submit"], button, input[type="reset"], .custom
 
 input[type="button"]:hover, input[type="submit"]:hover, button:hover, input[type="reset"]:hover, .custom-file-upload:hover {
     background-color: #E6E6E6;
+}
+
+input[type="button"][disabled], input[type="submit"][disabled], button[disabled], input[type="reset"][disabled], .custom-file-upload[disabled] {
+    background-color: #efefef;
+    color: #C6C6C6;
+    cursor: not-allowed;
 }
 
 table.cell-padding-1 th, table.cell-padding-1 td {

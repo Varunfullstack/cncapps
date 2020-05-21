@@ -278,7 +278,6 @@ class CTCNC extends Controller
     function isRunningFromCommandLine()
     {
         return ($GLOBALS['isRunningFromCommandLine']);
-
     }
 
     function getDbeUser()
@@ -447,7 +446,7 @@ class CTCNC extends Controller
         $this->addConditionalMenu(
             $menu,
             'fa-project-diagram',
-            "Management",
+            "Technical",
             $this->getDbeUser()->getValue(DBEUser::isExpenseApprover) || $this->getDbeUser()->getValue(
                 DBEUser::globalExpenseApprover
             ),
@@ -589,6 +588,9 @@ class CTCNC extends Controller
 
     function isUserSDManager()
     {
+        if ($this->isRunningFromCommandLine()) {
+            return true;
+        }
         return self::getDbeUser()->getValue(DBEUser::receiveSdManagerEmailFlag) == 'Y';
     }
 
@@ -598,7 +600,7 @@ class CTCNC extends Controller
             [
                 "id"    => 222,
                 "label" => "Manager Dashboard",
-                "href"  => "SDManagerDashboard.php?SP"
+                "href"  => "SDManagerDashboard.php?HD&ES"
             ],
             [
                 "id"    => 201,
@@ -1126,7 +1128,9 @@ class CTCNC extends Controller
 
     protected function isExpenseApprover()
     {
-        return $this->dbeUser->getValue(DBEUser::isExpenseApprover);
+        return $this->dbeUser->getValue(DBEUser::isExpenseApprover) || $this->dbeUser->getValue(
+                DBEUser::globalExpenseApprover
+            );
     }
 
     protected function isSdManager()
