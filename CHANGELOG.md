@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v3.14.6] - 2020-05-21
+### Fixed
+- Wrong content in the emails that get sent out as part of ServiceDeskAutoCompletion.php for Pending Closure
+- Some engineers travel missing from Expense Dashboard
+
 ## [v3.14.5] - 2020-05-18
 ### Fixed
 - Fixed issue with installation date readonly on RenHosting and RenBroadband
