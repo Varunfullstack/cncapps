@@ -1,7 +1,4 @@
 <!-- Template: GoodsInDisplay.inc.html -->
-<script language='JavaScript'
-        src='CommonJS.js'
-></script>
 <SCRIPT language="JavaScript">
     var qtySetZero = true; // initialise flag to indicate current toggle state
     document.onkeydown = function (event) {
@@ -137,6 +134,10 @@
                value="{description}"
         >
         <input type="hidden"
+               name="receive[{sequenceNo}][expectedDate]"
+               value="{expectedDate}"
+        />
+        <input type="hidden"
                id="sequenceNo"
                name="receive[{sequenceNo}][sequenceNo]"
                value="{sequenceNo}"
@@ -187,14 +188,15 @@
             </td>
             <td class="orderLineClass">{qtyOrdered}</td>
             <td class="orderLineClass">{qtyOS}</td>
-            <td class="orderLineClass"><input {lineDisabled}
-                                              type="text"
-                                              class="qtyToReceive"
-                                              name="receive[{sequenceNo}][qtyToReceive]"
-                                              value="{qtyToReceive}"
-                                              maxlength="5"
-                                              size="5"
-            >
+            <td class="orderLineClass">
+                <input {lineDisabled}
+                       type="text"
+                       class="qtyToReceive"
+                       name="receive[{sequenceNo}][qtyToReceive]"
+                       value="{qtyToReceive}"
+                       maxlength="5"
+                       size="5"
+                >
             </td>
             <td class="orderLineClass"><input
                     {DISABLED}

@@ -9,7 +9,10 @@
 namespace CNCLTD;
 
 
-class ItemNotYetReceived
+use DateTime;
+use JsonSerializable;
+
+class ItemNotYetReceived implements JsonSerializable
 {
     public static $items = [];
 
@@ -139,7 +142,7 @@ class ItemNotYetReceived
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
     public function getPurchaseOrderDate()
     {
@@ -149,7 +152,7 @@ class ItemNotYetReceived
     /**
      * @param $value
      * @param string $format
-     * @return \DateTime|null
+     * @return DateTime|null
      */
     private function returnDateIfValue($value,
                                        $format = 'Y-m-d'
@@ -158,7 +161,7 @@ class ItemNotYetReceived
         if (!$value) {
             return null;
         }
-        $dateTime = \DateTime::createFromFormat(
+        $dateTime = DateTime::createFromFormat(
             $format,
             $value
         );
@@ -268,62 +271,6 @@ class ItemNotYetReceived
         return $this->serviceRequestID;
     }
 
-    function getExpectedColorClass()
-    {
-        $expectedColorClass = null;
-        if ($this->getExpectedOn()) {
-            if ($this->getExpectedOn()->format(DATE_MYSQL_DATE) < (new \DateTime())->format(DATE_MYSQL_DATE)) {
-                $expectedColorClass = "redBackground";
-            }
-
-        } elseif ($this->getExpectedTBC()) {
-            $expectedColorClass = "amberBackground";
-        }
-
-        return $expectedColorClass;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getExpectedOn()
-    {
-        if (!$this->cost || $this->isCarriage()) {
-            return null;
-        }
-        return $this->returnDateIfValue($this->expectedOn);
-    }
-
-    private function isCarriage()
-    {
-        return $this->itemId == 1491;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getExpectedTBC()
-    {
-        return $this->expectedTBC;
-    }
-
-    function getRequiredByColorClass()
-    {
-        $requiredByColorClass = 'amberBackground';
-        if ($this->getPurchaseOrderRequiredBy()) {
-            $requiredByColorClass = null;
-        }
-        return $requiredByColorClass;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPurchaseOrderRequiredBy()
-    {
-        return $this->returnDateIfValue($this->purchaseOrderRequiredBy);
-    }
-
     public function getExpectedDateLinkURL()
     {
         return SITE_URL . "/PurchaseOrder.php?porheadID={$this->getPurchaseOrderId()}&action=editOrdline&sequenceNo={$this->getLineSequenceNumber()}";
@@ -356,8 +303,77 @@ class ItemNotYetReceived
     public function color()
     {
         if (!isset(self::$items[$this->getPurchaseOrderId()]) || !self::$items[$this->getPurchaseOrderId()]) {
-            return !$this->hasBeenOrdered ? 'red' : ($this->hasNotBeenReceivedYet ? 'orange' : "black");
+            $orangeOrBlack = $this->hasNotBeenReceivedYet ? 'orange' : "black";
+            return !$this->hasBeenOrdered ? 'red' : $orangeOrBlack;
         }
         return 'green';
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getExpectedOn()
+    {
+        if (!$this->cost || $this->isCarriage()) {
+            return null;
+        }
+        return $this->returnDateIfValue($this->expectedOn);
+    }
+
+    private function isCarriage()
+    {
+        return $this->itemId == 1491;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExpectedTBC()
+    {
+        return $this->expectedTBC;
+    }
+
+    public function jsonSerialize()
+    {
+        return array_merge(
+            get_object_vars($this),
+            [
+                "expectedColorClass"   => $this->getExpectedColorClass(),
+                "requiredByColorClass" => $this->getRequiredByColorClass(),
+                "color"                => $this->color(),
+            ]
+        );
+    }
+
+    function getExpectedColorClass()
+    {
+        $expectedColorClass = null;
+        if ($this->getExpectedOn()) {
+            if ($this->getExpectedOn()->format(DATE_MYSQL_DATE) < (new DateTime())->format(DATE_MYSQL_DATE)) {
+                $expectedColorClass = "redBackground";
+            }
+
+        } elseif ($this->getExpectedTBC()) {
+            $expectedColorClass = "amberBackground";
+        }
+
+        return $expectedColorClass;
+    }
+
+    function getRequiredByColorClass()
+    {
+        $requiredByColorClass = 'amberBackground';
+        if ($this->getPurchaseOrderRequiredBy()) {
+            $requiredByColorClass = null;
+        }
+        return $requiredByColorClass;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPurchaseOrderRequiredBy()
+    {
+        return $this->returnDateIfValue($this->purchaseOrderRequiredBy);
     }
 }
