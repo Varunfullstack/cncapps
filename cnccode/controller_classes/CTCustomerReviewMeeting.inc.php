@@ -238,6 +238,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 }
 
                 $lastReviewMeetingDateFormatted = null;
+                $lastReviewMeetingDate = null;
                 if ($dsCustomer->getValue(DBECustomer::lastReviewMeetingDate)) {
                     $lastReviewMeetingDate = DateTime::createFromFormat(
                         DATE_MYSQL_DATE,
@@ -493,10 +494,11 @@ class CTCustomerReviewMeeting extends CTCNC
                     'reviews'
                 );
                 $dsReviews = new DataSet($this);
+
                 $buActivity->getManagementReviewsInPeriod(
                     $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID),
-                    $startDate,
-                    $endDate,
+                    $lastReviewMeetingDate ? $lastReviewMeetingDate : $startDate,
+                    new DateTime(),
                     $dsReviews
                 );
 
