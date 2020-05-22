@@ -5,10 +5,9 @@
  * Date: 05/12/2018
  * Time: 12:42
  */
-
-
 require_once("config.inc.php");
-require_once($cfg["path_ct"]."/CTItemsNotYetReceived.php");
+global $cfg;
+require_once($cfg["path_ct"] . "/CTItemsNotYetReceived.php");
 session_start();
 page_open(
     array(
@@ -18,9 +17,9 @@ page_open(
         ''
     )
 );
-GLOBAL $cfg;
+global $cfg;
 header("Cache-control: private");
-$ctItem= new CTItemsNotYetReceived(
+$ctItem = new CTItemsNotYetReceived(
     $_SERVER['REQUEST_METHOD'],
     $_POST,
     $_GET,

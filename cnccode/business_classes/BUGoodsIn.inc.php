@@ -686,6 +686,7 @@ class BUGoodsIn extends Business
         If the supplier is an internal stock location call appropriate method with stock customerID otherwise
         use non-stock method.
         */
+
         if (
             ($dsPorhead->getValue(DBEJPorhead::supplierID) == CONFIG_SALES_STOCK_SUPPLIERID) ||
             ($dsPorhead->getValue(DBEJPorhead::supplierID) == CONFIG_MAINT_STOCK_SUPPLIERID)
@@ -731,8 +732,8 @@ class BUGoodsIn extends Business
         $dsGoodsIn->initialise();
         while ($dsGoodsIn->fetchNext()) {
             if (
-                ($dsGoodsIn->getValue(self::receiveDataSetQtyToReceive) <= 0) OR
-                ($dsGoodsIn->getValue(self::receiveDataSetAllowReceive) == FALSE)
+                ($dsGoodsIn->getValue(self::receiveDataSetQtyToReceive) <= 0) ||
+                !$dsGoodsIn->getValue(self::receiveDataSetAllowReceive)
             ) {
                 continue;
             }
@@ -794,16 +795,31 @@ class BUGoodsIn extends Business
                 $dsGoodsIn->getValue(self::receiveDataSetOrderSequenceNo)
             );
             $dbePorline->getRow();
+            $newQtyReceived = $dbePorline->getValue(DBEJPorline::qtyReceived) + $dsGoodsIn->getValue(
+                    self::receiveDataSetQtyToReceive
+                );
             $dbePorline->setValue(
                 DBEPorline::qtyReceived,
-                $dbePorline->getValue(DBEPorline::qtyReceived) + $dsGoodsIn->getValue(self::receiveDataSetQtyToReceive)
+                $newQtyReceived
             );
+            if ($newQtyReceived == $dbePorline->getValue(
+                    DBEJPorline::qtyOrdered
+                )) {    // if line fully received then set to expected date blank
+                $dbePorline->setValue(
+                    DBEJPorline::expectedTBC,
+                    false
+                );
+                if (!$dbePorline->getValue(DBEPorline::expectedDate)) {
+                    $dbePorline->setValue(DBEPorline::expectedDate, (new DateTime())->format(DATE_MYSQL_DATE));
+                }
+            }
 
             // there is no purchase invoice authorisation for stock suppliers so we update the invoiced qty here
             $dbePorline->setValue(
                 DBEPorline::qtyInvoiced,
                 $dbePorline->getValue(DBEPorline::qtyInvoiced) + $dsGoodsIn->getValue(self::receiveDataSetQtyToReceive)
             ); // not really required but hey!
+
             $dbePorline->updateRow();
 
             // update status on purchase order header
@@ -862,7 +878,7 @@ class BUGoodsIn extends Business
                     );
                 $dbeItem->updateMaintStockQty($newValue);
             }
-        }//dsGoodsIn->fetchNext()
+        }
     }
 
     /**
@@ -892,8 +908,8 @@ class BUGoodsIn extends Business
         $dsGoodsIn->initialise();
         while ($dsGoodsIn->fetchNext()) {
             if (
-                ($dsGoodsIn->getValue(self::receiveDataSetQtyToReceive) <= 0) OR
-                ($dsGoodsIn->getValue(self::receiveDataSetAllowReceive) == FALSE)
+                ($dsGoodsIn->getValue(self::receiveDataSetQtyToReceive) <= 0) ||
+                !$dsGoodsIn->getValue(self::receiveDataSetAllowReceive)
             ) {
                 continue;
             }
@@ -944,7 +960,7 @@ class BUGoodsIn extends Business
                     null
                 );    // redundant
                 $stockcat = $dbeItem->getValue(DBEItem::stockcat);
-                if (($stockcat == 'M') or ($stockcat == 'R')) {                        // cnc support contract
+                if (($stockcat == 'M') || ($stockcat == 'R')) {                        // cnc support contract
                     $dbeCustomerItem->setValue(
                         DBECustomerItem::expiryDate,
                         date(
@@ -995,10 +1011,14 @@ class BUGoodsIn extends Business
                     DBEJPorline::qtyOrdered
                 )) {    // if line fully received then set to expected date blank
                 $dbePorline->setValue(
-                    DBEJPorline::expectedDate,
-                    null
+                    DBEJPorline::expectedTBC,
+                    false
                 );
+                if (!$dbePorline->getValue(DBEPorline::expectedDate)) {
+                    $dbePorline->setValue(DBEPorline::expectedDate, (new DateTime())->format(DATE_MYSQL_DATE));
+                }
             }
+
             $dbePorline->updateRow();
             // update status on purchase order header
             $this->dbePorhead->getRow($porheadID);
@@ -1041,6 +1061,6 @@ class BUGoodsIn extends Business
                     );
                 $dbeItem->updateMaintStockQty($newValue);
             }
-        }//dsGoodsIn->fetchNext()
+        }
     }
 }

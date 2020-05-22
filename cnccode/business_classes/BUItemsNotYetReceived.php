@@ -1,17 +1,20 @@
 <?php
+
+use CNCLTD\ItemNotYetReceived;
+
 /**
  * Created by PhpStorm.
  * User: fizdalf
  * Date: 10/12/2018
  * Time: 8:57
  */
-
 class BUItemsNotYetReceived extends Business
 {
     /**
-     * @return \CNCLTD\ItemNotYetReceived[]
+     * @param int $daysAgo
+     * @return ItemNotYetReceived[]
      */
-    public function getItemsNotYetReceived()
+    public function getItemsNotYetReceived($daysAgo = 7)
     {
         global $db;
         $query = "SELECT porhead.deliveryConfirmedFlag,
@@ -28,7 +31,6 @@ class BUItemsNotYetReceived extends Business
                'Direct'
            )                                                           AS direct,
        poh_ord_date                                                    as purchaseOrderDate,
-       poh_required_by > (now() - INTERVAL 1 week)                     as oneWeekFromNow,
        (SELECT MIN(ca.caa_date)
         FROM callactivity ca
         WHERE ca.caa_problemno = minServiceRequest.`pro_problemno`
@@ -47,7 +49,6 @@ class BUItemsNotYetReceived extends Business
        pol_exp_date                                                    as expectedOn,
        pol_cost                                                        as cost,
        project.projectID,
-       poh_required_by > (now() - INTERVAL 1 week)                     as isRequiredAtLeastAWeekAgo,
        minServiceRequest.`pro_problemno`                               as serviceRequestID,
        expectedTBC
 FROM porline
@@ -72,38 +73,41 @@ WHERE
   AND customer.cus_name <> 'CNC Operating Stock'
   and (porline.pol_cost > 0 or porline.pol_cost < 0)
   and odh_type <> 'C'
+  and poh_required_by > (now() - INTERVAL ? day)
 ORDER BY poh_required_by, ordhead.`odh_custno` DESC, pol_porno, `pol_lineno` 
 ";
+        $statement = $db->preparedQuery(
+            $query,
+            [
+                [
+                    "type"  => "i",
+                    "value" => $daysAgo
+                ]
+            ]
+        );
 
-        $db->query($query);
         $data = [];
 
-        /** @var \CNCLTD\ItemNotYetReceived $item */
-        while ($item = $db->next_record_object(\CNCLTD\ItemNotYetReceived::class)) {
-
-            if (!isset(\CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()])) {
-                \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()] = true;
+        /** @var ItemNotYetReceived $item */
+        while ($item = $statement->fetch_object(ItemNotYetReceived::class)) {
+            if (!isset(ItemNotYetReceived::$items[$item->getPurchaseOrderId()])) {
+                ItemNotYetReceived::$items[$item->getPurchaseOrderId()] = true;
             }
 
-            if (!$item->isDeliveryConfirmed() && \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId(
+            if (!$item->isDeliveryConfirmed() && ItemNotYetReceived::$items[$item->getPurchaseOrderId(
                 )] && !$item->isGreenType()) {
-                \CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()] = false;
+                ItemNotYetReceived::$items[$item->getPurchaseOrderId()] = false;
             }
 
             $data[] = $item;
-        };
+        }
         $toReturn = [];
 
         foreach ($data as $item) {
-            if (!\CNCLTD\ItemNotYetReceived::$items[$item->getPurchaseOrderId()]) {
-                $toReturn[] = $item;
+            if (ItemNotYetReceived::$items[$item->getPurchaseOrderId()]) {
                 continue;
             }
-
-            if ($item->isRequiredAtLeastAWeekAgo()) {
-
-                $toReturn[] = $item;
-            }
+            $toReturn[] = $item;
         }
 
         return $toReturn;
