@@ -727,7 +727,7 @@ switch ($server_type) {
         );
         define(
             'CONFIG_CATCHALL_EMAIL',
-            'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', xavi@pavilionweb.co.uk'
+            'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN
         );
 //            error_reporting(E_ALL & ~E_STRICT)
         error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);

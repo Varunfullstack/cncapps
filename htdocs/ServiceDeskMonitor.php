@@ -40,11 +40,13 @@ while ($dsProblems->fetchNext()) {
     echo "<br>{$dsProblems->getValue(DBEJProblem::problemID)} is in breach resetting it to Awaiting CNC <br>";
     $buActivity->logOperationalActivity(
         $dsProblems->getValue(DBEJProblem::problemID),
-        "Future alarm has been reached, resetting to Awaiting CNC"
+        "Future alarm has been reached, resetting to Awaiting CNC",
+        true
     );
     $update->setValue(DBEProblem::alarmDate, null);
     $update->setValue(DBEProblem::alarmTime, null);
     $update->setValue(DBEProblem::awaitingCustomerResponseFlag, 'N');
+
     $update->updateRow();
 }
 echo 'Finished processing future breached SR\'s';

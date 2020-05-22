@@ -295,6 +295,7 @@ class BUProblemSLA extends Business
         if ($this->debug) {
             $this->dbeJCallActivity->setShowSQLOn();
         }
+
         $this->dbeJCallActivity->getRowsByProblemID(
             $problemID,
             false

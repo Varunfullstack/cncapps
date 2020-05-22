@@ -1124,6 +1124,10 @@ class DataAccess extends BaseObject
             return (int)$this->row[$ixColumnNumber];
         }
 
+        if ($type == DA_FLOAT) {
+            return (float)$this->row[$ixColumnNumber];
+        }
+
         if ($type == DA_JSON_ARRAY) {
             if (is_array($this->row[$ixColumnNumber])) {
                 return $this->row[$ixColumnNumber];

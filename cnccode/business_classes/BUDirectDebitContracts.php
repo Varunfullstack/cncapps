@@ -84,10 +84,7 @@ class BUDirectDebitContracts extends Business
 
         $hdrs = $buMail->mime->headers($hdrs);
 
-        $buMail->send(
-            'xavi@pavilionweb.co.uk', $hdrs, $body
-
-        );
+        $buMail->send($toEmail, $hdrs, $body        );
     }
 
     function createRenewalsSalesOrders()

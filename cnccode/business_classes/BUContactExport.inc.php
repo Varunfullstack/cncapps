@@ -54,8 +54,8 @@ class BUContactExport extends Business
                 {$DBEContact->getDBColumnName($DBEContact::customerID)} as CustomerID,
         {$DBEContact->getDBColumnName($DBEContact::title)} AS Title,
         {$DBEContact->getDBColumnName($DBEContact::lastName)} AS LastName,
-        {$DBEContact->getDBColumnName($DBEContact::firstName)}AS FirstName,
-        {$DBEContact->getDBColumnName($DBEContact::position)}AS Position,
+        {$DBEContact->getDBColumnName($DBEContact::firstName)} AS FirstName,
+        {$DBEContact->getDBColumnName($DBEContact::position)} AS Position,
         {$DBEContact->getDBColumnName($DBEContact::supportLevel)} as SupportLevel,
         {$dbeCustomer->getDBColumnName(DBECustomer::name)} AS Company,
         {$dbeSite->getDBColumnName(DBESite::add1)} AS BusinessStreet,
@@ -63,13 +63,13 @@ class BUContactExport extends Business
         {$dbeSite->getDBColumnName(DBESite::add3)}  AS BusinessStreet3,
         {$dbeSite->getDBColumnName(DBESite::town)} AS BusinessCity,
         {$dbeSite->getDBColumnName(DBESite::county)} AS BusinessState,
-        {$dbeSite->getDBColumnName(DBESite::postcode)}AS BusinessPostalCode,
+        {$dbeSite->getDBColumnName(DBESite::postcode)} AS BusinessPostalCode,
         if({$dbeSite->getDBColumnName(DBESite::phone)}, concat(\"'\",{$dbeSite->getDBColumnName(DBESite::phone)}),null) AS BusinessPhone,
         if({$DBEContact->getDBColumnName($DBEContact::phone)}, concat(\"'\",{$DBEContact->getDBColumnName($DBEContact::phone)}),null)  AS BusinessPhone2,
         if({$DBEContact->getDBColumnName($DBEContact::mobilePhone)}, concat(\"'\",{$DBEContact->getDBColumnName($DBEContact::mobilePhone)}), null) AS Mobile,
         {$DBEContact->getDBColumnName($DBEContact::email)} AS EmailAddress,
         CONCAT({$DBEContact->getDBColumnName($DBEContact::firstName)},' ',{$DBEContact->getDBColumnName($DBEContact::lastName)}) AS DisplayName,
-        {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null AS Prospect";
+        {$dbeCustomer->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is null AS Prospect";
 
 
             if ($dsSearchForm->getValue(CTContactExport::searchFormSendMailshotFlag)) {
@@ -117,14 +117,14 @@ class BUContactExport extends Business
         $query .= "
       FROM {$DBEContact->getTableName()}
       JOIN {$dbeSite->getTableName()} ON
-        ({$DBEContact->getDBColumnName($DBEContact::siteNo)} = {$dbeSite->getDBColumnName(DBESite::siteNo)}  AND {$DBEContact->getDBColumnName($DBEContact::customerID)} = {$dbeSite->getDBColumnName(DBESite::siteNo)})
+        ({$DBEContact->getDBColumnName($DBEContact::siteNo)} = {$dbeSite->getDBColumnName(DBESite::siteNo)}  AND {$DBEContact->getDBColumnName($DBEContact::customerID)} = {$dbeSite->getDBColumnName(DBESite::customerID)})
       JOIN {$dbeCustomer->getTableName()} ON
         {$DBEContact->getDBColumnName($DBEContact::customerID)} = {$dbeCustomer->getDBColumnName(DBECustomer::customerID)}";
 
         if ($contractItemIDs) {
 
             $query .=
-                " JOIN {$dbeCustItem->getTableName()} cc ON cc.{$dbeCustItem->getDBColumnName(DBECustomerItem::customerID)} = {$dbeCustomer->getDBColumnName(DBECustomer::customerID)}";
+                " JOIN {$dbeCustItem->getTableName()}  ON {$dbeCustItem->getDBColumnName(DBECustomerItem::customerID)} = {$dbeCustomer->getDBColumnName(DBECustomer::customerID)}";
         }
 
         $query .= " WHERE 1 = 1 ";
@@ -186,7 +186,7 @@ class BUContactExport extends Business
                 $query .= "and (" . implode(
                         ' or ',
                         array_map(
-                            function ($contractItemID) {
+                            function ($contractItemID) use ($dbeCustItem) {
                                 return " {$dbeCustItem->getDBColumnName(DBECustomerItem::itemID)} = $contractItemID ";
                             },
                             $contractItemIDs
@@ -282,7 +282,6 @@ class BUContactExport extends Business
         if (strlen($possibleOrQueries)) {
             $query .= " and (" . $possibleOrQueries . ")";
         }
-
         return $this->db->query($query);
 
     }

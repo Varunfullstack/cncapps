@@ -4,6 +4,22 @@ This project changes will be shown here.
 ### Changed
 - Issue 620 - New side menu design in CNCAPPS
 
+## [v3.14.6] - 2020-05-21
+### Fixed
+- Wrong content in the emails that get sent out as part of ServiceDeskAutoCompletion.php for Pending Closure
+- Some engineers travel missing from Expense Dashboard
+
+## [v3.14.5] - 2020-05-18
+### Fixed
+- Fixed issue with installation date readonly on RenHosting and RenBroadband
+- Fixed issue that prevents to set installation date when checking Direct Debit
+- Fixed issue trying to export contacts
+- Fixed issue with automatically approved overtime not getting an approved duration value
+
+## [v3.14.4] - 2020-05-13
+### Fixed
+- Fixed issue with awaiting CNC not being set correctly 
+
 ## [v3.14.3] - 2020-05-12
 ### Fixed
 - Fixed issue when trying to send Sales Order reminder

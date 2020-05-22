@@ -1,14 +1,13 @@
-DROP FUNCTION IF EXISTS `getOvertime`#
-
-CREATE DEFINER=`root`@`127.0.0.1` FUNCTION `getOvertime`(callactivityId BIGINT) RETURNS DECIMAL(5,2)
-    READS SQL DATA
+drop function getOvertime;
+create
+    definer = root@`127.0.0.1` function getOvertime(callactivityId bigint) returns decimal(5, 2)
+    reads sql data
+    deterministic
 BEGIN
     DECLARE shiftStartTime DECIMAL(10, 2);
     DECLARE shiftEndTime DECIMAL(10, 2);
-    DECLARE isWeekOvertimeAllowed BOOLEAN;
     DECLARE activityDate DATE;
     DECLARE activityEngineerOvertimeAllowed BOOLEAN;
-    DECLARE overtime DECIMAL(10, 2);
     DECLARE officeStartTime DECIMAL(10, 2);
     DECLARE officeEndTime DECIMAL(10, 2);
     declare submitAsOvertime boolean;
@@ -42,8 +41,8 @@ BEGIN
     end if;
 
     if(not isEngineerTravel) then
-                RETURN shiftEndTime - shiftStartTime;
-        end if;
+        RETURN shiftEndTime - shiftStartTime;
+    end if;
     IF (weekday(activityDate) in (5,6)
         or isBankHoliday(activityDate)
         )
@@ -59,23 +58,16 @@ BEGIN
     INTO officeStartTime,
         officeEndTime
     FROM headert;
+    if(shiftStartTime >= officeStartTime and shiftStartTime < officeEndTime) then
+        set shiftStartTime = officeEndTime;
+    end if;
 
-    SET overtime = 0;
-    IF (shiftStartTime < officeStartTime) THEN
-        IF (shiftEndTime < officeStartTime) THEN
-            SET overtime = shiftEndTime - shiftStartTime;
-        ELSE
-            SET overtime = officeStartTime - shiftStartTime;
-        END IF;
+    if(shiftEndTime > officeStartTime and shiftEndTime < officeEndTime) then
+        set shiftEndTime = officeStartTime;
+    end if;
 
-    END IF;
-    IF (shiftEndTime > officeEndTime) THEN
-        IF (shiftStartTime > officeEndTime) THEN
-            SET overtime = overtime + (shiftEndTime - shiftStartTime);
-        ELSE
-            SET overtime = overtime + (shiftEndTime - officeEndTime);
-        END IF;
-    END IF;
-    RETURN overtime;
-END #
-
+    if(officeEndTime < officeStartTime) then
+        return 0;
+    end if;
+    return shiftEndTime - shiftStartTime;
+END;
