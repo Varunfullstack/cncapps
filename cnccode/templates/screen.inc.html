@@ -171,11 +171,17 @@
         let modal;
         let wrapper;
         let modalOpen;
+        let sidebar;
+        let mainContent;
+        let favouriteMenu;
+        let doWeHaveFavourites = false;
 
         window.addEventListener('DOMContentLoaded', function () {
-
+            sidebar = $(".sidebar");
+            mainContent = $("#main");
             modal = $("#changemodal");
             wrapper = $("#changemodal-wrapper");
+            favouriteMenu = document.getElementById('favouriteMenuItem');
             modalOpen = false;
 
             $("#close-button").on("click", function (event) {
@@ -187,11 +193,61 @@
                 new SelectFx(el);
             });
 
-            var sidebar = $(".sidebar");
-            var mainContent = $("#main");
-            $("#leftside-navigation .sub-menu > a").click(function (e) {
+            const childrenContainer = favouriteMenu.querySelector('.children');
+            doWeHaveFavourites = childrenContainer.childElementCount > 0;
+            var isCollapsed = localStorage.getItem('menuCollapsed');
 
-                $("#leftside-navigation ul ul").slideUp();
+            if (isCollapsed) {
+                collapseMenu();
+            } else {
+                expandMenu();
+            }
+
+            function collapseMenu() {
+                setMenuState(true);
+            }
+
+            function expandMenu() {
+                setMenuState(false);
+            }
+
+            function toggleMenu() {
+                if (isCollapsed) {
+                    expandMenu();
+                } else {
+                    collapseMenu();
+                }
+
+            }
+
+            function setMenuState(collapsed) {
+                debugger;
+                isCollapsed = collapsed;
+                if (collapsed) {
+                    sidebar[0].classList.add('collapsed');
+                    mainContent[0].classList.add('expanded');
+                    localStorage.setItem('menuCollapsed', '1');
+
+
+                } else {
+                    sidebar[0].classList.remove('collapsed');
+                    mainContent[0].classList.remove('expanded');
+                    localStorage.removeItem('menuCollapsed');
+                    if (doWeHaveFavourites) {
+
+                        $(childrenContainer).slideDown();
+                    }
+                }
+                //sidebar[0].classList.remove('no-transition')
+            }
+
+
+            $("#leftside-navigation .sub-menu > a").click(function (e) {
+                let elementsQuery = '#leftside-navigation ul .sub-menu:not(.not-slide)  ul';
+                if (isCollapsed || !doWeHaveFavourites) {
+                    elementQuery = '#leftside-navigation ul ul';
+                }
+                $(elementsQuery).slideUp();
                 $(this).next().is(":visible") || $(this).next().slideDown();
 
                 e.stopPropagation()
@@ -203,11 +259,7 @@
                 var current = image.attr("src");
                 var swap = image.attr("data-swap");
                 image.attr('src', swap).attr("data-swap", current);
-
-                sidebar.toggleClass('collapsed', 'addOrRemove');
-                mainContent.toggleClass('expanded', 'addOrRemove');
-
-
+                toggleMenu();
             });
 
             jQuery('.selectpicker').selectpicker;
@@ -308,7 +360,7 @@
             }
             fetch('index.php?menuItemId=' + itemId + "&action=" + action).then(response => {
                 window.location.reload();
-            })
+            });
             return false;
         }
 
@@ -337,7 +389,7 @@
 </head>
 <body
 >
-<aside class="sidebar">
+<aside class="sidebar no-transition">
     <div id="leftside-navigation"
          class="nano"
     >
@@ -351,7 +403,7 @@
         </div>
 
         <ul class="nano-content">
-            <li class="sub-menu">
+            <li class="sub-menu not-slide" id="favouriteMenuItem">
                 <a href="javascript:void(0);">
                     <i class="fa fa-star"
                        data-placement="right"
