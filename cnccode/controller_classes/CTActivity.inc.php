@@ -1612,20 +1612,18 @@ class CTActivity extends CTCNC
         /*
       Now decide what we should do about travel
       */
-        if (!@$_SESSION['includeTravel'] && $dsCallActivity->getValue(DBEJCallActivity::travelFlag) == 'Y') {
+        if (!@$_SESSION['includeTravel'] && $dsCallActivity->getValue(
+                DBEJCallActivity::travelFlag
+            ) == 'Y' && $dbeCallActivity->rowCount() > 0) {
 
-            if ($dbeCallActivity->rowCount() > 0) {
+            $dbeCallActivity->fetchNext();
 
-                $dbeCallActivity->fetchNext();
+            $callActivityID = $dbeCallActivity->getValue(DBEJCallActivity::callActivityID);
 
-                $callActivityID = $dbeCallActivity->getValue(DBEJCallActivity::callActivityID);
-
-                $this->buActivity->getActivityByID(
-                    $callActivityID,
-                    $dsCallActivity
-                );
-            }
-
+            $this->buActivity->getActivityByID(
+                $callActivityID,
+                $dsCallActivity
+            );
         }
 
         $this->setPageTitle(CONFIG_SERVICE_REQUEST_DESC . ' ' . $dsCallActivity->getValue(DBEJCallActivity::problemID));
@@ -1678,7 +1676,7 @@ class CTActivity extends CTCNC
         if (
             !$dsCallActivity->getValue(DBEJCallActivity::endTime) || ($dsCallActivity->getValue(
                     DBEJCallActivity::status
-                ) != 'A' and $this->hasPermissions(MAINTENANCE_PERMISSION))
+                ) != 'A' && $this->hasPermissions(MAINTENANCE_PERMISSION))
         ) {
             $urlDeleteActivity =
                 Controller::buildLink(
@@ -1796,7 +1794,7 @@ class CTActivity extends CTCNC
         $txtSetProblemFixed = null;
         if (
             $dbeJProblem->getValue(DBEJProblem::status) == 'P' &&
-            $dbeJProblem->getValue(DBEJProblem::rootCauseID) != false
+            !$dbeJProblem->getValue(DBEJProblem::rootCauseID)
         ) {
 
             $urlSetProblemFixed =
@@ -2482,9 +2480,9 @@ class CTActivity extends CTCNC
     function getCustomerUrl($customerID)
     {
         return Controller::buildLink(
-            'SalesOrder.php',
+            'Customer.php',
             array(
-                'action'     => 'search',
+                'action'     => 'dispEdit',
                 'customerID' => $customerID
             )
         );
