@@ -483,7 +483,7 @@ class BUSalesOrder extends Business
         }
         // If the order customer is an internal stock location then we set pay method to no invoice
         if (
-            ($dsOrdhead->getValue(DBEOrdhead::customerID) == CONFIG_SALES_STOCK_CUSTOMERID) OR
+            ($dsOrdhead->getValue(DBEOrdhead::customerID) == CONFIG_SALES_STOCK_CUSTOMERID) or
             ($dsOrdhead->getValue(DBEOrdhead::customerID) == CONFIG_MAINT_STOCK_CUSTOMERID)
         ) {
             $dsOrdhead->setValue(
@@ -2489,6 +2489,39 @@ WHERE odl_ordno = $ordheadID
         $pkValue = null;
         $buPDF->endPage();
         return $buPDF->getData();
+    }
+
+    public function updatePurchaseOrdersRequiredByDate(DBEPorhead $dbePurchaseOrder)
+    {
+        $salesOrderRelatedPurchaseOrders = new DBEJPorhead($this);
+        $salesOrderRelatedPurchaseOrders->getRowsBySearchCriteria(
+            null,
+            $dbePurchaseOrder->getValue(DBEPorhead::ordheadID),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            true
+        );
+        if ($salesOrderRelatedPurchaseOrders->rowCount() > 1) {
+            while ($salesOrderRelatedPurchaseOrders->fetchNext()) {
+
+                if ($salesOrderRelatedPurchaseOrders->getValue(DBEJPorhead::porheadID) == $dbePurchaseOrder->getValue(
+                        DBEPorhead::porheadID
+                    )) {
+
+                    continue;
+                }
+
+                $toUpdatePo = new DBEPorhead($this);
+                $toUpdatePo->getRow($salesOrderRelatedPurchaseOrders->getValue(DBEJPorhead::porheadID));
+                $toUpdatePo->setValue(DBEPorhead::requiredBy, $dbePurchaseOrder->getValue(DBEPorhead::requiredBy));
+                $toUpdatePo->updateRow();
+            }
+        }
     }
 
 }

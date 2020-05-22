@@ -1,11 +1,30 @@
 <script>
-    var dataTable = null;
+    let dataTable = null;
+    let redSelect = null;
+    let orangeSelect = null;
+    let blackSelect = null;
+    let greenSelect = null;
+    const daysAgoSelector = document.createElement('select');
+    daysAgoSelector.addEventListener('change', () => {
+        dataTable.ajax.reload();
+    })
+    document.addEventListener('DOMContentLoaded', () => {
 
-    var redSelect = null;
-    var orangeSelect = null;
-    var blackSelect = null;
-    var greenSelect = null;
-    $(function () {
+        document.getElementById('selectorHolder').appendChild(daysAgoSelector);
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        let daysAgoValue = 7;
+        if (urlParams.get('daysAgo')) {
+            daysAgoValue = urlParams.get('daysAgo');
+        }
+        for (let i = 1; i <= 30; i++) {
+            const option = document.createElement('option');
+            option.value = '' + i;
+            option.text = '' + i;
+            option.selected = daysAgoValue === i;
+            daysAgoSelector.options.add(option);
+        }
+
         redSelect = $('#red-selector');
         orangeSelect = $('#orange-selector');
         blackSelect = $('#black-selector');
@@ -13,6 +32,131 @@
 
 
         dataTable = $('#theTable').DataTable({
+            fixedHeader: true,
+            serverSide: false,
+            ajax: {
+                url: "?action=getData",
+                type: "GET",
+                dataSrc: (response) => {
+                    $.LoadingOverlay('hide');
+                    return response;
+                },
+                data: (data) => {
+                    data.daysAgo = daysAgoSelector.selectedOptions[0].value;
+                    $.LoadingOverlay("show", {text: 'Running your search, please wait'});
+                    return data;
+                }
+            },
+            rowCallback: function (row, data) {
+                if (data.color) {
+                    row.classList.add(data.color);
+                }
+            },
+            columns: [
+                {
+                    data: "purchaseOrderId",
+                    render: (data) => {
+                        const anchor = document.createElement('a');
+                        anchor.href = "/PurchaseOrder.php?action=display&porheadID=" + data;
+                        anchor.text = data;
+                        anchor.target = '_blank';
+                        return anchor.outerHTML;
+                    }
+                },
+                {
+                    data: "salesOrderID",
+                    render: (data) => {
+                        const anchor = document.createElement('a');
+                        anchor.href = "SalesOrder.php?action=displaySalesOrder&ordheadID=" + data;
+                        anchor.text = data;
+                        anchor.target = '_blank';
+                        return anchor.outerHTML;
+
+                    }
+                },
+                {
+                    data: "serviceRequestID",
+                    render: (data) => {
+                        const anchor = document.createElement('a');
+                        anchor.href = "Activity.php?action=displayLastActivity&problemID=" + data;
+                        anchor.text = data;
+                        anchor.target = '_blank';
+                        return anchor.outerHTML;
+                    }
+                },
+                {data: "customerName"},
+                {data: "orderedQuantity"},
+                {data: "itemDescription"},
+                {data: "supplierName"},
+                {data: "direct"},
+                {
+                    data: "purchaseOrderDate",
+                    render: (data) => {
+                        if (!data) {
+                            return 'N/A';
+                        }
+                        return moment(data).format('DD/MM/YYYY');
+                    }
+                },
+                {
+                    data: "expectedOn",
+                    render: (data, type, row) => {
+                        if (data) {
+                            return moment(data).format('DD/MM/YYYY');
+                        }
+                        if (row.expectedTBC) {
+                            return 'TBC';
+                        }
+                        return 'N/A';
+                    },
+                    createdCell: (cell, data, row) => {
+                        if (row.expectedColorClass) {
+                            cell.classList.add(row.expectedColorClass);
+                        }
+                    }
+                },
+                {
+                    data: "futureDate",
+                    render: (data) => {
+                        if (!data) {
+                            return 'N/A';
+                        }
+                        return moment(data).format('DD/MM/YYYY');
+                    }
+                },
+                {
+                    data: "purchaseOrderRequiredBy",
+                    render: (data) => {
+                        if (!data) {
+                            return 'TBC';
+                        }
+                        return moment(data).format('DD/MM/YYYY');
+                    },
+                    createdCell: (cell, data, row) => {
+                        if (row.requiredByColorClass) {
+                            cell.classList.add(row.requiredByColorClass);
+                        }
+                    }
+                },
+                {data: "supplierRef"},
+                {
+                    data: "projectName",
+                    render: (data, row) => {
+                        if (!data) {
+                            return '';
+                        }
+                        const anchor = document.createElement('a');
+                        anchor.href = "Project.php?action=edit&projectID=" + row.projectID;
+                        anchor.text = data;
+                        anchor.target = '_blank';
+                        return anchor.outerHTML;
+                    }
+                },
+                {
+                    data: "color"
+                }
+            ],
+            orderCellsTop: true,
             dom: 'Blfrtip',
             buttons: [
                 {
@@ -33,7 +177,8 @@
                 },
             ]
         });
-    });
+    })
+
 
     function filterColor() {
         var colors = [];
@@ -94,6 +239,9 @@
         background-color: #F8A5B6;
     }
 </style>
+<p id="selectorHolder">
+
+</p>
 <P>
     <span style="color:red;background-color: red">R</span>
     <input type="checkbox"
@@ -175,58 +323,58 @@
     </TR>
     </thead>
     <tbody>
-    <!-- BEGIN notYetReceivedItemBlock -->
-    <TR {style}>
-        <TD>
-            <A href="{purchaseOrderLink}"
-               target="_blank"
-            >{purchaseOrderId}</A>
-        </TD>
-        <td>
-            {salesOrderLink}
-        </td>
-        <td>
-            {SRLink}
-        </td>
-        <td>
-            {customerName}
-        </td>
-        <td>
-            {orderedQty}
-        </td>
-        <td>
-            {itemDescription}
-        </td>
-        <td>
-            {supplierName}
-        </td>
-        <td>
-            {direct}
-        </td>
-        <td data-sort="{purchaseOrderDateSort}">
-            {purchaseOrderDate}
-        </td>
-        <td data-sort="{expectedOnSort}"
-            {expectedColor}
-        >
-            {expectedOn}
-        </td>
-        <td data-sort="{futureDateSort}">
-            {futureDate}
-        </td>
-        <td data-sort="{requiredByDateSort}" {requiredByColor}>
-            {requiredByDate}
-        </td>
-        <td>
-            {supplierRef}
-        </td>
-        <td>
-            {projectLink}
-        </td>
-        <td>
-            {color}
-        </td>
-    </TR>
+    <!--    &lt;!&ndash; BEGIN notYetReceivedItemBlock &ndash;&gt;-->
+    <!--    <TR {style}>-->
+    <!--        <TD>-->
+    <!--            <A href="{purchaseOrderLink}"-->
+    <!--               target="_blank"-->
+    <!--            >{purchaseOrderId}</A>-->
+    <!--        </TD>-->
+    <!--        <td>-->
+    <!--            {salesOrderLink}-->
+    <!--        </td>-->
+    <!--        <td>-->
+    <!--            {SRLink}-->
+    <!--        </td>-->
+    <!--        <td>-->
+    <!--            {customerName}-->
+    <!--        </td>-->
+    <!--        <td>-->
+    <!--            {orderedQty}-->
+    <!--        </td>-->
+    <!--        <td>-->
+    <!--            {itemDescription}-->
+    <!--        </td>-->
+    <!--        <td>-->
+    <!--            {supplierName}-->
+    <!--        </td>-->
+    <!--        <td>-->
+    <!--            {direct}-->
+    <!--        </td>-->
+    <!--        <td data-sort="{purchaseOrderDateSort}">-->
+    <!--            {purchaseOrderDate}-->
+    <!--        </td>-->
+    <!--        <td data-sort="{expectedOnSort}"-->
+    <!--            {expectedColor}-->
+    <!--        >-->
+    <!--            {expectedOn}-->
+    <!--        </td>-->
+    <!--        <td data-sort="{futureDateSort}">-->
+    <!--            {futureDate}-->
+    <!--        </td>-->
+    <!--        <td data-sort="{requiredByDateSort}" {requiredByColor}>-->
+    <!--            {requiredByDate}-->
+    <!--        </td>-->
+    <!--        <td>-->
+    <!--            {supplierRef}-->
+    <!--        </td>-->
+    <!--        <td>-->
+    <!--            {projectLink}-->
+    <!--        </td>-->
+    <!--        <td>-->
+    <!--            {color}-->
+    <!--        </td>-->
+    <!--    </TR>-->
     <!-- END notYetReceivedItemBlock -->
     </tbody>
 </TABLE>

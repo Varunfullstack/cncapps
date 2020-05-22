@@ -1385,10 +1385,10 @@ class CTPurchaseOrder extends CTCNC
             $dbePurchaseOrder = new DBEPorhead($this);
             $dbePurchaseOrder->getRow($dsPorhead->getValue(DBEJPorhead::porheadID));
 
+            $buSalesOrder = new BUSalesOrder($this);
             if ($dbePurchaseOrder->getValue(DBEPorhead::deliveryConfirmedFlag) == 'N' && $dsPorhead->getValue(
                     DBEJPorhead::deliveryConfirmedFlag
                 ) == 'Y' && $dbePurchaseOrder->getValue(DBEJPorhead::completionNotifiedFlag) == 'N') {
-                $buSalesOrder = new BUSalesOrder($this);
 
                 $buSalesOrder->notifyPurchaseOrderCompletion($dbePurchaseOrder);
 
@@ -1400,6 +1400,10 @@ class CTPurchaseOrder extends CTCNC
             }
 
             $this->buPurchaseOrder->updateHeader($dsPorhead);
+
+            if ($this->getParam('applyToAll')) {
+                $buSalesOrder->updatePurchaseOrdersRequiredByDate($this->buPurchaseOrder->dbePorhead);
+            }
 
             $urlNext =
                 Controller::buildLink(
