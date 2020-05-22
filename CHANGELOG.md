@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 686 - Meeting agendas change criteria for flag for review SRs
+
 ## [v4.0.1] - 2020-05-26
 ### Fixed
 - Current Activity Report bigger headings
