@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 872 - Booking Sales Visits with Future Dates
+
 ## [v3.14.6] - 2020-05-21
 ### Fixed
 - Wrong content in the emails that get sent out as part of ServiceDeskAutoCompletion.php for Pending Closure
