@@ -1,6 +1,6 @@
 # Changelog
 This project changes will be shown here.
-## [unreleased]
+## [v4.0.0]
 ### Changed
 - Issue 620 - New side menu design in CNCAPPS
 
