@@ -76,9 +76,10 @@ body {
   -ms-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
   z-index: 100;
-  overflow-y: scroll;
-  top: 0;
   bottom: 0;
+  top: 0;
+  overflow-y: scroll;
+
 
   .cnc-logo {
     transition:
@@ -110,7 +111,7 @@ body {
 
   &.collapsed {
     width: 45px;
-    overflow: hidden;
+    overflow-y: visible;
 
     #leftside-navigation ul li {
       span {

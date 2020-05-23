@@ -175,6 +175,7 @@
         let mainContent;
         let favouriteMenu;
         let doWeHaveFavourites = false;
+        let activeSubmenu;
 
         window.addEventListener('DOMContentLoaded', function () {
             sidebar = $(".sidebar");
@@ -187,6 +188,15 @@
             $("#close-button").on("click", function (event) {
                 closeChangelogModal();
             });
+
+
+            $( "body" ).click(function( event ) {
+                var a  = event.target;
+                if(a !== sidebar) {
+                    activeSubmenu.click();
+                }
+            });
+
 
             /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
             [].slice.call(document.querySelectorAll('select.cs-select')).forEach(function (el) {
@@ -221,7 +231,6 @@
             }
 
             function setMenuState(collapsed) {
-                debugger;
                 isCollapsed = collapsed;
                 if (collapsed) {
                     sidebar[0].classList.add('collapsed');
@@ -243,6 +252,7 @@
 
 
             $("#leftside-navigation .sub-menu > a").click(function (e) {
+                activeSubmenu = $(this);
                 let elementsQuery = '#leftside-navigation ul .sub-menu:not(.not-slide)  ul';
                 if (isCollapsed || !doWeHaveFavourites) {
                     elementQuery = '#leftside-navigation ul ul';
@@ -412,7 +422,7 @@
                     </i><span>Favourites</span>
                     <i class="arrow fa fa-angle-right pull-right"></i>
                 </a>
-                <ul class="children">
+                <ul class="children" style="display: none">
                     {favouritesMenuItems}
                 </ul>
             </li>
