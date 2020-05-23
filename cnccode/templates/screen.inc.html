@@ -189,19 +189,18 @@
                 closeChangelogModal();
             });
 
-
-            $( "body" ).click(function( event ) {
-                var a  = event.target;
-                if(a !== sidebar) {
-                    activeSubmenu.click();
+            document.addEventListener('click', (event) => {
+                let a = event.target;
+                if (a !== sidebar && isCollapsed) {
+                    // close any open menus...
+                    $('#leftside-navigation ul ul').slideUp();
                 }
-            });
-
+            })
 
             /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
-            [].slice.call(document.querySelectorAll('select.cs-select')).forEach(function (el) {
-                new SelectFx(el);
-            });
+            // [].slice.call(document.querySelectorAll('select.cs-select')).forEach(function (el) {
+            //     new SelectFx(el);
+            // });
 
             const childrenContainer = favouriteMenu.querySelector('.children');
             doWeHaveFavourites = childrenContainer.childElementCount > 0;
@@ -236,16 +235,14 @@
                     sidebar[0].classList.add('collapsed');
                     mainContent[0].classList.add('expanded');
                     localStorage.setItem('menuCollapsed', '1');
-
-
                 } else {
                     sidebar[0].classList.remove('collapsed');
                     mainContent[0].classList.remove('expanded');
                     localStorage.removeItem('menuCollapsed');
                     if (doWeHaveFavourites) {
-
                         $(childrenContainer).slideDown();
                     }
+                    openCurrentMenuItem();
                 }
                 //sidebar[0].classList.remove('no-transition')
             }
@@ -255,7 +252,7 @@
                 activeSubmenu = $(this);
                 let elementsQuery = '#leftside-navigation ul .sub-menu:not(.not-slide)  ul';
                 if (isCollapsed || !doWeHaveFavourites) {
-                    elementQuery = '#leftside-navigation ul ul';
+                    elementsQuery = '#leftside-navigation ul ul';
                 }
                 $(elementsQuery).slideUp();
                 $(this).next().is(":visible") || $(this).next().slideDown();
@@ -272,16 +269,20 @@
                 toggleMenu();
             });
 
-            jQuery('.selectpicker').selectpicker;
-            if (menuId) {
-                let selector = document.querySelector('li[data-menu-id="' + menuId + '"]');
-                if (selector) {
-                    selector.closest('.sub-menu').getElementsByTagName('a')[0].click();
-                    selector.classList.add('active');
-                    const parent = $('li.active').parent('ul').parent('li');
-                    parent.addClass('active');
+            function openCurrentMenuItem() {
+                if (menuId) {
+                    let selector = document.querySelector('li[data-menu-id="' + menuId + '"]');
+                    if (selector) {
+                        selector.closest('.sub-menu').getElementsByTagName('a')[0].click();
+                        selector.classList.add('active');
+                        const parent = $('li.active').parent('ul').parent('li');
+                        parent.addClass('active');
+                    }
                 }
             }
+
+            jQuery('.selectpicker').selectpicker;
+
 
             $('#menuToggle').on('click', function (event) {
                 $('body').toggleClass('open');
@@ -413,7 +414,9 @@
         </div>
 
         <ul class="nano-content">
-            <li class="sub-menu not-slide" id="favouriteMenuItem">
+            <li class="sub-menu not-slide"
+                id="favouriteMenuItem"
+            >
                 <a href="javascript:void(0);">
                     <i class="fa fa-star"
                        data-placement="right"
@@ -422,7 +425,9 @@
                     </i><span>Favourites</span>
                     <i class="arrow fa fa-angle-right pull-right"></i>
                 </a>
-                <ul class="children" style="display: none">
+                <ul class="children"
+                    style="display: none"
+                >
                     {favouritesMenuItems}
                 </ul>
             </li>
@@ -459,7 +464,7 @@
         </div>
     </div>
 </aside>
-
+<div style="clear: both;"></div>
 <div id="main"
      class="right-panel"
 

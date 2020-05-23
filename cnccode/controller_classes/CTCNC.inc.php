@@ -136,6 +136,10 @@ define(
     'displayNote'
 );
 define(
+    'CTCNC_ACT_INVOICE_REPRINT_GENERATE',
+    'invoiceReprintGenerate'
+);
+define(
     'CTCNC_ACT_INVOICE_PRINT_UNPRINTED',
     'invUnprinted'
 );

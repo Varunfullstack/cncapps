@@ -210,6 +210,9 @@ class CTInvoice extends CTCNC
             case CTCNC_ACT_INVOICE_REPRINT:
                 $this->invoiceReprint();
                 break;
+            case CTCNC_ACT_INVOICE_REPRINT_GENERATE:
+                $this->invoiceReprintGenerate();
+                break;
             case CTINVOICE_ACT_DELETE_INVOICE:
                 $this->deleteInvoice();
                 break;
@@ -1014,6 +1017,57 @@ class CTInvoice extends CTCNC
         $this->parsePage();
     }
 
+    /**
+     * @throws Exception
+     */
+    function invoiceReprintGenerate()
+    {
+        $this->setMethodName('invoiceReprintGenerate');
+        $this->buInvoice->initialiseDataset($this->dsPrintRange);
+        if (!$this->dsPrintRange->populateFromArray($this->getParam('invoice'))) {
+            $this->setFormErrorOn();
+            $this->invoiceReprint(); //redisplay with errors
+            exit;
+        }
+        if (!($this->dsPrintRange->getValue(BUInvoice::searchFormStartDate) .
+            $this->dsPrintRange->getValue(BUInvoice::searchFormEndDate) .
+            $this->dsPrintRange->getValue(BUInvoice::searchFormCustomerID) .
+            $this->dsPrintRange->getValue(BUInvoice::searchFormStartInvheadID) .
+            $this->dsPrintRange->getValue(BUInvoice::searchFormEndInvheadID))
+        ) {
+            $this->setFormErrorMessage('Please use parameters');
+            $this->invoiceReprint(); //redisplay with errors
+            exit;
+        }
+        // generate PDF invoices:
+        $buPDFInvoice = new BUPDFInvoice(
+            $this,
+            $this->buInvoice
+        );
+        $pdfFile =
+            $buPDFInvoice->reprintInvoicesByRange(
+                $this->dsPrintRange->getValue(BUInvoice::searchFormCustomerID),
+                $this->dsPrintRange->getValue(BUInvoice::searchFormStartDate),
+                $this->dsPrintRange->getValue(BUInvoice::searchFormEndDate),
+                $this->dsPrintRange->getValue(BUInvoice::searchFormStartInvheadID),
+                $this->dsPrintRange->getValue(BUInvoice::searchFormEndInvheadID)
+            );
+        if ($pdfFile != FALSE) {
+            header('Pragma: public');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: attachment; filename=invoices.pdf;');
+            header('Content-Transfer-Encoding: binary');
+            header('Content-Length: ' . filesize($pdfFile));
+            readfile($pdfFile);
+            unlink($pdfFile);
+            exit();
+        } else {
+            $this->setFormErrorMessage('No invoices found - try changing the search parameters');
+            $this->invoiceReprint(); //redisplay with errors
+        }
+    }
 
     /**
      * Delete Invoice
