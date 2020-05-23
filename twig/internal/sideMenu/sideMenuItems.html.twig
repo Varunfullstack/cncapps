@@ -24,7 +24,7 @@
                     </a>
                     {#Toggle class far and fa to show outline and solide star icons#}
                     <a href="#"
-                       class="float-right {{ item.favourite ? '' : 'favourited' }}"
+                       class="float-right {{ item.favourite ? 'favourited' : '' }}"
                        onclick="return toggleFavourite({{ item.id }}, {{ item.favourite ? 'true' : 'false' }})"
                     ><i class="{{ item.favourite ? 'fa' : '' }} far fa-star"></i>
                     </a>

@@ -43,6 +43,13 @@ body .lockedIcon::before {
   padding: 0.5rem;
 }
 
+.no-transition {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+  transition: none !important;
+}
+
 #main {
   margin-left: 195px;
   -webkit-transition: all 0.3s ease-in-out;
