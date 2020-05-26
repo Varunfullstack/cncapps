@@ -73,12 +73,16 @@ WHERE
   AND customer.cus_name <> 'CNC Operating Stock'
   and (porline.pol_cost > 0 or porline.pol_cost < 0)
   and odh_type <> 'C'
-  and poh_required_by > (now() - INTERVAL ? day)
+  and (? = -1 or (( poh_required_by > (now() - INTERVAL ? day) or poh_required_by is not null) or poh_required_by is null)) 
 ORDER BY poh_required_by, ordhead.`odh_custno` DESC, pol_porno, `pol_lineno` 
 ";
         $statement = $db->preparedQuery(
             $query,
             [
+                [
+                    "type"  => "i",
+                    "value" => $daysAgo
+                ],
                 [
                     "type"  => "i",
                     "value" => $daysAgo
