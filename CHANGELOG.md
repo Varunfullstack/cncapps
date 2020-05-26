@@ -5,6 +5,8 @@ This project changes will be shown here.
 ### Fixed
 - Current Activity Report bigger headings
 - Current Activity Remember expanded headings
+- Pending reopened section not showing in Current Activity Report
+- Star for flagging as favourite shows in the wrong place in technical menu
 
 ## [v4.0.0] - 2020-05-25
 ### Changed
