@@ -110,10 +110,9 @@
             }
         );
 
-
         if ({isSDManager}) {
-            document.querySelector('#SDManagerLinks').display = "block";
-            document.querySelector('#pendingReopened').display = "block";
+            document.getElementById('SDManagerLinks').style.display = "block";
+            document.getElementById('pendingReopened').style.display = "block";
         }
 
         $('.requestAdditionalTime').click(function () {
