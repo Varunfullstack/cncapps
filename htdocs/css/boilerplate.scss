@@ -91,7 +91,7 @@ body {
 
   }
   &:hover {
-    overflow-y: scroll;
+    overflow-y: overlay;
   }
   &::-webkit-scrollbar,
   &::-webkit-scrollbar-thumb {
