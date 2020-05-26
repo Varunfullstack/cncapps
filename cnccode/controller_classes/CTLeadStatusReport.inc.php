@@ -30,6 +30,7 @@ class CTLeadStatusReport extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(402);
         $this->buLeadStatus = new BULeadStatus($this);
     }
 

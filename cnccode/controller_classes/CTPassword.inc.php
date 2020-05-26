@@ -43,13 +43,13 @@ class CTPassword extends CTCNC
             $cfg
         );
         $roles = [
-            "sales",
             "technical",
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(104);
         $this->buPassword = new BUPassword($this);
     }
 
@@ -544,7 +544,7 @@ class CTPassword extends CTCNC
 
     function search()
     {
-
+        $this->template->setVar("menuId", 104);
         $this->setMethodName('search');
         /** @var DSForm $dsSearchForm */
         $this->buPassword->initialiseSearchForm($dsSearchForm);
@@ -680,4 +680,5 @@ class CTPassword extends CTCNC
             $ch2
         );
     }
+
 }// end of class

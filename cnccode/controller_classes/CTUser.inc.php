@@ -86,13 +86,12 @@ class CTUser extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "accounts",
-        ];
+        $roles = SENIOR_MANAGEMENT_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(903);
         $this->buUser = new BUUser($this);
         $this->dsUser = new DSForm($this);
         $this->dsUser->copyColumnsFrom($this->buUser->dbeUser);
@@ -197,15 +196,12 @@ class CTUser extends CTCNC
                 $this->edit();
                 break;
             case CTUSER_ACT_DELETE:
-                $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
                 $this->delete();
                 break;
             case CTUSER_ACT_UPDATE:
-                $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
                 $this->update();
                 break;
             case CTUSER_ACT_ABSENCE_EDIT:
-                $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
                 $this->absenceEdit();
                 break;
             case self::DECRYPT:
@@ -546,42 +542,39 @@ class CTUser extends CTCNC
                 ),
                 'salesChecked'                               => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
-                        PHPLIB_PERM_SALES
+                        SALES_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
-
-                'accountsChecked' => (strpos(
+                'accountManagementChecked'                   => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
-                        PHPLIB_PERM_ACCOUNTS
+                        ACCOUNT_MANAGEMENT_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
-
-                'technicalChecked' => (strpos(
+                'seniorManagementChecked'                    => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
-                        PHPLIB_PERM_TECHNICAL
+                        SENIOR_MANAGEMENT_PERMISSION
+                    ) !== FALSE) ? CT_CHECKED : null,
+                'accountsChecked'                            => (strpos(
+                        $dsUser->getValue(DBEJUser::perms),
+                        ACCOUNTS_PERMISSION
+                    ) !== FALSE) ? CT_CHECKED : null,
+                'technicalChecked'                           => (strpos(
+                        $dsUser->getValue(DBEJUser::perms),
+                        TECHNICAL_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
 
                 'supervisorChecked' => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
-                        PHPLIB_PERM_SUPERVISOR
+                        SUPERVISOR_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
 
                 'maintenanceChecked' => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
-                        PHPLIB_PERM_MAINTENANCE
+                        MAINTENANCE_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
-
-                'customerChecked' => (strpos(
+                'renewalsChecked'    => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
-                        PHPLIB_PERM_CUSTOMER
+                        RENEWALS_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
 
-                'renewalsChecked' => (strpos(
-                        $dsUser->getValue(DBEJUser::perms),
-                        PHPLIB_PERM_RENEWALS
-                    ) !== FALSE) ? CT_CHECKED : null,
-
-                'changeApproverFlagChecked'                     => Controller::htmlChecked(
-                    $dsUser->getValue(DBEJUser::changeApproverFlag)
-                ),
                 'changeInitialDateAndTimeFlagChecked'           => Controller::htmlChecked(
                     $dsUser->getValue(DBEUser::changeInitialDateAndTimeFlag)
                 ),
@@ -599,7 +592,7 @@ class CTUser extends CTCNC
                 ) ? 'checked' : null,
                 'reportsChecked'                                => (strpos(
                         $dsUser->getValue(DBEJUser::perms),
-                        PHPLIB_PERM_REPORTS
+                        REPORTS_PERMISSION
                     ) !== FALSE) ? CT_CHECKED : null,
                 'teamMessage'                                   => Controller::htmlDisplayText(
                     $dsUser->getMessage(DBEJUser::teamID)
@@ -693,32 +686,6 @@ class CTUser extends CTCNC
             $this->template->parse(
                 'teams',
                 'teamBlock',
-                true
-            );
-        }
-
-        // customer selection
-        $dbeCustomer = new DBECustomer($this);
-        $dbeCustomer->getRows(DBECustomer::name);
-        $this->template->set_block(
-            'UserEdit',
-            'customerBlock',
-            'customers'
-        );
-        while ($dbeCustomer->fetchNext()) {
-            $customerSelected = ($dsUser->getValue(DBEJUser::customerID) == $dbeCustomer->getValue(
-                    DBECustomer::customerID
-                )) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    'customerSelected' => $customerSelected,
-                    'customerID'       => $dbeCustomer->getValue(DBECustomer::customerID),
-                    'customerName'     => $dbeCustomer->getValue(DBECustomer::name)
-                )
-            );
-            $this->template->parse(
-                'customers',
-                'customerBlock',
                 true
             );
         }
@@ -952,7 +919,7 @@ class CTUser extends CTCNC
         $txtCreate = null;
         $urlCreate = null;
 
-        if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
+        if ($this->hasPermissions(SENIOR_MANAGEMENT_PERMISSION)) {
             $urlCreate =
                 Controller::buildLink(
                     $_SERVER['PHP_SELF'],
@@ -981,7 +948,7 @@ class CTUser extends CTCNC
 
                 $urlEdit = null;
                 $txtEdit = null;
-                if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
+                if ($this->hasPermissions(SENIOR_MANAGEMENT_PERMISSION)) {
 
                     $urlEdit =
                         Controller::buildLink(

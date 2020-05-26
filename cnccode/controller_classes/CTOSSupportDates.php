@@ -24,10 +24,7 @@ class CTOSSupportDates extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "maintenance",
-        ];
-        if (!self::hasPermissions($roles)) {
+        if (!self::isSdManager()) {
             Header("Location: /NotAllowed.php");
             exit;
         }
@@ -97,20 +94,20 @@ class CTOSSupportDates extends CTCNC
 
                 $availabilityDateString = $_REQUEST['availabilityDate'];
                 if ($availabilityDateString) {
-                    $availabilityDate = DateTime::createFromFormat('d/m/Y', $availabilityDateString);
+                    $availabilityDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $availabilityDateString);
                     if (!$availabilityDate) {
                         throw new Exception('Date format is wrong');
                     }
-                    $availabilityDateString = $availabilityDate->format('Y-m-d');
+                    $availabilityDateString = $availabilityDate->format(DATE_MYSQL_DATE);
                 }
 
                 $endOfLifeDateString = $_REQUEST['endOfLifeDate'];
                 if ($endOfLifeDateString) {
-                    $endOfLifeDate = DateTime::createFromFormat('d/m/Y', $endOfLifeDateString);
+                    $endOfLifeDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $endOfLifeDateString);
                     if (!$endOfLifeDate) {
                         throw new Exception('Date format is wrong');
                     }
-                    $endOfLifeDateString = $endOfLifeDate->format('Y-m-d');;
+                    $endOfLifeDateString = $endOfLifeDate->format(DATE_MYSQL_DATE);
                 }
 
 

@@ -3,6 +3,7 @@
     <h2>Send Contracts to be signed</h2>
     <button type="button"
             onclick="previewPDF()"
+            {disabled}
     >Preview
     </button>
     <input type="hidden"
@@ -16,6 +17,7 @@
     <select name="signableContact"
             id="signableContact"
             onchange="changedSignableContact()"
+            {disabled}
     >
         <option selected
                 value=""
@@ -33,6 +35,7 @@
     <select name="signableTemplate"
             id="signableTemplate"
             onchange="changedSignableTemplate()"
+            {disabled}
     >
         <option selected
                 value=""
@@ -67,7 +70,7 @@
         })
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
 
         if (showOfficeButton) {
             $('.officeReport.hidden').removeClass('hidden');

@@ -481,7 +481,6 @@ $environment = [
 
 ];
 
-
 if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line calls
     switch ($_SERVER['HTTP_HOST']) {
 
@@ -504,6 +503,7 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
     $GLOBALS['isRunningFromCommandLine'] = false;
 
 } else {                // command line call so assume live and force HTTP_HOST value
+
     $server_type = getEnvironmentByPath();
     $GLOBALS['isRunningFromCommandLine'] = true;
 }

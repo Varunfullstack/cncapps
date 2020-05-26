@@ -1533,7 +1533,7 @@ class BUCustomer extends Business
         $sortColumn = false
     )
     {
-        if ($controller->hasPermissions(PHPLIB_PERM_TECHNICAL)) {
+        if ($controller->hasPermissions(TECHNICAL_PERMISSION)) {
             $reviewUserID = false;
         } else {
             $reviewUserID = $GLOBALS['auth']->is_authenticated();

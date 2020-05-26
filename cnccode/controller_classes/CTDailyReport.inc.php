@@ -66,7 +66,7 @@ class CTDailyReport extends CTCNC
                 $dashboard = isset($_GET['dashboard']);
                 $generateLog = isset($_GET['generateLog']);
                 $selectedYear = isset($_GET['selectedYear']) ? $_GET['selectedYear'] : null;
-
+                $this->setMenuId(110);
                 $html = $this->buDailyReport->outstandingIncidents(
                     $this->daysAgo,
                     null,

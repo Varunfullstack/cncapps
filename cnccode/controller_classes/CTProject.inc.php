@@ -80,8 +80,6 @@ class CTProject extends CTCNC
             $cfg
         );
         $roles = [
-            "reports",
-            "sales",
             "technical"
         ];
 
@@ -118,6 +116,7 @@ class CTProject extends CTCNC
         );
 
         $this->dsProject->setAddColumnsOff();
+        $this->setMenuId(107);
     }
 
     /**

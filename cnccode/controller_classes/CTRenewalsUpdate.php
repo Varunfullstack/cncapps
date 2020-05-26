@@ -26,13 +26,13 @@ class CTRenewalsUpdate extends CTCNC
             $cfg
         );
         $roles = [
-            "sales",
+            SALES_PERMISSION
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
-
+        $this->setMenuId(310);
     }
 
     /**

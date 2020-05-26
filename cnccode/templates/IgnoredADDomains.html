@@ -91,39 +91,7 @@
         }
     }
 
-    $.ajax({
-        url: '{URLGetData}',
-        method: 'GET',
-        dataType: 'JSON'
-    }).then(function (result) {
-        ignoredADDomainItems = result;
-        drawList();
-    })
 
-    Mustache.tags = ['{%', '%}'];
-
-    Mustache.Formatters = {
-        decimal: function (number) {
-            if (typeof number !== 'number') {
-                return number;
-            }
-
-            return number.toFixed(2);
-        },
-        lightGrayClass: function (number) {
-
-            if (isNaN(parseFloat(number)) || !isFinite(number)) {
-                return null;
-            }
-
-            if (number != 0) {
-                return null;
-            }
-
-            return "grey"
-        }
-
-    };
     let editingItem = null;
 
     function drawList() {
@@ -133,7 +101,40 @@
         list.html(html);
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
+        $.ajax({
+            url: '{URLGetData}',
+            method: 'GET',
+            dataType: 'JSON'
+        }).then(function (result) {
+            ignoredADDomainItems = result;
+            drawList();
+        })
+
+        Mustache.tags = ['{%', '%}'];
+
+        Mustache.Formatters = {
+            decimal: function (number) {
+                if (typeof number !== 'number') {
+                    return number;
+                }
+
+                return number.toFixed(2);
+            },
+            lightGrayClass: function (number) {
+
+                if (isNaN(parseFloat(number)) || !isFinite(number)) {
+                    return null;
+                }
+
+                if (number != 0) {
+                    return null;
+                }
+
+                return "grey"
+            }
+
+        };
         customerSection = $('.customerSection');
         domainInput = $('[name="domain"]');
         addButton = $('.addButton');

@@ -5,7 +5,7 @@
  * Date: 25/07/2018
  * Time: 12:33
  */
-
+global $cfg;
 require_once($cfg['path_bu'] . '/BUContact.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -40,13 +40,12 @@ class CTContactAudit extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "sales",
-        ];
+        $roles = REPORTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(501);
         $this->buContact = new BUContact($this);
         $this->dsContact = new DSForm($this);    // new specialised dataset with form message support
         $this->dsContact->copyColumnsFrom($this->buContact->dbeContact);
@@ -58,21 +57,60 @@ class CTContactAudit extends CTCNC
      */
     function defaultAction()
     {
-        switch ($this->getAction()) {
-            case 'doSearch':
-                echo json_encode(
-                    $this->searchContactAudit(
-                        $this->getParam('customerId'),
-                        $this->getParam('startDate'),
-                        $this->getParam('endDate'),
-                        $this->getParam('firstName'),
-                        $this->getParam('lastName')
-                    )
-                );
-                break;
-            default:
-                $this->displaySearchForm();
+        $i = $this->getAction();
+        if ($i == 'doSearch') {
+            echo json_encode(
+                $this->searchContactAudit(
+                    $this->getParam('customerId'),
+                    $this->getParam('startDate'),
+                    $this->getParam('endDate'),
+                    $this->getParam('firstName'),
+                    $this->getParam('lastName')
+                )
+            );
+        } else {
+            $this->displaySearchForm();
         }
+    }
+
+    private function searchContactAudit($customerID = null,
+                                        $startDate = null,
+                                        $endDate = null,
+                                        $firstName = null,
+                                        $lastName = null
+    )
+    {
+        $test = new DBEJContactAudit($this);
+
+        if ($startDate) {
+            $startDate = DateTime::createFromFormat(
+                DATE_MYSQL_DATE,
+                $startDate
+            );
+        }
+
+        if ($endDate) {
+            $endDate = DateTime::createFromFormat(
+                DATE_MYSQL_DATE,
+                $endDate
+            );
+        }
+
+        $test->search(
+            $customerID,
+            $startDate,
+            $endDate,
+            $firstName,
+            $lastName
+        );
+
+        $result = [];
+
+        while ($test->fetchNext()) {
+            $result[] = $test->getRowAsAssocArray();
+        }
+
+        return $result;
     }
 
     /**
@@ -124,46 +162,5 @@ class CTContactAudit extends CTCNC
             true
         );
         $this->parsePage();
-    }
-
-
-    private function searchContactAudit($customerID = null,
-                                        $startDate = null,
-                                        $endDate = null,
-                                        $firstName = null,
-                                        $lastName = null
-    )
-    {
-        $test = new DBEJContactAudit($this);
-
-        if ($startDate) {
-            $startDate = DateTime::createFromFormat(
-                DATE_MYSQL_DATE,
-                $startDate
-            );
-        }
-
-        if ($endDate) {
-            $endDate = DateTime::createFromFormat(
-                DATE_MYSQL_DATE,
-                $endDate
-            );
-        }
-
-        $test->search(
-            $customerID,
-            $startDate,
-            $endDate,
-            $firstName,
-            $lastName
-        );
-
-        $result = [];
-
-        while ($test->fetchNext()) {
-            $result[] = $test->getRowAsAssocArray();
-        }
-
-        return $result;
     }
 }// end of class

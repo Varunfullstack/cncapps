@@ -26,9 +26,7 @@ class CTManagementReports extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            "reports",
-        ];
+        $roles = REPORTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -76,6 +74,7 @@ class CTManagementReports extends CTCNC
      */
     function SalesByCustomer()
     {
+        $this->setMenuId(505);
         $this->setMethodName('SalesByCustomer');
 
         $this->setTemplateFiles('ManagementReportsSalesCustomer', 'ManagementReportsSalesCustomer.inc');
@@ -231,6 +230,7 @@ class CTManagementReports extends CTCNC
      */
     function spendBySupplier()
     {
+        $this->setMenuId(506);
         $this->setMethodName('spendBySupplier');
 
         $this->setTemplateFiles('ManagementReportsSpendSupplier', 'ManagementReportsSpendSupplier.inc');
@@ -520,6 +520,7 @@ class CTManagementReports extends CTCNC
      */
     function spendByManufacturer()
     {
+        $this->setMenuId(507);
         $this->setMethodName('spendByManufacturer');
 
         $this->setTemplateFiles('ManagementReportsSpendManufacturer', 'ManagementReportsSpendManufacturer.inc');

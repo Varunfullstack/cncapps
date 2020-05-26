@@ -36,14 +36,12 @@ class CTCustomerReviewMeetingsReport extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "sales",
-            "technical"
-        ];
+        $roles = ACCOUNT_MANAGEMENT_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(404);
         $this->buCustomerReviewMeetings = new BUCustomerReviewMeeting($this);
     }
 
@@ -68,7 +66,6 @@ class CTCustomerReviewMeetingsReport extends CTCNC
     {
 
         $this->setPageTitle("Customer Review Meetings");
-
         $this->setTemplateFiles(
             'CustomerReviewMeetings',
             'CustomerReviewMeetingsReport'

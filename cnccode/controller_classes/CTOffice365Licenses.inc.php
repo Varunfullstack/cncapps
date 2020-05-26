@@ -31,10 +31,7 @@ class CTOffice365Licenses extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "maintenance",
-        ];
-        if (!self::hasPermissions($roles)) {
+        if (!self::isSdManager()) {
             Header("Location: /NotAllowed.php");
             exit;
         }

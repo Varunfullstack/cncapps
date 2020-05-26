@@ -29,14 +29,12 @@ class DBEUser extends DBEntity
     const lastName = "lastName";
     const activeFlag = "activeFlag";
     const helpdeskFlag = "helpdeskFlag";
-    const customerID = "customerID";
     const hourlyPayRate = "hourlyPayRate";
     const teamID = "teamID";
     const receiveSdManagerEmailFlag = "receiveSdManagerEmailFlag";
     const changePriorityFlag = "changePriorityFlag";
     const appearInQueueFlag = "appearInQueueFlag";
     const standardDayHours = "standardDayHours";
-    const changeApproverFlag = "changeApproverFlag";
     const admin = 'admin';
     const excludeFromStatsFlag = "excludeFromStatsFlag";
     const changeInitialDateAndTimeFlag = 'changeInitialDateAndTimeFlag';
@@ -199,11 +197,6 @@ class DBEUser extends DBEntity
             'cns_helpdesk_flag'
         ); // does user get overtime in weekdays
         $this->addColumn(
-            self::customerID,
-            DA_ID,
-            DA_ALLOW_NULL
-        );
-        $this->addColumn(
             self::hourlyPayRate,
             DA_FLOAT,
             DA_ALLOW_NULL,
@@ -233,11 +226,6 @@ class DBEUser extends DBEntity
         $this->addColumn(
             self::standardDayHours,
             DA_FLOAT,
-            DA_NOT_NULL
-        );
-        $this->addColumn(
-            self::changeApproverFlag,
-            DA_YN,
             DA_NOT_NULL
         );
         $this->addColumn(
@@ -451,6 +439,18 @@ class DBEUser extends DBEntity
         $sql = "select * from permissions inner join " . $this->getTableName() . " on " . $this->getPKName(
             ) . " = permissions.userID where page = '$page'";
         $this->setQueryString($sql);
+
+        return (parent::getRows());
+    }
+
+    function getActiveWithPermission($permission)
+    {
+        $permission = mysqli_real_escape_string($this->db->link_id(), $permission);
+        $query = "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE activeFlag = 'Y' and cns_perms like '%$permission%' ORDER BY firstName, lastName";
+
+        $this->setQueryString($query);
 
         return (parent::getRows());
     }

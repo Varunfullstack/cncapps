@@ -26,13 +26,12 @@ class CTCreateRenewalSalesOrdersManager extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "sales",
-        ];
-        if (!self::hasPermissions($roles)) {
+
+        if (!$this->isRenewalSalesOrderManager()) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(312);
 
     }
 

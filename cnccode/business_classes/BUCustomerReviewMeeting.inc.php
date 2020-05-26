@@ -13,6 +13,7 @@ use PhpOffice\PhpWord\Settings;
 use PhpOffice\PhpWord\TemplateProcessor;
 use setasign\FpdiProtection\FpdiProtection;
 
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUMail.inc.php");
 require_once($cfg["path_bu"] . "/BUCustomer.inc.php");

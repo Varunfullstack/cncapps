@@ -31,7 +31,7 @@
 ></script>
 {salesOrderLineEditJS} {salesOrderSiteEditJS}
 <script language='JavaScript'>
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         window.fromDate = $('#fromDate').get(0);
         window.toDate = $('#toDate').get(0);
     });
@@ -201,7 +201,7 @@
         <TD width="100px"
             class="navigateLink"
             valign="top"
-        ><a href="#"
+        ><a href="javascript:"
             onclick="customerNotePopup()"
         >{txtCustomerNote}</a></TD>
         <TD width="100px"

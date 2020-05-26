@@ -13,7 +13,7 @@
         }
     }
 
-    $(document).ready(function () {
+    window.addEventListener('DOMContentLoaded', function () {
 
         $('#myTable thead tr').clone(true).appendTo('#myTable thead');
         $('#myTable thead tr:eq(1) th').each(function (i) {

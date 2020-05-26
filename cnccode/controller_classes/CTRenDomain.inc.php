@@ -46,14 +46,12 @@ class CTRenDomain extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "renewals",
-            "technical"
-        ];
+        $roles = RENEWALS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(604);
         $this->buRenDomain = new BURenDomain($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenDomain = new DSForm($this);
@@ -171,7 +169,7 @@ class CTRenDomain extends CTCNC
         $disabled = CTCNC_HTML_DISABLED;
         $declined = null;
         $pricePerMonth = null;
-        if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
+        if ($this->hasPermissions(RENEWALS_PERMISSION)) {
             $readonly = null;
             $disabled = null;
             $declined =

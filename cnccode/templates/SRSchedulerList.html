@@ -129,15 +129,6 @@
         newWindow.document.write(atob(data));
     }
 
-    Mustache.Formatters = {
-        base64Encode: function (value) {
-            if (!value) {
-                return value;
-            }
-
-            return btoa(value);
-        }
-    };
 
     let currentSRScheduler = {
         id: null,
@@ -200,16 +191,6 @@
         };
     }
 
-    $.ajax({
-        url: '?action=getData',
-        method: 'GET',
-        dataType: 'JSON'
-    }).then(function (result) {
-        srSchedulerList = result;
-        drawList();
-    });
-
-    Mustache.tags = ['{%', '%}'];
 
     let editingItem = null;
 
@@ -224,7 +205,28 @@
         return JSON.parse(JSON.stringify(src));
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
+
+        Mustache.Formatters = {
+            base64Encode: function (value) {
+                if (!value) {
+                    return value;
+                }
+
+                return btoa(value);
+            }
+        };
+        $.ajax({
+            url: '?action=getData',
+            method: 'GET',
+            dataType: 'JSON'
+        }).then(function (result) {
+            srSchedulerList = result;
+            drawList();
+        });
+
+        Mustache.tags = ['{%', '%}'];
+
         addButton = $('.addButton');
         saveButton = $('.saveButton');
         cancelButton = $('.cancelButton');

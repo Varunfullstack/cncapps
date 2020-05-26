@@ -110,7 +110,7 @@ class CTDespatch extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_TECHNICAL);
+        $this->checkPermissions(TECHNICAL_PERMISSION);
         switch ($this->getAction()) {
             case CTCNC_ACT_DISPLAY_DESPATCH:
                 $this->displayDespatch();

@@ -1,0 +1,35 @@
+{# @var sideMenu \CNCLTD\SideMenu #}
+{# @var section \CNCLTD\MenuSection #}
+{% for section in sideMenu.sections %}
+    <li class="sub-menu">
+        <a href="javascript:">
+            <i class="fa {{ section.icon }}"
+               data-placement="right"
+               title="{{ section.name }}"
+            >
+
+            </i><span>{{ section.name }}</span>
+            <i class="arrow fa fa-angle-right pull-right"></i>
+        </a>
+        <ul class="children">
+
+            {% for item in section.items %}
+                <li data-menu-id="{{ item.id }}">
+                    <a href="{{ item.href }}"
+                    {% for attrName, attrValue in item.attributes %}
+                        {{ attrName }}="{{ attrValue }}"
+                    {% endfor %}
+                    >
+                    {{ item.label }}
+                    </a>
+                    {#Toggle class far and fa to show outline and solide star icons#}
+                    <a href="#"
+                       class="float-right {{ item.favourite ? 'favourited' : '' }}"
+                       onclick="return toggleFavourite({{ item.id }}, {{ item.favourite ? 'true' : 'false' }})"
+                    ><i class="{{ item.favourite ? 'fa' : '' }} far fa-star"></i>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </li>
+{% endfor %}

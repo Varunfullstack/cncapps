@@ -84,26 +84,4 @@ if ($result['curl_error']) {
 if ($result['http_code'] != 200) {
     die('HTTP Error: ' . $result['http_code']);
 }
-
-
-////we are going to use this to add to the monitoring db
-//$dsn = 'mysql:host=localhost;dbname=cncappsdev';
-//$DB_USER = "webuser";
-//$DB_PASSWORD = "CnC1988";
-//$options = [
-//    PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
-//];
-//$db = new mysqli($dsn, $DB_USER, $DB_PASSWORD, $options);
-
-//$statement = $db->prepare('INSERT INTO taskLog(description, startedAt, finishedAt, maxCpuUsage, maxMemoryUsage) VALUES( :description, :startedAt, :finishedAt, :maxCpuUsage, :maxMemoryUsage ) ');
-//
-//$statement->bindValue(':description', $argv[1]);
-//$statement->bindValue(':startedAt', $start_time);
-//$statement->bindValue(':finishedAt', $end_time);
-//$statement->bindValue(':maxCpuUsage', getCpuUsage());
-//$statement->bindValue(':maxMemoryUsage', memory_get_peak_usage(true));
-//
-//$statement->execute();
-
-
 ?>

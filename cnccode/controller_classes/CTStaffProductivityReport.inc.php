@@ -34,13 +34,12 @@ class CTStaffProductivityReport extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "accounts",
-        ];
+        $roles = SENIOR_MANAGEMENT_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(905);
         $this->BUStaffProductivityReport = new BUStaffProductivityReport ($this);
     }
 

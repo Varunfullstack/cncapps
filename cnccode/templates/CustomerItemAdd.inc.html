@@ -2,7 +2,7 @@
 <script>
 
     const autocompleteURL = "/Customer.php?action=searchName";
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         $('#customerName')[0].addEventListener('autocompleteselect', function ($event) {
             $('#customerID').val($event.detail.item.value);
         });

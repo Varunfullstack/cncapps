@@ -1,5 +1,5 @@
 <script>
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         $('#theTable').DataTable({
             dom: 'Blfrtip',
             buttons: [
@@ -10,7 +10,6 @@
             ],
             paging: false,
             footerCallback: function (tfoot, data, start, end, display) {
-                debugger;
                 var api = this.api();
                 var intVal = function (i) {
                     return typeof i === 'string' ?
@@ -172,7 +171,9 @@
         <td style="text-align:right">
             {serviceDeskUsers}
         </td>
-        <td style="text-align:right" class="{moreThanExpectedClass}">
+        <td style="text-align:right"
+            class="{moreThanExpectedClass}"
+        >
             {supportedUsers}
         </td>
         <td style="text-align:right">

@@ -1,6 +1,6 @@
 <!-- Template: ContractsAnalysisReport.inc.html -->
 <script>
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
             $('#customerID').val($event.detail.item.value);
         });

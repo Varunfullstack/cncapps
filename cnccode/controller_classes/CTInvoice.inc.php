@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_bu'] . '/BUInvoice.inc.php');
 require_once($cfg['path_bu'] . '/BUPDFInvoice.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -172,13 +173,12 @@ class CTInvoice extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "sales",
-        ];
+        $roles = ACCOUNTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(701);
         $this->buInvoice = new BUInvoice($this);
         $this->dsInvline = new DSForm($this);
         $this->dsInvline->copyColumnsFrom($this->buInvoice->dbeJInvline);
@@ -192,7 +192,7 @@ class CTInvoice extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_SALES);
+        $this->checkPermissions(SALES_PERMISSION);
         switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:
                 $this->search();
@@ -950,6 +950,7 @@ class CTInvoice extends CTCNC
      */
     function invoiceReprint()
     {
+        $this->setMenuId(704);
         $this->setMethodName('invoiceReprint');
         $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
@@ -1078,20 +1079,19 @@ class CTInvoice extends CTCNC
     function deleteInvoice()
     {
         $this->setMethodName('deleteInvoice');
-        $dsInvhead = new DataSet($this);
         $this->buInvoice->getInvoiceHeaderByID(
             $this->getParam('invheadID'),
-            $dsInvhead
+            $this->dsInvhead
         );
         $this->buInvoice->deleteInvoice($this->getParam('invheadID'));
-        if ($dsInvhead->getValue(DBEInvhead::ordheadID)) {
-            if ($this->buInvoice->countInvoicesByOrdheadID($dsInvhead->getValue(DBEInvhead::ordheadID)) > 0) {
+        if ($this->dsInvhead->getValue(DBEInvhead::ordheadID)) {
+            if ($this->buInvoice->countInvoicesByOrdheadID($this->dsInvhead->getValue(DBEInvhead::ordheadID)) > 0) {
                 $urlNext =                        // there is still one or more invoices so display it/them
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
                         array(
                             'action'    => CTCNC_ACT_SEARCH,
-                            'ordheadID' => $dsInvhead->getValue(DBEInvhead::ordheadID)
+                            'ordheadID' => $this->dsInvhead->getValue(DBEInvhead::ordheadID)
                             // if this is set then will show
                         )                                                                                                                    // remaining invoices for SO
                     );
@@ -1101,7 +1101,7 @@ class CTInvoice extends CTCNC
                         CTCNC_PAGE_SALESORDER,
                         array(
                             'action'    => CTCNC_ACT_DISP_SALESORDER,
-                            'ordheadID' => $dsInvhead->getValue(DBEInvhead::ordheadID)
+                            'ordheadID' => $this->dsInvhead->getValue(DBEInvhead::ordheadID)
                         )
                     );
             }
@@ -1314,7 +1314,7 @@ class CTInvoice extends CTCNC
                 true
             );
         }
-    }// end function invoiceLineForm()
+    }
 
     /**
      * Update/Insert order line
@@ -1409,7 +1409,7 @@ class CTInvoice extends CTCNC
             $this->getParam('sequenceNo')
         );
         $this->redirectToDisplay($this->getParam('invheadID'));
-    }
+    }// end function invoiceLineForm()
 
     /**
      * Move order line down
@@ -1495,7 +1495,7 @@ class CTInvoice extends CTCNC
     function printUnprinted()
     {
         $this->setMethodName('printUnprinted');
-
+        $this->setMenuId(703);
 
         $urlSubmit = Controller::buildLink(
             $_SERVER['PHP_SELF'],
@@ -1586,8 +1586,8 @@ class CTInvoice extends CTCNC
             $this->setFormErrorOn();
             $this->printUnprinted(); //redisplay with errors
         }
-
-        if ($list = $this->buInvoice->getCustomersWithoutInvoiceContact()) {
+        $list = $this->buInvoice->getCustomersWithoutInvoiceContact();
+        if (count($list)) {
 
             $this->setFormErrorMessage(
                 'These customers have no invoice contact set: ' . implode(

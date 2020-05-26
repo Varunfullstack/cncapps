@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg ['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg ['path_bu'] . '/BUMail.inc.php');
@@ -34,16 +35,11 @@ class CTServiceRequestsByCustomerReport extends CTCNC
             $cookieVars,
             $cfg
         );
-
         if (!$this->isUserSDManager()) {
-            $roles = [
-                "reports",
-            ];
-            if (!self::hasPermissions($roles)) {
-                Header("Location: /NotAllowed.php");
-                exit;
-            }
+            Header("Location: /NotAllowed.php");
+            exit;
         }
+        $this->setMenuId(213);
         $this->buActivity = new BUActivity($this);
     }
 
@@ -67,8 +63,10 @@ class CTServiceRequestsByCustomerReport extends CTCNC
         }
     }
 
-function email()
+    function email()
     {
+        var_dump('test');
+        exit;
         $this->setMethodName('email');
         $dsSearchForm = $this->initialiseSearchForm();
         $days = $this->getParam('days');

@@ -6,6 +6,7 @@
 <script language='JavaScript'>
     window.callActivityID = "{callActivityID}";
     window.problemID = "{problemID}";
+    let internalNotes;
     let submitAsOvertimeCheckbox;
 
     function gatherEscalationReason() {
@@ -56,7 +57,18 @@
     }
 
     const authorisedByName = "{authorisedByName}";
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
+
+        reason = CKEDITOR.replace('reason', {
+                customConfig: '/ckeditor_config.js'
+            }
+        );
+
+        internalNotes = CKEDITOR.replace('internalNotes',
+            {
+                customConfig: '/ckeditor_config.js'
+            }
+        );
         submitAsOvertimeCheckbox = $('input[name="callActivity[1][submitAsOvertime]"]');
         window.alarmDate = $('#alarmDate').get(0);
 
@@ -797,12 +809,6 @@
         </tr>
         <tr>
             <td colspan="4"><textarea name="reason">{reason}</textarea>
-                <script type="text/javascript">
-                    reason = CKEDITOR.replace('reason', {
-                            customConfig: '/ckeditor_config.js'
-                        }
-                    );
-                </script>
             </td>
         </tr>
         {htmlInternalNotes}
@@ -1004,7 +1010,7 @@
     }
 
 
-    $(document).ready(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         // run the first time; all subsequent calls will take care of themselves
         timeout = setTimeout(autoSave, 10000); // 10 seconds
 

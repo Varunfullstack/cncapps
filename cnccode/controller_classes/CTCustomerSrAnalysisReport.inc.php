@@ -37,14 +37,10 @@ class CTCustomerSrAnalysisReport extends CTCNC
             $cfg
         );
         if (!$this->isUserSDManager()) {
-            $roles = [
-                "reports",
-            ];
-            if (!self::hasPermissions($roles)) {
-                Header("Location: /NotAllowed.php");
-                exit;
-            }
+            Header("Location: /NotAllowed.php");
+            exit;
         }
+        $this->setMenuId(212);
         $this->buCustomerSrAnalysisReport = new BUCustomerSrAnalysisReport ($this);
     }
 

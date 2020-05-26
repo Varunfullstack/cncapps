@@ -3,7 +3,7 @@
         src="CommonJS.js"
 ></script>
 <script language='JavaScript'>
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         window.dateClosed = $('#dateClosed').get(0);
     });
     var state = 'none'; // display status
@@ -215,7 +215,7 @@
     </tr>
 </table>
 <BR>
-<A href="#"
+<A href="javascript:"
    onClick="javascript:SC_toggleDisplayAll();return false;"
 >[show/hide all actvity]</A> <A
         href="{urlCreateActivity}"

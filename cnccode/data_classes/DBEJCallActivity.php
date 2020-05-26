@@ -543,9 +543,9 @@ class DBEJCallActivity extends DBECallActivity
         }
 
         if ($descendingDate) {
-            $query .= " ORDER BY caa_date DESC,caa_starttime DESC, caa_callacttypeno = 51";
+            $query .= " ORDER BY caa_callacttypeno = 51 asc, caa_date DESC,caa_starttime DESC";
         } else {
-            $query .= " ORDER BY caa_date, caa_starttime,  caa_callacttypeno = 51 desc";
+            $query .= " ORDER BY caa_callacttypeno = 51 desc ,caa_date, caa_starttime";
         }
 
         $this->setQueryString($query);

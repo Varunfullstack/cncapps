@@ -12,7 +12,7 @@
         google.charts.setOnLoadCallback(resolve);
     });
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
             $('#customerID').val($event.detail.item.value);
             customerIDChanged($event.detail.item.value);

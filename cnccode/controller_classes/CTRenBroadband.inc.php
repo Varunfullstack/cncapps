@@ -38,14 +38,12 @@ class CTRenBroadband extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "renewals",
-            "technical"
-        ];
+        $roles = RENEWALS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(603);
         $this->buRenBroadband = new BURenBroadband($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenBroadband = new DSForm($this);
@@ -149,7 +147,7 @@ class CTRenBroadband extends CTCNC
         $disabled = CTCNC_HTML_DISABLED;
         $readonly = CTCNC_HTML_READONLY;
 
-        if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
+        if ($this->hasPermissions(RENEWALS_PERMISSION)) {
             $disabled = null;
             $readonly = null;
             $pricePerMonth =

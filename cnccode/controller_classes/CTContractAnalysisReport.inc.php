@@ -37,13 +37,12 @@ class CTContractAnalysisReport extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "accounts",
-        ];
+        $roles = REPORTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(511);
         $this->buContractAnalysisReport = new BUContractAnalysisReport ($this);
     }
 

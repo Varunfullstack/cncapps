@@ -186,7 +186,6 @@ class CTCustomer extends CTCNC
         );
         $roles = [
             "sales",
-            "reports",
             "technical"
         ];
 
@@ -194,6 +193,8 @@ class CTCustomer extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+
+        $this->setMenuId(303);
         $this->buCustomer = new BUCustomer($this);
         $this->dsContact = new DataSet($this);
         $this->dsContact->copyColumnsFrom($this->buCustomer->dbeContact);
@@ -285,7 +286,6 @@ class CTCustomer extends CTCNC
 
     function setContact(&$contactArray)
     {
-        var_dump('set contact called');
         if (!is_array(
             $contactArray
         )) {          // For some reason the dynamically generated call to setContact from retrieveHTMLVars does not
@@ -965,6 +965,7 @@ class CTCustomer extends CTCNC
                 $this->displayReviewList();
                 break;
             case CTCUSTOMER_ACT_SEARCH:
+
                 $this->search();
                 break;
             case CTCUSTOMER_ACT_ADDCUSTOMER:
@@ -985,18 +986,6 @@ class CTCustomer extends CTCNC
                 break;
             case CTCUSTOMER_ACT_DISP_CUST_POPUP:
                 $this->displayCustomerSelectPopup();
-                break;
-            case 'display24HourSupportCustomers':
-                $this->display24HourSupportCustomers();
-                break;
-            case 'displaySpecialAttentionCustomers':
-                $this->displaySpecialAttentionCustomers();
-                break;
-            case 'displayContractAndNumbersReport':
-                $this->displayContractAndNumbersReport();
-                break;
-            case 'csvContractAndNumbersReport':
-                $this->csvContractAndNumbersReport();
                 break;
             case 'saveContactPassword':
                 $response = [];
@@ -1802,7 +1791,7 @@ class CTCustomer extends CTCNC
                 'deleteCustomerText'             => $deleteCustomerText,
                 'cancelURL'                      => $cancelURL,
                 'disabled'                       => $this->hasPermissions(
-                    PHPLIB_PERM_SALES
+                    SALES_PERMISSION
                 ) ? null : CTCNC_HTML_DISABLED,
                 'gscTopUpAmount'                 => $this->dsCustomer->getValue(DBECustomer::gscTopUpAmount),
                 'noOfServers'                    => $this->dsCustomer->getValue(DBECustomer::noOfServers),
@@ -3200,460 +3189,6 @@ class CTCustomer extends CTCNC
         $this->parsePage();
     }
 
-    /**
-     * Displays list of customers with 24 Hour Support
-     *
-     * @throws Exception
-     */
-    function display24HourSupportCustomers()
-    {
-        $this->setMethodName('display24HourSupportCustomers');
-
-        $this->setPageTitle("24 Hour Support Customers");
-        $dsCustomer = new DataSet($this);
-        if ($this->buCustomer->get24HourSupportCustomers($dsCustomer)) {
-
-            $this->setTemplateFiles(
-                'Customer24HourSupport',
-                'Customer24HourSupport.inc'
-            );
-
-            $this->template->set_block(
-                'Customer24HourSupport',
-                'customerBlock',
-                'customers'
-            );
-
-            while ($dsCustomer->fetchNext()) {
-
-                $linkURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => 'dispEdit',
-                            'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
-                        )
-                    );
-
-
-                $this->template->set_var(
-                    array(
-                        'customerName' => $dsCustomer->getValue(DBECustomer::name),
-                        'linkURL'      => $linkURL
-                    )
-                );
-
-                $this->template->parse(
-                    'customers',
-                    'customerBlock',
-                    true
-                );
-
-            }
-
-            $this->template->parse(
-                'CONTENTS',
-                'Customer24HourSupport',
-                true
-            );
-
-        } else {
-
-            $this->setTemplateFiles(
-                'SimpleMessage',
-                'SimpleMessage.inc'
-            );
-            $this->template->set_var(
-                'message',
-                'There are no 24 Hour Support customers'
-            );
-        }
-
-        $this->parsePage();
-
-        exit;
-    }
-
-    /**
-     * Displays list of customers with Special Attention flag set
-     *
-     * @throws Exception
-     */
-    function displaySpecialAttentionCustomers()
-    {
-        $this->setMethodName('displaySpecialAttentionCustomers');
-
-        $this->setPageTitle("Special Attention Customers");
-        global $cfg;
-        $customerTemplate = new Template (
-            $cfg["path_templates"],
-            "remove"
-        );
-
-        $contactTemplate = new Template(
-            $cfg["path_templates"],
-            "remove"
-        );
-
-
-        $this->setTemplateFiles(
-            'SpecialAttention',
-            'SpecialAttention'
-        );
-
-        $buContact = new BUContact($this);
-        $dsContact = new DataSet($this);
-        if ($buContact->getSpecialAttentionContacts($dsContact)) {
-            $contactTemplate->setFile(
-                'ContactSpecialAttention',
-                'ContactSpecialAttention.html'
-            );
-
-            $contactTemplate->set_block(
-                'ContactSpecialAttention',
-                'contactBlock',
-                'contacts'
-            );
-            $dbeCustomer = new DBECustomer($this);
-            while ($dsContact->fetchNext()) {
-
-                $linkURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => 'dispEdit',
-                            'customerID' => $dsContact->getValue(DBEContact::customerID)
-                        )
-                    );
-
-                if ($dbeCustomer->getValue(DBECustomer::customerID) != $dsContact->getValue(DBEContact::customerID)) {
-                    $dbeCustomer->getRow($dsContact->getValue(DBEContact::customerID));
-                }
-
-                $contactTemplate->set_var(
-                    array(
-                        'contactName'  => ($dsContact->getValue(DBEContact::firstName) . " " . $dsContact->getValue(
-                                DBEContact::lastName
-                            )),
-                        'linkURL'      => $linkURL,
-                        'customerName' => $dbeCustomer->getValue(DBECustomer::name)
-                    )
-                );
-
-                $contactTemplate->parse(
-                    'contacts',
-                    'contactBlock',
-                    true
-                );
-
-            }
-
-            $contactTemplate->parse(
-                'OUTPUT',
-                'ContactSpecialAttention',
-                true
-            );
-
-
-        } else {
-            $contactTemplate->setFile(
-                'SimpleMessage',
-                'SimpleMessage.inc.html'
-            );
-
-            $contactTemplate->set_var(array('message' => 'There are no special attention contacts'));
-
-            $contactTemplate->parse(
-                'OUTPUT',
-                'SimpleMessage',
-                true
-            );
-        };
-        $dsCustomer = new DataSet($this);
-        if ($this->buCustomer->getSpecialAttentionCustomers($dsCustomer)) {
-
-
-            $customerTemplate->setFile(
-                'CustomerSpecialAttention',
-                'CustomerSpecialAttention.inc.html'
-            );
-
-            $customerTemplate->set_block(
-                'CustomerSpecialAttention',
-                'customerBlock',
-                'customers'
-            );
-
-            while ($dsCustomer->fetchNext()) {
-
-                $linkURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => 'dispEdit',
-                            'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
-                        )
-                    );
-
-
-                $customerTemplate->set_var(
-                    array(
-                        'customerName'            => $dsCustomer->getValue(DBECustomer::name),
-                        'specialAttentionEndDate' => $dsCustomer->getValue(DBECustomer::specialAttentionEndDate),
-                        'linkURL'                 => $linkURL
-                    )
-                );
-
-                $customerTemplate->parse(
-                    'customers',
-                    'customerBlock',
-                    true
-                );
-
-            }
-
-            $customerTemplate->parse(
-                'OUTPUT',
-                'CustomerSpecialAttention',
-                true
-            );
-
-        } else {
-
-            $customerTemplate->setFile(
-                'SimpleMessage',
-                'SimpleMessage.inc.html'
-            );
-
-            $customerTemplate->set_var(array('message' => 'There are no special attention customers'));
-
-            $customerTemplate->parse(
-                'OUTPUT',
-                'SimpleMessage',
-                true
-            );
-        }
-
-        $this->template->setVar(
-            [
-                "customerSpecialAttention" => $customerTemplate->getVar('OUTPUT'),
-                "contactSpecialAttention"  => $contactTemplate->getVar('OUTPUT')
-            ]
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'SpecialAttention'
-        );
-
-        $this->parsePage();
-
-        exit;
-    }
-
-    /**
-     * @throws Exception
-     */
-    function displayContractAndNumbersReport()
-    {
-
-        $this->setPageTitle("Service Contracts Ratio");
-
-        $this->setTemplateFiles(
-            'ContractAndNumbersReport',
-            'ContractAndNumbersReport'
-        );
-
-
-        $db = $this->getContractAndNumberData();
-
-
-        $this->template->set_block(
-            'ContractAndNumbersReport',
-            'contractItemBlock',
-            'contracts'
-        );
-
-        while ($db->next_record()) {
-            $row = $db->Record;
-            $this->template->set_var(
-                array(
-                    'customerName'                => $row["customerName"],
-                    'serviceDeskProduct'          => $row['serviceDeskProduct'],
-                    'serviceDeskUsers'            => $row['serviceDeskUsers'],
-                    'serviceDeskContract'         => $row['serviceDeskContract'],
-                    'serviceDeskCostPerUserMonth' => $row['serviceDeskCostPerUserMonth'],
-                    'serverCareProduct'           => $row['serverCareProduct'],
-                    'virtualServers'              => $row['virtualServers'],
-                    'physicalServers'             => $row['physicalServers'],
-                    'serverCareContract'          => $row['serverCareContract'],
-                    'supportedUsers'              => $row['supportedUsers'],
-                    'moreThanExpectedClass'       => $row['moreUsersThanExpected'] ? "red" : null
-
-                )
-            );
-
-            $this->template->parse(
-                'contracts',
-                'contractItemBlock',
-                true
-            );
-        }
-
-
-        $this->template->parse(
-            'CONTENTS',
-            'ContractAndNumbersReport',
-            true
-        );
-
-
-        $this->parsePage();
-
-        exit;
-    }
-
-    private function getContractAndNumberData()
-    {
-        global $db; //PHPLib DB object
-
-
-        $queryString =
-            "SELECT
-  `cus_custno`,
-  cus_name AS customerName,
-  serviceDeskProduct,
-  COALESCE(serviceDeskUsers,0) AS serviceDeskUsers,
-  COALESCE(serviceDeskContract,0) AS serviceDeskContract,
-  COALESCE(serviceDeskCostPerUserMonth,0) AS serviceDeskCostPerUserMonth,
-  serverCareProduct,
-  COALESCE(virtualServers,0) AS virtualServers,
-  COALESCE(physicalServers,0) AS physicalServers,
-  COALESCE(serverCareContract,0) AS serverCareContract,
-  concat('M ',coalesce(mainCount, 0),', SV ',coalesce(supervisorCount,0),', S ', coalesce(supportCount, 0),', D ', coalesce(delegateCount, 0),', T ', coalesce(totalCount, 0)) as supportedUsers,
-  totalCount > serviceDeskUsers as moreUsersThanExpected 
-FROM
-  customer
-  LEFT JOIN
-  (SELECT
-     `cui_custno`                      AS customerId,
-     itm_desc                          AS serviceDeskProduct,
-     sum(custitem.`cui_users`)              AS serviceDeskUsers,
-     sum(round(custitem.cui_sale_price, 0)) AS serviceDeskContract,
-     sum(ROUND(
-         custitem.cui_sale_price / custitem.cui_users / 12,
-         2
-     ))                                 AS serviceDeskCostPerUserMonth
-   FROM
-     custitem
-     LEFT JOIN item
-       ON item.`itm_itemno` = custitem.`cui_itemno`
-   WHERE itm_desc LIKE '%servicedesk%'
-         AND itm_discontinued <> 'Y'
-         AND custitem.`declinedFlag` <> 'Y' 
-      group by custitem.`cui_custno` 
-      ) AS test1
-    ON test1.customerId = customer.`cus_custno`
-  LEFT JOIN
-  (SELECT
-  custitem.`cui_custno` AS customerId,
-  item.`itm_desc` as serverCareProduct,
-  SUM(
-    ROUND(custitem.`cui_sale_price`, 0)
-  ) AS serverCareContract,
-  SUM(physicalServers) AS physicalServers,
-  SUM(virtualServers) AS virtualServers
-FROM
-  custitem
-  LEFT JOIN item
-    ON item.`itm_itemno` = custitem.`cui_itemno`
-  LEFT JOIN
-    (SELECT
-      custitem_contract.cic_contractcuino,
-      SUM(
-        serverItem.`itm_desc` NOT LIKE '%virtual%'
-      ) AS physicalServers,
-      SUM(
-        serverItem.`itm_desc` LIKE '%virtual%'
-      ) AS virtualServers
-    FROM
-      custitem_contract
-      LEFT JOIN custitem AS servers
-        ON custitem_contract.`cic_cuino` = servers.cui_cuino
-      LEFT JOIN item AS serverItem
-        ON servers.cui_itemno = serverItem.`itm_itemno`
-    GROUP BY custitem_contract.cic_contractcuino) b
-    ON b.`cic_contractcuino` = cui_cuino
-WHERE item.`itm_desc` LIKE '%servercare%'
-  AND item.itm_discontinued <> 'Y'
-  AND custitem.`declinedFlag` <> 'Y'
-GROUP BY custitem.`cui_custno`) test2
-    ON customer.cus_custno = test2.customerId
-left join (
-    select 
-  contact.`con_custno`,
-  sum(contact.`supportLevel` = 'main') as mainCount,
-  SUM(
-    contact.`supportLevel` = 'supervisor'
-  ) AS supervisorCount,
-  SUM(
-    contact.`supportLevel` = 'support'
-  ) AS supportCount,
-  SUM(
-    contact.`supportLevel` = 'delegate'
-  ) AS delegateCount,
-  sum(1) as totalCount 
-from
-  contact 
-where supportLevel is not null 
-GROUP BY con_custno 
-) supportUsers on supportUsers.con_custno = customer.cus_custno
-WHERE serviceDeskProduct IS NOT NULL OR serverCareProduct IS NOT NULL
-ORDER BY cus_name ASC   ";
-
-        $db->query($queryString);
-        return $db;
-    }
-
-    function csvContractAndNumbersReport()
-    {
-        $csv_export = '';
-        $db = $this->getContractAndNumberData();
-
-        $headersSet = false;
-
-        while ($db->next_record()) {
-            $row = $db->Record;
-            if (!$headersSet) {
-                foreach (array_keys($row) as $key) {
-                    if (!is_numeric($key)) {
-                        $csv_export .= $key . ';';
-                    }
-                }
-            }
-            $this->template->set_var(
-                array(
-                    'customerName'                => $row["customerName"],
-                    'serviceDeskProduct'          => $row['serviceDeskProduct'],
-                    'serviceDeskUsers'            => $row['serviceDeskUsers'],
-                    'serviceDeskContract'         => $row['serviceDeskContract'],
-                    'serviceDeskCostPerUserMonth' => $row['serviceDeskCostPerUserMonth'],
-                    'serverCareProduct'           => $row['serverCareProduct'],
-                    'virtualServers'              => $row['virtualServers'],
-                    'physicalServers'             => $row['physicalServers'],
-                    'serverCareContract'          => $row['serverCareContract']
-
-                )
-            );
-
-            $this->template->parse(
-                'contracts',
-                'contractItemBlock',
-                true
-            );
-
-        }
-    } // end siteDropdown
 
     /**
      * @return bool

@@ -197,7 +197,7 @@ class CTCurrentActivityReport extends CTCNC
                 $this->changeQueue();
                 break;
             case 'deleteCustomerRequest':
-                $this->checkPermissions(PHPLIB_PERM_TECHNICAL);
+                $this->checkPermissions(TECHNICAL_PERMISSION);
                 $this->deleteCustomerRequest();
                 break;
             case 'pendingReopenedPopup':
@@ -426,7 +426,7 @@ class CTCurrentActivityReport extends CTCNC
     {
 
         $this->setMethodName('displayReport');
-
+        $this->template->setVar("menuId", 103);
         unset($this->customerFilterList);   // for the customer filter drop-down (limited to customers with SRs)
 
         $this->setTemplateFiles(
@@ -1086,9 +1086,9 @@ class CTCurrentActivityReport extends CTCNC
             /* ------------------------------ */
 
             $urlCustomer = Controller::buildLink(
-                'SalesOrder.php',
+                'Customer.php',
                 array(
-                    'action'     => 'search',
+                    'action'     => 'dispEdit',
                     'customerID' => $serviceRequests->getValue(DBEJProblem::customerID)
                 )
             );

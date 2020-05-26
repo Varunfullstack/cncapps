@@ -82,7 +82,10 @@
         </table>
     </script>
     <script>
-        Mustache.tags = ['{%', '%}'];
+        window.addEventListener('DOMContentLoaded', function () {
+            Mustache.tags = ['{%', '%}'];
+        })
+
         const isDashboard = {isDashboard};
         const amberThreshold = {amberThreshold};
         const redThreshold = {redThreshold};
@@ -136,7 +139,7 @@
         }
 
         if (isDashboard) {
-            $(document).ready(function () {
+            window.addEventListener('DOMContentLoaded', function () {
                 $('#dashboard').show();
 
                 $('#selectDaysSelector').val(currentURL.searchParams.get('daysAgo'));

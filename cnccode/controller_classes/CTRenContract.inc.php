@@ -54,14 +54,12 @@ class CTRenContract extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "renewals",
-            "technical"
-        ];
+        $roles = RENEWALS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(602);
         $this->buRenContract = new BURenContract($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenContract = new DSForm($this);
@@ -232,7 +230,7 @@ class CTRenContract extends CTCNC
 
         $disabled = 'DISABLED';
         $readonly = 'READONLY';
-        if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
+        if ($this->hasPermissions(RENEWALS_PERMISSION)) {
             $readonly = null;
             $disabled = null;
         }

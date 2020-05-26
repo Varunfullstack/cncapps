@@ -238,6 +238,7 @@
 ></script>
 <div id="newPasswordDialog"
      title="New Password"
+     style="display: none"
 >
     <fieldset id="register">
         <legend></legend>
@@ -789,7 +790,7 @@
         }
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         checkIsProspect();
     })
 
@@ -894,12 +895,6 @@
         });
     }
 
-    $('#newPasswordDialog').dialog({
-        autoOpen: false, width: 500, close: function () {
-            resetPasswordFields();
-        }
-    });
-
 
     function askNewPassword() {
         const data = $(event.target).data();
@@ -917,7 +912,13 @@
 
     let validatingContactsModal;
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
+
+        $('#newPasswordDialog').dialog({
+            autoOpen: false, width: 500, close: function () {
+                resetPasswordFields();
+            }
+        });
 
         validatingContactsModal = $('#validatingContactsModal').dialog({
             autoOpen: false, width: 500, modal: true, dialogClass: 'no-close', position: {my: 'top', at: 'top'}
@@ -1580,7 +1581,7 @@
 
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         loadNote('first');
     })
     //-->
@@ -1662,6 +1663,7 @@
            onClick="document.location='{cancelURL}';"
     >
     <button type="button"
+            {disabled}
             onclick="setContactsToNoneAndReferCustomer()"
     >
         Set all users to no support
@@ -2139,7 +2141,7 @@
                         <button type="button"
                                 onclick="editEncrypted('sortCode',this)"
                         >
-                            <i class="fa fa-pencil {sortCodePencilColor}">
+                            <i class="fa fa-pencil-alt {sortCodePencilColor}">
                             </i>
                         </button>
                         <input type="hidden"
@@ -2168,7 +2170,7 @@
                         <button type="button"
                                 onclick="editEncrypted('accountNumber',this)"
                         >
-                            <i class="fa fa-pencil {accountNumberPencilColor}">
+                            <i class="fa fa-pencil-alt {accountNumberPencilColor}">
                             </i>
                         </button>
                         <input type="hidden"
@@ -2645,6 +2647,7 @@
                             class="content"
                         >
                             <button type="button"
+                                    {disabled}
                                     onclick="addContact({siteNo})"
                             >
                                 Add Contact
@@ -2944,6 +2947,7 @@
                         >
                         <div class="contactClear">
                             <button type="button"
+                                    {disabled}
                                     onclick="clearRow({contactID})"
                             >
                                 <i class="fa fa-trash-o"></i>
@@ -2956,6 +2960,7 @@
                             <select name="form[contact][{contactID}][siteNo]"
                                     data-validation="required"
                                     data-type="site"
+                                    {disabled}
                             >
                                 <!-- BEGIN selectSiteBlock -->
                                 <option {siteSelected}
@@ -3062,7 +3067,7 @@
                     <td>
                         <div class="contactSupportLevel">
 
-                            <select name="form[contact][{contactID}][supportLevel]"
+                            <select name="form[contact][{contactID}][supportLevel]" {disabled}
                                     data-validation="atLeastOneMain"
                                     data-type="mainSelector"
                                     data-except="$('#referred').prop('checked') || isProspect()"
@@ -3081,7 +3086,7 @@
                     <td class="center ">
                         <div class="contactPassword">
 
-                            <button onclick="askNewPassword()"
+                            <button onclick="askNewPassword()" {disabled}
                                     data-contact-id="{contactID}"
                                     type="button"
                                     class="{portalPasswordButtonClass}"
@@ -3464,9 +3469,11 @@
         <input name="Button"
                type="button"
                value="Cancel"
+               {disabled}
                onClick="document.location='{cancelURL}';"
         >
         <button type="button"
+                {disabled}
                 onclick="setContactsToNoneAndReferCustomer()"
         >
             Set all users to no support

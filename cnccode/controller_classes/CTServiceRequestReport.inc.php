@@ -33,14 +33,10 @@ class CTServiceRequestReport extends CTCNC
             $cfg
         );
         if (!$this->isUserSDManager()) {
-            $roles = [
-                "reports",
-            ];
-            if (!self::hasPermissions($roles)) {
-                Header("Location: /NotAllowed.php");
-                exit;
-            }
+            Header("Location: /NotAllowed.php");
+            exit;
         }
+        $this->setMenuId(211);
         $this->buServiceRequestReport = new BUServiceRequestReport ($this);
     }
 

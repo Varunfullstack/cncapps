@@ -126,9 +126,6 @@
         });
     }
 
-    fetchData();
-    Mustache.tags = ['{%', '%}'];
-
     let editingItem = null;
 
     function drawList() {
@@ -142,13 +139,14 @@
         return JSON.parse(JSON.stringify(src));
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         addButton = $('.addButton');
         saveButton = $('.saveButton');
         cancelButton = $('.cancelButton');
         detail = $('.detail');
         list = $('.list');
-        drawList();
+        fetchData();
+        Mustache.tags = ['{%', '%}'];
         cancelEdit();
         list.on('click', '.editButton', function () {
             $elm = $(this);

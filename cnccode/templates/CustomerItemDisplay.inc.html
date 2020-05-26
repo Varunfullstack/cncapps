@@ -6,7 +6,7 @@
 <script language='JavaScript'>
 
     const autocompleteURL = "/Customer.php?action=searchName";
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         window.secondsiteValidationSuspendUntilDate = $('#secondsiteValidationSuspendUntilDate').get(0);
         window.sOrderDate = $('#sOrderDate').get(0);
         $('#customerName')[0].addEventListener('autocompleteselect', function ($event) {
@@ -495,7 +495,7 @@
 </tr>
 </table>
 <script type="text/javascript">
-    $(document).ready(function () {
+    window.addEventListener('DOMContentLoaded', function () {
 
         const backupPermission = {offsiteBackupDelayDisable};
 

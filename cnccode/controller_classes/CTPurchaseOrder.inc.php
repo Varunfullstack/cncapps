@@ -139,6 +139,7 @@ class CTPurchaseOrder extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(302);
         $this->buPurchaseOrder = new BUPurchaseOrder($this);
         $this->dsPorhead = new DSForm($this);
         $this->dsPorline = new DSForm($this);
@@ -152,7 +153,7 @@ class CTPurchaseOrder extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_SALES);
+        $this->checkPermissions(SALES_PERMISSION);
         switch ($this->getAction()) {
             case CTCNC_ACT_GENERATE_POS_FROM_SO:
                 $this->generateFromSO();

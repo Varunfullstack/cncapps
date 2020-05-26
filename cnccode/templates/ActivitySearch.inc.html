@@ -4,19 +4,14 @@
     var state = 'none'; // display status
     var savedCustomerString;
 
-    function saveCustomerString() {
-        savedCustomerString = document.getElementById("customerString").value
-    }
-
-    renderContracts();
-
-    $(function () {
-        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
-            $('#customerID').val($event.detail.item.value);
+    window.addEventListener('DOMContentLoaded', function () {
+        renderContracts();
+        const customerIDInput = document.getElementById('customerID');
+        document.getElementById('customerString').addEventListener('autocompleteselect', function ($event) {
+            customerIDInput.value = $event.detail.item.value;
             renderContracts();
         });
-    });
-
+    })
 
     function renderContracts() {
         $('#contractSelector').html("<option value='99'>All</option><option value=''>T &amp; M</option>");
@@ -55,7 +50,6 @@
             document.searchForm.submit();
         }
     }
-
 
     function checkAll() {
         for (var i = 0; i < document.searchForm.elements.length; i++) {

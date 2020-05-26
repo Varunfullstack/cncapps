@@ -1,0 +1,56 @@
+{% extends "@internal/wrapper.html.twig" %}
+{% block title %}
+    Questionnaire Report
+{% endblock %}
+{% block content %}
+    <H3>
+        <strong>Questionnaire Report {{ period }} - {{ questionnaireDescription }}</strong>
+    </h3>
+    <hr/>
+    {% for rating in ratings %}
+        <p>
+            <strong>{{ rating.questionDescription }} ({{ rating.ratingTotal }} responses)</strong>
+        </p>
+        <img src="http://chart.apis.google.com/chart?cht=p3&chd=t:{{ rating.rating1Percent }},{{ rating.rating2Percent }},{{ rating.rating3Percent }},{{ rating.rating4Percent }},{{ rating.rating5Percent }}&chdl=1 {{ rating.rating1Description }}|2|3|4|5 {{ rating.rating5Description }}&chs=550x200&chl={{ rating.rating1Percent }}|{{ rating.rating2Percent }}|{{ rating.rating3Percent }}|{{ rating.rating4Percent }}|{{ rating.rating5Percent }}&chco=FF9E59|E0C253|D2E67A|729E4C|3DBA7E|20C7C7|6B8FD6|4C3A91|7250F2|9E29C4|E872B9|A3020F|382F26"
+             alt="chart"
+        />
+        <hr/>
+    {% endfor %}
+    <BR>
+    {% for yesNoQuestion in yesNoQuestions %}
+        <p>
+            <strong>{{ yesNoQuestion.questionDescription }} ({{ yesNoQuestion.ynTotal }} responses)</strong>
+        </p>
+        <img src="http://chart.apis.google.com/chart?cht=p3&chd=t:{{ yesNoQuestion.yesPercent }},{{ yesNoQuestion.noPercent }}&chdl=Yes|No&chs=550x200&chl={{ yesNoQuestion.yesPercent }}|{{ yesNoQuestion.noPercent }}&chco=FF9E59|E0C253|D2E67A|729E4C|3DBA7E|20C7C7|6B8FD6|4C3A91|7250F2|9E29C4|E872B9|A3020F|382F26"
+             alt="chart"
+        />
+        <hr/>
+    {% endfor %}
+    <BR>
+    {% for multiChoiceQuestion in multiChoiceQuestions %}
+        <p><strong>{{ multiChoiceQuestion.questionDescription }} ({{ multiChoiceQuestion.multiChoiceTotal }}
+                responses)</strong>
+        </p>
+        <img src="http://chart.apis.google.com/chart?cht=p3&chd=t:{{ multiChoiceQuestion.multiChoiceValues }}&chdl={{ multiChoiceQuestion.multiChoiceLabels }}&chs=550x200&chl={{ multiChoiceQuestion.multiChoiceLegends }}&chco=FF9E59|E0C253|D2E67A|729E4C|3DBA7E|20C7C7|6B8FD6|4C3A91|7250F2|9E29C4|E872B9|A3020F|382F26"
+             alt="chart"
+        />
+        <hr/>
+    {% endfor %}
+    <BR>
+    <table width="100%">
+        <tr>
+            <td><strong>Question</strong></td>
+            <td><strong>Name</strong></td>
+            <td><strong>Date</strong></td>
+            <td><strong>Answer</strong></td>
+        </tr>
+        {% for textBlockQuestion in textQuestions %}
+            <tr>
+                <td nowrap="nowrap"><strong>{{ textBlockQuestion.freeTextQuestion }}</strong></td>
+                <td nowrap="nowrap">{{ textBlockQuestion.freeTextName }} {{ textBlockQuestion.freeTextCustomer }}</td>
+                <td>{{ textBlockQuestion.freeTextDate }}</td>
+                <td>{{ textBlockQuestion.freeTextAnswer }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

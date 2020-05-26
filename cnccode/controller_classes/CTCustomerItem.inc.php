@@ -110,7 +110,6 @@ class CTCustomerItem extends CTCNC
         );
         $roles = [
             "technical",
-            "sales"
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
@@ -119,6 +118,7 @@ class CTCustomerItem extends CTCNC
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsSearchForm = new DSForm($this);
         $this->dsCustomerItem = new DSForm($this);
+        $this->template->setVar("menuId", 106);
     }
 
     /**
@@ -127,7 +127,7 @@ class CTCustomerItem extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_TECHNICAL);
+        $this->checkPermissions(TECHNICAL_PERMISSION);
         $this->setParentFormFields();
         switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:
