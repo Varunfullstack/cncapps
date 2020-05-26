@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 877 - Contract PDF formatting changes
+
 ## [v4.0.1] - 2020-05-26
 ### Fixed
 - Current Activity Report bigger headings
