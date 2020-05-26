@@ -99,19 +99,9 @@ ORDER BY poh_required_by, ordhead.`odh_custno` DESC, pol_porno, `pol_lineno`
                 )] && !$item->isGreenType()) {
                 ItemNotYetReceived::$items[$item->getPurchaseOrderId()] = false;
             }
-
             $data[] = $item;
         }
-        $toReturn = [];
-
-        foreach ($data as $item) {
-            if (ItemNotYetReceived::$items[$item->getPurchaseOrderId()]) {
-                continue;
-            }
-            $toReturn[] = $item;
-        }
-
-        return $toReturn;
+        return $data;
     }
 
 }

@@ -8,6 +8,20 @@
     daysAgoSelector.addEventListener('change', () => {
         dataTable.ajax.reload();
     })
+
+    function renderDate(value, type, defaultValue) {
+        defaultValue = defaultValue || 'N/A';
+        switch (type) {
+            case 'sort':
+                return data;
+            default:
+                if (!data) {
+                    return defaultValue;
+                }
+                return moment(data).format('DD/MM/YYYY');
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('selectorHolder').appendChild(daysAgoSelector);
@@ -66,6 +80,9 @@
                 {
                     data: "salesOrderID",
                     render: (data) => {
+                        if (!data) {
+                            return '';
+                        }
                         const anchor = document.createElement('a');
                         anchor.href = "SalesOrder.php?action=displaySalesOrder&ordheadID=" + data;
                         anchor.text = data;
@@ -77,6 +94,9 @@
                 {
                     data: "serviceRequestID",
                     render: (data) => {
+                        if (!data) {
+                            return '';
+                        }
                         const anchor = document.createElement('a');
                         anchor.href = "Activity.php?action=displayLastActivity&problemID=" + data;
                         anchor.text = data;
@@ -91,23 +111,17 @@
                 {data: "direct"},
                 {
                     data: "purchaseOrderDate",
-                    render: (data) => {
-                        if (!data) {
-                            return 'N/A';
-                        }
-                        return moment(data).format('DD/MM/YYYY');
+                    render: (data, type) => {
+                        return renderDate(data, type)
                     }
                 },
                 {
                     data: "expectedOn",
                     render: (data, type, row) => {
-                        if (data) {
-                            return moment(data).format('DD/MM/YYYY');
-                        }
                         if (row.expectedTBC) {
                             return 'TBC';
                         }
-                        return 'N/A';
+                        return renderDate(data, type);
                     },
                     createdCell: (cell, data, row) => {
                         if (row.expectedColorClass) {
@@ -117,20 +131,14 @@
                 },
                 {
                     data: "futureDate",
-                    render: (data) => {
-                        if (!data) {
-                            return 'N/A';
-                        }
-                        return moment(data).format('DD/MM/YYYY');
+                    render: (data, type) => {
+                        return renderDate(data, type)
                     }
                 },
                 {
                     data: "purchaseOrderRequiredBy",
-                    render: (data) => {
-                        if (!data) {
-                            return 'TBC';
-                        }
-                        return moment(data).format('DD/MM/YYYY');
+                    render: (data, type) => {
+                        return renderDate(data, type, 'TBC');
                     },
                     createdCell: (cell, data, row) => {
                         if (row.requiredByColorClass) {
@@ -141,7 +149,7 @@
                 {data: "supplierRef"},
                 {
                     data: "projectName",
-                    render: (data, row) => {
+                    render: (data, type, row) => {
                         if (!data) {
                             return '';
                         }
@@ -237,6 +245,7 @@
 
     td.redBackground {
         background-color: #F8A5B6;
+        color: black;
     }
 </style>
 <p id="selectorHolder">
@@ -323,58 +332,5 @@
     </TR>
     </thead>
     <tbody>
-    <!--    &lt;!&ndash; BEGIN notYetReceivedItemBlock &ndash;&gt;-->
-    <!--    <TR {style}>-->
-    <!--        <TD>-->
-    <!--            <A href="{purchaseOrderLink}"-->
-    <!--               target="_blank"-->
-    <!--            >{purchaseOrderId}</A>-->
-    <!--        </TD>-->
-    <!--        <td>-->
-    <!--            {salesOrderLink}-->
-    <!--        </td>-->
-    <!--        <td>-->
-    <!--            {SRLink}-->
-    <!--        </td>-->
-    <!--        <td>-->
-    <!--            {customerName}-->
-    <!--        </td>-->
-    <!--        <td>-->
-    <!--            {orderedQty}-->
-    <!--        </td>-->
-    <!--        <td>-->
-    <!--            {itemDescription}-->
-    <!--        </td>-->
-    <!--        <td>-->
-    <!--            {supplierName}-->
-    <!--        </td>-->
-    <!--        <td>-->
-    <!--            {direct}-->
-    <!--        </td>-->
-    <!--        <td data-sort="{purchaseOrderDateSort}">-->
-    <!--            {purchaseOrderDate}-->
-    <!--        </td>-->
-    <!--        <td data-sort="{expectedOnSort}"-->
-    <!--            {expectedColor}-->
-    <!--        >-->
-    <!--            {expectedOn}-->
-    <!--        </td>-->
-    <!--        <td data-sort="{futureDateSort}">-->
-    <!--            {futureDate}-->
-    <!--        </td>-->
-    <!--        <td data-sort="{requiredByDateSort}" {requiredByColor}>-->
-    <!--            {requiredByDate}-->
-    <!--        </td>-->
-    <!--        <td>-->
-    <!--            {supplierRef}-->
-    <!--        </td>-->
-    <!--        <td>-->
-    <!--            {projectLink}-->
-    <!--        </td>-->
-    <!--        <td>-->
-    <!--            {color}-->
-    <!--        </td>-->
-    <!--    </TR>-->
-    <!-- END notYetReceivedItemBlock -->
     </tbody>
 </TABLE>
