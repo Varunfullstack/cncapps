@@ -596,12 +596,17 @@ class CTCustomerReviewMeeting extends CTCNC
                 $options = [
                     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
                 ];
-                $labtechDB = new PDO(
-                    $dsn,
-                    LABTECH_DB_USERNAME,
-                    LABTECH_DB_PASSWORD,
-                    $options
-                );
+                try {
+                    $labtechDB = new PDO(
+                        $dsn,
+                        LABTECH_DB_USERNAME,
+                        LABTECH_DB_PASSWORD,
+                        $options
+                    );
+                } catch (\Exception $exception) {
+                    throw new \MongoDB\Driver\Exception\ConnectionException('Unable to connect to labtech');
+                }
+
 
                 $statement = $labtechDB->prepare(
                     'SELECT computers.name as agentName,letter as driveLetter,size as driveSize, free as driveFreeSpace, free/size  as freePercent FROM  drives 
