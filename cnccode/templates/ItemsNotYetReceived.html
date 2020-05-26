@@ -31,13 +31,18 @@
         if (urlParams.get('daysAgo')) {
             daysAgoValue = urlParams.get('daysAgo');
         }
-        for (let i = 1; i <= 30; i++) {
+        for (let i = 1; i <= 13; i++) {
             const option = document.createElement('option');
-            option.value = '' + i;
-            option.text = '' + i;
-            option.selected = daysAgoValue === i;
+            option.value = '' + i * 7;
+            option.text = '' + i + " Week" + (i > 1 ? 's' : '');
+            option.selected = daysAgoValue === i * 7;
             daysAgoSelector.options.add(option);
         }
+        const noFilterOption = document.createElement('option');
+        noFilterOption.value = "-1";
+        noFilterOption.text = "All";
+        noFilterOption.selected = daysAgoValue === -1;
+        daysAgoSelector.options.add(noFilterOption)
 
         redSelect = $('#red-selector');
         orangeSelect = $('#orange-selector');
