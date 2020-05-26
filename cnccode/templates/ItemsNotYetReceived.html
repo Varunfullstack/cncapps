@@ -13,12 +13,12 @@
         defaultValue = defaultValue || 'N/A';
         switch (type) {
             case 'sort':
-                return data;
+                return value;
             default:
-                if (!data) {
+                if (!value) {
                     return defaultValue;
                 }
-                return moment(data).format('DD/MM/YYYY');
+                return moment(value).format('DD/MM/YYYY');
         }
     }
 
