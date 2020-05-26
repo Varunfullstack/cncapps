@@ -4,7 +4,7 @@ This project changes will be shown here.
 ## [v4.0.1] - 2020-05-26
 ### Fixed
 - Current Activity Report bigger headings
-- Remember expanded headings
+- Current Activity Remember expanded headings
 
 ## [v4.0.0] - 2020-05-25
 ### Changed
