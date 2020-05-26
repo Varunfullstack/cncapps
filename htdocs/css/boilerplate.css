@@ -119,7 +119,7 @@ body .lockedIcon::before {
 }
 .sidebar.collapsed .children {
   background-color: #3c3c3c !important;
-  min-width: 178px;
+  min-width: 198px;
   position: absolute;
   left: 45px;
   top: 0;
