@@ -265,12 +265,15 @@ class BUPDF extends BaseObject
             $this->setFontStyle('U');
             $this->setFont();
         }
-
-        $this->pdf->Write(
-            ($this->getFontSize() / 2),
-            $string,
-            $link
-        );
+        if ($this->pdf->GetStringWidth($string) > $this->pdf->GetPageWidth()) {
+            $this->pdf->MultiCell(0, ($this->getFontSize() / 2), $string);
+        } else {
+            $this->pdf->Write(
+                ($this->getFontSize() / 2),
+                $string,
+                $link
+            );
+        }
 
         if ($link) {
             $this->pdf->SetTextColor(0);

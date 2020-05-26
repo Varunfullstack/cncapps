@@ -1,5 +1,10 @@
 # Changelog
 This project changes will be shown here.
+
+## [unreleased]
+### Changed
+- Issue 877 - Contract PDF formatting changes
+
 ## [v4.0.0] - 2020-05-25
 ### Changed
 - Issue 620 - New side menu design in CNCAPPS
