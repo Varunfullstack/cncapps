@@ -1,34 +1,11 @@
 <!-- Template: ServiceDeskReportCustomer.inc.html -->
 <script>
-    const autocompleteURL = "/Customer.php?action=searchName";
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         window.fromDate = $('#fromDate').get(0);
         window.toDate = $('#toDate').get(0);
 
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
         });
     });
 
@@ -73,6 +50,7 @@
                     value="{customerString}"
                     size="50"
                     maxlength="50"
+                    customer-search
             > <font class="formErrorMessage"> {customerStringMessage} </font></td>
         </tr>
         <tr>
@@ -84,7 +62,7 @@
                 <div align="right">from</div>
             </td>
             <td>
-                <input type="text"
+                <input type="date"
                        name="searchForm[1][fromDate]"
                        id="fromDate"
                        value="{fromDate}"
@@ -92,7 +70,6 @@
                        maxlength="10"
                        onKeypress="javascript:submitOnReturn()"
                        autocomplete="off"
-                       class="jQueryCalendar"
                 >
                 <font class="formErrorMessage">{fromDateMessage}</font>
             </td>
@@ -102,7 +79,7 @@
                 <div align="right">to</div>
             </td>
             <td>
-                <input type="text"
+                <input type="date"
                        name="searchForm[1][toDate]"
                        id="toDate"
                        value="{toDate}"
@@ -110,7 +87,6 @@
                        maxlength="10"
                        onKeypress="javascript:submitOnReturn()"
                        autocomplete="off"
-                       class="jQueryCalendar"
                 >
                 <font class="formErrorMessage">{toDateMessage}</font>
             </td>

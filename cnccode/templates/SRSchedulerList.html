@@ -129,15 +129,6 @@
         newWindow.document.write(atob(data));
     }
 
-    Mustache.Formatters = {
-        base64Encode: function (value) {
-            if (!value) {
-                return value;
-            }
-
-            return btoa(value);
-        }
-    };
 
     let currentSRScheduler = {
         id: null,
@@ -200,16 +191,6 @@
         };
     }
 
-    $.ajax({
-        url: '?action=getData',
-        method: 'GET',
-        dataType: 'JSON'
-    }).then(function (result) {
-        srSchedulerList = result;
-        drawList();
-    });
-
-    Mustache.tags = ['{%', '%}'];
 
     let editingItem = null;
 
@@ -224,7 +205,28 @@
         return JSON.parse(JSON.stringify(src));
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
+
+        Mustache.Formatters = {
+            base64Encode: function (value) {
+                if (!value) {
+                    return value;
+                }
+
+                return btoa(value);
+            }
+        };
+        $.ajax({
+            url: '?action=getData',
+            method: 'GET',
+            dataType: 'JSON'
+        }).then(function (result) {
+            srSchedulerList = result;
+            drawList();
+        });
+
+        Mustache.tags = ['{%', '%}'];
+
         addButton = $('.addButton');
         saveButton = $('.saveButton');
         cancelButton = $('.cancelButton');
@@ -378,37 +380,12 @@
         }).focus(function () {
             $(this).autocomplete("search", $(this).val());
         });
-        const autocompleteURL = "/Customer.php?action=searchName";
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-
-            },
-            delay: 200,
-            select: (event, ui) => {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                currentSRScheduler.customerId = ui.item.id;
-                currentSRScheduler.customerName = ui.item.label;
-                setSRScheduler(currentSRScheduler);
-            }
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
+            currentSRScheduler.customerId = $event.detail.item.value;
+            currentSRScheduler.customerName = $event.detail.item.label;
+            setSRScheduler(currentSRScheduler);
         });
-
-
         contactNameInput.autocomplete({
             minLength: 0,
             source: function (request, responseCB) {
@@ -666,6 +643,7 @@
                maxlength="50"
                name="name"
                id="customerString"
+               customer-search
         >
         <input hidden
                name="customerId"

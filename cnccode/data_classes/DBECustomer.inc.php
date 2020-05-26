@@ -18,7 +18,6 @@ class DBECustomer extends DBCNCEntity
     const referredFlag = "referredFlag";
     const pcxFlag = "pcxFlag";
     const customerTypeID = "customerTypeID";
-    const prospectFlag = "prospectFlag";
     const gscTopUpAmount = "gscTopUpAmount";
     const modifyDate = "modifyDate";
     const modifyUserID = "modifyUserID";
@@ -33,7 +32,7 @@ class DBECustomer extends DBCNCEntity
     const sectorID = "sectorID";
     const becameCustomerDate = "becameCustomerDate";
     const droppedCustomerDate = "droppedCustomerDate";
-    const leadStatusID = "leadStatusID";
+    const leadStatusId = "leadStatusId";
     const techNotes = "techNotes";
     const specialAttentionFlag = "specialAttentionFlag";
     const specialAttentionEndDate = "specialAttentionEndDate";
@@ -49,7 +48,6 @@ class DBECustomer extends DBCNCEntity
     const reviewMeetingFrequencyMonths = "reviewMeetingFrequencyMonths";
     const accountManagerUserID = "accountManagerUserID";
     const reviewMeetingEmailSentFlag = "reviewMeetingEmailSentFlag";
-    const customerLeadStatusID = "customerLeadStatusID";
     const dateMeetingConfirmed = 'dateMeetingConfirmed';
     const meetingDateTime = 'meetingDateTime';
     const inviteSent = 'inviteSent';
@@ -68,6 +66,7 @@ class DBECustomer extends DBCNCEntity
     const activeDirectoryName = "activeDirectoryName";
     const reviewMeetingBooked = 'reviewMeetingBooked';
     const licensedOffice365Users = 'licensedOffice365Users';
+    const websiteURL = "websiteURL";
 
     /**
      * calls constructor()
@@ -139,12 +138,6 @@ class DBECustomer extends DBCNCEntity
             DA_ID,
             DA_NOT_NULL,
             "cus_ctypeno"
-        );
-        $this->addColumn(
-            self::prospectFlag,
-            DA_YN_FLAG,
-            DA_NOT_NULL,
-            "cus_prospect"
         );
         $this->addColumn(
             self::gscTopUpAmount,
@@ -226,10 +219,9 @@ class DBECustomer extends DBCNCEntity
             'cus_dropped_customer_date'
         );
         $this->addColumn(
-            self::leadStatusID,
+            self::leadStatusId,
             DA_ID,
-            DA_ALLOW_NULL,
-            'cus_leadstatusno'
+            DA_ALLOW_NULL
         );
         $this->addColumn(
             self::techNotes,
@@ -320,12 +312,6 @@ class DBECustomer extends DBCNCEntity
             DA_ID,
             DA_ALLOW_NULL,
             "cus_account_manager_consno"
-        );
-        $this->addColumn(
-            self::customerLeadStatusID,
-            DA_ID,
-            DA_ALLOW_NULL,
-            "customer_lead_status_id"
         );
         $this->addColumn(
             self::dateMeetingConfirmed,
@@ -441,6 +427,11 @@ class DBECustomer extends DBCNCEntity
             null,
             0
         );
+        $this->addColumn(
+            self::websiteURL,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
 
         $this->setPK(0);
         $this->setAddColumnsOff();
@@ -472,26 +463,26 @@ class DBECustomer extends DBCNCEntity
     {
 
         $this->setMethodName("getRowsByNameMatch");
-        if ($contact == '' & $phoneNo == '' & $name == '' & $address == '' & $newCustomerFromDate == '' & $newCustomerToDate == '' & $droppedCustomerFromDate == '' & $droppedCustomerToDate == '') {
-            $this->raiseError('Either contact, phone, customer name, address or dates must be set');
-        }
+//        if (!$contact && !$phoneNo && !$address && !$newCustomerFromDate && !$newCustomerToDate && !$droppedCustomerFromDate && !$droppedCustomerToDate) {
+//            $this->raiseError('Either contact, phone, customer name, address or dates must be set');
+//        }
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName();
 
-        if ($address != '' OR $phoneNo != '') {
+        if ($address || $phoneNo) {
             $queryString .=
                 " INNER JOIN address ON cus_custno = add_custno";
         }
 
-        if ($contact != '' OR $phoneNo != '') {
+        if ($contact or $phoneNo) {
             $queryString .=
                 " INNER JOIN contact ON cus_custno = con_custno";
         }
 
         $queryString .= " WHERE 1=1";
 
-        if ($address != '') {
+        if ($address) {
             $queryString .=
                 " AND (add_town LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
@@ -519,7 +510,7 @@ class DBECustomer extends DBCNCEntity
                 ) . "%')";
         }
 
-        if ($contact != '') {
+        if ($contact) {
             $queryString .=
                 " AND (con_first_name LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
@@ -531,7 +522,7 @@ class DBECustomer extends DBCNCEntity
                 ) . "%')";
         }
 
-        if ($phoneNo != '') {
+        if ($phoneNo) {
             $queryString .=
                 " AND (con_phone LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
@@ -547,14 +538,14 @@ class DBECustomer extends DBCNCEntity
                 ) . "%')";
         }
 
-        if ($newCustomerFromDate != '') {
+        if ($newCustomerFromDate) {
             $queryString .=
                 " AND " . $this->getDBColumnName(self::becameCustomerDate) . ">='" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $newCustomerFromDate
                 ) . "'";
         }
-        if ($newCustomerToDate != '') {
+        if ($newCustomerToDate) {
             $queryString .=
                 " AND " . $this->getDBColumnName(self::becameCustomerDate) . "<='" . mysqli_real_escape_string(
                     $this->db->link_id(),
@@ -562,14 +553,14 @@ class DBECustomer extends DBCNCEntity
                 ) . "'";
         }
 
-        if ($droppedCustomerFromDate != '') {
+        if ($droppedCustomerFromDate) {
             $queryString .=
                 " AND " . $this->getDBColumnName(self::droppedCustomerDate) . ">='" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $droppedCustomerFromDate
                 ) . "'";
         }
-        if ($droppedCustomerToDate != '') {
+        if ($droppedCustomerToDate) {
             $queryString .=
                 " AND " . $this->getDBColumnName(self::droppedCustomerDate) . "<='" . mysqli_real_escape_string(
                     $this->db->link_id(),
@@ -577,7 +568,7 @@ class DBECustomer extends DBCNCEntity
                 ) . "'";
         }
 
-        if ($name != '') {
+        if ($name) {
             $queryString .= " AND " . $this->getDBColumnName(self::name) . " LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $name
@@ -587,7 +578,6 @@ class DBECustomer extends DBCNCEntity
         $queryString .= " GROUP BY " . $this->getDBColumnName(self::customerID) . " ORDER BY " . $this->getDBColumnName(
                 self::name
             );
-
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;
@@ -710,17 +700,14 @@ class DBECustomer extends DBCNCEntity
     {
         $this->setMethodName("getSpecialAttentionCustomers");
         $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " where " . $this->getDBColumnName(DBECustomer::referredFlag) . " <> 'Y'";
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} where {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y'";
 
         if ($ignoreProspects) {
-            $queryString .= " and " . $this->getDBColumnName(DBECustomer::prospectFlag) . " <> 'Y' ";
+            $queryString .= " and {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null ";
         }
-        $queryString .= " order by cus_name ";
+        $queryString .= " order by {$this->getDBColumnName(DBECustomer::name)} ";
         $this->setQueryString($queryString);
-        $ret = (parent::getRows());
-        return $ret;
+        return $this->getRows();
     }
 
     function getReviewList($userID,

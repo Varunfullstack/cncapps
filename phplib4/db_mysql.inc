@@ -270,8 +270,10 @@ class DB_Sql
             $a_params
         );
 
-        mysqli_stmt_execute($statement);
-
+        if (!mysqli_stmt_execute($statement)) {
+            $jsonParams = json_encode($parameters);
+            throw new Exception("Failed to execute prepared query : $queryString, {$jsonParams}");
+        }
         $result = mysqli_stmt_get_result($statement);
 
         $this->Row = 0;

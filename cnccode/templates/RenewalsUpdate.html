@@ -46,7 +46,7 @@
         })
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         $('#example thead tr').clone(true).appendTo('#example thead');
         $('#example thead tr:eq(1) th').each(function (i) {
             var title = $(this).text();
@@ -79,7 +79,14 @@
                             data: data
                         }
                     ).then(response => {
-                        responseCB(response.map(item => ({label: item.name, value: item.id})));
+                        if (response.length > 40) {
+                            response = response.slice(0, 40);
+                            response.unshift({
+                                id: -1,
+                                name: 'Keep typing to filter, there are more results not shown here'
+                            });
+                        }
+                        responseCB(response.map(x => ({label: x.name, value: x.id})));
                     })
 
                 },
@@ -87,7 +94,7 @@
                 select: function (event, ui) {
                     event.preventDefault();
                     event.target.value = ui.item.label;
-                    performSearch(ui.item.value, i);
+                    performSearch(ui.item.label, i);
                 }
             }).focus(function () {
                 $(this).autocomplete("search", $(this).val());

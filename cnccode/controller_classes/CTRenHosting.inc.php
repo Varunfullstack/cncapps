@@ -48,14 +48,12 @@ class CTRenHosting extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "renewals",
-            "technical"
-        ];
+        $roles = RENEWALS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(605);
         $this->buRenHosting = new BURenHosting($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenHosting = new DSForm($this);
@@ -133,157 +131,6 @@ class CTRenHosting extends CTCNC
     }
 
     /**
-     * Display list of types
-     * @access private
-     * @throws Exception
-     */
-    function displayList()
-    {
-        $this->setMethodName('displayList');
-        $this->setPageTitle('Hosting Renewals');
-        $this->setTemplateFiles(
-            array('RenHostingList' => 'RenHostingList.inc')
-        );
-        $dsRenHosting = new DataSet($this);
-        $this->buRenHosting->getAll(
-            $dsRenHosting,
-            $this->getParam('orderBy')
-        );
-
-        if ($dsRenHosting->rowCount() > 0) {
-            $this->template->set_block(
-                'RenHostingList',
-                'rowBlock',
-                'rows'
-            );
-            while ($dsRenHosting->fetchNext()) {
-
-                $customerItemID = $dsRenHosting->getValue(DBEJRenHosting::customerItemID);
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'edit',
-                            'ID'     => $customerItemID
-                        )
-                    );
-                $txtEdit = '[edit]';
-
-                $urlList =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'list'
-                        )
-                    );
-
-                $this->template->set_var(
-                    array(
-                        'customerName'    => $dsRenHosting->getValue(DBEJRenHosting::customerName),
-                        'itemDescription' => $dsRenHosting->getValue(DBEJRenHosting::itemDescription),
-                        'invoiceFromDate' => Controller::dateYMDtoDMY(
-                            $dsRenHosting->getValue(DBEJRenHosting::invoiceFromDate)
-                        ),
-                        'invoiceToDate'   => Controller::dateYMDtoDMY(
-                            $dsRenHosting->getValue(DBEJRenHosting::invoiceToDate)
-                        ),
-                        'urlEdit'         => $urlEdit,
-                        'urlList'         => $urlList,
-                        'txtEdit'         => $txtEdit
-                    )
-                );
-                $this->template->parse(
-                    'rows',
-                    'rowBlock',
-                    true
-                );
-            }//while $dsRenHosting->fetchNext()
-        }
-        $this->template->parse(
-            'CONTENTS',
-            'RenHostingList',
-            true
-        );
-        $this->parsePage();
-    }
-
-    /**
-     * Called from sales order line to edit a renewal.
-     * The page passes
-     * ordheadID
-     * sequenceNo (line)
-     * renewalCustomerItemID (blank if renewal not created yet
-     *
-     *
-     * @throws Exception
-     */
-    function editFromSalesOrder()
-    {
-        $buSalesOrder = new BUSalesOrder($this);
-        $dsOrdline = new DataSet($this);
-        $buSalesOrder->getOrdlineByIDSeqNo(
-            $this->getParam('ordheadID'),
-            $this->getParam('sequenceNo'),
-            $dsOrdline
-        );
-
-        $renewalCustomerItemID = $dsOrdline->getValue(DBEOrdline::renewalCustomerItemID);
-
-        // has the order line get a renewal already?
-        if (!$renewalCustomerItemID) {
-            // create a new record first
-            $dsOrdhead = new DataSet($this);
-            $buSalesOrder->getOrderByOrdheadID(
-                $this->getParam('ordheadID'),
-                $dsOrdhead,
-                $dsDontNeedOrdline
-            );
-
-            $this->buRenHosting->createNewRenewal(
-                $dsOrdhead->getValue(DBEOrdhead::customerID),
-                $dsOrdline->getValue(DBEOrdline::itemID),
-                $renewalCustomerItemID,
-                $dsOrdhead->getValue(DBEOrdhead::delSiteNo)                // returned by function
-            );
-
-
-            // For despatch, prevents the renewal appearing again today during despatch process.
-            $dbeOrdline = new DBEOrdline($this);
-
-            $dbeOrdline->setValue(
-                DBEOrdline::ordheadID,
-                $dsOrdline->getValue(DBEOrdline::ordheadID)
-            );
-            $dbeOrdline->setValue(
-                DBEOrdline::sequenceNo,
-                $dsOrdline->getValue(DBEOrdline::sequenceNo)
-            );
-
-            $dbeOrdline->getRow();
-            $dbeOrdline->setValue(
-                DBEOrdline::renewalCustomerItemID,
-                $renewalCustomerItemID
-            );
-
-            $dbeOrdline->updateRow();
-
-        }
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'edit',
-                    'ID'     => $renewalCustomerItemID
-                )
-            );
-
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    /**
      * Edit/Add Activity
      * @access private
      * @throws Exception
@@ -339,7 +186,7 @@ class CTRenHosting extends CTCNC
         $readonly = null;
         $disabled = null;
 
-        if (!$this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
+        if (!$this->hasPermissions(RENEWALS_PERMISSION)) {
             $disabled = 'DISABLED';
             $readonly = 'READONLY';
         }
@@ -464,9 +311,7 @@ class CTRenHosting extends CTCNC
                     $dsRenHosting->getValue(DBEJRenHosting::itemDescription)
                 ),
                 'invoiceFromDate'                    => $dsRenHosting->getValue(DBEJRenHosting::invoiceFromDate),
-                'installationDate'                   => Controller::dateYMDtoDMY(
-                    $dsRenHosting->getValue(DBEJRenHosting::installationDate)
-                ),
+                'installationDate'                   => $dsRenHosting->getValue(DBEJRenHosting::installationDate),
                 'invoiceToDate'                      => $dsRenHosting->getValue(DBEJRenHosting::invoiceToDate),
                 'invoicePeriodMonths'                => Controller::htmlInputText(
                     $dsRenHosting->getValue(DBEJRenHosting::invoicePeriodMonths)
@@ -603,6 +448,125 @@ class CTRenHosting extends CTCNC
 
     }
 
+    private function parseInitialContractLength($initialContractLength)
+    {
+        foreach (self::InitialContractLengthValues as $value) {
+            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    'initialContractLengthSelected'    => $initialContractLengthSelected,
+                    'initialContractLength'            => $value,
+                    'initialContractLengthDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'initialContractLengths',
+                'initialContractLengthBlock',
+                true
+            );
+        }
+    }
+
+    /**
+     * Display the renewal status drop-down selector
+     *
+     * @access private
+     * @param $renewalStatus
+     */
+    function parseRenewalSelector($renewalStatus)
+    {
+        foreach ($this->renewalStatusArray as $key => $value) {
+            $renewalStatusSelected = ($renewalStatus == $key) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    'renewalStatusSelected'    => $renewalStatusSelected,
+                    'renewalStatus'            => $key,
+                    'renewalStatusDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'renewalStatuss',
+                'renewalStatusBlock',
+                true
+            );
+        }
+    }
+
+    /**
+     * Called from sales order line to edit a renewal.
+     * The page passes
+     * ordheadID
+     * sequenceNo (line)
+     * renewalCustomerItemID (blank if renewal not created yet
+     *
+     *
+     * @throws Exception
+     */
+    function editFromSalesOrder()
+    {
+        $buSalesOrder = new BUSalesOrder($this);
+        $dsOrdline = new DataSet($this);
+        $buSalesOrder->getOrdlineByIDSeqNo(
+            $this->getParam('ordheadID'),
+            $this->getParam('sequenceNo'),
+            $dsOrdline
+        );
+
+        $renewalCustomerItemID = $dsOrdline->getValue(DBEOrdline::renewalCustomerItemID);
+
+        // has the order line get a renewal already?
+        if (!$renewalCustomerItemID) {
+            // create a new record first
+            $dsOrdhead = new DataSet($this);
+            $buSalesOrder->getOrderByOrdheadID(
+                $this->getParam('ordheadID'),
+                $dsOrdhead,
+                $dsDontNeedOrdline
+            );
+
+            $this->buRenHosting->createNewRenewal(
+                $dsOrdhead->getValue(DBEOrdhead::customerID),
+                $dsOrdline->getValue(DBEOrdline::itemID),
+                $renewalCustomerItemID,
+                $dsOrdhead->getValue(DBEOrdhead::delSiteNo)                // returned by function
+            );
+
+
+            // For despatch, prevents the renewal appearing again today during despatch process.
+            $dbeOrdline = new DBEOrdline($this);
+
+            $dbeOrdline->setValue(
+                DBEOrdline::ordheadID,
+                $dsOrdline->getValue(DBEOrdline::ordheadID)
+            );
+            $dbeOrdline->setValue(
+                DBEOrdline::sequenceNo,
+                $dsOrdline->getValue(DBEOrdline::sequenceNo)
+            );
+
+            $dbeOrdline->getRow();
+            $dbeOrdline->setValue(
+                DBEOrdline::renewalCustomerItemID,
+                $renewalCustomerItemID
+            );
+
+            $dbeOrdline->updateRow();
+
+        }
+
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'edit',
+                    'ID'     => $renewalCustomerItemID
+                )
+            );
+
+        header('Location: ' . $urlNext);
+        exit;
+    }
+
     /**
      * Update call activity type details
      * @access private
@@ -663,47 +627,79 @@ class CTRenHosting extends CTCNC
     }
 
     /**
-     * Display the renewal status drop-down selector
-     *
+     * Display list of types
      * @access private
-     * @param $renewalStatus
+     * @throws Exception
      */
-    function parseRenewalSelector($renewalStatus)
+    function displayList()
     {
-        foreach ($this->renewalStatusArray as $key => $value) {
-            $renewalStatusSelected = ($renewalStatus == $key) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    'renewalStatusSelected'    => $renewalStatusSelected,
-                    'renewalStatus'            => $key,
-                    'renewalStatusDescription' => $value
-                )
-            );
-            $this->template->parse(
-                'renewalStatuss',
-                'renewalStatusBlock',
-                true
-            );
-        }
-    }
+        $this->setMethodName('displayList');
+        $this->setPageTitle('Hosting Renewals');
+        $this->setTemplateFiles(
+            array('RenHostingList' => 'RenHostingList.inc')
+        );
+        $dsRenHosting = new DataSet($this);
+        $this->buRenHosting->getAll(
+            $dsRenHosting,
+            $this->getParam('orderBy')
+        );
 
-    private function parseInitialContractLength($initialContractLength)
-    {
-        foreach (self::InitialContractLengthValues as $value) {
-            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    'initialContractLengthSelected'    => $initialContractLengthSelected,
-                    'initialContractLength'            => $value,
-                    'initialContractLengthDescription' => $value
-                )
+        if ($dsRenHosting->rowCount() > 0) {
+            $this->template->set_block(
+                'RenHostingList',
+                'rowBlock',
+                'rows'
             );
-            $this->template->parse(
-                'initialContractLengths',
-                'initialContractLengthBlock',
-                true
-            );
+            while ($dsRenHosting->fetchNext()) {
+
+                $customerItemID = $dsRenHosting->getValue(DBEJRenHosting::customerItemID);
+
+                $urlEdit =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action' => 'edit',
+                            'ID'     => $customerItemID
+                        )
+                    );
+                $txtEdit = '[edit]';
+
+                $urlList =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action' => 'list'
+                        )
+                    );
+
+                $this->template->set_var(
+                    array(
+                        'customerName'    => $dsRenHosting->getValue(DBEJRenHosting::customerName),
+                        'itemDescription' => $dsRenHosting->getValue(DBEJRenHosting::itemDescription),
+                        'invoiceFromDate' => Controller::dateYMDtoDMY(
+                            $dsRenHosting->getValue(DBEJRenHosting::invoiceFromDate)
+                        ),
+                        'invoiceToDate'   => Controller::dateYMDtoDMY(
+                            $dsRenHosting->getValue(DBEJRenHosting::invoiceToDate)
+                        ),
+                        'urlEdit'         => $urlEdit,
+                        'urlList'         => $urlList,
+                        'txtEdit'         => $txtEdit
+                    )
+                );
+                $this->template->parse(
+                    'rows',
+                    'rowBlock',
+                    true
+                );
+            }//while $dsRenHosting->fetchNext()
         }
+        $this->template->parse(
+            'CONTENTS',
+            'RenHostingList',
+            true
+        );
+        $this->parsePage();
     }
 
 }// end of class

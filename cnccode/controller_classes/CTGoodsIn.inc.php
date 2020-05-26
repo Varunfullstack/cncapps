@@ -92,13 +92,13 @@ class CTGoodsIn extends CTCNC
             $cfg
         );
         $roles = [
-            "sales",
-            "accounts"
+            SALES_PERMISSION
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(307);
         $this->buPurchaseOrder = new BUPurchaseOrder($this);
         $this->buGoodsIn = new BUGoodsIn($this);
         $this->dsPorhead = new DSForm($this);
@@ -146,7 +146,7 @@ class CTGoodsIn extends CTCNC
         foreach ($_REQUEST as $key => $value) {
             $_REQUEST[$key] = trim($value);
         }
-        if (($this->getParam('porheadID')) AND (!is_numeric($this->getParam('porheadID')))) {
+        if (($this->getParam('porheadID')) and (!is_numeric($this->getParam('porheadID')))) {
             $this->setFormErrorMessage('Order no must be numeric');;
         }
         if (!$this->getFormError()) {

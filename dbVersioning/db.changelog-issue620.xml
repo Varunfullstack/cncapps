@@ -1,0 +1,66 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue620-0">
+        <tagDatabase tag="issue620"/>
+    </changeSet>
+    <changeSet id="issue620-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="favourites"/>
+            </not>
+        </preConditions>
+        <createTable tableName="favourites">
+            <column name="menuId" type="int(7)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="userId" type="bigint(11)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="createdAt" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="issue620-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="consultant" columnName="customerID"/>
+        </preConditions>
+        <dropColumn tableName="consultant" columnName="customerID"/>
+        <rollback>
+            <addColumn tableName="consultant">
+                <column name="customerID" remarks="OBSOLETE" type="INT"/>
+            </addColumn>
+        </rollback>
+
+    </changeSet>
+    <changeSet id="issue620-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="consultant" columnName="changeApproverFlag"/>
+        </preConditions>
+        <dropColumn tableName="consultant" columnName="changeApproverFlag"/>
+        <rollback>
+            <addColumn tableName="consultant">
+                <column defaultValue="N" name="changeApproverFlag"
+                        remarks="Allowed to approve changes in Change Control process" type="CHAR(1)">
+                    <constraints nullable="false"/>
+                </column>
+            </addColumn>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue620-4" author="pavwebdev">
+        <sql splitStatements="true">
+            update consultant
+            set cns_perms = concat(cns_perms, ',accountManagement')
+            where cns_perms not like '%accountManagement%'
+              and cns_consno in (2, 3, 29, 47, 63, 84, 137);
+            update consultant
+            set cns_perms = concat(cns_perms, ',seniorManagement')
+            where cns_perms not like '%seniorManagement%'
+              and cns_consno in (2, 3, 29, 47);
+        </sql>
+        <rollback/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -13,7 +13,8 @@
     const isAdditionalTimeLimitApprover = {additionalTimeLimitApprover};
     const minutesInADay = {minutesInADay};
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
+        reason = CKEDITOR.replace('comments', {customConfig: '/ckeditor_config.js'});
         timeSelectorElement = $('#allocatedTimeAmountSelector');
         timeInputElement = $('input[name="allocatedTimeValue"]');
         allocationErrorElement = $('#allocationError');
@@ -66,7 +67,7 @@
 
 </script>
 <p><A
-        href="#"
+        href="javascript:"
         onClick="window.open(
       '{urlProblemHistoryPopup}',
       'reason',
@@ -183,10 +184,6 @@
             </td>
             <td>
                 <textarea name="comments">{comments}</textarea>
-                <script type="text/javascript">
-                    reason = CKEDITOR.replace('comments', {customConfig: '/ckeditor_config.js'});
-                    reason.addCss('body { font-size: 10pt; }');
-                </script>
             </td>
         </tr>
 

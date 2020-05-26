@@ -3,34 +3,10 @@
         src="CommonJS.js"
 ></script>
 <script language='JavaScript'>
-    const autocompleteURL = "/Customer.php?action=searchName";
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         window.date = $('#date').get(0);
-
-        $('#customerName').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response.map(item => ({label: item.name, value: item.id})));
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+        $('#customerName')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
         });
     });
 
@@ -59,6 +35,7 @@
                         value="{customerName}"
                         size="50"
                         maxlength="50"
+                        customer-search
                 > <span class="formErrorMessage">{customerIDMessage}</span></td>
         </TR>
         <TR>
@@ -76,16 +53,15 @@
         </TR>
         <TR>
             <TD class="promptText">Date</TD>
-            <TD class="field"><input
-                    type="text"
-                    id="date"
-                    size="10"
-                    maxlength="10"
-                    name="callActivity[1][date]"
-                    value="{date}"
-                    class="jqueryCalendar"
-                    autocomplete="off"
-            > <span class="formErrorMessage">{dateMessage}</span>
+            <TD class="field">
+                <input type="date"
+                       id="date"
+                       size="10"
+                       maxlength="10"
+                       name="callActivity[1][date]"
+                       value="{date}"
+                       autocomplete="off"
+                > <span class="formErrorMessage">{dateMessage}</span>
             </TD>
         </TR>
         <tr>

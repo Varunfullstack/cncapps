@@ -43,14 +43,12 @@ class CTCustomerReviewMeeting extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "sales",
-            "accounts",
-        ];
+        $roles = ACCOUNT_MANAGEMENT_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(405);
         $this->buCustomerReviewMeeting = new BUCustomerReviewMeeting ($this);
     }
 
@@ -776,9 +774,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
                 'startYearMonthMessage' => $dsSearchForm->getMessage(BUCustomerReviewMeeting::searchFormStartYearMonth),
                 'endYearMonth'          => $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormEndYearMonth),
                 'endYearMonthMessage'   => $dsSearchForm->getMessage(BUCustomerReviewMeeting::searchFormEndYearMonth),
-                'meetingDate'           => self::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormMeetingDate)
-                ),
+                'meetingDate'           => $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormMeetingDate),
                 'meetingDateYmd'        => $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormMeetingDate),
                 'urlCustomerPopup'      => $urlCustomerPopup,
                 'editableText'          => $editableText,

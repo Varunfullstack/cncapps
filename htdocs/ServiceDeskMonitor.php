@@ -7,7 +7,7 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 require_once("config.inc.php");
-GLOBAL $cfg;
+global $cfg;
 require_once($cfg['path_bu'] . '/BUProblemSLA.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 $thing = null;
@@ -37,14 +37,16 @@ $dsProblems = $buActivity->getAlarmReachedProblems();
 while ($dsProblems->fetchNext()) {
     $update = new DBEProblem($thing);
     $update->getRow($dsProblems->getValue(DBEJProblem::problemID));
-    $dbejCallActivity = $buActivity->getLastActivityInProblem($dsProblems->getValue(DBEJProblem::problemID));
+    echo "<br>{$dsProblems->getValue(DBEJProblem::problemID)} is in breach resetting it to Awaiting CNC <br>";
     $buActivity->logOperationalActivity(
         $dsProblems->getValue(DBEJProblem::problemID),
-        "Future alarm has been reached, resetting to Awaiting CNC"
+        "Future alarm has been reached, resetting to Awaiting CNC",
+        true
     );
     $update->setValue(DBEProblem::alarmDate, null);
     $update->setValue(DBEProblem::alarmTime, null);
     $update->setValue(DBEProblem::awaitingCustomerResponseFlag, 'N');
+
     $update->updateRow();
 }
 echo 'Finished processing future breached SR\'s';

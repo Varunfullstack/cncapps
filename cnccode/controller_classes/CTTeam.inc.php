@@ -27,13 +27,12 @@ class CTTeam extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            "accounts",
-        ];
+        $roles = SENIOR_MANAGEMENT_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(902);
         $this->buTeam = new BUTeam($this);
         $this->dsTeam = new DSForm($this);
         $this->dsTeam->copyColumnsFrom($this->buTeam->dbeTeam);
@@ -48,23 +47,17 @@ class CTTeam extends CTCNC
     {
         switch ($this->getAction()) {
             case CTTEAM_ACT_EDIT:
-
             case CTTEAM_ACT_CREATE:
-                $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
                 $this->edit();
                 break;
-
             case CTTEAM_ACT_DELETE:
-                $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
                 $this->delete();
                 break;
             case CTTEAM_ACT_UPDATE:
-                $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
                 $this->update();
                 break;
             case CTTEAM_ACT_DISPLAY_LIST:
             default:
-                $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
                 $this->displayList();
                 break;
         }

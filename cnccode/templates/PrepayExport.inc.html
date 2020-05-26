@@ -1,6 +1,6 @@
 <!-- Template: PrepayExport.inc.html -->
 <script type="application/javascript">
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         window.endDate = $('#endDate').get(0);
     });
 
@@ -35,16 +35,14 @@
             <td width="40%"
                 class="field"
             >
-                <input
-                        type="text"
-                        name="export[1][endDate]"
-                        id="endDate"
-                        value="{endDate}"
-                        size="10"
-                        maxlength="10"
-                        required
-                        autocomplete="off"
-                        class="jQueryCalendar"
+                <input type="date"
+                       name="export[1][endDate]"
+                       id="endDate"
+                       value="{endDate}"
+                       size="10"
+                       maxlength="10"
+                       required
+                       autocomplete="off"
                 >
                 <font class="formErrorMessage">{endDateMessage}</font>
                 <input

@@ -292,10 +292,10 @@ class CTHome extends CTCNC
          * if user is only in the technical group then display the current activity dash-board
          */
         if (
-            $this->hasPermissions(PHPLIB_PERM_TECHNICAL) &&
-            !$this->hasPermissions(PHPLIB_PERM_SUPERVISOR) &&
-            !$this->hasPermissions(PHPLIB_PERM_MAINTENANCE) &&
-            !$this->hasPermissions(PHPLIB_PERM_ACCOUNTS)
+            $this->hasPermissions(TECHNICAL_PERMISSION) &&
+            !$this->hasPermissions(SUPERVISOR_PERMISSION) &&
+            !$this->hasPermissions(MAINTENANCE_PERMISSION) &&
+            !$this->hasPermissions(ACCOUNTS_PERMISSION)
         ) {
 
             $urlNext =
@@ -314,7 +314,7 @@ class CTHome extends CTCNC
         $this->displayUpcomingVisits();
 
 
-        if ($this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
+        if ($this->hasPermissions(ACCOUNTS_PERMISSION)) {
             $this->displaySalesFigures();
         }
 

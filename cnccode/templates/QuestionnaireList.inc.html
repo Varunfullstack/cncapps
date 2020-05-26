@@ -1,19 +1,129 @@
 <!-- Template: QuestionnaireList.inc.html -->
-<A href="{urlCreate}">[create new]</A> 
-<table class="singleBorder" width="417" border="0" cellspacing="1" cellpadding="2">
-	<tr> 
-		<td width="265" class="listHeadText">Description</td>
-		<td width="141" class="listHeadText">&nbsp;</td>
-	</tr>
-	<!-- BEGIN QuestionnaireBlock -->
-	<tr valign="top" onMouseOver="this.bgColor='#ffffcc';" onMouseOut="this.bgColor='';"> 
-		<td class="orderLineItem"><DIV align="left">{description}</div></td>
-		<td class="orderLineItem"><DIV align="left"></div>
-			<DIV align="left"> <A href="{urlEdit}" title="Edit details">{txtEdit}</a><A href="{urlDisplayQuestionList}" title="Questions">[questions]</a> 
-				<A href="{urlDelete}"  title="Delete this type" onClick="if(!confirm('Are you sure you want to remove this questionnaire?')) return(false)">{txtDelete}</A> <A href="{urlView}" target="_blank" title="View Questionnaire">[view]</A>
-			</DIV></td>
+<A href="{urlCreate}">[create new]</A>
+<table class="singleBorder"
+       width="417"
+       border="0"
+       cellspacing="1"
+       cellpadding="2"
+>
+    <tr>
+        <td width="265"
+            class="listHeadText"
+        >Description
+        </td>
+        <td width="141"
+            class="listHeadText"
+        >&nbsp;
+        </td>
+    </tr>
+    <!-- BEGIN QuestionnaireBlock -->
+    <tr valign="top"
+        onMouseOver="this.bgColor='#ffffcc';"
+        onMouseOut="this.bgColor='';"
+    >
+        <td class="orderLineItem">
+            <DIV align="left">{description}</div>
+        </td>
+        <td class="orderLineItem">
+            <DIV align="left"></div>
+            <DIV align="left"><A href="{urlEdit}"
+                                 title="Edit details"
+            >{txtEdit}</a><A href="{urlDisplayQuestionList}"
+                             title="Questions"
+            >[questions]</a>
+                <A href="{urlDelete}"
+                   title="Delete this type"
+                   onClick="if(!confirm('Are you sure you want to remove this questionnaire?')) return(false)"
+                >{txtDelete}</A> <A href="{urlView}"
+                                    target="_blank"
+                                    title="View Questionnaire"
+                >[view]</A>
+            </DIV>
+        </td>
         <td class="orderLineItem"></td>
-	</tr>
-	<!-- END QuestionnaireBlock -->
+    </tr>
+    <!-- END QuestionnaireBlock -->
 </table>
+<br>
+<h1>Questionnaire Results</h1>
+<div class="reportDescription">
+    This will show the results of the selected survey based on a time selected. It will also email you the results.
+</div>
+<form method="get"
+      action="/Questionnaire.php"
+      target="_blank"
+>
+    <input type="hidden"
+           name="action"
+           value="generateQuestionnaireReport"
+    >
+    <table width="500px"
+           border="0"
+           cellspacing="0"
+           cellpadding="1"
+    >
+        <tr>
+            <td class="promptText">Questionnaire</td>
+            <td>
+                <select name="questionnaireID"
+                        required
+                >
+                    <option value="">Please Select</option>
+                    <!-- BEGIN questionnaireBlock -->
+                    <option {questionnaireSelected}
+                            value="{questionnaireID}"
+                    >{questionnaireDescription}
+                    </option>
+                    <!-- END questionnaireBlock -->
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">from</div>
+            </td>
+            <td>
+                <input type="date"
+                       name="startDate"
+                       id="fromDate"
+                       value="{fromDate}"
+                       size="10"
+                       maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
+                >
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">to</div>
+            </td>
+            <td>
+                <input type="date"
+                       name="endDate"
+                       id="toDate"
+                       value="{toDate}"
+                       size="10"
+                       maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
+                >
+                <font class="formErrorMessage">{toDateMessage}</font></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <input type="submit"
+                       value="Generate"
+                >
+                <input type="submit"
+                       name="csv"
+                       value="CSV"
+                >
+            </td>
+        </tr>
+    </table>
+    <p>&nbsp;</p>
+
+</form>
+{report}
 <!-- End Template: QuestionnaireList.inc.html -->

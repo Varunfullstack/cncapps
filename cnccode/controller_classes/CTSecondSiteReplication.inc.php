@@ -24,7 +24,6 @@ class CTSecondSiteReplication extends CTSecondSite
         if (!$this->isUserSDManager()) {
             $roles = [
                 "technical",
-                "reports"
             ];
             if (!self::hasPermissions($roles)) {
                 Header("Location: /NotAllowed.php");
@@ -33,6 +32,7 @@ class CTSecondSiteReplication extends CTSecondSite
         }
         $this->buSecondsite = new BUSecondsiteReplication($this);
         $this->dsSecondsiteImage->copyColumnsFrom($this->buSecondsite->dbeSecondsiteImage);
+        $this->setMenuId(109);
     }
 
     /**
@@ -174,7 +174,7 @@ class CTSecondSiteReplication extends CTSecondSite
                 'availableYearsBlock',
                 true
             );
-        };
+        }
 
 
         $this->template->setBlock(
@@ -455,7 +455,6 @@ class CTSecondSiteReplication extends CTSecondSite
     function run()
     {
         $this->buSecondsite->validateBackups($this->getParam('customerItemID'));
-
         $urlNext =
             Controller::buildLink(
                 'OffsiteBackupReplicationStatus.php',

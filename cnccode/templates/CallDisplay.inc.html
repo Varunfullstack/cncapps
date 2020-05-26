@@ -3,7 +3,7 @@
         src="CommonJS.js"
 ></script>
 <script language='JavaScript'>
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         window.dateClosed = $('#dateClosed').get(0);
     });
     var state = 'none'; // display status
@@ -175,14 +175,13 @@
             <td class="mainHeadText">
                 <input
                         {DISABLED}
-                        type="text"
+                        type="date"
                         name="call[1][dateClosed]"
                         id="dateClosed"
                         value="{dateClosed}"
                         size="10"
                         maxlength="10"
                         autocomplete="off"
-                        class="jQueryCalendar"
                 >
                 <span class="formErrorMessage">{dateClosedMessage}</span>
             </td>
@@ -216,7 +215,7 @@
     </tr>
 </table>
 <BR>
-<A href="#"
+<A href="javascript:"
    onClick="javascript:SC_toggleDisplayAll();return false;"
 >[show/hide all actvity]</A> <A
         href="{urlCreateActivity}"

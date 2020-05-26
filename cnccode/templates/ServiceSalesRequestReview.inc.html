@@ -1,14 +1,19 @@
 <!-- Template: ServiceSalesRequestReview.inc.html -->
-<script src="CommonJS.js"></script>
-<p><A
-        href="#"
-        onClick="window.open(
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        CKEDITOR.replace('comments', {customConfig: '/ckeditor_config.js'});
+    })
+</script>
+<p>
+    <A
+            href="javascript:"
+            onClick="window.open(
       '{urlProblemHistoryPopup}',
       'reason',
       'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'); return false"
->
-    View SR history
-</A>
+    >
+        View SR history
+    </A>
 </p>
 <form method="post"
       action="{urlSubmit}"
@@ -55,10 +60,6 @@
             </td>
             <td>
                 <textarea name="comments">{comments}</textarea>
-                <script type="text/javascript">
-                    reason = CKEDITOR.replace('comments', {customConfig: '/ckeditor_config.js'});
-                    reason.addCss('body { font-size: 10pt; }');
-                </script>
             </td>
         </tr>
 

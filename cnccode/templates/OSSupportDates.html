@@ -75,18 +75,16 @@
         <div>
             <span>Availability Date:</span>
             <br>
-            <input type="text"
+            <input type="date"
                    name="availabilityDate"
                    required
-                   class="jqueryCalendar"
             >
         </div>
         <div>
             <span>EOL Date:</span>
             <br>
-            <input type="text"
+            <input type="date"
                    name="endOfLifeDate"
-                   class="jqueryCalendar"
             >
         </div>
         <div>
@@ -129,6 +127,7 @@
     let form = null;
 
     function showEdit(data = null) {
+        debugger;
         if (data) {
             form.elements['id'].value = data.id;
             form.elements['name'].value = data.name;
@@ -162,7 +161,7 @@
         form.elements['endOfLifeDate'].value = null;
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         dialogElem = $("#dialog");
         form = $('.detail')[0];
         dialogElem.dialog({autoOpen: false, position: {my: 'center', at: "top"}, modal: true});
@@ -283,8 +282,22 @@
             columns: [
                 {data: "name"},
                 {data: "version"},
-                {data: "availabilityDate"},
-                {data: "endOfLifeDate"},
+                {
+                    data: "availabilityDate", render: (value) => {
+                        if (value) {
+                            return moment(value, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                        }
+                        return "";
+                    }
+                },
+                {
+                    data: "endOfLifeDate", render: (value) => {
+                        if (value) {
+                            return moment(value, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                        }
+                        return "";
+                    }
+                },
                 {
                     data: 'isServer', render: (data) => {
                         if (data) {
@@ -302,7 +315,7 @@
                 [0, 'asc'],
             ],
             createdRow: (row, data, dataIndex) => {
-                const eolDate = moment(data.endOfLifeDate, "DD/MM/YYYY");
+                const eolDate = moment(data.endOfLifeDate, "YYYY-MM-DD");
                 const todayDate = moment();
                 if (todayDate.isSameOrAfter(eolDate)) {
                     $(row).addClass('expired');
@@ -366,9 +379,8 @@
         });
 
         addButton.click(function () {
-
+            debugger;
             if (!form.checkValidity()) {
-                form.submit();
                 return;
             }
 

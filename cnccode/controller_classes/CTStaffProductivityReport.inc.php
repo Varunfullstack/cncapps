@@ -34,13 +34,12 @@ class CTStaffProductivityReport extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "accounts",
-        ];
+        $roles = SENIOR_MANAGEMENT_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(905);
         $this->BUStaffProductivityReport = new BUStaffProductivityReport ($this);
     }
 
@@ -130,13 +129,9 @@ class CTStaffProductivityReport extends CTCNC
         $this->template->set_var(
             array(
                 'formError'        => $this->formError,
-                'startDate'        => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUStaffProductivityReport::searchFormStartDate)
-                ),
+                'startDate'        => $dsSearchForm->getValue(BUStaffProductivityReport::searchFormStartDate),
                 'startDateMessage' => $dsSearchForm->getMessage(BUStaffProductivityReport::searchFormStartDate),
-                'endDate'          => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUStaffProductivityReport::searchFormEndDate)
-                ),
+                'endDate'          => $dsSearchForm->getValue(BUStaffProductivityReport::searchFormEndDate),
                 'endDateMessage'   => $dsSearchForm->getMessage(BUStaffProductivityReport::searchFormEndDate)
             )
         );

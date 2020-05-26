@@ -26,13 +26,12 @@ class CTActivityType extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            "maintenance",
-        ];
+        $roles = MAINTENANCE_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(801);
         $this->buActivityType = new BUActivityType($this);
         $this->dsCallActType = new DSForm($this);
         $this->dsCallActType->copyColumnsFrom($this->buActivityType->dbeCallActType);
@@ -45,7 +44,7 @@ class CTActivityType extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
+        $this->checkPermissions(MAINTENANCE_PERMISSION);
         switch ($this->getAction()) {
             case CTACTIVITYTYPE_ACT_EDIT:
             case CTACTIVITYTYPE_ACT_CREATE:
@@ -64,89 +63,7 @@ class CTActivityType extends CTCNC
         }
     }
 
-    /**
-     * Display list of types
-     * @access private
-     * @throws Exception
-     */
-    function displayList()
-    {
-        $this->setMethodName('displayList');
-        $this->setPageTitle('Activity Types');
-        $this->setTemplateFiles(
-            array('ActivityTypeList' => 'ActivityTypeList.inc')
-        );
-        $dsCallActType = new DataSet($this);
-        $this->buActivityType->getAllTypes($dsCallActType);
-
-        $urlCreate = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTACTIVITYTYPE_ACT_CREATE
-            )
-        );
-
-        $this->template->set_var(
-            array('urlCreate' => $urlCreate)
-        );
-
-        if ($dsCallActType->rowCount()) {
-            $this->template->set_block('ActivityTypeList', 'typeBlock', 'types');
-            while ($dsCallActType->fetchNext()) {
-                $callActTypeID = $dsCallActType->getValue(DBECallActType::callActTypeID);
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'        => CTACTIVITYTYPE_ACT_EDIT,
-                            'callActTypeID' => $callActTypeID
-                        )
-                    );
-                $txtEdit = '[edit]';
-                $this->template->set_var(
-                    array(
-                        'callActTypeID'         => $callActTypeID,
-                        'description'           => Controller::htmlDisplayText(
-                            $dsCallActType->getValue(DBECallActType::description)
-                        ),
-                        'curValueFlag'          => $dsCallActType->getValue(DBECallActType::curValueFlag),
-                        'customerEmailFlag'     => $dsCallActType->getValue(DBECallActType::customerEmailFlag),
-                        'oohMultiplier'         => Controller::htmlInputText(
-                            $dsCallActType->getValue(DBECallActType::oohMultiplier)
-                        ),
-                        'maxHours'              => Controller::htmlInputText(
-                            $dsCallActType->getValue(DBECallActType::maxHours)
-                        ),
-                        'minHours'              => Controller::htmlInputText(
-                            $dsCallActType->getValue(DBECallActType::minHours)
-                        ),
-                        'allowSCRFlag'          => $dsCallActType->getValue(DBECallActType::allowSCRFlag),
-                        'requireCheckFlag'      => $dsCallActType->getValue(DBECallActType::requireCheckFlag),
-                        'allowReasonFlag'       => $dsCallActType->getValue(DBECallActType::allowReasonFlag),
-                        'allowActionFlag'       => $dsCallActType->getValue(DBECallActType::allowActionFlag),
-                        'allowFinalStatusFlag'  => $dsCallActType->getValue(DBECallActType::allowFinalStatusFlag),
-                        'reqReasonFlag'         => $dsCallActType->getValue(DBECallActType::reqReasonFlag),
-                        'reqActionFlag'         => $dsCallActType->getValue(DBECallActType::reqActionFlag),
-                        'reqFinalStatusFlag'    => $dsCallActType->getValue(DBECallActType::reqFinalStatusFlag),
-                        'activeFlag'            => $dsCallActType->getValue(DBECallActType::activeFlag),
-                        'showNotChargeableFlag' => $dsCallActType->getValue(DBECallActType::showNotChargeableFlag),
-                        'engineerOvertimeFlag'  => $dsCallActType->getValue(DBECallActType::engineerOvertimeFlag),
-                        'travelFlag'            => $dsCallActType->getValue(DBECallActType::travelFlag),
-                        'onSiteFlag'            => $dsCallActType->getValue(DBECallActType::onSiteFlag),
-                        'portalDisplayFlag'     => $dsCallActType->getValue(DBECallActType::portalDisplayFlag),
-                        'visibleInSRFlag'       => $dsCallActType->getValue(DBECallActType::visibleInSRFlag),
-                        'urlEdit'               => $urlEdit,
-                        'txtEdit'               => $txtEdit
-                    )
-                );
-                $this->template->parse('types', 'typeBlock', true);
-            }//while $dsCallActType->fetchNext()
-        }
-        $this->template->parse('CONTENTS', 'ActivityTypeList', true);
-        $this->parsePage();
-    }
-
-    /**
+/**
      * Edit/Add Activity
      * @access private
      * @throws Exception
@@ -309,6 +226,31 @@ class CTActivityType extends CTCNC
         );
         $this->template->parse('CONTENTS', 'ActivityTypeEdit', true);
         $this->parsePage();
+    }
+
+        /**
+     * Delete Activity
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function delete()
+    {
+        $this->setMethodName('delete');
+        if (!$this->buActivityType->deleteActivityType($this->getParam('callActTypeID'))) {
+            $this->displayFatalError('Cannot delete this activity type');
+            exit;
+        } else {
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTACTIVITYTYPE_ACT_DISPLAY_LIST
+                )
+            );
+            header('Location: ' . $urlNext);
+            exit;
+        }
     }// end function editActivity()
 
     /**
@@ -343,27 +285,84 @@ class CTActivityType extends CTCNC
     }
 
     /**
-     * Delete Activity
-     *
+     * Display list of types
      * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
      * @throws Exception
      */
-    function delete()
+    function displayList()
     {
-        $this->setMethodName('delete');
-        if (!$this->buActivityType->deleteActivityType($this->getParam('callActTypeID'))) {
-            $this->displayFatalError('Cannot delete this activity type');
-            exit;
-        } else {
-            $urlNext = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTACTIVITYTYPE_ACT_DISPLAY_LIST
-                )
-            );
-            header('Location: ' . $urlNext);
-            exit;
+        $this->setMethodName('displayList');
+        $this->setPageTitle('Activity Types');
+        $this->setTemplateFiles(
+            array('ActivityTypeList' => 'ActivityTypeList.inc')
+        );
+        $dsCallActType = new DataSet($this);
+        $this->buActivityType->getAllTypes($dsCallActType);
+
+        $urlCreate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTACTIVITYTYPE_ACT_CREATE
+            )
+        );
+
+        $this->template->set_var(
+            array('urlCreate' => $urlCreate)
+        );
+
+        if ($dsCallActType->rowCount()) {
+            $this->template->set_block('ActivityTypeList', 'typeBlock', 'types');
+            while ($dsCallActType->fetchNext()) {
+                $callActTypeID = $dsCallActType->getValue(DBECallActType::callActTypeID);
+                $urlEdit =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'        => CTACTIVITYTYPE_ACT_EDIT,
+                            'callActTypeID' => $callActTypeID
+                        )
+                    );
+                $txtEdit = '[edit]';
+                $this->template->set_var(
+                    array(
+                        'callActTypeID'         => $callActTypeID,
+                        'description'           => Controller::htmlDisplayText(
+                            $dsCallActType->getValue(DBECallActType::description)
+                        ),
+                        'curValueFlag'          => $dsCallActType->getValue(DBECallActType::curValueFlag),
+                        'customerEmailFlag'     => $dsCallActType->getValue(DBECallActType::customerEmailFlag),
+                        'oohMultiplier'         => Controller::htmlInputText(
+                            $dsCallActType->getValue(DBECallActType::oohMultiplier)
+                        ),
+                        'maxHours'              => Controller::htmlInputText(
+                            $dsCallActType->getValue(DBECallActType::maxHours)
+                        ),
+                        'minHours'              => Controller::htmlInputText(
+                            $dsCallActType->getValue(DBECallActType::minHours)
+                        ),
+                        'allowSCRFlag'          => $dsCallActType->getValue(DBECallActType::allowSCRFlag),
+                        'requireCheckFlag'      => $dsCallActType->getValue(DBECallActType::requireCheckFlag),
+                        'allowReasonFlag'       => $dsCallActType->getValue(DBECallActType::allowReasonFlag),
+                        'allowActionFlag'       => $dsCallActType->getValue(DBECallActType::allowActionFlag),
+                        'allowFinalStatusFlag'  => $dsCallActType->getValue(DBECallActType::allowFinalStatusFlag),
+                        'reqReasonFlag'         => $dsCallActType->getValue(DBECallActType::reqReasonFlag),
+                        'reqActionFlag'         => $dsCallActType->getValue(DBECallActType::reqActionFlag),
+                        'reqFinalStatusFlag'    => $dsCallActType->getValue(DBECallActType::reqFinalStatusFlag),
+                        'activeFlag'            => $dsCallActType->getValue(DBECallActType::activeFlag),
+                        'showNotChargeableFlag' => $dsCallActType->getValue(DBECallActType::showNotChargeableFlag),
+                        'engineerOvertimeFlag'  => $dsCallActType->getValue(DBECallActType::engineerOvertimeFlag),
+                        'travelFlag'            => $dsCallActType->getValue(DBECallActType::travelFlag),
+                        'onSiteFlag'            => $dsCallActType->getValue(DBECallActType::onSiteFlag),
+                        'portalDisplayFlag'     => $dsCallActType->getValue(DBECallActType::portalDisplayFlag),
+                        'visibleInSRFlag'       => $dsCallActType->getValue(DBECallActType::visibleInSRFlag),
+                        'urlEdit'               => $urlEdit,
+                        'txtEdit'               => $txtEdit
+                    )
+                );
+                $this->template->parse('types', 'typeBlock', true);
+            }//while $dsCallActType->fetchNext()
         }
+        $this->template->parse('CONTENTS', 'ActivityTypeList', true);
+        $this->parsePage();
     }
 }

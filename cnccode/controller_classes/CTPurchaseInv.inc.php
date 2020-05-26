@@ -47,13 +47,12 @@ class CTPurchaseInv extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            "accounts",
-        ];
+        $roles = ACCOUNTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(702);
         $this->buPurchaseInv = new BUPurchaseInv($this);
         $this->buPurchaseOrder = new BUPurchaseOrder($this);
         $this->dsPorhead = new DSForm($this);
@@ -68,7 +67,7 @@ class CTPurchaseInv extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
+        $this->checkPermissions(ACCOUNTS_PERMISSION);
         switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:
                 $this->search();
@@ -278,7 +277,7 @@ class CTPurchaseInv extends CTCNC
                 'porheadID'           => $porheadID,
                 'supplierName'        => Controller::htmlDisplayText($dsPorhead->getValue(DBEJPorhead::supplierName)),
                 'vatRate'             => $dsPorhead->getValue(DBEJPorhead::vatRate),
-                'purchaseInvoiceDate' => Controller::dateYMDtoDMY(($this->getParam('purchaseInvoiceDate'))),
+                'purchaseInvoiceDate' => $this->getParam('purchaseInvoiceDate'),
                 'purchaseInvoiceNo'   => Controller::htmlDisplayText($this->getParam('purchaseInvoiceNo')),
                 'urlUpdate'           => $urlUpdate,
                 'urlPurchaseOrder'    => $urlPurchaseOrder,
@@ -456,18 +455,19 @@ class CTPurchaseInv extends CTCNC
             $this->display();
             exit;
         }
-        $dateArray = explode('/', $this->getParam('purchaseInvoiceDate'));
-        if (!checkdate($dateArray[1], $dateArray[0], $dateArray[2])) {
+        $dateString = $this->getParam('purchaseInvoiceDate');
+
+        $date = DateTime::createFromFormat(DATE_MYSQL_DATE, $dateString);
+        if (!$date) {
             $this->setFormErrorMessage('Please enter a valid purchase invoice date');
             $this->display();
             exit;
-        } else {
-            $invoiceDateYMD = $dateArray[2] . '-' . $dateArray[1] . '-' . $dateArray[0];
         }
+
         $this->buPurchaseInv->update(
             $this->getParam('porheadID'),
             $this->getParam('purchaseInvoiceNo'),
-            $invoiceDateYMD,
+            $date->format(DATE_MYSQL_DATE),
             $dsPurchaseInv,
             $this->userID
         );

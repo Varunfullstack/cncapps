@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
@@ -19,14 +20,12 @@ class CTReviewList extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            'sales'
-        ];
+        $roles = ACCOUNT_MANAGEMENT_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
-
+        $this->setMenuId(401);
     }
 
     /**
@@ -35,7 +34,109 @@ class CTReviewList extends CTCNC
      */
     function defaultAction()
     {
-        $this->displayReviewList();
+        $i = $this->action;
+        if ($i == "getData") {
+            $this->getData();
+        } else {
+            $this->displayReviewList();
+        }
+    }
+
+    private function getData()
+    {
+        $baseQuery =
+            "select cus_name                                      as customerName,
+       reviewAction                                  as reviewAction,
+       reviewDate,
+       reviewTime,
+       reviewUserID,
+       consultant.cns_name                           as reviewUserName,
+       cus_custno                                    as customerId,
+       concat_ws(' ', con_first_name, con_last_name) as contactName,
+       con_email                                     as contactEmail,
+       coalesce(
+               if(con_phone, con_phone, null),
+               if(con_mobile_phone, con_mobile_phone, null),
+               if(add_phone, add_phone, null)
+           ) as contactPhone,
+       c.name                                        as leadStatus,
+       (select cno_details
+        from customernote
+        where cno_custno = customer.cus_custno
+        order by cno_created desc
+        limit 1)                                     as latestUpdate
+from customer
+         left join consultant on reviewUserID = consultant.cns_consno
+         left join contact on cus_custno = contact.con_custno and con_contno =
+                                                                  (select min(b.con_contno)
+                                                                   from contact b
+                                                                   where b.con_custno = cus_custno
+                                                                     and (
+                                                                           con_mailshot = 'Y' OR
+                                                                           con_mailflag2 = 'Y' OR
+                                                                           con_mailflag3 = 'Y' OR
+                                                                           con_mailflag4 = 'Y' OR
+                                                                           con_mailflag8 = 'Y' OR
+                                                                           con_mailflag9 = 'Y' OR
+                                                                           con_mailflag11 = 'Y' or
+                                                                           (supportLevel is not null and supportLevel <> '') or
+                                                                           hrUser = 'Y' or
+                                                                           initialLoggingEmailFlag = 'Y' or
+                                                                           workStartedEmailFlag = 'Y' or
+                                                                           workUpdatesEmailFlag = 'Y' or
+                                                                           fixedEmailFlag = 'Y' or
+                                                                           pendingClosureEmailFlag = 'Y' or
+                                                                           closureEmailFlag = 'Y' or
+                                                                           othersInitialLoggingEmailFlag = 'Y' or
+                                                                           othersWorkStartedEmailFlag = 'Y' or
+                                                                           othersWorkUpdatesEmailFlag = 'Y' or
+                                                                           othersFixedEmailFlag = 'Y' or
+                                                                           othersPendingClosureEmailFlag = 'Y' or
+                                                                           othersClosureEmailFlag = 'Y'
+                                                                       )
+                                                                  )
+         left join address on add_custno = cus_custno and add_siteno = con_siteno
+         left join customerleadstatus c on customer.leadStatusId = c.id
+where reviewDate IS NOT NULL
+  and reviewDate <= CURDATE() ";
+        $offset = $_REQUEST['start'];
+        $limit = $_REQUEST['length'];
+
+        /** @var dbSweetcode $db */
+        global $db;
+        $countResult = $db->query($baseQuery);
+        $totalCount = $countResult->num_rows;
+        $filteredCount = $totalCount;
+        $columns = $_REQUEST['columns'];
+        $order = @$_REQUEST['order'];
+        $orderItems = [];
+        foreach ($order as $orderItem) {
+            $orderItems[] = mysqli_real_escape_string(
+                $db->link_id(),
+                "{$columns[$orderItem['column']]['name']} {$orderItem['dir']}"
+            );
+        }
+        if (count($orderItems)) {
+            $baseQuery .= " order by " . implode(', ', $orderItems);
+        }
+        $baseQuery .= " limit ?, ?";
+        $parameters[] = ["type" => "i", "value" => $offset];
+        $parameters[] = ["type" => "i", "value" => $limit];
+        $result = $db->preparedQuery(
+            $baseQuery,
+            $parameters
+        );
+        $overtimes = $result->fetch_all(MYSQLI_ASSOC);
+        echo json_encode(
+            [
+                "draw"            => $_REQUEST['draw'],
+                "recordsTotal"    => $totalCount,
+                "recordsFiltered" => $filteredCount,
+                "data"            => $overtimes
+            ]
+        );
+
+
     }
 
     /**
@@ -50,63 +151,18 @@ class CTReviewList extends CTCNC
 
         $this->setTemplateFiles('CustomerReviewList', 'CustomerReviewList.inc');
 
-        $this->template->set_block('CustomerReviewList', 'reviewBlock', 'reviews');
 
-        $this->buCustomer = new BUCustomer($this);
+//                        'reviewAction' => substr($dsCustomer->getValue(DBECustomer::reviewAction), 0, 50),
+//                        'reviewUser'   => $user,
+//                        'linkURL'      => $linkURL,
+//                        'reportURL'    => $reportUrl
+//                    )
+//
+//                );
+//                $this->template->parse('reviews', 'reviewBlock', true);
+//            }
+        $this->template->parse('CONTENTS', 'CustomerReviewList', true);
 
-        if ($this->getParam('sortColumn')) {
-            $sortColumn = $this->getParam('sortColumn');
-        } else {
-            $sortColumn = false;
-        }
-        $dsCustomer = new DataSet($this);
-        if ($this->buCustomer->getDailyCallList($this, $dsCustomer, $sortColumn)) {
-
-            $buUser = new BUUser($this);
-
-            while ($dsCustomer->fetchNext()) {
-
-                $linkURL =
-                    Controller::buildLink(
-                        'CustomerCRM.php',
-                        array(
-                            'action'     => 'displayEditForm',
-                            'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
-                        )
-                    );
-
-                if ($dsCustomer->getValue(DBECustomer::reviewUserID)) {
-                    $dsUser = new DataSet($this);
-                    $buUser->getUserByID($dsCustomer->getValue(DBECustomer::reviewUserID), $dsUser);
-                    $user = $dsUser->getValue(DBEUser::name);
-                } else {
-                    $user = false;
-                }
-
-                $reportUrl =
-                    Controller::buildLink(
-                        'ReviewList.php',
-                        array()
-                    );
-                $this->template->set_var(
-
-                    array(
-                        'customerName' => $dsCustomer->getValue(DBECustomer::name),
-                        'reviewDate'   => (new DateTime($dsCustomer->getValue(DBECustomer::reviewDate)))->format(
-                            'd/m/Y'
-                        ),
-                        'reviewTime'   => $dsCustomer->getValue(DBECustomer::reviewTime),
-                        'reviewAction' => substr($dsCustomer->getValue(DBECustomer::reviewAction), 0, 50),
-                        'reviewUser'   => $user,
-                        'linkURL'      => $linkURL,
-                        'reportURL'    => $reportUrl
-                    )
-
-                );
-                $this->template->parse('reviews', 'reviewBlock', true);
-            }
-            $this->template->parse('CONTENTS', 'CustomerReviewList', true);
-        }
         $this->parsePage();
     }
 }

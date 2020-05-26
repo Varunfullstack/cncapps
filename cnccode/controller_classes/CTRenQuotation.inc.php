@@ -35,14 +35,12 @@ class CTRenQuotation extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "renewals",
-            "technical"
-        ];
+        $roles = RENEWALS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(601);
         $this->buRenQuotation = new BURenQuotation($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenQuotation = new DSForm($this);
@@ -112,6 +110,326 @@ class CTRenQuotation extends CTCNC
                 break;
         }
     }
+
+    /**
+     * Edit/Add Activity
+     * @access private
+     * @throws Exception
+     */
+    function edit()
+    {
+        $this->setMethodName('edit');
+        $dsRenQuotation = &$this->dsRenQuotation; // ref to class var
+
+        if (!$this->getFormError()) {
+            if ($this->getAction() == 'edit') {
+                $this->buRenQuotation->getRenQuotationByID(
+                    $this->getParam('ID'),
+                    $dsRenQuotation
+                );
+                $customerItemID = $this->getParam('ID');
+            } else {                                                                    // creating new
+                $dsRenQuotation->initialise();
+                $dsRenQuotation->setValue(
+                    DBEJRenQuotation::customerItemID,
+                    '0'
+                );
+                $customerItemID = '0';
+            }
+        } else {                                                                        // form validation error
+            $dsRenQuotation->initialise();
+            $dsRenQuotation->fetchNext();
+            $customerItemID = $dsRenQuotation->getValue(DBEJRenQuotation::customerItemID);
+        }
+
+        $urlUpdate =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'         => 'update',
+                    'ordheadID'      => $this->getParam('ordheadID'),
+                    'customerItemID' => $customerItemID
+                )
+            );
+        $urlDisplayList =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'list'
+                )
+            );
+        $this->setPageTitle('Edit Renewal');
+        $this->setTemplateFiles(
+            array('RenQuotationEdit' => 'RenQuotationEdit.inc')
+        );
+        $disabled = CTCNC_HTML_DISABLED;
+        $readonly = 'READONLY';
+
+        if ($this->hasPermissions(RENEWALS_PERMISSION)) {
+            $disabled = null; // not
+            $readonly = null;
+            $this->template->set_var(
+                array(
+                    'salePrice' => Controller::htmlDisplayText($dsRenQuotation->getValue(DBEJRenQuotation::salePrice)),
+                    'costPrice' => Controller::htmlDisplayText($dsRenQuotation->getValue(DBEJRenQuotation::costPrice))
+                )
+            );
+        }
+        $urlItemPopup =
+            Controller::buildLink(
+                CTCNC_PAGE_ITEM,
+                array(
+                    'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
+                    'renewalTypeID' => CONFIG_QUOTATION_RENEWAL_TYPE_ID,
+                    'htmlFmt'       => CT_HTML_FMT_POPUP
+                )
+            );
+        $urlItemEdit =
+            Controller::buildLink(
+                CTCNC_PAGE_ITEM,
+                array(
+                    'action'  => CTCNC_ACT_ITEM_EDIT,
+                    'htmlFmt' => CT_HTML_FMT_POPUP
+                )
+            );
+        $salesOrderLink = null;
+        if ($dsRenQuotation->getValue(DBEJRenQuotation::ordheadID)) {
+            $salesOrderURL = Controller::buildLink(
+                CTCNC_PAGE_SALESORDER,
+                array(
+                    'action'    => 'displaySalesOrder',
+                    'ordheadID' => $dsRenQuotation->getValue(DBEJRenQuotation::ordheadID)
+                )
+            );
+
+            $salesOrderLink = "<a href='$salesOrderURL' target='_blank'>" . $dsRenQuotation->getValue(
+                    DBEJRenQuotation::ordheadID
+                ) . "</a>";
+        }
+
+
+        $this->template->set_var(
+            array(
+                'customerID'           => Controller::htmlDisplayText(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::customerID)
+                ),
+                'siteName'             => Controller::htmlDisplayText(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::siteName)
+                ),
+                'siteNo'               => $dsRenQuotation->getValue(DBEJRenQuotation::siteNo),
+                'itemID'               => Controller::htmlDisplayText(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::itemID)
+                ),
+                'customerItemID'       => $dsRenQuotation->getValue(DBEJRenQuotation::customerItemID),
+                'customerName'         => Controller::htmlDisplayText(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::customerName)
+                ),
+                'itemDescription'      => Controller::htmlDisplayText(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::itemDescription)
+                ),
+                'startDate'            => $dsRenQuotation->getValue(DBEJRenQuotation::startDate),
+                'calculatedExpiryDate' =>
+                    DateTime::createFromFormat(
+                        'Y-m-d',
+                        $dsRenQuotation->getValue(DBEJRenQuotation::startDate)
+                    )->add(
+                        new DateInterval('P1Y')
+                    )->format('d/m/Y'),
+                'dateGenerated'        => $dsRenQuotation->getValue(DBEJRenQuotation::dateGenerated),
+                'dateGeneratedMessage' => $dsRenQuotation->getMessage(DBEJRenQuotation::dateGenerated),
+                'grantNumber'          => Controller::htmlDisplayText(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::grantNumber)
+                ),
+                'serialNo'             => Controller::htmlDisplayText(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::serialNo)
+                ),
+                'qty'                  => Controller::htmlDisplayText($dsRenQuotation->getValue(DBEJRenQuotation::qty)),
+                'declinedFlagChecked'  => Controller::htmlChecked(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::declinedFlag)
+                ),
+                'urlUpdate'            => $urlUpdate,
+                'urlItemEdit'          => $urlItemEdit,
+                'urlItemPopup'         => $urlItemPopup,
+                'urlDisplayList'       => $urlDisplayList,
+                'disabled'             => $disabled,
+                'internalNotes'        => Controller::htmlTextArea(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::internalNotes)
+                ),
+                'comments'             => Controller::htmlTextArea(
+                    $dsRenQuotation->getValue(DBEJRenQuotation::customerItemNotes)
+                ),
+                'readonly'             => $readonly,
+                'salesOrderLink'       => $salesOrderLink,
+                'ordheadID'            => $dsRenQuotation->getValue(DBEJRenQuotation::ordheadID)
+            )
+        );
+        $dbeRenQuotationType = new DBERenQuotationType($this);
+
+        $dbeRenQuotationType->getRows();
+
+        $this->template->set_block(
+            'RenQuotationEdit',
+            'typeBlock',
+            'types'
+        );
+
+        while ($dbeRenQuotationType->fetchNext()) {
+
+            $typeSelected = ($dsRenQuotation->getValue(
+                    DBEJRenQuotation::renQuotationTypeID
+                ) == $dbeRenQuotationType->getValue(
+                    DBERenQuotationType::renQuotationTypeID
+                )) ? CT_SELECTED : null;
+
+            $this->template->set_var(
+                array(
+                    'typeSelected'       => $typeSelected,
+                    'renQuotationTypeID' => $dbeRenQuotationType->getPKValue(),
+                    'typeDescription'    => $dbeRenQuotationType->getValue(DBERenQuotationType::description)
+                )
+            );
+            $this->template->parse(
+                'types',
+                'typeBlock',
+                true
+            );
+        }
+
+        $this->template->parse(
+            'CONTENTS',
+            'RenQuotationEdit',
+            true
+        );
+
+        $this->parsePage();
+
+    }
+
+    /**
+     * Called from sales order line to edit a renewal.
+     * The page passes
+     * ordheadID
+     * sequenceNo (line)
+     * renewalCustomerItemID (blank if renewal not created yet
+     *
+     *
+     * @throws Exception
+     */
+    function editFromSalesOrder()
+    {
+        $buSalesOrder = new BUSalesOrder($this);
+        $dsOrdline = new DataSet($this);
+        $buSalesOrder->getOrdlineByIDSeqNo(
+            $this->getParam('ordheadID'),
+            $this->getParam('sequenceNo'),
+            $dsOrdline
+        );
+
+        $renewalCustomerItemID = $dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
+        // has the order line get a renewal already?
+        if (!$renewalCustomerItemID) {
+            // create a new record first
+            $dsOrdhead = new DataSet($this);
+            $buSalesOrder->getOrderByOrdheadID(
+                $this->getParam('ordheadID'),
+                $dsOrdhead,
+                $dsDontNeedOrdline
+            );
+            $this->buRenQuotation->createNewRenewal(
+                $dsOrdhead->getValue(DBEJOrdhead::customerID),
+                $dsOrdline->getValue(DBEJOrdline::itemID),
+                $renewalCustomerItemID,
+                $dsOrdline->getValue(DBEJOrdline::curUnitSale),
+                $dsOrdline->getValue(DBEJOrdline::curUnitCost),
+                $dsOrdline->getValue(DBEJOrdline::qtyOrdered),
+                $dsOrdhead->getValue(DBEJOrdhead::delSiteNo)
+            );
+
+
+            // For despatch, prevents the renewal appearing again today during despatch process.
+            $dbeOrdline = new DBEOrdline($this);
+
+            $dbeOrdline->setValue(
+                DBEJOrdline::ordheadID,
+                $dsOrdline->getValue(DBEJOrdline::ordheadID)
+            );
+            $dbeOrdline->setValue(
+                DBEJOrdline::sequenceNo,
+                $dsOrdline->getValue(DBEJOrdline::sequenceNo)
+            );
+
+            $dbeOrdline->getRow();
+            $dbeOrdline->setValue(
+                DBEJOrdline::renewalCustomerItemID,
+                $renewalCustomerItemID
+            );
+
+            $dbeOrdline->updateRow();
+
+        }
+
+        $urlNext = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => 'edit',
+                'ID'     => $renewalCustomerItemID
+            )
+        );
+
+        header('Location: ' . $urlNext);
+        exit;
+    }
+
+    /**
+     * Update call activity type details
+     * @access private
+     * @throws Exception
+     */
+    function update()
+    {
+        $this->setMethodName('update');
+        $this->formError = (!$this->dsRenQuotation->populateFromArray($this->getParam('renQuotation')));
+
+        if ($this->formError) {
+
+            if ($this->dsRenQuotation->getValue(
+                DBEJRenQuotation::customerItemID
+            )) {                    // attempt to insert
+                $this->setAction('edit');
+            } else {
+                $this->setAction('create');
+            }
+            $this->edit();
+            exit;
+        }
+
+        $this->buRenQuotation->updateRenQuotation($this->dsRenQuotation);
+
+        if ($this->getParam('ordheadID') == 1) {        // see whether more renewals need to be edited for this
+            // despatch
+            $urlNext =
+                Controller::buildLink(
+                    'Despatch',
+                    array(
+                        'action' => 'inputRenewals',
+                        'ID'     => $this->getParam('ordheadID')
+                    )
+                );
+
+        } else {
+            $urlNext =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => 'edit',
+                        'ID'     => $this->dsRenQuotation->getValue(DBEJRenQuotation::customerItemID)
+                    )
+                );
+
+        }
+
+        header('Location: ' . $urlNext);
+    }// end function editActivity()
 
     /**
      * Display list of types
@@ -208,9 +526,7 @@ class CTRenQuotation extends CTCNC
                         'customerName'        => $dsRenQuotation->getValue(DBEJRenQuotation::customerName),
                         'itemDescription'     => $dsRenQuotation->getValue(DBEJRenQuotation::itemDescription),
                         'type'                => $dsRenQuotation->getValue(DBEJRenQuotation::type),
-                        'startDate'           => Controller::dateYMDtoDMY(
-                            $dsRenQuotation->getValue(DBEJRenQuotation::startDate)
-                        ),
+                        'startDate'           => $dsRenQuotation->getValue(DBEJRenQuotation::startDate),
                         'nextPeriodStartDate' => Controller::dateYMDtoDMY(
                             $dsRenQuotation->getValue(DBEJRenQuotation::nextPeriodStartDate)
                         ),
@@ -243,329 +559,5 @@ class CTRenQuotation extends CTCNC
             true
         );
         $this->parsePage();
-    }
-
-    /**
-     * Called from sales order line to edit a renewal.
-     * The page passes
-     * ordheadID
-     * sequenceNo (line)
-     * renewalCustomerItemID (blank if renewal not created yet
-     *
-     *
-     * @throws Exception
-     */
-    function editFromSalesOrder()
-    {
-        $buSalesOrder = new BUSalesOrder($this);
-        $dsOrdline = new DataSet($this);
-        $buSalesOrder->getOrdlineByIDSeqNo(
-            $this->getParam('ordheadID'),
-            $this->getParam('sequenceNo'),
-            $dsOrdline
-        );
-
-        $renewalCustomerItemID = $dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
-        // has the order line get a renewal already?
-        if (!$renewalCustomerItemID) {
-            // create a new record first
-            $dsOrdhead = new DataSet($this);
-            $buSalesOrder->getOrderByOrdheadID(
-                $this->getParam('ordheadID'),
-                $dsOrdhead,
-                $dsDontNeedOrdline
-            );
-            $this->buRenQuotation->createNewRenewal(
-                $dsOrdhead->getValue(DBEJOrdhead::customerID),
-                $dsOrdline->getValue(DBEJOrdline::itemID),
-                $renewalCustomerItemID,
-                $dsOrdline->getValue(DBEJOrdline::curUnitSale),
-                $dsOrdline->getValue(DBEJOrdline::curUnitCost),
-                $dsOrdline->getValue(DBEJOrdline::qtyOrdered),
-                $dsOrdhead->getValue(DBEJOrdhead::delSiteNo)
-            );
-
-
-            // For despatch, prevents the renewal appearing again today during despatch process.
-            $dbeOrdline = new DBEOrdline($this);
-
-            $dbeOrdline->setValue(
-                DBEJOrdline::ordheadID,
-                $dsOrdline->getValue(DBEJOrdline::ordheadID)
-            );
-            $dbeOrdline->setValue(
-                DBEJOrdline::sequenceNo,
-                $dsOrdline->getValue(DBEJOrdline::sequenceNo)
-            );
-
-            $dbeOrdline->getRow();
-            $dbeOrdline->setValue(
-                DBEJOrdline::renewalCustomerItemID,
-                $renewalCustomerItemID
-            );
-
-            $dbeOrdline->updateRow();
-
-        }
-
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => 'edit',
-                'ID'     => $renewalCustomerItemID
-            )
-        );
-
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    /**
-     * Edit/Add Activity
-     * @access private
-     * @throws Exception
-     */
-    function edit()
-    {
-        $this->setMethodName('edit');
-        $dsRenQuotation = &$this->dsRenQuotation; // ref to class var
-
-        if (!$this->getFormError()) {
-            if ($this->getAction() == 'edit') {
-                $this->buRenQuotation->getRenQuotationByID(
-                    $this->getParam('ID'),
-                    $dsRenQuotation
-                );
-                $customerItemID = $this->getParam('ID');
-            } else {                                                                    // creating new
-                $dsRenQuotation->initialise();
-                $dsRenQuotation->setValue(
-                    DBEJRenQuotation::customerItemID,
-                    '0'
-                );
-                $customerItemID = '0';
-            }
-        } else {                                                                        // form validation error
-            $dsRenQuotation->initialise();
-            $dsRenQuotation->fetchNext();
-            $customerItemID = $dsRenQuotation->getValue(DBEJRenQuotation::customerItemID);
-        }
-
-        $urlUpdate =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action'         => 'update',
-                    'ordheadID'      => $this->getParam('ordheadID'),
-                    'customerItemID' => $customerItemID
-                )
-            );
-        $urlDisplayList =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'list'
-                )
-            );
-        $this->setPageTitle('Edit Renewal');
-        $this->setTemplateFiles(
-            array('RenQuotationEdit' => 'RenQuotationEdit.inc')
-        );
-        $disabled = CTCNC_HTML_DISABLED;
-        $readonly = 'READONLY';
-
-        if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
-            $disabled = null; // not
-            $readonly = null;
-            $this->template->set_var(
-                array(
-                    'salePrice' => Controller::htmlDisplayText($dsRenQuotation->getValue(DBEJRenQuotation::salePrice)),
-                    'costPrice' => Controller::htmlDisplayText($dsRenQuotation->getValue(DBEJRenQuotation::costPrice))
-                )
-            );
-        }
-        $urlItemPopup =
-            Controller::buildLink(
-                CTCNC_PAGE_ITEM,
-                array(
-                    'action'        => CTCNC_ACT_DISP_ITEM_POPUP,
-                    'renewalTypeID' => CONFIG_QUOTATION_RENEWAL_TYPE_ID,
-                    'htmlFmt'       => CT_HTML_FMT_POPUP
-                )
-            );
-        $urlItemEdit =
-            Controller::buildLink(
-                CTCNC_PAGE_ITEM,
-                array(
-                    'action'  => CTCNC_ACT_ITEM_EDIT,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-        $salesOrderLink = null;
-        if ($dsRenQuotation->getValue(DBEJRenQuotation::ordheadID)) {
-            $salesOrderURL = Controller::buildLink(
-                CTCNC_PAGE_SALESORDER,
-                array(
-                    'action'    => 'displaySalesOrder',
-                    'ordheadID' => $dsRenQuotation->getValue(DBEJRenQuotation::ordheadID)
-                )
-            );
-
-            $salesOrderLink = "<a href='$salesOrderURL' target='_blank'>" . $dsRenQuotation->getValue(
-                    DBEJRenQuotation::ordheadID
-                ) . "</a>";
-        }
-
-
-        $this->template->set_var(
-            array(
-                'customerID'           => Controller::htmlDisplayText(
-                    $dsRenQuotation->getValue(DBEJRenQuotation::customerID)
-                ),
-                'siteName'             => Controller::htmlDisplayText(
-                    $dsRenQuotation->getValue(DBEJRenQuotation::siteName)
-                ),
-                'siteNo'               => $dsRenQuotation->getValue(DBEJRenQuotation::siteNo),
-                'itemID'               => Controller::htmlDisplayText(
-                    $dsRenQuotation->getValue(DBEJRenQuotation::itemID)
-                ),
-                'customerItemID'       => $dsRenQuotation->getValue(DBEJRenQuotation::customerItemID),
-                'customerName'         => Controller::htmlDisplayText(
-                    $dsRenQuotation->getValue(DBEJRenQuotation::customerName)
-                ),
-                'itemDescription'      => Controller::htmlDisplayText(
-                    $dsRenQuotation->getValue(DBEJRenQuotation::itemDescription)
-                ),
-                'startDate'            => Controller::dateYMDtoDMY(
-                    $dsRenQuotation->getValue(DBEJRenQuotation::startDate)
-                ),
-                'calculatedExpiryDate' =>
-                    DateTime::createFromFormat(
-                        'Y-m-d',
-                        $dsRenQuotation->getValue(DBEJRenQuotation::startDate)
-                    )->add(
-                        new DateInterval('P1Y')
-                    )->format('d/m/Y'),
-                'dateGenerated'        => Controller::dateYMDtoDMY(
-                    $dsRenQuotation->getValue(DBEJRenQuotation::dateGenerated)
-                ),
-                'dateGeneratedMessage' => $dsRenQuotation->getMessage(DBEJRenQuotation::dateGenerated),
-                'grantNumber'          => Controller::htmlDisplayText(
-                    $dsRenQuotation->getValue(DBEJRenQuotation::grantNumber)
-                ),
-                'serialNo'             => Controller::htmlDisplayText(
-                    $dsRenQuotation->getValue(DBEJRenQuotation::serialNo)
-                ),
-                'qty'                  => Controller::htmlDisplayText($dsRenQuotation->getValue(DBEJRenQuotation::qty)),
-                'declinedFlagChecked'  => Controller::htmlChecked(
-                    $dsRenQuotation->getValue(DBEJRenQuotation::declinedFlag)
-                ),
-                'urlUpdate'            => $urlUpdate,
-                'urlItemEdit'          => $urlItemEdit,
-                'urlItemPopup'         => $urlItemPopup,
-                'urlDisplayList'       => $urlDisplayList,
-                'disabled'             => $disabled,
-                'internalNotes'        => Controller::htmlTextArea(
-                    $dsRenQuotation->getValue(DBEJRenQuotation::internalNotes)
-                ),
-                'comments'             => Controller::htmlTextArea(
-                    $dsRenQuotation->getValue(DBEJRenQuotation::customerItemNotes)
-                ),
-                'readonly'             => $readonly,
-                'salesOrderLink'       => $salesOrderLink,
-                'ordheadID'            => $dsRenQuotation->getValue(DBEJRenQuotation::ordheadID)
-            )
-        );
-        $dbeRenQuotationType = new DBERenQuotationType($this);
-
-        $dbeRenQuotationType->getRows();
-
-        $this->template->set_block(
-            'RenQuotationEdit',
-            'typeBlock',
-            'types'
-        );
-
-        while ($dbeRenQuotationType->fetchNext()) {
-
-            $typeSelected = ($dsRenQuotation->getValue(
-                    DBEJRenQuotation::renQuotationTypeID
-                ) == $dbeRenQuotationType->getValue(
-                    DBERenQuotationType::renQuotationTypeID
-                )) ? CT_SELECTED : null;
-
-            $this->template->set_var(
-                array(
-                    'typeSelected'       => $typeSelected,
-                    'renQuotationTypeID' => $dbeRenQuotationType->getPKValue(),
-                    'typeDescription'    => $dbeRenQuotationType->getValue(DBERenQuotationType::description)
-                )
-            );
-            $this->template->parse(
-                'types',
-                'typeBlock',
-                true
-            );
-        }
-
-        $this->template->parse(
-            'CONTENTS',
-            'RenQuotationEdit',
-            true
-        );
-
-        $this->parsePage();
-
-    }// end function editActivity()
-
-    /**
-     * Update call activity type details
-     * @access private
-     * @throws Exception
-     */
-    function update()
-    {
-        $this->setMethodName('update');
-        $this->formError = (!$this->dsRenQuotation->populateFromArray($this->getParam('renQuotation')));
-
-        if ($this->formError) {
-
-            if ($this->dsRenQuotation->getValue(
-                DBEJRenQuotation::customerItemID
-            )) {                    // attempt to insert
-                $this->setAction('edit');
-            } else {
-                $this->setAction('create');
-            }
-            $this->edit();
-            exit;
-        }
-
-        $this->buRenQuotation->updateRenQuotation($this->dsRenQuotation);
-
-        if ($this->getParam('ordheadID') == 1) {        // see whether more renewals need to be edited for this
-            // despatch
-            $urlNext =
-                Controller::buildLink(
-                    'Despatch',
-                    array(
-                        'action' => 'inputRenewals',
-                        'ID'     => $this->getParam('ordheadID')
-                    )
-                );
-
-        } else {
-            $urlNext =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action' => 'edit',
-                        'ID'     => $this->dsRenQuotation->getValue(DBEJRenQuotation::customerItemID)
-                    )
-                );
-
-        }
-
-        header('Location: ' . $urlNext);
     }
 }

@@ -23,13 +23,12 @@ class CTPrepay extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            "accounts",
-        ];
+        $roles = ACCOUNTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(706);
         $this->buPrepay = new BUPrepay ($this);
     }
 
@@ -42,13 +41,13 @@ class CTPrepay extends CTCNC
         switch ($this->getAction()) {
 
             case 'exportGenerate':
-                $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
+                $this->checkPermissions(ACCOUNTS_PERMISSION);
                 $this->exportGenerate();
                 break;
 
             case 'exportForm':
             default:
-                $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
+                $this->checkPermissions(ACCOUNTS_PERMISSION);
                 $this->exportForm();
                 break;
         }
@@ -107,12 +106,8 @@ class CTPrepay extends CTCNC
         }
         $this->template->set_var(
             array(
-                'endDate'        => Controller::dateYMDtoDMY(
-                    $this->dsPrepayExport->getValue(BUPrepay::exportDataSetEndDate)
-                ),
-                'endDateMessage' => Controller::dateYMDtoDMY(
-                    $this->dsPrepayExport->getMessage(BUPrepay::exportDataSetEndDate)
-                ),
+                'endDate'        => $this->dsPrepayExport->getValue(BUPrepay::exportDataSetEndDate),
+                'endDateMessage' => $this->dsPrepayExport->getMessage(BUPrepay::exportDataSetEndDate),
                 'urlPreview'     => $urlPreview,
                 'urlExport'      => $urlExport
             )

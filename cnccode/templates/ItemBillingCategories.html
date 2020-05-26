@@ -67,7 +67,6 @@
         drawList();
     });
 
-    Mustache.tags = ['{%', '%}'];
 
     let editingItem = null;
 
@@ -82,7 +81,8 @@
         return JSON.parse(JSON.stringify(src));
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
+        Mustache.tags = ['{%', '%}'];
         addButton = $('.addButton');
         saveButton = $('.saveButton');
         cancelButton = $('.cancelButton');

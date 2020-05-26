@@ -110,7 +110,6 @@ class CTCustomerItem extends CTCNC
         );
         $roles = [
             "technical",
-            "sales"
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
@@ -119,6 +118,7 @@ class CTCustomerItem extends CTCNC
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsSearchForm = new DSForm($this);
         $this->dsCustomerItem = new DSForm($this);
+        $this->template->setVar("menuId", 106);
     }
 
     /**
@@ -127,7 +127,7 @@ class CTCustomerItem extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_TECHNICAL);
+        $this->checkPermissions(TECHNICAL_PERMISSION);
         $this->setParentFormFields();
         switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:
@@ -924,14 +924,14 @@ class CTCustomerItem extends CTCNC
                 'curUnitCostMessage'                                    => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::curUnitCost)
                 ),
-                'sOrderDate'                                            => Controller::dateYMDtoDMY(
-                    $dsCustomerItem->getValue(DBEJCustomerItem::sOrderDate)
+                'sOrderDate'                                            => $dsCustomerItem->getValue(
+                    DBEJCustomerItem::sOrderDate
                 ),
                 'sOrderDateMessage'                                     => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::sOrderDate)
                 ),
-                'expiryDate'                                            => Controller::dateYMDtoDMY(
-                    $dsCustomerItem->getValue(DBEJCustomerItem::expiryDate)
+                'expiryDate'                                            => $dsCustomerItem->getValue(
+                    DBEJCustomerItem::expiryDate
                 ),
                 'expiryDateMessage'                                     => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::expiryDate)
@@ -951,8 +951,8 @@ class CTCustomerItem extends CTCNC
                 'slaResponseHours'                                      => $dsCustomerItem->getValue(
                     DBEJCustomerItem::slaResponseHours
                 ),
-                'despatchDate'                                          => Controller::dateYMDtoDMY(
-                    $dsCustomerItem->getValue(DBEJCustomerItem::despatchDate)
+                'despatchDate'                                          => $dsCustomerItem->getValue(
+                    DBEJCustomerItem::despatchDate
                 ),
                 'despatchDateMessage'                                   => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::despatchDate)
@@ -969,14 +969,14 @@ class CTCustomerItem extends CTCNC
                 'secondSiteReplicationPathMessage'                      => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::secondSiteReplicationPath)
                 ),
-                'secondsiteValidationSuspendUntilDate'                  => Controller::dateYMDtoDMY(
-                    $dsCustomerItem->getValue(DBEJCustomerItem::secondsiteValidationSuspendUntilDate)
+                'secondsiteValidationSuspendUntilDate'                  => $dsCustomerItem->getValue(
+                    DBEJCustomerItem::secondsiteValidationSuspendUntilDate
                 ),
                 'secondsiteValidationSuspendUntilDateMessage'           => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::secondsiteValidationSuspendUntilDate)
                 ),
-                'offsiteReplicationValidationSuspendedUntilDate'        => Controller::dateYMDtoDMY(
-                    $dsCustomerItem->getValue(DBEJCustomerItem::offsiteReplicationValidationSuspendedUntilDate)
+                'offsiteReplicationValidationSuspendedUntilDate'        => $dsCustomerItem->getValue(
+                    DBEJCustomerItem::offsiteReplicationValidationSuspendedUntilDate
                 ),
                 'offsiteReplicationValidationSuspendedUntilDateMessage' => Controller::htmlDisplayText(
                     $dsCustomerItem->getMessage(DBECustomerItem::offsiteReplicationValidationSuspendedUntilDate)

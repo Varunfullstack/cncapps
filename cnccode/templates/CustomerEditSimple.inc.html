@@ -1,6 +1,5 @@
 <!-- Template: CustomerEdit.inc.html -->
-<script language='JavaScript'
-        src='.javascript/ajax.js'
+<script src='.javascript/ajax.js'
 ></script>
 <style>
 
@@ -29,13 +28,13 @@
     }
 
     .lockedIcon::before {
-        font-family: "FontAwesome";
+        font-family: "FontAwesome", serif;
         content: '\f023';
         color: green;
     }
 
     .unlockedIcon::before {
-        font-family: "FontAwesome";
+        font-family: "FontAwesome", serif;
         content: '\f13e';
         color: red;
     }
@@ -72,36 +71,6 @@
         color: red !important;
     }
 
-    table.fixed_header {
-        table-layout: fixed;
-    }
-
-    .fixed_header tbody, .fixed_header thead {
-        display: block;
-    }
-
-    .fixed_header tbody {
-        overflow-y: scroll;
-        max-height: 851px;
-        direction: rtl;
-        /*width: 100%;*/
-    }
-
-    .fixed_header tbody tr {
-        direction: ltr;
-    }
-
-    .fixed_header tbody td {
-        overflow: hidden;
-    }
-
-    .fixed_header td, .fixed_header th {
-        word-wrap: break-word;
-    }
-
-    .fixed_header thead tr, .fixed_header tbody tr {
-        display: block;
-    }
 
     .highlight {
         background-color: lightgreen;
@@ -269,8 +238,10 @@
 ></script>
 <div id="newPasswordDialog"
      title="New Password"
+     style="display: none"
 >
     <fieldset id="register">
+        <legend></legend>
         <label>Password </label>
         <input type="password"
                id="password"
@@ -330,6 +301,7 @@
                 <select name="form[contact][0][siteNo]"
                         data-validation="required"
                         data-type="site"
+                        title="site"
                 >
                     <!-- BEGIN templateSelectSiteBlock -->
                     <option value="{selectSiteNo}"
@@ -341,7 +313,6 @@
         </td>
         <td>
             <div class="contactTitle">
-
                 <input name="form[contact][0][title]"
                        size="2"
                        maxlength="10"
@@ -349,12 +320,12 @@
                        required
                        data-validation="required"
                        data-type="title"
+                       title="title"
                 >
             </div>
         </td>
         <td>
             <div class="contactFirstName">
-
                 <input name="form[contact][0][firstName]"
                        size="10"
                        maxlength="50"
@@ -362,12 +333,12 @@
                        required
                        data-validation="required"
                        data-type="firstName"
+                       title="First Name"
                 >
             </div>
         </td>
         <td>
             <div class="contactLast">
-
                 <input name="form[contact][0][lastName]"
                        size="10"
                        maxlength="50"
@@ -375,6 +346,7 @@
                        required
                        data-validation="required"
                        data-type="lastName"
+                       title="Last Name"
                 >
             </div>
         </td>
@@ -384,6 +356,7 @@
                        value=""
                        size="10"
                        maxlength="50"
+                       title="Position"
                 />
             </div>
         </td>
@@ -394,6 +367,7 @@
                        size="10"
                        maxlength="30"
                        class="telephoneValidator"
+                       title="Phone"
                 >
             </div>
         </td>
@@ -404,6 +378,7 @@
                        size="10"
                        maxlength="30"
                        class="telephoneValidator"
+                       title="Mobile"
                 >
             </div>
         </td>
@@ -417,7 +392,25 @@
                        data-validation="emailOrEmpty server"
                        data-validation-url="/validateUniqueEmail.php"
                        data-type="email"
+                       title="Email"
                 >
+            </div>
+        </td>
+        <td>
+            <div class="contactSupportLevel">
+                <select name="form[contact][0][supportLevel]"
+                        data-validation="atLeastOneMain"
+                        data-type="mainSelector"
+                        data-except="$('#referred').prop('checked') || isProspect()"
+                        title="Support Level"
+                >
+                    <!-- BEGIN templateSupportLevelBlock -->
+                    <option value="{supportLevelValue}"
+                    >
+                        {supportLevelDescription}
+                    </option>
+                    <!-- END templateSupportLevelBlock -->
+                </select>
             </div>
         </td>
         <td class="center ">
@@ -443,6 +436,17 @@
                 />
             </div>
         </td>
+        <td class="contactPendingLeaver">
+            <div class="content">
+                <i class="fab fa-linkedin-in"
+                   style="color: red"
+                   onclick="checkLink()"
+                ></i>
+                <input type="hidden"
+                       name="form[contact][0][linkedInURL]"
+                >
+            </div>
+        </td>
         <td>
             <div class="contactInitialLogging">
 
@@ -450,6 +454,7 @@
                        name="form[contact][0][initialLoggingEmailFlag]"
                        value="Y"
                        class="checkboxAlign"
+                       checked
                 >
             </div>
         </td>
@@ -460,6 +465,7 @@
                        name="form[contact][0][workStartedEmailFlag]"
                        value="Y"
                        class="checkboxAlign"
+                       checked
                 >
             </div>
         </td>
@@ -470,6 +476,7 @@
                        name="form[contact][0][workUpdatesEmailFlag]"
                        value="Y"
                        class="checkboxAlign"
+                       checked
                 >
             </div>
         </td>
@@ -480,6 +487,7 @@
                        name="form[contact][0][fixedEmailFlag]"
                        value="Y"
                        class="checkboxAlign"
+                       checked
                 >
             </div>
         </td>
@@ -490,6 +498,7 @@
                        name="form[contact][0][pendingClosureEmailFlag]"
                        value="Y"
                        class="checkboxAlign"
+                       checked
                 >
             </div>
         </td>
@@ -500,6 +509,7 @@
                        name="form[contact][0][closureEmailFlag]"
                        value="Y"
                        class="checkboxAlign"
+                       checked
                 >
             </div>
         </td>
@@ -572,7 +582,7 @@
                        value="Y"
                        data-validation="atLeastOne"
                        data-type="accounts"
-                       data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                       data-except="$('#referred').prop('checked') || isProspect()"
                 />
             </div>
         </td>
@@ -583,7 +593,7 @@
                        value="Y"
                        data-validation="atLeastOne"
                        data-type="invoice"
-                       data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                       data-except="$('#referred').prop('checked') || isProspect()"
                 />
             </div>
         </td>
@@ -592,6 +602,7 @@
                 <input type="checkbox"
                        name="form[contact][0][mailshot3Flag]"
                        value="Y"
+                       checked
                 />
             </div>
         </td>
@@ -603,26 +614,11 @@
                        class="stmCheckBox"
                        data-validation="atLeastOneAtMostOne"
                        data-type="statement"
-                       data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                       data-except="$('#referred').prop('checked') || isProspect()"
                 />
             </div>
         </td>
-        <td>
-            <div class="contactSupportLevel">
-                <select name="form[contact][0][supportLevel]"
-                        data-validation="atLeastOneMain"
-                        data-type="mainSelector"
-                        data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
-                >
-                    <!-- BEGIN templateSupportLevelBlock -->
-                    <option value="{supportLevelValue}"
-                    >
-                        {supportLevelDescription}
-                    </option>
-                    <!-- END templateSupportLevelBlock -->
-                </select>
-            </div>
-        </td>
+
         <td>
             <div class="contactHR">
                 <input type="checkbox"
@@ -639,7 +635,7 @@
                        value="Y"
                        data-validation="atLeastOne"
                        data-type="review"
-                       data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                       data-except="$('#referred').prop('checked') || isProspect()"
                 />
             </div>
         </td>
@@ -650,7 +646,7 @@
                        value="Y"
                        data-type="topUp"
                        {topUpValidation}
-                       data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                       data-except="$('#referred').prop('checked') || isProspect()"
                 />
             </div>
         </td>
@@ -659,6 +655,7 @@
                 <input type="checkbox"
                        name="form[contact][0][mailshot11Flag]"
                        value="Y"
+                       checked
                 />
             </div>
         </td>
@@ -669,7 +666,7 @@
                        value="Y"
                        data-validation="atLeastOne"
                        data-type="reports"
-                       data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                       data-except="$('#referred').prop('checked') || isProspect()"
                 />
             </div>
         </td>
@@ -678,6 +675,7 @@
                 <input type="checkbox"
                        name="form[contact][0][sendMailshotFlag]"
                        value="Y"
+                       checked
                 />
             </div>
         </td>
@@ -703,17 +701,61 @@
         </td>
         <td>
             <div class="contactPendingLeaverDate">
-                <input type="text"
+                <input type="date"
                        name="form[contact][0][pendingLeaverDate]"
                        value="{pendingLeaverDate}"
-                       class="jQueryCalendar"
                        autocomplete="off"
                 />
             </div>
         </td>
+        <td class="contactSpecialAttention">
+            <input type="checkbox"
+                   name="form[contact][0][specialAttentionContactFlag]"
+                   value="Y"
+            >
+        </td>
     </tr>
 </script>
 <script type="text/JavaScript">
+
+    function checkLink() {
+        const iconElement = event.target;
+        const input = iconElement.nextElementSibling;
+        let URL = input.value;
+        if (!URL) {
+            URL = prompt("Please provide a LinkedIn URL for the contact");
+            if (URL && !URL.match(/^https?:\/\/.*/)) {
+                URL = "http://" + URL;
+            }
+            if (!URL) {
+                return;
+            }
+            input.value = URL;
+            iconElement.style.color = 'green';
+            return;
+        }
+
+        window.open(URL, '_blank');
+    }
+
+    function checkWebsite() {
+        let URL = $('#websiteURL').val();
+        if (!URL) {
+            URL = prompt("Please provide a Website URL for the customer");
+            if (URL && !URL.match(/^https?:\/\/.*/)) {
+                URL = "http://" + URL;
+            }
+            if (!URL) {
+                return;
+            }
+            $('#websiteURL').val(URL);
+
+            $('.fas.fa-globe')[0].style.color = 'green';
+            return;
+        }
+
+        window.open(URL, '_blank');
+    }
 
     function clearReviewMeetingBooked() {
         document.getElementById('reviewMeetingBooked').checked = false;
@@ -740,23 +782,25 @@
     let contactsTableErrors;
 
 
-    function checkProspectFlag() {
-        const prospectFlagElm = document.getElementById('prospectFlag');
-
-        if (prospectFlagElm.checked) {
+    function checkIsProspect() {
+        if (isProspect()) {
             $('#primaryMainContactSelector').attr('required', false);
-        } else {
-            if ('{primaryMainMandatory}') {
-                $('#primaryMainContactSelector').attr('required', true);
-            }
+        } else if ('{primaryMainMandatory}') {
+            $('#primaryMainContactSelector').attr('required', true);
         }
     }
 
-    $(function () {
-        checkProspectFlag();
+    window.addEventListener('DOMContentLoaded', function () {
+        checkIsProspect();
     })
 
-    var isShowingInactive = {isShowingInactive};
+    function isProspect() {
+        const becameCustomerDateElm = document.getElementById('becameCustomerDate');
+        const droppedCustomerDateElm = document.getElementById('droppedCustomerDate');
+        return !(becameCustomerDateElm.value && !droppedCustomerDateElm.value);
+    }
+
+    const isShowingInactive = {isShowingInactive};
 
 
     function clearRow(contactID) {
@@ -765,9 +809,9 @@
             return;
         }
 
-        var row = $(event.target).closest('tr');
+        const row = $(event.target).closest('tr');
 
-        var object = {
+        const object = {
             contactID: contactID
         };
         $.ajax({
@@ -797,12 +841,12 @@
 
     function addContact(siteNo) {
         this.source = document.getElementById("contact-row").innerHTML;
-        var context = {
+        const context = {
             name: "a",
             id: 1,
             userID: 2
         };
-        var html = Mustache.to_html(this.source, context);
+        const html = Mustache.to_html(this.source, context);
         $(html)
             .find('select[name="form[contact][0][siteNo]"] option[value=' + siteNo + ']')
             .attr('selected', true)
@@ -810,8 +854,8 @@
             .prependTo('#contactsTable tbody');
     }
 
-    var currentContactId = null;
-    var currentPasswordButton = null;
+    let currentContactId = null;
+    let currentPasswordButton = null;
 
     function resetPasswordFields() {
         $('#password').val(null);
@@ -823,7 +867,7 @@
     }
 
     function saveNewPassword() {
-        var object = {
+        const object = {
             password: $('#password').val(),
             contactID: currentContactId
         };
@@ -851,15 +895,9 @@
         });
     }
 
-    $('#newPasswordDialog').dialog({
-        autoOpen: false, width: 500, close: function () {
-            resetPasswordFields();
-        }
-    });
-
 
     function askNewPassword() {
-        var data = $(event.target).data();
+        const data = $(event.target).data();
         currentContactId = data.contactId;
         currentPasswordButton = event.target;
         $('#newPasswordDialog').dialog('open');
@@ -869,17 +907,22 @@
         $('[name="' + elementName + '"]').focus();
     }
 
-    var validPassword = false;
-    var validRepeatPassword = false;
+    let validPassword = false;
+    let validRepeatPassword = false;
 
     let validatingContactsModal;
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
+
+        $('#newPasswordDialog').dialog({
+            autoOpen: false, width: 500, close: function () {
+                resetPasswordFields();
+            }
+        });
 
         validatingContactsModal = $('#validatingContactsModal').dialog({
             autoOpen: false, width: 500, modal: true, dialogClass: 'no-close', position: {my: 'top', at: 'top'}
         });
-        console.log(validatingContactsModal);
 
         $(".contactSupportLevel select").change(function () {
 
@@ -888,7 +931,7 @@
         });
 
         $("#contactsTable tbody tr").click(function () {
-            var selected = $(this).hasClass("highlight");
+            const selected = $(this).hasClass("highlight");
             $("#contactsTable tbody tr").removeClass("highlight");
             if (!selected)
                 $(this).addClass("highlight");
@@ -931,7 +974,7 @@
                 return false;
             }
 
-            var strength = 0;
+            let strength = 0;
             if (password.length < 6) {
                 return 'Too short'
             }
@@ -954,8 +997,8 @@
             }
         }
 
-        var erroredElements = {};
-        var errorsShowing = {};
+        const erroredElements = {};
+        let errorsShowing = {};
 
         contactsTableErrors = $('#contactsTableErrors');
 
@@ -969,7 +1012,8 @@
             contactsTableErrors.hide();
         }
 
-        $('#contactsTable').on('validation', 'input', onValidation);
+        const contactsTable = $('#contactsTable');
+        contactsTable.on('validation', 'input', onValidation);
         $('#contactsTable').on('beforeValidation', 'input', onBeforeValidation);
 
         function onBeforeValidation(value, lang, config) {
@@ -983,7 +1027,7 @@
 
         function onValidation(evt, valid) {
             //we have to generate the list of errored elements
-
+            console.log(evt, valid);
             const erroredElements = $('input.error').toArray()
 
             if (!erroredElements.length) {
@@ -1021,7 +1065,7 @@
 
         }
 
-        var config = {
+        const config = {
             modules: 'security',
             showHelpOnFocus: false,
             addSuggestions: false,
@@ -1045,14 +1089,14 @@
                     return true;
                 }
 
-                var emailParts = email.toLowerCase().split('@'),
-                    localPart = emailParts[0],
-                    domain = emailParts[1];
+                const emailParts = email.toLowerCase().split('@');
+                let localPart = emailParts[0];
+                const domain = emailParts[1];
 
                 if (localPart && domain) {
 
                     if (localPart.indexOf('"') === 0) {
-                        var len = localPart.length;
+                        const len = localPart.length;
                         localPart = localPart.replace(/\"/g, '');
                         if (localPart.length !== (len - 2)) {
                             return false; // It was not allowed to have more than two apostrophes
@@ -1070,13 +1114,13 @@
 
 
                     ///we need to check that no other email is set to the same
-                    var test = $('input[data-validation*="emailOrEmpty"]');
+                    const test = $('input[data-validation*="emailOrEmpty"]');
 
-                    var isDuplicate = false;
+                    let isDuplicate = false;
 
                     test.each(function () {
-                        var elm = $(this);
-                        var isMe = elm.get(0) === $el.get(0);
+                        const elm = $(this);
+                        const isMe = elm.get(0) === $el.get(0);
 
                         if (!isMe && elm.val().toLowerCase() === email.toLowerCase()) {
                             isDuplicate = true;
@@ -1101,9 +1145,9 @@
             validatorFunction: function (value, $el, config, language, $form) {
                 const elementData = $el.data();
                 const dataType = elementData.type;
-                var isValid = false;
-                var except = elementData.except;
-                var exceptCondition = false;
+                let isValid = false;
+                const except = elementData.except;
+                let exceptCondition = false;
                 if (except) {
                     exceptCondition = eval(except);
                 }
@@ -1117,11 +1161,11 @@
                     return validatorData[dataType];
                 }
 
-                var test = $('[data-type="' + dataType + '"]');
+                const test = $('[data-type="' + dataType + '"]');
 
-                var allElements = test.toArray();
+                const allElements = test.toArray();
 
-                var counter = 0;
+                let counter = 0;
 
                 do {
                     var elm = $(allElements[counter]);
@@ -1150,10 +1194,10 @@
             validatorFunction: function (value, $el, config, language, $form) {
                 const elementData = $el.data();
                 const dataType = elementData.type;
-                var test = $('[data-type="' + dataType + '"]');
-                var isValid = false;
-                var except = elementData.except;
-                var exceptCondition = false;
+                const test = $('[data-type="' + dataType + '"]');
+                let isValid = false;
+                const except = elementData.except;
+                let exceptCondition = false;
                 if (except) {
                     exceptCondition = eval(except);
                 }
@@ -1167,10 +1211,10 @@
                     return validatorData[dataType];
                 }
                 const t0 = performance.now();
-                var allElements = test.toArray();
+                const allElements = test.toArray();
 
-                var counter = 0;
-                var checkedCount = 0;
+                let counter = 0;
+                let checkedCount = 0;
                 do {
                     var elm = $(allElements[counter]);
                     checkedCount += !!elm.prop('checked');
@@ -1201,19 +1245,20 @@
         $.formUtils.addValidator({
             name: 'atLeastOneMain',
             validatorFunction: function (value, $el, config, language, $form) {
-                var test = $('[data-type="' + $el.data().type + '"]');
+                const test = $('[data-type="' + $el.data().type + '"]');
 
-                var checkedCount = 0;
-                var except = test.data().except;
-                var exceptCondition = eval(except);
+                let checkedCount = 0;
+                const except = test.data().except;
+                debugger;
+                const exceptCondition = eval(except);
 
                 if (exceptCondition) {
                     return true;
                 }
 
                 test.each(function () {
-                    var elm = $(this);
-                    var isMe = elm.get(0) === $el.get(0);
+                    const elm = $(this);
+                    const isMe = elm.get(0) === $el.get(0);
 
                     if (elm.val() === 'main') {
                         checkedCount++;
@@ -1235,9 +1280,9 @@
         window.lastReviewMeetingDate = $('#lastReviewMeetingDate').get(0);
         window.reviewDate = $('#reviewDate').get(0);
 
-        var assignClass = function () {
-            var elem = $(this);
-            var tr = elem.closest('tr');
+        const assignClass = function () {
+            const elem = $(this);
+            const tr = elem.closest('tr');
 
 
             if (elem[0].value === 'main' || elem[0].value === 'supervisor') {
@@ -1256,7 +1301,7 @@
 
         $(window).bind('validatorsLoaded', () => {
             $('[data-validation-url]').each(function (index) {
-                var $this = $(this);
+                const $this = $(this);
 
                 $this.validate(null, config);
             });
@@ -1264,10 +1309,10 @@
 
         $('[data-type="mainSelector"]').each(assignClass);
 
-        var types = {};
+        const types = {};
 
         $('[data-validation="atLeastOne"], [data-validation="atLeastOneAtMostOne"]').each(function (index) {
-            var $this = $(this);
+            const $this = $(this);
 
             if (typeof types[$this.data().type] === 'undefined') {
                 $this.validate();
@@ -1286,11 +1331,11 @@
     }
 
     function setCaretPosition(elemId, caretPos) {
-        var elem = document.getElementById(elemId);
+        const elem = document.getElementById(elemId);
 
         if (elem != null) {
             if (elem.createTextRange) {
-                var range = elem.createTextRange();
+                const range = elem.createTextRange();
                 range.move('character', caretPos);
                 range.select();
             } else {
@@ -1303,12 +1348,10 @@
         }
     }
 
-    var customerNotesChanged = false;
+    let customerNotesChanged = false;
 
     function setCustomerNotesChanged() {
-
         customerNotesChanged = true;
-
     }
 
     function MM_jumpMenu(targ, selObj, restore) { //v3.0
@@ -1320,7 +1363,7 @@
 
     function loadNote(noteIdentifier) {
 
-        var customerID = document.getElementById('customerID').value;
+        const customerID = document.getElementById('customerID').value;
 
         if (customerID == 0) {
             return;
@@ -1334,8 +1377,8 @@
 
         customerNotesChanged = false;
 
-        var created = document.getElementById('customerNoteCreated').value;
-        var url = "CustomerNote.php?action=getCustomerNote&customerID=" + customerID + "&created=" + created + "&identifier=" + noteIdentifier;
+        const created = document.getElementById('customerNoteCreated').value;
+        const url = "CustomerNote.php?action=getCustomerNote&customerID=" + customerID + "&created=" + created + "&identifier=" + noteIdentifier;
 
         loadXMLDoc(url);
 
@@ -1343,10 +1386,10 @@
 
     function newNote() {
 
-        var customerNoteID = document.getElementById('customerNoteID');
-        var customerNoteOrdheadID = document.getElementById('customerNoteOrdheadID');
-        var customerNoteDetails = document.getElementById('customerNoteDetails');
-        var customerNoteModifiedText = document.getElementById('customerNoteModifiedText');
+        const customerNoteID = document.getElementById('customerNoteID');
+        const customerNoteOrdheadID = document.getElementById('customerNoteOrdheadID');
+        const customerNoteDetails = document.getElementById('customerNoteDetails');
+        const customerNoteModifiedText = document.getElementById('customerNoteModifiedText');
 
         customerNoteID.value = '';
         customerNoteOrdheadID.value = '';
@@ -1356,8 +1399,8 @@
     }
 
     function deleteNote() {
-        var customerID = document.getElementById('customerID').value;
-        var customerNoteID = document.getElementById('customerNoteID');
+        const customerID = document.getElementById('customerID').value;
+        const customerNoteID = document.getElementById('customerNoteID');
 
         if (customerNoteID.value == '') {
             return;
@@ -1369,10 +1412,10 @@
 
         customerNotesChanged = false;
 
-        var customerNoteDetails = document.getElementById('customerNoteDetails');
-        var customerNoteModifiedText = document.getElementById('customerNoteModifiedText');
+        const customerNoteDetails = document.getElementById('customerNoteDetails');
+        const customerNoteModifiedText = document.getElementById('customerNoteModifiedText');
 
-        var url = "CustomerNote.php?action=deleteCustomerNote&customerNoteID=" + customerNoteID.value;
+        const url = "CustomerNote.php?action=deleteCustomerNote&customerNoteID=" + customerNoteID.value;
 
         loadXMLDoc(url);
 
@@ -1384,17 +1427,17 @@
 
     function saveNote() {
 
-        var customerID = document.getElementById('customerID').value;
+        const customerID = document.getElementById('customerID').value;
 
         if (customerID == 0) {
             return;
         }
 
-        var customerNoteID = document.getElementById('customerNoteID').value;
-        var customerNoteOrdheadID = document.getElementById('customerNoteOrdheadID').value;
-        var details = encodeURIComponent(document.getElementById('customerNoteDetails').value);
+        const customerNoteID = document.getElementById('customerNoteID').value;
+        const customerNoteOrdheadID = document.getElementById('customerNoteOrdheadID').value;
+        const details = encodeURIComponent(document.getElementById('customerNoteDetails').value);
 
-        var url = "CustomerNote.php?action=updateNote&customerNoteID=" +
+        const url = "CustomerNote.php?action=updateNote&customerNoteID=" +
             customerNoteID + "&ordheadID=" + customerNoteOrdheadID + "&customerID=" + customerID + "&details=" + details;
 
         customerNotesChanged = false;
@@ -1444,9 +1487,9 @@
         }
 
 
-        if ({customerID} && !document.getElementById('prospectFlag').checked) {
+        if ({customerID} && !isProspect()) {
             const primaryMainContactSelector = $('#primaryMainContactSelector');
-            const value = $('#primaryMainContactSelector').val();
+            const value = +$('#primaryMainContactSelector').val();
 
             const mainContactsSelect = $('.contactSupportLevel select option:selected[value="main"]').parent('select');
             if (!value) {
@@ -1538,7 +1581,7 @@
 
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         loadNote('first');
     })
     //-->
@@ -1602,6 +1645,11 @@
            type="hidden"
            value="{reviewMeetingEmailSentFlag}"
     >
+    <input type="hidden"
+           id="websiteURL"
+           name="form[customer][{customerID}][websiteURL]"
+           value="{websiteURL}"
+    >
 
     <input {disabled}
            type="submit"
@@ -1615,6 +1663,7 @@
            onClick="document.location='{cancelURL}';"
     >
     <button type="button"
+            {disabled}
             onclick="setContactsToNoneAndReferCustomer()"
     >
         Set all users to no support
@@ -1723,14 +1772,13 @@
                         />
                         until
                         <input {disabled}
-                               type="text"
+                               type="date"
                                name="form[customer][{customerID}][specialAttentionEndDate]"
                                id="specialAttentionEndDate"
                                value="{specialAttentionEndDate}"
                                size="10"
                                maxlength="10"
                                autocomplete="off"
-                               class="jQueryCalendar"
                         >
                         <span class="formErrorMessage">{specialAttentionEndDateMessage}</span>
                     </td>
@@ -1739,14 +1787,13 @@
                     <td class="content">Last Review Meeting</td>
                     <td class="content">
                         <input {disabled}
-                               type="text"
+                               type="date"
                                name="form[customer][{customerID}][lastReviewMeetingDate]"
                                id="lastReviewMeetingDate"
                                value="{lastReviewMeetingDate}"
                                size="10"
                                maxlength="10"
                                autocomplete="off"
-                               class="jQueryCalendar"
                                onchange="clearReviewMeetingBooked()"
                         >
                         Booked <input {disabled}
@@ -1772,18 +1819,10 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="content">Prospect</td>
+                    <td class="content">Lead Status</td>
                     <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[customer][{customerID}][prospectFlag]"
-                               value="Y"
-                               {prospectFlagChecked}
-                               id="prospectFlag"
-                               onchange="checkProspectFlag()"
-                        >
                         <select {disabled}
-                                name="form[customer][{customerID}][leadStatusID]"
+                                name="form[customer][{customerID}][leadStatusId]"
                         >
                             <option value="">None</option>
                             <!-- BEGIN leadStatusBlock -->
@@ -1904,11 +1943,13 @@
                     <td class='content'>Became Customer</td>
                     <td class='content'>
                         <input name="form[customer][{customerID}][becameCustomerDate]"
-                               type="text"
+                               id="becameCustomerDate"
+                               type="date"
                                value="{becameCustomerDate}"
                                size="10"
                                maxlength="10"
                                {disabled}
+                               onchange="checkIsProspect()"
                         >
                     </td>
                 </tr>
@@ -1916,11 +1957,13 @@
                     <td class='content'>Dropped Date</td>
                     <td class='content'>
                         <input name="form[customer][{customerID}][droppedCustomerDate]"
-                               type="text"
+                               id="droppedCustomerDate"
+                               type="date"
                                value="{droppedCustomerDate}"
                                size="10"
                                maxlength="10"
                                {disabled}
+                               onchange="checkIsProspect()"
                         >
                     </td>
                 </tr>
@@ -2098,7 +2141,7 @@
                         <button type="button"
                                 onclick="editEncrypted('sortCode',this)"
                         >
-                            <i class="fa fa-pencil {sortCodePencilColor}">
+                            <i class="fa fa-pencil-alt {sortCodePencilColor}">
                             </i>
                         </button>
                         <input type="hidden"
@@ -2127,7 +2170,7 @@
                         <button type="button"
                                 onclick="editEncrypted('accountNumber',this)"
                         >
-                            <i class="fa fa-pencil {accountNumberPencilColor}">
+                            <i class="fa fa-pencil-alt {accountNumberPencilColor}">
                             </i>
                         </button>
                         <input type="hidden"
@@ -2147,14 +2190,13 @@
             <div class="customerReviewTime">
                 To be reviewed on
                 <input {disabled}
-                       type="text"
+                       type="date"
                        name="form[customer][{customerID}][reviewDate]"
                        id="reviewDate"
                        value="{reviewDate}"
                        size="10"
                        maxlength="10"
                        autocomplete="off"
-                       class="jQueryCalendar"
                 >
                 Time
                 <input {disabled}
@@ -2605,6 +2647,7 @@
                             class="content"
                         >
                             <button type="button"
+                                    {disabled}
                                     onclick="addContact({siteNo})"
                             >
                                 Add Contact
@@ -2735,6 +2778,11 @@
                         </div>
                     </td>
                     <td class="headerLightgrey">
+                        <div class="contactPendingLeaver">
+                            LinkedIn
+                        </div>
+                    </td>
+                    <td class="headerLightgrey">
                         <div class="contactInitialLogging">
                             Initial Logging?
                         </div>
@@ -2861,11 +2909,10 @@
                         </div>
                     </td>
                     <td class="headerLightgrey">
-                        <div class="contactPendingLeaverDate">
+                        <div class="contactPendingLeaver">
                             Special Attention
                         </div>
                     </td>
-
                 </tr>
                 </thead>
                 <tbody>
@@ -2900,6 +2947,7 @@
                         >
                         <div class="contactClear">
                             <button type="button"
+                                    {disabled}
                                     onclick="clearRow({contactID})"
                             >
                                 <i class="fa fa-trash-o"></i>
@@ -2912,6 +2960,7 @@
                             <select name="form[contact][{contactID}][siteNo]"
                                     data-validation="required"
                                     data-type="site"
+                                    {disabled}
                             >
                                 <!-- BEGIN selectSiteBlock -->
                                 <option {siteSelected}
@@ -3008,7 +3057,7 @@
                                    name="form[contact][{contactID}][email]"
                                    value="{email}"
                                    size="25"
-                                   maxlength="50"
+                                   maxlength="60"
                                    data-validation="emailOrEmpty server"
                                    data-validation-url="/validateUniqueEmail.php"
                                    data-type="email"
@@ -3018,10 +3067,10 @@
                     <td>
                         <div class="contactSupportLevel">
 
-                            <select name="form[contact][{contactID}][supportLevel]"
+                            <select name="form[contact][{contactID}][supportLevel]" {disabled}
                                     data-validation="atLeastOneMain"
                                     data-type="mainSelector"
-                                    data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                                    data-except="$('#referred').prop('checked') || isProspect()"
                             >
                                 <!-- BEGIN supportLevelBlock -->
                                 <option {supportLevelSelected}
@@ -3037,7 +3086,7 @@
                     <td class="center ">
                         <div class="contactPassword">
 
-                            <button onclick="askNewPassword()"
+                            <button onclick="askNewPassword()" {disabled}
                                     data-contact-id="{contactID}"
                                     type="button"
                                     class="{portalPasswordButtonClass}"
@@ -3065,6 +3114,18 @@
                                    maxlength="200"
                                    value="{notes}"
                             />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contactPendingLeaver">
+                            <i class="fab fa-linkedin-in"
+                               style="color: {linkedInColor}"
+                               onclick="checkLink()"
+                            ></i>
+                            <input type="hidden"
+                                   name="form[contact][{contactID}][linkedInURL]"
+                                   value="{linkedInURL}"
+                            >
                         </div>
                     </td>
                     <td>
@@ -3227,7 +3288,7 @@
                                    {accountsFlagChecked}
                                    data-validation="atLeastOne"
                                    data-type="accounts"
-                                   data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                                   data-except="$('#referred').prop('checked') || isProspect()"
                             />
                         </div>
                     </td>
@@ -3241,7 +3302,7 @@
                                    {mailshot2FlagChecked}
                                    data-validation="atLeastOne"
                                    data-type="invoice"
-                                   data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                                   data-except="$('#referred').prop('checked') || isProspect()"
                             />
                         </div>
                     </td>
@@ -3267,7 +3328,7 @@
                                    class="stmCheckBox"
                                    data-validation="atLeastOneAtMostOne"
                                    data-type="statement"
-                                   data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                                   data-except="$('#referred').prop('checked') || isProspect()"
                             />
                         </div>
                     </td>
@@ -3293,7 +3354,7 @@
                                    {reviewUserFlagChecked}
                                    data-validation="atLeastOne"
                                    data-type="review"
-                                   data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                                   data-except="$('#referred').prop('checked') || isProspect()"
                             />
                         </div>
                     </td>
@@ -3307,7 +3368,7 @@
                                    {mailshot8FlagChecked}
                                    data-type="topUp"
                                    {topUpValidation}
-                                   data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                                   data-except="$('#referred').prop('checked') || isProspect()"
                             />
                         </div>
                     </td>
@@ -3332,7 +3393,7 @@
                                    {mailshot9FlagChecked}
                                    data-validation="atLeastOne"
                                    data-type="reports"
-                                   data-except="$('#referred').prop('checked') || $('#prospectFlag').prop('checked')"
+                                   data-except="$('#referred').prop('checked') || isProspect()"
                             />
                         </div>
                     </td>
@@ -3377,21 +3438,22 @@
                         <div class="contactPendingLeaverDate">
 
                             <input {disabled}
-                                   type="text"
+                                   type="date"
                                    name="form[contact][{contactID}][pendingLeaverDate]"
                                    value="{pendingLeaverDate}"
-                                   class="jQueryCalendar"
                                    autocomplete="off"
                             />
                         </div>
                     </td>
-                    <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[contact][{contactID}][specialAttentionContactFlag]"
-                               value="Y"
-                               {specialAttentionContactFlagChecked}
-                        >
+                    <td>
+                        <div class="contactPendingLeaver">
+                            <input {disabled}
+                                   type="checkbox"
+                                   name="form[contact][{contactID}][specialAttentionContactFlag]"
+                                   value="Y"
+                                   {specialAttentionContactFlagChecked}
+                            >
+                        </div>
                     </td>
                 </tr>
 
@@ -3407,9 +3469,11 @@
         <input name="Button"
                type="button"
                value="Cancel"
+               {disabled}
                onClick="document.location='{cancelURL}';"
         >
         <button type="button"
+                {disabled}
                 onclick="setContactsToNoneAndReferCustomer()"
         >
             Set all users to no support

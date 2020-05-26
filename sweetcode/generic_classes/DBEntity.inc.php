@@ -46,6 +46,7 @@ class DBEntity extends DataAccess
 {
     public const ORDER_DIRECTION_ASCENDING = "ASC";        // a new database connection purely for nextid function.
     public const ORDER_DIRECTION_DESCENDING = "DESC";            // Initialised PHPLib database object
+    static $count = 0;
     /** @var dbSweetcode|MDB_PEAR_PROXY|mixed|object|PDO */
     public $pkdb;// SQL query statement
     /** @var dbSweetcode */
@@ -174,7 +175,13 @@ class DBEntity extends DataAccess
             $this->raiseError("\$this->db is not an object");
         }
         if ($this->getShowSQL()) {
-            echo $this->getClassname() . ": " . $this->getQueryString() . "<BR/><HR/>";
+            try {
+                throw new Exception();
+            } catch (Exception $exception) {
+                echo $this->getClassname() . ": " . $this->getQueryString() . "<BR/>" . $exception->getTraceAsString(
+                    ) . " <HR/>";
+
+            }
         }
         if ($this->getLogSQL()) {
             $logFile = CONFIG_SQL_LOG;
@@ -538,7 +545,6 @@ class DBEntity extends DataAccess
     {
         $colType = $this->colType[$colIdx];
         $value = $this->getSQLValue($colIdx);
-
         if ($value === null) {
             return 'null';
         }
@@ -560,6 +566,10 @@ class DBEntity extends DataAccess
                 }
             case DA_DATE:
                 if ($value == '0000-00-00') {
+                    return 'null';
+                }
+            case DA_PHONE:
+                if ($value === '') {
                     return 'null';
                 }
             default:
@@ -752,8 +762,10 @@ class DBEntity extends DataAccess
                       $value
     )
     {
+        DBEntity::$count++;
         $ixColumn = $this->columnExists($ixPassedColumn);
         if ($ixColumn == DA_OUT_OF_RANGE) {
+
             $this->raiseError("Could not set column value because " . $ixPassedColumn . " out of range");
             return false;
         }

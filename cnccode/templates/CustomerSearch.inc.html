@@ -5,35 +5,13 @@
 <script src=".javascript/fromDateToDate.js"></script>
 <script type="application/javascript">
     const autocompleteURL = "/Customer.php?action=searchName";
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         window.newCustomerFromDate = $('#newCustomerFromDate').get(0);
         window.newCustomerToDate = $('#newCustomerToDate').get(0);
         window.droppedCustomerFromDate = $('#droppedCustomerFromDate').get(0);
         window.droppedCustomerToDate = $('#droppedCustomerToDate').get(0);
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
         });
     });
 
@@ -82,6 +60,7 @@
                        name="form[customerString]"
                        value="{customerString}"
                        id="customerString"
+                       customer-search
                 >
             </td>
         </tr>
@@ -97,58 +76,52 @@
                 <div align="right">New Between</div>
             </td>
             <td>
-                <input
-                    type="text"
-                    name="form[newCustomerFromDate]"
-                    id="newCustomerFromDate"
-                    value="{newCustomerFromDate}"
-                    size="10"
-                    maxlength="10"
-                    onKeypress="javascript:submitOnReturn()"
-                    class="jqueryCalendar"
-                    autocomplete="off"
-            >
-                <font class="formErrorMessage">{newCustomerFromDateMessage}</font>
-                and <input
-                        type="text"
-                        name="form[newCustomerToDate]"
-                        id="newCustomerToDate"
-                        value="{newCustomerToDate}"
-                        size="10"
-                        maxlength="10"
-                        onKeypress="javascript:submitOnReturn()"
-                        class="jqueryCalendar"
-                        autocomplete="off"
+                <input type="date"
+                       name="form[newCustomerFromDate]"
+                       id="newCustomerFromDate"
+                       value="{newCustomerFromDate}"
+                       size="10"
+                       maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
                 >
+                <font class="formErrorMessage">{newCustomerFromDateMessage}</font>
+                and <input type="date"
+                           name="form[newCustomerToDate]"
+                           id="newCustomerToDate"
+                           value="{newCustomerToDate}"
+                           size="10"
+                           maxlength="10"
+                           onKeypress="javascript:submitOnReturn()"
+                           autocomplete="off"
+            >
                 <font class="formErrorMessage">{newCustomerToDateMessage}</font></td>
         </tr>
         <tr>
             <td class="promptText">
                 <div align="right">Lost Between</div>
             </td>
-            <td><input
-                    type="text"
-                    name="form[droppedCustomerFromDate]"
-                    id="droppedCustomerFromDate"
-                    value="{droppedCustomerFromDate}"
+            <td>
+                <input type="date"
+                       name="form[droppedCustomerFromDate]"
+                       id="droppedCustomerFromDate"
+                       value="{droppedCustomerFromDate}"
+                       size="10"
+                       maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
+                >
+                <font class="formErrorMessage">{droppedCustomerFromDateMessage}</font>
+                and <input
+                    type="date"
+                    name="form[droppedCustomerToDate]"
+                    id="droppedCustomerToDate"
+                    value="{droppedCustomerToDate}"
                     size="10"
                     maxlength="10"
                     onKeypress="javascript:submitOnReturn()"
-                    class="jqueryCalendar"
                     autocomplete="off"
             >
-                <font class="formErrorMessage">{droppedCustomerFromDateMessage}</font>
-                and <input
-                        type="text"
-                        name="form[droppedCustomerToDate]"
-                        id="droppedCustomerToDate"
-                        value="{droppedCustomerToDate}"
-                        size="10"
-                        maxlength="10"
-                        onKeypress="javascript:submitOnReturn()"
-                        class="jqueryCalendar"
-                        autocomplete="off"
-                >
                 <font class="formErrorMessage">{droppedCustomerToDateMessage}</font></td>
         </tr>
         <tr>

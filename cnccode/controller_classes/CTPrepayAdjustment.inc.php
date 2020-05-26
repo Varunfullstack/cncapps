@@ -23,13 +23,12 @@ class CTPrepayAdjustment extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            "sales",
-        ];
+        $roles = ACCOUNTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(707);
         $this->buActivity = new BUActivity($this);
         $this->dsCallActivity = new DSForm($this);
         $this->dsCallActivity->copyColumnsFrom($this->buActivity->dbeJCallActivity);
@@ -64,7 +63,6 @@ class CTPrepayAdjustment extends CTCNC
                 $formError = true;
             } else {
                 $dbeCustomerItem = new DBECustomerItem($this);
-                $dbeCustomerItem->setShowSQLOn();
                 if (!$dbeCustomerItem->getGSCRow($this->dsCallActivity->getValue(DBEJCallActivity::customerID))) {
                     $this->dsCallActivity->setMessage(DBEJCallActivity::customerID, 'Not a Prepay Customer');
                     $formError = true;
@@ -110,9 +108,7 @@ class CTPrepayAdjustment extends CTCNC
                 'customerName'      => $this->getParam('customerName'),
                 'urlCustomerPopup'  => $urlCustomerPopup,
                 'callActivityID'    => $this->dsCallActivity->getValue(DBEJCallActivity::callActivityID),
-                'date'              => Controller::dateYMDtoDMY(
-                    $this->dsCallActivity->getValue(DBEJCallActivity::date)
-                ),
+                'date'              => $this->dsCallActivity->getValue(DBEJCallActivity::date),
                 'dateMessage'       => $this->dsCallActivity->getMessage(DBEJCallActivity::date),
                 'curValue'          => $this->dsCallActivity->getValue(DBEJCallActivity::curValue),
                 'curValueMessage'   => $this->dsCallActivity->getMessage(DBEJCallActivity::curValue),

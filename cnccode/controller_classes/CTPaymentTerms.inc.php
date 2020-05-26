@@ -26,13 +26,12 @@ class CTPaymentTerms extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            "accounts",
-        ];
+        $roles = ACCOUNTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(710);
         $this->buPaymentTerms = new BUPaymentTerms($this);
         $this->dsPaymentTerms = new DSForm($this);
         $this->dsPaymentTerms->copyColumnsFrom($this->buPaymentTerms->dbePaymentTerms);
@@ -44,7 +43,7 @@ class CTPaymentTerms extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
+        $this->checkPermissions(MAINTENANCE_PERMISSION);
         switch ($this->getAction()) {
             case CTPAYMENTTERMS_ACT_EDIT:
             case CTPAYMENTTERMS_ACT_CREATE:
@@ -63,63 +62,7 @@ class CTPaymentTerms extends CTCNC
         }
     }
 
-    /**
-     * Display list of terms
-     * @access private
-     * @throws Exception
-     */
-    function displayList()
-    {
-        $this->setMethodName('displayList');
-        $this->setPageTitle('Payment Terms');
-        $this->setTemplateFiles(
-            array('PaymentTermsList' => 'PaymentTermsList.inc')
-        );
-        $dsPaymentTerms = new DataSet($this);
-        $this->buPaymentTerms->getAllTerms($dsPaymentTerms);
-
-        $urlCreate = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array(
-                'action' => CTPAYMENTTERMS_ACT_CREATE
-            )
-        );
-
-        $this->template->set_var(
-            array('urlCreate' => $urlCreate)
-        );
-
-        if ($dsPaymentTerms->rowCount() > 0) {
-            $this->template->set_block('PaymentTermsList', 'termsBlock', 'terms');
-            while ($dsPaymentTerms->fetchNext()) {
-                $paymentTermsID = $dsPaymentTerms->getValue(DBEPaymentTerms::paymentTermsID);
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'         => CTPAYMENTTERMS_ACT_EDIT,
-                            'paymentTermsID' => $paymentTermsID
-                        )
-                    );
-                $txtEdit = '[edit]';
-                $this->template->set_var(
-                    array(
-                        'paymentTermsID' => $paymentTermsID,
-                        'description'    => Controller::htmlDisplayText(
-                            $dsPaymentTerms->getValue(DBEPaymentTerms::description)
-                        ),
-                        'urlEdit'        => $urlEdit,
-                        'txtEdit'        => $txtEdit
-                    )
-                );
-                $this->template->parse('terms', 'termsBlock', true);
-            }//while $dsPaymentTerms->fetchNext()
-        }
-        $this->template->parse('CONTENTS', 'PaymentTermsList', true);
-        $this->parsePage();
-    }
-
-    /**
+/**
      * Edit/Add Payment Terms
      * @access private
      * @throws Exception
@@ -204,6 +147,31 @@ class CTPaymentTerms extends CTCNC
         );
         $this->template->parse('CONTENTS', 'PaymentTermsEdit', true);
         $this->parsePage();
+    }
+
+        /**
+     * Delete Payment Terms
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function delete()
+    {
+        $this->setMethodName('delete');
+        if (!$this->buPaymentTerms->deletePaymentTerms($this->getParam('paymentTermsID'))) {
+            $this->displayFatalError('Cannot delete this payment term');
+            exit;
+        } else {
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTPAYMENTTERMS_ACT_DISPLAY_LIST
+                )
+            );
+            header('Location: ' . $urlNext);
+            exit;
+        }
     }// end function editPayment Terms()
 
     /**
@@ -241,27 +209,58 @@ class CTPaymentTerms extends CTCNC
     }
 
     /**
-     * Delete Payment Terms
-     *
+     * Display list of terms
      * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
      * @throws Exception
      */
-    function delete()
+    function displayList()
     {
-        $this->setMethodName('delete');
-        if (!$this->buPaymentTerms->deletePaymentTerms($this->getParam('paymentTermsID'))) {
-            $this->displayFatalError('Cannot delete this payment term');
-            exit;
-        } else {
-            $urlNext = Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => CTPAYMENTTERMS_ACT_DISPLAY_LIST
-                )
-            );
-            header('Location: ' . $urlNext);
-            exit;
+        $this->setMethodName('displayList');
+        $this->setPageTitle('Payment Terms');
+        $this->setTemplateFiles(
+            array('PaymentTermsList' => 'PaymentTermsList.inc')
+        );
+        $dsPaymentTerms = new DataSet($this);
+        $this->buPaymentTerms->getAllTerms($dsPaymentTerms);
+
+        $urlCreate = Controller::buildLink(
+            $_SERVER['PHP_SELF'],
+            array(
+                'action' => CTPAYMENTTERMS_ACT_CREATE
+            )
+        );
+
+        $this->template->set_var(
+            array('urlCreate' => $urlCreate)
+        );
+
+        if ($dsPaymentTerms->rowCount() > 0) {
+            $this->template->set_block('PaymentTermsList', 'termsBlock', 'terms');
+            while ($dsPaymentTerms->fetchNext()) {
+                $paymentTermsID = $dsPaymentTerms->getValue(DBEPaymentTerms::paymentTermsID);
+                $urlEdit =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'         => CTPAYMENTTERMS_ACT_EDIT,
+                            'paymentTermsID' => $paymentTermsID
+                        )
+                    );
+                $txtEdit = '[edit]';
+                $this->template->set_var(
+                    array(
+                        'paymentTermsID' => $paymentTermsID,
+                        'description'    => Controller::htmlDisplayText(
+                            $dsPaymentTerms->getValue(DBEPaymentTerms::description)
+                        ),
+                        'urlEdit'        => $urlEdit,
+                        'txtEdit'        => $txtEdit
+                    )
+                );
+                $this->template->parse('terms', 'termsBlock', true);
+            }//while $dsPaymentTerms->fetchNext()
         }
+        $this->template->parse('CONTENTS', 'PaymentTermsList', true);
+        $this->parsePage();
     }
 }

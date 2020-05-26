@@ -38,14 +38,12 @@ class CTRenBroadband extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "renewals",
-            "technical"
-        ];
+        $roles = RENEWALS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(603);
         $this->buRenBroadband = new BURenBroadband($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenBroadband = new DSForm($this);
@@ -86,7 +84,7 @@ class CTRenBroadband extends CTCNC
         }
     }
 
-/**
+    /**
      * Edit/Add Activity
      * @access private
      * @throws Exception
@@ -149,7 +147,7 @@ class CTRenBroadband extends CTCNC
         $disabled = CTCNC_HTML_DISABLED;
         $readonly = CTCNC_HTML_READONLY;
 
-        if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
+        if ($this->hasPermissions(RENEWALS_PERMISSION)) {
             $disabled = null;
             $readonly = null;
             $pricePerMonth =
@@ -355,12 +353,8 @@ class CTRenBroadband extends CTCNC
                 'password'                             => Controller::htmlInputText(
                     $dsRenBroadband->getValue(DBEJRenBroadband::password)
                 ),
-                'etaDate'                              => Controller::dateYMDtoDMY(
-                    $dsRenBroadband->getValue(DBEJRenBroadband::etaDate)
-                ),
-                'installationDate'                     => Controller::dateYMDtoDMY(
-                    $dsRenBroadband->getValue(DBEJRenBroadband::installationDate)
-                ),
+                'etaDate'                              => $dsRenBroadband->getValue(DBEJRenBroadband::etaDate),
+                'installationDate'                     => $dsRenBroadband->getValue(DBEJRenBroadband::installationDate),
                 'ispID'                                => Controller::htmlInputText(
                     $dsRenBroadband->getValue(DBEJRenBroadband::ispID)
                 ),
@@ -557,7 +551,7 @@ class CTRenBroadband extends CTCNC
         }
     }
 
-        /**
+    /**
      * Called from sales order line to edit a renewal.
      * The page passes
      * ordheadID

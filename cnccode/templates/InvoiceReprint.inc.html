@@ -1,34 +1,11 @@
 <!-- Template: InvoiceReprint.inc.html -->
 <script>
-    const autocompleteURL = "/Customer.php?action=searchName";
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         window.startDate = $('#startDate').get(0);
         window.endDate = $('#endDate').get(0);
 
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
         });
     });
 
@@ -65,6 +42,7 @@
                     value="{customerString}"
                     size="50"
                     maxlength="50"
+                    customer-search
             > <font class="formErrorMessage"> {customerStringMessage} </font></td>
         </tr>
         <tr>
@@ -73,14 +51,13 @@
             >Start Date
             </td>
             <td class="field">
-                <input type="text"
+                <input type="date"
                        name="invoice[1][startDate]"
                        id="startDate"
                        value="{startDate}"
                        size="10"
                        maxlength="10"
                        autocomplete="off"
-                       class="jQueryCalendar"
                 >
                 <font class="formErrorMessage">{startDateMessage}</font>
             </td>
@@ -91,15 +68,13 @@
             >End Date
             </td>
             <td class="field">
-                <input
-                        type="text"
-                        name="invoice[1][endDate]"
-                        id="endDate"
-                        value="{endDate}"
-                        size="10"
-                        maxlength="10"
-                        autocomplete="off"
-                        class="jQueryCalendar"
+                <input type="date"
+                       name="invoice[1][endDate]"
+                       id="endDate"
+                       value="{endDate}"
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
                 >
                 <font class="formErrorMessage">{endDateMessage}</font>
             </td>

@@ -125,7 +125,7 @@
     var validPassword = false;
     var validRepeatPassword = false;
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
 
 
         $('#password').keyup(function () {
@@ -187,6 +187,7 @@
                 return null
             }
         }
+
         var assignClass = function () {
             var elem = $(this);
             if (elem[0].value === 'main') {
@@ -223,6 +224,10 @@
     <input type="hidden"
            name="contact[1][siteNo]"
            value="{siteNo}"
+    >
+    <input type="hidden"
+           name="contact[1][linkedInURL]"
+           value="{linkedInURL}"
     >
     <table width="100%"
            border="0"
@@ -663,14 +668,13 @@
             <td class="promptText">Pending Leaver Date</td>
             <td class="field">
                 <input {disabled}
-                       type="text"
+                       type="date"
                        name="form[contact][{contactID}][pendingLeaverDate]"
                        value="{pendingLeaverDate}"
-                       class="jQueryCalendar"
                        autocomplete="off"
                 />
         </tr>
-        </td>
+
         <tr>
             <td>&nbsp;</td>
             <td align="left">

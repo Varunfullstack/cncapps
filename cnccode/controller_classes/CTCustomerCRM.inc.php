@@ -5,6 +5,7 @@
  * Date: 09/01/2018
  * Time: 18:05
  */
+global $cfg;
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
@@ -39,6 +40,12 @@ class CTCustomerCRM extends CTCustomer
             $cookieVars,
             $cfg
         );
+        $roles = ACCOUNT_MANAGEMENT_PERMISSION;
+        if (!self::hasPermissions($roles)) {
+            Header("Location: /NotAllowed.php");
+            exit;
+        }
+        $this->setMenuId(403);
     }
 
     function search()
@@ -118,13 +125,13 @@ class CTCustomerCRM extends CTCustomer
             while ($dsCustomerLeadStatuses->fetchNext()) {
                 $this->template->set_var(
                     array(
-                        'customerLeadStatusID'       => $dsCustomerLeadStatuses->getValue(
-                            DBECustomerLeadStatus::customerLeadStatusID
+                        'customerLeadStatusId'       => $dsCustomerLeadStatuses->getValue(
+                            DBECustomerLeadStatus::id
                         ),
                         'customerLeadStatusName'     => $dsCustomerLeadStatuses->getValue(DBECustomerLeadStatus::name),
                         'customerLeadStatusSelected' => ($dsCustomerLeadStatuses->getValue(
-                                DBECustomerLeadStatus::customerLeadStatusID
-                            ) == $this->dsCustomer->getValue(DBECustomer::customerLeadStatusID)) ? CT_SELECTED : null
+                                DBECustomerLeadStatus::id
+                            ) == $this->dsCustomer->getValue(DBECustomer::leadStatusId)) ? CT_SELECTED : null
                     )
                 );
                 $this->template->parse(
@@ -185,7 +192,7 @@ class CTCustomerCRM extends CTCustomer
         $leadStatuses = [];
         while ($dsCustomerLeadStatuses->fetchNext()) {
             $leadStatuses[$dsCustomerLeadStatuses->getValue(
-                DBECustomerLeadStatus::customerLeadStatusID
+                DBECustomerLeadStatus::id
             )] = $dsCustomerLeadStatuses->getValue(DBECustomerLeadStatus::name);
         }
 
@@ -207,7 +214,7 @@ class CTCustomerCRM extends CTCustomer
                     "customerName"        => $dbeCustomer->getValue(DBECustomer::name),
                     "customerLink"        => $link,
                     "customerReviewDate"  => $dbeCustomer->getValue(DBECustomer::reviewDate),
-                    "bluestoneLeadStatus" => $leadStatuses[+$dbeCustomer->getValue(DBECustomer::customerLeadStatusID)]
+                    "bluestoneLeadStatus" => $leadStatuses[+$dbeCustomer->getValue(DBECustomer::leadStatusId)]
                 ];
 
             }
@@ -247,55 +254,20 @@ class CTCustomerCRM extends CTCustomer
         header('Content-Type: application/json;charset=utf-8');
         return json_encode($data);
 
-    } // end search
+    }
 
     function initialProcesses()
     {
         $this->retrieveHTMLVars();
         parent::initialProcesses();
-    }
-
-    /**
-     * @param DataSet|DBEntity $dbSource
-     * @param DataSet $dsDestination
-     * @return bool
-     */
-    function getData(&$dbSource,
-                     &$dsDestination
-    )
-    {
-        if (!is_object($dsDestination)) {
-            $dsDestination = new Dataset($this);
-        } else {
-            if (
-                ($dsDestination->getClassname() != DA_CLASSNAME_DATASET) &
-                (!is_subclass_of(
-                    $dsDestination,
-                    DA_CLASSNAME_DATASET
-                ))
-            ) {
-                $this->raiseError(
-                    "dsDestination must be subclass or class of " .
-                    DA_CLASSNAME_DATASET
-                );
-            }
-        }
-        if (gettype($dbSource) != "object")
-            $this->raiseError("dbSource is not initialised");
-        if (!is_subclass_of(
-            $dbSource,
-            DA_CLASSNAME_DBENTITY
-        ))
-            $this->raiseError("dbSource must be subclass of " . DA_CLASSNAME_DBENTITY);
-        return ($dsDestination->replicate($dbSource));
-    }
+    } // end search
 
     function setSite(&$siteArray)
     {
         if (!is_array($siteArray)) {
             return;
         }
-        foreach ($siteArray as $key => $value) {
+        foreach ($siteArray as $value) {
             $dbeJSite = new DBEJSite($this);
             $dbeJSite->setValue(
                 DBESite::customerID,
@@ -343,19 +315,43 @@ class CTCustomerCRM extends CTCustomer
 
             $this->dsSite->post();
         }
-    }
+    } // end search
 
-    function setCustomerID($customerID)
+    /**
+     * @param DataSet|DBEntity $dbSource
+     * @param DataSet $dsDestination
+     * @return bool
+     */
+    function getData(&$dbSource,
+                     &$dsDestination
+    )
     {
-        $this->setNumericVar(
-            'customerID',
-            $customerID
-        );
-    }
-
-    function getCustomerID()
-    {
-        return $this->customerID;
+        if (!is_object($dsDestination)) {
+            $dsDestination = new Dataset($this);
+        } else {
+            if (
+                ($dsDestination->getClassname() != DA_CLASSNAME_DATASET) &
+                (!is_subclass_of(
+                    $dsDestination,
+                    DA_CLASSNAME_DATASET
+                ))
+            ) {
+                $this->raiseError(
+                    "dsDestination must be subclass or class of " .
+                    DA_CLASSNAME_DATASET
+                );
+            }
+        }
+        if (gettype($dbSource) != "object") {
+            $this->raiseError("dbSource is not initialised");
+        }
+        if (!is_subclass_of(
+            $dbSource,
+            DA_CLASSNAME_DBENTITY
+        )) {
+            $this->raiseError("dbSource must be subclass of " . DA_CLASSNAME_DBENTITY);
+        }
+        return ($dsDestination->replicate($dbSource));
     }
 
     function setSiteNo($siteNo)
@@ -364,11 +360,6 @@ class CTCustomerCRM extends CTCustomer
             'siteNo',
             $siteNo
         );
-    }
-
-    function getSiteNo()
-    {
-        return $this->siteNo;
     }
 
     function setContactID($contactID)
@@ -402,13 +393,18 @@ class CTCustomerCRM extends CTCustomer
                 $this->getYN(@$value['mailshotFlag'])
             );
             $this->dsCustomer->setValue(
-                DBECustomer::customerLeadStatusID,
-                @$value['customerLeadStatusID']
+                DBECustomer::leadStatusId,
+                @$value['leadStatusId']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::dateMeetingConfirmed,
                 @$value['dateMeetingConfirmedDate']
             );
+            $this->dsCustomer->setValue(
+                DBECustomer::websiteURL,
+                @$value['websiteURL']
+            );
+
             $this->dsCustomer->setValue(
                 DBECustomer::meetingDateTime,
                 @$value['meetingDateTime']
@@ -452,7 +448,7 @@ class CTCustomerCRM extends CTCustomer
                 @$value[DBECustomer::rating]
             );
             $reviewDate = DateTime::createFromFormat(
-                'd/m/Y',
+                'Y-m-d',
                 @$value[DBECustomer::reviewDate]
             );
 
@@ -486,9 +482,9 @@ class CTCustomerCRM extends CTCustomer
         }
     }
 
-    function setReviewMeetingFrequencyMonths($reviewMeetingFrequencyMonths)
+    private function getTrueFalse($value)
     {
-        $this->reviewMeetingFrequencyMonths = $reviewMeetingFrequencyMonths;
+        return $value == 'Y';
     }
 
     function getReviewMeetingFrequencyMonths()
@@ -496,9 +492,9 @@ class CTCustomerCRM extends CTCustomer
         return $this->reviewMeetingFrequencyMonths;
     }
 
-    function setLastReviewMeetingDate($lastReviewMeetingDate)
+    function setReviewMeetingFrequencyMonths($reviewMeetingFrequencyMonths)
     {
-        $this->lastReviewMeetingDate = $lastReviewMeetingDate;
+        $this->reviewMeetingFrequencyMonths = $reviewMeetingFrequencyMonths;
     }
 
     function getLastReviewMeetingDate()
@@ -506,9 +502,9 @@ class CTCustomerCRM extends CTCustomer
         return $this->lastReviewMeetingDate;
     }
 
-    function setReviewMeetingEmailSentFlag($value)
+    function setLastReviewMeetingDate($lastReviewMeetingDate)
     {
-        $this->reviewMeetingEmailSentFlag = $value;
+        $this->lastReviewMeetingDate = $lastReviewMeetingDate;
     }
 
     function getReviewMeetingEmailSentFlag()
@@ -516,9 +512,9 @@ class CTCustomerCRM extends CTCustomer
         return $this->reviewMeetingEmailSentFlag;
     }
 
-    function getChecked($flag)
+    function setReviewMeetingEmailSentFlag($value)
     {
-        return ($flag == 'N' || $flag == false ? null : CT_CHECKED);
+        $this->reviewMeetingEmailSentFlag = $value;
     }
 
     /**
@@ -604,10 +600,23 @@ class CTCustomerCRM extends CTCustomer
                 echo json_encode($response);
                 break;
             default:
-//                $this->displaySearchForm();
                 $this->search();
                 break;
         }
+    }
+
+
+    function setCustomerID($customerID)
+    {
+        $this->setNumericVar(
+            'customerID',
+            $customerID
+        );
+    }
+
+    function getCustomerID()
+    {
+        return $this->customerID;
     }
 
     /**
@@ -703,8 +712,16 @@ class CTCustomerCRM extends CTCustomer
                 CTCUSTOMER_CLS_TABLE_EDIT_HEADER
             );
         }
+        $title = "Customer - " . $this->dsCustomer->getValue(DBECustomer::name);
+        $color = "red";
+        if ($this->dsCustomer->getValue(DBECustomer::websiteURL)) {
+            $color = "green";
+        }
 
-        $this->setPageTitle("Customer - " . $this->dsCustomer->getValue(DBECustomer::name));
+        $this->setPageTitle(
+            $title,
+            $title . ' <i class="fas fa-globe" onclick="checkWebsite()" style="color:' . $color . '"></i>'
+        );
         /*
         Get the list of custom letter template file names from the custom letter directory
         */
@@ -807,25 +824,20 @@ class CTCustomerCRM extends CTCustomer
                 //                'customerNameClass'                  => $this->dsCustomer->getValue(DBECustomer::NameClass),
                 //                'SectorMessage'                      => $this->dsCustomer->getValue(DBECustomer::SectorMessage),
                 'regNo'                              => $this->dsCustomer->getValue(DBECustomer::regNo),
+                'websiteURL'                         => $this->dsCustomer->getValue(DBECustomer::websiteURL),
                 'mailshotFlagChecked'                => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::mailshotFlag)
                 ),
                 'referredFlagChecked'                => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::referredFlag)
                 ),
-                'prospectFlag'                       => $this->dsCustomer->getValue(
-                    DBECustomer::prospectFlag
-                ) == 'Y' ? 1 : 0,
                 'specialAttentionFlagChecked'        => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag)
                 ),
-                'specialAttentionEndDate'            => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)
+                'specialAttentionEndDate'            => $this->dsCustomer->getValue(
+                    DBECustomer::specialAttentionEndDate
                 ),
-                //                'specialAttentionEndDateMessage'     => $this->dsCustomer->getValue(DBECustomer::SpecialAttentionEndDateMessage),
-                'lastReviewMeetingDate'              => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::lastReviewMeetingDate)
-                ),
+                'lastReviewMeetingDate'              => $this->dsCustomer->getValue(DBECustomer::lastReviewMeetingDate),
                 'dateMeetingConfirmedDate'           => $this->dsCustomer->getValue(DBECustomer::dateMeetingConfirmed),
                 'meetingDateTime'                    => Controller::dateToISO(
                     $this->dsCustomer->getValue(DBECustomer::meetingDateTime)
@@ -846,55 +858,56 @@ class CTCustomerCRM extends CTCustomer
                 ),
                 DBECustomer::opportunityDeal         => $this->dsCustomer->getValue(DBECustomer::opportunityDeal),
                 DBECustomer::rating                  => $this->dsCustomer->getValue(DBECustomer::rating),
-
-                'prospectFlagChecked' => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::prospectFlag)
-                ),
-                'pcxFlagChecked'      => $this->getChecked(
+                'pcxFlagChecked'                     => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::pcxFlag)
                 ),
-                'createDate'          => $this->dsCustomer->getValue(DBECustomer::createDate),
-                'mailshot2FlagDesc'   => $this->buCustomer->dsHeader->getValue(DBEHeader::mailshot2FlagDesc),
-                'mailshot3FlagDesc'   => $this->buCustomer->dsHeader->getValue(DBEHeader::mailshot3FlagDesc),
-                'mailshot4FlagDesc'   => $this->buCustomer->dsHeader->getValue(DBEHeader::mailshot4FlagDesc),
-                'mailshot8FlagDesc'   => $this->buCustomer->dsHeader->getValue(DBEHeader::mailshot8FlagDesc),
-                'mailshot9FlagDesc'   => $this->buCustomer->dsHeader->getValue(DBEHeader::mailshot9FlagDesc),
-                'mailshot11FlagDesc'  => $this->buCustomer->dsHeader->getValue(
+                'createDate'                         => $this->dsCustomer->getValue(DBECustomer::createDate),
+                'mailshot2FlagDesc'                  => $this->buCustomer->dsHeader->getValue(
+                    DBEHeader::mailshot2FlagDesc
+                ),
+                'mailshot3FlagDesc'                  => $this->buCustomer->dsHeader->getValue(
+                    DBEHeader::mailshot3FlagDesc
+                ),
+                'mailshot4FlagDesc'                  => $this->buCustomer->dsHeader->getValue(
+                    DBEHeader::mailshot4FlagDesc
+                ),
+                'mailshot8FlagDesc'                  => $this->buCustomer->dsHeader->getValue(
+                    DBEHeader::mailshot8FlagDesc
+                ),
+                'mailshot9FlagDesc'                  => $this->buCustomer->dsHeader->getValue(
+                    DBEHeader::mailshot9FlagDesc
+                ),
+                'mailshot11FlagDesc'                 => $this->buCustomer->dsHeader->getValue(
                     DBEHeader::mailshot11FlagDesc
                 ),
-                'submitURL'           => $submitURL,
-                'renewalLink'         => $renewalLink,
-                'passwordLink'        => $passwordLink,
-                'deleteCustomerURL'   => $deleteCustomerURL,
-                'deleteCustomerText'  => $deleteCustomerText,
-                'cancelURL'           => $cancelURL,
-                'disabled'            => $this->hasPermissions(
-                    PHPLIB_PERM_SALES
+                'submitURL'                          => $submitURL,
+                'renewalLink'                        => $renewalLink,
+                'passwordLink'                       => $passwordLink,
+                'deleteCustomerURL'                  => $deleteCustomerURL,
+                'deleteCustomerText'                 => $deleteCustomerText,
+                'cancelURL'                          => $cancelURL,
+                'disabled'                           => $this->hasPermissions(
+                    SALES_PERMISSION
                 ) ? null : CTCNC_HTML_DISABLED,
-                'gscTopUpAmount'      => $this->dsCustomer->getValue(DBECustomer::gscTopUpAmount),
-                'noOfServers'         => $this->dsCustomer->getValue(DBECustomer::noOfServers),
-                'noOfSites'           => $this->dsCustomer->getValue(DBECustomer::noOfSites),
-                'modifyDate'          => $this->dsCustomer->getValue(DBECustomer::modifyDate),
-                'reviewDate'          => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::reviewDate)
-                ),
-                'reviewTime'          => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::reviewTime)
-                ),
-                'becameCustomerDate'  => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::becameCustomerDate)
-                ),
-                'droppedCustomerDate' => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::droppedCustomerDate)
-                ),
-                'reviewAction'        => $this->dsCustomer->getValue(DBECustomer::reviewAction),
-                'comments'            => $this->dsCustomer->getValue(DBECustomer::comments),
-                'techNotes'           => $this->dsCustomer->getValue(DBECustomer::techNotes),
-                'slaP1'               => $this->dsCustomer->getValue(DBECustomer::slaP1),
-                'slaP2'               => $this->dsCustomer->getValue(DBECustomer::slaP2),
-                'slaP3'               => $this->dsCustomer->getValue(DBECustomer::slaP3),
-                'slaP4'               => $this->dsCustomer->getValue(DBECustomer::slaP4),
-                'slaP5'               => $this->dsCustomer->getValue(DBECustomer::slaP5),
+                'gscTopUpAmount'                     => $this->dsCustomer->getValue(DBECustomer::gscTopUpAmount),
+                'noOfServers'                        => $this->dsCustomer->getValue(DBECustomer::noOfServers),
+                'noOfSites'                          => $this->dsCustomer->getValue(DBECustomer::noOfSites),
+                'modifyDate'                         => $this->dsCustomer->getValue(DBECustomer::modifyDate),
+                'reviewDate'                         => $this->dsCustomer->getValue(DBECustomer::reviewDate),
+                'reviewTime'                         => $this->dsCustomer->getValue(DBECustomer::reviewTime),
+                'referred'                           => $this->dsCustomer->getValue(
+                    DBECustomer::referredFlag
+                ) == 'Y' ? 'true' : 'false',
+                'becameCustomerDate'                 => $this->dsCustomer->getValue(DBECustomer::becameCustomerDate),
+                'droppedCustomerDate'                => $this->dsCustomer->getValue(DBECustomer::droppedCustomerDate),
+                'reviewAction'                       => $this->dsCustomer->getValue(DBECustomer::reviewAction),
+                'comments'                           => $this->dsCustomer->getValue(DBECustomer::comments),
+                'techNotes'                          => $this->dsCustomer->getValue(DBECustomer::techNotes),
+                'slaP1'                              => $this->dsCustomer->getValue(DBECustomer::slaP1),
+                'slaP2'                              => $this->dsCustomer->getValue(DBECustomer::slaP2),
+                'slaP3'                              => $this->dsCustomer->getValue(DBECustomer::slaP3),
+                'slaP4'                              => $this->dsCustomer->getValue(DBECustomer::slaP4),
+                'slaP5'                              => $this->dsCustomer->getValue(DBECustomer::slaP5),
 
                 'add1' => $site->getValue(DBESite::add1),
                 'add2' => $site->getValue(DBESite::add2),
@@ -1009,6 +1022,61 @@ class CTCustomerCRM extends CTCustomer
 
         $this->template->set_block(
             'CustomerEdit',
+            'templateSupportLevelBlock',
+            'templateSelectSupportLevel'
+        );
+
+        $this->template->set_block(
+            'CustomerEdit',
+            'templateCustomLetterBlock',
+            'templateCustomLetters'
+        );
+
+        /*
+       Display all the custom letters
+       */
+        foreach ($customLetterTemplates as $index => $filename) {
+
+            $customLetterURL =
+                Controller::buildLink(
+                    'LetterForm.php',
+                    array(
+                        'contactID'      => $this->dsContact->getValue(DBEContact::contactID),
+                        'letterTemplate' => $filename
+                    )
+                );
+
+
+            $this->template->set_var(
+
+                array(
+                    'customLetterURL'  => $customLetterURL,
+                    'customLetterName' => $filename
+
+                )
+            );
+
+            $this->template->parse(
+                'templateCustomLetters',
+                'templateCustomLetterBlock',
+                true
+            );
+
+        } // end foreach
+
+        $buContact = new BUContact($this);
+        $buContact->supportLevelDropDown(
+            null,
+            $this->template,
+            'supportLevelSelected',
+            'supportLevelValue',
+            'supportLevelDescription',
+            'templateSelectSupportLevel',
+            'templateSupportLevelBlock'
+        );
+
+        $this->template->set_block(
+            'CustomerEdit',
             'customerLeadStatusBlock',
             'customerleadstatuses'
         );
@@ -1021,13 +1089,13 @@ class CTCustomerCRM extends CTCustomer
 
             $this->template->set_var(
                 array(
-                    'customerLeadStatusID'       => $dsCustomerLeadStatuses->getValue(
-                        DBECustomerLeadStatus::customerLeadStatusID
+                    'customerLeadStatusId'       => $dsCustomerLeadStatuses->getValue(
+                        DBECustomerLeadStatus::id
                     ),
                     'customerLeadStatusName'     => $dsCustomerLeadStatuses->getValue(DBECustomerLeadStatus::name),
                     'customerLeadStatusSelected' => ($dsCustomerLeadStatuses->getValue(
-                            DBECustomerLeadStatus::customerLeadStatusID
-                        ) == $this->dsCustomer->getValue(DBECustomer::customerLeadStatusID)) ? CT_SELECTED : null
+                            DBECustomerLeadStatus::id
+                        ) == $this->dsCustomer->getValue(DBECustomer::leadStatusId)) ? CT_SELECTED : null
                 )
             );
             $this->template->parse(
@@ -1072,12 +1140,12 @@ class CTCustomerCRM extends CTCustomer
 
             $this->template->set_var(
                 array(
-                    'leadStatusID'          => $dsLeadStatus->getValue(DBELeadStatus::leadStatusID),
-                    'leadStatusDescription' => $dsLeadStatus->getValue(DBELeadStatus::description),
+                    'leadStatusID'          => $dsLeadStatus->getValue(DBECustomerLeadStatus::id),
+                    'leadStatusDescription' => $dsLeadStatus->getValue(DBECustomerLeadStatus::name),
                     'leadStatusSelected'    => ($dsLeadStatus->getValue(
-                            DBELeadStatus::leadStatusID
+                            DBECustomerLeadStatus::id
                         ) == $this->dsCustomer->getValue(
-                            DBECustomer::leadStatusID
+                            DBECustomer::leadStatusId
                         )) ? CT_SELECTED : null
                 )
             );
@@ -1516,9 +1584,7 @@ class CTCustomerCRM extends CTCustomer
                     'pendingLeaverFlagChecked'             => ($this->dsContact->getValue(
                             DBEContact::pendingLeaverFlag
                         ) == 'Y') ? CT_CHECKED : null,
-                    'pendingLeaverDate'                    => Controller::dateYMDtoDMY(
-                        $this->dsContact->getValue(DBEContact::pendingLeaverDate)
-                    ),
+                    'pendingLeaverDate'                    => $this->dsContact->getValue(DBEContact::pendingLeaverDate),
                     'failedLoginCount'                     => $this->dsContact->getValue(DBEContact::failedLoginCount),
                     'email'                                => $this->dsContact->getValue(DBEContact::email),
                     'emailClass'                           => $this->dsContact->getValue(self::contactFormEmailClass),
@@ -1610,7 +1676,11 @@ class CTCustomerCRM extends CTCustomer
                     'dearJohnURL'                          => $dearJohnURL,
                     'dmLetterURL'                          => $dmLetterURL,
                     'customLetter1URL'                     => $customLetter1URL,
-                    'deleteContactLink'                    => $deleteContactLink
+                    'deleteContactLink'                    => $deleteContactLink,
+                    'linkedInURL'                          => $this->dsContact->getValue(DBEContact::linkedInURL),
+                    'linkedInColor'                        => $this->dsContact->getValue(
+                        DBEContact::linkedInURL
+                    ) ? 'green' : 'red'
                 )
             );
 
@@ -1738,6 +1808,16 @@ class CTCustomerCRM extends CTCustomer
         $this->parsePage();
     }
 
+    function getChecked($flag)
+    {
+        return ($flag == 'N' || $flag == false ? null : CT_CHECKED);
+    }
+
+    function getSiteNo()
+    {
+        return $this->siteNo;
+    }
+
     /**
      * Update details
      * @access private
@@ -1775,10 +1855,5 @@ class CTCustomerCRM extends CTCustomer
         } else {
             $this->displayEditForm();
         }
-    }
-
-    private function getTrueFalse($value)
-    {
-        return $value == 'Y';
     }
 }

@@ -64,7 +64,7 @@
         const files = document.querySelector('[type=file]').files;
         const reviewMeetingDate = $('#reviewMeetingDate').val();
 
-        const isValidDate = moment(reviewMeetingDate, "DD/MM/YYYY", true).isValid();
+        const isValidDate = moment(reviewMeetingDate, "YYYY-MM-DD", true).isValid();
 
         if (files.length && isValidDate) {
             $('#uploadFilesBtn').attr('disabled', false);
@@ -215,35 +215,12 @@
         });
     }
 
-    const autocompleteURL = "/Customer.php?action=searchName";
-    $(function () {
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-                $('#uploadSection').show();
-                fetchTableData(ui.item.value);
-                fetchReviewContactsData(ui.item.value);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+    window.addEventListener('DOMContentLoaded', function () {
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
+            $('#uploadSection').show();
+            fetchTableData($event.detail.item.value);
+            fetchReviewContactsData($event.detail.item.value);
         });
     });
 
@@ -267,15 +244,15 @@
                    value="{customerString}"
                    size="50"
                    maxlength="50"
+                   customer-search
             >
         </td>
     </tr>
     <tr>
         <td class="promptText">Review Meeting Date</td>
         <td>
-            <input type="text"
+            <input type="date"
                    id="reviewMeetingDate"
-                   class="jQueryCalendar"
                    autocomplete="off"
                    onchange="checkUploadFilesBtn()"
             >

@@ -2,27 +2,119 @@
 <META HTTP-EQUIV=REFRESH
       CONTENT=240
 >
-<script type='text/JavaScript'
-        src='/.javascript/ajax.js'
-></script>
-<script language='JavaScript'
-        src='jquery/jquery.min.js'
-></script>
 <a href="Activity.php?action=activityCreate1">Log New Request</a>
 <br>
 <div id="SDManagerLinks"
      hidden
 >
     <a href="SDManagerDashboard.php?HD&ES">SD Manager Dashboard</a>
-    <a href="SDManagerDashboard.php?showP5=true&SP">P5</a>
 </div>
 <script>
-    $(function () {
+
+    window.addEventListener('DOMContentLoaded', function () {
+
+
+        $("#selectall").change(function () {
+            $(".priorityFilterCheckbox").prop('checked', $(this).prop("checked"));
+        });
+
+        if ({displayToBeLoggedFlag} == 0) {
+            $('table#toBeLogged').children('tbody').toggle();
+        }
+
+        if ({displayQueue1Flag} == 0) {
+            $('table#queue1').children('tbody').toggle();
+        }
+
+        if ({displayQueue2Flag} == 0) {
+            $('table#queue2').children('tbody').toggle();
+        }
+
+        if ({displayQueue3Flag} == 0) {
+            $('table#queue3').children('tbody').toggle();
+        }
+
+        if ({displayQueue4Flag} == 0) {
+            $('table#queue4').children('tbody').toggle();
+        }
+
+        if ({displayQueue5Flag} == 0) {
+            $('table#queue5').children('tbody').toggle();
+        }
+
+        if ({displayQueue6Flag} == 0) {
+            $('table#queue6').children('tbody').toggle();
+        }
+
+        if ({displayQueue7Flag} == 0) {
+            $('table#queue7').children('tbody').toggle();
+        }
+        if ({displayPendingReopenedFlag} == 0) {
+            $('table#pendingReopened').children('tbody').toggle();
+        }
+
+
+        $('table#pendingReopened th').click(function () {
+                $(this).parents('table#pendingReopened').children('tbody').toggle();
+                fetch("CurrentActivityReport.php?action=toggleDisplayPendingReopenedFlag");
+            }
+        );
+
+        $('table#toBeLogged th').click(
+            function () {
+                $(this).parents('table#toBeLogged').children('tbody').toggle();
+                fetch("CurrentActivityReport.php?action=toggleDisplayToBeLoggedFlag");
+            }
+        );
+
+        $('table#queue1 th').click(
+            function () {
+                $(this).parents('table#queue1').children('tbody').toggle();
+                fetch("CurrentActivityReport.php?action=toggleDisplayQueue1Flag");
+            }
+        );
+        $('table#queue2 th').click(
+            function () {
+                $(this).parents('table#queue2').children('tbody').toggle();
+                fetch("CurrentActivityReport.php?action=toggleDisplayQueue2Flag");
+            }
+        );
+        $('table#queue3 th').click(
+            function () {
+                $(this).parents('table#queue3').children('tbody').toggle();
+                fetch("CurrentActivityReport.php?action=toggleDisplayQueue3Flag");
+            }
+        );
+        $('table#queue4 th').click(
+            function () {
+                $(this).parents('table#queue4').children('tbody').toggle();
+                fetch("CurrentActivityReport.php?action=toggleDisplayQueue4Flag");
+            }
+        );
+        $('table#queue5 th').click(
+            function () {
+                $(this).parents('table#queue5').children('tbody').toggle();
+                fetch("CurrentActivityReport.php?action=toggleDisplayQueue5Flag");
+            }
+        );
+        $('table#queue6 th').click(
+            function () {
+                $(this).parents('table#queue6').children('tbody').toggle();
+                fetch("CurrentActivityReport.php?action=toggleDisplayQueue6Flag");
+            }
+        );
+        $('table#queue7 th').click(
+            function () {
+                $(this).parents('table#queue7').children('tbody').toggle();
+                fetch("CurrentActivityReport.php?action=toggleDisplayQueue7Flag");
+            }
+        );
 
         if ({isSDManager}) {
-            $('#SDManagerLinks').show();
-            $('#pendingReopened').show();
+            document.getElementById('SDManagerLinks').style.display = "block";
+            document.getElementById('pendingReopened').style.display = "block";
         }
+
         $('.requestAdditionalTime').click(function () {
 
             var reason = prompt('Please provide your reason for requesting additional time.(Required)');
@@ -48,21 +140,30 @@
         $('.userAllocation').change(function () {
             window.location = this.value;
         })
+
+        let queuePreviousValue = null;
+
+        $('.queueSelector').click(function (event) {
+            queuePreviousValue = $(this).val();
+        })
         $('.queueSelector').change(function (event) {
-            console.log(this.value);
-            var problemID = ($(this).data()).problemid;
+            debugger;
+            const dataSet = $(this).data();
+            const problemID = dataSet.problemid;
+            const problemStatus = dataSet.problemStatus;
+            let answer = null;
+            if (problemStatus === "P") {
+                answer = prompt('Please provide a reason for moving this SR into a different queue');
 
-            var answer = confirm('Are you sure you want to change this Service Request queue?');
-
-            if (!answer) {
-                return;
+                if (!answer) {
+                    $(this).val(queuePreviousValue);
+                    return;
+                }
             }
 
-            window.location = '/CurrentActivityReport.php?action=changeQueue&problemID=' + problemID + '&queue=' + this.value
+            window.location = '/CurrentActivityReport.php?action=changeQueue&problemID=' + problemID + '&queue=' + this.value + "&reason=" + answer
         })
-
     })
-
 
 </script>
 <table width="100%">
@@ -113,7 +214,7 @@
             >{cpCustomerName}</a></td>
             <td bgcolor="{cpBgColor}">
                 <A
-                        href="#"
+                        href="javascript:"
                         onClick="window.open(
             '{urlDetailsPopup}',
             'customer_problem',
@@ -147,8 +248,11 @@
         >
             <div align="left">Pending Reopened ({pendingReopenedCount})</div>
         </th>
+        <th class="listHeadText">
+            Received
+        </th>
         <th class="listHeadText"
-            width="5"
+            width="4"
             nowrap
         >SR
         </th>
@@ -190,13 +294,52 @@
                        value="R"
                        onClick="if(!confirm('Are you sure you want to reopen?')){ window.event.preventDefault()}"
                 >
+
                 <input type="submit"
                        name="result"
                        title="Delete"
                        value="D"
                        onClick="if(!confirm('Are you sure you want to delete?')){ window.event.preventDefault()}"
                 >
+                <script>
+                    function submitNew() {
+                        const form = document.createElement("form");
+                        form.method = "post";
+                        form.action = "/Activity.php";
+                        addInputs([
+                            {
+                                name: 'action',
+                                value: 'editServiceRequestHeader'
+                            },
+                            {
+                                name: 'contactID',
+                                value: event.target.dataset.contactId
+                            },
+                            {
+                                name: 'customerID',
+                                value: event.target.dataset.customerId,
+                            },
+                            {
+                                name: 'reason',
+                                value: atob(event.target.dataset.reason),
+                            }
+                        ], form);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                </script>
+                <button type="button"
+                        onclick="submitNew()"
+                        title="Submit new SR, unrelated message"
+                        data-contact-id="{pendingReopenedContactID}"
+                        data-customer-id="{pendingReopenedCustomerID}"
+                        data-reason="{base64Reason}"
+                >N
+                </button>
             </form>
+        </td>
+        <td>
+            {receivedDate}
         </td>
         <td>
             <A href={pendingReopenSRURL}
@@ -207,7 +350,7 @@
             {pendingReopenCustomerName}
         </td>
         <td>
-            <a href="#"
+            <a href="javascript:"
                onClick="window.open(
             '{pendingReopenDescriptionURL}',
             'customer_problem',
@@ -363,6 +506,7 @@
         <td width="3%">
             <select class="queueSelector"
                     data-problemId="{problemID}"
+                    data-problem-status="{problemStatus}"
             >
                 {queueOptions}
             </select></td>
@@ -426,7 +570,7 @@
 
         <td width="37%">
             <A
-                    href="#"
+                    href="javascript:"
                     onClick="window.open(
           '{urlProblemHistoryPopup}',
           'reason',
@@ -508,6 +652,7 @@
         <td width="3%">
             <select class="queueSelector"
                     data-problemId="{problemID}"
+                    data-problem-status="{problemStatus}"
             >
                 {queueOptions}
             </select></td>
@@ -569,7 +714,7 @@
 
         <td width="37%">
             <A
-                    href="#"
+                    href="javascript:"
                     onClick="window.open(
           '{urlProblemHistoryPopup}',
           'reason',
@@ -653,6 +798,7 @@
         <td width="3%">
             <select class="queueSelector"
                     data-problemId="{problemID}"
+                    data-problem-status="{problemStatus}"
             >
                 {queueOptions}
             </select></td>
@@ -714,7 +860,7 @@
 
         <td width="37%">
             <A
-                    href="#"
+                    href="javascript:"
                     onClick="window.open(
           '{urlProblemHistoryPopup}',
           'reason',
@@ -796,6 +942,7 @@
         <td width="3%">
             <select class="queueSelector"
                     data-problemId="{problemID}"
+                    data-problem-status="{problemStatus}"
             >
                 {queueOptions}
             </select></td>
@@ -857,7 +1004,7 @@
 
         <td width="37%">
             <A
-                    href="#"
+                    href="javascript:"
                     onClick="window.open(
           '{urlProblemHistoryPopup}',
           'reason',
@@ -942,6 +1089,7 @@
         <td width="3%">
             <select class="queueSelector"
                     data-problemId="{problemID}"
+                    data-problem-status="{problemStatus}"
             >
                 {queueOptions}
             </select></td>
@@ -1002,7 +1150,7 @@
 
         <td width="37%">
             <A
-                    href="#"
+                    href="javascript:"
                     onClick="window.open(
           '{urlProblemHistoryPopup}',
           'reason',
@@ -1141,7 +1289,7 @@
 
         <td width="40%">
             <A
-                    href="#"
+                    href="javascript:"
                     onClick="window.open(
           '{urlProblemHistoryPopup}',
           'reason',
@@ -1218,7 +1366,7 @@
 
             <td width="40%">
                 <A
-                        href="#"
+                        href="javascript:"
                         onClick="window.open(
           '{urlProblemHistoryPopup}',
           'reason',
@@ -1233,106 +1381,4 @@
     </tbody>
 </table>
 
-
-<script>
-    $(document).ready(function () {
-
-        $("#selectall").change(function () {
-            $(".priorityFilterCheckbox").prop('checked', $(this).prop("checked"));
-        });
-
-        if ({displayToBeLoggedFlag} == 0) {
-            $('table#toBeLogged').children('tbody').toggle();
-        }
-
-        if ({displayQueue1Flag} == 0) {
-            $('table#queue1').children('tbody').toggle();
-        }
-
-        if ({displayQueue2Flag} == 0) {
-            $('table#queue2').children('tbody').toggle();
-        }
-
-        if ({displayQueue3Flag} == 0) {
-            $('table#queue3').children('tbody').toggle();
-        }
-
-        if ({displayQueue4Flag} == 0) {
-            $('table#queue4').children('tbody').toggle();
-        }
-
-        if ({displayQueue5Flag} == 0) {
-            $('table#queue5').children('tbody').toggle();
-        }
-
-        if ({displayQueue6Flag} == 0) {
-            $('table#queue6').children('tbody').toggle();
-        }
-
-        if ({displayQueue7Flag} == 0) {
-            $('table#queue7').children('tbody').toggle();
-        }
-        if ({displayPendingReopenedFlag} == 0) {
-            $('table#pendingReopened').children('tbody').toggle();
-        }
-
-    });
-
-    $('table#pendingReopened th').click(function () {
-            $(this).parents('table#pendingReopened').children('tbody').toggle();
-            loadXMLDoc("CurrentActivityReport.php?action=toggleDisplayPendingReopenedFlag");
-        }
-    );
-
-    $('table#toBeLogged th').click(
-        function () {
-            $(this).parents('table#toBeLogged').children('tbody').toggle();
-            loadXMLDoc("CurrentActivityReport.php?action=toggleDisplayToBeLoggedFlag");
-        }
-    );
-
-    $('table#queue1 th').click(
-        function () {
-            $(this).parents('table#queue1').children('tbody').toggle();
-            loadXMLDoc("CurrentActivityReport.php?action=toggleDisplayQueue1Flag");
-        }
-    );
-    $('table#queue2 th').click(
-        function () {
-            $(this).parents('table#queue2').children('tbody').toggle();
-            loadXMLDoc("CurrentActivityReport.php?action=toggleDisplayQueue2Flag");
-        }
-    );
-    $('table#queue3 th').click(
-        function () {
-            $(this).parents('table#queue3').children('tbody').toggle();
-            loadXMLDoc("CurrentActivityReport.php?action=toggleDisplayQueue3Flag");
-        }
-    );
-    $('table#queue4 th').click(
-        function () {
-            $(this).parents('table#queue4').children('tbody').toggle();
-            loadXMLDoc("CurrentActivityReport.php?action=toggleDisplayQueue4Flag");
-        }
-    );
-    $('table#queue5 th').click(
-        function () {
-            $(this).parents('table#queue5').children('tbody').toggle();
-            loadXMLDoc("CurrentActivityReport.php?action=toggleDisplayQueue5Flag");
-        }
-    );
-    $('table#queue6 th').click(
-        function () {
-            $(this).parents('table#queue6').children('tbody').toggle();
-            loadXMLDoc("CurrentActivityReport.php?action=toggleDisplayQueue6Flag");
-        }
-    );
-    $('table#queue7 th').click(
-        function () {
-            $(this).parents('table#queue7').children('tbody').toggle();
-            loadXMLDoc("CurrentActivityReport.php?action=toggleDisplayQueue7Flag");
-        }
-    );
-
-</script>
 <!-- End Template: CurrentActivityReport.inc.html -->

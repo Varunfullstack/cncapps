@@ -27,13 +27,12 @@ class CTExpenseType extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            "maintenance",
-        ];
+        $roles = MAINTENANCE_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(804);
         $this->buExpenseType = new BUExpenseType($this);
         $this->dsExpenseType = new DSForm($this);
         $this->dsExpenseType->copyColumnsFrom($this->buExpenseType->dbeExpenseType);
@@ -45,7 +44,7 @@ class CTExpenseType extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_MAINTENANCE);
+        $this->checkPermissions(MAINTENANCE_PERMISSION);
         switch ($this->getAction()) {
             case CTEXPENSETYPE_ACT_EDIT:
             case CTEXPENSETYPE_ACT_CREATE:

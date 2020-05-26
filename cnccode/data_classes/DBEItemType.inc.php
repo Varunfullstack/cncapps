@@ -4,10 +4,15 @@
 * @access public
 */
 global $cfg;
+
+use CNCLTD\SortableDBE;
+
 require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBEItemType extends DBCNCEntity
 {
+
+    use SortableDBE;
 
     const itemTypeID = "itemTypeID";
     const description = "description";
@@ -15,6 +20,7 @@ class DBEItemType extends DBCNCEntity
     const reoccurring = "reoccurring";
     const active = "active";
     const showInCustomerReview = "showInCustomerReview";
+    const sortOrder = "sortOrder";
 
 
     /**
@@ -68,21 +74,47 @@ class DBEItemType extends DBCNCEntity
             true
         );
 
+        $this->addColumn(
+            self::sortOrder,
+            DA_INTEGER,
+            DA_NOT_NULL
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
 
-    function getCustomerReviewRows()
+    function getCustomerReviewRows($arbitrarySort = false)
     {
         $statement =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() . " where " . $this->getDBColumnName(
                 self::active
-            ) . " and " . $this->getDBColumnName(self::showInCustomerReview) . " order by " . $this->getDBColumnName(
-                self::description
-            );
+            ) . " and " . $this->getDBColumnName(self::showInCustomerReview);
+        if ($arbitrarySort) {
+            $statement .= " order by sortOrder";
+        } else {
+            $statement .= " order by " . $this->getDBColumnName(self::description);
+        }
         $this->setQueryString($statement);
         $ret = (parent::getRows());
+    }
+
+    protected function getSortOrderForItem($id)
+    {
+        $this->getRow($id);
+        return $this->getValue(DBEItemType::sortOrder);
+    }
+
+    protected function getSortOrderColumnName()
+    {
+        return $this->getDBColumnName(DBEItemType::sortOrder);
+    }
+
+    protected function getDB()
+    {
+        global $db;
+        return $db;
     }
 }
 

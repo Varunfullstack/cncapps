@@ -75,14 +75,15 @@ class CTExpense extends CTCNC
             $cfg
         );
         $roles = [
-            "accounts",
-            "technical",
-            "sales"
+            ACCOUNTS_PERMISSION,
+            TECHNICAL_PERMISSION,
+            SALES_PERMISSION
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(708);
         $this->buExpense = new BUExpense($this);
         $this->dsSearchForm = new DSForm($this);
         $this->dsSearchResults = new DSForm($this);
@@ -113,12 +114,12 @@ class CTExpense extends CTCNC
                 $this->createExpense();
                 break;
             case CTEXPENSE_ACT_EXPORT_FORM:
-                $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
+                $this->checkPermissions(ACCOUNTS_PERMISSION);
                 $this->exportExpenseForm();
                 break;
             case CTEXPENSE_ACT_EXPORT_GENERATE:
             case CTEXPENSE_ACT_EXPORT_TRIAL:
-                $this->checkPermissions(PHPLIB_PERM_ACCOUNTS);
+                $this->checkPermissions(ACCOUNTS_PERMISSION);
                 $this->exportExpenseGenerate();
                 break;
             default:
@@ -539,12 +540,8 @@ class CTExpense extends CTCNC
         }
         $this->template->set_var(
             array(
-                'endDate'        => Controller::dateYMDtoDMY(
-                    $this->dsExpenseExport->getValue(BUExpense::exportDataSetEndDate)
-                ),
-                'endDateMessage' => Controller::dateYMDtoDMY(
-                    $this->dsExpenseExport->getMessage(BUExpense::exportDataSetEndDate)
-                ),
+                'endDate'        => $this->dsExpenseExport->getValue(BUExpense::exportDataSetEndDate),
+                'endDateMessage' => $this->dsExpenseExport->getMessage(BUExpense::exportDataSetEndDate),
                 'urlSubmit'      => $urlSubmit
             )
         );

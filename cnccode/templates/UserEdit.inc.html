@@ -81,7 +81,7 @@
     }
 
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         updateHoursWorkedInAWeek();
         updateLengthOfService();
         generateEmptyInputs();
@@ -90,22 +90,18 @@
     });
 
     function updateLengthOfService() {
-
         let newValue = null;
         const dateValue = $('#startDate').val();
         try {
-            const date = luxon.DateTime.fromFormat(dateValue, 'dd/MM/yyyy');
+            const date = moment(dateValue, 'YYYY-MM-DD');
             if (date.isValid) {
-                const today = luxon.DateTime.local();
-
-                const difference = today.diff(date, ['years', 'months'], {conversionAccuracy: 'longterm'});
-
-                newValue = (difference.years + difference.months / 12).toFixed(1);
-
+                const today = moment();
+                const differenceYears = today.diff(date, 'years');
+                const differenceMonths = today.diff(date, 'months');
+                newValue = (differenceYears + differenceMonths / 12).toFixed(1);
             }
-
-
         } catch (e) {
+
         }
         let message = "Not Valid Start Date";
         if (newValue) {
@@ -373,11 +369,12 @@
         <tr>
             <td class="promptText">Start Date</td>
             <td class="field">
-                <input name="user[1][startDate]"
+                <input type="date"
+                       name="user[1][startDate]"
                        value="{startDate}"
-                       class="jqueryCalendar"
                        onchange="updateLengthOfService()"
                        id="startDate"
+                       wren
                 >
                 <span id="lengthOfService"></span> <span class="formErrorMessage">{startDateMessage}</span>
             </td>
@@ -387,7 +384,7 @@
             <td class="field">
                 <button type="button"
                         onclick="editEncryptedNew()"
-                ><i class="fa fa-pencil {dateOfBirthPencilColor}"></i>
+                ><i class="fa fa-pencil-alt {dateOfBirthPencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedDateOfBirth]"
@@ -395,8 +392,7 @@
                        class="encrypted"
                        data-name="dateOfBirth"
                        data-extra-data="age"
-                       data-custom-class="jqueryCalendar"
-                       data-custom-function="reAttachCalendars"
+                       data-additional-attributes='{"type": "date", "required": true}'
                 >
             </td>
         </tr>
@@ -409,7 +405,7 @@
             <td class="field">
                 <button type="button"
                         onclick="editEncryptedNew()"
-                ><i class="fa fa-pencil {address1PencilColor}"></i>
+                ><i class="fa fa-pencil-alt {address1PencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedAddress1]"
@@ -424,7 +420,7 @@
             <td class="field">
                 <button type="button"
                         onclick="editEncryptedNew()"
-                ><i class="fa fa-pencil {address2PencilColor}"></i>
+                ><i class="fa fa-pencil-alt {address2PencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedAddress2]"
@@ -439,7 +435,7 @@
             <td class="field">
                 <button type="button"
                         onclick="editEncryptedNew()"
-                ><i class="fa fa-pencil {address3PencilColor}"></i>
+                ><i class="fa fa-pencil-alt {address3PencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedAddress3]"
@@ -454,7 +450,7 @@
             <td class="field">
                 <button type="button"
                         onclick="editEncryptedNew()"
-                ><i class="fa fa-pencil {townPencilColor}"></i>
+                ><i class="fa fa-pencil-alt {townPencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedTown]"
@@ -469,7 +465,7 @@
             <td class="field">
                 <button type="button"
                         onclick="editEncryptedNew()"
-                ><i class="fa fa-pencil {countyPencilColor}"></i>
+                ><i class="fa fa-pencil-alt {countyPencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedCounty]"
@@ -484,7 +480,7 @@
             <td class="field">
                 <button type="button"
                         onclick="editEncryptedNew()"
-                ><i class="fa fa-pencil {postcodePencilColor}"></i>
+                ><i class="fa fa-pencil-alt {postcodePencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedPostcode]"
@@ -510,12 +506,11 @@
             <td class="promptText">Company Healthcare Start Date</td>
             <td class="field">
                 <input {DISABLED}
-                       type="text"
+                       type="date"
                        name="user[1][companyHealthcareStartDate]"
                        value="{companyHealthcareStartDate}"
                        size="10"
                        maxlength="10"
-                       class="jqueryCalendar"
                 > <span class="formErrorMessage">{companyHealthcareStartDateMessage}</span>
             </td>
         </tr>
@@ -523,12 +518,11 @@
             <td class="promptText">Enhanced CNC 2 year pension Start Date</td>
             <td class="field">
                 <input {DISABLED}
-                       type="text"
+                       type="date"
                        name="user[1][enhancedCNC2YearPensionStartDate]"
                        value="{enhancedCNC2YearPensionStartDate}"
                        size="10"
                        maxlength="10"
-                       class="jqueryCalendar"
                 > <span class="formErrorMessage">{enhancedCNC2YearPensionStartDateMessage}</span>
             </td>
         </tr>
@@ -537,7 +531,7 @@
             <td class="field">
                 <button type="button"
                         onclick="editEncryptedNew()"
-                ><i class="fa fa-pencil {pensionAdditionalPaymentsPencilColor}"></i>
+                ><i class="fa fa-pencil-alt {pensionAdditionalPaymentsPencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedPensionAdditionalPayments]"
@@ -553,7 +547,7 @@
                 <button type="button"
                         onclick="editEncryptedNew()"
                         id="salaryButton"
-                ><i class="fa fa-pencil {salaryPencilColor}"></i>
+                ><i class="fa fa-pencil-alt {salaryPencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedSalary]"
@@ -601,7 +595,7 @@
             <td class="field">
                 <button type="button"
                         onclick="editEncryptedNew()"
-                ><i class="fa fa-pencil {salarySacrificePencilColor}"></i>
+                ><i class="fa fa-pencil-alt {salarySacrificePencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedSalarySacrifice]"
@@ -616,7 +610,7 @@
             <td class="field">
                 <button type="button"
                         onclick="editEncryptedNew()"
-                ><i class="fa fa-pencil {nationalInsuranceNumberPencilColor}"></i>
+                ><i class="fa fa-pencil-alt {nationalInsuranceNumberPencilColor}"></i>
                 </button>
                 <input type="hidden"
                        name="user[1][encryptedNationalInsuranceNumber]"
@@ -657,13 +651,58 @@
             </td>
         </tr>
         <tr>
-            <td class="promptText">Helpdesk</td>
-            <td class="fieldText"><input name="user[1][helpdeskFlag]"
+            <td class="promptText">Change SR Priority</td>
+            <td class="fieldText"><INPUT name="user[1][changePriorityFlag]"
+                                         {DISABLED}
                                          type="checkbox"
                                          value="Y"
-                                         {DISABLED}
-                                         {helpdeskFlagChecked}
-            />
+                                         {changePriorityFlagChecked}
+            ></td>
+        </tr>
+        <tr>
+            <td class="promptText">Additional Time Level Approver</td>
+            <td class="fieldText">
+                <input name="user[1][additionalTimeLevelApprover]"
+                       type="checkbox"
+                       value="true"
+                       {DISABLED}
+                       {additionalTimeLevelApproverChecked}
+                />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">&nbsp;</td>
+            <td class="fieldText">&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="promptText">Active</td>
+            <td class="fieldText">
+                <INPUT name="user[1][activeFlag]"
+                       {DISABLED}
+                       type="checkbox"
+                       value="Y"
+                       {activeFlagChecked}
+                ></td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+                <h3>Menus to show</h3>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText"
+                title="Customer Items and the Despatch process"
+            >Technical
+            </td>
+            <td class="fieldText">
+                <INPUT name="perms[]"
+                       {DISABLED}
+                       id="technical"
+                       type="checkbox"
+                       value="technical"
+                       {technicalChecked}
+                >
             </td>
         </tr>
         <tr>
@@ -677,26 +716,183 @@
             ></td>
         </tr>
         <tr>
-            <td class="promptText">Change SR Priority</td>
-            <td class="fieldText"><INPUT name="user[1][changePriorityFlag]"
+            <td class="promptText"
+                title="Purchase Orders, Sales Orders, Sales Invoices, Customer Maintenance"
+            >Sales
+            </td>
+            <td class="fieldText">
+                <INPUT name="perms[]"
+                       {DISABLED}
+                       id="sales"
+                       type="checkbox"
+                       value="sales"
+                       {salesChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText"
+                title="Account Management"
+            >Account Management
+            </td>
+            <td class="fieldText">
+                <INPUT name="perms[]"
+                       {DISABLED}
+                       type="checkbox"
+                       value="accountManagement"
+                       {accountManagementChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText"
+                title="Access to Reports Menu"
+            >Reports
+            </td>
+            <td class="fieldText"><INPUT name="perms[]"
                                          {DISABLED}
+                                         id="reports"
                                          type="checkbox"
-                                         value="Y"
-                                         {changePriorityFlagChecked}
+                                         value="reports"
+                                         {reportsChecked}
             ></td>
         </tr>
-
         <tr>
-            <td class="promptText">Change Approver</td>
+            <td class="promptText"
+                title="Access to Renewals Menu"
+            >Renewals
+            </td>
+            <td class="fieldText"><INPUT name="perms[]"
+                                         {DISABLED}
+                                         id="renewals"
+                                         type="checkbox"
+                                         value="renewals"
+                                         {renewalsChecked}
+            ></td>
+        </tr>
+        <tr>
+            <td class="promptText"
+                title="Purchase Invoices, Pre-pay Export, Expenses and Overtime, Sage Export, User Maintenance, Amendment of Completed Sales Orders"
+            >
+                Accounts
+            </td>
             <td class="fieldText">
-                <input name="user[1][changeApproverFlag]"
+                <INPUT name="perms[]"
+                       {DISABLED}
+                       id="accounts"
                        type="checkbox"
-                       id="user[1][changeApproverFlag]"
+                       value="accounts"
+                       {accountsChecked}
+                ></td>
+        </tr>
+        <tr>
+            <td class="promptText"
+                title="Access to Maintenance Menu"
+            >Maintenance
+            </td>
+            <td class="fieldText">
+                <INPUT name="perms[]"
+                       {DISABLED}
+                       id="maintenance"
+                       type="checkbox"
+                       value="maintenance"
+                       {maintenanceChecked}
+                ></td>
+        </tr>
+        <tr>
+            <td class="promptText"
+                title="Senior Management"
+            >Senior Management
+            </td>
+            <td class="fieldText">
+                <INPUT name="perms[]"
+                       {DISABLED}
+                       type="checkbox"
+                       value="seniorManagement"
+                       {seniorManagementChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <h3>Generic Permissions</h3>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Helpdesk</td>
+            <td class="fieldText">
+                <input name="user[1][helpdeskFlag]"
+                       type="checkbox"
                        value="Y"
                        {DISABLED}
-                       {changeApproverFlagChecked}
+                       {helpdeskFlagChecked}
                 />
             </td>
+        </tr>
+        <tr>
+            <td class="promptText"
+                title="Completion of Service Requests, Set Logging Problem flag, Setting Activities to Checked, Service Request Master Dashboard"
+            >
+                Supervisor
+            </td>
+            <td class="fieldText"><INPUT name="perms[]"
+                                         {DISABLED}
+                                         id="supervisor"
+                                         type="checkbox"
+                                         value="supervisor"
+                                         {supervisorChecked}
+            ></td>
+        </tr>
+        <tr>
+            <td class="promptText">Appear in Queue</td>
+            <td class="fieldText">
+                <INPUT name="user[1][appearInQueueFlag]"
+                       {DISABLED}
+                       type="checkbox"
+                       value="Y"
+                       title="Does this user appear on the SR queue filter?"
+                       {appearInQueueFlagChecked}
+                >
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Exclude from Stats</td>
+            <td class="fieldText">
+                <input name="user[1][excludeFromStatsFlag]"
+                       type="checkbox"
+                       id="user[1][excludeFromStatsFlag]"
+                       value="Y"
+                       {DISABLED}
+                       {excludeFromStatsFlagChecked}
+                />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Sales Password Access</td>
+            <td class="fieldText">
+                <input name="user[1][salesPasswordAccess]"
+                       type="checkbox"
+                       id="user[1][salesPasswordAccess]"
+                       value="true"
+                       {DISABLED}
+                       {salesPasswordAccessChecked}
+                />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <h3>Team Lead Permissions</h3>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Change SR Priority</td>
+            <td class="fieldText">
+                <INPUT name="user[1][changePriorityFlag]"
+                       {DISABLED}
+                       type="checkbox"
+                       value="Y"
+                       {changePriorityFlagChecked}
+                ></td>
         </tr>
         <tr>
             <td class="promptText">Change Initial Activity Date And Time</td>
@@ -723,6 +919,11 @@
             </td>
         </tr>
         <tr>
+            <td colspan="2">
+                <h3>Specific Permissions</h3>
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">Starter & Leaver question management</td>
             <td class="fieldText">
                 <input name="user[1][starterLeaverQuestionManagementFlag]"
@@ -746,18 +947,7 @@
                 />
             </td>
         </tr>
-        <tr>
-            <td class="promptText">Exclude from Stats</td>
-            <td class="fieldText">
-                <input name="user[1][excludeFromStatsFlag]"
-                       type="checkbox"
-                       id="user[1][excludeFromStatsFlag]"
-                       value="Y"
-                       {DISABLED}
-                       {excludeFromStatsFlagChecked}
-                />
-            </td>
-        </tr>
+
         <tr>
             <td class="promptText">Project Management</td>
             <td class="fieldText">
@@ -818,151 +1008,6 @@
                 />
             </td>
         </tr>
-        <tr>
-            <td class="promptText">Sales Password Access</td>
-            <td class="fieldText">
-                <input name="user[1][salesPasswordAccess]"
-                       type="checkbox"
-                       id="user[1][salesPasswordAccess]"
-                       value="true"
-                       {DISABLED}
-                       {salesPasswordAccessChecked}
-                />
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">Additional Time Level Approver</td>
-            <td class="fieldText">
-                <input name="user[1][additionalTimeLevelApprover]"
-                       type="checkbox"
-                       value="true"
-                       {DISABLED}
-                       {additionalTimeLevelApproverChecked}
-                />
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText">&nbsp;</td>
-            <td class="fieldText">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="promptText">Active</td>
-            <td class="fieldText">
-                <INPUT name="user[1][activeFlag]"
-                       {DISABLED}
-                       type="checkbox"
-                       value="Y"
-                       {activeFlagChecked}
-                ></td>
-        </tr>
-
-        <tr>
-            <td class="promptText">Appear in Queue</td>
-            <td class="fieldText"><INPUT name="user[1][appearInQueueFlag]"
-                                         {DISABLED}
-                                         type="checkbox"
-                                         value="Y"
-                                         title="Does this user appear on the SR queue filter?"
-                                         {appearInQueueFlagChecked}
-            ></td>
-        </tr>
-
-        <tr>
-            <td class="promptText"
-                title="Purchase Orders, Sales Orders, Sales Invoices, Customer Maintenence"
-            >Sales
-            </td>
-            <td class="fieldText">
-                <INPUT name="perms[]"
-                       {DISABLED}
-                       id="sales"
-                       type="checkbox"
-                       value="sales"
-                       {salesChecked}
-                >
-            </td>
-        </tr>
-        <tr>
-            <td class="promptText"
-                title="Purchase Invoices, Pre-pay Export, Expenses and Overtime, Sage Export, User Maintenence, Amendment of Completed Sales Orders"
-            >
-                Accounts
-            </td>
-            <td class="fieldText"><INPUT name="perms[]"
-                                         {DISABLED}
-                                         id="accounts"
-                                         type="checkbox"
-                                         value="accounts"
-                                         {accountsChecked}
-            ></td>
-        </tr>
-        <tr>
-            <td class="promptText"
-                title="Customer Items and the Despatch process"
-            >Technical
-            </td>
-            <td class="fieldText"><INPUT name="perms[]"
-                                         {DISABLED}
-                                         id="technical"
-                                         type="checkbox"
-                                         value="technical"
-                                         {technicalChecked}
-            ></td>
-        </tr>
-        <tr>
-            <td class="promptText"
-                title="Completion of Service Requests, Set Logging Problem flag, Setting Activities to Checked, Service Request Master Dashboard"
-            >
-                Supervisor
-            </td>
-            <td class="fieldText"><INPUT name="perms[]"
-                                         {DISABLED}
-                                         id="supervisor"
-                                         type="checkbox"
-                                         value="supervisor"
-                                         {supervisorChecked}
-            ></td>
-        </tr>
-        <tr>
-            <td class="promptText"
-                title="Access to Reports Menu"
-            >Reports
-            </td>
-            <td class="fieldText"><INPUT name="perms[]"
-                                         {DISABLED}
-                                         id="reports"
-                                         type="checkbox"
-                                         value="reports"
-                                         {reportsChecked}
-            ></td>
-        </tr>
-        <tr>
-            <td class="promptText"
-                title="Access to Maintenance Menu"
-            >Maintenance
-            </td>
-            <td class="fieldText"><INPUT name="perms[]"
-                                         {DISABLED}
-                                         id="maintenance"
-                                         type="checkbox"
-                                         value="maintenance"
-                                         {maintenanceChecked}
-            ></td>
-        </tr>
-        <tr>
-            <td class="promptText"
-                title="Access to Renewals Menu"
-            >Renewals
-            </td>
-            <td class="fieldText"><INPUT name="perms[]"
-                                         {DISABLED}
-                                         id="renewals"
-                                         type="checkbox"
-                                         value="renewals"
-                                         {renewalsChecked}
-            ></td>
-        </tr>
-
         <tr>
             <td>&nbsp;</td>
             <td class="formErrorMessage">

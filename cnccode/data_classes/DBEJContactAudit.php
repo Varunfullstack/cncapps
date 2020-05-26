@@ -17,8 +17,8 @@ class DBEJContactAudit extends DBEContactAudit
     /**
      * calls constructor()
      * @access public
+     * @param void
      * @return void
-     * @param  void
      * @see constructor()
      */
     function __construct(&$owner)

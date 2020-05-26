@@ -186,7 +186,6 @@ class CTCustomer extends CTCNC
         );
         $roles = [
             "sales",
-            "reports",
             "technical"
         ];
 
@@ -194,6 +193,8 @@ class CTCustomer extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+
+        $this->setMenuId(303);
         $this->buCustomer = new BUCustomer($this);
         $this->dsContact = new DataSet($this);
         $this->dsContact->copyColumnsFrom($this->buCustomer->dbeContact);
@@ -291,8 +292,7 @@ class CTCustomer extends CTCNC
             return;                                // pass a valid array so I avoid a crash like this! Same for setSite() below.
         }
 
-        foreach ($contactArray as $key => $value) {
-
+        foreach ($contactArray as $value) {
             if (@$value['contactID']) {
 
                 $dbeContact = new DBEContact($this);
@@ -320,6 +320,11 @@ class CTCustomer extends CTCNC
             $this->dsContact->setValue(
                 DBEContact::siteNo,
                 @$value['siteNo']
+            );
+
+            $this->dsContact->setValue(
+                DBEContact::linkedInURL,
+                @$value['linkedInURL']
             );
 
             $this->dsContact->setValue(
@@ -542,7 +547,7 @@ class CTCustomer extends CTCNC
 
             $this->dsContact->setValue(
                 DBEContact::pendingLeaverDate,
-                common_convertDateDMYToYMD(@$value[DBEContact::pendingLeaverDate])
+                @$value[DBEContact::pendingLeaverDate]
             );
 
             // Determine whether a new contact is to be added
@@ -722,6 +727,10 @@ class CTCustomer extends CTCNC
                 @$value['invoiceSiteNo']
             );
             $this->dsCustomer->setValue(
+                DBECustomer::websiteURL,
+                @$value['websiteURL']
+            );
+            $this->dsCustomer->setValue(
                 DBECustomer::deliverSiteNo,
                 @$value['deliverSiteNo']
             );
@@ -739,7 +748,7 @@ class CTCustomer extends CTCNC
             );
             $this->dsCustomer->setValue(
                 DBECustomer::specialAttentionEndDate,
-                $this->convertDateYMD(@$value['specialAttentionEndDate'])
+                @$value['specialAttentionEndDate']
             );
 
             if (
@@ -783,14 +792,9 @@ class CTCustomer extends CTCNC
                 @$value['sectorID']
             );
             $this->dsCustomer->setValue(
-                DBECustomer::leadStatusID,
-                @$value['leadStatusID']
+                DBECustomer::leadStatusId,
+                @$value['leadStatusId']
             );
-            $this->dsCustomer->setValue(
-                DBECustomer::prospectFlag,
-                $this->getYN(@$value['prospectFlag'])
-            );
-
             $this->dsCustomer->setValue(
                 DBECustomer::createDate,
                 @$value['createDate']
@@ -802,15 +806,15 @@ class CTCustomer extends CTCNC
             );
             $this->dsCustomer->setValue(
                 DBECustomer::becameCustomerDate,
-                $this->convertDateYMD(@$value['becameCustomerDate'])
+                @$value['becameCustomerDate']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::droppedCustomerDate,
-                $this->convertDateYMD(@$value['droppedCustomerDate'])
+                @$value['droppedCustomerDate']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::lastReviewMeetingDate,
-                $this->convertDateYMD(@$value['lastReviewMeetingDate'])
+                @$value['lastReviewMeetingDate']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reviewMeetingFrequencyMonths,
@@ -818,7 +822,7 @@ class CTCustomer extends CTCNC
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reviewDate,
-                $this->convertDateYMD(@$value['reviewDate'])
+                @$value['reviewDate']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::reviewMeetingEmailSentFlag,
@@ -942,29 +946,6 @@ class CTCustomer extends CTCNC
         }
     }
 
-    function convertDateYMD($dateDMY)
-    {
-        if ($dateDMY) {
-            $dateArray = explode(
-                '/',
-                $dateDMY
-            );
-            return ($dateArray[2] . '-' . str_pad(
-                    $dateArray[1],
-                    2,
-                    '0',
-                    STR_PAD_LEFT
-                ) . '-' . str_pad(
-                    $dateArray[0],
-                    2,
-                    '0',
-                    STR_PAD_LEFT
-                ));
-        } else {
-            return null;
-        }
-    }
-
     /**
      * Route to function based upon action passed
      * @throws Exception
@@ -984,6 +965,7 @@ class CTCustomer extends CTCNC
                 $this->displayReviewList();
                 break;
             case CTCUSTOMER_ACT_SEARCH:
+
                 $this->search();
                 break;
             case CTCUSTOMER_ACT_ADDCUSTOMER:
@@ -1004,18 +986,6 @@ class CTCustomer extends CTCNC
                 break;
             case CTCUSTOMER_ACT_DISP_CUST_POPUP:
                 $this->displayCustomerSelectPopup();
-                break;
-            case 'display24HourSupportCustomers':
-                $this->display24HourSupportCustomers();
-                break;
-            case 'displaySpecialAttentionCustomers':
-                $this->displaySpecialAttentionCustomers();
-                break;
-            case 'displayContractAndNumbersReport':
-                $this->displayContractAndNumbersReport();
-                break;
-            case 'csvContractAndNumbersReport':
-                $this->csvContractAndNumbersReport();
                 break;
             case 'saveContactPassword':
                 $response = [];
@@ -1102,15 +1072,14 @@ class CTCustomer extends CTCNC
                 $buCustomer = new BUCustomer($this);
                 $buCustomer->getActiveCustomers($dsResult);
                 $customers = [];
+                $buCustomer->getCustomersByNameMatch($dsResult, null, null, $term);
                 while ($dsResult->fetchNext()) {
-                    if (preg_match('/.*' . $term . '.*/i', $dsResult->getValue(DBECustomer::name))) {
-                        $customers[] = [
-                            "id"   => $dsResult->getValue(DBECustomer::customerID),
-                            "label" => $dsResult->getValue(DBECustomer::name),
-                            "value" => $dsResult->getValue(DBECustomer::name),
-                        ];
-                    }
+                    $customers[] = [
+                        "id"   => $dsResult->getValue(DBECustomer::customerID),
+                        "name" => $dsResult->getValue(DBECustomer::name),
+                    ];
                 }
+
                 echo json_encode($customers);
                 break;
             default:
@@ -1305,10 +1274,10 @@ class CTCustomer extends CTCNC
             $this->getPhoneString(),
             $this->getCustomerString(),
             $this->getAddress(),
-            $this->convertDateYMD($this->getNewCustomerFromDate()),
-            $this->convertDateYMD($this->getNewCustomerToDate()),
-            $this->convertDateYMD($this->getDroppedCustomerFromDate()),
-            $this->convertDateYMD($this->getDroppedCustomerToDate())
+            $this->getNewCustomerFromDate(),
+            $this->getNewCustomerToDate(),
+            $this->getDroppedCustomerFromDate(),
+            $this->getDroppedCustomerToDate()
         )
         ) {
             $this->setCustomerStringMessage(CTCUSTOMER_MSG_NONE_FND);
@@ -1556,7 +1525,16 @@ class CTCustomer extends CTCNC
 
 
 // Parameters
-        $this->setPageTitle("Customer");
+        $title = "Customer - " . $this->dsCustomer->getValue(DBECustomer::name);
+        $color = "red";
+        if ($this->dsCustomer->getValue(DBECustomer::websiteURL)) {
+            $color = "green";
+        }
+
+        $this->setPageTitle(
+            $title,
+            $title . ' <i class="fas fa-globe" onclick="checkWebsite()" style="color:' . $color . '"></i>'
+        );
         if ($this->getParam('save_page')) {
             $this->setSessionParam('save_page', $this->getParam('save_page'));
         } else {
@@ -1756,6 +1734,7 @@ class CTCustomer extends CTCNC
                 'customerName'                   => $this->dsCustomer->getValue(DBECustomer::name),
                 'reviewCount'                    => $this->buCustomer->getReviewCount(),
                 'customerFolderLink'             => $customerFolderLink,
+                'websiteURL'                     => $this->dsCustomer->getValue(DBECustomer::websiteURL),
                 'customerNameClass'              => $this->dsCustomer->getValue(self::customerFormNameClass),
                 'SectorMessage'                  => $this->dsCustomer->getValue(self::customerFormSectorMessage),
                 'regNo'                          => $this->dsCustomer->getValue(DBECustomer::regNo),
@@ -1768,15 +1747,11 @@ class CTCustomer extends CTCNC
                 'specialAttentionFlagChecked'    => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag)
                 ),
-                'specialAttentionEndDate'        => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)
-                ),
+                'specialAttentionEndDate'        => $this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate),
                 'specialAttentionEndDateMessage' => $this->dsCustomer->getValue(
                     self::customerFormSpecialAttentionEndDateMessage
                 ),
-                'lastReviewMeetingDate'          => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::lastReviewMeetingDate)
-                ),
+                'lastReviewMeetingDate'          => $this->dsCustomer->getValue(DBECustomer::lastReviewMeetingDate),
                 'lastReviewMeetingDateMessage'   => $this->dsCustomer->getValue(
                     self::customerFormSpecialAttentionEndDateMessage
                 ),
@@ -1785,9 +1760,6 @@ class CTCustomer extends CTCNC
                 ) ? 'checked' : null,
                 'support24HourFlagChecked'       => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::support24HourFlag)
-                ),
-                'prospectFlagChecked'            => $this->getChecked(
-                    $this->dsCustomer->getValue(DBECustomer::prospectFlag)
                 ),
                 'pcxFlagChecked'                 => $this->getChecked(
                     $this->dsCustomer->getValue(DBECustomer::pcxFlag)
@@ -1819,7 +1791,7 @@ class CTCustomer extends CTCNC
                 'deleteCustomerText'             => $deleteCustomerText,
                 'cancelURL'                      => $cancelURL,
                 'disabled'                       => $this->hasPermissions(
-                    PHPLIB_PERM_SALES
+                    SALES_PERMISSION
                 ) ? null : CTCNC_HTML_DISABLED,
                 'gscTopUpAmount'                 => $this->dsCustomer->getValue(DBECustomer::gscTopUpAmount),
                 'noOfServers'                    => $this->dsCustomer->getValue(DBECustomer::noOfServers),
@@ -1827,18 +1799,10 @@ class CTCustomer extends CTCNC
                 'noOfSites'                      => $this->dsCustomer->getValue(DBECustomer::noOfSites),
                 'noOfPCs'                        => $this->dsCustomer->getValue(DBECustomer::noOfPCs),
                 'modifyDate'                     => $this->dsCustomer->getValue(DBECustomer::modifyDate),
-                'reviewDate'                     => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::reviewDate)
-                ),
-                'reviewTime'                     => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::reviewTime)
-                ),
-                'becameCustomerDate'             => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::becameCustomerDate)
-                ),
-                'droppedCustomerDate'            => Controller::dateYMDtoDMY(
-                    $this->dsCustomer->getValue(DBECustomer::droppedCustomerDate)
-                ),
+                'reviewDate'                     => $this->dsCustomer->getValue(DBECustomer::reviewDate),
+                'reviewTime'                     => $this->dsCustomer->getValue(DBECustomer::reviewTime),
+                'becameCustomerDate'             => $this->dsCustomer->getValue(DBECustomer::becameCustomerDate),
+                'droppedCustomerDate'            => $this->dsCustomer->getValue(DBECustomer::droppedCustomerDate),
                 'reviewAction'                   => $this->dsCustomer->getValue(DBECustomer::reviewAction),
                 'comments'                       => $this->dsCustomer->getValue(DBECustomer::comments),
                 'techNotes'                      => $this->dsCustomer->getValue(DBECustomer::techNotes),
@@ -1952,15 +1916,14 @@ class CTCustomer extends CTCNC
         $dsLeadStatus = new DataSet($this);
         $this->buCustomer->getLeadStatus($dsLeadStatus);
         while ($dsLeadStatus->fetchNext()) {
-
             $this->template->set_var(
                 array(
-                    'leadStatusID'          => $dsLeadStatus->getValue(DBELeadStatus::leadStatusID),
-                    'leadStatusDescription' => $dsLeadStatus->getValue(DBELeadStatus::description),
+                    'leadStatusID'          => $dsLeadStatus->getValue(DBECustomerLeadStatus::id),
+                    'leadStatusDescription' => $dsLeadStatus->getValue(DBECustomerLeadStatus::name),
                     'leadStatusSelected'    => ($dsLeadStatus->getValue(
-                            DBELeadStatus::leadStatusID
+                            DBECustomerLeadStatus::id
                         ) == $this->dsCustomer->getValue(
-                            DBECustomer::leadStatusID
+                            DBECustomer::leadStatusId
                         )) ? CT_SELECTED : null
                 )
             );
@@ -2527,9 +2490,7 @@ class CTCustomer extends CTCNC
                     'pendingLeaverFlagChecked'             => ($this->dsContact->getValue(
                             DBEContact::pendingLeaverFlag
                         ) == 'Y') ? CT_CHECKED : null,
-                    'pendingLeaverDate'                    => Controller::dateYMDtoDMY(
-                        $this->dsContact->getValue(DBEContact::pendingLeaverDate)
-                    ),
+                    'pendingLeaverDate'                    => $this->dsContact->getValue(DBEContact::pendingLeaverDate),
                     'failedLoginCount'                     => $this->dsContact->getValue(DBEContact::failedLoginCount),
                     'email'                                => $this->dsContact->getValue(DBEContact::email),
                     'emailClass'                           => $this->dsContact->getValue(self::contactFormEmailClass),
@@ -2621,7 +2582,11 @@ class CTCustomer extends CTCNC
                     ) ? 'data-validation="atLeastOne"' : null,
                     'dearJohnURL'                          => $dearJohnURL,
                     'dmLetterURL'                          => $dmLetterURL,
-                    'deleteContactLink'                    => $deleteContactLink
+                    'deleteContactLink'                    => $deleteContactLink,
+                    'linkedInURL'                          => $this->dsContact->getValue(DBEContact::linkedInURL),
+                    'linkedInColor'                        => $this->dsContact->getValue(
+                        DBEContact::linkedInURL
+                    ) ? 'green' : 'red'
                 )
             );
 
@@ -2976,7 +2941,7 @@ class CTCustomer extends CTCNC
                         ),
                         'customerContract'    => $dsPortalCustomerDocument->getValue(
                             DBEPortalCustomerDocument::customerContract
-                        ) ? 'Y': 'N',
+                        ) ? 'Y' : 'N',
                         'mainContactOnlyFlag' => $dsPortalCustomerDocument->getValue(
                             DBEPortalCustomerDocument::mainContactOnlyFlag
                         ),
@@ -3224,460 +3189,6 @@ class CTCustomer extends CTCNC
         $this->parsePage();
     }
 
-    /**
-     * Displays list of customers with 24 Hour Support
-     *
-     * @throws Exception
-     */
-    function display24HourSupportCustomers()
-    {
-        $this->setMethodName('display24HourSupportCustomers');
-
-        $this->setPageTitle("24 Hour Support Customers");
-        $dsCustomer = new DataSet($this);
-        if ($this->buCustomer->get24HourSupportCustomers($dsCustomer)) {
-
-            $this->setTemplateFiles(
-                'Customer24HourSupport',
-                'Customer24HourSupport.inc'
-            );
-
-            $this->template->set_block(
-                'Customer24HourSupport',
-                'customerBlock',
-                'customers'
-            );
-
-            while ($dsCustomer->fetchNext()) {
-
-                $linkURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => 'dispEdit',
-                            'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
-                        )
-                    );
-
-
-                $this->template->set_var(
-                    array(
-                        'customerName' => $dsCustomer->getValue(DBECustomer::name),
-                        'linkURL'      => $linkURL
-                    )
-                );
-
-                $this->template->parse(
-                    'customers',
-                    'customerBlock',
-                    true
-                );
-
-            }
-
-            $this->template->parse(
-                'CONTENTS',
-                'Customer24HourSupport',
-                true
-            );
-
-        } else {
-
-            $this->setTemplateFiles(
-                'SimpleMessage',
-                'SimpleMessage.inc'
-            );
-            $this->template->set_var(
-                'message',
-                'There are no 24 Hour Support customers'
-            );
-        }
-
-        $this->parsePage();
-
-        exit;
-    }
-
-    /**
-     * Displays list of customers with Special Attention flag set
-     *
-     * @throws Exception
-     */
-    function displaySpecialAttentionCustomers()
-    {
-        $this->setMethodName('displaySpecialAttentionCustomers');
-
-        $this->setPageTitle("Special Attention Customers");
-        global $cfg;
-        $customerTemplate = new Template (
-            $cfg["path_templates"],
-            "remove"
-        );
-
-        $contactTemplate = new Template(
-            $cfg["path_templates"],
-            "remove"
-        );
-
-
-        $this->setTemplateFiles(
-            'SpecialAttention',
-            'SpecialAttention'
-        );
-
-        $buContact = new BUContact($this);
-        $dsContact = new DataSet($this);
-        if ($buContact->getSpecialAttentionContacts($dsContact)) {
-            $contactTemplate->setFile(
-                'ContactSpecialAttention',
-                'ContactSpecialAttention.html'
-            );
-
-            $contactTemplate->set_block(
-                'ContactSpecialAttention',
-                'contactBlock',
-                'contacts'
-            );
-            $dbeCustomer = new DBECustomer($this);
-            while ($dsContact->fetchNext()) {
-
-                $linkURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => 'dispEdit',
-                            'customerID' => $dsContact->getValue(DBEContact::customerID)
-                        )
-                    );
-
-                if ($dbeCustomer->getValue(DBECustomer::customerID) != $dsContact->getValue(DBEContact::customerID)) {
-                    $dbeCustomer->getRow($dsContact->getValue(DBEContact::customerID));
-                }
-
-                $contactTemplate->set_var(
-                    array(
-                        'contactName'  => ($dsContact->getValue(DBEContact::firstName) . " " . $dsContact->getValue(
-                                DBEContact::lastName
-                            )),
-                        'linkURL'      => $linkURL,
-                        'customerName' => $dbeCustomer->getValue(DBECustomer::name)
-                    )
-                );
-
-                $contactTemplate->parse(
-                    'contacts',
-                    'contactBlock',
-                    true
-                );
-
-            }
-
-            $contactTemplate->parse(
-                'OUTPUT',
-                'ContactSpecialAttention',
-                true
-            );
-
-
-        } else {
-            $contactTemplate->setFile(
-                'SimpleMessage',
-                'SimpleMessage.inc.html'
-            );
-
-            $contactTemplate->set_var(array('message' => 'There are no special attention contacts'));
-
-            $contactTemplate->parse(
-                'OUTPUT',
-                'SimpleMessage',
-                true
-            );
-        };
-        $dsCustomer = new DataSet($this);
-        if ($this->buCustomer->getSpecialAttentionCustomers($dsCustomer)) {
-
-
-            $customerTemplate->setFile(
-                'CustomerSpecialAttention',
-                'CustomerSpecialAttention.inc.html'
-            );
-
-            $customerTemplate->set_block(
-                'CustomerSpecialAttention',
-                'customerBlock',
-                'customers'
-            );
-
-            while ($dsCustomer->fetchNext()) {
-
-                $linkURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'     => 'dispEdit',
-                            'customerID' => $dsCustomer->getValue(DBECustomer::customerID)
-                        )
-                    );
-
-
-                $customerTemplate->set_var(
-                    array(
-                        'customerName'            => $dsCustomer->getValue(DBECustomer::name),
-                        'specialAttentionEndDate' => $dsCustomer->getValue(DBECustomer::specialAttentionEndDate),
-                        'linkURL'                 => $linkURL
-                    )
-                );
-
-                $customerTemplate->parse(
-                    'customers',
-                    'customerBlock',
-                    true
-                );
-
-            }
-
-            $customerTemplate->parse(
-                'OUTPUT',
-                'CustomerSpecialAttention',
-                true
-            );
-
-        } else {
-
-            $customerTemplate->setFile(
-                'SimpleMessage',
-                'SimpleMessage.inc.html'
-            );
-
-            $customerTemplate->set_var(array('message' => 'There are no special attention customers'));
-
-            $customerTemplate->parse(
-                'OUTPUT',
-                'SimpleMessage',
-                true
-            );
-        }
-
-        $this->template->setVar(
-            [
-                "customerSpecialAttention" => $customerTemplate->getVar('OUTPUT'),
-                "contactSpecialAttention"  => $contactTemplate->getVar('OUTPUT')
-            ]
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'SpecialAttention'
-        );
-
-        $this->parsePage();
-
-        exit;
-    }
-
-    /**
-     * @throws Exception
-     */
-    function displayContractAndNumbersReport()
-    {
-
-        $this->setPageTitle("Service Contracts Ratio");
-
-        $this->setTemplateFiles(
-            'ContractAndNumbersReport',
-            'ContractAndNumbersReport'
-        );
-
-
-        $db = $this->getContractAndNumberData();
-
-
-        $this->template->set_block(
-            'ContractAndNumbersReport',
-            'contractItemBlock',
-            'contracts'
-        );
-
-        while ($db->next_record()) {
-            $row = $db->Record;
-            $this->template->set_var(
-                array(
-                    'customerName'                => $row["customerName"],
-                    'serviceDeskProduct'          => $row['serviceDeskProduct'],
-                    'serviceDeskUsers'            => $row['serviceDeskUsers'],
-                    'serviceDeskContract'         => $row['serviceDeskContract'],
-                    'serviceDeskCostPerUserMonth' => $row['serviceDeskCostPerUserMonth'],
-                    'serverCareProduct'           => $row['serverCareProduct'],
-                    'virtualServers'              => $row['virtualServers'],
-                    'physicalServers'             => $row['physicalServers'],
-                    'serverCareContract'          => $row['serverCareContract'],
-                    'supportedUsers'              => $row['supportedUsers'],
-                    'moreThanExpectedClass'       => $row['moreUsersThanExpected'] ? "red" : null
-
-                )
-            );
-
-            $this->template->parse(
-                'contracts',
-                'contractItemBlock',
-                true
-            );
-        }
-
-
-        $this->template->parse(
-            'CONTENTS',
-            'ContractAndNumbersReport',
-            true
-        );
-
-
-        $this->parsePage();
-
-        exit;
-    }
-
-    private function getContractAndNumberData()
-    {
-        global $db; //PHPLib DB object
-
-
-        $queryString =
-            "SELECT
-  `cus_custno`,
-  cus_name AS customerName,
-  serviceDeskProduct,
-  COALESCE(serviceDeskUsers,0) AS serviceDeskUsers,
-  COALESCE(serviceDeskContract,0) AS serviceDeskContract,
-  COALESCE(serviceDeskCostPerUserMonth,0) AS serviceDeskCostPerUserMonth,
-  serverCareProduct,
-  COALESCE(virtualServers,0) AS virtualServers,
-  COALESCE(physicalServers,0) AS physicalServers,
-  COALESCE(serverCareContract,0) AS serverCareContract,
-  concat('M ',coalesce(mainCount, 0),', SV ',coalesce(supervisorCount,0),', S ', coalesce(supportCount, 0),', D ', coalesce(delegateCount, 0),', T ', coalesce(totalCount, 0)) as supportedUsers,
-  totalCount > serviceDeskUsers as moreUsersThanExpected 
-FROM
-  customer
-  LEFT JOIN
-  (SELECT
-     `cui_custno`                      AS customerId,
-     itm_desc                          AS serviceDeskProduct,
-     sum(custitem.`cui_users`)              AS serviceDeskUsers,
-     sum(round(custitem.cui_sale_price, 0)) AS serviceDeskContract,
-     sum(ROUND(
-         custitem.cui_sale_price / custitem.cui_users / 12,
-         2
-     ))                                 AS serviceDeskCostPerUserMonth
-   FROM
-     custitem
-     LEFT JOIN item
-       ON item.`itm_itemno` = custitem.`cui_itemno`
-   WHERE itm_desc LIKE '%servicedesk%'
-         AND itm_discontinued <> 'Y'
-         AND custitem.`declinedFlag` <> 'Y' 
-      group by custitem.`cui_custno` 
-      ) AS test1
-    ON test1.customerId = customer.`cus_custno`
-  LEFT JOIN
-  (SELECT
-  custitem.`cui_custno` AS customerId,
-  item.`itm_desc` as serverCareProduct,
-  SUM(
-    ROUND(custitem.`cui_sale_price`, 0)
-  ) AS serverCareContract,
-  SUM(physicalServers) AS physicalServers,
-  SUM(virtualServers) AS virtualServers
-FROM
-  custitem
-  LEFT JOIN item
-    ON item.`itm_itemno` = custitem.`cui_itemno`
-  LEFT JOIN
-    (SELECT
-      custitem_contract.cic_contractcuino,
-      SUM(
-        serverItem.`itm_desc` NOT LIKE '%virtual%'
-      ) AS physicalServers,
-      SUM(
-        serverItem.`itm_desc` LIKE '%virtual%'
-      ) AS virtualServers
-    FROM
-      custitem_contract
-      LEFT JOIN custitem AS servers
-        ON custitem_contract.`cic_cuino` = servers.cui_cuino
-      LEFT JOIN item AS serverItem
-        ON servers.cui_itemno = serverItem.`itm_itemno`
-    GROUP BY custitem_contract.cic_contractcuino) b
-    ON b.`cic_contractcuino` = cui_cuino
-WHERE item.`itm_desc` LIKE '%servercare%'
-  AND item.itm_discontinued <> 'Y'
-  AND custitem.`declinedFlag` <> 'Y'
-GROUP BY custitem.`cui_custno`) test2
-    ON customer.cus_custno = test2.customerId
-left join (
-    select 
-  contact.`con_custno`,
-  sum(contact.`supportLevel` = 'main') as mainCount,
-  SUM(
-    contact.`supportLevel` = 'supervisor'
-  ) AS supervisorCount,
-  SUM(
-    contact.`supportLevel` = 'support'
-  ) AS supportCount,
-  SUM(
-    contact.`supportLevel` = 'delegate'
-  ) AS delegateCount,
-  sum(1) as totalCount 
-from
-  contact 
-where supportLevel is not null 
-GROUP BY con_custno 
-) supportUsers on supportUsers.con_custno = customer.cus_custno
-WHERE serviceDeskProduct IS NOT NULL OR serverCareProduct IS NOT NULL
-ORDER BY cus_name ASC   ";
-
-        $db->query($queryString);
-        return $db;
-    }
-
-    function csvContractAndNumbersReport()
-    {
-        $csv_export = '';
-        $db = $this->getContractAndNumberData();
-
-        $headersSet = false;
-
-        while ($db->next_record()) {
-            $row = $db->Record;
-            if (!$headersSet) {
-                foreach (array_keys($row) as $key) {
-                    if (!is_numeric($key)) {
-                        $csv_export .= $key . ';';
-                    }
-                }
-            }
-            $this->template->set_var(
-                array(
-                    'customerName'                => $row["customerName"],
-                    'serviceDeskProduct'          => $row['serviceDeskProduct'],
-                    'serviceDeskUsers'            => $row['serviceDeskUsers'],
-                    'serviceDeskContract'         => $row['serviceDeskContract'],
-                    'serviceDeskCostPerUserMonth' => $row['serviceDeskCostPerUserMonth'],
-                    'serverCareProduct'           => $row['serverCareProduct'],
-                    'virtualServers'              => $row['virtualServers'],
-                    'physicalServers'             => $row['physicalServers'],
-                    'serverCareContract'          => $row['serverCareContract']
-
-                )
-            );
-
-            $this->template->parse(
-                'contracts',
-                'contractItemBlock',
-                true
-            );
-
-        }
-    } // end siteDropdown
 
     /**
      * @return bool

@@ -54,14 +54,12 @@ class CTRenContract extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "renewals",
-            "technical"
-        ];
+        $roles = RENEWALS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(602);
         $this->buRenContract = new BURenContract($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenContract = new DSForm($this);
@@ -232,7 +230,7 @@ class CTRenContract extends CTCNC
 
         $disabled = 'DISABLED';
         $readonly = 'READONLY';
-        if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
+        if ($this->hasPermissions(RENEWALS_PERMISSION)) {
             $readonly = null;
             $disabled = null;
         }
@@ -380,9 +378,7 @@ class CTRenContract extends CTCNC
                     $dsRenContract->getValue(DBEJRenContract::itemDescription)
                 ),
                 'invoiceFromDate'                    => $dsRenContract->getValue(DBEJRenContract::invoiceFromDate),
-                'installationDate'                   => Controller::dateYMDtoDMY(
-                    $dsRenContract->getValue(DBEJRenContract::installationDate)
-                ),
+                'installationDate'                   => $dsRenContract->getValue(DBEJRenContract::installationDate),
                 'invoiceToDate'                      => $dsRenContract->getValue(DBEJRenContract::invoiceToDate),
                 'invoicePeriodMonths'                => Controller::htmlInputText(
                     $dsRenContract->getValue(DBEJRenContract::invoicePeriodMonths)
@@ -473,15 +469,11 @@ class CTRenContract extends CTCNC
                 'internalNotes'                      => Controller::htmlTextArea(
                     $dsRenContract->getValue(DBEJRenContract::internalNotes)
                 ),
-                'despatchDate'                       => Controller::dateYMDtoDMY(
-                    $dsRenContract->getValue(DBEJRenContract::despatchDate)
-                ),
+                'despatchDate'                       => $dsRenContract->getValue(DBEJRenContract::despatchDate),
                 'despatchDateMessage'                => Controller::htmlDisplayText(
                     $dsRenContract->getMessage(DBEJRenContract::despatchDate)
                 ),
-                'expiryDate'                         => Controller::dateYMDtoDMY(
-                    $dsRenContract->getValue(DBEJRenContract::expiryDate)
-                ),
+                'expiryDate'                         => $dsRenContract->getValue(DBEJRenContract::expiryDate),
                 'calculatedExpiryDate'               => $expiryDate,
                 'expiryDateMessage'                  => Controller::htmlDisplayText(
                     $dsRenContract->getMessage(DBEJRenContract::expiryDate)

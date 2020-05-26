@@ -1,34 +1,12 @@
 <!-- Template: CustomerProfitabilityReport.inc.html -->
 <script>
     const autocompleteURL = "/Customer.php?action=searchName";
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         window.fromDate = $('#fromDate').get(0);
         window.toDate = $('#toDate').get(0);
 
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
         });
 
     });
@@ -72,6 +50,7 @@
                     value="{customerString}"
                     size="50"
                     maxlength="50"
+                    customer-search
             > <font class="formErrorMessage"> {customerStringMessage} </font></td>
         </tr>
         <tr>
@@ -82,17 +61,16 @@
             <td class="promptText">
                 <div align="right">from</div>
             </td>
-            <td><input
-                    type="text"
-                    name="searchForm[1][fromDate]"
-                    id="fromDate"
-                    value="{fromDate}"
-                    size="10"
-                    maxlength="10"
-                    onKeypress="javascript:submitOnReturn()"
-                    class="jqueryCalendar"
-                    autocomplete="off"
-            >
+            <td>
+                <input type="date"
+                       name="searchForm[1][fromDate]"
+                       id="fromDate"
+                       value="{fromDate}"
+                       size="10"
+                       maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
+                >
                 <font class="formErrorMessage">{fromDateMessage}</font>
             </td>
         </tr>
@@ -100,17 +78,16 @@
             <td class="promptText">
                 <div align="right">to</div>
             </td>
-            <td><input
-                    type="text"
-                    name="searchForm[1][toDate]"
-                    id="toDate"
-                    value="{toDate}"
-                    size="10"
-                    maxlength="10"
-                    onKeypress="javascript:submitOnReturn()"
-                    class="jqueryCalendar"
-                    autocomplete="off"
-            >
+            <td>
+                <input type="date"
+                       name="searchForm[1][toDate]"
+                       id="toDate"
+                       value="{toDate}"
+                       size="10"
+                       maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
+                >
                 <font class="formErrorMessage">{toDateMessage}</font>
             </td>
         </tr>
@@ -125,7 +102,7 @@
                 <input type="button"
                        name="Clear"
                        value="Clear"
-                       onClick="document.location='ActivityProfitReport.php'"
+                       onClick="document.location='CustomerProfitabilityReport.php'"
                 />
             </td>
         </tr>

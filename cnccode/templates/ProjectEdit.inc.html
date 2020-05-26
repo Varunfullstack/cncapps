@@ -198,33 +198,6 @@
 <script type="application/javascript">
 
     const projectManagementCheck = '{projectManagementCheck}';
-
-    Mustache.tags = ['{%', '%}'];
-
-    Mustache.Formatters = {
-        decimal: function (number) {
-            if (typeof number !== 'number') {
-                return number;
-            }
-
-            return number.toFixed(2);
-        },
-        lightGrayClass: function (number) {
-
-            if (isNaN(parseFloat(number)) || !isFinite(number)) {
-                debugger;
-                return null;
-            }
-
-            if (number != 0) {
-                return null;
-            }
-
-            return "grey"
-        }
-
-    };
-
     const projectPlanDownloadURL = "{projectPlanDownloadURL}";
     let projectPlan = {hasProjectPlan};
 
@@ -233,9 +206,36 @@
             'Updates History', 'scrollbars=yes,resizable=no,width=980,height=300,copyhistory=no, menubar=0')
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
+        Mustache.tags = ['{%', '%}'];
+
+        Mustache.Formatters = {
+            decimal: function (number) {
+                if (typeof number !== 'number') {
+                    return number;
+                }
+
+                return number.toFixed(2);
+            },
+            lightGrayClass: function (number) {
+
+                if (isNaN(parseFloat(number)) || !isFinite(number)) {
+                    debugger;
+                    return null;
+                }
+
+                if (number != 0) {
+                    return null;
+                }
+
+                return "grey"
+            }
+
+        };
         window.startDate = $('#startDate').get(0);
         window.expiryDate = $('#expiryDate').get(0);
+        reason = CKEDITOR.replace('summary', {customConfig: '/ckeditor_config.js'});
+        fetchProjectBudget();
     });
 
     function linkedSalesOrderPopup() {
@@ -400,8 +400,6 @@
             })
     }
 
-    fetchProjectBudget();
-
 </script>
 <TABLE border="0"
        cellpadding="2"
@@ -483,22 +481,18 @@
                           {projectManagementCheck}
                 >{notes}</textarea>
                 <span class="formErrorMessage">{notesMessage}</span>
-                <script type="text/javascript">
-                    reason = CKEDITOR.replace('summary', {customConfig: '/ckeditor_config.js'});
-                </script>
             </td>
         </tr>
         <TR>
             <TD class="promptText">Project Opened Date</TD>
             <TD class="field">
-                <input type="text"
+                <input type="date"
                        id="startDate"
                        name="project[1][startDate]"
                        value="{startDate}"
                        size="10"
                        maxlength="10"
                        autocomplete="off"
-                       class="jQueryCalendar"
                        {projectManagementCheck}
                 >
                 <font class="formErrorMessage">{startDateMessage}</font>
@@ -507,14 +501,13 @@
         <TR>
             <TD class="promptText">Project Commence Date</TD>
             <TD class="field">
-                <input type="text"
+                <input type="date"
                        id="commenceDate"
                        name="project[1][commenceDate]"
                        value="{commenceDate}"
                        size="10"
                        maxlength="10"
                        autocomplete="off"
-                       class="jQueryCalendar"
                        {projectManagementCheck}
                 >
                 <font class="formErrorMessage">{commenceDateMessage}</font>
@@ -523,14 +516,13 @@
         <TR>
             <TD class="promptText">Completed Date</TD>
             <TD class="field">
-                <input type="text"
+                <input type="date"
                        id="expiryDate"
                        name="project[1][expiryDate]"
                        value="{expiryDate}"
                        size="10"
                        maxlength="10"
                        autocomplete="off"
-                       class="jQueryCalendar"
                        {projectManagementCheck}
                 >
                 <font class="formErrorMessage">{expiryDateMessage}</font>

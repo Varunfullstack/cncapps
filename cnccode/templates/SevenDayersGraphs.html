@@ -2,33 +2,34 @@
         src="https://www.gstatic.com/charts/loader.js"
 ></script>
 <script type="text/javascript">
-    let startDate = moment().subtract(6, 'months');
-    let endDate = moment();
+    let startDate;
+    let endDate;
+    window.addEventListener('DOMContentLoaded', function () {
+        startDate = moment().subtract(6, 'months');
+        endDate = moment();
+        const currentURL = new URL(location.href);
 
-    const currentURL = new URL(location.href);
+        if (currentURL.searchParams.get('startDate')) {
+            startDate = moment(currentURL.searchParams.get('startDate'), 'YYYY-MM-DD');
+        }
 
-    if (currentURL.searchParams.get('startDate')) {
-        startDate = moment(currentURL.searchParams.get('startDate'), 'YYYY-MM-DD');
-    }
+        if (currentURL.searchParams.get('endDate')) {
+            endDate = moment(currentURL.searchParams.get('endDate'), 'YYYY-MM-DD');
+        }
 
-    if (currentURL.searchParams.get('endDate')) {
-        endDate = moment(currentURL.searchParams.get('endDate'), 'YYYY-MM-DD');
-    }
 
-    $(() => {
-        $('#startDate').val(startDate.format('DD/MM/YYYY'));
-        $('#endDate').val(endDate.format('DD/MM/YYYY'));
+        $('#startDate').val(startDate.format('YYYY-MM-DD'));
+        $('#endDate').val(endDate.format('YYYY-MM-DD'));
+        if (!window.googleChartsLoaded) {
+            google.charts.load('current', {'packages': ['corechart']});
+            google.charts.setOnLoadCallback(drawChart);
+            window.googleChartsLoaded = true;
+        }
     })
 
-    if (!window.googleChartsLoaded) {
-        google.charts.load('current', {'packages': ['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
-        window.googleChartsLoaded = true;
-    }
-
     function changeDates() {
-        startDate = moment($('#startDate').val(), 'DD/MM/YYYY');
-        endDate = moment($('#endDate').val(), 'DD/MM/YYYY');
+        startDate = moment($('#startDate').val(), 'YYYY-MM-DD');
+        endDate = moment($('#endDate').val(), 'YYYY-MM-DD');
         currentURL.searchParams.set('startDate', startDate.format('YYYY-MM-DD'));
         currentURL.searchParams.set('endDate', endDate.format('YYYY-MM-DD'));
         window.history.pushState({path: currentURL.toString()}, '', currentURL.toString());
@@ -94,13 +95,12 @@
             <label>Start Date:</label>
         </td>
         <td>
-            <input type="text"
+            <input type="date"
                    name="startDate"
                    id="startDate"
                    size="10"
                    maxlength="10"
                    autocomplete="off"
-                   class="jQueryCalendar"
                    onchange="changeDates()"
             >
         </td>
@@ -110,13 +110,12 @@
             <label>End Date:</label>
         </td>
         <td>
-            <input type="text"
+            <input type="date"
                    name="endDate"
                    id="endDate"
                    size="10"
                    maxlength="10"
                    autocomplete="off"
-                   class="jQueryCalendar"
                    onchange="changeDates()"
             >
         </td>

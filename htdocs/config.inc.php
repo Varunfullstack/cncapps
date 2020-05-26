@@ -481,7 +481,6 @@ $environment = [
 
 ];
 
-
 if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line calls
     switch ($_SERVER['HTTP_HOST']) {
 
@@ -504,6 +503,7 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
     $GLOBALS['isRunningFromCommandLine'] = false;
 
 } else {                // command line call so assume live and force HTTP_HOST value
+
     $server_type = getEnvironmentByPath();
     $GLOBALS['isRunningFromCommandLine'] = true;
 }
@@ -727,7 +727,7 @@ switch ($server_type) {
         );
         define(
             'CONFIG_CATCHALL_EMAIL',
-            'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN . ', xavi@pavilionweb.co.uk'
+            'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN
         );
 //            error_reporting(E_ALL & ~E_STRICT)
         error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
@@ -1001,7 +1001,7 @@ define(
 
 define(
     "POWERSHELL_DIR",
-    BASE_DRIVE . "/powershell"
+    BASE_DRIVE . "\powershell"
 );
 
 define(
@@ -1075,6 +1075,7 @@ $twig = new Environment(
     ]
 );
 $twig->addExtension(new \Twig\Extra\Intl\IntlExtension());
+$twig->addExtension(new \Twig\Extension\DebugExtension());
 
 define(
     'DOMPDF_ENABLE_AUTOLOAD',

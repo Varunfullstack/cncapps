@@ -1193,7 +1193,7 @@ class BUInvoice extends Business
         $dsInvhead = new DataSet($this);
         $this->getUnprintedInvoices($dsInvhead);
 
-        $list = false;
+        $list = [];
 
         while ($dsInvhead->fetchNext()) {
 

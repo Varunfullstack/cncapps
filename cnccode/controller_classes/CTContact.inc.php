@@ -106,12 +106,12 @@ class CTContact extends CTCNC
         switch ($this->getAction()) {
             case CTCNC_ACT_CONTACT_ADD:
             case CTCNC_ACT_CONTACT_EDIT:
-                $this->checkPermissions(array(PHPLIB_PERM_MAINTENANCE, PHPLIB_PERM_SALES));
+                $this->checkPermissions(array(MAINTENANCE_PERMISSION, SALES_PERMISSION));
                 $this->contactForm();
                 break;
             case CTCONTACT_ACT_CONTACT_INSERT:
             case CTCONTACT_ACT_CONTACT_UPDATE:
-                $this->checkPermissions(array(PHPLIB_PERM_MAINTENANCE, PHPLIB_PERM_SALES));
+                $this->checkPermissions(array(MAINTENANCE_PERMISSION, SALES_PERMISSION));
                 $this->contactUpdate();
                 break;
             case 'search':
@@ -225,6 +225,7 @@ class CTContact extends CTCNC
                 'firstName'                            => Controller::htmlInputText(
                     $this->dsContact->getValue(DBEContact::firstName)
                 ),
+                'linkedInURL'                          => $this->dsContact->getValue(DBEContact::linkedInURL),
                 'firstNameMessage'                     => Controller::htmlDisplayText(
                     $this->dsContact->getMessage(DBEContact::firstName)
                 ),
@@ -372,9 +373,7 @@ class CTContact extends CTCNC
                 'pendingLeaverFlagChecked'             => ($this->dsContact->getValue(
                         DBEContact::pendingLeaverFlag
                     ) == 'Y') ? CT_CHECKED : null,
-                'pendingLeaverDate'                    => Controller::dateYMDtoDMY(
-                    $this->dsContact->getValue(DBEContact::pendingLeaverDate)
-                ),
+                'pendingLeaverDate'                    => $this->dsContact->getValue(DBEContact::pendingLeaverDate),
                 'urlSubmit'                            => $urlSubmit,
                 //				'urlCancel' => $urlCancel
             )

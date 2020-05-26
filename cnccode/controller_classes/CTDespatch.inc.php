@@ -110,7 +110,7 @@ class CTDespatch extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(PHPLIB_PERM_TECHNICAL);
+        $this->checkPermissions(TECHNICAL_PERMISSION);
         switch ($this->getAction()) {
             case CTCNC_ACT_DISPLAY_DESPATCH:
                 $this->displayDespatch();
@@ -519,7 +519,6 @@ class CTDespatch extends CTCNC
 
         $this->setDeliveryMethodID($this->getParam('deliveryMethodID'));
         $buDespatch->initialiseDespatchDataset($dsDespatch);
-        var_dump($this->getParam('despatch'));
         if (!$dsDespatch->populateFromArray($this->getParam('despatch'))) {
             $this->setFormErrorMessage('Quantities entered must be numeric');
         }

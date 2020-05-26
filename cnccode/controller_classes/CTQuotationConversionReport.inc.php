@@ -25,13 +25,12 @@ class CTQuotationConversionReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            "reports",
-        ];
+        $roles = REPORTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(508);
         $this->buQuotationConversionReport = new BUQuotationConversionReport($this);
         $this->dsSearchForm = new DSForm($this);
         $this->buQuotationConversionReport->initialiseSearchForm($this->dsSearchForm);
@@ -119,13 +118,9 @@ class CTQuotationConversionReport extends CTCNC
                 'customerID'        => $dsSearchForm->getValue(BUQuotationConversionReport::searchFormCustomerID),
                 'customerIDMessage' => $dsSearchForm->getMessage(BUQuotationConversionReport::searchFormCustomerID),
                 'customerString'    => $customerString,
-                'fromDate'          => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUQuotationConversionReport::searchFormFromDate)
-                ),
+                'fromDate'          => $dsSearchForm->getValue(BUQuotationConversionReport::searchFormFromDate),
                 'fromDateMessage'   => $dsSearchForm->getMessage(BUQuotationConversionReport::searchFormFromDate),
-                'toDate'            => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUQuotationConversionReport::searchFormToDate)
-                ),
+                'toDate'            => $dsSearchForm->getValue(BUQuotationConversionReport::searchFormToDate),
                 'toDateMessage'     => $dsSearchForm->getMessage(BUQuotationConversionReport::searchFormToDate),
                 'urlCustomerPopup'  => $urlCustomerPopup,
                 'urlSubmit'         => $urlSubmit

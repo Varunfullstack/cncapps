@@ -1,36 +1,13 @@
 <script>
     const autocompleteURL = "/Customer.php?action=searchName";
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         const customerIDHiddenElement = document.getElementById('customerID');
         const customerStringElement = document.getElementById('customerString');
 
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-                changeCustomerID(ui.item.value);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
+            changeCustomerID($event.detail.item.value);
         });
-
         startCreateSalesRequest(1, $('#container')[0]);
         salesRequest.onCancel = function () {
             customerIDHiddenElement.value = null;
@@ -72,6 +49,7 @@
                    size="50"
                    maxlength="50"
                    style="margin-left: 0"
+                   customer-search
             >
         </td>
     </tr>

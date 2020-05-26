@@ -30,6 +30,7 @@ class CTTimeRequestDashboard extends CTCNC
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(202);
     }
 
     /**
@@ -169,6 +170,7 @@ class CTTimeRequestDashboard extends CTCNC
                     'timeLeftOnBudget'  => $leftOnBudget,
                     'requesterTeam'     => $teamName,
                     'alertRow'          => $requestedDateTime < $alertTime ? 'warning' : null,
+                    'approvalLevel'     => $isOverLimit ? 'Mgmt' : 'Team Lead'
                 ]
             );
 

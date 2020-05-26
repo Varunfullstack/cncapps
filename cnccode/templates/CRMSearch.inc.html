@@ -4,33 +4,21 @@
 />
 <script type="text/javascript">
     const autocompleteURL = "/Customer.php?action=searchName";
-    $(function () {
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+    window.addEventListener('DOMContentLoaded', function () {
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
         });
     });
+
+    function checkCustomerId() {
+        debugger;
+        if (!$('#customerID').val()) {
+            alert('Please select a specific customer');
+            return false;
+        }
+        return true;
+    }
+
 </script>
 <style>
     input[type=text], select {
@@ -55,6 +43,7 @@
       id="search"
       method="post"
       action="{urlSubmit}"
+      onsubmit="return checkCustomerId();"
 >
     <input type="hidden"
            name="action"
@@ -77,7 +66,6 @@
                         name="searchForm[1][customerID]"
                         id="customerID"
                         value="{customerID}"
-                        onchange="document.search.submit()"
                 > <input
                     type="text"
                     id="customerString"
@@ -85,6 +73,7 @@
                     value="{customerString}"
                     required
                     maxlength="50"
+                    customer-search
             >
                 <button>search <i class="fa fa-search"
                                   aria-hidden="true"
@@ -120,7 +109,7 @@
                 <option value="">-- Search All --</option>
                 <!-- BEGIN customerLeadStatusBlock -->
                 <option {customerLeadStatusSelected}
-                        value="{customerLeadStatusID}"
+                        value="{customerLeadStatusId}"
                 >
                     {customerLeadStatusName}
                 </option>
@@ -165,6 +154,7 @@
     var dataTable = null;
 
     function searchCustomers() {
+        $.LoadingOverlay("show", {text: 'Running your search, please wait'});
         $.ajax({
             url: '{ajaxURL}',
             data: {customerLeadID: $('#customerLeadSelector').val()},
@@ -181,6 +171,10 @@
                 dataTable.draw();
             }
 
+        }, error => {
+
+        }).then(() => {
+            $.LoadingOverlay("hide");
         })
     }
 </script>

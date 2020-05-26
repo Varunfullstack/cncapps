@@ -1,12 +1,18 @@
-Param($User, $Password)
+Param($User, $Password, $OutputPath)
 $decodedPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($Password))
 $decodedUser = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($User))
 $securePassword = ConvertTo-SecureString $decodedPassword -AsPlainText -Force
 $Credentials = New-Object System.Management.Automation.PSCredential($decodedUser, $securePassword)
-Import-Module msonline
-Import-Module Microsoft.Online.SharePoint.PowerShell -DisableNameChecking
 try
 {
+    try
+    {
+        Connect-ExchangeOnline -Credential $Credentials -ShowProgress $false -ErrorAction Stop
+    }
+    catch
+    {
+        throw "Failed to connect to ExchangeOnline:$PSItem"
+    }
     try
     {
         Connect-MsolService -Credential $Credentials -ErrorAction Stop
@@ -15,17 +21,9 @@ try
     {
         throw "Failed to connect to MSOLService:$PSItem"
     }
-    $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $Credentials -Authentication Basic -AllowRedirection -ErrorAction Stop
-    if (!$Session)
-    {
-        throw "No session"
-    }
-    Import-PSSession $Session -DisableNameChecking -AllowClobber | Out-Null
-    Start-Sleep -s 5
     $MailboxesReport = @()
     $DevicesReport = @()
-    $Mailboxes = Get-Mailbox -ResultSize Unlimited | Where-Object { $_.RecipientTypeDetails -ne "DiscoveryMailbox" }
-    $MSOLDomain = Get-MsolDomain | Where-Object { $_.Authentication -eq "Managed" -and $_.IsDefault -eq "True" }
+    $Mailboxes = Get-EXOMailbox -ResultSize Unlimited | Where-Object { $_.RecipientTypeDetails -ne "DiscoveryMailbox" }
     [array]$LicensesData = Get-MsolAccountSku | Select-Object  AccountSkuId, ActiveUnits, @{ Name = 'Unallocated'; Expression = { $_.ActiveUnits - $_.ConsumedUnits } }
     $TenantDomainName = (Get-AcceptedDomain | Where-Object { $_.DomainName -like "*onmicrosoft.com" -and $_.DomainName -notlike "*mail.onmicrosoft.com" }).DomainName
     $SharePointName = $TenantDomainName.split('.')[0]
@@ -34,7 +32,7 @@ try
     $errors = @()
     try
     {
-        Connect-SPOService -Url $URL  -Credential $Credentials
+        Connect-SPOService -Url $URL  -Credential $Credentials -ErrorAction Stop
         $storageData = Get-SPOSite -IncludePersonalSite $True -Limit All -Filter "Url -like '-my.sharepoint.com/personal/'"
     }
     catch
@@ -43,22 +41,30 @@ try
     }
     $totalOneDriveStorageUsed = 0
     $totalEmailStorageUsed = 0
+    $mailboxesCount = ($Mailboxes).count
+    $mailboxIndex = 0
+    Remove-TypeData System.Array
     foreach ($mailbox in $Mailboxes)
     {
         $DisplayName = $mailbox.DisplayName
         $UserPrincipalName = $mailbox.UserPrincipalName
-        $devices = Get-MobileDeviceStatistics -Mailbox $mailbox.samaccountname
+        $devices = Get-EXOMobileDeviceStatistics -UserPrincipalName $UserPrincipalName
         if ($devices)
         {
             foreach ($device in $devices)
             {
                 $DeviceInfo = $device | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'Email'; Expression = { $UserPrincipalName } }, DeviceType, DeviceModel, DeviceFriendlyName, DeviceOS, @{ Name = 'FirstSyncTime'; Expression = { "{0:dd-MM-yyyy HH.mm}" -f $_.FirstSyncTime } }, @{ Name = 'LastSuccessSync'; Expression = { "{0:dd-MM-yyyy HH.mm}" -f $_.LastSuccessSync } }
-                $DevicesReport += $DeviceInfo
+
+                if ($DeviceInfo.DeviceOs -Notlike '*Windows*')
+                {
+                    $DevicesReport += $DeviceInfo
+                }
             }
         }
 
         $storageItem = $storageData |Sort-Object -Property LastContentModifiedDate -Descending|  Where-Object { $_.Owner -eq $UserPrincipalName }
         $oneDriveStorageUsage = 0
+
         if ($null -ne $storageItem)
         {
             if ($storageItem -is [array])
@@ -70,16 +76,14 @@ try
             $totalOneDriveStorageUsed = $totalOneDriveStorageUsed + $oneDriveStorageUsage
         }
         $UserDomain = $UserPrincipalName.Split('@')[1]
-        $MailboxStat = Get-MailboxStatistics $UserPrincipalName -WarningAction SilentlyContinue
-        $TotalItemSize = $MailboxStat | Select-Object @{ name = "TotalItemSize"; expression = { [math]::Round(($_.TotalItemSize.ToString().Split("(")[1].Split(" ")[0].Replace(",", "")/1MB), 2) } }
-        $TotalItemSize = $TotalItemSize.TotalItemSize
-
+        $MailboxStat = Get-EXOMailboxStatistics -UserPrincipalName $UserPrincipalName -WarningAction SilentlyContinue
+        $TotalItemSize = $MailboxStat.TotalItemSize.ToString().Split("(")[1].Split(" ")[0].Replace(",", "")/1MB
         $totalEmailStorageUsed = $totalEmailStorageUsed + $TotalItemSize
         $RecipientTypeDetails = $mailbox.RecipientTypeDetails
         try
         {
             $MSOLUSER = Get-MsolUser -UserPrincipalName $UserPrincipalName -ErrorAction Stop
-            $CASMailBox = Get-CASMailbox -Identity $UserPrincipalName -ErrorAction Stop
+            $CASMailBox = Get-EXOCASMailbox -Identity $UserPrincipalName -ErrorAction Stop
             if ($CASMailBox.OWAEnabled)
             {
                 $OWA = 'Yes'
@@ -96,17 +100,24 @@ try
             {
                 'No'
             }
-            if ($UserDomain -eq $MSOLDomain.name)
+            [array]$licenses = @()
+            foreach ($license in $MSOLUSER.licenses)
             {
-                $DaysToExpiry = $MSOLUSER |  Select-Object @{ Name = "DaysToExpiry"; Expression = { (New-TimeSpan -start (get-date) -end ($_.LastPasswordChangeTimestamp + $MSOLPasswordPolicy)).Days } }; $DaysToExpiry = $DaysToExpiry.DaysToExpiry
+                $licenses += $license.AccountSkuId
             }
-            $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { [array]$_.Licenses.AccountSkuId } }, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }, @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } }
+            $Information = $MSOLUSER | Select-Object @{ Name = 'DisplayName'; Expression = { $DisplayName } }, @{ Name = 'TotalItemSize'; Expression = { $TotalItemSize } }, @{ Name = 'RecipientTypeDetails'; Expression = { [String]::join(";", $RecipientTypeDetails) } }, islicensed, @{ Name = "Licenses"; Expression = { $licenses.SyncRoot } }, @{ Name = 'OWAEnabled'; Expression = { $OWA } }, @{ Name = '2FA'; Expression = { $2FA } }, @{ Name = 'OneDriveStorageUsed'; Expression = { $oneDriveStorageUsage } }
             $MailboxesReport += $Information
         }
         catch
         {
             $errors += [String]::Concat("", $PSItem)
         }
+        $mailboxIndex++
+        $progressPCT = 0
+        if($mailboxesCount -gt 0 ){
+            $progressPCT = ($mailboxIndex /$mailboxesCount) * 100
+        }
+        Write-Progress -Activity "Procesing Mailboxes" -Status "$progressPCT% Complete:" -PercentComplete $progressPCT
     }
     [array]$MailboxesReport = $MailboxesReport | Sort-Object TotalItemSize -Descending
     [array]$DevicesReport = $DevicesReport | Sort-Object DisplayName
@@ -118,16 +129,12 @@ try
         devices = $DevicesReport
         errors = [array]$errors
     }
-    Get-PSSession | Remove-PSSession
-    Remove-TypeData System.Array
-    if (-Not$Report)
+    if (-Not $Report)
     {
-        Write-Host "{}"
-        exit
+        $Report = @{ }
     }
     $JSOn = ConvertTo-Json $Report
-    $decodedJSON = [Text.Encoding]::UTF8.GetString([Text.Encoding]::GetEncoding(28591).GetBytes($JSOn))
-    Write-Host $decodedJSON
+    [IO.File]::WriteAllLines($OutputPath, $JSOn)
 }
 catch
 {
@@ -140,6 +147,5 @@ catch
         position = $positionMessage
     }
     $erroJSON = ConvertTo-Json $object
-    Get-PSSession | Remove-PSSession
-    Write-Host $erroJSON
+    [IO.File]::WriteAllLines($OutputPath, $erroJSON)
 }

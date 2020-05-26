@@ -2,6 +2,50 @@ function getFormDataAsJSON(form) {
 
 }
 
+function UpdateQueryString(key, value, url) {
+    if (!url) url = window.location.href;
+    var re = new RegExp("([?&])" + key + "=.*?(&|#|$)(.*)", "gi"),
+        hash;
+
+    if (re.test(url)) {
+        if (typeof value !== 'undefined' && value !== null) {
+            return url.replace(re, '$1' + key + "=" + value + '$2$3');
+        }
+        else {
+            hash = url.split('#');
+            url = hash[0].replace(re, '$1$3').replace(/(&|\?)$/, '');
+            if (typeof hash[1] !== 'undefined' && hash[1] !== null) {
+                url += '#' + hash[1];
+            }
+            return url;
+        }
+    }
+    else {
+        if (typeof value !== 'undefined' && value !== null) {
+            var separator = url.indexOf('?') !== -1 ? '&' : '?';
+            hash = url.split('#');
+            url = hash[0] + separator + key + '=' + value;
+            if (typeof hash[1] !== 'undefined' && hash[1] !== null) {
+                url += '#' + hash[1];
+            }
+            return url;
+        }
+        else {
+            return url;
+        }
+    }
+}
+
+function addInputs(array, form) {
+    array.forEach((element) => {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = element.name;
+        input.value = element.value;
+        form.appendChild(input);
+    })
+}
+
 /*
  Common Javascript functions
 
@@ -34,6 +78,7 @@ function LTrim(str)
     }
     return s;
 }
+
 /*
  ==================================================================
  RTrim(string) : Returns a copy of a string without trailing spaces.
@@ -70,6 +115,7 @@ function RTrim(str)
 
     return s;
 }
+
 /*
  =============================================================
  Trim(string) : Returns a copy of a string without leading or trailing spaces
@@ -93,12 +139,12 @@ function getElementCount(ID) {
     var numberOfElements = 0;
     if (!document.all(ID).length) {
         numberOfElements = 1;
-    }
-    else {
+    } else {
         numberOfElements = document.all(ID).length;
     }
     return numberOfElements;
 }
+
 function IsNumeric(sText) {
     var ValidChars = "0123456789.";
     var IsNumber = true;
@@ -131,6 +177,7 @@ function MM_swapImage() { //v3.0
         }
     }
 }
+
 function SC_toggleDisplay(currMenu) {
     if (document.getElementById) {
         thisMenu = document.getElementById('displayText' + currMenu).style
@@ -143,6 +190,7 @@ function SC_toggleDisplay(currMenu) {
         }
     }
 }
+
 /*
  This one sets the display properties of ALL elements starting ID=displayText on the current page
  State = blocl
@@ -150,8 +198,7 @@ function SC_toggleDisplay(currMenu) {
 function SC_toggleDisplayAll() {
     if (state == 'block') {
         state = 'none';
-    }
-    else {
+    } else {
         state = 'block';
     }
     len_all = document.all.length
@@ -162,10 +209,12 @@ function SC_toggleDisplayAll() {
         }
     }
 }
+
 /**
  * This array is used to remember mark status of rows in browse mode
  */
 var marked_row = new Array;
+
 /**
  * Sets/unsets the pointer and marker in browse mode
  *
@@ -184,18 +233,16 @@ function setPointer(theRow, theRowNum, theAction, theDefaultColor, thePointerCol
     // 1. Pointer and mark feature are disabled or the browser can't get the
     //    row -> exits
     if ((thePointerColor == '' && theMarkColor == '')
-        || typeof(theRow.style) == 'undefined') {
+        || typeof (theRow.style) == 'undefined') {
         return false;
     }
 
     // 2. Gets the current row and exits if the browser can't get it
-    if (typeof(document.getElementsByTagName) != 'undefined') {
+    if (typeof (document.getElementsByTagName) != 'undefined') {
         theCells = theRow.getElementsByTagName('td');
-    }
-    else if (typeof(theRow.cells) != 'undefined') {
+    } else if (typeof (theRow.cells) != 'undefined') {
         theCells = theRow.cells;
-    }
-    else {
+    } else {
         return false;
     }
 
@@ -206,8 +253,8 @@ function setPointer(theRow, theRowNum, theAction, theDefaultColor, thePointerCol
     var newColor = null;
     // 3.1 ... with DOM compatible browsers except Opera that does not return
     //         valid values with "getAttribute"
-    if (typeof(window.opera) == 'undefined'
-        && typeof(theCells[0].getAttribute) != 'undefined') {
+    if (typeof (window.opera) == 'undefined'
+        && typeof (theCells[0].getAttribute) != 'undefined') {
         currentColor = theCells[0].getAttribute('bgcolor');
         domDetect = true;
     }
@@ -238,8 +285,7 @@ function setPointer(theRow, theRowNum, theAction, theDefaultColor, thePointerCol
         || currentColor.toLowerCase() == theDefaultColor.toLowerCase()) {
         if (theAction == 'over' && thePointerColor != '') {
             newColor = thePointerColor;
-        }
-        else if (theAction == 'click' && theMarkColor != '') {
+        } else if (theAction == 'click' && theMarkColor != '') {
             newColor = theMarkColor;
             marked_row[theRowNum] = true;
             // Garvin: deactivated onclick marking of the checkbox because it's also executed
@@ -251,11 +297,10 @@ function setPointer(theRow, theRowNum, theAction, theDefaultColor, thePointerCol
     }
     // 4.1.2 Current color is the pointer one
     else if (currentColor.toLowerCase() == thePointerColor.toLowerCase()
-        && (typeof(marked_row[theRowNum]) == 'undefined' || !marked_row[theRowNum])) {
+        && (typeof (marked_row[theRowNum]) == 'undefined' || !marked_row[theRowNum])) {
         if (theAction == 'out') {
             newColor = theDefaultColor;
-        }
-        else if (theAction == 'click' && theMarkColor != '') {
+        } else if (theAction == 'click' && theMarkColor != '') {
             newColor = theMarkColor;
             marked_row[theRowNum] = true;
             // document.getElementById('id_rows_to_delete' + theRowNum).checked = true;
@@ -267,7 +312,7 @@ function setPointer(theRow, theRowNum, theAction, theDefaultColor, thePointerCol
             newColor = (thePointerColor != '')
                 ? thePointerColor
                 : theDefaultColor;
-            marked_row[theRowNum] = (typeof(marked_row[theRowNum]) == 'undefined' || !marked_row[theRowNum])
+            marked_row[theRowNum] = (typeof (marked_row[theRowNum]) == 'undefined' || !marked_row[theRowNum])
                 ? true
                 : null;
             // document.getElementById('id_rows_to_delete' + theRowNum).checked = false;

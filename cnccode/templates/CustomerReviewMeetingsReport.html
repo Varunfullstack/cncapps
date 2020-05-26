@@ -1,5 +1,5 @@
 <script>
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         $('#theTable').DataTable({
             dom: 'Blfrtip',
             buttons: [
@@ -71,7 +71,7 @@
     </thead>
     <tbody>
     <!-- BEGIN reviewMeetingsBlock -->
-    <TR {style}>
+    <TR {class}>
         <TD>
             {customerLink}
         </TD>

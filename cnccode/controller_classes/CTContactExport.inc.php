@@ -70,13 +70,12 @@ class CTContactExport extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "accounts",
-        ];
+        $roles = SENIOR_MANAGEMENT_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(904);
         $this->buContactExport = new BUContactExport($this);
     }
 
@@ -646,6 +645,9 @@ WHERE customer.`cus_referred` <> 'Y'
      */
     function generateCSV($resultSet)
     {
+        if(!$resultSet){
+            return;
+        }
         $fileName = 'contacts.csv';
         Header('Content-type: text/plain');
         Header('Content-Disposition: attachment; filename=' . $fileName);
@@ -666,7 +668,7 @@ WHERE customer.`cus_referred` <> 'Y'
             /*
             double-quote all values to allow for commas inside field values
             */
-            foreach ($row AS $key => $value) {
+            foreach ($row as $key => $value) {
                 $row[$key] = '"' . $value . '"';
             }
 

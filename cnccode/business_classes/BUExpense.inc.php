@@ -232,7 +232,7 @@ class BUExpense extends Business
     )
     {
         /** @var dbSweetcode $db */
-        GLOBAL $db;
+        global $db;
         $this->setMethodName('exportEngineerExpenses');
         $date = DateTime::createFromFormat(DATE_MYSQL_DATE, $dsData->getValue(self::exportDataSetEndDate));
         $nextProcessingDate = DateTime::createFromFormat(
@@ -526,38 +526,39 @@ ORDER BY cns_name,
         global $db;
 
         $queryString = "
-    SELECT 
-    cus_name as customerName,
-    DATE_FORMAT(
-    callactivity.caa_date,
-    '%e/%c/%Y'
-  ) AS activityDate,
-           caa_starttime as activityStartTime,
-           caa_endtime as activityEndTime,
-    caa_callactivityno as activityId,
-    cns_name as engineerName,
-    cns_logname as engineerUserName,
-           consultant.firstName as engineerFirstName,
-               consultant.lastName as engineerLastName,
-    `cns_employee_no` as employeeNumber,
-           DATE_FORMAT(caa_date, '%w')IN(0,6) as weekendOvertime,
-           overtimeDurationApproved AS overtimeValue,
-  overtimeDurationApproved * 60 < minimumOvertimeMinutesRequired AS belowThreshold,
-           overtimeDeniedReason is not null as isDenied, 
-           overtimeApprovedBy is not null as isApproved
-    FROM callactivity
-    JOIN problem ON pro_problemno = caa_problemno
-    JOIN callacttype ON caa_callacttypeno = cat_callacttypeno
-    JOIN customer ON pro_custno = cus_custno
-    JOIN consultant ON caa_consno = cns_consno
-    left join headert on (headerID = 1)
-    WHERE caa_date <= ? AND caa_date >= '2008-01-15'
-      and submitAsOvertime
-    AND (caa_status = 'C' OR caa_status = 'A' )
-    AND caa_ot_exp_flag = 'N'
-    AND  caa_endtime <> caa_starttime
-    AND callacttype.engineerOvertimeFlag = 'Y'
-    ORDER BY cns_name, caa_date";
+    SELECT cus_name                                                       as customerName,
+       DATE_FORMAT(
+               callactivity.caa_date,
+               '%e/%c/%Y'
+           )                                                          AS activityDate,
+       caa_starttime                                                  as activityStartTime,
+       caa_endtime                                                    as activityEndTime,
+       caa_callactivityno                                             as activityId,
+       cns_name                                                       as engineerName,
+       cns_logname                                                    as engineerUserName,
+       consultant.firstName                                           as engineerFirstName,
+       consultant.lastName                                            as engineerLastName,
+       `cns_employee_no`                                              as employeeNumber,
+       DATE_FORMAT(caa_date, '%w') IN (0, 6)                          as weekendOvertime,
+       overtimeDurationApproved                                       AS overtimeValue,
+       overtimeDurationApproved * 60 < minimumOvertimeMinutesRequired AS belowThreshold,
+       overtimeDeniedReason is not null                               as isDenied,
+       overtimeApprovedBy is not null                                 as isApproved
+FROM callactivity
+         JOIN problem ON pro_problemno = caa_problemno
+         JOIN callacttype ON caa_callacttypeno = cat_callacttypeno
+         JOIN customer ON pro_custno = cus_custno
+         JOIN consultant ON caa_consno = cns_consno
+         left join headert on (headerID = 1)
+WHERE caa_date <= ?
+  AND caa_date >= '2008-01-15'
+  and submitAsOvertime
+  and (overtimeApprovedBy is not null or overtimeDeniedReason is not null)
+  AND (caa_status = 'C' OR caa_status = 'A')
+  AND caa_ot_exp_flag = 'N'
+  AND caa_endtime <> caa_starttime
+  AND callacttype.engineerOvertimeFlag = 'Y'
+ORDER BY cns_name, caa_date";
 
 
         $result = $db->preparedQuery($queryString, [["type" => 's', "value" => $date->format(DATE_MYSQL_DATE)]]);
@@ -701,7 +702,6 @@ ORDER BY cns_name,
 
         $activityType = new DBECallActType($this);
         $activityType->getRow($dbejCallactivity->getValue(DBEJCallActivity::callActTypeID));
-
         if ($dbejCallactivity->getValue(DBECallActivity::overtimeDurationApproved)) {
             return $dbejCallactivity->getValue(DBECallActivity::overtimeDurationApproved);
         }
@@ -716,23 +716,18 @@ ORDER BY cns_name,
             return $shiftEndTime - $shiftStartTime;
         }
 
-        $overtime = 0;
-        if ($shiftStartTime < $officeStartTime) {
-            if ($shiftEndTime < $officeStartTime) {
-                $overtime = $shiftEndTime - $shiftStartTime;
-            } else {
-                $overtime = $officeStartTime - $shiftStartTime;
-            }
-        }
-        if ($shiftEndTime > $officeEndTime) {
-            if ($shiftStartTime > $officeEndTime) {
-                $overtime += $shiftEndTime - $shiftStartTime;
-            } else {
-                $overtime += $shiftEndTime - $officeEndTime;
-            }
+        if ($shiftStartTime > $officeEndTime || $shiftEndTime < $officeStartTime) {
+            return 0;
         }
 
-        return $overtime;
+        if ($shiftStartTime < $officeStartTime) {
+            $shiftStartTime = $officeStartTime;
+        }
+
+        if ($shiftEndTime > $officeEndTime) {
+            $shiftEndTime = $officeEndTime;
+        }
+        return $shiftEndTime - $shiftStartTime;
     }
 
     public function getTotalExpensesForSalesOrder($salesOrderID)

@@ -29,13 +29,12 @@ class CTOffice365BackupAudit extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "sales",
-        ];
+        $roles = REPORTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(502);
     }
 
     /**

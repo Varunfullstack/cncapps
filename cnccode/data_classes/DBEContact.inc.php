@@ -59,6 +59,7 @@ class DBEContact extends DBCNCEntity
     const pendingLeaverFlag = 'pendingLeaverFlag';
     const pendingLeaverDate = 'pendingLeaverDate';
     const specialAttentionContactFlag = "specialAttentionContactFlag";
+    const linkedInURL = "linkedInURL";
 
     /**
      * calls constructor()
@@ -127,7 +128,7 @@ class DBEContact extends DBCNCEntity
         );
         $this->addColumn(
             self::phone,
-            DA_STRING,
+            DA_PHONE,
             DA_ALLOW_NULL,
             "con_phone"
         );
@@ -324,6 +325,11 @@ class DBEContact extends DBCNCEntity
             self::specialAttentionContactFlag,
             DA_YN_FLAG,
             DA_NOT_NULL
+        );
+        $this->addColumn(
+            self::linkedInURL,
+            DA_TEXT,
+            DA_ALLOW_NULL
         );
 
         $this->setPK(0);
@@ -551,7 +557,8 @@ class DBEContact extends DBCNCEntity
         return $ret;
     }
 
-    function getSupportContactRowsByNameMatch($customerId, $match){
+    function getSupportContactRowsByNameMatch($customerId, $match)
+    {
         $this->setMethodName("getCustomerRowsByNameMatch");
         $this->setValue(
             self::customerID,
@@ -708,14 +715,17 @@ class DBEContact extends DBCNCEntity
 
     function getSupportRows($customerID = false)
     {
-        $sql = "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::supportLevel) .
-            " is not null  and " . $this->getDBColumnName(self::supportLevel) . " <> ''      
-            AND (SELECT cus_prospect = 'N' FROM customer WHERE con_custno = cus_custno )";
+        $dbeCustomer = new DBECustomer($this);
+        $sql = "SELECT {$this->getDBColumnNamesAsString()}
+FROM {$this->getTableName()}
+         left join {$dbeCustomer->getTableName()} on {$this->getDBColumnName(DBEContact::customerID)} = {$dbeCustomer->getDBColumnName(DBECustomer::customerID)}
+WHERE {$this->getDBColumnName(self::supportLevel)} is not null
+  and {$this->getDBColumnName(self::supportLevel)} <> ''
+  AND {$dbeCustomer->getDBColumnName(DBECustomer::becameCustomerDate)} is not null
+  and {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is null ";
 
         if ($customerID) {
-            $sql .= " AND con_custno = " . $customerID;
+            $sql .= " AND {$this->getDBColumnName(self::customerID)} = " . $customerID;
         }
         $this->setQueryString($sql);
 
@@ -764,9 +774,9 @@ class DBEContact extends DBCNCEntity
             " left join customer on con_custno = cus_custno ";
 
         if ($leadStatusID) {
-            $sqlQuery .= " WHERE  customer_lead_status_id = $leadStatusID";
+            $sqlQuery .= " WHERE  leadStatusId = $leadStatusID";
         } else {
-            $sqlQuery .= " WHERE  customer_lead_status_id is not null and customer_lead_status_id <> 0";
+            $sqlQuery .= " WHERE  leadStatusId is not null and leadStatusId <> 0";
         }
         $this->setQueryString($sqlQuery);
 

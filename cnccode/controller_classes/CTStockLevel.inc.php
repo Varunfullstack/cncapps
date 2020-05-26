@@ -24,12 +24,13 @@ class CTStockLevel extends CTCNC
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
         $roles = [
-            "sales",
+            SALES_PERMISSION,
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(308);
         $this->BUItem = new BUItem($this);
     }
 
@@ -63,7 +64,7 @@ class CTStockLevel extends CTCNC
         $maintStockQty = $_POST['maintStockQty'];
 
         $dbeItem = new DBEItem($this);
-        foreach ($salesStockQty AS $key => $value) {
+        foreach ($salesStockQty as $key => $value) {
             $dbeItem->getRow($key);
             $dbeItem->setValue(DBEItem::salesStockQty, $value);
             $dbeItem->setValue(DBEItem::maintStockQty, $maintStockQty[$key]);

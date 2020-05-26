@@ -4,41 +4,14 @@
     var state = 'none'; // display status
     var savedCustomerString;
 
-    function saveCustomerString() {
-        savedCustomerString = document.getElementById("customerString").value
-    }
-
-    renderContracts();
-
-    $(function () {
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-                renderContracts();
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+    window.addEventListener('DOMContentLoaded', function () {
+        renderContracts();
+        const customerIDInput = document.getElementById('customerID');
+        document.getElementById('customerString').addEventListener('autocompleteselect', function ($event) {
+            customerIDInput.value = $event.detail.item.value;
+            renderContracts();
         });
-    });
-
+    })
 
     function renderContracts() {
         $('#contractSelector').html("<option value='99'>All</option><option value=''>T &amp; M</option>");
@@ -55,7 +28,7 @@
                     //for each key we create an optgroup
                     acc += "<optgroup label='" + key + "'>";
                     acc += result[key].reduce(function (subacc, item) {
-                        subacc += "<option value='" + item.id + "' >" + item.description + "</option>";
+                        subacc += "<option value='" + item.id + +"' >" + item.description + "</option>";
                         return subacc;
                     }, "");
                     acc += "</optgroup>";
@@ -74,10 +47,9 @@
 
     function submitOnReturn() {
         if (event.keyCode == 13) {
-            // document.searchForm.submit();
+            document.searchForm.submit();
         }
     }
-
 
     function checkAll() {
         for (var i = 0; i < document.searchForm.elements.length; i++) {
@@ -139,6 +111,7 @@
                     value="{customerString}"
                     size="50"
                     maxlength="50"
+                    customer-search
             >
                 <p class="formErrorMessage"> {customerStringMessage}</p></td>
         </tr>
@@ -231,7 +204,9 @@
             <td class="promptText">
                 <div align="right">Priority</div>
             </td>
-            <td><select name="activity[1][priority]" style="width: 220px">
+            <td><select name="activity[1][priority]"
+                        style="width: 220px"
+            >
                 <option value="">All</option>
                 <!-- BEGIN priorityBlock -->
                 <option {prioritySelected}
@@ -340,41 +315,44 @@
                        size="100"
                        maxlength="100"
                 >
-                <button onclick="alert('+Office and +essentials – will search for any text that’s Office AND Essentials\n'+
+                <button type="button"
+                        onclick="alert('+Office and +essentials – will search for any text that’s Office AND Essentials\n'+
 '“Office 365” and +premium – will search for any text that’s “Office 365” AND there’s also Premium\n'+
-'Office 365 premium – will search for any of those key words (i.e. its Office OR 365 OR Premium)')">Help</button>
+'Office 365 premium – will search for any of those key words (i.e. its Office OR 365 OR Premium)')"
+                >Help
+                </button>
             </td>
         </tr>
         <tr>
             <td class="promptText">
                 <div align="right">Raised from</div>
             </td>
-            <td><input type="text"
+            <td>
+                <input type="date"
                        name="activity[1][fromDate]"
                        id="fromDate"
                        value="{fromDate}"
                        size="10"
                        maxlength="10"
                        onKeypress="javascript:submitOnReturn()"
-                       class="jqueryCalendar"
                        autocomplete="off"
-            > <span
+                > <span
                     class="formErrorMessage"
-            >{fromDateMessage}</span></td>
+            >{fromDateMessage}</span>
+            </td>
         </tr>
         <tr>
             <td class="promptText">
                 <div align="right">to</div>
             </td>
             <td>
-                <input type="text"
+                <input type="date"
                        name="activity[1][toDate]"
                        id="toDate"
                        value="{toDate}"
                        size="10"
                        maxlength="10"
                        onKeypress="javascript:submitOnReturn()"
-                       class="jqueryCalendar"
                        autocomplete="off"
                 >
                 <span class="formErrorMessage">{toDateMessage}</span>

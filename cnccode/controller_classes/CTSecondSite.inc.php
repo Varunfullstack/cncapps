@@ -28,7 +28,6 @@ class CTSecondSite extends CTCNC
         if (!$this->isUserSDManager()) {
             $roles = [
                 "technical",
-                "reports"
             ];
             if (!self::hasPermissions($roles)) {
                 Header("Location: /NotAllowed.php");
@@ -38,6 +37,7 @@ class CTSecondSite extends CTCNC
         $this->buSecondsite = new BUSecondsite($this);
         $this->dsSecondsiteImage = new DSForm($this);
         $this->dsSecondsiteImage->copyColumnsFrom($this->buSecondsite->dbeSecondsiteImage);
+        $this->setMenuId(108);
     }
 
     /**
@@ -65,6 +65,10 @@ class CTSecondSite extends CTCNC
                 break;
 
             case 'failureAnalysis':
+                if (!self::isSdManager()) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $this->failureAnalysis();
                 break;
 
@@ -243,6 +247,7 @@ class CTSecondSite extends CTCNC
     function failureAnalysis()
     {
         global $cfg;
+        $this->setMenuId(210);
 
         if (!$this->isUserSDManager()) {
             $roles = [
@@ -411,6 +416,7 @@ class CTSecondSite extends CTCNC
                 'endYearMonth'     => $dsSearchForm->getValue(BUSecondSite::searchFormEndYearMonth),
                 'urlCustomerPopup' => $urlCustomerPopup,
                 'urlSubmit'        => $urlSubmit,
+                'pattern'          => "^(0[1-9]|1[012])/\d{4{{}}}$"
             )
         );
 

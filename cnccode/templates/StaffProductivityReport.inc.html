@@ -4,34 +4,9 @@
 ></script>
 <script language='JavaScript'>
     const autocompleteURL = "/Customer.php?action=searchName";
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         window.startDate = $('#startDate').get(0);
         window.endDate = $('#endDate').get(0);
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
-        });
     });
 
     function submitOnReturn() {
@@ -54,17 +29,16 @@
             <td class="promptText">
                 <div align="right">Start Date</div>
             </td>
-            <td><input
-                    type="text"
-                    name="searchForm[1][startDate]"
-                    id="startDate"
-                    value="{startDate}"
-                    size="10"
-                    maxlength="10"
-                    onkeypress="javascript:submitOnReturn()"
-                    class="jqueryCalendar"
-                    autocomplete="off"
-            >
+            <td>
+                <input type="date"
+                       name="searchForm[1][startDate]"
+                       id="startDate"
+                       value="{startDate}"
+                       size="10"
+                       maxlength="10"
+                       onkeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
+                >
                 <font class="formErrorMessage">{startDateMessage}</font>
             </td>
         </tr>
@@ -72,17 +46,16 @@
             <td class="promptText">
                 <div align="right">End Date</div>
             </td>
-            <td><input
-                    type="text"
-                    name="searchForm[1][endDate]"
-                    id="endDate"
-                    value="{endDate}"
-                    size="10"
-                    maxlength="10"
-                    onkeypress="javascript:submitOnReturn()"
-                    class="jqueryCalendar"
-                    autocomplete="off"
-            >
+            <td>
+                <input type="date"
+                       name="searchForm[1][endDate]"
+                       id="endDate"
+                       value="{endDate}"
+                       size="10"
+                       maxlength="10"
+                       onkeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
+                >
                 <font class="formErrorMessage">{endDateMessage}</font>
             </td>
         </tr>

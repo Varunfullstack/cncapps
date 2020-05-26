@@ -32,13 +32,12 @@ class CTCustomerProfitabilityReport extends CTCNC
     function __construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg)
     {
         parent::__construct($requestMethod, $postVars, $getVars, $cookieVars, $cfg);
-        $roles = [
-            "accounts",
-        ];
+        $roles = REPORTS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(509);
         $this->buActivityProfitabilityReport = new BUCustomerProfitabilityReport ($this);
         $this->dsSearchForm = new DSForm ($this);
         $this->dsResults = new DataSet ($this);
@@ -212,15 +211,13 @@ class CTCustomerProfitabilityReport extends CTCNC
                     BUCustomerProfitabilityReport::searchFormCustomerID
                 ),
                 'customerString'           => $customerString,
-                'fromDate'                 => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUCustomerProfitabilityReport::searchFormFromDate)
+                'fromDate'                 => $dsSearchForm->getValue(
+                    BUCustomerProfitabilityReport::searchFormFromDate
                 ),
                 'fromDateMessage'          => $dsSearchForm->getMessage(
                     BUCustomerProfitabilityReport::searchFormFromDate
                 ),
-                'toDate'                   => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUCustomerProfitabilityReport::searchFormToDate)
-                ),
+                'toDate'                   => $dsSearchForm->getValue(BUCustomerProfitabilityReport::searchFormToDate),
                 'toDateMessage'            => $dsSearchForm->getMessage(
                     BUCustomerProfitabilityReport::searchFormToDate
                 ),

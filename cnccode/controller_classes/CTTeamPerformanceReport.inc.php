@@ -32,15 +32,11 @@ class CTTeamPerformanceReport extends CTCNC
             $cfg
         );
         if (!$this->isUserSDManager()) {
-            $roles = [
-                "reports",
-            ];
-            if (!self::hasPermissions($roles)) {
-                Header("Location: /NotAllowed.php");
-                exit;
-            }
+            Header("Location: /NotAllowed.php");
+            exit;
         }
         $this->buTeamPerformance = new BUTeamPerformance ($this);
+        $this->setMenuId(208);
     }
 
     /**
@@ -86,9 +82,15 @@ class CTTeamPerformanceReport extends CTCNC
                         'hdTeamTargetFixHours'       => $dsHeader->getValue(DBEJHeader::hdTeamTargetFixHours),
                         'hdTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEJHeader::hdTeamTargetFixQtyPerMonth),
 
-                        'smallProjectsTeamTargetSlaPercentage'  => $dsHeader->getValue(DBEJHeader::smallProjectsTeamTargetSlaPercentage),
-                        'smallProjectsTeamTargetFixHours'       => $dsHeader->getValue(DBEJHeader::smallProjectsTeamTargetFixHours),
-                        'smallProjectsTeamTargetFixQtyPerMonth' => $dsHeader->getValue(DBEJHeader::smallProjectsTeamTargetFixQtyPerMonth)
+                        'smallProjectsTeamTargetSlaPercentage'  => $dsHeader->getValue(
+                            DBEJHeader::smallProjectsTeamTargetSlaPercentage
+                        ),
+                        'smallProjectsTeamTargetFixHours'       => $dsHeader->getValue(
+                            DBEJHeader::smallProjectsTeamTargetFixHours
+                        ),
+                        'smallProjectsTeamTargetFixQtyPerMonth' => $dsHeader->getValue(
+                            DBEJHeader::smallProjectsTeamTargetFixQtyPerMonth
+                        )
 
                     )
                 );

@@ -6,6 +6,8 @@
  * Time: 11:26
  */
 
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+
 require_once("config.inc.php");
 global $cfg;
 require_once($cfg["path_dbe"] . "/DBEPortalCustomerDocument.php");
@@ -71,7 +73,7 @@ $BUHeader->getHeader($dbeHeader);
 $thresholdDays = $dbeHeader->getValue(DBEHeader::OSSupportDatesThresholdDays);
 
 if (!$thresholdDays) {
-    throw new Exception('OS Support Dates Threshold days is empty');
+    throw new UnexpectedValueException('OS Support Dates Threshold days is empty');
 }
 
 $buCustomer = new BUCustomer($thing);
@@ -88,7 +90,6 @@ if ($generateSummary) {
     $summarySheet = $summarySpreadSheet->getActiveSheet();
     $isHeaderSet = false;
 }
-
 
 
 function getUnrepeatedUsername($str)
@@ -249,7 +250,7 @@ ON computers.computerid = processor.computerid
     )
   left join v_extradatacomputers exd
   on (exd.computerid = computers.computerid)
-    where clients.externalID = ? 
+    where clients.externalID = ? and  ServiceVersion
 GROUP BY computers.computerid 
 ORDER BY Location, `Computer Name`';
 
@@ -279,7 +280,7 @@ ORDER BY Location, `Computer Name`';
         $text = $datum['Last User'];
         $text = str_replace('null', "", $text);
         $data[$key]['Last User'] = getUnrepeatedUsername($text);
-        $data[$key]['CPU'] =  preg_replace('/\s+/', ' ', $data[$key]['CPU']);
+        $data[$key]['CPU'] = preg_replace('/\s+/', ' ', $data[$key]['CPU']);
         $data[$key]['Model'] = preg_replace('/\s+/', ' ', $data[$key]['Model']);
         $purgedRow = $data[$key];
         unset($purgedRow['isServer']);
@@ -320,6 +321,30 @@ ORDER BY Location, `Computer Name`';
         $highestColumn = $sheet->getHighestColumn();
         $highestRow = $sheet->getHighestRow();
         $sheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
+
+
+        $dateTime = new DateTime();
+        $legendRowStart = $highestRow + 2;
+        $sheet->fromArray(
+            [
+                ["Operating System soon to be end of life"],
+                ["Operating System is end of life"],
+                ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
+            ],
+            null,
+            'A' . $legendRowStart
+        );
+        $sheet->getStyle("A{$legendRowStart}:A$legendRowStart")
+            ->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()
+            ->setARGB("FFFFEB9C");
+        $sheet->getStyle("A" . ($legendRowStart + 1) . ":A" . ($legendRowStart + 1))
+            ->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()
+            ->setARGB("FFFFC7CE");
+
 
         $pcs = 0;
         $servers = 0;
@@ -477,7 +502,7 @@ ORDER BY Location, `Computer Name`';
     } else {
         echo '<div>No Data was found</div>';
     }
-};
+}
 $tempFileName = null;
 if ($generateSummary) {
     echo '<h1>Generating Summary</h1>';

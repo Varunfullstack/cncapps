@@ -13,7 +13,7 @@
         }
     }
 
-    $(document).ready(function () {
+    window.addEventListener('DOMContentLoaded', function () {
 
         $('#myTable thead tr').clone(true).appendTo('#myTable thead');
         $('#myTable thead tr:eq(1) th').each(function (i) {
@@ -47,6 +47,13 @@
                             data: data
                         }
                     ).then(response => {
+                        if (response.length > 40) {
+                            response = response.slice(0, 40);
+                            response.unshift({
+                                id: -1,
+                                name: 'Keep typing to filter, there are more results not shown here'
+                            });
+                        }
                         responseCB(response.map(item => ({label: item.name, value: item.id})));
                     })
 
@@ -55,7 +62,12 @@
                 select: function (event, ui) {
                     event.preventDefault();
                     event.target.value = ui.item.label;
-                    performSearch(ui.item.value, i);
+                    performSearch(ui.item.label, i);
+                },
+                focus: function (event, ui) {
+                    event.preventDefault();
+                    event.target.value = ui.item.label;
+                    return false;
                 }
             }).focus(function () {
                 $(this).autocomplete("search", $(this).val());
@@ -87,10 +99,10 @@
                     const startDate = $('#startDate').val();
                     const endDate = $('#endDate').val();
                     if (startDate) {
-                        data.startDate = moment(startDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                        data.startDate = startDate
                     }
                     if (endDate) {
-                        data.endDate = moment(endDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                        data.endDate = endDate
                     }
                 }
             },
@@ -132,24 +144,21 @@
                 <div align="right">Created Between</div>
             </td>
             <td>
-                <input
-                        type="text"
-                        id="startDate"
-                        size="10"
-                        maxlength="10"
-                        onKeypress="javascript:submitOnReturn()"
-                        class="jqueryCalendar"
-                        autocomplete="off"
+                <input type="date"
+                       id="startDate"
+                       size="10"
+                       maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
                 >
-                and <input
-                    type="text"
-                    id="endDate"
-                    size="10"
-                    maxlength="10"
-                    onKeypress="javascript:submitOnReturn()"
-                    class="jqueryCalendar"
-                    autocomplete="off"
-            >
+                and
+                <input type="date"
+                       id="endDate"
+                       size="10"
+                       maxlength="10"
+                       onKeypress="javascript:submitOnReturn()"
+                       autocomplete="off"
+                >
             </td>
         </tr>
         <tr>

@@ -123,45 +123,43 @@ class DBEJCustomerItem extends DBECustomerItem
     )
     {
         $this->setMethodName('getRowsBySearchCriteria');
-        $queryString =
-            "SELECT " . $this->getDBColumnNamesAsString() .
+        $baseQuery = "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " JOIN item AS citem ON cui_itemno = itm_itemno" .
             " JOIN customer ON cui_custno = cus_custno" .
-            " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno" .
-            " WHERE 1=1";
+            " JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno ";
+
+
+        $filters = [];
+
+
         if ($customerID != '') {
-            $queryString .= " AND " . $this->getDBColumnName(self::customerID) . "=" . $customerID;
+            $filters[] = $this->getDBColumnName(self::customerID) . "=" . $customerID;
         }
         if ($ordheadID != '') {
-            $queryString .= " AND " . $this->getDBColumnName(self::ordheadID) . "=" . $ordheadID;
+            $filters[] = $this->getDBColumnName(self::ordheadID) . "=" . $ordheadID;
         }
         if ($startDate != '') {
-            $queryString .= " AND " . $this->getDBColumnName(self::expiryDate) . ">= '" . mysqli_real_escape_string(
+            $filters[] = $this->getDBColumnName(self::expiryDate) . ">= '" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $startDate
                 ) . "'";
         }
         if ($endDate != '') {
-            $queryString .= " AND " . $this->getDBColumnName(self::expiryDate) . "<= '" . mysqli_real_escape_string(
+            $filters[] = $this->getDBColumnName(self::expiryDate) . "<= '" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $endDate
                 ) . "'";
         }
         if ($serialNo != '') {
-            $queryString .= " AND " . $this->getDBColumnName(self::serialNo) . " LIKE '%" . mysqli_real_escape_string(
+            $filters[] = $this->getDBColumnName(self::serialNo) . " LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $serialNo
                 ) . "%'";
         }
-        if ($renewalStatus != '') {
-            $queryString .= " AND " . $this->getDBColumnName(self::renewalStatus) . "='" . mysqli_real_escape_string(
-                    $this->db->link_id(),
-                    $renewalStatus
-                ) . "'";
-        }
+
         if ($itemText != '') {
-            $queryString .= " AND citem.itm_desc LIKE '%" . mysqli_real_escape_string(
+            $filters[] = " citem.itm_desc LIKE '%" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $itemText
                 ) . "%'";
@@ -171,28 +169,38 @@ class DBEJCustomerItem extends DBECustomerItem
         If searching on contract text, need to sub-query to match item descriptions
         on custitem_contract
         */
-        if ($contractText != '') {
-            $queryString .=
-                " AND (
-            SELECT
-              COUNT(*)
-            FROM
-              custitem_contract
-              JOIN custitem AS contract ON cic_contractcuino = contract.`cui_cuino`
-              JOIN item ON contract.cui_itemno = itm_itemno
-            WHERE
-              itm_desc LIKE '%" . mysqli_real_escape_string(
-                    $this->db->link_id(),
-                    $contractText
-                ) . "%'
-              AND cic_cuino = custitem.`cui_cuino`
-            ) > 0";
+        if ($contractText != '' || $renewalStatus != '') {
+
+            $baseQuery .= " LEFT JOIN custitem_contract
+    ON cic_cuino = custitem.`cui_cuino`
+  LEFT JOIN custitem AS contractCustomerItem
+    ON cic_contractcuino = contractCustomerItem.`cui_cuino`
+  LEFT JOIN item AS contractItem ON contractCustomerItem.cui_itemno = contractItem.`itm_itemno`";
+
+            if ($renewalStatus) {
+
+                $filters[] = " contractCustomerItem.renewalStatus ='" . mysqli_real_escape_string(
+                        $this->db->link_id(),
+                        $renewalStatus
+                    ) . "'";
+            }
+            if ($contractText) {
+                $filters[] = " contractItem.itm_desc like '%" . mysqli_real_escape_string(
+                        $this->db->link_id(),
+                        $contractText
+                    ) . "%'";
+            }
+        }
+
+        if (count($filters)) {
+            $baseQuery .= " where " . implode(" and ", $filters);
         }
 
         if ($row_limit) {
-            $queryString .= " LIMIT 0," . $row_limit;
+            $baseQuery .= " LIMIT 0," . $row_limit;
         }
-        $this->setQueryString($queryString);
+
+        $this->setQueryString($baseQuery);
 
         return (parent::getRows());
     }

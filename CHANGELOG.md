@@ -1,6 +1,125 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.0.1] - 2020-05-26
+### Fixed
+- Current Activity Report bigger headings
+- Current Activity Remember expanded headings
+- Pending reopened section not showing in Current Activity Report
+- Star for flagging as favourite shows in the wrong place in technical menu
+
+## [v4.0.0] - 2020-05-25
+### Changed
+- Issue 620 - New side menu design in CNCAPPS
+
+## [v3.14.6] - 2020-05-21
+### Fixed
+- Wrong content in the emails that get sent out as part of ServiceDeskAutoCompletion.php for Pending Closure
+- Some engineers travel missing from Expense Dashboard
+
+## [v3.14.5] - 2020-05-18
+### Fixed
+- Fixed issue with installation date readonly on RenHosting and RenBroadband
+- Fixed issue that prevents to set installation date when checking Direct Debit
+- Fixed issue trying to export contacts
+- Fixed issue with automatically approved overtime not getting an approved duration value
+
+## [v3.14.4] - 2020-05-13
+### Fixed
+- Fixed issue with awaiting CNC not being set correctly 
+
+## [v3.14.3] - 2020-05-12
+### Fixed
+- Fixed issue when trying to send Sales Order reminder
+- Fixed issue with Office 365 license matching, changed it to be exact match
+
+## [v3.14.2] - 2020-05-11
+### Fixed
+- Fixed issue with RenContract installation date input having readonly attribute
+- Fixed Customer Review Meeting Documents upload not working
+- Fixed issue with customerProblem reason field being smaller than automated_request reason field
+
+## [v3.14.1] - 2020-05-11
+### Fixed
+- Fixed issue with searching in CustomerItem.php
+
+## [v3.14.0] - 2020-05-08
+### Changed
+- Issue 833 - Additional pages to lock out contract choices
+- Issue 834 - Show SR number on Fixed Page
+- Issue 837 - Exclude Operational Tasks from top of SR History pop up
+- Issue 839 - 3CX Call Reporting Enhancements
+- Issue 841 - OBRS comestics
+- Issue 843 - Include Manager Name on Time, Change & Sales requests feedback
+- Issue 847 - Moving SRs between teams requires reason
+- Issue 845 - O365 Mailbox Export Authentication & Formatting Improvements
+- Issue 823 - Customer CRM Page improvements
+- Issue 863 - Fixed activity hidden when final activity hidden
+### Fixed
+- Issue 832 - Review Meeting Booked Meetings not showing as booked
+- Issue 835 - Customer Item Renewal Status does not work
+- Issue 848 - Contact Validation for site phone number reporting incorrect sites
+- Issue 849 - You have open requests emails sometimes listing wrong To: field
+- Issue 853 - Overtime & Expenses Tweaks
+- Issue 856 - Password Services - One Per Customer not setting zero in database
+- Issue 864 - Contract Expiry Date in Customer Profitability Report Tweak
+
+## [v3.13.6] - 2020-05-05
+### Fixed
+- Fixed issue with "Allow SRs to be logged against this contract" checkbox not working properly
+
+## [v3.13.5] - 2020-05-04
+### Fixed
+- Fixed issue with 4th May 2020 not being a bank holiday..moved to 8th May 2020
+
+## [v3.13.4] - 2020-05-01
+### Fixed
+- Fixed issue with saving new contact
+
+## [v3.13.3] - 2020-04-30
+### Fixed
+- Fixed issue when setting problems to fixed.
+
+## [v3.13.2] - 2020-04-30
+### Fixed
+- Fixed issue where awaitingCustomer flag in SR is not working correctly
+
+## [v3.13.1] - 2020-04-29
+### Fixed
+- Fixed issue with trying to set open hours not working as expected
+- Fixed issue with resetting awatingCustomer flag
+
+## [v3.13.0] - 2020-04-21
+### Added
+- Issue 799 - Customer Contract Take Up Matrix
+### Changed
+- Issue 826 - Force future date when setting SR to Awaiting Customer
+- Issue 827 - Automated Asset Export validation of machines not fully checked in
+### Fixed
+- Issue 828 - Pending Time Request emails to include approval level
+- Issue 829 - Offsite Backup Replication Status missing 2020
+- Issue 830 - Awaiting CNC status not being reset correctly
+
+## [v3.12.3] - 2020-04-20
+### Fixed
+- Fix typo in the Current Asset List Extract
+
+## [v3.12.2] - 2020-04-17
+### Fixed
+- PrepayAdjustment.php Customer Dropdown is numbers, not names.
+- Office365StorageReports.php Does not appear to show any results, but I can see data in the table.
+- CustomerReviewMeetingDocuments.php. No Review Meeting Users are being shown
+- createSalesRequest.php: Picking any customer / template, click send, and you get an error:
+### Changed
+- RenewalReport.php (and the other pages that have the customer page) we need to tweak the search so that if it doesn't find a match, it then goes back to the database and then searches for all customers, including the referred ones.
+- Pending reopen section: add time and date of the email like we have in To Be Logged
+- Pending reopen section: Could we have an option to create a new SR if they try, and reopen an SR with something not related.
+- Current Mailbox Extract add legend to explain the meaning of the colored rows
+- TimeRequestDashboard.php Add a new column to the left of Chargeable Hours called Approval Level
+### Removed
+- Remove debug info from Dispatch page
+
+
 ## [v3.12.1] - 2020-04-15
 ### Changed
 - When editing Activities, apply the same lockdown of contracts in the dropdown Contract box as we have on the Fixed SR page.

@@ -1,31 +1,8 @@
 <!-- Template: ContractsAnalysisReport.inc.html -->
 <script>
-    const autocompleteURL = "/Customer.php?action=searchName";
-    $(function () {
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+    window.addEventListener('DOMContentLoaded', function () {
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
         });
     });
 </script>
@@ -263,6 +240,7 @@
             >
             <input type="text"
                    id="customerString"
+                   customer-search
             >
         </td>
     </tr>
@@ -271,21 +249,19 @@
             <div align="right">Between</div>
         </td>
         <td>
-            <input type="text"
+            <input type="date"
                    id="startDate"
                    size="10"
                    maxlength="10"
-                   class="jqueryCalendar"
                    autocomplete="off"
             >
-            and <input
-                type="text"
-                id="endDate"
-                size="10"
-                maxlength="10"
-                class="jqueryCalendar"
-                autocomplete="off"
-        >
+            and
+            <input type="date"
+                   id="endDate"
+                   size="10"
+                   maxlength="10"
+                   autocomplete="off"
+            >
         </td>
     </tr>
     <tr>
@@ -319,11 +295,11 @@
                     const commonParams = {};
 
                     if (startDateString) {
-                        commonParams.startDate = moment(startDateString, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                        commonParams.startDate = startDateString
                     }
 
                     if (endDateString) {
-                        commonParams.endDate = moment(endDateString, 'DD/MM/YYYY').format('YYYY-MM-DD');
+                        commonParams.endDate = endDateString
                     }
                     const getUrl = window.location;
                     const baseUrl = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
@@ -388,7 +364,7 @@
                         },
                         "responseTime": {
                             label: "Average Response Time",
-                            format: x => x.toFixed(2),
+                            format: x => x ? x.toFixed(2) : x,
                             assignClass: lowerIsBetter,
                             showInSummary: true
                         },
@@ -418,18 +394,18 @@
                         },
                         "avgChargeableTime": {
                             label: "Average Time of work carried out",
-                            format: x => x.toFixed(2),
+                            format: x => x ? x.toFixed(2) : x,
                             assignClass: lowerIsBetter,
                             showInSummary: true,
                         },
                         "avgTimeAwaitingCNC": {
                             label: "Average Time Awaiting CNC",
-                            format: x => x.toFixed(2),
+                            format: x => x ? x.toFixed(2) : x,
                             assignClass: lowerIsBetter
                         },
                         "avgTimeFromRaiseToFixHours": {
                             label: "Average Time from initial to Fixed",
-                            format: x => x.toFixed(2),
+                            format: x => x ? x.toFixed(2) : x,
                             assignClass: lowerIsBetter,
                             showInSummary: true,
                         },

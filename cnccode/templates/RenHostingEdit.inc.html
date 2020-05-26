@@ -6,6 +6,7 @@
 <script language='JavaScript'>
 
     const clientCheckDirectDebit = {clientCheckDirectDebit};
+
     function checkDirectDebit() {
         const directDebitCheckbox = $('#directDebit');
         const parent = directDebitCheckbox.parent();
@@ -25,7 +26,7 @@
         }
     }
 
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
         checkDirectDebit();
     });
 
@@ -146,18 +147,16 @@
         {prices}
         <tr>
             <td class="promptText">Installation Date</td>
-            <td class="fieldText"><input name="renHosting[1][installationDate]"
-                                         type="text"
-                                         value="{installationDate}"
-                                         {readonly}
-                                         size="40"
-                                         maxlength="50"
-                                         class="jqueryCalendar"
-                                         data-jqueryCalendarBeforeShowDay="beforeShowDay"
-                                         required
-                                         readonly="readonly"
-                                         id="installationDate"
-            >
+            <td class="fieldText">
+                <input name="renHosting[1][installationDate]"
+                       type="date"
+                       value="{installationDate}"
+                       {readonly}
+                       size="40"
+                       maxlength="50"
+                       required
+                       id="installationDate"
+                >
                 <span class="formErrorMessage">{installationDateMessage}</span>
             </td>
             <td class="promptText">

@@ -33,14 +33,10 @@ class CTServiceRequestReport extends CTCNC
             $cfg
         );
         if (!$this->isUserSDManager()) {
-            $roles = [
-                "reports",
-            ];
-            if (!self::hasPermissions($roles)) {
-                Header("Location: /NotAllowed.php");
-                exit;
-            }
+            Header("Location: /NotAllowed.php");
+            exit;
         }
+        $this->setMenuId(211);
         $this->buServiceRequestReport = new BUServiceRequestReport ($this);
     }
 
@@ -151,13 +147,9 @@ class CTServiceRequestReport extends CTCNC
             array(
                 'formError'        => $this->formError,
                 'customerID'       => $dsSearchForm->getValue(BUServiceRequestReport::searchFormCustomerID),
-                'fromDate'         => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUServiceRequestReport::searchFormFromDate)
-                ),
+                'fromDate'         => $dsSearchForm->getValue(BUServiceRequestReport::searchFormFromDate),
                 'fromDateMessage'  => $dsSearchForm->getMessage(BUServiceRequestReport::searchFormFromDate),
-                'toDate'           => Controller::dateYMDtoDMY(
-                    $dsSearchForm->getValue(BUServiceRequestReport::searchFormToDate)
-                ),
+                'toDate'           => $dsSearchForm->getValue(BUServiceRequestReport::searchFormToDate),
                 'toDateMessage'    => $dsSearchForm->getMessage(BUServiceRequestReport::searchFormToDate),
                 'urlCustomerPopup' => $urlCustomerPopup
             )

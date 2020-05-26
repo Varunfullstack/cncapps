@@ -12,33 +12,10 @@
         google.charts.setOnLoadCallback(resolve);
     });
 
-    const autocompleteURL = "/Customer.php?action=searchName";
-    $(function () {
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-                customerIDChanged(ui.item.value);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+    window.addEventListener('DOMContentLoaded', function () {
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
+            customerIDChanged($event.detail.item.value);
         });
     });
 
@@ -54,8 +31,8 @@
         const url = new URL(window.location.href);
         url.searchParams.append('action', 'getData');
         url.searchParams.append('customerId', customerID);
-        url.searchParams.append('startDate', moment(startDate, 'DD/MM/YYYY').format('YYYY-MM-DD'));
-        url.searchParams.append('endDate', moment(endDate, 'DD/MM/YYYY').format('YYYY-MM-DD'));
+        url.searchParams.append('startDate', startDate);
+        url.searchParams.append('endDate', endDate);
 
         return chartsLoaded
             .then(() => {
@@ -117,7 +94,9 @@
     <div style="width: 100px; display: inline-block">
         Customer
     </div>
-    <input id="customerString"
+    <input type="text"
+           id="customerString"
+           customer-search
     >
     <input type="hidden"
            id="customerID"
@@ -127,10 +106,9 @@
     <div style="width: 100px; display: inline-block">
         Start Date
     </div>
-    <input type="text"
+    <input type="date"
            id="startDateInput"
            autocomplete="off"
-           class="jQueryCalendar"
            onchange="startDateChanged(this.value)"
     >
 </div>
@@ -138,10 +116,9 @@
     <div style="width: 100px; display: inline-block">
         End Date
     </div>
-    <input type="text"
+    <input type="date"
            id="endDateInput"
            autocomplete="off"
-           class="jQueryCalendar"
            onchange="endDateChanged(this.value)"
     >
 </div>

@@ -20,13 +20,12 @@ class CTItemBillingCategory extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "maintenance",
-        ];
+        $roles = MAINTENANCE_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(807);
     }
 
     function delete()

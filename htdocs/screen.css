@@ -23,6 +23,10 @@ body.environment-development {
     background-color: rgb(250, 250, 250);
 }
 
+option:disabled {
+    color: #c3c3c3
+}
+
 TD, INPUT, SELECT, TEXTAREA {
     font-family: Arial, Tahoma, Helvetica, sans-serif;
     font-size: 12px;
@@ -336,6 +340,7 @@ DIV.purchOrderSearchScroll {
     color: Black;
     background-color: #cccccc;
     text-align: left;
+    font-size: 16px;
 }
 
 .listHeadTextRight {
@@ -581,6 +586,7 @@ table#user-performance-escalations td, th {
     background-color: #F5AEBD;
 }
 
+
 .boring-gray {
     background-color: #cccccc;
 }
@@ -594,7 +600,7 @@ table.second-site-image th {
 }
 
 table#passed {
-    background-color: #BCF7DD;
+    background-color: #bcf7dd;
 }
 
 table#bad-config, table#image-not-found, table#server-not-found, table#out-of-date {
@@ -785,7 +791,7 @@ table.fixed_header {
 .fixed_header tbody {
     overflow-y: scroll;
     max-height: 851px;
-    direction: rtl;
+    direction: ltr;
     /*width: 100%;*/
 }
 
@@ -803,10 +809,6 @@ table.fixed_header {
 
 .fixed_header thead tr, .fixed_header tbody tr {
     display: block;
-}
-
-.fixed_header thead {
-    margin-right: 12px;
 }
 
 .redPencil {
@@ -863,6 +865,12 @@ input[type="button"], input[type="submit"], button, input[type="reset"], .custom
 
 input[type="button"]:hover, input[type="submit"]:hover, button:hover, input[type="reset"]:hover, .custom-file-upload:hover {
     background-color: #E6E6E6;
+}
+
+input[type="button"][disabled], input[type="submit"][disabled], button[disabled], input[type="reset"][disabled], .custom-file-upload[disabled] {
+    background-color: #efefef;
+    color: #C6C6C6;
+    cursor: not-allowed;
 }
 
 table.cell-padding-1 th, table.cell-padding-1 td {

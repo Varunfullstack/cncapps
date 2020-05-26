@@ -20,20 +20,17 @@ class CTRenDomain extends CTCNC
         48,
         60
     ];
+    const renDomainFormCustomerName = "customerName";
+    const renDomainFormSiteName = "siteName";
+    const renDomainFormInvoiceFromDate = "invoiceFromDate";
+    const renDomainFormInvoiceToDate = "invoiceToDate";
+    const renDomainFormItemDescription = "itemDescription";
     /** @var DSForm */
     public $dsRenDomain;
     /** @var BURenDomain */
     public $buRenDomain;
     /** @var BUCustomerItem */
     public $buCustomerItem;
-
-
-    const renDomainFormCustomerName = "customerName";
-    const renDomainFormSiteName = "siteName";
-    const renDomainFormInvoiceFromDate = "invoiceFromDate";
-    const renDomainFormInvoiceToDate = "invoiceToDate";
-    const renDomainFormItemDescription = "itemDescription";
-
 
     function __construct($requestMethod,
                          $postVars,
@@ -49,14 +46,12 @@ class CTRenDomain extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "renewals",
-            "technical"
-        ];
+        $roles = RENEWALS_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(604);
         $this->buRenDomain = new BURenDomain($this);
         $this->buCustomerItem = new BUCustomerItem($this);
         $this->dsRenDomain = new DSForm($this);
@@ -118,159 +113,7 @@ class CTRenDomain extends CTCNC
         }
     }
 
-    /**
-     * Display list of types
-     * @access private
-     * @throws Exception
-     */
-    function displayList()
-    {
-        $this->setMethodName('displayList');
-        $this->setPageTitle('Domain Names');
-        $this->setTemplateFiles(
-            array('RenDomainList' => 'RenDomainList.inc')
-        );
-        $dsRenDomain = new DataSet($this);
-        $this->buRenDomain->getAll(
-            $dsRenDomain,
-            $this->getParam('orderBy')
-        );
-
-        if ($dsRenDomain->rowCount() > 0) {
-            $this->template->set_block(
-                'RenDomainList',
-                'rowBlock',
-                'rows'
-            );
-            while ($dsRenDomain->fetchNext()) {
-
-                $customerItemID = $dsRenDomain->getValue(DBEJCustomerItem::customerItemID);
-
-                $urlEdit =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'edit',
-                            'ID'     => $customerItemID
-                        )
-                    );
-                $txtEdit = '[edit]';
-
-                $urlList =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action' => 'list'
-                        )
-                    );
-
-                $this->template->set_var(
-                    array(
-                        'customerName'    => $dsRenDomain->getValue(DBEJCustomerItem::customerName),
-                        'itemDescription' => $dsRenDomain->getValue(DBEJCustomerItem::itemDescription),
-                        'domain'          => $dsRenDomain->getValue(DBEJCustomerItem::notes),
-                        'invoiceFromDate' => Controller::dateYMDtoDMY(
-                            $dsRenDomain->getValue(DBEJCustomerItem::invoiceFromDate)
-                        ),
-                        'invoiceToDate'   => Controller::dateYMDtoDMY(
-                            $dsRenDomain->getValue(DBEJCustomerItem::invoiceToDate)
-                        ),
-                        'urlEdit'         => $urlEdit,
-                        'urlList'         => $urlList,
-                        'txtEdit'         => $txtEdit
-                    )
-                );
-                $this->template->parse(
-                    'rows',
-                    'rowBlock',
-                    true
-                );
-            }//while $dsRenDomain->fetchNext()
-        }
-        $this->template->parse(
-            'CONTENTS',
-            'RenDomainList',
-            true
-        );
-        $this->parsePage();
-    }
-
-    /**
-     * Called from sales order line to edit a renewal.
-     * The page passes
-     * ordheadID
-     * sequenceNo (line)
-     * renewalCustomerItemID (blank if renewal not created yet
-     *
-     *
-     * @throws Exception
-     */
-    function editFromSalesOrder()
-    {
-        $buSalesOrder = new BUSalesOrder($this);
-        $dsOrdline = new DataSet($this);
-        $buSalesOrder->getOrdlineByIDSeqNo(
-            $this->getParam('ordheadID'),
-            $this->getParam('sequenceNo'),
-            $dsOrdline
-        );
-
-        $renewalCustomerItemID = $dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
-
-        // has the order line get a renewal already?
-        if (!$renewalCustomerItemID) {
-            // create a new record first
-            $dsOrdhead = new DataSet($this);
-            $buSalesOrder->getOrderByOrdheadID(
-                $this->getParam('ordheadID'),
-                $dsOrdhead,
-                $dsDontNeedOrdline
-            );
-
-            $this->buRenDomain->createNewRenewal(
-                $dsOrdhead->getValue(DBEJOrdhead::customerID),
-                $dsOrdline->getValue(DBEJOrdline::itemID),
-                $renewalCustomerItemID,
-                $dsOrdhead->getValue(DBEJOrdhead::delSiteNo)                // returned by function
-            );
-
-
-            // For despatch, prevents the renewal appearing again today during despatch process.
-            $dbeOrdline = new DBEOrdline($this);
-
-            $dbeOrdline->setValue(
-                DBEJOrdline::ordheadID,
-                $dsOrdline->getValue(DBEJOrdline::ordheadID)
-            );
-            $dbeOrdline->setValue(
-                DBEJOrdline::sequenceNo,
-                $dsOrdline->getValue(DBEJOrdline::sequenceNo)
-            );
-
-            $dbeOrdline->getRow();
-            $dbeOrdline->setValue(
-                DBEJOrdline::renewalCustomerItemID,
-                $renewalCustomerItemID
-            );
-
-            $dbeOrdline->updateRow();
-
-        }
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'edit',
-                    'ID'     => $renewalCustomerItemID
-                )
-            );
-
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    /**
+/**
      * Edit/Add Activity
      * @access private
      * @throws Exception
@@ -326,7 +169,7 @@ class CTRenDomain extends CTCNC
         $disabled = CTCNC_HTML_DISABLED;
         $declined = null;
         $pricePerMonth = null;
-        if ($this->hasPermissions(PHPLIB_PERM_RENEWALS)) {
+        if ($this->hasPermissions(RENEWALS_PERMISSION)) {
             $readonly = null;
             $disabled = null;
             $declined =
@@ -445,9 +288,7 @@ class CTRenDomain extends CTCNC
                     $dsRenDomain->getValue(DBEJCustomerItem::itemID)
                 ),
                 'invoiceFromDate'                    => $dsRenDomain->getValue(DBEJCustomerItem::invoiceFromDate),
-                'installationDate'                   => Controller::dateYMDtoDMY(
-                    $dsRenDomain->getValue(DBEJCustomerItem::installationDate)
-                ),
+                'installationDate'                   => $dsRenDomain->getValue(DBEJCustomerItem::installationDate),
                 'invoiceToDate'                      => $dsRenDomain->getValue(DBEJCustomerItem::invoiceToDate),
                 'invoicePeriodMonths'                => Controller::htmlInputText(
                     $dsRenDomain->getValue(DBEJCustomerItem::invoicePeriodMonths)
@@ -489,6 +330,100 @@ class CTRenDomain extends CTCNC
             true
         );
         $this->parsePage();
+    }
+
+    private function parseInitialContractLength($initialContractLength)
+    {
+        foreach (self::InitialContractLengthValues as $value) {
+            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : null;
+            $this->template->set_var(
+                array(
+                    'initialContractLengthSelected'    => $initialContractLengthSelected,
+                    'initialContractLength'            => $value,
+                    'initialContractLengthDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'initialContractLengths',
+                'initialContractLengthBlock',
+                true
+            );
+        }
+    }
+
+        /**
+     * Called from sales order line to edit a renewal.
+     * The page passes
+     * ordheadID
+     * sequenceNo (line)
+     * renewalCustomerItemID (blank if renewal not created yet
+     *
+     *
+     * @throws Exception
+     */
+    function editFromSalesOrder()
+    {
+        $buSalesOrder = new BUSalesOrder($this);
+        $dsOrdline = new DataSet($this);
+        $buSalesOrder->getOrdlineByIDSeqNo(
+            $this->getParam('ordheadID'),
+            $this->getParam('sequenceNo'),
+            $dsOrdline
+        );
+
+        $renewalCustomerItemID = $dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
+
+        // has the order line get a renewal already?
+        if (!$renewalCustomerItemID) {
+            // create a new record first
+            $dsOrdhead = new DataSet($this);
+            $buSalesOrder->getOrderByOrdheadID(
+                $this->getParam('ordheadID'),
+                $dsOrdhead,
+                $dsDontNeedOrdline
+            );
+
+            $this->buRenDomain->createNewRenewal(
+                $dsOrdhead->getValue(DBEJOrdhead::customerID),
+                $dsOrdline->getValue(DBEJOrdline::itemID),
+                $renewalCustomerItemID,
+                $dsOrdhead->getValue(DBEJOrdhead::delSiteNo)                // returned by function
+            );
+
+
+            // For despatch, prevents the renewal appearing again today during despatch process.
+            $dbeOrdline = new DBEOrdline($this);
+
+            $dbeOrdline->setValue(
+                DBEJOrdline::ordheadID,
+                $dsOrdline->getValue(DBEJOrdline::ordheadID)
+            );
+            $dbeOrdline->setValue(
+                DBEJOrdline::sequenceNo,
+                $dsOrdline->getValue(DBEJOrdline::sequenceNo)
+            );
+
+            $dbeOrdline->getRow();
+            $dbeOrdline->setValue(
+                DBEJOrdline::renewalCustomerItemID,
+                $renewalCustomerItemID
+            );
+
+            $dbeOrdline->updateRow();
+
+        }
+
+        $urlNext =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => 'edit',
+                    'ID'     => $renewalCustomerItemID
+                )
+            );
+
+        header('Location: ' . $urlNext);
+        exit;
     }// end function editActivity()
 
     /**
@@ -549,22 +484,80 @@ class CTRenDomain extends CTCNC
         $this->buRenDomain->createRenewalsSalesOrders();
     }
 
-    private function parseInitialContractLength($initialContractLength)
+    /**
+     * Display list of types
+     * @access private
+     * @throws Exception
+     */
+    function displayList()
     {
-        foreach (self::InitialContractLengthValues as $value) {
-            $initialContractLengthSelected = ($initialContractLength == $value) ? CT_SELECTED : null;
-            $this->template->set_var(
-                array(
-                    'initialContractLengthSelected'    => $initialContractLengthSelected,
-                    'initialContractLength'            => $value,
-                    'initialContractLengthDescription' => $value
-                )
+        $this->setMethodName('displayList');
+        $this->setPageTitle('Domain Names');
+        $this->setTemplateFiles(
+            array('RenDomainList' => 'RenDomainList.inc')
+        );
+        $dsRenDomain = new DataSet($this);
+        $this->buRenDomain->getAll(
+            $dsRenDomain,
+            $this->getParam('orderBy')
+        );
+
+        if ($dsRenDomain->rowCount() > 0) {
+            $this->template->set_block(
+                'RenDomainList',
+                'rowBlock',
+                'rows'
             );
-            $this->template->parse(
-                'initialContractLengths',
-                'initialContractLengthBlock',
-                true
-            );
+            while ($dsRenDomain->fetchNext()) {
+
+                $customerItemID = $dsRenDomain->getValue(DBEJCustomerItem::customerItemID);
+
+                $urlEdit =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action' => 'edit',
+                            'ID'     => $customerItemID
+                        )
+                    );
+                $txtEdit = '[edit]';
+
+                $urlList =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action' => 'list'
+                        )
+                    );
+
+                $this->template->set_var(
+                    array(
+                        'customerName'    => $dsRenDomain->getValue(DBEJCustomerItem::customerName),
+                        'itemDescription' => $dsRenDomain->getValue(DBEJCustomerItem::itemDescription),
+                        'domain'          => $dsRenDomain->getValue(DBEJCustomerItem::notes),
+                        'invoiceFromDate' => Controller::dateYMDtoDMY(
+                            $dsRenDomain->getValue(DBEJCustomerItem::invoiceFromDate)
+                        ),
+                        'invoiceToDate'   => Controller::dateYMDtoDMY(
+                            $dsRenDomain->getValue(DBEJCustomerItem::invoiceToDate)
+                        ),
+                        'urlEdit'         => $urlEdit,
+                        'urlList'         => $urlList,
+                        'txtEdit'         => $txtEdit
+                    )
+                );
+                $this->template->parse(
+                    'rows',
+                    'rowBlock',
+                    true
+                );
+            }//while $dsRenDomain->fetchNext()
         }
+        $this->template->parse(
+            'CONTENTS',
+            'RenDomainList',
+            true
+        );
+        $this->parsePage();
     }
 }

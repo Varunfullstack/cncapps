@@ -26,11 +26,11 @@ class CTFirstTimeFixReport extends CTCNC
         );
 
         if (!$this->isUserSDManager()) {
-
             Header("Location: /NotAllowed.php");
             exit;
-
         }
+
+        $this->setMenuId(206);
     }
 
     /**
@@ -47,7 +47,7 @@ class CTFirstTimeFixReport extends CTCNC
                 $startDate = null;
                 if (@$this->getParam('startDate')) {
                     $startDate = DateTime::createFromFormat(
-                        'd/m/Y',
+                        DATE_MYSQL_DATE,
                         $this->getParam('startDate')
                     );
                 }
@@ -55,7 +55,7 @@ class CTFirstTimeFixReport extends CTCNC
                 $endDate = null;
                 if (@$this->getParam('endDate')) {
                     $endDate = DateTime::createFromFormat(
-                        'd/m/Y',
+                        DATE_MYSQL_DATE,
                         $this->getParam('endDate')
                     );
                 }
@@ -72,76 +72,6 @@ class CTFirstTimeFixReport extends CTCNC
             default:
                 $this->search();
         }
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function search()
-    {
-
-        $this->setTemplateFiles(
-            array(
-                'FirstTimeFixReport' => 'FirstTimeFixReport'
-            )
-        );
-
-
-        $hdUsers = (new BUUser($this))->getUsersByTeamLevel(1);
-
-        $this->template->set_block(
-            'FirstTimeFixReport',
-            'userBlock',
-            'hdUsers'
-        );
-
-        foreach ($hdUsers as $user) {
-
-
-            $this->template->set_var(
-                array(
-                    'userName' => $user['userName'],
-                    'userID'   => $user['cns_consno']
-                )
-            );
-
-            $this->template->parse(
-                'hdUsers',
-                'userBlock',
-                true
-            );
-        }
-
-        $fetchURL = $urlSubmit = Controller::buildLink(
-            $_SERVER ['PHP_SELF'],
-            array('action' => "fetchData")
-        );
-
-        $customerPopupURL =
-            Controller::buildLink(
-                CTCNC_PAGE_CUSTOMER,
-                array(
-                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
-                    'htmlFmt' => CT_HTML_FMT_POPUP
-                )
-            );
-
-        $this->setPageTitle('First Time Fix Report');
-
-        $this->template->set_var(
-            array(
-                'customerPopupURL' => $customerPopupURL,
-                'fetchDataURL'     => $fetchURL
-            )
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'FirstTimeFixReport',
-            true
-        );
-
-        $this->parsePage();
     }
 
     private function getFirstTimeFixData($customerID = null,
@@ -290,5 +220,75 @@ ORDER BY engineer.firstName";
         ) : 'N/A';
         $data['phonedThroughRequests'] = $totalRaised;
         return $data;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function search()
+    {
+
+        $this->setTemplateFiles(
+            array(
+                'FirstTimeFixReport' => 'FirstTimeFixReport'
+            )
+        );
+
+
+        $hdUsers = (new BUUser($this))->getUsersByTeamLevel(1);
+
+        $this->template->set_block(
+            'FirstTimeFixReport',
+            'userBlock',
+            'hdUsers'
+        );
+
+        foreach ($hdUsers as $user) {
+
+
+            $this->template->set_var(
+                array(
+                    'userName' => $user['userName'],
+                    'userID'   => $user['cns_consno']
+                )
+            );
+
+            $this->template->parse(
+                'hdUsers',
+                'userBlock',
+                true
+            );
+        }
+
+        $fetchURL = $urlSubmit = Controller::buildLink(
+            $_SERVER ['PHP_SELF'],
+            array('action' => "fetchData")
+        );
+
+        $customerPopupURL =
+            Controller::buildLink(
+                CTCNC_PAGE_CUSTOMER,
+                array(
+                    'action'  => CTCNC_ACT_DISP_CUST_POPUP,
+                    'htmlFmt' => CT_HTML_FMT_POPUP
+                )
+            );
+
+        $this->setPageTitle('First Time Fix Report');
+
+        $this->template->set_var(
+            array(
+                'customerPopupURL' => $customerPopupURL,
+                'fetchDataURL'     => $fetchURL
+            )
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'FirstTimeFixReport',
+            true
+        );
+
+        $this->parsePage();
     }
 }

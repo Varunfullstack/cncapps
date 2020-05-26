@@ -35,15 +35,10 @@ class CTTeamAndUserStatistics extends CTCNC
         );
 
         if (!$this->isUserSDManager()) {
-
-            $roles = [
-                "reports",
-            ];
-            if (!self::hasPermissions($roles)) {
-                Header("Location: /NotAllowed.php");
-                exit;
-            }
+            Header("Location: /NotAllowed.php");
+            exit;
         }
+        $this->setMenuId(207);
         $this->buEscalationReport = new BUEscalationReport($this);
 
         $this->dsSearchForm = new DSForm ($this);
@@ -125,9 +120,9 @@ class CTTeamAndUserStatistics extends CTCNC
         $this->template->set_var(
             array(
                 'formError'        => $this->formError,
-                'fromDate'         => Controller::dateYMDtoDMY($this->dsSearchForm->getValue(self::searchFormFromDate)),
+                'fromDate'         => $this->dsSearchForm->getValue(self::searchFormFromDate),
                 'fromDateMessage'  => $this->dsSearchForm->getMessage(self::searchFormFromDate),
-                'toDate'           => Controller::dateYMDtoDMY($this->dsSearchForm->getValue(self::searchFormToDate)),
+                'toDate'           => $this->dsSearchForm->getValue(self::searchFormToDate),
                 'toDateMessage'    => $this->dsSearchForm->getMessage(self::searchFormToDate),
                 'urlSubmit'        => $urlSubmit,
                 'teamReport'       => $teamReport,

@@ -19,32 +19,38 @@
 {data}
 <script>
     const autocompleteURL = "/Customer.php?action=searchName";
-    $(function () {
+    window.addEventListener('DOMContentLoaded', function () {
+        reason = CKEDITOR.replace('editableText', {
+                contentsCss: '/screen.css',
+                toolbarStartupExpanded: false,
+                disableNativeSpellChecker: false,
+
+                toolbar: 'CNCToolbar',
+
+                toolbar_CNCToolbar:
+                    [
+                        ['Source', '-', '-', 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor'],
+                        ['NumberedList', 'BulletedList'],
+                        ['Table'],
+                        ['Format', 'Font', 'FontSize'],
+                        ['Anchor', 'Link'],
+                        ['Undo', 'Redo']
+                    ],
+                extraPlugins: 'font',
+                fontSize_sizes: '8/8pt;9/9pt;10/10pt;11/11pt;12/12pt;14/14pt;16/16pt;18/18pt;20/20pt;22/22pt;24/24pt;26/26pt;28/28pt;36/36pt;48/48pt;72/72pt',
+                height: '800px',
+                width: '890px',
+                extraAllowedContent: true,
+                allowedContent: true,
+                script: true
+            }
+        );
+        CKEDITOR.config.disableNativeSpellChecker = false;
+        CKEDITOR.config.removePlugins = 'liststyle,tabletools,scayt,menubutton,contextmenu,language,tableselection';
+
         window.meetingDate = $('#meetingDate').get(0);
-        $('#customerString').autocomplete({
-            minLength: 0,
-            source: function (request, responseCB) {
-                const data = {};
-                data.term = request.term;
-                $.ajax(
-                    autocompleteURL,
-                    {
-                        method: 'POST',
-                        dataType: 'json',
-                        data: data
-                    }
-                ).then(response => {
-                    responseCB(response);
-                })
-            },
-            select: function (event, ui) {
-                event.preventDefault();
-                event.target.value = ui.item.label;
-                $('#customerID').val(ui.item.id);
-            },
-            delay: 200,
-        }).focus(function () {
-            $(this).autocomplete("search", $(this).val());
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
         });
         $('#create-pdf').click(function () {
             $(this).attr('disabled', true);
@@ -343,6 +349,7 @@
                     value="{customerString}"
                     size="50"
                     maxlength="50"
+                    customer-search
             > <font class="formErrorMessage"> {customerIDMessage} </font></td>
         </tr>
         <tr>
@@ -384,16 +391,14 @@
                 <div align="right">Review Meeting Date</div>
             </td>
             <td>
-                <input
-                        type="text"
-                        name="searchForm[1][meetingDate]"
-                        value="{meetingDate}"
-                        id="meetingDate"
-                        placeholder="d/m/y"
-                        size="10"
-                        maxlength="10"
-                        class="jqueryCalendar"
-                        autocomplete="off"
+                <input type="date"
+                       name="searchForm[1][meetingDate]"
+                       value="{meetingDate}"
+                       id="meetingDate"
+                       placeholder="d/m/y"
+                       size="10"
+                       maxlength="10"
+                       autocomplete="off"
                 >
                 <font class="formErrorMessage"> {meetingDateMessage} </font></td>
         </tr>
@@ -419,35 +424,6 @@
            id="create-pdf"
            value="Create PDF"
     >
-    <script type="text/javascript">
-        reason = CKEDITOR.replace('editableText', {
-                contentsCss: '/screen.css',
-                toolbarStartupExpanded: false,
-                disableNativeSpellChecker: false,
-
-                toolbar: 'CNCToolbar',
-
-                toolbar_CNCToolbar:
-                    [
-                        ['Source', '-', '-', 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor'],
-                        ['NumberedList', 'BulletedList'],
-                        ['Table'],
-                        ['Format', 'Font', 'FontSize'],
-                        ['Anchor', 'Link'],
-                        ['Undo', 'Redo']
-                    ],
-                extraPlugins: 'font',
-                fontSize_sizes: '8/8pt;9/9pt;10/10pt;11/11pt;12/12pt;14/14pt;16/16pt;18/18pt;20/20pt;22/22pt;24/24pt;26/26pt;28/28pt;36/36pt;48/48pt;72/72pt',
-                height: '800px',
-                width: '890px',
-                extraAllowedContent: true,
-                allowedContent: true,
-                script: true
-            }
-        );
-        CKEDITOR.config.disableNativeSpellChecker = false;
-        CKEDITOR.config.removePlugins = 'liststyle,tabletools,scayt,menubutton,contextmenu,language,tableselection';
-    </script>
 </div>
 
 

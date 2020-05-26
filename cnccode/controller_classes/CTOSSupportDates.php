@@ -24,10 +24,7 @@ class CTOSSupportDates extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = [
-            "maintenance",
-        ];
-        if (!self::hasPermissions($roles)) {
+        if (!self::isSdManager()) {
             Header("Location: /NotAllowed.php");
             exit;
         }
@@ -82,23 +79,7 @@ class CTOSSupportDates extends CTCNC
                 }
 
                 $availabilityDateString = $_REQUEST['availabilityDate'];
-                if ($availabilityDateString) {
-                    $availabilityDate = DateTime::createFromFormat('d/m/Y', $availabilityDateString);
-                    if (!$availabilityDate) {
-                        throw new Exception('Date format is wrong');
-                    }
-                    $availabilityDateString = $availabilityDate->format('Y-m-d');
-                }
-
                 $endOfLifeDateString = $_REQUEST['endOfLifeDate'];
-                if ($endOfLifeDateString) {
-                    $endOfLifeDate = DateTime::createFromFormat('d/m/Y', $endOfLifeDateString);
-                    if (!$endOfLifeDate) {
-                        throw new Exception('Date format is wrong');
-                    }
-                    $endOfLifeDateString = $endOfLifeDate->format('Y-m-d');
-                }
-
 
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::name, $_REQUEST['name']);
                 $DBEOSSupportDates->setValue(DBEOSSupportDates::version, $_REQUEST['version']);
@@ -113,20 +94,20 @@ class CTOSSupportDates extends CTCNC
 
                 $availabilityDateString = $_REQUEST['availabilityDate'];
                 if ($availabilityDateString) {
-                    $availabilityDate = DateTime::createFromFormat('d/m/Y', $availabilityDateString);
+                    $availabilityDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $availabilityDateString);
                     if (!$availabilityDate) {
                         throw new Exception('Date format is wrong');
                     }
-                    $availabilityDateString = $availabilityDate->format('Y-m-d');
+                    $availabilityDateString = $availabilityDate->format(DATE_MYSQL_DATE);
                 }
 
                 $endOfLifeDateString = $_REQUEST['endOfLifeDate'];
                 if ($endOfLifeDateString) {
-                    $endOfLifeDate = DateTime::createFromFormat('d/m/Y', $endOfLifeDateString);
+                    $endOfLifeDate = DateTime::createFromFormat(DATE_MYSQL_DATE, $endOfLifeDateString);
                     if (!$endOfLifeDate) {
                         throw new Exception('Date format is wrong');
                     }
-                    $endOfLifeDateString = $endOfLifeDate->format('Y-m-d');;
+                    $endOfLifeDateString = $endOfLifeDate->format(DATE_MYSQL_DATE);
                 }
 
 
@@ -159,31 +140,14 @@ class CTOSSupportDates extends CTCNC
 
                 $data = [];
                 while ($DBEOSSupportDates->fetchNext()) {
-                    $availabilityDateString = $DBEOSSupportDates->getValue(DBEOSSupportDates::availabilityDate);
-                    if ($availabilityDateString) {
-                        $availabilityDate = DateTime::createFromFormat('Y-m-d', $availabilityDateString);
-                        if (!$availabilityDate) {
-                            throw new Exception('Date format is wrong');
-                        }
-                        $availabilityDateString = $availabilityDate->format('d/m/Y');
-                    }
 
-                    $endOfLifeDateString = $DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate);
-                    if ($endOfLifeDateString) {
-                        $endOfLifeDate = DateTime::createFromFormat('Y-m-d', $endOfLifeDateString);
-                        if (!$endOfLifeDate) {
-                            throw new Exception('Date format is wrong');
-                        }
-
-                        $endOfLifeDateString = $endOfLifeDate->format('d/m/Y');
-                    }
 
                     $data[] = [
                         "id"               => $DBEOSSupportDates->getValue(DBEOSSupportDates::id),
                         "name"             => $DBEOSSupportDates->getValue(DBEOSSupportDates::name),
                         "version"          => $DBEOSSupportDates->getValue(DBEOSSupportDates::version),
-                        "availabilityDate" => $availabilityDateString,
-                        "endOfLifeDate"    => $endOfLifeDateString,
+                        "availabilityDate" => $DBEOSSupportDates->getValue(DBEOSSupportDates::availabilityDate),
+                        "endOfLifeDate"    => $DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate),
                         "threshold"        => $this->dsSystemHeader->getValue(DBEHeader::OSSupportDatesThresholdDays),
                         "isServer"         => $DBEOSSupportDates->getValue(DBEOSSupportDates::isServer)
                     ];

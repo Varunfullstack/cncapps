@@ -406,12 +406,12 @@ class CTSalesOrder extends CTCNC
         );
         $roles = [
             "sales",
-            "technical",
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
+        $this->setMenuId(301);
         $this->buCustomer = new BUCustomer($this);
         $this->buSalesOrder = new BUSalesOrder($this);
         $this->buItem = new BUItem($this);
@@ -487,108 +487,108 @@ class CTSalesOrder extends CTCNC
                 $this->displayOrder();
                 break;
             case CTSALESORDER_ACT_SEND_QUOTE_DOC:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->sendQuoteDoc();
                 break;
             case CTSALESORDER_ACT_DELETE_QUOTE_DOC:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->deleteQuoteDoc();
                 break;
             case CTSALESORDER_ACT_UPDATE_LINES:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->updateLines();
                 break;
             case CTSALESORDER_ACT_COPY_TO_ORDER:
             case CTSALESORDER_ACT_CONVERT_TO_ORDER:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->convertToOrder();
                 break;
             case CTSALESORDER_ACT_INSERT_FROM_ORDER:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->insertFromOrder();
                 break;
             case CTSALESORDER_ACT_DELETE_LINES:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->deleteLines();                        // bulk delete of selected lines
                 break;
             case CTSALESORDER_ACT_CHANGE_SUPPLIER:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->changeSupplier();
                 break;
             case CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->generateOrderForm();
                 break;
             case CTSALESORDER_ACT_CREATE_QUICK_QUOTE:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->generateQuoteDoc();
                 break;
             case CTSALESORDER_ACT_UPLOAD_QUOTE_DOC:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->uploadQuoteDoc();
                 break;
             case CTSALESORDER_ACT_DISPLAY_QUOTE_DOC:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->displayQuoteDoc();
                 break;
             case CTSALESORDER_ACT_DELETE_ORDER:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->deleteOrder();
                 break;
             case CTSALESORDER_ACT_DOWNLOAD_CSV:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->downloadCSV();
                 break;
             case CTSALESORDER_ACT_UPDATE_DEL_ADDRESS:
             case CTSALESORDER_ACT_UPDATE_INV_ADDRESS:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->updateAddress();
                 break;
             case CTSALESORDER_ACT_UPDATE_INV_CONTACT:
             case CTSALESORDER_ACT_UPDATE_DEL_CONTACT:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->updateContact();
                 break;
             case CTSALESORDER_ACT_ADD_ORDLINE:
             case CTSALESORDER_ACT_EDIT_ORDLINE:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->editOrderLine();
                 break;
             case CTSALESORDER_ACT_UPDATE_ORDLINE:
             case CTSALESORDER_ACT_INSERT_ORDLINE:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->updateOrderLine();
                 break;
             case CTSALESORDER_ACT_MOVE_ORDLINE_UP:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->moveOrderLineUp();
                 break;
             case CTSALESORDER_ACT_MOVE_ORDLINE_DOWN:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->moveOrderLineDown();
                 break;
             case CTSALESORDER_ACT_DELETE_ORDLINE:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->deleteOrderLine();
                 break;
             case CTSALESORDER_ACT_UPDATE_HEADER:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->updateHeader();
                 break;
             case CTSALESORDER_ACT_SEND_CONFIRMATION:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->sendOrderConfirmation();
                 break;
             case 'updateItemPrice':
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->updateItemPrice();
                 break;
             case 'serviceRequest':
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->serviceRequest();
                 break;
             case CTSALESORDER_ACT_CREATE_SR_FROM_LINES:
-                $this->checkPermissions(PHPLIB_PERM_SALES);
+                $this->checkPermissions(SALES_PERMISSION);
                 $this->serviceRequestFromLines();
                 break;
             case 'sendReminder':
@@ -630,11 +630,11 @@ class CTSalesOrder extends CTCNC
             $this->displaySearchForm();
             return;
         }
-        if (($this->getToDateYMD()) && ($this->getFromDateYMD())) {
-            if ($this->getToDateYMD() < $this->getFromDateYMD()) {
-                $this->setToDateMessage(CTSALESORDER_TO_DATE_SMALLER);
-            }
+
+        if ($this->getToDate() && $this->getFromDate() && $this->getToDate() < $this->getFromDate()) {
+            $this->setToDateMessage(CTSALESORDER_TO_DATE_SMALLER);
         }
+
         if ($this->getFormError()) {
             $this->displaySearchForm();
             return;
@@ -646,8 +646,8 @@ class CTSalesOrder extends CTCNC
             $this->getOrderType(),
             $this->getCustPORef(),
             $this->getLineText(),
-            $this->getFromDateYMD(),
-            $this->getToDateYMD(),
+            $this->getFromDate(),
+            $this->getToDate(),
             $this->getQuotationUserID(),
             $this->dsOrdhead
         );
@@ -798,7 +798,7 @@ class CTSalesOrder extends CTCNC
             $custPORefCol = $this->dsOrdhead->columnExists(DBEOrdhead::custPORef);
             $rowNum = 1;
             while ($this->dsOrdhead->fetchNext()) {
-                if ($this->hasPermissions(PHPLIB_PERM_SALES)) {
+                if ($this->hasPermissions(SALES_PERMISSION)) {
                     $customerURL =
                         Controller::buildLink(
                             CTCNC_PAGE_CUSTOMER,
@@ -1053,47 +1053,6 @@ class CTSalesOrder extends CTCNC
         return $this->custPORef;
     }
 
-    function setCustPORef($ref)
-    {
-        $this->custPORef = $ref;
-    }
-
-    function getToDateYMD()
-    {
-        return $this->convertDateYMD($this->getToDate());
-    }
-
-    /**
-     * @param $dateDMY
-     * @return string
-     */
-    function convertDateYMD($dateDMY)
-    {
-        if (!$dateDMY) {
-            return null;
-        }
-        $dateArray = explode(
-            '/',
-            $dateDMY
-        );
-        return ($dateArray[2] . '-' . str_pad(
-                $dateArray[1],
-                2,
-                '0',
-                STR_PAD_LEFT
-            ) . '-' . str_pad(
-                $dateArray[0],
-                2,
-                '0',
-                STR_PAD_LEFT
-            ));
-    }
-
-    function getFromDateYMD()
-    {
-        return $this->convertDateYMD($this->getFromDate());
-    }
-
     /**
      * Display one order
      * @access private
@@ -1125,7 +1084,7 @@ class CTSalesOrder extends CTCNC
         $urlCustomerNote = null;
 
 
-        if ($this->getAction() != CTSALESORDER_ACT_CREATE_QUOTE AND $this->getAction(
+        if ($this->getAction() != CTSALESORDER_ACT_CREATE_QUOTE and $this->getAction(
             ) != CTSALESORDER_ACT_CREATE_ORDER) {
 
             if (!$this->getOrdheadID()) {
@@ -1213,7 +1172,7 @@ class CTSalesOrder extends CTCNC
                 $actions[CTSALESORDER_ACT_COPY_TO_ORDER] = 'copy to order';
                 $actions[CTSALESORDER_ACT_CONVERT_TO_ORDER] = 'convert to order';
             }
-            if ($orderType == 'Q' OR $orderType == 'I') {
+            if ($orderType == 'Q' or $orderType == 'I') {
                 $actions[CTSALESORDER_ACT_DELETE_LINES] = 'delete lines';
                 $actions[CTSALESORDER_ACT_UPDATE_LINES] = 'update values';
                 $actions[CTSALESORDER_ACT_INSERT_FROM_ORDER] = 'insert lines from order';
@@ -1280,7 +1239,7 @@ class CTSalesOrder extends CTCNC
     Any one outside the sales group will not be able to do anything or see anything other
     than non-value fields.
     */
-        if (!$this->hasPermissions(PHPLIB_PERM_SALES)) {
+        if (!$this->hasPermissions(SALES_PERMISSION)) {
             $restrictedView = CTCNC_HTML_DISABLED;
             $readOnly = CTCNC_HTML_DISABLED;
             $valuesDisabled = CTCNC_HTML_DISABLED;
@@ -1290,7 +1249,7 @@ class CTSalesOrder extends CTCNC
             /*
       Inside sales group, decide which items are readonly
       */
-            if ($orderType == 'Q' OR $orderType == 'I') {
+            if ($orderType == 'Q' or $orderType == 'I') {
                 /*
         Quotes or initial orders allow all
         */
@@ -1302,7 +1261,7 @@ class CTSalesOrder extends CTCNC
                 $valuesDisabled = CTCNC_HTML_DISABLED;
             }
 
-            if ($orderType == 'C' AND !$this->hasPermissions(PHPLIB_PERM_ACCOUNTS)) {
+            if ($orderType == 'C' and !$this->hasPermissions(ACCOUNTS_PERMISSION)) {
                 $valuesDisabled = null;
             }
 
@@ -1576,7 +1535,7 @@ class CTSalesOrder extends CTCNC
             }
 
             // Show navigate link to invoices if order is part or completed and they exist
-            if (($orderType == 'P') OR ($orderType == 'C')) {
+            if (($orderType == 'P') or ($orderType == 'C')) {
                 $buInvoice = new BUInvoice($this);
                 $invoiceCount = $buInvoice->countInvoicesByOrdheadID($dsOrdhead->getValue(DBEOrdhead::ordheadID));
                 if ($invoiceCount > 0) {
@@ -1599,7 +1558,7 @@ class CTSalesOrder extends CTCNC
             }
             // Show despatch link if order type is part-despatched or initial and there are lines
             if (
-                (($orderType == 'P') OR ($orderType == 'I')) and
+                (($orderType == 'P') or ($orderType == 'I')) and
                 ($dsOrdline->rowCount() > 0) and
                 (!common_isAnInternalStockLocation($dsOrdhead->getValue(DBEOrdhead::customerID)))
             ) {
@@ -2284,7 +2243,7 @@ class CTSalesOrder extends CTCNC
                 $project->getRowsByColumn(DBEProject::ordHeadID);
                 $requiredByDateValue = null;
                 if ($project->fetchNext() && $project->getValue(DBEProject::commenceDate)) {
-                    $requiredByDateValue = Controller::dateYMDtoDMY($project->getValue(DBEProject::commenceDate));
+                    $requiredByDateValue = $project->getValue(DBEProject::commenceDate);
                 }
 
                 $this->template->set_var(
@@ -2365,7 +2324,7 @@ class CTSalesOrder extends CTCNC
 
 
         // if part despatched or complete show any delivery notes
-        if (($orderType == 'P') OR ($orderType == 'C')) {
+        if (($orderType == 'P') or ($orderType == 'C')) {
             $buDespatch = new BUDespatch($this);
             $ctDeliveryNotes = new CTDeliveryNotes(
                 $this,
@@ -4938,7 +4897,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
 
         $this->template->set_var(
             array(
-                'etaDate'        => Controller::dateYMDtoDMY($dsInput->getValue(self::etaDate)),
+                'etaDate'        => $dsInput->getValue(self::etaDate),
                 'etaDateMessage' => $dsInput->getMessage(self::etaDate),
 
                 'serviceRequestText'                  => $dsInput->getValue(DBEOrdhead::serviceRequestText),
@@ -4951,16 +4910,12 @@ now that the notes are in a text field we need to split the lines up for the PDF
 
         $this->contractDropdown(
             $dsOrdhead->getValue(DBEOrdhead::customerID),
-            $dsInput->getValue(DBEOrdhead::serviceRequestCustomerItemID),
-            'SalesOrderServiceRequest',
-            'contractBlock'
+            $dsInput->getValue(DBEOrdhead::serviceRequestCustomerItemID)
         );
 
         $this->priorityDropdown(
             $dsInput->getValue(DBEOrdhead::serviceRequestPriority),
-            $buActivity,
-            'SalesOrderServiceRequest',
-            'priorityBlock'
+            $buActivity
         );
 
         $this->standardTextList(
@@ -4982,7 +4937,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
     function contractDropdown(
         $customerID,
         $serviceRequestCustomerItemID,
-        $templateName = 'SalesOrderVisitRequest',
+        $templateName = 'SalesOrderServiceRequest',
         $blockName = 'contractBlock'
     )
     {
@@ -5039,7 +4994,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
     function priorityDropdown(
         $serviceRequestPriority,
         $buActivity,
-        $templateName = 'SalesOrderVisitRequest',
+        $templateName = 'SalesOrderServiceRequest',
         $blockName = 'priorityBlock'
     )
     {
