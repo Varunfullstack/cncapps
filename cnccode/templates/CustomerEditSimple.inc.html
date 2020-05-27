@@ -2542,6 +2542,19 @@
                         </td>
                     </tr>
                     <tr>
+                        <td class="content">What3Words</td>
+                        <td class="content">
+                            <input {disabled}
+                                   title="[word].[word].[word] format required"
+                                   name="form[site][{customerID}{siteNo}][what3Words]"
+                                   value="{what3Words}"
+                                   pattern="^\w+\.\w+\.\w+$"
+                                   size="15"
+                                   maxlength="15"
+                            >
+                        </td>
+                    </tr>
+                    <tr>
                         <td class="content">Phone</td>
                         <td class="content">
                             <input {disabled}
@@ -3067,7 +3080,8 @@
                     <td>
                         <div class="contactSupportLevel">
 
-                            <select name="form[contact][{contactID}][supportLevel]" {disabled}
+                            <select name="form[contact][{contactID}][supportLevel]"
+                                    {disabled}
                                     data-validation="atLeastOneMain"
                                     data-type="mainSelector"
                                     data-except="$('#referred').prop('checked') || isProspect()"
@@ -3086,7 +3100,8 @@
                     <td class="center ">
                         <div class="contactPassword">
 
-                            <button onclick="askNewPassword()" {disabled}
+                            <button onclick="askNewPassword()"
+                                    {disabled}
                                     data-contact-id="{contactID}"
                                     type="button"
                                     class="{portalPasswordButtonClass}"

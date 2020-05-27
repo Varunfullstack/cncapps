@@ -27,6 +27,7 @@ class DBESite extends DBCNCEntity
     const maxTravelHours = "maxTravelHours";
     const activeFlag = "activeFlag";
     const nonUKFlag = "nonUKFlag";
+    const what3Words = "what3Words";
 
     /**
      * calls constructor()
@@ -135,6 +136,13 @@ class DBESite extends DBCNCEntity
             DA_ALLOW_NULL,
             "add_non_uk_flag"
         );
+
+        $this->addColumn(
+            self::what3Words,
+            DA_TEXT,
+            DA_ALLOW_NULL
+        );
+
         $this->setPK(1);        // NOTE: This is not really the PK, just the second element
         $this->setAddColumnsOff();
         $this->setNewRowValue(
