@@ -601,6 +601,10 @@ class CTCustomer extends CTCNC
                 DBESite::add1,
                 @$value['add1']
             );
+            $this->dsSite->setValue(
+                DBESite::what3Words,
+                @$value[DBESite::what3Words]
+            );
             if (!$this->dsSite->getValue(DBESite::add1)) {
                 $this->setFormErrorOn();
                 $this->dsSite->setValue(
@@ -2198,6 +2202,7 @@ class CTCustomer extends CTCNC
                     'county'         => $this->dsSite->getValue(DBESite::county),
                     'postcodeClass'  => $this->dsSite->getValue(self::siteFormPostcodeClass),
                     'postcode'       => $this->dsSite->getValue(DBESite::postcode),
+                    'what3Words'     => $this->dsSite->getValue(DBESite::what3Words),
                     'sitePhone'      => $this->dsSite->getValue(DBESite::phone),
                     'siteNo'         => $this->dsSite->getValue(DBESite::siteNo),
                     'customerID'     => $this->dsSite->getValue(DBESite::customerID),

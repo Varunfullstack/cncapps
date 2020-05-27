@@ -2,6 +2,9 @@
 <script src='.javascript/ajax.js'
 ></script>
 <style>
+    .what3WordsLinkHolder {
+        vertical-align: middle;
+    }
 
     .has-error table thead tr {
         background-color: red;
@@ -718,6 +721,12 @@
 </script>
 <script type="text/JavaScript">
 
+
+    function updateWhat3WordsLink(event) {
+        generateWhat3WordsLinks(event.target);
+    }
+
+
     function checkLink() {
         const iconElement = event.target;
         const input = iconElement.nextElementSibling;
@@ -789,10 +798,6 @@
             $('#primaryMainContactSelector').attr('required', true);
         }
     }
-
-    window.addEventListener('DOMContentLoaded', function () {
-        checkIsProspect();
-    })
 
     function isProspect() {
         const becameCustomerDateElm = document.getElementById('becameCustomerDate');
@@ -912,7 +917,40 @@
 
     let validatingContactsModal;
 
+    const what3WordsBlackImg = document.createElement('img');
+    what3WordsBlackImg.src = '/images/w3w_SymbolTransparentBackground_RGB_Black.png'
+    what3WordsBlackImg.height = 30;
+    const what3WordsRedImg = document.createElement('img');
+    what3WordsRedImg.src = '/images/w3w_SymbolTransparentBackground_RGB_Red.png'
+    what3WordsRedImg.height = 30;
+
+
+    function generateWhat3WordsLinks(what3WordsInput) {
+        const holder = what3WordsInput.nextElementSibling;
+        holder.innerHTML = ''
+        const value = what3WordsInput.value;
+        const link = document.createElement('a');
+        const redImg = what3WordsRedImg.cloneNode();
+        link.appendChild(redImg);
+        if (value && what3WordsInput.checkValidity()) {
+            link.replaceChild(what3WordsBlackImg.cloneNode(), redImg);
+            link.href = "https://what3words.com/" + value;
+            link.target = '_blank';
+        }
+        holder.appendChild(link);
+    }
+
     window.addEventListener('DOMContentLoaded', function () {
+
+        loadNote('first');
+        checkIsProspect();
+
+
+        document.querySelectorAll('.what3WordsInput').forEach(node => {
+            console.log('test');
+            node.addEventListener('change', updateWhat3WordsLink);
+            generateWhat3WordsLinks(node);
+        })
 
         $('#newPasswordDialog').dialog({
             autoOpen: false, width: 500, close: function () {
@@ -1027,7 +1065,6 @@
 
         function onValidation(evt, valid) {
             //we have to generate the list of errored elements
-            console.log(evt, valid);
             const erroredElements = $('input.error').toArray()
 
             if (!erroredElements.length) {
@@ -1580,11 +1617,6 @@
         return toReturn;
 
     }
-
-    window.addEventListener('DOMContentLoaded', function () {
-        loadNote('first');
-    })
-    //-->
 </script>
 
 <style>
@@ -2549,9 +2581,12 @@
                                    name="form[site][{customerID}{siteNo}][what3Words]"
                                    value="{what3Words}"
                                    pattern="^\w+\.\w+\.\w+$"
-                                   size="15"
-                                   maxlength="15"
+                                   size="30"
+                                   class="what3WordsInput"
                             >
+                            <span class="what3WordsLinkHolder">
+
+                            </span>
                         </td>
                     </tr>
                     <tr>
