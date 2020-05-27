@@ -1301,8 +1301,6 @@ class CTCustomerItem extends CTCNC
             $dsCustomerItem
         );
         $url = $this->getContractUrl($dsCustomerItem);
-        var_dump($url);
-        exit;
         header('Location: ' . $url);
         exit;
     }
