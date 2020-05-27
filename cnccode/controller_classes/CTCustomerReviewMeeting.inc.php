@@ -1469,6 +1469,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
             "supervisor" => 0,
             "support"    => 0,
             "delegate"   => 0,
+            "furlough"   => 0,
             "total"      => 0
         ];
 
@@ -1598,6 +1599,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
         $supportContactInfo .= "<tr><td>Supervisor</td><td>$supportContactsCounts[supervisor]</td></tr>";
         $supportContactInfo .= "<tr><td>Support</td><td>$supportContactsCounts[support]</td></tr>";
         $supportContactInfo .= "<tr><td>Delegate</td><td>$supportContactsCounts[delegate]</td></tr>";
+        $supportContactInfo .= "<tr><td>Furlough</td><td>$supportContactsCounts[furlough]</td></tr>";
         $supportContactInfo .= "<tr><td>Total</td><td>$supportContactsCounts[total]</td></tr>";
         $supportContactInfo .= "</tbody></table>";
 
