@@ -333,14 +333,6 @@ class ItemNotYetReceived implements JsonSerializable
         return $this->itemId == 1491;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getExpectedTBC()
-    {
-        return $this->expectedTBC;
-    }
-
     public function jsonSerialize()
     {
         return array_merge(

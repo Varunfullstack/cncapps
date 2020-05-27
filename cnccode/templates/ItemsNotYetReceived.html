@@ -27,7 +27,7 @@
         document.getElementById('selectorHolder').appendChild(daysAgoSelector);
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
-        let daysAgoValue = 7;
+        let daysAgoValue = 7 * 6;
         if (urlParams.get('daysAgo')) {
             daysAgoValue = urlParams.get('daysAgo');
         }
@@ -253,9 +253,14 @@
         color: black;
     }
 </style>
-<p id="selectorHolder">
-
-</p>
+<div>
+    <label>
+        Required within the next
+    </label>
+    <div style="display: inline-block"
+         id="selectorHolder"
+    ></div>
+</div>
 <P>
     <span style="color:red;background-color: red">R</span>
     <input type="checkbox"
