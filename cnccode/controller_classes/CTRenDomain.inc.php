@@ -46,7 +46,7 @@ class CTRenDomain extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = RENEWALS_PERMISSION;
+        $roles = [RENEWALS_PERMISSION, TECHNICAL_PERMISSION];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;
@@ -113,7 +113,7 @@ class CTRenDomain extends CTCNC
         }
     }
 
-/**
+    /**
      * Edit/Add Activity
      * @access private
      * @throws Exception
@@ -351,7 +351,7 @@ class CTRenDomain extends CTCNC
         }
     }
 
-        /**
+    /**
      * Called from sales order line to edit a renewal.
      * The page passes
      * ordheadID

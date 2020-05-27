@@ -1,6 +1,13 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.0.2] - 2020-05-27
+### Fixed
+- User.php shows wrong length of service value
+- CustomerItem.php displayCI permissions should be Technical or Sales
+- Added technical permission to contracts pages
+- Brought back environment colors!
+
 ## [v4.0.1] - 2020-05-26
 ### Fixed
 - Current Activity Report bigger headings
