@@ -32,6 +32,10 @@ This project changes will be shown here.
 ### Fixed
 - Fixed issue with awaiting CNC not being set correctly 
 
+## [unreleased]
+### Changed
+- Issue 840 - PO Status v10
+
 ## [v3.14.3] - 2020-05-12
 ### Fixed
 - Fixed issue when trying to send Sales Order reminder

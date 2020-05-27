@@ -31,7 +31,6 @@ class BUItemsNotYetReceived extends Business
                'Direct'
            )                                                           AS direct,
        poh_ord_date                                                    as purchaseOrderDate,
-       
        (SELECT MIN(ca.caa_date)
         FROM callactivity ca
         WHERE ca.caa_problemno = minServiceRequest.`pro_problemno`
@@ -50,7 +49,6 @@ class BUItemsNotYetReceived extends Business
        pol_exp_date                                                    as expectedOn,
        pol_cost                                                        as cost,
        project.projectID,
-       
        minServiceRequest.`pro_problemno`                               as serviceRequestID,
        expectedTBC
 FROM porline
@@ -73,13 +71,18 @@ FROM porline
 WHERE 
   item.excludeFromPOCompletion = 'N'
   AND customer.cus_name <> 'CNC Operating Stock'
-  and (porline.pol_cost > 0 or porline.pol_cost < 0)and odh_type <> 'C'
-  and poh_required_by > (now() - INTERVAL ? day)
+  and (porline.pol_cost > 0 or porline.pol_cost < 0)
+  and odh_type <> 'C'
+  and (? = -1 or (( poh_required_by > (now() - INTERVAL ? day) or poh_required_by is not null) or poh_required_by is null)) 
 ORDER BY poh_required_by, ordhead.`odh_custno` DESC, pol_porno, `pol_lineno` 
 ";
         $statement = $db->preparedQuery(
             $query,
             [
+                [
+                    "type"  => "i",
+                    "value" => $daysAgo
+                ],
                 [
                     "type"  => "i",
                     "value" => $daysAgo

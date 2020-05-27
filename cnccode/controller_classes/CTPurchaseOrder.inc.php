@@ -887,8 +887,8 @@ class CTPurchaseOrder extends CTCNC
                         DBEPorline::curUnitCost
                     ) && $dsPorline->getValue(DBEPorline::itemID) != 1491) {
                     $checkedAttribute = $dsPorline->getValue(DBEPorline::expectedTBC) ? 'checked' : null;
-                    $expectedDateInput = "<div data-seq-no='{$sequenceNo}'><input type='date'  onchange='expectedChanged()' value='{$dsPorline->getValue(DBEPorline::expectedDate)}'>";
-                    $TBCInput = "<input type='checkbox' onchange='tbcChanged()' {$checkedAttribute}></div>";
+                    $expectedDateInput = "<input type='date'  onchange='expectedChanged()' value='{$dsPorline->getValue(DBEPorline::expectedDate)}'>";
+                    $TBCInput = "<input type='checkbox' onchange='tbcChanged()' {$checkedAttribute}>";
                 }
 
                 $curTotalCost = $dsPorline->getValue(DBEJPorline::curUnitCost) * $dsPorline->getValue(
