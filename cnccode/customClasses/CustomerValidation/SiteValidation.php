@@ -43,10 +43,6 @@ class SiteValidation
             $errors->addError("Invalid Phone Number: " . $this->site->getValue(\DBESite::phone));
         }
 
-        if (!$this->site->getValue(\DBESite::what3Words)) {
-            $errors->addError("What3Words value is missing");
-        }
-
         return $errors;
     }
 
