@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 865 - What3words integration
+
 ## [v4.0.1] - 2020-05-26
 ### Fixed
 - Current Activity Report bigger headings
