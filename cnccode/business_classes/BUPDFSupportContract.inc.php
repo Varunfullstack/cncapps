@@ -217,33 +217,11 @@ class BUPDFSupportContract extends BaseObject
                         BUPDFSUPPORT_DETAILS_COL,
                         'Continued on next page...'
                     );
-
-                    $this->_buPDF->setBoldOn();
-                    $this->_buPDF->setFont();
-                    var_dump($this->_titleLine + (BUPDFSUPPORT_NUMBER_OF_LINES * $this->_buPDF->getFontSize() / 2));
-                    $this->_buPDF->moveYTo(
-                        $this->_titleLine + (BUPDFSUPPORT_NUMBER_OF_LINES * $this->_buPDF->getFontSize() / 2) + 4
-                    );
-                    $this->_buPDF->setFontSize(8);
-                    $this->_buPDF->setFont();
-                    $this->_buPDF->CR();
-                    $this->_buPDF->CR();
-                    $this->_buPDF->printStringAt(
-                        10,
-                        'This Contract Schedule forms part of an Agreement between the Parties and both Parties agree to be bound by the Terms & Conditions attached or available on the CNC web site.'
-                    );
-                    $this->_buPDF->CR();
-                    $this->_buPDF->CR();
-                    $this->_buPDF->placeImageAt(
-                        $GLOBALS['cfg']['cncaddress_path'],
-                        'PNG',
-                        6,
-                        200
-                    );
+                    $this->printFooter();
                     $this->noteHead();
-                    $this->_buPDF->setFontSize(8);
-                    $this->_buPDF->setFont();
                     $this->_buPDF->CR();
+                    $this->_buPDF->setFontSize(6);
+                    $this->_buPDF->setFont();
                     $this->_buPDF->printStringAt(
                         BUPDFSUPPORT_DETAILS_COL,
                         '... continued from previous page'
@@ -377,29 +355,7 @@ class BUPDFSupportContract extends BaseObject
             $hoursOfSupport
         );
         $this->_buPDF->CR();
-        $this->_buPDF->setFontSize(10);
-        $this->_buPDF->setFont();
-        $this->_buPDF->setBoldOn();
-        $this->_buPDF->setFont();
-        var_dump($this->_titleLine + (BUPDFSUPPORT_NUMBER_OF_LINES * $this->_buPDF->getFontSize() / 2));
-        $this->_buPDF->moveYTo($this->_titleLine + (BUPDFSUPPORT_NUMBER_OF_LINES * $this->_buPDF->getFontSize() / 2));
-        $this->_buPDF->setFontSize(8);
-        $this->_buPDF->setFont();
-        $this->_buPDF->CR();
-        $this->_buPDF->CR();
-        $this->_buPDF->printStringAt(
-            10,
-            'This Contract Schedule forms part of an Agreement between the Parties and both Parties agree to be bound by the Terms & Conditions attached or available on the CNC web site.'
-        );
-        $this->_buPDF->CR();
-        $this->_buPDF->CR();
-        $this->_buPDF->placeImageAt(
-            $GLOBALS['cfg']['cncaddress_path'],
-            'PNG',
-            6,
-            200
-        );
-        exit;
+        $this->printFooter();
     }
 
     /**
@@ -687,5 +643,30 @@ class BUPDFSupportContract extends BaseObject
         $this->_buPDF->setBoldOff();
         $this->_buPDF->setFont();
         $this->_buPDF->CR();
+    }
+
+    function printFooter()
+    {
+        $this->_buPDF->setFontSize(10);
+        $this->_buPDF->setFont();
+        $this->_buPDF->setBoldOn();
+        $this->_buPDF->setFont();
+        $this->_buPDF->moveYTo($this->_titleLine + (BUPDFSUPPORT_NUMBER_OF_LINES * $this->_buPDF->getFontSize() / 2));
+        $this->_buPDF->setFontSize(8);
+        $this->_buPDF->setFont();
+        $this->_buPDF->CR();
+        $this->_buPDF->CR();
+        $this->_buPDF->printStringAt(
+            10,
+            'This Contract Schedule forms part of an Agreement between the Parties and both Parties agree to be bound by the Terms & Conditions attached or available on the CNC web site.'
+        );
+        $this->_buPDF->CR();
+        $this->_buPDF->CR();
+        $this->_buPDF->placeImageAt(
+            $GLOBALS['cfg']['cncaddress_path'],
+            'PNG',
+            6,
+            200
+        );
     }
 }
