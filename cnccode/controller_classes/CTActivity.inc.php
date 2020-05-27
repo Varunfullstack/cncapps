@@ -5594,6 +5594,11 @@ class CTActivity extends CTCNC
                 )
             );
 
+        $what3WordsLink = "";
+        if ($dsSite->getValue(DBESite::what3Words)) {
+            $what3WordsLink = "https://what3words.com/{$dsSite->getValue(DBESite::what3Words)}\n\n";
+        }
+
         $notes = 'Details:\n\n' . CTActivity::prepareForICS($dsCallActivity->getValue(DBEJCallActivity::reason));
         if ($dsCallActivity->getValue(DBEJCallActivity::internalNotes)) {
             $notes .= '\n\nInternal Notes:\n\n' . CTActivity::prepareForICS(
@@ -5603,36 +5608,39 @@ class CTActivity extends CTCNC
 
         $this->template->set_var(
             array(
-                'scrRef'       => $callRef,
-                'userName'     => $dsCallActivity->getValue(DBEJCallActivity::userName),
-                'contactName'  => $dsCallActivity->getValue(DBEJCallActivity::contactName),
-                'contactPhone' => $buCustomer->getContactPhone($dsCallActivity->getValue(DBEJCallActivity::contactID)),
-                'dateYYYYMMDD' => str_replace(
+                'scrRef'         => $callRef,
+                'userName'       => $dsCallActivity->getValue(DBEJCallActivity::userName),
+                'contactName'    => $dsCallActivity->getValue(DBEJCallActivity::contactName),
+                'contactPhone'   => $buCustomer->getContactPhone(
+                    $dsCallActivity->getValue(DBEJCallActivity::contactID)
+                ),
+                'dateYYYYMMDD'   => str_replace(
                     '-',
                     '',
                     $dsCallActivity->getValue(DBEJCallActivity::date)
                 ),
-                'nowYYYYMMDD'  => date('Ymd'),
-                'nowHHMMSS'    => date('His'),
-                'startHHMM'    => str_replace(
+                'nowYYYYMMDD'    => date('Ymd'),
+                'nowHHMMSS'      => date('His'),
+                'startHHMM'      => str_replace(
                     ':',
                     '',
                     $dsCallActivity->getValue(DBEJCallActivity::startTime)
                 ),
-                'endHHMM'      => str_replace(
+                'endHHMM'        => str_replace(
                     ':',
                     '',
                     $endTime
                 ),
-                'customerName' => $dsCallActivity->getValue(DBEJCallActivity::customerName),
-                'notes'        => $notes,
-                'add1'         => $dsSite->getValue(DBESite::add1),
-                'add2'         => $dsSite->getValue(DBESite::add2),
-                'add3'         => $dsSite->getValue(DBESite::add3),
-                'town'         => $dsSite->getValue(DBESite::town),
-                'county'       => $dsSite->getValue(DBESite::county),
-                'postcode'     => $dsSite->getValue(DBESite::postcode),
-                'urlActivity'  => $urlActivity
+                'customerName'   => $dsCallActivity->getValue(DBEJCallActivity::customerName),
+                'notes'          => $notes,
+                'what3WordsLink' => $what3WordsLink,
+                'add1'           => $dsSite->getValue(DBESite::add1),
+                'add2'           => $dsSite->getValue(DBESite::add2),
+                'add3'           => $dsSite->getValue(DBESite::add3),
+                'town'           => $dsSite->getValue(DBESite::town),
+                'county'         => $dsSite->getValue(DBESite::county),
+                'postcode'       => $dsSite->getValue(DBESite::postcode),
+                'urlActivity'    => $urlActivity
             )
         );
         $this->template->parse(
