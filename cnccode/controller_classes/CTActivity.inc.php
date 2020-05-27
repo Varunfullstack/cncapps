@@ -2600,7 +2600,6 @@ class CTActivity extends CTCNC
                 array(
                     'action'     => 'contractListPopup',
                     'customerID' => $customerID,
-                    'htmlFmt'    => CT_HTML_FMT_POPUP
                 )
             );
 

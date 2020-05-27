@@ -5,7 +5,7 @@
         function popup(mylink, windowname) {
             if (!window.focus) return true;
             var href;
-            if (typeof(mylink) == 'string')
+            if (typeof (mylink) == 'string')
                 href = mylink;
             else
                 href = mylink.href;
@@ -26,7 +26,9 @@
     <!-- BEGIN contractBlock -->
     {itemTypeHeader}
     <tr class="singleBorder">
-        <td class="content"><a href="javascript:popup('{urlRenewalContract}')">{contractItemDescription}</a></td>
+        <td class="content"><a href="{urlRenewalContract}"
+                               target="_blank"
+        >{contractItemDescription}</a></td>
         <td class="content">{serialNo}</td>
     </tr>
     <!-- END contractBlock -->
