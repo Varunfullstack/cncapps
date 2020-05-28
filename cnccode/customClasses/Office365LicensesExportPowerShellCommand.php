@@ -103,6 +103,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $mailboxes = $data['mailboxes'];
         $licenses = $data['licenses'];
         $devices = $data['devices'];
+        $sharePointSites = $data['sharePointAndTeams'];
         $BUHeader = new BUHeader($thing);
         $this->dbeHeader = new DataSet($thing);
         $BUHeader->getHeader($this->dbeHeader);
@@ -147,8 +148,16 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             }
         }
 
-        if (!count($mailboxes) && !count($licenses) && !count($devices)) {
-            $message = 'This customer does not have a licences nor mailboxes nor devices';
+        if (count($sharePointSites)) {
+            try {
+                $this->processSharePointSites($spreadsheet, $sharePointSites);
+            } catch (Exception $exception) {
+                $logger->error('Failed to process sharepoint sites for customer: ' . $exception->getMessage());
+            }
+        }
+
+        if (!count($mailboxes) && !count($licenses) && !count($devices) && !count($sharePointSites)) {
+            $message = 'This customer does not have a licences nor mailboxes nor devices nor sharePointSites';
             $logger->warning($message);
             throw new UnexpectedValueException($message);
         }
@@ -509,7 +518,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             switch ($mailboxes[$key]['RecipientTypeDetails']) {
                 case "SharedMailbox":
                     $mailboxes[$key]['RecipientTypeDetails'] = "Shared";
-                    if(!$mailboxes[$key]['IsLicensed']){
+                    if (!$mailboxes[$key]['IsLicensed']) {
                         $mailboxLimit = 51200;
                     }
                     $otherLicenses++;
@@ -1166,6 +1175,49 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             ->setFillType(Fill::FILL_SOLID)
             ->getStartColor()
             ->setARGB("FFFFC7CE");
+    }
+
+    private function processSharePointSites(Spreadsheet $spreadsheet, $sharePointSites)
+    {
+        $sharePointSheet = $spreadsheet->createSheet();
+        $sharePointSheet->setTitle('Sharepoint & Teams');
+        $sharePointSheet->fromArray(
+            [
+                "Site URL",
+                "Allocated",
+                "Used",
+                "Warning Level",
+            ],
+            null,
+            'A1'
+        );
+        $sharePointSheet->fromArray(
+            $sharePointSites,
+            null,
+            'A2',
+            true
+        );
+        $highestRow = $sharePointSheet->getHighestRow();
+        $highestColumn = $sharePointSheet->getHighestColumn();
+        $sharePointSheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
+        $sharePointSheet->getStyle("A1:{$highestColumn}{$highestRow}")->getAlignment()->setHorizontal('center');
+        foreach (range('A', $highestColumn) as $col) {
+            $sharePointSheet->getColumnDimension($col)
+                ->setAutoSize(true);
+        }
+
+        $dateTime = new DateTime();
+        $nextRow = $highestRow + 1;
+        $sharePointSheet->setCellValue(
+            "C{$nextRow}",
+            '=sum(C2:C' . ($highestRow) . ')'
+        );
+        $legendRowStart = $highestRow + 2;
+        $sharePointSheet->fromArray(
+            ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
+            null,
+            'A' . $legendRowStart
+        );
     }
 
     protected function getParams(): PowerShellParamCollection
