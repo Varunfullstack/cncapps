@@ -5,6 +5,7 @@
  * Date: 15/02/2019
  * Time: 10:37
  */
+
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
@@ -170,7 +171,6 @@ class CTBookSalesVisit extends CTCNC
 
         $buActivity = new BUActivity($this);
 
-
         $dbeContact = new DBEContact($this);
 
         $dbeContact->getRow($dsSearchForm->getValue(self::searchFormContactID));
@@ -220,6 +220,14 @@ class CTBookSalesVisit extends CTCNC
         $dbeProblem->setValue(
             DBEProblem::dateRaised,
             date(DATE_MYSQL_DATETIME)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::alarmDate,
+            $dsSearchForm->getValue(self::searchFormMeetingDate)
+        );
+        $dbeProblem->setValue(
+            DBEProblem::alarmTime,
+            $dsSearchForm->getValue(self::searchFormMeetingTime)
         );
 
         $dbeProblem->setValue(
