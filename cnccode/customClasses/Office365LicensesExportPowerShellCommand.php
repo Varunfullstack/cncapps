@@ -126,12 +126,10 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 if ($this->alertMode) {
 
                     $primaryMainContactId = $this->dbeCustomer->getValue(DBECustomer::primaryMainContactID);
-                    if ($primaryMainContactId) {
+                    if ($primaryMainContactId && count($this->warningMailboxes)) {
 
                         $dbeContact = new DBEContact($this);
                         $dbeContact->getRow($primaryMainContactId);
-
-                        $buMail = new BUMail($this);
                         $subject = "Warning - Some Mailboxes Are Almost Full";
                         $emailTo = $dbeContact->getValue(DBEContact::email);
                         $hdrs = array(
@@ -145,11 +143,18 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                         $mime = new Mail_mime();
                         global $twig;
 
+                        usort(
+                            $this->warningMailboxes,
+                            function ($a, $b) {
+                                return $b['TotalItemSize'] - $a['TotalItemSize'];
+                            }
+                        );
+
                         $body = $twig->render(
                             "@internal/emailAlmostFullAlertEmail.html.twig",
                             [
                                 "contactFirstName" => $dbeContact->getValue(DBEContact::firstName),
-                                ""
+                                "mailboxes" => $this->warningMailboxes
                             ]
                         );
 
