@@ -46,7 +46,7 @@
                 data.addColumn('date', 'date');
                 data.addColumn('number', 'One Drive Storage Used(MB)');
                 data.addColumn('number', 'Email Storage Used(MB)');
-                data.addColumn('number', 'Site Storage Used(MB)');
+                data.addColumn('number', 'Site Storage Used(GB)');
                 const rows = serverData.map(d => {
                     d.date = moment(d.date, 'YYYY-MM-DD').toDate();
                     return Object.values(d);
