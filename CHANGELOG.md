@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v4.1.0]
 ### Added
 - Issue 865 - What3words integration
 - Issue 850 - Include Sharepoint & Teams Storage in Office 365 Mailbox Export
