@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Added
 - Issue 865 - What3words integration
 - Issue 850 - Include Sharepoint & Teams Storage in Office 365 Mailbox Export
+- Issue 820 - Alert Main Primary Contact when O365 mailboxes size are at the limit
 ### Changed
 - Issue 840 - PO Status v10
 

@@ -35,7 +35,7 @@ if (!is_cli()) {
     exit;
 }
 // Script example.php
-$shortopts = "c:dr";
+$shortopts = "c:dra";
 $longopts = array(
     "customer:",
 );
@@ -59,6 +59,10 @@ if (isset($options['d'])) {
     $debugMode = true;
 }
 
+$alertMode = false;
+if (isset($options['a'])) {
+    $alertMode = true;
+}
 $dbeCustomer = new DBECustomer($thing);
 
 if (isset($customerID)) {
@@ -94,6 +98,7 @@ do {
             $dbeCustomer,
             $logger,
             $debugMode,
+            $alertMode,
             $reuseData
         );
     } catch (\Exception $exception) {

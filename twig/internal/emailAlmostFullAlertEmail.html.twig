@@ -1,0 +1,50 @@
+{% extends "@internal/wrapper.html.twig" %}
+{% block content %}
+    <p>
+        Dear {{ contactFirstName }}
+    </p>
+    <p>
+        The following mailboxes are at or over 95% of their mail storage plan, please ask them to archive / delete
+        emails otherwise they risk not being able to receive emails. If you have a plan with 50GB mailbox limit then you
+        have the option to upgrade to a larger mailbox, if you already have a 100GB mailbox limit then you will need to
+        archive or delete emails.
+    </p>
+    <p>
+        A full report of the company mailbox sizes is available in our customer portal on our website.
+    </p>
+
+    <table class="alertTable">
+        <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Mailbox Size
+            </th>
+            <th>
+                Mailbox Limit
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for mailbox in mailboxes %}
+            <tr>
+                <td style="padding-right: 5px">
+                    {{ mailbox.DisplayName }}
+                </td>
+                <td style="text-align: center;padding-right: 5px">
+                    {{ mailbox.TotalItemSize |MBtoGB }}
+                </td>
+                <td style="text-align: center;">
+                    {{ mailbox.Limit |MBtoGB }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <p>
+        Regards
+    </p>
+{% endblock %}
