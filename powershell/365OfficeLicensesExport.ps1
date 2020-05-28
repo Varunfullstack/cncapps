@@ -34,7 +34,9 @@ try
     {
         Connect-SPOService -Url $URL  -Credential $Credentials -ErrorAction Stop
         $storageData = Get-SPOSite -IncludePersonalSite $True -Limit All -Filter "Url -like '-my.sharepoint.com/personal/'"
-        $siteCollection = Get-SPOSite -Limit All | Select-Object @{ Name = 'SiteURL'; Expression = { $_.URL } }, @{ Name = 'Allocated'; Expression = { $_.StorageQuota /1024/1024 } }, @{ Name = 'Used'; Expression = { $_.StorageUsageCurrent/1024/1024 } }, @{ Name = 'Warning Level'; Expression = { $_.StorageQuotaWarningLevel/1024/1024 } }
+        $allSitesCollection = Get-SPOSite -Limit All
+        $siteCollection = $allSitesCollection | Select-Object @{ Name = 'SiteURL'; Expression = { $_.URL } }, @{ Name = 'Allocated'; Expression = { $_.StorageQuota /1024/1024 } }, @{ Name = 'Used'; Expression = { $_.StorageUsageCurrent /1024/1024 } }, @{ Name = 'Warning Level'; Expression = { $_.StorageQuotaWarningLevel /1024/1024 } }
+        $totalSiteUsed = ($siteCollection | Measure-Object -Sum Used).Sum
     }
     catch
     {
@@ -128,6 +130,7 @@ try
         licenses = $LicensesData
         totalOneDriveStorageUsed = $totalOneDriveStorageUsed
         totalEmailStorageUsed = $totalEmailStorageUsed
+        totalSiteUsed = $totalSiteUsed
         devices = $DevicesReport
         sharePointAndTeams = $siteCollection
         errors = [array]$errors

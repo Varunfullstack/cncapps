@@ -1200,7 +1200,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $highestRow = $sharePointSheet->getHighestRow();
         $highestColumn = $sharePointSheet->getHighestColumn();
         $sharePointSheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
-        $sharePointSheet->getStyle("A1:{$highestColumn}{$highestRow}")->getAlignment()->setHorizontal('center');
+
         foreach (range('A', $highestColumn) as $col) {
             $sharePointSheet->getColumnDimension($col)
                 ->setAutoSize(true);
@@ -1212,6 +1212,18 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             "C{$nextRow}",
             '=sum(C2:C' . ($highestRow) . ')'
         );
+        $sharePointSheet->getCell("C{$nextRow}")->getStyle()->getNumberFormat()->setFormatCode("#,##0");
+        $sharePointSheet->setCellValue(
+            "B{$nextRow}",
+            'Total'
+        );
+
+        $numberColumns = $sharePointSheet->getStyle("B2:D$highestRow");
+        $numberColumns->getNumberFormat()->setFormatCode("#,##0");
+
+
+        $sharePointSheet->getStyle("A1:{$highestColumn}{$sharePointSheet->getHighestRow()}")->getAlignment(
+        )->setHorizontal('center');
         $legendRowStart = $highestRow + 2;
         $sharePointSheet->fromArray(
             ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
