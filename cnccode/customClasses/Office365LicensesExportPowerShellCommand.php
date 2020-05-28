@@ -52,9 +52,10 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
     private $dbeCustomer;
     private $dbeHeader;
 
-    public function __construct($dbeCustomer, LoggerCLI $logger, $debugMode = false)
+    public function __construct($dbeCustomer, LoggerCLI $logger, $debugMode = false, $reuseData = false)
     {
         $this->debugMode = $debugMode;
+        $this->reuseData = $reuseData;
         $this->dbeCustomer = $dbeCustomer;
         $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
         $customerName = $dbeCustomer->getValue(DBECustomer::name);
@@ -99,7 +100,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $this->logger = $logger;
         $this->commandName = "365OfficeLicensesExport";
         $data = $this->run();
-
         $mailboxes = $data['mailboxes'];
         $licenses = $data['licenses'];
         $devices = $data['devices'];
@@ -215,7 +215,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $fileName = "Current Mailbox Extract.xlsx";
         $filePath = $folderName . $fileName;
         try {
-
             $writer->save(
                 $filePath
             );

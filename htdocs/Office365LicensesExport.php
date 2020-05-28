@@ -8,9 +8,6 @@
  */
 
 use CNCLTD\LoggerCLI;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 require_once("config.inc.php");
 global $cfg;
@@ -38,7 +35,7 @@ if (!is_cli()) {
     exit;
 }
 // Script example.php
-$shortopts = "c:d";
+$shortopts = "c:dr";
 $longopts = array(
     "customer:",
 );
@@ -51,6 +48,10 @@ if (isset($options['c'])) {
 if (isset($options['customer'])) {
     $customerID = $options['customer'];
     unset($options['customer']);
+}
+$reuseData = false;
+if (isset($options['r'])) {
+    $reuseData = true;
 }
 
 $debugMode = false;
@@ -89,7 +90,12 @@ $buPassword = new BUPassword($thing);
 $dbeOffice365Licenses = new DBEOffice365License($thing);
 do {
     try {
-        $commandRunner = new \CNCLTD\Office365LicensesExportPowerShellCommand($dbeCustomer, $logger, $debugMode);
+        $commandRunner = new \CNCLTD\Office365LicensesExportPowerShellCommand(
+            $dbeCustomer,
+            $logger,
+            $debugMode,
+            $reuseData
+        );
     } catch (\Exception $exception) {
         continue;
     }

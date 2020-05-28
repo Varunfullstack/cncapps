@@ -11,6 +11,7 @@ abstract class PowerShellCommandRunner
     protected $debugMode;
     protected $outputFilePath;
     protected $commandName;
+    protected $reuseData;
 
     /** @var Logger */
     protected $logger;
@@ -30,38 +31,42 @@ abstract class PowerShellCommandRunner
      */
     public function run()
     {
-        $paramParts = $this->getParams();
-        $path = POWERSHELL_DIR . '\\' . $this->commandName . ".ps1";
-        $cmdParts = [
-            "powershell.exe",
-            "-executionpolicy",
-            "bypass",
-            "-NoProfile",
-            "-command",
-            $path,
-        ];
+        $output = null;
+        if (!$this->reuseData) {
+            $paramParts = $this->getParams();
+            $path = POWERSHELL_DIR . '\\' . $this->commandName . ".ps1";
+            $cmdParts = [
+                "powershell.exe",
+                "-executionpolicy",
+                "bypass",
+                "-NoProfile",
+                "-command",
+                $path,
+            ];
 
-        foreach ($paramParts as $paramPart) {
-            $cmdParts[] = '-' . $paramPart->getParameterName();
-            $cmdParts[] = base64_encode($paramPart->getValue());
+            foreach ($paramParts as $paramPart) {
+                $cmdParts[] = '-' . $paramPart->getParameterName();
+                $cmdParts[] = base64_encode($paramPart->getValue());
+            }
+
+            $cmdParts[] = "-OutputPath";
+            $cmdParts[] = $this->outputFilePath;
+
+            // all scripts will have a "path"
+
+            $escaped = implode(' ', array_map('escape_win32_argv', $cmdParts));
+            /* In almost all cases, escape for cmd.exe as well - the only exception is
+               when using proc_open() with the bypass_shell option. cmd doesn't handle
+               arguments individually, so the entire command line string can be escaped,
+               no need to process arguments individually */
+            $cmd = escape_win32_cmd($escaped);
+
+            if ($this->debugMode) {
+                $this->logger->notice('The powershell line to execute is :' . $cmd);
+            }
+            $output = noshell_exec($cmd);
         }
 
-        $cmdParts[] = "-OutputPath";
-        $cmdParts[] = $this->outputFilePath;
-
-        // all scripts will have a "path"
-
-        $escaped = implode(' ', array_map('escape_win32_argv', $cmdParts));
-        /* In almost all cases, escape for cmd.exe as well - the only exception is
-           when using proc_open() with the bypass_shell option. cmd doesn't handle
-           arguments individually, so the entire command line string can be escaped,
-           no need to process arguments individually */
-        $cmd = escape_win32_cmd($escaped);
-
-        if ($this->debugMode) {
-            $this->logger->notice('The powershell line to execute is :' . $cmd);
-        }
-        $output = noshell_exec($cmd);
         if (!file_exists($this->outputFilePath)) {
             $message = "PowerShell script failed to generate output file. File Not Found";
             $this->logger->error($message, ["powerShellStringOutput" => $output]);
