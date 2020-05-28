@@ -38,7 +38,7 @@ if (!is_cli()) {
     exit;
 }
 // Script example.php
-$shortopts = "c:d";
+$shortopts = "c:da";
 $longopts = array(
     "customer:",
 );
@@ -56,6 +56,11 @@ if (isset($options['customer'])) {
 $debugMode = false;
 if (isset($options['d'])) {
     $debugMode = true;
+}
+
+$alertMode = false;
+if(isset($options['a'])){
+    $alertMode = true;
 }
 
 $dbeCustomer = new DBECustomer($thing);
@@ -89,7 +94,7 @@ $buPassword = new BUPassword($thing);
 $dbeOffice365Licenses = new DBEOffice365License($thing);
 do {
     try {
-        $commandRunner = new \CNCLTD\Office365LicensesExportPowerShellCommand($dbeCustomer, $logger, $debugMode);
+        $commandRunner = new \CNCLTD\Office365LicensesExportPowerShellCommand($dbeCustomer, $logger, $debugMode, $alertMode);
     } catch (\Exception $exception) {
         continue;
     }

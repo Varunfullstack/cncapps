@@ -15,6 +15,7 @@ require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
+require_once($cfg['path_bu'] . '/BUMail.inc.php');
 
 use BUActivity;
 use BUCustomer;
@@ -51,11 +52,17 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
     private $password;
     private $dbeCustomer;
     private $dbeHeader;
+    private $warningMailboxes = [];
+    /**
+     * @var bool
+     */
+    private $alertMode;
 
-    public function __construct($dbeCustomer, LoggerCLI $logger, $debugMode = false)
+    public function __construct($dbeCustomer, LoggerCLI $logger, $debugMode = false, $alertMode = false)
     {
         $this->debugMode = $debugMode;
         $this->dbeCustomer = $dbeCustomer;
+        $this->alertMode = $alertMode;
         $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
         $customerName = $dbeCustomer->getValue(DBECustomer::name);
         $buCustomer = new BUCustomer($this);
@@ -67,7 +74,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $dbePasswordService->getRow(10);
 
         if (!$dbePassword->rowCount) {
-
             $passwordServiceCheck = $buCustomer->getPasswordItemByPasswordServiceId($customerID, 8);
             if ($passwordServiceCheck->rowCount()) {
                 $message = "This customer has an Office 365 login but does not have a {$dbePasswordService->getValue(DBEPasswordService::description)} set, please correct.";
@@ -82,8 +88,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         }
 
         if ($dbePassword->rowCount > 1) {
-
-
             $this->createFailedSR(
                 $dbeCustomer,
                 "There are multiple {$dbePasswordService->getValue(DBEPasswordService::description)} and there must only be one, please correct"
@@ -118,6 +122,63 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                     $dbeCustomer,
                     $dbeOffice365Licenses
                 );
+
+                if ($this->alertMode) {
+
+                    $primaryMainContactId = $this->dbeCustomer->getValue(DBECustomer::primaryMainContactID);
+                    if ($primaryMainContactId) {
+
+                        $dbeContact = new DBEContact($this);
+                        $dbeContact->getRow($primaryMainContactId);
+
+                        $buMail = new BUMail($this);
+                        $subject = "Warning - Some Mailboxes Are Almost Full";
+                        $emailTo = $dbeContact->getValue(DBEContact::email);
+                        $hdrs = array(
+                            'From'         => CONFIG_SUPPORT_EMAIL,
+                            'To'           => $emailTo,
+                            'Subject'      => $subject,
+                            'Date'         => date("r"),
+                            'Content-Type' => 'text/html; charset=UTF-8'
+                        );
+
+                        $mime = new Mail_mime();
+                        global $twig;
+
+                        $body = $twig->render(
+                            "@internal/emailAlmostFullAlertEmail.html.twig",
+                            [
+                                "contactFirstName" => $dbeContact->getValue(DBEContact::firstName),
+                                ""
+                            ]
+                        );
+
+                        $mime->setHTMLBody($body);
+
+                        $mime_params = array(
+                            'text_encoding' => '7bit',
+                            'text_charset'  => 'UTF-8',
+                            'html_charset'  => 'UTF-8',
+                            'head_charset'  => 'UTF-8'
+                        );
+
+                        $body = $mime->get($mime_params);
+
+                        $hdrs = $mime->headers($hdrs);
+
+                        $buMail = new BUMail($this);
+
+                        $buMail->putInQueue(
+                            CONFIG_SUPPORT_EMAIL,
+                            $emailTo,
+                            $hdrs,
+                            $body
+                        );
+                    }
+
+
+                }
+
             } catch (Exception $exception) {
                 $logger->error('Failed to process mailboxes for customer: ' . $exception->getMessage());
             }
@@ -509,7 +570,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             switch ($mailboxes[$key]['RecipientTypeDetails']) {
                 case "SharedMailbox":
                     $mailboxes[$key]['RecipientTypeDetails'] = "Shared";
-                    if(!$mailboxes[$key]['IsLicensed']){
+                    if (!$mailboxes[$key]['IsLicensed']) {
                         $mailboxLimit = 51200;
                     }
                     $otherLicenses++;
@@ -633,6 +694,8 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
 
                 if ($usage >= $this->dbeHeader->getValue(DBEHeader::office365MailboxRedWarningThreshold)) {
                     $color = "FFFFC7CE";
+                    $mailboxes[$i]['Limit'] = $mailboxLimits[$i];
+                    $this->warningMailboxes[] = $mailboxes[$i];
                 }
 
                 if ($color) {
