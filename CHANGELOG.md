@@ -9,6 +9,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 840 - PO Status v10
 - Issue 686 - Meeting agendas change criteria for flag for review SRs
+- Issue 882 - SR History Popup date format
 
 ## [v4.0.3] - 2020-05-28
 ### Fixed
