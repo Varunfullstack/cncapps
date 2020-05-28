@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 840 - PO Status v10
 - Issue 686 - Meeting agendas change criteria for flag for review SRs
 - Issue 882 - SR History Popup date format
+- Issue 876 - Colour code password levels
 
 ## [v4.0.3] - 2020-05-28
 ### Fixed
