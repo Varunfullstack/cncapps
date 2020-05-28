@@ -164,7 +164,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         global $db;
 
         $statement = $db->preparedQuery(
-            "insert into customerOffice365StorageStats values (?,?,?,?) on duplicate key update totalOneDriveStorageUsed = ?, totalEmailStorageUsed = ?",
+            "insert into customerOffice365StorageStats values (?,?,?,?,?) on duplicate key update totalOneDriveStorageUsed = ?, totalEmailStorageUsed = ?, totalSiteStorageUsed = ?",
             [
                 [
                     "type"  => 'i',
@@ -184,12 +184,20 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 ],
                 [
                     "type"  => 'd',
+                    "value" => $data['totalSiteUsed']
+                ],
+                [
+                    "type"  => 'd',
                     "value" => $data['totalOneDriveStorageUsed']
                 ],
                 [
                     "type"  => 'd',
                     "value" => $data['totalEmailStorageUsed']
-                ]
+                ],
+                [
+                    "type"  => 'd',
+                    "value" => $data['totalSiteUsed']
+                ],
             ]
         );
 
