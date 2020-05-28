@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 820 - Alert Main Primary Contact when O365 mailboxes size are at the limit
 ### Changed
 - Issue 840 - PO Status v10
+- Issue 686 - Meeting agendas change criteria for flag for review SRs
 
 ## [v4.0.3] - 2020-05-28
 ### Fixed

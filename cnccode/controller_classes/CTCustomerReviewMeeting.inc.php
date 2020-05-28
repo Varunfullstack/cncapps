@@ -236,6 +236,7 @@ class CTCustomerReviewMeeting extends CTCNC
                 }
 
                 $lastReviewMeetingDateFormatted = null;
+                $lastReviewMeetingDate = null;
                 if ($dsCustomer->getValue(DBECustomer::lastReviewMeetingDate)) {
                     $lastReviewMeetingDate = DateTime::createFromFormat(
                         DATE_MYSQL_DATE,
@@ -491,10 +492,11 @@ class CTCustomerReviewMeeting extends CTCNC
                     'reviews'
                 );
                 $dsReviews = new DataSet($this);
+
                 $buActivity->getManagementReviewsInPeriod(
                     $dsSearchForm->getValue(BUCustomerReviewMeeting::searchFormCustomerID),
-                    $startDate,
-                    $endDate,
+                    $lastReviewMeetingDate ? $lastReviewMeetingDate : $startDate,
+                    new DateTime(),
                     $dsReviews
                 );
 
@@ -594,12 +596,17 @@ class CTCustomerReviewMeeting extends CTCNC
                 $options = [
                     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
                 ];
-                $labtechDB = new PDO(
-                    $dsn,
-                    LABTECH_DB_USERNAME,
-                    LABTECH_DB_PASSWORD,
-                    $options
-                );
+                try {
+                    $labtechDB = new PDO(
+                        $dsn,
+                        LABTECH_DB_USERNAME,
+                        LABTECH_DB_PASSWORD,
+                        $options
+                    );
+                } catch (\Exception $exception) {
+                    throw new \MongoDB\Driver\Exception\ConnectionException('Unable to connect to labtech');
+                }
+
 
                 $statement = $labtechDB->prepare(
                     'SELECT computers.name as agentName,letter as driveLetter,size as driveSize, free as driveFreeSpace, free/size  as freePercent FROM  drives 
@@ -1462,6 +1469,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
             "supervisor" => 0,
             "support"    => 0,
             "delegate"   => 0,
+            "furlough"   => 0,
             "total"      => 0
         ];
 
@@ -1591,6 +1599,7 @@ WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalI
         $supportContactInfo .= "<tr><td>Supervisor</td><td>$supportContactsCounts[supervisor]</td></tr>";
         $supportContactInfo .= "<tr><td>Support</td><td>$supportContactsCounts[support]</td></tr>";
         $supportContactInfo .= "<tr><td>Delegate</td><td>$supportContactsCounts[delegate]</td></tr>";
+        $supportContactInfo .= "<tr><td>Furlough</td><td>$supportContactsCounts[furlough]</td></tr>";
         $supportContactInfo .= "<tr><td>Total</td><td>$supportContactsCounts[total]</td></tr>";
         $supportContactInfo .= "</tbody></table>";
 
