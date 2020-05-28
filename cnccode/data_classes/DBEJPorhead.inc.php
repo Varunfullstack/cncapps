@@ -97,6 +97,7 @@ class DBEJPorhead extends DBEPorhead
      * @param string $fromDate
      * @param string $toDate
      * @param string $context
+     * @param bool $noLimit
      * @return bool Success
      */
     function getRowsBySearchCriteria(
@@ -108,7 +109,8 @@ class DBEJPorhead extends DBEPorhead
         $partNo = null,
         $fromDate = null,
         $toDate = null,
-        $context = 'PO'                    // PI = Purchase Invoice 'PO' = Purchase Order GI = Goods In
+        $context = 'PO',                   // PI = Purchase Invoice 'PO' = Purchase Order GI = Goods In
+        bool $noLimit = false
     )
     {
         $this->setMethodName("getRowsBySearchCriteria");
@@ -220,9 +222,12 @@ class DBEJPorhead extends DBEPorhead
                     $supplierRef
                 ) . "%'";
         }
-        $statement = $statement .
-            " ORDER BY " . $this->getDBColumnName(self::porheadID) . " DESC" .
-            " LIMIT 0,200";
+
+        if (!$noLimit) {
+            $statement = $statement .
+                " ORDER BY " . $this->getDBColumnName(self::porheadID) . " DESC" .
+                " LIMIT 0,200";
+        }
 
         $this->setQueryString($statement);
         $ret = (parent::getRows());

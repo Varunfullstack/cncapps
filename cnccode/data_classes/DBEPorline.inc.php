@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEPorline extends DBEntity
@@ -16,6 +17,7 @@ class DBEPorline extends DBEntity
     const curUnitCost = "curUnitCost";
     const stockcat = "stockcat";
     const expectedDate = "expectedDate";
+    const expectedTBC = "expectedTBC";
 
     /**
      * calls constructor()
@@ -81,6 +83,14 @@ class DBEPorline extends DBEntity
             DA_DATE,
             DA_ALLOW_NULL,
             "pol_exp_date"
+        );
+
+        $this->addColumn(
+            self::expectedTBC,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
         );
         $this->setAddColumnsOff();
     }

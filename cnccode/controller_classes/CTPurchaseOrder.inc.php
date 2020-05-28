@@ -155,6 +155,10 @@ class CTPurchaseOrder extends CTCNC
     {
         $this->checkPermissions(SALES_PERMISSION);
         switch ($this->getAction()) {
+            case 'saveLine':
+                $this->saveLine();
+                echo json_encode(["status" => "ok"]);
+                break;
             case CTCNC_ACT_GENERATE_POS_FROM_SO:
                 $this->generateFromSO();
                 break;
@@ -200,6 +204,30 @@ class CTPurchaseOrder extends CTCNC
                 $this->displaySearchForm();
                 break;
         }
+    }
+
+    private function saveLine()
+    {
+        $contents = json_decode(file_get_contents('php://input'), true);
+        if (!isset($contents['purchaseOrderId'])) {
+            throw new Exception('Purchase Order Id is required');
+        }
+        if (!isset($contents['line'])) {
+            throw new Exception('Line is required');
+        }
+        $purchaseOrderLine = new DBEPorline($this);
+        $purchaseOrderLine->setValue(
+            DBEPorline::porheadID,
+            $contents['purchaseOrderId']
+        );
+        $purchaseOrderLine->setValue(
+            DBEPorline::sequenceNo,
+            $contents['line']['seqNo']
+        );
+        $purchaseOrderLine->getRow();
+        $purchaseOrderLine->setValue(DBEPorline::expectedDate, $contents['line']['expectedDate']);
+        $purchaseOrderLine->setValue(DBEPorline::expectedTBC, $contents['line']['TBC']);
+        $purchaseOrderLine->updateRow();
     }
 
     /**
@@ -854,19 +882,15 @@ class CTPurchaseOrder extends CTCNC
             while ($dsPorline->fetchNext()) {
                 $sequenceNo = $dsPorline->getValue(DBEJPorline::sequenceNo);
                 $itemDescription = $dsPorline->getValue(DBEJPorline::itemDescription);
-                if ($dsPorhead->getValue(DBEJPorhead::orderedByName) && $dsPorline->getValue(
-                        DBEPorline::expectedDate
-                    ) && (float)$dsPorline->getValue(
+                $expectedDateInput = $TBCInput = null;
+                if ((float)$dsPorline->getValue(
                         DBEPorline::curUnitCost
                     ) && $dsPorline->getValue(DBEPorline::itemID) != 1491) {
-                    $expectedDate = DateTime::createFromFormat(
-                        DATE_MYSQL_DATE,
-                        $dsPorline->getValue(DBEJPorline::expectedDate)
-                    )
-                        ->format('d/m/Y');
-                } else {
-                    $expectedDate = null;
+                    $checkedAttribute = $dsPorline->getValue(DBEPorline::expectedTBC) ? 'checked' : null;
+                    $expectedDateInput = "<input type='date'  onchange='expectedChanged()' value='{$dsPorline->getValue(DBEPorline::expectedDate)}'>";
+                    $TBCInput = "<input type='checkbox' onchange='tbcChanged()' {$checkedAttribute}>";
                 }
+
                 $curTotalCost = $dsPorline->getValue(DBEJPorline::curUnitCost) * $dsPorline->getValue(
                         DBEJPorline::qtyOrdered
                     );
@@ -899,7 +923,9 @@ class CTPurchaseOrder extends CTCNC
                             '.',
                             ''
                         ),
-                        'expectedDate' => $expectedDate
+                        'expectedDate' => $expectedDateInput,
+                        'TBCInput'     => $TBCInput,
+                        'seqNo'        => $dsPorline->getValue(DBEJPorline::sequenceNo)
                     )
                 );
                 if ($disabled != CTCNC_HTML_DISABLED) {        // enabled so allow/show editing options
@@ -1027,7 +1053,7 @@ class CTPurchaseOrder extends CTCNC
     {
         $this->setMethodName('createPO');
         if (!is_numeric($this->getParam('supplierID'))) {
-            $this->setFormErrorMessage('Supplier No must be numeric');;
+            $this->setFormErrorMessage('Supplier No must be numeric');
         }
         if (!is_numeric($this->getParam('ordheadID'))) {
             $this->setFormErrorMessage('Sales order no must be numeric');;
@@ -1064,7 +1090,7 @@ class CTPurchaseOrder extends CTCNC
         );
         header("Location: " . $urlNext);
         exit;
-    }
+    }// end function orderLineForm()
 
     /**
      * Edit/Add Order Line
@@ -1136,7 +1162,7 @@ class CTPurchaseOrder extends CTCNC
             true
         );
         $this->parsePage();
-    }// end function orderLineForm()
+    }
 
     /**
      * @throws Exception
@@ -1158,7 +1184,8 @@ class CTPurchaseOrder extends CTCNC
                 'curUnitCost'            => $this->dsPorline->getValue(DBEJPorline::curUnitCost),
                 'curUnitCostMessage'     => $this->dsPorline->getMessage(DBEJPorline::curUnitCost),
                 'expectedDate'           => $this->dsPorline->getValue(DBEJPorline::expectedDate),
-                'expectedDateMessage'    => $this->dsPorline->getMessage(DBEJPorline::expectedDate)
+                'expectedDateMessage'    => $this->dsPorline->getMessage(DBEJPorline::expectedDate),
+                'expectedTBCChecked'     => $this->dsPorline->getValue(DBEPorline::expectedTBC) ? "checked" : null
             )
         );
         if ($this->getAction() == CTPURCHASEORDER_ACT_EDIT_ORDLINE) {
@@ -1359,10 +1386,10 @@ class CTPurchaseOrder extends CTCNC
             $dbePurchaseOrder = new DBEPorhead($this);
             $dbePurchaseOrder->getRow($dsPorhead->getValue(DBEJPorhead::porheadID));
 
+            $buSalesOrder = new BUSalesOrder($this);
             if ($dbePurchaseOrder->getValue(DBEPorhead::deliveryConfirmedFlag) == 'N' && $dsPorhead->getValue(
                     DBEJPorhead::deliveryConfirmedFlag
                 ) == 'Y' && $dbePurchaseOrder->getValue(DBEJPorhead::completionNotifiedFlag) == 'N') {
-                $buSalesOrder = new BUSalesOrder($this);
 
                 $buSalesOrder->notifyPurchaseOrderCompletion($dbePurchaseOrder);
 
@@ -1374,6 +1401,10 @@ class CTPurchaseOrder extends CTCNC
             }
 
             $this->buPurchaseOrder->updateHeader($dsPorhead);
+
+            if ($this->getParam('applyToAll')) {
+                $buSalesOrder->updatePurchaseOrdersRequiredByDate($this->buPurchaseOrder->dbePorhead);
+            }
 
             $urlNext =
                 Controller::buildLink(

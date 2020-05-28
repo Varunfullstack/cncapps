@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 865 - What3words integration
+### Changed
+- Issue 840 - PO Status v10
 
 ## [v4.0.1] - 2020-05-26
 ### Fixed
