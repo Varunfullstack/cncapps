@@ -3952,7 +3952,14 @@ class CTActivity extends CTCNC
             $dsSite = new DataSet($this);
             $buSite->getSiteByID($dbeProblem->getValue(DBEProblem::customerID), $siteNo, $dsSite);
 
-            $date = $activitiesByProblemID->getValue(DBEJCallActivity::date);
+            $dateValue = $activitiesByProblemID->getValue(DBEJCallActivity::date);
+            $date = null;
+            if ($dateValue) {
+                $dateTime = DateTime::createFromFormat(DATE_MYSQL_DATE, $dateValue);
+                if ($dateTime) {
+                    $date = $dateTime->format('d-m-Y');
+                }
+            }
             $startTime = $activitiesByProblemID->getValue(DBEJCallActivity::startTime);
             $endTime = $activitiesByProblemID->getValue(DBEJCallActivity::endTime);
             $duration = number_format($activitiesByProblemID->getValue(DBEJCallActivity::durationMinutes) / 60, 2);
