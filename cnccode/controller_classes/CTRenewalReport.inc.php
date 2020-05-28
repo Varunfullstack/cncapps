@@ -513,7 +513,7 @@ class CTRenewalReport extends CTCNC
         );
 
         $pageCount = $mainPDF->setSourceFile(
-            PDF_RESOURCE_DIR . '/Terms & Conditions April 2018 branded.pdf'
+            PDF_RESOURCE_DIR . '/Terms & Conditions.pdf'
         );
         for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
             $pageId = $mainPDF->importPage($pageNo);

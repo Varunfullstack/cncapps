@@ -618,7 +618,6 @@ class BUPDFSupportContract extends BaseObject
             $this->_buPDF->getFontSize() / 2
         );
         $this->_buPDF->CR();
-        var_dump("title line is assigned again", $this->_buPDF->getYPos());
         $this->_titleLine = $this->_buPDF->getYPos();
         $this->_buPDF->setBoldOn();
         $this->_buPDF->setFont();
