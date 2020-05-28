@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 820 - Alert Main Primary Contact when O365 mailboxes size are at the limit
+
 ## [v4.0.3] - 2020-05-28
 ### Fixed
 - CKEditor not showing while processing change request
