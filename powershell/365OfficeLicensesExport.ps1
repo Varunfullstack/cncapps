@@ -35,7 +35,7 @@ try
         Connect-SPOService -Url $URL  -Credential $Credentials -ErrorAction Stop
         $storageData = Get-SPOSite -IncludePersonalSite $True -Limit All -Filter "Url -like '-my.sharepoint.com/personal/'"
         $allSitesCollection = Get-SPOSite -Limit All
-        $siteCollection = $allSitesCollection | Select-Object @{ Name = 'SiteURL'; Expression = { $_.URL } }, @{ Name = 'Allocated'; Expression = { $_.StorageQuota /1024/1024 } }, @{ Name = 'Used'; Expression = { $_.StorageUsageCurrent /1024/1024 } }, @{ Name = 'Warning Level'; Expression = { $_.StorageQuotaWarningLevel /1024/1024 } }
+        $siteCollection = $allSitesCollection | Select-Object @{ Name = 'SiteURL'; Expression = { $_.URL } }, @{ Name = 'Allocated'; Expression = { $_.StorageQuota/1024 -as [decimal]} }, @{ Name = 'Used'; Expression = { $_.StorageUsageCurrent/1024 -as [decimal] } }, @{ Name = 'Warning Level'; Expression = { $_.StorageQuotaWarningLevel/1024 -as [Decimal] } }
         $totalSiteUsed = ($siteCollection | Measure-Object -Sum Used).Sum
     }
     catch
@@ -78,7 +78,6 @@ try
             $oneDriveStorageUsage = $storageItem.StorageUsageCurrent
             $totalOneDriveStorageUsed = $totalOneDriveStorageUsed + $oneDriveStorageUsage
         }
-        $UserDomain = $UserPrincipalName.Split('@')[1]
         $MailboxStat = Get-EXOMailboxStatistics -UserPrincipalName $UserPrincipalName -WarningAction SilentlyContinue
         $TotalItemSize = $MailboxStat.TotalItemSize.ToString().Split("(")[1].Split(" ")[0].Replace(",", "")/1MB
         $totalEmailStorageUsed = $totalEmailStorageUsed + $TotalItemSize
