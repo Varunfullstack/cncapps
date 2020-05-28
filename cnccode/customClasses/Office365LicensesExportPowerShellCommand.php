@@ -1199,6 +1199,13 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             null,
             'A1'
         );
+
+        foreach ($sharePointSites as $key => $sharePointSite) {
+            $sharePointSites[$key]['Allocated'] = $sharePointSite['Allocated'] / 1024;
+            $sharePointSites[$key]['Used'] = $sharePointSite['Used'] / 1024;
+            $sharePointSites[$key]['Warning Level'] = $sharePointSite['Warning Level'] / 1024;
+        }
+
         $sharePointSheet->fromArray(
             $sharePointSites,
             null,
