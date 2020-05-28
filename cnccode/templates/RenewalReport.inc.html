@@ -130,6 +130,8 @@
             customerID: {customerID},
             contractsIDs: contractsIds
         };
+        $.LoadingOverlay("show", {text: 'Generating preview, please wait'});
+
         $.ajax({
             url: '?action=previewPDF',
             method: 'POST',
@@ -141,6 +143,7 @@
             window.open(result.PDFPath);
             var signableContact = $('#signableContact').val();
             checkSendSignable(signableContact);
+            $.LoadingOverlay('hide');
         });
     }
 

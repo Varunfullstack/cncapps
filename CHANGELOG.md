@@ -13,6 +13,7 @@ This project changes will be shown here.
 - Issue 876 - Colour code password levels
 - Issue 879 - Menu Scroll Bar Visual tweak
 - Issue 871 - Change PDF security on the invoices
+- Issue 877 - Contract PDF formatting changes
 
 ## [v4.0.3] - 2020-05-28
 ### Fixed
