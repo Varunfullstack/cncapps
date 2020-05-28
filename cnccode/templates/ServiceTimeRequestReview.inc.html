@@ -14,7 +14,7 @@
     const minutesInADay = {minutesInADay};
 
     window.addEventListener('DOMContentLoaded', function () {
-        reason = CKEDITOR.replace('comments', {customConfig: '/ckeditor_config.js'});
+        CKEDITOR.replace('comments', {customConfig: '/ckeditor_config.js'});
         timeSelectorElement = $('#allocatedTimeAmountSelector');
         timeInputElement = $('input[name="allocatedTimeValue"]');
         allocationErrorElement = $('#allocationError');

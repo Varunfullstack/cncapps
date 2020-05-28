@@ -9,6 +9,7 @@
     const isAdditionalTimeLimitApprover = {additionalTimeLimitApprover};
     const minutesInADay = {minutesInADay};
     window.addEventListener('DOMContentLoaded', function () {
+        CKEDITOR.replace('comments', {customConfig: '/ckeditor_config.js'});
         teamSelectorElement = $('#teamSelector');
         timeSelectorElement = $('#allocatedTimeAmountSelector');
         timeInputElement = $('input[name="allocatedTimeValue"]');
@@ -173,10 +174,6 @@
             </td>
             <td>
                 <textarea name="comments">{comments}</textarea>
-                <script type="text/javascript">
-                    reason = CKEDITOR.replace('comments', {customConfig: '/ckeditor_config.js'});
-                    reason.addCss('body { font-size: 10pt; }');
-                </script>
             </td>
         </tr>
 

@@ -5,6 +5,11 @@
 <script type="text/javascript"
         src="ckfinder/ckfinder.js"
 ></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        CKEDITOR.replace('reason', {customConfig: '/ckeditor_config.js'});
+    })
+</script>
 {activityWizardHeader}
 <P id="autoUpdateLabel"></P>
 <FORM method="post"
@@ -82,10 +87,6 @@
                 name="reason"
         >{reason}
         </textarea>
-                <script type="text/javascript">
-                    reason = CKEDITOR.replace('reason', {customConfig: '/ckeditor_config.js'});
-                    reason.addCss('body { font-size: 10pt; }');
-                </script>
             </td>
         </tr>
         <tr>

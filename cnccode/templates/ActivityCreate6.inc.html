@@ -5,7 +5,7 @@
 <script>
     window.addEventListener('DOMContentLoaded', function () {
         checkauthorisedBy();
-        reason = CKEDITOR.replace('reason', {customConfig: '/ckeditor_config.js'});
+        CKEDITOR.replace('reason', {customConfig: '/ckeditor_config.js'});
         const internalNotes = CKEDITOR.replace('internalNotes',
             {
                 customConfig: '/ckeditor_config.js'
