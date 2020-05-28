@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [v4.0.3] - 2020-05-28
 ### Fixed
 - CKEditor not showing while processing change request
+- CKEditor not showing while creating SR from sales order
+- Current Activity Report - Pending Reopen not showing as table
 
 ## [v4.0.2] - 2020-05-27
 ### Fixed
