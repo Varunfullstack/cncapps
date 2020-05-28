@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Issue 850 - Include Sharepoint & Teams Storage in Office 365 Mailbox Export
+
 ## [v4.0.3] - 2020-05-28
 ### Fixed
 - CKEditor not showing while processing change request

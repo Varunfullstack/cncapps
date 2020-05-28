@@ -34,6 +34,7 @@ try
     {
         Connect-SPOService -Url $URL  -Credential $Credentials -ErrorAction Stop
         $storageData = Get-SPOSite -IncludePersonalSite $True -Limit All -Filter "Url -like '-my.sharepoint.com/personal/'"
+        $siteCollection = Get-SPOSite -Limit All | Select-Object @{ Name = 'SiteURL'; Expression = { $_.URL } }, @{ Name = 'Allocated'; Expression = { $_.StorageQuota } }, @{ Name = 'Used'; Expression = { $_.StorageUsageCurrent } }, @{ Name = 'Used'; Expression = { $_.StorageQuotaWarningLevel } }
     }
     catch
     {
@@ -114,7 +115,8 @@ try
         }
         $mailboxIndex++
         $progressPCT = 0
-        if($mailboxesCount -gt 0 ){
+        if ($mailboxesCount -gt 0)
+        {
             $progressPCT = ($mailboxIndex /$mailboxesCount) * 100
         }
         Write-Progress -Activity "Procesing Mailboxes" -Status "$progressPCT% Complete:" -PercentComplete $progressPCT
@@ -127,9 +129,10 @@ try
         totalOneDriveStorageUsed = $totalOneDriveStorageUsed
         totalEmailStorageUsed = $totalEmailStorageUsed
         devices = $DevicesReport
+        sharePointAndTeams = $siteCollection
         errors = [array]$errors
     }
-    if (-Not $Report)
+    if (-Not$Report)
     {
         $Report = @{ }
     }
