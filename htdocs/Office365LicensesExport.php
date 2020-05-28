@@ -8,9 +8,6 @@
  */
 
 use CNCLTD\LoggerCLI;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 require_once("config.inc.php");
 global $cfg;
@@ -59,10 +56,9 @@ if (isset($options['d'])) {
 }
 
 $alertMode = false;
-if(isset($options['a'])){
+if (isset($options['a'])) {
     $alertMode = true;
 }
-
 $dbeCustomer = new DBECustomer($thing);
 
 if (isset($customerID)) {
@@ -94,7 +90,12 @@ $buPassword = new BUPassword($thing);
 $dbeOffice365Licenses = new DBEOffice365License($thing);
 do {
     try {
-        $commandRunner = new \CNCLTD\Office365LicensesExportPowerShellCommand($dbeCustomer, $logger, $debugMode, $alertMode);
+        $commandRunner = new \CNCLTD\Office365LicensesExportPowerShellCommand(
+            $dbeCustomer,
+            $logger,
+            $debugMode,
+            $alertMode
+        );
     } catch (\Exception $exception) {
         continue;
     }

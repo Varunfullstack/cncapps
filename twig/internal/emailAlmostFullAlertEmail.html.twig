@@ -34,10 +34,10 @@
                     {{ mailbox.DisplayName }}
                 </td>
                 <td>
-                    {{ mailbox.TotalItemSize }}
+                    {{ mailbox.TotalItemSize |MBtoGB }}
                 </td>
                 <td>
-                    {{ mailbox.Limit }}
+                    {{ mailbox.Limit |MBtoGB }}
                 </td>
             </tr>
         {% endfor %}

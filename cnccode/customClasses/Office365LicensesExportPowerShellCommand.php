@@ -43,6 +43,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Template;
+use Twig\TwigFilter;
 use UnexpectedValueException;
 
 
@@ -124,7 +125,9 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 );
 
                 if ($this->alertMode) {
-
+                    $logger->notice(
+                        'Alert mode is enabled, will notify of any mailboxes that are on or over the limit'
+                    );
                     $primaryMainContactId = $this->dbeCustomer->getValue(DBECustomer::primaryMainContactID);
                     if ($primaryMainContactId && count($this->warningMailboxes)) {
 
@@ -149,12 +152,22 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                                 return $b['TotalItemSize'] - $a['TotalItemSize'];
                             }
                         );
-
+                        $twig->addFilter(
+                            new TwigFilter(
+                                'MBtoGB',
+                                function ($string) {
+                                    if (!is_numeric($string)) {
+                                        return;
+                                    }
+                                    return number_format($string) . 'GB';
+                                }
+                            )
+                        );
                         $body = $twig->render(
                             "@internal/emailAlmostFullAlertEmail.html.twig",
                             [
                                 "contactFirstName" => $dbeContact->getValue(DBEContact::firstName),
-                                "mailboxes" => $this->warningMailboxes
+                                "mailboxes"        => $this->warningMailboxes
                             ]
                         );
 
