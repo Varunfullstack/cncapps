@@ -46,6 +46,7 @@
                 data.addColumn('date', 'date');
                 data.addColumn('number', 'One Drive Storage Used(MB)');
                 data.addColumn('number', 'Email Storage Used(MB)');
+                data.addColumn('number', 'Site Storage Used(MB)');
                 const rows = serverData.map(d => {
                     d.date = moment(d.date, 'YYYY-MM-DD').toDate();
                     return Object.values(d);
@@ -54,7 +55,7 @@
 
 
                 var options = {
-                    title: 'One Drive and Email storage used',
+                    title: 'One Drive, Email and Site storage used',
                     legend: {position: 'bottom'},
                     height: 800,
                     width: 1000

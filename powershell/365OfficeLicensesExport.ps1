@@ -34,6 +34,9 @@ try
     {
         Connect-SPOService -Url $URL  -Credential $Credentials -ErrorAction Stop
         $storageData = Get-SPOSite -IncludePersonalSite $True -Limit All -Filter "Url -like '-my.sharepoint.com/personal/'"
+        $allSitesCollection = Get-SPOSite -Limit All
+        $siteCollection = $allSitesCollection | Select-Object @{ Name = 'SiteURL'; Expression = { $_.URL } }, @{ Name = 'Allocated'; Expression = { $_.StorageQuota } }, @{ Name = 'Used'; Expression = { $_.StorageUsageCurrent } }, @{ Name = 'Warning Level'; Expression = { $_.StorageQuotaWarningLevel } }
+        $totalSiteUsed = ($siteCollection | Measure-Object -Sum Used).Sum
     }
     catch
     {
@@ -75,7 +78,6 @@ try
             $oneDriveStorageUsage = $storageItem.StorageUsageCurrent
             $totalOneDriveStorageUsed = $totalOneDriveStorageUsed + $oneDriveStorageUsage
         }
-        $UserDomain = $UserPrincipalName.Split('@')[1]
         $MailboxStat = Get-EXOMailboxStatistics -UserPrincipalName $UserPrincipalName -WarningAction SilentlyContinue
         $TotalItemSize = $MailboxStat.TotalItemSize.ToString().Split("(")[1].Split(" ")[0].Replace(",", "")/1MB
         $totalEmailStorageUsed = $totalEmailStorageUsed + $TotalItemSize
@@ -114,7 +116,8 @@ try
         }
         $mailboxIndex++
         $progressPCT = 0
-        if($mailboxesCount -gt 0 ){
+        if ($mailboxesCount -gt 0)
+        {
             $progressPCT = ($mailboxIndex /$mailboxesCount) * 100
         }
         Write-Progress -Activity "Procesing Mailboxes" -Status "$progressPCT% Complete:" -PercentComplete $progressPCT
@@ -126,10 +129,12 @@ try
         licenses = $LicensesData
         totalOneDriveStorageUsed = $totalOneDriveStorageUsed
         totalEmailStorageUsed = $totalEmailStorageUsed
+        totalSiteUsed = $totalSiteUsed
         devices = $DevicesReport
+        sharePointAndTeams = $siteCollection
         errors = [array]$errors
     }
-    if (-Not $Report)
+    if (-Not$Report)
     {
         $Report = @{ }
     }

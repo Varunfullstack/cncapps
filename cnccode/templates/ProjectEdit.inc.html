@@ -234,7 +234,7 @@
         };
         window.startDate = $('#startDate').get(0);
         window.expiryDate = $('#expiryDate').get(0);
-        reason = CKEDITOR.replace('summary', {customConfig: '/ckeditor_config.js'});
+        CKEDITOR.replace('summary', {customConfig: '/ckeditor_config.js'});
         fetchProjectBudget();
     });
 

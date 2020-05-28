@@ -96,9 +96,8 @@
             const date = moment(dateValue, 'YYYY-MM-DD');
             if (date.isValid) {
                 const today = moment();
-                const differenceYears = today.diff(date, 'years');
                 const differenceMonths = today.diff(date, 'months');
-                newValue = (differenceYears + differenceMonths / 12).toFixed(1);
+                newValue = (differenceMonths / 12).toFixed(1);
             }
         } catch (e) {
 

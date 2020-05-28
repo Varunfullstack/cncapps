@@ -52,9 +52,10 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
     private $dbeCustomer;
     private $dbeHeader;
 
-    public function __construct($dbeCustomer, LoggerCLI $logger, $debugMode = false)
+    public function __construct($dbeCustomer, LoggerCLI $logger, $debugMode = false, $reuseData = false)
     {
         $this->debugMode = $debugMode;
+        $this->reuseData = $reuseData;
         $this->dbeCustomer = $dbeCustomer;
         $customerID = $dbeCustomer->getValue(DBECustomer::customerID);
         $customerName = $dbeCustomer->getValue(DBECustomer::name);
@@ -99,10 +100,10 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $this->logger = $logger;
         $this->commandName = "365OfficeLicensesExport";
         $data = $this->run();
-
         $mailboxes = $data['mailboxes'];
         $licenses = $data['licenses'];
         $devices = $data['devices'];
+        $sharePointSites = $data['sharePointAndTeams'];
         $BUHeader = new BUHeader($thing);
         $this->dbeHeader = new DataSet($thing);
         $BUHeader->getHeader($this->dbeHeader);
@@ -147,15 +148,23 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             }
         }
 
-        if (!count($mailboxes) && !count($licenses) && !count($devices)) {
-            $message = 'This customer does not have a licences nor mailboxes nor devices';
+        if (count($sharePointSites)) {
+            try {
+                $this->processSharePointSites($spreadsheet, $sharePointSites);
+            } catch (Exception $exception) {
+                $logger->error('Failed to process sharepoint sites for customer: ' . $exception->getMessage());
+            }
+        }
+
+        if (!count($mailboxes) && !count($licenses) && !count($devices) && !count($sharePointSites)) {
+            $message = 'This customer does not have a licences nor mailboxes nor devices nor sharePointSites';
             $logger->warning($message);
             throw new UnexpectedValueException($message);
         }
         global $db;
 
         $statement = $db->preparedQuery(
-            "insert into customerOffice365StorageStats values (?,?,?,?) on duplicate key update totalOneDriveStorageUsed = ?, totalEmailStorageUsed = ?",
+            "insert into customerOffice365StorageStats values (?,?,?,?,?) on duplicate key update totalOneDriveStorageUsed = ?, totalEmailStorageUsed = ?, totalSiteStorageUsed = ?",
             [
                 [
                     "type"  => 'i',
@@ -175,12 +184,20 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 ],
                 [
                     "type"  => 'd',
+                    "value" => $data['totalSiteUsed']
+                ],
+                [
+                    "type"  => 'd',
                     "value" => $data['totalOneDriveStorageUsed']
                 ],
                 [
                     "type"  => 'd',
                     "value" => $data['totalEmailStorageUsed']
-                ]
+                ],
+                [
+                    "type"  => 'd',
+                    "value" => $data['totalSiteUsed']
+                ],
             ]
         );
 
@@ -198,7 +215,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $fileName = "Current Mailbox Extract.xlsx";
         $filePath = $folderName . $fileName;
         try {
-
             $writer->save(
                 $filePath
             );
@@ -509,7 +525,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             switch ($mailboxes[$key]['RecipientTypeDetails']) {
                 case "SharedMailbox":
                     $mailboxes[$key]['RecipientTypeDetails'] = "Shared";
-                    if(!$mailboxes[$key]['IsLicensed']){
+                    if (!$mailboxes[$key]['IsLicensed']) {
                         $mailboxLimit = 51200;
                     }
                     $otherLicenses++;
@@ -1166,6 +1182,68 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             ->setFillType(Fill::FILL_SOLID)
             ->getStartColor()
             ->setARGB("FFFFC7CE");
+    }
+
+    private function processSharePointSites(Spreadsheet $spreadsheet, $sharePointSites)
+    {
+        $sharePointSheet = $spreadsheet->createSheet();
+        $sharePointSheet->setTitle('Sharepoint & Teams');
+        $sharePointSheet->fromArray(
+            [
+                "Site URL",
+                "Allocated",
+                "Used",
+                "Warning Level",
+            ],
+            null,
+            'A1'
+        );
+
+        foreach ($sharePointSites as $key => $sharePointSite) {
+            $sharePointSites[$key]['Allocated'] = $sharePointSite['Allocated'] / 1024;
+            $sharePointSites[$key]['Used'] = $sharePointSite['Used'] / 1024;
+            $sharePointSites[$key]['Warning Level'] = $sharePointSite['Warning Level'] / 1024;
+        }
+
+        $sharePointSheet->fromArray(
+            $sharePointSites,
+            null,
+            'A2',
+            true
+        );
+        $highestRow = $sharePointSheet->getHighestRow();
+        $highestColumn = $sharePointSheet->getHighestColumn();
+        $sharePointSheet->getStyle("A1:{$highestColumn}1")->getFont()->setBold(true);
+
+        foreach (range('A', $highestColumn) as $col) {
+            $sharePointSheet->getColumnDimension($col)
+                ->setAutoSize(true);
+        }
+
+        $dateTime = new DateTime();
+        $nextRow = $highestRow + 1;
+        $sharePointSheet->setCellValue(
+            "C{$nextRow}",
+            '=sum(C2:C' . ($highestRow) . ')'
+        );
+        $sharePointSheet->getCell("C{$nextRow}")->getStyle()->getNumberFormat()->setFormatCode("#,##0");
+        $sharePointSheet->setCellValue(
+            "B{$nextRow}",
+            'Total'
+        );
+
+        $numberColumns = $sharePointSheet->getStyle("B2:D$highestRow");
+        $numberColumns->getNumberFormat()->setFormatCode("#,##0");
+
+
+        $sharePointSheet->getStyle("A1:{$highestColumn}{$sharePointSheet->getHighestRow()}")->getAlignment(
+        )->setHorizontal('center');
+        $legendRowStart = $highestRow + 2;
+        $sharePointSheet->fromArray(
+            ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],
+            null,
+            'A' . $legendRowStart
+        );
     }
 
     protected function getParams(): PowerShellParamCollection

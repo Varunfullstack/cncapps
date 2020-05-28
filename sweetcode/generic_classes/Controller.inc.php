@@ -616,11 +616,11 @@ class Controller extends BaseObject
                 "pageHeader" => $this->pageHeader
             ]
         );
+
         $this->template->set_var(
             'environmentClass',
-            "class='environment-" . $GLOBALS['server_type'] . "'"
+            "environment-" . $GLOBALS['server_type']
         );
-
 
         if ($this->getFormError()) {
             if ($this->getFormErrorMessage() != '') {

@@ -1,4 +1,9 @@
 <!-- Template: RootCauseEdit.inc.html -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        CKEDITOR.replace('fixedExplanation', {customConfig: '/ckeditor_config.js'});
+    })
+</script>
 <TABLE width="200px"
        border="0"
        cellpadding="2"
@@ -73,9 +78,7 @@
                 >
 					{fixedExplanation}
 				</textarea>
-                <script>
-                    CKEDITOR.replace('fixedExplanation', {customConfig: '/ckeditor_config.js'});
-                </script>
+
             </td>
         </tr>
         <tr>

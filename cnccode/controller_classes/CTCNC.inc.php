@@ -620,7 +620,7 @@ class CTCNC extends Controller
             [
                 "id"    => 203,
                 "label" => "Change Requests",
-                "href"  => "ChangeRequestDashboard.php"
+                "href"  => "ChangeRequestDashboard.php?HD=null&ES=null&SP=null&P=null"
             ],
             [
                 "id"    => 204,

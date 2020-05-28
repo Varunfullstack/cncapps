@@ -1,6 +1,14 @@
 <script type="text/javascript">
     window.addEventListener('DOMContentLoaded', function () {
         window.etaDate = $('#etaDate').get(0);
+        let reason = CKEDITOR.replace(
+            'serviceRequestText',
+            {
+                customConfig: '/ckeditor_config.js'
+            }
+        );
+        reason.config.width = "100%";
+        reason.config.height = "250px";
     });
 
     function insertValueQuery(myListBox, myQuery) {
@@ -111,16 +119,6 @@
                 <textarea id="serviceRequestText"
                           name="inputForm[1][serviceRequestText]"
                 >{serviceRequestText}</textarea>
-                <script type="text/javascript">
-                    reason = CKEDITOR.replace(
-                        'serviceRequestText',
-                        {
-                            customConfig: '/ckeditor_config.js'
-                        }
-                    );
-                    reason.config.width = "100%";
-                    reason.config.height = "250px";
-                </script>
             </td>
         </tr>
         <tr>

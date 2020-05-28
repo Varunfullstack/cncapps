@@ -35,7 +35,7 @@ class CTRenQuotation extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = RENEWALS_PERMISSION;
+        $roles = [RENEWALS_PERMISSION, TECHNICAL_PERMISSION];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;

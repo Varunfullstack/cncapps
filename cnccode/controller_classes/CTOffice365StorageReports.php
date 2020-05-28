@@ -89,7 +89,8 @@ class CTOffice365StorageReports extends CTCNC
         $query = "SELECT
   a.date,
   a.totalOneDriveStorageUsed,
-  a.totalEmailStorageUsed
+  a.totalEmailStorageUsed,
+  a.totalSiteStorageUsed
 FROM
   customerOffice365StorageStats a
   LEFT JOIN customer

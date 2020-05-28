@@ -4,8 +4,22 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 865 - What3words integration
+- Issue 850 - Include Sharepoint & Teams Storage in Office 365 Mailbox Export
 ### Changed
 - Issue 840 - PO Status v10
+
+## [v4.0.3] - 2020-05-28
+### Fixed
+- CKEditor not showing while processing change request
+- CKEditor not showing while creating SR from sales order
+- Current Activity Report - Pending Reopen not showing as table
+
+## [v4.0.2] - 2020-05-27
+### Fixed
+- User.php shows wrong length of service value
+- CustomerItem.php displayCI permissions should be Technical or Sales
+- Added technical permission to contracts pages
+- Brought back environment colors!
 
 ## [v4.0.1] - 2020-05-26
 ### Fixed

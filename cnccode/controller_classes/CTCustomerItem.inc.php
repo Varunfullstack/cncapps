@@ -109,7 +109,8 @@ class CTCustomerItem extends CTCNC
             $cfg
         );
         $roles = [
-            "technical",
+            TECHNICAL_PERMISSION,
+            SALES_PERMISSION
         ];
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
@@ -127,7 +128,6 @@ class CTCustomerItem extends CTCNC
      */
     function defaultAction()
     {
-        $this->checkPermissions(TECHNICAL_PERMISSION);
         $this->setParentFormFields();
         switch ($this->getAction()) {
             case CTCNC_ACT_SEARCH:
