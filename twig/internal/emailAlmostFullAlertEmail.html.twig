@@ -13,7 +13,7 @@
         A full report of the company mailbox sizes is available in our customer portal on our website.
     </p>
 
-    <table>
+    <table class="alertTable">
         <thead>
         <tr>
             <th>
@@ -30,13 +30,13 @@
         <tbody>
         {% for mailbox in mailboxes %}
             <tr>
-                <td>
+                <td style="padding-right: 5px">
                     {{ mailbox.DisplayName }}
                 </td>
-                <td>
+                <td style="text-align: center;padding-right: 5px">
                     {{ mailbox.TotalItemSize |MBtoGB }}
                 </td>
-                <td>
+                <td style="text-align: center;">
                     {{ mailbox.Limit |MBtoGB }}
                 </td>
             </tr>

@@ -159,7 +159,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                                     if (!is_numeric($string)) {
                                         return;
                                     }
-                                    return number_format($string) . 'GB';
+                                    return number_format($string/1024) . 'GB';
                                 }
                             )
                         );
