@@ -75,7 +75,7 @@ class BUPDF extends BaseObject
         $this->pdf = new FPDF_Protection();
         if ($encrypted) {
             $this->pdf->SetProtection(
-                ['print'],
+                ['print', 'annot-forms'],
                 '',
                 '[V.^DW_uA^2~vER$'
             );
