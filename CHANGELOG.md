@@ -11,6 +11,7 @@ This project changes will be shown here.
 - Issue 904 - Renewal Report Unit numbers not matching
 - Issue 892 - Lead Status Layout Change
 - Issue 892 - Lead Status Layout Change
+- Issue 822 - Combining SRs for Sales Order ordering issue
 
 ## [v4.1.8] - 2020-06-26
 ### Fixed
