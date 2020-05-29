@@ -59,7 +59,12 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
      */
     private $alertMode;
 
-    public function __construct($dbeCustomer, LoggerCLI $logger, $debugMode = false, $alertMode = false, $reuseData = false)
+    public function __construct($dbeCustomer,
+                                LoggerCLI $logger,
+                                $debugMode = false,
+                                $alertMode = false,
+                                $reuseData = false
+    )
     {
         $this->debugMode = $debugMode;
         $this->reuseData = $reuseData;
@@ -160,7 +165,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                                     if (!is_numeric($string)) {
                                         return;
                                     }
-                                    return number_format($string/1024) . 'GB';
+                                    return number_format($string / 1024) . 'GB';
                                 }
                             )
                         );
@@ -229,7 +234,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
 
         if (count($sharePointSites)) {
             try {
-                $this->processSharePointSites($spreadsheet, $sharePointSites);
+                $this->processSharePointSites($spreadsheet, $sharePointSites, $data['totalSiteUsed']);
             } catch (Exception $exception) {
                 $logger->error('Failed to process sharepoint sites for customer: ' . $exception->getMessage());
             }
@@ -1265,26 +1270,20 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             ->setARGB("FFFFC7CE");
     }
 
-    private function processSharePointSites(Spreadsheet $spreadsheet, $sharePointSites)
+    private function processSharePointSites(Spreadsheet $spreadsheet, $sharePointSites, $totalUsed)
     {
         $sharePointSheet = $spreadsheet->createSheet();
         $sharePointSheet->setTitle('Sharepoint & Teams');
         $sharePointSheet->fromArray(
             [
                 "Site URL",
-                "Allocated",
-                "Used",
-                "Warning Level",
+                "Used(MB)",
             ],
             null,
             'A1'
         );
+        $sharePointSites[] = ["Total", $totalUsed];
 
-        foreach ($sharePointSites as $key => $sharePointSite) {
-            $sharePointSites[$key]['Allocated'] = $sharePointSite['Allocated'] / 1024;
-            $sharePointSites[$key]['Used'] = $sharePointSite['Used'] / 1024;
-            $sharePointSites[$key]['Warning Level'] = $sharePointSite['Warning Level'] / 1024;
-        }
 
         $sharePointSheet->fromArray(
             $sharePointSites,
@@ -1302,23 +1301,13 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         }
 
         $dateTime = new DateTime();
-        $nextRow = $highestRow + 1;
         $sharePointSheet->setCellValue(
-            "C{$nextRow}",
-            '=sum(C2:C' . ($highestRow) . ')'
+            "B{$highestRow}",
+            '=sum(B2:B' . ($highestRow - 1) . ')'
         );
-        $sharePointSheet->getCell("C{$nextRow}")->getStyle()->getNumberFormat()->setFormatCode("#,##0");
-        $sharePointSheet->setCellValue(
-            "B{$nextRow}",
-            'Total'
-        );
-
-        $numberColumns = $sharePointSheet->getStyle("B2:D$highestRow");
-        $numberColumns->getNumberFormat()->setFormatCode("#,##0");
-
-
-        $sharePointSheet->getStyle("A1:{$highestColumn}{$sharePointSheet->getHighestRow()}")->getAlignment(
-        )->setHorizontal('center');
+        $sharePointSheet->getStyle("A{$highestRow}:B{$highestRow}")->getFont()->setBold(true);
+        $sharePointSheet->getStyle("B2:B{$highestRow}")->getNumberFormat()->setFormatCode("#,##0");
+        $sharePointSheet->getStyle("A1:B{$sharePointSheet->getHighestRow()}")->getAlignment()->setHorizontal('center');
         $legendRowStart = $highestRow + 2;
         $sharePointSheet->fromArray(
             ["Report generated at " . $dateTime->format("d-m-Y H:i:s")],

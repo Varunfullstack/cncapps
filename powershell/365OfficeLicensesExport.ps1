@@ -35,7 +35,7 @@ try
         Connect-SPOService -Url $URL  -Credential $Credentials -ErrorAction Stop
         $storageData = Get-SPOSite -IncludePersonalSite $True -Limit All -Filter "Url -like '-my.sharepoint.com/personal/'"
         $allSitesCollection = Get-SPOSite -Limit All
-        $siteCollection = $allSitesCollection | Select-Object @{ Name = 'SiteURL'; Expression = { $_.URL } }, @{ Name = 'Allocated'; Expression = { $_.StorageQuota } }, @{ Name = 'Used'; Expression = { $_.StorageUsageCurrent } }, @{ Name = 'Warning Level'; Expression = { $_.StorageQuotaWarningLevel } }
+        $siteCollection = $allSitesCollection | Select-Object @{ Name = 'SiteURL'; Expression = { $_.URL } }, @{ Name = 'Used'; Expression = { $_.StorageUsageCurrent } }
         $totalSiteUsed = ($siteCollection | Measure-Object -Sum Used).Sum
     }
     catch
