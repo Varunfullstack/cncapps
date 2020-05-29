@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 822 - Combining SRs for Sales Order ordering issue
+
 ## [v4.1.2] - 2020-06-03
 ### Fixed
 - SRScheduler doesn't show SR's
