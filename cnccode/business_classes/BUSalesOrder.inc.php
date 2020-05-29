@@ -1688,6 +1688,7 @@ class BUSalesOrder extends Business
 
 
         $dbeOrdline = new DBEOrdline($this);
+        $dbeOrdline->setShowSQLOn();
         $dbeOrdline->setValue(
             DBEOrdline::ordheadID,
             $ordheadID
@@ -1960,7 +1961,7 @@ class BUSalesOrder extends Business
         $dbeToOrdline->resetQueryString();
 
         if (!$sequenceNo) {
-            $sequenceNo = $dbeToOrdline->rowCount(); // so we paste after the last row
+            $sequenceNo = $dbeToOrdline->rowCount() -1 ; // so we paste after the last row
         } else {
             /*
             Shuffle up lines past $sequenceNo
