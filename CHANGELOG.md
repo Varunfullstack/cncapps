@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 822 - Combining SRs for Sales Order ordering issue
+
 ## [v4.0.3] - 2020-05-28
 ### Fixed
 - CKEditor not showing while processing change request
