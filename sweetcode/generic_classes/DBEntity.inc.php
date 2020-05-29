@@ -53,7 +53,7 @@ class DBEntity extends DataAccess
     public $db;    // RDBMS table name
     public $queryString = "";    // For debug purposes - TRUE causes all SQL statements to be output
     public $tableName = "";    // For debug purposes - TRUE causes all SQL statements to be output
-    public $showSQL = false;        // For comparison during update
+    public $showSQL = true;        // For comparison during update
     public $logSQL = false;    // For comparison during update
     public $rowBefore;
     public $arrayRowBefore;
