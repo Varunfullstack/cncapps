@@ -40,6 +40,7 @@ use Exception;
 use Mail_mime;
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Template;
@@ -1277,7 +1278,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $sharePointSheet->fromArray(
             [
                 "Site URL",
-                "Used(MB)",
+                "Used (MB)",
             ],
             null,
             'A1'
@@ -1305,6 +1306,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             "B{$highestRow}",
             '=sum(B2:B' . ($highestRow - 1) . ')'
         );
+        $sharePointSheet->getStyle("A{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
         $sharePointSheet->getStyle("A{$highestRow}:B{$highestRow}")->getFont()->setBold(true);
         $sharePointSheet->getStyle("B2:B{$highestRow}")->getNumberFormat()->setFormatCode("#,##0");
         $sharePointSheet->getStyle("A1:B{$sharePointSheet->getHighestRow()}")->getAlignment()->setHorizontal('center');
