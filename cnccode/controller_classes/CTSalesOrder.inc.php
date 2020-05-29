@@ -3128,6 +3128,7 @@ class CTSalesOrder extends CTCNC
             $this->getOrdheadID(),
             $this->dsSelectedOrderLine
         );
+        exit;
         header('Location: ' . $this->getDisplayOrderURL());
         exit;
     }
@@ -4124,10 +4125,12 @@ class CTSalesOrder extends CTCNC
         // pasting lines from another Sales Order
         if ($this->getParam('ordline')[1]['lineType'] == 'S') {
             $this->pasteLinesFromSO();
+            header('Location: ' . $this->getDisplayOrderURL());
             exit;
         }
         if ($this->getParam('ordline')[1]['lineType'] == 'T') {
             $this->pasteLinesFromQuotationTemplate();
+            header('Location: ' . $this->getDisplayOrderURL());
             exit;
         }
 
@@ -4402,6 +4405,7 @@ class CTSalesOrder extends CTCNC
             $this->getOrdheadID(),
             $this->getSequenceNo()
         );
+        exit;
         header('Location: ' . $this->getDisplayOrderURL());
     }
 
