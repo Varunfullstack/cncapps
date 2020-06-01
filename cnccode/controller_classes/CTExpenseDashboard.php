@@ -30,12 +30,11 @@ class CTExpenseDashboard extends CTCNC
             $cookieVars,
             $cfg
         );
-
-        if (!self::hasPermissions($this->isExpenseApprover())) {
+        $this->setMenuId(906);
+        if (!$this->isExpenseApprover() && !$this->hasPermissions(TECHNICAL_PERMISSION)) {
             Header("Location: /NotAllowed.php");
             exit;
         }
-        $this->setMenuId(906);
     }
 
     /**
@@ -189,7 +188,6 @@ WHERE
                 );
                 break;
             case "getOvertimeData" :
-                session_write_close();
                 // we have to retrieve the data for the user + if the user is someones approver
 
                 $queryString = 'SELECT
@@ -334,6 +332,10 @@ WHERE
                 );
                 break;
             case "approveExpense":
+                if (!$this->isExpenseApprover()) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $expenseId = @$_REQUEST['id'];
                 try {
                     $this->processExpense($expenseId);
@@ -345,6 +347,10 @@ WHERE
                 echo json_encode($response, JSON_NUMERIC_CHECK);
                 break;
             case "denyExpense":
+                if (!$this->isExpenseApprover()) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $expenseId = @$_REQUEST['id'];
                 $denyReason = @$_REQUEST['denyReason'];
                 try {
@@ -357,6 +363,10 @@ WHERE
                 echo json_encode($response, JSON_NUMERIC_CHECK);
                 break;
             case 'deleteExpense':
+                if (!$this->isExpenseApprover()) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $expenseId = @$_REQUEST['id'];
                 try {
                     $this->deleteExpense($expenseId);
@@ -368,6 +378,10 @@ WHERE
                 echo json_encode($response, JSON_NUMERIC_CHECK);
                 break;
             case "approveOvertime":
+                if (!$this->isExpenseApprover()) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $activityId = @$_REQUEST['id'];
                 $overtimeDurationApproved = @$_REQUEST['overtimeDurationApproved'];
                 try {
@@ -380,6 +394,10 @@ WHERE
                 echo json_encode($response, JSON_NUMERIC_CHECK);
                 break;
             case "denyOvertime":
+                if (!$this->isExpenseApprover()) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $activityId = @$_REQUEST['id'];
                 $denyReason = @$_REQUEST['denyReason'];
                 try {
@@ -392,6 +410,10 @@ WHERE
                 echo json_encode($response, JSON_NUMERIC_CHECK);
                 break;
             case "deleteOvertime":
+                if (!$this->isExpenseApprover()) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $activityId = @$_REQUEST['id'];
                 try {
                     $this->processOvertime($activityId, false, null, true);
@@ -402,12 +424,83 @@ WHERE
                 }
                 echo json_encode($response, JSON_NUMERIC_CHECK);
                 break;
-            case 'runningTotals':
-                session_write_close();
-                global $twig;
+            case "getExpensesRunningTotalData":
                 /** @var dbSweetcode $db */
                 global $db;
+                if (!$this->isExpenseApprover()) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
+                $expenseQuery = "SELECT * FROM 
+(SELECT
+  consultant.`cns_name` AS staffName,
+  (SELECT
+    SUM(exp_value)
+  FROM
+    expense
+    LEFT JOIN callactivity
+      ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
+  WHERE callactivity.`caa_consno` = consultant.`cns_consno`
+    AND caa_date BETWEEN DATE_FORMAT(NOW(), '%Y')
+    AND NOW()
+    AND exp_exported_flag <> \"N\"
+    AND expense.`approvedBy` IS NOT NULL) AS YTD,
+  b.*
+FROM
+  consultant
+  LEFT JOIN
+    (SELECT
+      callactivity.`caa_consno` AS staffId,
+      SUM(
+        IF(
+          expense.`approvedBy` IS NOT NULL,
+          expense.`exp_value`,
+          0
+        )
+      ) AS approvedValue,
+      SUM(
+        IF(
+          expense.`approvedBy` IS NULL
+          AND expense.`deniedReason` IS NULL,
+          expense.`exp_value`,
+          0
+        )
+      ) AS pendingValue
+    FROM
+      expense
+      LEFT JOIN `callactivity`
+        ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
+    WHERE caa_endtime
+      AND caa_endtime IS NOT NULL
+      AND expense.`exp_exported_flag` <> 'Y'
+    GROUP BY staffId) b
+    ON b.staffId = consultant.`cns_consno`
+WHERE (
+    consultant.`expenseApproverID` = ?
+    OR
+    (SELECT
+      1
+    FROM
+      consultant globalApprovers
+    WHERE globalApprovers.globalExpenseApprover
+      AND globalApprovers.cns_consno = ?) = 1
+  ) 
+  AND consultant.`activeFlag` = \"Y\") a WHERE YTD IS NOT NULL OR approvedValue IS NOT NULL OR pendingValue IS NOT NULL ORDER BY staffName";
 
+                $result = $db->preparedQuery(
+                    $expenseQuery,
+                    [["type" => "i", "value" => $this->userID], ["type" => "i", "value" => $this->userID]]
+                );
+                $expenses = $result->fetch_all(MYSQLI_ASSOC);
+                echo json_encode($expenses, JSON_NUMERIC_CHECK);
+                break;
+            case "getOvertimeRunningTotalData":
+                /** @var dbSweetcode $db */
+                global $db;
+                if (!$this->isExpenseApprover()) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
                 $overtimeQuery = "SELECT
   *
 FROM
@@ -483,78 +576,26 @@ ORDER BY staffName";
                     [["type" => "i", "value" => $this->userID], ["type" => "i", "value" => $this->userID]]
                 );
                 $overtimes = $result->fetch_all(MYSQLI_ASSOC);
+                echo json_encode($overtimes, JSON_NUMERIC_CHECK);
+                break;
+            case 'runningTotals':
+                if (!$this->isExpenseApprover()) {
+                    Header("Location: /NotAllowed.php");
+                    exit;
+                }
+                global $twig;
 
-                $expenseQuery = "SELECT * FROM 
-(SELECT
-  consultant.`cns_name` AS staffName,
-  (SELECT
-    SUM(exp_value)
-  FROM
-    expense
-    LEFT JOIN callactivity
-      ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
-  WHERE callactivity.`caa_consno` = consultant.`cns_consno`
-    AND caa_date BETWEEN DATE_FORMAT(NOW(), '%Y')
-    AND NOW()
-    AND exp_exported_flag <> \"N\"
-    AND expense.`approvedBy` IS NOT NULL) AS YTD,
-  b.*
-FROM
-  consultant
-  LEFT JOIN
-    (SELECT
-      callactivity.`caa_consno` AS staffId,
-      SUM(
-        IF(
-          expense.`approvedBy` IS NOT NULL,
-          expense.`exp_value`,
-          0
-        )
-      ) AS approvedValue,
-      SUM(
-        IF(
-          expense.`approvedBy` IS NULL
-          AND expense.`deniedReason` IS NULL,
-          expense.`exp_value`,
-          0
-        )
-      ) AS pendingValue
-    FROM
-      expense
-      LEFT JOIN `callactivity`
-        ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
-    WHERE caa_endtime
-      AND caa_endtime IS NOT NULL
-      AND expense.`exp_exported_flag` <> 'Y'
-    GROUP BY staffId) b
-    ON b.staffId = consultant.`cns_consno`
-WHERE (
-    consultant.`expenseApproverID` = ?
-    OR
-    (SELECT
-      1
-    FROM
-      consultant globalApprovers
-    WHERE globalApprovers.globalExpenseApprover
-      AND globalApprovers.cns_consno = ?) = 1
-  ) 
-  AND consultant.`activeFlag` = \"Y\") a WHERE YTD IS NOT NULL OR approvedValue IS NOT NULL OR pendingValue IS NOT NULL ORDER BY staffName";
-
-                $result = $db->preparedQuery(
-                    $expenseQuery,
-                    [["type" => "i", "value" => $this->userID], ["type" => "i", "value" => $this->userID]]
+                $this->setTemplateFiles(
+                    array('ChangeLog' => 'About.inc')
                 );
-                $expenses = $result->fetch_all(MYSQLI_ASSOC);
 
-                $context = [
-                    "expenses"  => $expenses,
-                    "overtimes" => $overtimes
-                ];
 
-                $this->template->setVar(
-                    'CONTENTS',
-                    $twig->render('@internal/expenseDashboard/runningTotals.html.twig', $context)
+                $this->template->set_var(
+                    'changeLog',
+                    $twig->render('@internal/expenseDashboard/runningTotals.html.twig', [])
                 );
+
+                $this->template->parse('CONTENTS', 'ChangeLog', true);
                 $this->parsePage();
                 break;
             default:

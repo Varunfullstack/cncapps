@@ -1,5 +1,62 @@
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        $('#expensesTable').dataTable({
+            dom: 'lfrtip',
+            stateSave: true,
+            searchDelay: 1000,
+            columns: [
+                {data: "staffName"},
+                {data: "approvedValue"},
+                {data: "pendingValue"},
+                {data: 'YTD'},
+
+            ],
+            order: [[0, "desc"]],
+            serverSide: false,
+            ajax: {
+                url: "?action=getExpensesRunningTotalData",
+                type: "GET",
+                dataSrc: (result) => {
+                    return result;
+                }
+            },
+            processing: true,
+            language: {
+                'loadingRecords': '&nbsp;',
+                'processing': 'Loading...'
+            }
+        });
+        $('#overtimeTable').dataTable({
+            dom: 'lfrtip',
+            stateSave: true,
+            searchDelay: 1000,
+            columns: [
+                {data: "staffName"},
+                {data: "approvedValue"},
+                {data: "pendingValue"},
+                {data: 'YTD'},
+
+            ],
+            order: [[0, "desc"]],
+            serverSide: false,
+            ajax: {
+                url: "?action=getOvertimeRunningTotalData",
+                type: "GET",
+                dataSrc: (result) => {
+                    return result;
+                }
+            },
+            processing: true,
+            language: {
+                'loadingRecords': '&nbsp;',
+                'processing': 'Loading...'
+            }
+        });
+
+    })
+</script>
 <h1>Expenses</h1>
-<table>
+<table id="expensesTable">
     <thead>
     <tr>
         <th>Name</th>
@@ -9,27 +66,11 @@
     </tr>
     </thead>
     <tbody>
-    {% for expense in expenses %}
-        <tr>
-            <td>
-                {{ expense.staffName }}
-            </td>
-            <td>
-                {{ expense.approvedValue }}
-            </td>
-            <td>
-                {{ expense.pendingValue }}
-            </td>
-            <td>
-                {{ expense.YTD }}
-            </td>
-        </tr>
-    {% endfor %}
     </tbody>
 </table>
 <br>
 <h1>Overtime</h1>
-<table>
+<table id="overtimeTable">
     <thead>
     <tr>
         <th>Name</th>
