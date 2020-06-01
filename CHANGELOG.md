@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.1.1]
+### Fixed
+- Contact Export blank page on type = customers
+- Search Activity page doesn't show the contracts correctly after selecting customer
+
 ## [v4.1.0]
 ### Added
 - Issue 865 - What3words integration

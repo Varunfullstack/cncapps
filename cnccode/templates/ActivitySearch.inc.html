@@ -13,28 +13,46 @@
         });
     })
 
+    function appendOptGroup(parent, label, options) {
+        const optGroupElement = document.createElement('optgroup');
+        optGroupElement.label = label;
+        options.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option.id;
+            optionElement.textContent = option.description;
+            optGroupElement.appendChild(optionElement);
+        })
+        parent.appendChild(optGroupElement);
+    }
+
+    let contractSelector;
+    let customerIDInput;
+
     function renderContracts() {
-        $('#contractSelector').html("<option value='99'>All</option><option value=''>T &amp; M</option>");
-        if ($('#customerID').val()) {
+        if (!contractSelector) {
+            contractSelector = document.getElementById('contractSelector');
+        }
+        if (!customerIDInput) {
+            customerIDInput = document.getElementById('customerID');
+        }
+        contractSelector.innerHTML = null;
+        const allOption = document.createElement('option');
+        allOption.value = "99";
+        allOption.text = "T & M";
+        contractSelector.appendChild(allOption);
+        if (customerIDInput.value) {
             $.ajax({
                 url: '{fetchContractsURL}',
                 method: 'POST',
                 type: 'post',
                 dataType: 'json',
-                data: {customerID: $('#customerID').val()}
+                data: {customerID: customerIDInput.value}
             }).then(function (result) {
                 console.log(result);
-                var options = Object.keys(result).reduce(function (acc, key) {
+                Object.keys(result).forEach(function (key) {
                     //for each key we create an optgroup
-                    acc += "<optgroup label='" + key + "'>";
-                    acc += result[key].reduce(function (subacc, item) {
-                        subacc += "<option value='" + item.id + +"' >" + item.description + "</option>";
-                        return subacc;
-                    }, "");
-                    acc += "</optgroup>";
-                    return acc;
-                }, '');
-                $('#contractSelector').append(options);
+                    appendOptGroup(contractSelector, key, result[key]);
+                });
             });
         }
     }

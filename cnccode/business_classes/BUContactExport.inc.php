@@ -218,8 +218,9 @@ class BUContactExport extends Business
 
             if ($dsSearchForm->getValue(CTContactExport::searchFormProspectFlag) != 'Y') {
                 $possibleOrQueries .= "  not {$condition}";
+            } else {
+                $possibleOrQueries .= $condition;
             }
-            $possibleOrQueries .= $condition;
         }
 
         if ($dsSearchForm->getValue(DBEContact::sendMailshotFlag)) {

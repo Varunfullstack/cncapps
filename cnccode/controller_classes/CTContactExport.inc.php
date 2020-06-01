@@ -411,7 +411,7 @@ WHERE customer.`cus_referred` <> 'Y'
                     $dsSearchForm,
                     $contractItemIDs
                 );
-
+            
             if ($this->getParam('Export')) {
                 $this->generateCSV($results);
                 exit;
@@ -645,7 +645,7 @@ WHERE customer.`cus_referred` <> 'Y'
      */
     function generateCSV($resultSet)
     {
-        if(!$resultSet){
+        if (!$resultSet) {
             return;
         }
         $fileName = 'contacts.csv';
