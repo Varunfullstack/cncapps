@@ -1,17 +1,17 @@
 # Changelog
 This project changes will be shown here.
 
-## [v4.1.2]
+## [v4.1.2] 2020-06-03
 ### Fixed
 - SRScheduler doesn't show SR's
 - Current Activity report doesn't reload automatically
 
-## [v4.1.1]
+## [v4.1.1] 2020-05-29
 ### Fixed
 - Contact Export blank page on type = customers
 - Search Activity page doesn't show the contracts correctly after selecting customer
-
-## [v4.1.0]
+ 
+## [v4.1.0] 2020-05-28
 ### Added
 - Issue 865 - What3words integration
 - Issue 850 - Include Sharepoint & Teams Storage in Office 365 Mailbox Export
