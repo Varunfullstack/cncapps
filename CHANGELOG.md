@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.1.2]
+### Fixed
+- SRScheduler doesn't show SR's
+- Current Activity report doesn't reload automatically
+
 ## [v4.1.1]
 ### Fixed
 - Contact Export blank page on type = customers
