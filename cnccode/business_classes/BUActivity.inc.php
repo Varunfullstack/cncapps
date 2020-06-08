@@ -1742,14 +1742,14 @@ class BUActivity extends Business
         if (in_array($problem->getValue(DBEProblem::status), ["F", "C"])) {
             /** @var $db dbSweetcode */
             global $db;
-            $db->preparedQuery(
+            $resultset = $db->preparedQuery(
                 'select getOpenHours(?)',
                 [["type" => "i", "value" => $problem->getValue(DBEProblem::problemID)]]
             );
-            $db->next_record(MYSQLI_NUM);
+            $row = $resultset->fetch_row();
             $problem->setValue(
                 DBEProblem::openHours,
-                $db->Record[0]
+                $row[0]
             );
         }
 

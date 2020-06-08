@@ -349,11 +349,25 @@ class QuestionnaireReportGenerator
          FROM
            answer           
           WHERE
-           ans_date BETWEEN '$this->startDate' AND '$this->endDate'
+           ans_date BETWEEN ? AND ?
            AND ans_questionno = $que_questionno
        ";
 
-        $mysqliResult = $this->db->query($sql);
+
+
+        $mysqliResult = $this->db->preparedQuery(
+            $sql,
+            [
+                [
+                    "type" => "s",
+                    "value" => $this->startDate->format(DATE_MYSQL_DATE)
+                ],
+                [
+                    "type" => "s",
+                    "value" => $this->endDate->format(DATE_MYSQL_DATE)
+                ],
+            ]
+        );
         $labels = [];
         while ($answer = $mysqliResult->fetch_assoc()) {
             if (!$answer['ans_answer']) {

@@ -5,6 +5,8 @@ use Signable\ApiClient;
 use Signable\DocumentWithoutTemplate;
 use Signable\Envelopes;
 use Signable\Party;
+use Slim\Psr7\Request;
+use Slim\Psr7\Response;
 use Twig\Environment;
 
 require_once __DIR__ . '/../config.inc.php';
@@ -449,7 +451,7 @@ ORDER BY COUNT DESC";
     NULL) 
   ) AS slaMet,
     AVG(IF(pro_status IN ("F","C"), openHours < 8, NULL)) AS closedWithin8Hours,
-    AVG(IF(pro_status ="C",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
+    AVG(IF(pro_status ="C" and pro_hide_from_customer_flag <> "Y",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
     AVG(IF(pro_status IN ("F","C"), problem.`pro_chargeable_activity_duration_hours`,NULL)) AS avgChargeableTime,
     AVG(IF(pro_status IN ("F","C"), problem.pro_working_hours,NULL)) AS avgTimeAwaitingCNC,
     AVG(IF(pro_status IN ("F","C"), openHours,NULL)) AS avgTimeFromRaiseToFixHours
@@ -486,7 +488,7 @@ WHERE  caa_date between ? and ?
     NULL) 
   ) AS slaMet,
     AVG(IF(pro_status IN ("F","C"), openHours < 8, NULL)) AS closedWithin8Hours,
-    AVG(IF(pro_status ="C",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
+    AVG(IF(pro_status ="C" and pro_hide_from_customer_flag <> "Y",problem.`pro_reopened_date` IS NOT NULL, NULL)) AS reopened,
     AVG(IF(pro_status IN ("F","C"), problem.`pro_chargeable_activity_duration_hours`,NULL)) AS avgChargeableTime,
     AVG(IF(pro_status IN ("F","C"), problem.pro_working_hours,NULL)) AS avgTimeAwaitingCNC,
     AVG(IF(pro_status IN ("F","C"), openHours,NULL)) AS avgTimeFromRaiseToFixHours
@@ -790,7 +792,16 @@ $app->group(
         );
     }
 );
-
-
-$app->run();
+$app->any(
+    '{route:.*}',
+    function (Request $request, Response $response) {
+        return $response->withStatus(404, 'page not found');
+    }
+);
+try {
+    $app->run();
+} catch (\Slim\Exception\HttpNotFoundException $exception) {
+    http_response_code(404);
+    echo json_encode(["Error" => "Resource not found"]);
+}
 

@@ -1,6 +1,14 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.1.3]
+### Fixed
+- Fixed issue with questionnaireReport
+- Fixed issue with Office365Licenses and OSSupportDates not getting the menu open
+### Changed
+- Prevent any user that is NOT SD Manager to click "update" button while editing activity
+- Changed API Stats query to exclude hidden from customer of the Reopened figures
+
 ## [v4.1.2] - 2020-06-03
 ### Fixed
 - SRScheduler doesn't show SR's

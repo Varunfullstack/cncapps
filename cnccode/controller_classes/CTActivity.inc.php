@@ -4407,6 +4407,7 @@ class CTActivity extends CTCNC
                 'hiddenContractCustomerItemID'   => $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID),
                 'hiddenActivityType'             => $hiddenActivityType,
                 'customerDetails'                => $customerDetails,
+                'SDManagerDisabled'              => $this->isSdManager() ? "" : CTCNC_HTML_DISABLED,
                 'contactPhone'                   => $buCustomer->getContactPhoneForHtml(
                     $dsCallActivity->getValue(DBEJCallActivity::contactID)
                 ),
@@ -5891,18 +5892,18 @@ class CTActivity extends CTCNC
         }
         $callActivityID = $this->getParam('callActivityID');
         $dbeCallDocument->deleteRow();
-        if ($_GET['isEdit']) {
+        if (isset($_GET['isEdit'])) {
             return $this->redirectToEdit($callActivityID);
         }
 
-        if ($_GET['isGather']) {
+        if (isset($_GET['isGather'])) {
             return $this->redirectToGather($callActivityID);
         }
 
         return $this->redirectToDisplay($callActivityID);
     }
 
-    /**
+    /**g
      * @param $callActivityID
      * @throws Exception
      */

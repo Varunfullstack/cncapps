@@ -428,16 +428,17 @@ class DBECallActivitySearch extends DBEntity
         }
 
         if ($activityText != '') {
+            $search = str_replace("@", " ", $activityText);
             $whereParameters .=
                 " AND ( MATCH (reason)
 					AGAINST ('" . mysqli_real_escape_string(
                     $this->db->link_id(),
-                    $activityText
+                    $search
                 ) . "' IN BOOLEAN MODE)
           OR MATCH (pro_internal_notes)
           AGAINST ('" . mysqli_real_escape_string(
                     $this->db->link_id(),
-                    $activityText
+                    $search
                 ) . "' IN BOOLEAN MODE) )";
         }
 
