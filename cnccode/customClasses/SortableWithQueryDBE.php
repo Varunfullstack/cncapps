@@ -40,6 +40,8 @@ trait SortableWithQueryDBE
 
     abstract protected function getDB();
 
+    abstract protected function getDiscriminatorColumnName();
+
     private function swapPlaces($oldOrderId, $newOrderId)
     {
         $query = "UPDATE
