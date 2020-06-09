@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v4.1.3]
+## [v4.1.3] - 2020-06-09
 ### Fixed
 - Fixed issue with questionnaireReport
 - Fixed issue with Office365Licenses and OSSupportDates not getting the menu open
