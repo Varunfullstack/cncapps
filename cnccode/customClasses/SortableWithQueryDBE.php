@@ -3,47 +3,46 @@
 
 namespace CNCLTD;
 
-
 trait SortableWithQueryDBE
 {
-    public function moveItemToBottom($id)
+    public function moveItemToBottom()
     {
-        if ($this->isLast($id)) {
+        if ($this->isLast()) {
             return;
         }
-        $this->getRow($id);
-        $this->swapPlaces($this->getSortOrderForItem($id), $this->getMaxSortOrder());
+        $this->swapPlaces($this->getSortOrder(), $this->getMaxSortOrder());
     }
 
-    private function isLast($id)
+    public function isLast()
     {
-        $this->getRow($id);
-        return $this->getSortOrderForItem($id) >= $this->getMaxSortOrder();
+        return $this->getSortOrder() >= $this->getMaxSortOrder();
     }
-
-    abstract protected function getRow($id);
-
-    abstract protected function getSortOrderForItem($id);
 
     public function getMaxSortOrder()
     {
-        $query = "select max({$this->getSortOrderColumnName()}) as maxSortOrder from {$this->getTableName()}";
-        $this->getDB()->query($query);
-
-        $this->getDB()->next_record(MYSQLI_ASSOC);
-        return $this->getDB()->Record['maxSortOrder'];
+        /** @var $db \dbSweetcode */
+        global $db;
+        $query = "select max({$this->getSortOrderColumnName()}) as maxSortOrder from {$this->getTableName()} where {$this->getDiscriminatorColumnName()} = {$this->getDiscriminatorCOlumnValue()}";
+        $result = $db->query($query);
+        if(!$result){
+            throw new \Exception("Failed to execute query");
+        }
+        $db->next_record(MYSQLI_ASSOC);
+        return $db->Record['maxSortOrder'];
     }
 
     abstract protected function getSortOrderColumnName();
 
     abstract protected function getTableName();
 
-    abstract protected function getDB();
-
     abstract protected function getDiscriminatorColumnName();
 
-    private function swapPlaces($oldOrderId, $newOrderId)
+    abstract protected function getDiscriminatorColumnValue();
+
+    public function swapPlaces($oldOrderId, $newOrderId)
     {
+        /** @var $db \dbSweetcode */
+        global $db;
         $query = "UPDATE
   {$this->getTableName()}
 SET
@@ -60,38 +59,31 @@ SET
     ELSE {$this->getSortOrderColumnName()}
   END
 WHERE {$this->getSortOrderColumnName()} BETWEEN LEAST($newOrderId, $oldOrderId)
-    AND GREATEST($newOrderId, $oldOrderId)";
+    AND GREATEST($newOrderId, $oldOrderId) and {$this->getDiscriminatorColumnName()} = {$this->getDiscriminatorColumnValue()} ";
 
-        $this->setQueryString($query);
-        $this->runQuery();
-
+        $db->query($query);
+        $db->next_record();
     }
 
-    abstract protected function setQueryString($query);
-
-    abstract protected function runQuery();
-
-    public function moveItemUp($id)
+    public function moveItemUp()
     {
-        if ($this->isFirst($id)) {
+        if ($this->isFirst()) {
             return;
         }
-        $this->getRow($id);
-        $this->swapPlaces($this->getSortOrderForItem($id), $this->getSortOrderForItem($id) - 1);
+        $this->swapPlaces($this->getSortOrder(), $this->getSortOrder() - 1);
     }
 
-    private function isFirst($id)
+    public function isFirst()
     {
-        return $this->getSortOrderForItem($id) <= 1;
+        return $this->getSortOrder() <= 1;
     }
 
-    public function moveItemDown($id)
+    public function moveItemDown()
     {
-        if ($this->isLast($id)) {
+        if ($this->isLast()) {
             return;
         }
-        $this->getRow($id);
-        $this->swapPlaces($this->getSortOrderForItem($id), $this->getSortOrderForItem($id) + 1);
+        $this->swapPlaces($this->getSortOrder(), $this->getSortOrder() + 1);
     }
 
     public function getNextSortOrder()
@@ -99,12 +91,12 @@ WHERE {$this->getSortOrderColumnName()} BETWEEN LEAST($newOrderId, $oldOrderId)
         return $this->getMaxSortOrder() + 1;
     }
 
-    public function moveItemToTop($id)
+    public function moveItemToTop()
     {
-        if ($this->isFirst($id)) {
+        if ($this->isFirst()) {
             return;
         }
 
-        $this->swapPlaces($this->getSortOrderForItem($id), 1);
+        $this->swapPlaces($this->getSortOrder(), 1);
     }
 }
