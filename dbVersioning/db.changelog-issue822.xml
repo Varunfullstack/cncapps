@@ -1,0 +1,35 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue822-0">
+        <tagDatabase tag="issue822"/>
+    </changeSet>
+    <changeSet id="issue822-1" author="pavwebdev">
+        <sql splitStatements="true">
+           <![CDATA[
+            set @newSortId := 0;
+            set @orderId := null;
+            update ordline left join (
+                select odl_ordlineno as id,
+                       odl_ordno     as orderId,
+                       odl_item_no   as sortOrder,
+                       if(@orderId <> ordline.odl_ordno, @newSortId := 1, @newSortId := @newSortId + 1),
+                       @newSortId    as newSortId,
+                       @orderId := odl_ordno
+                from ordline
+                order by odl_ordno, odl_item_no) a on a.id = ordline.odl_ordlineno
+            set odl_item_no = newSortId;
+            ]]>
+       </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="issue822-2" author="pavwebdev">
+        <sql>
+            insert into db_sequence(seq_name, nextid)
+            values ('ordline', (SELECT MAX(odl_ordlineno) FROM ordline))
+            on duplicate key update nextid = (SELECT MAX(odl_ordlineno) FROM ordline)
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

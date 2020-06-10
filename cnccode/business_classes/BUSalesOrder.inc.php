@@ -305,11 +305,7 @@ class BUSalesOrder extends Business
         $dbeOrdline = new DBEOrdline($this);
         $dbeOrdhead->setPKValue($ordheadID);
         $dbeOrdhead->deleteRow();
-        $dbeOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $ordheadID
-        );
-        $dbeOrdline->deleteRowsByOrderID();
+        $dbeOrdline->deleteRowsByOrderID($ordheadID);
 
         // delete any quote rows and associated documents
         $this->dbeQuotation->setValue(
@@ -1204,62 +1200,33 @@ class BUSalesOrder extends Business
         if ($action == "U") {
             $dbeOrdline->updateRow();
         } else {
+            // we are inserting, we can't just insert in any place, we are going to insert in the last place and then move it
+            $futureOrder = $dbeOrdline->getValue(DBEOrdline::sequenceNo);
+            $dbeOrdline->setValue(DBEOrdline::sequenceNo, $dbeOrdline->getNextSortOrder());
             $dbeOrdline->insertRow();
+            $dbeOrdline->swapPlaces($dbeOrdline->getValue(DBEOrdline::sequenceNo), $futureOrder);
         }
         $dbeOrdhead->setUpdatedTime();
     }
 
-    function moveOrderLineUp($ordheadID,
-                             $sequenceNo
-    )
+    function moveOrderLineUp($lineId)
     {
-        if (!$ordheadID) {
-            $this->raiseError('ordheadID not passed');
-        }
-        if (!$sequenceNo) {
-            $this->raiseError('sequenceNo not passed');
-        }
-        if ($sequenceNo == 0) {
-            return;
-        }
+
         $dbeOrdline = new DBEOrdline($this);
-        $dbeOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $ordheadID
-        );
-        $dbeOrdline->setValue(
-            DBEOrdline::sequenceNo,
-            $sequenceNo
-        );
-        $dbeOrdline->setShowSQLOn();
-        $dbeOrdline->moveRow('UP');
+        $dbeOrdline->getRow($lineId);
+        $dbeOrdline->moveItemUp();
         $dbeOrdhead = new DBEOrdhead($this);
-        $dbeOrdhead->setPKValue($ordheadID);
+        $dbeOrdhead->setPKValue($dbeOrdline->getValue(DBEOrdline::ordheadID));
         $dbeOrdhead->setUpdatedTime();
     }
 
-    function moveOrderLineDown($ordheadID,
-                               $sequenceNo
-    )
+    function moveOrderLineDown($lineId)
     {
-        if (!$ordheadID) {
-            $this->raiseError('ordheadID not passed');
-        }
-        if ($sequenceNo == null) {
-            $this->raiseError('sequenceNo not passed');
-        }
         $dbeOrdline = new DBEOrdline($this);
-        $dbeOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $ordheadID
-        );
-        $dbeOrdline->setValue(
-            DBEOrdline::sequenceNo,
-            $sequenceNo
-        );
-        $dbeOrdline->moveRow('DOWN');
+        $dbeOrdline->getRow($lineId);
+        $dbeOrdline->moveItemDown();
         $dbeOrdhead = new DBEOrdhead($this);
-        $dbeOrdhead->setPKValue($ordheadID);
+        $dbeOrdhead->setPKValue($dbeOrdline->getValue(DBEOrdline::ordheadID));
         $dbeOrdhead->setUpdatedTime();
     }
 
@@ -1674,41 +1641,13 @@ class BUSalesOrder extends Business
         return TRUE;
     }
 
-    function deleteOrderLine($ordheadID,
-                             $sequenceNo
-    )
+    function deleteOrderLine($lineId)
     {
-        if (!$ordheadID) {
-            $this->raiseError('ordheadID not passed');
-        }
-
-        if (!$sequenceNo) {
-            $sequenceNo = 0;
-        }
-
-
         $dbeOrdline = new DBEOrdline($this);
-        $dbeOrdline->setShowSQLOn();
-        $dbeOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $ordheadID
-        );
-        $dbeOrdline->setValue(
-            DBEOrdline::sequenceNo,
-            $sequenceNo
-        );
+        $dbeOrdline->getRow($lineId);
         $dbeOrdline->deleteRow();
-        $dbeOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $ordheadID
-        );
-        $dbeOrdline->setValue(
-            DBEOrdline::sequenceNo,
-            $sequenceNo
-        );
-        $dbeOrdline->shuffleRowsUp();
         $dbeOrdhead = new DBEOrdhead($this);
-        $dbeOrdhead->setPKValue($ordheadID);
+        $dbeOrdhead->setPKValue($dbeOrdline->getValue(DBEOrdline::ordheadID));
         $dbeOrdhead->setUpdatedTime();
     }
 
@@ -1961,7 +1900,7 @@ class BUSalesOrder extends Business
         $dbeToOrdline->resetQueryString();
 
         if (!$sequenceNo) {
-            $sequenceNo = $dbeToOrdline->rowCount() -1 ; // so we paste after the last row
+            $sequenceNo = $dbeToOrdline->rowCount() - 1; // so we paste after the last row
         } else {
             /*
             Shuffle up lines past $sequenceNo
