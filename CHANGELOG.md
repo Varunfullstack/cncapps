@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.1.4] - 2020-06-10
+### Changed
+- Show contact phone number in activity
+- Enable Update button for activity type 51
+
 ## [v4.1.3] - 2020-06-09
 ### Fixed
 - Fixed issue with questionnaireReport

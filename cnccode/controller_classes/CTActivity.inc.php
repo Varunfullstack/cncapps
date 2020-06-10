@@ -446,7 +446,11 @@ class CTActivity extends CTCNC
                 break;
             case 'contactNotes':
                 $buCustomer = new BUCustomer($this);
-                $phoneHtml = $buCustomer->getContactPhoneForHtml(@$this->getParam('contactID'));
+                $subject = null;
+                if ($this->getParam("problemID")) {
+                    $subject = "Service Request {$this->getParam("problemID")}";
+                }
+                $phoneHtml = $buCustomer->getContactPhoneForHtml(@$this->getParam('contactID'), $subject);
                 echo json_encode(['data' => $this->getContactNotes(), 'phone' => $phoneHtml]);
                 break;
             case 'authorisingContacts':
@@ -2283,7 +2287,8 @@ class CTActivity extends CTCNC
                 'urlSalesRequest'                    => $urlSalesRequest,
                 'disabled'                           => $disabled,
                 'contactPhone'                       => $buCustomer->getContactPhoneForHtml(
-                    $dsCallActivity->getValue(DBEJCallActivity::contactID)
+                    $dsCallActivity->getValue(DBEJCallActivity::contactID),
+                    "Service Request {$problemID}"
                 ),
                 'authorisedByHide'                   => $authorisedByName ? null : "hidden",
                 'authorisedByName'                   => $authorisedByName
@@ -4384,6 +4389,13 @@ class CTActivity extends CTCNC
                 );
         }
 
+        $sdManagerDisabled = CTCNC_HTML_DISABLED;
+        if ($this->isSdManager() || $this->dsCallActivity->getValue(
+                DBECallActivity::callActTypeID
+            ) == 51) {
+            $sdManagerDisabled = "";
+        }
+
 
         $this->template->set_var(
             array(
@@ -4407,9 +4419,10 @@ class CTActivity extends CTCNC
                 'hiddenContractCustomerItemID'   => $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID),
                 'hiddenActivityType'             => $hiddenActivityType,
                 'customerDetails'                => $customerDetails,
-                'SDManagerDisabled'              => $this->isSdManager() ? "" : CTCNC_HTML_DISABLED,
+                'SDManagerDisabled'              => $sdManagerDisabled,
                 'contactPhone'                   => $buCustomer->getContactPhoneForHtml(
-                    $dsCallActivity->getValue(DBEJCallActivity::contactID)
+                    $dsCallActivity->getValue(DBEJCallActivity::contactID),
+                    "Service Request {$problemID}"
                 ),
                 'expenseExportFlag'              => $dsCallActivity->getValue(DBEJCallActivity::expenseExportFlag),
                 'customerName'                   => Controller::htmlDisplayText(

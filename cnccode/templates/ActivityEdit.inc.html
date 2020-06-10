@@ -216,7 +216,7 @@
     }
 
     function changeContactNotes() {
-        const object = {contactID: event.target.value};
+        const object = {contactID: event.target.value, problemID};
         $.LoadingOverlay("show", {text: 'Fetching contact notes'});
         $.ajax({
             url: '?action=contactNotes',

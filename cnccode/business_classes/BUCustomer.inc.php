@@ -953,9 +953,10 @@ class BUCustomer extends Business
     /**
      * This version includes tel: tags for soft phone dialing from browser
      * @param $contactID
+     * @param null $emailSubject
      * @return string
      */
-    function getContactPhoneForHtml($contactID)
+    function getContactPhoneForHtml($contactID, $emailSubject = null)
     {
         /** @var DataSet $dsContact */
         $this->getContactByID(
@@ -991,6 +992,14 @@ class BUCustomer extends Business
                     '',
                     $dsContact->getValue(DBEContact::mobilePhone)
                 ) . '">' . $dsContact->getValue(DBEContact::mobilePhone) . '</a>';
+        }
+
+        if ($dsContact->getValue(DBEContact::email)) {
+            $subject = null;
+            if ($emailSubject) {
+                $subject = "?subject={$emailSubject}";
+            }
+            $contactPhone .= "&nbsp;<a href='mailto:{$dsContact->getValue(DBEContact::email)}{$subject}'><img src='images/email.gif' style='border: 0' alt='email'></a>";
         }
 
         return $contactPhone;
