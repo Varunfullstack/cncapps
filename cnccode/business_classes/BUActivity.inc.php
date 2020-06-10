@@ -6995,10 +6995,10 @@ is currently a balance of ';
 
         while ($dsOrdline->fetchNext()) {
 
-            if (!$selectedOrderLine or
+            if (!$selectedOrderLine ||
                 ($selectedOrderLine &&
                     in_array(
-                        $dsOrdline->getValue(DBEOrdline::sequenceNo),
+                        $dsOrdline->getValue(DBEOrdline::id),
                         $selectedOrderLine
                     )
                 )
