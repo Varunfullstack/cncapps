@@ -2707,7 +2707,6 @@ class CTSalesOrder extends CTCNC
                 array(
                     "I" => "Item",
                     "C" => "Comment",
-                    "S" => "Sales Order",
                     "T" => "Template"
                 );
         }
@@ -2957,7 +2956,7 @@ class CTSalesOrder extends CTCNC
             $this->getParam('updatedTime'),
             $dsOrdhead->getValue(DBEOrdhead::updatedTime)
         );
-        if (($dsOrdhead->getValue(DBEOrdhead::type) != 'Q') & ($dsOrdhead->getValue(DBEOrdhead::type) != 'I')) {
+        if (($dsOrdhead->getValue(DBEOrdhead::type) != 'Q') && ($dsOrdhead->getValue(DBEOrdhead::type) != 'I')) {
             $this->displayFatalError(CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL);
             return;
         }
@@ -3079,17 +3078,18 @@ class CTSalesOrder extends CTCNC
             $this->displayOrder();
             return false;
         }
-
-        if (count($this->postVars['selectedOrderLine']) != 1) {
-            $this->setLinesMessage('Select a line before which to insert order');
-            $this->displayOrder();
-            return FALSE;
+        $sequenceNo = null;
+        if (isset($this->postVars['selectedOrderLine']) && count($this->postVars['selectedOrderLine'])) {
+            $lastLineId = $this->postVars['selectedOrderLine'][count($this->postVars['selectedOrderLine']) - 1];
+            $dbeOrdline = new DBEOrdline($this);
+            $dbeOrdline->getRow($lastLineId);
+            $sequenceNo = $dbeOrdline->getValue(DBEOrdline::sequenceNo);
         }
+
         $this->buSalesOrder->pasteLinesFromOrder(
             $this->getFromOrdheadID(),
             $this->getOrdheadID(),
-            false,
-            $this->postVars['selectedOrderLine'][0]
+            $sequenceNo
         );
         header('Location: ' . $this->getDisplayOrderURL());
         exit;
@@ -3415,8 +3415,8 @@ class CTSalesOrder extends CTCNC
 
         while ($dsOrdline->fetchNext()) {
             if ($this->dsSelectedOrderLine->search(
-                'sequenceNo',
-                $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                DBEOrdline::id,
+                $dsOrdline->getValue(DBEOrdline::id)
             )) {
                 if ($dsOrdline->getValue(DBEOrdline::lineType) == "I") {
                     $buPDF->printStringRJAt(
@@ -3865,8 +3865,8 @@ class CTSalesOrder extends CTCNC
         while ($dsOrdline->fetchNext()) {
 
             if ($this->dsSelectedOrderLine->search(
-                'sequenceNo',
-                $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                DBEOrdline::id,
+                $dsOrdline->getValue(DBEOrdline::id)
             )) {
 
                 if ($dsOrdline->getValue(DBEJOrdline::itemDescription)) {
@@ -4119,11 +4119,6 @@ class CTSalesOrder extends CTCNC
     {
         $this->setMethodName('updateOrderLine');
         // pasting lines from another Sales Order
-        if ($this->getParam('ordline')[1]['lineType'] == 'S') {
-            $this->pasteLinesFromSO();
-            header('Location: ' . $this->getDisplayOrderURL());
-            exit;
-        }
         if ($this->getParam('ordline')[1]['lineType'] == 'T') {
             $this->pasteLinesFromQuotationTemplate();
             header('Location: ' . $this->getDisplayOrderURL());
@@ -4255,38 +4250,6 @@ class CTSalesOrder extends CTCNC
             $this->buSalesOrder->updateOrderLine($this->dsOrdline);
         }
         header('Location: ' . $this->getDisplayOrderURL());
-    }
-
-    /**
-     * Paste lines from another Sales Order onto the end of this one
-     * $this->getParam('ordline')[1]['description'] holds ordheadID of order to paste from
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function pasteLinesFromSO()
-    {
-        $this->setMethodName('pasteLinesFromSO');
-        $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
-        if (!is_numeric($this->getParam('ordline')[1]['description'])) {
-            $this->setFormErrorMessage('Sales order number must be numeric');
-            $this->displayOrder();
-            return;
-        }
-        if (!$this->buSalesOrder->getOrdheadByID(
-            $this->getParam('ordline')[1]['description'],
-            $dsOrdhead
-        )) {
-            $this->setFormErrorMessage('The sales order you are trying to paste from does not exist');
-            $this->displayOrder();
-            return;
-        }
-        $this->buSalesOrder->pasteLinesFromOrder(
-            $this->getParam('ordline')[1]['description'],
-            $this->getOrdheadID()
-        );
-        $this->displayOrder();
     }
 
     /**
@@ -4769,7 +4732,6 @@ now that the notes are in a text field we need to split the lines up for the PDF
     {
         $this->setMethodName('serviceRequest');
 
-        //$this->dsSelectedOrderLine
         $buActivity = new BUActivity($this);
         $dsOrdline = new DataSet($this);
         $dsOrdhead = new DataSet($this);
@@ -4860,7 +4822,6 @@ now that the notes are in a text field we need to split the lines up for the PDF
         */
                 header('Location: ' . $this->getDisplayOrderURL());
 
-                //echo '<script language="javascript">window.close()</script>;';
                 exit;
 
             }
@@ -5071,7 +5032,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
             header('Location: ' . $redirectUrl);
         }
         return true;
-    } // end contractDropdown
+    }
 
     /**
      * @throws Exception
@@ -5230,7 +5191,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
 
         $this->template->parse('CONTENTS', 'TemplatedQuote');
         $this->parsePage();
-    }
+    } // end contractDropdown
 
     /**
      * @param $customerID
@@ -5313,6 +5274,38 @@ now that the notes are in a text field we need to split the lines up for the PDF
                 true
             );
         }
+    }
+
+    /**
+     * Paste lines from another Sales Order onto the end of this one
+     * $this->getParam('ordline')[1]['description'] holds ordheadID of order to paste from
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function pasteLinesFromSO()
+    {
+        $this->setMethodName('pasteLinesFromSO');
+        $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
+        if (!is_numeric($this->getParam('ordline')[1]['description'])) {
+            $this->setFormErrorMessage('Sales order number must be numeric');
+            $this->displayOrder();
+            return;
+        }
+        if (!$this->buSalesOrder->getOrdheadByID(
+            $this->getParam('ordline')[1]['description'],
+            $dsOrdhead
+        )) {
+            $this->setFormErrorMessage('The sales order you are trying to paste from does not exist');
+            $this->displayOrder();
+            return;
+        }
+        $this->buSalesOrder->pasteLinesFromOrder(
+            $this->getParam('ordline')[1]['description'],
+            $this->getOrdheadID()
+        );
+        $this->displayOrder();
     }
 
     /**

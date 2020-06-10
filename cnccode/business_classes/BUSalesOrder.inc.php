@@ -1270,7 +1270,7 @@ class BUSalesOrder extends Business
         $originalNo = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
 
         if (
-            ($dsOrdline->rowCount() == $dsSelectedOrderLine->rowCount()) and
+            ($dsOrdline->rowCount() == $dsSelectedOrderLine->rowCount()) &&
             $convertToOrder                                // Flag indicates to convert not copy
         ) {
             $dsOrdhead->setUpdateModeUpdate();
@@ -1322,8 +1322,8 @@ class BUSalesOrder extends Business
             $dsNewOrdline->copyColumnsFrom($dsOrdline);
             while ($dsOrdline->fetchNext()) {
                 if ($dsSelectedOrderLine->search(
-                    DBEOrdline::sequenceNo,
-                    $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                    DBEOrdline::id,
+                    $dsOrdline->getValue(DBEOrdline::id)
                 )) {
                     $sequenceNo++;
                     $dsNewOrdline->setUpdateModeInsert();
@@ -1506,10 +1506,7 @@ class BUSalesOrder extends Business
         $dsSelectedOrderLine->initialise();
 
         while ($dsSelectedOrderLine->fetchNext()) {
-            $dbeOrdline->getRowBySequence(
-                $ordheadID,
-                $dsSelectedOrderLine->getValue(DBEOrdline::sequenceNo)
-            );
+            $dbeOrdline->getRow($dsSelectedOrderLine->getValue(DBEOrdline::id));
             if ($dbeOrdline->getValue(DBEOrdline::lineType) != 'C') {
                 $dbeOrdline->setValue(
                     DBEOrdline::supplierID,
@@ -1632,10 +1629,7 @@ class BUSalesOrder extends Business
         */
         $deletedCount = 0;
         while ($dsSelectedOrderLine->fetchNext()) {
-            $this->deleteOrderLine(
-                $ordheadID,
-                $dsSelectedOrderLine->getValue(DBEOrdline::sequenceNo) - $deletedCount
-            );
+            $this->deleteOrderLine($dsSelectedOrderLine->getValue(DBEOrdline::id));
             $deletedCount++;
         }
         return TRUE;
@@ -1865,13 +1859,11 @@ class BUSalesOrder extends Business
      * copy lines from one sales order and paste them to the end of another
      * @param $fromOrdheadID
      * @param $toOrdheadID
-     * @param bool $keepRenewals
      * @param bool $sequenceNo
      * @return bool
      */
     function pasteLinesFromOrder($fromOrdheadID,
                                  $toOrdheadID,
-                                 $keepRenewals = false,
                                  $sequenceNo = false
     )
     {
@@ -1900,31 +1892,13 @@ class BUSalesOrder extends Business
         $dbeToOrdline->resetQueryString();
 
         if (!$sequenceNo) {
-            $sequenceNo = $dbeToOrdline->rowCount() - 1; // so we paste after the last row
+            $sequenceNo = $dbeToOrdline->getNextSortOrder(); // so we paste after the last row
         } else {
-            /*
-            Shuffle up lines past $sequenceNo
-            */
-            $fromOrderLineCount = $dbeFromOrdline->rowCount();
-
-            $db = $GLOBALS['db'];
-            $statement =
-                "UPDATE
-          ordline
-        SET
-          odl_item_no = odl_item_no + $fromOrderLineCount
-        WHERE
-          odl_ordno = $toOrdheadID
-          AND odl_item_no >= $sequenceNo";
-
-            $db->query($statement);
-
-            $sequenceNo--;
-
+            $sequenceNo++;
         }
 
         while ($dbeFromOrdline->fetchNext()) {
-            $sequenceNo++;
+
             for ($i = 0; $i < $colCount; $i++) {
                 $dbeToOrdline->setValueNoCheckByColumnNumber(
                     $i,
@@ -1943,17 +1917,22 @@ class BUSalesOrder extends Business
                 DBEOrdline::qtyLastDespatched,
                 0
             );
+            $newOrderId = $dbeToOrdline->getNextSortOrder();
             $dbeToOrdline->setValue(
                 DBEOrdline::sequenceNo,
-                $sequenceNo
+                $newOrderId
             );
-            if (!$keepRenewals) {
-                $dbeToOrdline->setValue(
-                    DBEOrdline::renewalCustomerItemID,
-                    0
-                );
-            }
+
+            $dbeToOrdline->setValue(
+                DBEOrdline::renewalCustomerItemID,
+                0
+            );
+
             $dbeToOrdline->insertRow();
+            if ($newOrderId !== $sequenceNo) {
+                $dbeToOrdline->swapPlaces($newOrderId, $sequenceNo);
+            }
+            $sequenceNo++;
         }
         return TRUE;
     }
