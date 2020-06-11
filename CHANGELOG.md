@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.1.5] - 2020-06-11
+### Changed
+- Changed office version text
+
 ## [v4.1.4] - 2020-06-10
 ### Changed
 - Show contact phone number in activity

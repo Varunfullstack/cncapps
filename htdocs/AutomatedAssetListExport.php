@@ -25,8 +25,10 @@ $dbeCustomer = new DBECustomer($thing);
 
 $generateSummary = isset($_REQUEST['generateSummary']);
 $customerID = isset($_REQUEST['customerID']) ? $_REQUEST['customerID'] : null;
+$runOnce = false;
 if ($customerID) {
     $dbeCustomer->getRow($customerID);
+    $runOnce = true;
 } else {
     $dbeCustomer->getActiveCustomers();
 }
@@ -45,6 +47,7 @@ $DBEOSSupportDates = new DBEOSSupportDates($thing);
 
 $DBEOSSupportDates->getRows();
 $fakeTable = null;
+
 while ($DBEOSSupportDates->fetchNext()) {
     if (!$DBEOSSupportDates->getValue(DBEOSSupportDates::endOfLifeDate)) {
         continue;
@@ -123,8 +126,8 @@ function getUnrepeatedUsername($str)
     return $prospect;
 }
 
-while ($dbeCustomer->fetchNext()) {
-
+while ($runOnce || $dbeCustomer->fetchNext()) {
+    $runOnce = false;
     $query = /** @lang MySQL */
         'SELECT 
   locations.name AS "Location",
@@ -172,11 +175,7 @@ IF(
   computers.version AS "Version",
        (select endOfSupportDate from (' . $fakeTable . ') f where computers.os = f.osName and computers.version like concat(\'%\', f.version, \'%\') limit 1) as `OS End of Support Date`,
   computers.domain AS \'Domain\',
-  SUBSTRING_INDEX(
-    software.name,
-    \'Microsoft Office \',
-    - 1
-  ) AS "Office Version",
+       SUBSTRING_INDEX(REPLACE(REPLACE(software.`Name`, \'Microsoft Office \',\'\'),\'Microsoft 365\',\'365\')," - ",1) AS "Office Version",
   virusscanners.name AS AV,
   DATE_FORMAT(
     STR_TO_DATE(computers.VirusDefs, \'%Y%m%d\'),
@@ -204,7 +203,10 @@ ON computers.computerid = processor.computerid
   LEFT JOIN (software) 
     ON (
       computers.computerid = software.computerid 
-      AND software.name LIKE "%microsoft office%" 
+      AND 
+      (software.name LIKE "%microsoft office%"
+          or software.name like "%microsoft 365%"
+          ) 
       AND software.name NOT LIKE "%visio%" 
       AND software.name NOT LIKE "%Activation%" 
       AND software.name NOT LIKE "%Access%" 
