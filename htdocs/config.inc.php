@@ -67,6 +67,11 @@ function getEnvironmentByPath()
         return MAIN_CONFIG_SERVER_TYPE_DESIGN;
     }
 
+    if (strpos(__DIR__, 'cncdev2') !== false) {
+        $_SERVER['HTTP_HOST'] = 'cncdev2.cnc-ltd.co.uk';
+        return MAIN_CONFIG_SERVER_TYPE_DEV2;
+    }
+
     return MAIN_CONFIG_SERVER_TYPE_LIVE;
 }
 
@@ -415,7 +420,10 @@ define(
     'MAIN_CONFIG_SERVER_TYPE_DESIGN',
     'design'
 );
-
+define(
+    'MAIN_CONFIG_SERVER_TYPE_DEV2',
+    'dev2'
+);
 
 define(
     'CUSTOMERS_ENCRYPTION_PRIVATE_KEY',
@@ -498,6 +506,8 @@ if (isset($_SERVER['HTTP_HOST'])) {                // not set for command line c
             break;
         case 'cncdesign.cnc-ltd.co.uk':
             $server_type = MAIN_CONFIG_SERVER_TYPE_DESIGN;
+        case 'cncdev2.cnc-ltd.co.uk':
+            $server_type = MAIN_CONFIG_SERVER_TYPE_DEV2;
     }
 
     $GLOBALS['isRunningFromCommandLine'] = false;
@@ -965,6 +975,90 @@ switch ($server_type) {
                 'user'     => 'devasr',
                 'password' => 'Unread01$'
             );
+        break;
+    case MAIN_CONFIG_SERVER_TYPE_DEV2:
+        define(
+            "DB_NAME",
+            "mustafa"
+        );
+        define(
+            "BASE_DRIVE",
+            dirname(__DIR__)
+        );
+        define(
+            "SCR_DIR",
+            "\\\\cncltd\\cnc\\Company\\scr\\dev"
+        );
+        define(
+            "TECHNICAL_DIR",
+            "\\\\cncltd\\cnc\\Customer\\dev\\Computer & Network Consultants Ltd"
+        );
+        define(
+            "CUSTOMER_DIR_FROM_BROWSER",
+            "//cncltd/cnc/customer/dev"
+        );
+        define(
+            "CUSTOMER_DIR",
+            "\\\\cncltd\\cnc\\Customer\\dev"
+        );
+        define(
+            'CONFIG_CATCHALL_EMAIL',
+            'HelpdeskTestSystemEmails@' . CONFIG_PUBLIC_DOMAIN
+        );
+        error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
+        ini_set(
+            'display_errors',
+            'on'
+        );
+
+        $GLOBALS['mail_options'] =
+            array(
+                'driver' => 'smtp',
+                'host'   => 'cncltd-co-uk0i.mail.protection.outlook.com',
+                'port'   => 25,
+                'auth'   => false
+            );
+
+        define(
+            'CONFIG_TEST_EMAIL',
+            CONFIG_CATCHALL_EMAIL
+        );
+        define(
+            'CONFIG_SALES_EMAIL',
+            'sales@' . CONFIG_PUBLIC_DOMAIN
+        );
+        define(
+            'CONFIG_SALES_MANAGER_EMAIL',
+            CONFIG_CATCHALL_EMAIL
+        );
+        define(
+            'CONFIG_SUPPORT_EMAIL',
+            'support@cnc-ltd.co.uk'
+        );
+        define(
+            'CONFIG_CUSTOMER_SERVICE_EMAIL',
+            ' customerservice@' . CONFIG_PUBLIC_DOMAIN
+        );
+        define(
+            'CONFIG_SUPPORT_MANAGER_EMAIL',
+            CONFIG_CATCHALL_EMAIL
+        );
+        define(
+            'CONFIG_SUPPORT_ADMINISTRATOR_EMAIL',
+            CONFIG_CATCHALL_EMAIL
+        );
+        define(
+            'CONFIG_HELP_DESK_EMAIL',
+            'helpdeskE-Mails@' . CONFIG_PUBLIC_DOMAIN
+        );
+        define(
+            'CONFIG_PREPAY_EMAIL',
+            CONFIG_CATCHALL_EMAIL
+        );
+        define(
+            'API_URL',
+            'https://dev.cnc-ltd.co.uk:666/api'
+        );
         break;
 
 } // end switch
