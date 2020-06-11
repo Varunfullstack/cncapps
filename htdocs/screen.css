@@ -15,8 +15,8 @@ div.environment-website {
     background-color: #f0f9ff;
 }
 
-div.environment-development {
-    background-color: #FAE8EF;
+div.environment-development, div.environment-dev2 {
+    background-color: #fae8ef;
 }
 
 .oddRows > tbody > tr:nth-child(odd) {
