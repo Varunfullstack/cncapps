@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 892 - Lead Status Layout Change
+
 ## [v4.1.5] - 2020-06-11
 ### Changed
 - Changed office version text
