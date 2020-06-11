@@ -284,6 +284,7 @@ ORDER BY Location, `Computer Name`';
         $data[$key]['Last User'] = getUnrepeatedUsername($text);
         $data[$key]['CPU'] = preg_replace('/\s+/', ' ', $data[$key]['CPU']);
         $data[$key]['Model'] = preg_replace('/\s+/', ' ', $data[$key]['Model']);
+        $data[$key]['Office Version'] = ucwords($data[$key]['Office Version']);
         $purgedRow = $data[$key];
         unset($purgedRow['isServer']);
         $purgedData[] = $purgedRow;
