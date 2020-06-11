@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Pending Reopen New SR doesn't delete the pending one.
 ### Changed
 - Renewal Report Unit numbers not matching
+- Issue 892 - Lead Status Layout Change
 ### Fixed
 - Imported customers not assigning default delivery address
 - Imported contacts not getting the site assigned correctly
