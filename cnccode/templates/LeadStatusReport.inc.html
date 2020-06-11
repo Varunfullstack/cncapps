@@ -3,7 +3,7 @@
         .then(response => response.json())
         .then(data => {
             const leadStatisticsTD = document.getElementById('leadStatistics');
-            const map = new Map();
+            let map = new Map();
 
             data.forEach(item => {
                 let mapArray = map.get(item.leadStatusName);
@@ -15,6 +15,9 @@
                 }
                 map.set(item.leadStatusName, mapArray);
             });
+            console.log(map);            
+            const orders=['Proposal','Audit','Meeting','Lead'];
+            map=new Map([...map.entries()].sort((a,b)=>orders.indexOf(a[0])>orders.indexOf(b[0])?1:-1));
             console.log(map);
             map.forEach((arrayOfLeads, key) => {
                 ({parentTd, table, row, header} = getBaseElement());
