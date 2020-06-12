@@ -1,0 +1,41 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue912-0">
+        <tagDatabase tag="issue912"/>
+    </changeSet>
+    <changeSet id="issue912-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="true">
+                SELECT CHARACTER_MAXIMUM_LENGTH = 35 FROM information_schema.`COLUMNS` WHERE table_name = 'address' AND
+                column_name
+                = 'add_add1'
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="address" columnName="add_add1" newDataType="char(45)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet id="issue912-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="true">
+                SELECT CHARACTER_MAXIMUM_LENGTH = 35 FROM information_schema.`COLUMNS` WHERE table_name = 'address' AND
+                column_name
+                = 'add_add2'
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="address" columnName="add_add2" newDataType="char(45)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet id="issue912-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="true">
+                SELECT CHARACTER_MAXIMUM_LENGTH = 35 FROM information_schema.`COLUMNS` WHERE table_name = 'address' AND
+                column_name
+                = 'add_add3'
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="address" columnName="add_add3" newDataType="char(45)"/>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

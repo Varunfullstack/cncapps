@@ -789,7 +789,10 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
     {
         $inserted = parent::insertRow();
 
-        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+        $currentLoggedInUserID = USER_SYSTEM;
+        if (isset($GLOBALS['auth'])) {
+            $currentLoggedInUserID = $GLOBALS['auth']->is_authenticated();
+        }
         global $db;
 
         if ($inserted) {
