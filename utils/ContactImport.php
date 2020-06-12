@@ -102,7 +102,8 @@ while ($line = fgetcsv($csvFile)) {
 
 
     $dbeContact = new DBEContact($thing);
-    if (!$dbeContact->getRowsByCustomerID($customerId, true)) {
+    $dbeContact->getRowsByCustomerID($customerId, true);
+    if (!$dbeContact->rowCount()) {
         $contactInsert = new DBEContact($thing);
         $contactInsert->setValue(DBEContact::customerID, $customerId);
         $contactInsert->setValue(DBEContact::sendMailshotFlag, 'Y');
