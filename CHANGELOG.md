@@ -3,7 +3,7 @@ This project changes will be shown here.
 
 ## [v4.1.6] - 2020-06-12
 ### Added
-- Added a script that allows to import customers from a csv file.
+- Added a script that allows importing customers from a csv file.
 
 ## [v4.1.5] - 2020-06-11
 ### Changed
