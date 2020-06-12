@@ -5,6 +5,8 @@ This project changes will be shown here.
 ### Added
 - Confirm Report Logic / calculations
 - Pending Reopen New SR doesn't delete the pending one.
+### Changed
+- Renewal Report Unit numbers not matching
 ### Fixed
 - Imported customers not assigning default delivery address
 - Imported contacts not getting the site assigned correctly
