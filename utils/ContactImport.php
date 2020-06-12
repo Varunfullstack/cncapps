@@ -75,6 +75,10 @@ while ($line = fgetcsv($csvFile)) {
         $customerId = $dbeCustomer->getValue(DBECustomer::customerID);
     }
 
+    if (!$customerId) {
+        continue;
+    }
+
     $dbeSite = new DBESite($thing);
     $dbeSite->setValue(DBESite::siteNo, 0);
     $dbeSite->setValue(DBESite::customerID, $customerId);

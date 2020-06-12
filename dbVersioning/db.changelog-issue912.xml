@@ -7,10 +7,10 @@
     </changeSet>
     <changeSet id="issue912-1" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="true">
+            <sqlCheck expectedResult="1">
                 SELECT CHARACTER_MAXIMUM_LENGTH = 35 FROM information_schema.`COLUMNS` WHERE table_name = 'address' AND
                 column_name
-                = 'add_add1'
+                = 'add_add1' and TABLE_SCHEMA = database()
             </sqlCheck>
         </preConditions>
         <modifyDataType tableName="address" columnName="add_add1" newDataType="char(45)"/>
@@ -18,10 +18,9 @@
     </changeSet>
     <changeSet id="issue912-2" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="true">
+            <sqlCheck expectedResult="1">
                 SELECT CHARACTER_MAXIMUM_LENGTH = 35 FROM information_schema.`COLUMNS` WHERE table_name = 'address' AND
-                column_name
-                = 'add_add2'
+                column_name = 'add_add2' and TABLE_SCHEMA = database()
             </sqlCheck>
         </preConditions>
         <modifyDataType tableName="address" columnName="add_add2" newDataType="char(45)"/>
@@ -29,13 +28,23 @@
     </changeSet>
     <changeSet id="issue912-3" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="true">
+            <sqlCheck expectedResult="1">
                 SELECT CHARACTER_MAXIMUM_LENGTH = 35 FROM information_schema.`COLUMNS` WHERE table_name = 'address' AND
-                column_name
-                = 'add_add3'
+                column_name = 'add_add3' and TABLE_SCHEMA = database()
             </sqlCheck>
         </preConditions>
         <modifyDataType tableName="address" columnName="add_add3" newDataType="char(45)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet id="issue912-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT CHARACTER_MAXIMUM_LENGTH = 50 FROM information_schema.`COLUMNS` WHERE table_name = 'customer' AND
+                column_name
+                = 'cus_name' and TABLE_SCHEMA = database()
+            </sqlCheck>
+        </preConditions>
+        <modifyDataType tableName="customer" columnName="cus_name" newDataType="varchar(70)"/>
         <rollback/>
     </changeSet>
 </databaseChangeLog>
