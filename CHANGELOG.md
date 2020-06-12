@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [v4.1.6] - 2020-06-12
 ### Added
 - Added a script that allows importing customers from a csv file.
+- Added cncdev2 environment
 
 ## [v4.1.5] - 2020-06-11
 ### Changed
