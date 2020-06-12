@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Contacts have Active flag
+
 ## [v4.1.6] - 2020-06-12
 ### Added
 - Added a script that allows importing customers from a csv file.

@@ -365,29 +365,7 @@ class DBEContact extends DBCNCEntity
 
         if (!$includeInactive) {
             $query .=
-                " AND (
-					con_mailshot = 'Y' OR
-					con_mailflag2 = 'Y' OR
-					con_mailflag3 = 'Y' OR
-					con_mailflag4 = 'Y' OR
-					con_mailflag8 = 'Y' OR
-					con_mailflag9 = 'Y' OR
-					con_mailflag11 = 'Y' or
-					(supportLevel is not null and supportLevel <> '')  or
-					hrUser = 'Y' or
-                    initialLoggingEmailFlag = 'Y' or
-                    workStartedEmailFlag = 'Y' or
-                    workUpdatesEmailFlag = 'Y' or
-                    fixedEmailFlag = 'Y' or
-                    pendingClosureEmailFlag = 'Y' or
-                    closureEmailFlag = 'Y' or
-                    othersInitialLoggingEmailFlag = 'Y' or
-                    othersWorkStartedEmailFlag = 'Y' or
-                    othersWorkUpdatesEmailFlag = 'Y' or
-                    othersFixedEmailFlag = 'Y' or
-                    othersPendingClosureEmailFlag = 'Y' or
-                    othersClosureEmailFlag = 'Y' 
-					)
+                " AND `active`
 					";
         }
 
@@ -624,15 +602,7 @@ class DBEContact extends DBCNCEntity
                 " AND " . $this->getDBColumnName(self::siteNo) . " = " . $this->getFormattedValue(self::siteNo);
         }
         $queryString .=
-            " AND (
-        con_mailshot = 'Y' OR
-        con_mailflag2 = 'Y' OR
-        con_mailflag3 = 'Y' OR
-        con_mailflag4 = 'Y' Or
-        con_mailflag8 = 'Y' OR
-        con_mailflag9 = 'Y' OR
-        con_mailflag11 = 'Y'
-        )
+            " AND `active`
         ";
 
         $queryString .=

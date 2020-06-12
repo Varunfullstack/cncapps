@@ -127,15 +127,7 @@ WHERE customer.`cus_referred` <> 'Y'
     OR contact.`con_phone` 
     OR contact.`con_mobile_phone`
   ) 
-  AND (
-    con_mailshot = 'Y' 
-    OR con_mailflag2 = 'Y' 
-    OR con_mailflag3 = 'Y' 
-    OR con_mailflag4 = 'Y' 
-    OR con_mailflag8 = 'Y' 
-    OR con_mailflag9 = 'Y' 
-    OR con_mailflag11 = 'Y'
-  )";
+  AND `active`";
 
         $db->query($query);
 
