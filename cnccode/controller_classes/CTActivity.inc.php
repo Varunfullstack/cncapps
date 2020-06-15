@@ -3335,7 +3335,7 @@ class CTActivity extends CTCNC
         $this->parsePage();
 
     }
-
+    
     /**
      * Create Service Request
      * @access private
@@ -3344,11 +3344,12 @@ class CTActivity extends CTCNC
     function editServiceRequestHeader()
     {
         $this->setMethodName('editServiceRequestHeader');
-
-
+         
         if ($this->getParam('reason')) {
             $this->updateSession('reason', $this->getParam('reason'));
         }
+
+      
 
         $error = [];
         /* validate if this is a POST request */
@@ -3374,6 +3375,11 @@ class CTActivity extends CTCNC
             $this->updateSession('callActTypeID', CONFIG_INITIAL_ACTIVITY_TYPE_ID);
 
             $this->updateSession('customerID', $this->getParam('customerID'));
+            if( $this->getParam('pendingReopenedID'))
+                $this->updateSession('pendingReopenedID', $this->getParam('pendingReopenedID'));        
+            if( $this->getParam('deletePending'))
+                $this->updateSession('deletePending', $this->getParam('deletePending'));
+            
 
             /*
         Check nothing in fields that don't allow content
@@ -3422,10 +3428,19 @@ class CTActivity extends CTCNC
                 $error['priority'] = 'Required';
             }
 
-            if (count($error) == 0) {
+            if (count($error) == 0) {                
+                $pendingReopenedID=$_SESSION[$this->sessionKey]['pendingReopenedID'];
+                $deletePending=$_SESSION[$this->sessionKey]['deletePending'];
+                //$this->console_log($pendingReopenedID);
                 /* Create initial activity */
                 $dsCallActivity = $this->buActivity->createActivityFromSession($this->sessionKey);
-
+                if(isset($dsCallActivity)&&isset($pendingReopenedID)
+                &&isset($deletePending)&&$deletePending=='true')
+                {                    
+                    //delete pending 
+                    $dbePendingReopened = new DBEPendingReopened($this);
+                    $dbePendingReopened->deleteRow($pendingReopenedID);
+                }
                 /*
           Upload file
           */
@@ -3436,6 +3451,7 @@ class CTActivity extends CTCNC
           Add to queue so return to dashboard
           */
                 if ($isAddToQueue) {
+                    
                     $nextURL =
                         Controller::buildLink(
                             'CurrentActivityReport.php',
