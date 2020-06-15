@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased] - 2020-06-15
+### Added
+- Pending Reopen New SR doesn't delete the pending one.
+
+
 ## [v4.1.6] - 2020-06-12
 ### Added
 - Added a script that allows importing customers from a csv file.

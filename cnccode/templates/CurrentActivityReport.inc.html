@@ -325,6 +325,14 @@
                             {
                                 name: 'reason',
                                 value: atob(event.target.dataset.reason),
+                            },
+                            {
+                                name: 'pendingReopenedID',
+                                value: event.target.dataset.pendingReopenedId,
+                            },
+                            {
+                                name: 'deletePending',
+                                value: true,
                             }
                         ], form);
                         document.body.appendChild(form);
@@ -337,6 +345,8 @@
                         data-contact-id="{pendingReopenedContactID}"
                         data-customer-id="{pendingReopenedCustomerID}"
                         data-reason="{base64Reason}"
+                        data-pending-reopened-id="{pendingReopenedID}"
+
                 >N
                 </button>
             </form>
