@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+
+## [v4.1.7] - 2020-06-15
+### Added
+- Fix visit confirmation ICS file
+
 ## [v4.1.6] - 2020-06-12
 ### Added
 - Added a script that allows importing customers from a csv file.
