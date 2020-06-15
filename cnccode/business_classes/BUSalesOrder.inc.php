@@ -1791,15 +1791,7 @@ class BUSalesOrder extends Business
         $dbeOrdline = new DBEOrdline($this);
         $dsOrdline->initialise();
         while ($dsOrdline->fetchNext()) {
-            $dbeOrdline->setValue(
-                DBEOrdline::ordheadID,
-                $ordheadID
-            );
-            $dbeOrdline->setValue(
-                DBEOrdline::sequenceNo,
-                $dsOrdline->getValue(DBEOrdline::sequenceNo)
-            );
-            $dbeOrdline->getRow();
+            $dbeOrdline->getRow($dsOrdline->getValue(DBEOrdline::id));
             $dbeOrdline->setValue(
                 DBEOrdline::qtyOrdered,
                 $dsOrdline->getValue(DBEOrdline::qtyOrdered)

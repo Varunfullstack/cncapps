@@ -1709,9 +1709,8 @@ class CTSalesOrder extends CTCNC
                         Controller::buildLink(
                             $page,
                             array(
-                                'action'     => 'editFromSalesOrder',
-                                'ordheadID'  => $dsOrdhead->getValue(DBEOrdline::ordheadID),
-                                'sequenceNo' => $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                                'action' => 'editFromSalesOrder',
+                                'lineId' => $dsOrdline->getValue(DBEOrdline::id),
                             )
                         );
 
