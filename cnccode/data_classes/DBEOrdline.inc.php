@@ -292,85 +292,12 @@ class DBEOrdline extends DBEntity
         return (parent::getRow());
     }
 
-    public function consolidateLines($ordheadID)
+    public function insertRow()
     {
-        $this->consolidateLinesForItem($ordheadID, 1502);
-        $this->consolidateLinesForItem($ordheadID, 1503);
-    }
-
-    private function consolidateLinesForItem($ordheadID, $itemId)
-    {
-        $this->getLinesForOrderWithItem($ordheadID, $itemId);
-        $toInsertOrderLine = null;
-        $toInsertSequence = null;
-        while ($this->nextRecord()) {
-            if (!$toInsertOrderLine) {
-                $toInsertOrderLine = new self($this);
-                $toInsertOrderLine->setValue(self::lineType, $this->getValue(self::lineType));
-                $toInsertOrderLine->setValue(self::ordheadID, $this->getValue(self::ordheadID));
-                $toInsertOrderLine->setValue(self::itemID, $itemId);
-                $toInsertOrderLine->setValue(self::customerID, $this->getValue(self::customerID));
-                $toInsertOrderLine->setValue(self::stockcat, $this->getValue(self::stockcat));
-                $toInsertOrderLine->setValue(self::description, $this->getValue(self::description));
-                $toInsertOrderLine->setValue(self::qtyOrdered, 0);
-                $toInsertOrderLine->setValue(self::qtyDespatched, 0);
-                $toInsertOrderLine->setValue(self::qtyLastDespatched, 0);
-                $toInsertOrderLine->setValue(self::supplierID, $this->getValue(self::supplierID));
-                $toInsertOrderLine->setValue(self::curUnitCost, $this->getValue(self::curUnitCost));
-                $toInsertOrderLine->setValue(self::curTotalCost, 0);
-                $toInsertOrderLine->setValue(self::curUnitSale, $this->getValue(self::curUnitSale));
-                $toInsertOrderLine->setValue(self::curTotalSale, 0);
-                $toInsertOrderLine->setValue(self::renewalCustomerItemID, $this->getValue(self::renewalCustomerItemID));
-                $toInsertOrderLine->setValue(self::sequenceNo, $this->getNextSortOrder());
-                $toInsertSequence = $this->getValue(self::sequenceNo);
-            }
-            $toInsertOrderLine->setValue(
-                self::qtyOrdered,
-                $toInsertOrderLine->getValue(self::qtyOrdered) + $this->getValue(
-                    self::qtyOrdered
-                )
-            );
-            $toInsertOrderLine->setValue(
-                self::qtyDespatched,
-                $toInsertOrderLine->getValue(self::qtyDespatched) + $this->getValue(
-                    self::qtyDespatched
-                )
-            );
-            $toInsertOrderLine->setValue(
-                self::qtyLastDespatched,
-                $toInsertOrderLine->getValue(self::qtyLastDespatched) + $this->getValue(
-                    self::qtyLastDespatched
-                )
-            );
-            $toInsertOrderLine->setValue(
-                self::curTotalCost,
-                $toInsertOrderLine->getValue(self::curTotalCost) + $this->getValue(
-                    self::curTotalCost
-                )
-            );
-            $toInsertOrderLine->setValue(
-                self::curTotalSale,
-                $toInsertOrderLine->getValue(self::curTotalSale) + $this->getValue(
-                    self::curTotalSale
-                )
-            );
-            $this->deleteRow();
+        if (!$this->getValue(self::sequenceNo)) {
+            $this->setValue(self::sequenceNo, $this->getNextSortOrder());
         }
-        if ($toInsertOrderLine) {
-            $toInsertOrderLine->insertRow();
-            $toInsertOrderLine->swapPlaces($toInsertOrderLine->getValue(self::sequenceNo), $toInsertSequence);
-        }
-    }
-
-    public function getLinesForOrderWithItem($ordheadID, $itemId)
-    {
-        $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE {$this->getDBColumnName(self::ordheadID)} = {$ordheadID}
-             AND {$this->getDBColumnName(self::itemID)} = {$itemId}"
-        );
-        return (parent::getRows(self::sequenceNo));
+        parent::insertRow();
     }
 
     function deleteRow($pkValue = '')

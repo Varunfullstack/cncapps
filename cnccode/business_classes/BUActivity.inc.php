@@ -4462,34 +4462,18 @@ class BUActivity extends Business
 
     }
 
-    /**
-     * @param $activityIDArray
-     * @return bool
-     * @throws Exception
-     */
     function createSalesOrdersFromActivities($activityIDArray)
     {
         $db = new dbSweetcode(); // database connection for query
-
         $this->setMethodName('createSalesOrderFromActivities');
-
         $dbeJCallActivity = new DBEJCallActivity($this);
-
-        $dbeCallActivity = new DBECallActivity($this); // for status update
-
         $this->dbeProblem = new DBEProblem($this);
-
-        $dbeCallActType = new DBECallActType($this);
-
-        $buCustomer = new BUCustomer($this);
 
         $activityIDsAsString = implode(
             ',',
             $activityIDArray
         );
-        /*
-    Get a list of the associated problem id's
-    */
+        // Get a list of the associated problem id's
         $select =
             "SELECT
         DISTINCT caa_problemno
@@ -4503,9 +4487,7 @@ class BUActivity extends Business
         while ($db->next_record()) {
             $problemIDArray[] = $db->Record['caa_problemno'];
         }
-        /*
-    Get a list of completed T&M activities for these problems
-    */
+        // Get a list of completed T&M activities for these problems
         $problemIDsAsString = implode(
             ',',
             $problemIDArray
@@ -4527,120 +4509,69 @@ class BUActivity extends Business
             $finalActivityIDArray[] = $db->Record['caa_callactivityno'];
         }
 
-        /*
-    Get full activity rows(these come back in customerID, date order)
-    */
+        // Get full activity rows(these come back in customerID, date order)
         $dbeJCallActivity->getRowsInIdArray($finalActivityIDArray);
-
         if ($dbeJCallActivity->rowCount() == 0) {
             return FALSE; // no activities so return false
         }
         /* need to loop activities checking for change of Request Number(problemID) */
-
         $buSalesOrder = new BUSalesOrder($this);
-
         $dbeOrdline = new DBEOrdline($this);
-
-        $ordheadID = false;
-        $lastProblemID = false;
-        $lastUserID = false;
-        $lastDate = false;
-        $consultantName = null;
-        $sequenceNo = null;
-
+        $ordheadID = null;
+        $lastProblemID = null;
+        $toInsertLines = [];
         while ($dbeJCallActivity->fetchNext()) {
-
             if ($dbeJCallActivity->getValue(DBEJCallActivity::activityTypeCost) == 0) {
                 // update status on call activity to Authorised
+                $dbeCallActivity = new DBECallActivity($this);
                 $dbeCallActivity->getRow($dbeJCallActivity->getValue(DBEJCallActivity::callActivityID));
-                $dbeCallActivity->setValue(
-                    DBEJCallActivity::status,
-                    'A'
-                );
-
+                $dbeCallActivity->setValue(DBEJCallActivity::status, 'A');
                 $dbeCallActivity->updateRow();
                 continue;
             }
+
             $problemID = $dbeJCallActivity->getValue(DBEJCallActivity::problemID);
             $customerID = $dbeJCallActivity->getValue(DBEJCallActivity::customerID);
-
             if ($problemID != $lastProblemID) {
-                /*
-        Consolidate sales order lines on previous order by description/rate
-        */
-                if ($ordheadID) {
-                    $buSalesOrder->consolidateSalesOrderLines($ordheadID);
+                $lastProblemID = $problemID;
+                //we are looking at a new problem, we should create the lines we have from the previous run
+                if (count($toInsertLines)) {
+
+                    foreach ($toInsertLines as $insertLine) {
+                        $insertLine->insertRow();
+                    }
+                    $toInsertLines = [];
                 }
+                // we have to create a new order ..or reuse an existing not closed order
 
-                $buCustomer->getCustomerByID(
-                    $customerID,
-                    $dsCustomer
-                );
-
-                $ordheadID = false;
-                /*
-        If the SR is linked to an open sales order then we append details to that Order
-        */
+                $ordheadID = null;
+                // If the SR is linked to an open sales order then we append details to that Order
                 if ($dbeJCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID)) {
-                    $dsOrdhead = new DataSet($this);
-                    $dsOrdline = new DataSet($this);
-                    $buSalesOrder->getOrderByOrdheadID(
-                        $dbeJCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID),
-                        $dsOrdhead,
-                        $dsOrdline
-                    );
-
+                    $dbeOrdHead = new DBEOrdhead($this);
+                    $dbeOrdHead->getRow($dbeJCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID));
                     if (!in_array(
-                        $dsOrdhead->getValue(DBEOrdhead::type),
+                        $dbeOrdHead->getValue(DBEOrdhead::type),
                         array('C', 'Q')
                     )) {
                         $ordheadID = $dbeJCallActivity->getValue(DBEJCallActivity::linkedSalesOrderID);
                     }
                 }
 
-                if ($ordheadID) {
-
-                    $buSalesOrder->getOrderByOrdheadID(
-                        $ordheadID,
-                        $dsOrdhead,
-                        $dsOrdline
-                    );
-                    $dsOrdhead->fetchNext();
-                    $dbeOrdline->setValue(
-                        DBEJOrdline::ordheadID,
-                        $ordheadID
-                    );
-                    $dbeOrdline->getRowsByColumn(
-                        DBEJOrdline::ordheadID,
-                        DBEJOrdline::sequenceNo
-                    );
-                    $dbeOrdline->resetQueryString();
-                } else {
-
+                if (!$ordheadID) {
                     $dsOrdhead = new DataSet($this);
                     $dsOrdline = new DataSet($this);
+                    $dsCustomer = new DBECustomer($this);
+                    $dsCustomer->getRow($customerID);
                     $buSalesOrder->initialiseOrder(
                         $dsOrdhead,
                         $dsOrdline,
                         $dsCustomer
                     );
                     $dsOrdhead->setUpdateModeUpdate();
-                    $dsOrdhead->setValue(
-                        DBEJOrdhead::custPORef,
-                        'T & M Service'
-                    );
-                    $dsOrdhead->setValue(
-                        DBEJOrdhead::addItem,
-                        'N'
-                    );
-                    $dsOrdhead->setValue(
-                        DBEJOrdhead::partInvoice,
-                        'N'
-                    );
-                    $dsOrdhead->setValue(
-                        DBEJOrdhead::paymentTermsID,
-                        CONFIG_PAYMENT_TERMS_30_DAYS
-                    );
+                    $dsOrdhead->setValue(DBEJOrdhead::custPORef, 'T & M Service');
+                    $dsOrdhead->setValue(DBEJOrdhead::addItem, 'N');
+                    $dsOrdhead->setValue(DBEJOrdhead::partInvoice, 'N');
+                    $dsOrdhead->setValue(DBEJOrdhead::paymentTermsID, CONFIG_PAYMENT_TERMS_30_DAYS);
                     $dsOrdhead->post();
                     $buSalesOrder->updateHeader(
                         $dsOrdhead->getValue(DBEOrdhead::ordheadID),
@@ -4651,246 +4582,184 @@ class BUActivity extends Business
                     );
 
                     $ordheadID = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
-                    /*
-          Link SR to new Order
-          */
+                    // Link SR to new Order
                     $this->dbeProblem->getRow($problemID);
                     $this->dbeProblem->setValue(
                         DBEJProblem::linkedSalesOrderID,
                         $ordheadID
                     );
+                    var_dump($ordheadID);
                     $this->dbeProblem->updateRow();
                 }
 
-                // Common to all order lines
-                $dbeOrdline->setValue(
-                    DBEJOrdline::ordheadID,
-                    $ordheadID
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::customerID,
-                    $customerID
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::qtyDespatched,
-                    0
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::qtyLastDespatched,
-                    0
-                );
+                // Create the comment line with the SR number
+                $dbeOrdline->setValue(DBEJOrdline::ordheadID, $ordheadID);
+                $dbeOrdline->setValue(DBEJOrdline::customerID, $customerID);
+                $dbeOrdline->setValue(DBEJOrdline::qtyDespatched, 0);
+                $dbeOrdline->setValue(DBEJOrdline::qtyLastDespatched, 0);
                 $dbeOrdline->setValue(
                     DBEJOrdline::supplierID,
                     CONFIG_SALES_STOCK_SUPPLIERID
                 );
-
-                // first line is Service Request Number
-                $sequenceNo++;
-                $dbeOrdline->setValue(
-                    DBEJOrdline::lineType,
-                    'C'
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::itemID,
-                    null
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::stockcat,
-                    null
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::sequenceNo,
-                    $dbeOrdline->getNextSortOrder()
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::qtyOrdered,
-                    0
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::curUnitCost,
-                    0
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::curTotalCost,
-                    0
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::curUnitSale,
-                    0
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::curTotalSale,
-                    0
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::description,
-                    'Service Request ' . $problemID
-                );
-                $dbeOrdline->insertRow();
-
-
-                $lastUserID = false;
-            } // end if($problemID != $lastProblemID)
-
-
-            $lastProblemID = $problemID;
-
-            if ($lastUserID != $dbeJCallActivity->getValue(
-                    DBEJCallActivity::userID
-                ) or $lastDate != $dbeJCallActivity->getValue(
-                    DBEJCallActivity::date
-                )) {
-                $consultantName = $dbeJCallActivity->getValue(DBEJCallActivity::userName);
-            }
-
-            $lastUserID = $dbeJCallActivity->getValue(DBEJCallActivity::userID);
-            $lastDate = $dbeJCallActivity->getValue(DBEJCallActivity::date);
-
-            $dbeCallActType->getRow($dbeJCallActivity->getValue(DBEJCallActivity::callActTypeID));
-
-            /* mantis 359: Apply maximum travel hours to travel type activities */
-            if ($dbeCallActType->getValue(DBEJCallActivity::travelFlag) == 'Y') {
-                $dsSite = new DataSet($this);
-                $buCustomer->getSiteByCustomerIDSiteNo(
-                    $customerID,
-                    $dbeJCallActivity->getValue(DBEJCallActivity::siteNo),
-                    $dsSite
-                );
-                $max_hours = $dsSite->getValue(DBESite::maxTravelHours);
-            } else {
-                // use the max hours field from call activity
-                $max_hours = $dbeCallActType->getValue(DBECallActType::maxHours);
-            }
-
-            // this function is found in Functions/Activity
-            getRatesAndHours(
-                $dbeJCallActivity->getValue(DBEJCallActivity::date),
-                $dbeJCallActivity->getValue(DBEJCallActivity::startTime),
-                $dbeJCallActivity->getValue(DBEJCallActivity::endTime),
-                $dbeCallActType->getValue(DBECallActType::minHours),
-                $max_hours,
-                $dbeCallActType->getValue(DBECallActType::oohMultiplier),
-                $dbeCallActType->getValue(DBECallActType::itemID),
-                $this->dsHeader,
-                $normalHours,
-                $beforeHours,
-                $afterHours,
-                $outOfHoursRate,
-                $normalRate
-            );
-
-            if ($normalHours > 0) {
-                $description = $consultantName . ' - Consultancy';
-                $dbeOrdline->setValue(
-                    DBEJOrdline::lineType,
-                    'I'
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::sequenceNo,
-                    $dbeOrdline->getNextSortOrder()
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::stockcat,
-                    'G'
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::itemID,
-                    CONFIG_CONSULTANCY_DAY_LABOUR_ITEMID
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::qtyOrdered,
-                    $normalHours
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::curUnitCost,
-                    0
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::curTotalCost,
-                    0
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::curUnitSale,
-                    $normalRate
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::curTotalSale,
-                    $normalHours * $normalRate
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::description,
-                    $description
-                );
+                $dbeOrdline->setValue(DBEJOrdline::lineType, 'C');
+                $dbeOrdline->setValue(DBEJOrdline::itemID, null);
+                $dbeOrdline->setValue(DBEJOrdline::stockcat, null);
+                $dbeOrdline->setValue(DBEJOrdline::sequenceNo, $dbeOrdline->getNextSortOrder());
+                $dbeOrdline->setValue(DBEJOrdline::qtyOrdered, 0);
+                $dbeOrdline->setValue(DBEJOrdline::curUnitCost, 0);
+                $dbeOrdline->setValue(DBEJOrdline::curTotalCost, 0);
+                $dbeOrdline->setValue(DBEJOrdline::curUnitSale, 0);
+                $dbeOrdline->setValue(DBEJOrdline::curTotalSale, 0);
+                $dbeOrdline->setValue(DBEJOrdline::description, 'Service Request ' . $problemID);
                 $dbeOrdline->insertRow();
             }
-            /*
-      Out of hours
-      */
-            if ($beforeHours > 0 or $afterHours > 0) {
-                $description = $consultantName . ' - Consultancy';
-                $dbeOrdline->setValue(
-                    DBEJOrdline::lineType,
-                    'I'
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::sequenceNo,
-                    $dbeOrdline->getNextSortOrder()
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::stockcat,
-                    'G'
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::itemID,
-                    CONFIG_CONSULTANCY_OUT_OF_HOURS_LABOUR_ITEMID
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::qtyOrdered,
-                    $beforeHours + $afterHours
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::curUnitCost,
-                    0
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::curTotalCost,
-                    0
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::curUnitSale,
-                    $outOfHoursRate
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::curTotalSale,
-                    ($beforeHours + $afterHours) * $outOfHoursRate
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::description,
-                    $description
-                );
-                $dbeOrdline->insertRow();
+            $this->updateConsolidatedLineFromActivity($toInsertLines, $dbeJCallActivity, $ordheadID);
+            $toUpdateActivity = new DBECallActivity($this);
+            $toUpdateActivity->getRow($dbeJCallActivity->getValue(DBEJCallActivity::callActivityID));
+            $toUpdateActivity->setValue(DBEJCallActivity::status, 'A');
+            $toUpdateActivity->updateRow();
+
+        }
+
+        if (count($toInsertLines)) {
+            foreach ($toInsertLines as $insertLine) {
+                $insertLine->insertRow();
             }
-            // update status on call activity to Authorised
-            $dbeCallActivity->getRow($dbeJCallActivity->getValue(DBEJCallActivity::callActivityID));
-            $dbeCallActivity->setValue(
-                DBEJCallActivity::status,
-                'A'
-            );
-            $dbeCallActivity->updateRow();
-
-
-        } // end while($dbeJCallActivity->fetchNext())
-
+        }
         foreach ($problemIDArray as $currentProblemID) {
             $this->setProblemToCompleted($currentProblemID);
         }
-        /*
-    Consolidate sales order lines on final order by description/rate
-    */
-        if ($ordheadID) {
-            $buSalesOrder->consolidateSalesOrderLines($ordheadID);
-        }
         return true;
+    }
+
+    private function updateConsolidatedLineFromActivity(&$toInsertLines, $dbeJCallActivity, $ordheadId)
+    {
+        $consultantName = $dbeJCallActivity->getValue(DBEJCallActivity::userName);
+        $customerID = $dbeJCallActivity->getValue(DBEJCallActivity::customerID);
+        $dbeCallActType = new DBECallActType($this);
+        $dbeCallActType->getRow($dbeJCallActivity->getValue(DBEJCallActivity::callActTypeID));
+
+        /* mantis 359: Apply maximum travel hours to travel type activities */
+        if ($dbeCallActType->getValue(DBEJCallActivity::travelFlag) == 'Y') {
+            $dsSite = new DataSet($this);
+            $buCustomer = new BUCustomer($this);
+            $buCustomer->getSiteByCustomerIDSiteNo(
+                $customerID,
+                $dbeJCallActivity->getValue(DBEJCallActivity::siteNo),
+                $dsSite
+            );
+            $max_hours = $dsSite->getValue(DBESite::maxTravelHours);
+        } else {
+            // use the max hours field from call activity
+            $max_hours = $dbeCallActType->getValue(DBECallActType::maxHours);
+        }
+
+        // this function is found in Functions/Activity
+        getRatesAndHours(
+            $dbeJCallActivity->getValue(DBEJCallActivity::date),
+            $dbeJCallActivity->getValue(DBEJCallActivity::startTime),
+            $dbeJCallActivity->getValue(DBEJCallActivity::endTime),
+            $dbeCallActType->getValue(DBECallActType::minHours),
+            $max_hours,
+            $dbeCallActType->getValue(DBECallActType::oohMultiplier),
+            $dbeCallActType->getValue(DBECallActType::itemID),
+            $this->dsHeader,
+            $normalHours,
+            $beforeHours,
+            $afterHours,
+            $outOfHoursRate,
+            $normalRate
+        );
+
+        $description = $consultantName . ' - Consultancy';
+        if ($normalHours > 0) {
+            $insertKey = "$description - $normalRate";
+            if (!isset($toInsertLines[$insertKey])) {
+                $toInsertLines[$insertKey] = $this->initializeSOLineFromActivity($description, $normalRate, $ordheadId);
+            }
+
+            $toInsertLines[$insertKey]->setValue(
+                DBEJOrdline::qtyOrdered,
+                $toInsertLines[$insertKey]->getValue(DBEJOrdline::qtyOrdered) + $normalHours
+            );
+            $toInsertLines[$insertKey]->setValue(
+                DBEJOrdline::curTotalSale,
+                $toInsertLines[$insertKey]->getValue(DBEOrdline::curTotalSale) + ($normalHours * $normalRate)
+            );
+        }
+
+        if ($beforeHours > 0 || $afterHours > 0) {
+            $insertKey = "$description - $outOfHoursRate";
+            if (!isset($toInsertLines[$insertKey])) {
+                $toInsertLines[$insertKey] = $this->initializeSOLineFromActivity(
+                    $description,
+                    $outOfHoursRate,
+                    $ordheadId,
+                    CONFIG_CONSULTANCY_OUT_OF_HOURS_LABOUR_ITEMID
+                );
+            }
+
+            $toInsertLines[$insertKey]->setValue(
+                DBEJOrdline::qtyOrdered,
+                $toInsertLines[$insertKey]->getValue(DBEOrdline::qtyOrdered) + $beforeHours + $afterHours
+            );
+
+            $toInsertLines[$insertKey]->setValue(
+                DBEJOrdline::curTotalSale,
+                $toInsertLines[$insertKey]->getValue(
+                    DBEOrdline::curTotalSale
+                ) + (($beforeHours + $afterHours) * $outOfHoursRate)
+            );
+        }
+    }
+
+    private function initializeSOLineFromActivity($description,
+                                                  $rate,
+                                                  $ordheadId,
+                                                  $itemID = CONFIG_CONSULTANCY_DAY_LABOUR_ITEMID
+    )
+    {
+        $dbeOrderLine = new DBEOrdline($this);
+        $dbeOrderLine->setValue(DBEOrdline::ordheadID, $ordheadId);
+        $dbeOrderLine->setValue(
+            DBEJOrdline::lineType,
+            'I'
+        );
+        $dbeOrderLine->setValue(
+            DBEJOrdline::stockcat,
+            'G'
+        );
+        $dbeOrderLine->setValue(
+            DBEJOrdline::itemID,
+            $itemID
+        );
+
+        $dbeOrderLine->setValue(
+            DBEJOrdline::curUnitCost,
+            0
+        );
+        $dbeOrderLine->setValue(
+            DBEJOrdline::curTotalCost,
+            0
+        );
+        $dbeOrderLine->setValue(
+            DBEJOrdline::curUnitSale,
+            $rate
+        );
+
+        $dbeOrderLine->setValue(
+            DBEJOrdline::description,
+            $description
+        );
+        $dbeOrderLine->setValue(
+            DBEJOrdline::qtyOrdered,
+            0
+        );
+        $dbeOrderLine->setValue(
+            DBEJOrdline::curTotalSale,
+            0
+        );
+        return $dbeOrderLine;
     }
 
     /**
