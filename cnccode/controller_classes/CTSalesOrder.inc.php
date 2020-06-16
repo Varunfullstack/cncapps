@@ -4043,13 +4043,15 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError('Line ID not provided');
             return;
         }
-        $dsOrdline = new DBEOrdline($this);
-        if (!$dsOrdline->getRow($this->getParam('lineId'))) {
+        $this->dsOrdline = new DBEJOrdline($this);
+        if (!$this->dsOrdline->getRow($this->getParam('lineId'))) {
             $this->displayFatalError('Line not found');
             return;
         }
 
-        $this->setOrdheadID($dsOrdline->getValue(DBEOrdline::ordheadID));
+
+
+        $this->setOrdheadID($this->dsOrdline->getValue(DBEOrdline::ordheadID));
 
         $this->setMethodName('editOrderLine');
         if (!$this->getOrdheadID()) {

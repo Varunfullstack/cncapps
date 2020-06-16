@@ -25,7 +25,7 @@ trait SortableWithQueryDBE
         $query = "select max({$this->getSortOrderColumnName()}) as maxSortOrder from {$this->getTableName()} where {$this->getDiscriminatorColumnName()} = {$this->getDiscriminatorCOlumnValue()}";
         $result = $db->query($query);
         if(!$result){
-            throw new \Exception("Failed to execute query");
+            throw new \Exception("Failed to execute query: $query");
         }
         $db->next_record(MYSQLI_ASSOC);
         return $db->Record['maxSortOrder'];

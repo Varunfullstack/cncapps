@@ -99,7 +99,7 @@ class DBEJOrdline extends DBEOrdline
             ) . "=sup_suppno" .
             " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "=itm_itemno where " . $this->getPKWhere()
         );
-        parent::getRow($pkValue);
+        return parent::getRow($pkValue);
     }
 
     function getRowByOrdheadIDSequenceNo()
