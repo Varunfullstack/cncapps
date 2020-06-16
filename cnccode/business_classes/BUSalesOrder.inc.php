@@ -1940,17 +1940,6 @@ class BUSalesOrder extends Business
 
     }
 
-    /**
-     * Where many lines exist with identical description and rates, summarise onto one line
-     *
-     * @param mixed $ordheadID
-     */
-    function consolidateSalesOrderLines($ordheadID)
-    {
-        $dbeOrdline = new DBEOrdline($this);
-        $dbeOrdline->consolidateLines($ordheadID);
-    }
-
     public function notifyPurchaseOrderCompletion(DBEPorhead $purchaseOrderHeader)
     {
         // we need to find out what is the related sales order first
