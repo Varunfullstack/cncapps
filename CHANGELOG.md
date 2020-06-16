@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased] - 2020-06-15
+### Added
+- Confirm Report Logic / calculations
 
 ## [v4.1.7] - 2020-06-15
 ### Added

@@ -110,27 +110,32 @@
     <p>&nbsp;</p>
 
 </form>
-<table width="600px"
+<table style="max-width: 600px;"
        border="0"
        cellspacing="1"
        cellpadding="1"
+       class="table table-striped"
 >
+<thead>
     <tr>
-        <th align="left">Year</th>
-        <th align="left">Month</th>
-        <th align="right">Quotes</th>
-        <th align="right">Conversions</th>
-        <th align="right">Percentage</th>
+        <th >Year</th>
+        <th >Month</th>
+        <th >Quotes</th>
+        <th >Conversions</th>
+        <th >Percentage</th>
     </tr>
+</thead>
+<tbody>
     <!-- BEGIN rowBlock -->
     <tr>
         <td>{year}</td>
         <td>{month}</td>
-        <td align="right">{quoteCount}</td>
-        <td align="right">{conversionCount}</td>
-        <td align="right">{conversionPercentage}</td>
+        <td>{quoteCount}</td>
+        <td>{conversionCount}</td>
+        <td>{conversionPercentage}</td>
     </tr>
     <!-- END rowBlock -->
+</tbody>
 </table>
 <p><img src="{urlChart}"/></p>
 
