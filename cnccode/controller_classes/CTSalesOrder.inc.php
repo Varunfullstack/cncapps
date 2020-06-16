@@ -1172,12 +1172,12 @@ class CTSalesOrder extends CTCNC
         // below the lines section and will be applied to the selected (checked) lines
         $actions = array();
         $quickQuoteDisabled = false;
-        if ($dsOrdline->rowCount() > 0) {                        // There are lines
+        if ($dsOrdline->rowCount()) {                        // There are lines
             if ($orderType == 'Q') {
                 $actions[CTSALESORDER_ACT_COPY_TO_ORDER] = 'copy to order';
                 $actions[CTSALESORDER_ACT_CONVERT_TO_ORDER] = 'convert to order';
             }
-            if ($orderType == 'Q' or $orderType == 'I') {
+            if ($orderType == 'Q' || $orderType == 'I') {
                 $actions[CTSALESORDER_ACT_DELETE_LINES] = 'delete lines';
                 $actions[CTSALESORDER_ACT_UPDATE_LINES] = 'update values';
                 $actions[CTSALESORDER_ACT_INSERT_FROM_ORDER] = 'insert lines from order';
@@ -1195,6 +1195,8 @@ class CTSalesOrder extends CTCNC
             $actions[CTSALESORDER_ACT_CHANGE_SUPPLIER] = 'change supplier';
             $actions[CTSALESORDER_ACT_DOWNLOAD_CSV] = 'download CSV';
             $actions[CTSALESORDER_ACT_CREATE_SR_FROM_LINES] = 'create new SR';
+        } elseif ($orderType == 'Q' || $orderType == 'I'){
+            $actions[CTSALESORDER_ACT_INSERT_FROM_ORDER] = 'insert lines from order';
         }
         $order = [
             CTSALESORDER_ACT_CREATE_QUICK_QUOTE,
@@ -4048,8 +4050,6 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError('Line not found');
             return;
         }
-
-
 
         $this->setOrdheadID($this->dsOrdline->getValue(DBEOrdline::ordheadID));
 
