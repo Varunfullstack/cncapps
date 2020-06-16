@@ -4501,7 +4501,6 @@ class BUActivity extends Business
         $db->query($select);
         $problemIDArray = [];
         while ($db->next_record()) {
-
             $problemIDArray[] = $db->Record['caa_problemno'];
         }
         /*
@@ -4525,7 +4524,6 @@ class BUActivity extends Business
         $db->query($select);
         $finalActivityIDArray = [];
         while ($db->next_record()) {
-
             $finalActivityIDArray[] = $db->Record['caa_callactivityno'];
         }
 
@@ -4616,7 +4614,6 @@ class BUActivity extends Business
                         DBEJOrdline::ordheadID,
                         DBEJOrdline::sequenceNo
                     );
-                    $sequenceNo = $dbeOrdline->rowCount(); // so we paste after the last row
                     $dbeOrdline->resetQueryString();
                 } else {
 
@@ -4663,18 +4660,12 @@ class BUActivity extends Business
                         $ordheadID
                     );
                     $this->dbeProblem->updateRow();
-
-                    $sequenceNo = 0;
                 }
 
                 // Common to all order lines
                 $dbeOrdline->setValue(
                     DBEJOrdline::ordheadID,
                     $ordheadID
-                );
-                $dbeOrdline->setValue(
-                    DBEJOrdline::sequenceNo,
-                    $sequenceNo
                 );
                 $dbeOrdline->setValue(
                     DBEJOrdline::customerID,
@@ -4709,7 +4700,7 @@ class BUActivity extends Business
                 );
                 $dbeOrdline->setValue(
                     DBEJOrdline::sequenceNo,
-                    $sequenceNo
+                    $dbeOrdline->getNextSortOrder()
                 );
                 $dbeOrdline->setValue(
                     DBEJOrdline::qtyOrdered,
@@ -4790,14 +4781,13 @@ class BUActivity extends Business
 
             if ($normalHours > 0) {
                 $description = $consultantName . ' - Consultancy';
-                $sequenceNo++;
                 $dbeOrdline->setValue(
                     DBEJOrdline::lineType,
                     'I'
                 );
                 $dbeOrdline->setValue(
                     DBEJOrdline::sequenceNo,
-                    $sequenceNo
+                    $dbeOrdline->getNextSortOrder()
                 );
                 $dbeOrdline->setValue(
                     DBEJOrdline::stockcat,
@@ -4838,14 +4828,13 @@ class BUActivity extends Business
       */
             if ($beforeHours > 0 or $afterHours > 0) {
                 $description = $consultantName . ' - Consultancy';
-                $sequenceNo++;
                 $dbeOrdline->setValue(
                     DBEJOrdline::lineType,
                     'I'
                 );
                 $dbeOrdline->setValue(
                     DBEJOrdline::sequenceNo,
-                    $sequenceNo
+                    $dbeOrdline->getNextSortOrder()
                 );
                 $dbeOrdline->setValue(
                     DBEJOrdline::stockcat,

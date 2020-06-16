@@ -1947,62 +1947,8 @@ class BUSalesOrder extends Business
      */
     function consolidateSalesOrderLines($ordheadID)
     {
-        $db = $GLOBALS['db'];
-        /*
-        Get a list of existing order line numbers
-        */
-        $statement =
-            "SELECT GROUP_CONCAT(`odl_ordlineno`) AS ordlinenos
-FROM ordline
-WHERE odl_ordno = $ordheadID
-  AND (odl_itemno = 1502 OR odl_itemno = 1503)";
-
-        $db->query($statement);
-        $db->next_record();
-        $oldOrdlinenos = $db->Record['ordlinenos'];
-        /*
-        Insert new, summarised order lines
-        */
-        $statement =
-            "INSERT INTO ordline
-
-        SELECT
-          0,
-          `odl_type`,
-          `odl_ordno`,
-          `odl_item_no`,
-          `odl_custno`,
-          `odl_itemno`,
-          `odl_stockcat`,
-          `odl_desc`,
-          SUM( odl_qty_ord ),
-          SUM(`odl_qty_desp`),
-          SUM(`odl_qty_last_desp`),
-          `odl_suppno`,
-          `odl_d_unit`,
-          SUM( `odl_d_total` ),
-          `odl_e_unit`,
-          SUM( `odl_e_total` ),
-          `odl_renewal_cuino` 
-
-        FROM
-          ordline
-
-        WHERE
-          odl_ordno = $ordheadID
-          AND (odl_itemno = 1502 OR odl_itemno = 1503)
-        GROUP BY
-          odl_desc, odl_e_unit, odl_d_unit
-          
-        ORDER BY odl_item_no";
-
-        $db->query($statement);
-        /*
-        Remove original order lines
-        */
-        $statement = "DELETE FROM ordline WHERE odl_ordlineno IN (" . $oldOrdlinenos . ")";
-
-        $db->query($statement);
+        $dbeOrdline = new DBEOrdline($this);
+        $dbeOrdline->consolidateLines($ordheadID);
     }
 
     public function notifyPurchaseOrderCompletion(DBEPorhead $purchaseOrderHeader)
