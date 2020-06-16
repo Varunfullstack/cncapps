@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Confirm Report Logic / calculations
 ### Fixed
 - Imported customers not assigning default delivery address
 - Imported contacts not getting the site assigned correctly
