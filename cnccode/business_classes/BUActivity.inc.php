@@ -6524,7 +6524,7 @@ is currently a balance of ';
         /*
     Send an email to the new person new user is not "unallocated" user
     */
-        if ($userID) { // not de-allocating
+        if ($userID && $this->dbeUser->getValue(DBEJUser::sendEmailWhenAssignedService)==1) { // not de-allocating          
             $this->sendServiceReallocatedEmail(
                 $problemID,
                 $userID,

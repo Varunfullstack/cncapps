@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Domain renewal controller class
+ * My Account controller class
  * CNC Ltd
  *
  * @access public
- * @authors Karim Ahmed - Sweet Code Limited
+ * @authors Mustafa Taha
  */
 global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
@@ -37,7 +37,7 @@ class CTMySettings extends CTCNC
         //     Header("Location: /NotAllowed.php");
         //     exit;
         // }
-        $this->setMenuId(1001);
+        $this->setMenuId(1002);
         //$this->buPassword = new BUPassword($this);
     }
 
@@ -47,10 +47,12 @@ class CTMySettings extends CTCNC
      */
     function defaultAction()
     {
-
         switch ($this->getAction()) {
             case "getMySettings":
                 echo json_encode($this->getMyData());
+                exit;
+            case "sendEmailAssignedService":                
+                echo json_encode($this->setSendEmailAssignedService());
                 exit;
             default:
                 $this->getTemplate();
@@ -60,14 +62,12 @@ class CTMySettings extends CTCNC
     function getTemplate()
     {
         $this->setMethodName('displayMySettings');
-
         $this->setTemplateFiles(
             array(
                 'MySettings' => 'MySettings.inc'
             )
         );
         $this->setPageTitle('My Account');
-
         $this->template->parse(
             'CONTENTS',
             'MySettings',
@@ -79,23 +79,20 @@ class CTMySettings extends CTCNC
 
     function getMyData()
     {
-        $arr = array('a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5);
         $BUUser = new BUUser($this);
         $dsUser = new DataSet($this);
-
-       
-
-        $BUUser->getUserByID(139, $dsUser);
+        $BUUser->getUserByID($this->userID, $dsUser);
         $teamId=$dsUser->getValue(DBEJUser::teamID);
         $managerId=$dsUser->getValue(DBEJUser::managerID);
         $userId=$dsUser->getValue(DBEJUser::userID);
         $result = array(
             'name' => $dsUser->getValue(DBEJUser::name),
             'jobTitle' => $dsUser->getValue(DBEJUser::jobTitle),
-            'team' => $this->getTeamName($teamId),
-            'manager' => $this->getMangerName($managerId),
+            'team' =>  !$teamId?'':$this->getTeamName($teamId),
+            'manager' =>  !$managerId?'':$this->getMangerName($managerId),
             'employeeNo' => $dsUser->getValue(DBEJUser::employeeNo),
-            'startDate' => $dsUser->getValue(DBEJUser::startDate),            
+            'startDate' => $dsUser->getValue(DBEJUser::startDate), 
+            'sendEmailAssignedService' => $dsUser->getValue(DBEJUser::sendEmailWhenAssignedService),                       
             'userLog' =>$this->getUserTimeLog($userId)
         );
         return $result;
@@ -119,7 +116,7 @@ class CTMySettings extends CTCNC
         $sql="select * from user_time_log where userID=:userId 
                 ORDER BY  `loggedDate` DESC  
                 limit 5";        
-        return $this->fetchAll($sql,['userId'=>139]);
+        return $this->fetchAll($sql,['userId'=>$userId]);
     }
     
     public  function fetchAll($query,$params)
@@ -143,5 +140,16 @@ class CTMySettings extends CTCNC
         $stmt->execute();
         $result=$stmt->fetchAll(PDO::FETCH_ASSOC);        
         return $result;
+    }
+
+    function setSendEmailAssignedService()
+    {        
+        $dbeUser= new DBEUser($this);
+        $dbeUser->setValue(DBEJUser::userID,$this->userID);
+        $dbeUser->getRow();
+        $temp=$dbeUser->getValue(DBEJUser::sendEmailWhenAssignedService);
+        $dbeUser->setValue(DBEJUser::sendEmailWhenAssignedService,!$temp);
+        $dbeUser->updateRow();
+        return true;   
     }
 }
