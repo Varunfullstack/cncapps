@@ -360,7 +360,9 @@ class CTCNC extends Controller
             $userName = $dbeUser->getValue(DBEUser::name);
         }
 
-        $this->template->set_var(array('userName' => $userName, 'fromDate' => null, 'urlLogout' => $urlLogout));
+        $this->template->set_var(array('userName' => $userName, 'fromDate' => null,  
+         'urlLogout2' => $urlLogout,
+         'urlLogout' => $urlLogout));
 
         if ($this->hasPermissions(TECHNICAL_PERMISSION)) {
             $menu->addSection("Technical", 'fa-laptop', $this->getDefaultTechnicalMenu(), null);
@@ -1150,5 +1152,28 @@ class CTCNC extends Controller
     protected function isRenewalSalesOrderManager()
     {
         return $this->dbeUser->getValue(DBEUser::createRenewalSalesOrdersFlag) == 'Y';
+    }
+
+    protected function fetchAll($query,$params)
+    {         
+        $db = new PDO(
+            'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8',
+            DB_USER,
+            DB_PASSWORD
+        );
+        $stmt=$db->prepare($query,$params);
+        foreach($params as $key=>$value)
+        {
+            if(($params[ $key]!=null||$params[ $key]=='0')&&is_numeric($params[ $key]))
+            {
+                $params[ $key]=(int)$params[ $key];
+                $stmt->bindParam($key,  $params[ $key],PDO::PARAM_INT);
+            }
+            else
+                $stmt->bindParam($key,  $params[ $key]);
+        }        
+        $stmt->execute();
+        $result=$stmt->fetchAll(PDO::FETCH_ASSOC);        
+        return $result;
     }
 }
