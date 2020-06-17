@@ -12,16 +12,18 @@ import CheckBox from './utils/checkBox.js';
     fetch('?action=getMySettings')
     .then(res => res.json())
     .then(data=>{     
-      data.lengthOfServices=(moment().diff(moment(data.startDate),'months')/12).toFixed(1);
+      data.lengthOfServices=0;
+      if(data.startDate)
+        data.lengthOfServices=(moment().diff(moment(data.startDate),'months')/12).toFixed(1);     
       this.setState({...data})
-      console.log(data);
+      //console.log(data);
     })
   }
   getElement(key,label,value)
   {
     return [
       this.el('dt',{key:key+"_label",className:'col-3' },label),
-      this.el('dd',{key:key+'_value',className:'col-9'},value),
+      this.el('dd',{key:key+'_value',className:'col-9'},value===null?'':value),
     ]; 
   }
 
@@ -36,7 +38,13 @@ import CheckBox from './utils/checkBox.js';
     else return null;
   }
   handleOnChange=()=>{
-    console.log('change');
+    //console.log(this.state.sendEmailAssignedService);
+    const sendEmailAssignedService=!this.state.sendEmailAssignedService;
+    this.setState({sendEmailAssignedService});
+    // save it to database
+    fetch('?action=sendEmailAssignedService',{method:'POST'}).then(response=>{
+      //console.log(response);
+    })
   }
   render() {
     
@@ -62,12 +70,19 @@ import CheckBox from './utils/checkBox.js';
           this.getElement('userLog','User Log',''),
       ]),
       this.getUserLog(),      
-      this.el(CheckBox,{key:'sendMeEmail', name:'sendMeEmail',label:"Send me an email when I'm assigned a Service Request.",checked:true,onChange:this.handleOnChange()},null) ,
+      this.el('h1',{key:'section_title_2'},'Settings'), 
+      this.el(CheckBox,
+        { key:'sendMeEmail', 
+          name:'sendMeEmail',
+          label:"Send me an email when I'm assigned a Service Request.",
+          checked:this.state.sendEmailAssignedService,
+          onChange:this.handleOnChange
+        },null) ,
     ]
     );
   }
 }
 export default CMPMySettings;
 
-const domContainer = document.querySelector('#react_main');
+const domContainer = document.querySelector('#react_main_mysettings');
 ReactDOM.render(React.createElement(CMPMySettings), domContainer);

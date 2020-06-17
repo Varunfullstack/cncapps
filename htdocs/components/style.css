@@ -34,7 +34,7 @@
     -ms-flex-direction: column;
     flex-direction: column;
     padding-left: 0;
-    margin-bottom: 0;
+    margin-bottom: 10px;
 }
 .user-log{
     max-width: 200px;
@@ -144,4 +144,7 @@ dd {
  }
  .check-box label{
     margin-left: 10px;
+}
+.col-1 , .col-2 , .col-3 , .col-4 , .col-5 , .col-6 , .col-7 , .col-8 , .col-9 , .col-10 , .col-11 , .col-12{
+    min-height: 15px;
 }

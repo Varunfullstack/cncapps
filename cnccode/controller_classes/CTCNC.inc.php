@@ -448,17 +448,26 @@ class CTCNC extends Controller
             $menu->addSection("Management", 'fa-project-diagram', $this->getDefaultManagementMenu());
         }
 
-
         $this->addConditionalMenu(
             $menu,
-            'fa-project-diagram',
-            "Technical",
+            'fa-user-circle',
+            $this->getDbeUser()->getValue(DBEUser::name),
             $this->getDbeUser()->getValue(DBEUser::isExpenseApprover) || $this->getDbeUser()->getValue(
                 DBEUser::globalExpenseApprover
             ),
-            906,
+            1001,
             "Expenses/Overtime",
             "ExpenseDashboard.php"
+        );
+        
+        $this->addConditionalMenu(
+            $menu,
+            'fa-user-circle',
+            $this->getDbeUser()->getValue(DBEUser::name),
+            true,
+            1002,
+            "My Account",
+            "MySettings.php"
         );
 
         global $twig;
@@ -1071,6 +1080,7 @@ class CTCNC extends Controller
             ],
         ];
     }
+   
 
     function initialProcesses()
     {
