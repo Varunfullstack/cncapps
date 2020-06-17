@@ -4077,8 +4077,8 @@ class CTSalesOrder extends CTCNC
 
         if (!$this->formError && $this->getAction() != CTSALESORDER_ACT_EDIT_ORDLINE) {
             $this->buSalesOrder->initialiseNewOrdline(
-                $dsOrdline->getValue(DBEOrdline::ordheadID),
-                $dsOrdline->getValue(DBEOrdline::sequenceNo),
+                $this->dsOrdline->getValue(DBEOrdline::ordheadID),
+                $this->dsOrdline->getValue(DBEOrdline::sequenceNo),
                 $this->dsOrdline
             );
         }
