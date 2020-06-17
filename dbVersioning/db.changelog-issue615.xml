@@ -25,8 +25,25 @@
                 OR con_mailflag4 = 'Y'
                 OR con_mailflag8 = 'Y'
                 OR con_mailflag9 = 'Y'
-                OR con_mailflag11 = 'Y') and con_email is null and supportLevel is null
+                OR con_mailflag11 = 'Y')
+              and con_email is null
+              and supportLevel is null
         </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="active"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue615-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="active"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="active" type="tinyint(1)" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
     </changeSet>
 
 </databaseChangeLog>
