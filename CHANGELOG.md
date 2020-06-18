@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Imported customers not assigning default delivery address
+
 ## [v4.1.8] - 2020-06-26
 ### Fixed
 - Fix issue in activityCreate1 when the customer name has an apostrophe
