@@ -52,7 +52,7 @@ class CTMySettings extends CTCNC
                 echo json_encode($this->getMyData());
                 exit;
             case "sendEmailAssignedService":                
-                echo json_encode($this->setSendEmailAssignedService());
+                echo  $this->setSendEmailAssignedService();
                 exit;
             default:
                 $this->getTemplate();
@@ -82,6 +82,7 @@ class CTMySettings extends CTCNC
         $BUUser = new BUUser($this);
         $dsUser = new DataSet($this);
         $BUUser->getUserByID($this->userID, $dsUser);
+        //$BUUser->getUserByID(29, $dsUser);
         $teamId=$dsUser->getValue(DBEJUser::teamID);
         $managerId=$dsUser->getValue(DBEJUser::managerID);
         $userId=$dsUser->getValue(DBEJUser::userID);
@@ -143,12 +144,14 @@ class CTMySettings extends CTCNC
     }
 
     function setSendEmailAssignedService()
-    {        
+    {   
+        $newVal= $this->getParam('sendEmailAssignedService');
+        if(!isset($newVal))
+         return false;
         $dbeUser= new DBEUser($this);
         $dbeUser->setValue(DBEJUser::userID,$this->userID);
         $dbeUser->getRow();
-        $temp=$dbeUser->getValue(DBEJUser::sendEmailWhenAssignedService);
-        $dbeUser->setValue(DBEJUser::sendEmailWhenAssignedService,!$temp);
+        $dbeUser->setValue(DBEJUser::sendEmailWhenAssignedService,$newVal);
         $dbeUser->updateRow();
         return true;   
     }
