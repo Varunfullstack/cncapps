@@ -14,8 +14,16 @@ import CheckBox from './utils/checkBox.js';
     .then(data=>{     
       data.lengthOfServices=0;
       if(data.startDate)
+      {
         data.lengthOfServices=(moment().diff(moment(data.startDate),'months')/12).toFixed(1);     
-      this.setState({...data})
+        data.startDate=moment(data.startDate).format('DD-MM-YYYY');
+      }
+      if(data.userLog)
+        data.userLog=data.userLog.map(log=>{        
+          return {...log, loggedDate:moment(log.loggedDate).format('DD-MM-YYYY')};
+        });
+      
+      this.setState({...data});
       //console.log(data);
     })
   }
@@ -29,20 +37,30 @@ import CheckBox from './utils/checkBox.js';
 
   getUserLog()
   {
-    if(this.state.userLog)
-    return this.el("ul", { className: "list-group user-log",key:"user_log" }, [
-      this.state.userLog.map((log) => {
-        return this.el('li',{className:'list-group-item',key:log.userTimeLogID},log.loggedDate+' '+log.startedTime)
-      }),
-    ]);
+    // if(this.state.userLog)
+    // return this.el("ul", { className: "list-group user-log",key:"user_log" }, [
+    //   this.state.userLog.map((log) => {
+    //     return this.el('li',{className:'list-group-item',key:log.userTimeLogID},log.loggedDate+' '+log.startedTime)
+    //   }),
+    // ]);
+
+    if(this.state.userLog)    
+    return this.el("dl", {key:"user_log" }, [
+         this.state.userLog.map((log) => {
+        return this.el('dd',{key:log.userTimeLogID},log.loggedDate+' '+log.startedTime)
+      })]);
+  
     else return null;
   }
   handleOnChange=()=>{
     //console.log(this.state.sendEmailAssignedService);
     const sendEmailAssignedService=!this.state.sendEmailAssignedService;
     this.setState({sendEmailAssignedService});
+  }
+
+  handleOnClick =()=>{
     // save it to database
-    fetch('?action=sendEmailAssignedService',{method:'POST'}).then(response=>{
+    fetch('?action=sendEmailAssignedService&&sendEmailAssignedService='+(this.state.sendEmailAssignedService?1:0),{method:'POST'}).then(response=>{
       //console.log(response);
     })
   }
@@ -51,26 +69,23 @@ import CheckBox from './utils/checkBox.js';
     return this.el(
       "div",
       {className:'my-account'},
-      [
-        
-      this.el('h1',{key:'section_title_1'},'About Me'), 
-      this.el('dl',{className:'row',key:'about_me'},[
+      [     
+        this.el('dl',{className:'row',key:'about_me'},[
           this.getElement('name','Name',this.state.name),
 
           this.getElement('jobTitle','Job Title',this.state.jobTitle),
 
           this.getElement('startDate','Start Date',this.state.startDate),
 
-          this.getElement('lengthOfServices','Length Of Services',this.state.lengthOfServices),
+          this.getElement('lengthOfServices','Length Of Service',this.state.lengthOfServices),
           
           this.getElement('manager','Manager',this.state.manager),
 
-          this.getElement('team','Team',this.state.team),
-          
-          this.getElement('userLog','User Log',''),
-      ]),
-      this.getUserLog(),      
-      this.el('h1',{key:'section_title_2'},'Settings'), 
+          this.getElement('team','Team',this.state.team) ,     
+          this.el('dt',{key:'userLog',className:'col-3'},'Last login times'),
+          this.getUserLog(),            
+      ]),           
+      this.el('h1',{key:'section_title_2'},'My Settings'), 
       this.el(CheckBox,
         { key:'sendMeEmail', 
           name:'sendMeEmail',
@@ -78,6 +93,7 @@ import CheckBox from './utils/checkBox.js';
           checked:this.state.sendEmailAssignedService,
           onChange:this.handleOnChange
         },null) ,
+      this.el('button',{key:'btnSave',style:{width:50},onClick:this.handleOnClick},'Save')
     ]
     );
   }

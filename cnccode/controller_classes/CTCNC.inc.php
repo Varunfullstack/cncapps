@@ -452,9 +452,10 @@ class CTCNC extends Controller
             $menu,
             'fa-user-circle',
             $this->getDbeUser()->getValue(DBEUser::name),
-            $this->getDbeUser()->getValue(DBEUser::isExpenseApprover) || $this->getDbeUser()->getValue(
-                DBEUser::globalExpenseApprover
-            ),
+            // $this->getDbeUser()->getValue(DBEUser::isExpenseApprover) || $this->getDbeUser()->getValue(
+            //     DBEUser::globalExpenseApprover
+            // ),
+            true,
             1001,
             "Expenses/Overtime",
             "ExpenseDashboard.php"
