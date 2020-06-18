@@ -59,6 +59,7 @@ while ($line = fgetcsv($csvFile)) {
         $customerInsert->setValue(DBECustomer::noOfPCs, $line[18]);
         $customerInsert->setValue(DBECustomer::mailshotFlag, 'Y');
         $customerInsert->setValue(DBECustomer::customerTypeID, 47);
+        $customerInsert->setValue(DBECustomer::deliverSiteNo, 0);
         $customerInsert->insertRow();
         $customerId = $customerInsert->getPKValue();
 

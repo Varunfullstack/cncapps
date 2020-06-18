@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Imported customers not assigning default delivery address
 
 ## [v4.1.7] - 2020-06-15
 ### Added
