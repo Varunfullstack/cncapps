@@ -132,7 +132,6 @@ class BUPassword extends Business
         if (!$data) {
             return null;
         }
-        $data=trim($data," ");
         return Encryption::encrypt(
             PASSWORD_ENCRYPTION_PUBLIC_KEY,
             $data
