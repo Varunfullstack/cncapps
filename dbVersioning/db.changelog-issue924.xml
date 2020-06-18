@@ -1,0 +1,60 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue924-0">
+        <tagDatabase tag="issue924"/>
+    </changeSet>
+    <changeSet id="issue924-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="slaFixHoursP1"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="slaFixHoursP1" type="decimal(4,1)" defaultValue="8">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="issue924-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="slaFixHoursP2"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="slaFixHoursP2" type="decimal(4,1)" defaultValue="16">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="issue924-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="slaFixHoursP3"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="slaFixHoursP3" type="decimal(4,1)" defaultValue="24">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="issue924-4" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="slaFixHoursP4"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="slaFixHoursP4" type="decimal(4,1)" defaultValue="48">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

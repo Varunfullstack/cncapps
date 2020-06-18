@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Added
+- Add Fix SLA to customer page
 
 ## [v4.1.7] - 2020-06-15
 ### Added

@@ -67,6 +67,10 @@ class DBECustomer extends DBCNCEntity
     const reviewMeetingBooked = 'reviewMeetingBooked';
     const licensedOffice365Users = 'licensedOffice365Users';
     const websiteURL = "websiteURL";
+    const slaFixHoursP1 = "slaFixHoursP1";
+    const slaFixHoursP2 = "slaFixHoursP2";
+    const slaFixHoursP3 = "slaFixHoursP3";
+    const slaFixHoursP4 = "slaFixHoursP4";
 
     /**
      * calls constructor()
@@ -277,6 +281,12 @@ class DBECustomer extends DBCNCEntity
             DA_NOT_NULL,
             "cus_sla_p5"
         );
+        $this->addColumn(self::slaFixHoursP1, DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn(self::slaFixHoursP2, DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn(self::slaFixHoursP3, DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn(self::slaFixHoursP4, DA_FLOAT, DA_NOT_NULL);
+
+
         $this->addColumn(
             self::sendContractEmail,
             DA_STRING,

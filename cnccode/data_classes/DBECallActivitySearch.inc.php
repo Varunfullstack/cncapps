@@ -562,15 +562,16 @@ class DBECallActivitySearch extends DBEntity
                 " AND caa_callacttypeno = " . $callActTypeID;
         }
 
-        switch ($breachedSlaOption) {
-            case 'B':
-                $whereParameters .=
-                    " AND pro_responded_hours > pro_sla_response_hours";
-                break;
-            case 'N':
-                $whereParameters .=
-                    " AND pro_responded_hours <= pro_sla_response_hours";
-                break;
+        if($fixedSLAStatus == 'B'){
+            $whereParameters.=  "  and  ";
+        }
+
+        if ($breachedSlaOption == 'B') {
+            $whereParameters .=
+                " AND pro_responded_hours > pro_sla_response_hours";
+        } elseif ($breachedSlaOption == 'N') {
+            $whereParameters .=
+                " AND pro_responded_hours <= pro_sla_response_hours";
         }
 
         if ($rootCauseID != '') {

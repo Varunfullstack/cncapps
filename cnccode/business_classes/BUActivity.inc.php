@@ -88,6 +88,7 @@ class BUActivity extends Business
     const searchFormLinkedSalesOrderID = 'linkedSalesOrderID';
     const searchFormManagementReviewOnly = 'managementReviewOnly';
     const searchFormBreachedSlaOption = 'breachedSlaOption';
+    const searchFormFixSLAOption = "searchFormFixSLAOption";
 
     const customerActivityMonthFormCustomerID = 'customerID';
     const customerActivityMonthFormFromDate = 'fromDate';
@@ -315,7 +316,11 @@ class BUActivity extends Business
             DA_STRING,
             DA_ALLOW_NULL
         );
-
+        $dsData->addColumn(
+            self::searchFormFixSLAOption,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
 
         $dsData->setValue(
             self::searchFormCustomerID,
@@ -363,6 +368,10 @@ class BUActivity extends Business
         );
         $dsData->setValue(
             self::searchFormBreachedSlaOption,
+            null
+        );
+        $dsData->setValue(
+            self::searchFormFixSLAOption,
             null
         );
     } // end sendServiceReallocatedEmail
