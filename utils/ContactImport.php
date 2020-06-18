@@ -87,8 +87,6 @@ while ($line = fgetcsv($csvFile)) {
         $siteInsert = new DBESite($thing);
         $siteInsert->setValue(DBESite::siteNo, 0);
         $siteInsert->setValue(DBESite::customerID, $customerId);
-        $siteInsert->setValue(DBESite::siteNo, 0);
-        $siteInsert->setValue(DBESite::customerID, $customerId);
         $siteInsert->setValue(DBESite::add1, $line[7]);
         $siteInsert->setValue(DBESite::add2, $line[8]);
         $siteInsert->setValue(DBESite::add3, $line[9]);
@@ -116,6 +114,7 @@ while ($line = fgetcsv($csvFile)) {
         $contactInsert->setValue(DBEContact::lastName, $line[3]);
         $contactInsert->setValue(DBEContact::position, $line[4]);
         $contactInsert->setValue(DBEContact::email, $line[5]);
+        $contactInsert->setValue(DBEContact::siteNo, 0);
         $contactInsert->insertRow();
     }
 
