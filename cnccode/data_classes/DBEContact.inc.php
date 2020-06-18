@@ -60,6 +60,7 @@ class DBEContact extends DBCNCEntity
     const pendingLeaverDate = 'pendingLeaverDate';
     const specialAttentionContactFlag = "specialAttentionContactFlag";
     const linkedInURL = "linkedInURL";
+    const active = "active";
 
     /**
      * calls constructor()
@@ -332,6 +333,14 @@ class DBEContact extends DBCNCEntity
             DA_ALLOW_NULL
         );
 
+        $this->addColumn(
+            self::active,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            1
+        );
+
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
@@ -365,8 +374,7 @@ class DBEContact extends DBCNCEntity
 
         if (!$includeInactive) {
             $query .=
-                " AND `active`
-					";
+                " AND `active` ";
         }
 
         if ($supportOnly) {
@@ -485,12 +493,13 @@ class DBEContact extends DBCNCEntity
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(self::customerID) . '=' . $this->getFormattedValue(self::customerID) .
-            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
+            " AND active and " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
             " AND " . $this->getDBColumnName(self::siteNo) . '=' . $this->getFormattedValue(self::siteNo);
 
         if ($supportOnly) {
             $sql .= " AND " . $this->getDBColumnName(self::supportLevel) . " = '" . self::supportLevelMain . "'";
         }
+
         $sql .=
             " ORDER BY " . $this->getDBColumnName(self::lastName);
 
@@ -556,7 +565,7 @@ class DBEContact extends DBCNCEntity
             " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
             " AND " . $this->getDBColumnName(self::customerID) . " = " . $this->getFormattedValue(self::customerID);
         $queryString .=
-            " AND supportLevel in('support' or 'main')
+            " AND supportLevel in('support' or 'main') and active
         ";
 
         $queryString .=
@@ -602,8 +611,7 @@ class DBEContact extends DBCNCEntity
                 " AND " . $this->getDBColumnName(self::siteNo) . " = " . $this->getFormattedValue(self::siteNo);
         }
         $queryString .=
-            " AND `active`
-        ";
+            " AND `active` ";
 
         $queryString .=
             " ORDER BY " . $this->getDBColumnName(self::lastName) . "," . $this->getDBColumnName(self::firstName);
@@ -642,7 +650,7 @@ class DBEContact extends DBCNCEntity
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(CONFIG_HEADER_GSC_STATEMENT_FLAG) . " = 'Y'" .
-            " AND " . $this->getDBColumnName(self::customerID) . " = " . $customerID
+            " AND active and " . $this->getDBColumnName(self::customerID) . " = " . $customerID
         );
         return (parent::getRows());
     }
@@ -666,6 +674,7 @@ class DBEContact extends DBCNCEntity
                     self::supportLevel
                 ) . " in ('" . self::supportLevelMain . "','" . self::supportLevelSupervisor . "')";
         }
+        $sql .= " and active ";
 
         $this->setQueryString($sql);
         return (parent::getRows());
@@ -676,7 +685,7 @@ class DBEContact extends DBCNCEntity
         $sql = "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(self::supportLevel) .
-            " in ('main', 'supervisor')  AND con_custno = " . $customerID;
+            " in ('main', 'supervisor') and active  AND con_custno = " . $customerID;
 
         $this->setQueryString($sql);
 
@@ -692,7 +701,7 @@ FROM {$this->getTableName()}
 WHERE {$this->getDBColumnName(self::supportLevel)} is not null
   and {$this->getDBColumnName(self::supportLevel)} <> ''
   AND {$dbeCustomer->getDBColumnName(DBECustomer::becameCustomerDate)} is not null
-  and {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is null ";
+  and {$dbeCustomer->getDBColumnName(DBECustomer::droppedCustomerDate)} is null and active ";
 
         if ($customerID) {
             $sql .= " AND {$this->getDBColumnName(self::customerID)} = " . $customerID;
@@ -711,7 +720,7 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(CONFIG_HEADER_INVOICE_CONTACT) . " = 'Y'" .
-            " AND " . $this->getDBColumnName(self::customerID) . " = " . $customerID
+            " AND active and " . $this->getDBColumnName(self::customerID) . " = " . $customerID
 
         );
         return (parent::getRows());
@@ -726,7 +735,7 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE " . $this->getDBColumnName(self::supportLevel) . " = '" . self::supportLevelMain . "'" .
-            " AND " . $this->getDBColumnName(self::customerID) . " = " . $customerID
+            " AND active and " . $this->getDBColumnName(self::customerID) . " = " . $customerID
 
         );
         return (parent::getRows());
@@ -741,12 +750,12 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
         $sqlQuery =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " left join customer on con_custno = cus_custno ";
+            " left join customer on con_custno = cus_custno WHERE active and ";
 
         if ($leadStatusID) {
-            $sqlQuery .= " WHERE  leadStatusId = $leadStatusID";
+            $sqlQuery .= " leadStatusId = $leadStatusID";
         } else {
-            $sqlQuery .= " WHERE  leadStatusId is not null and leadStatusId <> 0";
+            $sqlQuery .= " leadStatusId is not null and leadStatusId <> 0";
         }
         $this->setQueryString($sqlQuery);
 
@@ -843,7 +852,11 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
     public function deleteRow($pkValue = null)
     {
         global $db;
-        $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+        if (isset($GLOBALS['auth'])) {
+            $currentLoggedInUserID = ( string )$GLOBALS['auth']->is_authenticated();
+        } else {
+            $currentLoggedInUserID = USER_SYSTEM;
+        }
 
         $query = "insert into contactauditlog select
                               'delete'                  as action,
@@ -868,7 +881,7 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
             " FROM " . $this->getTableName() .
             " left join customer on con_custno = cus_custno 
              WHERE " .
-            $this->getDBColumnName(self::pendingLeaverFlag) . " = 'Y' and " .
+            $this->getDBColumnName(self::pendingLeaverFlag) . " = 'Y' and active and " .
             $this->getDBColumnName(self::pendingLeaverDate) . " <= curdate() ";
         $this->setQueryString($sqlQuery);
         $this->getRows();
@@ -880,7 +893,7 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
         $sqlQuery =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::reviewUser) . " = 'Y' and "
+            " WHERE " . $this->getDBColumnName(self::reviewUser) . " = 'Y' and active and "
             . $this->getDBColumnName(self::customerID) . " = " . $customerID;
 
 
@@ -897,7 +910,7 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " where specialAttentionContactFlag = 'Y'
+            " where specialAttentionContactFlag = 'Y' and active and
       ORDER BY con_custno, con_contno";
 
         $this->setQueryString($queryString);
@@ -912,7 +925,7 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " where con_email like '%@$prefix' ORDER BY con_custno, con_contno";
+            " where  active and con_email like '%@$prefix' ORDER BY con_custno, con_contno";
 
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
@@ -926,7 +939,7 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " where " . $this->getDBColumnName(DBEContact::reviewUser) . " = 'Y' and " . $this->getDBColumnName(
+            " where active and " . $this->getDBColumnName(DBEContact::reviewUser) . " = 'Y' and " . $this->getDBColumnName(
                 DBEContact::customerID
             ) . " = $customerID
       ORDER BY con_custno, con_contno";
@@ -939,7 +952,7 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
 
     public function validateUniqueEmail($email, $contactID)
     {
-        $query = "select count(con_contno) as count from contact where con_email = ? and con_contno <> ?";
+        $query = "select count(con_contno) as count from contact where con_email = ? and con_contno <> ? and active";
 
         $parameters = [
             [

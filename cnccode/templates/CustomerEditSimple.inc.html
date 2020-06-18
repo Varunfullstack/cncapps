@@ -830,9 +830,7 @@
                 throw 'Failed to clear contact';
             } else {
                 if (isShowingInactive) {
-                    row.find('input[type="checkbox"]').attr('checked', false);
                     row.find('input[type="email"]').val(null);
-                    row.find('select[data-type="mainSelector"]').val("").change();
                 } else {
                     row.remove();
                 }

@@ -273,7 +273,7 @@ class BUCustomer extends Business
         }
 
 
-        $query = "select count(con_contno) as count from contact where con_email = ? ";
+        $query = "select count(con_contno) as count from contact where con_email = ? and active = 1 ";
 
 
         $paramTypes = 's';
@@ -1213,7 +1213,7 @@ class BUCustomer extends Business
     }
 
     /**
-     *    Delete sites and contacts
+     * Gets a list of main support contacts
      * @param $customerID
      * @param bool $includeSupervisors
      * @return array
