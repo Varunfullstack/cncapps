@@ -57,9 +57,18 @@
         }
     }
 
+    function postToBlank() {
+        console.log('here!');
+        if (document.searchForm) {
+            document.searchForm.target = "_blank";
+            document.location.reload();
+        }
+        return true;
+    }
+
     function createActivity() {
         if (document.searchForm.customerID.value != "") {
-            document.location = '{urlCreateActivity}&customerID=' + escape(document.searchForm.customerID.value)
+            document.location = '{urlCreateActivity}&customerID=' + escape(document.searchForm.customerID.value);
         }
     }
 
