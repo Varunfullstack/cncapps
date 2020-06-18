@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Fixed
 - Imported customers not assigning default delivery address
+- Imported contacts not getting the site assigned correctly
 
 ## [v4.1.8] - 2020-06-26
 ### Fixed
