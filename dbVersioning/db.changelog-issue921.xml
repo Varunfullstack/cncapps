@@ -1,0 +1,164 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevmt" id="issue903-0">
+      <tagDatabase tag="issue903"/>
+    </changeSet>
+
+    <changeSet author="pavwebdevmt" id="issue903-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="problemRaiseType"/>            
+            </not>
+        </preConditions>
+        <createTable tableName="problemRaiseType">
+            <column autoIncrement="true" name="id" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>           
+        </createTable>         
+         <rollback>
+            drop table problemRaiseType
+        </rollback>
+    </changeSet>
+
+      <changeSet author="pavwebdevmt" id="issue903-2">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="problemRaiseType"/>    
+            <sqlCheck expectedResult="true">  
+                select count(*) from  problemRaiseType
+            </sqlCheck>        
+        </preConditions>
+         <sql>
+         insert into problemRaiseType(name) values('Email');
+         insert into problemRaiseType(name) values('Portal');
+         insert into problemRaiseType(name) values('Phone');
+         insert into problemRaiseType(name) values('On site');
+         insert into problemRaiseType(name) values('Alert');
+         insert into problemRaiseType(name) values('Sales');
+         insert into problemRaiseType(name) values('Manual');
+         </sql>
+         <rollback>
+            delete from problemRaiseType 
+        </rollback>
+    </changeSet>
+
+	<changeSet author="pavwebdevmt" id="issue903-3">
+        <preConditions onFail="MARK_RAN">            
+            <tableExists tableName="problemRaiseType"/>                     
+        </preConditions>
+        <dropTable  tableName="problemRaise"/> 
+
+        <createTable tableName="problemRaise">
+            <column autoIncrement="true" name="id" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column> 
+            <column name="raiseTypeId" remarks="Raise type. FK to problemRaiseType.id " type="INT UNSIGNED">                 
+            </column>
+            <column name="consultantId" remarks="User that last raised the problem. FK to consultant.cns_consno" type="INT"/>
+            <column name="problemId" remarks="The raised problem. FK to problem.pro_problemno" type="INT UNSIGNED"/>
+            <column name="createAt" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>            
+        </createTable>
+
+        <addForeignKeyConstraint    baseTableName="problemRaise" 
+                                    baseColumnNames="consultantId"
+                                    constraintName="fk_proConsultantId"
+                                    referencedTableName="consultant"
+                                    referencedColumnNames="cns_consno"
+                                    onDelete="CASCADE"
+        />
+
+        <addForeignKeyConstraint    baseTableName="problemRaise" 
+                                    baseColumnNames="problemId"
+                                    constraintName="fk_problemId"
+                                    referencedTableName="problem"
+                                    referencedColumnNames="pro_problemno"
+                                    onDelete="CASCADE"
+        />
+
+         <addForeignKeyConstraint    baseTableName="problemRaise" 
+                                    baseColumnNames="raiseTypeId"
+                                    constraintName="fk_proRaiseTypeId"
+                                    referencedTableName="problemRaiseType"
+                                    referencedColumnNames="id"
+                                    onDelete="CASCADE"
+        />
+        <rollback>
+            drop table problemRaise
+        </rollback>
+    </changeSet>
+
+    <changeSet author="pavwebdevmt" id="issue903-4">   
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problem" columnName="problemraisetypeID"/>
+            </not>
+        </preConditions>
+
+        <dropTable  tableName="problemRaise"/> 
+
+        <addColumn tableName="problem">
+            <column name="problemraisetypeId" type="INT UNSIGNED" >                
+            </column>
+        </addColumn>
+
+        <addForeignKeyConstraint    baseTableName="problem" 
+                                    baseColumnNames="problemraisetypeId"
+                                    constraintName="fk_proRaiseTypeId"
+                                    referencedTableName="problemRaiseType"
+                                    referencedColumnNames="id"
+                                    onDelete="CASCADE"
+                />
+        <rollback>
+            <dropColumn  columnName="problemraisetypeId"  tableName="problem">                        
+            </dropColumn>         
+        </rollback>
+    </changeSet>
+
+     <changeSet author="pavwebdevmt" id="issue903-5">  
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="problemRaiseType" columnName="description"/>
+            </not>
+        </preConditions>
+
+        <dropColumn  columnName="name"  tableName="problemRaiseType">                        
+        </dropColumn>
+
+        <addColumn tableName="problemRaiseType">
+            <column name="description" type="varchar(20)" >                
+            </column>
+        </addColumn>
+        
+        <rollback>
+            <dropColumn  columnName="description"  tableName="problemRaiseType">                        
+            </dropColumn>         
+        </rollback>
+
+    </changeSet>
+ <changeSet author="pavwebdevmt" id="issue903-6">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="problemRaiseType"/>    
+                  
+        </preConditions>
+        <sql>  
+                delete from problemRaiseType;
+                ALTER TABLE problemRaiseType AUTO_INCREMENT = 1;
+        </sql>  
+         <sql>
+         insert into problemRaiseType(description) values('Email');
+         insert into problemRaiseType(description) values('Portal');
+         insert into problemRaiseType(description) values('Phone');
+         insert into problemRaiseType(description) values('On site');
+         insert into problemRaiseType(description) values('Alert');
+         insert into problemRaiseType(description) values('Sales');
+         insert into problemRaiseType(description) values('Manual');
+         </sql>
+        
+    </changeSet>
+</databaseChangeLog>

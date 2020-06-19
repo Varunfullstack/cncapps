@@ -43,6 +43,7 @@ require_once($cfg ["path_bu"] . "/BUStandardText.inc.php");
 require_once($cfg["path_dbe"] . "/DBEJPorhead.inc.php");
 require_once($cfg["path_dbe"] . "/DBEPendingReopened.php");
 require_once($cfg["path_ct"] . "/CTProject.inc.php");
+require_once($cfg ["path_bu"] . "/BUProblemRaiseType.inc.php");
 
 define(
     'BUACTIVITY_RESOLVED',
@@ -5569,6 +5570,7 @@ is currently a balance of ';
         /*
     * Create a new problem
     */
+    
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->setValue(
             DBEProblem::hdLimitMinutes,
@@ -5662,6 +5664,9 @@ is currently a balance of ';
             DBEProblem::projectID,
             @$_SESSION [$sessionKey] ['projectID']
         );
+        
+        
+
         $dbeProblem->insertRow();
 
         if ($_SESSION[$sessionKey]['monitorSRFlag'] === 'Y') {
@@ -5744,6 +5749,8 @@ is currently a balance of ';
             $GLOBALS['auth']->is_authenticated()
         ); // user that created activity
         $dsCallActivity->post();
+        $this->setProblemRaise($dbeProblem,$dsCallActivity);
+
         $dbeContact = null;
         if (@$_SESSION[$sessionKey]['contactID']) {
             $dbeContact = new DBEContact($this);
@@ -5785,6 +5792,94 @@ is currently a balance of ';
         unset($_SESSION[$sessionKey]);
 
         return $dsCallActivity;
+    }
+    private function getProblemRaiseType($description)
+    {      
+        $buProblemRaiseType =new BUProblemRaiseType($this);
+        $id=null;
+        $id= $buProblemRaiseType->getProblemRaiseTypeByName($description)['id'];              
+        return $id;
+    }
+    private function setProblemRaise($dbeProblem, $callActivity)
+    {
+        if(isset($dbeProblem))
+        {
+            $userId=$dbeProblem->getValue(DBEProblem::userID);
+            $dbeUser=new DBEUser($this);
+            $teamId = $dbeUser->getValue(DBEUser::teamID);
+           
+        }
+        //For each problem, where callactivity.caa_callacttypeno = 57 and callactivity.caa_serverguard = Y, then set the problem source as Alert.
+        if (
+            isset($dbeProblem) && isset($callActivity)
+            && $callActivity->getValue(DBEJCallActivity::callActTypeID) == 57
+            && $callActivity->getValue(DBEJCallActivity::serverGuard) == 'Y'
+        ) {
+            $dbeProblem->setValue(
+                DBEProblem::problemraisetypeId,
+                $this->getProblemRaiseType(BUProblemRaiseType::ALERT)
+            );
+        } else 
+         if (
+            isset($dbeProblem) && isset($callActivity)
+            && $dbeProblem->getValue(DBEJProblem::linkedSalesOrderID) > 0
+            && $dbeProblem->getValue(DBEJProblem::priority) == 5
+        ) {
+            $dbeProblem->setValue(
+                DBEProblem::problemraisetypeId,
+                $this->getProblemRaiseType(BUProblemRaiseType::SALES)
+            );
+        } else //For each problem, where callactivity.caa_callactivityno = 57 and callactivity.caa_consno = 67 and callactivity.caa_serverguard = N, then set the problem source as Email.
+            if (
+                isset($dbeProblem) && isset($callActivity)
+                && $callActivity->getValue(DBEJCallActivity::callActTypeID) == 57
+                && $callActivity->getValue(DBEJCallActivity::caaConsno) == 67
+                && $callActivity->getValue(DBEJCallActivity::serverGuard) == 'N'
+            ) {
+                $dbeProblem->setValue(
+                    DBEProblem::problemraisetypeId,
+                    $this->getProblemRaiseType(BUProblemRaiseType::EMAIL)
+                );
+            }
+            else //Problems that get created from new from the automated_request table are considered 'email' unless automated_request_serverGuardFlag = Y, in which case it's System. ImportRequest.php is used to import data from that table and creates a new SR.
+            if ( // come from automated_request
+                isset($dbeProblem) && $callActivity == null               
+            ) {
+                global $db;
+                $sql="select * from automated_request where serviceRequestID =".$dbeProblem->getValue(DBEProblem::problemID);
+                $db->query($sql); 
+                $db->next_record();
+                $automatedRequest= $db->Record;
+                if(isset($automatedRequest) && $automatedRequest['serverGuardFlag']=='N')
+                    $dbeProblem->setValue(
+                        DBEProblem::problemraisetypeId,
+                        $this->getProblemRaiseType(BUProblemRaiseType::EMAIL)
+                    );
+                else if(isset($automatedRequest) && $automatedRequest['serverGuardFlag']=='Y')
+                $dbeProblem->setValue(
+                    DBEProblem::problemraisetypeId,
+                    $this->getProblemRaiseType(BUProblemRaiseType::ALERT)
+                );
+            }
+            else             
+            if( isset($teamId ) && $teamId ==1) //created by help desk
+            {
+                $dbeProblem->setValue(
+                    DBEProblem::problemraisetypeId,
+                    $this->getProblemRaiseType(BUProblemRaiseType::PHONE)
+                );
+                return;
+            }            
+            else
+            {
+                $dbeProblem->setValue(
+                    DBEProblem::problemraisetypeId,
+                    $this->getProblemRaiseType(BUProblemRaiseType::MANUAL)
+                );
+            }    
+
+        if (isset($dbeProblem))
+            $dbeProblem->updateRow();
     }
 
     public function toggleMonitoringFlag($problemID)
@@ -6982,6 +7077,8 @@ is currently a balance of ';
             }
         }
 
+             
+       
         $dbeProblem->insertRow();
 
         $reason = "<p>An order has been received for the items below:</p>";
@@ -7105,9 +7202,8 @@ is currently a balance of ';
             );
         }
         //$dbeCallActivity->setValue( 'overtimeExportedFlag', 'N' );
-
         $dbeCallActivity->insertRow();
-
+        $this->setProblemRaise($dbeProblem,$dbeCallActivity);
         $db = new dbSweetcode(); // database connection for query
 
         $sql =
@@ -7457,7 +7553,7 @@ FROM
             $dbeProblem = new DBEProblem($this);
 
             $dbeProblem->getRow($automatedRequest->getServiceRequestID());
-
+            $this->setProblemRaise($dbeProblem,null);
             if (!$dbeProblem->rowCount()) {
                 echo "<div>The service request doesn't exist </div>";
                 // create a new service request

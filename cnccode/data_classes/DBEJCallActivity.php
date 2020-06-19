@@ -64,6 +64,8 @@ class DBEJCallActivity extends DBECallActivity
     const hdPauseCount = "hdPauseCount";
     const allocatedUserID = "allocatedUserID";
     const queueNo = "queueNo";
+    const caaConsno="caa_consno";
+
     var $fromString;
 
     /**
@@ -362,7 +364,13 @@ class DBEJCallActivity extends DBECallActivity
             DA_NOT_NULL,
             "problem.pro_queue_no"
         );
-
+        $this->addColumn(
+            self::caaConsno,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            "caa_consno"
+        );
+ 
         $this->setAddColumnsOff();
 
         $this->fromString =
