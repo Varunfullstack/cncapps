@@ -2,24 +2,19 @@
 This project changes will be shown here.
 
 ## [unreleased]
-### Added
-- Confirm Report Logic / calculations
-- Pending Reopen New SR doesn't delete the pending one.
 ### Changed
-- Renewal Report Unit numbers not matching
-- Issue 892 - Lead Status Layout Change
+- Issue 818 - Confirm Report Logic / calculations
+- Issue 925 - Improve Double Quote handling in passwords fields
 ### Fixed
 - Imported customers not assigning default delivery address
 - Imported contacts not getting the site assigned correctly
+- Issue 904 - Renewal Report Unit numbers not matching
+- Issue 892 - Lead Status Layout Change
+- Issue 892 - Lead Status Layout Change
 
 ## [v4.1.8] - 2020-06-26
 ### Fixed
 - Fix issue in activityCreate1 when the customer name has an apostrophe
-
-## [unreleased] - 2020-06-15
-### Added
-- Improve Double Quote handling in password fields
-
 
 ## [v4.1.7] - 2020-06-15
 ### Added
