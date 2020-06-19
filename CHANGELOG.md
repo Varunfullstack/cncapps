@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 930 - Too many email customer icons on Activity Page
 
 ## [v4.1.7] - 2020-06-15
 ### Added
