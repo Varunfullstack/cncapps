@@ -318,54 +318,38 @@ class CTRenQuotation extends CTCNC
     function editFromSalesOrder()
     {
         $buSalesOrder = new BUSalesOrder($this);
-        $dsOrdline = new DataSet($this);
-        $buSalesOrder->getOrdlineByIDSeqNo(
-            $this->getParam('ordheadID'),
-            $this->getParam('sequenceNo'),
-            $dsOrdline
-        );
-
-        $renewalCustomerItemID = $dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
+        $DBEJOrdline = new DBEJOrdline($this);
+        $DBEJOrdline->getRow($this->getParam('lineId'));
+        $renewalCustomerItemID = $DBEJOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
         // has the order line get a renewal already?
         if (!$renewalCustomerItemID) {
             // create a new record first
             $dsOrdhead = new DataSet($this);
             $buSalesOrder->getOrderByOrdheadID(
-                $this->getParam('ordheadID'),
+                $DBEJOrdline->getValue(DBEJOrdline::ordheadID),
                 $dsOrdhead,
                 $dsDontNeedOrdline
             );
             $this->buRenQuotation->createNewRenewal(
                 $dsOrdhead->getValue(DBEJOrdhead::customerID),
-                $dsOrdline->getValue(DBEJOrdline::itemID),
+                $DBEJOrdline->getValue(DBEJOrdline::itemID),
                 $renewalCustomerItemID,
-                $dsOrdline->getValue(DBEJOrdline::curUnitSale),
-                $dsOrdline->getValue(DBEJOrdline::curUnitCost),
-                $dsOrdline->getValue(DBEJOrdline::qtyOrdered),
+                $DBEJOrdline->getValue(DBEJOrdline::curUnitSale),
+                $DBEJOrdline->getValue(DBEJOrdline::curUnitCost),
+                $DBEJOrdline->getValue(DBEJOrdline::qtyOrdered),
                 $dsOrdhead->getValue(DBEJOrdhead::delSiteNo)
             );
 
 
             // For despatch, prevents the renewal appearing again today during despatch process.
             $dbeOrdline = new DBEOrdline($this);
-
-            $dbeOrdline->setValue(
-                DBEJOrdline::ordheadID,
-                $dsOrdline->getValue(DBEJOrdline::ordheadID)
-            );
-            $dbeOrdline->setValue(
-                DBEJOrdline::sequenceNo,
-                $dsOrdline->getValue(DBEJOrdline::sequenceNo)
-            );
-
-            $dbeOrdline->getRow();
+            $dbeOrdline->getRow($DBEJOrdline->getValue(DBEJOrdline::id));
             $dbeOrdline->setValue(
                 DBEJOrdline::renewalCustomerItemID,
                 $renewalCustomerItemID
             );
 
             $dbeOrdline->updateRow();
-
         }
 
         $urlNext = Controller::buildLink(

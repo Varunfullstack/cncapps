@@ -868,7 +868,7 @@ class CTActivity extends CTCNC
 
             if ($dsSearchForm->getValue(BUActivity::searchFormStatus) == 'CHECKED_T_AND_M') {
                 $bulkActionButtons =
-                    '<input name="Search" type="submit" value="Generate Sales Orders" />
+                    '<input name="Search" type="submit" value="Generate Sales Orders" onclick="postToBlank()" />
           <input name="Search" type="submit" value="Skip Sales Orders" />';
                 $checkAllBox =
                     '<input type="checkbox" name="checkAllBox" id="checkAllBox" value="0" onClick="checkAll();"/>';

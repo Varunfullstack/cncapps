@@ -25,6 +25,10 @@
         }
     }
 
+    document.addEventListener('DOMContentLoaded', () => {
+        selectionChanged();
+    })
+
 </script>
 <script language='JavaScript'
         src="CommonJS.js"
@@ -323,17 +327,17 @@
         <!-- BEGIN orderLineBlock -->
         <INPUT type="hidden"
                id="lineType"
-               name="ordline[{sequenceNo}][lineType]"
+               name="ordline[{lineId}][lineType]"
                value="{lineType}"
         >
         <INPUT type="hidden"
                id="description"
-               name="ordline[{sequenceNo}][description]"
+               name="ordline[{lineId}][description]"
                value="{description}"
         >
         <INPUT type="hidden"
                id="supplierName"
-               name="ordline[{sequenceNo}][supplierName]"
+               name="ordline[{lineId}][supplierName]"
                value="{supplierName}"
         >
         {salesOrderLine}

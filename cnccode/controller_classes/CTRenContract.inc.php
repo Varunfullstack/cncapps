@@ -663,28 +663,22 @@ class CTRenContract extends CTCNC
     function editFromSalesOrder()
     {
         $buSalesOrder = new BUSalesOrder($this);
-        $dsOrdline = new DataSet($this);
-        $buSalesOrder->getOrdlineByIDSeqNo(
-            $this->getParam('ordheadID'),
-            $this->getParam('sequenceNo'),
-            $dsOrdline
-        );
-
-        $renewalCustomerItemID = $dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
-
+        $DBEJOrdline = new DBEJOrdline($this);
+        $DBEJOrdline->getRow($this->getParam('lineId'));
+        $renewalCustomerItemID = $DBEJOrdline->getValue(DBEJOrdline::renewalCustomerItemID);
         // has the order line get a renewal already?
         if (!$renewalCustomerItemID) {
             // create a new record first
             $dsOrdhead = new DataSet($this);
             $buSalesOrder->getOrderByOrdheadID(
-                $this->getParam('ordheadID'),
+                $DBEJOrdline->getValue(DBEJOrdline::ordheadID),
                 $dsOrdhead,
                 $dsDontNeedOrdline
             );
 
             $this->buRenContract->createNewRenewal(
                 $dsOrdhead->getValue(DBEJOrdhead::customerID),
-                $dsOrdline,
+                $DBEJOrdline,
                 $renewalCustomerItemID,
                 $dsOrdhead->getValue(DBEJOrdhead::delSiteNo)                // returned by function
             );
@@ -692,17 +686,7 @@ class CTRenContract extends CTCNC
 
             // For despatch, prevents the renewal appearing again today during despatch process.
             $dbeOrdline = new DBEOrdline($this);
-
-            $dbeOrdline->setValue(
-                DBEJOrdline::ordheadID,
-                $dsOrdline->getValue(DBEJOrdline::ordheadID)
-            );
-            $dbeOrdline->setValue(
-                DBEJOrdline::sequenceNo,
-                $dsOrdline->getValue(DBEJOrdline::sequenceNo)
-            );
-
-            $dbeOrdline->getRow();
+            $dbeOrdline->getRow($DBEJOrdline->getValue(DBEJOrdline::id));
             $dbeOrdline->setValue(
                 DBEJOrdline::renewalCustomerItemID,
                 $renewalCustomerItemID

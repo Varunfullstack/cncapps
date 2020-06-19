@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBEOrdline.inc.php");
 
 class DBEJOrdline extends DBEOrdline
@@ -86,6 +87,19 @@ class DBEJOrdline extends DBEOrdline
             " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn)
         );
         return ($this->getRows());
+    }
+
+    function getRow($pkValue = null)
+    {
+        $this->setPKValue($pkValue);
+        $this->setQueryString(
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() . " LEFT JOIN supplier ON " . $this->getDBColumnName(
+                self::supplierID
+            ) . "=sup_suppno" .
+            " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "=itm_itemno where " . $this->getPKWhere()
+        );
+        return parent::getRow($pkValue);
     }
 
     function getRowByOrdheadIDSequenceNo()

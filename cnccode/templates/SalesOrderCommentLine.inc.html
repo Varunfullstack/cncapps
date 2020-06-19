@@ -1,18 +1,39 @@
 <!-- Template: SalesOrderCommentLine.inc.html -->
-		<tr onMouseOver="this.bgColor='#FFFFCC';" onMouseOut="this.bgColor='';"> 
-			<INPUT type="hidden" id="sequenceNo" name="ordline[{sequenceNo}][sequenceNo]" value="{sequenceNo}">
-			<td class="orderLineComment"> <input type="checkbox" id="orderLine" name="selectedOrderLine[]" value="{sequenceNo}" {orderLineChecked}></td>
-			<td class="orderLineComment">&nbsp;</td>
-			<td class="orderLineComment"> <DIV align="left"> {salesOrderLineDesc} </DIV></td>
-			<td class="orderLineComment">&nbsp;</td>
-			<td class="orderLineComment">&nbsp;</td>
-			<td class="orderLineComment">&nbsp;</td>
-			<td class="orderLineComment">&nbsp;</td>
-			<td class="orderLineComment">&nbsp;</td>
-			<td class="orderLineComment">&nbsp;</td>
-			<td class="orderLineComment">&nbsp;</td>
-			<td class="orderLineComment">&nbsp;</td>
-			<td class="orderLineComment">&nbsp;</td>
-			<td class="orderLineComment"> <DIV align="left"> {salesOrderLineIcons} </DIV></td>
-		</tr>
+<tr onMouseOver="this.bgColor='#FFFFCC';"
+    onMouseOut="this.bgColor='';"
+>
+    <INPUT type="hidden"
+           id="sequenceNo"
+           name="ordline[{lineId}][sequenceNo]"
+           value="{sequenceNo}"
+    >
+    <INPUT type="hidden"
+           name="ordline[{lineId}][id]"
+           value="{lineId}"
+    >
+    <td class="orderLineComment">
+        <input type="checkbox"
+               id="orderLine"
+               name="selectedOrderLine[]"
+               value="{lineId}"
+               {orderLineChecked}
+        >
+    </td>
+    <td class="orderLineComment">&nbsp;</td>
+    <td class="orderLineComment">
+        <DIV align="left"> {salesOrderLineDesc}</DIV>
+    </td>
+    <td class="orderLineComment">&nbsp;</td>
+    <td class="orderLineComment">&nbsp;</td>
+    <td class="orderLineComment">&nbsp;</td>
+    <td class="orderLineComment">&nbsp;</td>
+    <td class="orderLineComment">&nbsp;</td>
+    <td class="orderLineComment">&nbsp;</td>
+    <td class="orderLineComment">&nbsp;</td>
+    <td class="orderLineComment">&nbsp;</td>
+    <td class="orderLineComment">&nbsp;</td>
+    <td class="orderLineComment">
+        <DIV align="left"> {salesOrderLineIcons}</DIV>
+    </td>
+</tr>
 <!-- End Template: SalesOrderCommentLine.inc.html -->

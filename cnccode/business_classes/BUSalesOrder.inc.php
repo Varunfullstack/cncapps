@@ -305,11 +305,7 @@ class BUSalesOrder extends Business
         $dbeOrdline = new DBEOrdline($this);
         $dbeOrdhead->setPKValue($ordheadID);
         $dbeOrdhead->deleteRow();
-        $dbeOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $ordheadID
-        );
-        $dbeOrdline->deleteRowsByOrderID();
+        $dbeOrdline->deleteRowsByOrderID($ordheadID);
 
         // delete any quote rows and associated documents
         $this->dbeQuotation->setValue(
@@ -1204,62 +1200,33 @@ class BUSalesOrder extends Business
         if ($action == "U") {
             $dbeOrdline->updateRow();
         } else {
+            // we are inserting, we can't just insert in any place, we are going to insert in the last place and then move it
+            $futureOrder = $dbeOrdline->getValue(DBEOrdline::sequenceNo);
+            $dbeOrdline->setValue(DBEOrdline::sequenceNo, $dbeOrdline->getNextSortOrder());
             $dbeOrdline->insertRow();
+            $dbeOrdline->swapPlaces($dbeOrdline->getValue(DBEOrdline::sequenceNo), $futureOrder);
         }
         $dbeOrdhead->setUpdatedTime();
     }
 
-    function moveOrderLineUp($ordheadID,
-                             $sequenceNo
-    )
+    function moveOrderLineUp($lineId)
     {
-        if (!$ordheadID) {
-            $this->raiseError('ordheadID not passed');
-        }
-        if (!$sequenceNo) {
-            $this->raiseError('sequenceNo not passed');
-        }
-        if ($sequenceNo == 0) {
-            return;
-        }
+
         $dbeOrdline = new DBEOrdline($this);
-        $dbeOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $ordheadID
-        );
-        $dbeOrdline->setValue(
-            DBEOrdline::sequenceNo,
-            $sequenceNo
-        );
-        $dbeOrdline->setShowSQLOn();
-        $dbeOrdline->moveRow('UP');
+        $dbeOrdline->getRow($lineId);
+        $dbeOrdline->moveItemUp();
         $dbeOrdhead = new DBEOrdhead($this);
-        $dbeOrdhead->setPKValue($ordheadID);
+        $dbeOrdhead->setPKValue($dbeOrdline->getValue(DBEOrdline::ordheadID));
         $dbeOrdhead->setUpdatedTime();
     }
 
-    function moveOrderLineDown($ordheadID,
-                               $sequenceNo
-    )
+    function moveOrderLineDown($lineId)
     {
-        if (!$ordheadID) {
-            $this->raiseError('ordheadID not passed');
-        }
-        if ($sequenceNo == null) {
-            $this->raiseError('sequenceNo not passed');
-        }
         $dbeOrdline = new DBEOrdline($this);
-        $dbeOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $ordheadID
-        );
-        $dbeOrdline->setValue(
-            DBEOrdline::sequenceNo,
-            $sequenceNo
-        );
-        $dbeOrdline->moveRow('DOWN');
+        $dbeOrdline->getRow($lineId);
+        $dbeOrdline->moveItemDown();
         $dbeOrdhead = new DBEOrdhead($this);
-        $dbeOrdhead->setPKValue($ordheadID);
+        $dbeOrdhead->setPKValue($dbeOrdline->getValue(DBEOrdline::ordheadID));
         $dbeOrdhead->setUpdatedTime();
     }
 
@@ -1303,7 +1270,7 @@ class BUSalesOrder extends Business
         $originalNo = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
 
         if (
-            ($dsOrdline->rowCount() == $dsSelectedOrderLine->rowCount()) and
+            ($dsOrdline->rowCount() == $dsSelectedOrderLine->rowCount()) &&
             $convertToOrder                                // Flag indicates to convert not copy
         ) {
             $dsOrdhead->setUpdateModeUpdate();
@@ -1355,8 +1322,8 @@ class BUSalesOrder extends Business
             $dsNewOrdline->copyColumnsFrom($dsOrdline);
             while ($dsOrdline->fetchNext()) {
                 if ($dsSelectedOrderLine->search(
-                    DBEOrdline::sequenceNo,
-                    $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                    DBEOrdline::id,
+                    $dsOrdline->getValue(DBEOrdline::id)
                 )) {
                     $sequenceNo++;
                     $dsNewOrdline->setUpdateModeInsert();
@@ -1539,10 +1506,7 @@ class BUSalesOrder extends Business
         $dsSelectedOrderLine->initialise();
 
         while ($dsSelectedOrderLine->fetchNext()) {
-            $dbeOrdline->getRowBySequence(
-                $ordheadID,
-                $dsSelectedOrderLine->getValue(DBEOrdline::sequenceNo)
-            );
+            $dbeOrdline->getRow($dsSelectedOrderLine->getValue(DBEOrdline::id));
             if ($dbeOrdline->getValue(DBEOrdline::lineType) != 'C') {
                 $dbeOrdline->setValue(
                     DBEOrdline::supplierID,
@@ -1665,49 +1629,19 @@ class BUSalesOrder extends Business
         */
         $deletedCount = 0;
         while ($dsSelectedOrderLine->fetchNext()) {
-            $this->deleteOrderLine(
-                $ordheadID,
-                $dsSelectedOrderLine->getValue(DBEOrdline::sequenceNo) - $deletedCount
-            );
+            $this->deleteOrderLine($dsSelectedOrderLine->getValue(DBEOrdline::id));
             $deletedCount++;
         }
         return TRUE;
     }
 
-    function deleteOrderLine($ordheadID,
-                             $sequenceNo
-    )
+    function deleteOrderLine($lineId)
     {
-        if (!$ordheadID) {
-            $this->raiseError('ordheadID not passed');
-        }
-
-        if (!$sequenceNo) {
-            $sequenceNo = 0;
-        }
-
-
         $dbeOrdline = new DBEOrdline($this);
-        $dbeOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $ordheadID
-        );
-        $dbeOrdline->setValue(
-            DBEOrdline::sequenceNo,
-            $sequenceNo
-        );
+        $dbeOrdline->getRow($lineId);
         $dbeOrdline->deleteRow();
-        $dbeOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $ordheadID
-        );
-        $dbeOrdline->setValue(
-            DBEOrdline::sequenceNo,
-            $sequenceNo
-        );
-        $dbeOrdline->shuffleRowsUp();
         $dbeOrdhead = new DBEOrdhead($this);
-        $dbeOrdhead->setPKValue($ordheadID);
+        $dbeOrdhead->setPKValue($dbeOrdline->getValue(DBEOrdline::ordheadID));
         $dbeOrdhead->setUpdatedTime();
     }
 
@@ -1857,15 +1791,7 @@ class BUSalesOrder extends Business
         $dbeOrdline = new DBEOrdline($this);
         $dsOrdline->initialise();
         while ($dsOrdline->fetchNext()) {
-            $dbeOrdline->setValue(
-                DBEOrdline::ordheadID,
-                $ordheadID
-            );
-            $dbeOrdline->setValue(
-                DBEOrdline::sequenceNo,
-                $dsOrdline->getValue(DBEOrdline::sequenceNo)
-            );
-            $dbeOrdline->getRow();
+            $dbeOrdline->getRow($dsOrdline->getValue(DBEOrdline::id));
             $dbeOrdline->setValue(
                 DBEOrdline::qtyOrdered,
                 $dsOrdline->getValue(DBEOrdline::qtyOrdered)
@@ -1925,13 +1851,11 @@ class BUSalesOrder extends Business
      * copy lines from one sales order and paste them to the end of another
      * @param $fromOrdheadID
      * @param $toOrdheadID
-     * @param bool $keepRenewals
      * @param bool $sequenceNo
      * @return bool
      */
     function pasteLinesFromOrder($fromOrdheadID,
                                  $toOrdheadID,
-                                 $keepRenewals = false,
                                  $sequenceNo = false
     )
     {
@@ -1960,31 +1884,13 @@ class BUSalesOrder extends Business
         $dbeToOrdline->resetQueryString();
 
         if (!$sequenceNo) {
-            $sequenceNo = $dbeToOrdline->rowCount(); // so we paste after the last row
+            $sequenceNo = $dbeToOrdline->getNextSortOrder(); // so we paste after the last row
         } else {
-            /*
-            Shuffle up lines past $sequenceNo
-            */
-            $fromOrderLineCount = $dbeFromOrdline->rowCount();
-
-            $db = $GLOBALS['db'];
-            $statement =
-                "UPDATE
-          ordline
-        SET
-          odl_item_no = odl_item_no + $fromOrderLineCount
-        WHERE
-          odl_ordno = $toOrdheadID
-          AND odl_item_no >= $sequenceNo";
-
-            $db->query($statement);
-
-            $sequenceNo--;
-
+            $sequenceNo++;
         }
 
         while ($dbeFromOrdline->fetchNext()) {
-            $sequenceNo++;
+
             for ($i = 0; $i < $colCount; $i++) {
                 $dbeToOrdline->setValueNoCheckByColumnNumber(
                     $i,
@@ -2003,17 +1909,22 @@ class BUSalesOrder extends Business
                 DBEOrdline::qtyLastDespatched,
                 0
             );
+            $newOrderId = $dbeToOrdline->getNextSortOrder();
             $dbeToOrdline->setValue(
                 DBEOrdline::sequenceNo,
-                $sequenceNo
+                $newOrderId
             );
-            if (!$keepRenewals) {
-                $dbeToOrdline->setValue(
-                    DBEOrdline::renewalCustomerItemID,
-                    0
-                );
-            }
+
+            $dbeToOrdline->setValue(
+                DBEOrdline::renewalCustomerItemID,
+                0
+            );
+
             $dbeToOrdline->insertRow();
+            if ($newOrderId !== $sequenceNo) {
+                $dbeToOrdline->swapPlaces($newOrderId, $sequenceNo);
+            }
+            $sequenceNo++;
         }
         return TRUE;
     }
@@ -2027,71 +1938,6 @@ class BUSalesOrder extends Business
             $dsResults
         ));
 
-    }
-
-    /**
-     * Where many lines exist with identical description and rates, summarise onto one line
-     *
-     * @param mixed $ordheadID
-     */
-    function consolidateSalesOrderLines($ordheadID)
-    {
-        $db = $GLOBALS['db'];
-        /*
-        Get a list of existing order line numbers
-        */
-        $statement =
-            "SELECT GROUP_CONCAT(`odl_ordlineno`) AS ordlinenos
-FROM ordline
-WHERE odl_ordno = $ordheadID
-  AND (odl_itemno = 1502 OR odl_itemno = 1503)";
-
-        $db->query($statement);
-        $db->next_record();
-        $oldOrdlinenos = $db->Record['ordlinenos'];
-        /*
-        Insert new, summarised order lines
-        */
-        $statement =
-            "INSERT INTO ordline
-
-        SELECT
-          0,
-          `odl_type`,
-          `odl_ordno`,
-          `odl_item_no`,
-          `odl_custno`,
-          `odl_itemno`,
-          `odl_stockcat`,
-          `odl_desc`,
-          SUM( odl_qty_ord ),
-          SUM(`odl_qty_desp`),
-          SUM(`odl_qty_last_desp`),
-          `odl_suppno`,
-          `odl_d_unit`,
-          SUM( `odl_d_total` ),
-          `odl_e_unit`,
-          SUM( `odl_e_total` ),
-          `odl_renewal_cuino` 
-
-        FROM
-          ordline
-
-        WHERE
-          odl_ordno = $ordheadID
-          AND (odl_itemno = 1502 OR odl_itemno = 1503)
-        GROUP BY
-          odl_desc, odl_e_unit, odl_d_unit
-          
-        ORDER BY odl_item_no";
-
-        $db->query($statement);
-        /*
-        Remove original order lines
-        */
-        $statement = "DELETE FROM ordline WHERE odl_ordlineno IN (" . $oldOrdlinenos . ")";
-
-        $db->query($statement);
     }
 
     public function notifyPurchaseOrderCompletion(DBEPorhead $purchaseOrderHeader)
