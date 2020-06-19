@@ -1,4 +1,11 @@
 <!-- Template: RenewalReport.inc.html -->
+<style>
+    .wrong
+    {
+        color: red;
+        font-weight: bold;
+    }
+</style>
 <div style="float: right">
     <h2>Send Contracts to be signed</h2>
     <button type="button"
@@ -235,7 +242,7 @@
             <td class="content">{notes}{coveredItemsString}</td>
             <td class="content">{expiryDate}</td>
             <td class="content">{calculatedExpiryDate}</td>
-            <td class="content">{units}</td>
+            <td class="content {unitsNotEqualItems}">{units}</td>
             <td class="content">{directDebit}</td>
             <td class="contentRightAlign">{costPrice}</td>
             <td class="contentRightAlign">{salePrice}</td>
