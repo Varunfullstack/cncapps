@@ -7,6 +7,7 @@ This project changes will be shown here.
 ### Fixed
 - Imported customers not assigning default delivery address
 - Imported contacts not getting the site assigned correctly
+- Pending Reopen New SR doesn't delete the pending one.
 
 ## [v4.1.7] - 2020-06-15
 ### Added
