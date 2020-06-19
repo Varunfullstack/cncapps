@@ -360,7 +360,14 @@ class CTCNC extends Controller
             $userName = $dbeUser->getValue(DBEUser::name);
         }
 
-        $this->template->set_var(array('userName' => $userName, 'fromDate' => null, 'urlLogout' => $urlLogout));
+        $this->template->set_var(
+            array(
+                'userName'   => $userName,
+                'fromDate'   => null,
+                'urlLogout2' => $urlLogout,
+                'urlLogout'  => $urlLogout
+            )
+        );
 
         if ($this->hasPermissions(TECHNICAL_PERMISSION)) {
             $menu->addSection("Technical", 'fa-laptop', $this->getDefaultTechnicalMenu(), null);
@@ -446,17 +453,26 @@ class CTCNC extends Controller
             $menu->addSection("Management", 'fa-project-diagram', $this->getDefaultManagementMenu());
         }
 
+        $this->addConditionalMenu(
+            $menu,
+            'fa-user-circle',
+            $this->getDbeUser()->getValue(DBEUser::name),
+             $this->getDbeUser()->getValue(DBEUser::isExpenseApprover) || $this->getDbeUser()->getValue(
+                 DBEUser::globalExpenseApprover
+             ),
+            1001,
+            "Expenses/Overtime",
+            "ExpenseDashboard.php"
+        );
 
         $this->addConditionalMenu(
             $menu,
-            'fa-project-diagram',
-            "Technical",
-            $this->getDbeUser()->getValue(DBEUser::isExpenseApprover) || $this->getDbeUser()->getValue(
-                DBEUser::globalExpenseApprover
-            ),
-            906,
-            "Expenses/Overtime",
-            "ExpenseDashboard.php"
+            'fa-user-circle',
+            $this->getDbeUser()->getValue(DBEUser::name),
+            true,
+            1002,
+            "My Account",
+            "MySettings.php"
         );
 
         global $twig;
@@ -1070,6 +1086,7 @@ class CTCNC extends Controller
         ];
     }
 
+
     function initialProcesses()
     {
         if ($this->getParam('htmlFmt')) {
@@ -1152,8 +1169,31 @@ class CTCNC extends Controller
         return $this->dbeUser->getValue(DBEUser::createRenewalSalesOrdersFlag) == 'Y';
     }
 
+    protected function fetchAll($query,$params)
+    {
+        $db = new PDO(
+            'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8',
+            DB_USER,
+            DB_PASSWORD
+        );
+        $stmt=$db->prepare($query,$params);
+        foreach($params as $key=>$value)
+        {
+            if(($params[ $key]!=null||$params[ $key]=='0')&&is_numeric($params[ $key]))
+            {
+                $params[ $key]=(int)$params[ $key];
+                $stmt->bindParam($key,  $params[ $key],PDO::PARAM_INT);
+            }
+            else
+                $stmt->bindParam($key,  $params[ $key]);
+        }
+        $stmt->execute();
+        $result=$stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
     protected function console_log($output, $with_script_tags = true) {
-        $js_code = 'console.log(' . json_encode($output, JSON_HEX_TAG) . 
+        $js_code = 'console.log(' . json_encode($output, JSON_HEX_TAG) .
     ');';
         if ($with_script_tags) {
             $js_code = '<script>' . $js_code . '</script>';
