@@ -3,18 +3,14 @@ This project changes will be shown here.
 
 ## [unreleased]
 ### Changed
-- Confirm Report Logic / calculations
+- Issue 818 - Confirm Report Logic / calculations
+- Issue 925 - Improve Double Quote handling in passwords fields
 ### Fixed
 - Imported customers not assigning default delivery address
 - Imported contacts not getting the site assigned correctly
 - Issue 926 - Pending Reopen New SR doesn't delete the pending one.
 - Issue 904 - Renewal Report Unit numbers not matching
 - Issue 892 - Lead Status Layout Change
-
-## [unreleased] - 2020-06-15
-### Added
-- Improve Double Quote handling in password fields
-
 
 ## [v4.1.7] - 2020-06-15
 ### Added
