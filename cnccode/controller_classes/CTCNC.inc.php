@@ -360,9 +360,14 @@ class CTCNC extends Controller
             $userName = $dbeUser->getValue(DBEUser::name);
         }
 
-        $this->template->set_var(array('userName' => $userName, 'fromDate' => null,
-         'urlLogout2' => $urlLogout,
-         'urlLogout' => $urlLogout));
+        $this->template->set_var(
+            array(
+                'userName'   => $userName,
+                'fromDate'   => null,
+                'urlLogout2' => $urlLogout,
+                'urlLogout'  => $urlLogout
+            )
+        );
 
         if ($this->hasPermissions(TECHNICAL_PERMISSION)) {
             $menu->addSection("Technical", 'fa-laptop', $this->getDefaultTechnicalMenu(), null);
@@ -452,15 +457,12 @@ class CTCNC extends Controller
             $menu,
             'fa-user-circle',
             $this->getDbeUser()->getValue(DBEUser::name),
-            // $this->getDbeUser()->getValue(DBEUser::isExpenseApprover) || $this->getDbeUser()->getValue(
-            //     DBEUser::globalExpenseApprover
-            // ),
-            true,
+             true,
             1001,
             "Expenses/Overtime",
             "ExpenseDashboard.php"
         );
-        
+
         $this->addConditionalMenu(
             $menu,
             'fa-user-circle',
@@ -1081,7 +1083,7 @@ class CTCNC extends Controller
             ],
         ];
     }
-   
+
 
     function initialProcesses()
     {
