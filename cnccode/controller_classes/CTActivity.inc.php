@@ -1660,17 +1660,9 @@ class CTActivity extends CTCNC
             ', ' . $dsSite->getValue(DBESite::postcode);
 
         if ($dsContact) {
-            $customerDetails .=
-                ', ' . $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(DBEContact::lastName);
-
-
-            if ($dsContact->getValue(DBEContact::email)) {
-                $customerDetails .=
-                    '<A HREF="mailto:' . $dsContact->getValue(
-                        DBEContact::email
-                    ) . '?subject=Service Request ' . $dsCallActivity->getValue(DBEJCallActivity::problemID) . '"' .
-                    ' title="Send email to contact"><img src="images/email.gif" border="0" alt="email"></A>';
-            }
+            $customerDetails .= ', ' . $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(
+                    DBEContact::lastName
+                );
         }
         /*
       allow delete if open (no end time) OR (if user is member of Supervisor group then
@@ -4277,13 +4269,6 @@ class CTActivity extends CTCNC
                     $dsCallActivity->getValue(DBEJCallActivity::contactID)
                 ) . '</span>';
 
-            if ($dsContact->getValue(DBEContact::email)) {
-                $customerDetails .=
-                    ' <A HREF="mailto:' . $dsContact->getValue(
-                        DBEContact::email
-                    ) . '?subject=Service Request ' . $dsCallActivity->getValue(DBEJCallActivity::problemID) . '"' .
-                    ' title="Send email to contact"><img src="images/email.gif" style="border: 0" alt="email"></A>';
-            }
             if ($dsContact->getValue(DBEContact::notes)) {
                 $dsCallActivity->setValue(
                     DBEJCallActivity::contactNotes,
