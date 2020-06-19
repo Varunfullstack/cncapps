@@ -106,6 +106,23 @@ $app->group(
             ELSE 0
         END,
         NULL)) AS slaMetRaw,
+       AVG(IF(pro_status IN ('F' , 'C'),
+        problem.`pro_working_hours` > CASE problem.`pro_priority`
+            WHEN 1 THEN customer.`slaFixHoursP1`
+            WHEN 2 THEN customer.`slaFixHoursP2`
+            WHEN 3 THEN customer.`slaFixHoursP3`
+            WHEN 4 THEN customer.`slaFixHoursP4`
+        END,
+        NULL)) AS fixSLAFailedPct,
+       sum(IF(pro_status IN ('F' , 'C'),
+        problem.`pro_working_hours` > CASE problem.`pro_priority`
+            WHEN 1 THEN customer.slaFixHoursP1
+            WHEN 2 THEN customer.slaFixHoursP2
+            WHEN 3 THEN customer.slaFixHoursP3
+            WHEN 4 THEN customer.slaFixHoursP4
+            ELSE 0
+        END,
+        NULL)) AS fixSLAFailedCount,
     AVG(IF(pro_status IN ('F' , 'C'),
         openHours < 8,
         NULL)) AS closedWithin8Hours,
@@ -149,6 +166,12 @@ WHERE
             WHEN 3 THEN customer.`cus_sla_p3`
             WHEN 4 THEN customer.`cus_sla_p4`
             ELSE 0 end as sla,
+       CASE problem.`pro_priority`
+            WHEN 1 THEN customer.slaFixHoursP1
+            WHEN 2 THEN customer.slaFixHoursP2
+            WHEN 3 THEN customer.slaFixHoursP3
+            WHEN 4 THEN customer.slaFixHoursP4
+                else 0 end as fixSLA,
        AVG(IF(pro_status IN ('F' , 'C'),
         problem.`pro_responded_hours` < CASE problem.`pro_priority`
             WHEN 1 THEN customer.`cus_sla_p1`
@@ -167,6 +190,23 @@ WHERE
             ELSE 0
         END,
         NULL)) AS slaMetRaw,
+       AVG(IF(pro_status IN ('F' , 'C'),
+        problem.`pro_working_hours` > CASE problem.`pro_priority`
+            WHEN 1 THEN customer.`slaFixHoursP1`
+            WHEN 2 THEN customer.`slaFixHoursP2`
+            WHEN 3 THEN customer.`slaFixHoursP3`
+            WHEN 4 THEN customer.`slaFixHoursP4`
+        END,
+        NULL)) AS fixSLAFailedPct,
+       sum(IF(pro_status IN ('F' , 'C'),
+        problem.`pro_working_hours` > CASE problem.`pro_priority`
+            WHEN 1 THEN customer.slaFixHoursP1
+            WHEN 2 THEN customer.slaFixHoursP2
+            WHEN 3 THEN customer.slaFixHoursP3
+            WHEN 4 THEN customer.slaFixHoursP4
+            ELSE 0
+        END,
+        NULL)) AS fixSLAFailedCount,
     AVG(IF(pro_status IN ('F' , 'C'),
         openHours < 8,
         NULL)) AS closedWithin8Hours,
