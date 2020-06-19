@@ -782,6 +782,7 @@ class CTActivity extends CTCNC
         );
 
         $this->breachedSlaDropdown($dsSearchForm->getValue(BUActivity::searchFormBreachedSlaOption));
+        $this->fixSLADropdown($dsSearchForm->getValue(BUActivity::searchFormFixSLAOption));
 
         //Contract selection
 
@@ -1139,6 +1140,37 @@ class CTActivity extends CTCNC
             );
             $this->template->parse(
                 'breaches',
+                $block,
+                true
+            );
+        }
+    }
+
+    function fixSLADropdown(
+        $selectedID,
+        $template = 'ActivitySearch',
+        $block = 'searchFormFixSLAOptionBlock'
+    )
+    {
+        $this->template->set_block(
+            $template,
+            $block,
+            'fixSLAOptions'
+        );
+
+        foreach ($this->buActivity->breachedSlaOptionArray as $key => $value) {
+
+            $breachedSlaOptionSelected = ($selectedID == $key) ? CT_SELECTED : null;
+
+            $this->template->set_var(
+                array(
+                    'searchFormFixSLAOptionSelected'    => $breachedSlaOptionSelected,
+                    'searchFormFixSLAOptionValue'       => $key,
+                    'searchFormFixSLAOptionDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'fixSLAOptions',
                 $block,
                 true
             );

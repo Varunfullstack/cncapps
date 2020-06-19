@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBECallActivitySearch extends DBEntity
@@ -334,7 +335,8 @@ class DBECallActivitySearch extends DBEntity
         $breachedSlaOption = '',
         $sortColumn = false,
         $sortDirection = 'ASC',
-        $limit = true
+        $limit = true,
+        $fixSLAStatus = null
     )
     {
         $this->setMethodName('getRowsBySearchCriteria');
@@ -407,17 +409,17 @@ class DBECallActivitySearch extends DBEntity
             }
         }
 
-        if ($customerID != '' AND $customerID != 0) {
+        if ($customerID != '' and $customerID != 0) {
             $whereParameters = $whereParameters .
                 " AND " . $this->getDBColumnName(self::customerID) . "=" . $customerID;
         }
 
-        if ($linkedSalesOrderID != '' AND $linkedSalesOrderID != 0) {
+        if ($linkedSalesOrderID != '' and $linkedSalesOrderID != 0) {
             $whereParameters = $whereParameters .
                 " AND " . $this->getDBColumnName(self::linkedSalesOrderID) . "=" . $linkedSalesOrderID;
         }
 
-        if ($userID != '' AND $userID != 0) {
+        if ($userID != '' and $userID != 0) {
             $whereParameters = $whereParameters .
                 " AND " . $this->getDBColumnName(self::userID) . "=" . $userID;
         }
@@ -562,8 +564,22 @@ class DBECallActivitySearch extends DBEntity
                 " AND caa_callacttypeno = " . $callActTypeID;
         }
 
-        if($fixedSLAStatus == 'B'){
-            $whereParameters.=  "  and  ";
+        if ($fixSLAStatus == 'B') {
+            $whereParameters .= " and  pro_priority <> 5
+  and pro_working_hours > case pro_priority
+                              when 1 then slaFixHoursP1
+                              when 2 then slaFixHoursP2
+                              when 3 then slaFixHoursP3
+                              when 5 then slaFixHoursP4
+                              else 0 end  ";
+        } elseif ($fixSLAStatus == 'N') {
+            $whereParameters .= " and pro_priority <> 5
+  and pro_working_hours <= case pro_priority
+                              when 1 then slaFixHoursP1
+                              when 2 then slaFixHoursP2
+                              when 3 then slaFixHoursP3
+                              when 5 then slaFixHoursP4
+                              else 0 end ";
         }
 
         if ($breachedSlaOption == 'B') {

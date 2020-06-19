@@ -435,7 +435,8 @@ class BUActivity extends Business
             trim($dsSearchForm->getValue(self::searchFormBreachedSlaOption)),
             $sortColumn,
             $sortDirection,
-            $limit
+            $limit,
+            trim($dsSearchForm->getValue(self::searchFormFixSLAOption))
         );
         $this->dbeCallActivitySearch->fetchNext();
 
