@@ -11,6 +11,11 @@ This project changes will be shown here.
 - Issue 904 - Renewal Report Unit numbers not matching
 - Issue 892 - Lead Status Layout Change
 
+## [unreleased] - 2020-06-15
+### Added
+- Improve Double Quote handling in password fields
+
+
 ## [v4.1.7] - 2020-06-15
 ### Added
 - Fix visit confirmation ICS file
