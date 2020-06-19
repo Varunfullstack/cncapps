@@ -282,7 +282,7 @@
                 });
 
 
-                function generateActivitySearchLink(label) {
+                function generateActivitySearchLink(label, priority) {
 
                     const url = new URL('/Activity.php', window.location.protocol + "//" + window.location.host);
                     url.searchParams.append('action', 'search');
@@ -292,6 +292,10 @@
                     url.searchParams.append('activity[1][searchFormFixSLAOption]', 'B');
                     url.searchParams.append('activity[1][fromDate]', startDateInput.value);
                     url.searchParams.append('activity[1][toDate]', endDateInput.value);
+                    url.searchParams.append('activity[1][status]', "FIXED_OR_COMPLETED");
+                    if (priority) {
+                        url.searchParams.append('activity[1][priority]', priority);
+                    }
                     const anchor = document.createElement('a');
                     anchor.target = '_blank';
                     anchor.href = url.toString();
@@ -467,16 +471,16 @@
                                 "description": labels[key].label,
                                 "p1": customerP1 ? labels[key].format(customerP1[key]) : null,
                                 "p1Class": customerP1 ? labels[key].assignClass(customerP1[key], allP1[key]) : null,
-                                "p1Link": customerP1 && labels[key].link ? labels[key].link(customerP1[key]) : null,
+                                "p1Link": customerP1 && labels[key].link ? labels[key].link(customerP1[key], 1) : null,
                                 "p2": customerP2 ? labels[key].format(customerP2[key]) : null,
                                 "p2Class": customerP2 ? labels[key].assignClass(customerP2[key], allP2[key]) : null,
-                                "p2Link": customerP2 && labels[key].link ? labels[key].link(customerP2[key]) : null,
+                                "p2Link": customerP2 && labels[key].link ? labels[key].link(customerP2[key], 2) : null,
                                 "p3": customerP3 ? labels[key].format(customerP3[key]) : null,
                                 "p3Class": customerP3 ? labels[key].assignClass(customerP3[key], allP3[key]) : null,
-                                "p3Link": customerP3 && labels[key].link ? labels[key].link(customerP3[key]) : null,
+                                "p3Link": customerP3 && labels[key].link ? labels[key].link(customerP3[key], 3) : null,
                                 "p4": customerP4 ? labels[key].format(customerP4[key]) : null,
                                 "p4Class": customerP4 ? labels[key].assignClass(customerP4[key], allP4[key]) : null,
-                                "p4Link": customerP4 && labels[key].link ? labels[key].link(customerP4[key]) : null,
+                                "p4Link": customerP4 && labels[key].link ? labels[key].link(customerP4[key], 4) : null,
                                 "all": labels[key].format(customerSummarised[key]),
                                 "allClass": labels[key].assignClass(customerSummarised[key], summarised[key]),
                                 "allLink": labels[key].link ? labels[key].link(customerSummarised[key]) : null
@@ -521,7 +525,7 @@
     <table>
         <thead>
         <tr>
-            <th></th>
+            <th style="min-width: 220px;"></th>
             <th>P1</th>
             <th>P2</th>
             <th>P3</th>

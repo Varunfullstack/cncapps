@@ -538,6 +538,9 @@ class DBECallActivitySearch extends DBEntity
                 $whereParameters .=
                     " AND pro_status ='C'";
                 break;
+            case 'FIXED_OR_COMPLETED':
+                $whereParameters .= " and pro_status in ('F','C') ";
+                break;
         }
         // Contract Type:
 
@@ -570,7 +573,7 @@ class DBECallActivitySearch extends DBEntity
                               when 1 then slaFixHoursP1
                               when 2 then slaFixHoursP2
                               when 3 then slaFixHoursP3
-                              when 5 then slaFixHoursP4
+                              when 4 then slaFixHoursP4
                               else 0 end  ";
         } elseif ($fixSLAStatus == 'N') {
             $whereParameters .= " and pro_priority <> 5
@@ -578,7 +581,7 @@ class DBECallActivitySearch extends DBEntity
                               when 1 then slaFixHoursP1
                               when 2 then slaFixHoursP2
                               when 3 then slaFixHoursP3
-                              when 5 then slaFixHoursP4
+                              when 4 then slaFixHoursP4
                               else 0 end ";
         }
 

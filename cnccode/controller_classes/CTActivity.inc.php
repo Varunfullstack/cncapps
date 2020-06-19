@@ -161,18 +161,17 @@ class CTActivity extends CTCNC
     private $buActivity;
     private $statusArray =
         array(
-            ""          => "All",
-            "INITIAL"   => "Awaiting Initial Response",
-            "CUSTOMER"  => "Awaiting Customer",
-            "CNC"       => "Awaiting CNC",
-            "FIXED"     => "Fixed",
-            "COMPLETED" => "Completed",
-            "NOT_FIXED" => "Not Fixed",
-            "CHECKED_T_AND_M"
-                        => "Checked T&M Due Completion",
-            "CHECKED_NON_T_AND_M"
-                        => "Checked Non-T&M Due Completion",
-            "UNCHECKED" => "Unchecked"
+            ""                    => "All",
+            "INITIAL"             => "Awaiting Initial Response",
+            "CUSTOMER"            => "Awaiting Customer",
+            "CNC"                 => "Awaiting CNC",
+            "FIXED"               => "Fixed",
+            "COMPLETED"           => "Completed",
+            "NOT_FIXED"           => "Not Fixed",
+            "CHECKED_T_AND_M"     => "Checked T&M Due Completion",
+            "CHECKED_NON_T_AND_M" => "Checked Non-T&M Due Completion",
+            "UNCHECKED"           => "Unchecked",
+            "FIXED_OR_COMPLETED"  => "Fixed Or Completed"
         );
 
     function __construct($requestMethod,
