@@ -77,7 +77,7 @@ import CheckBox from './utils/checkBox.js';
 
           this.getElement('startDate','Start Date',this.state.startDate),
 
-          this.getElement('lengthOfServices','Length Of Service',this.state.lengthOfServices),
+          this.getElement('lengthOfServices','Length Of Service',this.state.lengthOfServices+" years"),
           
           this.getElement('manager','Manager',this.state.manager),
 
