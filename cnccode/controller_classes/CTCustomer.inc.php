@@ -946,7 +946,45 @@ class CTCustomer extends CTCNC
     {
         $this->setParentFormFields();
         switch ($this->getAction()) {
-
+            case 'getMainContacts':
+            {
+                $customerID = @$_REQUEST['customerID'];
+                if (!$customerID) {
+                    http_response_code(400);
+                    echo json_encode(["status" => "error", "description" => "Customer ID Not provided"]);
+                    exit;
+                }
+                echo json_encode(["status" => "ok", "data" => $this->getMainContacts($customerID)]);
+                break;
+            }
+            case 'getLeadStatuses':
+            {
+                $dbeLeadStatus = new DBECustomerLeadStatus($this);
+                $dbeLeadStatus->getRows(DBECustomerLeadStatus::sortOrder);
+                echo json_encode(["status" => "ok", "data" => $dbeLeadStatus->fetchArray()]);
+                break;
+            }
+            case 'getSectors':
+            {
+                $dbeSector = new DBESector($this);
+                $dbeSector->getRows(DBESector::description);
+                echo json_encode(["status" => "ok", "data" => $dbeSector->fetchArray()]);
+                break;
+            }
+            case 'getCustomerTypes':
+            {
+                $dbeCustomerTypes = new DBECustomerType($this);
+                $dbeCustomerTypes->getRows(DBECustomerType::description);
+                echo json_encode(["status" => "ok", "data" => $dbeCustomerTypes->fetchArray()]);
+                break;
+            }
+            case 'getAccountManagerEngineers':
+            {
+                $dbeUser = new DBEUser($this);
+                $dbeUser->getRows();
+                echo json_encode(["status" => "ok", "data" => $dbeUser->fetchArray()]);
+                break;
+            }
             case 'createCustomerFolder':
                 $this->createCustomerFolder();
                 break;
@@ -1118,6 +1156,13 @@ class CTCustomer extends CTCNC
         if ($this->getParam('parentDescField')) {
             $this->setSessionParam('parentDescField', $this->getParam('parentDescField'));
         }
+    }
+
+    private function getMainContacts($customerID)
+    {
+        $dbeContact = new DBEContact($this);
+        $dbeContact->getMainContacts($customerID);
+        return $dbeContact->fetchArray();
     }
 
     /**
@@ -3051,7 +3096,6 @@ class CTCustomer extends CTCNC
         );
         $this->parsePage();
     }
-
 
     /**
      * @return bool
