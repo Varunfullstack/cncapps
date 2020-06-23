@@ -2139,7 +2139,7 @@ class CTActivity extends CTCNC
 
 
         $this->template->set_var(
-            array(
+            array(                
                 'hiddenText'                         => $hiddenText,
                 'currentUserBgColor'                 => $currentUserBgColor,
                 'currentUser'                        => $currentUser,
@@ -2291,8 +2291,8 @@ class CTActivity extends CTCNC
                     "Service Request {$problemID}"
                 ),
                 'authorisedByHide'                   => $authorisedByName ? null : "hidden",
-                'authorisedByName'                   => $authorisedByName
-
+                'authorisedByName'                   => $authorisedByName,
+                'raiseIcon'                          => $this->getProblemRaiseIcon ($dbeJProblem)
             )
         );
 
@@ -7302,5 +7302,43 @@ WHERE caa_problemno = ?
         $test = $result->fetch_assoc();
 
         return !!$test['hiddenChargeableActivities'];
+    }
+    private function getProblemRaiseIcon($dbeJProblem)
+    {
+        if(isset($dbeJProblem))
+        {
+            $raiseTypeId=$dbeJProblem->getValue(DBEProblem::problemraisetypeId);
+            if(isset($raiseTypeId) && $raiseTypeId !=null)
+            {
+               $dbeProblemRaiseType=new  DBEProblemRaiseType($this);
+               $dbeProblemRaiseType->setPKValue($raiseTypeId);
+               $dbeProblemRaiseType->getRow();
+               switch($dbeProblemRaiseType->getValue(DBEProblemRaiseType::description))
+               {
+                   case 'Email':
+                        return "<i class='fa fa-envelope'></i>";
+                    break;
+                    case 'Portal':
+                        return "<i class='fab fa-internet-explorer'></i>";
+                    break;
+                    case 'Phone':
+                        return "<i class='fa fa-phone'></i>";
+                    break;
+                    case 'On site':
+                        return "<i class='fas fa-building'></i>";
+                    break;
+                    case 'Alert':
+                        return "<i class='fas fa-bell'></i>";
+                    break;
+                    case 'Sales':
+                        return "<i class='fas fa-shopping-cart'></i>";
+                    break;
+                    case 'Manual':
+                        return "<i class='fas fa-user-edit'></i>";
+                    break;
+               }
+            }
+        }
+        else return null;
     }
 }

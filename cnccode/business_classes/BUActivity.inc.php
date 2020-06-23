@@ -5427,7 +5427,6 @@ is currently a balance of ';
                 $dbeCustomerItem->getPKValue()
             );
             $this->dbeProblem->updateRow();
-
         } else {
             $this->raiseError('No Pre-pay Contract Found');
             return FALSE;
@@ -5543,6 +5542,7 @@ is currently a balance of ';
         );
 
         $dbeCallActivity->insertRow();
+        $this->setProblemRaise($dbeProblem,$dbeCallActivity); //createActivityFromCustomerID
 
         return $dbeCallActivity->getPKValue();
     }
@@ -5749,7 +5749,7 @@ is currently a balance of ';
             $GLOBALS['auth']->is_authenticated()
         ); // user that created activity
         $dsCallActivity->post();
-        $this->setProblemRaise($dbeProblem,$dsCallActivity);
+        $this->setProblemRaise($dbeProblem,$dsCallActivity); //createActivityFromSession
 
         $dbeContact = null;
         if (@$_SESSION[$sessionKey]['contactID']) {
@@ -5800,8 +5800,19 @@ is currently a balance of ';
         $id= $buProblemRaiseType->getProblemRaiseTypeByName($description)['id'];              
         return $id;
     }
-    private function setProblemRaise($dbeProblem, $callActivity)
+    private function setProblemRaise($dbeProblem, $callActivity,$raiseType=null)
     {
+        if(!isset($dbeProblem) && !isset($callActivity))
+            return null;
+        if($raiseType!=null)
+        {
+            $dbeProblem->setValue(
+                DBEProblem::problemraisetypeId,
+                $this->getProblemRaiseType(BUProblemRaiseType::ALERT)
+            );
+            $dbeProblem->updateRow();
+            return;
+        }
         if(isset($dbeProblem))
         {
             $userId=$dbeProblem->getValue(DBEProblem::userID);
@@ -5823,7 +5834,7 @@ is currently a balance of ';
          if (
             isset($dbeProblem) && isset($callActivity)
             && $dbeProblem->getValue(DBEJProblem::linkedSalesOrderID) > 0
-            && $dbeProblem->getValue(DBEJProblem::priority) == 5
+            //&& $dbeProblem->getValue(DBEJProblem::priority) == 5
         ) {
             $dbeProblem->setValue(
                 DBEProblem::problemraisetypeId,
@@ -5869,7 +5880,7 @@ is currently a balance of ';
                     $this->getProblemRaiseType(BUProblemRaiseType::PHONE)
                 );
                 return;
-            }            
+            }             
             else
             {
                 $dbeProblem->setValue(
@@ -7203,7 +7214,7 @@ is currently a balance of ';
         }
         //$dbeCallActivity->setValue( 'overtimeExportedFlag', 'N' );
         $dbeCallActivity->insertRow();
-        $this->setProblemRaise($dbeProblem,$dbeCallActivity);
+        $this->setProblemRaise($dbeProblem,$dbeCallActivity,BUProblemRaiseType::SALES); //createSalesServiceRequest
         $db = new dbSweetcode(); // database connection for query
 
         $sql =
@@ -7553,7 +7564,6 @@ FROM
             $dbeProblem = new DBEProblem($this);
 
             $dbeProblem->getRow($automatedRequest->getServiceRequestID());
-            $this->setProblemRaise($dbeProblem,null);
             if (!$dbeProblem->rowCount()) {
                 echo "<div>The service request doesn't exist </div>";
                 // create a new service request
@@ -8069,7 +8079,8 @@ FROM
         );
 
         $dbeCallActivity->insertRow();
-
+        $this->setProblemRaise($dbeProblem,$dbeCallActivity); // raiseNewRequestFromImport
+        
         if ($record->getAttachment() == 'Y') {
             $this->processAttachment(
                 $dbeProblem->getPKValue(),
@@ -10057,7 +10068,8 @@ FROM
             );
 
             $dbeCallActivity->insertRow();
-
+            $this->setProblemRaise($dbeProblem,$dbeCallActivity,BUProblemRaiseType::ALERT); // raiseSolarwindsFailedBackupRequest
+            
         } else {
             $this->createFollowOnActivity(
                 $callActivityID,
@@ -10322,7 +10334,7 @@ FROM
             );
 
             $dbeCallActivity->insertRow();
-
+            $this->setProblemRaise($dbeProblem,$dbeCallActivity,BUProblemRaiseType::ALERT); //createSecondsiteSR
         } else {
 
             $this->createFollowOnActivity(
@@ -11112,6 +11124,7 @@ FROM
                 )
             );
             $dbeCallActivity->insertRow();
+            $this->setProblemRaise($dbeProblem,$dbeCallActivity,BUProblemRaiseType::SALES); //sendSalesRequest
         }
 
         $buStandardText = new BUStandardText($this);
