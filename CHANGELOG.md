@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 913 - Customer Page Main Section Rewrite
 
 ## [v4.1.7] - 2020-06-15
 ### Added
