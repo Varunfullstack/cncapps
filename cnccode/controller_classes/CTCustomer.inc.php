@@ -986,6 +986,23 @@ class CTCustomer extends CTCNC
     {
         $this->setParentFormFields();
         switch ($this->getAction()) {
+            case 'getCustomer':
+            {
+                $customerID = @$_REQUEST['customerID'];
+                if (!$customerID) {
+                    http_response_code(400);
+                    echo json_encode(["status" => "error", "description" => "Customer ID Not provided"]);
+                    exit;
+                }
+                $dbeCustomer = new DBECustomer($this);
+                if (!$dbeCustomer->getRow($customerID)) {
+                    http_response_code(404);
+                    echo json_encode(["status" => "error", "description" => "Customer not found"]);
+                    exit;
+                }
+                echo json_encode(["status" => "ok", "data" => $dbeCustomer->getRowAsAssocArray()]);
+                break;
+            }
             case 'getMainContacts':
             {
                 $customerID = @$_REQUEST['customerID'];
@@ -1018,7 +1035,7 @@ class CTCustomer extends CTCNC
                 echo json_encode(["status" => "ok", "data" => $dbeCustomerTypes->fetchArray()]);
                 break;
             }
-            case 'getAccountManagerEngineers':
+            case 'getAccountManagers':
             {
                 $dbeUser = new DBEUser($this);
                 $dbeUser->getRows();
@@ -1600,6 +1617,10 @@ class CTCustomer extends CTCNC
             'CustomerEditSimple.inc'
         );
 
+        $this->template->setVar(
+            'javaScript',
+            "<script type=\"module\" src='components/customerEditMain/CustomerEditMain.js?version=1.0.0'></script>"
+        );
 
 // Parameters
         $title = "Customer - " . $this->dsCustomer->getValue(DBECustomer::name);
