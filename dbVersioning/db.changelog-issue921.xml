@@ -161,4 +161,19 @@
          </sql>
         
     </changeSet>
+    <changeSet author="pavwebdevmt" id="issue903-7">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="consultant"/>                      
+        </preConditions>
+
+        <addColumn tableName="consultant">             
+             <column defaultValue="0" name="basedAtCustomerSite" remarks="Based at customer site" type="TINYINT(1)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        
+         <sql>
+         update consultant set basedAtCustomerSite=1 where cns_consno in (141, 132, 144, 131)
+         </sql>        
+    </changeSet>
 </databaseChangeLog>

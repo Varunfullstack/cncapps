@@ -13,7 +13,6 @@ class DBEJUser extends DBEUser
     const firstName = "firstName";
     const lastName = "lastName";
     const activeFlag = "activeFlag";
-
     /**
      * calls constructor()
      * @access public
@@ -50,6 +49,7 @@ class DBEJUser extends DBEUser
             DA_YN,
             DA_NOT_NULL
         );
+       
 
 
 

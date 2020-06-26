@@ -87,7 +87,8 @@ class BUServiceRequestReport extends Business
             IFNULL(add_postcode, ''),
             ' ',
             IFNULL(adslPhone, '')
-          ) AS `Contract`
+          ) AS `Contract`,
+          prt.description AS raiseType
         FROM
           problem 
           LEFT JOIN customer 
@@ -104,6 +105,8 @@ class BUServiceRequestReport extends Business
             ON add_custno = cui_custno AND add_siteno = cui_siteno
           LEFT JOIN item 
             ON itm_itemno = cui_itemno
+          LEFT JOIN ProblemRaiseType prt
+            ON problem.problemraisetypeId=prt.id
           WHERE 1=1";
 
         if ($dsSearchForm->getValue(self::searchFormFromDate)) {

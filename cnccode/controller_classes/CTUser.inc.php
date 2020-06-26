@@ -601,6 +601,7 @@ class CTUser extends CTCNC
                 'urlDelete'                                     => $urlDelete,
                 'txtDelete'                                     => $txtDelete,
                 'urlDisplayList'                                => $urlDisplayList,
+                "basedAtCustomerSiteChecked"                    => $this->dsUser->getValue(DBEUser::basedAtCustomerSite) ? 'checked' : null,
 
             )
         );
@@ -731,8 +732,10 @@ class CTUser extends CTCNC
      */
     function update()
     {
-        $this->setMethodName('update');
+        $this->setMethodName('update'); 
+              
         $this->formError = (!$this->dsUser->populateFromArray($this->getParam('user')));
+        
         $userData = $this->getParam('user')[1];
         $this->updateEncryptedData($userData, $this->dsUser);
 
