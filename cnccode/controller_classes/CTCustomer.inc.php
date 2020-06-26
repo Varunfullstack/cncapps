@@ -1010,7 +1010,53 @@ class CTCustomer extends CTCNC
                     echo json_encode(["status" => "error", "description" => "Customer not found"]);
                     exit;
                 }
-                echo json_encode(["status" => "ok", "data" => $dbeCustomer->getRowAsAssocArray()]);
+                echo json_encode(
+                    [
+                        "status" => "ok",
+                        "data"   => [
+                            "accountManagerUserID"         => $dbeCustomer->getValue(DBECustomer::accountManagerUserID),
+                            "accountName"                  => $dbeCustomer->getValue(DBECustomer::accountName),
+                            "accountNumber"                => $dbeCustomer->getValue(DBECustomer::accountNumber),
+                            "activeDirectoryName"          => $dbeCustomer->getValue(DBECustomer::activeDirectoryName),
+                            "becameCustomerDate"           => $dbeCustomer->getValue(DBECustomer::becameCustomerDate),
+                            "customerID"                   => $dbeCustomer->getValue(DBECustomer::customerID),
+                            "customerTypeID"               => $dbeCustomer->getValue(DBECustomer::customerTypeID),
+                            "droppedCustomerDate"          => $dbeCustomer->getValue(DBECustomer::droppedCustomerDate),
+                            "gscTopUpAmount"               => $dbeCustomer->getValue(DBECustomer::gscTopUpAmount),
+                            "lastReviewMeetingDate"        => $dbeCustomer->getValue(
+                                DBECustomer::lastReviewMeetingDate
+                            ),
+                            "leadStatusId"                 => $dbeCustomer->getValue(DBECustomer::leadStatusId),
+                            "mailshotFlag"                 => $dbeCustomer->getValue(DBECustomer::mailshotFlag),
+                            "modifyDate"                   => $dbeCustomer->getValue(DBECustomer::modifyDate),
+                            "name"                         => $dbeCustomer->getValue(DBECustomer::name),
+                            "noOfPCs"                      => $dbeCustomer->getValue(DBECustomer::noOfPCs),
+                            "noOfServers"                  => $dbeCustomer->getValue(DBECustomer::noOfServers),
+                            "noOfSites"                    => $dbeCustomer->getValue(DBECustomer::noOfSites),
+                            "primaryMainContactID"         => $dbeCustomer->getValue(DBECustomer::primaryMainContactID),
+                            "referredFlag"                 => $dbeCustomer->getValue(DBECustomer::referredFlag),
+                            "regNo"                        => $dbeCustomer->getValue(DBECustomer::regNo),
+                            "reviewMeetingBooked"          => $dbeCustomer->getValue(DBECustomer::reviewMeetingBooked),
+                            "reviewMeetingFrequencyMonths" => $dbeCustomer->getValue(
+                                DBECustomer::reviewMeetingFrequencyMonths
+                            ),
+                            "sectorID"                     => $dbeCustomer->getValue(DBECustomer::sectorID),
+                            "slaP1"                        => $dbeCustomer->getValue(DBECustomer::slaP1),
+                            "slaP2"                        => $dbeCustomer->getValue(DBECustomer::slaP2),
+                            "slaP3"                        => $dbeCustomer->getValue(DBECustomer::slaP3),
+                            "slaP4"                        => $dbeCustomer->getValue(DBECustomer::slaP4),
+                            "slaP5"                        => $dbeCustomer->getValue(DBECustomer::slaP5),
+                            "sortCode"                     => $dbeCustomer->getValue(DBECustomer::sortCode),
+                            "specialAttentionEndDate"      => $dbeCustomer->getValue(
+                                DBECustomer::specialAttentionEndDate
+                            ),
+                            "specialAttentionFlag"         => $dbeCustomer->getValue(DBECustomer::specialAttentionFlag),
+                            "support24HourFlag"            => $dbeCustomer->getValue(DBECustomer::support24HourFlag),
+                            "techNotes"                    => $dbeCustomer->getValue(DBECustomer::techNotes),
+                            "websiteURL"                   => $dbeCustomer->getValue(DBECustomer::websiteURL),
+                        ]
+                    ]
+                );
                 break;
             }
             case 'getMainContacts':
@@ -1029,6 +1075,20 @@ class CTCustomer extends CTCNC
                 $dbeLeadStatus = new DBECustomerLeadStatus($this);
                 $dbeLeadStatus->getRows(DBECustomerLeadStatus::sortOrder);
                 echo json_encode(["status" => "ok", "data" => $dbeLeadStatus->fetchArray()]);
+                break;
+            }
+            case 'updateCustomer':
+            {
+                $json = file_get_contents('php://input');
+                $data = json_decode($json, true);
+                $dbeCustomer = new DBECustomer($this);
+                $dbeCustomer->getRow($data['customerID']);
+                foreach ($data as $key => $value) {
+                    $dbeCustomer->setValue($key, $value);
+                }
+
+                $dbeCustomer->updateRow();
+                echo json_encode(["status" => "ok"]);
                 break;
             }
             case 'getSectors':
@@ -1629,8 +1689,7 @@ class CTCustomer extends CTCNC
 
         $this->template->setVar(
             'javaScript',
-            "<script type=\"module\" src='components/customerEditMain/CustomerEditMain.js?version=1.0.0'></script>
-<script defer src='https://unpkg.com/react-input-mask/dist/react-input-mask.min.js'></script>"
+            "<script type=\"module\" src='components/customerEditMain/build/CustomerEditMain.js?version=1.0.0'></script>"
         );
 
 // Parameters
