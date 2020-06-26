@@ -1,7 +1,8 @@
 "use strict";
-
-import Select from "../utils/Select.js";
-import EncryptedTextInput from "../utils/EncryptedTextInput.js";
+import React from 'react';
+import Select from "./Select";
+import EncryptedTextInput from "./EncryptedTextInput";
+import Skeleton from "react-loading-skeleton";
 
 class CustomerEditMain extends React.Component {
     el = React.createElement;
@@ -16,53 +17,24 @@ class CustomerEditMain extends React.Component {
                 accountNumber: '',
                 activeDirectoryName: '',
                 becameCustomerDate: '',
-                comments: '',
-                companyBackground: '',
-                createDate: '',
-                crmComments: '',
                 customerID: '',
                 customerTypeID: '',
-                dateMeetingConfirmed: '',
-                decisionMakerBackground: '',
-                deliverSiteNo: '',
                 droppedCustomerDate: '',
                 gscTopUpAmount: '',
-                inviteSent: '',
-                invoiceSiteNo: '',
-                lastContractSent: '',
                 lastReviewMeetingDate: '',
                 leadStatusId: '',
-                licensedOffice365Users: '',
                 mailshotFlag: '',
-                meetingDateTime: '',
                 modifyDate: '',
-                modifyUserID: '',
                 name: '',
                 noOfPCs: '',
                 noOfServers: '',
                 noOfSites: '',
-                opportunityDeal: '',
-                pcxFlag: '',
                 primaryMainContactID: '',
-                rating: '',
                 referredFlag: '',
                 regNo: '',
-                reportProcessed: '',
-                reportSent: '',
-                reviewAction: '',
-                reviewDate: '',
                 reviewMeetingBooked: '',
-                reviewMeetingEmailSentFlag: '',
                 reviewMeetingFrequencyMonths: '',
-                reviewTime: '',
-                reviewUserID: '',
                 sectorID: '',
-                sendContractEmail: '',
-                sendTandcEmail: '',
-                slaFixHoursP1: '',
-                slaFixHoursP2: '',
-                slaFixHoursP3: '',
-                slaFixHoursP4: '',
                 slaP1: '',
                 slaP2: '',
                 slaP3: '',
@@ -76,7 +48,6 @@ class CustomerEditMain extends React.Component {
                 websiteURL: '',
 
             }
-
         };
         this.handleCustomerTypeUpdate = this.handleCustomerTypeUpdate.bind(this);
         this.handlePrimaryMainContactUpdate = this.handlePrimaryMainContactUpdate.bind(this);
@@ -102,6 +73,27 @@ class CustomerEditMain extends React.Component {
         this.handleSLAP3Update = this.handleSLAP3Update.bind(this);
         this.handleSLAP4Update = this.handleSLAP4Update.bind(this);
         this.handleSLAP5Update = this.handleSLAP5Update.bind(this);
+        this.handleTechNotesUpdate = this.handleTechNotesUpdate.bind(this);
+        this.handleActiveDirectoryNameUpdate = this.handleActiveDirectoryNameUpdate.bind(this);
+        this.handleAccountManagerUserIDUpdate = this.handleAccountManagerUserIDUpdate.bind(this);
+        this.handleSortCodeUpdate = this.handleSortCodeUpdate.bind(this);
+        this.handleAccountNameUpdate = this.handleAccountNameUpdate.bind(this);
+        this.handleAccountNumberUpdate = this.handleAccountNumberUpdate.bind(this);
+        document.customerMain = this;
+    }
+
+    save() {
+        fetch('?action=updateCustomer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(this.state.customer)
+        })
+            .then(response => response.json())
+            .then(response => {
+                console.log('customer data saved');
+            })
     }
 
     componentDidMount() {
@@ -591,7 +583,6 @@ class CustomerEditMain extends React.Component {
     }
 
     getSortCodeInput() {
-        debugger;
         return this.el(
             EncryptedTextInput,
             {
@@ -618,14 +609,33 @@ class CustomerEditMain extends React.Component {
 
     }
 
-    getAccountNumberInput() {
+    handleAccountNumberUpdate(value) {
+        this.updateCustomerField('accountNumber', value);
+    }
 
+    getAccountNumberInput() {
+        return this.el(
+            EncryptedTextInput,
+            {
+                encryptedValue: this.state.customer.accountNumber,
+                onChange: this.handleAccountNumberUpdate,
+                mask: '99999999'
+            }
+        )
     }
 
 
     render() {
         if (!this.state.loaded) {
-            return '';
+            return this.el(
+                Skeleton,
+                null,
+                this.el(
+                    'table',
+                    {className: 'content', border: 0, cellPadding: 2, cellSpacing: 1, width: '100%'},
+                    this.el('tbody')
+                )
+            );
         }
 
         return this.el('table', {className: 'content', border: 0, cellPadding: 2, cellSpacing: 1, width: '100%'},
