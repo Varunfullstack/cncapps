@@ -2879,21 +2879,29 @@ class CTActivity extends CTCNC
           WHERE supportLevel is not null";
 
                 if ($this->getParam('customerString')) {
-                    $query .= " AND ( cus_name LIKE '%" . $this->getParam(
-                            'customerString'
-                        ) . "%' OR customer.cus_custno = '" . $this->getParam('customerString') . "')";
+                    $query .= " AND ( cus_name LIKE '%" . mysqli_real_escape_string(
+                            $db,
+                            $this->getParam(
+                                'customerString'
+                            )
+                        ) . "%' OR customer.cus_custno = '" . mysqli_real_escape_string(
+                            $db,
+                            $this->getParam(
+                                'customerString'
+                            )
+                        ) . "')";
                 }
                 if ($this->getParam('contactFirstName')) {
                     $query .= "
-            AND con_first_name LIKE '%" . $this->getParam('contactFirstName') . "%'";
+            AND con_first_name LIKE '%" . mysqli_real_escape_string($db,$this->getParam('contactFirstName')) . "%'";
                 }
                 if ($this->getParam('contactLastName')) {
                     $query .= "
-            AND con_last_name LIKE '%" . $this->getParam('contactLastName') . "%'";
+            AND con_last_name LIKE '%" . mysqli_real_escape_string($db,$this->getParam('contactLastName')) . "%'";
                 }
                 if ($this->getParam('contactLastName')) {
                     $query .= "
-            AND con_last_name LIKE '%" . $this->getParam('contactLastName') . "%'";
+            AND con_last_name LIKE '%" . mysqli_real_escape_string($db,$this->getParam('contactLastName')) . "%'";
                 }
 
                 if ($this->getParam('customerID')) {

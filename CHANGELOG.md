@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.1.8] - 2020-06-26
+### Fixed
+- Fix issue in activityCreate1 when the customer name has an apostrophe
 
 ## [v4.1.7] - 2020-06-15
 ### Added
