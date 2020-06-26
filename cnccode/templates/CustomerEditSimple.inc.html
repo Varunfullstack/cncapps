@@ -800,9 +800,7 @@
     }
 
     function isProspect() {
-        const becameCustomerDateElm = document.getElementById('becameCustomerDate');
-        const droppedCustomerDateElm = document.getElementById('droppedCustomerDate');
-        return !(becameCustomerDateElm.value && !droppedCustomerDateElm.value);
+        return document.customerMain.isProspect()
     }
 
     const isShowingInactive = {isShowingInactive};
@@ -939,8 +937,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', function () {
-
-        loadNote('first');
+        //loadNote('first');
         checkIsProspect();
 
 
@@ -1365,6 +1362,7 @@
         }
     }
 
+
     function setCaretPosition(elemId, caretPos) {
         const elem = document.getElementById(elemId);
 
@@ -1398,7 +1396,7 @@
 
     function loadNote(noteIdentifier) {
 
-        const customerID = document.getElementById('customerID').value;
+        const customerID = {customerID};
 
         if (customerID == 0) {
             return;
@@ -1412,8 +1410,8 @@
 
         customerNotesChanged = false;
 
-        const created = document.getElementById('customerNoteCreated').value;
-        const url = "CustomerNote.php?action=getCustomerNote&customerID=" + customerID + "&created=" + created + "&identifier=" + noteIdentifier;
+        // const created = document.getElementById('customerNoteCreated').value;
+        const url = "CustomerNote.php?action=getCustomerNote&customerID=" + customerID + "&identifier=" + noteIdentifier;
 
         loadXMLDoc(url);
 
@@ -1609,11 +1607,13 @@
     }
 
     function checkMailShotOptions() {
-        document.customerMain.save();
-        validatingContactsModal.dialog('open');
-        const toReturn = runValidations();
-        validatingContactsModal.dialog('close');
-        return toReturn;
+        document.customerMain.save().then(() => {
+            validatingContactsModal.dialog('open');
+            const toReturn = runValidations();
+            validatingContactsModal.dialog('close');
+            return toReturn;
+        });
+
     }
 </script>
 
@@ -1696,9 +1696,13 @@
 
             <div class="customerReviewTime">
                 To be reviewed on
+                <input name="customerID"
+                       type="hidden"
+                       value="{customerID}"
+                />
                 <input {disabled}
                        type="date"
-                       name="form[customer][{customerID}][reviewDate]"
+                       name="form[customer][reviewDate]"
                        id="reviewDate"
                        value="{reviewDate}"
                        size="10"
@@ -1707,7 +1711,7 @@
                 >
                 Time
                 <input {disabled}
-                       name="form[customer][{customerID}][reviewTime]"
+                       name="form[customer][reviewTime]"
                        value="{reviewTime}"
                        size="5"
                        maxlength="5"
@@ -1716,7 +1720,7 @@
                 <select
                         {disabled}
                         type="text"
-                        name="form[customer][{customerID}][reviewUserID]"
+                        name="form[customer][reviewUserID]"
                         onchange="setFormChanged();"
                 >
                     <!-- BEGIN reviewUserBlock -->
@@ -1733,7 +1737,7 @@
                           {disabled}
                           cols="120"
                           rows="3"
-                          name="form[customer][{customerID}][reviewAction]"
+                          name="form[customer][reviewAction]"
                 >{reviewAction}</textarea>
             </div>
 

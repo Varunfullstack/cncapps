@@ -5,8 +5,8 @@
     "main": "CMPMySettings.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "parcel src/CustomerEditMain.js",
-        "build": "parcel build src/CustomerEditMain.js"
+        "start": "parcel src/CustomerEditMain.js --public-url /components/customerEditMain/dist" ,
+        "build": "parcel build src/CustomerEditMain.js --public-url /components/customerEditMain/dist"
     },
     "author": "",
     "license": "ISC",

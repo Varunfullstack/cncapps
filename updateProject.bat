@@ -1,3 +1,2 @@
 composer update && ^
-npm install --prefix htdocs/components/customerEditMain && ^
-npm run build --prefix htdocs/components/customerEditMain/
+pushd htdocs\components\customerEditMain && npm install && npm run build && popd
