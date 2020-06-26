@@ -1,6 +1,7 @@
 "use strict";
 
 import Select from "../utils/Select.js";
+import EncryptedTextInput from "../utils/EncryptedTextInput.js";
 
 class CustomerEditMain extends React.Component {
     el = React.createElement;
@@ -145,8 +146,8 @@ class CustomerEditMain extends React.Component {
                 .then(response => response.json())
                 .then(response => this.setState({
                     accountManagers: response.data.map(x => ({
-                        label: x.cns_consno,
-                        value: x.cns_name
+                        label: x.cns_name,
+                        value: x.cns_consno,
                     }))
                 })),
         ])
@@ -585,11 +586,35 @@ class CustomerEditMain extends React.Component {
         )
     }
 
-    getSortCodeInput() {
+    handleSortCodeUpdate(value) {
+        this.updateCustomerField('sortCode', value);
+    }
 
+    getSortCodeInput() {
+        debugger;
+        return this.el(
+            EncryptedTextInput,
+            {
+                encryptedValue: this.state.customer.sortCode,
+                onChange: this.handleSortCodeUpdate,
+                mask: '99-99-99'
+            }
+        )
+    }
+
+    handleAccountNameUpdate(event) {
+        this.updateCustomerField('accountName', event.target.value);
     }
 
     getAccountNameInput() {
+        return this.el(
+            'input',
+            {
+                type: 'text',
+                value: this.state.customer.accountName,
+                onChange: this.handleAccountNameUpdate
+            }
+        )
 
     }
 
