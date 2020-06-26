@@ -688,265 +688,9 @@ class CTCustomer extends CTCNC
             return;
         }
 
-        foreach ($customerArray as $key => $value) {
-            $this->dsCustomer->setUpdateModeInsert();
-            $this->dsCustomer->setValue(
-                self::customerFormNameClass,
-                CTCUSTOMER_CLS_TABLE_EDIT_HEADER
-            );
-            $this->dsCustomer->setValue(
-                self::customerFormInvoiceSiteMessage,
-                CTCUSTOMER_CLS_TABLE_EDIT_HEADER
-            );
-            $this->dsCustomer->setValue(
-                self::customerFormDeliverSiteMessage,
-                CTCUSTOMER_CLS_TABLE_EDIT_HEADER
-            );
-
-            $this->dsCustomer->setValue(
-                DBECustomer::customerID,
-                @$value['customerID']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::name,
-                @$value['name']
-            );
-            if (!$this->dsCustomer->getValue(DBECustomer::name)) {
-                $this->setFormErrorOn();
-                $this->dsCustomer->setValue(
-                    self::customerFormNameClass,
-                    CTCUSTOMER_CLS_FORM_ERROR
-                );
-            }
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewMeetingBooked,
-                !!@$value['reviewMeetingBooked']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::regNo,
-                @$value['regNo']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::invoiceSiteNo,
-                @$value['invoiceSiteNo']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::websiteURL,
-                @$value['websiteURL']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::deliverSiteNo,
-                @$value['deliverSiteNo']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::mailshotFlag,
-                $this->getYN(@$value['mailshotFlag'])
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::referredFlag,
-                $this->getYN(@$value['referredFlag'])
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::specialAttentionFlag,
-                $this->getYN(@$value['specialAttentionFlag'])
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::specialAttentionEndDate,
-                @$value['specialAttentionEndDate']
-            );
-
-            if (
-                $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
-                !$this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)
-            ) {
-                $this->dsCustomer->setValue(
-                    self::customerFormSpecialAttentionEndDateMessage,
-                    'You must enter a date'
-                );
-                $this->setFormErrorOn();
-            }
-
-            $this->dsCustomer->setValue(
-                DBECustomer::primaryMainContactID,
-                @$value[DBECustomer::primaryMainContactID]
-            );
-
-            $this->dsCustomer->setValue(
-                DBECustomer::customerTypeID,
-                @$value['customerTypeID']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::support24HourFlag,
-                $this->getYN(@$value['support24HourFlag'])
-            );
-
-            $this->dsCustomer->setValue(
-                self::customerFormSectorMessage,
-                null
-            );
-            if (!@$value['sectorID']) {
-                $this->setFormErrorOn();
-                $this->dsCustomer->setValue(
-                    self::customerFormSectorMessage,
-                    'Required'
-                );
-            }
-            $this->dsCustomer->setValue(
-                DBECustomer::sectorID,
-                @$value['sectorID']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::leadStatusId,
-                @$value['leadStatusId']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::createDate,
-                @$value['createDate']
-            );
-
-            $this->dsCustomer->setValue(
-                DBECustomer::gscTopUpAmount,
-                @$value['gscTopUpAmount']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::becameCustomerDate,
-                @$value['becameCustomerDate']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::droppedCustomerDate,
-                @$value['droppedCustomerDate']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::lastReviewMeetingDate,
-                @$value['lastReviewMeetingDate']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewMeetingFrequencyMonths,
-                @$value['reviewMeetingFrequencyMonths']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewDate,
-                @$value['reviewDate']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewMeetingEmailSentFlag,
-                $this->getYN(@$value['reviewMeetingEmailSentFlag'])
-            );
-
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewAction,
-                @$value['reviewAction']
-
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewUserID,
-                @$value['reviewUserID']
-            );
-
-            $this->dsCustomer->setValue(
-                DBECustomer::accountManagerUserID,
-                @$value['accountManagerUserID']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewTime,
-                @$value['reviewTime']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::noOfServers,
-                @$value['noOfServers']
-            );
-
-            $this->dsCustomer->setValue(
-                DBECustomer::activeDirectoryName,
-                @$value['activeDirectoryName']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::noOfPCs,
-                @$value['noOfPCs']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::noOfSites,
-                @$value['noOfSites']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::comments,
-                @$value['comments']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::techNotes,
-                @$value['techNotes']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::slaP1,
-                @$value['slaP1']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::slaP2,
-                @$value['slaP2']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::slaP3,
-                @$value['slaP3']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::slaP4,
-                @$value['slaP4']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::slaP5,
-                @$value['slaP5']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::pcxFlag,
-                $this->getYN(@$value['pcxFlag'])
-            );
-
-            $this->dsCustomer->setValue(
-                DBECustomer::sortCode,
-                @$value['sortCode']
-            );
-
-            if (isset($value['newSortCode'])) {
-                $sortCode = null;
-                if ($value['newSortCode']) {
-                    $sortCode = Encryption::encrypt(
-                        CUSTOMERS_ENCRYPTION_PUBLIC_KEY,
-                        $value['newSortCode']
-                    );
-                }
-                $this->dsCustomer->setValue(
-                    DBECustomer::sortCode,
-                    $sortCode
-                );
-            }
+        foreach ($customerArray as $customerID => $customer) {
 
 
-            $this->dsCustomer->setValue(
-                DBECustomer::accountName,
-                @$value['accountName']
-            );
-
-            $this->dsCustomer->setValue(
-                DBECustomer::accountNumber,
-                @$value['accountNumber']
-            );
-
-            if (isset($value['newAccountNumber'])) {
-                $accountNumber = null;
-
-                if ($value['newAccountNumber']) {
-                    $accountNumber = Encryption::encrypt(
-                        CUSTOMERS_ENCRYPTION_PUBLIC_KEY,
-                        $value['newAccountNumber']
-                    );
-                }
-
-                $this->dsCustomer->setValue(
-                    DBECustomer::accountNumber,
-                    $accountNumber
-                );
-            }
-            $this->dsCustomer->post();
         }
     }
 
@@ -1269,7 +1013,7 @@ class CTCustomer extends CTCNC
 
     function getCustomerID()
     {
-        return $this->customerID;
+        return $_REQUEST['customerID'];
     }
 
     function setCustomerID($customerID)
@@ -1631,6 +1375,8 @@ class CTCustomer extends CTCNC
                 }
             }
             $this->dsCustomer->fetchNext();
+//            var_dump($this->dsCustomer->getValue(DBECustomer::reviewDate));
+//            exit;
 
 
             // If we can delete this customer set the link
@@ -1661,7 +1407,7 @@ class CTCustomer extends CTCNC
 
         $this->template->setVar(
             'javaScript',
-            "<script type=\"module\" src='components/customerEditMain/build/CustomerEditMain.js?version=1.0.0'></script>"
+            "<script src='components/customerEditMain/dist/CustomerEditMain.js?version=1.0.0'></script>"
         );
 
 // Parameters
@@ -1810,7 +1556,6 @@ class CTCustomer extends CTCNC
                     'showInactiveSites' => '1'
                 )
             );
-        $bodyTagExtras = 'onLoad="loadNote(\'last\')"';
 
         $urlContactPopup =
             Controller::buildLink(
@@ -1862,7 +1607,6 @@ class CTCustomer extends CTCNC
             array(
                 'lastContractSent'               => $this->dsCustomer->getValue(DBECustomer::lastContractSent),
                 'urlContactPopup'                => $urlContactPopup,
-                'bodyTagExtras'                  => $bodyTagExtras,
                 /* hidden */
                 'reviewMeetingEmailSentFlag'     => $this->dsCustomer->getValue(
                     DBECustomer::reviewMeetingEmailSentFlag
@@ -3544,7 +3288,15 @@ class CTCustomer extends CTCNC
                 $this->dsCustomer->fetchNext();
                 $this->setCustomerID($this->dsCustomer->getValue(DBECustomer::customerID));
             } else {                // Updates to customer and updates/inserts to sites and contacts
-                $this->buCustomer->updateCustomer($this->dsCustomer);
+
+                $dbeCustomer = new DBECustomer($this);
+                $dbeCustomer->getRow($this->getCustomerID());
+                $customerData = $_REQUEST['form']['customer'];
+                $dbeCustomer->setValue(DBECustomer::reviewDate, $customerData['reviewDate']);
+                $dbeCustomer->setValue(DBECustomer::reviewTime, $customerData['reviewTime']);
+                $dbeCustomer->setValue(DBECustomer::reviewUserID, $customerData['reviewUserID']);
+                $dbeCustomer->setValue(DBECustomer::reviewAction, $customerData['reviewAction']);
+                $dbeCustomer->updateRow();
                 $this->buCustomer->updateSite($this->dsSite);
                 if (isset($this->postVars["form"]["contact"])) {
                     $this->buCustomer->updateContact($this->dsContact);
