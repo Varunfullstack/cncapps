@@ -1,3 +1,5 @@
+import React from 'react';
+
 class Select extends React.Component {
     el = React.createElement;
 

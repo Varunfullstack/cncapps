@@ -1,22 +1,24 @@
+import React from 'react';
+import ReactInputMask from 'react-input-mask';
+
 class EncryptedTextInput extends React.Component {
     el = React.createElement;
 
     constructor(props) {
-        debugger;
         super(props);
         this.state = {
-            encryptedValue: props.value,
+            encryptedValue: props.encryptedValue,
             unencryptedValue: '',
             onChange: props.onChange,
-            isEncrypted: true
+            isEncrypted: !!props.encryptedValue
         }
 
         this.handleChange = this.handleChange.bind(this);
+        this.decryptValue = this.decryptValue.bind(this);
     }
 
     handleChange(e) {
-
-        this.setState({unencryptedValue: e.target.value});
+        this.setState({unencryptedValue: e.target.value.replace(/[^0-9]+/g, "")});
         if (this.props.onChange) {
             if (!e.target.value) {
                 return this.props.onChange(e.target.value);
@@ -33,13 +35,6 @@ class EncryptedTextInput extends React.Component {
                     this.setState({encryptedValue: response.data});
                     this.props.onChange(response.data);
                 })
-        }
-    }
-
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        debugger;
-        if (prevProps.encryptedValue !== this.props.encryptedValue) {
-            this.setState({encryptedValue: this.props.encryptedValue, unencryptedValue: '', isEncrypted: true});
         }
     }
 
@@ -98,12 +93,15 @@ class EncryptedTextInput extends React.Component {
     }
 
     render() {
-        debugger;
         if (this.state.isEncrypted && this.state.encryptedValue) {
-            return this.el('i', {
-                className: 'fa fa-pencil-alt greenPencil',
-                onClick: this.decryptValue
-            });
+            return this.el(
+                'button',
+                {onClick: this.decryptValue},
+                this.el(
+                    'i',
+                    {className: 'fa fa-pencil-alt greenPencil',}
+                )
+            );
         }
 
         // not encrypted ...we need to show the input
