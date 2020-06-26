@@ -986,6 +986,16 @@ class CTCustomer extends CTCNC
     {
         $this->setParentFormFields();
         switch ($this->getAction()) {
+            case 'encrypt':
+            {
+                $value = @$_REQUEST['value'];
+                $encrypted = Encryption::encrypt(
+                    CUSTOMERS_ENCRYPTION_PUBLIC_KEY,
+                    $value
+                );
+                echo json_encode(["status" => "ok", "data" => $encrypted]);
+                exit;
+            }
             case 'getCustomer':
             {
                 $customerID = @$_REQUEST['customerID'];
@@ -1619,7 +1629,8 @@ class CTCustomer extends CTCNC
 
         $this->template->setVar(
             'javaScript',
-            "<script type=\"module\" src='components/customerEditMain/CustomerEditMain.js?version=1.0.0'></script>"
+            "<script type=\"module\" src='components/customerEditMain/CustomerEditMain.js?version=1.0.0'></script>
+<script defer src='https://unpkg.com/react-input-mask/dist/react-input-mask.min.js'></script>"
         );
 
 // Parameters
