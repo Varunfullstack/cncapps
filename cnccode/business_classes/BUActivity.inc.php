@@ -11062,4 +11062,162 @@ FROM
 
         return $dsResults;
     }
+
+    function createActivityLeasedLineExpire(
+        $customerID,      
+        $custItemID,
+        $itemDescription,  
+        $expireDate,      
+        $problemStatus = 'I',
+        $priority=5,
+        $hideFromCustomerFlag='Y'
+    )
+    { 
+
+        $this->setMethodName('createActivityLeasedLineExpire');
+        $reason="Reason for request".'  :  '.$itemDescription .' will be expired at '
+        .$expireDate;
+        //$contractCustomerItemID =`custitem_contract`.cic_contractcuino
+        $problemStatus = 'I';
+        $userID =67 ;  // qsystem
+        $buCustomer = new BUCustomer($this);
+
+        $dsCustomer = new DataSet($this);
+
+        $buCustomer->getCustomerByID(
+            $customerID,
+            $dsCustomer
+        );
+        $buSite = new BUSite($this);
+
+        $dsSite = new DataSet($this);
+        $buSite->getSiteByID(
+            $customerID,
+            $dsCustomer->getValue(DBECustomer::deliverSiteNo),
+            $dsSite
+        );
+
+        // create new problem here
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->setValue(
+            DBEJProblem::customerID,
+            $customerID
+        );
+        $dbeProblem->setValue(
+            DBEJProblem::status,
+            $problemStatus
+        );
+        $dbeProblem->setValue(
+            DBEJProblem::priority,
+            $priority
+        );
+        $dbeProblem->setValue(
+            DBEJProblem::dateRaised,
+            date(DATE_MYSQL_DATETIME)
+        ); // default
+        $dbeProblem->setValue(
+           'problemraisetypeId',
+            6
+        );
+        $dbeProblem->setValue(
+            DBEJProblem::hideFromCustomerFlag,
+            $hideFromCustomerFlag
+        );
+         
+        $dbeProblem->insertRow();
+//callactivity.salesRequestStatus = 'O' and caa_callacttypeno = 43
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActivityID,
+            0
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::siteNo,
+            $dsSite->getValue(DBESite::siteNo)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::contactID,
+            $dsSite->getValue(DBESite::invoiceContactID)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActTypeID,
+            43
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::date,
+            date(DATE_MYSQL_DATE)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::startTime,
+            date('H:i')
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::endTime,
+            null
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::status,
+            'O'
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::salesRequestStatus,
+            'O'
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::reason,
+            $reason
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::userID,
+            $userID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::problemID,
+            $dbeProblem->getPKValue()
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::curValue,
+            0.00
+        );
+
+        $dbeCallActivity->insertRow();
+        // send email to grahaml@cnc-ltd.co.uk
+        $buMail = new BUMail($this);
+        $senderEmail = CONFIG_SUPPORT_EMAIL;
+        $activityRef =  $dbeProblem->getPKValue() . ' ' .$dsCustomer->getValue(DBECustomer::name);
+        $body ="The service #ServiceName at #CustomerName comes to the end of contract on the #expireDate.
+        Please review to ensure that appropriate action is taken and a proposal submitted to the customer.";
+
+        $body=str_replace("#ServiceName","<a href='/RenBroadband.php?action=edit&ID=$custItemID' title='$itemDescription'>$itemDescription</a>",$body);
+        $body=str_replace("#CustomerName", $dsCustomer->getValue(DBECustomer::name),$body);
+        $body=str_replace("#expireDate", $expireDate,$body);
+        $toEmail="grahaml@cnc-ltd.co.uk";         
+        $hdrs = array(
+            'From'         => $senderEmail,
+            'To'           => $toEmail,
+            'Subject'      => CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' - Will expire',
+            'Date'         => date("r"),
+            'Content-Type' => 'text/html; charset=UTF-8'
+        );
+
+        $buMail->mime->setHTMLBody($body);
+
+        $mime_params = array(
+            'text_encoding' => '7bit',
+            'text_charset'  => 'UTF-8',
+            'html_charset'  => 'UTF-8',
+            'head_charset'  => 'UTF-8'
+        );
+
+        $body = $buMail->mime->get($mime_params);
+        $hdrs = $buMail->mime->headers($hdrs);
+        $buMail->putInQueue(
+            $senderEmail,
+            $toEmail,
+            $hdrs,
+            $body
+        );
+        return true;
+    }
+    
 }
