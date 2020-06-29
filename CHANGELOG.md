@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [unreleased]
+### Added
+- Leased line contract expiry notification
 
 ## [unreleased]
 ### Added
