@@ -362,6 +362,12 @@ WHERE customer.`cus_referred` <> 'Y'
             DA_YN_FLAG,
             DA_ALLOW_NULL
         );
+        $dsSearchForm->addColumn(
+            DBEContact::active,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            false
+        );
 
 
         $buHeader = new BUHeader($this);
@@ -403,7 +409,7 @@ WHERE customer.`cus_referred` <> 'Y'
                     $dsSearchForm,
                     $contractItemIDs
                 );
-            
+
             if ($this->getParam('Export')) {
                 $this->generateCSV($results);
                 exit;
@@ -546,6 +552,7 @@ WHERE customer.`cus_referred` <> 'Y'
                 'reviewUserChecked'            => Controller::htmlChecked(
                     $dsSearchForm->getValue(DBEContact::reviewUser)
                 ),
+                'activeChecked'                => $dsSearchForm->getValue(DBEContact::active) ? 'checked' : 'null',
                 'hrUserChecked'                => Controller::htmlChecked(
                     $dsSearchForm->getValue(DBEContact::hrUser)
                 ),
