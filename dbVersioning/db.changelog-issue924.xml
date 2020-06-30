@@ -12,7 +12,7 @@
             </not>
         </preConditions>
         <addColumn tableName="customer">
-            <column name="slaFixHoursP1" type="decimal(4,1)" defaultValue="8">
+            <column name="slaFixHoursP1" type="decimal(4,1)" defaultValue="12">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
@@ -56,5 +56,32 @@
             </column>
         </addColumn>
     </changeSet>
+
+    <changeSet id="issue924-5" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="slaPenaltiesAgreed"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="slaPenaltiesAgreed" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="issue924-6" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="headert" columnName="fixSLABreachWarningHours"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="headert">
+            <column name="fixSLABreachWarningHours" type="decimal(4,1)" defaultValue="2.5">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 
 </databaseChangeLog>

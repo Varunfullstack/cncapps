@@ -71,6 +71,7 @@ class DBECustomer extends DBCNCEntity
     const slaFixHoursP2 = "slaFixHoursP2";
     const slaFixHoursP3 = "slaFixHoursP3";
     const slaFixHoursP4 = "slaFixHoursP4";
+    const slaPenaltiesAgreed = "slaPenaltiesAgreed";
 
     /**
      * calls constructor()
@@ -441,6 +442,14 @@ class DBECustomer extends DBCNCEntity
             self::websiteURL,
             DA_TEXT,
             DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::slaPenaltiesAgreed,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
         );
 
         $this->setPK(0);

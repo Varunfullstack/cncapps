@@ -755,6 +755,11 @@ class CTCustomer extends CTCNC
                 @$value['specialAttentionEndDate']
             );
 
+            $this->dsCustomer->setValue(
+                DBECustomer::slaPenaltiesAgreed,
+                @$value['slaPenaltiesAgreed']
+            );
+
             if (
                 $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
                 !$this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)
@@ -1821,6 +1826,9 @@ class CTCustomer extends CTCNC
                 'slaP3'                          => $this->dsCustomer->getValue(DBECustomer::slaP3),
                 'slaP4'                          => $this->dsCustomer->getValue(DBECustomer::slaP4),
                 'slaP5'                          => $this->dsCustomer->getValue(DBECustomer::slaP5),
+                'slaPenaltiesAgreedChecked'      => $this->dsCustomer->getValue(
+                    DBECustomer::slaPenaltiesAgreed
+                ) ? 'checked' : null,
                 'slaFixHoursP1'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP1),
                 'slaFixHoursP2'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP2),
                 'slaFixHoursP3'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP3),
