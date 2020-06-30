@@ -646,7 +646,7 @@ class CTCNC extends Controller
             [
                 "id"    => 208,
                 "label" => "SLA Performance",
-                "href"  => "TeamPerformanceReport.php"
+                "href"  => "SLAPerformance.php"
             ],
             [
                 "id"    => 209,

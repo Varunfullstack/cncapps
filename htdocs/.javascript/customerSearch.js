@@ -4,6 +4,7 @@
 
         const autocompleteURL = "/Customer.php?action=searchName";
         $('input[type="text"][customer-search]').each(function () {
+            debugger;
             const that = this;
             // we are going to pull options out of attributes
             let defaultOptions = {
