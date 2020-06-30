@@ -617,7 +617,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                     break;
                 case "UserMailbox":
                     $mailboxes[$key]['RecipientTypeDetails'] = "User";
-                    $licensedUsers++;
                     break;
                 case 'RoomMailbox':
                     $mailboxes[$key]['RecipientTypeDetails'] = "Room";
@@ -671,10 +670,10 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             true
         );
         $highestRow = count($mailboxes) + 2;
-        if ($licensedUsers + $otherLicenses) {
             $updateCustomer = new DBECustomer($thing);
             $updateCustomer->getRow($dbeCustomer->getValue(DBECustomer::customerID));
-            $updateCustomer->setValue(DBECustomer::licensedOffice365Users, $licensedUsers + $otherLicenses);
+        if ($licensedUsers != $updateCustomer->getValue(DBECustomer::licensedOffice365Users)) {
+            $updateCustomer->setValue(DBECustomer::licensedOffice365Users, $licensedUsers);
             $updateCustomer->updateRow();
         }
         $mailboxesSheet->fromArray(

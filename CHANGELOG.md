@@ -15,6 +15,10 @@ This project changes will be shown here.
 - Issue 892 - Lead Status Layout Change
 - Issue 822 - Combining SRs for Sales Order ordering issue
 
+## [v4.1.9] - 2020-06-30
+### Fixed
+- Office365LicensesExport.php not correctly counting number of licensed mailboxes.
+
 ## [v4.1.8] - 2020-06-26
 ### Fixed
 - Fix issue in activityCreate1 when the customer name has an apostrophe
