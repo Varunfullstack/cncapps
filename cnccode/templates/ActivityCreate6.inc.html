@@ -1,6 +1,6 @@
 <!-- Template: ActivityCreate6.inc.html -->
 {activityWizardHeader} {contractListPopupLink} {thirdPartyContactLink} {contactHistoryLink}
-<BR/><BR/>
+<BR>
 <script src="CommonJS.js"></script>
 <script>
     window.addEventListener('DOMContentLoaded', function () {
@@ -13,14 +13,38 @@
         );
     })
 
+    function changeContactNotes(contactID) {
+        if (!contactID) {
+            return;
+        }
+        const object = {contactID: contactID};
+        $.LoadingOverlay("show", {text: 'Fetching contact details'});
+        $.ajax({
+            url: '?action=contactNotes',
+            method: 'POST',
+            type: 'post',
+            dataType: 'json',
+            data: object
+        }).then(function (result) {
+            $('.contactPhone').html(result.phone);
+        }).catch(function () {
+        }).then(function () {
+            $.LoadingOverlay('hide');
+        });
+
+    }
+
     function checkauthorisedBy() {
-        if ($('#contactID').find(':selected').text().indexOf('- Delegate') > -1) {
+        const selectedOption = $('#contactID')[0].selectedOptions[0];
+        if (selectedOption && selectedOption.text.indexOf('- Delegate') > -1) {
             $("#authorisedRow").show();
             $("#authorisedBy").prop('required', true);
         } else {
             $("#authorisedBy").prop('required', false);
             $("#authorisedRow").hide();
         }
+
+        changeContactNotes(selectedOption && selectedOption.value);
     }
 
 </script>
@@ -130,7 +154,10 @@
                     </option>
                     <!-- END contactBlock -->
                 </select>
-                <a href="tel:{contactPhone}">{contactPhone}</a><span class="formErrorMessage">{contactIDMessage}</span>
+                <span class="contactPhone">
+
+                </span>
+                <span class="formErrorMessage">{contactIDMessage}</span>
             </td>
 
             <td class="promptText">Date Raised</td>
