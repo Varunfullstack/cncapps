@@ -11116,10 +11116,6 @@ FROM
             date(DATE_MYSQL_DATETIME)
         ); // default
         $dbeProblem->setValue(
-           'problemraisetypeId',
-            6
-        );
-        $dbeProblem->setValue(
             DBEJProblem::hideFromCustomerFlag,
             $hideFromCustomerFlag
         );
