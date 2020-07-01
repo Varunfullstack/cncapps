@@ -1527,6 +1527,10 @@ class CTCustomer extends CTCNC
             'CustomerEditSimple.inc'
         );
 
+        $this->template->setVar(
+            'javaScript',
+            "<script src='components/customerEditMain/dist/CustomerEditMain.js?version=1.0.0'></script>"
+        );
 
 // Parameters
         $title = "Customer - " . $this->dsCustomer->getValue(DBECustomer::name);
