@@ -593,7 +593,6 @@ class CTActivity extends CTCNC
                 $this->displaySearchForm(); //redisplay with errors
                 exit;
             }
-
             if ($this->countParamsSet($this->getParam('activity')) < 2 and
                 empty($this->dsSearchForm->getValue(BUActivity::searchFormCustomerID)) and
                 $this->dsSearchForm->getValue(BUActivity::searchFormContractCustomerItemID) == '99' and

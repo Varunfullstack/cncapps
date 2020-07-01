@@ -116,42 +116,6 @@ class BUProblemSLA extends Business
         $this->dbeJProblem = new DBEJProblem($this);
     }
 
-    function checkSLAFix($problemID,$workingHours){
-        $dbeCustomer = new DBECustomer($this);
-        $dbeCustomer->getRow($problemID);
-
-        if ($dbeCustomer->getValue(DBECustomer::slaPenaltiesAgreed)) {
-            $fixSLAValue = null;
-
-            switch ($this->dbeProblem->getValue(DBEProblem::priority)) {
-                case 1 :
-                    $fixSLAValue = $dbeCustomer->getValue(DBECustomer::slaFixHoursP1);
-                    break;
-                case 2 :
-                    $fixSLAValue = $dbeCustomer->getValue(DBECustomer::slaFixHoursP2);
-                    break;
-                case 3 :
-                    $fixSLAValue = $dbeCustomer->getValue(DBECustomer::slaFixHoursP3);
-                    break;
-                case 4 :
-                    $fixSLAValue = $dbeCustomer->getValue(DBECustomer::slaFixHoursP4);
-                    break;
-                default:
-                    $fixSLAValue = null;
-            }
-
-            if ($fixSLAValue) {
-                $buHeader = new BUHeader($this);
-                $dsHeader = new DataSet($this);
-                $buHeader->getHeader($dsHeader);
-                // we have a value..so now we need to evaluate if we have to send the email or not
-                if (($fixSLAValue - $workingHours) <= $dsHeader->getValue(DBEHeader::fixSLABreachWarningHours)) {
-                    $this->sendFixSlaAlertEmail($problemID);
-                }
-            }
-        }
-    }
-
     function monitor($dryRun = false, $problemID = null, $debug = false)
     {
         $dsProblems = new DataSet($this);
@@ -180,7 +144,7 @@ class BUProblemSLA extends Business
             $workingHours = $this->getWorkingHours($dsProblems->getValue(DBEProblem::problemID));
             $hoursToSLA = $dsProblems->getValue(DBEProblem::slaResponseHours) - $workingHours;
 
-            $this->checkSLAFix($problemID, $workingHours);
+            $this->checkSLAFix($this->dbeProblem, $workingHours);
 
             /*
             Send an alert email to managers if within 20 minutes of SLA response hours and not priority 4 or 5
@@ -248,7 +212,7 @@ class BUProblemSLA extends Business
             $workingHours = $this->getWorkingHours($dsProblems->getValue(DBEProblem::problemID));
 
             $this->dbeProblem->getRow($dsProblems->getValue(DBEProblem::problemID));
-            $this->checkSLAFix($problemID, $workingHours);
+            $this->checkSLAFix($this->dbeProblem, $workingHours);
 
             $this->dbeProblem->setValue(
                 DBEProblem::workingHours,
@@ -320,7 +284,7 @@ class BUProblemSLA extends Business
             }
         }
 
-    } // end function monitor
+    }
 
     /**
      * Calculate number of working hours for a problem
@@ -461,7 +425,7 @@ class BUProblemSLA extends Business
 
         return round($returnHours, 2);
 
-    } // end function autoCompletion
+    } // end function monitor
 
     function getWorkingHoursBetweenUnixDates($utStart,
                                              $utEnd,
@@ -585,21 +549,60 @@ class BUProblemSLA extends Business
         }
 
         return ($includedSeconds / self::hour);
+    } // end function autoCompletion
+
+    function checkSLAFix(DBEProblem $dsProblem, $workingHours)
+    {
+        $dbeCustomer = new DBECustomer($this);
+        $dbeCustomer->getRow($dsProblem->getValue(DBEProblem::customerID));
+
+        if ($dbeCustomer->getValue(DBECustomer::slaPenaltiesAgreed)) {
+            $fixSLAValue = null;
+
+            switch ($this->dbeProblem->getValue(DBEProblem::priority)) {
+                case 1 :
+                    $fixSLAValue = $dbeCustomer->getValue(DBECustomer::slaFixHoursP1);
+                    break;
+                case 2 :
+                    $fixSLAValue = $dbeCustomer->getValue(DBECustomer::slaFixHoursP2);
+                    break;
+                case 3 :
+                    $fixSLAValue = $dbeCustomer->getValue(DBECustomer::slaFixHoursP3);
+                    break;
+                case 4 :
+                    $fixSLAValue = $dbeCustomer->getValue(DBECustomer::slaFixHoursP4);
+                    break;
+                default:
+                    $fixSLAValue = null;
+            }
+
+            if ($fixSLAValue) {
+                $buHeader = new BUHeader($this);
+                $dsHeader = new DataSet($this);
+                $buHeader->getHeader($dsHeader);
+                // we have a value..so now we need to evaluate if we have to send the email or not
+                if (($fixSLAValue - $workingHours) <= $dsHeader->getValue(DBEHeader::fixSLABreachWarningHours)) {
+                    $dbeJProblem = new DBEJProblem($this);
+                    $dbeJProblem->getRow($dsProblem->getValue(DBEProblem::problemID));
+                    $this->sendFixSlaAlertEmail($dbeJProblem);
+                }
+            }
+        }
     }
 
     /**
      * Sends Fix SLA Alert
      *
-     * @param $problemID
+     * @param DBEJProblem $DBEProblem
      */
-    function sendFixSlaAlertEmail($problemID)
+    function sendFixSlaAlertEmail(DBEJProblem $DBEProblem)
     {
         $buMail = new BUMail($this);
 
-        $dbeJProblem = new DBEJProblem($this);
-        $dbeJProblem->getRow($problemID);
 
-        if ($dbeJCallActivity = $this->buActivity->getFirstActivityInProblem($problemID)) {
+        if ($dbeJCallActivity = $this->buActivity->getFirstActivityInProblem(
+            $DBEProblem->getValue(DBEProblem::problemID)
+        )) {
             $senderEmail = CONFIG_SUPPORT_EMAIL;
 
             $toEmail = 'fixslabreach@' . CONFIG_PUBLIC_DOMAIN;
@@ -621,7 +624,7 @@ class BUProblemSLA extends Business
             $template->setVar(
                 array(
                     'urlActivity'                 => $urlActivity,
-                    'customerName'                => $dbeJProblem->getValue(DBEJProblem::customerName),
+                    'customerName'                => $DBEProblem->getValue(DBEJProblem::customerName),
                     'activityRef'                 => $activityRef,
                     'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
                     'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC,
@@ -639,9 +642,9 @@ class BUProblemSLA extends Business
             $hdrs = array(
                 'To'           => $toEmail,
                 'From'         => $senderEmail,
-                'Subject'      => 'Fix SLA WARNING - SR for ' . $dbeJProblem->getValue(
+                'Subject'      => 'Fix SLA WARNING - SR for ' . $DBEProblem->getValue(
                         DBEJProblem::customerName
-                    ) . 'assigned to ' . $dbeJProblem->getValue(
+                    ) . 'assigned to ' . $DBEProblem->getValue(
                         DBEJProblem::engineerName
                     ) . ' close to breaching the agreed fix SLA',
                 'Date'         => date("r"),

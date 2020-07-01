@@ -123,6 +123,20 @@ $app->group(
             ELSE 0
         END,
         NULL)) AS fixSLAFailedCount,
+       sum(
+               if(
+                       pro_status in ('F', 'C'),
+                       timestampdiff(HOUR, concat(initial.caa_date, ' ', initial.caa_endtime, ':00'),
+                                     concat(fixed.caa_date, ' ', fixed.caa_starttime, ':00')) >
+                       CASE problem.`pro_priority`
+                           WHEN 1 THEN customer.slaFixHoursP1
+                           WHEN 2 THEN customer.slaFixHoursP2
+                           WHEN 3 THEN customer.slaFixHoursP3
+                           WHEN 4 THEN customer.slaFixHoursP4
+                           END,
+                       null
+                   )
+           )                              as overFixSLAWorkingHours,
     AVG(IF(pro_status IN ('F' , 'C'),
         openHours < 8,
         NULL)) AS closedWithin8Hours,
@@ -146,12 +160,13 @@ FROM
         LEFT JOIN
     callactivity initial ON initial.`caa_problemno` = problem.`pro_problemno`
         AND initial.`caa_callacttypeno` = 51
+        left join callactivity fixed on fixed.caa_problemno = problem.pro_problemno and fixed.caa_callacttypeno = 57
         JOIN
     customer ON problem.`pro_custno` = customer.`cus_custno`
 WHERE
 
         problem.pro_custno = ?
-  and caa_date between ? and ?
+  and initial.caa_date between ? and ?
         AND pro_priority < 5";
 
                 if ($isBreakDown) {
@@ -207,6 +222,20 @@ WHERE
             ELSE 0
         END,
         NULL)) AS fixSLAFailedCount,
+       sum(
+               if(
+                       pro_status in ('F', 'C'),
+                       timestampdiff(HOUR, concat(initial.caa_date, ' ', initial.caa_endtime, ':00'),
+                                     concat(fixed.caa_date, ' ', fixed.caa_starttime, ':00')) >
+                       CASE problem.`pro_priority`
+                           WHEN 1 THEN customer.slaFixHoursP1
+                           WHEN 2 THEN customer.slaFixHoursP2
+                           WHEN 3 THEN customer.slaFixHoursP3
+                           WHEN 4 THEN customer.slaFixHoursP4
+                           END,
+                       null
+                   )
+           )                              as overFixSLAWorkingHours,
     AVG(IF(pro_status IN ('F' , 'C'),
         openHours < 8,
         NULL)) AS closedWithin8Hours,
@@ -230,12 +259,13 @@ FROM
         LEFT JOIN
     callactivity initial ON initial.`caa_problemno` = problem.`pro_problemno`
         AND initial.`caa_callacttypeno` = 51
+        left join callactivity fixed on fixed.caa_problemno = problem.pro_problemno and fixed.caa_callacttypeno = 57
         JOIN
     customer ON problem.`pro_custno` = customer.`cus_custno`
 WHERE
 
         problem.pro_custno = ?
-  and caa_date between ? and ?
+  and initial.caa_date between ? and ?
         AND pro_priority < 5
         group by pro_priority
         order by pro_priority ";

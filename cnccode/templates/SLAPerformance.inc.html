@@ -281,6 +281,25 @@
                     reportSectionElement = document.getElementById('reportSection');
                 });
 
+                function generateOverFixSLAWorkingHoursLink(label, priority) {
+                    const url = new URL('/Activity.php', window.location.protocol + "//" + window.location.host);
+                    url.searchParams.append('action', 'search');
+                    url.searchParams.append('activity[1][customerID]', customerIdInput.value);
+                    url.searchParams.append('activity[1][callActTypeID]', '51');
+                    url.searchParams.append('activity[1][contractCustomerItemID]', '99');
+                    url.searchParams.append('activity[1][searchFormOverFixSLAWorkingHours]', "1");
+                    url.searchParams.append('activity[1][fromDate]', startDateInput.value);
+                    url.searchParams.append('activity[1][toDate]', endDateInput.value);
+                    url.searchParams.append('activity[1][status]', "FIXED_OR_COMPLETED");
+                    if (priority) {
+                        url.searchParams.append('activity[1][priority]', priority);
+                    }
+                    const anchor = document.createElement('a');
+                    anchor.target = '_blank';
+                    anchor.href = url.toString();
+                    anchor.text = label;
+                    return anchor
+                }
 
                 function generateActivitySearchLink(label, priority) {
 
@@ -374,14 +393,14 @@
                     };
 
                     const labels = {
-                        "raised": {
-                            label: "Total SRs Raised",
+                        "fixed": {
+                            label: "Total SRs fixed",
                             format: x => x,
                             assignClass: noColour,
                             showInSummary: true
                         },
-                        "fixed": {
-                            label: "Total SRs fixed",
+                        "raised": {
+                            label: "Total SRs Raised",
                             format: x => x,
                             assignClass: noColour,
                             showInSummary: true
@@ -445,6 +464,13 @@
                             assignClass: zeroTolerance,
                             showInSummary: false,
                             link: generateActivitySearchLink
+                        },
+                        "overFixSLAWorkingHours": {
+                            label: "Number of SRs over Fix SLA Working Hours",
+                            format: x => x,
+                            assignClass: zeroTolerance,
+                            showInSummary: false,
+                            link: generateOverFixSLAWorkingHoursLink
                         }
                     };
                     const customersData = [];

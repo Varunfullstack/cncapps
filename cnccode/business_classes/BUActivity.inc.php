@@ -89,6 +89,7 @@ class BUActivity extends Business
     const searchFormManagementReviewOnly = 'managementReviewOnly';
     const searchFormBreachedSlaOption = 'breachedSlaOption';
     const searchFormFixSLAOption = "searchFormFixSLAOption";
+    const searchFormOverFixSLAWorkingHours = "searchFormOverFixSLAWorkingHours";
 
     const customerActivityMonthFormCustomerID = 'customerID';
     const customerActivityMonthFormFromDate = 'fromDate';
@@ -322,6 +323,13 @@ class BUActivity extends Business
             DA_ALLOW_NULL
         );
 
+        $dsData->addColumn(
+            self::searchFormOverFixSLAWorkingHours,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            false
+        );
+
         $dsData->setValue(
             self::searchFormCustomerID,
             null
@@ -374,7 +382,11 @@ class BUActivity extends Business
             self::searchFormFixSLAOption,
             null
         );
-    } // end sendServiceReallocatedEmail
+        $dsData->setValue(
+            self::searchFormOverFixSLAWorkingHours,
+            false
+        );
+    }
 
     function initialiseCustomerActivityMonthForm(&$dsData)
     {
@@ -436,7 +448,8 @@ class BUActivity extends Business
             $sortColumn,
             $sortDirection,
             $limit,
-            trim($dsSearchForm->getValue(self::searchFormFixSLAOption))
+            trim($dsSearchForm->getValue(self::searchFormFixSLAOption)),
+            trim($dsSearchForm->getValue(self::searchFormOverFixSLAWorkingHours))
         );
         $this->dbeCallActivitySearch->fetchNext();
 

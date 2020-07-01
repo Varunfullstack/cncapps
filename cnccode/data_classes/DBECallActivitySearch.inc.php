@@ -336,7 +336,8 @@ class DBECallActivitySearch extends DBEntity
         $sortColumn = false,
         $sortDirection = 'ASC',
         $limit = true,
-        $fixSLAStatus = null
+        $fixSLAStatus = null,
+        $overFixSLAWorkingHours = null
     )
     {
         $this->setMethodName('getRowsBySearchCriteria');
@@ -395,6 +396,27 @@ class DBECallActivitySearch extends DBEntity
                     " AND caa_callactivityno = " . $callActivityID;
             }
         }
+
+        if ($overFixSLAWorkingHours) {
+            $statement .= " and caa_problemno in (select pro_problemno
+                        from problem
+                                 join callactivity initial ON initial.`caa_problemno` = problem.`pro_problemno` AND
+                                                              initial.`caa_callacttypeno` = 51
+                                 join callactivity fixed
+                                      on fixed.caa_problemno = problem.pro_problemno and fixed.caa_callacttypeno = 57
+                        where pro_status in ('F', 'C')
+                          and timestampdiff(HOUR, concat(initial.caa_date, ' ', initial.caa_starttime, ':00'),
+                                            concat(fixed.caa_date, ' ', fixed.caa_starttime, ':00')
+                                  ) >
+                              CASE problem.`pro_priority`
+                                  WHEN 1 THEN customer.slaFixHoursP1
+                                  WHEN 2 THEN customer.slaFixHoursP2
+                                  WHEN 3 THEN customer.slaFixHoursP3
+                                  WHEN 4 THEN customer.slaFixHoursP4
+                                  END
+)";
+        }
+
         if ($problemID) {
             if (strpos(
                 $problemID,
@@ -616,6 +638,7 @@ class DBECallActivitySearch extends DBEntity
         if ($limit) {
             $statement .= " LIMIT 0, 150";
         }
+
         $this->setQueryString($statement);
         $ret = (parent::getRows());
         return $ret;
