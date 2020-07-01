@@ -6702,6 +6702,19 @@ is currently a balance of ';
         return $dsResults;
     }
 
+
+    function getSLAWarningProblems()
+    {
+        $dbeJProblem = new DBEJProblem($this);
+        $dbeJProblem->getSLAWarningRows();
+        $dsResults = new DataSet($this);
+        $this->getData(
+            $dbeJProblem,
+            $dsResults
+        );
+        return $dsResults;
+    }
+
     /**
      * Get future dated SRs
      *
