@@ -757,7 +757,17 @@ class CTCustomer extends CTCNC
 
             $this->dsCustomer->setValue(
                 DBECustomer::slaP1PenaltiesAgreed,
-                @$value['slaPenaltiesAgreed']
+                @$value['slaP1PenaltiesAgreed']
+            );
+
+            $this->dsCustomer->setValue(
+                DBECustomer::slaP2PenaltiesAgreed,
+                @$value['slaP2PenaltiesAgreed']
+            );
+
+            $this->dsCustomer->setValue(
+                DBECustomer::slaP3PenaltiesAgreed,
+                @$value['slaP3PenaltiesAgreed']
             );
 
             if (
@@ -1826,8 +1836,14 @@ class CTCustomer extends CTCNC
                 'slaP3'                          => $this->dsCustomer->getValue(DBECustomer::slaP3),
                 'slaP4'                          => $this->dsCustomer->getValue(DBECustomer::slaP4),
                 'slaP5'                          => $this->dsCustomer->getValue(DBECustomer::slaP5),
-                'slaPenaltiesAgreedChecked'      => $this->dsCustomer->getValue(
+                'slaP1PenaltiesAgreedChecked'    => $this->dsCustomer->getValue(
                     DBECustomer::slaP1PenaltiesAgreed
+                ) ? 'checked' : null,
+                'slaP2PenaltiesAgreedChecked'    => $this->dsCustomer->getValue(
+                    DBECustomer::slaP2PenaltiesAgreed
+                ) ? 'checked' : null,
+                'slaP3PenaltiesAgreedChecked'    => $this->dsCustomer->getValue(
+                    DBECustomer::slaP3PenaltiesAgreed
                 ) ? 'checked' : null,
                 'slaFixHoursP1'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP1),
                 'slaFixHoursP2'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP2),

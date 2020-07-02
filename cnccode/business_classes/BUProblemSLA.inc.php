@@ -556,36 +556,41 @@ class BUProblemSLA extends Business
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($dsProblem->getValue(DBEProblem::customerID));
 
-        if ($dbeCustomer->getValue(DBECustomer::slaP1PenaltiesAgreed)) {
-            $fixSLAValue = null;
 
-            switch ($this->dbeProblem->getValue(DBEProblem::priority)) {
-                case 1 :
-                    $fixSLAValue = $dbeCustomer->getValue(DBECustomer::slaFixHoursP1);
-                    break;
-                case 2 :
-                    $fixSLAValue = $dbeCustomer->getValue(DBECustomer::slaFixHoursP2);
-                    break;
-                case 3 :
-                    $fixSLAValue = $dbeCustomer->getValue(DBECustomer::slaFixHoursP3);
-                    break;
-                case 4 :
-                    $fixSLAValue = $dbeCustomer->getValue(DBECustomer::slaFixHoursP4);
-                    break;
-                default:
-                    $fixSLAValue = null;
-            }
+        $fixSLAValue = null;
 
-            if ($fixSLAValue) {
-                $buHeader = new BUHeader($this);
-                $dsHeader = new DataSet($this);
-                $buHeader->getHeader($dsHeader);
-                // we have a value..so now we need to evaluate if we have to send the email or not
-                if (($fixSLAValue - $workingHours) <= $dsHeader->getValue(DBEHeader::fixSLABreachWarningHours)) {
-                    $dbeJProblem = new DBEJProblem($this);
-                    $dbeJProblem->getRow($dsProblem->getValue(DBEProblem::problemID));
-                    $this->sendFixSlaAlertEmail($dbeJProblem);
+        switch ($this->dbeProblem->getValue(DBEProblem::priority)) {
+            case 1 :
+                if (!$dbeCustomer->getValue(DBECustomer::slaP1PenaltiesAgreed)) {
+                    return;
                 }
+                $fixSLAValue = $dbeCustomer->getValue(DBECustomer::slaFixHoursP1);
+                break;
+            case 2 :
+                if (!$dbeCustomer->getValue(DBECustomer::slaP2PenaltiesAgreed)) {
+                    return;
+                }
+                $fixSLAValue = $dbeCustomer->getValue(DBECustomer::slaFixHoursP2);
+                break;
+            case 3 :
+                if (!$dbeCustomer->getValue(DBECustomer::slaP3PenaltiesAgreed)) {
+                    return;
+                }
+                $fixSLAValue = $dbeCustomer->getValue(DBECustomer::slaFixHoursP3);
+                break;
+            default:
+                return;
+        }
+
+        if ($fixSLAValue) {
+            $buHeader = new BUHeader($this);
+            $dsHeader = new DataSet($this);
+            $buHeader->getHeader($dsHeader);
+            // we have a value..so now we need to evaluate if we have to send the email or not
+            if (($fixSLAValue - $workingHours) <= $dsHeader->getValue(DBEHeader::fixSLABreachWarningHours)) {
+                $dbeJProblem = new DBEJProblem($this);
+                $dbeJProblem->getRow($dsProblem->getValue(DBEProblem::problemID));
+                $this->sendFixSlaAlertEmail($dbeJProblem);
             }
         }
     }
