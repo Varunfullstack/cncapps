@@ -60,17 +60,41 @@
     <changeSet id="issue924-5" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="customer" columnName="slaPenaltiesAgreed"/>
+                <columnExists tableName="customer" columnName="slaP1PenaltiesAgreed"/>
             </not>
         </preConditions>
         <addColumn tableName="customer">
-            <column name="slaPenaltiesAgreed" type="tinyint(1)" defaultValue="0">
+            <column name="slaP1PenaltiesAgreed" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue924-6" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="slaP2PenaltiesAgreed"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="slaP2PenaltiesAgreed" type="tinyint(1)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue924-7" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="slaP3PenaltiesAgreed"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="slaP3PenaltiesAgreed" type="tinyint(1)" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
     </changeSet>
 
-    <changeSet id="issue924-6" author="pavwebdev">
+    <changeSet id="issue924-8" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="headert" columnName="fixSLABreachWarningHours"/>

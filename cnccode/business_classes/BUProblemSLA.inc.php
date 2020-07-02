@@ -556,7 +556,7 @@ class BUProblemSLA extends Business
         $dbeCustomer = new DBECustomer($this);
         $dbeCustomer->getRow($dsProblem->getValue(DBEProblem::customerID));
 
-        if ($dbeCustomer->getValue(DBECustomer::slaPenaltiesAgreed)) {
+        if ($dbeCustomer->getValue(DBECustomer::slaP1PenaltiesAgreed)) {
             $fixSLAValue = null;
 
             switch ($this->dbeProblem->getValue(DBEProblem::priority)) {
@@ -608,45 +608,27 @@ class BUProblemSLA extends Business
             $toEmail = 'fixslabreach@' . CONFIG_PUBLIC_DOMAIN;
 
             $activityRef = $dbeJCallActivity->getValue(DBEJCallActivity::problemID);
+            global $twig;
 
-            $template = new Template (
-                EMAIL_TEMPLATE_DIR,
-                "remove"
+            $urlActivity = SITE_URL . "/Activity.php?action=displayActivity&callActivityID={$dbeJCallActivity->getPKValue()}";
+            $body = $twig->render(
+                '@internal/fixSLAWarningEmail.html.twig',
+                [
+                    "serviceRequestId" => $activityRef,
+                    "activityURL"      => $urlActivity,
+                ]
             );
-            $template->set_file(
-                'page',
-                'SlaAlertEmail.inc.html'
-            );
-
-            $urlActivity = SITE_URL . '/Activity.php?action=displayActivity&callActivityID=' . $dbeJCallActivity->getPKValue(
-                );
-
-            $template->setVar(
-                array(
-                    'urlActivity'                 => $urlActivity,
-                    'customerName'                => $DBEProblem->getValue(DBEJProblem::customerName),
-                    'activityRef'                 => $activityRef,
-                    'reason'                      => $dbeJCallActivity->getValue(DBEJCallActivity::reason),
-                    'CONFIG_SERVICE_REQUEST_DESC' => CONFIG_SERVICE_REQUEST_DESC,
-                )
-            );
-
-            $template->parse(
-                'output',
-                'page',
-                true
-            );
-
-            $body = $template->get_var('output');
 
             $hdrs = array(
                 'To'           => $toEmail,
                 'From'         => $senderEmail,
                 'Subject'      => 'Fix SLA WARNING - SR for ' . $DBEProblem->getValue(
                         DBEJProblem::customerName
-                    ) . 'assigned to ' . $DBEProblem->getValue(
+                    ) . ' assigned to ' . ($DBEProblem->getValue(
                         DBEJProblem::engineerName
-                    ) . ' close to breaching the agreed fix SLA',
+                    ) ? $DBEProblem->getValue(
+                        DBEJProblem::engineerName
+                    ) : 'NOBODY') . ' is close to breaching the agreed fix SLA',
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );
@@ -746,7 +728,9 @@ class BUProblemSLA extends Business
                 'From'         => $senderEmail,
                 'Subject'      => 'WARNING - SR for ' . $dbeJProblem->getValue(
                         DBEJProblem::customerName
-                    ) . 'assigned to ' . $dbeJProblem->getValue(DBEJProblem::engineerName) . ' close to breaching SLA',
+                    ) . ' assigned to ' . ($dbeJProblem->getValue(DBEJProblem::engineerName) ? $dbeJProblem->getValue(
+                        DBEJProblem::engineerName
+                    ) : 'NOBODY') . ' is close to breaching SLA',
                 'Date'         => date("r"),
                 'Content-Type' => 'text/html; charset=UTF-8'
             );

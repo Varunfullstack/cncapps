@@ -756,7 +756,7 @@ class CTCustomer extends CTCNC
             );
 
             $this->dsCustomer->setValue(
-                DBECustomer::slaPenaltiesAgreed,
+                DBECustomer::slaP1PenaltiesAgreed,
                 @$value['slaPenaltiesAgreed']
             );
 
@@ -1827,7 +1827,7 @@ class CTCustomer extends CTCNC
                 'slaP4'                          => $this->dsCustomer->getValue(DBECustomer::slaP4),
                 'slaP5'                          => $this->dsCustomer->getValue(DBECustomer::slaP5),
                 'slaPenaltiesAgreedChecked'      => $this->dsCustomer->getValue(
-                    DBECustomer::slaPenaltiesAgreed
+                    DBECustomer::slaP1PenaltiesAgreed
                 ) ? 'checked' : null,
                 'slaFixHoursP1'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP1),
                 'slaFixHoursP2'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP2),
