@@ -825,31 +825,13 @@ class CTCustomer extends CTCNC
                 @$value['reviewMeetingFrequencyMonths']
             );
             $this->dsCustomer->setValue(
-                DBECustomer::reviewDate,
-                @$value['reviewDate']
-            );
-            $this->dsCustomer->setValue(
                 DBECustomer::reviewMeetingEmailSentFlag,
                 $this->getYN(@$value['reviewMeetingEmailSentFlag'])
             );
 
             $this->dsCustomer->setValue(
-                DBECustomer::reviewAction,
-                @$value['reviewAction']
-
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewUserID,
-                @$value['reviewUserID']
-            );
-
-            $this->dsCustomer->setValue(
                 DBECustomer::accountManagerUserID,
                 @$value['accountManagerUserID']
-            );
-            $this->dsCustomer->setValue(
-                DBECustomer::reviewTime,
-                @$value['reviewTime']
             );
             $this->dsCustomer->setValue(
                 DBECustomer::noOfServers,
@@ -958,6 +940,67 @@ class CTCustomer extends CTCNC
     {
         $this->setParentFormFields();
         switch ($this->getAction()) {
+
+            case 'getReviewEngineers':
+            {
+                $dbeUser = new DBEUser($this);
+                $dbeUser->getRows();
+                echo json_encode(["status" => "ok", "data" => $dbeUser->fetchArray()]);
+                break;
+            }
+            case 'getCustomerReviewData':
+            {
+                if (!isset($_REQUEST['customerID'])) {
+                    http_response_code(400);
+                    echo json_encode(["status" => "error", "message" => "Customer ID is mandatory"]);
+                    exit;
+                }
+
+                $dbeCustomer = new DBECustomer($this);
+                if (!$dbeCustomer->getRow($_REQUEST['customerID'])) {
+                    http_response_code(404);
+                    echo json_encode(["status" => "error", "message" => "Customer does not exist"]);
+                    exit;
+                }
+                echo json_encode(
+                    [
+                        "status" => "ok",
+                        "data"   => [
+                            "toBeReviewedOnDate"         => $dbeCustomer->getValue(DBECustomer::reviewDate),
+                            "toBeReviewedOnTime"         => $dbeCustomer->getValue(DBECustomer::reviewTime),
+                            "toBeReviewedOnByEngineerId" => $dbeCustomer->getValue(DBECustomer::reviewUserID),
+                            "toBeReviewedOnAction"       => $dbeCustomer->getValue(DBECustomer::reviewAction)
+                        ]
+                    ]
+                );
+
+                break;
+            }
+            case 'updateCustomerReview':
+            {
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!isset($data['customerId'])) {
+                    http_response_code(400);
+                    echo json_encode(["status" => "error", "message" => "Customer ID is mandatory"]);
+                    exit;
+                }
+
+                $dbeCustomer = new DBECustomer($this);
+                if (!$dbeCustomer->getRow($data['customerId'])) {
+                    http_response_code(404);
+                    echo json_encode(["status" => "error", "message" => "Customer does not exist"]);
+                    exit;
+                }
+                $dbeCustomer->setValue(DBECustomer::reviewDate, $data["toBeReviewedOnDate"]);
+                $dbeCustomer->setValue(DBECustomer::reviewTime, $data["toBeReviewedOnTime"]);
+                $dbeCustomer->setValue(DBECustomer::reviewUserID, $data["toBeReviewedOnByEngineerId"]);
+                $dbeCustomer->setValue(DBECustomer::reviewAction, $data["toBeReviewedOnAction"]);
+                $dbeCustomer->updateRow();
+                echo json_encode(
+                    ["status" => "ok",]
+                );
+                break;
+            }
 
             case 'createCustomerFolder':
                 $this->createCustomerFolder();
@@ -1529,7 +1572,7 @@ class CTCustomer extends CTCNC
 
         $this->template->setVar(
             'javaScript',
-            "<script src='components/customerEditMain/dist/CustomerEditMain.js?version=1.0.0'></script>"
+            "<script src='components/customerEditMain/dist/CustomerReviewComponent.js?version=1.0.0'></script>"
         );
 
 // Parameters

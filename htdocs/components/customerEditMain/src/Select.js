@@ -36,12 +36,15 @@ class Select extends React.Component {
 
     getOptions(options) {
         if (!options) return [];
-        return options.map(x =>
-            this.el('option', {
-                value: x.value,
-                key: x.value
-            }, x.label)
-        )
+        return [
+            this.el('option', {value: '', key: 'empty-option'}, 'Select one option'),
+            ...options.map(x =>
+                this.el('option', {
+                    value: x.value,
+                    key: x.value
+                }, x.label)
+            )
+        ]
     }
 }
 
