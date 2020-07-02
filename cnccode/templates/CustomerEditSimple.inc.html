@@ -1609,11 +1609,13 @@
     }
 
     function checkMailShotOptions() {
-        validatingContactsModal.dialog('open');
-        const toReturn = runValidations();
-        validatingContactsModal.dialog('close');
-        return toReturn;
-
+        return document.customerReviewComponent.save()
+            .then(() => {
+                validatingContactsModal.dialog('open');
+                const toReturn = runValidations();
+                validatingContactsModal.dialog('close');
+                return toReturn;
+            });
     }
 </script>
 
@@ -2317,50 +2319,9 @@
         </div> <!-- customerEditMainLeftColumn -->
 
         <div class="customerEditMainRightColumn">
-
-            <div class="customerReviewTime">
-                To be reviewed on
-                <input {disabled}
-                       type="date"
-                       name="form[customer][{customerID}][reviewDate]"
-                       id="reviewDate"
-                       value="{reviewDate}"
-                       size="10"
-                       maxlength="10"
-                       autocomplete="off"
-                >
-                Time
-                <input {disabled}
-                       name="form[customer][{customerID}][reviewTime]"
-                       value="{reviewTime}"
-                       size="5"
-                       maxlength="5"
-                >
-                <span class="formErrorMessage formError">{reviewTimeMessage}</span>By
-                <select
-                        {disabled}
-                        type="text"
-                        name="form[customer][{customerID}][reviewUserID]"
-                        onchange="setFormChanged();"
-                >
-                    <!-- BEGIN reviewUserBlock -->
-                    <option {reviewUserSelected}
-                            value="{reviewUserID}"
-                    >{reviewUserName}
-                    </option>
-                    <!-- END reviewUserBlock -->
-                </select>
-            </div> <!-- customerReviewTime -->
-
-            <div class="customerReviewAction">
-                <textarea title="Action to be taken"
-                          {disabled}
-                          cols="120"
-                          rows="3"
-                          name="form[customer][{customerID}][reviewAction]"
-                >{reviewAction}</textarea>
-            </div>
-
+            <div id="reactCustomerReviewSection"
+                 data-customer-id="{customerID}"
+            ></div>
             <div class="customerNoteHistory">
         <textarea
                 cols="120"

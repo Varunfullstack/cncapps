@@ -773,6 +773,6 @@ export default CustomerEditMain;
 
 document.addEventListener('DOMContentLoaded', () => {
     const domContainer = document.querySelector('#reactCustomerEditMain');
-    ReactDOM.render(React.createElement(CustomerEditMain, {customerID: domContainer.dataset.customerId}), domContainer);
+    // ReactDOM.render(React.createElement(CustomerEditMain, {customerID: domContainer.dataset.customerId}), domContainer);
 });
 

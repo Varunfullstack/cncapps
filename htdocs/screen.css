@@ -500,16 +500,14 @@ TABLE.fieldChooser {
 }
 
 div.customerEditMain {
-    /*  width: 55%; */
+    display: flex;
+    flex-direction: row;
 }
 
 div.customerEditMainLeftColumn {
-    width: 20%;
-    float: left;
 }
 
 div.customerEditMainRightColumn {
-    /* float:right; */
 }
 
 div.customerEditProjects {
