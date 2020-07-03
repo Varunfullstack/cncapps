@@ -79,7 +79,7 @@ class CMPSRSource extends React.Component {
           const search = { ...this.state.search };
           search.result = result;
           search.resultSummary=this.getSummary(result);     
-          console.log(result);
+          //console.log(result);
           this.setState({ search });
         });
     }
@@ -170,6 +170,7 @@ class CMPSRSource extends React.Component {
       else
       summary['None'] =!summary['None']?1:summary['None']+1;
     }
+    summary['Total']=result.length;
     return Object.entries(summary);
   }
   getSummaryElements=()=>
@@ -208,7 +209,7 @@ class CMPSRSource extends React.Component {
         else if((sr.status==='I'||sr.status==='P')&&sr.pro_contract_cuino===null)
         {
           contractDisplay='';
-          console.log(contractDisplay)
+          //console.log(contractDisplay)
 
         }
         return this.el('label',{key:'contractDisplay'+sr.CallReference},contractDisplay);
