@@ -10,12 +10,19 @@ require_once($cfg["path_dbe"] . "/DBEProblemRaiseType.inc.php");
 class BUProblemRaiseType extends Business
 {
     const EMAIL='Email';
+    const EMAILID=1;
     const PORTAL='Portal';
+    const PORTALID=2;
     const PHONE='Phone';
+    const PHONEID=3;
     const ONSITE='On site';
+    const ONSITEID=4;
     const ALERT='Alert';
+    const ALERTID=5;
     const SALES='Sales';
+    const SALESID=6;
     const MANUAL='Manual';
+    const MANUALID=7;
 
     var $dbeProblemRaiseType = "";
 

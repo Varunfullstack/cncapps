@@ -20,6 +20,7 @@ require_once($cfg['path_dbe'] . '/DBEJCallActivity.php');
 require_once($cfg['path_dbe'] . '/DBECallDocument.inc.php');
 require_once($cfg['path_dbe'] . '/DBECallActType.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJCallActType.php');
+require_once($cfg['path_dbe'] . '/DBEProblemRaiseType.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUExpenseType.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
@@ -7316,25 +7317,25 @@ WHERE caa_problemno = ?
                switch($dbeProblemRaiseType->getValue(DBEProblemRaiseType::description))
                {
                    case 'Email':
-                        return "<i class='fa fa-envelope'></i>";
+                        return "<i class='fa fa-envelope' title='This Service Request was raised by email'></i>";
                     break;
                     case 'Portal':
-                        return "<i class='fab fa-internet-explorer'></i>";
+                        return "<i class='fa fa-edge' title='This Service Request was raised by the portal'></i>";
                     break;
                     case 'Phone':
-                        return "<i class='fa fa-phone'></i>";
+                        return "<i class='fa fa-phone' title='This Service Request was raised by phone'></i>";
                     break;
                     case 'On site':
-                        return "<i class='fas fa-building'></i>";
+                        return "<i class='fas fa-building' title='This Service Request was raised by an on site engineer'></i>";
                     break;
                     case 'Alert':
-                        return "<i class='fas fa-bell'></i>";
+                        return "<i class='fas fa-bell' title='This Service Request was raised by an alert'></i>";
                     break;
                     case 'Sales':
-                        return "<i class='fas fa-shopping-cart'></i>";
+                        return "<i class='fas fa-shopping-cart' title='This Service Request was raised via Sales'></i>";
                     break;
                     case 'Manual':
-                        return "<i class='fas fa-user-edit'></i>";
+                        return "<i class='fas fa-user-edit' title='This Service Request was raised manually'></i>";
                     break;
                }
             }

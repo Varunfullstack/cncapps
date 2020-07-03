@@ -98,12 +98,22 @@ class CTSRSource extends CTCNC
                 strtotime($body->toDate)
             )
         );
+        if($body->customerID)
         $dsSearchForm->setValue(
             BUServiceRequestReport::searchFormCustomerID,
             $body->customerID
         );
-        $results = $this->buServiceRequestReport->search($dsSearchForm);         
-        return $results->fetch_all(MYSQLI_ASSOC);            
+        $results = $this->buServiceRequestReport->search($dsSearchForm,true)->fetch_all(MYSQLI_ASSOC);      
+        foreach ($results as &$sr) {
+            $sr['srLink'] = Controller::buildLink(
+                'Activity.php',
+                [
+                    "callActivityID" => $sr['inialActivity'],
+                    "action"         => "displayActivity"
+                ]
+            );
+        }       
+        return $results;            
          
     }
     function setTemplate()

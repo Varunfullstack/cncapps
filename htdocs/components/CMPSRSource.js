@@ -69,7 +69,7 @@ class CMPSRSource extends React.Component {
       fetch("?action=searchSR&&export="+exportData, {
         method: "POST",
         body: JSON.stringify({
-          customerID: search.customer.id,
+          customerID: search.customer?search.customer.id:null,
           fromDate: search.dateFrom,
           toDate: search.dateTo,
         }),
@@ -78,7 +78,8 @@ class CMPSRSource extends React.Component {
         .then((result) => {
           const search = { ...this.state.search };
           search.result = result;
-          search.resultSummary=this.getSummary(result);          
+          search.resultSummary=this.getSummary(result);     
+          console.log(result);
           this.setState({ search });
         });
     }
@@ -91,13 +92,13 @@ class CMPSRSource extends React.Component {
   };
   valid = () => {
     let isValid=true;
-    const search = { ...this.state.search };
-    search.errors = [];
-    if (!search.customer){
-       search.errors["customer"] = "Please select customer";
-       isValid=false;
-    }
-    this.setState({ search });
+    // const search = { ...this.state.search };
+    // search.errors = [];
+    // if (!search.customer){
+    //    search.errors["customer"] = "Please select customer";
+    //    isValid=false;
+    // }
+    // this.setState({ search });
     return isValid;
   };
   makeid=(length=5)=> {
@@ -115,7 +116,7 @@ class CMPSRSource extends React.Component {
     const { customers, search } = this.state;
     return el('div', {key:'searchForm'}, [
       this.getSearchElement(
-        "customer",
+        "Customer",
         el(
           AutoComplete,
           {
@@ -167,7 +168,7 @@ class CMPSRSource extends React.Component {
       if(result[i].raiseType!=null)
         summary[result[i].raiseType]=!summary[result[i].raiseType]?1:summary[result[i].raiseType]+1;        
       else
-      summary['Non'] =!summary['Non']?1:summary['Non']+1;
+      summary['None'] =!summary['None']?1:summary['None']+1;
     }
     return Object.entries(summary);
   }
@@ -193,12 +194,26 @@ class CMPSRSource extends React.Component {
   getSearchResultElement()
   {
   const  columns = [
-      { path: "CallReference",label: "Service Request", sortable:true},
-      { path: "Contact", label: "Contact" ,sortable:true,},
-      { path: "Contract", label: "Contract",sortable:true, },
-      { path: "Customer", label: "Customer",sortable:true, },
       { path: "raiseType", label: "Source",sortable:true, },
-      { path: "DiffResponseContract", label: "DiffResponseContract",sortable:false} 
+      { path: "CallReference",label: "Service Request", sortable:true,
+      content:(sr)=>
+        this.el('a',{key:sr.inialActivity,href:sr.srLink,target:"_blank"},sr.CallReference)},
+      { path: "Customer", label: "Customer",sortable:true, },
+      { path: "Contact", label: "Contact" ,sortable:true,},
+      { path: "Contract", label: "Contract",sortable:true, 
+      content:(sr)=>{
+        let contractDisplay=sr.Contract;
+        if((sr.status==='C'||sr.status==='F')&&sr.pro_contract_cuino===null)
+          contractDisplay="T&M";
+        else if((sr.status==='I'||sr.status==='P')&&sr.pro_contract_cuino===null)
+        {
+          contractDisplay='';
+          console.log(contractDisplay)
+
+        }
+        return this.el('label',{key:'contractDisplay'+sr.CallReference},contractDisplay);
+      }},
+      { path: "Priority", label: "Priority",sortable:true, },
     ];    
     const {result}=this.state.search;  
     if(result!=null)    
@@ -208,7 +223,7 @@ class CMPSRSource extends React.Component {
         data:result,
         columns:columns,
         defaultSortPath:'CallReference',
-        defaultSortOrder:'desc',
+        defaultSortOrder:'asc',
         pk:'CallReference'
       })
     }

@@ -342,7 +342,15 @@ class CTUser extends CTCNC
                 true
             );
         }
-
+        $siteCustomerString='';
+        $siteCustomerId=$dsUser->getValue(DBEJUser::siteCustId);
+        if(isset($siteCustomerId))
+        {
+            $dbeCustomer=new DBECustomer($this);
+            $dbeCustomer->setPKValue( $siteCustomerId);
+            $dbeCustomer->getRow();
+            $siteCustomerString=$dbeCustomer->getValue(DBECustomer::name);
+        }
 
         $this->template->setVar(
             array(
@@ -602,7 +610,8 @@ class CTUser extends CTCNC
                 'txtDelete'                                     => $txtDelete,
                 'urlDisplayList'                                => $urlDisplayList,
                 "basedAtCustomerSiteChecked"                    => $this->dsUser->getValue(DBEUser::basedAtCustomerSite) ? 'checked' : null,
-
+                "basedAtCustomerSiteChecked"                    => $this->dsUser->getValue(DBEUser::basedAtCustomerSite) ? 'checked' : null,
+                'siteCustomerString'                            => $siteCustomerString,
             )
         );
         // manager selection

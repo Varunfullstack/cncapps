@@ -50,6 +50,7 @@ class DBEJUser extends DBEUser
             DA_NOT_NULL
         );
        
+        
 
 
 

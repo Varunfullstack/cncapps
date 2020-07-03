@@ -5800,28 +5800,32 @@ is currently a balance of ';
         $id= $buProblemRaiseType->getProblemRaiseTypeByName($description)['id'];              
         return $id;
     }
-    private function setProblemRaise($dbeProblem, $callActivity,$raiseType=null)
+    private function setProblemRaise($dbeProblem, $callActivity, $raiseType = null)
     {
-        if(!isset($dbeProblem) && !isset($callActivity))
+        if (!isset($dbeProblem) && !isset($callActivity))
             return null;
-        if($raiseType!=null)
-        {
+        if ($raiseType != null) {
             $dbeProblem->setValue(
                 DBEProblem::problemraisetypeId,
-                $this->getProblemRaiseType(BUProblemRaiseType::ALERT)
+                $this->getProblemRaiseType($raiseType)
             );
             $dbeProblem->updateRow();
             return;
         }
-        if(isset($dbeProblem))
-        {
-            $userId=$dbeProblem->getValue(DBEProblem::userID);
-            $dbeUser=new DBEUser($this);
-            $teamId = $dbeUser->getValue(DBEUser::teamID);
-           
+        if (isset($GLOBALS['auth'])) {
+            // get team
+            $userID = $GLOBALS['auth']->is_authenticated();
+            if (isset($userID)) {
+                $dbeUser = new DBEUser($this);
+                $dbeUser->setPKValue($userID);
+                $dbeUser->getRow();
+                $teamId = $dbeUser->getValue(DBEUser::teamID);
+            }
         }
+      
+        
         //For each problem, where callactivity.caa_callacttypeno = 57 and callactivity.caa_serverguard = Y, then set the problem source as Alert.
-        if (
+          if (
             isset($dbeProblem) && isset($callActivity)
             && $callActivity->getValue(DBEJCallActivity::callActTypeID) == 57
             && $callActivity->getValue(DBEJCallActivity::serverGuard) == 'Y'
@@ -5830,8 +5834,7 @@ is currently a balance of ';
                 DBEProblem::problemraisetypeId,
                 $this->getProblemRaiseType(BUProblemRaiseType::ALERT)
             );
-        } else 
-         if (
+        } else if (
             isset($dbeProblem) && isset($callActivity)
             && $dbeProblem->getValue(DBEJProblem::linkedSalesOrderID) > 0
             //&& $dbeProblem->getValue(DBEJProblem::priority) == 5
@@ -5840,54 +5843,34 @@ is currently a balance of ';
                 DBEProblem::problemraisetypeId,
                 $this->getProblemRaiseType(BUProblemRaiseType::SALES)
             );
-        } else //For each problem, where callactivity.caa_callactivityno = 57 and callactivity.caa_consno = 67 and callactivity.caa_serverguard = N, then set the problem source as Email.
-            if (
-                isset($dbeProblem) && isset($callActivity)
-                && $callActivity->getValue(DBEJCallActivity::callActTypeID) == 57
-                && $callActivity->getValue(DBEJCallActivity::caaConsno) == 67
-                && $callActivity->getValue(DBEJCallActivity::serverGuard) == 'N'
-            ) {
-                $dbeProblem->setValue(
-                    DBEProblem::problemraisetypeId,
-                    $this->getProblemRaiseType(BUProblemRaiseType::EMAIL)
-                );
-            }
-            else //Problems that get created from new from the automated_request table are considered 'email' unless automated_request_serverGuardFlag = Y, in which case it's System. ImportRequest.php is used to import data from that table and creates a new SR.
-            if ( // come from automated_request
-                isset($dbeProblem) && $callActivity == null               
-            ) {
-                global $db;
-                $sql="select * from automated_request where serviceRequestID =".$dbeProblem->getValue(DBEProblem::problemID);
-                $db->query($sql); 
-                $db->next_record();
-                $automatedRequest= $db->Record;
-                if(isset($automatedRequest) && $automatedRequest['serverGuardFlag']=='N')
-                    $dbeProblem->setValue(
-                        DBEProblem::problemraisetypeId,
-                        $this->getProblemRaiseType(BUProblemRaiseType::EMAIL)
-                    );
-                else if(isset($automatedRequest) && $automatedRequest['serverGuardFlag']=='Y')
-                $dbeProblem->setValue(
-                    DBEProblem::problemraisetypeId,
-                    $this->getProblemRaiseType(BUProblemRaiseType::ALERT)
-                );
-            }
-            else             
-            if( isset($teamId ) && $teamId ==1) //created by help desk
-            {
-                $dbeProblem->setValue(
-                    DBEProblem::problemraisetypeId,
-                    $this->getProblemRaiseType(BUProblemRaiseType::PHONE)
-                );
-                return;
-            }             
-            else
-            {
-                $dbeProblem->setValue(
-                    DBEProblem::problemraisetypeId,
-                    $this->getProblemRaiseType(BUProblemRaiseType::MANUAL)
-                );
-            }    
+        } else if //For each problem, where callactivity.caa_callactivityno = 57 and callactivity.caa_consno = 67 and callactivity.caa_serverguard = N, then set the problem source as Email.
+        (
+            isset($dbeProblem) && isset($callActivity)
+            && $callActivity->getValue(DBEJCallActivity::callActTypeID) == 57
+            && $callActivity->getValue(DBEJCallActivity::caaConsno) == 67
+            && $callActivity->getValue(DBEJCallActivity::serverGuard) == 'N'
+        ) {
+            $dbeProblem->setValue(
+                DBEProblem::problemraisetypeId,
+                $this->getProblemRaiseType(BUProblemRaiseType::EMAIL)
+            );
+        } else if (isset($teamId) && $teamId == 1) //created by help desk
+        {
+            $raiseType=BUProblemRaiseType::PHONE;
+            if($dbeUser->getValue(DBEUser::basedAtCustomerSite)==1 &&
+            $dbeProblem->getValue(DBEProblem::customerID) == $dbeUser->getValue(DBEUser::siteCustId)  )
+                $raiseType=BUProblemRaiseType::ONSITE;
+            $dbeProblem->setValue(
+                DBEProblem::problemraisetypeId,
+                $this->getProblemRaiseType($raiseType)
+            );
+        }
+        else {
+            $dbeProblem->setValue(
+                DBEProblem::problemraisetypeId,
+                $this->getProblemRaiseType(BUProblemRaiseType::MANUAL)
+            );
+        }
 
         if (isset($dbeProblem))
             $dbeProblem->updateRow();
@@ -8013,6 +7996,12 @@ FROM
             DBEJProblem::userID,
             null
         );        // not allocated
+        
+        $raiseTypeId= $record->getServerGuardFlag()=='Y'?BUProblemRaiseType::ALERTID: BUProblemRaiseType::EMAILID;
+        $dbeProblem->setValue(
+            DBEJProblem::problemraisetypeId,
+            $raiseTypeId
+        );  
         $dbeProblem->insertRow();
 
 
@@ -8079,7 +8068,7 @@ FROM
         );
 
         $dbeCallActivity->insertRow();
-        $this->setProblemRaise($dbeProblem,$dbeCallActivity); // raiseNewRequestFromImport
+       // $this->setProblemRaise($dbeProblem,$dbeCallActivity); // raiseNewRequestFromImport
         
         if ($record->getAttachment() == 'Y') {
             $this->processAttachment(

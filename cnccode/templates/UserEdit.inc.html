@@ -178,6 +178,20 @@
 
         parent.find('button').hide();
     }
+    window.onload =function(){   
+        $('#basedAtCustomerSiteCheckbox')[0].addEventListener('change',function($event){
+            if($event.target.checked)
+                $('#siteCustomerString')[0].removeAttribute('disabled');
+            else
+                $('#siteCustomerString')[0].setAttribute('disabled','disabled');
+
+        })
+        if(!$('#basedAtCustomerSiteCheckbox')[0].checked)
+            $('#siteCustomerString')[0].setAttribute('disabled','disabled');
+        $('#siteCustomerString')[0].addEventListener('autocompleteselect', function ($event) {
+                $('#siteCustId').val($event.detail.item.value);
+            });
+        }
 </script>
 <TABLE width="200px"
        border="0"
@@ -309,11 +323,33 @@
             <td class="fieldText">
                 <input name="user[1][basedAtCustomerSite]"
                        type="checkbox"
-                        id="basedAtCustomerSiteCheckbox"
+                        id="basedAtCustomerSiteCheckbox"                        
                        {DISABLED}
                        {basedAtCustomerSiteChecked}
                         
                  />
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">Customer</td>
+            <td class="fieldText">
+                <input
+                type="hidden"
+                name="user[1][siteCustId]"
+                id="siteCustId"
+                value="{siteCustId}"
+        />
+                <input type="text" 
+                id="siteCustomerString" 
+                name="siteCustomerString" 
+                value="{siteCustomerString}" size="50" maxlength="50" 
+                customer-search="" 
+                class="ui-autocomplete-input" 
+                autocomplete="off"
+                {DISABLED}>
+
+                
+                
             </td>
         </tr>
         <tr>
