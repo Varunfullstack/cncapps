@@ -606,7 +606,8 @@ class BUProblemSLA extends Business
 
 
         if ($dbeJCallActivity = $this->buActivity->getFirstActivityInProblem(
-            $DBEProblem->getValue(DBEProblem::problemID)
+            $DBEProblem->getValue(DBEProblem::problemID),
+            CONFIG_INITIAL_ACTIVITY_TYPE_ID
         )) {
             $senderEmail = CONFIG_SUPPORT_EMAIL;
 
@@ -621,6 +622,7 @@ class BUProblemSLA extends Business
                 [
                     "serviceRequestId" => $activityRef,
                     "activityURL"      => $urlActivity,
+                    "details"          => $dbeJCallActivity->getValue(DBEJCallActivity::reason)
                 ]
             );
 
@@ -677,7 +679,7 @@ class BUProblemSLA extends Business
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getRow($problemID);
 
-        if ($dbeJCallActivity = $this->buActivity->getFirstActivityInProblem($problemID)) {
+        if ($dbeJCallActivity = $this->buActivity->getFirstActivityInProblem($problemID, CONFIG_INITIAL_ACTIVITY_TYPE_ID)) {
 
             $senderEmail = CONFIG_SUPPORT_EMAIL;
 

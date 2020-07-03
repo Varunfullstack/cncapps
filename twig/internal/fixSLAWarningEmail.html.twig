@@ -2,6 +2,12 @@
 {% block content %}
     <p>
         Service Penalties may be incurred if this request is not fixed soon because the Service
-        Request {{ serviceRequestId }} will breach its FIX SLA shortly.
+        Request <a href="{{ activityURL }}"
+                   target="_blank"
+        >{{ serviceRequestId }}</a> will breach its FIX SLA shortly.
+    </p>
+    <p>
+        Details
+        {{ details | raw }}
     </p>
 {% endblock %}
