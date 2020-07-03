@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_bu'] . '/BUCustomerNote.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 
@@ -38,8 +39,8 @@ class CTCustomerNote extends CTCNC
     {
         switch ($this->getAction()) {
 
-            case 'getCustomerNote':
-                $this->getCustomerNote();
+            case 'getCustomerNotes':
+                $this->getCustomerNotes();
                 break;
 
             case 'updateNote':
@@ -53,7 +54,7 @@ class CTCustomerNote extends CTCNC
                 $this->customerNoteHistoryPopup();
                 break;
 
-            case 'deleteCustomerNote':
+            case 'deleteNote':
                 $this->deleteCustomerNote();
                 break;
 
@@ -64,111 +65,38 @@ class CTCustomerNote extends CTCNC
         }
     }
 
-    function getCustomerNote()
+    function getCustomerNotes()
     {
-
-        if (!$this->getParam('identifier')) {
-            $this->raiseError('No identifier Passed');
+        if (!$this->getParam('customerId')) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "Customer Id is missing"]);
+            exit;
         }
-        if (!$this->getParam('customerID')) {
-            $this->raiseError('No customerID Passed');
-        }
-
         $buCustomerNote = new BUCustomerNote($this);
-
-        if ($record = $buCustomerNote->getNote(
-            $this->getParam('customerID'),
-            $this->getParam('created'),
-            $this->getParam('identifier')
-        )) {
-
-            $noteHistory = $this->getTextStringOfHistory($record->cno_custno);
-
-            echo $this->createReturnJavascriptString($record, $noteHistory);
-        }
-    }
-
-    function getTextStringOfHistory($customerID)
-    {
-
-        $buCustomerNote = new BUCustomerNote($this);
-
-        if ($results = $buCustomerNote->getNotesByCustomerID($customerID)) {
-
-            $returnString = '';
-
-            while ($row = $results->fetch_object()) {
-
-                if ($returnString != '') {
-                    $returnString .= "\\n\\n";
-                }
-                if (substr($row->cno_modified, 0, 10) != '2010-09-28') {
-                    $returnString .=
-                        Controller::dateYMDtoDMY(
-                            $row->cno_modified
-                        ) . ' - ' . $row->cns_name . " ####################################################################\\n\\n";
-                }
-
-                $returnString .= $row->cno_details;
-
-            }
-
-            return $returnString;
-        }
-
-    }
-
-    function createReturnJavascriptString($record, $history)
-    {
-        $details = str_replace(array("\r", "\n"), array('\r', '\n'), $record->cno_details);
-        $details = addcslashes($details, "'\"");
-
-        $history = str_replace(array("\r", "\n"), array('\r', '\n'), $history);
-        $history = addcslashes($history, "'\"");
-
-        $javascript = '
-        var im = document.getElementById(\'customerNoteDetails\');
-        im.value = "' . $details . '";
-        var im = document.getElementById(\'customerNoteHistory\');
-        im.value = "' . $history . '";
-        var im = document.getElementById(\'customerNoteCreated\');
-        im.value = "' . $record->cno_created . '";
-        var im = document.getElementById(\'customerNoteModified\');
-        im.value = "' . $record->cno_modified . '";
-        var im = document.getElementById(\'customerNoteModifiedText\');
-        im.innerHTML = "' . Controller::dateYMDtoDMY($record->cno_modified) . ' by ' . $record->cns_logname . '";
-        var im = document.getElementById(\'customerNoteID\');
-        im.value = "' . $record->cno_customernoteno . '";
-        var im = document.getElementById(\'customerNoteOrdheadID\');
-        im.value = "' . $record->cno_ordno . '";';
-
-        /*
-              im.value = "' . $history . '";
-        */
-        return $javascript;
+        $notes = $buCustomerNote->getNotesByCustomerID($this->getParam('customerId'));
+        echo json_encode(["status" => "ok", "data" => $notes]);
     }
 
     function updateNote()
     {
 
-        if (!$this->getParam('customerID')) {
-            $this->raiseError('No customerID Passed');
-        }
+        $data = json_decode(file_get_contents('php://input'), true);
 
         $buCustomerNote = new BUCustomerNote($this);
 
-        if ($record = $buCustomerNote->updateNote(
-            $this->getParam('customerID'),
-            $this->getParam('customerNoteID'),
-            $this->getParam('details'),
-            $this->getParam('ordheadID')
-        )) {
+        $customerNoteArray = $buCustomerNote->updateNote(
+            $data['customerId'],
+            $data['id'],
+            $data['note'],
+        );
 
-            $noteHistory = $this->getTextStringOfHistory($record->cno_custno);
-
-            echo $this->createReturnJavascriptString($record, $noteHistory);
+        if (!$customerNoteArray) {
+            echo json_encode(["status" => "error", "message" => "Failed to save note"]);
+            http_response_code(400);
+            exit;
         }
 
+        echo json_encode(["status" => "ok", "data" => $customerNoteArray]);
     }
 
     /**
@@ -289,22 +217,14 @@ class CTCustomerNote extends CTCNC
 
     function deleteCustomerNote()
     {
-
-        if (!$this->getParam('customerNoteID')) {
-            $this->raiseError('No customerNoteID Passed');
+        if (!isset($_REQUEST['noteId'])) {
+            echo json_encode(["status" => "error", "message" => "Id of the note to be deleted not provided"]);
+            http_response_code(400);
+            exit;
         }
 
         $buCustomerNote = new BUCustomerNote($this);
-
-        if ($record = $buCustomerNote->deleteNote(
-            $this->getParam('customerNoteID')
-        )) {
-
-            $noteHistory = $this->getTextStringOfHistory($record->cno_custno);
-
-            echo $this->createReturnJavascriptString($record, $noteHistory);
-
-        }
+        $buCustomerNote->deleteNote($_REQUEST['noteId']);
+        echo json_encode(["status" => "ok"]);
     }
-
-}// end of class
+}

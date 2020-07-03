@@ -707,6 +707,28 @@ class CTCustomer extends CTCNC
                 DBECustomer::customerID,
                 @$value['customerID']
             );
+
+            if (@$value['customerID']) {
+                $dbeCustomer = new DBECustomer($this);
+                $dbeCustomer->getRow(@$value['customerID']);
+                $this->dsCustomer->setValue(
+                    DBECustomer::reviewAction,
+                    $dbeCustomer->getValue(DBECustomer::reviewAction)
+                );
+                $this->dsCustomer->setValue(
+                    DBECustomer::reviewUserID,
+                    $dbeCustomer->getValue(DBECustomer::reviewUserID)
+                );
+                $this->dsCustomer->setValue(
+                    DBECustomer::reviewDate,
+                    $dbeCustomer->getValue(DBECustomer::reviewDate)
+                );
+                $this->dsCustomer->setValue(
+                    DBECustomer::reviewTime,
+                    $dbeCustomer->getValue(DBECustomer::reviewTime)
+                );
+            }
+
             $this->dsCustomer->setValue(
                 DBECustomer::name,
                 @$value['name']
@@ -1572,7 +1594,8 @@ class CTCustomer extends CTCNC
 
         $this->template->setVar(
             'javaScript',
-            "<script src='components/customerEditMain/dist/CustomerReviewComponent.js?version=1.0.0'></script>"
+            "<script src='components/customerEditMain/dist/CustomerReviewComponent.js?version=1.0.0'></script>
+            <script src='components/customerEditMain/dist/CustomerNotesComponent.js?version=1.0.0'></script>"
         );
 
 // Parameters
@@ -1778,7 +1801,6 @@ class CTCustomer extends CTCNC
                 'reviewMeetingEmailSentFlag'     => $this->dsCustomer->getValue(
                     DBECustomer::reviewMeetingEmailSentFlag
                 ),
-                'customerNotePopupLink'          => $this->getCustomerNotePopupLink($this->getCustomerID()),
                 'showInactiveContactsURL'        => $showInactiveContactsURL,
                 'showInactiveSitesURL'           => $showInactiveSitesURL,
                 'customerID'                     => $this->getCustomerID() ? $this->getCustomerID() : 'null',
@@ -2787,29 +2809,6 @@ class CTCustomer extends CTCNC
             true
         );
         $this->parsePage();
-    }
-
-    /**
-     * @param $customerID
-     * @return string
-     * @throws Exception
-     */
-    function getCustomerNotePopupLink($customerID)
-    {
-        if (!$customerID) {
-            return null;
-        }
-        $url =
-            Controller::buildLink(
-                'CustomerNote.php',
-                array(
-                    'action'     => 'customerNoteHistoryPopup',
-                    'customerID' => $customerID,
-                    'htmlFmt'    => CT_HTML_FMT_POPUP
-                )
-            );
-
-        return '<A HREF="' . $url . ' " target="_blank" >Notes History</A>';
     }
 
     function getChecked($flag)

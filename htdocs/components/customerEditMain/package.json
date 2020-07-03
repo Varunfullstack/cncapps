@@ -5,8 +5,10 @@
     "main": "CMPMySettings.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "parcel src/CustomerReviewComponent.js --public-url /components/customerEditMain/dist",
-        "build": "parcel build src/CustomerReviewComponent.js --public-url /components/customerEditMain/dist"
+        "buildCustomerNotes": "parcel build src/CustomerNotesComponent.js --public-url /components/customerEditMain/dist",
+        "buildCustomerReview": "parcel build src/CustomerReviewComponent.js --public-url /components/customerEditMain/dist",
+        "start": "parcel src/CustomerReviewComponent.js --public-url /components/customerEditMain/dist && parcel src/CustomerNotesComponent.js --public-url /components/customerEditMain/dist",
+        "build": "npm run buildCustomerReview && npm run buildCustomerNotes"
     },
     "author": "",
     "license": "ISC",
