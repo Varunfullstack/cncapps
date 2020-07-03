@@ -157,8 +157,10 @@ class CustomerReviewComponent extends React.Component {
                             title: "Action to be taken",
                             cols: "120",
                             rows: "3",
-                            value: this.state.toBeReviewedOnAction || '',
-                            onChange: this.handleToBeReviewedOnActionChange
+                            //     defaultValue: 'test',
+                            value: this.state.customerReview.toBeReviewedOnAction || '',
+                            onChange: this.handleToBeReviewedOnActionChange,
+                            //     key: 'actionInput'
                         }
                     )
                 ),
