@@ -281,6 +281,46 @@
                     reportSectionElement = document.getElementById('reportSection');
                 });
 
+                function generateOverFixSLAWorkingHoursLink(label, priority) {
+                    const url = new URL('/Activity.php', window.location.protocol + "//" + window.location.host);
+                    url.searchParams.append('action', 'search');
+                    url.searchParams.append('activity[1][customerID]', customerIdInput.value);
+                    url.searchParams.append('activity[1][callActTypeID]', '51');
+                    url.searchParams.append('activity[1][contractCustomerItemID]', '99');
+                    url.searchParams.append('activity[1][searchFormOverFixSLAWorkingHours]', "1");
+                    url.searchParams.append('activity[1][fromDate]', startDateInput.value);
+                    url.searchParams.append('activity[1][toDate]', endDateInput.value);
+                    url.searchParams.append('activity[1][status]', "FIXED_OR_COMPLETED");
+                    if (priority) {
+                        url.searchParams.append('activity[1][priority]', priority);
+                    }
+                    const anchor = document.createElement('a');
+                    anchor.target = '_blank';
+                    anchor.href = url.toString();
+                    anchor.text = label;
+                    return anchor
+                }
+
+                function generateActivitySearchLink(label, priority) {
+
+                    const url = new URL('/Activity.php', window.location.protocol + "//" + window.location.host);
+                    url.searchParams.append('action', 'search');
+                    url.searchParams.append('activity[1][customerID]', customerIdInput.value);
+                    url.searchParams.append('activity[1][callActTypeID]', '51');
+                    url.searchParams.append('activity[1][contractCustomerItemID]', '99');
+                    url.searchParams.append('activity[1][searchFormFixSLAOption]', 'B');
+                    url.searchParams.append('activity[1][fromDate]', startDateInput.value);
+                    url.searchParams.append('activity[1][toDate]', endDateInput.value);
+                    url.searchParams.append('activity[1][status]', "FIXED_OR_COMPLETED");
+                    if (priority) {
+                        url.searchParams.append('activity[1][priority]', priority);
+                    }
+                    const anchor = document.createElement('a');
+                    anchor.target = '_blank';
+                    anchor.href = url.toString();
+                    anchor.text = label;
+                    return anchor
+                }
 
                 function showStats() {
                     if (!customerIdInput.value) {
@@ -345,19 +385,22 @@
                     const lowerIsBetter = (customer, allCustomers) => {
                         return customer <= allCustomers ? "performance-green" : 'performance-warn'
                     };
+                    const zeroTolerance = (customer, allCustomers) => {
+                        return customer ? "performance-warn" : "performance-green";
+                    }
                     const noColour = (customer, allCustomers) => {
                         return null;
                     };
 
                     const labels = {
-                        "raised": {
-                            label: "Total SRs Raised",
+                        "fixed": {
+                            label: "Total SRs fixed",
                             format: x => x,
                             assignClass: noColour,
                             showInSummary: true
                         },
-                        "fixed": {
-                            label: "Total SRs fixed",
+                        "raised": {
+                            label: "Total SRs Raised",
                             format: x => x,
                             assignClass: noColour,
                             showInSummary: true
@@ -369,13 +412,13 @@
                             showInSummary: true
                         },
                         "sla": {
-                            label: 'Customer SLA',
+                            label: 'Response SLA',
                             format: x => x,
                             assignClass: x => null,
                             showInSummary: false
                         },
                         "slaMet": {
-                            label: "% of SLAs Met",
+                            label: "% of Response SLAs Met",
                             format: x => (x * 100).toFixed(2),
                             assignClass: higherIsBetter,
                             showInSummary: true
@@ -399,16 +442,36 @@
                             showInSummary: true,
                         },
                         "avgTimeAwaitingCNC": {
-                            label: "Average Time Awaiting CNC",
+                            label: "Average Fix Time (Awaiting CNC)",
                             format: x => x ? x.toFixed(2) : x,
                             assignClass: lowerIsBetter
                         },
                         "avgTimeFromRaiseToFixHours": {
-                            label: "Average Time from initial to Fixed",
+                            label: "Average Time from Initial to Fixed",
                             format: x => x ? x.toFixed(2) : x,
                             assignClass: lowerIsBetter,
                             showInSummary: true,
                         },
+                        "fixSLAFailedPct": {
+                            label: "% of Fix SLAs Failed",
+                            format: x => x ? (x * 100).toFixed(2) : x,
+                            assignClass: zeroTolerance,
+                            showInSummary: false
+                        },
+                        "fixSLAFailedCount": {
+                            label: "Number of Fix SLAs Failed",
+                            format: x => x,
+                            assignClass: zeroTolerance,
+                            showInSummary: false,
+                            link: generateActivitySearchLink
+                        },
+                        "overFixSLAWorkingHours": {
+                            label: "Number of SRs over Fix SLA Working Hours",
+                            format: x => x,
+                            assignClass: zeroTolerance,
+                            showInSummary: false,
+                            link: generateOverFixSLAWorkingHoursLink
+                        }
                     };
                     const customersData = [];
                     const allData = [];
@@ -434,14 +497,19 @@
                                 "description": labels[key].label,
                                 "p1": customerP1 ? labels[key].format(customerP1[key]) : null,
                                 "p1Class": customerP1 ? labels[key].assignClass(customerP1[key], allP1[key]) : null,
+                                "p1Link": customerP1 && labels[key].link ? labels[key].link(customerP1[key], 1) : null,
                                 "p2": customerP2 ? labels[key].format(customerP2[key]) : null,
                                 "p2Class": customerP2 ? labels[key].assignClass(customerP2[key], allP2[key]) : null,
+                                "p2Link": customerP2 && labels[key].link ? labels[key].link(customerP2[key], 2) : null,
                                 "p3": customerP3 ? labels[key].format(customerP3[key]) : null,
                                 "p3Class": customerP3 ? labels[key].assignClass(customerP3[key], allP3[key]) : null,
+                                "p3Link": customerP3 && labels[key].link ? labels[key].link(customerP3[key], 3) : null,
                                 "p4": customerP4 ? labels[key].format(customerP4[key]) : null,
                                 "p4Class": customerP4 ? labels[key].assignClass(customerP4[key], allP4[key]) : null,
+                                "p4Link": customerP4 && labels[key].link ? labels[key].link(customerP4[key], 4) : null,
                                 "all": labels[key].format(customerSummarised[key]),
-                                "allClass": labels[key].assignClass(customerSummarised[key], summarised[key])
+                                "allClass": labels[key].assignClass(customerSummarised[key], summarised[key]),
+                                "allLink": labels[key].link ? labels[key].link(customerSummarised[key]) : null
                             }
                         );
                         if (!labels[key].showInSummary) {
@@ -483,7 +551,7 @@
     <table>
         <thead>
         <tr>
-            <th></th>
+            <th style="min-width: 245px;"></th>
             <th>P1</th>
             <th>P2</th>
             <th>P3</th>
@@ -497,11 +565,26 @@
             <td>
                 {% description %}
             </td>
-            <td class="{% p1Class %}"> {% p1 %}</td>
-            <td class="{% p2Class %}"> {% p2 %}</td>
-            <td class="{% p3Class %}"> {% p3 %}</td>
-            <td class="{% p4Class %}"> {% p4 %}</td>
-            <td class="{% allClass %}">{% all %}</td>
+            <td class="{% p1Class %}"> {% #p1Link %}<a href="{% p1Link %}"
+                                                       target="_blank"
+            >{% p1 %}</a>{% /p1Link %}{% ^p1Link %}{% p1 %}{% /p1Link %}
+            </td>
+            <td class="{% p2Class %}"> {% #p2Link %}<a href="{% p2Link %}"
+                                                       target="_blank"
+            >{% p2 %}</a>{% /p2Link %}{% ^p2Link %}{% p2 %}{% /p2Link %}
+            </td>
+            <td class="{% p3Class %}"> {% #p3Link %}<a href="{% p3Link %}"
+                                                       target="_blank"
+            >{% p3 %}</a>{% /p3Link %}{% ^p3Link %}{% p3 %}{% /p3Link %}
+            </td>
+            <td class="{% p4Class %}"> {% #p4Link %}<a href="{% p4Link %}"
+                                                       target="_blank"
+            >{% p4 %}</a>{% /p4Link %}{% ^p4Link %}{% p4 %}{% /p4Link %}
+            </td>
+            <td class="{% allClass %}"> {% #allLink %}<a href="{% allLink %}"
+                                                         target="_blank"
+            >{% all %}</a>{% /allLink %}{% ^allLink %}{% all %}{% /allLink %}
+            </td>
         </tr>
         {% /data %}
         </tbody>

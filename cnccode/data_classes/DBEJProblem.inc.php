@@ -292,6 +292,42 @@ class DBEJProblem extends DBEProblem
 
         return (parent::getRows());
     }
+
+    function getSLAWarningRows()
+    {
+        $sql =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " LEFT JOIN customer ON cus_custno = pro_custno
+           LEFT JOIN consultant ON cns_consno = pro_consno
+           
+          JOIN callactivity `initial`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
+
+            " JOIN callactivity `last`
+            ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
+              (
+              SELECT
+                MAX( ca.caa_callactivityno )
+              FROM callactivity ca
+              WHERE ca.caa_problemno = pro_problemno
+              AND ca.caa_callacttypeno <> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+            )
+        WHERE pro_status IN ( 'I', 'P' )
+          AND (
+             CASE problem.`pro_priority`
+            WHEN 1 THEN customer.slaFixHoursP1
+            WHEN 2 THEN customer.slaFixHoursP2
+            WHEN 3 THEN customer.slaFixHoursP3
+            WHEN 4 THEN customer.slaFixHoursP4
+            end - pro_working_hours <= (select fixSLABreachWarningHours from headert where headerID = 1)           
+          )
+      ORDER BY pro_alarm_date, pro_alarm_time";
+        $this->setQueryString($sql);
+
+        return (parent::getRows());
+    }
+
     function getAlarmReachedRows()
     {
         $sql =

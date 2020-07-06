@@ -88,6 +88,8 @@ class BUActivity extends Business
     const searchFormLinkedSalesOrderID = 'linkedSalesOrderID';
     const searchFormManagementReviewOnly = 'managementReviewOnly';
     const searchFormBreachedSlaOption = 'breachedSlaOption';
+    const searchFormFixSLAOption = "searchFormFixSLAOption";
+    const searchFormOverFixSLAWorkingHours = "searchFormOverFixSLAWorkingHours";
 
     const customerActivityMonthFormCustomerID = 'customerID';
     const customerActivityMonthFormFromDate = 'fromDate';
@@ -315,7 +317,18 @@ class BUActivity extends Business
             DA_STRING,
             DA_ALLOW_NULL
         );
+        $dsData->addColumn(
+            self::searchFormFixSLAOption,
+            DA_STRING,
+            DA_ALLOW_NULL
+        );
 
+        $dsData->addColumn(
+            self::searchFormOverFixSLAWorkingHours,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            false
+        );
 
         $dsData->setValue(
             self::searchFormCustomerID,
@@ -365,7 +378,15 @@ class BUActivity extends Business
             self::searchFormBreachedSlaOption,
             null
         );
-    } // end sendServiceReallocatedEmail
+        $dsData->setValue(
+            self::searchFormFixSLAOption,
+            null
+        );
+        $dsData->setValue(
+            self::searchFormOverFixSLAWorkingHours,
+            false
+        );
+    }
 
     function initialiseCustomerActivityMonthForm(&$dsData)
     {
@@ -426,7 +447,9 @@ class BUActivity extends Business
             trim($dsSearchForm->getValue(self::searchFormBreachedSlaOption)),
             $sortColumn,
             $sortDirection,
-            $limit
+            $limit,
+            trim($dsSearchForm->getValue(self::searchFormFixSLAOption)),
+            trim($dsSearchForm->getValue(self::searchFormOverFixSLAWorkingHours))
         );
         $this->dbeCallActivitySearch->fetchNext();
 
@@ -6542,6 +6565,19 @@ is currently a balance of ';
     {
         $dbeJProblem = new DBEJProblem($this);
         $dbeJProblem->getAlarmReachedRows();
+        $dsResults = new DataSet($this);
+        $this->getData(
+            $dbeJProblem,
+            $dsResults
+        );
+        return $dsResults;
+    }
+
+
+    function getSLAWarningProblems()
+    {
+        $dbeJProblem = new DBEJProblem($this);
+        $dbeJProblem->getSLAWarningRows();
         $dsResults = new DataSet($this);
         $this->getData(
             $dbeJProblem,

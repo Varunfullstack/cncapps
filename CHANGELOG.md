@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - My Settings Page
+- Add Fix SLA to customer page
 ### Changed
 - Issue 818 - Confirm Report Logic / calculations
 - Issue 925 - Improve Double Quote handling in passwords fields

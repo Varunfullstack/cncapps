@@ -161,18 +161,17 @@ class CTActivity extends CTCNC
     private $buActivity;
     private $statusArray =
         array(
-            ""          => "All",
-            "INITIAL"   => "Awaiting Initial Response",
-            "CUSTOMER"  => "Awaiting Customer",
-            "CNC"       => "Awaiting CNC",
-            "FIXED"     => "Fixed",
-            "COMPLETED" => "Completed",
-            "NOT_FIXED" => "Not Fixed",
-            "CHECKED_T_AND_M"
-                        => "Checked T&M Due Completion",
-            "CHECKED_NON_T_AND_M"
-                        => "Checked Non-T&M Due Completion",
-            "UNCHECKED" => "Unchecked"
+            ""                    => "All",
+            "INITIAL"             => "Awaiting Initial Response",
+            "CUSTOMER"            => "Awaiting Customer",
+            "CNC"                 => "Awaiting CNC",
+            "FIXED"               => "Fixed",
+            "COMPLETED"           => "Completed",
+            "NOT_FIXED"           => "Not Fixed",
+            "CHECKED_T_AND_M"     => "Checked T&M Due Completion",
+            "CHECKED_NON_T_AND_M" => "Checked Non-T&M Due Completion",
+            "UNCHECKED"           => "Unchecked",
+            "FIXED_OR_COMPLETED"  => "Fixed Or Completed"
         );
 
     function __construct($requestMethod,
@@ -594,7 +593,6 @@ class CTActivity extends CTCNC
                 $this->displaySearchForm(); //redisplay with errors
                 exit;
             }
-
             if ($this->countParamsSet($this->getParam('activity')) < 2 and
                 empty($this->dsSearchForm->getValue(BUActivity::searchFormCustomerID)) and
                 $this->dsSearchForm->getValue(BUActivity::searchFormContractCustomerItemID) == '99' and
@@ -782,6 +780,7 @@ class CTActivity extends CTCNC
         );
 
         $this->breachedSlaDropdown($dsSearchForm->getValue(BUActivity::searchFormBreachedSlaOption));
+        $this->fixSLADropdown($dsSearchForm->getValue(BUActivity::searchFormFixSLAOption));
 
         //Contract selection
 
@@ -1139,6 +1138,37 @@ class CTActivity extends CTCNC
             );
             $this->template->parse(
                 'breaches',
+                $block,
+                true
+            );
+        }
+    }
+
+    function fixSLADropdown(
+        $selectedID,
+        $template = 'ActivitySearch',
+        $block = 'searchFormFixSLAOptionBlock'
+    )
+    {
+        $this->template->set_block(
+            $template,
+            $block,
+            'fixSLAOptions'
+        );
+
+        foreach ($this->buActivity->breachedSlaOptionArray as $key => $value) {
+
+            $breachedSlaOptionSelected = ($selectedID == $key) ? CT_SELECTED : null;
+
+            $this->template->set_var(
+                array(
+                    'searchFormFixSLAOptionSelected'    => $breachedSlaOptionSelected,
+                    'searchFormFixSLAOptionValue'       => $key,
+                    'searchFormFixSLAOptionDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'fixSLAOptions',
                 $block,
                 true
             );

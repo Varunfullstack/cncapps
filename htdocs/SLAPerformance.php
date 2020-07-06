@@ -1,6 +1,7 @@
 <?php
 require_once("config.inc.php");
-require_once($cfg["path_ct"]."/CTTeamPerformanceReport.inc.php");
+global $cfg;
+require_once($cfg["path_ct"]."/CTSLAPerformance.inc.php");
 session_start();
 page_open(
 	array(
@@ -12,13 +13,13 @@ page_open(
 );
 GLOBAL $cfg;
 header("Cache-control: private");
-$ctTeamPerformanceReport= new CTTeamPerformanceReport(
+$ctSLAPerformance= new CTSLAPerformance(
 	$_SERVER['REQUEST_METHOD'],
 	$_POST,
 	$_GET,
 	$_COOKIE,
 	$cfg
 );
-$ctTeamPerformanceReport->execute();
+$ctSLAPerformance->execute();
 page_close();
 ?>

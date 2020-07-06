@@ -755,6 +755,21 @@ class CTCustomer extends CTCNC
                 @$value['specialAttentionEndDate']
             );
 
+            $this->dsCustomer->setValue(
+                DBECustomer::slaP1PenaltiesAgreed,
+                @$value['slaP1PenaltiesAgreed']
+            );
+
+            $this->dsCustomer->setValue(
+                DBECustomer::slaP2PenaltiesAgreed,
+                @$value['slaP2PenaltiesAgreed']
+            );
+
+            $this->dsCustomer->setValue(
+                DBECustomer::slaP3PenaltiesAgreed,
+                @$value['slaP3PenaltiesAgreed']
+            );
+
             if (
                 $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
                 !$this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)
@@ -896,6 +911,12 @@ class CTCustomer extends CTCNC
                 DBECustomer::slaP5,
                 @$value['slaP5']
             );
+
+            $this->dsCustomer->setValue(DBECustomer::slaFixHoursP1, @$value['slaFixHoursP1']);
+            $this->dsCustomer->setValue(DBECustomer::slaFixHoursP2, @$value['slaFixHoursP2']);
+            $this->dsCustomer->setValue(DBECustomer::slaFixHoursP3, @$value['slaFixHoursP3']);
+            $this->dsCustomer->setValue(DBECustomer::slaFixHoursP4, @$value['slaFixHoursP4']);
+
             $this->dsCustomer->setValue(
                 DBECustomer::pcxFlag,
                 $this->getYN(@$value['pcxFlag'])
@@ -1815,6 +1836,19 @@ class CTCustomer extends CTCNC
                 'slaP3'                          => $this->dsCustomer->getValue(DBECustomer::slaP3),
                 'slaP4'                          => $this->dsCustomer->getValue(DBECustomer::slaP4),
                 'slaP5'                          => $this->dsCustomer->getValue(DBECustomer::slaP5),
+                'slaP1PenaltiesAgreedChecked'    => $this->dsCustomer->getValue(
+                    DBECustomer::slaP1PenaltiesAgreed
+                ) ? 'checked' : null,
+                'slaP2PenaltiesAgreedChecked'    => $this->dsCustomer->getValue(
+                    DBECustomer::slaP2PenaltiesAgreed
+                ) ? 'checked' : null,
+                'slaP3PenaltiesAgreedChecked'    => $this->dsCustomer->getValue(
+                    DBECustomer::slaP3PenaltiesAgreed
+                ) ? 'checked' : null,
+                'slaFixHoursP1'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP1),
+                'slaFixHoursP2'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP2),
+                'slaFixHoursP3'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP3),
+                'slaFixHoursP4'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP4),
                 'isShowingInactive'              => $this->getParam('showInactiveContacts') ? 'true' : 'false',
                 'primaryMainMandatory'           => count($mainContacts) ? 'required' : null,
                 'sortCode'                       => $this->dsCustomer->getValue(DBECustomer::sortCode),

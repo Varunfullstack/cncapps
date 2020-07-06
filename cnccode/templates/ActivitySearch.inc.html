@@ -246,17 +246,35 @@
 
         <tr>
             <td class="promptText">
-                <div align="right">SLA Status</div>
+                <div align="right">Response SLA Status</div>
             </td>
-            <td><select name="activity[1][breachedSlaOption]">
-                <option value="">Ignore</option>
-                <!-- BEGIN breachedSlaOptionBlock -->
-                <option {breachedSlaOptionSelected}
-                        value="{breachedSlaOption}"
-                >{breachedSlaOptionDesc}
-                </option>
-                <!-- END breachedSlaOptionBlock -->
-            </select></td>
+            <td>
+                <select name="activity[1][breachedSlaOption]">
+                    <option value="">Ignore</option>
+                    <!-- BEGIN breachedSlaOptionBlock -->
+                    <option {breachedSlaOptionSelected}
+                            value="{breachedSlaOption}"
+                    >{breachedSlaOptionDesc}
+                    </option>
+                    <!-- END breachedSlaOptionBlock -->
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="promptText">
+                <div align="right">Fix SLA Status</div>
+            </td>
+            <td>
+                <select name="activity[1][searchFormFixSLAOption]">
+                    <option value="">Ignore</option>
+                    <!-- BEGIN searchFormFixSLAOptionBlock -->
+                    <option {searchFormFixSLAOptionSelected}
+                            value="{searchFormFixSLAOptionValue}"
+                    >{searchFormFixSLAOptionDescription}
+                    </option>
+                    <!-- END searchFormFixSLAOptionBlock -->
+                </select>
+            </td>
         </tr>
 
         <tr>
