@@ -55,6 +55,7 @@ if ($dsRenBroadband->rowCount()) {
         $customerItemID = $dsRenBroadband->getValue(DBEJRenBroadband::customerItemID);
         if($dsRenBroadband->getValue(DBEJRenBroadband::contractExpireNotified)==0)
         {
+            // Create New SR and send Email
             $buActivity=new BUActivity($thing);   
             $buActivity->createActivityLeasedLineExpire( 
                 $dsRenBroadband->getValue(DBEJRenBroadband::customerID),           
@@ -106,41 +107,41 @@ if ($dsRenBroadband->rowCount()) {
     if ($onScreen) {
         echo $result;
     } else {
-        $buMail = new BUMail($thing);
+        // $buMail = new BUMail($thing);
 
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
-        $senderName = 'CNC Support Department';
+        // $senderEmail = CONFIG_SUPPORT_EMAIL;
+        // $senderName = 'CNC Support Department';
 
-        $toEmail = "leasedlinecontractexpirations@cnc-ltd.co.uk";
+        // $toEmail = "leasedlinecontractexpirations@cnc-ltd.co.uk";
 
-        $body = $result;
+        // $body = $result;
 
-        $hdrs = array(
-            'From'         => $senderEmail,
-            'To'           => $toEmail,
-            'Subject'      => 'Leased line contract expiry notification',
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
+        // $hdrs = array(
+        //     'From'         => $senderEmail,
+        //     'To'           => $toEmail,
+        //     'Subject'      => 'Leased line contract expiry notification',
+        //     'Date'         => date("r"),
+        //     'Content-Type' => 'text/html; charset=UTF-8'
+        // );
 
 
-        $buMail->mime->setHTMLBody($body);
+        // $buMail->mime->setHTMLBody($body);
 
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-        $body = $buMail->mime->get($mime_params);
+        // $mime_params = array(
+        //     'text_encoding' => '7bit',
+        //     'text_charset'  => 'UTF-8',
+        //     'html_charset'  => 'UTF-8',
+        //     'head_charset'  => 'UTF-8'
+        // );
+        // $body = $buMail->mime->get($mime_params);
 
-        $hdrs = $buMail->mime->headers($hdrs);
+        // $hdrs = $buMail->mime->headers($hdrs);
 
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body
-        );
+        // $buMail->putInQueue(
+        //     $senderEmail,
+        //     $toEmail,
+        //     $hdrs,
+        //     $body
+        // );
     }
 }
