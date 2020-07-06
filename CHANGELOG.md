@@ -8,6 +8,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 818 - Confirm Report Logic / calculations
 - Issue 925 - Improve Double Quote handling in passwords fields
+- Contacts have Active flag
 ### Fixed
 - Imported customers not assigning default delivery address
 - Imported contacts not getting the site assigned correctly

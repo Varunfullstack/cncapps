@@ -2934,7 +2934,7 @@ class CTActivity extends CTCNC
                     $query .= " AND con_contno = " . $this->getParam('contactID');
                 }
 
-                $query .= " ORDER BY cus_name, con_last_name, con_first_name";
+                $query .= " and active ORDER BY cus_name, con_last_name, con_first_name";
                 $result = mysqli_query(
                     $db,
                     $query

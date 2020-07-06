@@ -302,6 +302,10 @@ class CTCustomer extends CTCNC
                     DBEContact::portalPassword,
                     $dbeContact->getValue(DBEContact::portalPassword)
                 );
+                $this->dsContact->setValue(
+                    DBEContact::active,
+                    $dbeContact->getValue(DBEContact::active)
+                );
             }
 
             $this->dsContact->setUpdateModeInsert();
@@ -395,6 +399,8 @@ class CTCustomer extends CTCNC
                     );
                     $validEmail = false;
                 }
+
+
             }
 
             if ($validEmail) {
@@ -557,6 +563,7 @@ class CTCustomer extends CTCNC
                     ($this->dsContact->getValue(DBEContact::firstName)) |
                     ($this->dsContact->getValue(DBEContact::lastName))
                 ) {
+                    $this->dsContact->setValue(DBEContact::active, 1);
                     $this->dsContact->post();
                 }
             } else {
@@ -3272,119 +3279,10 @@ class CTCustomer extends CTCNC
         if (!$contactID) {
             throw new Exception("Contact ID required");
         }
-
         $dbeContact = new DBEContact($this);
-
         $dbeContact->getRow($contactID);
-
-        $dbeContact->setValue(
-            DBEContact::email,
-            null
-        );
-        $dbeContact->setValue(
-            DBEContact::supportLevel,
-            null
-        );
-        $dbeContact->setValue(
-            DBEContact::reviewUser,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::hrUser,
-            "N"
-        );
-
-        $dbeContact->setValue(
-            DBEContact::sendMailshotFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::discontinuedFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::accountsFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::mailshot2Flag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::mailshot3Flag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::mailshot4Flag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::mailshot8Flag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::mailshot9Flag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::mailshot11Flag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::initialLoggingEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::workStartedEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::workUpdatesEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::fixedEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::pendingClosureEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::closureEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::othersInitialLoggingEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::othersWorkStartedEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::othersWorkUpdatesEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::othersFixedEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::othersPendingClosureEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::othersClosureEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::pendingLeaverFlag,
-            "N"
-        );
-
+        $dbeContact->setValue(DBEContact::active, 0);
         $dbeContact->updateRow();
-
         return true;
     }
 

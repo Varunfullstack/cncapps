@@ -112,6 +112,9 @@ class BUContactExport extends Business
             if ($dsSearchForm->getValue(DBEContact::reviewUser)) {
                 $query .= ", {$DBEContact->getDBColumnName($DBEContact::reviewUser)} as review";
             }
+
+            $query .= ", active";
+
         }// end
 
         $query .= "
@@ -128,6 +131,8 @@ class BUContactExport extends Business
         }
 
         $query .= " WHERE 1 = 1 ";
+
+        $query .= " and active =  " . ($dsSearchForm->getValue(DBEContact::active) ? '1' : '0');
 
         if ($dsSearchForm->getValue(DBEContact::supportLevel)) {
             $selectedOptions = json_decode($dsSearchForm->getValue(DBEContact::supportLevel));

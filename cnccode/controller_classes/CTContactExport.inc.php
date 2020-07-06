@@ -127,15 +127,7 @@ WHERE customer.`cus_referred` <> 'Y'
     OR contact.`con_phone` 
     OR contact.`con_mobile_phone`
   ) 
-  AND (
-    con_mailshot = 'Y' 
-    OR con_mailflag2 = 'Y' 
-    OR con_mailflag3 = 'Y' 
-    OR con_mailflag4 = 'Y' 
-    OR con_mailflag8 = 'Y' 
-    OR con_mailflag9 = 'Y' 
-    OR con_mailflag11 = 'Y'
-  )";
+  AND `active`";
 
         $db->query($query);
 
@@ -370,6 +362,12 @@ WHERE customer.`cus_referred` <> 'Y'
             DA_YN_FLAG,
             DA_ALLOW_NULL
         );
+        $dsSearchForm->addColumn(
+            DBEContact::active,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            false
+        );
 
 
         $buHeader = new BUHeader($this);
@@ -411,7 +409,7 @@ WHERE customer.`cus_referred` <> 'Y'
                     $dsSearchForm,
                     $contractItemIDs
                 );
-            
+
             if ($this->getParam('Export')) {
                 $this->generateCSV($results);
                 exit;
@@ -554,6 +552,7 @@ WHERE customer.`cus_referred` <> 'Y'
                 'reviewUserChecked'            => Controller::htmlChecked(
                     $dsSearchForm->getValue(DBEContact::reviewUser)
                 ),
+                'activeChecked'                => $dsSearchForm->getValue(DBEContact::active) ? 'checked' : 'null',
                 'hrUserChecked'                => Controller::htmlChecked(
                     $dsSearchForm->getValue(DBEContact::hrUser)
                 ),

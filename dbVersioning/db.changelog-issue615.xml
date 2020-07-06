@@ -1,0 +1,49 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue615-0">
+        <tagDatabase tag="issue615"/>
+    </changeSet>
+    <changeSet id="issue615-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contact" columnName="active"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contact">
+            <column name="active" type="tinyint(1)" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            update contact
+            set `active` = 0
+            where not (con_mailshot = 'Y'
+                OR con_mailflag2 = 'Y'
+                OR con_mailflag3 = 'Y'
+                OR con_mailflag4 = 'Y'
+                OR con_mailflag8 = 'Y'
+                OR con_mailflag9 = 'Y'
+                OR con_mailflag11 = 'Y')
+              and con_email is null
+              and supportLevel is null
+        </sql>
+        <rollback>
+            <dropColumn tableName="contact" columnName="active"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="issue615-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="contactAuditLog" columnName="active"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="contactAuditLog">
+            <column name="active" type="tinyint(1)" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
