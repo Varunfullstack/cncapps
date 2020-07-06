@@ -15,6 +15,7 @@ This project changes will be shown here.
 - Issue 892 - Lead Status Layout Change
 - Issue 892 - Lead Status Layout Change
 - Issue 822 - Combining SRs for Sales Order ordering issue
+- Issue 930 - Too many email customer icons on Activity Page
 
 ## [v4.1.9] - 2020-06-30
 ### Fixed
