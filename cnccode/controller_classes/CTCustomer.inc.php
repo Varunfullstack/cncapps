@@ -962,68 +962,12 @@ class CTCustomer extends CTCNC
     {
         $this->setParentFormFields();
         switch ($this->getAction()) {
-
             case 'getReviewEngineers':
-            {
-                $dbeUser = new DBEUser($this);
-                $dbeUser->getRows();
-                echo json_encode(["status" => "ok", "data" => $dbeUser->fetchArray()]);
-                break;
-            }
+                return $this->getReviewEngineersController();
             case 'getCustomerReviewData':
-            {
-                if (!isset($_REQUEST['customerID'])) {
-                    http_response_code(400);
-                    echo json_encode(["status" => "error", "message" => "Customer ID is mandatory"]);
-                    exit;
-                }
-
-                $dbeCustomer = new DBECustomer($this);
-                if (!$dbeCustomer->getRow($_REQUEST['customerID'])) {
-                    http_response_code(404);
-                    echo json_encode(["status" => "error", "message" => "Customer does not exist"]);
-                    exit;
-                }
-                echo json_encode(
-                    [
-                        "status" => "ok",
-                        "data"   => [
-                            "toBeReviewedOnDate"         => $dbeCustomer->getValue(DBECustomer::reviewDate),
-                            "toBeReviewedOnTime"         => $dbeCustomer->getValue(DBECustomer::reviewTime),
-                            "toBeReviewedOnByEngineerId" => $dbeCustomer->getValue(DBECustomer::reviewUserID),
-                            "toBeReviewedOnAction"       => $dbeCustomer->getValue(DBECustomer::reviewAction)
-                        ]
-                    ]
-                );
-
-                break;
-            }
+                return $this->getCustomerReviewDataController();
             case 'updateCustomerReview':
-            {
-                $data = json_decode(file_get_contents('php://input'), true);
-                if (!isset($data['customerId'])) {
-                    http_response_code(400);
-                    echo json_encode(["status" => "error", "message" => "Customer ID is mandatory"]);
-                    exit;
-                }
-
-                $dbeCustomer = new DBECustomer($this);
-                if (!$dbeCustomer->getRow($data['customerId'])) {
-                    http_response_code(404);
-                    echo json_encode(["status" => "error", "message" => "Customer does not exist"]);
-                    exit;
-                }
-                $dbeCustomer->setValue(DBECustomer::reviewDate, $data["toBeReviewedOnDate"]);
-                $dbeCustomer->setValue(DBECustomer::reviewTime, $data["toBeReviewedOnTime"]);
-                $dbeCustomer->setValue(DBECustomer::reviewUserID, $data["toBeReviewedOnByEngineerId"]);
-                $dbeCustomer->setValue(DBECustomer::reviewAction, $data["toBeReviewedOnAction"]);
-                $dbeCustomer->updateRow();
-                echo json_encode(
-                    ["status" => "ok",]
-                );
-                break;
-            }
-
+                return $this->updateCustomerReviewController();
             case 'createCustomerFolder':
                 $this->createCustomerFolder();
                 break;
@@ -1169,6 +1113,65 @@ class CTCustomer extends CTCNC
         if ($this->getParam('parentDescField')) {
             $this->setSessionParam('parentDescField', $this->getParam('parentDescField'));
         }
+    }
+
+    function getReviewEngineersController()
+    {
+        $dbeUser = new DBEUser($this);
+        $dbeUser->getRows();
+        echo json_encode(["status" => "ok", "data" => $dbeUser->fetchArray()]);
+    }
+
+    function getCustomerReviewDataController()
+    {
+        if (!isset($_REQUEST['customerID'])) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "Customer ID is mandatory"]);
+            exit;
+        }
+
+        $dbeCustomer = new DBECustomer($this);
+        if (!$dbeCustomer->getRow($_REQUEST['customerID'])) {
+            http_response_code(404);
+            echo json_encode(["status" => "error", "message" => "Customer does not exist"]);
+            exit;
+        }
+        echo json_encode(
+            [
+                "status" => "ok",
+                "data"   => [
+                    "toBeReviewedOnDate"         => $dbeCustomer->getValue(DBECustomer::reviewDate),
+                    "toBeReviewedOnTime"         => $dbeCustomer->getValue(DBECustomer::reviewTime),
+                    "toBeReviewedOnByEngineerId" => $dbeCustomer->getValue(DBECustomer::reviewUserID),
+                    "toBeReviewedOnAction"       => $dbeCustomer->getValue(DBECustomer::reviewAction)
+                ]
+            ]
+        );
+    }
+
+    function updateCustomerReviewController()
+    {
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!isset($data['customerId'])) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "Customer ID is mandatory"]);
+            exit;
+        }
+
+        $dbeCustomer = new DBECustomer($this);
+        if (!$dbeCustomer->getRow($data['customerId'])) {
+            http_response_code(404);
+            echo json_encode(["status" => "error", "message" => "Customer does not exist"]);
+            exit;
+        }
+        $dbeCustomer->setValue(DBECustomer::reviewDate, $data["toBeReviewedOnDate"]);
+        $dbeCustomer->setValue(DBECustomer::reviewTime, $data["toBeReviewedOnTime"]);
+        $dbeCustomer->setValue(DBECustomer::reviewUserID, $data["toBeReviewedOnByEngineerId"]);
+        $dbeCustomer->setValue(DBECustomer::reviewAction, $data["toBeReviewedOnAction"]);
+        $dbeCustomer->updateRow();
+        echo json_encode(
+            ["status" => "ok",]
+        );
     }
 
     /**
