@@ -53,7 +53,7 @@ class CMPSRSource extends React.Component {
     const { el } = this;
     return el("div", {key:elementKey+'row', className: "row" }, [
       el("div", { key:elementKey+'label',className: "col-1 promptText" }, label),
-      el("div", { key:elementKey+'element',className: "col-5" }, element),
+      el("div", { key:elementKey+'element',style:{width:150} }, element),
       el("div", { key:elementKey+'error',className: "col-5 error" }, error),
     ]);
   }
@@ -138,6 +138,7 @@ class CMPSRSource extends React.Component {
           name: "dateFrom",
           type: "date",
           onChange: handleChange,
+          style:{width:150},
         }),'','dateFrom'
       ),
       this.getSearchElement(
@@ -147,6 +148,7 @@ class CMPSRSource extends React.Component {
           name: "dateTo",
           type: "date",
           onChange: handleChange,
+          style:{width:150},
         }),'','dateTo'
       ),
       this.getSearchElement(

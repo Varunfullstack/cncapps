@@ -10006,6 +10006,10 @@ FROM
                 DBEProblem::userID,
                 null
             );        // not allocated
+            $dbeProblem->setValue(
+                DBEProblem::problemraisetypeId,
+                BUProblemRaiseType::ALERTID
+            ); 
             $dbeProblem->insertRow();
 
             $problemID = $dbeProblem->getPKValue();
@@ -10057,7 +10061,6 @@ FROM
             );
 
             $dbeCallActivity->insertRow();
-            $this->setProblemRaise($dbeProblem,$dbeCallActivity,BUProblemRaiseType::ALERT); // raiseSolarwindsFailedBackupRequest
             
         } else {
             $this->createFollowOnActivity(
@@ -10149,7 +10152,8 @@ FROM
             $detailsWithoutDriveLetters,
             $details,
             $serverName,
-            $serverCustomerItemID
+            $serverCustomerItemID,
+            BUProblemRaiseType::ALERTID
         );
     }
 
@@ -10168,7 +10172,8 @@ FROM
         $matchText,
         $details,
         $serverName,
-        $serverCustomerItemID
+        $serverCustomerItemID,
+        $raiseTypeId=null
     )
     {
         $priority = 2;
@@ -10261,6 +10266,11 @@ FROM
                 DBEProblem::userID,
                 null
             );        // not allocated
+            if($raiseTypeId!=null)
+                $dbeProblem->setValue(
+                    DBEProblem::problemraisetypeId,
+                    $raiseTypeId
+                ); 
             $dbeProblem->insertRow();
 
             $problemID = $dbeProblem->getPKValue();
@@ -10323,8 +10333,7 @@ FROM
             );
 
             $dbeCallActivity->insertRow();
-            $this->setProblemRaise($dbeProblem,$dbeCallActivity,BUProblemRaiseType::ALERT); //createSecondsiteSR
-        } else {
+         } else {
 
             $this->createFollowOnActivity(
                 $callActivityID,
@@ -10364,7 +10373,8 @@ FROM
             $details,
             $details,
             $serverName,
-            $serverCustomerItemID
+            $serverCustomerItemID,
+            BUProblemRaiseType::ALERTID
         );
     }
 
