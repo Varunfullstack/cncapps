@@ -17,6 +17,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "html-react-parser": "^0.13.0",
         "react": "^16.13.1",
         "react-dom": "^16.13.1",
         "react-input-mask": "^2.0.4",

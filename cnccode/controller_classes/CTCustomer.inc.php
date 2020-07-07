@@ -1601,7 +1601,8 @@ class CTCustomer extends CTCNC
         $this->template->setVar(
             'javaScript',
             "<script src='components/customerEditMain/dist/CustomerReviewComponent.js?version=1.0.0'></script>
-            <script src='components/customerEditMain/dist/CustomerNotesComponent.js?version=1.0.0'></script>"
+            <script src='components/customerEditMain/dist/CustomerNotesComponent.js?version=1.0.0'></script>
+            <script src='components/customerEditMain/dist/CustomerProjectsComponent.js?version=1.0.0'></script>"
         );
 
 // Parameters
@@ -3434,7 +3435,7 @@ class CTCustomer extends CTCNC
     {
         $response = [];
         try {
-            $response['data'] = $this->getCustomerProjects($_REQUEST['customerID']);
+            $response['data'] = $this->getCustomerProjects($_REQUEST['customerId']);
             $response["status"] = "ok";
         } catch (Exception $exception) {
             http_response_code(400);
