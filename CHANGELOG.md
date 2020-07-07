@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+## Added
+- Issue 915 - Customer Page Sites Rewrite
+
 ## [v4.2.3] - 2020-07-15
 ### Changed
 - Split up SD Monitor into different bits and pieces so that they can run independently.
