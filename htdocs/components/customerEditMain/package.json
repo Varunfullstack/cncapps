@@ -5,10 +5,14 @@
     "main": "CMPMySettings.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "buildCustomerNotes": "parcel build src/CustomerNotesComponent.js --public-url /components/customerEditMain/dist",
-        "buildCustomerReview": "parcel build src/CustomerReviewComponent.js --public-url /components/customerEditMain/dist",
-        "start": "parcel src/CustomerReviewComponent.js --public-url /components/customerEditMain/dist && parcel src/CustomerNotesComponent.js --public-url /components/customerEditMain/dist",
-        "build": "npm run buildCustomerReview && npm run buildCustomerNotes"
+        "buildCustomerNotesComponent": "parcel build src/CustomerNotesComponent.js --public-url /components/customerEditMain/dist",
+        "buildCustomerReviewComponent": "parcel build src/CustomerReviewComponent.js --public-url /components/customerEditMain/dist",
+        "buildCustomerProjectsComponent": "parcel build src/CustomerProjectsComponent.js --public-url /components/customerEditMain/dist",
+        "startCustomerNotesComponent": "parcel src/CustomerReviewComponent.js --public-url /components/customerEditMain/dist",
+        "startCustomerReviewComponent": "parcel src/CustomerNotesComponent.js --public-url /components/customerEditMain/dist",
+        "startCustomerProjectsComponent": "parcel src/CustomerProjectsComponent.js --public-url /components/customerEditMain/dist",
+        "start": "npm run startCustomerNotesComponent && npm run startCustomerReviewComponent && npm run startCustomerProjectsComponent",
+        "build": "npm run buildCustomerReview && npm run buildCustomerNotes && npm run buildCustomerProjectsComponent"
     },
     "author": "",
     "license": "ISC",
