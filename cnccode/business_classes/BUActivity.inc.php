@@ -11189,7 +11189,8 @@ FROM
         "itemDescription"=>$itemDescription,
         "customerName"=>$dsCustomer->getValue(DBECustomer::name),
         "expireDate"=>$expireDate,
-        "SITE_URL"=>SITE_URL
+        "SITE_URL"=>SITE_URL,
+        "callActivityID"=>$dbeCallActivity->getPKValue()
         ];
         // $content ="The service #ServiceName at #CustomerName comes to the end of contract on the #expireDate.
         // Please review to ensure that appropriate action is taken and a proposal submitted to the customer.";
@@ -11212,8 +11213,8 @@ FROM
         $hdrs = array(
             'From'         => $senderEmail,
             'To'           => $toEmail,
-            'Subject'      => CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' - Will expire',
-            'Date'         => date("r")            
+            'Subject'      => "Leased line contract expiry notification",// CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' - Will expire',
+            'Date'         => date("r")
         );
 
         $buMail->mime->setHTMLBody($body);

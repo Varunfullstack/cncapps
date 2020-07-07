@@ -59,7 +59,7 @@ if ($dsRenBroadband->rowCount()) {
             $buActivity=new BUActivity($thing);   
             $buActivity->createActivityLeasedLineExpire( 
                 $dsRenBroadband->getValue(DBEJRenBroadband::customerID),           
-                $dsRenBroadband->getValue(DBEJRenBroadband::itemID),
+                $customerItemID,
                 $dsRenBroadband->getValue(DBEJRenBroadband::itemDescription),
                 Controller::dateYMDtoDMY(
                     $dsRenBroadband->getValue(DBEJRenBroadband::contractExpiryDate)
