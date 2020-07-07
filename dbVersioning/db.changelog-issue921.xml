@@ -1,0 +1,241 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="pavwebdevmt" id="issue921-0">
+        <tagDatabase tag="issue921"/>
+    </changeSet>
+
+    <changeSet author="pavwebdevmt" id="issue921-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="problemRaiseType"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="problemRaiseType">
+            <column autoIncrement="true" name="id" type="INT UNSIGNED">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="description" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <sql>
+            insert into problemRaiseType(description)
+            values ('Email');
+            insert into problemRaiseType(description)
+            values ('Portal');
+            insert into problemRaiseType(description)
+            values ('Phone');
+            insert into problemRaiseType(description)
+            values ('On site');
+            insert into problemRaiseType(description)
+            values ('Alert');
+            insert into problemRaiseType(description)
+            values ('Sales');
+            insert into problemRaiseType(description)
+            values ('Manual');
+        </sql>
+
+        <rollback>
+            drop table problemRaiseType;
+        </rollback>
+    </changeSet>
+
+    <changeSet author="pavwebdevmt" id="issue921-2">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="problemRaiseType"/>
+            <not>
+                <columnExists tableName="problem" columnName="problemraisetypeId"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="problem">
+            <column name="problemraisetypeId" type="INT UNSIGNED">
+            </column>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="problem"
+                                 baseColumnNames="problemraisetypeId"
+                                 constraintName="fk_proRaiseTypeId"
+                                 referencedTableName="problemRaiseType"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"
+        />
+        <rollback>
+            alter table problem drop foreign key fk_proRaiseTypeId;
+            alter table problem drop column problemraisetypeId;
+        </rollback>
+    </changeSet>
+    <changeSet author="pavwebdevmt" id="issue921-3">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="consultant"/>
+            <not>
+                <columnExists tableName="consultant" columnName="basedAtCustomerSite"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="consultant">
+            <column defaultValue="0" name="basedAtCustomerSite" remarks="Based at customer site" type="TINYINT(1)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <sql>
+            update consultant
+            set basedAtCustomerSite=1
+            where cns_consno in (141, 132, 144, 131);
+        </sql>
+        <rollback>
+            <dropColumn tableName="consultant" columnName="basedAtCustomerSite"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="pavwebdevmt" id="issue921-6">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="problem"/>
+            <tableExists tableName="callactivity"/>
+            <tableExists tableName="problemRaiseType"/>
+        </preConditions>
+        <sql splitStatements="true">
+             -- clear problemraisetypeId            
+            UPDATE `problem`
+            SET problemraisetypeId=NULL;
+
+            -- set raise alert
+            UPDATE `problem`
+            SET problemraisetypeId=5
+            WHERE `pro_date_raised` >= '2016-01-01'
+              AND `pro_problemno` IN (
+                SELECT `caa_problemno`
+                FROM `callactivity`
+                WHERE problem.`pro_problemno` = callactivity.`caa_problemno`
+                  AND `caa_callacttypeno` = 51
+                  AND callactivity.caa_serverguard = 'Y'
+            );
+
+            -- set raise sales
+            UPDATE `problem`
+            SET problemraisetypeId=6
+            WHERE `pro_date_raised` >= '2016-01-01'
+              AND `pro_linked_ordno` IS NOT NULL
+              AND `pro_priority` = 5
+              AND problemraisetypeId IS NULL;
+
+            -- set raise email
+            UPDATE `problem`
+            SET problemraisetypeId=1
+            WHERE `pro_date_raised` >= '2016-01-01'
+              AND problemraisetypeId IS NULL
+              AND `pro_problemno` IN (
+                SELECT `caa_problemno`
+                FROM `callactivity`
+                WHERE problem.`pro_problemno` = callactivity.`caa_problemno`
+                  AND callactivity.`caa_consno` = 67
+                  AND callactivity.`caa_callacttypeno` = 51
+                  AND callactivity.caa_serverguard = 'N'
+            );
+
+            -- set raise to Phone
+            UPDATE `problem`
+            SET problemraisetypeId=3
+            WHERE problemraisetypeId IS NULL
+              AND `pro_date_raised` >= '2016-01-01'
+              AND `pro_problemno` IN (
+                SELECT `caa_problemno`
+                FROM `callactivity`
+                         JOIN `consultant` ON callactivity.`caa_consno` = consultant.`cns_consno`
+                WHERE problem.`pro_problemno` = callactivity.`caa_problemno`
+                  AND `caa_callacttypeno` = 51
+                  AND `teamID` = 1
+                  AND `basedAtCustomerSite` = 0
+            );
+
+            -- manual
+            UPDATE `problem`
+            SET problemraisetypeId=7
+            WHERE problemraisetypeId IS NULL
+              AND `pro_date_raised` >= '2016-01-01'
+              AND `pro_problemno` IN (
+                SELECT `caa_problemno`
+                FROM `callactivity`
+                         JOIN `consultant` ON callactivity.`caa_consno` = consultant.`cns_consno`
+                WHERE problem.`pro_problemno` = callactivity.`caa_problemno`
+                  AND `caa_callacttypeno` = 51
+                  AND `teamID` > 1
+            );
+
+            -- set raise to On Site
+            UPDATE problem
+            SET problemraisetypeId=4
+            WHERE problemraisetypeId IS NULL
+            AND pro_date_raised >= '2016-01-01'
+            AND pro_problemno IN (
+		    SELECT caa_problemno
+		    FROM callactivity
+		    JOIN consultant ON callactivity.caa_consno = consultant.cns_consno
+		    WHERE problem.pro_problemno = callactivity.caa_problemno
+		    AND caa_callacttypeno = 51
+		    AND teamID = 1
+		    AND basedAtCustomerSite = 1
+            );
+        </sql>         
+    </changeSet>
+
+     <changeSet author="pavwebdevmt" id="issue921-7">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="customer"/>
+            <tableExists tableName="consultant"/>
+            <not>
+                <columnExists tableName="consultant" columnName="siteCustId"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="consultant">
+            <column   name="siteCustId" remarks="Customer Id " type="INT(11)">
+            </column>
+        </addColumn>
+
+        <addForeignKeyConstraint    baseTableName="consultant"
+                                    baseColumnNames="siteCustId"
+                                    constraintName="fk_siteCustId"
+                                    referencedTableName="customer"
+                                    referencedColumnNames="cus_custno"                                   
+                />
+
+        <sql splitStatements="true">
+            update consultant set siteCustId=6585  where cns_consno =141;
+            update consultant set siteCustId=6585  where cns_consno =144;
+            update consultant set siteCustId=3474  where cns_consno =131;
+            update consultant set siteCustId=3474  where cns_consno =132;
+        </sql>
+        <rollback>
+            <dropColumn tableName="consultant" columnName="siteCustId"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="pavwebdevmt" id="issue921-8">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="problem"/>
+            <tableExists tableName="callactivity"/>
+            <tableExists tableName="problemRaiseType"/>
+        </preConditions>
+        <sql splitStatements="true">
+            -- set raise to On Site
+           UPDATE problem  SET problemraisetypeId=4
+            WHERE    pro_date_raised >= '2016-01-01' 
+            AND pro_problemno IN ( 
+                SELECT caa_problemno  FROM  callactivity  			 
+                    JOIN consultant ON callactivity.caa_consno = consultant.cns_consno 
+                WHERE  
+                problem.pro_problemno = callactivity.caa_problemno 		   
+                AND caa_callacttypeno = 51
+                AND teamID = 1
+                AND basedAtCustomerSite = 1 
+                AND  consultant.`siteCustId`=problem.`pro_custno`		
+		   )
+        </sql>         
+    </changeSet>
+</databaseChangeLog>

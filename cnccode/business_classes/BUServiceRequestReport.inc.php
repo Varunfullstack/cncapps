@@ -42,11 +42,13 @@ class BUServiceRequestReport extends Business
      * @param DSForm $dsSearchForm
      * @return bool|mysqli_result
      */
-    function search(&$dsSearchForm)
+    function search(&$dsSearchForm,$hasInialActivity=false)
     {
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
-
+        $inialActivity="";
+        if($hasInialActivity)
+        $inialActivity=",(select min(caa_callactivityno) from callactivity where caa_problemno=pro_problemno and caa_callacttypeno=51) inialActivity";
         $query =
             "
         SELECT 
@@ -87,7 +89,11 @@ class BUServiceRequestReport extends Business
             IFNULL(add_postcode, ''),
             ' ',
             IFNULL(adslPhone, '')
-          ) AS `Contract`
+          ) AS `Contract`,
+          prt.description AS raiseType,
+          pro_status AS status,
+          pro_contract_cuino
+          $inialActivity
         FROM
           problem 
           LEFT JOIN customer 
@@ -104,6 +110,8 @@ class BUServiceRequestReport extends Business
             ON add_custno = cui_custno AND add_siteno = cui_siteno
           LEFT JOIN item 
             ON itm_itemno = cui_itemno
+          LEFT JOIN ProblemRaiseType prt
+            ON problem.problemraisetypeId=prt.id
           WHERE 1=1";
 
         if ($dsSearchForm->getValue(self::searchFormFromDate)) {

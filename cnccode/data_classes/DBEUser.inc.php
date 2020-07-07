@@ -68,6 +68,8 @@ class DBEUser extends DBEntity
     const globalExpenseApprover = "globalExpenseApprover";
     const additionalTimeLevelApprover = "additionalTimeLevelApprover";
     const sendEmailWhenAssignedService = "sendEmailAssignedService";
+    const basedAtCustomerSite = "basedAtCustomerSite";
+    const siteCustId = "siteCustId";
 
     /**
      * calls constructor()
@@ -385,7 +387,18 @@ class DBEUser extends DBEntity
             null,
             0
         );
-
+        $this->addColumn(
+            self::basedAtCustomerSite,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            0
+        );
+        $this->addColumn(
+            self::siteCustId,
+            DA_ID,
+            DA_ALLOW_NULL
+        );
         $this->addColumn(self::globalExpenseApprover, DA_BOOLEAN, DA_NOT_NULL, null, 0);
         $this->addColumn(self::additionalTimeLevelApprover, DA_BOOLEAN, DA_NOT_NULL, null, 0);
         $this->addColumn(self::sendEmailWhenAssignedService, DA_BOOLEAN, DA_NOT_NULL, null, 1);

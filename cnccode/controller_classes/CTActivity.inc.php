@@ -20,6 +20,7 @@ require_once($cfg['path_dbe'] . '/DBEJCallActivity.php');
 require_once($cfg['path_dbe'] . '/DBECallDocument.inc.php');
 require_once($cfg['path_dbe'] . '/DBECallActType.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJCallActType.php');
+require_once($cfg['path_dbe'] . '/DBEProblemRaiseType.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUExpenseType.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
@@ -2161,7 +2162,7 @@ class CTActivity extends CTCNC
 
 
         $this->template->set_var(
-            array(
+            array(                
                 'hiddenText'                         => $hiddenText,
                 'currentUserBgColor'                 => $currentUserBgColor,
                 'currentUser'                        => $currentUser,
@@ -2313,8 +2314,8 @@ class CTActivity extends CTCNC
                     "Service Request {$problemID}"
                 ),
                 'authorisedByHide'                   => $authorisedByName ? null : "hidden",
-                'authorisedByName'                   => $authorisedByName
-
+                'authorisedByName'                   => $authorisedByName,
+                'raiseIcon'                          => $this->getProblemRaiseIcon ($dbeJProblem)
             )
         );
 
@@ -7341,5 +7342,43 @@ WHERE caa_problemno = ?
         $test = $result->fetch_assoc();
 
         return !!$test['hiddenChargeableActivities'];
+    }
+    private function getProblemRaiseIcon($dbeJProblem)
+    {
+        if(isset($dbeJProblem))
+        {
+            $raiseTypeId=$dbeJProblem->getValue(DBEProblem::problemraisetypeId);
+            if(isset($raiseTypeId) && $raiseTypeId !=null)
+            {
+               $dbeProblemRaiseType=new  DBEProblemRaiseType($this);
+               $dbeProblemRaiseType->setPKValue($raiseTypeId);
+               $dbeProblemRaiseType->getRow();
+               switch($dbeProblemRaiseType->getValue(DBEProblemRaiseType::description))
+               {
+                   case 'Email':
+                        return "<i class='fa fa-envelope' title='This Service Request was raised by email'></i>";
+                    break;
+                    case 'Portal':
+                        return "<i class='fa fa-edge' title='This Service Request was raised by the portal'></i>";
+                    break;
+                    case 'Phone':
+                        return "<i class='fa fa-phone' title='This Service Request was raised by phone'></i>";
+                    break;
+                    case 'On site':
+                        return "<i class='fas fa-building' title='This Service Request was raised by an on site engineer'></i>";
+                    break;
+                    case 'Alert':
+                        return "<i class='fas fa-bell' title='This Service Request was raised by an alert'></i>";
+                    break;
+                    case 'Sales':
+                        return "<i class='fas fa-shopping-cart' title='This Service Request was raised via Sales'></i>";
+                    break;
+                    case 'Manual':
+                        return "<i class='fas fa-user-edit' title='This Service Request was raised manually'></i>";
+                    break;
+               }
+            }
+        }
+        else return null;
     }
 }

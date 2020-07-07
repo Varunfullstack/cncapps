@@ -151,6 +151,7 @@ FROM
   JOIN consultant engineer 
     ON initial.`caa_consno` = engineer.`cns_consno` 
 WHERE problem.`pro_custno` <> 282 
+  AND problem.problemraisetypeId=3
   AND 
   (SELECT 
     COUNT(item.`itm_itemno`) 
