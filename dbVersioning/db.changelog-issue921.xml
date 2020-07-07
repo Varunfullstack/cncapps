@@ -49,16 +49,16 @@
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="problemRaiseType"/>
             <not>
-                <columnExists tableName="problem" columnName="problemraisetypeId"/>
+                <columnExists tableName="problem" columnName="raiseTypeId"/>
             </not>
         </preConditions>
 
         <addColumn tableName="problem">
-            <column name="problemraisetypeId" type="INT UNSIGNED">
+            <column name="raiseTypeId" type="INT UNSIGNED">
             </column>
         </addColumn>
         <addForeignKeyConstraint baseTableName="problem"
-                                 baseColumnNames="problemraisetypeId"
+                                 baseColumnNames="raiseTypeId"
                                  constraintName="fk_proRaiseTypeId"
                                  referencedTableName="problemRaiseType"
                                  referencedColumnNames="id"
@@ -66,7 +66,7 @@
         />
         <rollback>
             alter table problem drop foreign key fk_proRaiseTypeId;
-            alter table problem drop column problemraisetypeId;
+            alter table problem drop column raiseTypeId;
         </rollback>
     </changeSet>
     <changeSet author="pavwebdevmt" id="issue921-3">
@@ -100,13 +100,13 @@
             <tableExists tableName="problemRaiseType"/>
         </preConditions>
         <sql splitStatements="true">
-             -- clear problemraisetypeId            
+             -- clear emraisetypeId            
             UPDATE `problem`
-            SET problemraisetypeId=NULL;
+            SET raiseTypeId=NULL;
 
             -- set raise alert
             UPDATE `problem`
-            SET problemraisetypeId=5
+            SET raiseTypeId=5
             WHERE `pro_date_raised` >= '2016-01-01'
               AND `pro_problemno` IN (
                 SELECT `caa_problemno`
@@ -118,17 +118,17 @@
 
             -- set raise sales
             UPDATE `problem`
-            SET problemraisetypeId=6
+            SET raiseTypeId=6
             WHERE `pro_date_raised` >= '2016-01-01'
               AND `pro_linked_ordno` IS NOT NULL
               AND `pro_priority` = 5
-              AND problemraisetypeId IS NULL;
+              AND raiseTypeId IS NULL;
 
             -- set raise email
             UPDATE `problem`
-            SET problemraisetypeId=1
+            SET raiseTypeId=1
             WHERE `pro_date_raised` >= '2016-01-01'
-              AND problemraisetypeId IS NULL
+              AND raiseTypeId IS NULL
               AND `pro_problemno` IN (
                 SELECT `caa_problemno`
                 FROM `callactivity`
@@ -140,8 +140,8 @@
 
             -- set raise to Phone
             UPDATE `problem`
-            SET problemraisetypeId=3
-            WHERE problemraisetypeId IS NULL
+            SET raiseTypeId=3
+            WHERE raiseTypeId IS NULL
               AND `pro_date_raised` >= '2016-01-01'
               AND `pro_problemno` IN (
                 SELECT `caa_problemno`
@@ -155,8 +155,8 @@
 
             -- manual
             UPDATE `problem`
-            SET problemraisetypeId=7
-            WHERE problemraisetypeId IS NULL
+            SET raiseTypeId=7
+            WHERE raiseTypeId IS NULL
               AND `pro_date_raised` >= '2016-01-01'
               AND `pro_problemno` IN (
                 SELECT `caa_problemno`
@@ -169,8 +169,8 @@
 
             -- set raise to On Site
             UPDATE problem
-            SET problemraisetypeId=4
-            WHERE problemraisetypeId IS NULL
+            SET raiseTypeId=4
+            WHERE raiseTypeId IS NULL
             AND pro_date_raised >= '2016-01-01'
             AND pro_problemno IN (
 		    SELECT caa_problemno
@@ -224,7 +224,7 @@
         </preConditions>
         <sql splitStatements="true">
             -- set raise to On Site
-           UPDATE problem  SET problemraisetypeId=4
+           UPDATE problem  SET raiseTypeId=4
             WHERE    pro_date_raised >= '2016-01-01' 
             AND pro_problemno IN ( 
                 SELECT caa_problemno  FROM  callactivity  			 

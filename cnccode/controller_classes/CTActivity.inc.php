@@ -7347,7 +7347,7 @@ WHERE caa_problemno = ?
     {
         if(isset($dbeJProblem))
         {
-            $raiseTypeId=$dbeJProblem->getValue(DBEProblem::problemraisetypeId);
+            $raiseTypeId=$dbeJProblem->getValue(DBEProblem::raiseTypeId);
             if(isset($raiseTypeId) && $raiseTypeId !=null)
             {
                $dbeProblemRaiseType=new  DBEProblemRaiseType($this);

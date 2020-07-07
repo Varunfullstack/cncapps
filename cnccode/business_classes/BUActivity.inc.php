@@ -5423,9 +5423,92 @@ is currently a balance of ';
         );
 
         $dbeCallActivity->insertRow();
-        $this->setProblemRaise($dbeProblem,$dbeCallActivity); //createActivityFromCustomerID
+        $this->setProblemRaise($dbeProblem, $dbeCallActivity); //createActivityFromCustomerID
 
         return $dbeCallActivity->getPKValue();
+    }
+
+    private function setProblemRaise($dbeProblem, $callActivity, $raiseType = null)
+    {
+        if (!isset($dbeProblem) && !isset($callActivity))
+            return null;
+        if ($raiseType != null) {
+            $dbeProblem->setValue(
+                DBEProblem::raiseTypeId,
+                $this->getProblemRaiseType($raiseType)
+            );
+            $dbeProblem->updateRow();
+            return;
+        }
+        if (isset($GLOBALS['auth'])) {
+            // get team
+            $userID = $GLOBALS['auth']->is_authenticated();
+            if (isset($userID)) {
+                $dbeUser = new DBEUser($this);
+                $dbeUser->setPKValue($userID);
+                $dbeUser->getRow();
+                $teamId = $dbeUser->getValue(DBEUser::teamID);
+            }
+        }
+
+
+        //For each problem, where callactivity.caa_callacttypeno = 57 and callactivity.caa_serverguard = Y, then set the problem source as Alert.
+        if (
+            isset($dbeProblem) && isset($callActivity)
+            && $callActivity->getValue(DBEJCallActivity::callActTypeID) == 57
+            && $callActivity->getValue(DBEJCallActivity::serverGuard) == 'Y'
+        ) {
+            $dbeProblem->setValue(
+                DBEProblem::raiseTypeId,
+                $this->getProblemRaiseType(BUProblemRaiseType::ALERT)
+            );
+        } else if (
+            isset($dbeProblem) && isset($callActivity)
+            && $dbeProblem->getValue(DBEJProblem::linkedSalesOrderID) > 0
+            //&& $dbeProblem->getValue(DBEJProblem::priority) == 5
+        ) {
+            $dbeProblem->setValue(
+                DBEProblem::raiseTypeId,
+                $this->getProblemRaiseType(BUProblemRaiseType::SALES)
+            );
+        } else if //For each problem, where callactivity.caa_callactivityno = 57 and callactivity.caa_consno = 67 and callactivity.caa_serverguard = N, then set the problem source as Email.
+        (
+            isset($dbeProblem) && isset($callActivity)
+            && $callActivity->getValue(DBEJCallActivity::callActTypeID) == 57
+            && $callActivity->getValue(DBEJCallActivity::caaConsno) == 67
+            && $callActivity->getValue(DBEJCallActivity::serverGuard) == 'N'
+        ) {
+            $dbeProblem->setValue(
+                DBEProblem::raiseTypeId,
+                $this->getProblemRaiseType(BUProblemRaiseType::EMAIL)
+            );
+        } else if (isset($teamId) && $teamId == 1) //created by help desk
+        {
+            $raiseType = BUProblemRaiseType::PHONE;
+            if ($dbeUser->getValue(DBEUser::basedAtCustomerSite) == 1 &&
+                $dbeProblem->getValue(DBEProblem::customerID) == $dbeUser->getValue(DBEUser::siteCustId))
+                $raiseType = BUProblemRaiseType::ONSITE;
+            $dbeProblem->setValue(
+                DBEProblem::raiseTypeId,
+                $this->getProblemRaiseType($raiseType)
+            );
+        } else {
+            $dbeProblem->setValue(
+                DBEProblem::raiseTypeId,
+                $this->getProblemRaiseType(BUProblemRaiseType::MANUAL)
+            );
+        }
+
+        if (isset($dbeProblem))
+            $dbeProblem->updateRow();
+    }
+
+    private function getProblemRaiseType($description)
+    {
+        $buProblemRaiseType = new BUProblemRaiseType($this);
+        $id = null;
+        $id = $buProblemRaiseType->getProblemRaiseTypeByName($description)['id'];
+        return $id;
     }
 
     /**
@@ -5451,7 +5534,7 @@ is currently a balance of ';
         /*
     * Create a new problem
     */
-    
+
         $dbeProblem = new DBEProblem($this);
         $dbeProblem->setValue(
             DBEProblem::hdLimitMinutes,
@@ -5545,8 +5628,7 @@ is currently a balance of ';
             DBEProblem::projectID,
             @$_SESSION [$sessionKey] ['projectID']
         );
-        
-        
+
 
         $dbeProblem->insertRow();
 
@@ -5630,7 +5712,7 @@ is currently a balance of ';
             $GLOBALS['auth']->is_authenticated()
         ); // user that created activity
         $dsCallActivity->post();
-        $this->setProblemRaise($dbeProblem,$dsCallActivity); //createActivityFromSession
+        $this->setProblemRaise($dbeProblem, $dsCallActivity); //createActivityFromSession
 
         $dbeContact = null;
         if (@$_SESSION[$sessionKey]['contactID']) {
@@ -5673,88 +5755,6 @@ is currently a balance of ';
         unset($_SESSION[$sessionKey]);
 
         return $dsCallActivity;
-    }
-    private function getProblemRaiseType($description)
-    {      
-        $buProblemRaiseType =new BUProblemRaiseType($this);
-        $id=null;
-        $id= $buProblemRaiseType->getProblemRaiseTypeByName($description)['id'];              
-        return $id;
-    }
-    private function setProblemRaise($dbeProblem, $callActivity, $raiseType = null)
-    {
-        if (!isset($dbeProblem) && !isset($callActivity))
-            return null;
-        if ($raiseType != null) {
-            $dbeProblem->setValue(
-                DBEProblem::problemraisetypeId,
-                $this->getProblemRaiseType($raiseType)
-            );
-            $dbeProblem->updateRow();
-            return;
-        }
-        if (isset($GLOBALS['auth'])) {
-            // get team
-            $userID = $GLOBALS['auth']->is_authenticated();
-            if (isset($userID)) {
-                $dbeUser = new DBEUser($this);
-                $dbeUser->setPKValue($userID);
-                $dbeUser->getRow();
-                $teamId = $dbeUser->getValue(DBEUser::teamID);
-            }
-        }
-      
-        
-        //For each problem, where callactivity.caa_callacttypeno = 57 and callactivity.caa_serverguard = Y, then set the problem source as Alert.
-          if (
-            isset($dbeProblem) && isset($callActivity)
-            && $callActivity->getValue(DBEJCallActivity::callActTypeID) == 57
-            && $callActivity->getValue(DBEJCallActivity::serverGuard) == 'Y'
-        ) {
-            $dbeProblem->setValue(
-                DBEProblem::problemraisetypeId,
-                $this->getProblemRaiseType(BUProblemRaiseType::ALERT)
-            );
-        } else if (
-            isset($dbeProblem) && isset($callActivity)
-            && $dbeProblem->getValue(DBEJProblem::linkedSalesOrderID) > 0
-            //&& $dbeProblem->getValue(DBEJProblem::priority) == 5
-        ) {
-            $dbeProblem->setValue(
-                DBEProblem::problemraisetypeId,
-                $this->getProblemRaiseType(BUProblemRaiseType::SALES)
-            );
-        } else if //For each problem, where callactivity.caa_callactivityno = 57 and callactivity.caa_consno = 67 and callactivity.caa_serverguard = N, then set the problem source as Email.
-        (
-            isset($dbeProblem) && isset($callActivity)
-            && $callActivity->getValue(DBEJCallActivity::callActTypeID) == 57
-            && $callActivity->getValue(DBEJCallActivity::caaConsno) == 67
-            && $callActivity->getValue(DBEJCallActivity::serverGuard) == 'N'
-        ) {
-            $dbeProblem->setValue(
-                DBEProblem::problemraisetypeId,
-                $this->getProblemRaiseType(BUProblemRaiseType::EMAIL)
-            );
-        } else if (isset($teamId) && $teamId == 1) //created by help desk
-        {
-            $raiseType=BUProblemRaiseType::PHONE;
-            if($dbeUser->getValue(DBEUser::basedAtCustomerSite)==1 &&
-            $dbeProblem->getValue(DBEProblem::customerID) == $dbeUser->getValue(DBEUser::siteCustId)  )
-                $raiseType=BUProblemRaiseType::ONSITE;
-            $dbeProblem->setValue(
-                DBEProblem::problemraisetypeId,
-                $this->getProblemRaiseType($raiseType)
-            );
-        }
-        else {
-            $dbeProblem->setValue(
-                DBEProblem::problemraisetypeId,
-                $this->getProblemRaiseType(BUProblemRaiseType::MANUAL)
-            );
-        }
-
-        if (isset($dbeProblem))
-            $dbeProblem->updateRow();
     }
 
     public function toggleMonitoringFlag($problemID)
@@ -6494,7 +6494,9 @@ is currently a balance of ';
         /*
     Send an email to the new person new user is not "unallocated" user
     */
-        if ($userID && $this->dbeUser->getValue(DBEJUser::sendEmailWhenAssignedService)==1) { // not de-allocating          
+        if ($userID && $this->dbeUser->getValue(
+                DBEJUser::sendEmailWhenAssignedService
+            ) == 1) { // not de-allocating
             $this->sendServiceReallocatedEmail(
                 $problemID,
                 $userID,
@@ -6965,8 +6967,7 @@ is currently a balance of ';
             }
         }
 
-             
-       
+
         $dbeProblem->insertRow();
 
         $reason = "<p>An order has been received for the items below:</p>";
@@ -7091,7 +7092,7 @@ is currently a balance of ';
         }
         //$dbeCallActivity->setValue( 'overtimeExportedFlag', 'N' );
         $dbeCallActivity->insertRow();
-        $this->setProblemRaise($dbeProblem,$dbeCallActivity,BUProblemRaiseType::SALES); //createSalesServiceRequest
+        $this->setProblemRaise($dbeProblem, $dbeCallActivity, BUProblemRaiseType::SALES); //createSalesServiceRequest
         $db = new dbSweetcode(); // database connection for query
 
         $sql =
@@ -7890,12 +7891,12 @@ FROM
             DBEJProblem::userID,
             null
         );        // not allocated
-        
-        $raiseTypeId= $record->getServerGuardFlag()=='Y'?BUProblemRaiseType::ALERTID: BUProblemRaiseType::EMAILID;
+
+        $raiseTypeId = $record->getServerGuardFlag() == 'Y' ? BUProblemRaiseType::ALERTID : BUProblemRaiseType::EMAILID;
         $dbeProblem->setValue(
-            DBEJProblem::problemraisetypeId,
+            DBEJProblem::raiseTypeId,
             $raiseTypeId
-        );  
+        );
         $dbeProblem->insertRow();
 
 
@@ -7962,8 +7963,8 @@ FROM
         );
 
         $dbeCallActivity->insertRow();
-       // $this->setProblemRaise($dbeProblem,$dbeCallActivity); // raiseNewRequestFromImport
-        
+        // $this->setProblemRaise($dbeProblem,$dbeCallActivity); // raiseNewRequestFromImport
+
         if ($record->getAttachment() == 'Y') {
             $this->processAttachment(
                 $dbeProblem->getPKValue(),
@@ -9901,9 +9902,9 @@ FROM
                 null
             );        // not allocated
             $dbeProblem->setValue(
-                DBEProblem::problemraisetypeId,
+                DBEProblem::raiseTypeId,
                 BUProblemRaiseType::ALERTID
-            ); 
+            );
             $dbeProblem->insertRow();
 
             $problemID = $dbeProblem->getPKValue();
@@ -9955,7 +9956,7 @@ FROM
             );
 
             $dbeCallActivity->insertRow();
-            
+
         } else {
             $this->createFollowOnActivity(
                 $callActivityID,
@@ -10067,7 +10068,7 @@ FROM
         $details,
         $serverName,
         $serverCustomerItemID,
-        $raiseTypeId=null
+        $raiseTypeId = null
     )
     {
         $priority = 2;
@@ -10160,11 +10161,11 @@ FROM
                 DBEProblem::userID,
                 null
             );        // not allocated
-            if($raiseTypeId!=null)
+            if ($raiseTypeId != null)
                 $dbeProblem->setValue(
-                    DBEProblem::problemraisetypeId,
+                    DBEProblem::raiseTypeId,
                     $raiseTypeId
-                ); 
+                );
             $dbeProblem->insertRow();
 
             $problemID = $dbeProblem->getPKValue();
@@ -10227,7 +10228,7 @@ FROM
             );
 
             $dbeCallActivity->insertRow();
-         } else {
+        } else {
 
             $this->createFollowOnActivity(
                 $callActivityID,
@@ -11017,7 +11018,7 @@ FROM
                 )
             );
             $dbeCallActivity->insertRow();
-            $this->setProblemRaise($dbeProblem,$dbeCallActivity,BUProblemRaiseType::SALES); //sendSalesRequest
+            $this->setProblemRaise($dbeProblem, $dbeCallActivity, BUProblemRaiseType::SALES); //sendSalesRequest
         }
 
         $buStandardText = new BUStandardText($this);
@@ -11208,22 +11209,22 @@ FROM
     }
 
     function createActivityLeasedLineExpire(
-        $customerID,      
+        $customerID,
         $custItemID,
-        $itemDescription,  
-        $expireDate,      
+        $itemDescription,
+        $expireDate,
         $problemStatus = 'I',
-        $priority=5,
-        $hideFromCustomerFlag='Y'
+        $priority = 5,
+        $hideFromCustomerFlag = 'Y'
     )
-    { 
+    {
 
         $this->setMethodName('createActivityLeasedLineExpire');
-        $reason="The contract for".'  :  '.$itemDescription .' will be expired on '
-        .$expireDate;
+        $reason = "The contract for" . '  :  ' . $itemDescription . ' will be expired on '
+            . $expireDate;
         //$contractCustomerItemID =`custitem_contract`.cic_contractcuino
         $problemStatus = 'I';
-        $userID =67 ;  // qsystem
+        $userID = 67;  // qsystem
         $buCustomer = new BUCustomer($this);
 
         $dsCustomer = new DataSet($this);
@@ -11258,12 +11259,16 @@ FROM
         $dbeProblem->setValue(
             DBEJProblem::dateRaised,
             date(DATE_MYSQL_DATETIME)
-        ); // default
+        );
+        $dbeProblem->setValue(
+            DBEProblem::raiseTypeId,
+            6
+        );
         $dbeProblem->setValue(
             DBEJProblem::hideFromCustomerFlag,
             $hideFromCustomerFlag
         );
-         
+
         $dbeProblem->insertRow();
 //callactivity.salesRequestStatus = 'O' and caa_callacttypeno = 43
         $dbeCallActivity = new DBECallActivity($this);
@@ -11328,13 +11333,14 @@ FROM
         // send email to grahaml@cnc-ltd.co.uk
         $buMail = new BUMail($this);
         $senderEmail = CONFIG_SUPPORT_EMAIL;
-        $activityRef =  $dbeProblem->getPKValue() . ' ' .$dsCustomer->getValue(DBECustomer::name);
-        $data=["custItemID"=>$custItemID,
-        "itemDescription"=>$itemDescription,
-        "customerName"=>$dsCustomer->getValue(DBECustomer::name),
-        "expireDate"=>$expireDate,
-        "SITE_URL"=>SITE_URL,
-        "callActivityID"=>$dbeCallActivity->getPKValue()
+        $activityRef = $dbeProblem->getPKValue() . ' ' . $dsCustomer->getValue(DBECustomer::name);
+        $data = [
+            "custItemID"      => $custItemID,
+            "itemDescription" => $itemDescription,
+            "customerName"    => $dsCustomer->getValue(DBECustomer::name),
+            "expireDate"      => $expireDate,
+            "SITE_URL"        => SITE_URL,
+            "callActivityID"  => $dbeCallActivity->getPKValue()
         ];
         // $content ="The service #ServiceName at #CustomerName comes to the end of contract on the #expireDate.
         // Please review to ensure that appropriate action is taken and a proposal submitted to the customer.";
@@ -11352,13 +11358,14 @@ FROM
 
         $dbeStandardText = new DBEStandardText($this);
         $dbeStandardText->getRow($dbeCallActivity->getValue(DBECallActivity::requestType));
-        $toEmail = $dbeStandardText->getValue(DBEStandardText::salesRequestEmail);  
-        
+        $toEmail = $dbeStandardText->getValue(DBEStandardText::salesRequestEmail);
+
         $hdrs = array(
-            'From'         => $senderEmail,
-            'To'           => $toEmail,
-            'Subject'      => "Leased line contract expiry notification",// CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' - Will expire',
-            'Date'         => date("r")
+            'From'    => $senderEmail,
+            'To'      => $toEmail,
+            'Subject' => "Leased line contract expiry notification",
+            // CONFIG_SERVICE_REQUEST_DESC . ' ' . $activityRef . ' - Will expire',
+            'Date'    => date("r")
         );
 
         $buMail->mime->setHTMLBody($body);
@@ -11377,8 +11384,8 @@ FROM
             $toEmail,
             $hdrs,
             $body
-        );         
+        );
         return true;
     }
-    
+
 }

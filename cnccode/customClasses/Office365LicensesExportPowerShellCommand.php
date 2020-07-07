@@ -447,7 +447,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             null
         );        // not allocated
         $dbeProblem->setValue(
-            DBEProblem::problemraisetypeId,
+            DBEProblem::raiseTypeId,
             BUProblemRaiseType::ALERTID
         ); 
         $dbeProblem->insertRow();
@@ -849,7 +849,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             null
         );        // not allocated
         $dbeProblem->setValue(
-            DBEProblem::problemraisetypeId,
+            DBEProblem::raiseTypeId,
             BUProblemRaiseType::ALERTID
         ); 
         $dbeProblem->insertRow();
@@ -988,7 +988,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             null
         );        // not allocated
         $dbeProblem->setValue(
-            DBEProblem::problemraisetypeId,
+            DBEProblem::raiseTypeId,
             BUProblemRaiseType::ALERTID
         ); 
         $dbeProblem->insertRow();

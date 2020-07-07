@@ -164,7 +164,7 @@ try {
 
         $dbeProblem->setValue(DBEProblem::internalNotes, $internalNotes);        
         $dbeProblem->setValue(
-            DBEProblem::problemraisetypeId,
+            DBEProblem::raiseTypeId,
             BUProblemRaiseType::MANUALID
         ); 
         $dbeProblem->insertRow();
@@ -311,7 +311,7 @@ try {
         null
     );        // not allocated
     $dbeProblem->setValue(
-        DBEProblem::problemraisetypeId,
+        DBEProblem::raiseTypeId,
         BUProblemRaiseType::MANUALID
     ); 
     $dbeProblem->insertRow();
