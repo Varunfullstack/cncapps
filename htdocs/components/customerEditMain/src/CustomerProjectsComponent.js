@@ -1,6 +1,7 @@
 import React from 'react';
 import Skeleton from "react-loading-skeleton";
 import ReactDOM from 'react-dom';
+import * as HTMLReactParser from 'html-react-parser'
 
 class CustomerProjectsComponent extends React.Component {
     el = React.createElement;
@@ -13,11 +14,10 @@ class CustomerProjectsComponent extends React.Component {
             customerId: props.customerID,
         };
         document.customerProjectsComponent = this;
-        this.handleDeleteProject = this.handleDeleteProject.bind(this);
     }
 
     fetchCustomerProjects() {
-        return fetch('/CustomerNote.php?action=getCustomerProjects&customerId=' + this.props.customerID)
+        return fetch('?action=getCustomerProjects&customerId=' + this.props.customerID)
             .then(response => response.json())
             .then(response => this.setState({customerProjects: response.data}));
     }
@@ -34,22 +34,24 @@ class CustomerProjectsComponent extends React.Component {
     renderHeadingRow() {
         return this.el(
             'tr',
-            {},
+            {
+                key: 'headerRow'
+            },
             [
-                this.renderTd('headerLightgrey', 'Name'),
-                this.renderTd('headerLightgrey', 'Notes'),
-                this.renderTd('headerLightgrey', 'Starts'),
-                this.renderTd('headerLightgrey', 'Expires'),
-                this.renderTd('headerLightgrey', ' '),
+                this.renderTd('headerLightgrey', 'Name', 'headerName'),
+                this.renderTd('headerLightgrey', 'Notes', 'headerNotes'),
+                this.renderTd('headerLightgrey', 'Starts', 'headerStarts'),
+                this.renderTd('headerLightgrey', 'Expires', 'headerExpires'),
+                this.renderTd('headerLightgrey', ' ', 'headerActions'),
             ],
         )
     }
 
-    renderTd(className, value) {
+    renderTd(className, value, key, isComplex = false) {
         return this.el(
             'td',
-            {className},
-            value
+            {className, key},
+            (value && !isComplex && HTMLReactParser.default(value)) || value
         )
     }
 
@@ -59,8 +61,11 @@ class CustomerProjectsComponent extends React.Component {
         }
         return this.el(
             'a',
-            {href: `Project.php?action=delete&projectID=${project.id}`},
-            'delete'
+            {
+                href: `Project.php?action=delete&projectID=${project.id}`,
+                key: `delete-${project.id}`
+            },
+            ' delete'
         )
     }
 
@@ -69,23 +74,28 @@ class CustomerProjectsComponent extends React.Component {
             project => {
                 return this.el(
                     'tr',
-                    {},
+                    {
+                        key: `projectRow-${project.id}`
+                    },
                     [
-                        this.renderTd('content', project.name),
-                        this.renderTd('content', project.notes),
-                        this.renderTd('content', project.startDate),
-                        this.renderTd('content', project.expiryDate),
+                        this.renderTd('content', project.name, `name-${project.id}`),
+                        this.renderTd('content', project.notes && project.notes.substr(0, 50), `notes-${project.id}`),
+                        this.renderTd('content', project.startDate, `startDate-${project.id}`),
+                        this.renderTd('content', project.expiryDate, `expiryDate-${project.id}`),
                         this.renderTd('content',
                             [
                                 this.el(
                                     'a',
                                     {
-                                        href: `/Project.php?action=edit&projectID=${project.id}`
+                                        href: `/Project.php?action=edit&projectID=${project.id}`,
+                                        key: `edit-${project.id}`
                                     },
                                     'edit'
                                 ),
-                                this.renderDeleteLink(project)
-                            ]
+                                this.renderDeleteLink(project),
+                            ],
+                            `actions-${project.id}`,
+                            true
                         )
                     ]
                 )
@@ -100,7 +110,8 @@ class CustomerProjectsComponent extends React.Component {
                 className: 'content',
                 border: 0,
                 cellPadding: 2,
-                cellSpacing: 1
+                cellSpacing: 1,
+                key: 'projectsTable'
             },
             this.el(
                 'tbody',
