@@ -120,6 +120,7 @@ define(
 class CTCustomer extends CTCNC
 {
     const GET_CUSTOMER_REVIEW_CONTACTS = "getCustomerReviewContacts";
+    const GET_CUSTOMER_PROJECTS = 'getCustomerProjects';
     const DECRYPT = "decrypt";
     const contactFormTitleClass = 'TitleClass';
     const contactFormFirstNameClass = 'FirstNameClass';                      // Used when searching for an entity by string
@@ -1039,6 +1040,8 @@ class CTCustomer extends CTCNC
 
                 echo json_encode($response);
                 break;
+            case self::GET_CUSTOMER_PROJECTS:
+                return $this->getCustomerProjectsController();
             case self::DECRYPT:
                 $response = ["status" => "ok"];
                 try {
@@ -3243,7 +3246,6 @@ class CTCustomer extends CTCNC
         $this->parsePage();
     }
 
-
     /**
      * @return bool
      * @throws Exception
@@ -3426,6 +3428,40 @@ class CTCustomer extends CTCNC
         }
 
         return $contacts;
+    }
+
+    function getCustomerProjectsController()
+    {
+        $response = [];
+        try {
+            $response['data'] = $this->getCustomerProjects($_REQUEST['customerID']);
+            $response["status"] = "ok";
+        } catch (Exception $exception) {
+            http_response_code(400);
+            $response["status"] = "error";
+            $response["error"] = $exception->getMessage();
+        }
+
+        echo json_encode($response);
+    }
+
+    function getCustomerProjects($customerId)
+    {
+        $buProject = new BUProject($this);
+        $dsResults = new DataSet($this);
+        $buProject->getProjectsByCustomerID($customerId, $dsResults);
+        $projects = [];
+        while ($dsResults->fetchNext()) {
+            $projects[] = [
+                "id"          => $dsResults->getValue(DBEProject::projectID),
+                "name"        => $dsResults->getValue(DBEProject::description),
+                "notes"       => $dsResults->getValue(DBEProject::notes),
+                "startDate"   => $dsResults->getValue(DBEProject::commenceDate),
+                "expiryDate"  => $dsResults->getValue(DBEProject::completedDate),
+                "isDeletable" => $buProject->canDelete($dsResults->getValue(DBEProject::projectID)),
+            ];
+        }
+        return $projects;
     }
 
     function removeSupportForAllUsersAndReferCustomer($customerID)
