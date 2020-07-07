@@ -11,6 +11,7 @@ GLOBAL $cfg;
 require_once("config.inc.php");
 require_once($cfg["path_ct"] . "/CTLeadStatusReport.inc.php");
 require_once($cfg['path_bu'] . '/BURenBroadband.inc.php');
+require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
 $thing = null;
@@ -37,6 +38,7 @@ if (isset($_GET['upperBoundDays'])) {
     $upperBoundDays = $_GET['upperBoundDays'];
 }
 $onScreen = isset($_GET['onScreen']);
+$buRenBroadband->resetContractExpireNotified();
 $buRenBroadband->getLeasedLinesToExpire(
     $dsRenBroadband,
     $lowerBoundDays,
@@ -51,6 +53,25 @@ if ($dsRenBroadband->rowCount()) {
     );
     while ($dsRenBroadband->fetchNext()) {
         $customerItemID = $dsRenBroadband->getValue(DBEJRenBroadband::customerItemID);
+        if($dsRenBroadband->getValue(DBEJRenBroadband::contractExpireNotified)==0)
+        {
+            // Create New SR and send Email
+            $buActivity=new BUActivity($thing);   
+            $buActivity->createActivityLeasedLineExpire( 
+                $dsRenBroadband->getValue(DBEJRenBroadband::customerID),           
+                $customerItemID,
+                $dsRenBroadband->getValue(DBEJRenBroadband::itemDescription),
+                Controller::dateYMDtoDMY(
+                    $dsRenBroadband->getValue(DBEJRenBroadband::contractExpiryDate)
+                )
+            );
+             // mark contractExpireNotified @ custitem  to 1                
+            global $db;
+            $sql ="UPDATE custitem
+                SET contractExpireNotified = 1 where cui_cuino=$customerItemID";
+            $db->query($sql);
+        }
+       
 
         $template->set_var(
             array(
@@ -86,41 +107,41 @@ if ($dsRenBroadband->rowCount()) {
     if ($onScreen) {
         echo $result;
     } else {
-        $buMail = new BUMail($thing);
+        // $buMail = new BUMail($thing);
 
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
-        $senderName = 'CNC Support Department';
+        // $senderEmail = CONFIG_SUPPORT_EMAIL;
+        // $senderName = 'CNC Support Department';
 
-        $toEmail = "leasedlinecontractexpirations@cnc-ltd.co.uk";
+        // $toEmail = "leasedlinecontractexpirations@cnc-ltd.co.uk";
 
-        $body = $result;
+        // $body = $result;
 
-        $hdrs = array(
-            'From'         => $senderEmail,
-            'To'           => $toEmail,
-            'Subject'      => 'Leased line contract expiry notification',
-            'Date'         => date("r"),
-            'Content-Type' => 'text/html; charset=UTF-8'
-        );
+        // $hdrs = array(
+        //     'From'         => $senderEmail,
+        //     'To'           => $toEmail,
+        //     'Subject'      => 'Leased line contract expiry notification',
+        //     'Date'         => date("r"),
+        //     'Content-Type' => 'text/html; charset=UTF-8'
+        // );
 
 
-        $buMail->mime->setHTMLBody($body);
+        // $buMail->mime->setHTMLBody($body);
 
-        $mime_params = array(
-            'text_encoding' => '7bit',
-            'text_charset'  => 'UTF-8',
-            'html_charset'  => 'UTF-8',
-            'head_charset'  => 'UTF-8'
-        );
-        $body = $buMail->mime->get($mime_params);
+        // $mime_params = array(
+        //     'text_encoding' => '7bit',
+        //     'text_charset'  => 'UTF-8',
+        //     'html_charset'  => 'UTF-8',
+        //     'head_charset'  => 'UTF-8'
+        // );
+        // $body = $buMail->mime->get($mime_params);
 
-        $hdrs = $buMail->mime->headers($hdrs);
+        // $hdrs = $buMail->mime->headers($hdrs);
 
-        $buMail->putInQueue(
-            $senderEmail,
-            $toEmail,
-            $hdrs,
-            $body
-        );
+        // $buMail->putInQueue(
+        //     $senderEmail,
+        //     $toEmail,
+        //     $hdrs,
+        //     $body
+        // );
     }
 }

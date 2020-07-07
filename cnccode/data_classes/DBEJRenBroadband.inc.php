@@ -18,6 +18,7 @@ class DBEJRenBroadband extends DBECustomerItem
     const itemTypeDescription = "itemTypeDescription";
     const invoiceFromDateYMD = "invoiceFromDateYMD";
     const invoiceToDateYMD = "invoiceToDateYMD";
+    const contractExpireNotified = "contractExpireNotified";
 
     function __construct(&$owner)
     {
@@ -90,7 +91,12 @@ class DBEJRenBroadband extends DBECustomerItem
             DA_YN,
             DA_NOT_NULL
         );
-
+        $this->addColumn(
+            self::contractExpireNotified,
+            DA_STRING,
+            DA_NOT_NULL,
+            "contractExpireNotified"
+        );
         $this->setAddColumnsOff();
     }
 
@@ -148,7 +154,9 @@ class DBEJRenBroadband extends DBECustomerItem
 			WHERE declinedFlag = 'N'
         AND renewalTypeID = 1 AND itm_desc NOT LIKE '%Broadband%'
   AND DATEDIFF(DATE_ADD(installationDate, INTERVAL initialContractLength MONTH), CURDATE()) > $lowerBoundDays AND 
-  DATEDIFF(DATE_ADD(installationDate, INTERVAL initialContractLength MONTH), CURDATE()) < $upperBoundDays order by contractExpiryDate ";
+  DATEDIFF(DATE_ADD(installationDate, INTERVAL initialContractLength MONTH), CURDATE()) < $upperBoundDays 
+  AND salePricePerMonth>100
+  order by contractExpiryDate ";
         $this->setQueryString($statement);
         $ret = (parent::getRows());
     }

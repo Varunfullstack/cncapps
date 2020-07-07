@@ -1,20 +1,18 @@
 # Changelog
 This project changes will be shown here.
-## [unrealesed ] - 2020-06-26
-### Added
-- Record the source of a SR, phone, email or portal
 
 ## [unreleased]
 ### Added
-- My Settings Page
-- Add Fix SLA to customer page
+- Issue 903 - My Settings Page
+- Issue 924 - Add Fix SLA to customer page
+- Issue 921 - Record the source of a SR, phone, email or portal
+- Issue 895 - Leased line contract expiry notification
 ### Changed
 - Issue 818 - Confirm Report Logic / calculations
 - Issue 925 - Improve Double Quote handling in passwords fields
-- Contacts have Active flag
+- Issue 615 - Contacts have Active flag
 ### Fixed
-- Imported customers not assigning default delivery address
-- Imported contacts not getting the site assigned correctly
+- Issue 927 - Imported customers not assigning default delivery address
 - Issue 904 - Renewal Report Unit numbers not matching
 - Issue 892 - Lead Status Layout Change
 - Issue 892 - Lead Status Layout Change
