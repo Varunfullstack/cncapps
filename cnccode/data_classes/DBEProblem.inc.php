@@ -387,8 +387,7 @@ class DBEProblem extends DBEntity
         $this->addColumn(
             self::raiseTypeId,
             DA_INTEGER,
-            DA_ALLOW_NULL,
-            "problemraisetypeId"
+            DA_ALLOW_NULL
         );
 
         $this->setAddColumnsOff();

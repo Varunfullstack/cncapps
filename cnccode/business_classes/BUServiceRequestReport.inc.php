@@ -111,7 +111,7 @@ class BUServiceRequestReport extends Business
           LEFT JOIN item 
             ON itm_itemno = cui_itemno
           LEFT JOIN ProblemRaiseType prt
-            ON problem.problemraisetypeId=prt.id
+            ON problem.raiseTypeId=prt.id
           WHERE 1=1";
 
         if ($dsSearchForm->getValue(self::searchFormFromDate)) {
