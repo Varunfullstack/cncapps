@@ -1,0 +1,26 @@
+{
+    "name": "components",
+    "version": "1.0.0",
+    "description": "",
+    "main": "CMPMySettings.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "buildCustomerNotes": "parcel build src/CustomerNotesComponent.js --public-url /components/customerEditMain/dist",
+        "buildCustomerReview": "parcel build src/CustomerReviewComponent.js --public-url /components/customerEditMain/dist",
+        "buildCustomerSites": "parcel build src/CustomerSitesComponent.js --public-url /components/customerEditMain/dist",
+        "startCustomerSites": "parcel src/CustomerSitesComponent.js --public-url /components/customerEditMain/dist",
+        "start": "parcel src/CustomerReviewComponent.js --public-url /components/customerEditMain/dist && parcel src/CustomerNotesComponent.js --public-url /components/customerEditMain/dist && parcel src/CustomerSitesComponent.js --public-url /components/customerEditMain/dist",
+        "build": "npm run buildCustomerReview && npm run buildCustomerNotes && npm run buildCustomerSites"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "react": "^16.13.1",
+        "react-dom": "^16.13.1",
+        "react-input-mask": "^2.0.4",
+        "react-loading-skeleton": "^2.1.1"
+    },
+    "devDependencies": {
+        "parcel-bundler": "^1.12.4"
+    }
+}
