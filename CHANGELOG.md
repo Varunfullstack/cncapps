@@ -15,7 +15,6 @@ This project changes will be shown here.
 - Issue 927 - Imported customers not assigning default delivery address
 - Issue 904 - Renewal Report Unit numbers not matching
 - Issue 892 - Lead Status Layout Change
-- Issue 892 - Lead Status Layout Change
 - Issue 822 - Combining SRs for Sales Order ordering issue
 - Issue 930 - Too many email customer icons on Activity Page
 
