@@ -1,6 +1,6 @@
 import {ADD_SITE, SET_VISIBILITY_FILTER, VisibilityFilterOptions} from './actions';
 
-function visibilityFilter(state = VisibilityFilterOptions.SHOW_ACTIVE, action) {
+function visibilityFilter(action, state = VisibilityFilterOptions.SHOW_ACTIVE) {
     if (action.type === SET_VISIBILITY_FILTER) {
         return action.filter
     } else {
@@ -8,7 +8,7 @@ function visibilityFilter(state = VisibilityFilterOptions.SHOW_ACTIVE, action) {
     }
 }
 
-function sites(state = [], action) {
+function sites(action, state = []) {
     switch (action.type) {
         case ADD_SITE:
             return [
