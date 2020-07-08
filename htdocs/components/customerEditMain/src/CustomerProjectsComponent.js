@@ -2,6 +2,7 @@ import React from 'react';
 import Skeleton from "react-loading-skeleton";
 import ReactDOM from 'react-dom';
 import * as HTMLReactParser from 'html-react-parser'
+import moment from "moment";
 
 class CustomerProjectsComponent extends React.Component {
     el = React.createElement;
@@ -69,6 +70,13 @@ class CustomerProjectsComponent extends React.Component {
         )
     }
 
+    formatDate(dateString) {
+        if (!dateString) {
+            return ''
+        }
+        return moment(dateString, 'YYYY-MM-DD').format('DD/MM/YYYY');
+    }
+
     renderProjectsRows() {
         return this.state.customerProjects.map(
             project => {
@@ -80,8 +88,8 @@ class CustomerProjectsComponent extends React.Component {
                     [
                         this.renderTd('content', project.name, `name-${project.id}`),
                         this.renderTd('content', project.notes && project.notes.substr(0, 50), `notes-${project.id}`),
-                        this.renderTd('content', project.startDate, `startDate-${project.id}`),
-                        this.renderTd('content', project.expiryDate, `expiryDate-${project.id}`),
+                        this.renderTd('content', this.formatDate(project.startDate), `startDate-${project.id}`),
+                        this.renderTd('content', this.formatDate(project.expiryDate), `expiryDate-${project.id}`),
                         this.renderTd('content',
                             [
                                 this.el(
