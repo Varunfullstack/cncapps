@@ -142,7 +142,7 @@
             <tableExists tableName="problemRaiseType"/>
         </preConditions>
         <sql splitStatements="true">
-            update problem left join callactivity on caa_problemno = pro_problemno and caa_callactivityno = 51
+            update problem left join callactivity on caa_problemno = pro_problemno and caa_callacttypeno = 51
                 left join consultant on callactivity.caa_consno = consultant.cns_consno
             set raiseTypeId = case
                                   when caa_consno = 67 and caa_serverguard = 'N' then 1
