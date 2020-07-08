@@ -1801,12 +1801,6 @@ class CTCustomerCRM extends CTCustomer
             }
 
         }
-        if ($this->dsCustomer->getValue(DBECustomer::customerID)) {
-            $this->documents(
-                $this->dsCustomer->getValue(DBECustomer::customerID),
-                'CustomerEdit'
-            );
-        }
         $this->template->setVar(
             'javaScript',
             "<script src='components/customerEditMain/dist/CustomerReviewComponent.js?version=1.0.0'></script><script src=components/customerEditMain/dist/CustomerNotesComponent.js?version=1.0.0'></script>",

@@ -2260,59 +2260,9 @@
 
     <div class="customerEditPortalCustomerDocuments">
         <h3>Portal Documents</h3>
-        <a href="{urlAddDocument}">{txtAddDocument}</a>
-        <table class="singleBorder"
-               width="50%"
-        >
-            <tr>
-                <td class="listHeadText">Description</td>
-                <td class="listHeadText">File</td>
-                <td class="listHeadText">Customer Contract</td>
-                <td class="listHeadText">Main Contact Only</td>
-                <td class="listHeadText"
-                    colspan="2"
-                >&nbsp;
-                </td>
-            </tr>
-            <!-- BEGIN portalDocumentBlock -->
-            <tr valign="top"
-                onMouseOver="this.bgColor='#ffffcc';"
-                onMouseOut="this.bgColor='';"
-            >
-                <td class="content"
-                    nowrap="nowrap"
-                >
-                    <A href="{urlViewFile}"
-                       title="View attached document"
-                    >{description}</A>
-                </td>
-                <td class="content"
-                    nowrap="nowrap"
-                >
-                    <A href="{urlViewFile}"
-                       title="View attached document"
-                    >{filename}</A>
-                </td>
-                <td class="content"
-                    nowrap="nowrap"
-                >{customerContract}
-                </td>
-                <td class="content"
-                    nowrap="nowrap"
-                >{mainContactOnlyFlag}
-                </td>
-                <td class="content">
-                    <A href="{urlEditDocument}">edit</A>
-                </td>
-                <td class="content">
-                    <A href="{urlDeleteDocument}"
-                       title="Delete attached document"
-                       onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)"
-                    >delete</A>
-                </td>
-            </tr>
-            <!-- END portalDocumentBlock -->
-        </table>
+        <div id="reactCustomerPortalDocuments"
+             data-customer-id="{customerID}"
+        ></div>
         <h3>Sites</h3>
         <div class="customerEditSites">
             <div class="addSite">
