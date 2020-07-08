@@ -69,6 +69,7 @@
             alter table problem drop column raiseTypeId;
         </rollback>
     </changeSet>
+
     <changeSet author="pavwebdevmt" id="issue921-3">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="consultant"/>
@@ -93,98 +94,7 @@
         </rollback>
     </changeSet>
 
-    <changeSet author="pavwebdevmt" id="issue921-6">
-        <preConditions onFail="MARK_RAN">
-            <tableExists tableName="problem"/>
-            <tableExists tableName="callactivity"/>
-            <tableExists tableName="problemRaiseType"/>
-        </preConditions>
-        <sql splitStatements="true">
-             -- clear emraisetypeId            
-            UPDATE `problem`
-            SET raiseTypeId=NULL;
-
-            -- set raise alert
-            UPDATE `problem`
-            SET raiseTypeId=5
-            WHERE `pro_date_raised` >= '2016-01-01'
-              AND `pro_problemno` IN (
-                SELECT `caa_problemno`
-                FROM `callactivity`
-                WHERE problem.`pro_problemno` = callactivity.`caa_problemno`
-                  AND `caa_callacttypeno` = 51
-                  AND callactivity.caa_serverguard = 'Y'
-            );
-
-            -- set raise sales
-            UPDATE `problem`
-            SET raiseTypeId=6
-            WHERE `pro_date_raised` >= '2016-01-01'
-              AND `pro_linked_ordno` IS NOT NULL
-              AND `pro_priority` = 5
-              AND raiseTypeId IS NULL;
-
-            -- set raise email
-            UPDATE `problem`
-            SET raiseTypeId=1
-            WHERE `pro_date_raised` >= '2016-01-01'
-              AND raiseTypeId IS NULL
-              AND `pro_problemno` IN (
-                SELECT `caa_problemno`
-                FROM `callactivity`
-                WHERE problem.`pro_problemno` = callactivity.`caa_problemno`
-                  AND callactivity.`caa_consno` = 67
-                  AND callactivity.`caa_callacttypeno` = 51
-                  AND callactivity.caa_serverguard = 'N'
-            );
-
-            -- set raise to Phone
-            UPDATE `problem`
-            SET raiseTypeId=3
-            WHERE raiseTypeId IS NULL
-              AND `pro_date_raised` >= '2016-01-01'
-              AND `pro_problemno` IN (
-                SELECT `caa_problemno`
-                FROM `callactivity`
-                         JOIN `consultant` ON callactivity.`caa_consno` = consultant.`cns_consno`
-                WHERE problem.`pro_problemno` = callactivity.`caa_problemno`
-                  AND `caa_callacttypeno` = 51
-                  AND `teamID` = 1
-                  AND `basedAtCustomerSite` = 0
-            );
-
-            -- manual
-            UPDATE `problem`
-            SET raiseTypeId=7
-            WHERE raiseTypeId IS NULL
-              AND `pro_date_raised` >= '2016-01-01'
-              AND `pro_problemno` IN (
-                SELECT `caa_problemno`
-                FROM `callactivity`
-                         JOIN `consultant` ON callactivity.`caa_consno` = consultant.`cns_consno`
-                WHERE problem.`pro_problemno` = callactivity.`caa_problemno`
-                  AND `caa_callacttypeno` = 51
-                  AND `teamID` > 1
-            );
-
-            -- set raise to On Site
-            UPDATE problem
-            SET raiseTypeId=4
-            WHERE raiseTypeId IS NULL
-            AND pro_date_raised >= '2016-01-01'
-            AND pro_problemno IN (
-		    SELECT caa_problemno
-		    FROM callactivity
-		    JOIN consultant ON callactivity.caa_consno = consultant.cns_consno
-		    WHERE problem.pro_problemno = callactivity.caa_problemno
-		    AND caa_callacttypeno = 51
-		    AND teamID = 1
-		    AND basedAtCustomerSite = 1
-            );
-        </sql>         
-    </changeSet>
-
-     <changeSet author="pavwebdevmt" id="issue921-7">
+    <changeSet author="pavwebdevmt" id="issue921-4">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="customer"/>
             <tableExists tableName="consultant"/>
@@ -194,48 +104,57 @@
         </preConditions>
 
         <addColumn tableName="consultant">
-            <column   name="siteCustId" remarks="Customer Id " type="INT(11)">
+            <column name="siteCustId" remarks="Customer Id " type="INT(11)">
             </column>
         </addColumn>
 
-        <addForeignKeyConstraint    baseTableName="consultant"
-                                    baseColumnNames="siteCustId"
-                                    constraintName="fk_siteCustId"
-                                    referencedTableName="customer"
-                                    referencedColumnNames="cus_custno"                                   
-                />
+        <addForeignKeyConstraint baseTableName="consultant"
+                                 baseColumnNames="siteCustId"
+                                 constraintName="fk_siteCustId"
+                                 referencedTableName="customer"
+                                 referencedColumnNames="cus_custno"
+        />
 
         <sql splitStatements="true">
-            update consultant set siteCustId=6585  where cns_consno =141;
-            update consultant set siteCustId=6585  where cns_consno =144;
-            update consultant set siteCustId=3474  where cns_consno =131;
-            update consultant set siteCustId=3474  where cns_consno =132;
+            update consultant
+            set siteCustId=6585
+            where cns_consno = 141;
+            update consultant
+            set siteCustId=6585
+            where cns_consno = 144;
+            update consultant
+            set siteCustId=3474
+            where cns_consno = 131;
+            update consultant
+            set siteCustId=3474
+            where cns_consno = 132;
         </sql>
         <rollback>
+            <dropForeignKeyConstraint baseTableName="consultant" constraintName="fk_siteCustId"/>
             <dropColumn tableName="consultant" columnName="siteCustId"/>
         </rollback>
     </changeSet>
 
-    <changeSet author="pavwebdevmt" id="issue921-8">
+    <changeSet author="pavwebdevmt" id="issue921-5">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="problem"/>
             <tableExists tableName="callactivity"/>
             <tableExists tableName="problemRaiseType"/>
         </preConditions>
         <sql splitStatements="true">
-            -- set raise to On Site
-           UPDATE problem  SET raiseTypeId=4
-            WHERE    pro_date_raised >= '2016-01-01' 
-            AND pro_problemno IN ( 
-                SELECT caa_problemno  FROM  callactivity  			 
-                    JOIN consultant ON callactivity.caa_consno = consultant.cns_consno 
-                WHERE  
-                problem.pro_problemno = callactivity.caa_problemno 		   
-                AND caa_callacttypeno = 51
-                AND teamID = 1
-                AND basedAtCustomerSite = 1 
-                AND  consultant.`siteCustId`=problem.`pro_custno`		
-		   )
-        </sql>         
+            update problem left join callactivity on caa_problemno = pro_problemno and caa_callacttypeno = 51
+                left join consultant on callactivity.caa_consno = consultant.cns_consno
+            set raiseTypeId = case
+                                  when caa_consno = 67 and caa_serverguard = 'N' then 1
+                                  when caa_serverguard = 'Y' then 5
+                                  when pro_linked_ordno is not null and pro_priority = 5 then 6
+                                  when teamID = 1 and basedAtCustomerSite and consultant.siteCustId = problem.pro_custno
+                                      then 4
+                                  when teamID = 1 then 3
+                                  when teamID > 1 then 7
+                end
+            where date(pro_date_raised) >= '2016-01-01'
+        </sql>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>

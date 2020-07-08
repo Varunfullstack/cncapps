@@ -40,15 +40,16 @@ class BUServiceRequestReport extends Business
 
     /**
      * @param DSForm $dsSearchForm
+     * @param bool $hasInialActivity
      * @return bool|mysqli_result
      */
-    function search(&$dsSearchForm,$hasInialActivity=false)
+    function search(&$dsSearchForm, $hasInialActivity = false)
     {
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
-        $inialActivity="";
-        if($hasInialActivity)
-        $inialActivity=",(select min(caa_callactivityno) from callactivity where caa_problemno=pro_problemno and caa_callacttypeno=51) inialActivity";
+        $inialActivity = "";
+        if ($hasInialActivity)
+            $inialActivity = ",(select min(caa_callactivityno) from callactivity where caa_problemno=pro_problemno and caa_callacttypeno=51) inialActivity";
         $query =
             "
         SELECT 
@@ -111,15 +112,15 @@ class BUServiceRequestReport extends Business
           LEFT JOIN item 
             ON itm_itemno = cui_itemno
           LEFT JOIN ProblemRaiseType prt
-            ON problem.problemraisetypeId=prt.id
+            ON problem.raiseTypeId=prt.id
           WHERE 1=1";
 
         if ($dsSearchForm->getValue(self::searchFormFromDate)) {
-            $query .= " AND pro_date_raised >= '" . $dsSearchForm->getValue(self::searchFormFromDate) . "'";
+            $query .= " AND date(pro_date_raised) >= '" . $dsSearchForm->getValue(self::searchFormFromDate) . "'";
         }
 
         if ($dsSearchForm->getValue(self::searchFormToDate)) {
-            $query .= " AND pro_date_raised <= '" . $dsSearchForm->getValue(self::searchFormToDate) . "'";
+            $query .= " AND date(pro_date_raised) <= '" . $dsSearchForm->getValue(self::searchFormToDate) . "'";
         }
 
         if ($dsSearchForm->getValue(self::searchFormCustomerID)) {

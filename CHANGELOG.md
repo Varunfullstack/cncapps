@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v4.2.0] - 2020-07-08
 ### Added
 - Issue 903 - My Settings Page
 - Issue 924 - Add Fix SLA to customer page
@@ -14,7 +14,6 @@ This project changes will be shown here.
 ### Fixed
 - Issue 927 - Imported customers not assigning default delivery address
 - Issue 904 - Renewal Report Unit numbers not matching
-- Issue 892 - Lead Status Layout Change
 - Issue 892 - Lead Status Layout Change
 - Issue 822 - Combining SRs for Sales Order ordering issue
 - Issue 930 - Too many email customer icons on Activity Page

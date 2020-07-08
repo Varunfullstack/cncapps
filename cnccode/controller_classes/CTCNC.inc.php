@@ -665,7 +665,7 @@ class CTCNC extends Controller
             [
                 "id"    => 224,
                 "label" => "SR Source",
-                "href"  => "SRSrource.php"
+                "href"  => "SRSource.php"
             ],
             [
                 "id"    => 209,
