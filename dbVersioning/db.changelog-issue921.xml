@@ -130,6 +130,7 @@
             where cns_consno = 132;
         </sql>
         <rollback>
+            <dropForeignKeyConstraint baseTableName="consultant" constraintName="fk_siteCustId"/>
             <dropColumn tableName="consultant" columnName="siteCustId"/>
         </rollback>
     </changeSet>
