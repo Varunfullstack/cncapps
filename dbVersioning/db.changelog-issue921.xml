@@ -69,6 +69,7 @@
             alter table problem drop column raiseTypeId;
         </rollback>
     </changeSet>
+
     <changeSet author="pavwebdevmt" id="issue921-3">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="consultant"/>
