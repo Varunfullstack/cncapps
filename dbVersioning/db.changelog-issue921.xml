@@ -154,5 +154,6 @@
                 end
             where date(pro_date_raised) >= '2016-01-01'
         </sql>
+        <rollback/>
     </changeSet>
 </databaseChangeLog>
