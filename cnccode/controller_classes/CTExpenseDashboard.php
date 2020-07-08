@@ -30,8 +30,10 @@ class CTExpenseDashboard extends CTCNC
             $cookieVars,
             $cfg
         );
-        $this->setMenuId(906);
-        if (!$this->isExpenseApprover() && !$this->hasPermissions(TECHNICAL_PERMISSION)) {
+        $this->setMenuId(1001);
+        //if (!$this->isExpenseApprover() && !$this->hasPermissions(TECHNICAL_PERMISSION))
+        if (!$this->isExpenseApprover() )
+         {
             Header("Location: /NotAllowed.php");
             exit;
         }

@@ -60,6 +60,7 @@ class DBEProblem extends DBEntity
     const authorisedBy = "authorisedBy";
     const openHours = "openHours";
     const projectTeamTimeAlertFlag = "projectTeamTimeAlertFlag";
+    const raiseTypeId = "raiseTypeId";
 
     /**
      * calls constructor()
@@ -380,6 +381,12 @@ class DBEProblem extends DBEntity
         $this->addColumn(
             self::openHours,
             DA_FLOAT,
+            DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::raiseTypeId,
+            DA_INTEGER,
             DA_ALLOW_NULL
         );
 

@@ -3,10 +3,14 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBEOrdline extends DBEntity
 {
+    use \CNCLTD\SortableWithQueryDBE;
+
+    const id = "id";
     const lineType = "lineType";
     const ordheadID = "ordheadID";
     const sequenceNo = "sequenceNo";
@@ -35,6 +39,12 @@ class DBEOrdline extends DBEntity
     {
         parent::__construct($owner);
         $this->setTableName("ordline");
+        $this->addColumn(
+            self::id,
+            DA_ID,
+            DA_NOT_NULL,
+            'odl_ordlineno'
+        );
         $this->addColumn(
             self::lineType,
             DA_STRING,
@@ -131,28 +141,22 @@ class DBEOrdline extends DBEntity
             DA_ALLOW_NULL,
             "odl_renewal_cuino"
         );
+        $this->setPK(0);
         $this->setAddColumnsOff();
     }
 
-    function deleteRowsByOrderID()
+    function deleteRowsByOrderID($orderId)
     {
-        if ($this->getValue(self::ordheadID) == '') {
+        if (!$orderId) {
             $this->raiseError('ordheadID not set');
+            return false;
         }
         $this->setQueryString(
             'DELETE FROM ' . $this->getTableName() . ' WHERE ' . $this->getDBColumnName(
                 self::ordheadID
-            ) . ' = ' . $this->getValue(self::ordheadID)
+            ) . ' = ' . $orderId
         );
-        return (parent::runQuery());
-    }
-
-    function getPKWhere()
-    {
-        return (
-            $this->getDBColumnName(self::ordheadID) . ' = ' . $this->getValue(self::ordheadID) .
-            " AND " . $this->getDBColumnName(self::sequenceNo) . ' = ' . $this->getValue(self::sequenceNo)
-        );
+        return parent::runQuery();
     }
 
     /**
@@ -211,6 +215,11 @@ class DBEOrdline extends DBEntity
         return $ret;
     }
 
+    function getSortOrder()
+    {
+        return $this->getValue(self::sequenceNo);
+    }
+
     /**
      * Move given row down in the sequence
      * Swaps sequence numbers of 2 rows
@@ -220,9 +229,6 @@ class DBEOrdline extends DBEntity
      */
     function moveRow($direction = 'UP')
     {
-        if($direction == 'UP'){
-            $this->setShowSQLOn();
-        }
         $this->setMethodName("moveRow");
         if (!$this->getValue(self::ordheadID)) {
             $this->raiseError('ordheadID not set');
@@ -230,42 +236,16 @@ class DBEOrdline extends DBEntity
         if ($this->getValue(self::sequenceNo) == null) {
             $this->setValue(
                 self::sequenceNo,
-                0
+                $this->getNextSortOrder()
             );
         }
-        // current row into temporary buffer row: sequenceNo = -99
-        $this->setQueryString(
-            'UPDATE ' . $this->getTableName() .
-            ' SET ' . $this->getDBColumnName(self::sequenceNo) . ' = -99' .
-            ' WHERE ' . $this->getDBColumnName(self::ordheadID) . ' = ' . $this->getValue(self::ordheadID) .
-            ' AND ' . $this->getDBColumnName(self::sequenceNo) . ' = ' . $this->getValue(self::sequenceNo)
-        );
-        $this->runQuery();
-        $this->resetQueryString();
         // Move row next to this one
         if ($direction == 'UP') {
-            $sequenceNo = $this->getValue(self::sequenceNo) - 1;
+            $this->moveItemUp($this->getPKValue());
         } else {            // down
-            $sequenceNo = $this->getValue(self::sequenceNo) + 1;
+            $this->moveItemDown($this->getPKValue());
         }
-        $this->setQueryString(
-            'UPDATE ' . $this->getTableName() .
-            ' SET ' . $this->getDBColumnName(self::sequenceNo) . ' = ' . $this->getValue(self::sequenceNo) .
-            ' WHERE ' . $this->getDBColumnName(self::ordheadID) . ' = ' . $this->getValue(self::ordheadID) .
-            ' AND ' . $this->getDBColumnName(self::sequenceNo) . ' = ' . $sequenceNo
-        );
-        $this->runQuery();
         $this->resetQueryString();
-        // Move current row from temp
-        $this->setQueryString(
-            'UPDATE ' . $this->getTableName() .
-            ' SET ' . $this->getDBColumnName(self::sequenceNo) . ' = ' . $sequenceNo .
-            ' WHERE ' . $this->getDBColumnName(self::ordheadID) . ' = ' . $this->getValue(self::ordheadID) .
-            ' AND ' . $this->getDBColumnName(self::sequenceNo) . ' = -99'
-        );
-        $ret = $this->runQuery();
-        $this->resetQueryString();
-        return $ret;
     }
 
     /**
@@ -310,5 +290,38 @@ class DBEOrdline extends DBEntity
         );
 
         return (parent::getRow());
+    }
+
+    public function insertRow()
+    {
+        if (!$this->getValue(self::sequenceNo)) {
+            $this->setValue(self::sequenceNo, $this->getNextSortOrder());
+        }
+        parent::insertRow();
+    }
+
+    function deleteRow($pkValue = '')
+    {
+        if ($pkValue) {
+            $this->getRow($pkValue);
+        }
+        //we are going to move this to be the end of the list..and then delete it
+        $this->moveItemToBottom();
+        return parent::deleteRow($pkValue);
+    }
+
+    protected function getDiscriminatorColumnValue()
+    {
+        return $this->getValue(self::ordheadID);
+    }
+
+    protected function getSortOrderColumnName()
+    {
+        return $this->getDBColumnName(self::sequenceNo);
+    }
+
+    protected function getDiscriminatorColumnName()
+    {
+        return $this->getDBColumnName(self::ordheadID);
     }
 }

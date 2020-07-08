@@ -12,7 +12,7 @@ require_once($cfg ['path_bu'] . '/BUTeamPerformance.inc.php');
 require_once($cfg ['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 
-class CTTeamPerformanceReport extends CTCNC
+class CTSLAPerformance extends CTCNC
 {
 
     public $buTeamPerformance;
@@ -64,7 +64,7 @@ class CTTeamPerformanceReport extends CTCNC
 
         $this->buTeamPerformance->initialiseSearchForm($dsSearchForm);
 
-        $this->setTemplateFiles(array('TeamPerformanceReport' => 'TeamPerformanceReport.inc'));
+        $this->setTemplateFiles(array('SLAPerformance' => 'SLAPerformance.inc'));
 
         if (isset($_REQUEST ['searchForm'])) {
 
@@ -218,7 +218,7 @@ class CTTeamPerformanceReport extends CTCNC
             array('action' => CTCNC_ACT_SEARCH)
         );
 
-        $this->setPageTitle('Team Performance Report');
+        $this->setPageTitle('SLA Performance Report');
 
         $this->template->set_var(
             array(
@@ -230,7 +230,7 @@ class CTTeamPerformanceReport extends CTCNC
 
         $this->template->parse(
             'CONTENTS',
-            'TeamPerformanceReport',
+            'SLAPerformance',
             true
         );
         $this->parsePage();

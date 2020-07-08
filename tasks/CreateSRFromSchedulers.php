@@ -14,6 +14,8 @@ require_once(__DIR__ . "/../htdocs/config.inc.php");
 global $cfg;
 require_once($cfg ['path_dbe'] . '/DBESRScheduler.php');
 require_once($cfg ['path_bu'] . '/BUActivity.inc.php');
+require_once($cfg ["path_bu"] . "/BUProblemRaiseType.inc.php");
+
 /** @var $db dbSweetcode */
 global $db;
 $logName = 'CreateSRFromSchedulers';
@@ -160,8 +162,11 @@ try {
             $dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
         );
 
-        $dbeProblem->setValue(DBEProblem::internalNotes, $internalNotes);
-
+        $dbeProblem->setValue(DBEProblem::internalNotes, $internalNotes);        
+        $dbeProblem->setValue(
+            DBEProblem::raiseTypeId,
+            BUProblemRaiseType::MANUALID
+        ); 
         $dbeProblem->insertRow();
 
         $problemID = $dbeProblem->getPKValue();
@@ -305,6 +310,10 @@ try {
         DBEProblem::userID,
         null
     );        // not allocated
+    $dbeProblem->setValue(
+        DBEProblem::raiseTypeId,
+        BUProblemRaiseType::MANUALID
+    ); 
     $dbeProblem->insertRow();
 
     $dbeCallActivity = new DBECallActivity($thing);

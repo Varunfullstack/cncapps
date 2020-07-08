@@ -20,6 +20,7 @@ require_once($cfg['path_dbe'] . '/DBEJCallActivity.php');
 require_once($cfg['path_dbe'] . '/DBECallDocument.inc.php');
 require_once($cfg['path_dbe'] . '/DBECallActType.inc.php');
 require_once($cfg['path_dbe'] . '/DBEJCallActType.php');
+require_once($cfg['path_dbe'] . '/DBEProblemRaiseType.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUExpenseType.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
@@ -161,18 +162,17 @@ class CTActivity extends CTCNC
     private $buActivity;
     private $statusArray =
         array(
-            ""          => "All",
-            "INITIAL"   => "Awaiting Initial Response",
-            "CUSTOMER"  => "Awaiting Customer",
-            "CNC"       => "Awaiting CNC",
-            "FIXED"     => "Fixed",
-            "COMPLETED" => "Completed",
-            "NOT_FIXED" => "Not Fixed",
-            "CHECKED_T_AND_M"
-                        => "Checked T&M Due Completion",
-            "CHECKED_NON_T_AND_M"
-                        => "Checked Non-T&M Due Completion",
-            "UNCHECKED" => "Unchecked"
+            ""                    => "All",
+            "INITIAL"             => "Awaiting Initial Response",
+            "CUSTOMER"            => "Awaiting Customer",
+            "CNC"                 => "Awaiting CNC",
+            "FIXED"               => "Fixed",
+            "COMPLETED"           => "Completed",
+            "NOT_FIXED"           => "Not Fixed",
+            "CHECKED_T_AND_M"     => "Checked T&M Due Completion",
+            "CHECKED_NON_T_AND_M" => "Checked Non-T&M Due Completion",
+            "UNCHECKED"           => "Unchecked",
+            "FIXED_OR_COMPLETED"  => "Fixed Or Completed"
         );
 
     function __construct($requestMethod,
@@ -594,7 +594,6 @@ class CTActivity extends CTCNC
                 $this->displaySearchForm(); //redisplay with errors
                 exit;
             }
-
             if ($this->countParamsSet($this->getParam('activity')) < 2 and
                 empty($this->dsSearchForm->getValue(BUActivity::searchFormCustomerID)) and
                 $this->dsSearchForm->getValue(BUActivity::searchFormContractCustomerItemID) == '99' and
@@ -782,6 +781,7 @@ class CTActivity extends CTCNC
         );
 
         $this->breachedSlaDropdown($dsSearchForm->getValue(BUActivity::searchFormBreachedSlaOption));
+        $this->fixSLADropdown($dsSearchForm->getValue(BUActivity::searchFormFixSLAOption));
 
         //Contract selection
 
@@ -868,7 +868,7 @@ class CTActivity extends CTCNC
 
             if ($dsSearchForm->getValue(BUActivity::searchFormStatus) == 'CHECKED_T_AND_M') {
                 $bulkActionButtons =
-                    '<input name="Search" type="submit" value="Generate Sales Orders" />
+                    '<input name="Search" type="submit" value="Generate Sales Orders" onclick="postToBlank()" />
           <input name="Search" type="submit" value="Skip Sales Orders" />';
                 $checkAllBox =
                     '<input type="checkbox" name="checkAllBox" id="checkAllBox" value="0" onClick="checkAll();"/>';
@@ -1139,6 +1139,37 @@ class CTActivity extends CTCNC
             );
             $this->template->parse(
                 'breaches',
+                $block,
+                true
+            );
+        }
+    }
+
+    function fixSLADropdown(
+        $selectedID,
+        $template = 'ActivitySearch',
+        $block = 'searchFormFixSLAOptionBlock'
+    )
+    {
+        $this->template->set_block(
+            $template,
+            $block,
+            'fixSLAOptions'
+        );
+
+        foreach ($this->buActivity->breachedSlaOptionArray as $key => $value) {
+
+            $breachedSlaOptionSelected = ($selectedID == $key) ? CT_SELECTED : null;
+
+            $this->template->set_var(
+                array(
+                    'searchFormFixSLAOptionSelected'    => $breachedSlaOptionSelected,
+                    'searchFormFixSLAOptionValue'       => $key,
+                    'searchFormFixSLAOptionDescription' => $value
+                )
+            );
+            $this->template->parse(
+                'fixSLAOptions',
                 $block,
                 true
             );
@@ -1660,17 +1691,9 @@ class CTActivity extends CTCNC
             ', ' . $dsSite->getValue(DBESite::postcode);
 
         if ($dsContact) {
-            $customerDetails .=
-                ', ' . $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(DBEContact::lastName);
-
-
-            if ($dsContact->getValue(DBEContact::email)) {
-                $customerDetails .=
-                    '<A HREF="mailto:' . $dsContact->getValue(
-                        DBEContact::email
-                    ) . '?subject=Service Request ' . $dsCallActivity->getValue(DBEJCallActivity::problemID) . '"' .
-                    ' title="Send email to contact"><img src="images/email.gif" border="0" alt="email"></A>';
-            }
+            $customerDetails .= ', ' . $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(
+                    DBEContact::lastName
+                );
         }
         /*
       allow delete if open (no end time) OR (if user is member of Supervisor group then
@@ -2139,7 +2162,7 @@ class CTActivity extends CTCNC
 
 
         $this->template->set_var(
-            array(
+            array(                
                 'hiddenText'                         => $hiddenText,
                 'currentUserBgColor'                 => $currentUserBgColor,
                 'currentUser'                        => $currentUser,
@@ -2291,8 +2314,8 @@ class CTActivity extends CTCNC
                     "Service Request {$problemID}"
                 ),
                 'authorisedByHide'                   => $authorisedByName ? null : "hidden",
-                'authorisedByName'                   => $authorisedByName
-
+                'authorisedByName'                   => $authorisedByName,
+                'raiseIcon'                          => $this->getProblemRaiseIcon ($dbeJProblem)
             )
         );
 
@@ -2912,7 +2935,7 @@ class CTActivity extends CTCNC
                     $query .= " AND con_contno = " . $this->getParam('contactID');
                 }
 
-                $query .= " ORDER BY cus_name, con_last_name, con_first_name";
+                $query .= " and active ORDER BY cus_name, con_last_name, con_first_name";
                 $result = mysqli_query(
                     $db,
                     $query
@@ -3335,7 +3358,7 @@ class CTActivity extends CTCNC
         $this->parsePage();
 
     }
-
+    
     /**
      * Create Service Request
      * @access private
@@ -3344,11 +3367,12 @@ class CTActivity extends CTCNC
     function editServiceRequestHeader()
     {
         $this->setMethodName('editServiceRequestHeader');
-
-
+         
         if ($this->getParam('reason')) {
             $this->updateSession('reason', $this->getParam('reason'));
         }
+
+      
 
         $error = [];
         /* validate if this is a POST request */
@@ -3374,6 +3398,11 @@ class CTActivity extends CTCNC
             $this->updateSession('callActTypeID', CONFIG_INITIAL_ACTIVITY_TYPE_ID);
 
             $this->updateSession('customerID', $this->getParam('customerID'));
+            if( $this->getParam('pendingReopenedID'))
+                $this->updateSession('pendingReopenedID', $this->getParam('pendingReopenedID'));        
+            if( $this->getParam('deletePending'))
+                $this->updateSession('deletePending', $this->getParam('deletePending'));
+            
 
             /*
         Check nothing in fields that don't allow content
@@ -3422,10 +3451,19 @@ class CTActivity extends CTCNC
                 $error['priority'] = 'Required';
             }
 
-            if (count($error) == 0) {
+            if (count($error) == 0) {                
+                $pendingReopenedID=$_SESSION[$this->sessionKey]['pendingReopenedID'];
+                $deletePending=$_SESSION[$this->sessionKey]['deletePending'];
+                //$this->console_log($pendingReopenedID);
                 /* Create initial activity */
                 $dsCallActivity = $this->buActivity->createActivityFromSession($this->sessionKey);
-
+                if(isset($dsCallActivity)&&isset($pendingReopenedID)
+                &&isset($deletePending)&&$deletePending=='true')
+                {                    
+                    //delete pending 
+                    $dbePendingReopened = new DBEPendingReopened($this);
+                    $dbePendingReopened->deleteRow($pendingReopenedID);
+                }
                 /*
           Upload file
           */
@@ -3436,6 +3474,7 @@ class CTActivity extends CTCNC
           Add to queue so return to dashboard
           */
                 if ($isAddToQueue) {
+                    
                     $nextURL =
                         Controller::buildLink(
                             'CurrentActivityReport.php',
@@ -4285,13 +4324,6 @@ class CTActivity extends CTCNC
                     $dsCallActivity->getValue(DBEJCallActivity::contactID)
                 ) . '</span>';
 
-            if ($dsContact->getValue(DBEContact::email)) {
-                $customerDetails .=
-                    ' <A HREF="mailto:' . $dsContact->getValue(
-                        DBEContact::email
-                    ) . '?subject=Service Request ' . $dsCallActivity->getValue(DBEJCallActivity::problemID) . '"' .
-                    ' title="Send email to contact"><img src="images/email.gif" style="border: 0" alt="email"></A>';
-            }
             if ($dsContact->getValue(DBEContact::notes)) {
                 $dsCallActivity->setValue(
                     DBEJCallActivity::contactNotes,
@@ -7310,5 +7342,43 @@ WHERE caa_problemno = ?
         $test = $result->fetch_assoc();
 
         return !!$test['hiddenChargeableActivities'];
+    }
+    private function getProblemRaiseIcon($dbeJProblem)
+    {
+        if(isset($dbeJProblem))
+        {
+            $raiseTypeId=$dbeJProblem->getValue(DBEProblem::raiseTypeId);
+            if(isset($raiseTypeId) && $raiseTypeId !=null)
+            {
+               $dbeProblemRaiseType=new  DBEProblemRaiseType($this);
+               $dbeProblemRaiseType->setPKValue($raiseTypeId);
+               $dbeProblemRaiseType->getRow();
+               switch($dbeProblemRaiseType->getValue(DBEProblemRaiseType::description))
+               {
+                   case 'Email':
+                        return "<i class='fa fa-envelope' title='This Service Request was raised by email'></i>";
+                    break;
+                    case 'Portal':
+                        return "<i class='fa fa-edge' title='This Service Request was raised by the portal'></i>";
+                    break;
+                    case 'Phone':
+                        return "<i class='fa fa-phone' title='This Service Request was raised by phone'></i>";
+                    break;
+                    case 'On site':
+                        return "<i class='fas fa-building' title='This Service Request was raised by an on site engineer'></i>";
+                    break;
+                    case 'Alert':
+                        return "<i class='fas fa-bell' title='This Service Request was raised by an alert'></i>";
+                    break;
+                    case 'Sales':
+                        return "<i class='fas fa-shopping-cart' title='This Service Request was raised via Sales'></i>";
+                    break;
+                    case 'Manual':
+                        return "<i class='fas fa-user-edit' title='This Service Request was raised manually'></i>";
+                    break;
+               }
+            }
+        }
+        else return null;
     }
 }

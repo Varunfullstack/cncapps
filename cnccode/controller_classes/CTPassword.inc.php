@@ -262,11 +262,11 @@ class CTPassword extends CTCNC
             array(
                 'customerID'             => $dsPassword->getValue(DBEPassword::customerID),
                 'passwordID'             => $dsPassword->getValue(DBEPassword::passwordID),
-                DBEPassword::username    => $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::username)),
+                DBEPassword::username    => $this->replaceQuatos($this->buPassword->decrypt($dsPassword->getValue(DBEPassword::username))),
                 'usernameMessage'        => $dsPassword->getMessage(DBEPassword::username),
-                'password'               => $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::password)),
+                'password'               => $this->replaceQuatos($this->buPassword->decrypt($dsPassword->getValue(DBEPassword::password))),
                 'passwordMessage'        => $dsPassword->getMessage(DBEPassword::password),
-                DBEPassword::notes       => $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::notes)),
+                DBEPassword::notes       => $this->replaceQuatos($this->buPassword->decrypt($dsPassword->getValue(DBEPassword::notes))),
                 'notesMessage'           => $dsPassword->getMessage(DBEPassword::notes),
                 'urlEdit'                => $urlEdit,
                 'URL'                    => $this->buPassword->decrypt($dsPassword->getValue(DBEPassword::URL)),
@@ -285,7 +285,10 @@ class CTPassword extends CTCNC
         $this->parsePage();
 
     } // end search
-
+    function replaceQuatos($str)
+    {
+        return str_replace("\"","&quot;",$str);
+    }
     function archive()
     {
         $this->setMethodName('archive');

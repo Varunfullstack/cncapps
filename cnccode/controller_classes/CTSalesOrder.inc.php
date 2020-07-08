@@ -418,6 +418,11 @@ class CTSalesOrder extends CTCNC
         $this->dsOrdhead = new Dataset($this);
         $this->dsSelectedOrderLine = new Dataset($this);
         $this->dsSelectedOrderLine->addColumn(
+            DBEOrdline::id,
+            DA_ID,
+            DA_NOT_NULL
+        );
+        $this->dsSelectedOrderLine->addColumn(
             DBEOrdline::sequenceNo,
             DA_INTEGER,
             DA_ALLOW_NULL
@@ -1167,12 +1172,12 @@ class CTSalesOrder extends CTCNC
         // below the lines section and will be applied to the selected (checked) lines
         $actions = array();
         $quickQuoteDisabled = false;
-        if ($dsOrdline->rowCount() > 0) {                        // There are lines
+        if ($dsOrdline->rowCount()) {                        // There are lines
             if ($orderType == 'Q') {
                 $actions[CTSALESORDER_ACT_COPY_TO_ORDER] = 'copy to order';
                 $actions[CTSALESORDER_ACT_CONVERT_TO_ORDER] = 'convert to order';
             }
-            if ($orderType == 'Q' or $orderType == 'I') {
+            if ($orderType == 'Q' || $orderType == 'I') {
                 $actions[CTSALESORDER_ACT_DELETE_LINES] = 'delete lines';
                 $actions[CTSALESORDER_ACT_UPDATE_LINES] = 'update values';
                 $actions[CTSALESORDER_ACT_INSERT_FROM_ORDER] = 'insert lines from order';
@@ -1190,6 +1195,8 @@ class CTSalesOrder extends CTCNC
             $actions[CTSALESORDER_ACT_CHANGE_SUPPLIER] = 'change supplier';
             $actions[CTSALESORDER_ACT_DOWNLOAD_CSV] = 'download CSV';
             $actions[CTSALESORDER_ACT_CREATE_SR_FROM_LINES] = 'create new SR';
+        } elseif ($orderType == 'Q' || $orderType == 'I'){
+            $actions[CTSALESORDER_ACT_INSERT_FROM_ORDER] = 'insert lines from order';
         }
         $order = [
             CTSALESORDER_ACT_CREATE_QUICK_QUOTE,
@@ -1704,9 +1711,8 @@ class CTSalesOrder extends CTCNC
                         Controller::buildLink(
                             $page,
                             array(
-                                'action'     => 'editFromSalesOrder',
-                                'ordheadID'  => $dsOrdhead->getValue(DBEOrdline::ordheadID),
-                                'sequenceNo' => $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                                'action' => 'editFromSalesOrder',
+                                'lineId' => $dsOrdline->getValue(DBEOrdline::id),
                             )
                         );
 
@@ -1733,9 +1739,8 @@ class CTSalesOrder extends CTCNC
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'      => CTSALESORDER_ACT_EDIT_ORDLINE,
-                                'ordheadID'   => $this->getOrdheadID(),
+                                'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
                                 'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
-                                'sequenceNo'  => $dsOrdline->getValue(DBEOrdline::sequenceNo)
                             )
                         );
                     // common to comment and item lines
@@ -1744,10 +1749,8 @@ class CTSalesOrder extends CTCNC
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'      => CTSALESORDER_ACT_ADD_ORDLINE,
-                                'ordheadID'   => $this->getOrdheadID(),
+                                'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
                                 'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
-                                'sequenceNo'  => ($dsOrdline->getValue(DBEOrdline::sequenceNo) + 1)
-                                // new line below current
                             )
                         );
 
@@ -1757,9 +1760,8 @@ class CTSalesOrder extends CTCNC
                                 $_SERVER['PHP_SELF'],
                                 array(
                                     'action'      => CTSALESORDER_ACT_MOVE_ORDLINE_UP,
-                                    'ordheadID'   => $this->getOrdheadID(),
+                                    'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
                                     'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
-                                    'sequenceNo'  => $dsOrdline->getValue(DBEOrdline::sequenceNo)
                                 )
                             );
                     }
@@ -1769,9 +1771,8 @@ class CTSalesOrder extends CTCNC
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'      => CTSALESORDER_ACT_MOVE_ORDLINE_DOWN,
-                                'ordheadID'   => $this->getOrdheadID(),
+                                'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
                                 'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
-                                'sequenceNo'  => $dsOrdline->getValue(DBEOrdline::sequenceNo)
                             )
                         );
                     $urlDeleteLine =
@@ -1779,17 +1780,15 @@ class CTSalesOrder extends CTCNC
                             $_SERVER['PHP_SELF'],
                             array(
                                 'action'      => CTSALESORDER_ACT_DELETE_ORDLINE,
-                                'ordheadID'   => $this->getOrdheadID(),
-                                'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
-                                'sequenceNo'  => $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                                'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
+                                'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime)
                             )
                         );
                     $salesOrderLineDesc =
                         '<A href="' . $urlEditLine . '">' . Controller::htmlDisplayText(
                             $dsOrdline->getValue(DBEOrdline::description)
                         ) . '</A>';
-                } //	if ( !$readOnly && !$restrictedView ){
-                else {
+                } else {
                     $salesOrderLineDesc = Controller::htmlDisplayText($dsOrdline->getValue(DBEOrdline::description));
                 }
 
@@ -1805,6 +1804,10 @@ class CTSalesOrder extends CTCNC
                     $removeDescription
                 );
 
+                $ordline = new DBEOrdline($this);
+
+                $ordline->getRow($dsOrdline->getValue(DBEOrdline::id));
+
                 $this->template->set_var(
                     array(
                         'salesOrderLineDesc' => $salesOrderLineDesc,
@@ -1813,15 +1816,15 @@ class CTSalesOrder extends CTCNC
                         'lineType'           => $dsOrdline->getValue(DBEOrdline::lineType),
                         'partNo'             => Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::partNo)),
                         'sequenceNo'         => $dsOrdline->getValue(DBEOrdline::sequenceNo),
+                        'lineId'             => $dsOrdline->getValue(DBEOrdline::id),
                         'orderLineChecked'   => ($this->dsSelectedOrderLine->search(
-                            'sequenceNo',
-                            $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                            'id',
+                            $dsOrdline->getValue(DBEOrdline::id)
                         )) ? CT_CHECKED : null,
                         'urlMoveLineUp'      => $urlMoveLineUp,
                         'urlMoveLineDown'    => $urlMoveLineDown,
-                        'moveUpHidden'       => $firstLine ? 'hidden' : null,
-                        'moveDownHidden'     => $dsOrdline->getValue(DBEOrdline::sequenceNo) <= $dsOrdline->rowCount(
-                        ) - 1 ? null : 'hidden',
+                        'moveUpHidden'       => $ordline->isFirst() ? 'hidden' : null,
+                        'moveDownHidden'     => $ordline->isLast() ? 'hidden' : null,
                         'removeDescription'  => $removeDescription,
                         'urlEditLine'        => $urlEditLine,
                         'urlDeleteLine'      => $urlDeleteLine,
@@ -2705,7 +2708,6 @@ class CTSalesOrder extends CTCNC
                 array(
                     "I" => "Item",
                     "C" => "Comment",
-                    "S" => "Sales Order",
                     "T" => "Template"
                 );
         }
@@ -2955,7 +2957,7 @@ class CTSalesOrder extends CTCNC
             $this->getParam('updatedTime'),
             $dsOrdhead->getValue(DBEOrdhead::updatedTime)
         );
-        if (($dsOrdhead->getValue(DBEOrdhead::type) != 'Q') & ($dsOrdhead->getValue(DBEOrdhead::type) != 'I')) {
+        if (($dsOrdhead->getValue(DBEOrdhead::type) != 'Q') && ($dsOrdhead->getValue(DBEOrdhead::type) != 'I')) {
             $this->displayFatalError(CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL);
             return;
         }
@@ -3047,10 +3049,7 @@ class CTSalesOrder extends CTCNC
         }
         foreach ($array as $value) {
             $this->dsSelectedOrderLine->setUpdateModeInsert();
-            $this->dsSelectedOrderLine->setValue(
-                DBEOrdline::sequenceNo,
-                $value
-            );
+            $this->dsSelectedOrderLine->setValue(DBEOrdline::id, $value);
             $this->dsSelectedOrderLine->post();
         }
         return TRUE;
@@ -3080,17 +3079,18 @@ class CTSalesOrder extends CTCNC
             $this->displayOrder();
             return false;
         }
-
-        if (count($this->postVars['selectedOrderLine']) != 1) {
-            $this->setLinesMessage('Select a line before which to insert order');
-            $this->displayOrder();
-            return FALSE;
+        $sequenceNo = null;
+        if (isset($this->postVars['selectedOrderLine']) && count($this->postVars['selectedOrderLine'])) {
+            $lastLineId = $this->postVars['selectedOrderLine'][count($this->postVars['selectedOrderLine']) - 1];
+            $dbeOrdline = new DBEOrdline($this);
+            $dbeOrdline->getRow($lastLineId);
+            $sequenceNo = $dbeOrdline->getValue(DBEOrdline::sequenceNo);
         }
+
         $this->buSalesOrder->pasteLinesFromOrder(
             $this->getFromOrdheadID(),
             $this->getOrdheadID(),
-            false,
-            $this->postVars['selectedOrderLine'][0]
+            $sequenceNo
         );
         header('Location: ' . $this->getDisplayOrderURL());
         exit;
@@ -3416,8 +3416,8 @@ class CTSalesOrder extends CTCNC
 
         while ($dsOrdline->fetchNext()) {
             if ($this->dsSelectedOrderLine->search(
-                'sequenceNo',
-                $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                DBEOrdline::id,
+                $dsOrdline->getValue(DBEOrdline::id)
             )) {
                 if ($dsOrdline->getValue(DBEOrdline::lineType) == "I") {
                     $buPDF->printStringRJAt(
@@ -3866,8 +3866,8 @@ class CTSalesOrder extends CTCNC
         while ($dsOrdline->fetchNext()) {
 
             if ($this->dsSelectedOrderLine->search(
-                'sequenceNo',
-                $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                DBEOrdline::id,
+                $dsOrdline->getValue(DBEOrdline::id)
             )) {
 
                 if ($dsOrdline->getValue(DBEJOrdline::itemDescription)) {
@@ -4041,6 +4041,18 @@ class CTSalesOrder extends CTCNC
      */
     function editOrderLine()
     {
+        if (!$this->getParam('lineId')) {
+            $this->displayFatalError('Line ID not provided');
+            return;
+        }
+        $this->dsOrdline = new DBEJOrdline($this);
+        if (!$this->dsOrdline->getRow($this->getParam('lineId'))) {
+            $this->displayFatalError('Line not found');
+            return;
+        }
+
+        $this->setOrdheadID($this->dsOrdline->getValue(DBEOrdline::ordheadID));
+
         $this->setMethodName('editOrderLine');
         if (!$this->getOrdheadID()) {
             $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
@@ -4062,27 +4074,13 @@ class CTSalesOrder extends CTCNC
             $this->displayFatalError(CTSALESORDER_MSG_MUST_BE_QUOTE_OR_INITIAL);
             return;
         }
-        if ($this->getSequenceNo() === null) {
-            $this->displayFatalError(CTSALESORDER_MSG_SEQNO_NOT_PASSED);
-            return;
-        }
-        if (!$this->formError) {
-            if ($this->getAction() == CTSALESORDER_ACT_EDIT_ORDLINE) {
-                if (!$this->buSalesOrder->getOrdlineByIDSeqNo(
-                    $this->getOrdheadID(),
-                    $this->getSequenceNo(),
-                    $this->dsOrdline
-                )) {
-                    $this->displayFatalError(CTSALESORDER_MSG_ORDLINE_NOT_FND);
-                    return;
-                }
-            } else {
-                $this->buSalesOrder->initialiseNewOrdline(
-                    $this->getOrdheadID(),
-                    $this->getSequenceNo(),
-                    $this->dsOrdline
-                );
-            }
+
+        if (!$this->formError && $this->getAction() != CTSALESORDER_ACT_EDIT_ORDLINE) {
+            $this->buSalesOrder->initialiseNewOrdline(
+                $this->dsOrdline->getValue(DBEOrdline::ordheadID),
+                $this->dsOrdline->getValue(DBEOrdline::sequenceNo),
+                $this->dsOrdline
+            );
         }
         $this->setTemplateFiles(
             array(
@@ -4122,12 +4120,9 @@ class CTSalesOrder extends CTCNC
     {
         $this->setMethodName('updateOrderLine');
         // pasting lines from another Sales Order
-        if ($this->getParam('ordline')[1]['lineType'] == 'S') {
-            $this->pasteLinesFromSO();
-            exit;
-        }
         if ($this->getParam('ordline')[1]['lineType'] == 'T') {
             $this->pasteLinesFromQuotationTemplate();
+            header('Location: ' . $this->getDisplayOrderURL());
             exit;
         }
 
@@ -4266,38 +4261,6 @@ class CTSalesOrder extends CTCNC
      * @authors Karim Ahmed - Sweet Code Limited
      * @throws Exception
      */
-    function pasteLinesFromSO()
-    {
-        $this->setMethodName('pasteLinesFromSO');
-        $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
-        if (!is_numeric($this->getParam('ordline')[1]['description'])) {
-            $this->setFormErrorMessage('Sales order number must be numeric');
-            $this->displayOrder();
-            return;
-        }
-        if (!$this->buSalesOrder->getOrdheadByID(
-            $this->getParam('ordline')[1]['description'],
-            $dsOrdhead
-        )) {
-            $this->setFormErrorMessage('The sales order you are trying to paste from does not exist');
-            $this->displayOrder();
-            return;
-        }
-        $this->buSalesOrder->pasteLinesFromOrder(
-            $this->getParam('ordline')[1]['description'],
-            $this->getOrdheadID()
-        );
-        $this->displayOrder();
-    }
-
-    /**
-     * Paste lines from another Sales Order onto the end of this one
-     * $this->getParam('ordline')[1]['description'] holds ordheadID of order to paste from
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
     function pasteLinesFromQuotationTemplate()
     {
         $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
@@ -4331,19 +4294,23 @@ class CTSalesOrder extends CTCNC
     function moveOrderLineUp()
     {
         $this->setMethodName('moveOrderLineUp');
-        $this->moveOrderLineValidation();
-        $this->buSalesOrder->moveOrderLineUp(
-            $this->getOrdheadID(),
-            $this->getSequenceNo()
-        );
+        $this->moveOrderLineValidation($this->getParam('lineId'));
+        $this->buSalesOrder->moveOrderLineUp($this->getParam('lineId'));
         header('Location: ' . $this->getDisplayOrderURL());
     }
 
     /**
+     * @param $lineId
      * @throws Exception
      */
-    function moveOrderLineValidation()
+    function moveOrderLineValidation($lineId)
     {
+        $dbeOrderLine = new DBEOrdline($this);
+        if (!$dbeOrderLine->getRow($lineId)) {
+            $this->displayFatalError('Line not found');
+        }
+
+        $this->setOrdheadID($dbeOrderLine->getValue(DBEOrdline::ordheadID));
         if (!$this->getOrdheadID()) {
             $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
         }
@@ -4358,9 +4325,6 @@ class CTSalesOrder extends CTCNC
             $this->getParam('updatedTime'),
             $dsOrdhead->getValue(DBEOrdhead::updatedTime)
         );
-        if ($this->getSequenceNo() === null) {
-            $this->displayFatalError(CTSALESORDER_MSG_SEQNO_NOT_PASSED);
-        }
     }
 
     /**
@@ -4373,11 +4337,8 @@ class CTSalesOrder extends CTCNC
     function moveOrderLineDown()
     {
         $this->setMethodName('moveOrderLineDown');
-        $this->moveOrderLineValidation();
-        $this->buSalesOrder->moveOrderLineDown(
-            $this->getOrdheadID(),
-            $this->getSequenceNo()
-        );
+        $this->moveOrderLineValidation($this->getParam('lineId'));
+        $this->buSalesOrder->moveOrderLineDown($this->getParam('lineId'));
         header('Location: ' . $this->getDisplayOrderURL());
     }
 
@@ -4391,17 +4352,9 @@ class CTSalesOrder extends CTCNC
     function deleteOrderLine()
     {
         $this->setMethodName('deleteOrderLine');
-        if (!$this->buSalesOrder->getOrdheadByID(
-            $this->getOrdheadID(),
-            $dsOrdhead
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
-        }
-        $this->moveOrderLineValidation();
-        $this->buSalesOrder->deleteOrderLine(
-            $this->getOrdheadID(),
-            $this->getSequenceNo()
-        );
+
+        $this->moveOrderLineValidation($this->getParam('lineId'));
+        $this->buSalesOrder->deleteOrderLine($this->getParam('lineId'));
         header('Location: ' . $this->getDisplayOrderURL());
     }
 
@@ -4780,7 +4733,6 @@ now that the notes are in a text field we need to split the lines up for the PDF
     {
         $this->setMethodName('serviceRequest');
 
-        //$this->dsSelectedOrderLine
         $buActivity = new BUActivity($this);
         $dsOrdline = new DataSet($this);
         $dsOrdhead = new DataSet($this);
@@ -4871,7 +4823,6 @@ now that the notes are in a text field we need to split the lines up for the PDF
         */
                 header('Location: ' . $this->getDisplayOrderURL());
 
-                //echo '<script language="javascript">window.close()</script>;';
                 exit;
 
             }
@@ -5082,7 +5033,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
             header('Location: ' . $redirectUrl);
         }
         return true;
-    } // end contractDropdown
+    }
 
     /**
      * @throws Exception
@@ -5241,7 +5192,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
 
         $this->template->parse('CONTENTS', 'TemplatedQuote');
         $this->parsePage();
-    }
+    } // end contractDropdown
 
     /**
      * @param $customerID
@@ -5324,6 +5275,38 @@ now that the notes are in a text field we need to split the lines up for the PDF
                 true
             );
         }
+    }
+
+    /**
+     * Paste lines from another Sales Order onto the end of this one
+     * $this->getParam('ordline')[1]['description'] holds ordheadID of order to paste from
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function pasteLinesFromSO()
+    {
+        $this->setMethodName('pasteLinesFromSO');
+        $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
+        if (!is_numeric($this->getParam('ordline')[1]['description'])) {
+            $this->setFormErrorMessage('Sales order number must be numeric');
+            $this->displayOrder();
+            return;
+        }
+        if (!$this->buSalesOrder->getOrdheadByID(
+            $this->getParam('ordline')[1]['description'],
+            $dsOrdhead
+        )) {
+            $this->setFormErrorMessage('The sales order you are trying to paste from does not exist');
+            $this->displayOrder();
+            return;
+        }
+        $this->buSalesOrder->pasteLinesFromOrder(
+            $this->getParam('ordline')[1]['description'],
+            $this->getOrdheadID()
+        );
+        $this->displayOrder();
     }
 
     /**

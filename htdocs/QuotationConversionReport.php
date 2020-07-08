@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="./css/table.css">
 <?php
 require_once("config.inc.php");
 require_once($cfg["path_ct"]."/CTQuotationConversionReport.inc.php");

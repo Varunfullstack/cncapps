@@ -16,6 +16,7 @@ require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUPassword.inc.php');
 require_once($cfg['path_bu'] . '/BUMail.inc.php');
+require_once($cfg["path_bu"] . "/BUProblemRaiseType.inc.php");
 
 use BUActivity;
 use BUCustomer;
@@ -46,7 +47,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Template;
 use Twig\TwigFilter;
 use UnexpectedValueException;
-
+use BUProblemRaiseType;
 
 class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
 {
@@ -445,6 +446,10 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJProblem::userID,
             null
         );        // not allocated
+        $dbeProblem->setValue(
+            DBEProblem::raiseTypeId,
+            BUProblemRaiseType::ALERTID
+        ); 
         $dbeProblem->insertRow();
 
         $dbeCallActivity = new DBECallActivity($thing);
@@ -843,6 +848,10 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJProblem::userID,
             null
         );        // not allocated
+        $dbeProblem->setValue(
+            DBEProblem::raiseTypeId,
+            BUProblemRaiseType::ALERTID
+        ); 
         $dbeProblem->insertRow();
 
         $dbeCallActivity = new DBECallActivity($thing);
@@ -978,6 +987,10 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             DBEJProblem::userID,
             null
         );        // not allocated
+        $dbeProblem->setValue(
+            DBEProblem::raiseTypeId,
+            BUProblemRaiseType::ALERTID
+        ); 
         $dbeProblem->insertRow();
 
         $dbeCallActivity = new DBECallActivity($thing);

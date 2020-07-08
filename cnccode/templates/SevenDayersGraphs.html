@@ -4,10 +4,10 @@
 <script type="text/javascript">
     let startDate;
     let endDate;
+    const currentURL = new URL(location.href);
     window.addEventListener('DOMContentLoaded', function () {
         startDate = moment().subtract(6, 'months');
         endDate = moment();
-        const currentURL = new URL(location.href);
 
         if (currentURL.searchParams.get('startDate')) {
             startDate = moment(currentURL.searchParams.get('startDate'), 'YYYY-MM-DD');

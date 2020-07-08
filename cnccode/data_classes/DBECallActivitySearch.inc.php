@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_gc"] . "/DBEntity.inc.php");
 
 class DBECallActivitySearch extends DBEntity
@@ -334,7 +335,9 @@ class DBECallActivitySearch extends DBEntity
         $breachedSlaOption = '',
         $sortColumn = false,
         $sortDirection = 'ASC',
-        $limit = true
+        $limit = true,
+        $fixSLAStatus = null,
+        $overFixSLAWorkingHours = null
     )
     {
         $this->setMethodName('getRowsBySearchCriteria');
@@ -393,6 +396,27 @@ class DBECallActivitySearch extends DBEntity
                     " AND caa_callactivityno = " . $callActivityID;
             }
         }
+
+        if ($overFixSLAWorkingHours) {
+            $statement .= " and caa_problemno in (select pro_problemno
+                        from problem
+                                 join callactivity initial ON initial.`caa_problemno` = problem.`pro_problemno` AND
+                                                              initial.`caa_callacttypeno` = 51
+                                 join callactivity fixed
+                                      on fixed.caa_problemno = problem.pro_problemno and fixed.caa_callacttypeno = 57
+                        where pro_status in ('F', 'C')
+                          and timestampdiff(HOUR, concat(initial.caa_date, ' ', initial.caa_starttime, ':00'),
+                                            concat(fixed.caa_date, ' ', fixed.caa_starttime, ':00')
+                                  ) >
+                              CASE problem.`pro_priority`
+                                  WHEN 1 THEN customer.slaFixHoursP1
+                                  WHEN 2 THEN customer.slaFixHoursP2
+                                  WHEN 3 THEN customer.slaFixHoursP3
+                                  WHEN 4 THEN customer.slaFixHoursP4
+                                  END
+)";
+        }
+
         if ($problemID) {
             if (strpos(
                 $problemID,
@@ -407,17 +431,17 @@ class DBECallActivitySearch extends DBEntity
             }
         }
 
-        if ($customerID != '' AND $customerID != 0) {
+        if ($customerID != '' and $customerID != 0) {
             $whereParameters = $whereParameters .
                 " AND " . $this->getDBColumnName(self::customerID) . "=" . $customerID;
         }
 
-        if ($linkedSalesOrderID != '' AND $linkedSalesOrderID != 0) {
+        if ($linkedSalesOrderID != '' and $linkedSalesOrderID != 0) {
             $whereParameters = $whereParameters .
                 " AND " . $this->getDBColumnName(self::linkedSalesOrderID) . "=" . $linkedSalesOrderID;
         }
 
-        if ($userID != '' AND $userID != 0) {
+        if ($userID != '' and $userID != 0) {
             $whereParameters = $whereParameters .
                 " AND " . $this->getDBColumnName(self::userID) . "=" . $userID;
         }
@@ -536,6 +560,9 @@ class DBECallActivitySearch extends DBEntity
                 $whereParameters .=
                     " AND pro_status ='C'";
                 break;
+            case 'FIXED_OR_COMPLETED':
+                $whereParameters .= " and pro_status in ('F','C') ";
+                break;
         }
         // Contract Type:
 
@@ -562,15 +589,30 @@ class DBECallActivitySearch extends DBEntity
                 " AND caa_callacttypeno = " . $callActTypeID;
         }
 
-        switch ($breachedSlaOption) {
-            case 'B':
-                $whereParameters .=
-                    " AND pro_responded_hours > pro_sla_response_hours";
-                break;
-            case 'N':
-                $whereParameters .=
-                    " AND pro_responded_hours <= pro_sla_response_hours";
-                break;
+        if ($fixSLAStatus == 'B') {
+            $whereParameters .= " and  pro_priority <> 5
+  and pro_working_hours > case pro_priority
+                              when 1 then slaFixHoursP1
+                              when 2 then slaFixHoursP2
+                              when 3 then slaFixHoursP3
+                              when 4 then slaFixHoursP4
+                              else 0 end  ";
+        } elseif ($fixSLAStatus == 'N') {
+            $whereParameters .= " and pro_priority <> 5
+  and pro_working_hours <= case pro_priority
+                              when 1 then slaFixHoursP1
+                              when 2 then slaFixHoursP2
+                              when 3 then slaFixHoursP3
+                              when 4 then slaFixHoursP4
+                              else 0 end ";
+        }
+
+        if ($breachedSlaOption == 'B') {
+            $whereParameters .=
+                " AND pro_responded_hours > pro_sla_response_hours";
+        } elseif ($breachedSlaOption == 'N') {
+            $whereParameters .=
+                " AND pro_responded_hours <= pro_sla_response_hours";
         }
 
         if ($rootCauseID != '') {
@@ -596,6 +638,7 @@ class DBECallActivitySearch extends DBEntity
         if ($limit) {
             $statement .= " LIMIT 0, 150";
         }
+
         $this->setQueryString($statement);
         $ret = (parent::getRows());
         return $ret;

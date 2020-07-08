@@ -1,6 +1,23 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.2.0] - 2020-07-08
+### Added
+- Issue 903 - My Settings Page
+- Issue 924 - Add Fix SLA to customer page
+- Issue 921 - Record the source of a SR, phone, email or portal
+- Issue 895 - Leased line contract expiry notification
+### Changed
+- Issue 818 - Confirm Report Logic / calculations
+- Issue 925 - Improve Double Quote handling in passwords fields
+- Issue 615 - Contacts have Active flag
+### Fixed
+- Issue 927 - Imported customers not assigning default delivery address
+- Issue 904 - Renewal Report Unit numbers not matching
+- Issue 892 - Lead Status Layout Change
+- Issue 822 - Combining SRs for Sales Order ordering issue
+- Issue 930 - Too many email customer icons on Activity Page
+
 ## [v4.1.9] - 2020-06-30
 ### Fixed
 - Office365LicensesExport.php not correctly counting number of licensed mailboxes.

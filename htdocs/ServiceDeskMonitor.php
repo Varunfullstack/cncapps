@@ -30,7 +30,7 @@ if (isset($_REQUEST['debug'])) {
 $buProblemSLA = new BUProblemSLA($thing);
 $buProblemSLA->monitor($dryRun, $problemID, $debug);
 echo "Service Desk Monitor Routine Finished";
-
+//
 echo 'Start processing future SR\n';
 $buActivity = new BUActivity($thing);
 $dsProblems = $buActivity->getAlarmReachedProblems();
@@ -50,5 +50,4 @@ while ($dsProblems->fetchNext()) {
     $update->updateRow();
 }
 echo 'Finished processing future breached SR\'s';
-
 ?>

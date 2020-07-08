@@ -244,8 +244,8 @@ class BUPDFSalesQuote extends Business
 
         while ($dsOrdline->fetchNext()) {
             if (!$dsSelectedOrderLine || !$dsSelectedOrderLine->search(
-                    DBEOrdline::sequenceNo,
-                    $dsOrdline->getValue(DBEJOrdline::sequenceNo)
+                    DBEOrdline::id,
+                    $dsOrdline->getValue(DBEJOrdline::id)
                 )) {
                 continue;
             }

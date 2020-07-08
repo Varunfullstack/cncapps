@@ -59,6 +59,7 @@ while ($line = fgetcsv($csvFile)) {
         $customerInsert->setValue(DBECustomer::noOfPCs, $line[18]);
         $customerInsert->setValue(DBECustomer::mailshotFlag, 'Y');
         $customerInsert->setValue(DBECustomer::customerTypeID, 47);
+        $customerInsert->setValue(DBECustomer::deliverSiteNo, 0);
         $customerInsert->insertRow();
         $customerId = $customerInsert->getPKValue();
 
@@ -84,8 +85,6 @@ while ($line = fgetcsv($csvFile)) {
     $dbeSite->setValue(DBESite::customerID, $customerId);
     if (!$dbeSite->getRowByCustomerIDSiteNo()) {
         $siteInsert = new DBESite($thing);
-        $siteInsert->setValue(DBESite::siteNo, 0);
-        $siteInsert->setValue(DBESite::customerID, $customerId);
         $siteInsert->setValue(DBESite::siteNo, 0);
         $siteInsert->setValue(DBESite::customerID, $customerId);
         $siteInsert->setValue(DBESite::add1, $line[7]);
@@ -115,6 +114,7 @@ while ($line = fgetcsv($csvFile)) {
         $contactInsert->setValue(DBEContact::lastName, $line[3]);
         $contactInsert->setValue(DBEContact::position, $line[4]);
         $contactInsert->setValue(DBEContact::email, $line[5]);
+        $contactInsert->setValue(DBEContact::siteNo, 0);
         $contactInsert->insertRow();
     }
 

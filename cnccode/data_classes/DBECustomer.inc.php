@@ -67,6 +67,14 @@ class DBECustomer extends DBCNCEntity
     const reviewMeetingBooked = 'reviewMeetingBooked';
     const licensedOffice365Users = 'licensedOffice365Users';
     const websiteURL = "websiteURL";
+    const slaFixHoursP1 = "slaFixHoursP1";
+    const slaFixHoursP2 = "slaFixHoursP2";
+    const slaFixHoursP3 = "slaFixHoursP3";
+    const slaFixHoursP4 = "slaFixHoursP4";
+    const slaP1PenaltiesAgreed = "slaP1PenaltiesAgreed";
+    const slaP2PenaltiesAgreed = "slaP2PenaltiesAgreed";
+    const slaP3PenaltiesAgreed = "slaP3PenaltiesAgreed";
+
 
     /**
      * calls constructor()
@@ -277,6 +285,12 @@ class DBECustomer extends DBCNCEntity
             DA_NOT_NULL,
             "cus_sla_p5"
         );
+        $this->addColumn(self::slaFixHoursP1, DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn(self::slaFixHoursP2, DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn(self::slaFixHoursP3, DA_FLOAT, DA_NOT_NULL);
+        $this->addColumn(self::slaFixHoursP4, DA_FLOAT, DA_NOT_NULL);
+
+
         $this->addColumn(
             self::sendContractEmail,
             DA_STRING,
@@ -431,6 +445,29 @@ class DBECustomer extends DBCNCEntity
             self::websiteURL,
             DA_TEXT,
             DA_ALLOW_NULL
+        );
+
+        $this->addColumn(
+            self::slaP1PenaltiesAgreed,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
+        );
+
+        $this->addColumn(
+            self::slaP2PenaltiesAgreed,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
+        );
+        $this->addColumn(
+            self::slaP3PenaltiesAgreed,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
         );
 
         $this->setPK(0);

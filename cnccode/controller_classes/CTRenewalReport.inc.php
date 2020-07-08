@@ -368,6 +368,7 @@ class CTRenewalReport extends CTCNC
                     'checkbox'             => $checkbox,
                     'calculatedExpiryDate' => $item['calculatedExpiryDate'],
                     'units'                => $item['units'],
+                    'unitsNotEqualItems'   => count($item['coveredItems'])>0&&count($item['coveredItems'])!=$item['units']?'wrong':'',
                     'directDebit'          => $item['directDebit'] ? 'Yes' : null,
                     "showOfficeButton"     => $addOfficeReportButton ? 1 : 0,
                     "disabled"             => $displayAccountsInfo ? null : "disabled"

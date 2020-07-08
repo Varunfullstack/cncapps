@@ -40,13 +40,16 @@ class BUServiceRequestReport extends Business
 
     /**
      * @param DSForm $dsSearchForm
+     * @param bool $hasInialActivity
      * @return bool|mysqli_result
      */
-    function search(&$dsSearchForm)
+    function search(&$dsSearchForm, $hasInialActivity = false)
     {
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
-
+        $inialActivity = "";
+        if ($hasInialActivity)
+            $inialActivity = ",(select min(caa_callactivityno) from callactivity where caa_problemno=pro_problemno and caa_callacttypeno=51) inialActivity";
         $query =
             "
         SELECT 
@@ -87,7 +90,11 @@ class BUServiceRequestReport extends Business
             IFNULL(add_postcode, ''),
             ' ',
             IFNULL(adslPhone, '')
-          ) AS `Contract`
+          ) AS `Contract`,
+          prt.description AS raiseType,
+          pro_status AS status,
+          pro_contract_cuino
+          $inialActivity
         FROM
           problem 
           LEFT JOIN customer 
@@ -104,14 +111,16 @@ class BUServiceRequestReport extends Business
             ON add_custno = cui_custno AND add_siteno = cui_siteno
           LEFT JOIN item 
             ON itm_itemno = cui_itemno
+          LEFT JOIN ProblemRaiseType prt
+            ON problem.raiseTypeId=prt.id
           WHERE 1=1";
 
         if ($dsSearchForm->getValue(self::searchFormFromDate)) {
-            $query .= " AND pro_date_raised >= '" . $dsSearchForm->getValue(self::searchFormFromDate) . "'";
+            $query .= " AND date(pro_date_raised) >= '" . $dsSearchForm->getValue(self::searchFormFromDate) . "'";
         }
 
         if ($dsSearchForm->getValue(self::searchFormToDate)) {
-            $query .= " AND pro_date_raised <= '" . $dsSearchForm->getValue(self::searchFormToDate) . "'";
+            $query .= " AND date(pro_date_raised) <= '" . $dsSearchForm->getValue(self::searchFormToDate) . "'";
         }
 
         if ($dsSearchForm->getValue(self::searchFormCustomerID)) {

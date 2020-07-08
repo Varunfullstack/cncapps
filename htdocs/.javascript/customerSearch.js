@@ -1,7 +1,5 @@
 (function () {
     $(function () {
-
-
         const autocompleteURL = "/Customer.php?action=searchName";
         $('input[type="text"][customer-search]').each(function () {
             const that = this;
@@ -51,7 +49,6 @@
             this.addEventListener('focus', function (event) {
                 $(event.target).autocomplete("search", $(event.target).val());
             })
-
         })
     })
 })();

@@ -227,6 +227,12 @@ class CTHeader extends CTCNC
                 'overtimeEndTimeMessage'                 => Controller::htmlDisplayText(
                     $dsHeader->getMessage(DBEJHeader::overtimeEndTime)
                 ),
+                'fixSLABreachWarningHours'               => Controller::htmlDisplayText(
+                    $dsHeader->getValue(DBEHeader::fixSLABreachWarningHours)
+                ),
+                'fixSLABreachWarningHoursMessage'        => Controller::htmlDisplayText(
+                    $dsHeader->getMessage(DBEHeader::fixSLABreachWarningHours)
+                ),
                 'hourlyLabourCost'                       => Controller::htmlInputText(
                     $dsHeader->getValue(DBEJHeader::hourlyLabourCost)
                 ),

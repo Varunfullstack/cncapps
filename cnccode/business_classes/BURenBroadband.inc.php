@@ -718,6 +718,14 @@ class BURenBroadband extends Business
         );
 
     }
-
+    
+    function resetContractExpireNotified()
+    {
+        global $db;
+        $sql ="UPDATE custitem
+                SET contractExpireNotified = 0 
+                where  DATEDIFF(DATE_ADD(installationDate, INTERVAL initialContractLength MONTH), CURDATE()) >=90";
+         $db->query($sql);
+    }
 } // End of class
 ?>

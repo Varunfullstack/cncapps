@@ -71,29 +71,7 @@ from customer
                                                                   (select min(b.con_contno)
                                                                    from contact b
                                                                    where b.con_custno = cus_custno
-                                                                     and (
-                                                                           con_mailshot = 'Y' OR
-                                                                           con_mailflag2 = 'Y' OR
-                                                                           con_mailflag3 = 'Y' OR
-                                                                           con_mailflag4 = 'Y' OR
-                                                                           con_mailflag8 = 'Y' OR
-                                                                           con_mailflag9 = 'Y' OR
-                                                                           con_mailflag11 = 'Y' or
-                                                                           (supportLevel is not null and supportLevel <> '') or
-                                                                           hrUser = 'Y' or
-                                                                           initialLoggingEmailFlag = 'Y' or
-                                                                           workStartedEmailFlag = 'Y' or
-                                                                           workUpdatesEmailFlag = 'Y' or
-                                                                           fixedEmailFlag = 'Y' or
-                                                                           pendingClosureEmailFlag = 'Y' or
-                                                                           closureEmailFlag = 'Y' or
-                                                                           othersInitialLoggingEmailFlag = 'Y' or
-                                                                           othersWorkStartedEmailFlag = 'Y' or
-                                                                           othersWorkUpdatesEmailFlag = 'Y' or
-                                                                           othersFixedEmailFlag = 'Y' or
-                                                                           othersPendingClosureEmailFlag = 'Y' or
-                                                                           othersClosureEmailFlag = 'Y'
-                                                                       )
+                                                                     and active
                                                                   )
          left join address on add_custno = cus_custno and add_siteno = con_siteno
          left join customerleadstatus c on customer.leadStatusId = c.id
