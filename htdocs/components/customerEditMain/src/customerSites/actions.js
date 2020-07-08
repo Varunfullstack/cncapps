@@ -26,3 +26,7 @@ export function setDefaultInvoiceSite(siteNo) {
 export function setDefaultDeliverySite(siteNo) {
     return {type: SET_DEFAULT_DELIVERY_SITE, siteNo};
 }
+
+export function requestContacts(customerId) {
+
+}
