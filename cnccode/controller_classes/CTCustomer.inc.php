@@ -136,6 +136,7 @@ class CTCustomer extends CTCNC
     const customerFormSectorMessage = 'SectorMessage';
     const customerFormSpecialAttentionEndDateMessage = 'specialAttentionEndDateMessage';
     const customerFormLastReviewMeetingDateMessage = 'lastReviewMeetingDateMessage';
+    const GET_CUSTOMER_PORTAL_DOCUMENTS = 'getCustomerPortalDocuments';
     public $customerID;
     public $customerString;
     public $contactString;
@@ -969,6 +970,8 @@ class CTCustomer extends CTCNC
                 return $this->getCustomerReviewDataController();
             case 'updateCustomerReview':
                 return $this->updateCustomerReviewController();
+            case self::GET_CUSTOMER_PORTAL_DOCUMENTS:
+                return $this->getCustomerPortalDocumentsController();
             case 'createCustomerFolder':
                 $this->createCustomerFolder();
                 break;
@@ -979,7 +982,6 @@ class CTCustomer extends CTCNC
                 $this->displayReviewList();
                 break;
             case CTCUSTOMER_ACT_SEARCH:
-
                 $this->search();
                 break;
             case CTCUSTOMER_ACT_ADDCUSTOMER:
@@ -1175,6 +1177,49 @@ class CTCustomer extends CTCNC
         echo json_encode(
             ["status" => "ok",]
         );
+    }
+
+    function getCustomerPortalDocumentsController()
+    {
+        if (!isset($_REQUEST['customerId'])) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "Customer ID is mandatory"]);
+            exit;
+        }
+        echo json_encode(
+            ["status" => "ok", "data" => $this->getPortalDocuments($_REQUEST['customerId'])]
+        );
+    }
+
+    /**
+     * @param $customerID
+     * @return array
+     * @throws Exception
+     */
+    function getPortalDocuments($customerID)
+    {
+        $portalDocuments = new DBEPortalCustomerDocumentWithoutFile($customerID);
+        $portalDocuments->setValue(DBEPortalCustomerDocumentWithoutFile::customerID, $customerID);
+        $portalDocuments->getRowsByColumn(
+            DBEPortalCustomerDocument::customerID,
+            DBEPortalCustomerDocumentWithoutFile::description
+        );
+        $documents = [];
+        while ($portalDocuments->fetchNext()) {
+            $documents[] =
+                [
+                    'id'                  => $portalDocuments->getValue(
+                        DBEPortalCustomerDocument::portalCustomerDocumentID
+                    ),
+                    'description'         => $portalDocuments->getValue(DBEPortalCustomerDocumentWithoutFile::description),
+                    'filename'            => $portalDocuments->getValue(DBEPortalCustomerDocumentWithoutFile::filename),
+                    'customerContract'    => $portalDocuments->getValue(DBEPortalCustomerDocumentWithoutFile::customerContract),
+                    'mainContactOnlyFlag' => $portalDocuments->getValue(
+                            DBEPortalCustomerDocument::mainContactOnlyFlag
+                        ) === 'Y'
+                ];
+        }
+        return $documents;
     }
 
     /**
@@ -1602,7 +1647,8 @@ class CTCustomer extends CTCNC
             'javaScript',
             "<script src='components/customerEditMain/dist/CustomerReviewComponent.js?version=1.0.0'></script>
             <script src='components/customerEditMain/dist/CustomerNotesComponent.js?version=1.0.0'></script>
-            <script src='components/customerEditMain/dist/CustomerProjectsComponent.js?version=1.0.0'></script>"
+            <script src='components/customerEditMain/dist/CustomerProjectsComponent.js?version=1.0.0'></script>
+            <script src='components/customerEditMain/dist/CustomerPortalDocumentsComponent.js?version=1.0.0'></script>"
         );
 
 // Parameters
@@ -2094,76 +2140,6 @@ class CTCustomer extends CTCNC
                 'addProjectURL'  => $addProjectURL
             )
         );
-
-        $this->template->set_block(
-            'CustomerEdit',
-            'projectBlock',
-            'projects'
-        );      // have to declare innermost block first
-
-        if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) {
-
-            $buProject = new BUProject($this);
-            $dsProject = new DataSet($this);
-            $buProject->getProjectsByCustomerID(
-                $this->getCustomerID(),
-                $dsProject
-            );
-
-            while ($dsProject->fetchNext()) {
-                $deleteProjectLink = null;
-                $deleteProjectText = null;
-                if ($buProject->canDelete($dsProject->getValue(DBEProject::projectID))) {
-                    $deleteProjectLink =
-                        Controller::buildLink(
-                            'Project.php',
-                            array(
-                                'action'    => 'delete',
-                                'projectID' => $dsProject->getValue(DBEProject::projectID)
-                            )
-                        );
-                    $deleteProjectText = 'delete';
-                }
-
-                $editProjectLink =
-                    Controller::buildLink(
-                        'Project.php',
-                        array(
-                            'action'    => 'edit',
-                            'projectID' => $dsProject->getValue(DBEProject::projectID)
-                        )
-                    );
-
-                $this->template->set_var(
-                    array(
-                        'projectID'         => $dsProject->getValue(DBEProject::projectID),
-                        'projectName'       => $dsProject->getValue(DBEProject::description),
-                        'notes'             => substr(
-                            $dsProject->getValue(DBEProject::notes),
-                            0,
-                            50
-                        ),
-                        'startDate'         => strftime(
-                            "%d/%m/%Y",
-                            strtotime($dsProject->getValue(DBEProject::openedDate))
-                        ),
-                        'expiryDate'        => strftime(
-                            "%d/%m/%Y",
-                            strtotime($dsProject->getValue(DBEProject::completedDate))
-                        ),
-                        'editProjectLink'   => $editProjectLink,
-                        'deleteProjectLink' => $deleteProjectLink,
-                        'deleteProjectText' => $deleteProjectText
-                    )
-                );
-
-                $this->template->parse(
-                    'projects',
-                    'projectBlock',
-                    true
-                );
-            }
-        }
 
         $this->template->set_block(
             'CustomerEdit',
@@ -2803,12 +2779,6 @@ class CTCustomer extends CTCNC
             );
 
         }
-        if ($this->dsCustomer->getValue(DBECustomer::customerID)) {
-            $this->documents(
-                $this->dsCustomer->getValue(DBECustomer::customerID),
-                'CustomerEdit'
-            );
-        }
 
         $this->template->parse(
             'CONTENTS',
@@ -2911,113 +2881,6 @@ class CTCustomer extends CTCNC
     function getOrderTypeDescription($type)
     {
         return $this->orderTypeArray[$type];
-    }
-
-    /**
-     * @param $customerID
-     * @param $templateName
-     * @throws Exception
-     */
-    function documents($customerID,
-                       $templateName
-    )
-    {
-        $this->template->set_block(
-            $templateName,
-            'portalDocumentBlock',
-            'portalDocuments'
-        );
-
-        if ($this->getAction() != CTCUSTOMER_ACT_ADDCUSTOMER) {
-
-            $buPortalCustomerDocument = new BUPortalCustomerDocument($this);
-            $dsPortalCustomerDocument = new DataSet($this);
-            $buPortalCustomerDocument->getDocumentsByCustomerID(
-                $customerID,
-                $dsPortalCustomerDocument
-            );
-
-            $urlAddDocument =
-                Controller::buildLink(
-                    'PortalCustomerDocument.php',
-                    array(
-                        'action'     => 'add',
-                        'customerID' => $customerID
-                    )
-                );
-
-
-            $this->template->set_var(
-                array(
-                    'txtAddDocument' => 'Add document',
-                    'urlAddDocument' => $urlAddDocument
-                )
-            );
-
-            while ($dsPortalCustomerDocument->fetchNext()) {
-
-                $urlEditDocument =
-                    Controller::buildLink(
-                        'PortalCustomerDocument.php',
-                        array(
-                            'action'                   => 'edit',
-                            'portalCustomerDocumentID' => $dsPortalCustomerDocument->getValue(
-                                DBEPortalCustomerDocument::portalCustomerDocumentID
-                            )
-                        )
-                    );
-
-                $urlViewFile =
-                    Controller::buildLink(
-                        'PortalCustomerDocument.php',
-                        array(
-                            'action'                   => 'viewFile',
-                            'portalCustomerDocumentID' => $dsPortalCustomerDocument->getValue(
-                                DBEPortalCustomerDocument::portalCustomerDocumentID
-                            )
-                        )
-                    );
-
-                $urlDeleteDocument =
-                    Controller::buildLink(
-                        'PortalCustomerDocument.php',
-                        array(
-                            'action'                   => 'delete',
-                            'portalCustomerDocumentID' => $dsPortalCustomerDocument->getValue(
-                                DBEPortalCustomerDocument::portalCustomerDocumentID
-                            )
-                        )
-                    );
-
-                $this->template->set_var(
-                    array(
-                        'description'         => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::description
-                        ),
-                        'filename'            => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::filename
-                        ),
-                        'customerContract'    => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::customerContract
-                        ) ? 'Y' : 'N',
-                        'mainContactOnlyFlag' => $dsPortalCustomerDocument->getValue(
-                            DBEPortalCustomerDocument::mainContactOnlyFlag
-                        ),
-                        'urlViewFile'         => $urlViewFile,
-                        'urlEditDocument'     => $urlEditDocument,
-                        'urlDeleteDocument'   => $urlDeleteDocument
-                    )
-                );
-                $this->template->parse(
-                    'portalDocuments',
-                    'portalDocumentBlock',
-                    true
-                );
-            } // end while
-
-        } // end if
-
-
     }
 
     /**
