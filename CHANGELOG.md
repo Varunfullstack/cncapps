@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v4.2.0]
+## [v4.2.0] - 2020-07-08
 ### Added
 - Issue 903 - My Settings Page
 - Issue 924 - Add Fix SLA to customer page
