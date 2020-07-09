@@ -270,87 +270,10 @@
            name="userWarned"
            value="{userWarned}"
     >
-
     <input type="hidden"
            id="callActivityID"
            name="callActivity[1][callActivityID]"
            value="{callActivityID}"
-    >
-    <input type="hidden"
-           name="callActivity[1][overtimeExportedFlag]"
-           value="{overtimeExportedFlag}"
-    >
-    <input type="hidden"
-           name="callActivity[1][awaitingCustomerResponseFlag]"
-           value="{awaitingCustomerResponseFlag}"
-    >
-    <input type="hidden"
-           name="callActivity[1][customerID]"
-           value="{customerID}"
-    >
-    <input type="hidden"
-           id="problemID"
-           name="callActivity[1][problemID]"
-           value="{problemID}"
-    >
-    <input type="hidden"
-           name="callActivity[1][problemStatus]"
-           value="{problemStatus}"
-    >
-    <input type="hidden"
-           name="callActivity[1][status]"
-           value="{status}"
-    >
-    <input type="hidden"
-           name="callActivity[1][siteDesc]"
-           value="{siteDesc}"
-    >
-    <input type="hidden"
-           name="callActivity[1][date]"
-           value="{date}"
-    >
-    <input type="hidden"
-           name="callActivity[1][startTime]"
-           value="{startTime}"
-    >
-    <input type="hidden"
-           name="callActivity[1][endTime]"
-           value="{endTime}"
-    >
-
-    <input type="hidden"
-           name="callActivity[1][onSiteFlag]"
-           value="{onSiteFlag}"
-    >
-    <input type="hidden"
-           name="callActivity[1][rootCauseID]"
-           value="{rootCauseID}"
-    >
-
-    <input type="hidden"
-           name="callActivity[1][customerName]"
-           value="{customerName}"
-    >
-    <input type="hidden"
-           name="callActivity[1][authorisedFlag]"
-           value="{authorisedFlag}"
-    >
-    <input type="hidden"
-           name="callActivity[1][priority]"
-           value="{hiddenPriority}"
-    >
-    <input type="hidden"
-           name="callActivity[1][contractCustomerItemID]"
-           value="{hiddenContractCustomerItemID}"
-    >
-    <input type="hidden"
-           name="callActivity[1][hideFromCustomerFlag]"
-           value="{hideFromCustomerFlag}"
-    >
-    {hiddenActivityType}
-    <input type="hidden"
-           name="callActivity[1][salesRequestStatus]"
-           value="{salesRequestStatus}"
     >
     <input type="hidden"
            name="MAX_FILE_SIZE"
@@ -458,6 +381,7 @@
             <td class="fieldText">
                 <select {INITIAL_DISABLED}
                         {typeDisabled}
+                        required
                         id="activityTypeSelector"
                         name="callActivity[1][callActTypeID]"
                 >

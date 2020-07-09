@@ -4937,26 +4937,30 @@ class CTActivity extends CTCNC
     function updateCallActivity()
     {
         $this->setMethodName('updateCallActivity');
-        $dsCallActivity = &$this->dsCallActivity;
+        $callActivityID = $this->getParam('callActivity')[1]['callActivityID'];
+        $this->buActivity->getActivityByID(
+            $callActivityID,
+            $this->dsCallActivity
+        );
         $this->formError = (!$this->dsCallActivity->populateFromArray($this->getParam('callActivity')));
 
-        $callActivityID = $dsCallActivity->getValue(DBEJCallActivity::callActivityID);
+
         // these names must not be part of an html array as the fckeditor does not work
-        $dsCallActivity->setUpdateModeUpdate();
-        $dsCallActivity->setValue(
+        $this->dsCallActivity->setUpdateModeUpdate();
+        $this->dsCallActivity->setValue(
             DBEJCallActivity::reason,
             $_POST['reason']
         );
-        $dsCallActivity->setValue(
+        $this->dsCallActivity->setValue(
             DBEJCallActivity::internalNotes,
             $_POST['internalNotes']
         );
 
-        $dsCallActivity->post();
+        $this->dsCallActivity->post();
         $dbeCallActType = new DBEJCallActType($this);
 
 
-        if (!$dsCallActivity->getValue(
+        if (!$this->dsCallActivity->getValue(
             DBEJCallActivity::callActTypeID
         )) {
 
@@ -4966,8 +4970,8 @@ class CTActivity extends CTCNC
                 'Required'
             );
         } else {
-            $dbeCallActType->getRow($dsCallActivity->getValue(DBEJCallActivity::callActTypeID));
-            if ($dsCallActivity->getValue(DBEJCallActivity::siteNo) === null) {
+            $dbeCallActType->getRow($this->dsCallActivity->getValue(DBEJCallActivity::callActTypeID));
+            if ($this->dsCallActivity->getValue(DBEJCallActivity::siteNo) === null) {
                 $this->formError = true;
                 $this->dsCallActivity->setMessage(
                     DBEJCallActivity::siteNo,
@@ -4975,7 +4979,7 @@ class CTActivity extends CTCNC
                 );
             }
 
-            if (!$dsCallActivity->getValue(DBEJCallActivity::contactID) || $dsCallActivity->getValue(
+            if (!$this->dsCallActivity->getValue(DBEJCallActivity::contactID) || $this->dsCallActivity->getValue(
                     DBEJCallActivity::contactID
                 ) == 0) {
                 $this->formError = true;
@@ -4985,9 +4989,9 @@ class CTActivity extends CTCNC
                 );
             } else {
                 if ($this->buActivity->needsTravelHoursAdding(
-                    $dsCallActivity->getValue(DBEJCallActivity::callActTypeID),
-                    $dsCallActivity->getValue(DBEJCallActivity::customerID),
-                    $dsCallActivity->getValue(DBEJCallActivity::siteNo)
+                    $this->dsCallActivity->getValue(DBEJCallActivity::callActTypeID),
+                    $this->dsCallActivity->getValue(DBEJCallActivity::customerID),
+                    $this->dsCallActivity->getValue(DBEJCallActivity::siteNo)
                 )) {
                     $this->formError = true;
                     $this->dsCallActivity->setMessage(
@@ -4998,7 +5002,7 @@ class CTActivity extends CTCNC
 
                 // is the selected contact a nominated support contact?
                 $buCustomer = new BUCustomer($this);
-                if (!$buCustomer->isASupportContact($dsCallActivity->getValue(DBEJCallActivity::contactID))) {
+                if (!$buCustomer->isASupportContact($this->dsCallActivity->getValue(DBEJCallActivity::contactID))) {
                     $this->formError = true;
                     $this->dsCallActivity->setMessage(
                         DBEJCallActivity::contactID,
@@ -5050,8 +5054,8 @@ class CTActivity extends CTCNC
 
 
                 if (
-                    $dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID) &&
-                    $dsCallActivity->getValue(DBEJCallActivity::projectID)
+                    $this->dsCallActivity->getValue(DBEJCallActivity::contractCustomerItemID) &&
+                    $this->dsCallActivity->getValue(DBEJCallActivity::projectID)
                 ) {
                     $this->dsCallActivity->setMessage(
                         DBEJCallActivity::projectID,
@@ -5062,7 +5066,9 @@ class CTActivity extends CTCNC
                 /*
           Date/time must be after Initial activity
           */
-                if ($dsCallActivity->getValue(DBEJCallActivity::callActTypeID) != CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
+                if ($this->dsCallActivity->getValue(
+                        DBEJCallActivity::callActTypeID
+                    ) != CONFIG_INITIAL_ACTIVITY_TYPE_ID) {
 
                     $dbeFirstActivity = $this->buActivity->getFirstActivityInProblem(
                         $this->dsCallActivity->getValue(DBEJCallActivity::problemID)
@@ -5099,23 +5105,23 @@ class CTActivity extends CTCNC
                     }
 
                     $durationHours = common_convertHHMMToDecimal(
-                            $dsCallActivity->getValue(DBEJCallActivity::endTime)
-                        ) - common_convertHHMMToDecimal($dsCallActivity->getValue(DBEJCallActivity::startTime));
+                            $this->dsCallActivity->getValue(DBEJCallActivity::endTime)
+                        ) - common_convertHHMMToDecimal($this->dsCallActivity->getValue(DBEJCallActivity::startTime));
 
                     $durationMinutes = convertHHMMToMinutes(
-                            $dsCallActivity->getValue(DBEJCallActivity::endTime)
-                        ) - convertHHMMToMinutes($dsCallActivity->getValue(DBEJCallActivity::startTime));
+                            $this->dsCallActivity->getValue(DBEJCallActivity::endTime)
+                        ) - convertHHMMToMinutes($this->dsCallActivity->getValue(DBEJCallActivity::startTime));
 
 
-                    $activityType = $dsCallActivity->getValue(DBEJCallActivity::callActTypeID);
+                    $activityType = $this->dsCallActivity->getValue(DBEJCallActivity::callActTypeID);
 
                     if (in_array(
                         $activityType,
                         [4, 8, 11, 18]
                     )) {
-                        $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
+                        $problemID = $this->dsCallActivity->getValue(DBEJCallActivity::problemID);
 
-                        $userID = $dsCallActivity->getValue(DBEJCallActivity::userID);
+                        $userID = $this->dsCallActivity->getValue(DBEJCallActivity::userID);
                         $dbeUser = new DBEUser($this);
                         $dbeUser->setValue(
                             DBEUser::userID,
@@ -5186,7 +5192,7 @@ class CTActivity extends CTCNC
 
 
                             if (
-                                $dsCallActivity->getValue(
+                                $this->dsCallActivity->getValue(
                                     DBEJCallActivity::callActTypeID
                                 ) == CONFIG_CUSTOMER_CONTACT_ACTIVITY_TYPE_ID &&
                                 $durationHours > $dsHeader->getValue(DBEHeader::customerContactWarnHours)
@@ -5202,7 +5208,7 @@ class CTActivity extends CTCNC
 
                             }
 
-                            if ($dsCallActivity->getValue(
+                            if ($this->dsCallActivity->getValue(
                                     DBEJCallActivity::callActTypeID
                                 ) == CONFIG_REMOTE_TELEPHONE_ACTIVITY_TYPE_ID) {
                                 if ($durationHours > $dsHeader->getValue(DBEHeader::remoteSupportWarnHours)) {
@@ -5236,7 +5242,7 @@ class CTActivity extends CTCNC
                 }
             }
 
-            $problemID = $dsCallActivity->getValue(DBEJCallActivity::problemID);
+            $problemID = $this->dsCallActivity->getValue(DBEJCallActivity::problemID);
             if ($this->getParam('problem') && isset(
                     $this->getParam(
                         'problem'
@@ -5260,11 +5266,13 @@ class CTActivity extends CTCNC
             if ($this->getParam('Fixed')) {
                 //try to close all the activities
 
-                $this->buActivity->closeActivitiesWithEndTime($dsCallActivity->getValue(DBEJCallActivity::problemID));
+                $this->buActivity->closeActivitiesWithEndTime(
+                    $this->dsCallActivity->getValue(DBEJCallActivity::problemID)
+                );
 
                 if ($this->buActivity->countOpenActivitiesInRequest(
-                        $dsCallActivity->getValue(DBEJCallActivity::problemID),
-                        $dsCallActivity->getValue(DBEJCallActivity::callActivityID)
+                        $this->dsCallActivity->getValue(DBEJCallActivity::problemID),
+                        $this->dsCallActivity->getValue(DBEJCallActivity::callActivityID)
                     ) > 0) {
                     $this->dsCallActivity->setMessage(
                         DBEJCallActivity::problemStatus,
@@ -5293,29 +5301,29 @@ class CTActivity extends CTCNC
         if ($this->getParam('Fixed')) {
             $nextStatus = 'Fixed';
         } elseif ($this->getParam('CustomerAction')) {
-            $dsCallActivity->setUpdateModeUpdate();
-            $dsCallActivity->setValue(
+            $this->dsCallActivity->setUpdateModeUpdate();
+            $this->dsCallActivity->setValue(
                 DBEJCallActivity::awaitingCustomerResponseFlag,
                 'Y'
             );
             $updateAwaitingCustomer = true;
-            $dsCallActivity->post();
+            $this->dsCallActivity->post();
             $nextStatus = 'CustomerAction';
         } elseif ($this->getParam('CncAction')) {
-            $dsCallActivity->setUpdateModeUpdate();
-            $dsCallActivity->setValue(
+            $this->dsCallActivity->setUpdateModeUpdate();
+            $this->dsCallActivity->setValue(
                 DBEJCallActivity::awaitingCustomerResponseFlag,
                 'N'
             );
             $updateAwaitingCustomer = true;
 
-            $dsCallActivity->post();
+            $this->dsCallActivity->post();
             $nextStatus = 'CncAction';
         } elseif ($this->getParam('Escalate')) {
             $dbeProblem = new DBEProblem($this);
             $dbeProblem->setValue(
                 DBEProblem::problemID,
-                $dsCallActivity->getValue(DBECallActivity::problemID)
+                $this->dsCallActivity->getValue(DBECallActivity::problemID)
             );
             $dbeProblem->getRow();
             if (!in_array($dbeProblem->getValue(DBEProblem::status), ["I", "F", "C"]) && !$this->getParam(
@@ -5341,10 +5349,10 @@ class CTActivity extends CTCNC
 
         if ($updateAwaitingCustomer) {
             $toUpdateProblem = new DBEProblem($this);
-            $toUpdateProblem->getRow($dsCallActivity->getValue(DBECallActivity::problemID));
+            $toUpdateProblem->getRow($this->dsCallActivity->getValue(DBECallActivity::problemID));
             $toUpdateProblem->setValue(
                 DBEProblem::awaitingCustomerResponseFlag,
-                $dsCallActivity->getValue(DBECallActivity::awaitingCustomerResponseFlag)
+                $this->dsCallActivity->getValue(DBECallActivity::awaitingCustomerResponseFlag)
             );
             $toUpdateProblem->updateRow();
         }
