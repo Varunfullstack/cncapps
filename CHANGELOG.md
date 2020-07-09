@@ -3,7 +3,10 @@ This project changes will be shown here.
 
 ## [v4.2.1]
 ### Fixed
-- Fix email link not having subject
+- Fixed email link not having subject
+- Fixed issue that prevented from editing Sales orders lines
+- Fixed ExpenseDashboard Permissions
+- Fixed issue with Double overtime submissions
 
 ## [v4.2.0] - 2020-07-08
 ### Added

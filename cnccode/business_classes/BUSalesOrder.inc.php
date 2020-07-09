@@ -1098,6 +1098,9 @@ class BUSalesOrder extends Business
         }
         // ordline fields
         $dbeOrdline = new DBEOrdline($this);
+        if ($dsOrdline->getValue(DBEOrdline::id)) {
+            $dbeOrdline->getRow($dsOrdline->getValue(DBEOrdline::id));
+        }
 
         $dbeOrdline->setValue(
             DBEOrdline::lineType,
@@ -1196,8 +1199,10 @@ class BUSalesOrder extends Business
                 DBEOrdline::description,
                 $dsOrdline->getValue(DBEOrdline::description)
             );
+
         }
         if ($action == "U") {
+            $dbeOrdline->setShowSQLOn();
             $dbeOrdline->updateRow();
         } else {
             // we are inserting, we can't just insert in any place, we are going to insert in the last place and then move it

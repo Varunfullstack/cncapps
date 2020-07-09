@@ -2162,7 +2162,7 @@ class CTActivity extends CTCNC
 
 
         $this->template->set_var(
-            array(                
+            array(
                 'hiddenText'                         => $hiddenText,
                 'currentUserBgColor'                 => $currentUserBgColor,
                 'currentUser'                        => $currentUser,
@@ -2315,7 +2315,7 @@ class CTActivity extends CTCNC
                 ),
                 'authorisedByHide'                   => $authorisedByName ? null : "hidden",
                 'authorisedByName'                   => $authorisedByName,
-                'raiseIcon'                          => $this->getProblemRaiseIcon ($dbeJProblem)
+                'raiseIcon'                          => $this->getProblemRaiseIcon($dbeJProblem)
             )
         );
 
@@ -2681,6 +2681,41 @@ class CTActivity extends CTCNC
         return $linkMarkup;
     }
 
+    private function getProblemRaiseIcon($dbeJProblem)
+    {
+        if (isset($dbeJProblem)) {
+            $raiseTypeId = $dbeJProblem->getValue(DBEProblem::raiseTypeId);
+            if (isset($raiseTypeId) && $raiseTypeId != null) {
+                $dbeProblemRaiseType = new  DBEProblemRaiseType($this);
+                $dbeProblemRaiseType->setPKValue($raiseTypeId);
+                $dbeProblemRaiseType->getRow();
+                switch ($dbeProblemRaiseType->getValue(DBEProblemRaiseType::description)) {
+                    case 'Email':
+                        return "<i class='fa fa-envelope' title='This Service Request was raised by email'></i>";
+                        break;
+                    case 'Portal':
+                        return "<i class='fa fa-edge' title='This Service Request was raised by the portal'></i>";
+                        break;
+                    case 'Phone':
+                        return "<i class='fa fa-phone' title='This Service Request was raised by phone'></i>";
+                        break;
+                    case 'On site':
+                        return "<i class='fas fa-building' title='This Service Request was raised by an on site engineer'></i>";
+                        break;
+                    case 'Alert':
+                        return "<i class='fas fa-bell' title='This Service Request was raised by an alert'></i>";
+                        break;
+                    case 'Sales':
+                        return "<i class='fas fa-shopping-cart' title='This Service Request was raised via Sales'></i>";
+                        break;
+                    case 'Manual':
+                        return "<i class='fas fa-user-edit' title='This Service Request was raised manually'></i>";
+                        break;
+                }
+            }
+        } else return null;
+    } // end cancelEdit
+
     /**
      * Documents display and upload
      *
@@ -2767,7 +2802,7 @@ class CTActivity extends CTCNC
         }
 
 
-    } // end cancelEdit
+    }
 
     /**
      * @throws Exception
@@ -2778,7 +2813,7 @@ class CTActivity extends CTCNC
 
         $this->redirectToDisplay($dbeCallActivity->getValue(DBEJCallActivity::callActivityID));
 
-    }
+    }// end function displayActivity()
 
     /**
      * Redirect to call page
@@ -2798,7 +2833,7 @@ class CTActivity extends CTCNC
             );
         header('Location: ' . $urlNext);
         exit;
-    }// end function displayActivity()
+    }
 
     /**
      * @throws Exception
@@ -2916,15 +2951,15 @@ class CTActivity extends CTCNC
                 }
                 if ($this->getParam('contactFirstName')) {
                     $query .= "
-            AND con_first_name LIKE '%" . mysqli_real_escape_string($db,$this->getParam('contactFirstName')) . "%'";
+            AND con_first_name LIKE '%" . mysqli_real_escape_string($db, $this->getParam('contactFirstName')) . "%'";
                 }
                 if ($this->getParam('contactLastName')) {
                     $query .= "
-            AND con_last_name LIKE '%" . mysqli_real_escape_string($db,$this->getParam('contactLastName')) . "%'";
+            AND con_last_name LIKE '%" . mysqli_real_escape_string($db, $this->getParam('contactLastName')) . "%'";
                 }
                 if ($this->getParam('contactLastName')) {
                     $query .= "
-            AND con_last_name LIKE '%" . mysqli_real_escape_string($db,$this->getParam('contactLastName')) . "%'";
+            AND con_last_name LIKE '%" . mysqli_real_escape_string($db, $this->getParam('contactLastName')) . "%'";
                 }
 
                 if ($this->getParam('customerID')) {
@@ -3152,7 +3187,7 @@ class CTActivity extends CTCNC
 
         $this->parsePage();
 
-    }
+    }  // end finaliseProblem
 
     function validateSession()
     {
@@ -3164,7 +3199,7 @@ class CTActivity extends CTCNC
 
         }
 
-    }  // end finaliseProblem
+    }
 
     /**
      * @throws Exception
@@ -3357,8 +3392,8 @@ class CTActivity extends CTCNC
 
         $this->parsePage();
 
-    }
-    
+    }    // end allocateAdditionalTime
+
     /**
      * Create Service Request
      * @access private
@@ -3367,12 +3402,11 @@ class CTActivity extends CTCNC
     function editServiceRequestHeader()
     {
         $this->setMethodName('editServiceRequestHeader');
-         
+
         if ($this->getParam('reason')) {
             $this->updateSession('reason', $this->getParam('reason'));
         }
 
-      
 
         $error = [];
         /* validate if this is a POST request */
@@ -3398,11 +3432,11 @@ class CTActivity extends CTCNC
             $this->updateSession('callActTypeID', CONFIG_INITIAL_ACTIVITY_TYPE_ID);
 
             $this->updateSession('customerID', $this->getParam('customerID'));
-            if( $this->getParam('pendingReopenedID'))
-                $this->updateSession('pendingReopenedID', $this->getParam('pendingReopenedID'));        
-            if( $this->getParam('deletePending'))
+            if ($this->getParam('pendingReopenedID'))
+                $this->updateSession('pendingReopenedID', $this->getParam('pendingReopenedID'));
+            if ($this->getParam('deletePending'))
                 $this->updateSession('deletePending', $this->getParam('deletePending'));
-            
+
 
             /*
         Check nothing in fields that don't allow content
@@ -3451,16 +3485,15 @@ class CTActivity extends CTCNC
                 $error['priority'] = 'Required';
             }
 
-            if (count($error) == 0) {                
-                $pendingReopenedID=$_SESSION[$this->sessionKey]['pendingReopenedID'];
-                $deletePending=$_SESSION[$this->sessionKey]['deletePending'];
+            if (count($error) == 0) {
+                $pendingReopenedID = $_SESSION[$this->sessionKey]['pendingReopenedID'];
+                $deletePending = $_SESSION[$this->sessionKey]['deletePending'];
                 //$this->console_log($pendingReopenedID);
                 /* Create initial activity */
                 $dsCallActivity = $this->buActivity->createActivityFromSession($this->sessionKey);
-                if(isset($dsCallActivity)&&isset($pendingReopenedID)
-                &&isset($deletePending)&&$deletePending=='true')
-                {                    
-                    //delete pending 
+                if (isset($dsCallActivity) && isset($pendingReopenedID)
+                    && isset($deletePending) && $deletePending == 'true') {
+                    //delete pending
                     $dbePendingReopened = new DBEPendingReopened($this);
                     $dbePendingReopened->deleteRow($pendingReopenedID);
                 }
@@ -3474,7 +3507,7 @@ class CTActivity extends CTCNC
           Add to queue so return to dashboard
           */
                 if ($isAddToQueue) {
-                    
+
                     $nextURL =
                         Controller::buildLink(
                             'CurrentActivityReport.php',
@@ -3638,7 +3671,7 @@ class CTActivity extends CTCNC
 
         $this->parsePage();
 
-    }    // end allocateAdditionalTime
+    }
 
     private function handleUploads($problemID)
     {
@@ -3889,8 +3922,7 @@ class CTActivity extends CTCNC
             );
         }
 
-    }
-
+    }  // end finaliseProblem
 
     /**
      * @throws Exception
@@ -3960,7 +3992,7 @@ class CTActivity extends CTCNC
             true
         );
         $this->parsePage();
-    }  // end finaliseProblem
+    }
 
     /**
      * @throws Exception
@@ -4103,7 +4135,7 @@ class CTActivity extends CTCNC
         $this->parsePage();
 
         exit;
-    }
+    }  // end finaliseProblem
 
     /**
      * @throws Exception
@@ -4137,7 +4169,7 @@ class CTActivity extends CTCNC
 
         $this->parsePage();
         exit;
-    }  // end finaliseProblem
+    }
 
     /**
      * Edit/Add Activity
@@ -4321,7 +4353,8 @@ class CTActivity extends CTCNC
                 ', ' . $dsContact->getValue(DBEContact::firstName) . ' ' . $dsContact->getValue(
                     DBEContact::lastName
                 ) . ', <span class="contactPhone">' . $buCustomer->getContactPhoneForHtml(
-                    $dsCallActivity->getValue(DBEJCallActivity::contactID)
+                    $dsCallActivity->getValue(DBEJCallActivity::contactID),
+                    "Service Request {$dsCallActivity->getValue(DBEJCallActivity::problemID)}"
                 ) . '</span>';
 
             if ($dsContact->getValue(DBEContact::notes)) {
@@ -4550,6 +4583,7 @@ class CTActivity extends CTCNC
                 'submitAsOvertimeChecked'        => $dsCallActivity->getValue(
                     DBECallActivity::submitAsOvertime
                 ) ? 'checked' : null,
+                'overtimeExportedFlag'           => $dsCallActivity->getValue(DBECallActivity::overtimeExportedFlag),
                 'hdRemainMinutes'                => $hdAssignedMinutes - $hdUsedMinutes,
                 'esRemainMinutes'                => $esAssignedMinutes - $esUsedMinutes,
                 'imRemainMinutes'                => $imAssignedMinutes - $imUsedMinutes,
@@ -7051,13 +7085,13 @@ class CTActivity extends CTCNC
     function getServerTime()
     {
         echo date('H') . ':' . date('i');
-    }
+    }// end contactDropdown
 
     function updateHistoricUserTimeLogs(DateTime $startDate = null)
     {
         $this->buActivity->updateAllHistoricUserLoggedHours($startDate);
         echo "Done";
-    }// end contactDropdown
+    }
 
     /**
      * @throws Exception
@@ -7342,43 +7376,5 @@ WHERE caa_problemno = ?
         $test = $result->fetch_assoc();
 
         return !!$test['hiddenChargeableActivities'];
-    }
-    private function getProblemRaiseIcon($dbeJProblem)
-    {
-        if(isset($dbeJProblem))
-        {
-            $raiseTypeId=$dbeJProblem->getValue(DBEProblem::raiseTypeId);
-            if(isset($raiseTypeId) && $raiseTypeId !=null)
-            {
-               $dbeProblemRaiseType=new  DBEProblemRaiseType($this);
-               $dbeProblemRaiseType->setPKValue($raiseTypeId);
-               $dbeProblemRaiseType->getRow();
-               switch($dbeProblemRaiseType->getValue(DBEProblemRaiseType::description))
-               {
-                   case 'Email':
-                        return "<i class='fa fa-envelope' title='This Service Request was raised by email'></i>";
-                    break;
-                    case 'Portal':
-                        return "<i class='fa fa-edge' title='This Service Request was raised by the portal'></i>";
-                    break;
-                    case 'Phone':
-                        return "<i class='fa fa-phone' title='This Service Request was raised by phone'></i>";
-                    break;
-                    case 'On site':
-                        return "<i class='fas fa-building' title='This Service Request was raised by an on site engineer'></i>";
-                    break;
-                    case 'Alert':
-                        return "<i class='fas fa-bell' title='This Service Request was raised by an alert'></i>";
-                    break;
-                    case 'Sales':
-                        return "<i class='fas fa-shopping-cart' title='This Service Request was raised via Sales'></i>";
-                    break;
-                    case 'Manual':
-                        return "<i class='fas fa-user-edit' title='This Service Request was raised manually'></i>";
-                    break;
-               }
-            }
-        }
-        else return null;
     }
 }

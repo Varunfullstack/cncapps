@@ -1195,7 +1195,7 @@ class CTSalesOrder extends CTCNC
             $actions[CTSALESORDER_ACT_CHANGE_SUPPLIER] = 'change supplier';
             $actions[CTSALESORDER_ACT_DOWNLOAD_CSV] = 'download CSV';
             $actions[CTSALESORDER_ACT_CREATE_SR_FROM_LINES] = 'create new SR';
-        } elseif ($orderType == 'Q' || $orderType == 'I'){
+        } elseif ($orderType == 'Q' || $orderType == 'I') {
             $actions[CTSALESORDER_ACT_INSERT_FROM_ORDER] = 'insert lines from order';
         }
         $order = [
@@ -2622,7 +2622,7 @@ class CTSalesOrder extends CTCNC
                 )
             );
         }
-        if (($this->formError) & ($parentPage == 'SalesOrderLineEdit')) {
+        if (($this->formError) && ($parentPage == 'SalesOrderLineEdit')) {
             $this->template->set_var(
                 array(
                     'descriptionMessage'  => $this->dsOrdline->getValue(self::descriptionMessage),
@@ -2688,6 +2688,7 @@ class CTSalesOrder extends CTCNC
             array(
                 'sequenceNo'       => $this->dsOrdline->getValue(DBEOrdline::sequenceNo),
                 'ordheadID'        => $this->dsOrdline->getValue(DBEOrdline::ordheadID),
+                'lineId'           => $this->dsOrdline->getValue(DBEOrdline::id),
                 'urlSubmit'        => $urlSubmit,
                 'urlItemPopup'     => $urlItemPopup,
                 'urlItemEdit'      => $urlItemEdit,
@@ -4159,6 +4160,8 @@ class CTSalesOrder extends CTCNC
             DA_STRING,
             DA_ALLOW_NULL
         );
+
+
         if ($this->getParam('ordline')[1]['lineType'] == "I") {                    // Item line
             $this->dsOrdline->setNull(
                 DBEOrdline::itemID,
@@ -4233,7 +4236,6 @@ class CTSalesOrder extends CTCNC
             $this->getParam('updatedTime'),
             $dsOrdhead->getValue(DBEOrdhead::updatedTime)
         );
-
         // Validate Item line
         if ($this->formError) {                    // Form error so redisplay edit form
             if ($this->getAction() == CTSALESORDER_ACT_INSERT_ORDLINE) {
