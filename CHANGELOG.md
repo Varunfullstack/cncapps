@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.2.1]
+### Fixed
+- Fix email link not having subject
+
 ## [v4.2.0] - 2020-07-08
 ### Added
 - Issue 903 - My Settings Page
