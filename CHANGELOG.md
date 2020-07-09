@@ -1,12 +1,15 @@
 # Changelog
 This project changes will be shown here.
 
-## [v4.2.1]
+## [v4.2.1] - 2020-07-09
 ### Fixed
 - Fixed email link not having subject
 - Fixed issue that prevented from editing Sales orders lines
 - Fixed ExpenseDashboard Permissions
 - Fixed issue with Double overtime submissions
+### Changed
+- When an activity updates its start/end time, if it had any overtime approved, now it gets reset.
+- Edit link when displaying activities now shows a tooltip if it's not enabled.
 
 ## [v4.2.0] - 2020-07-08
 ### Added
