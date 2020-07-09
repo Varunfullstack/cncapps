@@ -2027,7 +2027,8 @@ class CTActivity extends CTCNC
       Also, disable the edit link
       */
         $urlEditActivity = null;
-        $txtEditActivity = null;
+        $editTooltip = null;
+        $editClass = null;
 
         if (
             $dbeLastActivity->getValue(DBEJCallActivity::callActTypeID) == 0 &&
@@ -2041,10 +2042,10 @@ class CTActivity extends CTCNC
             $currentUserBgColor = self::CONTENT;
             $currentUser = null;
 
-            if ($this->buActivity->canEdit(
-                $dsCallActivity,
-                $this
-            )) {
+            if (($editionCheck = $this->buActivity->checkActivityEdition(
+                    $dsCallActivity,
+                    $this
+                )) == 'ALL_GOOD') {
 
                 $urlEditActivity =
                     Controller::buildLink(
@@ -2054,7 +2055,11 @@ class CTActivity extends CTCNC
                             'callActivityID' => $callActivityID
                         )
                     );
-                $txtEditActivity = 'Edit';
+                $editTooltip = "Edit activity details";
+            } else {
+                $urlEditActivity = '#';
+                $editTooltip = $editionCheck;
+                $editClass = "disabled";
             }
 
             if (
@@ -2224,7 +2229,8 @@ class CTActivity extends CTCNC
                     $dsCallActivity->getValue(DBEJCallActivity::rootCauseDescription)
                 ),
                 'urlEditActivity'                    => $urlEditActivity,
-                'txtEditActivity'                    => $txtEditActivity,
+                'editTooltip'                        => $editTooltip,
+                'editClass'                          => $editClass,
                 'urlSetProblemFixed'                 => $urlSetProblemFixed,
                 'txtSetProblemFixed'                 => $txtSetProblemFixed,
                 'urlViewExpenses'                    => $urlViewExpenses,
@@ -3835,6 +3841,7 @@ class CTActivity extends CTCNC
         }
     }
 
+
     /**
      * @param $customerID
      * @param $contactID
@@ -4226,10 +4233,10 @@ class CTActivity extends CTCNC
             $callActivityID = $dsCallActivity->getValue(DBEJCallActivity::callActivityID);
         }
 
-        if (!$this->buActivity->canEdit(
-            $dsCallActivity,
-            $this
-        )) {
+        if ($this->buActivity->checkActivityEdition(
+                $dsCallActivity,
+                $this
+            ) !== 'ALL_GOOD') {
             $this->raiseError('No permissions to edit this activity');
         }
         $disabled = CTCNC_HTML_DISABLED;
@@ -4942,11 +4949,12 @@ class CTActivity extends CTCNC
             $callActivityID,
             $this->dsCallActivity
         );
+        $previousStartTime = $this->dsCallActivity->getValue(DBECallActivity::startTime);
+        $previousEndTime = $this->dsCallActivity->getValue(DBECallActivity::endTime);
         $this->formError = (!$this->dsCallActivity->populateFromArray($this->getParam('callActivity')));
 
-
-        // these names must not be part of an html array as the fckeditor does not work
         $this->dsCallActivity->setUpdateModeUpdate();
+        // these names must not be part of an html array as the fckeditor does not work
         $this->dsCallActivity->setValue(
             DBEJCallActivity::reason,
             $_POST['reason']
@@ -4955,8 +4963,17 @@ class CTActivity extends CTCNC
             DBEJCallActivity::internalNotes,
             $_POST['internalNotes']
         );
-
         $this->dsCallActivity->post();
+
+        if (($previousStartTime != $this->dsCallActivity->getValue(DBECallActivity::startTime)
+                || $previousEndTime != $this->dsCallActivity->getValue(DBECallActivity::endTime)
+            ) && $this->dsCallActivity->getValue(DBECallActivity::overtimeExportedFlag) == 'N'
+        ) {
+            $this->dsCallActivity->setValue(DBECallActivity::overtimeDurationApproved, null);
+            $this->dsCallActivity->setValue(DBECallActivity::overtimeApprovedDate, null);
+            $this->dsCallActivity->setValue(DBECallActivity::overtimeApprovedBy, null);
+        }
+
         $dbeCallActType = new DBEJCallActType($this);
 
 

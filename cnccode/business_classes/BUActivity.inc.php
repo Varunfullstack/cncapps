@@ -6375,22 +6375,24 @@ is currently a balance of ';
      * @param CTCNC $ctActivity
      * @return bool
      */
-    function canEdit($dsCallActivity,
-                     $ctActivity
+    function checkActivityEdition($dsCallActivity,
+                                  $ctActivity
     )
     {
-        if ($ctActivity->hasPermissions(SUPERVISOR_PERMISSION)) {
-            return true;
-        }
-        // status is NOT Authorised AND NOT Checked
-        if ($dsCallActivity->getValue(DBEJCallActivity::status) != 'A' && $dsCallActivity->getValue(
-                DBEJCallActivity::status
-            ) != 'C'
-        ) {
-            return true;
+        if ($dsCallActivity->getValue(DBECallActivity::overtimeExportedFlag) == 'Y' && !$ctActivity->getDbeUser(
+            )->isApprover()) {
+            return "This activity has overtime which has been processed so it can't be edited.";
         }
 
-        return false;
+        // status is NOT Authorised AND NOT Checked
+        $dbeProblem = new DBEProblem($this);
+        $dbeProblem->getRow($dsCallActivity->getValue(DBECallActivity::problemID));
+        if ($dbeProblem->getValue(DBEProblem::status) == 'C' && !$ctActivity->isUserSDManager()
+        ) {
+            return "This request has been completed and can't be edited.";
+        }
+
+        return 'ALL_GOOD';
 
     }
 
@@ -8520,6 +8522,13 @@ FROM
                 $reason
             )
         );
+        $dbeCallActivity->setValue(DBEJCallActivity::overtimeExportedFlag, 'N');
+        $dbeCallActivity->setValue(DBEJCallActivity::overtimeApprovedBy, null);
+        $dbeCallActivity->setValue(DBEJCallActivity::overtimeApprovedDate, null);
+        $dbeCallActivity->setValue(DBEJCallActivity::overtimeDeniedReason, null);
+        $dbeCallActivity->setValue(DBEJCallActivity::overtimeDurationApproved, null);
+        $dbeCallActivity->setValue(DBEJCallActivity::expenseExportFlag, 'N');
+
         $dbeCallActivity->setValue(
             DBEJCallActivity::serverGuard,
             $dbeCallActivity->getValue(DBEJCallActivity::serverGuard)
