@@ -483,6 +483,11 @@ class DBEUser extends DBEntity
         return (parent::getRows());
     }
 
+    public function isApprover()
+    {
+        return $this->getValue(DBEUser::isExpenseApprover) || $this->getValue(DBEUser::globalExpenseApprover);
+    }
+
     public function getAppraisalUsers()
     {
         $ignoredUsers = [67, 97, 111, 115];

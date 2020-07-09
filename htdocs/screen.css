@@ -27,6 +27,10 @@ option:disabled {
     color: #c3c3c3
 }
 
+a.disabled{
+    color: black;
+}
+
 TD, INPUT, SELECT, TEXTAREA {
     font-family: Arial, Tahoma, Helvetica, sans-serif;
     font-size: 12px;
