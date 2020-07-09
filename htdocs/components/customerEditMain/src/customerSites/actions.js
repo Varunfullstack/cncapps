@@ -28,5 +28,9 @@ export function setDefaultDeliverySite(siteNo) {
 }
 
 export function requestContacts(customerId) {
+    return {type: FETCH_CONTACTS_REQUEST, customerId}
+}
 
+export function receiveContacts(customerId, contacts) {
+    return {type: FETCH_CONTACTS_SUCCESS, customerId, contacts}
 }
