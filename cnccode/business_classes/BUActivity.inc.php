@@ -10346,6 +10346,7 @@ FROM
         if ($callActivityID) {
             $dbeJCallActivity = new DBEJCallActivity($this);
             $dbeJCallActivity->getRow($callActivityID);
+            $problemID = $dbeJCallActivity->getValue(DBECallActivity::problemID);
             $requesterID = $dbeJCallActivity->getValue(DBEJCallActivity::userID);
         } else {
             $requesterID = $GLOBALS['auth']->is_authenticated();
