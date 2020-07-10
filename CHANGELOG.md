@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.2.2] - 2020-07-10
+### Fixed
+- Fixed issue with time requests missing information
+
 ## [v4.2.1] - 2020-07-09
 ### Fixed
 - Fixed email link not having subject

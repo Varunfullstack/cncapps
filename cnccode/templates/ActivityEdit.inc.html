@@ -1,9 +1,6 @@
 <!-- Template: ActivityEdit.inc.html -->
-<script language='JavaScript'
-        src="CommonJS.js"
-></script>
-
-<script language='JavaScript'>
+<script src="CommonJS.js"></script>
+<script>
     window.callActivityID = "{callActivityID}";
     window.problemID = "{problemID}";
     let internalNotes;
@@ -955,7 +952,6 @@
                 url: 'Activity.php',
                 data: {
                     action: "requestAdditionalTime",
-                    problemID: $("INPUT#problemID").val(),
                     reason: reason,
                     callActivityID: {callActivityID}
                 }
