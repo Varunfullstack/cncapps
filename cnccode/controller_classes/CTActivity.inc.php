@@ -6541,9 +6541,10 @@ class CTActivity extends CTCNC
      */
     function requestAdditionalTime()
     {
-        if (!$this->getParam('problemID')) {
-
-            echo 'problemID not passed';
+        if (!$this->getParam('problemID') && !$this->getParam('callActivityID')) {
+            http_response_code(400);
+            echo json_encode(["status" => 'error', "message" => "ProblemID or CallactivityID required"]);
+            exit;
         }
 
         $this->buActivity->requestAdditionalTime(
