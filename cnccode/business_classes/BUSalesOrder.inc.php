@@ -97,36 +97,6 @@ class BUSalesOrder extends Business
         return true;
     }
 
-    function getOrdlineByIDSeqNo($ordheadID,
-                                 $sequenceNo,
-                                 &$dsOrdline
-    )
-    {
-        $this->setMethodName('getOrdlineByIDSeqNo');
-
-        if (!$ordheadID) {
-            $this->raiseError('order ID not passed');
-        }
-        if ($sequenceNo === null) {
-            $this->raiseError('sequenceNo not passed');
-        }
-        $dbeJOrdline = new DBEJOrdline($this);
-        $dbeJOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $ordheadID
-        );
-        $dbeJOrdline->setValue(
-            DBEOrdline::sequenceNo,
-            $sequenceNo
-        );
-
-        $dbeJOrdline->getRowByOrdheadIDSequenceNo();
-        return ($this->getData(
-            $dbeJOrdline,
-            $dsOrdline
-        ));
-    }
-
     /**
      * Send email to order delivery contact from cnc user as PDF attachment
      * @parameter Integer $ordheadID Order ID
@@ -1002,20 +972,15 @@ class BUSalesOrder extends Business
 
     /**
      * @param $ordheadID
-     * @param $sequenceNo
      * @param $dsOrdline
      */
     function initialiseNewOrdline($ordheadID,
-                                  $sequenceNo,
                                   &$dsOrdline
     )
     {
         $this->setMethodName('initialiseNewOrdline');
         if (!$ordheadID) {
             $this->raiseError('ordheadID not passed');
-        }
-        if (!$sequenceNo) {
-            $this->raiseError('sequenceNo not passed');
         }
         $dbeJOrdline = new DBEJOrdline($this);
         $dsOrdline = new DataSet($this);
@@ -1032,10 +997,6 @@ class BUSalesOrder extends Business
         $dsOrdline->setValue(
             DBEOrdline::supplierID,
             null
-        );
-        $dsOrdline->setValue(
-            DBEOrdline::sequenceNo,
-            $sequenceNo
         );
         $dsOrdline->setValue(
             DBEOrdline::lineType,
@@ -1061,18 +1022,6 @@ class BUSalesOrder extends Business
             DBEOrdline::ordheadID,
             $dsOrdline->getValue(DBEOrdline::ordheadID)
         );
-        if ($dbeOrdline->countRowsByColumn(DBEOrdline::ordheadID) > 0) {
-            // shuffle down existing rows before inserting new one
-            $dbeOrdline->setValue(
-                DBEOrdline::ordheadID,
-                $dsOrdline->getValue(DBEOrdline::ordheadID)
-            );
-            $dbeOrdline->setValue(
-                DBEOrdline::sequenceNo,
-                $dsOrdline->getValue(DBEOrdline::sequenceNo)
-            );
-            $dbeOrdline->shuffleRowsDown();
-        }
         $this->updateOrderLine(
             $dsOrdline,
             "I"
@@ -1205,11 +1154,12 @@ class BUSalesOrder extends Business
             $dbeOrdline->setShowSQLOn();
             $dbeOrdline->updateRow();
         } else {
-            // we are inserting, we can't just insert in any place, we are going to insert in the last place and then move it
+            // Order Lines are inserted at the "end", so we need to move it afterwards..if we do have a sequence number
             $futureOrder = $dbeOrdline->getValue(DBEOrdline::sequenceNo);
-            $dbeOrdline->setValue(DBEOrdline::sequenceNo, $dbeOrdline->getNextSortOrder());
             $dbeOrdline->insertRow();
-            $dbeOrdline->swapPlaces($dbeOrdline->getValue(DBEOrdline::sequenceNo), $futureOrder);
+            if ($futureOrder) {
+                $dbeOrdline->swapPlaces($dbeOrdline->getValue(DBEOrdline::sequenceNo), $futureOrder);
+            }
         }
         $dbeOrdhead->setUpdatedTime();
     }

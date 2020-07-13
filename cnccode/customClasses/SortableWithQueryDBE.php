@@ -22,12 +22,14 @@ trait SortableWithQueryDBE
     {
         /** @var $db \dbSweetcode */
         global $db;
-        $query = "select max({$this->getSortOrderColumnName()}) as maxSortOrder from {$this->getTableName()} where {$this->getDiscriminatorColumnName()} = {$this->getDiscriminatorCOlumnValue()}";
+        $query = "select max({$this->getSortOrderColumnName()}) as maxSortOrder from {$this->getTableName()} where {$this->getDiscriminatorColumnName()} = {$this->getDiscriminatorColumnValue()}";
         $result = $db->query($query);
-        if(!$result){
+        if (!$result) {
             throw new \Exception("Failed to execute query: $query");
         }
-        $db->next_record(MYSQLI_ASSOC);
+        if (!$db->next_record(MYSQLI_ASSOC)) {
+            return 0;
+        }
         return $db->Record['maxSortOrder'];
     }
 

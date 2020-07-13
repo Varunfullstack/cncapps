@@ -4,6 +4,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg["path_gc"] . "/Business.inc.php");
 require_once($cfg["path_bu"] . "/BUSalesOrder.inc.php");
 require_once($cfg["path_bu"] . "/BUInvoice.inc.php");
@@ -17,7 +18,7 @@ require_once($cfg["path_dbe"] . "/DBEPorhead.inc.php");
 
 class BUDespatch extends Business
 {
-    const despatchSequenceNo = 'sequenceNo';
+    const despatchLineId = 'id';
     const despatchQtyToDespatch = 'qtyToDespatch';
 
     /** @var DBEOrdline */
@@ -64,35 +65,6 @@ class BUDespatch extends Business
     }
 
     /**
-     * @param $ordheadID
-     * @param DataSet $dsOrdline
-     * @return bool
-     */
-    function getLinesByID($ordheadID,
-                          &$dsOrdline
-    )
-    {
-        $this->setMethodName('getLinesByID');
-        $ret = FALSE;
-        if (!$ordheadID) {
-            $this->raiseError('ordheadID not passed');
-        } else {
-            $dbeJOrdline = new DBEJOrdline($this);
-            $dbeJOrdline->setValue(
-                DBEJOrdline::ordheadID,
-                $ordheadID
-            );
-            $dbeJOrdline->getRowsByColumn(DBEJOrdline::ordheadID);
-            $ret = ($this->getData(
-                $dbeJOrdline,
-                $dsOrdline
-            ));
-            $dsOrdline->columnSort(DBEOrdline::sequenceNo);
-        }
-        return $ret;
-    }
-
-    /**
      * Return a dataset of despatch qtys for this set of order lines
      * @param DataSet $dsOrdline
      * @param DSForm $dsDespatch
@@ -108,8 +80,8 @@ class BUDespatch extends Business
         while ($dsOrdline->fetchNext()) {
             $dsDespatch->setUpdateModeInsert();
             $dsDespatch->setValue(
-                self::despatchSequenceNo,
-                $dsOrdline->getValue(DBEJOrdline::sequenceNo)
+                self::despatchLineId,
+                $dsOrdline->getValue(DBEJOrdline::id)
             );
             $dsDespatch->setValue(
                 self::despatchQtyToDespatch,
@@ -124,7 +96,7 @@ class BUDespatch extends Business
     {
         $dsDespatch = new DataSet($this);
         $dsDespatch->addColumn(
-            self::despatchSequenceNo,
+            self::despatchLineId,
             DA_INTEGER,
             DA_ALLOW_NULL
         );
@@ -188,7 +160,6 @@ class BUDespatch extends Business
         $dsOrdline->initialise();
         while ($dsDespatch->fetchNext()) {
             $dsOrdline->fetchNext();
-
             $qtyToDespatch = $dsDespatch->getValue('qtyToDespatch');
 
             if ($qtyToDespatch <= 0) {
@@ -230,7 +201,7 @@ class BUDespatch extends Business
 
             if ($dbePaymentTerms->getValue(DBEPaymentTerms::generateInvoiceFlag) == 'Y') {
                 // Last despatch for this non part-invoice order so generate invoice for whole
-                if (!$partInvoice AND $fullyDespatched) {
+                if (!$partInvoice && $fullyDespatched) {
                     $buInvoice = new BUInvoice($this);
                     $invheadID = $buInvoice->createInvoiceFromOrder($dsOrdhead, $dsOrdline);
                     unset($buInvoice);
@@ -250,7 +221,7 @@ class BUDespatch extends Business
         if (
             !$onlyCreateDespatchNote &&
             (
-                $dsOrdline->getValue(DBEOrdline::itemID) == CONFIG_DEF_PREPAY_ITEMID OR
+                $dsOrdline->getValue(DBEOrdline::itemID) == CONFIG_DEF_PREPAY_ITEMID ||
                 $dsOrdline->getValue(DBEOrdline::itemID) == CONFIG_DEF_PREPAY_TOPUP_ITEMID)
         ) {
             // create an activity row
@@ -269,26 +240,83 @@ class BUDespatch extends Business
 
         $deliveryNoteFile = FALSE;
 
-        if ($dsDeliveryMethod->getValue(DBEDeliveryMethod::sendNoteFlag) == 'Y') {
-
-            if ($ordlineUpdated) {
-
-                $buContact = new BUContact($this);
-
-                $buContact->getContactByID($dsOrdhead->getValue(DBEOrdhead::delContactID), $dsContact);
-
-                $deliveryNoteFile = $this->createDeliveryNote(
-                    $dsOrdhead,
-                    $dsOrdline,
-                    $dsDespatch,
-                    $dsContact,
-                    $dsDeliveryMethod,
-                    $fullyDespatched
-                );
-            }
+        if ($dsDeliveryMethod->getValue(DBEDeliveryMethod::sendNoteFlag) == 'Y' && $ordlineUpdated) {
+            $buContact = new BUContact($this);
+            $buContact->getContactByID($dsOrdhead->getValue(DBEOrdhead::delContactID), $dsContact);
+            $deliveryNoteFile = $this->createDeliveryNote(
+                $dsOrdhead,
+                $dsOrdline,
+                $dsDespatch,
+                $dsContact,
+                $dsDeliveryMethod,
+                $fullyDespatched
+            );
         }
         unset($dbeDeliveryMethod);
         return $deliveryNoteFile;
+    }
+
+    /**
+     * @param $ordheadID
+     * @param DataSet $dsOrdline
+     * @return bool
+     */
+    function getLinesByID($ordheadID,
+                          &$dsOrdline
+    )
+    {
+        $this->setMethodName('getLinesByID');
+        $ret = FALSE;
+        if (!$ordheadID) {
+            $this->raiseError('ordheadID not passed');
+        } else {
+            $dbeJOrdline = new DBEJOrdline($this);
+            $dbeJOrdline->setValue(
+                DBEJOrdline::ordheadID,
+                $ordheadID
+            );
+            $dbeJOrdline->getRowsByColumn(DBEJOrdline::ordheadID, DBEOrdline::sequenceNo);
+            $ret = ($this->getData(
+                $dbeJOrdline,
+                $dsOrdline
+            ));
+        }
+        return $ret;
+    }
+
+    /**
+     * @param $ordheadID
+     * @param DataSet|DBEJOrdline $dsOrdline
+     * @param DSForm $dsDespatch
+     */
+    function updateOrdline($ordheadID,
+                           &$dsOrdline,
+                           &$dsDespatch
+    )
+    {
+        $dbeOrdline = &$this->dbeOrdline;
+        $dbeOrdline->setValue(
+            DBEOrdline::ordheadID,
+            $ordheadID
+        );
+        $dbeOrdline->setValue(
+            DBEOrdline::id,
+            $dsOrdline->getValue(DBEOrdline::id)
+        );
+        $dbeOrdline->getRow();
+        $dbeOrdline->setValue(
+            DBEOrdline::qtyDespatched,
+            $dsOrdline->getValue(DBEOrdline::qtyDespatched) + $dsDespatch->getValue(self::despatchQtyToDespatch)
+        );
+        $dbeOrdline->setValue(
+            DBEOrdline::qtyLastDespatched,
+            $dsDespatch->getValue(self::despatchQtyToDespatch)
+        );
+        $dbeOrdline->setValue(
+            DBEOrdline::description,
+            $dsOrdline->getValue(DBEOrdline::description)
+        );
+        $dbeOrdline->updateRow();
     }
 
     /**
@@ -330,41 +358,6 @@ class BUDespatch extends Business
             $fullyDespatched
         );
         return ($buPDFDeliveryNote->generateFile()); // the file path is returned
-    }
-
-    /**
-     * @param $ordheadID
-     * @param DataSet|DBEJOrdline $dsOrdline
-     * @param DSForm $dsDespatch
-     */
-    function updateOrdline($ordheadID,
-                           &$dsOrdline,
-                           &$dsDespatch
-    )
-    {
-        $dbeOrdline = &$this->dbeOrdline;
-        $dbeOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $ordheadID
-        );
-        $dbeOrdline->setValue(
-            DBEOrdline::sequenceNo,
-            $dsOrdline->getValue(DBEOrdline::sequenceNo)
-        );
-        $dbeOrdline->getRow();
-        $dbeOrdline->setValue(
-            DBEOrdline::qtyDespatched,
-            $dsOrdline->getValue(DBEOrdline::qtyDespatched) + $dsDespatch->getValue(self::despatchQtyToDespatch)
-        );
-        $dbeOrdline->setValue(
-            DBEOrdline::qtyLastDespatched,
-            $dsDespatch->getValue(self::despatchQtyToDespatch)
-        );
-        $dbeOrdline->setValue(
-            DBEOrdline::description,
-            $dsOrdline->getValue(DBEOrdline::description)
-        );
-        $dbeOrdline->updateRow();
     }
 
     /**

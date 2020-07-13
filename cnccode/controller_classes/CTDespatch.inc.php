@@ -6,6 +6,7 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+global $cfg;
 require_once($cfg['path_bu'] . '/BUSalesOrder.inc.php');
 require_once($cfg['path_bu'] . '/BUDespatch.inc.php');
 require_once($cfg["path_bu"] . "/BURenewal.inc.php");
@@ -34,10 +35,6 @@ define(
 define(
     'CTDESPATCH_MSG_MUST_BE_INITIAL',
     'Must be an initial order'
-);
-define(
-    'CTDESPATCH_MSG_SEQNO_NOT_PASSED',
-    'sequence no not passed'
 );
 define(
     'CTDESPATCH_MSG_ORDLINE_NOT_FND',
@@ -269,9 +266,9 @@ class CTDespatch extends CTCNC
                         Controller::buildLink(
                             $page,
                             array(
-                                'action'     => 'editFromSalesOrder',
-                                'ordheadID'  => $dsOrdhead->getValue(DBEOrdhead::ordheadID),
-                                'sequenceNo' => $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                                'action'    => 'editFromSalesOrder',
+                                'ordheadID' => $dsOrdhead->getValue(DBEOrdhead::ordheadID),
+                                'lineId'    => $dsOrdline->getValue(DBEOrdline::id)
                             )
                         );
 
@@ -283,7 +280,7 @@ class CTDespatch extends CTCNC
                 $this->template->set_var(
                     array(
                         'description' => Controller::htmlDisplayText($dsOrdline->getValue(DBEOrdline::description)),
-                        'sequenceNo'  => $dsOrdline->getValue(DBEOrdline::sequenceNo)
+                        'lineId'      => $dsOrdline->getValue(DBEOrdline::id)
                     )
                 );
                 if ($dsOrdline->getValue(DBEOrdline::lineType) != "I") {                    // Comment line
@@ -376,7 +373,7 @@ class CTDespatch extends CTCNC
         foreach ($_REQUEST as $key => $value) {
             $_REQUEST[$key] = trim($value);
         }
-        if (($this->getParam('ordheadID') != '') AND (!is_numeric($this->getParam('ordheadID')))) {
+        if (($this->getParam('ordheadID') != '') and (!is_numeric($this->getParam('ordheadID')))) {
             $this->setFormErrorMessage('Order no must be numeric');;
         }
         if ($this->getFormError() == 0) {
@@ -526,19 +523,14 @@ class CTDespatch extends CTCNC
         $dsDespatch->initialise();
         $buRenewal = null;
         while ($dsDespatch->fetchNext()) {
-            $dsOrdline = new DataSet($this);
-            $buSalesOrder->getOrdlineByIDSeqNo(
-                $this->getParam('ordheadID'),
-                $dsDespatch->getValue(BUDespatch::despatchSequenceNo),
-                $dsOrdline
-            );
-            if ($dsOrdline->getValue(DBEOrdline::lineType) != 'C') {
-                if (
-                    $dsDespatch->getValue(BUDespatch::despatchQtyToDespatch) >
-                    ($dsOrdline->getValue(DBEOrdline::qtyOrdered) - $dsOrdline->getValue(DBEOrdline::qtyDespatched))
-                ) {
-                    $this->setFormErrorMessage('Quantities must not exceed outstanding');
-                }
+            $dsOrdline = new DBEJOrdline($this);
+            $dsOrdline->getRow($dsDespatch->getValue(BUDespatch::despatchLineId));
+
+            if ($dsOrdline->getValue(DBEOrdline::lineType) != 'C' && $dsDespatch->getValue(
+                    BUDespatch::despatchQtyToDespatch
+                ) >
+                ($dsOrdline->getValue(DBEOrdline::qtyOrdered) - $dsOrdline->getValue(DBEOrdline::qtyDespatched))) {
+                $this->setFormErrorMessage('Quantities must not exceed outstanding');
             }
             /*
              * Validate that renewals have been created and minimum information has been entered

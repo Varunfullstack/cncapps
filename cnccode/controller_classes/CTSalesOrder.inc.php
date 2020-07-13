@@ -2267,14 +2267,8 @@ class CTSalesOrder extends CTCNC
                 'SalesOrderDisplayUpdateLines',
                 true
             );
-            if ($dsOrdline->rowCount() == 0) {
-                $this->setSequenceNo(1);
-            } else {
-                $this->setSequenceNo($dsOrdline->getValue(DBEOrdline::sequenceNo) + 1);
-            }
             $this->buSalesOrder->initialiseNewOrdline(
                 $this->getOrdheadID(),
-                $this->getSequenceNo(),
                 $this->dsOrdline
             );
             $_SESSION['urlReferer'] =                    // so called functions know where to come back to
@@ -2574,16 +2568,6 @@ class CTSalesOrder extends CTCNC
         return file_exists('quotes/' . $quoteFile);
     }
 
-    function getSequenceNo()
-    {
-        return $this->sequenceNo;
-    }
-
-    function setSequenceNo($no)
-    {
-        $this->sequenceNo = $no;
-    }
-
     /**
      * @param $dsOrdhead DBEOrdhead|DataSet
      * @param string $parentPage
@@ -2734,7 +2718,6 @@ class CTSalesOrder extends CTCNC
             );
         }
     }
-
 
     /**
      * @param $ordheadID
@@ -2895,7 +2878,7 @@ class CTSalesOrder extends CTCNC
             'quotationID',
             $quotationID
         );
-    } // End function Display Sales Order Header
+    }
 
     /**
      * delete a quote document
@@ -2976,7 +2959,7 @@ class CTSalesOrder extends CTCNC
             );
             header('Location: ' . $this->getDisplayOrderURL());
         }
-    }
+    } // End function Display Sales Order Header
 
     /**
      * This function deals with the case where another user has updated the order we are attempting
@@ -3001,7 +2984,7 @@ class CTSalesOrder extends CTCNC
             $this->displayOrder();
             exit;
         }
-    }// end function orderLineForm()
+    }
 
     /**
      * Convert quote to order
@@ -3054,7 +3037,7 @@ class CTSalesOrder extends CTCNC
             $this->dsSelectedOrderLine->post();
         }
         return TRUE;
-    }
+    }// end function orderLineForm()
 
     /**
      * @return bool
@@ -4079,7 +4062,6 @@ class CTSalesOrder extends CTCNC
         if (!$this->formError && $this->getAction() != CTSALESORDER_ACT_EDIT_ORDLINE) {
             $this->buSalesOrder->initialiseNewOrdline(
                 $this->dsOrdline->getValue(DBEOrdline::ordheadID),
-                $this->dsOrdline->getValue(DBEOrdline::sequenceNo),
                 $this->dsOrdline
             );
         }
@@ -4243,7 +4225,6 @@ class CTSalesOrder extends CTCNC
             } else {
                 $this->setAction(CTSALESORDER_ACT_UPDATE_ORDLINE);
             }
-            $this->setSequenceNo($this->dsOrdline->getValue(DBEOrdline::sequenceNo));
             $this->editOrderLine();
             exit;
         }
@@ -5118,7 +5099,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
         $this->setOrdheadID($this->dsQuotation->getValue(DBEJQuotation::ordheadID));
         header('Location: ' . $this->getDisplayOrderURL());
         exit;
-    } // end contractDropdown
+    }
 
     /**
      * @throws Exception
@@ -5194,7 +5175,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
 
         $this->template->parse('CONTENTS', 'TemplatedQuote');
         $this->parsePage();
-    } // end contractDropdown
+    }
 
     /**
      * @param $customerID
@@ -5242,7 +5223,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
             $this->buSalesOrder->pasteLinesFromOrder($salesOrderID, $destinationQuotation);
         }
         return $destinationQuotation;
-    }
+    } // end contractDropdown
 
     /**
      * Get and parse user drop-down selector
@@ -5277,7 +5258,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
                 true
             );
         }
-    }
+    } // end contractDropdown
 
     /**
      * Paste lines from another Sales Order onto the end of this one
