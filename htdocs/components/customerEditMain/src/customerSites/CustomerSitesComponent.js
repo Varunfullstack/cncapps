@@ -3,15 +3,16 @@ import React, {Component} from 'react'
 import {Provider} from 'react-redux'
 import SitesList from "./SitesList";
 import {fetchContacts, fetchSites, initializeCustomer} from "./actions";
-
+import ReactDOM from 'react-dom';
 
 const store = configureStore();
 
 export default class CustomerSitesComponent extends Component {
     constructor(props) {
+        console.log(props);
         super(props);
-        const {customerId, defaultInvoice, defaultDelivery} = props;
-        store.dispatch(initializeCustomer(customerId, defaultInvoice, defaultDelivery))
+        const {customerId, invoiceSiteNo, deliverSiteNo} = props;
+        store.dispatch(initializeCustomer(customerId, invoiceSiteNo, deliverSiteNo))
         store.dispatch(fetchSites(customerId))
         store.dispatch(fetchContacts(customerId))
     }
@@ -22,13 +23,26 @@ export default class CustomerSitesComponent extends Component {
             <Provider store={store}>
                 <div>
                     <a href={`/Customer.php?action=addSite&customerID=${customerId}`}
-                       key: 'add-site-link'
                     >
                         Add Site
                     </a>
-                    <SitesList></SitesList>
+                    <SitesList/>
                 </div>
             </Provider>
         )
     }
 }
+document.addEventListener('DOMContentLoaded', () => {
+    const domContainer = document.querySelector('#reactCustomerSites');
+    ReactDOM.render(
+        React.createElement(
+            CustomerSitesComponent,
+            {
+                customerId: domContainer.dataset.customerId,
+                invoiceSiteNo: domContainer.dataset.invoiceSiteNo,
+                deliverSiteNo: domContainer.dataset.deliverSiteNo
+            }
+        ),
+        domContainer
+    );
+});

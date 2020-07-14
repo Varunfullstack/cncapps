@@ -27,6 +27,10 @@ option:disabled {
     color: #c3c3c3
 }
 
+.sites-list table.content {
+    display: inline-table;
+}
+
 TD, INPUT, SELECT, TEXTAREA {
     font-family: Arial, Tahoma, Helvetica, sans-serif;
     font-size: 12px;

@@ -411,16 +411,8 @@ class BUCustomer extends Business
     {
         $this->setMethodName('insertCustomer');
         $ret = ($this->updateCustomer($dsData));
-        $this->addNewSiteRow(
-            $dsSite,
-            $dsData->getValue(DBECustomer::customerID)
-        );                        // New customerID
-        $dsSite->initialise();
-        $this->dbeSite->setCallbackMethod(
-            DA_BEFORE_POST,
-            $this,
-            'setSageRef'
-        );
+        $this->addNewSiteRow($dsData->getValue(DBECustomer::customerID));                        // New customerID
+
         $ret = $ret && ($this->updateSite($dsSite));
         $this->dbeSite->resetCallbackMethod(DA_BEFORE_POST);
         $this->addNewContactRow(
@@ -468,52 +460,93 @@ class BUCustomer extends Business
     }
 
     /**
-     * @param DataSet $dsSite
      * @param $customerID
      * @return bool
      */
-    function addNewSiteRow(&$dsSite,
-                           $customerID
-    )
+    function addNewSiteRow($customerID)
     {
         if (!$customerID) {
             $this->raiseError('customerID not passed');
             return FALSE;
         } else {
-            $dsSite->clearCurrentRow();
-            $dsSite->setUpdateModeInsert();
-            $dsSite->setValue(
-                DBESite::customerID,
-                $customerID
-            );
-            $dsSite->setValue(
+            $dbeSite = new DBESite($this);
+            $dbeSite->setValue(DBESite::customerID, $customerID);
+            $dbeSite->setValue(DBESite::sageRef, $this->getSageRef($customerID));
+            $dbeSite->setValue(
                 DBESite::activeFlag,
                 'Y'
             );
-            $dsSite->setValue(
+            $dbeSite->setValue(
                 DBESite::siteNo,
                 -9
             );
-            $dsSite->setValue(
+            $dbeSite->setValue(
                 DBESite::add1,
                 'Address Line 1'
             );
-            $dsSite->setValue(
+            $dbeSite->setValue(
                 DBESite::town,
                 'TOWN'
             );
-            $dsSite->setValue(
+            $dbeSite->setValue(
                 DBESite::maxTravelHours,
                 -1
             );    // means not set because 0 is now a valid distance
-            $dsSite->setValue(
+            $dbeSite->setValue(
                 DBESite::postcode,
                 'POSTCODE'
             );
-            $dsSite->post();
-//			$this->updateModify($dsSite->getValue(DBESite::CustomerID));
+            $dbeSite->insertRow();
             return TRUE;
         }
+    }
+
+    /**
+     * Calculate a unique Sage Reference for new customer site
+     * Based upon uppercase first two non-space characters of name plus integer starting at 1 (e.g. KA002)
+     * @access public
+     * @param $customerID
+     * @return string|null
+     */
+    function getSageRef($customerID)
+    {
+        $dbeCustomer = new DBECustomer($this);
+        $dbeCustomer->getRow($customerID);
+        $customerName = $dbeCustomer->getValue(DBECustomer::name);
+        $shortCode = "";
+        for ($ixChar = 0; $ixChar <= strlen($customerName); $ixChar++) {
+            if (substr(
+                    $customerName,
+                    $ixChar,
+                    1
+                ) != " ") {
+                $shortCode = $shortCode . strtoupper(
+                        substr(
+                            $customerName,
+                            $ixChar,
+                            1
+                        )
+                    );
+                if (strlen($shortCode) == 2) {
+                    break;
+                }
+            }
+        }
+        $number = 1;
+        $numberUnique = FALSE;
+        $dbeSite = new DBESite($this);
+        $sageRef = null;
+        while (!$numberUnique) {
+            $sageRef = $shortCode . str_pad(
+                    $number,
+                    3,
+                    "0",
+                    STR_PAD_LEFT
+                );
+            $numberUnique = $dbeSite->uniqueSageRef($sageRef);
+            $number++;
+        }
+        return $sageRef;
     }
 
     /**
@@ -703,59 +736,6 @@ class BUCustomer extends Business
         $dbeSite->setValue(
             DBESite::customerID,
             $source->getValue(DBECustomer::customerID)
-        );
-        return TRUE;
-    }
-
-    /**
-     * Calculate a unique Sage Reference for new customer site
-     * Based upon uppercase first two non-space characters of name plus integer starting at 1 (e.g. KA002)
-     * @param DataSet &$source dataset
-     * @param DBESite &$dbeSite site database entity
-     * @return bool : Success
-     * @access public
-     */
-    function setSageRef(&$source,
-                        &$dbeSite
-    )
-    {
-        $customerName = $this->dbeCustomer->getValue(DBECustomer::name);
-        $shortCode = "";
-        for ($ixChar = 0; $ixChar <= strlen($customerName); $ixChar++) {
-            if (substr(
-                    $customerName,
-                    $ixChar,
-                    1
-                ) != " ") {
-                $shortCode = $shortCode . strtoupper(
-                        substr(
-                            $customerName,
-                            $ixChar,
-                            1
-                        )
-                    );
-                if (strlen($shortCode) == 2) {
-                    break;
-                }
-            }
-        }
-        $number = 1;
-        $numberUnique = FALSE;
-        $dbeSite = new DBESite($this);
-        $sageRef = null;
-        while (!$numberUnique) {
-            $sageRef = $shortCode . str_pad(
-                    $number,
-                    3,
-                    "0",
-                    STR_PAD_LEFT
-                );
-            $numberUnique = $dbeSite->uniqueSageRef($sageRef);
-            $number++;
-        }
-        $source->setValue(
-            DBESite::sageRef,
-            $sageRef
         );
         return TRUE;
     }
