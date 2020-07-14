@@ -1,25 +1,31 @@
 import React from 'react';
 import {connect} from "react-redux";
 import {SHOW_ACTIVE} from "./visibilityFilterTypes";
-import {addContactToSite, changeDefaultDeliveryContact, changeDefaultInvoiceContact} from "./actions";
+import {addContactToSite, changeDeliverSiteNo, changeInvoiceSiteNo} from "./actions";
+import Site from './Site.js';
 
-const SitesList = ({sites, customerId, defaultInvoice, defaultDelivery, changeDefaultInvoice, changeDefaultDelivery, addContactToSite}) => (
-    <div className="sites-list">
-        {
-            sites.map(site => (
-                <Site key={site.siteNo}
-                      site={site}
-                      customerId={customerId}
-                      defaultInvoice={defaultInvoice}
-                      defaultDelivery={defaultDelivery}
-                      changeDefaultInvoice={changeDefaultInvoice}
-                      changedDefaultDelivery={changeDefaultDelivery}
-                      addContactToSite={addContactToSite}
-                />
-            ))
-        }
-    </div>
-)
+const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, changeInvoiceSiteNo, changeDeliverSiteNo, addContactToSite}) => {
+    console.log(sites);
+    return (
+        <div className="sites-list">
+            {
+                sites.length ?
+                    sites.map(site => (
+                        <Site key={site.siteNo}
+                              site={site}
+                              contacts={contacts}
+                              customerId={customerId}
+                              invoiceSiteNo={invoiceSiteNo}
+                              deliverSiteNo={deliverSiteNo}
+                              changeInvoiceSiteNo={changeInvoiceSiteNo}
+                              changedDeliverSiteNo={changeDeliverSiteNo}
+                              addContactToSite={addContactToSite}
+                        />
+                    )) : ''
+            }
+        </div>
+    )
+}
 
 function getVisibleSites(sites, filter) {
     const mappedSites = sites.allIds.map(id => sites.byIds[id]);
@@ -33,24 +39,30 @@ function getMappedContacts(contacts) {
     return contacts.allIds.map(id => contacts.byIds[id])
 }
 
+function debug(key, result) {
+    console.log(key, result);
+    return result;
+}
+
 function mapStateToProps(state) {
+    console.log('mapStateToProps', state);
     const {customer, sites, contacts, visibilityFilter} = state;
     return {
-        sites: getVisibleSites(sites, visibilityFilter),
-        customerId,
-        contacts: getMappedContacts(contacts),
-        defaultInvoice: customer.defaultInvoice,
-        defaultDelivery: customer.defaultDelivery
+        sites: debug('getVisibleSites', getVisibleSites(sites, visibilityFilter)),
+        customerId: customer.customerId,
+        contacts: debug('getMappedContacts', getMappedContacts(contacts)),
+        invoiceSiteNo: customer.invoiceSiteNo,
+        deliverSiteNo: customer.deliverSiteNo
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        changeDefaultInvoice: contactId => {
-            dispatch(changeDefaultInvoiceContact(contactId))
+        changeDeliverSiteNo: siteNo => {
+            dispatch(changeDeliverSiteNo(siteNo))
         },
-        changedDefaultDelivery: contactId => {
-            dispatch(changeDefaultDeliveryContact(contactId))
+        changeInvoiceSiteNo: siteNo => {
+            dispatch(changeInvoiceSiteNo(siteNo))
         },
         addContactToSite: siteNo => {
             dispatch(addContactToSite(siteNo))
@@ -58,4 +70,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps)(SitesList)
+export default connect(mapStateToProps, mapDispatchToProps)(SitesList)

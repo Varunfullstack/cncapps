@@ -125,7 +125,7 @@
         id: null,
         customerId: null,
         rruleString: null,
-        contactId: null,
+        siteNo: null,
         siteNo: null,
         priority: null,
         hideFromCustomer: null,
@@ -172,7 +172,7 @@
             id: null,
             customerId: null,
             rruleString: (new rrule.RRule()).toString(),
-            contactId: null,
+            siteNo: null,
             siteNo: null,
             priority: null,
             hideFromCustomer: null,
@@ -404,7 +404,7 @@
             },
             delay: 200,
             select: function (event, ui) {
-                currentSRScheduler.contactId = ui.item.id;
+                currentSRScheduler.siteNo = ui.item.id;
             }
         }).focus(function () {
             $(this).autocomplete("search", $(this).val());
@@ -435,7 +435,7 @@
             detail.submit();
             return false;
         }
-        if (!currentSRScheduler.customerId || !currentSRScheduler.contactId || currentSRScheduler.siteNo === null) {
+        if (!currentSRScheduler.customerId || !currentSRScheduler.siteNo || currentSRScheduler.siteNo === null) {
             alert('Customer, contact and site are required');
             return false;
         }
