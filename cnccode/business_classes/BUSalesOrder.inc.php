@@ -1158,7 +1158,7 @@ class BUSalesOrder extends Business
             $futureOrder = $dbeOrdline->getValue(DBEOrdline::sequenceNo);
             $dbeOrdline->insertRow();
             if ($futureOrder) {
-                $dbeOrdline->swapPlaces($dbeOrdline->getValue(DBEOrdline::sequenceNo), $futureOrder);
+                $dbeOrdline->swapPlaces($dbeOrdline->getValue(DBEOrdline::sequenceNo), $futureOrder + 1);
             }
         }
         $dbeOrdhead->setUpdatedTime();

@@ -4064,6 +4064,12 @@ class CTSalesOrder extends CTCNC
                 $this->dsOrdline->getValue(DBEOrdline::ordheadID),
                 $this->dsOrdline
             );
+            if ($this->getParam('lineId')) {
+                $lineBefore = new DBEOrdline($this);
+                $lineBefore->getRow($this->getParam('lineId'));
+                $this->dsOrdline->setValue(DBEOrdline::sequenceNo, $lineBefore->getValue(DBEOrdline::sequenceNo));
+            }
+
         }
         $this->setTemplateFiles(
             array(
@@ -4109,6 +4115,7 @@ class CTSalesOrder extends CTCNC
             exit;
         }
 
+
         $this->dsOrdline = new DataSet($this);
         $dbeOrdline = new DBEOrdline($this);
         $this->dsOrdline->copyColumnsFrom($dbeOrdline);
@@ -4142,7 +4149,7 @@ class CTSalesOrder extends CTCNC
             DA_STRING,
             DA_ALLOW_NULL
         );
-
+        $this->dsOrdline->setNull(DBEOrdline::sequenceNo, DA_ALLOW_NULL);
 
         if ($this->getParam('ordline')[1]['lineType'] == "I") {                    // Item line
             $this->dsOrdline->setNull(
@@ -4204,7 +4211,6 @@ class CTSalesOrder extends CTCNC
             );
         }
         $this->formError = !$this->dsOrdline->populateFromArray($this->getParam('ordline'));
-
         $this->setOrdheadID($this->dsOrdline->getValue(DBEOrdhead::ordheadID));
         $dsOrdhead = new DataSet($this);
         if (!$this->buSalesOrder->getOrdheadByID(
