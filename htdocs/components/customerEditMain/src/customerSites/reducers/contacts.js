@@ -8,6 +8,7 @@ const initialState = {
 }
 
 export default function (state = initialState, action) {
+
     switch (action.type) {
         case FETCH_CONTACTS_REQUEST:
             return {
@@ -18,15 +19,17 @@ export default function (state = initialState, action) {
             // we have received the list of contacts
             return {
                 ...action.contacts.reduce(
-                    (acc, site) => {
-                        acc.allIds.push(site.siteNo);
-                        acc.byIds[site.siteNo] = site
+                    (acc, contact) => {
+                        acc.allIds.push(contact.id);
+                        acc.byIds[contact.id] = contact
                         return acc;
                     }, {allIds: [], byIds: {}}
                 ),
                 isFetching: false,
                 lastUpdated: new Date()
             }
+        default:
+            return state
     }
 }
 

@@ -10,7 +10,12 @@ const initialState = {
 export default function (state = initialState, action) {
     switch (action.type) {
         case FETCH_SITES_REQUEST:
-            
+            console.log('fetch sites request')
+            return {
+                ...state,
+                isFetching: true,
+                lastUpdated: null
+            }
         case FETCH_SITES_SUCCESS:
             // we have received the list of sites
             return {
@@ -24,7 +29,8 @@ export default function (state = initialState, action) {
                 isFetching: false,
                 lastUpdated: new Date()
             }
-
+        default:
+            return state
     }
 
 }

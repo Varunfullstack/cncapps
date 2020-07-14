@@ -901,7 +901,7 @@
 
     function askNewPassword() {
         const data = $(event.target).data();
-        currentContactId = data.contactId;
+        currentContactId = data.siteNo;
         currentPasswordButton = event.target;
         $('#newPasswordDialog').dialog('open');
     }
@@ -2264,6 +2264,13 @@
              data-customer-id="{customerID}"
         ></div>
         <h3>Sites</h3>
+        <div id="reactCustomerSites"
+             data-customer-id="{customerID}"
+             data-deliver-site-no="{deliverSiteNo}"
+             data-invoice-site-no="{invoiceSiteNo}"
+        >
+
+        </div>
         <div class="customerEditSites">
             <div class="addSite">
                 <a href="{addSiteURL}">{addSiteText}</a>
