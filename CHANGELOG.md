@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v4.2.3] - 2020-07-13
+## [v4.2.3] - 2020-07-15
 ### Changed
 - Split up SD Monitor into different bits and pieces so that they can run independently.
 ### Fixed
