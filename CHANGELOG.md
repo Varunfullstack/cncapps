@@ -6,6 +6,8 @@ This project changes will be shown here.
 - Split up SD Monitor into different bits and pieces so that they can run independently.
 ### Fixed
 - Fixed issue with despatching some renewal items.
+- LeasedLinesContractExpiryNotification doesn't generate initial activity for the SR
+- When a change request is raised, set the end time to 4 minutes after the start time 
 
 ## [v4.2.2] - 2020-07-10
 ### Fixed

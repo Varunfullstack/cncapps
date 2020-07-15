@@ -9563,75 +9563,6 @@ FROM
         );
     }
 
-    /**
-     * @param DataSet $dbeProblem
-     * @param integer $siteNo
-     * @param integer $contactID
-     * @param string $reason
-     * @param bool $oldProblemID
-     * @throws Exception
-     */
-    function addInitialActivityToNewRequest($dbeProblem,
-                                            $siteNo,
-                                            $contactID,
-                                            $reason,
-                                            $oldProblemID = false
-    )
-    {
-
-        if ($oldProblemID) {
-
-            $reason .= 'This incident refers to incident ' . $oldProblemID . ' which has already been completed.';
-
-        }
-
-        $dbeCallActivity = new DBECallActivity($this);
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::siteNo,
-            $siteNo
-        );
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::contactID,
-            $contactID
-        );
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::callActTypeID,
-            CONFIG_INITIAL_ACTIVITY_TYPE_ID
-        );
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::date,
-            date(DATE_MYSQL_DATE)
-        );
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::startTime,
-            date('H:i')
-        );
-
-        $endTime = $this->getEndtime(CONFIG_INITIAL_ACTIVITY_TYPE_ID);
-
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::endTime,
-            $endTime
-        );
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::status,
-            'C'
-        );
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::reason,
-            Controller::formatForHTML($reason)
-        );
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::userID,
-            USER_SYSTEM
-        );
-        $dbeCallActivity->setValue(
-            DBEJCallActivity::problemID,
-            $dbeProblem->getValue(DBEProblem::problemID)
-        );
-        $dbeCallActivity->insertRow();
-    }
-
     function sendSiteVisitEmail($callActivityID)
     {
         $buMail = new BUMail($this);
@@ -11280,6 +11211,14 @@ FROM
         );
 
         $dbeProblem->insertRow();
+
+        $this->addInitialActivityToNewRequest(
+            $dbeProblem,
+            $dsSite->getValue(DBESite::siteNo),
+            $dsSite->getValue(DBESite::invoiceContactID),
+            $reason
+        );
+
 //callactivity.salesRequestStatus = 'O' and caa_callacttypeno = 43
         $dbeCallActivity = new DBECallActivity($this);
         $dbeCallActivity->setValue(
@@ -11396,6 +11335,72 @@ FROM
             $body
         );
         return true;
+    }
+
+    /**
+     * @param DBEProblem $dbeProblem
+     * @param integer $siteNo
+     * @param integer $contactID
+     * @param string $reason
+     * @param bool $oldProblemID
+     * @throws Exception
+     */
+    function addInitialActivityToNewRequest($dbeProblem,
+                                            $siteNo,
+                                            $contactID,
+                                            $reason,
+                                            $oldProblemID = false
+    )
+    {
+        if ($oldProblemID) {
+            $reason .= 'This incident refers to incident ' . $oldProblemID . ' which has already been completed.';
+        }
+
+        $dbeCallActivity = new DBECallActivity($this);
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::siteNo,
+            $siteNo
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::contactID,
+            $contactID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::callActTypeID,
+            CONFIG_INITIAL_ACTIVITY_TYPE_ID
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::date,
+            date(DATE_MYSQL_DATE)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::startTime,
+            date('H:i')
+        );
+
+        $endTime = $this->getEndtime(CONFIG_INITIAL_ACTIVITY_TYPE_ID);
+
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::endTime,
+            $endTime
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::status,
+            'C'
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::reason,
+            Controller::formatForHTML($reason)
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::userID,
+            USER_SYSTEM
+        );
+        $dbeCallActivity->setValue(
+            DBEJCallActivity::problemID,
+            $dbeProblem->getValue(DBEProblem::problemID)
+        );
+        $dbeCallActivity->insertRow();
     }
 
 }
