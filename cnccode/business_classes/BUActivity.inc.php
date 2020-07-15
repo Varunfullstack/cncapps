@@ -3196,9 +3196,8 @@ class BUActivity extends Business
                 break;
 
             case CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID:
-                $minutesToAdd = 7;
+                $minutesToAdd = 4;
                 break;
-
             default:
                 $minutesToAdd = 0;
                 break;
@@ -3639,6 +3638,7 @@ class BUActivity extends Business
      * @param string $status
      * @param null $standardTextId
      * @return DataAccess|DBECallActivity
+     * @throws Exception
      */
     function createChangeRequestActivity(
         $problemID,
@@ -3657,13 +3657,16 @@ class BUActivity extends Business
             DBEJCallActivity::date,
             date('Y-m-d')
         );         // today
+
+        $startTime = date('H:i');
+
         $dbeNewActivity->setValue(
             DBEJCallActivity::startTime,
-            date('H:i')
+            $startTime
         );
         $dbeNewActivity->setValue(
             DBEJCallActivity::endTime,
-            date('H:i')
+            $this->getEndtime(CONFIG_CHANGE_REQUEST_ACTIVITY_TYPE_ID, $startTime)
         );
         $dbeNewActivity->setValue(
             DBEJCallActivity::userID,
