@@ -152,7 +152,7 @@ class CNCCode extends Session
     var $that_class     = PHPLIB_CLASSNAME_SESSION_CONTAINER;  ## name of data storage container
     var $auto_init      = PHPLIB_SESSION_VAR_INIT;        ## initial session variables and values
     var $allowcache     = "no";        ## "public", "private", or "no"
-    var $gc_probability = 5;
+    var $gc_probability = 0;
 }
 
 class auSweetcode extends Auth

@@ -29,47 +29,49 @@
 </head>
 <body>
 <section>
-<div class="page">
-<div class="welcome">
-<img src="images/CNC_logo_whiteout.png"
-border="0"
-width="200"
-/>
-</div>
+    <div class="page">
+        <div class="welcome">
+            <img src="images/CNC_logo_whiteout.png"
+                 border="0"
+                 width="200"
+            />
+        </div>
 
-<div class="sign_up">
-    <form name="login"
-          method="post"
-          action="<?php print $this->url() ?>"
-    >
-<h2>Sign In</h2>
-    <input type="text"
-           placeholder="Username"
-           name="username"
-           title="Username"
-           value="<?php if (isset($this->auth["
-           uname"])) print htmlentities($this->auth["uname"]) ?>" size="30" maxlength="2048" />
-    <br>
-    <input name="password"
-           type="password"
-           placeholder="Password"
-           title="Password"
-           value=""
-           size="30"
-           maxlength="2048"
-           required
-    />
-    <br>
-    <input type="submit"
-           name="Submit"
-           value="Login"
-           class="up"
-    >
-    <span class="error" style="display: block; padding: 1rem 0"><?php if (isset($GLOBALS['loginMessage'])) print htmlentities($GLOBALS['loginMessage']);?></span>
-</form>
-</div>
+        <div class="sign_up">
+            <form name="login"
+                  method="post"
+                  action="<?php print $this->url() ?>"
+            >
+                <h2>Sign In</h2>
+                <input type="text"
+                       placeholder="Username"
+                       name="username"
+                       title="Username"
+                       value="<?php if (isset($this->auth["
+                       uname"])) print htmlentities($this->auth["uname"]) ?>" size="30" maxlength="2048" />
+                <br>
+                <input name="password"
+                       type="password"
+                       placeholder="Password"
+                       title="Password"
+                       value=""
+                       size="30"
+                       maxlength="2048"
+                       required
+                />
+                <br>
+                <input type="submit"
+                       name="Submit"
+                       value="Login"
+                       class="up"
+                >
+                <span class="error"
+                      style="display: block; padding: 1rem 0"
+                ><?php if (isset($GLOBALS['loginMessage'])) print htmlentities($GLOBALS['loginMessage']);?></span>
+            </form>
+        </div>
 
-</div>
+    </div>
 </section>
 
 </body>
