@@ -1,9 +1,151 @@
 import React from 'react'
+import What3WordsInput from "./dumbComponents/What3WordsInput";
+import SiteSelect from "./dumbComponents/SiteSelect";
+import SiteInput from "./dumbComponents/SiteInput";
 
 export default class Site extends React.Component {
+
+    formStructure = [
+        {
+            name: "address1",
+            size: 35,
+            maxLength: 35,
+            handleChange: this.handleInputChange,
+            required: true,
+            labelWidth: "13%",
+            inputWidth: "87%",
+            labelText: "Site Address",
+            value: this.props.site.address1,
+        },
+        {
+            name: "address2",
+            size: 35,
+            maxLength: 35,
+            handleChange: this.handleInputChange,
+            labelText: " ",
+            value: this.props.site.address2,
+        },
+        {
+            name: "address3",
+            size: 35,
+            maxLength: 35,
+            handleChange: this.handleInputChange,
+            labelText: " ",
+            value: this.props.site.address3
+        },
+        {
+            name: "town",
+            size: 25,
+            maxLength: 25,
+            handleChange: this.handleInputChange,
+            labelText: "Town",
+            value: this.props.site.town,
+            required: true
+        },
+        {
+            name: "county",
+            size: 25,
+            maxLength: 25,
+            handleChange: this.handleInputChange,
+            labelText: "County",
+            value: this.props.site.county,
+            required: true
+        },
+        {
+            name: "what3Words",
+            handleChange: this.handleInputChange,
+            value: this.props.site.what3Words,
+            component: What3WordsInput
+        },
+        {
+            name: "postcode",
+            size: 15,
+            maxLength: 15,
+            handleChange: this.handleInputChange,
+            labelText: "Postcode",
+            value: this.props.site.postcode,
+            required: true
+        },
+        {
+            name: "phone",
+            size: 20,
+            maxLength: 20,
+            handleChange: this.handleInputChange,
+            labelText: "Phone",
+            value: this.props.site.phone,
+            className: "telephoneValidator"
+        },
+        {
+            name: "maxTravelHours",
+            size: 5,
+            maxLength: 5,
+            type: 'number',
+            handleChange: this.handleInputChange,
+            labelText: "Max Travel Hours",
+            value: this.props.site.maxTravelHours
+        },
+        {
+            name: "invoiceSiteNo",
+            type: 'radio',
+            handleChange: (e) => this.props.changeInvoiceSiteNo(e.target.value),
+            labelText: "Default Invoice",
+            value: this.props.site.siteNo !== null ? this.props.site.siteNo : '',
+            checked: +this.props.invoiceSiteNo === +this.props.site.siteNo
+        },
+        {
+            name: "deliverSiteNo",
+            type: 'radio',
+            handleChange: (e) => this.props.changedDeliverSiteNo(e.target.value),
+            labelText: "Default Delivery",
+            value: this.props.site.siteNo !== null ? this.props.site.siteNo : '',
+            checked: +this.props.deliverSiteNo === +this.props.site.siteNo
+        },
+        {
+            name: "invoiceContact",
+            handleChange: this.handleInputChange,
+            labelText: "Invoice Contact",
+            value: this.props.site.invoiceContact,
+            options: this.props.contacts,
+            optionLabelFn: x => `${x.firstName} ${x.lastName}`,
+            component: SiteSelect,
+        },
+        {
+            name: "deliveryContact",
+            handleChange: this.handleInputChange,
+            labelText: "Delivery Contact",
+            value: this.props.site.deliveryContact,
+            options: this.props.contacts,
+            optionLabelFn: x => `${x.firstName} ${x.lastName}`,
+            component: SiteSelect,
+        },
+        {
+            name: "nonUKFlag",
+            type: 'checkbox',
+            handleChange: this.handleInputChange,
+            labelText: "Non UK",
+            value: 'Y',
+            checked: this.props.site.nonUKFlag === 'Y'
+        },
+        {
+            name: "active",
+            type: 'checkbox',
+            handleChange: this.handleInputChange,
+            labelText: "Active",
+            value: 'Y',
+            checked: this.props.site.active === 'Y'
+        },
+    ]
+
     constructor(props) {
         super(props);
         this.handleDeliverContact = this.handleDeliverContact.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
+
+    }
+
+    handleInputChange($event) {
+        const target = $event.target;
+        const value = 1;
     }
 
     checkDelete() {
@@ -14,8 +156,31 @@ export default class Site extends React.Component {
 
     }
 
+    renderFields() {
+        return this.formStructure.map(x => {
+            const TagName = x.component || SiteInput;
+            return (
+                <TagName
+                    name={x.name}
+                    size={x.size}
+                    maxLength={x.maxLength}
+                    handleChange={x.handleChange}
+                    required={x.required}
+                    labelWidth={x.labelWidth}
+                    inputWidth={x.inputWidth}
+                    labelText={x.labelText}
+                    value={x.value}
+                    options={x.options}
+                    optionLabelFn={x.optionLabelFn}
+                    checked={x.checked}
+                    key={`${x.name}-${this.props.site.siteNo}`}
+                />
+            )
+        })
+    }
+
     render() {
-        let {site, customerId, contacts, invoiceSiteNo, deliverSiteNo, changeInvoiceSiteNo, changedDeliverSiteNo} = this.props;
+        let {site, customerId} = this.props;
         return (
             <table className="content"
                    border="0"
@@ -41,194 +206,7 @@ export default class Site extends React.Component {
 
                     </td>
                 </tr>
-                <tr>
-                    <td className="content"
-                        width="13%"
-                    >Site Address
-                    </td>
-                    <td className="content"
-                        width="87%"
-                    >
-                        <input value={site.address1 ? site.address1 : ''}
-                               size="35"
-                               maxLength="35"
-                               readOnly
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td className="content">&nbsp;</td>
-                    <td className="content">
-                        <input value={site.address2 ? site.address2 : ''}
-                               size="35"
-                               maxLength="35"
-                               readOnly
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td className="content">&nbsp;</td>
-                    <td className="content">
-                        <input value={site.address3 ? site.address3 : ''}
-                               size="35"
-                               maxLength="35"
-                               readOnly
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td className="content">Town</td>
-                    <td className="content">
-                        <input value={site.town ? site.town : ''}
-                               size="25"
-                               maxLength="25"
-                               readOnly
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td className="content">County</td>
-                    <td className="content">
-                        <input value={site.county ? site.county : ''}
-                               size="25"
-                               maxLength="25"
-                               readOnly
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td className="content">Postcode</td>
-                    <td className="content">
-                        <input value={site.postcode ? site.postcode : ''}
-                               size="15"
-                               maxLength="15"
-                               readOnly
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td className="content">What3Words</td>
-                    <td className="content">
-                        <input title="[word].[word].[word] format required"
-                               value={site.what3Words ? site.what3Words : ''}
-                               pattern="^\w+\.\w+\.\w+$"
-                               size="30"
-                               className="what3WordsInput"
-                               readOnly
-                        />
-                        <span className="what3WordsLinkHolder">
-                            <a target="_blank"
-                               href={site.what3Words ? "https://what3words.com/" + site.what3Words : '#'}
-                            >
-                                <img src={site.what3Words ? '/images/w3w_SymbolTransparentBackground_RGB_Black.png' : "/images/w3w_SymbolTransparentBackground_RGB_Red.png"}
-                                     height="30"
-                                     alt="what3WordsLogo"
-                                />
-                            </a>
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td className="content">Phone</td>
-                    <td className="content">
-                        <input value={site.phone ? site.phone : ''}
-                               size="20"
-                               maxLength="20"
-                               className="telephoneValidator"
-                               readOnly
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td className="content">Max Travel Hours</td>
-                    <td className="content">
-                        <input value={site.maxTravelHours ? site.maxTravelHours : ''}
-                               size="5"
-                               maxLength="5"
-                               readOnly
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td className="content">Default Invoice</td>
-                    <td className="content">
-                        <input type="radio"
-                               value={site.siteNo !== null ? site.siteNo : ''}
-                               checked={invoiceSiteNo == site.siteNo}
-                               onChange={(e) => changeInvoiceSiteNo(e.target.value)}
-                               name="invoiceSiteNo"
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td className="content">Default Delivery</td>
-                    <td className="content">
-                        <input type="radio"
-                               value={site.siteNo !== null ? site.siteNo : ''}
-                               checked={deliverSiteNo == site.siteNo}
-                               name="deliverSiteNo"
-                               onChange={(e) => changedDeliverSiteNo(e.target.value)}
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td className="content">Invoice Contact</td>
-                    <td>
-                        <select
-                            value={site.invoiceContact ? site.invoiceContact : ''}
-                            onChange={this.handleDeliverContact}
-                        >
-                            {
-                                contacts.length ?
-                                    contacts.map(x => {
-                                        return <option value={x.id}
-                                                       key={`invoiceContact-${x.id}`}
-                                        >{`${x.firstName} ${x.lastName}`}</option>
-                                    }) :
-                                    ''
-                            }
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td className="content">Delivery Contact</td>
-                    <td>
-                        <select value={site.deliveryContact ? site.deliveryContact : ''}
-                                onChange={this.handleDeliverContact}
-                        >
-                            {
-                                contacts.length ?
-                                    contacts.map(x => {
-                                        return <option value={x.id}
-                                                       key={`deliveryContact-${x.id}`}
-                                        >{`${x.firstName} ${x.lastName}`}</option>
-                                    }) :
-                                    ''
-                            }
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td className="content">Non UK</td>
-                    <td className="content">
-                        <input type="checkbox"
-                               checked={site.nonUKFlag === 'Y'}
-                               title="Check to show this site is overseas and not in the UK"
-                               value="Y"
-                               readOnly
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td className="content">Active</td>
-                    <td className="content">
-                        <input type="checkbox"
-                               value="Y"
-                               checked={site.active}
-                               readOnly
-                        />
-                    </td>
-                </tr>
+                {this.renderFields()}
                 <tr>
                     <td colSpan="2"
                         className="content"
