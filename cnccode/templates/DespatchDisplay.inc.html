@@ -180,15 +180,15 @@
                             <DIV align="right">
                                 <input type="text"
                                        class="qtyToDespatch"
-                                       name="despatch[{sequenceNo}][qtyToDespatch]"
+                                       name="despatch[{lineId}][qtyToDespatch]"
                                        value="{qtyToDespatch}"
                                        maxlength="10"
                                 >
                             </DIV>
                             <input type="hidden"
-                                   id="sequenceNo"
-                                   name="despatch[{sequenceNo}][sequenceNo]"
-                                   value={sequenceNo}
+                                   id="lineId"
+                                   name="despatch[{lineId}][id]"
+                                   value={lineId}
                             >
                             <input type="hidden"
                                    class="qtyOutstandingHide"

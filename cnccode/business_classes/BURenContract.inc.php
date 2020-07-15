@@ -240,7 +240,6 @@ class BURenContract extends Business
 
         $generateInvoice = false;
 
-        $line = null;
         echo "<div> Contract Renewals - START </div>";
         while ($dsRenContract->fetchNext()) {
             ?>
@@ -303,8 +302,6 @@ class BURenContract extends Business
                         $dsOrdline,
                         $dsCustomer
                     );
-                    $line = -1;    // initialise sales order line seq
-
                     ?>
                     <div>Creating new Sales Order: <?= $dsOrdhead->getValue(DBEOrdhead::ordheadID) ?></div>
                     <?php
@@ -338,9 +335,6 @@ class BURenContract extends Business
                  * add notes as a comment line (if they exist)
                  */
                 if ($dsRenContract->getValue(DBEJRenContract::notes) && !$itemBillingCategoryID) {
-
-                    $line++;
-
                     $dbeOrdline->setValue(
                         DBEOrdline::description,
                         $dsRenContract->getValue(DBEJRenContract::notes)
@@ -368,10 +362,6 @@ class BURenContract extends Business
                     $dbeOrdline->setValue(
                         DBEOrdline::supplierID,
                         null
-                    );
-                    $dbeOrdline->setValue(
-                        DBEOrdline::sequenceNo,
-                        $line
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::lineType,
@@ -402,7 +392,6 @@ class BURenContract extends Business
 
                 } // end notes
 
-                $line++;
                 /*
                  * Get stock category from item table
                  */
@@ -442,10 +431,6 @@ class BURenContract extends Business
                     CONFIG_SALES_STOCK_SUPPLIERID
                 );
                 $dbeOrdline->setValue(
-                    DBEOrdline::sequenceNo,
-                    $line
-                );
-                $dbeOrdline->setValue(
                     DBEOrdline::lineType,
                     'I'
                 );
@@ -479,7 +464,6 @@ class BURenContract extends Business
                 $dbeOrdline->insertRow();
 
                 // period comment line
-                $line++;
                 $description = $dsRenContract->getValue(
                         DBEJRenContract::invoiceFromDate
                     ) . ' to ' . $dsRenContract->getValue(
@@ -512,10 +496,6 @@ class BURenContract extends Business
                 $dbeOrdline->setValue(
                     DBEOrdline::supplierID,
                     null
-                );
-                $dbeOrdline->setValue(
-                    DBEOrdline::sequenceNo,
-                    $line
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::lineType,
@@ -551,7 +531,6 @@ class BURenContract extends Business
 
                     $dbeItem->getRow(CONFIG_CONSULTANCY_HOURLY_LABOUR_ITEMID);
 
-                    $line++;
                     $description = 'Installation Charge';
                     $dbeOrdline->setValue(
                         DBEOrdline::lineType,
@@ -576,10 +555,6 @@ class BURenContract extends Business
                     $dbeOrdline->setValue(
                         DBEOrdline::supplierID,
                         CONFIG_SALES_STOCK_SUPPLIERID
-                    );
-                    $dbeOrdline->setValue(
-                        DBEOrdline::sequenceNo,
-                        $line
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::qtyOrdered,
@@ -673,8 +648,6 @@ class BURenContract extends Business
                     $dsLinkedItems
                 );
                 while ($dsLinkedItems->fetchNext()) {
-                    $line++;
-
                     $description = $dsLinkedItems->getValue(DBEJCustomerItem::itemDescription);
                     if ($dsLinkedItems->getValue(DBEJCustomerItem::serverName)) {
                         $description .= ' (' . $dsLinkedItems->getValue(DBEJCustomerItem::serverName) . ')';
@@ -710,10 +683,6 @@ class BURenContract extends Business
                     $dbeOrdline->setValue(
                         DBEOrdline::supplierID,
                         null
-                    );
-                    $dbeOrdline->setValue(
-                        DBEOrdline::sequenceNo,
-                        $line
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::lineType,

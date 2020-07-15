@@ -7,7 +7,7 @@
  */
 
 
-GLOBAL $cfg;
+global $cfg;
 require_once("config.inc.php");
 require_once($cfg["path_ct"] . "/CTLeadStatusReport.inc.php");
 require_once($cfg['path_bu'] . '/BURenBroadband.inc.php');
@@ -53,25 +53,24 @@ if ($dsRenBroadband->rowCount()) {
     );
     while ($dsRenBroadband->fetchNext()) {
         $customerItemID = $dsRenBroadband->getValue(DBEJRenBroadband::customerItemID);
-        if($dsRenBroadband->getValue(DBEJRenBroadband::contractExpireNotified)==0)
-        {
+        if ($dsRenBroadband->getValue(DBEJRenBroadband::contractExpireNotified) == 0) {
             // Create New SR and send Email
-            $buActivity=new BUActivity($thing);   
-            $buActivity->createActivityLeasedLineExpire( 
-                $dsRenBroadband->getValue(DBEJRenBroadband::customerID),           
+            $buActivity = new BUActivity($thing);
+            $buActivity->createActivityLeasedLineExpire(
+                $dsRenBroadband->getValue(DBEJRenBroadband::customerID),
                 $customerItemID,
                 $dsRenBroadband->getValue(DBEJRenBroadband::itemDescription),
                 Controller::dateYMDtoDMY(
                     $dsRenBroadband->getValue(DBEJRenBroadband::contractExpiryDate)
                 )
             );
-             // mark contractExpireNotified @ custitem  to 1                
+            // mark contractExpireNotified @ custitem  to 1
             global $db;
-            $sql ="UPDATE custitem
+            $sql = "UPDATE custitem
                 SET contractExpireNotified = 1 where cui_cuino=$customerItemID";
             $db->query($sql);
         }
-       
+
 
         $template->set_var(
             array(

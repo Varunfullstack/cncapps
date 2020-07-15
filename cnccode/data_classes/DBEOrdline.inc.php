@@ -294,9 +294,7 @@ class DBEOrdline extends DBEntity
 
     public function insertRow()
     {
-        if (!$this->getValue(self::sequenceNo)) {
-            $this->setValue(self::sequenceNo, $this->getNextSortOrder());
-        }
+        $this->setValue(self::sequenceNo, $this->getNextSortOrder());
         parent::insertRow();
     }
 
