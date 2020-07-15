@@ -1,7 +1,6 @@
 "use strict";
 import React from 'react';
 import Select from "./Select";
-import Skeleton from "react-loading-skeleton";
 import EncryptedTextInput from "./EncryptedTextInput";
 
 class CustomerEditMain extends React.Component {
@@ -134,7 +133,6 @@ class CustomerEditMain extends React.Component {
         })
             .then(response => response.json())
             .then(response => {
-                console.log('customer data saved');
             })
     }
 
@@ -263,7 +261,6 @@ class CustomerEditMain extends React.Component {
     }
 
     getSpecialAttentionInput() {
-        console.log(this.state.customer.specialAttentionFlag, this.state.customer.specialAttentionEndDate);
         return [
             this.el('input', {
                 type: 'checkbox',
@@ -521,7 +518,7 @@ class CustomerEditMain extends React.Component {
                        step="0.1"
                        maxLength="4"
                        max="999.9"
-                       style="width: 50px;"
+                       style={{width: "50px"}}
                        onChange={this.handleSlaFixHoursP1}
                 />
                 2
@@ -532,7 +529,7 @@ class CustomerEditMain extends React.Component {
                        step="0.1"
                        maxLength="4"
                        max="999.9"
-                       style="width: 50px;"
+                       style={{width: "50px"}}
                        onChange={this.handleSlaFixHoursP2}
                 />
                 3
@@ -543,7 +540,7 @@ class CustomerEditMain extends React.Component {
                        step="0.1"
                        maxLength="4"
                        max="999.9"
-                       style="width: 50px;"
+                       style={{width: "50px"}}
                        onChange={this.handleSlaFixHoursP3}
                 />
                 4
@@ -554,7 +551,7 @@ class CustomerEditMain extends React.Component {
                        step="0.1"
                        maxLength="4"
                        max="999.9"
-                       style="width: 50px;"
+                       style={{width: "50px"}}
                        onChange={this.handleSlaFixHoursP4}
                 />
             </React.Fragment>
@@ -563,32 +560,29 @@ class CustomerEditMain extends React.Component {
 
     getSLAPenaltiesAgreedInputs() {
         return (
-            <tr>
-                <td className="content">SLA Penalties Agreed</td>
-                <td className="content">
-                    1
-                    <input type="checkbox"
-                           name="slaP1PenaltiesAgreed"
-                           checked={this.state.customer.slaP1PenaltiesAgreed}
-                           onChange={this.handleSlaP1PenaltiesAgreed}
-                           value="1"
-                    />
-                    2
-                    <input type="checkbox"
-                           name="slaP2PenaltiesAgreed"
-                           checked={this.state.customer.slaP2PenaltiesAgreed}
-                           onChange={this.handleSlaP2PenaltiesAgreed}
-                           value="1"
-                    />
-                    3
-                    <input type="checkbox"
-                           name="slaP3PenaltiesAgreed"
-                           checked={this.state.customer.slaP3PenaltiesAgreed}
-                           onChange={this.handleSlaP3PenaltiesAgreed}
-                           value="1"
-                    />
-                </td>
-            </tr>
+            <React.Fragment>
+                1
+                <input type="checkbox"
+                       name="slaP1PenaltiesAgreed"
+                       checked={this.state.customer.slaP1PenaltiesAgreed}
+                       onChange={this.handleSlaP1PenaltiesAgreed}
+                       value="1"
+                />
+                2
+                <input type="checkbox"
+                       name="slaP2PenaltiesAgreed"
+                       checked={this.state.customer.slaP2PenaltiesAgreed}
+                       onChange={this.handleSlaP2PenaltiesAgreed}
+                       value="1"
+                />
+                3
+                <input type="checkbox"
+                       name="slaP3PenaltiesAgreed"
+                       checked={this.state.customer.slaP3PenaltiesAgreed}
+                       onChange={this.handleSlaP3PenaltiesAgreed}
+                       value="1"
+                />
+            </React.Fragment>
         )
     }
 
@@ -732,21 +726,10 @@ class CustomerEditMain extends React.Component {
         )
     }
 
-
     render() {
-        if (!this.state.loaded) {
-            return this.el(
-                Skeleton,
-                null,
-                this.el(
-                    'table',
-                    {className: 'content', border: 0, cellPadding: 2, cellSpacing: 1, width: '100%'},
-                    this.el('tbody')
-                )
-            );
-        }
-
-        return this.el('table', {className: 'content', border: 0, cellPadding: 2, cellSpacing: 1, width: '100%'},
+        return this.el(
+            'table',
+            {className: 'content', border: 0, cellPadding: 2, cellSpacing: 1, width: '100%'},
             this.el('tbody', null,
                 [
                     this.getInputRow('Customer ' + this.props.customerID, this.getCustomerNameInput(), 'name', '13%'),
@@ -763,6 +746,7 @@ class CustomerEditMain extends React.Component {
                     this.getInputRow('Servers', this.getServersInput(), 'servers'),
                     this.getInputRow('Reg', this.getRegNoInput(), 'reg'),
                     this.getInputRow('Sites', this.getNoOfSitesInput(), 'sites'),
+                    this.getInputRow('Pre-pay Top Up', this.getGscTopUpAmountInput(), 'gscTopUpAmount'),
                     this.getInputRow('Pre-pay Top Up', this.getGscTopUpAmountInput(), 'gscTopUpAmount'),
                     this.getInputRow('Became Customer', this.getBecameCustomerDateInput(), 'becameCustomerDate'),
                     this.getInputRow('SLA Response Hours', this.getSLAResponseHoursInput(), 'SLA Response Hours'),
