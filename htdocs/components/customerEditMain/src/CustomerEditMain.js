@@ -1,9 +1,8 @@
 "use strict";
 import React from 'react';
 import Select from "./Select";
-import EncryptedTextInput from "./EncryptedTextInput";
 import Skeleton from "react-loading-skeleton";
-import ReactDOM from 'react-dom';
+import EncryptedTextInput from "./EncryptedTextInput";
 
 class CustomerEditMain extends React.Component {
     el = React.createElement;
@@ -47,6 +46,13 @@ class CustomerEditMain extends React.Component {
                 support24HourFlag: '',
                 techNotes: '',
                 websiteURL: '',
+                slaFixHoursP1: '',
+                slaFixHoursP2: '',
+                slaFixHoursP3: '',
+                slaFixHoursP4: '',
+                slaP1PenaltiesAgreed: '',
+                slaP2PenaltiesAgreed: '',
+                slaP3PenaltiesAgreed: '',
 
             }
         };
@@ -80,7 +86,42 @@ class CustomerEditMain extends React.Component {
         this.handleSortCodeUpdate = this.handleSortCodeUpdate.bind(this);
         this.handleAccountNameUpdate = this.handleAccountNameUpdate.bind(this);
         this.handleAccountNumberUpdate = this.handleAccountNumberUpdate.bind(this);
+        this.handleSlaFixHoursP1 = this.handleSlaFixHoursP1.bind(this);
+        this.handleSlaFixHoursP2 = this.handleSlaFixHoursP2.bind(this);
+        this.handleSlaFixHoursP3 = this.handleSlaFixHoursP3.bind(this);
+        this.handleSlaFixHoursP4 = this.handleSlaFixHoursP4.bind(this);
+        this.handleSlaP1PenaltiesAgreed = this.handleSlaP1PenaltiesAgreed.bind(this);
+        this.handleSlaP2PenaltiesAgreed = this.handleSlaP2PenaltiesAgreed.bind(this);
+        this.handleSlaP3PenaltiesAgreed = this.handleSlaP3PenaltiesAgreed.bind(this);
         document.customerMain = this;
+    }
+
+    handleSlaFixHoursP1($event) {
+        this.updateCustomerField('slaFixHoursP1', $event.target.value);
+    }
+
+    handleSlaFixHoursP2($event) {
+        this.updateCustomerField('slaFixHoursP2', $event.target.value);
+    }
+
+    handleSlaFixHoursP3($event) {
+        this.updateCustomerField('slaFixHoursP3', $event.target.value);
+    }
+
+    handleSlaFixHoursP4($event) {
+        this.updateCustomerField('slaFixHoursP4', $event.target.value);
+    }
+
+    handleSlaP1PenaltiesAgreed($event) {
+        this.updateCustomerField('slaP1PenaltiesAgreed', $event.target.value);
+    }
+
+    handleSlaP2PenaltiesAgreed($event) {
+        this.updateCustomerField('slaP2PenaltiesAgreed', $event.target.value);
+    }
+
+    handleSlaP3PenaltiesAgreed($event) {
+        this.updateCustomerField('slaP3PenaltiesAgreed', $event.target.value);
     }
 
     save() {
@@ -300,6 +341,7 @@ class CustomerEditMain extends React.Component {
         ]
     }
 
+
     handleLeadStatusIdUpdate(value) {
         this.updateCustomerField('leadStatusId', value);
     }
@@ -468,69 +510,135 @@ class CustomerEditMain extends React.Component {
         this.updateCustomerField('slaP5', event.target.value);
     }
 
+    getSLAFixHoursInputs() {
+        return (
+            <React.Fragment>
+                1
+                <input name="slaFixHoursP1"
+                       value={this.state.customer.slaFixHoursP1}
+                       type="number"
+                       size="1"
+                       step="0.1"
+                       maxLength="4"
+                       max="999.9"
+                       style="width: 50px;"
+                       onChange={this.handleSlaFixHoursP1}
+                />
+                2
+                <input name="slaFixHoursP2"
+                       value={this.state.customer.slaFixHoursP2}
+                       type="number"
+                       size="1"
+                       step="0.1"
+                       maxLength="4"
+                       max="999.9"
+                       style="width: 50px;"
+                       onChange={this.handleSlaFixHoursP2}
+                />
+                3
+                <input name="slaFixHoursP3"
+                       value={this.state.customer.slaFixHoursP3}
+                       type="number"
+                       size="1"
+                       step="0.1"
+                       maxLength="4"
+                       max="999.9"
+                       style="width: 50px;"
+                       onChange={this.handleSlaFixHoursP3}
+                />
+                4
+                <input name="slaFixHoursP4"
+                       value={this.state.customer.slaFixHoursP4}
+                       type="number"
+                       size="1"
+                       step="0.1"
+                       maxLength="4"
+                       max="999.9"
+                       style="width: 50px;"
+                       onChange={this.handleSlaFixHoursP4}
+                />
+            </React.Fragment>
+        )
+    }
+
+    getSLAPenaltiesAgreedInputs() {
+        return (
+            <tr>
+                <td className="content">SLA Penalties Agreed</td>
+                <td className="content">
+                    1
+                    <input type="checkbox"
+                           name="slaP1PenaltiesAgreed"
+                           checked={this.state.customer.slaP1PenaltiesAgreed}
+                           onChange={this.handleSlaP1PenaltiesAgreed}
+                           value="1"
+                    />
+                    2
+                    <input type="checkbox"
+                           name="slaP2PenaltiesAgreed"
+                           checked={this.state.customer.slaP2PenaltiesAgreed}
+                           onChange={this.handleSlaP2PenaltiesAgreed}
+                           value="1"
+                    />
+                    3
+                    <input type="checkbox"
+                           name="slaP3PenaltiesAgreed"
+                           checked={this.state.customer.slaP3PenaltiesAgreed}
+                           onChange={this.handleSlaP3PenaltiesAgreed}
+                           value="1"
+                    />
+                </td>
+            </tr>
+        )
+    }
+
+
     getSLAResponseHoursInput() {
-        return [
-            "1",
-            this.el(
-                'input',
-                {
-                    type: 'text',
-                    value: this.state.customer.slaP1,
-                    onChange: this.handleSLAP1Update,
-                    key: 'SLAP1',
-                    size: 1,
-                    maxLength: 3
-                }
-            ),
-            " 2",
-            this.el(
-                'input',
-                {
-                    type: 'text',
-                    value: this.state.customer.slaP2,
-                    onChange: this.handleSLAP2Update,
-                    key: 'SLAP2',
-                    size: 1,
-                    maxLength: 3
-                }
-            ),
-            " 3",
-            this.el(
-                'input',
-                {
-                    type: 'text',
-                    value: this.state.customer.slaP3,
-                    onChange: this.handleSLAP3Update,
-                    key: 'SLAP3',
-                    size: 1,
-                    maxLength: 3
-                }
-            ),
-            " 4",
-            this.el(
-                'input',
-                {
-                    type: 'text',
-                    value: this.state.customer.slaP4,
-                    onChange: this.handleSLAP4Update,
-                    key: 'SLAP4',
-                    size: 1,
-                    maxLength: 3
-                }
-            ),
-            " 5",
-            this.el(
-                'input',
-                {
-                    type: 'text',
-                    value: this.state.customer.slaP5,
-                    onChange: this.handleSLAP5Update,
-                    key: 'SLAP5',
-                    size: 1,
-                    maxLength: 3
-                }
-            ),
-        ];
+        return (
+            <React.Fragment>
+                1
+                <input type="text"
+                       value={this.state.customer.slaP1}
+                       onChange={this.handleSLAP1Update}
+                       key="SLAP1"
+                       size="1"
+                       maxLength="3"
+                />
+                2
+                <input type="text"
+                       value={this.state.customer.slaP2}
+                       onChange={this.handleSLAP2Update}
+                       key="SLAP2"
+                       size="1"
+                       maxLength="3"
+                />
+                3
+                <input type=" text"
+                       value={this.state.customer.slaP3}
+                       onChange={this.handleSLAP3Update}
+                       key="SLAP3"
+                       size="1"
+                       maxLength="3"
+
+                />
+                4
+                <input type="text"
+                       value={this.state.customer.slaP4}
+                       onChange={this.handleSLAP4Update}
+                       key="SLAP4"
+                       size="1"
+                       maxLength="3"
+                />
+                5
+                <input type="text"
+                       value={this.state.customer.slaP5}
+                       onChange={this.handleSLAP5Update}
+                       key="SLAP5"
+                       size="1"
+                       maxLength="3"
+                />
+            </React.Fragment>
+        );
     }
 
     handleTechNotesUpdate(event) {
@@ -538,13 +646,12 @@ class CustomerEditMain extends React.Component {
     }
 
     getTechNotesInput() {
-        return this.el(
-            'input',
-            {
-                type: 'text',
-                value: this.state.customer.techNotes,
-                onChange: this.handleTechNotesUpdate
-            }
+        return (
+            <input
+                type="text"
+                value={this.state.customer.techNotes}
+                onChange={this.handleTechNotesUpdate}
+            />
         )
     }
 
@@ -659,6 +766,8 @@ class CustomerEditMain extends React.Component {
                     this.getInputRow('Pre-pay Top Up', this.getGscTopUpAmountInput(), 'gscTopUpAmount'),
                     this.getInputRow('Became Customer', this.getBecameCustomerDateInput(), 'becameCustomerDate'),
                     this.getInputRow('SLA Response Hours', this.getSLAResponseHoursInput(), 'SLA Response Hours'),
+                    this.getInputRow('SLA Fix Hours', this.getSLAFixHoursInputs(), 'SLA Fix Hours'),
+                    this.getInputRow('Penalties Agreed', this.getSLAPenaltiesAgreedInputs(), 'Penalties Agreed'),
                     this.getInputRow('Last Modified', this.state.customer.modifyDate, 'Last Modified'),
                     this.getInputRow('Technical Notes', this.getTechNotesInput(), 'Technical Notes'),
                     this.getInputRow('Active Directory Name', this.getActiveDirectoryNameInput(), 'Active Directory Name'),

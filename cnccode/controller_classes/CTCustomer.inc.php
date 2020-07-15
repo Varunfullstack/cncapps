@@ -767,6 +767,13 @@ class CTCustomer extends CTCNC
                             "slaP3"                        => $dbeCustomer->getValue(DBECustomer::slaP3),
                             "slaP4"                        => $dbeCustomer->getValue(DBECustomer::slaP4),
                             "slaP5"                        => $dbeCustomer->getValue(DBECustomer::slaP5),
+                            "slaFixHoursP1"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP1),
+                            "slaFixHoursP2"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP2),
+                            "slaFixHoursP3"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP3),
+                            "slaFixHoursP4"                => $dbeCustomer->getValue(DBECustomer::slaFixHoursP4),
+                            "slaP1PenaltiesAgreed"         => $dbeCustomer->getValue(DBECustomer::slaP1PenaltiesAgreed),
+                            "slaP2PenaltiesAgreed"         => $dbeCustomer->getValue(DBECustomer::slaP2PenaltiesAgreed),
+                            "slaP3PenaltiesAgreed"         => $dbeCustomer->getValue(DBECustomer::slaP3PenaltiesAgreed),
                             "sortCode"                     => $dbeCustomer->getValue(DBECustomer::sortCode),
                             "specialAttentionEndDate"      => $dbeCustomer->getValue(
                                 DBECustomer::specialAttentionEndDate
