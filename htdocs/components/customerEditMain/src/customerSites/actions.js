@@ -10,6 +10,7 @@ import {
     FETCH_SITES_REQUEST,
     FETCH_SITES_SUCCESS,
     INITIALIZE_CUSTOMER,
+    SAVE_CUSTOMER_DATA_SUCCESS,
     SITE_DATA_SAVED,
     TOGGLE_VISIBILITY,
     UPDATE_SITE
@@ -70,6 +71,10 @@ export function toggleVisibility() {
 
 export function savedSiteData(siteNo) {
     return {type: SITE_DATA_SAVED, siteNo}
+}
+
+export function savedCustomerData() {
+    return {type: SAVE_CUSTOMER_DATA_SUCCESS}
 }
 
 export function fetchSites(customerId) {

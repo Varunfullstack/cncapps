@@ -1,9 +1,15 @@
-import {CHANGE_DELIVER_SITE_NO, CHANGE_INVOICE_SITE_NO, INITIALIZE_CUSTOMER} from "../actionTypes";
+import {
+    CHANGE_DELIVER_SITE_NO,
+    CHANGE_INVOICE_SITE_NO,
+    INITIALIZE_CUSTOMER,
+    SAVE_CUSTOMER_DATA_SUCCESS
+} from "../actionTypes";
 
 const initialState = {
     customerId: null,
     invoiceSiteNo: null,
-    deliverSiteNo: null
+    deliverSiteNo: null,
+    hasPendingChanges: false
 }
 
 export default function (state = initialState, action) {
@@ -20,14 +26,22 @@ export default function (state = initialState, action) {
             const {siteNo} = action
             return {
                 ...state,
-                deliverSiteNo: siteNo
+                deliverSiteNo: siteNo,
+                hasPendingChanges: true
             }
         }
         case CHANGE_INVOICE_SITE_NO: {
             const {siteNo} = action
             return {
                 ...state,
-                invoiceSiteNo: siteNo
+                invoiceSiteNo: siteNo,
+                hasPendingChanges: true
+            }
+        }
+        case SAVE_CUSTOMER_DATA_SUCCESS: {
+            return {
+                ...state,
+                hasPendingChanges: false
             }
         }
         default:
