@@ -343,8 +343,8 @@ handleSetOrderStatus=(status)=>{
     el('span',{key:'spanTitle'},'Select an option below to modify your current subscription and press Submit when done or Cancel to return to manage Tenant page'),
     el('div',{key:'divStatus'},[ 
       el('span',{key:"spanStatusText"},'Current status : '),
-      el('span',{key:"spanStatusCompleted",className:'green-text'},productDetails?.lineStatus=="active"?'Acitve':''),
-      el('span',{key:"spanStatusNotCompleted", className:'red-text'},productDetails?.lineStatus=='inactive'?'Inacitve':''),
+      el('span',{key:"spanStatusCompleted",className:'green-text'},productDetails?.lineStatus=="active"?'Active':''),
+      el('span',{key:"spanStatusNotCompleted", className:'red-text'},productDetails?.lineStatus=='inactive'?'Inactive':''),
       ]),
     el('hr',{key:'hr1'}),
     el('h4',{key:'q1'},'What do you want to do?'),
