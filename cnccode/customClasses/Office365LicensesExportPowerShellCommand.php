@@ -23,6 +23,7 @@ use BUCustomer;
 use BUHeader;
 use BUMail;
 use BUPassword;
+use BUProblemRaiseType;
 use DataSet;
 use DateInterval;
 use DateTime;
@@ -47,7 +48,6 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Template;
 use Twig\TwigFilter;
 use UnexpectedValueException;
-use BUProblemRaiseType;
 
 class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
 {
@@ -61,6 +61,17 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
      */
     private $alertMode;
 
+
+    /**
+     * Office365LicensesExportPowerShellCommand constructor.
+     * @param $dbeCustomer
+     * @param LoggerCLI $logger
+     * @param bool $debugMode
+     * @param bool $alertMode
+     * @param bool $reuseData
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws Exception
+     */
     public function __construct($dbeCustomer,
                                 LoggerCLI $logger,
                                 $debugMode = false,
@@ -111,7 +122,17 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $this->password = $password;
         $this->logger = $logger;
         $this->commandName = "365OfficeLicensesExport";
-        $data = $this->run();
+        try {
+            $data = $this->run();
+        } catch (\Exception $exception) {
+            $this->createFailedSR(
+                $dbeCustomer,
+                $exception->getMessage(),
+                $exception->getTraceAsString(),
+                $exception->getLine()
+            );
+            throw new Exception('Failed to process result');
+        }
         $mailboxes = $data['mailboxes'];
         $licenses = $data['licenses'];
         $devices = $data['devices'];
@@ -165,7 +186,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                                 'MBtoGB',
                                 function ($string) {
                                     if (!is_numeric($string)) {
-                                        return;
+                                        return '';
                                     }
                                     return number_format($string / 1024) . 'GB';
                                 }
@@ -248,46 +269,52 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             throw new UnexpectedValueException($message);
         }
         global $db;
+        
+        try {
+            $db->preparedQuery(
+                "insert into customerOffice365StorageStats values (?,?,?,?,?) on duplicate key update totalOneDriveStorageUsed = ?, totalEmailStorageUsed = ?, totalSiteStorageUsed = ?",
+                [
+                    [
+                        "type"  => 'i',
+                        "value" => $customerID
+                    ],
+                    [
+                        "type"  => 's',
+                        "value" => (new DateTime())->format(DATE_MYSQL_DATE)
+                    ],
+                    [
+                        "type"  => 'd',
+                        "value" => $data['totalOneDriveStorageUsed']
+                    ],
+                    [
+                        "type"  => 'd',
+                        "value" => $data['totalEmailStorageUsed']
+                    ],
+                    [
+                        "type"  => 'd',
+                        "value" => $data['totalSiteUsed']
+                    ],
+                    [
+                        "type"  => 'd',
+                        "value" => $data['totalOneDriveStorageUsed']
+                    ],
+                    [
+                        "type"  => 'd',
+                        "value" => $data['totalEmailStorageUsed']
+                    ],
+                    [
+                        "type"  => 'd',
+                        "value" => $data['totalSiteUsed']
+                    ],
+                ]
+            );
+        } catch (Exception $exception) {
+            var_dump($exception->getMessage());
+        }
 
-        $statement = $db->preparedQuery(
-            "insert into customerOffice365StorageStats values (?,?,?,?,?) on duplicate key update totalOneDriveStorageUsed = ?, totalEmailStorageUsed = ?, totalSiteStorageUsed = ?",
-            [
-                [
-                    "type"  => 'i',
-                    "value" => $customerID
-                ],
-                [
-                    "type"  => 's',
-                    "value" => (new DateTime())->format(DATE_MYSQL_DATE)
-                ],
-                [
-                    "type"  => 'd',
-                    "value" => $data['totalOneDriveStorageUsed']
-                ],
-                [
-                    "type"  => 'd',
-                    "value" => $data['totalEmailStorageUsed']
-                ],
-                [
-                    "type"  => 'd',
-                    "value" => $data['totalSiteUsed']
-                ],
-                [
-                    "type"  => 'd',
-                    "value" => $data['totalOneDriveStorageUsed']
-                ],
-                [
-                    "type"  => 'd',
-                    "value" => $data['totalEmailStorageUsed']
-                ],
-                [
-                    "type"  => 'd',
-                    "value" => $data['totalSiteUsed']
-                ],
-            ]
-        );
-
+        var_dump('here');
         $spreadsheet->removeSheetByIndex(0);
+        $spreadsheet->setActiveSheetIndex(0);
         $writer = new Xlsx($spreadsheet);
         $customerFolder = $buCustomer->getCustomerFolderPath($customerID);
         $folderName = $customerFolder . "\Review Meetings\\";
@@ -304,6 +331,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             $writer->save(
                 $filePath
             );
+            var_dump('here');
             $dbeCustomerDocument = new DBEPortalCustomerDocument($thing);
             $dbeCustomerDocument->getCurrentOffice365Licenses($customerID);
 
@@ -449,7 +477,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $dbeProblem->setValue(
             DBEProblem::raiseTypeId,
             BUProblemRaiseType::ALERTID
-        ); 
+        );
         $dbeProblem->insertRow();
 
         $dbeCallActivity = new DBECallActivity($thing);
@@ -542,6 +570,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 );
             }
         }
+        var_dump($data);
         return $data;
     }
 
@@ -675,8 +704,8 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             true
         );
         $highestRow = count($mailboxes) + 2;
-            $updateCustomer = new DBECustomer($thing);
-            $updateCustomer->getRow($dbeCustomer->getValue(DBECustomer::customerID));
+        $updateCustomer = new DBECustomer($thing);
+        $updateCustomer->getRow($dbeCustomer->getValue(DBECustomer::customerID));
         if ($licensedUsers != $updateCustomer->getValue(DBECustomer::licensedOffice365Users)) {
             $updateCustomer->setValue(DBECustomer::licensedOffice365Users, $licensedUsers);
             $updateCustomer->updateRow();
@@ -851,7 +880,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $dbeProblem->setValue(
             DBEProblem::raiseTypeId,
             BUProblemRaiseType::ALERTID
-        ); 
+        );
         $dbeProblem->insertRow();
 
         $dbeCallActivity = new DBECallActivity($thing);
@@ -990,7 +1019,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
         $dbeProblem->setValue(
             DBEProblem::raiseTypeId,
             BUProblemRaiseType::ALERTID
-        ); 
+        );
         $dbeProblem->insertRow();
 
         $dbeCallActivity = new DBECallActivity($thing);
