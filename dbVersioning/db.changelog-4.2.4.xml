@@ -1,0 +1,44 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="release-v4.2.4-0">
+        <tagDatabase tag="release-v4.2.4"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="hotfix-v4.2.4-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT IS_NULLABLE = 'NO' FROM information_schema.`COLUMNS` WHERE table_name =
+                'customerOffice365StorageStats' AND column_name
+                = 'totalOneDriveStorageUsed' and information_schema.COLUMNS.TABLE_SCHEMA = database()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint tableName="customerOffice365StorageStats" columnName="totalOneDriveStorageUsed"
+                               columnDataType="decimal(12,2)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="hotfix-v4.2.4-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT IS_NULLABLE = 'NO' FROM information_schema.`COLUMNS` WHERE table_name =
+                'customerOffice365StorageStats' AND column_name
+                = 'totalEmailStorageUsed' and information_schema.COLUMNS.TABLE_SCHEMA = database()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint tableName="customerOffice365StorageStats" columnName="totalEmailStorageUsed"
+                               columnDataType="decimal(12,2)"/>
+        <rollback/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="hotfix-v4.2.4-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT IS_NULLABLE = 'NO' FROM information_schema.`COLUMNS` WHERE table_name =
+                'customerOffice365StorageStats' AND column_name
+                = 'totalSiteStorageUsed' and information_schema.COLUMNS.TABLE_SCHEMA = database()
+            </sqlCheck>
+        </preConditions>
+        <dropNotNullConstraint tableName="customerOffice365StorageStats" columnName="totalSiteStorageUsed"
+                               columnDataType="decimal(12,2)"/>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>
