@@ -119,8 +119,8 @@ class CMPTDCustomerOrders extends React.Component {
           el("label", null, moment(sub.createdDate).format("DD/MM/YYYY HH:MM")),
       },
       { path: "orderNumber", label: "Order", sortable: true },
-      { path: "orderSource", label: "Order Source", sortable: true },
-      { path: "vendorName", label: "Vendor", sortable: true },
+      // { path: "orderSource", label: "Order Source", sortable: true },
+      // { path: "vendorName", label: "Vendor", sortable: true },
       { path: "sku", label: "SKU", sortable: true },
       {
         path: "additionalData.domain",
@@ -131,7 +131,9 @@ class CMPTDCustomerOrders extends React.Component {
       { path: "quantity", label: "Units", sortable: true },
       { path: "unitPrice", label: "Unit Price", sortable: true },
       { path: "status", label: "Status", sortable: true },
-      { path: "lineStatus", label: "Line Status", sortable: true },
+      { path: "lineStatus", label: "Line Status", sortable: true,
+        content:(o)=>o.lineStatus==='processing'?el('div',{key:'divSpin'+o.orderNumber,className:'loader-content-sm'}):
+        el('div',{key:'divSpin'+o.orderNumber},o.lineStatus) },
 
       {
         path: null,
@@ -146,13 +148,13 @@ class CMPTDCustomerOrders extends React.Component {
       },
       {
         path: null,
-        label: "Manage",
+        label: "Manage Licenses",
         sortable: true,
         content: (c) =>
           el(
             "button",
             { key: "btnManageTenant", onClick: () => handleManageTenant(c) },
-            "Manage Tenant"
+            "Edit"
           ),
       },
     ];
@@ -289,8 +291,8 @@ handleUpdateOrder=()=>{
    {
      if(res.BodyText.modifyOrdersDetails[0].status=='success')
      {
-        this.setState({showModal:false,orderUpdateError:null});
-        setTimeout(()=> this.getCustomerOrders(),3000);
+        this.setState({showModal:false,orderUpdateError:null,productDetails:null,modalDefaultAction:1});
+        setTimeout(()=> this.getCustomerOrders(),2000);
         setTimeout(()=> this.getCustomerOrders(),10000);
      }
      else if(res.BodyText.modifyOrdersDetails[0].status==="failed")
@@ -321,8 +323,8 @@ handleSetOrderStatus=(status)=>{
     {
       if(res.BodyText.modifyOrdersDetails[0].status=='success')
       {
-         this.setState({showModal:false});
-         setTimeout(()=> this.getCustomerOrders(),3000);
+         this.setState({showModal:false,orderUpdateError:null,productDetails:null,modalDefaultAction:1});
+         setTimeout(()=> this.getCustomerOrders(),2000);
          setTimeout(()=> this.getCustomerOrders(),10000);
          this.hideSpinner();
 
@@ -342,7 +344,7 @@ handleSetOrderStatus=(status)=>{
     el('div',{key:'divStatus'},[ 
       el('span',{key:"spanStatusText"},'Current status : '),
       el('span',{key:"spanStatusCompleted",className:'green-text'},productDetails?.lineStatus=="active"?'Acitve':''),
-      el('span',{key:"spanStatusNotCompleted", className:'red-text'},productDetails?.lineStatus=='inactive'?'In Acitve':''),
+      el('span',{key:"spanStatusNotCompleted", className:'red-text'},productDetails?.lineStatus=='inactive'?'Inacitve':''),
       ]),
     el('hr',{key:'hr1'}),
     el('h4',{key:'q1'},'What do you want to do?'),

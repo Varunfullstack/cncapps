@@ -55,8 +55,7 @@ class CMPTDCustomerSearch extends React.Component {
           (c.cncCustomerName != null &&
             c.cncCustomerName
               .toLowerCase()
-              .indexOf(input.value.toLowerCase()) >= 0) ||
-          c.phone1.toLowerCase().indexOf(input.value.toLowerCase()) >= 0
+              .indexOf(input.value.toLowerCase()) >= 0)
         );
       });
       this.setState({ filteredResult });
@@ -165,12 +164,12 @@ class CMPTDCustomerSearch extends React.Component {
     const { search, filteredResult } = this.state;
     const { el, handleEdit, handleSaas } = this;
     const columns = [
-      { path: "companyName", label: "Company Name", sortable: true },
-      { path: "email", label: "Email", sortable: true },
+      { path: "companyName", label: "StreamOne Company Name", sortable: true },
+      
       { path: "cncCustomerName", label: "CNC Customer", sortable: true },
       {
         path: "firstName",
-        label: "Customer Name",
+        label: "Contact Name",
         sortable: true,
         content: (c) =>
           el(
@@ -179,18 +178,20 @@ class CMPTDCustomerSearch extends React.Component {
             c.firstName + " " + c.lastName
           ),
       },
-      { path: "createdOn", label: "Created On", sortable: true },
+      { path: "email", label: "Email", sortable: true },
+     
+      // { path: "createdOn", label: "Created On", sortable: true },
       {
         path: null,
-        label: "Edit",
+        label: "Edit Company",
         sortable: false,
         content: (c) => el("button", { onClick: () => handleEdit(c) }, "Edit"),
       },
       {
         path: null,
-        label: "SaaS",
+        label: "Edit Licenses",
         sortable: false,
-        content: (c) => el("button", { onClick: () => handleSaas(c) }, "SaaS"),
+        content: (c) => el("button", { onClick: () => handleSaas(c) }, "Edit"),
       },
     ];
     //if(search&& search.result&&search.result.endCustomersDetails!=null)
@@ -199,7 +200,7 @@ class CMPTDCustomerSearch extends React.Component {
         key: "reaulttable",
         data: filteredResult || [],
         columns: columns,
-        defaultSortPath: "createdOn",
+        defaultSortPath: "companyName",
         defaultSortOrder: "desc",
         pk: "endCustomerId",
       });

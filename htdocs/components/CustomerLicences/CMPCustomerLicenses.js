@@ -1,13 +1,9 @@
 "use strict";
-import AutoComplete from "./../utils/autoComplete.js?v=1";
-import Table from './../utils/table/table.js?v=1';
-import * as Utils from './../utils/utils.js?v=1';
-import APICustomerLicenses from './APICustomerLicenses.js?v=1';
-import APITechData from './../services/APITechData.js?v=1';
-import CMPTDCustomerSearch from './CMPTDCustomerSearch.js?v=1';
-import CMPTDCustomerDetails from './CMPTDCustomerDetails.js?v=2';
-import CMPTDCustomerOrders from './CMPTDCustomerOrders.js?v=1';
-import CMPTDOrderDetails from './CMPTDOrderDetails.js?v=1'
+import APICustomerLicenses from './APICustomerLicenses.js?v=3';
+import CMPTDCustomerSearch from './CMPTDCustomerSearch.js?v=3';
+import CMPTDCustomerDetails from './CMPTDCustomerDetails.js?v=3';
+import CMPTDCustomerOrders from './CMPTDCustomerOrders.js?v=3';
+import CMPTDOrderDetails from './CMPTDOrderDetails.js?v=3'
 /**
  * Don't forget to change v value in js import before push to gethub to avoid cache problem
  */

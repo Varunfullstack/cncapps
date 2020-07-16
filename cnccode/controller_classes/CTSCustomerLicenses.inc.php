@@ -107,27 +107,27 @@ class CTSCustomerLicenses extends CTCNC
         switch ($action) {
             case 'searchOrders':
                 $this->setMenuId(312);
-                $this->setPageTitle('TechData Orders');
+                $this->setPageTitle('StreamOne Orders');
                 break;
             case 'newOrder':
                 $this->setMenuId(312);
-                $this->setPageTitle('TechData Place New Order');
+                $this->setPageTitle('StreamOne Place New Order');
                 break;
             case "editOrder":
                 $this->setMenuId(312);
-                $this->setPageTitle('TechData Edit Order');
+                $this->setPageTitle('StreamOne Edit Order');
                 break;
             case 'searchCustomers':
                 $this->setMenuId(312);
-                $this->setPageTitle('TechData Customers');
+                $this->setPageTitle('StreamOne Customers');
                 break;
             case 'addNewCustomer';
                 $this->setMenuId(312);
-                $this->setPageTitle('TechData Add New Customer');
+                $this->setPageTitle('StreamOne Add New Customer');
                 break;
             case 'editCustomer':
                 $this->setMenuId(312);
-                $this->setPageTitle('TechData Edit Customer detials');
+                $this->setPageTitle('StreamOne Edit Customer detials');
                 break;
                 
         }

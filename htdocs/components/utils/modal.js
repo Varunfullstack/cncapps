@@ -23,7 +23,7 @@ export class Modal extends React.Component {
             key: "modalContent",
             className: "modal-content",
             style: { maxWidth },
-            onBlur: handleClose,
+            
           },
           [
             el("div", { key: "modalHeader", className: "modal-header" }, [

@@ -795,7 +795,7 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 312,
-                "label" => "TechData Customers",
+                "label" => "SteamOne Licenses",
                 "href"  => "CustomerLicenses.php?action=searchCustomers",
             ],
             // [
