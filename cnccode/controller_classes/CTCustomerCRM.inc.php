@@ -317,6 +317,12 @@ function setSite(&$siteArray)
     {
         $this->setParentFormFields();
         switch ($this->getAction()) {
+            case 'getReviewEngineers':
+                return $this->getReviewEngineersController();
+            case 'getCustomerReviewData':
+                return $this->getCustomerReviewDataController();
+            case 'updateCustomerReview':
+                return $this->updateCustomerReviewController();
             case 'createCustomerFolder':
                 $this->createCustomerFolder();
                 break;
@@ -667,6 +673,7 @@ function search()
             'CustomerCRM.inc'
         );
 
+
 // Parameters
         if ($this->getParam('save_page')) {
             $this->setSessionParam('save_page', $this->getParam('save_page'));
@@ -796,6 +803,7 @@ function search()
                 )
             );
 
+
         $site = new DBESite($this);
         $site->setValue(
             DBESite::siteNo,
@@ -815,13 +823,10 @@ function search()
                 'reviewMeetingEmailSentFlag'         => $this->dsCustomer->getValue(
                     DBECustomer::reviewMeetingEmailSentFlag
                 ),
-                'customerNotePopupLink'              => $this->getCustomerNotePopupLink($this->getCustomerID()),
                 'customerID'                         => $this->dsCustomer->getValue(DBECustomer::customerID),
                 'customerName'                       => $this->dsCustomer->getValue(DBECustomer::name),
                 'reviewCount'                        => $this->buCustomer->getReviewCount(),
                 'customerFolderLink'                 => $customerFolderLink,
-                //                'customerNameClass'                  => $this->dsCustomer->getValue(DBECustomer::NameClass),
-                //                'SectorMessage'                      => $this->dsCustomer->getValue(DBECustomer::SectorMessage),
                 'regNo'                              => $this->dsCustomer->getValue(DBECustomer::regNo),
                 'websiteURL'                         => $this->dsCustomer->getValue(DBECustomer::websiteURL),
                 'mailshotFlagChecked'                => $this->getChecked(
@@ -1796,12 +1801,10 @@ function search()
             }
 
         }
-        if ($this->dsCustomer->getValue(DBECustomer::customerID)) {
-            $this->documents(
-                $this->dsCustomer->getValue(DBECustomer::customerID),
-                'CustomerEdit'
-            );
-        }
+        $this->template->setVar(
+            'javaScript',
+            "<script src='components/customerEditMain/dist/CustomerReviewComponent.js?version=1.0.0'></script><script src=components/customerEditMain/dist/CustomerNotesComponent.js?version=1.0.0'></script>",
+        );
 
         $this->template->parse(
             'CONTENTS',

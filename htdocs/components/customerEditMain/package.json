@@ -5,12 +5,24 @@
     "main": "CMPMySettings.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "parcel src/CustomerEditMain.js --public-url /components/customerEditMain/dist" ,
-        "build": "parcel build src/CustomerEditMain.js --public-url /components/customerEditMain/dist"
+        "buildCustomerEditMainComponent": "parcel build src/CustomerEditMain.js --public-url /components/customerEditMain/dist",
+        "buildCustomerNotesComponent": "parcel build src/CustomerNotesComponent.js --public-url /components/customerEditMain/dist",
+        "buildCustomerReviewComponent": "parcel build src/CustomerReviewComponent.js --public-url /components/customerEditMain/dist",
+        "buildCustomerProjectsComponent": "parcel build src/CustomerProjectsComponent.js --public-url /components/customerEditMain/dist",
+        "buildCustomerPortalDocumentsComponent": "parcel build src/CustomerPortalDocumentsComponent.js --public-url /components/customerEditMain/dist",
+        "startCustomerEditMainComponent": "parcel src/CustomerEditMain.js --public-url /components/customerEditMain/dist",
+        "startCustomerNotesComponent": "parcel src/CustomerReviewComponent.js --public-url /components/customerEditMain/dist",
+        "startCustomerReviewComponent": "parcel src/CustomerNotesComponent.js --public-url /components/customerEditMain/dist",
+        "startCustomerProjectsComponent": "parcel src/CustomerProjectsComponent.js --public-url /components/customerEditMain/dist",
+        "startCustomerPortalDocumentsComponent": "parcel src/CustomerPortalDocumentsComponent.js --public-url /components/customerEditMain/dist",
+        "start": "npm run startCustomerEditMainComponent && npm run startCustomerReviewComponent && npm run startCustomerNotesComponent && npm run startCustomerProjectsComponent && npm run startCustomerPortalDocumentsComponent",
+        "build": "npm run buildCustomerEditMainComponent && npm run buildCustomerReview && npm run buildCustomerNotes && npm run buildCustomerProjectsComponent && npm run buildCustomerPortalDocumentsComponent"
     },
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "html-react-parser": "^0.13.0",
+        "moment": "^2.27.0",
         "react": "^16.13.1",
         "react-dom": "^16.13.1",
         "react-input-mask": "^2.0.4",

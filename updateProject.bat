@@ -1,2 +1,2 @@
 composer update && ^
-pushd htdocs\components\customerEditMain && npm install && npm run build && popd
+call buildReactApps.bat

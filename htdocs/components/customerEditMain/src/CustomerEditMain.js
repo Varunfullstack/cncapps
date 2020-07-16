@@ -2,6 +2,8 @@
 import React from 'react';
 import Select from "./Select";
 import EncryptedTextInput from "./EncryptedTextInput";
+import Skeleton from "react-loading-skeleton";
+import ReactDOM from 'react-dom';
 
 class CustomerEditMain extends React.Component {
     el = React.createElement;
@@ -633,6 +635,69 @@ class CustomerEditMain extends React.Component {
                 />
             </React.Fragment>
         );
+    getSLAResponseHoursInput() {
+        return [
+            "1",
+            this.el(
+                'input',
+                {
+                    type: 'text',
+                    value: this.state.customer.slaP1,
+                    onChange: this.handleSLAP1Update,
+                    key: 'SLAP1',
+                    size: 1,
+                    maxLength: 3
+                }
+            ),
+            " 2",
+            this.el(
+                'input',
+                {
+                    type: 'text',
+                    value: this.state.customer.slaP2,
+                    onChange: this.handleSLAP2Update,
+                    key: 'SLAP2',
+                    size: 1,
+                    maxLength: 3
+                }
+            ),
+            " 3",
+            this.el(
+                'input',
+                {
+                    type: 'text',
+                    value: this.state.customer.slaP3,
+                    onChange: this.handleSLAP3Update,
+                    key: 'SLAP3',
+                    size: 1,
+                    maxLength: 3
+                }
+            ),
+            " 4",
+            this.el(
+                'input',
+                {
+                    type: 'text',
+                    value: this.state.customer.slaP4,
+                    onChange: this.handleSLAP4Update,
+                    key: 'SLAP4',
+                    size: 1,
+                    maxLength: 3
+                }
+            ),
+            " 5",
+            this.el(
+                'input',
+                {
+                    type: 'text',
+                    value: this.state.customer.slaP5,
+                    onChange: this.handleSLAP5Update,
+                    key: 'SLAP5',
+                    size: 1,
+                    maxLength: 3
+                }
+            ),
+        ];
     }
 
     handleTechNotesUpdate(event) {
@@ -727,9 +792,19 @@ class CustomerEditMain extends React.Component {
     }
 
     render() {
-        return this.el(
-            'table',
-            {className: 'content', border: 0, cellPadding: 2, cellSpacing: 1, width: '100%'},
+        if (!this.state.loaded) {
+            return this.el(
+                Skeleton,
+                null,
+                this.el(
+                    'table',
+                    {className: 'content', border: 0, cellPadding: 2, cellSpacing: 1, width: '100%'},
+                    this.el('tbody')
+                )
+            );
+        }
+
+        return this.el('table', {className: 'content', border: 0, cellPadding: 2, cellSpacing: 1, width: '100%'},
             this.el('tbody', null,
                 [
                     this.getInputRow('Customer ' + this.props.customerID, this.getCustomerNameInput(), 'name', '13%'),

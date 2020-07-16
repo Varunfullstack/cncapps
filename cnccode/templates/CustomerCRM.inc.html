@@ -606,8 +606,6 @@
     }
 
 
-
-
     function askNewPassword() {
         var data = $(event.target).data();
         currentContactId = data.contactId;
@@ -1100,7 +1098,21 @@
         );
     }
 
+
     function checkMailShotOptions() {
+        window.event.preventDefault();
+        debugger;
+        document.customerReviewComponent.save()
+            .then(() => {
+                debugger;
+                if (validateData()) {
+                    window.event.target.submit();
+                }
+            })
+        return false;
+    }
+
+    function validateData() {
         const emails = {};
 
         const inputs = $(".contacts input[type='email']");
@@ -1119,8 +1131,6 @@
         }
 
         var x = document.getElementsByClassName('stmCheckBox');
-
-        console.log(x);
 
         var count = 0;
         var i = 0;
@@ -1161,7 +1171,14 @@
     }
 
     window.addEventListener('DOMContentLoaded', function () {
-        loadNote('first');
+        console.log('register event listener...');
+        document.querySelector('form[name="form"]')
+            .addEventListener(
+                'submit',
+                ($event) => {
+                    console.log('submit !!');
+
+                })
     })
     //-->
 </script>
@@ -1562,14 +1579,12 @@
 
 
 </style>
-
 <span class="formError">{errorMessage}</span>
-<!--<a href="{deleteCustomerURL}" onClick="if(!confirm('Are you sure you want to delete this customer?')) return(false)">{deleteCustomerText}</a>-->
 <form name="form"
       method="post"
       action="{submitURL}"
       AUTOCOMPLETE="off"
-      onsubmit="return checkMailShotOptions();"
+      onsubmit="return checkMailShotOptions()"
 >
     <button {disabled}
             name="Go"
@@ -2643,160 +2658,15 @@
             </table>
         </div>
     </div>
-    <div class="customerEditMainRightColumn">
-        <div id="customerNoteModifiedText">
-        </div>
-        <div class="customerNoteDetails">
-            <textarea
-                    {disabled}
-                    name="customerNoteDetails"
-                    id="customerNoteDetails"
-                    cols="120"
-                    onchange="setCustomerNotesChanged()"
-                    rows="12"
-            >{customerNoteDetails}
-            </textarea>
-        </div>
-        <div class="customerNoteNav">
-            <button {disabled}
-                    type="button"
-                    name="First"
-                    aria-hidden="true"
-                    onclick="loadNote('first')"
-            >
-                <i class="fa fa-step-backward">
-                </i> First
-            </button>
-            <button {disabled}
-                    type="button"
-                    name="Previous"
-                    onclick="loadNote('previous')"
-            >
-                <i class="fa fa-backward"
-                   aria-hidden="true"
-                >
-                </i> Back
-            </button>
-            <button {disabled}
-                    type="button"
-                    name="Next"
-                    onclick="loadNote('next')"
-            >
-                Next <i class="fa fa-forward"
-                        aria-hidden="true"
-            >
-            </i>
-            </button>
-            <button {disabled}
-                    type="button"
-                    name="Last"
-                    onclick="loadNote('last')"
-            >
-                Last <i class="fa fa-step-forward"
-                        aria-hidden="true"
-            >
-            </i>
-            </button>
-            <button {disabled}
-                    type="button"
-                    name="Delete"
-                    onclick="deleteNote()"
-            >
-                <i class="fa fa-trash"
-                   aria-hidden="true"
-                >
-                </i>
-                Delete
-            </button>
-            <button {disabled}
-                    type="button"
-                    name="New"
-                    onclick="newNote()"
-            >
-                <i class="fa fa-plus-circle"
-                   aria-hidden="true"
-                >
-                </i>
-                New
-            </button>
-            <button {disabled}
-                    type="button"
-                    name="Save"
-                    onclick="saveNote()"
-            >
-                <i class="fa fa-floppy-o"
-                   aria-hidden="true"
-                >
-                </i>
-                Save
-            </button>
-            {customerNotePopupLink}
-        </div>
-        <div class="customerReviewTime">
-            To be reviewed on
-            <input {disabled}
-                   type="date"
-                   name="form[customer][{customerID}][reviewDate]"
-                   id="reviewDate"
-                   value="{reviewDate}"
-                   size="10"
-                   maxlength="10"
-                   autocomplete="off"
-            >
-            Time
-            <input {disabled}
-                   name="form[customer][{customerID}][reviewTime]"
-                   value="{reviewTime}"
-                   size="5"
-                   maxlength="5"
-            >
-            <span class="formErrorMessage formError">{reviewTimeMessage}</span>By
-            <select
-                    {disabled}
-                    type="text"
-                    name="form[customer][{customerID}][reviewUserID]"
-                    onchange="setFormChanged();"
-            >
-                <!-- BEGIN reviewUserBlock -->
-                <option {reviewUserSelected}
-                        value="{reviewUserID}"
-                >{reviewUserName}
-                </option>
-                <!-- END reviewUserBlock -->
-            </select>
-        </div> <!-- customerReviewTime -->
-        <button {disabled}
-                name="Go"
-        ><i class="fa fa-floppy-o"
-            aria-hidden="true"
-        ></i> Save
-        </button>
-        <button {disabled}
-                name="Button"
-                onClick="document.location='{cancelURL}';"
-        ><i class="fa fa-ban"
-            aria-hidden="true"
-        ></i> Cancel
-        </button>
-        <div class="customerNoteHistory">
-        <textarea
-                cols="120"
-                rows="18"
-                readonly="readonly"
-                {disabled}
-                id="customerNoteHistory"
-        ></textarea>
-        </div>
-        <div>
-            {lastContractSent}
-        </div>
-
-
-        <input type="hidden"
-               value="{reviewAction}"
-               name="form[customer][{customerID}][reviewAction]"
-        />
-
-    </div> <!-- customerEditMainRightColumn -->
 </form>
-
+<div class="customerEditMainRightColumn">
+    <div id="reactCustomerReviewSection"
+         data-customer-id="{customerID}"
+    ></div>
+    <div id="reactCustomerNotes"
+         data-customer-id="{customerID}"
+    ></div>
+    <div>
+        {lastContractSent}
+    </div>
+</div> <!-- customerEditMainRightColumn -
