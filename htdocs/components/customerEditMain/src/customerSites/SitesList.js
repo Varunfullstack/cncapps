@@ -46,7 +46,6 @@ function debug(key, result) {
 
 function mapStateToProps(state) {
     const {customer, sites, contacts, visibilityFilter} = state;
-    console.log('state changed');
     return {
         sites: getVisibleSites(sites, visibilityFilter),
         customerId: customer.customerId,

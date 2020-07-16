@@ -12,7 +12,6 @@ export default class Site extends React.Component {
     }
 
     handleInputChange($event) {
-        console.log(this);
         const target = $event.target;
         let value = target.value;
         const name = target.name;
@@ -186,7 +185,6 @@ export default class Site extends React.Component {
     }
 
     render() {
-        console.log('site render called');
         let {site, customerId} = this.props;
         return (
             <table className="content"

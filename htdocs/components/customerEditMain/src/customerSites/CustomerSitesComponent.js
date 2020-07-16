@@ -46,7 +46,6 @@ export default class CustomerSitesComponent extends Component {
                             .then(response => response.json())
                             .then(response => {
                                 store.dispatch(savedSiteData(siteId));
-                                console.log('customer data saved');
                             })
                     }),
                 Promise.resolve(store.dispatch(savedCustomerData()))
