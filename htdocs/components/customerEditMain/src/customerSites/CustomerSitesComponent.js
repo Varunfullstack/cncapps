@@ -2,7 +2,14 @@ import configureStore from "./configureStore";
 import React, {Component} from 'react'
 import {Provider} from 'react-redux'
 import SitesList from "./SitesList";
-import {fetchContacts, fetchSites, initializeCustomer, savedSiteData, toggleVisibility} from "./actions";
+import {
+    fetchContacts,
+    fetchSites,
+    initializeCustomer,
+    savedCustomerData,
+    savedSiteData,
+    toggleVisibility
+} from "./actions";
 import ReactDOM from 'react-dom';
 import ToggleSwitch from "./dumbComponents/ToggleSwitch";
 
@@ -26,20 +33,24 @@ export default class CustomerSitesComponent extends Component {
     saveSites() {
         const state = store.getState();
         return Promise.all(
-            Object.keys(state.sites.sitesPendingChanges).map(siteId => {
-                return fetch('?action=updateSite', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(state.sites.byIds[siteId])
-                })
-                    .then(response => response.json())
-                    .then(response => {
-                        store.dispatch(savedSiteData(siteId));
-                        console.log('customer data saved');
-                    })
-            })
+            [
+                ...Object.keys(state.sites.sitesPendingChanges)
+                    .map(siteId => {
+                        return fetch('?action=updateSite', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(state.sites.byIds[siteId])
+                        })
+                            .then(response => response.json())
+                            .then(response => {
+                                store.dispatch(savedSiteData(siteId));
+                                console.log('customer data saved');
+                            })
+                    }),
+                Promise.resolve(store.dispatch(savedCustomerData()))
+            ]
         )
     }
 
