@@ -800,9 +800,7 @@
     }
 
     function isProspect() {
-        const becameCustomerDateElm = document.getElementById('becameCustomerDate');
-        const droppedCustomerDateElm = document.getElementById('droppedCustomerDate');
-        return !(becameCustomerDateElm.value && !droppedCustomerDateElm.value);
+        return document.customerMain.isProspect()
     }
 
     const isShowingInactive = {isShowingInactive};
@@ -939,10 +937,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', function () {
-
-        loadNote('first');
         checkIsProspect();
-
 
         document.querySelectorAll('.what3WordsInput').forEach(node => {
             console.log('test');
@@ -1365,6 +1360,7 @@
         }
     }
 
+
     function setCaretPosition(elemId, caretPos) {
         const elem = document.getElementById(elemId);
 
@@ -1398,7 +1394,7 @@
 
     function loadNote(noteIdentifier) {
 
-        const customerID = document.getElementById('customerID').value;
+        const customerID = {customerID};
 
         if (customerID == 0) {
             return;
@@ -1412,8 +1408,8 @@
 
         customerNotesChanged = false;
 
-        const created = document.getElementById('customerNoteCreated').value;
-        const url = "CustomerNote.php?action=getCustomerNote&customerID=" + customerID + "&created=" + created + "&identifier=" + noteIdentifier;
+        // const created = document.getElementById('customerNoteCreated').value;
+        const url = "CustomerNote.php?action=getCustomerNote&customerID=" + customerID + "&identifier=" + noteIdentifier;
 
         loadXMLDoc(url);
 
@@ -1609,10 +1605,12 @@
     }
 
     function checkMailShotOptions() {
-        validatingContactsModal.dialog('open');
-        const toReturn = runValidations();
-        validatingContactsModal.dialog('close');
-        return toReturn;
+        document.customerMain.save().then(() => {
+            validatingContactsModal.dialog('open');
+            const toReturn = runValidations();
+            validatingContactsModal.dialog('close');
+            return toReturn;
+        });
 
     }
 </script>
@@ -1630,7 +1628,6 @@
 <link rel="stylesheet"
       href="/font-awesome/css/font-awesome.css"
 />
-
 <span class="formError">{errorMessage}</span>
 <a href="{deleteCustomerURL}"
    onClick="if(!confirm('Are you sure you want to delete this customer?')) return(false)"
@@ -1641,45 +1638,6 @@
       AUTOCOMPLETE="off"
       onsubmit="return checkMailShotOptions();"
 >
-    <input type="hidden"
-           id="customerID"
-           name="form[customer][{customerID}][customerID]"
-           value="{customerID}"
-    >
-    <input type="hidden"
-           name="form[customer][{customerID}][createDate]"
-           value="{createDate}"
-    >
-    <input name="customerNoteID"
-           id="customerNoteID"
-           type="hidden"
-           value="{customerNoteID}"
-    >
-    <input name="customerNoteOrdheadID"
-           id="customerNoteOrdheadID"
-           type="hidden"
-           value="{customerNoteOrdheadID}"
-    >
-    <input name="customerNoteCreated"
-           id="customerNoteCreated"
-           type="hidden"
-           value="{customerNoteCreated}"
-    >
-    <input name="customerNoteModified"
-           id="customerNoteModified"
-           type="hidden"
-           value="{customerNoteModified}"
-    >
-    <input name="form[customer][{customerID}][reviewMeetingEmailSentFlag]"
-           id="reviewMeetingEmailSentFlag"
-           type="hidden"
-           value="{reviewMeetingEmailSentFlag}"
-    >
-    <input type="hidden"
-           id="websiteURL"
-           name="form[customer][{customerID}][websiteURL]"
-           value="{websiteURL}"
-    >
 
     <input {disabled}
            type="submit"
@@ -1726,580 +1684,23 @@
     <div class="customerEditMain">
 
         <div class="customerEditMainLeftColumn">
-
-            <table class="content"
-                   border="0"
-                   cellpadding="2"
-                   cellspacing="1"
-                   width="100%"
-            >
-                <tr valign="top">
-                    <td class="content"
-                        width="13%"
-                    >Customer {customerID}
-                    </td>
-                    <td class="content">
-                        <input {disabled}
-                               name="form[customer][{customerID}][name]"
-                               type="text"
-                               value="{customerName}"
-                               size="50"
-                               maxlength="50"
-                        >
-                    </td>
-
-                </tr>
-                <tr>
-                    <td class="content">Primary Main Contact</td>
-                    <td class="content">
-                        <select {disabled}
-                                id="primaryMainContactSelector"
-                                name="form[customer][{customerID}][primaryMainContactID]"
-                                {primaryMainMandatory}
-                        >
-                            <option value="">Select a contact to be the Primary Main</option>
-                            <!-- BEGIN primaryMainContactBlock -->
-                            <option {primaryMainContactSelected}
-                                    value="{primaryMainContactValue}"
-                            >
-                                {primaryMainContactDescription}
-                            </option>
-                            <!-- END primaryMainContactBlock -->
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Mailshot</td>
-                    <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[customer][{customerID}][mailshotFlag]"
-                               value="Y"
-                               {mailshotFlagChecked}
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Referred</td>
-                    <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[customer][{customerID}][referredFlag]"
-                               value="Y"
-                               id="referred"
-                               {referredFlagChecked}
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Special Attention</td>
-                    <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[customer][{customerID}][specialAttentionFlag]"
-                               value="Y"
-                               {specialAttentionFlagChecked}
-                        />
-                        until
-                        <input {disabled}
-                               type="date"
-                               name="form[customer][{customerID}][specialAttentionEndDate]"
-                               id="specialAttentionEndDate"
-                               value="{specialAttentionEndDate}"
-                               size="10"
-                               maxlength="10"
-                               autocomplete="off"
-                        >
-                        <span class="formErrorMessage">{specialAttentionEndDateMessage}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Last Review Meeting</td>
-                    <td class="content">
-                        <input {disabled}
-                               type="date"
-                               name="form[customer][{customerID}][lastReviewMeetingDate]"
-                               id="lastReviewMeetingDate"
-                               value="{lastReviewMeetingDate}"
-                               size="10"
-                               maxlength="10"
-                               autocomplete="off"
-                               onchange="clearReviewMeetingBooked()"
-                        >
-                        Booked <input {disabled}
-                                      type="checkbox"
-                                      name="form[customer][{customerID}][reviewMeetingBooked]"
-                                      id="reviewMeetingBooked"
-                                      {reviewMeetingBookedChecked}
-                                      value="1"
-                    >
-                        Frequency
-                        <select {disabled}
-                                name="form[customer][{customerID}][reviewMeetingFrequencyMonths]"
-                        >
-                            <!-- BEGIN reviewFrequencyBlock -->
-                            <option {reviewMeetingFrequencyMonthsSelected}
-                                    value="{reviewMeetingFrequencyMonths}"
-                            >
-                                {reviewMeetingFrequencyMonthsDescription}
-                            </option>
-                            <!-- END reviewFrequencyBlock -->
-                        </select>
-                        <span class="formErrorMessage">{reviewMeetingFrequencyMonthsMessage}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Lead Status</td>
-                    <td class="content">
-                        <select {disabled}
-                                name="form[customer][{customerID}][leadStatusId]"
-                        >
-                            <option value="">None</option>
-                            <!-- BEGIN leadStatusBlock -->
-                            <option {leadStatusSelected}
-                                    value="{leadStatusID}"
-                            >{leadStatusDescription}
-                            </option>
-                            <!-- END leadStatusBlock -->
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">24 Hour Cover</td>
-                    <td class="content">
-                        <input {disabled}
-                               type="checkbox"
-                               name="form[customer][{customerID}][support24HourFlag]"
-                               value="Y"
-                               {support24HourFlagChecked}
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Type</td>
-                    <td class="content">
-                        <select {disabled}
-                                name="form[customer][{customerID}][customerTypeID]"
-                        >
-                            <!-- BEGIN customerTypeBlock -->
-                            <option {customerTypeSelected}
-                                    value="{customerTypeID}"
-                            >{customerTypeDescription}
-                            </option>
-                            <!-- END customerTypeBlock -->
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Sector</td>
-                    <td class="content">
-                        <select {disabled}
-                                name="form[customer][{customerID}][sectorID]"
-                        >
-                            <option value="">Please select</option>
-                            <!-- BEGIN sectorBlock -->
-                            <option {sectorSelected}
-                                    value="{sectorID}"
-                            >{sectorDescription}
-                            </option>
-                            <!-- END sectorBlock -->
-                        </select>
-                        <span class="formErrorMessage">{SectorMessage}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">PCs</td>
-                    <td class="content">
-                        <input type="number"
-                               min="0"
-                               step="1"
-                               name="form[customer][{customerID}][noOfPCs]"
-                               {disabled}
-                               value="{noOfPCs}"
-                               size="10"
-                               maxlength="10"
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Servers</td>
-                    <td class="content">
-                        <input name="form[customer][{customerID}][noOfServers]"
-                               type="number"
-                               value="{noOfServers}"
-                               size="10"
-                               maxlength="10"
-                               {disabled}
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Reg</td>
-                    <td class="content">
-                        <input name="form[customer][{customerID}][regNo]"
-                               type="text"
-                               value="{regNo}"
-                               size="10"
-                               maxlength="10"
-                               {disabled}
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Sites</td>
-                    <td class="content">
-                        <input {disabled}
-                               name="form[customer][{customerID}][noOfSites]"
-                               type="text"
-                               value="{noOfSites}"
-                               size="2"
-                               maxlength="2"
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td class='content'>Pre-pay Top Up</td>
-                    <td class='content'>
-                        <input name="form[customer][{customerID}][gscTopUpAmount]"
-                               type="text"
-                               value="{gscTopUpAmount}"
-                               size="10"
-                               maxlength="10"
-                               {disabled}
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td class='content'>Became Customer</td>
-                    <td class='content'>
-                        <input name="form[customer][{customerID}][becameCustomerDate]"
-                               id="becameCustomerDate"
-                               type="date"
-                               value="{becameCustomerDate}"
-                               size="10"
-                               maxlength="10"
-                               {disabled}
-                               onchange="checkIsProspect()"
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td class='content'>Dropped Date</td>
-                    <td class='content'>
-                        <input name="form[customer][{customerID}][droppedCustomerDate]"
-                               id="droppedCustomerDate"
-                               type="date"
-                               value="{droppedCustomerDate}"
-                               size="10"
-                               maxlength="10"
-                               {disabled}
-                               onchange="checkIsProspect()"
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">SLA Response Hours</td>
-                    <td class="content">
-                        1<input name="form[customer][{customerID}][slaP1]"
-                                type="number"
-                                step="0.1"
-                                value="{slaP1}"
-                                size="1"
-                                maxlength="3"
-                                {disabled}
-                                style="width: 50px;"
-                    >
-                        2<input name="form[customer][{customerID}][slaP2]"
-                                type="number"
-                                step="0.1"
-                                value="{slaP2}"
-                                size="1"
-                                maxlength="3"
-                                {disabled}
-                                style="width: 50px;"
-                    >
-                        3<input name="form[customer][{customerID}][slaP3]"
-                                type="number"
-                                step="0.1"
-                                value="{slaP3}"
-                                size="1"
-                                maxlength="3"
-                                {disabled}
-                                style="width: 50px;"
-                    >
-                        4<input name="form[customer][{customerID}][slaP4]"
-                                type="number"
-                                step="0.1"
-                                value="{slaP4}"
-                                size="1"
-                                maxlength="3"
-                                {disabled}
-                                style="width: 50px;"
-                    >
-                        5<input name="form[customer][{customerID}][slaP5]"
-                                type="number"
-                                step="0.1"
-                                value="{slaP5}"
-                                size="1"
-                                maxlength="3"
-                                {disabled}
-                                style="width: 50px;"
-                    >
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">SLA Fix Hours</td>
-                    <td class="content">
-                        1<input name="form[customer][{customerID}][slaFixHoursP1]"
-                                value="{slaFixHoursP1}"
-                                type="number"
-                                size="1"
-                                step="0.1"
-                                maxlength="4"
-                                max="999.9"
-                                style="width: 50px;"
-                                {disabled}
-                    >
-                        2<input name="form[customer][{customerID}][slaFixHoursP2]"
-                                value="{slaFixHoursP2}"
-                                type="number"
-                                size="1"
-                                step="0.1"
-                                maxlength="4"
-                                max="999.9"
-                                style="width: 50px;"
-                                {disabled}
-                    >
-                        3<input name="form[customer][{customerID}][slaFixHoursP3]"
-                                value="{slaFixHoursP3}"
-                                type="number"
-                                size="1"
-                                step="0.1"
-                                maxlength="4"
-                                max="999.9"
-                                style="width: 50px;"
-                                {disabled}
-                    >
-                        4<input name="form[customer][{customerID}][slaFixHoursP4]"
-                                value="{slaFixHoursP4}"
-                                type="number"
-                                size="1"
-                                step="0.1"
-                                maxlength="4"
-                                max="999.9"
-                                style="width: 50px;"
-                                {disabled}
-                    >
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">SLA Penalties Agreed</td>
-                    <td class="content">
-                        1<input {disabled}
-                                type="checkbox"
-                                name="form[customer][{customerID}][slaP1PenaltiesAgreed]"
-                                {slaP1PenaltiesAgreedChecked}
-                                value="1"
-                    >
-                        2<input {disabled}
-                                type="checkbox"
-                                name="form[customer][{customerID}][slaP2PenaltiesAgreed]"
-                                {slaP2PenaltiesAgreedChecked}
-                                value="1"
-                    >
-                        3<input {disabled}
-                                type="checkbox"
-                                name="form[customer][{customerID}][slaP3PenaltiesAgreed]"
-                                {slaP3PenaltiesAgreedChecked}
-                                value="1"
-                    >
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Last Modified</td>
-                    <td class="content">{modifyDate}</td>
-                </tr>
-                <tr>
-                    <td colspan="2"
-                        class="content"
-                    >
-
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Technical Notes</td>
-                    <td class="content">
-                        <input {disabled}
-                               type="text"
-                               name="form[customer][{customerID}][techNotes]"
-                               id="techNotes"
-                               value="{techNotes}"
-                               size="54"
-                               maxlength="100"
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Active Directory Name</td>
-                    <td class="content">
-                        <input {disabled}
-                               type="text"
-                               name="form[customer][{customerID}][activeDirectoryName]"
-                               value="{activeDirectoryName}"
-                               size="54"
-                               maxlength="255"
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Account Manager</td>
-                    <td class="content">
-                        <select
-                                {disabled}
-                                type="text"
-                                name="form[customer][{customerID}][accountManagerUserID]"
-                                onchange="setFormChanged();"
-                        >
-                            <!-- BEGIN accountManagerBlock -->
-                            <option {accountManagerUserSelected}
-                                    value="{accountManagerUserID}"
-                            >
-                                {accountManagerUserName}
-                            </option>
-                            <!-- END accountManagerBlock -->
-                        </select>
-                    </td>
-                </tr>
-                <script>
-
-
-                    let storedPassPhrase = null;
-
-                    const masks = {
-                        sortCode: '00-00-00',
-                        accountNumber: '00000000'
-                    };
-
-                    function storePassPhrase(passPhrase) {
-                        storedPassPhrase = passPhrase;
-                        setTimeout(() => {
-                            storedPassPhrase = null;
-                        }, 30000);
-                    }
-
-
-                    function editEncrypted(id, element) {
-
-                        const el = $(element);
-                        const parent = el.closest('td');
-
-                        let encryptedValue = parent.find('.encrypted').val();
-                        let promise;
-
-                        if (encryptedValue) {
-                            let passPhrase = storedPassPhrase;
-                            if (!passPhrase) {
-                                passPhrase = prompt('Please provide secure passphrase');
-                                storePassPhrase(passPhrase);
-                            }
-                            if (!passPhrase) {
-                                return;
-                            }
-
-                            const formData = new FormData();
-
-                            formData.append('passphrase', passPhrase);
-                            formData.append('encryptedData', encryptedValue);
-                            promise = fetch('?action=decrypt', {
-                                method: 'POST',
-                                body: formData
-                            }).then(response => {
-                                if (response.ok) {
-                                    return response.json()
-                                }
-                                return null;
-                            }).then(json => {
-                                if (json) {
-                                    return json.decryptedData;
-                                } else {
-                                    return null;
-                                }
-                            })
-                        } else {
-                            promise = new Promise(resolve => {
-                                resolve()
-                            });
-                        }
-
-                        promise.then(data => {
-                            parent.append('<input id="' + id + '" name="form[customer][{customerID}][new' + capitalize(id) + ']" value="' + data + '">');
-                            $('#' + id).mask(masks[id]);
-                            el.hide();
-                        })
-
-                    }
-
-                    function capitalize(string) {
-                        return string.charAt(0).toUpperCase() + string.slice(1);
-                    }
-                </script>
-                <tr>
-                    <td class="content">Sort Code</td>
-                    <td class="content">
-                        <button type="button"
-                                onclick="editEncrypted('sortCode',this)"
-                        >
-                            <i class="fa fa-pencil-alt {sortCodePencilColor}">
-                            </i>
-                        </button>
-                        <input type="hidden"
-                               name="form[customer][{customerID}][sortCode]"
-                               value="{sortCode}"
-                               class="encrypted"
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Account Name</td>
-                    <td class="content">
-                        <input {disabled}
-                               type="text"
-                               name="form[customer][{customerID}][accountName]"
-                               id="accountName"
-                               value="{accountName}"
-                               size="18"
-                               maxlength="18"
-                        >
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">Account Number</td>
-                    <td class="content">
-                        <button type="button"
-                                onclick="editEncrypted('accountNumber',this)"
-                        >
-                            <i class="fa fa-pencil-alt {accountNumberPencilColor}">
-                            </i>
-                        </button>
-                        <input type="hidden"
-                               name="form[customer][{customerID}][accountNumber]"
-                               value="{accountNumber}"
-                               class="encrypted"
-                        >
-                    </td>
-                </tr>
-
-            </table>
-
+            <div id="reactCustomerEditMain"
+                 data-customer-id="{customerID}"
+                 class="loader"
+            ></div>
         </div> <!-- customerEditMainLeftColumn -->
 
         <div class="customerEditMainRightColumn">
 
             <div class="customerReviewTime">
                 To be reviewed on
+                <input name="customerID"
+                       type="hidden"
+                       value="{customerID}"
+                />
                 <input {disabled}
                        type="date"
-                       name="form[customer][{customerID}][reviewDate]"
+                       name="form[customer][reviewDate]"
                        id="reviewDate"
                        value="{reviewDate}"
                        size="10"
@@ -2308,7 +1709,7 @@
                 >
                 Time
                 <input {disabled}
-                       name="form[customer][{customerID}][reviewTime]"
+                       name="form[customer][reviewTime]"
                        value="{reviewTime}"
                        size="5"
                        maxlength="5"
@@ -2317,7 +1718,7 @@
                 <select
                         {disabled}
                         type="text"
-                        name="form[customer][{customerID}][reviewUserID]"
+                        name="form[customer][reviewUserID]"
                         onchange="setFormChanged();"
                 >
                     <!-- BEGIN reviewUserBlock -->
@@ -2334,7 +1735,7 @@
                           {disabled}
                           cols="120"
                           rows="3"
-                          name="form[customer][{customerID}][reviewAction]"
+                          name="form[customer][reviewAction]"
                 >{reviewAction}</textarea>
             </div>
 

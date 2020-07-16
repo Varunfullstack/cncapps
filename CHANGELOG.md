@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased] 
 ### Changed
 - Issue 909 - Update GUI on Customer Page
+- Issue 913 - Customer Page Main Section Rewrite
 
 ## [v4.2.3] - 2020-07-15
 ### Changed
