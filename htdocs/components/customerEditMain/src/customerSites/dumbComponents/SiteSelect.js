@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SiteSelect = (value, labelText, handleChange, options, name, optionLabelFn) => {
+const SiteSelect = ({value, labelText, handleChange, options, name, optionLabelFn}) => {
     return (
         <tr>
             <td className="content">{labelText}</td>

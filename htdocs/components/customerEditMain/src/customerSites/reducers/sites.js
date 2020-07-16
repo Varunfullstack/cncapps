@@ -1,10 +1,11 @@
-import {FETCH_SITES_REQUEST, FETCH_SITES_SUCCESS} from "../actionTypes";
+import {FETCH_SITES_REQUEST, FETCH_SITES_SUCCESS, SITE_DATA_SAVED, UPDATE_SITE} from "../actionTypes";
 
 const initialState = {
     allIds: [],
     byIds: {},
     isFetching: false,
-    lastUpdated: null
+    lastUpdated: null,
+    sitesPendingChanges: {}
 }
 
 export default function (state = initialState, action) {
@@ -28,6 +29,37 @@ export default function (state = initialState, action) {
                 ),
                 isFetching: false,
                 lastUpdated: new Date()
+            }
+        case UPDATE_SITE:
+            //we are receiving changes from a component and we need to update the site with the changes
+            return {
+                ...state,
+                byIds: {
+                    ...state.byIds,
+                    [action.siteNo]: {
+                        ...state.byIds[action.siteNo],
+                        ...action.data
+                    }
+                },
+                sitesPendingChanges: {
+                    ...state.sitesPendingChanges,
+                    [action.siteNo]: null
+                }
+            }
+        case SITE_DATA_SAVED:
+            return {
+                ...state,
+                sitesPendingChanges: Object
+                    .keys(state.sitesPendingChanges)
+                    .reduce(
+                        (acc, key) => {
+                            if (key === action.siteNo) {
+                                return acc;
+                            }
+                            acc[key] = null;
+                        },
+                        {}
+                    )
             }
         default:
             return state

@@ -5,147 +5,21 @@ import SiteInput from "./dumbComponents/SiteInput";
 
 export default class Site extends React.Component {
 
-    formStructure = [
-        {
-            name: "address1",
-            size: 35,
-            maxLength: 35,
-            handleChange: this.handleInputChange,
-            required: true,
-            labelWidth: "13%",
-            inputWidth: "87%",
-            labelText: "Site Address",
-            value: this.props.site.address1,
-        },
-        {
-            name: "address2",
-            size: 35,
-            maxLength: 35,
-            handleChange: this.handleInputChange,
-            labelText: " ",
-            value: this.props.site.address2,
-        },
-        {
-            name: "address3",
-            size: 35,
-            maxLength: 35,
-            handleChange: this.handleInputChange,
-            labelText: " ",
-            value: this.props.site.address3
-        },
-        {
-            name: "town",
-            size: 25,
-            maxLength: 25,
-            handleChange: this.handleInputChange,
-            labelText: "Town",
-            value: this.props.site.town,
-            required: true
-        },
-        {
-            name: "county",
-            size: 25,
-            maxLength: 25,
-            handleChange: this.handleInputChange,
-            labelText: "County",
-            value: this.props.site.county,
-            required: true
-        },
-        {
-            name: "what3Words",
-            handleChange: this.handleInputChange,
-            value: this.props.site.what3Words,
-            component: What3WordsInput
-        },
-        {
-            name: "postcode",
-            size: 15,
-            maxLength: 15,
-            handleChange: this.handleInputChange,
-            labelText: "Postcode",
-            value: this.props.site.postcode,
-            required: true
-        },
-        {
-            name: "phone",
-            size: 20,
-            maxLength: 20,
-            handleChange: this.handleInputChange,
-            labelText: "Phone",
-            value: this.props.site.phone,
-            className: "telephoneValidator"
-        },
-        {
-            name: "maxTravelHours",
-            size: 5,
-            maxLength: 5,
-            type: 'number',
-            handleChange: this.handleInputChange,
-            labelText: "Max Travel Hours",
-            value: this.props.site.maxTravelHours
-        },
-        {
-            name: "invoiceSiteNo",
-            type: 'radio',
-            handleChange: (e) => this.props.changeInvoiceSiteNo(e.target.value),
-            labelText: "Default Invoice",
-            value: this.props.site.siteNo !== null ? this.props.site.siteNo : '',
-            checked: +this.props.invoiceSiteNo === +this.props.site.siteNo
-        },
-        {
-            name: "deliverSiteNo",
-            type: 'radio',
-            handleChange: (e) => this.props.changedDeliverSiteNo(e.target.value),
-            labelText: "Default Delivery",
-            value: this.props.site.siteNo !== null ? this.props.site.siteNo : '',
-            checked: +this.props.deliverSiteNo === +this.props.site.siteNo
-        },
-        {
-            name: "invoiceContact",
-            handleChange: this.handleInputChange,
-            labelText: "Invoice Contact",
-            value: this.props.site.invoiceContact,
-            options: this.props.contacts,
-            optionLabelFn: x => `${x.firstName} ${x.lastName}`,
-            component: SiteSelect,
-        },
-        {
-            name: "deliveryContact",
-            handleChange: this.handleInputChange,
-            labelText: "Delivery Contact",
-            value: this.props.site.deliveryContact,
-            options: this.props.contacts,
-            optionLabelFn: x => `${x.firstName} ${x.lastName}`,
-            component: SiteSelect,
-        },
-        {
-            name: "nonUKFlag",
-            type: 'checkbox',
-            handleChange: this.handleInputChange,
-            labelText: "Non UK",
-            value: 'Y',
-            checked: this.props.site.nonUKFlag === 'Y'
-        },
-        {
-            name: "active",
-            type: 'checkbox',
-            handleChange: this.handleInputChange,
-            labelText: "Active",
-            value: 'Y',
-            checked: this.props.site.active === 'Y'
-        },
-    ]
-
     constructor(props) {
         super(props);
         this.handleDeliverContact = this.handleDeliverContact.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
-
     }
 
     handleInputChange($event) {
+        console.log(this);
         const target = $event.target;
-        const value = 1;
+        let value = target.value;
+        const name = target.name;
+        if (target.type === 'checkbox') {
+            value = target.checked;
+        }
+        this.props.updateSite(this.props.site.siteNo, {[name]: value});
     }
 
     checkDelete() {
@@ -157,12 +31,144 @@ export default class Site extends React.Component {
     }
 
     renderFields() {
-        return this.formStructure.map(x => {
+        const formStructure = [
+            {
+                name: "address1",
+                size: 35,
+                maxLength: 35,
+                handleChange: ($event) => this.handleInputChange($event),
+                required: true,
+                labelWidth: "13%",
+                inputWidth: "87%",
+                labelText: "Site Address",
+                value: this.props.site.address1,
+            },
+            {
+                name: "address2",
+                size: 35,
+                maxLength: 35,
+                handleChange: this.handleInputChange,
+                labelText: " ",
+                value: this.props.site.address2,
+            },
+            {
+                name: "address3",
+                size: 35,
+                maxLength: 35,
+                handleChange: this.handleInputChange,
+                labelText: " ",
+                value: this.props.site.address3
+            },
+            {
+                name: "town",
+                size: 25,
+                maxLength: 25,
+                handleChange: this.handleInputChange,
+                labelText: "Town",
+                value: this.props.site.town,
+                required: true
+            },
+            {
+                name: "county",
+                size: 25,
+                maxLength: 25,
+                handleChange: this.handleInputChange,
+                labelText: "County",
+                value: this.props.site.county,
+                required: true
+            },
+            {
+                name: "what3Words",
+                handleChange: this.handleInputChange,
+                value: this.props.site.what3Words,
+                component: What3WordsInput
+            },
+            {
+                name: "postcode",
+                size: 15,
+                maxLength: 15,
+                handleChange: this.handleInputChange,
+                labelText: "Postcode",
+                value: this.props.site.postcode,
+                required: true
+            },
+            {
+                name: "phone",
+                size: 20,
+                maxLength: 20,
+                handleChange: this.handleInputChange,
+                labelText: "Phone",
+                value: this.props.site.phone,
+                className: "telephoneValidator"
+            },
+            {
+                name: "maxTravelHours",
+                size: 5,
+                maxLength: 5,
+                type: 'number',
+                handleChange: this.handleInputChange,
+                labelText: "Max Travel Hours",
+                value: this.props.site.maxTravelHours
+            },
+            {
+                name: "invoiceSiteNo",
+                type: 'radio',
+                handleChange: (e) => this.props.changeInvoiceSiteNo(e.target.value),
+                labelText: "Default Invoice",
+                value: `${this.props.site.siteNo}`,
+                checked: +this.props.invoiceSiteNo === +this.props.site.siteNo
+            },
+            {
+                name: "deliverSiteNo",
+                type: 'radio',
+                handleChange: (e) => this.props.changedDeliverSiteNo(e.target.value),
+                labelText: "Default Delivery",
+                value: `${this.props.site.siteNo}`,
+                checked: +this.props.deliverSiteNo === +this.props.site.siteNo
+            },
+            {
+                name: "invoiceContact",
+                handleChange: this.handleInputChange,
+                labelText: "Invoice Contact",
+                value: this.props.site.invoiceContact,
+                options: this.props.contacts,
+                optionLabelFn: x => `${x.firstName} ${x.lastName}`,
+                component: SiteSelect,
+            },
+            {
+                name: "deliveryContact",
+                handleChange: this.handleInputChange,
+                labelText: "Delivery Contact",
+                value: this.props.site.deliveryContact,
+                options: this.props.contacts,
+                optionLabelFn: x => `${x.firstName} ${x.lastName}`,
+                component: SiteSelect,
+            },
+            {
+                name: "nonUKFlag",
+                type: 'checkbox',
+                handleChange: this.handleInputChange,
+                labelText: "Non UK",
+                value: '1',
+                checked: this.props.site.nonUKFlag
+            },
+            {
+                name: "active",
+                type: 'checkbox',
+                handleChange: this.handleInputChange,
+                labelText: "Active",
+                value: '1',
+                checked: this.props.site.active
+            },
+        ]
+
+        return formStructure.map(x => {
             const TagName = x.component || SiteInput;
             return (
                 <TagName
                     name={x.name}
                     size={x.size}
+                    type={x.type}
                     maxLength={x.maxLength}
                     handleChange={x.handleChange}
                     required={x.required}
@@ -180,6 +186,7 @@ export default class Site extends React.Component {
     }
 
     render() {
+        console.log('site render called');
         let {site, customerId} = this.props;
         return (
             <table className="content"
