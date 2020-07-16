@@ -1109,11 +1109,15 @@ class CTCustomer extends CTCNC
                     $customers[] = [
                         "id"   => $dsResult->getValue(DBECustomer::customerID),
                         "name" => $dsResult->getValue(DBECustomer::name),
+                        "techDataCustomerId" => $dsResult->getValue(DBECustomer::techDataCustomerId),
                     ];
                 }
 
                 echo json_encode($customers);
                 break;
+            case "getCurrentUser":
+                echo $this->getCurrentUser();
+                exit;
             default:
                 $this->displaySearchForm();
                 break;
@@ -3367,5 +3371,14 @@ class CTCustomer extends CTCNC
         } else {
             $this->displayEditForm();
         }
+    }
+    function getCurrentUser()
+    {
+        return json_encode( [
+            'firstName' => $this->dbeUser->getValue(DBEJUser::firstName),
+            'lastName' => $this->dbeUser->getValue(DBEJUser::lastName),
+            'id' => $this->dbeUser->getValue(DBEJUser::userID),
+            'email' => $this->dbeUser->getEmail()
+        ]);
     }
 }

@@ -13,6 +13,7 @@ class AutoComplete extends React.Component {
       // What the user has entered
       userInput: "",
     };
+    
   }
   // Event fired when the input value is changed
   onChange = (e) => {
@@ -41,6 +42,7 @@ class AutoComplete extends React.Component {
   onClick = (item) => {
     const {displayColumn,onSelect}=this.props;
     // Update the user input and reset the rest of the state
+    //console.log('click',item);
     this.setState({
       activeSuggestion: 0,
        showSuggestions: false,
@@ -113,9 +115,14 @@ class AutoComplete extends React.Component {
   handleOnBlur=e=>{
       setTimeout(()=>{
         this.setState({showSuggestions:false})
-      },110);
+      },200);
+  }
+  componentDidUpdate(prevProps) {
+    
   }
   render() {
+    const {displayColumn,pk,errorMessage}=this.props;
+   
     const {
       onChange,
       onClick,
@@ -129,7 +136,6 @@ class AutoComplete extends React.Component {
       handleOnClick,
       handleOnBlur
     } = this;
-    const {displayColumn,pk,errorMessage}=this.props;
     let suggestionsListComponent;
 
     if (showSuggestions) {
@@ -142,25 +148,26 @@ class AutoComplete extends React.Component {
           if (index === activeSuggestion) {
             className = "suggestion-active";
           }
-        
-          return /*#__PURE__*/React.createElement("li", {
+         
+          return React.createElement("li", {
             className: className,
             key: pk ? suggestion[pk] : suggestion,
             onClick: () => onClick(suggestion)
           }, displayColumn ? suggestion[displayColumn] : suggestion);
         }));
       } else {
+        if(userInput!="")
         suggestionsListComponent =React.createElement("div", {
           className: "no-suggestions"
-        }, /*#__PURE__*/React.createElement("em", null, errorMessage ? errorMessage : "No items "));
+        }, React.createElement("em", null, errorMessage ? errorMessage : "No items "));
       }
     }
-
+    let defaultValue=this.props.value?this.props.value:"";
     return React.createElement("div", null, React.createElement("input", {
       type: "text",
       onChange: onChange,
       onKeyDown: onKeyDown,
-      value: userInput,
+      value: userInput||defaultValue,
       onClick: handleOnClick,
       onBlur: handleOnBlur,
       style:{width:'100%'}

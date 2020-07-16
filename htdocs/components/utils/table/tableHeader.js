@@ -49,7 +49,7 @@ class TableHeader extends React.Component {
             "th",
             {
               className: "clickable",
-              key: c.path || c.key,
+              key: c.path || c.key||c.label.replace(' ',''),
               onClick: () => raiseSort(c.path),
             },
             c.label,

@@ -793,6 +793,16 @@ class CTCNC extends Controller
                 "label" => "Quote Templates",
                 "href"  => "QuoteTemplates.php",
             ],
+            [
+                "id"    => 312,
+                "label" => "TechData Customers",
+                "href"  => "CustomerLicenses.php?action=searchCustomers",
+            ],
+            // [
+            //     "id"    => 313,
+            //     "label" => "TechData Orders",
+            //     "href"  => "CustomerLicenses.php?action=searchOrders",
+            // ],
         ];
     }
 

@@ -74,6 +74,7 @@ class DBECustomer extends DBCNCEntity
     const slaP1PenaltiesAgreed = "slaP1PenaltiesAgreed";
     const slaP2PenaltiesAgreed = "slaP2PenaltiesAgreed";
     const slaP3PenaltiesAgreed = "slaP3PenaltiesAgreed";
+    const techDataCustomerId = "techDataCustomerId";
 
 
     /**
@@ -469,7 +470,11 @@ class DBECustomer extends DBCNCEntity
             null,
             false
         );
-
+        $this->addColumn(
+            self::techDataCustomerId,
+            DA_TEXT,
+            DA_ALLOW_NULL,"techDataCustomerId"
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
