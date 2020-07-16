@@ -137,6 +137,7 @@ class CTCustomer extends CTCNC
     const customerFormLastReviewMeetingDateMessage = 'lastReviewMeetingDateMessage';
     const GET_CUSTOMER_SITES = "getSites";
     const GET_CUSTOMER_CONTACTS = "getContacts";
+    const UPDATE_SITE = "updateSite";
     public $customerID;
     public $customerString;
     public $contactString;
@@ -303,6 +304,10 @@ class CTCustomer extends CTCNC
                 $this->dsContact->setValue(
                     DBEContact::portalPassword,
                     $dbeContact->getValue(DBEContact::portalPassword)
+                );
+                $this->dsContact->setValue(
+                    DBEContact::active,
+                    $dbeContact->getValue(DBEContact::active)
                 );
             }
 
@@ -559,6 +564,7 @@ class CTCustomer extends CTCNC
                     ($this->dsContact->getValue(DBEContact::firstName)) |
                     ($this->dsContact->getValue(DBEContact::lastName))
                 ) {
+                    $this->dsContact->setValue(DBEContact::active, 1);
                     $this->dsContact->post();
                 }
             } else {
@@ -779,6 +785,21 @@ class CTCustomer extends CTCNC
                 @$value['specialAttentionEndDate']
             );
 
+            $this->dsCustomer->setValue(
+                DBECustomer::slaP1PenaltiesAgreed,
+                @$value['slaP1PenaltiesAgreed']
+            );
+
+            $this->dsCustomer->setValue(
+                DBECustomer::slaP2PenaltiesAgreed,
+                @$value['slaP2PenaltiesAgreed']
+            );
+
+            $this->dsCustomer->setValue(
+                DBECustomer::slaP3PenaltiesAgreed,
+                @$value['slaP3PenaltiesAgreed']
+            );
+
             if (
                 $this->dsCustomer->getValue(DBECustomer::specialAttentionFlag) == 'Y' &&
                 !$this->dsCustomer->getValue(DBECustomer::specialAttentionEndDate)
@@ -902,6 +923,12 @@ class CTCustomer extends CTCNC
                 DBECustomer::slaP5,
                 @$value['slaP5']
             );
+
+            $this->dsCustomer->setValue(DBECustomer::slaFixHoursP1, @$value['slaFixHoursP1']);
+            $this->dsCustomer->setValue(DBECustomer::slaFixHoursP2, @$value['slaFixHoursP2']);
+            $this->dsCustomer->setValue(DBECustomer::slaFixHoursP3, @$value['slaFixHoursP3']);
+            $this->dsCustomer->setValue(DBECustomer::slaFixHoursP4, @$value['slaFixHoursP4']);
+
             $this->dsCustomer->setValue(
                 DBECustomer::pcxFlag,
                 $this->getYN(@$value['pcxFlag'])
@@ -956,6 +983,11 @@ class CTCustomer extends CTCNC
         }
     }
 
+    function updateSite()
+    {
+
+    }
+
     /**
      * Route to function based upon action passed
      * @throws Exception
@@ -983,6 +1015,8 @@ class CTCustomer extends CTCNC
                 return $this->getCustomerSitesController();
             case self::GET_CUSTOMER_CONTACTS:
                 return $this->getCustomerContactsController();
+            case self::UPDATE_SITE:
+                return $this->updateSiteController();
             case CTCUSTOMER_ACT_SEARCH:
                 $this->search();
                 break;
@@ -1364,8 +1398,8 @@ class CTCustomer extends CTCNC
                 "sageRef"        => $dbeSite->getValue(DBESite::sageRef),
                 "phone"          => $dbeSite->getValue(DBESite::phone),
                 "maxTravelHours" => $dbeSite->getValue(DBESite::maxTravelHours),
-                "active"         => $dbeSite->getValue(DBESite::activeFlag),
-                "nonUKFlag"      => $dbeSite->getValue(DBESite::nonUKFlag),
+                "active"         => $dbeSite->getValue(DBESite::activeFlag) == 'Y',
+                "nonUKFlag"      => $dbeSite->getValue(DBESite::nonUKFlag) == 'Y',
                 "what3Words"     => $dbeSite->getValue(DBESite::what3Words),
                 "canDelete"      => $this->buCustomer->canDeleteSite($customerId, $dbeSite->getValue(DBESite::siteNo))
             ];
@@ -1433,6 +1467,40 @@ class CTCustomer extends CTCNC
             ];
         }
         echo json_encode(["status" => "ok", "data" => $contacts]);
+    }
+
+    function updateSiteController()
+    {
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!isset($data['siteNo']) || !isset($data['customerID'])) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "CustomerId and siteNo are required"]);
+            exit;
+        }
+        $dbeSite = new DBESite($this);
+        $dbeSite->setValue(DBESite::customerID, $data['customerID']);
+        $dbeSite->setValue(DBESite::siteNo, $data['siteNo']);
+        $dbeSite->getRow();
+        $dbeSite->setValue(DBESite::add1, $data["address1"]);
+        $dbeSite->setValue(DBESite::add2, $data["address2"]);
+        $dbeSite->setValue(DBESite::add3, $data["address3"]);
+        $dbeSite->setValue(DBESite::town, $data["town"]);
+        $dbeSite->setValue(DBESite::county, $data["county"]);
+        $dbeSite->setValue(DBESite::postcode, $data["postcode"]);
+        $dbeSite->setValue(DBESite::invoiceContactID, $data["invoiceContact"]);
+        $dbeSite->setValue(DBESite::deliverContactID, $data["deliverContact"]);
+        $dbeSite->setValue(DBESite::debtorCode, $data["debtorCode"]);
+        $dbeSite->setValue(DBESite::sageRef, $data["sageRef"]);
+        $dbeSite->setValue(DBESite::phone, $data["phone"]);
+        $dbeSite->setValue(DBESite::maxTravelHours, $data["maxTravelHours"]);
+        $dbeSite->setValue(DBESite::activeFlag, $data["active"] ? 'Y' : 'N');
+        $dbeSite->setValue(DBESite::nonUKFlag, $data["nonUKFlag"] ? 'Y' : 'N');
+        $dbeSite->setValue(DBESite::what3Words, $data["what3Words"]);
+        $dbeSite->updateRow();
+
+        echo json_encode(
+            ["status" => "ok",]
+        );
     }
 
     /**
@@ -1992,6 +2060,19 @@ class CTCustomer extends CTCNC
                 'slaP3'                          => $this->dsCustomer->getValue(DBECustomer::slaP3),
                 'slaP4'                          => $this->dsCustomer->getValue(DBECustomer::slaP4),
                 'slaP5'                          => $this->dsCustomer->getValue(DBECustomer::slaP5),
+                'slaP1PenaltiesAgreedChecked'    => $this->dsCustomer->getValue(
+                    DBECustomer::slaP1PenaltiesAgreed
+                ) ? 'checked' : null,
+                'slaP2PenaltiesAgreedChecked'    => $this->dsCustomer->getValue(
+                    DBECustomer::slaP2PenaltiesAgreed
+                ) ? 'checked' : null,
+                'slaP3PenaltiesAgreedChecked'    => $this->dsCustomer->getValue(
+                    DBECustomer::slaP3PenaltiesAgreed
+                ) ? 'checked' : null,
+                'slaFixHoursP1'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP1),
+                'slaFixHoursP2'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP2),
+                'slaFixHoursP3'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP3),
+                'slaFixHoursP4'                  => $this->dsCustomer->getValue(DBECustomer::slaFixHoursP4),
                 'isShowingInactive'              => $this->getParam('showInactiveContacts') ? 'true' : 'false',
                 'primaryMainMandatory'           => count($mainContacts) ? 'required' : null,
                 'sortCode'                       => $this->dsCustomer->getValue(DBECustomer::sortCode),
@@ -3227,113 +3308,7 @@ class CTCustomer extends CTCNC
         $dbeContact = new DBEContact($this);
 
         $dbeContact->getRow($contactID);
-
-        $dbeContact->setValue(
-            DBEContact::email,
-            null
-        );
-        $dbeContact->setValue(
-            DBEContact::supportLevel,
-            null
-        );
-        $dbeContact->setValue(
-            DBEContact::reviewUser,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::hrUser,
-            "N"
-        );
-
-        $dbeContact->setValue(
-            DBEContact::sendMailshotFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::discontinuedFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::accountsFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::mailshot2Flag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::mailshot3Flag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::mailshot4Flag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::mailshot8Flag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::mailshot9Flag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::mailshot11Flag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::initialLoggingEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::workStartedEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::workUpdatesEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::fixedEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::pendingClosureEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::closureEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::othersInitialLoggingEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::othersWorkStartedEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::othersWorkUpdatesEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::othersFixedEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::othersPendingClosureEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::othersClosureEmailFlag,
-            "N"
-        );
-        $dbeContact->setValue(
-            DBEContact::pendingLeaverFlag,
-            "N"
-        );
-
+        $dbeContact->setValue(DBEContact::active, 0);
         $dbeContact->updateRow();
 
         return true;
@@ -3428,7 +3403,7 @@ class CTCustomer extends CTCNC
                 $this->setCustomerID($this->dsCustomer->getValue(DBECustomer::customerID));
             } else {                // Updates to customer and updates/inserts to sites and contacts
                 $this->buCustomer->updateCustomer($this->dsCustomer);
-                $this->buCustomer->updateSite($this->dsSite);
+//                $this->buCustomer->updateSite($this->dsSite);
                 if (isset($this->postVars["form"]["contact"])) {
                     $this->buCustomer->updateContact($this->dsContact);
                 }

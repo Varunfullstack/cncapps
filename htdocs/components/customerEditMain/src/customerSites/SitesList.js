@@ -1,11 +1,10 @@
 import React from 'react';
 import {connect} from "react-redux";
 import {SHOW_ACTIVE} from "./visibilityFilterTypes";
-import {addContactToSite, changeDeliverSiteNo, changeInvoiceSiteNo} from "./actions";
+import {addContactToSite, changeDeliverSiteNo, changeInvoiceSiteNo, updateSite} from "./actions";
 import Site from './Site.js';
 
-const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, changeInvoiceSiteNo, changeDeliverSiteNo, addContactToSite}) => {
-    console.log(sites);
+const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, changeInvoiceSiteNo, changeDeliverSiteNo, addContactToSite, updateSite}) => {
     return (
         <div className="sites-list">
             {
@@ -20,6 +19,7 @@ const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, c
                               changeInvoiceSiteNo={changeInvoiceSiteNo}
                               changedDeliverSiteNo={changeDeliverSiteNo}
                               addContactToSite={addContactToSite}
+                              updateSite={updateSite}
                         />
                     )) : ''
             }
@@ -30,7 +30,7 @@ const SitesList = ({sites, customerId, contacts, invoiceSiteNo, deliverSiteNo, c
 function getVisibleSites(sites, filter) {
     const mappedSites = sites.allIds.map(id => sites.byIds[id]);
     if (filter === SHOW_ACTIVE) {
-        return mappedSites.filter(x => x.active === 'Y');
+        return mappedSites.filter(x => x.active);
     }
     return mappedSites;
 }
@@ -45,12 +45,12 @@ function debug(key, result) {
 }
 
 function mapStateToProps(state) {
-    console.log('mapStateToProps', state);
     const {customer, sites, contacts, visibilityFilter} = state;
+    console.log('state changed');
     return {
-        sites: debug('getVisibleSites', getVisibleSites(sites, visibilityFilter)),
+        sites: getVisibleSites(sites, visibilityFilter),
         customerId: customer.customerId,
-        contacts: debug('getMappedContacts', getMappedContacts(contacts)),
+        contacts: getMappedContacts(contacts),
         invoiceSiteNo: customer.invoiceSiteNo,
         deliverSiteNo: customer.deliverSiteNo
     }
@@ -66,6 +66,9 @@ function mapDispatchToProps(dispatch) {
         },
         addContactToSite: siteNo => {
             dispatch(addContactToSite(siteNo))
+        },
+        updateSite: (siteNo, data) => {
+            dispatch(updateSite(siteNo, data))
         }
     }
 }

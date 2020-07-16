@@ -10,7 +10,9 @@ import {
     FETCH_SITES_REQUEST,
     FETCH_SITES_SUCCESS,
     INITIALIZE_CUSTOMER,
-    SET_VISIBILITY_FILTER
+    SITE_DATA_SAVED,
+    TOGGLE_VISIBILITY,
+    UPDATE_SITE
 } from "./actionTypes";
 
 export const VisibilityFilterOptions = {
@@ -22,10 +24,9 @@ export function addSite(customerId) {
     return {type: ADD_SITE, customerId};
 }
 
-export function setVisibilityFilter(filter) {
-    return {type: SET_VISIBILITY_FILTER, filter};
+export function updateSite(siteNo, data) {
+    return {type: UPDATE_SITE, siteNo, data}
 }
-
 
 export function requestContacts(customerId) {
     return {type: FETCH_CONTACTS_REQUEST, customerId}
@@ -61,6 +62,14 @@ export function changeInvoiceSiteNo(siteNo) {
 
 export function addContactToSite(siteNo) {
     return {type: ADD_CONTACT_TO_SITE, siteNo}
+}
+
+export function toggleVisibility() {
+    return {type: TOGGLE_VISIBILITY}
+}
+
+export function savedSiteData(siteNo) {
+    return {type: SITE_DATA_SAVED, siteNo}
 }
 
 export function fetchSites(customerId) {

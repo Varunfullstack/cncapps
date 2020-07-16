@@ -1609,11 +1609,15 @@
     }
 
     function checkMailShotOptions() {
-        validatingContactsModal.dialog('open');
-        const toReturn = runValidations();
-        validatingContactsModal.dialog('close');
-        return toReturn;
-
+         document.customerSitesComponent.saveSites()
+            .then(() => {
+                // validatingContactsModal.dialog('open');
+                // const toReturn = runValidations();
+                // validatingContactsModal.dialog('close');
+                // return toReturn;
+                return false;
+            })
+        return false;
     }
 </script>
 
