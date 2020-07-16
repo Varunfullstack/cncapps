@@ -11,7 +11,6 @@ const initialState = {
 export default function (state = initialState, action) {
     switch (action.type) {
         case FETCH_SITES_REQUEST:
-            console.log('fetch sites request')
             return {
                 ...state,
                 isFetching: true,
