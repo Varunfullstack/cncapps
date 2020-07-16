@@ -5,6 +5,8 @@ This project changes will be shown here.
 ### Changed
 - Issue 909 - Update GUI on Customer Page
 - Issue 913 - Customer Page Main Section Rewrite
+- Issue 914 - Customer Page Customer Notes, Projects, Portal Documents Rewrite
+- Issue 915 - Customer Page Sites Rewrite
 
 ## [v4.2.3] - 2020-07-15
 ### Changed

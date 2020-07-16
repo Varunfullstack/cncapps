@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBCNCEntity.inc.php");
 
 class DBEContact extends DBCNCEntity
@@ -939,7 +940,9 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " where active and " . $this->getDBColumnName(DBEContact::reviewUser) . " = 'Y' and " . $this->getDBColumnName(
+            " where active and " . $this->getDBColumnName(
+                DBEContact::reviewUser
+            ) . " = 'Y' and " . $this->getDBColumnName(
                 DBEContact::customerID
             ) . " = $customerID
       ORDER BY con_custno, con_contno";
