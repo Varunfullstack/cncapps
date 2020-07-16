@@ -269,7 +269,7 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             throw new UnexpectedValueException($message);
         }
         global $db;
-        
+
         try {
             $db->preparedQuery(
                 "insert into customerOffice365StorageStats values (?,?,?,?,?) on duplicate key update totalOneDriveStorageUsed = ?, totalEmailStorageUsed = ?, totalSiteStorageUsed = ?",
@@ -309,10 +309,14 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 ]
             );
         } catch (Exception $exception) {
-            var_dump($exception->getMessage());
+            $this->createFailedSR(
+                $dbeCustomer,
+                "Failed to update Stats in DB: {$exception->getMessage()}",
+                $exception->getTraceAsString(),
+                $exception->getLine()
+            );
         }
 
-        var_dump('here');
         $spreadsheet->removeSheetByIndex(0);
         $spreadsheet->setActiveSheetIndex(0);
         $writer = new Xlsx($spreadsheet);
@@ -331,7 +335,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
             $writer->save(
                 $filePath
             );
-            var_dump('here');
             $dbeCustomerDocument = new DBEPortalCustomerDocument($thing);
             $dbeCustomerDocument->getCurrentOffice365Licenses($customerID);
 
@@ -570,7 +573,6 @@ class Office365LicensesExportPowerShellCommand extends PowerShellCommandRunner
                 );
             }
         }
-        var_dump($data);
         return $data;
     }
 
