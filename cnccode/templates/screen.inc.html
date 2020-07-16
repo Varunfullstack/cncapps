@@ -261,7 +261,6 @@
             });
 
             $("#sidebarToggle").click(function (e) {
-                $(this).find('i').toggleClass('fa-angle-right fa-angle-left');
                 var image = $("#cnc-logo");
                 var current = image.attr("src");
                 var swap = image.attr("data-swap");
@@ -423,7 +422,8 @@
                        title=""
                     >
 
-                    </i><span>Favourites</span>
+                    </i>
+                    <span>Favourites</span>
                     <i class="arrow fa fa-angle-right pull-right"></i>
                 </a>
                 <ul class="children"
@@ -441,15 +441,15 @@
                 <a href="About.php"> <i class="menu-icon fa fa-info-circle"></i><span>About</span></a>
             </li>
             <li class="sub-menu"
-            id="logOutLink"
-            data-placement="right"
-            title="Log Out"
-        >
-        <a href="index.php?action=logout">
-            <i class="fa fa-door-open"></i>
-            Logout
-        </a>
-        </li>
+                id="logOutLink"
+                data-placement="right"
+                title="Log Out"
+            >
+                <a href="index.php?action=logout">
+                    <i class="fa fa-door-open"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
 
             <!-- <li class="sub-menu">
                 <a href="javascript:void(0);">
@@ -476,7 +476,10 @@
 
         </ul>
         <div class="text-align-center sidebarToggle">
-            <button id="sidebarToggle"><i class="fa fa-angle-left"></i></button>
+            <button id="sidebarToggle">
+                <i class="fa fa-angle-left"></i>
+                <i class="fa fa-angle-right"></i>
+            </button>
         </div>
     </div>
 </aside>

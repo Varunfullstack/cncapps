@@ -90,17 +90,21 @@ body {
     border-radius: 4px;
 
   }
+
   &:hover {
     overflow-y: overlay;
   }
+
   &::-webkit-scrollbar,
   &::-webkit-scrollbar-thumb {
-    overflow:visible;
+    overflow: visible;
     border-radius: 4px;
   }
+
   &::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,.4);
+    background: rgba(255, 255, 255, .4);
   }
+
   .cnc-logo {
     transition: all 0.3s ease-in-out;
 
@@ -157,6 +161,16 @@ body {
       }
     }
 
+    #sidebarToggle {
+      .fa-angle-left {
+        display: none;
+      }
+
+      .fa-angle-right {
+        display: inline-block;
+      }
+    }
+
     .children {
       background-color: $secondary-color !important;
       min-width: 185px;
@@ -180,6 +194,14 @@ body {
       border: none;
       color: #e6e6e6;
       border-radius: 100%;
+
+      .fa-angle-left {
+        display: inline-block;
+      }
+
+      .fa-angle-right {
+        display: none;
+      }
 
       &:focus {
         outline: none;
@@ -295,6 +317,7 @@ body {
     }
   }
 }
+
 
 .card {
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
