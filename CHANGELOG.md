@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.2.5] - 2020-07-17
+### Fixed
+- Fixed issue with contracts not showing
+
 ## [v4.2.4] - 2020-07-16
 ### Fixed
 - Fixed Office 365 export issues

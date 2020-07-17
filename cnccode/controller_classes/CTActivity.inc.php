@@ -1204,7 +1204,8 @@ class CTActivity extends CTCNC
         if (!$contractCustomerItemID) {
             $this->template->set_var(
                 array(
-                    'tandMSelected' => CT_SELECTED
+                    'tandMSelected'    => CT_SELECTED,
+                    'salesOrderReason' => "- Must be selected because this is linked to a Sales Order"
                 )
             );
         }
