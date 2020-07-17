@@ -49,10 +49,10 @@
             <th>Rule</th>
             <th>Hide?</th>
             <th>Priority</th>
-            <th>Created By</th>
             <th>Created At</th>
-            <th>Updated By</th>
+            <th>Created By</th>
             <th>Updated At</th>
+            <th>Updated By</th>
             <th>Details</th>
             <th>Internal Notes</th>
             <th></th>
@@ -186,6 +186,60 @@
     let editingItem = null;
 
     function drawList() {
+        dataTable = $('#myTable').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'excel'
+                }
+            ],
+            paging: false,
+            columns: [
+                {data: "createdByUserName"},
+                {data: "createdByContactName"},
+                {data: "action"},
+                {data: "createdAt"},
+                {data: "customerName"},
+                {data: "title"},
+                {data: "firstName"},
+                {data: "lastName"},
+                {data: "email"},
+                {data: "contactID"},
+                {data: "siteNo"},
+                {data: "supportLevel"},
+                {data: "position"},
+                {data: "phone"},
+                {data: "mobilePhone"},
+                {data: "sendMailshotFlag"},
+                {data: "mailshot2Flag"},
+                {data: "mailshot3Flag"},
+                {data: "mailshot4Flag"},
+                {data: "mailshot8Flag"},
+                {data: "mailshot9Flag"},
+                {data: "mailshot11Flag"},
+                {data: "notes"},
+                {data: "workStartedEmailFlag"},
+                {data: "initialLoggingEmailFlag"},
+                {data: "workUpdatesEmailFlag"},
+                {data: "fixedEmailFlag"},
+                {data: "pendingClosureEmailFlag"},
+                {data: "closureEmailFlag"},
+                {data: "othersInitialLoggingEmailFlag"},
+                {data: "othersWorkStartedEmailFlag"},
+                {data: "othersWorkUpdatesEmailFlag"},
+                {data: "othersFixedEmailFlag"},
+                {data: "othersPendingClosureEmailFlag"},
+                {data: "othersClosureEmailFlag"},
+                {data: "pendingLeaverFlag"},
+                {data: "pendingLeaverDate"}
+            ]
+        });
+
+
+        $('#customerString')[0].addEventListener('autocompleteselect', function ($event) {
+            $('#customerID').val($event.detail.item.value);
+        });
+
         const source = document.getElementById("SRScheduler-items-template").innerHTML;
         const context = {items: srSchedulerList};
         const html = Mustache.to_html(source, context);

@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 939 - Sortable SR Scheduler Columns
+
 ## [v4.2.4] - 2020-07-16
 ### Fixed
 - Fixed Office 365 export issues
