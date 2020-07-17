@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Fixed
+- Issue 933 - User Time Logs sometimes showing as holiday
+
 ## [v4.2.4] - 2020-07-16
 ### Fixed
 - Fixed Office 365 export issues
