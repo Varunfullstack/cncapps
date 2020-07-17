@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 938 - Increase number of favourites in menu
+
 ## [v4.2.4] - 2020-07-16
 ### Fixed
 - Fixed Office 365 export issues

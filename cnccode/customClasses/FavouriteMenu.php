@@ -6,7 +6,7 @@ namespace CNCLTD;
 
 class FavouriteMenu
 {
-    const MAX_FAVOURITES = 7;
+    const MAX_FAVOURITES = 10;
     private $db;
     private $userId;
     /** @var int[] */
@@ -45,7 +45,7 @@ class FavouriteMenu
             return;
         }
 
-        if (count($this->favourites) == 7) {
+        if (count($this->favourites) == self::MAX_FAVOURITES) {
             $this->removeFavourite($this->favourites[0]);
         }
         $this->insertFavourite($menuId);
