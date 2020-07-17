@@ -95,6 +95,10 @@ class CustomerEditMain extends React.Component {
         document.customerMain = this;
     }
 
+    testFunction(){
+        console.log('test');
+    }
+
     handleSlaFixHoursP1($event) {
         this.updateCustomerField('slaFixHoursP1', $event.target.value);
     }
@@ -746,7 +750,6 @@ class CustomerEditMain extends React.Component {
                     this.getInputRow('Servers', this.getServersInput(), 'servers'),
                     this.getInputRow('Reg', this.getRegNoInput(), 'reg'),
                     this.getInputRow('Sites', this.getNoOfSitesInput(), 'sites'),
-                    this.getInputRow('Pre-pay Top Up', this.getGscTopUpAmountInput(), 'gscTopUpAmount'),
                     this.getInputRow('Pre-pay Top Up', this.getGscTopUpAmountInput(), 'gscTopUpAmount'),
                     this.getInputRow('Became Customer', this.getBecameCustomerDateInput(), 'becameCustomerDate'),
                     this.getInputRow('SLA Response Hours', this.getSLAResponseHoursInput(), 'SLA Response Hours'),
