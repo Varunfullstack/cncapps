@@ -255,7 +255,7 @@ width:70px;
 }
 .error-message{
     color: rgb(138, 14, 14);
-    white-space: nowrap;
+    /* white-space: nowrap; */
     margin-left: 10px;
 }
 .ml-1{
@@ -417,7 +417,8 @@ hr{
     width: 20px;
     height: 20px;
     animation: spin 2s linear infinite;
-    position: fixed;
+    position: absolute;
+    
     margin: auto;
     
   }

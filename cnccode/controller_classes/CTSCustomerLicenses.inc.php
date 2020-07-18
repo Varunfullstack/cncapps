@@ -90,6 +90,15 @@ class CTSCustomerLicenses extends CTCNC
                 exit;
             case "updateSubscription":
                 echo $this->buTechDataApi->updateSubscription();
+                exit;                
+            case "updateSubscriptionAddOns":
+                echo $this->buTechDataApi->updateSubscriptionAddOns();
+                exit;
+            case "purchaseSubscriptionAddOns":
+                echo $this->buTechDataApi->purchaseSubscriptionAddOns();
+                exit;
+            case "getProductsPrices":
+                echo $this->buTechDataApi->getProductsPrices();
                 exit;
             break;          
             default:

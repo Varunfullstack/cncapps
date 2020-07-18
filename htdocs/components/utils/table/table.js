@@ -35,9 +35,10 @@ class Table extends React.Component {
   }
   render() {
     const props=this.props;   
-      const { data,  columns,pk } = props;
+      const { data,  columns,pk,selected,selectedKey } = props;
       const {sortColumn}=this.state;
       const el = React.createElement;
+      //console.log('selected',selected)
       if(this.state.sortColumn.path!=null&&data.length>0)
       {
         this.sort(data,this.state.sortColumn.path,this.state.sortColumn.order);
@@ -49,7 +50,7 @@ class Table extends React.Component {
           sortColumn: sortColumn,
           onSort: this.handleSort,
         }),
-        data.length>0?el(TableBody, { key: "tableBody", data: data, columns: columns,pk }):null,
+        data.length>0?el(TableBody, { key: "tableBody", data, columns,pk,selected,selectedKey }):null,
       ]);   
   }
 }

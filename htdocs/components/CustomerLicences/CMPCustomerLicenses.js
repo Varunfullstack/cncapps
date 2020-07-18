@@ -1,9 +1,9 @@
 "use strict";
-import APICustomerLicenses from './APICustomerLicenses.js?v=3';
-import CMPTDCustomerSearch from './CMPTDCustomerSearch.js?v=3';
-import CMPTDCustomerDetails from './CMPTDCustomerDetails.js?v=3';
-import CMPTDCustomerOrders from './CMPTDCustomerOrders.js?v=3';
-import CMPTDOrderDetails from './CMPTDOrderDetails.js?v=3'
+import APICustomerLicenses from './APICustomerLicenses.js?v=4';
+import CMPTDCustomerSearch from './CMPTDCustomerSearch.js?v=4';
+import CMPTDCustomerDetails from './CMPTDCustomerDetails.js?v=4';
+import CMPTDCustomerOrders from './CMPTDCustomerOrders.js?v=4';
+import CMPTDOrderDetails from './CMPTDOrderDetails.js?v=4'
 /**
  * Don't forget to change v value in js import before push to gethub to avoid cache problem
  */

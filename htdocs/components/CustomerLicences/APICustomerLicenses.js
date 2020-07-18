@@ -38,7 +38,7 @@ class APICustomerLicenses extends APIMain{
    }
    updateTechDataCustomer(id,data)
    {
-    return fetch(`${this.baseURL}updateTechDataCustomer&endCustomerId=${id}`,{method:'POST',body:JSON.stringify(data)}).then(res=>res.json());
+      return fetch(`${this.baseURL}updateTechDataCustomer&endCustomerId=${id}`,{method:'POST',body:JSON.stringify(data)}).then(res=>res.json());
    }
 
    getCustomerDetails(endCustomerId)
@@ -48,28 +48,43 @@ class APICustomerLicenses extends APIMain{
    //vendors
    getVendors(page=1)
    {
-     return fetch(`${this.baseURL}getVendors&page=${page}`).then(res=>res.json());
+      return fetch(`${this.baseURL}getVendors&page=${page}`).then(res=>res.json());
    }
    // products
    getProductsByVendor(vendorId,page=1)
    {
-     return fetch(`${this.baseURL}getProductsByVendor&page=${page}&vendorId=${vendorId}`).then(res=>res.json());
+      return fetch(`${this.baseURL}getProductsByVendor&page=${page}&vendorId=${vendorId}`).then(res=>res.json());
    }
+
    getProductBySKU(body)
    { 
-    return fetch(`${this.baseURL}getProductBySKU`,{method:'POST',body:JSON.stringify(body)}).then(res=>res.json());
+      return fetch(`${this.baseURL}getProductBySKU`,{method:'POST',body:JSON.stringify(body)}).then(res=>res.json());
    }
+
    //get order detials
    getOrderDetials(orderId)
    {
-    return fetch(`${this.baseURL}getOrderDetials&orderId=${orderId}`).then(res=>res.json());
-
+      return fetch(`${this.baseURL}getOrderDetials&orderId=${orderId}`).then(res=>res.json());
    }
-   updateOrder(body)
-   {
-     console.log(body)
-    return fetch(`${this.baseURL}updateSubscription`,{method:'POST',body:JSON.stringify(body)}).then(res=>res.json());
 
+   updateOrder(body)
+   {     
+      return fetch(`${this.baseURL}updateSubscription`,{method:'POST',body:JSON.stringify(body)}).then(res=>res.json());
+   }
+
+   updateSubscriptionAddOns(body)
+   {     
+     return fetch(`${this.baseURL}updateSubscriptionAddOns`,{method:'POST',body:JSON.stringify(body)}).then(res=>res.json());
+   }
+
+   purchaseSubscriptionAddOns(body)
+   {     
+     return fetch(`${this.baseURL}purchaseSubscriptionAddOns`,{method:'POST',body:JSON.stringify(body)}).then(res=>res.json());
+   }
+
+   getProductsPrices(products)
+   {    
+     return fetch(`${this.baseURL}getProductsPrices`,{method:'POST',body:JSON.stringify(products)}).then(res=>res.json());
    }
 }
 export default APICustomerLicenses;

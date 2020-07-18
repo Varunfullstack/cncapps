@@ -143,6 +143,16 @@ class BUTechDataApi extends Business
         $body = file_get_contents('php://input');
         return $this->callApi("order/", $body, 'PATCH');
     }
+    function updateSubscriptionAddOns()
+    {   
+        $body = file_get_contents('php://input');
+        return $this->callApi("order/addOns", $body, 'PATCH');
+    }
+    function purchaseSubscriptionAddOns()
+    {   
+        $body = file_get_contents('php://input');
+        return $this->callApi("order/addOns", $body, 'POST');
+    }
     function getAllSubscriptions($page = 1)
     {
         return $this->callApi("order/subscriptions/$page");
@@ -212,7 +222,7 @@ class BUTechDataApi extends Business
     }
     function getProductsByVendor($page)
     {
-
+        //micrsosft =397
         $vendorId = null;
         if (isset($_GET['vendorId']))
         $vendorId = $_GET['vendorId'];
@@ -239,6 +249,11 @@ class BUTechDataApi extends Business
     {     
         $body = file_get_contents('php://input');
         return $this->callApi("catalog/productDetails",$body,'POST');        
+    }
+    function getProductsPrices()
+    {     
+        $body = file_get_contents('php://input');
+        return $this->callApi("catalog/price",$body,'POST');        
     }
 
 }// End of class
