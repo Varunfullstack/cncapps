@@ -97,8 +97,7 @@ class CMPTDCustomerSearch extends React.Component {
             el(
               "button",
               {
-                key: "NewCustomer",
-                className: "fa fa-plus btn-search nowrap",
+                key: "NewCustomer",                
                 onClick: handleAddNew,
               },
               "Add new"

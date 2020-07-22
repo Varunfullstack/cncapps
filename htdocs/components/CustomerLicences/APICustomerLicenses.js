@@ -66,7 +66,10 @@ class APICustomerLicenses extends APIMain{
    {
       return fetch(`${this.baseURL}getOrderDetials&orderId=${orderId}`).then(res=>res.json());
    }
-
+   addOrder(body)
+   {     
+      return fetch(`${this.baseURL}addSubscription`,{method:'POST',body:JSON.stringify(body)}).then(res=>res.json());
+   }
    updateOrder(body)
    {     
       return fetch(`${this.baseURL}updateSubscription`,{method:'POST',body:JSON.stringify(body)}).then(res=>res.json());
@@ -85,6 +88,20 @@ class APICustomerLicenses extends APIMain{
    getProductsPrices(products)
    {    
      return fetch(`${this.baseURL}getProductsPrices`,{method:'POST',body:JSON.stringify(products)}).then(res=>res.json());
+   }
+   // update cnc item 
+   activeCncItem(customerId,sku)
+   {  
+    return fetch(`${this.baseURL}activeCncItem&customerId=${customerId}&sku=${sku}`,{method:'POST'}).then(res=>res.json());
+
+   }
+   deactiveCncItemBySku(customerId,sku)
+   {
+
+   }
+   updateCncItemSeats(customerId,sku)
+   {
+     
    }
 }
 export default APICustomerLicenses;

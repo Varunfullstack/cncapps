@@ -244,16 +244,21 @@ class BUTechDataApi extends Business
             return $this->callApi("order/details/$orderId");
         else return $this->failed();
     }
+    function addOrder()
+    {
+        $body = file_get_contents('php://input');
+        return $this->callApi("order/",$body,'POST');  
+    }
     // product
     function getProductBySKU()
     {     
         $body = file_get_contents('php://input');
         return $this->callApi("catalog/productDetails",$body,'POST');        
     }
-    function getProductsPrices()
+    function getProductsPrices($body)
     {     
-        $body = file_get_contents('php://input');
-        return $this->callApi("catalog/price",$body,'POST');        
+         return $this->callApi("catalog/price",$body,'POST');        
     }
+     
 
 }// End of class

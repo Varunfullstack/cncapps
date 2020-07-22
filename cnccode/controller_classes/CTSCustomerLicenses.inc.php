@@ -7,11 +7,16 @@
  * @access public
  * @authors Mustafa Taha
  */
+
+use PhpParser\Node\Expr\Isset_;
+
 global $cfg;
+
+
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg ['path_dbe'] . '/DBECustomer.inc.php');
-
+require_once($cfg ['path_dbe'] . '/DBEItem.inc.php');
 require_once($cfg['path_bu'] . '/BUTechDataApi.inc.php');
 
 class CTSCustomerLicenses extends CTCNC
@@ -98,7 +103,13 @@ class CTSCustomerLicenses extends CTCNC
                 echo $this->buTechDataApi->purchaseSubscriptionAddOns();
                 exit;
             case "getProductsPrices":
-                echo $this->buTechDataApi->getProductsPrices();
+                echo $this->getProductsPrices();
+                exit;
+            case "activeCncItem":
+                echo $this->activeCncItem();
+                exit;
+            case "addSubscription":
+                echo $this->buTechDataApi->addOrder();
                 exit;
             break;          
             default:
@@ -106,39 +117,36 @@ class CTSCustomerLicenses extends CTCNC
         }
     }
 
-
+    function getProductsPrices()
+    {
+        $body = file_get_contents('php://input');
+        return $this->buTechDataApi->getProductsPrices($body);        
+    }
     function setTemplate()
     {
         $this->setMethodName('setTemplate');
 
         $action = $this->getAction();
-
+        $this->setMenuId(313);
         switch ($action) {
-            case 'searchOrders':
-                $this->setMenuId(312);
+            case 'searchOrders':             
                 $this->setPageTitle('StreamOne Orders');
                 break;
             case 'newOrder':
-                $this->setMenuId(312);
                 $this->setPageTitle('StreamOne Place New Order');
                 break;
             case "editOrder":
-                $this->setMenuId(312);
                 $this->setPageTitle('StreamOne Edit Order');
                 break;
             case 'searchCustomers':
-                $this->setMenuId(312);
                 $this->setPageTitle('StreamOne Customers');
                 break;
             case 'addNewCustomer';
-                $this->setMenuId(312);
                 $this->setPageTitle('StreamOne Add New Customer');
                 break;
             case 'editCustomer':
-                $this->setMenuId(312);
                 $this->setPageTitle('StreamOne Edit Customer detials');
                 break;
-                
         }
 
         $this->setTemplateFiles(
@@ -212,6 +220,50 @@ class CTSCustomerLicenses extends CTCNC
         else return json_encode(['Result'=>'Failed']);
 
     }
+    function activeCncItem()
+    { 
+        global $db;
+        $customerId =null;
+        $sku =null;
+        $seats=null;
+        if (isset($_GET['customerId']))
+            $customerId = $_GET['customerId'];
+        if (isset($_GET['sku']))        
+            $sku = $_GET['sku'];            
+        //get item id
      
-   
+        $dbeItem=new DBEItem($this);
+        $dbeItem->setValue(DBEItem::partNo,$sku);      
+        $dbeItem->getRowByColumn(DBEItem::partNo);
+        $itemId=$dbeItem->getValue(DBEItem::itemID);
+        // update customer item
+        if($customerId && $itemId&&$seats)
+        {
+            $result=$db->query("update custitem set
+            renewalStatus ='R',
+            declinedFlag ='N',
+            cui_users =$seats
+            where                 
+                cui_custno=$customerId and
+                cui_itemno=  $itemId  and
+                renewalStatus ='D' and
+                declinedFlag  ='Y'
+            ");
+            if($result)
+            {
+                return $this->success("");
+            }
+        }   
+        return $this->failed();
+        
+    }
+    
+    function failed($message="")
+    {
+        return json_encode(['Result'=>'Failed','message'=>$message]);
+    }
+    function success($message="")
+    {
+        return json_encode(['Result'=>'Success','message'=>$message]);
+    }
 }

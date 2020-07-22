@@ -5,6 +5,7 @@ import APICustomerLicenses from './APICustomerLicenses.js?v=1';
 import Modal from './../utils/modal.js?v=1';
 import RadioButtons from './../utils/radioButtons.js?v=1';
 import Spinner from './../utils/spinner.js?v=1';
+import CMPOrderHistoryModal from './CMPOrderHistoryModal.js?v=1';
 /**
  * searching in TechData customers and link them with CNC customers
  */
@@ -27,8 +28,11 @@ class CMPTDCustomerOrders extends React.Component {
       currentUser: null,
       _showSpinner: false,
       orderUpdateError: null,
-      modalElement:null,
-      selectedAddon:null
+      modalElement: null,
+      selectedAddon: null,
+      orderHistory: null,
+      showOrderHistory: false,
+      showAddonHistory: false,
     };
     this.apiCustomerLicenses = new APICustomerLicenses();
     this.addonsRef = React.createRef();
@@ -68,7 +72,6 @@ class CMPTDCustomerOrders extends React.Component {
   };
   hideSpinner = () => {
     this.setState({ _showSpinner: false });
-
   };
   handleNewOrder = () => {
     if (this.state.search.techDataCustomerId == null) {
@@ -111,15 +114,8 @@ class CMPTDCustomerOrders extends React.Component {
 
   getSearchResult = () => {
     let { results, selectedOrderLine } = this.state;
-    const { el, handleManageTenant, handleAddOns } = this;
+    const { el, handleManageTenant, handleAddOns, handelOrderHistory } = this;
     const columns = [
-      // {
-      //   path: null,
-      //   label: "Select",
-      //   sortable: true,
-      //   content: (sub) =>
-      //     el("i", {className:'fa fa-check'}, ),
-      // },
       {
         path: "createdDate",
         label: "Created Date",
@@ -128,8 +124,6 @@ class CMPTDCustomerOrders extends React.Component {
           el("label", null, moment(sub.createdDate).format("DD/MM/YYYY HH:MM")),
       },
       { path: "orderNumber", label: "Order", sortable: true },
-      // { path: "orderSource", label: "Order Source", sortable: true },
-      // { path: "vendorName", label: "Vendor", sortable: true },
       { path: "sku", label: "SKU", sortable: true },
       {
         path: "additionalData.domain",
@@ -145,12 +139,12 @@ class CMPTDCustomerOrders extends React.Component {
         label: "Line Status",
         sortable: true,
         content: (o) =>
-          o.lineStatus === "processing"
+          o.lineStatus === "processing"|| o.lineStatus === "in_process"
             ? el("div", {
                 key: "divSpin" + o.orderNumber,
                 className: "loader-content-sm",
               })
-            : el("div", { key: "divSpin" + o.orderNumber, }, o.lineStatus),
+            : el("div", { key: "divSpin" + o.orderNumber }, o.lineStatus),
       },
 
       {
@@ -175,6 +169,17 @@ class CMPTDCustomerOrders extends React.Component {
             "Edit"
           ),
       },
+      {
+        path: null,
+        label: "History",
+        sortable: true,
+        content: (c) =>
+          el(
+            "button",
+            { key: "btnHistory", onClick: () => handelOrderHistory(c) },
+            "Show"
+          ),
+      },
     ];
     if (results) {
       //////console.log('selectedOrderLine',selectedOrderLine)
@@ -190,7 +195,32 @@ class CMPTDCustomerOrders extends React.Component {
       });
     }
   };
-
+  handelOrderHistory = (order) => {
+    console.log(order);
+    const { selectedOrderLine } = this.state;
+    //getOrderHistory
+    if (order.subscriptionHistory.length > 0) {
+      if (selectedOrderLine?.sku !== order.sku)
+        this.setState({
+          orderHistory: order.subscriptionHistory,
+          showOrderHistory: true,
+          selectedOrderLine: order,
+        });
+      else
+        this.setState({
+          orderHistory: order.subscriptionHistory,
+          showOrderHistory: true,
+        });
+    } else {
+      if (selectedOrderLine?.sku !== order.sku)
+        this.setState({
+          orderHistory: [],
+          showOrderHistory: true,
+          selectedOrderLine: order,
+        });
+      else this.setState({ orderHistory: [], showOrderHistory: true });
+    }
+  };
   getHeader = () => {
     const { el } = this;
     const { endCustomer } = this.state;
@@ -198,7 +228,7 @@ class CMPTDCustomerOrders extends React.Component {
       return el(
         "h3",
         { key: "h2Customer", className: "text-center" },
-        `Customer ${endCustomer.firstName} for ${endCustomer.companyName}`
+        `StreamOne Orders For ${endCustomer.firstName} @ ${endCustomer.companyName}`
       );
     else
       el(
@@ -223,7 +253,8 @@ class CMPTDCustomerOrders extends React.Component {
       handleUpdateOrder,
       handleSetOrderStatus,
     } = this;
-    const inactive = selectedOrderLine?.lineStatus === "inactive" ? true : false;
+    const inactive =
+      selectedOrderLine?.lineStatus === "inactive" ? true : false;
     //prepare body
     const body = el("div", { key: "body" }, [
       el(
@@ -290,47 +321,53 @@ class CMPTDCustomerOrders extends React.Component {
           )
         : null,
     ]);
-    this.setState({modalElement:el(Modal, {
-      key: "Modal",
-      show: showModal,
-      width: "600px",
-      title: `Modify your ${selectedOrderLine?.name}`,
-      onClose: handleOnClose,
-      content: body,
-      footer,
-    })})
-    
-  };
-  handleManageTenant = (order) => {   
     this.setState({
-      showModal: true,
-      orderUpdateError: null,
-      selectedOrderLine: order ,      
-      modalDefaultAction:1
+      modalElement: el(Modal, {
+        key: "Modal",
+        show: showModal,
+        width: "600px",
+        title: `Modify your ${selectedOrderLine?.name}`,
+        onClose: handleOnClose,
+        content: body,
+        footer,
+      }),
     });
+  };
+  handleManageTenant = (order) => {
+    const { selectedOrderLine } = this.state;
+    if (selectedOrderLine?.sku != order.sku) {
+      this.setState({
+        showModal: true,
+        orderUpdateError: null,
+        selectedOrderLine: order,
+        modalDefaultAction: 1,
+      });
+    } else
+      this.setState({
+        showModal: true,
+        orderUpdateError: null,
+        modalDefaultAction: 1,
+      });
     setTimeout(() => {
       this.getModalOrderElement();
     }, 100);
   };
 
- 
   handleOnClose = () => {
-    this.setState({ showModal: false,modalElement:null });
+    this.setState({ showModal: false, modalElement: null });
   };
   handleModalAction = (actionValue) => {
     ////console.log(actionValue);
     this.setState({ modalDefaultAction: actionValue });
-    setTimeout(()=> this.getModalOrderElement(),50);
+    setTimeout(() => this.getModalOrderElement(), 50);
   };
   handleChange = ({ currentTarget: input }) => {
     const selectedOrderLine = { ...this.state.selectedOrderLine };
     selectedOrderLine[input.name] = input.value;
     this.setState({ selectedOrderLine });
-    setTimeout(()=> this.getModalOrderElement(),50);
-    
+    setTimeout(() => this.getModalOrderElement(), 50);
   };
-   
-  
+
   handleUpdateOrder = () => {
     const {
       modalDefaultAction,
@@ -371,7 +408,7 @@ class CMPTDCustomerOrders extends React.Component {
               showModal: false,
               orderUpdateError: null,
               modalDefaultAction: 1,
-              modalElement:null
+              modalElement: null,
             });
             setTimeout(() => this.getCustomerOrders(), 2000);
             setTimeout(() => this.getCustomerOrders(), 10000);
@@ -409,9 +446,9 @@ class CMPTDCustomerOrders extends React.Component {
           if (res.BodyText.modifyOrdersDetails[0].status == "success") {
             this.setState({
               showModal: false,
-              orderUpdateError: null,              
+              orderUpdateError: null,
               modalDefaultAction: 1,
-              modalElement:null
+              modalElement: null,
             });
             setTimeout(() => this.getCustomerOrders(), 2000);
             setTimeout(() => this.getCustomerOrders(), 10000);
@@ -420,18 +457,17 @@ class CMPTDCustomerOrders extends React.Component {
         }
       });
   };
-  
-  
+
   handleAddOns = (order) => {
     ////console.log("order", order);
-   this.setState({
-     selectedOrderLine: order ,
-   });
-   setTimeout(()=> this.getAddons(order),50)  ;
- };
+    this.setState({
+      selectedOrderLine: order,
+    });
+    setTimeout(() => this.getAddons(order), 50);
+  };
   getAddons = async (order) => {
     if (order != null) {
-      this.showSpinner();      
+      this.showSpinner();
 
       //1- load order detials to get it's addons
       let orderAddons = await this.apiCustomerLicenses.getOrderDetials(
@@ -442,9 +478,9 @@ class CMPTDCustomerOrders extends React.Component {
       const selectedOrderLine = { ...this.state.selectedOrderLine };
       const line = orderAddons.BodyText.orderInfo.lines.filter(
         (l) => l.sku === selectedOrderLine.sku
-      );   
+      );
       selectedOrderLine.addOns = line && line.length > 0 && line[0].addOns;
-      //until now we have current order addons with there qunantity  
+      //until now we have current order addons with there qunantity
 
       //3- get current product to get all avialabel addons
       let product = await this.apiCustomerLicenses.getProductBySKU({
@@ -459,8 +495,8 @@ class CMPTDCustomerOrders extends React.Component {
           return { sku: a.sku, quantity: 1 };
         });
         ////console.log('products',products);
-        //4- get currend product addons prices 
-        const pages = addOnsProductList.length / 10;
+        //4- get currend product addons prices
+        const pages = addOnsProductList?.length / 10;
         for (let i = 0; i < pages; i++) {
           const obj = {
             vendorIds: [397],
@@ -481,19 +517,22 @@ class CMPTDCustomerOrders extends React.Component {
         }
         // now we have order addons and product addons and need to update order addons price
         // update selectedOrderLine addons prices
-        for(let k=0; k<selectedOrderLine?.addOns?.length; k++)
-        {
-          for(let l=0;l<productAddOns.length;l++)
-          {
-            if(selectedOrderLine.addOns[k].sku===productAddOns[l].sku)
-            {
-              selectedOrderLine.addOns[k]={...selectedOrderLine.addOns[k],...productAddOns[l]};
+        for (let k = 0; k < selectedOrderLine?.addOns?.length; k++) {
+          for (let l = 0; l < productAddOns.length; l++) {
+            if (selectedOrderLine.addOns[k].sku === productAddOns[l].sku) {
+              selectedOrderLine.addOns[k] = {
+                ...selectedOrderLine.addOns[k],
+                ...productAddOns[l],
+              };
             }
           }
         }
         //console.log(selectedOrderLine,productAddOns);
         // finally update state
-        this.setState({ selectedOrderLine,productDetails: product.BodyText.productDetails[0] }); 
+        this.setState({
+          selectedOrderLine,
+          productDetails: product.BodyText.productDetails[0],
+        });
       } else {
         this.setState({ productDetails: null });
       }
@@ -501,20 +540,27 @@ class CMPTDCustomerOrders extends React.Component {
       this.scrollToAddons();
     }
   };
-  handleAddonEdit=(addon)=>{
-    //console.log('addon',addon);
+  handleAddonEdit = (addon) => {
+    console.log("addon", addon);
     this.setState({
       showModal: true,
       orderUpdateError: null,
-      selectedAddon:addon
+      selectedAddon: addon,
     });
     setTimeout(() => {
       this.getModalAddonsElement(addon);
     }, 100);
-  }
+  };
+  handleAddonHistory = (addon) => {
+    this.setState({
+      selectedAddon: addon,
+      orderHistory: addon.additionalData?.subscriptionHistory,
+      showAddonHistory: true,
+    });
+  };
   getAddonsElement = () => {
     const { productDetails, selectedOrderLine } = this.state;
-    const {handleAddonEdit,el}=this;
+    const { handleAddonEdit, handleAddonHistory, el } = this;
     //////console.log('addons',productDetails?.addOns,selectedOrderLine?.addOns);
     const allAddOns = productDetails?.addOns?.map((a) => {
       if (selectedOrderLine?.addOns) {
@@ -524,8 +570,7 @@ class CMPTDCustomerOrders extends React.Component {
         const newAddon =
           addonTemp.length > 0 ? { ...a, ...addonTemp[0] } : { ...a };
         //////console.log(newAddon);
-        if(!newAddon.quantity)
-        newAddon.quantity=0;
+        if (!newAddon.quantity) newAddon.quantity = 0;
         return newAddon;
       } else return a;
     });
@@ -551,27 +596,33 @@ class CMPTDCustomerOrders extends React.Component {
           path: "quantity",
           label: "Quantity",
           sortable: true,
-          content: (a) =>           
-              a.addOnStatus  === "processing"
-                ? el("div", {
+          content: (a) =>
+            a.addOnStatus === "processing"||a.addOnStatus === "in_process"
+              ? el("div", {
+                  key: "divSpin" + a.sku,
+                  className: "loader-content-sm",
+                })
+              : el(
+                  "div",
+                  {
                     key: "divSpin" + a.sku,
-                    className: "loader-content-sm",
-                  })
-                : el("div", {
-                  key: "divSpin" + a.sku,                  
-                },(a.quantity || 0))//(a.quantity || 0)
-             
+                  },
+                  a.quantity || 0
+                ), //(a.quantity || 0)
         },
         {
           path: null,
           label: "Edit",
           sortable: false,
           content: (addon) =>
-            el(
-              "button",
-              { onClick: () => handleAddonEdit(addon) },
-              "Edit"
-            ),
+            el("button", { onClick: () => handleAddonEdit(addon) }, "Edit"),
+        },
+        {
+          path: null,
+          label: "History",
+          sortable: false,
+          content: (addon) =>
+            el("button", { onClick: () => handleAddonHistory(addon) }, "Show"),
         },
       ];
       return el(Table, {
@@ -585,119 +636,117 @@ class CMPTDCustomerOrders extends React.Component {
     } else return null;
   };
 
-  handleUpdateOrderAddOn=(addon)=>{
-    const {      
+  handleUpdateOrderAddOn = (addon) => {
+    const {
       selectedOrderLine,
       currentUser,
       endCustomer,
-      productDetails
+      productDetails,
     } = this.state;
-    
-    const inOrderList=selectedOrderLine.addOns.filter(a=>a.sku===addon.sku);
+
+    const inOrderList = selectedOrderLine.addOns.filter(
+      (a) => a.sku === addon.sku
+    );
     //console.log('addon',inOrderList,addon,selectedOrderLine,productDetails);
-    let body = {      
+    let body = {
       orderNumber: selectedOrderLine.orderNumber,
       baseSubscription: selectedOrderLine.sku,
-      addOns:[{
-        action: "units",
-		    addOnSku: addon.sku,
-        newQuantity: addon.quantity,
-        quantity: addon.quantity,
-      }],
+      addOns: [
+        {
+          action: "units",
+          addOnSku: addon.sku,
+          newQuantity: addon.quantity,
+          quantity: addon.quantity,
+        },
+      ],
       metaData: {
         firstName: currentUser.firstName,
         lastName: currentUser.lastName,
         isEndCustomer: false,
-      },    
-      agreementDetails :{
+      },
+      agreementDetails: {
         firstName: endCustomer.firstName,
         lastName: endCustomer.lastName,
         email: endCustomer.email,
         acceptanceDate: moment().format("MM/DD/YYYY"),
         phoneNumber: endCustomer.phone1,
-      }
+      },
     };
-    //console.log('update addon',body);  
-    if(addon.quantity==0)
-    {
-      body.addOns[0].action="suspend";
+    //console.log('update addon',body);
+    if (addon.quantity == 0) {
+      body.addOns[0].action = "suspend";
       delete body.addOns[0].newQuantity;
       delete body.addOns[0].quantity;
     }
     this.showSpinner();
-    if(inOrderList.length>0)
-    {
-       
+    if (inOrderList.length > 0) {
       //console.log("old addon")
-    this.apiCustomerLicenses
-      .updateSubscriptionAddOns({ modifyAddons: body })
-      .then((res) => {
-        //console.log(res);
-        if (res.Result == "Success") {
-          this.setState({
-            showModal: false,
-            orderUpdateError: null,
-            modalDefaultAction: 1,
-          });
-          setTimeout(() => this.getAddons(selectedOrderLine), 3000);
-          setTimeout(() => this.getAddons(selectedOrderLine), 15000);
-        } else if (res.Result === "Failed")     
-       
-          this.setState({
-            orderUpdateError: res.ErrorMessage,
-          });
-          setTimeout(() => {
-            this.getModalAddonsElement(addon);  
-          }, 100);          
-        this.hideSpinner();
-      });
-    }
-    else  if(addon.quantity>0){ //new addon
-      
       this.apiCustomerLicenses
-      .purchaseSubscriptionAddOns({ orderAddons: body })
-      .then((res) => {
-        //console.log(res);
-        if (res.Result == "Success") {
-          this.setState({
-            showModal: false,
-            orderUpdateError: null,
-            modalDefaultAction: 1,
-          });
-          setTimeout(() => this.getAddons(selectedOrderLine), 3000);
-          setTimeout(() => this.getAddons(selectedOrderLine), 15000);
-        } else if (res.Result === "Failed")     
-       
-          this.setState({
-            orderUpdateError: res.ErrorMessage,
-          });
-                
-        this.hideSpinner();
-      });
-    }
-    else {
+        .updateSubscriptionAddOns({ modifyAddons: body })
+        .then((res) => {
+          //console.log(res);
+          if (res.Result == "Success") {
+            this.setState({
+              showModal: false,
+              orderUpdateError: null,
+              modalDefaultAction: 1,
+            });
+            setTimeout(() => this.getAddons(selectedOrderLine), 3000);
+            setTimeout(() => this.getAddons(selectedOrderLine), 15000);
+          } else if (res.Result === "Failed")
+            this.setState({
+              orderUpdateError: res.ErrorMessage,
+            });
+          setTimeout(() => {
+            this.getModalAddonsElement(addon);
+          }, 100);
+          this.hideSpinner();
+        });
+    } else if (addon.quantity > 0) {
+      //new addon
+
+      this.apiCustomerLicenses
+        .purchaseSubscriptionAddOns({ orderAddons: body })
+        .then((res) => {
+          //console.log(res);
+          if (res.Result == "Success") {
+            this.setState({
+              showModal: false,
+              orderUpdateError: null,
+              modalDefaultAction: 1,
+            });
+            setTimeout(() => this.getAddons(selectedOrderLine), 3000);
+            setTimeout(() => this.getAddons(selectedOrderLine), 15000);
+          } else if (res.Result === "Failed")
+            this.setState({
+              orderUpdateError: res.ErrorMessage,
+            });
+
+          this.hideSpinner();
+        });
+    } else {
       this.setState({
-        orderUpdateError: "Please enter a valid quantity",_showSpinner: false
+        orderUpdateError: "Please enter a valid quantity",
+        _showSpinner: false,
       });
-   
+
       setTimeout(() => {
-        this.getModalAddonsElement(addon);  
-      }, 100);  
+        this.getModalAddonsElement(addon);
+      }, 100);
     }
-     
-  }
-  handleAddonChange= ({ currentTarget: input }) => {
+  };
+  handleAddonChange = ({ currentTarget: input }) => {
     const selectedAddon = { ...this.state.selectedAddon };
     selectedAddon[input.name] = input.value;
     this.setState({ selectedAddon });
-    setTimeout(()=>this.getModalAddonsElement(),50)
+    setTimeout(() => this.getModalAddonsElement(), 50);
   };
   getModalAddonsElement = () => {
     const {
       showModal,
-      selectedOrderLine,      
+      selectedOrderLine,
       orderUpdateError,
-      selectedAddon
+      selectedAddon,
     } = this.state;
     const {
       el,
@@ -705,16 +754,17 @@ class CMPTDCustomerOrders extends React.Component {
       handleAddonChange,
       handleUpdateOrderAddOn,
     } = this;
-    const inactive = selectedOrderLine?.lineStatus === "inactive" ? true : false;
+    const inactive =
+      selectedOrderLine?.lineStatus === "inactive" ? true : false;
     //prepare body
     const body = el("div", { key: "body" }, [
       el(
         "span",
-        { key: "spanTitle",style:{display:'block'} },
+        { key: "spanTitle", style: { display: "block" } },
         "Specify  the number of seats required."
       ),
-      el('strong',{key:'s1'},'Add-On: '),
-      el('span',{key:'span1'},selectedAddon?.skuName),
+      el("strong", { key: "s1" }, "Add-On: "),
+      el("span", { key: "span1" }, selectedAddon?.skuName),
       el("div", { key: "divStatus" }, [
         el("span", { key: "spanStatusText" }, "Base Subscription status : "),
         el(
@@ -740,42 +790,85 @@ class CMPTDCustomerOrders extends React.Component {
         onChange: handleAddonChange,
       }),
       el("br", { key: "br1" }),
-      el("span", { key: "s3", }, "0 Quantity will suspend the addon"),
+      el("span", { key: "s3" }, "0 Quantity will suspend the addon"),
       el("span", { key: "s4", className: "error-message" }, orderUpdateError),
     ]);
     const footer = el(React.Fragment, { key: "footer" }, [
-      el("button", { key: "btnCancel", onClick: handleOnClose }, "Cancel"),      
-         el(
-            "button",
-            { key: "btnSubmit", onClick:()=> handleUpdateOrderAddOn(selectedAddon),disabled:inactive },
-            "Submit"
-          )  
+      el("button", { key: "btnCancel", onClick: handleOnClose }, "Cancel"),
+      el(
+        "button",
+        {
+          key: "btnSubmit",
+          onClick: () => handleUpdateOrderAddOn(selectedAddon),
+          disabled: inactive,
+        },
+        "Submit"
+      ),
     ]);
-    this.setState({modalElement:el(Modal, {
-      key: "Modal",
-      show: showModal,
-      width: "600px",
-      title: `Office 365 Add-On`,
-      onClose: handleOnClose,
-      content: body,
-      footer,
-    })})
-    
+    this.setState({
+      modalElement: el(Modal, {
+        key: "Modal",
+        show: showModal,
+        width: "600px",
+        title: `Office 365 Add-On`,
+        onClose: handleOnClose,
+        content: body,
+        footer,
+      }),
+    });
   };
-  
-  scrollToAddons = () => window.scrollTo(0, this.addonsRef.current.offsetTop);
 
+  scrollToAddons = () => window.scrollTo(0, this.addonsRef.current.offsetTop);
+  handleOrderHistoryHide = () => {
+    this.setState({ showOrderHistory: false });
+  };
+  handleAddonHistoryClose = () => {
+    this.setState({ showAddonHistory: false });
+  };
+  handleNewOrder=()=>{
+    const {endCustomer}=this.state;    
+    window.location =
+    "/CustomerLicenses.php?action=newOrder&endCustomerId=" + endCustomer.id;
+  }
   render() {
-    const { el } = this;
-    const { _showSpinner,modalElement } = this.state;
+    const { el, handleOrderHistoryHide, handleAddonHistoryClose,handleNewOrder } = this;
+    const {
+      _showSpinner,
+      modalElement,
+      orderHistory,
+      showOrderHistory,
+      selectedOrderLine,
+      showAddonHistory,
+      selectedAddon,
+      
+    } = this.state;
+    console.log(selectedAddon);
+ 
     return el("div", null, [
       el(Spinner, { key: "spinner", show: _showSpinner }),
+      el(CMPOrderHistoryModal, {
+        show: true,
+        key: "orderHistor",
+        items: orderHistory,
+        show: showOrderHistory,
+        title: selectedOrderLine && "History of " + selectedOrderLine?.name,
+        onHide: handleOrderHistoryHide,
+      }),
+      el(CMPOrderHistoryModal, {
+        show: true,
+        key: "addonHistor",
+        items: orderHistory,
+        show: showAddonHistory,
+        title:
+          selectedAddon && "History of " + selectedAddon?.skuName + " addon",
+        onHide: handleAddonHistoryClose,
+      }),
       modalElement,
       this.getHeader(),
-      el("h2", { key: "h2installedSaas" }, "SaaS Applications"),
+      el('button',{key:'btnNewOrder',onClick:handleNewOrder},"Place New Order",),
       this.getSearchResult(),
       el("h2", { key: "h2Addons", ref: this.addonsRef }, "AddOns"),
-       this.getAddonsElement(),
+      this.getAddonsElement(),
     ]);
   }
 }

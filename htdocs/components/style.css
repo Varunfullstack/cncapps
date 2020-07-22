@@ -284,7 +284,7 @@ margin-left: 1pt;
 
     display: block; /* Hidden by default */
     position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
+    z-index: 100; /* Sit on top */
     padding-top: 100px; /* Location of the box */
     left: 0;
     top: 0;
@@ -315,7 +315,8 @@ margin-left: 1pt;
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
     animation-name: animatetop;
-    animation-duration: 0.4s
+    animation-duration: 0.4s;
+   
   }
   .modal-content h4{
     font-size: 1.2rem !important;
@@ -365,7 +366,11 @@ margin-left: 1pt;
     font-weight: 500;
     font-size: 1.25rem;
   }
-  .modal-body {padding: 2px 16px;}
+  .modal-body {
+      padding: 2px 16px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
   
   .modal-footer {
     padding: 2px 16px;

@@ -1,9 +1,10 @@
 "use strict";
-import APICustomerLicenses from './APICustomerLicenses.js?v=4';
-import CMPTDCustomerSearch from './CMPTDCustomerSearch.js?v=4';
-import CMPTDCustomerDetails from './CMPTDCustomerDetails.js?v=4';
-import CMPTDCustomerOrders from './CMPTDCustomerOrders.js?v=4';
-import CMPTDOrderDetails from './CMPTDOrderDetails.js?v=4'
+import APICustomerLicenses from './APICustomerLicenses.js?v=5';
+import CMPTDCustomerSearch from './CMPTDCustomerSearch.js?v=5';
+import CMPTDCustomerDetails from './CMPTDCustomerDetails.js?v=5';
+import CMPTDCustomerOrders from './CMPTDCustomerOrders.js?v=5';
+import CMPTDOrderDetails from './CMPTDOrderDetails.js?v=5'
+import NewOrder from './CMPNewOrder.js?v=5';
 /**
  * Don't forget to change v value in js import before push to gethub to avoid cache problem
  */
@@ -23,7 +24,26 @@ class CMPCustomerLicenses extends React.Component {
     this.loadComponents();
   }
   loadComponents = async () => {};
-  componentDidMount() {}
+  componentDidMount() {
+    // this.apiCustomerLicenses.getProductsPrices({
+    //   "vendorIds" : [397],
+    //   "lines":
+    //     [
+    //       {
+    //       "sku":"SK4665",
+    //       "quantity":1
+    //       },
+    //       {
+    //       "sku":"SK4663",
+    //       "quantity":1
+    //       }
+    //     ],
+    //   "page": 1
+    //   }).then(result=>{
+    //   console.log(result);
+    // })
+   
+  }
   handleAddCustomer = () => {
     console.log("add customer");
     window.location = "/CustomerLicenses.php?action=addNewCustomer";
@@ -45,7 +65,7 @@ class CMPCustomerLicenses extends React.Component {
           customerId: queryParams.get("endCustomerId"),
         });
       case "newOrder":
-        return el(CMPTDOrderDetails, null);
+        return el(NewOrder, null);
       case "editOrder":
         return el(CMPTDOrderDetails, null);
       default:

@@ -1,0 +1,31 @@
+{% extends "@internal/wrapper.html.twig" %}
+{# @var items \CNCLTD\SolarwindsAccountItem[] #}
+{% block styles %}
+{% endblock %}
+{% block content %}
+    <p>
+    The cost price of the following items have been changed and have been updated within the database:
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Sku</th>
+                <th>Description</th>
+                <th>Old Value</th>
+                <th>New Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}        
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.sku }}</td>
+                    <td>{{ item.desc }}</td>
+                    <td>{{ item.oldPrice }}</td>
+                    <td>{{ item.newPrice }}</td>
+                </tr>
+            {% endfor %}           
+        </tbody>
+    </table>
+    
+{% endblock %}

@@ -164,6 +164,7 @@ class AutoComplete extends React.Component {
     }
     let defaultValue=this.props.value?this.props.value:"";
     return React.createElement("div", null, React.createElement("input", {
+      className:"form-control",
       type: "text",
       onChange: onChange,
       onKeyDown: onKeyDown,

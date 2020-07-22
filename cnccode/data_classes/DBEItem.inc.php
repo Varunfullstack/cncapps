@@ -30,7 +30,7 @@ class DBEItem extends DBCNCEntity
     const excludeFromPOCompletion = "excludeFromPOCompletion";
     const itemBillingCategoryID = "itemBillingCategoryID";
     const allowSRLog = "allowSRLog";
-
+    const isStreamOne = "isStreamOne";
     /**
      * calls constructor()
      * @access public
@@ -172,6 +172,13 @@ class DBEItem extends DBCNCEntity
             null,
             false
         );
+        $this->addColumn(
+            self::isStreamOne,
+            DA_BOOLEAN,
+            DA_ALLOW_NULL,
+            "isStreamOne"
+        );
+        
         $this->setPK(0);
         $this->setAddColumnsOff();
     }
