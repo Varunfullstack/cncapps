@@ -60,6 +60,11 @@ class APICustomerLicenses extends APIMain{
    { 
       return fetch(`${this.baseURL}getProductBySKU`,{method:'POST',body:JSON.stringify(body)}).then(res=>res.json());
    }
+   getLocalProducts()
+   {
+      return fetch(`${this.baseURL}getLocalProducts`).then(res=>res.json());
+
+   }
 
    //get order detials
    getOrderDetials(orderId)

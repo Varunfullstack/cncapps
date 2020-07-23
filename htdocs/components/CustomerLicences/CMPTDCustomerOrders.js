@@ -139,7 +139,7 @@ class CMPTDCustomerOrders extends React.Component {
         label: "Line Status",
         sortable: true,
         content: (o) =>
-          o.lineStatus === "processing"|| o.lineStatus === "in_process"
+          o.lineStatus === "processing"|| o.lineStatus === "in_process" ||o.lineStatus === "pending"
             ? el("div", {
                 key: "divSpin" + o.orderNumber,
                 className: "loader-content-sm",
@@ -413,8 +413,10 @@ class CMPTDCustomerOrders extends React.Component {
             setTimeout(() => this.getCustomerOrders(), 2000);
             setTimeout(() => this.getCustomerOrders(), 10000);
           } else if (res.BodyText.modifyOrdersDetails[0].status === "failed")
+            console.log(res.BodyText.modifyOrdersDetails[0].message);
             this.setState({
               orderUpdateError: res.BodyText.modifyOrdersDetails[0].message,
+              modalElement:this.getModalOrderElement()
             });
         }
         this.hideSpinner();

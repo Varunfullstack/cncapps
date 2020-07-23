@@ -5,7 +5,9 @@ class Table extends React.Component {
     super(props);
     this.state={
       sortColumn:{path:this.props.defaultSortPath,
-        order:this.props.defaultSortOrder?this.props.defaultSortOrder:'asc'}
+      order:this.props.defaultSortOrder?this.props.defaultSortOrder:'asc',
+      searchFilter:""
+      }
     }
     
   }
@@ -33,25 +35,54 @@ class Table extends React.Component {
           else return 0;
       })
   }
+  handleSearch=(event)=>{
+    console.log(event.target.value);
+    this.setState({searchFilter:event.target.value});
+  }
+  filterData(data,columns){
+    const {searchFilter}=this.state;
+    let filterdData=[];
+    if(searchFilter&&searchFilter.length>0)
+    {
+      for (let i = 0; i < data.length; i++) {
+        for (let j = 0; j < columns.length; j++) {
+          if (columns[j].path != null && columns[j].path != "") {
+            if (data[i][columns[j].path]&&data[i][columns[j].path].toLowerCase().indexOf(searchFilter.toLowerCase()) >= 0) {
+              filterdData.push(data[i]);
+              break;
+            }
+          }
+        }
+      }
+      return filterdData;
+    }
+    else return [...data];
+  }
   render() {
     const props=this.props;   
-      const { data,  columns,pk,selected,selectedKey } = props;
+      const { data,  columns,pk,selected,selectedKey,search } = props;
       const {sortColumn}=this.state;
+      const {handleSearch}=this;
       const el = React.createElement;
-      //console.log('selected',selected)
+      const filterData=search?this.filterData( data,  columns):data;
       if(this.state.sortColumn.path!=null&&data.length>0)
       {
-        this.sort(data,this.state.sortColumn.path,this.state.sortColumn.order);
+        this.sort(filterData,this.state.sortColumn.path,this.state.sortColumn.order);
       }
-      return el("table", { key: "table", className: "table table-striped" }, [
+      return [
+        search?el('div',{key:"tableSearch"},[
+          el('label',{key:"lbLabel"},"Search"),
+          el('input',{key:"inpSearch",onChange:handleSearch})
+        ]):null,
+      el("table", { key: "table", className: "table table-striped" }, [
         el(TableHeader, {
           key: "tableHeader",
           columns: columns,
           sortColumn: sortColumn,
           onSort: this.handleSort,
         }),
-        data.length>0?el(TableBody, { key: "tableBody", data, columns,pk,selected,selectedKey }):null,
-      ]);   
+        filterData.length>0?el(TableBody, { key: "tableBody", data:filterData, columns,pk,selected,selectedKey }):null,
+      ])];   
   }
 }
 

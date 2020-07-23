@@ -1,10 +1,10 @@
 "use strict";
-import APICustomerLicenses from './APICustomerLicenses.js?v=5';
-import CMPTDCustomerSearch from './CMPTDCustomerSearch.js?v=5';
-import CMPTDCustomerDetails from './CMPTDCustomerDetails.js?v=5';
-import CMPTDCustomerOrders from './CMPTDCustomerOrders.js?v=5';
-import CMPTDOrderDetails from './CMPTDOrderDetails.js?v=5'
-import NewOrder from './CMPNewOrder.js?v=5';
+import APICustomerLicenses from './APICustomerLicenses.js?v=6';
+import CMPTDCustomerSearch from './CMPTDCustomerSearch.js?v=6';
+import CMPTDCustomerDetails from './CMPTDCustomerDetails.js?v=6';
+import CMPTDCustomerOrders from './CMPTDCustomerOrders.js?v=6';
+import CMPTDOrderDetails from './CMPTDOrderDetails.js?v=6'
+import NewOrder from './CMPNewOrder.js?v=6';
 /**
  * Don't forget to change v value in js import before push to gethub to avoid cache problem
  */
@@ -42,7 +42,9 @@ class CMPCustomerLicenses extends React.Component {
     //   }).then(result=>{
     //   console.log(result);
     // })
-   
+  //  this.apiCustomerLicenses.getProductList(3).then(res=>{
+  //    console.log(res);
+  //  })
   }
   handleAddCustomer = () => {
     console.log("add customer");

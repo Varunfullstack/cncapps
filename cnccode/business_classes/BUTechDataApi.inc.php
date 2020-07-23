@@ -7,6 +7,7 @@
  * @authors Mustafa Taha
  */
 require_once($cfg["path_gc"] . "/Business.inc.php");
+use CNCLTD\LoggerCLI;
 
 class BUTechDataApi extends Business
 {
@@ -21,7 +22,7 @@ class BUTechDataApi extends Business
     private $authUrl; // production
     private $timeStamp;
     private $mode = 'production';
-
+    private $logger;
     //private $mode='test';
 
     /**
@@ -55,6 +56,8 @@ class BUTechDataApi extends Business
         }
 
         $this->authenticate();
+        $this->logger = new LoggerCLI("StreamOne");
+
     }
 
     function authenticate()
@@ -103,6 +106,14 @@ class BUTechDataApi extends Business
         $this->signature=$_SESSION["AuthSignature"];
         $this->timeStamp=$_SESSION["AuthTimeStamp"];
         $this->accessToken=$_SESSION["AuthAccessToken"];
+        file_put_contents('streamOneAuth.txt',json_encode(array(
+            "Content-type: application/json",
+            "Authorization: Bearer $this->accessToken",
+            "SOIN: $this->SOIN",
+            "TimeStamp: $this->timeStamp",
+            "Signature: $this->signature",
+            "Accept: application/json"
+        )));
         return  array(
             "Content-type: application/json",
             "Authorization: Bearer $this->accessToken",
@@ -115,7 +126,9 @@ class BUTechDataApi extends Business
 
     function callApi($url, $body = null, $method = 'GET')
     {
-        $curl = curl_init();
+        $this->logger->info($url );
+        $this->logger->info($body );
+         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => $this->baseUrl . $url,
             CURLOPT_RETURNTRANSFER => true,
@@ -228,10 +241,10 @@ class BUTechDataApi extends Business
         $vendorId = $_GET['vendorId'];
         if ($vendorId != null) {
             $body = [
-                "vendorIds" => [(int)$vendorId],
-                "page" => $page
-            ];            
-            return $this->callApi("catalog/search",json_decode($body), 'POST');
+                "vendorIds" =>  [$vendorId],
+                "page" =>$page
+            ];                     
+            return $this->callApi("catalog/search",json_encode($body), 'POST');
         } else return $this->failed();
     }
     // orders

@@ -21,6 +21,7 @@ require_once($cfg['path_bu'] . '/BUTechDataApi.inc.php');
 
 class CTSCustomerLicenses extends CTCNC
 {
+    
     /**
      * @var BUTechDataApi
      */
@@ -110,6 +111,9 @@ class CTSCustomerLicenses extends CTCNC
                 exit;
             case "addSubscription":
                 echo $this->buTechDataApi->addOrder();
+                exit;
+            case "getLocalProducts":
+                echo $this->getLocalProducts();
                 exit;
             break;          
             default:
@@ -265,5 +269,11 @@ class CTSCustomerLicenses extends CTCNC
     function success($message="")
     {
         return json_encode(['Result'=>'Success','message'=>$message]);
+    }
+    function getLocalProducts()
+    {
+        global $db;
+        $results=$db->query("SELECT itm_itemno,itm_desc as description, itm_unit_of_sale as sku, itm_sstk_cost as cost FROM  item WHERE isStreamOne=1")->fetch_all(MYSQLI_ASSOC);
+        return json_encode($results);
     }
 }
