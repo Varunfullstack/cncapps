@@ -221,10 +221,12 @@ dd {
       margin-top: 5px;
   }
   .form-control {
+    font-family: Arial, Tahoma, Helvetica, sans-serif;
+    font-size: 12px;
     display: block;
     width: 100%;
     /* padding: .375rem .75rem; */
-    font-size: 1rem;
+    
     /* line-height: 1.5; */
     color: #495057;
     background-color: #fff;
@@ -394,7 +396,7 @@ hr{
     
     display: block; /* Hidden by default */
     position: fixed; /* Stay in place */
-    z-index: 2; /* Sit on top */
+    z-index: 1000000; /* Sit on top */
     padding-top: 40vh; /* Location of the box */
     
     width: 100%; /* Full width */
@@ -430,4 +432,7 @@ hr{
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+  }
+  .pointer{
+      cursor: pointer;
   }

@@ -153,21 +153,17 @@ class CMPTDCustomerOrders extends React.Component {
         sortable: true,
         content: (c) =>
           el(
-            "button",
-            { key: "btnManageTenant", onClick: () => handleAddOns(c) },
-            "AddOns"
+            "i",
+            { key: "btnManageTenant", onClick: () => handleAddOns(c),className:'fa  fa-cart-plus pointer', title:"AddOns" },            
           ),
       },
       {
         path: null,
         label: "Manage Licenses",
         sortable: true,
-        content: (c) =>
-          el(
-            "button",
-            { key: "btnManageTenant", onClick: () => handleManageTenant(c) },
-            "Edit"
-          ),
+        content: (c) =>           
+          el("i", { key: "btnManageTenant",onClick: () => handleManageTenant(c),className:'pointer fa fa-pencil',title:"Edit" })
+
       },
       {
         path: null,
@@ -175,9 +171,8 @@ class CMPTDCustomerOrders extends React.Component {
         sortable: true,
         content: (c) =>
           el(
-            "button",
-            { key: "btnHistory", onClick: () => handelOrderHistory(c) },
-            "Show"
+            "i",
+            { key: "btnHistory", onClick: () => handelOrderHistory(c) , title:"History" , className:'fa fa-history pointer'}            
           ),
       },
     ];
@@ -228,7 +223,7 @@ class CMPTDCustomerOrders extends React.Component {
       return el(
         "h3",
         { key: "h2Customer", className: "text-center" },
-        `StreamOne Orders For ${endCustomer.firstName} @ ${endCustomer.companyName}`
+        `StreamOne Orders For ${endCustomer.firstName} ${endCustomer.lastName}`
       );
     else
       el(
@@ -299,7 +294,7 @@ class CMPTDCustomerOrders extends React.Component {
       }),
       el("br", { key: "br1" }),
       el("label", { key: "l3" }, "Only applicable when changing seat number "),
-      el("span", { key: "s3", className: "error-message" }, orderUpdateError),
+      el("span", { key: "s3", className: "error-message",style:{display: "block"} }, orderUpdateError),
     ]);
     const footer = el(React.Fragment, { key: "footer" }, [
       el("button", { key: "btnCancel", onClick: handleOnClose }, "Cancel"),
@@ -510,6 +505,7 @@ class CMPTDCustomerOrders extends React.Component {
           if (prices.Result == "Success") {
             prices.BodyText.pricingDetails.map((adn) => {
               for (let j = 0; j < productAddOns.length; j++) {
+                productAddOns[j].quantity=0;
                 if (productAddOns[j].sku === adn.sku) {
                   productAddOns[j] = { ...productAddOns[j], ...adn };
                 }
@@ -616,15 +612,15 @@ class CMPTDCustomerOrders extends React.Component {
           path: null,
           label: "Edit",
           sortable: false,
-          content: (addon) =>
-            el("button", { onClick: () => handleAddonEdit(addon) }, "Edit"),
+          content: (c) =>            
+            el("i", { onClick: () => handleAddonEdit(c),className:'pointer fa fa-pencil',title:"Edit" })
         },
         {
           path: null,
           label: "History",
           sortable: false,
           content: (addon) =>
-            el("button", { onClick: () => handleAddonHistory(addon) }, "Show"),
+            el("i", { onClick: () => handleAddonHistory(addon), title:"History" , className:'fa fa-history pointer' }),
         },
       ];
       return el(Table, {
@@ -646,9 +642,9 @@ class CMPTDCustomerOrders extends React.Component {
       productDetails,
     } = this.state;
 
-    const inOrderList = selectedOrderLine.addOns.filter(
+    const inOrderList =selectedOrderLine.addOns? selectedOrderLine.addOns.filter(
       (a) => a.sku === addon.sku
-    );
+    ):[];
     //console.log('addon',inOrderList,addon,selectedOrderLine,productDetails);
     let body = {
       orderNumber: selectedOrderLine.orderNumber,
@@ -723,7 +719,9 @@ class CMPTDCustomerOrders extends React.Component {
             this.setState({
               orderUpdateError: res.ErrorMessage,
             });
-
+            setTimeout(() => {
+              this.getModalAddonsElement(addon);
+            }, 100);
           this.hideSpinner();
         });
     } else {
@@ -793,7 +791,7 @@ class CMPTDCustomerOrders extends React.Component {
       }),
       el("br", { key: "br1" }),
       el("span", { key: "s3" }, "0 Quantity will suspend the addon"),
-      el("span", { key: "s4", className: "error-message" }, orderUpdateError),
+      el("span", { key: "s4", className: "error-message",style:{display: "block"} }, orderUpdateError),
     ]);
     const footer = el(React.Fragment, { key: "footer" }, [
       el("button", { key: "btnCancel", onClick: handleOnClose }, "Cancel"),
@@ -807,12 +805,13 @@ class CMPTDCustomerOrders extends React.Component {
         "Submit"
       ),
     ]);
+    console.log(selectedAddon);
     this.setState({
       modalElement: el(Modal, {
         key: "Modal",
         show: showModal,
         width: "600px",
-        title: `Office 365 Add-On`,
+        title: selectedAddon?.skuName,
         onClose: handleOnClose,
         content: body,
         footer,
@@ -867,7 +866,7 @@ class CMPTDCustomerOrders extends React.Component {
       }),
       modalElement,
       this.getHeader(),
-      el('button',{key:'btnNewOrder',onClick:handleNewOrder},"Place New Order",),
+      el('i',{key:'btnNewOrder',onClick:handleNewOrder,className:'fa fa-shopping-cart fa-2x pointer',title:"Place New Order"}),
       this.getSearchResult(),
       el("h2", { key: "h2Addons", ref: this.addonsRef }, "AddOns"),
       this.getAddonsElement(),

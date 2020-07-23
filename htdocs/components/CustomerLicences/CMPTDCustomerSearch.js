@@ -184,13 +184,13 @@ class CMPTDCustomerSearch extends React.Component {
         path: null,
         label: "Edit Company",
         sortable: false,
-        content: (c) => el("button", { onClick: () => handleEdit(c) }, "Edit"),
+        content: (c) => el("i", { onClick: () => handleEdit(c),className:'pointer fa fa-pencil',title:"Edit customer details" })
       },
       {
         path: null,
         label: "Edit Licenses",
         sortable: false,
-        content: (c) => el("button", { onClick: () => handleSaas(c) }, "Edit"),
+        content: (c) => el("i", { onClick: () => handleSaas(c),className:'pointer fa fa-pencil',title:"Edit customer licences" }),
       },
     ];
     //if(search&& search.result&&search.result.endCustomersDetails!=null)

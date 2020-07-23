@@ -42,12 +42,25 @@ class NewOrder extends React.Component {
     //console.log(endCustomer.BodyText.endCustomerDetails);
     const currentUser = await this.apiCustomerLicenses.getCurrentUser();
     let productList = await this.apiCustomerLicenses.getLocalProducts();
-    console.log(productList);
+   
     productList=productList.map(p=>{
       p.quantity=0;
       return p;
     });
-    
+    let streamOneProducts = await this.apiCustomerLicenses.getProductBySKU({
+      skus: productList.map(p=>p.sku),
+    });
+    productList=productList.map(p=>{
+      const streamProduct=streamOneProducts.BodyText.productDetails.filter(s=>s.sku===p.sku);
+      if(streamProduct.length>0)
+      {
+        p={...p,...streamProduct[0]};
+      }
+      p.quantity=0;
+      return p;
+    });
+    console.log('streamOneProduct',streamOneProducts)
+    console.log(productList);
     if (endCustomer.Result == "Success")
       state = {
         ...state,
@@ -80,23 +93,7 @@ class NewOrder extends React.Component {
       selectedCategory,
     });
   };
-  // getProductListElement() {
-  //   const { productList, selectedCategoryName } = this.state;
-  //   const { el, handleProductListChange } = this;
-  //   if (productList)
-  //     return el(
-  //       "select",
-  //       {
-  //         key: "productListSelect",
-  //         onChange: handleProductListChange,
-  //         value: selectedCategoryName,
-  //       },
-  //       productList.map((c, indx) =>
-  //         el("option", { key: "option" + indx }, c.listingName)
-  //       )
-  //     );
-  //   else return null;
-  // }
+  
   handleDomainChange = (event) => {
     this.setState({ selectedDomain: event.target.value });
   };
@@ -110,6 +107,7 @@ class NewOrder extends React.Component {
           key: "customerDomains",
           onChange: handleDomainChange,
           value: selectedDomain,
+          style:{width: 155}
         },
         endCustomer.additionalData
           ? endCustomer.additionalData.MsDomain.map((c, indx) =>
@@ -141,32 +139,39 @@ class NewOrder extends React.Component {
         label: "SKU",
         sortable: true,
       },
-      { path: "description", label: "Product Name", sortable: true },
-      { path: "cost", label: "Unit Price", sortable: true },
+      { path: "skuName", label: "Product Name", sortable: true },
+      { path: "cost", label: "Unit Price", sortable: true,content:(p)=>el("label",null,"₤"+p.cost) },
+      {path:"skuType",label:'Product Type',sortable:true},
+      {path:"listingName",label:'Listing Name',sortable:true},
       {
         path: "quantity",
         label: "Qty",
         sortable: true,
+        
         content: (p) =>
           el("input", {
             value: p.quantity,
             min: 0,
             type: "number",
+            disabled:p.skuType==="Add On Subscription",
             style: { maxWidth: 40 },
             onChange: (event) => handleProductQuantity(event, p),
           }),
       },
+      
+      
     ];
 
-    return this.el('div',{key:"tableContainer",style:{maxWidth:600,overflowY:'auto',maxHeight:600}},
+    return this.el('div',{key:"tableContainer",style:{maxWidth:1200,overflowY:'auto',maxHeight:600}},
     this.el(Table, {
       key: "lines",
       data: productList || [],
       columns: columns,
-      defaultSortPath: "sku",
-      defaultSortOrder: "asc",
+      defaultSortPath: "skuType",
+      defaultSortOrder: "desc",
       pk: "sku",
-      search:true
+      search:true,
+      searchLabelStyle:{marginRight: 30,marginLeft: 5}
     }));
   }
   handleDeleteCartItem = (item) => {
@@ -198,9 +203,9 @@ class NewOrder extends React.Component {
         label: "SKU",
         sortable: true,
       },
-      { path: "description", label: "Product Name", sortable: true },
+      { path: "skuName", label: "Product Name", sortable: true },
       { path: "quantity", label: "Qty", sortable: true },
-      { path: "cost", label: "Unit Price", sortable: true },
+      { path: "cost", label: "Unit Price", sortable: true,content:(p)=>this.el('label',null,"₤"+p.cost) },
       {
         path: null,
         label: "Delete",
@@ -222,7 +227,7 @@ class NewOrder extends React.Component {
           .reduce((c, p) => c + p)
           .toFixed(2);
 
-      return this.el("div", { key: "cartContainer", style: { width: 600 } }, [
+      return this.el("div", { key: "cartContainer", style: { width: 1200 } }, [
         this.el(Table, {
           key: "cartItems",
           data: items || [],
@@ -309,10 +314,10 @@ class NewOrder extends React.Component {
         el(
           "tbody",
           { key: "tbody1" },
-          el("tr", { key: "trProductList" }, [
-             el("td", { key: "td1" }, "Customer "),
-             el("td", { key: "td2" },endCustomer?endCustomer.firstName+' '+endCustomer.lastName+' @ '+ endCustomer.companyName:'Not Found'),
-           ]),
+          endCustomer!=null?el("tr", { key: "trProductList" }, [
+             el("td", { key: "td1" }, "StreamOne "),
+             el("td", { key: "td2" }," Place New Order for"+endCustomer?endCustomer?.firstName+' '+endCustomer?.lastName:''),
+           ]):null,
           el("tr", { key: "tr2" }, [
             el("td", { key: "td3" }, "Domain"),
             el("td", { key: "td4" }, this.getEndcustomerDomainElement()),
@@ -331,7 +336,7 @@ class NewOrder extends React.Component {
         },
         errorMessage
       ),
-      el("button", { key: "submit", onClick: handleSubmit }, "Place Order"),
+      el("i", { key: "submit", onClick: handleSubmit,className:'fa fa-shopping-cart fa-2x pointer' , title:"Place Order"}, ),
     ]);
   }
 }

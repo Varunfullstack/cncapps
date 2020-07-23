@@ -249,4 +249,9 @@
         )
        </sql>           
     </changeSet>
+    <changeSet id="issue539-6" author="pavwebdevmt">            
+       <sql  splitStatements="true">
+       UPDATE  consultant SET streamOneLicenseManagement =1 WHERE cns_consno IN (29, 2, 50, 47, 138)       
+       </sql>           
+    </changeSet>
 </databaseChangeLog>

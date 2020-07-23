@@ -60,7 +60,7 @@ class Table extends React.Component {
   }
   render() {
     const props=this.props;   
-      const { data,  columns,pk,selected,selectedKey,search } = props;
+      const { data,  columns,pk,selected,selectedKey,search,searchLabelStyle } = props;
       const {sortColumn}=this.state;
       const {handleSearch}=this;
       const el = React.createElement;
@@ -71,7 +71,7 @@ class Table extends React.Component {
       }
       return [
         search?el('div',{key:"tableSearch"},[
-          el('label',{key:"lbLabel"},"Search"),
+          el('label',{key:"lbLabel",style:searchLabelStyle||null},"Search"),
           el('input',{key:"inpSearch",onChange:handleSearch})
         ]):null,
       el("table", { key: "table", className: "table table-striped" }, [
