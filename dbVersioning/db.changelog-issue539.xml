@@ -224,4 +224,29 @@
             </column>
         </addColumn>              
     </changeSet>
+     <changeSet id="issue539-5" author="pavwebdevmt">            
+       <sql  splitStatements="true">
+       UPDATE item SET isStreamOne=1 WHERE itm_itemno IN (14594	,
+        14787	,
+        15415	,
+        16074	,
+        16075	,
+        16461	,
+        16588	,
+        17048	,
+        17199	,
+        17220	,
+        17254	,
+        17378	,
+        17568	,
+        17598	,
+        17879	,
+        18027	,
+        18106	,
+        18152	,
+        18175	,
+        18215	
+        )
+       </sql>           
+    </changeSet>
 </databaseChangeLog>
