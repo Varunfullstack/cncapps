@@ -235,7 +235,7 @@ class NewOrder extends React.Component {
           ? this.el(
               "dt",
               { key: "total", style: { textAlign: "right" } },
-              "Total " + items[0].currencySymbol + total
+              "Total " + '₤' + total
             )
           : null,
       ]);
