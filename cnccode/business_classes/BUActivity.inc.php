@@ -8442,6 +8442,7 @@ FROM
                 DBEJProblem::alarmTime,
                 null
             );
+            $dbeCallActivity->setValue(DBECallActivity::submitAsOvertime, 0);
             $dbeProblem->updateRow();
 
         } else {
