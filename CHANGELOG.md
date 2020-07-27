@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v4.2.6]
+## [v4.2.6] - 2020-07-27
 ## Fixed
 - Overtime flag incorrectly being carried forward.
 
