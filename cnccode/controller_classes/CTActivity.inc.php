@@ -4998,6 +4998,10 @@ class CTActivity extends CTCNC
             );
         } else {
             $dbeCallActType->getRow($this->dsCallActivity->getValue(DBEJCallActivity::callActTypeID));
+            $this->dsCallActivity->setValue(
+                DBECallActivity::submitAsOvertime,
+                isset($this->getParam('callActivity')[1]['submitAsOvertime'])
+            );
             if ($this->dsCallActivity->getValue(DBEJCallActivity::siteNo) === null) {
                 $this->formError = true;
                 $this->dsCallActivity->setMessage(
