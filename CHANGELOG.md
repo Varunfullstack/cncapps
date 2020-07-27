@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.2.6]
+## Fixed
+- Overtime flag incorrectly being carried forward.
+
 ## [v4.2.5] - 2020-07-17
 ### Fixed
 - Fixed issue with contracts not showing
