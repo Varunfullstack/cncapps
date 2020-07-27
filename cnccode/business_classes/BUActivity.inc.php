@@ -3240,9 +3240,10 @@ class BUActivity extends Business
                     $comments,
                     $reviewingUser
                 );
+
                 $this->logOperationalActivity(
                     $dsCallActivity->getValue(DBECallActivity::problemID),
-                    '<p>Additional time allocated: ' . $minutes . ' minutes</p><p>' . $comments . '</p>'
+                    "<p>Additional time allocated to {$this->getTeamName($teamLevel)} Team: {$minutes} minutes</p><p>{$comments}</p>"
                 );
                 break;
             case 'D':
@@ -3339,11 +3340,6 @@ class BUActivity extends Business
             $reviewingUser->getValue(DBEUser::name)
         );
     }
-
-    /*
-  Check to se whether this site record requires travel hours added to the site record.
-  i.e. is this a chargeable activity and does this site have zero travel hours.
-  */
 
     private function sendTimeAllocatedEmail($minutes,
                                             $comments,
@@ -3443,6 +3439,25 @@ class BUActivity extends Business
             $hdrs,
             $body
         );
+    }
+
+    /*
+  Check to se whether this site record requires travel hours added to the site record.
+  i.e. is this a chargeable activity and does this site have zero travel hours.
+  */
+
+    public function getTeamName($teamLevel)
+    {
+        switch ($teamLevel) {
+            case 1:
+                return "Help Desk";
+            case 2:
+                return 'Escalations';
+            case 3:
+                return 'Small Projects';
+            default:
+                return 'Projects';
+        }
     }
 
     /**
