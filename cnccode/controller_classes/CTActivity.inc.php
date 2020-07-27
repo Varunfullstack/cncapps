@@ -4998,10 +4998,6 @@ class CTActivity extends CTCNC
             );
         } else {
             $dbeCallActType->getRow($this->dsCallActivity->getValue(DBEJCallActivity::callActTypeID));
-            $this->dsCallActivity->setValue(
-                DBECallActivity::submitAsOvertime,
-                isset($this->getParam('callActivity')[1]['submitAsOvertime'])
-            );
             if ($this->dsCallActivity->getValue(DBEJCallActivity::siteNo) === null) {
                 $this->formError = true;
                 $this->dsCallActivity->setMessage(
@@ -5328,6 +5324,12 @@ class CTActivity extends CTCNC
         /*
       Record action button selected
       */
+        $this->dsCallActivity->setUpdateModeUpdate();
+        $this->dsCallActivity->setValue(
+            DBECallActivity::submitAsOvertime,
+            isset($this->getParam('callActivity')[1]['submitAsOvertime'])
+        );
+        $this->dsCallActivity->post();
         $updateAwaitingCustomer = false;
         if ($this->getParam('Fixed')) {
             $nextStatus = 'Fixed';
