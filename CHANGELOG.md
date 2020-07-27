@@ -7,6 +7,14 @@ This project changes will be shown here.
 ### Fixed
 - Issue 933 - User Time Logs sometimes showing as holiday
 
+## [v4.2.6] - 2020-07-27
+## Fixed
+- Overtime flag incorrectly being carried forward.
+
+## [v4.2.5] - 2020-07-17
+### Fixed
+- Fixed issue with contracts not showing
+
 ## [v4.2.4] - 2020-07-16
 ### Fixed
 - Fixed Office 365 export issues
