@@ -12,6 +12,7 @@ require_once($cfg['path_bu'] . '/BURenContract.inc.php');
 require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
+require_once($cfg['path_dbe'] . '/DBEItem.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerItem.inc.php');
 require_once($cfg['path_bu'] . '/BUPDFSupportContract.inc.php');
 
@@ -332,7 +333,8 @@ class CTRenContract extends CTCNC
                     'htmlFmt' => CT_HTML_FMT_POPUP
                 )
             );
-
+        $dbeItem=new DBEItem($this);        
+        $dbeItem->getRow($dsRenContract->getValue(DBECustomerItem::itemID));
         $dsCustomer = new DBECustomer($this);
         $dsCustomer->getRow($dsRenContract->getValue(DBECustomerItem::customerID));
 
@@ -363,6 +365,9 @@ class CTRenContract extends CTCNC
                 'users'                              => Controller::htmlDisplayText(
                     $dsRenContract->getValue(DBEJRenContract::users)
                 ),
+                'usersDisable'                              => Controller::htmlDisplayText(
+                    $dbeItem->getValue(DBEItem::isStreamOne)==1?'disabled':''
+                ),                
                 'salePricePerMonth'                  => $dsRenContract->getValue(DBECustomerItem::salePricePerMonth),
                 'costPricePerMonth'                  => $dsRenContract->getValue(DBECustomerItem::costPricePerMonth),
                 'siteDesc'                           => Controller::htmlDisplayText(

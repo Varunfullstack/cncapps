@@ -191,13 +191,13 @@ class BUTechDataApi extends Business
             return $this->callApi("order/subscriptions/dateRange/$from/$to/$page");
         } else return false;
     }
-
-    function searchCustomers($page = 1)
+    //customers
+    function searchCustomers($body=null)
     {       
-        
+        if($body==null)
         $body = file_get_contents('php://input');
         return $this->callApi("endCustomer/search", $body, 'POST');
-    }
+    }     
 
     function createCustomer()
     {
@@ -209,10 +209,16 @@ class BUTechDataApi extends Business
     {        
         return $this->callApi("endCustomer/$endCustomerId");
     }
-
+    function getStreamOneCustomerByEmail()
+    {
+        $body = file_get_contents('php://input');        
+        return $this->callApi("endCustomer/search", $body, 'POST');
+    }
     function updateCustomer($id,$body)
     {
-        return $this->callApi("endCustomer/".$id, $body, 'PATCH');
+        $b=json_decode($body);
+        $b->id=$id;
+        return $this->callApi("endCustomer/".$id, json_encode($b), 'PATCH');
     }
     function getSubscriptionsByEndCustomerId($page)
     {

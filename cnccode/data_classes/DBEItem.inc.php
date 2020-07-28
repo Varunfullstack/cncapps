@@ -31,6 +31,7 @@ class DBEItem extends DBCNCEntity
     const itemBillingCategoryID = "itemBillingCategoryID";
     const allowSRLog = "allowSRLog";
     const isStreamOne = "isStreamOne";
+    const partNoOld = "partNoOld";
     /**
      * calls constructor()
      * @access public
@@ -178,7 +179,12 @@ class DBEItem extends DBCNCEntity
             DA_ALLOW_NULL,
             "isStreamOne"
         );
-        
+        $this->addColumn(
+            self::partNoOld,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "partNoOld"
+        );
         $this->setPK(0);
         $this->setAddColumnsOff();
     }

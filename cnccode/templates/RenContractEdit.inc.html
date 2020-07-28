@@ -211,13 +211,14 @@
         {prices}
         <tr>
             <td class="promptText">Number of Users/Units</td>
-            <td class="fieldText">
+            <td class="fieldText"> 
                 <input name="renContract[1][users]"
                        type="number"
                        value="{users}"
                        title="Users"
                        onkeyup="recalculatePrices()"
                        id="units"
+                       {usersDisable}
                 >
                 <span class="formErrorMessage">{usersMessage}</span>
             </td>

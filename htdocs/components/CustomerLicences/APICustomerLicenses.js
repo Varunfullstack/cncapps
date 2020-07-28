@@ -108,5 +108,26 @@ class APICustomerLicenses extends APIMain{
    {
      
    }
+   // customers
+   getCustomerByEmail(email)
+   {
+      const body={ email: email };
+      return fetch(`${this.baseURL}getStreamOneCustomerByEmail`,{method:'POST',body:JSON.stringify(body)}).then(res=>res.json());
+
+   }
+   getStreamOneCustomersLocal()
+   {
+      return fetch(`${this.baseURL}getStreamOneCustomersLocal`)
+      .then(res=>res.json()).then(res=>{
+         res.forEach(element => {
+            if(element.MsDomain)
+            {
+               element.MsDomain=JSON.parse(element.MsDomain);
+            }
+            return element;
+         });
+         return res;
+      });
+   }
 }
 export default APICustomerLicenses;

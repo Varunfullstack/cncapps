@@ -3,8 +3,8 @@ import AutoComplete from "./../utils/autoComplete.js?v=1";
 import Table from './../utils/table/table.js?v=1';
 import APICustomerLicenses from './APICustomerLicenses.js?v=1';
 import Spinner from './../utils/spinner.js?v=1';
-
-/**
+import {distinct} from '../utils/utils.js?v=1';
+/**import 
  * searching in TechData customers and link them with CNC customers
  */
 class CMPTDCustomerSearch extends React.Component {
@@ -17,13 +17,9 @@ class CMPTDCustomerSearch extends React.Component {
    */
   constructor(props) {
     super(props);
-    this.state = {
-      search: {
-        noOfRecords: 500,
-      },
-      cncCustomers: [],
-      result: [],
-      filteredResult: [],
+      this.state = {      
+      customers: this.props.customers,      
+      filteredResult:this.props.customers,
       _showSpinner: false,
     };
     this.apiCustomerLicenses = new APICustomerLicenses();
@@ -35,31 +31,33 @@ class CMPTDCustomerSearch extends React.Component {
     this.setState({ _showSpinner: false });
   };
   componentDidMount() {
-    this.showSpinner();
-    this.apiCustomerLicenses.getCustomers().then((cncCustomers) => {
-      this.setState({ cncCustomers });
-      setTimeout(() => this.handleSearch(), 100);
-      this.hideSpinner();
-    });
+    // this.showSpinner();
+    // this.apiCustomerLicenses.getCustomers().then((cncCustomers) => {
+    //   this.setState({ cncCustomers });
+    //   setTimeout(() => this.handleSearch(), 100);
+    //   this.hideSpinner();
+    // });
+    
+    
   }
   handleChange = ({ currentTarget: input }) => {
-    const { result } = this.state;
-    if (result.length > 0 && input.value.length > 0) {
-      const filteredResult = result.filter((c) => {
+    const { customers } = this.state;
+    if (customers.length > 0 && input.value.length > 0) {
+      const filteredResult = customers.filter((c) => {
         return (
-          (c.firstName + " " + c.lastName)
+          (c.name)
             .toLowerCase()
             .indexOf(input.value.toLowerCase()) >= 0 ||
           c.companyName.toLowerCase().indexOf(input.value.toLowerCase()) >= 0 ||
           c.email.toLowerCase().indexOf(input.value.toLowerCase()) >= 0 ||
-          (c.cncCustomerName != null &&
-            c.cncCustomerName
+          (c.cncCustName != null &&
+            c.cncCustName
               .toLowerCase()
               .indexOf(input.value.toLowerCase()) >= 0)
         );
       });
       this.setState({ filteredResult });
-    } else this.setState({ filteredResult: [...result] });
+    } else this.setState({ filteredResult: [...customers] });
     // const search = { ...this.state.search };
     // search[input.name] = input.value;
     // this.setState({ search });
@@ -108,40 +106,53 @@ class CMPTDCustomerSearch extends React.Component {
     );
   }
  
-  handleSearch = () => {
-    console.log("Search", this.state.search);
-    this.apiCustomerLicenses
-      .searchTechDataCustomers(this.state.search)
-      .then((res) => {
-        //set cnc customers
-        if (res.Result === "Success") {
-          // set result
-          res.BodyText.endCustomersDetails.map((endCust) => {
-            const cncCustomers = this.state.cncCustomers.filter(
-              (cnc) => cnc.techDataCustomerId == endCust.endCustomerId
-            );
-            //console.log(endCust.endCustomerId);
-            if (cncCustomers.length > 0) {
-              endCust.cncCustomerName = cncCustomers[0].name;
-            }
-            return endCust;
-          });
-        }
-        return res;
-      })
-      .then((res) => {
-        console.log("result", res);
-        if (res.Result === "Success") {
-          // set result
-          this.setState({
-            result: res.BodyText.endCustomersDetails,
-            filteredResult: res.BodyText.endCustomersDetails,
-          });
-        } else {
-          this.setState({ result: [], filteredResult: [] });
-        }
-      });
-  };
+  // handleSearch = () => {
+  //   console.log("Search", this.state.search);
+  //   const {cncCustomers}=this.state;
+  //   this.apiCustomerLicenses
+  //     .searchTechDataCustomers(this.state.search)
+  //     .then((res) => {
+  //       //set cnc customers
+  //       if (res.Result === "Success") {
+  //         // set result
+  //         res.BodyText.endCustomersDetails.map((endCust) => {
+  //           const cncCustomers = this.state.cncCustomers.filter(
+  //             (cnc) => cnc.streamOneEmail == endCust.endCustomerId
+  //           );
+  //           //console.log(endCust.endCustomerId);
+  //           if (cncCustomers.length > 0) {
+  //             endCust.cncCustomerName = cncCustomers[0].name;
+  //           }
+  //           return endCust;
+  //         });
+  //       }
+  //       return res;
+  //     })
+  //     .then((res) => {
+  //       console.log("result", res);
+  //       if (res.Result === "Success") {
+  //         // set result
+  //         const orders= this.props.orders;
+  //        const orderContacts= orders.map(o=>{
+  //           return {name:o.endCustomerName,email:o.endCustomerEmail,company:o.company,po:o.endCustomerPO
+  //             ,cncCustomer:cncCustomers.filter(cnc=>cnc.streamOneEmail===o.endCustomerEmail)[0]||null};
+  //         })
+  //         let streamOneCustomers=res.BodyText.endCustomersDetails.map(c=>{
+  //           return {name:c.firstName+' '+c.lastName,email:c.email,company:c.companyName,po:c.companyName,id:c.endCustomerId
+  //           ,cncCustomer:cncCustomers.filter(cnc=>cnc.streamOneEmail===c.email)[0]||null}
+  //         });
+  //         console.log(streamOneCustomers)
+  //         let allContact=distinct([...streamOneCustomers,...orderContacts],'email');      
+  //         console.log('All Contact',allContact);    
+  //         this.setState({
+  //           result: allContact,
+  //           filteredResult: allContact,
+  //         });
+  //       } else {
+  //         this.setState({ result: [], filteredResult: [] });
+  //       }
+  //     });
+  // };
 
   handleAddNew = () => {
     if (this.props.onAddNew) this.props.onAddNew();
@@ -155,28 +166,20 @@ class CMPTDCustomerSearch extends React.Component {
   handleSaas = (customer) => {
     console.log(customer);
     // get customer orders;
-    window.location = `/CustomerLicenses.php?action=searchOrders&endCustomerId=${customer.endCustomerId}&tap=saas`;
+    window.location = `/CustomerLicenses.php?action=searchOrders&email=${customer.email}&tap=saas`;
     //    this.apiCustomerLicenses.getSubscriptionsByEndCustomerId(customner.endCustomerId).then(result=>console.log(result))
     //this.apiCustomerLicenses.getSubscriptionsByEmail('mark.perres@ajmhealthcare.ord').then(result=>console.log(result))
   };
   getSearchResult = () => {
     const { search, filteredResult } = this.state;
     const { el, handleEdit, handleSaas } = this;
+    //            return {name:o.endCustomerName,email:o.endCustomerEmail,company:o.company,po:o.endCustomerPO};
+
     const columns = [
       { path: "companyName", label: "StreamOne Company Name", sortable: true },
       
-      { path: "cncCustomerName", label: "CNC Customer", sortable: true },
-      {
-        path: "firstName",
-        label: "Contact Name",
-        sortable: true,
-        content: (c) =>
-          el(
-            "label",
-            { ket: c.endCustomerId + "name" },
-            c.firstName + " " + c.lastName
-          ),
-      },
+      { path: "cncCustName", label: "CNC Customer", sortable: true },
+      { path: "name", label: "Contact Name", sortable: true,},
       { path: "email", label: "Email", sortable: true },
      
       // { path: "createdOn", label: "Created On", sortable: true },
@@ -184,7 +187,7 @@ class CMPTDCustomerSearch extends React.Component {
         path: null,
         label: "Edit Company",
         sortable: false,
-        content: (c) => el("i", { onClick: () => handleEdit(c),className:'pointer fa fa-pencil',title:"Edit customer details" })
+        content: (c) =>c.endCustomerId !=null? el("i", { onClick: () => handleEdit(c),className:'pointer fa fa-pencil',title:"Edit customer details" }):null
       },
       {
         path: null,
@@ -199,15 +202,16 @@ class CMPTDCustomerSearch extends React.Component {
         key: "reaulttable",
         data: filteredResult || [],
         columns: columns,
-        defaultSortPath: "companyName",
-        defaultSortOrder: "desc",
-        pk: "endCustomerId",
+        defaultSortPath: "cncCustName",
+        defaultSortOrder: "asc",
+        pk: "email",
       });
     }
   };
   render() {
     const { el } = this;
     const { _showSpinner } = this.state;
+   
     return el("div", null, [
       el(Spinner, { key: "spinner", show: _showSpinner }),
       this.getSearchElements(),

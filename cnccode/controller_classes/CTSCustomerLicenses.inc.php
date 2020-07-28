@@ -17,6 +17,8 @@ require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg ['path_dbe'] . '/DBECustomer.inc.php');
 require_once($cfg ['path_dbe'] . '/DBEItem.inc.php');
+require_once($cfg ['path_dbe'] . '/DBEStreamOneCustomers.inc.php');
+
 require_once($cfg['path_bu'] . '/BUTechDataApi.inc.php');
 
 class CTSCustomerLicenses extends CTCNC
@@ -115,6 +117,12 @@ class CTSCustomerLicenses extends CTCNC
             case "getLocalProducts":
                 echo $this->getLocalProducts();
                 exit;
+            case "getStreamOneCustomerByEmail":
+                echo $this->buTechDataApi->getStreamOneCustomerByEmail();
+                exit;
+            case "getStreamOneCustomersLocal":
+                echo $this->getStreamOneCustomersLocal();
+                exit;
             break;          
             default:
                 $this->setTemplate();
@@ -129,12 +137,21 @@ class CTSCustomerLicenses extends CTCNC
     function setTemplate()
     {
         $this->setMethodName('setTemplate');
-
+        $email=null;
+        $name ="";
+        if(isset($_GET["email"]))
+        {
+            $email=$_GET["email"];
+            $dbeStreamOneCustomers=new DBEStreamOneCustomers($this);
+            $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::email,$email);
+            $dbeStreamOneCustomers->getRowByColumn(DBEStreamOneCustomers::email);
+            $name =$dbeStreamOneCustomers->getValue(DBEStreamOneCustomers::name);
+        }
         $action = $this->getAction();
         $this->setMenuId(313);
         switch ($action) {
             case 'searchOrders':             
-                $this->setPageTitle('StreamOne Orders');
+                $this->setPageTitle('StreamOne Orders For '. $name);
                 break;
             case 'newOrder':
                 $this->setPageTitle('StreamOne Place New Order');
@@ -149,7 +166,7 @@ class CTSCustomerLicenses extends CTCNC
                 $this->setPageTitle('StreamOne Add New Customer');
                 break;
             case 'editCustomer':
-                $this->setPageTitle('StreamOne Edit Customer detials');
+                $this->setPageTitle('StreamOne Edit Customer Details');
                 break;
         }
 
@@ -178,8 +195,8 @@ class CTSCustomerLicenses extends CTCNC
             //get cnc customer by endcustomerId
             if ($obj->Result == 'Success') {
                 $dbeCustomer = new DBECustomer($this);
-                $dbeCustomer->setValue(DBECustomer::techDataCustomerId,  $endCustomerId);
-                $dbeCustomer->getRowsByColumn(DBECustomer::techDataCustomerId);
+                $dbeCustomer->setValue(DBECustomer::streamOneEmail,  $endCustomerId);
+                $dbeCustomer->getRowsByColumn(DBECustomer::streamOneEmail);
                 $dbeCustomer->fetchNext();
                 $obj->BodyText->endCustomerDetails->cncCustomerId = $dbeCustomer->getValue(DBECustomer::customerID);
                 $obj->BodyText->endCustomerDetails->cncCustomerName = $dbeCustomer->getValue(DBECustomer::name);
@@ -190,39 +207,71 @@ class CTSCustomerLicenses extends CTCNC
     }
     function updateTechDataCustomer()
     {
-        $body = file_get_contents('php://input');                     
-        if(isset($_GET['endCustomerId']) && isset($body))
-        {
-            $result = $this->buTechDataApi->updateCustomer($_GET['endCustomerId'],$body);
-            $obj=json_decode($result);
-            $bodyObj=json_decode($body);
-            if($obj->Result=='Success'&&$bodyObj->cncCustomerId!=null)
-            {
-                //remove  old customer
-                $dbeCustomer = new DBECustomer($this);
-                $dbeCustomer->setValue(DBECustomer::techDataCustomerId,  $_GET['endCustomerId']);
-                $dbeCustomer->getRowsByColumn(DBECustomer::techDataCustomerId);
-                $dbeCustomer->fetchNext();
-                
-                if( $dbeCustomer->getPKValue()!=$bodyObj->cncCustomerId)
-                {
-                    $dbeCustomer->setPKValue($dbeCustomer->getValue(DBECustomer::customerID));
+        $body = file_get_contents('php://input');
+        if (isset($_GET['endCustomerId']) && isset($body)) {
+            $bodyObj = json_decode($body);
+
+            
+
+            $result = $this->buTechDataApi->updateCustomer($_GET['endCustomerId'], $body);
+            $obj = json_decode($result);
+            
+            if ($obj->Result == 'Success' ) {
+                if (
+                    $bodyObj->cncCustId != null  
+                ) {
+                    $dbeCustomer = new DBECustomer($this);
+                    $dbeCustomer->setPKValue($bodyObj->cncCustId);
                     $dbeCustomer->getRow();
-                    $dbeCustomer->setValue(DBECustomer::techDataCustomerId,null);
-                    $dbeCustomer->updateRow();
-  
-                    // set new customer
-                    $dbeCustomer->setPKValue($bodyObj->cncCustomerId);
-                    $dbeCustomer->getRow();
-                    $dbeCustomer->setValue(DBECustomer::techDataCustomerId,$_GET['endCustomerId']);
+                    $dbeCustomer->setValue(DBECustomer::streamOneEmail, null);
                     $dbeCustomer->updateRow();
                 }
-                 
+                if($bodyObj->newCustomerId != null)
+                {
+                // set new  
+                $dbeCustomer = new DBECustomer($this);
+                $dbeCustomer->setPKValue($bodyObj->newCustomerId);
+                $dbeCustomer->getRow();
+                $dbeCustomer->setValue(DBECustomer::streamOneEmail, $bodyObj->email);
+                $dbeCustomer->updateRow();
+                }
             }
-            return $result;
+        if($obj->Result == 'Success' &&$bodyObj->cncCustId!=null)
+        { 
+            // update local item
+            $dbeStreamOneCustomers=new DBEStreamOneCustomers($this);
+            $dbeStreamOneCustomers->setPKValue($bodyObj->id);
+            $dbeStreamOneCustomers->getRow();
+            if (isset($bodyObj->addressLine1))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::addressLine1, $bodyObj->addressLine1);
+            if (isset($bodyObj->addressLine2))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::addressLine2, $bodyObj->addressLine2);
+            if (isset($bodyObj->city))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::city, $bodyObj->city);
+            if (isset($bodyObj->companyName))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::companyName, $bodyObj->companyName);
+            if (isset($bodyObj->country))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::country, $bodyObj->country);
+            if (isset($bodyObj->createdOn))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::createdOn, $bodyObj->createdOn);
+            if (isset($bodyObj->email))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::email, $bodyObj->email);
+            if (isset($bodyObj->endCustomerId))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::endCustomerId, $bodyObj->endCustomerId);
+            if (isset($bodyObj->endCustomerPO))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::endCustomerPO, $bodyObj->endCustomerPO);            
+            if (isset($bodyObj->name))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::name, $bodyObj->name);
+            if (isset($bodyObj->phone1))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::phone1, $bodyObj->phone1);
+            if (isset($bodyObj->postalCode))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::postalCode, $bodyObj->postalCode);
+            if (isset($bodyObj->title))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::title, $bodyObj->title);
+                $dbeStreamOneCustomers->updateRow();
         }
-        else return json_encode(['Result'=>'Failed']);
-
+            return $result;
+        } else return json_encode(['Result' => 'Failed']);
     }
     function activeCncItem()
     { 
@@ -275,5 +324,32 @@ class CTSCustomerLicenses extends CTCNC
         global $db;
         $results=$db->query("SELECT itm_itemno,itm_desc as description, itm_unit_of_sale as sku, itm_sstk_cost as cost FROM  item WHERE isStreamOne=1")->fetch_all(MYSQLI_ASSOC);
         return json_encode($results);
+    }
+    function getStreamOneCustomersLocal()
+    {
+       $dbeStreamOneCustomers =new DBEStreamOneCustomers($this);
+       $dbeStreamOneCustomers->getRows();
+       $rows=$dbeStreamOneCustomers->fetchArray();       
+       global $db;
+       $db->query("SELECT   s.`id`,
+       s.`name`,
+       s.`email`,
+       s.`createdOn`,
+       s.`country`,
+       s.`companyName`,
+       s.`city`,
+       s.`addressLine1`,
+       s.`addressLine2`,
+       s.`MsDomain`,
+       s.`phone1`,
+       s.`postalCode`,
+       s.`title`,
+       s.`endCustomerId`,
+       s.`endCustomerPO`,
+        `cus_name` cncCustName ,
+     `cus_custno` cncCustId   
+        FROM  streamOneCustomers s LEFT JOIN `customer` c ON s.email=c.streamOneEmail");
+
+       return json_encode($db->fetchAll(MYSQLI_ASSOC));
     }
 }

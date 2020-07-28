@@ -254,4 +254,59 @@
        UPDATE  consultant SET streamOneLicenseManagement =1 WHERE cns_consno IN (29, 2, 50, 47, 138)       
        </sql>           
     </changeSet>
+     <changeSet id="issue539-7" author="pavwebdevmt">      
+       <dropTable  tableName="streamOneCustomers"/>    
+       <sql  splitStatements="true">
+      CREATE TABLE `streamOneCustomers` (
+            `id` INT (10) NOT NULL,
+            `name` VARCHAR (100),            
+            `email` VARCHAR (100),
+            `createdOn` DATE,
+            `country` VARCHAR (10),
+            `companyName` VARCHAR (100),
+            `city` VARCHAR (100),
+            `addressLine1` VARCHAR (1000),
+            `addressLine2` VARCHAR (1000),
+            `MsDomain` VARCHAR (1000),
+            `phone1` VARCHAR (50),
+            `postalCode` VARCHAR (50),
+            `title` VARCHAR (50),
+            `endCustomerId` VARCHAR (100),
+            endCustomerPO VARCHAR (100),
+            PRIMARY KEY (`id`)
+        );
+       </sql>           
+    </changeSet>
+    <changeSet id="issue539-8" author="pavwebdevmt">    
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="streamOneEmail"/>
+            </not>
+        </preConditions>
+        <dropColumn tableName="customer" columnName="techDataCustomerId"/>
+        <addColumn tableName="customer">
+            <column name="streamOneEmail" type="varchar(60)" >
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>                
+        <createIndex indexName="idx_streamOneEmail" tableName="customer">
+            <column name="streamOneEmail"/>
+        </createIndex>        
+        <dropIndex  indexName="idx_techDataCustomerId"  tableName="customer"/> 
+    </changeSet>
+     <changeSet id="issue539-9" author="pavwebdevmt">    
+        <sql>
+            UPDATE  `customer` SET  `streamOneEmail` =(SELECT MIN(con_email) FROM  `contact` WHERE contact.`con_custno`=`cus_custno` AND  `con_email` IN (SELECT email FROM streamOneCustomers));
+        </sql>
+    </changeSet>
+    <changeSet id="issue539-10" author="pavwebdevmt">    
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="item" columnName="partNoOld"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="item">
+            <column name="partNoOld" type="VARCHAR(20)"/>             
+        </addColumn>  
+    </changeSet>
 </databaseChangeLog>

@@ -214,6 +214,7 @@ class CTItem extends CTCNC
                     $this->dsItem->getValue(DBEItem::serialNoFlag)
                 ),
                 'partNo'                         => Controller::htmlInputText($this->dsItem->getValue(DBEItem::partNo)),
+                'partNoOld'                      => Controller::htmlInputText($this->dsItem->getValue(DBEItem::partNoOld)),
                 'notes'                          => Controller::htmlTextArea($this->dsItem->getValue(DBEItem::notes)),
                 'contractResponseTime'           => Controller::htmlInputText(
                     $this->dsItem->getValue(DBEItem::contractResponseTime)

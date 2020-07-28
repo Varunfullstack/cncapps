@@ -74,7 +74,7 @@ class DBECustomer extends DBCNCEntity
     const slaP1PenaltiesAgreed = "slaP1PenaltiesAgreed";
     const slaP2PenaltiesAgreed = "slaP2PenaltiesAgreed";
     const slaP3PenaltiesAgreed = "slaP3PenaltiesAgreed";
-    const techDataCustomerId = "techDataCustomerId";
+    const streamOneEmail = "streamOneEmail";
 
 
     /**
@@ -471,9 +471,9 @@ class DBECustomer extends DBCNCEntity
             false
         );
         $this->addColumn(
-            self::techDataCustomerId,
+            self::streamOneEmail,
             DA_TEXT,
-            DA_ALLOW_NULL,"techDataCustomerId"
+            DA_ALLOW_NULL,"streamOneEmail"
         );
         $this->setPK(0);
         $this->setAddColumnsOff();

@@ -1,8 +1,9 @@
 "use strict";
 import AutoComplete from "./../utils/autoComplete.js?v=1";
-import Table from './../utils/table/table.js?v=1';
 import APICustomerLicenses from './APICustomerLicenses.js?v=1';
 import {Cities} from './../utils/ukCities.js';
+import Spinner from './../utils/spinner.js?v=1';
+
 /**
  *  Edit TechData customers and link them with CNC customers
  */
@@ -16,6 +17,7 @@ class CMPTDCustomerDetails extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      _showSpinner:false,
       mode: "insert",
       cncCustomers: [],
       data: {
@@ -32,7 +34,7 @@ class CMPTDCustomerDetails extends React.Component {
         country: "GB",
         state: "",
         postalCode: "",
-        cncCustomerName: "",
+        cncCustName: "",
         cncCustomerId: "",
       },
       errors: {},
@@ -41,15 +43,30 @@ class CMPTDCustomerDetails extends React.Component {
   }
 
   componentDidMount() {
-    this.apiCustomerLicenses
-      .getCustomers()
-      .then((cncCustomers) => this.setState({ cncCustomers }));
-
+    const {customers}=this.props;
     const queryParams = new URLSearchParams(window.location.search);
     const endCustomerId = queryParams.get("endCustomerId");
-    if (endCustomerId && endCustomerId != "")
-      this.getCustomerDetails(endCustomerId);
+    const result=customers.filter(c=>c.endCustomerId==endCustomerId)
+    if(result.length>0)
+    {
+      let data=result[0];
+      data.firstName=data.name.split(' ')[0];
+      data.lastName=data.name.split(' ')[1];
+      data.newCustomerId=null;
+      this.setState({data:result[0],mode :"edit"});
+      console.log(result[0]);
+    }
+     this.apiCustomerLicenses
+     .getCustomers()
+     .then((cncCustomers) => this.setState({ cncCustomers }));
+  
   }
+  showSpinner = () => {
+    this.setState({ _showSpinner: true });
+  };
+  hideSpinner = () => {
+    this.setState({ _showSpinner: false });
+  };
   handleChange = ({ currentTarget: input }) => {
     const data = { ...this.state.data };
     data[input.name] = input.value;
@@ -61,11 +78,12 @@ class CMPTDCustomerDetails extends React.Component {
     content = null,
     value = "",
     required = true,
-    errorMessage = ""
+    errorMessage = "",
+    disabled=false
   ) {
     const { el, handleChange } = this;
     return el("tr", { key: "tr" + name }, [
-      el("td", { key: "td" + name, className: "text-right nowrap" }, label),
+      el("td", { key: "td" + name, className: "text-right nowrap",style:{width:100} }, label),
       el(
         "td",
         { key: `td${name}Input` },
@@ -78,6 +96,7 @@ class CMPTDCustomerDetails extends React.Component {
               className: "form-control " + (required ? "required" : ""),
               onChange: handleChange,
               value,
+              disabled:disabled?'disabled':''
             })
       ),
       el(
@@ -99,12 +118,12 @@ class CMPTDCustomerDetails extends React.Component {
       handleOnSave,
       handleOnCancel
     } = this;
-    const { cncCustomers, data, errors } = this.state;
+    const { cncCustomers, data, errors,mode } = this.state;
     let errorMessage = "";
     if (typeof errors === "string") errorMessage = errors;
     return el(
       "table",
-      { key: "table", style: { maxWidth: 1000 } },
+      { key: "table", style: { width: 500 } },
       el("tbody", null, [
         this.getCustomerElement(
           "Company Name",
@@ -144,7 +163,8 @@ class CMPTDCustomerDetails extends React.Component {
           null,
           data.email,
           true,
-          errors["email"]
+          errors["email"],
+          mode == "edit"
         ),
         this.getCustomerElement(
           "Phone 1",
@@ -229,7 +249,7 @@ class CMPTDCustomerDetails extends React.Component {
             displayLength: "40",
             displayColumn: "name",
             pk: "id",
-            value:data.cncCustomerName,
+            value:data.cncCustName,
             onSelect: handleCncCustomerOnSelect,
           })
         ),
@@ -260,30 +280,44 @@ class CMPTDCustomerDetails extends React.Component {
     );
   }
   handleCncCustomerOnSelect = (event) => {
-    if (event != null) {
-      const data = { ...this.state.data };
-      data.cncCustomerId = event.id;
-      data.cncCustomerName = event.name;
-      this.setState({ data });
+    const data = { ...this.state.data };
+    if (event != null) {      
+      data.newCustomerId = event.id;
+      data.cncCustName = event.name;      
       console.log(event);
     }
+    else
+    {
+      data.newCustomerId = null;
+      data.cncCustName = "";
+    }
+    this.setState({ data });
   };
   handleCityOnSelect = (event) => {
+    const data = { ...this.state.data };
+
     if (event != null) {
-      const data = { ...this.state.data };
       data.city = event.name;
-      this.setState({ data });
       console.log(event);
     }
+    else 
+    {
+      data.city = null;
+    }
+    this.setState({ data });
   };
   handleOnSave = () => {
-    console.log(this.state.data);
+  
     const { data, mode } = this.state;
+    console.log(data);
+     this.showSpinner();
+     
     if (mode == "insert") {
       this.apiCustomerLicenses
-        .addTechDataCustomer(this.state.data)
+        .addTechDataCustomer(data)
         .then((result) => {
           console.log("add customer result", result);
+          this.hideSpinner();
           if (result.Result == "Failed") {
             const errors = result.ErrorMessage;
             this.setState({ errors });
@@ -292,8 +326,9 @@ class CMPTDCustomerDetails extends React.Component {
     } else if (mode == "edit") {
       console.log('edit customer')
       this.apiCustomerLicenses
-      .updateTechDataCustomer(this.state.data.id,this.state.data)
+      .updateTechDataCustomer(data.endCustomerId,data)
       .then((result) => {
+        this.hideSpinner();
         console.log("update customer result", result);
         if (result.Result == "Failed") {
           const errors = result.ErrorMessage;
@@ -322,7 +357,8 @@ class CMPTDCustomerDetails extends React.Component {
   }
   render() {
     const { el } = this;    
-    return el("div", null, [this.getCustomerElements()]);
+    const {_showSpinner }=this.state;
+    return [  el(Spinner, { key: "spinner", show: _showSpinner }),el("div", {key:"divContent"}, [this.getCustomerElements()])];
   }
 }
 

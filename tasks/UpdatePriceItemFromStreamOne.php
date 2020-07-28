@@ -16,6 +16,8 @@ require_once($cfg['path_bu'] . '/BUHeader.inc.php');
 require_once($cfg['path_bu'] . '/BUMail.inc.php');
 require_once($cfg['path_bu'] . '/BUTechDataApi.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomerItem.inc.php');
+require_once($cfg['path_dbe'] . '/DBEStreamOneCustomers.inc.php');
+
 
 $logName = 'UpdatePriceItemFromStreamOne';
 $logger = new LoggerCLI($logName);
@@ -69,7 +71,7 @@ for ($page = 1; $page <= $pages; $page++) {
             foreach ($cncItems as $cncItem) {
                 if (
                     $cncItem['itm_unit_of_sale'] == $streamOneItem['sku'] &&
-                    $cncItem['itm_sstk_cost'] != $streamOneItem['unitResellerCost']
+                    round($cncItem['itm_sstk_cost'],2) != round($streamOneItem['unitResellerCost'],2)
                 ) {
                     //compare price of item
                     array_push($updatedItems, [
@@ -85,12 +87,12 @@ for ($page = 1; $page <= $pages; $page++) {
     }
 }
 if (count($updatedItems) > 0) {
-    //echo json_encode($updatedItems);
+    echo json_encode($updatedItems);
     // start update item with new prices
     foreach ($updatedItems as $key => $item) {
         $newValue = round($item["newPrice"], 2);
-        $updatedItems[$key]["newPrice"] =  $newValue;        
-        $db->query("update item set itm_sstk_cost=$newValue where itm_itemno=$item[id]");
+        $updatedItems[$key]["newPrice"] =  $newValue;
+      echo  $db->query("update item set itm_sstk_cost=$newValue where itm_itemno=$item[id]");
     }
 
     //send email to sales to tell them there is an update to price  
@@ -130,4 +132,119 @@ if (count($updatedItems) > 0) {
         $body
     );
     echo "email sent";
+}
+// fetch all stream one customers
+
+$allCustomers = json_decode($buStreamOneApi->searchCustomers(json_encode(["noOfRecords" => 500])));
+if ($allCustomers->Result == "Success") {
+    //BodyText.endCustomersDetails
+    // now we have all streamOne Customers
+    $streamOneCustomers = array_map(function ($item) {
+        $item->name = $item->firstName . ' ' . $item->lastName;
+        $item->endCustomerPO = $item->companyName;
+        return $item;
+    }, $allCustomers->BodyText->endCustomersDetails);
+    // get all subscriptions
+    $allSubscriptions = [];
+    $firstSubscription = json_decode($buStreamOneApi->getAllSubscriptions(1));
+    if ($firstSubscription->Result == "Success") {
+        //"totalRecords":457,"totalPages":23,"page":1,"recordsPerPage":20,"subscriptions":
+        $totalPages = $firstSubscription->BodyText->totalPages;
+        $subscriptions = $firstSubscription->BodyText->subscriptions;
+        $allSubscriptions = array_merge($allSubscriptions, $firstSubscription->BodyText->subscriptions);
+        for ($i = 2; $i <= 1; $i++) {
+            $temp = json_decode($buStreamOneApi->getAllSubscriptions($i));
+            $allSubscriptions = array_merge($allSubscriptions, $temp->BodyText->subscriptions);
+            //echo count($allSubscriptions)."\n";  
+        }
+        //----------------------------start update customer items seats from stream one
+        foreach ($allSubscriptions as $subscription) {
+            foreach ($subscription as $key => $value) {
+                
+            }
+        }
+        echo json_encode($allSubscriptions);
+        exit;
+        //----------------------------end update customer items seats from stream one
+        //now we have all subscription and we need to map it to customers
+        $subscriptionsContacts = [];
+        foreach ($allSubscriptions as $subscription) {
+            foreach ($subscription as $key => $value) {
+
+                $contact = [
+                    "companyName" => $value->company,
+                    "email" => $value->endCustomerEmail,
+                    "name" => $value->endCustomerName,
+                    "endCustomerPO" => isset($value->endCustomerPO) ? $value->endCustomerPO : null,
+                    "MsDomain" => isset($value->additionalData) ? [$value->additionalData] : null,
+                ];
+                $found = false;
+                foreach ($subscriptionsContacts as $inContact) {
+                    if ($inContact->email == $contact["email"])
+                        $found = true;
+                }
+                if (!$found) {
+                    //echo  $contact["email"]."\n";                    
+                    array_push($subscriptionsContacts, (object)$contact);
+                }
+            }
+        }
+        // now we have all subscription contacts and then we need to merge it with customers
+        $subscriptionsContacts = $subscriptionsContacts;
+        foreach ($subscriptionsContacts as $orderContact) {
+            $found = false;
+            foreach ($streamOneCustomers as $customer) {
+                if ($customer->email == $orderContact->email) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                array_push($streamOneCustomers, $orderContact);
+                //echo   json_decode($orderContact);
+            }
+        }
+        // now we have all customers and need to insert into db
+        $inserted = 0;
+        $db->query("delete from streamonecustomers");
+        $i=1;
+         foreach ($streamOneCustomers as $customer) {            
+            $dbeStreamOneCustomers = new DBEStreamOneCustomers($thing);
+            $dbeStreamOneCustomers->setPKValue($i);
+            if (isset($customer->addressLine1))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::addressLine1, $customer->addressLine1);
+            if (isset($customer->addressLine2))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::addressLine2, $customer->addressLine2);
+            if (isset($customer->city))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::city, $customer->city);
+            if (isset($customer->companyName))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::companyName, $customer->companyName);
+            if (isset($customer->country))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::country, $customer->country);
+            if (isset($customer->createdOn))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::createdOn, $customer->createdOn);
+            if (isset($customer->email))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::email, $customer->email);
+            if (isset($customer->endCustomerId))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::endCustomerId, $customer->endCustomerId);
+            if (isset($customer->endCustomerPO))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::endCustomerPO, $customer->endCustomerPO);
+            if (isset($customer->MsDomain))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::MsDomain, json_encode($customer->MsDomain));
+            if (isset($customer->name))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::name, $customer->name);
+            if (isset($customer->phone1))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::phone1, $customer->phone1);
+            if (isset($customer->postalCode))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::postalCode, $customer->postalCode);
+            if (isset($customer->title))
+                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::title, $customer->title);
+             $dbeStreamOneCustomers->insertRow();
+            $inserted++;
+            $i=$i+1;
+        }
+        $logger->info('inserted customers = '.$inserted);
+        
+    }
+    
 }

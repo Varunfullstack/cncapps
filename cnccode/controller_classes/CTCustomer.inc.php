@@ -1109,7 +1109,7 @@ class CTCustomer extends CTCNC
                     $customers[] = [
                         "id"   => $dsResult->getValue(DBECustomer::customerID),
                         "name" => $dsResult->getValue(DBECustomer::name),
-                        "techDataCustomerId" => $dsResult->getValue(DBECustomer::techDataCustomerId),
+                        "streamOneEmail" => $dsResult->getValue(DBECustomer::streamOneEmail),
                     ];
                 }
 
