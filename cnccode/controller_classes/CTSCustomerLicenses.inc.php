@@ -146,12 +146,14 @@ class CTSCustomerLicenses extends CTCNC
             $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::email,$email);
             $dbeStreamOneCustomers->getRowByColumn(DBEStreamOneCustomers::email);
             $name =$dbeStreamOneCustomers->getValue(DBEStreamOneCustomers::name);
+            $company =$dbeStreamOneCustomers->getValue(DBEStreamOneCustomers::companyName);
+
         }
         $action = $this->getAction();
         $this->setMenuId(313);
         switch ($action) {
             case 'searchOrders':             
-                $this->setPageTitle('StreamOne Orders For '. $name);
+                $this->setPageTitle('StreamOne Orders For '. $company);
                 break;
             case 'newOrder':
                 $this->setPageTitle('StreamOne Place New Order');
