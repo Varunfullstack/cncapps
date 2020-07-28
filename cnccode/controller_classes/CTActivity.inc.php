@@ -5324,6 +5324,12 @@ class CTActivity extends CTCNC
         /*
       Record action button selected
       */
+        $this->dsCallActivity->setUpdateModeUpdate();
+        $this->dsCallActivity->setValue(
+            DBECallActivity::submitAsOvertime,
+            isset($this->getParam('callActivity')[1]['submitAsOvertime'])
+        );
+        $this->dsCallActivity->post();
         $updateAwaitingCustomer = false;
         if ($this->getParam('Fixed')) {
             $nextStatus = 'Fixed';
