@@ -79,7 +79,7 @@ class CTSRScheduler extends CTCNC
                 $toUpdateItem->setValue(DBESRScheduler::priority, $this->getParam('priority'));
                 $toUpdateItem->setValue(
                     DBESRScheduler::hideFromCustomer,
-                    !!json_decode($this->getParam('hideFromCustomer'))
+                    (bool)json_decode($this->getParam('hideFromCustomer'))
                 );
                 $toUpdateItem->setValue(DBESRScheduler::teamId, $this->getParam('teamId'));
                 $toUpdateItem->setValue(DBESRScheduler::details, $this->getParam('details'));
@@ -107,7 +107,7 @@ class CTSRScheduler extends CTCNC
                 $newItem->setValue(DBESRScheduler::contactId, $this->getParam('contactId'));
                 $newItem->setValue(DBESRScheduler::siteNo, $this->getParam('siteNo'));
                 $newItem->setValue(DBESRScheduler::priority, $this->getParam('priority'));
-                $newItem->setValue(DBESRScheduler::hideFromCustomer, !!$this->getParam('hideFromCustomer'));
+                $newItem->setValue(DBESRScheduler::hideFromCustomer, (bool)$this->getParam('hideFromCustomer'));
                 $newItem->setValue(DBESRScheduler::teamId, $this->getParam('teamId'));
                 $newItem->setValue(DBESRScheduler::details, $this->getParam('details'));
                 $newItem->setValue(DBESRScheduler::internalNotes, $this->getParam('internalNotes'));
@@ -141,8 +141,39 @@ class CTSRScheduler extends CTCNC
                 while ($dbeSrScheduler->fetchNext()) {
                     $result[] = $this->populateSRSchedulerObjectFromDB($dbeSrScheduler);
                 }
+
+                $draw = $_REQUEST['draw'];
+                $order = $_REQUEST['order'];
+                $columns = $_REQUEST['columns'];
+                if (count($order)) {
+                    usort(
+                        $result,
+                        function ($item1, $item2) use ($order, $columns) {
+                            $idx = 0;
+                            do {
+                                $orderItem = $order[$idx];
+                                $columnIdx = $orderItem['column'];
+                                $columnName = $columns[$columnIdx]['name'];
+                                if (!isset($item1[$columnName])) {
+                                    throw new Exception("Column name does not exist {$columnName}");
+                                }
+                                $comparison = $item1[$columnName] <=> $item2[$columnName];
+                                if ($orderItem['dir'] == 'desc') {
+                                    $comparison = -$comparison;
+                                }
+                                $idx++;
+                            } while ($comparison === 0 && $idx < count($order));
+                            return $comparison;
+                        }
+                    );
+                }
                 echo json_encode(
-                    $result,
+                    [
+                        "draw"            => $draw,
+                        "recordsTotal"    => count($result),
+                        "recordsFiltered" => count($result),
+                        "data"            => $result
+                    ],
                     JSON_NUMERIC_CHECK
                 );
                 break;
