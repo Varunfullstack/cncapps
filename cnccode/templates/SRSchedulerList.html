@@ -41,7 +41,7 @@
 
     function showInfo(data) {
         const newWindow = window.open("", "", "width=500,height=400");
-        newWindow.document.write(atob(data));
+        newWindow.document.write(data);
     }
 
 
@@ -141,7 +141,7 @@
     }
 
     function getSchedulerById(schedulerId) {
-        return srSchedulerList.find(x.id === schedulerId);
+        return srSchedulerList.find(x => x.id === schedulerId);
     }
 
     function showSchedulerInfo(schedulerId, field) {
@@ -229,7 +229,7 @@
                     data: "id",
                     name: 'internalNotes',
                     render: (data, type, row) => {
-                        return "<button onclick='showSchedulerInfo(" + data + ",\"internalNotes\")'>Details</button>"
+                        return "<button onclick='showSchedulerInfo(" + data + ",\"internalNotes\")'>Internal Notes</button>"
                     }
                 },
                 {
