@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 938 - Increase number of favourites in menu
 ### Fixed
 - Issue 933 - User Time Logs sometimes showing as holiday
+- Issue 943 - Disk space in meeting agenda listing zero capacity drives
 
 ## [v4.2.6] - 2020-07-27
 ## Fixed
