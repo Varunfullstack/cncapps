@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 938 - Increase number of favourites in menu
+- Issue 951 - Expenses Breakdown Year to Date
 ### Fixed
 - Issue 933 - User Time Logs sometimes showing as holiday
 
