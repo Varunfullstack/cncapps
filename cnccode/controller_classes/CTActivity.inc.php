@@ -6414,7 +6414,7 @@ class CTActivity extends CTCNC
 
             $this->buActivity->logOperationalActivity(
                 $this->getParam('problemID'),
-                '<p>Additional time allocated: ' . $minutes . ' minutes</p><p>' . $this->getParam('comments') . '</p>'
+                "<p>Additional time allocated to {$this->buActivity->getTeamName($this->getParam('teamLevel'))} Team: {$minutes} minutes</p><p>{$this->getParam('comments')}</p>"
             );
 
             $nextURL =
