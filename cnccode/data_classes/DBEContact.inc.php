@@ -910,7 +910,7 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " where specialAttentionContactFlag = 'Y' and active and
+            " where specialAttentionContactFlag = 'Y' and active
       ORDER BY con_custno, con_contno";
 
         $this->setQueryString($queryString);
@@ -939,7 +939,9 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " where active and " . $this->getDBColumnName(DBEContact::reviewUser) . " = 'Y' and " . $this->getDBColumnName(
+            " where active and " . $this->getDBColumnName(
+                DBEContact::reviewUser
+            ) . " = 'Y' and " . $this->getDBColumnName(
                 DBEContact::customerID
             ) . " = $customerID
       ORDER BY con_custno, con_contno";
