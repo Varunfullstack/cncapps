@@ -1,8 +1,12 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.2.7] - 2020-07-29
+### Fixed
+- Fixed SpecialAttentionCustomersReport.php not loading
+
 ## [v4.2.6] - 2020-07-27
-## Fixed
+### Fixed
 - Overtime flag incorrectly being carried forward.
 
 ## [v4.2.5] - 2020-07-17
