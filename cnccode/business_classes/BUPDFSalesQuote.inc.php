@@ -191,6 +191,8 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printString($introduction);
+        $confirmationCode = uniqid(null, true);
+        $buPDF->printString('this link', API_URL . "/acceptQuotation?code=$confirmationCode");
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->setBoldOn();
@@ -236,7 +238,6 @@ class BUPDFSalesQuote extends Business
         $dsQuotation->setValue(DBEQuotation::deliverySiteTown, $dsOrdhead->getValue(DBEOrdhead::delTown));
         $dsQuotation->setValue(DBEQuotation::deliverySiteCounty, $dsOrdhead->getValue(DBEOrdhead::delCounty));
         $dsQuotation->setValue(DBEQuotation::deliverySitePostCode, $dsOrdhead->getValue(DBEOrdhead::delPostcode));
-        $confirmationCode = uniqid(null, true);
         $dsQuotation->setValue(DBEQuotation::confirmCode, $confirmationCode);
         $dsQuotation->post();
         $quotationNextId = $this->buSalesOrder->insertQuotation($dsQuotation);
