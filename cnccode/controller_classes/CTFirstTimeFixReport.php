@@ -42,7 +42,7 @@ class CTFirstTimeFixReport extends CTCNC
 
         switch (@$this->getAction()) {
 
-            case 'fetchApprovalSubordinates':
+            case 'fetchData':
 
                 $startDate = null;
                 if (@$this->getParam('startDate')) {
@@ -263,7 +263,7 @@ ORDER BY engineer.firstName";
 
         $fetchURL = $urlSubmit = Controller::buildLink(
             $_SERVER ['PHP_SELF'],
-            array('action' => "fetchApprovalSubordinates")
+            array('action' => "fetchData")
         );
 
         $customerPopupURL =
