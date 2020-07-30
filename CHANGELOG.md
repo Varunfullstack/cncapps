@@ -5,6 +5,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 938 - Increase number of favourites in menu
 - Issue 950 - Include team in time allocation
+- Issue 939 - Sortable SR Scheduler Columns
 ### Fixed
 - Issue 933 - User Time Logs sometimes showing as holiday
 
