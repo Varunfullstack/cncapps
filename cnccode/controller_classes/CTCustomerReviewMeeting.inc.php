@@ -612,7 +612,7 @@ class CTCustomerReviewMeeting extends CTCNC
                     'SELECT computers.name as agentName,letter as driveLetter,size as driveSize, free as driveFreeSpace, free/size  as freePercent FROM  drives 
 JOIN computers ON computers.`ComputerID` = drives.`ComputerID`
 JOIN clients ON computers.`ClientID` = clients.`ClientID`
-WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' AND clients.`ExternalID` = ?'
+WHERE INTERNAL = 1 AND missing=0 AND os LIKE \'%server%\' and size >= 1024 AND clients.`ExternalID` = ?'
                 );
                 $statement->execute([$customerId]);
 

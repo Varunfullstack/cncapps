@@ -8,6 +8,7 @@ This project changes will be shown here.
 - Issue 939 - Sortable SR Scheduler Columns
 - Issue 945 - Move Invoices menu to Sales
 - Issue 947 - Creating new customers, set SLA as required fields
+- Issue 943 - Remove drives under 1GB from Customer Review Meeting Agenda
 ### Fixed
 - Issue 933 - User Time Logs sometimes showing as holiday
 
