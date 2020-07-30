@@ -130,6 +130,10 @@ class CMPTDCustomerOrders extends React.Component {
         }  
       }
       allSubscriptions=allSubscriptions.map(order=>order[Object.keys(order)[0]]);
+      allSubscriptions.forEach(async (subscription)=>{
+        const result=await this.apiCustomerLicenses.checkLicenseExistAtCNC(subscription.endCustomerEmail,subscription.sku)
+        subscription.cncStatus=result.status;
+      })
       resolve(allSubscriptions);
     })
   
@@ -171,7 +175,18 @@ class CMPTDCustomerOrders extends React.Component {
               })
             : el("div", { key: "divSpin" + o.orderNumber }, o.lineStatus),
       },
-
+      {
+        path: "cncStatus",
+        label: "CNC Status",
+        sortable: true,
+        content: (o) =>         
+              el("label", {
+                key: "divCncStatus" + o.orderNumber,
+                className: "error-message",
+                style:{whiteSpace:"nowrap"}
+              }, o.cncStatus ===false?"Not Found":"")
+             
+      },
       {
         path: null,
         label: "AddOns",

@@ -67,6 +67,11 @@ class APICustomerLicenses extends APIMain{
    }
 
    //get order detials
+   // customers
+   checkLicenseExistAtCNC(email,sku)
+   {
+      return fetch(`${this.baseURL}checkLicenseExistAtCNC&email=${email}&sku=${sku}`,{method:'GET'}).then(res=>res.json());
+   }
    getOrderDetials(orderId)
    {
       return fetch(`${this.baseURL}getOrderDetials&orderId=${orderId}`).then(res=>res.json());

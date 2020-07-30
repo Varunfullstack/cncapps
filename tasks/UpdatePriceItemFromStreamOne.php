@@ -17,6 +17,8 @@ require_once($cfg['path_bu'] . '/BUMail.inc.php');
 require_once($cfg['path_bu'] . '/BUTechDataApi.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomerItem.inc.php');
 require_once($cfg['path_dbe'] . '/DBEStreamOneCustomers.inc.php');
+require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
+
 
 
 $logName = 'UpdatePriceItemFromStreamOne';
@@ -37,8 +39,11 @@ if (isset($options['d'])) {
     $debugMode = true;
 }
 $thing = null;
+//**************************************************update item prices */
+if(true)
+{
 //------ get all ccna items
-$query  = "SELECT  itm_itemno,itm_unit_of_sale, itm_sstk_cost ,itm_desc FROM  item WHERE isStreamOne=1";
+$query  = "SELECT  itm_itemno,itm_unit_of_sale, itm_sstk_cost ,itm_desc , partNoOld FROM  item WHERE isStreamOne=1";
 $db->query($query);
 $cncItems = $db->fetchAll(MYSQLI_ASSOC);
 
@@ -133,8 +138,9 @@ if (count($updatedItems) > 0) {
     );
     echo "email sent";
 }
+//**************************************get all customers */
 // fetch all stream one customers
-
+$allSubscriptions = [];
 $allCustomers = json_decode($buStreamOneApi->searchCustomers(json_encode(["noOfRecords" => 500])));
 if ($allCustomers->Result == "Success") {
     //BodyText.endCustomersDetails
@@ -145,26 +151,20 @@ if ($allCustomers->Result == "Success") {
         return $item;
     }, $allCustomers->BodyText->endCustomersDetails);
     // get all subscriptions
-    $allSubscriptions = [];
+    
     $firstSubscription = json_decode($buStreamOneApi->getAllSubscriptions(1));
     if ($firstSubscription->Result == "Success") {
         //"totalRecords":457,"totalPages":23,"page":1,"recordsPerPage":20,"subscriptions":
         $totalPages = $firstSubscription->BodyText->totalPages;
         $subscriptions = $firstSubscription->BodyText->subscriptions;
         $allSubscriptions = array_merge($allSubscriptions, $firstSubscription->BodyText->subscriptions);
-        for ($i = 2; $i <= 1; $i++) {
+        //$totalPages=1;
+        for ($i = 2; $i <= $totalPages; $i++) {
             $temp = json_decode($buStreamOneApi->getAllSubscriptions($i));
             $allSubscriptions = array_merge($allSubscriptions, $temp->BodyText->subscriptions);
             //echo count($allSubscriptions)."\n";  
         }
-        //----------------------------start update customer items seats from stream one
-        foreach ($allSubscriptions as $subscription) {
-            foreach ($subscription as $key => $value) {
-                
-            }
-        }
-        echo json_encode($allSubscriptions);
-        exit;
+        
         //----------------------------end update customer items seats from stream one
         //now we have all subscription and we need to map it to customers
         $subscriptionsContacts = [];
@@ -205,6 +205,8 @@ if ($allCustomers->Result == "Success") {
             }
         }
         // now we have all customers and need to insert into db
+        //if(false)
+        {
         $inserted = 0;
         $db->query("delete from streamonecustomers");
         $i=1;
@@ -244,7 +246,66 @@ if ($allCustomers->Result == "Success") {
             $i=$i+1;
         }
         $logger->info('inserted customers = '.$inserted);
-        
+        }
     }
     
 }
+}
+//******************************* update customer licences number and status */
+// now we have all subscriptions,  streamone customers and cnc items
+//----------------------------start update customer items seats from stream one
+//1- get all cnc customers
+$db->query("SELECT `cus_custno` as id,streamOneEmail as email FROM `customer` WHERE `streamOneEmail` IS NOT NULL");
+$cncCustomers =$db->fetchAll(MYSQLI_ASSOC);
+//echo json_encode( $cncCustomers); //cus_custno
+echo "\n";
+$updatedItems=0;
+foreach($cncCustomers as $customer)
+{
+    //echo $customer["email"]."\n";
+    //get all customer subscriptions
+    foreach ($allSubscriptions as $item) {
+        foreach ($item as $key => $subscription) {
+            //echo json_encodesubscription$value);
+   
+           // echo $subscription->endCustomerEmail."\n";
+            if($customer["email"]==$subscription->endCustomerEmail)
+            {
+                $itemId=getItemId($cncItems,$subscription->sku);
+                //echo "\n".$customer["id"]." ".$customer["email"]." ".$subscription->sku." ".$itemId." ".$subscription->quantity;
+                if($itemId)
+                {
+                    $db->query("select cui_users quantity from custitem where   renewalStatus='R'  AND declinedFlag='N'
+                    and cui_custno= $customer[id]
+                    and cui_itemno=  $itemId");
+                    $temp=$db->fetchAll();
+                    if(count($temp)>0)
+                    {
+                      //  echo " ".$temp[0]["quantity"];
+                    if((int)$subscription->quantity!=(int)$temp[0]["quantity"])
+                     {
+                      $db->query("update custitem set cui_users=$subscription->quantity where   renewalStatus='R'  AND declinedFlag='N'
+                      and cui_custno= $customer[id]
+                      and cui_itemno=  $itemId");
+                      $updatedItems++;
+                     }
+                    }
+                   
+                }
+            }
+             
+        }
+    }
+}
+$logger->info('updated customers items  '.$updatedItems);
+function getItemId($cncItems,$sku)
+{
+   foreach($cncItems as $item)
+   {
+    if($item['itm_unit_of_sale'] ==$sku||$item['partNoOld']  == $sku)
+        return $item['itm_itemno'];
+   } 
+   return null;
+}
+
+exit;

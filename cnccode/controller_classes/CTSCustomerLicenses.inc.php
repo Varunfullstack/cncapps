@@ -123,6 +123,9 @@ class CTSCustomerLicenses extends CTCNC
             case "getStreamOneCustomersLocal":
                 echo $this->getStreamOneCustomersLocal();
                 exit;
+            case "checkLicenseExistAtCNC":
+                echo $this->checkLicenseExistAtCNC();
+                exit;
             break;          
             default:
                 $this->setTemplate();
@@ -353,5 +356,39 @@ class CTSCustomerLicenses extends CTCNC
         FROM  streamOneCustomers s LEFT JOIN `customer` c ON s.email=c.streamOneEmail");
 
        return json_encode($db->fetchAll(MYSQLI_ASSOC));
+    }
+    function checkLicenseExistAtCNC()
+    {
+        global $db;
+        $email=$_GET["email"]??null;
+        $sku=$_GET["sku"]??null;
+        if($email!=null&&$sku!=null)
+        {
+            //get customer Id
+            $dbeCustomer =new DBECustomer($this);
+            $dbeCustomer->setValue(DBECustomer::streamOneEmail,$email);
+            $dbeCustomer->getRowByColumn(DBECustomer::streamOneEmail);
+            $custId=$dbeCustomer->getPKValue();
+            if($custId)
+            {
+                // get item no by sku
+                $dbeItem=new DBEItem($this);
+                $dbeItem->setValue(DBEItem::partNo,$sku);
+                $dbeItem->getRowByColumn(DBEItem::partNo);
+                $itemId=$dbeItem->getPKValue();
+                if($itemId)
+                {
+                    // check custItem
+                    $db->query("select count(*) total from custitem where cui_custno = $custId and cui_itemno = $itemId ");
+                    $result=$db->fetchAll(MYSQLI_ASSOC);
+                    if(count($result)>0&& $result[0]["total"]>0)
+                    return json_encode(["status"=>true,"custId"=>$custId,"itemId"=>$itemId])  ;
+                      
+                }
+                return json_encode(["status"=>false,"custId"=>$custId,"itemId"=>$itemId])  ;
+
+            }
+        } 
+        return json_encode(["status"=>false ])  ;
     }
 }
