@@ -77,6 +77,7 @@ class CTSRScheduler extends CTCNC
                 $toUpdateItem->setValue(DBESRScheduler::contactId, $this->getParam('contactId'));
                 $toUpdateItem->setValue(DBESRScheduler::siteNo, $this->getParam('siteNo'));
                 $toUpdateItem->setValue(DBESRScheduler::priority, $this->getParam('priority'));
+                $toUpdateItem->setValue(DBESRScheduler::linkedSalesOrderId, $this->getParam('linkedSalesOrderId'));
                 $toUpdateItem->setValue(
                     DBESRScheduler::hideFromCustomer,
                     (bool)json_decode($this->getParam('hideFromCustomer'))
@@ -100,6 +101,20 @@ class CTSRScheduler extends CTCNC
                 $toUpdateItem->updateRow();
                 echo json_encode(["status" => "ok"]);
                 break;
+            case 'checkSalesOrder':
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!$data) {
+                    echo json_encode(["status" => "error", "error" => "Data is missing"]);
+                    http_response_code(400);
+                    exit;
+                }
+                $customerId = $data['customerId'];
+                $salesOrderId = $data['salesOrderId'];
+                $dbeSalesOrder = new DBEOrdhead($this);
+                $dbeSalesOrder->getRow($salesOrderId);
+                $answer = $dbeSalesOrder->getValue(DBEOrdhead::customerID) == $customerId;
+                echo json_encode(["status" => "ok", "data" => $answer]);
+                exit;
             case 'create':
                 $newItem = new DBESRScheduler($this);
                 $newItem->setValue(DBESRScheduler::customerId, $this->getParam('customerId'));
@@ -111,6 +126,7 @@ class CTSRScheduler extends CTCNC
                 $newItem->setValue(DBESRScheduler::teamId, $this->getParam('teamId'));
                 $newItem->setValue(DBESRScheduler::details, $this->getParam('details'));
                 $newItem->setValue(DBESRScheduler::internalNotes, $this->getParam('internalNotes'));
+                $newItem->setValue(DBESRScheduler::linkedSalesOrderId, $this->getParam('linkedSalesOrderId'));
                 $newItem->setValue(DBESRScheduler::createdBy, $this->userID);
                 $newItem->setValue(DBESRScheduler::updatedBy, $this->userID);
                 $newItem->setValue(DBESRScheduler::createdAt, (new DateTime())->format(DATE_MYSQL_DATETIME));
@@ -154,7 +170,7 @@ class CTSRScheduler extends CTCNC
                                 $orderItem = $order[$idx];
                                 $columnIdx = $orderItem['column'];
                                 $columnName = $columns[$columnIdx]['name'];
-                                if (!isset($item1[$columnName])) {
+                                if (!array_key_exists($columnName, $item1)) {
                                     throw new Exception("Column name does not exist {$columnName}");
                                 }
                                 $comparison = $item1[$columnName] <=> $item2[$columnName];

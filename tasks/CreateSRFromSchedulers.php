@@ -161,12 +161,16 @@ try {
             DBEProblem::projectTeamLimitMinutes,
             $dsHeader->getValue(DBEHeader::projectTeamLimitMinutes)
         );
+        $dbeProblem->setValue(
+            DBEProblem::linkedSalesOrderID,
+            $dbeSrScheduler->getValue(DBESRScheduler::linkedSalesOrderId)
+        );
 
-        $dbeProblem->setValue(DBEProblem::internalNotes, $internalNotes);        
+        $dbeProblem->setValue(DBEProblem::internalNotes, $internalNotes);
         $dbeProblem->setValue(
             DBEProblem::raiseTypeId,
             BUProblemRaiseType::MANUALID
-        ); 
+        );
         $dbeProblem->insertRow();
 
         $problemID = $dbeProblem->getPKValue();
@@ -313,7 +317,7 @@ try {
     $dbeProblem->setValue(
         DBEProblem::raiseTypeId,
         BUProblemRaiseType::MANUALID
-    ); 
+    );
     $dbeProblem->insertRow();
 
     $dbeCallActivity = new DBECallActivity($thing);
