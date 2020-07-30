@@ -509,6 +509,7 @@ ORDER BY staffName";
                 $this->setTemplateFiles(
                     array('ChangeLog' => 'About.inc')
                 );
+                $this->setPageTitle("Expenses Breakdown Year To Date");
                 $this->template->setVar(
                     'changeLog',
                     "<div id='react-expense-breakdown' data-user-id='{$this->getDbeUser()->getValue(DBEUser::userID)}'></div>"
