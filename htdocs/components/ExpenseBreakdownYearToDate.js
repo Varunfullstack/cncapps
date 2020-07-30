@@ -13,7 +13,7 @@ class ExpenseBreakdownYearToDate extends React.Component {
     }
 
     handleChangeEngineer(value) {
-        this.setState({selectedEngineer: value});
+        this.setState({selectedEngineer: ''+value});
     }
 
     fetchApprovalSubordinates(userId) {
@@ -41,6 +41,7 @@ class ExpenseBreakdownYearToDate extends React.Component {
             this.fetchApprovalSubordinates();
         }
         if (this.state.selectedEngineer !== prevState.selectedEngineer) {
+            console.log(this.state.selectedEngineer, prevState.selectedEngineer);
             this.fetchExpenses(this.state.selectedEngineer);
         }
     }
@@ -55,7 +56,6 @@ class ExpenseBreakdownYearToDate extends React.Component {
     render() {
         const isApprover = this.state.approvalSubordinates.length > 1;
         const currentDate = new Date();
-
         // if is approver we render a dropdown, that we are going to populate from the active users
         // if not we won't have the selector as it's the guy's data
         const totalRow = new Array(currentDate.getMonth() + 2).fill(0);
@@ -94,7 +94,7 @@ class ExpenseBreakdownYearToDate extends React.Component {
                     this.el(
                         'select',
                         {
-                            value: this.state.selectedEngigneer || '',
+                            value: this.state.selectedEngineer || '',
                             onChange: ($event) => {
                                 this.handleChangeEngineer($event.target.value)
                             },
@@ -123,7 +123,7 @@ class ExpenseBreakdownYearToDate extends React.Component {
                     ),
                 this.el(
                     "table",
-                    {className: 'my-account', key: 'data-table'},
+                    {className: 'table table-striped', key: 'data-table'},
                     [
                         this.el(
                             'thead',

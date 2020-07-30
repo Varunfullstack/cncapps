@@ -517,6 +517,7 @@ ORDER BY staffName";
                 $this->template->setVar(
                     'javaScript',
                     '
+                    <link rel="stylesheet" href="./css/table.css">
                     <script src="js/react.development.js" crossorigin></script>
                     <script src="js/react-dom.development.js" crossorigin></script>
                     <script type="module" src=\'components/expenseBreakdownYearToDate.js\'></script>
