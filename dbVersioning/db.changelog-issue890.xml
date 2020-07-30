@@ -1,0 +1,51 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue890-0">
+        <tagDatabase tag="issue890"/>
+    </changeSet>
+    <changeSet id="issue890-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="salesOrderMonitor"/>
+            </not>
+        </preConditions>
+        <createTable tableName="salesOrderMonitor">
+            <column name="salesOrderId" type="int(11)">
+                <constraints primaryKey="true" primaryKeyName="PRIMARY" nullable="false"/>
+            </column>
+            <column name="userId" type="int(11)">
+                <constraints primaryKey="true" primaryKeyName="PRIMARY" nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="issue890-2" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="salesOrderMonitor"
+                                            foreignKeyName="FK-salesOrderMonitor-salesOrderId"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="salesOrderMonitor" baseColumnNames="salesOrderId"
+                                 constraintName="FK-salesOrderMonitor-salesOrderId"
+                                 referencedTableName="ordhead"
+                                 referencedColumnNames="odh_ordno"
+                                 onDelete="CASCADE"
+                                 onUpdate="CASCADE"/>
+    </changeSet>
+    <changeSet id="issue890-3" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="salesOrderMonitor"
+                                            foreignKeyName="FK-salesOrderMonitor-userId"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="salesOrderMonitor" baseColumnNames="userId"
+                                 constraintName="FK-salesOrderMonitor-userId"
+                                 referencedTableName="consultant"
+                                 referencedColumnNames="cns_consno"
+                                 onDelete="CASCADE"
+                                 onUpdate="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>

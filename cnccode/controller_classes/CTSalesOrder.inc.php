@@ -2064,7 +2064,15 @@ class CTSalesOrder extends CTCNC
                     true
                 );
             }
-
+            global $db;
+            $result = $db->preparedQuery(
+                'select 1 from salesOrderMonitor where userId = ? and salesOrderId = ? ',
+                [
+                    ["type" => "i", "value" => $this->userID],
+                    ["type" => "i", "value" => $dsOrdhead->getValue(DBEOrdhead::ordheadID)]
+                ]
+            );
+            $this->template->setVar('monitorChecked', $result->num_rows ? 'checked' : '');
             $quoteSentDateTime = null;
 
             if ($thereAreQuoteDocuments) {
