@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 938 - Increase number of favourites in menu
+- Issue 943 - Remove drives under 1GB from Customer Review Meeting Agenda
 ### Fixed
 - Issue 933 - User Time Logs sometimes showing as holiday
 - Issue 943 - Disk space in meeting agenda listing zero capacity drives
