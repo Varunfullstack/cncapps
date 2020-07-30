@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 951 - Expenses Breakdown Year to Date
 ### Changed
 - Issue 938 - Increase number of favourites in menu
 - Issue 950 - Include team in time allocation

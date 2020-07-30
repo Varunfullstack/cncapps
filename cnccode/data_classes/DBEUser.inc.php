@@ -529,6 +529,17 @@ class DBEUser extends DBEntity
         $this->setQueryString($query);
         return parent::getRows();
     }
+
+    public function getApprovalSubordinates($superiorId)
+    {
+        $query = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE {$this->getDBColumnName(self::activeFlag)} = 'Y' 
+            and  
+            (select 1 from {$this->getTableName()} where {$this->getDBColumnName(self::globalExpenseApprover)} 
+                                 and {$this->getDBColumnName(self::userID)} = {$superiorId}
+                ) = 1 or {$this->getDBColumnName(self::expenseApproverID)} = {$superiorId} order by cns_name";
+        $this->setQueryString($query);
+        return parent::getRows();
+    }
 }
 
 ?>
