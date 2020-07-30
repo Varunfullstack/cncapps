@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 950 - Include team in time allocation
 - Issue 939 - Sortable SR Scheduler Columns
 - Issue 945 - Move Invoices menu to Sales
+- Issue 947 - Creating new customers, set SLA as required fields
 ### Fixed
 - Issue 933 - User Time Logs sometimes showing as holiday
 
