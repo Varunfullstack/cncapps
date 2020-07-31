@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 951 - Expenses Breakdown Year to Date
+- Issue 861 - Scheduled requests to have option of being linked to a Sales Order
 - Issue 890 - Monitor Sales Order to get notifications when it's signed.
 ### Changed
 - Issue 938 - Increase number of favourites in menu
@@ -11,7 +12,7 @@ This project changes will be shown here.
 - Issue 939 - Sortable SR Scheduler Columns
 - Issue 945 - Move Invoices menu to Sales
 - Issue 947 - Creating new customers, set SLA as required fields
-- Issue 943 - Remove drives under 1GB from Customer Review Meeting Agenda
+- Issue 943 - Remove drives under 1 GB from Customer Review Meeting Agenda
 - Issue 940 - Include Signable instructions in quote email body
 ### Fixed
 - Issue 933 - User Time Logs sometimes showing as holiday

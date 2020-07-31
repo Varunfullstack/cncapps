@@ -22,6 +22,7 @@ class DBESRScheduler extends DBEntity implements JsonSerializable
     const updatedBy = "updatedBy";
     const createdAt = "createdAt";
     const updatedAt = "updatedAt";
+    const linkedSalesOrderId = "linkedSalesOrderId";
 
     /**
      * calls constructor()
@@ -107,6 +108,11 @@ class DBESRScheduler extends DBEntity implements JsonSerializable
             DA_DATETIME,
             DA_NOT_NULL
         );
+        $this->addColumn(
+            self::linkedSalesOrderId,
+            DA_ID,
+            DA_ALLOW_NULL
+        );
         $this->setAddColumnsOff();
         $this->setPK(0);
     }
@@ -117,20 +123,21 @@ class DBESRScheduler extends DBEntity implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            DBESRScheduler::id               => $this->getValue(DBESRScheduler::id),
-            DBESRScheduler::customerId       => $this->getValue(DBESRScheduler::customerId),
-            DBESRScheduler::rruleString      => $this->getValue(DBESRScheduler::rruleString),
-            DBESRScheduler::contactId        => $this->getValue(DBESRScheduler::contactId),
-            DBESRScheduler::siteNo           => $this->getValue(DBESRScheduler::siteNo),
-            DBESRScheduler::priority         => $this->getValue(DBESRScheduler::priority),
-            DBESRScheduler::hideFromCustomer => $this->getValue(DBESRScheduler::hideFromCustomer),
-            DBESRScheduler::teamId           => $this->getValue(DBESRScheduler::teamId),
-            DBESRScheduler::details          => $this->getValue(DBESRScheduler::details),
-            DBESRScheduler::internalNotes    => $this->getValue(DBESRScheduler::internalNotes),
-            DBESRScheduler::createdBy        => $this->getValue(DBESRScheduler::createdBy),
-            DBESRScheduler::updatedBy        => $this->getValue(DBESRScheduler::updatedBy),
-            DBESRScheduler::createdAt        => $this->getValue(DBESRScheduler::createdAt),
-            DBESRScheduler::updatedAt        => $this->getValue(DBESRScheduler::updatedAt),
+            DBESRScheduler::id                 => $this->getValue(DBESRScheduler::id),
+            DBESRScheduler::customerId         => $this->getValue(DBESRScheduler::customerId),
+            DBESRScheduler::rruleString        => $this->getValue(DBESRScheduler::rruleString),
+            DBESRScheduler::contactId          => $this->getValue(DBESRScheduler::contactId),
+            DBESRScheduler::siteNo             => $this->getValue(DBESRScheduler::siteNo),
+            DBESRScheduler::priority           => $this->getValue(DBESRScheduler::priority),
+            DBESRScheduler::hideFromCustomer   => $this->getValue(DBESRScheduler::hideFromCustomer),
+            DBESRScheduler::teamId             => $this->getValue(DBESRScheduler::teamId),
+            DBESRScheduler::details            => $this->getValue(DBESRScheduler::details),
+            DBESRScheduler::internalNotes      => $this->getValue(DBESRScheduler::internalNotes),
+            DBESRScheduler::createdBy          => $this->getValue(DBESRScheduler::createdBy),
+            DBESRScheduler::updatedBy          => $this->getValue(DBESRScheduler::updatedBy),
+            DBESRScheduler::createdAt          => $this->getValue(DBESRScheduler::createdAt),
+            DBESRScheduler::updatedAt          => $this->getValue(DBESRScheduler::updatedAt),
+            DBESRScheduler::linkedSalesOrderId => $this->getValue(DBESRScheduler::linkedSalesOrderId)
         ];
     }
 
