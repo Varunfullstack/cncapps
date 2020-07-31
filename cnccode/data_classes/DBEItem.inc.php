@@ -32,6 +32,7 @@ class DBEItem extends DBCNCEntity
     const allowSRLog = "allowSRLog";
     const isStreamOne = "isStreamOne";
     const partNoOld = "partNoOld";
+
     /**
      * calls constructor()
      * @access public
@@ -332,6 +333,15 @@ class DBEItem extends DBCNCEntity
 
         $ret = (parent::getRows());
         return $ret;
+    }
+
+    public function getItemsByPartNoOrOldPartNo($sku)
+    {
+        $queryString =
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE 
+                              {$this->getDBColumnName(self::partNo)} = '{$sku}' or {$this->getDBColumnName(self::partNoOld)} = '{$sku}' limit 1";
+        $this->setQueryString($queryString);
+        return parent::getRows();
     }
 
 }

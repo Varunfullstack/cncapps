@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Created by Mustafa Taha. * 
- * Date: 20/07/2020 
+ * Created by Mustafa Taha. *
+ * Date: 20/07/2020
  */
 
 use CNCLTD\LoggerCLI;
@@ -18,7 +18,6 @@ require_once($cfg['path_bu'] . '/BUTechDataApi.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomerItem.inc.php');
 require_once($cfg['path_dbe'] . '/DBEStreamOneCustomers.inc.php');
 require_once($cfg['path_dbe'] . '/DBECustomer.inc.php');
-
 
 
 $logName = 'UpdatePriceItemFromStreamOne';
@@ -40,10 +39,8 @@ if (isset($options['d'])) {
 }
 $thing = null;
 //**************************************************update item prices */
-if(true)
-{
 //------ get all ccna items
-$query  = "SELECT  itm_itemno,itm_unit_of_sale, itm_sstk_cost ,itm_desc , partNoOld FROM  item WHERE isStreamOne=1";
+$query = "SELECT  itm_itemno,itm_unit_of_sale, itm_sstk_cost ,itm_desc , partNoOld FROM  item WHERE isStreamOne=1";
 $db->query($query);
 $cncItems = $db->fetchAll(MYSQLI_ASSOC);
 
@@ -55,7 +52,7 @@ $search["lines"] = [
     ["sku" => "SK4663", "quantity" => 1]
 ];
 foreach ($cncItems as $item) {
-    array_push($search["lines"],  ["sku" => $item["itm_unit_of_sale"], "quantity" => 1]);
+    array_push($search["lines"], ["sku" => $item["itm_unit_of_sale"], "quantity" => 1]);
 }
 
 $updatedItems = [];
@@ -66,26 +63,29 @@ $buStreamOneApi = new BUTechDataApi($thing);
 for ($page = 1; $page <= $pages; $page++) {
     $search['page'] = $page;
     $encodedSearch = json_encode($search);
-    //echo json_encode($encodedSearch);     
+    //echo json_encode($encodedSearch);
     $streamOneItems = json_decode($buStreamOneApi->getProductsPrices($encodedSearch), true);
     //echo $streamOneItems["Result"];
     if ($streamOneItems["Result"] === "Success") {
-        //start to compare prices        
+        //start to compare prices
         foreach ($streamOneItems["BodyText"]['pricingDetails'] as $streamOneItem) {
 
             foreach ($cncItems as $cncItem) {
                 if (
                     $cncItem['itm_unit_of_sale'] == $streamOneItem['sku'] &&
-                    round($cncItem['itm_sstk_cost'],2) != round($streamOneItem['unitResellerCost'],2)
+                    round($cncItem['itm_sstk_cost'], 2) != round($streamOneItem['unitResellerCost'], 2)
                 ) {
                     //compare price of item
-                    array_push($updatedItems, [
-                        "id" => $cncItem['itm_itemno'],
-                        "sku" => $streamOneItem['sku'],
-                        "oldPrice" => $cncItem['itm_sstk_cost'],
-                        "newPrice" => $streamOneItem['unitResellerCost'],
-                        "desc" => $cncItem['itm_desc']
-                    ]);
+                    array_push(
+                        $updatedItems,
+                        [
+                            "id"       => $cncItem['itm_itemno'],
+                            "sku"      => $streamOneItem['sku'],
+                            "oldPrice" => $cncItem['itm_sstk_cost'],
+                            "newPrice" => $streamOneItem['unitResellerCost'],
+                            "desc"     => $cncItem['itm_desc']
+                        ]
+                    );
                 }
             }
         }
@@ -96,11 +96,11 @@ if (count($updatedItems) > 0) {
     // start update item with new prices
     foreach ($updatedItems as $key => $item) {
         $newValue = round($item["newPrice"], 2);
-        $updatedItems[$key]["newPrice"] =  $newValue;
-      echo  $db->query("update item set itm_sstk_cost=$newValue where itm_itemno=$item[id]");
+        $updatedItems[$key]["newPrice"] = $newValue;
+        echo $db->query("update item set itm_sstk_cost=$newValue where itm_itemno=$item[id]");
     }
 
-    //send email to sales to tell them there is an update to price  
+    //send email to sales to tell them there is an update to price
     $buMail = new BUMail($thing);
     $senderEmail = CONFIG_SUPPORT_EMAIL;
     $toEmail = CONFIG_SALES_EMAIL;
@@ -145,13 +145,16 @@ $allCustomers = json_decode($buStreamOneApi->searchCustomers(json_encode(["noOfR
 if ($allCustomers->Result == "Success") {
     //BodyText.endCustomersDetails
     // now we have all streamOne Customers
-    $streamOneCustomers = array_map(function ($item) {
-        $item->name = $item->firstName . ' ' . $item->lastName;
-        $item->endCustomerPO = $item->companyName;
-        return $item;
-    }, $allCustomers->BodyText->endCustomersDetails);
+    $streamOneCustomers = array_map(
+        function ($item) {
+            $item->name = $item->firstName . ' ' . $item->lastName;
+            $item->endCustomerPO = $item->companyName;
+            return $item;
+        },
+        $allCustomers->BodyText->endCustomersDetails
+    );
     // get all subscriptions
-    
+
     $firstSubscription = json_decode($buStreamOneApi->getAllSubscriptions(1));
     if ($firstSubscription->Result == "Success") {
         //"totalRecords":457,"totalPages":23,"page":1,"recordsPerPage":20,"subscriptions":
@@ -162,9 +165,9 @@ if ($allCustomers->Result == "Success") {
         for ($i = 2; $i <= $totalPages; $i++) {
             $temp = json_decode($buStreamOneApi->getAllSubscriptions($i));
             $allSubscriptions = array_merge($allSubscriptions, $temp->BodyText->subscriptions);
-            //echo count($allSubscriptions)."\n";  
+            //echo count($allSubscriptions)."\n";
         }
-        
+
         //----------------------------end update customer items seats from stream one
         //now we have all subscription and we need to map it to customers
         $subscriptionsContacts = [];
@@ -172,11 +175,11 @@ if ($allCustomers->Result == "Success") {
             foreach ($subscription as $key => $value) {
 
                 $contact = [
-                    "companyName" => $value->company,
-                    "email" => $value->endCustomerEmail,
-                    "name" => $value->endCustomerName,
+                    "companyName"   => $value->company,
+                    "email"         => $value->endCustomerEmail,
+                    "name"          => $value->endCustomerName,
                     "endCustomerPO" => isset($value->endCustomerPO) ? $value->endCustomerPO : null,
-                    "MsDomain" => isset($value->additionalData) ? [$value->additionalData] : null,
+                    "MsDomain"      => isset($value->additionalData) ? [$value->additionalData] : null,
                 ];
                 $found = false;
                 foreach ($subscriptionsContacts as $inContact) {
@@ -184,7 +187,7 @@ if ($allCustomers->Result == "Success") {
                         $found = true;
                 }
                 if (!$found) {
-                    //echo  $contact["email"]."\n";                    
+                    //echo  $contact["email"]."\n";
                     array_push($subscriptionsContacts, (object)$contact);
                 }
             }
@@ -207,108 +210,138 @@ if ($allCustomers->Result == "Success") {
         // now we have all customers and need to insert into db
         //if(false)
         {
-        $inserted = 0;
-        $db->query("delete from streamonecustomers");
-        $i=1;
-         foreach ($streamOneCustomers as $customer) {            
-            $dbeStreamOneCustomers = new DBEStreamOneCustomers($thing);
-            $dbeStreamOneCustomers->setPKValue($i);
-            if (isset($customer->addressLine1))
-                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::addressLine1, $customer->addressLine1);
-            if (isset($customer->addressLine2))
-                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::addressLine2, $customer->addressLine2);
-            if (isset($customer->city))
-                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::city, $customer->city);
-            if (isset($customer->companyName))
-                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::companyName, $customer->companyName);
-            if (isset($customer->country))
-                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::country, $customer->country);
-            if (isset($customer->createdOn))
-                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::createdOn, $customer->createdOn);
-            if (isset($customer->email))
-                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::email, $customer->email);
-            if (isset($customer->endCustomerId))
-                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::endCustomerId, $customer->endCustomerId);
-            if (isset($customer->endCustomerPO))
-                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::endCustomerPO, $customer->endCustomerPO);
-            if (isset($customer->MsDomain))
-                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::MsDomain, json_encode($customer->MsDomain));
-            if (isset($customer->name))
-                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::name, $customer->name);
-            if (isset($customer->phone1))
-                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::phone1, $customer->phone1);
-            if (isset($customer->postalCode))
-                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::postalCode, $customer->postalCode);
-            if (isset($customer->title))
-                $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::title, $customer->title);
-             $dbeStreamOneCustomers->insertRow();
-            $inserted++;
-            $i=$i+1;
-        }
-        $logger->info('inserted customers = '.$inserted);
+            $inserted = 0;
+            $db->query("delete from streamonecustomers");
+            $i = 1;
+            foreach ($streamOneCustomers as $customer) {
+                $dbeStreamOneCustomers = new DBEStreamOneCustomers($thing);
+                $dbeStreamOneCustomers->setPKValue($i);
+                if (isset($customer->addressLine1))
+                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::addressLine1, $customer->addressLine1);
+                if (isset($customer->addressLine2))
+                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::addressLine2, $customer->addressLine2);
+                if (isset($customer->city))
+                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::city, $customer->city);
+                if (isset($customer->companyName))
+                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::companyName, $customer->companyName);
+                if (isset($customer->country))
+                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::country, $customer->country);
+                if (isset($customer->createdOn))
+                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::createdOn, $customer->createdOn);
+                if (isset($customer->email))
+                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::email, $customer->email);
+                if (isset($customer->endCustomerId))
+                    $dbeStreamOneCustomers->setValue(
+                        DBEStreamOneCustomers::endCustomerId,
+                        $customer->endCustomerId
+                    );
+                if (isset($customer->endCustomerPO))
+                    $dbeStreamOneCustomers->setValue(
+                        DBEStreamOneCustomers::endCustomerPO,
+                        $customer->endCustomerPO
+                    );
+                if (isset($customer->MsDomain))
+                    $dbeStreamOneCustomers->setValue(
+                        DBEStreamOneCustomers::MsDomain,
+                        json_encode($customer->MsDomain)
+                    );
+                if (isset($customer->name))
+                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::name, $customer->name);
+                if (isset($customer->phone1))
+                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::phone1, $customer->phone1);
+                if (isset($customer->postalCode))
+                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::postalCode, $customer->postalCode);
+                if (isset($customer->title))
+                    $dbeStreamOneCustomers->setValue(DBEStreamOneCustomers::title, $customer->title);
+                $dbeStreamOneCustomers->insertRow();
+                $inserted++;
+                $i = $i + 1;
+            }
+            $logger->info('inserted customers = ' . $inserted);
         }
     }
-    
-}
+
 }
 //******************************* update customer licences number and status */
 // now we have all subscriptions,  streamone customers and cnc items
 //----------------------------start update customer items seats from stream one
 //1- get all cnc customers
 $db->query("SELECT `cus_custno` as id,streamOneEmail as email FROM `customer` WHERE `streamOneEmail` IS NOT NULL");
-$cncCustomers =$db->fetchAll(MYSQLI_ASSOC);
+$cncCustomers = $db->fetchAll(MYSQLI_ASSOC);
 //echo json_encode( $cncCustomers); //cus_custno
 echo "\n";
-$updatedItems=0;
-foreach($cncCustomers as $customer)
-{
+$updatedItems = 0;
+foreach ($cncCustomers as $customer) {
     //echo $customer["email"]."\n";
     //get all customer subscriptions
     foreach ($allSubscriptions as $item) {
         foreach ($item as $key => $subscription) {
             //echo json_encodesubscription$value);
-   
-           // echo $subscription->endCustomerEmail."\n";
-            if($customer["email"]==$subscription->endCustomerEmail)
-            {
-                $itemId=getItemId($cncItems,$subscription->sku);
+
+            // echo $subscription->endCustomerEmail."\n";
+            if ($customer["email"] == $subscription->endCustomerEmail) {
+                $itemId = getItemId($cncItems, $subscription->sku);
                 //echo "\n".$customer["id"]." ".$customer["email"]." ".$subscription->sku." ".$itemId." ".$subscription->quantity;
-                if($itemId)
-                {
-                    $db->query("select cui_users quantity from custitem where   renewalStatus='R'  AND declinedFlag='N'
+                if ($itemId) {
+                    $db->query(
+                        "select cui_users quantity from custitem where   renewalStatus='R'  AND declinedFlag='N'
                     and cui_custno= $customer[id]
-                    and cui_itemno=  $itemId");
-                    $temp=$db->fetchAll();
-                    if(count($temp)>0)
-                    {
-                      //  echo " ".$temp[0]["quantity"];
-                        if((int)$subscription->quantity!=(int)$temp[0]["quantity"]&&$subscription->lineStatus=="active")
-                        {
+                    and cui_itemno=  $itemId"
+                    );
+                    $temp = $db->fetchAll();
+                    if (count($temp) > 0) {
+                        //  echo " ".$temp[0]["quantity"];
+                        if ((int)$subscription->quantity != (int)$temp[0]["quantity"] && $subscription->lineStatus == "active") {
                             //echo  $customer["id"]." ".$itemId." ".(int)$subscription->quantity." ".(int)$temp[0]["quantity"]."\n";
-                            $db->query("update custitem set cui_users=$subscription->quantity where   renewalStatus='R'  AND declinedFlag='N'
-                            and cui_custno= $customer[id]
-                            and cui_itemno=  $itemId");
+                            $params = [
+                                [
+                                    "type"  => "i",
+                                    "value" => $subscription->quantity
+                                ],
+                                [
+                                    "type"  => "d",
+                                    "value" => $subscription->unitPrice
+                                ],
+                                [
+                                    "type"  => "d",
+                                    "value" => ($subscription->unitPrice * $subscription->quantity) * 12
+                                ],
+                                [
+                                    "type"  => "i",
+                                    "value" => $customer['id']
+                                ],
+                                [
+                                    "type"  => "i",
+                                    "value" => $itemId
+                                ],
+                            ];
+
+                            $result = $db->preparedQuery(
+                                "update custitem set cui_users = ? , costPricePerMonth = ?, cui_cost_price = ?  where   renewalStatus='R'  AND declinedFlag='N'
+                            and cui_custno = ?
+                            and cui_itemno = ?",
+                                $params
+                            );
                             $updatedItems++;
                         }
-                    }
-                    else $logger->info("Customer $customer[email] does not have license $subscription->sku in CNCAPPS");
-                }
-                else $logger->info("Customer $customer[email] does not have license $subscription->sku in CNCAPPS");
+                    } else $logger->info(
+                        "Customer $customer[email] does not have license $subscription->sku in CNCAPPS"
+                    );
+                } else $logger->info("Customer $customer[email] does not have license $subscription->sku in CNCAPPS");
 
             }
-             
+
         }
     }
 }
-$logger->info('updated customers items  '.$updatedItems);
-function getItemId($cncItems,$sku)
+$logger->info('updated customers items  ' . $updatedItems);
+function getItemId($cncItems, $sku)
 {
-   foreach($cncItems as $item)
-   {
-    if($item['itm_unit_of_sale'] ==$sku||$item['partNoOld']  == $sku)
-        return $item['itm_itemno'];
-   } 
-   return null;
+    foreach ($cncItems as $item) {
+        if ($item['itm_unit_of_sale'] == $sku || $item['partNoOld'] == $sku)
+            return $item['itm_itemno'];
+    }
+    return null;
 }
 
 exit;
