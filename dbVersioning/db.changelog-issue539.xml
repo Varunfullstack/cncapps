@@ -255,8 +255,7 @@
        </sql>           
     </changeSet>
      <changeSet id="issue539-7" author="pavwebdevmt">      
-       <dropTable  tableName="streamOneCustomers"/>    
-       <sql  splitStatements="true">
+              <sql  splitStatements="true">
       CREATE TABLE `streamOneCustomers` (
             `id` INT (10) NOT NULL,
             `name` VARCHAR (100),            
@@ -283,8 +282,7 @@
                 <columnExists tableName="customer" columnName="streamOneEmail"/>
             </not>
         </preConditions>
-        <dropColumn tableName="customer" columnName="techDataCustomerId"/>
-        <addColumn tableName="customer">
+                <addColumn tableName="customer">
             <column name="streamOneEmail" type="varchar(60)" >
                 <constraints nullable="true"/>
             </column>
@@ -292,8 +290,7 @@
         <createIndex indexName="idx_streamOneEmail" tableName="customer">
             <column name="streamOneEmail"/>
         </createIndex>        
-        <dropIndex  indexName="idx_techDataCustomerId"  tableName="customer"/> 
-    </changeSet>
+            </changeSet>
      <changeSet id="issue539-9" author="pavwebdevmt">    
         <sql>
             UPDATE  `customer` SET  `streamOneEmail` =(SELECT MIN(con_email) FROM  `contact` WHERE contact.`con_custno`=`cus_custno` AND  `con_email` IN (SELECT email FROM streamOneCustomers));
