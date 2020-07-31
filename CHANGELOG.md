@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [v4.3.0]
+## [v4.3.0] - 2020-07-31
 ### Added
 - Issue 951 - Expenses Breakdown Year to Date
 - Issue 861 - Scheduled requests to have option of being linked to a Sales Order
