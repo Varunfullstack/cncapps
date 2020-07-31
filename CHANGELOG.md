@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v4.3.0]
 ### Added
 - Issue 951 - Expenses Breakdown Year to Date
 - Issue 861 - Scheduled requests to have option of being linked to a Sales Order
@@ -16,6 +16,7 @@ This project changes will be shown here.
 - Issue 940 - Include Signable instructions in quote email body
 ### Fixed
 - Issue 933 - User Time Logs sometimes showing as holiday
+- Fix issue with pending leavers process not using the new "active" field for contacts
 
 ## [v4.2.7] - 2020-07-29
 ### Fixed
