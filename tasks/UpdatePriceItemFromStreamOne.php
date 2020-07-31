@@ -282,16 +282,19 @@ foreach($cncCustomers as $customer)
                     if(count($temp)>0)
                     {
                       //  echo " ".$temp[0]["quantity"];
-                    if((int)$subscription->quantity!=(int)$temp[0]["quantity"])
-                     {
-                      $db->query("update custitem set cui_users=$subscription->quantity where   renewalStatus='R'  AND declinedFlag='N'
-                      and cui_custno= $customer[id]
-                      and cui_itemno=  $itemId");
-                      $updatedItems++;
-                     }
+                        if((int)$subscription->quantity!=(int)$temp[0]["quantity"]&&$subscription->lineStatus=="active")
+                        {
+                            //echo  $customer["id"]." ".$itemId." ".(int)$subscription->quantity." ".(int)$temp[0]["quantity"]."\n";
+                            $db->query("update custitem set cui_users=$subscription->quantity where   renewalStatus='R'  AND declinedFlag='N'
+                            and cui_custno= $customer[id]
+                            and cui_itemno=  $itemId");
+                            $updatedItems++;
+                        }
                     }
-                   
+                    else $logger->info("Customer $customer[email] does not have license $subscription->sku in CNCAPPS");
                 }
+                else $logger->info("Customer $customer[email] does not have license $subscription->sku in CNCAPPS");
+
             }
              
         }

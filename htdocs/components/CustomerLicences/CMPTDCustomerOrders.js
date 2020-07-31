@@ -63,6 +63,7 @@ class CMPTDCustomerOrders extends React.Component {
     // get all subscriptions by email
     //const orders=await this.apiCustomerLicenses.getSubscriptionsByEmail(endCustomerEmail);
     const allSubscriptions =await this.getCustomerOrders(endCustomerEmail);
+    
     // let endCustomer=null;  
     // const res=await this.apiCustomerLicenses.getCustomerByEmail(endCustomerEmail)    
     // if(res.Result==="Success")
@@ -83,8 +84,10 @@ class CMPTDCustomerOrders extends React.Component {
     //get current user
     const currentUser=await this.apiCustomerLicenses.getCurrentUser();
     //console.log(allSubscriptions);
-   
+   setTimeout(()=>{
     this.setState({ currentUser ,endCustomerEmail,results: allSubscriptions,endCustomer});
+
+   },300)
     this.hideSpinner();
     }
   }
@@ -179,12 +182,15 @@ class CMPTDCustomerOrders extends React.Component {
         path: "cncStatus",
         label: "CNC Status",
         sortable: true,
-        content: (o) =>         
+        content: (o) =>     
+        o.cncStatus===true?    
+              el('i',{className:"fa fa-check "}):
               el("label", {
                 key: "divCncStatus" + o.orderNumber,
-                className: "error-message",
-                style:{whiteSpace:"nowrap"}
-              }, o.cncStatus ===false?"Not Found":"")
+                className: "error-message",                
+                style:{whiteSpace:"nowrap",marginLeft:0}
+              }, "Not Found")
+              
              
       },
       {
@@ -536,6 +542,7 @@ class CMPTDCustomerOrders extends React.Component {
       let orderAddons = await this.apiCustomerLicenses.getOrderDetials(
         order.orderNumber
       );
+      console.log(orderAddons);
       //2- update product quantity and price
       const selectedOrderLine = { ...this.state.selectedOrderLine };
       const line = orderAddons.BodyText.orderInfo.lines.filter(
@@ -544,7 +551,13 @@ class CMPTDCustomerOrders extends React.Component {
       
 
       selectedOrderLine.addOns = line && line.length > 0 && line[0].addOns;
-      //console.log( selectedOrderLine.addOns)
+     
+      if(selectedOrderLine.addOns)
+      selectedOrderLine.addOns.forEach(async (subscription)=>{
+        const result=await this.apiCustomerLicenses.checkLicenseExistAtCNC(selectedOrderLine.endCustomerEmail,subscription.sku)
+        subscription.cncStatus=result.status;
+      })
+      console.log( selectedOrderLine.addOns);
       //until now we have current order addons with there qunantity
 
       //3- get current product to get all avialabel addons
@@ -678,6 +691,20 @@ class CMPTDCustomerOrders extends React.Component {
                 ), //(a.quantity || 0)
         },
         {
+          path: "cncStatus",
+          label: "CNC Status",
+          sortable: true,
+          content: (o) =>     
+          !o.cncStatus?    
+                el("label", {
+                  key: "divCncStatus" + o.orderNumber,
+                  className: "error-message",                
+                  style:{whiteSpace:"nowrap",marginLeft:0}
+                }, "Not Found"):
+                el('i',{className:"fa fa-check "})
+               
+        },
+        {
           path: null,
           label: "Edit",
           sortable: false,
@@ -695,7 +722,7 @@ class CMPTDCustomerOrders extends React.Component {
       console.log(allAddOns)
       let cost =0;
       let  totalElement=null;
-      if(allAddOns.length>0)
+      if(allAddOns&&allAddOns.length>0)
       {
         allAddOns.forEach(addon=>{
           

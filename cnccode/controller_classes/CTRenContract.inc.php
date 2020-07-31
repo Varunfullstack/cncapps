@@ -366,7 +366,7 @@ class CTRenContract extends CTCNC
                     $dsRenContract->getValue(DBEJRenContract::users)
                 ),
                 'usersDisable'                              => Controller::htmlDisplayText(
-                    $dbeItem->getValue(DBEItem::isStreamOne)==1?'disabled':''
+                    $dbeItem->getValue(DBEItem::isStreamOne)==1?'readonly':''
                 ),                
                 'salePricePerMonth'                  => $dsRenContract->getValue(DBECustomerItem::salePricePerMonth),
                 'costPricePerMonth'                  => $dsRenContract->getValue(DBECustomerItem::costPricePerMonth),

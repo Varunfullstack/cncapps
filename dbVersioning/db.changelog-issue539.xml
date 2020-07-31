@@ -481,4 +481,13 @@
             UPDATE  `customer` SET  `streamOneEmail` ="alismith@xstrahl.com" WHERE `cus_name` ="Xstrahl Ltd";
         </sql>
     </changeSet>
+       <changeSet id="issue539-12" author="pavwebdevmt">    
+         <sql  splitStatements="true">
+            UPDATE item SET `partNoOld`='SK4660', itm_unit_of_sale ='SK103996' WHERE `itm_itemno`= 16075;
+            UPDATE item SET `partNoOld`='SK4661', itm_unit_of_sale ='SK103871' WHERE `itm_itemno`= 16461;
+            UPDATE item SET `partNoOld`='SK4662', itm_unit_of_sale ='SK104123' WHERE `itm_itemno`= 16074;
+            UPDATE item SET `partNoOld`='SK4664', itm_unit_of_sale ='SK103962' WHERE `itm_itemno`= 16588;
+            UPDATE item SET `partNoOld`='SK16147', itm_unit_of_sale ='SK104123' WHERE `itm_itemno`= 18152;
+          </sql>
+    </changeSet>
 </databaseChangeLog>
