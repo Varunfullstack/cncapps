@@ -630,6 +630,9 @@ class CTUser extends CTCNC
                     DBEUser::basedAtCustomerSite
                 ) ? 'checked' : null,
                 'siteCustomerString'                            => $siteCustomerString,
+                'streamOneLicenseManagementChecked'        => Controller::htmlChecked(
+                    $dsUser->getValue(DBEJUser::streamOneLicenseManagement)
+                ),
             )
         );
         // manager selection

@@ -70,6 +70,7 @@ class DBEUser extends DBEntity
     const sendEmailWhenAssignedService = "sendEmailAssignedService";
     const basedAtCustomerSite = "basedAtCustomerSite";
     const siteCustId = "siteCustId";
+    const streamOneLicenseManagement = "streamOneLicenseManagement";
 
     /**
      * calls constructor()
@@ -366,7 +367,11 @@ class DBEUser extends DBEntity
             DA_YN,
             DA_NOT_NULL
         );
-
+        $this->addColumn(
+            self::streamOneLicenseManagement,
+            DA_BOOLEAN,
+            DA_NOT_NULL
+        );        
         $this->addColumn(
             self::expenseApproverID,
             DA_ID,

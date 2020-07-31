@@ -109,6 +109,12 @@
     }
 
 </script>
+<style>
+    input[readonly].users{
+        background-color: rgb(231, 231, 231);
+        
+    }
+</style>
 <!-- Template: RenContractEdit.inc.html -->
 <TABLE width="200px"
        border="0"
@@ -211,13 +217,16 @@
         {prices}
         <tr>
             <td class="promptText">Number of Users/Units</td>
-            <td class="fieldText">
-                <input name="renContract[1][users]"
+            <td class="fieldText" > 
+                 <input name="renContract[1][users]"
                        type="number"
                        value="{users}"
                        title="Users"
                        onkeyup="recalculatePrices()"
                        id="units"
+                        class="users"
+                       {usersDisable}
+                     
                 >
                 <span class="formErrorMessage">{usersMessage}</span>
             </td>

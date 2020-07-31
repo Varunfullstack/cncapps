@@ -63,6 +63,8 @@ This project changes will be shown here.
 - Issue 924 - Add Fix SLA to customer page
 - Issue 921 - Record the source of a SR, phone, email or portal
 - Issue 895 - Leased line contract expiry notification
+- Issue 539 - Office 365 license API with Techdata
+
 ### Changed
 - Issue 818 - Confirm Report Logic / calculations
 - Issue 925 - Improve Double Quote handling in passwords fields

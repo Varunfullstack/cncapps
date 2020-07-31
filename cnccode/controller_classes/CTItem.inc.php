@@ -214,6 +214,7 @@ class CTItem extends CTCNC
                     $this->dsItem->getValue(DBEItem::serialNoFlag)
                 ),
                 'partNo'                         => Controller::htmlInputText($this->dsItem->getValue(DBEItem::partNo)),
+                'partNoOld'                      => Controller::htmlInputText($this->dsItem->getValue(DBEItem::partNoOld)),
                 'notes'                          => Controller::htmlTextArea($this->dsItem->getValue(DBEItem::notes)),
                 'contractResponseTime'           => Controller::htmlInputText(
                     $this->dsItem->getValue(DBEItem::contractResponseTime)
@@ -229,7 +230,8 @@ class CTItem extends CTCNC
                 'excludeFromPOCompletionChecked' => Controller::htmlChecked(
                     $this->dsItem->getValue(DBEItem::excludeFromPOCompletion)
                 ),
-                'allowSRLog'                     => $this->dsItem->getValue(DBEItem::allowSRLog) ? "checked" : null
+                'allowSRLog'                     => $this->dsItem->getValue(DBEItem::allowSRLog) ? "checked" : null,
+                'isStreamOne'                     => $this->dsItem->getValue(DBEItem::isStreamOne) ? "checked" : null
             )
         );
         $this->parseItemTypeSelector($this->dsItem->getValue(DBEItem::itemTypeID));

@@ -1,0 +1,493 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdevmt" id="issue539-0">
+        <tagDatabase tag="issue539"/>
+    </changeSet>
+    <changeSet id="issue539-1" author="pavwebdevmt">
+    
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="techDataCustomerId"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="customer">
+            <column name="techDataCustomerId" type="varchar(50)" >
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <createIndex indexName="idx_techDataCustomerId" tableName="customer">
+            <column name="techDataCustomerId"/>
+        </createIndex>        
+    </changeSet>
+     <changeSet id="issue539-2" author="pavwebdevmt">    
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="item" columnName="isStreamOne"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="item">
+            <column defaultValue="0" name="isStreamOne" type="TINYINT(1)" remarks="Is this item a StreamOne product or not " >
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>      
+         <createIndex indexName="idx_item_isStreamOne" tableName="item">
+            <column name="isStreamOne"/>
+        </createIndex>   
+    </changeSet>
+    <changeSet id="issue539-3" author="pavwebdevmt">    
+         <sql  splitStatements="true">
+            UPDATE `customer` SET `techDataCustomerId`= 'faac282f87511c6bbda9494fa79f2f50' WHERE `cus_custno`=5869;
+            UPDATE `customer` SET `techDataCustomerId`= '563c551f8e1b5c260cf8f85cad15004c' WHERE `cus_custno`=5151;
+            UPDATE `customer` SET `techDataCustomerId`= '5ffb050b17e41e4ccf9b5307c3106a49' WHERE `cus_custno`=6342;
+            UPDATE `customer` SET `techDataCustomerId`= 'a1986dc11a05b4024c826b627d16f425' WHERE `cus_custno`=6476;
+            UPDATE `customer` SET `techDataCustomerId`= 'cf8828324684d57a47fb1b8ac835a037' WHERE `cus_custno`=5190;
+            UPDATE `customer` SET `techDataCustomerId`= 'a51210d32fb40414125783b2682be403' WHERE `cus_custno`=4700;
+            UPDATE `customer` SET `techDataCustomerId`= 'aa3e6a4c21e2dc743488fb8c3c3b5159' WHERE `cus_custno`=6441;
+            UPDATE `customer` SET `techDataCustomerId`= '0412c853faf10168f84e109d227ac7c5' WHERE `cus_custno`=6454;
+            UPDATE `customer` SET `techDataCustomerId`= '21972194c273fb54c777efa5c2abd87b' WHERE `cus_custno`=6307;
+            UPDATE `customer` SET `techDataCustomerId`= '69d16673c0eca547d0fb6f92e7a83882' WHERE `cus_custno`=1401;
+            UPDATE `customer` SET `techDataCustomerId`= 'b69977661209091cbcfb4c41f175a280' WHERE `cus_custno`=1478;
+            UPDATE `customer` SET `techDataCustomerId`= 'e7bb92e8b0107701b62c05bfbd48e97e' WHERE `cus_custno`=6409;
+            UPDATE `customer` SET `techDataCustomerId`= 'ad1fe4571051d5730acf80c9dad171ae' WHERE `cus_custno`=2530;
+            UPDATE `customer` SET `techDataCustomerId`= 'ec22e254b4520ba77bb9fa20dfb9b0be' WHERE `cus_custno`=6011;
+            UPDATE `customer` SET `techDataCustomerId`= 'eecf423f7a26ad31a45bbf74c0e8589f' WHERE `cus_custno`=6591;
+            UPDATE `customer` SET `techDataCustomerId`= 'ed4fd8c2035b9d501f7aa51f04b7c302' WHERE `cus_custno`=6473;
+            UPDATE `customer` SET `techDataCustomerId`= '6c1b0acede95db966cbf2f780e012ca6' WHERE `cus_custno`=6402;
+            UPDATE `customer` SET `techDataCustomerId`= 'f724392da10ca21ef00c0a0ed8df553a' WHERE `cus_custno`=4767;
+            UPDATE `customer` SET `techDataCustomerId`= 'd887c9f1beb429b4280c63bc33ec59a1' WHERE `cus_custno`=2857;
+            UPDATE `customer` SET `techDataCustomerId`= '5b576997de0cd61f57db46fd8dc13380' WHERE `cus_custno`=6115;
+            UPDATE `customer` SET `techDataCustomerId`= '1acbe8f7aae1afdf2b7c87e3c33240a3' WHERE `cus_custno`=6074;
+            UPDATE `customer` SET `techDataCustomerId`= 'f7bd7f3cf9e7f3356aff2b77167f39a7' WHERE `cus_custno`=4061;
+            UPDATE `customer` SET `techDataCustomerId`= 'bb4f7f0233caed8307924cd18aaf96b1' WHERE `cus_custno`=6101;
+            UPDATE `customer` SET `techDataCustomerId`= '659dbdef641ad97f713caf39f770db24' WHERE `cus_custno`=2535;
+            UPDATE `customer` SET `techDataCustomerId`= '66734b7a729cd31627d21172c70842b1' WHERE `cus_custno`=2488;
+            UPDATE `customer` SET `techDataCustomerId`= 'b122d2c5f1e3d975ce393b9996c3fd03' WHERE `cus_custno`=2914;
+            UPDATE `customer` SET `techDataCustomerId`= '6f929e643f8966bc774b904833cf1770' WHERE `cus_custno`=1939;
+            UPDATE `customer` SET `techDataCustomerId`= '80bac58a0fe777732c8c273d7d456f15' WHERE `cus_custno`=2848;
+            UPDATE `customer` SET `techDataCustomerId`= '16e25006dec5b5b0da5fc819cd09e139' WHERE `cus_custno`=6345;
+            UPDATE `customer` SET `techDataCustomerId`= '4d1bb23c7cc2f5eb404220ab98f91b87' WHERE `cus_custno`=5194;
+            UPDATE `customer` SET `techDataCustomerId`= '16d53045b3ca5c6b3b5a6c39c943facb' WHERE `cus_custno`=2315;
+            UPDATE `customer` SET `techDataCustomerId`= '00d6286989adfdb7fd28971f38f88ee6' WHERE `cus_custno`=203;
+            UPDATE `customer` SET `techDataCustomerId`= '10984f4592bb85b910d30dbd1d0769de' WHERE `cus_custno`=1653;
+            UPDATE `customer` SET `techDataCustomerId`= '30c48d93c9e3f6f4ea89342c3de20a27' WHERE `cus_custno`=6529;
+            UPDATE `customer` SET `techDataCustomerId`= '6b8a35da87b9cbff623c031226644d9d' WHERE `cus_custno`=4995;
+            UPDATE `customer` SET `techDataCustomerId`= '49faa8b89d9c79edb74ef26568855ffd' WHERE `cus_custno`=6600;
+            UPDATE `customer` SET `techDataCustomerId`= '5d46ff0b691e2d729005908dfd834a73' WHERE `cus_custno`=6075;
+            UPDATE `customer` SET `techDataCustomerId`= 'f656573757d8fc4be491a3201fdab12c' WHERE `cus_custno`=1743;
+            UPDATE `customer` SET `techDataCustomerId`= '67cad6fa4d40a14d9efae5c3fc46882b' WHERE `cus_custno`=1714;
+            UPDATE `customer` SET `techDataCustomerId`= 'f923844b87073a8becf8f2e9afcb9110' WHERE `cus_custno`=5978;
+            UPDATE `customer` SET `techDataCustomerId`= 'de468731b091c86f80ed9c712fcc7f16' WHERE `cus_custno`=5615;
+            UPDATE `customer` SET `techDataCustomerId`= '1acfc328b4020961b5ffaa42078a4ad0' WHERE `cus_custno`=6290;
+            UPDATE `customer` SET `techDataCustomerId`= '8bfc9d894d4ac401d7c40f05be4d541f' WHERE `cus_custno`=6533;
+            UPDATE `customer` SET `techDataCustomerId`= '3b1b15ecf312d38ff286b6c0eb52aa90' WHERE `cus_custno`=6074;
+            UPDATE `customer` SET `techDataCustomerId`= 'e8e181c65c4bf5e21f6abe6d09423669' WHERE `cus_custno`=6074;
+            UPDATE `customer` SET `techDataCustomerId`= 'cbac5b67018a1683230cc95e8429aace' WHERE `cus_custno`=5837;
+            UPDATE `customer` SET `techDataCustomerId`= '3ec34bc522b0a49cacdd017d3fc7e3dd' WHERE `cus_custno`=6372;
+            UPDATE `customer` SET `techDataCustomerId`= '7752ce3282548878c4f2b66610096ed8' WHERE `cus_custno`=6249;
+            UPDATE `customer` SET `techDataCustomerId`= '9e5ecfaa21eb80e34b6688697cb65150' WHERE `cus_custno`=520;
+            UPDATE `customer` SET `techDataCustomerId`= '08545d9494cdbca252299adbe34c67ea' WHERE `cus_custno`=5711;
+            UPDATE `customer` SET `techDataCustomerId`= 'c7a1beacdd85a63ad239f29601340839' WHERE `cus_custno`=1929;
+            UPDATE `customer` SET `techDataCustomerId`= '8c65dea11dd8ff1091c63e22984faf8a' WHERE `cus_custno`=6561;
+            UPDATE `customer` SET `techDataCustomerId`= '4525a8c955b19bf986b9b4b0795885dc' WHERE `cus_custno`=2916;
+            UPDATE `customer` SET `techDataCustomerId`= 'be06138b8437b04c091d42c1b850bbc7' WHERE `cus_custno`=4664;
+            UPDATE `customer` SET `techDataCustomerId`= '9b147f8e08eb194c7da1afe19e3794c9' WHERE `cus_custno`=6388;
+            UPDATE `customer` SET `techDataCustomerId`= 'ae5d97373fcf7c7fb26f8c00acb63a1b' WHERE `cus_custno`=2186;
+            UPDATE `customer` SET `techDataCustomerId`= 'c1d3dad5758cf5bb254d2131a6c22f78' WHERE `cus_custno`=5402;
+            UPDATE `customer` SET `techDataCustomerId`= '58b278d5079ca463e598e5c154f67728' WHERE `cus_custno`=823;
+            UPDATE `customer` SET `techDataCustomerId`= 'e927ead45afc5cf4886fa353cb7c443e' WHERE `cus_custno`=6473;
+            UPDATE `customer` SET `techDataCustomerId`= '191551870cf71c8d713f2e73d6bb44eb' WHERE `cus_custno`=3627;
+            UPDATE `customer` SET `techDataCustomerId`= '45936a64b887b3a3ebf753bfae7d222b' WHERE `cus_custno`=4995;
+            UPDATE `customer` SET `techDataCustomerId`= '2e83c3a0757553d71a00541f50fa58b7' WHERE `cus_custno`=4053;
+            UPDATE `customer` SET `techDataCustomerId`= '777d6440f27c34df83edcefbabfae565' WHERE `cus_custno`=6410;
+            UPDATE `customer` SET `techDataCustomerId`= 'f0eff294fe994ce986e3c91528265313' WHERE `cus_custno`=6378;
+            UPDATE `customer` SET `techDataCustomerId`= '92a858f7a02a122ad90b670cad3b70e7' WHERE `cus_custno`=6098;
+            UPDATE `customer` SET `techDataCustomerId`= '0319e0577d78c597ed6f196886df48aa' WHERE `cus_custno`=4952;
+            UPDATE `customer` SET `techDataCustomerId`= 'cf2bc4d55b2a64e48466ee889aa97304' WHERE `cus_custno`=6594;
+            UPDATE `customer` SET `techDataCustomerId`= 'c7ea9900734da7d9b712df84299b63c1' WHERE `cus_custno`=1841;
+            UPDATE `customer` SET `techDataCustomerId`= '01ee0f509753f53a787339ff91b15860' WHERE `cus_custno`=5783;
+            UPDATE `customer` SET `techDataCustomerId`= '8b60cb64ef25d49b21d8634fcbd03938' WHERE `cus_custno`=6340;
+            UPDATE `customer` SET `techDataCustomerId`= 'bdacc689e9d575974d0be5e24476a374' WHERE `cus_custno`=2507;
+            UPDATE `customer` SET `techDataCustomerId`= 'e9e0ca51e6aec374bd8e1e872c0aef31' WHERE `cus_custno`=6498;
+            UPDATE `customer` SET `techDataCustomerId`= '33cde8b81d801d552a1499f7fb74766a' WHERE `cus_custno`=4648;
+            UPDATE `customer` SET `techDataCustomerId`= '1f46bf9382bef468b6ac2fa2fd01e88b' WHERE `cus_custno`=1965;
+            UPDATE `customer` SET `techDataCustomerId`= 'c40a53dacd0e7fee194d9b77cdb6213d' WHERE `cus_custno`=5662;
+            UPDATE `customer` SET `techDataCustomerId`= '59dc2883bb150bb86e19cbb7c378e1ca' WHERE `cus_custno`=6115;
+            UPDATE `customer` SET `techDataCustomerId`= '9a7f9e8c9b0c2bbb6e5ab0e5a745cd79' WHERE `cus_custno`=2539;
+            UPDATE `customer` SET `techDataCustomerId`= 'dd0ba16b2b756698f20cc7d3a5bfd9eb' WHERE `cus_custno`=6556;
+            UPDATE `customer` SET `techDataCustomerId`= '1ab17c322b6bf783bada2c0e473592e0' WHERE `cus_custno`=6558;
+            UPDATE `customer` SET `techDataCustomerId`= '96362ed6db48e2a154b3d94161873580' WHERE `cus_custno`=2343;
+            UPDATE `customer` SET `techDataCustomerId`= '4ee85031cf991539026be726f0c7cd99' WHERE `cus_custno`=2312;
+            UPDATE `customer` SET `techDataCustomerId`= 'd30fe450a127fd40e8f6a322e5421515' WHERE `cus_custno`=5348;
+            UPDATE `customer` SET `techDataCustomerId`= '03c9bc74baed64be3fcb0b7194543844' WHERE `cus_custno`=6264;
+            UPDATE `customer` SET `techDataCustomerId`= '84a91914804a1bd0c8efe3e0f9b26ba4' WHERE `cus_custno`=2869;
+            UPDATE `customer` SET `techDataCustomerId`= '2f706f4a0429799f1c98330388043cde' WHERE `cus_custno`=6573;
+            UPDATE `customer` SET `techDataCustomerId`= '7de3c6ecb041ad01a74ab238fe46ecb4' WHERE `cus_custno`=1510;
+            UPDATE `customer` SET `techDataCustomerId`= '17d07fd765fa1fa76208f0aec354de73' WHERE `cus_custno`=1510;
+            UPDATE `customer` SET `techDataCustomerId`= 'c82c5c228cddf99dfdc62db6ec722985' WHERE `cus_custno`=6394;
+            UPDATE `customer` SET `techDataCustomerId`= 'ee249c262fb8380ed7ea533e3a86d301' WHERE `cus_custno`=5619;
+            UPDATE `customer` SET `techDataCustomerId`= 'df7af0c61b70aadeddd138c545fc4676' WHERE `cus_custno`=6397;
+            UPDATE `customer` SET `techDataCustomerId`= '22efa031dc8da974efa696d6372555b6' WHERE `cus_custno`=4236;
+            UPDATE `customer` SET `techDataCustomerId`= '60b5c81bcc4678cd843c67e859688833' WHERE `cus_custno`=503;
+            UPDATE `customer` SET `techDataCustomerId`= 'e9c7c79904f998431bc7d456e076c754' WHERE `cus_custno`=6476;
+            UPDATE `customer` SET `techDataCustomerId`= '470ec956e3a223f6803ede8125adda07' WHERE `cus_custno`=1617;
+            UPDATE `customer` SET `techDataCustomerId`= '2f85a30cf3a940c51c2b24cd50bce585' WHERE `cus_custno`=6503;
+            UPDATE `customer` SET `techDataCustomerId`= '8daa24d4b3d38258871ceba8e004cbe0' WHERE `cus_custno`=6585;
+            UPDATE `customer` SET `techDataCustomerId`= '13f7cffd6154c40b10206c4190e5d27d' WHERE `cus_custno`=961;
+            UPDATE `customer` SET `techDataCustomerId`= 'f0009ade0996de1d612b04630ae736b4' WHERE `cus_custno`=6313;
+            UPDATE `customer` SET `techDataCustomerId`= '7b9bcbc6c0bc8aaf8332a016be8d61b6' WHERE `cus_custno`=282;
+            UPDATE `customer` SET `techDataCustomerId`= '59d54faddafd4e5090a0f50a2f7917b6' WHERE `cus_custno`=5140;
+            UPDATE `customer` SET `techDataCustomerId`= '78dd88c9da3160b0c3bc0c0872ea024a' WHERE `cus_custno`=6313;
+            UPDATE `customer` SET `techDataCustomerId`= '01aeed27065fe3b5d334a1beb9405c1a' WHERE `cus_custno`=6319;
+            UPDATE `customer` SET `techDataCustomerId`= 'a03e6ad462df00f65e99a06743d8492a' WHERE `cus_custno`=2095;
+            UPDATE `customer` SET `techDataCustomerId`= '52e546526987a9bd5d4dd0353d438f60' WHERE `cus_custno`=2707;
+            UPDATE `customer` SET `techDataCustomerId`= 'e6e09a21ed299761488e9603ba5aa376' WHERE `cus_custno`=4664;
+            UPDATE `customer` SET `techDataCustomerId`= '526654b3454d6c86af48596e8d8ed4ba' WHERE `cus_custno`=3983;
+            UPDATE `customer` SET `techDataCustomerId`= 'f4cf579e9cf0de0822b6557244598805' WHERE `cus_custno`=6503;
+            UPDATE `customer` SET `techDataCustomerId`= '9bdd161531d9f5c03abdd76e00f1212a' WHERE `cus_custno`=6243;
+            UPDATE `customer` SET `techDataCustomerId`= '470d2aa410ad44786a9baac45e1e3e3e' WHERE `cus_custno`=1065;
+            UPDATE `customer` SET `techDataCustomerId`= 'f353fa614b788222757344fd9e9464fe' WHERE `cus_custno`=2420;
+            UPDATE `customer` SET `techDataCustomerId`= '8cd69819c5dc814c096c8ca18b521169' WHERE `cus_custno`=6544;
+            UPDATE `customer` SET `techDataCustomerId`= 'f5d1de96ea19001a257b4c37906192d5' WHERE `cus_custno`=6110;
+            UPDATE `customer` SET `techDataCustomerId`= '8231e2f5ba167b0d8a800f04bb3547b9' WHERE `cus_custno`=2693;
+            UPDATE `customer` SET `techDataCustomerId`= '17ae46c88d5d4c2f486743de7e46c729' WHERE `cus_custno`=3292;
+            UPDATE `customer` SET `techDataCustomerId`= 'a162bbb456ebebdd0b24e11939de924d' WHERE `cus_custno`=5212;
+            UPDATE `customer` SET `techDataCustomerId`= 'b260172fc936772b4283ae021a521dc3' WHERE `cus_custno`=6589;
+            UPDATE `customer` SET `techDataCustomerId`= 'd783f787878f7407feed9d729fdea420' WHERE `cus_custno`=1833;
+            UPDATE `customer` SET `techDataCustomerId`= 'cf5f49775292915e8b37856015b57f53' WHERE `cus_custno`=1647;
+            UPDATE `customer` SET `techDataCustomerId`= '4b8978bfd2a3d86c919136256c902026' WHERE `cus_custno`=1468;
+            UPDATE `customer` SET `techDataCustomerId`= 'a1576a5a9c7e05a88af271a5ea3c4503' WHERE `cus_custno`=6213;
+            UPDATE `customer` SET `techDataCustomerId`= '17987803ade2e1ca79541aac5ea8ef30' WHERE `cus_custno`=6424;
+            UPDATE `customer` SET `techDataCustomerId`= '0df303598023e527cfe278f5270b9e6f' WHERE `cus_custno`=5654;
+            UPDATE `customer` SET `techDataCustomerId`= '982d59fef3c29fc9e155bf6096ce84c3' WHERE `cus_custno`=1833;
+            UPDATE `customer` SET `techDataCustomerId`= '4f5f73f9e5a81dc73599ffc956b4c63a' WHERE `cus_custno`=1649;
+            UPDATE `customer` SET `techDataCustomerId`= '4a8cfc3ee02127595666a72a50598d5d' WHERE `cus_custno`=1951;
+            UPDATE `customer` SET `techDataCustomerId`= '7b6e9ac4c773910108f0e3897c87f9ac' WHERE `cus_custno`=6146;
+            UPDATE `customer` SET `techDataCustomerId`= '087f49ba604e98d4995b610259231755' WHERE `cus_custno`=6497;
+            UPDATE `customer` SET `techDataCustomerId`= '65169c5dfddecde474bd15dd9ab6161a' WHERE `cus_custno`=5389;
+            UPDATE `customer` SET `techDataCustomerId`= '40fa5e9ee1c50200bdfa8e56ac56a6a5' WHERE `cus_custno`=2065;
+            UPDATE `customer` SET `techDataCustomerId`= '9de7556c2b00b6b2d2a841ffc83adcde' WHERE `cus_custno`=2955;
+            UPDATE `customer` SET `techDataCustomerId`= '24a82143735657502c4e3e1446a23e12' WHERE `cus_custno`=2207;
+            UPDATE `customer` SET `techDataCustomerId`= '9d390e824d6a6d3594245c1bafdb4364' WHERE `cus_custno`=2651;
+            UPDATE `customer` SET `techDataCustomerId`= '50dca41a80bc02bb9e854be5be222bd6' WHERE `cus_custno`=6539;
+            UPDATE `customer` SET `techDataCustomerId`= '2c09729bf3e81f4d9d357818838a6c21' WHERE `cus_custno`=2498;
+            UPDATE `customer` SET `techDataCustomerId`= '2b63db74dadb1d21b04927c919990526' WHERE `cus_custno`=4295;
+            UPDATE `customer` SET `techDataCustomerId`= '6685b1788c0b42e909616654654f7a9f' WHERE `cus_custno`=6202;
+            UPDATE `customer` SET `techDataCustomerId`= '4c1ea6c5b59903baeff62d0535ff4107' WHERE `cus_custno`=6097;
+            UPDATE `customer` SET `techDataCustomerId`= '1350d082883fc36000282152a2edb4ff' WHERE `cus_custno`=4560;
+            UPDATE `customer` SET `techDataCustomerId`= '05b6e80b37029161c1ecf0f3b01ed963' WHERE `cus_custno`=6148;
+            UPDATE `customer` SET `techDataCustomerId`= 'ebcebb3fc6cac682be30430b9183d2bb' WHERE `cus_custno`=6478;
+            UPDATE `customer` SET `techDataCustomerId`= '0794eebf48752cbc2413abd813b75288' WHERE `cus_custno`=282;
+            UPDATE `customer` SET `techDataCustomerId`= 'bfed185ad0e7697f683daaeb38be2c1c' WHERE `cus_custno`=1717;
+            UPDATE `customer` SET `techDataCustomerId`= 'cac7aba955868c6ec8e5886616898031' WHERE `cus_custno`=6562;
+            UPDATE `customer` SET `techDataCustomerId`= '955d2efbe651e04690eeb3675afa2121' WHERE `cus_custno`=6184;
+            UPDATE `customer` SET `techDataCustomerId`= '63880b49a98d9dc8977e235db2f76fe6' WHERE `cus_custno`=4523;
+            UPDATE `customer` SET `techDataCustomerId`= '2b8023a2bd8ce50176efb7ae2fee0822' WHERE `cus_custno`=6423;
+            UPDATE `customer` SET `techDataCustomerId`= '2676040bd47ad7f0a3fcebc6c1f6c3fc' WHERE `cus_custno`=6593;
+            UPDATE `customer` SET `techDataCustomerId`= 'd263801a182dedd932093406090dc58b' WHERE `cus_custno`=6979;
+            UPDATE `customer` SET `techDataCustomerId`= 'c93ee3eb25e50e22a8a8fa1ab370848a' WHERE `cus_custno`=282;
+            UPDATE `customer` SET `techDataCustomerId`= '88ba8864b0766f6b3086e0cbd5a6b081' WHERE `cus_custno`=1268;
+            UPDATE `customer` SET `techDataCustomerId`= '8104350dd76fe9fe384456d22c9b2397' WHERE `cus_custno`=2404;
+            UPDATE `customer` SET `techDataCustomerId`= 'fa95f7bc732dba68e34811e4538d710a' WHERE `cus_custno`=2533;
+            UPDATE `customer` SET `techDataCustomerId`= 'a0d6c60707b767adb01993a221f73817' WHERE `cus_custno`=6145;
+            UPDATE `customer` SET `techDataCustomerId`= 'bcc1cb3b0170f23064bbaa0d924a6723' WHERE `cus_custno`=6566;
+            UPDATE `customer` SET `techDataCustomerId`= 'e26b83d153e2d725015c81f0bdb8b7a7' WHERE `cus_custno`=6011;
+            UPDATE `customer` SET `techDataCustomerId`= 'c2b6fcf4276d76838f8b45264a455c8f' WHERE `cus_custno`=6569;
+            UPDATE `customer` SET `techDataCustomerId`= '355d489b1fa679e791d7e5e294e1c79a' WHERE `cus_custno`=5206;
+            UPDATE `customer` SET `techDataCustomerId`= '34fdb81f7f78f09b275367a331207766' WHERE `cus_custno`=5148;
+            UPDATE `customer` SET `techDataCustomerId`= '0e607d915e841b1332192cc3c1c78e85' WHERE `cus_custno`=5007;
+            UPDATE `customer` SET `techDataCustomerId`= '008062ca2382724418c2ae29b0681f05' WHERE `cus_custno`=1711;
+            UPDATE `customer` SET `techDataCustomerId`= '37dc4d494273b019fad151d0374d8567' WHERE `cus_custno`=1545;
+            UPDATE `customer` SET `techDataCustomerId`= '3354565c9d8802a866583c59210793a4' WHERE `cus_custno`=1908;
+            UPDATE `customer` SET `techDataCustomerId`= 'a98e09ef109e911445860fa5e4e652d3' WHERE `cus_custno`=6396;
+            UPDATE `customer` SET `techDataCustomerId`= '1565a6b5419fa5143faefe2893be02d9' WHERE `cus_custno`=6555;
+            UPDATE `customer` SET `techDataCustomerId`= '2d1c88d0cbbdf59fddb629a323cbdfa7' WHERE `cus_custno`=2172;
+            UPDATE `customer` SET `techDataCustomerId`= '83e9513a58247d79ee1d2d45ea6215cd' WHERE `cus_custno`=2172;
+            UPDATE `customer` SET `techDataCustomerId`= 'd95bece6772f979c62889fe74e341916' WHERE `cus_custno`=6035;
+            UPDATE `customer` SET `techDataCustomerId`= '6a059f63c236e34dbedab2ddede5f875' WHERE `cus_custno`=6117;
+
+         </sql>
+        
+    </changeSet>
+    <changeSet id="issue539-4" author="pavwebdevmt">    
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="consultant" columnName="streamOneLicenseManagement"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="consultant">
+            <column defaultValue="0" name="streamOneLicenseManagement" type="TINYINT(1)" remarks="Determine if streamone item in the menu will display or not" >
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>              
+    </changeSet>
+     <changeSet id="issue539-5" author="pavwebdevmt">            
+       <sql  splitStatements="true">
+       UPDATE item SET isStreamOne=1 WHERE itm_itemno IN (14594	,
+        14787	,
+        15415	,
+        16074	,
+        16075	,
+        16461	,
+        16588	,
+        17048	,
+        17199	,
+        17220	,
+        17254	,
+        17378	,
+        17568	,
+        17598	,
+        17879	,
+        18027	,
+        18106	,
+        18152	,
+        18175	,
+        18215	
+        )
+       </sql>           
+    </changeSet>
+    <changeSet id="issue539-6" author="pavwebdevmt">            
+       <sql  splitStatements="true">
+       UPDATE  consultant SET streamOneLicenseManagement =1 WHERE cns_consno IN (29, 2, 50, 47, 138)       
+       </sql>           
+    </changeSet>
+     <changeSet id="issue539-7" author="pavwebdevmt">      
+              <sql  splitStatements="true">
+      CREATE TABLE `streamOneCustomers` (
+            `id` INT (10) NOT NULL,
+            `name` VARCHAR (100),            
+            `email` VARCHAR (100),
+            `createdOn` DATE,
+            `country` VARCHAR (10),
+            `companyName` VARCHAR (100),
+            `city` VARCHAR (100),
+            `addressLine1` VARCHAR (1000),
+            `addressLine2` VARCHAR (1000),
+            `MsDomain` VARCHAR (1000),
+            `phone1` VARCHAR (50),
+            `postalCode` VARCHAR (50),
+            `title` VARCHAR (50),
+            `endCustomerId` VARCHAR (100),
+            endCustomerPO VARCHAR (100),
+            PRIMARY KEY (`id`)
+        );
+       </sql>           
+    </changeSet>
+    <changeSet id="issue539-8" author="pavwebdevmt">    
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="customer" columnName="streamOneEmail"/>
+            </not>
+        </preConditions>
+                <addColumn tableName="customer">
+            <column name="streamOneEmail" type="varchar(60)" >
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>                
+        <createIndex indexName="idx_streamOneEmail" tableName="customer">
+            <column name="streamOneEmail"/>
+        </createIndex>        
+            </changeSet>
+     <changeSet id="issue539-9" author="pavwebdevmt">    
+        <sql>
+            UPDATE  `customer` SET  `streamOneEmail` =(SELECT MIN(con_email) FROM  `contact` WHERE contact.`con_custno`=`cus_custno` AND  `con_email` IN (SELECT email FROM streamOneCustomers));
+        </sql>
+    </changeSet>
+    <changeSet id="issue539-10" author="pavwebdevmt">    
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="item" columnName="partNoOld"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="item">
+            <column name="partNoOld" type="VARCHAR(20)"/>             
+        </addColumn>  
+    </changeSet>
+     <changeSet id="issue539-11" author="pavwebdevmt">    
+         <sql  splitStatements="true">
+             
+            UPDATE  `customer` SET  `streamOneEmail` ="simon.p@pilbeamconstruction.co.uk" WHERE `cus_name` ="A &amp;amp; F Pilbeam Construction Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="mark.perress@ajmhealthcare.org" WHERE `cus_name` ="A J Mobility Ltd";  
+            UPDATE  `customer` SET  `streamOneEmail` ="david.erskine@akmuller.co.uk" WHERE `cus_name` ="A K Muller (UK) Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="daveking@amt-ltd.co.uk" WHERE `cus_name` ="Advanced Machining Techniques Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="jenny@ampersandconsulting.co.uk" WHERE `cus_name` ="Ampersand Consulting Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="lindapolson@arundelservices.co.uk" WHERE `cus_name` ="Arundel Services Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="dpassey@arvin-sons.co.uk" WHERE `cus_name` ="Arvin &amp;amp; Sons Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="kevinfox@ashtonshospitalpharmacy.com" WHERE `cus_name` ="Ashtons Hospital Pharmacy Ser Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="mailbox@stoakes.co.uk" WHERE `cus_name` ="Astralite Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="ca@avraam.co.uk" WHERE `cus_name` ="Avraam Associates";
+            UPDATE  `customer` SET  `streamOneEmail` ="lynn.s@blbsurveyors.co.uk" WHERE `cus_name` ="B L B Surveyors Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="martin@bakerstimber.co.uk" WHERE `cus_name` ="Bakers Timber Buildings";
+            UPDATE  `customer` SET  `streamOneEmail` ="admin@ballandhoolahan.co.uk" WHERE `cus_name` ="Ball and Hoolahan Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="office@belmaineandburleigh.co.uk" WHERE `cus_name` ="Belmaine &amp;amp; Burleigh Court";
+            UPDATE  `customer` SET  `streamOneEmail` ="tina.jones@bettybarclay.co.uk" WHERE `cus_name` ="Betty Barclay International GMBH";
+            UPDATE  `customer` SET  `streamOneEmail` ="aferrari@bowesfastrac.com" WHERE `cus_name` ="Bowes Fastrac Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="sue@brewercowls.co.uk" WHERE `cus_name` ="Brewer Metalcraft Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="ben@brighton-marina.co.uk" WHERE `cus_name` ="Brighton Marina Village Est Co LLP";
+            UPDATE  `customer` SET  `streamOneEmail` ="nick@insidecareers.co.uk" WHERE `cus_name` ="Cambridge Market Intelligence Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="rob@vwcampersales.com" WHERE `cus_name` ="Campersales Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="andrew.may@capitec.co.uk" WHERE `cus_name` ="Capitec Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="saran@chambersand.co.uk" WHERE `cus_name` ="Chambers &amp;amp; Co Accountants LLP";
+            UPDATE  `customer` SET  `streamOneEmail` ="garyj@cnc-ltd.co.uk" WHERE `cus_name` ="Computer &amp;amp; Network Consultants Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="cnctraining@cnc-ltd.co.uk" WHERE `cus_name` ="CNC Training";
+            UPDATE  `customer` SET  `streamOneEmail` ="simon.robinson@coastalfp.co.uk" WHERE `cus_name` ="Coastal Financial Planning Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="Toni.Trevett@CompleteHR.ltd.uk" WHERE `cus_name` ="CompleteHR";
+            UPDATE  `customer` SET  `streamOneEmail` ="toni.trevett@completehr.ltd.uk" WHERE `cus_name` ="CompleteHR";
+            UPDATE  `customer` SET  `streamOneEmail` ="nicky.hannon@corefive.co.uk" WHERE `cus_name` ="Core Five LLP";
+            UPDATE  `customer` SET  `streamOneEmail` ="phil.edwards@rockwells.co.uk" WHERE `cus_name` ="County Wireless Services Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="patrick@cohsurveyors.co.uk" WHERE `cus_name` ="Crowther Overton Hart";
+            UPDATE  `customer` SET  `streamOneEmail` ="dave.hanley@crucial-enviro.co.uk" WHERE `cus_name` ="Crucial Environmental Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="jo@dgpools.co.uk" WHERE `cus_name` ="D G Pool &amp;amp; Leisure Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="peterw@smarthomes.tv" WHERE `cus_name` ="DataTel Media Communications Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="nick@designedstorage.com" WHERE `cus_name` ="Designed Storage Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="lee@drivepointcontractors.co.uk" WHERE `cus_name` ="Drivepoint Contractors Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="karen.adams@drusillas.co.uk" WHERE `cus_name` ="Drusillas Zoo Park";
+            UPDATE  `customer` SET  `streamOneEmail` ="andy@easyship.uk.com" WHERE `cus_name` ="Easyship Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="alistairthomas@econotech.co.uk" WHERE `cus_name` ="Econotech Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="Chris.Andrewartha@equity.co.uk" WHERE `cus_name` ="Equity Inspiring Learning Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="chris.andrewartha@equity.co.uk" WHERE `cus_name` ="Duplicate email";
+            UPDATE  `customer` SET  `streamOneEmail` ="ianbayley@express-foodservice.co.uk" WHERE `cus_name` ="Express Food Service";
+            UPDATE  `customer` SET  `streamOneEmail` ="Simon.Lovett@felixr.com" WHERE `cus_name` ="Felix Rosenstiel's Widow &amp;amp; Son Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="simon.lovett@felixr.com" WHERE `cus_name` ="DUPLICATE email";
+            UPDATE  `customer` SET  `streamOneEmail` ="dawn@fiction-reviewer.com" WHERE `cus_name` ="Dawn Peers-Reed";
+            UPDATE  `customer` SET  `streamOneEmail` ="gerri@fml-pr.co.uk" WHERE `cus_name` ="FIELD McNally Leathes Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="sarah@focuscs.co.uk" WHERE `cus_name` ="Focus Building Surveying Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="graham.lock@fhs.co.uk" WHERE `cus_name` ="Fry Heath &amp;amp; Spence LLP";
+            UPDATE  `customer` SET  `streamOneEmail` ="andrewblackburn@gbspice.co.uk" WHERE `cus_name` ="G &amp;amp; B Ingredients Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="andrewblackburn@gelpkeandbate.co.uk" WHERE `cus_name` ="Gelpke &amp;amp; Bate Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="m.cooper@gemini-print.co.uk" WHERE `cus_name` ="Gemini Print Southern Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="ilaughton@accredoltd.co.uk" WHERE `cus_name` ="GENERAL Asset Management UK Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="michael.brown@gesl.net" WHERE `cus_name` ="Geo-Environmental Services Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="angela@gmak.co.uk" WHERE `cus_name` ="GMAK Chartered Accountants";
+            UPDATE  `customer` SET  `streamOneEmail` ="lynne.holden@golz.co.uk" WHERE `cus_name` ="Golz (UK) Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="juliek@gorringes.co.uk" WHERE `cus_name` ="Gorringes";
+            UPDATE  `customer` SET  `streamOneEmail` ="graham@lindfamily.co.uk" WHERE `cus_name` ="Graham Lind";
+            UPDATE  `customer` SET  `streamOneEmail` ="GRANT@xout.uk" WHERE `cus_name` ="GRANT Little";
+            UPDATE  `customer` SET  `streamOneEmail` ="mroberts@gtacivils.co.uk" WHERE `cus_name` ="GTA Civils Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="clarem@hghgroundworks.com" WHERE `cus_name` ="H G H Groundworks Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="simon.terry@hgrover.co.uk" WHERE `cus_name` ="H Grover (Decorations) Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="ashley@hamrenlarsson.com" WHERE `cus_name` ="Hamren-Larsson Family";
+            UPDATE  `customer` SET  `streamOneEmail` ="steve.caldersmith@innovation-network.co.uk" WHERE `cus_name` ="Headroom4Health";
+            UPDATE  `customer` SET  `streamOneEmail` ="dave@heatmat.co.uk" WHERE `cus_name` ="Heat Mat Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="kevin.scott@herbertscott.co.uk" WHERE `cus_name` ="Herbert Scott Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="roger.bateman@hvms.co.uk" WHERE `cus_name` ="High Voltage Maintenance Ser Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="rita@hobdensmanage.co.uk" WHERE `cus_name` ="Hobdens Property Management Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="josie.macdonald@hopeandglorypr.com" WHERE `cus_name` ="Hope &amp;amp; Glory PR";
+            UPDATE  `customer` SET  `streamOneEmail` ="n.horner@hornerblakey.co.uk" WHERE `cus_name` ="Horner Blakey Insurance Brokers";
+            UPDATE  `customer` SET  `streamOneEmail` ="iwillis@ipwtechnical.co.uk" WHERE `cus_name` ="I P W Technical Services Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="accounts@ibgrp.co.uk" WHERE `cus_name` ="Ian Brown Insurance ";
+            UPDATE  `customer` SET  `streamOneEmail` ="cris@ignitebusinessresults.co.uk" WHERE `cus_name` ="Ignite Business Results";
+            UPDATE  `customer` SET  `streamOneEmail` ="s.ritchie@imprintgroup.co.uk" WHERE `cus_name` ="Imprint Creative Print Solutions Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="Steve@caldersmith.net" WHERE `cus_name` ="Headroom4Health";
+            UPDATE  `customer` SET  `streamOneEmail` ="steve@caldersmith.net" WHERE `cus_name` ="DUPLICATE email";
+            UPDATE  `customer` SET  `streamOneEmail` ="karensanusi@jordandavisgroup.com" WHERE `cus_name` ="Jordan Davis GROUP Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="rosanna@journeysbydesign.com" WHERE `cus_name` ="Journeys BY Design";
+            UPDATE  `customer` SET  `streamOneEmail` ="ken@kennethball.co.uk" WHERE `cus_name` ="Kenneth Ball";
+            UPDATE  `customer` SET  `streamOneEmail` ="paul.ryan@keg.co.uk" WHERE `cus_name` ="Kentinental Engineering";
+            UPDATE  `customer` SET  `streamOneEmail` ="Paul.Ryan@keg.co.uk" WHERE `cus_name` ="Kentinental Engineering";
+            UPDATE  `customer` SET  `streamOneEmail` ="Susan.Goldsmith@kestrelalarms.co.uk" WHERE `cus_name` ="Kestrel Alarms Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="susan.goldsmith@kestrelalarms.co.uk" WHERE `cus_name` ="Kestrel Alarms Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="colette.chapman@knights-solicitors.co.uk" WHERE `cus_name` ="Knights Solicitors";
+            UPDATE  `customer` SET  `streamOneEmail` ="tony@focuscs.co.uk" WHERE `cus_name` ="Krapht Works Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="hilary@languardalarms.co.uk" WHERE `cus_name` ="Languard Alarms";
+            UPDATE  `customer` SET  `streamOneEmail` ="laurencesprey@aol.com" WHERE `cus_name` ="Laurence Sprey";
+            UPDATE  `customer` SET  `streamOneEmail` ="jlawson@lawsonqueay.co.uk" WHERE `cus_name` ="Lawson Queay Chartered Surveyors";
+            UPDATE  `customer` SET  `streamOneEmail` ="pjarvis@lewvac.co.uk" WHERE `cus_name` ="Lewvac Components Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="damian@lionvest.co.uk" WHERE `cus_name` ="Lionvest Trading (UK) Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="liamclark@mcaltd.co.uk" WHERE `cus_name` ="M C A Consulting Engineers Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="mark.beaumont@graffiti-solutions.co.uk" WHERE `cus_name` ="M P M Specialist Solutions";
+            UPDATE  `customer` SET  `streamOneEmail` ="nick@magneticshields.co.uk" WHERE `cus_name` ="Magnetic Shields Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="martin@smith1.biz" WHERE `cus_name` ="Martin Smith";
+            UPDATE  `customer` SET  `streamOneEmail` ="Chrisb@mcbseafoods.co.uk" WHERE `cus_name` ="MCB Seafoods Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="chrisb@mcbseafoods.co.uk" WHERE `cus_name` ="DUPLICATE email";
+            UPDATE  `customer` SET  `streamOneEmail` ="hollie.tuffnell@mccall.co.uk" WHERE `cus_name` ="McCall GROUP";
+            UPDATE  `customer` SET  `streamOneEmail` ="james@meridian-medical.com" WHERE `cus_name` ="Meridian Medical Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="lturner@metway.co.uk" WHERE `cus_name` ="Metway Electrical Industries Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="mj@mishonmackay.com" WHERE `cus_name` ="Mishon Mackay";
+            UPDATE  `customer` SET  `streamOneEmail` ="david.morris@mmcpc.co.uk" WHERE `cus_name` ="MMC Project Consulting LLP";
+            UPDATE  `customer` SET  `streamOneEmail` ="gleslie@monson.co.uk" WHERE `cus_name` ="Monson Engineering Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="msmith@mwr-ltd.co.uk" WHERE `cus_name` ="Municipal Waste Recycling Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="vdoig@nakamalondon.com" WHERE `cus_name` ="Nakama";
+            UPDATE  `customer` SET  `streamOneEmail` ="owhippy@nebula-partners.com" WHERE `cus_name` ="Nebula Partners";
+            UPDATE  `customer` SET  `streamOneEmail` ="james.kehoe@nts-london.co.uk" WHERE `cus_name` ="NTS London Fashion Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="nick@onagency.co.uk" WHERE `cus_name` ="ON Agency";
+            UPDATE  `customer` SET  `streamOneEmail` ="s.noonan@orbinox.co.uk" WHERE `cus_name` ="Orbinox (UK) Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="rob.smith@orionheritage.co.uk" WHERE `cus_name` ="Orion Heritage Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="pp@overview.co.uk" WHERE `cus_name` ="Overview Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="paul.searle@phmotorcycles.co.uk" WHERE `cus_name` ="P &amp;amp; H Motorcycles Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="joseph.martello@p1pistons.com" WHERE `cus_name` ="P1 Pistons ";
+            UPDATE  `customer` SET  `streamOneEmail` ="kulbir.kandhola@paladone.com" WHERE `cus_name` ="Paladone Products Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="nigel@darkstarbrewing.co.uk" WHERE `cus_name` ="Pale Moon Pub Company Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="stan.everitt@paulearl.co.uk" WHERE `cus_name` ="Paul Earl Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="wframpton@paulmurrayplc.co.uk" WHERE `cus_name` ="Paul Murray Plc";
+            UPDATE  `customer` SET  `streamOneEmail` ="janet@pentonuk.co.uk" WHERE `cus_name` ="Penton UK Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="pete@theburfords.co.uk" WHERE `cus_name` ="Peter Burford";
+            UPDATE  `customer` SET  `streamOneEmail` ="kevin@planetscott.co.uk" WHERE `cus_name` ="Planet Scott";
+            UPDATE  `customer` SET  `streamOneEmail` ="igilbert@ptlengines.com" WHERE `cus_name` ="Powertrain Technology Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="will.morey@wearepragma.co.uk" WHERE `cus_name` ="Pragma Distribution Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="malcolmpreece@price.co.uk" WHERE `cus_name` ="Price &amp;amp; Company";
+            UPDATE  `customer` SET  `streamOneEmail` ="geoff@providence.co.uk" WHERE `cus_name` ="Providence Print &amp;amp; Mailing Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="ianb@pureprint.com" WHERE `cus_name` ="Pureprint GROUP Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="becky@rjmeakerfencing.co.uk" WHERE `cus_name` ="R J Meaker Fencing Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="sid@radiocoms.co.uk" WHERE `cus_name` ="Radiocoms Systems Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="adrianl@rathfinnyestate.com" WHERE `cus_name` ="Rathfinny Wine Estate Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="Kerri.Sayers@rbwconsulting.com" WHERE `cus_name` ="RBW Consulting Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="kerri.sayers@rbwconsulting.com" WHERE `cus_name` ="RBW Consulting Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="lara.james@peterjames.com" WHERE `cus_name` ="Really Scary Books Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="richard@redgreenbluegraphics.co.uk" WHERE `cus_name` ="Red Green Blue Graphics";
+            UPDATE  `customer` SET  `streamOneEmail` ="russellgilbert@review-displays.co.uk" WHERE `cus_name` ="Review Display Systems Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="robert.bousfield@bousfield.com" WHERE `cus_name` ="Rex Bousfield Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="steve.bennett@rhopoint.co.uk" WHERE `cus_name` ="Rhopoint Components Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="ciarron.clarkson@richmondhill.co.uk" WHERE `cus_name` ="Richmond Hill Hotel";
+            UPDATE  `customer` SET  `streamOneEmail` ="joseph.martello@roscomac.com" WHERE `cus_name` ="Roscomac Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="paul@scanprobe.com" WHERE `cus_name` ="Scanprobe Techniques Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="dan.v@screensolutions.co.uk" WHERE `cus_name` ="Screen Solutions Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="allan@shermondholdings.co.uk" WHERE `cus_name` ="Shermond Holdings";
+            UPDATE  `customer` SET  `streamOneEmail` ="sbassett@shoreham-port.co.uk" WHERE `cus_name` ="Sussex PORT Forwarding";
+            UPDATE  `customer` SET  `streamOneEmail` ="oly@southernmobility.com" WHERE `cus_name` ="Southern Mobility Centre";
+            UPDATE  `customer` SET  `streamOneEmail` ="a.cairncross@square-metre.com" WHERE `cus_name` ="Square Metre";
+            UPDATE  `customer` SET  `streamOneEmail` ="carol.homewood@stapledairy.co.uk" WHERE `cus_name` ="Staple Dairy Products Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="bb@stephenrimmer.com" WHERE `cus_name` ="Stephen Rimmer LLP";
+            UPDATE  `customer` SET  `streamOneEmail` ="dillon@stringsandthings.co.uk" WHERE `cus_name` ="Strings &amp;amp; Things Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="d.woolgar@stuartradleyassociates.co.uk" WHERE `cus_name` ="Stuart Radley Associates Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="trevorc@sal.uk.com" WHERE `cus_name` ="Survey Associates Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="finance@sussexifa.com" WHERE `cus_name` ="Sussex Independent Finance Advisers Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="PatrickOvens@sussexportforwarding.co.uk" WHERE `cus_name` ="Shoreham PORT Authority";
+            UPDATE  `customer` SET  `streamOneEmail` ="patrickovens@sussexportforwarding.co.uk" WHERE `cus_name` ="Shoreham PORT Authority";
+            UPDATE  `customer` SET  `streamOneEmail` ="info@sussexwineries.com" WHERE `cus_name` ="Sussex Wineries";
+            UPDATE  `customer` SET  `streamOneEmail` ="liz@sweeptech.co.uk" WHERE `cus_name` ="Sweeptech Environmental Services";
+            UPDATE  `customer` SET  `streamOneEmail` ="neil@thinktmb.com" WHERE `cus_name` ="T M B Marketing &amp;amp; Communications";
+            UPDATE  `customer` SET  `streamOneEmail` ="peter@tpieurope.com" WHERE `cus_name` ="Test Products INT Europe Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="paulthatcher@thlaccountancy.co.uk" WHERE `cus_name` ="Thatcher Hobbs Langridge LLP";
+            UPDATE  `customer` SET  `streamOneEmail` ="ciarron.clarkson@grandbrighton.co.uk" WHERE `cus_name` ="The Grand Brighton";
+            UPDATE  `customer` SET  `streamOneEmail` ="dianne@becomeuk.com" WHERE `cus_name` ="The Recruitment Business Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="billkay@poppyfactory.org" WHERE `cus_name` ="The Royal British Poppy Factory Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="finance@thorpassociates.com" WHERE `cus_name` ="Thorp Associates Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="neil@vibtec.com" WHERE `cus_name` ="Vibratechniques Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="david@vokins.com" WHERE `cus_name` ="Vokins Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="gary.roberts@whleary.co.uk" WHERE `cus_name` ="W H Leary Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="rrichards@wallsandirwin.co.uk" WHERE `cus_name` ="Walls AND Irwin Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="swardley@wardray-premise.com" WHERE `cus_name` ="Wardray Premise Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="mike.smith@watsons.co.uk" WHERE `cus_name` ="Watson Associates (Professional Services) Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="david@weme-uk.net" WHERE `cus_name` ="West END AND Metropolitan Est Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="Paul@wildphilanthropy.com" WHERE `cus_name` ="Journeys BY Design";
+            UPDATE  `customer` SET  `streamOneEmail` ="paul@wildphilanthropy.com" WHERE `cus_name` ="Journeys BY Design";
+            UPDATE  `customer` SET  `streamOneEmail` ="peter.burford@wilmot-budgen.co.uk" WHERE `cus_name` ="Wilmot Budgen Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="paul.judd@workspace-design.co.uk" WHERE `cus_name` ="Workspace Design &amp;amp; Contracts Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="AliSmith@xstrahl.com" WHERE `cus_name` ="Xstrahl Ltd";
+            UPDATE  `customer` SET  `streamOneEmail` ="alismith@xstrahl.com" WHERE `cus_name` ="Xstrahl Ltd";
+        </sql>
+    </changeSet>
+       <changeSet id="issue539-12" author="pavwebdevmt">    
+         <sql  splitStatements="true">
+            UPDATE item SET `partNoOld`='SK4660', itm_unit_of_sale ='SK103996' WHERE `itm_itemno`= 16075;
+            UPDATE item SET `partNoOld`='SK4661', itm_unit_of_sale ='SK103871' WHERE `itm_itemno`= 16461;
+            UPDATE item SET `partNoOld`='SK4662', itm_unit_of_sale ='SK104123' WHERE `itm_itemno`= 16074;
+            UPDATE item SET `partNoOld`='SK4664', itm_unit_of_sale ='SK103962' WHERE `itm_itemno`= 16588;
+            UPDATE item SET `partNoOld`='SK16147', itm_unit_of_sale ='SK104123' WHERE `itm_itemno`= 18152;
+          </sql>
+    </changeSet>
+</databaseChangeLog>
