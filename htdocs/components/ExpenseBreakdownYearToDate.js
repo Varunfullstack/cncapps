@@ -13,7 +13,7 @@ class ExpenseBreakdownYearToDate extends React.Component {
     }
 
     handleChangeEngineer(value) {
-        this.setState({selectedEngineer: ''+value});
+        this.setState({selectedEngineer: '' + value});
     }
 
     fetchApprovalSubordinates(userId) {
@@ -59,6 +59,7 @@ class ExpenseBreakdownYearToDate extends React.Component {
         // if is approver we render a dropdown, that we are going to populate from the active users
         // if not we won't have the selector as it's the guy's data
         const totalRow = new Array(currentDate.getMonth() + 2).fill(0);
+        const mileage = new Array(currentDate.getMonth() + 2).fill(0);
         const tableData = this.state.expenses.reduce((acc, expense) => {
             if (!(expense.expenseTypeDescription in acc)) {
                 acc[expense.expenseTypeDescription] = new Array(currentDate.getMonth() + 2).fill(0);
@@ -68,6 +69,10 @@ class ExpenseBreakdownYearToDate extends React.Component {
             acc[expense.expenseTypeDescription][acc[expense.expenseTypeDescription].length - 1] += expense.value;
             totalRow[expenseMonth] += expense.value;
             totalRow[totalRow.length - 1] += expense.value;
+            if (expense.expenseTypeDescription === 'Mileage') {
+                mileage[expenseMonth] += expense.mileage;
+                mileage[mileage.length - 1] += expense.mileage;
+            }
             return acc;
         }, {});
         const monthNames = [
@@ -139,7 +144,8 @@ class ExpenseBreakdownYearToDate extends React.Component {
                                             'th',
                                             {
                                                 key: 'descriptionHeader'
-                                            }
+                                            },
+                                            "Expense Type"
                                         )
                                     }
                                     if (index === array.length - 1) {
@@ -180,7 +186,7 @@ class ExpenseBreakdownYearToDate extends React.Component {
                                         key: expenseType + '-row'
                                     },
                                     [
-                                        this.el('th', {key: expenseType + '-title'}, expenseType),
+                                        this.el('th', {key: expenseType + '-title'}, expenseType == "Mileage" ? "Mileage (Miles)" : expenseType),
                                         ...tableData[expenseType].map((value, idx) => {
                                             return this.el(
                                                 'td',
@@ -188,7 +194,7 @@ class ExpenseBreakdownYearToDate extends React.Component {
                                                     style: {textAlign: "right"},
                                                     key: expenseType + idx
                                                 },
-                                                value.toFixed(2)
+                                                value.toFixed(2) + (expenseType == "Mileage" ? ` (${mileage[idx]})` : '')
                                             )
                                         })
                                     ]

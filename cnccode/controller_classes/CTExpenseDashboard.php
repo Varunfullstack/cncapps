@@ -549,7 +549,7 @@ ORDER BY staffName";
     " ",
     consultant.`lastName`
   ) AS staffName,
-  
+  exp_mileage as mileage,
   consultant.`cns_consno` AS userId,
   exp_callactivityno AS activityId,
   callactivity.`caa_problemno` AS serviceRequestId,
