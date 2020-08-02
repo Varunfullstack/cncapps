@@ -127,7 +127,7 @@ class BUTechDataApi extends Business
     function callApi($url, $body = null, $method = 'GET')
     {
         $this->logger->info($url );
-        $this->logger->info($body );
+        //$this->logger->info($body );
          $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => $this->baseUrl . $url,
@@ -144,6 +144,43 @@ class BUTechDataApi extends Business
         $response = curl_exec($curl);
         curl_close($curl);
         return $response;
+    }
+
+    function callMultipleApi($urls,  $body=null, $method = 'GET')
+    {
+        //$this->logger->info(json_encode($urls) );
+        $result = array();
+        $multiCurl = array();
+        $mh = curl_multi_init();
+        foreach($urls as $i => $url)
+        {           
+            $multiCurl[$i] = curl_init();            
+            curl_setopt_array($multiCurl[$i], array(
+                CURLOPT_URL => $this->baseUrl . $url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => $method,
+                CURLOPT_POSTFIELDS => $body,
+                CURLOPT_HTTPHEADER => $this->getHeader(),
+            ));
+            curl_multi_add_handle($mh, $multiCurl[$i]);
+        }
+        $index=null;
+        do {
+        curl_multi_exec($mh,$index);
+        } while($index > 0);
+        // get content and remove handles
+        foreach($multiCurl as $k => $ch) {
+            $result[$k] =json_decode( curl_multi_getcontent($ch),true);
+            curl_multi_remove_handle($mh, $ch);
+        }
+         // close
+        curl_multi_close($mh);
+        return $result;
     }
 
     function getProductList($page = 1)
@@ -169,6 +206,25 @@ class BUTechDataApi extends Business
     function getAllSubscriptions($page = 1)
     {
         return $this->callApi("order/subscriptions/$page");
+    }
+    function getAllSubscriptionsSync($pages ,$pageSize=25 )
+    {
+        $urls=array();
+        foreach($pages  as   $page)
+        {
+           array_push($urls,"order/subscriptions/$page");
+        }
+        $totalPages=count($urls)/$pageSize;
+        $result=array();
+        for($i=0;$i<$totalPages;$i++)
+        {
+          $subUrls=  array_slice($urls,$i*$pageSize,$pageSize);
+          //echo json_encode($subUrls);
+          $response=$this->callMultipleApi($subUrls);
+          $result=array_merge( $result, $response);
+        }
+         
+        return $result; 
     }
     function getSubscriptionsByEmail($page = 1)
     {
@@ -278,6 +334,27 @@ class BUTechDataApi extends Business
     {     
          return $this->callApi("catalog/price",$body,'POST');        
     }
-     
+    /**
+     * @var $orderNumbers array
+     */
+    function getProductsDetails($orderNumbers,$pageSize=10)
+    {
+        $urls=array();
+        foreach($orderNumbers as   $orderNumber)
+        {
+           array_push($urls,"order/details/$orderNumber");
+        }
+        $totalPages=count($orderNumbers)/$pageSize;
+        $result=array();
+        for($i=0;$i<$totalPages;$i++)
+        {
+          $subUrls=  array_slice($urls,$i*$pageSize,$pageSize);
+          //echo json_encode($subUrls);
+          $response=$this->callMultipleApi($subUrls);
+          $result=array_merge( $result, $response);
+        }        
+        // return $this->callMultipleApi($urls);
+        return $result;
+    }
 
 }// End of class
