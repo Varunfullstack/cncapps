@@ -276,6 +276,7 @@ foreach ($allSubscriptions as $item) {
 }
 
 //echo "268". json_encode($orderIds)."\n";
+$logger->info("Loading all subscriptions and there addOns from streamOne.....");
 $orderDetails = $buStreamOneApi->getProductsDetails($orderIds,40);
 syncAddons($orderDetails,$cncItems,$cncCustomers,$logger);
 //check addond
@@ -286,7 +287,7 @@ $updatedItems=0;
 $updatedItemsAddOns=0;
 
 $subscription=null;
-echo count($allSubscriptions );
+$logger->info( "All subscriptions number :".count($allSubscriptions ));
 foreach($cncCustomers as $customer)
 {
     //echo $customer["email"]."\n";
@@ -304,8 +305,8 @@ foreach($cncCustomers as $customer)
                 if($itemId)
                 {
                     $db->query("select cui_users quantity from custitem where   renewalStatus='R'  AND declinedFlag='N'
-                    and cui_custno= $customer[id]
-                    and cui_itemno=  $itemId");
+                                and cui_custno= $customer[id]
+                                and cui_itemno=  $itemId");
                     $temp=$db->fetchAll();
                     if(count($temp)>0)
                     {
@@ -314,14 +315,22 @@ foreach($cncCustomers as $customer)
                         {
                             //echo  $customer["id"]." ".$itemId." ".(int)$subscription->quantity." ".(int)$temp[0]["quantity"]."\n";
                             $db->query("update custitem set cui_users=$subscription->quantity where   renewalStatus='R'  AND declinedFlag='N'
-                            and cui_custno= $customer[id]
-                            and cui_itemno=  $itemId");
+                                        and cui_custno= $customer[id]
+                                        and cui_itemno=  $itemId");
                             $updatedItems++;
                         }
                     }
-                    else $logger->info("Customer $customer[email] does not have license $subscription->sku in CNCAPPS");
+                    else if($subscription->lineStatus=="active") 
+                        $logger->info("Customer $customer[email] does not have license $subscription->sku in CNCAPPS");
+                    if($subscription->lineStatus=="inactive")
+                    {                      
+                        $db->query("update custitem set  renewalStatus='D'  , declinedFlag='Y' where   
+                                    cui_custno= $customer[id]
+                                    and cui_itemno=  $itemId");
+                    }
                 }
-                else $logger->info("Customer $customer[email] does not have license $subscription->sku in CNCAPPS");
+                else if($subscription->lineStatus=="active") 
+                    $logger->info("Customer $customer[email] does not have license $subscription->sku in CNCAPPS");
               
             }
              
@@ -415,11 +424,19 @@ function syncAddons($orderDetails,$cncItems,$cncCustomers,$logger)
                                    
                         $updatedItemsAddOns++;
                     }
+                    if($status=="inactive")
+                    {  
+                        $db->query("update custitem set  renewalStatus='D'  , declinedFlag='Y' where   
+                         cui_custno= $customerId
+                        and cui_itemno=  $itemId");
+                    }
                     
                 }
-                else $logger->info("Customer $addOn->email does not have license $sku in CNCAPPS");
+                else if($status=="active") 
+                    $logger->info("Customer $addOn->email does not have license $sku in CNCAPPS");
             }
-            else $logger->info("Customer $addOn->email does not have license $sku in CNCAPPS");
+            else  if($status=="active") 
+                    $logger->info("Customer $addOn->email does not have license $sku in CNCAPPS");
 
      }
     // echo "addons groups".count($items)."\n";    

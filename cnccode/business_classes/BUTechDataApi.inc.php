@@ -169,10 +169,13 @@ class BUTechDataApi extends Business
             ));
             curl_multi_add_handle($mh, $multiCurl[$i]);
         }
-        $index=null;
+        //$index=null;
         do {
-        curl_multi_exec($mh,$index);
-        } while($index > 0);
+                curl_multi_exec($mh,$running);          
+                // Wait a short time for more activity
+                curl_multi_select($mh);
+        
+        } while($running > 0);
         // get content and remove handles
         foreach($multiCurl as $k => $ch) {
             $result[$k] =json_decode( curl_multi_getcontent($ch),true);
