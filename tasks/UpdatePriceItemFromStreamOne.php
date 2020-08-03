@@ -375,7 +375,7 @@ function syncAddons($orderDetails,$cncItems,$cncCustomers,$logger)
     $items=array();
     foreach($allAddons as $addon)
     {
-        if($addon->email=="Chris.Andrewartha@equity.co.uk")
+        //if($addon->email=="Chris.Andrewartha@equity.co.uk")
        // echo "chris ".$addon->orderNumber." ".$addon->quantity." ".$addon->sku." ".$addon->addOnStatus."\n";
 
         $found=false;
@@ -396,7 +396,7 @@ function syncAddons($orderDetails,$cncItems,$cncCustomers,$logger)
     }
      foreach($items as $addOn)
      {
-        $sku= $addOn->sku;
+            $sku= $addOn->sku;
             $quantity=$addOn->quantity;
             $status=$addOn->addOnStatus;
             $itemId=getItemId($cncItems,$sku);
@@ -448,7 +448,7 @@ function getCustomerId($customers,$email)
 {
     foreach($customers as $customer)
     {
-        if($customer["email"]==$email)
+        if(trim(strtolower( $customer["email"]))==trim(strtolower($email)))
         return $customer["id"];
     }
 }
