@@ -1,12 +1,12 @@
 "use strict";
-import APICustomerLicenses from "./APICustomerLicenses.js?v=8";
-import CMPTDCustomerSearch from "./CMPTDCustomerSearch.js?v=8";
-import CMPTDCustomerDetails from "./CMPTDCustomerDetails.js?v=8";
-import CMPTDCustomerOrders from "./CMPTDCustomerOrders.js?v=8";
-import CMPTDOrderDetails from "./CMPTDOrderDetails.js?v=8";
-import NewOrder from "./CMPNewOrder.js?v=8";
-import StreamOneService from "./CMPStreamOneService.js?v=8";
-import Spinner from './../utils/spinner.js?v=8';
+import APICustomerLicenses from "./APICustomerLicenses.js?v=9";
+import CMPTDCustomerSearch from "./CMPTDCustomerSearch.js?v=9";
+import CMPTDCustomerDetails from "./CMPTDCustomerDetails.js?v=9";
+import CMPTDCustomerOrders from "./CMPTDCustomerOrders.js?v=9";
+import CMPTDOrderDetails from "./CMPTDOrderDetails.js?v=9";
+import NewOrder from "./CMPNewOrder.js?v=9";
+import StreamOneService from "./CMPStreamOneService.js?v=9";
+import Spinner from './../utils/spinner.js?v=9';
 
 /**
  * Don't forget to change v value in js import before push to gethub to avoid cache problem
