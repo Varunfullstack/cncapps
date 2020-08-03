@@ -335,55 +335,97 @@ class BUTeamPerformance extends Business
     {
         $sql =
             "SELECT
-        year,
-          CASE
-            WHEN MONTH BETWEEN 1 AND 3 THEN 1
-            WHEN MONTH BETWEEN 4 AND 6 THEN 2
-            WHEN MONTH BETWEEN 7 AND 9 THEN 3
-            WHEN MONTH BETWEEN 10 AND 12 THEN 4
-          END
-         AS quarter,
-          AVG(`hdTeamTargetSlaPercentage`) AS hdTeamTargetSlaPercentage,
-          AVG(`hdTeamTargetFixHours`) AS hdTeamTargetFixHours,
-          SUM(`hdTeamTargetFixQtyPerMonth`) AS hdTeamTargetFixQty,
-          AVG(`hdTeamActualSlaPercentage`) AS hdTeamActualSlaPercentage,
-          AVG(`hdTeamActualFixHours`) AS hdTeamActualFixHours,
-          SUM(`hdTeamActualFixQtyPerMonth`) AS hdTeamActualFixQty,
-
-          AVG(`esTeamTargetSlaPercentage`) AS esTeamTargetSlaPercentage,
-          AVG(`esTeamTargetFixHours`) AS esTeamTargetFixHours,
-          SUM(`esTeamTargetFixQtyPerMonth`) AS esTeamTargetFixQty,
-          AVG(`esTeamActualSlaPercentage`) AS esTeamActualSlaPercentage,
-          AVG(`esTeamActualFixHours`) AS esTeamActualFixHours,
-          SUM(`esTeamActualFixQtyPerMonth`) AS esTeamActualFixQty,
-
-          AVG(`imTeamTargetSlaPercentage`) AS smallProjectsTeamTargetSlaPercentage,
-          AVG(`imTeamTargetFixHours`) AS smallProjectsTeamTargetFixHours,
-          SUM(`imTeamTargetFixQtyPerMonth`) AS smallProjectsTeamTargetFixQty,
-          AVG(`imTeamActualSlaPercentage`) AS smallProjectsTeamActualSlaPercentage,
-          AVG(`imTeamActualFixHours`) AS smallProjectsTeamActualFixHours,
-          SUM(`imTeamActualFixQtyPerMonth`) AS smallProjectsTeamActualFixQty,
-          
-          AVG(`projectTeamTargetSlaPercentage`) AS projectTeamTargetSlaPercentage,
-          AVG(`projectTeamTargetFixHours`) AS projectTeamTargetFixHours,
-          SUM(`projectTeamTargetFixQtyPerMonth`) AS projectTeamTargetFixQty,
-          AVG(`projectTeamActualSlaPercentage`) AS projectTeamActualSlaPercentage,
-          AVG(`projectTeamActualFixHours`) AS projectTeamActualFixHours,
-          SUM(`projectTeamActualFixQtyPerMonth`) AS projectTeamActualFixQty
-        FROM
-          `team_performance`
-        WHERE
-           YEAR = ?
-         GROUP BY
-         
-         CONCAT( YEAR,
-          CASE
-            WHEN MONTH BETWEEN 1 AND 3 THEN 1
-            WHEN MONTH BETWEEN 4 AND 6 THEN 2
-            WHEN MONTH BETWEEN 7 AND 9 THEN 3
-            WHEN MONTH BETWEEN 10 AND 12 THEN 4
-          END
-        )";
+  YEAR,
+  QUARTER,
+  hdTeamTargetSlaPercentage,
+  hdTeamTargetFixHours,
+  `hdTeamTargetFixQtyPerMonth` AS hdTeamTargetFixQty,
+  SUM(
+    hdTeamActualSlaPercentage * hdTeamActualFixQtyPerMonth
+  ) / SUM(hdTeamActualFixQtyPerMonth) AS hdTeamTargetSlaPercentage,
+  SUM(
+    hdTeamActualFixHours * hdTeamActualFixQtyPerMonth
+  ) / SUM(hdTeamActualFixQtyPerMonth) AS hdTeamTargetFixHours,
+  `hdTeamActualFixQtyPerMonth` AS hdTeamActualFixQty,
+  `esTeamTargetSlaPercentage`,
+  `esTeamTargetFixHours`,
+  `esTeamTargetFixQtyPerMonth` AS esTeamTargetFixQty,
+  SUM(
+    esTeamActualSlaPercentage * esTeamActualFixQtyPerMonth
+  ) / SUM(esTeamActualFixQtyPerMonth) AS esTeamActualSlaPercentage,
+  SUM(
+    `esTeamActualFixHours` * esTeamActualFixQtyPerMonth
+  ) / SUM(esTeamActualFixQtyPerMonth) AS esTeamActualFixHours,
+  `esTeamActualFixQtyPerMonth` AS esTeamActualFixQty,
+  `imTeamTargetSlaPercentage` AS smallProjectsTeamTargetSlaPercentage,
+  `imTeamTargetFixHours` AS smallProjectsTeamTargetFixHours,
+  `imTeamTargetFixQtyPerMonth` AS smallProjectsTeamTargetFixQty,
+  SUM(
+    imTeamActualSlaPercentage * imTeamActualFixQtyPerMonth
+  ) / SUM(imTeamActualFixQtyPerMonth) AS smallProjectsTeamActualSlaPercentage,
+  SUM(
+    `imTeamActualFixHours` * imTeamActualFixQtyPerMonth
+  ) / SUM(imTeamActualFixQtyPerMonth) AS smallProjectsTeamActualFixHours,
+  `imTeamActualFixQtyPerMonth` AS smallProjectsTeamActualFixQty,
+  `projectTeamTargetSlaPercentage`,
+  `projectTeamTargetFixHours`,
+  `projectTeamTargetFixQtyPerMonth` AS projectTeamTargetFixQty,
+  SUM(
+    projectTeamActualSlaPercentage * projectTeamActualFixQtyPerMonth
+  ) / SUM(
+    projectTeamActualFixQtyPerMonth
+  ) AS projectTeamActualSlaPercentage,
+  SUM(
+    `projectTeamActualFixHours` * projectTeamActualFixQtyPerMonth
+  ) / SUM(
+    projectTeamActualFixQtyPerMonth
+  ) AS projectTeamActualFixHours,
+  `projectTeamActualFixQtyPerMonth` AS projectTeamActualFixQty
+FROM
+  (SELECT
+    YEAR,
+    CASE
+      WHEN MONTH BETWEEN 1
+      AND 3
+      THEN 1
+      WHEN MONTH BETWEEN 4
+      AND 6
+      THEN 2
+      WHEN MONTH BETWEEN 7
+      AND 9
+      THEN 3
+      WHEN MONTH BETWEEN 10
+      AND 12
+      THEN 4
+    END AS QUARTER,
+    `hdTeamTargetSlaPercentage`,
+    `hdTeamTargetFixHours`,
+    `hdTeamTargetFixQtyPerMonth`,
+    `hdTeamActualSlaPercentage`,
+    `hdTeamActualFixHours`,
+    `hdTeamActualFixQtyPerMonth`,
+    `esTeamTargetSlaPercentage`,
+    `esTeamTargetFixHours`,
+    `esTeamTargetFixQtyPerMonth`,
+    `esTeamActualSlaPercentage`,
+    `esTeamActualFixHours`,
+    `esTeamActualFixQtyPerMonth`,
+    `imTeamTargetSlaPercentage`,
+    `imTeamTargetFixHours`,
+    `imTeamTargetFixQtyPerMonth`,
+    `imTeamActualSlaPercentage`,
+    `imTeamActualFixHours`,
+    `imTeamActualFixQtyPerMonth`,
+    `projectTeamTargetSlaPercentage`,
+    `projectTeamTargetFixHours`,
+    `projectTeamTargetFixQtyPerMonth`,
+    `projectTeamActualSlaPercentage`,
+    `projectTeamActualFixHours`,
+    `projectTeamActualFixQtyPerMonth`
+  FROM
+    `team_performance`
+  WHERE YEAR = ?) a
+GROUP BY QUARTER";
         $statement = $this->connection->prepare($sql);
         $statement->execute(array($year));
         return $statement->fetchAll(); // an array of all records for year
