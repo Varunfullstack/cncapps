@@ -2,7 +2,7 @@
 This project changes will be shown here.
 
 ## [v4.3.1] - 2020-08-03
-## Fixed
+### Fixed
 - Fixed Issues with StreamOne licenses
 
 ## [v4.3.0] - 2020-07-31
