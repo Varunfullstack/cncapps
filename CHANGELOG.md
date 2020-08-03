@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+- Issue 961 - Team Performance at the start of the month
+
 ## [v4.3.0] - 2020-07-31
 ### Added
 - Issue 951 - Expenses Breakdown Year to Date
