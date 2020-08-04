@@ -4,11 +4,9 @@ use CNCLTD\LoggerCLI;
 
 global $cfg;
 require_once(__DIR__ . "/../htdocs/config.inc.php");
-require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
-require_once($cfg["path_dbe"] . "/DBEExpense.inc.php");
-require_once($cfg["path_dbe"] . "/DBECallActivity.inc.php");
-require_once($cfg['path_bu'] . '/BUHeader.inc.php');
-require_once($cfg['path_bu'] . '/BUExpense.inc.php');
+require_once($cfg["path_dbe"] . "/DBECustomer.inc.php");
+require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
+require_once($cfg['path_bu'] . '/BUActivity.inc.php');
 global $db;
 $logName = 'CheckWebroot';
 $logger = new LoggerCLI($logName);
@@ -39,10 +37,48 @@ $gsmKey = "2FB2-LTSW-E06B-3F49-43DC";
 $webrootAPI = new \CNCLTD\WebrootAPI\WebrootAPI($user, $password, $client_Id, $client_secret, $gsmKey);
 
 $sitesResponse = $webrootAPI->getSites();
+$buActivity = new BUActivity($thing);
 foreach ($sitesResponse->sites as $site) {
     // we have to find each client based on the site name
-//    $dbeCustomer = new DBECustomer();
-//    $dbeCustomer->setValue(DBECustomer::name, $site->siteName);
-//    $dbeCustomer->getcu
-    var_dump($site->siteName, $site->totalEndpoints);
+    $dbeCustomer = new DBECustomer($thing);
+    $dbeCustomer->getCustomerByName($site->siteName);
+    if (!$dbeCustomer->rowCount()) {
+        $buActivity->raiseWebrootCustomerNotMatchedSR($site);
+        continue;
+    }
+    $dbeCustomer->fetchNext();
+
+    $dbeCustomerItem = new DBECustomerItem($thing);
+    $dbeCustomerItem->getRowsByCustomerAndItemID(
+        $dbeCustomer->getValue(DBECustomer::customerID),
+        CONFIG_WEBROOT_ITEMTYPEID,
+        true
+    );
+    if (!$dbeCustomerItem->fetchNext()) {
+        try {
+            $buActivity->raiseWebrootContractNotFound($site, $dbeCustomer);
+        } catch (Exception $exception) {
+            $logger->error($exception);
+        }
+        continue;
+    }
+    $contractId = $dbeCustomerItem->getValue(DBECustomerItem::customerItemID);
+    $dbeCustomerItem->getRow($contractId);
+    $dbeCustomerItem->setValue(DBECustomerItem::users, $site->totalEndpoints);
+    $dbeCustomerItem->setValue(
+        DBECustomerItem::curUnitSale,
+        $site->totalEndpoints * 12 * $dbeCustomerItem->getValue(
+            DBECustomerItem::salePricePerMonth
+        )
+    );
+    $dbeCustomerItem->setValue(
+        DBECustomerItem::curUnitCost,
+        $site->totalEndpoints * 12 * $dbeCustomerItem->getValue(
+            DBECustomerItem::costPricePerMonth
+        )
+    );
+    $dbeCustomerItem->updateRow();
+    $logger->info(
+        "Customer {$dbeCustomer->getValue(DBECustomer::name)} contract {$dbeCustomerItem->getValue(DBECustomerItem::customerItemID)} updated!"
+    );
 }

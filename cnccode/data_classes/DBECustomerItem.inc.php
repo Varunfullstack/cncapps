@@ -690,7 +690,8 @@ class DBECustomerItem extends DBCNCEntity
     }
 
     function getRowsByCustomerAndItemID($customerID,
-                                        $itemID
+                                        $itemID,
+                                        bool $ignoreDeclined = false
     )
     {
         $this->setMethodName('getRowsByCustomerAndItemID');
@@ -700,12 +701,14 @@ class DBECustomerItem extends DBCNCEntity
         if ($itemID == '') {
             $this->raiseError('itemID not set');
         }
-        $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
-            " FROM " . $this->getTableName() .
-            " WHERE " . $this->getDBColumnName(self::customerID) . "=" . $customerID .
-            " AND " . $this->getDBColumnName(self::itemID) . "=" . $itemID
-        );
+        $queryString = "SELECT {$this->getDBColumnNamesAsString()} 
+            FROM {$this->getTableName()} 
+            WHERE {$this->getDBColumnName(self::customerID)}={$customerID} 
+              AND {$this->getDBColumnName(self::itemID)}={$itemID}";
+        if ($ignoreDeclined) {
+            $queryString .= " and {$this->getDBColumnName(self::declinedFlag)} <> 'Y' and {$this->getDBColumnName(self::renewalStatus)} = 'R'";
+        }
+        $this->setQueryString($queryString);
         return (parent::getRows());
     }
 

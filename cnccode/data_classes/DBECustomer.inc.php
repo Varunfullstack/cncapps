@@ -473,7 +473,8 @@ class DBECustomer extends DBCNCEntity
         $this->addColumn(
             self::streamOneEmail,
             DA_TEXT,
-            DA_ALLOW_NULL,"streamOneEmail"
+            DA_ALLOW_NULL,
+            "streamOneEmail"
         );
         $this->setPK(0);
         $this->setAddColumnsOff();
@@ -644,6 +645,23 @@ class DBECustomer extends DBCNCEntity
 
         $queryString .= ' LIMIT 0,1';
 
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+    }
+
+    function getCustomerByName($name)
+    {
+        $this->setMethodName("getCustomerByName");
+
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " where 
+				cus_name = '$name'
+				and {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y' 
+				and {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null
+				LIMIT 1";
         $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;

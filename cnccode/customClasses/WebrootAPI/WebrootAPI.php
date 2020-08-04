@@ -118,7 +118,6 @@ class WebrootAPI
 
             $body = (string)$response->getBody();
             $parsedBody = json_decode($body);
-            var_dump($parsedBody);
             if (!$parsedBody) {
                 throw new Exception('Failed to parse response body');
             }
