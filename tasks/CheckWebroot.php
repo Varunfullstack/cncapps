@@ -44,6 +44,7 @@ foreach ($sitesResponse->sites as $site) {
     $dbeCustomer->getCustomerByName($site->siteName);
     if (!$dbeCustomer->rowCount()) {
         $buActivity->raiseWebrootCustomerNotMatchedSR($site);
+        $logger->warning("No match found for site with name '{$site->siteName}'");
         continue;
     }
     $dbeCustomer->fetchNext();
@@ -57,6 +58,7 @@ foreach ($sitesResponse->sites as $site) {
     if (!$dbeCustomerItem->fetchNext()) {
         try {
             $buActivity->raiseWebrootContractNotFound($site, $dbeCustomer);
+            $logger->warning("No Contract found for customer: {$dbeCustomer->getValue(DBECustomer::name)}");
         } catch (Exception $exception) {
             $logger->error($exception);
         }

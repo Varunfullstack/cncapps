@@ -237,6 +237,7 @@
                 <input type="number"
                        value="{salePricePerMonth}"
                        onkeyup="recalculateSalePrice()"
+                       onmouseup="recalculateSalePrice()"
                        id="unitSale"
                        step="0.01"
                        name="renContract[1][salePricePerMonth]"
@@ -248,7 +249,8 @@
             <td class="fieldText">
                 <input type="number"
                        value="{costPricePerMonth}"
-                       onkeyup="recalculateCostPrice()"
+                       onkeyup="recalculateSalePrice()"
+                       onmouseup="recalculateSalePrice()"
                        id="unitCost"
                        step="0.01"
                        name="renContract[1][costPricePerMonth]"
