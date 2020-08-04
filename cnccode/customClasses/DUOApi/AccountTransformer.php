@@ -8,7 +8,7 @@ use Karriere\JsonDecoder\Bindings\AliasBinding;
 use Karriere\JsonDecoder\ClassBindings;
 use Karriere\JsonDecoder\Transformer;
 
-class DuoAccountTransformer implements Transformer
+class AccountTransformer implements Transformer
 {
 
     public function register(ClassBindings $classBindings)
@@ -20,6 +20,6 @@ class DuoAccountTransformer implements Transformer
 
     public function transforms()
     {
-        return DuoAccount::class;
+        return Account::class;
     }
 }

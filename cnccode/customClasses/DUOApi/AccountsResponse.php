@@ -4,9 +4,11 @@
 namespace CNCLTD\DUOApi;
 
 
-class DuoAccountsResponse
+class AccountsResponse
 {
-
+    /**
+     * @var Account[]
+     */
     public $response;
     public $stat;
 }

@@ -7,7 +7,7 @@ namespace CNCLTD\DUOApi;
 use Karriere\JsonDecoder\Bindings\ArrayBinding;
 use Karriere\JsonDecoder\ClassBindings;
 
-class DuoAccountsResponseTransformer implements \Karriere\JsonDecoder\Transformer
+class AccountsResponseTransformer implements \Karriere\JsonDecoder\Transformer
 {
 
     /**
@@ -15,7 +15,7 @@ class DuoAccountsResponseTransformer implements \Karriere\JsonDecoder\Transforme
      */
     public function register(ClassBindings $classBindings)
     {
-        $classBindings->register(new ArrayBinding('response', 'response', DuoAccount::class));
+        $classBindings->register(new ArrayBinding('response', 'response', Account::class));
     }
 
     /**
@@ -23,6 +23,6 @@ class DuoAccountsResponseTransformer implements \Karriere\JsonDecoder\Transforme
      */
     public function transforms()
     {
-        return DuoAccountsResponse::class;
+        return AccountsResponse::class;
     }
 }

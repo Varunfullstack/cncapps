@@ -30,7 +30,7 @@ class DUOApi
     }
 
     /**
-     * @return DuoAccount[]
+     * @return Account[]
      * @throws Exception
      */
     function getAccountsList()
@@ -41,12 +41,35 @@ class DUOApi
         }
 
         $jsonDecoder = new JsonDecoder();
-        $jsonDecoder->register(new DuoAccountTransformer());
-        $jsonDecoder->register(new DuoAccountsResponseTransformer());
-        /** @var DuoAccountsResponse $duoAccountsResponse */
-        $duoAccountsResponse = $jsonDecoder->decode($response['response'], DuoAccountsResponse::class);
+        $jsonDecoder->register(new AccountTransformer());
+        $jsonDecoder->register(new AccountsResponseTransformer());
+        /** @var AccountsResponse $duoAccountsResponse */
+        $duoAccountsResponse = $jsonDecoder->decode($response['response'], AccountsResponse::class);
         return $duoAccountsResponse->response;
     }
 
+    /**
+     * @param $accountId
+     * @return AccountInfo
+     */
+    function getAccountInfo($accountId)
+    {
+        $response = $this->duoAPIClient->apiCall(
+            'GET',
+            "/admin/v1/info/summary",
+            [
+                "account_id" => $accountId
+            ]
+        );
+        if (!$response['success']) {
+            throw new Exception('Failed to pull account info: ' . json_encode($response));
+        }
+        $jsonDecoder = new JsonDecoder();
+        $jsonDecoder->register(new AccountInfoTransformer());
+        $jsonDecoder->register(new AccountInfoResponseTransformer());
+        /** @var AccountInfoResponse $accountInfoResponse */
+        $accountInfoResponse = $jsonDecoder->decode($response['response'], AccountInfoResponse::class);
+        return $accountInfoResponse->response;
+    }
 
 }

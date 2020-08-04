@@ -4,7 +4,7 @@
 namespace CNCLTD\DUOApi;
 
 
-class DuoAccount
+class Account
 {
     public $accountId;
     public $apiHostname;

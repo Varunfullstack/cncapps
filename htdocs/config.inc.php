@@ -1289,9 +1289,15 @@ define(
     57
 );
 
+
 define(
     'CONFIG_2NDSITE_LOCAL_ITEMTYPEID',
     58
+);
+
+define(
+    'CONFIG_DUO_ITEMTYPEID',
+    17540
 );
 define(
     'CONFIG_2NDSITE_CNC_ITEMTYPEID',
