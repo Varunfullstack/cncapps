@@ -49,19 +49,30 @@ class NewOrder extends React.Component {
       p.quantity=0;
       return p;
     });
-    let streamOneProducts = await this.apiCustomerLicenses.getProductBySKU({
-      skus: productList.map(p=>p.sku),
-    });
-    productList=productList.map(p=>{
-      const streamProduct=streamOneProducts.BodyText.productDetails.filter(s=>s.sku===p.sku);
-      if(streamProduct.length>0)
-      {
-        p={...p,...streamProduct[0]};
-      }
-      p.quantity=0;
-      return p;
-    });
-    console.log('streamOneProduct',streamOneProducts)
+    let pages=productList.length/20;
+    console.log(productList);
+    console.log(Math.ceil( pages));
+    
+    for (let i = 0; i < productList.length; i += 20) {
+      const chunck = productList.slice(i, i + 20);
+      console.log("chunck", chunck);
+      let streamOneProducts = await this.apiCustomerLicenses.getProductBySKU({
+        skus: chunck.map((p) => p.sku),
+      });
+      console.log("streamOneProduct", streamOneProducts);
+      productList = productList.map((p) => {
+        const streamProduct = streamOneProducts.BodyText.productDetails.filter(
+          (s) => s.sku === p.sku
+        );
+        if (streamProduct.length > 0) {
+          p = { ...p, ...streamProduct[0] };
+        }
+        p.quantity = 0;
+        return p;
+      });
+    }
+  
+
     console.log(productList);
     if (state.endCustomer.email)
       state = {
