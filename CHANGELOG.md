@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unrealeased] - 2020-08-04
+## [v4.3.2] - 2020-08-04
 ### Fixed
 - Fixed Issues with StreamOne New licenses
 
