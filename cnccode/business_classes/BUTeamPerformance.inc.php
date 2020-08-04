@@ -335,17 +335,17 @@ class BUTeamPerformance extends Business
     {
         $sql =
             "SELECT
-  YEAR,
-  QUARTER,
+  `year`,
+  `quarter`,  
   hdTeamTargetSlaPercentage,
   hdTeamTargetFixHours,
   `hdTeamTargetFixQtyPerMonth` AS hdTeamTargetFixQty,
   SUM(
     hdTeamActualSlaPercentage * hdTeamActualFixQtyPerMonth
-  ) / SUM(hdTeamActualFixQtyPerMonth) AS hdTeamTargetSlaPercentage,
+  ) / SUM(hdTeamActualFixQtyPerMonth) AS hdTeamActualSlaPercentage,
   SUM(
     hdTeamActualFixHours * hdTeamActualFixQtyPerMonth
-  ) / SUM(hdTeamActualFixQtyPerMonth) AS hdTeamTargetFixHours,
+  ) / SUM(hdTeamActualFixQtyPerMonth) AS hdTeamActualFixHours,
   `hdTeamActualFixQtyPerMonth` AS hdTeamActualFixQty,
   `esTeamTargetSlaPercentage`,
   `esTeamTargetFixHours`,
@@ -383,7 +383,7 @@ class BUTeamPerformance extends Business
   `projectTeamActualFixQtyPerMonth` AS projectTeamActualFixQty
 FROM
   (SELECT
-    YEAR,
+    `year`,
     CASE
       WHEN MONTH BETWEEN 1
       AND 3
@@ -397,7 +397,7 @@ FROM
       WHEN MONTH BETWEEN 10
       AND 12
       THEN 4
-    END AS QUARTER,
+    END AS `quarter`,
     `hdTeamTargetSlaPercentage`,
     `hdTeamTargetFixHours`,
     `hdTeamTargetFixQtyPerMonth`,
@@ -425,7 +425,7 @@ FROM
   FROM
     `team_performance`
   WHERE YEAR = ?) a
-GROUP BY QUARTER";
+GROUP BY quarter";
         $statement = $this->connection->prepare($sql);
         $statement->execute(array($year));
         return $statement->fetchAll(); // an array of all records for year

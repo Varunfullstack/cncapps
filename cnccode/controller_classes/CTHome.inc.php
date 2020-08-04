@@ -575,11 +575,11 @@ class CTHome extends CTCNC
             $projectTeamSLAPerformanceClass = 'performance-warn';
             $projectTeamFixHoursClass = 'performance-warn';
 
-            if (round($result['esTeamActualSlaPercentage'],1) >= round($result['esTeamTargetSlaPercentage'],1)) {
+            if (round($result['esTeamActualSlaPercentage'], 1) >= round($result['esTeamTargetSlaPercentage'], 1)) {
                 $esSLAPerformanceClass = 'performance-green';
             }
 
-            if (round($result['hdTeamActualSlaPercentage'],1) >= round($result['hdTeamTargetSlaPercentage'],1)) {
+            if (round($result['hdTeamActualSlaPercentage'], 1) >= round($result['hdTeamTargetSlaPercentage'], 1)) {
                 $hdSLAPerformanceClass = 'performance-green';
             }
 
