@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7e62670d256e7b3a52eed703ee1d9923",
+    "content-hash": "b525e398abbef8f16ee9b1c6db03dcd7",
     "packages": [
         {
             "name": "bramus/ansi-php",
@@ -278,6 +278,40 @@
             "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
             "homepage": "https://github.com/dompdf/dompdf",
             "time": "2020-02-20T03:52:51+00:00"
+        },
+        {
+            "name": "duosecurity/duo_api_php",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/duosecurity/duo_api_php.git",
+                "reference": "80792b92bd1ab9b64c680b89de74ee32e62f8c34"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/duosecurity/duo_api_php/zipball/80792b92bd1ab9b64c680b89de74ee32e62f8c34",
+                "reference": "80792b92bd1ab9b64c680b89de74ee32e62f8c34",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~5.7",
+                "satooshi/php-coveralls": "dev-master",
+                "squizlabs/php_codesniffer": "2.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DuoAPI\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "A PHP implementation of the Duo API.",
+            "homepage": "https://duo.com/",
+            "time": "2020-04-28T14:21:43+00:00"
         },
         {
             "name": "fig/http-message-util",
@@ -3350,7 +3384,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "signable/signable-php": 20
+        "signable/signable-php": 20,
+        "duosecurity/duo_api_php": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
