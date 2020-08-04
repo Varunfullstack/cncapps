@@ -38,6 +38,7 @@ foreach ($duoAPI->getAccountsList() as $account) {
     $dbeCustomer->getCustomerByName($account->name);
     if (!$dbeCustomer->rowCount()) {
         $buActivity->raiseDuoCustomerNotMatchedSR($account);
+        $logger->warning("Could not match a customer for account with name {$account->name}, raising SR!");
         continue;
     }
     $dbeCustomer->fetchNext();
@@ -51,6 +52,7 @@ foreach ($duoAPI->getAccountsList() as $account) {
     if (!$dbeCustomerItem->fetchNext()) {
         try {
             $buActivity->raiseDuoContractNotFound($account, $dbeCustomer);
+            $logger->warning("Could not find a contract for customer {$account->name}, raising SR!");
         } catch (Exception $exception) {
             $logger->error($exception);
         }

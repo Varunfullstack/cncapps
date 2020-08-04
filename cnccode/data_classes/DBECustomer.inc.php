@@ -657,12 +657,12 @@ class DBECustomer extends DBCNCEntity
             return $this;
         }
         $this->setMethodName("getCustomerByName");
-
+        $name = mysqli_real_escape_string($this->db->link_id(), $name);
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " where 
-				cus_name = '$name'
+				cus_name = '{$name}'
 				and {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y' 
 				and {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null
 				LIMIT 1";
