@@ -4,11 +4,8 @@ use CNCLTD\LoggerCLI;
 
 global $cfg;
 require_once(__DIR__ . "/../htdocs/config.inc.php");
-//require_once($cfg["path_dbe"] . "/DBEProblem.inc.php");
-//require_once($cfg["path_dbe"] . "/DBEExpense.inc.php");
-//require_once($cfg["path_dbe"] . "/DBECallActivity.inc.php");
-//require_once($cfg['path_bu'] . '/BUHeader.inc.php');
-//require_once($cfg['path_bu'] . '/BUExpense.inc.php');
+require_once($cfg['path_bu'] . '/BUActivity.inc.php');
+
 global $db;
 $logName = 'CheckDUO';
 $logger = new LoggerCLI($logName);
