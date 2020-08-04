@@ -34,7 +34,8 @@ $integrationKey = "DI6FY9277NHNHTD7ZXN1";
 $secret = "zAOdK7JTpE0xVLzVrVjkVd0LukEe4RyhsmU5Kq64";
 $apiHostname = "api-8f3a2990.duosecurity.com";
 
-$duoAPI = new \DuoAPI\Auth($integrationKey, $secret, $apiHostname, null, false);
-$call = $duoAPI->apiCall('POST', '/accounts/v1/account/list', []);
+$duoAPI = new \CNCLTD\DUOApi\DUOApi($secret, $integrationKey, $apiHostname);
 
-var_dump($call);
+foreach ($duoAPI->getAccountsList() as $account) {
+    var_dump($account->name);
+}
