@@ -346,7 +346,7 @@ class BUTeamPerformance extends Business
   SUM(
     hdTeamActualFixHours * hdTeamActualFixQtyPerMonth
   ) / SUM(hdTeamActualFixQtyPerMonth) AS hdTeamActualFixHours,
-  `hdTeamActualFixQtyPerMonth` AS hdTeamActualFixQty,
+  sum(`hdTeamActualFixQtyPerMonth`) AS hdTeamActualFixQty,
   `esTeamTargetSlaPercentage`,
   `esTeamTargetFixHours`,
   `esTeamTargetFixQtyPerMonth` AS esTeamTargetFixQty,
@@ -356,7 +356,7 @@ class BUTeamPerformance extends Business
   SUM(
     `esTeamActualFixHours` * esTeamActualFixQtyPerMonth
   ) / SUM(esTeamActualFixQtyPerMonth) AS esTeamActualFixHours,
-  `esTeamActualFixQtyPerMonth` AS esTeamActualFixQty,
+  sum(`esTeamActualFixQtyPerMonth`) AS esTeamActualFixQty,
   `imTeamTargetSlaPercentage` AS smallProjectsTeamTargetSlaPercentage,
   `imTeamTargetFixHours` AS smallProjectsTeamTargetFixHours,
   `imTeamTargetFixQtyPerMonth` AS smallProjectsTeamTargetFixQty,
@@ -366,7 +366,7 @@ class BUTeamPerformance extends Business
   SUM(
     `imTeamActualFixHours` * imTeamActualFixQtyPerMonth
   ) / SUM(imTeamActualFixQtyPerMonth) AS smallProjectsTeamActualFixHours,
-  `imTeamActualFixQtyPerMonth` AS smallProjectsTeamActualFixQty,
+  sum(`imTeamActualFixQtyPerMonth`) AS smallProjectsTeamActualFixQty,
   `projectTeamTargetSlaPercentage`,
   `projectTeamTargetFixHours`,
   `projectTeamTargetFixQtyPerMonth` AS projectTeamTargetFixQty,
@@ -380,7 +380,7 @@ class BUTeamPerformance extends Business
   ) / SUM(
     projectTeamActualFixQtyPerMonth
   ) AS projectTeamActualFixHours,
-  `projectTeamActualFixQtyPerMonth` AS projectTeamActualFixQty
+  sum(`projectTeamActualFixQtyPerMonth`) AS projectTeamActualFixQty
 FROM
   (SELECT
     `year`,
