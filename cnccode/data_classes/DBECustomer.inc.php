@@ -653,6 +653,9 @@ class DBECustomer extends DBCNCEntity
 
     function getCustomerByName($name)
     {
+        if (!$name) {
+            return $this;
+        }
         $this->setMethodName("getCustomerByName");
 
         $queryString =
