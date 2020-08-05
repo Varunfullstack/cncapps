@@ -1,13 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased] - 2020-08-04
+## [v4.3.3] - 2020-08-04
 ### Fixed
 - Fixed Issues with StreamOne addOns New licenses
-
-## [unreleased]
-### Added
-- Issue 961 - Team Performance at the start of the month
+- Fixed Issues with Customer Page not saving StreamOne email
 
 ## [v4.3.2] - 2020-08-04
 ### Fixed
