@@ -953,7 +953,11 @@ class CTCustomer extends CTCNC
                 DBECustomer::accountName,
                 @$value['accountName']
             );
-
+            $this->dsCustomer->setValue(
+                DBECustomer::streamOneEmail,
+                @$value['streamOneEmail']
+            );
+            
             $this->dsCustomer->setValue(
                 DBECustomer::accountNumber,
                 @$value['accountNumber']
@@ -1871,7 +1875,9 @@ class CTCustomer extends CTCNC
                 'accountNumberPencilColor'       => $this->dsCustomer->getValue(
                     DBECustomer::accountNumber
                 ) ? "greenPencil" : "redPencil",
-                'forceDirectDebit'               => $forceDirectDebit ? 'true' : 'false'
+                'forceDirectDebit'               => $forceDirectDebit ? 'true' : 'false',
+                'streamOneEmail'               => $this->dsCustomer->getValue(DBECustomer::streamOneEmail)
+
 
             )
         );
