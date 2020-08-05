@@ -2,6 +2,7 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
 - Issue 961 - Team Performance at the start of the month
 
 ## [v4.3.2] - 2020-08-04
