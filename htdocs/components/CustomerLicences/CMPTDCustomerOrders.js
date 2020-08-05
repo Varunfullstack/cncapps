@@ -62,6 +62,7 @@ class CMPTDCustomerOrders extends React.Component {
             let endCustomer = null;
             if (customerSerach.length > 0)
                 endCustomer = customerSerach[0];
+            console.log(endCustomer);
             // get all subscriptions by email
             //const orders=await this.apiCustomerLicenses.getSubscriptionsByEmail(endCustomerEmail);
             const allSubscriptions = await this.getCustomerOrders(endCustomerEmail);
@@ -797,7 +798,8 @@ class CMPTDCustomerOrders extends React.Component {
                 phoneNumber: endCustomer.phone1,
             },
         };
-        //console.log('update addon',body);
+        console.log('update addon',body);
+        
         if (addon.quantity == 0) {
             body.addOns[0].action = "suspend";
             delete body.addOns[0].newQuantity;
@@ -806,6 +808,8 @@ class CMPTDCustomerOrders extends React.Component {
         this.showSpinner();
         if (inOrderList.length > 0) {
             //console.log("old addon")
+            
+
             this.apiCustomerLicenses
                 .updateSubscriptionAddOns({modifyAddons: body})
                 .then((res) => {
