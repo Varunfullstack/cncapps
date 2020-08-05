@@ -59,6 +59,7 @@ class CMPCustomerLicenses extends React.Component {
         let customers = await this.apiCustomerLicenses.getStreamOneCustomersLocal();
         console.log(customers);
         customers = customers.map(c => {
+            c.name=c.name.replace("  "," ");
             c.firstName = c.name.split(' ')[0];
             c.lastName = c.name.split(' ')[1];
             return c;

@@ -1,0 +1,1 @@
+["Content-type: application\/json","Authorization: Bearer 0006YwUEfjrtapExJ0so2nFbCzkbIOZ5OAICH3CVlRtuVVmT5J","SOIN: 8D3BE069277C5CC450DA5173B989AA390FDECA03","TimeStamp: 1596642642","Signature: MDAwNll3VUVmanJ0YXBFeEowc28ybkZiQ3prYklPWjVPQUlDSDNDVmxSdHVWVm1UNUo6OEQzQkUwNjkyNzdDNUNDNDUwREE1MTczQjk4OUFBMzkwRkRFQ0EwMzoxNTk2NjQyNjQy","Accept: application\/json"]
