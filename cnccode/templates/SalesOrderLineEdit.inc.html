@@ -6,6 +6,12 @@
 {salesOrderHeadDisplay}
 <!-- NOTE: This is also in salesOrderDisplay.inc.html -->
 <script language='JavaScript'>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('itemID').addEventListener('change', ($event) => {
+            console.log($event.target.value);
+        })
+    })
+
     function checkFunctionKey(field) {
         if (event.keyCode == 120) {			// F9 - edit
             switch (field.id) {
@@ -32,6 +38,10 @@
             }
         }
         return;
+    }
+
+    function itemIdChanged($event) {
+        console.log($event.target.value);
     }
 </SCRIPT>
 <table width="910px"

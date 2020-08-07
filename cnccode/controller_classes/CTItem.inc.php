@@ -6,6 +6,10 @@
  * @access public
  * @authors Karim Ahmed - Sweet Code Limited
  */
+
+use CNCLTD\Exceptions\JsonHttpException;
+
+global $cfg;
 require_once($cfg['path_bu'] . '/BUItem.inc.php');
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_dbe'] . '/DSForm.inc.php');
@@ -51,6 +55,11 @@ define(
 
 class CTItem extends CTCNC
 {
+    public const ADD_CHILD_ITEM = "ADD_CHILD_ITEM";
+    public const REMOVE_CHILD_ITEM = "REMOVE_CHILD_ITEM";
+    const GET_CHILD_ITEMS = "GET_CHILD_ITEMS";
+    const GET_PARENT_ITEMS = "GET_PARENT_ITEMS";
+    const SEARCH_ITEMS = "SEARCH_ITEMS";
     /** @var DSForm */
     public $dsItem;
     /**
@@ -106,6 +115,68 @@ class CTItem extends CTCNC
             case 'discontinue':
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->discontinue();
+                break;
+            case self::ADD_CHILD_ITEM:
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!key_exists('itemId', $data) || !isset($data['itemId'])) {
+                    throw new JsonHttpException(400, 'Item Id is mandatory');
+                }
+                if (!key_exists('childItemId', $data) || !isset($data['childItemId'])) {
+                    throw new JsonHttpException(400, 'child item id is mandatory');
+                }
+
+                $this->addChildItem($data['itemId'], $data['childItemId']);
+                $dbeItem = new DBEItem($this);
+                $dbeItem->getRow($data['childItemId']);
+                echo json_encode(["status" => "ok", "childItem" => $dbeItem->getRowAsAssocArray()]);
+                break;
+            case self::REMOVE_CHILD_ITEM:
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!key_exists('itemId', $data) || !isset($data['itemId'])) {
+                    throw new JsonHttpException(400, 'Item Id is mandatory');
+                }
+                if (!key_exists('childItemId', $data) || !isset($data['childItemId'])) {
+                    throw new JsonHttpException(400, 'child item id is mandatory');
+                }
+                $this->removeChildItem($data['itemId'], $data['childItemId']);
+                echo json_encode(["status" => "ok"]);
+                break;
+            case self::GET_CHILD_ITEMS:
+                if (!$this->getParam('itemId')) {
+                    throw new JsonHttpException(400, 'Item Id is mandatory');
+                }
+                $dbeItem = new DBEItem($this);
+                $dbeItem->getChildItems($this->getParam('itemId'));
+                $rows = [];
+                while ($dbeItem->fetchNext()) {
+                    $rows[] = $dbeItem->getRowAsAssocArray();
+                }
+                echo json_encode(["status" => "ok", "data" => $rows]);
+
+                break;
+            case self::GET_PARENT_ITEMS:
+                if (!$this->getParam('itemId')) {
+                    throw new JsonHttpException(400, 'Item Id is mandatory');
+                }
+                $dbeItem = new DBEItem($this);
+                $dbeItem->getParentItems($this->getParam('itemId'));
+                $rows = [];
+                while ($dbeItem->fetchNext()) {
+                    $rows[] = $dbeItem->getRowAsAssocArray();
+                }
+                echo json_encode(["status" => "ok", "data" => $rows]);
+
+                break;
+
+                break;
+            case self::SEARCH_ITEMS:
+                $dbeItem = new DBEItem($this);
+                $dbeItem->getRowsByDescriptionOrPartNoSearch($this->getParam('term'), null, $this->getParam('limit'));
+                $rows = [];
+                while ($dbeItem->fetchNext()) {
+                    $rows[] = $dbeItem->getRowAsAssocArray();
+                }
+                echo json_encode(["status" => "ok", "data" => $rows]);
                 break;
             case CTCNC_ACT_DISP_ITEM_POPUP:
             default:
@@ -214,7 +285,9 @@ class CTItem extends CTCNC
                     $this->dsItem->getValue(DBEItem::serialNoFlag)
                 ),
                 'partNo'                         => Controller::htmlInputText($this->dsItem->getValue(DBEItem::partNo)),
-                'partNoOld'                      => Controller::htmlInputText($this->dsItem->getValue(DBEItem::partNoOld)),
+                'partNoOld'                      => Controller::htmlInputText(
+                    $this->dsItem->getValue(DBEItem::partNoOld)
+                ),
                 'notes'                          => Controller::htmlTextArea($this->dsItem->getValue(DBEItem::notes)),
                 'contractResponseTime'           => Controller::htmlInputText(
                     $this->dsItem->getValue(DBEItem::contractResponseTime)
@@ -231,7 +304,10 @@ class CTItem extends CTCNC
                     $this->dsItem->getValue(DBEItem::excludeFromPOCompletion)
                 ),
                 'allowSRLog'                     => $this->dsItem->getValue(DBEItem::allowSRLog) ? "checked" : null,
-                'isStreamOne'                     => $this->dsItem->getValue(DBEItem::isStreamOne) ? "checked" : null
+                'isStreamOne'                    => $this->dsItem->getValue(DBEItem::isStreamOne) ? "checked" : null,
+                'javaScript'                     => '<script src="js/react.development.js" crossorigin></script>
+                    <script src="js/react-dom.development.js" crossorigin></script>
+                    <script type="module" src=\'components/ChildItemComponent/ChildAndParentItems.js\'></script>'
             )
         );
         $this->parseItemTypeSelector($this->dsItem->getValue(DBEItem::itemTypeID));
@@ -298,15 +374,19 @@ class CTItem extends CTCNC
                 $this->displayFatalError(CTITEM_MSG_ITEM_NOT_FND);
             }
         }
+
+        $params = [
+            'action' => CTITEM_ACT_ITEM_UPDATE,
+        ];
+
+        if ($this->getParam('htmlFmt')) {
+            $params['htmlFmt'] = CT_HTML_FMT_POPUP;
+        }
         return (
         Controller::buildLink(
             $_SERVER['PHP_SELF'],
-            array(
-                'action'  => CTITEM_ACT_ITEM_UPDATE,
-                'htmlFmt' => CT_HTML_FMT_POPUP
-            )
-        )
-        );
+            $params
+        ));
     }
 
     function parseItemTypeSelector($itemTypeID)
@@ -456,15 +536,26 @@ class CTItem extends CTCNC
         $this->buItem->updateItem($this->dsItem);
         $itemID = $this->dsItem->getPKValue();
 
-        // this forces update of itemID back through Javascript to parent HTML window
         $urlNext = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
-                'action'          => CTCNC_ACT_DISP_ITEM_POPUP,
-                'itemDescription' => $itemID,
-                'htmlFmt'         => CT_HTML_FMT_POPUP
+                'action'          => CTCNC_ACT_ITEM_EDIT,
+                'itemID' => $itemID,
             )
         );
+
+        if ($this->getParam('htmlFmt')) {
+            // this forces update of itemID back through Javascript to parent HTML window
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'          => CTCNC_ACT_DISP_ITEM_POPUP,
+                    'itemDescription' => $itemID,
+                    'htmlFmt'         => CT_HTML_FMT_POPUP
+                )
+            );
+        }
+
         header('Location: ' . $urlNext);
     }
 
@@ -479,6 +570,46 @@ class CTItem extends CTCNC
 
         }
         header('Location: ' . $this->getParam('returnTo'));
+    }
+
+    function addChildItem($parentItemId, $childItemId)
+    {
+        global $db;
+
+        $query = "insert ignore into childItem values(?,?) ";
+        $db->preparedQuery(
+            $query,
+            [
+                [
+                    "type"  => "i",
+                    "value" => $parentItemId,
+                ],
+                [
+                    "type"  => "i",
+                    "value" => $childItemId,
+                ],
+            ]
+        );
+    }
+
+    function removeChildItem($parentItemId, $childItemId)
+    {
+        global $db;
+
+        $query = "delete from childItem where parentItemId = ? and childItemId = ?";
+        $db->preparedQuery(
+            $query,
+            [
+                [
+                    "type"  => "i",
+                    "value" => $parentItemId,
+                ],
+                [
+                    "type"  => "i",
+                    "value" => $childItemId,
+                ],
+            ]
+        );
     }
 
     /**

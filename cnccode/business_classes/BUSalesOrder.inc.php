@@ -1017,11 +1017,7 @@ class BUSalesOrder extends Business
         $this->setMethodName('insertNewOrdline');
 //count rows
         $dsOrdline->fetchNext();
-        $dbeOrdline = new DBEOrdline($this);
-        $dbeOrdline->setValue(
-            DBEOrdline::ordheadID,
-            $dsOrdline->getValue(DBEOrdline::ordheadID)
-        );
+        var_dump($dsOrdline->getValue(DBEOrdline::ordheadID));
         $this->updateOrderLine(
             $dsOrdline,
             "I"
@@ -1039,6 +1035,7 @@ class BUSalesOrder extends Business
                              $action = "U"
     )
     {
+        var_dump($dsOrdline->getValue(DBEOrdline::ordheadID));
         $this->setMethodName('updateOrderLine');
         $dbeOrdhead = new DBEOrdhead($this);
         $dbeOrdhead->setPKValue($dsOrdline->getValue(DBEOrdline::ordheadID));
