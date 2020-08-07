@@ -1,3 +1,22 @@
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.userAllocation').forEach((elm) => {
+            elm.addEventListener('change', ($event) => {
+                const select = $event.target;
+                const userId = $event.target.value || null;
+                const problemId = select.dataset.problemId;
+
+                fetch('?action=assignUser', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        problemId,
+                        userId
+                    })
+                })
+            })
+        })
+    })
+</script>
 <table class="oddRows">
     <thead>
     <tr>
@@ -23,7 +42,7 @@
             Type
         </th>
         <th>
-
+            Assigned To
         </th>
     </tr>
     </thead>
@@ -49,6 +68,11 @@
             {attachments}
         </td>
         <td>{type}</td>
+        <td>
+            <select class="userAllocation"
+                    data-problem-id="{problemId}"
+            >{engineerDropDown}</select>
+        </td>
         <td>
             {processCRLink}
         </td>

@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 961 - Team Performance at the start of the month
+- Issue 971 - Ability to allocate Sales Requests to people
 
 ## [v4.3.2] - 2020-08-04
 ### Fixed
