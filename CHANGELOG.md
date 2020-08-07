@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 961 - Team Performance at the start of the month
+### Changed
+- Issue 964 - Make Office 365 Backup unit numbers field read only because it's linked to an API
 
 ## [v4.3.2] - 2020-08-04
 ### Fixed
