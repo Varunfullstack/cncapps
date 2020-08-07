@@ -4,6 +4,8 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 961 - Team Performance at the start of the month
+### Fixed
+- Issue 968 - Clear Special Attention Status Once Expired
 
 ## [v4.3.2] - 2020-08-04
 ### Fixed

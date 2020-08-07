@@ -473,7 +473,8 @@ class DBECustomer extends DBCNCEntity
         $this->addColumn(
             self::streamOneEmail,
             DA_TEXT,
-            DA_ALLOW_NULL,"streamOneEmail"
+            DA_ALLOW_NULL,
+            "streamOneEmail"
         );
         $this->setPK(0);
         $this->setAddColumnsOff();
@@ -824,6 +825,17 @@ class DBECustomer extends DBCNCEntity
         return $ret;
 
 
+    }
+
+    public function getBreachedSpecialAttentionCustomers()
+    {
+        $this->setMethodName('getBreachedSpecialAttentionCustomers');
+        $queryString =
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE {$this->getDBColumnName(self::specialAttentionFlag)} = 'Y' and {$this->getDBColumnName(self::specialAttentionEndDate)}  <= current_date() ";
+
+        $this->setQueryString($queryString);
+        $ret = (self::getRows());
+        return $ret;
     }
 }
 
