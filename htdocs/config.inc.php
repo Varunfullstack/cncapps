@@ -1275,9 +1275,12 @@ define(
     'CONFIG_SERVER_ITEMTYPEID',
     16
 );                // Server item type
-
 define(
-    'CONFIG_SERVERCARE_ITEMTYPEID',
+    'CONFIG_DUO_ITEMID',
+    17540
+);
+define(
+    'CONFIG_SERVERCARE_ITEMID',
     55
 );
 define(
@@ -1295,10 +1298,6 @@ define(
     58
 );
 
-define(
-    'CONFIG_DUO_ITEMTYPEID',
-    17540
-);
 define(
     'CONFIG_2NDSITE_CNC_ITEMTYPEID',
     59

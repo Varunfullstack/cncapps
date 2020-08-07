@@ -46,7 +46,7 @@ foreach ($duoAPI->getAccountsList() as $account) {
     $dbeCustomerItem = new DBECustomerItem($thing);
     $dbeCustomerItem->getRowsByCustomerAndItemID(
         $dbeCustomer->getValue(DBECustomer::customerID),
-        CONFIG_DUO_ITEMTYPEID,
+        CONFIG_DUO_ITEMID,
         true
     );
     if (!$dbeCustomerItem->fetchNext()) {
