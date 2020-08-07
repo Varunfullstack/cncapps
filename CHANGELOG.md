@@ -4,6 +4,9 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 961 - Team Performance at the start of the month
+### Fixed
+- Issue 970 - StreamOne Page Permissions
+
 
 ## [v4.3.2] - 2020-08-04
 ### Fixed
