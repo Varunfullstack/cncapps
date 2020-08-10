@@ -29,13 +29,14 @@ if (!is_cli()) {
     exit;
 }
 // Script example.php
-$shortopts = "d";
+$shortopts = "df";
 $longopts = [];
 $options = getopt($shortopts, $longopts);
 $debugMode = false;
 if (isset($options['d'])) {
     $debugMode = true;
 }
+$forcedMode = isset($forcedMode['f']);
 $thing = null;
 //**************************************************update item prices */
 if (true) {
@@ -315,7 +316,7 @@ foreach ($cncCustomers as $customer) {
                     $temp = $db->fetchAll();
                     if (count($temp) > 0) {
 
-                        if ((int)$subscription->quantity != (int)$temp[0]["quantity"] && $subscription->lineStatus == "active") {
+                        if (((int)$subscription->quantity != (int)$temp[0]["quantity"] || $forcedMode) && $subscription->lineStatus == "active") {
                             $params = [
                                 [
                                     "type"  => "i",
