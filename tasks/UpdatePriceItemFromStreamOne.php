@@ -319,7 +319,7 @@ foreach ($cncCustomers as $customer) {
 
                     $temp = $db->fetchAll();
                     if (count($temp) > 0) {
-                        if (((int)$subscription->quantity != (int)$temp[0]["quantity"] || $forcedMode) && $subscription->lineStatus == "active") {
+                        if (((int)$subscription->quantity != (int)$temp[0]["quantity"] && $subscription->lineStatus == "active") || $forcedMode) {
                             $salePriceAnnum = ($temp[0]['salePrice'] * $subscription->quantity) * 12;
                             $logger->info(
                                 "we are updating contracts for customer {$customer['name']}, salePricePerMonth is : {$temp[0]['salePrice']}, salePriceAnnum must be: {$salePriceAnnum}"
