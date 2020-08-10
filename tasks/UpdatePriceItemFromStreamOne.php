@@ -309,13 +309,12 @@ foreach ($cncCustomers as $customer) {
 
                 if ($itemId) {
                     $db->query(
-                        "select cui_users quantity, costPricePerMonth as salePrice from custitem where   renewalStatus='R'  AND declinedFlag='N'
+                        "select cui_users quantity, salePricePerMonth as salePrice from custitem where   renewalStatus='R'  AND declinedFlag='N'
                                 and cui_custno= $customer[id]
                                 and cui_itemno=  $itemId"
                     );
                     $temp = $db->fetchAll();
                     if (count($temp) > 0) {
-
                         if (((int)$subscription->quantity != (int)$temp[0]["quantity"] || $forcedMode) && $subscription->lineStatus == "active") {
                             $params = [
                                 [
