@@ -82,14 +82,15 @@ class ChildItemComponent extends React.Component {
                             },
                             value: this.state.inputSearch || '',
                             onInputChange: (value) => this.changeInput(value),
-                            readOnly: this.state.selectedChildItemId
+                            readOnly: this.state.selectedChildItemId,
                         }),
                         this.state.selectedChildItemId ? this.el(
-                            'button',
+                            'i',
                             {
                                 onClick: ($event) => this.clearSelectedItem(),
                                 key: 'child-clear-button',
-                                type: 'button'
+                                type: 'button',
+                                className: ''
                             },
                             this.el(
                                 'i',
