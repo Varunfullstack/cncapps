@@ -278,7 +278,9 @@ if (true) {
 // now we have all subscriptions,  streamone customers and cnc items
 //----------------------------start update customer items seats from stream one
 //1- get all cnc customers
-$db->query("SELECT `cus_custno` as id,streamOneEmail as email FROM `customer` WHERE `streamOneEmail` IS NOT NULL");
+$db->query(
+    "SELECT `cus_custno` as id,streamOneEmail as email, cus_name as name FROM `customer` WHERE `streamOneEmail` IS NOT NULL"
+);
 $cncCustomers = $db->fetchAll(MYSQLI_ASSOC);
 //2- get all subscriptions details
 $count = 0;
@@ -313,9 +315,16 @@ foreach ($cncCustomers as $customer) {
                                 and cui_custno= $customer[id]
                                 and cui_itemno=  $itemId"
                     );
+
+
                     $temp = $db->fetchAll();
                     if (count($temp) > 0) {
                         if (((int)$subscription->quantity != (int)$temp[0]["quantity"] || $forcedMode) && $subscription->lineStatus == "active") {
+                            $salePriceAnnum = ($temp[0]['salePrice'] * $subscription->quantity) * 12;
+                            $logger->info(
+                                "we are updating contracts for customer {$customer['name']}, salePricePerMonth is : {$temp[0]['salePrice']}, salePriceAnnum must be: {$salePriceAnnum}"
+                            );
+
                             $params = [
                                 [
                                     "type"  => "i",
