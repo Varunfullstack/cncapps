@@ -517,7 +517,7 @@ class DB_Sql
     function next_record($fetchMode = MYSQLI_BOTH)
     {
         if (!$this->Query_ID) {
-            $this->halt("next_record called with no query pending.");
+            throw new Exception("next_record called with no query pending.");
             return 0;
         }
         $this->Record = @mysqli_fetch_array(
