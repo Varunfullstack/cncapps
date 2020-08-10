@@ -32,9 +32,9 @@ class LoggerCLI
         $this->log->pushHandler($consoleHandler);
     }
 
-    public function info($message)
+    public function info($message, $context = null)
     {
-        $this->log->info($message);
+        $this->log->info($message, $context);
     }
 
     public function error($message)

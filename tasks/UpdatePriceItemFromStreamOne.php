@@ -140,6 +140,8 @@ if (true) {
     }
 //**************************************get all customers */
 // fetch all stream one customers
+
+
     $allSubscriptions = [];
     $allCustomers = json_decode($buStreamOneApi->searchCustomers(json_encode(["noOfRecords" => 500])));
     if ($allCustomers->Result == "Success") {
@@ -287,34 +289,26 @@ foreach ($allSubscriptions as $item) {
     }
 }
 
-//echo "268". json_encode($orderIds)."\n";
 $logger->info("Loading all subscriptions and there addOns from streamOne.....");
 $orderDetails = $buStreamOneApi->getProductsDetails($orderIds, 40);
 syncAddons($orderDetails, $cncItems, $cncCustomers, $logger);
-//check addond
-//echo json_encode(count( $orderDetails[0]->BodyText->orderInfo->lines));
-//echo json_encode( $cncCustomers); //cus_custno
-//echo "\n";
 $updatedItems = 0;
 $updatedItemsAddOns = 0;
 
 $subscription = null;
 $logger->info("All subscriptions number :" . count($allSubscriptions));
 foreach ($cncCustomers as $customer) {
-    //echo $customer["email"]."\n";
     //get all customer subscriptions
     foreach ($allSubscriptions as $item) {
-        foreach ($item as $key => $subscription) {
-            //echo json_encodesubscription$value);
-            $subscription = (object)$subscription;
-            // echo $subscription->endCustomerEmail."\n";
 
+        foreach ($item as $key => $subscription) {
+            $subscription = (object)$subscription;
             if (strtolower($customer["email"]) == strtolower($subscription->endCustomerEmail)) {
                 $itemId = getItemId($cncItems, $subscription->sku);
-                //echo "\n".$customer["id"]." ".$customer["email"]." ".$subscription->sku." ".$itemId." ".$subscription->quantity;
+
                 if ($itemId) {
                     $db->query(
-                        "select cui_users quantity from custitem where   renewalStatus='R'  AND declinedFlag='N'
+                        "select cui_users quantity, costPricePerMonth as salePrice from custitem where   renewalStatus='R'  AND declinedFlag='N'
                                 and cui_custno= $customer[id]
                                 and cui_itemno=  $itemId"
                     );
@@ -336,6 +330,10 @@ foreach ($cncCustomers as $customer) {
                                     "value" => ($subscription->unitPrice * $subscription->quantity) * 12
                                 ],
                                 [
+                                    "type"  => "d",
+                                    "value" => ($temp[0]['salePrice'] * $subscription->quantity) * 12
+                                ],
+                                [
                                     "type"  => "i",
                                     "value" => $customer['id']
                                 ],
@@ -346,7 +344,7 @@ foreach ($cncCustomers as $customer) {
                             ];
 
                             $result = $db->preparedQuery(
-                                "update custitem set cui_users = ? , costPricePerMonth = ?, cui_cost_price = ?  where   renewalStatus='R'  AND declinedFlag='N'
+                                "update custitem set cui_users = ? , costPricePerMonth = ?, cui_cost_price = ?, cui_sales_price = ? where   renewalStatus='R'  AND declinedFlag='N'
                             and cui_custno = ?
                             and cui_itemno = ?",
                                 $params
