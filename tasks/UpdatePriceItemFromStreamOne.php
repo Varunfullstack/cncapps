@@ -334,8 +334,10 @@ function updateContracts($cncItems,
         }
         return;
     }
+
     if (((int)$units != (int)$temp[0]["units"] || $forcedMode) && $licenseStatus == "active") {
         $salePriceAnnum = ($temp[0]['salePrice'] * $units) * 12;
+        $costAnnum = ($unitPrice * $units) * 12;
 
         $params = [
             [
@@ -348,7 +350,7 @@ function updateContracts($cncItems,
             ],
             [
                 "type"  => "d",
-                "value" => ($unitPrice * $units) * 12
+                "value" => $costAnnum
             ],
             [
                 "type"  => "d",
@@ -380,7 +382,7 @@ function updateContracts($cncItems,
     }
 }
 
-//syncAddons($orderDetails, $cncItems, $forcedMode, $logger);
+syncAddons($orderDetails, $cncItems, $forcedMode, $logger);
 $updatedItems = 0;
 $updatedItemsAddOns = 0;
 
