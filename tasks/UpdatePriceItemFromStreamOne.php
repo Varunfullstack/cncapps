@@ -36,7 +36,7 @@ $debugMode = false;
 if (isset($options['d'])) {
     $debugMode = true;
 }
-$forcedMode = isset($forcedMode['f']);
+$forcedMode = isset($options['f']);
 $thing = null;
 //**************************************************update item prices */
 if (true) {
@@ -321,9 +321,6 @@ foreach ($cncCustomers as $customer) {
                     if (count($temp) > 0) {
                         if (((int)$subscription->quantity != (int)$temp[0]["quantity"] && $subscription->lineStatus == "active") || $forcedMode) {
                             $salePriceAnnum = ($temp[0]['salePrice'] * $subscription->quantity) * 12;
-                            $logger->info(
-                                "we are updating contracts for customer {$customer['name']}, salePricePerMonth is : {$temp[0]['salePrice']}, salePriceAnnum must be: {$salePriceAnnum}"
-                            );
 
                             $params = [
                                 [
@@ -340,7 +337,7 @@ foreach ($cncCustomers as $customer) {
                                 ],
                                 [
                                     "type"  => "d",
-                                    "value" => ($temp[0]['salePrice'] * $subscription->quantity) * 12
+                                    "value" => $salePriceAnnum
                                 ],
                                 [
                                     "type"  => "i",
