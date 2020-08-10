@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.3.4] - 2020-08-10
+### Fixed
+- Fixed sale price calculation from UpdatePriceItemFromStreamOne
+
 ## [v4.3.3] - 2020-08-04
 ### Fixed
 - Fixed Issues with StreamOne addOns New licenses
