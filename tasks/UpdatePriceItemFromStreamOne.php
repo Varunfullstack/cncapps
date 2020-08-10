@@ -344,7 +344,7 @@ foreach ($cncCustomers as $customer) {
                             ];
 
                             $result = $db->preparedQuery(
-                                "update custitem set cui_users = ? , costPricePerMonth = ?, cui_cost_price = ?, cui_sales_price = ? where   renewalStatus='R'  AND declinedFlag='N'
+                                "update custitem set cui_users = ? , costPricePerMonth = ?, cui_cost_price = ?, cui_sale_price = ? where   renewalStatus='R'  AND declinedFlag='N'
                             and cui_custno = ?
                             and cui_itemno = ?",
                                 $params
