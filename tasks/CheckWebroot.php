@@ -27,8 +27,8 @@ if (isset($options['d'])) {
     $debugMode = true;
 }
 $thing = null;
-$user = "adrianc@cnc-ltd.co.uk";
-$password = '$pv29gTMDJ#x!!9';
+$user = "cncappsapi@cnc-ltd.co.uk";
+$password = '3uGhNEBW6dsAHd6q';
 $client_Id = 'client_e2maZ8d5@cnc-ltd.co.uk';
 $client_secret = '{1!XM^QJcqvM8qj';
 $gsmKey = "2FB2-LTSW-E06B-3F49-43DC";
