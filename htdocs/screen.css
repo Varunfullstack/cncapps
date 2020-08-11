@@ -900,3 +900,21 @@ table.cell-padding-1 th, table.cell-padding-1 td {
 .typeahead-input {
     width: 346px;
 }
+
+
+.wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.wrapper span {
+    position: absolute;
+    left: 336px;
+    height: 22px;
+}
+
+.wrapper span i {
+    height: 100%;
+    font-size: 14px;
+    padding-top: 4px;
+}

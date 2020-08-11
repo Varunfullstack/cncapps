@@ -37,22 +37,39 @@ class TypeAheadSearch extends React.Component {
     }
 
     render() {
-        const {value, onInputChange, readOnly} = this.props;
+        const {value, onInputChange, readOnly, showClear, onClear} = this.props;
         return this.el(
-            React.Fragment,
-            {},
-            this.el(
-                'input',
-                {
-                    type: 'text',
-                    ref: 'autocomplete',
-                    key: 'typeahead-input',
-                    className: 'typeahead-input',
-                    onChange: ($event) => onInputChange($event.target.value),
-                    value: value,
-                    readOnly
-                },
-            )
+            'div',
+            {
+                className: "wrapper"
+            },
+            [
+                this.el(
+                    'input',
+                    {
+                        type: 'text',
+                        ref: 'autocomplete',
+                        key: 'typeahead-input',
+                        className: 'typeahead-input show-clear',
+                        onChange: ($event) => onInputChange($event.target.value),
+                        value: value,
+                        readOnly
+                    },
+                ),
+                showClear ? this.el(
+                    'span',
+                    {
+                        key: 'typeahead-clear'
+                    },
+                    this.el(
+                        'i',
+                        {
+                            className: 'fas fa-times',
+                            onClick: ($event) => onClear()
+                        }
+                    )
+                ) : ''
+            ]
         )
     }
 }
