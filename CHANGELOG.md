@@ -9,6 +9,7 @@ This project changes will be shown here.
 ### Changed
 - Issue 964 - Make Office 365 Backup unit numbers field read only because it's linked to an API
 - Issue 899 - Link dependant Sales Items
+- Issue 979 - Purchase Order Date Formatting
 ### Fixed
 - Issue 968 - Clear Special Attention Status Once Expired
 - Issue 970 - StreamOne Page Permissions
