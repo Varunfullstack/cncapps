@@ -137,61 +137,60 @@ class AutoComplete extends React.Component {
     componentDidUpdate(prevProps) {
 
     }
+  render() {
+    const {displayColumn,pk,errorMessage,required,width}=this.props;
+    const {
+      onChange,
+      onClick,
+      onKeyDown,
+      state: {
+        activeSuggestion,
+        filteredSuggestions,
+        showSuggestions,
+        userInput,
+        filtered
+      },
+      handleOnClick,
+      handleOnBlur
+    } = this;
+    let suggestionsListComponent;
 
-    render() {
-        const {displayColumn, pk, errorMessage, required} = this.props;
-        const {
-            onChange,
-            onClick,
-            onKeyDown,
-            state: {
-                activeSuggestion,
-                filteredSuggestions,
-                showSuggestions,
-                userInput,
-                filtered
-            },
-            handleOnClick,
-            handleOnBlur
-        } = this;
-        let suggestionsListComponent;
-
-        if (showSuggestions) {
-            if (filteredSuggestions.length) {
-                suggestionsListComponent = React.createElement("ul", {
-                    className: "suggestions"
-                }, filteredSuggestions.map((suggestion, index) => {
-                    let className; // Flag the active suggestion with a class
-
-                    if (index === activeSuggestion) {
-                        className = "suggestion-active";
-                    }
-
-                    return React.createElement("li", {
-                        className: className,
-                        key: pk ? suggestion[pk] : suggestion,
-                        onClick: () => onClick(suggestion)
-                    }, displayColumn ? suggestion[displayColumn] : suggestion);
-                }));
-            } else {
-                if (userInput != "")
-                    suggestionsListComponent = React.createElement("div", {
-                        className: "no-suggestions"
-                    }, React.createElement("em", null, errorMessage ? errorMessage : "No items "));
-            }
-        }
-        let defaultValue = this.props.value ? this.props.value : "";
-        return React.createElement("div", null, React.createElement("input", {
-            className: "form-control " + (required ? "required" : ""),
-            type: "text",
-            onChange: onChange,
-            onKeyDown: onKeyDown,
-            value: userInput || (!filtered && defaultValue) || "",
-            onClick: handleOnClick,
-            onBlur: handleOnBlur,
-            style: {width: '100%'}
-        }), suggestionsListComponent);
-    }
+    if (showSuggestions) {
+      if (filteredSuggestions.length) {
+        suggestionsListComponent = React.createElement("ul", {
+          className: "suggestions"
+        }, filteredSuggestions.map((suggestion, index) => {
+          let className; // Flag the active suggestion with a class
+        
+          if (index === activeSuggestion) {
+            className = "suggestion-active";
+          }
+         
+          return React.createElement("li", {
+            className: className,
+            key: pk ? suggestion[pk] : suggestion,
+            onClick: () => onClick(suggestion)
+          }, displayColumn ? suggestion[displayColumn] : suggestion);
+        }));
+      } else {
+        if(userInput!="")
+        suggestionsListComponent =React.createElement("div", {
+          className: "no-suggestions"
+        }, React.createElement("em", null, errorMessage ? errorMessage : "No items "));
+      }
+    }    
+    let defaultValue=this.props.value?this.props.value:"";
+    return React.createElement("div", null, React.createElement("input", {
+      className:"form-control "+ (required ? "required" : ""),
+      type: "text",
+      onChange: onChange,
+      onKeyDown: onKeyDown,
+      value: userInput||(!filtered&&defaultValue)||"",
+      onClick: handleOnClick,
+      onBlur: handleOnBlur,
+      style:{width:width||'100%'}
+    }), suggestionsListComponent);
+  }
 }
 
 export default AutoComplete;
