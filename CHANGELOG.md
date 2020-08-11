@@ -10,6 +10,7 @@ This project changes will be shown here.
 - Issue 899 - Link dependant Sales Items
 ### Fixed
 - Issue 968 - Clear Special Attention Status Once Expired
+- Issue 970 - StreamOne Page Permissions
 
 ## [v4.3.4] - 2020-08-10
 ### Fixed
