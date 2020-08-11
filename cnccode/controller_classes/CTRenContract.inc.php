@@ -354,8 +354,7 @@ class CTRenContract extends CTCNC
         }
 
         $officeItems = new DBEItem($this);
-        $officeItems->setValue(DBEItem::description, "+CNC +Office +365 +Backup");
-        $officeItems->getRowsByDescriptionMatch();
+        $officeItems->getRowsByDescriptionMatch("+CNC +Office +365 +Backup");
         $isOfficeItem = false;
         while (!$isOfficeItem && $officeItems->fetchNext()) {
             $isOfficeItem = $officeItems->getValue(DBEItem::itemID) == $dbeItem->getValue(DBEItem::itemID);
@@ -376,9 +375,9 @@ class CTRenContract extends CTCNC
                 'users'                              => Controller::htmlDisplayText(
                     $dsRenContract->getValue(DBEJRenContract::users)
                 ),
-                'usersDisable'                              => Controller::htmlDisplayText(
-                    $dbeItem->getValue(DBEItem::isStreamOne) || $isOfficeItem || $isWebroot ?'readonly':''
-                ),                
+                'usersDisable'                       => Controller::htmlDisplayText(
+                    $dbeItem->getValue(DBEItem::isStreamOne) || $isOfficeItem || $isWebroot ? 'readonly' : ''
+                ),
                 'salePricePerMonth'                  => $dsRenContract->getValue(DBECustomerItem::salePricePerMonth),
                 'costPricePerMonth'                  => $dsRenContract->getValue(DBECustomerItem::costPricePerMonth),
                 'siteDesc'                           => Controller::htmlDisplayText(
