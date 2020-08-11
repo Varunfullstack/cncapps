@@ -361,7 +361,7 @@ class CTRenContract extends CTCNC
         }
 
         $isWebroot = $dbeItem->getValue(DBEItem::itemID) == CONFIG_WEBROOT_ITEMTYPEID;
-
+        $isDUO = $dbeItem->getValue(DBEItem::itemID) == CONFIG_DUO_ITEMID;
 
         $this->template->set_var(
             array(
@@ -376,7 +376,7 @@ class CTRenContract extends CTCNC
                     $dsRenContract->getValue(DBEJRenContract::users)
                 ),
                 'usersDisable'                       => Controller::htmlDisplayText(
-                    $dbeItem->getValue(DBEItem::isStreamOne) || $isOfficeItem || $isWebroot ? 'readonly' : ''
+                    $dbeItem->getValue(DBEItem::isStreamOne) || $isOfficeItem || $isWebroot || $isDUO ? 'readonly' : ''
                 ),
                 'salePricePerMonth'                  => $dsRenContract->getValue(DBECustomerItem::salePricePerMonth),
                 'costPricePerMonth'                  => $dsRenContract->getValue(DBECustomerItem::costPricePerMonth),

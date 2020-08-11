@@ -30,6 +30,7 @@
         "ext-intl": "*",
         "rlanvin/php-rrule": "^2.2",
         "guzzlehttp/guzzle": "^7.0",
+        "duosecurity/duo_api_php": "dev-master",
         "karriere/json-decoder": "^3.1"
     },
     "autoload": {
