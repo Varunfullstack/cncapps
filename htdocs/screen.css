@@ -898,7 +898,7 @@ table.cell-padding-1 th, table.cell-padding-1 td {
 }
 
 .typeahead-input {
-    width: 346px;
+    width: 353px;
 }
 
 
@@ -909,7 +909,7 @@ table.cell-padding-1 th, table.cell-padding-1 td {
 
 .wrapper span {
     position: absolute;
-    left: 336px;
+    right: 7px;
     height: 22px;
 }
 
