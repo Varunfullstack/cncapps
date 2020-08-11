@@ -851,6 +851,17 @@ class DBECustomer extends DBCNCEntity
         $this->fetchNext();
         return $this;
     }
+
+    public function getBreachedSpecialAttentionCustomers()
+    {
+        $this->setMethodName('getBreachedSpecialAttentionCustomers');
+        $queryString =
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE {$this->getDBColumnName(self::specialAttentionFlag)} = 'Y' and {$this->getDBColumnName(self::specialAttentionEndDate)}  <= current_date() ";
+
+        $this->setQueryString($queryString);
+        $ret = (self::getRows());
+        return $ret;
+    }
 }
 
 ?>
