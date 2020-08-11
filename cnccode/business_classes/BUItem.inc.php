@@ -71,11 +71,7 @@ class BUItem extends Business
                 ));
             }
             if (!$ret) {
-                $this->dbeItem->setValue(
-                    DBEItem::description,
-                    $matchString
-                );
-                $this->dbeItem->getRowsByDescriptionMatch($renewalTypeID);
+                $this->dbeItem->getRowsByDescriptionOrPartNoSearch($matchString, $renewalTypeID);
                 $ret = ($this->getData(
                     $this->dbeItem,
                     $dsResults

@@ -194,23 +194,26 @@ class DBEItem extends DBCNCEntity
      * Get rows by description match
      * Excludes discontinued rows
      * @access public
+     * @param string|null $search
      * @param bool $renewalTypeID
      * @return bool Success
      */
-    function getRowsByDescriptionMatch($renewalTypeID = false)
+    function getRowsByDescriptionMatch(string $search, $renewalTypeID = false)
     {
         $this->setMethodName("getRowsByDescriptionMatch");
-
-        if (!$this->getValue(self::description)) {
-            $this->raiseError('description not set');
-        }
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
             " WHERE 1=1";
-        $queryString .=
-            " AND MATCH (item.itm_desc, item.notes, item.itm_unit_of_sale)
-				AGAINST ('" . $this->getValue(self::description) . "' IN BOOLEAN MODE)";
+
+        if ($search) {
+            $queryString .=
+                " AND MATCH (item.itm_desc, item.itm_unit_of_sale)
+				AGAINST ('" . mysqli_real_escape_string(
+                    $this->db->link_id(),
+                    $search
+                ) . "' IN BOOLEAN MODE)";
+        }
 
         if ($renewalTypeID) {
             $queryString .= " AND renewalTypeID = $renewalTypeID";
@@ -222,6 +225,39 @@ class DBEItem extends DBCNCEntity
             " LIMIT 0,200";
         $this->setQueryString($queryString);
 
+        $ret = (parent::getRows());
+        return $ret;
+    }
+
+    function getRowsByDescriptionOrPartNoSearch(string $search, $renewalTypeID = false, $limit = 200)
+    {
+        $this->setMethodName("getRowsByDescriptionMatch");
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " WHERE 1=1";
+
+        if ($search) {
+            $searchEscaped = mysqli_real_escape_string(
+                $this->db->link_id(),
+                "%{$search}%"
+            );
+            $queryString .=
+                " AND (item.itm_desc like '{$searchEscaped}' or item.itm_unit_of_sale like '{$searchEscaped}') ";
+        }
+
+        if ($renewalTypeID) {
+            $queryString .= " AND renewalTypeID = $renewalTypeID";
+        }
+
+        $queryString .=
+            " AND " . $this->getDBColumnName(self::discontinuedFlag) . " <> 'Y'" .
+            " ORDER BY " . $this->getDBColumnName(self::description);
+
+        if ($limit) {
+            $queryString .= " LIMIT 0,$limit";
+        }
+        $this->setQueryString($queryString);
         $ret = (parent::getRows());
         return $ret;
     }
@@ -342,6 +378,30 @@ class DBEItem extends DBCNCEntity
                               {$this->getDBColumnName(self::partNo)} = '{$sku}' or {$this->getDBColumnName(self::partNoOld)} = '{$sku}' limit 1";
         $this->setQueryString($queryString);
         return parent::getRows();
+    }
+
+    public function getChildItems($parentItemId)
+    {
+        global $db;
+        $escapedParentItemId = mysqli_real_escape_string($db->link_id(), $parentItemId);
+        $queryString =
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} 
+                join childItem on parentItemId = '{$escapedParentItemId}' and childItemId =  {$this->getDBColumnName(self::itemID)}";
+
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+    }
+
+    public function getParentItems($itemId)
+    {
+        global $db;
+        $escapedItemId = mysqli_real_escape_string($db->link_id(), $itemId);
+        $queryString =
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} 
+                join childItem on childItemId = '{$escapedItemId}' and parentItemId =  {$this->getDBColumnName(self::itemID)}";
+
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
     }
 
 }

@@ -27,6 +27,7 @@ require_once($cfg["path_dbe"] . "/DBEQuotationTemplate.inc.php");
 require_once($cfg["path_dbe"] . "/DBESignableEnvelope.inc.php");
 require_once($cfg["path_func"] . "/Common.inc.php");
 require_once($cfg ["path_bu"] . "/BUMail.inc.php");
+require_once($cfg['path_dbe'] . '/DBESupplier.inc.php');
 // Parameters
 define(
     'CTSALESORDER_VAL_NONE_SELECTED',
@@ -4124,6 +4125,15 @@ class CTSalesOrder extends CTCNC
                 'SalesOrderLineEditJS'  => 'SalesOrderLineEditJS.inc' // javascript
             )
         );
+
+        $this->template->setVar(
+            [
+                'javaScript' => '<script src="js/react.development.js" crossorigin></script>
+                    <script src="js/react-dom.development.js" crossorigin></script>
+                    <script type="module" src=\'components/ChildAndParentItems/ChildAndParentItems.js\'></script>'
+            ]
+        );
+
         $this->displaySalesOrderHeader($dsOrdhead);
         $this->orderLineForm($dsOrdhead);
         $this->template->parse(
@@ -4280,8 +4290,54 @@ class CTSalesOrder extends CTCNC
             $this->editOrderLine();
             exit;
         }
+
         if ($this->getAction() == CTSALESORDER_ACT_INSERT_ORDLINE) {
             $this->buSalesOrder->insertNewOrderLine($this->dsOrdline);
+            if ($this->dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
+                $dbeItem = new DBEItem($this);
+                $itemID = $this->dsOrdline->getValue(DBEOrdline::itemID);
+                $dbeItem->getChildItems($itemID);
+
+                $rowCount = 1;
+                $dbeSupplier = new DBESupplier($this);
+                $dbeSupplier->getRow(53);
+                while ($dbeItem->fetchNext()) {
+                    $toInsertChildDsOrdline = new DataSet($this);
+                    $toInsertChildDsOrdline->copyColumnsFrom($dbeOrdline);
+                    $toInsertChildDsOrdline->setValue(
+                        DBEOrdline::ordheadID,
+                        $this->dsOrdline->getValue(DBEOrdline::ordheadID)
+                    );
+                    $toInsertChildDsOrdline->setValue(DBEOrdline::itemID, $dbeItem->getValue(DBEItem::itemID));
+                    $toInsertChildDsOrdline->setValue(DBEOrdline::lineType, 'I');
+                    $toInsertChildDsOrdline->setValue(
+                        DBEOrdline::supplierID,
+                        $dbeSupplier->getValue(DBESupplier::supplierID)
+                    );
+                    $toInsertChildDsOrdline->setValue(
+                        DBEOrdline::qtyOrdered,
+                        $this->dsOrdline->getValue(DBEOrdline::qtyOrdered)
+                    );
+                    $toInsertChildDsOrdline->setValue(
+                        DBEOrdline::curUnitCost,
+                        $dbeItem->getValue(DBEItem::curUnitCost)
+                    );
+                    $toInsertChildDsOrdline->setValue(
+                        DBEOrdline::curUnitSale,
+                        $dbeItem->getValue(DBEItem::curUnitSale)
+                    );
+                    $toInsertChildDsOrdline->setValue(
+                        DBEOrdline::description,
+                        $dbeItem->getValue(DBEItem::description)
+                    );
+                    $sequenceNo = $this->dsOrdline->getValue(DBEOrdline::sequenceNo);
+                    if ($sequenceNo) {
+                        $toInsertChildDsOrdline->setValue(DBEOrdline::sequenceNo, $sequenceNo + $rowCount);
+                    }
+                    $rowCount++;
+                    $this->buSalesOrder->insertNewOrderLine($toInsertChildDsOrdline);
+                }
+            }
         } else {
             $this->buSalesOrder->updateOrderLine($this->dsOrdline);
         }

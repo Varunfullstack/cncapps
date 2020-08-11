@@ -773,7 +773,13 @@ class Controller extends BaseObject
                 break;
 
             default:
-                $this->defaultAction();
+                try {
+                    $this->defaultAction();
+                } catch (\CNCLTD\Exceptions\JsonHttpException $exception) {
+                    echo $exception->getMessage();
+                    http_response_code($exception->getResponseCode());
+                    exit;
+                }
                 break;
         }
     }

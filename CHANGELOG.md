@@ -7,6 +7,7 @@ This project changes will be shown here.
 - Issue 971 - Ability to allocate Sales Requests to people
 ### Changed
 - Issue 964 - Make Office 365 Backup unit numbers field read only because it's linked to an API
+- Issue 899 - Link dependant Sales Items
 ### Fixed
 - Issue 968 - Clear Special Attention Status Once Expired
 
