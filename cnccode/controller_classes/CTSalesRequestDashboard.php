@@ -13,6 +13,9 @@ require_once($cfg['path_dbe'] . '/DBECallDocumentWithoutFile.php');
 
 class CTSalesRequestDashboard extends CTCNC
 {
+    private $allocatedUser;
+    private $filterUser;
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -41,7 +44,22 @@ class CTSalesRequestDashboard extends CTCNC
     {
 
         switch ($this->getAction()) {
+            case 'assignUser':
+                $data = json_decode(file_get_contents('php://input'), true);
 
+                if (!array_key_exists('userId', $data)) {
+                    throw new Exception('user ID Field required');
+                }
+                if (!array_key_exists('problemId', $data) || !isset($data['problemId'])) {
+                    throw new Exception('Problem ID required');
+                }
+
+                $dbeProblem = new DBEProblem($this);
+                $dbeProblem->getRow($data['problemId']);
+                $dbeProblem->setValue(DBEProblem::salesRequestAssignedUserId, $data['userId']);
+                $dbeProblem->updateRow();
+                echo json_encode(["status" => "ok"]);
+                break;
             default:
                 $this->displayReport();
                 break;
@@ -115,12 +133,40 @@ class CTSalesRequestDashboard extends CTCNC
 
             $dbeStandardText = new DBEStandardText($this);
             $dbeStandardText->getRow($dbejCallActivity->getValue(DBEJCallActivity::requestType));
+            $dbeProblem = new DBEProblem($this);
+            $dbeProblem->getRow($dbejCallActivity->getValue(DBECallActivity::problemID));
 
+            $dbeUser = new DBEUser($this);
+
+            $dbeUser->getRows('firstName');
+
+            while ($dbeUser->fetchNext()) {
+
+                $userRow =
+                    array(
+                        'userID'   => $dbeUser->getValue(DBEUser::userID),
+                        'userName' => $dbeUser->getValue(DBEUser::name),
+                        'fullName' => $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(
+                                DBEUser::lastName
+                            )
+                    );
+
+                $this->allocatedUser[$dbeUser->getValue(DBEUser::userID)] = $userRow;
+
+                if ($dbeUser->getValue(DBEUser::appearInQueueFlag) == 'Y') {
+
+                    $this->filterUser[$dbeUser->getValue(DBEUser::userID)] = $userRow;
+                }
+            }
 
             $this->template->set_var(
                 [
                     'customerName'      => $dbejCallActivity->getValue(DBEJCallActivity::customerName),
                     'srLink'            => $srLink,
+                    'engineerDropDown'  => $this->getAllocatedUserDropdown(
+                        $dbeProblem->getValue(DBEProblem::salesRequestAssignedUserId)
+                    ),
+                    'problemId'         => $dbeProblem->getValue(DBEProblem::problemID),
                     'salesRequest'      => $dbejCallActivity->getValue(DBEJCallActivity::reason),
                     'requestedBy'       => $dbejCallActivity->getValue(DBEJCallActivity::userAccount),
                     'requestedDateTime' => $dbejCallActivity->getValue(
@@ -147,6 +193,33 @@ class CTSalesRequestDashboard extends CTCNC
         );
         $this->parsePage();
 
+
+    }
+
+    /**
+     * return list of user options for dropdown
+     *
+     * @param mixed $selectedID
+     * @return string
+     * @throws Exception
+     */
+    function getAllocatedUserDropdown($selectedID
+    )
+    {
+
+        // user selection
+        $userSelected = !$selectedID ? CT_SELECTED : null;
+        $string = '<option ' . $userSelected . ' value=""></option>';
+
+        foreach ($this->allocatedUser as $value) {
+
+            $userSelected = ($selectedID == $value['userID']) ? CT_SELECTED : null;
+
+            $string .= "<option {$userSelected} value='{$value['userID']}'>{$value['userName']}</option>";
+
+        }
+
+        return $string;
 
     }
 }

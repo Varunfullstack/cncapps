@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Added
 - Issue 961 - Team Performance at the start of the month
+- Issue 971 - Ability to allocate Sales Requests to people
 ### Changed
 - Issue 964 - Make Office 365 Backup unit numbers field read only because it's linked to an API
 ### Fixed
