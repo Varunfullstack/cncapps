@@ -650,6 +650,23 @@ class DBECustomer extends DBCNCEntity
         return $ret;
     }
 
+    function getCustomerByName($name)
+    {
+        $this->setMethodName("getCustomerByName");
+
+        $queryString =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " where 
+				cus_name = '$name'
+				and {$this->getDBColumnName(DBECustomer::referredFlag)} <> 'Y' 
+				and {$this->getDBColumnName(DBECustomer::becameCustomerDate)} is not null and {$this->getDBColumnName(DBECustomer::droppedCustomerDate)} is null
+				LIMIT 1";
+        $this->setQueryString($queryString);
+        $ret = (parent::getRows());
+        return $ret;
+    }
+
     /**
      * Count review rows
      *

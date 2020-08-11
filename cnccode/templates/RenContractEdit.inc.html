@@ -110,9 +110,9 @@
 
 </script>
 <style>
-    input[readonly].users{
+    input[readonly].users {
         background-color: rgb(231, 231, 231);
-        
+
     }
 </style>
 <!-- Template: RenContractEdit.inc.html -->
@@ -217,16 +217,16 @@
         {prices}
         <tr>
             <td class="promptText">Number of Users/Units</td>
-            <td class="fieldText" > 
-                 <input name="renContract[1][users]"
+            <td class="fieldText">
+                <input name="renContract[1][users]"
                        type="number"
                        value="{users}"
                        title="Users"
                        onkeyup="recalculatePrices()"
                        id="units"
-                        class="users"
+                       class="users"
                        {usersDisable}
-                     
+
                 >
                 <span class="formErrorMessage">{usersMessage}</span>
             </td>
@@ -237,6 +237,7 @@
                 <input type="number"
                        value="{salePricePerMonth}"
                        onkeyup="recalculateSalePrice()"
+                       onmouseup="recalculateSalePrice()"
                        id="unitSale"
                        step="0.01"
                        name="renContract[1][salePricePerMonth]"
@@ -248,7 +249,8 @@
             <td class="fieldText">
                 <input type="number"
                        value="{costPricePerMonth}"
-                       onkeyup="recalculateCostPrice()"
+                       onkeyup="recalculateSalePrice()"
+                       onmouseup="recalculateSalePrice()"
                        id="unitCost"
                        step="0.01"
                        name="renContract[1][costPricePerMonth]"

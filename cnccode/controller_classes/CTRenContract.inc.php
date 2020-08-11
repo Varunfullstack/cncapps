@@ -361,6 +361,9 @@ class CTRenContract extends CTCNC
             $isOfficeItem = $officeItems->getValue(DBEItem::itemID) == $dbeItem->getValue(DBEItem::itemID);
         }
 
+        $isWebroot = $dbeItem->getValue(DBEItem::itemID) == CONFIG_WEBROOT_ITEMTYPEID;
+
+
         $this->template->set_var(
             array(
                 'customerItemID'                     => $dsRenContract->getValue(DBEJRenContract::customerItemID),
@@ -373,9 +376,9 @@ class CTRenContract extends CTCNC
                 'users'                              => Controller::htmlDisplayText(
                     $dsRenContract->getValue(DBEJRenContract::users)
                 ),
-                'usersDisable'                       => Controller::htmlDisplayText(
-                    $dbeItem->getValue(DBEItem::isStreamOne) == 1 || $isOfficeItem ? 'readonly' : ''
-                ),
+                'usersDisable'                              => Controller::htmlDisplayText(
+                    $dbeItem->getValue(DBEItem::isStreamOne) || $isOfficeItem || $isWebroot ?'readonly':''
+                ),                
                 'salePricePerMonth'                  => $dsRenContract->getValue(DBECustomerItem::salePricePerMonth),
                 'costPricePerMonth'                  => $dsRenContract->getValue(DBECustomerItem::costPricePerMonth),
                 'siteDesc'                           => Controller::htmlDisplayText(

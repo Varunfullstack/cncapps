@@ -1288,7 +1288,10 @@ define(
     'CONFIG_PREPAY_ITEMTYPEID',
     57
 );
-
+define(
+    'CONFIG_WEBROOT_ITEMTYPEID',
+    17619
+);
 define(
     'CONFIG_2NDSITE_LOCAL_ITEMTYPEID',
     58
