@@ -27,6 +27,7 @@ class DBEOrdline extends DBEntity
     const curUnitSale = "curUnitSale";
     const curTotalSale = "curTotalSale";
     const renewalCustomerItemID = "renewalCustomerItemID";
+    const isRecurring = "isRecurring";
 
     /**
      * calls constructor()
@@ -140,6 +141,13 @@ class DBEOrdline extends DBEntity
             DA_ID,
             DA_ALLOW_NULL,
             "odl_renewal_cuino"
+        );
+        $this->addColumn(
+            self::isRecurring,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            null,
+            false
         );
         $this->setPK(0);
         $this->setAddColumnsOff();

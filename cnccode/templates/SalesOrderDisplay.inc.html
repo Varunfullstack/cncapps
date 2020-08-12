@@ -33,7 +33,6 @@
 <script language='JavaScript'
         src="CommonJS.js"
 ></script>
-{salesOrderLineEditJS} {salesOrderSiteEditJS}
 <script language='JavaScript'>
     window.addEventListener('DOMContentLoaded', function () {
         window.fromDate = $('#fromDate').get(0);
@@ -161,66 +160,70 @@
         }
     }
 </script>
+{salesOrderLineEditJS} {salesOrderSiteEditJS}
 {projectLink}
-<TABLE width="1000px"
-       border="0"
-       cellpadding="2"
-       cellspacing="1"
->
-    <TR>
-        <TD width="100px"
-            class="navigateLink"
-            valign="top"
-        ><a href="{urlDeleteOrder}"
-            onClick="if(!confirm('Are you sure you want to remove this quote?')) return(false)"
-        >{txtDeleteOrder}</a>
-        </TD>
-        <TD width="100px"
-            class="navigateLink"
-            valign="top"
-        ><a href="{urlPurchaseOrders}">{txtPurchaseOrders}</a>
-        </TD>
-        <TD width="100px"
-            class="navigateLink"
-            valign="top"
-        ><a href="{urlInvoices}">{txtInvoices}</a>
-        </TD>
-        <TD width="100px"
-            class="navigateLink"
-            valign="top"
-        ><a href="{urlDespatch}">{txtDespatch}</a>
-        </TD>
-        <TD width="100px"
-            class="navigateLink"
-            valign="top"
-        > {linkServiceRequest}
-        </TD>
-        <TD width="100px"
-            class="navigateLink"
-            valign="top"
-        ><a href="{urlRenewalReport}"
-            target="_blank"
-        >{txtRenewalReport}</a>
-        </TD>
-        <TD width="100px"
-            class="navigateLink"
-            valign="top"
-        ><a href="javascript:"
-            onclick="customerNotePopup()"
-        >{txtCustomerNote}</a></TD>
-        <TD width="100px"
-            class="navigateLink"
-            valign="top"
-        >
-        </TD>
-        <TD width="100px"
-            valign="top"
-        >{uncSalesOrderConf}
-        </TD>
-    </TR>
-</table>
-<br/>
-{salesOrderHeadDisplay} {salesOrderDisplayNewLine}
+<div style="position: sticky; top: -1px; background: white;padding-top: 6px">
+    <TABLE width="1000px"
+           border="0"
+           cellpadding="2"
+           cellspacing="1"
+    >
+        <TR>
+            <TD width="100px"
+                class="navigateLink"
+                valign="top"
+            ><a href="{urlDeleteOrder}"
+                onClick="if(!confirm('Are you sure you want to remove this quote?')) return(false)"
+            >{txtDeleteOrder}</a>
+            </TD>
+            <TD width="100px"
+                class="navigateLink"
+                valign="top"
+            ><a href="{urlPurchaseOrders}">{txtPurchaseOrders}</a>
+            </TD>
+            <TD width="100px"
+                class="navigateLink"
+                valign="top"
+            ><a href="{urlInvoices}">{txtInvoices}</a>
+            </TD>
+            <TD width="100px"
+                class="navigateLink"
+                valign="top"
+            ><a href="{urlDespatch}">{txtDespatch}</a>
+            </TD>
+            <TD width="100px"
+                class="navigateLink"
+                valign="top"
+            > {linkServiceRequest}
+            </TD>
+            <TD width="100px"
+                class="navigateLink"
+                valign="top"
+            ><a href="{urlRenewalReport}"
+                target="_blank"
+            >{txtRenewalReport}</a>
+            </TD>
+            <TD width="100px"
+                class="navigateLink"
+                valign="top"
+            ><a href="javascript:"
+                onclick="customerNotePopup()"
+            >{txtCustomerNote}</a></TD>
+            <TD width="100px"
+                class="navigateLink"
+                valign="top"
+            >
+            </TD>
+            <TD width="100px"
+                valign="top"
+            >{uncSalesOrderConf}
+            </TD>
+        </TR>
+    </table>
+    <br/>
+    {salesOrderHeadDisplay} {salesOrderDisplayNewLine}
+</div>
+
 <form name="quickQuoteForm"
       method="POST"
       enctype="multipart/form-data"
