@@ -424,6 +424,175 @@
                 <font class="formErrorMessage">{linesMessage}</font>
             </td>
     </table>
+    <table class="singleBorder"
+           width="970"
+           border="0"
+           cellspacing="1"
+           cellpadding="1"
+    >
+        <tr>
+            <td width="16px"
+                class="listHeadText"
+            >
+                <input type="checkbox"
+                       name="Toggle"
+                       onClick="ToggleSelectedLines(document.quickQuoteForm.Toggle.checked)"
+                >
+            </td>
+            <td width="10px"
+                class="listHeadText"
+            >&nbsp;
+            </td>
+            <td width="242px"
+                class="listHeadText"
+            >Description
+            </td>
+            <td width="57px"
+                class="listHeadText"
+            >Part No
+            </td>
+            <td width="125px"
+                class="listHeadText"
+            >Supplier
+            </td>
+            <td width="50px"
+                class="listHeadText"
+            >
+                <DIV align="right">Qty</DIV>
+            </td>
+            <td width="50px"
+                class="listHeadText"
+            >
+                <DIV align="right">Cost(&pound;)</DIV>
+            </td>
+            <td width="50px"
+                class="listHeadText"
+            >
+                <DIV align="right">Total(&pound;)</DIV>
+            </td>
+            <td width="50px"
+                class="listHeadText"
+            >
+                <DIV align="right">Sale(&pound;)</DIV>
+            </td>
+            <td width="50px"
+                class="listHeadText"
+            >
+                <DIV align="right">Total(&pound;)</DIV>
+            </td>
+            <td width="50px"
+                class="listHeadText"
+            >
+                <DIV align="right">Profit(&pound;)</DIV>
+            </td>
+            <td width="50px"
+                class="listHeadText"
+            >
+                <DIV align="right">Profit(%)</DIV>
+            </td>
+            <td width="100px"
+                class="orderLineClass"
+            >
+                <div align="left">{salesOrderDisplayCreatePO}{salesOrderDisplayUpdateLines}</div>
+            </td>
+        </tr>
+        <!-- BEGIN recurringOrderLineBlock -->
+        <INPUT type="hidden"
+               id="lineType"
+               name="ordline[{lineId}][lineType]"
+               value="{lineType}"
+        >
+        <INPUT type="hidden"
+               id="description"
+               name="ordline[{lineId}][description]"
+               value="{description}"
+        >
+        <INPUT type="hidden"
+               id="supplierName"
+               name="ordline[{lineId}][supplierName]"
+               value="{supplierName}"
+        >
+        {salesOrderLine}
+        <!-- END recurringOrderLineBlock -->
+        <tr>
+            <td>&nbsp;</td>
+            <td class="orderTotalItem">&nbsp;</td>
+            <td class="orderTotalItem">
+                <DIV align="left"> Totals</DIV>
+            </td>
+            <td class="orderTotalItem">&nbsp;</td>
+            <td class="orderTotalItem">&nbsp;</td>
+            <td class="orderTotalItem">&nbsp;</td>
+            <td class="orderTotalItem">&nbsp;</td>
+            <td class="{recurringOrderTotalCostClass}">{recurringCurCostGrandTotal}</td>
+            <td class="orderTotalItem">&nbsp;</td>
+            <td class="{recurringOrderTotalSaleClass}">{recurringCurSaleGrandTotal}</td>
+            <td class="{recurringOrderTotalProfitClass}">{recurringCurProfitGrandTotal}</td>
+            <td class="{recurringOrderTotalProfitClass}">{recurringPercProfitGrandTotal}</td>
+            <td class="{orderTotalItem}">{salesOrderDisplayUpdateLines}</td>
+        </tr>
+        <tr>
+            <td colspan="7">
+                <img src="./images/arrow_ltr.gif"
+                     border="0"
+                     width="38"
+                     height="22"
+                     alt="With selected lines:"
+                />
+
+                <input
+                        type="hidden"
+                        name="form[updateSupplierID]"
+                        id="updateSupplierID"
+                        value="{updateSupplierID}"
+                >
+
+                <select
+                        {readOnly}
+                        type="text"
+                        id="action"
+                        name="form[action]"
+                        onChange="selectionChanged()"
+                >
+                    <!-- BEGIN actionBlock -->
+                    <option {SELECTED}
+                            value="{action}"
+                            {disabled}
+                    >{actionDescription}
+                    </option>
+                    <!-- END actionBlock -->
+                </select>
+                <input
+                        {fromOrdheadIDStyle}
+                        type="text"
+                        name="form[fromOrdheadID]"
+                        id="fromOrdheadID"
+                        value="{fromOrdheadID}"
+                        placeholder="From Sales Order ID"
+                >
+                <input
+                        {updateSupplierNameStyle}
+                        type="text"
+                        name="form[updateSupplierName]"
+                        id="updateSupplierName"
+                        value="{updateSupplierName}"
+                        onChange="javascript:validateUpdateSupplierName()"
+                        onKeydown="javascript:checkFunctionKey(updateSupplierName)"
+                        size="35"
+                        maxlength="50"
+                        placeholder="Supplier Name or ID"
+                >
+                <font class="formErrorMessage">{updateSupplierNameMessage}</font>
+                <input
+                        {readOnly}
+                        type="submit"
+                        name="Submit"
+                        value="Go"
+                        onClick="return bulkUpdateClick()"
+                >
+                <font class="formErrorMessage">{linesMessage}</font>
+            </td>
+    </table>
     {salesOrderGenerateQuotes}
 
 </form>

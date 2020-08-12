@@ -1709,17 +1709,38 @@ class CTSalesOrder extends CTCNC
         $curSaleGrandTotal = 0;
         $curProfitGrandTotal = 0;
         $curCostGrandTotal = 0;
+        $percProfitGrandTotal = 0;
+
+        $recurringCurSaleGrandTotal = 0;
+        $recurringCurCostGrandTotal = 0;
+        $recurringCurProfitGrandTotal = 0;
+        $recurringPercProfitGrandTotal = 0;
+
 
         $firstLine = true;
         $hasGreenArrow = false;
         if ($dsOrdline->fetchNext()) {
+
             $this->template->set_block(
                 'SalesOrderDisplay',
                 'orderLineBlock',
                 'orderLines'
             );
 
+            $this->template->set_block(
+                'SalesOrderDisplay',
+                'recurringOrderLineBlock',
+                'recurringOrderLines'
+            );
+
+            $handle = 'orderLineBlock';
+            $name = "orderLines";
+
             do {
+                if ($dsOrdline->getValue(DBEOrdline::isRecurring)) {
+                    $handle = "recurringOrderLineBlock";
+                    $name = "recurringOrderLines";
+                }
                 $renewalIcon = null;
                 if ($dsOrdline->getValue(DBEJOrdline::renewalTypeID)) {
                     if (!$buRenewal) {
@@ -1851,12 +1872,14 @@ class CTSalesOrder extends CTCNC
                         'removeDescription'  => $removeDescription,
                         'urlEditLine'        => $urlEditLine,
                         'urlDeleteLine'      => $urlDeleteLine,
-                        'urlAddLine'         => $urlAddLine
+                        'urlAddLine'         => $urlAddLine,
+                        'isRecurring'        => $dsOrdline->getValue(DBEOrdline::isRecurring) ? 'true' : 'false'
                     )
                 );
                 if ($dsOrdline->getValue(
                         DBEOrdline::lineType
                     ) == "I") {                    // Item line needs all these fields
+
                     $curSaleTotal = $dsOrdline->getValue(DBEOrdline::curUnitSale) * $dsOrdline->getValue(
                             DBEOrdline::qtyOrdered
                         );
@@ -1907,9 +1930,17 @@ class CTSalesOrder extends CTCNC
                                 'orderLineCostTotalClass' => ($curCostTotal < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM
                             )
                         );
-                        $curSaleGrandTotal += $curSaleTotal;
-                        $curProfitGrandTotal += $curProfit;
-                        $curCostGrandTotal += $curCostTotal;
+
+                        if (!$dsOrdline->getValue(DBEOrdline::isRecurring)) {
+                            $curSaleGrandTotal += $curSaleTotal;
+                            $curProfitGrandTotal += $curProfit;
+                            $curCostGrandTotal += $curCostTotal;
+                        } else {
+                            $recurringCurSaleGrandTotal += $curSaleTotal;
+                            $recurringCurCostGrandTotal += $curProfit;
+                            $recurringCurProfitGrandTotal += $curCostTotal;
+
+                        }
 
                         if (!$readOnly) {
 
@@ -1959,8 +1990,8 @@ class CTSalesOrder extends CTCNC
                     );
                 }
                 $this->template->parse(
-                    'orderLines',
-                    'orderLineBlock',
+                    $name,
+                    $handle,
                     true
                 );
                 $this->template->set_var(
@@ -1981,23 +2012,32 @@ class CTSalesOrder extends CTCNC
         // END OF ORDER LINES SECTION
 
         // Order totals
-        if ($curCostGrandTotal != 0) {
-            $percProfitGrandTotal = $curProfitGrandTotal * (100 / $curCostGrandTotal);
+        if (!$dsOrdline->getValue(DBEOrdline::isRecurring)) {
+            if ($curCostGrandTotal) {
+                $percProfitGrandTotal = $curProfitGrandTotal * (100 / $curCostGrandTotal);
+            }
         } else {
-            $percProfitGrandTotal = 0;
+            if ($recurringCurCostGrandTotal) {
+                $recurringPercProfitGrandTotal = $recurringCurProfitGrandTotal * (100 / $recurringCurCostGrandTotal);
+            }
         }
+
         $this->template->set_var(
             array(
-                'curSaleGrandTotal'     => Controller::formatNumber($curSaleGrandTotal),
-                'curCostGrandTotal'     => Controller::formatNumber($curCostGrandTotal),
-                'curProfitGrandTotal'   => Controller::formatNumber($curProfitGrandTotal),
-                'percProfitGrandTotal'  => Controller::formatNumber(
-                    $percProfitGrandTotal,
-                    1
-                ),
-                'orderTotalProfitClass' => ($curProfitGrandTotal < 0) ? CTSALESORDER_CLS_ORDER_TOTAL_LOSS : CTSALESORDER_CLS_ORDER_TOTAL_ITEM,
-                'orderTotalSaleClass'   => ($curSaleGrandTotal < 0) ? CTSALESORDER_CLS_ORDER_TOTAL_LOSS : CTSALESORDER_CLS_ORDER_TOTAL_ITEM,
-                'orderTotalCostClass'   => ($curCostGrandTotal < 0) ? CTSALESORDER_CLS_ORDER_TOTAL_LOSS : CTSALESORDER_CLS_ORDER_TOTAL_ITEM
+                'curSaleGrandTotal'              => Controller::formatNumber($curSaleGrandTotal),
+                'curCostGrandTotal'              => Controller::formatNumber($curCostGrandTotal),
+                'curProfitGrandTotal'            => Controller::formatNumber($curProfitGrandTotal),
+                'percProfitGrandTotal'           => Controller::formatNumber($percProfitGrandTotal, 1),
+                'orderTotalProfitClass'          => ($curProfitGrandTotal < 0) ? CTSALESORDER_CLS_ORDER_TOTAL_LOSS : CTSALESORDER_CLS_ORDER_TOTAL_ITEM,
+                'orderTotalSaleClass'            => ($curSaleGrandTotal < 0) ? CTSALESORDER_CLS_ORDER_TOTAL_LOSS : CTSALESORDER_CLS_ORDER_TOTAL_ITEM,
+                'orderTotalCostClass'            => ($curCostGrandTotal < 0) ? CTSALESORDER_CLS_ORDER_TOTAL_LOSS : CTSALESORDER_CLS_ORDER_TOTAL_ITEM,
+                'recurringCurCostGrandTotal'     => Controller::formatNumber($recurringCurSaleGrandTotal),
+                'recurringCurSaleGrandTotal'     => Controller::formatNumber($recurringCurCostGrandTotal),
+                'recurringCurProfitGrandTotal'   => Controller::formatNumber($recurringCurProfitGrandTotal),
+                'recurringPercProfitGrandTotal'  => Controller::formatNumber($recurringPercProfitGrandTotal, 1),
+                'recurringOrderTotalCostClass'   => ($recurringCurProfitGrandTotal < 0) ? CTSALESORDER_CLS_ORDER_TOTAL_LOSS : CTSALESORDER_CLS_ORDER_TOTAL_ITEM,
+                'recurringOrderTotalSaleClass'   => ($recurringCurSaleGrandTotal < 0) ? CTSALESORDER_CLS_ORDER_TOTAL_LOSS : CTSALESORDER_CLS_ORDER_TOTAL_ITEM,
+                'recurringOrderTotalProfitClass' => ($recurringCurCostGrandTotal < 0) ? CTSALESORDER_CLS_ORDER_TOTAL_LOSS : CTSALESORDER_CLS_ORDER_TOTAL_ITEM,
             )
         );
         // End of order totals
