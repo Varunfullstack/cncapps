@@ -193,7 +193,7 @@ class CTCurrentActivityReportNew extends CTCNC
         $queueOptions = [
             '<option>-</option>',
         ];
-
+/*
         if ($queueNo != 1) {
             $queueOptions[] = '<option value="1">H</option>';
         }
@@ -215,7 +215,7 @@ class CTCurrentActivityReportNew extends CTCNC
         }
 
         $blockName = 'queue' . $queueNo . 'Block';
-       
+       */
         // $this->template->set_block(
         //     'CurrentActivityReport',
         //     $blockName,
@@ -226,6 +226,7 @@ class CTCurrentActivityReportNew extends CTCNC
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
         while ($serviceRequests->fetchNext()) {
+            
             $totalActivityDurationHours = $serviceRequests->getValue(DBEJProblem::totalActivityDurationHours);
             $totalActivityDurationMinutes = $totalActivityDurationHours * 60;
             $timeSpentColorClass = null;
@@ -253,13 +254,14 @@ class CTCurrentActivityReportNew extends CTCNC
             $this->customerFilterList[$serviceRequests->getValue(DBEJProblem::customerID)] = $serviceRequests->getValue(
                 DBEJProblem::customerName
             );
-
+            /*
             if (!in_array($serviceRequests->getValue(DBEJProblem::priority), $this->getSessionParam('priorityFilter'))
             ) {
                 continue;
             }
-
-
+*/
+/*
+Filter by selected customer
             if ($this->getSessionParam('selectedCustomerID') && $this->getSessionParam(
                     'selectedCustomerID'
                 ) != $serviceRequests->getValue(
@@ -267,7 +269,10 @@ class CTCurrentActivityReportNew extends CTCNC
                 )) {
                 continue;
             }
+*/
 
+/*
+fileter by user
             if ($this->getSessionParam('selectedUserID') &&
                 $serviceRequests->getValue(DBEJProblem::userID) &&
                 $this->getSessionParam(
@@ -277,7 +282,7 @@ class CTCurrentActivityReportNew extends CTCNC
                 )) {
                 continue;
             }
-
+*/
             $rowCount++;
 
             $urlViewActivity =

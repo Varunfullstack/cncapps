@@ -77,3 +77,11 @@ export function distinct(array,propertyName)
   }
   return array.filter(d);
 }
+export const Colors={
+  AMBER : '#FFF5B3',
+  RED : '#F8A5B6',
+  GREEN : '#BDF8BA',    
+  BLUE : '#b2daff',    
+  PURPLE : '#dcbdff',
+  ORANGE : '#FFE6AB',
+}

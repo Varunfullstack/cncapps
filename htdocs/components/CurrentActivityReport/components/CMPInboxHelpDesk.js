@@ -1,6 +1,7 @@
 import Table from "./../../utils/table/table.js?v=1";
+import {Colors} from "./../../utils/utils.js?v=1";
+
 import SVCCurrentActivityService from "./../services/SVCCurrentActivityService.js?v=1";
-import AutoComplete from "./../../utils/autoComplete.js?v=1";
 
 class CMPInboxHelpDesk extends React.Component {
   code = "H";
@@ -10,194 +11,207 @@ class CMPInboxHelpDesk extends React.Component {
     super(props);
     this.apiCurrentActivityService = new SVCCurrentActivityService();
   }
-  moveToAnotherTeam = () => {
-    const reason = prompt(
-      "Please provide a reason for moving this SR into a different queue"
-    );
-    console.log(reason);
-  };
-  startWork = (problem) => {
-    if (problem.lastCallActTypeID != null) {
-      const message =
-        "Are you sure you want to start work on this SR? It will be automatically allocated to you UNLESS it is already allocated";
-      if (confirm(message)) {
-        this.apiCurrentActivityService
-          .startActivityWork(problem.callActivityID)
-          .then((res) => {
-            if (res) {
-              console.log(res);
-              //reload
-            }
-          });
-        console.log(problem);
-      }
-    } else {
-      alert("Another user is currently working on this SR");
-    }
-  };
-  moveToAnotherTeam = ({ target }, problem) => {
-    console.log(target.value, problem, problem.problemStatus);
-    let answer = null;
-    if (problem.problemStatus === "P") {
-      answer = prompt(
-        "Please provide a reason for moving this SR into a different queue"
-      );
-      if (!answer) {
-        return;
-      }
-    }
 
-    this.apiCurrentActivityService
-      .changeQueue(problem.problemID, target.value, answer)
-      .then((res) => {
-        console.log(res);
-        if (res && res.status) {
-          this.props.loadQueue(this.code);
-        }
-      });
-  };
-  allocateAdditionalTime = (problem) => {
-    console.log("aalocate");
-    window.location = `Activity.php?action=allocateAdditionalTime&problemID=${problem.problemID}`;
-  };
-  requestAdditionalTime = (problem) => {
-    var reason = prompt(
-      "Please provide your reason for requesting additional time.(Required)"
-    );
-    if (!reason) {
-      return;
-    }
-    this.apiCurrentActivityService
-      .requestAdditionalTime(problem.problemID, reason)
-      .then((res) => {
-        if (res.ok) alert("Additional time has been requested");
-      });
-  };
-  srDescription = (problem) => {
-    window.open(
-      `Activity.php?action=problemHistoryPopup&problemID=${problem.problemID}&htmlFmt=popup`,
-      "reason",
-      "scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0"
-    );
-  };
   getTableElement = () => {
+    const { el } = this;
     const {
-      el,
-      startWork,
       getMoveElement,
+      srDescription,
       allocateAdditionalTime,
       requestAdditionalTime,
-      srDescription,
+      startWork,
       getAllocatedElement,
-    } = this;
+    } = this.props;
     const columns = [
       {
         path: null,
-        label: "Work",
+        label: "",
+        key: "work",
         sortable: false,
-        backgroundColorColumn: "workBgColor",
+        className: "text-center",
+        hdClassName:"text-center",
+        className:"text-center",
+        //backgroundColorColumn: "workBgColor",
         content: (problem) =>
-          el("button", { onClick: () => startWork(problem) }, "Work"),
+          el("i", {
+            className:(problem.workBtnColor==="#C6C6C6"? "fal fa-play":"fad fa-play ")+" fa-2x  pointer inbox-icon" + problem.workHidden||'',
+            onClick: () => startWork(problem, this.code),
+            title: problem.workBtnTitle,
+            style: {
+              color: problem.workBtnColor,
+              "--fa-primary-color":
+                problem.workBtnColor == "#FFF5B3" ? "gold" : "#32a852",
+              "--fa-secondary-color":
+                problem.workBtnColor == "#FFF5B3" ? "gray" : "gray",
+            },
+          }),
       },
       {
         path: null,
-        label: "Move",
+        label: "",
+        key: "moreTime",
+        toolTip: "Amount of time left on the Service Request",
+        icon: "fal fa-2x fa-stopwatch color-gray2 ",
+        width: "40",
         sortable: false,
+        hdClassName:"text-center",
+        className:"text-center",
+        content: (problem) => [
+          el(
+            "i",
+            {
+              key: "img1",
+              className: "fal fa-2x fa-hourglass-end color-gray inbox-icon",
+              title: "Request more time",
+              style: { cursor: "pointer", width: 20 },
+              onClick: () => requestAdditionalTime(problem),
+            },
+            ""
+          ),
+          el(
+            "span",
+            {
+              key: "span1",
+              style: {
+                // color: problem.hdColor != "green" ? problem.hdColor : "",
+              },
+            },
+            `${problem.hdRemaining}`
+          ),
+          // el(
+          //   "span",
+          //   { key: "span2", style: { color: problem.esColor } },
+          //   ` E:${problem.esRemaining}`
+          // ),
+          // el(
+          //   "span",
+          //   { key: "span3", style: { color: problem.smallProjectsTeamColor } },
+          //   ` SP:${problem.smallProjectsTeamRemaining}`
+          // ),
+          // el(
+          //   "span",
+          //   { key: "span4", style: { color: problem.projectTeamColor } },
+          //   ` P:${problem.projectTeamRemaining}`
+          // ),
+        ],
+      },
+      {
+        path: "hoursRemaining",
+        label: "",
+        toolTip: "Hours the Service Request has been open",
+        icon: "fal fa-2x  fa-clock color-gray2 ",
+        sortable: false,
+        width: "55",
+        hdClassName:"text-center",
+        className:"text-center",
+        //backgroundColorColumn: "hoursRemainingBgColor",
+        content: (problem) => [
+          el(
+            "label",
+            { key: "label", style: { verticalAlign: "middle" } },
+            problem.hoursRemaining
+          ),
+          problem.hoursRemainingBgColor === "#BDF8BA"
+            ? el("i", {
+                className: "fal  fa-user-clock color-gray pointer inbox-icon",
+                title: "On Hold",
+                key: "icon",
+                style: { float: "right" },
+              })
+            : null,
+        ],
+      },
+      {
+        path: null,
+        label: "",
+        key: "moverequest",
+        toolTip: "Move Service Request to another queue",
+        icon: "fal fa-2x fa-person-carry color-gray2 ",
+        sortable: false,
+        hdClassName:"text-center",
+        className:"text-center",
         content: (problem) => getMoveElement(this.code, problem),
       },
       {
         path: "problemID",
-        label: "Id",
+        label: "",
+        toolTip: "Service Request number",
+        icon: "fal fa-2x fa-hashtag color-gray2 ",
         sortable: false,
-        backgroundColorColumn:"bgColour",        
-        content: (problem) =>
+        hdClassName:"text-center",
+        className:"text-center",
+        //backgroundColorColumn:"bgColour",
+        content: (problem) => [
           el(
             "a",
             {
               href: `Activity.php?action=displayLastActivity&problemID=${problem.problemID}`,
               target: "_blank",
+              key: "link",
             },
             problem.problemID
           ),
+          problem.bgColour == "#F8A5B6"
+            ? el("i", {
+                className: "fal fa-2x fa-bell-slash color-gray pointer inbox-icon",
+                title: "",
+                key: "icon",               
+              })
+            : null,
+        ],
       },
       {
         path: "customerName",
-        label: "Customer",
+        label: "",
+        toolTip: "Customer",
+        icon: "fal fa-2x fa-building color-gray2 ",
         sortable: false,
-        classNameColumn:"customerNameDisplayClass",
-        content: (problem) =>
+        width: "220",
+        hdClassName:"text-center",
+        //classNameColumn: "customerNameDisplayClass",
+        content: (problem) => [
           el(
             "a",
             {
               href: `Customer.php?action=dispEdit&customerID=${problem.customerID}`,
               target: "_blank",
+              key: "link",
             },
             problem.customerName
           ),
-      },
-      { path: "priority", label: "Priority", sortable: false },
-      {
-        path: null,
-        label: "Aditional Time",
-        sortable: false,
-        content: (problem) =>
-          el("img", {
-            src: "/images/clock.png",
-            title: "Allocate Aditional Time",
-            style: { width: 20, cursor: "pointer" },
-            onClick: () => allocateAdditionalTime(problem),
-          }),
-      },
-      {
-        path: "hoursRemaining",
-        label: "Open Hours",
-        sortable: false,
-        backgroundColorColumn: "hoursRemainingBgColor",
-      },
-      {
-        path: "totalActivityDurationHours",
-        label: "Time Spent",
-        sortable: false,
-        classNameColumn: "timeSpentColorClass",
-      },
-      {
-        path: null,
-        label: "Time Budget",
-        sortable: false,
-        content: (problem) => [
-          el("img", {
-            src: "/images/clock.png",
-            title: "Allocate Aditional Time",
-            style: { width: 20, cursor: "pointer" },
-            onClick: () => requestAdditionalTime(problem),
-          }),
-          el(
-            "span",
-            { key: "span1", style: { color: problem.hdColor } },
-            `H:${problem.hdRemaining}`
-          ),
-          el(
-            "span",
-            { key: "span2", style: { color: problem.esColor } },
-            ` E:${problem.esRemaining}`
-          ),
-          el(
-            "span",
-            { key: "span3", style: { color: problem.smallProjectsTeamColor } },
-            ` SP:${problem.smallProjectsTeamRemaining}`
-          ),
-          el(
-            "span",
-            { key: "span4", style: { color: problem.projectTeamColor } },
-            ` P:${problem.projectTeamRemaining}`
-          ),
+          problem.customerNameDisplayClass != null
+            ? el("i", {
+                className: "fal fa-2x fa-star color-gray pointer float-right inbox-icon",
+                title: "Special Attention customer / contact",
+                key: "starIcon",
+              })
+            : null,
         ],
       },
       {
-        path: "reason",
-        label: "Description",
+        path: "priority",
+        label: "",
+        toolTip: "Service Request Priority",
+        icon: "fal fa-2x fa-signal color-gray2 ",
         sortable: false,
-        width:"350",
+        hdClassName:"text-center",
+        className:"text-center",
+      },
+
+      // {
+      //   path: "totalActivityDurationHours",
+      //   label: "Time Spent",
+      //   sortable: false,
+      //   classNameColumn: "timeSpentColorClass",
+      // },
+
+      {
+        path: "reason",
+        label: "",
+        toolTip: "Description of the Service Request",
+        icon: "fal fa-2x fa-file-alt color-gray2 ",
+        sortable: false,
+        hdClassName:"text-center",
         content: (problem) =>
           el(
             "a",
@@ -210,80 +224,100 @@ class CMPInboxHelpDesk extends React.Component {
       },
       {
         path: null,
-        label: "Assigned To",
+        label: "",
+        key: "assignedUser",
+        toolTip: "Service Request is assigned to this person",
+        icon: "fal fa-2x fa-user-hard-hat color-gray2 ",
         sortable: false,
-        content: (problem) => getAllocatedElement(problem),
+        hdClassName:"text-center",
+         
+        content: (problem) => getAllocatedElement(problem, this.code),
       },
-      {
-        path: "updated",
-        label: "Updated",
-        sortable: false,
-        width:"100",
-        backgroundColorColumn:"updatedBgColor",
-        content: (problem) =>
-          moment(problem.updated).format("DD/MM/YYYY HH:mm"),
-      },
+      // {
+      //   path: "updated",
+      //   label: "Updated",
+      //   sortable: false,
+      //   width:"100",
+      //   backgroundColorColumn:"updatedBgColor",
+      //   content: (problem) =>
+      //     moment(problem.updated).format("DD/MM/YYYY HH:mm"),
+      // },
     ];
+    if (this.props?.currentUser?.isSDManger)
+      columns.splice(1, 0, {
+        path: null,
+        label: "",
+        key: "additionalTime",
+        toolTip: "Allocate additional time",
+        icon: "fal fa-2x fa-alarm-plus color-gray2 ",
+        sortable: false,
+        hdClassName:"text-center",
+        className:"text-center",
+        content: (problem) =>
+          el("i", {
+            className: "fal fa-2x fa-hourglass-start color-gray inbox-icon",
+            title: "Allocate more time",
+            style: { cursor: "pointer" },
+            onClick: () => allocateAdditionalTime(problem),
+          }),
+      });
     const { data } = this.props;
 
     return el(Table, {
       key: "helpDesk",
       data: data || [],
-      columns: columns,      
+      columns: columns,
       pk: "problemID",
       search: true,
     });
   };
-  getAllocatedElement = (problem) => {
-    const { el, handleUserOnSelect } = this;
-    const { allocatedUsers, currentUser } = this.props;
-    return el(AutoComplete, {
-      key: "allocatedUser",
-      errorMessage: "No User Found",
-      items: allocatedUsers,
-      displayColumn: "fullName",
-      pk: "userID",
-      value: problem.engineerName || null,
-      width: 100,
-      onSelect:(event)=> handleUserOnSelect(event,problem),
-    });
-  };
-  handleUserOnSelect = (user,problem) => {
-    console.log(user,problem);
-    this.apiCurrentActivityService.allocateUser(problem.problemID,user?.userID||0).then(res=>{
-      if(res.status)
-      {
-        this.props.loadQueue(this.code)
-      }
-    })
-  };
-  getMoveElement = (current, problem) => {
-    const { el, moveToAnotherTeam } = this;
-    let options = [
-      { id: 2, title: "E" },
-      { id: 3, title: "SP" },
-      { id: 5, title: "P" },
-      { id: 4, title: "S" },
-      { id: 1, title: "H" },
-    ];
-    options = options.filter((e) => e.title != current);
-    return el(
-      "select",
-      {
-        key: "movItem" + problem.callActivityID,
-        onChange: (event) => moveToAnotherTeam(event, problem),
-      },
-      [
-        el("option", { value: "", key: "null" }),
-        options.map((e) => el("option", { value: e.id, key: e.id }, e.title)),
-      ]
-    );
-  };
-  render() {
-    const { el, getTableElement } = this;
+
+  getSrByUsersSummaryElement = () => {
+    const { el } = this;
     const { data } = this.props;
-    console.log(data);
-    return getTableElement();
+    if (data.length > 0) {
+      const items = data
+        .reduce((prev, current) => {
+          //check index
+          const index = prev.findIndex((p) => p.name === current.engineerName);
+          if (index == -1) prev.push({ name: current.engineerName, total: 1 });
+          else prev[index].total += 1;
+          return prev;
+        }, [])
+        .map((p) => {
+          if (p.name != null && p.name != "") {
+            p.name = p.name.replace("  ", " ");
+            const arr = p.name.split(" ");
+            p.name = arr[0][0] + arr[1][0];
+          }
+          return p;
+        })
+        .sort((a, b) => (a.name > b.name ? 1 : -1))
+        .map((item) => {
+            return [
+                el("dt", { key: "name" ,style:{paddingLeft:10}},  (item.name||'NN') + ":"),
+                el("dd", { key: "total" }, item.total),
+            ]
+             
+        }).concat( [
+          el("dt", { key: "name" ,style:{paddingLeft:10}},  'Total' + ":"),
+          el("dt", { key: "total" }, data.length),
+      ]);
+      //console.log(items);
+      return items;
+    }
+    return null;
+  };
+
+  render() {
+    const { el, getTableElement, getSrByUsersSummaryElement } = this;
+    const { data } = this.props;
+    //console.log(data);
+
+    return [
+      el("div", { key: "summary",style:{display:'flex',flexDirection:'row'} }, getSrByUsersSummaryElement()),
+      getTableElement(),
+    ];
   }
 }
 export default CMPInboxHelpDesk;

@@ -48,14 +48,20 @@ class TableHeader extends React.Component {
           el(
             "th",
             {
-              className: "clickable",
+              className: (c?.hdClassName||' ')+" clickable ",
               key: c.path || c.key||c.label.replace(' ',''),
-              onClick: () => raiseSort(c.path)
-              ,width:c.width?c.width:''
+              onClick: () => raiseSort(c.path),
+              width:c.width?c.width:'',
+              //title:c.toolTip?c.toolTip:""
             },
-            c.label,
-            " ",
-            renderSortIcon(c)
+            el('div',{className:"tooltip"},
+                c?.label||" ",            
+                c.icon?el('i',{className:  c.icon}):null,
+                renderSortIcon(c),
+                c.toolTip?el('div',{className:"tooltiptext tooltip-bottom"},
+                c.toolTip?c.toolTip:""
+                ):null
+            )
           )
         )
       )

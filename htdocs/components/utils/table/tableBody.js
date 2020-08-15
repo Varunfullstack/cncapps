@@ -25,7 +25,8 @@ class TableBody extends React.Component {
       key: (pk?item[pk]:item[0]).toString()+makeid().toString(),
       className:selected&&pk&&selected[pk]==item[pk]&&selected[selectedKey]===item[selectedKey]?'selected':null
     }, columns.map(c => el("td", {
-      key: c.path || c.key||c.label.replace(' ','')+makeid().toString(),className:c.classNameColumn?this.get(item, c.classNameColumn):''
+      key: c.path || c.key||c.label.replace(' ','')+makeid().toString(),      
+      className:c.className?c.className:' '+c.classNameColumn?this.get(item, c.classNameColumn):''
       ,style:{backgroundColor:c.backgroundColorColumn?this.get(item, c.backgroundColorColumn):''}
  
     }, c.content ? c.content(item) : this.get(item, c.path)))))

@@ -11,7 +11,17 @@
     border-top: 1px solid #dee2e6;
 }
 
+.fixedServiceRequestCountComponent-table .table th, .fixedServiceRequestCountComponent-table .table td {
+    padding: 0.5rem;
+}
 
+.fixedServiceRequestCountComponent-table .table .teamFooter td {
+    font-weight: bold;
+    padding-bottom: 2.2rem;
+}
+.fixedServiceRequestCountComponent-table .table .teamHeader th {
+    font-size: large;
+}
 
 .table thead th {
     vertical-align: bottom;

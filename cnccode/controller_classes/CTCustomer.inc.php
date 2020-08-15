@@ -3339,17 +3339,6 @@ class CTCustomer extends CTCNC
         return $this->buCustomer->removeSupportForAllUsersAndReferCustomer($customerID);
     }
 
-    function getCurrentUser()
-    {
-        return json_encode(
-            [
-                'firstName' => $this->dbeUser->getValue(DBEJUser::firstName),
-                'lastName'  => $this->dbeUser->getValue(DBEJUser::lastName),
-                'id'        => $this->dbeUser->getValue(DBEJUser::userID),
-                'email'     => $this->dbeUser->getEmail()
-            ]
-        );
-    }
 
     /**
      * Update details
@@ -3398,5 +3387,16 @@ class CTCustomer extends CTCNC
         } else {
             $this->displayEditForm();
         }
+    }
+    function getCurrentUser()
+    {
+        return json_encode( [
+            'firstName' => $this->dbeUser->getValue(DBEJUser::firstName),
+            'lastName' => $this->dbeUser->getValue(DBEJUser::lastName),
+            'id' => $this->dbeUser->getValue(DBEJUser::userID),
+            'email' => $this->dbeUser->getEmail(),
+            'permissions'=>$this->dbeUser->getValue(DBEUser::perms),
+            'isSDManger'=>($this->dbeUser->getValue(DBEUser::receiveSdManagerEmailFlag) == 'Y')
+        ]);
     }
 }
