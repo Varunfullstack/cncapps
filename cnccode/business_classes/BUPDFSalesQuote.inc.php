@@ -133,7 +133,6 @@ class BUPDFSalesQuote extends Business
             142,
             38
         );
-        //$buPDF->placeImageAt( $GLOBALS['cfg']['btlogo_path'], 'JPEG', 15, 40);
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->CR();

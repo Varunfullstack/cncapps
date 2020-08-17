@@ -437,6 +437,11 @@ class Controller extends BaseObject
         }
     }
 
+    function getJSONData()
+    {
+        return json_decode(file_get_contents('php://input'), true);
+    }
+
     public function getParam($paramName)
     {
         if (!$paramName) {

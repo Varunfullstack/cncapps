@@ -21,7 +21,6 @@ class DBEItemType extends DBCNCEntity
     const active = "active";
     const showInCustomerReview = "showInCustomerReview";
     const sortOrder = "sortOrder";
-    const isRecurring = "isRecurring";
 
 
     /**
@@ -79,14 +78,6 @@ class DBEItemType extends DBCNCEntity
             self::sortOrder,
             DA_INTEGER,
             DA_NOT_NULL
-        );
-
-        $this->addColumn(
-            self::isRecurring,
-            DA_BOOLEAN,
-            DA_NOT_NULL,
-            null,
-            false
         );
 
         $this->setPK(0);

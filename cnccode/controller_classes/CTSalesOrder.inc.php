@@ -95,20 +95,12 @@ define(
     'createSrFromLines'
 );
 define(
-    'CTSALESORDER_ACT_CREATE_QUICK_QUOTE',
-    'genQuickQuote'
-); // generate quick quote using selector
-define(
     'CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM',
     'genManualOrderForm'
 );
 define(
     'CTSALESORDER_ACT_CHANGE_SUPPLIER',
     'changeSupplier'
-);
-define(
-    'CTSALESORDER_ACT_DOWNLOAD_CSV',
-    'downloadCSV'
 );
 define(
     'CTSALESORDER_ACT_UPDATE_LINES',
@@ -300,6 +292,10 @@ class CTSalesOrder extends CTCNC
     const supplierNameMessage = 'supplierNameMessage';
     const descriptionMessage = 'descriptionMessage';
     const supplierName = 'supplierName';
+    const MOVE_LINE_TO_POSITION = "MOVE_LINE_TO_POSITION";
+    const UPDATE_LINE_VALUES = "UPDATE_LINE_VALUES";
+    const UPDATE_ITEM_PRICE = "UPDATE_ITEM_PRICE";
+    const CREATE_SIGNABLE_QUOTE = "CREATE_SIGNABLE_QUOTE";
     /** @var */
     public $customerID;
     /** @var */
@@ -500,6 +496,32 @@ class CTSalesOrder extends CTCNC
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->deleteQuoteDoc();
                 break;
+            case self::UPDATE_LINE_VALUES:
+                $data = json_decode(file_get_contents('php://input'), true);
+
+                if (!array_key_exists('lineId', $data)) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "Line id is required");
+                }
+
+                if (!array_key_exists('unitSale', $data)) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'unitSale is required');
+                }
+                if (!array_key_exists('quantity', $data)) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'quantity is required');
+                }
+                if (!array_key_exists('unitCost', $data)) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'unitCost is required');
+                }
+                $dbeOrdline = new DBEOrdline($this);
+                $dbeOrdline->getRow($data['lineId']);
+                $dbeOrdline->setValue(DBEOrdline::curUnitCost, $data['unitCost']);
+                $dbeOrdline->setValue(DBEOrdline::curTotalCost, $data['quantity'] * $data['unitCost']);
+                $dbeOrdline->setValue(DBEOrdline::curUnitSale, $data['unitSale']);
+                $dbeOrdline->setValue(DBEOrdline::curTotalSale, $data['quantity'] * $data['unitSale']);
+                $dbeOrdline->setValue(DBEOrdline::qtyOrdered, $data['quantity']);
+                $dbeOrdline->updateRow();
+                echo json_encode(["status" => "ok"]);
+                break;
             case CTSALESORDER_ACT_UPDATE_LINES:
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->updateLines();
@@ -525,8 +547,7 @@ class CTSalesOrder extends CTCNC
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->generateOrderForm();
                 break;
-            case CTSALESORDER_ACT_CREATE_QUICK_QUOTE:
-                $this->checkPermissions(SALES_PERMISSION);
+            case self::CREATE_SIGNABLE_QUOTE:
                 $this->generateQuoteDoc();
                 break;
             case CTSALESORDER_ACT_UPLOAD_QUOTE_DOC:
@@ -607,8 +628,14 @@ class CTSalesOrder extends CTCNC
                 );
                 echo json_encode(["status" => "ok"]);
                 break;
-            case 'updateItemPrice':
-                $this->checkPermissions(SALES_PERMISSION);
+            case self::UPDATE_ITEM_PRICE:
+                if (!$this->hasPermissions(SALES_PERMISSION)) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                        403,
+                        'You do not sufficient permissions to perform this task'
+                    );
+                }
+
                 $this->updateItemPrice();
                 break;
             case 'serviceRequest':
@@ -624,6 +651,24 @@ class CTSalesOrder extends CTCNC
                 break;
             case CTSALESORDER_ACT_CREATE_TEMPLATED_QUOTE:
                 $this->createTemplatedQuote();
+                break;
+            case self::MOVE_LINE_TO_POSITION:
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!array_key_exists('lineId', $data)) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Line id is required');
+                }
+                if (!array_key_exists('replacedLineId', $data)) {
+                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Replaced Line Id is required');
+                }
+                $dbeOrdline = new DBEOrdline($this);
+                $dbeOrdline->getRow($data['lineId']);
+                $replacedLine = new DBEOrdline($this);
+                $replacedLine->getRow($data['replacedLineId']);
+                $dbeOrdline->swapPlaces(
+                    $dbeOrdline->getValue(DBEOrdline::sequenceNo),
+                    $replacedLine->getValue(DBEOrdline::sequenceNo)
+                );
+                echo json_encode(["status" => 'ok']);
                 break;
             default:
                 $this->displaySearchForm();
@@ -1172,7 +1217,6 @@ class CTSalesOrder extends CTCNC
                 'SalesOrderDisplay'                 => 'SalesOrderDisplay.inc',
                 'SalesOrderDisplayConvertToOrder'   => 'SalesOrderDisplayConvertToOrder.inc',
                 'SalesOrderDisplayCreatePO'         => 'SalesOrderDisplayCreatePO.inc',
-                'SalesOrderDisplayUpdateLines'      => 'SalesOrderDisplayUpdateLines.inc',
                 'SalesOrderLineEditJS'              => 'SalesOrderLineEditJS.inc',
                 'SalesOrderDisplayNewLine'          => 'SalesOrderDisplayNewLine.inc',
                 'SalesOrderHeadDisplay'             => 'SalesOrderHeadDisplay.inc',
@@ -1202,36 +1246,26 @@ class CTSalesOrder extends CTCNC
             }
             if ($orderType == 'Q' || $orderType == 'I') {
                 $actions[CTSALESORDER_ACT_DELETE_LINES] = 'delete lines';
-                $actions[CTSALESORDER_ACT_UPDATE_LINES] = 'update values';
-                $actions[CTSALESORDER_ACT_INSERT_FROM_ORDER] = 'insert lines from order';
-            }
-            if ($orderType == 'I') {
-                $actions[CTSALESORDER_ACT_SEND_CONFIRMATION] = 'send confirmation email';
             }
 
             if ($orderType !== 'C') {
                 $quickQuoteDisabled = !$this->dbeUser->getValue(DBEUser::signatureFilename);
-                $actions[CTSALESORDER_ACT_CREATE_QUICK_QUOTE] = 'create Signable quote';
+                $actions[self::CREATE_SIGNABLE_QUOTE] = 'create Signable quote';
             }
 
             $actions[CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM] = 'create manual order form';
             $actions[CTSALESORDER_ACT_CHANGE_SUPPLIER] = 'change supplier';
-            $actions[CTSALESORDER_ACT_DOWNLOAD_CSV] = 'download CSV';
             $actions[CTSALESORDER_ACT_CREATE_SR_FROM_LINES] = 'create new SR';
-        } elseif ($orderType == 'Q' || $orderType == 'I') {
-            $actions[CTSALESORDER_ACT_INSERT_FROM_ORDER] = 'insert lines from order';
         }
         $order = [
-            CTSALESORDER_ACT_CREATE_QUICK_QUOTE,
+            self::CREATE_SIGNABLE_QUOTE,
             CTSALESORDER_ACT_COPY_TO_ORDER,
             CTSALESORDER_ACT_CONVERT_TO_ORDER,
             CTSALESORDER_ACT_DELETE_LINES,
             CTSALESORDER_ACT_UPDATE_LINES,
-            CTSALESORDER_ACT_INSERT_FROM_ORDER,
             CTSALESORDER_ACT_SEND_CONFIRMATION,
             CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM,
             CTSALESORDER_ACT_CHANGE_SUPPLIER,
-            CTSALESORDER_ACT_DOWNLOAD_CSV,
             CTSALESORDER_ACT_CREATE_SR_FROM_LINES,
         ];
 
@@ -1242,7 +1276,7 @@ class CTSalesOrder extends CTCNC
             }
         );
 
-        if (count($actions) > 0) {
+        if (!empty($actions)) {
             $this->template->set_block(
                 'SalesOrderDisplay',
                 'actionBlock',
@@ -1254,7 +1288,7 @@ class CTSalesOrder extends CTCNC
                         'SELECTED'          => ($this->getAction() == $action) ? CT_SELECTED : null,
                         'action'            => $action,
                         'actionDescription' => $actionDescription,
-                        'disabled'          => $quickQuoteDisabled && $action == CTSALESORDER_ACT_CREATE_QUICK_QUOTE ? 'disabled' : null
+                        'disabled'          => $quickQuoteDisabled && $action == self::CREATE_SIGNABLE_QUOTE ? 'disabled' : null
                     )
                 );
                 $this->template->parse(
@@ -1279,7 +1313,7 @@ class CTSalesOrder extends CTCNC
             /*
       Inside sales group, decide which items are readonly
       */
-            if ($orderType == 'Q' or $orderType == 'I') {
+            if ($orderType == 'Q' || $orderType == 'I') {
                 /*
         Quotes or initial orders allow all
         */
@@ -1291,7 +1325,7 @@ class CTSalesOrder extends CTCNC
                 $valuesDisabled = CTCNC_HTML_DISABLED;
             }
 
-            if ($orderType == 'C' and !$this->hasPermissions(ACCOUNTS_PERMISSION)) {
+            if ($orderType == 'C' && !$this->hasPermissions(ACCOUNTS_PERMISSION)) {
                 $valuesDisabled = null;
             }
 
@@ -1431,20 +1465,6 @@ class CTSalesOrder extends CTCNC
                     )
                 );
             if ($orderType != 'Q') {
-                // Display link to sales order confirmation document
-                /** @noinspection HtmlDeprecatedAttribute */
-                $uncSalesOrderConf =
-                    '<A HREF=
-				  "file:' . COMPANY_DIR_FROM_BROWSER . '/sales/sales orders/' . $dsOrdhead->getValue(
-                        DBEOrdhead::customerID
-                    ) . '_' .
-                    $dsOrdhead->getValue(DBEOrdhead::ordheadID) . '.pdf" target="_blank" title="Customer Confirmation Document (opens in new window)">
-				  <IMG src="images/pdf_icon.gif" height="15" border="0"></A>';
-                $this->template->set_var(
-                    array(
-                        'uncSalesOrderConf' => $uncSalesOrderConf
-                    )
-                );
                 // Show navigate Purchase Orders if they exist
                 if ($purchaseOrderCount > 0) {
                     $urlPurchaseOrders =
@@ -1588,9 +1608,8 @@ class CTSalesOrder extends CTCNC
             }
             // Show despatch link if order type is part-despatched or initial and there are lines
             if (
-                (($orderType == 'P') or ($orderType == 'I')) and
-                ($dsOrdline->rowCount() > 0) and
-                (!common_isAnInternalStockLocation($dsOrdhead->getValue(DBEOrdhead::customerID)))
+                (($orderType == 'P') || ($orderType == 'I')) && ($dsOrdline->rowCount(
+                )) || (!common_isAnInternalStockLocation($dsOrdhead->getValue(DBEOrdhead::customerID)))
             ) {
                 $urlDespatch =
                     Controller::buildLink(
@@ -1699,13 +1718,6 @@ class CTSalesOrder extends CTCNC
         );
         $buRenewal = null;
         // Order lines section
-
-        $urlMoveLineUp = null;
-        $urlMoveLineDown = null;
-        $urlEditLine = null;
-        $urlDeleteLine = null;
-        $urlAddLine = null;
-
         $curSaleGrandTotal = 0;
         $curProfitGrandTotal = 0;
         $curCostGrandTotal = 0;
@@ -1716,8 +1728,6 @@ class CTSalesOrder extends CTCNC
         $recurringCurProfitGrandTotal = 0;
         $recurringPercProfitGrandTotal = 0;
 
-
-        $firstLine = true;
         $hasGreenArrow = false;
         if ($dsOrdline->fetchNext()) {
 
@@ -1733,280 +1743,23 @@ class CTSalesOrder extends CTCNC
                 'recurringOrderLines'
             );
 
-            $handle = 'orderLineBlock';
-            $name = "orderLines";
 
             do {
-                if ($dsOrdline->getValue(DBEOrdline::isRecurring)) {
-                    $handle = "recurringOrderLineBlock";
-                    $name = "recurringOrderLines";
-                }
-                $renewalIcon = null;
-                if ($dsOrdline->getValue(DBEJOrdline::renewalTypeID)) {
-                    if (!$buRenewal) {
-                        $buRenewal = new BURenewal($this);
-                    }
-                    $buRenewal->getRenewalBusinessObject(
-                        $dsOrdline->getValue(DBEJOrdline::renewalTypeID),
-                        $page
-                    );
-
-                    $urlEditRenewal =
-                        Controller::buildLink(
-                            $page,
-                            array(
-                                'action' => 'editFromSalesOrder',
-                                'lineId' => $dsOrdline->getValue(DBEOrdline::id),
-                            )
-                        );
-
-                    $createItem = true;
-                    $iconColor = 'red';
-                    if ($dsOrdline->getValue(DBEOrdline::renewalCustomerItemID)) {
-                        $iconColor = 'green';
-                        $createItem = false;
-                        $hasGreenArrow = true;
-                    }
-
-
-                    $renewalIcon =
-                        '<A HREF="' . $urlEditRenewal . '" target="_BLANK" onclick="checkCreation()" ' . ($createItem ? ' class="createItem" ' : null) . '>' .
-                        '<i class="fa fa-2x fa-step-forward" style="color: ' . $iconColor . '"></i>
-                         </A>';
-                }
-
-                // if form error and there is a set of lines to redisplay then set the values accordingly
-                if (!$readOnly && !$restrictedView) {
-
-                    $urlEditLine =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'      => CTSALESORDER_ACT_EDIT_ORDLINE,
-                                'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
-                                'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
-                            )
-                        );
-                    // common to comment and item lines
-                    $urlAddLine =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'      => CTSALESORDER_ACT_ADD_ORDLINE,
-                                'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
-                                'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
-                            )
-                        );
-
-                    if ($dsOrdline->getValue(DBEOrdline::sequenceNo) > 0) {
-                        $urlMoveLineUp =
-                            Controller::buildLink(
-                                $_SERVER['PHP_SELF'],
-                                array(
-                                    'action'      => CTSALESORDER_ACT_MOVE_ORDLINE_UP,
-                                    'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
-                                    'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
-                                )
-                            );
-                    }
-
-                    $urlMoveLineDown =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'      => CTSALESORDER_ACT_MOVE_ORDLINE_DOWN,
-                                'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
-                                'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
-                            )
-                        );
-                    $urlDeleteLine =
-                        Controller::buildLink(
-                            $_SERVER['PHP_SELF'],
-                            array(
-                                'action'      => CTSALESORDER_ACT_DELETE_ORDLINE,
-                                'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
-                                'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime)
-                            )
-                        );
-                    $salesOrderLineDesc =
-                        '<A href="' . $urlEditLine . '">' . Controller::htmlDisplayText(
-                            $dsOrdline->getValue(DBEOrdline::description)
-                        ) . '</A>';
-                } else {
-                    $salesOrderLineDesc = Controller::htmlDisplayText($dsOrdline->getValue(DBEOrdline::description));
-                }
-
-                // for javascript message remove all " and ' chars
-                $removeDescription = str_replace(
-                    '"',
-                    '',
-                    $dsOrdline->getValue(DBEOrdline::description)
+                $this->renderLine(
+                    $dsOrdline,
+                    $curSaleGrandTotal,
+                    $curProfitGrandTotal,
+                    $curCostGrandTotal,
+                    $percProfitGrandTotal,
+                    $recurringCurSaleGrandTotal,
+                    $recurringCurCostGrandTotal,
+                    $recurringCurProfitGrandTotal,
+                    $recurringPercProfitGrandTotal,
+                    $buRenewal,
+                    $readOnly,
+                    $restrictedView,
+                    $dsOrdhead
                 );
-                $removeDescription = str_replace(
-                    '\'',
-                    '',
-                    $removeDescription
-                );
-
-                $ordline = new DBEOrdline($this);
-
-                $ordline->getRow($dsOrdline->getValue(DBEOrdline::id));
-
-                $this->template->set_var(
-                    array(
-                        'salesOrderLineDesc' => $salesOrderLineDesc,
-                        'description'        => $dsOrdline->getValue(DBEOrdline::description),
-                        'qtyOrdered'         => number_format($dsOrdline->getValue(DBEOrdline::qtyOrdered), 2, '.', ''),
-                        'lineType'           => $dsOrdline->getValue(DBEOrdline::lineType),
-                        'partNo'             => Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::partNo)),
-                        'sequenceNo'         => $dsOrdline->getValue(DBEOrdline::sequenceNo),
-                        'lineId'             => $dsOrdline->getValue(DBEOrdline::id),
-                        'orderLineChecked'   => ($this->dsSelectedOrderLine->search(
-                            'id',
-                            $dsOrdline->getValue(DBEOrdline::id)
-                        )) ? CT_CHECKED : null,
-                        'urlMoveLineUp'      => $urlMoveLineUp,
-                        'urlMoveLineDown'    => $urlMoveLineDown,
-                        'moveUpHidden'       => $ordline->isFirst() ? 'hidden' : null,
-                        'moveDownHidden'     => $ordline->isLast() ? 'hidden' : null,
-                        'removeDescription'  => $removeDescription,
-                        'urlEditLine'        => $urlEditLine,
-                        'urlDeleteLine'      => $urlDeleteLine,
-                        'urlAddLine'         => $urlAddLine,
-                        'isRecurring'        => $dsOrdline->getValue(DBEOrdline::isRecurring) ? 'true' : 'false'
-                    )
-                );
-                if ($dsOrdline->getValue(
-                        DBEOrdline::lineType
-                    ) == "I") {                    // Item line needs all these fields
-
-                    $curSaleTotal = $dsOrdline->getValue(DBEOrdline::curUnitSale) * $dsOrdline->getValue(
-                            DBEOrdline::qtyOrdered
-                        );
-                    $curCostTotal = $dsOrdline->getValue(DBEOrdline::curUnitCost) * $dsOrdline->getValue(
-                            DBEOrdline::qtyOrdered
-                        );
-                    $curProfit = $curSaleTotal - $curCostTotal;
-                    if ($curCostTotal != 0) {
-                        $percProfit = $curProfit * (100 / $curCostTotal);
-                    } else {
-                        $percProfit = 100;
-                    }
-                    if ($dsOrdline->getValue(DBEJOrdline::webSiteURL)) {
-                        $supplierName = '<A HREF="' . $dsOrdline->getValue(
-                                DBEJOrdline::webSiteURL
-                            ) . '" target="_blank">' .
-                            Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::supplierName)) . '</A>';
-                    } else {
-                        $supplierName = Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::supplierName));
-                    }
-
-                    if (!$restrictedView) {
-
-                        $this->template->set_var(
-                            array(
-                                'stockcat'                => $dsOrdline->getValue(DBEOrdline::stockcat),
-                                'renewalIcon'             => $renewalIcon,
-                                'lineSupplierName'        => $supplierName,
-                                'curUnitCost'             => number_format(
-                                    $dsOrdline->getValue(DBEOrdline::curUnitCost),
-                                    2
-                                    ,
-                                    '.',
-                                    ''
-                                ),
-                                'curCostTotal'            => number_format($curCostTotal, 2),
-                                'curUnitSale'             => number_format(
-                                    $dsOrdline->getValue(DBEOrdline::curUnitSale),
-                                    2,
-                                    '.',
-                                    ''
-                                ),
-                                'curSaleTotal'            => number_format($curSaleTotal, 2),
-                                'curProfit'               => number_format($curProfit, 2),
-                                'percProfit'              => number_format($percProfit, 2),
-                                'orderLineProfitClass'    => ($curProfit < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
-                                'orderLineSaleTotalClass' => ($curSaleTotal < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
-                                'orderLineCostTotalClass' => ($curCostTotal < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM
-                            )
-                        );
-
-                        if (!$dsOrdline->getValue(DBEOrdline::isRecurring)) {
-                            $curSaleGrandTotal += $curSaleTotal;
-                            $curProfitGrandTotal += $curProfit;
-                            $curCostGrandTotal += $curCostTotal;
-                        } else {
-                            $recurringCurSaleGrandTotal += $curSaleTotal;
-                            $recurringCurCostGrandTotal += $curProfit;
-                            $recurringCurProfitGrandTotal += $curCostTotal;
-
-                        }
-
-                        if (!$readOnly) {
-
-                            $urlUpdateItemPrice =
-                                Controller::buildLink(
-                                    $_SERVER['PHP_SELF'],
-                                    array(
-                                        'action'      => 'updateItemPrice',
-                                        'ordheadID'   => $this->getOrdheadID(),
-                                        'itemID'      => $dsOrdline->getValue(DBEOrdline::itemID),
-                                        'curUnitCost' => $dsOrdline->getValue(DBEOrdline::curUnitCost),
-                                        'curUnitSale' => $dsOrdline->getValue(DBEOrdline::curUnitSale)
-                                    )
-                                );
-                            $this->template->set_var(
-                                'urlUpdateItemPrice',
-                                $urlUpdateItemPrice
-                            );
-                            $this->template->parse(
-                                'salesOrderLineUpdateItemPriceIcon',
-                                'SalesOrderLineUpdateItemPriceIcon',
-                                true
-                            );
-                            $this->template->parse(
-                                'salesOrderLineIcons',
-                                'SalesOrderLineIcons',
-                                true
-                            );
-
-                        }
-                    }
-                    $this->template->parse(
-                        'salesOrderLine',
-                        'SalesOrderItemLine'
-                    );
-                } else {
-                    if (!$readOnly) {
-                        $this->template->parse(
-                            'salesOrderLineIcons',
-                            'SalesOrderLineIcons',
-                            true
-                        );
-                    }
-                    $this->template->parse(
-                        'salesOrderLine',
-                        'SalesOrderCommentLine'
-                    );
-                }
-                $this->template->parse(
-                    $name,
-                    $handle,
-                    true
-                );
-                $this->template->set_var(
-                    'salesOrderAddIcon',
-                    null
-                ); // clears for next time
-                $this->template->set_var(
-                    'salesOrderLineIcons',
-                    null
-                ); // clears for next time
-                $this->template->set_var(
-                    'salesOrderLineUpdateItemPriceIcon',
-                    null
-                ); // clears for next time
-                $firstLine = false;
             } while ($dsOrdline->fetchNext());
         }
         // END OF ORDER LINES SECTION
@@ -2331,11 +2084,7 @@ class CTSalesOrder extends CTCNC
                 );
             }
 
-            $this->template->parse(
-                'salesOrderDisplayUpdateLines',
-                'SalesOrderDisplayUpdateLines',
-                true
-            );
+
             $this->buSalesOrder->initialiseNewOrdline(
                 $this->getOrdheadID(),
                 $this->dsOrdline
@@ -2362,11 +2111,13 @@ class CTSalesOrder extends CTCNC
                 $dsOrdhead,
                 'SalesOrderDisplayNewLine'
             );
-            $this->template->parse(
-                'salesOrderDisplayNewLine',
-                'SalesOrderDisplayNewLine',
-                true
-            );
+            if ($dsOrdhead->getValue(DBEOrdhead::type) !== 'C') {
+                $this->template->parse(
+                    'salesOrderDisplayNewLine',
+                    'SalesOrderDisplayNewLine',
+                    true
+                );
+            }
             $this->template->parse(
                 'salesOrderLineEditJS',
                 'SalesOrderLineEditJS',
@@ -2553,6 +2304,277 @@ class CTSalesOrder extends CTCNC
             $currentDocumentsLink = '<a href="file:' . $currentDocumentsPath . '" target="_blank" title="Documentation">Documentation</a>';
         }
         return $currentDocumentsLink;
+    }
+
+    function renderLine($dsOrdline,
+                        &$curSaleGrandTotal,
+                        &$curProfitGrandTotal,
+                        &$curCostGrandTotal,
+                        &$percProfitGrandTotal,
+                        &$recurringCurSaleGrandTotal,
+                        &$recurringCurCostGrandTotal,
+                        &$recurringCurProfitGrandTotal,
+                        &$recurringPercProfitGrandTotal,
+                        $buRenewal,
+                        $readOnly,
+                        $restrictedView,
+                        $dsOrdhead
+    )
+    {
+        $urlEditLine = null;
+        $urlDeleteLine = null;
+        $urlAddLine = null;
+        $handle = 'orderLineBlock';
+        $name = "orderLines";
+        if ($dsOrdline->getValue(DBEOrdline::isRecurring)) {
+            $handle = "recurringOrderLineBlock";
+            $name = "recurringOrderLines";
+        }
+        $renewalIcon = null;
+        if ($dsOrdline->getValue(DBEJOrdline::renewalTypeID)) {
+            if (!$buRenewal) {
+                $buRenewal = new BURenewal($this);
+            }
+            $buRenewal->getRenewalBusinessObject(
+                $dsOrdline->getValue(DBEJOrdline::renewalTypeID),
+                $page
+            );
+
+            $urlEditRenewal =
+                Controller::buildLink(
+                    $page,
+                    array(
+                        'action' => 'editFromSalesOrder',
+                        'lineId' => $dsOrdline->getValue(DBEOrdline::id),
+                    )
+                );
+
+            $createItem = true;
+            $iconColor = 'red';
+            if ($dsOrdline->getValue(DBEOrdline::renewalCustomerItemID)) {
+                $iconColor = 'green';
+                $createItem = false;
+                $hasGreenArrow = true;
+            }
+
+
+            $renewalIcon =
+                '<A HREF="' . $urlEditRenewal . '" target="_BLANK" onclick="checkCreation()" ' . ($createItem ? ' class="createItem" ' : null) . '>' .
+                '<i class="fal fa-2x fa-step-forward" style="color: ' . $iconColor . '"></i>
+                         </A>';
+        }
+
+        // if form error and there is a set of lines to redisplay then set the values accordingly
+        if (!$readOnly && !$restrictedView) {
+
+            $urlEditLine =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'      => CTSALESORDER_ACT_EDIT_ORDLINE,
+                        'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
+                        'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
+                    )
+                );
+            // common to comment and item lines
+            $urlAddLine =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'      => CTSALESORDER_ACT_ADD_ORDLINE,
+                        'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
+                        'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
+                    )
+                );
+
+
+            $urlDeleteLine =
+                Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action'      => CTSALESORDER_ACT_DELETE_ORDLINE,
+                        'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
+                        'updatedTime' => $dsOrdhead->getValue(DBEOrdhead::updatedTime)
+                    )
+                );
+            $salesOrderLineDesc =
+                '<A href="' . $urlEditLine . '">' . Controller::htmlDisplayText(
+                    $dsOrdline->getValue(DBEOrdline::description)
+                ) . '</A>';
+        } else {
+            $salesOrderLineDesc = Controller::htmlDisplayText($dsOrdline->getValue(DBEOrdline::description));
+        }
+
+        // for javascript message remove all " and ' chars
+        $removeDescription = str_replace(
+            '"',
+            '',
+            $dsOrdline->getValue(DBEOrdline::description)
+        );
+        $removeDescription = str_replace(
+            '\'',
+            '',
+            $removeDescription
+        );
+
+        $ordline = new DBEOrdline($this);
+
+        $ordline->getRow($dsOrdline->getValue(DBEOrdline::id));
+
+        $this->template->set_var(
+            array(
+                'salesOrderLineDesc' => $salesOrderLineDesc,
+                'description'        => $dsOrdline->getValue(DBEOrdline::description),
+                'qtyOrdered'         => number_format($dsOrdline->getValue(DBEOrdline::qtyOrdered), 2, '.', ''),
+                'lineType'           => $dsOrdline->getValue(DBEOrdline::lineType),
+                'partNo'             => Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::partNo)),
+                'sequenceNo'         => $dsOrdline->getValue(DBEOrdline::sequenceNo),
+                'lineId'             => $dsOrdline->getValue(DBEOrdline::id),
+                'orderLineChecked'   => ($this->dsSelectedOrderLine->search(
+                    'id',
+                    $dsOrdline->getValue(DBEOrdline::id)
+                )) ? CT_CHECKED : null,
+                //                'urlMoveLineUp'      => $urlMoveLineUp,
+                //                'urlMoveLineDown'    => $urlMoveLineDown,
+                //                'moveUpHidden'       => $ordline->isFirst() ? 'hidden' : null,
+                //                'moveDownHidden'     => $ordline->isLast() ? 'hidden' : null,
+                'removeDescription'  => $removeDescription,
+                'urlEditLine'        => $urlEditLine,
+                'urlDeleteLine'      => $urlDeleteLine,
+                'urlAddLine'         => $urlAddLine,
+                'isRecurring'        => $dsOrdline->getValue(DBEOrdline::isRecurring) ? 'true' : 'false'
+            )
+        );
+        if ($dsOrdline->getValue(
+                DBEOrdline::lineType
+            ) == "I") {                    // Item line needs all these fields
+
+            $curSaleTotal = $dsOrdline->getValue(DBEOrdline::curUnitSale) * $dsOrdline->getValue(
+                    DBEOrdline::qtyOrdered
+                );
+            $curCostTotal = $dsOrdline->getValue(DBEOrdline::curUnitCost) * $dsOrdline->getValue(
+                    DBEOrdline::qtyOrdered
+                );
+            $curProfit = $curSaleTotal - $curCostTotal;
+            if ($curCostTotal != 0) {
+                $percProfit = $curProfit * (100 / $curCostTotal);
+            } else {
+                $percProfit = 100;
+            }
+            if ($dsOrdline->getValue(DBEJOrdline::webSiteURL)) {
+                $supplierName = '<A HREF="' . $dsOrdline->getValue(
+                        DBEJOrdline::webSiteURL
+                    ) . '" target="_blank">' .
+                    Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::supplierName)) . '</A>';
+            } else {
+                $supplierName = Controller::htmlDisplayText($dsOrdline->getValue(DBEJOrdline::supplierName));
+            }
+
+            if (!$restrictedView) {
+
+                $this->template->set_var(
+                    array(
+                        'stockcat'                => $dsOrdline->getValue(DBEOrdline::stockcat),
+                        'renewalIcon'             => $renewalIcon,
+                        'lineSupplierName'        => $supplierName,
+                        'curUnitCost'             => number_format(
+                            $dsOrdline->getValue(DBEOrdline::curUnitCost),
+                            2
+                            ,
+                            '.',
+                            ''
+                        ),
+                        'curCostTotal'            => number_format($curCostTotal, 2),
+                        'curUnitSale'             => number_format(
+                            $dsOrdline->getValue(DBEOrdline::curUnitSale),
+                            2,
+                            '.',
+                            ''
+                        ),
+                        'curSaleTotal'            => number_format($curSaleTotal, 2),
+                        'curProfit'               => number_format($curProfit, 2),
+                        'percProfit'              => number_format($percProfit, 2),
+                        'orderLineProfitClass'    => ($curProfit < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
+                        'orderLineSaleTotalClass' => ($curSaleTotal < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM,
+                        'orderLineCostTotalClass' => ($curCostTotal < 0) ? CTSALESORDER_CLS_ORDER_LINE_LOSS : CTSALESORDER_CLS_ORDER_LINE_ITEM
+                    )
+                );
+
+                if (!$dsOrdline->getValue(DBEOrdline::isRecurring)) {
+                    $curSaleGrandTotal += $curSaleTotal;
+                    $curProfitGrandTotal += $curProfit;
+                    $curCostGrandTotal += $curCostTotal;
+                } else {
+                    $recurringCurSaleGrandTotal += $curSaleTotal;
+                    $recurringCurCostGrandTotal += $curProfit;
+                    $recurringCurProfitGrandTotal += $curCostTotal;
+
+                }
+
+                if (!$readOnly) {
+
+                    $urlUpdateItemPrice =
+                        Controller::buildLink(
+                            $_SERVER['PHP_SELF'],
+                            array(
+                                'action'      => 'updateItemPrice',
+                                'ordheadID'   => $this->getOrdheadID(),
+                                'itemID'      => $dsOrdline->getValue(DBEOrdline::itemID),
+                                'curUnitCost' => $dsOrdline->getValue(DBEOrdline::curUnitCost),
+                                'curUnitSale' => $dsOrdline->getValue(DBEOrdline::curUnitSale)
+                            )
+                        );
+                    $this->template->set_var(
+                        'urlUpdateItemPrice',
+                        $urlUpdateItemPrice
+                    );
+                    $this->template->parse(
+                        'salesOrderLineUpdateItemPriceIcon',
+                        'SalesOrderLineUpdateItemPriceIcon',
+                        true
+                    );
+                    $this->template->parse(
+                        'salesOrderLineIcons',
+                        'SalesOrderLineIcons',
+                        true
+                    );
+
+                }
+            }
+            $this->template->parse(
+                'salesOrderLine',
+                'SalesOrderItemLine'
+            );
+        } else {
+            if (!$readOnly) {
+                $this->template->parse(
+                    'salesOrderLineIcons',
+                    'SalesOrderLineIcons',
+                    true
+                );
+            }
+            $this->template->parse(
+                'salesOrderLine',
+                'SalesOrderCommentLine'
+            );
+        }
+        $this->template->parse(
+            $name,
+            $handle,
+            true
+        );
+        $this->template->set_var(
+            'salesOrderAddIcon',
+            null
+        ); // clears for next time
+        $this->template->set_var(
+            'salesOrderLineIcons',
+            null
+        ); // clears for next time
+        $this->template->set_var(
+            'salesOrderLineUpdateItemPriceIcon',
+            null
+        ); // clears for next time
     }
 
     function getSalutation()
@@ -2766,7 +2788,8 @@ class CTSalesOrder extends CTCNC
                 'urlSupplierPopup' => $urlSupplierPopup,
                 'urlSupplierEdit'  => $urlSupplierEdit,
                 'urlCancel'        => $urlCancel,
-                'updatedTime'      => $dsOrdhead->getValue(DBEOrdhead::updatedTime)
+                'updatedTime'      => $dsOrdhead->getValue(DBEOrdhead::updatedTime),
+                'isRecurring'      => $this->dsOrdline->getValue(DBEOrdline::isRecurring) ? '1' : '',
             )
         );
         if ($parentPage == 'SalesOrderLineEdit') {
@@ -2780,7 +2803,8 @@ class CTSalesOrder extends CTCNC
                 array(
                     "I" => "Item",
                     "C" => "Comment",
-                    "T" => "Template"
+                    "T" => "Template",
+                    "O" => "Insert From Order",
                 );
         }
 
@@ -2965,7 +2989,7 @@ class CTSalesOrder extends CTCNC
             'quotationID',
             $quotationID
         );
-    }
+    } // End function Display Sales Order Header
 
     /**
      * delete a quote document
@@ -2997,7 +3021,7 @@ class CTSalesOrder extends CTCNC
         unlink($quoteFile);
         header('Location: ' . $this->getDisplayOrderURL());
         exit;
-    } // End function Display Sales Order Header
+    }
 
     /**
      * Update order lines details
@@ -3035,6 +3059,8 @@ class CTSalesOrder extends CTCNC
         $dbeJOrdline = new DBEJOrdline($this);
         $this->dsOrdline = new DataSet($this);
         $this->dsOrdline->copyColumnsFrom($dbeJOrdline);
+        var_dump($this->getParam('ordline'));
+        exit;
         if (!$this->dsOrdline->populateFromArray($this->getParam('ordline'))) {
             $this->lineValidationError = 'One or more order line values are invalid';
             $this->displayOrder();
@@ -3111,7 +3137,7 @@ class CTSalesOrder extends CTCNC
         );
         header('Location: ' . $this->getDisplayOrderURL());
         exit;
-    }
+    }// end function orderLineForm()
 
     function setSelectedOrderLines($array)
     {
@@ -3124,7 +3150,7 @@ class CTSalesOrder extends CTCNC
             $this->dsSelectedOrderLine->post();
         }
         return TRUE;
-    }// end function orderLineForm()
+    }
 
     /**
      * @return bool
@@ -3657,56 +3683,57 @@ class CTSalesOrder extends CTCNC
      */
     function generateQuoteDoc()
     {
-        $this->setMethodName('generateQuoteDoc');
-        if (count($this->postVars['selectedOrderLine']) == 0) {
-            $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
-            $this->displayOrder();
-            return FALSE;
-        } else {
-            $this->setSelectedOrderLines($this->postVars['selectedOrderLine']);
-        }
-        if (!$this->getSalutation()) {
-            $this->setUserMessage(CTSALESORDER_MSG_SELECT_SALUTATION);
-            $this->displayOrder();
-            return FALSE;
-        }
-        if (!$this->getIntroduction()) {
-            $this->setUserMessage(CTSALESORDER_MSG_SELECT_INTRODUCTION);
-            $this->displayOrder();
-            return FALSE;
-        }
-        if (!$this->getOrdheadID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return FALSE;
-        }
-        if (!$this->getEmailSubject()) {
-            $this->setFormErrorMessage('Email Subject is required');
-            $this->setFormErrorOn();
-            return $this->displayOrder();
+
+        if (!$this->hasPermissions(SALES_PERMISSION)) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(403, 'You do not have enough permissions to proceed');
         }
 
+        $data = $this->getJSONData();
+
+
+        $this->setMethodName('generateQuoteDoc');
+        if (!array_key_exists('selectedLines', $data) || empty($data['selectedLines'])) {
+            throw  new \CNCLTD\Exceptions\JsonHttpException(
+                400,
+                'You have to select at least one line to create the quote'
+            );
+        }
+
+        $this->setSelectedOrderLines($data['selectedLines']);
+
+        if (!array_key_exists('salutation', $data) || empty($data['salutation'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'You have to provide a salutation message');
+        }
+
+        if (!array_key_exists('introduction', $data) || empty($data['introduction'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'You have to provide a introduction message');
+        }
+        if (!array_key_exists('orderHeadId', $data) || empty($data['orderHeadId'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Order Head Id required');
+        }
+        if (!array_key_exists('emailSubject', $data) || empty($data['emailSubject'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Email Subject required');
+        }
         if (!$this->dbeUser->getValue(DBEUser::signatureFilename)) {
-            $this->setFormErrorMessage('User does not have signature file assigned, please assign one to continue');
-            $this->setFormErrorOn();
-            return $this->displayOrder();
+            throw new \CNCLTD\Exceptions\JsonHttpException(
+                400,
+                'User does not have signature file assigned, please assign one to continue'
+            );
         }
 
         $buPDFSalesQuote = new BUPDFSalesQuote($this);
         try {
             $buPDFSalesQuote->generate(
-                $this->getOrdheadID(),
-                $this->getSalutation(),
-                $this->getIntroduction(),
-                $this->getEmailSubject(),
+                $data['orderHeadId'],
+                $data['salutation'],
+                $data['introduction'],
+                $data['emailSubject'],
                 $this->dsSelectedOrderLine
             );
-            header('Location: ' . $this->getDisplayOrderURL());
+            echo json_encode(["status" => "ok"]);
         } catch (Exception $exception) {
-            $this->setUserMessage($exception->getMessage());
-            $this->displayOrder();
-            return FALSE;
+            throw new \CNCLTD\Exceptions\JsonHttpException('500', $exception->getMessage());
         }
-        return true;
     }
 
     /**
@@ -4211,6 +4238,11 @@ class CTSalesOrder extends CTCNC
             exit;
         }
 
+        if ($this->getParam('ordline')[1]['lineType'] == 'O') {
+            $this->pasteLinesFromSO();
+            header('Location: ' . $this->getDisplayOrderURL());
+            exit;
+        }
 
         $this->dsOrdline = new DataSet($this);
         $dbeOrdline = new DBEOrdline($this);
@@ -4410,6 +4442,38 @@ class CTSalesOrder extends CTCNC
         }
         $this->buSalesOrder->pasteLinesFromOrder(
             $this->getParam('ordline')[1]['itemID'],
+            $this->getOrdheadID()
+        );
+        $this->displayOrder();
+    }
+
+    /**
+     * Paste lines from another Sales Order onto the end of this one
+     * $this->getParam('ordline')[1]['description'] holds ordheadID of order to paste from
+     *
+     * @access private
+     * @authors Karim Ahmed - Sweet Code Limited
+     * @throws Exception
+     */
+    function pasteLinesFromSO()
+    {
+        $this->setMethodName('pasteLinesFromSO');
+        $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
+        if (!is_numeric($this->getParam('ordline')[1]['description'])) {
+            $this->setFormErrorMessage('Sales order number must be numeric');
+            $this->displayOrder();
+            return;
+        }
+        if (!$this->buSalesOrder->getOrdheadByID(
+            $this->getParam('ordline')[1]['description'],
+            $dsOrdhead
+        )) {
+            $this->setFormErrorMessage('The sales order you are trying to paste from does not exist');
+            $this->displayOrder();
+            return;
+        }
+        $this->buSalesOrder->pasteLinesFromOrder(
+            $this->getParam('ordline')[1]['description'],
             $this->getOrdheadID()
         );
         $this->displayOrder();
@@ -4840,20 +4904,38 @@ now that the notes are in a text field we need to split the lines up for the PDF
     function updateItemPrice()
     {
         $this->setMethodName('updateItemPrice');
+        $data = $this->getJSONData();
+
+        if (!array_key_exists('lineId', $data)) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "Line Id is required");
+        }
+        if (!array_key_exists('unitSale', $data)) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "Unit Sale is required");
+        }
+        if (!array_key_exists('unitCost', $data)) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "Unit Cost is required");
+        }
+        $dbOrderLine = new DBEOrdline($this);
+        $dbOrderLine->getRow($data['lineId']);
+        $itemId = $dbOrderLine->getValue(DBEOrdline::itemID);
+
+        if (!$itemId) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, "The line selected does not have connected item");
+        }
 
         $dbeItem = new DBEItem($this);
-        $dbeItem->getRow($this->getParam('itemID'));
+        $dbeItem->getRow($itemId);
         $dbeItem->setValue(
             DBEItem::curUnitSale,
-            $this->getParam('curUnitSale')
+            $data['unitSale']
         );
         $dbeItem->setValue(
             DBEItem::curUnitCost,
-            $this->getParam('curUnitCost')
+            $data['unitCost']
         );
         $dbeItem->updateRow();
 
-        header('Location: ' . $this->getDisplayOrderURL());
+        echo json_encode(["status" => "ok"]);
 
     }
 
@@ -5247,7 +5329,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
         $this->setOrdheadID($this->dsQuotation->getValue(DBEJQuotation::ordheadID));
         header('Location: ' . $this->getDisplayOrderURL());
         exit;
-    }
+    } // end contractDropdown
 
     /**
      * @throws Exception
@@ -5323,7 +5405,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
 
         $this->template->parse('CONTENTS', 'TemplatedQuote');
         $this->parsePage();
-    }
+    } // end contractDropdown
 
     /**
      * @param $customerID
@@ -5371,7 +5453,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
             $this->buSalesOrder->pasteLinesFromOrder($salesOrderID, $destinationQuotation);
         }
         return $destinationQuotation;
-    } // end contractDropdown
+    }
 
     /**
      * Get and parse user drop-down selector
@@ -5406,38 +5488,6 @@ now that the notes are in a text field we need to split the lines up for the PDF
                 true
             );
         }
-    } // end contractDropdown
-
-    /**
-     * Paste lines from another Sales Order onto the end of this one
-     * $this->getParam('ordline')[1]['description'] holds ordheadID of order to paste from
-     *
-     * @access private
-     * @authors Karim Ahmed - Sweet Code Limited
-     * @throws Exception
-     */
-    function pasteLinesFromSO()
-    {
-        $this->setMethodName('pasteLinesFromSO');
-        $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
-        if (!is_numeric($this->getParam('ordline')[1]['description'])) {
-            $this->setFormErrorMessage('Sales order number must be numeric');
-            $this->displayOrder();
-            return;
-        }
-        if (!$this->buSalesOrder->getOrdheadByID(
-            $this->getParam('ordline')[1]['description'],
-            $dsOrdhead
-        )) {
-            $this->setFormErrorMessage('The sales order you are trying to paste from does not exist');
-            $this->displayOrder();
-            return;
-        }
-        $this->buSalesOrder->pasteLinesFromOrder(
-            $this->getParam('ordline')[1]['description'],
-            $this->getOrdheadID()
-        );
-        $this->displayOrder();
     }
 
     /**
@@ -5474,7 +5524,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
                 true
             );
         }
-    }
+    } // end function documents
 
     /**
      * Get and parse contact drop-down selector
@@ -5506,6 +5556,5 @@ now that the notes are in a text field we need to split the lines up for the PDF
                 true
             );
         }
-    } // end function documents
-
+    }
 }

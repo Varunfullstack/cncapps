@@ -1,13 +1,7 @@
 <!-- Template: SalesOrderDisplay.inc.html -->
 <script type="text/javascript">
+
     function selectionChanged() {
-        if ($("#action").val() == "insertFromOrder") {
-
-            $("input#fromOrdheadID").show();
-        } else {
-            $("input#fromOrdheadID").hide();
-        }
-
         if ($("#action").val() == "changeSupplier") {
             $("input#updateSupplierName").show();
         } else {
@@ -25,8 +19,313 @@
         }
     }
 
+    let actionSelector;
+    let supplierToChangeId;
+    let salutationInput;
+    let introductionTextArea;
+    let emailSubjectInput;
+    let orderHeadIdInput;
+
     document.addEventListener('DOMContentLoaded', () => {
+
+
+        const oneOffSortableJQuery = $('.sortableLines');
+        oneOffSortableJQuery.sortable({
+            axis: "y",
+            tolerance: "pointer",
+            containment: 'parent',
+            update: (event, ui) => {
+                const lineData = ui.item.data();
+                const movingLineId = lineData.lineId;
+                const fromSequenceNo = lineData.sequenceNo;
+                let swappedItem = ui.item.next();
+                if (ui.position.top > ui.originalPosition.top) {
+                    swappedItem = ui.item.prev();
+                }
+                const toSequenceNo = swappedItem.data().sequenceNo;
+                const replacedLineId = swappedItem.data().lineId;
+                fetch('?action=MOVE_LINE_TO_POSITION', {
+                    method: 'POST',
+                    body: JSON.stringify(
+                        {
+                            lineId: movingLineId,
+                            replacedLineId,
+                        }
+                    )
+                })
+                    .then(() => {
+                        // we have to update the sequences of the items to match the new ordering
+                        const siblings = ui.item.parent().children();
+                        let lowerBound = fromSequenceNo;
+                        let upperBound = toSequenceNo;
+                        if (lowerBound > upperBound) {
+                            upperBound = fromSequenceNo;
+                            lowerBound = toSequenceNo;
+                        }
+
+                        for (let i = lowerBound - 1; i < upperBound; i++) {
+                            siblings[i].dataset.sequenceNo = (i + 1).toString();
+                        }
+                    })
+                    .catch(errorResponse => {
+                        alert('Failed to move line');
+                        console.error(errorResponse);
+                        oneOffSortableJQuery.sortable('cancel');
+                    })
+
+            }
+        });
         selectionChanged();
+
+        actionSelector = document.querySelector('#actionSelector');
+        supplierToChangeId = document.querySelector('#updateSupplierID');
+        salutationInput = document.querySelector('#salutation');
+        introductionTextArea = document.querySelector('#introduction');
+        emailSubjectInput = document.querySelector('#emailSubject');
+        orderHeadIdInput = document.querySelector('[name="form[ordheadID]"]');
+
+
+        document.querySelectorAll('.lineItemQuantityOrdered').forEach(el => {
+            el.addEventListener('input', handleQuantityChanged)
+            el.addEventListener('change', handleUpdateLine);
+        })
+
+        document.querySelectorAll('.lineItemUnitCost').forEach(el => {
+            el.addEventListener('input', handleUnitCostChange)
+            el.addEventListener('change', handleUpdateLine);
+        })
+        document.querySelectorAll('.lineItemUnitSale').forEach(el => {
+            el.addEventListener('input', handleUnitSaleChange)
+            el.addEventListener('change', handleUpdateLine);
+        })
+
+        document.querySelectorAll('.updateItemPriceButton').forEach(el => {
+            el.addEventListener('click', handleUpdateItemPrice);
+        })
+
+
+        function confirmOption(text) {
+            return confirm('Are you sure you want to ' + text);
+        }
+
+        document.querySelector('#performActionButton').addEventListener('click', $event => {
+            console.log('perform action');
+            if (!actionSelector.selectedOptions.length) {
+                return;
+            }
+
+            const selectedOptionText = actionSelector.selectedOptions[0].value;
+
+            switch (selectedOptionText) {
+                case 'change supplier':
+                    if (!supplierToChangeId.value) {
+                        alert('Please select a Supplier');
+                        return;
+                    }
+
+                    if (!confirmOption(selectedOptionText)) {
+                        return;
+                    }
+
+                    // todo: update the supplier for the given lines
+                    break;
+                case 'CREATE_SIGNABLE_QUOTE':
+
+                    const salutation = salutationInput.value;
+                    const introduction = introductionTextArea.value;
+                    const emailSubject = emailSubjectInput.value;
+                    const orderHeadId = orderHeadIdInput.value;
+
+                    if (!salutation || !introduction || !emailSubject) {
+                        alert('Please make sure you have set Salutation, Email Subject and Introduction before trying again');
+                        return;
+                    }
+
+                    const selectedLines = [];
+                    document.querySelectorAll('[name="selectedOrderLine[]"]:checked').forEach((selectedCheckbox) => {
+                        selectedLines.push(selectedCheckbox.value);
+                    });
+
+                    if (!selectedLines.length) {
+                        alert('Please select at least 1 line to proceed');
+                        return;
+                    }
+
+                    // todo: try to generate the quote
+                    fetch('?action=CREATE_SIGNABLE_QUOTE',
+                        {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                selectedLines,
+                                salutation,
+                                introduction,
+                                emailSubject,
+                                orderHeadId
+                            })
+                        }
+                    )
+                        .then(response => response.json())
+                        .then(response => {
+                            if (response.status == 'error') {
+                                throw new Error(response.message);
+                            }
+                            document.location.reload();
+                        })
+                        .catch(error => {
+                            alert(error.message);
+                        })
+
+                    break;
+            }
+        })
+
+        function handleUpdateItemPrice($event) {
+            const target = $event.target;
+            const parentRow = target.closest('tr');
+            const unitSale = parentRow.querySelector('.lineItemUnitSale').value;
+            const unitCost = parentRow.querySelector('.lineItemUnitCost').value;
+            const lineId = parentRow.dataset.lineId;
+            fetch('?action=UPDATE_ITEM_PRICE', {
+                method: 'POST',
+                body: JSON.stringify({
+                    lineId,
+                    unitSale,
+                    unitCost
+                })
+            })
+                .then(() => {
+                    alert('Price updated');
+                })
+                .catch(() => {
+                    alert('Failed to update price');
+                })
+        }
+
+        function handleUpdateLine($event) {
+            const target = $event.target;
+            const parentRow = target.closest('tr');
+            const unitSale = parentRow.querySelector('.lineItemUnitSale').value;
+            const quantity = parentRow.querySelector('.lineItemQuantityOrdered').value;
+            const unitCost = parentRow.querySelector('.lineItemUnitCost').value;
+
+            const rowOverlay = document.createElement('div');
+            const trPosition = parentRow.getBoundingClientRect();
+            rowOverlay.style.height = String(trPosition.height) + "px";
+            rowOverlay.style.width = String(trPosition.width) + "px";
+            rowOverlay.style.position = 'fixed';
+            rowOverlay.style.left = String(trPosition.left) + "px";
+            rowOverlay.style.top = String(trPosition.top) + "px";
+            rowOverlay.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
+            const indicatorHolder = document.createElement('div');
+            indicatorHolder.style.position = 'relative';
+
+            const indicator = document.createElement('div');
+            indicator.className = "loading";
+            indicator.style.top = String(trPosition.height);
+            indicatorHolder.append(indicator);
+            rowOverlay.append(indicatorHolder);
+            document.body.append(rowOverlay);
+
+            fetch('?action=UPDATE_LINE_VALUES', {
+                method: 'POST',
+                body: JSON.stringify({
+                    lineId: parentRow.dataset.lineId,
+                    unitSale,
+                    quantity,
+                    unitCost,
+                })
+            })
+                .catch(() => {
+                    alert('Failed trying to save');
+                })
+                .then(() => {
+                    rowOverlay.parentNode.removeChild(rowOverlay);
+                })
+
+        }
+
+        function getCalculatedValues(quantity, unitCost, unitSale) {
+            const totalCost = unitCost * quantity;
+            const totalSale = unitSale * quantity;
+            const profitAmount = totalSale - totalCost;
+            const profitPercentage = totalCost ? profitAmount / totalCost * 100 : 0;
+            return {
+                totalCost,
+                totalSale,
+                profitAmount,
+                profitPercentage
+            }
+        }
+
+
+        function updateRowCalculatedValues(row, quantity, unitCost, unitSale) {
+            const calculatedValues = getCalculatedValues(quantity, unitCost, unitSale);
+            row.querySelector('.lineItemCostTotal').textContent = calculatedValues.totalCost.toFixed(2);
+            row.querySelector('.lineItemSaleTotal').textContent = calculatedValues.totalSale.toFixed(2);
+            const lineItemProfitAmount = row.querySelector('.lineItemProfitAmount');
+            lineItemProfitAmount.textContent = calculatedValues.profitAmount.toFixed(2);
+            if (calculatedValues.profitAmount < 0) {
+                lineItemProfitAmount.classList.add('orderLineLoss');
+            } else {
+                lineItemProfitAmount.classList.remove('orderLineLoss');
+            }
+            const lineItemProfitPercentage = row.querySelector('.lineItemProfitPercentage');
+            lineItemProfitPercentage.textContent = calculatedValues.profitPercentage.toFixed(2);
+            if (calculatedValues.profitPercentage < 0) {
+                lineItemProfitPercentage.classList.add('orderLineLoss');
+            } else {
+                lineItemProfitPercentage.classList.remove('orderLineLoss');
+            }
+            const tbody = row.closest('tbody');
+            const grandTotals = Array.from(tbody.querySelectorAll('tr')).reduce((sums, tr) => {
+                const lineItemCostTotalInput = tr.querySelector('.lineItemCostTotal');
+                if (!lineItemCostTotalInput) {
+                    return sums;
+                }
+                sums.costGrandTotal += parseFloat(tr.querySelector('.lineItemCostTotal').textContent);
+                sums.saleGrandTotal += parseFloat(tr.querySelector('.lineItemSaleTotal').textContent);
+                sums.profitAmountGrandTotal += parseFloat(tr.querySelector('.lineItemProfitAmount').textContent);
+                return sums;
+            }, {
+                costGrandTotal: 0,
+                saleGrandTotal: 0,
+                profitAmountGrandTotal: 0
+            })
+            const footer = row.closest('table').querySelector('tfoot');
+            footer.querySelector('.costGrandTotal').textContent = grandTotals.costGrandTotal.toFixed(2);
+            footer.querySelector('.saleGrandTotal').textContent = grandTotals.saleGrandTotal.toFixed(2);
+            footer.querySelector('.profitAmountGrandTotal').textContent = grandTotals.profitAmountGrandTotal.toFixed(2);
+        }
+
+        function handleQuantityChanged($event) {
+            // get the parent row
+            const target = $event.target;
+            const quantityValue = target.value;
+            const parentRow = target.closest('tr');
+            const unitCost = parentRow.querySelector('.lineItemUnitCost').value;
+            const unitSale = parentRow.querySelector('.lineItemUnitSale').value;
+            updateRowCalculatedValues(parentRow, quantityValue, unitCost, unitSale);
+        }
+
+        function handleUnitCostChange($event) {
+            const target = $event.target;
+            const unitCost = target.value;
+            const parentRow = target.closest('tr');
+            const quantity = parentRow.querySelector('.lineItemQuantityOrdered').value;
+            const unitSale = parentRow.querySelector('.lineItemUnitSale').value;
+            updateRowCalculatedValues(parentRow, quantity, unitCost, unitSale);
+        }
+
+        function handleUnitSaleChange($event) {
+            const target = $event.target;
+            const unitSale = target.value;
+            const parentRow = target.closest('tr');
+            const quantity = parentRow.querySelector('.lineItemQuantityOrdered').value;
+            const unitCost = parentRow.querySelector('.lineItemUnitCost').value;
+            updateRowCalculatedValues(parentRow, quantity, unitCost, unitSale);
+        }
+
+
     })
 
 </script>
@@ -222,6 +521,62 @@
     </table>
     <br/>
     {salesOrderHeadDisplay} {salesOrderDisplayNewLine}
+    <table>
+        <tbody>
+        <tr>
+            <td colspan="7">
+                <input
+                        type="hidden"
+                        name="form[updateSupplierID]"
+                        id="updateSupplierID"
+                        value="{updateSupplierID}"
+                >
+
+                <select {readOnly}
+                        id="actionSelector"
+                        onChange="selectionChanged()"
+                >
+                    <!-- BEGIN actionBlock -->
+                    <option {SELECTED}
+                            value="{action}"
+                            {disabled}
+                    >{actionDescription}
+                    </option>
+                    <!-- END actionBlock -->
+                </select>
+                <input
+                        {fromOrdheadIDStyle}
+                        type="text"
+                        name="form[fromOrdheadID]"
+                        id="fromOrdheadID"
+                        value="{fromOrdheadID}"
+                        placeholder="From Sales Order ID"
+                >
+                <input
+                        {updateSupplierNameStyle}
+                        type="text"
+                        name="form[updateSupplierName]"
+                        id="updateSupplierName"
+                        value="{updateSupplierName}"
+                        onChange="javascript:validateUpdateSupplierName()"
+                        onKeydown="javascript:checkFunctionKey(updateSupplierName)"
+                        size="35"
+                        maxlength="50"
+                        placeholder="Supplier Name or ID"
+                >
+                <font class="formErrorMessage">{updateSupplierNameMessage}</font>
+                <button id="performActionButton"
+                        {readOnly}
+                        type="button"
+
+                >Go
+                </button>
+                <font class="formErrorMessage">{linesMessage}</font>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
 </div>
 
 <form name="quickQuoteForm"
@@ -255,12 +610,13 @@
            name="updatedTime"
            value="{updatedTime}"
     >
-    <table class="singleBorder"
+    <table class="singleBorder sortableTable"
            width="970"
            border="0"
            cellspacing="1"
            cellpadding="1"
     >
+        <thead>
         <tr>
             <td width="16px"
                 class="listHeadText"
@@ -324,27 +680,18 @@
             <td width="100px"
                 class="orderLineClass"
             >
-                <div align="left">{salesOrderDisplayCreatePO}{salesOrderDisplayUpdateLines}</div>
+                <div align="left">{salesOrderDisplayCreatePO}</div>
             </td>
         </tr>
+        </thead>
+        <tbody class="sortableLines"
+               style="padding-top: 5px;"
+        >
         <!-- BEGIN orderLineBlock -->
-        <INPUT type="hidden"
-               id="lineType"
-               name="ordline[{lineId}][lineType]"
-               value="{lineType}"
-        >
-        <INPUT type="hidden"
-               id="description"
-               name="ordline[{lineId}][description]"
-               value="{description}"
-        >
-        <INPUT type="hidden"
-               id="supplierName"
-               name="ordline[{lineId}][supplierName]"
-               value="{supplierName}"
-        >
         {salesOrderLine}
         <!-- END orderLineBlock -->
+        </tbody>
+        <tfoot>
         <tr>
             <td>&nbsp;</td>
             <td class="orderTotalItem">&nbsp;</td>
@@ -355,81 +702,24 @@
             <td class="orderTotalItem">&nbsp;</td>
             <td class="orderTotalItem">&nbsp;</td>
             <td class="orderTotalItem">&nbsp;</td>
-            <td class="{orderTotalCostClass}">{curCostGrandTotal}</td>
+            <td class="{orderTotalCostClass} costGrandTotal">{curCostGrandTotal}</td>
             <td class="orderTotalItem">&nbsp;</td>
-            <td class="{orderTotalSaleClass}">{curSaleGrandTotal}</td>
-            <td class="{orderTotalProfitClass}">{curProfitGrandTotal}</td>
+            <td class="{orderTotalSaleClass} saleGrandTotal">{curSaleGrandTotal}</td>
+            <td class="{orderTotalProfitClass} profitAmountGrandTotal">{curProfitGrandTotal}</td>
             <td class="{orderTotalProfitClass}">{percProfitGrandTotal}</td>
-            <td class="{orderTotalItem}">{salesOrderDisplayUpdateLines}</td>
+            <td class="{orderTotalItem}">&nbsp;</td>
         </tr>
-        <tr>
-            <td colspan="7">
-                <img src="./images/arrow_ltr.gif"
-                     border="0"
-                     width="38"
-                     height="22"
-                     alt="With selected lines:"
-                />
-
-                <input
-                        type="hidden"
-                        name="form[updateSupplierID]"
-                        id="updateSupplierID"
-                        value="{updateSupplierID}"
-                >
-
-                <select
-                        {readOnly}
-                        type="text"
-                        id="action"
-                        name="form[action]"
-                        onChange="selectionChanged()"
-                >
-                    <!-- BEGIN actionBlock -->
-                    <option {SELECTED}
-                            value="{action}"
-                            {disabled}
-                    >{actionDescription}
-                    </option>
-                    <!-- END actionBlock -->
-                </select>
-                <input
-                        {fromOrdheadIDStyle}
-                        type="text"
-                        name="form[fromOrdheadID]"
-                        id="fromOrdheadID"
-                        value="{fromOrdheadID}"
-                        placeholder="From Sales Order ID"
-                >
-                <input
-                        {updateSupplierNameStyle}
-                        type="text"
-                        name="form[updateSupplierName]"
-                        id="updateSupplierName"
-                        value="{updateSupplierName}"
-                        onChange="javascript:validateUpdateSupplierName()"
-                        onKeydown="javascript:checkFunctionKey(updateSupplierName)"
-                        size="35"
-                        maxlength="50"
-                        placeholder="Supplier Name or ID"
-                >
-                <font class="formErrorMessage">{updateSupplierNameMessage}</font>
-                <input
-                        {readOnly}
-                        type="submit"
-                        name="Submit"
-                        value="Go"
-                        onClick="return bulkUpdateClick()"
-                >
-                <font class="formErrorMessage">{linesMessage}</font>
-            </td>
+        </tfoot>
     </table>
-    <table class="singleBorder"
+    <table class="singleBorder sortableTable"
            width="970"
            border="0"
            cellspacing="1"
            cellpadding="1"
     >
+        <thead>
+
+
         <tr>
             <td width="16px"
                 class="listHeadText"
@@ -493,27 +783,17 @@
             <td width="100px"
                 class="orderLineClass"
             >
-                <div align="left">{salesOrderDisplayCreatePO}{salesOrderDisplayUpdateLines}</div>
+                <div align="left">{salesOrderDisplayCreatePO}</div>
             </td>
         </tr>
+        </thead>
+        <tbody class="sortableLines">
+
         <!-- BEGIN recurringOrderLineBlock -->
-        <INPUT type="hidden"
-               id="lineType"
-               name="ordline[{lineId}][lineType]"
-               value="{lineType}"
-        >
-        <INPUT type="hidden"
-               id="description"
-               name="ordline[{lineId}][description]"
-               value="{description}"
-        >
-        <INPUT type="hidden"
-               id="supplierName"
-               name="ordline[{lineId}][supplierName]"
-               value="{supplierName}"
-        >
         {salesOrderLine}
         <!-- END recurringOrderLineBlock -->
+        </tbody>
+        <tfoot>
         <tr>
             <td>&nbsp;</td>
             <td class="orderTotalItem">&nbsp;</td>
@@ -529,69 +809,9 @@
             <td class="{recurringOrderTotalSaleClass}">{recurringCurSaleGrandTotal}</td>
             <td class="{recurringOrderTotalProfitClass}">{recurringCurProfitGrandTotal}</td>
             <td class="{recurringOrderTotalProfitClass}">{recurringPercProfitGrandTotal}</td>
-            <td class="{orderTotalItem}">{salesOrderDisplayUpdateLines}</td>
+            <td class="{orderTotalItem}">&nbsp;</td>
         </tr>
-        <tr>
-            <td colspan="7">
-                <img src="./images/arrow_ltr.gif"
-                     border="0"
-                     width="38"
-                     height="22"
-                     alt="With selected lines:"
-                />
-
-                <input
-                        type="hidden"
-                        name="form[updateSupplierID]"
-                        id="updateSupplierID"
-                        value="{updateSupplierID}"
-                >
-
-                <select
-                        {readOnly}
-                        type="text"
-                        id="action"
-                        name="form[action]"
-                        onChange="selectionChanged()"
-                >
-                    <!-- BEGIN actionBlock -->
-                    <option {SELECTED}
-                            value="{action}"
-                            {disabled}
-                    >{actionDescription}
-                    </option>
-                    <!-- END actionBlock -->
-                </select>
-                <input
-                        {fromOrdheadIDStyle}
-                        type="text"
-                        name="form[fromOrdheadID]"
-                        id="fromOrdheadID"
-                        value="{fromOrdheadID}"
-                        placeholder="From Sales Order ID"
-                >
-                <input
-                        {updateSupplierNameStyle}
-                        type="text"
-                        name="form[updateSupplierName]"
-                        id="updateSupplierName"
-                        value="{updateSupplierName}"
-                        onChange="javascript:validateUpdateSupplierName()"
-                        onKeydown="javascript:checkFunctionKey(updateSupplierName)"
-                        size="35"
-                        maxlength="50"
-                        placeholder="Supplier Name or ID"
-                >
-                <font class="formErrorMessage">{updateSupplierNameMessage}</font>
-                <input
-                        {readOnly}
-                        type="submit"
-                        name="Submit"
-                        value="Go"
-                        onClick="return bulkUpdateClick()"
-                >
-                <font class="formErrorMessage">{linesMessage}</font>
-            </td>
+        </tfoot>
     </table>
     {salesOrderGenerateQuotes}
 

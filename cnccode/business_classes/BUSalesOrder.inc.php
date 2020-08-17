@@ -1017,7 +1017,6 @@ class BUSalesOrder extends Business
         $this->setMethodName('insertNewOrdline');
 //count rows
         $dsOrdline->fetchNext();
-        var_dump($dsOrdline->getValue(DBEOrdline::ordheadID));
         $this->updateOrderLine(
             $dsOrdline,
             "I"
@@ -1120,6 +1119,13 @@ class BUSalesOrder extends Business
                 DBEOrdline::curTotalSale,
                 $dsOrdline->getValue(DBEOrdline::curUnitSale) * $dsOrdline->getValue(DBEOrdline::qtyOrdered)
             );
+            $dbeItemType = new DBEItemType($this);
+            $dbeItemType->getRow($dsItem->getValue(DBEItem::itemTypeID));
+            $dbeOrdline->setValue(
+                DBEOrdline::isRecurring,
+                $dbeItemType->getValue(DBEItemType::reoccurring)
+            );
+
         } else {
             $dbeOrdline->setValue(
                 DBEOrdline::qtyOrdered,
@@ -1145,7 +1151,10 @@ class BUSalesOrder extends Business
                 DBEOrdline::description,
                 $dsOrdline->getValue(DBEOrdline::description)
             );
-
+            $dbeOrdline->setValue(
+                DBEOrdline::isRecurring,
+                $dsOrdline->getValue(DBEOrdline::isRecurring)
+            );
         }
         if ($action == "U") {
             $dbeOrdline->setShowSQLOn();
@@ -1378,7 +1387,12 @@ class BUSalesOrder extends Business
             $dbeJOrdline,
             $dsJOrdline
         );
-        $dsJOrdline->sortAscending(DBEJOrdline::sequenceNo);
+        $dsJOrdline->columnSort(
+            DBEOrdline::isRecurring,
+            SORT_ASC,
+            DBEOrdline::sequenceNo,
+            SORT_ASC
+        );
         $buCustomer = new BUCustomer($this);
         $buCustomer->getContactByID(
             $dsOrdhead->getValue(DBEOrdhead::delContactID),
@@ -2119,110 +2133,24 @@ class BUSalesOrder extends Business
         $buPDF->printString(
             'Please accept this as official confirmation that we wish to proceed with the supply and installation of the following equipment and services as per your reference ' . $ordHeadID . '/' . $versionNo
         );
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->setBoldOn();
-        $buPDF->setFont();
-        $boxTop = $buPDF->getYPos();
-        $buPDF->printStringRJAt(
-            28,
-            'Qty'
-        );
-        $buPDF->box(
-            QTY_LEFT,
-            $boxTop,
-            ALL_WIDTH,
-            $buPDF->getFontSize() / 2
-        );
-        $buPDF->printStringAt(
-            40,
-            'Details'
-        );
-        $buPDF->printStringRJAt(
-            150,
-            'Unit'
-        );
-        $buPDF->printStringRJAt(
-            173,
-            'Total'
-        );
-        $buPDF->setBoldOff();
-        $buPDF->setFont();
-        $buPDF->CR();
-        $dsOrdline = new DBEQuotationLine($this);
-        $dsOrdline->setValue(DBEQuotationLine::quotationID, $dbeQuotation->getValue(DBEQuotation::quotationID));
-        $dsOrdline->getRowsByColumn(DBEQuotationLine::quotationID);
+
+        $quotationLine = new DBEQuotationLine($this);
+        $quotationLine->setValue(DBEQuotationLine::quotationID, $dbeQuotation->getValue(DBEQuotation::quotationID));
+        $quotationLine->getRowsByColumn(DBEQuotationLine::quotationID, DBEQuotationLine::sequenceNo);
+        $oneOffLines = [];
+        $recurringLines = [];
+        while ($quotationLine->fetchNext()) {
+            if ($quotationLine->getValue(DBEQuotationLine::isRecurring)) {
+                $recurringLines[] = $quotationLine->getRowAsAssocArray();
+            } else {
+                $oneOffLines[] = $quotationLine->getRowAsAssocArray();
+            }
+        }
 
         $grand_total = 0;
 
-        while ($dsOrdline->fetchNext()) {
-            $dsItem = null;
-            if ($dsOrdline->getValue(DBEQuotationLine::lineType) == "I") {
-                $buPDF->printStringRJAt(
-                    28,
-                    $dsOrdline->getValue(DBEQuotationLine::qtyOrdered)
-                );
-                if ($dsOrdline->getValue(DBEQuotationLine::itemID)) {
-                    // some item lines in old system did not have a related item record
-                    $buItem = new BUItem($this);
-                    $buItem->getItemByID(
-                        $dsOrdline->getValue(DBEQuotationLine::itemID),
-                        $dsItem
-                    );
-                }
-
-                if ($dsOrdline->getValue(DBEQuotationLine::description)) {
-                    $buPDF->printStringAt(
-                        40,
-                        $dsOrdline->getValue(DBEQuotationLine::description)
-                    );
-                } else {
-                    if ($dsItem) {
-                        $buPDF->printStringAt(
-                            40,
-                            $dsItem->getValue(DBEItem::description)
-                        );
-                    }
-                }
-                $buPDF->printStringRJAt(
-                    150,
-                    Controller::formatNumberCur($dsOrdline->getValue(DBEQuotationLine::curUnitSale))
-                );
-                $total = ($dsOrdline->getValue(DBEQuotationLine::curUnitSale) * $dsOrdline->getValue(
-                        DBEQuotationLine::qtyOrdered
-                    ));
-                $grand_total += $total;
-                $buPDF->printStringRJAt(
-                    173,
-                    Controller::formatNumberCur($total)
-                );
-
-            } else {
-                $buPDF->printStringAt(
-                    40,
-                    $dsOrdline->getValue(DBEQuotationLine::description)
-                ); // comment line
-            }
-            $buPDF->box(
-                QTY_LEFT,
-                $buPDF->getYPos(),
-                ALL_WIDTH,
-                $buPDF->getFontSize() / 2
-            );
-            $buPDF->CR();
-
-        }
-
-        $buPDF->setBoldOn();
-        $buPDF->setFont();
-        $buPDF->printStringAt(
-            UNIT_LEFT,
-            'Grand total'
-        ); // comment line
-        $buPDF->printStringRJAt(
-            173,
-            Controller::formatNumberCur($grand_total)
-        );
+        $this->renderLines($buPDF, 'One Off Costs', $oneOffLines);
+        $this->renderLines($buPDF, 'Monthly Costs', $recurringLines);
 
         $buPDF->CR();
         $buPDF->CR();
@@ -2287,6 +2215,111 @@ class BUSalesOrder extends Business
         $pkValue = null;
         $buPDF->endPage();
         return $buPDF->getData();
+    }
+
+    private function renderLines(BUPDF $buPDF, string $sectionTitle, array $lines)
+    {
+        if (empty($lines)) {
+            return;
+        }
+        $grandTotal = 0;
+        $buPDF->CR();
+        $buPDF->CR();
+        $buPDF->setBoldOn();
+        $buPDF->setFont();
+        $buPDF->printString($sectionTitle);
+        $boxTop = $buPDF->getYPos();
+        $buPDF->printStringRJAt(
+            28,
+            'Qty'
+        );
+        $buPDF->box(
+            QTY_LEFT,
+            $boxTop,
+            ALL_WIDTH,
+            $buPDF->getFontSize() / 2
+        );
+        $buPDF->printStringAt(
+            40,
+            'Details'
+        );
+        $buPDF->printStringRJAt(
+            150,
+            'Unit'
+        );
+        $buPDF->printStringRJAt(
+            173,
+            'Total'
+        );
+        $buPDF->setBoldOff();
+        $buPDF->setFont();
+        $buPDF->CR();
+        foreach ($lines as $line) {
+            $dsItem = null;
+            if ($line[DBEQuotationLine::lineType] == "I") {
+                $buPDF->printStringRJAt(
+                    28,
+                    $line[DBEQuotationLine::qtyOrdered]
+                );
+                if ($line[DBEQuotationLine::itemID]) {
+                    // some item lines in old system did not have a related item record
+                    $buItem = new BUItem($this);
+                    $buItem->getItemByID(
+                        $line[DBEQuotationLine::itemID],
+                        $dsItem
+                    );
+                }
+
+                if ($line[DBEQuotationLine::description]) {
+                    $buPDF->printStringAt(
+                        40,
+                        $line[DBEQuotationLine::description]
+                    );
+                } else {
+                    if ($dsItem) {
+                        $buPDF->printStringAt(
+                            40,
+                            $dsItem->getValue(DBEItem::description)
+                        );
+                    }
+                }
+                $buPDF->printStringRJAt(
+                    150,
+                    Controller::formatNumberCur($line[DBEQuotationLine::curUnitSale])
+                );
+                $total = ($line[DBEQuotationLine::curUnitSale] * $line[DBEQuotationLine::qtyOrdered]);
+                $grandTotal += $total;
+                $buPDF->printStringRJAt(
+                    173,
+                    Controller::formatNumberCur($total)
+                );
+
+            } else {
+                $buPDF->printStringAt(
+                    40,
+                    $lines[DBEQuotationLine::description]
+                ); // comment line
+            }
+            $buPDF->box(
+                QTY_LEFT,
+                $buPDF->getYPos(),
+                ALL_WIDTH,
+                $buPDF->getFontSize() / 2
+            );
+            $buPDF->CR();
+
+        }
+
+        $buPDF->setBoldOn();
+        $buPDF->setFont();
+        $buPDF->printStringAt(
+            UNIT_LEFT,
+            'Grand total'
+        ); // comment line
+        $buPDF->printStringRJAt(
+            173,
+            Controller::formatNumberCur($grandTotal)
+        );
     }
 
     public function updatePurchaseOrdersRequiredByDate(DBEPorhead $dbePurchaseOrder)

@@ -316,18 +316,16 @@ class DBEOrdline extends DBEntity
         return parent::deleteRow($pkValue);
     }
 
-    protected function getDiscriminatorColumnValue()
-    {
-        return $this->getValue(self::ordheadID);
-    }
-
     protected function getSortOrderColumnName()
     {
         return $this->getDBColumnName(self::sequenceNo);
     }
 
-    protected function getDiscriminatorColumnName()
+
+    protected function getDiscriminatorCondition()
     {
-        return $this->getDBColumnName(self::ordheadID);
+        global $db;
+        $isRecurringString = $this->getValue(self::isRecurring) ? '1' : '0';
+        return "{$this->getDBColumnName(self::ordheadID)} = '{$this->getValue(self::ordheadID)}' and {$this->getDBColumnName(self::isRecurring)} = {$isRecurringString}";
     }
 }
