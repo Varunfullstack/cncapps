@@ -2140,6 +2140,7 @@ class BUSalesOrder extends Business
         $oneOffLines = [];
         $recurringLines = [];
         while ($quotationLine->fetchNext()) {
+
             if ($quotationLine->getValue(DBEQuotationLine::isRecurring)) {
                 $recurringLines[] = $quotationLine->getRowAsAssocArray();
             } else {
@@ -2147,7 +2148,7 @@ class BUSalesOrder extends Business
             }
         }
 
-        $grand_total = 0;
+
 
         $this->renderLines($buPDF, 'One Off Costs', $oneOffLines);
         $this->renderLines($buPDF, 'Monthly Costs', $recurringLines);
