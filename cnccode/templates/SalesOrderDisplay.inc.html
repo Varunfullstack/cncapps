@@ -287,8 +287,37 @@
                     break
                 }
 
+                case 'CREATE_MANUAL_ORDER_FORM': {
+                    const orderHeadId = orderHeadIdInput.value;
+                    const selectedLines = getSelectedLines();
 
-                case 'CREATE_SIGNABLE_QUOTE':
+                    if (!selectedLines.length) {
+                        alert('Please select at least 1 line to proceed');
+                        return;
+                    }
+
+                    fetch('?action=CREATE_MANUAL_ORDER_FORM',
+                        {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                selectedLines,
+                                orderHeadId
+                            })
+                        }
+                    )
+                        .then(response => response.json())
+                        .then(response => {
+                            if (response.status == 'error') {
+                                throw new Error(response.message);
+                            }
+                            document.location.reload();
+                        })
+                        .catch(error => {
+                            alert(error.message);
+                        })
+                    break;
+                }
+                case 'CREATE_SIGNABLE_QUOTE': {
 
                     const salutation = salutationInput.value;
                     const introduction = introductionTextArea.value;
@@ -306,7 +335,6 @@
                         return;
                     }
 
-                    // todo: try to generate the quote
                     fetch('?action=CREATE_SIGNABLE_QUOTE',
                         {
                             method: 'POST',
@@ -331,6 +359,7 @@
                         })
 
                     break;
+                }
             }
         })
 

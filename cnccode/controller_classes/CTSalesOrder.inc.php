@@ -3587,9 +3587,10 @@ class CTSalesOrder extends CTCNC
         }
         $buPDF->CR();
         $buPDF->CR();
-        $buPDF->printString($string);
         $buPDF->setBoldOn();
         $buPDF->setFont();
+        $buPDF->printString($string);
+        $buPDF->CR();
         $boxTop = $buPDF->getYPos();
         $buPDF->printStringRJAt(
             28,
@@ -3665,8 +3666,8 @@ class CTSalesOrder extends CTCNC
                 ALL_WIDTH,
                 $buPDF->getFontSize() / 2
             );
+            $buPDF->CR();
         }
-        $buPDF->CR();
         $buPDF->setBoldOn();
         $buPDF->setFont();
         $buPDF->printStringAt(
