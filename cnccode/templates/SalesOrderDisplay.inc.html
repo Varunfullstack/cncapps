@@ -109,13 +109,6 @@
         return;
     }
 
-    function selectionChanged() {
-        if ($("#action").val() == "changeSupplier") {
-            $("input#updateSupplierName").show();
-        } else {
-            $("input#updateSupplierName").hide();
-        }
-    }
 
     function checkCreation() {
         if (this.event.target.parentElement.className === 'createItem') {
@@ -134,6 +127,7 @@
     let emailSubjectInput;
     let orderHeadIdInput;
     let toggleCheckBoxes;
+    let updateSupplierName;
 
     document.addEventListener('DOMContentLoaded', () => {
         window.fromDate = $('#fromDate').get(0);
@@ -185,7 +179,6 @@
 
             }
         });
-        selectionChanged();
 
         actionSelector = document.querySelector('#actionSelector');
         supplierToChangeId = document.querySelector('#updateSupplierID');
@@ -194,6 +187,7 @@
         emailSubjectInput = document.querySelector('#emailSubject');
         orderHeadIdInput = document.querySelector('[name="form[ordheadID]"]');
         toggleCheckBoxes = document.querySelectorAll('[name="Toggle"]');
+        updateSupplierName = document.querySelector('#updateSupplierName')
 
         toggleCheckBoxes.forEach(el => {
             el.addEventListener('change', $event => {
@@ -236,6 +230,14 @@
             return selectedLines;
         }
 
+        actionSelector.addEventListener('change', $event => {
+            let displayValue = "inline-block"
+            if (actionSelector.value !== 'CHANGE_SUPPLIER_FOR_LINES') {
+                displayValue = 'none'
+            }
+            updateSupplierName.style.display = displayValue;
+        })
+
         document.querySelector('#performActionButton').addEventListener('click', $event => {
             console.log('perform action');
             if (!actionSelector.selectedOptions.length) {
@@ -245,18 +247,22 @@
             const selectedOptionText = actionSelector.selectedOptions[0].value;
 
             switch (selectedOptionText) {
-                case 'change supplier':
-                    if (!supplierToChangeId.value) {
-                        alert('Please select a Supplier');
+                case 'CREATE_SERVICE_REQUEST_FROM_ORDER': {
+                    const selectedLines = getSelectedLines();
+
+                    if (!selectedLines.length) {
+                        alert('Please select at least 1 line to proceed');
                         return;
                     }
 
-                    if (!confirmOption(selectedOptionText)) {
-                        return;
-                    }
-
-                    // todo: update the supplier for the given lines
+                    const orderHeadId = orderHeadIdInput.value;
+                    let url = '?action=CREATE_SERVICE_REQUEST_FROM_ORDER&ordheadID=' + orderHeadId;
+                    url += selectedLines.map((lineId, idx) => {
+                        return '&selectedLines[' + idx + ']=' + lineId
+                    }).join();
+                    open(url, '_blank');
                     break;
+                }
                 case 'DELETE_LINES': {
                     const selectedLines = getSelectedLines();
 
@@ -265,7 +271,6 @@
                         return;
                     }
 
-                    // todo: try to generate the quote
                     fetch('?action=DELETE_LINES',
                         {
                             method: 'POST',
@@ -287,6 +292,42 @@
                     break
                 }
 
+                case 'CHANGE_SUPPLIER_FOR_LINES': {
+                    const selectedLines = getSelectedLines();
+                    const supplierId = supplierToChangeId.value;
+
+                    if (!supplierId) {
+                        alert('Please select a supplier first');
+                        return;
+                    }
+
+
+                    if (!selectedLines.length) {
+                        alert('Please select at least 1 line to proceed');
+                        return;
+                    }
+
+                    fetch('?action=CHANGE_SUPPLIER_FOR_LINES',
+                        {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                selectedLines,
+                                supplierId
+                            })
+                        }
+                    )
+                        .then(response => response.json())
+                        .then(response => {
+                            if (response.status == 'error') {
+                                throw new Error(response.message);
+                            }
+                            document.location.reload();
+                        })
+                        .catch(error => {
+                            alert(error.message);
+                        })
+                    break;
+                }
                 case 'CREATE_MANUAL_ORDER_FORM': {
                     const orderHeadId = orderHeadIdInput.value;
                     const selectedLines = getSelectedLines();
@@ -589,7 +630,6 @@
 
                 <select {readOnly}
                         id="actionSelector"
-                        onChange="selectionChanged()"
                 >
                     <!-- BEGIN actionBlock -->
                     <option {SELECTED}

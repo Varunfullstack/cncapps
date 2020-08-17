@@ -90,10 +90,6 @@ define(
     'convertToOrder'
 );  // bulk convert to initial order using selector
 define(
-    'CTSALESORDER_ACT_CREATE_SR_FROM_LINES',
-    'createSrFromLines'
-);
-define(
     'CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM',
     'genManualOrderForm'
 );
@@ -294,6 +290,9 @@ class CTSalesOrder extends CTCNC
     const CREATE_SIGNABLE_QUOTE = "CREATE_SIGNABLE_QUOTE";
     const DELETE_LINES = "DELETE_LINES";
     const CREATE_MANUAL_ORDER_FORM = "CREATE_MANUAL_ORDER_FORM";
+    const CHANGE_SUPPLIER_FOR_LINES = "CHANGE_SUPPLIER_FOR_LINES";
+    const CREATE_SR_FROM_LINES = "CREATE_SR_FROM_LINES";
+    const CREATE_SERVICE_REQUEST_FROM_ORDER = "CREATE_SERVICE_REQUEST_FROM_ORDER";
     /** @var */
     public $customerID;
     /** @var */
@@ -536,8 +535,7 @@ class CTSalesOrder extends CTCNC
             case self::DELETE_LINES:
                 $this->deleteLines();                        // bulk delete of selected lines
                 break;
-            case CTSALESORDER_ACT_CHANGE_SUPPLIER:
-                $this->checkPermissions(SALES_PERMISSION);
+            case self::CHANGE_SUPPLIER_FOR_LINES:
                 $this->changeSupplier();
                 break;
             case self::CREATE_MANUAL_ORDER_FORM:
@@ -626,12 +624,11 @@ class CTSalesOrder extends CTCNC
 
                 $this->updateItemPrice();
                 break;
-            case 'serviceRequest':
+            case self::CREATE_SERVICE_REQUEST_FROM_ORDER:
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->serviceRequest();
                 break;
-            case CTSALESORDER_ACT_CREATE_SR_FROM_LINES:
-                $this->checkPermissions(SALES_PERMISSION);
+            case self::CREATE_SR_FROM_LINES:
                 $this->serviceRequestFromLines();
                 break;
             case 'sendReminder':
@@ -1242,8 +1239,8 @@ class CTSalesOrder extends CTCNC
             }
 
             $actions[self::CREATE_MANUAL_ORDER_FORM] = 'create manual order form';
-            $actions[CTSALESORDER_ACT_CHANGE_SUPPLIER] = 'change supplier';
-            $actions[CTSALESORDER_ACT_CREATE_SR_FROM_LINES] = 'create new SR';
+            $actions[self::CHANGE_SUPPLIER_FOR_LINES] = 'change supplier';
+            $actions[self::CREATE_SERVICE_REQUEST_FROM_ORDER] = 'create new SR';
         }
         $order = [
             self::CREATE_SIGNABLE_QUOTE,
@@ -1252,8 +1249,8 @@ class CTSalesOrder extends CTCNC
             self::DELETE_LINES,
             CTSALESORDER_ACT_UPDATE_LINES,
             self::CREATE_MANUAL_ORDER_FORM,
-            CTSALESORDER_ACT_CHANGE_SUPPLIER,
-            CTSALESORDER_ACT_CREATE_SR_FROM_LINES,
+            self::CHANGE_SUPPLIER_FOR_LINES,
+            self::CREATE_SERVICE_REQUEST_FROM_ORDER
         ];
 
         uksort(
@@ -1481,12 +1478,11 @@ class CTSalesOrder extends CTCNC
                         Controller::buildLink(
                             $_SERVER['PHP_SELF'],
                             array(
-                                'action'    => 'serviceRequest',
+                                'action'    => self::CREATE_SERVICE_REQUEST_FROM_ORDER,
                                 'ordheadID' => $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                             )
                         );
 
-//          $linkServiceRequest = '<a href="#" onclick="serviceRequestPopup()">Service Request</a>';
                     $linkServiceRequest = '<a href="' . $urlServiceRequest . '" >Create SR</a>';
 
                 } elseif ($linkedServiceRequestCount == 1) {
@@ -1626,7 +1622,7 @@ class CTSalesOrder extends CTCNC
             );
         }
 
-        if ($this->getAction() != CTSALESORDER_ACT_CHANGE_SUPPLIER) {
+        if ($this->getAction() != self::CHANGE_SUPPLIER_FOR_LINES) {
             $this->template->set_var(
                 array(
                     'updateSupplierNameStyle' => 'style="display: none"'
@@ -3046,8 +3042,6 @@ class CTSalesOrder extends CTCNC
         $dbeJOrdline = new DBEJOrdline($this);
         $this->dsOrdline = new DataSet($this);
         $this->dsOrdline->copyColumnsFrom($dbeJOrdline);
-        var_dump($this->getParam('ordline'));
-        exit;
         if (!$this->dsOrdline->populateFromArray($this->getParam('ordline'))) {
             $this->lineValidationError = 'One or more order line values are invalid';
             $this->displayOrder();
@@ -3216,50 +3210,30 @@ class CTSalesOrder extends CTCNC
      */
     function changeSupplier()
     {
-        if (!$this->getOrdheadID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return false;
+        if (!$this->hasPermissions(SALES_PERMISSION)) {
+            throw new JsonHttpException(403, 'You do not have the required permission to perform this operation');
         }
-        if (!$this->getUpdateSupplierID()) {
-            $this->setLinesMessage('Supplier not set');
-            $this->displayOrder();
-            return FALSE;
-        }
-        if (!$this->buSalesOrder->getOrderWithCustomerName(
-            $this->getOrdheadID(),
-            $dsOrdhead,
-            $dsOrdline,
-            $dsDeliveryContact
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
-            return;
-        }
-        if (count($this->postVars['selectedOrderLine']) == 0) {
-            $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
-            $this->displayOrder();
-            return FALSE;
-        } else {
-            $this->setSelectedOrderLines($this->postVars['selectedOrderLine']);
-        }
-        $this->buSalesOrder->changeSupplier(
-            $this->getOrdheadID(),
-            $this->getUpdateSupplierID(),
-            $this->dsSelectedOrderLine
-        );
-        header('Location: ' . $this->getDisplayOrderURL());
-    }
 
-    function getUpdateSupplierID()
-    {
-        return $this->updateSupplierID;
-    }
+        $data = $this->getJSONData();
+        if (!array_key_exists("supplierId", $data)) {
+            throw new JsonHttpException(400, 'The new supplier ID is required');
+        }
 
-    function setUpdateSupplierID($updateSupplierID)
-    {
-        $this->setNumericVar(
-            'updateSupplierID',
-            $updateSupplierID
-        );
+        if (!array_key_exists('selectedLines', $data) || empty($data['selectedLines'])) {
+            throw new JsonHttpException(
+                400,
+                "Select at least one line to be deleted"
+            );
+        }
+        try {
+            $this->buSalesOrder->changeSupplier(
+                $data['supplierId'],
+                $data['selectedLines']
+            );
+            echo json_encode(["status" => "ok"]);
+        } catch (\Exception $exception) {
+            throw new JsonHttpException(500, $exception->getMessage());
+        }
     }
 
     /**
@@ -4590,6 +4564,7 @@ class CTSalesOrder extends CTCNC
             DA_STRING,
             DA_ALLOW_NULL
         );
+
         /*
     get existing values
     */
@@ -4607,8 +4582,8 @@ class CTSalesOrder extends CTCNC
                 $dsOrdhead->getValue(DBEOrdhead::serviceRequestPriority)
             );
         }
-
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            var_dump($this->getParam('selectedLines'));
 
             $formError = !$dsInput->populateFromArray($this->getParam('inputForm'));
 
@@ -4623,15 +4598,13 @@ class CTSalesOrder extends CTCNC
             if (!$formError) {
 
                 $queue = $_REQUEST['queue'] == "Create For Small Projects" ? 3 : 5;
-
                 if ($dsInput->getValue(self::etaDate)) {
                     $buActivity->createSalesServiceRequest(
                         $this->getOrdheadID(),
                         $dsInput,
-                        @$_SESSION['selectedOrderLine'],
+                        $this->getParam('selectedLines'),
                         $queue
                     );
-                    unset($_SESSION['selectedOrderLine']);
                 } else {
                     $this->buSalesOrder->updateServiceRequestDetails(
                         $this->getOrdheadID(),
@@ -4658,15 +4631,23 @@ class CTSalesOrder extends CTCNC
             )
         );
 
-        $urlSubmit =
+        $params = [
+            'action'    => self::CREATE_SERVICE_REQUEST_FROM_ORDER,
+            'ordheadID' => $this->getOrdheadID(),
 
+        ];
+
+        if ($this->getParam('selectedLines')) {
+            foreach ($this->getParam('selectedLines') as $idx => $lineId) {
+                $params["selectedLines[{$idx}]"] = $lineId;
+            }
+        }
+        $urlSubmit =
             Controller::buildLink(
                 $_SERVER['PHP_SELF'],
-                array(
-                    'action'    => 'serviceRequest',
-                    'ordheadID' => $this->getOrdheadID()
-                )
+                $params
             );
+
 
         $this->template->set_var(
             array(
@@ -4838,22 +4819,26 @@ class CTSalesOrder extends CTCNC
      */
     function serviceRequestFromLines()
     {
-        if (count($this->postVars['selectedOrderLine']) == 0) {
-            $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
-            $this->displayOrder();
-            return FALSE;
-        } else {
-            $this->setSessionParam('selectedOrderLine', $this->postVars['selectedOrderLine']);
-            $redirectUrl =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'    => 'serviceRequest',
-                        'ordheadID' => $this->getOrdheadID()
-                    )
-                );
-            header('Location: ' . $redirectUrl);
+        if (!$this->hasPermissions(SALES_PERMISSION)) {
+            throw new JsonHttpException(403, 'You do not have the required permissions to perform this operation');
         }
+
+        $data = $this->getJSONData();
+
+        if (!array_key_exists('selectedLines', $data) || empty($data['selectedLines'])) {
+            throw new JsonHttpException(400, 'Select at least one line');
+        }
+
+        $redirectUrl =
+            Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action'    => self::CREATE_SERVICE_REQUEST_FROM_ORDER,
+                    'ordheadID' => $this->getOrdheadID()
+                )
+            );
+        header('Location: ' . $redirectUrl);
+
         return true;
     }
 
@@ -4938,7 +4923,7 @@ class CTSalesOrder extends CTCNC
         $this->setOrdheadID($this->dsQuotation->getValue(DBEJQuotation::ordheadID));
         header('Location: ' . $this->getDisplayOrderURL());
         exit;
-    } // end contractDropdown
+    }
 
     /**
      * @throws Exception
@@ -5014,7 +4999,7 @@ class CTSalesOrder extends CTCNC
 
         $this->template->parse('CONTENTS', 'TemplatedQuote');
         $this->parsePage();
-    } // end contractDropdown
+    }
 
     /**
      * @param $customerID
@@ -5062,7 +5047,7 @@ class CTSalesOrder extends CTCNC
             $this->buSalesOrder->pasteLinesFromOrder($salesOrderID, $destinationQuotation);
         }
         return $destinationQuotation;
-    }
+    } // end contractDropdown
 
     /**
      * Get and parse user drop-down selector
@@ -5097,6 +5082,19 @@ class CTSalesOrder extends CTCNC
                 true
             );
         }
+    } // end contractDropdown
+
+    function getUpdateSupplierID()
+    {
+        return $this->updateSupplierID;
+    }
+
+    function setUpdateSupplierID($updateSupplierID)
+    {
+        $this->setNumericVar(
+            'updateSupplierID',
+            $updateSupplierID
+        );
     }
 
     /**

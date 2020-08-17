@@ -1034,7 +1034,6 @@ class BUSalesOrder extends Business
                              $action = "U"
     )
     {
-        var_dump($dsOrdline->getValue(DBEOrdline::ordheadID));
         $this->setMethodName('updateOrderLine');
         $dbeOrdhead = new DBEOrdhead($this);
         $dbeOrdhead->setPKValue($dsOrdline->getValue(DBEOrdline::ordheadID));
@@ -1440,48 +1439,27 @@ class BUSalesOrder extends Business
     }
 
     /**
-     * @param $ordheadID
      * @param $supplierID
-     * @param DataSet $dsSelectedOrderLine
+     * @param array $selectedLineIds
      */
-    function changeSupplier($ordheadID,
-                            $supplierID,
-                            &$dsSelectedOrderLine
+    function changeSupplier(
+        $supplierID,
+        array $selectedLineIds
     )
     {
         $this->setMethodName('changeSupplier');
-
-        if (!is_a(
-            $dsSelectedOrderLine,
-            'DataSet'
-        )) {
-            $this->raiseError('orderLines object not passed');
-        }
-
-        if (!$this->getOrderWithCustomerName(
-            $ordheadID,
-            $dsOrdhead,
-            $dsOrdline,
-            $dsContact
-        )) {
-            $this->raiseError('Order not found');
-        }
-
-        $dbeOrdline = new DBEOrdline($this);
-
-        $dsSelectedOrderLine->initialise();
-
-        while ($dsSelectedOrderLine->fetchNext()) {
-            $dbeOrdline->getRow($dsSelectedOrderLine->getValue(DBEOrdline::id));
-            if ($dbeOrdline->getValue(DBEOrdline::lineType) != 'C') {
-                $dbeOrdline->setValue(
+        $orderLine = new DBEOrdline($this);
+        foreach ($selectedLineIds as $lineId) {
+            $orderLine->getRow($lineId);
+            if ($orderLine->getValue(DBEOrdline::lineType) != 'C') {
+                $orderLine->setValue(
                     DBEOrdline::supplierID,
                     $supplierID
                 );
-                $dbeOrdline->updateRow();
+                $orderLine->updateRow();
             }
         }
-    }// end changeSupplier
+    }
 
     /**
      * Create a duplicate quotation from an existing sales order
