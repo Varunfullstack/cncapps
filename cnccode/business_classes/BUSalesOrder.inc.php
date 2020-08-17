@@ -1562,43 +1562,14 @@ class BUSalesOrder extends Business
 
     /**
      * Delete multiple Order Lines
-     * @param $ordheadID
-     * @param DataSet $dsSelectedOrderLine
-     * @return bool
+     * @param array $lineIds
+     * @return void
      */
-    function deleteLines($ordheadID,
-                         &$dsSelectedOrderLine
-    )
+    function deleteLines($lineIds)
     {
-        $this->setMethodName('deleteLines');
-        if (!$ordheadID) {
-            $this->raiseError('ordheadID not passed');
+        foreach ($lineIds as $lineId) {
+            $this->deleteOrderLine($lineId);
         }
-        if (!is_a(
-            $dsSelectedOrderLine,
-            'DataSet'
-        )) {
-            $this->raiseError('orderLines object not passed');
-        }
-        if (!$this->getOrderWithCustomerName(
-            $ordheadID,
-            $dsOrdhead,
-            $dsOrdline,
-            $dsContact
-        )) {
-            $this->raiseError('Order/Quote not found');
-        }
-        $dsSelectedOrderLine->initialise();
-        /*
-            The reason for deletedCount is that, as a line is deleted, all the sequenceNos of lines beyond it are decreased by
-            one. Therefore, we need to apply this adjustment to any subsequent deletions.
-        */
-        $deletedCount = 0;
-        while ($dsSelectedOrderLine->fetchNext()) {
-            $this->deleteOrderLine($dsSelectedOrderLine->getValue(DBEOrdline::id));
-            $deletedCount++;
-        }
-        return TRUE;
     }
 
     function deleteOrderLine($lineId)

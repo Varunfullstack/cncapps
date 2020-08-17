@@ -7,6 +7,9 @@
  * @authors Karim Ahmed - Sweet Code Limited
  */
 global $cfg;
+
+use CNCLTD\Exceptions\JsonHttpException;
+
 require_once($cfg['path_bu'] . '/BUCustomer.inc.php');
 require_once($cfg['path_bu'] . '/BUProject.inc.php');
 require_once($cfg['path_bu'] . '/BUCustomerNote.inc.php');
@@ -87,10 +90,6 @@ define(
     'convertToOrder'
 );  // bulk convert to initial order using selector
 define(
-    'CTSALESORDER_ACT_DELETE_LINES',
-    'deleteLines'
-);         // bulk delete of lines using selector
-define(
     'CTSALESORDER_ACT_CREATE_SR_FROM_LINES',
     'createSrFromLines'
 );
@@ -158,10 +157,7 @@ define(
     'CTSALESORDER_ACT_UPDATE_HEADER',
     'updateHead'
 );
-define(
-    'CTSALESORDER_ACT_SEND_CONFIRMATION',
-    'sendOrderConfirmation'
-);
+
 // Messages
 define(
     'CTSALESORDER_MSG_CUSTTRING_REQ',
@@ -296,6 +292,8 @@ class CTSalesOrder extends CTCNC
     const UPDATE_LINE_VALUES = "UPDATE_LINE_VALUES";
     const UPDATE_ITEM_PRICE = "UPDATE_ITEM_PRICE";
     const CREATE_SIGNABLE_QUOTE = "CREATE_SIGNABLE_QUOTE";
+    const DELETE_LINES = "DELETE_LINES";
+    const CREATE_MANUAL_ORDER_FORM = "CREATE_MANUAL_ORDER_FORM";
     /** @var */
     public $customerID;
     /** @var */
@@ -500,17 +498,17 @@ class CTSalesOrder extends CTCNC
                 $data = json_decode(file_get_contents('php://input'), true);
 
                 if (!array_key_exists('lineId', $data)) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, "Line id is required");
+                    throw new JsonHttpException(400, "Line id is required");
                 }
 
                 if (!array_key_exists('unitSale', $data)) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'unitSale is required');
+                    throw new JsonHttpException(400, 'unitSale is required');
                 }
                 if (!array_key_exists('quantity', $data)) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'quantity is required');
+                    throw new JsonHttpException(400, 'quantity is required');
                 }
                 if (!array_key_exists('unitCost', $data)) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'unitCost is required');
+                    throw new JsonHttpException(400, 'unitCost is required');
                 }
                 $dbeOrdline = new DBEOrdline($this);
                 $dbeOrdline->getRow($data['lineId']);
@@ -535,16 +533,14 @@ class CTSalesOrder extends CTCNC
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->insertFromOrder();
                 break;
-            case CTSALESORDER_ACT_DELETE_LINES:
-                $this->checkPermissions(SALES_PERMISSION);
+            case self::DELETE_LINES:
                 $this->deleteLines();                        // bulk delete of selected lines
                 break;
             case CTSALESORDER_ACT_CHANGE_SUPPLIER:
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->changeSupplier();
                 break;
-            case CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM:
-                $this->checkPermissions(SALES_PERMISSION);
+            case self::CREATE_MANUAL_ORDER_FORM:
                 $this->generateOrderForm();
                 break;
             case self::CREATE_SIGNABLE_QUOTE:
@@ -561,10 +557,6 @@ class CTSalesOrder extends CTCNC
             case CTSALESORDER_ACT_DELETE_ORDER:
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->deleteOrder();
-                break;
-            case CTSALESORDER_ACT_DOWNLOAD_CSV:
-                $this->checkPermissions(SALES_PERMISSION);
-                $this->downloadCSV();
                 break;
             case CTSALESORDER_ACT_UPDATE_DEL_ADDRESS:
             case CTSALESORDER_ACT_UPDATE_INV_ADDRESS:
@@ -602,10 +594,6 @@ class CTSalesOrder extends CTCNC
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->updateHeader();
                 break;
-            case CTSALESORDER_ACT_SEND_CONFIRMATION:
-                $this->checkPermissions(SALES_PERMISSION);
-                $this->sendOrderConfirmation();
-                break;
             case 'toggleSOMonitor':
                 $salesOrderId = @$_REQUEST['salesOrderId'];
                 if (!$salesOrderId) {
@@ -630,7 +618,7 @@ class CTSalesOrder extends CTCNC
                 break;
             case self::UPDATE_ITEM_PRICE:
                 if (!$this->hasPermissions(SALES_PERMISSION)) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(
+                    throw new JsonHttpException(
                         403,
                         'You do not sufficient permissions to perform this task'
                     );
@@ -655,10 +643,10 @@ class CTSalesOrder extends CTCNC
             case self::MOVE_LINE_TO_POSITION:
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!array_key_exists('lineId', $data)) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Line id is required');
+                    throw new JsonHttpException(400, 'Line id is required');
                 }
                 if (!array_key_exists('replacedLineId', $data)) {
-                    throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Replaced Line Id is required');
+                    throw new JsonHttpException(400, 'Replaced Line Id is required');
                 }
                 $dbeOrdline = new DBEOrdline($this);
                 $dbeOrdline->getRow($data['lineId']);
@@ -1245,7 +1233,7 @@ class CTSalesOrder extends CTCNC
                 $actions[CTSALESORDER_ACT_CONVERT_TO_ORDER] = 'convert to order';
             }
             if ($orderType == 'Q' || $orderType == 'I') {
-                $actions[CTSALESORDER_ACT_DELETE_LINES] = 'delete lines';
+                $actions[self::DELETE_LINES] = 'delete lines';
             }
 
             if ($orderType !== 'C') {
@@ -1253,7 +1241,7 @@ class CTSalesOrder extends CTCNC
                 $actions[self::CREATE_SIGNABLE_QUOTE] = 'create Signable quote';
             }
 
-            $actions[CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM] = 'create manual order form';
+            $actions[self::CREATE_MANUAL_ORDER_FORM] = 'create manual order form';
             $actions[CTSALESORDER_ACT_CHANGE_SUPPLIER] = 'change supplier';
             $actions[CTSALESORDER_ACT_CREATE_SR_FROM_LINES] = 'create new SR';
         }
@@ -1261,10 +1249,9 @@ class CTSalesOrder extends CTCNC
             self::CREATE_SIGNABLE_QUOTE,
             CTSALESORDER_ACT_COPY_TO_ORDER,
             CTSALESORDER_ACT_CONVERT_TO_ORDER,
-            CTSALESORDER_ACT_DELETE_LINES,
+            self::DELETE_LINES,
             CTSALESORDER_ACT_UPDATE_LINES,
-            CTSALESORDER_ACT_SEND_CONFIRMATION,
-            CTSALESORDER_ACT_CREATE_MANUAL_ORDER_FORM,
+            self::CREATE_MANUAL_ORDER_FORM,
             CTSALESORDER_ACT_CHANGE_SUPPLIER,
             CTSALESORDER_ACT_CREATE_SR_FROM_LINES,
         ];
@@ -3201,32 +3188,26 @@ class CTSalesOrder extends CTCNC
      */
     function deleteLines()
     {
-        if (!$this->getOrdheadID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return false;
+        if (!$this->hasPermissions(SALES_PERMISSION)) {
+            throw new JsonHttpException(
+                403,
+                "You do not have sufficient permissions to perform this action"
+            );
         }
-        if (!$this->buSalesOrder->getOrderWithCustomerName(
-            $this->getOrdheadID(),
-            $dsOrdhead,
-            $dsOrdline,
-            $dsDeliveryContact
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
-            return false;
+
+        $data = $this->getJSONData();
+        if (!array_key_exists('selectedLines', $data) || empty($data['selectedLines'])) {
+            throw new JsonHttpException(
+                400,
+                "Select at least one line to be deleted"
+            );
         }
-        if (count($this->postVars['selectedOrderLine']) == 0) {
-            $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
-            $this->displayOrder();
-            return FALSE;
-        } else {
-            $this->setSelectedOrderLines($this->postVars['selectedOrderLine']);
+        try {
+            $this->buSalesOrder->deleteLines($data['selectedLines']);
+            echo json_encode(["status" => "ok"]);
+        } catch (\Exception $exception) {
+            throw new JsonHttpException(500, $exception->getMessage());
         }
-        $this->buSalesOrder->deleteLines(
-            $this->getOrdheadID(),
-            $this->dsSelectedOrderLine
-        );
-        header('Location: ' . $this->getDisplayOrderURL());
-        exit;
     }
 
     /**
@@ -3284,47 +3265,57 @@ class CTSalesOrder extends CTCNC
     /**
      * generate a PDF order form.
      * @access private
-     * @param bool $isESigned
-     * @return bool
-     * @throws Exception
+     * @return void
+     * @throws JsonHttpException
      */
     function generateOrderForm()
     {
         $this->setMethodName('generateOrderForm');
-        if (count($this->postVars['selectedOrderLine']) == 0) {
-            $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
-            $this->displayOrder();
-            return FALSE;
-        } else {
-            $this->setSelectedOrderLines($this->postVars['selectedOrderLine']);
+        if (!$this->hasPermissions(SALES_PERMISSION)) {
+            throw new JsonHttpException(
+                403,
+                "You do not have the required permission for this operation"
+            );
         }
-        if (!$this->getOrdheadID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return FALSE;
+        $data = $this->getJSONData();
+
+        if (!array_key_exists('selectedLines', $data) || empty($data['selectedLines'])) {
+            throw new JsonHttpException(400, 'Select at least one line');
         }
-        $this->buildOrderForm();
-        header('Location: ' . $this->getDisplayOrderURL());
-        exit;
+
+        if (!array_key_exists('orderHeadId', $data) || empty($data['orderHeadId'])) {
+            throw new JsonHttpException(400, 'Order Head Id required');
+        }
+
+        try {
+            $this->buildOrderForm($data['orderHeadId'], $data['selectedLines']);
+            echo json_encode(["status" => "ok"]);
+        } catch (Exception $exception) {
+            throw new JsonHttpException(500, 'Operation Failed: ' . $exception->getMessage());
+        }
+
     }
 
     /**
-     *
+     * @param $orderHeadId
+     * @param $lineIds
+     * @throws Exception
      */
-    function buildOrderForm()
+    function buildOrderForm($orderHeadId, $lineIds)
     {
         $dsOrdhead = new DataSet($this);
         $dsOrdline = new DataSet($this);
         $dsDeliveryContact = new DataSet($this);
         if (!$this->buSalesOrder->getOrderWithCustomerName(
-            $this->getOrdheadID(),
+            $orderHeadId,
             $dsOrdhead,
             $dsOrdline,
             $dsDeliveryContact
         )) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
+            throw new Exception(CTSALESORDER_MSG_ORDER_NOT_FND);
         }
-        $versionNo = $this->buSalesOrder->getNextQuoteVersion($this->getOrdheadID());
-        $orderFile = 'quotes/' . $this->getOrdheadID() . '_' . $versionNo . '.pdf';
+        $versionNo = $this->buSalesOrder->getNextQuoteVersion($orderHeadId);
+        $orderFile = 'quotes/' . $orderHeadId . '_' . $versionNo . '.pdf';
         $this->buSalesOrder->getUserByID(
             $this->userID,
             $this->dsUser
@@ -3334,7 +3325,7 @@ class CTSalesOrder extends CTCNC
             $this,
             $orderFile,
             $this->dsUser->getValue(DBEUser::name),
-            $this->getOrdheadID() . '/' . $versionNo,
+            $orderHeadId . '/' . $versionNo,
             'CNC Ltd',
             'Customer Order Form'
         );
@@ -3477,110 +3468,29 @@ class CTSalesOrder extends CTCNC
             'Please accept this as official confirmation that we wish to proceed with the supply and installation of the following equipment and services as per your reference ' . $this->getOrdheadID(
             ) . '/' . $versionNo
         );
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->setBoldOn();
-        $buPDF->setFont();
-        $boxTop = $buPDF->getYPos();
-        $buPDF->printStringRJAt(
-            28,
-            'Qty'
-        );
-        $buPDF->box(
-            QTY_LEFT,
-            $boxTop,
-            ALL_WIDTH,
-            $buPDF->getFontSize() / 2
-        );
-        $buPDF->printStringAt(
-            40,
-            'Details'
-        );
-        $buPDF->printStringRJAt(
-            150,
-            'Unit'
-        );
-        $buPDF->printStringRJAt(
-            173,
-            'Total'
-        );
-        $buPDF->setBoldOff();
-        $buPDF->setFont();
-        $buPDF->CR();
-        $dsOrdline->initialise();
-
-        $grand_total = 0;
-
+        $oneOffLines = [];
+        $ongoingLines = [];
         while ($dsOrdline->fetchNext()) {
-            if ($this->dsSelectedOrderLine->search(
-                DBEOrdline::id,
-                $dsOrdline->getValue(DBEOrdline::id)
-            )) {
-                if ($dsOrdline->getValue(DBEOrdline::lineType) == "I") {
-                    $buPDF->printStringRJAt(
-                        28,
-                        $dsOrdline->getValue(DBEOrdline::qtyOrdered)
-                    );
-                    if ($dsOrdline->getValue(DBEOrdline::description)) {
-                        $buPDF->printStringAt(
-                            40,
-                            $dsOrdline->getValue(DBEOrdline::description)
-                        );
-                    } else {
-                        $buPDF->printStringAt(
-                            40,
-                            $dsOrdline->getValue(DBEJOrdline::itemDescription)
-                        );
-                    }
-                    $buPDF->printStringRJAt(
-                        150,
-                        Controller::formatNumberCur($dsOrdline->getValue(DBEOrdline::curUnitSale))
-                    );
-                    $total = ($dsOrdline->getValue(DBEOrdline::curUnitSale) * $dsOrdline->getValue(
-                            DBEOrdline::qtyOrdered
-                        ));
-                    $grand_total += $total;
-                    $buPDF->printStringRJAt(
-                        173,
-                        Controller::formatNumberCur($total)
-                    );
-                    if ($dsOrdline->getValue(DBEOrdline::itemID)) {
-                        // some item lines in old system did not have a related item record
-                        $this->buItem->getItemByID(
-                            $dsOrdline->getValue(DBEOrdline::itemID),
-                            $dsItem
-                        );
-                    }
-                } else {
-                    $buPDF->printStringAt(
-                        40,
-                        $dsOrdline->getValue(DBEOrdline::description)
-                    ); // comment line
-                }
-                $buPDF->box(
-                    QTY_LEFT,
-                    $buPDF->getYPos(),
-                    ALL_WIDTH,
-                    $buPDF->getFontSize() / 2
-                );
-                $buPDF->CR();
+            if (!in_array($dsOrdline->getValue(DBEOrdline::id), $lineIds)) {
+                continue;
+            }
+            $row = [
+                DBEOrdline::lineType         => $dsOrdline->getValue(DBEOrdline::lineType),
+                DBEOrdline::qtyOrdered       => $dsOrdline->getValue(DBEOrdline::qtyOrdered),
+                DBEOrdline::description      => $dsOrdline->getValue(DBEOrdline::description),
+                DBEJOrdline::itemDescription => $dsOrdline->getValue(DBEJOrdline::itemDescription),
+                DBEOrdline::curUnitSale      => $dsOrdline->getValue(DBEOrdline::curUnitSale),
+                DBEOrdline::itemID           => $dsOrdline->getValue(DBEOrdline::itemID),
+            ];
+            if ($dsOrdline->getValue(DBEOrdline::isRecurring)) {
+                $ongoingLines[] = $row;
+            } else {
+                $oneOffLines[] = $row;
             }
         }
-        //$buPDF->box(QTY_LEFT, $boxTop, QTY_WIDTH, $buPDF->getYPos() - $boxTop);
-        //$buPDF->box(UNIT_LEFT, $boxTop, UNIT_WIDTH, $buPDF->getYPos() - $boxTop);
-        //$buPDF->box(TOTAL_LEFT, $boxTop, TOTAL_WIDTH, $buPDF->getYPos() - $boxTop);
+        $this->renderManualOrderLine($buPDF, 'One Off', $oneOffLines);
+        $this->renderManualOrderLine($buPDF, 'Ongoing', $ongoingLines);
 
-        $buPDF->setBoldOn();
-        $buPDF->setFont();
-        $buPDF->printStringAt(
-            UNIT_LEFT,
-            'Grand total'
-        ); // comment line
-        //$buPDF->box(TOTAL_LEFT, $buPDF->getYPos(), TOTAL_WIDTH, $buPDF->getFontSize()/2);
-        $buPDF->printStringRJAt(
-            173,
-            Controller::formatNumberCur($grand_total)
-        );
 
         $buPDF->CR();
         $buPDF->CR();
@@ -3588,35 +3498,30 @@ class CTSalesOrder extends CTCNC
             UNIT_LEFT - 2,
             'Our official order no:'
         );
-        //$buPDF->box(UNIT_LEFT, $buPDF->getYPos(), UNIT_WIDTH * 2, $buPDF->getFontSize()/2);
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printStringRJAt(
             UNIT_LEFT - 2,
             'Name:'
         );
-        //$buPDF->box(UNIT_LEFT, $buPDF->getYPos(), UNIT_WIDTH * 2, $buPDF->getFontSize()/2);
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printStringRJAt(
             UNIT_LEFT - 2,
             'Signed:'
         );
-        //$buPDF->box(UNIT_LEFT, $buPDF->getYPos(), UNIT_WIDTH * 2, $buPDF->getFontSize()/2);
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printStringRJAt(
             UNIT_LEFT - 2,
             'Date:'
         );
-        //$buPDF->box(UNIT_LEFT, $buPDF->getYPos(), UNIT_WIDTH * 2, $buPDF->getFontSize()/2);
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->printStringRJAt(
             UNIT_LEFT - 2,
             'Position:'
         );
-        //$buPDF->box(UNIT_LEFT, $buPDF->getYPos(), UNIT_WIDTH * 2, $buPDF->getFontSize()/2);
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->setBoldOn();
@@ -3625,7 +3530,6 @@ class CTSalesOrder extends CTCNC
         $buPDF->CR();
         $buPDF->CR();
         $buPDF->CR();
-        $pkValue = null;
         $buPDF->printString(
             'Please return a signed copy to sales@cnc-ltd.co.uk'
         );
@@ -3676,6 +3580,105 @@ class CTSalesOrder extends CTCNC
 
     }
 
+    private function renderManualOrderLine(BUPDF $buPDF, string $string, array $oneOffLines)
+    {
+        if (empty($oneOffLines)) {
+            return;
+        }
+        $buPDF->CR();
+        $buPDF->CR();
+        $buPDF->printString($string);
+        $buPDF->setBoldOn();
+        $buPDF->setFont();
+        $boxTop = $buPDF->getYPos();
+        $buPDF->printStringRJAt(
+            28,
+            'Qty'
+        );
+        $buPDF->box(
+            QTY_LEFT,
+            $boxTop,
+            ALL_WIDTH,
+            $buPDF->getFontSize() / 2
+        );
+        $buPDF->printStringAt(
+            40,
+            'Details'
+        );
+        $buPDF->printStringRJAt(
+            150,
+            'Unit'
+        );
+        $buPDF->printStringRJAt(
+            173,
+            'Total'
+        );
+        $buPDF->setBoldOff();
+        $buPDF->setFont();
+        $buPDF->CR();
+        $grandTotal = 0;
+
+        foreach ($oneOffLines as $line) {
+            if ($line[DBEOrdline::lineType] == "I") {
+                $buPDF->printStringRJAt(
+                    28,
+                    $line[DBEOrdline::qtyOrdered]
+                );
+                if ($line[DBEOrdline::description]) {
+                    $buPDF->printStringAt(
+                        40,
+                        $line[DBEOrdline::description]
+                    );
+                } else {
+                    $buPDF->printStringAt(
+                        40,
+                        $line[DBEJOrdline::itemDescription]
+                    );
+                }
+                $buPDF->printStringRJAt(
+                    150,
+                    Controller::formatNumberCur($line[DBEOrdline::curUnitSale])
+                );
+                $total = $line[DBEOrdline::curUnitSale] *
+                    $line[DBEOrdline::qtyOrdered];
+                $grandTotal += $total;
+                $buPDF->printStringRJAt(
+                    173,
+                    Controller::formatNumberCur($total)
+                );
+                if ($line[DBEOrdline::itemID]) {
+                    // some item lines in old system did not have a related item record
+                    $this->buItem->getItemByID(
+                        $line[DBEOrdline::itemID],
+                        $dsItem
+                    );
+                }
+            } else {
+                $buPDF->printStringAt(
+                    40,
+                    $line[DBEOrdline::description]
+                ); // comment line
+            }
+            $buPDF->box(
+                QTY_LEFT,
+                $buPDF->getYPos(),
+                ALL_WIDTH,
+                $buPDF->getFontSize() / 2
+            );
+        }
+        $buPDF->CR();
+        $buPDF->setBoldOn();
+        $buPDF->setFont();
+        $buPDF->printStringAt(
+            UNIT_LEFT,
+            "$string Total"
+        );
+        $buPDF->printStringRJAt(
+            173,
+            Controller::formatNumberCur($grandTotal)
+        );
+    }
+
     /**
      * generate a PDF quote.
      * @access private
@@ -3685,7 +3688,7 @@ class CTSalesOrder extends CTCNC
     {
 
         if (!$this->hasPermissions(SALES_PERMISSION)) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(403, 'You do not have enough permissions to proceed');
+            throw new JsonHttpException(403, 'You do not have enough permissions to proceed');
         }
 
         $data = $this->getJSONData();
@@ -3693,7 +3696,7 @@ class CTSalesOrder extends CTCNC
 
         $this->setMethodName('generateQuoteDoc');
         if (!array_key_exists('selectedLines', $data) || empty($data['selectedLines'])) {
-            throw  new \CNCLTD\Exceptions\JsonHttpException(
+            throw  new JsonHttpException(
                 400,
                 'You have to select at least one line to create the quote'
             );
@@ -3702,20 +3705,20 @@ class CTSalesOrder extends CTCNC
         $this->setSelectedOrderLines($data['selectedLines']);
 
         if (!array_key_exists('salutation', $data) || empty($data['salutation'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'You have to provide a salutation message');
+            throw new JsonHttpException(400, 'You have to provide a salutation message');
         }
 
         if (!array_key_exists('introduction', $data) || empty($data['introduction'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'You have to provide a introduction message');
+            throw new JsonHttpException(400, 'You have to provide a introduction message');
         }
         if (!array_key_exists('orderHeadId', $data) || empty($data['orderHeadId'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Order Head Id required');
+            throw new JsonHttpException(400, 'Order Head Id required');
         }
         if (!array_key_exists('emailSubject', $data) || empty($data['emailSubject'])) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Email Subject required');
+            throw new JsonHttpException(400, 'Email Subject required');
         }
         if (!$this->dbeUser->getValue(DBEUser::signatureFilename)) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(
+            throw new JsonHttpException(
                 400,
                 'User does not have signature file assigned, please assign one to continue'
             );
@@ -3732,7 +3735,7 @@ class CTSalesOrder extends CTCNC
             );
             echo json_encode(["status" => "ok"]);
         } catch (Exception $exception) {
-            throw new \CNCLTD\Exceptions\JsonHttpException('500', $exception->getMessage());
+            throw new JsonHttpException('500', $exception->getMessage());
         }
     }
 
@@ -3923,98 +3926,6 @@ class CTSalesOrder extends CTCNC
             }
         }
         header('Location: ' . $url);
-        exit;
-    }
-
-    /**
-     * generate a CSV of the selected lines.
-     * @access private
-     * @throws Exception
-     */
-    function downloadCSV()
-    {
-        $this->setMethodName('downloadCSV');
-        if (count($this->postVars['selectedOrderLine']) == 0) {
-            $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
-            $this->displayOrder();
-            return FALSE;
-        } else {
-            $this->setSelectedOrderLines($this->postVars['selectedOrderLine']);
-        }
-        if (!$this->getOrdheadID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return FALSE;
-        }
-        $dsOrdline = new DataSet($this);
-        if (!$this->buSalesOrder->getOrderWithCustomerName(
-            $this->getOrdheadID(),
-            $dsOrdhead,
-            $dsOrdline,
-            $dsDeliveryContact
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
-        }
-
-        $fileName = 'order.csv';
-        Header('Content-type: text/plain');
-        Header('Content-Disposition: attachment; filename=' . $fileName);
-
-        print    "quantity, description , unitSale\n";
-
-        while ($dsOrdline->fetchNext()) {
-
-            if ($this->dsSelectedOrderLine->search(
-                DBEOrdline::id,
-                $dsOrdline->getValue(DBEOrdline::id)
-            )) {
-
-                if ($dsOrdline->getValue(DBEJOrdline::itemDescription)) {
-                    $description = $dsOrdline->getValue(DBEJOrdline::itemDescription);                // from item table
-                } else {
-                    $description = $dsOrdline->getValue(DBEOrdline::description);
-                }
-                $qtyOrdered = null;
-                $unitSale = null;
-
-                if ($dsOrdline->getValue(DBEOrdline::lineType) == "I") { // item line
-
-                    $qtyOrdered = number_format(
-                        $dsOrdline->getValue(DBEOrdline::qtyOrdered),
-                        2
-                    );
-                    $unitSale = number_format(
-                        $dsOrdline->getValue(DBEOrdline::curUnitSale),
-                        2
-                    );
-                    /*
-					if we have item notes then add them to the description
-					*/
-                    if ($dsOrdline->getValue(DBEOrdline::itemID)) {
-                        // some item lines do not have a related item record
-                        $dsItem = new DataSet($this);
-                        $this->buItem->getItemByID(
-                            $dsOrdline->getValue(DBEOrdline::itemID),
-                            $dsItem
-                        );
-
-                        if ($dsItem->getValue(DBEItem::notes)) {
-                            $description .= "\n" . str_replace(
-                                    chr(13),
-                                    '',
-                                    $dsItem->getValue(DBEItem::notes)
-                                );
-                        }
-                    }
-
-                }
-
-                print    '"' . $qtyOrdered . '","' . $description . '","' . $unitSale . "\"\n";
-
-
-            }
-        }
-
-        $this->pageClose();
         exit;
     }
 
@@ -4596,309 +4507,6 @@ class CTSalesOrder extends CTCNC
     }
 
     /**
-     * send an emailed PDF order confirmation to delivery contact.
-     * @access private
-     * @throws Exception
-     */
-    function sendOrderConfirmation()
-    {
-        $this->setMethodName('sendOrderConfirmation');
-        $dsOrdhead = new DataSet($this);
-        $dsDeliveryContact = new DataSet($this);
-        $dsOrdline = new DataSet($this);
-        if (!$this->buSalesOrder->getOrderWithCustomerName(
-            $this->getOrdheadID(),
-            $dsOrdhead,
-            $dsOrdline,
-            $dsDeliveryContact
-        )) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
-        }
-        $this->buSalesOrder->getUserByID(
-            $this->userID,
-            $this->dsUser
-        );
-        $this->setSalutation('Dear ' . $dsDeliveryContact->getValue(DBEContact::firstName));
-        $tempFile = tempnam(
-            '/tmp',
-            'CNF'
-        );
-        $versionNo = null;
-        $buPDF = new BUPDF(
-            $this,
-            $tempFile,
-            $this->dsUser->getValue(DBEUser::name),
-            $this->getOrdheadID() . '/' . $versionNo,
-            'CNC Ltd',
-            'Order Confirmation'
-        );
-        $buPDF->startPage();
-        $buPDF->placeImageAt(
-            $GLOBALS['cfg']['cnclogo_path'],
-            'PNG',
-            142,
-            38
-        );
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->setFontFamily(BUPDF_FONT_ARIAL);
-        $buPDF->setBoldItalicOn();
-        $buPDF->setFontSize(8);
-        $buPDF->setFont();
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->setBoldOn();
-        $buPDF->setFontSize(14);
-        $buPDF->setFont();
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printString('Order Confirmation: ' . $this->getOrdheadID());
-        $buPDF->setFontSize(10);
-        $buPDF->setBoldOff();
-        $buPDF->setFont();
-        $buPDF->CR();
-        $buPDF->CR();
-        $firstName = $dsDeliveryContact->getValue(DBEContact::firstName);
-        $buPDF->printString(
-            $dsDeliveryContact->getValue(DBEContact::title) . ' ' . $firstName{0} . ' ' . $dsDeliveryContact->getValue(
-                DBEContact::lastName
-            )
-        );
-        $buPDF->CR();
-        $buPDF->printString($dsOrdhead->getValue(DBEJOrdhead::customerName));
-        $buPDF->CR();
-        $buPDF->printString($dsOrdhead->getValue(DBEOrdhead::delAdd1));
-        if ($dsOrdhead->getValue(DBEOrdhead::delAdd2)) {
-            $buPDF->CR();
-            $buPDF->printString($dsOrdhead->getValue(DBEOrdhead::delAdd2));
-        }
-        if ($dsOrdhead->getValue(DBEOrdhead::delAdd3)) {
-            $buPDF->CR();
-            $buPDF->printString($dsOrdhead->getValue(DBEOrdhead::delAdd3));
-        }
-        $buPDF->CR();
-        $buPDF->printString($dsOrdhead->getValue(DBEOrdhead::delTown));
-        if ($dsOrdhead->getValue(DBEOrdhead::delCounty)) {
-            $buPDF->CR();
-            $buPDF->printString($dsOrdhead->getValue(DBEOrdhead::delCounty));
-        }
-        $buPDF->CR();
-        $buPDF->printString($dsOrdhead->getValue(DBEOrdhead::delPostcode));
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printString(date('l, jS F Y'));
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printString($this->getSalutation() . ',');
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printString('Following receipt of your official order,');
-        if ($dsOrdhead->getValue(DBEOrdhead::custPORef)) {
-            $buPDF->printString(' (Ref: ' . $dsOrdhead->getValue(DBEOrdhead::custPORef) . '),');
-        }
-        $buPDF->printString(' please find confirmation of the items to be supplied detailed below.');
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->setBoldOn();
-        $buPDF->setFont();
-        $buPDF->printStringRJAt(
-            30,
-            'Qty'
-        );
-        $buPDF->printStringAt(
-            40,
-            'Details'
-        );
-        $buPDF->printStringRJAt(
-            150,
-            'Unit'
-        );
-        $buPDF->printStringRJAt(
-            170,
-            'Total'
-        );
-        $buPDF->setBoldOff();
-        $buPDF->setFont();
-        $buPDF->CR();
-        $grandTotal = 0;
-        while ($dsOrdline->fetchNext()) {
-            if ($dsOrdline->getValue(DBEJOrdline::lineType) == "I") {
-                if ($dsOrdline->getValue(DBEJOrdline::description)) {
-                    $buPDF->printStringAt(
-                        40,
-                        $dsOrdline->getValue(DBEJOrdline::description)
-                    );
-                } else {
-                    $buPDF->printStringAt(
-                        40,
-                        $dsOrdline->getValue(DBEJOrdline::itemDescription)
-                    );
-                }
-                $buPDF->printStringRJAt(
-                    30,
-                    Controller::formatNumber(
-                        $dsOrdline->getValue(DBEJOrdline::qtyOrdered),
-                        2
-                    )
-                );
-                /*
-Do not print zero sale values
-*/
-                if ($dsOrdline->getValue(DBEJOrdline::curUnitSale) != 0) {
-                    $buPDF->printStringRJAt(
-                        150,
-                        Controller::formatNumberCur($dsOrdline->getValue(DBEJOrdline::curUnitSale))
-                    );
-                    $total = ($dsOrdline->getValue(DBEJOrdline::curUnitSale) * $dsOrdline->getValue(
-                            DBEJOrdline::qtyOrdered
-                        ));
-                    $buPDF->printStringRJAt(
-                        170,
-                        Controller::formatNumberCur($total)
-                    );
-                    $grandTotal += $total;
-                }
-                if ($dsOrdline->getValue(DBEJOrdline::itemID)) {
-                    // some item lines in old system did not have a related item record
-                    $dsItem = new DataSet($this);
-                    $this->buItem->getItemByID(
-                        $dsOrdline->getValue(DBEJOrdline::itemID),
-                        $dsItem
-                    );
-                    /*
-now that the notes are in a text field we need to split the lines up for the PDF printing
-*/
-                    if ($dsItem->getValue(DBEItem::notes)) {
-                        $buPDF->setFontSize(8);
-                        $buPDF->setFont();
-                        $notesArray = explode(
-                            chr(13) . chr(10),
-                            $dsItem->getValue(DBEItem::notes)
-                        );
-                        foreach ($notesArray as $noteLine) {
-                            if (trim($noteLine)) {                    // ignore blank lines
-                                $buPDF->CR();
-                                $buPDF->printStringAt(
-                                    40,
-                                    $noteLine
-                                );
-                            }
-                        }
-                        $buPDF->setFontSize(10);
-                        $buPDF->setFont();
-                    }
-                }
-            } else {
-                $buPDF->printStringAt(
-                    40,
-                    $dsOrdline->getValue(DBEOrdline::description)
-                ); // comment line
-            }
-            $buPDF->CR();
-        }
-        $buPDF->setBoldOn();
-        $buPDF->setFont();
-        $buPDF->printStringRJAt(
-            150,
-            'Grand Total'
-        );
-        $buPDF->printStringRJAt(
-            170,
-            Controller::formatNumberCur($grandTotal)
-        );
-        $buPDF->setBoldOff();
-        $buPDF->setFont();
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printString(
-            'These goods or services will be supplied to you ASAP and if installation services are required, our technical department will contact you to arrange a suitable appointment.'
-        );
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printString('If I can be of any further assistance please do not hesitate to contact me.');
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printString('Yours sincerely,');
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printString('For and on behalf of');
-        $buPDF->CR();
-        $buPDF->printString('COMPUTER & NETWORK CONSULTANTS LTD');
-        $buPDF->CR();
-        $buPDF->CR();
-        if ($this->dsUser->getValue(DBEUser::signatureFilename)) {
-            $buPDF->placeImageAt(
-                IMAGES_DIR . '/' . $this->dsUser->getValue(DBEUser::signatureFilename),
-                'PNG',
-                10,
-                35
-            );
-        }
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printString(
-            $this->dsUser->getValue(DBEUser::firstName) . ' ' . $this->dsUser->getValue(DBEUser::lastName)
-        );
-        $buPDF->CR();
-        $buPDF->setBoldOn();
-        $buPDF->setFont();
-        $buPDF->printString($this->dsUser->getValue(DBEUser::jobTitle));
-        $buPDF->CR();
-        $buPDF->CR();
-        $buPDF->printString('E. & O. E.');
-        $buPDF->endPage();
-        $buPDF->close();
-        $senderEmail = $this->dsUser->getValue(DBEUser::username) . '@cnc-ltd.co.uk';
-        $senderName = $this->dsUser->getValue(DBEUser::firstName) . ' ' . $this->dsUser->getValue(DBEUser::lastName);
-        // Send email with attachment
-        $message = '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
-        $message .= $this->getSalutation();
-        $message .= '</span></p>';
-        $message .= '<p class=MsoNormal><span style=\'font-size:10.0pt;color:black\'>';
-        $message .= 'Please find attached confirmation of your recent order.';
-        $message .= '</span></p>';
-        $subject = 'Your confirmation ' . $dsOrdhead->getValue(DBEOrdhead::ordheadID);
-        $filename = $dsOrdhead->getValue(DBEOrdhead::ordheadID) . '.pdf';
-        $mime_boundary = "----=_NextPart_" . md5(time());
-        $headers = "From: " . $senderName . " <" . $senderEmail . ">\r\n";
-        $headers .= "Return-Receipt-To: " . $senderName . " <" . $senderEmail . ">\r\n";
-        $headers .= "Disposition-Notification-To: " . $senderName . " <" . $senderEmail . ">\r\n";
-        $headers .= "MIME-Version: 1.0\r\n";
-        $headers .= "Content-Type: multipart/mixed;\r\n";
-        $headers .= " boundary=\"$mime_boundary\"\r\n";
-        $mime_message = "\r\nThis is a multi-part message in MIME format.\r\n";
-        $mime_message .= "\r\n--$mime_boundary\r\n";
-        $mime_message .= "Content-Type: text/html;";
-        $mime_message .= " charset=utf-8\n";
-        $mime_message .= "Content-Transfer-Encoding: 7bit\r\n\r\n";
-        $mime_message .= "$message\r\n"; // text content of email
-        $mime_message .= "\r\n--$mime_boundary\r\n";
-        $mime_message .= "Content-Type: application/pdf; name=\"$filename\"\r\n";
-        $mime_message .= "Content-Transfer-Encoding: base64\r\n";
-        $mime_message .= "Content-Disposition: attachment; filename=\"$filename\"\r\n\r\n";
-        $mime_message .= chunk_split(
-                base64_encode(file_get_contents($tempFile)),
-                60
-            ) . "\r\n"; // split attachment to email
-        $mime_message .= "\r\n--$mime_boundary--";
-
-        ini_set(
-            "sendmail_from",
-            $senderEmail
-        );        // the envelope from address
-
-        mail(
-            $dsOrdhead->getValue(DBEOrdhead::delContactEmail),
-            $subject,
-            $mime_message,
-            $headers
-        );
-        unlink($tempFile);
-        header('Location: ' . $this->getDisplayOrderURL());
-    }
-
-    /**
      * @throws Exception
      */
     function updateItemPrice()
@@ -4907,20 +4515,20 @@ now that the notes are in a text field we need to split the lines up for the PDF
         $data = $this->getJSONData();
 
         if (!array_key_exists('lineId', $data)) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, "Line Id is required");
+            throw new JsonHttpException(400, "Line Id is required");
         }
         if (!array_key_exists('unitSale', $data)) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, "Unit Sale is required");
+            throw new JsonHttpException(400, "Unit Sale is required");
         }
         if (!array_key_exists('unitCost', $data)) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, "Unit Cost is required");
+            throw new JsonHttpException(400, "Unit Cost is required");
         }
         $dbOrderLine = new DBEOrdline($this);
         $dbOrderLine->getRow($data['lineId']);
         $itemId = $dbOrderLine->getValue(DBEOrdline::itemID);
 
         if (!$itemId) {
-            throw new \CNCLTD\Exceptions\JsonHttpException(400, "The line selected does not have connected item");
+            throw new JsonHttpException(400, "The line selected does not have connected item");
         }
 
         $dbeItem = new DBEItem($this);
@@ -5491,6 +5099,98 @@ now that the notes are in a text field we need to split the lines up for the PDF
     }
 
     /**
+     * generate a CSV of the selected lines.
+     * @access private
+     * @throws Exception
+     */
+    function downloadCSV()
+    {
+        $this->setMethodName('downloadCSV');
+        if (count($this->postVars['selectedOrderLine']) == 0) {
+            $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
+            $this->displayOrder();
+            return FALSE;
+        } else {
+            $this->setSelectedOrderLines($this->postVars['selectedOrderLine']);
+        }
+        if (!$this->getOrdheadID()) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
+            return FALSE;
+        }
+        $dsOrdline = new DataSet($this);
+        if (!$this->buSalesOrder->getOrderWithCustomerName(
+            $this->getOrdheadID(),
+            $dsOrdhead,
+            $dsOrdline,
+            $dsDeliveryContact
+        )) {
+            $this->displayFatalError(CTSALESORDER_MSG_ORDER_NOT_FND);
+        }
+
+        $fileName = 'order.csv';
+        Header('Content-type: text/plain');
+        Header('Content-Disposition: attachment; filename=' . $fileName);
+
+        print    "quantity, description , unitSale\n";
+
+        while ($dsOrdline->fetchNext()) {
+
+            if ($this->dsSelectedOrderLine->search(
+                DBEOrdline::id,
+                $dsOrdline->getValue(DBEOrdline::id)
+            )) {
+
+                if ($dsOrdline->getValue(DBEJOrdline::itemDescription)) {
+                    $description = $dsOrdline->getValue(DBEJOrdline::itemDescription);                // from item table
+                } else {
+                    $description = $dsOrdline->getValue(DBEOrdline::description);
+                }
+                $qtyOrdered = null;
+                $unitSale = null;
+
+                if ($dsOrdline->getValue(DBEOrdline::lineType) == "I") { // item line
+
+                    $qtyOrdered = number_format(
+                        $dsOrdline->getValue(DBEOrdline::qtyOrdered),
+                        2
+                    );
+                    $unitSale = number_format(
+                        $dsOrdline->getValue(DBEOrdline::curUnitSale),
+                        2
+                    );
+                    /*
+					if we have item notes then add them to the description
+					*/
+                    if ($dsOrdline->getValue(DBEOrdline::itemID)) {
+                        // some item lines do not have a related item record
+                        $dsItem = new DataSet($this);
+                        $this->buItem->getItemByID(
+                            $dsOrdline->getValue(DBEOrdline::itemID),
+                            $dsItem
+                        );
+
+                        if ($dsItem->getValue(DBEItem::notes)) {
+                            $description .= "\n" . str_replace(
+                                    chr(13),
+                                    '',
+                                    $dsItem->getValue(DBEItem::notes)
+                                );
+                        }
+                    }
+
+                }
+
+                print    '"' . $qtyOrdered . '","' . $description . '","' . $unitSale . "\"\n";
+
+
+            }
+        }
+
+        $this->pageClose();
+        exit;
+    } // end function documents
+
+    /**
      * Get and parse user drop-down selector
      * @access private
      * @param $siteNo
@@ -5524,7 +5224,7 @@ now that the notes are in a text field we need to split the lines up for the PDF
                 true
             );
         }
-    } // end function documents
+    }
 
     /**
      * Get and parse contact drop-down selector
