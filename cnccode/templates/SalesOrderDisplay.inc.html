@@ -569,7 +569,11 @@
     </table>
 
 </div>
-
+<INPUT type="hidden"
+       id="updatedTime"
+       name="updatedTime"
+       value="{updatedTime}"
+>
 <form name="quickQuoteForm"
       method="POST"
       enctype="multipart/form-data"
@@ -591,16 +595,7 @@
            name="form[ordheadID]"
            value="{ordheadID}"
     >
-    <INPUT type="hidden"
-           id="ordheadID"
-           name="ordheadID"
-           value="{ordheadID}"
-    >
-    <INPUT type="hidden"
-           id="updatedTime"
-           name="updatedTime"
-           value="{updatedTime}"
-    >
+
     <table class="singleBorder sortableTable"
            width="970"
            border="0"
@@ -817,7 +812,6 @@
               action="{urlUpdateInvAddress}"
         >
             <INPUT type="hidden"
-                   id="updatedTime"
                    name="updatedTime"
                    value="{updatedTime}"
             >
@@ -850,11 +844,11 @@
                             <P class="addressLine">{invPostcode}</P></td>
                     </tr>
                     <tr>
-                        <td class="mainHeadText"><input type="hidden"
-                                                        name="form[ordheadID]"
-                                                        id="ordheadID"
-                                                        value="{ordheadID}"
-                        >
+                        <td class="mainHeadText">
+                            <input type="hidden"
+                                   name="form[ordheadID]"
+                                   value="{ordheadID}"
+                            >
                             <input type="hidden"
                                    name="form[siteNo]"
                                    id="invSiteNo"
@@ -871,16 +865,16 @@
                                     size="50"
                                     maxlength="50"
                             > <input
-                                    type="text"
-                                    name="blah"
-                                    style="display:none"
-                            > <input
-                                    type="button"
-                                    name="SubmitInvAdd"
-                                    {readOnly}
-                                    value="Select"
-                                    onClick="form.submit();"
-                            ></td>
+                                type="text"
+                                name="blah"
+                                style="display:none"
+                        > <input
+                                type="button"
+                                name="SubmitInvAdd"
+                                {readOnly}
+                                value="Select"
+                                onClick="form.submit();"
+                        ></td>
                     </tr>
                 </table>
             </td>
@@ -890,7 +884,6 @@
               action="{urlUpdateDelAddress}"
         >
             <INPUT type="hidden"
-                   id="updatedTime"
                    name="updatedTime"
                    value="{updatedTime}"
             >
@@ -1026,7 +1019,6 @@
                           action="{urlUpdateInvContact}"
                     >
                         <INPUT type="hidden"
-                               id="updatedTime"
                                name="updatedTime"
                                value="{updatedTime}"
                         >
@@ -1034,7 +1026,6 @@
                             class="mainHeadText"
                         ><input type="hidden"
                                 name="form[ordheadID]"
-                                id="ordheadID"
                                 value="{ordheadID}"
                         >
                             <input type="hidden"
@@ -1128,7 +1119,6 @@
                           action="{urlUpdateDelContact}"
                     >
                         <INPUT type="hidden"
-                               id="updatedTime"
                                name="updatedTime"
                                value="{updatedTime}"
                         >
@@ -1136,7 +1126,6 @@
                             class="mainHeadText"
                         ><input type="hidden"
                                 name="form[ordheadID]"
-                                id="ordheadID"
                                 value="{ordheadID}"
                         >
                             <input type="hidden"

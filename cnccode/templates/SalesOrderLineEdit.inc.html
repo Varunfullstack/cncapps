@@ -62,7 +62,6 @@
       AUTOCOMPLETE="off"
 >
     <INPUT type="hidden"
-           id="updatedTime"
            name="updatedTime"
            value="{updatedTime}"
     >
@@ -70,32 +69,26 @@
            name="ordline[1][id]"
            value="{lineId}"
     >
-    <input
-            type="hidden"
-            name="ordline[1][ordheadID]"
-            value="{ordheadID}"
+    <input type="hidden"
+           name="ordline[1][ordheadID]"
+           value="{ordheadID}"
     >
-    <input
-            type="hidden"
-            name="ordline[1][itemID]"
-            id="itemID"
-            value="{itemID}"
+    <input type="hidden"
+           name="ordline[1][itemID]"
+           value="{itemID}"
     >
-    <input
-            type="hidden"
-            name="ordline[1][sequenceNo]"
-            value="{sequenceNo}"
+    <input type="hidden"
+           name="ordline[1][sequenceNo]"
+           value="{sequenceNo}"
     >
-    <input
-            type="hidden"
-            name="ordline[1][supplierID]"
-            id="supplierID"
-            value="{supplierID}"
+    <input type="hidden"
+           name="ordline[1][supplierID]"
+
+           value="{supplierID}"
     >
-    <input
-            type="hidden"
-            name="ordline[1][renewalCustomerItemID]"
-            value="{renewalCustomerItemID}"
+    <input type="hidden"
+           name="ordline[1][renewalCustomerItemID]"
+           value="{renewalCustomerItemID}"
     >
     <input type="hidden"
            name="ordline[1][isRecurring]"
@@ -109,8 +102,7 @@
         <tr>
             <td class="promptText">Line Type</td>
             <td class="field">
-                <select
-                        {lineTypeReadOnly}"
+                <select {lineTypeReadOnly}
                 type="text"
                 id="lineType"
                 name="ordline[1][lineType]"
@@ -194,7 +186,6 @@
                 <input
                         type="text"
                         name="ordline[1][curUnitSale]"
-                        id="curUnitSale"
                         value="{curUnitSale}"
                         align="right"
                         onKeypress="javascript:submitOnReturn()"
