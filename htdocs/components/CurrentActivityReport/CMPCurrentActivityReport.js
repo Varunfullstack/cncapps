@@ -13,6 +13,7 @@ class CMPCurrentActivityReport extends MainComponent{
         this.state={
             activeTab:'helpdesk',
             helpDeskInbox:[],
+            helpDeskInboxFiltered:[],
             escalationsInbox:[],
             salesInbox:[],
             smallProjectsInbox:[],
@@ -21,7 +22,8 @@ class CMPCurrentActivityReport extends MainComponent{
             futureInbox:[],
             allocatedUsers:[],
             currentUser:null,
-            _showSpinner:false
+            _showSpinner:false,
+            userFilter:'',
         }
         this.apiCurrentActivityService=new SVCCurrentActivityService();
     }
@@ -69,13 +71,18 @@ class CMPCurrentActivityReport extends MainComponent{
 
     }
     loadQueue=(code)=>{
-      console.log('load',code);
+      //console.log('load',code);
       if(code)
       {
       this.showSpinner();
         switch(code){
             case "H":
-                this.apiCurrentActivityService.getHelpDeskInbox().then(res=>this.setState({_showSpinner: false,helpDeskInbox:this.prepareResult(res)}));
+                this.apiCurrentActivityService.getHelpDeskInbox().then(res=>{
+                  const helpDeskInbox=this.prepareResult(res);
+                  const helpDeskInboxFiltered=[...helpDeskInbox];
+                  console.log(helpDeskInbox);
+                  this.setState({_showSpinner: false,helpDeskInbox,helpDeskInboxFiltered})
+                });
             break;
             case 'E':
                 this.apiCurrentActivityService.getEscalationsInbox().then(res=>this.setState({_showSpinner: false,escalationsInbox:res}));
@@ -95,7 +102,7 @@ class CMPCurrentActivityReport extends MainComponent{
     }
     // Shared methods
     moveToAnotherTeam = ({ target }, problem,code) => {
-        console.log(target.value, problem, problem.problemStatus);
+        //console.log(target.value, problem, problem.problemStatus);
         let answer = null;
         if (problem.problemStatus === "P") {
           answer = prompt(
@@ -109,7 +116,7 @@ class CMPCurrentActivityReport extends MainComponent{
         this.apiCurrentActivityService
           .changeQueue(problem.problemID, target.value, answer)
           .then((res) => {
-            console.log(res);
+            //console.log(res);
             if (res && res.status) {
               this.loadQueue(code);
             }
@@ -145,7 +152,7 @@ class CMPCurrentActivityReport extends MainComponent{
         );
       };
       allocateAdditionalTime = (problem) => {
-        console.log("aalocate");
+        //console.log("aalocate");
         window.location = `Activity.php?action=allocateAdditionalTime&problemID=${problem.problemID}`;
       };
       requestAdditionalTime = (problem) => {
@@ -169,20 +176,22 @@ class CMPCurrentActivityReport extends MainComponent{
             this.apiCurrentActivityService
               .startActivityWork(problem.callActivityID)
               .then((res) => {            
-                  //console.log(res);
+                  ////console.log(res);
                   //reload
                   this.loadQueue(code);
                 
               });
-            //console.log(problem);
+            ////console.log(problem);
           }
         } else {
           alert("Another user is currently working on this SR");
         }
       }; 
-      handleUserOnSelect = (user,problem,code) => {
-        console.log(user,problem);
-        this.apiCurrentActivityService.allocateUser(problem.problemID,user?.userID||0).then(res=>{
+      handleUserOnSelect = (event,problem,code) => {
+        //console.log(event.target.value,problem);
+        const engineerId=event.target.value!=""?event.target.value:0;
+        problem.engineerId=engineerId;
+        this.apiCurrentActivityService.allocateUser(problem.problemID,engineerId).then(res=>{
           if(res.status)
           {
             this.loadQueue(code)
@@ -191,17 +200,13 @@ class CMPCurrentActivityReport extends MainComponent{
       };
       getAllocatedElement = (problem,code) => {
         const { el, handleUserOnSelect } = this;
-        const { allocatedUsers, currentUser } = this.state;
-        return el(AutoComplete, {
+        const { allocatedUsers} = this.state;      
+        return el("select", {
           key: "allocatedUser",
-          errorMessage: "No User Found",
-          items: allocatedUsers,
-          displayColumn: "fullName",
-          pk: "userID",
-          value: problem.engineerName || null,
+          value: problem.engineerId ||'',
           width: 120,
-          onSelect:(event)=> handleUserOnSelect(event,problem,code),
-        });
+          onChange:(event)=> handleUserOnSelect(event,problem,code),
+        },[el('option',{value:'',key:"allOptions"},""),...allocatedUsers.map(p=>el('option',{value:p.userID,key:"option"+p.userID},p.fullName))]);
       }; 
     // end of shared methods
     getProblemWorkTitle(problem){
@@ -225,12 +230,74 @@ class CMPCurrentActivityReport extends MainComponent{
         return color;
       }
     prepareResult=(result)=>{
+  
         result.map(problem=>{
             problem.workBtnTitle=this.getProblemWorkTitle(problem);
-            problem.workBtnColor=this.getProblemWorkColor(problem);
-
+            problem.workBtnColor=this.getProblemWorkColor(problem);            
+            problem.alarmDateTime=problem.alarmDateTime?.trim(' ');
+            if(moment(problem.alarmDateTime)>moment())
+            console.log('Future',problem.problemID);
+            //delete problem.alarmDateTime;
+            delete problem.date;
+            delete problem.engineerDropDown;
+            delete problem.esColor;
+            delete problem.esRemaining;
+            delete problem.linkAllocateAdditionalTime;
+            delete problem.projectTeamColor;
+            delete problem.projectTeamRemaining;
+            delete problem.queueOptions;
+            delete problem.slaResponseHours;
+            delete problem.smallProjectsTeamColor;
+            delete problem.smallProjectsTeamRemaining;
+            delete problem.smallProjectsTeamRemaining;
+            delete problem.smallProjectsTeamRemaining;
+            delete problem.smallProjectsTeamRemaining;
+            delete problem.smallProjectsTeamRemaining;
+            delete problem.smallProjectsTeamRemaining;
+            delete problem.time;
+            delete problem.timeSpentColorClass;
+            delete problem.totalActivityDurationHours;
+            delete problem.updated;
+            delete problem.updatedBgColor;
+            delete problem.urlCustomer;
+            delete problem.urlProblemHistoryPopup;
+            delete problem.urlViewActivity;
+            delete problem.urlCustomer;
+            delete problem.urlCustomer;
+            delete problem.workOnClick;
         });
-        return result;
+        const old=result.filter(p=> moment(p.alarmDateTime)<=moment());
+        const feature=result.filter(p=> moment(p.alarmDateTime)>moment()).sort((a,b)=>moment(a.alarmDateTime)>moment(b.alarmDateTime)?1:-1);
+
+        return [...old,...feature];
+    }
+    handleUserFilterOnSelect=(event)=>{
+      const userFilter=event.target.value;      
+      let {helpDeskInbox}=this.state;      
+      const helpDeskInboxFiltered=this.filterData(userFilter,helpDeskInbox);
+      this.setState({userFilter,helpDeskInboxFiltered});
+    }
+    filterData=(engineerId,data)=>{
+      // //console.log(engineerId,data.map(p=>{
+      //   return {"problemID":p.problemID,"engineerId":p.engineerId};
+      // }));
+      const result=data.filter(p=>p.engineerId===null||p.engineerId==engineerId||engineerId==='' )
+      //console.log(result);
+      return result;
+    }
+    getEngineersFilterElement=()=>
+    {
+      const { el, handleUserFilterOnSelect } = this;
+      const { allocatedUsers,userFilter} = this.state;      
+      return el("select", {
+        style:{marginTop:"20px"},
+        className:"float-right",
+        key: "userFilter",
+        value: userFilter,
+        width: 120,
+        onChange:(event)=> handleUserFilterOnSelect(event),
+      },[el('option',{value:'',key:""},"All engineers"),...allocatedUsers.map(p=>el('option',{value:p.userID,key:"option"+p.userID},p.fullName))]);
+
     }
     render()
     {
@@ -241,21 +308,24 @@ class CMPCurrentActivityReport extends MainComponent{
         allocateAdditionalTime,
         requestAdditionalTime,
         startWork,
-        getAllocatedElement
+        getAllocatedElement,
+        getEngineersFilterElement
         }=this;
-        const {helpDeskInbox,allocatedUsers,currentUser,_showSpinner}=this.state;
-        console.log(currentUser);
+        const {helpDeskInboxFiltered,allocatedUsers,currentUser,_showSpinner}=this.state;
+        //console.log(currentUser);
         return el('div',{style:{backgroundColor:'white'}}, [ 
             el(Spinner, {key: "spinner", show: _showSpinner}),
             getTabsElement(),
-            isActive("helpdesk")?el(CMPInboxHelpDesk,{key:'help',data:helpDeskInbox,allocatedUsers,currentUser,
+            getEngineersFilterElement(),
+            isActive("helpdesk")?el(CMPInboxHelpDesk,{key:'help',data:helpDeskInboxFiltered,allocatedUsers,currentUser,
             loadQueue:loadQueue,
             getMoveElement,
             srDescription,
-            allocateAdditionalTime,
-            requestAdditionalTime,
             startWork,
-            getAllocatedElement}):null
+            allocateAdditionalTime,
+            requestAdditionalTime,           
+            getAllocatedElement}):null,
+            
         ]);
     }
 }

@@ -14,6 +14,10 @@ class TableBody extends React.Component {
     }
     return result;
   }
+  addToolTip=(element,title)=>
+  {
+    return title?this.el('div',{className:'tooltip'},element,this.el('div',{className:"tooltiptext tooltip-bottom"},title)):element;
+  }
   render() {
     const { data, columns,pk,selected,selectedKey} = this.props;
     const {el,makeid}=this;
@@ -29,7 +33,9 @@ class TableBody extends React.Component {
       className:c.className?c.className:' '+c.classNameColumn?this.get(item, c.classNameColumn):''
       ,style:{backgroundColor:c.backgroundColorColumn?this.get(item, c.backgroundColorColumn):''}
  
-    }, c.content ? c.content(item) : this.get(item, c.path)))))
+    }, this.addToolTip(
+    c.content ? c.content(item) : this.get(item, c.path),c?.toolTip||null)
+    ))))
     );     
   }
 }

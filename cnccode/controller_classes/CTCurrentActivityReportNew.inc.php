@@ -179,12 +179,13 @@ class CTCurrentActivityReportNew extends CTCNC
                 false
             );
 
-        } elseif ($queueNo == 7) {
-            /* future dated */
-            $this->buActivity->getFutureProblems($serviceRequests);
+         } 
+        //elseif ($queueNo == 7) {
+        //     /* future dated */
+        //     $this->buActivity->getFutureProblems($serviceRequests);
 
-        } else {
-            $this->buActivity->getProblemsByQueueNo(
+         else {
+            $this->buActivity->getProblemsByQueueNoWithFuture(
                 $queueNo,
                 $serviceRequests
             );
@@ -350,9 +351,9 @@ fileter by user
             );
             $alarmDateTimeDisplay = null;
             if ($serviceRequests->getValue(DBEProblem::alarmDate)) {
-                $alarmDateTimeDisplay = Controller::dateYMDtoDMY(
+                $alarmDateTimeDisplay =  
                         $serviceRequests->getValue(DBEProblem::alarmDate)
-                    ) . ' ' . $serviceRequests->getValue(DBEProblem::alarmTime);
+                     . ' ' . $serviceRequests->getValue(DBEProblem::alarmTime);
 
                 /*
                 Has an alarm date that is in the past, set updated BG Colour (indicates moved back into work queue from future queue)

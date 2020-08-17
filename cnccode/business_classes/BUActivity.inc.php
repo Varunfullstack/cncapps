@@ -6824,6 +6824,43 @@ is currently a balance of ';
 
         $dsResults->replicate($dsAssignedResults);
     }
+/**
+     * @param $queueNo
+     * @param DataSet $dsResults
+     */
+    function getProblemsByQueueNoWithFuture($queueNo,
+                                  &$dsResults
+    )
+    {
+        $dbeJProblem = new DBEJProblem($this);
+        $dbeJProblem->getRowsByQueueNoWithFuture(
+            $queueNo,
+            true
+        ); // unassigned first
+        $this->getData(
+            $dbeJProblem,
+            $dsResults
+        );
+
+        $dsResults->sortAscending(
+            'dashboardSortColumn'
+        );
+        $dbeJProblem->getRowsByQueueNoWithFuture($queueNo);       // then assigned
+
+        $dsAssignedResults = new DataSet($this);
+        $this->getData(
+            $dbeJProblem,
+            $dsAssignedResults
+        );
+
+        $dsAssignedResults->sortAscending(
+            'dashboardSortColumn'
+        );
+
+        $dsResults->setClearRowsBeforeReplicateOff();
+
+        $dsResults->replicate($dsAssignedResults);
+    }
 
     /**
      * Get active problems by customer

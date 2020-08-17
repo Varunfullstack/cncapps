@@ -400,7 +400,46 @@ class DBEJProblem extends DBEProblem
         $this->setQueryString($sql);
         return (parent::getRows());
     }
+  /*
+    Get Awaiting, In-progress and future SRs by Queue
 
+    */
+    function getRowsByQueueNoWithFuture($queueNo,
+                              $unassignedOnly = false
+    )
+    {
+        $sql =
+            "SELECT " . $this->getDBColumnNamesAsString() .
+            " FROM " . $this->getTableName() .
+            " LEFT JOIN customer ON cus_custno = pro_custno
+           LEFT JOIN consultant ON cns_consno = pro_consno
+
+          JOIN callactivity `initial`
+            ON initial.caa_problemno = pro_problemno AND initial.caa_callacttypeno = " . CONFIG_INITIAL_ACTIVITY_TYPE_ID .
+
+            " JOIN callactivity `last`
+            ON last.caa_problemno = pro_problemno AND last.caa_callactivityno =
+              (
+              SELECT
+                MAX( ca.caa_callactivityno )
+              FROM callactivity ca
+              WHERE ca.caa_problemno = pro_problemno
+              AND not ca.caa_callacttypeno <=> " . CONFIG_OPERATIONAL_ACTIVITY_TYPE_ID . "
+            ) 
+
+        WHERE pro_status IN( 'I', 'P' )
+
+          AND pro_queue_no = $queueNo";
+
+        if ($unassignedOnly) {
+            $sql .= " AND pro_consno is null";
+
+        } else {
+            $sql .= " AND pro_consno is not null";
+        }
+        $this->setQueryString($sql);
+        return (parent::getRows());
+    }
     function getRow($pkID)
     {
         $this->setPKValue($pkID);

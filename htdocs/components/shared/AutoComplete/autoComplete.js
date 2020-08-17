@@ -188,7 +188,8 @@ class AutoComplete extends React.Component {
       value: userInput||(!filtered&&defaultValue)||"",
       onClick: handleOnClick,
       onBlur: handleOnBlur,
-      style:{width:width||'100%'}
+      style:{width:width||'100%'},
+      autoComplete:"off",
     }), suggestionsListComponent);
   }
 }
