@@ -191,32 +191,29 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         $buPDF->printString($introduction);
 
-        $quotationLines = [];
-
         // Insert into database
-        $dsQuotation = new DataSet($this);
-        $dsQuotation->copyColumnsFrom($this->buSalesOrder->dbeQuotation);
-        $dsQuotation->setUpdateModeInsert();
-        $dsQuotation->setValue(DBEQuotation::versionNo, $versionNo);
-        $dsQuotation->setValue(DBEQuotation::ordheadID, $dsOrdhead->getValue(DBEJOrdhead::ordheadID));
-        $dsQuotation->setValue(DBEQuotation::userID, $userID);
-        $dsQuotation->setValue(DBEQuotation::sentDateTime, null);
-        $dsQuotation->setValue(DBEQuotation::salutation, $salutation);
-        $dsQuotation->setValue(DBEQuotation::emailSubject, $emailSubject);
-        $dsQuotation->setValue(DBEQuotation::fileExtension, 'pdf');
-        $dsQuotation->setValue(DBEQuotation::documentType, 'quotation');
-        $dsQuotation->setValue(DBEQuotation::deliveryContactID, $dsOrdhead->getValue(DBEOrdhead::delContactID));
-        $dsQuotation->setValue(DBEQuotation::deliverySiteAdd1, $dsOrdhead->getValue(DBEOrdhead::delAdd1));
-        $dsQuotation->setValue(DBEQuotation::deliverySiteAdd2, $dsOrdhead->getValue(DBEOrdhead::delAdd2));
-        $dsQuotation->setValue(DBEQuotation::deliverySiteAdd3, $dsOrdhead->getValue(DBEOrdhead::delAdd3));
-        $dsQuotation->setValue(DBEQuotation::deliverySiteTown, $dsOrdhead->getValue(DBEOrdhead::delTown));
-        $dsQuotation->setValue(DBEQuotation::deliverySiteCounty, $dsOrdhead->getValue(DBEOrdhead::delCounty));
-        $dsQuotation->setValue(DBEQuotation::deliverySitePostCode, $dsOrdhead->getValue(DBEOrdhead::delPostcode));
-        $confirmationCode = uniqid(null, true);
-        $dsQuotation->setValue(DBEQuotation::confirmCode, $confirmationCode);
-        $dsQuotation->post();
-        $quotationNextId = $this->buSalesOrder->insertQuotation($dsQuotation);
+        $dbeQuotation = new DBEQuotation($this);
 
+
+        $dbeQuotation->setValue(DBEQuotation::versionNo, $versionNo);
+        $dbeQuotation->setValue(DBEQuotation::ordheadID, $dsOrdhead->getValue(DBEJOrdhead::ordheadID));
+        $dbeQuotation->setValue(DBEQuotation::userID, $userID);
+        $dbeQuotation->setValue(DBEQuotation::sentDateTime, null);
+        $dbeQuotation->setValue(DBEQuotation::salutation, $salutation);
+        $dbeQuotation->setValue(DBEQuotation::emailSubject, $emailSubject);
+        $dbeQuotation->setValue(DBEQuotation::fileExtension, 'pdf');
+        $dbeQuotation->setValue(DBEQuotation::documentType, 'quotation');
+        $dbeQuotation->setValue(DBEQuotation::deliveryContactID, $dsOrdhead->getValue(DBEOrdhead::delContactID));
+        $dbeQuotation->setValue(DBEQuotation::deliverySiteAdd1, $dsOrdhead->getValue(DBEOrdhead::delAdd1));
+        $dbeQuotation->setValue(DBEQuotation::deliverySiteAdd2, $dsOrdhead->getValue(DBEOrdhead::delAdd2));
+        $dbeQuotation->setValue(DBEQuotation::deliverySiteAdd3, $dsOrdhead->getValue(DBEOrdhead::delAdd3));
+        $dbeQuotation->setValue(DBEQuotation::deliverySiteTown, $dsOrdhead->getValue(DBEOrdhead::delTown));
+        $dbeQuotation->setValue(DBEQuotation::deliverySiteCounty, $dsOrdhead->getValue(DBEOrdhead::delCounty));
+        $dbeQuotation->setValue(DBEQuotation::deliverySitePostCode, $dsOrdhead->getValue(DBEOrdhead::delPostcode));
+        $confirmationCode = uniqid(null, true);
+        $dbeQuotation->setValue(DBEQuotation::confirmCode, $confirmationCode);
+        $dbeQuotation->insertRow();
+        $quotationNextId = $dbeQuotation->getValue(DBEQuotation::quotationID);
         $oneOffLines = [];
         $recurringLines = [];
         while ($dsOrdline->fetchNext()) {
@@ -371,10 +368,6 @@ class BUPDFSalesQuote extends Business
         );
 
         $buPDF->close();
-        /** @var DBEQuotationLine $quotationLine */
-        foreach ($quotationLines as $quotationLine) {
-            $quotationLine->insertRow();
-        }
 
         return true;
     } // end function
@@ -382,7 +375,7 @@ class BUPDFSalesQuote extends Business
     private function renderAndSaveQuotationLines(BUPDF $buPDF,
                                                  string $title,
                                                  array $lines,
-                                                 bool $quotationNextId
+                                                 int $quotationNextId
     )
     {
         if (empty($lines)) {
@@ -475,7 +468,8 @@ class BUPDFSalesQuote extends Business
                 $line[DBEJOrdline::renewalCustomerItemID]
             );
             $dbeQuotationLine->setValue(DBEQuotationLine::isRecurring, $line[DBEOrdline::isRecurring]);
-            $quotationLines[] = $dbeQuotationLine;
+            $dbeQuotationLine->insertRow();
+
 
             if ($line[DBEJOrdline::lineType] == "I") {
                 if ($line[DBEJOrdline::itemDescription] != '') {

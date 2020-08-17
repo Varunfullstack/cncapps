@@ -2149,9 +2149,8 @@ class BUSalesOrder extends Business
         }
 
 
-
-        $this->renderLines($buPDF, 'One Off Costs', $oneOffLines);
-        $this->renderLines($buPDF, 'Monthly Costs', $recurringLines);
+        $this->renderLines($buPDF, 'One Off', $oneOffLines);
+        $this->renderLines($buPDF, 'Ongoing', $recurringLines);
 
         $buPDF->CR();
         $buPDF->CR();
@@ -2228,7 +2227,8 @@ class BUSalesOrder extends Business
         $buPDF->CR();
         $buPDF->setBoldOn();
         $buPDF->setFont();
-        $buPDF->printString($sectionTitle);
+        $buPDF->printString($sectionTitle . " Costs");
+        $buPDF->CR();
         $boxTop = $buPDF->getYPos();
         $buPDF->printStringRJAt(
             28,
@@ -2298,7 +2298,7 @@ class BUSalesOrder extends Business
             } else {
                 $buPDF->printStringAt(
                     40,
-                    $lines[DBEQuotationLine::description]
+                    $line[DBEQuotationLine::description]
                 ); // comment line
             }
             $buPDF->box(
@@ -2315,7 +2315,7 @@ class BUSalesOrder extends Business
         $buPDF->setFont();
         $buPDF->printStringAt(
             UNIT_LEFT,
-            'Grand total'
+            $sectionTitle . ' Total'
         ); // comment line
         $buPDF->printStringRJAt(
             173,
