@@ -17,7 +17,7 @@
             </column>
         </addColumn>
     </changeSet>
-    <changeSet id="issue521-1" author="pavwebdev">
+    <changeSet id="issue521-2" author="pavwebdev">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="quotationLines" columnName="isRecurring"/>
