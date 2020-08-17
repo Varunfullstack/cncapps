@@ -244,6 +244,7 @@ class BUPDFSalesQuote extends Business
                 DBEJOrdline::renewalCustomerItemID => $dsOrdline->getValue(DBEJOrdline::renewalCustomerItemID),
                 DBEOrdline::isRecurring            => $dsOrdline->getValue(DBEOrdline::isRecurring),
                 DBEJOrdline::itemDescription       => $dsOrdline->getValue(DBEJOrdline::itemDescription),
+                DBEOrdline::sequenceNo             => $dsOrdline->getValue(DBEOrdline::sequenceNo)
             ];
             if ($dsOrdline->getValue(DBEOrdline::isRecurring)) {
                 $recurringLines[] = $row;
@@ -252,8 +253,8 @@ class BUPDFSalesQuote extends Business
             }
         }
 
-        $this->renderAndSaveQuotationLines($buPDF, 'One Off Costs', $oneOffLines, $quotationNextId);
-        $this->renderAndSaveQuotationLines($buPDF, 'Monthly Costs', $recurringLines, $quotationNextId);
+        $this->renderAndSaveQuotationLines($buPDF, 'One Off', $oneOffLines, $quotationNextId);
+        $this->renderAndSaveQuotationLines($buPDF, 'Ongoing', $recurringLines, $quotationNextId);
 
         $buPDF->CR();
         $buPDF->CR();
@@ -392,7 +393,7 @@ class BUPDFSalesQuote extends Business
         $buPDF->CR();
         $buPDF->setBoldOn();
         $buPDF->setFont();
-        $buPDF->printString($title);
+        $buPDF->printString($title . " Costs");
         $buPDF->CR();
         $buPDF->printStringRJAt(
             30,
@@ -553,7 +554,7 @@ class BUPDFSalesQuote extends Business
         $buPDF->setFont();
         $buPDF->printStringRJAt(
             150,
-            'Grand Total'
+            $title . ' Total'
         );
         $buPDF->printStringRJAt(
             170,

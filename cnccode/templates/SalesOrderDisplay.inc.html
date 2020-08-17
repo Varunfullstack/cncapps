@@ -1,5 +1,113 @@
 <!-- Template: SalesOrderDisplay.inc.html -->
+<script src="CommonJS.js"
+></script>
+
 <script type="text/javascript">
+
+    function customerNotePopup() {
+        window.open(
+            '{urlCustomerNote}',
+            'item',
+            'scrollbars=yes,resizable=yes,width=660,height=560,copyhistory=no, menubar=0'
+        );
+
+    }
+
+    function serviceRequestPopup() {
+        window.open(
+            '{urlServiceRequest}',
+            'item',
+            'scrollbars=yes,resizable=yes,width=900,height=800,copyhistory=no, menubar=0'
+        );
+
+    }
+
+    function checkFunctionKey(field) {
+
+        if (event.keyCode == 120) {			// F9 - edit
+            switch (field.id) {
+                case "itemDescription":
+                    if (document.getElementById("itemID").value != "0") {
+                        window.open(
+                            '{urlItemEdit}&itemID=' +
+                            escape(document.getElementById("itemID").value) +
+                            '&parentIDField=itemID' +
+                            '&parentDescField=itemDescription',
+                            'item',
+                            'scrollbars=yes,resizable=yes,width=610,height=560,copyhistory=no, menubar=0'
+                        );
+                    }
+                    break;
+                case "supplierName":
+                    if (document.getElementById("supplierID").value != "0") {
+                        window.open(
+                            '{urlSupplierEdit}&supplierID=' +
+                            escape(document.getElementById("supplierID").value) +
+                            '&parentIDField=supplierID' +
+                            '&parentDescField=supplierName',
+                            'supplier',
+                            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                        );
+                    }
+                    break;
+
+                case "updateSupplierName":
+                    if (document.getElementById("updateSupplierID").value != "0") {
+                        window.open(
+                            '{urlSupplierEdit}&supplierID=' +
+                            escape(document.getElementById("updateSupplierID").value) +
+                            '&parentIDField=updateSupplierID' +
+                            '&parentDescField=updateSupplierName',
+                            'supplier',
+                            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                        );
+                    }
+                    break;
+                case "invSiteDesc":
+                    if (document.getElementById("invSiteNo").value != "") {
+                        window.open(
+                            '{urlSiteEdit}&customerID={customerID}' +
+                            '&siteNo=' + escape(document.getElementById("invSiteNo").value) +
+                            '&parentIDField=invSiteNo' +
+                            '&parentDescField=invSiteDesc',
+                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
+                        );
+                    }
+                    break;
+                case "delSiteDesc":
+                    if (document.getElementById("delSiteNo").value != "") {
+                        window.open(
+                            '{urlSiteEdit}&customerID={customerID}' +
+                            '&siteNo=' + escape(document.getElementById("delSiteNo").value) +
+                            '&parentIDField=delSiteNo' +
+                            '&parentDescField=delSiteDesc',
+                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
+                    }
+                    break;
+                case "invContactName":
+                    if (document.getElementById("invContactID").value != "") {
+                        window.open(
+                            '{urlContactEdit}' +
+                            '&contactID=' + escape(document.getElementById("invContactID").value) +
+                            '&parentIDField=invContactID' +
+                            '&parentDescField=invContactName',
+                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
+                    }
+                    break;
+                case "delContactName":
+                    if (document.getElementById("delContactID").value != "") {
+                        window.open(
+                            '{urlContactEdit}' +
+                            '&contactID=' + escape(document.getElementById("delContactID").value) +
+                            '&parentIDField=delContactID' +
+                            '&parentDescField=delContactName',
+                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
+                    }
+                    break;
+            }
+        }
+        return;
+    }
 
     function selectionChanged() {
         if ($("#action").val() == "changeSupplier") {
@@ -25,9 +133,11 @@
     let introductionTextArea;
     let emailSubjectInput;
     let orderHeadIdInput;
+    let toggleCheckBoxes;
 
     document.addEventListener('DOMContentLoaded', () => {
-
+        window.fromDate = $('#fromDate').get(0);
+        window.toDate = $('#toDate').get(0);
 
         const oneOffSortableJQuery = $('.sortableLines');
         oneOffSortableJQuery.sortable({
@@ -83,7 +193,17 @@
         introductionTextArea = document.querySelector('#introduction');
         emailSubjectInput = document.querySelector('#emailSubject');
         orderHeadIdInput = document.querySelector('[name="form[ordheadID]"]');
+        toggleCheckBoxes = document.querySelectorAll('[name="Toggle"]');
 
+        toggleCheckBoxes.forEach(el => {
+            el.addEventListener('change', $event => {
+                const parentTable = el.closest('table');
+                const checkBoxes = parentTable.querySelectorAll('tbody input[type="checkbox"]');
+                checkBoxes.forEach(checkBox => {
+                    checkBox.checked = el.checked;
+                })
+            })
+        })
 
         document.querySelectorAll('.lineItemQuantityOrdered').forEach(el => {
             el.addEventListener('input', handleQuantityChanged)
@@ -329,136 +449,7 @@
     })
 
 </script>
-<script language='JavaScript'
-        src="CommonJS.js"
-></script>
-<script language='JavaScript'>
-    window.addEventListener('DOMContentLoaded', function () {
-        window.fromDate = $('#fromDate').get(0);
-        window.toDate = $('#toDate').get(0);
-    });
 
-    function customerNotePopup() {
-        window.open(
-            '{urlCustomerNote}',
-            'item',
-            'scrollbars=yes,resizable=yes,width=660,height=560,copyhistory=no, menubar=0'
-        );
-
-    }
-
-    function serviceRequestPopup() {
-        window.open(
-            '{urlServiceRequest}',
-            'item',
-            'scrollbars=yes,resizable=yes,width=900,height=800,copyhistory=no, menubar=0'
-        );
-
-    }
-
-    function checkFunctionKey(field) {
-
-        if (event.keyCode == 120) {			// F9 - edit
-            switch (field.id) {
-                case "itemDescription":
-                    if (document.getElementById("itemID").value != "0") {
-                        window.open(
-                            '{urlItemEdit}&itemID=' +
-                            escape(document.getElementById("itemID").value) +
-                            '&parentIDField=itemID' +
-                            '&parentDescField=itemDescription',
-                            'item',
-                            'scrollbars=yes,resizable=yes,width=610,height=560,copyhistory=no, menubar=0'
-                        );
-                    }
-                    break;
-                case "supplierName":
-                    if (document.getElementById("supplierID").value != "0") {
-                        window.open(
-                            '{urlSupplierEdit}&supplierID=' +
-                            escape(document.getElementById("supplierID").value) +
-                            '&parentIDField=supplierID' +
-                            '&parentDescField=supplierName',
-                            'supplier',
-                            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
-                        );
-                    }
-                    break;
-
-                case "updateSupplierName":
-                    if (document.getElementById("updateSupplierID").value != "0") {
-                        window.open(
-                            '{urlSupplierEdit}&supplierID=' +
-                            escape(document.getElementById("updateSupplierID").value) +
-                            '&parentIDField=updateSupplierID' +
-                            '&parentDescField=updateSupplierName',
-                            'supplier',
-                            'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
-                        );
-                    }
-                    break;
-                case "invSiteDesc":
-                    if (document.getElementById("invSiteNo").value != "") {
-                        window.open(
-                            '{urlSiteEdit}&customerID={customerID}' +
-                            '&siteNo=' + escape(document.getElementById("invSiteNo").value) +
-                            '&parentIDField=invSiteNo' +
-                            '&parentDescField=invSiteDesc',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0'
-                        );
-                    }
-                    break;
-                case "delSiteDesc":
-                    if (document.getElementById("delSiteNo").value != "") {
-                        window.open(
-                            '{urlSiteEdit}&customerID={customerID}' +
-                            '&siteNo=' + escape(document.getElementById("delSiteNo").value) +
-                            '&parentIDField=delSiteNo' +
-                            '&parentDescField=delSiteDesc',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
-                    }
-                    break;
-                case "invContactName":
-                    if (document.getElementById("invContactID").value != "") {
-                        window.open(
-                            '{urlContactEdit}' +
-                            '&contactID=' + escape(document.getElementById("invContactID").value) +
-                            '&parentIDField=invContactID' +
-                            '&parentDescField=invContactName',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
-                    }
-                    break;
-                case "delContactName":
-                    if (document.getElementById("delContactID").value != "") {
-                        window.open(
-                            '{urlContactEdit}' +
-                            '&contactID=' + escape(document.getElementById("delContactID").value) +
-                            '&parentIDField=delContactID' +
-                            '&parentDescField=delContactName',
-                            'address', 'scrollbars=yes,resizable=yes,height=550,width=500,copyhistory=no, menubar=0');
-                    }
-                    break;
-            }
-        }
-        return;
-    }
-
-    function ToggleSelectedLines(checkedOn) {
-        var sa = false;
-        if (checkedOn)
-            sa = true;
-        var numberOfElements = getElementCount("orderLine");
-        for (var i = 0; i < numberOfElements; i++) {
-            var e = document.all("orderLine", i);
-            if (sa && !e.readOnly) {
-                $(e).attr('checked', 'checked')
-            } else {
-                $(e).removeAttr('checked')
-            }
-
-        }
-    }
-</script>
 {salesOrderLineEditJS} {salesOrderSiteEditJS}
 {projectLink}
 <div style="position: sticky; top: -1px; background: white;padding-top: 6px">
@@ -623,7 +614,6 @@
             >
                 <input type="checkbox"
                        name="Toggle"
-                       onClick="ToggleSelectedLines(document.quickQuoteForm.Toggle.checked)"
                 >
             </td>
             <td width="10px"
@@ -726,7 +716,6 @@
             >
                 <input type="checkbox"
                        name="Toggle"
-                       onClick="ToggleSelectedLines(document.quickQuoteForm.Toggle.checked)"
                 >
             </td>
             <td width="10px"
