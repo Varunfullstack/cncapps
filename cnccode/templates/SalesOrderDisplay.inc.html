@@ -162,6 +162,7 @@
                 const lineData = ui.item.data();
                 const movingLineId = lineData.lineId;
                 const fromSequenceNo = lineData.sequenceNo;
+                const updatedTime = updatedTimeInput.value;
                 let swappedItem = ui.item.next();
                 if (ui.position.top > ui.originalPosition.top) {
                     swappedItem = ui.item.prev();
@@ -174,6 +175,7 @@
                         {
                             lineId: movingLineId,
                             replacedLineId,
+                            updatedTime
                         }
                     )
                 })
