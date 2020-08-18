@@ -639,21 +639,47 @@ class CTSalesOrder extends CTCNC
                 break;
             case self::MOVE_LINE_TO_POSITION:
                 $data = json_decode(file_get_contents('php://input'), true);
-                if (!array_key_exists('lineId', $data)) {
+                if (empty($data['lineId'])) {
                     throw new JsonHttpException(400, 'Line id is required');
                 }
-                if (!array_key_exists('replacedLineId', $data)) {
+                if (empty($data['replacedLineId'])) {
                     throw new JsonHttpException(400, 'Replaced Line Id is required');
                 }
+                if (empty($data['updatedTime'])) {
+                    throw new JsonHttpException(400, 'Updated time is required');
+                }
+
+
                 $dbeOrdline = new DBEOrdline($this);
-                $dbeOrdline->getRow($data['lineId']);
+                if (!$dbeOrdline->getRow($data['lineId'])) {
+                    throw new JsonHttpException(400, 'Source Line not found');
+                }
+                $orderHeadId = $dbeOrdline->getValue(DBEOrdline::ordheadID);
+                try {
+                    $hasOrderBeenUpdated = $this->hasOrderBeenModifiedMoreRecently(
+                        $orderHeadId,
+                        $data['updatedTime']
+                    );
+                } catch (Exception $exception) {
+                    throw new JsonHttpException(400, "Could not find order");
+                }
+
+                if ($hasOrderBeenUpdated) {
+                    throw new JsonHttpException(
+                        400, 'Operation Cancelled: The order has been modified by another user'
+                    );
+                }
+
                 $replacedLine = new DBEOrdline($this);
-                $replacedLine->getRow($data['replacedLineId']);
+                if (!$replacedLine->getRow($data['replacedLineId'])) {
+                    throw new JsonHttpException(400, 'Destination Line not found');
+                }
                 $dbeOrdline->swapPlaces(
                     $dbeOrdline->getValue(DBEOrdline::sequenceNo),
                     $replacedLine->getValue(DBEOrdline::sequenceNo)
                 );
-                echo json_encode(["status" => 'ok']);
+                $updatedTime = $this->buSalesOrder->updateOrderTime($orderHeadId);
+                echo json_encode(["status" => 'ok', "updatedTime" => $updatedTime]);
                 break;
             default:
                 $this->displaySearchForm();
@@ -3190,18 +3216,51 @@ class CTSalesOrder extends CTCNC
         }
 
         $data = $this->getJSONData();
-        if (!array_key_exists('selectedLines', $data) || empty($data['selectedLines'])) {
+        if (empty($data['selectedLines'])) {
             throw new JsonHttpException(
                 400,
                 "Select at least one line to be deleted"
             );
         }
+
+        if (empty($data['updatedTime'])) {
+            throw new JsonHttpException(
+                400,
+                'Updated time is required'
+            );
+        }
+
+        $lineId = $data['selectedLines'][0];
+        $dbeOrderLine = new DBEOrdline($this);
+        $dbeOrderLine->getRow($lineId);
         try {
-            $this->buSalesOrder->deleteLines($data['selectedLines']);
-            echo json_encode(["status" => "ok"]);
+            $hasOrderBeenUpdated = $this->hasOrderBeenModifiedMoreRecently(
+                $dbeOrderLine->getValue(DBEOrdline::ordheadID),
+                $data['updatedTime']
+            );
+        } catch (Exception $exception) {
+            throw new JsonHttpException(400, 'Could not find order');
+        }
+
+        if ($hasOrderBeenUpdated) {
+            throw new JsonHttpException(400, 'Operation cancelled, the order has been updated by another user');
+        }
+
+        try {
+            $updatedTime = $this->buSalesOrder->deleteLines($data['selectedLines']);
+            echo json_encode(["status" => "ok", "updatedTime" => $updatedTime]);
         } catch (\Exception $exception) {
             throw new JsonHttpException(500, $exception->getMessage());
         }
+    }
+
+    function hasOrderBeenModifiedMoreRecently($orderHeadId, $lastUpdatedTime)
+    {
+        $dbeOrderHead = new DBEOrdhead($this);
+        if (!$dbeOrderHead->getRow($orderHeadId)) {
+            throw new Exception('The order does not exist');
+        }
+        return $dbeOrderHead->getValue(DBEOrdhead::updatedTime) !== $lastUpdatedTime;
     }
 
     /**
@@ -4432,6 +4491,7 @@ class CTSalesOrder extends CTCNC
      */
     function deleteOrderLine()
     {
+
         $this->setMethodName('deleteOrderLine');
         if (!$this->hasPermissions(SALES_PERMISSION)) {
             throw new JsonHttpException(403, 'You do not have the required permissions to perform this operation');
@@ -4441,36 +4501,30 @@ class CTSalesOrder extends CTCNC
             throw new JsonHttpException(400, "Line Id is required");
         }
 
-        if (empty($data['lastUpdateTime'])) {
-            throw new JsonHttpException(400, "Last update time is required");
+        if (empty($data['updatedTime'])) {
+            throw new JsonHttpException(400, "Updated time is required");
         }
 
         $dbeOrderLine = new DBEOrdline($this);
-        if ($dbeOrderLine->getRow($data['lineId'])) {
+        if (!$dbeOrderLine->getRow($data['lineId'])) {
             throw new JsonHttpException(400, "Could not find line to be deleted");
         }
-
-
-        if ($this->hasOrderBeenModifiedMoreRecently(
-            $dbeOrderLine->getValue(DBEOrdline::ordheadID),
-            $data['lastUpdateTime']
-        )) {
-
+        try {
+            $hasOrderBeenModified = $this->hasOrderBeenModifiedMoreRecently(
+                $dbeOrderLine->getValue(DBEOrdline::ordheadID),
+                $data['updatedTime']
+            );
+        } catch (Exception $exception) {
+            throw new JsonHttpException(400, "Could not find order");
         }
 
-        $this->moveOrderLineValidation($this->getParam('lineId'));
-        $this->buSalesOrder->deleteOrderLine($this->getParam('lineId'));
-        header('Location: ' . $this->getDisplayOrderURL());
-    }
-
-    function hasOrderBeenModifiedMoreRecently($orderHeadId, $lastUpdatedTime)
-    {
-        $dbeOrderHead = new DBEOrdhead($this);
-        if (!$dbeOrderHead->getRow($orderHeadId)) {
-            throw new Exception('The order does not exist');
+        if ($hasOrderBeenModified) {
+            throw new JsonHttpException(
+                400, "Could not perform operation due to another user having the order updated"
+            );
         }
-
-        return $dbeOrderHead->getValue(DBEOrdhead::updatedTime) !== $lastUpdatedTime;
+        $updatedTime = $this->buSalesOrder->deleteOrderLine($data['lineId']);
+        echo json_encode(["status" => "ok", "updatedTime" => $updatedTime]);
 
     }
 

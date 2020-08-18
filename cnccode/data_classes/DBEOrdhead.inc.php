@@ -429,18 +429,13 @@ class DBEOrdhead extends DBEntity
         if ($this->getPKValue() == '') {
             $this->raiseError('ordheadID not set');
         }
-        $this->setValue(
-            self::updatedTime,
-            date('Y-m-d H:i:s')
-        );
+        $newTime = date('Y-m-d H:i:s');
         $this->setQueryString(
-            "UPDATE " . $this->getTableName() .
-            " SET " . $this->getDBColumnName(self::updatedTime) . "='" . date('Y-m-d H:i:s') . "'" .
-            " WHERE " . $this->getPKDBName() . "=" . $this->getPKValue()
+            "UPDATE {$this->getTableName()} SET {$this->getDBColumnName(self::updatedTime)}='{$newTime}' WHERE {$this->getPKDBName()}={$this->getPKValue()}"
         );
         $this->runQuery();
         $this->resetQueryString();
-        return TRUE;
+        return $newTime;
     }
 
     function setStatusCompleted()

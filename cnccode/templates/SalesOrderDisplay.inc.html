@@ -128,10 +128,24 @@
     let orderHeadIdInput;
     let toggleCheckBoxes;
     let updateSupplierName;
+    let updatedTimeInput;
 
     document.addEventListener('DOMContentLoaded', () => {
         window.fromDate = $('#fromDate').get(0);
         window.toDate = $('#toDate').get(0);
+
+        function updateSequenceNumbers(items, fromSequenceNo, toSequenceNo) {
+            let lowerBound = fromSequenceNo;
+            let upperBound = toSequenceNo;
+            if (lowerBound > upperBound) {
+                upperBound = fromSequenceNo;
+                lowerBound = toSequenceNo;
+            }
+
+            for (let i = lowerBound - 1; i < upperBound; i++) {
+                items[i].dataset.sequenceNo = (i + 1).toString();
+            }
+        }
 
         const oneOffSortableJQuery = $('.sortableLines');
         oneOffSortableJQuery.sortable({
@@ -157,23 +171,16 @@
                         }
                     )
                 })
-                    .then(() => {
-                        // we have to update the sequences of the items to match the new ordering
-                        const siblings = ui.item.parent().children();
-                        let lowerBound = fromSequenceNo;
-                        let upperBound = toSequenceNo;
-                        if (lowerBound > upperBound) {
-                            upperBound = fromSequenceNo;
-                            lowerBound = toSequenceNo;
+                    .then(x => x.json())
+                    .then(response => {
+                        if (response.status !== 'ok') {
+                            throw new Error(response.message);
                         }
-
-                        for (let i = lowerBound - 1; i < upperBound; i++) {
-                            siblings[i].dataset.sequenceNo = (i + 1).toString();
-                        }
+                        updateUpdatedTimeInput(response.updatedTime);
+                        updateSequenceNumbers(ui.item.parent().children(), fromSequenceNo, toSequenceNo);
                     })
                     .catch(errorResponse => {
-                        alert('Failed to move line');
-                        console.error(errorResponse);
+                        alert(errorResponse);
                         oneOffSortableJQuery.sortable('cancel');
                     })
 
@@ -187,7 +194,8 @@
         emailSubjectInput = document.querySelector('#emailSubject');
         orderHeadIdInput = document.querySelector('[name="form[ordheadID]"]');
         toggleCheckBoxes = document.querySelectorAll('[name="Toggle"]');
-        updateSupplierName = document.querySelector('#updateSupplierName')
+        updateSupplierName = document.querySelector('#updateSupplierName');
+        updatedTimeInput = document.querySelector('#updatedTime');
 
         toggleCheckBoxes.forEach(el => {
             el.addEventListener('change', $event => {
@@ -217,12 +225,21 @@
             el.addEventListener('click', handleUpdateItemPrice);
         })
 
+        document.querySelectorAll('.deleteLineButton').forEach(el => {
+            el.addEventListener('click', handleDeleteLine)
+        })
 
         function confirmOption(text) {
             return confirm('Are you sure you want to ' + text);
         }
 
-        function getSelectedLines() {
+        function getSelectedHTMLRows() {
+            return Array.from(document.querySelectorAll('[name="selectedOrderLine[]"]:checked')).map(checkbox => {
+                return checkbox.closest('tr');
+            });
+        }
+
+        function getSelectedLinesIds() {
             const selectedLines = [];
             document.querySelectorAll('[name="selectedOrderLine[]"]:checked').forEach((selectedCheckbox) => {
                 selectedLines.push(selectedCheckbox.value);
@@ -248,7 +265,7 @@
 
             switch (selectedOptionText) {
                 case 'CREATE_SERVICE_REQUEST_FROM_ORDER': {
-                    const selectedLines = getSelectedLines();
+                    const selectedLines = getSelectedLinesIds();
 
                     if (!selectedLines.length) {
                         alert('Please select at least 1 line to proceed');
@@ -264,27 +281,34 @@
                     break;
                 }
                 case 'DELETE_LINES': {
-                    const selectedLines = getSelectedLines();
+                    const selectedLines = getSelectedLinesIds();
 
                     if (!selectedLines.length) {
                         alert('Please select at least 1 line to proceed');
                         return;
                     }
 
+                    const updatedTime = updatedTimeInput.value;
+
                     fetch('?action=DELETE_LINES',
                         {
                             method: 'POST',
                             body: JSON.stringify({
                                 selectedLines,
+                                updatedTime,
                             })
                         }
                     )
                         .then(response => response.json())
                         .then(response => {
-                            if (response.status == 'error') {
+                            if (response.status !== 'ok') {
                                 throw new Error(response.message);
                             }
-                            document.location.reload();
+                            updateUpdatedTimeInput(response.updatedTime);
+                            getSelectedHTMLRows().forEach(row => {
+                                deleteRowAndUpdate(row);
+                            })
+
                         })
                         .catch(error => {
                             alert(error.message);
@@ -293,7 +317,7 @@
                 }
 
                 case 'CHANGE_SUPPLIER_FOR_LINES': {
-                    const selectedLines = getSelectedLines();
+                    const selectedLines = getSelectedLinesIds();
                     const supplierId = supplierToChangeId.value;
 
                     if (!supplierId) {
@@ -330,7 +354,7 @@
                 }
                 case 'CREATE_MANUAL_ORDER_FORM': {
                     const orderHeadId = orderHeadIdInput.value;
-                    const selectedLines = getSelectedLines();
+                    const selectedLines = getSelectedLinesIds();
 
                     if (!selectedLines.length) {
                         alert('Please select at least 1 line to proceed');
@@ -369,7 +393,7 @@
                         alert('Please make sure you have set Salutation, Email Subject and Introduction before trying again');
                         return;
                     }
-                    const selectedLines = getSelectedLines();
+                    const selectedLines = getSelectedLinesIds();
 
                     if (!selectedLines.length) {
                         alert('Please select at least 1 line to proceed');
@@ -403,6 +427,47 @@
                 }
             }
         })
+
+        function deleteRowAndUpdate(row) {
+            updateRowCalculatedValues(row, 0, 0, 0);
+            const tbody = row.parentElement;
+            const currentSequenceNo = row.dataset.sequenceNo;
+            row.remove();
+            updateSequenceNumbers(tbody.children, currentSequenceNo, tbody.childElementCount);
+        }
+
+        function handleDeleteLine($event) {
+            const target = $event.target;
+            const parentRow = target.closest('tr');
+            const lineId = parentRow.dataset.lineId;
+            const updatedTime = updatedTimeInput.value;
+
+            fetch('?action=DELETE_LINE',
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        lineId,
+                        updatedTime
+                    })
+                }
+            )
+                .then(r => r.json())
+                .then(response => {
+                    debugger;
+                    if (response.status !== 'ok') {
+                        throw new Error(response.message);
+                    }
+                    updateUpdatedTimeInput(response.updatedTime);
+                    deleteRowAndUpdate(parentRow);
+                })
+                .catch(error => {
+                    alert(error);
+                })
+        }
+
+        function updateUpdatedTimeInput(newValue) {
+            updatedTimeInput.value = newValue;
+        }
 
         function handleUpdateItemPrice($event) {
             const target = $event.target;
@@ -485,7 +550,11 @@
 
         function updateRowCalculatedValues(row, quantity, unitCost, unitSale) {
             const calculatedValues = getCalculatedValues(quantity, unitCost, unitSale);
-            row.querySelector('.lineItemCostTotal').textContent = calculatedValues.totalCost.toFixed(2);
+            const lineItemCostTotal = row.querySelector('.lineItemCostTotal');
+            if (!lineItemCostTotal) {
+                return;
+            }
+            lineItemCostTotal.textContent = calculatedValues.totalCost.toFixed(2);
             row.querySelector('.lineItemSaleTotal').textContent = calculatedValues.totalSale.toFixed(2);
             const lineItemProfitAmount = row.querySelector('.lineItemProfitAmount');
             lineItemProfitAmount.textContent = calculatedValues.profitAmount.toFixed(2);

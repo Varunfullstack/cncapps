@@ -1541,13 +1541,15 @@ class BUSalesOrder extends Business
     /**
      * Delete multiple Order Lines
      * @param array $lineIds
-     * @return void
+     * @return false|string|void
      */
     function deleteLines($lineIds)
     {
+        $lastUpdated = null;
         foreach ($lineIds as $lineId) {
-            $this->deleteOrderLine($lineId);
+            $lastUpdated = $this->deleteOrderLine($lineId);
         }
+        return $lastUpdated;
     }
 
     function deleteOrderLine($lineId)
@@ -1555,9 +1557,14 @@ class BUSalesOrder extends Business
         $dbeOrdline = new DBEOrdline($this);
         $dbeOrdline->getRow($lineId);
         $dbeOrdline->deleteRow();
+        return $this->updateOrderTime($dbeOrdline->getValue(DBEOrdline::ordheadID));
+    }
+
+    function updateOrderTime($orderHeadId)
+    {
         $dbeOrdhead = new DBEOrdhead($this);
-        $dbeOrdhead->setPKValue($dbeOrdline->getValue(DBEOrdline::ordheadID));
-        $dbeOrdhead->setUpdatedTime();
+        $dbeOrdhead->setPKValue($orderHeadId);
+        return $dbeOrdhead->setUpdatedTime();
     }
 
     function updateHeader(
