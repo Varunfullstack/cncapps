@@ -1254,6 +1254,8 @@ class CTSalesOrder extends CTCNC
             if ($orderType == 'Q') {
                 $actions[CTSALESORDER_ACT_COPY_TO_ORDER] = 'copy to order';
                 $actions[CTSALESORDER_ACT_CONVERT_TO_ORDER] = 'convert to order';
+            } else {
+                $actions[self::CREATE_SERVICE_REQUEST_FROM_ORDER] = 'create new SR';
             }
             if ($orderType == 'Q' || $orderType == 'I') {
                 $actions[self::DELETE_LINES] = 'delete lines';
@@ -1266,7 +1268,7 @@ class CTSalesOrder extends CTCNC
 
             $actions[self::CREATE_MANUAL_ORDER_FORM] = 'create manual order form';
             $actions[self::CHANGE_SUPPLIER_FOR_LINES] = 'change supplier';
-            $actions[self::CREATE_SERVICE_REQUEST_FROM_ORDER] = 'create new SR';
+
         }
         $order = [
             self::CREATE_SIGNABLE_QUOTE,

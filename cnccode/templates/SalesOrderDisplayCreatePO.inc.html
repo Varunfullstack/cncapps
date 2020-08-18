@@ -19,11 +19,14 @@
         document.location = url;
     }
 </script>
-<input type="button"
-       name="createPO"
-       value="Create POs"
-       onclick="goToCreatePO()"
+<button type="button"
+        name="createPO"
+        value="Create POs"
+        onclick="goToCreatePO()"
+        class="salesOrderButton"
 >
+    <i class="fal fa-layer-plus fa-2x"></i>
+</button>
 <label>
     <span>Required By</span>
     <input type="date"

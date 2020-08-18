@@ -437,6 +437,11 @@
         }
 
         function handleDeleteLine($event) {
+
+            if (!confirm('Are you sure you want to delete this row?')) {
+                return;
+            }
+
             const target = $event.target;
             const parentRow = target.closest('tr');
             const lineId = parentRow.dataset.lineId;
@@ -731,8 +736,10 @@
                 <button id="performActionButton"
                         {readOnly}
                         type="button"
-
-                >Go
+                        class="salesOrderButton not-so-faint"
+                        title="Complete selected action"
+                >
+                    <i class="fal fa-play fa-2x"></i>
                 </button>
                 <font class="formErrorMessage">{linesMessage}</font>
             </td>
@@ -776,69 +783,64 @@
            cellpadding="1"
     >
         <thead>
+
+
         <tr>
-            <td width="16px"
-                class="listHeadText"
+            <td class="listHeadText toggleColumn">
+                <div>
+                    <input type="checkbox"
+                           name="Toggle"
+                    >
+                </div>
+            </td>
+            <td class="listHeadText renewalsColumn">
+                <div> &nbsp;</div>
+            </td>
+            <td class="listHeadText descriptionColumn">
+                <div> Description</div>
+            </td>
+            <td class="listHeadText partNumberColumn">
+                <div>
+                    Part No
+                </div>
+            </td>
+            <td class="listHeadText supplierColumn">
+                <div>
+                    Supplier
+                </div>
+            </td>
+            <td class="listHeadText financialColumn">
+                <DIV>
+                    Qty
+                </DIV>
+            </td>
+            <td class="listHeadText financialColumn">
+                <DIV>
+                    Cost(&pound;)
+                </DIV>
+            </td>
+            <td class="listHeadText financialColumn">
+                <DIV>
+                    Total(&pound;)
+                </DIV>
+            </td>
+            <td class="listHeadText financialColumn">
+                <DIV>
+                    Sale(&pound;)
+                </DIV>
+            </td>
+            <td class="listHeadText financialColumn">
+                <DIV>Total(&pound;)</DIV>
+            </td>
+            <td class="listHeadText financialColumn">
+                <DIV>Profit(&pound;)</DIV>
+            </td>
+            <td class="listHeadText financialColumn">
+                <DIV>Profit(%)</DIV>
+            </td>
+            <td class="orderLineClass createPOColumn"
             >
-                <input type="checkbox"
-                       name="Toggle"
-                >
-            </td>
-            <td width="10px"
-                class="listHeadText"
-            >&nbsp;
-            </td>
-            <td width="242px"
-                class="listHeadText"
-            >Description
-            </td>
-            <td width="57px"
-                class="listHeadText"
-            >Part No
-            </td>
-            <td width="125px"
-                class="listHeadText"
-            >Supplier
-            </td>
-            <td width="50px"
-                class="listHeadText"
-            >
-                <DIV align="right">Qty</DIV>
-            </td>
-            <td width="50px"
-                class="listHeadText"
-            >
-                <DIV align="right">Cost(&pound;)</DIV>
-            </td>
-            <td width="50px"
-                class="listHeadText"
-            >
-                <DIV align="right">Total(&pound;)</DIV>
-            </td>
-            <td width="50px"
-                class="listHeadText"
-            >
-                <DIV align="right">Sale(&pound;)</DIV>
-            </td>
-            <td width="50px"
-                class="listHeadText"
-            >
-                <DIV align="right">Total(&pound;)</DIV>
-            </td>
-            <td width="50px"
-                class="listHeadText"
-            >
-                <DIV align="right">Profit(&pound;)</DIV>
-            </td>
-            <td width="50px"
-                class="listHeadText"
-            >
-                <DIV align="right">Profit(%)</DIV>
-            </td>
-            <td width="100px"
-                class="orderLineClass"
-            >
-                <div align="left">{salesOrderDisplayCreatePO}</div>
+                <div>{salesOrderDisplayCreatePO}</div>
             </td>
         </tr>
         </thead>
@@ -881,68 +883,61 @@
 
 
         <tr>
-            <td width="16px"
-                class="listHeadText"
+            <td class="listHeadText toggleColumn">
+                <div>
+                    <input type="checkbox"
+                           name="Toggle"
+                    >
+                </div>
+            </td>
+            <td class="listHeadText renewalsColumn">
+                <div> &nbsp;</div>
+            </td>
+            <td class="listHeadText descriptionColumn">
+                <div> Description</div>
+            </td>
+            <td class="listHeadText partNumberColumn">
+                <div>
+                    Part No
+                </div>
+            </td>
+            <td class="listHeadText supplierColumn">
+                <div>
+                    Supplier
+                </div>
+            </td>
+            <td class="listHeadText financialColumn">
+                <DIV>
+                    Qty
+                </DIV>
+            </td>
+            <td class="listHeadText financialColumn">
+                <DIV>
+                    Cost(&pound;)
+                </DIV>
+            </td>
+            <td class="listHeadText financialColumn">
+                <DIV>
+                    Total(&pound;)
+                </DIV>
+            </td>
+            <td class="listHeadText financialColumn">
+                <DIV>
+                    Sale(&pound;)
+                </DIV>
+            </td>
+            <td class="listHeadText financialColumn">
+                <DIV>Total(&pound;)</DIV>
+            </td>
+            <td class="listHeadText financialColumn">
+                <DIV>Profit(&pound;)</DIV>
+            </td>
+            <td class="listHeadText financialColumn">
+                <DIV>Profit(%)</DIV>
+            </td>
+            <td class="orderLineClass createPOColumn"
             >
-                <input type="checkbox"
-                       name="Toggle"
-                >
-            </td>
-            <td width="10px"
-                class="listHeadText"
-            >&nbsp;
-            </td>
-            <td width="242px"
-                class="listHeadText"
-            >Description
-            </td>
-            <td width="57px"
-                class="listHeadText"
-            >Part No
-            </td>
-            <td width="125px"
-                class="listHeadText"
-            >Supplier
-            </td>
-            <td width="50px"
-                class="listHeadText"
-            >
-                <DIV align="right">Qty</DIV>
-            </td>
-            <td width="50px"
-                class="listHeadText"
-            >
-                <DIV align="right">Cost(&pound;)</DIV>
-            </td>
-            <td width="50px"
-                class="listHeadText"
-            >
-                <DIV align="right">Total(&pound;)</DIV>
-            </td>
-            <td width="50px"
-                class="listHeadText"
-            >
-                <DIV align="right">Sale(&pound;)</DIV>
-            </td>
-            <td width="50px"
-                class="listHeadText"
-            >
-                <DIV align="right">Total(&pound;)</DIV>
-            </td>
-            <td width="50px"
-                class="listHeadText"
-            >
-                <DIV align="right">Profit(&pound;)</DIV>
-            </td>
-            <td width="50px"
-                class="listHeadText"
-            >
-                <DIV align="right">Profit(%)</DIV>
-            </td>
-            <td width="100px"
-                class="orderLineClass"
-            >
-                <div align="left">{salesOrderDisplayCreatePO}</div>
+                <div>{salesOrderDisplayCreatePO}</div>
             </td>
         </tr>
         </thead>

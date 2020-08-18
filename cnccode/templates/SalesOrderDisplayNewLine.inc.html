@@ -187,8 +187,11 @@
             >
                 <DIV align="right">Sale(&pound;)</DIV>
             </td>
+            <td>
+                <div style="width: 90px">&nbsp;</div>
+            </td>
         </tr>
-        <tr>
+        <tr class="newLine">
             <td class="field">
                 <select id="lineType"
                         name="ordline[1][lineType]"
@@ -235,9 +238,8 @@
                        name="ordline[1][qtyOrdered]"
                        value="{qtyOrdered}"
                        onKeypress="javascript:submitOnReturn()"
-                       size="4"
                        align="right"
-                       maxlength="10"
+
                        step="0.01"
                 >
                 <font class="formErrorMessage">{qtyOrderedMessage}</font>
@@ -268,14 +270,20 @@
                 <font class="formErrorMessage">{curUnitSaleMessage}</font>
             </td>
             <td width="35">
-                <button name="addLine">
-                    <i class="fas fa-plus"></i>
+                <button name="addLine"
+                        class="salesOrderButton not-so-faint"
+                        title="Add to order"
+                >
+                    <i class="fal fa-plus fa-2x"></i>
                 </button>
                 <button name="ordline[1][isRecurring]"
                         style="display: none"
                         value="1"
+                        class="salesOrderButton not-so-faint"
+                        title="Add to recurring section"
+
                 >
-                    <i class="fal fa-repeat"></i>
+                    <i class="fal fa-repeat fa-2x"></i>
                 </button>
             </td>
             <td width="62">&nbsp;</td>

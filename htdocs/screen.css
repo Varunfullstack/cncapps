@@ -918,3 +918,55 @@ table.cell-padding-1 th, table.cell-padding-1 td {
     font-size: 14px;
     padding-top: 4px;
 }
+
+.newLine input[type="number"] {
+    width: 47px;
+}
+
+.salesOrderButton {
+    background-color: transparent;
+}
+
+.salesOrderButton[disabled] {
+    background-color: transparent;
+}
+
+.salesOrderButton i {
+    color: #C6C6C6;
+}
+
+.salesOrderButton.not-so-faint i {
+    color: #3C3C3C
+}
+
+.toggleColumn div {
+    width: 16px
+}
+
+.renewalsColumn div {
+    width: 10px;
+}
+
+.descriptionColumn div {
+    width: 250px
+}
+
+.partNumberColumn div {
+    width: 80px;
+}
+
+.supplierColumn div {
+    width: 250px;
+}
+
+.financialColumn div {
+    width: 70px;
+    text-align: right;
+}
+
+.createPOColumn div {
+    width: 100px;
+}
+.sortableTable input[type="number"] {
+    width: 47px;
+}
