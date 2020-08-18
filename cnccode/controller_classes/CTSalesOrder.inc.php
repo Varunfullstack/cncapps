@@ -293,6 +293,7 @@ class CTSalesOrder extends CTCNC
     const CHANGE_SUPPLIER_FOR_LINES = "CHANGE_SUPPLIER_FOR_LINES";
     const CREATE_SR_FROM_LINES = "CREATE_SR_FROM_LINES";
     const CREATE_SERVICE_REQUEST_FROM_ORDER = "CREATE_SERVICE_REQUEST_FROM_ORDER";
+    const DELETE_LINE = "DELETE_LINE";
     /** @var */
     public $customerID;
     /** @var */
@@ -584,8 +585,7 @@ class CTSalesOrder extends CTCNC
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->moveOrderLineDown();
                 break;
-            case CTSALESORDER_ACT_DELETE_ORDLINE:
-                $this->checkPermissions(SALES_PERMISSION);
+            case self::DELETE_LINE:
                 $this->deleteOrderLine();
                 break;
             case CTSALESORDER_ACT_UPDATE_HEADER:
@@ -4433,10 +4433,45 @@ class CTSalesOrder extends CTCNC
     function deleteOrderLine()
     {
         $this->setMethodName('deleteOrderLine');
+        if (!$this->hasPermissions(SALES_PERMISSION)) {
+            throw new JsonHttpException(403, 'You do not have the required permissions to perform this operation');
+        }
+        $data = $this->getJSONData();
+        if (empty($data['lineId'])) {
+            throw new JsonHttpException(400, "Line Id is required");
+        }
+
+        if (empty($data['lastUpdateTime'])) {
+            throw new JsonHttpException(400, "Last update time is required");
+        }
+
+        $dbeOrderLine = new DBEOrdline($this);
+        if ($dbeOrderLine->getRow($data['lineId'])) {
+            throw new JsonHttpException(400, "Could not find line to be deleted");
+        }
+
+
+        if ($this->hasOrderBeenModifiedMoreRecently(
+            $dbeOrderLine->getValue(DBEOrdline::ordheadID),
+            $data['lastUpdateTime']
+        )) {
+
+        }
 
         $this->moveOrderLineValidation($this->getParam('lineId'));
         $this->buSalesOrder->deleteOrderLine($this->getParam('lineId'));
         header('Location: ' . $this->getDisplayOrderURL());
+    }
+
+    function hasOrderBeenModifiedMoreRecently($orderHeadId, $lastUpdatedTime)
+    {
+        $dbeOrderHead = new DBEOrdhead($this);
+        if (!$dbeOrderHead->getRow($orderHeadId)) {
+            throw new Exception('The order does not exist');
+        }
+
+        return $dbeOrderHead->getValue(DBEOrdhead::updatedTime) !== $lastUpdatedTime;
+
     }
 
     /**
