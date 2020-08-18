@@ -1381,7 +1381,6 @@ class BUSalesOrder extends Business
             $dbeJOrdline,
             $dsJOrdline
         );
-        $dsJOrdline->sortAscending(DBEJOrdline::sequenceNo);
         $buCustomer = new BUCustomer($this);
         $buCustomer->getContactByID(
             $dsOrdhead->getValue(DBEOrdhead::delContactID),

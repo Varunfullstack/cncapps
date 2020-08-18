@@ -280,7 +280,7 @@ class CTDespatch extends CTCNC
                 $this->template->set_var(
                     array(
                         'description' => Controller::htmlDisplayText($dsOrdline->getValue(DBEOrdline::description)),
-                        'lineId'      => $dsOrdline->getValue(DBEOrdline::id)
+                        'lineId'      => $dsOrdline->getValue(DBEOrdline::id),
                     )
                 );
                 if ($dsOrdline->getValue(DBEOrdline::lineType) != "I") {                    // Comment line
