@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.3.5] - 2020-08-18
+### Fixed
+- When Despatching, it can change the order of items.
+
 ## [v4.3.4] - 2020-08-10
 ### Fixed
 - Fixed sale price calculation from UpdatePriceItemFromStreamOne
