@@ -168,12 +168,9 @@ class BUDespatch extends Business
             if (
                 $dsOrdline->getValue(DBEOrdline::lineType) == 'I' // exclude comment lines
             ) {
-
                 if (!$onlyCreateDespatchNote) {
-
                     $this->updateOrdline($ordheadID, $dsOrdline, $dsDespatch);
                 }
-
                 $ordlineUpdated = TRUE;
             }
         }
@@ -275,7 +272,7 @@ class BUDespatch extends Business
                 DBEJOrdline::ordheadID,
                 $ordheadID
             );
-            $dbeJOrdline->getRowsByColumn(DBEJOrdline::ordheadID, DBEOrdline::sequenceNo);
+            $dbeJOrdline->getRowsByColumn(DBEJOrdline::ordheadID);
             $ret = ($this->getData(
                 $dbeJOrdline,
                 $dsOrdline

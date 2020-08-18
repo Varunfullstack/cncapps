@@ -78,14 +78,20 @@ class DBEJOrdline extends DBEOrdline
             $this->raiseError("Column " . $column . " out of range");
             return DA_OUT_OF_RANGE;
         }
-        $this->setQueryString(
-            "SELECT " . $this->getDBColumnNamesAsString() .
+        $query = "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() . " LEFT JOIN supplier ON " . $this->getDBColumnName(
                 self::supplierID
             ) . "=sup_suppno" .
             " LEFT JOIN item ON " . $this->getDBColumnName(self::itemID) . "=itm_itemno" .
-            " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn)
-        );
+            " WHERE " . $this->getDBColumnName($ixColumn) . "=" . $this->getFormattedValue($ixColumn);
+
+        if ($sortColumn) {
+            $query .= " order by {$this->getDBColumnName($sortColumn)}";
+        } else {
+            $query .= " order by {$this->getDBColumnName(self::sequenceNo)}";
+        }
+        $this->setQueryString($query);
+
         return ($this->getRows());
     }
 
