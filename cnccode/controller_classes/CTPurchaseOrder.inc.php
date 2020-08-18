@@ -785,7 +785,9 @@ class CTPurchaseOrder extends CTCNC
                     $dsPorhead->getValue(DBEJPorhead::orderedByName)
                 ),
                 'orderRequiredBy'              => $dsPorhead->getValue(DBEPorhead::requiredBy),
-                'orderDate'                    => $dsPorhead->getValue(DBEJPorhead::orderDate),
+                'orderDate'                    => Controller::dateYMDtoDMY(
+                    $dsPorhead->getValue(DBEJPorhead::orderDate)
+                ),
                 'supplierName'                 => Controller::htmlInputText(
                     $dsPorhead->getValue(DBEJPorhead::supplierName)
                 ),
