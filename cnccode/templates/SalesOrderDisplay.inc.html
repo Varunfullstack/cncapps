@@ -109,6 +109,9 @@
         return;
     }
 
+    function confirmOption(text) {
+        return confirm('Are you sure you want to ' + text);
+    }
 
     function checkCreation() {
         if (this.event.target.parentElement.className === 'createItem') {
@@ -129,6 +132,9 @@
     let toggleCheckBoxes;
     let updateSupplierName;
     let updatedTimeInput;
+
+    let requiredByDateInput;
+    let tbcInput;
 
     document.addEventListener('DOMContentLoaded', () => {
         window.fromDate = $('#fromDate').get(0);
@@ -196,6 +202,8 @@
         toggleCheckBoxes = document.querySelectorAll('[name="Toggle"]');
         updateSupplierName = document.querySelector('#updateSupplierName');
         updatedTimeInput = document.querySelector('#updatedTime');
+        requiredByDateInput = document.querySelector('#requiredByDate');
+        tbcInput = document.querySelector('#tbc');
 
         toggleCheckBoxes.forEach(el => {
             el.addEventListener('change', $event => {
@@ -229,9 +237,6 @@
             el.addEventListener('click', handleDeleteLine)
         })
 
-        function confirmOption(text) {
-            return confirm('Are you sure you want to ' + text);
-        }
 
         function getSelectedHTMLRows() {
             return Array.from(document.querySelectorAll('[name="selectedOrderLine[]"]:checked')).map(checkbox => {
@@ -248,11 +253,19 @@
         }
 
         actionSelector.addEventListener('change', $event => {
-            let displayValue = "inline-block"
+            let updateSupplierDisplayValue = "inline-block";
+            let purchaseOrderDisplayValue = 'inline-block';
             if (actionSelector.value !== 'CHANGE_SUPPLIER_FOR_LINES') {
-                displayValue = 'none'
+                updateSupplierDisplayValue = 'none'
             }
-            updateSupplierName.style.display = displayValue;
+
+            if (actionSelector.value !== 'CREATE_PURCHASE_ORDERS') {
+                purchaseOrderDisplayValue = 'none';
+            }
+
+            requiredByDateInput.style.display = purchaseOrderDisplayValue;
+            tbcInput.style.display = purchaseOrderDisplayValue;
+            updateSupplierName.style.display = updateSupplierDisplayValue;
         })
 
         document.querySelector('#performActionButton').addEventListener('click', $event => {
@@ -264,6 +277,64 @@
             const selectedOptionText = actionSelector.selectedOptions[0].value;
 
             switch (selectedOptionText) {
+                case 'CONVERT_TO_ORDER':
+                case 'COPY_TO_ORDER': {
+                    const orderHeadId = orderHeadIdInput.value;
+                    const selectedLines = getSelectedLinesIds();
+                    if (!selectedLines.length) {
+                        alert('Please select at least 1 line to proceed');
+                        return;
+                    }
+
+                    fetch('?action=' + selectedOptionText,
+                        {
+                            method: 'POST',
+                            body: JSON.stringify(
+                                {
+                                    orderHeadId,
+                                    selectedLines
+                                }
+                            )
+                        }
+                    )
+                        .then(x => x.json())
+                        .then(res => {
+                            if (res.status !== 'ok') {
+                                throw new Error(res.message);
+                            }
+
+                            if (res.orderHeadId !== orderHeadId) {
+                                open('SalesOrder.php?action=displaySalesOrder&ordheadID=' + res.orderHeadId)
+                            } else {
+                                window.location.reload();
+                            }
+                        })
+                        .catch(error => {
+                            alert(error.message);
+                        })
+
+                    break;
+                }
+                case 'CREATE_PURCHASE_ORDERS': {
+                    const orderHeadId = orderHeadIdInput.value;
+                    let url = '/PurchaseOrder.php?action=generatePOs&ordheadID=' + orderHeadId;
+                    const requiredByDate = requiredByDateInput.value;
+
+                    if (requiredByDate) {
+                        url += ("&requiredByDate=" + requiredByDate);
+                    } else {
+                        if (!tbcInput.checked) {
+                            return alert("Provide a date, or check the TBC checkbox!");
+                        }
+                    }
+                    open(url);
+                    const evt = document.createEvent('HTMLEvents');
+                    evt.initEvent('change', false, true);
+                    actionSelector.value = 'CREATE_SIGNABLE_QUOTE';
+                    actionSelector.dispatchEvent(evt);
+                    actionSelector.querySelector('option[value="CREATE_PURCHASE_ORDERS"]').remove();
+                    break;
+                }
                 case 'CREATE_SERVICE_REQUEST_FROM_ORDER': {
                     const selectedLines = getSelectedLinesIds();
 
@@ -623,8 +694,6 @@
             const unitCost = parentRow.querySelector('.lineItemUnitCost').value;
             updateRowCalculatedValues(parentRow, quantity, unitCost, unitSale);
         }
-
-
     })
 
 </script>
@@ -720,6 +789,18 @@
                         id="fromOrdheadID"
                         value="{fromOrdheadID}"
                         placeholder="From Sales Order ID"
+                >
+                <input type="date"
+                       name="requiredByDate"
+                       id="requiredByDate"
+                       value="{requiredByDateValue}"
+                       title="Required By Date"
+                       style="display: none"
+                >
+                <input type="checkbox"
+                       id="tbc"
+                       title="Date TBC"
+                       style="display: none"
                 >
                 <input {updateSupplierNameStyle}
                        type="text"

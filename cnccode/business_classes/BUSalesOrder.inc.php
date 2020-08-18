@@ -1194,24 +1194,20 @@ class BUSalesOrder extends Business
      * Converts a quote into an order
      * @param $ordheadID
      * @param $convertToOrder
-     * @param DataSet $dsSelectedOrderLine
+     * @param array $lineIds
      * @return bool|float|int|string
+     * @throws Exception
      */
     function convertQuoteToOrder($ordheadID,
                                  $convertToOrder,
-                                 &$dsSelectedOrderLine
+                                 array $lineIds
     )
     {
         $this->setMethodName('convertQuoteToOrder');
         if (!$ordheadID) {
-            $this->raiseError('ordheadID not passed');
+            throw new Exception('Order Head Id is required');
         }
-        if (!is_a(
-            $dsSelectedOrderLine,
-            'DataSet'
-        )) {
-            $this->raiseError('orderLines object not passed');
-        }
+
         $dsOrdhead = new DataSet($this);
         $dsOrdline = new DataSet($this);
         if (!$this->getOrderWithCustomerName(
@@ -1230,7 +1226,7 @@ class BUSalesOrder extends Business
         $originalNo = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
 
         if (
-            ($dsOrdline->rowCount() == $dsSelectedOrderLine->rowCount()) &&
+            ($dsOrdline->rowCount() == count($lineIds)) &&
             $convertToOrder                                // Flag indicates to convert not copy
         ) {
             $dsOrdhead->setUpdateModeUpdate();
@@ -1277,21 +1273,28 @@ class BUSalesOrder extends Business
             );    // create new order header
             $newOrdheadID = $dsOrdhead->getValue(DBEOrdhead::ordheadID);
             // Add selected lines to new order
-            $sequenceNo = 0;
+            $oneOffSequenceNumber = 0;
+            $recurringSequenceNumber = 0;
             $dsNewOrdline = new DataSet($this);
             $dsNewOrdline->copyColumnsFrom($dsOrdline);
             while ($dsOrdline->fetchNext()) {
-                if ($dsSelectedOrderLine->search(
-                    DBEOrdline::id,
-                    $dsOrdline->getValue(DBEOrdline::id)
-                )) {
-                    $sequenceNo++;
+                if (in_array($dsOrdline->getValue(DBEOrdline::id), $lineIds)) {
+                    if ($dsOrdline->getValue(DBEOrdline::isRecurring)) {
+                        $recurringSequenceNumber++;
+                        $sequenceNo = $recurringSequenceNumber;
+                    } else {
+                        $oneOffSequenceNumber++;
+                        $sequenceNo = $oneOffSequenceNumber;
+                    }
+
                     $dsNewOrdline->setUpdateModeInsert();
                     $dsNewOrdline->row = $dsOrdline->row;
+                    $dsNewOrdline->setValue(DBEOrdline::id, null);
                     $dsNewOrdline->setValue(
                         DBEOrdline::ordheadID,
                         $newOrdheadID
                     );
+
                     $dsNewOrdline->setValue(
                         DBEOrdline::sequenceNo,
                         $sequenceNo
@@ -1325,12 +1328,8 @@ class BUSalesOrder extends Business
         );
         $buRenQuotation = null;
         while ($dsOrdline->fetchNext()) {
-
             if ($dsOrdline->getValue(DBEOrdline::renewalCustomerItemID)) {
-
-                /*
-                 * Only updates renewal if found on one of these renewal tables
-                 */
+                // Only updates renewal if found on one of these renewal tables
                 if (!$buRenQuotation) {
                     $buRenQuotation = new BURenQuotation($this);
                 }
@@ -1339,9 +1338,7 @@ class BUSalesOrder extends Business
                     $dsOrdline->getValue(DBEOrdline::renewalCustomerItemID),
                     $convertToOrder
                 );
-
             }
-
         }
 
         return $ret;

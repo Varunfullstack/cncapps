@@ -1,42 +1,28 @@
 <!-- Template: SalesOrderDisplayCreatePO.inc.html -->
 <script>
 
-    function goToCreatePO() {
 
-        let url = '{urlCreatePO}';
-
-        const requiredByDate = $('#requiredByDate').val();
-
-        const tbcInput = document.getElementById('tbc');
-
-        if (requiredByDate) {
-            url += ("&requiredByDate=" + requiredByDate);
-        } else {
-            if (!tbcInput.checked) {
-                return alert("Provide a date, or check the TBC checkbox!");
-            }
-        }
-        document.location = url;
-    }
 </script>
 <button type="button"
         name="createPO"
         value="Create POs"
         onclick="goToCreatePO()"
-        class="salesOrderButton"
+        class="salesOrderButton not-so-faint"
 >
     <i class="fal fa-layer-plus fa-2x"></i>
 </button>
-<label>
+<div>
     <span>Required By</span>
     <input type="date"
            name="requiredByDate"
            id="requiredByDate"
            value="{requiredByDateValue}"
     >
-    Date TBC
+</div>
+<div>
+    <span>Date TBC</span>
     <input type="checkbox"
            id="tbc"
     >
-</label>
+</div>
 <!-- End Template: SalesOrderDisplayCreatePO.inc.html -->

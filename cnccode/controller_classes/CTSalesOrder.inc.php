@@ -294,6 +294,9 @@ class CTSalesOrder extends CTCNC
     const CREATE_SR_FROM_LINES = "CREATE_SR_FROM_LINES";
     const CREATE_SERVICE_REQUEST_FROM_ORDER = "CREATE_SERVICE_REQUEST_FROM_ORDER";
     const DELETE_LINE = "DELETE_LINE";
+    const CREATE_PURCHASE_ORDERS = "CREATE_PURCHASE_ORDERS";
+    const COPY_TO_ORDER = "COPY_TO_ORDER";
+    const CONVERT_TO_ORDER = "CONVERT_TO_ORDER";
     /** @var */
     public $customerID;
     /** @var */
@@ -524,10 +527,9 @@ class CTSalesOrder extends CTCNC
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->updateLines();
                 break;
-            case CTSALESORDER_ACT_COPY_TO_ORDER:
-            case CTSALESORDER_ACT_CONVERT_TO_ORDER:
-                $this->checkPermissions(SALES_PERMISSION);
-                $this->convertToOrder();
+            case self::COPY_TO_ORDER:
+            case self::CONVERT_TO_ORDER:
+                $this->convertToOrder(self::getAction() === self::CONVERT_TO_ORDER);
                 break;
             case CTSALESORDER_ACT_INSERT_FROM_ORDER:
                 $this->checkPermissions(SALES_PERMISSION);
@@ -1227,7 +1229,6 @@ class CTSalesOrder extends CTCNC
             array(
                 'SalesOrderDisplay'                 => 'SalesOrderDisplay.inc',
                 'SalesOrderDisplayConvertToOrder'   => 'SalesOrderDisplayConvertToOrder.inc',
-                'SalesOrderDisplayCreatePO'         => 'SalesOrderDisplayCreatePO.inc',
                 'SalesOrderLineEditJS'              => 'SalesOrderLineEditJS.inc',
                 'SalesOrderDisplayNewLine'          => 'SalesOrderDisplayNewLine.inc',
                 'SalesOrderHeadDisplay'             => 'SalesOrderHeadDisplay.inc',
@@ -1252,8 +1253,8 @@ class CTSalesOrder extends CTCNC
         $quickQuoteDisabled = false;
         if ($dsOrdline->rowCount()) {                        // There are lines
             if ($orderType == 'Q') {
-                $actions[CTSALESORDER_ACT_COPY_TO_ORDER] = 'copy to order';
-                $actions[CTSALESORDER_ACT_CONVERT_TO_ORDER] = 'convert to order';
+                $actions[self::COPY_TO_ORDER] = 'copy to order';
+                $actions[self::CONVERT_TO_ORDER] = 'convert to order';
             } else {
                 $actions[self::CREATE_SERVICE_REQUEST_FROM_ORDER] = 'create new SR';
             }
@@ -1266,19 +1267,23 @@ class CTSalesOrder extends CTCNC
                 $actions[self::CREATE_SIGNABLE_QUOTE] = 'create Signable quote';
             }
 
+            if ($orderType == 'I' && !$purchaseOrderCount) {
+                $actions[self::CREATE_PURCHASE_ORDERS] = "create purchase orders";
+            }
+
             $actions[self::CREATE_MANUAL_ORDER_FORM] = 'create manual order form';
             $actions[self::CHANGE_SUPPLIER_FOR_LINES] = 'change supplier';
 
         }
         $order = [
             self::CREATE_SIGNABLE_QUOTE,
-            CTSALESORDER_ACT_COPY_TO_ORDER,
-            CTSALESORDER_ACT_CONVERT_TO_ORDER,
+            self::COPY_TO_ORDER,
+            self::CONVERT_TO_ORDER,
             self::DELETE_LINES,
-            CTSALESORDER_ACT_UPDATE_LINES,
             self::CREATE_MANUAL_ORDER_FORM,
             self::CHANGE_SUPPLIER_FOR_LINES,
-            self::CREATE_SERVICE_REQUEST_FROM_ORDER
+            self::CREATE_SERVICE_REQUEST_FROM_ORDER,
+            self::CREATE_PURCHASE_ORDERS
         ];
 
         uksort(
@@ -1478,7 +1483,7 @@ class CTSalesOrder extends CTCNC
                 );
             if ($orderType != 'Q') {
                 // Show navigate Purchase Orders if they exist
-                if ($purchaseOrderCount > 0) {
+                if ($purchaseOrderCount) {
                     $urlPurchaseOrders =
                         Controller::buildLink(
                             CTCNC_PAGE_PURCHASEORDER,
@@ -2057,10 +2062,7 @@ class CTSalesOrder extends CTCNC
             }
 
             // if initial order and no purchase orders exist then show generate POs button
-            if (
-                ($orderType == 'I') &
-                ($purchaseOrderCount == 0)
-            ) {
+            if ($orderType == 'I' && !$purchaseOrderCount) {
                 $urlCreatePO =
                     Controller::buildLink(
                         CTCNC_PAGE_PURCHASEORDER,
@@ -2087,11 +2089,6 @@ class CTSalesOrder extends CTCNC
                         'urlCreatePO'         => $urlCreatePO,
                         "requiredByDateValue" => $requiredByDateValue
                     ]
-                );
-                $this->template->parse(
-                    'salesOrderDisplayCreatePO',
-                    'SalesOrderDisplayCreatePO',
-                    true
                 );
             }
 
@@ -3121,45 +3118,36 @@ class CTSalesOrder extends CTCNC
      * button has been pressed then do 2.
      *
      * @access private
-     * @throws Exception
+     * @param $convertToOrder
+     * @throws JsonHttpException
      */
-    function convertToOrder()
+    function convertToOrder($convertToOrder)
     {
-        if (!$this->getOrdheadID()) {
-            $this->displayFatalError(CTSALESORDER_MSG_ORDHEADID_NOT_PASSED);
-            return false;
+        if (!$this->hasPermissions(SALES_PERMISSION)) {
+            throw new JsonHttpException(403, "You do not have the required permissions to perform the operation");
         }
-        if (count($this->postVars['selectedOrderLine']) == 0) {
-            $this->setLinesMessage(CTSALESORDER_MSG_NO_LINES);
-            $this->displayOrder();
-            return FALSE;
-        } else {
-            $this->setSelectedOrderLines($this->postVars['selectedOrderLine']);
-        }
-        $convertToOrder = ($this->getAction() == CTSALESORDER_ACT_CONVERT_TO_ORDER); // determine action to take below
-        $this->setOrdheadID(
-            $this->buSalesOrder->convertQuoteToOrder(
-                $this->getOrdheadID(),
-                $convertToOrder,
-                $this->dsSelectedOrderLine
-            )
-        );
-        header('Location: ' . $this->getDisplayOrderURL());
-        exit;
-    }// end function orderLineForm()
 
-    function setSelectedOrderLines($array)
-    {
-        if (!is_array($array)) {
-            return FALSE;
+        $data = $this->getJSONData();
+
+        if (empty($data['orderHeadId'])) {
+            throw new JsonHttpException(400, "Order Head Id is required");
         }
-        foreach ($array as $value) {
-            $this->dsSelectedOrderLine->setUpdateModeInsert();
-            $this->dsSelectedOrderLine->setValue(DBEOrdline::id, $value);
-            $this->dsSelectedOrderLine->post();
+
+        if (empty($data['selectedLines'])) {
+            throw new JsonHttpException(400, "Select at least one line");
         }
-        return TRUE;
-    }
+
+        try {
+            $newOrderId = $this->buSalesOrder->convertQuoteToOrder(
+                $data['orderHeadId'],
+                $convertToOrder,
+                $data['selectedLines']
+            );
+            echo json_encode(["status" => "ok", "orderHeadId" => $newOrderId]);
+        } catch (Exception $exception) {
+            throw new JsonHttpException(500, 'Failed to copy/convert order', $exception->getMessage());
+        }
+    }// end function orderLineForm()
 
     /**
      * @return bool
@@ -3773,6 +3761,19 @@ class CTSalesOrder extends CTCNC
         } catch (Exception $exception) {
             throw new JsonHttpException('500', $exception->getMessage());
         }
+    }
+
+    function setSelectedOrderLines($array)
+    {
+        if (!is_array($array)) {
+            return FALSE;
+        }
+        foreach ($array as $value) {
+            $this->dsSelectedOrderLine->setUpdateModeInsert();
+            $this->dsSelectedOrderLine->setValue(DBEOrdline::id, $value);
+            $this->dsSelectedOrderLine->post();
+        }
+        return TRUE;
     }
 
     /**
