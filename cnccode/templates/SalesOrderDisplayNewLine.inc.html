@@ -1,118 +1,292 @@
 <!-- Template: SalesOrderDisplayNewLine.inc.html -->
-<form name="ordline" method="post" action="{urlSubmit}">
-	<INPUT type="hidden" id="updatedTime" name="updatedTime" value="{updatedTime}">
-	<input
-		type="hidden"
-		name="ordline[1][ordheadID]"
-		value="{ordheadID}"
-	>
-	<input
-		type="hidden"
-		name="ordline[1][itemID]"
-		id="itemID"
-		value="{itemID}"
-	>
-	<input
-		type="hidden"
-		name="ordline[1][sequenceNo]"
-		value="{sequenceNo}"
-	>
-	<input
-		type="hidden"
-		name="ordline[1][supplierID]"
-		id="supplierID"
-		value="{supplierID}"
-	>
-<table class="singleBorder" width="700px" border="0" cellspacing="1" cellpadding="1">
-	<tr> 
-		<td width="108" class="listHeadText">Type</td>
-		<td width="175" class="listHeadText">Description</td>
-		<td width="242" class="listHeadText">Supplier</td>
-		<td width="106" class="listHeadText"><DIV align="right">Qty</DIV></td>
-		<td width="109" class="listHeadText"><DIV align="right">Cost(&pound;)</DIV></td>
-		<td width="107" class="listHeadText"><DIV align="right">Sale(&pound;)</DIV></td>
-	</tr>
-	<tr>
-	<td class="field">
-		<select
-			type="text"
-			id="lineType"
-			name="ordline[1][lineType]"
-		>
-			<!-- BEGIN lineTypeBlock -->
-			<option {lineTypeSelected} value="{lineType}">{lineTypeDesc}</option>
-			<!-- END lineTypeBlock -->
-		</select>
-	</td>
-	<td>
-		<input
-			type="text"
-			name="ordline[1][description]"
-			id="itemDescription"
-			value="{description}"
-			onChange="javascript:validateItemDescription()"
-			onKeydown="javascript:checkFunctionKey(itemDescription)"
-			size="35"
-			maxlength="50"
-		>
-		<font class="formErrorMessage">{descriptionMessage}</font>
-	</td>
-	<td class="field">
-		<input
-			type="text"
-			name="ordline[1][supplierName]"
-			id="supplierName"
-			value="{supplierName}"
-			onChange="javascript:validateSupplierName()"
-			onKeydown="javascript:checkFunctionKey(supplierName)"
-			size="35"
-			maxlength="50"
-		>
-		<font class="formErrorMessage">{supplierNameMessage}</font>
-	</td>
-	<td class="fieldRight" align="right">
-		<input
-			type="text"
-			id="qtyOrdered"
-			name="ordline[1][qtyOrdered]"
-			value="{qtyOrdered}"
-			onKeypress="javascript:submitOnReturn()"
-			size="4"
-			align="right"
-			maxlength="10"
-		>
-		<font class="formErrorMessage">{qtyOrderedMessage}</font>
-	</td>
-	<td class="fieldRight">
-		<input
-			type="text"
-			name="ordline[1][curUnitCost]"
-			id="curUnitCost"
-			value="{curUnitCost}"
-			onKeypress="javascript:submitOnReturn()"
-			align="right"
-			size="4"
-			maxlength="10"
-		>
-		<font class="formErrorMessage">{curUnitCostMessage}</font>
-	</td>
-	<td class="fieldRight">
-		<input
-			type="text"
-			name="ordline[1][curUnitSale]"
-			id="curUnitSale"
-			value="{curUnitSale}"
-			onKeypress="javascript:submitOnReturn()"
-			align="right"
-			size="4"
-			maxlength="10"
-		>
-		<font class="formErrorMessage">{curUnitSaleMessage}</font>
-	</td>
-	<td width="35">
-		<input type="button" name="Submit" value="Add To End" onClick="form.submit();">
-	</td>
-	<td width="62">&nbsp;</td>
-</table>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const itemIdInput = document.getElementById("itemID");
+        const addLineButton = document.querySelector('button[name="addLine"]');
+        const addToRecurringButton = document.querySelector('button[name="ordline[1][isRecurring]"]');
+        const typeSelector = document.getElementById("lineType");
+
+        const itemDescriptionInput = document.getElementById("itemDescription");
+        const supplierNameInput = document.getElementById('supplierName')
+        const supplierIdInput = document.getElementById("supplierID");
+        const qtyOrderedInput = document.getElementById("qtyOrdered");
+        const curUnitCostInput = document.querySelector("input[name='ordline[1][curUnitCost]']")
+        const curUnitSaleInput = document.querySelector("input[name='ordline[1][curUnitSale]']")
+
+
+        const toCheckArray = [itemIdInput, itemDescriptionInput, supplierIdInput, qtyOrderedInput, curUnitCostInput, curUnitSaleInput].forEach(x => {
+            x.addEventListener('change', () => {
+                console.log('checking buttons')
+                updateButtons();
+            })
+        })
+
+        addToRecurringButton.style.display = 'none';
+        addLineButton.disabled = true;
+        addToRecurringButton.disabled = true;
+        let typeSelected = typeSelector.value;
+        updateButtons();
+
+        function checkLineValid(typeSelected) {
+            if (typeSelected === 'C') {
+                return itemDescriptionInput.value !== '';
+            }
+
+            if (typeSelected === 'T') {
+                return itemIdInput.value !== '';
+            }
+
+            if (typeSelected === 'I') {
+                return itemIdInput.value !== '' && supplierIdInput.value !== '' && qtyOrderedInput.value !== '' && curUnitSaleInput.value !== '' && curUnitSaleInput.value !== ''
+            }
+
+            if (typeSelected === 'O') {
+                return itemDescriptionInput.value !== '';
+            }
+        }
+
+        function updateButtons() {
+            if (typeSelected === 'I' || typeSelected === 'T' || typeSelected === 'O') {
+                showAddLineButton();
+                hideRecurringButton();
+                if (typeSelected === 'T' || typeSelected === 'O') {
+                    disableAllExceptDescription();
+                } else {
+                    enableAllExceptDescription();
+                }
+            } else {
+                showRecurringButton();
+                disableAllExceptDescription();
+            }
+            if (checkLineValid(typeSelected)) {
+                enableAddLineButton();
+                enableRecurringButton();
+            } else {
+                disableAddLineButton();
+                disableRecurringButton();
+            }
+        }
+
+        function disableAllExceptDescription() {
+            supplierNameInput.disabled = true;
+            qtyOrderedInput.disabled = true;
+            curUnitCostInput.disabled = true;
+            curUnitSaleInput.disabled = true;
+        }
+
+        function enableAllExceptDescription() {
+            supplierNameInput.disabled = false;
+            qtyOrderedInput.disabled = false;
+            curUnitCostInput.disabled = false;
+            curUnitSaleInput.disabled = false;
+        }
+
+        typeSelector.addEventListener('change', ($event) => {
+            typeSelected = $event.target.value;
+            clearInputs();
+            updateButtons();
+        })
+
+        function clearInputs() {
+            itemDescriptionInput.value = "";
+            supplierNameInput.value = "";
+            qtyOrderedInput.value = "";
+            curUnitCostInput.value = "";
+            curUnitSaleInput.value = "";
+            supplierIdInput.value = "";
+            itemIdInput.value = "";
+
+        }
+
+        function showRecurringButton() {
+            addToRecurringButton.style.display = 'inline-block';
+        }
+
+        function enableRecurringButton() {
+            addToRecurringButton.disabled = false;
+        }
+
+        function disableRecurringButton() {
+            addToRecurringButton.disabled = true;
+        }
+
+        function hideRecurringButton() {
+            addToRecurringButton.style.display = 'none';
+        }
+
+        function showAddLineButton() {
+            addLineButton.style.display = 'inline-block';
+        }
+
+        function enableAddLineButton() {
+            addLineButton.disabled = false;
+        }
+
+        function disableAddLineButton() {
+            addLineButton.disabled = true;
+        }
+    })
+</script>
+<form name="ordline"
+      method="post"
+      action="{urlSubmit}"
+>
+    <INPUT type="hidden"
+           name="updatedTime"
+           value="{updatedTime}"
+    >
+    <input type="hidden"
+           name="ordline[1][ordheadID]"
+           value="{ordheadID}"
+    >
+    <input type="hidden"
+           name="ordline[1][itemID]"
+           id="itemID"
+           value="{itemID}"
+    >
+    <input type="hidden"
+           name="ordline[1][sequenceNo]"
+           value="{sequenceNo}"
+    >
+    <input type="hidden"
+           name="ordline[1][supplierID]"
+           id="supplierID"
+           value="{supplierID}"
+    >
+    <table class="singleBorder"
+           width="700px"
+           border="0"
+           cellspacing="1"
+           cellpadding="1"
+    >
+        <tr>
+            <td width="108"
+                class="listHeadText"
+            >Type
+            </td>
+            <td width="175"
+                class="listHeadText"
+            >Description
+            </td>
+            <td width="242"
+                class="listHeadText"
+            >Supplier
+            </td>
+            <td width="106"
+                class="listHeadText"
+            >
+                <DIV align="right">Qty</DIV>
+            </td>
+            <td width="109"
+                class="listHeadText"
+            >
+                <DIV align="right">Cost(&pound;)</DIV>
+            </td>
+            <td width="107"
+                class="listHeadText"
+            >
+                <DIV align="right">Sale(&pound;)</DIV>
+            </td>
+            <td>
+                <div style="width: 90px">&nbsp;</div>
+            </td>
+        </tr>
+        <tr class="newLine">
+            <td class="field">
+                <select id="lineType"
+                        name="ordline[1][lineType]"
+                >
+                    <!-- BEGIN lineTypeBlock -->
+                    <option {lineTypeSelected}
+                            value="{lineType}"
+                    >{lineTypeDesc}
+                    </option>
+                    <!-- END lineTypeBlock -->
+                </select>
+            </td>
+            <td>
+                <input
+                        type="text"
+                        name="ordline[1][description]"
+                        id="itemDescription"
+                        value="{description}"
+                        onChange="javascript:validateItemDescription()"
+                        onKeydown="javascript:checkFunctionKey(itemDescription)"
+                        size="35"
+                        maxlength="50"
+                >
+                <font class="formErrorMessage">{descriptionMessage}</font>
+            </td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="ordline[1][supplierName]"
+                        id="supplierName"
+                        value="{supplierName}"
+                        onChange="javascript:validateSupplierName()"
+                        onKeydown="javascript:checkFunctionKey(supplierName)"
+                        size="35"
+                        maxlength="50"
+                >
+                <font class="formErrorMessage">{supplierNameMessage}</font>
+            </td>
+            <td class="fieldRight"
+                align="right"
+            >
+                <input type="number"
+                       id="qtyOrdered"
+                       name="ordline[1][qtyOrdered]"
+                       value="{qtyOrdered}"
+                       onKeypress="javascript:submitOnReturn()"
+                       align="right"
+
+                       step="0.01"
+                >
+                <font class="formErrorMessage">{qtyOrderedMessage}</font>
+            </td>
+            <td class="fieldRight">
+                <input
+                        type="number"
+                        name="ordline[1][curUnitCost]"
+                        id="curUnitCost"
+                        value="{curUnitCost}"
+                        align="right"
+                        size="4"
+                        maxlength="10"
+                        step="0.01"
+                >
+                <font class="formErrorMessage">{curUnitCostMessage}</font>
+            </td>
+            <td class="fieldRight">
+                <input type="number"
+                       name="ordline[1][curUnitSale]"
+                       id="curUnitSale"
+                       value="{curUnitSale}"
+                       align="right"
+                       size="4"
+                       maxlength="10"
+                       step="0.01"
+                >
+                <font class="formErrorMessage">{curUnitSaleMessage}</font>
+            </td>
+            <td width="35">
+                <button name="addLine"
+                        class="salesOrderButton not-so-faint"
+                        title="Add to order"
+                >
+                    <i class="fal fa-plus fa-2x"></i>
+                </button>
+                <button name="ordline[1][isRecurring]"
+                        style="display: none"
+                        value="1"
+                        class="salesOrderButton not-so-faint"
+                        title="Add to recurring section"
+
+                >
+                    <i class="fal fa-repeat fa-2x"></i>
+                </button>
+            </td>
+            <td width="62">&nbsp;</td>
+    </table>
 </form>
 <!-- End Template: SalesOrderDisplayNewLine.inc.html -->

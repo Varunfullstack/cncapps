@@ -60,6 +60,7 @@ class CTItem extends CTCNC
     const GET_CHILD_ITEMS = "GET_CHILD_ITEMS";
     const GET_PARENT_ITEMS = "GET_PARENT_ITEMS";
     const SEARCH_ITEMS = "SEARCH_ITEMS";
+    const CHECK_ITEM_RECURRING = "CHECK_ITEM_RECURRING";
     /** @var DSForm */
     public $dsItem;
     /**
@@ -178,6 +179,20 @@ class CTItem extends CTCNC
                 }
                 echo json_encode(["status" => "ok", "data" => $rows]);
                 break;
+            case self::CHECK_ITEM_RECURRING:
+            {
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (array_key_exists('itemId', $data) || !isset($data['itemId'])) {
+                    throw new JsonHttpException(400, 'Item Id is mandatory');
+                }
+                $dbeItem = new DBEItem($this);
+                $dbeItem->getRow($data['itemId']);
+                $itemTypeId = $dbeItem->getValue(DBEItem::itemTypeID);
+                $dbeItemType = new DBEItemType($this);
+                $dbeItemType->getRow($itemTypeId);
+                echo json_encode(["status" => "ok", "data" => $dbeItemType->getValue(DBEItemType::reoccurring)]);
+
+            }
             case CTCNC_ACT_DISP_ITEM_POPUP:
             default:
                 $this->displayItemSelectPopup();
@@ -539,7 +554,7 @@ class CTItem extends CTCNC
         $urlNext = Controller::buildLink(
             $_SERVER['PHP_SELF'],
             array(
-                'action'          => CTCNC_ACT_ITEM_EDIT,
+                'action' => CTCNC_ACT_ITEM_EDIT,
                 'itemID' => $itemID,
             )
         );

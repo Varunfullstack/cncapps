@@ -4,14 +4,18 @@
         function submitItem(id, description, linkedSalesOrderId) {
             if ((opener) && (!opener.closed)) {
                 if (opener.document.getElementById("{parentIDField}")) {
-                    opener.document.getElementById("{parentIDField}").value = id;
+                    opener.document.getElementById("{parentIDField}").value = description;
                 }
                 if (opener.document.getElementById("{parentDescField}")) {
                     opener.document.getElementById("{parentDescField}").value = description;
                 }
 
-                if (opener.document.getElementById("{parentLinkedSalesOrderField}")) {
-                    opener.document.getElementById("{parentLinkedSalesOrderField}").value = linkedSalesOrderId;
+                const idInput = opener.document.getElementById("{parentLinkedSalesOrderField}")
+                if (idInput) {
+                    idInput.value = id;
+                    const evt = opener.document.createEvent('HTMLEvents');
+                    evt.initEvent('change', false, true);
+                    idInput.dispatchEvent(evt);
                 }
                 window.close();
             }

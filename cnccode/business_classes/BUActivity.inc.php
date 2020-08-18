@@ -4630,7 +4630,6 @@ class BUActivity extends Business
                         DBEJProblem::linkedSalesOrderID,
                         $ordheadID
                     );
-                    var_dump($ordheadID);
                     $this->dbeProblem->updateRow();
                 }
 
@@ -7002,14 +7001,11 @@ is currently a balance of ';
         while ($dsOrdline->fetchNext()) {
 
             if (!$selectedOrderLine ||
-                ($selectedOrderLine &&
-                    in_array(
-                        $dsOrdline->getValue(DBEOrdline::id),
-                        $selectedOrderLine
-                    )
+                in_array(
+                    "{$dsOrdline->getValue(DBEOrdline::id)}",
+                    $selectedOrderLine
                 )
             ) {
-
                 $reason .= '<tr><td>';
 
                 if ($dsOrdline->getValue(DBEOrdline::lineType) == 'I') {
@@ -7025,7 +7021,6 @@ is currently a balance of ';
         } // end while
 
         $reason .= '</table>';
-
         $dbeCallActivity = new DBECallActivity($this);
 
         $dbeCallActivity->setValue(
@@ -11575,7 +11570,9 @@ FROM
         $dbeContact->getMainSupportRowsByCustomerID($customerID);
 
         if (!$dbeContact->fetchNext()) {
-            throw new Exception("Customer {$customerID} does not have any Main Support Contacts"); // no main support contact so abort
+            throw new Exception(
+                "Customer {$customerID} does not have any Main Support Contacts"
+            ); // no main support contact so abort
         }
 
         $dbeCallActivity = new DBECallActivity($this);

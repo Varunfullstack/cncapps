@@ -1,22 +1,27 @@
 <!-- Template: SalesOrderCommentLine.inc.html -->
 <tr onMouseOver="this.bgColor='#FFFFCC';"
     onMouseOut="this.bgColor='';"
+    data-line-id="{lineId}"
+    data-sequence-no="{sequenceNo}"
 >
-    <INPUT type="hidden"
-           id="sequenceNo"
-           name="ordline[{lineId}][sequenceNo]"
-           value="{sequenceNo}"
-    >
-    <INPUT type="hidden"
-           name="ordline[{lineId}][id]"
-           value="{lineId}"
-    >
+
     <td class="orderLineComment">
+        <INPUT type="hidden"
+               name="ordline[{lineId}][lineType]"
+               value="{lineType}"
+        >
         <input type="checkbox"
-               id="orderLine"
                name="selectedOrderLine[]"
                value="{lineId}"
                {orderLineChecked}
+        >
+        <INPUT type="hidden"
+               name="ordline[{lineId}][sequenceNo]"
+               value="{sequenceNo}"
+        >
+        <INPUT type="hidden"
+               name="ordline[{lineId}][id]"
+               value="{lineId}"
         >
     </td>
     <td class="orderLineComment">&nbsp;</td>
