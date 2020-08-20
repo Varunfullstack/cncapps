@@ -1,8 +1,8 @@
 import Table from "./../../utils/table/table.js?v=1";
 import SVCCurrentActivityService from "./../services/SVCCurrentActivityService.js?v=1";
 
-class CMPInboxHelpDesk extends React.Component {
-  code = "H";
+class CMPInboxSales extends React.Component {
+  code = "S";
   el = React.createElement;
   apiCurrentActivityService;
   constructor(props) {
@@ -108,7 +108,7 @@ class CMPInboxHelpDesk extends React.Component {
             : null,
       },
       {
-        hide: false,
+        hide: true,
         order: 10,
         path: null,
         label: "",
@@ -459,4 +459,4 @@ class CMPInboxHelpDesk extends React.Component {
     ];
   }
 }
-export default CMPInboxHelpDesk;
+export default CMPInboxSales;

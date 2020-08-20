@@ -1,8 +1,8 @@
 import Table from "./../../utils/table/table.js?v=1";
 import SVCCurrentActivityService from "./../services/SVCCurrentActivityService.js?v=1";
 
-class CMPInboxHelpDesk extends React.Component {
-  code = "H";
+class CMPInboxSmallProjects extends React.Component {
+  code = "SP";
   el = React.createElement;
   apiCurrentActivityService;
   constructor(props) {
@@ -123,7 +123,7 @@ class CMPInboxHelpDesk extends React.Component {
         content: (problem) => [
           el(
             "div",
-            { key: "img1",style:{display:"flex",flexDirection:"row",width:"100%",alignItems:"center"}, onClick: () => requestAdditionalTime(problem) },
+            { key: "img1",style:{display:"flex",flexDirection:"row",width:"100%",alignItems:"center"},  onClick: () => requestAdditionalTime(problem) },
             el(
               "i",
               {
@@ -143,7 +143,7 @@ class CMPInboxHelpDesk extends React.Component {
                   // color: problem.hdColor != "green" ? problem.hdColor : "",
                 },
               },
-              `${problem.hdRemaining}`
+              `${problem.smallProjectsTeamRemaining}`
             )
           ),
 
@@ -459,4 +459,4 @@ class CMPInboxHelpDesk extends React.Component {
     ];
   }
 }
-export default CMPInboxHelpDesk;
+export default CMPInboxSmallProjects;

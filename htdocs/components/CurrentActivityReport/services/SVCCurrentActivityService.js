@@ -2,7 +2,7 @@
 import APIMain from './../../services/APIMain.js?v=1';
 
 class SVCCurrentActivityService extends APIMain {
-    baseURL = "CurrentActivityReportNew.php?action=";
+    baseURL = "CurrentActivityReport.php?action=";
     activityUrl="Activity.php?action=";
     getHelpDeskInbox() {
         return fetch(`${this.baseURL}getHelpDeskInbox`).then(res => res.json());
@@ -24,6 +24,12 @@ class SVCCurrentActivityService extends APIMain {
     } 
     getFutureInbox() {
         return fetch(`${this.baseURL}getFutureInbox`).then(res => res.json());
+    }
+    getToBeLoggedInbox() {
+        return fetch(`${this.baseURL}getToBeLoggedInbox`).then(res => res.json());
+    } 
+    getPendingReopenedInbox() {
+        return fetch(`${this.baseURL}getPendingReopenedInbox`).then(res => res.json());
     } 
     startActivityWork(callActivityId)
     {
@@ -49,6 +55,27 @@ class SVCCurrentActivityService extends APIMain {
     {
         return fetch(`${this.baseURL}allocateUser&problemID=${problemId}&userID=${userId}`).then(res => res.json());
 
+    }
+    deleteSR(customerProblemNo)
+    {
+        return fetch(`${this.baseURL}deleteCustomerRequest&cpr_customerproblemno=${customerProblemNo}`).then(res => res.json());
+    }
+    processPendingReopened(pendingReopenedID,result)
+    {
+        const data={
+            pendingReopenedID,result
+        };
+        return fetch(`${this.baseURL}processPendingReopened`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        }).then(res => res.json());
+    }
+    newSRPendingReopened(data)
+    { 
+        return fetch(`${this.activityUrl}editServiceRequestHeader`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        }).then(res => res.json());
     }
 }
 

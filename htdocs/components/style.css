@@ -492,6 +492,7 @@ hr {
 .tab-container{
     display: flex;
     flex-direction: row;
+    margin-bottom: 5px;
 }
 .tab-container i{
     margin: 2px !important;
@@ -528,9 +529,15 @@ hr {
     overflow: hidden; 
     text-overflow: ellipsis;    
     word-wrap: break-word;
-
+     
 }
 .inbox-icon{
     font-size: 18px !important;
     
+}
+.in-team{
+    background-color: #C6C6C6;
+}
+.align-left{
+    text-align: left;
 }

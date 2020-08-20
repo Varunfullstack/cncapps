@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Customer Activity Report controller class
+         * Customer Activity Report controller class
  * CNC Ltd
  *
  * @access public
@@ -21,7 +22,8 @@ class CTCurrentActivityReport extends CTCNC
     const AMBER = '#FFF5B3';
     const RED = '#F8A5B6';
     const GREEN = '#BDF8BA';
-    const /** @noinspection SpellCheckingInspection */
+    const
+        /** @noinspection SpellCheckingInspection */
         BLUE = '#b2daff';
     const CONTENT = null;
     const PURPLE = '#dcbdff';
@@ -40,14 +42,14 @@ class CTCurrentActivityReport extends CTCNC
      */
     public $buActivity;
 
-    function __construct($requestMethod,
-                         $postVars,
-                         $getVars,
-                         $cookieVars,
-                         $cfg,
-                         $checkPermissions = true
-    )
-    {
+    function __construct(
+        $requestMethod,
+        $postVars,
+        $getVars,
+        $cookieVars,
+        $cfg,
+        $checkPermissions = true
+    ) {
         parent::__construct(
             $requestMethod,
             $postVars,
@@ -55,6 +57,8 @@ class CTCurrentActivityReport extends CTCNC
             $cookieVars,
             $cfg
         );
+        $this->buActivity = new BUActivity($this);
+        $this->buCustomerItem = new BUCustomerItem($this);
 
         if ($checkPermissions) {
 
@@ -66,49 +70,6 @@ class CTCurrentActivityReport extends CTCNC
                 exit;
             }
         }
-
-
-        $this->buActivity = new BUActivity($this);
-
-        $this->buCustomerItem = new BUCustomerItem($this);
-
-        $dbeUser = new DBEUser($this);
-
-        $dbeUser->getRows('firstName');
-
-        while ($dbeUser->fetchNext()) {
-
-            $userRow =
-                array(
-                    'userID'   => $dbeUser->getValue(DBEUser::userID),
-                    'userName' => $dbeUser->getValue(DBEUser::name),
-                    'fullName' => $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(
-                            DBEUser::lastName
-                        )
-                );
-
-            $this->allocatedUser[$dbeUser->getValue(DBEUser::userID)] = $userRow;
-
-            if ($dbeUser->getValue(DBEUser::appearInQueueFlag) == 'Y') {
-
-                $this->filterUser[$dbeUser->getValue(DBEUser::userID)] = $userRow;
-            }
-        }
-
-        if (!$this->getSessionParam('priorityFilter')) {
-            $priorityFilter = $this->getSessionParam('priorityFilter');
-
-            if (!$priorityFilter) {
-                $priorityFilter = [];
-            }
-            foreach ($this->buActivity->priorityArray as $key => $value) {
-                $priorityFilter[] = $key;
-            }
-            $this->setSessionParam('priorityFilter', $priorityFilter);
-        }
-
-        $buUser = new BUUser($this);
-        $this->loggedInUserIsSdManager = $buUser->isSdManager($this->userID);
     }
 
     /**
@@ -117,805 +78,112 @@ class CTCurrentActivityReport extends CTCNC
      */
     function defaultAction()
     {
-
-
-        if (!$this->getSessionParam('displayToBeLoggedSectionFlag')) {
-            $this->setSessionParam('displayToBeLoggedSectionFlag', 1);
-        }
-        if (!isset($_SESSION['displayQueue1Flag'])) {
-            $this->setSessionParam('displayQueue1Flag', 1);
-        }
-        if (!isset($_SESSION['displayQueue2Flag'])) {
-            $this->setSessionParam('displayQueue2Flag', 1);
-        }
-        if (!isset($_SESSION['displayQueue3Flag'])) {
-            $this->setSessionParam('displayQueue3Flag', 1);
-        }
-        if (!isset($_SESSION['displayQueue4Flag'])) {
-            $this->setSessionParam('displayQueue4Flag', 1);
-        }
-        if (!isset($_SESSION['displayQueue5Flag'])) {
-            $this->setSessionParam('displayQueue5Flag', 1);
-        }
-        if (!isset($_SESSION['displayQueue7Flag'])) {
-            $this->setSessionParam('displayQueue7Flag', 1);
-        }
-
+        //$this->renderQueue(1);  // Helpdesk
+    //$this->renderQueue(2);  // Escalations
+    //$this->renderQueue(4);  // Sales wrong
+    //$this->renderQueue(3);  // Small Projects
+    //$this->renderQueue(5);  // Projects
+    //$this->renderQueue(6);  //Fixed
         switch ($this->getAction()) {
-
+            case "getHelpDeskInbox":
+                echo json_encode($this->renderQueue(1));
+                exit;                
+             break;
+             case "getEscalationsInbox":
+                echo json_encode($this->renderQueue(2));
+                exit;                
+             break;
+             case "getSalesInbox":
+                echo json_encode($this->renderQueue(4));
+                exit;                
+             break;
+             case "getSmallProjectsInbox":
+                echo json_encode($this->renderQueue(3));
+                exit;                
+             break;
+             case "getProjectsInbox":
+                echo json_encode($this->renderQueue(5));
+                exit;                
+             break;
+             case "getFixedInbox":
+                echo json_encode($this->renderQueue(6));
+                exit;                
+             break;
+             case "getFutureInbox":
+                echo json_encode($this->renderQueue(7));
+                exit;                
+             break;
+             case 'changeQueue':
+                echo $this->changeQueue();
+                exit;  
+                break;
+            case 'allocatedUsers':
+                echo $this->getAllocatedUsers();
+                exit;  
+                break;
             case 'allocateUser':
-                $this->allocateUser();
+               echo $this->allocateUser();
+                exit; 
                 break;
-
-            case 'showMineOnly':
-                $this->showMineOnly();
+            case "getToBeLoggedInbox":
+                echo $this->getToBeLogged();
+                exit;
+            break;
+            case "getPendingReopenedInbox":
+                echo $this->getPendingReopenedRequests();
+                exit;
+            break;
+            case 'deleteCustomerRequest':                 
+                $this->checkPermissions(TECHNICAL_PERMISSION);                
+                echo $this->deleteCustomerRequest();
+                exit;
                 break;
-
-            case 'setFilter':
-                $this->setFilter();
-                break;
-
-            case 'resetFilter':
-                $this->resetFilter();
-                break;
-
-            case 'toggleDisplayToBeLoggedFlag':
-                $this->toggleDisplayFlag('displayToBeLoggedFlag');
-                break;
-            case 'toggleDisplayPendingReopenedFlag':
-                $this->toggleDisplayFlag('pendingReopened');
-                break;
-
-            case 'toggleDisplayQueue1Flag':
-                $this->toggleDisplayFlag('displayQueue1Flag');
-                break;
-
-            case 'toggleDisplayQueue2Flag':
-                $this->toggleDisplayFlag('displayQueue2Flag');
-                break;
-
-            case 'toggleDisplayQueue3Flag':
-                $this->toggleDisplayFlag('displayQueue3Flag');
-                break;
-
-            case 'toggleDisplayQueue4Flag':
-                $this->toggleDisplayFlag('displayQueue4Flag');
-                break;
-
-            case 'toggleDisplayQueue5Flag':
-                $this->toggleDisplayFlag('displayQueue5Flag');
-                break;
-
-            case 'toggleDisplayQueue6Flag':
-                $this->toggleDisplayFlag('displayQueue6Flag');
-                break;
-
-            case 'toggleDisplayQueue7Flag':
-                $this->toggleDisplayFlag('displayQueue7Flag');
-                break;
-            case 'changeQueue':
-                $this->changeQueue();
-                break;
-            case 'deleteCustomerRequest':
-                $this->checkPermissions(TECHNICAL_PERMISSION);
-                $this->deleteCustomerRequest();
-                break;
-            case 'pendingReopenedPopup':
-                $this->pendingReopenedDescriptionPopUp();
-                break;
-            /** @noinspection PhpMissingBreakStatementInspection */
             case 'processPendingReopened':
-                $this->processPendingReopened($_REQUEST['pendingReopenedID'], $_REQUEST['result']);
+                echo $this->processPendingReopened();
+                exit;                
             default:
-                $this->displayReport();
+                $this->setTemplate();
                 break;
         }
     }
 
-    /**
-     * @param array $options
-     * @throws Exception
-     */
-    function allocateUser($options = [])
+    function setTemplate()
     {
-        $dbeUser = new DBEUser ($this);
-        $dbeUser->setValue(
-            DBEUser::userID,
-            $this->userID
-        );
-        $dbeUser->getRow();
-
-        $this->buActivity->allocateUserToRequest(
-            $this->getParam('problemID'),
-            $this->getParam('userID') == 0 ? null : $this->getParam('userID'),
-            $dbeUser
-        );
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                $options ? $options : []
-            );
-
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    /**
-     * @throws Exception
-     */
-    function showMineOnly()
-    {
-        $this->unsetSessionParam('selectedUserID');
-
-        $this->setSessionParam('selectedUserID', $GLOBALS['auth']->is_authenticated());
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array()
-            );
-        header('Location: ' . $urlNext);
-        exit;
-
-    }
-
-    /**
-     * Set filtering
-     * @throws Exception
-     */
-    function setFilter()
-    {
-        $this->setSessionParam('selectedUserID', $this->getParam('selectedUserID'));
-        $this->setSessionParam('priorityFilter', $this->getParam('priorityFilter'));
-        $this->setSessionParam('selectedCustomerID', $this->getParam('selectedCustomerID'));
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array()
-            );
-
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    /**
-     * Remove all filters
-     * @throws Exception
-     */
-    function resetFilter()
-    {
-
-        $this->unsetSessionParam('selectedUserID');
-        $this->unsetSessionParam('selectedCustomerID');
-        $this->unsetSessionParam('priorityFilter');
-
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array()
-            );
-
-        header('Location: ' . $urlNext);
-        exit;
-    }
-
-    function toggleDisplayFlag($flag)
-    {
-        if ($this->getSessionParam($flag)) {
-            $this->setSessionParam($flag, false);
-        } else {
-            $this->setSessionParam($flag, true);
-        }
-    }
-
-    /**
-     * @throws Exception
-     */
-    function changeQueue()
-    {
-        $problemID = $this->getParam('problemID');
-        $newQueue = $this->getParam('queue');
-        $reason = $this->getParam('reason');
-
-        $this->buActivity->escalateProblemByProblemID(
-            $problemID,
-            $reason,
-            $newQueue
-        );
-
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array()
-        );
-        header('Location: ' . $urlNext);
-        exit;
-
-    }
-
-    /**
-     * @throws Exception
-     */
-    function deleteCustomerRequest()
-    {
-        $customerproblemno = $this->getParam('cpr_customerproblemno');
-
-        $this->buActivity->deleteCustomerRaisedRequest($customerproblemno);
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            array()
-        );
-        header('Location: ' . $urlNext);
-        exit;
-
-    }
-
-    /**
-     * @throws Exception
-     */
-    function pendingReopenedDescriptionPopUp()
-    {
-        $this->setTemplateFiles(
-            'ActivityCustomerProblemPopup',
-            'ActivityCustomerProblemPopup.inc'
-        );
-
-        $this->setPageTitle('Pending Reopened Description');
-        $pendingReopenedID = $this->getParam('pendingReopenedID');
-        if (!$pendingReopenedID) {
-            throw new Exception('Pending reopened ID is missing');
-        }
-
-        $dbePendingReopened = new DBEPendingReopened($this);
-        $dbePendingReopened->getRow($pendingReopenedID);
-
-        $this->template->set_var(
-            array(
-                'details' => str_replace(
-                    "\n",
-                    "<br/>",
-                    $dbePendingReopened->getValue(DBEPendingReopened::reason)
-                )
-            )
-        );
-
-        $this->template->parse(
-            'CONTENTS',
-            'ActivityCustomerProblemPopup',
-            true
-        );
-
-        $this->parsePage();
-        exit;
-    }  // end finaliseProblem
-
-    /**
-     * @param $pendingReopenedID
-     * @param $result
-     * @throws Exception
-     */
-    private function processPendingReopened($pendingReopenedID, $result)
-    {
-        $dbePendingReopened = new DBEPendingReopened($this);
-        switch ($result) {
-            case 'R':
-            {
-                $dbePendingReopened->getRow($pendingReopenedID);
-                $this->buActivity->approvePendingReopened($dbePendingReopened);
-                break;
-            }
-            case 'D':
-            {
-                $dbePendingReopened->deleteRow($pendingReopenedID);
-                break;
-            }
-        }
-        $urlNext = Controller::buildLink(
-            $_SERVER['PHP_SELF'],
-            []
-        );
-        header('Location: ' . $urlNext);
-    }
-
-    /**
-     * Display search form
-     * @access private
-     * @throws Exception
-     */
-    function displayReport()
-    {
-
-        $this->setMethodName('displayReport');
+        $this->setMethodName('setTemplate');
         $this->template->setVar("menuId", 103);
-        unset($this->customerFilterList);   // for the customer filter drop-down (limited to customers with SRs)
+        $action = $this->getAction();
+        $this->setPageTitle('Service Requests');
+        switch ($action) {
+            case 'inbox':
+                $this->setPageTitle('Service Requests');
+                break;
+        }
 
         $this->setTemplateFiles(
-            array(
-                'CurrentActivityReport' => 'CurrentActivityReportEngineer.inc',
-            )
+            'CurrentActivityReportNew',
+            'CurrentActivityReportNew.inc'
         );
-
-
-        $this->setTemplateFiles(
-            'CurrentActivityReport',
-            'CurrentActivityReport.inc'
-        );
-
-        $openSrsByUser = $this->buActivity->getOpenSrsByUser();
-
-        $this->template->set_block(
-            'CurrentActivityReport',
-            'userSrCountBlock',
-            'userSrCount'
-        );
-
-        foreach ($openSrsByUser as $row) {
-
-            $this->template->set_var(
-
-                array(
-                    'openSrInitials' => $row['initials'],
-                    'openSrCount'    => $row['count']
-                )
-            );
-
-            $this->template->parse(
-                'userSrCount',
-                'userSrCountBlock',
-                true
-            );
-
-        }
-
-        $pendingReopenedRequests = $this->buActivity->getPendingReopenedRequests();
-        if ($pendingReopenedRequests && count($pendingReopenedRequests)) {
-            $this->template->set_block(
-                'CurrentActivityReport',
-                'pendingReopenedBlock',
-                'pendingReopenedRequests'
-            );
-
-            foreach ($pendingReopenedRequests as $pendingReopenedRequest) {
-                $pendingReopenSRURL = Controller::buildLink(
-                    'Activity.php',
-                    array(
-                        'action'    => 'displayLastActivity',
-                        'problemID' => $pendingReopenedRequest['problemID']
-                    )
-                );
-                $pendingReopenSR = $pendingReopenedRequest['problemID'];
-                $pendingReopenCustomerName = $pendingReopenedRequest['customerName'];
-                $pendingReopenedPriority = $pendingReopenedRequest['priority'];
-                $truncatedReason = CTCurrentActivityReport::truncate(
-                    $pendingReopenedRequest['reason'],
-                    150
-                );
-                $pendingReopenDescriptionSummary = $truncatedReason;
-                $pendingReopenDescriptionURL =
-                    Controller::buildLink(
-                        $_SERVER['PHP_SELF'],
-                        array(
-                            'action'            => 'pendingReopenedPopup',
-                            'pendingReopenedID' => $pendingReopenedRequest['id'],
-                            'htmlFmt'           => CT_HTML_FMT_POPUP
-                        )
-                    );
-                $this->template->set_var(
-                    [
-                        "pendingReopenSRURL"              => $pendingReopenSRURL,
-                        "pendingReopenSR"                 => $pendingReopenSR,
-                        "pendingReopenCustomerName"       => $pendingReopenCustomerName,
-                        "pendingReopenPriority"           => $pendingReopenedPriority,
-                        "pendingReopenDescriptionURL"     => $pendingReopenDescriptionURL,
-                        "pendingReopenDescriptionSummary" => $pendingReopenDescriptionSummary,
-                        "pendingReopenedID"               => $pendingReopenedRequest['id'],
-                        "receivedDate"                    => $pendingReopenedRequest['createdAt'],
-                        "pendingReopenedCustomerID"       => $pendingReopenedRequest['customerID'],
-                        "pendingReopenedContactID"        => $pendingReopenedRequest['contactID'],
-                        "base64Reason"                    => base64_encode($pendingReopenedRequest['reason']),
-
-                    ]
-                );
-
-                $this->template->parse(
-                    'pendingReopenedRequests',
-                    'pendingReopenedBlock',
-                    true
-                );
-                $this->template->setVar('pendingReopenedCount', count($pendingReopenedRequests));
-            }
-        }
-
-
-        $customerRaisedRequests = $this->buActivity->getCustomerRaisedRequests();
-        /*
-        Requests raised via the customer portal
-        */
-        $customerRaisedRequests->next_record();
-
-        $count = 0;
-
-        if ($customerRaisedRequests->Record) {
-
-            $this->template->set_block(
-                'CurrentActivityReport',
-                'customerRequestsBlock',
-                'customerRequests'
-            );
-
-            do {
-
-                $urlCreateRequestFromCustomerRequest =
-                    Controller::buildLink(
-                        'Activity.php',
-                        array(
-                            'action'                => 'createRequestFromCustomerRequest',
-                            'cpr_customerproblemno' => $customerRaisedRequests->Record['cpr_customerproblemno']
-                        )
-                    );
-
-                $createRequestOnClick = "document.location='" . $urlCreateRequestFromCustomerRequest . "'";
-
-                $newButton = '
-          <INPUT
-          type="button"
-          value="N"
-          title="Create New"
-          onClick="' . $createRequestOnClick . '">';
-
-
-                $updateButton = null;
-                if ($customerRaisedRequests->Record['cpr_update_existing_request'] == 1) {
-                    $urlUpdateCustomerRequest =
-                        Controller::buildLink(
-                            'Activity.php',
-                            array(
-                                'action'                => 'updateRequestFromCustomerRequest',
-                                'cpr_customerproblemno' => $customerRaisedRequests->Record['cpr_customerproblemno']
-                            )
-                        );
-
-                    $updateRequestOnClick = "document.location='" . $urlUpdateCustomerRequest . "'";
-
-                    $updateButton = '<input type="button" value="U"      title="Update Existing" onClick="' . $updateRequestOnClick . '">';
-                }
-
-                $urlDeleteCustomerRequest =
-                    Controller::buildLink(
-                        'CurrentActivityReport.php',
-                        array(
-                            'action'                => 'deleteCustomerRequest',
-                            'cpr_customerproblemno' => $customerRaisedRequests->Record['cpr_customerproblemno']
-                        )
-                    );
-
-                $urlCustomer =
-                    Controller::buildLink(
-                        'SalesOrder.php',
-                        array(
-                            'action'     => 'search',
-                            'customerID' => $customerRaisedRequests->Record['con_custno']
-                        )
-                    );
-                $txtServiceRequestID = null;
-                $urlServiceRequest = null;
-                if ($customerRaisedRequests->Record['cpr_problemno'] > 0) {
-                    $urlServiceRequest =
-                        Controller::buildLink(
-                            'Activity.php',
-                            array(
-                                'action'    => 'displayServiceRequest',
-                                'problemID' => $customerRaisedRequests->Record['cpr_problemno']
-                            )
-                        );
-                    $txtServiceRequestID = $customerRaisedRequests->Record['cpr_problemno'];
-                }
-
-                $truncatedReason = CTCurrentActivityReport::truncate(
-                    $customerRaisedRequests->Record['cpr_reason'],
-                    150
-                );
-
-                $bgColour = self::RED;    // customer raised
-                if ($customerRaisedRequests->Record['cpr_source'] == 'S') {
-                    $bgColour = self::CONTENT;
-                }
-                $count++;
-
-                $urlDetailsPopup =
-                    Controller::buildLink(
-                        'Activity.php',
-                        array(
-                            'action'            => 'customerProblemPopup',
-                            'customerProblemID' => $customerRaisedRequests->Record['cpr_customerproblemno'],
-                            'htmlFmt'           => CT_HTML_FMT_POPUP
-                        )
-                    );
-
-
-                $this->template->set_var(
-
-                    array(
-                        'urlDetailsPopup'          => $urlDetailsPopup,
-                        'cpCustomerProblemID'      => $customerRaisedRequests->Record['cpr_customerproblemno'],
-                        'cpNewButton'              => $newButton,
-                        'cpUpdateButton'           => $updateButton,
-                        'cpCustomerName'           => $customerRaisedRequests->Record['cus_name'],
-                        'cpContactName'            => $customerRaisedRequests->Record['con_first_name'] . ' ' . $customerRaisedRequests->Record['con_last_name'],
-                        'cpDate'                   => $customerRaisedRequests->Record['cpr_date'],
-                        'cpServiceRequestID'       => $txtServiceRequestID,
-                        'cpUrlServiceRequest'      => $urlServiceRequest,
-                        'cpPriority'               => $customerRaisedRequests->Record['cpr_priority'],
-                        'cpTruncatedReason'        => $truncatedReason,
-                        'cpFullReason'             => $customerRaisedRequests->Record['cpr_reason'],
-                        'cpUrlCustomer'            => $urlCustomer,
-                        'urlDeleteCustomerRequest' => $urlDeleteCustomerRequest,
-                        'cpBgColor'                => $bgColour,
-                        'cpCount'                  => $count
-                    )
-
-                );
-
-                $this->template->parse(
-                    'customerRequests',
-                    'customerRequestsBlock',
-                    true
-                );
-
-            } while ($customerRaisedRequests->next_record());
-
-        }
-
-        $this->template->set_var(
-            'customerPortalCount',
-            $count
-        );
-
-        $this->setTemplateFlags($this->template);
-        $this->setPageTitle(CONFIG_SERVICE_REQUEST_DESC . 's');
-
-        $this->renderQueue(1);  // Helpdesk
-        $this->renderQueue(2);  // Escalations
-        $this->renderQueue(3);  // Sales
-        $this->renderQueue(4);  // Small Projects
-        $this->renderQueue(5);  // Projects
-
-        if ($this->getSessionParam('selectedCustomerID')) {
-            $this->renderQueue(6);  //Fixed
-        } else {
-            $this->template->set_block(
-                'CurrentActivityReport',
-                'queue6Block',
-                'requests6'
-            );
-            $this->template->set_var(
-
-                array(
-
-                    'workOnClick'                => null,
-                    'hoursRemaining'             => null,
-                    'updatedBgColor'             => null,
-                    'priorityBgColor'            => null,
-                    'hoursRemainingBgColor'      => null,
-                    'totalActivityDurationHours' => null,
-                    'hdRemaining'                => null,
-                    'esRemaining'                => null,
-                    'spRemaining'                => null,
-                    'hdColor'                    => null,
-                    'esColor'                    => null,
-                    'spColor'                    => null,
-                    'urlCustomer'                => null,
-                    'time'                       => null,
-                    'date'                       => null,
-                    'problemID'                  => null,
-                    'reason'                     => null,
-                    'urlProblemHistoryPopup'     => null,
-                    'engineerDropDown'           => null,
-                    'engineerName'               => null,
-                    'customerName'               => null,
-                    'customerNameDisplayClass'   => null,
-                    'urlViewActivity'            => null,
-                    'linkAllocateAdditionalTime' => null,
-                    'slaResponseHours'           => null,
-                    'priority'                   => null,
-                    'alarmDateTime'              => null,
-                    'bgColour'                   => null,
-                    'workBgColor'                => null,
-
-                )
-
-            );
-            $this->template->parse(
-                'requests6',
-                'queue6Block',
-                true
-            );
-
-        }
-
-        $this->renderQueue(7); // Future
-
-        $this->template->set_block(
-            'CurrentActivityReport',
-            'userFilterBlock',
-            'users'
-        );
-
-        $loggedInUserID = $this->userID;
-
-        usort(
-            $this->filterUser,
-            function ($a,
-                      $b
-            ) use (
-                $loggedInUserID
-            ) {
-
-                if ($a['userID'] == $loggedInUserID) {
-                    return -1;
-                }
-
-                if ($b['userID'] == $loggedInUserID) {
-                    return 1;
-                }
-                return strcasecmp(
-                    $a['fullName'],
-                    $b['fullName']
-                );
-            }
-        );
-
-        foreach ($this->filterUser as $value) {
-
-            $userSelected = null;
-            if ($value['userID'] == $this->getSessionParam('selectedUserID')) {
-                $userSelected = 'SELECTED';
-            }
-
-            $this->template->set_var(
-                array(
-                    'filterUserName'     => $value['fullName'],
-                    'filterUserID'       => $value['userID'],
-                    'filterUserSelected' => $userSelected
-                )
-            );
-
-            $this->template->parse(
-                'users',
-                'userFilterBlock',
-                true
-            );
-        }
-        /*
-        Priority Filter
-        */
-        $this->template->set_block(
-            'CurrentActivityReport',
-            'priorityFilterBlock',
-            'priorityFilters'
-        );
-
-        foreach ($this->buActivity->priorityArray as $key => $value) {
-
-            $checked = null;
-            if (in_array($key, $this->getSessionParam('priorityFilter'))
-            ) {
-                $checked = 'checked';
-            }
-
-            $this->template->set_var(
-                ['priority' => $key, 'priorityChecked' => $checked]
-            );
-
-            $this->template->parse(
-                'priorityFilters',
-                'priorityFilterBlock',
-                true
-            );
-
-        }
-        // end priority filter
-
-        /*
-        customer filter
-        */
-        $this->template->set_block(
-            'CurrentActivityReport',
-            'customerFilterBlock',
-            'customers'
-        );
-
-        if ($this->customerFilterList) {
-            asort($this->customerFilterList);
-            foreach ($this->customerFilterList as $customerID => $customerName) {
-                $customerIDSelected = null;
-                if ($this->getSessionParam('selectedCustomerID') == $customerID) {
-                    $customerIDSelected = 'SELECTED';
-                }
-                $this->template->set_var(
-                    array(
-                        'filterCustomerIDSelected' => $customerIDSelected,
-                        'filterCustomerID'         => $customerID,
-                        'filterCustomerName'       => $customerName
-                    )
-                );
-
-                $this->template->parse(
-                    'customers',
-                    'customerFilterBlock',
-                    true
-                );
-            }
-        }
-        /*
-        end customer filter
-        */
-        $urlSetFilter =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'action' => 'setFilter'
-                )
-            );
-
-        $urlResetFilter =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array('action' => 'resetFilter')
-            );
-
-        $urlShowMineOnly =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array('action' => 'showMineOnly')
-            );
-        $this->template->set_var(
-            array(
-                'urlResetFilter'  => $urlResetFilter,
-                'urlShowMineOnly' => $urlShowMineOnly,
-                'urlSetFilter'    => $urlSetFilter,
-                'isSDManager'     => $this->loggedInUserIsSdManager ? 'true' : 'false'
-            )
-
-        );
-
 
         $this->template->parse(
             'CONTENTS',
-            'CurrentActivityReport',
+            'CurrentActivityReportNew',
             true
         );
-
-
         $this->parsePage();
-
     }
 
-    private function setTemplateFlags(Template $template)
+    function getHelpDeskInbox()
     {
-        $flags = [
-            'displayToBeLoggedFlag',
-            'displayPendingReopenedFlag',
-            'displayQueue1Flag',
-            'displayQueue2Flag',
-            'displayQueue3Flag',
-            'displayQueue4Flag',
-            'displayQueue5Flag',
-            'displayQueue6Flag',
-            'displayQueue7Flag',
-        ];
-        foreach ($flags as $flag) {
-            $template->set_var(
-                $flag,
-                ($this->getSessionParam($flag) == 0) ? '0' : '1'
-            );
-        }
-    }
+        $this->setMethodName('getHelpDeskInbox');
 
-    /**
-     * @param $queueNo
-     * @throws Exception
-     */
+        return json_encode($this->renderQueue(1));
+    }
+    //$this->renderQueue(1);  // Helpdesk
+    //$this->renderQueue(2);  // Escalations
+    //$this->renderQueue(3);  // Sales
+    //$this->renderQueue(4);  // Small Projects
+    //$this->renderQueue(5);  // Projects
+    //$this->renderQueue(6);  //Fixed
     private function renderQueue($queueNo)
     {
         /** @var DBEProblem|DataSet $serviceRequests */
@@ -928,12 +196,9 @@ class CTCurrentActivityReport extends CTCNC
                 false
             );
 
-        } elseif ($queueNo == 7) {
-            /* future dated */
-            $this->buActivity->getFutureProblems($serviceRequests);
-
-        } else {
-            $this->buActivity->getProblemsByQueueNo(
+         }   
+         else {
+            $this->buActivity->getProblemsByQueueNoWithFuture(
                 $queueNo,
                 $serviceRequests
             );
@@ -942,7 +207,7 @@ class CTCurrentActivityReport extends CTCNC
         $queueOptions = [
             '<option>-</option>',
         ];
-
+/*
         if ($queueNo != 1) {
             $queueOptions[] = '<option value="1">H</option>';
         }
@@ -964,22 +229,23 @@ class CTCurrentActivityReport extends CTCNC
         }
 
         $blockName = 'queue' . $queueNo . 'Block';
-
-        $this->template->set_block(
-            'CurrentActivityReport',
-            $blockName,
-            'requests' . $queueNo
-        );
-
+       */
+        // $this->template->set_block(
+        //     'CurrentActivityReport',
+        //     $blockName,
+        //     'requests' . $queueNo
+        // );
+        $result=array();
         $rowCount = 0;
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
         while ($serviceRequests->fetchNext()) {
+            
             $totalActivityDurationHours = $serviceRequests->getValue(DBEJProblem::totalActivityDurationHours);
             $totalActivityDurationMinutes = $totalActivityDurationHours * 60;
             $timeSpentColorClass = null;
             $compareMinutes = null;
-
+          
             if (in_array($queueNo, [1, 2, 3, 7])) {
 
                 switch ($serviceRequests->getValue(DBEJCallActivity::queueNo)) {
@@ -1002,13 +268,14 @@ class CTCurrentActivityReport extends CTCNC
             $this->customerFilterList[$serviceRequests->getValue(DBEJProblem::customerID)] = $serviceRequests->getValue(
                 DBEJProblem::customerName
             );
-
+            /*
             if (!in_array($serviceRequests->getValue(DBEJProblem::priority), $this->getSessionParam('priorityFilter'))
             ) {
                 continue;
             }
-
-
+*/
+/*
+Filter by selected customer
             if ($this->getSessionParam('selectedCustomerID') && $this->getSessionParam(
                     'selectedCustomerID'
                 ) != $serviceRequests->getValue(
@@ -1016,7 +283,10 @@ class CTCurrentActivityReport extends CTCNC
                 )) {
                 continue;
             }
+*/
 
+/*
+fileter by user
             if ($this->getSessionParam('selectedUserID') &&
                 $serviceRequests->getValue(DBEJProblem::userID) &&
                 $this->getSessionParam(
@@ -1026,7 +296,7 @@ class CTCurrentActivityReport extends CTCNC
                 )) {
                 continue;
             }
-
+*/
             $rowCount++;
 
             $urlViewActivity =
@@ -1094,9 +364,9 @@ class CTCurrentActivityReport extends CTCNC
             );
             $alarmDateTimeDisplay = null;
             if ($serviceRequests->getValue(DBEProblem::alarmDate)) {
-                $alarmDateTimeDisplay = Controller::dateYMDtoDMY(
+                $alarmDateTimeDisplay =  
                         $serviceRequests->getValue(DBEProblem::alarmDate)
-                    ) . ' ' . $serviceRequests->getValue(DBEProblem::alarmTime);
+                     . ' ' . $serviceRequests->getValue(DBEProblem::alarmTime);
 
                 /*
                 Has an alarm date that is in the past, set updated BG Colour (indicates moved back into work queue from future queue)
@@ -1110,6 +380,7 @@ class CTCurrentActivityReport extends CTCNC
             If the dashboard is filtered by customer then the Work button opens
             Activity edit
             */
+            //we don't need this part
             if ($serviceRequests->getValue(DBEJProblem::lastCallActTypeID) == null) {
                 $workBgColor = self::GREEN; // green = in progress
                 $workOnClick = "alert( 'Another user is currently working on this SR' ); return false";
@@ -1192,7 +463,7 @@ class CTCurrentActivityReport extends CTCNC
             $dbeCustomer->getRow($serviceRequests->getValue(DBEJProblem::customerID));
             $hideWork = $dbeCustomer->getValue(DBECustomer::referredFlag) == 'Y';
 
-            $this->template->set_var(
+             array_push($result,
 
                 array(
                     'queueOptions'               => implode($queueOptions),
@@ -1216,6 +487,7 @@ class CTCurrentActivityReport extends CTCNC
                     'date'                       => Controller::dateYMDtoDMY(
                         $serviceRequests->getValue(DBEJProblem::lastDate)
                     ),
+                    'updated'=>   $serviceRequests->getValue(DBEJProblem::lastDate)." ".$serviceRequests->getValue(DBEJProblem::lastStartTime),
                     'problemID'                  => $serviceRequests->getValue(DBEJProblem::problemID),
                     'problemStatus'              => $serviceRequests->getValue(DBEJProblem::status),
                     'reason'                     => CTCurrentActivityReport::truncate(
@@ -1230,6 +502,7 @@ class CTCurrentActivityReport extends CTCNC
                         $serviceRequests->getValue(DBEJProblem::userID)
                     ),
                     'engineerName'               => $serviceRequests->getValue(DBEJProblem::engineerName),
+                    'engineerId'               => $serviceRequests->getValue(DBEJProblem::userID),                    
                     'customerName'               => $serviceRequests->getValue(DBEJProblem::customerName),
                     'customerNameDisplayClass'   => $this->getCustomerNameDisplayClass(
                         $serviceRequests->getValue(DBEJProblem::specialAttentionFlag),
@@ -1249,19 +522,17 @@ class CTCurrentActivityReport extends CTCNC
                     'bgColour'                   => $bgColour,
                     'workBgColor'                => $workBgColor,
                     'workHidden'                 => $hideWork ? 'hidden' : null,
-                )
-
+                    "callActivityID"             =>$serviceRequests->getValue(DBEJProblem::callActivityID),
+                    "lastCallActTypeID"         =>$serviceRequests->getValue(DBEJProblem::lastCallActTypeID),
+                    'customerID'               => $serviceRequests->getValue(DBEJProblem::customerID),
+                 )
             );
 
-            $this->template->parse(
-                'requests' . $queueNo,
-                $blockName,
-                true
-            );
+            
 
 
         } // end while
-
+        return $result;
         $this->template->set_var(
             array(
                 'queue' . $queueNo . 'Count' => $rowCount,
@@ -1270,18 +541,6 @@ class CTCurrentActivityReport extends CTCNC
             )
         );
     }
-
-    /**
-     * Return the appropriate background colour for this problem
-     *
-     *
-     * @param $status
-     * @param $priority
-     * @param $slaResponseHours
-     * @param $workingHours
-     * @param $respondedHours
-     * @return string
-     */
     function getResponseColour(
         $status,
         $priority,
@@ -1333,7 +592,6 @@ class CTCurrentActivityReport extends CTCNC
 
         return $bgColour;
     }
-
     protected function pickColor($value)
     {
         if ($value <= 5) {
@@ -1344,8 +602,7 @@ class CTCurrentActivityReport extends CTCNC
             return 'green';
         }
     } // end function displayReport
-
-    /**
+ /**
      * @param $problemID
      * @return mixed|string
      * @throws Exception
@@ -1362,7 +619,6 @@ class CTCurrentActivityReport extends CTCNC
         );
 
     }
-
     /**
      * return list of user options for dropdown
      *
@@ -1411,23 +667,234 @@ class CTCurrentActivityReport extends CTCNC
         return $string;
 
     }
-
-    function getCustomerNameDisplayClass($specialAttentionFlag,
-                                         $specialAttentionEndDate,
-                                         $specialAttentionContactFlag
-    )
-    {
+    function getCustomerNameDisplayClass(
+        $specialAttentionFlag,
+        $specialAttentionEndDate,
+        $specialAttentionContactFlag
+    ) {
         if (
             $specialAttentionFlag == 'Y' &&
             $specialAttentionEndDate >= date('Y-m-d')
         ) {
-            return 'class="specialAttentionCustomer"';
+            return 'specialAttentionCustomer';
         }
 
         if ($specialAttentionContactFlag == 'Y') {
-            return 'class="specialAttentionContact"';
+            return 'specialAttentionContact';
         }
 
         return null;
+    }
+     /**
+     * @throws Exception
+     */
+    function changeQueue()
+    {
+        $problemID = $this->getParam('problemID');
+        $newQueue = $this->getParam('queue');
+        $reason = $this->getParam('reason'); 
+        $this->buActivity->escalateProblemByProblemID(
+            $problemID,
+            $reason,
+            $newQueue
+        );
+        return json_encode(["status"=>true]);
+    }
+    function getAllocatedUsers()
+    {
+        $dbeUser = new DBEUser($this);
+
+        $dbeUser->getRows('firstName');
+        $allocatedUser=array();
+        while ($dbeUser->fetchNext()) {
+
+            $userRow =
+                array(
+                    'userID'   => $dbeUser->getValue(DBEUser::userID),
+                    'userName' => $dbeUser->getValue(DBEUser::name),
+                    'fullName' => $dbeUser->getValue(DBEUser::firstName) . ' ' . $dbeUser->getValue(
+                            DBEUser::lastName
+                    ),
+                    'appearInQueueFlag'=>$dbeUser->getValue(DBEUser::appearInQueueFlag),
+                    "teamID"=>$dbeUser->getValue(DBEUser::teamID),
+                );
+                array_push($allocatedUser,$userRow);
+            // if ($dbeUser->getValue(DBEUser::appearInQueueFlag) == 'Y') {
+
+            //     $this->filterUser[$dbeUser->getValue(DBEUser::userID)] = $userRow;
+            // }
+        }
+        return json_encode($allocatedUser);
+    }
+     /**
+     * @param array $options
+     * @throws Exception
+     */
+    function allocateUser()
+    {
+        $dbeUser = new DBEUser ($this);
+        $dbeUser->setValue(
+            DBEUser::userID,
+            $this->userID
+        );
+        $dbeUser->getRow();
+        $this->buActivity->allocateUserToRequest(
+            $this->getParam('problemID'),
+            $this->getParam('userID') == 0 ? null : $this->getParam('userID'),
+            $dbeUser
+        );
+        return json_encode(["status"=>true]);
+    }
+    function getToBeLogged()
+    {
+        $this->setMethodName('getToBeLogged');                
+        $customerRaisedRequests = $this->buActivity->getCustomerRaisedRequests();
+        /*
+        Requests raised via the customer portal
+        */
+        $customerRaisedRequests->next_record();
+        $count = 0;
+        $result=Array();
+        if ($customerRaisedRequests->Record) {
+            do {
+                
+
+                $urlCustomer =
+                    Controller::buildLink(
+                        'SalesOrder.php',
+                        array(
+                            'action'     => 'search',
+                            'customerID' => $customerRaisedRequests->Record['con_custno']
+                        )
+                    );                
+                $urlServiceRequest = null;
+                if ($customerRaisedRequests->Record['cpr_problemno'] > 0) {
+                    $urlServiceRequest =
+                        Controller::buildLink(
+                            'Activity.php',
+                            array(
+                                'action'    => 'displayServiceRequest',
+                                'problemID' => $customerRaisedRequests->Record['cpr_problemno']
+                            )
+                        );                    
+                }
+
+                $truncatedReason = CTCurrentActivityReport::truncate(
+                    $customerRaisedRequests->Record['cpr_reason'],
+                    150
+                );
+
+                $bgColour = self::RED;    // customer raised
+                if ($customerRaisedRequests->Record['cpr_source'] == 'S') {
+                    $bgColour = self::CONTENT;
+                }
+                $count++;
+                    array_push($result,
+                    array(
+                        'cpCustomerProblemID'      => $customerRaisedRequests->Record['cpr_customerproblemno'],
+                        'cpCustomerName'           => $customerRaisedRequests->Record['cus_name'],
+                        'cpContactName'            => $customerRaisedRequests->Record['con_first_name'] . ' ' . $customerRaisedRequests->Record['con_last_name'],
+                        'cpDate'                   => $customerRaisedRequests->Record['cpr_date'],
+                        'cpUrlServiceRequest'      => $urlServiceRequest,
+                        'cpServiceRequestID'      =>  $customerRaisedRequests->Record['cpr_problemno'],
+                        'cpPriority'               => $customerRaisedRequests->Record['cpr_priority'],
+                        'cpTruncatedReason'        => $truncatedReason,
+                        'cpFullReason'             => $customerRaisedRequests->Record['cpr_reason'],
+                        'cpUrlCustomer'            => $urlCustomer,
+                        'cpBgColor'                => $bgColour,
+                        'cpCount'                  => $count,                        
+                    )
+                );
+            } while ($customerRaisedRequests->next_record());
+        }
+        return  json_encode($result);
+       
+    }
+    function getPendingReopenedRequests()
+    {
+        $pendingReopenedRequests = $this->buActivity->getPendingReopenedRequests();
+        $result=array();
+        if ($pendingReopenedRequests && count($pendingReopenedRequests)) {        
+
+            foreach ($pendingReopenedRequests as $pendingReopenedRequest) {
+                $pendingReopenSRURL = Controller::buildLink(
+                    'Activity.php',
+                    array(
+                        'action'    => 'displayLastActivity',
+                        'problemID' => $pendingReopenedRequest['problemID']
+                    )
+                );
+                $pendingReopenSR = $pendingReopenedRequest['problemID'];
+                $pendingReopenCustomerName = $pendingReopenedRequest['customerName'];
+                $pendingReopenedPriority = $pendingReopenedRequest['priority'];
+                $truncatedReason = CTCurrentActivityReport::truncate(
+                    $pendingReopenedRequest['reason'],
+                    150
+                );
+                $pendingReopenDescriptionSummary = $truncatedReason;
+                $pendingReopenDescriptionURL =
+                    Controller::buildLink(
+                        $_SERVER['PHP_SELF'],
+                        array(
+                            'action'            => 'pendingReopenedPopup',
+                            'pendingReopenedID' => $pendingReopenedRequest['id'],
+                            'htmlFmt'           => CT_HTML_FMT_POPUP
+                        )
+                    );
+                    array_push($result,                 
+                    [
+                        "pendingReopenSRURL"              => $pendingReopenSRURL,
+                        "pendingReopenSR"                 => $pendingReopenSR,
+                        "pendingReopenCustomerName"       => $pendingReopenCustomerName,
+                        "pendingReopenPriority"           => $pendingReopenedPriority,
+                        "pendingReopenDescriptionURL"     => $pendingReopenDescriptionURL,
+                        "pendingReopenDescriptionSummary" => $pendingReopenDescriptionSummary,
+                        "pendingReopenedID"               => $pendingReopenedRequest['id'],
+                        "receivedDate"                    => $pendingReopenedRequest['createdAt'],
+                        "pendingReopenedCustomerID"       => $pendingReopenedRequest['customerID'],
+                        "pendingReopenedContactID"        => $pendingReopenedRequest['contactID'],
+                        "base64Reason"                    => base64_encode($pendingReopenedRequest['reason']),
+
+                    ]
+                ); 
+            }
+        }
+        return json_encode($result);
+    }
+     /**
+     * @throws Exception
+     */
+    function deleteCustomerRequest()
+    {
+        $customerproblemno = $this->getParam('cpr_customerproblemno');
+        $this->buActivity->deleteCustomerRaisedRequest($customerproblemno);
+        return 1;
+    }
+ /**
+     * @param $pendingReopenedID
+     * @param $result
+     * @throws Exception
+     */
+    private function processPendingReopened()
+    {
+        $body = json_decode(file_get_contents('php://input'));
+        $pendingReopenedID = $body->pendingReopenedID;
+        $result = $body->result;        
+        if (isset($pendingReopenedID) && isset($result)) {
+            $dbePendingReopened = new DBEPendingReopened($this);
+            switch ($result) {
+                case 'R': {
+                        $dbePendingReopened->getRow($pendingReopenedID);
+                        $this->buActivity->approvePendingReopened($dbePendingReopened);
+                        break;
+                    }
+                case 'D': {
+                        $dbePendingReopened->deleteRow($pendingReopenedID);
+                        break;
+                    }
+            }
+            return 1;
+        }
+        return 0;
     }
 }

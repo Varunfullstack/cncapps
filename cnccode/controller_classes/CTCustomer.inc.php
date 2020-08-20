@@ -3396,7 +3396,7 @@ class CTCustomer extends CTCNC
             'id' => $this->dbeUser->getValue(DBEJUser::userID),
             'email' => $this->dbeUser->getEmail(),
             'permissions'=>$this->dbeUser->getValue(DBEUser::perms),
-            'isSDManger'=>($this->dbeUser->getValue(DBEUser::receiveSdManagerEmailFlag) == 'Y')
+            'isSDManger'=>($this->dbeUser->getValue(DBEUser::changeInitialDateAndTimeFlag) == 'Y')
         ]);
     }
 }

@@ -169,6 +169,10 @@ informing about this odd issue.
 
 ## [v4.4.0] - 2020-08-25
 ### Added
+- Issue 977 - New Current Activity 
+
+## [unreleased]
+### Added
 - Issue 961 - Team Performance at the start of the month
 - Issue 971 - Ability to allocate Sales Requests to people
 - Issue 901 - Webroot API for Billing and Reporting
