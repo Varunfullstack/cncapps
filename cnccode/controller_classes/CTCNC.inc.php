@@ -579,7 +579,7 @@ class CTCNC extends Controller
             [
                 "id"    => 110,
                 "href"  => "DailyReport.php?action=outstandingIncidents&onScreen=true&dashboard=true&daysAgo=7",
-                "label" => "7 Dayers",
+                "label" => "Aged Service Requests",
             ],
             [
                 "id"    => 111,
