@@ -199,28 +199,31 @@ class CTItem extends CTCNC
                     "itemCategory",
                     "renewalType",
                     "manufacturer",
-                    "discontinued"
+                    "discontinued",
+                    'renewalTypeID'
                 ];
                 $columnsDefinition = [
-                    "description"  => 'item.itm_desc',
-                    "costPrice"    => 'item.itm_sstk_cost',
-                    "salePrice"    => 'item.itm_sstk_price',
-                    "partNumber"   => 'item.itm_unit_of_sale',
-                    "itemCategory" => 'itemtype.ity_desc',
-                    "renewalType"  => 'renewalTypeID',
-                    "manufacturer" => 'man_name',
-                    "discontinued" => 'itm.itm_discontinued'
+                    "description"   => 'item.itm_desc',
+                    "costPrice"     => 'item.itm_sstk_cost',
+                    "salePrice"     => 'item.itm_sstk_price',
+                    "partNumber"    => 'item.itm_unit_of_sale',
+                    "itemCategory"  => 'itemtype.ity_desc',
+                    "renewalType"   => 'renewalTypeID',
+                    "manufacturer"  => 'man_name',
+                    "discontinued"  => 'item.itm_discontinued',
+                    "renewalTypeId" => 'renewalTypeID'
                 ];
 
                 $columnsTypes = [
-                    "description"  => 'like',
-                    "costPrice"    => 'like',
-                    "salePrice"    => 'like',
-                    "partNumber"   => 'like',
-                    "itemCategory" => 'like',
-                    "renewalType"  => 'explicitString',
-                    "manufacturer" => 'like',
-                    "discontinued" => 'explicitString'
+                    "description"   => 'like',
+                    "costPrice"     => 'like',
+                    "salePrice"     => 'like',
+                    "partNumber"    => 'like',
+                    "itemCategory"  => 'like',
+                    "renewalType"   => 'like',
+                    "renewalTypeId" => 'explicitInt',
+                    "manufacturer"  => 'like',
+                    "discontinued"  => 'explicitString'
                 ];
 
                 /** @var dbSweetcode $db */
@@ -237,10 +240,17 @@ class CTItem extends CTCNC
                     {$dbeItem->getDBColumnName(DBEItem::curUnitSale)} as 'salePrice',
                     {$dbeItem->getDBColumnName(DBEItem::partNo)} as 'partNumber',
                     {$dbeItemType->getDBColumnName(DBEItemType::description)} as 'itemCategory',
-                    {$dbeItem->getDBColumnName(DBEItem::renewalTypeID)} as 'renewalType',
+                    case {$dbeItem->getDBColumnName(DBEItem::renewalTypeID)}
+                        when 1 then 'Broadband'
+    when 2 then 'Renewals'
+    when 3 then 'Quotation'
+    when 4 then 'Domain'
+    when 5 then 'Hosting'
+    end as 'renewalType',
+       {$dbeItem->getDBColumnName(DBEItem::renewalTypeID)} as renewalTypeId,
                     {$dbeManufacturer->getDBColumnName(DBEManufacturer::name)} as 'manufacturer',
                     {$dbeItem->getDBColumnName(DBEItem::discontinuedFlag)} as 'discontinued'
-FROM {$dbeItem->getTableName()}
+                FROM {$dbeItem->getTableName()}
          left join {$dbeItemType->getTableName()} on {$dbeItem->getDBColumnName(DBEItem::itemTypeID)} = {$dbeItemType->getDBColumnName(DBEItemType::itemTypeID)}
          left join {$dbeManufacturer->getTableName()} on {$dbeItem->getDBColumnName(DBEItem::manufacturerID)} = {$dbeManufacturer->getDBColumnName(DBEManufacturer::manufacturerID)} where 1 ";
                 $columnSearch = [];
@@ -252,11 +262,18 @@ FROM {$dbeItem->getTableName()}
 
                     if ($column['search']['value']) {
                         switch ($columnsTypes[$column['data']]) {
+                            case 'explicitInt':
+                                $columnSearch[] = $columnsDefinition[$column['data']] . " = ?";
+                                $parameters[] = [
+                                    "type"  => "i",
+                                    "value" => $column['search']['value']
+                                ];
+                                break;
                             case 'explicitString':
                                 $columnSearch[] = $columnsDefinition[$column['data']] . " = ?";
                                 $parameters[] = [
                                     "type"  => "s",
-                                    "value" => "%" . $column['search']['value'] . "%"
+                                    "value" => $column['search']['value']
                                 ];
                                 break;
                             case 'like':
@@ -275,7 +292,6 @@ FROM {$dbeItem->getTableName()}
                     $defaultQuery .= $wherePart;
                     $countQuery .= $wherePart;
                 }
-
                 $orderBy = [];
                 if (count($order)) {
                     foreach ($order as $orderItem) {

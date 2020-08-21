@@ -32,13 +32,6 @@ class BUManufacturer extends Business
         return TRUE;
     }
 
-    function getManufacturerByID($ID, &$dsResults)
-    {
-        $this->dbeManufacturer->setPKValue($ID);
-        $this->dbeManufacturer->getRow();
-        return ($this->getData($this->dbeManufacturer, $dsResults));
-    }
-
     /**
      * Get Item rows whose names match the search string or, if the string is numeric, try to select by customerID
      * Don't include discontinued items
@@ -61,11 +54,17 @@ class BUManufacturer extends Business
             $ret = ($this->getManufacturerByID($matchString, $dsResults));
         }
         if (!$ret) {
-            $this->dbeManufacturer->setValue(DBEManufacturer::name, $matchString);
-            $this->dbeManufacturer->getRowsByNameMatch();
+            $this->dbeManufacturer->getRowsByNameMatch($matchString);
             $ret = ($this->getData($this->dbeManufacturer, $dsResults));
         }
         return $ret;
+    }
+
+    function getManufacturerByID($ID, &$dsResults)
+    {
+        $this->dbeManufacturer->setPKValue($ID);
+        $this->dbeManufacturer->getRow();
+        return ($this->getData($this->dbeManufacturer, $dsResults));
     }
 
     function getAll(&$dsResults)

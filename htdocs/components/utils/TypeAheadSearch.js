@@ -16,7 +16,6 @@ class TypeAheadSearch extends React.Component {
             minLength: 0,
             source: function (request, responseCB) {
                 searchRequest(request.term, itemsToShow, (items) => {
-                    console.log(items);
                     if (items.length > itemsToShow) {
                         items = items.slice(0, itemsToShow);
                         items.unshift({
@@ -55,7 +54,6 @@ class TypeAheadSearch extends React.Component {
                         key: 'typeahead-input',
                         className: 'typeahead-input show-clear',
                         onChange: ($event) => {
-                            console.log($event);
                             onInputChange($event.target.value)
                         },
                         value: value,

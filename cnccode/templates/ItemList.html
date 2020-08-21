@@ -2,10 +2,6 @@
     import TypeAheadSearch from "/components/utils/TypeAheadSearch.js";
 
     let table;
-    let state = {
-        inputSearch: ''
-    }
-
 
     function renderReactElement(component, props, targetNode, callback) {
         const reactElement = React.createElement(TypeAheadSearch, props, null);
@@ -13,44 +9,7 @@
         return reactElement;
     }
 
-    const testContainer = document.getElementById('testingAutocomplete');
-    let testProps = {
-        autocompleteSelectedCallBack: (thing) => {
-            // performSearch(thing.label, key);
-        },
-        searchRequest: (term, itemsToShow, responseCB) => {
-            fetch(
-                'ItemType.php?action=SEARCH_BY_DESCRIPTION',
-                {
-                    method: 'POST',
-                    body: JSON.stringify({description: testProps.value})
-                }
-            )
-                .then(x => x.json())
-                .then(response => {
-                    if (response.status !== 'ok') {
-                        throw new Error(response.message);
-                    }
-                    responseCB(response.data.map(x => ({label: x.description, value: x.description})))
-                })
-        },
-        value: '',
-        onInputChange: (value) => {
-            testProps.value = value;
-            // performSearch(value, key);
-            renderReactElement(TypeAheadSearch, testProps, testContainer)
-        },
-        readOnly: false,
-        showClear: false,
-        onClear: () => {
-            this.clearSelectedItem();
-        }
-    }
-
-    renderReactElement(TypeAheadSearch, testProps, testContainer);
-
     const debounce = (func, wait) => {
-        console.log(wait);
         let timeout;
         return function executedFunction(...args) {
             const later = () => {
@@ -86,7 +45,6 @@
                 case 'filterAsYouType': {
                     const input = document.createElement('input');
                     input.addEventListener('keyup', debounce(($event) => {
-                        console.log(input.value);
                         performSearch(input.value, key);
                     }, 300));
                     th.appendChild(input);
@@ -95,17 +53,20 @@
                 case 'autocomplete': {
                     const domContainer = document.createElement('div');
 
+                    const termField = data.autocompleteTermField;
+
                     let props = {
                         autocompleteSelectedCallBack: (selectedItem) => {
                             props.value = selectedItem.label;
                             performSearch(selectedItem.label, key);
+                            renderReactElement(TypeAheadSearch, props, domContainer)
                         },
                         searchRequest: (term, itemsToShow, responseCB) => {
                             fetch(
                                 data.autocompleteUrl,
                                 {
                                     method: 'POST',
-                                    body: JSON.stringify({description: props.value})
+                                    body: JSON.stringify({[termField]: props.value})
                                 }
                             )
                                 .then(x => x.json())
@@ -113,7 +74,7 @@
                                     if (response.status !== 'ok') {
                                         throw new Error(response.message);
                                     }
-                                    responseCB(response.data.map(x => ({label: x.description, value: x.description})))
+                                    responseCB(response.data.map(x => ({label: x[termField], value: x[termField]})))
                                 })
                         },
                         value: '',
@@ -124,67 +85,37 @@
                         },
                         readOnly: false,
                         showClear: false,
-                        onClear: () => {
-                            this.clearSelectedItem();
-                        }
                     }
 
                     renderReactElement(TypeAheadSearch, props, domContainer);
                     th.appendChild(domContainer);
                     break;
                 }
+                case 'renewalTypeDropdown': {
+                    const options = [
+                        {value: '', label: ''},
+                        {value: 1, label: 'Broadband'},
+                        {value: 4, label: 'Domain'},
+                        {value: 5, label: 'Hosting'},
+                        {value: 3, label: 'Quotation'},
+                        {value: 2, label: 'Renewals'},
+                    ]
+
+                    const selectElm = document.createElement('select');
+
+                    selectElm.addEventListener('change', $event => {
+                        performSearch(selectElm.value, 9);
+                    })
+
+                    options.forEach(optionData => {
+                        const optionElm = document.createElement('option');
+                        optionElm.value = optionData.value;
+                        optionElm.text = optionData.label;
+                        selectElm.options.add(optionElm);
+                    })
+                    th.appendChild(selectElm);
+                }
             }
-
-            return;
-
-
-            $(this).html('<input type="text" placeholder="Search ' + title + '" />');
-            // const autocompleteURL = $(this).data().autocompleteUrl;
-            // const autocompleteTermField = 'term' || $(this).data().autocompleteTermField;
-            // const performSearch = function (value, column) {
-            //     if (table.column(column).search() != value) {
-            //         table.column(column)
-            //             .search(value);
-            //         table.draw();
-            //     }
-            // };
-            //
-            // const filterInput = $(this).find('input');
-            // filterInput.autocomplete({
-            //     minLength: 0,
-            //     source: function (request, responseCB) {
-            //         const data = {};
-            //         data[autocompleteTermField] = request.term;
-            //         $.ajax(
-            //             autocompleteURL,
-            //             {
-            //                 method: 'POST',
-            //                 dataType: 'json',
-            //                 data: data
-            //             }
-            //         ).then(response => {
-            //             if (response.length > 40) {
-            //                 response = response.slice(0, 40);
-            //                 response.unshift({
-            //                     id: -1,
-            //                     name: 'Keep typing to filter, there are more results not shown here'
-            //                 });
-            //             }
-            //             responseCB(response.map(x => ({label: x.name, value: x.id})));
-            //         })
-            //
-            //     },
-            //     delay: 200,
-            //     select: function (event, ui) {
-            //         event.preventDefault();
-            //         event.target.value = ui.item.label;
-            //         performSearch(ui.item.label, i);
-            //     }
-            // }).focus(function () {
-            //     $(this).autocomplete("search", $(this).val());
-            // }).on('change', function () {
-            //     performSearch(filterInput[0].value, i);
-            // });
         });
 
         table = $('#example').DataTable({
@@ -215,24 +146,6 @@
                 {
                     data: 'renewalType',
                     name: 'renewalType',
-                    render: function (data, type, row) {
-                        switch (data) {
-                            case 1:
-                                return 'Broadband';
-                            case 2:
-                                return 'Renewals';
-                            case 3:
-                                return 'Quotation';
-                            case 4:
-                                return 'Domain';
-                            case 5:
-                                return 'Hosting';
-                            default:
-                                return ''
-                        }
-                    }
-
-
                 },
                 {
                     data: 'manufacturer',
@@ -247,11 +160,14 @@
                 },
                 {
                     data: 'discontinued'
+                },
+                {
+                    data: 'renewalTypeId'
                 }
             ],
             columnDefs: [
                 {
-                    targets: 8,
+                    targets: [8, 9],
                     visible: false,
                 }
             ],
@@ -262,27 +178,24 @@
                 });
             }
         });
+
+        const discontinuedDropdown = document.getElementById('discontinuedDropdown')
+        discontinuedDropdown.addEventListener('change', () => {
+            performSearch(discontinuedDropdown.value, 8);
+        })
     })
 </script>
-description
-cost price
-sale price
-part number
-item category
-renewal type
-manufactuer
-
-search on
-description [autocomplete]
-part number [autocomplete]
-item category [autocomplete]
-renewal type [dropdown]
-manufactuer [autocomplete]
-
-search with dropdown (no column shown) on column discontinued (Show All/Active/Discontinued)
-
-<div id="testingAutocomplete"
-></div>
+<div>
+    <label>
+        <span>Discontinued Selector</span>
+        <select id="discontinuedDropdown">
+            <option value="">Show All</option>
+            <option value="N">Active</option>
+            <option value="Y">Discontinued</option>
+        </select>
+    </label>
+</div>
+<br/>
 <table id="example"
        class="display"
        style="width:100%"
@@ -302,20 +215,22 @@ search with dropdown (no column shown) on column discontinued (Show All/Active/D
         <th data-searchable="true"
             data-search-type="autocomplete"
             data-autocomplete-url="/ItemType.php?action=SEARCH_BY_DESCRIPTION"
+            data-autocomplete-term-field="description"
         >Item Category
         </th>
         <th data-searchable="true"
-            data-search-type="autocomplete"
-            data-autocomplete-url=""
+            data-search-type="renewalTypeDropdown"
         >Renewal Type
         </th>
         <th data-searchable="true"
             data-search-type="autocomplete"
-            data-autocomplete-url=""
+            data-autocomplete-url="/Manufacturer.php?action=SEARCH_MANUFACTURER_BY_NAME"
+            data-autocomplete-term-field="name"
         >Manufacturer
         </th>
         <th>&nbsp;</th>
         <th>discontinued</th>
+        <th>renewalTypeId</th>
     </tr>
     </thead>
     <tfoot>
@@ -329,6 +244,7 @@ search with dropdown (no column shown) on column discontinued (Show All/Active/D
         <th>Manufacturer</th>
         <th>&nbsp;</th>
         <th>discontinued</th>
+        <th>renewalTypeId</th>
     </tr>
     </tfoot>
 </table>
