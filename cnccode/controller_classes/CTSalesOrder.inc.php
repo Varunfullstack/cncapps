@@ -1245,6 +1245,13 @@ class CTSalesOrder extends CTCNC
             )
         );
 
+        $this->template->setVar(
+            'javaScript',
+            '<script src="js/react.development.js" crossorigin></script>
+                    <script src="js/react-dom.development.js" crossorigin></script>
+                    <script type="module" src=\'components/utils/TypeAheadSearch.js\'></script>'
+        );
+
         $purchaseOrderCount = $this->buSalesOrder->countPurchaseOrders($dsOrdhead->getValue(DBEOrdhead::ordheadID));
 
         // Initialise an array of actions that may be performed upon this order: they are displayed in a drop-down

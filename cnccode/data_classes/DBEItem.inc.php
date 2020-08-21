@@ -229,7 +229,7 @@ class DBEItem extends DBCNCEntity
         return $ret;
     }
 
-    function getRowsByDescriptionOrPartNoSearch(string $search, $renewalTypeID = false, $limit = 200)
+    function getRowsByDescriptionOrPartNoSearch($search, $renewalTypeID = false, $limit = 200)
     {
         $this->setMethodName("getRowsByDescriptionMatch");
         $queryString =

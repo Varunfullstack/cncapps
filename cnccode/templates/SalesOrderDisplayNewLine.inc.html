@@ -1,5 +1,7 @@
 <!-- Template: SalesOrderDisplayNewLine.inc.html -->
-<script>
+<script type="module">
+    import TypeAheadSearch from "/components/utils/TypeAheadSearch.js";
+
     document.addEventListener('DOMContentLoaded', () => {
         const itemIdInput = document.getElementById("itemID");
         const addLineButton = document.querySelector('button[name="addLine"]');
@@ -12,11 +14,53 @@
         const qtyOrderedInput = document.getElementById("qtyOrdered");
         const curUnitCostInput = document.querySelector("input[name='ordline[1][curUnitCost]']")
         const curUnitSaleInput = document.querySelector("input[name='ordline[1][curUnitSale]']")
+        const autocompleteItemContainer = document.getElementById('autocompleteItem');
 
+        let props = {
+            autocompleteSelectedCallBack: (selectedItem) => {
+                props.value = selectedItem.label;
+                itemIdInput.value = selectedItem.value;
+                curUnitCostInput.value = selectedItem.curUnitCost;
+                curUnitSaleInput.value = selectedItem.curUnitSale;
+                itemDescriptionInput.value = selectedItem.label;
+                updateButtons();
+                renderReactElement(TypeAheadSearch, props, autocompleteItemContainer)
+            },
+            searchRequest: (term, itemsToShow, responseCB) => {
+                fetch(
+                    '/Item.php?action=SEARCH_ITEMS_JSON',
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({term: props.value, limit: itemsToShow + 1})
+                    }
+                )
+                    .then(x => x.json())
+                    .then(response => {
+                        if (response.status !== 'ok') {
+                            throw new Error(response.message);
+                        }
+
+                        responseCB(response.data.map(x => ({
+                            label: x.description,
+                            value: x.itemID,
+                            curUnitCost: x.curUnitCost,
+                            curUnitSale: x.curUnitSale,
+                        })))
+                    })
+            },
+            value: '',
+            onInputChange: (value) => {
+                props.value = value;
+                renderReactElement(TypeAheadSearch, props, autocompleteItemContainer)
+            },
+            readOnly: false,
+            showClear: false,
+        }
+
+        renderReactElement(TypeAheadSearch, props, autocompleteItemContainer);
 
         const toCheckArray = [itemIdInput, itemDescriptionInput, supplierIdInput, qtyOrderedInput, curUnitCostInput, curUnitSaleInput].forEach(x => {
             x.addEventListener('change', () => {
-                console.log('checking buttons')
                 updateButtons();
             })
         })
@@ -46,9 +90,17 @@
         }
 
         function updateButtons() {
+            if (typeSelected === 'I') {
+                hideItemDescription();
+                showItemSearch();
+            } else {
+                hideItemSearch();
+                showItemDescription();
+            }
             if (typeSelected === 'I' || typeSelected === 'T' || typeSelected === 'O') {
                 showAddLineButton();
                 hideRecurringButton();
+
                 if (typeSelected === 'T' || typeSelected === 'O') {
                     disableAllExceptDescription();
                 } else {
@@ -67,6 +119,22 @@
             }
         }
 
+        function hideItemDescription() {
+            itemDescriptionInput.style.display = 'none';
+        }
+
+        function showItemSearch() {
+            autocompleteItemContainer.style.display = 'block'
+        }
+
+        function showItemDescription() {
+            itemDescriptionInput.style.display = 'inline-block';
+        }
+
+        function hideItemSearch() {
+            autocompleteItemContainer.style.display = 'none'
+        }
+
         function disableAllExceptDescription() {
             supplierNameInput.disabled = true;
             qtyOrderedInput.disabled = true;
@@ -79,6 +147,12 @@
             qtyOrderedInput.disabled = false;
             curUnitCostInput.disabled = false;
             curUnitSaleInput.disabled = false;
+        }
+
+        function renderReactElement(component, props, targetNode, callback) {
+            const reactElement = React.createElement(TypeAheadSearch, props, null);
+            ReactDOM.render(reactElement, targetNode, callback);
+            return reactElement;
         }
 
         typeSelector.addEventListener('change', ($event) => {
@@ -95,7 +169,6 @@
             curUnitSaleInput.value = "";
             supplierIdInput.value = "";
             itemIdInput.value = "";
-
         }
 
         function showRecurringButton() {
@@ -205,6 +278,7 @@
                 </select>
             </td>
             <td>
+                <div id="autocompleteItem"></div>
                 <input
                         type="text"
                         name="ordline[1][description]"

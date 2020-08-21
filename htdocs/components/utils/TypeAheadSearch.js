@@ -11,7 +11,6 @@ class TypeAheadSearch extends React.Component {
 
     componentDidMount() {
         const {autocompleteSelectedCallBack, itemsToShow, searchRequest, delay} = this.props;
-        console.log('component did mount');
         $(this.refs.autocomplete).autocomplete({
             minLength: 0,
             source: function (request, responseCB) {
@@ -19,8 +18,9 @@ class TypeAheadSearch extends React.Component {
                     if (items.length > itemsToShow) {
                         items = items.slice(0, itemsToShow);
                         items.unshift({
-                            id: -1,
-                            name: 'Keep trying to filter, there are more results not shown here'
+                            value: -1,
+                            label: 'Keep trying to filter, there are more results not shown here',
+                            disabled: true
                         })
                     }
                     responseCB(items);
@@ -29,10 +29,13 @@ class TypeAheadSearch extends React.Component {
             delay,
             select: (event, ui) => {
                 event.preventDefault();
+                if (ui.item.disabled) {
+                    return false;
+                }
                 if (autocompleteSelectedCallBack) {
                     autocompleteSelectedCallBack(ui.item)
                 }
-            }
+            },
         }).focus(function () {
             $(this).autocomplete("search", $(this).val());
         })

@@ -62,6 +62,7 @@ class CTItem extends CTCNC
     const SEARCH_ITEMS = "SEARCH_ITEMS";
     const CHECK_ITEM_RECURRING = "CHECK_ITEM_RECURRING";
     const DATA_TABLE_GET_DATA = "DATA_TABLE_GET_DATA";
+    const SEARCH_ITEMS_JSON = "SEARCH_ITEMS_JSON";
     /** @var DSForm */
     public $dsItem;
     /**
@@ -169,6 +170,20 @@ class CTItem extends CTCNC
                 echo json_encode(["status" => "ok", "data" => $rows]);
 
                 break;
+            case self::SEARCH_ITEMS_JSON:
+                $data = self::getJSONData();
+                $term = '';
+                $limit = null;
+
+                if (!empty($data['term'])) {
+                    $term = $data['term'];
+                }
+                if (!empty($data['limit'])) {
+                    $limit = $data['limit'];
+                }
+                $this->setParam('term', $term);
+                $this->setParam('limit', $limit);
+
             case self::SEARCH_ITEMS:
                 $dbeItem = new DBEItem($this);
                 $dbeItem->getRowsByDescriptionOrPartNoSearch($this->getParam('term'), null, $this->getParam('limit'));
