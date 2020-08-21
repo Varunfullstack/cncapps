@@ -1,0 +1,334 @@
+<script type="module">
+    import TypeAheadSearch from "/components/utils/TypeAheadSearch.js";
+
+    let table;
+    let state = {
+        inputSearch: ''
+    }
+
+
+    function renderReactElement(component, props, targetNode, callback) {
+        const reactElement = React.createElement(TypeAheadSearch, props, null);
+        ReactDOM.render(reactElement, targetNode, callback);
+        return reactElement;
+    }
+
+    const testContainer = document.getElementById('testingAutocomplete');
+    let testProps = {
+        autocompleteSelectedCallBack: (thing) => {
+            // performSearch(thing.label, key);
+        },
+        searchRequest: (term, itemsToShow, responseCB) => {
+            fetch(
+                'ItemType.php?action=SEARCH_BY_DESCRIPTION',
+                {
+                    method: 'POST',
+                    body: JSON.stringify({description: testProps.value})
+                }
+            )
+                .then(x => x.json())
+                .then(response => {
+                    if (response.status !== 'ok') {
+                        throw new Error(response.message);
+                    }
+                    responseCB(response.data.map(x => ({label: x.description, value: x.description})))
+                })
+        },
+        value: '',
+        onInputChange: (value) => {
+            testProps.value = value;
+            // performSearch(value, key);
+            renderReactElement(TypeAheadSearch, testProps, testContainer)
+        },
+        readOnly: false,
+        showClear: false,
+        onClear: () => {
+            this.clearSelectedItem();
+        }
+    }
+
+    renderReactElement(TypeAheadSearch, testProps, testContainer);
+
+    const debounce = (func, wait) => {
+        console.log(wait);
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            }
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        }
+    }
+    const performSearch = function (value, column) {
+        if (table.column(column).search() !== value) {
+            table.column(column)
+                .search(value);
+            table.draw();
+        }
+    };
+    document.addEventListener('DOMContentLoaded', ($event) => {
+        const tableElement = document.getElementById('example');
+        const header = tableElement.querySelector('thead');
+        const clonedHeaderRow = header.querySelector('tr').cloneNode(true);
+        header.appendChild(clonedHeaderRow);
+
+
+        clonedHeaderRow.querySelectorAll('th').forEach((th, key) => {
+            const data = th.dataset;
+            if (!data.searchable) {
+                return;
+            }
+
+            th.innerHTML = '';
+            switch (data.searchType) {
+                case 'filterAsYouType': {
+                    const input = document.createElement('input');
+                    input.addEventListener('keyup', debounce(($event) => {
+                        console.log(input.value);
+                        performSearch(input.value, key);
+                    }, 300));
+                    th.appendChild(input);
+                    break;
+                }
+                case 'autocomplete': {
+                    const domContainer = document.createElement('div');
+
+                    let props = {
+                        autocompleteSelectedCallBack: (selectedItem) => {
+                            props.value = selectedItem.label;
+                            performSearch(selectedItem.label, key);
+                        },
+                        searchRequest: (term, itemsToShow, responseCB) => {
+                            fetch(
+                                data.autocompleteUrl,
+                                {
+                                    method: 'POST',
+                                    body: JSON.stringify({description: props.value})
+                                }
+                            )
+                                .then(x => x.json())
+                                .then(response => {
+                                    if (response.status !== 'ok') {
+                                        throw new Error(response.message);
+                                    }
+                                    responseCB(response.data.map(x => ({label: x.description, value: x.description})))
+                                })
+                        },
+                        value: '',
+                        onInputChange: (value) => {
+                            props.value = value;
+                            performSearch(value, key);
+                            renderReactElement(TypeAheadSearch, props, domContainer)
+                        },
+                        readOnly: false,
+                        showClear: false,
+                        onClear: () => {
+                            this.clearSelectedItem();
+                        }
+                    }
+
+                    renderReactElement(TypeAheadSearch, props, domContainer);
+                    th.appendChild(domContainer);
+                    break;
+                }
+            }
+
+            return;
+
+
+            $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+            // const autocompleteURL = $(this).data().autocompleteUrl;
+            // const autocompleteTermField = 'term' || $(this).data().autocompleteTermField;
+            // const performSearch = function (value, column) {
+            //     if (table.column(column).search() != value) {
+            //         table.column(column)
+            //             .search(value);
+            //         table.draw();
+            //     }
+            // };
+            //
+            // const filterInput = $(this).find('input');
+            // filterInput.autocomplete({
+            //     minLength: 0,
+            //     source: function (request, responseCB) {
+            //         const data = {};
+            //         data[autocompleteTermField] = request.term;
+            //         $.ajax(
+            //             autocompleteURL,
+            //             {
+            //                 method: 'POST',
+            //                 dataType: 'json',
+            //                 data: data
+            //             }
+            //         ).then(response => {
+            //             if (response.length > 40) {
+            //                 response = response.slice(0, 40);
+            //                 response.unshift({
+            //                     id: -1,
+            //                     name: 'Keep typing to filter, there are more results not shown here'
+            //                 });
+            //             }
+            //             responseCB(response.map(x => ({label: x.name, value: x.id})));
+            //         })
+            //
+            //     },
+            //     delay: 200,
+            //     select: function (event, ui) {
+            //         event.preventDefault();
+            //         event.target.value = ui.item.label;
+            //         performSearch(ui.item.label, i);
+            //     }
+            // }).focus(function () {
+            //     $(this).autocomplete("search", $(this).val());
+            // }).on('change', function () {
+            //     performSearch(filterInput[0].value, i);
+            // });
+        });
+
+        table = $('#example').DataTable({
+            dom: "lrtip",
+            serverSide: true,
+            ajax: '?action=getData',
+            orderCellsTop: true,
+            fixedHeader: true,
+            pageLength: 50,
+            columns: [
+                {
+                    data: "description",
+                    name: "description",
+                    // render: function (data, type, row) {
+                    // return "<a href='RenContract.php?action=edit&ID=" + row.contractID + "' target='_blank'>" + data + "</a>";
+                    // }
+                },
+                {data: "costPrice"},
+                {data: "salePrice"},
+                {
+                    data: "partNumber",
+                    name: "partNumber",
+                },
+                {
+                    data: 'itemCategory',
+                    name: 'itemCategory'
+                },
+                {
+                    data: 'renewalType',
+                    name: 'renewalType',
+                    render: function (data, type, row) {
+                        switch (data) {
+                            case 1:
+                                return 'Broadband';
+                            case 2:
+                                return 'Renewals';
+                            case 3:
+                                return 'Quotation';
+                            case 4:
+                                return 'Domain';
+                            case 5:
+                                return 'Hosting';
+                            default:
+                                return ''
+                        }
+                    }
+
+
+                },
+                {
+                    data: 'manufacturer',
+                },
+                {
+                    data: 'id',
+                    sortable: false,
+                    searchable: false,
+                    render: (data) => {
+                        return "<button class='salesOrderButton' data-item-id='" + data + "'><i class='fal fa-edit fa-2x'/></button>";
+                    }
+                },
+                {
+                    data: 'discontinued'
+                }
+            ],
+            columnDefs: [
+                {
+                    targets: 8,
+                    visible: false,
+                }
+            ],
+            createdRow: (row, data, displayNum) => {
+                const button = row.querySelector('.salesOrderButton');
+                button.addEventListener('click', ($event) => {
+                    open('?action=editItem&itemID=' + button.dataset.itemId);
+                });
+            }
+        });
+    })
+</script>
+description
+cost price
+sale price
+part number
+item category
+renewal type
+manufactuer
+
+search on
+description [autocomplete]
+part number [autocomplete]
+item category [autocomplete]
+renewal type [dropdown]
+manufactuer [autocomplete]
+
+search with dropdown (no column shown) on column discontinued (Show All/Active/Discontinued)
+
+<div id="testingAutocomplete"
+></div>
+<table id="example"
+       class="display"
+       style="width:100%"
+>
+    <thead>
+    <tr>
+        <th data-searchable="true"
+            data-search-type="filterAsYouType"
+        >Description
+        </th>
+        <th>Cost Price</th>
+        <th>Sale Price</th>
+        <th data-searchable="true"
+            data-search-type="filterAsYouType"
+        >Part Number
+        </th>
+        <th data-searchable="true"
+            data-search-type="autocomplete"
+            data-autocomplete-url="/ItemType.php?action=SEARCH_BY_DESCRIPTION"
+        >Item Category
+        </th>
+        <th data-searchable="true"
+            data-search-type="autocomplete"
+            data-autocomplete-url=""
+        >Renewal Type
+        </th>
+        <th data-searchable="true"
+            data-search-type="autocomplete"
+            data-autocomplete-url=""
+        >Manufacturer
+        </th>
+        <th>&nbsp;</th>
+        <th>discontinued</th>
+    </tr>
+    </thead>
+    <tfoot>
+    <tr>
+        <th>Description</th>
+        <th>Cost Price</th>
+        <th>Sale Price</th>
+        <th>Part Number</th>
+        <th>Item Category</th>
+        <th>Renewal Type</th>
+        <th>Manufacturer</th>
+        <th>&nbsp;</th>
+        <th>discontinued</th>
+    </tr>
+    </tfoot>
+</table>

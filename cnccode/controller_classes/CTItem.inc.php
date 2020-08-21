@@ -61,6 +61,7 @@ class CTItem extends CTCNC
     const GET_PARENT_ITEMS = "GET_PARENT_ITEMS";
     const SEARCH_ITEMS = "SEARCH_ITEMS";
     const CHECK_ITEM_RECURRING = "CHECK_ITEM_RECURRING";
+    const DATA_TABLE_GET_DATA = "DATA_TABLE_GET_DATA";
     /** @var DSForm */
     public $dsItem;
     /**
@@ -168,8 +169,6 @@ class CTItem extends CTCNC
                 echo json_encode(["status" => "ok", "data" => $rows]);
 
                 break;
-
-                break;
             case self::SEARCH_ITEMS:
                 $dbeItem = new DBEItem($this);
                 $dbeItem->getRowsByDescriptionOrPartNoSearch($this->getParam('term'), null, $this->getParam('limit'));
@@ -178,6 +177,144 @@ class CTItem extends CTCNC
                     $rows[] = $dbeItem->getRowAsAssocArray();
                 }
                 echo json_encode(["status" => "ok", "data" => $rows]);
+                break;
+            case self::DATA_TABLE_GET_DATA:
+            case 'getData':
+
+                $dbeItem = new DBEItem($this);
+                $dbeItemType = new DBEItemType($this);
+                $dbeManufacturer = new DBEManufacturer($this);
+                $draw = $_REQUEST['draw'];
+                $columns = $_REQUEST['columns'];
+                $search = $_REQUEST['search'];
+                $order = $_REQUEST['order'];
+                $offset = $_REQUEST['start'];
+                $limit = $_REQUEST['length'];
+
+                $columnsNames = [
+                    "description",
+                    "costPrice",
+                    "salePrice",
+                    "partNumber",
+                    "itemCategory",
+                    "renewalType",
+                    "manufacturer",
+                    "discontinued"
+                ];
+                $columnsDefinition = [
+                    "description"  => 'item.itm_desc',
+                    "costPrice"    => 'item.itm_sstk_cost',
+                    "salePrice"    => 'item.itm_sstk_price',
+                    "partNumber"   => 'item.itm_unit_of_sale',
+                    "itemCategory" => 'itemtype.ity_desc',
+                    "renewalType"  => 'renewalTypeID',
+                    "manufacturer" => 'man_name',
+                    "discontinued" => 'itm.itm_discontinued'
+                ];
+
+                $columnsTypes = [
+                    "description"  => 'like',
+                    "costPrice"    => 'like',
+                    "salePrice"    => 'like',
+                    "partNumber"   => 'like',
+                    "itemCategory" => 'like',
+                    "renewalType"  => 'explicitString',
+                    "manufacturer" => 'like',
+                    "discontinued" => 'explicitString'
+                ];
+
+                /** @var dbSweetcode $db */
+                global $db;
+                $countQuery = "select count(*) FROM {$dbeItem->getTableName()}
+         left join {$dbeItemType->getTableName()} on {$dbeItem->getDBColumnName(DBEItem::itemTypeID)} = {$dbeItemType->getDBColumnName(DBEItemType::itemTypeID)}
+         left join {$dbeManufacturer->getTableName()} on {$dbeItem->getDBColumnName(DBEItem::manufacturerID)} = {$dbeManufacturer->getDBColumnName(DBEManufacturer::manufacturerID)}";
+                $totalCountResult = $db->query($countQuery);
+                $totalCount = $totalCountResult->fetch_row()[0];
+                $defaultQuery = "select 
+                    {$dbeItem->getDBColumnName(DBEItem::itemID)} as 'id',
+                    {$dbeItem->getDBColumnName(DBEItem::description)} as 'description',
+                    {$dbeItem->getDBColumnName(DBEItem::curUnitCost)} as 'costPrice',
+                    {$dbeItem->getDBColumnName(DBEItem::curUnitSale)} as 'salePrice',
+                    {$dbeItem->getDBColumnName(DBEItem::partNo)} as 'partNumber',
+                    {$dbeItemType->getDBColumnName(DBEItemType::description)} as 'itemCategory',
+                    {$dbeItem->getDBColumnName(DBEItem::renewalTypeID)} as 'renewalType',
+                    {$dbeManufacturer->getDBColumnName(DBEManufacturer::name)} as 'manufacturer',
+                    {$dbeItem->getDBColumnName(DBEItem::discontinuedFlag)} as 'discontinued'
+FROM {$dbeItem->getTableName()}
+         left join {$dbeItemType->getTableName()} on {$dbeItem->getDBColumnName(DBEItem::itemTypeID)} = {$dbeItemType->getDBColumnName(DBEItemType::itemTypeID)}
+         left join {$dbeManufacturer->getTableName()} on {$dbeItem->getDBColumnName(DBEItem::manufacturerID)} = {$dbeManufacturer->getDBColumnName(DBEManufacturer::manufacturerID)} where 1 ";
+                $columnSearch = [];
+                $parameters = [];
+                foreach ($columns as $column) {
+                    if (!isset($columnsDefinition[$column['data']])) {
+                        continue;
+                    }
+
+                    if ($column['search']['value']) {
+                        switch ($columnsTypes[$column['data']]) {
+                            case 'explicitString':
+                                $columnSearch[] = $columnsDefinition[$column['data']] . " = ?";
+                                $parameters[] = [
+                                    "type"  => "s",
+                                    "value" => "%" . $column['search']['value'] . "%"
+                                ];
+                                break;
+                            case 'like':
+                                $columnSearch[] = $columnsDefinition[$column['data']] . " like ?";
+                                $parameters[] = [
+                                    "type"  => "s",
+                                    "value" => "%" . $column['search']['value'] . "%"
+                                ];
+                                break;
+                        }
+                    }
+                }
+
+                if (count($columnSearch)) {
+                    $wherePart = " and " . implode(" and ", $columnSearch);
+                    $defaultQuery .= $wherePart;
+                    $countQuery .= $wherePart;
+                }
+
+                $orderBy = [];
+                if (count($order)) {
+                    foreach ($order as $orderItem) {
+                        if (!isset($columnsNames[(int)$orderItem['column']])) {
+                            continue;
+                        }
+                        $orderBy[] = $columnsDefinition[$columnsNames[(int)$orderItem['column']]] . " " . mysqli_real_escape_string(
+                                $db->link_id(),
+                                $orderItem['dir']
+                            );
+                    }
+                    if (count($orderBy)) {
+                        $defaultQuery .= (" order by " . implode(' , ', $orderBy));
+                    }
+                }
+                $countResult = $db->preparedQuery(
+                    $countQuery,
+                    $parameters
+                );
+                $filteredCount = $countResult->fetch_row()[0];
+
+                $defaultQuery .= " limit ?,?";
+                $parameters[] = ["type" => "i", "value" => $offset];
+                $parameters[] = ["type" => "i", "value" => $limit];
+                $result = $db->preparedQuery(
+                    $defaultQuery,
+                    $parameters
+                );
+                $data = $result->fetch_all(MYSQLI_ASSOC);
+
+                echo json_encode(
+                    [
+                        "draw"            => +$draw,
+                        "recordsTotal"    => +$totalCount,
+                        "recordsFiltered" => $filteredCount,
+                        "data"            => $data
+                    ]
+                );
+
                 break;
             case self::CHECK_ITEM_RECURRING:
             {
@@ -194,9 +331,10 @@ class CTItem extends CTCNC
 
             }
             case CTCNC_ACT_DISP_ITEM_POPUP:
-            default:
                 $this->displayItemSelectPopup();
                 break;
+            default:
+                $this->showItemList();
         }
     }
 
@@ -808,6 +946,25 @@ class CTItem extends CTCNC
             'ItemSelect',
             true
         );
+        $this->parsePage();
+    }
+
+    function showItemList()
+    {
+        $this->setTemplateFiles(
+            'ItemList',
+            'ItemList'
+        );
+
+        $this->template->setVar(
+            [
+                'javaScript' => '<script src="js/react.development.js" crossorigin></script>
+                    <script src="js/react-dom.development.js" crossorigin></script>
+                    <script type="module" src=\'components/utils/TypeAheadSearch.js\'></script>'
+            ]
+        );
+
+        $this->template->parse('CONTENTS', 'ItemList');
         $this->parsePage();
     }
 

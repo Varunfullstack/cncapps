@@ -14,6 +14,8 @@ require_once($cfg['path_dbe'] . '/DBEStockcat.inc.php');
 // Actions
 class CTItemType extends CTCNC
 {
+    const SEARCH_BY_DESCRIPTION = "SEARCH_BY_DESCRIPTION";
+
     function __construct($requestMethod,
                          $postVars,
                          $getVars,
@@ -177,6 +179,20 @@ class CTItemType extends CTCNC
                     ];
                 }
                 echo json_encode($data, JSON_NUMERIC_CHECK);
+                break;
+            case self::SEARCH_BY_DESCRIPTION:
+                $data = $this->getJSONData();
+                $description = "";
+                if (!empty($data['description'])) {
+                    $description = $data['description'];
+                }
+                $DBEItemTypes = new DBEItemType($this);
+                $DBEItemTypes->getRowsByDescription($description);
+                $toReturnData = [];
+                while ($DBEItemTypes->fetchNext()) {
+                    $toReturnData[] = $DBEItemTypes->getRowAsAssocArray();
+                }
+                echo json_encode(["status" => "ok", "data" => $toReturnData]);
                 break;
             case 'displayForm':
             default:

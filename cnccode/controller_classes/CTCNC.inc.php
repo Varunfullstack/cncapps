@@ -406,7 +406,7 @@ class CTCNC extends Controller
 
 
         if ($this->hasPermissions(SALES_PERMISSION)) {
-            $menu->addSection("Sales", 'fa-tag', $this->getDefaultSalesMenu());            
+            $menu->addSection("Sales", 'fa-tag', $this->getDefaultSalesMenu());
             $this->addConditionalMenu(
                 $menu,
                 'fa-tag',
@@ -416,7 +416,7 @@ class CTCNC extends Controller
                 "StreamOne Licenses",
                 "CustomerLicenses.php?action=searchCustomers"
             );
-            
+
             // [
             //     "id"    => 312,
             //     "label" => "StreamOne Licenses",
@@ -813,7 +813,7 @@ class CTCNC extends Controller
                 "label" => "Quote Templates",
                 "href"  => "QuoteTemplates.php",
             ],
-            
+
             // [
             //     "id"    => 313,
             //     "label" => "TechData Orders",
@@ -1047,6 +1047,11 @@ class CTCNC extends Controller
                 "href"  => "ItemType.php",
             ],
             [
+                "id"    => 812,
+                "label" => "Items",
+                "href"  => "Item.php"
+            ],
+            [
                 "id"    => 806,
                 "label" => "Standard Text",
                 "href"  => "StandardText.php",
@@ -1222,5 +1227,5 @@ class CTCNC extends Controller
         }
         echo $js_code;
     }
-    
+
 }
