@@ -967,6 +967,11 @@ table.cell-padding-1 th, table.cell-padding-1 td {
 .createPOColumn div {
     width: 80px;
 }
+
 .sortableTable input[type="number"] {
     width: 47px;
+}
+
+#itemListTable th {
+    padding-left: 2px;
 }

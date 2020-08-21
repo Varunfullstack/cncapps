@@ -28,7 +28,7 @@
         }
     };
     document.addEventListener('DOMContentLoaded', ($event) => {
-        const tableElement = document.getElementById('example');
+        const tableElement = document.getElementById('itemListTable');
         const header = tableElement.querySelector('thead');
         const clonedHeaderRow = header.querySelector('tr').cloneNode(true);
         header.appendChild(clonedHeaderRow);
@@ -36,14 +36,15 @@
 
         clonedHeaderRow.querySelectorAll('th').forEach((th, key) => {
             const data = th.dataset;
+            th.innerHTML = '';
             if (!data.searchable) {
                 return;
             }
 
-            th.innerHTML = '';
             switch (data.searchType) {
                 case 'filterAsYouType': {
                     const input = document.createElement('input');
+                    input.style.width = '100%';
                     input.addEventListener('keyup', debounce(($event) => {
                         performSearch(input.value, key);
                     }, 300));
@@ -115,10 +116,11 @@
                     })
                     th.appendChild(selectElm);
                 }
+
             }
         });
 
-        table = $('#example').DataTable({
+        table = $('#itemListTable').DataTable({
             dom: "lrtip",
             serverSide: true,
             ajax: '?action=getData',
@@ -129,6 +131,7 @@
                 {
                     data: "description",
                     name: "description",
+                    width: '50px'
                     // render: function (data, type, row) {
                     // return "<a href='RenContract.php?action=edit&ID=" + row.contractID + "' target='_blank'>" + data + "</a>";
                     // }
@@ -183,20 +186,24 @@
         discontinuedDropdown.addEventListener('change', () => {
             performSearch(discontinuedDropdown.value, 8);
         })
+        performSearch('N', 8);
     })
-</script>º
+</script>
 <div>
     <label>
         <span>Discontinued Selector</span>
         <select id="discontinuedDropdown">
             <option value="">Show All</option>
-            <option value="N">Active</option>
+            <option value="N"
+                    selected
+            >Active
+            </option>
             <option value="Y">Discontinued</option>
         </select>
     </label>
 </div>
 <br/>
-<table id="example"
+<table id="itemListTable"
        class="display"
        style="width:100%"
 >
