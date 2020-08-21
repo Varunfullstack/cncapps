@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v4.4.0]
 ### Added
 - Issue 961 - Team Performance at the start of the month
 - Issue 971 - Ability to allocate Sales Requests to people
