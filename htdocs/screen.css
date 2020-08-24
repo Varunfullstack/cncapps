@@ -985,3 +985,7 @@ input::-webkit-inner-spin-button {
 input[type=number] {
     -moz-appearance: textfield;
 }
+
+#autocompleteItem .ui-autocomplete-input {
+    width: 300px;
+}
