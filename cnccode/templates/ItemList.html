@@ -34,6 +34,10 @@
         header.appendChild(clonedHeaderRow);
 
 
+        document.getElementById('createItemButton').addEventListener('click', () => {
+            open('?action=addItem', '_blank');
+        })
+
         clonedHeaderRow.querySelectorAll('th').forEach((th, key) => {
             const data = th.dataset;
             th.innerHTML = '';
@@ -190,6 +194,12 @@
     })
 </script>
 <div>
+    <button title="Create new item"
+            type="button"
+            id="createItemButton"
+    >
+        <i class="fal fa-plus"></i>
+    </button>
     <label>
         <span>Discontinued Selector</span>
         <select id="discontinuedDropdown">
