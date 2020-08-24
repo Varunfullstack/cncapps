@@ -88,7 +88,7 @@ class DBEJOrdline extends DBEOrdline
         if ($sortColumn) {
             $query .= " order by {$this->getDBColumnName($sortColumn)}";
         } else {
-            $query .= " order by {$this->getDBColumnName(self::sequenceNo)}";
+            $query .= " order by {$this->getDBColumnName(self::isRecurring)},  {$this->getDBColumnName(self::sequenceNo)}";
         }
         $this->setQueryString($query);
 

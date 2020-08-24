@@ -974,3 +974,14 @@ table.cell-padding-1 th, table.cell-padding-1 td {
 #itemListTable .typeahead-input {
     width: 180px;
 }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
