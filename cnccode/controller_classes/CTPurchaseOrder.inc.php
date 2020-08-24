@@ -694,7 +694,6 @@ class CTPurchaseOrder extends CTCNC
                 'PurchaseOrderLineEditJS'  => 'PurchaseOrderLineEditJS.inc',
                 'PurchaseOrderHeadDisplay' => 'PurchaseOrderHeadDisplay.inc',
                 'SalesOrderLineIcons'      => 'SalesOrderLineIcons.inc',
-                'AddFirstLineIcon'         => 'AddFirstLineIcon.inc'
             )
         );
         // if there is a sales order then display the delivery details etc
@@ -851,26 +850,6 @@ class CTPurchaseOrder extends CTCNC
             $this->template->parse(
                 'payMethods',
                 'payMethodBlock',
-                true
-            );
-        }
-        if ($dsPorline->rowCount() == 0) {                // no lines yet so need way of adding first
-            $urlAddLine =
-                Controller::buildLink(
-                    $_SERVER['PHP_SELF'],
-                    array(
-                        'action'     => CTPURCHASEORDER_ACT_ADD_ORDLINE,
-                        'porheadID'  => $porheadID,
-                        'sequenceNo' => (1)
-                    )
-                );
-            $this->template->set_var(
-                'urlAddLine',
-                $urlAddLine
-            );
-            $this->template->parse(
-                'salesOrderLineIcons',
-                'AddFirstLineIcon',
                 true
             );
         }
@@ -1120,10 +1099,6 @@ class CTPurchaseOrder extends CTCNC
             return;
         }
 
-        if (!$this->getParam('sequenceNo')) {
-            $this->displayFatalError(CTPURCHASEORDER_MSG_SEQNO_NOT_PASSED);
-            return;
-        }
         if (!$this->formError) {
             if ($this->getAction() == CTPURCHASEORDER_ACT_EDIT_ORDLINE) {
                 if (!$this->buPurchaseOrder->getOrdlineByIDSeqNo(
@@ -1137,7 +1112,6 @@ class CTPurchaseOrder extends CTCNC
             } else {
                 $this->buPurchaseOrder->initialiseNewOrdline(
                     $this->getParam('porheadID'),
-                    $this->getParam('sequenceNo'),
                     $this->dsPorline
                 );
             }
@@ -1343,20 +1317,24 @@ class CTPurchaseOrder extends CTCNC
      */
     function deleteOrderLine()
     {
-        $this->setMethodName('deleteOrderLine');
+
+        $data = $this->getJSONData();
+
+        if (empty($data['purchaseOrderHeadId'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException('Purchase Order Id required');
+        }
+        if (empty($data['sequenceNumber'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException('Sequence Number required');
+        }
+
+        $purchaseOrderHeadId = $data['purchaseOrderHeadId'];
+        $sequenceNumber = $data['sequenceNumber'];
+
         $this->buPurchaseOrder->deleteOrderLine(
-            $this->getParam('porheadID'),
-            $this->getParam('sequenceNo')
+            $purchaseOrderHeadId,
+            $sequenceNumber
         );
-        $urlNext =
-            Controller::buildLink(
-                $_SERVER['PHP_SELF'],
-                array(
-                    'porheadID' => $this->getParam('porheadID'),
-                    'action'    => CTCNC_ACT_DISPLAY_PO
-                )
-            );
-        header('Location: ' . $urlNext);
+        echo json_encode(["status" => "ok"]);
     }
 
     /**

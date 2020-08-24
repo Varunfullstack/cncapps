@@ -220,5 +220,23 @@ class DBEPorline extends DBEntity
         return $ret;
     }
 
+    function getNextSequenceForPurchaseOrder($purchaseOrderHeadId)
+    {
+        if (!($maxSequence = $this->getMaxSequenceForPurchaseOrder($purchaseOrderHeadId))) {
+            return 1;
+        }
+        return $maxSequence + 1;
+    }
+
+    function getMaxSequenceForPurchaseOrder($purchaseOrderHeadId)
+    {
+        global $db;
+        $escapedPurchaseOrderHeadId = mysqli_real_escape_string($db->link_id(), $purchaseOrderHeadId);
+        $query = "select max({$this->getDBColumnName(self::sequenceNo)}) as maxSequenceNumber from {$this->getTableName()} where {$this->getDBColumnName(self::porheadID)} = {$escapedPurchaseOrderHeadId}";
+        $db->query($query);
+        $db->next_record(MYSQLI_ASSOC);
+        return $db->Record['maxSequenceNumber'];
+    }
+
 
 }

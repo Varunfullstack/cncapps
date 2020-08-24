@@ -49,6 +49,9 @@
                 case 'filterAsYouType': {
                     const input = document.createElement('input');
                     input.style.width = '100%';
+                    if (data.searchWidth) {
+                        input.style.width = data.searchWidth;
+                    }
                     input.addEventListener('keyup', debounce(($event) => {
                         performSearch(input.value, key);
                     }, 300));
@@ -135,7 +138,6 @@
                 {
                     data: "description",
                     name: "description",
-                    width: '50px'
                     // render: function (data, type, row) {
                     // return "<a href='RenContract.php?action=edit&ID=" + row.contractID + "' target='_blank'>" + data + "</a>";
                     // }
@@ -147,6 +149,7 @@
                     name: "partNumber",
                 },
                 {
+                    width: "180px",
                     data: 'itemCategory',
                     name: 'itemCategory'
                 },
@@ -176,7 +179,7 @@
                 {
                     targets: [8, 9],
                     visible: false,
-                }
+                },
             ],
             createdRow: (row, data, displayNum) => {
                 const button = row.querySelector('.salesOrderButton');
@@ -198,7 +201,7 @@
             type="button"
             id="createItemButton"
     >
-        <i class="fal fa-plus"></i>
+        <i class="fal fa-plus fa-2x"></i>
     </button>
     <label>
         <span>Discontinued Selector</span>
@@ -221,19 +224,35 @@
     <tr>
         <th data-searchable="true"
             data-search-type="filterAsYouType"
+            data-search-width="350px"
         >Description
         </th>
-        <th>Cost Price</th>
-        <th>Sale Price</th>
+        <th>
+            <div style="width: 80px">
+
+                Cost Price
+            </div>
+        </th>
+        <th>
+            <div style="width: 80px">
+                Sale Price
+            </div>
+        </th>
         <th data-searchable="true"
             data-search-type="filterAsYouType"
-        >Part Number
+        >
+            <div style="width: 150px">
+                Part Number
+            </div>
         </th>
         <th data-searchable="true"
             data-search-type="autocomplete"
             data-autocomplete-url="/ItemType.php?action=SEARCH_BY_DESCRIPTION"
             data-autocomplete-term-field="description"
-        >Item Category
+        >
+            <div style="width: 180px">
+                Item Category
+            </div>
         </th>
         <th data-searchable="true"
             data-search-type="renewalTypeDropdown"

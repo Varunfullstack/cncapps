@@ -897,11 +897,6 @@ table.cell-padding-1 th, table.cell-padding-1 td {
     padding-left: 10px;
 }
 
-.typeahead-input {
-    width: 353px;
-}
-
-
 .wrapper {
     position: relative;
     display: inline-block;
@@ -920,7 +915,7 @@ table.cell-padding-1 th, table.cell-padding-1 td {
 }
 
 .newLine input[type="number"] {
-    width: 47px;
+    width: 60px;
 }
 
 .salesOrderButton {
@@ -974,4 +969,8 @@ table.cell-padding-1 th, table.cell-padding-1 td {
 
 #itemListTable th {
     padding-left: 2px;
+}
+
+#itemListTable .typeahead-input {
+    width: 180px;
 }

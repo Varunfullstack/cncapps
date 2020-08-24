@@ -2103,7 +2103,7 @@ class BUSalesOrder extends Business
 
 
         $this->renderLines($buPDF, 'One Off', $oneOffLines);
-        $this->renderLines($buPDF, 'Ongoing', $recurringLines);
+        $this->renderLines($buPDF, 'Recurring', $recurringLines);
 
         $buPDF->CR();
         $buPDF->CR();

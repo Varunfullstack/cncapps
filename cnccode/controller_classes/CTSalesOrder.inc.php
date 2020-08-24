@@ -3519,7 +3519,7 @@ class CTSalesOrder extends CTCNC
             }
         }
         $this->renderManualOrderLine($buPDF, 'One Off', $oneOffLines);
-        $this->renderManualOrderLine($buPDF, 'Ongoing', $ongoingLines);
+        $this->renderManualOrderLine($buPDF, 'Recurring', $ongoingLines);
 
 
         $buPDF->CR();

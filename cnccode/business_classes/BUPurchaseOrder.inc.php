@@ -109,37 +109,6 @@ class BUPurchaseOrder extends Business
     /*
     * Create new purchase order against given sales order/supplier
     */
-    function createNewPO($ordheadID,
-                         $supplierID,
-                         $userID
-    )
-    {
-        $dsOrdhead = &$this->dsOrdhead;
-        $dsSupplier = &$this->dsSupplier;
-        $this->setMethodName('createNewPO');
-        if ($ordheadID == '') {
-            $this->raiseError('ordheadID not passed');
-        }
-        if ($userID == '') {
-            $this->raiseError('userID not passed');
-        }
-        if ($supplierID == '') {
-            $this->raiseError('supplierID not passed');
-        }
-        $buSalesOrder = new BUSalesOrder($this);
-        if (!$buSalesOrder->getOrdheadByID(
-            $ordheadID,
-            $dsOrdhead
-        )) {
-            $this->raiseError('sales order not found');
-        }
-        $buSupplier = new BUSupplier($this);
-        $buSupplier->getSupplierByID(
-            $supplierID,
-            $dsSupplier
-        );
-        return ($this->insertPOHeader($userID));
-    }
 
     function insertPOHeader($userID,
                             DateTime $requiredByDate = null
@@ -265,6 +234,38 @@ class BUPurchaseOrder extends Business
         );
 
         $dbePorline->insertRow();
+    }
+
+    function createNewPO($ordheadID,
+                         $supplierID,
+                         $userID
+    )
+    {
+        $dsOrdhead = &$this->dsOrdhead;
+        $dsSupplier = &$this->dsSupplier;
+        $this->setMethodName('createNewPO');
+        if ($ordheadID == '') {
+            $this->raiseError('ordheadID not passed');
+        }
+        if ($userID == '') {
+            $this->raiseError('userID not passed');
+        }
+        if ($supplierID == '') {
+            $this->raiseError('supplierID not passed');
+        }
+        $buSalesOrder = new BUSalesOrder($this);
+        if (!$buSalesOrder->getOrdheadByID(
+            $ordheadID,
+            $dsOrdhead
+        )) {
+            $this->raiseError('sales order not found');
+        }
+        $buSupplier = new BUSupplier($this);
+        $buSupplier->getSupplierByID(
+            $supplierID,
+            $dsSupplier
+        );
+        return ($this->insertPOHeader($userID));
     }
 
     function search(
@@ -408,16 +409,12 @@ class BUPurchaseOrder extends Business
      * @param $dsPorline
      */
     function initialiseNewOrdline($porheadID,
-                                  $sequenceNo,
                                   &$dsPorline
     )
     {
         $this->setMethodName('initialiseNewOrdline');
         if ($porheadID == '') {
             $this->raiseError('porheadID not passed');
-        }
-        if ($sequenceNo == '') {
-            $this->raiseError('sequenceNo not passed');
         }
         $dbeJPorline = new DBEJPorline($this);
         $dsPorline = new DSForm($this);
@@ -434,7 +431,7 @@ class BUPurchaseOrder extends Business
         );
         $dsPorline->setValue(
             DBEJPorline::sequenceNo,
-            $sequenceNo
+            $dbeJPorline->getNextSequenceForPurchaseOrder($porheadID)
         );
         $dsPorline->setValue(
             DBEJPorline::qtyOrdered,
