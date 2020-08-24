@@ -1,0 +1,11 @@
+{% extends "@internal/wrapper.html.twig" %}
+{% block content %}
+    These licenses in StreamOne do not match up with the customer contracts:
+    <ul>
+        {% for item in items %}
+            <li>
+                {{ item }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

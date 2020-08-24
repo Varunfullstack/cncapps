@@ -208,7 +208,7 @@ class DBEItem extends DBCNCEntity
 
         if ($search) {
             $queryString .=
-                " AND MATCH (item.itm_desc, item.itm_unit_of_sale)
+                " AND MATCH (item.itm_desc, notes, item.itm_unit_of_sale)
 				AGAINST ('" . mysqli_real_escape_string(
                     $this->db->link_id(),
                     $search

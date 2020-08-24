@@ -5,6 +5,7 @@
  * Date: 20/07/2020
  */
 
+use CNCLTD\Exceptions\MissingLicenseException;
 use CNCLTD\LoggerCLI;
 
 require_once(__DIR__ . "/../htdocs/config.inc.php");
@@ -276,7 +277,7 @@ foreach ($allSubscriptions as $item) {
     }
 }
 
-$logger->info("Loading all subscriptions and there addOns from streamOne.....");
+$logger->info("Loading all subscriptions and related addOns from streamOne.....");
 $orderDetails = $buStreamOneApi->getProductsDetails($orderIds, 40);
 
 /**
@@ -287,7 +288,7 @@ $orderDetails = $buStreamOneApi->getProductsDetails($orderIds, 40);
  * @param $licenseStatus
  * @param $forcedMode
  * @param $licenseEmail
- * @throws Exception
+ * @throws Exception|MissingLicenseException
  */
 function updateContracts($cncItems,
                          $sku,
@@ -312,7 +313,7 @@ function updateContracts($cncItems,
     $itemId = getItemId($cncItems, $sku);
     if (!$itemId) {
         if ($licenseStatus == 'active') {
-            throw new Exception(
+            throw new MissingLicenseException(
                 "Customer {$customerName}({$customerId}) {$licenseEmail}  does not have license for SKU {$sku} in CNCAPPS"
             );
         }
@@ -328,7 +329,7 @@ function updateContracts($cncItems,
     $temp = $db->fetchAll();
     if (empty($temp)) {
         if ($licenseStatus == 'active') {
-            throw new Exception(
+            throw new MissingLicenseException(
                 "Customer {$customerName}({$customerId}) {$licenseEmail}  does not have license for SKU {$sku} in CNCAPPS"
             );
         }
@@ -389,6 +390,8 @@ $updatedItemsAddOns = 0;
 $subscription = null;
 $logger->info("All subscriptions number :" . count($allSubscriptions));
 
+$missingLicensesErrors = [];
+
 //get all customer subscriptions
 foreach ($allSubscriptions as $item) {
     foreach ($item as $key => $subscription) {
@@ -404,9 +407,57 @@ foreach ($allSubscriptions as $item) {
                 $subscription->endCustomerEmail
             );
         } catch (Exception $exception) {
+            if ($exception instanceof MissingLicenseException) {
+                $missingLicensesErrors[] = $exception;
+            }
             $logger->error($exception->getMessage());
         }
     }
+}
+
+if (!empty($missingLicensesErrors)) {
+    $buMail = new BUMail($thing);
+    $senderEmail = CONFIG_SUPPORT_EMAIL;
+    $toEmail = CONFIG_SALES_EMAIL;
+    $hdrs = array(
+        'From'         => $senderEmail,
+        'To'           => $toEmail,
+        'Subject'      => 'StreamOne licenses not listed for customers',
+        'Date'         => date("r"),
+        'Content-Type' => 'text/html; charset=UTF-8'
+    );
+
+    global $twig;
+    $html = $twig->render(
+        '@internal/streamOneMissingLicensesEmail.html.twig',
+        [
+            "items" => array_map(
+                function (MissingLicenseException $licenseError) {
+                    return $licenseError->getMessage();
+                },
+                $missingLicensesErrors
+            )
+        ]
+    );
+    $buMail->mime->setHTMLBody($html);
+
+    $mime_params = array(
+        'text_encoding' => '7bit',
+        'text_charset'  => 'UTF-8',
+        'html_charset'  => 'UTF-8',
+        'head_charset'  => 'UTF-8'
+    );
+
+    $body = $buMail->mime->get($mime_params);
+
+    $hdrs = $buMail->mime->headers($hdrs);
+
+    $buMail->putInQueue(
+        $senderEmail,
+        $toEmail,
+        $hdrs,
+        $body
+    );
 }
 
 $logger->info('updated customers items  ' . $updatedItems);
@@ -455,6 +506,9 @@ function syncAddons($orderDetails, $cncItems, $forcedMode, LoggerCLI $logger)
                 $addOn->email
             );
         } catch (\Exception $exception) {
+            if ($exception instanceof MissingLicenseException) {
+                $missingLicensesErrors[] = $exception;
+            }
             $logger->error($exception->getMessage());
         }
     }

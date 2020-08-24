@@ -17,6 +17,7 @@ require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg ['path_dbe'] . '/DSForm.inc.php');
 require_once($cfg ['path_dbe'] . '/DBECustomer.inc.php');
 require_once($cfg ['path_dbe'] . '/DBEItem.inc.php');
+require_once($cfg ['path_dbe'] . '/DBECustomerItem.inc.php');
 require_once($cfg ['path_dbe'] . '/DBEStreamOneCustomers.inc.php');
 
 require_once($cfg['path_bu'] . '/BUTechDataApi.inc.php');
@@ -133,7 +134,6 @@ class CTSCustomerLicenses extends CTCNC
             case "checkLicenseExistAtCNC":
                 echo $this->checkLicenseExistAtCNC();
                 exit;
-                break;
             default:
                 $this->setTemplate();
         }
@@ -334,24 +334,17 @@ class CTSCustomerLicenses extends CTCNC
             $custId = $dbeCustomer->getPKValue();
             if ($custId) {
                 // get item no by sku
-
-                $db->query(" SELECT  `itm_itemno` FROM item WHERE `itm_unit_of_sale`='$sku' OR  `partNoOld` ='$sku'");
-                $result = $db->fetchAll(MYSQLI_ASSOC);
-                $itemId = null;
-                if (count($result) > 0 && $result[0]["itm_itemno"] > 0)
-                    $itemId = $result[0]["itm_itemno"];
-                if ($itemId) {
-                    // check custItem
-                    $db->query(
-                        "select count(*) total from custitem where cui_custno = $custId and cui_itemno = $itemId "
-                    );
-                    $result = $db->fetchAll(MYSQLI_ASSOC);
-                    if (count($result) > 0 && $result[0]["total"] > 0)
+                $dbeItem = new DBEItem($this);
+                $dbeItem->getItemsByPartNoOrOldPartNo($sku);
+                if ($dbeItem->fetchNext()) {
+                    $itemId = $dbeItem->getPKValue();
+                    $customerItem = new DBECustomerItem($this);
+                    $count = $customerItem->getCountByCustomerAndItemID($custId, $itemId);
+                    if ($count) {
                         return json_encode(["status" => true, "custId" => $custId, "itemId" => $itemId]);
-
+                    }
+                    return json_encode(["status" => false, "custId" => $custId, "itemId" => $itemId]);
                 }
-                return json_encode(["status" => false, "custId" => $custId, "itemId" => $itemId]);
-
             }
         }
         return json_encode(["status" => false]);
