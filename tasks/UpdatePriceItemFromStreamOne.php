@@ -159,8 +159,9 @@ if ($allCustomers->Result == "Success") {
         //"totalRecords":457,"totalPages":23,"page":1,"recordsPerPage":20,"subscriptions":
         $totalPages = $firstSubscription->BodyText->totalPages;
         $pages = array();
-        for ($i = 2; $i < $totalPages; $i++)
+        for ($i = 2; $i <= $totalPages; $i++) {
             array_push($pages, $i);
+        }
 
         $subscriptions = $firstSubscription->BodyText->subscriptions;
         $allSubscriptions = array_merge($allSubscriptions, $subscriptions);
@@ -288,7 +289,9 @@ $orderDetails = $buStreamOneApi->getProductsDetails($orderIds, 40);
  * @param $licenseStatus
  * @param $forcedMode
  * @param $licenseEmail
- * @throws Exception|MissingLicenseException
+ * @param LoggerCLI $loggerCLI
+ * @throws MissingLicenseException
+ * @throws Exception
  */
 function updateContracts($cncItems,
                          $sku,
@@ -296,9 +299,13 @@ function updateContracts($cncItems,
                          $unitPrice,
                          $licenseStatus,
                          $forcedMode,
-                         $licenseEmail
+                         $licenseEmail,
+                         LoggerCLI $loggerCLI
 )
 {
+    $loggerCLI->info(
+        "Attempting to update licenses for {$sku} and email {$licenseEmail} with {$units} and status {$licenseStatus}"
+    );
     $customer = getCustomerFromLicenseEmail($licenseEmail);
 
     if (!$customer) {
@@ -373,6 +380,10 @@ function updateContracts($cncItems,
                             and cui_itemno = ?",
             $params
         );
+
+        $loggerCLI->notice(
+            "Customer {$customerName} licenses for {$sku} have been changed from {$temp[0]["units"]} to {$units} "
+        );
     }
     if ($licenseStatus == "inactive") {
         $db->query(
@@ -380,6 +391,7 @@ function updateContracts($cncItems,
                                     cui_custno= $customerId
                                     and cui_itemno=  $itemId"
         );
+        $loggerCLI->notice("Customer {$customerName} licenses for {$sku} have been changed to inactive");
     }
 }
 
@@ -404,7 +416,8 @@ foreach ($allSubscriptions as $item) {
                 $subscription->unitPrice,
                 $subscription->lineStatus,
                 $forcedMode,
-                $subscription->endCustomerEmail
+                $subscription->endCustomerEmail,
+                $logger
             );
         } catch (Exception $exception) {
             if ($exception instanceof MissingLicenseException) {
@@ -503,7 +516,8 @@ function syncAddons($orderDetails, $cncItems, $forcedMode, LoggerCLI $logger)
                 $addOn->unitPrice,
                 $addOn->addOnStatus,
                 $forcedMode,
-                $addOn->email
+                $addOn->email,
+                $logger
             );
         } catch (\Exception $exception) {
             if ($exception instanceof MissingLicenseException) {
