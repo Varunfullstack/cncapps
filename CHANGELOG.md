@@ -1,16 +1,13 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
-### Added
-- Issue 965 - StreamOne missing license email notification addition
-
 ## [v4.4.0]
 ### Added
 - Issue 961 - Team Performance at the start of the month
 - Issue 971 - Ability to allocate Sales Requests to people
 - Issue 901 - Webroot API for Billing and Reporting
 - Issue 521 - Split up renewal items from quotes
+- Issue 965 - StreamOne missing license email notification addition
 ### Changed
 - Issue 964 - Make Office 365 Backup unit numbers field read only because it's linked to an API
 - Issue 899 - Link dependant Sales Items
