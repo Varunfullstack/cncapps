@@ -14,6 +14,7 @@ This project changes will be shown here.
 - Issue 979 - Purchase Order Date Formatting
 - Issue 974 - New Method to edit Items
 - Issue 988 - Rename 7 Dayers
+- Issue 994 - "Please reply above the line" text in SR emails to customers
 ### Fixed
 - Issue 968 - Clear Special Attention Status Once Expired
 - Issue 970 - StreamOne Page Permissions
