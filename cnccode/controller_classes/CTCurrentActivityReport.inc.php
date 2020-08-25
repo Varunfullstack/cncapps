@@ -207,121 +207,13 @@ class CTCurrentActivityReport extends CTCNC
         $queueOptions = [
             '<option>-</option>',
         ];
-/*
-        if ($queueNo != 1) {
-            $queueOptions[] = '<option value="1">H</option>';
-        }
 
-        if ($queueNo != 2) {
-            $queueOptions[] = '<option value="2">E</option>';
-        }
-
-        if ($queueNo != 3) {
-            $queueOptions[] = '<option value="3">SP</option>';
-        }
-
-        if ($queueNo != 5) {
-            $queueOptions[] = '<option value="5">P</option>';
-        }
-
-        if ($queueNo != 4) {
-            $queueOptions[] = '<option value="4">S</option>';
-        }
-
-        $blockName = 'queue' . $queueNo . 'Block';
-       */
-        // $this->template->set_block(
-        //     'CurrentActivityReport',
-        //     $blockName,
-        //     'requests' . $queueNo
-        // );
         $result=array();
         $rowCount = 0;
         $buHeader = new BUHeader($this);
         $buHeader->getHeader($dsHeader);
-        while ($serviceRequests->fetchNext()) {
-            
-            $totalActivityDurationHours = $serviceRequests->getValue(DBEJProblem::totalActivityDurationHours);
-            $totalActivityDurationMinutes = $totalActivityDurationHours * 60;
-            $timeSpentColorClass = null;
-            $compareMinutes = null;
-          
-            if (in_array($queueNo, [1, 2, 3, 7])) {
-
-                switch ($serviceRequests->getValue(DBEJCallActivity::queueNo)) {
-                    case 1:
-                        $compareMinutes = $dsHeader->getValue(DBEHeader::hdTeamManagementTimeApprovalMinutes);
-                        break;
-                    case 2:
-                        $compareMinutes = $dsHeader->getValue(DBEHeader::esTeamManagementTimeApprovalMinutes);
-                        break;
-                    case 3:
-                        $compareMinutes = $dsHeader->getValue(
-                            DBEHeader::smallProjectsTeamManagementTimeApprovalMinutes
-                        );
-                }
-                $timeSpentColorClass = $totalActivityDurationMinutes >= $compareMinutes ? 'alert-field' : null;
-            }
-
-
-            $linkAllocateAdditionalTime = null;
-            $this->customerFilterList[$serviceRequests->getValue(DBEJProblem::customerID)] = $serviceRequests->getValue(
-                DBEJProblem::customerName
-            );
-            /*
-            if (!in_array($serviceRequests->getValue(DBEJProblem::priority), $this->getSessionParam('priorityFilter'))
-            ) {
-                continue;
-            }
-*/
-/*
-Filter by selected customer
-            if ($this->getSessionParam('selectedCustomerID') && $this->getSessionParam(
-                    'selectedCustomerID'
-                ) != $serviceRequests->getValue(
-                    DBEJProblem::customerID
-                )) {
-                continue;
-            }
-*/
-
-/*
-fileter by user
-            if ($this->getSessionParam('selectedUserID') &&
-                $serviceRequests->getValue(DBEJProblem::userID) &&
-                $this->getSessionParam(
-                    'selectedUserID'
-                ) != $serviceRequests->getValue(
-                    DBEJProblem::userID
-                )) {
-                continue;
-            }
-*/
+        while ($serviceRequests->fetchNext()) {            
             $rowCount++;
-
-            $urlViewActivity =
-                Controller::buildLink(
-                    'Activity.php',
-                    array(
-                        'action'    => 'displayLastActivity',
-                        'problemID' => $serviceRequests->getValue(DBEJProblem::problemID)
-                    )
-                );
-
-            if ($this->loggedInUserIsSdManager) {
-
-                $urlAllocateAdditionalTime =
-                    Controller::buildLink(
-                        'Activity.php',
-                        array(
-                            'action'    => 'allocateAdditionalTime',
-                            'problemID' => $serviceRequests->getValue(DBEJProblem::problemID)
-                        )
-                    );
-
-                $linkAllocateAdditionalTime = '<a href="' . $urlAllocateAdditionalTime . '" title="Allocate additional time"><img src="/images/clock.png" width="20px" alt="time">';
-            }
-
             $bgColour = $this->getResponseColour(
                 $serviceRequests->getValue(DBEJProblem::status),
                 $serviceRequests->getValue(DBEJProblem::priority),
@@ -329,18 +221,7 @@ fileter by user
                 $serviceRequests->getValue(DBEJProblem::workingHours),
                 $serviceRequests->getValue(DBEJProblem::respondedHours)
             );
-            /*
-            Updated by another user?
-            */
-            if (
-                $serviceRequests->getValue(DBEJProblem::userID) &&
-                $serviceRequests->getValue(DBEJProblem::userID) != $serviceRequests->getValue(DBEJProblem::lastUserID)
-            ) {
-                $updatedBgColor = self::PURPLE;
-            } else {
-                $updatedBgColor = self::CONTENT;
-            }
-
+         
             if ($serviceRequests->getValue(DBEJProblem::respondedHours) == 0 && $serviceRequests->getValue(
                     DBEJProblem::status
                 ) == 'I') {
@@ -353,69 +234,12 @@ fileter by user
             } else {
                 $hoursRemainingBgColor = self::BLUE;
             }
-            /* ------------------------------ */
-
-            $urlCustomer = Controller::buildLink(
-                'Customer.php',
-                array(
-                    'action'     => 'dispEdit',
-                    'customerID' => $serviceRequests->getValue(DBEJProblem::customerID)
-                )
-            );
-            $alarmDateTimeDisplay = null;
-            if ($serviceRequests->getValue(DBEProblem::alarmDate)) {
-                $alarmDateTimeDisplay =  
-                        $serviceRequests->getValue(DBEProblem::alarmDate)
-                     . ' ' . $serviceRequests->getValue(DBEProblem::alarmTime);
-
-                /*
-                Has an alarm date that is in the past, set updated BG Colour (indicates moved back into work queue from future queue)
-                */
-                if ($serviceRequests->getValue(DBEJProblem::alarmDate) <= date(DATE_MYSQL_DATE)) {
-                    $updatedBgColor = self::PURPLE;
-                }
-
-            }
-            /*
-            If the dashboard is filtered by customer then the Work button opens
-            Activity edit
-            */
-            //we don't need this part
+    
+             
             if ($serviceRequests->getValue(DBEJProblem::lastCallActTypeID) == null) {
                 $workBgColor = self::GREEN; // green = in progress
-                $workOnClick = "alert( 'Another user is currently working on this SR' ); return false";
             } else {
-                $workBgColor = self::CONTENT;
-                if ($this->getSessionParam('selectedCustomerID')) {
-                    $urlWork =
-                        Controller::buildLink(
-                            'Activity.php',
-                            array(
-                                'action'         => 'createFollowOnActivity',
-                                'callActivityID' => $serviceRequests->getValue(DBEJProblem::callActivityID)
-                            )
-
-                        );
-
-                    $workOnClick = "if(confirm('Are you sure you want to start work on this SR? It will be automatically allocated to you UNLESS it is already allocated')) document.location='" . $urlWork . "'";
-                } else {
-
-                    /*
-                    If the dashboard is not filtered by customer then the Work button filters by
-                    this customer
-                    */
-                    $urlWork =
-                        Controller::buildLink(
-                            'CurrentActivityReport.php',
-                            array(
-                                'action'             => 'setFilter',
-                                'selectedCustomerID' => $serviceRequests->getValue(DBEJProblem::customerID),
-                                'selectedUserID'     => null
-                            )
-                        );
-
-                    $workOnClick = "if(confirm('Filter all SRs by this customer in preparation to start work')) document.location='" . $urlWork . "'";
-                }
+                $workBgColor = self::CONTENT;                
             }
 
             if ($serviceRequests->getValue(DBEJProblem::priority) == 1) {
@@ -467,13 +291,13 @@ fileter by user
 
                 array(
                     'queueOptions'               => implode($queueOptions),
-                    'workOnClick'                => $workOnClick,
+                    //'workOnClick'                => $workOnClick,
                     'hoursRemaining'             => $hoursRemaining,
-                    'updatedBgColor'             => $updatedBgColor,
+                    //'updatedBgColor'             => $updatedBgColor,
                     'priorityBgColor'            => $priorityBgColor,
                     'hoursRemainingBgColor'      => $hoursRemainingBgColor,
-                    'totalActivityDurationHours' => $totalActivityDurationHours,
-                    'timeSpentColorClass'        => $timeSpentColorClass,
+                    //'totalActivityDurationHours' => $totalActivityDurationHours,
+                    //'timeSpentColorClass'        => $timeSpentColorClass,
                     'hdRemaining'                => $hdRemaining,
                     'esRemaining'                => $esRemaining,
                     'smallProjectsTeamRemaining' => $smallProjectsTeamRemaining,
@@ -482,7 +306,7 @@ fileter by user
                     'esColor'                    => $this->pickColor($esRemaining),
                     'smallProjectsTeamColor'     => $this->pickColor($smallProjectsTeamRemaining),
                     'projectTeamColor'           => $this->pickColor($projectTeamRemaining),
-                    'urlCustomer'                => $urlCustomer,
+                    //'urlCustomer'                => $urlCustomer,
                     'time'                       => $serviceRequests->getValue(DBEJProblem::lastStartTime),
                     'date'                       => Controller::dateYMDtoDMY(
                         $serviceRequests->getValue(DBEJProblem::lastDate)
@@ -509,8 +333,8 @@ fileter by user
                         $serviceRequests->getValue(DBEJProblem::specialAttentionEndDate),
                         $serviceRequests->getValue(DBEJProblem::specialAttentionContactFlag)
                     ),
-                    'urlViewActivity'            => $urlViewActivity,
-                    'linkAllocateAdditionalTime' => $linkAllocateAdditionalTime,
+                    //'urlViewActivity'            => $urlViewActivity,
+                    //'linkAllocateAdditionalTime' => $linkAllocateAdditionalTime,
                     'slaResponseHours'           => number_format(
                         $serviceRequests->getValue(DBEJProblem::slaResponseHours),
                         1
@@ -518,7 +342,7 @@ fileter by user
                     'priority'                   => Controller::htmlDisplayText(
                         $serviceRequests->getValue(DBEJProblem::priority)
                     ),
-                    'alarmDateTime'              => $alarmDateTimeDisplay,
+                    //'alarmDateTime'              => $alarmDateTimeDisplay,
                     'bgColour'                   => $bgColour,
                     'workBgColor'                => $workBgColor,
                     'workHidden'                 => $hideWork ? 'hidden' : null,
@@ -527,10 +351,6 @@ fileter by user
                     'customerID'               => $serviceRequests->getValue(DBEJProblem::customerID),
                  )
             );
-
-            
-
-
         } // end while
         return $result;
         $this->template->set_var(

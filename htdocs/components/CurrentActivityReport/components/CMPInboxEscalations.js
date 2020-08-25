@@ -293,6 +293,7 @@ class CMPInboxEscalations extends React.Component {
         sortable: false,
         hdClassName: "text-center",
         className: "text-center",
+        backgroundColorColumn:"priorityBgColor"
       },
 
       // {

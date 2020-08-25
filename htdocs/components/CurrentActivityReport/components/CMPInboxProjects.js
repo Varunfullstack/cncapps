@@ -293,6 +293,8 @@ class CMPInboxProjects extends React.Component {
         sortable: false,
         hdClassName: "text-center",
         className: "text-center",
+        backgroundColorColumn:"priorityBgColor"
+
       },
 
       // {
