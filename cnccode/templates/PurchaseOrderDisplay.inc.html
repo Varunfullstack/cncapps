@@ -216,7 +216,7 @@
         checkValidity();
 
         document.getElementById('addNewRowButton').addEventListener('click', $event => {
-            open('https://cncdev.cnc-ltd.co.uk/PurchaseOrder.php?action=addOrdline&porheadID=56026', '_blank');
+            open('/PurchaseOrder.php?action=addOrdline&porheadID=' + getPurchaseOrderId(), '_blank');
         })
 
         const deleteLineButtons = document.querySelectorAll('button.deleteLineButton');
