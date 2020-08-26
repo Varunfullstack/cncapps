@@ -63,6 +63,7 @@ class CTItem extends CTCNC
     const CHECK_ITEM_RECURRING = "CHECK_ITEM_RECURRING";
     const DATA_TABLE_GET_DATA = "DATA_TABLE_GET_DATA";
     const SEARCH_ITEMS_JSON = "SEARCH_ITEMS_JSON";
+    const GET_ITEM = 'GET_ITEM';
     /** @var DSForm */
     public $dsItem;
     /**
@@ -169,6 +170,21 @@ class CTItem extends CTCNC
                 }
                 echo json_encode(["status" => "ok", "data" => $rows]);
 
+                break;
+            case self::GET_ITEM:
+                if (!$this->getParam('itemId')) {
+                    throw new JsonHttpException(400, 'Item Id is mandatory');
+                }
+                $dbeItem = new DBEItem($this);
+                if (!$dbeItem->getRow($this->getParam('itemId'))) {
+                    throw new JsonHttpException(404, 'Item Not Found');
+                }
+                echo json_encode(
+                    [
+                        "status" => "ok",
+                        "data"   => $dbeItem->getRowAsAssocArray(),
+                    ]
+                );
                 break;
             case self::SEARCH_ITEMS_JSON:
                 $data = self::getJSONData();
