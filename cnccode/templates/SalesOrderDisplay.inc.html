@@ -141,11 +141,21 @@
         window.toDate = $('#toDate').get(0);
 
         function updateSequenceNumbers(items, fromSequenceNo, toSequenceNo) {
+            if (!items.length) {
+                return;
+            }
             let lowerBound = fromSequenceNo;
             let upperBound = toSequenceNo;
             if (lowerBound > upperBound) {
                 upperBound = fromSequenceNo;
                 lowerBound = toSequenceNo;
+            }
+
+            if (upperBound > items.length) {
+                upperBound = items.length;
+            }
+            if (lowerBound < 0) {
+                lowerBound = 0;
             }
 
             for (let i = lowerBound - 1; i < upperBound; i++) {
@@ -378,7 +388,7 @@
                             if (response.status !== 'ok') {
                                 throw new Error(response.message);
                             }
-                            debugger;
+
                             updateUpdatedTimeInput(response.updatedTime);
                             getSelectedHTMLRows().forEach(row => {
                                 deleteRowAndUpdate(row);
@@ -533,7 +543,6 @@
             )
                 .then(r => r.json())
                 .then(response => {
-                    debugger;
                     if (response.status !== 'ok') {
                         throw new Error(response.message);
                     }
@@ -940,6 +949,7 @@
         <tfoot>
         <tr>
             <td>&nbsp;</td>
+            <td>&nbsp;</td>
             <td class="orderTotalItem">&nbsp;</td>
             <td class="orderTotalItem">
                 <DIV align="left"> Totals</DIV>
@@ -969,6 +979,9 @@
 
 
         <tr>
+            <td class="listHeadText">
+                <div> &nbsp;</div>
+            </td>
             <td class="listHeadText toggleColumn">
                 <div>
                     <input type="checkbox"
@@ -1036,6 +1049,7 @@
         <tfoot>
         <tr>
             <td>&nbsp;</td>
+            <td>&nbsp;</td>
             <td class="orderTotalItem">&nbsp;</td>
             <td class="orderTotalItem">
                 <DIV align="left"> Totals</DIV>
@@ -1044,10 +1058,10 @@
             <td class="orderTotalItem">&nbsp;</td>
             <td class="orderTotalItem">&nbsp;</td>
             <td class="orderTotalItem">&nbsp;</td>
-            <td class="{recurringOrderTotalCostClass}">{recurringCurCostGrandTotal}</td>
+            <td class="{recurringOrderTotalCostClass} costGrandTotal">{recurringCurCostGrandTotal}</td>
             <td class="orderTotalItem">&nbsp;</td>
-            <td class="{recurringOrderTotalSaleClass}">{recurringCurSaleGrandTotal}</td>
-            <td class="{recurringOrderTotalProfitClass}">{recurringCurProfitGrandTotal}</td>
+            <td class="{recurringOrderTotalSaleClass} saleGrandTotal">{recurringCurSaleGrandTotal}</td>
+            <td class="{recurringOrderTotalProfitClass} profitAmountGrandTotal">{recurringCurProfitGrandTotal}</td>
             <td class="{recurringOrderTotalProfitClass}">{recurringPercProfitGrandTotal}</td>
             <td class="{orderTotalItem}">&nbsp;</td>
         </tr>
