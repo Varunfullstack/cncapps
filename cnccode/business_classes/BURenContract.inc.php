@@ -344,6 +344,10 @@ class BURenContract extends Business
                         'C'
                     );
                     $dbeOrdline->setValue(
+                        DBEOrdline::isRecurring,
+                        $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
+                    );
+                    $dbeOrdline->setValue(
                         DBEOrdline::renewalCustomerItemID,
                         null
                     );
@@ -400,6 +404,10 @@ class BURenContract extends Business
                 $buItem->getItemByID(
                     $dbeJCustomerItem->getValue(DBEJCustomerItem::itemID),
                     $dsItem
+                );
+                $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::stockcat,
@@ -470,6 +478,10 @@ class BURenContract extends Business
                         DBEJRenContract::invoiceToDate
                     );
                 $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
+                );
+                $dbeOrdline->setValue(
                     DBEOrdline::lineType,
                     'C'
                 );
@@ -535,6 +547,10 @@ class BURenContract extends Business
                     $dbeOrdline->setValue(
                         DBEOrdline::lineType,
                         'I'
+                    );
+                    $dbeOrdline->setValue(
+                        DBEOrdline::isRecurring,
+                        $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
                     );
                     $dbeOrdline->setValue(
                         DBEOrdline::ordheadID,
@@ -656,6 +672,10 @@ class BURenContract extends Business
                         $description .= ' ' . $dsLinkedItems->getValue(DBEJCustomerItem::serialNo);
                     }
 
+                    $dbeOrdline->setValue(
+                        DBEOrdline::isRecurring,
+                        $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
+                    );
                     $dbeOrdline->setValue(
                         DBEOrdline::description,
                         $description

@@ -391,6 +391,10 @@ class BURenQuotation extends Business
                     'C'
                 );
                 $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
+                );
+                $dbeOrdline->setValue(
                     DBEOrdline::renewalCustomerItemID,
                     null
                 );
@@ -466,6 +470,10 @@ class BURenQuotation extends Business
                     $this->dbeJRenQuotation->getValue(DBEJRenQuotation::customerItemID)
                 );
                 $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
+                );
+                $dbeOrdline->setValue(
                     DBEOrdline::ordheadID,
                     $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                 );
@@ -535,6 +543,10 @@ class BURenQuotation extends Business
                         0
                     );
                     $dbeOrdline->setValue(
+                        DBEOrdline::isRecurring,
+                        $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
+                    );
+                    $dbeOrdline->setValue(
                         DBEOrdline::ordheadID,
                         $dsOrdhead->getValue(DBEOrdhead::ordheadID)
                     );
@@ -599,6 +611,10 @@ class BURenQuotation extends Business
                 $dbeOrdline->setValue(
                     DBEOrdline::renewalCustomerItemID,
                     null
+                );
+                $dbeOrdline->setValue(
+                    DBEOrdline::isRecurring,
+                    $dbeJCustomerItem->getValue(DBEJCustomerItem::reoccurring)
                 );
                 $dbeOrdline->setValue(
                     DBEOrdline::ordheadID,

@@ -3,6 +3,7 @@
 * @authors Karim Ahmed
 * @access public
 */
+global $cfg;
 require_once($cfg["path_dbe"] . "/DBECustomerItem.inc.php");
 
 class DBEJCustomerItem extends DBECustomerItem
@@ -20,6 +21,7 @@ class DBEJCustomerItem extends DBECustomerItem
     const invoiceToDate = "invoiceToDate";
     const invoiceFromDateYMD = "invoiceFromDateYMD";
     const invoiceToDateYMD = "invoiceToDateYMD";
+    const reoccurring = "reocurring";
 
     /**
      * calls constructor()
@@ -105,6 +107,13 @@ class DBEJCustomerItem extends DBECustomerItem
             DA_DATE,
             DA_NOT_NULL,
             "DATE_FORMAT( DATE_ADD(custitem.installationDate, INTERVAL custitem.totalInvoiceMonths + custitem.invoicePeriodMonths MONTH ), '%Y-%m-%d') as invoiceToDateYMD"
+        );
+
+        $this->addColumn(
+            self::reoccurring,
+            DA_BOOLEAN,
+            DA_NOT_NULL,
+            "item.reoccurring"
         );
 
         $this->setAddColumnsOff();
