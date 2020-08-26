@@ -1,6 +1,9 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.4.1] -2020-08-26
+
+
 ## [v4.4.0] - 2020-08-25
 ### Added
 - Issue 961 - Team Performance at the start of the month
