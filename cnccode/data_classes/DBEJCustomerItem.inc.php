@@ -227,8 +227,6 @@ class DBEJCustomerItem extends DBECustomerItem
                 join itemtype on ity_itemtypeno = citem.itm_itemtypeno
             WHERE {$this->getDBColumnName(self::customerItemID)}={$ID}";
         $this->setQueryString($queryString);
-        var_dump($queryString);
-        exit;
         return (parent::getRow());
     }
 
