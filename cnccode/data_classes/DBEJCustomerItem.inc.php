@@ -136,7 +136,7 @@ class DBEJCustomerItem extends DBECustomerItem
                         JOIN item AS citem ON cui_itemno = itm_itemno 
                         JOIN customer ON cui_custno = cus_custno 
                         JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
-                        left join itemtype on ity.itemtypeno = item.itm_itemno
+                        left join itemtype on ity_itemtypeno = citem.itm_itemno
                         ";
 
 
@@ -186,7 +186,6 @@ class DBEJCustomerItem extends DBECustomerItem
   LEFT JOIN custitem AS contractCustomerItem
     ON cic_contractcuino = contractCustomerItem.`cui_cuino`
   LEFT JOIN item AS contractItem ON contractCustomerItem.cui_itemno = contractItem.`itm_itemno`
-  left join itemtype on ity.itemtypeno = item.itm_itemno
   ";
 
             if ($renewalStatus) {
@@ -225,9 +224,8 @@ class DBEJCustomerItem extends DBECustomerItem
                 JOIN item AS citem ON cui_itemno = itm_itemno 
                 JOIN customer ON cui_custno = cus_custno 
                 JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
-                join itemtype on ity.itemtypeno = item.itm_itemno
+                join itemtype on ity_itemtypeno = citem.itm_itemno
             WHERE {$this->getDBColumnName(self::customerItemID)}={$ID}";
-
         $this->setQueryString($queryString);
         return (parent::getRow());
     }
@@ -251,7 +249,7 @@ class DBEJCustomerItem extends DBECustomerItem
                 JOIN item AS citem ON cui_itemno = itm_itemno 
                 JOIN customer ON cui_custno = cus_custno 
                 JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
-                join itemtype on ity.itemtypeno = item.itm_itemno
+                join itemtype on ity_itemtypeno = citem.itm_itemno
                 WHERE {$this->getDBColumnName($ixColumn)}={$this->getFormattedValue($ixColumn)}";
 
         if ($sortColumn != '') {
@@ -279,7 +277,7 @@ class DBEJCustomerItem extends DBECustomerItem
           JOIN item AS citem ON cui_itemno = itm_itemno
           JOIN customer ON cui_custno = cus_custno
           JOIN address ON add_siteno = cui_siteno AND add_custno = cui_custno
-          join itemtype on ity.itemtypeno = item.itm_itemno
+          join itemtype on ity_itemtypeno = citem.itm_itemno
        WHERE
           cic_contractcuino = $customerItemId
 
@@ -311,7 +309,7 @@ class DBEJCustomerItem extends DBECustomerItem
           JOIN custitem_contract cic ON cic.cic_cuino = custitem.cui_cuino
           JOIN custitem con ON con.cui_cuino = cic.cic_contractcuino
           JOIN item con_item ON con.cui_itemno = con_item.itm_itemno
-          join itemtype on ity.itemtypeno = item.itm_itemno
+          join itemtype on ity_itemtypeno = citem.itm_itemno
       
  		   WHERE " . $this->getDBColumnName(self::customerID) . "=" . $this->getValue(self::customerID) .
             " AND citem.itm_itemtypeno = " . CONFIG_SERVER_ITEMTYPEID .
@@ -335,7 +333,7 @@ class DBEJCustomerItem extends DBECustomerItem
         custitem_contract cic
         JOIN custitem c ON cic_contractcuino = c.cui_cuino
         JOIN item i ON i.itm_itemno = c.cui_itemno
-        join itemtype on ity.itemtypeno = item.itm_itemno
+        join itemtype on ity_itemtypeno = i.itm_itemno
       WHERE
        cic_cuino = $customerItemID";
         $db->query($select);
