@@ -158,6 +158,7 @@
             axis: "y",
             tolerance: "pointer",
             containment: 'parent',
+            handle: '.handle',
             update: (event, ui) => {
                 const lineData = ui.item.data();
                 const movingLineId = lineData.lineId;
@@ -377,6 +378,7 @@
                             if (response.status !== 'ok') {
                                 throw new Error(response.message);
                             }
+                            debugger;
                             updateUpdatedTimeInput(response.updatedTime);
                             getSelectedHTMLRows().forEach(row => {
                                 deleteRowAndUpdate(row);
@@ -866,9 +868,10 @@
            cellpadding="1"
     >
         <thead>
-
-
         <tr>
+            <td class="listHeadText">
+                <div> &nbsp;</div>
+            </td>
             <td class="listHeadText toggleColumn">
                 <div>
                     <input type="checkbox"
