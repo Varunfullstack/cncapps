@@ -136,6 +136,7 @@ class CTItemType extends CTCNC
                         "reoccurring"          => $DBEItemType->getValue(DBEItemType::reoccurring),
                         "stockcat"             => $DBEItemType->getValue(DBEItemType::stockcat),
                         "showInCustomerReview" => $DBEItemType->getValue(DBEItemType::showInCustomerReview),
+                        "sortOrder"            => $DBEItemType->getValue(DBEItemType::sortOrder)
                     ],
                     JSON_NUMERIC_CHECK
                 );

@@ -255,7 +255,7 @@
                 const foundIndex = rules.findIndex(rule => currentRule.id === rule.id);
                 rules = arrayReplaceAt(rules, foundIndex, currentRule);
             }
-            rules.sort((a, b) => a.sortOrder.localeCompare(b.sortOrder));
+            rules.sort((a, b) => a.sortOrder - b.sortOrder);
             drawList();
             cancelEdit();
         })
