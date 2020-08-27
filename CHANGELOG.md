@@ -1,8 +1,16 @@
 # Changelog
 This project changes will be shown here.
 
-## [v4.4.1] -2020-08-26
-
+## [v4.4.1] - 2020-08-26
+### Added
+- Show the Part Number in the edit item page
+### Changed
+- Changed the way lines are dragged in sales orders to allow for copy/select line text
+- Changed the size of the trash icon in sales order lines
+### Fixed
+- Fixed issue with Renewals Sales orders not assigning the recurring flag correctly
+- Fixed issue with deleting lines in Sales Orders
+- Fixed issue when adding an itemtype
 
 ## [v4.4.0] - 2020-08-25
 ### Added
