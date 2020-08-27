@@ -131,7 +131,6 @@
     let orderHeadIdInput;
     let toggleCheckBoxes;
     let updateSupplierName;
-    let updatedTimeInput;
 
     let requiredByDateInput;
     let tbcInput;
@@ -173,7 +172,7 @@
                 const lineData = ui.item.data();
                 const movingLineId = lineData.lineId;
                 const fromSequenceNo = lineData.sequenceNo;
-                const updatedTime = updatedTimeInput.value;
+                const updatedTime = getUpdatedTimeCurrentValue();
                 let swappedItem = ui.item.next();
                 if (ui.position.top > ui.originalPosition.top) {
                     swappedItem = ui.item.prev();
@@ -214,7 +213,6 @@
         orderHeadIdInput = document.querySelector('[name="form[ordheadID]"]');
         toggleCheckBoxes = document.querySelectorAll('[name="Toggle"]');
         updateSupplierName = document.querySelector('#updateSupplierName');
-        updatedTimeInput = document.querySelector('#updatedTime');
         requiredByDateInput = document.querySelector('#requiredByDate');
         tbcInput = document.querySelector('#tbc');
 
@@ -372,7 +370,7 @@
                         return;
                     }
 
-                    const updatedTime = updatedTimeInput.value;
+                    const updatedTime = getUpdatedTimeCurrentValue();
 
                     fetch('?action=DELETE_LINES',
                         {
@@ -530,7 +528,7 @@
             const target = $event.target;
             const parentRow = target.closest('tr');
             const lineId = parentRow.dataset.lineId;
-            const updatedTime = updatedTimeInput.value;
+            const updatedTime = getUpdatedTimeCurrentValue();
 
             fetch('?action=DELETE_LINE',
                 {
@@ -555,7 +553,13 @@
         }
 
         function updateUpdatedTimeInput(newValue) {
-            updatedTimeInput.value = newValue;
+            document.querySelectorAll('input[name="updatedTime"]').forEach(el => {
+                el.value = newValue;
+            })
+        }
+
+        function getUpdatedTimeCurrentValue() {
+            return document.querySelector('input[name="updatedTime"]').value;
         }
 
         function handleUpdateItemPrice($event) {
@@ -842,11 +846,6 @@
     </table>
 
 </div>
-<INPUT type="hidden"
-       id="updatedTime"
-       name="updatedTime"
-       value="{updatedTime}"
->
 <form name="quickQuoteForm"
       method="POST"
       enctype="multipart/form-data"

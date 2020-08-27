@@ -1,5 +1,8 @@
 # Changelog
 This project changes will be shown here.
+## [v4.4.2] - 2020-08-27
+### Fixed
+- Fix issue with inserting after reordering the lines
 
 ## [v4.4.1] - 2020-08-26
 ### Added
