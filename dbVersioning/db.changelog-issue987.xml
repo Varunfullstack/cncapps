@@ -1,0 +1,108 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue987-0">
+        <tagDatabase tag="issue987"/>
+    </changeSet>
+    <changeSet id="issue987-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="user_time_log" columnName="cncLoggedHours"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="user_time_log">
+            <column name="cncLoggedHours" type="decimal(6,2)" defaultValue="0.0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="issue987-2" author="pavwebdev">
+        <sql>
+            <![CDATA[
+            UPDATE
+                user_time_log
+            SET loggedHours    =
+                    (SELECT ROUND(
+                                    COALESCE(
+                                                SUM(
+                                                        COALESCE(
+                                                                    TIME_TO_SEC(
+                                                                            IF(
+                                                                                    caa_endtime > '18:30',
+                                                                                    '18:30',
+                                                                                    caa_endtime
+                                                                                )
+                                                                        ) - TIME_TO_SEC(
+                                                                            IF(
+                                                                                    caa_starttime < '07:00',
+                                                                                    '07:00',
+                                                                                    caa_starttime
+                                                                                )
+                                                                        ),
+                                                                    0
+                                                            )
+                                                    ) / 3600,
+                                                0
+                                        ),
+                                    2
+                                )
+                     FROM callactivity
+                              JOIN callacttype
+                                   ON cat_callacttypeno = caa_callacttypeno
+                              join problem on callactivity.caa_problemno = problem.pro_problemno
+                     WHERE caa_consno = userID
+                       AND caa_date = loggedDate
+                       AND callacttype.travelFlag <> 'Y'
+                       AND caa_starttime < '18:30'
+                       AND caa_endtime > '07:00'
+                       and problem.pro_custno <> 282
+                    ),
+                cncLoggedHours = (SELECT ROUND(
+                                                 COALESCE(
+                                                             SUM(
+                                                                     COALESCE(
+                                                                                 TIME_TO_SEC(
+                                                                                         IF(
+                                                                                                 caa_endtime > '18:30',
+                                                                                                 '18:30',
+                                                                                                 caa_endtime
+                                                                                             )
+                                                                                     ) - TIME_TO_SEC(
+                                                                                         IF(
+                                                                                                 caa_starttime < '07:00',
+                                                                                                 '07:00',
+                                                                                                 caa_starttime
+                                                                                             )
+                                                                                     ),
+                                                                                 0
+                                                                         )
+                                                                 ) / 3600,
+                                                             0
+                                                     ),
+                                                 2
+                                             )
+                                  FROM callactivity
+                                           JOIN callacttype
+                                                ON cat_callacttypeno = caa_callacttypeno
+                                           join problem on callactivity.caa_problemno = problem.pro_problemno
+                                  WHERE caa_consno = userID
+                                    AND caa_date = loggedDate
+                                    AND callacttype.travelFlag <> 'Y'
+                                    AND caa_starttime < '18:30'
+                                    AND caa_endtime > '07:00'
+                                    and problem.pro_custno = 282
+                ),
+                holiday        = 0
+            WHERE not holiday
+              AND loggedDate >= '2018-01-01'
+            ]]>
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="issue987-3" author="pavwebdev">
+        <sqlFile path="/getLoggedTimeAvgFunction.sql" endDelimiter="#" stripComments="true"/>
+        <sqlFile path="/getLoggedTimeTotalFunction.sql" endDelimiter="#" stripComments="true"/>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>
