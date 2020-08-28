@@ -19,6 +19,7 @@ class DBEJRenContract extends DBECustomerItem
     const invoiceFromDateYMD = "invoiceFromDateYMD";
     const invoiceToDateYMD = "invoiceToDateYMD";
     const isArrears = 'isArrears';
+    const itemTypeId = 'itemTypeId';
 
 
     function __construct(&$owner)
@@ -118,6 +119,13 @@ class DBEJRenContract extends DBECustomerItem
     itemBillingCategory.arrearsBilling,
     0
   ) as isArrears"
+        );
+
+        $this->addColumn(
+            self::itemTypeId,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            'itm_itemtypeno'
         );
 
         $this->setAddColumnsOff();

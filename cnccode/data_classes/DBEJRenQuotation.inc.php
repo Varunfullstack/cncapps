@@ -20,6 +20,7 @@ class DBEJRenQuotation extends DBECustomerItem
     const nextPeriodEndDateYMD = "nextPeriodEndDateYMD";
     const nextPeriodEndDate = "nextPeriodEndDate";
     const latestQuoteSent = "latestQuoteSent";
+    const itemTypeId = 'itemTypeId';
 
     function __construct(&$owner)
     {
@@ -100,6 +101,13 @@ class DBEJRenQuotation extends DBECustomerItem
             DA_DATE,
             DA_ALLOW_NULL,
             "(select max(sentDateTime) from quotation where ordheadID = cui_ordno group by ordheadID) as latestQuoteSent"
+        );
+
+        $this->addColumn(
+            self::itemTypeId,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            'itm_itemtypeno'
         );
 
         $this->setAddColumnsOff();

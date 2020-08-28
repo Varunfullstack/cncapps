@@ -19,6 +19,7 @@ class DBEJRenBroadband extends DBECustomerItem
     const invoiceFromDateYMD = "invoiceFromDateYMD";
     const invoiceToDateYMD = "invoiceToDateYMD";
     const contractExpireNotified = "contractExpireNotified";
+    const itemTypeId = "itemTypeId";
 
     function __construct(&$owner)
     {
@@ -96,6 +97,13 @@ class DBEJRenBroadband extends DBECustomerItem
             DA_STRING,
             DA_NOT_NULL,
             "contractExpireNotified"
+        );
+
+        $this->addColumn(
+            self::itemTypeId,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            'itm_itemtypeno'
         );
         $this->setAddColumnsOff();
     }

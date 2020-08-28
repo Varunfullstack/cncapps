@@ -399,6 +399,7 @@ class BURenewal extends Business
             $row['expiryDate'] = $dbeJRenContract->getValue(DBEJRenContract::invoiceFromDate);
             $row['itemID'] = $dbeJRenContract->getValue(DBEJRenContract::itemID);
             $row['renewalTypeID'] = 2;
+            $row['itemTypeId'] = $dbeJRenContract->getValue(DBEJRenContract::itemTypeId);
 
 
             $expiryDate = null;
@@ -476,6 +477,7 @@ class BURenewal extends Business
             $row['itemID'] = $dbeJRenDomain->getValue(DBEJRenDomain::itemID);
             $row['renewalTypeID'] = 4;
             $row['coveredItems'] = [];
+            $row['itemTypeId'] = $dbeJRenDomain->getValue(DBEJRenDomain::itemTypeId);
 
             $installationDate = DateTime::createFromFormat(
                 'Y-m-d',
@@ -530,6 +532,7 @@ class BURenewal extends Business
             $row['itemID'] = $dbeJRenBroadband->getValue(DBEJRenBroadband::itemID);
             $row['renewalTypeID'] = 1;
             $row['coveredItems'] = [];
+            $row['itemTypeId'] = $dbeJRenBroadband->getValue(DBEJRenBroadband::itemTypeId);
             $installationDate = DateTime::createFromFormat(
                 'Y-m-d',
                 $dbeJRenBroadband->getValue(DBECustomerItem::installationDate)
@@ -579,6 +582,7 @@ class BURenewal extends Business
             $row['notes'] = $dbeJRenHosting->getValue(DBEJRenHosting::notes);
             $row['expiryDate'] = $dbeJRenHosting->getValue(DBEJRenHosting::invoiceFromDate);
             $row['itemID'] = $dbeJRenHosting->getValue(DBEJRenHosting::itemID);
+            $row['itemTypeId'] = $dbeJRenHosting->getValue(DBEJRenHosting::itemTypeId);
             $row['renewalTypeID'] = 5;
             $row['coveredItems'] = [];
             $installationDate = DateTime::createFromFormat(
@@ -633,9 +637,10 @@ class BURenewal extends Business
             $row['itemTypeDescription'] = $dbeJRenQuotation->getValue(DBEJRenQuotation::itemTypeDescription);
             $row['notes'] = $dbeJRenQuotation->getValue(DBEJRenQuotation::notes);
             $row['expiryDate'] = $dbeJRenQuotation->getValue(DBEJRenQuotation::nextPeriodStartDate);
-            $row['units'] = $dbeJRenQuotation->getValue(DBEJRenContract::users);
-            $row['directDebit'] = $dbeJRenQuotation->getValue(DBEJRenContract::directDebitFlag) == 'Y';
-            $row['itemID'] = $dbeJRenQuotation->getValue(DBEJRenContract::itemID);
+            $row['units'] = $dbeJRenQuotation->getValue(DBEJRenQuotation::users);
+            $row['directDebit'] = $dbeJRenQuotation->getValue(DBEJRenQuotation::directDebitFlag) == 'Y';
+            $row['itemID'] = $dbeJRenQuotation->getValue(DBEJRenQuotation::itemID);
+            $row['itemTypeId'] = $dbeJRenQuotation->getValue(DBEJRenQuotation::itemTypeId);
             $row['renewalTypeID'] = 3;
             $row['coveredItems'] = [];
             $row['calculatedExpiryDate'] = (
@@ -678,6 +683,7 @@ class BURenewal extends Business
             $row['customerItemID'] = null;
             $row['itemTypeDescription'] = $dsExternalItem->getValue(DBEJExternalItem::itemTypeDescription);
             $row['notes'] = $dsExternalItem->getValue(DBEJExternalItem::notes);
+            $row['itemTypeId'] = $dsExternalItem->getValue(DBEJExternalItem::itemTypeId);
             $row['renewalTypeID'] = 0;
             $row['coveredItems'] = [];
             $returnArray[] = $row;
