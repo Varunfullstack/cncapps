@@ -17,6 +17,7 @@ class DBEJRenDomain extends DBECustomerItem
     const invoiceToDate = "invoiceToDate";
     const invoiceFromDateYMD = "invoiceFromDateYMD";
     const invoiceToDateYMD = "invoiceToDateYMD";
+    const itemTypeId = "itemTypeId" ;
 
 
     function __construct(&$owner)
@@ -100,6 +101,12 @@ class DBEJRenDomain extends DBECustomerItem
             "itm_sstk_cost"
         );
 
+        $this->addColumn(
+            self::itemTypeId,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            'itm_itemtypeno'
+        );
 
         $this->setAddColumnsOff();
     }

@@ -268,20 +268,19 @@ class CTRenewalReport extends CTCNC
                 $costPrice = Controller::formatNumber($item['costPrice']);
                 $totalCostPrice += $item['costPrice'];
                 $totalSalePrice += $item['salePrice'];
-                if (trim($item['itemTypeDescription']) == 'Software') {
+                if ($item['itemTypeId'] == 29) {
                     $dbeItem = new DBEItem($this);
                     $dbeItem->getRow($item['itemID']);
                     if ($dbeItem->getValue(DBEItem::itemBillingCategoryID) === 4) {
                         $addOfficeReportButton = true;
                     }
-
                 }
             }
 
             $itemTypeHeader = null;
             if ($item['itemTypeDescription'] != $lastItemTypeDescription) {
-                $itemTypeHeader = '<tr><td colspan="7"><h3>' . $item['itemTypeDescription'] . '</h3></td></tr>';
-                if (trim($item['itemTypeDescription']) == 'Software Subscription') {
+                $itemTypeHeader = "<tr><td colspan=\"7\"><h3>{$item['itemTypeDescription']}</h3></td></tr>";
+                if ($item['itemTypeId'] == 29) {
                     $itemTypeHeader .= '<tr class="officeReport hidden" ><td colspan="7"><button  type="button" onclick="runOfficeReport(' . $customerID . ')">Run O365 Mailbox Report</button></td></tr>';
                 }
             }
@@ -368,7 +367,9 @@ class CTRenewalReport extends CTCNC
                     'checkbox'             => $checkbox,
                     'calculatedExpiryDate' => $item['calculatedExpiryDate'],
                     'units'                => $item['units'],
-                    'unitsNotEqualItems'   => count($item['coveredItems'])>0&&count($item['coveredItems'])!=$item['units']?'wrong':'',
+                    'unitsNotEqualItems'   => count($item['coveredItems']) > 0 && count(
+                        $item['coveredItems']
+                    ) != $item['units'] ? 'wrong' : '',
                     'directDebit'          => $item['directDebit'] ? 'Yes' : null,
                     "showOfficeButton"     => $addOfficeReportButton ? 1 : 0,
                     "disabled"             => $displayAccountsInfo ? null : "disabled"

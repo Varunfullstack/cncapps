@@ -17,6 +17,7 @@ class DBEJRenHosting extends DBECustomerItem
     const invoiceFromDateYMD = "invoiceFromDateYMD";
     const invoiceToDateYMD = "invoiceToDateYMD";
     const allowDirectDebit = "allowDirectDebit";
+    const itemTypeId = "itemTypeId";
 
     function __construct(&$owner)
     {
@@ -98,6 +99,13 @@ class DBEJRenHosting extends DBECustomerItem
             self::allowDirectDebit,
             DA_YN,
             DA_NOT_NULL
+        );
+
+        $this->addColumn(
+            self::itemTypeId,
+            DA_INTEGER,
+            DA_ALLOW_NULL,
+            'itm_itemtypeno'
         );
 
         $this->setAddColumnsOff();
