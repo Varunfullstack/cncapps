@@ -1161,6 +1161,7 @@ class BUSalesOrder extends Business
         } else {
             // Order Lines are inserted at the "end", so we need to move it afterwards..if we do have a sequence number
             $futureOrder = $dbeOrdline->getValue(DBEOrdline::sequenceNo);
+            $dbeOrdline->setValue(DBEOrdline::sequenceNo, null);
             $dbeOrdline->insertRow();
             if ($futureOrder) {
                 $dbeOrdline->swapPlaces($dbeOrdline->getValue(DBEOrdline::sequenceNo), $futureOrder + 1);
@@ -1770,12 +1771,14 @@ class BUSalesOrder extends Business
      * copy lines from one sales order and paste them to the end of another
      * @param $fromOrdheadID
      * @param $toOrdheadID
-     * @param bool $sequenceNo
+     * @param null|integer $oneOffSequenceNumber
+     * @param null|integer $recurringSequenceNumber
      * @return bool
      */
     function pasteLinesFromOrder($fromOrdheadID,
                                  $toOrdheadID,
-                                 $sequenceNo = false
+                                 $oneOffSequenceNumber = null,
+                                 $recurringSequenceNumber = null
     )
     {
         $this->setMethodName('pasteLinesFromOrder');
@@ -1802,12 +1805,6 @@ class BUSalesOrder extends Business
         );
         $dbeToOrdline->resetQueryString();
 
-        if (!$sequenceNo) {
-            $sequenceNo = $dbeToOrdline->getNextSortOrder(); // so we paste after the last row
-        } else {
-            $sequenceNo++;
-        }
-
         while ($dbeFromOrdline->fetchNext()) {
 
             for ($i = 0; $i < $colCount; $i++) {
@@ -1828,6 +1825,7 @@ class BUSalesOrder extends Business
                 DBEOrdline::qtyLastDespatched,
                 0
             );
+
             $newOrderId = $dbeToOrdline->getNextSortOrder();
             $dbeToOrdline->setValue(
                 DBEOrdline::sequenceNo,
@@ -1840,10 +1838,19 @@ class BUSalesOrder extends Business
             );
 
             $dbeToOrdline->insertRow();
-            if ($newOrderId !== $sequenceNo) {
-                $dbeToOrdline->swapPlaces($newOrderId, $sequenceNo);
+
+            $sequenceNumber = null;
+            if ($dbeToOrdline->getValue(DBEOrdline::isRecurring) && $recurringSequenceNumber) {
+                $recurringSequenceNumber += 1;
+                $sequenceNumber = $recurringSequenceNumber;
+            } elseif ($oneOffSequenceNumber) {
+                $oneOffSequenceNumber += 1;
+                $sequenceNumber = $oneOffSequenceNumber;
             }
-            $sequenceNo++;
+
+            if ($sequenceNumber && $newOrderId !== $sequenceNumber) {
+                $dbeToOrdline->swapPlaces($newOrderId, $sequenceNumber);
+            }
         }
         return TRUE;
     }

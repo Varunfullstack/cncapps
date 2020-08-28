@@ -12,7 +12,7 @@
 
                 const idInput = opener.document.getElementById("{parentLinkedSalesOrderField}")
                 if (idInput) {
-                    idInput.value = id;
+                    idInput.value = linkedSalesOrderId;
                     const evt = opener.document.createEvent('HTMLEvents');
                     evt.initEvent('change', false, true);
                     idInput.dispatchEvent(evt);

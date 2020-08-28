@@ -2,6 +2,8 @@
 This project changes will be shown here.
 
 ## [unreleased]
+### Added
+- Issue 999 - Sales Order insert in place feature
 ### Changed
 - Issue 997 - Improve Edit GUI to make it more intuitive
 - Issue 990 - Current Service Request menu link
