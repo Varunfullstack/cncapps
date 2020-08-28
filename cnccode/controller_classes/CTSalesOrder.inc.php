@@ -2712,7 +2712,7 @@ class CTSalesOrder extends CTCNC
                     'supplierID'   => null,
                     'qtyOrdered'   => null,
                     'curUnitCost'  => null,
-                    'curUnitSale'  => null
+                    'curUnitSale'  => null,
                 )
             );
         } else {                                                                                                // Item line
@@ -4241,8 +4241,7 @@ class CTSalesOrder extends CTCNC
             DA_STRING,
             DA_ALLOW_NULL
         );
-        $this->dsOrdline->setNull(DBEOrdline::sequenceNo, DA_ALLOW_NULL);
-        $sequenceNo = null;
+        $sequenceNo = $this->getParam('ordline')[1]['sequenceNo'];
         if ($this->getParam('ordline')[1]['lineType'] == "I") {                    // Item line
             $this->dsOrdline->setNull(
                 DBEOrdline::itemID,

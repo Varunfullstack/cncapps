@@ -1,6 +1,11 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.5.2] - 2020-08-28
+### Fixed
+- Fixed issue with updating lines
+
+
 ## [v4.5.1] - 2020-08-28
 ### Fixed
 - Fixed issue with user performance data not considering cncLoggedHours
