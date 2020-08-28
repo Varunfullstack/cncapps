@@ -281,7 +281,7 @@ class CTRenewalReport extends CTCNC
             $itemTypeHeader = null;
             if ($item['itemTypeDescription'] != $lastItemTypeDescription) {
                 $itemTypeHeader = '<tr><td colspan="7"><h3>' . $item['itemTypeDescription'] . '</h3></td></tr>';
-                if (trim($item['itemTypeDescription']) == 'Software') {
+                if (trim($item['itemTypeDescription']) == 'Software Subscription') {
                     $itemTypeHeader .= '<tr class="officeReport hidden" ><td colspan="7"><button  type="button" onclick="runOfficeReport(' . $customerID . ')">Run O365 Mailbox Report</button></td></tr>';
                 }
             }

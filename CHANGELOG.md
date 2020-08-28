@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 1000 - Link manual O365 Mailbox Report to Software Subscription
+
 ## [v4.4.2] - 2020-08-27
 ### Fixed
 - Fix issue with inserting after reordering the lines
