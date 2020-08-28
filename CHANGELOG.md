@@ -1,7 +1,7 @@
 # Changelog
 This project changes will be shown here.
 
-## [unreleased]
+## [v4.5.0]
 ### Added
 - Issue 999 - Sales Order insert in place feature
 ### Changed
