@@ -130,26 +130,16 @@
                         })
                     );
 
-                    var options = {
-                        'title': 'Hours Logged Over Time',
-                        seriesType: 'bars',
-                        series: {
-                            0: {color: '#0082b9'},
-                            1: {type: 'line'},
-                            2: {type: 'line'},
-                            3: {color: '#c6c6c6'},
-                        },
-                        legend: {
-                            position: 'bottom'
-                        },
-                        vAxis: {title: 'Hours Logged'}
-                    };
 
-                    var storedOptions = {
+                    const storedOptions = {
                         title: item.userName,
                         trendlines: {0: {}},
                         legend: 'none',
-                        isStacked: true
+                        isStacked: true,
+                        series: {
+                            0: {color: '#0082b9'},
+                            1: {color: '#c6c6c6'},
+                        }
                     };
 
                     var chart = new google.visualization.ColumnChart(test[0]);
