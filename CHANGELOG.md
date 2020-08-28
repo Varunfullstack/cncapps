@@ -4,6 +4,7 @@ This project changes will be shown here.
 ## [unreleased]
 ### Changed
 - Issue 997 - Improve Edit GUI to make it more intuitive
+- Issue 990 - Current Service Request menu link
 
 ## [v4.4.2] - 2020-08-27
 ### Fixed
