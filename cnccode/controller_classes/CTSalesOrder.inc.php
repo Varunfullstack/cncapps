@@ -4179,15 +4179,31 @@ class CTSalesOrder extends CTCNC
     function updateOrderLine()
     {
         $this->setMethodName('updateOrderLine');
+
+        $oneOffSequenceNumber = null;
+        if ($this->getParam('oneOffSequenceNumber')) {
+            $oneOffSequenceNumber = $this->getParam('oneOffSequenceNumber');
+        }
+        $recurringSequenceNumber = null;
+        if ($this->getParam('recurringSequenceNumber')) {
+            $recurringSequenceNumber = $this->getParam('recurringSequenceNumber');
+        }
+
         // pasting lines from another Sales Order
         if ($this->getParam('ordline')[1]['lineType'] == 'T') {
-            $this->pasteLinesFromQuotationTemplate();
+            $this->pasteLinesFromQuotationTemplate(
+                $oneOffSequenceNumber,
+                $recurringSequenceNumber
+            );
             header('Location: ' . $this->getDisplayOrderURL());
             exit;
         }
 
         if ($this->getParam('ordline')[1]['lineType'] == 'O') {
-            $this->pasteLinesFromSO();
+            $this->pasteLinesFromSO(
+                $oneOffSequenceNumber,
+                $recurringSequenceNumber
+            );
             header('Location: ' . $this->getDisplayOrderURL());
             exit;
         }
@@ -4226,7 +4242,7 @@ class CTSalesOrder extends CTCNC
             DA_ALLOW_NULL
         );
         $this->dsOrdline->setNull(DBEOrdline::sequenceNo, DA_ALLOW_NULL);
-
+        $sequenceNo = null;
         if ($this->getParam('ordline')[1]['lineType'] == "I") {                    // Item line
             $this->dsOrdline->setNull(
                 DBEOrdline::itemID,
@@ -4256,6 +4272,15 @@ class CTSalesOrder extends CTCNC
                 DBEOrdline::description,
                 DA_NOT_NULL
             );
+            $dbeItem = new DBEItem($this);
+            $dbeItem->getRow($this->getParam('ordline')[1]['itemID']);
+            $itemType = new DBEItemType($this);
+            $itemType->getRow($dbeItem->getValue(DBEItem::itemTypeID));
+            if ($itemType->getValue(DBEItemType::reoccurring) && $recurringSequenceNumber) {
+                $sequenceNo = $recurringSequenceNumber;
+            } elseif (!$itemType->getValue(DBEItemType::reoccurring) && $oneOffSequenceNumber) {
+                $sequenceNo = $oneOffSequenceNumber;
+            }
         } else {                                                                                                        // Comment line
             $this->dsOrdline->setNull(
                 DBEOrdline::itemID,
@@ -4285,8 +4310,15 @@ class CTSalesOrder extends CTCNC
                 DBEOrdline::description,
                 DA_NOT_NULL
             );
+            if (!empty($this->getParam('ordline')[1]['isRecurring']) && $recurringSequenceNumber) {
+                $sequenceNo = $recurringSequenceNumber;
+            } elseif (empty($this->getParam('ordline')[1]['isRecurring']) && $oneOffSequenceNumber) {
+                $sequenceNo = $oneOffSequenceNumber;
+            }
         }
+
         $this->formError = !$this->dsOrdline->populateFromArray($this->getParam('ordline'));
+        $this->dsOrdline->setValue(DBEOrdline::sequenceNo, $sequenceNo);
         $this->setOrdheadID($this->dsOrdline->getValue(DBEOrdhead::ordheadID));
         $dsOrdhead = new DataSet($this);
         if (!$this->buSalesOrder->getOrdheadByID(
@@ -4318,7 +4350,8 @@ class CTSalesOrder extends CTCNC
                 $itemID = $this->dsOrdline->getValue(DBEOrdline::itemID);
                 $dbeItem->getChildItems($itemID);
 
-                $rowCount = 1;
+                $oneOffRowCount = 1;
+                $recurringRowCount = 1;
                 $dbeSupplier = new DBESupplier($this);
                 $dbeSupplier->getRow(53);
                 while ($dbeItem->fetchNext()) {
@@ -4350,11 +4383,27 @@ class CTSalesOrder extends CTCNC
                         DBEOrdline::description,
                         $dbeItem->getValue(DBEItem::description)
                     );
-                    $sequenceNo = $this->dsOrdline->getValue(DBEOrdline::sequenceNo);
-                    if ($sequenceNo) {
-                        $toInsertChildDsOrdline->setValue(DBEOrdline::sequenceNo, $sequenceNo + $rowCount);
+
+                    $dbeItemType = new DBEItemType($this);
+                    $dbeItemType->getRow($dbeItem->getValue(DBEItem::itemID));
+                    if ($dbeItemType->getValue(DBEItemType::reoccurring)) {
+                        if ($recurringSequenceNumber) {
+                            $toInsertChildDsOrdline->setValue(
+                                DBEOrdline::sequenceNo,
+                                $recurringSequenceNumber + $recurringRowCount
+                            );
+                        }
+                        $recurringRowCount++;
+                    } else {
+                        if ($oneOffSequenceNumber) {
+
+                            $toInsertChildDsOrdline->setValue(
+                                DBEOrdline::sequenceNo,
+                                $oneOffSequenceNumber + $oneOffRowCount
+                            );
+                        }
+                        $oneOffRowCount++;
                     }
-                    $rowCount++;
                     $this->buSalesOrder->insertNewOrderLine($toInsertChildDsOrdline);
                 }
             }
@@ -4370,9 +4419,13 @@ class CTSalesOrder extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @param $oneOffSequenceNumber
+     * @param $recurringSequenceNumber
      * @throws Exception
      */
-    function pasteLinesFromQuotationTemplate()
+    function pasteLinesFromQuotationTemplate($oneOffSequenceNumber,
+                                             $recurringSequenceNumber
+    )
     {
         $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
         if (!is_numeric($this->getParam('ordline')[1]['itemID'])) {
@@ -4380,6 +4433,7 @@ class CTSalesOrder extends CTCNC
             $this->displayOrder();
             return;
         }
+
         if (!$this->buSalesOrder->getOrdheadByID(
             $this->getParam('ordline')[1]['itemID'],
             $dsOrdhead
@@ -4390,7 +4444,9 @@ class CTSalesOrder extends CTCNC
         }
         $this->buSalesOrder->pasteLinesFromOrder(
             $this->getParam('ordline')[1]['itemID'],
-            $this->getOrdheadID()
+            $this->getOrdheadID(),
+            $oneOffSequenceNumber,
+            $recurringSequenceNumber
         );
         $this->displayOrder();
     }
@@ -4401,9 +4457,13 @@ class CTSalesOrder extends CTCNC
      *
      * @access private
      * @authors Karim Ahmed - Sweet Code Limited
+     * @param $oneOffSequenceNumber
+     * @param $recurringSequenceNumber
      * @throws Exception
      */
-    function pasteLinesFromSO()
+    function pasteLinesFromSO($oneOffSequenceNumber,
+                              $recurringSequenceNumber
+    )
     {
         $this->setMethodName('pasteLinesFromSO');
         $this->setOrdheadID($this->getParam('ordline')[1]['ordheadID']);
@@ -4422,7 +4482,9 @@ class CTSalesOrder extends CTCNC
         }
         $this->buSalesOrder->pasteLinesFromOrder(
             $this->getParam('ordline')[1]['description'],
-            $this->getOrdheadID()
+            $this->getOrdheadID(),
+            $oneOffSequenceNumber,
+            $recurringSequenceNumber
         );
         $this->displayOrder();
     }
