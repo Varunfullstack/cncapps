@@ -2683,13 +2683,53 @@ class BUActivity extends Business
                 ) 
               FROM
                 callactivity 
-                JOIN callacttype 
-                  ON cat_callacttypeno = caa_callacttypeno 
+                JOIN callacttype
+                  ON cat_callacttypeno = caa_callacttypeno
+                join problem on callactivity.caa_problemno = problem.pro_problemno
               WHERE caa_consno = userID 
                 AND caa_date = loggedDate 
                 AND callacttype.travelFlag <> 'Y' 
                 AND caa_starttime < '$endTime' 
-                AND caa_endtime > '$startTime'),
+                AND caa_endtime > '$startTime'
+                and problem.pro_custno <> 282
+                  ),
+                cncLoggedHours = (SELECT 
+                ROUND(
+                  COALESCE(
+                    SUM(
+                      COALESCE(
+                        TIME_TO_SEC(
+                          IF(
+                            caa_endtime > '$endTime',
+                            '$endTime',
+                            caa_endtime
+                          )
+                        ) - TIME_TO_SEC(
+                          IF(
+                            caa_starttime < '$startTime',
+                            '$startTime',
+                            caa_starttime
+                          )
+                        ),
+                        0
+                      )
+                    ) / 3600,
+                    0
+                  ),
+                  2
+                ) 
+              FROM
+                callactivity 
+                JOIN callacttype
+                  ON cat_callacttypeno = caa_callacttypeno
+                join problem on callactivity.caa_problemno = problem.pro_problemno
+              WHERE caa_consno = userID 
+                AND caa_date = loggedDate 
+                AND callacttype.travelFlag <> 'Y' 
+                AND caa_starttime < '$endTime' 
+                AND caa_endtime > '$startTime'
+                and problem.pro_custno = 282
+                  ),
                 holiday = 0
             WHERE userID = $userID 
               AND loggedDate = '$date' ";
@@ -10504,7 +10544,7 @@ FROM
 
         $sql =
             "SELECT
-        SUM( loggedHours / dayHours ) * 100 as performancePercentage
+        SUM( (loggedHours+cncLoggedHours) / dayHours ) * 100 as performancePercentage
       FROM
         user_time_log
       WHERE

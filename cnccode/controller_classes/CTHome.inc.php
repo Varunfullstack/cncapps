@@ -148,9 +148,10 @@ class CTHome extends CTCNC
             }
 
             $usersData[$result['userID']]['dataPoints'][] = [
-                'date'        => (new DateTime($result['loggedDate']))->format(DATE_ISO8601),
-                'loggedHours' => $result['loggedHours'],
-                'isHolidays'  => $result['holiday']
+                'date'           => (new DateTime($result['loggedDate']))->format(DATE_ISO8601),
+                'loggedHours'    => $result['loggedHours'],
+                'cncLoggedHours' => $result['cncLoggedHours'],
+                'isHolidays'     => $result['holiday']
             ];
         }
 
