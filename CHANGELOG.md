@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [unreleased]
+### Changed
+- Issue 997 - Improve Edit GUI to make it more intuitive
+
 ## [v4.4.2] - 2020-08-27
 ### Fixed
 - Fix issue with inserting after reordering the lines
