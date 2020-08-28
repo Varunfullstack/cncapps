@@ -6,6 +6,7 @@ This project changes will be shown here.
 - Issue 997 - Improve Edit GUI to make it more intuitive
 - Issue 990 - Current Service Request menu link
 - Issue 1000 - Link manual O365 Mailbox Report to Software Subscription
+- Issue 987 - Show CNC logged time in the user graphs
 
 ## [v4.4.2] - 2020-08-27
 ### Fixed
