@@ -471,9 +471,9 @@ ORDER BY user_time_log.`loggedDate` DESC
             "SELECT 
         cns_name,
         teamLevel,
-        SUM( loggedHours ) AS loggedHours,
+        SUM( loggedHours+ cncLoggedHours ) AS loggedHours,
         SUM( dayHours ) AS dayHours,
-        ( SUM( loggedHours ) / SUM( dayHours ) ) * 100 AS performancePercentage
+        ( SUM( loggedHours+cncLoggedHours ) / SUM( dayHours ) ) * 100 AS performancePercentage
         
       FROM
         user_time_log 

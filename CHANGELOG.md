@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.5.1] - 2020-08-28
+### Fixed
+- Fixed issue with user performance data not considering cncLoggedHours
+
 ## [v4.5.0] - 2020-08-28
 ### Added
 - Issue 999 - Sales Order insert in place feature
