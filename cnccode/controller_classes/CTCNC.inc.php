@@ -540,7 +540,7 @@ class CTCNC extends Controller
             ],
             [
                 "id"    => 103,
-                "href"  => "CurrentActivityReport.php?action=setFilter&selectedCustomerID=",
+                "href"  => "CurrentActivityReport.php",
                 "label" => "Current Service Requests",
             ],
             [
