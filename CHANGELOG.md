@@ -1,6 +1,10 @@
 # Changelog
 This project changes will be shown here.
 
+## [v4.5.3] - 2020-09-01
+### Fixed
+- Fixed issue with totals for recurring table showing wrong values in Sales order page
+
 ## [v4.5.2] - 2020-08-28
 ### Fixed
 - Fixed issue with updating lines

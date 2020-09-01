@@ -1788,14 +1788,13 @@ class CTSalesOrder extends CTCNC
         // END OF ORDER LINES SECTION
 
         // Order totals
-        if (!$dsOrdline->getValue(DBEOrdline::isRecurring)) {
-            if ($curCostGrandTotal) {
-                $percProfitGrandTotal = $curProfitGrandTotal * (100 / $curCostGrandTotal);
-            }
-        } else {
-            if ($recurringCurCostGrandTotal) {
-                $recurringPercProfitGrandTotal = $recurringCurProfitGrandTotal * (100 / $recurringCurCostGrandTotal);
-            }
+
+        if ($curCostGrandTotal) {
+            $percProfitGrandTotal = $curProfitGrandTotal * (100 / $curCostGrandTotal);
+        }
+
+        if ($recurringCurCostGrandTotal) {
+            $recurringPercProfitGrandTotal = $recurringCurProfitGrandTotal * (100 / $recurringCurCostGrandTotal);
         }
 
         $this->template->set_var(
@@ -1807,8 +1806,8 @@ class CTSalesOrder extends CTCNC
                 'orderTotalProfitClass'          => ($curProfitGrandTotal < 0) ? CTSALESORDER_CLS_ORDER_TOTAL_LOSS : CTSALESORDER_CLS_ORDER_TOTAL_ITEM,
                 'orderTotalSaleClass'            => ($curSaleGrandTotal < 0) ? CTSALESORDER_CLS_ORDER_TOTAL_LOSS : CTSALESORDER_CLS_ORDER_TOTAL_ITEM,
                 'orderTotalCostClass'            => ($curCostGrandTotal < 0) ? CTSALESORDER_CLS_ORDER_TOTAL_LOSS : CTSALESORDER_CLS_ORDER_TOTAL_ITEM,
-                'recurringCurCostGrandTotal'     => Controller::formatNumber($recurringCurSaleGrandTotal),
-                'recurringCurSaleGrandTotal'     => Controller::formatNumber($recurringCurCostGrandTotal),
+                'recurringCurCostGrandTotal'     => Controller::formatNumber($recurringCurCostGrandTotal),
+                'recurringCurSaleGrandTotal'     => Controller::formatNumber($recurringCurSaleGrandTotal),
                 'recurringCurProfitGrandTotal'   => Controller::formatNumber($recurringCurProfitGrandTotal),
                 'recurringPercProfitGrandTotal'  => Controller::formatNumber($recurringPercProfitGrandTotal, 1),
                 'recurringOrderTotalCostClass'   => ($recurringCurProfitGrandTotal < 0) ? CTSALESORDER_CLS_ORDER_TOTAL_LOSS : CTSALESORDER_CLS_ORDER_TOTAL_ITEM,
@@ -2521,8 +2520,8 @@ class CTSalesOrder extends CTCNC
                     $curCostGrandTotal += $curCostTotal;
                 } else {
                     $recurringCurSaleGrandTotal += $curSaleTotal;
-                    $recurringCurCostGrandTotal += $curProfit;
-                    $recurringCurProfitGrandTotal += $curCostTotal;
+                    $recurringCurProfitGrandTotal += $curProfit;
+                    $recurringCurCostGrandTotal += $curCostTotal;
 
                 }
 
