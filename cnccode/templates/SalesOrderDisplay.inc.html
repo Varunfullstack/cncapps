@@ -234,8 +234,9 @@
             newLineOneOffSequenceNumberInput.value = getOneOffLastSelectedLineCheckboxSequenceNumber();
             newLineRecurringSequenceNumberInput.value = getRecurringLastSelectedLineCheckboxSequenceNumber();
         }
+
         newLineSubmitButton.addEventListener('click', handleNewLineClick);
-        newLineSubmitRecurringButton.addEventListener('click',handleNewLineClick);
+        newLineSubmitRecurringButton.addEventListener('click', handleNewLineClick);
 
 
         toggleCheckBoxes.forEach(el => {
@@ -720,8 +721,10 @@
             footer.querySelector('.costGrandTotal').textContent = grandTotals.costGrandTotal.toFixed(2);
             footer.querySelector('.saleGrandTotal').textContent = grandTotals.saleGrandTotal.toFixed(2);
             footer.querySelector('.profitAmountGrandTotal').textContent = grandTotals.profitAmountGrandTotal.toFixed(2);
+            footer.querySelector('.profitPctGrandTotal').textContent = (grandTotals.costGrandTotal ? grandTotals.profitAmountGrandTotal * (100 / grandTotals.costGrandTotal) : 0).toFixed(2);
         }
 
+        //$curProfitGrandTotal * (100 / $curCostGrandTotal)
         function handleQuantityChanged($event) {
             // get the parent row
             const target = $event.target;
@@ -980,7 +983,7 @@
         <td class="orderTotalItem">&nbsp;</td>
         <td class="{orderTotalSaleClass} saleGrandTotal">{curSaleGrandTotal}</td>
         <td class="{orderTotalProfitClass} profitAmountGrandTotal">{curProfitGrandTotal}</td>
-        <td class="{orderTotalProfitClass}">{percProfitGrandTotal}</td>
+        <td class="{orderTotalProfitClass} profitPctGrandTotal">{percProfitGrandTotal}</td>
         <td class="{orderTotalItem}">&nbsp;</td>
     </tr>
     </tfoot>
@@ -1081,7 +1084,7 @@
         <td class="orderTotalItem">&nbsp;</td>
         <td class="{recurringOrderTotalSaleClass} saleGrandTotal">{recurringCurSaleGrandTotal}</td>
         <td class="{recurringOrderTotalProfitClass} profitAmountGrandTotal">{recurringCurProfitGrandTotal}</td>
-        <td class="{recurringOrderTotalProfitClass}">{recurringPercProfitGrandTotal}</td>
+        <td class="{recurringOrderTotalProfitClass} profitPctGrandTotal">{recurringPercProfitGrandTotal}</td>
         <td class="{orderTotalItem}">&nbsp;</td>
     </tr>
     </tfoot>
