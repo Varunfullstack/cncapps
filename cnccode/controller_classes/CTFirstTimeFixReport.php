@@ -216,18 +216,20 @@ ORDER BY engineer.firstName";
             ];
 
 
-            $totalRaised += $row['totalRaised'];
-            $totalAttempted += $row['attemptedFirstTimeFix'];
-            $totalAchieved += $row['firstTimeFix'];
+            $data['totalRaised'] += $row['totalRaised'];
+            $data['totalAttempted'] += $row['attemptedFirstTimeFix'];
+            $data['totalAchieved'] += $row['firstTimeFix'];
         }
 
-        $data['firstTimeFixAttemptedPct'] = $totalRaised > 0 ? round(
-            ($totalAttempted / $totalRaised) * 100
+        $data['firstTimeFixAttemptedPct'] = $data['totalRaised'] > 0 ? round(
+            ($data['totalAttempted'] / $data['totalRaised']) * 100
         ) : 'N/A';
-        $data['firstTimeFixAchievedPct'] = $totalRaised > 0 ? round(
-            ($totalAchieved / $totalRaised) * 100
+        $data['firstTimeFixAchievedPct'] = $data['totalRaised'] > 0 ? round(
+            ($data['totalAchieved'] / $data['totalRaised']) * 100
         ) : 'N/A';
-        $data['phonedThroughRequests'] = $totalRaised;
+        $data['phonedThroughRequests'] = $data['totalRaised'];
+
+
         return $data;
     }
 

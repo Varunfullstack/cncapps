@@ -27,7 +27,8 @@ class FixedServiceRequestCountComponent extends React.Component {
             yearMonth: currentFormattedDate,
             selectedState: SelectionState.YEAR_TO_DATE,
             firstTimeFixData: null,
-            fixedServiceRequestData: null
+            fixedServiceRequestData: null,
+            teamPerformanceData: null
         }
         this.fetchData();
     }
@@ -120,7 +121,11 @@ class FixedServiceRequestCountComponent extends React.Component {
             return null;
         }
 
-        const {fixedActivitiesData, teamPerformance} = tableData;
+        const {
+            firstTimeFixData,
+            fixedServiceRequestData,
+            teamPerformanceData
+        } = tableData;
 
         const teams = {};
         fixedActivitiesData.forEach(row => {
