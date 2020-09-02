@@ -88,6 +88,7 @@ class CTFirstTimeFixReport extends CTCNC
     ' ',
     engineer.`lastName`
   ) AS name,
+  engineer.cns_consno as engineerId,
   SUM(
     COALESCE(
       (SELECT 
