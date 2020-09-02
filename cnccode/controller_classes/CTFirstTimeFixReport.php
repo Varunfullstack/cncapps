@@ -188,6 +188,9 @@ WHERE problem.`pro_custno` <> 282
         $query .= " GROUP BY engineer.`cns_consno` 
 ORDER BY engineer.firstName";
 
+        var_dump($query);
+        exit;
+
         $result = $db->query($query);
 
         $totalRaised = 0;
@@ -202,6 +205,7 @@ ORDER BY engineer.firstName";
 
         while ($row = $result->fetch_assoc()) {
             $data["engineers"][] = [
+                'id'                    => $row['engineerId'],
                 'name'                  => $row['name'],
                 'firstTimeFix'          => $row['firstTimeFix'],
                 'attemptedFirstTimeFix' => $row['attemptedFirstTimeFix'],

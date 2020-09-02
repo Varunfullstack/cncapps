@@ -29,6 +29,7 @@ class FixedServiceRequestCountComponent extends React.Component {
             firstTimeFixData: null,
             fixedServiceRequestData: null
         }
+        this.fetchData();
     }
 
     fetchFirstTimeFixedData(startDate, endDate) {
@@ -53,10 +54,26 @@ class FixedServiceRequestCountComponent extends React.Component {
                 if (response.status != 'ok') {
                     throw new Error('Failed to pull data');
                 }
-
                 return response.data;
             })
 
+    }
+
+    fetchTeamPerformanceData(startDate, endDate) {
+        return fetch('?action=GET_TEAM_PERFORMANCE_DATA', {
+            method: 'POST',
+            body: JSON.stringify({
+                startDate,
+                endDate
+            })
+        })
+            .then(r => r.json())
+            .then(response => {
+                if (response.status != 'ok') {
+                    throw new Error('Failed to pull data');
+                }
+                return response.data;
+            })
     }
 
     fetchData() {
@@ -72,12 +89,14 @@ class FixedServiceRequestCountComponent extends React.Component {
 
         Promise.all([
                 this.fetchFirstTimeFixedData(startDate, endDate),
-                this.fetchFixedServiceRequestData(startDate, endDate)
+                this.fetchFixedServiceRequestData(startDate, endDate),
+                this.fetchTeamPerformanceData(startDate, endDate)
             ]
-        ).then(([firstTimeFixData, fixedServiceRequestData]) => {
+        ).then(([firstTimeFixData, fixedServiceRequestData, teamPerformanceData]) => {
             this.setState({
                 firstTimeFixData,
-                fixedServiceRequestData
+                fixedServiceRequestData,
+                teamPerformanceData
             })
         })
     }
