@@ -1167,12 +1167,13 @@ class CTInvoice extends CTCNC
             $this->displayFatalError(CTINVOICE_MSG_INVOICE_NOT_FND);
             return;
         }
-        if (!$this->getParam('sequenceNo')) {
-            $this->displayFatalError(CTINVOICE_MSG_SEQNO_NOT_PASSED);
-            return;
-        }
+
         if (!$this->formError) {
             if ($this->getAction() == CTINVOICE_ACT_EDIT_LINE) {
+                if (!$this->getParam('sequenceNo')) {
+                    $this->displayFatalError(CTINVOICE_MSG_SEQNO_NOT_PASSED);
+                    return;
+                }
                 if (!$this->buInvoice->getInvlineByIDSeqNo(
                     $this->getParam('invheadID'),
                     $this->getParam('sequenceNo'),
@@ -1182,9 +1183,15 @@ class CTInvoice extends CTCNC
                     return;
                 }
             } else {
+                $lines = new DataSet($this);
+                $this->buInvoice->getLinesByID($this->getParam('invheadID'), $lines);
+                $sequenceNo = 1;
+                while ($lines->fetchNext()) {
+                    $sequenceNo = $lines->getValue(DBEInvline::sequenceNo);
+                }
                 $this->buInvoice->initialiseNewInvline(
                     $this->getParam('invheadID'),
-                    $this->getParam('sequenceNo'),
+                    $sequenceNo + 1,
                     $this->dsInvline
                 );
             }
