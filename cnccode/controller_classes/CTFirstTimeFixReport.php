@@ -5,6 +5,7 @@
  * Date: 07/08/2018
  * Time: 9:42
  */
+global $cfg;
 require_once($cfg['path_ct'] . '/CTCNC.inc.php');
 require_once($cfg['path_bu'] . '/BUUser.inc.php');
 

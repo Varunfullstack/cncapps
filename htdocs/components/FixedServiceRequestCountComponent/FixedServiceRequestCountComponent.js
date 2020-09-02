@@ -115,30 +115,225 @@ class FixedServiceRequestCountComponent extends React.Component {
         }
     }
 
-    renderTable() {
-        const {tableData} = this.state;
-        if (!tableData || !Object.keys(tableData).length) {
-            return null;
-        }
+    getTeamData(teamPerformanceData, teamId) {
 
+        switch (teamId) {
+            case 1:
+                return {
+                    avgFixHours: teamPerformanceData.hdTeamAvgFixHours,
+                    avgSLAPercentage: teamPerformanceData.hdTeamAvgSLAPercentage
+                }
+            case 2:
+                return {
+                    avgFixHours: teamPerformanceData.esTeamAvgFixHours,
+                    avgSLAPercentage: teamPerformanceData.esTeamAvgSLAPercentage
+                }
+            case 4:
+                return {
+                    avgFixHours: teamPerformanceData.spTeamAvgFixHours,
+                    avgSLAPercentage: teamPerformanceData.spTeamAvgSLAPercentage
+                }
+            case 5:
+                return {
+                    avgFixHours: teamPerformanceData.pTeamAvgFixHours,
+                    avgSLAPercentage: teamPerformanceData.pTeamAvgSLAPercentage
+                }
+        }
+    }
+
+    renderTable() {
         const {
             firstTimeFixData,
             fixedServiceRequestData,
             teamPerformanceData
-        } = tableData;
-
+        } = this.state
+        if (!fixedServiceRequestData) {
+            return;
+        }
         const teams = {};
-        fixedActivitiesData.forEach(row => {
-            if (!(row.teamId in teams)) {
-                teams[row.teamId] = {
-                    name: this.getTeamName(row.teamId),
-                    totalFixed: 0,
-                    totalRaised: 0,
-                    firstTimeFixed
-                };
-            }
-        })
+        let previousTeam = null;
 
+        return this.el('table', null,
+            [
+                this.el('thead', {key: 'head'},
+                    this.el('tr', null, [
+                        this.el('td', {key: 'nothing'}),
+                        this.el('td', {
+                                key: 'srsFixedHeader',
+                                title: "Number of SRs fixed in a calendar month"
+                            }, 'SRs Fixed'
+                        ),
+                        this.el('td', {
+                            key: 'srsRaisedHeader',
+                            title: "Number of SRs raised in a calendar month"
+                        }, 'SRs Raised'),
+                        this.el('td', {
+                            key: 'firstTimeFixedRaisedHeader',
+                            title: "Number of SRs raised in a calendar month"
+                        }, 'First Time Fixed Raised Header'),
+                        this.el('td', {
+                            key: 'firstTimeFixedPercentAttemptedHeader',
+                            title: "Number of SRs fixed in a calendar month"
+                        }, 'FTF Percent Attempted'),
+                        this.el('td', {
+                            key: 'firstTimeFixedAchievedHeader',
+                            title: "Number of SRs fixed in a calendar month"
+                        }, 'FTF Percent Achieved'),
+                        this.el('td', {
+                            key: 'timeRequestsHeader',
+                            title: "Number of SRs fixed in a calendar month"
+                        }, 'Time Requests'),
+                        this.el('td', {
+                            key: 'changeRequestsHeader',
+                            title: "Number of SRs fixed in a calendar month"
+                        }, 'Change Requests'),
+                        this.el('td', {
+                            key: 'operationalTasksHeader',
+                            title: "Number of SRs fixed in a calendar month"
+                        }, 'Operational Tasks'),
+                        this.el('td', {
+                            key: 'teamSLAPercentHeader',
+                            title: "Number of SRs fixed in a calendar month"
+                        }, 'Team SLA%'),
+                        this.el('td', {
+                            key: 'teamAverageFixHoursHeader',
+                            title: "Number of SRs fixed in a calendar month"
+                        }, 'Team Average Fix Hours'),
+                    ])
+                ),
+                this.el(
+                    'tbody',
+                    {key: 'body'},
+                    [
+                        fixedServiceRequestData.reduce((acc, row, index, array) => {
+                            if (!(row.teamId in teams)) {
+                                const name = this.getTeamName(row.teamId);
+                                teams[row.teamId] = {
+                                    name,
+                                    teamId: row.teamId,
+                                    totalFixed: 0,
+                                    totalRaised: 0,
+                                    firstTimeFixRaised: null,
+                                    firstTimeFixPercentAttempted: null,
+                                    firstTimeFixPercentAchieved: null,
+                                    timeRequests: 0,
+                                    changeRequests: 0,
+                                    operationalTasks: 0,
+                                    engineers: []
+                                };
+
+                                if (row.teamId === 1) {
+                                    teams[row.teamId].firstTimeFixRaised = firstTimeFixData.totalRaised;
+                                    teams[row.teamId].firstTimeFixPercentAttempted = firstTimeFixData.firstTimeFixAttemptedPct;
+                                    teams[row.teamId].firstTimeFixPercentAchieved = firstTimeFixData.firstTimeFixAchievedPct;
+                                }
+
+                                if (previousTeam) {
+                                    const teamPerformanceValues = this.getTeamData(teamPerformanceData, previousTeam.teamId);
+                                    acc.push(
+                                        this.el('tr', {key: `footer-${previousTeam.teamId}`},
+                                            [
+                                                this.el('td', {key: `footer-0-${previousTeam.teamId}`}, 'Team Total'),
+                                                this.el('td', {key: `footer-1-${previousTeam.teamId}`}, previousTeam.totalFixed),
+                                                this.el('td', {key: `footer-2-${previousTeam.teamId}`}, previousTeam.totalRaised),
+                                                this.el('td', {key: `footer-3-${previousTeam.teamId}`}, previousTeam.firstTimeFixRaised),
+                                                this.el('td', {key: `footer-4-${previousTeam.teamId}`}, previousTeam.firstTimeFixPercentAttempted),
+                                                this.el('td', {key: `footer-5-${previousTeam.teamId}`}, previousTeam.firstTimeFixPercentAchieved),
+                                                this.el('td', {key: `footer-6-${previousTeam.teamId}`}, previousTeam.timeRequests),
+                                                this.el('td', {key: `footer-7-${previousTeam.teamId}`}, previousTeam.changeRequests),
+                                                this.el('td', {key: `footer-8-${previousTeam.teamId}`}, previousTeam.operationalTasks),
+                                                this.el('td', {key: `footer-9-${previousTeam.teamId}`}, teamPerformanceValues.avgFixHours),
+                                                this.el('td', {key: `footer-10-${previousTeam.teamId}`}, teamPerformanceValues.avgSLAPercentage),
+                                            ]
+                                        )
+                                    )
+                                }
+
+                                acc.push(
+                                    this.el('tr', {key: `header-${row.teamId}`},
+                                        [
+                                            this.el('td', {key: `header-0-${row.teamId}`}, name),
+                                            this.el('td', {key: `header-1-${row.teamId}`}),
+                                            this.el('td', {key: `header-2-${row.teamId}`}),
+                                            this.el('td', {key: `header-3-${row.teamId}`}),
+                                            this.el('td', {key: `header-4-${row.teamId}`}),
+                                            this.el('td', {key: `header-5-${row.teamId}`}),
+                                            this.el('td', {key: `header-6-${row.teamId}`}),
+                                            this.el('td', {key: `header-7-${row.teamId}`}),
+                                            this.el('td', {key: `header-8-${row.teamId}`}),
+                                            this.el('td', {key: `header-9-${row.teamId}`}),
+                                            this.el('td', {key: `header-10-${row.teamId}`}),
+                                        ]
+                                    )
+                                )
+                            }
+                            const currentTeam = teams[row.teamId];
+                            if (!(row.userId in currentTeam.engineers)) {
+                                currentTeam.engineers[row.userId] = row.userId;
+                                currentTeam.totalFixed += +row.fixed;
+                                currentTeam.totalRaised += +row.raised;
+                                currentTeam.timeRequests += +row.timeRequests;
+                                currentTeam.changeRequests += +row.changeRequests;
+                                currentTeam.operationalTasks += +row.operationalTasks;
+                                const foundFirstTimeFixData = firstTimeFixData.engineers.find(x => x.id == row.userId);
+
+                                let firstTimeFixTotalRaised = null;
+                                let firstTimeFixPct = null;
+                                let attemptedFirstTimeFixPct = null;
+                                if (foundFirstTimeFixData && foundFirstTimeFixData.totalRaised) {
+                                    firstTimeFixTotalRaised = foundFirstTimeFixData.totalRaised;
+                                    firstTimeFixPct = ((foundFirstTimeFixData.firstTimeFix / foundFirstTimeFixData.totalRaised) * 100).toFixed(2)
+                                    attemptedFirstTimeFixPct = ((foundFirstTimeFixData.attemptedFirstTimeFix / foundFirstTimeFixData.totalRaised) * 100).toFixed(2)
+                                }
+
+                                acc.push(
+                                    this.el(
+                                        'tr',
+                                        {key: `engineer-${row.userId}`},
+                                        [
+                                            this.el('td', {key: `engineer-0-${row.userId}`}, row.userName),
+                                            this.el('td', {key: `engineer-1-${row.userId}`}, row.fixed),
+                                            this.el('td', {key: `engineer-2-${row.userId}`}, row.raised),
+                                            this.el('td', {key: `engineer-3-${row.userId}`}, foundFirstTimeFixData ? firstTimeFixTotalRaised : null),
+                                            this.el('td', {key: `engineer-4-${row.userId}`}, foundFirstTimeFixData ? firstTimeFixPct : null),
+                                            this.el('td', {key: `engineer-5-${row.userId}`}, foundFirstTimeFixData ? attemptedFirstTimeFixPct : null),
+                                            this.el('td', {key: `engineer-6-${row.userId}`}, row.timeRequests),
+                                            this.el('td', {key: `engineer-7-${row.userId}`}, row.changeRequests),
+                                            this.el('td', {key: `engineer-8-${row.userId}`}, row.operationalTasks),
+                                            this.el('td', {key: `engineer-9-${row.userId}`}),
+                                            this.el('td', {key: `engineer-10-${row.userId}`}),
+                                        ]
+                                    )
+                                )
+                            }
+                            previousTeam = currentTeam;
+                            if (index == array.length - 1) {
+                                const teamPerformanceValues = this.getTeamData(teamPerformanceData, previousTeam.teamId);
+
+                                acc.push(
+                                    this.el('tr', {key: `footer-${previousTeam.teamId}`},
+                                        [
+                                            this.el('td', {key: `footer-0-${previousTeam.teamId}`}, 'Team Total'),
+                                            this.el('td', {key: `footer-1-${previousTeam.teamId}`}, previousTeam.totalFixed),
+                                            this.el('td', {key: `footer-2-${previousTeam.teamId}`}, previousTeam.totalRaised),
+                                            this.el('td', {key: `footer-3-${previousTeam.teamId}`}, previousTeam.firstTimeFixRaised),
+                                            this.el('td', {key: `footer-4-${previousTeam.teamId}`}, previousTeam.firstTimeFixPercentAttempted),
+                                            this.el('td', {key: `footer-5-${previousTeam.teamId}`}, previousTeam.firstTimeFixPercentAchieved),
+                                            this.el('td', {key: `footer-6-${previousTeam.teamId}`}, previousTeam.timeRequests),
+                                            this.el('td', {key: `footer-7-${previousTeam.teamId}`}, previousTeam.changeRequests),
+                                            this.el('td', {key: `footer-8-${previousTeam.teamId}`}, previousTeam.operationalTasks),
+                                            this.el('td', {key: `footer-9-${previousTeam.teamId}`}, teamPerformanceValues.avgFixHours),
+                                            this.el('td', {key: `footer-10-${previousTeam.teamId}`}, teamPerformanceValues.avgSLAPercentage),
+                                        ]
+                                    )
+                                )
+                            }
+                            return acc;
+                        }, [])
+                    ]
+                )
+            ]
+        )
 
     }
 

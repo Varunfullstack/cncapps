@@ -121,7 +121,7 @@ WHERE CONCAT(
                         ],
                     ]
                 );
-                $teamPerformanceData = $teamPerformanceResult->fetch_all(MYSQLI_ASSOC);
+                $teamPerformanceData = $teamPerformanceResult->fetch_array(MYSQLI_ASSOC);
 
                 echo json_encode(
                     [
@@ -152,12 +152,12 @@ WHERE CONCAT(
                        SELECT
   consultant.`cns_name` AS userName,
   consultant.`cns_consno` AS userId,
-  consultant.`teamID`,
+  consultant.`teamID` as teamId,
   SUM(isFixed) AS `fixed`,
-  SUM(isInitial) AS initial,
-  SUM(isTimeRequest) AS timeRequest,
-  SUM(isTechnicalChangeRequest) AS technicalChangeRequest,
-  SUM(isOperationalTask) AS operationalTask
+  SUM(isInitial) AS raised,
+  SUM(isTimeRequest) AS timeRequests,
+  SUM(isTechnicalChangeRequest) AS changeRequests,
+  SUM(isOperationalTask) AS operationalTasks
 FROM
   (SELECT
     callactivity.`caa_consno` AS userId,
@@ -187,7 +187,7 @@ FROM
     ON consultant.`cns_consno` = a.`userId`
 WHERE consultant.`teamID` <= 5
 GROUP BY a.userId
-ORDER BY `teamID`,
+ORDER BY teamId,
   userName             
                 ";
                 $result = $db->preparedQuery(
