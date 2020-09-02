@@ -270,7 +270,7 @@ ORDER BY teamId,
             array('action' => CTCNC_ACT_SEARCH)
         );
 
-        $this->setPageTitle('Team & User Statistics', 'Fixed Service Request Count');
+        $this->setPageTitle('Team & User Statistics', 'Engineer Service Request Statistics');
 
         $this->template->set_var(
             array(

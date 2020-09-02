@@ -153,7 +153,7 @@ class FixedServiceRequestCountComponent extends React.Component {
         const teams = {};
         let previousTeam = null;
 
-        return this.el('table', null,
+        return this.el('table', {className: 'table table-striped'},
             [
                 this.el('thead', {key: 'head'},
                     this.el('tr', null, [
@@ -165,39 +165,39 @@ class FixedServiceRequestCountComponent extends React.Component {
                         ),
                         this.el('td', {
                             key: 'srsRaisedHeader',
-                            title: "Number of SRs raised in a calendar month"
-                        }, 'SRs Raised'),
+                            title: "Total SRs raised by engineer."
+                        }, 'Total SRs Raised'),
                         this.el('td', {
                             key: 'firstTimeFixedRaisedHeader',
-                            title: "Number of SRs raised in a calendar month"
-                        }, 'First Time Fixed Raised Header'),
+                            title: "Total FTF qualifying SRs raised, not CNC, source is phone call, and customer has correct contract."
+                        }, 'Total FTF SRs Raised'),
                         this.el('td', {
                             key: 'firstTimeFixedPercentAttemptedHeader',
-                            title: "Number of SRs fixed in a calendar month"
+                            title: "First Time Fix attempted (helpdesk only)"
                         }, 'FTF Percent Attempted'),
                         this.el('td', {
                             key: 'firstTimeFixedAchievedHeader',
-                            title: "Number of SRs fixed in a calendar month"
+                            title: "First Time Fix Achieved (helpdesk only)"
                         }, 'FTF Percent Achieved'),
                         this.el('td', {
                             key: 'timeRequestsHeader',
-                            title: "Number of SRs fixed in a calendar month"
+                            title: "number of time requests submitted (includes resubmussion after requests denied)"
                         }, 'Time Requests'),
                         this.el('td', {
                             key: 'changeRequestsHeader',
-                            title: "Number of SRs fixed in a calendar month"
+                            title: "number of change requests submitted (includes resubmission after4 requests denied)"
                         }, 'Change Requests'),
                         this.el('td', {
                             key: 'operationalTasksHeader',
-                            title: "Number of SRs fixed in a calendar month"
+                            title: "number of operational tasks (escalation, deescalation, CR, TR, SLA change) done by TL"
                         }, 'Operational Tasks'),
                         this.el('td', {
                             key: 'teamSLAPercentHeader',
-                            title: "Number of SRs fixed in a calendar month"
+                            title: "team SLA percentage achieved"
                         }, 'Team SLA%'),
                         this.el('td', {
                             key: 'teamAverageFixHoursHeader',
-                            title: "Number of SRs fixed in a calendar month"
+                            title: "team average fix hours achieved"
                         }, 'Team Average Fix Hours'),
                     ])
                 ),
@@ -231,7 +231,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                                 if (previousTeam) {
                                     const teamPerformanceValues = this.getTeamData(teamPerformanceData, previousTeam.teamId);
                                     acc.push(
-                                        this.el('tr', {key: `footer-${previousTeam.teamId}`},
+                                        this.el('tr', {key: `footer-${previousTeam.teamId}`, className: 'teamFooter'},
                                             [
                                                 this.el('td', {key: `footer-0-${previousTeam.teamId}`}, 'Team Total'),
                                                 this.el('td', {key: `footer-1-${previousTeam.teamId}`}, previousTeam.totalFixed),
@@ -242,27 +242,27 @@ class FixedServiceRequestCountComponent extends React.Component {
                                                 this.el('td', {key: `footer-6-${previousTeam.teamId}`}, previousTeam.timeRequests),
                                                 this.el('td', {key: `footer-7-${previousTeam.teamId}`}, previousTeam.changeRequests),
                                                 this.el('td', {key: `footer-8-${previousTeam.teamId}`}, previousTeam.operationalTasks),
-                                                this.el('td', {key: `footer-9-${previousTeam.teamId}`}, teamPerformanceValues.avgFixHours),
-                                                this.el('td', {key: `footer-10-${previousTeam.teamId}`}, teamPerformanceValues.avgSLAPercentage),
+                                                this.el('td', {key: `footer-9-${previousTeam.teamId}`}, (+teamPerformanceValues.avgFixHours).toFixed(2)),
+                                                this.el('td', {key: `footer-10-${previousTeam.teamId}`}, (+teamPerformanceValues.avgSLAPercentage).toFixed(2)),
                                             ]
                                         )
                                     )
                                 }
 
                                 acc.push(
-                                    this.el('tr', {key: `header-${row.teamId}`},
+                                    this.el('tr', {key: `header-${row.teamId}`, className: 'teamHeader'},
                                         [
-                                            this.el('td', {key: `header-0-${row.teamId}`}, name),
-                                            this.el('td', {key: `header-1-${row.teamId}`}),
-                                            this.el('td', {key: `header-2-${row.teamId}`}),
-                                            this.el('td', {key: `header-3-${row.teamId}`}),
-                                            this.el('td', {key: `header-4-${row.teamId}`}),
-                                            this.el('td', {key: `header-5-${row.teamId}`}),
-                                            this.el('td', {key: `header-6-${row.teamId}`}),
-                                            this.el('td', {key: `header-7-${row.teamId}`}),
-                                            this.el('td', {key: `header-8-${row.teamId}`}),
-                                            this.el('td', {key: `header-9-${row.teamId}`}),
-                                            this.el('td', {key: `header-10-${row.teamId}`}),
+                                            this.el('th', {key: `header-0-${row.teamId}`}, name),
+                                            this.el('th', {key: `header-1-${row.teamId}`}),
+                                            this.el('th', {key: `header-2-${row.teamId}`}),
+                                            this.el('th', {key: `header-3-${row.teamId}`}),
+                                            this.el('th', {key: `header-4-${row.teamId}`}),
+                                            this.el('th', {key: `header-5-${row.teamId}`}),
+                                            this.el('th', {key: `header-6-${row.teamId}`}),
+                                            this.el('th', {key: `header-7-${row.teamId}`}),
+                                            this.el('th', {key: `header-8-${row.teamId}`}),
+                                            this.el('th', {key: `header-9-${row.teamId}`}),
+                                            this.el('th', {key: `header-10-${row.teamId}`}),
                                         ]
                                     )
                                 )
@@ -337,6 +337,14 @@ class FixedServiceRequestCountComponent extends React.Component {
 
     }
 
+    componentDidUpdate(prevProps, prevState) {
+
+        if (prevState.yearMonth !== this.state.yearMonth ||
+            prevState.selectedState !== this.state.selectedState) {
+            this.fetchData();
+        }
+    }
+
     render() {
         const {selectedState, yearMonth} = this.state;
         return this.el(
@@ -369,7 +377,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                                         key: 'yearToDateInput',
                                         onChange: () => {
                                             this.setState({selectedState: SelectionState.YEAR_TO_DATE});
-                                            this.fetchData();
+
                                         }
                                     }
                                 ),
@@ -398,7 +406,6 @@ class FixedServiceRequestCountComponent extends React.Component {
                                         key: 'specificMonthInput',
                                         onChange: () => {
                                             this.setState({selectedState: SelectionState.SPECIFIC_YEAR_MONTH});
-                                            this.fetchData();
                                         }
                                     }
                                 ),
@@ -418,7 +425,6 @@ class FixedServiceRequestCountComponent extends React.Component {
                                 onChange: ($event) => {
                                     const value = $event.currentTarget.value;
                                     this.setState({yearMonth: value});
-                                    this.fetchData();
                                 },
                                 key: 'yearMonthInput'
                             }) : null
