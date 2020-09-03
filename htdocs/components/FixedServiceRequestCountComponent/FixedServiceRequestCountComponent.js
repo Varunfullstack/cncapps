@@ -141,6 +141,28 @@ class FixedServiceRequestCountComponent extends React.Component {
         }
     }
 
+    footerRow(rowList, teamPerformanceData, previousTeam) {
+        const teamPerformanceValues = this.getTeamData(teamPerformanceData, previousTeam.teamId);
+        rowList.push(
+            this.el('tr', {key: `footer-${previousTeam.teamId}`, className: 'teamFooter'},
+                [
+                    this.el('td', {key: `footer-0-${previousTeam.teamId}`}, 'Team Total'),
+                    this.el('td', {key: `footer-1-${previousTeam.teamId}`}, previousTeam.totalFixed),
+                    this.el('td', {key: `footer-2-${previousTeam.teamId}`}, previousTeam.totalRaised),
+                    this.el('td', {key: `footer-3-${previousTeam.teamId}`}, previousTeam.firstTimeFixRaised),
+                    this.el('td', {key: `footer-4-${previousTeam.teamId}`}, previousTeam.firstTimeFixPercentAttempted),
+                    this.el('td', {key: `footer-5-${previousTeam.teamId}`}, previousTeam.firstTimeFixPercentAchieved),
+                    this.el('td', {key: `footer-6-${previousTeam.teamId}`}, previousTeam.timeRequests),
+                    this.el('td', {key: `footer-7-${previousTeam.teamId}`}, previousTeam.changeRequests),
+                    this.el('td', {key: `footer-8-${previousTeam.teamId}`}, previousTeam.operationalTasks),
+                    this.el('td', {key: `footer-9-${previousTeam.teamId}`}, (+teamPerformanceValues.avgFixHours).toFixed(2)),
+                    this.el('td', {key: `footer-10-${previousTeam.teamId}`}, (+teamPerformanceValues.avgSLAPercentage).toFixed(2)),
+                ]
+            )
+        )
+        return rowList;
+    }
+
     renderTable() {
         const {
             firstTimeFixData,
@@ -157,45 +179,45 @@ class FixedServiceRequestCountComponent extends React.Component {
             [
                 this.el('thead', {key: 'head'},
                     this.el('tr', null, [
-                        this.el('td', {key: 'nothing'}),
-                        this.el('td', {
+                        this.el('th', {key: 'nothing'}),
+                        this.el('th', {
                                 key: 'srsFixedHeader',
                                 title: "Number of SRs fixed in a calendar month"
                             }, 'SRs Fixed'
                         ),
-                        this.el('td', {
+                        this.el('th', {
                             key: 'srsRaisedHeader',
                             title: "Total SRs raised by engineer."
                         }, 'Total SRs Raised'),
-                        this.el('td', {
+                        this.el('th', {
                             key: 'firstTimeFixedRaisedHeader',
                             title: "Total FTF qualifying SRs raised, not CNC, source is phone call, and customer has correct contract."
                         }, 'Total FTF SRs Raised'),
-                        this.el('td', {
+                        this.el('th', {
                             key: 'firstTimeFixedPercentAttemptedHeader',
                             title: "First Time Fix attempted (helpdesk only)"
                         }, 'FTF Percent Attempted'),
-                        this.el('td', {
+                        this.el('th', {
                             key: 'firstTimeFixedAchievedHeader',
                             title: "First Time Fix Achieved (helpdesk only)"
                         }, 'FTF Percent Achieved'),
-                        this.el('td', {
+                        this.el('th', {
                             key: 'timeRequestsHeader',
                             title: "number of time requests submitted (includes resubmussion after requests denied)"
                         }, 'Time Requests'),
-                        this.el('td', {
+                        this.el('th', {
                             key: 'changeRequestsHeader',
                             title: "number of change requests submitted (includes resubmission after4 requests denied)"
                         }, 'Change Requests'),
-                        this.el('td', {
+                        this.el('th', {
                             key: 'operationalTasksHeader',
                             title: "number of operational tasks (escalation, deescalation, CR, TR, SLA change) done by TL"
                         }, 'Operational Tasks'),
-                        this.el('td', {
+                        this.el('th', {
                             key: 'teamSLAPercentHeader',
                             title: "team SLA percentage achieved"
                         }, 'Team SLA%'),
-                        this.el('td', {
+                        this.el('th', {
                             key: 'teamAverageFixHoursHeader',
                             title: "team average fix hours achieved"
                         }, 'Team Average Fix Hours'),
@@ -229,24 +251,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                                 }
 
                                 if (previousTeam) {
-                                    const teamPerformanceValues = this.getTeamData(teamPerformanceData, previousTeam.teamId);
-                                    acc.push(
-                                        this.el('tr', {key: `footer-${previousTeam.teamId}`, className: 'teamFooter'},
-                                            [
-                                                this.el('td', {key: `footer-0-${previousTeam.teamId}`}, 'Team Total'),
-                                                this.el('td', {key: `footer-1-${previousTeam.teamId}`}, previousTeam.totalFixed),
-                                                this.el('td', {key: `footer-2-${previousTeam.teamId}`}, previousTeam.totalRaised),
-                                                this.el('td', {key: `footer-3-${previousTeam.teamId}`}, previousTeam.firstTimeFixRaised),
-                                                this.el('td', {key: `footer-4-${previousTeam.teamId}`}, previousTeam.firstTimeFixPercentAttempted),
-                                                this.el('td', {key: `footer-5-${previousTeam.teamId}`}, previousTeam.firstTimeFixPercentAchieved),
-                                                this.el('td', {key: `footer-6-${previousTeam.teamId}`}, previousTeam.timeRequests),
-                                                this.el('td', {key: `footer-7-${previousTeam.teamId}`}, previousTeam.changeRequests),
-                                                this.el('td', {key: `footer-8-${previousTeam.teamId}`}, previousTeam.operationalTasks),
-                                                this.el('td', {key: `footer-9-${previousTeam.teamId}`}, (+teamPerformanceValues.avgFixHours).toFixed(2)),
-                                                this.el('td', {key: `footer-10-${previousTeam.teamId}`}, (+teamPerformanceValues.avgSLAPercentage).toFixed(2)),
-                                            ]
-                                        )
-                                    )
+                                    this.footerRow(acc, teamPerformanceData, previousTeam);
                                 }
 
                                 acc.push(
@@ -308,25 +313,7 @@ class FixedServiceRequestCountComponent extends React.Component {
                             }
                             previousTeam = currentTeam;
                             if (index == array.length - 1) {
-                                const teamPerformanceValues = this.getTeamData(teamPerformanceData, previousTeam.teamId);
-
-                                acc.push(
-                                    this.el('tr', {key: `footer-${previousTeam.teamId}`},
-                                        [
-                                            this.el('td', {key: `footer-0-${previousTeam.teamId}`}, 'Team Total'),
-                                            this.el('td', {key: `footer-1-${previousTeam.teamId}`}, previousTeam.totalFixed),
-                                            this.el('td', {key: `footer-2-${previousTeam.teamId}`}, previousTeam.totalRaised),
-                                            this.el('td', {key: `footer-3-${previousTeam.teamId}`}, previousTeam.firstTimeFixRaised),
-                                            this.el('td', {key: `footer-4-${previousTeam.teamId}`}, previousTeam.firstTimeFixPercentAttempted),
-                                            this.el('td', {key: `footer-5-${previousTeam.teamId}`}, previousTeam.firstTimeFixPercentAchieved),
-                                            this.el('td', {key: `footer-6-${previousTeam.teamId}`}, previousTeam.timeRequests),
-                                            this.el('td', {key: `footer-7-${previousTeam.teamId}`}, previousTeam.changeRequests),
-                                            this.el('td', {key: `footer-8-${previousTeam.teamId}`}, previousTeam.operationalTasks),
-                                            this.el('td', {key: `footer-9-${previousTeam.teamId}`}, teamPerformanceValues.avgFixHours),
-                                            this.el('td', {key: `footer-10-${previousTeam.teamId}`}, teamPerformanceValues.avgSLAPercentage),
-                                        ]
-                                    )
-                                )
+                                this.footerRow(acc, teamPerformanceData, previousTeam);
                             }
                             return acc;
                         }, [])
