@@ -256,18 +256,18 @@ class Auth
         $sessionStartDateTime = new DateTime();
         $nowDateTime = new DateTime();
         $sessionStartTimestamp = @$this->auth['sessionStartTimestamp'];
-        $expiredSession = true;
         if ($sessionStartTimestamp) {
             $sessionStartDateTime->setTimestamp($sessionStartTimestamp);
             $expiredSession = $nowDateTime->format('j') !== $sessionStartDateTime->format('j');
+            if ($expiredSession) {
+                return false;
+            }
         }
+
+
         if (
-            isset($this->auth["uid"])
-            &&
-            $this->auth["uid"]
-            &&
+            !empty($this->auth["uid"]) &&
             (($this->lifetime <= 0) || (time() < $this->auth["exp"]))
-            && !$expiredSession
         ) {
             # If more than $this->refresh minutes are passed since last check,
             # perform auth data refreshing. Refresh is only done when current
