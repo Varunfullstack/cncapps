@@ -845,14 +845,10 @@ class CTUser extends CTCNC
     {
         $this->setPageTitle('Register Half Holidays');
 
-        $this->setTemplateFiles(array('UserHalfHolidays' => 'UserHalfHoliday.inc'));
-
+        $this->setTemplateFiles(array('UserHalfHolidays' => 'UserHalfHoliday'));
+        $userId = $this->getParam('userID');
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-            $userId = $this->getParam('userId');
             $date = $this->getParam('date');
-
-
             $this->buUser->logHalfHoliday($userId, $date);
 
             $urlNext = Controller::buildLink(
@@ -867,7 +863,7 @@ class CTUser extends CTCNC
         }
         $dsUser = new DataSet($this);
         $this->buUser->getUserByID(
-            $this->getParam('userID'),
+            $userId,
             $dsUser
         );
 
@@ -1044,7 +1040,13 @@ class CTUser extends CTCNC
 
                     $txtEdit = '[edit]';
                 }
-
+                $urlHalfHolidays = Controller::buildLink(
+                    $_SERVER['PHP_SELF'],
+                    array(
+                        'action' => self::REGISTER_HALF_HOLIDAYS,
+                        'userID' => $userID
+                    )
+                );
                 $urlReportAbsent =
                     Controller::buildLink(
                         $_SERVER['PHP_SELF'],
@@ -1057,20 +1059,14 @@ class CTUser extends CTCNC
 
                 $this->template->set_var(
                     array(
-                        'userID' => $userID,
-
-                        'firstName' => Controller::htmlDisplayText($dsUser->getValue(DBEJUser::firstName)),
-
-                        'lastName' => Controller::htmlDisplayText($dsUser->getValue(DBEJUser::lastName)),
-
-                        'urlReportAbsent'
-                        => $urlReportAbsent,
-
-                        'txtReportAbsent'
-                        => $txtReportAbsent,
-
-                        'urlEdit' => $urlEdit,
-                        'txtEdit' => $txtEdit
+                        'userID'          => $userID,
+                        'firstName'       => Controller::htmlDisplayText($dsUser->getValue(DBEJUser::firstName)),
+                        'lastName'        => Controller::htmlDisplayText($dsUser->getValue(DBEJUser::lastName)),
+                        'urlReportAbsent' => $urlReportAbsent,
+                        'txtReportAbsent' => $txtReportAbsent,
+                        'urlHalfHolidays' => $urlHalfHolidays,
+                        'urlEdit'         => $urlEdit,
+                        'txtEdit'         => $txtEdit
                     )
                 );
                 $this->template->parse(
