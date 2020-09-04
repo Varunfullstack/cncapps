@@ -1,0 +1,24 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue969-0">
+        <tagDatabase tag="issue969"/>
+    </changeSet>
+    <changeSet id="issue969-1" author="pavwebdev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="userHalfHolidays"/>
+            </not>
+        </preConditions>
+        <createTable tableName="userHalfHolidays">
+            <column name="userId" type="int(11)">
+                <constraints nullable="false" foreignKeyName="halfHolidays_userId_fk" referencedTableName="consultant"
+                             referencedColumnNames="cns_consno" primaryKey="true" primaryKeyName="PRIMARY"/>
+            </column>
+            <column name="date" type="date">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PRIMARY"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

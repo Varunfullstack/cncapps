@@ -297,6 +297,24 @@ class BUUser extends Business
         );
     }
 
+    function logHalfHoliday($userID, $date)
+    {
+        global $db;
+        $db->preparedQuery(
+            "insert ignore into userHalfHolidays values(?,?)",
+            [
+                [
+                    "type"  => "i",
+                    "value" => $userID,
+                ],
+                [
+                    "type"  => "s",
+                    "value" => $date,
+                ]
+            ]
+        );
+    }
+
     function userTimeHasBeenLogged($ID)
     {
         global $db;

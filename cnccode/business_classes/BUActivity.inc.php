@@ -2653,7 +2653,9 @@ class BUActivity extends Business
         $endTime = '18:30';
         $sql =
             "UPDATE 
-              user_time_log 
+              user_time_log left join userHalfHolidays on userHalfHolidays.date = loggedDate and userHalfHolidays.userId = userID
+              join consultant on cns_consno = userID
+              join headert 
             SET
               loggedHours = 
               (SELECT 
@@ -2717,7 +2719,7 @@ class BUActivity extends Business
                     0
                   ),
                   2
-                ) 
+                ),
               FROM
                 callactivity 
                 JOIN callacttype
@@ -2731,6 +2733,17 @@ class BUActivity extends Business
                 and problem.pro_custno = 282
                   ),
                 holiday = 0
+                holidayHours = if(userHalfHolidays.userId is null or teamLevel > 5 , 0,               
+                      standardDayHours  * (
+                      case teamLevel 
+                      when 1 then hed_hd_team_target_log_percentage
+                      when 2 then hed_es_team_target_log_percentage
+                      when 3 then hed_im_team_target_log_percentage
+                      when 5 then projectTeamTargetLogPercentage
+                      end
+                    
+                      ) * 0.5 /100        
+                )
             WHERE userID = $userID 
               AND loggedDate = '$date' ";
         if (!$this->db->query($sql)) {
@@ -4006,8 +4019,7 @@ class BUActivity extends Business
         if ($startDate) {
             $sql .= " where loggedDate >= '" . $startDate->format('Y-m-d') . "'";
         }
-        $sql .= " and holiday = 0 ";
-        $sql .= " order by loggedDate asc, userID";
+        $sql .= " and holiday = 0  order by loggedDate asc, userID";
         $result = $this->db->query($sql);
         $userTimeLogs = $result->fetch_all(MYSQLI_ASSOC);
         foreach ($userTimeLogs as $record) {

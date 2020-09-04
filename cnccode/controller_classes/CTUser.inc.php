@@ -65,6 +65,7 @@ class CTUser extends CTCNC
 
     const DECRYPT = 'decrypt';
     const GetAge = 'getAge';
+    const REGISTER_HALF_HOLIDAYS = 'REGISTER_HALF_HOLIDAYS';
     /** @var DSForm */
     public $dsUser;
     /** @var DSForm */
@@ -200,6 +201,9 @@ class CTUser extends CTCNC
                 break;
             case CTUSER_ACT_UPDATE:
                 $this->update();
+                break;
+            case self::REGISTER_HALF_HOLIDAYS:
+                $this->registerHalfHolidays();
                 break;
             case CTUSER_ACT_ABSENCE_EDIT:
                 $this->absenceEdit();
@@ -630,7 +634,7 @@ class CTUser extends CTCNC
                     DBEUser::basedAtCustomerSite
                 ) ? 'checked' : null,
                 'siteCustomerString'                            => $siteCustomerString,
-                'streamOneLicenseManagementChecked'        => Controller::htmlChecked(
+                'streamOneLicenseManagementChecked'             => Controller::htmlChecked(
                     $dsUser->getValue(DBEJUser::streamOneLicenseManagement)
                 ),
             )
@@ -835,6 +839,52 @@ class CTUser extends CTCNC
             $this->dsUser->setValue($encryptedKeyName, $encryptedValue);
         }
         $dsUser->post();
+    }
+
+    function registerHalfHolidays()
+    {
+        $this->setPageTitle('Register Half Holidays');
+
+        $this->setTemplateFiles(array('UserHalfHolidays' => 'UserHalfHoliday.inc'));
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            $userId = $this->getParam('userId');
+            $date = $this->getParam('date');
+
+
+            $this->buUser->logHalfHoliday($userId, $date);
+
+            $urlNext = Controller::buildLink(
+                $_SERVER['PHP_SELF'],
+                array(
+                    'action' => CTUSER_ACT_DISPLAY_LIST
+                )
+            );
+            header('Location: ' . $urlNext);
+            exit;
+
+        }
+        $dsUser = new DataSet($this);
+        $this->buUser->getUserByID(
+            $this->getParam('userID'),
+            $dsUser
+        );
+
+        $this->template->setVar(
+            array(
+                'userID'   => $this->dsAbsence->getValue(self::absenceFormUserID),
+                'userName' => $dsUser->getValue(DBEJUser::name),
+            )
+        );
+
+        $this->template->parse(
+            'CONTENTS',
+            'UserHalfHolidays',
+            true
+        );
+
+        $this->parsePage();
     }
 
     /**
