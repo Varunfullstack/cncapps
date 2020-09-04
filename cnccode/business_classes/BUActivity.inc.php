@@ -2653,8 +2653,8 @@ class BUActivity extends Business
         $endTime = '18:30';
         $sql =
             "UPDATE 
-              user_time_log left join userHalfHolidays on userHalfHolidays.date = loggedDate and userHalfHolidays.userId = userID
-              join consultant on cns_consno = userID
+              user_time_log left join userHalfHolidays on userHalfHolidays.date = loggedDate and userHalfHolidays.userId = user_time_log.userID
+              join consultant on cns_consno = user_time_log.userID
               join headert 
             SET
               loggedHours = 
@@ -2688,7 +2688,7 @@ class BUActivity extends Business
                 JOIN callacttype
                   ON cat_callacttypeno = caa_callacttypeno
                 join problem on callactivity.caa_problemno = problem.pro_problemno
-              WHERE caa_consno = userID 
+              WHERE caa_consno = user_time_log.userID 
                 AND caa_date = loggedDate 
                 AND callacttype.travelFlag <> 'Y' 
                 AND caa_starttime < '$endTime' 
@@ -2719,20 +2719,20 @@ class BUActivity extends Business
                     0
                   ),
                   2
-                ),
+                )
               FROM
                 callactivity 
                 JOIN callacttype
                   ON cat_callacttypeno = caa_callacttypeno
                 join problem on callactivity.caa_problemno = problem.pro_problemno
-              WHERE caa_consno = userID 
+              WHERE caa_consno = user_time_log.userID 
                 AND caa_date = loggedDate 
                 AND callacttype.travelFlag <> 'Y' 
                 AND caa_starttime < '$endTime' 
                 AND caa_endtime > '$startTime'
                 and problem.pro_custno = 282
                   ),
-                holiday = 0
+                holiday = 0,
                 holidayHours = if(userHalfHolidays.userId is null or teamLevel > 5 , 0,               
                       standardDayHours  * (
                       case teamLevel 
@@ -2744,7 +2744,7 @@ class BUActivity extends Business
                     
                       ) * 0.5 /100        
                 )
-            WHERE userID = $userID 
+            WHERE user_time_log.userID = $userID 
               AND loggedDate = '$date' ";
         if (!$this->db->query($sql)) {
             return false;
