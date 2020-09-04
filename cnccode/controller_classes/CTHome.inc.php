@@ -151,7 +151,8 @@ class CTHome extends CTCNC
                 'date'           => (new DateTime($result['loggedDate']))->format(DATE_ISO8601),
                 'loggedHours'    => $result['loggedHours'],
                 'cncLoggedHours' => $result['cncLoggedHours'],
-                'isHolidays'     => $result['holiday']
+                'isHolidays'     => $result['holiday'],
+                'holidayHours'   => $result['holidayHours']
             ];
         }
 

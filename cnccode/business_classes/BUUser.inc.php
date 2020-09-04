@@ -346,6 +346,7 @@ class BUUser extends Business
                       loggedHours,
                       cncLoggedHours,
                       holiday,
+                      holidayHours,       
                       CONCAT(
                         consultant.`firstName`,
                         ' ',
@@ -428,6 +429,7 @@ class BUUser extends Business
   loggedDate,
   user_time_log.`loggedHours`,
   user_time_log.`cncLoggedHours`,
+  user_time_log.holidayHours,
   holiday,
   userID,
   CASE
