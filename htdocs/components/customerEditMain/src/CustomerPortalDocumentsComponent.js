@@ -167,8 +167,3 @@ class CustomerPortalDocumentsComponent extends React.Component {
 }
 
 export default CustomerPortalDocumentsComponent;
-
-document.addEventListener('DOMContentLoaded', () => {
-    const domContainer = document.querySelector('#reactCustomerPortalDocuments');
-    ReactDOM.render(React.createElement(CustomerPortalDocumentsComponent, {customerID: domContainer.dataset.customerId}), domContainer);
-});

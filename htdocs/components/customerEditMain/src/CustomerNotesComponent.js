@@ -338,8 +338,3 @@ class CustomerNotesComponent extends React.Component {
 }
 
 export default CustomerNotesComponent;
-
-document.addEventListener('DOMContentLoaded', () => {
-    const domContainer = document.querySelector('#reactCustomerNotes');
-    ReactDOM.render(React.createElement(CustomerNotesComponent, {customerID: domContainer.dataset.customerId}), domContainer);
-});

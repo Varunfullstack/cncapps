@@ -161,8 +161,3 @@ class CustomerProjectsComponent extends React.Component {
 }
 
 export default CustomerProjectsComponent;
-
-document.addEventListener('DOMContentLoaded', () => {
-    const domContainer = document.querySelector('#reactCustomerProjects');
-    ReactDOM.render(React.createElement(CustomerProjectsComponent, {customerID: domContainer.dataset.customerId}), domContainer);
-});
