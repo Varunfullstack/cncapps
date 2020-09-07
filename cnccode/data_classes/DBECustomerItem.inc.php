@@ -709,6 +709,27 @@ class DBECustomerItem extends DBCNCEntity
         return (parent::getRows());
     }
 
+    function getCountByCustomerAndItemID($customerID,
+                                         $itemID
+    )
+    {
+        $this->setMethodName('getRowsByCustomerAndItemID');
+        if ($customerID == '') {
+            $this->raiseError('customerID not set');
+        }
+        if ($itemID == '') {
+            $this->raiseError('itemID not set');
+        }
+        global $db;
+        $query = "SELECT count(*) as count FROM {$this->getTableName()} WHERE {$this->getDBColumnName(self::customerID)}={$customerID} AND {$this->getDBColumnName(self::itemID)}={$itemID}";
+        $db->query($query);
+        if (!$db->num_rows()) {
+            return 0;
+        }
+        $db->next_record(MYSQLI_ASSOC);
+        return $db->Record['count'];
+    }
+
     function search($customerID,
                     $itemID
     )

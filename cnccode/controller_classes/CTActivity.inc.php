@@ -1204,8 +1204,18 @@ class CTActivity extends CTCNC
         if (!$contractCustomerItemID) {
             $this->template->set_var(
                 array(
-                    'tandMSelected' => CT_SELECTED
+                    'tandMSelected' => CT_SELECTED,
                 )
+            );
+        }
+
+        if ($linkedToSalesOrder) {
+            $this->template->set_var(
+                [
+
+                    'salesOrderReason' => "- Must be selected because this is linked to a Sales Order"
+                ]
+
             );
         }
 
@@ -5314,6 +5324,12 @@ class CTActivity extends CTCNC
         /*
       Record action button selected
       */
+        $this->dsCallActivity->setUpdateModeUpdate();
+        $this->dsCallActivity->setValue(
+            DBECallActivity::submitAsOvertime,
+            isset($this->getParam('callActivity')[1]['submitAsOvertime'])
+        );
+        $this->dsCallActivity->post();
         $updateAwaitingCustomer = false;
         if ($this->getParam('Fixed')) {
             $nextStatus = 'Fixed';
@@ -6398,7 +6414,7 @@ class CTActivity extends CTCNC
 
             $this->buActivity->logOperationalActivity(
                 $this->getParam('problemID'),
-                '<p>Additional time allocated: ' . $minutes . ' minutes</p><p>' . $this->getParam('comments') . '</p>'
+                "<p>Additional time allocated to {$this->buActivity->getTeamName($this->getParam('teamLevel'))} Team: {$minutes} minutes</p><p>{$this->getParam('comments')}</p>"
             );
 
             $nextURL =

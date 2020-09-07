@@ -584,6 +584,28 @@ class CTSalesOrder extends CTCNC
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->sendOrderConfirmation();
                 break;
+            case 'toggleSOMonitor':
+                $salesOrderId = @$_REQUEST['salesOrderId'];
+                if (!$salesOrderId) {
+                    echo json_encode(["status" => "error", "message" => "Sales Order ID not given"]);
+                    http_response_code(400);
+                    exit;
+                }
+                global $db;
+                $params = [
+                    ["type" => "i", "value" => $salesOrderId],
+                    ["type" => "i", "value" => $this->userID],
+                ];
+                $query = 'delete from salesOrderMonitor where  salesOrderId = ? and userId = ?';
+                if (!$this->checkMonitoringSalesOrder($salesOrderId)) {
+                    $query = 'insert into salesOrderMonitor values (?,?)';
+                }
+                $db->preparedQuery(
+                    $query,
+                    $params
+                );
+                echo json_encode(["status" => "ok"]);
+                break;
             case 'updateItemPrice':
                 $this->checkPermissions(SALES_PERMISSION);
                 $this->updateItemPrice();
@@ -2065,6 +2087,12 @@ class CTSalesOrder extends CTCNC
                 );
             }
 
+            $this->template->setVar(
+                'monitorChecked',
+                $this->checkMonitoringSalesOrder(
+                    $dsOrdhead->getValue(DBEOrdhead::ordheadID)
+                ) ? 'checked' : ''
+            );
             $quoteSentDateTime = null;
 
             if ($thereAreQuoteDocuments) {
@@ -2550,6 +2578,24 @@ class CTSalesOrder extends CTCNC
     }
 
     /**
+     * @param $salesOrderId
+     * @return bool
+     * @throws Exception
+     */
+    function checkMonitoringSalesOrder($salesOrderId): bool
+    {
+        global $db;
+        $result = $db->preparedQuery(
+            'select 1 from salesOrderMonitor where userId = ? and salesOrderId = ? ',
+            [
+                ["type" => "i", "value" => $this->userID],
+                ["type" => "i", "value" => $salesOrderId]
+            ]
+        );
+        return (bool)$result->num_rows;
+    }
+
+    /**
      * @param $dsQuotation DataSet
      * @return bool
      */
@@ -2910,7 +2956,7 @@ class CTSalesOrder extends CTCNC
         unlink($quoteFile);
         header('Location: ' . $this->getDisplayOrderURL());
         exit;
-    }
+    } // End function Display Sales Order Header
 
     /**
      * Update order lines details
@@ -2959,7 +3005,7 @@ class CTSalesOrder extends CTCNC
             );
             header('Location: ' . $this->getDisplayOrderURL());
         }
-    } // End function Display Sales Order Header
+    }
 
     /**
      * This function deals with the case where another user has updated the order we are attempting

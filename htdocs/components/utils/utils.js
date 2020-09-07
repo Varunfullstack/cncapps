@@ -68,4 +68,12 @@ export function exportCSV(items, fileName, header = []) {
       }, 0);
     }
   }
+
+}
+export function distinct(array,propertyName)
+{
+  const d=(value,index,self)=>{
+    return self.map(a=>a[propertyName]).indexOf(value[propertyName])===index;
+  }
+  return array.filter(d);
 }

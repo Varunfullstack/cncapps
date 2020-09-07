@@ -1,7 +1,7 @@
 <?php
 require_once("config.inc.php");
-require_once($cfg["path_ct"]."/CTSRScheduler.php");
-session_start();
+global $cfg;
+require_once($cfg["path_ct"] . "/CTSRScheduler.php");
 page_open(
     array(
         'sess' => PHPLIB_CLASSNAME_SESSION,
@@ -10,9 +10,9 @@ page_open(
         ''
     )
 );
-GLOBAL $cfg;
+global $cfg;
 header("Cache-control: private");
-$ctStandardText= new CTSRScheduler(
+$ctStandardText = new CTSRScheduler(
     $_SERVER['REQUEST_METHOD'],
     $_POST,
     $_GET,

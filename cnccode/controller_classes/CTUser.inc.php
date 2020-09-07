@@ -248,6 +248,21 @@ class CTUser extends CTCNC
                 }
                 echo json_encode($response);
                 break;
+            case 'getApprovalSubordinates':
+                $superiorId = $_REQUEST['superiorId'];
+                $dbeUser = new DBEUser($this);
+                $dbeUser->getApprovalSubordinates($superiorId);
+                $users = [];
+                while ($dbeUser->fetchNext()) {
+                    $users[] = $dbeUser->getRowAsAssocArray();
+                }
+                echo json_encode(
+                    [
+                        "status" => "ok",
+                        "data"   => $users
+                    ]
+                );
+                break;
             case CTUSER_ACT_DISPLAY_LIST:
             default:
                 $this->displayList();
@@ -342,14 +357,13 @@ class CTUser extends CTCNC
                 true
             );
         }
-        $siteCustomerString='';
-        $siteCustomerId=$dsUser->getValue(DBEJUser::siteCustId);
-        if(isset($siteCustomerId))
-        {
-            $dbeCustomer=new DBECustomer($this);
-            $dbeCustomer->setPKValue( $siteCustomerId);
+        $siteCustomerString = '';
+        $siteCustomerId = $dsUser->getValue(DBEJUser::siteCustId);
+        if (isset($siteCustomerId)) {
+            $dbeCustomer = new DBECustomer($this);
+            $dbeCustomer->setPKValue($siteCustomerId);
             $dbeCustomer->getRow();
-            $siteCustomerString=$dbeCustomer->getValue(DBECustomer::name);
+            $siteCustomerString = $dbeCustomer->getValue(DBECustomer::name);
         }
 
         $this->template->setVar(
@@ -609,9 +623,16 @@ class CTUser extends CTCNC
                 'urlDelete'                                     => $urlDelete,
                 'txtDelete'                                     => $txtDelete,
                 'urlDisplayList'                                => $urlDisplayList,
-                "basedAtCustomerSiteChecked"                    => $this->dsUser->getValue(DBEUser::basedAtCustomerSite) ? 'checked' : null,
-                "basedAtCustomerSiteChecked"                    => $this->dsUser->getValue(DBEUser::basedAtCustomerSite) ? 'checked' : null,
+                "basedAtCustomerSiteChecked"                    => $this->dsUser->getValue(
+                    DBEUser::basedAtCustomerSite
+                ) ? 'checked' : null,
+                "basedAtCustomerSiteChecked"                    => $this->dsUser->getValue(
+                    DBEUser::basedAtCustomerSite
+                ) ? 'checked' : null,
                 'siteCustomerString'                            => $siteCustomerString,
+                'streamOneLicenseManagementChecked'        => Controller::htmlChecked(
+                    $dsUser->getValue(DBEJUser::streamOneLicenseManagement)
+                ),
             )
         );
         // manager selection
@@ -741,10 +762,10 @@ class CTUser extends CTCNC
      */
     function update()
     {
-        $this->setMethodName('update'); 
-              
+        $this->setMethodName('update');
+
         $this->formError = (!$this->dsUser->populateFromArray($this->getParam('user')));
-        
+
         $userData = $this->getParam('user')[1];
         $this->updateEncryptedData($userData, $this->dsUser);
 

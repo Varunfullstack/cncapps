@@ -42,143 +42,54 @@ class CTExpenseDashboard extends CTCNC
 
         switch ($this->getAction()) {
             case "getExpensesData" :
-                // we have to retrieve the data for the user + if the user is someones approver
-
-                $queryString = 'SELECT
-  expense.`exp_expenseno` AS id,
-  CONCAT(
-    consultant.`firstName`,
-    " ",
-    consultant.`lastName`
-  ) AS staffName,
-       
-  consultant.`cns_consno` AS userId,
-  exp_callactivityno AS activityId,
-  callactivity.`caa_problemno` AS serviceRequestId,
-  caa_date as `dateSubmitted`,
-  expensetype.`ext_desc` AS expenseTypeDescription,
-  expense.`exp_expensetypeno` AS expenseTypeId,
-  expense.`exp_value` AS `value`,
-  project.`description` AS projectDescription,
-  project.`projectID` AS projectId,
-  expense.approvedDate,
-       customer.cus_name as customerName,
-  CONCAT(
-    approver.`firstName`,
-    " ",
-    approver.`lastName`
-  ) AS approverName,
-  IF(
-    expense.`approvedBy` is not null,
-    "Approved",
-    IF(
-      expense.`deniedReason` is not null,
-      "Denied",
-      "Pending"
-    )
-  ) AS status,
-       callactivity.caa_consno = ? as isSelf,
-       receipt.id as receiptId,
-       expensetype.receiptRequired,
-         ((SELECT
-        1
-      FROM
-        consultant globalApprovers
-      WHERE globalApprovers.globalExpenseApprover
-        AND globalApprovers.cns_consno = ?) = 1 or consultant.`expenseApproverID` = ?) as isApprover
-FROM
-  expense
-  LEFT JOIN `callactivity`
-    ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
-  LEFT JOIN consultant
-    ON callactivity.`caa_consno` = consultant.`cns_consno`
-      left join receipt on receipt.expenseId = expense.exp_expenseno
-  LEFT JOIN `expensetype`
-    ON `expensetype`.`ext_expensetypeno` = expense.`exp_expensetypeno`
-  LEFT JOIN problem
-    ON problem.`pro_problemno` = callactivity.`caa_problemno`
-  left join ordhead on pro_linked_ordno = ordhead.odh_ordno
-      left join project on project.ordHeadID = ordhead.odh_ordno
-  LEFT JOIN consultant approver
-    ON approver.`cns_consno` = expense.`approvedBy`
-   left join customer on pro_custno = customer.cus_custno
-WHERE 
-      caa_endtime and caa_endtime is not null and
-      (
-    callactivity.`caa_consno` = ?
-    OR consultant.`expenseApproverID` = ?
-    OR ((SELECT 1 FROM consultant globalApprovers WHERE globalApprovers.globalExpenseApprover AND globalApprovers.cns_consno = ?) = 1 AND consultant.`activeFlag` = "Y")
-  )
-  AND exp_exported_flag <> "Y" ';
 
                 $offset = $_REQUEST['start'];
                 $limit = $_REQUEST['length'];
-
-                $parameters = [
-                    ["type" => "i", "value" => $this->userID],
-                    ["type" => "i", "value" => $this->userID],
-                    ["type" => "i", "value" => $this->userID],
-                    ["type" => "i", "value" => $this->userID],
-                    ["type" => "i", "value" => $this->userID],
-                    ["type" => "i", "value" => $this->userID],
-                ];
-                /** @var dbSweetcode $db */
-                global $db;
-                $countResult = $db->preparedQuery(
-                    $queryString,
-                    $parameters
-                );
-                $totalCount = $countResult->num_rows;
-
                 $search = $_REQUEST['search']['value'];
-                $filteredCount = $totalCount;
-                if ($search) {
-                    $queryString .= " and (CONCAT(
-    consultant.`firstName`,
-    \" \",
-    consultant.`lastName`
-  )  like ? or problem.`pro_problemno` like ? or expensetype.`ext_desc` like ? or project.`description` like ? or cus_name like ?) ";
-                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
-                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
-                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
-                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
-                    $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
-                    $countResult = $db->preparedQuery(
-                        $queryString,
-                        $parameters
-                    );
-                    $filteredCount = $countResult->num_rows;
-
-                }
-
                 $columns = $_REQUEST['columns'];
                 $order = $_REQUEST['order'];
                 $orderItems = [];
                 foreach ($order as $orderItem) {
-                    $orderItems[] = mysqli_real_escape_string(
-                        $db->link_id(),
-                        "{$columns[$orderItem['column']]['name']} {$orderItem['dir']}"
-                    );
+                    $orderItems[] = [
+                        "name" => $columns[$orderItem['column']]['name'],
+                        "dir"  => $orderItem['dir'],
+                    ];
                 }
-                if (count($orderItems)) {
-                    $queryString .= " order by " . implode(', ', $orderItems);
-                }
-//                echo json_encode($_REQUEST, JSON_NUMERIC_CHECK);
-//                exit;
-                $queryString .= " limit ?, ?";
-                $parameters[] = ["type" => "i", "value" => $offset];
-                $parameters[] = ["type" => "i", "value" => $limit];
-                $result = $db->preparedQuery(
-                    $queryString,
-                    $parameters
-                );
-                $overtimes = $result->fetch_all(MYSQLI_ASSOC);
+                $result = $this->getExpenses($offset, $limit, $search, $orderItems);
                 echo json_encode(
                     [
                         "draw"            => $_REQUEST['draw'],
-                        "recordsTotal"    => $totalCount,
-                        "recordsFiltered" => $filteredCount,
-                        "data"            => $overtimes
+                        "recordsTotal"    => $result['meta']['total'],
+                        "recordsFiltered" => $result['meta']['filtered'],
+                        "data"            => $result['data']
+                    ],
+                    JSON_NUMERIC_CHECK
+                );
+                break;
+            case "getYearToDateExpenses":
+                $engineerId = @$_REQUEST['engineerId'];
+                $orderItems = [
+                    ["name" => "expenseTypeDescription", "dir" => "asc"],
+                    ["name" => "dateSubmitted", "dir" => "asc"]
+                ];
+
+                $startDate = (new DateTime());
+                $endDate = clone $startDate;
+                $startDate->setDate($startDate->format('Y'), 1, 1);
+
+                $result = $this->getExpenses(
+                    null,
+                    null,
+                    null,
+                    $orderItems,
+                    $engineerId,
+                    true,
+                    $startDate,
+                    $endDate
+                );
+                echo json_encode(
+                    [
+                        "data" => $result['data']
                     ],
                     JSON_NUMERIC_CHECK
                 );
@@ -594,10 +505,193 @@ ORDER BY staffName";
                 $this->template->parse('CONTENTS', 'ChangeLog', true);
                 $this->parsePage();
                 break;
+            case 'expensesBreakdownYearToDate':
+                $this->setTemplateFiles(
+                    array('ChangeLog' => 'About.inc')
+                );
+                $this->setPageTitle("Expenses Breakdown Year To Date");
+                $this->template->setVar(
+                    'changeLog',
+                    "<div id='react-expense-breakdown' data-user-id='{$this->getDbeUser()->getValue(DBEUser::userID)}'></div>"
+                );
+                $this->template->parse('CONTENTS', 'ChangeLog', true);
+                $this->template->setVar(
+                    'javaScript',
+                    '
+                    <link rel="stylesheet" href="./css/table.css">
+                    <script src="js/react.development.js" crossorigin></script>
+                    <script src="js/react-dom.development.js" crossorigin></script>
+                    <script type="module" src=\'components/expenseBreakdownYearToDate.js\'></script>
+                '
+                );
+                $this->parsePage();
+                break;
             default:
                 $this->displayReport();
                 break;
         }
+    }
+
+    function getExpenses($offset = 0,
+                         $limit = null,
+                         $searchValue = null,
+                         $order = [],
+                         $engineerId = null,
+                         $exported = false,
+                         DateTimeInterface $startDate = null,
+                         DateTimeInterface $endDate = null
+    )
+    {
+        $queryString = 'SELECT
+  expense.`exp_expenseno` AS id,
+  CONCAT(
+    consultant.`firstName`,
+    " ",
+    consultant.`lastName`
+  ) AS staffName,
+  exp_mileage as mileage,
+  consultant.`cns_consno` AS userId,
+  exp_callactivityno AS activityId,
+  callactivity.`caa_problemno` AS serviceRequestId,
+  caa_date as `dateSubmitted`,
+  expensetype.`ext_desc` AS expenseTypeDescription,
+  expense.`exp_expensetypeno` AS expenseTypeId,
+  expense.`exp_value` AS `value`,
+  project.`description` AS projectDescription,
+  project.`projectID` AS projectId,
+  expense.approvedDate,
+   customer.cus_name as customerName,
+  CONCAT(
+    approver.`firstName`,
+    " ",
+    approver.`lastName`
+  ) AS approverName,
+  IF(
+    expense.`approvedBy` is not null,
+    "Approved",
+    IF(
+      expense.`deniedReason` is not null,
+      "Denied",
+      "Pending"
+    )
+  ) AS status,
+       callactivity.caa_consno = ? as isSelf,
+       receipt.id as receiptId,
+       expensetype.receiptRequired,
+         ((SELECT
+        1
+      FROM
+        consultant globalApprovers
+      WHERE globalApprovers.globalExpenseApprover
+        AND globalApprovers.cns_consno = ?) = 1 or consultant.`expenseApproverID` = ?) as isApprover
+FROM
+  expense
+  LEFT JOIN `callactivity`
+    ON `callactivity`.`caa_callactivityno` = expense.`exp_callactivityno`
+  LEFT JOIN consultant
+    ON callactivity.`caa_consno` = consultant.`cns_consno`
+      left join receipt on receipt.expenseId = expense.exp_expenseno
+  LEFT JOIN `expensetype`
+    ON `expensetype`.`ext_expensetypeno` = expense.`exp_expensetypeno`
+  LEFT JOIN problem
+    ON problem.`pro_problemno` = callactivity.`caa_problemno`
+  left join ordhead on pro_linked_ordno = ordhead.odh_ordno
+      left join project on project.ordHeadID = ordhead.odh_ordno
+  LEFT JOIN consultant approver
+    ON approver.`cns_consno` = expense.`approvedBy`
+   left join customer on pro_custno = customer.cus_custno
+WHERE 
+      caa_endtime and caa_endtime is not null and
+      (
+    callactivity.`caa_consno` = ?
+    OR consultant.`expenseApproverID` = ?
+    OR ((SELECT 1 FROM consultant globalApprovers WHERE globalApprovers.globalExpenseApprover AND globalApprovers.cns_consno = ?) = 1 AND consultant.`activeFlag` = "Y")
+  ) and (? is not null and callactivity.caa_consno = ? or ? is null ) 
+   ';
+        if ($exported) {
+            $queryString .= " AND exp_exported_flag = 'Y' ";
+        } else {
+            $queryString .= " AND exp_exported_flag <> 'Y' ";
+        }
+
+        $parameters = [
+            ["type" => "i", "value" => $this->userID],
+            ["type" => "i", "value" => $this->userID],
+            ["type" => "i", "value" => $this->userID],
+            ["type" => "i", "value" => $this->userID],
+            ["type" => "i", "value" => $this->userID],
+            ["type" => "i", "value" => $this->userID],
+            ["type" => "i", "value" => $engineerId],
+            ["type" => "i", "value" => $engineerId],
+            ["type" => "i", "value" => $engineerId],
+        ];
+        if ($startDate) {
+            $queryString .= " and caa_date >= ? ";
+            $parameters[] = ["type" => "s", "value" => $startDate->format(DATE_MYSQL_DATE)];
+        }
+
+        if ($endDate) {
+            $queryString .= " and caa_date <= ? ";
+            $parameters[] = ["type" => "s", "value" => $endDate->format(DATE_MYSQL_DATE)];
+        }
+
+        /** @var dbSweetcode $db */
+        global $db;
+        $countResult = $db->preparedQuery(
+            $queryString,
+            $parameters
+        );
+        $totalCount = $countResult->num_rows;
+
+        $search = $searchValue;
+        $filteredCount = $totalCount;
+        if ($search) {
+            $queryString .= " and (CONCAT(
+    consultant.`firstName`,
+    \" \",
+    consultant.`lastName`
+  )  like ? or problem.`pro_problemno` like ? or expensetype.`ext_desc` like ? or project.`description` like ? or cus_name like ?) ";
+            $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
+            $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
+            $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
+            $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
+            $parameters[] = ["type" => "s", "value" => "%" . $search . "%"];
+            $countResult = $db->preparedQuery(
+                $queryString,
+                $parameters
+            );
+            $filteredCount = $countResult->num_rows;
+
+        }
+
+        $orderItems = [];
+        foreach ($order as $orderItem) {
+            $orderItems[] = mysqli_real_escape_string(
+                $db->link_id(),
+                "{$orderItem['name']} {$orderItem['dir']}"
+            );
+        }
+        if (count($orderItems)) {
+            $queryString .= " order by " . implode(', ', $orderItems);
+        }
+        if ($limit) {
+            $queryString .= " limit ?, ?";
+            $parameters[] = ["type" => "i", "value" => $offset];
+            $parameters[] = ["type" => "i", "value" => $limit];
+        }
+        $result = $db->preparedQuery(
+            $queryString,
+            $parameters
+        );
+        $data = $result->fetch_all(MYSQLI_ASSOC);
+        return [
+            "data" => $data,
+            "meta" => [
+                "total"    => $totalCount,
+                "filtered" => $filteredCount,
+            ]
+
+        ];
     }
 
     /**

@@ -9,6 +9,7 @@ require_once($cfg["path_dbe"] . "/DBEQuotation.inc.php");
 require_once($cfg["path_dbe"] . "/DBESalesOrderDocument.inc.php");
 require_once($cfg["path_dbe"] . "/DBESignableEnvelope.inc.php");
 require_once($cfg["path_bu"] . "/BUSalesOrder.inc.php");
+
 use Psr\Log\LoggerInterface;
 
 class SignableSignedQuoteDownload implements SignableProcess
@@ -57,16 +58,36 @@ class SignableSignedQuoteDownload implements SignableProcess
         $dbeSalesDocument->insertRow();
 
         //we have to send a notification to the contact that created the document
-        $senderEmail = CONFIG_SUPPORT_EMAIL;
         $userToNotify = $dbeQuotation->getValue(\DBEQuotation::userID);
         $dbeUser = new \DBEUser($this);
         $dbeUser->getRow($userToNotify);
-        $buMail = new \BUMail($this);
-        $toEmail = $dbeUser->getValue(\DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
-
         $customerID = $dbeOrdHead->getValue(\DBEOrdhead::customerID);
         $dbeCustomer = new \DBECustomer($this);
         $dbeCustomer->getRow($customerID);
+        $this->sendNotificationEmail($dbeUser, $dbeCustomer, $dbeQuotation);
+        // we have to check if anybody else is monitoring the Sales Order this document is attached to
+        global $db;
+
+        $result = $db->preparedQuery(
+            "select userId from salesOrderMonitor where salesOrderId = ?",
+            [["type" => "i", "value" => $dbeOrdHead->getValue(\DBEOrdhead::ordheadID)]]
+        );
+        while ($row = $result->fetch_assoc()) {
+            if ($row['userId'] == $userToNotify) {
+                continue;
+            }
+            $dbeUser->getRow($row['userId']);
+            $this->sendNotificationEmail($dbeUser, $dbeCustomer, $dbeQuotation);
+        }
+
+    }
+
+    function sendNotificationEmail($dbeUser, $dbeCustomer, $dbeQuotation)
+    {
+        $senderEmail = CONFIG_SUPPORT_EMAIL;
+        $buMail = new \BUMail($this);
+        $toEmail = $dbeUser->getValue(\DBEUser::username) . '@' . CONFIG_PUBLIC_DOMAIN;
+        // we have to check if anybody else is monitoring the Sales Order this document is attached to
         $subject = "Quote {$dbeQuotation->getValue(\DBEQuotation::ordheadID)} for {$dbeCustomer->getValue(\DBECustomer::name)} has been signed";
 
         $hdrs = array(

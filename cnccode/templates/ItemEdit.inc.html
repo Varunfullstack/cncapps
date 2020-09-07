@@ -177,6 +177,19 @@
             </td>
         </tr>
         <tr>
+            <td class="promptText">Old Part Number</td>
+            <td class="field">
+                <input
+                        type="text"
+                        name="item[1][partNoOld]"
+                        value="{partNoOld}"
+                        align="left"
+                        size="30"
+                        maxlength="30"
+                > <font class="formErrorMessage">{partNoOldMessage}</font>
+            </td>
+        </tr>
+        <tr>
             <td class="promptText">Serial No Required</td>
             <td class="field">
                 <input type="checkbox"
@@ -302,6 +315,21 @@
                                name="item[1][allowSRLog]"
                                value="1"
                                {allowSRLog}
+                        >
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top"
+                class="promptText"
+            >Item is linked to StreamOne
+            </td>
+            <td>
+                <span class="field">
+						<input type="checkbox"
+                               name="item[1][isStreamOne]"
+                               value="1"
+                               {isStreamOne}
                         >
                 </span>
             </td>

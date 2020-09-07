@@ -30,6 +30,8 @@ class DBEItem extends DBCNCEntity
     const excludeFromPOCompletion = "excludeFromPOCompletion";
     const itemBillingCategoryID = "itemBillingCategoryID";
     const allowSRLog = "allowSRLog";
+    const isStreamOne = "isStreamOne";
+    const partNoOld = "partNoOld";
 
     /**
      * calls constructor()
@@ -171,6 +173,18 @@ class DBEItem extends DBCNCEntity
             DA_NOT_NULL,
             null,
             false
+        );
+        $this->addColumn(
+            self::isStreamOne,
+            DA_BOOLEAN,
+            DA_ALLOW_NULL,
+            "isStreamOne"
+        );
+        $this->addColumn(
+            self::partNoOld,
+            DA_STRING,
+            DA_ALLOW_NULL,
+            "partNoOld"
         );
         $this->setPK(0);
         $this->setAddColumnsOff();
@@ -319,6 +333,15 @@ class DBEItem extends DBCNCEntity
 
         $ret = (parent::getRows());
         return $ret;
+    }
+
+    public function getItemsByPartNoOrOldPartNo($sku)
+    {
+        $queryString =
+            "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE 
+                              {$this->getDBColumnName(self::partNo)} = '{$sku}' or {$this->getDBColumnName(self::partNoOld)} = '{$sku}' limit 1";
+        $this->setQueryString($queryString);
+        return parent::getRows();
     }
 
 }

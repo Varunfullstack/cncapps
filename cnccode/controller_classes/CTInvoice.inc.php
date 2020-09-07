@@ -173,7 +173,7 @@ class CTInvoice extends CTCNC
             $cookieVars,
             $cfg
         );
-        $roles = ACCOUNTS_PERMISSION;
+        $roles = SALES_PERMISSION;
         if (!self::hasPermissions($roles)) {
             Header("Location: /NotAllowed.php");
             exit;

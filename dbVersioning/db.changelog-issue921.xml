@@ -60,7 +60,7 @@
         <addForeignKeyConstraint baseTableName="problem"
                                  baseColumnNames="raiseTypeId"
                                  constraintName="fk_proRaiseTypeId"
-                                 referencedTableName="problemRaiseType"
+                                 referencedTableName="raiseTypeId"
                                  referencedColumnNames="id"
                                  onDelete="CASCADE"
         />

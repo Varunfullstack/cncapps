@@ -1,0 +1,34 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="pavwebdev" id="issue861-0">
+        <tagDatabase tag="issue861"/>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue861-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="SRScheduler" columnName="linkedSalesOrderId"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="SRScheduler">
+            <column name="linkedSalesOrderId" type="int(11)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="pavwebdev" id="issue861-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="SRScheduler"
+                                            foreignKeyName="FK-SRScheduler-linkedSalesOrderId"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="SRScheduler" baseColumnNames="linkedSalesOrderId"
+                                 constraintName="FK-SRScheduler-linkedSalesOrderId"
+                                 referencedTableName="ordhead"
+                                 referencedColumnNames="odh_ordno" onUpdate="CASCADE" onDelete="CASCADE"/>
+    </changeSet>
+
+
+</databaseChangeLog>

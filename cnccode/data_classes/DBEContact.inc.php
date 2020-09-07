@@ -911,7 +911,7 @@ WHERE {$this->getDBColumnName(self::supportLevel)} is not null
         $queryString =
             "SELECT " . $this->getDBColumnNamesAsString() .
             " FROM " . $this->getTableName() .
-            " where specialAttentionContactFlag = 'Y' and active and
+            " where specialAttentionContactFlag = 'Y' and active
       ORDER BY con_custno, con_contno";
 
         $this->setQueryString($queryString);

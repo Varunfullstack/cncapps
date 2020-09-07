@@ -406,7 +406,22 @@ class CTCNC extends Controller
 
 
         if ($this->hasPermissions(SALES_PERMISSION)) {
-            $menu->addSection("Sales", 'fa-tag', $this->getDefaultSalesMenu());
+            $menu->addSection("Sales", 'fa-tag', $this->getDefaultSalesMenu());            
+            $this->addConditionalMenu(
+                $menu,
+                'fa-tag',
+                "Sales",
+                $this->dbeUser->getValue(DBEUser::streamOneLicenseManagement) == 1,
+                313,
+                "StreamOne Licenses",
+                "CustomerLicenses.php?action=searchCustomers"
+            );
+            
+            // [
+            //     "id"    => 312,
+            //     "label" => "StreamOne Licenses",
+            //     "href"  => "CustomerLicenses.php?action=searchCustomers",
+            // ],
         }
 
         $this->addConditionalMenu(
@@ -457,7 +472,7 @@ class CTCNC extends Controller
             $menu,
             'fa-user-circle',
             $this->getDbeUser()->getValue(DBEUser::name),
-             true,
+            true,
             1001,
             "Expenses/Overtime",
             "ExpenseDashboard.php"
@@ -739,6 +754,11 @@ class CTCNC extends Controller
     {
         return [
             [
+                "id"    => 701,
+                "label" => "Invoices",
+                "href"  => "Invoice.php",
+            ],
+            [
                 "id"    => 301,
                 "label" => "Sales Orders",
                 "href"  => "SalesOrder.php",
@@ -793,6 +813,12 @@ class CTCNC extends Controller
                 "label" => "Quote Templates",
                 "href"  => "QuoteTemplates.php",
             ],
+            
+            // [
+            //     "id"    => 313,
+            //     "label" => "TechData Orders",
+            //     "href"  => "CustomerLicenses.php?action=searchOrders",
+            // ],
         ];
     }
 
@@ -944,11 +970,6 @@ class CTCNC extends Controller
     private function getDefaultAccountsMenu()
     {
         return [
-            [
-                "id"    => 701,
-                "label" => "Invoices",
-                "href"  => "Invoice.php",
-            ],
             [
                 "id"    => 702,
                 "label" => "Purchase Invoice Auth",
@@ -1172,35 +1193,34 @@ class CTCNC extends Controller
         return $this->dbeUser->getValue(DBEUser::createRenewalSalesOrdersFlag) == 'Y';
     }
 
-    protected function fetchAll($query,$params)
+    protected function fetchAll($query, $params)
     {
         $db = new PDO(
             'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8',
             DB_USER,
             DB_PASSWORD
         );
-        $stmt=$db->prepare($query,$params);
-        foreach($params as $key=>$value)
-        {
-            if(($params[ $key]!=null||$params[ $key]=='0')&&is_numeric($params[ $key]))
-            {
-                $params[ $key]=(int)$params[ $key];
-                $stmt->bindParam($key,  $params[ $key],PDO::PARAM_INT);
-            }
-            else
-                $stmt->bindParam($key,  $params[ $key]);
+        $stmt = $db->prepare($query, $params);
+        foreach ($params as $key => $value) {
+            if (($params[$key] != null || $params[$key] == '0') && is_numeric($params[$key])) {
+                $params[$key] = (int)$params[$key];
+                $stmt->bindParam($key, $params[$key], PDO::PARAM_INT);
+            } else
+                $stmt->bindParam($key, $params[$key]);
         }
         $stmt->execute();
-        $result=$stmt->fetchAll(PDO::FETCH_ASSOC);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
 
-    protected function console_log($output, $with_script_tags = true) {
+    protected function console_log($output, $with_script_tags = true)
+    {
         $js_code = 'console.log(' . json_encode($output, JSON_HEX_TAG) .
-    ');';
+            ');';
         if ($with_script_tags) {
             $js_code = '<script>' . $js_code . '</script>';
         }
         echo $js_code;
     }
+    
 }

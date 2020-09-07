@@ -70,6 +70,7 @@ class DBEUser extends DBEntity
     const sendEmailWhenAssignedService = "sendEmailAssignedService";
     const basedAtCustomerSite = "basedAtCustomerSite";
     const siteCustId = "siteCustId";
+    const streamOneLicenseManagement = "streamOneLicenseManagement";
 
     /**
      * calls constructor()
@@ -366,7 +367,11 @@ class DBEUser extends DBEntity
             DA_YN,
             DA_NOT_NULL
         );
-
+        $this->addColumn(
+            self::streamOneLicenseManagement,
+            DA_BOOLEAN,
+            DA_NOT_NULL
+        );        
         $this->addColumn(
             self::expenseApproverID,
             DA_ID,
@@ -526,6 +531,17 @@ class DBEUser extends DBEntity
             " WHERE " . $this->getDBColumnName(
                 self::activeFlag
             ) . " = 'Y' and  ";
+        $this->setQueryString($query);
+        return parent::getRows();
+    }
+
+    public function getApprovalSubordinates($superiorId)
+    {
+        $query = "SELECT {$this->getDBColumnNamesAsString()} FROM {$this->getTableName()} WHERE {$this->getDBColumnName(self::activeFlag)} = 'Y' 
+            and  
+            (select 1 from {$this->getTableName()} where {$this->getDBColumnName(self::globalExpenseApprover)} 
+                                 and {$this->getDBColumnName(self::userID)} = {$superiorId}
+                ) = 1 or {$this->getDBColumnName(self::expenseApproverID)} = {$superiorId} order by cns_name";
         $this->setQueryString($query);
         return parent::getRows();
     }

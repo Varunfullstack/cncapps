@@ -8,6 +8,38 @@ This project changes will be shown here.
 - Issue 914 - Customer Page Customer Notes, Projects, Portal Documents Rewrite
 - Issue 915 - Customer Page Sites Rewrite
 
+## [v4.3.1] - 2020-08-03
+### Fixed
+- Fixed Issues with StreamOne licenses
+
+## [v4.3.0] - 2020-07-31
+### Added
+- Issue 951 - Expenses Breakdown Year to Date
+- Issue 861 - Scheduled requests to have option of being linked to a Sales Order
+- Issue 890 - Monitor Sales Order to get notifications when it's signed.
+### Changed
+- Issue 938 - Increase number of favourites in menu
+- Issue 950 - Include team in time allocation
+- Issue 939 - Sortable SR Scheduler Columns
+- Issue 945 - Move Invoices menu to Sales
+- Issue 947 - Creating new customers, set SLA as required fields
+- Issue 943 - Remove drives under 1 GB from Customer Review Meeting Agenda
+- Issue 940 - Include Signable instructions in quote email body
+### Fixed
+- Issue 933 - User Time Logs sometimes showing as holiday
+- Fix issue with pending leavers process not using the new "active" field for contacts
+
+## [v4.2.7] - 2020-07-29
+### Fixed
+- Fixed SpecialAttentionCustomersReport.php not loading
+
+## [v4.2.6] - 2020-07-27
+### Fixed
+- Overtime flag incorrectly being carried forward.
+
+## [v4.2.5] - 2020-07-17
+### Fixed
+- Fixed issue with contracts not showing
 
 ## [v4.2.4] - 2020-07-16
 ### Fixed
@@ -43,6 +75,8 @@ This project changes will be shown here.
 - Issue 924 - Add Fix SLA to customer page
 - Issue 921 - Record the source of a SR, phone, email or portal
 - Issue 895 - Leased line contract expiry notification
+- Issue 539 - Office 365 license API with Techdata
+
 ### Changed
 - Issue 818 - Confirm Report Logic / calculations
 - Issue 925 - Improve Double Quote handling in passwords fields

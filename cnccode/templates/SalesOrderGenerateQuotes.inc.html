@@ -94,7 +94,7 @@
         </td>
     </tr>
     <tr>
-        <td width="100%"
+        <td width="50%"
             valign="top"
         >
             <table class="singleBorder"
@@ -123,6 +123,7 @@
                                 Upload Manual Quote
                             </div>
                         </td>
+
                     </tr>
                     <tr>
                         <td class="promptText">File</td>
@@ -145,6 +146,46 @@
                         </td>
                     </tr>
                 </form>
+            </table>
+        </td>
+        <td width="50%">
+            <script>
+                function toggleMonitor() {
+                    const toggleURL = new URL(location.href);
+                    toggleURL.searchParams.append('action', 'toggleSOMonitor');
+                    toggleURL.searchParams.append('salesOrderId', {ordheadID});
+                    fetch(toggleURL.toString())
+                }
+            </script>
+
+            <table class="singleBorder"
+                   width="100%"
+                   border="0"
+                   cellspacing="2"
+                   cellpadding="0"
+            >
+
+                <tr>
+                    <td valign="top"
+                        class="listHeadText"
+                    >
+                        <div align="center"
+                             style="white-space: nowrap"
+                        >
+                            Monitor This Sales Order
+                        </div>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td>
+                        <input name="monitor"
+                               type="checkbox"
+                               {monitorChecked}
+                               onchange="toggleMonitor()"
+                        >
+                    </td>
+                </tr>
             </table>
         </td>
     </tr>

@@ -718,11 +718,15 @@ class BUPDFSalesQuote extends Business
       ';
         // Send email with attachment
         $message .= '<P>' . $dbeQuotation->getValue(DBEQuotation::salutation) . '</P>';
-        $message .= '<P>Please find attached a quotation for your attention.</P>';
-        $message .= '<P>If you have any questions please do not hesitate to contact us.</P>';
-
         if ($dbeQuotation->getValue(DBEQuotation::documentType) == 'order form') {
+            $message .= '<P>Please find attached a quotation for your attention.</P>';
+            $message .= '<P>If you have any questions please do not hesitate to contact us.</P>';
             $message .= ' To allow us to process your order please complete, sign and return at your earliest convenience';
+        } else {
+            $apiURL = API_URL . "/acceptQuotation?code={$dbeQuotation->getValue(DBEQuotation::confirmCode)}";
+            $message .= "
+            <p>With reference to your recent enquiry, I have great pleasure in providing you with the following prices.
+             Full details are attached or click on <a href='{$apiURL}'>this link</a> to receive the electronic quote to sign.</p>";
         }
 
         $message .= '<P>Regards,</P>';
