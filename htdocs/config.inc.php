@@ -1280,7 +1280,7 @@ define(
     17540
 );
 define(
-    'CONFIG_SERVERCARE_ITEMID',
+    'CONFIG_SERVERCARE_ITEMTYPEID',
     55
 );
 define(
