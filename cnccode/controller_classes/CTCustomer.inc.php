@@ -991,8 +991,8 @@ class CTCustomer extends CTCNC
                 $buCustomer->getCustomersByNameMatch($dsResult, null, null, $term);
                 while ($dsResult->fetchNext()) {
                     $customers[] = [
-                        "id"   => $dsResult->getValue(DBECustomer::customerID),
-                        "name" => $dsResult->getValue(DBECustomer::name),
+                        "id"             => $dsResult->getValue(DBECustomer::customerID),
+                        "name"           => $dsResult->getValue(DBECustomer::name),
                         "streamOneEmail" => $dsResult->getValue(DBECustomer::streamOneEmail),
                     ];
                 }
@@ -1120,9 +1120,13 @@ class CTCustomer extends CTCNC
                     'id'                  => $portalDocuments->getValue(
                         DBEPortalCustomerDocument::portalCustomerDocumentID
                     ),
-                    'description'         => $portalDocuments->getValue(DBEPortalCustomerDocumentWithoutFile::description),
+                    'description'         => $portalDocuments->getValue(
+                        DBEPortalCustomerDocumentWithoutFile::description
+                    ),
                     'filename'            => $portalDocuments->getValue(DBEPortalCustomerDocumentWithoutFile::filename),
-                    'customerContract'    => $portalDocuments->getValue(DBEPortalCustomerDocumentWithoutFile::customerContract),
+                    'customerContract'    => $portalDocuments->getValue(
+                        DBEPortalCustomerDocumentWithoutFile::customerContract
+                    ),
                     'mainContactOnlyFlag' => $portalDocuments->getValue(
                             DBEPortalCustomerDocument::mainContactOnlyFlag
                         ) === 'Y'
@@ -1130,8 +1134,6 @@ class CTCustomer extends CTCNC
         }
         return $documents;
     }
-
-
 
 
     /**
@@ -1690,15 +1692,10 @@ class CTCustomer extends CTCNC
             'CustomerEditSimple.inc'
         );
 
-        $this->template->setVar(
-            'javaScript',
-            "<script src='components/customerEditMain/dist/CustomerEditMain.js?version=1.0.0'></script>
-            <script src='components/customerEditMain/dist/CustomerReviewComponent.js?version=1.0.0'></script>
-            <script src='components/customerEditMain/dist/CustomerNotesComponent.js?version=1.0.0'></script>
-            <script src='components/customerEditMain/dist/CustomerProjectsComponent.js?version=1.0.0'></script>
-            <script src='components/customerEditMain/dist/CustomerPortalDocumentsComponent.js?version=1.0.0'></script>
-            <script src='components/customerEditMain/dist/CustomerSitesComponent.js?version=1.0.0'></script>"
-        );
+//        $this->template->setVar(
+//            'javaScript',
+//            "<script src='/components/customerEditMain/dist/CustomerEditComponent.js?version=1.0.0'></script>"
+//        );
 
 // Parameters
         $title = "Customer - " . $this->dsCustomer->getValue(DBECustomer::name);
@@ -3112,6 +3109,18 @@ class CTCustomer extends CTCNC
         return $this->buCustomer->removeSupportForAllUsersAndReferCustomer($customerID);
     }
 
+    function getCurrentUser()
+    {
+        return json_encode(
+            [
+                'firstName' => $this->dbeUser->getValue(DBEJUser::firstName),
+                'lastName'  => $this->dbeUser->getValue(DBEJUser::lastName),
+                'id'        => $this->dbeUser->getValue(DBEJUser::userID),
+                'email'     => $this->dbeUser->getEmail()
+            ]
+        );
+    }
+
     /**
      * Get and parse contact drop-down selector
      * @access private
@@ -3200,14 +3209,5 @@ class CTCustomer extends CTCNC
         } else {
             $this->displayEditForm();
         }
-    }
-    function getCurrentUser()
-    {
-        return json_encode( [
-            'firstName' => $this->dbeUser->getValue(DBEJUser::firstName),
-            'lastName' => $this->dbeUser->getValue(DBEJUser::lastName),
-            'id' => $this->dbeUser->getValue(DBEJUser::userID),
-            'email' => $this->dbeUser->getEmail()
-        ]);
     }
 }

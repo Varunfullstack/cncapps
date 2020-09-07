@@ -170,8 +170,3 @@ class CustomerReviewComponent extends React.Component {
 }
 
 export default CustomerReviewComponent;
-
-document.addEventListener('DOMContentLoaded', () => {
-    const domContainer = document.querySelector('#reactCustomerReviewSection');
-    ReactDOM.render(React.createElement(CustomerReviewComponent, {customerID: domContainer.dataset.customerId}), domContainer);
-});

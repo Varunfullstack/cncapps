@@ -10,7 +10,6 @@ import {
     savedSiteData,
     toggleVisibility
 } from "./actions";
-import ReactDOM from 'react-dom';
 import ToggleSwitch from "./dumbComponents/ToggleSwitch";
 
 const store = configureStore();
@@ -70,17 +69,3 @@ export default class CustomerSitesComponent extends Component {
         )
     }
 }
-document.addEventListener('DOMContentLoaded', () => {
-    const domContainer = document.querySelector('#reactCustomerSites');
-    ReactDOM.render(
-        React.createElement(
-            CustomerSitesComponent,
-            {
-                customerId: domContainer.dataset.customerId,
-                invoiceSiteNo: domContainer.dataset.invoiceSiteNo,
-                deliverSiteNo: domContainer.dataset.deliverSiteNo
-            }
-        ),
-        domContainer
-    );
-});

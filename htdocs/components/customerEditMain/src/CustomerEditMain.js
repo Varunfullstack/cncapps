@@ -3,7 +3,6 @@ import React from 'react';
 import Select from "./Select";
 import EncryptedTextInput from "./EncryptedTextInput";
 import Skeleton from "react-loading-skeleton";
-import ReactDOM from 'react-dom';
 
 class CustomerEditMain extends React.Component {
     el = React.createElement;
@@ -97,7 +96,7 @@ class CustomerEditMain extends React.Component {
         document.customerMain = this;
     }
 
-    testFunction(){
+    testFunction() {
         console.log('test');
     }
 
@@ -785,9 +784,3 @@ class CustomerEditMain extends React.Component {
 }
 
 export default CustomerEditMain;
-
-document.addEventListener('DOMContentLoaded', () => {
-    const domContainer = document.querySelector('#reactCustomerEditMain');
-    ReactDOM.render(React.createElement(CustomerEditMain, {customerID: domContainer.dataset.customerId}), domContainer);
-});
-
