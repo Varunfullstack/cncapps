@@ -1,6 +1,4 @@
 import React from 'react';
-import Skeleton from "react-loading-skeleton";
-import ReactDOM from 'react-dom';
 import * as HTMLReactParser from 'html-react-parser'
 
 class CustomerPortalDocumentsComponent extends React.Component {
@@ -139,30 +137,137 @@ class CustomerPortalDocumentsComponent extends React.Component {
     }
 
     render() {
-        if (!this.state.loaded) {
-            return this.el(
-                Skeleton,
-                null,
-                'Loading Data'
-            );
-        }
+        return (
+            <div className="tab-pane fade"
+                 id="nav-portal-documents-tab"
+                 role="tabpanel"
+                 aria-labelledby="nav-portal-documents-tab"
+            >
+                <div className="container-fluid mt-3 mb-3">
+                    <div className="row">
+                        <div className="col-md-12">
+                            <h2>Portal Documents</h2>
+                        </div>
+                        <div className="col-md-12">
+                            <button className="btn btn-primary mt-3 mb-3">Add Document
+                            </button>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-md-12">
 
+                            <table className="table table-striped table-bordered"
+                                   width="50%"
+                            >
+                                <thead>
+                                <tr>
+                                    <td>Description</td>
+                                    <td>Files</td>
+                                    <td>Starters Form</td>
+                                    <td>Leavers Form</td>
+                                    <td>Main Contact Only</td>
+                                    <td/>
+                                    <td/>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        {/*<a href="{urlViewFile}"                                                                       title="View attached document"*/}
+                                        {/*>{description}</a>*/}
+                                    </td>
+                                    <td>
+                                        {/*<a href="{urlViewFile}"*/}
+                                        {/*   title="View attached document"*/}
+                                        {/*>{filename}</a>*/}
+                                    </td>
+                                    <td>{startersFormFlag}
+                                    </td>
+                                    <td>{leaversFormFlag}
+                                    </td>
+                                    <td>{mainContactOnlyFlag}
+                                    </td>
 
-        return this.el(
-            'div',
-            {},
-            [
-                this.el(
-                    'a',
-                    {
-                        href: `/PortalCustomerDocument.php?action=add&customerID=${this.props.customerId}`,
-                        key: 'addDocumentLink'
-                    },
-                    'Add document'
-                ),
-                this.renderPortalDocuments()
-            ]
+                                    <td>
+                                        {/*<a href="{urlEditDocument}">*/}
+                                        <button className="btn btn-outline-secondary">
+                                            <i className="fa fa-edit"/>
+                                        </button>
+                                        {/*</a>*/}
+                                    </td>
+                                    <td>
+                                        {/*<a href="{urlDeleteDocument}"*/}
+                                        {/*   title="Delete attached document"*/}
+                                        {/*   onClick="if(!confirm('Are you sure you want to remove this document?')) return(false)"*/}
+                                        {/*>*/}
+                                        <button className="btn btn-outline-danger">
+                                            <i className="fa fa-trash"/>
+                                        </button>
+                                        {/*</a>*/}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <nav aria-label="Page navigation example">
+                                <ul className="pagination justify-content-end">
+                                    <li className="page-item">
+                                        <a className="page-link"
+                                           href="#"
+                                        >Previous</a>
+                                    </li>
+                                    <li className="page-item">
+                                        <a className="page-link"
+                                           href="#"
+                                        >1</a>
+                                    </li>
+                                    <li className="page-item">
+                                        <a className="page-link"
+                                           href="#"
+                                        >2</a>
+                                    </li>
+                                    <li className="page-item">
+                                        <a className="page-link"
+                                           href="#"
+                                        >3</a>
+                                    </li>
+                                    <li className="page-item">
+                                        <a className="page-link"
+                                           href="#"
+                                        >Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
         )
+        // if (!this.state.loaded) {
+        //     return this.el(
+        //         Skeleton,
+        //         null,
+        //         'Loading Data'
+        //     );
+        // }
+        //
+        //
+        // return this.el(
+        //     'div',
+        //     {},
+        //     [
+        //         this.el(
+        //             'a',
+        //             {
+        //                 href: `/PortalCustomerDocument.php?action=add&customerID=${this.props.customerId}`,
+        //                 key: 'addDocumentLink'
+        //             },
+        //             'Add document'
+        //         ),
+        //         this.renderPortalDocuments()
+        //     ]
+        // )
     }
 }
 
