@@ -777,7 +777,8 @@ class CTInvoice extends CTCNC
                             'curUnitSale'    => null,
                             'curCostTotal'   => null,
                             'curSaleTotal'   => null,
-                            'orderLineClass' => 'orderLineComment'
+                            'orderLineClass' => 'orderLineComment',
+                            'sequenceNo'     => $dsInvline->getValue(DBEInvline::sequenceNo),
                         )
                     );
                 } else {
@@ -797,7 +798,8 @@ class CTInvoice extends CTCNC
                             'curCostTotal'   => Controller::formatNumber($curCostTotal),
                             'curUnitSale'    => Controller::formatNumber($dsInvline->getValue(DBEInvline::curUnitSale)),
                             'curSaleTotal'   => Controller::formatNumber($curSaleTotal),
-                            'orderLineClass' => 'orderLineClass'
+                            'orderLineClass' => 'orderLineClass',
+                            'sequenceNo'     => $dsInvline->getValue(DBEInvline::sequenceNo),
                         )
                     );
                 }
@@ -1444,12 +1446,23 @@ class CTInvoice extends CTCNC
      */
     function deleteLine()
     {
+
+        $jsonData = $this->getJSONData();
+
+        if (empty($jsonData['invheadID'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Invoice Head Id required');
+        }
+
+        if (empty($jsonData['sequenceNo'])) {
+            throw new \CNCLTD\Exceptions\JsonHttpException(400, 'Sequence No Required');
+        }
+
         $this->setMethodName('deleteLine');
         $this->buInvoice->deleteLine(
-            $this->getParam('invheadID'),
-            $this->getParam('sequenceNo')
+            $jsonData['invheadID'],
+            $jsonData['sequenceNo']
         );
-        $this->redirectToDisplay($this->getParam('invheadID'));
+        echo json_encode(["status" => "ok"]);
     }
 
     /**

@@ -5,7 +5,69 @@
 {invoiceSiteEditJS}
 <script language='JavaScript'>
 
+
+    function updateSequenceNumbers(items, fromSequenceNo, toSequenceNo) {
+        if (!items.length) {
+            return;
+        }
+        let lowerBound = fromSequenceNo;
+        let upperBound = toSequenceNo;
+        if (lowerBound > upperBound) {
+            upperBound = fromSequenceNo;
+            lowerBound = toSequenceNo;
+        }
+
+        if (upperBound > items.length) {
+            upperBound = items.length;
+        }
+        if (lowerBound < 0) {
+            lowerBound = 0;
+        }
+
+        for (let i = lowerBound - 1; i < upperBound; i++) {
+            items[i].dataset.sequenceNo = (i + 1).toString();
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+        const deleteLineButtons = document.querySelectorAll('button.deleteLineButton');
+        deleteLineButtons.forEach(el => el.addEventListener('click', ($event) => {
+
+                if (!confirm('Are you sure you want to delete this row?')) {
+                    return;
+                }
+
+                const target = $event.target;
+                const row = target.closest('tr');
+
+                const currentSequenceNo = row.dataset.sequenceNo;
+
+                fetch('?action=deleteLine', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        invheadID: {invheadID},
+                        sequenceNo: currentSequenceNo
+                    })
+                })
+                    .then(x => x.json())
+                    .then(res => {
+                        if (res.status !== 'ok') {
+                            throw new Error('Failed to delete row: ' + res.message);
+                        }
+                        const tbody = row.closest('tbody');
+                        row.remove();
+                        updateSequenceNumbers(tbody.children, currentSequenceNo, tbody.childElementCount);
+
+                    })
+                    .catch(error => {
+                        alert(error);
+                        console.error(error)
+                    })
+
+
+            })
+        );
+
         document.getElementById('addNewRowButton').addEventListener('click', $event => {
             open('/Invoice.php?action=addLine&invheadID={invheadID}', '_blank');
         })
@@ -80,6 +142,7 @@
        cellspacing="1"
        cellpadding="2"
 >
+    <thead>
     <tr>
         <td width="260px"
             class="listHeadText"
@@ -110,9 +173,12 @@
         >&nbsp;
         </td>
     </tr>
+    </thead>
+    <tbody>
     <!-- BEGIN invoiceLineBlock -->
     <tr onMouseOver="this.bgColor='#FFFFCC';"
         onMouseOut="this.bgColor='';"
+        data-sequence-no="{sequenceNo}"
     >
         <td class="{orderLineClass}">{lineDescription}</td>
         <td class="{orderLineClass}">
@@ -135,6 +201,8 @@
         </td>
     </tr>
     <!-- END invoiceLineBlock -->
+    </tbody>
+    <tfoot>
     <tr onMouseOver="this.bgColor='#FFFFCC';"
         onMouseOut="this.bgColor='';"
     >
@@ -152,6 +220,7 @@
         </td>
         <td class="orderTotalItem">&nbsp;</td>
     </tr>
+    </tfoot>
 </table>
 <BR>
 <table class="singleBorder"
